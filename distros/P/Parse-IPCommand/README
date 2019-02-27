@@ -1,0 +1,103 @@
+NAME
+    Parse::IPCommand - List network interfaces from "ip addr show" output
+
+VERSION
+    This document describes version 0.001 of Parse::IPCommand (from Perl
+    distribution Parse-IPCommand), released on 2019-02-26.
+
+SYNOPSIS
+     use Parse::IPCommand qw(
+         parse_ip_addr_show
+         list_network_interfaces
+     );
+
+     my $res = parse_ip_addr_show(output => scalar `ip addr show`);
+
+DESCRIPTION
+FUNCTIONS
+  list_network_interfaces
+    Usage:
+
+     list_network_interfaces(%args) -> [status, msg, payload, meta]
+
+    List network interfaces from "ip addr show" output.
+
+    If "output" is not specified, will run '/sbin/ip addr show' to get the
+    output.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   output => *str*
+
+        Output of command.
+
+        This function only parses program's output. You need to invoke "ip"
+        command on your own.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  parse_ip_addr_show
+    Usage:
+
+     parse_ip_addr_show(%args) -> [status, msg, payload, meta]
+
+    Parse the output of "ip addr show" command.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   output* => *str*
+
+        Output of command.
+
+        This function only parses program's output. You need to invoke "ip"
+        command on your own.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Parse-IPCommand>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Parse-IPCommand>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-IPCommand>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

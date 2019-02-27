@@ -1,3 +1,12 @@
+0.103   2019-02-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq version Getopt::Long 0 -> 2.50 because
+	  versions between 2.43 (inclusive) and 2.50 (exclusive) is
+	  incompatible with us [RT#128643] [thanks Eric 'ikegami' Brine].
+
+
 0.102   2017-08-12 (PERLANCAR)
 
 	- Comment-out Log::ger because we broke

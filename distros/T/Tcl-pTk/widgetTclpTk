@@ -1,6 +1,8 @@
-#!/usr/local/bin/perl -w
+#!/usr/local/bin/perl
 
 use 5.008;
+use warnings;
+use strict;
 use Config;
 use Tcl::pTk qw/:perlTk/;
 use lib Tcl::pTk->findINC( 'demos/widget_lib' );
@@ -14,7 +16,6 @@ use vars qw/ $MW $FONT $WIDTRIB /;
 use vars qw/ $CODE $CODE_RERUN $CODE_TEXT $VARS $VIEW $VIEW_TEXT /;
 use vars qw/ $ALIGN $BRAKES $LIGHTS $OIL $SOBER $TRANS $WIPERS /;
 use vars qw/ $COLOR $FONT_STYLE $POINT_SIZE $DEMO_FILE %DEMO_DESCRIPTION /;
-use strict;
 
 
 $MW = MainWindow->new;
@@ -418,7 +419,7 @@ sub invoke {
 
 sub lsearch {
 
-    # Search the list using the supplied regular expression and return it's
+    # Search the list using the supplied regular expression and return its
     # ordinal, or -1 if not found.
 
     my($regexp, @list) = @_;

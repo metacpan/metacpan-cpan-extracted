@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
-# MANIFEST.SKIP -- my various excluded files
+# MANIFEST.SKIP -- Kevin's various excluded files
 
-# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2015, 2019 Kevin Ryde
 
 # This file is shared among several distributions.
 #
@@ -20,7 +20,7 @@
 # with this file.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# cf. /usr/share/perl/5.10/ExtUtils/MANIFEST.SKIP
+# cf. /usr/share/perl/5.14/ExtUtils/MANIFEST.SKIP
 
 
 # emacs backups
@@ -36,6 +36,8 @@
 \.tar$
 \.tar\.gz$
 \.deb$
+\.dsc$
+\.diff.gz$
 
 # ExtUtils::MakeMaker leaving Makefile.old
 # and "myman" leaving MANIFEST.old
@@ -60,6 +62,8 @@
 
 # built - recent Module::Build nonsense
 ^MYMETA\.yml$
+# built - something recent ExtUtils::MakeMaker
+^MYMETA\.json$
 
 # built - cdbs and debhelper
 ^debian/stamp-
@@ -67,6 +71,10 @@
 
 # built - texinfo.tex temporaries
 \.(aux|cp|cps|fn|fns|ky|log|pg|toc|tp|tps|vr)$
+# built - PGF temporary
+\.pgf$
+# tex or latex output, not distributed for now
+\.(dvi|pdf|ps)$
 
 # toplevel .c files built from .xs
 ^[^/]+\.c$
@@ -86,9 +94,6 @@
 
 # built - toplevel html pages
 ^[a-zA-Z][^./]+\.html$
-
-# cpantesters reports
-^msg\d*\.html$
 
 # inc/MyMakefileExtras.pm "diff-prev"
 ^diff\.tmp
@@ -124,8 +129,6 @@ devel/h2xs/TestConstFoo/
 ^devel/invisible-blank$
 # special case x'or executables
 ^devel/gtk-gc-colour$
-# special case m-i executables
-^devel/gen-bits$
 # special case combo executables
 ^devel/toolbutton-overflow-leak$
 # special case xpother executables
@@ -139,6 +142,18 @@ devel/h2xs/TestConstFoo/
 
 # special htmlext environs
 ^test-dist/
+
+# TeX
+_whizzy.*
+\.aux$
+\.dvi$
+\.fls$
+\.log$
+\.out$
+\.pdf$
+\.waux$
+\.wdvi$
+\.fdb_latexmk$
 
 
 \.junk$

@@ -11,7 +11,7 @@ Installation is simple:
   make test
   make install
 
-Copyright 2016, FileDir, All Rights Reserved.
+Copyright 2019, AppAgg, All Rights Reserved.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

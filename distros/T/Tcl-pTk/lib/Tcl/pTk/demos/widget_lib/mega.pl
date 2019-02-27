@@ -1,7 +1,9 @@
 # mega.pl
 
-use vars qw / $TOP /;
+use warnings;
 use strict;
+
+use vars qw / $TOP /;
 
 sub mega {
 

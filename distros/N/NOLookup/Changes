@@ -1,5 +1,12 @@
 Revision history for Perl extension NOLookup
 
+1.15 2019-02-25
+
+     - Support NOLookup::Brreg::DataLookup version accept_header
+       request, ref.
+       https://data.brreg.no/enhetsregisteret/api/docs/index.html#versjonering
+       Use versioning to be sure the API does not change.
+     
 1.14 2019-02-05
 
      - Added NOLookup::Brreg::DataLookup::lookup_update_dates()

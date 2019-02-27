@@ -1,6 +1,6 @@
 ;;; chartprog.el --- stock quotes using Chart.
 
-;; Copyright 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+;; Copyright 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 ;; Author: Kevin Ryde <user42_kevin@yahoo.com.au>
 ;; Keywords: comm, finance
@@ -1012,7 +1012,7 @@ terminal with `\\[chartprog-watchlist-detail]'."
           buffer-read-only t
           chartprog-watchlist-current-symlist 'favourites)
     (chartprog-header-line-scrolling
-     "Symbol       bid/offer     last  change    low    high    volume   when   note")
+     "Symbol       Bid/Offer     Last  Change    Low    High    Volume   When   Note")
 
     (set (make-local-variable 'mode-line-buffer-identification)
          (append (default-value 'mode-line-buffer-identification)

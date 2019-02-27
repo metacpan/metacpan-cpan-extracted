@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -30,14 +30,14 @@ Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5), perl (>= 5.10), libtest-more-perl | perl (>= 5.6.2)
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
-Standards-Version: 3.9.5
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/file-locate-iterator/index.html
 Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libfile-locate-iterator-perl
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
-Depends: perl (>= 5.6), libconstant-defer-perl, libfile-fnmatch-perl, libscalar-list-utils-perl | perl-modules (>= 5.8), ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Depends: perl (>= 5.6), libconstant-defer-perl, libfile-fnmatch-perl, libscalar-list-utils-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
 Recommends: libfile-map-perl (>= 0.35)
 Suggests: libiterator-perl, libiterator-simple-perl, libmoosex-iterator-perl
 Description: Read a "locate" database file with an iterator

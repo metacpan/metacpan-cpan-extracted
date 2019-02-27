@@ -2,7 +2,7 @@ package Plack::Middleware::Session;
 use strict;
 use warnings;
 
-our $VERSION   = '0.30';
+our $VERSION   = '0.32';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Plack::Util;
@@ -253,7 +253,7 @@ of the module per-request.  The following sub-keys exist:
 
 =item I<change_id>
 
-If set to a true value, forces the session identifier to change.  This
+If set to a true value, forces the session identifier to change (rotate).  This
 should always be done after logging in, to prevent session fixation
 attacks from subdomains; see
 L<http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking>
@@ -266,7 +266,7 @@ the state in the client.
 =item I<no_store>
 
 If set to a true value, no changes made to the session in this request
-will be saved to the store.  Either L</expire> and I</change_id> take
+will be saved to the store.  Either L</expire> and L</change_id> take
 precedence over this, as both need to update the session store.
 
 =item I<late_store>

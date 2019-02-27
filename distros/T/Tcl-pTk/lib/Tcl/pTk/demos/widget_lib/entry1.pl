@@ -1,5 +1,8 @@
 # entry1.pl
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub entry1 {

@@ -1,5 +1,8 @@
 # button.pl
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub button {

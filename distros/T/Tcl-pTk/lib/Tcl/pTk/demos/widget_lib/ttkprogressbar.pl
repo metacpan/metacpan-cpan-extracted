@@ -1,5 +1,8 @@
 # Demo of tile widget
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub ttkprogressbar{
@@ -14,7 +17,7 @@ sub ttkprogressbar{
         );
 
         my $msg = $TOP->ttkLabel( -text => 
-                "Below are two progress bars. The top one is a \u201Cdeterminate\u201D progress bar, which is used for showing how far through a defined task the program has got. The bottom one is an \u201Cindeterminate\u201D progress bar, which is used to show that the program is busy but does not know how long for. Both are run here in self-animated mode, which can be turned on and off using the buttons underneath.",
+                "Below are two progress bars. The top one is a \x{201C}determinate\x{201D} progress bar, which is used for showing how far through a defined task the program has got. The bottom one is an \x{201C}indeterminate\x{201D} progress bar, which is used to show that the program is busy but does not know how long for. Both are run here in self-animated mode, which can be turned on and off using the buttons underneath.",
         qw/ -wraplength 4i -justify left/)->pack(-side => 'top', -fill => 'x');
          
         my $frame = $TOP->ttkFrame()->pack(-fill => 'both', -expand => 1);

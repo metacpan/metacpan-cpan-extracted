@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-GD.
 #
@@ -23,7 +23,7 @@ use warnings;
 use Carp;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 15;
+$VERSION = 16;
 
 use Image::Base 1.12; # version 1.12 for ellipse() $fill
 @ISA = ('Image::Base');
@@ -99,10 +99,10 @@ sub set {
 
   # these not documented yet ...
   if (exists $param{'-interlaced'}) {
-    $self->{'gd'}->interlaced (delete $param{'-interlaced'});
+    $self->{'-gd'}->interlaced (delete $param{'-interlaced'});
   }
   if (exists $param{'-truecolor'}) {
-    my $gd = $self->{'gd'};
+    my $gd = $self->{'-gd'};
     if (delete $param{'-truecolor'}) {
       if (! $gd->isTrueColor) {
         die "How to turn palette into truecolor?";
@@ -433,6 +433,9 @@ sub diamond {
   }
 }
 
+#------------------------------------------------------------------------------
+# colours
+
 sub add_colours {
   my $self = shift;
   ### add_colours: @_
@@ -458,7 +461,7 @@ sub add_colours {
 
     } else {
       my @rgb = _colour_to_rgb255($colour);
-      if ($gd->can('colorExact')  # not available in Image::WMF
+      if ($gd->can('colorExact')  # not available in Image::WMF pre 1.03
           && $gd->colorExact(@rgb) != -1) {
         ### already exists: $gd->colorExact(@rgb)
         next;
@@ -525,6 +528,8 @@ sub colour_to_index {
 
 sub _colour_to_rgb255 {
   my ($colour) = @_;
+
+  # 1 to 4 digit hex
   # Crib: [:xdigit:] matches some wide chars, but hex() as of perl 5.12.4
   # doesn't accept them, so only 0-9A-F
   if ($colour =~ /^#(([0-9A-F]{3}){1,4})$/i) {
@@ -534,6 +539,7 @@ sub _colour_to_rgb255 {
             substr ($colour, 1+$len, $len),
             substr ($colour, -$len));
   }
+
   require GD::Simple;
   if (defined (my $aref = GD::Simple->color_names->{lc($colour)})) {
     ### table: $aref
@@ -612,18 +618,18 @@ And read-only,
     xbm
 
 PNG, JPEG and XPM are available if libgd is compiled with the respective
-support libraries.  GIF may not be available if the Perl C<GD> interface was
+support libraries.  GIF will be unavailable if the Perl C<GD> interface was
 built with its option to disable GIF.
 
 C<load()> auto-detects the file format and calls the corresponding
-C<newFromPng()> etc.  "gd" format differs between libgd 1.x and 2.x.  libgd
-2.x can load the 1.x format, but always writes 2.x so that's what C<save()>
-here gives.  Both "gd" formats are a byte dump mainly intended for temporary
-files.
+C<newFromPng()> etc.  "gd" file format differs between libgd 1.x and 2.x.
+libgd 2.x can load the 1.x format, but always writes 2.x so that's what
+C<save()> here gives.  Both "gd" formats are a byte dump mainly intended for
+temporary files.
 
 WBMP is a bitmap format and is treated by GD as colours black "#000000" for
-0 and white "#FFFFFF" for 1.  On save any non-black is treated as white so 1
-too, but it's probably not a good idea to depend on that.
+0 and white "#FFFFFF" for 1.  On save any non-black is treated as white 1
+too, but not sure that's a documented feature.
 
 =head2 Other GD Modules
 
@@ -793,8 +799,8 @@ Putting colour "None" into pixels requires GD "alpha blending" turned off.
 C<Image::Base::GD> turns off blending for GD objects it creates, but
 currently if you pass in a C<-gd> then you must set the blending yourself if
 you're going to use None.  Is that the best way?  The ideal might be to save
-and restore while drawing None, but there's no apparent way to read back the
-blending setting out of a GD to later restore.  Or maybe turn blending off
+and restore blending while drawing None, but there's no apparent way to read
+back the blending out of a GD to later restore.  Or maybe turn blending off
 and leave it off on first drawing any None.
 
 =head1 SEE ALSO
@@ -814,7 +820,7 @@ http://user42.tuxfamily.org/image-base-gd/index.html
 
 =head1 LICENSE
 
-Image-Base-GD is Copyright 2010, 2011, 2012 Kevin Ryde
+Image-Base-GD is Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 Image-Base-GD is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

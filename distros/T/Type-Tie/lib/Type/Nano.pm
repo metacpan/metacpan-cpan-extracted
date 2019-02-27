@@ -8,7 +8,7 @@ use Scalar::Util ();
 package Type::Nano;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.013';
+our $VERSION   = '0.014';
 our @ISA       = qw( Exporter::Tiny );
 our @EXPORT_OK = qw(
 	Any Defined Undef Ref ArrayRef HashRef CodeRef Object Str Bool Num Int Object
@@ -242,22 +242,45 @@ sub get_message { # Type::API::Constraint
 # Overloading
 #
 
-no strict 'refs'; # avoid loading overload.pm
-*{__PACKAGE__ . '::(('} = sub {};
-*{__PACKAGE__ . '::()'} = sub {};
-*{__PACKAGE__ . '::()'} = do { my $x = 1; \$x };
-*{__PACKAGE__ . '::(bool'} = sub { 1 };
-*{__PACKAGE__ . '::(""'} = sub { shift->{name} };
-*{__PACKAGE__ . '::(&{}'} = sub {
-	my $self = shift;
-	sub {
-		my ($value) = @_;
-		$self->check($value) or do {
-			require Carp;
-			Carp::croak($self->get_message($value));
+{
+	my $nil = sub {};
+	sub _install_overloads
+	{
+		no strict 'refs';
+		no warnings 'redefine', 'once';
+		if ($] < 5.010) {
+			require overload;
+			push @_, fallback => 1;
+			goto \&overload::OVERLOAD;
 		};
-	};
-};
+		my $class = shift;
+		*{$class . '::(('} = sub {};
+		*{$class . '::()'} = sub {};
+		*{$class . '::()'} = do { my $x = 1; \$x };
+		while (@_)
+		{
+			my $f = shift;
+			#*{$class . '::(' . $f} = $nil; # cargo culting overload.pm
+			#*{$class . '::(' . $f} = shift;
+			*{$class . '::(' . $f} = ref $_[0] ? shift : do { my $m = shift; sub { shift->$m(@_) } };
+		}
+	}
+}
+
+__PACKAGE__ ->_install_overloads(
+	'bool'  => sub { 1 },
+	'""'    => sub { shift->{name} },
+	'&{}'   => sub {
+		my $self = shift;
+		sub {
+			my ($value) = @_;
+			$self->check($value) or do {
+				require Carp;
+				Carp::croak($self->get_message($value));
+			};
+		};
+	},
+);
 
 1;
 

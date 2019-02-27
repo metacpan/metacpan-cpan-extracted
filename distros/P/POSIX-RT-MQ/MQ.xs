@@ -22,10 +22,12 @@ MQ_OPEN_MAX()
     PREINIT:
         int val=-1;
     CODE:
+	errno = 0;
 #ifdef  _SC_MQ_OPEN_MAX
         val = sysconf(_SC_MQ_OPEN_MAX);
 #endif
-        if (val==-1) not_here("MQ_OPEN_MAX"); 
+	/* if errno is still 0 the limit is indeterminate */
+        if (errno && val==-1) not_here("MQ_OPEN_MAX"); 
         RETVAL=val;
     OUTPUT:
         RETVAL
@@ -35,10 +37,12 @@ MQ_PRIO_MAX()
     PREINIT:
         int val=-1;
     CODE:
+	errno = 0;
 #ifdef _SC_MQ_PRIO_MAX
         val = sysconf(_SC_MQ_PRIO_MAX);
 #endif
-        if (val==-1) not_here("MQ_PRIO_MAX");
+	/* if errno is still 0 the limit is indeterminate */
+        if (errno && val==-1) not_here("MQ_PRIO_MAX");
         RETVAL=val;
     OUTPUT:
         RETVAL

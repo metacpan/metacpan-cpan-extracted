@@ -1,4 +1,5 @@
-use Mojo::Base -strict;
+use warnings;
+use strict;
 
 use Test::More;
 

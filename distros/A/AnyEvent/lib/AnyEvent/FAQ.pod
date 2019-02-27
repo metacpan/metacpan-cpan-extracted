@@ -2,6 +2,8 @@
 
 AnyEvent::FAQ - frequently asked questions
 
+=head1 FAQs
+
 The newest version of this document can be found at
 L<http://pod.tst.eu/http://cvs.schmorp.de/AnyEvent/lib/AnyEvent/FAQ.pod>.
 

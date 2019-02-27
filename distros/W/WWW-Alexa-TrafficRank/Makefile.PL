@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME         => 'WWW::Alexa::TrafficRank',
-    AUTHOR       => 'FileDir <guruperl@cpan.org>',
+    AUTHOR       => 'AppAgg <guruperl@cpan.org>',
     VERSION_FROM => 'lib/WWW/Alexa/TrafficRank.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
       ? ('LICENSE'=> 'perl')

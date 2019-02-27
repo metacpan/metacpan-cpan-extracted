@@ -252,6 +252,12 @@ sub request_identical_ok {
         };
 
         is_deeply \%got, $res->{headers}, $name;
+
+        # Now, also check that our HTTP::Request looks similar
+        my $http_request = $r->as_request;
+        my $payload = $http_request->content;
+
+        is $payload, $r->body || '', "We don't munge the request body";
     };
 
     # Now create a program from the request, run it and check that it still
@@ -268,7 +274,7 @@ sub request_identical_ok {
     };
 };
 
-plan tests => 0+@tests*2;
+plan tests => 0+@tests*3;
 
 for my $test ( @tests ) {
     request_identical_ok( $test );

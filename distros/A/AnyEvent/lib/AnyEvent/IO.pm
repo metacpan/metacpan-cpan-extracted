@@ -6,7 +6,7 @@ AnyEvent::IO - the DBI of asynchronous I/O implementations
 
    use AnyEvent::IO;
 
-   # load /etc/passwd, call clalback with the file data when done.
+   # load /etc/passwd, call callback with the file data when done.
    aio_load "/etc/passwd", sub {
       my ($data) = @_
          or return AE::log error => "/etc/passwd: $!";

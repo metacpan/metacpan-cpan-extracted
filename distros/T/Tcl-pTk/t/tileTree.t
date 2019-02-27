@@ -1,5 +1,8 @@
 # Demo of tile widget
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 
 use Test;
@@ -50,7 +53,7 @@ my @data = (
     );
 
 
-$style = $tree->cget(-style);
+my $style = $tree->cget(-style);
 my $font = $tree->ttkStyleLookup( $style, -font);
 
 ## Code to insert the data nicely

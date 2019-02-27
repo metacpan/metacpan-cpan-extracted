@@ -1,5 +1,8 @@
 # Form, window management by Tix->form.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 
 my $Main = MainWindow->new();

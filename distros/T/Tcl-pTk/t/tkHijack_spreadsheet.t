@@ -1,6 +1,10 @@
 
 # This test case checks for a specific problem found using TableMatrix::Spreadsheet and TkHijack
 #   Before this bug was fixed, the TableMatrix module would get loaded twice, causing problems
+
+use warnings;
+use strict;
+
 use Tcl::pTk::TkHijack;
 
 use Test;

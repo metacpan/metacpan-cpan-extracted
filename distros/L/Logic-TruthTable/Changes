@@ -1,5 +1,12 @@
 Revision history for Boolean-TruthTable
 
+1.02
+     2019 February 26
+	- A hash-dereference syntax I used in fncolumn() was apparently
+	  introduced at around version 5.20ish of perl. Since I have
+	  the minimum perl limit set to 5.16, I'm hearing about it from
+	  CPAN testers. Mohammad S Anwar (MANWAR) submitted a one-line
+	  patch that should fix this; lets see.
 1.01
      2019 February 18
 	- So many typos.

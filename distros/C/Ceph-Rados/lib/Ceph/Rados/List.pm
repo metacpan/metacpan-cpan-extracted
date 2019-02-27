@@ -35,14 +35,14 @@ Ceph::Rados::List - Perl wrapper to librados IO context.
 
 =head2 next()
 
-Wraps C<rados_objects_list_next()>.  Returns the next entry (object ID) and increments the list pointer
+Wraps C<rados_nobjects_list_next()>.  Returns the next entry (object ID) and increments the list pointer
 
 =head2 pos()
 
-Wraps C<rados_objects_list_get_pg_hash_position()>.  Returns the current list pointer.
+Wraps C<rados_nobjects_list_get_pg_hash_position()>.  Returns the current list pointer.
 
 =head2 seek(pos)
 
-Wraos C<rados_objects_list_seek()>.  Sets the current list pointer.
+Wraos C<rados_nobjects_list_seek()>.  Sets the current list pointer.
 
 =cut

@@ -1,5 +1,14 @@
 Revision history for LWP-Authen-OAuth2
 
+0.16    2019-02-25T21:39:03
+    - remove useless links to search.cpan.org (Thomas Klausner)
+    - add Michael Stevens to thank-you section (Thomas Klausner)
+    - Add new Yahoo ServiceProvider. (Michael Stevens)
+    - Make "make test" actually find all the tests. (Michael Stevens)
+    - Update github repo link to point to domm not btilly. (Michael Stevens)
+    - MANIFEST fixes (Thomas Klausner)
+
+
 0.15	2018-10-31T17:54:15
     - Update to match CPAN (Colin Newell)
     - Add license file (eadjei)

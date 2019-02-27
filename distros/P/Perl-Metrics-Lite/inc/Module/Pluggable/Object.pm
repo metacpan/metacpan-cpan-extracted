@@ -5,12 +5,27 @@ use strict;
 use File::Find ();
 use File::Basename;
 use File::Spec::Functions qw(splitdir catdir curdir catfile abs2rel);
-use Carp qw(croak carp);
+use Carp qw(croak carp confess);
 use Devel::InnerPackage;
-use Data::Dumper;
-use vars qw($VERSION);
+use vars qw($VERSION $MR);
 
-$VERSION = '3.6';
+use if $] > 5.017, 'deprecate';
+
+$VERSION = '5.2';
+
+BEGIN {
+    eval {  require Module::Runtime };
+    unless ($@) {
+        Module::Runtime->import('require_module');
+    } else {
+        *require_module = sub {
+            my $module = shift;
+            my $path   = $module . ".pm";
+            $path =~ s{::}{/}g;
+            require $path;
+        };
+    }
+}
 
 
 sub new {
@@ -21,96 +36,137 @@ sub new {
 
 }
 
+### Eugggh, this code smells 
+### This is what happens when you keep adding patches
+### *sigh*
+
 
 sub plugins {
-        my $self = shift;
+    my $self = shift;
+    my @args = @_;
 
-        # override 'require'
-        $self->{'require'} = 1 if $self->{'inner'};
+    # override 'require'
+    $self->{'require'} = 1 if $self->{'inner'};
 
-        my $filename   = $self->{'filename'};
-        my $pkg        = $self->{'package'};
+    my $filename   = $self->{'filename'};
+    my $pkg        = $self->{'package'};
 
-        # automatically turn a scalar search path or namespace into a arrayref
-        for (qw(search_path search_dirs)) {
-            $self->{$_} = [ $self->{$_} ] if exists $self->{$_} && !ref($self->{$_});
+    # Get the exception params instantiated
+    $self->_setup_exceptions;
+
+    # automatically turn a scalar search path or namespace into a arrayref
+    for (qw(search_path search_dirs)) {
+        $self->{$_} = [ $self->{$_} ] if exists $self->{$_} && !ref($self->{$_});
+    }
+
+    # default search path is '<Module>::<Name>::Plugin'
+    $self->{'search_path'} ||= ["${pkg}::Plugin"]; 
+
+    # default error handler
+    $self->{'on_require_error'} ||= sub { my ($plugin, $err) = @_; carp "Couldn't require $plugin : $err"; return 0 };
+    $self->{'on_instantiate_error'} ||= sub { my ($plugin, $err) = @_; carp "Couldn't instantiate $plugin: $err"; return 0 };
+
+    # default whether to follow symlinks
+    $self->{'follow_symlinks'} = 1 unless exists $self->{'follow_symlinks'};
+
+    # check to see if we're running under test
+    my @SEARCHDIR = exists $INC{"blib.pm"} && defined $filename && $filename =~ m!(^|/)blib/! && !$self->{'force_search_all_paths'} ? grep {/blib/} @INC : @INC;
+
+    # add any search_dir params
+    unshift @SEARCHDIR, @{$self->{'search_dirs'}} if defined $self->{'search_dirs'};
+
+    # set our @INC up to include and prefer our search_dirs if necessary
+    my @tmp = @INC;
+    unshift @tmp, @{$self->{'search_dirs'} || []};
+    local @INC = @tmp if defined $self->{'search_dirs'};
+
+    my @plugins = $self->search_directories(@SEARCHDIR);
+    push(@plugins, $self->handle_inc_hooks($_, @SEARCHDIR)) for @{$self->{'search_path'}};
+    push(@plugins, $self->handle_innerpackages($_)) for @{$self->{'search_path'}};
+    
+    # return blank unless we've found anything
+    return () unless @plugins;
+
+    # remove duplicates
+    # probably not necessary but hey ho
+    my %plugins;
+    for(@plugins) {
+        next unless $self->_is_legit($_);
+        $plugins{$_} = 1;
+    }
+
+    # are we instantiating or requiring?
+    if (defined $self->{'instantiate'}) {
+        my $method = $self->{'instantiate'};
+        my @objs   = ();
+        foreach my $package (sort keys %plugins) {
+            next unless $package->can($method);
+            my $obj = eval { $package->$method(@_) };
+            $self->{'on_instantiate_error'}->($package, $@) if $@;
+            push @objs, $obj if $obj;           
         }
+        return @objs;
+    } else { 
+        # no? just return the names
+        my @objs= sort keys %plugins;
+        return @objs;
+    }
+}
 
+sub _setup_exceptions {
+    my $self = shift;
 
+    my %only;   
+    my %except; 
+    my $only;
+    my $except;
 
-
-        # default search path is '<Module>::<Name>::Plugin'
-        $self->{'search_path'} = ["${pkg}::Plugin"] unless $self->{'search_path'}; 
-
-
-        #my %opts = %$self;
-
-
-        # check to see if we're running under test
-        my @SEARCHDIR = exists $INC{"blib.pm"} && $filename =~ m!(^|/)blib/! ? grep {/blib/} @INC : @INC;
-
-        # add any search_dir params
-        unshift @SEARCHDIR, @{$self->{'search_dirs'}} if defined $self->{'search_dirs'};
-
-
-        my @plugins = $self->search_directories(@SEARCHDIR);
-
-        # push @plugins, map { print STDERR "$_\n"; $_->require } list_packages($_) for (@{$self->{'search_path'}});
+    if (defined $self->{'only'}) {
+        if (ref($self->{'only'}) eq 'ARRAY') {
+            %only   = map { $_ => 1 } @{$self->{'only'}};
+        } elsif (ref($self->{'only'}) eq 'Regexp') {
+            $only = $self->{'only'}
+        } elsif (ref($self->{'only'}) eq '') {
+            $only{$self->{'only'}} = 1;
+        }
+    }
         
-        # return blank unless we've found anything
-        return () unless @plugins;
 
-
-        # exceptions
-        my %only;   
-        my %except; 
-        my $only;
-        my $except;
-
-        if (defined $self->{'only'}) {
-            if (ref($self->{'only'}) eq 'ARRAY') {
-                %only   = map { $_ => 1 } @{$self->{'only'}};
-            } elsif (ref($self->{'only'}) eq 'Regexp') {
-                $only = $self->{'only'}
-            } elsif (ref($self->{'only'}) eq '') {
-                $only{$self->{'only'}} = 1;
-            }
+    if (defined $self->{'except'}) {
+        if (ref($self->{'except'}) eq 'ARRAY') {
+            %except   = map { $_ => 1 } @{$self->{'except'}};
+        } elsif (ref($self->{'except'}) eq 'Regexp') {
+            $except = $self->{'except'}
+        } elsif (ref($self->{'except'}) eq '') {
+            $except{$self->{'except'}} = 1;
         }
+    }
+    $self->{_exceptions}->{only_hash}   = \%only;
+    $self->{_exceptions}->{only}        = $only;
+    $self->{_exceptions}->{except_hash} = \%except;
+    $self->{_exceptions}->{except}      = $except;
         
+}
 
-        if (defined $self->{'except'}) {
-            if (ref($self->{'except'}) eq 'ARRAY') {
-                %except   = map { $_ => 1 } @{$self->{'except'}};
-            } elsif (ref($self->{'except'}) eq 'Regexp') {
-                $except = $self->{'except'}
-            } elsif (ref($self->{'except'}) eq '') {
-                $except{$self->{'except'}} = 1;
-            }
-        }
+sub _is_legit {
+    my $self   = shift;
+    my $plugin = shift;
+    my %only   = %{$self->{_exceptions}->{only_hash}||{}};
+    my %except = %{$self->{_exceptions}->{except_hash}||{}};
+    my $only   = $self->{_exceptions}->{only};
+    my $except = $self->{_exceptions}->{except};
+    my $depth  = () = split '::', $plugin, -1;
 
+    return 0 if     (keys %only   && !$only{$plugin}     );
+    return 0 unless (!defined $only || $plugin =~ m!$only!     );
 
-        # remove duplicates
-        # probably not necessary but hey ho
-        my %plugins;
-        for(@plugins) {
-            next if (keys %only   && !$only{$_}     );
-            next unless (!defined $only || m!$only! );
+    return 0 if     (keys %except &&  $except{$plugin}   );
+    return 0 if     (defined $except &&  $plugin =~ m!$except! );
+    
+    return 0 if     defined $self->{max_depth} && $depth>$self->{max_depth};
+    return 0 if     defined $self->{min_depth} && $depth<$self->{min_depth};
 
-            next if (keys %except &&  $except{$_}   );
-            next if (defined $except &&  m!$except! );
-            $plugins{$_} = 1;
-        }
-
-        # are we instantiating or requring?
-        if (defined $self->{'instantiate'}) {
-            my $method = $self->{'instantiate'};
-            return map { ($_->can($method)) ? $_->$method(@_) : () } keys %plugins;
-        } else { 
-            # no? just return the names
-            return keys %plugins;
-        }
-
-
+    return 1;
 }
 
 sub search_directories {
@@ -122,7 +178,6 @@ sub search_directories {
     foreach my $dir (@SEARCHDIR) {
         push @plugins, $self->search_paths($dir);
     }
-
     return @plugins;
 }
 
@@ -152,6 +207,8 @@ sub search_paths {
             # parse the file to get the name
             my ($name, $directory, $suffix) = fileparse($file, $file_regex);
 
+            next if (!$self->{include_editor_junk} && $self->_is_editor_junk($name));
+
             $directory = abs2rel($directory, $sp);
 
             # If we have a mixed-case package name, assume case has been preserved
@@ -168,7 +225,7 @@ sub search_paths {
                     next if ($in_pod || $line =~ /^=cut/);  # skip pod text
                     next if $line =~ /^\s*#/;               # and comments
                     if ( $line =~ m/^\s*package\s+(.*::)?($name)\s*;/i ) {
-                        @pkg_dirs = split /::/, $1;
+                        @pkg_dirs = split /::/, $1 if defined $1;;
                         $name = $2;
                         last;
                     }
@@ -193,29 +250,64 @@ sub search_paths {
             }
             my $plugin = join '::', $searchpath, @dirs, $name;
 
-            next unless $plugin =~ m!(?:[a-z\d]+)[a-z\d]!i;
+            next unless $plugin =~ m!(?:[a-z\d]+)[a-z\d]*!i;
 
-            my $err = $self->handle_finding_plugin($plugin);
-            carp "Couldn't require $plugin : $err" if $err;
-             
-            push @plugins, $plugin;
+            $self->handle_finding_plugin($plugin, \@plugins)
         }
 
         # now add stuff that may have been in package
         # NOTE we should probably use all the stuff we've been given already
         # but then we can't unload it :(
-        push @plugins, $self->handle_innerpackages($searchpath) unless (exists $self->{inner} && !$self->{inner});
+        push @plugins, $self->handle_innerpackages($searchpath);
     } # foreach $searchpath
 
     return @plugins;
 }
 
-sub handle_finding_plugin {
-    my $self   = shift;
-    my $plugin = shift;
+sub _is_editor_junk {
+    my $self = shift;
+    my $name = shift;
 
-    return unless (defined $self->{'instantiate'} || $self->{'require'}); 
-    $self->_require($plugin);
+    # Emacs (and other Unix-y editors) leave temp files ending in a
+    # tilde as a backup.
+    return 1 if $name =~ /~$/;
+    # Emacs makes these files while a buffer is edited but not yet
+    # saved.
+    return 1 if $name =~ /^\.#/;
+    # Vim can leave these files behind if it crashes.
+    return 1 if $name =~ /\.sw[po]$/;
+
+    return 0;
+}
+
+sub handle_finding_plugin {
+    my $self    = shift;
+    my $plugin  = shift;
+    my $plugins = shift;
+    my $no_req  = shift || 0;
+    
+    return unless $self->_is_legit($plugin);
+    unless (defined $self->{'instantiate'} || $self->{'require'}) {
+        push @$plugins, $plugin;
+        return;
+    } 
+
+    $self->{before_require}->($plugin) || return if defined $self->{before_require};
+    unless ($no_req) {
+        my $tmp = $@;
+        my $res = eval { require_module($plugin) };
+        my $err = $@;
+        $@      = $tmp;
+        if ($err) {
+            if (defined $self->{on_require_error}) {
+                $self->{on_require_error}->($plugin, $err) || return; 
+            } else {
+                return;
+            }
+        }
+    }
+    $self->{after_require}->($plugin) || return if defined $self->{after_require};
+    push @$plugins, $plugin;
 }
 
 sub find_files {
@@ -231,7 +323,8 @@ sub find_files {
     { # for the benefit of perl 5.6.1's Find, localize topic
         local $_;
         File::Find::find( { no_chdir => 1, 
-                           wanted => sub { 
+                            follow   => $self->{'follow_symlinks'}, 
+                            wanted   => sub { 
                              # Inlined from File::Find::Rule C< name => '*.pm' >
                              return unless $File::Find::name =~ /$file_regex/;
                              (my $path = $File::Find::name) =~ s#^\\./##;
@@ -244,33 +337,40 @@ sub find_files {
 
 }
 
+sub handle_inc_hooks {
+    my $self      = shift;
+    my $path      = shift;
+    my @SEARCHDIR = @_;
+
+    my @plugins;
+    for my $dir ( @SEARCHDIR ) {
+        next unless ref $dir && eval { $dir->can( 'files' ) };
+
+        foreach my $plugin ( $dir->files ) {
+            $plugin =~ s/\.pm$//;
+            $plugin =~ s{/}{::}g;
+            next unless $plugin =~ m!^${path}::!;
+            $self->handle_finding_plugin( $plugin, \@plugins );
+        }
+    }
+    return @plugins;
+}
+
 sub handle_innerpackages {
     my $self = shift;
+    return () if (exists $self->{inner} && !$self->{inner});
+
     my $path = shift;
     my @plugins;
 
-
     foreach my $plugin (Devel::InnerPackage::list_packages($path)) {
-        my $err = $self->handle_finding_plugin($plugin);
-        #next if $err;
-        #next unless $INC{$plugin};
-        push @plugins, $plugin;
+        $self->handle_finding_plugin($plugin, \@plugins, 1);
     }
     return @plugins;
 
 }
 
-
-sub _require {
-    my $self = shift;
-    my $pack = shift;
-    local $@;
-    eval "CORE::require $pack";
-    return $@;
-}
-
-
 1;
 
-#line 320
+#line 428
 

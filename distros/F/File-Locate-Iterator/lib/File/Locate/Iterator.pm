@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde.
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019 Kevin Ryde.
 #
 # This file is part of File-Locate-Iterator.
 #
@@ -18,14 +18,14 @@
 
 
 # Maybe:
-#     ignore_case
+#     ignore_case      globs and suffixes, not easily done to regexs
 #     glob_ignore_case
 #     suffix_ignore_case
 #
 
 
 package File::Locate::Iterator;
-use 5.006;  # for qr//, and open anon handles
+use 5.006;  # for qr//, and open anonymous handles
 use strict;
 use warnings;
 use Carp;
@@ -33,7 +33,7 @@ use Carp;
 use DynaLoader;
 our @ISA = ('DynaLoader');
 
-our $VERSION = 23;
+our $VERSION = 26;
 
 # uncomment this to run the ### lines
 #use Devel::Comments;
@@ -505,28 +505,27 @@ Locate databases normally hold filenames as a way of finding files by name
 faster than searching through all directories.  Optional glob, suffix and
 regexp options on the iterator can restrict the entries returned.
 
-See F<examples/native.pl> in the File-Locate-Iterator sources for a simple
-sample read, or F<examples/mini-locate.pl> for a whole locate program
-simulation.
+See F<examples/native.pl> for a simple sample read, or
+F<examples/mini-locate.pl> for a whole program like the real C<locate>.
 
-Only "LOCATE02" format files are supported, as per current versions of GNU
+Only "LOCATE02" format files are supported, per current versions of GNU
 C<locate>, not the previous "slocate" format.
 
 Iterators from this module are stand-alone, they don't need any of the
 various Perl iterator frameworks.  But see L<Iterator::Locate>,
 L<Iterator::Simple::Locate> and L<MooseX::Iterator::Locate> to inter-operate
-with those frameworks.  Those frameworks include ways to grep, map and
-otherwise manipulate iterations.
+with those others.  Those frameworks include ways to grep, map and otherwise
+manipulate iterations.
 
 =head2 Forks and Threads
 
 If an iterator using a file handle is cloned to a new thread or a process
 level C<fork()> then generally it can be used by the parent or the child but
 not both.  The underlying file descriptor position is shared by parent and
-child, so when one of them reads it upsets the position for the other.  This
-sort of thing affects almost all code working with file handles across
-C<fork()> and threads.  Perhaps some thread C<CLONE> code could let threads
-work correctly (but slower), but a C<fork()> is probably doomed.
+child, so when one of them reads it will upset the position for the other.
+This sort of thing affects almost all code working with file handles across
+C<fork()> and threads.  Perhaps some thread C<CLONE> code here could let
+threads work correctly (but slower), but a C<fork()> is probably doomed.
 
 Iterators using C<mmap> work correctly for both forks and threads, except
 that the size calculation and sharing for C<if_sensible> is not thread-aware
@@ -539,7 +538,7 @@ Under taint mode (see L<perlsec/Taint mode>), strings read from a file or
 file handle are always tainted, the same as other file input.  Taintedness
 of a C<database_str> string propagates to the entry strings returned.
 
-For C<database_str_ref> the initial taintedness of the database string
+For C<database_str_ref>, the initial taintedness of the database string
 propagates to the entries.  If you untaint it during iteration then
 subsequent entries returned are still tainted because they may depend on the
 data back from when the input was tainted.  A C<rewind()> will reset to the
@@ -606,7 +605,7 @@ to act on a given scalar without copying,
     $it = File::Locate::Iterator->new
             (database_str_ref => \$str);
 
-For C<database_str_ref> if the originating scalar is tied or has other magic
+For C<database_str_ref>, if the underlying scalar is tied or has other magic
 then that is re-run for each access, in the usual way.  This might be a good
 thing, or you might prefer the copying of C<database_str> in that case.
 
@@ -649,8 +648,8 @@ its strings and patterns.
 Whether to use C<mmap()> to access the database.  C<mmap> is fast and
 resource-efficient, when available.  To use mmap you must have the
 C<File::Map> module (version 0.38 or higher), the file must fit in available
-address space, and for a C<database_fh> handle there mustn't be any
-transforming C<PerlIO> layers.  The C<use_mmap> choices are
+address space, and if a C<database_fh> handle then no transforming C<PerlIO>
+layers.  The C<use_mmap> choices are
 
     undef           \
     "default"       | use mmap if sensible
@@ -672,7 +671,7 @@ When multiple iterators access the same file they share the mmap.  The size
 check for C<if_sensible> counts space in all distinct
 C<File::Locate::Iterator> mappings and won't go beyond 1/5 of available data
 space.  Data space is assumed to be a quarter of the wordsize, so for a
-32-bit system a net mmap total at most 200Mb.
+32-bit system an mmap total at most 200Mb.
 
 C<if_possible> and C<if_sensible> both only mmap ordinary files because
 generally the file size on char specials is not reliable.
@@ -717,8 +716,8 @@ Rewind C<$it> back to the start of the database.  The next C<$it-E<gt>next>
 call will return the first entry.
 
 This is only possible when the underlying database file or handle is
-seekable, ie. C<seek()> works, which will usually mean a plain file, or
-PerlIO layers with seek support.
+seekable, ie. C<seek()> works.  This means a plain file, or a seekable char
+special, or PerlIO layers with seek support.
 
 =back
 
@@ -746,11 +745,11 @@ Default locate database, if C<LOCATE_PATH> environment variable not set.
 
 C<File::Locate> reads a locate database with callbacks instead.  Whether you
 want callbacks or an iterator is generally a matter of personal preference.
-Iterators let you write your own loop and can have multiple searches in
+Iterators let you write your own loop, and can have multiple searches in
 progress simultaneously.
 
 The speed of an iterator is about the same as callbacks when
-C<File::Locate::Iterator> is built with its XSUB code (which requires Perl
+C<File::Locate::Iterator> is built with its XS code (which requires Perl
 5.10.0 or higher currently).
 
 Iterators are good for cooperative coroutining like C<POE> or C<Gtk> where
@@ -763,7 +762,7 @@ If you have the recommended C<File::Map> module then iterators share an
 C<mmap()> of the database file.  Otherwise the database file is a separate
 open handle in each iterator, meaning a file descriptor and PerlIO buffering
 each.  Sharing a handle and having each seek to its desired position would
-be possible, but a seek drops buffered data and so would be slower.  Some
+be possible, but a seek drops buffered data so would be slower.  Some
 C<PerlIO> or C<IO::Handle> trickery might transparently share an fd and keep
 buffered blocks from multiple file positions.
 
@@ -777,11 +776,11 @@ L<File::FnMatch>, L<File::Map>
 
 =head1 HOME PAGE
 
-http://user42.tuxfamily.org/file-locate-iterator/index.html
+L<http://user42.tuxfamily.org/file-locate-iterator/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019 Kevin Ryde
 
 File-Locate-Iterator is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

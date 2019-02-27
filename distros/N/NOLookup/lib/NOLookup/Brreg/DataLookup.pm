@@ -9,14 +9,36 @@ use WWW::Mechanize;
 use JSON;
 use URI::Encode qw(uri_encode);
 use Data::Dumper;
+
 $Data::Dumper::Indent=1;
 
 my $BRREG_TIMEOUT = 60; # secs (default is 180 secs but we want shorter time).
 my $MAX_PAGES     = 10;  # max pages to fetch if no max is specified
 my $MAX_SIZE      = 100; # max size to ask for in each request
 
-my $BRREG         = "https://data.brreg.no/enhetsregisteret/api";
-my $BRREG_UPD     = "https://data.brreg.no/enhetsregisteret/api/oppdateringer";
+# API service URLs
+my $BRREG            = "https://data.brreg.no/enhetsregisteret/api";
+my $BRREG_UPD        = "https://data.brreg.no/enhetsregisteret/api/oppdateringer";
+
+###
+# API version selection.
+# It is possible to specify a specific version of the API,
+# and we use that to get a more stable API.
+#
+# Version is signalled by use of the http accept_header in request,
+# with the below header strings. 
+
+my $use_header = 1;    # Set to 0 for no header, 1 to use header
+
+# Only v1 supported for now, as it is the only one that exists.
+my $hver              = "v1"; # Set to "v1" for version 1, etc.
+
+my $AC_COMMON = "application/vnd.brreg.enhetsregisteret";
+    
+my $AC_HEADER_E       = "$AC_COMMON.enhet.$hver+json";
+my $AC_HEADER_UE      = "$AC_COMMON.underenhet.$hver+json";
+my $AC_HEADER_E_UPD   = "$AC_COMMON.oppdatering.enhet.$hver+json";
+my $AC_HEADER_UE_UPD  = "$AC_COMMON.oppdatering.underenhet.$hver+json";
 
 my @module_methods = qw /
 
@@ -49,8 +71,26 @@ __PACKAGE__->mk_accessors(
 );
 
 
-
 ######## L o o k u p
+
+sub _init_lookup {
+    my ($self, $sok_underenheter, $sok_updates) = @_;
+    
+    my $ENHETER   = "enheter";
+    my $AC_HEADER = $AC_HEADER_E;
+    if ($sok_updates) {
+	$AC_HEADER = $AC_HEADER_E_UPD;
+    }
+    if ($sok_underenheter) {
+        $ENHETER   = "under" . $ENHETER;
+	$AC_HEADER = $AC_HEADER_UE;
+	if ($sok_updates) {
+	    $AC_HEADER = $AC_HEADER_UE_UPD;
+	}
+    }
+    return ($ENHETER, $AC_HEADER);
+
+}
 
 sub lookup_orgno {
     my ($self, $orgno, $sok_underenheter) = @_;
@@ -61,22 +101,19 @@ sub lookup_orgno {
 	return 0;
     }
 
-    my $ENHETER="enheter";
-    if ($sok_underenheter) {
-        $ENHETER = "under" . $ENHETER;
-    }
-    
     # validate the organizaton number
     unless ($self->orgno_ok($orgno)) {
-	# errno has been set
+	# errno has already been set
         return $self;
     }
+
+    my ($ENHETER, $AC_HEADER) = $self->_init_lookup($sok_underenheter);
     
     ##
     # Use the orgno as key to brreg.
     # Match is only found if number does exist.
     $self->size(0);
-    $self->_lookup_org_entries("$BRREG/$ENHETER/$orgno");
+    $self->_lookup_org_entries("$BRREG/$ENHETER/$orgno", $AC_HEADER);
 
 }
 
@@ -88,17 +125,15 @@ sub lookup_orgname {
         $self->error(1);
 	return 0;
     }
-    
-    my $ENHETER="enheter";
-    if ($sok_underenheter) {
-        $ENHETER = "under" . $ENHETER;
-    }
+
+    my ($ENHETER, $AC_HEADER) = $self->_init_lookup($sok_underenheter);
+
     # Use the orgname as filter in search to brreg
     my $onm_e = uri_encode($orgname, {encode_reserved => 1});
 
     my $BR = "$BRREG/$ENHETER/?size=$MAX_SIZE&navn=$onm_e";
 
-    $self->_fetch_pages($BR, $max_no_pages, $page_ix);
+    $self->_fetch_pages($BR, $max_no_pages, $page_ix, $AC_HEADER);
 }
 
 sub lookup_reg_dates {
@@ -109,11 +144,8 @@ sub lookup_reg_dates {
 	$self->error(1);
 	return 0;
     }
-    
-    my $ENHETER="enheter";
-    if ($sok_underenheter) {
-        $ENHETER = "under" . $ENHETER;
-    }
+
+    my ($ENHETER, $AC_HEADER) = $self->_init_lookup($sok_underenheter);
     
     # Use the from / to dates as filter for lookup on 
     # registration dates
@@ -132,7 +164,7 @@ sub lookup_reg_dates {
     
     my $BR = "$BRREG/$ENHETER/?size=$MAX_SIZE&$dateFilter";
     
-    $self->_fetch_pages($BR, $max_no_pages, $page_ix);
+    $self->_fetch_pages($BR, $max_no_pages, $page_ix, $AC_HEADER);
 
 }
 
@@ -145,11 +177,8 @@ sub lookup_update_dates {
 	$self->error(1);
 	return 0;
     }
-    
-    my $ENHETER="enheter";
-    if ($sok_underenheter) {
-        $ENHETER = "under" . $ENHETER;
-    }
+
+    my ($ENHETER, $AC_HEADER) = $self->_init_lookup($sok_underenheter, 1);
 
     # Use the from / to dates as filter for lookup on 
     # update date
@@ -166,7 +195,7 @@ sub lookup_update_dates {
     
     my $BR = "$BRREG_UPD/$ENHETER/?size=$MAX_SIZE&$updFilter";
     
-    $self->_fetch_pages($BR, $max_no_pages, $page_ix);
+    $self->_fetch_pages($BR, $max_no_pages, $page_ix, $AC_HEADER);
 
 }
 
@@ -190,10 +219,8 @@ sub orgno_ok {
     return 1;
 }
 
-
-
 sub _fetch_pages {
-    my ($self, $BR, $max_no_pages, $page_ix) = @_;
+    my ($self, $BR, $max_no_pages, $page_ix, $accept_header) = @_;
 	
     # Fetch the requested pages
     # First page is 0
@@ -214,22 +241,29 @@ sub _fetch_pages {
 	# Remember size before next lookup. If size has not increased, stop the loop.
 	$bsize = $self->size;
 
-        $self->_lookup_org_entries("$BR&page=$pix");
+        $self->_lookup_org_entries("$BR&page=$pix", $accept_header);
         ++$pcnt;
 	++$pix;
     }
 }
 
 sub _lookup_org_entries {
-    my ($self, $URL) = @_;
+    my ($self, $URL, $accept_header) = @_;
 
     #print STDERR "URL: $URL\n";
     
     my $mech = WWW::Mechanize->new(
         timeout => $BRREG_TIMEOUT,
-        autocheck => 0
+        autocheck => 0,
         );
-    
+
+    # Specify API version to use
+    #https://data.brreg.no/enhetsregisteret/api/docs/index.html#_hvordan_velger_jeg_versjon
+    if ($use_header) {
+	$mech->add_header( Accept  => $accept_header);
+	$mech->add_header( Charset => "UTF-8");
+    }
+        
     my $resp = $mech->get($URL);
 
     unless ($mech->success) {
@@ -303,6 +337,14 @@ if Brreg lookup is hanging for some reason.
 
 The module provides the below methods.
 
+=head3 _init_lookup
+
+Common init method.
+
+- Set seach URLs.
+- Returns URL and accept header.
+
+    
 =head3 lookup_orgno()
 
 Lookup based on a complete organization number.
@@ -445,4 +487,10 @@ it under the same terms as Perl itself.
 
 =cut
 
+=head1 TODO
+
+Perhaps add an address object to contain the address info.
+
+=cut
+    
 1;

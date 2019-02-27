@@ -20,7 +20,7 @@ open_ctx(io)
   INIT:
     New( 0, ctx, 1, rados_list_ctx_t );
   CODE:
-    err = rados_objects_list_open(io, &ctx);
+    err = rados_nobjects_list_open(io, &ctx);
     if (err < 0)
         croak("cannot open object list: %s", strerror(-err));
     RETVAL = ctx;
@@ -31,7 +31,7 @@ uint32_t
 pos(ctx)
     rados_list_ctx_t ctx
   CODE:
-    RETVAL = rados_objects_list_get_pg_hash_position(ctx);
+    RETVAL = rados_nobjects_list_get_pg_hash_position(ctx);
   OUTPUT:
     RETVAL
 
@@ -40,7 +40,7 @@ seek(ctx, pos)
     rados_list_ctx_t ctx
     uint32_t         pos
   CODE:
-    RETVAL = rados_objects_list_seek(ctx, pos);
+    RETVAL = rados_nobjects_list_seek(ctx, pos);
   OUTPUT:
     RETVAL
 
@@ -50,9 +50,10 @@ next(ctx)
   PREINIT:
     const char *     entry;
     const char *     key;
+    const char *     nspace;
     int              err;
   CODE:
-    err = rados_objects_list_next(ctx, &entry, &key);
+    err = rados_nobjects_list_next(ctx, &entry, &key, &nspace);
     if (err == -ENOENT) {
         RETVAL = &PL_sv_undef;
     } else if (err < 0) {
@@ -67,4 +68,4 @@ void
 close(ctx)
     rados_list_ctx_t ctx
   CODE:
-    rados_objects_list_close(ctx);
+    rados_nobjects_list_close(ctx);

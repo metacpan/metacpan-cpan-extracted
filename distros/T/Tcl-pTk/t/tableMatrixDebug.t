@@ -5,6 +5,8 @@
 ## jeff.hobbs@acm.org
 ##  Converted to perl/tk by John Cerney
 
+use warnings;
+use strict;
 
 use Tcl::pTk;
 use Tcl::pTk::TableMatrix;

@@ -4,6 +4,9 @@
 #  Cloned menus have '#' in the path name.
 
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Test;
 

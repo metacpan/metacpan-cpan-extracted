@@ -1,5 +1,8 @@
 # states.pl
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub states {

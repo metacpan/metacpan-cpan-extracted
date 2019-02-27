@@ -550,7 +550,7 @@ subprocess after C<run_cmd> returns.
 
 Note the the PID might already have been recycled and used by an unrelated
 process at the time C<run_cmd> returns, so it's not useful to send
-signals, use a unique key in data structures and so on.
+signals, use as a unique key in data structures and so on.
 
 =back
 

@@ -1,3 +1,9 @@
+0.11 2019-02-26
+    * Properly handle POST data. The data was previously quoted
+      as if it were to be interpolated into Perl code even when it was
+      handed to ->as_request.
+      Reported by Choroba at https://perlmonks.org/?node_id=1230538
+
 0.10 2019-02-02
     * Handle -k, --insecure
       This is the easy way out of encryption

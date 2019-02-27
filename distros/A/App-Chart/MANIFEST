@@ -713,6 +713,7 @@ unused/CommSec.pm
 unused/Float.pm
 unused/t-tradingroom.pl
 unused/TradingRoom.pm
+unused/YahooOld.pm
 xt/0-desktop-file-validate.t
 xt/0-exe-shebang.t
 xt/0-file-is-part-of.t

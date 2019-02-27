@@ -1,3 +1,6 @@
+use warnings;
+use strict;
+
 #use Tk;
 use Tcl::pTk;
 

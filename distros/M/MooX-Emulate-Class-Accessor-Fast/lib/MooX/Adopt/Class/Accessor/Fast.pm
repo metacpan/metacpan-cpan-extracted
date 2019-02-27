@@ -1,5 +1,5 @@
 package MooX::Adopt::Class::Accessor::Fast;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 $INC{'Class/Accessor/Fast.pm'} = __FILE__;
 
@@ -36,14 +36,8 @@ L<MooX::Emulate::Class::Accessor::Fast> and ultimately, to L<Moo>.
 L<Moo>, L<Class::Accessor>, L<Class::Accessor::Fast>,
 L<MooseX::Emulate::Class::Accessor::Fast>
 
-=head1 AUTHOR
+=head1 AUTHORS AND LICENSE
 
-Aran Clary Deltac <bluefeet@gmail.com>
+See L<MooX::Emulate::Class::Accessor::Fast/AUTHORS>
+and L<MooX::Emulate::Class::Accessor::Fast/LICENSE>.
 
-Original code, tests, and documentation taken from
-L<MooseX::Emulate::Class::Accessor::Fast>.  Thanks!
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.

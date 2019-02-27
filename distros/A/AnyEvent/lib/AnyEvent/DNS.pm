@@ -47,14 +47,29 @@ our @DNS_FALLBACK; # some public dns servers as fallback
 
    my $ipv4 = $prep->(
       ["08080808", "08080404"], # 8.8.8.8, 8.8.4.4 - google public dns
+      ["01010101", "01000001"], # 1.1.1.1, 1.0.0.1 - cloudflare public dns
+      ["50505050", "50505151"], # 80.80.80.80, 80.80.81.81 - freenom.world
 ##      ["d1f40003", "d1f30004"], # v209.244.0.3/4 - resolver1/2.level3.net - status unknown
 ##      ["04020201", "04020203", "04020204", "04020205", "04020206"], # v4.2.2.1/3/4/5/6 - vnsc-pri.sys.gtei.net - effectively public
 ##      ["cdd22ad2", "4044c8c8"], # 205.210.42.205, 64.68.200.200 - cache1/2.dnsresolvers.com - verified public
-#      ["8d010101"], # 141.1.1.1 - cable&wireless - status unknown
+#      ["8d010101"], # 141.1.1.1 - cable&wireless, now vodafone - status unknown
+# 84.200.69.80      # dns.watch
+# 84.200.70.40      # dns.watch
+# 37.235.1.174      # freedns.zone
+# 37.235.1.177      # freedns.zone
+# 213.73.91.35      # dnscache.berlin.ccc.de
+# 194.150.168.168   # dns.as250.net; Berlin/Frankfurt
+# 85.214.20.141     # FoeBud (digitalcourage.de)
+# 77.109.148.136    # privacyfoundation.ch
+# 77.109.148.137    # privacyfoundation.ch
+# 91.239.100.100    # anycast.censurfridns.dk
+# 89.233.43.71      # ns1.censurfridns.dk
+# 204.152.184.76    # f.6to4-servers.net, ISC, USA
    );
 
    my $ipv6 = $prep->(
       ["20014860486000000000000000008888", "20014860486000000000000000008844"], # 2001:4860:4860::8888/8844 - google ipv6
+      ["26064700470000000000000000001111", "26064700470000000000000000001001"], # 2606:4700:4700::1111/1001 - cloudflare dns
    );
 
    undef $ipv4 unless $AnyEvent::PROTOCOL{ipv4};
@@ -412,6 +427,7 @@ our %type_id = (
    mailb => 253,
    "*"   => 255,
    uri   => 256,
+   caa   => 257, # rfc6844
 );
 
 our %type_str = reverse %type_id;
@@ -572,6 +588,7 @@ our %dec_rr = (
     },
     39 => sub { local $ofs = $ofs - length; _dec_name }, # dname
     99 => sub { unpack "(C/a*)*", $_ }, # spf
+   257 => sub { unpack "CC/a*a*", $_ }, # caa
 );
 
 sub _dec_rr {
@@ -620,7 +637,8 @@ Examples:
      'aa' => '',
      'an' => [],
      'rd' => 1,
-     'op' => 'query'
+     'op' => 'query',
+     '__' => '<original dns packet>',
    }
    
    # a successful reply
@@ -649,7 +667,8 @@ Examples:
                [ 'www.l.google.com', 'a', 'in', 3600, '66.249.93.147' ],
              ],
      'rd' => 1,
-     'op' => 0
+     'op' => 0,
+     '__' => '<original dns packet>',
    }
 
 =cut
@@ -662,6 +681,7 @@ sub dns_unpack($) {
    local $ofs = 6 * 2;
 
    {
+      __ => $pkt,
       id => $id,
       qr => ! ! ($flags & 0x8000),
       aa => ! ! ($flags & 0x0400),
@@ -681,6 +701,70 @@ sub dns_unpack($) {
 }
 
 #############################################################################
+
+=back
+
+=head3 Extending DNS Encoder and Decoder
+
+This section describes an I<experimental> method to extend the DNS encoder
+and decoder with new opcode, rcode, class and type strings, as well as
+resource record decoders.
+
+Since this is experimental, it can change, as anything can change, but
+this interface is expe ctedc to be relatively stable and was stable during
+the whole existance of C<AnyEvent::DNS> so far.
+
+Note that, since changing the decoder or encoder might break existing
+code, you should either be sure to control for this, or only temporarily
+change these values, e.g. like so:
+
+   my $decoded = do {
+      local $AnyEvent::DNS::opcode_str{7} = "yxrrset";
+      AnyEvent::DNS::dns_unpack $mypkt
+   };
+
+=over 4
+
+=item %AnyEvent::DNS::opcode_id, %AnyEvent::DNS::opcode_str
+
+Two hashes that map lowercase opcode strings to numerical id's (For the
+encoder), or vice versa (for the decoder). Example: add a new opcode
+string C<notzone>.
+
+   $AnyEvent::DNS::opcode_id{notzone} = 10;
+   $AnyEvent::DNS::opcode_str{10} = 'notzone';
+
+=item %AnyEvent::DNS::rcode_id, %AnyEvent::DNS::rcode_str
+
+Same as above, for for rcode values.
+
+=item %AnyEvent::DNS::class_id, %AnyEvent::DNS::class_str
+
+Same as above, but for resource record class names/values.
+
+=item %AnyEvent::DNS::type_id, %AnyEvent::DNS::type_str
+
+Same as above, but for resource record type names/values.
+
+=item %AnyEvent::DNS::dec_rr
+
+This hash maps resource record type values to code references. When
+decoding, they are called with C<$_> set to the undecoded data portion and
+C<$ofs> being the current byte offset. of the record. You should have a
+look at the existing implementations to understand how it works in detail,
+but here are two examples:
+
+Decode an A record. A records are simply four bytes with one byte per
+address component, so the decoder simply unpacks them and joins them with
+dots in between:
+
+   $AnyEvent::DNS::dec_rr{1} = sub { join ".", unpack "C4", $_ };
+
+Decode a CNAME record, which contains a potentially compressed domain
+name.
+
+   package AnyEvent::DNS; # for %dec_rr, $ofsd and &_dec_name
+   $dec_rr{5} = sub { local $ofs = $ofs - length; _dec_name };
 
 =back
 

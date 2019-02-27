@@ -225,13 +225,16 @@ Files: Changes
  bin/boxer
  dist.ini
  doap.ttl
- t/00_compile.t
+ t/world.t
+Copyright: Copyright 2019 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/00_compile.t
  t/00_compile_scripts.t
  t/01_app_help.t
  t/fixme.t
  t/minimumversion.t
  t/pod.t
- t/world.t
 Copyright: Copyright 2018 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -250,14 +253,14 @@ Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

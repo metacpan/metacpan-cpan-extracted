@@ -1,5 +1,6 @@
 # Example of using the TixTree widget directly from Tcl::pTk
 
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;

@@ -47,10 +47,10 @@ file_contents_like $outdir->child('preseed.cfg'),
 	qr/\nd-i preseed\/late_command string .*\\\n suite=\S+\\\n chroot \/target apt-mark auto \\\n  ciderwebmail/,
 	'preseed.cfg includes auto-marking of ciderwebmail';
 file_contents_like $outdir->child('script.sh'),
-	qr/\napt-get install acpi-support-base /,
+	qr/\napt install acpi-support-base /,
 	'script.sh includes install of acpi-support-base';
 file_contents_like $outdir->child('script.sh'),
-	qr/\napt-get install .*\n.* spamc-/,
+	qr/\napt install .*\n.* spamc-/,
 	'script.sh includes avoidance of spamc';
 file_contents_like $outdir->child('script.sh'),
 	qr/\nsuite=\S+\n\napt-mark auto \\\n  ciderwebmail/,

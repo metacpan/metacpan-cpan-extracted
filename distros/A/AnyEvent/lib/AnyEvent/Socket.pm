@@ -104,12 +104,21 @@ Example:
    print unpack "H*", parse_ipv6 "2002:5345::10.0.0.1";
    # => 2002534500000000000000000a000001
 
+   print unpack "H*", parse_ipv6 "192.89.98.1";
+   # => 00000000000000000000ffffc0596201
+
 =cut
 
 sub parse_ipv6($) {
    # quick test to avoid longer processing
    my $n = $_[0] =~ y/://;
-   return undef if $n < 2 || $n > 8;
+
+   if ($n < 2 || $n > 8) {
+      if (!$n && (my $ipn = parse_ipv4 $_[0])) {
+         return "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff$ipn";
+      }
+      return undef;
+   }
 
    my ($h, $t) = split /::/, $_[0], 2;
 
@@ -163,17 +172,19 @@ sub parse_unix($) {
 
 =item $ipn = parse_address $ip
 
-Combines C<parse_ipv4> and C<parse_ipv6> in one function. The address
-here refers to the host address (not socket address) in network form
-(binary).
+Combines C<parse_ipv4>, C<parse_ipv6> and C<parse_unix> in one
+function. The address here refers to the host address (not socket address)
+in network form (binary).
 
 If the C<$text> is C<unix/>, then this function returns a special token
 recognised by the other functions in this module to mean "UNIX domain
 socket".
 
-If the C<$text> to parse is a mapped IPv4 in IPv6 address (:ffff::<ipv4>),
-then it will be treated as an IPv4 address. If you don't want that, you
-have to call C<parse_ipv4> and/or C<parse_ipv6> manually.
+If the C<$text> to parse is a plain IPv4 or mapped IPv4 in IPv6 address
+(:ffff::<ipv4>), then it will be treated as an IPv4 address and four
+octets will be returned. If you don't want that, you have to call
+C<parse_ipv4> and/or C<parse_ipv6> manually (the latter always returning a
+16 octet IPv6 address for mapped IPv4 addresses).
 
 Example:
 
@@ -191,9 +202,9 @@ sub parse_address($) {
    for (&parse_ipv6) {
       if ($_) {
          s/^\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff//;
-         return $_;
+         return $_
       } else {
-         return &parse_ipv4 || &parse_unix
+         return &parse_unix
       }
    }
 }
@@ -258,7 +269,7 @@ It also supports defaulting the service name in a simple way by using
 C<$default_service> if no service was detected. If neither a service was
 detected nor a default was specified, then this function returns the
 empty list. The same happens when a parse error was detected, such as a
-hostname with a colon in it (the function is rather conservative, though).
+hostname with a colon in it (the function is rather forgiving, though).
 
 Example:
 

@@ -1,5 +1,8 @@
 # Local Drag/Drop Test
 
+use warnings;
+use strict;
+
 #use Tk;
 #use Tk::DragDrop;
 #use Tk::DropSite;
@@ -12,7 +15,6 @@ use Test;
 
 plan test => 1;
 
-use strict;
 use vars qw($top $f $lb_src $lb_dest $dnd_token);
 
 $top = MainWindow->new();

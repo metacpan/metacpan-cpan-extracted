@@ -1,3 +1,6 @@
+v0.500
+    - Moved to AnyEvent.
+
 0.31
     - Adopt new namespase. I perfectly aware that's a foul practice, but
       initial name was a realy bad choice.

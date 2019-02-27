@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -25,7 +25,29 @@ use FindBin;
 use File::Spec;
 my $thisdir = $FindBin::Bin;
 my $topdir = File::Spec->catdir ($FindBin::Bin, File::Spec->updir);
+$|=1;
 
+{
+  # PerlIO::gzip 0.19 cannot dup
+  require PerlIO::gzip;
+  open GG, "<:gzip", "$thisdir/show-argv.pl.gz" or die "cannot open: $!";
+  my $line = readline *GG;
+  print $line;
+  open HH, '<&', \*GG or die "cannot dup GG: $!";
+  $line = readline *HH;
+  print $line;
+  exit 0;
+}
+{
+  # PerlIO::gzip 0.19 cannot seek, even rewind
+  require PerlIO::gzip;
+  open my $fh, "<:gzip", "$thisdir/show-argv.pl.gz" or die $!;
+  print "$fh\n";
+  my $line = readline $fh;
+  print $line;
+  seek $fh, 0, 0 or die $!;
+  exit 0;
+}
 
 {
   # open my $fh, '<', '/tmp/x.dat' or die;

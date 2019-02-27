@@ -1,6 +1,9 @@
 # This test checks to see if image loading and usage (in this case the 'folder' images used
 # in the DirTree Widget) works across interpreters.
 
+use warnings;
+use strict;
+
 use Test;
 use Tcl::pTk;
 use Tcl::pTk::DirTree;

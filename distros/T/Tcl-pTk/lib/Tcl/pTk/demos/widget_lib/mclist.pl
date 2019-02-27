@@ -1,5 +1,8 @@
 # Demo of tile widget
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub mclist {
@@ -44,7 +47,7 @@ sub mclist {
             );
         
         
-        $style = $tree->cget(-style);
+        my $style = $tree->cget(-style);
         my $font = $tree->ttkStyleLookup( $style, -font);
         
         ## Code to insert the data nicely

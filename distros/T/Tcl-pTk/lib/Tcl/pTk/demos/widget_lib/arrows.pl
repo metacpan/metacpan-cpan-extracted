@@ -1,5 +1,8 @@
 # arrows.pl
 
+use warnings;
+use strict;
+
 use subs qw/arrow_err arrow_move1 arrow_move2 arrow_move3 arrow_setup/;
 use vars qw/$TOP/;
 

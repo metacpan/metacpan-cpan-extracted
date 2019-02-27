@@ -1,5 +1,8 @@
 # Balloon, pop up help window when mouse lingers over widget.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use English;
 use Carp;

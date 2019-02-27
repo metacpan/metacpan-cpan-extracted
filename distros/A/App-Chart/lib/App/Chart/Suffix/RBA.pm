@@ -1,6 +1,6 @@
 # Reserve Bank of Australia setups.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2016, 2019 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -46,7 +46,7 @@ App::Chart::setup_source_help
   ($pred, __p('manual-node','Reserve Bank of Australia'));
 
 use constant RBA_COPYRIGHT_URL =>
-  'http://www.rba.gov.au/copyright/';
+  'https://www.rba.gov.au/copyright/';
 
 
 #------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ App::Chart::Weblink->new
   (pred => $pred,
    name => __('_RBA Home Page'),
    desc => __('Open web browser at the Reserve Bank of Australia home page'),
-   url  => 'http://www.rba.gov.au');
+   url  => 'https://www.rba.gov.au');
 
 
 #------------------------------------------------------------------------------
@@ -65,7 +65,7 @@ App::Chart::Weblink->new
 # This uses the rates at:
 #
 use constant RBA_EXCHANGE_URL =>
-  'http://www.rba.gov.au/statistics/frequency/exchange-rates.html';
+  'https://www.rba.gov.au/statistics/frequency/exchange-rates.html';
 use constant RBA_EXCHANGE_URL_DAYS => 3;
 
 # would it be a few minutes after 4pm ?
@@ -98,7 +98,9 @@ sub threeday_parse {
 
   require HTML::TableExtract;
   my $te = HTML::TableExtract->new
-    (headers => ['Units of foreign currency per'],
+    (
+     # is now a <caption>
+     # headers => ['Units of foreign currency per'],
      slice_columns => 0);
   $te->parse($content);
   my $ts = $te->first_table_found();
@@ -167,16 +169,16 @@ sub latest_download {
 # historical xls page
 #
 # This downloads and parses up the page:
-# http://www.rba.gov.au/statistics/historical-data.html
+# https://www.rba.gov.au/statistics/historical-data.html
 #
 # 2014 to present
-#    http://www.rba.gov.au/statistics/tables/csv/f11.1-data.csv
+#    https://www.rba.gov.au/statistics/tables/csv/f11.1-data.csv
 #    213k or 47k compressed, also byte ranges
-#    http://www.rba.gov.au/statistics/tables/xls-hist/2014-current.xls
+#    https://www.rba.gov.au/statistics/tables/xls-hist/2014-current.xls
 #    438k
 #
 use constant RBA_HISTORICAL_PAGE_URL =>
-  'http://www.rba.gov.au/statistics/hist-exchange-rates/index.html';
+  'https://www.rba.gov.au/statistics/hist-exchange-rates/index.html';
 #
 # which offers various xls files for past rates.
 
@@ -238,7 +240,7 @@ sub historical_parse {
 # This parses the monthly rates spreadsheet file from the
 # RBA_HISTORICAL_PAGE_URL page above,
 #
-#     http://www.rba.gov.au/statistics/tables/xls/f11hist-1969-2009.xls
+#     https://www.rba.gov.au/statistics/tables/xls/f11hist-1969-2009.xls
 #
 # but only the part from 1983 back is wanted since there's daily data for
 # 1983 onwards.
@@ -367,7 +369,7 @@ sub iso_weekdays_in_month {
 #
 # This parses xls spreadsheet files like
 #
-#     http://www.rba.gov.au/Statistics/HistoricalExchangeRates/2003to2007.xls
+#     https://www.rba.gov.au/Statistics/HistoricalExchangeRates/2003to2007.xls
 #
 # The files aren't huge (500k upwards) but there's a lot of cells, which
 # makes Spreadsheet::ParseExcel fairly slow and eat up about 50Mb of core
@@ -435,7 +437,7 @@ sub xls_parse {
 #
 # This parses csv download files like
 #
-#     http://www.rba.gov.au/statistics/tables/csv/f11.1-data.csv
+#     https://www.rba.gov.au/statistics/tables/csv/f11.1-data.csv
 #
 # row Title, A$1=USD, Trade-weighted Index May 1970 = 100, A$1=CNY, A$1=JPY,
 #
@@ -459,7 +461,7 @@ sub xls_parse {
 # AED CAD CHF CNY EUR GBP HKD IDR INR JPY KRW MYR NZD PGK PHP SDR SGD THB TWD TWI USD VND
 
 use constant RBA_CURRENT_CSV_URL =>
-  'http://www.rba.gov.au/statistics/tables/csv/f11.1-data.csv';
+  'https://www.rba.gov.au/statistics/tables/csv/f11.1-data.csv';
 
 sub csv_parse {
   my ($resp) = @_;

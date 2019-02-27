@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -29,7 +29,7 @@ use ExtUtils::MakeMaker;
 my $want_xs = 1;
 @ARGV = grep { /^MY_WITHOUT_XS/
                  ? do { $want_xs = 0; 0 }  # record and remove
-                   : 1 } @ARGV;
+                 : 1 } @ARGV;
 if (! $want_xs) {
   print STDERR "XS skipped by request\n";
 }
@@ -42,12 +42,10 @@ if ($want_xs && $] < 5.010) {
   $want_xs = 0;
 }
 if ($want_xs) {
-  print STDERR "XS enabled by default.
-If you don't have a compiler or the .xs doesn't work then disable with
-    perl Makefile.PL MY_WITHOUT_XS=1
+  print STDERR "XS enabled by default (if you don't have a compiler or the .xs doesn't work
+then forcibly disable with \"perl Makefile.PL MY_WITHOUT_XS=1\")
 ";
 }
-
 
 my %file_map_optional
   = ('File::Map'=> '0.38',   # version 0.38 for taint
@@ -57,6 +55,19 @@ my %file_map_deps
   = ('Scalar::Util' => 0, # for FileMap bits
     );
 
+my %PREREQ_PM = ('constant::defer' => 0,
+                 'File::FnMatch'   => 0,
+                 %file_map_deps,
+                );
+my %TEST_REQUIRES = (
+                     # for the t/*.t tests
+                     'Test::More' => 0,
+                    );
+unless (eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
+  # past ExtUtils::MakeMaker without separate TEST_REQUIRES
+  %PREREQ_PM = (%PREREQ_PM, %TEST_REQUIRES);
+}
+
 WriteMakefile
   (NAME         => 'File::Locate::Iterator',
    ABSTRACT     => 'Read "locate" database file with an iterator.',
@@ -64,12 +75,9 @@ WriteMakefile
    AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
    LICENSE      => 'gpl_3',
    SIGN         => 1,
-   PREREQ_PM    => { 'constant::defer' => 0,
-                     'File::FnMatch'   => 0,
-                     'Test::More'      => 0, # for tests only
-                     %file_map_deps,
-                   },
    MIN_PERL_VERSION => '5.006',
+   PREREQ_PM        => \%PREREQ_PM,
+   TEST_REQUIRES    => \%TEST_REQUIRES,
 
    # as of ExtUtils::MakeMaker 6.55_02 if you force XS then C is still
    # generated from scanned .xs files, so must force it too
@@ -81,13 +89,24 @@ WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/file-locate-iterator/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     no_index => { directory=>['devel'] },
+     no_index => { directory=>['devel','xt'] },
 
      recommends =>
      { %file_map_optional,
        # version 0.06 fixes UNIVERSAL::isa() import
        'Iterator::Simple' => 0.06,
      },
+
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Taint::Util' => 0,  # for taint testing
+           # Test::Weaken version 3.002 for "tracked_types"
+           'Test::Weaken' => '3.002',
+         },
+       },
+     },
+
      optional_features =>
      { maximum_examples =>
        { description => 'Be able to run all the examples programs.',
@@ -102,13 +121,6 @@ WriteMakefile
                        'Iterator' => 0,
                        'Iterator::Simple' => 0,
                        'MooseX::Iterator' => 0,
-                     },
-       },
-       maximum_tests =>
-       { description => 'Have "make test" do as much as possible.',
-         requires => { 'Taint::Util' => 0,  # for taint testing
-                       # version 3.002 for "tracked_types"
-                       'Test::Weaken' => '3.002',
                      },
        },
      },

@@ -3,7 +3,7 @@ use warnings;
 no warnings 'uninitialized';
 
 package Form::Diva;
-$Form::Diva::VERSION = '1.00';
+$Form::Diva::VERSION = '1.01';
 # use Data::Printer;
 
 # ABSTRACT: Generate HTML5 form label and input fields
@@ -184,7 +184,7 @@ sub _label {
         : $self->{label_class};
     my $label_tag
         = $field->{label} ? $field->{label} : ucfirst( $field->{name} );
-    return qq|<LABEL for="$field->{id}" class="$label_class">|
+    return qq|<LABEL for="$field->{id}" id="$field->{id}_label" class="$label_class">|
         . qq|$label_tag</LABEL>|;
 }
 
@@ -421,7 +421,7 @@ Form::Diva - Generate HTML5 form label and input fields
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 AUTHOR
 

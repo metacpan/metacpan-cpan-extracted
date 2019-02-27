@@ -5,6 +5,9 @@
 #  Putting this at the top of a simple perl/tk script is all that needs to be done
 #   to make it work with Tcl::pTk
 
+use warnings;
+use strict;
+
 use Tcl::pTk::TkHijack;
 use Test;
 plan tests => 1;
@@ -15,7 +18,6 @@ package Tk::SlideSwitch;
 use Tk;
 use Tk::widgets qw/Label Scale/;
 use base qw/Tk::Frame/;
-use strict;
 
 Construct Tk::Widget 'SlideSwitch';
 

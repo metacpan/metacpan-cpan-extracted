@@ -2,13 +2,15 @@
 package Devel::InnerPackage;
 
 use strict;
-use base qw(Exporter);
+use Exporter 5.57 'import';
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '0.3';
+use if $] > 5.017, 'deprecate';
+
+$VERSION = '0.4';
 @EXPORT_OK = qw(list_packages);
 
-#line 61
+#line 62
 
 sub list_packages {
             my $pack = shift; $pack .= "::" unless $pack =~ m!::$!;
@@ -25,7 +27,7 @@ sub list_packages {
                     !__PACKAGE__->_loaded($pack.$cand); # or @children;
                 push @packs, @children;
             }
-            return grep {$_ !~ /::::ISA::CACHE/} @packs;
+            return grep {$_ !~ /::(::ISA::CACHE|SUPER)/} @packs;
 }
 
 ### XXX this is an inlining of the Class-Inspector->loaded()
@@ -33,12 +35,12 @@ sub list_packages {
 sub _loaded {
        my ($class, $name) = @_;
 
-    no strict 'refs';
+        no strict 'refs';
 
        # Handle by far the two most common cases
        # This is very fast and handles 99% of cases.
        return 1 if defined ${"${name}::VERSION"};
-       return 1 if defined @{"${name}::ISA"};
+       return 1 if @{"${name}::ISA"};
 
        # Are there any symbol table entries other than other namespaces
        foreach ( keys %{"${name}::"} ) {
@@ -55,7 +57,7 @@ sub _loaded {
 }
 
 
-#line 122
+#line 123
 
 
 

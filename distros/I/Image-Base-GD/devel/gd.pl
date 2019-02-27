@@ -23,6 +23,19 @@ use warnings;
 
 use Smart::Comments;
 
+
+{
+  # 2x2 palletted bad for "chimera2"
+  require GD;
+  print GD->VERSION,"\n";
+  my $gd = GD::Image->new (2,2);
+  print $gd->colorAllocate(0,0,0),"\n";
+  open FH, '>', '/tmp/gd.png' or die;
+  print FH $gd->png or die;
+  close FH or die;
+  exit 0;
+}
+
 {
   # rectangle off-screen
 

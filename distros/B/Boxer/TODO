@@ -3,9 +3,25 @@
   * Isolate package auto-install flagging only relevant for upgrades.
   * Fail (or optionally warn) if both installing and avoiding a package.
   * Handle bugs as parameters, and extend data documentation.
+  * Resolve default suite from system, favored over hardcoded string.
   * Resolve named suites (e.g. stretch) from relative (e.g. testing).
   * Use warnings::warnif instead of carp (and croak?). Or Throwable?
   * Use IPC::PrettyPipe
+  * Introduce compose option --nodepath (and maybe deprecate --nodedir)
+    + nodepath is colon-separated lookup list for node
+    + dirs without *.yml files are silently skipped
+    + dirs with subdirs are skipped with warning that it is unsupported
+      - Avoids confusing error if reclass is fed non-node YAML data.
+    + default nodepath is environment variable BOXER_NODE_PATH
+    + BOXER_NODE_PATH internal default is .:${XDG datadir + suite/nodes}
+  * Resolve skeleton template variables in Boxer::File::WithSkeleton
+    (not in Boxer::Task::Serialize).
+  * Introduce compose option --style with default "preseed,script",
+    and warn if omitted that the option will become mandatory
+    + Deprecate compose formats preseed script.
+    + Deprecate skeleton template variable tweaklist.
+  * Introduce compose style bootstrap
+    + Include skeleton files for debootstrap, multistrap, and mmdebstrap.
 
 Initial release:
 
@@ -52,3 +68,16 @@ Later releases...
     + <https://wiki.fogproject.org/wiki/index.php?title=FOG_on_a_MAC>
   * Improve testsuite
     + Test implicit --skeldir (by setting ENV variable instead)
+
+
+misc.
+
+  * Maybe mention germinate as a competitor?
+  * Borrow boilerplate patterns from https://metacpan.org/pod/Sympatic
+  * Maybe implement warning field.
+    Examples:
+    + Reference <https://lists.debian.org/debian-boot/2018/05/msg00250.html>
+      when including package unattended-upgrades.
+    + Tweaking conffiles
+      (known to fail later upgrade: See bug#311188).
+  * Use MooX::StrictConstructor.

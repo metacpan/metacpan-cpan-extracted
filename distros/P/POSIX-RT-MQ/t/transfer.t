@@ -4,15 +4,33 @@ use warnings;
 use strict;
 
 use Test;
+
+sub _mq_avail {
+    # currently only for freebsd
+    return 1 unless $^O =~ /^(freebsd)$/;
+    my $mqfs = `mount | fgrep mqueuefs`;
+    return 1 if $mqfs and $mqfs =~ 'mqueuefs';
+    warn "skipping tests becasue mqueuefs is not mounted";
+    return 0;
+}
+
 BEGIN 
 {     
     use vars qw(@tests $testqueue @q_len @msg_len);
     @tests = ( \&test_integrity,
                \&test_nonblocking,
                \&test_blocking );
-    @q_len    = (1, 10, 128);
+    # linux has a default maxmsg of 10 for non-privileged users
+    # so use some low suitable whacky numbers
+    #@q_len    = (1, 10, 128);
+    @q_len    = (1, 5, 10);
     @msg_len  = (1, 128, 1024, 4096);
     $testqueue = '/testq_42';
+
+    unless (_mq_avail()) {
+        print "1..0 # Skip: mqueues not available\n";
+        exit 0;
+    }
     
     plan tests => scalar(@tests);
 };
@@ -35,6 +53,7 @@ sub test_integrity
     {
         for my $msg_len (@msg_len)
         {
+            #print STDERR "test_integrity { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len }\n";
             my $attr = { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len };
 
             POSIX::RT::MQ->unlink($testqueue);
@@ -63,6 +82,7 @@ sub test_nonblocking
 {
     my $q_len   = $q_len[-1];
     my $msg_len = $msg_len[-1];
+    #print STDERR "test_nonblocking { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len }\n";
     my $attr = { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len };
     
     POSIX::RT::MQ->unlink($testqueue);
@@ -89,6 +109,7 @@ sub test_blocking
 {
     my $q_len   = $q_len[-1];
     my $msg_len = $msg_len[-1];
+    #print STDERR "test_blocking { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len }\n";
     my $attr    = { mq_maxmsg=>$q_len, mq_msgsize=>$msg_len };
     
     POSIX::RT::MQ->unlink($testqueue);
@@ -98,7 +119,7 @@ sub test_blocking
     {
         my $timeout = '';
         local $SIG{ALRM} = sub { $timeout = 'TIMEOUT' };
-        alarm(5);
+        alarm(3);
         $mq->receive;
         $timeout eq 'TIMEOUT'  or die "receive() didn't block\n";
     }
@@ -115,7 +136,7 @@ sub test_blocking
         my $timeout = '';
         local $SIG{ALRM} = sub { $timeout = 'TIMEOUT' };
         my ($msg, undef) = construct_message($msg_len, 0);
-        alarm(5);
+        alarm(3);
         $mq->send($msg);
         $timeout eq 'TIMEOUT'  or die "send() didn't block\n";
     }

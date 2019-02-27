@@ -1,5 +1,10 @@
 Revision history for Perl extension Data::Recursive::Encode
 
+0.07 2019-02-25T15:48:41Z
+
+    - fixed undefined value handling for Encode 2.99+
+      (tokuhirom)
+
 0.06 2014-11-17T02:22:16Z
 
     - Fixed packaging issues.

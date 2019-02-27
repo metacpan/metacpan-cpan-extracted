@@ -106,7 +106,7 @@ sub io {
 
    if ($fh =~ /^\s*\d+\s*$/) {
       $fd = $fh;
-      $fh = AnyEvent::_dupfh $arg{poll}, $fh;
+      ($fh) = AnyEvent::_dupfh $arg{poll}, $fh;
    } else {
       defined eval { $fd = fileno $fh }
          or confess "AnyEvent->io called with illegal fh argument '$fh'";

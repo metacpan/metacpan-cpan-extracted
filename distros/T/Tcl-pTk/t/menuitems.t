@@ -2,6 +2,9 @@
 #
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 #require Tcl::pTk::Menu;
 #require Tcl::pTk::Menu::Item;
@@ -28,6 +31,7 @@ my $menuclass = ref($mb->menu);
 
 ############# Menubutton Tests ########################
 # check the classnames of the items created from the menubutton
+my $xxx = 0;
 my $cb = $mb->checkbutton(-label => 'checkbutton',
                  -variable => \$xxx);
 #print "Checkbutton = $cb\n";

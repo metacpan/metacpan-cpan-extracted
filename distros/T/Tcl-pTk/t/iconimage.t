@@ -1,5 +1,8 @@
 # Test of iconimage method. This method is implemented in Tcl as the iconphoto method,
 #  which only exists is Tcl/pTk > 8.5
+use warnings;
+use strict;
+
 use Tcl::pTk;
 
 use Test;

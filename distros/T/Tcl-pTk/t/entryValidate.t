@@ -1,5 +1,5 @@
 # entry1.pl
-
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;
@@ -29,7 +29,8 @@ my $e1 = $TOP->Entry(@relief,
             -invalidcommand => sub{ $invalid = 1; return 0}  # invalid will be set to 1 if called
 )->pack(@pl);
 
-        
+$TOP->focusForce; # workaround for Tk Aqua 8.5.9
+
 # Generate some events for testing
 $TOP->after(1000, sub{
                 $e1->eventGenerate('<1>'); # 

@@ -1,12 +1,14 @@
 # slide.pl
 
+use warnings;
+use strict;
+
 $Tcl::pTk::SlideSwitch::VERSION = '1.1';
 
 package Tcl::pTk::SlideSwitch;
 
 use Tcl::pTk;
 use base qw/Tcl::pTk::Frame/;
-use strict;
 
 Construct Tcl::pTk::Widget 'SlideSwitch';
 
@@ -75,7 +77,6 @@ sub rlabel {
 package main;
 
 use vars qw / $TOP /;
-use strict;
 use Tcl::pTk;
 
 sub slide {

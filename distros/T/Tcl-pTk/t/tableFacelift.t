@@ -1,7 +1,7 @@
-#!/usr/local/bin/perl -w
-
 # Check that Table widget works with facelift
 
+use warnings;
+use strict;
 use Test;
 use Tcl::pTk;
 use Tcl::pTk::Table();

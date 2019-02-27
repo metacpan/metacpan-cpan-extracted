@@ -1,9 +1,11 @@
 # Test script that checks for a particular bug where a simple scrolled widget
 #   would get pack errors if the Delegates 'DEFAULT' was set.
 
+use warnings;
+use strict;
+
 package Tcl::pTk::TextTest;
 
-use strict;
 use vars qw($VERSION @ISA);
 
 $VERSION = substr(q$Revision: 2.8 $, 10) . "";

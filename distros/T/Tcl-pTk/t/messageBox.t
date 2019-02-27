@@ -2,6 +2,7 @@
 #use Tk;
 #use Tk::Dialog;
 
+use warnings;
 use strict;
 use Tcl::pTk;
 use Test;

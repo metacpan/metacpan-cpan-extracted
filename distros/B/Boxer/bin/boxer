@@ -19,11 +19,11 @@ Boxer::CLI->run;
 
 =head1 VERSION
 
-Version v1.1.11
+Version v1.2.0
 
 =cut
 
-our $VERSION = version->declare("v1.1.11");
+our $VERSION = version->declare("v1.2.0");
 
 =head1 SYNOPSIS
 
@@ -34,11 +34,11 @@ our $VERSION = version->declare("v1.1.11");
 
     $ boxer install
     [...]
-    Done: Installed "Debian GNU/Linux 7.0 (wheezy)" to /media/boxer
+    Done: Installed "Debian GNU/Linux 10 (buster)" to /media/boxer
 
     $ boxer install --arch armhf --classes swedish kde webdesign
     [...]
-    Done: Installed "Debian GNU/Linux 7.0 (wheezy)" to /media/boxer
+    Done: Installed "Debian GNU/Linux 10 (buster)" to /media/boxer
 
     $ boxer detect
     Analyzing current system...

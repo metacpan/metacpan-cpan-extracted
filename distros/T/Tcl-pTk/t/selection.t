@@ -1,5 +1,5 @@
-#!/usr/local/bin/perl -w
-
+use warnings;
+use strict;
 use Tcl::pTk;
 #use Tk;
 

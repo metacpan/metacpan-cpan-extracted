@@ -31,7 +31,8 @@ require Finance::Quote::MGEX;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-my $want_version = 14;
+#------------------------------------------------------------------------------
+my $want_version = 15;
 ok ($Finance::Quote::MGEX::VERSION, $want_version, 'VERSION variable');
 ok (Finance::Quote::MGEX->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { Finance::Quote::MGEX->VERSION($want_version); 1 },

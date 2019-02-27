@@ -1,8 +1,8 @@
-#!/usr/local/bin/perl -w
-
 # Script to check that font create methods return font objects
 #   
 
+use warnings;
+use strict;
 use Tcl::pTk;
 #use Tk;
 use Test;

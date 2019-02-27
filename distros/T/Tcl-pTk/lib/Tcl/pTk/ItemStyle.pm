@@ -1,6 +1,6 @@
 package Tcl::pTk::ItemStyle;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 require Tcl::pTk;
 use base  qw(Tcl::pTk::Widget);
@@ -21,7 +21,7 @@ sub new
  my $name = $int->icall('tixDisplayStyle', $type, %args);
  
  # Create an object structure: itemStyle with the name of the style item, winID so 
- #  we can find our interp for (semi-) compatiblity with other widget objects
+ #  we can find our interp for (semi-) compatibility with other widget objects
  return bless {itemStyle => $name, winID => $widget->{winID} },$package;
 }
 

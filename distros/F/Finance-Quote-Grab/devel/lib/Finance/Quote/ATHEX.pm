@@ -1,5 +1,7 @@
-# Copyright 2011, 2014, 2015 Kevin Ryde
+# Copyright 2011, 2014, 2015, 2016 Kevin Ryde
 
+# This file is part of Finance-Quote-Grab.
+#
 # Finance-Quote-Grab is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3, or (at your option) any
@@ -11,7 +13,7 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
 
 # cf ASEGR.pm
 
@@ -24,7 +26,7 @@ use Carp;
 use Devel::Comments;
 
 use vars '$VERSION';
-$VERSION = 14;
+$VERSION = 15;
 
 
 # eg. http://www.helex.gr/content/en/marketdata/stocks/prices/Share_SearchResults.asp?share=HTO
@@ -367,7 +369,7 @@ L<http://user42.tuxfamily.org/finance-quote-grab/index.html>
 
 =head1 LICENCE
 
-Copyright 2011, 2014, 2015 Kevin Ryde
+Copyright 2011, 2014, 2015, 2016 Kevin Ryde
 
 Finance-Quote-Grab is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

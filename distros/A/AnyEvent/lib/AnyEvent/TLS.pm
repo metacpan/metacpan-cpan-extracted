@@ -576,6 +576,16 @@ BEGIN {
    eval 'sub _check_tls_gt_1 (){'
       . (($Net::SSLeay::VERSION >= 1.55 && Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x1000100f) * 1)
       . '}';
+
+   # as of this writing, Net::SSLeay (1.85-2) has not been ported to OpenSSL 1.1,
+   # but many distributions and users compile it against openssl 1.1, leading to
+   # many symbols not being defined because they are now enums instead of macros
+   # and have different prefixes.
+   # The only one we use is SSL_ST_OK, or TLS_ST_OK, which should be available
+   # as Net::SSLeay::ST_OK. If it is not callable, we define it to be 1, which
+   # hopefully will not change.
+   eval 'Net::SSLeay::ST_OK (); 1'
+      or *Net::SSLeay::ST_OK = sub () { 1 };
 }
 
 our %SSL_METHODS = (

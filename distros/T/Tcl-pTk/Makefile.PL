@@ -1,24 +1,49 @@
-#!perl -w
-
+use warnings;
 use strict;
 use Getopt::Long qw(GetOptions);
 use ExtUtils::MakeMaker;
+
+sub _die ($) {
+    # CPAN smokers report FAIL if Makefile.PL dies, it should exit with status 0
+    my $err = shift;
+    warn $err;
+    exit 0;
+}
 
 ## The executable scripts to be installed
 my @SCRIPTS   = qw( widgetTclpTk
                );
 
-my $tclshArg;
-my $tclsh = "tclsh";
-if ($^O eq 'freebsd') {$tclsh.='8.4'}
+# Allow bypassing with --no-test-for-tk
+my $test_for_tk = 1;
 
-GetOptions("tclsh=s", \$tclshArg,
-	  )
-    || die <<EOT;
+my $tclsh_default = 'tclsh';
+# for FreeBSD users, try to guess their name for tclsh; see ticket 6086
+if ($^O eq 'freebsd') {
+    for my $ver (qw(8.9 8.8 8.7 8.6 8.5 8.4 8.3 8.2 8.1 8.0)) {
+       system "which tclsh$ver >/dev/null 2>&1";
+       if ($? == 0) {
+	    $tclsh_default = "tclsh$ver"; # ok will use that as default
+	    last;
+	}
+    }
+}
 
-Usage: perl Makefile.PL [--tclsh <path>] [<makemaker opts>...]
+GetOptions(
+    "tclsh=s", \(my $tclsh=$tclsh_default),
+    "help!",   \ my $help,
+    "test-for-tk!", \$test_for_tk,
+) || usage();
+usage() if $help;
+sub usage {
+    _die <<'EOT';
 
+Usage: perl Makefile.PL [--tclsh <path>] [--no-test-for-tk] [<makemaker opts>...]
+
+--tclsh option is mostly for FreeBSD users, who have tclsh8.6 or alike;
+however default autodetection should be fine with freebsd as well.
 EOT
+}
 
 my %makeArgs = (
     NAME => "Tcl::pTk",
@@ -56,28 +81,22 @@ WriteMakefile(
 );
 
 
-# Allow the tclsh prog to be provided by env var or arg
-if ($tclshArg) {
-    $tclsh = $tclshArg;
-} elsif (defined($ENV{'TCLSH_PROG'})) {
-    $tclsh = $ENV{'TCLSH_PROG'};
-}
 
-open TCLSH, "$tclsh test-for-tk.tcl|";
-my $res = join '', <TCLSH>;
+if ($test_for_tk) {
+    my $res = `$tclsh test-for-tk.tcl`;
 
-unless ($res =~ /^ok1/m) {
-  die <<EOS;
+    unless ($res =~ /^ok1/m) {
+        _die <<EOS;
 
 #####################  Error   ####################################
 Your Tcl installation ($tclsh) doesn't appear to include the Tk package.
 One of possible reasons is missing file 'pkgIndex.tcl' in ..../tk8.4/
 directory; Please check if you can feed 'package require Tk' to tclsh
 EOS
-}
+    }
 
-unless ($res =~ /^ok_Tix/m) {
-  warn <<EOS;
+    unless ($res =~ /^ok_Tix/m) {
+        warn <<EOS;
 
 ##################### Warning ####################################
 Your Tcl/Tk installation does not appear to include the Tix package.
@@ -86,12 +105,22 @@ Build can continue, but some functionality will be missing.
 
 Information on Tix can be found at http://tix.sourceforge.net
 EOS
-}
+    }
 
-my ($TclVersion) = ($res =~ /TclVersion\s+(\S+)/ );
+    unless ($res =~ /^ok3/m) {
+        warn <<EOS;
 
-if( $TclVersion < 8.4 ){
-  die <<EOS;
+##################### Warning ####################################
+Your Tk installation fails to find 'tklib' package.
+This package is recommended. Be informed on this and better have this package
+installed within your Tcl/Tk.
+EOS
+    }
+
+    my ($TclVersion) = ($res =~ /TclVersion\s+(\S+)/ );
+
+    if( $TclVersion < 8.4 ){
+        _die <<EOS;
 
 ##################### Error ####################################
 Your Tcl/Tk installation version is less than 8.4. This is not
@@ -99,10 +128,10 @@ supported. Upgrade your Tcl/Tk installation.
 Tcl/Tk information can be found at http://www.tcl.tk/
 EOS
 
-}
+    }
 
-if( $TclVersion < 8.5 ){
-  warn <<EOS;
+    if( $TclVersion < 8.5 ){
+        warn <<EOS;
 
 ##################### Warning ####################################
 You have an older Tcl/Tk installation (Version 8.4).
@@ -112,9 +141,6 @@ Build can continue, but some functionality will be missing.
 Tcl/Tk information can be found at http://www.tcl.tk/
 EOS
 
+    }
 }
-
-
-
-
 

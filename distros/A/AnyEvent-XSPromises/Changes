@@ -1,5 +1,8 @@
 Revision history for Perl extension AnyEvent::XSPromises.
 
+0.005  Mon Feb 25 2019
+    - unalias values passed to resolve/reject
+
 0.004  Tue Feb 19 2019
     - resolve rare error caused by call to undefined function
 

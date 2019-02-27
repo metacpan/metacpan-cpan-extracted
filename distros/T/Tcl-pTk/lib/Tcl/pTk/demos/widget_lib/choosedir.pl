@@ -1,5 +1,8 @@
 # This demonstration script prompts the user to select a directory.
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub choosedir {

@@ -1,5 +1,5 @@
-#!/usr/local/bin/perl -w
-
+use warnings;
+use strict;
 use Tcl::pTk;
 
 use Test;
@@ -80,7 +80,7 @@ You can also bind commands to tags. Like press the right mouse button for menu "
 $t->tagBind(
     "underline",
     $t->windowingsystem ne 'aqua' ? '<3>' : '<2>',
-    [sub { shift; shift->Post(@_)},$m,Ev(X),Ev(Y)],
+    [sub { shift; shift->Post(@_)},$m,Ev('x'),Ev('y')],
 );
 
 
@@ -137,7 +137,7 @@ unlink('tempfile');
 
 
 sub insertwtag {
-  local($w,$text,$tag) = @_;
+  my ($w,$text,$tag) = @_;
   my $start = $w->index("insert");
   #print "start=$start\n";
   $w->insert("insert",$text);

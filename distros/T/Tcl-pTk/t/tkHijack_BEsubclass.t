@@ -1,9 +1,9 @@
 # This is a empty subclass test of the BrowseEntry widget with TkHikack and TkFacelift
 
+use warnings;
+use strict;
 
 use Test;
-
-use strict;
 
 use Tcl::pTk::TkHijack;
 use Tcl::pTk::Facelift;

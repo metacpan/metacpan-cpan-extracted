@@ -1,6 +1,6 @@
 package DBIx::Class::Migration;
 
-our $VERSION = "0.060";
+our $VERSION = "0.063";
 $VERSION = eval $VERSION;
 
 use Moose;
@@ -8,10 +8,21 @@ use JSON::MaybeXS qw(JSON);
 use File::Copy 'cp';
 use File::Spec::Functions 'catdir', 'catfile', 'updir';
 use File::Path 'mkpath', 'remove_tree';
-use DBIx::Class::Migration::Types 'LoadableClass', 'LoadableDBICSchemaClass';
+use DBIx::Class::Migration::Types qw(
+  LoadableClass LoadableDBICSchemaClass
+  AbsolutePath
+);
 use Class::Load 'load_class';
 use Devel::PartialDump;
 use SQL::Translator;
+use Log::Any '$log', default_adapter => 'Stderr';
+use Carp 'croak';
+
+sub _log_die {
+  my ($msg) = @_;
+  $log->error($msg);
+  croak $msg;
+}
 
 has db_sandbox_class => (
   is => 'ro',
@@ -31,8 +42,8 @@ has db_sandbox_builder_class => (
 
   sub _build_db_sandbox_builder_class {
     my $self = shift;
-    return $self->has_db_sandbox_dir ? 
-      'DBIx::Class::Migration::SandboxDirSandboxBuilder' : 
+    return $self->has_db_sandbox_dir ?
+      'DBIx::Class::Migration::SandboxDirSandboxBuilder' :
         'DBIx::Class::Migration::TargetDirSandboxBuilder';
   }
 
@@ -79,9 +90,9 @@ has target_dir_builder => ( is => 'ro', lazy_build => 1);
   sub _infer_schema_class {
     my $self = shift;
     return $self->has_schema_class ?
-      $self->schema_class : $self->has_schema ? 
-        ref($self->schema) : 
-          die "Can't infer schema class without a --schema or --schema_class";
+      $self->schema_class : $self->has_schema ?
+        ref($self->schema) :
+          _log_die "Can't infer schema class without a --schema or --schema_class";
   }
 
   sub _build_target_dir_builder {
@@ -91,7 +102,7 @@ has target_dir_builder => ( is => 'ro', lazy_build => 1);
       ->new(schema_class=>$inferred_schema_class);
   }
 
-has target_dir => (is=>'ro', isa=>'Str', lazy_build=>1);
+has target_dir => (is => 'ro', isa=> AbsolutePath, coerce => 1, lazy_build=>1);
 
   sub _build_target_dir {
     shift->target_dir_builder->build;
@@ -99,7 +110,9 @@ has target_dir => (is=>'ro', isa=>'Str', lazy_build=>1);
 
 has dbic_dh_args => (is=>'rw', isa=>'HashRef', lazy_build=>1);
 
-  sub _build_dbic_dh_args { +{} }
+  sub _build_dbic_dh_args {
+    +{ sql_translator_args => { quote_identifiers => 1 } }
+  }
 
 has schema_loader_class => (
   is => 'ro',
@@ -123,7 +136,7 @@ has dbic_fixture_class => (
 
 has dbic_fixtures_extra_args => ( is=>'ro', isa=>'HashRef', lazy_build=>1);
 
-  sub _build_dbic_fixtures_extra_args { 
+  sub _build_dbic_fixtures_extra_args {
     return +{};
   }
 
@@ -135,7 +148,7 @@ has deployment_handler_class => (
 
 has extra_schemaloader_args => (is=>'ro', isa=>'HashRef', lazy_build=>1);
 
-  sub _build_extra_schemaloader_args { 
+  sub _build_extra_schemaloader_args {
     return +{};
   }
 
@@ -177,9 +190,9 @@ sub dbic_dh {
   my %dbic_dh_args = $self->normalized_dbic_dh_args;
 
   (load_class "SQL::Translator::Producer::$_" ||
-    die "No SQLT Producer for $_") for @{$dbic_dh_args{databases}};
+    _log_die "No SQLT Producer for $_") for @{$dbic_dh_args{databases}};
 
-  die "A \$VERSION needs to be specified in your schema class ${\$self->_infer_schema_class}"
+  _log_die "A \$VERSION needs to be specified in your schema class ${\$self->_infer_schema_class}"
   unless $self->schema->schema_version;
 
 
@@ -231,7 +244,7 @@ sub status {
 sub _create_file_at_path {
   my ($path, $data) = @_;
   open(my $fh, '>', $path)
-    || die "Can't create $path: $!";
+    || _log_die "Can't create $path: $!";
   print $fh $data;
   close $fh;
 }
@@ -253,6 +266,11 @@ sub _create_all_fixture_config_from_sources {
 }
 
 sub _filter_private_sources { grep {$_!~/^__/} @_ }
+
+sub _filter_views {
+    my ($self, @sources) = @_;
+    grep { ref($self->schema->source($_)) !~ m/View$/ } @sources;
+}
 
 sub _prepare_fixture_conf_dir {
   my ($dir, $version) = @_;
@@ -284,14 +302,14 @@ sub _copy_from_to {
   my ($from_dir, $to_dir) = @_;
   print "Copying Fixture Confs from $from_dir to $to_dir\n";
   (cp($_, $to_dir)
-    || die "Could not copy $_: $!")
+    || _log_die "Could not copy $_: $!")
       for _only_from_when_not_to($from_dir, $to_dir);
 }
 
 sub prepare_up_down_grades {
   my ($self, $previous, $schema_version) = @_;
   $self->dbic_dh->version_storage_is_installed
-    || die "No Database to create up or downgrades from!";
+    || _log_die "No Database to create up or downgrades from!";
 
   if($self->dbic_dh->database_version < $schema_version) {
     $self->prepare_upgrade;
@@ -305,15 +323,16 @@ sub prepare_up_down_grades {
 sub prepare {
   my $self = shift;
   my $schema_version = $self->dbic_dh->schema_version
-    || die "Your Schema has no version!";
+    || _log_die "Your Schema has no version!";
 
   $self->prepare_install;
   my $fixture_conf_dir = _prepare_fixture_conf_dir(
     $self->target_dir, $schema_version);
 
   my @sources = _filter_private_sources($self->schema->sources);
+  my @real_tables = $self->_filter_views(@sources);
   my $all_tables_path = catfile($fixture_conf_dir,'all_tables.json');
-  _create_all_fixture_set($all_tables_path, @sources);
+  _create_all_fixture_set($all_tables_path, @real_tables);
 
   if(my $previous = _has_previous_version($schema_version)) {
     $self->prepare_up_down_grades($previous, $schema_version);
@@ -393,10 +412,13 @@ sub build_dbic_fixtures {
 
 sub _schema_from_database {
   my $self = shift;
-  return $self->schema_loader
+  my $schema = $self->schema_loader
     ->schema_from_database(
       $self->_infer_schema_class,
       %{$self->extra_schemaloader_args});
+  # SQL_IDENTIFIER_QUOTE_CHAR
+  $schema->storage->sql_maker->quote_char($schema->storage->dbh->get_info(29));
+  $schema;
 }
 
 sub dump_named_sets {
@@ -467,7 +489,7 @@ sub populate_set_to_schema {
 
 sub populate {
   (my $self = shift)->dbic_dh->version_storage_is_installed
-    || die "No Database to populate!";
+    || _log_die "No Database to populate!";
 
   my $version = $self->dbic_dh->database_version;
   my $schema = $self->_schema_from_database;
@@ -481,7 +503,7 @@ sub populate {
 
 sub make_schema {
   (my $self = shift)->dbic_dh->version_storage_is_installed
-    || die "No Database to make Schema from!";
+    || _log_die "No Database to make Schema from!";
   my $schema = $self->schema_loader
     ->generate_dump(
       $self->_infer_schema_class,
@@ -506,7 +528,7 @@ sub diagram {
       out_file  => $self->_diagram_default_outfile });
 
   $trans->translate
-    or die $trans->error;
+    or _log_die $trans->error;
 }
 
   sub _diagram_default_outfile {
@@ -640,7 +662,7 @@ thoughts on good development patterns in using databases with application
 frameworks like L<Catalyst>.
 
 L<DBIx::Class::Migration> offers code and advice based on my experience of using
-L<DBIx::Class> for several years, which hopefully can help you bootstrap a new 
+L<DBIx::Class> for several years, which hopefully can help you bootstrap a new
 project.  The solutions given should work for you if you want to use L<DBIx::Class>
 and have database migrations, but don't really know what to do next.  These
 solutions should scale upward from a small project to a medium project involving
@@ -650,7 +672,7 @@ difficult architectual issues, you might be better off building something on
 top of L<DBIx::Class::DeploymentHandler> directly.
 
 L<DBIx::Class::Migration> is a base class upon which interfaces like
-L<DBIx::Class::Migration::Script> are built.  
+L<DBIx::Class::Migration::Script> are built.
 
 Please see L<DBIx::Class::Migration::Tutorial> for more approachable
 documentation.  If you want to read a high level feature overview, see
@@ -848,6 +870,10 @@ Used to pass custom args when building a L<DBIx::Class::DeploymentHandler>.
 Please see the docs for that class for more.  Useful args might be C<databases>,
 C<to_version> and C<force_overwrite>.
 
+Defaults to a hash setting C<sql_translator_args>'s C<quote_identifiers>
+to a true value, which despite being documented as the default, is not
+the case in practice.
+
 =head2 dbic_dh
 
 Accepts Instance of L<DBIx::Class::DeploymentHandler>.  Required but lazily
@@ -938,7 +964,7 @@ an alternative location.
 Be default if you allow for a local database sandbox (as you might during early
 development and you don't want to work to make a database) that sandbox gets
 built in the 'target_dir'.  Since other bits in the target_dir are probably
-going to be in your project repository and the sandbox generally isnt, you 
+going to be in your project repository and the sandbox generally isnt, you
 might wish to build the sandbox in an alternative location.  This setting
 allows that:
 
@@ -981,7 +1007,7 @@ of the current C<schema> version.  Sends this as a string to STDOUT
 
 Creates a C<fixtures> and C<migrations> directory under L</target_dir> (if they
 don't already exist) and makes deployment files for the current schema.  If
-deployment files exist, will fail unless you L</overwrite_migrations>. 
+deployment files exist, will fail unless you L</overwrite_migrations>.
 
 The C<migrations> directory reflects a directory structure as documented in
 L<DBIx::Class::DeploymentHandler>.
@@ -1179,6 +1205,12 @@ missed you.
     https://github.com/moltar
     https://github.com/andyjones
     https://github.com/pnu
+    https://github.com/n7st
+    https://github.com/willsheppard
+    https://github.com/mulletboy2
+    https://github.com/mohawk2
+    https://github.com/manwar
+    https://github.com/upasana-me
 
 =head1 SEE ALSO
 

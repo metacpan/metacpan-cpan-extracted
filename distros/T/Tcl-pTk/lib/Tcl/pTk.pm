@@ -1,11 +1,11 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 use strict;
 use Tcl;
 use Exporter ('import');
-use Scalar::Util (qw /blessed/); # Used only for it's blessed function
+use Scalar::Util (qw /blessed/); # Used only for its blessed function
 use AutoLoader; # Used for autoloading the Error routine
 use vars qw(@EXPORT @EXPORT_OK %EXPORT_TAGS $platform @cleanup_refs $cleanup_queue_maxsize $cleanupPending);
 
@@ -42,7 +42,7 @@ use Tcl::pTk::Font;
 
 # Tcl::pTk::libary variable: Translation from perl/tk Tk.pm
 {($Tcl::pTk::library) = __FILE__ =~ /^(.*)\.pm$/;}
-$Tcl::pTk::library = Tk->findINC('.') unless (defined($Tcl::pTk::library) && -d $Tcl::pTk::library);
+$Tcl::pTk::library = Tcl::pTk->findINC('.') unless (defined($Tcl::pTk::library) && -d $Tcl::pTk::library);
 
 
 # Global vars used by this package
@@ -288,7 +288,7 @@ approach with perl/Tk syntax.
 =item * The Tcl Interpreter
 
 The Tcl interpreter is used to process Tcl/Tk widgets; within C<Tcl::pTk> you
-create it with C<new>, and given any widget object, you can retreive it by the
+create it with C<new>, and given any widget object, you can retrieve it by the
 C<< $widget->interp >> method. ( Within pure Tcl/Tk the interpreter already exists,
 you don't need to create it explicitly. ) 
 
@@ -301,7 +301,7 @@ C<.fram>, and you want to create a button on it and name it C<butt>, then
 you should specify name C<.fram.butt>. Widget paths are also referred in
 other miscellaneous widget operations, like geometry management.
 
-At any time a widget's path can be retreived with C<< $widget->path; >>
+At any time a widget's path can be retrieved with C<< $widget->path; >>
 within C<Tcl::pTk>.
 
 =item * The Widget Path as a Tcl/Tk command
@@ -320,7 +320,7 @@ if C<$button> corresponds to C<.fr.b> widget.
 The C<use Tcl::pTk;> statement not only creates the C<Tcl::pTk> package, but also creates the
 C<Tcl::pTk::Widget> package, which is responsible for widgets. Each widget ( an object
 blessed to C<Tcl::pTk::Widget>, or any of its subclasses )
-behaves in such a way that its method will result in calling it's path on the
+behaves in such a way that its method will result in calling its path on the
 interpreter.
 
 =head3 Perl/Tk syntax
@@ -614,7 +614,7 @@ for the widget options described in the Tcl/Tk docs for use in C<Tcl::pTk>.
 
 =head2 C<< $int->widget( path, widget-type ) >>
 
-When widgets are created in C<Tcl::pTk> they are stored internally and can and can be retreived
+When widgets are created in C<Tcl::pTk> they are stored internally and can be retrieved
 by the C<widget()> method, which takes widget path as first parameter, and optionally
 the widget type (such as Button, or Text etc.). For Example:
 
@@ -783,7 +783,13 @@ sub new {
     $i->SetVar("argv", [@argv], Tcl::GLOBAL_ONLY);
     $i->SetVar("tcl_interactive", 0, Tcl::GLOBAL_ONLY);
     $i->SUPER::Init();
-    $i->pkg_require('Tk', $i->GetVar('tcl_version'));
+    
+    unless ($i->pkg_require('Tk', $i->GetVar('tcl_version'))) {
+        warn $@; # in case of failure: warn to show this error for user
+        unless ($i->pkg_require('Tk')) { # try w/o version
+	    die $@; # ...and then re-die to have this error for user
+	}
+    }
 
     my $mwid = $i->invoke('winfo','id','.');
     $W{PATH}->{$mwid} = '.';
@@ -813,6 +819,28 @@ sub new {
     # Create background error handling method that is similar to the way perltk does it
     $tkinterp->CreateCommand('bgerror', \&Tcl::pTk::bgerror);
 
+    # RT #127120: Middle-click paste workaround
+    # for older Tcl/Tk versions on macOS aqua
+    if ($i->Eval('tk windowingsystem') eq 'aqua') {
+        my $tcl_version = $i->GetVar('tcl_version');
+        # Check for affected versions of Tk
+        if (
+            ($tcl_version eq '8.4')
+            or (
+                ($tcl_version eq '8.5')
+                and ($i->Eval('package vcompare $tk_patchLevel 8.5.16') == -1)
+            ) or (
+                ($tcl_version eq '8.6')
+                and ($i->Eval('package vcompare $tk_patchLevel 8.6.1') == -1)
+            )
+        ) {
+            # Remove the wrong binding (right button)
+            $i->Eval('event delete <<PasteSelection>> <ButtonRelease-2>');
+            # Replace it with the correct binding (middle button)
+            $i->Eval('event add <<PasteSelection>> <ButtonRelease-3>');
+        }
+    }
+
     return $i;
 }
 
@@ -831,11 +859,8 @@ sub tkinit {
 sub MainWindow {
     my $interp = Tcl::pTk->new(@_);
 
-    # Load Tile Widgets, if the tcl version is > 8.5
-    my $patchlevel = $interp->icall('info', 'patchlevel');
-    my (@patchElems) = split('\.', $patchlevel);
-    my $versionNumber = $patchElems[0] + $patchElems[1]/1000 + $patchElems[2]/100e3; # convert version to number
-    if( $versionNumber >= 8.005 ){
+    # Load Tile Widgets, if the tcl version is >= 8.5
+    if( $interp->Eval('package vsatisfies [package provide Tk] 8.5') ){
             require Tcl::pTk::Tile;
             Tcl::pTk::Tile::_declareTileWidgets($interp);
     }
@@ -882,11 +907,6 @@ sub MainLoop {
 
 # timeofday function for compatibility with Tk::timeofday
 sub timeofday {
-    # This perl-based mainloop differs from Tk_MainLoop in that it
-    # relies on the traced deletion of '.' instead of using the
-    # Tk_GetNumMainWindows C API.
-    # This could optionally be implemented with 'vwait' on a specially
-    # named variable that gets set when '.' is destroyed.
     my $int = (ref $_[0]?shift:$tkinterp);
     my $t = $int->invoke("clock", "microseconds");
     $t = $t/1e6;
@@ -1341,7 +1361,7 @@ sub break
  
 }
 
-# Wrappers for the Event Flag subs in Tcl (for compatiblity with perl/tk code
+# Wrappers for the Event Flag subs in Tcl (for compatibility with perl/tk code)
 sub DONT_WAIT{ Tcl::DONT_WAIT()};        
 sub WINDOW_EVENTS{ Tcl::WINDOW_EVENTS()};        
 sub FILE_EVENTS{ Tcl::FILE_EVENTS()};        
@@ -1349,7 +1369,7 @@ sub TIMER_EVENTS{ Tcl::TIMER_EVENTS()};
 sub IDLE_EVENTS{ Tcl::IDLE_EVENTS()};        
 sub ALL_EVENTS{ Tcl::ALL_EVENTS()};        
 
-# Wrappers for the Tk color functions (for compatibility with perl/tk
+# Wrappers for the Tk color functions (for compatibility with perl/tk)
 sub NORMAL_BG{
         if($^O eq 'cygwin' || $^O =~ /win32/ ){
                 return 'systembuttonface';

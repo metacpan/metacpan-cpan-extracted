@@ -17,11 +17,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.11
+Version v1.2.0
 
 =cut
 
-our $VERSION = version->declare("v1.1.11");
+our $VERSION = version->declare("v1.2.0");
 
 use constant {
 	abstract   => q[show aliases for boxer commands],

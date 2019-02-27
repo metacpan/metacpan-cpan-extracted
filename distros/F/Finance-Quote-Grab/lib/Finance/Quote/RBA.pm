@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2015 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -13,7 +13,7 @@
 # for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
 
 
 package Finance::Quote::RBA;
@@ -22,7 +22,7 @@ use Scalar::Util;
 use Finance::Quote 1.15; # for isoTime()
 
 use vars qw($VERSION %name_to_symbol);
-$VERSION = 14;
+$VERSION = 15;
 
 # uncomment this to run the ### lines
 #use Smart::Comments;
@@ -40,10 +40,10 @@ sub labels {
 }
 
 use constant EXCHANGE_RATES_URL =>
-  'http://www.rba.gov.au/statistics/frequency/exchange-rates.html';
+  'https://www.rba.gov.au/statistics/frequency/exchange-rates.html';
 
 use constant COPYRIGHT_URL =>
-  'http://www.rba.gov.au/copyright/index.html';
+  'https://www.rba.gov.au/copyright/index.html';
 
 sub rba_quotes {
   my ($fq, @symbol_list) = @_;
@@ -83,7 +83,9 @@ sub _parse {
 
   require HTML::TableExtract;
   my $te = HTML::TableExtract->new
-    (headers => ['Units of foreign currency per'],
+    (
+     # now in a <caption> instead of a heading
+     # headers => [qr/Units of Foreign Currencies per/i],
      slice_columns => 0);
   $te->parse($content);
   my $ts = $te->first_table_found;
@@ -210,7 +212,7 @@ Reserve Bank of Australia,
 
 =over 4
 
-L<http://www.rba.gov.au/>
+L<https://www.rba.gov.au/>
 
 =back
 
@@ -218,7 +220,7 @@ using the page
 
 =over 4
 
-L<http://www.rba.gov.au/statistics/frequency/exchange-rates.html>
+L<https://www.rba.gov.au/statistics/frequency/exchange-rates.html>
 
 =back
 
@@ -226,7 +228,7 @@ As of June 2009 the web site terms of use,
 
 =over 4
 
-L<http://www.rba.gov.au/copyright/index.html>
+L<https://www.rba.gov.au/copyright/index.html>
 
 =back
 
@@ -238,7 +240,7 @@ ensure your use of this module complies with current and future terms.
 =head2 Symbols
 
 The symbols used are "AUDXXX" where XXX is the other currency.  Each is the
-value of 1 Australian dollar in the other currency.  As of Febrary 2015 the
+value of 1 Australian dollar in the other currency.  As of February 2019 the
 following symbols are available
 
     AUDUSD    US dollar
@@ -260,7 +262,6 @@ following symbols are available
     AUDCHF    Swiss franc
     AUDAED    United Arab Emirates dirham
     AUDCAD    Canadian dollar
-    AUDPHP    Philippines peso
 
 Plus the RBA's Trade Weighted Index for the Australian dollar, and the
 Australian dollar valued in the IMF's Special Drawing Right basket of
@@ -315,7 +316,7 @@ format, but it doesn't give previous day's rates for the Finance-Quote
 
 L<Finance::Quote>, L<LWP>
 
-RBA website L<http://www.rba.gov.au/>
+RBA website L<https://www.rba.gov.au/>
 
 =head1 HOME PAGE
 
@@ -323,7 +324,7 @@ L<http://user42.tuxfamily.org/finance-quote-grab/index.html>
 
 =head1 LICENCE
 
-Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2015 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2014, 2015, 2016, 2019 Kevin Ryde
 
 Finance-Quote-Grab is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

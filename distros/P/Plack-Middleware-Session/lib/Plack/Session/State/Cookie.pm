@@ -2,7 +2,7 @@ package Plack::Session::State::Cookie;
 use strict;
 use warnings;
 
-our $VERSION   = '0.30';
+our $VERSION   = '0.32';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use parent 'Plack::Session::State';
@@ -15,6 +15,7 @@ use Plack::Util::Accessor qw[
     expires
     secure
     httponly
+    samesite
 ];
 
 sub get_session_id {
@@ -31,6 +32,7 @@ sub merge_options {
     $options{domain}   = $self->domain      if !exists $options{domain} && defined $self->domain;
     $options{secure}   = $self->secure      if !exists $options{secure} && defined $self->secure;
     $options{httponly} = $self->httponly    if !exists $options{httponly} && defined $self->httponly;
+    $options{samesite} = $self->samesite    if !exists $options{samesite} && defined $self->samesite;
 
 
     if (!exists $options{expires} && defined $self->expires) {
@@ -102,7 +104,7 @@ L<Plack::Middleware::Session>.
 
 The C<%params> can include I<path>, I<domain>, I<expires>, I<secure>,
 and I<httponly> options, as well as all the options accepted by
-L<Plack::Session::Store>.
+L<Plack::Session::State>.
 
 =item B<path>
 

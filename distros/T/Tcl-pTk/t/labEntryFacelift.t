@@ -1,11 +1,12 @@
 # slide.pl
 
+use warnings;
+use strict;
 
 use Tcl::pTk;
 use Tcl::pTk::LabEntry;
 use Tcl::pTk::Facelift;
 use Test;
-use strict;
 
 
 

@@ -212,7 +212,7 @@ Options:
 
 	watchdiff -e uptime -e iostat -e df
 
-	watchdiff -sr --diff 'sdif --cdif -U100' netstat -S -I en0
+	watchdiff -psr --diff 'sdif --no-command -U-1' netstat -S -I en0
 
 	watchdiff -pc18i10r0 date; say tea is ready
 

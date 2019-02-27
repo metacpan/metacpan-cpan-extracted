@@ -12,3 +12,5 @@ t/creation.t
 t/transfer.t
 t/trnotify.t
 
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

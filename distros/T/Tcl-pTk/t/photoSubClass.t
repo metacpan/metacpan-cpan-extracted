@@ -1,6 +1,7 @@
 # Test script for the Photo widget as a subclass of Image
 
-BEGIN { $^W = 1; $| = 1;}
+BEGIN { $| = 1; }
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;
@@ -24,7 +25,7 @@ ok($photo->height, 60, "Photo->height method problem");
 
 my $label = $mw->Label(-image => $photo)->pack();
 
-# Check to see if retreived photo works
+# Check to see if retrieved photo works
 my $image = $label->cget(-image);
 ok($image->width,  60, "Photo->width method problem");
 ok($photo->height, 60, "Photo->height method problem");

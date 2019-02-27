@@ -49,6 +49,7 @@ As your normal, every day user, install L<perlbrew|http://perlbrew.pl>:
 
     \wget -O - https://install.perlbrew.pl | bash
     echo "source /home/pi/perl5/perlbrew/etc/bashrc" >> ~/.bashrc
+    sudo reboot
 
 First thing to do is to install the appropriate C<cpanm> version:
 
@@ -56,8 +57,8 @@ First thing to do is to install the appropriate C<cpanm> version:
 
 Then, install an instance of Perl, and switch to it:
 
-    perlbrew install perl-5.26.0
-    perlbrew switch perl-5.26.0
+    perlbrew install perl-5.28.1
+    perlbrew switch perl-5.28.1
 
 =head2 sudo configuration
 
@@ -70,6 +71,12 @@ value for the C<secure_path> directive to include the path to the new
 C<perlbrew> managed perl, followed by a colon. For example:
 C</home/pi/perl5/perlbrew/perls/perl-5.26.0/bin:>. Leave the existing part of
 the string in place.
+
+Test that it looks correctly:
+
+    sudo echo $PATH
+
+...your new path should be the first entry in the environment variable.
 
 Now, you can do everything with the normal user account, using their personal
 installation of Perl, and you just need C<sudo> to run your scripts, leaving
@@ -321,6 +328,20 @@ C<RPi::Const>, you can also use C<PWM_MODE_MS> or C<PWM_MODE_BAL>.
 Example:
 
     $pi->pwm_mode(0);
+
+=head3 PWM Range
+
+The PWM range is the numeric range in which PWM will go from off to on full.
+The parameter always uses C<0> as its reference, so whatever you send in will
+become the new top-end of the PWM range:
+
+The default is C<1023>.
+
+Examples:
+
+    $pi->pwm_range(511);  # range is now 0-511
+
+    $pi->pwm_range(1023); # back to the default
 
 =head2 Interrupt usage
 
@@ -952,10 +973,25 @@ L<Test::BrewBuild> has some special features specifically to facilitate the
 automatic testing of this distribution while on a Raspberry Pi, with provisions
 that allow you to display the last test run results on an LCD if desired.
 
+WARNING: Note that seemingly from perlbrew 0.86, the output of its <c>exec</c>
+command doesn't display the perl version if only a single instance of perl is
+installed. Simply ensure you've got more than one Perl instance installed.
+
+=head3 Installing Test::BrewBuild
+
+On the Raspberry Pi, we have to install an SSL development library before the
+L<Net::SSLeay> dependency can be installed:
+
+    sudo apt-get install libssl-dev
+
+Now you can carry on installing L<Test::BrewBuild> in the normal way:
+
+    cpanm Test::BrewBuild
+
 First, on the Pi you're running, you need to set the C<PI_BOARD> environment
 variable to ensure all tests run. I set this to C<1> in C</etc/environment>.
 
-First, install C<Test::BrewBuild>. Then, start the C<bbtester> software in the
+NEXT, install C<Test::BrewBuild>. Then, start the C<bbtester> software in the
 background:
 
     bbtester start -a

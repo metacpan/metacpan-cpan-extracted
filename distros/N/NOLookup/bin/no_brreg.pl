@@ -4,16 +4,22 @@ use strict;
 use warnings;
 use NOLookup::Brreg::DataLookup;
 use Encode;
-use vars qw($opt_o $opt_n $opt_f $opt_t $opt_p $opt_i $opt_u $opt_d $opt_x $opt_v $opt_h);
+
+use vars qw / 
+    $opt_o $opt_n $opt_f $opt_t $opt_p $opt_i $opt_u 
+    $opt_d $opt_x $opt_v $opt_h
+    /;
 use Getopt::Std;
+
 use Pod::Usage;
 
 use Data::Dumper;
 $Data::Dumper::Indent=1;
 
-# o=orgno, n=name, f:from_date, t:to_date, p:max_pages
-# d=update_date, i:update_id
-# u:underenhet, , v=verbose dump
+# Use this to activate LWP debug,
+# ref. https://metacpan.org/pod/LWP::ConsoleLogger::Everywhere
+#use LWP::ConsoleLogger::Everywhere;
+
 &getopts('hvuo:n:f:p:t:i:d:x:');
 
 if ($opt_h) {
@@ -46,7 +52,6 @@ if ($opt_o) {
 if ($bo->error) {
     print STDERR "Error: ", $bo->status, "\n";
     exit;
-    
 }
 
 if ($bo->warning) {
@@ -129,11 +134,14 @@ Examples:
   perl no_brreg.pl -o 985821585
 
      Found 1 matching entries:
+     OrgNumber	OrgForm	regDate  	orgName
      985821585  AS      2003-06-30      UNINETT NORID AS
 
   perl no_brreg.pl -n uninett 
 
-     Found 3 matching entries:
+     Found 4 matching (Enhet) entries:
+     OrgNumber	OrgForm	regDate  	orgName
+     819549532	FLI	2017-09-12	UNINETT PENSJONISTFORENING
      968100211  AS      1995-02-20      UNINETT AS
      985821585  AS      2003-06-30      UNINETT NORID AS
      814864332  AS      2015-01-26      UNINETT SIGMA2 AS
@@ -142,31 +150,57 @@ Examples:
      found.
 
   perl no_brreg.pl -n uninett -u
-     Found 3 matching entries:
-     973897187 BEDR    1995-02-23      UNINETT AS      (UnderEnhet)
-     986671773 BEDR    2004-03-11      UNINETT NORID AS        (UnderEnhet)
-     987631473 BEDR    2004-12-22      UNINETT SIGMA2 AS       (UnderEnhet)
 
-  perl no_brreg.pl -n "regnskap as" -u
-     Found 3 matching entries:
-     973897187 BEDR    1995-02-23      UNINETT AS      (UnderEnhet)
-     986671773 BEDR    2004-03-11      UNINETT NORID AS        (UnderEnhet)
-     987631473 BEDR    2004-12-22      UNINETT SIGMA2 AS       (UnderEnhet)
+     Found 3 matching (UnderEnhet) entries:
+     OrgNumber	OrgForm	regDate  	orgName
+     973897187 BEDR    1995-02-23      UNINETT AS
+     986671773 BEDR    2004-03-11      UNINETT NORID AS
+     987631473 BEDR    2004-12-22      UNINETT SIGMA2 AS
 
-     Lists max. 3 pages, each 100 hits. Default max. pages are 10, e.g. 1000 hits.
+  perl no_brreg.pl -n "uninett as" -p3
 
-  perl no_brreg.pl  -f 2017-04-10 -t 2017-04-11
+     Found 300 matching (Enhet) entries:
+     OrgNumber	OrgForm	regDate  	orgName
+     968100211	AS	1995-02-20	UNINETT AS
+     985821585	AS	2003-06-30	UNINETT NORID AS
+     814864332	AS	2015-01-26	UNINETT SIGMA2 AS
+     819549532	FLI	2017-09-12	UNINETT PENSJONISTFORENING
+     918312080	AS	2017-01-24	AS TRANSPORT AS
+     918591052	AS	2017-02-21	AS HOLDING AS
+     :
+     :
+     Lists max. 3 pages, each of 100 hits. Default max. pages are 10, e.g. 1000 hits.
 
-     Found 167 matching entries:
-     917416699  ENK     2017-04-10      ARVID KROGSTAD
-     917853711  FLI     2017-04-10      DIA- KJEMISKE AVD. 231
-     818822022  ENK     2017-04-10      ANDERSEN ENTERTAINMENT
-      :
+  perl no_brreg.pl  -f 2019-02-23 -t 2019-02-24 
 
-  perl no_brreg.pl  -d 2017-04-10
-     Found 167 matching entries:
-     917416699  ENK     2017-04-10      ARVID KROGSTAD
+     Found 10 matching (Enhet) entries:
+     OrgNumber	OrgForm	regDate  	orgName
+     922173222	AS	2019-02-23	AERO DRAGBAG AS
+     922141266	NUF	2019-02-23	COMAEN B.V.
+     922266433	AS	2019-02-23	SVÅBEKK 15 AS
+     922082510	ENK	2019-02-23	SHIRAZI ISOKONTROLL MEHDI SADEGHINEJADIAN SHIRAZI
+     922084823	ENK	2019-02-23	MOFRAD HMS MOHAMMAD NEKOOMANESHMOFRAD
+     :
 
+
+  perl ./no_brreg.pl  -d 2019-02-25 -p1
+
+     Found 100 matching updated (Enhet) entries:
+     OrgNumber	updateDateTime			updateId
+     816860482	2019-02-25T05:01:06.526Z	2686439
+     816860482	2019-02-25T05:01:47.969Z	2686443
+     958292104	2019-02-25T05:01:47.969Z	2686445
+     :
+     :
+
+  perl no_brreg.pl  -d 2019-02-25 -p1 -x 2687774
+
+     Found 2 matching updated (Enhet) entries:
+     OrgNumber	updateDateTime			updateId
+     919640170	2019-02-25T18:25:34.449Z	2687776
+     919640170	2019-02-25T18:26:16.002Z	2687778
+
+     List enheter on date and with optional updateId 
 
 Arguments:
 

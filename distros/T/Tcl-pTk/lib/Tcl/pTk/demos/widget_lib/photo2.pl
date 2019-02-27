@@ -1,7 +1,9 @@
 # photo2.pl
 
-use vars qw/ $TOP $photo2_use_bg /;
+use warnings;
 use strict;
+
+use vars qw/ $TOP $photo2_use_bg /;
 
 sub photo2 {
 

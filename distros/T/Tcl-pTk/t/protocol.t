@@ -1,6 +1,9 @@
 # Test Case for bind and commands
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 #use Tk;
 use Test;

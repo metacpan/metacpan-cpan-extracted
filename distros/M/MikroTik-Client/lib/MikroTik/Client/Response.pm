@@ -1,19 +1,19 @@
 package MikroTik::Client::Response;
-use Mojo::Base '-base';
+use MikroTik::Client::Mo;
 
 use MikroTik::Client::Sentence;
 
-has data     => sub { [] };
+has data     => [];
 has sentence => sub { MikroTik::Client::Sentence->new() };
 
 sub parse {
-    my ($self, $buff) = @_;
+    my ($self, $buf) = @_;
 
     my $data = [];
 
     my $sentence = $self->sentence;
-    while ($$buff) {
-        my $words = $sentence->fetch($buff);
+    while ($$buf) {
+        my $words = $sentence->fetch($buf);
         last if $sentence->is_incomplete;
 
         my $item = {'.tag' => '', '.type' => (shift @$words)};
@@ -31,7 +31,6 @@ sub parse {
 
 1;
 
-
 =encoding utf8
 
 =head1 NAME
@@ -44,7 +43,7 @@ MikroTik::Client::Response - Parse responses from a buffer
 
   my $response = MikroTik::Client::Response->new();
 
-  my $list = $response->parse(\$buff);
+  my $list = $response->parse(\$buf);
   for my $re (@$list) {
       my ($type, $tag) = delete @{$re}{'.type'. '.tag'};
       say "$_ => $re->{$_}" for keys %$re;
@@ -75,7 +74,7 @@ L<MikroTik::Client::Sentence> object used to decode sentences from network buffe
 
 =head2 parse
 
-  my $list = $response->parse(\$buff);
+  my $list = $response->parse(\$buf);
 
 Parses data from a buffer and returns list of hashrefs with attributes for each
 sentence. There are some special attributes:
@@ -101,4 +100,3 @@ Reply type.
 L<MikroTik::Client>
 
 =cut
-

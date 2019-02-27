@@ -1,10 +1,11 @@
 # slide.pl
 
+use warnings;
+use strict;
 
 use Tcl::pTk;
 use Tcl::pTk::LabEntry;
 use Test;
-use strict;
 
 plan tests => 1;
 

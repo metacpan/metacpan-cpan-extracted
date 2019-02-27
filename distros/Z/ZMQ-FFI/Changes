@@ -1,4 +1,8 @@
 
+1.12      2019-02-26 05:16:15-05:00 America/New_York
+
+    - Fix t/proxy.t hang (GH#37)
+
 1.11      2016-01-10 19:27:05-05:00 America/New_York
 
     - Fix bareword error in closed_socket.t (GH#27 - thanks @rhrhunter)

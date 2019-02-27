@@ -1,5 +1,8 @@
 # Demo of tile widget
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub ttkmenu{

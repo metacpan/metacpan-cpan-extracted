@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -64,10 +64,15 @@ if (0) {
   @modules = ('RBA');
   @symbols = ('AUDTWI', 'AUDUSD');
 }
-if (1) {
+if (0) {
   $method = 'athex';
   @modules = ('ATHEX');
   @symbols = ('HTO', 'ALPHA');
+}
+if (1) {
+  $method = 'Ghana';
+  @modules = ('Ghana');
+  @symbols = ('CAL');
 }
 
 if (@ARGV && $ARGV[0] =~ /^-/) {

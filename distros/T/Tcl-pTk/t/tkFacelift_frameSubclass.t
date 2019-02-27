@@ -1,8 +1,7 @@
-#!/usr/bin/perl -w
-#
-#
 #  Simple use of Tcl::pTk::TkHijack and TkFacelift with a subclassed Frame
 
+use warnings;
+use strict;
 use Tcl::pTk::TkHijack;
 use Tcl::pTk::Facelift;
 

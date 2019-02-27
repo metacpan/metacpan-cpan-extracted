@@ -1,5 +1,7 @@
 # clrpick.pl
 
+use warnings;
+use strict;
 
 use subs qw/setColor setColor_helper/;
 use vars qw/$TOP/;

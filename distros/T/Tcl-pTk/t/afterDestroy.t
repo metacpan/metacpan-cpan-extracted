@@ -1,6 +1,8 @@
 #
 # Script to check the destruction of after callbacks after a window is destroyed
 
+use warnings;
+use strict;
 #use Tk;
 use Tcl::pTk;
 use Test;

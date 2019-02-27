@@ -7,6 +7,9 @@
 # Note: For Tcl::pTk, removed the importing of Tk::Fileselect, since this doesn't exist in Tcl::pTk
 #   the getOpenFile and getSaveFile methods already exist natively in Tcl::tk
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub filebox {
@@ -57,7 +60,7 @@ sub fileDialog {
     my $w = shift;
     my $ent = shift;
     my $operation = shift;
-    my $types;
+    my @types;
     my $file;
     #   Type names		Extension(s)	Mac File Type(s)
     #

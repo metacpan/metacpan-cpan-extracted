@@ -2,7 +2,7 @@ package Plack::Session::Store;
 use strict;
 use warnings;
 
-our $VERSION   = '0.30';
+our $VERSION   = '0.32';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Plack::Util::Accessor qw[ _stash ];
@@ -49,7 +49,7 @@ Plack::Session::Store - Basic in-memory session store
   };
 
   builder {
-      enable 'Session'; # this is the defalt store
+      enable 'Session'; # this is the default store
       $app;
   };
 

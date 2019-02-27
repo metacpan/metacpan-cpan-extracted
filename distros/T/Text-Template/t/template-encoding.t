@@ -3,10 +3,16 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More;
 use Encode;
 use File::Temp;
-use Test::More::UTF8;
+
+# Non-CORE module(s)
+unless (eval { require Test::More::UTF8; 1; } ) {
+    plan skip_all => '[ Test::More::UTF8 ] is required for testing';
+}
+
+plan tests => 3;
 
 use_ok 'Text::Template' or exit 1;
 

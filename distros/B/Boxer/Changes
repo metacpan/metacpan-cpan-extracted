@@ -7,10 +7,32 @@ Home page:    <https://wiki.debian.org/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v1.2.0	2019-02-27
+
+ [ Bug Fixes ]
+ - Fix compose option --help output to list current dir as default for
+   --nodedir, to match boxer pod and actual logic since v1.1.4.
+
+ [ Documentation ]
+ - Update TODOs.
+
+ [ Test Suite ]
+ - Update spelling test, adding a few more words.
+
+ [ Other ]
+ - Provide additional variables to skeleton templates, containing
+   comma-separated lists: pkgs pkgs_avoid pkgs_auto.
+ - Provide additional variables to skeleton templates, containing plain and
+   perl-escaped shell code: tweaks tweaks_perl.
+ - Update skeleton files: Drop workaround unneeded since Jessie (see
+   bug#751367).
+ - Update skeleton files: Use apt (not apt-get) in shell script.
+ - Use buster as default suite.
+
 v1.1.11	2018-10-04
 
  [ Bug Fixes ]
- - Fix propagate nonfree flag to skeleton files..
+ - Fix propagate nonfree flag to skeleton files.
 
 v1.1.10	2018-09-27
 

@@ -1,5 +1,8 @@
 # vscale.pl
 
+use warnings;
+use strict;
+
 use subs qw/vscale_height/;
 use vars qw/$TOP/;
 

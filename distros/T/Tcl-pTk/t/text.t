@@ -1,5 +1,7 @@
 # very simplistic, must be much more complex soon
 
+use warnings;
+use strict;
 use Test;
 BEGIN {plan tests=>1}
 use Tcl::pTk;

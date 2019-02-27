@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -21,7 +21,7 @@ Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5), libtest-more-perl | perl (>= 5.6.2)
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
-Standards-Version: 3.9.5
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/filter-gunzip/index.html
 Bugs: mailto:user42_kevin@yahoo.com.au
 
@@ -30,5 +30,6 @@ Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
 Depends: perl (>= 5.006), libperlio-perl | perl (>= 5.6), libperlio-gzip-perl, ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
 Description: Source filter uncompressing gzip files
- Filter::gunzip uncompresses gzipped Perl source files for execution.
- It can run .pl.gz files or make a self-uncompressing executable.
+ Filter::gunzip uncompresses gzipped Perl source files for execution
+ using the Perl source filter mechanism.  It can run .pl.gz files or
+ can make a self-uncompressing executable.

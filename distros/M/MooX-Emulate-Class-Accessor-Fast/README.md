@@ -114,16 +114,16 @@ See ["make\_wo\_accessor" in Class::Accessor](https://metacpan.org/pod/Class::Ac
 [Moo](https://metacpan.org/pod/Moo), [Class::Accessor](https://metacpan.org/pod/Class::Accessor), [Class::Accessor::Fast](https://metacpan.org/pod/Class::Accessor::Fast),
 [MooseX::Emulate::Class::Accessor::Fast](https://metacpan.org/pod/MooseX::Emulate::Class::Accessor::Fast)
 
-# AUTHOR
+# AUTHORS
 
 Aran Clary Deltac <bluefeet@gmail.com>
 
+Graham Knop <haarg@haarg.org>
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
 Original code, tests, and documentation taken from
 [MooseX::Emulate::Class::Accessor::Fast](https://metacpan.org/pod/MooseX::Emulate::Class::Accessor::Fast).  Thanks!
-
-# CONTRIBUTORS
-
-- Graham Knop <haarg@haarg.org>
 
 # LICENSE
 

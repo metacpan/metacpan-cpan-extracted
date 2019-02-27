@@ -89,7 +89,7 @@
 
     # amCharts4
     amcharts4 => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.9 );
+        my $ver = version->parse( $args->{ver} // v4.1.13 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4';
 
@@ -109,7 +109,7 @@
 
     # amCharts4 geodata
     amcharts4_geodata => sub ( $cdn, $native, $args ) {
-        my $ver = version->parse( $args->{ver} // v4.1.2 );
+        my $ver = version->parse( $args->{ver} // v4.1.3 );
 
         state $native_prefix = 'https://www.amcharts.com/lib/4/geodata';
 

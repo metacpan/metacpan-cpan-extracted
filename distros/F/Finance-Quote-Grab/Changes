@@ -1,4 +1,4 @@
-Copyright 2009, 2010, 2011, 2014, 2015 Kevin Ryde
+Copyright 2009, 2010, 2011, 2014, 2015, 2019 Kevin Ryde
 
 This file is part of Finance-Quote-Grab.
 
@@ -15,6 +15,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 15, Febrary 2019
+    - RBA, Ghana page changes
 
 Version 14, June 2015
     - META.yml provides=> for the Finance::Quote::Grab dist name

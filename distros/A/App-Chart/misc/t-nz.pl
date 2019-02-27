@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -32,7 +32,7 @@ use Smart::Comments;
   # old jul 09
   # my $content = slurp ("$ENV{'HOME'}/chart/samples/nzx/Dividends.html");
   # new sep 17
-  my $content = slurp ("$ENV{HOME}/chart/samples/nzx/dividends-nov17.html");
+  my $content = slurp ("$ENV{HOME}/chart/samples/nzx/dividends-sep18.html");
 
   my $resp = HTTP::Response->new (200, 'OK',
                                   ['Content-Type' => 'text/html; charset=utf-8'],
@@ -44,10 +44,11 @@ use Smart::Comments;
   ### charset: $resp->content_charset
   # ### resp: $resp->as_string
 
+  $App::Chart::option{'verbose'} = 1;
   my $h = App::Chart::Suffix::NZ::dividends_parse ($resp);
-  # App::Chart::Download::crunch_h($h);
+  App::Chart::Download::crunch_h($h);
   print Dumper ($h);
-   App::Chart::Download::write_daily_group ($h);
+   # App::Chart::Download::write_daily_group ($h);
   exit 0;
 }
 

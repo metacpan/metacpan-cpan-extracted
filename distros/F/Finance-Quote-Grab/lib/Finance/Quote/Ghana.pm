@@ -1,5 +1,7 @@
-# Copyright 2014, 2015 Kevin Ryde
+# Copyright 2014, 2015, 2016, 2019 Kevin Ryde
 
+# This file is part of Finance-Quote-Grab.
+#
 # Finance-Quote-Grab is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3, or (at your option) any
@@ -11,7 +13,7 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
 
 package Finance::Quote::Ghana;
 use 5.004;
@@ -22,11 +24,11 @@ use Carp;
 # use Smart::Comments;
 
 use vars '$VERSION';
-$VERSION = 14;
+$VERSION = 15;
 
 
 use constant GHANA_MARKET_URL =>
-  'http://www.gse.com.gh/index1.php?linkid=5&sublinkid=12';
+  'https://gse.com.gh/daily-shares-and-etfs-trades/';
    
 sub methods {
   return (ghana => \&ghana_quotes);
@@ -81,8 +83,8 @@ sub _parse {
   }
   my $content = $resp->decoded_content (raise_error => 1, charset => 'none');
 
-  # Eg. <span class="datetradeddate">Thursday, February 05th, 2015</span>
-  $content =~ m{<span class="datetradeddate">[a-z]+, ([a-z]+) (\d)+[a-z]*, (\d\d\d\d)</span>}i
+  # Eg. <span class="glyphicon glyphicon-calendar"></span> February 22, 2019</div>
+  $content =~ m{glyphicon-calendar.*?([a-z]+) (\d{1,2}), (\d\d\d\d)}i
     or die "GSE: daily page cannot find trade date\n";
   my $date = "$1/$2/$3";  # "October/03/2014"
 
@@ -92,10 +94,10 @@ sub _parse {
                  qr/ISIN/i,
                  qr/Share Code/i,
                  qr/Year High/i,
-                 qr/Year Low/,
+                 qr/Year Low/i,
                  qr/Previous Closing Price VWAP/i,
                  qr/Opening/i,
-                 qr/Closing Price VWAP/,
+                 qr/Closing Price VWAP/i,
                  qr/Price Change/i,
                  qr/Closing Bid Price/i,
                  qr/Closing Offer Price/i,
@@ -183,7 +185,7 @@ This module downloads share prices from the Ghana Stock Exchange,
 
 =over 4
 
-L<http://www.gse.com.gh>
+L<https://www.gse.com.gh>
 
 =back
 
@@ -191,7 +193,7 @@ Using the market trading results page
 
 =over 4
 
-L<http://www.gse.com.gh/index1.php?linkid=5&sublinkid=12>
+L<https://gse.com.gh/daily-shares-and-etfs-trades/>
 
 =back
 
@@ -225,7 +227,7 @@ L<http://user42.tuxfamily.org/finance-quote-grab/index.html>
 
 =head1 LICENCE
 
-Copyright 2014, 2015 Kevin Ryde
+Copyright 2014, 2015, 2016, 2019 Kevin Ryde
 
 Finance-Quote-Grab is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

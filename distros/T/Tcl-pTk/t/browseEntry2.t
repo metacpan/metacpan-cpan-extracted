@@ -3,6 +3,9 @@
 #### This test case was copied/modified from the Tk-804.029 distribution to work with Tcl::pTk
 ####
 
+use warnings;
+use strict;
+
 use Test::More;
 
 

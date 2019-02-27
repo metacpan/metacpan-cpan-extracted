@@ -1,3 +1,4 @@
+use warnings;
 use strict;
 
 sub keysyms {

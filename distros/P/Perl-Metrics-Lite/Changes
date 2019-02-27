@@ -1,5 +1,12 @@
 Revision history for Perl extension Perl::Metrics::Lite
 
+
+0.091 Web Mar 23:35:00 2019
+	* Upgrade Test::More
+
+0.09 Tue Feb 23:37:00 2019
+	* Use Module::Pluggable 5.2 to support perl 5.22+
+
 0.08 Sat Mar 14:14:00 2012
 	* Get the line number correctly (kzys++)
 

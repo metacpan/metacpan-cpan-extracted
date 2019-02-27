@@ -47,22 +47,22 @@ my @fields      = @{ $diva1->{FormMap} };
 my @radiofields = @{ $diva2->{FormMap} };
 foreach my $test (
     [   $diva1->_label( $fields[0] ),
-        '<LABEL for="formdiva_fullname" class="testclass">Full Name</LABEL>'
+        '<LABEL for="formdiva_fullname" id="formdiva_fullname_label" class="testclass">Full Name</LABEL>'
     ],
     [   $diva1->_label( $fields[1] ),
-        '<LABEL for="phonefieldid" class="testclass">Phone</LABEL>'
+        '<LABEL for="phonefieldid" id="phonefieldid_label" class="testclass">Phone</LABEL>'
     ],
     [   $diva1->_label( $fields[2] ),
-        '<LABEL for="formdiva_email" class="testclass">Email</LABEL>'
+        '<LABEL for="formdiva_email" id="formdiva_email_label" class="testclass">Email</LABEL>'
     ],
     [   $diva1->_label( $fields[3] ),
-        '<LABEL for="formdiva_our_id" class="testclass">Our_id</LABEL>'
+        '<LABEL for="formdiva_our_id" id="formdiva_our_id_label" class="testclass">Our_id</LABEL>'
     ],
     [   $diva1->_label( $fields[4] ),
-        '<LABEL for="formdiva_label_over" class="not_that_class we_can_override_label_class">Label Over-Ride</LABEL>'
+        '<LABEL for="formdiva_label_over" id="formdiva_label_over_label" class="not_that_class we_can_override_label_class">Label Over-Ride</LABEL>'
     ],    
     [   $diva2->_label( $radiofields[0] ),
-        '<LABEL for="formdiva_radiotest" class="testclass">Radiotest</LABEL>'
+        '<LABEL for="formdiva_radiotest" id="formdiva_radiotest_label" class="testclass">Radiotest</LABEL>'
     ],
     )
 {

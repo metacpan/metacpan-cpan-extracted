@@ -1,5 +1,63 @@
 Summary of Changes to Tcl::pTk
 
+Release 0.95:  2019-02-25
+
+ * Improve several tests: can now PASS
+   on recent Windows, macOS, FreeBSD, and Linux
+   - Keep more tests open if command line argument specified for debugging
+   - Avoid hardcoded filename and line numbers in tests;
+     use `__FILE__` and `__LINE__` instead
+   - bgerror2 tests: add code that was missing to toggle the SlideSwitch
+     and generate the expected error
+   - Use `focusForce()` to prevent failures on Tk Aqua 8.5.9 (RT #125908)
+   - Replace `$^W = 1` with `use warnings`
+   - Invoke fileeventSubProcesses script using `"$^X"`
+     (instead of `perl` from PATH)
+   - Skip fileevent tests on BSD and macOS (RT #125662)
+   - Mark certain font tests as TODO due to platform-dependent failures (RT #119754)
+   - photo.t: if Img package is not present, run tests for formats already
+     supported by Tk or TkPNG (if present and using Tk < 8.5)
+   - ptk-compat2.t: explicitly disable tearoffs to have consistent number
+     of entries across platforms (tearoffs are not supported by Aqua,
+     and not normally usable on X11/Windows anyways)
+   - scrolledOptional.t: add extra column to avoid failure observed on Ubuntu 18.10
+   - Fix Tix Notebook tests on Aqua
+ * Improve several widget demos:
+   - Use Perl instead of Tcl Unicode escaping in strings in newer
+     widget demos adapted from Tcl/Tk
+   - Toolbar demo: allow spaces in font names
+   - Combo: "Alice Springs" is one city
+   - photo1: use after to schedule transparency update rather than blocking
+     so that the window always appears right away
+ * Incorporate some recent improvements from Tcl::Tk
+   - Improve error shown if "package require Tk" fails (RT #127552)
+   - Makefile.PL:
+     - exit with status 0 if Tk 8.4+ is not present
+       (UNKNOWN reports will no loner be generated)
+     - warn if tklib is not present
+     - Find tclsh8.x command more easily on FreeBSD
+     - TCLSH_PROG environment variable is no longer used to specify tclsh
+   - Update README
+ * Add option `--no-test-for-tk` to have Makefile.PL bypass Tk package checks
+ * pTk.pm: `Tk->findINC` should be `Tcl::pTk->findINC` (RT #127529)
+ * Patch older Aqua Tk at runtime so that the correct mouse button
+   (middle button rather than right button) causes selected text
+   to be pasted (RT #127120)
+ * Prevent menu entries from having paths like '.mnonf'
+ * tooltip: packageRequire() should be pkg_require()
+ * Use case-correct image names for Getimage() to work correctly
+   on case-sensitive filesystems
+ * More usage of `package vcompare` and `package vsatisfies`
+   for robustly checking the version of Tcl/Tk present
+ * Remove unnecessary executable permissions and shebang lines
+ * `use warnings` and `use strict` in more files, performing changes
+   as necessary (properly declare/scope variables, quote barewords, etc.)
+ * All text files in git repository/distfile now use
+   Unix line endings (LF) instead of DOS line endings (CRLF) 
+ * Various spelling/grammar fixes
+ * Cleanup duplicated/misplaced comments
+ * Non-functional code style adjustments
+
 Release 0.94:  2018-07-28
 
  * Change `use Tk;` to `use Tcl::pTk;` in text2.t

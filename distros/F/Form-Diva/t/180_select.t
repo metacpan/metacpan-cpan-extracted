@@ -102,7 +102,7 @@ is( $select2->_option_input( $select2->{form}[0] ) ,
     'select2 has no values provided and returns with no option elements');
 my $select2_no_data = $select2->generate ;
 is( $select2_no_data->[0]{label}, 
-    '<LABEL for="formdiva_empty" class="testclass">Empty</LABEL>',
+    '<LABEL for="formdiva_empty" id="formdiva_empty_label" class="testclass">Empty</LABEL>',
     'Check the label on the empty one');
 # remove extra space because generate does.
 $empty_input_nodata =~ s/\s//g;

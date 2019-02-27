@@ -11,7 +11,7 @@
 
 package Tcl::pTk::TextEdit;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 use Tcl::pTk qw (Ev);
 use AutoLoader;
@@ -293,7 +293,7 @@ sub IndicesLookGood
  ##########################
  return 1 if ($start_column == $end_column);
 
- # otherwise its bad
+ # otherwise it's bad
  return 0;
 }
 

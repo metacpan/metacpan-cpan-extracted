@@ -375,6 +375,37 @@ my %tests= (
             is($_[0], 1);
         })
     },
+
+    # Regrettion (regression tests)
+    no_alias_on_resolve => sub {
+        my $d= deferred;
+        my $reason= 'abc';
+        $d->resolve($reason);
+        $reason= 'def';
+        $d->promise->then(sub {
+            is($_[0], 'abc');
+        });
+    },
+    no_alias_on_reject => sub {
+        my $d= deferred;
+        my $reason= 'abc';
+        $d->reject($reason);
+        $reason= 'def';
+        $d->promise->then(sub {
+            fail;
+        }, sub {
+            is($_[0], 'abc');
+        });
+    },
+    no_alias_on_return => sub {
+        my $msg= 'abc';
+        resolved()->then(sub {
+            $msg;
+        })->then(sub {
+            $msg= 'def';
+            is($_[0], 'abc');
+        });
+    },
 );
 
 my @promises= map {

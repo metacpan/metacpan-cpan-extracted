@@ -1,11 +1,11 @@
-#!/usr/local/bin/nperl -w
-
+use warnings;
+use strict;
 use Tcl::pTk;
 use Data::Dumper;
 use Test;
 
 
-$mw = MainWindow->new;
+my $mw = MainWindow->new;
 $|=1;
 
 # This will skip if Tix not present
@@ -42,7 +42,7 @@ $hl->configure( -command => [ sub
 
 $hl->pack(-expand => 1, -fill => 'both');
 
-@list = qw(one two three);
+my @list = qw(one two three);
 
 my $i = 0;
 foreach my $item (@list)

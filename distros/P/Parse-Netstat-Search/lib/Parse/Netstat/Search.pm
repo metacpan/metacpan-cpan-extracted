@@ -12,11 +12,11 @@ Parse::Netstat::Search - Searches the connection list in the results returned by
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.1.1';
 
 
 =head1 SYNOPSIS
@@ -25,7 +25,7 @@ our $VERSION = '0.0.2';
     use Parse::Netstat::Search;
     use Parse::Netstat qw(parse_netstat);
 
-    my $res = parse_netstat(output => join("", `netstat -anp`), flavor=>'linux');
+    my $res = parse_netstat(output => join("", `netstat -n`), flavor=>$^O);
 
     my $search = Parse::Netstat::Search->new();
 
@@ -36,6 +36,37 @@ our $VERSION = '0.0.2';
 
 Two big things to bet aware of is this module does not currently resulve names and this module
 does not handle unix sockets. Unix sockets will just be skipped over.
+
+The connection hashes returned differ from Parse::Netstat slightly. Below is what a standard ones
+for IPv4/6 looks like.
+
+    {
+        'foreign_host'=>'10.0.0.1',
+        'local_host'=>'10.0.0.2',
+        'foreign_port'=>'22222',
+        'local_port'=>'22',
+        'sendq'=>'0',
+        'recvq'=>'0',
+        'state' => 'ESTABLISHED',
+        'proto' => 'tcp4',
+    }
+
+This module has two additional keys, "local_pp" and "foreign_pp". Which contains and data
+after % in a address. So "fe80::1%lo0" would be split into "fe80::1" and "lo0" as in the
+example below.
+
+     {
+        'state' => '',
+        'foreign_host' => '*',
+        'local_port' => '123',
+        'proto' => 'udp6',
+        'foreign_pp' => undef,
+        'foreign_port' => '*',
+        'local_host' => 'fe80::1',
+        'recvq' => '44',
+        'local_pp' => 'lo0',
+        'sendq' => '33'
+    }
 
 =head1 methods
 
@@ -219,10 +250,23 @@ sub search{
 			my $state=$res->[2]->{active_conns}->[$res_int]->{state};
 			my $protocol=$res->[2]->{active_conns}->[$res_int]->{proto};
 			my $local_port=$res->[2]->{active_conns}->[$res_int]->{local_port};
-			my $local_host=$res->[2]->{active_conns}->[$res_int]->{local_host};
-			my $foreign_host=$res->[2]->{active_conns}->[$res_int]->{foreign_host};
+			#my $local_host=$res->[2]->{active_conns}->[$res_int]->{local_host};
+			#my $foreign_host=$res->[2]->{active_conns}->[$res_int]->{foreign_host};
 			my $sendq=$res->[2]->{active_conns}->[$res_int]->{sendq};
 			my $recvq=$res->[2]->{active_conns}->[$res_int]->{recvq};
+
+			#handle IPv6 % stuff if needed
+			my ( $local_host, $local_pp ) = split( /\%/, $res->[2]->{active_conns}->[$res_int]->{local_host} );
+			my ( $foreign_host, $foreign_pp ) = split( /\%/, $res->[2]->{active_conns}->[$res_int]->{foreign_host} );
+
+			# Handle when parse netstat chokes on lines like...
+			# udp6       0      0 fe80::4ecc:6aff:.123   *.*
+			if ( $local_host =~ /[0123456789AaBbCcDdEeFf]\:$/ ){
+				$local_host =~ s/\:$//;
+			}
+			if ( $foreign_host =~ /[0123456789AaBbCcDdEeFf]\:$/ ){
+				$foreign_host =~ s/\:$//;
+			}
 
 			# UDP is stateless and in some cases on listening ports for it Parse::Netstat
 			# does not return any host, so use * for it.
@@ -266,20 +310,29 @@ sub search{
 			}
 
 			# checks the forient port against each CIDR
-			if (
-				$cidr_require &&
-				(
-				 (
-				  ( $foreign_host ne '*' ) &&
-				  ( Net::CIDR::cidrlookup( $foreign_host, @{ $self->{cidrs} } ) )
-				  ) ||
-				 (
-				  ( $local_host ne '*' ) &&
-				  ( Net::CIDR::cidrlookup( $local_host, @{ $self->{cidrs} } ) )
-				  )
-				 )
-				) {
-				$cidr_meet=1;
+			my @cidrs=@{ $self->{cidrs} };
+			if ( $cidr_require ){
+				# check each one by its self... Net::CIDR will error if you tell it to search for in IPv4 and IPv6 space at the same time
+				my @cidrs=@{ $self->{cidrs} };
+				my $cidr=pop( @cidrs );
+				while (
+					   ( defined( $cidr ) ) &&
+					   ( ! $cidr_meet )
+						){
+					if (
+						(
+						 ( $foreign_host ne '*' ) &&
+						 ( eval{ Net::CIDR::cidrlookup( $foreign_host, $cidr ) })
+						 ) || (
+						 ( $local_host ne '*' ) &&
+						 ( eval{ Net::CIDR::cidrlookup( $local_host,  $cidr ) } )
+						 )
+						){
+						$cidr_meet=1;
+					}
+
+					$cidr=pop( @cidrs );
+				}
 			}
 
 			# handle it if port checking is required
@@ -322,6 +375,8 @@ sub search{
 							   'recvq'=>$recvq,
 							   'proto'=>$protocol,
 							   'state'=>$state,
+							   'local_pp'=>$local_pp,
+							   'foreign_pp'=>$foreign_pp,
 							   }
 					  );
 			}
@@ -634,7 +689,7 @@ L<https://metacpan.org/release/Parse-Netstat-Search>
 
 =item * Code Repo
 
-L<http://gitea.eesdp.org/vvelox/Parse-Netstat-Search>
+L<https://gitea.eesdp.org/vvelox/Parse-Netstat-Search>
 
 =back
 

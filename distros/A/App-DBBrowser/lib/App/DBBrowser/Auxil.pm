@@ -136,39 +136,30 @@ sub insert_into_args_info_format {
 
 sub __select_cols {
     my ( $sf, $sql ) = @_;
-    my @cols;
-    if ( @{$sql->{select_cols}} ) {
-        if ( ! keys %{$sql->{alias}} ) {
-            @cols = @{$sql->{select_cols}};
+    my @cols = @{$sql->{select_cols}} ? @{$sql->{select_cols}} : ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
+    if ( ! @cols ) {
+        if ( $sf->{i}{special_table} eq 'join' ) {
+            return ' ' . join ', ', @{$sql->{cols}};
         }
         else {
-            for ( @{$sql->{select_cols}} ) {
-                if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
-                    push @cols, $_ . " AS " . $sql->{alias}{$_};
-                }
-                else {
-                    push @cols, $_;
-                }
-            }
+            return " *";
         }
     }
-    elsif ( $sf->{i}{special_table} eq 'join' ) {
-        @cols = @{$sql->{cols}};
-    }
-    elsif ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
-        for ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ) {
-            if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
-                push @cols, $_ . " AS " . $sql->{alias}{$_};
-            }
-            else {
-                push @cols, $_;
-            }
-        }
+    elsif ( ! keys %{$sql->{alias}} ) {
+        return ' ' . join ', ', @cols;
     }
     else {
-        @cols = ( "*" );
+        my @cols_alias;
+        for ( @cols ) {
+            if ( exists $sql->{alias}{$_} && defined  $sql->{alias}{$_} && length $sql->{alias}{$_} ) {
+                push @cols_alias, $_ . " AS " . $sql->{alias}{$_};
+            }
+            else {
+                push @cols_alias, $_;
+            }
+        }
+        return ' ' . join ', ', @cols_alias;
     }
-    return ' ' . join ', ', @cols;
 }
 
 

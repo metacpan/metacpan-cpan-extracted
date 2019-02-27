@@ -1,8 +1,8 @@
 package ZMQ::FFI::Constants;
-$ZMQ::FFI::Constants::VERSION = '1.11';
+$ZMQ::FFI::Constants::VERSION = '1.12';
 # ABSTRACT: Generated module of zmq constants. All constants, all versions.
 
-# Generated using ZMQ versions v2.1.0-v4.1.4
+# Generated using ZMQ versions v2.1.0-v4.1.6
 
 use strict;
 use warnings;
@@ -283,7 +283,7 @@ ZMQ::FFI::Constants - Generated module of zmq constants. All constants, all vers
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 
@@ -296,7 +296,7 @@ version 1.11
 =head1 DESCRIPTION
 
 This module includes every zmq constant from every stable version of zeromq.
-Currently that is v2.1.0-v4.1.4.  It was generated using the zeromq2-x,
+Currently that is v2.1.0-v4.1.6.  It was generated using the zeromq2-x,
 zeromq3-x, zeromq4-x, and zeromq4-1 git repos at L<https://github.com/zeromq>.
 
 =head1 SEE ALSO
@@ -315,7 +315,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dylan Cali.
+This software is copyright (c) 2019 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,10 +4,17 @@
 # (reading the output of an external command into a text widget)
 # no luxuries (like scrollbars)
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use IO::File;
 
 use Test;
+if ($^O =~ m/darwin|dragonfly|freebsd|netbsd|openbsd/) {
+        print "1..0 # Skipped: fileevent is not working on BSD and macOS, see RT #125662\n";
+        exit;
+}
 plan tests => 2;
 
 my $closed = 0;  # Flag = 1 when fileevent pipe from the child process closes
@@ -18,7 +25,7 @@ my $closed = 0;  # Flag = 1 when fileevent pipe from the child process closes
  
 my $mw = MainWindow->new(-title => "fileevent Test");
 
-my $command = "perl -w t/fileeventSubProcesses";
+my $command = qq("$^X" t/fileeventSubProcesses);
 
 my $lineFromFile; # Last line read from the file 
 

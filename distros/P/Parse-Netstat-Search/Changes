@@ -1,15 +1,32 @@
 Revision history for Parse-Netstat-Search
 
-0.0.2	2019-02-24/08:30
-		- Previous issue turned out to be specifically. Added
-		  addtional handling for UDP as it is stateless. This
-		  removes '?' from previously. State for for UDP is ''.
+0.1.1	 2019-02-26/04:00
+		 - Apparently Net::CIDR does not like searching IPv4 and IPv6 at the
+		   same time. Each requested CIDR is now checked on its own. While
+		   it says the functions will handle both in the docs, apparently
+		   this does not mean at the same time.
 
-0.0.1	2019-02-24/06:30
-		- Handle where FreeBSD does not state LISTEN.
-		- Add a missing error flag.
-		- If state is not defined use '?'.
+0.1.0	 2019-02-26/00:15
+		 - Add in handling of % in IPv6 addresses.
+		 - Add in handling of slightly malformed IPv6 address that netstat
+		   on FreeBSD seems to sometimes produce, using ':.' for the port
+		   delimiter instead of '.'. This is not to be confused with ::
+		   appearing at the end, but like "fe80::4ecc:6aff:.123".
 
-0.0.0	2019-02-20/06:00
-		-Initial release.
+0.0.3	 2019-02-25/06:30
+		 - Use eval to talk to Net::CIDR as it seems to not always like IPv6.
+		   This allows it to continue instead of killing the entire op.
+
+0.0.2	 2019-02-24/08:30
+		 - Previous issue turned out to be specifically. Added
+		   addtional handling for UDP as it is stateless. This
+		   removes '?' from previously. State for for UDP is ''.
+
+0.0.1	 2019-02-24/06:30
+		 - Handle where FreeBSD does not state LISTEN.
+		 - Add a missing error flag.
+		 - If state is not defined use '?'.
+
+0.0.0	 2019-02-20/06:00
+		 -Initial release.
 

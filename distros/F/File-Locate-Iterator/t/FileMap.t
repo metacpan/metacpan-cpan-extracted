@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -39,7 +39,7 @@ diag "File::Map version ",File::Map->VERSION;
 plan tests => 14;
 
 use_ok ('File::Locate::Iterator::FileMap');
-my $want_version = 23;
+my $want_version = 26;
 is ($File::Locate::Iterator::FileMap::VERSION, $want_version,
     'VERSION variable');
 is (File::Locate::Iterator::FileMap->VERSION, $want_version,

@@ -20,6 +20,7 @@ devel/mgex.pl
 devel/offline.pl
 devel/online.t
 devel/rba-old.pl
+devel/rba.pl
 devel/run.pl
 examples/dump.pl
 inc/my_pod2html

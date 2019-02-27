@@ -1,23 +1,22 @@
 package MikroTik::Client;
-use Mojo::Base '-base';
+use MikroTik::Client::Mo;
 
+use AnyEvent;
+use AnyEvent::Handle;
+use Digest::MD5 'md5_hex';
 use MikroTik::Client::Response;
-use MikroTik::Client::Sentence qw(encode_sentence);
+use MikroTik::Client::Sentence 'encode_sentence';
 use Carp ();
-use Mojo::Collection;
-use Mojo::IOLoop;
-use Mojo::Util qw(md5_sum term_escape);
 use Scalar::Util 'weaken';
 
 use constant CONN_TIMEOUT => $ENV{MIKROTIK_CLIENT_CONNTIMEOUT};
 use constant DEBUG        => $ENV{MIKROTIK_CLIENT_DEBUG} || 0;
-use constant PROMISES     => !!(eval { require Mojo::Promise; 1 });
+use constant PROMISES     => !!(eval { require Promises; 1 });
 
-our $VERSION = '0.31';
+our $VERSION = "v0.500";
 
 has error     => '';
 has host      => '192.168.88.1';
-has ioloop    => sub { Mojo::IOLoop->new() };
 has new_login => sub { $_[0]->tls || 0 };
 has password  => '';
 has port      => 0;
@@ -27,247 +26,230 @@ has user      => 'admin';
 has _tag      => 0;
 
 # Aliases
-Mojo::Util::monkey_patch(__PACKAGE__, 'cmd',   \&command);
-Mojo::Util::monkey_patch(__PACKAGE__, 'cmd_p', \&command_p);
-Mojo::Util::monkey_patch(__PACKAGE__, '_fail', \&_finish);
+{
+    no strict 'refs';
+    *{__PACKAGE__ . "::cmd"}   = \&command;
+    *{__PACKAGE__ . "::cmd_p"} = \&command_p;
+    *{__PACKAGE__ . "::_fail"} = \&_finish;
+}
 
-sub DESTROY { Mojo::Util::_global_destruction() or shift->_cleanup() }
+sub DESTROY {
+    (defined ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT')
+        or shift->_cleanup();
+}
 
 sub cancel {
-  my $cb = ref $_[-1] eq 'CODE' ? pop : sub { };
-  return shift->_command(Mojo::IOLoop->singleton, '/cancel', {'tag' => shift},
-    undef, $cb);
+    my $cb = ref $_[-1] eq 'CODE' ? pop : sub { };
+    return shift->_command('/cancel', {'tag' => shift}, undef, $cb);
 }
 
 sub command {
-  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
-  my ($self, $cmd, $attr, $query) = @_;
+    my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+    my ($self, $cmd, $attr, $query) = @_;
 
-  # non-blocking
-  return $self->_command(Mojo::IOLoop->singleton, $cmd, $attr, $query, $cb)
-    if $cb;
+    # non-blocking
+    return $self->_command($cmd, $attr, $query, $cb) if $cb;
 
-  # blocking
-  my $res;
-  $self->_command($self->ioloop, $cmd, $attr, $query,
-    sub { $_[0]->ioloop->stop(); $res = $_[2]; });
-  $self->ioloop->start();
-
-  return $res;
+    # blocking
+    my $cv = AnyEvent->condvar;
+    $self->_command($cmd, $attr, $query, sub { $cv->send($_[2]) });
+    return $cv->recv;
 }
 
 sub command_p {
-  Carp::croak 'Mojolicious v7.54+ is required for using promises.'
-    unless PROMISES;
-  my ($self, $cmd, $attr, $query) = @_;
+    Carp::croak 'Promises 0.99+ is required for this functionality.'
+        unless PROMISES;
+    my ($self, $cmd, $attr, $query) = @_;
 
-  my $p = Mojo::Promise->new();
-  $self->_command(
-    Mojo::IOLoop->singleton,
-    $cmd, $attr, $query,
-    sub {
-      return $p->reject($_[1], $_[2]) if $_[1];
-      $p->resolve($_[2]);
-    }
-  );
+    my $d = Promises::deferred();
+    $self->_command($cmd, $attr, $query,
+        sub { $_[1] ? $d->reject(@_[1, 2]) : $d->resolve($_[2]) });
 
-  return $p;
+    return $d->promise;
 }
 
 sub subscribe {
-  do { $_[0]->{error} = 'can\'t subscribe in blocking mode'; return; }
-    unless ref $_[-1] eq 'CODE';
-  my $cb = pop;
-  my ($self, $cmd, $attr, $query) = @_;
-  $attr->{'.subscription'} = 1;
-  return $self->_command(Mojo::IOLoop->singleton, $cmd, $attr, $query, $cb);
+    do { $_[0]->{error} = 'can\'t subscribe in blocking mode'; return; }
+        unless ref $_[-1] eq 'CODE';
+    my $cb = pop;
+    my ($self, $cmd, $attr, $query) = @_;
+    $attr->{'.subscription'} = 1;
+    return $self->_command($cmd, $attr, $query, $cb);
 }
 
 sub _cleanup {
-  my $self = shift;
-  $_->{timeout} && $_->{loop}->remove($_->{timeout})
-    for values %{$self->{requests}};
-  $_ && $_->unsubscribe('close')->close() for values %{$self->{handles}};
-  delete $self->{handles};
+    my $self = shift;
+    delete $_->{timeout} for values %{$self->{requests}};
+    delete $self->{handle};
 }
 
 sub _close {
-  my ($self, $loop) = @_;
-  $self->_fail_all($loop, 'closed prematurely');
-  delete $self->{handles}{$loop};
-  delete $self->{responses}{$loop};
+    my ($self, $err) = @_;
+    $self->_fail_all($err || 'closed prematurely');
+    delete @{$self}{qw(handle response)};
 }
 
 sub _command {
-  my ($self, $loop, $cmd, $attr, $query, $cb) = @_;
+    my ($self, $cmd, $attr, $query, $cb) = @_;
 
-  my $tag = ++$self->{_tag};
-  my $r = $self->{requests}{$tag} = {tag => $tag, loop => $loop, cb => $cb};
-  $r->{subscription} = delete $attr->{'.subscription'};
+    my $tag = ++$self->{_tag};
+    my $r   = $self->{requests}{$tag} = {tag => $tag, cb => $cb};
+    $r->{subscription} = delete $attr->{'.subscription'};
 
-  warn "-- got request for command '$cmd' (tag: $tag)\n" if DEBUG;
+    warn "-- got request for command '$cmd' (tag: $tag)\n" if DEBUG;
 
-  $r->{sentence} = encode_sentence($cmd, $attr, $query, $tag);
-  return $self->_send_request($r);
+    $r->{sentence} = encode_sentence($cmd, $attr, $query, $tag);
+    return $self->_send_request($r);
 }
 
 sub _connect {
-  my ($self, $r) = @_;
+    my ($self, $r) = @_;
 
-  warn "-- creating new connection\n" if DEBUG;
+    warn "-- creating new connection\n" if DEBUG;
 
-  my $queue = $self->{queues}{$r->{loop}} = [$r];
+    my $queue = $self->{queue} = [$r];
 
-  my $tls = $self->tls;
-  my $port = $self->port ? $self->{port} : $tls ? 8729 : 8728;
+    my $tls  = $self->tls;
+    my $port = $self->port ? $self->{port} : $tls ? 8729 : 8728;
 
-  $r->{loop}->client(
-    {
-      address     => $self->host,
-      port        => $port,
-      timeout     => CONN_TIMEOUT,
-      tls         => $tls,
-      tls_ciphers => 'HIGH'
-    } => sub {
-      my ($loop, $err, $stream) = @_;
+    weaken $self;
+    $self->{handle} = AnyEvent::Handle->new(
+        connect => [$self->host, $port],
+        timeout => 60,
 
-      delete $self->{queues}{$loop};
+        $tls ? (tls => "connect", tls_ctx => {cipher_list => "HIGH"}) : (),
 
-      if ($err) { $self->_fail($_, $err) for @$queue; return }
+        on_connect => sub {
+            warn "-- connection established\n" if DEBUG;
 
-      warn "-- connection established\n" if DEBUG;
+            delete $self->{queue};
 
-      $self->{handles}{$loop} = $stream;
+            $self->_login(sub {
+                return $self->_close($_[1]) if $_[1];
+                $self->_write_sentence($_) for @$queue;
+            });
+        },
 
-      weaken $self;
-      $stream->on(read => sub { $self->_read($loop, $_[1]) });
-      $stream->on(error => sub { $self and $self->_fail_all($loop, $_[1]) });
-      $stream->on(close => sub { $self && $self->_close($loop) });
+        on_connect_error => sub {
+            delete @{$self}{qw(handle queue)};
+            $self->_close($_[1]);
+        },
 
-      $self->_login(
-        $loop,
-        sub {
-          if ($_[1]) {
-            $_[0]->_fail($_, $_[1]) for @$queue;
-            $stream->close();
-            return;
-          }
-          $self->_write_sentence($stream, $_) for @$queue;
-        }
-      );
-    }
-  );
+        on_eof   => sub { $self && $self->_close },
+        on_error => sub { $self && $self->_close($_[2]) },
+        on_read    => sub { $self->_read(\$_[0]->{rbuf}) },
+        on_prepare => sub {CONN_TIMEOUT},
+        on_timeout => sub { $self && $self->_close }
+    );
 
-  return $r->{tag};
+    return $r->{tag};
 }
 
 sub _enqueue {
-  my ($self, $r) = @_;
-  return $self->_connect($r) unless my $queue = $self->{queues}{$r->{loop}};
-  push @$queue, $r;
-  return $r->{tag};
+    my ($self, $r) = @_;
+    return $self->_connect($r) unless my $queue = $self->{queue};
+    push @$queue, $r;
+    return $r->{tag};
 }
 
 sub _fail_all {
-  $_[0]->_fail($_, $_[2])
-    for grep { $_->{loop} eq $_[1] } values %{$_[0]->{requests}};
+    $_[0]->_fail($_, $_[1]) for values %{$_[0]->{requests}};
 }
 
 sub _finish {
-  my ($self, $r, $err) = @_;
-  delete $self->{requests}{$r->{tag}};
-  if (my $timer = $r->{timeout}) { $r->{loop}->remove($timer) }
-  $r->{cb}->($self, ($self->{error} = $err // ''), $r->{data});
+    my ($self, $r, $err) = @_;
+    delete $self->{requests}{$r->{tag}};
+    delete $r->{timeout};
+    $r->{cb}->($self, ($self->{error} = $err // ''), $r->{data});
 }
 
 sub _login {
-  my ($self, $loop, $cb) = @_;
-  warn "-- trying to log in\n" if DEBUG;
+    my ($self, $cb) = @_;
+    warn "-- trying to log in\n" if DEBUG;
 
-  $loop->delay(
-    sub {
-      $self->_command(
-        $loop, '/login',
+    $self->_command(
+        '/login',
         (
-          $self->new_login
-          ? {name => $self->user, password => $self->password}
-          : {}
+            $self->new_login
+            ? {name => $self->user, password => $self->password}
+            : {}
         ),
         undef,
-        $_[0]->begin()
-      );
-    },
-    sub {
-      my ($delay, $err, $res) = @_;
-      return $self->$cb($err) if $err;
-      return $self->$cb() if !$res->[0]{ret};    # New style login
+        sub {
+            my ($self, $err, $res) = @_;
+            return $self->$cb($err) if $err;
+            return $self->$cb() if !$res->[0]{ret};    # New style login
 
-      my $secret = md5_sum("\x00", $self->password, pack 'H*', $res->[0]{ret});
-      $self->_command($loop, '/login',
-        {name => $self->user, response => "00$secret"},
-        undef, $delay->begin());
-    },
-    sub {
-      $self->$cb($_[1]);
-    },
-  );
+            my $secret
+                = md5_hex("\x00", $self->password, pack 'H*', $res->[0]{ret});
+
+            $self->_command('/login',
+                {name => $self->user, response => "00$secret"},
+                undef, $cb);
+        }
+    );
 }
 
 sub _read {
-  my ($self, $loop, $bytes) = @_;
+    my ($self, $buf) = @_;
 
-  warn term_escape "-- read from socket: " . length($bytes) . "\n$bytes\n"
-    if DEBUG;
+    warn _term_esc("-- read buffer (" . length($$buf) . " bytes)\n$$buf\n")
+        if DEBUG;
 
-  my $response = $self->{responses}{$loop}
-    ||= MikroTik::Client::Response->new();
-  my $data = $response->parse(\$bytes);
+    my $response = $self->{response} ||= MikroTik::Client::Response->new();
+    my $data     = $response->parse($buf);
 
-  for (@$data) {
-    next unless my $r = $self->{requests}{delete $_->{'.tag'}};
-    my $type = delete $_->{'.type'};
-    push @{$r->{data} ||= Mojo::Collection->new()}, $_
-      if %$_ && !$r->{subscription};
+    for (@$data) {
+        next unless my $r = $self->{requests}{delete $_->{'.tag'}};
+        my $type = delete $_->{'.type'};
+        push @{$r->{data} ||= []}, $_ if %$_ && !$r->{subscription};
 
-    if ($type eq '!re' && $r->{subscription}) {
-      $r->{cb}->($self, '', $_);
+        if ($type eq '!re' && $r->{subscription}) {
+            $r->{cb}->($self, '', $_);
 
+        }
+        elsif ($type eq '!done') {
+            $r->{data} ||= [];
+            $self->_finish($r);
+
+        }
+        elsif ($type eq '!trap' || $type eq '!fatal') {
+            $self->_fail($r, $_->{message});
+        }
     }
-    elsif ($type eq '!done') {
-      $r->{data} ||= Mojo::Collection->new();
-      $self->_finish($r);
-
-    }
-    elsif ($type eq '!trap' || $type eq '!fatal') {
-      $self->_fail($r, $_->{message});
-    }
-  }
 }
 
 sub _send_request {
-  my ($self, $r) = @_;
-  return $self->_enqueue($r) unless my $stream = $self->{handles}{$r->{loop}};
-  return $self->_write_sentence($stream, $r);
+    my ($self, $r) = @_;
+    return $self->_enqueue($r) unless $self->{handle};
+    return $self->_write_sentence($r);
+}
+
+sub _term_esc {
+    my $str = shift;
+    $str =~ s/([\x00-\x09\x0b-\x1f\x7f\x80-\x9f])/sprintf '\\x%02x', ord $1/ge;
+    return $str;
 }
 
 sub _write_sentence {
-  my ($self, $stream, $r) = @_;
-  warn term_escape "-- writing sentence for tag: $r->{tag}\n$r->{sentence}\n"
-    if DEBUG;
+    my ($self, $r) = @_;
+    warn _term_esc("-- writing sentence for tag: $r->{tag}\n$r->{sentence}\n")
+        if DEBUG;
 
-  $stream->write($r->{sentence});
+    $self->{handle}->push_write($r->{sentence});
 
-  return $r->{tag} if $r->{subscription};
+    return $r->{tag} if $r->{subscription};
 
-  weaken $self;
-  $r->{timeout} = $r->{loop}
-    ->timer($self->timeout => sub { $self->_fail($r, 'response timeout') });
+    weaken $self;
+    $r->{timeout} = AnyEvent->timer(
+        after => $self->timeout,
+        cb    => sub { $self->_fail($r, 'response timeout') }
+    );
 
-  return $r->{tag};
+    return $r->{tag};
 }
 
 1;
-
 
 =encoding utf8
 
@@ -290,14 +272,16 @@ MikroTik::Client - Non-blocking interface to MikroTik API
 
 
   # Non-blocking
+  my $cv  = AE::cv;
   my $tag = $api->command(
       '/system/resource/print',
       {'.proplist' => 'board-name,version,uptime'} => sub {
           my ($api, $err, $list) = @_;
           ...;
+          $cv->send;
       }
   );
-  Mojo::IOLoop->start();
+  $cv->recv;
 
   # Subscribe
   $tag = $api->subscribe(
@@ -306,8 +290,7 @@ MikroTik::Client - Non-blocking interface to MikroTik API
           ...;
       }
   );
-  Mojo::IOLoop->timer(3 => sub { $api->cancel($tag) });
-  Mojo::IOLoop->start();
+  AE::timer 3, 0, cb => sub { $api->cancel($tag) };
 
   # Errors handling
   $api->command(
@@ -322,19 +305,19 @@ MikroTik::Client - Non-blocking interface to MikroTik API
           ...;
       }
   );
-  Mojo::IOLoop->start();
-
+ 
   # Promises
+  $cv  = AE::cv;
   $api->cmd_p('/interface/print')
       ->then(sub { my $res = shift }, sub { my ($err, $attr) = @_ })
-      ->finally(sub { Mojo::IOLoop->stop() });
-  Mojo::IOLoop->start();
+      ->finally($cv);
+  $cv->recv;
 
 =head1 DESCRIPTION
 
-Both blocking and non-blocking interface to a MikroTik API service. With queries,
-command subscriptions and Promises/A+ (courtesy of an I/O loop). Based on
-L<Mojo::IOLoop> and would work alongside L<EV>.
+Both blocking and non-blocking (don't mix them though) interface to a MikroTik
+API service. With queries, command subscriptions and optional Promises. Starting
+from C<v0.5> this module is an L<AnyEvent> user.
 
 =head1 ATTRIBUTES
 
@@ -352,14 +335,6 @@ Keeps an error from last L</command> call. Empty string on successful commands.
   $api     = $api->host('border-gw.local');
 
 Host name or IP address to connect to. Defaults to C<192.168.88.1>.
-
-=head2 ioloop
-
-  my $loop = $api->ioloop;
-  $api     = $api->loop(Mojo::IOLoop->new());
-
-Event loop object to use for blocking operations, defaults to L<Mojo::IOLoop>
-object.
 
 =head2 new_login
 
@@ -415,7 +390,7 @@ User name for authentication purposes. Defaults to C<admin>.
   my $tag = $api->subscribe('/ping', {address => '127.0.0.1'} => sub {...});
 
   # cancel command after 10 seconds
-  Mojo::IOLoop->timer(10 => sub { $api->cancel($tag) });
+  my $t = AE::timer 10, 0, sub { $api->cancel($tag) };
 
   # or with callback
   $api->cancel($tag => sub {...});
@@ -464,13 +439,11 @@ An alias for L</command_p>.
       die "Error: $err, category: " . $list->[0]{category};
   }
 
-Executes a command on a remote host and returns L<Mojo::Collection> with hashrefs
-containing elements returned by a host. You can append a callback for non-blocking
-calls.
+Executes a command on a remote host and returns list with hashrefs containing
+elements returned by a host. You can append a callback for non-blocking calls.
 
-In a case of error it may return extra attributes to C<!trap> or C<!fatal> API
-replies in addition to error messages in an L</error> attribute or an C<$err>
-argument. You should never rely on defines of the result to catch errors.
+In a case of error, returned value may keep additional attributes such as category
+or an error code. You should never rely on defines of the result to catch errors.
 
 For a query syntax refer to L<MikroTik::Client::Query>.
 
@@ -487,8 +460,8 @@ For a query syntax refer to L<MikroTik::Client::Query>.
   });
 
 Same as L</command>, but always performs requests non-blocking and returns a
-L<Mojo::Promise> object instead of accepting a callback. L<Mojolicious> v7.54+ is
-required for promises functionality.
+promise instead of accepting a callback. L<Promises> v0.99+ is required for
+this functionality.
 
 =head2 subscribe
 
@@ -497,9 +470,7 @@ required for promises functionality.
         my ($api, $err, $res) = @_;
       });
 
-  Mojo::IOLoop->timer(
-      3 => sub { $api->cancel($tag) }
-  );
+  AE::timer 3, 0, sub { $api->cancel($tag) };
 
 Subscribe to an output of commands with continuous responses such as C<listen> or
 C<ping>. Should be terminated with L</cancel>.
@@ -513,7 +484,7 @@ Also, you can change connection timeout with the MIKROTIK_CLIENT_CONNTIMEOUT var
 
 =head1 COPYRIGHT AND LICENSE
 
-Andre Parker, 2017-2018.
+Andre Parker, 2017-2019.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.
@@ -523,4 +494,3 @@ the terms of the Artistic License version 2.0.
 L<https://wiki.mikrotik.com/wiki/Manual:API>, L<https://github.com/anparker/api-mikrotik>
 
 =cut
-

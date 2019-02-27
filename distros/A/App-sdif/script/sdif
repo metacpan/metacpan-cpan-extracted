@@ -87,6 +87,7 @@ my $opt_l;
 my $opt_s;
 my $opt_q;
 my $opt_d;
+my $opt_command = 1;
 my $opt_truncate = 0;
 my $opt_onword = 1;
 my $opt_cdif = 'cdif';
@@ -137,6 +138,7 @@ my @optargs = (
     "width|W=i" => \$opt_W,
     "view|v" => \$opt_view,
     "ambiguous=s" => \$opt_ambiguous,
+    "command!" => \$opt_command,
 
     "d+" => \$opt_d,
     "h|help" => sub { usage() },
@@ -741,6 +743,8 @@ sub print_column_23 {
 }
 
 sub print_command_n {
+    $opt_command or return;
+
     my $opt = ref $_[0] ? shift : {};
     my $column = @_;
     my $width = column_width $column;
@@ -975,6 +979,11 @@ if possible.
 
 Print line number on each lines.
 Default false.
+
+=item B<-->[B<no>]B<command>
+
+Print diff command control lines.
+Default true.
 
 =item B<--digit>=I<n>
 

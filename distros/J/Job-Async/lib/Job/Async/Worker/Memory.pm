@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Job::Async::Worker);
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 =head1 NAME
 

@@ -5,6 +5,9 @@
 #  This tests to see if we can create megawidgets in an arbitrary namespace, like the WidgetDemo.pm file
 #   in the Tk demos directory.
 
+use warnings;
+use strict;
+
 #$Tk::SlideSwitch::VERSION = '1.1';
 
 use Test;
@@ -17,8 +20,6 @@ use Tcl::pTk::MegaWidget;
 
 
 use base qw/Tcl::pTk::Frame/;
-
-use strict;
 
 Construct Tcl::pTk::Widget 'SlideSwitch';
 

@@ -1,0 +1,65 @@
+NAME
+    Dist::Zilla::Plugin::Prereqs::SetMinimumVersion::FromPmVersions - Set
+    minimum version of prereqs from pmversions.ini
+
+VERSION
+    This document describes version 0.001 of
+    Dist::Zilla::Plugin::Prereqs::SetMinimumVersion::FromPmVersions (from
+    Perl distribution
+    Dist-Zilla-Plugin-Prereqs-SetMinimumVersion-FromPmVersions), released on
+    2019-02-26.
+
+SYNOPSIS
+    In ~/pmversions.ini:
+
+     Log::ger=0.019
+     File::Write::Rotate=0.28
+
+    In dist.ini:
+
+     [Prereqs::SetMinimumVersion::FromPmVersions]
+
+DESCRIPTION
+    This plugin is the counterpart of [Prereqs::EnsureVersion].
+    [Prereqs::EnsureVersion] checks prereqs and aborts the build when a
+    prereq specifies version less than specified in pmversions.ini.
+    [Prereqs::SetMinimumVersion::FromPmVersions] on the other hand, sets a
+    prereq's minimum version to that specified in pmversions.ini.
+
+ENVIRONMENT
+  PMVERSIONS_PATH
+    String. Set location of pmversions.ini instead of the default
+    "~/pmversions.ini". Example: "/etc/minver.conf". Note that this is
+    actually observed by in PMVersions::Util.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Prereqs-SetMinimumVersio
+    n-FromPmVersions>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Prereqs-EnsureVersi
+    on>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Pre
+    reqs-SetMinimumVersion-FromPmVersions>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Dist::Zilla::Plugin::Prereqs::EnsureVersion
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

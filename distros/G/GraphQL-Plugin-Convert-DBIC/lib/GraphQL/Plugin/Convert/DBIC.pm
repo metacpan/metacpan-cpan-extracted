@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -42,6 +42,9 @@ my %GRAPHQL_TYPE2SQLS = (
     'tinytext',
     'mediumtext',
     'longtext',
+    # pgsql
+    'cidr',
+    'inet',
   ],
   Int => [
     'bigint',

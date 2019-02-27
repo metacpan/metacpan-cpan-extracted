@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Map-Tube",
    "no_index" : {
@@ -37,7 +37,7 @@
             "File::Basename" : "2.6",
             "File::ShareDir" : "1.114",
             "JSON" : "2.90",
-            "Map::Tube::Exception" : "3.16",
+            "Map::Tube::Exception" : "3.19",
             "Module::Pluggable" : "5.1",
             "Moo" : "2.000000",
             "Moo::Role" : "2.000000",
@@ -57,35 +57,35 @@
    "provides" : {
       "Map::Tube" : {
          "file" : "lib/Map/Tube.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Line" : {
          "file" : "lib/Map/Tube/Line.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Node" : {
          "file" : "lib/Map/Tube/Node.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Pluggable" : {
          "file" : "lib/Map/Tube/Pluggable.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Route" : {
          "file" : "lib/Map/Tube/Route.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Table" : {
          "file" : "lib/Map/Tube/Table.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Types" : {
          "file" : "lib/Map/Tube/Types.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       },
       "Map::Tube::Utils" : {
          "file" : "lib/Map/Tube/Utils.pm",
-         "version" : "3.59"
+         "version" : "3.60"
       }
    },
    "release_status" : "stable",
@@ -96,6 +96,6 @@
          "web" : "https://github.com/manwar/Map-Tube"
       }
    },
-   "version" : "3.59",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "3.60",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

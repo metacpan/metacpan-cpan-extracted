@@ -20,6 +20,8 @@
 # with this file.  If not, see <http://www.gnu.org/licenses/>.
 
 
+# Module::CPANTS::Analyse
+
 set -e
 set -x
 

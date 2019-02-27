@@ -1,5 +1,8 @@
 # bitmaps.pl
 
+use warnings;
+use strict;
+
 use subs qw/bitmaps_row/;
 use vars qw/$TOP/;
 

@@ -1,58 +1,44 @@
 package MikroTik::Client::Mockup;
-use Mojo::Base '-base';
+use MikroTik::Client::Mo;
 
+use AE;
+use AnyEvent::Handle;
+use AnyEvent::Socket;
 use MikroTik::Client::Response;
 use MikroTik::Client::Sentence qw(encode_sentence);
-use Mojo::IOLoop;
+use Scalar::Util 'weaken';
 
 has 'fd';
-has ioloop => sub { Mojo::IOLoop->singleton };
-has 'port';
-has res => sub { MikroTik::Client::Response->new() };
+has port   => undef;
+has res    => sub { MikroTik::Client::Response->new() };
 has server => sub {
     my $self = shift;
+    weaken $self;
 
-    my $opts = {address => '127.0.0.1'};
-    if (defined(my $fd = $self->fd)) {
-        $opts->{fd} = $fd;
-    }
-    else {
-        $opts->{port}  = $self->port;
-        $opts->{reuse} = 1;
-    }
+    return tcp_server "127.0.0.1", $self->port, sub {
+        my $fh = shift;
+        $self->{h} = AnyEvent::Handle->new(
+            fh      => $fh,
+            on_read => sub {
+                my $h    = shift;
+                my $data = $self->res->parse(\$h->{rbuf});
+                for (@$data) {
+                    my $cmd = $_->{'.type'} // '';
+                    warn "wrong command \"$cmd\"\n" and next
+                        unless $cmd =~ s/^\//cmd_/;
+                    $cmd =~ s/\//_/g;
 
-    my $serv_id = $self->ioloop->server(
-        $opts => sub {
-            my ($loop, $stream, $id) = @_;
-
-            $self->{h} = $stream;
-
-            $stream->on(
-                read => sub {
-                    my ($stream, $bytes) = @_;
-
-                    my $data = $self->res->parse(\$bytes);
-                    for (@$data) {
-                        my $cmd = $_->{'.type'} // '';
-                        warn "wrong command \"$cmd\"\n" and next
-                            unless $cmd =~ s/^\//cmd_/;
-                        $cmd =~ s/\//_/g;
-
-                        eval {
-                            my $resp = '';
-                            $resp .= encode_sentence(@$_) for ($self->$cmd($_));
-                            $stream->write($resp);
-                        } or warn "unhandled command \"$cmd\": $@";
-                    }
+                    eval {
+                        my $resp = '';
+                        $resp .= encode_sentence(@$_) for ($self->$cmd($_));
+                        $h->push_write($resp);
+                        1;
+                    } or warn "unhandled command \"$cmd\": $@";
                 }
-            );
-            $stream->on(
-                close => sub { $loop->remove($_) for values %{$self->{timers}} }
-            );
-        }
-    );
-
-    return $serv_id;
+            },
+            on_eof => sub { delete $self->{timers} }
+        );
+    }, sub { $self->port($_[2]); return 0 };
 };
 
 sub cmd_cancel {
@@ -61,8 +47,7 @@ sub cmd_cancel {
     my $cmd_tag = $attr->{'tag'};
 
     return ['!trap', {message => 'unknown command'}, undef, $tag]
-        unless my $id = delete $self->{timers}{$cmd_tag};
-    $self->ioloop->remove($id);
+        unless delete $self->{timers}{$cmd_tag};
 
     return (
         ['!trap', {category => 2, message => 'interrupted'}, undef, $cmd_tag],
@@ -72,13 +57,7 @@ sub cmd_cancel {
 sub cmd_close_premature {
     my ($self, $attr) = @_;
 
-    my $sent = encode_sentence('!re', {message => 'response'}, undef,
-        $attr->{'.tag'});
-    substr $sent, (length($sent) / 2), -1, '';
-
-    $self->{h}->write($sent);
-    $self->ioloop->timer(0.5 => sub { $self->{h}->close() });
-
+    $self->{timers}{_prem} = AE::timer 0.25, 0, sub { $self->{h}->destroy };
     return ();
 }
 
@@ -95,9 +74,14 @@ sub cmd_login {
     return _done($tag, {ret => '098f6bcd4621d373cade4e832627b4f6'})
         unless $attr->{name};
 
-    return _done($tag)
-        if $attr->{name} eq 'test'
-        && $attr->{response} eq '00119ce7e093e33497053e73f37a5d3e15';
+    return _done($tag) if $attr->{name} eq 'test' && (
+
+        # Pre 6.43
+        ($attr->{response} // '') eq '00119ce7e093e33497053e73f37a5d3e15'
+
+        # 6.43+
+        or ($attr->{password} // '') eq 'tset'
+    );
 
     return ['!fatal', {message => 'cannot log in'}, undef, $tag];
 }
@@ -119,12 +103,10 @@ sub cmd_subs {
     my $tag = $attr->{'.tag'} // 0;
     my $key = $attr->{'key'};
 
-    $self->{timers}{$tag} = $self->ioloop->recurring(
-        0.5 => sub {
-            $self->{h}
-                ->write(encode_sentence('!re', {key => $key}, undef, $tag));
-        }
-    );
+    $self->{timers}{$tag} = AE::timer 0.5, 0.5, sub {
+        $self->{h}
+            ->push_write(encode_sentence('!re', {key => $key}, undef, $tag));
+    };
 
     return ();
 }
@@ -141,4 +123,3 @@ sub _gen_attr {
 }
 
 1;
-

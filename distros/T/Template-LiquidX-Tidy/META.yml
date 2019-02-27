@@ -1,0 +1,35 @@
+---
+abstract: 'Indentation for Liquid template documents'
+author:
+  - 'Ailin Nemui <ailin at devio dot us>'
+build_requires:
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Output: '0'
+  ok: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-LiquidX-Tidy
+requires:
+  Exporter: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  Template::Liquid: '0'
+  Template::Liquid::Tag: '0'
+  Template::Liquid::Tag::Case: '0'
+  Template::Liquid::Tag::If: '0'
+  Template::Liquid::Utility: '0'
+  base: '0'
+  experimental: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.01'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

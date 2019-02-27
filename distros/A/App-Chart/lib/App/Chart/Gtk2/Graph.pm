@@ -1,6 +1,6 @@
 # Graph widget.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2013 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -44,7 +44,7 @@ use App::Chart::Series;
 use App::Chart::Gtk2::Graph::Plugin::Latest;
 
 # uncomment this to run the ### lines
-#use Devel::Comments;
+# use Smart::Comments;
 
 use Glib::Object::Subclass
   'Gtk2::DrawingArea',
@@ -124,7 +124,10 @@ HERE
 sub INIT_INSTANCE {
   my ($self) = @_;
   $self->{'series_list'} = [];
+
   $self->set_double_buffered (0);
+  $self->set_app_paintable (1);
+
   $self->add_events (['button-press-mask',
                       'button-motion-mask',
                       'button-release-mask']);
@@ -309,7 +312,7 @@ sub draw_t_range {
 # 'expose' class closure
 sub _do_expose_event {
   my ($self, $event) = @_;
-  ### Graph _do_expose_event()
+  ### Graph _do_expose_event() ...
 
   if (delete $self->{'initial_scale'}) {
     _initial_scale ($self);
@@ -330,11 +333,13 @@ sub _do_expose_event {
   } else {
     _draw_region ($self, $region);
   }
+  ### Graph _do_expose_event() end ...
   return Gtk2::EVENT_PROPAGATE;
 }
 
 sub _draw_region {
   my ($self, $region) = @_;
+  ### Graph _draw_region() ...
 
   my $series_list = $self->get('series_list');
   my $any = 0;
@@ -345,12 +350,14 @@ sub _draw_region {
     $any |= $class->draw ($self, $series, $region);
   }
   if (! $any) {
+    ### Graph _draw_region() no data ...
     App::Chart::Gtk2::GUI::draw_text_centred ($self, $region, __('no data'));
   }
 
   foreach my $class (@plugins) {
     $class->draw ($self, $region);
   }
+  ### Graph _draw_region() end ...
 }
 
 # 'changed' and 'value-changed' signals on vadjustment
@@ -686,7 +693,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2007, 2008, 2009, 2010, 2011, 2013 Kevin Ryde
+Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2018 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

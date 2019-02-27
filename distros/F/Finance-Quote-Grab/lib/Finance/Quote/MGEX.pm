@@ -1,5 +1,7 @@
-# Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
 
+# This file is part of Finance-Quote-Grab.
+#
 # Finance-Quote-Grab is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published
 # by the Free Software Foundation; either version 3, or (at your option) any
@@ -11,14 +13,14 @@
 # Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with Finance-Quote-Grab.  If not, see <http://www.gnu.org/licenses/>.
 
 package Finance::Quote::MGEX;
 use 5.005;
 use strict;
 
 use vars '$VERSION';
-$VERSION = 14;
+$VERSION = 15;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -114,7 +116,9 @@ my %aquote_name_to_commodity
      'HRSI'    => 'IP',
      'SRWI'    => 'IW',
      'NSI'     => 'IS',
-     'AJC'     => 'AJ',
+
+     # Apple Juice gone in 2019.
+     # 'AJC'     => 'AJ',
     );
 
 my %month_code_to_month = ('F' => 1,
@@ -457,13 +461,13 @@ __END__
 
 Finance::Quote::MGEX - download Minneapolis Grain Exchange quotes
 
-=for Finance_Quote_Grab symbols MWZ15
+=for Finance_Quote_Grab symbols MWZ19
 
 =head1 SYNOPSIS
 
  use Finance::Quote;
  my $fq = Finance::Quote->new ('MGEX');
- my %quotes = $fq->fetch('mgex', 'MWZ15');
+ my %quotes = $fq->fetch('mgex', 'MWZ19');
 
 =head1 DESCRIPTION
 
@@ -498,20 +502,19 @@ L<http://sites.barchart.com/pl/mgex/wquotes_js.js>
 
 The available symbols are for example
 
-=for Finance_Quote_Grab symbols MWZ15 AJK15 KEZ15 ZWZ15 ICH15 IHH15 IPH15 ISH15 IWH15
+=for Finance_Quote_Grab symbols MWZ19 KEZ19 ZWZ19 ICH19 IHH19 IPH19 ISH19 IWH19
 
-    MWZ15      Minneapolis wheat
-    AJK15      apple juice concentrate
-    KEZ15      Kansas wheat
-    ZWZ15      CBOT wheat
+    MWZ19      Minneapolis wheat
+    KEZ19      Kansas wheat
+    ZWZ19      CBOT wheat
 
-    ICH15      national corn index
-    IHH15      hard red winter wheat index
-    IPH15      hard red spring wheat index
-    ISH15      national soybean index
-    IWH15      soft red spring wheat index
+    ICH19      national corn index
+    IHH19      hard red winter wheat index
+    IPH19      hard red spring wheat index
+    ISH19      national soybean index
+    IWH19      soft red spring wheat index
 
-The "Z15" etc is the contract month letter and the year "15" for 2015.  The
+The "Z19" etc is the contract month letter and the year "19" for 2019.  The
 month letters are the usual U.S. futures style
 
     F    January
@@ -547,7 +550,7 @@ Plus the following extras
 
 Prices on the web pages are in eighths but are always returned here as
 decimals so they can be used arithmetically.  For instance "195-2" meaning
-S<195 2/8> becomes "195.25".
+S<195 + 2/8> becomes "195.25".
 
 =head1 SEE ALSO
 
@@ -561,7 +564,7 @@ L<http://user42.tuxfamily.org/finance-quote-grab/index.html>
 
 =head1 LICENCE
 
-Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2016, 2019 Kevin Ryde
 
 Finance-Quote-Grab is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

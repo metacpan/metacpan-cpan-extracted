@@ -52,6 +52,7 @@
       },
       "test" : {
          "requires" : {
+            "Class::Accessor::Fast" : "0",
             "Test::Exception" : "0",
             "Test::Simple" : "0.94"
          }
@@ -60,11 +61,11 @@
    "provides" : {
       "MooX::Adopt::Class::Accessor::Fast" : {
          "file" : "lib/MooX/Adopt/Class/Accessor/Fast.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "MooX::Emulate::Class::Accessor::Fast" : {
          "file" : "lib/MooX/Emulate/Class/Accessor/Fast.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -78,10 +79,11 @@
          "web" : "https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>",
-      "Graham Knop <haarg@haarg.org>"
+      "Graham Knop <haarg@haarg.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1

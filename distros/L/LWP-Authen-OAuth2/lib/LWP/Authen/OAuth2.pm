@@ -335,7 +335,8 @@ Version 0.15
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
+
 
 =head1 SYNOPSIS
 
@@ -383,6 +384,12 @@ implemented by L<Adam Millerchip|https://github.com/amillerchip>
 L<LWP::Authen::OAuth2::ServiceProvider::Strava>
 
 implemented by L<Leon Wright|https://github.com/techman83>
+
+=item * Yahoo
+
+L<LWP::Authen::OAuth2::ServiceProvider::Yahoo>
+
+implemented by L<Michael Stevens|https://github.com/michael-stevens>
 
 =back
 
@@ -831,7 +838,7 @@ You can also look for information at:
 
 =item Github (submit patches here)
 
-L<https://github.com/btilly/perl-oauth2>
+L<https://github.com/domm/perl-oauth2>
 
 =item RT: CPAN's request tracker (report bugs here)
 
@@ -845,9 +852,9 @@ L<http://annocpan.org/dist/LWP-Authen-OAuth2>
 
 L<http://cpanratings.perl.org/d/LWP-Authen-OAuth2>
 
-=item Search CPAN
+=item MetaCPAN
 
-L<http://search.cpan.org/dist/LWP-Authen-OAuth2/>
+L<https://metacpan.org/release/LWP-Authen-OAuth2>
 
 =back
 
@@ -877,6 +884,8 @@ C<ServiceProvider> work without requiring subclassing.
 =item * L<Adi Fairbank|https://github.com/adifairbank> for adding a L<Dwolla | https://www.dwolla.com/> Service Provider and some other improvements
 
 =item * L<Adam Millerchip|https://github.com/amillerchip> for adding a L<Line | https://line.me> Service Provider and some refactoring
+
+=item * L<Michael Stevens|https://github.com/mstevens> for adding a C<Yahoo | https://developer.yahoo.com> Service Provider and some dist cleanup
 
 =item * Nick Morrott for fixing some documentation typos
 

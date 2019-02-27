@@ -1858,9 +1858,9 @@ SSL2-compatible framing is supported).
 
 If it detects that the input data is likely TLS, it calls the callback
 with a true value for C<$detect> and the (on-wire) TLS version as second
-and third argument (C<$major> is C<3>, and C<$minor> is 0..3 for SSL
-3.0, TLS 1.0, 1.1 and 1.2, respectively).  If it detects the input to
-be definitely not TLS, it calls the callback with a false value for
+and third argument (C<$major> is C<3>, and C<$minor> is 0..4 for SSL
+3.0, TLS 1.0, 1.1, 1.2 and 1.3, respectively).  If it detects the input
+to be definitely not TLS, it calls the callback with a false value for
 C<$detect>.
 
 The callback could use this information to decide whether or not to start
@@ -1916,7 +1916,7 @@ register_read_type tls_detect => sub {
 
          # full match, valid TLS record
          my ($major, $minor) = unpack "CC", $1;
-         $cb->($self, "accept", $major + $minor * 0.1);
+         $cb->($self, "accept", $major, $minor);
       } else {
          # mismatch == guaranteed not TLS
          $cb->($self, undef);

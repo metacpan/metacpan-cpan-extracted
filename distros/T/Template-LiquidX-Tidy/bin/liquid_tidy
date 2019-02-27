@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use App::LiquidTidy;
+
+my %options;
+GetOptions(\%options,
+	   'help|h|?',
+
+	   'html!',
+	   'indent=i',
+	   'force_nl!',
+	   'short_if=i',
+	   'force_nl_tags=s',
+	  ) or pod2usage(2);
+pod2usage(1) if $options{help};
+pod2usage("$0: Too many files given.\n") if (@ARGV > 1);
+
+$options{file} = $ARGV[0] // '-';
+
+App::LiquidTidy->new(\%options)->run;
+
+=head1 NAME
+
+liquid_tidy - Indent Liquid template documents
+
+=head1 SYNOPSIS
+
+liquid_tidy [-html] [-indent=4] [-noforce_nl] [-short_if=8] [-force_nl_tags="for if ..."] [<file>]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-help>
+
+Print this message.
+
+=item B<-html>, B<-nohtml>
+
+Indent HTML code
+
+=item B<-indent>
+
+The number of spaces for each indentation level
+
+=item B<-force_nl>, B<-noforce_nl>
+
+Whether to forcibly add line breaks into tags listed as force_nl_tags
+
+=item B<-short_if>
+
+The length of a text inbetween {% if %} that should be exempt from force_nl
+
+=item B<-force_nl_tags>
+
+A space separated list of tags where -force_nl will add line breaks.
+
+Default tags: for endfor comment endcomment if unless elsif else endif
+endunless case when endcase
+
+=back
+
+=head1 DESCRIPTION
+
+This program will read the given input file and output the nicely
+indented Liquid template to standard output.
+
+=head1 SEE ALSO
+
+L<Template::Liquid>
+
+=cut
+

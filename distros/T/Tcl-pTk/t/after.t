@@ -1,3 +1,5 @@
+use warnings;
+use strict;
 #use Test::More (tests => 6);
 use Test;
 BEGIN {plan tests=>8}

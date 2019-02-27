@@ -1,5 +1,8 @@
 # search.pl
 
+use warnings;
+use strict;
+
 use Tcl::pTk::LabEntry;
 use subs qw/search_flash_matches search_load_file search_text/;
 use vars qw/$TOP/;

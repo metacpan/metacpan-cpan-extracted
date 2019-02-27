@@ -1,8 +1,8 @@
-#!/usr/local/bin/perl -w
-
 # Test for many of the commands/methods added to the text widget by
 #    Tcl/pTk/Widget/Text.pm
 
+use warnings;
+use strict;
 #use Tk;
 use Tcl::pTk;
 

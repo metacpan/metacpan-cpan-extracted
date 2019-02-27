@@ -1,7 +1,7 @@
-# MikroTik::Client - Non-blocking interface to MikroTik API. [![Build Status](https://travis-ci.org/anparker/api-mikrotik.svg?branch=master)](https://travis-ci.org/anparker/api-mikrotik)
+# MikroTik::Client - Non-blocking interface to MikroTik API. [![Build Status](https://travis-ci.org/anparker/mikrotik-client.svg?branch=master)](https://travis-ci.org/anparker/mikrotik-client)
 
 Blocking and non-blocking API interface with queries, command subscriptions
-and Promises/A+ (courtesy of [Mojo::IOLoop](http://github.com/kraih/mojo/)).
+and Promises/A.
 
 ```perl
   my $api = MikroTik::Client->new();
@@ -17,14 +17,16 @@ and Promises/A+ (courtesy of [Mojo::IOLoop](http://github.com/kraih/mojo/)).
 
 
   # Non-blocking
+  my $cv = AE::cv;
   my $tag = $api->command(
       '/system/resource/print',
       {'.proplist' => 'board-name,version,uptime'} => sub {
           my ($api, $err, $list) = @_;
           ...;
+          $cv->send;
       }
   );
-  Mojo::IOLoop->start();
+  $cv->recv;
 
   # Subscribe
   $tag = $api->subscribe(
@@ -33,8 +35,7 @@ and Promises/A+ (courtesy of [Mojo::IOLoop](http://github.com/kraih/mojo/)).
           ...;
       }
   );
-  Mojo::IOLoop->timer(3 => sub { $api->cancel($tag) });
-  Mojo::IOLoop->start();
+  my $t = AE::timer 3, 0, sub { $api->cancel($tag) };
 
   # Errors handling
   $api->command(
@@ -49,11 +50,11 @@ and Promises/A+ (courtesy of [Mojo::IOLoop](http://github.com/kraih/mojo/)).
           ...;
       }
   );
-  Mojo::IOLoop->start();
 
   # Promises
+  $cv  = AE::cv;
   $api->cmd_p('/interface/print')
       ->then(sub { my $res = shift }, sub { my ($err, $attr) = @_ })
-      ->finally(sub { Mojo::IOLoop->stop() });
-  Mojo::IOLoop->start();
+      ->finally($cv);
+  $cv->recv;
 ```

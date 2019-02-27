@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use ExtUtils::MakeMaker;
-
 use File::ShareDir::Install;
  
 install_share 'share';
@@ -18,14 +17,16 @@ WriteMakefile(
     ],
     LICENSE          => 'gpl_2',
     MIN_PERL_VERSION => '5.10.1',
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker'     => 6.52,
+        'File::ShareDir::Install' => 0.13,
+    },
     PREREQ_PM => {
 		'Net::AMQP'       => 0.06,
 		'List::MoreUtils' => 0.25,
-		'File::ShareDir'  => 1.00,
-        'File::ShareDir::Install' => 0.11,
+		'File::ShareDir'  => 1.116,
 		'Try::Tiny'       => 0.12,
 		'Socket::Linux'   => 0.01,
-		'File::ShareDir::Install' => 0.10,
     },
     TEST_REQUIRES => {
         'Test::File::ShareDir' => 1.001001,

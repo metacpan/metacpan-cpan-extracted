@@ -2,7 +2,7 @@
 #   There is a global variable in Tcl::pTk called $inMainLoop that prevents this from happening.
 #   Multiple mainloops are encountered in the widget demos when calling up demos like browseentry.pl
 
-
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;  

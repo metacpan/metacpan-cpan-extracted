@@ -15,7 +15,7 @@ use parent qw( EPublisher::Source::Base );
 
 has ua => ( is => 'ro', default => sub { HTTP::Tiny->new } );
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 # implementing the interface to EPublisher::Source::Base
 sub load_source{
@@ -25,9 +25,8 @@ sub load_source{
 
     my $options = $self->_config;
     
-    return if !$options->{name};
-
     my $name = $options->{name};
+    return if !$name;
 
     # fetching the requested tutorial from metacpan
     $self->publisher->debug( "103: fetch tutorial $name" );
@@ -93,7 +92,7 @@ EPublisher::Source::Plugin::PerltutsCom - Get POD from tutorials published on pe
 
 =head1 VERSION
 
-version 0.5
+version 0.6
 
 =head1 SYNOPSIS
 

@@ -35,18 +35,21 @@ push @parts, (substr $packed, 0, $_, '') for (900, 700, 880, 820);
 $attr->{'.tag'}  = '';
 $attr->{'.type'} = '!re';
 
-my $w = $r->parse(\$parts[0]);
+my $buf = $parts[0];
+my $w = $r->parse(\$buf);
 is_deeply $w, [$attr], 'right result';
 ok $r->sentence->is_incomplete, 'incomplete is set';
-$w = $r->parse(\$parts[1]);
+$buf .= $parts[1];
+$w = $r->parse(\$buf);
 is_deeply $w, [], 'right result';
 ok $r->sentence->is_incomplete, 'incomplete is set';
-$w = $r->parse(\$parts[2]);
+$buf .= $parts[2];
+$w = $r->parse(\$buf);
 is_deeply $w, [($attr) x 2], 'right result';
 ok $r->sentence->is_incomplete, 'incomplete is set';
-$w = $r->parse(\$parts[3]);
+$buf .= $parts[3];
+$w = $r->parse(\$buf);
 is_deeply $w, [$attr], 'right result';
 ok !$r->sentence->is_incomplete, 'incomplete is not set';
 
 done_testing();
-

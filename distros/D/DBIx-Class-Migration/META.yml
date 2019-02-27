@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ requires:
   Class::Load: '0.22'
   Config::MySQL: '0.02'
   DBD::SQLite: '1.46'
-  DBIx::Class::DeploymentHandler: '0.002221'
+  DBIx::Class::DeploymentHandler: '0.002222'
   DBIx::Class::Fixtures: '1.001028'
   DBIx::Class::Schema::Loader: '0.07042'
   Devel::PartialDump: '0.17'
@@ -33,6 +33,8 @@ requires:
   File::Spec: '0'
   File::Temp: '0'
   JSON::MaybeXS: '0'
+  Log::Any: '1.707'
+  Module::Find: '0.13'
   Moose: '2.2006'
   MooseX::Attribute::ENV: '0.02'
   MooseX::Getopt: '0.68'
@@ -47,5 +49,6 @@ resources:
   bugtracker: https://github.com/jjn1056/DBIx-Class-Migration/issues
   homepage: https://github.com/jjn1056/DBIx-Class-Migration
   repository: https://github.com/jjn1056/DBIx-Class-Migration.git
-version: '0.060'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.063'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

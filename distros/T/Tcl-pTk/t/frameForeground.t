@@ -2,6 +2,9 @@
 #   The -foreground option for Frame is only valid for perl/tk syntax. This test cases checks to see
 #  if Tcl::pTk is compatible.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 #use Tk;
 use Test;

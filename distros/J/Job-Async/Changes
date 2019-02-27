@@ -1,6 +1,12 @@
 
 Revision history for Job-Async
 
+0.003     2019-02-27 13:55:17+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support for Sereal encoding on parameters, you can now select between plain text, JSON and Sereal
+    - ->structured_data method for explicitly selecting the type of data to retrieve
+
 0.002     2018-01-02 00:54:36+08:00 Asia/Kuala_Lumpur
     No new features.
 

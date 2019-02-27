@@ -1,6 +1,8 @@
 # Test to check error reporting for a background error (with TkHijack Active)
 #   that occurs due to a undefined sub in a megawidget
 
+use warnings;
+use strict;
 use Test;
 BEGIN {plan tests=>4};
 
@@ -12,8 +14,6 @@ use Tk;
 use Tk::TextUndo;
 use base qw/Tk::Frame/;
 
-
-use strict;
 
 Construct Tk::Widget 'SlideSwitch';
 #Construct Tk::Widget 'SlideSwitch';
@@ -93,6 +93,10 @@ package main;
 
 use Tk;
 
+# Filename and line numbers to look for in expected errors
+my $ok_file = quotemeta(__FILE__);
+my ($ok3_line, $ok4_line);
+
 # Setup to redirect stderr to file, so we can check it.
 # Save existing StdErr
 *OLD_STDERR = *STDERR;
@@ -109,18 +113,24 @@ my $TOP = MainWindow->new();
         -bg          => 'gray',
         -orient      => 'horizontal',
         -command     => sub {
-                                print "Switch value is '".join("', '", @_)."'\n";
-                                 main::bogus(); # Call undefined routine to trigger error
-
-                            },
+            print "Switch value is '".join("', '", @_)."'\n";
+            $ok4_line = __LINE__ + 1; # Line to look for in error output
+            main::bogus(); # Call undefined routine to trigger error
+        },
         -llabel      => [-text => 'OFF', -foreground => 'blue'],
         -rlabel      => [-text => 'ON',  -foreground => 'blue'],
         -troughcolor => 'tan',
     )->pack(qw/-side left -expand 1/);
 
 
-$mw->after(2000, [$mw, 'destroy']);
+$mw->after(1000,
+    sub {
+        $sl->{sl}->set(1); # toggle SlideSwitch
+    },
+);
+$mw->after(2000, [$mw, 'destroy']) unless (@ARGV); # Persist if any args supplied, for debugging
 
+$ok3_line = __LINE__ + 1; # Line to look for in error output
 MainLoop;
     
 # Redirect stderr back
@@ -139,8 +149,8 @@ close INFILE;
 # Check error messages for key components
 ok( $errMessages =~ /Undefined subroutine\s+\&main\:\:bogus/);
 ok( $errMessages =~ /command executed by scale/);
-ok( $errMessages =~ /Error Started at t\/tkHijack_bgerror2.t line 124/);
-ok( $errMessages =~ / Undefined subroutine \&main::bogus called at t\/tkHijack_bgerror2.t line 113/);
+ok( $errMessages =~ /Error Started at $ok_file line $ok3_line/);
+ok( $errMessages =~ / Undefined subroutine \&main::bogus called at $ok_file line $ok4_line/);
 
 unlink 'serr.out';
 

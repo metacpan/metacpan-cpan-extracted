@@ -1,5 +1,8 @@
 # floor.pl
 
+use warnings;
+use strict;
+
 use Tcl::pTk::Trace;
 use subs qw/floor_bg1 floor_bg2 floor_bg3 floor_display floor_fg1 floor_fg2
 	    floor_fg3 floor_room_changed/;
@@ -92,7 +95,6 @@ sub floor {
 	[sub {
 	    my($index, $value, $op, $floor_items, $cinfo) = @_;
 	    return if $op eq 'u';
-	    $floor_current_room = $value;
 	    &floor_room_changed($c->Subwidget('canvas'), $floor_items, $cinfo);
 	    $value;             # always return variable's new value
 	}, \%floor_items, \%cinfo],

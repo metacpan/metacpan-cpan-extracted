@@ -1,0 +1,51 @@
+{
+   "abstract" : "Perl interface for POSIX Message Queues",
+   "author" : [
+      "Wieger Opmeer <wiegerop@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POSIX-RT-MQ",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/a6502/POSIX-RT-MQ/issues"
+      },
+      "homepage" : "https://github.com/a6502/POSIX-RT-MQ",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/a6502/POSIX-RT-MQ.git",
+         "web" : "https://github.com/a6502/POSIX-RT-MQ"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

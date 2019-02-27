@@ -1,5 +1,8 @@
 # dialog1.pl
 
+use warnings;
+use strict;
+
 use subs qw/see_code/;
 use vars qw/$DIALOG1/;
 use Tcl::pTk::Dialog;

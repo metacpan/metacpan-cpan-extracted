@@ -1,10 +1,10 @@
-#!/usr/local/bin/perl -w
-
 # Example/test of using the Pane widget (translated from Tk::Pane to use the
 #  tcl ScrollableFrame widget
 # This test skips if BWidget tcl package not available.
 #   
 
+use warnings;
+use strict;
 use Tcl::pTk;
 use Tcl::pTk::Pane;
 #use Tk;

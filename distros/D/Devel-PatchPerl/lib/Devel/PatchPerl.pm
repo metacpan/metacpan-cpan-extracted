@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.54';
+$Devel::PatchPerl::VERSION = '1.56';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -289,7 +289,7 @@ sub patch_source {
   }
   if ( _norm_ver( $vers ) >= CERTIFIED ) {
       warn "Nothing to do '$vers' is fine\n";
-      exit;
+      return;
   }
   $source = File::Spec->rel2abs($source);
   {
@@ -7762,7 +7762,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.54
+version 1.56
 
 =head1 SYNOPSIS
 

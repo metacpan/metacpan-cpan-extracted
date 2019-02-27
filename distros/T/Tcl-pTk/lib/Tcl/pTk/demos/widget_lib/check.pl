@@ -1,5 +1,8 @@
 # check.pl
 
+use warnings;
+use strict;
+
 use vars qw/$TOP $WIPERS $BRAKES $SOBER/;
 
 sub check {

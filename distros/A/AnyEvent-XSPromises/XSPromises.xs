@@ -629,7 +629,7 @@ resolve(self, ...)
         xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_RESOLVED, items-1);
         int i;
         for (i = 0; i < items-1; i++) {
-            result->result[i] = SvREFCNT_inc(ST(1+i));
+            result->result[i] = newSVsv(ST(1+i));
         }
         xspr_promise_finish(aTHX_ self->promise, result);
         xspr_result_decref(aTHX_ result);
@@ -646,7 +646,7 @@ reject(self, ...)
         xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_REJECTED, items-1);
         int i;
         for (i = 0; i < items-1; i++) {
-            result->result[i] = SvREFCNT_inc(ST(1+i));
+            result->result[i] = newSVsv(ST(1+i));
         }
         xspr_promise_finish(aTHX_ self->promise, result);
         xspr_result_decref(aTHX_ result);

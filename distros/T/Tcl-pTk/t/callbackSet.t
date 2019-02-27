@@ -1,6 +1,9 @@
 # Test of getting/setting callbacks from -command options
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Test;
 

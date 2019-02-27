@@ -1,6 +1,8 @@
 # This test checks for a bug where if two mainwindows were created, and the second one was closed, then the 
 #   mainloop would exit, even though the first mainwindow was still present.
 
+use warnings;
+use strict;
 
 use Tcl::pTk;
 use Test;

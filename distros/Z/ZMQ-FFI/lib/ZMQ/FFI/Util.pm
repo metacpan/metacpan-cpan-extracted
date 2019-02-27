@@ -1,5 +1,5 @@
 package ZMQ::FFI::Util;
-$ZMQ::FFI::Util::VERSION = '1.11';
+$ZMQ::FFI::Util::VERSION = '1.12';
 # ABSTRACT: zmq convenience functions
 
 use strict;
@@ -32,7 +32,7 @@ sub zmq_soname {
     # If Linux extensions fail also try platform specific
     # extensions (e.g. OS X) before giving up.
     my @sonames = qw(
-        libzmq.so    libzmq.so.4    libzmq.so.3    libzmq.so.1
+        libzmq.so    libzmq.so.5    libzmq.so.4    libzmq.so.3    libzmq.so.1
         libzmq.dylib libzmq.4.dylib libzmq.3.dylib libzmq.1.dylib
     );
 
@@ -123,7 +123,7 @@ ZMQ::FFI::Util - zmq convenience functions
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 
@@ -139,6 +139,7 @@ version 1.11
 Tries to load the following sonames (in order):
 
     libzmq.so
+    libzmq.so.5
     libzmq.so.4
     libzmq.so.3
     libzmq.so.1
@@ -174,7 +175,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dylan Cali.
+This software is copyright (c) 2019 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

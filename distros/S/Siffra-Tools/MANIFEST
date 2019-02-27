@@ -3,8 +3,11 @@ lib/Siffra/Tools.pm
 LICENSE
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 t/001_load.t
+t/pod-coverage.t
+t/pod.t
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

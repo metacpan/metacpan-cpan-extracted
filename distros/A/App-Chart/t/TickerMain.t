@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -86,10 +86,12 @@ sub my_ignores {
 }
 
 SKIP: {
-  $have_display or skip 'due to no DISPLAY available', 2;
-  $have_test_weaken or skip 'due to Test::Weaken 3 not available', 2;
+  $have_display
+    or skip 'due to no DISPLAY available', 2;
+  $have_test_weaken
+    or skip 'due to Test::Weaken 3 not available', 2;
   $have_test_weaken_extrabits
-    or skip 'due to Test::Weaken::ExtraBits not available', 1;
+    or skip 'due to Test::Weaken::ExtraBits not available', 2;
 
   require Test::Weaken::Gtk2;
 

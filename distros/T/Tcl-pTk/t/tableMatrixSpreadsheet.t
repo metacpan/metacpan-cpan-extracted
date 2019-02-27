@@ -1,5 +1,8 @@
 # Test of the tablematrix spreadsheet widget
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Test;
 
@@ -47,7 +50,7 @@ my $class = $actualWidget->class();
 ok($class, 'Spreadsheet', "Tk Class check");
 	
 # Check to see if empty cell sets work
-$t->update; # update the table, so it's array variables will be read for the following tests
+$t->update; # update the table, so its array variables will be read for the following tests
 $t->set('2,2', '');
 
 my $val = $t->get("2,2");

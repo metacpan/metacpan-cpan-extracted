@@ -16,7 +16,7 @@
 #  Modified for use in Tcl::pTk
 package Tcl::pTk::Balloon;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 use Tcl::pTk;
 use Carp;
@@ -263,7 +263,7 @@ sub grabBad {
     my $winterp = $w->interp;
     return 0 if( $ginterp != $winterp);
     
-    # The grab is OK if $client is a decendant of $g. Use the internal Tcl/Tk
+    # The grab is OK if $client is a descendant of $g. Use the internal Tcl/Tk
     # pathname (yes, it's cheating, but it's legal).
     return 0 if $g == $w->MainWindow;
     my $wp = $w->PathName;
@@ -371,7 +371,7 @@ sub Popup {
     # Explanation of following code. [JD]
     # PREMISE: We want to ensure that the balloon is always "on screen".
     # To do this we use calculate the size of the
-    # toplevel before it is mapped. Then we adjust it's position with respect to the
+    # toplevel before it is mapped. Then we adjust its position with respect to the
     # mouse cursor or widget. Balloons are usually shown below and to the right of the target.
     # From extensive KDE experience using Xinerama, and from using dual monitors on WinXP..
     # the balloon will extend across two monitors in single logical screen mode (SLS).

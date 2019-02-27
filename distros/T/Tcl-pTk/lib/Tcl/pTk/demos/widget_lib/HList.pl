@@ -1,5 +1,8 @@
 # HList, a hierarchial listbox widget.
 
+use warnings;
+use strict;
+
 use Cwd;
 use subs qw/show_dir/;
 use vars qw/$TOP $FILEIMG $FOLDIMG/;

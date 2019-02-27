@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2016, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -72,7 +72,7 @@ sub new {
   # $self->agent ();
 
   # ask for everything decoded_content() accepts
-  $self->default_header ('Accept-Encoding' => HTTP::Message::decodable());
+  $self->default_header ('Accept-Encoding' => scalar HTTP::Message::decodable());
 
   # trace on redirect ...
 
@@ -219,7 +219,7 @@ L<http://user42.tuxfamily.org/chart/index.html>
 
 =head1 LICENCE
 
-Copyright 2008, 2009, 2010, 2011, 2016 Kevin Ryde
+Copyright 2008, 2009, 2010, 2011, 2016, 2018 Kevin Ryde
 
 Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software

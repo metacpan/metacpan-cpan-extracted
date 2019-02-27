@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
 
 	dist_author => q{John M. Gamble <jgamble@cpan.org>},
 	dist_abstract => q(Create a Boolean Truth Table),
-	dist_version => '1.01',
+	dist_version => '1.02',
 	release_status => 'stable',
 
 	provides => {

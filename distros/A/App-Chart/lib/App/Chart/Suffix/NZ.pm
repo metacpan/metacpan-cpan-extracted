@@ -1,6 +1,6 @@
 # New Zealand Stock Exchange setups.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -110,9 +110,11 @@ App::Chart::DownloadHandler::DividendsPage->new
 
 sub dividends_parse {
   my ($resp) = @_;
-
+  ### NZ dividends_parse() ...
+  
   # note: want wide-chars for HTML::TableExtract parse
   my $body = $resp->decoded_content (raise_error => 1);
+  ### $body
 
   my @dividends = ();
   my $h = { source          => __PACKAGE__,
@@ -120,7 +122,7 @@ sub dividends_parse {
             dividends       => \@dividends,
             copyright_key   => 'NZ-dividends-copyright',
             copyright       => 'http://www.nzx.com/terms',
-            date_format     => 'mdy', # dates like "October 19, 2017"
+            date_format     => 'dmy', # dates like "27 Sep 2018"
             prefer_decimals => 2,
           };
 
@@ -140,25 +142,22 @@ sub dividends_parse {
     die "NZX dividend table not matched";
   }
 
-  my $count = 0;
   foreach my $ts ($te->tables) {
     foreach my $row ($ts->rows) {
       my ($symbol, $ex_date, $pay_date, $amount, $currency, $imput)
         = @$row;
-
-      # dummy footnote row
-      next if ($symbol =~ /cents per share/);
-
       push @dividends,
         dividend_parse ($symbol, $ex_date,$pay_date,$amount, $currency,$imput);
     }
   }
+  my $count = scalar(@dividends);
   App::Chart::Download::verbose_message ("NZX dividends total $count found");
   return $h;
 }
 
 sub dividend_parse {
   my ($symbol, $ex_date,$pay_date,$amount, $currency,$imput) = @_;
+  ### NZ dividend_parse(): @_
 
   # leading and trailing whitespace
   $symbol = App::Chart::collapse_whitespace($symbol);

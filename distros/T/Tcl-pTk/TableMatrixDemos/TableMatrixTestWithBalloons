@@ -79,7 +79,7 @@ $b->attach(    $t,
 
 			#print "returning 0\n";
 
-			# Same item, and within it's bounding box don't cancel the Balloon
+			# Same item, and within its bounding box don't cancel the Balloon
 			0;
 		}
 		else {

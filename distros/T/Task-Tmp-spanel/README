@@ -1,0 +1,112 @@
+NAME
+    Task::Tmp::spanel - Perl modules for Spanel
+
+VERSION
+    version 0.002
+
+TASK CONTENTS
+  Included modules
+   Algorithm::Dependency::Ordered
+   Algorithm::Dependency::Source::HoA
+   Any::Moose
+   App::CreateSelfSignedSSL
+   CDB_File
+   CHI
+   Capture::Tiny
+   Carp
+   Clone::Any
+   Complete::Util
+   Config::IniFiles
+   Crypt::PasswdMD5
+   Cwd
+   DBI
+   Data::Clone
+   Data::Dump::PHP
+   Data::Dumper
+   Data::ModeMerge
+   Data::Sah
+   Date::Manip
+   DateTime
+   Digest::MD5
+   Digest::SHA1
+   Error
+   Exporter
+   Fcntl
+   File::Copy::Recursive
+   File::Find
+   File::Flock
+   File::Path
+   File::Slurp
+   File::Slurp::Shortcuts
+   File::Slurp::Tiny
+   File::Spec
+   File::Temp
+   File::Which
+   File::chdir
+   File::chmod
+   FindBin
+   GDBM_File
+   Getopt::Long
+   IO::CaptureOutput
+   IO::File
+   IO::Prompt::I18N
+   IO::Socket::UNIX
+   IPC::System::Options
+   LWP::UserAgent
+   List::MoreUtils
+   List::Util
+   Log::Log4perl
+   Log::ger
+   MIME::Base64
+   Mail::Address
+   Mail::Sendmail
+   Module::List
+   Module::Load
+   Module::Loaded
+   Module::Version
+   Moo
+   Moo::Role
+   Net::DNS
+   Net::Domain::TLD
+   POSIX
+   Path::Class
+   Perinci::Access::HTTP::Client
+   Perinci::CmdLine
+   Perinci::CmdLine::Lite
+   Perinci::CmdLine::Server
+   Perinci::Exporter
+   Perinci::Sub::Util
+   Proc::ChildError
+   Proc::PID::File
+   Quota
+   Regexp::Shellish
+   SHARYANTO::Template::Util
+   Scalar::Util
+   Storable
+   String::ShellQuote
+   Sub::Curry
+   Time::Local
+   URI
+   URI::Escape
+   UUID::Random
+   WWW::Mechanize
+   YAML::XS
+   autodie
+   base
+   bytes
+   constant
+   experimental
+   feature
+   lib
+   strict
+   vars
+   warnings
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -7,7 +7,7 @@ use mro;
 
 use parent qw(Job::Async::Client);
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 =head1 NAME
 
@@ -19,6 +19,7 @@ Job::Async::Client::Redis - L<Net::Async::Redis> client implementation for L<Job
 
 =cut
 
+use Ryu::Async;
 use Job::Async::Utils;
 use Net::Async::Redis 1.003;
 
@@ -47,6 +48,9 @@ sub _add_to_loop {
             uri => $self->uri,
         )
     );
+    $self->add_child(
+        $self->{ryu} = Ryu::Async->new
+    );
 }
 
 =head2 client
@@ -67,6 +71,15 @@ sub subscriber { shift->{subscriber} }
 
 sub submitter { shift->{submitter} }
 
+sub ryu { shift->{ryu} }
+
+sub prefix { shift->{prefix} //= 'jobs' }
+
+sub prefixed_queue {
+    my ($self, $q) = @_;
+    return $q unless length(my $prefix = $self->prefix);
+    return join '::', $self->prefix, $q;
+}
 sub queue { shift->{queue} //= 'pending' }
 
 =head2 start
@@ -148,7 +161,14 @@ sub submit {
                 _reply_to => $self->id,
                 %{ $job->flattened_data }
             ),
-            $tx->lpush($self->queue, $id)
+            $tx->lpush($self->prefixed_queue($self->queue), $id)
+                ->on_done(sub {
+                    my ($count) = @_;
+                    local @{$log->{context}}{qw(client_id job_id)} = ($self->id, $id);
+                    $log->tracef('Job count for [%s] now %d', $self->queue, $count);
+                    $self->queue_length
+                        ->emit($count);
+                })
         )
     };
     ($self->use_multi
@@ -158,8 +178,14 @@ sub submit {
      ->retain
 }
 
-sub use_multi { shift->{use_multi} }
+sub queue_length {
+    my ($self) = @_;
+    $self->{queue_length} ||= $self->ryu->source(
+        label => 'Currently pending events for ' . $self->queue
+    );
+}
 
+sub use_multi { shift->{use_multi} }
 
 sub pending_job {
     my ($self, $id) = @_;
@@ -169,7 +195,7 @@ sub pending_job {
 
 sub configure {
     my ($self, %args) = @_;
-    for (qw(queue uri use_multi)) {
+    for (qw(queue uri use_multi prefix)) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
     $self->next::method(%args)

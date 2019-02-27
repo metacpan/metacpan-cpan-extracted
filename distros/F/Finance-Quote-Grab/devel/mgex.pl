@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2013, 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -21,6 +21,7 @@ use 5.010;
 use strict;
 use File::Slurp 'slurp';
 use Finance::Quote;
+$|=1;
 
 use Finance::Quote::MGEX;
 print "Finance::Quote::MGEX version ",Finance::Quote::MGEX->VERSION,"\n";
@@ -31,19 +32,23 @@ use Smart::Comments;
 {
   require HTTP::Response;
   my $resp = HTTP::Response->new(200, 'OK');
-  # my $content = slurp('samples/mgex/aquotes.htx.8');
-  my $content = slurp('samples/mgex/wquotes_js.js.5');
+  my $content;
   # my $content = slurp('samples/mgex/intraday-no.html');
+  $content = slurp('samples/mgex/wquotes_js.js.6');
+  $content = slurp('samples/mgex/aquotes.htx.9');
   $resp->content($content);
   $resp->content_type('application/x-javascript');
 
   #  print $content;
-  # print Finance::Quote::MGEX::_java_document_write($content);
+  # print Finance::Quote::MGEX::_javascript_document_write($content);
+  my $html = Finance::Quote::MGEX::_javascript_document_write($content);
+  require HTML::FormatText::W3m;
+  print HTML::FormatText::W3m->format_string ($html);
 
   my $fq = Finance::Quote->new ('MGEX');
   my %quotes;
   Finance::Quote::MGEX::resp_to_quotes ($fq, $resp, \%quotes,
-                                        ['AJK15','ISH15','MWZ0','MWZ15']);
+                                        ['ISH19','MWZ0','MWZ19']);
   ### %quotes
 
   exit 0;

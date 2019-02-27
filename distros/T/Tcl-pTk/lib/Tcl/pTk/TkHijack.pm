@@ -3,7 +3,7 @@ use Tcl::pTk ( qw/ MainLoop DoOneEvent tkinit update Ev Exists /); # Don't impor
 
 package Tcl::pTk::TkHijack;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ $debug = 1;
 
 
 # Mapping of Tk Packages that have equivalence in Tcl::pTk.
-#   If a Tk package is mapped to undef, then that means it's functionality is already included
+#   If a Tk package is mapped to undef, then that means its functionality is already included
 #   in the main Tcl::pTk package.
 #  This list is used for mapping "use" statements, for example if
 #    "use Tk::Tree" is encountered, the file "Tcl/pTk/Tree.pm" is loaded instead

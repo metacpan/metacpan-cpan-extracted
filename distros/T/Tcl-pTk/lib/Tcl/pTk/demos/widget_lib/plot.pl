@@ -1,5 +1,8 @@
 # plot.pl
 
+use warnings;
+use strict;
+
 use Plot;
 use vars qw/$TOP/;
 

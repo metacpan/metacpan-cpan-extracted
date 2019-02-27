@@ -1,4 +1,4 @@
-# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -29,6 +29,10 @@
 #    since it has bits for bad utf-8 and that version is available in
 #    the Debian archive.
 #
+# "Suggests: sensible-utils"
+#    Only used for browser spawning, and only as a fallback from the
+#    Gtk config.
+#
 # "Build-Depends: texinfo"
 #    For "makeinfo" to build the info file which is not included in
 #    the dist.
@@ -42,7 +46,7 @@ Section: misc
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5), texinfo, libfile-slurp-perl
 Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
-Standards-Version: 4.1.1
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/chart/index.html
 Bugs: mailto:user42_kevin@yahoo.com.au
 
@@ -50,11 +54,11 @@ Package: chart
 Architecture: all
 Depends: perl (>= 5.10), libclass-singleton-perl (>= 1.4), libclass-weaksingleton-perl, libconstant-defer-perl, libdate-calc-perl (>= 5.0), libdbd-sqlite3-perl (>= 1.27), libdbi-perl, libencode-locale-perl (>= 0.02), libfile-homedir-perl (>= 0.61), libglib-perl (>= 1:1.220), libglib-ex-connectproperties-perl (>= 18), libglib-ex-objectbits-perl (>= 16), libgtk2-perl (>= 1:1.220), libgtk2-ex-datasheet-dbi-perl, libgtk2-ex-datespinner-perl (>= 2), libgtk2-ex-dragger-perl (>= 2), libgtk2-ex-errortextdialog-perl (>= 2), libgtk2-ex-history-perl (>= 1), libgtk2-ex-listmodelconcat-perl (>= 1), libgtk2-ex-noshrink-perl (>= 2), libgtk2-ex-numaxis-perl (>= 4), libgtk2-ex-menuview-perl (>= 1), libgtk2-ex-tickerview-perl (>= 7), libgtk2-ex-treemodelfilter-dragdest-perl, libgtk2-ex-widgetbits-perl (>= 47), libgtk2-ex-widgetcursor-perl (>= 8), libgtk2-ex-xor-perl (>= 17), libhtml-parser-perl, libhtml-tableextract-perl, libhtml-tree-perl, libhttp-cookies-perl, libi18n-langinfo-wide-perl (>= 2), libintl-perl (>= 1.19), libio-string-perl (>= 1.07), libjson-perl, liblist-moreutils-perl (>= 0.24), libmath-round-perl, libmodule-find-perl (>= 0.06), libmodule-pluggable-perl, libmodule-util-perl, libnumber-format-perl (>= 1.60), libperl-lisp-perl (>= 0.04), libperlio-via-escstatus-perl (>= 2), libposix-wide-perl, libproc-syncexec-perl, libregexp-common-perl, libregexp-tr-perl, libset-intspan-fast-perl (>= 1.10), libsoftware-license-perl (>= 0.001), libtext-glob-perl, libtie-cache-perl, libtie-ixhash-perl, libtie-tz-perl (>= 6), libtimedate-perl, liburi-perl, libwww-perl (>= 5.814), libhttp-message-perl (>= 5.814) | libwww-perl, ${perl:Depends}, ${misc:Depends}
 Recommends: libcrypt-ssleay-perl, libdevel-stacktrace-perl (>= 1.19), libintl-xs-perl (>= 1.19), libset-intspan-fast-xs-perl (>= 0.05), libspreadsheet-parseexcel-perl
-Suggests: bash-completion, emacs | emacsen, libbsd-resource-perl, libdevel-arena-perl, libdevel-findblessedrefs-perl, libdevel-mallinfo-perl, libfinance-quote-perl, libfinance-ta-perl, libgt-perl
+Suggests: bash-completion, emacs | emacsen, libbsd-resource-perl, libdevel-arena-perl, libdevel-findblessedrefs-perl, libdevel-mallinfo-perl, libfinance-quote-perl, libfinance-ta-perl, libgt-perl, sensible-utils
 Description: Stock and commodity charting
  Chart displays stock and commodity charts from downloaded data.
  .
- Stock quotes and data from Yahoo and various other sources.  Fund
+ Share quotes and data from Yahoo and some other sources.  Fund
  quotes and data from MLC and Yahoo (US funds).
  .
  Chart is written in Perl using Gtk2-Perl to for the Gtk toolkit.

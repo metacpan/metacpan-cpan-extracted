@@ -1,12 +1,12 @@
 {
-   "abstract" : "Siffra Tools",
+   "abstract" : "Module abstract (<= 44 characters) goes here",
    "author" : [
       "Luiz Benevenuto (luiz@siffra.com.br)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -32,11 +33,20 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::Simple" : "0.44"
+            "Data::Dumper" : "0",
+            "Log::Any" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.44",
+            "perl" : "5.014",
+            "strict" : "0",
+            "utf8" : "0",
+            "version" : "0",
+            "warnings" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

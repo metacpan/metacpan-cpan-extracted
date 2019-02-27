@@ -1,6 +1,9 @@
 # Test to verify the ttkLabel font returns a valid font object and not just an empty string.
 #   This enables 'Clone' to be called on it
 #
+use warnings;
+use strict;
+
 use Tcl::pTk;
 
 use Test;

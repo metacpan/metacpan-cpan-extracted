@@ -1,6 +1,7 @@
 # Test script for the Bitmap widget as a subclass of Image
 
-BEGIN { $^W = 1; $| = 1;}
+BEGIN { $| = 1; }
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;
@@ -25,7 +26,7 @@ ok($bitmap->height, 61, "bitmap->height method problem");
 my $label = $mw->Label(-image => $bitmap)->pack();
 
 
-# Check to see if retreived photo works
+# Check to see if retrieved photo works
 my $image = $label->cget(-image);
 ok($image->width,  61, "bitmap->width method problem");
 ok($image->height, 61, "bitmap->height method problem");

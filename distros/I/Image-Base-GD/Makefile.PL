@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Image-Base-GD.
 #
@@ -22,22 +22,31 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-WriteMakefile
-  (NAME         => 'Image-Base-GD',
-   ABSTRACT     => 'Image::Base on PNG and other files using GD.',
-   VERSION_FROM => 'lib/Image/Base/GD.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
-   SIGN         => 1,
-   PREREQ_PM    => {
-                    'Image::Base' => '1.12',  # for ellipse() $fill
-                    'GD'         => '2.45', # 2.45 for GD::Group inst fix
-                    'GD::Simple' => 0,      # no version num in 2.45
+my %PREREQ_PM = (
+                 'Image::Base' => '1.12', # for ellipse() $fill
+                 'GD'          => '2.45', # 2.45 for GD::Group inst fix
+                 'GD::Simple'  => 0,      # no version num in 2.45
+                 'File::Temp'  => 0,      # reading XPM
+                );
+my %TEST_REQUIRES = (
+                     'Test::More' => 0,
+                     'List::Util' => 0,
+                    );
+unless (eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
+  # past ExtUtils::MakeMaker without separate TEST_REQUIRES
+  %PREREQ_PM = (%PREREQ_PM, %TEST_REQUIRES);
+}
 
-                    # for testing
-                    'Test::More' => 0,
-                    'List::Util' => 0,
-                   },
+WriteMakefile
+  (NAME          => 'Image::Base::GD',
+   ABSTRACT      => 'Image::Base on PNG and other files using GD.',
+   VERSION_FROM  => 'lib/Image/Base/GD.pm',
+   AUTHOR        => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE       => 'gpl_3',
+   SIGN          => 1,
+   PREREQ_PM     => \%PREREQ_PM,
+   TEST_REQUIRES => \%TEST_REQUIRES,
+
    # GD is 5.6.0 (in its 2.45 Makefile.PL, perhaps not the GD.pm as such)
    MIN_PERL_VERSION => '5.006',
 
@@ -46,11 +55,13 @@ WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/image-base-gd/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     optional_features =>
-     { maximum_tests =>
-       { description => 'Have "make test" do as much as possible.',
-         requires => { 'Test::Weaken' => '2.000',
-                     },
+     no_index => { directory=>['devel','xt'] },
+
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Test::Weaken' => '2.000',
+         },
        },
      },
    },

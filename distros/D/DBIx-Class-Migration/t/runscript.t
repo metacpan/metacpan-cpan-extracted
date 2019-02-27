@@ -1,15 +1,20 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
 use lib 't/lib';
 use Test::Most;
 use DBIx::Class::Migration;
 use DBIx::Class::Migration::RunScript;
-use File::Spec::Functions 'catfile';
-use File::Path 'rmtree';
+use File::Temp 'tempdir';
 
+my $dir = tempdir(DIR => 't', CLEANUP => 1);
 
 ok(
-  my $migration = DBIx::Class::Migration->new(schema_class=>'Local::Schema'),
+  my $migration = DBIx::Class::Migration->new(
+    schema_class=>'Local::Schema',
+    target_dir => $dir,
+  ),
   'created migration with schema_class');
 
 $migration->prepare;
@@ -39,9 +44,3 @@ SUGAR: {
 }
 
 done_testing;
-
-END {
-  rmtree catfile($migration->target_dir, 'migrations');
-  rmtree catfile($migration->target_dir, 'fixtures');
-  unlink catfile($migration->target_dir, 'local-schema.db');
-}

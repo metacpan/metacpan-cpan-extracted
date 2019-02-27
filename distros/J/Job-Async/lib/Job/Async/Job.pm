@@ -3,7 +3,7 @@ package Job::Async::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 =head1 NAME
 
@@ -15,7 +15,13 @@ Job::Async::Job - represents a single job for L<Job::Async>
 
 =cut
 
+use Sereal;
 use JSON::MaybeUTF8 qw(:v1);
+
+use constant SEREAL_DEFAULT => 1;
+
+my $sereal_encode = Sereal::Encoder->new;
+my $sereal_decode = Sereal::Decoder->new;
 
 sub id { shift->{id} }
 
@@ -26,10 +32,33 @@ sub data {
 }
 
 sub flattened_data {
-    my ($self) = @_;
-    my $data = $self->{data};
-    return $data unless grep ref, values %$data;
-    return { map { $_ => ref($data->{$_}) ? encode_json_utf8($data->{$_}) : $_ } keys %$data };
+    my ($self, $data) = @_;
+    $data //= $self->{data};
+    return { map {
+        !ref($data->{$_})
+        ? ("text_$_" => $data->{$_})
+        : SEREAL_DEFAULT
+        ? ("sereal_$_" => $sereal_encode->encode($data->{$_}))
+        : ("json_$_" => encode_json_utf8($data->{$_}))
+    } keys %$data };
+}
+
+sub structured_data {
+    my ($self, $data) = @_;
+    $data //= $self->{data};
+    return {
+        (map {
+            die "invalid format for $_" unless my ($type, $k) = /^(json|text|sereal)_(.*)$/;
+            $k => (
+                $type eq 'text'
+                ? $data->{$_}
+                : $type eq 'json'
+                ? decode_json_utf8($data->{$_})
+                : $sereal_decode->decode($data->{$_})
+            )
+        } grep /^[a-z]/, keys %$data),
+        map {; $_ => $data->{$_} } grep /^_/, keys %$data
+    };
 }
 
 sub future { shift->{future} }

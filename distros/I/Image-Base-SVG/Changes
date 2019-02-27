@@ -1,4 +1,4 @@
-Copyright 2011 Kevin Ryde
+Copyright 2011, 2019 Kevin Ryde
 
 This file is part of Image-Base-SVG.
 
@@ -16,6 +16,8 @@ You can get a copy of the GNU General Public License online at
 <http://www.gnu.org/licenses/>.
 
 
+Version 5, February 2019
+    - TEST_REQUIRES separate
 
 Version 4, July 2011
     - tests avoid XML::Parser::Expat warnings from perl 5.14 tied

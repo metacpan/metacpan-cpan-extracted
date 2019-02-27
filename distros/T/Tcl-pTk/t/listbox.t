@@ -1,9 +1,8 @@
-#!/usr/local/bin/perl -w
-
+use warnings;
+use strict;
 use Tcl::pTk;
 #use Tk;
 use Test;
-use strict;
 
 plan tests => 7;
 

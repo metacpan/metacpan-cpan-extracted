@@ -1,8 +1,8 @@
-#!/usr/local/bin/perl -w
-
 # Simple example that crashes Tcl when run, before the cleanup mods of Tcl::pTk made on 3/26/09
 #
 
+use warnings;
+use strict;
 use Tcl::pTk;
 use Test;
 

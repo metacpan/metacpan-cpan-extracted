@@ -1,5 +1,8 @@
 # Demo of tile combo box widgets
 
+use warnings;
+use strict;
+
 use vars qw/$TOP/;
 
 sub combo {
@@ -20,8 +23,8 @@ sub combo {
          
         my @australianCities = ( qw/ 
             Canberra Sydney Melbourne Perth Adelaide Brisbane
-            Hobart Darwin "Alice Springs"
-         /);
+            Hobart Darwin /, 'Alice Springs',
+        );
         
         my $firstvalue = '';
         my $secondvalue = 'unchangeable';

@@ -1,5 +1,8 @@
 # LabFrame, frame with embedded label.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Tcl::pTk::LabEntry;
 

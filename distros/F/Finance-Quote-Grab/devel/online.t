@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2015 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2015, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -58,6 +58,9 @@ require MyPodParser;
 
 my @check_files = grep {m{^lib/.*\.pm$}} keys %$manifest;
 ### @check_files
+
+# @check_files = grep {/MGEX/} @check_files;
+# @check_files = grep {/MLC/} @check_files;
 
 my @check_modules;
 my %symbols;

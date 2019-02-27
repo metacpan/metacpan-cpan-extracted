@@ -1,5 +1,8 @@
 # Test Case for a megawidget
 
+use warnings;
+use strict;
+
 #$Tk::SlideSwitch::VERSION = '1.1';
 
 use Test;
@@ -16,8 +19,6 @@ use Tcl::pTk::TextUndo;
 
 use base qw/Tcl::pTk::Frame/;
 #use base qw/Tk::Frame/;
-
-use strict;
 
 Construct Tcl::pTk::Widget 'SlideSwitch';
 #Construct Tk::Widget 'SlideSwitch';

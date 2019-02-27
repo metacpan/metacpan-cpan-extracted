@@ -1,4 +1,4 @@
-Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+Copyright 2009, 2010, 2011, 2014, 2018, 2019 Kevin Ryde
 
 This file is part of File-Locate-Iterator.
 
@@ -15,6 +15,15 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with File-Locate-Iterator.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 26, February 2019
+    - tests beware locate program being mlocate
+
+Version 25, February 2019
+    - TEST_REQUIRES separate, debian bindnow
+
+Version 24, November 2018
+    - debian bits mangler for no-XS
 
 Version 23, August 2014
     - debian bits Pre-Depends

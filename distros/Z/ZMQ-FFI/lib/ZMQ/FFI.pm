@@ -1,5 +1,5 @@
 package ZMQ::FFI;
-$ZMQ::FFI::VERSION = '1.11';
+$ZMQ::FFI::VERSION = '1.12';
 # ABSTRACT: version agnostic Perl bindings for zeromq using ffi
 
 use strict;
@@ -29,15 +29,25 @@ sub new {
         $args{soname} = zmq_soname( die => 1 );
     }
 
-    my ($major) = zmq_version($args{soname});
+    my ($major, $minor) = zmq_version($args{soname});
 
     if ($major == 2) {
         require ZMQ::FFI::ZMQ2::Context;
         return ZMQ::FFI::ZMQ2::Context->new(%args);
     }
-    else {
+    elsif ($major == 3) {
         require ZMQ::FFI::ZMQ3::Context;
         return ZMQ::FFI::ZMQ3::Context->new(%args);
+    } 
+    else {
+	if ($major == 4 and $minor == 0) {
+            require ZMQ::FFI::ZMQ4::Context;
+            return ZMQ::FFI::ZMQ4::Context->new(%args);
+        }
+        else {
+            require ZMQ::FFI::ZMQ4_1::Context;
+            return ZMQ::FFI::ZMQ4_1::Context->new(%args);
+        }
     }
 }
 
@@ -55,7 +65,7 @@ ZMQ::FFI - version agnostic Perl bindings for zeromq using ffi
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 SYNOPSIS
 
@@ -645,7 +655,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dylan Cali.
+This software is copyright (c) 2019 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

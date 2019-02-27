@@ -3,8 +3,8 @@ NAME
     subcommands and completion
 
 VERSION
-    This document describes version 0.102 of Getopt::Long::Subcommand (from
-    Perl distribution Getopt-Long-Subcommand), released on 2017-08-12.
+    This document describes version 0.103 of Getopt::Long::Subcommand (from
+    Perl distribution Getopt-Long-Subcommand), released on 2019-02-27.
 
 SYNOPSIS
      use Getopt::Long::Subcommand; # exports GetOptions
@@ -226,7 +226,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2016, 2015 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

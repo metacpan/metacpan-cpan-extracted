@@ -1,3 +1,5 @@
+1.0.4   25.02.2019
+         - min Test::More version
 1.0.3   20.02.2019
          - speedup compilation
 1.0.2   11.02.2019

@@ -1,5 +1,8 @@
 # Check of OnDestroy operation
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 #use Tk;
 

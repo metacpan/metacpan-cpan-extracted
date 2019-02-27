@@ -1,5 +1,6 @@
 # check.pl
 
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;  # import eventtypes, because we are going to check to see if DoOneEvent works

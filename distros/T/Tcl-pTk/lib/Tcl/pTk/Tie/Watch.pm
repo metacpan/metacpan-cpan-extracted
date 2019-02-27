@@ -1,9 +1,9 @@
 # This package was copied from perl/tk for inclusion into Tcl::pTk so that traceVariable methods
-#  can be supported, for compatiblity with perl/tk
+#  can be supported, for compatibility with perl/tk
 
 package Tcl::pTk::Tie::Watch;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 =head1 NAME
 

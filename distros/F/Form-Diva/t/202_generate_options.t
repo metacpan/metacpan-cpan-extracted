@@ -44,7 +44,7 @@ my $diva = Form::Diva->new(
 my $basic = $diva->generate;
 
 is( $basic->[0]{label},
-    '<LABEL for="formdiva_empty" class="testclass">Empty</LABEL>',
+    '<LABEL for="formdiva_empty" id="formdiva_empty_label" class="testclass">Empty</LABEL>',
     'Check the label for the select'
     );
 is( $basic->[0]{input},

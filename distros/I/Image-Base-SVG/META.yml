@@ -1,52 +1,32 @@
---- #YAML:1.0
-name:               Image-Base-SVG
-version:            4
-abstract:           Image::Base on SVG files using the SVG module.
+---
+abstract: 'Image::Base on SVG files using the SVG module.'
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            gpl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Image::Base:  0
-    perl:         5.006
-    SVG:          2.38
-    SVG::Parser:  0
-    Test::More:   0
-resources:
-    homepage:  http://user42.tuxfamily.org/image-base-svg/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - xt
-        - devel
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-optional_features:
-    maximum_devel:
-        description:  Stuff used variously for development.
-        requires:
-            Pod::Simple::HTML:  0
-            Smart::Comments:    0
-            warnings::unused:   0
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            Parse::CPAN::Meta:   0
-            Test::DistManifest:  0
-            Test::Pod:           1.00
-            Test::Synopsis:      0
-            Test::Weaken:        2.000
-            Test::YAML::Meta:    0.15
-            XML::Parser::Expat:  2.41
-            YAML:                0
-            YAML::Syck:          0
-            YAML::Tiny:          0
-            YAML::XS:            0
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-Base-SVG
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+requires:
+  Image::Base: '0'
+  SVG: '2.38'
+  SVG::Parser: '0'
+  perl: '5.006'
+resources:
+  homepage: http://user42.tuxfamily.org/image-base-svg/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '5'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

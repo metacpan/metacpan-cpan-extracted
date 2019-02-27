@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Encode" => 0,
     "File::Basename" => 0,
     "HTTP::Tiny" => 0,
+    "Moo" => 0,
     "parent" => 0
   },
   "TEST_REQUIRES" => {
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "0.5",
+  "VERSION" => "0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "File::Find" => 0,
   "File::Spec" => 0,
   "HTTP::Tiny" => 0,
+  "Moo" => 0,
   "Test::More" => 0,
   "Test::Pod" => "1.14",
   "Test::Pod::Coverage" => "1.08",

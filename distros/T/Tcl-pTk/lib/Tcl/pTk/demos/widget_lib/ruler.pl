@@ -1,5 +1,8 @@
 # ruler.pl
 
+use warnings;
+use strict;
+
 use Tcl::pTk qw/Ev/;
 
 use subs qw/ruler_make_tab ruler_move_tab ruler_new_tab ruler_release_tab

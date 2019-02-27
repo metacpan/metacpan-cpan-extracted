@@ -4,7 +4,7 @@
       "John Karr <brainbuz@brainbuz.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -56,6 +56,8 @@
          "web" : "https://github.com/brainbuz/form-diva"
       }
    },
-   "version" : "1.00"
+   "version" : "1.01",
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

@@ -1,5 +1,6 @@
 # ProgressBar - display various progress bars.
 
+use warnings;
 use strict;
 use Tcl::pTk;
 use Tcl::pTk::ProgressBar;

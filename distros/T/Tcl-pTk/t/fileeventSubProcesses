@@ -4,6 +4,9 @@
 #
 #
 
+use warnings;
+use strict;
+
 $| = 1; # Pipes hot
 
 foreach ( 1..5){

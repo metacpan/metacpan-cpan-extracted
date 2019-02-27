@@ -27,7 +27,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 use Finance::Quote::Casablanca;
 
-my $want_version = 14;
+my $want_version = 15;
 is ($Finance::Quote::Casablanca::VERSION, $want_version,
     'VERSION variable');
 is (Finance::Quote::Casablanca->VERSION,  $want_version,

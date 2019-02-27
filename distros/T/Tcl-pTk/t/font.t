@@ -1,21 +1,26 @@
 # Tcl-Tk Font test
 #  Adapted from the font.t test case in the perl/tk distribution
 
-BEGIN { $|=1; $^W=1; }
+BEGIN { $|=1; }
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;
 
 use Tcl::pTk::Font;
 
-BEGIN { plan tests => 13 };
+BEGIN {
+  print "# Test 11 (check -size from fontActual()) has had\n"
+      . "# platform-dependent failures. See RT #119754\n";
+  plan tests => 13, todo => [11];
+};
 
 my $mw = MainWindow->new;
 $mw->geometry("+10+10");
 
 ##
 ## if there's only one (fixed) or no font family
-## then something is wrong. Propably the envirionment
+## then something is wrong. Probably the environment
 ## and not perl/Tks fault.
 ##
 {
@@ -96,13 +101,16 @@ foreach my $key (sort keys %expect)
   my $val = $mw->fontActual($lf,$key);
   my $expected = $expect{$key};
   # Size of 9 is ok
+  # ^ CAC says: why is that, other than that's what
+  #   e.g. Windows/X11 tend to output? Does that mean
+  #   size of 12 is similarly ok on macOS aqua?
   if( $key eq '-size' && $val == 9){
     $expected = 9;
   }
   skip($skip_times, lc $val, lc $expected,"Value of $key");
  }
 
-# Subfonts test removed (not supprted in tcl::tk)
+# Subfonts test removed (not supported in tcl::tk)
 # my @subfonts = $mw->fontSubfonts($lf);
 # foreach my $sf (@subfonts)
 #  {

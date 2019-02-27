@@ -2,11 +2,21 @@ package DBIx::Class::Migration::Script;
 
 use Moose;
 use MooseX::Attribute::ENV;
-use MooseX::Types::LoadableClass 'LoadableClass';
 use Pod::Find ();
 use Pod::Usage ();
+use DBIx::Class::Migration::Types qw(
+  LoadableClass ArraySQLTProducers AbsolutePath
+);
+use Log::Any;
+use Carp 'croak';
 
 with 'MooseX::Getopt';
+
+sub _log_die {
+  my ($self, $msg) = @_;
+  $self->log->error($msg);
+  croak $msg;
+}
 
 sub ENV_PREFIX {
   $ENV{DBIC_MIGRATION_ENV_PREFIX}
@@ -18,6 +28,12 @@ use constant {
   SANDBOX_MYSQL => 'MySQLSandbox',
   SANDBOX_POSTGRESQL => 'PostgresqlSandbox',
 };
+
+has log => (
+    is  => 'ro',
+    isa => 'Log::Any::Proxy',
+    default => sub { Log::Any->get_logger( category => 'DBIx::Class::Migration') },
+);
 
 has includes => (
   traits => ['Getopt'],
@@ -31,7 +47,8 @@ has schema => (is=>'ro', predicate=>'has_schema');
 has schema_class => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa => 'Str',
   predicate=>'has_schema_class', env_prefix=>ENV_PREFIX, cmd_aliases => 'S');
 
-has target_dir => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa=> 'Str',
+has target_dir => (traits => [ 'Getopt', 'ENV' ],
+  is => 'ro', isa=> AbsolutePath, coerce => 1,
   predicate=>'has_target_dir', env_prefix=>ENV_PREFIX, cmd_aliases => 'dir');
 
 has sandbox_dir => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa=> 'Str',
@@ -53,9 +70,10 @@ has to_version => (traits => [ 'Getopt' ], is => 'ro', isa => 'Int',
   predicate=>'has_to_version', cmd_aliases => 'V');
 
 has sql_translator_args => (traits => [ 'Getopt' ], is => 'ro', isa => 'HashRef',
-  predicate=>'has_sql_translator_args');
+  predicate=>'has_sql_translator_args',
+  default => sub { +{ quote_identifiers => 1 }});
 
-has databases => (traits => [ 'Getopt' ], is => 'ro', isa => 'ArrayRef',
+has databases => (traits => [ 'Getopt' ], is => 'ro', isa => ArraySQLTProducers,
   predicate=>'has_databases', cmd_aliases => 'database');
 
 has sandbox_class => (traits => [ 'Getopt', 'ENV' ], is => 'ro', isa => 'Str',
@@ -113,16 +131,15 @@ has migration => (
     if($self->dsn) {
       push @schema_args, ($self->dsn,
        $self->username, $self->password);
-    
-      if($self->has_dbi_connect_attrs) {
-        push @schema_args, $self->dbi_connect_attrs;
-      }
-      if($self->has_dbic_connect_attrs) {
-        push @schema_args, {} unless $self->has_dbi_connect_attrs;
-        push @schema_args, $self->dbic_connect_attrs;
-      }
     } else {
       warn "no --dsn argument was found, defaulting to a local SQLite database\n";
+    }
+    if($self->has_dbi_connect_attrs) {
+      push @schema_args, $self->dbi_connect_attrs;
+    }
+    if($self->has_dbic_connect_attrs) {
+      push @schema_args, {} unless $self->has_dbi_connect_attrs;
+      push @schema_args, $self->dbic_connect_attrs;
     }
     return @schema_args;
   }
@@ -232,7 +249,7 @@ sub run {
     foreach my $cmd ($argv, @extra_argv) {
       $self->can("cmd_${cmd}") ?
         $self->${\"cmd_${cmd}"} :
-        die "No such command ${cmd}\n";
+        $self->_log_die( "No such command ${cmd}\n" );
     }
 
   }
@@ -424,9 +441,9 @@ Accepts ArrayRef.  Not Required.
 
 Used when building L</migration> to define the target databases we are building
 migration files for.  You can name any of the databases currently supported by
-L<SQLT>.  If you leave this undefined we will derive a value based on the value
+L<SQL::Translator>.  If you leave this undefined we will derive a value based on the value
 of L</dsn>.  For example, if your L</dsn> is "DBI:SQLite:test.db", we will set
-the valuye of L</databases> to C<['SQLite']>.
+the value of L</databases> to C<['SQLite']>.
 
 =head2 sql_translator_args
 
@@ -438,7 +455,9 @@ L<SQL::Translator>, for example:
 
     producer_args => { postgres_version => '9.1' }
 
-to define the database version for SQL producer.
+to define the database version for SQL producer. Defaults to setting
+C<quote_identifiers> to a true value, which despite being documented as
+the default, is not the case in practice.
 
 =head2 fixture_sets
 

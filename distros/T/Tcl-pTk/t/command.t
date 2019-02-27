@@ -1,6 +1,9 @@
 # Example of the Ev sematics in Tcl::pTk to get the Tcl '%x, %y', etc substitutions
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Test;
 

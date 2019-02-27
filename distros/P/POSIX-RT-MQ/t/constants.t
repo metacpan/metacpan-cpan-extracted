@@ -29,8 +29,13 @@ sub test_mq_open_max
 {
     my $val = POSIX::RT::MQ::MQ_OPEN_MAX;
 #    warn "\nPOSIX::RT::MQ::MQ_OPEN_MAX=$val\n";
-    defined($val) && $val>=0  
-        or die "strange value of MQ_OPEN_MAX: ", (defined $val ? $val : '"undef"'), "\n";
+    if ($^O =~ /^(linux|freebsd)$/) {
+        defined($val) && $val== -1
+           or die "expecting MQ_OPEN_MAX to be -1 on $^O";
+    } else {
+        defined($val) && $val>=0  
+            or die "strange value of MQ_OPEN_MAX: ", (defined $val ? $val : '"undef"'), "\n";
+    }
 }
 
 sub test_mq_prio_max

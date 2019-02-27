@@ -1,6 +1,6 @@
 # GUI shared functions.
 
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -175,11 +175,16 @@ sub browser_open {
     # possible Glib::Error "operation not supported" on http urls
     ### show_uri() error: $@
   }
-
-  # The quoting, or lack thereof, expected of the url in openURL is in
-  # mozilla XRemoteService.cpp.  It looks for ( ) delims, then the last ","
-  # is the last arg to take off new-window, new-tab, noraise, etc.
   {
+    # Debian "sensible-browser" program which looks at $BROWSER and various
+    # other things.
+    my @command = ('sensible-browser', $uri);
+    if (_spawn (@command)) { return }
+  }
+  {
+    # The quoting, or lack thereof, expected of the url in openURL is in
+    # mozilla XRemoteService.cpp.  It looks for ( ) delims, then the last
+    # "," is the last arg to take off new-window, new-tab, noraise, etc.
     my @command = ('mozilla', '-remote', "openURL($uri,new-window)");
     ### run: @command
     if (system (@command) == 0) {
@@ -187,10 +192,6 @@ sub browser_open {
     }
     ### run status: $?
     ### error: "$!"
-  }
-  {
-    my @command = ('sensible-browser', $uri);
-    if (_spawn (@command)) { return }
   }
   {
     my @command = ('mozilla', $uri);

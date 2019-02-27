@@ -1,6 +1,9 @@
 # Test Case setPalette commands
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Test;
 

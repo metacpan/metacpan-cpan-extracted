@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  IO::Async::Loop: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
@@ -12,31 +13,67 @@ build_requires:
   Test::Fatal: '0'
   Test::HexString: '0'
   Test::More: '0.98'
-  perl: '5.014000'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Job-Async
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Job::Async:
+    file: lib/Job/Async.pm
+    version: '0.003'
+  Job::Async::Client:
+    file: lib/Job/Async/Client.pm
+    version: '0.003'
+  Job::Async::Client::Memory:
+    file: lib/Job/Async/Client/Memory.pm
+    version: '0.003'
+  Job::Async::Job:
+    file: lib/Job/Async/Job.pm
+    version: '0.003'
+  Job::Async::Test::Compliance:
+    file: lib/Job/Async/Test/Compliance.pm
+    version: '0.003'
+  Job::Async::Utils:
+    file: lib/Job/Async/Utils.pm
+    version: '0.003'
+  Job::Async::Worker:
+    file: lib/Job/Async/Worker.pm
+    version: '0.003'
+  Job::Async::Worker::Memory:
+    file: lib/Job/Async/Worker/Memory.pm
+    version: '0.003'
 requires:
   Future: '0.37'
+  Future::Utils: '0'
   IO::Async: '0'
+  IO::Async::Notifier: '0'
   JSON::MaybeUTF8: '1.000'
   List::Util: '1.29'
   Log::Any: '1.050'
   Math::Random::Secure: '0'
+  Module::Load: '0'
   Ryu::Async: '0.006'
+  Sereal: '0'
+  constant: '0'
   curry: '0'
   namespace::clean: '0'
   parent: '0'
-resources:
-  Prepan_author: http://prepan.org/user/TEAM
-  Prepan_module: http://prepan.org/module/Job-Async
-  bugtracker: https://github.com/team-at-cpan/Job-Async/issues
-  repository: git://github.com/team-at-cpan/Job-Async.git
-version: '0.002'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  strict: '0'
+  warnings: '0'
+version: '0.003'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

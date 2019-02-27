@@ -2,20 +2,29 @@
 
 use strict;
 use warnings;
-
 use lib 't/lib';
 use Test::Most;
 use DBIx::Class::Migration;
-use File::Spec::Functions 'catfile';
-use File::Path 'rmtree';
 use Local::Schema;
+use File::Temp 'tempdir';
+
+my $dir = tempdir(DIR => 't', CLEANUP => 1);
 
 ## Create an in-memory sqlite version of the test schema
-(my $schema = Local::Schema->connect('dbi:SQLite::memory:'))
-  ->deploy;
+ok my $schema = Local::Schema->connect('dbi:SQLite::memory:');
+
+# SQL_IDENTIFIER_QUOTE_CHAR
+$schema->storage->sql_maker->quote_char($schema->storage->dbh->get_info(29));
+
+$schema->deploy;
 
 ## Connect a DBIC migration to that
-ok my $migration = DBIx::Class::Migration->new(schema => $schema);
+ok(
+  my $migration = DBIx::Class::Migration->new(
+    schema => $schema,
+    target_dir => $dir,
+  )
+);
 
 ## Verify that the connected schema is missing the version storage meta-table
 
@@ -45,9 +54,3 @@ is(
   'database version and schema version match');
 
 done_testing;
-
-END {
-  rmtree catfile($migration->target_dir, 'migrations');
-  rmtree catfile($migration->target_dir, 'fixtures');
-  unlink catfile($migration->target_dir, 'local-schema.db');
-}

@@ -1,6 +1,10 @@
 Changes for EPublisher::Source::Plugin::PerltutsCom
 ===================================================
 
+0.5  2019-02-25 17:10:00
+
+    - fix list of prerequesits
+
 0.5  2019-02-24 19:24:00
 
     - update dist.ini

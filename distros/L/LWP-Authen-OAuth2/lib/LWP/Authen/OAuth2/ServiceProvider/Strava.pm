@@ -100,12 +100,7 @@ L<http://annocpan.org/dist/LWP-Authen-OAuth2>
 
 L<http://cpanratings.perl.org/d/LWP-Authen-OAuth2>
 
-=item Search CPAN
-
-L<http://search.cpan.org/dist/LWP-Authen-OAuth2/>
-
 =back
-
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,0 +1,71 @@
+=encoding utf-8
+
+=head1 NAME
+
+Perl::Metrics::Lite - Pluggable Perl Code Metrics System
+
+=head1 SYNOPSIS
+
+  use Perl::Metrics::Lite;
+  my $analzyer   = Perl::Metrics::Lite->new;
+  my $analysis   = $analzyer->analyze_files(@ARGV);
+  my $file_stats = $analysis->file_stats;
+  my $sub_stats = $analysis->sub_stats;
+
+=head1 DESCRIPTION
+
+B<Perl::Metrics::Lite> is the pluggable perl code metrics system.
+
+B<Perl::Metrics::Lite> provides just enough methods to run static analysis
+of one or many Perl files and obtain a few metrics.
+
+B<Perl::Metrics::Lite> is far simpler than L<Perl::Metrics> 
+and more extensible than L<Perl::Metrics::Simple>.
+
+=head1 USAGE
+
+See the F<measureperl> and F<measureperl-checkstyle>  script 
+(included with this distribution) for a simple example of usage.
+
+=head1 CLASS METHODS
+
+=head2 new
+
+Takes no arguments and returns a new L<Perl::Metrics::Lite> object.
+
+=head1 OBJECT METHODS
+
+=head2 analyze_files( @paths, @refs_to_file_contents )
+
+Takes an array of files and or directory paths, and/or
+SCALAR refs to file contents and returns
+an L<Perl::Metrics::Lite::Analysis> object.
+
+=head1 SOURCE AVAILABILITY
+
+This source is in Github:
+
+  http://github.com/dann/p5-perl-metrics-lite
+
+=head1 CONTRIBUTORS
+
+Many thanks to:
+
+
+=head1 AUTHOR
+
+Dann E<lt>techmemo{at}gmail.comE<gt>
+
+=head1 SEE ALSO
+
+L<Perl::Metrics>
+L<Perl::Metrics::Simple>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
+

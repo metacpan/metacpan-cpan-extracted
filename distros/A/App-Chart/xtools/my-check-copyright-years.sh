@@ -2,7 +2,7 @@
 
 # my-check-copyright-years.sh -- check copyright years in dist
 
-# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017, 2018 Kevin Ryde
 
 # my-check-copyright-years.sh is shared by several distributions.
 #
@@ -72,9 +72,11 @@ do
     | t/empty.dat | t/*.xpm | t/*.xbm | t/*.jpg | t/*.gif \
     | t/*.g${MY_HIDE}d \
     | tools/*-oeis-samples.gp \
+    | test-oeis-samples.gp \
     | tools/configurations-gfs-generated.gp \
     | devel/configurations-t-generated.gp \
-    | test-symbols.txt \
+    | test-symbols.txt | test-funcs.txt \
+    | devel/minimal-domsets-max-even2.c \
     | */_whizzy*)
       continue ;;
     *.gz)

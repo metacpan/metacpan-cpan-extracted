@@ -21,7 +21,7 @@ use RPi::Serial;
 use RPi::SPI;
 use RPi::StepperMotor;
 
-our $VERSION = '2.3630';
+our $VERSION = '2.3631';
 
 my $fatal_exit = 1;
 
@@ -256,26 +256,14 @@ various items
 
 =head1 SYNOPSIS
 
+Please see the L<FAQ|RPi::WiringPi::FAQ> for full usage details.
+
     use RPi::WiringPi;
     use RPi::Const qw(:all);
 
     my $pi = RPi::WiringPi->new;
 
-    #
-    # identification
-    #
-
-    $pi->io_led(1);  # turn green disk IO LED on full-time
-    $pi->pwr_led(1); # turn red power LED off
-
-    $pi->io_led;     # set green disk IO LED back to default status
-    $pi->pwr_led;    # set red power LED back to default
-
-    $pi->label('pi-test-01'); # set a name/label for your Pi object
-
-    #
     # pin
-    #
 
     my $pin = $pi->pin(5);
     $pin->mode(OUTPUT);
@@ -285,276 +273,9 @@ various items
     my $mode = $pin->mode;
     my $state = $pin->read;
 
-    #
-    # analog to digital converter (ADS1115)
-    #
-
-    my $adc = $pi->adc;
-   
-    # read channel A0 on the ADC
-
-    my $v = $adc->volts(0);
-    my $p = $adc->percent(0);
-
-    # analog to digital converter (MCP3008)
-
-    my $adc = $pi->adc(model => 'MCP3008', channel => 0);
-
-    print $adc->raw(0);
-    print $adc->percent(0);
-
-    #
-    # I2C
-    #
-
-    my $device_addr = 0x7c;
-
-    my $i2c_device = $pi->i2c($device_addr);
-
-    my $register = 0x0A;
-
-    $i2c_device->write_block([55, 29, 255], $register);
-
-    my $byte = $i2c_device->read;
-
-    my @bytes = $i2c_device->read_block;
-
-    #
-    # SPI
-    #
-
-    my $channel = 0; # SPI channel /dev/spidev0.0
-
-    my $spi = $pi->spi($channel);
-
-    my $buf = [0x01, 0x02];
-    my $len = scalar @$buf;
-
-    my @read_bytes = $spi->rw($buf, $len);
-
-    #
-    # Serial
-    #
-
-    my $dev  = "/dev/ttyS0";
-    my $baud = 115200;
-
-    my $ser = $pi->serial($dev, $baud);
-
-    $ser->putc(5);
-
-    my $char = $ser->getc;
-
-    $ser->puts("hello, world!");
-
-    my $num_bytes = 12;
-    my $str  = $ser->gets($num_bytes);
-
-    $ser->flush;
-
-    my $bytes_available = $ser->avail;
-
-    #
-    # digital to analog converter (DAC)
-    #
-
-    my $dac_cs_pin = $pi->pin(29);
-    my $spi_chan = 0;
-
-    my $dac = $pi->dac(
-        model   => 'MCP4922',
-        channel => $spi_chan,
-        cs      => $dac_cs_pin
-    );
-
-    my ($dacA, $dacB) = (0, 1);
-
-    $dac->set($dacA, 4095); # 100% output
-    $dac->set($dacB, 0);    # 0% output
-
-    #
-    # digital potentiometer
-    #
-
-    my $cs = 18;     # GPIO pin connected to dpot CS pin
-    my $channel = 0; # SPI channel /dev/spidev0.0
-
-    my $dpot = $pi->dpot($cs, $channel);
-
-    # set to 50% output
-
-    $dpot->set(127);
-
-    # shutdown (sleep) the potentiometer
-
-    $dpot->shutdown;
-
-    #
-    # shift register
-    #
-    
-    my ($base, $num_pins, $data, $clk, $latch)
-      = (100, 8, 5, 6, 13);
-
-    $pi->shift_register(
-        $base, $num_pins, $data, $clk, $latch
-    );
-
-    # now we can access the new 8 pins of the
-    # register commencing at new pin 100-107
-
-    for (100..107){
-        my $pin = $pi->pin($_);
-        $pin->write(HIGH);
-    }
-
-    #
-    # BMP180 barometric pressure sensor
-    #
-    
-    my $base = 300; 
-
-    my $bmp = $pi->bmp($base);
-
-    my $farenheit = $bmp->temp;
-    my $celcius   = $bmp->temp('c');
-    my $pressure  = $bmp->pressure; # kPa
-
-    #
-    # DHT11 temperature/humidity sensor
-    #
-
-    my $sensor_pin = 21;
-
-    my $env = $pi->hygrometer($sensor_pin);
-
-    my $humidity  = $env->humidity;
-    my $temp      = $env->temp; # celcius
-    my $farenheit = $env->temp('f');
-
-    # GPS (requires gpsd to be installed and running)
-
-    my $gps = $pi->gps;
-
-    print $gps->lat;
-    print $gps->lon;
-    print $gps->speed;
-    print $gps->direction;
-
-    #
-    # LCD
-    #
-
-    my $lcd = $pi->lcd(...);
-
-    # first column, first row
-    
-    $lcd->position(0, 0); 
-    $lcd->print("hi there!");
-
-    # first column, second row
-    
-    $lcd->position(0, 1);
-    $lcd->print("pin $num... mode: $mode, state: $state");
-
-    $lcd->clear;
-    $lcd->display(OFF);
-
-    $pi->cleanup;
-
-    #
-    # real time clock
-    #
-
-    my $rtc = $pi->rtc;
-
-    my $dt_string = $rtc->date_time;
-    my %dt_hash   = $rtc->dt_hash;
-
-    # set an individual attribute
-
-    $rtc->hour(22);
-
-    # set 12/24 hour clock
-
-    $rtc->clock_hours(12);
-
-    # get AM or PM while in 12-hour clock mode
-
-    my $meridien = $rtc->am_pm;
-
-    #
-    # MCP23017 GPIO expander
-    #
-
-    my $i2c_addr = 0x20;            # default
-
-    my $exp = $pi->expander($addr); # param not required if using the default
-
-    # pins are INPUT by default. Turn the first pin to OUTPUT
-
-    $exp->mode(0, 0); # or MCP23017_OUTPUT if using RPi::Const
-
-    # turn the pin on (HIGH)
-
-    $exp->write(0, 1); # or HIGH
-
-    # read the pin's status (HIGH or LOW)
-
-    $exp->read(6);
-
-    # turn the first bank (0) of pins (0-7) to OUTPUT, and make them live (HIGH)
-
-    $exp->mode_bank(0, 0);  # bank A, OUTPUT
-    $exp->write_bank(0, 1); # bank A, HIGH
-
-    # enable internal pullup resistors on the entire bank A (0)
-
-    $exp->pullup_bank(0, 1); # bank A, pullup enabled
-
-    # put all 16 pins as OUTPUT, and put them on (HIGH)
-
-    $exp->mode_all(0);  # or OUTPUT
-    $exp->write_all(1); # or HIGH
-
     # cleanup all pins and reset them to default before exiting your program
 
-    $exp->cleanup;
-
-    # ultrasonic distance sensor
-    #
-
-    my $trig_pin = 23;
-    my $echo_pin = 24;
-
-    my $ruler = $pi->hcsr04($trig_pin, $echo_pin);
-
-    my $inches = $sensor->inch;
-    my $cm     = $sensor->cm;
-    my $raw    = $sensor->raw;
-
-    #
-    # servo
-    #
-
-    my $pin_num = 18;
-
-    my $servo = $pi->servo($pin_num);
-
-    $servo->pwm(150); # centre position
-    $servo->pwm(50);  # left position
-    $servo->pwm(250); # right position
-
-    #
-    # stepper motor
-    #
-
-    my $sm = $pi->stepper_motor(
-        pins => [12, 16, 20, 21]
-    );
-
-    $sm->cw(180);   # turn clockwise 180 degrees
-    $sm->ccw(240);  # turn counter-clockwise 240 degrees
+    $pi->cleanup;
 
 =head1 DESCRIPTION
 

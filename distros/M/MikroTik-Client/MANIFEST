@@ -1,12 +1,12 @@
 Changes
 lib/MikroTik/Client.pm
+lib/MikroTik/Client/Mo.pm
 lib/MikroTik/Client/Query.pm
 lib/MikroTik/Client/Response.pm
 lib/MikroTik/Client/Sentence.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.bak
 MANIFEST.SKIP
 README.md
 t/lib/MikroTik/Client/Mockup.pm

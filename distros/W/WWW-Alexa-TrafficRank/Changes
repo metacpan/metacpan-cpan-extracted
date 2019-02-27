@@ -1,49 +1,55 @@
-2016-10-06      FileDir <guruperl@cpan.org>
+2019-02-26      AppAgg <guruperl@cpan.org>
+
+	Release 1.12
+
+	Cosmetic changes
+
+2016-10-06      AppAgg <guruperl@cpan.org>
 
 	Release 1.11
 
 	Cosmetic changes
 
-2014-12-12      FileDir <guruperl@cpan.org>
+2014-12-12      AppAgg <guruperl@cpan.org>
 
 	Release 1.10
 
 	Remove country rank
 
-2013-06-05      FileDir <guruperl@cpan.org>
+2013-06-05      AppAgg <guruperl@cpan.org>
 
 	Release 1.9
 
-	Cosmetic changes in Alexa.com
+	Cosmetic changes in AppAgga.com
 
-2013-03-15      FileDir <guruperl@cpan.org>
+2013-03-15      AppAgg <guruperl@cpan.org>
 
 	Release 1.8
 
-	Cosmetic changes in Alexa.com
+	Cosmetic changes in AppAgga.com
 
-2010-06-05      FileDir <guruperl@cpan.org>
+2010-06-05      AppAgg <guruperl@cpan.org>
 
 	Release 1.7
 
-	Cosmetic changes in Alexa.com
+	Cosmetic changes in AppAgga.com
 
-2009-10-13      FileDir <guruperl@cpan.org>
+2009-10-13      AppAgg <guruperl@cpan.org>
 
 	Release 1.6
 
-	Cosmetic changes in Alexa.com
+	Cosmetic changes in AppAgga.com
 	Added Changes to distribution
 
-2009-10-02      FileDir <guruperl@cpan.org>
+2009-10-02      AppAgg <guruperl@cpan.org>
 
 	Release 1.5
 
-	Cosmetic changes in Alexa.com
+	Cosmetic changes in AppAgga.com
 	Added Changes to distribution
 
 
-2009-06-08      FileDir <guruperl@cpan.org>
+2009-06-08      AppAgg <guruperl@cpan.org>
 
 	Release 1.4
 
@@ -51,7 +57,7 @@
 	Thanks to Evan Harris <spanner@ihug.co.nz>
 
 
-2009-05-10      FileDir <guruperl@cpan.org>
+2009-05-10      AppAgg <guruperl@cpan.org>
 
 	Release 1.3
 
@@ -59,17 +65,17 @@
 	Thanks to Lucas Mateus
 
 
-2009-04-01      FileDir <guruperl@cpan.org>
+2009-04-01      AppAgg <guruperl@cpan.org>
 
 	Release 1.2
 
-	Cosmetic changes in Alexa.com
+	Cosmetic changes in AppAgga.com
 	Added Changes to distribution
 
 
-2008-08-28      FileDir <guruperl@cpan.org>
+2008-08-28      AppAgg <guruperl@cpan.org>
 
 	Release 1.0
 
-	Cosmetic changes in WWW/Alexa/TrafficRank.pm.
+	Cosmetic changes in WWW/AppAgga/TrafficRank.pm.
 	Added Changes to distribution

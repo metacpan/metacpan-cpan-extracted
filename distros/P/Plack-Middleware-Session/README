@@ -107,10 +107,11 @@ PLACK REQUEST OPTIONS
 
     change_id
 
-      If set to a true value, forces the session identifier to change. This
-      should always be done after logging in, to prevent session fixation
-      attacks from subdomains; see
-      http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-subdomain_cooking
+      If set to a true value, forces the session identifier to change
+      (rotate). This should always be done after logging in, to prevent
+      session fixation attacks from subdomains; see
+      http://en.wikipedia.org/wiki/Session_fixation#Attacks_using_cross-sub
+      domain_cooking
 
     expire
 
@@ -120,7 +121,7 @@ PLACK REQUEST OPTIONS
     no_store
 
       If set to a true value, no changes made to the session in this
-      request will be saved to the store. Either "expire" and /change_id
+      request will be saved to the store. Either "expire" and "change_id"
       take precedence over this, as both need to update the session store.
 
     late_store

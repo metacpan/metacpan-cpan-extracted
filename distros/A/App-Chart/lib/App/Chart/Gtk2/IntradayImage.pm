@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2016 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2016, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -31,7 +31,7 @@ use App::Chart::Database;
 use App::Chart::Gtk2::GUI;
 
 # uncomment this to run the ### lines
-#use Smart::Comments;
+# use Smart::Comments;
 
 
 use Glib::Object::Subclass
@@ -57,8 +57,9 @@ sub INIT_INSTANCE {
   $self->{'symbol'} = '';
   $self->{'mode'} = '';
 
-  # single pixbuf draw operation doesn't need double buffering
+  # Single pixbuf draw operation doesn't need double buffering.
   $self->set_double_buffered (0);
+  $self->set_app_paintable (1);
 
   App::Chart::chart_dirbroadcast()->connect_for_object
       ('intraday-changed', \&_do_intraday_changed, $self);

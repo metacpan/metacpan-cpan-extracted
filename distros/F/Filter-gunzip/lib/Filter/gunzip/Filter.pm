@@ -22,7 +22,7 @@ use Filter::Util::Call qw(filter_add filter_read filter_del);
 use Compress::Raw::Zlib qw(Z_OK Z_STREAM_END Z_BUF_ERROR);
 
 use vars '$VERSION';
-$VERSION = 6;
+$VERSION = 7;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

@@ -9,9 +9,9 @@ build_requires:
   Test::More: '0.88'
   Test::Requires: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,14 +19,14 @@ meta-spec:
 name: Plack-Middleware-Session
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Cookie::Baker: '0'
+  Cookie::Baker: '0.10'
   Digest::HMAC_SHA1: '1.03'
   Digest::SHA1: '0'
   Plack: '0.9910'
@@ -34,12 +34,14 @@ resources:
   bugtracker: https://github.com/plack/Plack-Middleware-Session/issues
   homepage: https://github.com/plack/Plack-Middleware-Session
   repository: https://github.com/plack/Plack-Middleware-Session.git
-version: '0.30'
+version: '0.32'
 x_contributors:
   - 'Alex Vandiver <alex@chmrr.net>'
+  - 'Florian Schlichting <fsfs@debian.org>'
   - 'franck cuny <franck@lumberjaph.net>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Ivan Baidakou <basiliscos@openmailbox.com>'
+  - 'John Lifsey <john.lifsey@inspire.com>'
   - 'Lee Aylward <lee@laylward.com>'
   - 'lestrrat <lestrrat+github@gmail.com>'
   - 'Mark Stosberg <mark@stosberg.com>'
@@ -50,4 +52,9 @@ x_contributors:
   - 's-aska <s.aska.org@gmail.com>'
   - 'Stevan Little <stevan.little@iinteractive.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'vividsnow <vividsnow@gmail.com>'
+x_generated_by_perl: v5.20.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

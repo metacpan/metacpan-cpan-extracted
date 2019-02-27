@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -33,7 +33,7 @@ use File::Locate::Iterator;
 
 
 {
-  my $want_version = 23;
+  my $want_version = 26;
   is ($File::Locate::Iterator::VERSION, $want_version, 'VERSION variable');
   is (File::Locate::Iterator->VERSION,  $want_version, 'VERSION class method');
 
@@ -448,6 +448,7 @@ SKIP: {
 # database_str option
 
 {
+  # example in the POD
   my $str = "\0LOCATE02\0\0/hello\0\006/world\0";
   my $it = File::Locate::Iterator->new (database_str => $str);
   $str = '';

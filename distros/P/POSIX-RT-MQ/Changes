@@ -1,5 +1,23 @@
 # $Id: Changes,v 1.3 2003/01/28 07:08:50 ilja Exp $
 
+0.04 2019-02-26
+	Release, no changes as to 0.04_04
+
+0.04_04 2019-02-18
+	Better FreeBSD support
+	Bail out on Windows the offcial way
+
+0.04_03 2019-01-31
+	Try to get FreeBSD support working
+
+0.04_02 2019-01-29
+	Add more metadata to Makefile.PL
+
+0.04_01 2019-01-29
+	New maintainer
+	Made the tests work on Linux
+	Added mqdes() and close() methods
+
 0.03 2003-01-27
         Added MQ_OPEN_MAX constant;
         Added MQ_PRIO_MAX constant;
@@ -12,6 +30,4 @@
 
 0.01 2003-01-03
         First alpha release.
-
-
 

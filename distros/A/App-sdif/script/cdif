@@ -419,7 +419,6 @@ while (<DIFF>) {
     elsif (/^<<<<<<<\s+(.*)/) {
       CONFLICT:
 	{
-	    my $yours = $1;
 	    my $c1 = $_;
 
 	    my @old = read_until { /^=======$/ } *DIFF;
@@ -429,7 +428,6 @@ while (<DIFF>) {
 	    };
 
 	    my @new = read_until { /^>>>>>>>\s+(.*)/ } *DIFF;
-	    my $theirs = $2;
 	    my $c3 = pop @new // do {
 		print $c1, @old, $c2, @new;
 		last;

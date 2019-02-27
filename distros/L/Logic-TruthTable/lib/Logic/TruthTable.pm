@@ -129,11 +129,11 @@ Logic::TruthTable - Create and solve sets of boolean equations.
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 
 =head1 SYNOPSIS
@@ -611,7 +611,8 @@ sub fncolumn
 	#### Let's look an an element: $self->_fn_lookup()->{$fn_name}
 	#
 
-	$idx = %{$self->_fn_lookup()}{$fn_name};
+	#$idx = %{$self->_fn_lookup()}{$fn_name};
+	$idx = $self->_fn_lookup()->{$fn_name};
 
 	return undef unless (defined $idx);
 	return ${$self->_get_columns}[$idx];

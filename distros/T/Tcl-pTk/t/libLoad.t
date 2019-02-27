@@ -1,8 +1,8 @@
-#!/usr/local/bin/nperl -w
-
 # This test checks to see if loading a library (in this case 'tix') happens for
 #   different tcl interpreters.
 
+use warnings;
+use strict;
 use Tcl::pTk;
 use Data::Dumper;
 use Test;
@@ -10,7 +10,7 @@ use Test;
 
 #### Create a Mainwindow (and a interpreter) and create an Hlist ####
 ###   Creating an hlist will cause the tix library to load for this interp ###
-$mw = MainWindow->new;
+my $mw = MainWindow->new;
 $|=1;
 
 # This will skip if Tix not present
@@ -32,7 +32,7 @@ my $hl = $mw->HList( -separator => '.', -width => 25,
 
 $hl->pack(-expand => 1, -fill => 'both');
 
-@list = qw(one two three);
+my @list = qw(one two three);
 
 my $i = 0;
 foreach my $item (@list)

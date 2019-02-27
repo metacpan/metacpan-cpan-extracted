@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011, 2012, 2013 Kevin Ryde
+# Copyright 2011, 2012, 2013, 2015 Kevin Ryde
 
 # 0-file-is-part-of.t is shared by several distributions.
 #
@@ -36,6 +36,9 @@ BEGIN { require 5 }
 use strict;
 use ExtUtils::Manifest;
 use File::Slurp;
+
+# uncomment this to run the ### lines
+# use Smart::Comments;
 
 sub import {
   my $class = shift;
@@ -97,6 +100,8 @@ sub makefile_distname {
   if ($content =~ /^DISTNAME\s*=\s*([^#\n]*)/m) {
     $distname = $1;
     $distname =~ s/\s+$//;
+    ### $distname
+    if ($distname eq 'App-Chart') { $distname = 'Chart'; } # hack
   }
   return $distname;
 }
@@ -113,7 +118,7 @@ sub check_file_is_part_of {
   $content =~ /([T]his file is part of[^\n]*)/i
     or return 1;
   my $got = $1;
-  if ($got =~ /[T]his file is part of \Q$distname/i) {
+  if ($got =~ /[T]his file is part of \Q$distname\E\b/i) {
     return 1;
   }
   $self->diag("$filename: $got");

@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('0.94');
+our ($VERSION) = ('0.95');
 
 use IO::Handle; 
 
@@ -24,7 +24,7 @@ use Tcl::pTk::Bitmap;
 use Tcl::pTk::XEvent;  # Limited XEvent support
 use Tcl::pTk::Font;
 
-use Scalar::Util (qw /blessed/); # Used only for it's blessed function
+use Scalar::Util (qw /blessed/); # Used only for its blessed function
 
 # Setup camel-case commands for pack, and the font commands
 use Tcl::pTk::Submethods(
@@ -492,7 +492,7 @@ sub configure {
 }
 
 
-# returns (and optionally creates) data hash assotiated with widget
+# returns (and optionally creates) data hash associated with widget
 sub widget_data {
     my $self = shift;
     return ($Tcl::pTk::Wdata->{$self->path} || ($Tcl::pTk::Wdata->{$self->path}={}));
@@ -502,7 +502,7 @@ sub widget_data {
 sub tooltip {
     my $self = shift;
     my $ttext = shift;
-    $self->interp->packageRequire('tooltip');
+    $self->interp->pkg_require('tooltip');
     $self->call("tooltip::tooltip",$self,$ttext);
     $self;
 }
@@ -1074,7 +1074,7 @@ sub chooseColor {
 #
 # Arguments:
 # color - Name of starting color.
-# perecent - Integer telling how much to brighten or darken as a
+# percent - Integer telling how much to brighten or darken as a
 # percent: 50 means darken by 50%, 110 means brighten
 # by 10%.
 sub Darken {
@@ -1640,6 +1640,7 @@ sub _addcascade {
     # Create submenu with predefined naming convention ($mnu.m+1), so we can return it
     #  if the menu method is called on the menu button
     my $entries = $mnu->index('end');
+    $entries = -1 if ($entries eq 'none');
     $entries++;
     my $smnu = $int->widget($mnu->call('menu',"$mnu.m$entries"), "Tcl::pTk::Menu");
     #my $smnu = $mnu->Menu; # return unique widget id
@@ -1773,7 +1774,7 @@ sub Scrolled
 # end-of-scrolled
 # ----------------------------------------------------------------------------
 
-# MainWindow method, For pTk compatiblity. Returns the main-window for any widget
+# MainWindow method, For pTk compatibility. Returns the main-window for any widget
 sub MainWindow{
     my $self = shift;
     my $interp = $self->interp;
@@ -1880,7 +1881,7 @@ sub declareAutoWidget{
 
                          # Delegate sub created in Tcl::pTk::Widget namespace
                          # DelegateFor  trickyness is to allow Frames and other derived things
-                         # to force creation in a delegate e.g. a ScrlText with embeded windows
+                         # to force creation in a delegate e.g. a ScrlText with embedded windows
                          # need those windows to be children of the Text to get clipping right
                          # and not of the Frame which contains the Text and the scrollbars.
                          my $class = "Tcl::pTk::$widgetname";
@@ -2384,7 +2385,6 @@ sub XMouseWheelBind
 {
  my ($mw,$class) = @_;
  # <4> and <5> are how mousewheel looks on X
- # <4> and <5> are how mousewheel looks on X
  $mw->bind($class,'<Shift-4>',      ['xview','scroll',-1,'units']);
  $mw->bind($class,'<Shift-5>',      ['xview','scroll',1,'units']);
 }
@@ -2418,9 +2418,9 @@ sub MouseWheelBind
 {
  my($mw,$class) = @_;
 
- # The MouseWheel will typically only fire on Windows. However, one
- # could use the "event generate" command to produce MouseWheel
- # events on other platforms.
+ # The MouseWheel will typically only fire on Windows and macOS.
+ # However, one could use the "event generate" command to produce
+ # MouseWheel events on other platforms.
 
  $mw->bind($class, '<MouseWheel>',
     $mw->windowingsystem eq 'aqua'
@@ -2444,7 +2444,7 @@ sub MouseWheelBind
   }
 }
 
-# Clipboard functions definded in perl/tk
+# Clipboard functions defined in perl/tk
 sub clipboardClear{
         my $self = shift;
         $self->call('clipboard', 'clear', @_);
@@ -2718,7 +2718,7 @@ sub AUTOLOAD {
     }
     #
     # 3.5) If the method is "containerName", find a base class of the $package that
-    #       is a mapped tcl-tk widget. This enables perl/tk subwidgets to be defind
+    #       is a mapped tcl-tk widget. This enables perl/tk subwidgets to be defined
     #       from tcl-tk widgets (for example Tcl::pTk::Tree, which is derived 
     #       from the tcl-tk widget HList)
     if( $method eq 'containerName'){

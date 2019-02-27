@@ -2,6 +2,7 @@
 #
 # Chris Dean <ctdean@cogit.com>
 
+use warnings;
 use strict;
 use Tcl::pTk::BrowseEntry;
 
@@ -22,7 +23,7 @@ sub main {
                                   -choices => \@countries,
                                   -state => $state )->pack;
         if( $state eq "disabled" ) {
-            $be->configure( -arrowimage => $f->Getimage( "balArrow" ) )
+            $be->configure( -arrowimage => $f->Getimage( "balarrow" ) )
         }
         foreach my $s (@states) {
             $f->Radiobutton( -text => $s,

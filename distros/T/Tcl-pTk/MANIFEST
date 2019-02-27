@@ -319,6 +319,7 @@ t/onDestroy.t
 t/optmenu.t
 t/palette.t
 t/pane.t
+t/patchTk.t
 t/photo.t
 t/photoGetImage.t
 t/photoSubClass.t

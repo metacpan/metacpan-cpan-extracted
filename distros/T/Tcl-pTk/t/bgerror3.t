@@ -1,6 +1,8 @@
 # Test to check error reporting for a background error
 #   that occurs due to a undefined sub 
 #  This version handles the error using ErrorDialog
+use warnings;
+use strict;
 use Test;
 BEGIN {plan tests=>1}
 use Tcl::pTk;
@@ -19,7 +21,7 @@ $mw->after(2000,
         
 
 # Setup label with a scroll command that is not defined
-#   This will create a backgound error.
+#   This will create a background error.
 my $lb = $mw->Listbox->pack;
 $lb->configure(-yscrollcommand =>  \&bogus);
 $lb->insert(qw/0 foo/);

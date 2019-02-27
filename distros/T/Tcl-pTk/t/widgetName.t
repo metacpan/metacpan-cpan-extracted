@@ -2,6 +2,9 @@
 #
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 #require Tcl::pTk::Menu;
 #require Tcl::pTk::Menu::Item;

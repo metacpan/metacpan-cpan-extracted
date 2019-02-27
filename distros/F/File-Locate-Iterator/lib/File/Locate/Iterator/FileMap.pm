@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2014 Kevin Ryde.
+# Copyright 2009, 2010, 2011, 2014, 2018, 2019 Kevin Ryde.
 #
 # This file is part of File-Locate-Iterator.
 #
@@ -25,7 +25,7 @@ use Carp;
 # uncomment this to run the ### lines
 #use Devel::Comments;
 
-our $VERSION = 23;
+our $VERSION = 26;
 
 our %cache;
 
@@ -180,11 +180,11 @@ L<File::Locate::Iterator>, L<File::Map>
 
 =head1 HOME PAGE
 
-http://user42.tuxfamily.org/file-locate-iterator/index.html
+L<http://user42.tuxfamily.org/file-locate-iterator/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+Copyright 2009, 2010, 2011, 2014, 2018, 2019 Kevin Ryde
 
 File-Locate-Iterator is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

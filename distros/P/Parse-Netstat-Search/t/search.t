@@ -1,7 +1,6 @@
 use strict;
 
 use Test::More;
-use Data::Dumper;
 
 BEGIN {
    use_ok('Parse::Netstat::Search');
@@ -82,6 +81,16 @@ my $res=[ '0', '1',
 							 'refs' => '0',
 							 'nextref' => '0'
 							 },
+							{
+							 'foreign_host' => '*',
+							 'recvq' => '44',
+							 'local_port' => '123',
+							 'local_host' => 'fe80::1:%lo0',
+							 'foreign_port' => '*',
+							 'state' => '',
+							 'proto' => 'udp6',
+							 'sendq' => '33'
+							},
 							],
 		   }
 		 ];
@@ -101,7 +110,7 @@ my $search=Parse::Netstat::Search->new;
 
 #return all non-unix connections
 my @found=$search->search($res);
-ok( $#found eq '5', 'search, all') or diag('"'.$#found.'" number of returned connections for a empty search instead of "5"');
+ok( $#found eq '6', 'search, all') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"');
 
 # set a state and make sure returns only those
 $search->set_states( ['LISTEN'] );
@@ -109,7 +118,7 @@ $search->set_states( ['LISTEN'] );
 ok( $#found eq '1', 'search, LISTEN state') or diag('"'.$#found.'" number of returned connections for LISTEN state search instead of "2"');
 $search->set_states;
 @found=$search->search($res);
-ok( $#found eq '5', 'search, state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "5"... failed to reset the states');
+ok( $#found eq '6', 'search, state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"... failed to reset the states');
 
 # makes sure searching based on CIDR works
 # set a state and make sure returns only those
@@ -124,7 +133,7 @@ $search->set_cidrs( ['10.0.0.0/24','127.0.0.1/32'] );
 ok( $#found eq '4', 'search, CIDR 3') or diag('"'.$#found.'" number of returned connections for CIDR 127.0.0.1/32 10.0.0.0/24 search instead of "4"');
 $search->set_cidrs;
 @found=$search->search($res);
-ok( $#found eq '5', 'search, CIDR reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "5"... failed to reset the CIDRs');
+ok( $#found eq '6', 'search, CIDR reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"... failed to reset the CIDRs');
 
 #make sure we can match multiple items
 $search->set_cidrs( ['127.0.0.0/24'] );
@@ -134,7 +143,7 @@ ok( $#found eq '0', 'search, CIDR+state') or diag('"'.$#found.'" number of retur
 $search->set_cidrs;
 $search->set_states;
 @found=$search->search($res);
-ok( $#found eq '5', 'search, CIDR+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "5"... failed to reset the CIDRs and states');
+ok( $#found eq '6', 'search, CIDR+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"... failed to reset the CIDRs and states');
 
 #make sure we cans search based on protocols
 $search->set_protocols(['udp4']);
@@ -149,7 +158,7 @@ ok( $#found eq '0', 'search, Protocol+Listen') or diag('"'.$#found.'" number of 
 $search->set_states;
 $search->set_protocols;
 @found=$search->search($res);
-ok( $#found eq '5', 'search, protocol+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "5"... failed to reset the protocols and states');
+ok( $#found eq '6', 'search, protocol+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"... failed to reset the protocols and states');
 
 #make sure we can search based on ports
 $search->set_ports(['22']);
@@ -167,6 +176,17 @@ ok( $#found eq '0', 'search, port+state') or diag('"'.$#found.'" number of retur
 $search->set_states;
 $search->set_ports;
 @found=$search->search($res);
-ok( $#found eq '5', 'search, port+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "5"... failed to reset the ports and states');
+ok( $#found eq '6', 'search, port+state reset') or diag('"'.$#found.'" number of returned connections for a empty search instead of "6"... failed to reset the ports and states');
 
-done_testing(20);
+# find all IPv6 addresses
+$search->set_cidrs( ['::/0'] );
+@found=$search->search($res);
+ok( $#found eq '0', 'IPv6 CIDR search 1') or diag('"'.$#found.'" number of returned connections for ::/0 instead of "0"');
+ok( $found[0]->{local_pp} eq 'lo0', 'IPv6 % removal test') or diag('"local_pp" not defined for removed % section of IPv6 address. "lo0" expected');
+
+# test for future regrestions in mixed IPv4/6 CIDR lists
+$search->set_cidrs( ['::/0','192.168.0.0/16'] );
+@found=$search->search($res);
+ok( $#found eq '1', 'Mixed IPv4/6 CIDR search 1') or diag('"'.$#found.'" number of returned connections for ::/0,192.168.0.0/16 instead of "1"');
+
+done_testing(23);

@@ -8,6 +8,9 @@
 #    lower level Rows should look ok, with the spans restoring back
 #    to where they were.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 
 use Tcl::pTk::TableMatrix::SpreadsheetHideRows;

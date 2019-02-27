@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -37,7 +37,7 @@ diag "GT::DB version ",GT::DB->VERSION;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 264;
+my $want_version = 267;
 is ($GT::DB::Chart::VERSION, $want_version, 'VERSION variable');
 is (GT::DB::Chart->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { GT::DB::Chart->VERSION($want_version); 1 },

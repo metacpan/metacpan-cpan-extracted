@@ -1,9 +1,10 @@
 # This is a empty subclass test of the BrowseEntry widget
 
+use warnings;
+use strict;
 
 use Test;
 plan tests => 1;
-use strict;
 
 
 ############# Empty subclass test ####################

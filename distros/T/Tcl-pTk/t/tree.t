@@ -1,11 +1,9 @@
-#!/usr/bin/perl -w
-#
 # Perl/Tk version of Tix4.1.0/demos/samples/Tree.tcl.  Not quite as
 # nice as the Tix version: fonts and colors are different, and the
 # collapse/expand buttons are higlighted differently.
 #
 
-
+use warnings;
 use strict;
 use Tcl::pTk;
 use Tcl::pTk::Tree;

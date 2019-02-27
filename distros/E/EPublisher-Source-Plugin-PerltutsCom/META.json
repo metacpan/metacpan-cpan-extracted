@@ -32,6 +32,7 @@
             "Encode" : "0",
             "File::Basename" : "0",
             "HTTP::Tiny" : "0",
+            "Moo" : "0",
             "parent" : "0",
             "perl" : "5.008"
          }
@@ -49,7 +50,7 @@
    "provides" : {
       "EPublisher::Source::Plugin::PerltutsCom" : {
          "file" : "lib/EPublisher/Source/Plugin/PerltutsCom.pm",
-         "version" : "0.5"
+         "version" : "0.6"
       }
    },
    "release_status" : "stable",
@@ -64,7 +65,7 @@
          "web" : "http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom"
       }
    },
-   "version" : "0.5",
+   "version" : "0.6",
    "x_contributors" : [
       "Boris Daeppen <boris_daeppen@bluewin.ch>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

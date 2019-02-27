@@ -5,4 +5,8 @@ if {![catch {package require Tk}]} {
 if {![catch {package require Tix}]} {
     puts {ok_Tix}
 }
+# detect tklib existence ('cursor' is a package in tklib)
+if {![catch {package require cursor}]} {
+    puts {ok3}
+}
 exit

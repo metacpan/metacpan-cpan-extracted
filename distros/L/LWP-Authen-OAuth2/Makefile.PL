@@ -26,6 +26,7 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'LWP-Authen-OAuth2-*' },
+	test => { TESTS => "t/*.t t/LWP/Authen/*.t t/LWP/Authen/OAuth2/*.t t/LWP/Authen/OAuth2/ServiceProvider/*.t t/LWP/Authen/OAuth2/ServiceProvider/Line/*.t t/LWP/Authen/OAuth2/AccessToken/*.t" },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
     'meta-spec' => { version => 2 },
      resources => {

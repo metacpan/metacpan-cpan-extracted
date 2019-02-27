@@ -4,11 +4,9 @@
 
 set -e
 
-# Workaround for dictionaries-common install failure (bug#751367)
-apt-get install apt-utils
 [% IF pkglist %]
 [% pkgdesc %]
-apt-get install [% pkglist %][% END %]
+apt install [% pkglist %][% END %]
 
 [% tweakdesc %]
 suite=[% suite %]

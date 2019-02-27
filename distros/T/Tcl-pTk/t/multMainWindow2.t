@@ -1,6 +1,8 @@
 # This is the same as multipleMainWindow1, but it destroys the mainwindow in reverse order
 #
 
+use warnings;
+use strict;
 
 use Tcl::pTk;
 use Test;

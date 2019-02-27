@@ -1,7 +1,7 @@
 package Getopt::Long::Subcommand;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.102'; # VERSION
+our $DATE = '2019-02-27'; # DATE
+our $VERSION = '0.103'; # VERSION
 
 use 5.010001;
 use strict;
@@ -294,7 +294,7 @@ Getopt::Long::Subcommand - Process command-line options, with subcommands and co
 
 =head1 VERSION
 
-This document describes version 0.102 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2017-08-12.
+This document describes version 0.103 of Getopt::Long::Subcommand (from Perl distribution Getopt-Long-Subcommand), released on 2019-02-27.
 
 =head1 SYNOPSIS
 
@@ -536,7 +536,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

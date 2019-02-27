@@ -1,5 +1,13 @@
 Revision history for Text::Template
 
+1.55  2019-02-25
+    - Improve AppVeyor tests for older Perls (Thanks Roy Ivy)
+    - Check for Test::More 0.94 and skip tests if not installed where
+      done_testing() is used (Thanks Roy Ivy).
+    - Improve workaround for broken Win32 File::Temp taint failure (Thanks Roy Ivy).
+    - Skip/todo tests which fail under Devel::Cover (Thanks Roy Ivy)
+    - Add checks and skip_all checks for non-core test modules (Thanks Roy Ivy)
+
 1.54  2019-01-13
     - Fix tempfile creation during tests on Win32
 

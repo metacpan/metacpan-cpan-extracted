@@ -1,5 +1,8 @@
 # DirTree, display directory tree.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Tcl::pTk::DirTree;
 my $top = MainWindow->new;

@@ -1,4 +1,3 @@
-#!/usr/bin/perl -w
 # -*- perl -*-
 
 # Copied from Perl/Tk 804.028_503
@@ -13,6 +12,7 @@
 
 # Here goes tests for non-core Tk methods
 
+use warnings;
 use strict;
 use Tcl::pTk;
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.12	Wed 27 Feb 13:25:53 GMT 2019
+ - Postgres network types - thanks @ccakes
+
 0.11	Fri 22 Feb 02:45:48 GMT 2019
  - support singular and plural PK queries (thanks @nohuhu)
 

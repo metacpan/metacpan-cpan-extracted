@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2019 Kevin Ryde
 
 # This file is part of Image-Base-SVG.
 #
@@ -30,7 +30,7 @@ use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
 # uncomment this to run the ### lines
-#use Devel::Comments;
+# use Smart::Comments;
 
 require Image::Base::SVG;
 diag "Image::Base version ", Image::Base->VERSION;
@@ -39,7 +39,7 @@ if (eval { require XML::Parser::Expat; 1 }) {
   diag "XML::Parser::Expat version ", XML::Parser::Expat->VERSION;
   if (! eval { XML::Parser::Expat->VERSION(2.41); 1 }) {
     plan skip_all => "due to XML::Parser::Expat before 2.41 gets warnings for perl 5.14 incompatible changes -- $@";
-   }
+  }
 }
 
 sub find_elem {
@@ -58,7 +58,7 @@ plan tests => 83;
 # VERSION
 
 {
-  my $want_version = 4;
+  my $want_version = 5;
   is ($Image::Base::SVG::VERSION, $want_version, 'VERSION variable');
   is (Image::Base::SVG->VERSION,  $want_version, 'VERSION class method');
 

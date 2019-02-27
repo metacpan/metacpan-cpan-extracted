@@ -1,7 +1,7 @@
-#!/usr/local/bin/perl -w
-
 # Script to check for popup menu creation using the menubutton  methods
 
+use warnings;
+use strict;
 use Tcl::pTk;
 
 use Test;
@@ -12,7 +12,8 @@ my $top = MainWindow->new;
 #$top->option('add','*Text.background'=>'white');
 
 
-my $m = $top->Menu();
+my $m = $top->Menu(-type => 'menubar', -tearoff=> 0);
+$top->configure(-menu => $m);
 
 my $mb = $m->Menubutton(qw/-text File -underline 0 -tearoff 0 -menuitems/ =>
   [
@@ -35,7 +36,7 @@ my $mb2 = $m->Cascade(qw/-label File-Cascade -underline 0 -tearoff 0 -menuitems/
 my $noEntries = $m->index('end');
 my $type = $m->type(1);
 #print "Childs = $noEntries, type = $type\n";
-ok($noEntries, 2, "Number of entries in the popup");
+ok($noEntries, 1, "Number of entries in the popup");
 ok($type, 'cascade', 'Type of menuitem is cascade');
 
 

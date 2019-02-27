@@ -3,6 +3,7 @@ abstract: 'Emulate Class::Accessor::Fast behavior using Moo attributes.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
+  Class::Accessor::Fast: '0'
   Test::Exception: '0'
   Test::Simple: '0.94'
 configure_requires:
@@ -27,10 +28,10 @@ no_index:
 provides:
   MooX::Adopt::Class::Accessor::Fast:
     file: lib/MooX/Adopt/Class/Accessor/Fast.pm
-    version: '0.05'
+    version: '0.06'
   MooX::Emulate::Class::Accessor::Fast:
     file: lib/MooX/Emulate/Class/Accessor/Fast.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '2.05'
@@ -42,9 +43,10 @@ resources:
   bugtracker: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast/issues
   homepage: https://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast
   repository: git://github.com/bluefeet/MooX-Emulate-Class-Accessor-Fast.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
   - 'Graham Knop <haarg@haarg.org>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

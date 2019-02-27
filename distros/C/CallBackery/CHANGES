@@ -1,86 +1,348 @@
-0.13.0 2018-05-30
-  * fighting circular references and thus all sorts of leaks
-
-    - getters are now called with an object reference as the first argument
-      so if your getter uses $self, put a my $self = shift at the start of the callback
-    - handlers are deprecated, user actionHandler instead. It also gets self
-      as the first call argument.
-    - true and false do not exist as GuiPlugin methods anymore.
-      use Mojo:JSON qw(true false) instead
-
-0.8.14
-  * added some dependencies back in
-
-0.8.13
-  * use require to load Mojo::SQLite in the sql property of the database module
-    opening up the option for using a diffrent database or none at all
-  * more Mojo::File cleanup
-
-0.8.12
-  * make login screen configurable
-
-0.8.9
- * properly handle row selection after table reload
-
-0.8.5
- * tr is not available in server.js
-0.8.3
- * fix args regression
-0.8.2
- * make sure args always returns at least a hashpointer
-
-0.8.1
- * allow escape to cancle popupClosed
-
-0.8.0
- * provide meta information to the formCfg initializer ... in the case of a popup this is the
-   data from the parent form. See SongForm for example use.
-0.7.1
- * removed 'bad dependency' on non existing README
-0.7.0
- * new action properties:  addToContextMenu and defaultAction. These two will get used in the table Plugin
-
-0.6.5 2016-08-19 tobi@oetiker.ch
- * allow popups to open further popups via popup actions
-
-0.6.4 2016-07-04 tobi@oetiker.ch
- * fix line focus ... keep focus if at least one table row has the property primary set
-
-0.6.3 2016-07-04 tobi@oetiker.ch
- * fix table reloading
-
-0.6.2 2016-06-27 tobi@oetiker.ch
- * it should be options not option
-
-0.6.1 2016-06-27 tobi@oetiker.ch
- * introduced default screenCfg->{options}{warnAboutUnsavedData} => 1
- * handle date as a column type for tables
- * introduce btnCfg->{option}{noReload} => 1
- * improved build system in template project
-
-0.5.0 2015-12-23 tobi@oetiker.ch
- * properly handle 'string dates'
- * properly layout upload button in toolbar
- * new 'inivisible' TextWidget for storing record id in edit forms
-
-0.3.4 2015-12-08 tobi@oetiker.ch
- * some more regressions fixed
-
-0.3.3 2015-12-08 tobi@oetiker.ch
- * thirdparty got its own Makefile now
-
-0.3.2 2015-11-23 tobi@oetiker.ch
- * fix sample app
- * include missing plugin file
-
-0.3.1 2015-11-23 tobi@oetiker.ch
-
- * never save dbh ... always request a copy via db
- * fix reload handling in table widget
-
-0.2.0 2015-08-28 tobi@oetiker.ch
-
- * big update
- * prefixed all 'system' tables with cb
- * moved Plugins to GuiPlugin
- * renamed base classes into Abstract*
+* 121c4ab - (HEAD -> login-log) log login acctivity (4 minutes ago) <Tobias Oetiker>
+* bf1b222 - (origin/master, origin/HEAD, master) fix generator to work with mojo8 (3 months ago) <Tobias Oetiker>
+* 4087cfe - trying to get travis going again (3 months ago) <Tobias Oetiker>
+* fc77dca - fix some regressions (3 months ago) <Tobias Oetiker>
+* 7c715da - fix userform syntax (3 months ago) <Tobias Oetiker>
+* dc01dcb - teach Promises to callbackery (3 months ago) <Tobias Oetiker>
+* 35bcb56 - 0.13.8 (8 months ago) <Tobias Oetiker>
+* f0cb691 - remove stray 0 at the end of the sqlite dump (8 months ago) <Tobias Oetiker>
+* 043a79c - (tag: v0.13.7) use database dump in the backup file not the raw db file (8 months ago) <Tobias Oetiker>
+* 6dc7875 - (tag: v0.13.4) fix spelling of instanciation ... it is instantiation (8 months ago) <Tobias Oetiker>
+* 60c4ec8 - (tag: v0.13.3) must load CallBackery::User (9 months ago) <Tobias Oetiker>
+* 2fad13b - (tag: v0.13.2) limit width of note column in forms (9 months ago) <Tobias Oetiker>
+* a732cd7 - (tag: v0.13.1) fix call to userObject (9 months ago) <Tobias Oetiker>
+* 4878b5b - (tag: v0.13.0) Fighting circular references (9 months ago) <Tobias Oetiker>
+* 7547c30 - update PERL_MODULES (10 months ago) <Tobias Oetiker>
+* 7d871b9 - (tag: v0.12.9) fix deprecated route syuntax (no more braces) (10 months ago) <Tobias Oetiker>
+* d22bf7e - update template PERL_MODULES (10 months ago) <Tobias Oetiker>
+* 36e18d1 - (tag: v0.12.8) updated dependncy to require latest qooxdoo plugin (10 months ago) <Tobias Oetiker>
+* 71ba760 - widen tests (10 months ago) <Tobias Oetiker>
+* 33507d2 - fix cpanmin.us link (10 months ago) <Tobias Oetiker>
+* 1716124 - Update README.md (10 months ago) <Tobias Oetiker>
+* 3cda105 - Update README.md (10 months ago) <Tobias Oetiker>
+* b6b2deb - (tag: v0.12.7) search templates in templates/system (11 months ago) <Tobias Oetiker>
+* 1253847 - (tag: v0.12.6) localize $_ before loading locales since this function modifies $_ (11 months ago) <Tobias Oetiker>
+* aa50217 - simplify table change detection (12 months ago) <Tobias Oetiker>
+* dc13afc - (tag: v0.12.5) new String is not a good thing ... stick with just String (1 year ago) <Tobias Oetiker>
+* e65abe4 - add missing Makefile (1 year ago) <Tobias Oetiker>
+* b0ff480 - (tag: v0.12.3) fix user object for up and downloads (1 year, 1 month ago) <Tobias Oetiker>
+* 88ba138 - (tag: v0.12.2) auto build source version (1 year, 1 month ago) <Tobias Oetiker>
+* 5898387 - add a cache-control header for all requests but those going for the resource files. (1 year, 1 month ago) <Tobias Oetiker>
+* bd53c60 - (tag: v0.12.0) v0.12.0 (1 year, 2 months ago) <Tobias Oetiker>
+* 4e0dfba - additional types supported for table columns: - string - number   including format option (1 year, 2 months ago) <Tobias Oetiker>
+* 8d5425f - qxclass changes (1 year, 2 months ago) <Tobias Oetiker>
+* 6494665 - local class (1 year, 2 months ago) <Tobias Oetiker>
+* ae4f5ed - local class (1 year, 2 months ago) <Tobias Oetiker>
+* 851f7d3 - add bin makefile handle qxpath seperately (1 year, 2 months ago) <Tobias Oetiker>
+* 6c7450c - app names with - and not _ please (1 year, 2 months ago) <Tobias Oetiker>
+* 603bd0e - update to latest CallBackery (1 year, 2 months ago) <Tobias Oetiker>
+* 7c52763 - (tag: v0.11.2) handle text fields with 0 (numeric) content properly (1 year, 3 months ago) <Tobias Oetiker>
+* 901ce64 - (tag: v0.11.1) fix popup regression (1 year, 4 months ago) <Tobias Oetiker>
+* 683f147 - (tag: v0.11.0) make visibility propagation actually work (1 year, 5 months ago) <Tobias Oetiker>
+* 8eb8770 - a bunch of changes to enable plugins to hide themselves if they want to (1 year, 5 months ago) <Tobias Oetiker>
+* f3c697c - * improve handling of user objects * add support for #focusApp=xxx  location argument (1 year, 5 months ago) <Tobias Oetiker>
+* 874ba3c - (tag: v0.10.9) no more transitions for blocker (1 year, 9 months ago) <Tobias Oetiker>
+* e1e5f4a - (tag: v0.10.8) 0.10.8 (1 year, 9 months ago) <Tobias Oetiker>
+* a401b20 - make download work again (1 year, 9 months ago) <Tobias Oetiker>
+* 8a9f180 - do not recursively define SHARE (1 year, 9 months ago) <Tobias Oetiker>
+* d04d959 - move blocker tuneing into separate method, so that alternate implemenations are simple (1 year, 9 months ago) <Tobias Oetiker>
+* 48146ac - (tag: v0.10.7) blurring blocker effect added (1 year, 9 months ago) <Tobias Oetiker>
+* b61ada6 - (tag: v0.10.6) de-slurpify (1 year, 10 months ago) <Tobias Oetiker>
+* 9ad58c9 - (tag: v0.10.5) html widget must be added with flex (1 year, 11 months ago) <Tobias Oetiker>
+* 282b55b - (tag: v0.10.4) * allow to translate lable property of form fields * unbreak html plugin after _populate move (1 year, 11 months ago) <Tobias Oetiker>
+* 4ea1a06 - do not reinstantiate the database handle (1 year, 11 months ago) <Tobias Oetiker>
+* 9aff270 - publish user info too (1 year, 11 months ago) <Tobias Oetiker>
+* 8e28e7c - new FRONTEND parameter max_width for the maximum width of the ui component (1 year, 11 months ago) <Tobias Oetiker>
+*   a837348 - Merge pull request #44 from zaucker/DateTime (1 year, 11 months ago) <Tobias Oetiker>
+|\  
+| * c3a30ca - Easier extension of plugins (1 year, 11 months ago) <Fritz Zaucker>
+* | 1e28f20 - (tag: v0.10.0) added date time to dist (2 years ago) <Tobias Oetiker>
+* |   cafe876 - Merge branch 'master' of github.com:oetiker/callbackery (2 years ago) <Tobias Oetiker>
+|\ \  
+| * \   7cd362b - Merge pull request #43 from zaucker/DateTime (2 years ago) <Tobias Oetiker>
+| |\ \  
+| | |/  
+| | *   608c206 - Merge branch 'master' into DateTime (2 years ago) <Fritz Zaucker>
+| | |\  
+| | |/  
+| |/|   
+| | * 12ed8b1 - Add DateTime widget (2 years ago) <Fritz Zaucker>
+| | *   46f8d9b - Merge branch 'master' of https://github.com/zaucker/callbackery into NoSQL (2 years ago) <Fritz Zaucker>
+| | |\  
+* | | | 9ee4a65 - v0.10.0 (2 years ago) <Tobias Oetiker>
+* | | | 8c8cd49 - some versions of perl seem to not like objects with methods called system (2 years ago) <Tobias Oetiker>
+|/ / /  
+* | | 29397a6 - (tag: v0.9.0) * new pseudo 'action spacer' to space out buttons * support for header and notes in table form fields (2 years ago) <Tobias Oetiker>
+* | | 4176e28 - use hiddenText feature (2 years ago) <Tobias Oetiker>
+* | | 7527497 - (tag: v0.8.18) allow to configure an alternate spinner image (2 years ago) <Tobias Oetiker>
+* | | e96a531 - translate placeholders (2 years ago) <Tobias Oetiker>
+* | | a9cd000 - (tag: v0.8.17) patch the curent color theme! (2 years ago) <Tobias Oetiker>
+* | | 9c5f027 - (tag: v0.8.16) db handle must always be fresh ... (2 years ago) <Tobias Oetiker>
+* | | 1035b7d - (tag: v0.8.15) fix require statement (2 years ago) <Tobias Oetiker>
+* | | ca8ba6d - better search and replace expression for README on version change (2 years ago) <Tobias Oetiker>
+* | | 08d98b2 - selection is not known here when submissing data so the handlers must be valid in any case (2 years ago) <Tobias Oetiker>
+* | | 3622291 - (tag: v0.8.14) fix dependencies (2 years ago) <Tobias Oetiker>
+* | | b3cb811 - add minimal dependencies back in (2 years ago) <Tobias Oetiker>
+* | | 774d1f8 - (tag: v0.8.13) * remove sqlite dependency * transition to Mojo::File properly (2 years ago) <Tobias Oetiker>
+* | |   d64efb0 - Merge pull request #41 from zaucker/NoSQL (2 years ago) <Tobias Oetiker>
+|\ \ \  
+| |/ /  
+| * | 22fe9f7 - Replace use CallBackery::Database with require in database attribute (2 years ago) <Fritz Zaucker>
+| * | ccb5147 - Replace use CallBackery::Database with require in database attribute (2 years ago) <Fritz Zaucker>
+* | | 4f31622 - (tag: v0.8.12) sync up (2 years ago) <Tobias Oetiker>
+* | |   0d3e49f - Merge pull request #39 from zaucker/LoginConfigurable (2 years ago) <Tobias Oetiker>
+|\ \ \  
+| * \ \   88bee81 - Merge branch 'LoginConfigurable' of https://github.com/zaucker/callbackery into LoginConfigurable (2 years ago) <Fritz Zaucker>
+| |\ \ \  
+| | * | | fa585b8 - Fix CHANGES file (2 years ago) <Fritz Zaucker>
+| | * | | 653fb58 - Revert "Replace deprecated Mojo::Util::slurp() function" (2 years ago) <Fritz Zaucker>
+| | * | | c4b08e9 - Make login screen configurable (2 years ago) <Fritz Zaucker>
+| | | |/  
+| | |/|   
+| * | | f904916 - Make login screen configurable (2 years ago) <Fritz Zaucker>
+| |/ /  
+| * | 67dae26 - Replace deprecated Mojo::Util::slurp() function (2 years ago) <Fritz Zaucker>
+* | |   1405372 - Merge pull request #40 from zaucker/MojoUpdate (2 years ago) <Tobias Oetiker>
+|\ \ \  
+| |/ /  
+|/| /   
+| |/    
+| * c78b39e - Fix slurp (2 years ago) <Fritz Zaucker>
+|/  
+* 98fae34 - handle id strings in utf8 (2 years ago) <Tobias Oetiker>
+* ee17db1 - (tag: v0.8.11) 0.8.11 (2 years ago) <Tobias Oetiker>
+* 723dba1 - implement #36 (2 years ago) <Tobias Oetiker>
+* 4cdc054 - (tag: v0.8.10) prep for 0.8.10 (2 years ago) <Tobias Oetiker>
+* c666bdd - added missing translations (2 years ago) <Tobias Oetiker>
+* dfda28e - (tag: v0.8.9) 0.8.9 (2 years, 1 month ago) <Tobias Oetiker>
+*   ecfee68 - Merge pull request #31 from samoser/FixForTableRowSelection (2 years, 1 month ago) <Tobias Oetiker>
+|\  
+| * 99f33e5 - row must be unselected when data is not existing (2 years, 1 month ago) <amoser>
+|/  
+* 1903916 - (tag: v0.8.8) we need a newer version (2 years, 2 months ago) <Tobias Oetiker>
+* 0f17bc6 - merge master (2 years, 2 months ago) <Tobias Oetiker>
+*   5bb348e - Merge branch 'master' of github.com:oetiker/callbackery (2 years, 2 months ago) <Tobias Oetiker>
+|\  
+| *   efa25c4 - Merge pull request #30 from manwar/fix-pod-errors (2 years, 3 months ago) <Tobias Oetiker>
+| |\  
+| | * 29adfa0 - Fix pod error as reported by CPANTS. http://cpants.cpanauthors.org/dist/CallBackery (2 years, 3 months ago) <Mohammad S Anwar>
+| |/  
+* | 2fe27fa - improve portability (2 years, 2 months ago) <Tobias Oetiker>
+|/  
+* 4275dcc - better readme (2 years, 3 months ago) <Tobias Oetiker>
+* 0c6b5e6 - better readme (2 years, 3 months ago) <Tobias Oetiker>
+* b7b4b10 - this.tr is not available in server.js. fix for #29 (2 years, 3 months ago) <Tobias Oetiker>
+* 25418af - (tag: v0.8.4) v0.8.4 (2 years, 3 months ago) <Tobias Oetiker>
+* 847b0b1 - allow html in header (2 years, 3 months ago) <Tobias Oetiker>
+* 02d43ea - translate busy message (2 years, 3 months ago) <Tobias Oetiker>
+* 762bf8e - fix loading animation (2 years, 3 months ago) <Tobias Oetiker>
+* 2cd7746 - fix args regression (2 years, 4 months ago) <Tobias Oetiker>
+* 9ec77b6 - 0.8.2 (2 years, 4 months ago) <Tobias Oetiker>
+* 55cfdca - args should alwais at least contain a hash ... this is only a stop gap fix ... we realy have to pass the partenArgs every time we interact with the plugin (2 years, 4 months ago) <Tobias Oetiker>
+* c28ab41 - (tag: v0.8.1) 0.8.1  * allow escape to cancle popupClosed (2 years, 4 months ago) <Tobias Oetiker>
+* 7c674ff - (tag: v0.7.1) fix readme issue (2 years, 4 months ago) <Tobias Oetiker>
+* 80ef5e1 - cpanmin.us seems unstable (2 years, 4 months ago) <Tobias Oetiker>
+* 061b82c - (tag: v0.7.0) added context menu and default action to table widget (2 years, 4 months ago) <Tobias Oetiker>
+* a23d65a - handle validation on selectboxes without content (2 years, 5 months ago) <Tobias Oetiker>
+* b485eb7 - be more careful with the server handler (2 years, 5 months ago) <Tobias Oetiker>
+* ca89896 - better sample build app (2 years, 5 months ago) <Tobias Oetiker>
+* 02a4dea - re-indent (2 years, 5 months ago) <Tobias Oetiker>
+* 17493a7 - improved build system (2 years, 5 months ago) <Tobias Oetiker>
+* 2325ae2 - (tag: v0.6.5) release 0.6.5 (2 years, 6 months ago) <Tobias Oetiker>
+*   84b7e2b - Merge pull request #28 from samoser/PopUpPopUp (2 years, 6 months ago) <Tobias Oetiker>
+|\  
+| * bd84797 - PopUp-Rekursion von Tobi (2 years, 6 months ago) <amoser>
+* | 0d138c9 - (tag: v0.6.4) table row focus fix (2 years, 8 months ago) <Tobias Oetiker>
+* | 14edd3e - table row focus fix (2 years, 8 months ago) <Tobias Oetiker>
+* | 441f4eb - (tag: v0.6.3) update changes (2 years, 8 months ago) <Tobias Oetiker>
+* | 0e8c833 - cleanup additions (2 years, 8 months ago) <Tobias Oetiker>
+* | 6d891a4 - refresh table on appear fix for #25 (2 years, 8 months ago) <Tobias Oetiker>
+* | 7cc669c - handle action response on upload fix for #22 (2 years, 8 months ago) <Tobias Oetiker>
+* |   7237520 - Merge pull request #27 from zaucker/Translation (2 years, 8 months ago) <Tobias Oetiker>
+|\ \  
+| * | 6201f5c - Enable Qooxdoo translations (2 years, 8 months ago) <Fritz Zaucker>
+|/ /  
+* |   8befa00 - Merge pull request #26 from zaucker/SupportFooter (2 years, 8 months ago) <Tobias Oetiker>
+|\ \  
+| * | 089fbb1 - Revert "Revert "Revert previous change for Upload toolbar button and just make UploadButton.js extend qx.ui.toolbar.Button"" (2 years, 8 months ago) <Fritz Zaucker>
+| * | 0b553b2 - Revert "Allow date format table columns" (2 years, 8 months ago) <Fritz Zaucker>
+| * | 0a77075 - Add optional support link to application footer (2 years, 8 months ago) <Fritz Zaucker>
+| * | 05cc5d0 - Revert "Add optional support link to application footer" (2 years, 8 months ago) <Fritz Zaucker>
+| * | f832ff7 - Add optional support link to application footer (2 years, 8 months ago) <Fritz Zaucker>
+| * | 3b30862 - Revert "Revert previous change for Upload toolbar button and just make UploadButton.js extend qx.ui.toolbar.Button" (2 years, 9 months ago) <Fritz Zaucker>
+| * | 32ed584 - Allow date format table columns (2 years, 9 months ago) <Fritz Zaucker>
+* | | d88758b - (tag: v0.6.2) fix noReload option (2 years, 8 months ago) <Tobias Oetiker>
+* | | 850a312 - (tag: v0.6.1) add changes file (2 years, 8 months ago) <Tobias Oetiker>
+* | |   937b6c4 - (tag: v0.6.0) Merge branch 'master' of github.com:oetiker/callbackery (2 years, 8 months ago) <Tobias Oetiker>
+|\ \ \  
+| * \ \   ebae297 - Merge pull request #21 from samoser/samoser-patch-1 (2 years, 8 months ago) <Tobias Oetiker>
+| |\ \ \  
+| | |_|/  
+| |/| |   
+| | * | 59e0165 - Update Action.js (2 years, 8 months ago) <Samuel Amoser>
+| |/ /  
+* | | c495015 - feature updates (2 years, 8 months ago) <Tobias Oetiker>
+|/ /  
+* | 449ed66 - return a hash pointer! (2 years, 8 months ago) <Tobias Oetiker>
+* | bcd45e1 - make the warning about unsaved data configurable (2 years, 8 months ago) <Tobias Oetiker>
+* | 64af5df - fix for Makefile glob (2 years, 8 months ago) <Tobias Oetiker>
+* | 3008e71 - do not install Makefiles (2 years, 8 months ago) <Tobias Oetiker>
+* |   8d41a53 - Merge branch 'master' of github.com:oetiker/callbackery (2 years, 9 months ago) <Tobias Oetiker>
+|\ \  
+| * \   3a73c69 - Merge pull request #20 from zaucker/TableDateFormat (2 years, 9 months ago) <Tobias Oetiker>
+| |\ \  
+| | * \   67d1e12 - Merge branch 'TableDateFormat' of https://github.com/zaucker/callbackery into TableDateFormat (2 years, 9 months ago) <Fritz Zaucker>
+| | |\ \  
+| | | * | 1446775 - Change row to col for column name (2 years, 9 months ago) <Fritz Zaucker>
+| | | * | a7563ae - Add date format for table columns (2 years, 9 months ago) <Fritz Zaucker>
+| | * | | d852a92 - Add date format for table columns (2 years, 9 months ago) <Fritz Zaucker>
+| | |/ /  
+| | * |   8cb231d - Merge branch 'master' of https://github.com/oetiker/callbackery into TableDateFormat (2 years, 9 months ago) <Fritz Zaucker>
+| | |\ \  
+| | |/ /  
+| |/| |   
+| | * | 2778ce4 - Revert "Revert "Only set selection on none-empty tables"" (2 years, 9 months ago) <Fritz Zaucker>
+* | | | 729556e - optimize code (2 years, 9 months ago) <Tobias Oetiker>
+|/ / /  
+* | | 683a02e - its col not row! (2 years, 9 months ago) <Tobias Oetiker>
+* | | 8a042dc - its col not row (2 years, 9 months ago) <Tobias Oetiker>
+* | |   839d27c - Merge pull request #19 from zaucker/TableSelection (2 years, 9 months ago) <Tobias Oetiker>
+|\ \ \  
+| * | | c79877f - Revert "Allow date format columns in table" (2 years, 9 months ago) <Fritz Zaucker>
+| * | | 301f511 - Only set selection on none-empty tables (2 years, 9 months ago) <Fritz Zaucker>
+| |/ /  
+| * | 798857c - Allow date format columns in table (2 years, 9 months ago) <Fritz Zaucker>
+| * | bfa27f6 - Revert "Revert previous change for Upload toolbar button and just make UploadButton.js extend qx.ui.toolbar.Button" (2 years, 9 months ago) <Fritz Zaucker>
+| * | 710500b - Revert "Only set selection on none-empty tables" (2 years, 9 months ago) <Fritz Zaucker>
+| |/  
+| * 09b0878 - Revert previous change for Upload toolbar button and just make UploadButton.js extend qx.ui.toolbar.Button (2 years, 9 months ago) <Fritz Zaucker>
+| * 05ca327 - Only set selection on none-empty tables (2 years, 9 months ago) <Fritz Zaucker>
+* | b9d7c8d - improved build system (2 years, 10 months ago) <Tobias Oetiker>
+* | f8d74d7 - more perl checking (2 years, 11 months ago) <Tobias Oetiker>
+* | e3537a8 - more perl checking (2 years, 11 months ago) <Tobias Oetiker>
+* | 3118b4f - integrate latest findings from logsender (2 years, 11 months ago) <Tobias Oetiker>
+* | ef20a5a - make perl module building a bit simpler ... just build them don't mess (3 years ago) <Tobias Oetiker>
+* | 6f04a1a - simpler gitignore (3 years, 1 month ago) <Tobias Oetiker>
+* | a949a75 - added .gitignore to sample app (3 years, 1 month ago) <Tobias Oetiker>
+* | 51d36f7 - make sure one does NOT install in the same directory as the source was unpacked (3 years, 2 months ago) <Tobias Oetiker>
+* | 76ed15d - be more careful to rebuild the perl module repo (3 years, 2 months ago) <Tobias Oetiker>
+* | 6d51350 - curl seems to work better on old linuxes than wget ... so lets try curl first (3 years, 2 months ago) <Tobias Oetiker>
+* | 63ec92c - (tag: v0.5.0) 0.5.0 (3 years, 2 months ago) <Tobias Oetiker>
+* |   40d9aaa - Merge pull request #14 from zaucker/FixCheckbox (3 years, 2 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 07b2e95 - null should not check checkbox (3 years, 2 months ago) <Fritz Zaucker>
+| * 9ba5773 - Add UploadToolbarButton (3 years, 2 months ago) <Fritz Zaucker>
+| * dedeb3a - Allow hidden text fields (e.g. for database id fields in edit forms) (3 years, 2 months ago) <Fritz Zaucker>
+* |   d67fa50 - Merge pull request #11 from zaucker/HiddenField (3 years, 2 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 396b8f6 - Allow numeric and other date values (3 years, 2 months ago) <Fritz Zaucker>
+|/  
+* f3e8c7d - (tag: v0.4.1) extra ; removed (3 years, 2 months ago) <Tobias Oetiker>
+* 1cc7bce - (tag: v0.4.0) more changes to make app work again (3 years, 2 months ago) <Tobias Oetiker>
+* a995d4d - (tag: v0.3.4) ready for 0.3.4 (3 years, 3 months ago) <Tobias Oetiker>
+*   179e8d5 - (tag: v0.3.3) Merge branch 'master' of github.com:oetiker/callbackery (3 years, 3 months ago) <Tobias Oetiker>
+|\  
+| *   7907b1c - Merge pull request #8 from maettu/master (3 years, 3 months ago) <Tobias Oetiker>
+| |\  
+| | *   9cebaaa - Merge remote-tracking branch 'upstream/master' (3 years, 3 months ago) <Matthias Bloch>
+| | |\  
+| | |/  
+| |/|   
+| | * efa457a - small README enhancements / typo fixes (3 years, 3 months ago) <Matthias Bloch>
+* | | 4794afe - push 0.3.3 (3 years, 3 months ago) <Tobias Oetiker>
+|/ /  
+* | 0be3b07 - added missing Makefile (3 years, 3 months ago) <Tobias Oetiker>
+* | 076120c - do not require a perl version in configure (3 years, 3 months ago) <Tobias Oetiker>
+* | ed6886e - dokument changes (3 years, 3 months ago) <Tobias Oetiker>
+* | f32ab00 - move thirdparty building into its own Makefile (3 years, 3 months ago) <Tobias Oetiker>
+* | 8fa3f39 - (tag: v0.3.2) 0.3.2 (3 years, 3 months ago) <Tobias Oetiker>
+* | f5f7cc2 - make sure assets get copied (3 years, 3 months ago) <Tobias Oetiker>
+* | a64a860 - (tag: v0.3.1) no version necessary (3 years, 3 months ago) <Tobias Oetiker>
+* | 2fc1203 - update versions (3 years, 3 months ago) <Tobias Oetiker>
+* | 7f06d31 - never save a copy of dbh ... always get a new one (3 years, 3 months ago) <Tobias Oetiker>
+* | 915399c - fix reload handling for tables (3 years, 3 months ago) <Tobias Oetiker>
+* | 2d0ab84 - small fixes to the sample app (3 years, 3 months ago) <Tobias Oetiker>
+* | c1eb3d2 - another loading fix (3 years, 4 months ago) <Tobias Oetiker>
+* | e3a1498 - fix loading issue better better (3 years, 4 months ago) <Tobias Oetiker>
+* | 567692d - fix 'loading' book keeping to not get out of step even when one reload fails for some reason (3 years, 4 months ago) <Tobias Oetiker>
+* | f6c38f7 - make sure we rebuild on config changes (3 years, 4 months ago) <Tobias Oetiker>
+|/  
+* 43dfa90 - (tag: v0.3.0) ready for 0.3.0 release (3 years, 5 months ago) <Tobias Oetiker>
+*   9ac2f71 - Merge pull request #7 from zaucker/master (3 years, 5 months ago) <Tobias Oetiker>
+|\  
+| * 4130737 - Convert incoming epoch seconds to milliseconds (3 years, 5 months ago) <Fritz Zaucker>
+| * 9733692 - Fix docu (3 years, 5 months ago) <Fritz Zaucker>
+| * 2324356 - Fix typo (3 years, 5 months ago) <Fritz Zaucker>
+| * 872a445 - Fix documentation (3 years, 5 months ago) <Fritz Zaucker>
+* |   d75ed55 - Merge pull request #6 from zaucker/master (3 years, 5 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 7ea9452 - Fix usage message for --with-qooxdoo-sdk-dir (3 years, 5 months ago) <Fritz Zaucker>
+* |   bc5ec69 - Merge pull request #5 from zaucker/master (3 years, 6 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 18cf754 - Remove debug output (3 years, 6 months ago) <Fritz Zaucker>
+| * ca38400 - Fix date setter (3 years, 6 months ago) <Fritz Zaucker>
+* |   6051c06 - Merge pull request #4 from zaucker/master (3 years, 6 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 1396dd6 - Added some missing commas (3 years, 6 months ago) <Fritz Zaucker>
+* |   c1f28a5 - Merge pull request #3 from zaucker/master (3 years, 6 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 3f89b77 - Add registry for applicaiton specific GUI plugins (3 years, 6 months ago) <Fritz Zaucker>
+* |   6f336d9 - Merge pull request #2 from zaucker/master (3 years, 6 months ago) <Tobias Oetiker>
+|\ \  
+| |/  
+| * 592de53 - Fix spelling and docu (3 years, 6 months ago) <Fritz Zaucker>
+| * 00913ff - Fix spelling (3 years, 6 months ago) <Fritz Zaucker>
+|/  
+* 108bbb2 - (tag: v0.2.6) 0.2.6 (3 years, 6 months ago) <Tobias Oetiker>
+* d785816 - improved rules for qooxdoo building (3 years, 6 months ago) <Tobias Oetiker>
+* 53d52c3 - cut down on excessive reloading of the table widget (3 years, 6 months ago) <Tobias Oetiker>
+* 125039f - add search example (3 years, 6 months ago) <Tobias Oetiker>
+* f814906 - automatically sync CallBackery dependency in sample app (3 years, 6 months ago) <Tobias Oetiker>
+* 3659355 - automatically sync CallBackery dependency in sample app (3 years, 6 months ago) <Tobias Oetiker>
+* 023103e - do not rebuild webclient so agressively (3 years, 6 months ago) <Tobias Oetiker>
+* b809021 - fix documentation (3 years, 6 months ago) <Tobias Oetiker>
+* 9cd1425 - fix path to cpanm (3 years, 6 months ago) <Tobias Oetiker>
+* 3c400d0 - cpan release (3 years, 6 months ago) <Tobias Oetiker>
+* ee2badd - testdata.sql does not exist (3 years, 6 months ago) <Tobias Oetiker>
+* d010b74 - add path magic to example script (3 years, 6 months ago) <Tobias Oetiker>
+* 5600987 - tuneing (3 years, 6 months ago) <Tobias Oetiker>
+* 5175320 - logic errors (3 years, 6 months ago) <Tobias Oetiker>
+* ca59604 - better docs (3 years, 6 months ago) <Tobias Oetiker>
+* 5db5cf3 - better readme (3 years, 6 months ago) <Tobias Oetiker>
+* 32945ef - better readme (3 years, 6 months ago) <Tobias Oetiker>
+* 6455aa2 - travis (3 years, 6 months ago) <Tobias Oetiker>
+* a3fd78c - travis (3 years, 6 months ago) <Tobias Oetiker>
+* bea9f9e - travis (3 years, 6 months ago) <Tobias Oetiker>
+* 4c79da0 - updated readme (3 years, 6 months ago) <Tobias Oetiker>
+* 168174a - initial travis support (3 years, 6 months ago) <Tobias Oetiker>
+* 08a4534 - better readme (3 years, 6 months ago) <Tobias Oetiker>
+* 1c24e51 - fixes (3 years, 6 months ago) <Tobias Oetiker>
+* 1c9e6c8 - tuneing (3 years, 6 months ago) <Tobias Oetiker>
+* 59f9763 - documentation tuning (3 years, 6 months ago) <Tobias Oetiker>
+* cb10f70 - the big reshuffle (3 years, 6 months ago) <Tobias Oetiker>
+* 9ab03cc - (origin/0.2) enable 'password saving in login' dialog (3 years, 7 months ago) <Tobias Oetiker>
+* 9477b36 - added templates (3 years, 10 months ago) <Tobias Oetiker>
+*   0427f4f - (tag: v0.1.5) Merge branch 'master' of github.com:oetiker/callbackery (3 years, 11 months ago) <Tobias Oetiker>
+|\  
+| *   fb55b37 - Merge pull request #1 from zaucker/master (4 years, 1 month ago) <Tobias Oetiker>
+| |\  
+| | * 25986fb - Remove unnecessary ; (4 years, 1 month ago) <Fritz Zaucker>
+| | * 2c3454a - Suppress warnings from ioctl.ph (4 years, 1 month ago) <Fritz Zaucker>
+| |/  
+* | 299ab1a - we want a newer Qooxdoo (3 years, 11 months ago) <Tobias Oetiker>
+* | 1487490 - 1.5.0 (3 years, 11 months ago) <Tobias Oetiker>
+* | 1113aa7 - that mus be defined outside of the callback or it will fail (3 years, 11 months ago) <Tobias Oetiker>
+* | 232ac6d - add some security tweaks (3 years, 11 months ago) <Tobias Oetiker>
+* | 897d435 - set field names so that the browser can autofill them (4 years, 3 months ago) <Tobias Oetiker>
+|/  
+* e4caace - new version to trigger updates (4 years, 4 months ago) <Tobias Oetiker>
+* e5f7572 - minimal testing added (4 years, 4 months ago) <Tobias Oetiker>
+* 35b52f8 - first code drop (4 years, 4 months ago) <Tobias Oetiker>
+* e3ace2d - initial (4 years, 4 months ago) <Tobias Oetiker>
+* 21d02cf - Initial commit (4 years, 6 months ago) <Tobias Oetiker>

@@ -65,7 +65,7 @@ is( $generated4->[2]{input},
     '<INPUT type="text" name="secret" id="formdiva_secret" class="different" value="">',
     'previously hidden field is now a textfield'     );
 is( $generated4->[2]{label},
-   '<LABEL for="formdiva_secret" class="testclass">Secret</LABEL>',
+   '<LABEL for="formdiva_secret" id="formdiva_secret_label" class="testclass">Secret</LABEL>',
    'label for previously hidden secret field' );
 like( $generated4->[3]{input},
    qr/id="mystery_site_url"/,

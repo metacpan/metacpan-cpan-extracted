@@ -1,5 +1,8 @@
 # Notebook, selectable pages.
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
 use Tcl::pTk::DialogBox;
 

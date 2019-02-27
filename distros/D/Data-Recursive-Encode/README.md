@@ -74,7 +74,7 @@ module may help you.
 
 # AUTHOR
 
-Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
+Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF GMAIL COM>
 
 gfx
 

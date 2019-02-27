@@ -14,7 +14,7 @@ BEGIN
 {
 	package Type::Tie;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.013';
+	our $VERSION   = '0.014';
 	our @ISA       = qw( Exporter::Tiny );
 	our @EXPORT    = qw( ttie );
 	
@@ -45,7 +45,7 @@ BEGIN
 {
 	package Type::Tie::BASE;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.013';
+	our $VERSION   = '0.014';
 	
 	BEGIN {
 		my $impl;
@@ -134,7 +134,7 @@ BEGIN
 {
 	package Type::Tie::ARRAY;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.013';
+	our $VERSION   = '0.014';
 	our @ISA       = qw( Tie::StdArray Type::Tie::BASE );
 	
 	sub TIEARRAY
@@ -175,7 +175,7 @@ BEGIN
 {
 	package Type::Tie::HASH;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.013';
+	our $VERSION   = '0.014';
 	our @ISA       = qw( Tie::StdHash Type::Tie::BASE );
 	
 	sub TIEHASH
@@ -197,7 +197,7 @@ BEGIN
 {
 	package Type::Tie::SCALAR;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.013';
+	our $VERSION   = '0.014';
 	our @ISA       = qw( Tie::StdScalar Type::Tie::BASE );
 	
 	sub TIESCALAR

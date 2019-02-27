@@ -864,7 +864,8 @@ the callback after invocation.
 
 =head1 SUPPORTED EVENT LOOPS/BACKENDS
 
-The available backend classes are (every class has its own manpage):
+The following backend classes are part of the AnyEvent distribution (every
+class has its own manpage):
 
 =over 4
 
@@ -923,6 +924,13 @@ backend, so it can be supported through POE.
 AnyEvent knows about both L<Prima> and L<Wx>, however, and will try to
 load L<POE> when detecting them, in the hope that POE will pick them up,
 in which case everything will be automatic.
+
+=item Known event loops outside the AnyEvent distribution
+
+The following event loops or programs support AnyEvent by providing their
+own AnyEvent backend. They will be picked up automatically.
+
+   urxvt::anyevent           available to rxvt-unicode extensions
 
 =back
 
@@ -1260,7 +1268,7 @@ BEGIN {
 
 use Carp ();
 
-our $VERSION = 7.14;
+our $VERSION = 7.15;
 our $MODEL;
 our @ISA;
 our @REGISTRY;

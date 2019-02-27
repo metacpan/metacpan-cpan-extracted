@@ -4,6 +4,7 @@ debian/changelog
 debian/compat
 debian/control
 debian/copyright
+debian/mangle-to-no-xs.sh
 debian/rules
 debian/source/format
 debian/watch

@@ -1,5 +1,8 @@
 # hscale.pl
 
+use warnings;
+use strict;
+
 use subs qw /hscale_width/;
 use vars qw/$TOP/;
 

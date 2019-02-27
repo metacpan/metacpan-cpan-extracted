@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2013, 2014, 2019 Kevin Ryde
 
 # This file is part of Filter-gunzip.
 #
@@ -23,7 +23,7 @@ use PerlIO;
 use PerlIO::gzip;
 
 use vars qw($VERSION @ISA);
-$VERSION = 6;
+$VERSION = 7;
 @ISA = ('DynaLoader');
 
 __PACKAGE__->bootstrap($VERSION);
@@ -105,27 +105,27 @@ and gzip bytes immediately following that line,
     use Filter::gunzip;
     ... raw gzip bytes here
 
-The filter is implemented one of two ways.  For the usual case that
-C<Filter::gunzip> is the first filter and PerlIO is available then push a
-C<PerlIO::gzip> layer.  Otherwise add a block-oriented source filter per
-L<perlfilter>.  In both cases the uncompressed code can apply further source
-filters in the usual way.
+The filter is implemented one of two ways.  If C<Filter::gunzip> is the
+first filter and PerlIO is available (now usual) then push a C<PerlIO::gzip>
+layer.  Otherwise add a block-oriented source filter per L<perlfilter>.  In
+both cases the compressed code executed can apply further source filters in
+the usual way.
 
 =head2 DATA Handle
 
-The C<__DATA__> token (L<perldata/Special Literals>) and C<DATA> handle can
-be used in the compressed source, but only some of the time.
+The C<__DATA__> token (see L<perldata/Special Literals>) and C<DATA> handle
+can be used in the compressed source, but only some of the time.
 
-For the PerlIO case the C<DATA> handle is simply the input, including the
+For the PerlIO case, the C<DATA> handle is simply the input, including the
 C<:gzip> uncompressing layer, positioned just after the C<__DATA__> token.
 It can be read in the usual way.  Note however C<PerlIO::gzip> as of its
-version 0.18 cannot C<dup()> or C<seek()> which limits what can be done with
+version 0.19 cannot C<dup()> or C<seek()> which limits what can be done with
 the C<DATA> handle.  In particular for example C<SelfLoader> requires
 C<seek()> and so doesn't work on compressed source.  (Duping and seeking in
-C<PerlIO::gzip> are probably both feasible, though seeking backward might be
+C<PerlIO::gzip> are probably both feasible, though seeking backward could be
 slow.)
 
-For the filter case C<DATA> doesn't work properly.  Perl stops reading from
+For the filter case, C<DATA> doesn't work properly.  Perl stops reading from
 the source filters at the C<__DATA__> token, because that's where the source
 ends.  But a block oriented filter like C<Filter::gunzip> may read ahead in
 the input file which means the position of the C<DATA> handle is
@@ -134,18 +134,18 @@ stacked up.
 
 =head2 Further Details
 
-Perl source is normally read without CRLF translation (in Perl 5.6.1 and up
-at least).  If C<Filter::gunzip> sees a C<:crlf> layer on the input it
-pushes the C<:gzip> underneath that, since the CRLF is almost certainly
-meant to apply to the text, not to the raw gzip bytes.  This should let it
-work with the forced C<PERLIO=crlf> suggested by F<README.cygwin> (see
+Perl source is normally read without CRLF translation (Perl 5.6.1 and up at
+least).  If C<Filter::gunzip> sees a C<:crlf> layer on the input it pushes
+the C<:gzip> underneath that, since the CRLF is almost certainly meant to
+apply to the text, not to the raw gzip bytes.  This should let it work with
+the forced C<PERLIO=crlf> suggested by F<README.cygwin> (see
 L<perlrun/"PERLIO">).
 
 The gzip format has a CRC checksum at the end of the data.  This might catch
 subtle corruption in the compressed bytes, but as of Perl 5.10 the parser
-usually doesn't report a read error and in any case the code is compiled and
-C<BEGIN> blocks executed immediately, before the CRC is reached, so
-corruption will likely provoke a syntax error or similar first.
+usually doesn't report a read error from the source and in any case the code
+is compiled and C<BEGIN> blocks executed immediately, before the CRC is
+reached, so corruption will likely provoke a syntax error or similar first.
 
 Only the gzip format (RFC 1952) is supported.  Zlib format (RFC 1950)
 differs only in the header, but C<PerlIO::gzip> (version 0.18) doesn't allow
@@ -177,9 +177,8 @@ affect other later loads or opens.
             foo.pl.gz arg1 arg2
 
 It doesn't work to set a C<PERLIO> environment variable for a global
-C<:gzip> layer, eg. C<PERLIO=':gzip(autopop)'>, because the default layers
-in the C<PERLIO> environment variable are restricted to Perl builtins (see
-L<perlrun/PERLIO>).
+C<:gzip> layer, eg. C<PERLIO=':gzip(autopop)'>, because such default layers
+are restricted to Perl builtins (see L<perlrun/PERLIO>).
 
 =head1 SEE ALSO
 
@@ -202,7 +201,7 @@ http://user42.tuxfamily.org/filter-gunzip/index.html
 
 =head1 LICENSE
 
-Filter-gunzip is Copyright 2010, 2011, 2013, 2014 Kevin Ryde
+Filter-gunzip is Copyright 2010, 2011, 2013, 2014, 2019 Kevin Ryde
 
 Filter-gunzip is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

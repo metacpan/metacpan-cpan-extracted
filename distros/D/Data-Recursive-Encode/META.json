@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.2.0",
+   "generated_by" : "Minilla/v3.0.9",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -54,7 +54,7 @@
    "provides" : {
       "Data::Recursive::Encode" : {
          "file" : "lib/Data/Recursive/Encode.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -68,11 +68,12 @@
          "web" : "https://github.com/tokuhirom/p5-data-recursive-encode"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "gfx <gfuji@cpan.org>",
       "Hiroki Honda <cside.story@gmail.com>",
       "Hiroyoshi Houchi <git@hixi-hyi.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

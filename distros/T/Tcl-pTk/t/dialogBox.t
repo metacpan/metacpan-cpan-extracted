@@ -1,8 +1,9 @@
+use warnings;
+use strict;
 
 #use Tk;
 #use Tk::Dialog;
 
-use strict;
 use Tcl::pTk;
 use Test;
 

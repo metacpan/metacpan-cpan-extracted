@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.1.0';
+our $VERSION = '1.1.1';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args not_available/;
@@ -51,6 +51,7 @@ sub makemaker_args {
     process_CPLUS(\%params);
     process_CCFLAGS(\%params);
     $params{OPTIMIZE} = merge_optimize($Config{optimize}, '-O2', $params{OPTIMIZE});
+    process_LD(\%params);
     process_test(\%params);
     post_process(\%params);
 
@@ -83,6 +84,7 @@ sub pre_process {
     my $module_info = XS::Install::Payload::binary_module_info($params->{NAME}) || {};
     $params->{MODULE_INFO} = {
         BIN_DEPENDENT => $module_info->{BIN_DEPENDENT},
+        SHARED_LIBS   => [],
         SELF_INC      => $params->{INC} || '',
         ALL_C         => [],
     };
@@ -184,7 +186,7 @@ sub _apply_BIN_DEPS {
     push @{$params->{MODULE_INFO}{VISIBLE_BIN_DEPS} ||= []}, $module unless $stop_sharing;
     
     # add so/dll to linker list
-    my $shared_list = $params->{MODULE_INFO}{SHARED_LIBS} ||= [];
+    my $shared_list = $params->{MODULE_INFO}{SHARED_LIBS};
     my $module_path = $module;
     $module_path =~ s#::#/#g;
     die "SHOULDN'T EVER HAPPEN" unless $module =~ /([^:]+)$/;
@@ -449,17 +451,17 @@ sub process_LD {
 
     $params->{LDFROM} ||= '$(OBJECT)';
     
-    if (my $shared_libs = $params->{MODULE_INFO}{SHARED_LIBS} and $^O ne 'darwin') { # MacOSX doesn't allow for linking with bundles :(
+    if ($^O ne 'darwin') { # MacOSX doesn't allow for linking with bundles :(
         my %seen;
-        @$shared_libs = grep {!$seen{$_}++} reverse @$shared_libs;
-        my $str = join(' ', @$shared_libs);
+        my @shared_libs = grep {!$seen{$_}++} reverse @{$params->{MODULE_INFO}{SHARED_LIBS}};
+        my $str = join(' ', @shared_libs);
         $params->{MODULE_INFO}{SHARED_LIBS_LINKING} = $str;
         $params->{LDFROM} .= ' '.$str if $str;
     }
 }
 
 sub process_test {
-    my ($params, $shared_libs_linking) = @_;
+    my $params = shift;
     my $tp = $params->{test} or return;
     
     $tp->{CPLUS} //= $params->{CPLUS};
@@ -520,7 +522,7 @@ sub process_test {
         
     push @{$params->{postamble}},
         "TEST_INST_DYNAMIC = $dlpath",
-        'TEST_LDFROM = $(TEST_OBJECT) '.($shared_libs_linking||''),
+        'TEST_LDFROM = $(TEST_OBJECT) '.($params->{MODULE_INFO}{SHARED_LIBS_LINKING}||''),
         '$(TEST_INST_DYNAMIC) : $(TEST_OBJECT) $(INST_DYNAMIC)'."\n".
             "\t".'$(RM_F) $@'."\n".
             "\t".'$(LD) $(LDDLFLAGS) $(TEST_LDFROM) $(INST_DYNAMIC) $(OTHERLDFLAGS) -o $@ $(INST_DYNAMIC_FIX)'."\n".
@@ -799,15 +801,17 @@ sub _get_cplusplus {
     not_available("C++ compiler not available") unless defined $v_out;
     
     #check if C++ compiler supports -std=XXX
-    my $tmpfile = '__xs_install_check_cpp.cc';
-    my $outfile = '__xs_install_check_cpp.out';
+    mkdir 'tmp';
+    my $tmpfile = 'tmp/__xs_install_check_cpp.cc';
+    my $outfile = 'tmp/__xs_install_check_cpp.out';
     if (open my $fh, '>', $tmpfile) {
         print $fh "int main () { return 0; }\n";
         close $fh;
         unlink $outfile;
-        `$cpp -std=c++$minstd -o $outfile $tmpfile 2>&1`;
+        `$cpp -c -std=c++$minstd -o $outfile $tmpfile 2>&1`;
         my $success = -f $outfile;
         unlink $tmpfile, $outfile;
+        rmdir 'tmp';
         not_available("C++ compiler does not support -std=c++$minstd") unless $success;
     }
     

@@ -1,12 +1,12 @@
 package MikroTik::Client::Sentence;
-use Mojo::Base '-base';
+use MikroTik::Client::Mo;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(encode_sentence);
 
 use MikroTik::Client::Query 'build_query';
 
-has words => sub { [] };
+has words => [];
 
 sub encode_sentence {
     shift if ref $_[0];
@@ -30,25 +30,20 @@ sub encode_sentence {
 }
 
 sub fetch {
-    my ($self, $buff) = @_;
-    my $words;
+    my ($self, $buf) = @_;
 
-    if (defined(my $old_buff = delete $self->{_buff})) {
-        $words = $self->{words};
-        $$buff = $old_buff . $$buff;
-    }
-    else { $words = $self->{words} = [] }
+    my $words = $self->is_incomplete ? $self->words : ($self->{words} = []);
 
-    while (my $w = $self->_fetch_word($buff)) { push @$words, $w }
+    while (my $w = $self->_fetch_word($buf)) { push @$words, $w }
     return $words;
 }
 
 sub is_incomplete {
-    return exists $_[0]->{_buff};
+    return exists $_[0]->{expecting_bytes} || exists $_[0]->{partial};
 }
 
 sub reset {
-    delete @{$_[0]}{qw(words _buff)};
+    delete @{$_[0]}{qw(words expecting_bytes partial)};
     return $_[0];
 }
 
@@ -83,25 +78,24 @@ sub _encode_word {
 }
 
 sub _fetch_word {
-    my ($self, $buff) = @_;
+    my ($self, $buf) = @_;
 
-    return $self->{_buff} = '' unless my $buff_bytes = length $$buff;
-    return do { $self->{_buff} = $$buff; $$buff = ''; }
-        if $buff_bytes < 5 && $$buff ne "\x00";
+    return $self->{expecting_bytes} = 0 unless my $buf_bytes = length $$buf;
+    if ($buf_bytes < 5 && $$buf ne "\x00") { $self->{partial} = 1; return '' }
 
-    my $len = _strip_length($buff);
-    my $word = substr $$buff, 0, $len, '';
+    my $len
+        = delete $self->{partial}
+        ? _strip_length($buf)
+        : delete $self->{expecting_bytes} // _strip_length($buf);
+    if (length $$buf < $len) { $self->{expecting_bytes} = $len; return '' }
 
-    return do { $self->{_buff} = _encode_length($len) . $word; ''; }
-        if (length $word) < $len;
-
-    return $word;
+    return substr $$buf, 0, $len, '';
 }
 
 sub _strip_length {
-    my $buff = shift;
+    my $buf = shift;
 
-    my $len = unpack 'C', substr $$buff, 0, 1, '';
+    my $len = unpack 'C', substr $$buf, 0, 1, '';
 
     if (($len & 0x80) == 0x00) {
         return $len;
@@ -109,18 +103,18 @@ sub _strip_length {
     elsif (($len & 0xc0) == 0x80) {
         $len &= ~0x80;
         $len <<= 8;
-        $len += unpack 'C', substr $$buff, 0, 1, '';
+        $len += unpack 'C', substr $$buf, 0, 1, '';
     }
     elsif (($len & 0xe0) == 0xc0) {
         $len &= ~0xc0;
         $len <<= 16;
-        $len += unpack 'n', substr $$buff, 0, 2, '';
+        $len += unpack 'n', substr $$buf, 0, 2, '';
     }
     elsif (($len & 0xf0) == 0xe0) {
-        $len = unpack 'N', pack('C', ($len & ~0xe0)) . substr($$buff, 0, 3, '');
+        $len = unpack 'N', pack('C', ($len & ~0xe0)) . substr($$buf, 0, 3, '');
     }
     elsif (($len & 0xf8) == 0xf0) {
-        $len = unpack 'N', substr $$buff, 0, 4, '';
+        $len = unpack 'N', substr $$buf, 0, 4, '';
     }
 
     return $len;
@@ -166,14 +160,11 @@ Can be also called as an object method.
 
 =head2 fetch
 
-  my $words = $sentence->fetch(\$buff);
+  my $words = $sentence->fetch(\$buf);
 
-Fetches a sentence from a buffer and parses it into a list of API words. In a
-situation when amount of data in the buffer are insufficient to complete the
-sentence, already processed words and the remaining buffer will be stored in an
-object. On a next call will prepend a buffer with kept data and merge a result
-with the one stored from a previous call.
-
+Fetches a sentence from a buffer and parses it into a list of API words. It
+will return empty list and set L</is_incomplete> flag if amount of data in
+a buffer is unsufficient for parsing full sentence.
 
 =head2 is_incomplete
 
@@ -186,7 +177,7 @@ insufficient to complete a sentence.
 
   my $sentence->reset;
 
-Clears an incomplete status and removes a remaining buffer.
+Clears an incomplete status and removes data from previous L</fetch> call.
 
 =head1 SEE ALSO
 

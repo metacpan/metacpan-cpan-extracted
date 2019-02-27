@@ -1,6 +1,6 @@
 # Download functions.
 
-# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2013, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -213,7 +213,7 @@ sub month_to_nearest_year {
 sub Decode_Date_EU_to_iso {
   my ($str, $noerror) = @_;
   my ($year, $month, $day) = Date::Calc::Decode_Date_EU ($str);
-  if (! (defined $year && defined $month && defined $day)) {
+  unless (defined $year && defined $month && defined $day) {
     if ($noerror) {
       return undef;
     } else {
@@ -226,6 +226,9 @@ sub Decode_Date_EU_to_iso {
 sub Decode_Date_US_to_iso {
   my ($str) = @_;
   my ($year, $month, $day) = Date::Calc::Decode_Date_US ($str);
+  unless (defined $year && defined $month && defined $day) {
+    croak "Decode_Date_US_to_iso: unrecognised date \"$str\"\n";
+  }
   return App::Chart::ymd_to_iso ($year, $month, $day);
 }
 

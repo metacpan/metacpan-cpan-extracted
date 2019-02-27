@@ -141,7 +141,7 @@ sub basicWidget{
         my $package = shift;
         my $containerWidget = shift;
   
-        # Widget is a "basic" widget if it's container widget is the same as its
+        # Widget is a "basic" widget if its container widget is the same as its
         #   package name like so
         return 1 if( "Tcl::pTk::$containerWidget" eq $package);
         return 0;
@@ -225,7 +225,7 @@ sub CreateArgs
  # or which may as well be applied right away
  # return these as a list of -key => value pairs
  # Augment same hash with default values for missing mandatory options,
- # allthough this can be done later in InitObject.
+ # although this can be done later in InitObject.
 
  # Note that the behaviour for the -class option has been changed
  #   for Tcl::pTk. Perl/Tk would set the -class option for every widget, because

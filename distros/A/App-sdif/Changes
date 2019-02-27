@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.3 2019-02-27T04:20:02Z
+
+    - Introduce sdif --[no]command option.
+
 4.10.2 2019-02-24T00:59:14Z
 
     - Use `tput cols 2> /dev/tty` to get terminal width in sdif.

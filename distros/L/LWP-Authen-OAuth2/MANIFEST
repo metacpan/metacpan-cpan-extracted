@@ -11,6 +11,7 @@ lib/LWP/Authen/OAuth2/ServiceProvider/Google.pm
 lib/LWP/Authen/OAuth2/ServiceProvider/Line.pm
 lib/LWP/Authen/OAuth2/ServiceProvider/Line/AccessToken.pm
 lib/LWP/Authen/OAuth2/ServiceProvider/Strava.pm
+lib/LWP/Authen/OAuth2/ServiceProvider/Yahoo.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -26,6 +27,7 @@ t/LWP/Authen/OAuth2/ServiceProvider/Google.t
 t/LWP/Authen/OAuth2/ServiceProvider/Line.t
 t/LWP/Authen/OAuth2/ServiceProvider/Line/AccessToken.t
 t/LWP/Authen/OAuth2/ServiceProvider/Strava.t
+t/LWP/Authen/OAuth2/ServiceProvider/Yahoo.t
 t/manifest.t
 t/pod.t
 LICENSE

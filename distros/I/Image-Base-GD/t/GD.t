@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-GD.
 #
@@ -131,7 +131,7 @@ sub my_bounding_box_and_sides {
 # VERSION
 
 {
-  my $want_version = 15;
+  my $want_version = 16;
   is ($Image::Base::GD::VERSION, $want_version, 'VERSION variable');
   is (Image::Base::GD->VERSION,  $want_version, 'VERSION class method');
 

@@ -29,7 +29,7 @@ use Compress::Raw::Bzip2;
 #use Smart::Comments;
 
 use vars '$VERSION';
-$VERSION = 6;
+$VERSION = 7;
 
 # libbunzip2 supposedly uses either 4Mb or 2.5Mb for decompressing, so an
 # effort is made here to turf the inflator as soon as no longer needed

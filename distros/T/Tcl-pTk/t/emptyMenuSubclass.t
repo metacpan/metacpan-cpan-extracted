@@ -1,7 +1,7 @@
 # Test to see if a subclass of a auto-loaded widget (Menu) can be created without
 #   creating an instance of the auto-loaded widget first
 
-
+use warnings;
 use strict;
 
 use Tcl::pTk;

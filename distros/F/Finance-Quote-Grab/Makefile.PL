@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -22,31 +22,39 @@ use 5.005;
 use strict;
 use ExtUtils::MakeMaker;
 
+my %PREREQ_PM = (
+                 'Finance::Quote' => 1.15,
+
+                 # Finance::Quote depends on this already actually
+                 'HTML::TableExtract' => 0,
+
+                 # version 5.814 for HTTP::Request::accept_decodable()
+                 'LWP' => '5.814',
+                 # parts of LWP, but used explicitly, so name them
+                 'HTTP::Request'  => 0,
+                 'HTTP::Response' => 0,
+                 'URI::Escape'    => 0,
+
+                 'Scalar::Util' => 0,
+                );
+my %TEST_REQUIRES = (
+                     'Test::More'   => 0,
+                    );
+unless (eval { ExtUtils::MakeMaker->VERSION(6.64) }) {
+  # past ExtUtils::MakeMaker without separate TEST_REQUIRES
+  %PREREQ_PM = (%PREREQ_PM, %TEST_REQUIRES);
+}
+
 WriteMakefile
-  (NAME         => 'Finance::Quote::Grab',
-   ABSTRACT     => 'Fetch stock quotes from a grab bag of sources.',
-   VERSION_FROM => 'lib/Finance/Quote/MLC.pm',
+  (NAME             => 'Finance::Quote::Grab',
+   ABSTRACT         => 'Fetch stock quotes from a grab bag of sources.',
+   VERSION_FROM     => 'lib/Finance/Quote/MLC.pm',
+   AUTHOR           => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE          => 'gpl_3',
+   SIGN             => 1,
    MIN_PERL_VERSION => '5.005',
-   PREREQ_PM    => {
-                    'Finance::Quote' => 1.15,
-
-                    # Finance::Quote depends on this already actually
-                    'HTML::TableExtract' => 0,
-
-                    # version 5.814 for HTTP::Request::accept_decodable()
-                    'LWP' => '5.814',
-                    # parts of LWP, but used explicitly, so name them
-                    'HTTP::Request'  => 0,
-                    'HTTP::Response' => 0,
-                    'URI::Escape'    => 0,
-
-                    'Scalar::Util' => 0,
-                    'Test::More'   => 0,
-                   },
-
-   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
-   LICENSE      => 'gpl_3',
-   SIGN         => 1,
+   PREREQ_PM        => \%PREREQ_PM,
+   TEST_REQUIRES    => \%TEST_REQUIRES,
 
    META_MERGE =>
    { resources =>
@@ -58,19 +66,19 @@ WriteMakefile
      # Finance::Quote::Grab gets the dist name, no actual module of that name
      provides =>
      { 'Finance::Quote::Grab'  => { file => 'META.yml',
-                                    version => 14,
+                                    version => 15,
                                   },
        'Finance::Quote::Ghana' => { file => 'Finance/Quote/Ghana.pm',
-                                    version => 14,
+                                    version => 15,
                                   },
        'Finance::Quote::MGEX'  => { file => 'lib/Finance/Quote/MGEX.pm',
-                                    version => 14,
+                                    version => 15,
                                   },
        'Finance::Quote::MLC'   => { file => 'lib/Finance/Quote/MLC.pm',
-                                    version => 14,
+                                    version => 15,
                                   },
        'Finance::Quote::RBA'   => { file => 'lib/Finance/Quote/RBA.pm',
-                                    version => 14,
+                                    version => 15,
                                   },
      },
 

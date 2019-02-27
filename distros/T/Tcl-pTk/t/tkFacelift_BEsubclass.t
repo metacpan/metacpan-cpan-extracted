@@ -1,8 +1,8 @@
 # This is a empty subclass test of the BrowseEntry widget with Facelift
 
-
-use Test;
+use warnings;
 use strict;
+use Test;
 
 
 

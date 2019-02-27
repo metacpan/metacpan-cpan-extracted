@@ -1,5 +1,8 @@
 # button.pl
 
+use warnings;
+use strict;
+
 #use Tk;
 #use Tk::Balloon;
 

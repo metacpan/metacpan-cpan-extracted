@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010, 2011 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -36,11 +36,20 @@ BEGIN {
   $ENV{'PATH'} =~ /(.*)/ and $ENV{'PATH'} = $1;
 
   my $locate_help = `locate --help`;
-  (defined $locate_help && $locate_help =~ /--null/)
-    or plan skip_all => 'locate program not available or no --null option';
+  diag "locate --help is";
+  diag $locate_help;
+  unless (defined $locate_help) {
+    plan skip_all => 'locate program not available';
+  }
+  unless ($locate_help =~ /--null/) {
+    plan skip_all => 'locate program does not have --null option';
+  }
+  if ($locate_help =~ /mlocate database/) {
+    plan skip_all => 'locate looks like mlocate instead';
+  }
 
   $filename = File::Locate::Iterator->default_database_file;
-  diag "locate database $filename";
+  diag "default_database_file() is $filename";
   -e $filename
     or plan skip_all => "no locate database $filename";
 

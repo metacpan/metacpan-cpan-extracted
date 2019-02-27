@@ -21,7 +21,7 @@ use warnings;
 use Carp;
 use Filter::Util::Call qw(filter_add filter_read);
 
-our $VERSION = 6;
+our $VERSION = 7;
 
 use constant DEBUG => 0;
 

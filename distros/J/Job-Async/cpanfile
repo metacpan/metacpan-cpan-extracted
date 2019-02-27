@@ -2,6 +2,7 @@ requires 'parent', 0;
 requires 'curry', 0;
 requires 'Future', '>= 0.37';
 requires 'IO::Async', 0;
+requires 'Sereal', 0;
 requires 'Ryu::Async', '>= 0.006';
 requires 'List::Util', '>= 1.29';
 requires 'namespace::clean', 0;

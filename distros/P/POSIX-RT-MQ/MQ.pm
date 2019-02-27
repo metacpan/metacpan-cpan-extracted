@@ -11,7 +11,7 @@ use Fcntl 'O_NONBLOCK';
 require DynaLoader;
 
 our @ISA = qw(DynaLoader);
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 bootstrap POSIX::RT::MQ $VERSION;
 
@@ -23,6 +23,9 @@ sub open
 
     my @args = @_;
     $args[2] = 0666                 unless defined $args[2];
+    # work around 'using undefined value' warnings
+    # todo: fix XS?
+    delete $args[3] unless defined $args[3];
     $args[3] = attr_pack($args[3])  if     defined $args[3]; # pack attr
     
     defined(my $mqdes  = mq_open(@args))  or return undef;
@@ -32,7 +35,7 @@ sub open
     # get attributes and save for future references (in receive())
     $self->{_saved_attr_} = $self->attr  or return undef;
     
-    $self;
+    return $self;
 }
 
 sub unlink 
@@ -65,7 +68,7 @@ sub send
 { 
     my $self = shift;
     (@_ >= 1 && @_ <= 2) or croak 'Usage: $mq->send($msg ,[ $prio ])';
-    mq_send( $self->{mqdes}, $_[0], ($_[1] || 0) );
+    return mq_send( $self->{mqdes}, $_[0], ($_[1] || 0) );
 }
 
 sub receive 
@@ -103,13 +106,19 @@ sub blocking
 
 sub name { $_[0]->{name} }
 
-sub DESTROY 
+# expose mqdes
+sub mqdes { $_[0]->{mqdes} }
+
+sub DESTROY
 { 
     my $self  = shift;
+    #print "destrsroying $self\n";
     defined($self->{mqdes}) and mq_close($self->{mqdes});
     $self->{mqdes} = undef;
 }    
 
+# allow explicit close
+*close = \&DESTROY;
 
 sub attr_pack
 {
@@ -137,14 +146,14 @@ POSIX::RT::MQ - Perl interface for POSIX Message Queues
 =head1 SYNOPSIS
 
  use POSIX::RT::MQ;
- 
+
  my $mqname = '/some_queue';
- 
+
  my $attr = { mq_maxmsg  => 1024, mq_msgsize =>  256 };
 
  my $mq = POSIX::RT::MQ->open($mqname, O_RDWR|O_CREAT, 0600, $attr) 
      or die "cannot open $mqname: $!\n";
- 
+
  $mq->send('some_message', 0) or die "cannot send: $!\n";
 
  my ($msg,  $prio)  = $mq->receive or die "cannot receive: $!\n";
@@ -171,7 +180,7 @@ A wrapper for the C<mq_open()> function.
 
  $mq = open('/some_q1', O_RDWR);
  $mq = open('/some_q2', O_RDWR|O_CREAT, 0600);
- 
+
  $attr = { mq_maxmsg=>1000, mq_msgsize=>2048 };
  $mq = open('/some_q3', O_RDWR|O_CREAT, 0600, $attr);
 
@@ -226,7 +235,7 @@ A wrapper for the C<mq_getattr()> and C<mq_setattr()> functions.
 
  $current_attr = $mq->attr();
  $old_attr = $mq->attr($new_attr);
- 
+
  # set the non-blocking mode:
  $attr = $mq->attr();
  $attr->{mq_flags} |= O_NONBLOCK;
@@ -323,7 +332,7 @@ Currently this module dosn't support the full C<mq_notify()> semantic and doesn'
 let the user to provide his own C<struct sigevent>.
 
 The semantic of C<$mq-E<gt>notify($signo)> is equivalent in C to:
-        
+
         struct sigevent sigev;
         sigev.sigev_notify = SIGEV_SIGNAL;
         sigev.sigev_signo  = $signo
@@ -338,7 +347,7 @@ Please refer to documents listed in L</SEE ALSO> for a complete description of n
 
 =item blocking([ BOOL ])
 
-A covinience method.
+A convenience method.
 
  $mq->blocking(0);
  # now in non-blocking mode
@@ -355,19 +364,25 @@ if C<BOOL> is not given.
 On errror returns C<undef>.
 
 You may get the same results by using the C<attr()> method.
-                          
+
 =item name
 
-A covinience method.
- 
+A convenience method.
+
  $name = $mq->name();
 
 Returns either the queue name as it was supplied to C<open()>
 or C<undef> if C<$mq-E<gt>unlink> was (successfully) called before.
 
+=item name
+
+ $fd = $mq->mqdes();
+
+Returns the message queue descriptor. On some operating systems (Linux, FreeBSD) the
+message queue descriptor is a regular file descripter that can be used with select / poll / etc.
+
 =back
 
-           
 =head1 CONSTANTS
 
 =over 4
@@ -386,15 +401,9 @@ Access to the MQ_PRIO_MAX constant.
 
 =back
 
-           
 =head1 BUGS
 
 C<mq_notify()> function is not fully supported.
-
-
-=head1 AUTHOR
-
-Ilja Tabachnik E<lt>billy@arnis-bsl.comE<gt>
 
 =head1 SEE ALSO
 
@@ -405,5 +414,21 @@ The Single UNIX Specification, Version 2 (http://www.unix.org/version2/)
 The Single UNIX Specification, Version 3 (http://www.unix.org/version3/)
 
 The Base Definitions volume of IEEE Std 1003.1-2001.
+
+=head1 AUTHORS
+
+Ilja Tabachnik E<lt>billy@arnis-bsl.comE<gt>
+(Original author)
+
+Wieger Opmeer E<lt>wiegerop@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2003, Ilja Tabachnik
+
+Copyright (C) 2019, Wieger Opmeer
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

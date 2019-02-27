@@ -12,6 +12,26 @@ TODO: more formats for parse_ipv6 (single ipv6 address without port, ...p80, ...
 TODO: inet_aton maybe pack C4? no, add a comment why not
 TODO: socket prepare callbacks, can they easily signal failure as well?
 
+7.15 Tue Feb 26 03:07:42 CET 2019
+        - INCOMPATIBLE CHANGE: AnyEvent::Handle's tls_detect documentation gave
+          separate major and minor versions, while code passed only a single
+          value. This version follows the documentation and now passes separate
+          major and minor values.
+	- work around Net::SSLeay not having been ported to openssl 1.1, but many
+          distributions compiling it against openssl 1.1, which unfortunately
+          succeeds and results in a very broken module.
+        - AnyEvent::DNS::dns_unpack now stores the original DNS packet
+          in the __ member, to allow decoding of undecodable resouce records
+          containing compressed domian names.
+	- AnyEvent::Socket::parse_ipv6 would NOT, as advertised, accept ipv4
+          addresses. It now does and converts them to ipv4 mapped addresses.
+        - support CAA records, based on patch by Steve Atkins.
+        - add freenom and cloudflare nameservers as dns fallback.
+	- AnyEvent::Strict would not properly ward against io watchers
+          on files when the handle passed was a file descriptor.
+        - document "internal" variables used by the dns en-/decoder to allow
+          enterprising users to extend them in a semi-official way.
+
 7.14 Sat Jun 24 01:44:19 CEST 2017
 	- fix a crash bug in AnyEvent::Handle with openssl 1.1.0 (patched
 	  by Paul Howarth and apparently tracked down by Mike McCauley).

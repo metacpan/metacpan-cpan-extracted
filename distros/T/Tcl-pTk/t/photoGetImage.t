@@ -1,4 +1,5 @@
-BEGIN { $^W = 1; $| = 1;}
+BEGIN { $| = 1; }
+use warnings;
 use strict;
 use Test;
 use Tcl::pTk;

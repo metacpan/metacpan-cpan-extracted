@@ -4,16 +4,14 @@ package File::Spec::Functions;
 use File::Spec;
 use strict;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $VERSION);
-
-$VERSION = '3.33';
-$VERSION = eval $VERSION;
+our $VERSION = '3.75';
+$VERSION =~ tr/_//d;
 
 require Exporter;
 
-@ISA = qw(Exporter);
+our @ISA = qw(Exporter);
 
-@EXPORT = qw(
+our @EXPORT = qw(
 	canonpath
 	catdir
 	catfile
@@ -25,7 +23,7 @@ require Exporter;
 	path
 );
 
-@EXPORT_OK = qw(
+our @EXPORT_OK = qw(
 	devnull
 	tmpdir
 	splitpath
@@ -36,17 +34,37 @@ require Exporter;
 	case_tolerant
 );
 
-%EXPORT_TAGS = ( ALL => [ @EXPORT_OK, @EXPORT ] );
+our %EXPORT_TAGS = ( ALL => [ @EXPORT_OK, @EXPORT ] );
+
+require File::Spec::Unix;
+my %udeps = (
+    canonpath => [],
+    catdir => [qw(canonpath)],
+    catfile => [qw(canonpath catdir)],
+    case_tolerant => [],
+    curdir => [],
+    devnull => [],
+    rootdir => [],
+    updir => [],
+);
 
 foreach my $meth (@EXPORT, @EXPORT_OK) {
     my $sub = File::Spec->can($meth);
     no strict 'refs';
-    *{$meth} = sub {&$sub('File::Spec', @_)};
+    if (exists($udeps{$meth}) && $sub == File::Spec::Unix->can($meth) &&
+	    !(grep {
+		File::Spec->can($_) != File::Spec::Unix->can($_)
+	    } @{$udeps{$meth}}) &&
+	    defined(&{"File::Spec::Unix::_fn_$meth"})) {
+	*{$meth} = \&{"File::Spec::Unix::_fn_$meth"};
+    } else {
+	*{$meth} = sub {&$sub('File::Spec', @_)};
+    }
 }
 
 
 1;
 __END__
 
-#line 109
+#line 127
 

@@ -6,29 +6,51 @@ use warnings;
 # the contents of the Makefile that is written.
 
 my %WriteMakefileArgs = (
-    NAME                => 'Siffra::Tools',
-    VERSION_FROM        => 'lib/Siffra/Tools.pm',
-    AUTHOR              => 'Luiz Benevenuto (luiz@siffra.com.br)',
-    ABSTRACT            => 'Siffra Tools',
-    INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
-    PREREQ_PM           => {
+    NAME             => 'Siffra::Tools',
+    VERSION_FROM     => 'lib/Siffra/Tools.pm',
+    ABSTRACT_FROM    => 'lib/Siffra/Tools.pm',
+    AUTHOR           => 'Luiz Benevenuto (luiz@siffra.com.br)',
+    MIN_PERL_VERSION => '5.014',
+    LICENSE          => 'perl',
+    INSTALLDIRS      => ( $] < 5.011 ? 'perl' : 'site' ),
+    PREREQ_PM        => {
+        'strict'       => 0,
+        'warnings'     => 0,
         'Test::Simple' => 0.44,
+        'Test::More'   => 0,
+        'version'      => 0,
+        'utf8'         => 0,
+        'Log::Any'     => 0,
+        'Scalar::Util' => 0,
+        'Data::Dumper' => 0,
     },
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
-        'meta-spec' => { version => 2 },
-        dynamic_config => 1,
-        #resources => {
-        #    homepage    => undef,
-        #    repository  => {
-        #        url         => undef,
-        #        web         => undef,
-        #        type        => undef,
-        #    },
-        #    bugtracker => {
-        #        web         => undef,
-        #    },
-        #},
-    })),
+    BUILD_REQUIRES => {
+        'Test::More'          => 0,
+        'ExtUtils::MakeMaker' => 0,
+    },
+    (
+        eval { ExtUtils::MakeMaker->VERSION(6.46) }
+        ? ()
+        : (
+            META_MERGE => {
+                'meta-spec'    => { version => 2 },
+                dynamic_config => 1,
+                resources      => {
+                    homepage   => 'https://siffra.com.br',
+                    repository => {
+                        url  => 'git@github.com:lbenevenuto/Siffra-Tools.git',
+                        web  => 'https://github.com/lbenevenuto/Siffra-Tools',
+                        type => 'git',
+                    },
+                    bugtracker => {
+                        web => 'https://github.com/lbenevenuto/Siffra-Tools/issues',
+                    },
+                },
+            }
+        )
+    ),
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES    => 'Siffra-Tools-* *.old *.bak' },
 );
 
 WriteMakefile(%WriteMakefileArgs);

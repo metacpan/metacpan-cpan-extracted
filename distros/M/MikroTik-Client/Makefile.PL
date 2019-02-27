@@ -13,7 +13,7 @@ WriteMakefile(
         dynamic_config => 0,
         'meta-spec'    => {version => 2},
         no_index       => {directory => ['t']},
-        prereqs        => {runtime => {requires => {perl => '5.010001'}}},
+        prereqs        => {runtime => {requires => {perl => '5.012000'}}},
         resources      => {
             bugtracker =>
                 {web => 'https://github.com/anparker/mikrotik-client/issues'},
@@ -26,7 +26,7 @@ WriteMakefile(
             },
         },
     },
-    PREREQ_PM => {'Mojolicious' => '7.00'},
-    test      => {TESTS         => 't/*.t'},
+    PREREQ_PM => {'AnyEvent' => '7.00'},
+    test      => {TESTS      => 't/*.t'},
 );
 

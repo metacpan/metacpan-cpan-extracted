@@ -25,11 +25,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.11
+Version v1.2.0
 
 =cut
 
-our $VERSION = version->declare("v1.1.11");
+our $VERSION = version->declare("v1.2.0");
 
 has world => (
 	is       => 'ro',
@@ -92,22 +92,40 @@ sub run
 
 	my $world = $self->world->flatten( $self->node, $self->nonfree, );
 
+	my $pkgs       = join( ',',      sort @{ $world->pkgs } );
+	my $pkgs_avoid = join( ',',      sort @{ $world->pkgs_avoid } );
+	my $pkgs_auto  = join( ',',      sort @{ $world->pkgs_auto } );
+	my $tweaks     = join( ";\\\n ", @{ $world->tweaks } );
+
 	my $pkglist = join( ' ', sort @{ $world->pkgs } );
 	$pkglist .= " \\\n ";
 	$pkglist .= join( ' ', sort map { $_ . '-' } @{ $world->pkgs_avoid } );
-	my $pkgautolist = join( ' ',      sort @{ $world->pkgs_auto } );
-	my $tweaklist   = join( ";\\\n ", @{ $world->tweaks } );
+	my $pkgautolist = join( ' ', sort @{ $world->pkgs_auto } );
+
+	my $tweaks_perl = $tweaks;
+	$tweaks_perl =~ s,chroot\s+/target\s+,,g;
+	$tweaks_perl =~ s,/target/,/,g;
+
+	# TODO: maybe move below (or only $''{ part?) to reclass parser
+	$tweaks_perl =~ s/\\\K''(?=n)|\$\K''(?=\{)//g;
 
 	my %vars = (
 		node        => $self->node,
 		suite       => $world->epoch,
+		pkgs        => $pkgs,
+		pkgs_avoid  => $pkgs_avoid,
+		pkgs_auto   => $pkgs_auto,
 		pkgdesc     => $world->pkgdesc,
 		pkglist     => $pkglist,
 		tweakdesc   => $world->tweakdesc,
-		tweaklist   => $tweaklist,
+		tweaks      => $tweaks,
+		tweaks_perl => $tweaks_perl,
+		tweaklist   => $tweaks,
 		pkgautolist => $pkgautolist,
 		nonfree     => $self->nonfree,
 	);
+	my %altvars = %vars;
+	$altvars{tweaklist} = $tweaks_perl;
 
 	Boxer::File::WithSkeleton->new(
 		basename      => 'preseed.cfg',
@@ -117,13 +135,6 @@ sub run
 		file_path     => $self->outfile,
 		vars          => \%vars,
 	)->create;
-
-	my %altvars = %vars;
-	$altvars{tweaklist} =~ s,chroot\s+/target\s+,,g;
-	$altvars{tweaklist} =~ s,/target/,/,g;
-
-	# TODO: maybe move below (or only $''{ part?) to reclass parser
-	$altvars{tweaklist} =~ s/\\\K''(?=n)|\$\K''(?=\{)//g;
 
 	Boxer::File::WithSkeleton->new(
 		basename      => 'script.sh',

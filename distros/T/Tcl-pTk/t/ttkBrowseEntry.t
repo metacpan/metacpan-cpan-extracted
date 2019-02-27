@@ -1,8 +1,8 @@
 # This is a test of the BrowseEntry widget, a standard perl/tk megawidget
 
-
-use Tcl::pTk;
+use warnings;
 use strict;
+use Tcl::pTk;
 use Test;
 use Tcl::pTk::ttkBrowseEntry;
 

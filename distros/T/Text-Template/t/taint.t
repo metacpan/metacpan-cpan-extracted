@@ -9,7 +9,15 @@ use File::Temp;
 
 use_ok 'Text::Template' or exit 1;
 
-my $tmpfile = File::Temp->new( $^O eq 'MSWin32' ? (DIR => '.') : () );
+if ($^O eq 'MSWin32') {
+    # File::Temp (for all versions up to at least 0.2308) is currently bugged under MSWin32/taint mode [as of 2018-09]
+    # ... fails unless "/tmp" on the current windows drive is a writable directory OR either $ENV{TMP} or $ENV{TEMP} are untainted and point to a writable directory
+    # ref: [File-Temp: Fails under -T, Windows 7, Strawberry Perl 5.12.1](https://rt.cpan.org/Public/Bug/Display.html?id=60340)
+    ($ENV{TEMP}) = $ENV{TEMP} =~ m/^.*$/gmsx; # untaint $ENV{TEMP}
+    ($ENV{TMP})  = $ENV{TMP}  =~ m/^.*$/gmsx; # untaint $ENV{TMP}
+}
+
+my $tmpfile = File::Temp->new;
 my $file    = $tmpfile->filename;
 
 # makes its arguments tainted

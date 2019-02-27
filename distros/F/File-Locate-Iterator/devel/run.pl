@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2017, 2018 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -21,11 +21,86 @@ use 5.006;
 use strict;
 use warnings;
 use Carp;
+use FindBin;
 use File::Locate::Iterator;
+$|=1;
 
 # uncomment this to run the ### lines
 use Smart::Comments;
 
+{
+  require PerlIO::via::Base64;
+  require File::Spec;
+  my $samp_locatedb_base64 = "$FindBin::Bin/../t/samp.locatedb.base64";
+  open my $fh, '<:via(Base64)', $samp_locatedb_base64
+    or die $!;
+  while (<$fh>) { print; }
+  exit 0;
+}
+
+
+{
+  # pngcheck on all png files
+  require IPC::Run;
+  my $it = File::Locate::Iterator->new (regexp => qr/\.png$/i);
+  my $count = 0;
+  my $pngcheck = '/usr/bin/pngcheck';
+  while (defined(my $filename = $it->next)) {
+    -e $filename or next;
+    $count++;
+    # print "$filename\n";
+    unless (IPC::Run::run([$pngcheck,$filename], '>',\my $output, '2>&1')) {
+      print $output,"\n";
+    }
+  }
+  print "$count png files\n";
+  exit 0;
+}
+{
+  # pngmeta on all png files
+  require IPC::Run;
+  my $it = File::Locate::Iterator->new (regexp => qr/\.png$/i);
+  my $count = 0;
+  my $pngmeta;
+  $pngmeta = '/so/png/bug-pngmeta-free/pngmeta-1.11/pngmeta';
+  $pngmeta = '/usr/bin/pngmeta';
+  my $count_bad = 0;
+  while (defined(my $filename = $it->next)) {
+    -e $filename or next;
+    $count++;
+    # print "$filename\n";
+    unless (IPC::Run::run([$pngmeta,$filename], '>',\my $output, '2>&1')) {
+      print "$filename\n";
+      print "exit $?\n";
+      print $output,"\n";
+      last if $count_bad++ > 10;
+    }
+  }
+  print "$count png files, $count_bad bad\n";
+  exit 0;
+}
+{
+  # Emacs backups foo.txt~ without their original file
+
+  my $it = File::Locate::Iterator->new;
+  my @prev;
+  my $count = 0;
+  while (defined(my $this = $it->next)) {
+    if ($this =~ /[^.]~$/) {
+      $count++;
+      my $len = length($this)-1;
+      unless (defined $prev[$len] && $prev[$len] eq substr($this,0,$len)) {
+        if (-e $this) {
+          print "$this\n";
+        }
+      }
+    } else {
+      $prev[length($this)] = $this;
+    }
+  }
+  print "$count backups\n";
+  exit 0;
+}
 {
   use warnings 'layer';
   require File::Map;

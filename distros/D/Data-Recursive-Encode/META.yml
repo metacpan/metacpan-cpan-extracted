@@ -5,9 +5,9 @@ author:
 build_requires:
   JSON: '0'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.0.9, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,16 +26,17 @@ no_index:
 provides:
   Data::Recursive::Encode:
     file: lib/Data/Recursive/Encode.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/tokuhirom/p5-data-recursive-encode/issues
   homepage: https://github.com/tokuhirom/p5-data-recursive-encode
   repository: git://github.com/tokuhirom/p5-data-recursive-encode.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'gfx <gfuji@cpan.org>'
   - 'Hiroki Honda <cside.story@gmail.com>'
   - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

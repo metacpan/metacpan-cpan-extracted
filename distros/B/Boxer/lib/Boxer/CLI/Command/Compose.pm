@@ -18,11 +18,11 @@ use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.1.11
+Version v1.2.0
 
 =cut
 
-our $VERSION = version->declare("v1.1.11");
+our $VERSION = version->declare("v1.2.0");
 
 use constant {
 	abstract   => q[compose system recipe from reclass node],
@@ -51,8 +51,8 @@ sub command_names
 sub opt_spec
 {
 	return (
-		[ "suite=s",    "suite of classes to use (wheezy)" ],
-		[ "nodedir=s",  "location of nodes (XDG datadir + suite/nodes)" ],
+		[ "suite=s",    "suite of classes to use (buster)" ],
+		[ "nodedir=s",  "location of nodes (current dir)" ],
 		[ "classdir=s", "location of classes (XDG datadir + suite/classes)" ],
 		[ "datadir=s",  "location containing nodes and classes" ],
 		[ "skeldir=s",  "location of skeleton files (use builtin)" ],

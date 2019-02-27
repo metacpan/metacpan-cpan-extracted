@@ -1,4 +1,4 @@
-#!perl -w
+#!/usr/bin/env perl -w
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ BEGIN { plan tests => 1 }
 use WWW::Alexa::TrafficRank; 
 my $tr = WWW::Alexa::TrafficRank->new();
 
-my $rank = $tr->get('filedir.com');
+my $rank = $tr->get('appagg.com');
 
 ok($rank);
 

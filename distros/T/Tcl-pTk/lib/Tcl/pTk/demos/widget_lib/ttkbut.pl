@@ -53,11 +53,11 @@ sub ttkbut {
 	## Set up the radiobutton group
 	my $radioFrame = $bigFrame->ttkLabelframe(-text => 'RadioButtons');
 	my $happiness = 'great';
-	$radioFrame->ttkRadiobutton(-text => "Great", -variable =>  \$happyness,  -value => 'great')->pack( -fill => 'x', -pady => 2);
-	$radioFrame->ttkRadiobutton(-text => "Good" , -variable =>  \$happyness,  -value => 'good')->pack( -fill => 'x', -pady => 2);
-	$radioFrame->ttkRadiobutton(-text => "OK"   , -variable =>  \$happyness,  -value => 'ok')->pack( -fill => 'x', -pady => 2);
-	$radioFrame->ttkRadiobutton(-text => "Poor" , -variable =>  \$happyness,  -value => 'poor')->pack( -fill => 'x', -pady => 2);
-	$radioFrame->ttkRadiobutton(-text => "Awful", -variable =>  \$happyness,  -value => 'awful')->pack( -fill => 'x', -pady => 2);
+	$radioFrame->ttkRadiobutton(-text => "Great", -variable =>  \$happiness,  -value => 'great')->pack( -fill => 'x', -pady => 2);
+	$radioFrame->ttkRadiobutton(-text => "Good" , -variable =>  \$happiness,  -value => 'good')->pack( -fill => 'x', -pady => 2);
+	$radioFrame->ttkRadiobutton(-text => "OK"   , -variable =>  \$happiness,  -value => 'ok')->pack( -fill => 'x', -pady => 2);
+	$radioFrame->ttkRadiobutton(-text => "Poor" , -variable =>  \$happiness,  -value => 'poor')->pack( -fill => 'x', -pady => 2);
+	$radioFrame->ttkRadiobutton(-text => "Awful", -variable =>  \$happiness,  -value => 'awful')->pack( -fill => 'x', -pady => 2);
 
 
 	$buttonFrame->grid($checkFrame, $radioFrame, qw/-sticky nwe  -pady 2 -padx 3/);

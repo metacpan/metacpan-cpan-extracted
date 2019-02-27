@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
+use Log::Any::Adapter qw(TAP);
 
 use IO::Async::Loop;
 use Job::Async::Test::Compliance;

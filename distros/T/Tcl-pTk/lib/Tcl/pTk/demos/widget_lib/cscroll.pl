@@ -1,5 +1,8 @@
 # cscroll.pl
 
+use warnings;
+use strict;
+
 use subs qw/cscroll_button cscroll_enter cscroll_leave/;
 use vars qw/$TOP/;
 

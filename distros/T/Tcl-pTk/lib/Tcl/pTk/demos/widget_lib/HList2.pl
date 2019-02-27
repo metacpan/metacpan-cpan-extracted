@@ -13,6 +13,9 @@
 # WWW:  http://user.cs.tu-berlin.de/~eserte/
 #
 
+use warnings;
+use strict;
+
 use Tcl::pTk::HList;
 use Tcl::pTk::ItemStyle;
 

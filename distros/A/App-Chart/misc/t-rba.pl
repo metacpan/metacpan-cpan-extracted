@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2012, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2012, 2016, 2019 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -23,6 +23,16 @@ use HTTP::Response;
 use File::Slurp;
 use App::Chart::Suffix::RBA;
 
+{
+  my $resp = HTTP::Response->new();
+  my $content = File::Slurp::read_file("$ENV{HOME}/chart/samples/rba/exchange-rates.6.html");
+  $resp->content($content);
+  $resp->content_type('text/html');
+  my $h = App::Chart::Suffix::RBA::threeday_parse ($resp);
+  print Data::Dumper->new([$h],['h'])->Indent(1)->Dump;
+  # App::Chart::Download::write_latest_group ($h);
+  exit 0;
+}
 {
   # .RBA symbols in the database
   my $database_symbols_hash = App::Chart::Database::database_symbols_hash();
@@ -87,16 +97,7 @@ use App::Chart::Suffix::RBA;
   print "rows ($minrow, $maxrow) cols ($mincol, $maxcol)\n";
   exit 0;
 }
-{
-  my $resp = HTTP::Response->new();
-  my $content = slurp ("$ENV{HOME}/chart/samples/rba/exchange-rates.html.3");
-  $resp->content($content);
-  $resp->content_type('text/html');
-  my $h = App::Chart::Suffix::RBA::threeday_parse ($resp);
-  print Data::Dumper->new([$h],['h'])->Indent(1)->Dump;
-  # App::Chart::Download::write_latest_group ($h);
-  exit 0;
-}
+
 {
   my $resp = HTTP::Response->new();
   my $content = slurp (<~/chart/samples/rba/hist-exch.html>);

@@ -1,5 +1,8 @@
 # BrowseEntry, entry with listbox to select list values.
 
+use warnings;
+use strict;
+
 use Tcl::pTk::BrowseEntry;
 
 my $month = "January";

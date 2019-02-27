@@ -1,12 +1,14 @@
 # trace2.pl
 
+use warnings;
+use strict;
+
 $Tcl::pTk::TraceText::VERSION = '1.0';
 
 package Tcl::pTk::TraceText;
 
 use Tcl::pTk;
 use base qw/ Tcl::pTk::Derived Tcl::pTk::Text /;
-use strict;
 
 Construct Tcl::pTk::Widget 'TraceText';
 
@@ -91,7 +93,6 @@ package main;
 
 use Tcl::pTk;
 use vars qw / $TOP /;
-use strict;
 
 sub trace2 {
 

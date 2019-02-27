@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2014, 2018, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -30,7 +30,7 @@ use Getopt::Long;
 use Iterator::Simple 'igrep';
 use Iterator::Simple::Locate;
 
-our $VERSION = 23;
+our $VERSION = 26;
 
 use FindBin;
 my $progname = $FindBin::Script;

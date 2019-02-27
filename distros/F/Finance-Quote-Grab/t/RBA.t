@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2015 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2015, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -32,7 +32,8 @@ require Finance::Quote::RBA;
 
 ## no critic (ProtectPrivateSubs)
 
-my $want_version = 14;
+#------------------------------------------------------------------------------
+my $want_version = 15;
 is ($Finance::Quote::RBA::VERSION, $want_version,
     'VERSION variable');
 is (Finance::Quote::RBA->VERSION,  $want_version,
@@ -75,8 +76,8 @@ foreach my $elem ([ 'Abc def',        'Abc def', '16:00' ],
 <html>
 <body>
 <table><tbody>
+<caption>Units of Foreign Currencies per Australian Dollar</caption>
 <thead>
-<tr><th>Units of foreign currency per A$</th></tr>
 <tr>
   <td></td>
   <td>02 Jan 2009</td>

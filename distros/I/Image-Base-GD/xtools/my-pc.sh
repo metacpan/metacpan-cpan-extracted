@@ -2,7 +2,7 @@
 
 # my-pc.sh -- run cpants_lint kwalitee checker
 
-# Copyright 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2016 Kevin Ryde
 
 # my-pc.sh is shared by several distributions.
 #
@@ -49,12 +49,12 @@ done
 
 
 
-perl -e 'use Test::Vars; all_vars_ok()'
+# perl -e 'use Test::Vars; all_vars_ok()'
 # MyMakeMakerExtras_Pod_Coverage
 
 perl -e 'use Pod::Coverage package => $class'
 
 podlinkcheck -I lib `ls $LINT_FILES | grep -v '\.bash$$|\.desktop$$\.png$$|\.xpm$$'`
 
-podchecker `ls $LINT_FILES | grep -v '\.bash$$|\.desktop$$\.png$$|\.xpm$$'`
+podchecker -nowarnings `ls $LINT_FILES | grep -v '\.bash$$|\.desktop$$\.png$$|\.xpm$$'`
 perlcritic $LINT_FILES

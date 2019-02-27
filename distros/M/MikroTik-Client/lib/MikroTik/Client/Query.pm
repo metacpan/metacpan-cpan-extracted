@@ -1,5 +1,5 @@
 package MikroTik::Client::Query;
-use Mojo::Base '-base';
+use MikroTik::Client::Mo;
 
 use Exporter 'import';
 use Scalar::Util 'blessed';

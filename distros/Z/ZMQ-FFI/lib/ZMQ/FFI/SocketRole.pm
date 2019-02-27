@@ -1,5 +1,5 @@
 package ZMQ::FFI::SocketRole;
-$ZMQ::FFI::SocketRole::VERSION = '1.11';
+$ZMQ::FFI::SocketRole::VERSION = '1.12';
 use FFI::Platypus;
 use FFI::Platypus::Memory qw(malloc);
 
@@ -111,7 +111,7 @@ ZMQ::FFI::SocketRole
 
 =head1 VERSION
 
-version 1.11
+version 1.12
 
 =head1 AUTHOR
 
@@ -119,7 +119,7 @@ Dylan Cali <calid1984@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Dylan Cali.
+This software is copyright (c) 2019 by Dylan Cali.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

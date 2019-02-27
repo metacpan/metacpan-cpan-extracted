@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.11  Mon 25 Feb 14:41:41 GMT 2019
+    - list context compatibility updates for Luminous+ Ceph builds
+
 0.10  Thu 20 Dec 16:00:38 GMT 2018
     - better filehandle detection
     - more constant filtering

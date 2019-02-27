@@ -13,7 +13,7 @@ use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -87,7 +87,7 @@ has output => (
     is => 'ro',
 );
 
-sub _build_body( $self ) {
+sub _build_quoted_body( $self ) {
     if( my $body = $self->body ) {
         $body =~ s!([\x00-\x1f'\\])!sprintf '\\x%02x', ord $1!ge;
         return sprintf "'%s'", $body
@@ -167,7 +167,7 @@ sub as_request( $self ) {
     HTTP::Request->new(
         $self->method => $self->uri,
         [ %{ $self->headers } ],
-        $self->_build_body(),
+        $self->body(),
     )
 };
 
@@ -281,7 +281,7 @@ sub as_snippet( $self, %options ) {
         [
 @{[$self->_build_headers('            ', %options)]},
         ],
-        @{[$self->_build_body()]}
+        @{[$self->_build_quoted_body()]}
     );
     my \$res = \$ua->request( $request_args );
 SNIPPET

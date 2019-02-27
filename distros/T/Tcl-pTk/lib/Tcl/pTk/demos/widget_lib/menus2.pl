@@ -1,5 +1,8 @@
 # menus2.pl
 
+use warnings;
+use strict;
+
 use subs qw/menus_error2/;
 use vars qw/$TOP/;
 
@@ -192,9 +195,9 @@ sub menus2 {
         -font => 'Helvetica 10', -textvariable => \$status_bar)->
 	pack(qw/-padx 2 -pady 2 -expand yes -fill both/);
     $menubar->bind('<<MenuSelect>>' => sub {
-	$status_bar = '';
-	$status_bar = $_[0]->entrycget('active', -label);
-	$TOP->idletasks;
+        my $entry = shift;
+        $status_bar = $entry->entrycget('active', -label) || '';
+        $TOP->idletasks;
     });
 
 } # end menus2

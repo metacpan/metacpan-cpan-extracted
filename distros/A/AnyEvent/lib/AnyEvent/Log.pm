@@ -35,7 +35,7 @@ Log level overview:
 
    use AnyEvent::Log;
 
-   my $tracer = AnyEvent::Log::logger trace => \$my $trace;
+   my $tracer = AnyEvent::Log::logger trace => \my $trace;
 
    $tracer->("i am here") if $trace;
    $tracer->(sub { "lots of data: " . Dumper $self }) if $trace;

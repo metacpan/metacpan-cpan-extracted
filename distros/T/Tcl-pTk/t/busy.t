@@ -1,4 +1,5 @@
 # Test of Busy / UnBusy operation
+use warnings;
 use strict;
 use Tcl::pTk;
 #use Tk;

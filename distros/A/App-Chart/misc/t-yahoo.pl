@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2011, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2015, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -30,27 +30,6 @@ use Date::Parse;
 # uncomment this to run the ### lines
 use Smart::Comments;
 
-
-
-{
-  # json v7 latest parse
-
-  my $symbol = 'NAB.AX';
-  my $filename = "$ENV{HOME}/chart/samples/yahoo/GXY-v7.json";
-  $filename = "$ENV{HOME}/chart/samples/yahoo/NOSUCH-v7.json";
-  $filename = "$ENV{HOME}/chart/samples/yahoo/GSPC-v7.json";
-  $filename = "$ENV{HOME}/chart/samples/yahoo/RMX-v7.json";
-  $filename = "$ENV{HOME}/chart/samples/yahoo/SCG-v7.json";
-  require HTTP::Response;
-  my $resp = HTTP::Response->new();
-  my $content = slurp ($filename);
-  $resp->content($content);
-  $resp->content_type('text/html; charset=utf-8');
-  my $h = App::Chart::Yahoo::latest_parse ($symbol, $resp);
-  print Dumper(\$h);
-  # App::Chart::Download::write_latest_group ($h);
-  exit 0;
-}
 {
   # json v7 download
 
@@ -63,6 +42,7 @@ use Smart::Comments;
   $symbol = '^GSPC';
   $symbol = 'RMX.AX';
   $symbol = 'SCG.AX';
+  $symbol = 'TTS.AX';
   my $end   = time() + 86400*2;
   my $start = $end - 86400*10;
 
@@ -99,6 +79,26 @@ use Smart::Comments;
 
   exit 0;
 }
+{
+  # json v7 latest parse
+
+  my $symbol = 'NAB.AX';
+  my $filename = "$ENV{HOME}/chart/samples/yahoo/GXY-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/NOSUCH-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/GSPC-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/RMX-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/SCG-v7.json";
+  require HTTP::Response;
+  my $resp = HTTP::Response->new();
+  my $content = slurp ($filename);
+  $resp->content($content);
+  $resp->content_type('text/html; charset=utf-8');
+  my $h = App::Chart::Yahoo::latest_parse ($symbol, $resp);
+  print Dumper(\$h);
+  # App::Chart::Download::write_latest_group ($h);
+  exit 0;
+}
+
 {
   # json v8 with flonum values rounding
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2014, 2015 Kevin Ryde
+# Copyright 2014, 2015, 2019 Kevin Ryde
 
 # This file is part of Finance-Quote-Grab.
 #
@@ -34,14 +34,15 @@ use Smart::Comments;
 {
   require HTTP::Response;
   my $resp = HTTP::Response->new(200, 'OK');
-  my $content = slurp('samples/ghana/index1.php?linkid=5&sublinkid=12');
+  my $content = slurp('samples/ghana/Daily_Shares_and_ETFs_Trades_Ghana_Stock_Exchange.html');
   $resp->content($content);
   $resp->content_type('text/html');
 
   my $fq = Finance::Quote->new ('Ghana');
   my %quotes;
   Finance::Quote::Ghana::_parse ($fq, $resp, \%quotes,
-                                 ['SCB PREF', 'EBG','AADS','GLD']);
+                                 ['CAL',
+                                  'SCB PREF', 'EBG','AADS','GLD']);
   ### %quotes
 
   exit 0;

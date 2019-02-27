@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010, 2017 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2017, 2018 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -19,7 +19,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 31;
+use Test::More tests => 25;
 
 use lib 't';
 use MyTestHelpers;
@@ -204,19 +204,5 @@ App::Chart::symbol_setups ('X.LME');
 }
 
 #------------------------------------------------------------------------------
-# quote_parse_div_date()
-
-SKIP: {
-  $have_test_mocktime or skip 'due to Test::MockTime not available', 6;
-
-  Test::MockTime::set_fixed_time ('1981-01-01T00:00:00Z');
-  is (App::Chart::Yahoo::quote_parse_div_date('Jan  7'), '1981-01-07');
-  is (App::Chart::Yahoo::quote_parse_div_date(' 5 Jan'), '1981-01-05');
-  is (App::Chart::Yahoo::quote_parse_div_date('31 Dec'), '1980-12-31');
-  is (App::Chart::Yahoo::quote_parse_div_date('24-Sep-04'),    '2004-09-24');
-  is (App::Chart::Yahoo::quote_parse_div_date('24 Sep, 2004'), '2004-09-24');
-  is (App::Chart::Yahoo::quote_parse_div_date('Sep 24, 2004'), '2004-09-24');
-  Test::MockTime::restore_time();
-}
 
 exit 0;

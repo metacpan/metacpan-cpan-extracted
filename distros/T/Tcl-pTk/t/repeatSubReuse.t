@@ -1,10 +1,12 @@
 ## Test case to check for a problem where a command was created in Tcl-land for each instance of a repeat event.
 ##   This was changed to reuse the Tcl-command for each instance of ther repeat event, and not create a new one
 ##
+use warnings;
+use strict;
+
 use Tcl::pTk;
 
 #use Tk;
-use strict;
 
 use Test;
 plan tests => 1;

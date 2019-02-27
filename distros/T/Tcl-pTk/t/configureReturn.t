@@ -1,13 +1,16 @@
 # Test to make sure configure with no-args returns a 2-d array (or nothing) for
 #   a large set of widgets
 
+use warnings;
+use strict;
+
 use Tcl::pTk;
-use Tcl::pTk::widgets(TextUndo);
+use Tcl::pTk::widgets('TextUndo');
 use Test;
 
 plan tests => 20;
 
-$mw = MainWindow->new;
+my $mw = MainWindow->new;
 $|=1;
 
 my @widgets = ( qw/ Button Checkbutton  Entry  LabelFrame Label 

@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Encode ();
 use Carp ();
@@ -69,7 +69,10 @@ sub encode {
 
 sub decode_utf8 {
     my ($class, $stuff, $check) = @_;
-    _apply(sub { Encode::decode_utf8($_[0], $check) }, {}, $stuff);
+    my $cb = @_==3
+        ? sub { Encode::decode_utf8($_[0], $check) }
+        : sub { Encode::decode_utf8($_[0]) };
+    _apply($cb, {}, $stuff);
 }
 
 sub encode_utf8 {
@@ -84,7 +87,10 @@ sub from_to {
         || Carp::croak("$class: unknown encoding '$from_enc'");
     $to_enc = Encode::find_encoding($to_enc)
         || Carp::croak("$class: unknown encoding '$to_enc'");
-    _apply(sub { Encode::from_to($_[0], $from_enc, $to_enc, $check) }, {}, $stuff);
+    my $cb = @_==5
+        ? sub { Encode::from_to($_[0], $from_enc, $to_enc, $check) }
+        : sub { Encode::from_to($_[0], $from_enc, $to_enc) };
+    _apply($cb, {}, $stuff);
     return $stuff;
 }
 

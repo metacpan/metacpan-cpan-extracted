@@ -1,8 +1,8 @@
 # Logic-TruthTable
 
-## version 1.01
+## version 1.02
 
-## 18 February 2019
+## 26 February 2019
 
 ---
 

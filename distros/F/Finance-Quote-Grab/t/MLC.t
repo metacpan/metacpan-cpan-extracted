@@ -28,7 +28,8 @@ BEGIN { MyTestHelpers::nowarnings() }
 use Finance::Quote::MLC;
 
 
-my $want_version = 14;
+#------------------------------------------------------------------------------
+my $want_version = 15;
 is ($Finance::Quote::MLC::VERSION, $want_version,
     'VERSION variable');
 is (Finance::Quote::MLC->VERSION,  $want_version,

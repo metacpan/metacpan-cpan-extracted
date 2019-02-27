@@ -1,12 +1,13 @@
 # This is a test of parent/child widget relationships in a
 #  megawidget (the LabEntry widget)
 
+use warnings;
+use strict;
 
 use Tcl::pTk;
 use Tcl::pTk::BrowseEntry;
 #use Tk;
 #use Tk::BrowseEntry;
-use strict;
 use Test;
 
 plan tests => 4;

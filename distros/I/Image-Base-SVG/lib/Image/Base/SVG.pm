@@ -1,4 +1,4 @@
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-SVG.
 #
@@ -23,13 +23,13 @@ use Carp;
 use SVG; # version 2.50 needs an import() to create methods
 
 use vars '$VERSION', '@ISA';
-$VERSION = 4;
+$VERSION = 5;
 
 use Image::Base;
 @ISA = ('Image::Base');
 
 # uncomment this to run the ### lines
-#use Devel::Comments '###';
+# use Smart::Comments '###';
 
 
 sub new {
@@ -300,11 +300,11 @@ Image::Base::SVG -- SVG image file output
 
  use Image::Base::SVG;
  my $image = Image::Base::SVG->new (-width => 100,
-                                                    -height => 100);
- $image->rectangle (0,0, 99,99, 'b');
- $image->xy (20,20, 'o');
- $image->line (50,50, 70,70, 'o');
- $image->line (50,50, 70,70, 'o');
+                                    -height => 100);
+ $image->rectangle (0,0, 99,99, 'black');
+ $image->xy (20,20, 'green');
+ $image->line (50,50, 70,70, 'red');
+ $image->line (50,50, 70,70, 'blue');
  $image->save ('/some/filename.svg');
 
 =head1 CLASS HIERARCHY
@@ -316,19 +316,19 @@ C<Image::Base::SVG> is a subclass of C<Image::Base>,
 
 =head1 DESCRIPTION
 
-C<Image::Base::SVG> extends C<Image::Base> to create or
-update SVG format image files using the C<SVG.pm> module (see
-L<SVG::Manual>).
+C<Image::Base::SVG> extends C<Image::Base> to create or update SVG format
+image files using the C<SVG> module.  The C<SVG> module holds the contents
+of an SVG file in memory as an object which can be variously manipulated.
+See L<SVG::Manual> for details.
 
 C<Image::Base> is pixel oriented so isn't really the sort of thing SVG is
-meant for, but this module can direct some C<Image::Base> style code at an
-C<SVG> object.  Of course the C<SVG> module has many more features if used
-natively.
+meant for, but this module can direct C<Image::Base> style code at an C<SVG>
+object.  The C<SVG> module has many more features if used natively.
 
 It's often fairly easy to spit out SVG directly too, and for instance the
-C<Image::Base::SVGout> module can do that.  The advantages of the C<SVG>
-document object model comes when combining images or fragments, or going
-through elements for post-facto mangling.
+C<Image::Base::SVGout> module can do that.  The advantage of the C<SVG>
+object comes when combining images or fragments, or going through elements
+for post-facto mangling.
 
 In the current code the SVG elements emitted assume some default style
 attributes such as stroke-width 1.  Perhaps that should be set explicitly on
@@ -349,6 +349,9 @@ plus extra names
     http://www.w3.org/TR/2003/REC-SVG11-20030114/types.html#ColorKeywords
 
 =head1 FUNCTIONS
+
+See L<Image::Base/FUNCTIONS> for the behaviour common to all Image-Base
+classes.
 
 =over 4
 
@@ -386,7 +389,7 @@ Load an SVG file into C<$image>, either from the current C<-file> attribute,
 or set that to C<$filename> then load.
 
 This uses the C<SVG::Parser> module.  See that module for how to choose
-between Expat or SAX for its underlying XML parse, and in turn see
+between Expat or SAX for its underlying XML parse, and see in turn
 L<XML::SAX> for its further choice of libxml, pure perl, etc.  LibXML might
 be unhelpfully strict.
 
@@ -428,7 +431,7 @@ http://user42.tuxfamily.org/image-base-svg/index.html
 
 =head1 LICENSE
 
-Image-Base-SVG is Copyright 2011 Kevin Ryde
+Image-Base-SVG is Copyright 2011, 2012, 2019 Kevin Ryde
 
 Image-Base-SVG is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

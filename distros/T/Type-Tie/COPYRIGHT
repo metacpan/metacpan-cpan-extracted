@@ -3,15 +3,6 @@ Upstream-Name: Type-Tie
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Type-Tie
 
-Files: INSTALL
- LICENSE
- Makefile.PL
- inc/Test/Fatal.pm
- inc/Test/Requires.pm
- inc/Try/Tiny.pm
-Copyright: Unknown
-License: Unknown
-
 Files: README
  lib/Type/Tie.pm
  t/01basic.t
@@ -20,6 +11,15 @@ Files: README
  t/05typetiny.t
 Copyright: This software is copyright (c) 2013-2014, 2018-2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ inc/Test/Fatal.pm
+ inc/Test/Requires.pm
+ inc/Try/Tiny.pm
+Copyright: Unknown
+License: Unknown
 
 Files: Changes
  META.json

@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2014 Kevin Ryde
+# Copyright 2010, 2011, 2014, 2017, 2018, 2019 Kevin Ryde
 
 # This file is part of File-Locate-Iterator.
 #
@@ -27,7 +27,7 @@ extends
   'Moose::Object'; # does() and stuff
 with 'MooseX::Iterator::Role';
 
-our $VERSION = 23;
+our $VERSION = 26;
 
 # uncomment this to run the ### lines
 #use Devel::Comments;
@@ -212,8 +212,7 @@ C<MooseX::Iterator::Locate> reads a "locate" database file in the style of
 L<MooseX::Iterator>.  It's implemented as a front-end to
 L<File::Locate::Iterator>.
 
-See F<examples/moosex-iterator.pl> in the File-Locate-Iterator sources for a
-complete sample program.
+See F<examples/moosex-iterator.pl> for a complete sample program.
 
 =head1 FUNCTIONS
 
@@ -250,8 +249,7 @@ Move C<$it> back to the start of the database again.  The next call to
 C<$it-E<gt>next> gives the first entry again.
 
 As discussed in C<File::Locate::Iterator> under C<rewind()>, this reset is
-only possible when the underlying database file or handle is a plain file or
-something seekable.
+only possible when the underlying database file or handle is seekable.
 
 =back
 
@@ -273,8 +271,8 @@ The various parameters accepted by C<new> are attributes.  They're all
                         "default", "if_sensible", "if_possible", "0", "1"
 
 C<database_file> default is
-C<< File::Locate::Iterator->default_database_file() >>, done as a coderef
-default since C<default_database_file()> looks at C<%ENV>.
+C<< File::Locate::Iterator->default_database_file() >>, in the form of a
+coderef default since C<default_database_file()> looks at C<%ENV>.
 
 =head1 SEE ALSO
 
@@ -284,11 +282,11 @@ L<Moose::Manual::Roles>
 
 =head1 HOME PAGE
 
-http://user42.tuxfamily.org/file-locate-iterator/index.html
+L<http://user42.tuxfamily.org/file-locate-iterator/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011, 2014 Kevin Ryde
+Copyright 2010, 2011, 2014, 2017, 2018, 2019 Kevin Ryde
 
 File-Locate-Iterator is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

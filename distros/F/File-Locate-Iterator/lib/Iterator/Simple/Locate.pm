@@ -1,4 +1,4 @@
-# Copyright 2009, 2010, 2011, 2014 Kevin Ryde.
+# Copyright 2009, 2010, 2011, 2014, 2017, 2018, 2019 Kevin Ryde.
 #
 # This file is part of File-Locate-Iterator.
 #
@@ -24,7 +24,7 @@ use warnings;
 use File::Locate::Iterator;
 use Iterator::Simple;
 
-our $VERSION = 23;
+our $VERSION = 26;
 
 sub new {
   my $class = shift;
@@ -56,8 +56,7 @@ style.  It's implemented as a front-end to C<File::Locate::Iterator>,
 allowing the various C<Iterator::Simple> features to be used to filter or
 crunch entries from the locate database.
 
-See F<examples/iterator-simple.pl> in the File-Locate-Iterator sources for a
-simple complete program.
+See F<examples/iterator-simple.pl> for a simple complete program.
 
 =head1 FUNCTIONS
 
@@ -81,11 +80,11 @@ L<Iterator::Simple>, L<File::Locate::Iterator>
 
 =head1 HOME PAGE
 
-http://user42.tuxfamily.org/file-locate-iterator/index.html
+L<http://user42.tuxfamily.org/file-locate-iterator/index.html>
 
 =head1 COPYRIGHT
 
-Copyright 2009, 2010, 2011, 2014 Kevin Ryde
+Copyright 2009, 2010, 2011, 2014, 2017, 2018, 2019 Kevin Ryde
 
 File-Locate-Iterator is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as published by

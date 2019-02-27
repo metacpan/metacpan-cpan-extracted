@@ -24,8 +24,8 @@ my %WriteMakefileArgs = (
     "Complete::Getopt::Long" => "0.43",
     "Complete::Tcsh" => 0,
     "Complete::Util" => "0.57",
-    "Exporter" => 0,
-    "Getopt::Long" => 0,
+    "Exporter" => "5.57",
+    "Getopt::Long" => "2.50",
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.102",
+  "VERSION" => "0.103",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,9 +47,9 @@ my %FallbackPrereqs = (
   "Complete::Getopt::Long" => "0.43",
   "Complete::Tcsh" => 0,
   "Complete::Util" => "0.57",
-  "Exporter" => 0,
+  "Exporter" => "5.57",
   "File::Spec" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => "0.98",

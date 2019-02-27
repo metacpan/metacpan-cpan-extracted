@@ -9,4 +9,5 @@ requires 'Carp';
 on test => sub {
     requires 'Test::Simple' => 0.94;
     requires 'Test::Exception';
+    requires 'Class::Accessor::Fast';
 };
