@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.004';
+our $VERSION = '1.007';
 
 use strict;
 use warnings;
@@ -191,6 +191,18 @@ sub _compute_result {
 	    next;
 	}
 
+	if ($sig->{error}) {
+	    # something wrong with the DKIM-Signature header, return error
+	    push @rv, $sig->{':result'} =
+		Mail::DKIM::Iterator::VerifyRecord->new(
+		    $sig,
+		    ($sig->{s}//'UNKNOWN')."_domainkey".($sig->{d}//'UNKNOWN'),
+		    DKIM_PERMERROR,
+		    $sig->{error}
+		);
+	    next;
+	}
+
 	if (!$sig->{b}) {
 	    # sig is not for verification but for signing
 	    if (!$sig->{'bh:computed'}) {
@@ -206,18 +218,6 @@ sub _compute_result {
 			    : ($sig,undef,DKIM_FAIL,$err)
 		    );
 	    }
-	    next;
-	}
-
-	if ($sig->{error}) {
-	    # something wrong with the DKIM-Signature header, return error
-	    push @rv, $sig->{':result'} =
-		Mail::DKIM::Iterator::VerifyRecord->new(
-		    $sig,
-		    ($sig->{s}//'UNKNOWN')."_domainkey".($sig->{d}//'UNKNOWN'),
-		    DKIM_PERMERROR,
-		    $sig->{error}
-		);
 	    next;
 	}
 
@@ -520,21 +520,27 @@ sub _verify_sig {
 	return ($FAIL,'body hash mismatch');
     }
 
-    my $rsa = Crypt::OpenSSL::RSA->new_public_key(do {
-	local $_ = $param->{p};
-	s{\s+}{}g;
-	s{(.{1,64})}{$1\n}g;
-	"-----BEGIN PUBLIC KEY-----\n$_-----END PUBLIC KEY-----\n";
-    });
-    $rsa or return ($FAIL,"using public key failed");
-    $rsa->use_no_padding;
-    my $bencrypt = $rsa->encrypt($sig->{'b:bin'});
-    my $expect = _emsa_pkcs1_v15(
-	$sig->{'a:hash'},$sig->{'h:hash'},$rsa->size);
-    if ($expect ne $bencrypt) {
-	# warn "expect= "._encode64($expect)."\n";
-	# warn "encrypt="._encode64($bencrypt)."\n";
-	return ($FAIL,'header sig mismatch');
+    if (!eval {
+	my $rsa = Crypt::OpenSSL::RSA->new_public_key(do {
+	    local $_ = $param->{p};
+	    s{\s+}{}g;
+	    s{(.{1,64})}{$1\n}g;
+	    "-----BEGIN PUBLIC KEY-----\n$_-----END PUBLIC KEY-----\n";
+	}) or die [DKIM_PERMERROR,"using public key failed"];
+	$rsa->use_no_padding;
+	my $bencrypt = eval { $rsa->encrypt($sig->{'b:bin'}) }
+	    or die die [DKIM_PERMERROR,"header sig corrupt"];
+	my $expect = _emsa_pkcs1_v15(
+	    $sig->{'a:hash'},$sig->{'h:hash'},$rsa->size);
+	if ($expect ne $bencrypt) {
+	    # warn "expect= "._encode64($expect)."\n";
+	    # warn "encrypt="._encode64($bencrypt)."\n";
+	    die [$FAIL,"header sig mismatch"];
+	}
+	1;
+    }) {
+	return @{$@} if ref($@);
+	return (DKIM_PERMERROR,"using public key failed");
     }
     return (DKIM_PASS, join(' + ', @{$sig->{':warning'} || []}));
 }
@@ -862,7 +868,7 @@ sub authentication_results {
     return if ! $self->[2];
     my $ar = "dkim=$self->[2]";
     $ar .= " ($self->[3])" if defined $self->[3] and $self->[3] ne '';
-    $ar .= " header.d=".$self->[0]{d};
+    $ar .= " header.d=".( $self->[0]{d} // 'unknown');
     return $ar;
 }
 

@@ -9,7 +9,7 @@ use v5.18.0; # require 2014 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Command;
-$PiFlash::Command::VERSION = '0.0.6';
+$PiFlash::Command::VERSION = '0.1.0';
 use autodie;
 use POSIX; # included with perl
 use IO::Handle; # rpm: "dnf install perl-IO", deb: included with perl
@@ -313,7 +313,7 @@ PiFlash::Command - process/command running utilities for piflash
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -336,7 +336,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

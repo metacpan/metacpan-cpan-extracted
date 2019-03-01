@@ -234,19 +234,19 @@ $expected =<< 'EOF';
 
 <quote>
 Hi [REDACTED].
-
+<br>
 I am writing to you on behalf of the 2012 NYC Anarchist Book fair Safe(r) Space Group to let you know that a request has been made that you not attend this year. The policy at the event, posted at http://www.anarchistbookfair.net/saferspace, is in place to create a supportive, non-threatening environment for all. This means that anyone may be asked to not attend. <em><strong>No blame is placed, no decision is made</strong></em>, we simply ask that you not attend to prevent anyone from feeling unsafe.
-
+<br>
 We understand that being asked not to attend is not easy, and we don’t take it lightly. You may not know why you are being asked not to attend or who all is requesting this, or you may feel the situation is totally unfair. Our goal is not to decide right or wrong but to maintain safety at the fair. Some situations are gray and sometimes based on simple misunderstandings, but regardless of the reasons, no matter what your defense, we still ask that you not attend this years book fair. Not attending is not an admission of guilt. In fact, you not attending is a statement that you respect everyone’s safety at the fair and are taking a positive step to uphold that principle.
-
+<br>
 <em><strong>We also understand your need to know why you are being asked not to attend. However, the book fair is not the place to resolve conflict.</strong></em> Please, do not approach anyone at the fair who you think is responsible for the request that you not attend, or anyone that you think may have made this request before the fair. This violates our commitment to keeping everyone safe.
-
+<br>
 We realize that this email is formal. We chose to email you because we want to remain as neutral as possible in this position and situation, as well as to give you the space in which to process this request in whatever way is most comfortable and safe.
-
+<br>
 <em><strong>If you have any questions please don't hesitate to contact me.</strong></em> Again, do not contact anyone without their consent, especially any survivors. <em><strong>You can field all questions through me or I can put you in contact with other safer space members</strong></em>.
-
+<br>
 Thanks for helping us keep it safe,
-
+<br>
 [REDACTED]/ NYC Anarchist Bookfair Safer Space Team
 </quote>
 
@@ -286,8 +286,10 @@ $expected =<< 'MUSE';
  - By providing anonymity to the person who requested the recipient be asked not to attend the bookfair, this letter paves the way for abuses of power and a slew of false allegations.
 
 I don't think the letter is without fault, nor do I think that people objecting to it are apologists for sexual assault by default, and I'd like to make that quite clear. I decided to go and chat to the safer spaces team at the bookfair. They weren't some shadowy clique plotting people's downfall in a backroom somewhere, I met a few women sat at the very entrance to the main room, with a clear sign indicating who they were, and arm bands making them easily identifiable. They had formed a group called [[http://supportny.org/about/][Support New York]] who are
+<br>
 
 Quote:
+<br>
 
 <quote>
 dedicated to healing the effects of sexual assault and abuse. Our aim is to meet the needs of the survivor, to hold accountable those who have perpetrated harm, and to maintain a larger dialogue within the community about consent, mutual aid, and our society’s narrow views of abuse. We came together in order to create our own safe(r) space and provide support for people of all genders, races, ages and orientations, separate from the police and prison systems that perpetuate these abuses

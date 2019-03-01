@@ -3,7 +3,7 @@ package Data::Hopen::G::Node;
 use Data::Hopen;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000012';
 
 sub outputs;
 

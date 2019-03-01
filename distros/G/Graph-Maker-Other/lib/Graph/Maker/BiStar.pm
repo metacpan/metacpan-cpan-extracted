@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 
@@ -66,7 +66,7 @@ Graph::Maker->add_factory_type('bi_star' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde
+=for stopwords Ryde undirected
 
 =head1 NAME
 
@@ -82,8 +82,9 @@ Graph::Maker::BiStar - create bi-star graphs
 =head1 DESCRIPTION
 
 C<Graph::Maker::BiStar> creates C<Graph.pm> bi-star graphs.  A bi-star graph
-is two stars with an edge connecting their centres.  Parameters N and M are
-how many vertices in each star, for total N+M vertices.
+is two stars with an edge connecting the centre vertex of the two.
+Parameters N and M are how many vertices in each star, for total N+M
+vertices.
 
 
      3   2       9
@@ -93,7 +94,7 @@ how many vertices in each star, for total N+M vertices.
      4   5       7
 
 Vertices of the first star are numbered per C<Graph::Maker::Star>, then the
-second star.
+second star similar but offset +N.
 
     vertices
       1                      first star centre
@@ -136,28 +137,27 @@ The graph diameter is 3 when both N,M>=2.  The smaller cases can be written
 
     diameter(N,M) = (N>=2) + (M>=2) + (N>=3 || M>=3 || (N>=1&&M>=1))
 
-The Wiener index (total distance between vertex pairs) follows from counts
+The Wiener index (total distances between vertex pairs) follows from counts
 and measures between the leaf and centre vertices.  Cases M=0 or N=0 reduce
 to a single star which are exceptions.
 
     Wiener(N,M) = N^2 + 3*N*M + M^2 - 3*N - 3*M + 2
-                  if M=0 then + N-1
-                  if N=0 then + M-1
+                  + if M=0 then N-1
+                  + if N=0 then M-1
 
                 = (N+M)*(N+M-3) + N*M + 2
-                  if M=0 then + N-1
-                  if N=0 then + M-1
+                  + if M=0 then N-1
+                  + if N=0 then M-1
 
 With N+M vertices, the number of pairs of distinct vertices is
 
     Pairs(N,M) = (N+M)*(N+M-1)/2
 
 Mean distance between vertices is then Wiener/Pairs.  A bi-star with some
-particular desired mean distance can be found by solving for N,M in
+particular desired mean distance can be found by solving for N,M, which
+becomes a binary quadratic form.
 
     Wiener(N,M) = Pairs(N,M) * mean
-
-which becomes a binary quadratic form.
 
 =head1 HOUSE OF GRAPHS
 
@@ -214,7 +214,7 @@ L<Graph::Maker::Star>
 
 =head1 LICENSE
 
-Copyright 2017 Kevin Ryde
+Copyright 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

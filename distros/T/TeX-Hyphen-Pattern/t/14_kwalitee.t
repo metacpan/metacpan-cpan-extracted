@@ -6,7 +6,7 @@ use utf8;
 
 use Test::More;
 
-our $VERSION = 0.103;
+our $VERSION = v1.1.1;
 
 BEGIN {
     if ( not $ENV{'RELEASE_TESTING'} ) {

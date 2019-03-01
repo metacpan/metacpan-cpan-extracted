@@ -1,4 +1,4 @@
-# AWS::IoT::Thing generated from spec 1.11.0
+# AWS::IoT::Thing generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoT::Thing',
@@ -21,7 +21,7 @@ package Cfn::Resource::Properties::AWS::IoT::Thing {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has AttributePayload => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AttributePayload => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ThingName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

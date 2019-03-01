@@ -1,8 +1,18 @@
 Revision history for Set-Product-XS
 
+0.06  Thu Feb 28 04:47:43 UTC 2019
+    - Don't use G_NOARGS flag; on Perl <= 5.22 it results in @_ not being
+      reset if @_ is recreated in the code block.
+
+0.05  Wed Feb 27 22:24:37 UTC 2019
+    - Fixed memory leak that was originally fixed in 0.03.
+    - Upgraded ppport.h.
+    - Updated benchmarks.
+
 0.04  Fri Oct  6 03:20:09 UTC 2017
     - Fixed memory leak. (GH #1)
-    - Upgraded ppport.h
+    - Upgraded ppport.h.
+    - Updated benchmarks.
 
 0.03  Tue Nov 10 18:38:48 UTC 2015
     - Fixed a memory leak resulting from the multicall api not calling the

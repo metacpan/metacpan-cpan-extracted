@@ -10,30 +10,34 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 
 has '+format' => 'tar';
 
 
-has gzip_cmd => sub {
+sub gzip_cmd
+{
   _which('gzip') ? 'gzip' : undef;
-};
+}
 
 
-sub _which { File::Which::which(@_) }
+sub _which { scalar File::Which::which(@_) }
 
-has bzip2_cmd => sub {
+sub bzip2_cmd
+{
   _which('bzip2') ? 'bzip2' : undef;
-};
+}
 
 
-has xz_cmd => sub {
+sub xz_cmd
+{
   _which('xz') ? 'xz' : undef;
-};
+}
 
 
-has tar_cmd => sub {
+sub tar_cmd
+{
   _which('bsdtar')
     ? 'bsdtar'
     # Slowlaris /usr/bin/tar doesn't seem to like pax global header
@@ -53,9 +57,10 @@ has tar_cmd => sub {
 };
 
 
-has unzip_cmd => sub {
+sub unzip_cmd
+{
   _which('unzip') ? 'unzip' : undef;
-};
+}
 
 sub _run
 {
@@ -148,7 +153,7 @@ sub handles
   return if $ext =~ s/\.xz$//     && (!$self->xz_cmd);
 
   return 1 if $ext eq 'tar' && $self->_tar_can('tar');
-  return 1 if $ext eq 'zip' && $self->unzip_cmd;
+  return 1 if $ext eq 'zip' && $self->_tar_can('zip');
 
   return;
 }
@@ -177,6 +182,10 @@ sub init
   elsif($self->format =~ /^tar\.(gz|Z)$/ && !$self->handles($self->format))
   {
     $meta->add_requires('share' => 'Alien::gzip' => '0.03');
+  }
+  elsif($self->format eq 'zip' && !$self->handles('zip'))
+  {
+    $meta->add_requires('share' => 'Alien::unzip' => '0');
   }
 
   $meta->register_hook(
@@ -233,8 +242,6 @@ sub _tar_can
 {
   my($self, $ext) = @_;
 
-  my $tar = $self->tar_cmd;
-
   unless(%tars)
   {
     my $name = '';
@@ -273,8 +280,14 @@ sub _tar_can
 
   Path::Tiny->new($name)->spew_raw($tars{$name});
 
+  my @cmd = ($self->tar_cmd, 'xf', $name);
+  if($ext eq 'zip')
+  {
+    @cmd = ($self->unzip_cmd, $name);
+  }
+
   my(undef, $exit) = capture_merged {
-    system($self->tar_cmd, 'xf', $name);
+    system(@cmd);
     $?;
   };
 
@@ -302,7 +315,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 1.55
+version 1.60
 
 =head1 SYNOPSIS
 
@@ -434,33 +447,12 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 __DATA__
-[ xx.tar.xz ]
-M_3=Z6%H```3FUK1&`@`A`18```!T+^6CX`?_`&!=`#Q@M.AX.4O&N38V648.
-M[J6L\\<_[3M*R;CASOTX?P=AC_+TG]8[KH(8/FH'K8A88=^>]Y`\*#,F=7,6
-MMB.:40OP*L85<<5!.@M$*(&TH(*TAWN"E)(+1>_I$^W5V^4=``!FY,=\7,&)
-9IP`!?(`0````:OY*7K'$9_L"``````196@``
-
-[ xx.tar.bz2 ]
-M0EIH.3%!62936=+(]$0``$A[D-$0`8!``7^``!!AI)Y`!```""``=!JGIH-(
-MT#0]0/2!**---&F@;4#0&:D;X?(6@JH(2<%'N$%3VHC-9E>S/N@"6&I*1@GN
-JNHCC2>$I5(<0BKR.=XBZ""HVZ;T,CV\LJ!K&*?9`#\7<D4X4)#2R/1$`
-
-[ xx.tar.gz ]
-M'XL(`(;*<%D``ZNHT"NI*&&@*3`P,#`S,5$`T>9FIF#:P`C"AP)C!4-C0V,3
-M0Q-30W-S!0-#(W-#0P8%`]HZ"P)*BTL2BX!.R<_)R2Q.QZT.J"PM#8\Y$(\H
->P.DA`BHJN`;:":-@%(R"43`*!@```)9R\&H`"```
-
-[ xx.tar.Z]
-M'YV0>/"XH(.'#H"#"!,J7,BPH<.'$"-*1`BCH@T:-$``J`CCAHT:&CG"D)%Q
-MH\B3,T#$F+&21@P:-6+<N`$"1@P9-V+$`%!SHL^?0(,*!5!G#ITP<DR^8<,F
-MS9PS0Q<:#6/&3-2%)V&$/*GQJM>O8,.*'1I0P=BS:-.J7<NVK=NW<./*G4NW
-7KMV[>//JW<NWK]^_@`,+'DRXL.'#0P$`
 
 [ xx.tar ]
 M>'@N='AT````````````````````````````````````````````````````
 M````````````````````````````````````````````````````````````
 M`````````````#`P,#8T-"``,#`P-S8U(``P,#`P,C0@`#`P,#`P,#`P,#`S
-M(#$S,3,T,30U,3<W(#`Q,C<Q,0`@,```````````````````````````````
+M(#$S-#,U,#0S-#(R(#`Q,C<P,P`@,```````````````````````````````
 M````````````````````````````````````````````````````````````
 M``````````````````````````````````````````!U<W1A<@`P,&]L;&ES
 M9P``````````````````````````````````<W1A9F8`````````````````
@@ -503,3 +495,38 @@ M````````````````````````````````````````````````````````````
 M````````````````````````````````````````````````````````````
 M````````````````````````````````````````````````````````````
 7````````````````````````````````
+
+
+[ xx.tar.Z ]
+M'YV0>/"XH(.'#H"#"!,J7,BPH<.'$"-*1`BCH@T:-$``J`CCAHT:&CG"D)%Q
+MH\B3,T#$F$%C1@T8+6G(D`$"1@P9-V#,`%!SHL^?0(,*!5!G#ITP<DR^8<,F
+MS9PS0Q<:#6/&3-2%)V&$/*GQJM>O8,.*'1I0P=BS:-.J7<NVK=NW<./*G4NW
+7KMV[>//JW<NWK]^_@`,+'DRXL.'#0P$`
+
+
+[ xx.tar.bz2 ]
+M0EIH.3%!629365(,+ID``$A[D-$0`8!``7^``!!AI)Y`!```""``=!JGIBC3
+M30&CU`]($HHTTR:`>D#0)SI*Z'R%H*J"&3@H]P@J>U$F5BMHOC`$L-"8C!(V
+I"`'?*WA:(9*4U)@4)+"(V%.G]#W(_E6B'J8G]D`/Q=R13A0D%(,+ID``
+
+
+[ xx.tar.gz ]
+M'XL("!)'=%P``WAX+G1A<@"KJ-`KJ2AAH"DP,#`P,S%1`-'F9J9@VL`(PH<"
+M8P5#8Q-C4P,38Q,C(P4#0R-S`V,&!0/:.@L"2HM+$HN`3LG/R<DL3L>M#J@L
+E+0V/.1"/*,#I(0(J*K@&V@FC8!2,@E$P"@8````U:,3F``@`````
+
+
+[ xx.tar.xz ]
+M_3=Z6%H```3FUK1&`@`A`18```!T+^6CX`?_`&!=`#Q@M.AX.4O&N38V648.
+M[J6L\\<_[3M*R;CASOTX?B.F\V:^)+G;\YY4"!4MLF9`*\N40G=O+K,J0"NF
+M0VU7J%NN(A,R^DM8@/(_YGR5CAO+1CS_YNHE:,1!G%6L1\GT``"[$^?"O*"!
+9`P`!?(`0````:OY*7K'$9_L"``````196@``
+
+
+[ xx.zip ]
+M4$L#!`H``````%5V64X:^I"B`P````,````&`!P`>'@N='AT550)``,21W1<
+M$D=T7'5X"P`!!/4!```$%````'AX"E!+`0(>`PH``````%5V64X:^I"B`P``
+M``,````&`!@```````$```"D@0````!X>"YT>'155`4``Q)'=%QU>`L``03U
+>`0``!!0```!02P4&``````$``0!,````0P``````
+
+

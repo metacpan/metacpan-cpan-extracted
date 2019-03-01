@@ -1,5 +1,9 @@
 Revision history for Google-ProtocolBuffers-Dynamic
 
+0.24      2019-02-27 18:47:54 CET
+
+    - Add option to return plain hashes from the decoder.
+
 0.23      2018-11-10 22:47:32 CET
 
     - Compilation fixes for protobuf 3.6

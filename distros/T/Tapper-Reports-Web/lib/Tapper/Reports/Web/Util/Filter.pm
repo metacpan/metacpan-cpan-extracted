@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Util::Filter;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Util::Filter::VERSION = '5.0.13';
+$Tapper::Reports::Web::Util::Filter::VERSION = '5.0.14';
 use DateTime;
 use Data::Dumper;
 use DateTime::Format::DateParse;
@@ -179,7 +179,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

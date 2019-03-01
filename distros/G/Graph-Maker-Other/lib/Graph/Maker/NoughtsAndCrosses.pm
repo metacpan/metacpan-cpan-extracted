@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -418,7 +418,7 @@ L<Graph::Maker>
 
 =head1 LICENSE
 
-Copyright 2017 Kevin Ryde
+Copyright 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

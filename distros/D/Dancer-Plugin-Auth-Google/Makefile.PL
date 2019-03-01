@@ -21,7 +21,9 @@ WriteMakefile(
     },
     META_MERGE => {
         resources => {
-            repository => 'http://github.com/garu/Dancer-Plugin-Auth-Google',
+            repository => 'https://github.com/garu/Dancer-Plugin-Auth-Google',
+            bugtracker => 'https://github.com/garu/Dancer-Plugin-Auth-Google/issues',
+            license    => 'http://dev.perl.org/licenses',
         },
     },
     dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

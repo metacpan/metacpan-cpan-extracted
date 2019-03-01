@@ -1,5 +1,11 @@
 Revision history for Getopt-Alt
 
+0.5.2   2019-02-28
+        Updating for release of version 0.5.2
+        Fixing up how autocompletion (Ivan Wills)
+        Fixing long line (Ivan Wills)
+        Fixing auto-complete (Ivan Wills)
+
 0.5.1   2019-02-16
         Updating for release of version 0.5.1
         Added new files to manifest (Ivan Wills)

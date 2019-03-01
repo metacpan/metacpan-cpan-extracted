@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -130,7 +130,7 @@ Graph::Maker->add_factory_type('knight_grid' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde OEIS undirected
+=for stopwords Ryde OEIS undirected tesseract
 
 =head1 NAME
 
@@ -293,7 +293,7 @@ L<Graph::Maker>, L<Graph::Maker::Grid>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

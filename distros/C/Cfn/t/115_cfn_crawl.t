@@ -41,4 +41,35 @@ while (my $file = $d->read){
   }
 }
 
+{
+  my $o = Cfn->new;
+  $o->addResource(R1 => 'AWS::IAM::User', { Path => Cfn::DynamicValue->new(Value => sub { return '/' }) });
+
+  my $crawl = Cfn::Crawler->new(
+    cfn => $o,
+    criteria => sub {
+      $_[0]->isa('Cfn::DynamicValue');
+    }
+  );
+
+  my @elements = $crawl->all;
+  cmp_ok(scalar(@elements), '==', 1);
+}
+
+{
+  my $o = Cfn->new;
+  $o->addResource(R1 => 'AWS::IAM::User', { Path => Cfn::DynamicValue->new(Value => sub { return '/' }) });
+
+  my $crawl = Cfn::Crawler->new(
+    resolve_dynamicvalues => 1,
+    cfn => $o,
+    criteria => sub {
+      $_[0]->isa('Cfn::DynamicValue');
+    }
+  );
+
+  my @elements = $crawl->all;
+  cmp_ok(scalar(@elements), '==', 0);
+}
+
 done_testing;

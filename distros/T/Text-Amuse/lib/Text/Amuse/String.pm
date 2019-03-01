@@ -12,9 +12,11 @@ Text::Amuse::String - Process one-line muse strings.
 This module provides a minimal class compatible with
 Text::Amuse::Document to process single strings passed via value.
 
-=cut
+=head1 CONSTRUCTORS
 
-=head3 new ($string);
+=over 4
+
+=item new ($string)
 
 Constructor
 
@@ -30,7 +32,13 @@ sub new {
     return $self;
 };
 
-=head3 string
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item string
 
 The string stored
 
@@ -40,7 +48,7 @@ sub string {
     return shift->{_raw_string};
 }
 
-=head3 elements
+=item elements
 
 It returns the only L<Text::Amuse::Element> which composes the body.
 
@@ -53,6 +61,8 @@ sub elements {
                                        string => $self->string);
     return ($el);
 }
+
+=back
 
 =head2 Fake methods
 

@@ -6,8 +6,8 @@ my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 my $meta = {
   "abstract"       => "import a magic subclass",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -42,7 +42,7 @@ my $meta = {
                                      },
                       },
   "provides"       => {
-                        "Subclass::Of" => { file => "lib/Subclass/Of.pm", version => 0.007 },
+                        "Subclass::Of" => { file => "lib/Subclass/Of.pm", version => 0.008 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -56,10 +56,15 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Subclass-Of/project",
                       },
-  "version"        => 0.007,
+  "version"        => 0.008,
 };
 
 my %dynamic_config;
+do {
+# Hash::Util::FieldHash was first released with perl v5.9.4
+$meta->{prereqs}{runtime}{requires}{'Hash::FieldHash'} = 0 if $] < 5.009004;
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

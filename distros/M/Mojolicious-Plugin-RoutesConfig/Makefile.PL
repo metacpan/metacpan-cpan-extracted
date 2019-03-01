@@ -12,7 +12,11 @@ WriteMakefile(
      VERSION_FROM  => $module_file,
      AUTHOR        => 'Красимир Беров (berov@cpan.org)',
      ABSTRACT_FROM => $module_file,
-     PREREQ_PM     => {'Mojolicious' => '7.70', perl => '5.020000'},
+     PREREQ_PM     => {
+                   'Mojolicious'                    => '8.13',
+                   'Mojolicious::Plugin::PODViewer' => '0.004',
+                   perl                             => '5.020000',
+                  },
      test       => {TESTS => 't/*.t'},
      clean      => {FILES => 'Mojolicious-Plugin-*'},
      dist       => {PREOP => $preop},

@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Mon Dec  3 12:38:30 EST 2018
+#    Generated on: Thu Feb 21 10:52:57 EST 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.59';
+$VERSION='3.60';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -378,6 +378,7 @@ $Locale::Codes::Retired{'country'}{'alpha-2'}{'name'} = {
    q(svalbard and jan mayen islands) => [ q(sj), q(Svalbard and Jan Mayen Islands) ],
    q(swaziland) => [ q(sz), q(Swaziland) ],
    q(taiwan, province of china) => [ q(tw), q(Taiwan, Province of China) ],
+   q(tanzania, united republic of) => [ q(tz), q(Tanzania, United Republic of) ],
    q(united kingdom) => [ q(gb), q(United Kingdom) ],
    q(united states) => [ q(us), q(United States) ],
    q(vatican city state (holy see)) => [ q(va), q(Vatican City State (Holy See)) ],
@@ -510,6 +511,7 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
    q(swaziland) => [ q(sz), q(Swaziland) ],
    q(taiwan) => [ q(TW), q(Taiwan) ],
    q(taiwan, province of china) => [ q(tw), q(Taiwan, Province of China) ],
+   q(tanzania, united republic of) => [ q(tz), q(Tanzania, United Republic of) ],
    q(united kingdom) => [ q(gb), q(United Kingdom) ],
    q(united states) => [ q(us), q(United States) ],
    q(ussr) => [ q(su), q(USSR) ],
@@ -522,14 +524,17 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
    q(czech republic) => [ q(CZ), q(Czech Republic) ],
+   q(swaziland) => [ q(SZ), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
    q(czech republic) => [ q(CZE), q(Czech Republic) ],
+   q(swaziland) => [ q(SWZ), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
    q(czech republic) => [ q(203), q(Czech Republic) ],
+   q(swaziland) => [ q(748), q(SWAZILAND) ],
 };
 
 $Locale::Codes::Retired{'country'}{'numeric'}{'name'} = {
@@ -621,14 +626,18 @@ $Locale::Codes::Retired{'country'}{'numeric'}{'name'} = {
 $Locale::Codes::Retired{'country'}{'un-alpha-3'}{'name'} = {
    q(czech republic) => [ q(CZE), q(Czech Republic) ],
    q(korea, the democratic people's republic of) => [ q(PRK), q(Korea, The Democratic People's Republic of) ],
+   q(macedonia, the former yugoslav republic of) => [ q(MKD), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(SWZ), q(Swaziland) ],
+   q(tanzania, united republic of) => [ q(TZA), q(Tanzania, United Republic of) ],
 };
 
 $Locale::Codes::Retired{'country'}{'un-numeric'}{'name'} = {
    q(channel islands) => [ q(830), q(Channel Islands) ],
    q(czech republic) => [ q(203), q(Czech Republic) ],
    q(korea, the democratic people's republic of) => [ q(408), q(Korea, The Democratic People's Republic of) ],
+   q(macedonia, the former yugoslav republic of) => [ q(807), q(Macedonia, The former Yugoslav Republic of) ],
    q(swaziland) => [ q(748), q(Swaziland) ],
+   q(tanzania, united republic of) => [ q(834), q(Tanzania, United Republic of) ],
 };
 
 

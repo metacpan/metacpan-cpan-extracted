@@ -225,7 +225,11 @@ Files: Changes
  bin/boxer
  dist.ini
  doap.ttl
- t/world.t
+ t/bootstrap.t
+ t/classify.t
+ t/compose.t
+ t/namespaces_clean.t
+ t/serialize.t
 Copyright: Copyright 2019 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
@@ -244,12 +248,17 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: lib/Boxer/Part/Reclass.pm
-Copyright: Copyright Â© 2016 Jonas Smedegaard.
+Files: lib/Boxer/CLI/Command/Bootstrap.pm
+ lib/Boxer/Task/Bootstrap.pm
+Copyright: Copyright Â© 2019 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: Makefile.PL
 Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Boxer/Part/Reclass.pm
+Copyright: Copyright Â© 2016 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

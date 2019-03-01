@@ -1,5 +1,8 @@
 Revision history for Win32-Backup-Robocopy
 
+v15
+fixed some test failing if running from drive X:
+
 
 v14 
 fixed warning on undefined value for the executable not present

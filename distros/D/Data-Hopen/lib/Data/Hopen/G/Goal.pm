@@ -2,10 +2,13 @@
 package Data::Hopen::G::Goal;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000012';
 
 use parent 'Data::Hopen::G::Op';
-#use Class::Tiny qw(_passthrough);
+use Class::Tiny {
+    should_output => true,      # if true, forward the goal's inputs as
+                                # its outputs.
+};
 
 use Data::Hopen;
 use Data::Hopen::Util::Data qw(forward_opts);
@@ -23,11 +26,18 @@ is reserved for the root goal.  Goals usually appear at the end of the build
 graph, but this is not required --- Goal nodes can appear anywhere in the
 graph.
 
+=head1 MEMBERS
+
+=head2 should_output
+
+Boolean, default true.  If false, the goal's outputs are always C<{}> (empty).
+If true, the goal's inputs are passed through as outputs.
+
 =head1 FUNCTIONS
 
 =head2 run
 
-Wraps a L<Data::Hopen::G::CollectOp>'s run function.
+Passes through the inputs if L</should_output> is set.
 
 =cut
 
@@ -35,7 +45,11 @@ Wraps a L<Data::Hopen::G::CollectOp>'s run function.
 
 sub _run {
     my ($self, %args) = getparameters('self', [qw(; phase generator)], @_);
-    hlog { Goal => $self->name };
+    hlog { Goal => $self->name, ($self->should_output ? 'with' : 'without'),
+            'outputs' };
+
+    return {} unless $self->should_output;
+
     return $self->passthrough(-nocontext=>1, -levels => 'local',
             forward_opts(\%args, {'-'=>1}, qw[phase generator]));
 } #_run()

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -40,7 +40,7 @@ sub num_children {
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 10;
+  my $want_version = 13;
   ok ($Graph::Maker::NoughtsAndCrosses::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::NoughtsAndCrosses->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::NoughtsAndCrosses->VERSION($want_version); 1 }, 1,

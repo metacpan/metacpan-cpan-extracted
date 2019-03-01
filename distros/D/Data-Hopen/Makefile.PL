@@ -9,6 +9,8 @@ use File::Spec;
 
 my $VERSION_FROM = File::Spec->catfile(qw(lib Data Hopen.pm));
 my $IS_TRIAL = check_trial();
+my $secure_perl_path = get_perl_filename();
+my @provides = ();
 
 # Check if this is a TRIAL version {{{1
 sub check_trial {
@@ -26,16 +28,18 @@ sub check_trial {
     }
     return 0;
 } #check_trial()
+
 # }}}1
 # Module metadata {{{1
-my $provides;
 eval {
     require Module::Metadata;
-    $provides = Module::Metadata->provides(version => '2', dir => 'lib');
+    @provides =
+        (provides => Module::Metadata->provides(version => '2', dir => 'lib'));
         # Thanks to https://stackoverflow.com/a/28928985/2877364 by LEONT
+        # for the suggestion to use Module::Metadata
 };
-# }}}1
 
+# }}}1
 # Get the filename of the Perl interpreter running this. {{{1
 # Modified from perlvar.
 # The -x test is for cygwin or other systems where $Config{perlpath} has no
@@ -49,10 +53,9 @@ sub get_perl_filename {
                             ($secure_perl_path =~ m/$Config{_exe}$/i);
     }
     return $secure_perl_path;
-} # get_perl_filename() }}}1
+} # get_perl_filename()
 
-my $secure_perl_path = get_perl_filename();
-
+# }}}1
 # Makefile customization (MY) {{{1
 {   package MY;
 
@@ -133,7 +136,9 @@ actually_uninstall_from_vendordirs ::
 EOT
 
     } #postamble()
-} #package MY }}}1
+} #package MY
+
+# }}}1
 
 # Main options for EUMM
 my %opts = (
@@ -154,6 +159,8 @@ my %opts = (
 
     # In the following, if a specific version is listed, but no explanation
     # is given, that means we want that version for bugfixes it includes.
+    # Prereqs commented out with "##" were used at one time but no longer
+    # appear to be.
     CONFIGURE_REQUIRES => {
         'Config' => '0',
         'ExtUtils::MakeMaker' => '0',
@@ -172,7 +179,7 @@ my %opts = (
         'rlib' => '0',
         'Scalar::Util' => '0',
         'Test::Deep' => '0.084',        # for superhashof
-        'Test::Directory' => '0.02',    # for subdirs
+        ## 'Test::Directory' => '0.02',    # for subdirs
         'Test::More' => '0',
         # Test::TempDir::Tiny?  If so, remove Test::Directory dependency?
     },
@@ -193,31 +200,30 @@ my %opts = (
         #'Class::Method::Modifiers' => '1.05',  # version nums from Antlers
         #'Role::Tiny' => '1.000000',
 
-        'Class::XPath' => '1.4',
+        ## 'Class::XPath' => '1.4',
         'Config' => '0',
-        'Cwd' => '0',
+        #'Cwd' => '0',
 
         'constant' => '0',
         'Data::Dumper' => '0',
-        'Deep::Hash::Utils' => '0.03',  # For correct metadata
+        ## 'Deep::Hash::Utils' => '0.03',  # For correct metadata
         'experimental' => '0.009',      # For support on perl < 5.15.7
         'Exporter' => '0',
         'feature' => '0',
         # 'File::Find::Rule' => '0',    # - might be nice for finding files
-        'File::Glob' => '0',
+        #'File::Glob' => '0',
         #'File::Globstar' => '0.5',      # Fewer dependencies
-        'File::Path::Tiny' => '0.9',
+        ## 'File::Path::Tiny' => '0.9',
         'File::Spec' => '0',
-        'File::stat' => '0',
-        'File::Which' => '1.22',    # for msys2 support
+        ## 'File::stat' => '0',
+        ## 'File::Which' => '1.22',    # for msys2 support
         'Hash::Merge' => '0.299',
-        'Hash::Ordered' => '0.011',
+        ## 'Hash::Ordered' => '0.011',
         'Import::Into' => '0',
-        'IO::Handle' => '0',
         'Getargs::Mixed' => '1.04', # For -undef_ok option
         'Getopt::Long' => '2.5',    # For long option bugfix
         'Graph' => '0.9704',        # For latest multiedged support
-        'List::MoreUtils' => '0.428',
+        ## 'List::MoreUtils' => '0.428',
 
         # 'Module::Find' => '0.12', # For bugfixes
                                     # - Use for finding plugins to load.
@@ -230,7 +236,7 @@ my %opts = (
 
         'overload' => '0',
 
-        'Package::Alias' => '0.12',
+        ## 'Package::Alias' => '0.12',
 
         # 'Parse::RecDescent' => '1.967015',
             # - Use for parsing Lua tables as inline config data?
@@ -241,7 +247,7 @@ my %opts = (
             #   precedence in P::RD grammars.
 
         'Path::Class' => '0.37',
-        'Pod::Usage' => '0',
+        ## 'Pod::Usage' => '0',
         # 'Probe::Perl' => '0', # For perl interpreter file location or other info.
                                 # Alternative: Padre::Perl
 
@@ -280,7 +286,7 @@ my %opts = (
             },
         },
 
-        $provides ? (provides => $provides) : (),
+        @provides,
 
     }, #META_MERGE
 

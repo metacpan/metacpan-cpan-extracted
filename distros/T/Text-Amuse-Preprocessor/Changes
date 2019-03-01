@@ -1,5 +1,11 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.59 2019-02-28
+
+ - Preserve the <br> on import. At some point this was suppressed, but
+   experience shows it's better to preserve it, and too bad for texts
+   using <br> instead of <p>
+
 0.58 2018-12-17
 
  - Improve non-breaking space related functions. Thanks to @link2xt

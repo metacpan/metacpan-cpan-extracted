@@ -1,6 +1,8 @@
 # -*- Perl -*-
 #
-# Methods to interact with OpenSSH authorized_keys file data.
+# methods to interact with OpenSSH authorized_keys file data
+#
+# run perldoc(1) on this file for additional documentation
 
 package Config::OpenSSH::Authkey;
 
@@ -8,30 +10,30 @@ use 5.006000;
 use strict;
 use warnings;
 
-use Carp qw/croak/;
+use Carp qw(croak);
 use Config::OpenSSH::Authkey::Entry ();
 
 use IO::Handle qw(getline);
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 ######################################################################
 #
 # Utility Methods - Internal
 
 {
-  # Utility class for comments or blank lines in authorized_keys files
-  package Config::OpenSSH::Authkey::MetaEntry;
+    # Utility class for comments or blank lines in authorized_keys files
+    package Config::OpenSSH::Authkey::MetaEntry;
 
-  sub new {
-    my $class = shift;
-    my $entry = shift;
-    bless \$entry, $class;
-  }
+    sub new {
+        my $class = shift;
+        my $entry = shift;
+        bless \$entry, $class;
+    }
 
-  sub as_string {
-    ${ $_[0] };
-  }
+    sub as_string {
+        ${ $_[0] };
+    }
 }
 
 ######################################################################
@@ -39,26 +41,26 @@ our $VERSION = '1.05';
 # Class methods
 
 sub new {
-  my $class = shift;
-  my $options_ref = shift || {};
+    my $class       = shift;
+    my $options_ref = shift || {};
 
-  my $self = {
-    _fh                  => undef,
-    _keys                => [],
-    _seen_keys           => {},
-    _auto_store          => 0,
-    _tag_dups            => 0,
-    _nostore_nonkey_data => 0
-  };
+    my $self = {
+        _fh                  => undef,
+        _keys                => [],
+        _seen_keys           => {},
+        _auto_store          => 0,
+        _tag_dups            => 0,
+        _nostore_nonkey_data => 0
+    };
 
-  for my $pref (qw/auto_store tag_dups nostore_nonkey_data/) {
-    if ( exists $options_ref->{$pref} ) {
-      $self->{"_$pref"} = $options_ref->{$pref} ? 1 : 0;
+    for my $pref (qw/auto_store tag_dups nostore_nonkey_data/) {
+        if ( exists $options_ref->{$pref} ) {
+            $self->{"_$pref"} = $options_ref->{$pref} ? 1 : 0;
+        }
     }
-  }
 
-  bless $self, $class;
-  return $self;
+    bless $self, $class;
+    return $self;
 }
 
 ######################################################################
@@ -66,117 +68,117 @@ sub new {
 # Instance methods
 
 sub fh {
-  my $self = shift;
-  my $fh = shift || croak 'fh requires a filehandle';
+    my $self = shift;
+    my $fh   = shift || croak 'fh requires a filehandle';
 
-  $self->{_fh} = $fh;
-  return $self;
+    $self->{_fh} = $fh;
+    return $self;
 }
 
 sub file {
-  my $self = shift;
-  my $file = shift || croak 'file requires a file';
+    my $self = shift;
+    my $file = shift || croak 'file requires a file';
 
-  my $fh;
-  open( $fh, '<', $file ) or croak $!;
-  $self->{_fh} = $fh;
+    my $fh;
+    open( $fh, '<', $file ) or croak $!;
+    $self->{_fh} = $fh;
 
-  return $self;
+    return $self;
 }
 
 sub iterate {
-  my $self = shift;
-  croak 'no filehandle to iterate on' if !defined $self->{_fh};
+    my $self = shift;
+    croak 'no filehandle to iterate on' if !defined $self->{_fh};
 
-  my $line = $self->{_fh}->getline;
-  return defined $line ? $self->parse($line) : ();
+    my $line = $self->{_fh}->getline;
+    return defined $line ? $self->parse($line) : ();
 }
 
 sub consume {
-  my $self = shift;
-  croak 'no filehandle to consume' if !defined $self->{_fh};
+    my $self = shift;
+    croak 'no filehandle to consume' if !defined $self->{_fh};
 
-  my $old_auto_store = $self->auto_store();
-  $self->auto_store(1);
+    my $old_auto_store = $self->auto_store();
+    $self->auto_store(1);
 
-  while ( my $line = $self->{_fh}->getline ) {
-    $self->parse($line);
-  }
+    while ( my $line = $self->{_fh}->getline ) {
+        $self->parse($line);
+    }
 
-  $self->auto_store($old_auto_store);
+    $self->auto_store($old_auto_store);
 
-  return $self;
+    return $self;
 }
 
 sub parse {
-  my $self = shift;
-  my $data = shift || croak 'need data to parse';
+    my $self = shift;
+    my $data = shift || croak 'need data to parse';
 
-  my $entry;
+    my $entry;
 
-  if ( $data =~ m/^\s*(?:#|$)/ ) {
-    chomp($data);
-    $entry = Config::OpenSSH::Authkey::MetaEntry->new($data);
-    if ( $self->{_auto_store} and !$self->{_nostore_nonkey_data} ) {
-      push @{ $self->{_keys} }, $entry;
+    if ( $data =~ m/^\s*(?:#|$)/ ) {
+        chomp($data);
+        $entry = Config::OpenSSH::Authkey::MetaEntry->new($data);
+        if ( $self->{_auto_store} and !$self->{_nostore_nonkey_data} ) {
+            push @{ $self->{_keys} }, $entry;
+        }
+    } else {
+        $entry = Config::OpenSSH::Authkey::Entry->new($data);
+        if ( $self->{_tag_dups} ) {
+            if ( exists $self->{_seen_keys}->{ $entry->key } ) {
+                $entry->duplicate_of( $self->{_seen_keys}->{ $entry->key } );
+            } else {
+                $self->{_seen_keys}->{ $entry->key } = $entry;
+            }
+        }
+        push @{ $self->{_keys} }, $entry if $self->{_auto_store};
     }
-  } else {
-    $entry = Config::OpenSSH::Authkey::Entry->new($data);
-    if ( $self->{_tag_dups} ) {
-      if ( exists $self->{_seen_keys}->{ $entry->key } ) {
-        $entry->duplicate_of( $self->{_seen_keys}->{ $entry->key } );
-      } else {
-        $self->{_seen_keys}->{ $entry->key } = $entry;
-      }
-    }
-    push @{ $self->{_keys} }, $entry if $self->{_auto_store};
-  }
 
-  return $entry;
+    return $entry;
 }
 
 sub get_stored_keys {
-  shift->{_keys};
+    shift->{_keys};
 }
 
 sub reset_store {
-  my $self = shift;
-  $self->{_seen_keys} = {};
-  $self->{_keys}      = [];
-  return $self;
+    my $self = shift;
+    $self->{_seen_keys} = {};
+    $self->{_keys}      = [];
+    return $self;
 }
 
 sub reset_dups {
-  my $self = shift;
-  $self->{_seen_keys} = {};
-  return $self;
+    my $self = shift;
+    $self->{_seen_keys} = {};
+    return $self;
 }
 
 sub auto_store {
-  my $self    = shift;
-  my $setting = shift;
-  if ( defined $setting ) {
-    $self->{_auto_store} = $setting ? 1 : 0;
-  }
-  return $self->{_auto_store};
+    my $self    = shift;
+    my $setting = shift;
+    if ( defined $setting ) {
+        $self->{_auto_store} = $setting ? 1 : 0;
+    }
+    return $self->{_auto_store};
 }
 
 sub tag_dups {
-  my $self    = shift;
-  my $setting = shift;
-  if ( defined $setting ) {
-    $self->{_tag_dups} = $setting ? 1 : 0;
-  }
-  return $self->{_tag_dups};
+    my $self    = shift;
+    my $setting = shift;
+    if ( defined $setting ) {
+        $self->{_tag_dups} = $setting ? 1 : 0;
+    }
+    return $self->{_tag_dups};
 }
 
 sub nostore_nonkey_data {
-  my $self    = shift;
-  my $setting = shift;
-  if ( defined $setting ) {
-    $self->{_nostore_nonkey_data} = $setting ? 1 : 0;
-  }
-  return $self->{_nostore_nonkey_data};
+    my $self    = shift;
+    my $setting = shift;
+    if ( defined $setting ) {
+        $self->{_nostore_nonkey_data} = $setting ? 1 : 0;
+    }
+    return $self->{_nostore_nonkey_data};
 }
 
 1;
@@ -400,7 +402,7 @@ No known bugs. Newer versions of this module may be available from CPAN.
 If the bug is in the latest version, send a report to the author.
 Patches that fix problems or add new features are welcome.
 
-http://github.com/thrig/Config-OpenSSH-Authkey
+https://github.com/thrig/Config-OpenSSH-Authkey
 
 =head1 SEE ALSO
 
@@ -413,9 +415,9 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2009-2010,2012,2015 by Jeremy Mates.
+Copyright 2009-2010,2012,2015,2019 by Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
 
 =cut

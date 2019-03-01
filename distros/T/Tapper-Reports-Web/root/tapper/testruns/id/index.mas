@@ -12,8 +12,7 @@ $precondition_string => ''
 % my $topic = $testrun->topic_name;
 
 <h3>
-  Testrun
-  <strong><% $testrun->id %></strong>:
+  Testrun <% $testrun->id %>:
   <strong><a href="/tapper/testruns/topic/<% $topic %>"><% $topic %></a></strong>
 </h3>
 
@@ -21,7 +20,7 @@ $precondition_string => ''
 
 % if (%reportlist_rgt) {
 <h4>Reports</h4>
-<& /tapper/reports/reportlist.mas, reportlist => \%reportlist_rgt &>
+<& /tapper/reports/reportlist.mas, reportlist => \%reportlist_rgt, testplan_id => $testrun->testplan_id  &>
 %}
 
     <!-- ************************************************************ -->

@@ -1,5 +1,13 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.5 2019-03-01T03:58:30Z
+
+    - Improve --view behaviour.
+
+4.10.4 2019-02-28T02:28:20Z
+
+    - sdif uses "cdif --tc" when --view option is given.
+
 4.10.3 2019-02-27T04:20:02Z
 
     - Introduce sdif --[no]command option.

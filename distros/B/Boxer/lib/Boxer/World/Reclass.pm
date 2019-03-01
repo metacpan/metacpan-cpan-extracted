@@ -13,26 +13,26 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 use autodie;
 use Carp qw<croak>;
 
 use Try::Tiny;
 
 use Moo;
-extends 'Boxer::World';
+use MooX::StrictConstructor;
 use Types::Standard qw(ArrayRef InstanceOf);
 use Boxer::World::Flat;
+extends 'Boxer::World';
 with qw(MooX::Role::Logger);
-
-use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 =head1 DESCRIPTION
 

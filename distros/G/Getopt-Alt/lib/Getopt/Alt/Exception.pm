@@ -12,7 +12,7 @@ use overload '""' => sub { shift->message };
 
 extends 'Throwable::Error';
 
-our $VERSION = version->new('0.5.1');
+our $VERSION = version->new('0.5.2');
 
 has help => (
     is  => 'rw',
@@ -37,7 +37,7 @@ Getopt::Alt::Exception - I have forgotten where I was going with this
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt::Exception version 0.5.1.
+This documentation refers to Getopt::Alt::Exception version 0.5.2.
 
 
 =head1 SYNOPSIS

@@ -1,1 +1,4 @@
 See the git repository.
+
+ * 1.06 - BSD license, update to support ecdsa-sha2-nistp256 ssh-ed25519
+   public key types

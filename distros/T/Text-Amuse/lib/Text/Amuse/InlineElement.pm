@@ -7,7 +7,7 @@ use utf8;
 
 Text::Amuse::InlineElement - Helper for Text::Amuse
 
-=head1 METHODS/ACCESSORS
+=head1 METHODS
 
 Everything here is pretty much internal only, underdocumented and
 subject to change.
@@ -38,8 +38,6 @@ The name of the tag
 =item fmt
 
 C<ltx> or C<html>
-
-=back
 
 =cut
 
@@ -83,7 +81,7 @@ sub string {
     shift->{string};
 }
 
-=head2 lang
+=item lang
 
 The language code.
 
@@ -93,7 +91,7 @@ sub lang {
     shift->{lang};
 }
 
-=head2 append($element)
+=item append($element)
 
 Append the provided string to the self's one and update the
 last_position.
@@ -117,7 +115,7 @@ sub fmt {
     shift->{fmt};
 }
 
-=head2 stringify
+=item stringify
 
 Main method to get the desired output from the element.
 
@@ -391,7 +389,7 @@ sub _html_french_punctuation {
 }
 
 
-=head2 escape_all_html($string)
+=item escape_all_html($string)
 
 HTML escape
 
@@ -407,7 +405,7 @@ sub escape_all_html {
     return $string;
 }
 
-=head2 escape_tex
+=item escape_tex
 
 Escape the string for LaTeX output
 
@@ -431,11 +429,11 @@ sub escape_tex {
 }
 
 
-=head2 is_latex
+=item is_latex
 
 Shortcut to check if the format is latex
 
-=head2 is_html
+=item is_html
 
 Shortcut to check if the format is html
 
@@ -449,7 +447,7 @@ sub is_html {
     shift->fmt eq 'html';
 }
 
-=head2 unroll
+=item unroll
 
 Convert the close_inline open_inline symbols (= and *) into elements
 an open/close type and the tag properly set.
@@ -477,7 +475,7 @@ sub unroll {
     return map { __PACKAGE__->new(%$_, string => '', fmt => $self->fmt) } @new;
 }
 
-=head2 verbatim_string($string)
+=item verbatim_string($string)
 
 Escape the string according to the element format
 
@@ -495,5 +493,9 @@ sub verbatim_string {
         die "Not reached";
     }
 }
+
+=back
+
+=cut
 
 1;

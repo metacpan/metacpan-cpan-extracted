@@ -1,4 +1,4 @@
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is part of Graph-Maker-Other.
 
@@ -16,6 +16,15 @@ You should have received a copy of the GNU General Public License
 along with Graph-Maker-Other.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
+Version 13, February 2019
+    - new Catalans, ExcessConfigurations
+
+Version 12, January 2019
+    - new BulgarianSolitaire
+
+Version 11, August 2018
+    - new Circulant
 
 Version 10, December 2017
     - fix QuartetTree perl-5.10-ism

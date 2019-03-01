@@ -23,9 +23,13 @@ FretboardDiagram
 Gene
 Music
 PNG
+Pawe
 TTF
 fretboard
 gene
+horiz
 lib
 png
+showname
 th
+Świderski

@@ -10,12 +10,7 @@
     }
 </style>
 
-% if ($c->flash->{error_msg}) {
-<pre>
-
-<strong>Error:</strong> <% $c->flash->{error_msg} %>
-</pre>
-% }
+<& /tapper/message.mas &>
 
 %   if ( $c->stash->{view_pager} ) {
 

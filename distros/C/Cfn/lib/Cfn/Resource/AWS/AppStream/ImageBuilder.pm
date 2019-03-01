@@ -1,4 +1,4 @@
-# AWS::AppStream::ImageBuilder generated from spec 2.15.0
+# AWS::AppStream::ImageBuilder generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppStream::ImageBuilder',
@@ -34,8 +34,8 @@ package Cfn::Resource::Properties::AWS::AppStream::ImageBuilder::VpcConfigValue 
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has SecurityGroupIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SubnetIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecurityGroupIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SubnetIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::AppStream::ImageBuilder::DomainJoinInfo',

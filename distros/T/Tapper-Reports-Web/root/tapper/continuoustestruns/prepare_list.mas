@@ -48,26 +48,26 @@
                 <a title="Click to show details" href="/tapper/testruns/id/<% $hr_testrun->{testrun_id} %>">tr<% $hr_testrun->{testrun_id} %></a>
             </td>
             <td><% $hr_testrun->{testrun_date} %></td>
-            <td><% $hr_testrun->{topic_name} %></td>
+            <td><a class="ctlink" title="Show testruns with this name" href="/tapper/testruns/topic/<% $hr_testrun->{topic_name} %>"><% $hr_testrun->{topic_name} %></a></td>
             <td><% $hr_testrun->{queue_name} %></td>
-            <td><% join '<br />', split /,/, $hr_testrun->{hosts} | n %></td>
+            <td><a class="ctlink" title="Show hosts with this name" href="/tapper/testruns/host/<% $hr_testrun->{hosts} %>"><% join '<br />', split /,/, $hr_testrun->{hosts} | n %></a></td>
             <td><% $hr_testrun->{owner} %></td>
             <td>
 %               if ( $hr_testrun->{status} eq 'prepare' ) {
-                    <img src="/tapper/static/images/continue.small.png" class="continue" title="continue continuous testing" />
+                    <a class="ctlink" title="Show remaining running testruns with this name" href="/tapper/testruns/topic/<% $hr_testrun->{topic_name} %>/state/running">S</a> <img src="/tapper/static/images/continue.small.png" class="continue" title="SLEEPING - click to run" />
 %               }
 %               else {
-                    <img src="/tapper/static/images/pause.small.png" class="pause" title="pause continuous testing" />
+                    <a class="ctlink" title="Show running testruns with this name" href="/tapper/testruns/topic/<% $hr_testrun->{topic_name} %>/state/running">R</a> <img src="/tapper/static/images/pause.small.png" class="pause" title="RUNNING - click to sleep" />
 %               }
             </td>
             <td>
-                <img src="/tapper/static/images/edit.small.png" class="edit" title="edit continuous testrun" />
+                <img src="/tapper/static/images/edit.small.png" class="edit" title="edit" />
             </td>
             <td>
-                <img src="/tapper/static/images/clone.small.png" class="clone" title="clone continuous testrun" />
+                <img src="/tapper/static/images/clone.small.png" class="clone" title="clone" />
             </td>
             <td>
-                <img src="/tapper/static/images/delete.small.png" class="cancel" title="cancel continuous testrun" />
+                <img src="/tapper/static/images/delete.small.png" class="cancel" title="delete" />
             </td>
         </tr>
 %   }
@@ -107,8 +107,7 @@
             })
             .tablesorter({
                 headers : {
-                    0 : { sorter : 'testrunid' },
-                    6 : { sorter : false }
+                    0 : { sorter : 'testrunid' }
                 }
             })
         ;

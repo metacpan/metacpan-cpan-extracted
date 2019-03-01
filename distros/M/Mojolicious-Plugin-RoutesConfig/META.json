@@ -4,13 +4,13 @@
       "ÐÑÐ°ÑÐ¸Ð¼Ð¸Ñ ÐÐµÑÐ¾Ð² (berov@cpan.org)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-RoutesConfig",
    "no_index" : {
@@ -33,7 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "7.70",
+            "Mojolicious" : "8.13",
+            "Mojolicious::Plugin::PODViewer" : "0.004",
             "perl" : "5.020000"
          }
       }
@@ -53,6 +54,6 @@
          "web" : "https://github.com/kberov/Mojolicious-Plugin-RoutesConfig"
       }
    },
-   "version" : 0.05,
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : 0.06,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

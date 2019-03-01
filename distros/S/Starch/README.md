@@ -304,15 +304,15 @@ Please submit bugs and feature requests to the Starch GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch/issues](https://github.com/bluefeet/Starch/issues)
 
-# AUTHOR
+# AUTHORS
 
 Aran Clary Deltac <bluefeet@gmail.com>
 
-# CONTRIBUTORS
+Arthur Axel "fREW" Schmidt &lt;frioux+cpan@gmail.com>
 
-- Arthur Axel "fREW" Schmidt &lt;frioux+cpan@gmail.com>
-- Jonathan Scott Duff <duff@pobox.com>
-- Ismail Kerim <ismail.kerim@assurant.com>
+Jonathan Scott Duff <duff@pobox.com>
+
+Ismail Kerim <ismail.kerim@assurant.com>
 
 # ACKNOWLEDGEMENTS
 

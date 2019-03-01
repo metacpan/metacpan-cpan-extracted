@@ -1,4 +1,4 @@
-# AWS::EC2::VPNGatewayRoutePropagation generated from spec 1.11.0
+# AWS::EC2::VPNGatewayRoutePropagation generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::VPNGatewayRoutePropagation',
@@ -21,7 +21,7 @@ package Cfn::Resource::Properties::AWS::EC2::VPNGatewayRoutePropagation {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has RouteTableIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RouteTableIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VpnGatewayId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

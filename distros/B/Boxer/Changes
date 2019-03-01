@@ -7,7 +7,39 @@ Home page:    <https://wiki.debian.org/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v1.3.0	2019-03-01
+
+ [ Documentation ]
+ - Add TODO about unit testing code coverage.
+ - Reference inspirational projects and competing tools.
+ - Rephrase Boxer::Reclass pod DESCRIPTION.
+ - Update/fix references to upstream git.
+
+ [ Test Suite ]
+ - Avoid declaring test count where tests are optionally skipped.
+ - Check path prefix handling in serialize.t.
+ - Process node parl-greens (not lxp5) in serialize.t, to expose different
+   features.
+ - Update spelling test, adding a few more words.
+ - Use Test::CleanNamespaces in testsuite.
+ - Use Test::Fatal (replacing Test::Exception).
+
+ [ Other ]
+ - Added: Add subcommand bootstrap.
+ - Added: Fix implement boxer-compose option --format.
+ - Handle serialization details in Boxer::World::Flat (not
+   Boxer::Task::Serialize).
+ - Limit Type::Utils import: Apparently unneeded.
+ - Pass variables when file template is processed (not when instantiated).
+ - Treat namespace::autoclean as a pragma (one of its benefits over
+   namespace::clean).
+ - Use MooX::StrictConstructor.
+
 v1.2.0	2019-02-27
+
+ [ BACK COMPAT ]
+ - Update skeleton files: Drop workaround unneeded since Jessie (see
+   bug#751367).
 
  [ Bug Fixes ]
  - Fix compose option --help output to list current dir as default for
@@ -20,14 +52,12 @@ v1.2.0	2019-02-27
  - Update spelling test, adding a few more words.
 
  [ Other ]
- - Provide additional variables to skeleton templates, containing
+ - Added: Provide additional variables to skeleton templates, containing
    comma-separated lists: pkgs pkgs_avoid pkgs_auto.
- - Provide additional variables to skeleton templates, containing plain and
-   perl-escaped shell code: tweaks tweaks_perl.
- - Update skeleton files: Drop workaround unneeded since Jessie (see
-   bug#751367).
+ - Added: Provide additional variables to skeleton templates, containing
+   plain and perl-escaped shell code: tweaks tweaks_perl.
  - Update skeleton files: Use apt (not apt-get) in shell script.
- - Use buster as default suite.
+ - Updated: Use buster as default suite.
 
 v1.1.11	2018-10-04
 
@@ -113,7 +143,7 @@ v1.1.5	2017-01-24
    pragma/non-Moo/Moo/cleanup and (roughly) by specificity.
  - Drop unused code in Boxer::CLI.
  - Modernize to use perl v5.14, utf8, and strictures 2.
- - Stop handle __PKGAUTOLIST__ in data (deprecated since 0.004).
+ - Removed: Stop handle __PKGAUTOLIST__ in data (deprecated since 0.004).
  - Stop skip undefined args in Task::Serialize (needed only for
    Task::Classify).
  - Stop use MooX::Types::MooseLike::Base.
@@ -157,8 +187,8 @@ v1.1.0	2015-11-29
  - Added: Pass suite to skeleton files, and set as variable in shellscript
    and preseed file late_script.
  - Fix drop all hardcoded data from default skeleton files.
- - Support empty packagelist.
  - Tidy Boxer::Types.
+ - Updated: Support empty packagelist.
 
 v1.0.0	2015-11-21
 
@@ -170,12 +200,14 @@ v1.0.0	2015-11-21
  [ Documentation ]
  - Rewrite INSTALL to use Debian boxer package.
 
+ [ Packaging ]
+ - Release as stable, using semantic versioning.
+
  [ Other ]
  - Added: Implement --nonfree option for subcommand compose.
  - Croak (not die) on broken input.
  - Fixate suite in preseed file (resolved package list is suite-specific).
  - Improve coercion and error messages for input paths.
- - Release as stable, using semantic versioning.
  - Sync example data with boxer-data.
  - Tidy whitespace.
  - Use MooX::Role::Logger (not MooX::Log::Any) and
@@ -189,16 +221,16 @@ v1.0.0	2015-11-21
 
  [ Documentation ]
  - Add some TODOs.
-
- [ Other ]
- - Adjust example class set: Use reclass 1.4 ABI, and drop broken Printing
-   class.
  - Adjust help output of Compose command to describe correct default
    locations.
- - Deprecate expansion of __PKGAUTOLIST__ in tweaklist.
+
+ [ Other ]
  - Move initial shell code for tweaklist out to skeleton file.
+ - Removed: Deprecate expansion of __PKGAUTOLIST__ in tweaklist.
  - Sort doc sections by explicit list (and alphabetically only as
    fallback).
+ - Updated: Adjust example class set: Use reclass 1.4 ABI, and drop broken
+   Printing class.
  - Use Template::Tiny.
 
 0.003	2014-10-19
@@ -214,8 +246,8 @@ v1.0.0	2015-11-21
    Type::Tiny).
 
  [ Other ]
- - Add --suite option (and drop it as 2nd argument) in compose command,
-   allowing multiple nodes instead.
+ - Added: Add --suite option (and drop it as 2nd argument) in compose
+   command, allowing multiple nodes instead.
  - Added: Handle nodes, classes and skeleton files with separate options in
    compose command.
  - Added: Include builting skeleton files, and ship with example classes

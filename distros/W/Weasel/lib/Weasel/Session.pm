@@ -5,7 +5,7 @@ Weasel::Session - Connection to an encapsulated test driver
 
 =head1 VERSION
 
-0.08
+0.10
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ use Module::Runtime qw/ use_module /;;
 use Weasel::FindExpanders qw/ expand_finder_pattern /;
 use Weasel::WidgetHandlers qw| best_match_handler_class |;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 
 =head1 ATTRIBUTES
@@ -329,6 +329,53 @@ sub get_text {
         'get_text', 'element text');
 }
 
+=item set_attribute($element_id, $attribute_name, $value)
+
+Changes the value of the attribute named by C<$attribute_name> to C<$value>
+for the element identified by C<$element_id>.
+
+=cut
+
+sub set_attribute {
+    my ($self, $element, $attribute, $value) = @_;
+
+    return $self->_logged(
+        sub {
+            return $self->driver->set_attribute($element->_id,
+                                                $attribute, $value);
+        },
+        'set_attribute', qq{Setting attribute $attribute to '$value'});
+}
+
+=item get_selected($element_id)
+
+=cut
+
+sub get_selected {
+    my ($self, $element) = @_;
+
+    return $self->_logged(
+        sub {
+            return $self->driver->get_selected($element->_id);
+        },
+        'get_selected', 'Is element selected?');
+}
+
+=item set_selected($element_id, $value)
+
+=cut
+
+sub set_selected {
+    my ($self, $element, $value) = @_;
+
+    return $self->_logged(
+        sub {
+            return $self->driver->get_selected($element->_id, $value);
+        },
+        'set_selected', qq{Setting 'selected' property: $value});
+}
+
+
 =item is_displayed($element)
 
 Returns a boolean value indicating if the element identified by
@@ -423,12 +470,43 @@ session-global settings.
 
 =cut
 
+sub _wrap_callback {
+    my ($self, $cb) = @_;
+
+    if (! $self->log_hook) {
+        return $cb;
+    }
+    else {
+        my $count = 0;
+        return sub {
+            if ($count) {
+                my $log_hook = $self->log_hook;
+                local $self->{log_hook} = undef; # suppress logging
+                my $rv = $cb->();
+                if ($rv) {
+                    # $self->log_hook is still bound to 'undef'
+                    $log_hook->('post_wait_for',
+                                "success after $count retries");
+                }
+                $count++;
+                return $rv;
+            }
+            else {
+                $count++;
+                $self->log_hook->('pre_wait_for',
+                                  'checking wait_for conditions');
+                return $cb->();
+            }
+        };
+    }
+}
+
 sub wait_for {
     my ($self, $callback, %args) = @_;
 
     return $self->_logged(
         sub {
-            $self->driver->wait_for($callback,
+            $self->driver->wait_for($self->_wrap_callback($callback),
                                     retry_timeout => $self->retry_timeout,
                                     poll_delay => $self->poll_delay,
                                     %args);
@@ -481,7 +559,7 @@ C<$log_hook> for lazy evaluation.
 sub _unlogged {
     my ($self, $func) = @_;
 
-    local $self->{log_hook} = undef; ## no critic (Variables::ProhibitLocalVars)
+    local $self->{log_hook} = undef;
     $func->();
 
     return;

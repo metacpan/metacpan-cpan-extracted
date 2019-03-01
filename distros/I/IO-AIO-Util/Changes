@@ -1,9 +1,15 @@
 Revision history for IO-AIO-Util
 
+0.11  Thu Feb 28 13:12:01 UTC 2019
+    - Fixed test on Windows.
+
+0.10  Thu Feb 28 01:40:03 UTC 2019
+    - Reset permissions of temp directory to ensure it is cleaned. (GH #1)
+
 0.09  Wed Sep 16 06:39:23 UTC 2009
-    - Stopped creating parent and child directories asynchronously. The resulting
-      race condition was responsible for the sporadic "not found" errors that the
-      previous update intentionally ignored.
+    - Stopped creating parent and child directories asynchronously. The
+      resulting race condition was responsible for the sporadic "not found"
+      errors that the previous update intentionally ignored.
 
 0.08  Tue Sep 15 07:07:01 UTC 2009
     - Updated behaviour to match that of `mkdir -p` from GNU coreutils.

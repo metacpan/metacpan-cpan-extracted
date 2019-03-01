@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -499,12 +499,12 @@ use MyGraphs;
   foreach my $v (2 .. 5) {
     my $s = $wheel->copy;
     $s->delete_vertex($v);
-    my $iso = Graph_is_isomorphic($s,$kite);
+    my $iso = MyGraphs::Graph_is_isomorphic($s,$kite);
     print "wheel->kite $iso\n";
     $iso or die;
   }
 
-  hog_searches_html($octahedral, $wheel, $kite, $complete);
+  MyGraphs::hog_searches_html($octahedral, $wheel, $kite, $complete);
   exit 0;
 
   sub Graph_make_octahedral {
@@ -552,7 +552,7 @@ use MyGraphs;
        });
     next unless $found;
 
-    Graph_view($graph, synchronous=>1);
+    MyGraphs::Graph_view($graph, synchronous=>1);
   }
   exit 0;
 }

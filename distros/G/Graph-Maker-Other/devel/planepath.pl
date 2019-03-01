@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -30,32 +30,6 @@ use MyGraphs;
 
 
 {
-  # TriangularHypot hexagon of hexagons
-  # N=1..24 2x2 hog not
-  # N=1..54 3x3
-  require Graph::Maker::PlanePath;
-  my $graph = Graph::Maker->new
-    ('planepath',
-     undirected=>1,
-     n_hi => 24,
-     n_hi => 54,
-     type => 'neighbours6',
-     planepath => 'TriangularHypot,points=hex_centred',
-     vertex_name_type => 'xy',
-    );
-  MyGraphs::Graph_view($graph);
-  MyGraphs::hog_searches_html($graph);
-
-  require Math::PlanePath::TriangularHypot;
-  my $path = Math::PlanePath::TriangularHypot->new (points=>'hex_centred');
-  foreach my $n (1 .. 54) {
-    my ($x,$y) = $path->n_to_xy($n);
-    print $x**2 + 3*$y**2, "\n";
-  }
-  exit 0;
-}
-
-{
   # hog trees and paths
 
   # state machines
@@ -68,7 +42,7 @@ use MyGraphs;
   # Terdragon Eboth -- not
 
   my @graphs;
-  for (my $k = 2; @graphs < 6; $k++) {
+  for (my $k = 2; @graphs <= 6; $k++) {
     print "________________________________________________________\nk=$k\n";
     my $graph;
 
@@ -104,12 +78,21 @@ use MyGraphs;
       #        *---*
       #         \
       #      *---*
+      # AlternateTerdragon
+      #   k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=30397
+      #   k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=30399
+      #   k=4
+      #   k=5
       # CCurve k=4..5 not
       require Graph::Maker::PlanePath;
       $graph = Graph::Maker->new('planepath',
                                  undirected=>1,
                                  level=>$k,
-                                 planepath=>'AlternatePaper');
+                                 planepath=>'AlternateTerdragon');
+      $graph->set_graph_attribute('vertex_name_type_xy',1);
+      if($k==4) {
+        MyGraphs::Graph_view($graph);
+      }
     }
 
     # UlamWarburton depth=2..3 not
@@ -171,14 +154,48 @@ use MyGraphs;
     # print "delete hanging cycles " . Graph_delete_hanging_cycles($graph) . "\n";
 
     # next if $graph->vertices == 0;
-    last if $graph->vertices > 200;
+    my $num_vertices = $graph->vertices;
+    if ($num_vertices > 255) {
+      print "stop $k with $num_vertices vertices above limit 255\n";
+      last;
+    }
 
-    Graph_xy_print($graph);
+    if ($num_vertices < 100) {
+      MyGraphs::Graph_xy_print($graph);
+    }
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
+
+{
+  # TriangularHypot hexagon of hexagons
+  # N=1..24 2x2 hog not
+  # N=1..54 3x3
+  require Graph::Maker::PlanePath;
+  my $graph = Graph::Maker->new
+    ('planepath',
+     undirected=>1,
+     n_hi => 24,
+     n_hi => 54,
+     type => 'neighbours6',
+     planepath => 'TriangularHypot,points=hex_centred',
+     vertex_name_type => 'xy',
+    );
+  MyGraphs::Graph_view($graph);
+  MyGraphs::hog_searches_html($graph);
+
+  require Math::PlanePath::TriangularHypot;
+  my $path = Math::PlanePath::TriangularHypot->new (points=>'hex_centred');
+  foreach my $n (1 .. 54) {
+    my ($x,$y) = $path->n_to_xy($n);
+    print $x**2 + 3*$y**2, "\n";
+  }
+  exit 0;
+}
+
+
 
 {
   # leftist toothpicks

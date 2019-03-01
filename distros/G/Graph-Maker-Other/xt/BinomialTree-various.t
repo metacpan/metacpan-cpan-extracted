@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -45,13 +45,16 @@ plan tests => 75;
 {
   my %shown = ('N=1' => 1310,   'order=0' => 1310,
                'N=2' => 19655,  'order=1' => 19655,
+               'N=3' => 32234,
                'N=4' => 594,    'order=2' => 594,
                'N=5' => 30,
                'N=6' => 496,
                'N=7' => 714,
                'N=8' => 700,    'order=3' => 700,
-               'N=16' => 28507, 'order=4' => 28507,
-               'N=32' => 21088, 'order=5' => 21088,
+               'N=16'  => 28507, 'order=4' => 28507,
+               'N=32'  => 21088, 'order=5' => 21088,
+               'N=64'  => 33543, 'order=6' => 33543,
+               'N=128' => 33545, 'order=7' => 33545,
               );
   my $extras = 0;
   my $compared = 0;

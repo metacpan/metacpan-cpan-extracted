@@ -11,30 +11,65 @@ use File::Temp qw( tempdir );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 
-has curl_command => sub { defined $ENV{CURL} ? which($ENV{CURL}) : which('curl') };
+sub curl_command
+{
+  defined $ENV{CURL} ? scalar which($ENV{CURL}) : scalar which('curl');
+}
+
 has ssl => 0;
 has _see_headers => 0;
+has '+url' => '';
+
+# when bootstrapping we have to specify this plugin as a prereq
+# 1 is the default so that when this plugin is used directly
+# you also get the prereq
+has bootstrap_ssl => 1;
+
+
+sub protocol_ok
+{
+  my($class, $protocol) = @_;
+  my $curl = $class->curl_command;
+  return unless defined $curl;
+  my($out, $err, $exit) = capture {
+    system $curl, '--version';
+  };
+  foreach my $line (split /\n/, $out)
+  {
+    if($line =~ /^Protocols:\s*(.*)\s*$/)
+    {
+      my %proto = map { $_ => 1 } split /\s+/, $1;
+      return $proto{$protocol} if $proto{$protocol};
+    }
+  }
+  return;
+}
 
 sub init
 {
   my($self, $meta) = @_;
 
-  $meta->add_requires('configure', 'Alien::Build::Plugin::Fetch::CurlCommand' => '1.19');
+  $meta->prop->{start_url} ||= $self->url;
+  $self->url($meta->prop->{start_url});
+  $self->url || Carp::croak('url is a required property');
+
+  $meta->add_requires('configure', 'Alien::Build::Plugin::Fetch::CurlCommand' => '1.19')
+    if $self->bootstrap_ssl;
 
   $meta->register_hook(
     fetch => sub {
       my($build, $url) = @_;
-      $url ||= $meta->prop->{start_url};
+      $url ||= $self->url;
 
       my($scheme) = $url =~ /^([a-z0-9]+):/i;
-      
+
       if($scheme =~ /^https?$/)
       {
         local $CWD = tempdir( CLEANUP => 1 );
-      
+
         path('writeout')->spew(
           join("\\n",
             "ab-filename     :%{filename_effective}",
@@ -42,17 +77,17 @@ sub init
             "ab-url          :%{url_effective}",
           ),
         );
-      
+
         my @command = (
           $self->curl_command,
           '-L', '-f', -o => 'content',
           -w => '@writeout',
         );
-      
+
         push @command, -D => 'head' if $self->_see_headers;
-      
+
         push @command, $url;
-      
+
         my($stdout, $stderr) = $self->_execute($build, @command);
 
         my %h = map { my($k,$v) = m/^ab-(.*?)\s*:(.*)$/; $k => $v } split /\n/, $stdout;
@@ -65,7 +100,7 @@ sub init
         {
           $h{filename} = 'index.html';
         }
-        
+
         rename 'content', $h{filename};
 
         if(-e 'head')
@@ -73,7 +108,7 @@ sub init
           $build->log(" ~ $_ => $h{$_}") for sort keys %h;
           $build->log(" header: $_") for path('headers')->lines;
         }
-      
+
         my($type) = split ';', $h{content_type};
 
         if($type eq 'text/html')
@@ -125,7 +160,7 @@ sub init
 #            };
 #          }
 #        }
-#        
+#
 #        {
 #          my($stdout, $stderr) = eval { $self->_execute($build, $self->curl_command, -l => "$url/") };
 #          if($@ eq '')
@@ -148,11 +183,11 @@ sub init
       {
         die "scheme $scheme is not supported by the Fetch::CurlCommand plugin";
       }
-      
+
     },
   ) if $self->curl_command;
-  
-  $self;  
+
+  $self;
 }
 
 sub _execute
@@ -186,7 +221,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.55
+version 1.60
 
 =head1 SYNOPSIS
 
@@ -199,14 +234,14 @@ version 1.55
 
 =head1 DESCRIPTION
 
-B<WARNING>: This plugin is somewhat experimental at this time.
-
 This plugin provides a fetch based on the C<curl> command.  It works with other fetch
 plugins (that is, the first one which succeeds will be used).  Most of the time the best plugin
 to use will be L<Alien::Build::Plugin::Download::Negotiate>, but for some SSL bootstrapping
 it may be desirable to try C<curl> first.
 
 Protocols supported: C<http>, C<https>
+
+C<https> support requires that curl was built with SSL support.
 
 =head1 PROPERTIES
 
@@ -217,6 +252,13 @@ The full path to the C<curl> command.  The default is usually correct.
 =head2 ssl
 
 Ignored by this plugin.  Provided for compatibility with some other fetch plugins.
+
+=head1 METHODS
+
+=head2 protocol_ok
+
+ my $bool = $plugin->protocol_ok($protocol);
+ my $bool = Alien::Build::Plugin::Fetch::CurlCommand->protocol_ok($protocol);
 
 =head1 SEE ALSO
 

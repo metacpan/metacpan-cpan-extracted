@@ -1,6 +1,12 @@
 Revision history for Types::Mojo
 ================================
 
+0.05  2019-02-28 15:13:00
+
+    * Fix parameter of MojoCollection (thanks to NGEFreak)
+    * removed unnecessary dependencies (thanks to NGEFreak)
+    * Fixed tests
+
 0.04  2019-02-12 07:47:00
 
     * remove doubled class_type definition

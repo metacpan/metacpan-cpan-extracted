@@ -1,7 +1,7 @@
 package Starch::Plugin::RenewExpiration;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Moo;
 use namespace::clean;
@@ -70,7 +70,7 @@ Defaults to C<0.0> which means there will be no variance.
 
 =head1 AUTHORS AND LICENSE
 
-See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+See L<Starch/AUTHORS> and L<Starch/LICENSE>.
 
 =cut
 

@@ -1,5 +1,5 @@
 package Date::Manip::DM5abbrevs;
-# Copyright (c) 2003-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 2003-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -32,7 +32,7 @@ use strict;
 use warnings;
 
 our($VERSION);
-$VERSION='6.75';
+$VERSION='6.76';
 
 END {
    my $tmp;
@@ -117,6 +117,7 @@ $Date::Manip::DM5::Abbrevs = join(' ',qw(
       ewt    -0400
       f      -0600
       g      -0700
+      gdt    +1100
       gmt    +0000
       gmt+1  +0100
       gmt+10 +1000
@@ -287,6 +288,7 @@ The following timezones are defined:
       FWT    +0100
       G      -0700
       GB     +0100
+      GDT    +1100
       GMT    +0000
       GMT+1  +0100
       GMT+10 +1000

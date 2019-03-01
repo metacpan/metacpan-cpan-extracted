@@ -85,8 +85,8 @@ sub get_dll_file_runtime {
   
   my $dll_rel_file = SPVM::Builder::Util::convert_package_name_to_dll_category_rel_file($package_name, $self->category);
   my $build_dir = $self->{build_dir};
-  my $output_dir = "$build_dir/work/lib";
-  my $dll_file = "$output_dir/$dll_rel_file";
+  my $lib_dir = "$build_dir/work/lib";
+  my $dll_file = "$lib_dir/$dll_rel_file";
   
   return $dll_file;
 }
@@ -155,20 +155,14 @@ sub compile {
   }
   
   # Input directory
-  my $input_dir = $opt->{input_dir};
+  my $src_dir = $opt->{src_dir};
 
   # Temporary directory
-  my $tmp_dir = $opt->{tmp_dir};
-  unless (defined $tmp_dir && -d $tmp_dir) {
+  my $object_dir = $opt->{object_dir};
+  unless (defined $object_dir && -d $object_dir) {
     confess "Temporary directory must be specified for " . $self->category . " build";
   }
   
-  # Output directory
-  my $output_dir = $opt->{output_dir};
-  unless (defined $output_dir && -d $output_dir) {
-    confess "Output directory must be specified for " . $self->category . " build";
-  }
-
   # Quiet output
   my $quiet = $self->quiet;
   
@@ -176,7 +170,7 @@ sub compile {
  
   my $package_rel_file = SPVM::Builder::Util::convert_package_name_to_rel_file($package_name);
   my $package_rel_dir = SPVM::Builder::Util::convert_package_name_to_rel_dir($package_name);
-  my $work_object_dir = "$tmp_dir/$package_rel_dir";
+  my $work_object_dir = "$object_dir/$package_rel_dir";
   mkpath $work_object_dir;
   
   # Package base name
@@ -185,7 +179,7 @@ sub compile {
 
   # Config file
   my $config_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'config');
-  my $config_file = "$input_dir/$config_rel_file";
+  my $config_file = "$src_dir/$config_rel_file";
   
   # Config
   my $build_config;
@@ -204,7 +198,7 @@ sub compile {
 
   # Source file
   my $src_rel_file_no_ext = SPVM::Builder::Util::convert_package_name_to_category_rel_file_without_ext($package_name, $category);
-  my $src_file_no_ext = "$input_dir/$src_rel_file_no_ext";
+  my $src_file_no_ext = "$src_dir/$src_rel_file_no_ext";
   my @available_exts = qw(.c .C .cpp .i .s .cxx .cc);
   my @src_files;
   for my $ext (@available_exts) {
@@ -236,7 +230,7 @@ sub compile {
   
   # Object file
   my $object_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'o');
-  my $object_file = "$tmp_dir/$object_rel_file";
+  my $object_file = "$object_dir/$object_rel_file";
 
   # Do compile. This is same as make command
   my $do_compile;
@@ -279,23 +273,23 @@ sub link {
   }
   
   # Input directory
-  my $input_dir = $opt->{input_dir};
+  my $src_dir = $opt->{src_dir};
 
   # Work temporary directory
-  my $tmp_dir = $opt->{tmp_dir};
-  unless (defined $tmp_dir && -d $tmp_dir) {
+  my $object_dir = $opt->{object_dir};
+  unless (defined $object_dir && -d $object_dir) {
     confess "Temporary directory must be specified for " . $self->category . " build";
   }
   
   # Output directory
-  my $output_dir = $opt->{output_dir};
-  unless (defined $output_dir && -d $output_dir) {
+  my $lib_dir = $opt->{lib_dir};
+  unless (defined $lib_dir && -d $lib_dir) {
     confess "Output directory must be specified for " . $self->category . " build";
   }
 
   # shared object file
   my $dll_rel_file = SPVM::Builder::Util::convert_package_name_to_dll_category_rel_file($package_name, $self->category);
-  my $dll_file = "$output_dir/$dll_rel_file";
+  my $dll_file = "$lib_dir/$dll_rel_file";
 
   # Quiet output
   my $quiet = $self->quiet;
@@ -303,7 +297,7 @@ sub link {
   # Create temporary package directory
   my $tmp_package_rel_file = SPVM::Builder::Util::convert_package_name_to_rel_file($package_name);
   my $tmp_package_rel_dir = SPVM::Builder::Util::convert_package_name_to_rel_dir($package_name);
-  my $tmp_package_dir = "$tmp_dir/$tmp_package_rel_dir";
+  my $tmp_package_dir = "$object_dir/$tmp_package_rel_dir";
   mkpath $tmp_package_dir;
   
   # Category
@@ -311,7 +305,7 @@ sub link {
 
   # Config file
   my $config_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'config');
-  my $config_file = "$input_dir/$config_rel_file";
+  my $config_file = "$src_dir/$config_rel_file";
   
   # Config
   my $build_config;
@@ -363,7 +357,7 @@ sub link {
 
   # Create shared object blib directory
   my $package_rel_file_without_ext = SPVM::Builder::Util::convert_package_name_to_rel_file_without_ext($package_name);
-  my $dll_dir = "$output_dir/$package_rel_file_without_ext";
+  my $dll_dir = "$lib_dir/$package_rel_file_without_ext";
   mkpath $dll_dir;
   
   # Move shared objectrary file to blib directory
@@ -387,26 +381,29 @@ sub get_dll_file_dist {
 sub build_dll_precompile_runtime {
   my ($self, $package_name, $sub_names) = @_;
 
-  # Output directory
+  # Build directory
   my $build_dir = $self->{build_dir};
   unless (defined $build_dir && -d $build_dir) {
     confess "SPVM build directory must be specified for runtime " . $self->category . " build";
   }
   
-  my $tmp_dir = "$build_dir/work/tmp";
-  mkpath $tmp_dir;
-  my $input_dir = "$build_dir/work/src";
-  mkpath $input_dir;
-  my $output_dir = "$build_dir/work/lib";
-  mkpath $output_dir;
+  # Object directory
+  my $object_dir = "$build_dir/work/object";
+  mkpath $object_dir;
+  
+  # Source directory
+  my $src_dir = "$build_dir/work/src";
+  mkpath $src_dir;
+  
+  # Lib directory
+  my $lib_dir = "$build_dir/work/lib";
+  mkpath $lib_dir;
   
   $self->create_source_precompile(
     $package_name,
     $sub_names,
     {
-      input_dir => $input_dir,
-      tmp_dir => $tmp_dir,
-      output_dir => $tmp_dir,
+      src_dir => $src_dir,
     }
   );
   
@@ -414,9 +411,9 @@ sub build_dll_precompile_runtime {
     $package_name,
     $sub_names,
     {
-      input_dir => $tmp_dir,
-      tmp_dir => $tmp_dir,
-      output_dir => $output_dir,
+      src_dir => $src_dir,
+      object_dir => $object_dir,
+      lib_dir => $lib_dir,
     }
   );
 }
@@ -425,7 +422,7 @@ sub build_dll_native_runtime {
   my ($self, $package_name, $sub_names) = @_;
   
   my $module_file = $self->builder->get_module_file($package_name);
-  my $input_dir = SPVM::Builder::Util::remove_package_part_from_file($module_file, $package_name);
+  my $src_dir = SPVM::Builder::Util::remove_package_part_from_file($module_file, $package_name);
 
   # Build directory
   my $build_dir = $self->{build_dir};
@@ -433,19 +430,19 @@ sub build_dll_native_runtime {
     confess "SPVM build directory must be specified for runtime " . $self->category . " build";
   }
   
-  my $tmp_dir = "$build_dir/work/tmp";
-  mkpath $tmp_dir;
+  my $object_dir = "$build_dir/work/object";
+  mkpath $object_dir;
   
-  my $output_dir = "$build_dir/work/lib";
-  mkpath $output_dir;
+  my $lib_dir = "$build_dir/work/lib";
+  mkpath $lib_dir;
   
   $self->build_dll(
     $package_name,
     $sub_names,
     {
-      input_dir => $input_dir,
-      tmp_dir => $tmp_dir,
-      output_dir => $output_dir,
+      src_dir => $src_dir,
+      object_dir => $object_dir,
+      lib_dir => $lib_dir,
     }
   );
 }
@@ -453,35 +450,25 @@ sub build_dll_native_runtime {
 sub build_dll_precompile_dist {
   my ($self, $package_name, $sub_names) = @_;
   
-  my $input_dir = 'lib';
+  my $object_dir = "spvm_build/work/object";
+  mkpath $object_dir;
+  
+  my $src_dir = "spvm_build/work/src";
+  mkpath $src_dir;
 
-  my $tmp_dir = "spvm_build/work/tmp";
-  mkpath $tmp_dir;
-
-  my $output_dir = 'blib/lib';
+  my $lib_dir = 'blib/lib';
   
   my $category = $self->category;
   
   my $module_base_name = $package_name;
   $module_base_name =~ s/^.+:://;
-  my $config_file = "$input_dir/$module_base_name.config";
+  my $config_file = "$src_dir/$module_base_name.config";
 
   $self->create_source_precompile(
     $package_name,
     $sub_names,
     {
-      input_dir => $input_dir,
-      tmp_dir => $tmp_dir,
-      output_dir => $tmp_dir,
-    }
-  );
-  
-  $self->copy_source_precompile_dist(
-    $package_name,
-    $sub_names,
-    {
-      input_dir => $tmp_dir,
-      output_dir => $output_dir,
+      src_dir => $src_dir,
     }
   );
   
@@ -489,9 +476,9 @@ sub build_dll_precompile_dist {
     $package_name,
     $sub_names,
     {
-      input_dir => $tmp_dir,
-      tmp_dir => $tmp_dir,
-      output_dir => $output_dir,
+      src_dir => $src_dir,
+      object_dir => $object_dir,
+      lib_dir => $lib_dir,
     }
   );
 }
@@ -499,12 +486,12 @@ sub build_dll_precompile_dist {
 sub build_dll_native_dist {
   my ($self, $package_name, $sub_names) = @_;
   
-  my $input_dir = 'lib';
+  my $src_dir = 'lib';
 
-  my $tmp_dir = "spvm_build/work/tmp";
-  mkpath $tmp_dir;
+  my $object_dir = "spvm_build/work/object";
+  mkpath $object_dir;
 
-  my $output_dir = 'blib/lib';
+  my $lib_dir = 'blib/lib';
 
   my $category = $self->category;
   
@@ -513,9 +500,9 @@ sub build_dll_native_dist {
     $package_name,
     $sub_names,
     {
-      input_dir => $input_dir,
-      tmp_dir => $tmp_dir,
-      output_dir => $output_dir,
+      src_dir => $src_dir,
+      object_dir => $object_dir,
+      lib_dir => $lib_dir,
     }
   );
 }
@@ -523,17 +510,16 @@ sub build_dll_native_dist {
 sub create_source_precompile {
   my ($self, $package_name, $sub_names, $opt) = @_;
   
-  my $tmp_dir = $opt->{tmp_dir};
-  mkpath $tmp_dir;
-  
-  my $output_dir = $opt->{output_dir};
+  my $src_dir = $opt->{src_dir};
+  mkpath $src_dir;
   
   my $category = 'precompile';
   
   my $package_rel_file_without_ext = SPVM::Builder::Util::convert_package_name_to_rel_file_without_ext($package_name);
   my $package_rel_dir = SPVM::Builder::Util::convert_package_name_to_rel_dir($package_name);
-  my $source_file = "$tmp_dir/$package_rel_file_without_ext.$category.c";
-  my $source_dir = "$tmp_dir/$package_rel_dir";
+  my $source_file = "$src_dir/$package_rel_file_without_ext.$category.c";
+  
+  my $source_dir = "$src_dir/$package_rel_dir";
   mkpath $source_dir;
 
   my $package_csource = $self->build_package_csource_precompile($package_name, $sub_names);
@@ -571,25 +557,6 @@ sub create_source_precompile {
     print $fh $package_csource;
     close $fh;
   }
-}
-
-sub copy_source_precompile_dist {
-  my ($self, $package_name, $sub_names, $opt) = @_;
-  
-  my $input_dir = $opt->{input_dir};
-
-  my $output_dir = $opt->{output_dir};
-  
-  my $category = 'precompile';
-  
-  my $package_rel_file_without_ext = SPVM::Builder::Util::convert_package_name_to_rel_file_without_ext($package_name);
-  my $input_src_file = "$input_dir/$package_rel_file_without_ext.$category.c";
-  my $output_src_file = "$output_dir/$package_rel_file_without_ext.$category.c";
-  my $output_src_dir = dirname $output_src_file;
-  mkpath $output_src_dir;
-  
-  copy $input_src_file, $output_src_file
-    or confess "Can't copy $input_src_file to $output_src_file: $!";
 }
 
 1;

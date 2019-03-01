@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPoolUser generated from spec 1.11.0
+# AWS::Cognito::UserPoolUser generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolUser',
@@ -65,7 +65,7 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPoolUser {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has DesiredDeliveryMediums => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has DesiredDeliveryMediums => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ForceAliasCreation => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has MessageAction => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has UserAttributes => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Cognito::UserPoolUser::AttributeType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

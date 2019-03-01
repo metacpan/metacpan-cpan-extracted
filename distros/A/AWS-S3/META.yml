@@ -42,5 +42,5 @@ resources:
   homepage: https://metacpan.org/module/AWS-S3
   license: http://dev.perl.org/licenses/
   repository: https://github.com/leejo/AWS-S3
-version: '0.16'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

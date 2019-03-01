@@ -3,35 +3,79 @@ abstract: 'Pluggable Perl Code Metrics System'
 author:
   - 'Dann <techmemo{at}gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  Test::LoadAllModules: '0.021'
+  Test::More: '1.302073'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Perl-Metrics-Lite
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::Metrics::Lite:
+    file: lib/Perl/Metrics/Lite.pm
+    version: '0.092'
+  Perl::Metrics::Lite::Analysis:
+    file: lib/Perl/Metrics/Lite/Analysis.pm
+    version: '0.092'
+  Perl::Metrics::Lite::Analysis::DocumentFactory:
+    file: lib/Perl/Metrics/Lite/Analysis/DocumentFactory.pm
+  Perl::Metrics::Lite::Analysis::File:
+    file: lib/Perl/Metrics/Lite/Analysis/File.pm
+    version: '0.092'
+  Perl::Metrics::Lite::Analysis::File::Plugin::Lines:
+    file: lib/Perl/Metrics/Lite/Analysis/File/Plugin/Lines.pm
+  Perl::Metrics::Lite::Analysis::File::Plugin::NumberOfMethods:
+    file: lib/Perl/Metrics/Lite/Analysis/File/Plugin/NumberOfMethods.pm
+  Perl::Metrics::Lite::Analysis::File::Plugin::Packages:
+    file: lib/Perl/Metrics/Lite/Analysis/File/Plugin/Packages.pm
+  Perl::Metrics::Lite::Analysis::Sub::Plugin::LineNumber:
+    file: lib/Perl/Metrics/Lite/Analysis/Sub/Plugin/LineNumber.pm
+  Perl::Metrics::Lite::Analysis::Sub::Plugin::Lines:
+    file: lib/Perl/Metrics/Lite/Analysis/Sub/Plugin/Lines.pm
+  Perl::Metrics::Lite::Analysis::Sub::Plugin::MccabeComplexity:
+    file: lib/Perl/Metrics/Lite/Analysis/Sub/Plugin/MccabeComplexity.pm
+  Perl::Metrics::Lite::Analysis::Util:
+    file: lib/Perl/Metrics/Lite/Analysis/Util.pm
+  Perl::Metrics::Lite::FileFinder:
+    file: lib/Perl/Metrics/Lite/FileFinder.pm
+  Perl::Metrics::Lite::Report::CheckStyle:
+    file: lib/Perl/Metrics/Lite/Report/CheckStyle.pm
+  Perl::Metrics::Lite::Report::Text:
+    file: lib/Perl/Metrics/Lite/Report/Text.pm
 requires:
-  Carp: 0
-  File::Basename: 0
-  File::Find: 1.01
-  File::Spec: 0
-  Getopt::Long: 0
-  IO::File: 1.14
-  Module::Pluggable: 5.2
-  PPI: 1.205
-  Pod::Usage: 0
-  Readonly: 1.03
-  Text::ASCIITable: 0
-  perl: '5.005'
+  Carp: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  IO::File: '1.14'
+  Module::Pluggable: '0'
+  PPI: '1.205'
+  Pod::Usage: '0'
+  Readonly: '1.03'
+  Text::ASCIITable: '0'
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
-version: '0.091'
+  bugtracker: https://github.com/dann/p5-perl-metrics-lite/issues
+  homepage: https://github.com/dann/p5-perl-metrics-lite
+  repository: git://github.com/dann/p5-perl-metrics-lite.git
+version: '0.092'
+x_contributors:
+  - 'Kato Kazuyoshi <kato.kazuyoshi@gmail.com>'
+  - 'dann <techmemo@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

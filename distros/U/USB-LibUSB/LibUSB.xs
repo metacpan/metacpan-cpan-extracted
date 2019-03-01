@@ -84,12 +84,21 @@ interface_descriptor_to_HV(pTHX_ libusb_context *ctx, const struct libusb_interf
 }
 
 static SV *
-interface_array_to_AV(pTHX_ libusb_context *ctx, const struct libusb_interface *interface)
+altsetting_array_to_AV(pTHX_ libusb_context *ctx, const struct libusb_interface *interface)
 {
     AV *rv = newAV();
     for (int i = 0; i < interface->num_altsetting; ++i)
         av_push(rv, interface_descriptor_to_HV(aTHX_ ctx, &interface->altsetting[i]));
     return newRV_noinc((SV *) rv);  
+}
+
+static SV *
+interface_array_to_AV(pTHX_ libusb_context *ctx, const struct libusb_interface *interface, int num_interfaces)
+{
+    AV *rv = newAV();
+    for (int i = 0; i < num_interfaces; ++i)
+        av_push(rv, altsetting_array_to_AV(aTHX_ ctx, &interface[i]));
+    return newRV_noinc((SV *) rv);
 }
 
 static SV *
@@ -104,7 +113,7 @@ config_descriptor_to_RV(pTHX_ libusb_context *ctx, struct libusb_config_descript
     hv_stores(rv, "iConfiguration", newSVuv(config->iConfiguration));
     hv_stores(rv, "bmAttributes", newSVuv(config->bmAttributes));
     hv_stores(rv, "MaxPower", newSVuv(config->MaxPower));
-    hv_stores(rv, "interface", interface_array_to_AV(aTHX_ ctx, config->interface));
+    hv_stores(rv, "interface", interface_array_to_AV(aTHX_ ctx, config->interface, config->bNumInterfaces));
     hv_stores(rv, "extra", newSVpvn((const char *) config->extra, config->extra_length));
     return newRV_noinc((SV *) rv);
 }

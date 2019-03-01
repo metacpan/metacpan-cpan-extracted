@@ -1,0 +1,17 @@
+#title Verse
+#lang it
+
+> Le donne, i cavallier, l’arme, gli amori,
+> le cortesie, l’audaci imprese io canto,
+>
+> che furo al tempo che passaro i Mori
+> d’Africa il mare, e in Francia nocquer tanto,
+>
+> seguendo l’ire e i giovenil furori
+> d’Agramante lor re, che si diè vanto
+>
+>
+>
+> di vendicar la morte di Troiano
+> sopra re Carlo imperator romano.
+

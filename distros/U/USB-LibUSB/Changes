@@ -1,5 +1,8 @@
 Revision history for Perl extension USB::LibUSB.
 
+0.06 2019-02-27
+    - Fix data structure of libusb_config_descriptor: Support multiple interfaces
+
 0.05 2017-09-29
     - Add driver installation docs for Windows
     - document 'last_retval' method

@@ -19,8 +19,8 @@ my $bkp = Win32::Backup::Robocopy->new( conf =>  File::Spec->catfile($tbasedir,'
 
 ok (0 == scalar $bkp->listjobs, 'zero returned in scalar context if no jobs are configured');
 
-$bkp->job(name=>'job1',src=>'x:/',cron=>'5 * * 1 *',history=>1);
-$bkp->job(name=>'job2',src=>'x:/',cron=>'3 * * 4 *',history=>1);
+$bkp->job(name=>'job1',src=>'X:/supposed/to/not/exist/for/testing',cron=>'5 * * 1 *',history=>1);
+$bkp->job(name=>'job2',src=>'X:/supposed/to/not/exist/for/testing',cron=>'3 * * 4 *',history=>1);
 
 ok( 2 == scalar $bkp->listjobs(),'correct number of elements in scalar context' );
 

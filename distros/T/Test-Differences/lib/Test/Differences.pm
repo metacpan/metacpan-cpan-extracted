@@ -318,7 +318,7 @@ if you do this.
 
 =cut
 
-our $VERSION = "0.65"; # or "0.001_001" for a dev release
+our $VERSION = "0.66"; # or "0.001_001" for a dev release
 $VERSION = eval $VERSION;
 
 use Exporter;

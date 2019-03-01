@@ -196,6 +196,7 @@ lib/alienfile.pm
 maint/Alien-Base-PkgConfig/Makefile.PL
 maint/ci-test-plugins.pl
 maint/cip-before-install
+maint/gen-test-archives.pl
 maint/gen.pl
 maint/travis-daemon
 maint/travis-dzil

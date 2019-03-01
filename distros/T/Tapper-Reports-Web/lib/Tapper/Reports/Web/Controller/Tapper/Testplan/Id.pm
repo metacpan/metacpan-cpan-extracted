@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::Testplan::Id;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Testplan::Id::VERSION = '5.0.13';
+$Tapper::Reports::Web::Controller::Tapper::Testplan::Id::VERSION = '5.0.14';
 use parent 'Tapper::Reports::Web::Controller::Base';
 
 use common::sense;
@@ -34,7 +34,7 @@ sub parse_testrun
 
         push @{$testrun{kernel}}, dpath('/preconditions/*/filename[ value =~ /linux-.*\d+.\d+/]')->match($description);
         push @{$testrun{test}},
-         map { basename($_) }
+         map { $? ? basename($_) : () }
           dpath('/preconditions/*/precondition_type[ value eq "testprogram"]/../program')->match($description);
         $testrun{shortname} = $description->{shortname};
         return \%testrun;
@@ -88,8 +88,8 @@ sub index :Path :Args(1)
         $c->stash->{instance}{plan}     = $inst_res->evaluated_testplan;
         $c->stash->{instance}{plan}     =~ s/^\n+//m;
         $c->stash->{instance}{plan}     =~ s/\n+/\n/m;
-        $c->stash->{instance}{path}     = $inst_res->path;
-        $c->stash->{instance}{overview} = $self->gen_testplan_overview($c, $c->stash->{instance}{plan});
+        #$c->stash->{instance}{path}     = $inst_res->path;
+        #$c->stash->{instance}{overview} = $self->gen_testplan_overview($c, $c->stash->{instance}{plan});
         $c->stash->{title} = "Testplan id $instance_id, ".$c->stash->{instance}{name};
         return;
 }
@@ -105,11 +105,11 @@ sub prepare_navi :Private
 
         push @{$c->stash->{navi}}, { title => 'Rerun this testplan',
                        href  => "/tapper/testplan/$id/rerun",
-                       confirm => 'Do you want to reapply this test plan?',
+                       confirm => 'Do you really want to RERUN this test plan?',
                      };
-        push @{$c->stash->{navi}}, { title => 'Delete this testplan',
-                       href  => "/tapper/testplan/$id/delete",
-                       confirm => "Do you want to delete this test plan?\nAll associated testruns will set to finished.",
+        push @{$c->stash->{navi}}, { title => 'Cancel this testplan',
+                                     href  => "/tapper/testplan/$id/cancel",
+                                     confirm => 'Do you really want to CANCEL this testplan?',
                      };
 }
 
@@ -181,7 +181,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

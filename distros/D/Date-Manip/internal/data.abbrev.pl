@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -56,6 +56,7 @@
    'FFMT'        => 'America/Martinique',
    'FMT'         => 'Atlantic/Madeira',
    'G'           => 'G',
+   'GDT'         => 'Pacific/Guam',
    'GMT'         => [ 'Etc/GMT' => 'Europe/London' ],
    'GMT+1'       => 'Etc/GMT+1',
    'GMT+10'      => 'Etc/GMT+10',

@@ -56,7 +56,8 @@ while ( my $mail = $mbox->nextmail ) {
 	my $todo = shift(@todo);
 	if (ref($todo)) {
 	    # need more data from mail
-	    $buf //= $mbox->nextdata // die "no more data from mail";
+	    $buf //= $mbox->nextdata
+		// die "need more data but no more data available in mail";
 	    (undef,@todo) = $dkim->next($buf);
 	    $buf = undef;
 	} else {
@@ -78,7 +79,7 @@ while ( my $mail = $mbox->nextmail ) {
 
     for(@{$dkim->result || []}) {
 	my $status = $_->status;
-	my $domain = $_->domain;
+	my $domain = $_->domain // 'unknown';
 	if (!defined $status) {
 	    print STDERR " unkown $domain\n";
 	} else {

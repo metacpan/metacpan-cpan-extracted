@@ -4,7 +4,7 @@ use Test::More;
 use Template::LiquidX::Tidy;
 use Template::Liquid;
 use vars qw($t1_expected $t2_expected);
-require "t/results.pl";
+require "./t/results.pl";
 
 plan tests => 2;
 

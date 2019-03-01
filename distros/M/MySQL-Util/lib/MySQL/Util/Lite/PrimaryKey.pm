@@ -37,8 +37,8 @@ has _util => (
 );
 
 method get_columns {
-	
-	return @{ $self->columns };	
+
+	return @{ $self->columns };
 }
 
 =head2 is_autoinc
@@ -52,20 +52,23 @@ Returns: Bool
 method is_autoinc {
 
 	my @cols = $self->get_columns();
-	if (@cols == 1) {
+	if ( @cols == 1 ) {
 		my $col = shift @cols;
-		if ($col->is_autoinc) {
-			return 1;	
-		}	
-	}	
-	
+		if ( $col->is_autoinc ) {
+			return 1;
+		}
+	}
+
 	return 0;
 }
 
 method _build_columns {
 
-	my $aref = $self->_util->get_constraint( name => $self->name );
-	
+	my $aref = $self->_util->get_constraint(
+		table => $self->table_name,
+		name  => $self->name
+	);
+
 	my @cols;
 	foreach my $col (@$aref) {
 		my $href = $self->_util->describe_column(

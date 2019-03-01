@@ -1,6 +1,16 @@
 ==================================================
-Changes from 2012-06-03 00:00:00 +0000 to present.
+Changes from 2014-02-28 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 0.46 at 2019-02-27 22:03:38 +0000
+-----------------------------------------
+
+  Change: 3701e98e498f344ace7d67d0294655ed469eb704
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-02-27 22:03:38 +0000
+
+    When the music stops, find a chair 
 
 -----------------------------------------
 version 0.44 at 2017-06-02 08:32:06 +0000
@@ -62,96 +72,6 @@ version 0.34 at 2014-05-11 11:03:06 +0000
 
     Moving and a-shaking 
 
------------------------------------------
-version 0.32 at 2014-02-09 23:04:04 +0000
------------------------------------------
-
-  Change: 5d3340cb7ae651d63cdb4fef65fac333770a63ae
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-02-09 23:04:04 +0000
-
-    Change of maintainers 
-
------------------------------------------
-version 0.30 at 2013-10-08 15:17:10 +0000
------------------------------------------
-
-  Change: af32d10cc4121e641677c8360ddf2c3266f16c3b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-10-08 16:17:10 +0000
-
-    A conveyor belt of contribution ... mine is the cuddly toy 
-
------------------------------------------
-version 0.28 at 2013-07-26 20:54:40 +0000
------------------------------------------
-
-  Change: 80316b96f4e1e4bbaf90d03f2cc9319b1a9d85f8
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-07-26 21:54:40 +0000
-
-    Remove some gentlemen 
-
------------------------------------------
-version 0.26 at 2013-05-23 22:04:02 +0000
------------------------------------------
-
-  Change: d59cd485cb46cca151f9bed85bef92effc1953cd
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-23 23:04:02 +0000
-
-    New blood 
-
------------------------------------------
-version 0.24 at 2013-05-04 17:37:53 +0000
------------------------------------------
-
-  Change: d36d3c1dda5abc4c8c6ef9c6ce8374f7d6c7956b
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-05-04 18:37:53 +0000
-
-    recent updates 
-
------------------------------------------
-version 0.22 at 2013-03-25 22:57:34 +0000
------------------------------------------
-
-  Change: e89f4af06b238f2f049dd8f08ecaf55e01a9c62e
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-03-25 22:57:34 +0000
-
-    Recent updates 
-
------------------------------------------
-version 0.20 at 2013-01-19 00:34:02 +0000
------------------------------------------
-
-  Change: a1dfbaa813096c3fa76b3248ab70181189410351
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2013-01-19 00:34:02 +0000
-
-    Added Dominic Hargreaves 
-
------------------------------------------
-version 0.18 at 2012-08-22 12:23:00 +0000
------------------------------------------
-
-  Change: e755477575dbfb5486b97ecb60848430699cbd0d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-08-22 13:23:00 +0000
-
-    Add two new authors 
-
------------------------------------------
-version 0.16 at 2012-06-06 22:14:59 +0000
------------------------------------------
-
-  Change: a3aacc9bd468a4ae523a1374e9a856b07fbb7973
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-06-06 23:14:59 +0000
-
-    Updated for latest dual-life authors 
-
-================================================
-Plus 7 releases after 2012-06-03 00:00:00 +0000.
-================================================
+=================================================
+Plus 16 releases after 2014-02-28 00:00:00 +0000.
+=================================================

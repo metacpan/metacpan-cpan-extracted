@@ -73,7 +73,7 @@ has sql => sub {
     });
 
     $sql->migrations
-        ->name('cbBaseDB')
+        ->name('cbmig')
         ->from_data(__PACKAGE__,'dbsetup.sql')
         ->migrate;
 
@@ -419,14 +419,12 @@ __DATA__
 
 -- 1 up
 
--- the base callbackery tables. normally you do NOT want to mess with them
-
-CREATE TABLE cbconfig (
+CREATE TABLE IF NOT EXISTS cbconfig (
     cbconfig_id TEXT PRIMARY KEY,
     cbconfig_value TEXT
 );
 
-CREATE TABLE cbuser (
+CREATE TABLE IF NOT EXISTS cbuser (
     cbuser_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     cbuser_login TEXT UNIQUE,
     cbuser_family TEXT,
@@ -435,27 +433,20 @@ CREATE TABLE cbuser (
     cbuser_note TEXT
 );
 
-CREATE TABLE cbright (
+CREATE TABLE IF NOT EXISTS cbright (
     cbright_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     cbright_key TEXT UNIQUE,
     cbright_label TEXT
 );
 
-INSERT INTO cbright (cbright_key,cbright_label)
+INSERT OR IGNORE INTO cbright (cbright_key,cbright_label)
     VALUES ('admin','Administrator');
 
-CREATE TABLE cbuserright (
+CREATE TABLE IF NOT EXISTS cbuserright (
     cbuserright_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     cbuserright_cbuser INTEGER REFERENCES cbuser(cbuser_id) ON DELETE CASCADE,
     cbuserright_cbright INTEGER REFERENCES cbright
 );
 
-CREATE UNIQUE INDEX cbuserright_idx
+CREATE UNIQUE INDEX IF NOT EXISTS cbuserright_idx
     ON cbuserright(cbuserright_cbuser,cbuserright_cbright)
-
--- 1 down
-
-DROP TABLE cbconfig;
-DROP TABLE cbuser;
-DROP TABLE cbright;
-DROP TABLE cbuserright;

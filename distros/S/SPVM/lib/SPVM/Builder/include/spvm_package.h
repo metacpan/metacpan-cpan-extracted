@@ -12,8 +12,7 @@ enum {
 enum {
   SPVM_PACKAGE_C_FLAG_POINTER = 1,
   SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE = 2,
-  SPVM_PACKAGE_C_FLAG_PRIVATE = 4,
-  SPVM_PACKAGE_C_FLAG_PUBLIC = 8,
+  SPVM_PACKAGE_C_FLAG_PUBLIC = 4,
 };
 
 extern const char* const SPVM_PACKAGE_C_CATEGORY_NAMES[];
@@ -53,6 +52,7 @@ struct SPVM_package {
   const char* module_rel_file;
   SPVM_OP* op_type;
   SPVM_LIST* op_uses;
+  SPVM_LIST* op_allows;
   int32_t id;
   int32_t fields_byte_size;
   int32_t object_fields_offset;

@@ -75,6 +75,10 @@ COPYRIGHT
     with this module.
 
 SEE ALSO
-    Mojolicious::Routes, Mojolicious::Routes::Route,
-    Mojolicious::Plugin::Config
+    Mojolicious::Guides::Routing, Mojolicious::Routes,
+    Mojolicious::Routes::Route, Mojolicious::Plugin::Config
+
+    Slovo has a pretty advanced routes configuration using
+    Mojolicious::Plugin::RoutesConfig. Please look at
+    Slovo/lib/Slovo/resources/etc/routes.conf.
 

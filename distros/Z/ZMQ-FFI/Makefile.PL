@@ -52,6 +52,7 @@ my %WriteMakefileArgs = (
     "Math::BigInt" => "1.997",
     "Moo" => "1.004005",
     "Moo::Role" => 0,
+    "Scalar::Util" => 0,
     "Sub::Exporter" => 0,
     "Try::Tiny" => 0,
     "bytes" => 0,
@@ -67,7 +68,6 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "Math::BigInt" => "1.997",
     "POSIX" => 0,
-    "Scalar::Util" => 0,
     "Sub::Override" => 0,
     "Sys::SigAction" => 0,
     "Test::Deep" => 0,
@@ -79,7 +79,7 @@ my %WriteMakefileArgs = (
     "locale" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.14",
   "test" => {
     "TESTS" => "t/*.t"
   }

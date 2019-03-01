@@ -586,11 +586,21 @@ Examples:
 
 sub fround ($$) {
     my ($num,$prec)=@_;
+
     $prec>0 || throw XAO::E::Utils "fround - no precision given";
+    $prec*=1.0;
+
+    # Adding a very small amount is a dirty hack, but without it
+    # it is hard to deal with fround(7.42/0.8, 100) being 9.27 instead
+    # of 9.28.
+    #
+    my $d=1/($prec * 100_000);
     if($num<0) {
+        $num-=$d;
         return -(int((-$num+1/$prec/2)*$prec))/$prec;
     }
     else {
+        $num+=$d;
         return (int(($num+1/$prec/2)*$prec))/$prec;
     }
 }

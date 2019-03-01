@@ -7,7 +7,7 @@ use v5.18.0; # require 2014 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Hook;
-$PiFlash::Hook::VERSION = '0.0.6';
+$PiFlash::Hook::VERSION = '0.1.0';
 use Carp qw(confess);
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 
@@ -36,26 +36,10 @@ sub AUTOLOAD {
 		}
 		return;
 	} else {
-		# handle class methods
-
-		# Is there a hook of that name?
-		if (!exists $hooks{$called}) {
-			if (PiFlash::State::verbose()) {
-				say "PiFlash::Hook dispatch: no such hook $called - ignored";
-			}
-			return;
-		}
-
-		# call all functions registered in the list for this hook
-		my @result;
-		if (ref $hooks{$called} eq "ARRAY") {
-			foreach my $hook (@{$hooks{$called}}) {
-				my @hook_return = $hook->run();
-				push @result, [@hook_return];
-			}
-		}
-		return @result;
+		# autoloaded class methods run hooks by name
+		run($called, @_);
 	}
+
 }
 
 # add a code reference to a named hook
@@ -72,7 +56,8 @@ sub add
 	push @{$hooks{$name}}, PiFlash::Hook::new({name => $name, code => $coderef, origin => [caller]});
 }
 
-# new() - internal function to instantiate hook object, should be called from add() with coderef & caller parameters
+# new() - internal function to instantiate hook object
+# this should only be called from add() with coderef/caller/origin parameters
 sub new
 {
 	my $class = shift;
@@ -96,10 +81,34 @@ sub new
 	return $self;
 }
 
+# check if there are any hooks registered for a name
+sub has
+{
+	my $name = shift;
+	return exists $hooks{$name};
+}
+
 # run the hook code
 sub run
 {
-	# TODO
+	my $name = shift;
+
+	# Is there a hook of that name?
+	if (!exists $hooks{$name}) {
+		if (PiFlash::State::verbose()) {
+			say "PiFlash::Hook dispatch: no such hook $name - ignored";
+		}
+		return;
+	}
+
+	# call all functions registered in the list for this hook
+	my @result;
+	if (ref $hooks{$name} eq "ARRAY") {
+		foreach my $hook (@{$hooks{$name}}) {
+			push @result, $hook->{code}(@_);
+		}
+	}
+	return @result;
 }
 
 1;
@@ -116,7 +125,7 @@ PiFlash::Hook - named dispatch/hook library for PiFlash
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -137,7 +146,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

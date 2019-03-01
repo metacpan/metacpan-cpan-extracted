@@ -4,7 +4,7 @@ require 5.010_001;
 use XAO::BaseConfig;
 use base qw(XAO::BaseConfig);
 
-our $VERSION='1.24';
+our $VERSION='1.25';
 
 ###############################################################################
 1;

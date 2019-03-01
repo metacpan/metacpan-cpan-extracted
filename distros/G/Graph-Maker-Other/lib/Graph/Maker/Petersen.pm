@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,9 +20,10 @@ package Graph::Maker::Petersen;
 use 5.004;
 use strict;
 use Graph::Maker;
+use List::Util 'min';
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -50,18 +51,17 @@ sub init {
   my $graph = $self->make_graph(%params);
   $graph->set_graph_attribute (name => ($N==5 && $K==2 ? "Petersen" : "Petersen $N,$K"));
 
-  $graph->add_cycle(1 .. $N);
+  $K = min($K%$N, (-$K)%$N);
+  ### K reduced: $K
+  ### cf N/2: $N/2
+
+  $graph->add_cycle(1 .. $N);      # outer cycle
   foreach my $i (1 .. $N) {
-    my $j = $i + $N;
-    my $f = $N+1 + (($i-1+$K) % $N);
-    if ($f > 2*$N) { $f -= $N; }
-    $graph->add_edges([$i,$j],[$j,$f]);
+    $graph->add_edge($i,$i+$N);    # outer to inner
   }
-
-  # $graph->add_cycle(1,2,3,4,5);
-  # $graph->add_cycle(6,8,10,7,9);
-  # $graph->add_edges([1,6],[2,7],[3,8],[4,9],[5,10]);
-
+  foreach my $i (0 .. ($K==$N/2 ? $N/2 : $N)-1) {
+    $graph->add_edges($N+1+$i, $N+1+(($i+$K)%$N));  # inner circulant
+  }
   if ($graph->is_directed) {
     $graph->add_edges(map {[reverse @$_]} $graph->edges);
   }
@@ -73,7 +73,7 @@ Graph::Maker->add_factory_type('Petersen' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde
+=for stopwords Ryde generalized circulant Mobius undirected Mobius Kantor Dodecahedral Desargues OEIS
 
 =head1 NAME
 
@@ -108,19 +108,22 @@ Parameters C<N> and C<K> give generalized Petersen graphs.  For example
     $graph = Graph::Maker->new('Petersen', N=>7, K=>3);
 
 C<N> is the number of vertices in the outer cycle, and the same again in the
-inner circulant.  C<K> is how many steps between connections for the inner
-vertices.  In the default Petersen 5,2 for example at inner vertex 6 step by
-2 for edge 6--8.  The outer vertices are numbered C<1 .. N> and the inner
-C<N+1 .. 2*N>.
+inner circulant.  C<K> is how many steps between connections for the inner.
+In the default Petersen 5,2 for example at inner vertex 6 step by 2 for edge
+6--8.  The outer vertices are numbered C<1 .. N> and the inner C<N+1
+.. 2*N>.
 
 Should have C<N E<gt>= 3> and C<K != 0 mod N>.  K=1 is an inner vertex cycle
-the same as the outer.  N=4,K=1 is the cube graph, the same as
-L<Graph::Maker::Hypercube> of 3 dimensions.
+the same as the outer.
 
 K will usually be in the range 1 E<lt>= K E<lt>= N/2.  Other values are
 accepted but become the same as something in that range since the K steps
-wrap-around.  For example 7,9 is the same as 7,2, and 7,5 the same as 7,2
-too, since steps are effectively forward and backward by K.
+wrap-around and go as both K and -K mod N.  So for example 7,9 and 7,5 are
+both the same as 7,2.
+
+N=4,K=1 is equivalent to the cube graph (L<Graph::Maker::Hypercube> of 3
+dimensions).  N=4,K=2 is equivalent to a Mobius ladder of 4 rungs with 2
+consecutive rungs deleted.
 
 =head1 FUNCTIONS
 
@@ -150,7 +153,7 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item N=3, K=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>
+=item N=3, K=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>, circular ladder 3 rungs
 
 =item N=4, K=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1022> (cube)
 
@@ -160,7 +163,7 @@ House of Graphs entries for graphs here include
 
 =item N=7, K=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=28482>
 
-=item N=8, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1229> (Moebius Kantor)
+=item N=8, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1229> (Mobius Kantor)
 
 =item N=9, K=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6700>
 
@@ -201,7 +204,7 @@ L<Graph::Maker::Hypercube>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

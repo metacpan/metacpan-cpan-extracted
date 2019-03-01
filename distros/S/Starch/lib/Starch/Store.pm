@@ -1,7 +1,7 @@
 package Starch::Store;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -192,7 +192,7 @@ sub calculate_expires {
 
 This method is used by stores that store and lookup data by
 a string (all of them at this time).  It combines the state
-ID with the L</namespace> of the key data for the store
+ID with the L<Starch::Manager/namespace> of the key data for the store
 request.
 
 =cut
@@ -233,7 +233,7 @@ __END__
 
 =head1 AUTHORS AND LICENSE
 
-See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+See L<Starch/AUTHORS> and L<Starch/LICENSE>.
 
 =cut
 

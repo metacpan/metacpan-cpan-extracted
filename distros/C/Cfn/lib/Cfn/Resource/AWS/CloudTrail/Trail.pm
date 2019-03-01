@@ -1,4 +1,4 @@
-# AWS::CloudTrail::Trail generated from spec 1.11.0
+# AWS::CloudTrail::Trail generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CloudTrail::Trail',
@@ -57,7 +57,7 @@ package Cfn::Resource::Properties::AWS::CloudTrail::Trail::DataResourceValue {
   extends 'Cfn::Value::TypedValue';
   
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Values => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Values => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::CloudTrail::Trail::EventSelector',
      as 'Cfn::Value',

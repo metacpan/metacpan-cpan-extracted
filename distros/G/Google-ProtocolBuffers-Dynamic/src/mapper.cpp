@@ -315,17 +315,18 @@ Mapper::DecoderHandlers *Mapper::DecoderHandlers::on_start_sub_message(DecoderHa
         cxt->seen_oneof.resize(cxt->seen_oneof.size() + 1);
         cxt->seen_oneof.back().resize(oneof_count, -1);
     }
-    sv_bless(target, cxt->mappers.back()->stash);
+    if (mapper->get_decode_blessed())
+        sv_bless(target, cxt->mappers.back()->stash);
 
     return cxt;
 }
 
 bool Mapper::DecoderHandlers::on_end_sub_message(DecoderHandlers *cxt, const int *field_index) {
-    cxt->items.pop_back();
-    cxt->mappers.pop_back();
-    cxt->seen_fields.pop_back();
     if (cxt->mappers.back()->message_def->oneof_count())
         cxt->seen_oneof.pop_back();
+    cxt->seen_fields.pop_back();
+    cxt->mappers.pop_back();
+    cxt->items.pop_back();
 
     return true;
 }
@@ -532,6 +533,7 @@ Mapper::Mapper(pTHX_ Dynamic *_registry, const MessageDef *_message_def, HV *_st
     encode_defaults = message_def->syntax() == UPB_SYNTAX_PROTO2 &&
         options.encode_defaults;
     check_enum_values = options.check_enum_values;
+    decode_blessed = options.decode_blessed;
     warn_context = WarnContext::get(aTHX);
 
     if (!decoder_handlers->SetEndMessageHandler(UpbMakeHandler(DecoderHandlers::on_end_message)))
@@ -790,7 +792,9 @@ SV *Mapper::make_object(SV *data) const {
     } else {
         obj = newRV_noinc((SV *) newHV());
     }
-    sv_bless(obj, stash);
+
+    if (decode_blessed)
+        sv_bless(obj, stash);
 
     return obj;
 }
@@ -811,6 +815,10 @@ void Mapper::create_encoder_decoder() {
     pb_decoder_method = DecoderMethod::New(DecoderMethodOptions(decoder_handlers.get()));
     json_decoder_method = ParserMethod::New(message_def);
     decoder_sink.Reset(decoder_handlers.get(), &decoder_callbacks);
+}
+
+bool Mapper::get_decode_blessed() const {
+    return decode_blessed;
 }
 
 SV *Mapper::encode(SV *ref) {
@@ -857,8 +865,11 @@ SV *Mapper::decode(const char *buffer, STRLEN bufsize) {
     decoder_callbacks.prepare(newHV());
 
     SV *result = NULL;
-    if (BufferSource::PutBuffer(buffer, bufsize, pb_decoder->input()))
-        result = sv_bless(newRV_inc(decoder_callbacks.get_target()), stash);
+    if (BufferSource::PutBuffer(buffer, bufsize, pb_decoder->input())) {
+        result = newRV_inc(decoder_callbacks.get_target());
+        if (decode_blessed)
+            sv_bless(result, stash);
+    }
     decoder_callbacks.clear();
 
     return result;
@@ -873,8 +884,11 @@ SV *Mapper::decode_json(const char *buffer, STRLEN bufsize) {
     decoder_callbacks.prepare(newHV());
 
     SV *result = NULL;
-    if (BufferSource::PutBuffer(buffer, bufsize, json_decoder->input()))
-        result = sv_bless(newRV_inc(decoder_callbacks.get_target()), stash);
+    if (BufferSource::PutBuffer(buffer, bufsize, json_decoder->input())) {
+        result = newRV_inc(decoder_callbacks.get_target());
+        if (decode_blessed)
+            sv_bless(result, stash);
+    }
     decoder_callbacks.clear();
 
     return result;

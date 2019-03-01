@@ -19,16 +19,19 @@ Boxer::CLI->run;
 
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 =head1 SYNOPSIS
 
     $ boxer compose parl-greens
     Done: composed preseed.cfg and script.sh for a DebianParl system
+
+    $ boxer bootstrap lxp5
+    Done: created rootfs for lxp5 node
 
     # TODO: below command are not yet implemented
 

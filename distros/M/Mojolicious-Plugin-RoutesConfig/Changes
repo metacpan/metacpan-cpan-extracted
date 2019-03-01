@@ -1,5 +1,14 @@
 Revision history for Perl module Mojolicious::Plugin::RoutesConfig
 
+0.06 чт фев 28 20:57:21 EET 2019
+    - No functional changes. Fixed failing tests due to outdated dependencies.
+      Upgraded to Mojolicious 8.13 and now depending on
+      Mojolicious::Plugin::PODViewer 0.004 just because...
+    - Improved documentation. Added link to Slovo - a mojo application, which
+      uses this plugin.
+    - This version was made in Check-Point Charly restaurant, Sofia, Bulgaria
+      while waiting for some old schoolmates.
+
 0.05 сб апр  7 19:08:16 CEST 2018
     - Now "under" is fully supported. It accepts all the methods as keys
     (e.g. "name", "to") like other ordinary routes.

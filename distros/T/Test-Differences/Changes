@@ -1,5 +1,8 @@
 Changes file for Test::Differences
 
+0.66   2019-02-27
+    - Fix tests on Windows (thanks to Serguei Trouchelle)
+
 0.65   2019-02-19
     - Canonical repo is now https://github.com/DrHyde/perl-modules-Test-Differences
     - Fix discrepancies in copyright notices (thanks to Christian Neukirchen

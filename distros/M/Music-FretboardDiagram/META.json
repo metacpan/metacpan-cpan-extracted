@@ -66,7 +66,7 @@
          "web" : "https://github.com/ology/Music-FretboardDiagram"
       }
    },
-   "version" : "0.0402",
+   "version" : "0.1001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -281,10 +281,14 @@
                   "spell_cmd" : "aspell list",
                   "stopwords" : [
                      "PNG",
+                     "Pawe",
                      "TTF",
                      "fretboard",
+                     "horiz",
                      "png",
-                     "th"
+                     "showname",
+                     "th",
+                     "\u015awiderski"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }

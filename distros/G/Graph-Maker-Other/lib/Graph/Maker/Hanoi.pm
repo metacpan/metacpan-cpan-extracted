@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -330,18 +330,18 @@ subgraphs are moves of the bigger discs, where permitted.
 
 The puzzle is again to move all discs from one spindle to another.  Spindles
 E<gt>= 4 can be done in fewer moves than spindles=3 by taking advantage of
-the extra places, but the problem of a shortest path is more difficult.  In
-spindles=3 the biggest disc can only move by putting all smaller discs on
+the extra place(s), but the problem of a shortest path is more difficult.
+In spindles=3 the biggest disc can only move by putting all smaller discs on
 the other spindle, but for E<gt>=4 there are many ways to distribute the
 smaller discs on the other spindles.
 
 Spindles=1 is allowed but is a trivial 1-vertex graph since all discs are on
 that spindle and no moves are possible.
 
-Spindles=2 is allowed but is 2^N vertices of disconnected pairs since only
-the smallest disc can ever move.
+Spindles=2 is allowed but is 2^N vertices in pairs since only the smallest
+disc can ever move.
 
-Spindles 3,4,5 appears as "The Reve's Puzzle" in
+Spindles = 3,4,5 appear as "The Reve's Puzzle" in
 
 =over
 
@@ -361,13 +361,13 @@ discs can only move forward or backward to adjacent spindles in the cycle.
 In the vertex digit representation the cycle is around digits 0 to S-1, so
 digit changes are +/-1 mod S.
 
-For spindlesE<lt>=3 cyclic is the same as adjacency "any".  For
-spindlesE<gt>=4 some moves between spindles are disallowed when cyclic, so
+For spindlesE<lt>=3, cyclic is the same as adjacency "any".  For
+spindlesE<gt>=4, some moves between spindles are disallowed when cyclic, so
 is an edge subset of adjacency "any".
 
 (This option is for cyclic with moves in either direction.  Another
 possibility is cyclic with moves only in one direction around the cycle, as
-considered by Scorer, Grundy and Smith.  There's nothing yet here for a
+considered by Scorer, Grundy and Smith.  There's nothing here yet for a
 directed graph of this kind.)
 
 =head2 Linear
@@ -383,13 +383,13 @@ L<http://www.cs.wm.edu/~pkstoc/boca.ps>
 
 =back
 
-In the vertex digit representation the row is digits 0 to S-1, so digit
-changes +/-1 in the middle or +1 or -1 at the ends.
+In the vertex digit representation, the row is digits 0 to S-1, so digit
+changes +/-1 with no wraparound.
 
 The puzzle is to move all discs from the first spindle to the last, which
 means a path from vertex 0 to S^N-1.
 
-For spindlesE<lt>=2 linear is the same as "any".  For spindlesE<gt>=3 some
+For spindlesE<lt>=2, linear is the same as "any".  For spindlesE<gt>=3 some
 moves between spindles are disallowed when linear, so an edge subset of
 cyclic, which in turn an edge subset of any.
 
@@ -412,11 +412,11 @@ L<http://www.cs.wm.edu/~pkstoc/boca.ps>
 
 =back
 
-In the vertex digit representation digit 0 is the centre.
+In the vertex digit representation, digit 0 is the centre.
 
-For spindlesE<lt>=2 star is the same as "any".  For spindles=3 star is
-equivalent to linear above but with digit change 0E<lt>-E<gt>1 (different
-centre).  For spindlesE<gt>=4 star is an edge subset of adjacency "any".
+For spindlesE<lt>=2, star is the same as "any".  For spindles=3 star is
+equivalent to linear above but with digit flip 0E<lt>-E<gt>1 (the centre is
+different).  For spindlesE<gt>=4, star is an edge subset of adjacency "any".
 
 =head1 FUNCTIONS
 
@@ -478,7 +478,7 @@ L<Graph::Maker::Linear>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

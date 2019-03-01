@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -25,6 +25,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use MyGraphs;
 use Graph::Maker::TwinAlternateAreaTree;
+$|=1;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -33,6 +34,8 @@ use Graph::Maker::TwinAlternateAreaTree;
 {
   # HOG graphs
 
+  # possible branch reduction
+
   # k=0  https://hog.grinvin.org/ViewGraphInfo.action?id=1310    single vertex
   # k=1  https://hog.grinvin.org/ViewGraphInfo.action?id=19655   path-2
   # k=2  https://hog.grinvin.org/ViewGraphInfo.action?id=594     path-4
@@ -40,19 +43,23 @@ use Graph::Maker::TwinAlternateAreaTree;
   # k=4  https://hog.grinvin.org/ViewGraphInfo.action?id=27042
   # k=5  https://hog.grinvin.org/ViewGraphInfo.action?id=27044
   # k=6  https://hog.grinvin.org/ViewGraphInfo.action?id=27046
+  # k=7
   require MyGraphs;
   my @graphs;
-  foreach my $level (3) {
+  foreach my $level (7) {
     my $graph = Graph::Maker->new ('twin_alternate_area_tree',
                                    level => $level,
                                    undirected => 1,
                                    vertex_name_type => 'xy',
                                   );
+    # MyGraphs::Graph_branch_reduce($graph);
+    # if($level==4) { MyGraphs::Graph_view($graph); }
+
     my $num_vertices = $graph->vertices;
     my $num_edges = $graph->edges;
     my $diameter = $graph->diameter || 0;
-    print "$num_vertices vertices $num_edges edges, diameter $diameter\n";
-    MyGraphs::Graph_xy_print($graph);
+    print "level=$level  $num_vertices vertices $num_edges edges, diameter $diameter\n";
+    # MyGraphs::Graph_xy_print($graph);
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);

@@ -18,11 +18,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.58
+Version 0.59
 
 =cut
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 
 =head1 SYNOPSIS
@@ -590,8 +590,8 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Text::Amuse::Preprocessor
 
-Repository available at Gitorious:
-L<https://gitorious.org/text-amuse-preprocessor>
+Repository available at GitHub:
+L<https://github.com/melmothx/text-amuse-preprocessor>
 
 =head1 SEE ALSO
 

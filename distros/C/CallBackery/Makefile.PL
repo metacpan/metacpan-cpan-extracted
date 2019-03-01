@@ -27,7 +27,7 @@ WriteMakefile(
       repository  => 'https://github.com/oetiker/callbackery',
       bugtracker  => 'https://github.com/oetiker/callbackery/issues'
     },
-    no_index => {directory => ['t','example','setup','lib/Mojolicious/Command/generate/callbackery_app']}
+    no_index => {directory => ['t','example','setup','lib/Mojolicious/Command/Author/generate/callbackery_app']}
   },
   dist => {
         PREOP => q{$(PERL) -i -p -e 's/CallBackery\@\d+(\.\d+){2}/CallBackery\@$(VERSION)/g' lib/Mojolicious/Command/generate/callbackery_app/PERL_MODULES}

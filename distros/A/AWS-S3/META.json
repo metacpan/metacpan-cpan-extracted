@@ -67,6 +67,6 @@
          "url" : "https://github.com/leejo/AWS-S3"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

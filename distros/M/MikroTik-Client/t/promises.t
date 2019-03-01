@@ -12,6 +12,7 @@ use lib './';
 use lib "$FindBin::Bin/lib";
 
 use AE;
+use Errno qw(ECONNREFUSED);
 use MikroTik::Client;
 use MikroTik::Client::Mockup;
 use Test::More;
@@ -39,7 +40,7 @@ my ($cv, $err, $res);
 $cv = AE::cv;
 $p->catch(sub { ($err, $res) = @_ })->finally($cv);
 $cv->recv;
-like $err, qr/Connection refused/, 'connection error';
+ok $! == ECONNREFUSED, 'connection error';
 ok !$res, 'no error attributes';
 $api->port($port);
 

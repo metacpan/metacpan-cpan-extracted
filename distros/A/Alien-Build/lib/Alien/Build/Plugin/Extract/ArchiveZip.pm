@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Plugin to extract a tarball using Archive::Zip
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 
 has '+format' => 'zip';
@@ -58,7 +58,7 @@ Alien::Build::Plugin::Extract::ArchiveZip - Plugin to extract a tarball using Ar
 
 =head1 VERSION
 
-version 1.55
+version 1.60
 
 =head1 SYNOPSIS
 
@@ -72,6 +72,10 @@ version 1.55
 Note: in most case you will want to use L<Alien::Build::Plugin::Extract::Negotiate>
 instead.  It picks the appropriate Extract plugin based on your platform and environment.
 In some cases you may need to use this plugin directly instead.
+
+B<Note>: Seriously do NOT use this plugin! L<Archive::Zip> is pretty unreliable and
+breaks all-the-time.  If you use the negotiator plugin mentioned above, then it will
+prefer installing L<Alien::unzip>, which is much more reliable than L<Archive::Zip>.
 
 This plugin extracts from an archive in zip format using L<Archive::Zip>.
 

@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+1.27 2019-02-28
+
+ - Fix POD style (thanks @link2xt)
+ - Use plain \\ (instead of the wrapper) in LaTeX verse output
+
 1.26 2018-11-03
 
  - Fix perl warning about unescaped {}

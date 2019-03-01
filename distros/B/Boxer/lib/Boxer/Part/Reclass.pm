@@ -13,30 +13,30 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 use autodie;
 
 use Moo;
-extends 'Boxer::Part';
+use MooX::StrictConstructor;
 use Types::Standard qw(Str Maybe ArrayRef HashRef);
 use Types::TypeTiny qw(StringLike);
-
-use namespace::autoclean 0.16;
+extends 'Boxer::Part';
 
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 =head1 DESCRIPTION
 
 Outside the box is a World of software,
 consisting of parts.
 
-B<Boxer::Part::Reclass::Node> represents a part of a <Boxer::World>,
-represented as a B<reclass> node or class.
+B<Boxer::Part::Reclass> represents a part of a L<Boxer::World>
+structured as a B<reclass> node or class.
 
 =head1 SEE ALSO
 

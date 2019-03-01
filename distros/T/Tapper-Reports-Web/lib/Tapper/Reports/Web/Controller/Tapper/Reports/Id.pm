@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::Reports::Id;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Reports::Id::VERSION = '5.0.13';
+$Tapper::Reports::Web::Controller::Tapper::Reports::Id::VERSION = '5.0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -126,6 +126,10 @@ sub index :Path :Args(1)
                         if (my @report_failures = @{ $self->get_report_failures($r) }) {
                                 $c->stash->{failures}->{$r->id}{name} = $r->suite->name;
                                 $c->stash->{failures}->{$r->id}{machine_name} = $r->machine_name;
+                                my @descriptions = ();
+                                my $sections = $r->reportsections;
+                                while (my $section = $sections->next) { my %col = $section->get_columns; push @descriptions, $col{description} if $col{description} };
+                                $c->stash->{failures}->{$r->id}{report_description} = join(",", @descriptions);
                                 push @{$c->stash->{failures}->{$r->id}{failures}}, @report_failures;
                         }
                 }
@@ -214,7 +218,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

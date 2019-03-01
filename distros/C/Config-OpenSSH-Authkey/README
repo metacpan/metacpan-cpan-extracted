@@ -1,25 +1,19 @@
-Config::OpenSSH::Authkey
+Config::OpenSSH::Authkey - methods to interact with OpenSSH authorized_keys
 
-Methods to interact with OpenSSH authorized_keys file data.
+to install this module, use CPAN, for example
 
-Install via the cpan(1) command:;
+  cpanm Config::OpenSSH::Authkey
 
-  cpan Config::OpenSSH::Authkey
+run perldoc(1) on Config::OpenSSH::Authkey for additional documentation
 
-or from source via:
+
+for the source code, see
+
+https://github.com/thrig/Config-OpenSSH-Authkey
+
+this can be built and installed by running
 
   perl Makefile.PL
   make
   make test
   make install
-
-After installation, the documentation may be read by running:
-
-  perldoc Config::OpenSSH::Authkey
-
-COPYRIGHT AND LICENCE
-
-Copyright 2009-2010,2012,2015 by Jeremy Mates.
-
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).

@@ -1,6 +1,12 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit d2c86775604d0c0d1d679872ebffcac194c961d7
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Feb 27 15:55:31 2019 -0800
+
+    1.25 Fixed fround() for 7.42/0.8 edge case
+
 commit 073bcc869e05ff5d9e7f5c266ad7bb1d8ac02eb0
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Thu Jan 17 18:48:51 2019 -0800
@@ -74,10 +80,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Fri Jul 6 19:01:41 2018 -0700
 
     Made dist archive use 1.20 instead of 1.2
-
-commit 4fdf3649f464669c5f8e776b22fd49b7feeeb05d
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 18:51:30 2018 -0700
-
-    Removed unnecessary man page building
 

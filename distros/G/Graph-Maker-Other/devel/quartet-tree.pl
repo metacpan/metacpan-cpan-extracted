@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -44,7 +44,8 @@ use Smart::Comments;
     my $graph = Graph::Maker->new('quartet_tree',
                                   level => $level,
                                   undirected=>1);
-    MyGraphs::Graph_xy_print($graph);
+    # MyGraphs::Graph_branch_reduce($graph);
+    # MyGraphs::Graph_xy_print($graph);
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);

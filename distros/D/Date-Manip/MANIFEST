@@ -539,6 +539,11 @@ lib/Date/Manip/Offset/off436.pm
 lib/Date/Manip/Offset/off437.pm
 lib/Date/Manip/Offset/off438.pm
 lib/Date/Manip/Offset/off439.pm
+lib/Date/Manip/Offset/off440.pm
+lib/Date/Manip/Offset/off441.pm
+lib/Date/Manip/Offset/off442.pm
+lib/Date/Manip/Offset/off443.pm
+lib/Date/Manip/Offset/off444.pm
 lib/Date/Manip/Problems.pod
 lib/Date/Manip/Recur.pm
 lib/Date/Manip/Recur.pod
@@ -758,6 +763,7 @@ lib/Date/Manip/TZ/asoral00.pm
 lib/Date/Manip/TZ/aspont00.pm
 lib/Date/Manip/TZ/aspyon00.pm
 lib/Date/Manip/TZ/asqata00.pm
+lib/Date/Manip/TZ/asqost00.pm
 lib/Date/Manip/TZ/asqyzy00.pm
 lib/Date/Manip/TZ/asriya00.pm
 lib/Date/Manip/TZ/assakh00.pm
@@ -1020,6 +1026,7 @@ t/date.list_holidays.1.t
 t/date.list_holidays.2.t
 t/date.list_holidays.3.t
 t/date.list_holidays.4.t
+t/date.list_holidays.5.t
 t/date.nearest_business_day.t
 t/date.next.t
 t/date.next_business_day.t

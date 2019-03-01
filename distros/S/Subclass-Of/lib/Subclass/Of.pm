@@ -8,7 +8,7 @@ package Subclass::Of;
 
 BEGIN {
 	$Subclass::Of::AUTHORITY = 'cpan:TOBYINK';
-	$Subclass::Of::VERSION   = '0.007';
+	$Subclass::Of::VERSION   = '0.008';
 }
 
 use B qw(perlstring);
@@ -263,6 +263,7 @@ sub _apply_attributes_moo
 	$me->_apply_attributes_generic($has, $opts);
 }
 
+my $fieldhash;
 sub _apply_attributes_raw
 {
 	my $me = shift;
@@ -273,7 +274,7 @@ sub _apply_attributes_raw
 		for my $key (sort keys %$opts)
 		{
 			croak "Option '$key' in attribute specification not supported"
-				unless $key =~ /^(is|isa|default|lazy)$/;
+				unless $key =~ /^(is|isa|default|lazy|fieldhash)$/;
 		}
 		if (exists $opts->{lazy} and not $opts->{lazy})
 		{
@@ -289,25 +290,62 @@ sub _apply_attributes_raw
 				unless blessed $opts->{isa} && $opts->{isa}->can('assert_valid');
 		}
 		
-		*{"$child\::$name"} = sub
+		my $code;
+		if (exists $opts->{fieldhash} and $opts->{fieldhash})
 		{
-			my $self = shift;
-			if (@_)
+			$fieldhash ||= do {
+				my $impl;
+				$impl ||= eval { require Hash::FieldHash;       'Hash::FieldHash' };
+				$impl ||= do   { require Hash::Util::FieldHash; 'Hash::Util::FieldHash' };
+				$impl->can('fieldhash');
+			};
+			my %data;
+			$fieldhash->(\%data);
+			
+			$code = sub
 			{
-				croak "read-only accessor" unless $opts->{is} eq 'rw';
-				$opts->{isa}->assert_valid($_[0]) if $opts->{isa};
-				$self->{$name} = $_[0];
-			}
-			if (exists $opts->{default} and not exists $self->{$name})
+				my $self = shift;
+				if (@_)
+				{
+					croak "read-only accessor" unless $opts->{is} eq 'rw';
+					$opts->{isa}->assert_valid($_[0]) if $opts->{isa};
+					$data{$self} = $_[0];
+				}
+				if (exists $opts->{default} and not exists $self->{$name})
+				{
+					my $tmp = ref($opts->{default}) eq q(CODE)
+						? $opts->{default}->($self)
+						: $opts->{default};
+					$opts->{isa}->assert_valid($tmp) if $opts->{isa};
+					$data{$self} = $tmp;
+				}
+				$data{$self};
+			};
+		}
+		else
+		{
+			$code = sub
 			{
-				my $tmp = ref($opts->{default}) eq q(CODE)
-					? $opts->{default}->($self)
-					: $opts->{default};
-				$opts->{isa}->assert_valid($tmp) if $opts->{isa};
-				$self->{$name} = $tmp;
-			}
-			return $self->{$name};
-		};
+				my $self = shift;
+				if (@_)
+				{
+					croak "read-only accessor" unless $opts->{is} eq 'rw';
+					$opts->{isa}->assert_valid($_[0]) if $opts->{isa};
+					$self->{$name} = $_[0];
+				}
+				if (exists $opts->{default} and not exists $self->{$name})
+				{
+					my $tmp = ref($opts->{default}) eq q(CODE)
+						? $opts->{default}->($self)
+						: $opts->{default};
+					$opts->{isa}->assert_valid($tmp) if $opts->{isa};
+					$self->{$name} = $tmp;
+				}
+				$self->{$name};
+			};
+		}
+		
+		*{"$child\::$name"} = set_subname("$child\::$name", $code);
 	};
 	
 	$me->_apply_attributes_generic($has, $opts);
@@ -534,6 +572,15 @@ attribute builder is used, which assumes that the object is a blessed
 hash. The builder supports C<is>, C<isa> and C<default> (which is always
 treated as lazy). It only builds accessors, I<not> a constructor!
 
+From Subclass::Of 0.008, you can pass C<< fieldhash => 1 >> to use
+L<Hash::Util::FieldHash> or L<Hash::FieldHash> to store the attribute
+inside-out, so the accessor will work for non-hashrefs.
+
+   use SubClass::Of "MyClass",
+      -has => [
+          counter => [ is => "ro", isa => Int, fieldhash => 1 ],
+      ];
+
 =item C<< -package >>
 
 The package name for the subclass. Usually you can ignore this; Subclass::Of
@@ -666,7 +713,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013, 2017 by Toby Inkster.
+This software is copyright (c) 2013, 2017, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

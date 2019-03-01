@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -114,7 +114,7 @@ Graph::Maker->add_factory_type('rook_grid' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde OEIS undirected
+=for stopwords Ryde OEIS undirected xN hypercubes tesseract
 
 =head1 NAME
 
@@ -155,6 +155,9 @@ here include steps bigger than 1.
 1xN grids are complete-N graphs the same as L<Graph::Maker::Complete>.
 
 2x2x...x2 grids are hypercubes the same as L<Graph::Maker::Hypercube>.
+
+2x2 and 3x2 grids are circular ladders the same as
+L<Graph::Maker::CircularLadder>.
 
 There is no C<cyclic> parameter since the edges are already effectively
 cyclic, having for example an edge 4 to 1, and 4 to anywhere else in the
@@ -205,7 +208,7 @@ House of Graphs entries for graphs here include
 
 =item 2x2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=674>, 4-cycle
 
-=item 2x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>
+=item 2x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=746>, circular ladder 3 rungs
 
 =item 3x3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=6607>, Paley
 
@@ -246,7 +249,7 @@ L<Graph::Maker::Hypercube>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -1,13 +1,13 @@
 
-# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Nov 30 14:33:51 EST 2018
-#    Data version: tzdata2018g
-#    Code version: tzcode2018g
+#    Generated on: Thu Feb 28 13:08:25 EST 2019
+#    Data version: tzdata2018i
+#    Code version: tzcode2018i
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -262,6 +262,7 @@ database:
      Asia/Pontianak                       aspont00
      Asia/Pyongyang                       aspyon00
      Asia/Qatar                           asqata00
+     Asia/Qostanay                        asqost00
      Asia/Qyzylorda                       asqyzy00
      Asia/Riyadh                          asriya00
      Asia/Sakhalin                        assakh00
@@ -865,6 +866,7 @@ default alias can be overridden as described above.
                                           Europe/Gibraltar
                                           Europe/Dublin
      GMT0IST                              Europe/Dublin
+     GST-10GDT                            Pacific/Guam
      HKT-8HKST                            Asia/Hong_Kong
      HST10HDT                             America/Adak
      IST-1GMT                             Europe/Dublin
@@ -1068,7 +1070,6 @@ Aliases include:
      Newfoundland Standard Time           America/St_Johns
      North Asia East Standard Time        Asia/Irkutsk
      North Asia Standard Time             Asia/Krasnoyarsk
-     PST-8PDT                             Asia/Singapore
      PST8PDT#Canada                       America/Vancouver
      PWT0PST                              Europe/Lisbon
      Pacific SA Standard Time             America/Santiago
@@ -1135,8 +1136,12 @@ L<Date::Manip::TZ> module.
      ISDST  OFFSET      TIME ZONE                
      -----  ----------  -------------------------
      0      -15:56:00   Asia/Manila
+     0      -15:02:04   Pacific/Palau
      0      -14:21:00   Pacific/Guam
      0      -14:00:00   Etc/GMT-14
+     0      -13:52:52   Pacific/Chuuk
+     0      -13:27:08   Pacific/Pohnpei
+     0      -13:08:04   Pacific/Kosrae
      0      -13:00:00   Etc/GMT-13
      0      -12:00:00   Etc/GMT-12
                         M
@@ -1208,10 +1213,10 @@ L<Date::Manip::TZ> module.
                         America/Whitehorse
                         America/Dawson
                         Pacific/Pitcairn
+                        America/Metlakatla
                         Etc/GMT-8
                         H
                         America/Fort_Nelson
-                        America/Metlakatla
                         America/Juneau
                         America/Sitka
                         America/Inuvik
@@ -1472,9 +1477,9 @@ L<Date::Manip::TZ> module.
                         America/Goose_Bay
                         America/Santo_Domingo
                         America/Guyana
-                        America/Grand_Turk
                         Etc/GMT-4
                         D
+                        America/Grand_Turk
                         America/Punta_Arenas
                         America/Eirunepe
                         America/Rio_Branco
@@ -1610,6 +1615,7 @@ L<Date::Manip::TZ> module.
                         Atlantic/Faroe
                         Europe/Lisbon
                         Africa/Abidjan
+                        Africa/Sao_Tome
                         Africa/Accra
                         Atlantic/Canary
                         Atlantic/Madeira
@@ -1617,14 +1623,13 @@ L<Date::Manip::TZ> module.
                         Africa/Monrovia
                         Africa/Bissau
                         America/Danmarkshavn
-                        Africa/Sao_Tome
-                        Africa/Casablanca
-                        Africa/El_Aaiun
                         Etc/GMT
                         UT
                         UTC
                         Z
                         Antarctica/Troll
+                        Africa/Casablanca
+                        Africa/El_Aaiun
                         Atlantic/Azores
                         Africa/Ceuta
                         Africa/Algiers
@@ -1830,10 +1835,10 @@ L<Date::Manip::TZ> module.
                         Asia/Qatar
                         Europe/Istanbul
                         Africa/Juba
-                        Europe/Volgograd
                         Etc/GMT+3
                         P
                         Antarctica/Syowa
+                        Europe/Volgograd
                         Africa/Khartoum
                         Asia/Famagusta
                         Europe/Saratov
@@ -1896,12 +1901,14 @@ L<Date::Manip::TZ> module.
                         Asia/Yekaterinburg
                         Asia/Aqtobe
                         Asia/Ashgabat
+                        Asia/Qostanay
                         Asia/Tehran
                         Asia/Qatar
                         Asia/Kabul
                         Asia/Qyzylorda
                         Asia/Samarkand
      0      +04:02:33   Asia/Yekaterinburg
+     0      +04:14:28   Asia/Qostanay
      0      +04:21:52   Asia/Qyzylorda
      0      +04:27:53   Asia/Samarkand
      0      +04:28:12   Asia/Karachi
@@ -1920,6 +1927,7 @@ L<Date::Manip::TZ> module.
                         Asia/Ashgabat
                         Asia/Atyrau
                         Asia/Oral
+                        Asia/Qyzylorda
                         Asia/Samarkand
                         Asia/Yekaterinburg
                         Indian/Kerguelen
@@ -1929,7 +1937,7 @@ L<Date::Manip::TZ> module.
                         R
                         Antarctica/Mawson
                         Asia/Bishkek
-                        Asia/Qyzylorda
+                        Asia/Qostanay
                         Indian/Chagos
                         Asia/Omsk
                         Asia/Almaty
@@ -1960,12 +1968,13 @@ L<Date::Manip::TZ> module.
                         Asia/Bishkek
                         Asia/Omsk
                         Asia/Dhaka
-                        Asia/Qyzylorda
+                        Asia/Qostanay
                         Asia/Thimphu
                         Indian/Chagos
                         Etc/GMT+6
                         S
                         Antarctica/Vostok
+                        Asia/Qyzylorda
                         Asia/Barnaul
                         Asia/Novosibirsk
                         Asia/Tomsk
@@ -2073,6 +2082,7 @@ L<Date::Manip::TZ> module.
      0      +08:27:52   Asia/Seoul
      0      +08:30:00   Asia/Pyongyang
                         Asia/Seoul
+                        Asia/Hong_Kong
      0      +08:35:28   Australia/Eucla
      0      +08:38:58   Asia/Yakutsk
      0      +08:43:20   Australia/Darwin
@@ -2095,6 +2105,9 @@ L<Date::Manip::TZ> module.
                         Asia/Vladivostok
                         Asia/Ust-Nera
                         Asia/Sakhalin
+                        Pacific/Chuuk
+                        Pacific/Kosrae
+                        Pacific/Pohnpei
                         Asia/Taipei
                         Asia/Hong_Kong
                         Asia/Macau
@@ -2106,9 +2119,12 @@ L<Date::Manip::TZ> module.
                         Asia/Singapore
                         Asia/Yangon
                         Pacific/Bougainville
-                        Asia/Ho_Chi_Minh
-                        Asia/Manila
                         Pacific/Nauru
+                        Asia/Ho_Chi_Minh
+                        Pacific/Majuro
+                        Pacific/Guam
+                        Pacific/Kwajalein
+                        Asia/Manila
                         Australia/Adelaide
                         Australia/Darwin
                         Australia/Broken_Hill
@@ -2153,6 +2169,10 @@ L<Date::Manip::TZ> module.
                         Asia/Yakutsk
                         Asia/Srednekolymsk
                         Australia/Lord_Howe
+                        Pacific/Kosrae
+                        Pacific/Kwajalein
+                        Pacific/Majuro
+                        Pacific/Pohnpei
                         Australia/Broken_Hill
                         Antarctica/Macquarie
      0      +10:03:12   Asia/Magadan
@@ -2179,7 +2199,6 @@ L<Date::Manip::TZ> module.
                         Pacific/Norfolk
                         Etc/GMT+11
                         X
-                        Antarctica/Casey
                         Antarctica/Macquarie
                         Asia/Ust-Nera
                         Asia/Vladivostok
@@ -2188,6 +2207,7 @@ L<Date::Manip::TZ> module.
                         Asia/Khandyga
                         Pacific/Kwajalein
                         Pacific/Majuro
+                        Antarctica/Casey
      0      +11:05:48   Pacific/Noumea
      0      +11:06:28   Pacific/Wake
      0      +11:07:40   Pacific/Nauru
@@ -2439,6 +2459,8 @@ L<Date::Manip::TZ> module.
      1      +00:00:00   Atlantic/Azores
                         Europe/Dublin
                         America/Scoresbysund
+                        Africa/Casablanca
+                        Africa/El_Aaiun
                         Atlantic/Reykjavik
                         Atlantic/Madeira
                         Europe/Prague
@@ -2578,6 +2600,7 @@ L<Date::Manip::TZ> module.
                         Asia/Atyrau
                         Asia/Aqtobe
                         Asia/Ashgabat
+                        Asia/Qostanay
                         Asia/Qyzylorda
                         Asia/Yekaterinburg
                         Europe/Astrakhan
@@ -2591,6 +2614,7 @@ L<Date::Manip::TZ> module.
                         Asia/Karachi
                         Asia/Bishkek
                         Asia/Aqtobe
+                        Asia/Qostanay
                         Asia/Qyzylorda
                         Asia/Atyrau
                         Asia/Aqtau
@@ -2664,6 +2688,7 @@ L<Date::Manip::TZ> module.
                         Asia/Magadan
                         Asia/Srednekolymsk
                         Asia/Ust-Nera
+                        Pacific/Guam
                         Antarctica/Macquarie
      1      +11:30:00   Australia/Lord_Howe
      1      +12:00:00   Asia/Magadan
@@ -3176,16 +3201,17 @@ most commonly used, I'm willing to entertain arguments for altering the order.
      FFMT             America/Martinique
      FMT              Atlantic/Madeira
      G                G
+     GDT              Pacific/Guam
      GMT              Etc/GMT
                       Europe/London
                       Africa/Abidjan
+                      Africa/Sao_Tome
                       Europe/Dublin
                       Africa/Accra
                       Atlantic/Reykjavik
                       Africa/Monrovia
                       Africa/Bissau
                       America/Danmarkshavn
-                      Africa/Sao_Tome
                       Europe/Gibraltar
                       Europe/Prague
      GMT+1            Etc/GMT+1
@@ -3421,8 +3447,8 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       America/Tijuana
                       America/Whitehorse
                       America/Dawson
-                      America/Fort_Nelson
                       America/Metlakatla
+                      America/Fort_Nelson
                       America/Juneau
                       America/Sitka
                       America/Inuvik

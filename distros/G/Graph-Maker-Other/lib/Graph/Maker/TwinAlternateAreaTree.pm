@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -23,7 +23,7 @@ use Carp 'croak';
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -138,7 +138,7 @@ __END__
 
 
 
-=for stopwords Ryde chamfered undirected McWorter Tazelaar
+=for stopwords Ryde chamfered undirected McWorter Tazelaar OEIS paperfolding
 
 =head1 NAME
 
@@ -181,10 +181,10 @@ twin alternate area tree.
 Graph vertices are unit squares inside a twin alternate curve formed by two
 alternate paperfolding curves back-to-back, or equivalently a cycle of four
 such curves.  For level=k the twin alternate is four level k paperfolding
-curves curves.  It has 2^k squares inside which are vertices.  Edges are
-between squares with segments consecutive in the curve.  Or equivalently if
-the curves are drawn with corners chamfered off to leave little gaps at
-corners then edges connect squares through those gaps.  See the author's
+curves.  It has 2^k squares inside which are vertices.  Edges are between
+squares with segments consecutive in the curve.  Or equivalently if the
+curves are drawn with corners chamfered off to leave little gaps at corners
+then edges connect squares through those gaps.  See the author's
 mathematical write-up for more
 
 =over
@@ -253,10 +253,14 @@ big level=6 example above this is vertices 15 to 48.
 
 Each level is the previous plus a copy of that previous attached at the
 biggest bit pattern edge.  The effect is to make two spines continuing
-infinitely.  One spine is the verticals 0,3,12,15,etc, the other is the
-North West stair-step 0,1,6,7,24,etc.  The vertical and vertices branching
-off from it are N with an even length in binary.  The NW and vertices
-branching off from it are N with an odd length in binary.
+infinitely.
+
+    vertical spine                0,3,12,15,...
+    North West stair-step spine   0,1, 6, 7,24,...
+
+The vertical spine and the vertices branching off from it are N with an even
+length in binary.  The NW spine and the vertices branching off from it are N
+with an odd length in binary.
 
 =cut
 
@@ -305,25 +309,22 @@ between vertices.
 
 =head1 HOUSE OF GRAPHS
 
-House of Graphs entries for the graphs here include
+House of Graphs entries for the trees here include
 
 =over
 
-=item level=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
-
-=item level=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
-
-=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
-
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=260>  (path-8)
-
-=item level=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27042>
-
-=item level=5, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27044>
-
-=item level=6, L<https://hog.grinvin.org/ViewGraphInfo.action?id=27046>
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
 
 =back
+
+    1310    level=0, singleton
+    19655   level=1, path-2
+    594     level=2, path-4
+    260     level=3, path-8
+    27042   level=4
+    27044   level=5
+    27046   level=6
+    33541   level=7
 
 =head1 OEIS
 
@@ -354,7 +355,7 @@ L<Math::PlanePath::AlternatePaper>
 
 =head1 LICENSE
 
-Copyright 2017 Kevin Ryde
+Copyright 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

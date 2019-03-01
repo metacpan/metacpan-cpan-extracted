@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl interface to the libusb-1.0 API.",
    "author" : [
-      "Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>"
+      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
@@ -59,6 +59,6 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

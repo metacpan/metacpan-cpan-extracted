@@ -7,31 +7,6 @@ DESCRIPTION
 
     Utility functions for working with MySQL.
 
-REQUIRES
-
-    Modules:
-    --------
-    DBD::mysql
-    namespace::autoclean
-    Moose
-    Test::More
-
-    Database:
-    ---------
-    A running instance of mysql.  See CONF file for connection configuration.
-
-
-INSTALLATION
-
-To install this module, run the following commands:
-
-    modify CONF file as appropriate
-
-	perl Makefile.PL
-	make
-	make test
-	make install
-
 SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the

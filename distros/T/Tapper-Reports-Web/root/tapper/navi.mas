@@ -5,15 +5,23 @@
 %       my $title = $nav->{title} || '';
 %       my $image = $nav->{image} || '';
 %       my $i_id  = $nav->{id}    || '';
+%       my $confirm = $nav->{confirm} || '';
 %       my $subnavi = $nav->{subnavi};
 	<h4>
 %           if ($subnavi) {
                 <span>
 %           }
-            <a class="navilink" href="<% $href %>"><% $title %></a>
+                  <a class="navilink" href="<% $href %>"
+%                if ( $confirm ) {
+                     onclick="return confirm('<% $confirm %>');"
+%                }
+><% $title %></a>
 %           if ($image) {
-              <a class="navilink" href="<% $href %>"><img src="<% $image %>"></a>
-
+              <a class="navilink" href="<% $href %>"
+%                if ( $confirm ) {
+                   onclick="return confirm('<% $confirm %>');"
+%                }
+><img src="<% $image %>"></a>
 %           }
 %           if ($subnavi) {
                 </span>
@@ -22,10 +30,10 @@
         <ul id="<% $i_id %>">
 %               if ($subnavi and @$subnavi) {
 %                       foreach my $snav (@$subnavi) {
-%                               my $shref  = $snav->{href}  || '';
-%                               my $stitle = $snav->{title} || '';
-%                               my $confirm= $snav->{confirm} || '';
-%                               my $simage = $snav->{image} || '';
+%                               my $shref    = $snav->{href}    || '';
+%                               my $stitle   = $snav->{title}   || '';
+%                               my $sconfirm = $snav->{confirm} || '';
+%                               my $simage   = $snav->{image}   || '';
                                 <li>
 %                                       if ( $shref ) {
 %                                               if ($simage) {
@@ -34,8 +42,8 @@
                                                         &nbsp;&nbsp;&nbsp;&nbsp;
 %                                               }
                                                         <a href="<% $shref %>"
-%                                                          if ( $confirm ) {
-                                                             onclick="return confirm('<% $confirm %>');"
+%                                                          if ( $sconfirm ) {
+                                                             onclick="return confirm('<% $sconfirm %>');"
 %                                                          }
                                                         ><% $stitle %></a><br />
 %                                       }

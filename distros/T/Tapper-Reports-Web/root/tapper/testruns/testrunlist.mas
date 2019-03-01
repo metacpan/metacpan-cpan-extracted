@@ -12,8 +12,8 @@
   </%args>
 %               my $formatter    = DateTime::Format::Strptime->new(pattern     => '%Y-%m-%d %H:%M');
 %               my $full_width   = 50;
-%               my $green_width  = int (       $testrun->{success_ratio}  * $full_width / 100);
-%               my $red_width    = int ((100 - $testrun->{success_ratio}) * $full_width / 100);
+%               my $green_width  = int ($testrun->{success_ratio}  * $full_width / 100);
+%               my $red_width    = int ($full_width - $green_width);
 
 % # formatting is a display issue and belongs to the template
 
@@ -50,6 +50,10 @@
                         <td>
 % if ($testrun->{status} eq 'finished'){
 <a href="/tapper/testruns/id/<% $testrun->{testrun_id} || '' %>" title="<% $testrun->{success_ratio} || '' %>% - Click to show details"><img src="/tapper/static/images/green_bar.png" height="16" width="<% $green_width %>"><img src="/tapper/static/images/red_bar.png" height="16" width="<% $red_width %>"></a>
+% } elsif ($testrun->{status} eq 'running') {
+<a href="/tapper/testruns/id/<% $testrun->{testrun_id} || '' %>" title="<% $testrun->{success_ratio} || '' %>% - Click to show details"><img src="/tapper/static/images/yellow_bar.png" height="16" width="<% $full_width %>"></a>
+% } else {
+<a href="/tapper/testruns/id/<% $testrun->{testrun_id} || '' %>" title="<% $testrun->{success_ratio} || '' %>% - Click to show details"><img src="/tapper/static/images/yellow_bar_dimmed.png" height="16" width="<% $full_width %>"></a>
 % }
                         </td>
                         <td>

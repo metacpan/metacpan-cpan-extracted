@@ -1044,24 +1044,18 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                     return;
                   }
                   
+                  // Access control
                   int32_t is_private;
-                  // Private flag
-                  if (package->flag & SPVM_PACKAGE_C_FLAG_PRIVATE) {
-                    is_private = 1;
-                  }
-                  // Public flag
-                  else if (package->flag & SPVM_PACKAGE_C_FLAG_PUBLIC) {
+                  if (package->flag & SPVM_PACKAGE_C_FLAG_PUBLIC) {
                     is_private = 0;
                   }
                   // Default
                   else {
-                    assert(!(package->flag & SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE));
-                    assert(package->category != SPVM_PACKAGE_C_CATEGORY_VALUE);
                     is_private = 1;
                   }
                   
                   if (is_private && !(op_cur->flag & SPVM_OP_C_FLAG_NEW_INLINE)) {
-                    if (strcmp(package->op_name->uv.name, sub->package->op_name->uv.name) != 0) {
+                    if (!SPVM_OP_is_allowed(compiler, sub->package->op_package, new_package->op_package)) {
                       SPVM_COMPILER_error(compiler, "Can't create object of private package at %s line %d\n", op_cur->file, op_cur->line);
                       return;
                     }
@@ -2328,6 +2322,23 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 SPVM_COMPILER_error(compiler, "Invalid subroutine call \"%s\" at %s line %d\n", op_cur->first->uv.name, op_cur->file, op_cur->line);
                 return;
               }
+
+              // Access control
+              int32_t is_private;
+              if (call_sub->sub->flag & SPVM_SUB_C_FLAG_PRIVATE) {
+                is_private = 1;
+              }
+              // Default
+              else {
+                is_private = 0;
+              }
+              
+              if (is_private) {
+                if (!SPVM_OP_is_allowed(compiler, sub->package->op_package, call_sub->sub->package->op_package)) {
+                  SPVM_COMPILER_error(compiler, "Can't call private subroutine %s::%s at %s line %d\n", package->name, sub->name, op_cur->file, op_cur->line);
+                  return;
+                }
+              }
               
               const char* sub_name = call_sub->sub->op_name->uv.name;
               
@@ -2721,12 +2732,8 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               int32_t is_private;
-              // Private flag
-              if (package_var->flag & SPVM_PACKAGE_VAR_C_FLAG_PRIVATE) {
-                is_private = 1;
-              }
               // Public flag
-              else if (package_var->flag & SPVM_PACKAGE_VAR_C_FLAG_PUBLIC) {
+              if (package_var->flag & SPVM_PACKAGE_VAR_C_FLAG_PUBLIC) {
                 is_private = 0;
               }
               // Default is private
@@ -2735,7 +2742,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
 
               if (is_private && !op_cur->uv.package_var_access->inline_expansion) {
-                if (strcmp(package_var_access_package->name, sub->package->op_name->uv.name) != 0) {
+                if (!SPVM_OP_is_allowed(compiler, sub->package->op_package, package_var_access_package->op_package)) {
                   SPVM_COMPILER_error(compiler, "Can't access to private package variable \"%s\" at %s line %d\n", op_cur->uv.package_var_access->op_name->uv.name, op_cur->file, op_cur->line);
                   return;
                 }
@@ -2881,13 +2888,9 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
                 return;
               }
 
+              // Access control
               int32_t is_private;
-              // Private flag
-              if (field->flag & SPVM_FIELD_C_FLAG_PRIVATE) {
-                is_private = 1;
-              }
-              // Public flag
-              else if (field->flag & SPVM_FIELD_C_FLAG_PUBLIC) {
+              if (field->flag & SPVM_FIELD_C_FLAG_PUBLIC) {
                 is_private = 0;
               }
               // Default
@@ -2907,7 +2910,7 @@ void SPVM_OP_CHECKER_check_tree(SPVM_COMPILER* compiler, SPVM_OP* op_root, SPVM_
               }
               
               if (is_private && !op_cur->uv.field_access->inline_expansion) {
-                if (strcmp(invoker_type->basic_type->name, sub->package->op_name->uv.name) != 0) {
+                if (!SPVM_OP_is_allowed(compiler, sub->package->op_package, field->package->op_package)) {
                   SPVM_COMPILER_error(compiler, "Can't access to private field \"%s\" at %s line %d\n", op_name->uv.name, op_cur->file, op_cur->line);
                   return;
                 }

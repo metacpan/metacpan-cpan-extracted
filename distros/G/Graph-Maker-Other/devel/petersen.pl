@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker::Petersen;
 
 use FindBin;
-use lib "$FindBin::Bin/../devel/lib";
+use lib "$FindBin::Bin/lib";
 use MyGraphs;
 $|=1;
 
@@ -74,6 +74,7 @@ $|=1;
   
   # N=3 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=746
   #         triangles cross connected
+  #         circular ladder 3 rungs
   # N=4 K=1 https://hog.grinvin.org/ViewGraphInfo.action?id=1022
   #         squares cross connected = cube
   # N=4 K=2 https://hog.grinvin.org/ViewGraphInfo.action?id=588

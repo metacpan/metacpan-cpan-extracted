@@ -18,24 +18,24 @@ elements:
     - type: Block
       tag: br
 
-    - type: Text
-      name: shortname
-      label: Short name
-      # This is an optional 'mouse over' title pop-up
-      value: Test-in-WebGUI
-      attributes:
-        title: Enter a descriptive name here
-      constraints:
-        - type: Printable
-          message: "Should be readable text"
-
-    - type: Select
-      name: topic
-      label: Topic
-      value: Misc
-      constraints:
-      - type: Required
-        message: Please select a topic
+#    - type: Text
+#      name: shortname
+#      label: Short name
+#      # This is an optional 'mouse over' title pop-up
+#      value: Usertest
+#      attributes:
+#        title: Enter a descriptive name here
+#      constraints:
+#        - type: Printable
+#          message: "Should be readable text"
+#
+#    - type: Text
+#      name: topic
+#      label: Topic
+#      value: Usertest
+#      constraints:
+#      - type: Required
+#        message: Please select a topic
 
     - type: Select
       name: owner

@@ -41,29 +41,17 @@ has table_class_name => (
 method generate {
 
 	$self->trace;
-	
-	#
-	# do not overwrite existing CustomRole.pm!
-	#
 
-	if ( !-f $self->get_module_path ) {
+	$self->writer->write_class(
+		file_name  => $self->get_module_path,
+		class_name => $self->get_role_name,
+		use        => [
+			'Modern::Perl',       'Moose::Role',
+			'Method::Signatures', "Data::Printer alias => 'pdump'"
+		],
+		overwrite => 0,
+	);
 
-		$self->writer->write_class(
-			file_name  => $self->get_module_path,
-			class_name => $self->get_role_name,
-			use        => [
-				'Modern::Perl', 'Moose::Role',
-				'Method::Signatures',
-				"Data::Printer alias => 'pdump'"
-			],
-		);
-	}
-	else {
-		say "skipping "
-		  . $self->get_module_path
-		  . " (already exists)";
-	}
-	
 	$self->trace('exit');
 }
 

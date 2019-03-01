@@ -20,20 +20,19 @@ name: EPublisher-Source-Plugin-PerltutsCom
 provides:
   EPublisher::Source::Plugin::PerltutsCom:
     file: lib/EPublisher/Source/Plugin/PerltutsCom.pm
-    version: '0.6'
+    version: '0.7'
 requires:
   EPublisher: '0.6'
   Encode: '0'
   File::Basename: '0'
   HTTP::Tiny: '0'
-  Moo: '0'
   parent: '0'
-  perl: '5.008'
+  perl: '5.010'
 resources:
   bugtracker: http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom/issues
   homepage: http://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom
   repository: git://github.com/reneeb/EPublisher-Source-Plugin-PerltutsCom.git
-version: '0.6'
+version: '0.7'
 x_contributors:
   - 'Boris Daeppen <boris_daeppen@bluewin.ch>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

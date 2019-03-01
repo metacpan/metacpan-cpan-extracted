@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -20,6 +20,9 @@
 
 use strict;
 use 5.004;
+use FindBin;
+use File::Spec;
+use File::Slurp;
 use Test;
 # before warnings checking since Graph.pm 0.96 is not safe to non-numeric
 # version number from Storable.pm
@@ -34,19 +37,32 @@ use Graph::Maker::TwindragonAreaTree;
 use lib 'devel/lib';
 use MyGraphs;
 
-plan tests => 1;
+plan tests => 2;
 
 
 #------------------------------------------------------------------------------
 # POD HOG Shown
 
 {
-  my %shown = ('0' => 1310,
-               '1' => 19655,
-               '2' => 594,
-               '3' => 700,
-               '4' => 28549,
-              );
+  my $content = File::Slurp::read_file
+    (File::Spec->catfile($FindBin::Bin,
+                         File::Spec->updir,
+                         'lib','Graph','Maker','TwindragonAreaTree.pm'));
+  $content =~ /=head1 HOUSE OF GRAPHS.*?=head1/s or die;
+  $content = $&;
+  my %shown;
+  while ($content =~ /^    (\d+) +level=(\d+)/mg) {
+    $shown{$2} = $1;
+  }
+  ok (scalar(keys %shown), 8);
+  # my %shown = (0 => 1310,
+  #              1 => 19655,
+  #              2 => 594,
+  #              3 => 700,
+  #              4 => 28549,
+  #              5 => 31086,
+  #             );
+
   my $extras = 0;
   my %seen;
   foreach my $level (0 .. 8) {

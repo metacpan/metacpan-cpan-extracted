@@ -4,13 +4,13 @@
       "Jeremy Mates <jmates@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "artistic_2"
+      "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Config-OpenSSH-Authkey",
    "no_index" : {
@@ -21,33 +21,33 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.48",
+            "strict" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "IO::Handle" : "0",
+            "IO::Handle" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0",
-            "perl" : "5.006"
+            "lib" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/thrig/Config-OpenSSH-Authkey",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
          "url" : "https://github.com/thrig/Config-OpenSSH-Authkey"
       }
    },
-   "version" : "1.05"
+   "version" : "1.06",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

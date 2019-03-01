@@ -1,5 +1,13 @@
 Change log for PiFlash
 
+0.1.0 2019-02-28T11:45:04-08:00 America/Los_Angeles
+ [DOCS]
+ - Updated installation package dependencies for RPM & DEB systems
+
+ [ENHANCEMENTS]
+ - Added YAML config files
+ - Added plugin modules and PiFlash::Hook
+
 0.0.6 2019-02-05T19:11:47-08:00 America/Los_Angeles
  - tweaks to RPM spec for release
 

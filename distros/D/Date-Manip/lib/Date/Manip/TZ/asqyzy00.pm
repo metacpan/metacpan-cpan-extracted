@@ -1,14 +1,14 @@
 package #
 Date::Manip::TZ::asqyzy00;
-# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Nov 30 14:28:40 EST 2018
-#    Data version: tzdata2018g
-#    Code version: tzcode2018g
+#    Generated on: Thu Feb 28 13:05:10 EST 2019
+#    Data version: tzdata2018i
+#    Code version: tzcode2018i
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.75';
+$VERSION='6.76';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -263,8 +263,14 @@ END { undef $VERSION; }
           '+06',1,[2004,10,30,20,59,59],[2004,10,31,2,59,59],
           '2004032721:00:00','2004032803:00:00','2004103020:59:59','2004103102:59:59' ],
         [ [2004,10,30,21,0,0],[2004,10,31,3,0,0],'+06:00:00',[6,0,0],
-          '+06',0,[9999,12,31,0,0,0],[9999,12,31,6,0,0],
-          '2004103021:00:00','2004103103:00:00','9999123100:00:00','9999123106:00:00' ],
+          '+06',0,[2018,12,20,17,59,59],[2018,12,20,23,59,59],
+          '2004103021:00:00','2004103103:00:00','2018122017:59:59','2018122023:59:59' ],
+     ],
+   2018 =>
+     [
+        [ [2018,12,20,18,0,0],[2018,12,20,23,0,0],'+05:00:00',[5,0,0],
+          '+05',0,[9999,12,31,0,0,0],[9999,12,31,5,0,0],
+          '2018122018:00:00','2018122023:00:00','9999123100:00:00','9999123105:00:00' ],
      ],
 );
 

@@ -13,7 +13,7 @@ use Carp;
 use Exporter 'import';
 our @EXPORT = @USB::LibUSB::XS::EXPORT;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has 'ctx' => (
     is => 'ro',
@@ -197,7 +197,8 @@ USB::LibUSB - Perl interface to the libusb-1.0 API.
 
  my $ctx = USB::LibUSB->init();
  my $handle = $ctx->open_device_with_vid_pid(0x1111, 0x2222);
- $handle->set_auto_detach_kernel_driver(1);
+
+ $handle->set_auto_detach_kernel_driver(1); # Linux only
 
  # We want to use interface 0
  $handle->claim_interface(0);
@@ -380,7 +381,7 @@ Like C<open_device_with_vid_pid>, but also requires a serial number.
 
 =head3 get_device
 
- my $dev = $hanlde->get_device();
+ my $dev = $handle->get_device();
 
 =head3 get_configuration
 
@@ -425,6 +426,8 @@ Like C<open_device_with_vid_pid>, but also requires a serial number.
 =head3 set_auto_detach_kernel_driver
 
  $handle->set_auto_detach_kernel_driver($enable);
+
+Throws exception on Windows and Darwin.
 
 =head2 Miscellaneous
 
@@ -540,7 +543,7 @@ Return hashref C<$config> with the following keys:
 =back
 
 With the exception of B<interface>, all values are scalars.
-B<interface> holds an arrayref of interface descriptors. These are hashrefs with the
+B<interface> holds an arrayref of bNumInterfaces interface descriptors. Each interface consists of an array of alternate settings. These are hashrefs with the
 following keys:
 
 =over
@@ -632,33 +635,34 @@ For a B<Linux Foundation 3.0 root hub>:
  extra: ~
  iConfiguration: 0
  interface:
- - bAlternateSetting: 0
-   bDescriptorType: 4
-   bInterfaceClass: 9
-   bInterfaceNumber: 0
-   bInterfaceProtocol: 0
-   bInterfaceSubClass: 0
-   bLength: 9
-   bNumEndpoints: 1
-   endpoint:
-   - bDescriptorType: 5
-     bEndpointAddress: 129
-     bInterval: 12
-     bLength: 7
-     bRefresh: 0
-     bSynchAddress: 0
-     bmAttributes: 3
-     extra: "\x060\0\0\x02\0"
-     ss_endpoint_companion:
-       bDescriptorType: 48
-       bLength: 6
-       bMaxBurst: 0
-       bmAttributes: 0
-       wBytesPerInterval: 2
-     wMaxPacketSize: 4
-   extra: ~
-   iInterface: 0
+ - - bAlternateSetting: 0
+     bDescriptorType: 4
+     bInterfaceClass: 9
+     bInterfaceNumber: 0
+     bInterfaceProtocol: 0
+     bInterfaceSubClass: 0
+     bLength: 9
+     bNumEndpoints: 1
+     endpoint:
+     - bDescriptorType: 5
+       bEndpointAddress: 129
+       bInterval: 12
+       bLength: 7
+       bRefresh: 0
+       bSynchAddress: 0
+       bmAttributes: 3
+       extra: "\x060\0\0\x02\0"
+       ss_endpoint_companion:
+         bDescriptorType: 48
+         bLength: 6
+         bMaxBurst: 0
+         bmAttributes: 0
+         wBytesPerInterval: 2
+       wMaxPacketSize: 4
+     extra: ~
+     iInterface: 0
  wTotalLength: 31
+ 
 
 =head3 get_config_descriptor
 
@@ -815,7 +819,7 @@ Feel free to contact us at the #labmeasurement channel on Freenode IRC.
 
 =head1 AUTHOR
 
-Simon Reinhardt, E<lt>simon.reinhardt@stud.uni-regensburg.deE<gt>
+Simon Reinhardt, E<lt>simon.reinhardt@physik.uni-r.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

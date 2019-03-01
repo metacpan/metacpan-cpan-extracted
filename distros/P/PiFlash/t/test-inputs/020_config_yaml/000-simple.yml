@@ -1,0 +1,5 @@
+This: top level mapping
+is:
+    - a
+    - YAML
+    - document

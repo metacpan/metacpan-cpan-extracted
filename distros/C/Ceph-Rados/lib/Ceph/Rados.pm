@@ -8,7 +8,7 @@ use AutoLoader;
 use Carp;
 use Ceph::Rados::IO;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 # Do we have C symbols in a Ceph::Rados::Constants::C::Symbols module?
 my $_symbols_present;
@@ -72,7 +72,7 @@ sub io {
 
 sub DESTROY {
     my $self = shift;
-    $self->shutdown;
+    $self->shutdown if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 }
 
 # Autoload methods go after =cut, and are processed by the autosplit program.

@@ -50,7 +50,7 @@
    "provides" : {
       "Types::Mojo" : {
          "file" : "lib/Types/Mojo.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -65,8 +65,9 @@
          "web" : "http://github.com/reneeb/Types-Mojo"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
+      "NGEfreak <NGEfreak@users.noreply.github.com>",
       "reneeb <info@perl-services.de>"
    ],
    "x_serialization_backend" : "JSON::XS version 3.04"

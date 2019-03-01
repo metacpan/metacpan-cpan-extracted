@@ -1,3 +1,14 @@
+** 0.22 / 2019-02-28
+   - Correctly update $VERSION strings (incorrectly updated on 0.21)
+
+** 0.21 / 2019-02-27
+   - Suppress output of second and later 'wait_for' iterations
+     in order to increase the usefulness of the log content
+     (Note that the logger now does include the number of retries)
+   - Implement three missing element interactions in Weasel::Session,
+     the broker component linking the driver to the front-end
+     (element) API: set_attribute, get_selected & set_selected
+
 ** 0.20 / 2019-02-20
    - Don't send driver interaction caused by logging to the logger
 

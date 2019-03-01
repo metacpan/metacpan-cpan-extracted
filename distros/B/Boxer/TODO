@@ -26,7 +26,6 @@
 Initial release:
 
   * Reimplement commands and classes from current make-based boxer:
-    + bootstrap
     + install
     + Bootstrap::Multistrap
     + Install::Device
@@ -72,7 +71,6 @@ Later releases...
 
 misc.
 
-  * Maybe mention germinate as a competitor?
   * Borrow boilerplate patterns from https://metacpan.org/pod/Sympatic
   * Maybe implement warning field.
     Examples:
@@ -81,3 +79,5 @@ misc.
     + Tweaking conffiles
       (known to fail later upgrade: See bug#311188).
   * Use MooX::StrictConstructor.
+  * Track unit testing code coverage:
+    <https://stackoverflow.com/questions/533553/perl-build-unit-testing-code-coverage-a-complete-working-example>

@@ -4,17 +4,18 @@ use warnings;
 use 5.014000;
 use utf8;
 
-use Test::More;
+use Test::More tests => 2;
 
-our $VERSION = 0.103;
+our $VERSION = v1.1.1;
 
 eval {
-    require Test::CheckManifest;
+    require ExtUtils::Manifest;
     1;
 } or do {
-    my $msg = q{Test::CheckManifest 1.01 required to check spelling of POD};
+    my $msg = q{ExtUtils::Manifest required to check manifest};
     plan 'skip_all' => $msg;
 };
 
-Test::CheckManifest::ok_manifest(
-    { 'filter' => [qr/(Debian_CPANTS.txt|[.](svn|bak))/sxm] } );
+use ExtUtils::Manifest;
+is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';

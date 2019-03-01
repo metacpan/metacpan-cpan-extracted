@@ -1,7 +1,7 @@
 package Starch;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Starch::Factory;
 use Moo::Object qw();
@@ -470,27 +470,15 @@ Please submit bugs and feature requests to the Starch GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+Aran Clary Deltac E<lt>bluefeet@gmail.comE<gt>
 
-=head1 CONTRIBUTORS
+Arthur Axel "fREW" Schmidt E<lt>frioux+cpan@gmail.comE<gt>
 
-=over
+Jonathan Scott Duff E<lt>duff@pobox.comE<gt>
 
-=item *
-
-Arthur Axel "fREW" Schmidt <frioux+cpanE<64>gmail.com>
-
-=item *
-
-Jonathan Scott Duff <duffE<64>pobox.com>
-
-=item *
-
-Ismail Kerim <ismail.kerimE<64>assurant.com>
-
-=back
+Ismail Kerim E<lt>ismail.kerim@assurant.comE<gt>
 
 =head1 ACKNOWLEDGEMENTS
 

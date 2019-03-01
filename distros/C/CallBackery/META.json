@@ -20,7 +20,7 @@
          "t",
          "example",
          "setup",
-         "lib/Mojolicious/Command/generate/callbackery_app"
+         "lib/Mojolicious/Command/Author/generate/callbackery_app"
       ]
    },
    "prereqs" : {
@@ -56,6 +56,6 @@
          "url" : "https://github.com/oetiker/callbackery"
       }
    },
-   "version" : "v0.14.4",
+   "version" : "v0.14.5",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

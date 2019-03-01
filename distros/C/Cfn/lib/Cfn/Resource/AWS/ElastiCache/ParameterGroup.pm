@@ -1,4 +1,4 @@
-# AWS::ElastiCache::ParameterGroup generated from spec 1.11.0
+# AWS::ElastiCache::ParameterGroup generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ElastiCache::ParameterGroup',
@@ -23,7 +23,7 @@ package Cfn::Resource::Properties::AWS::ElastiCache::ParameterGroup {
   
   has CacheParameterGroupFamily => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Properties => (isa => 'Cfn::Value::Hash', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Properties => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

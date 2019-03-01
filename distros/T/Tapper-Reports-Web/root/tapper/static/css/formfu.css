@@ -1,6 +1,5 @@
 fieldset {
 	padding: 1em;
-        border: 0;
 }
 
 fieldset .button,
@@ -10,6 +9,7 @@ fieldset .date,
 fieldset .file,
 fieldset .image,
 fieldset .multi,
+fieldset .number,
 fieldset .password,
 fieldset .radio,
 fieldset .recaptcha,
@@ -33,12 +33,11 @@ fieldset .recaptcha noscript textarea {
     display: block;
 }
 
-/* override the iframe's height="" - it's seems a bit big
+/* override the iframe's height="" - it seems a bit big
 */
 fieldset .recaptcha iframe {
     height: 230px ! important;
 }
-
 
 fieldset .button.label,
 fieldset .checkbox.label,
@@ -47,6 +46,7 @@ fieldset .date.label,
 fieldset .file.label,
 fieldset .image.label,
 fieldset .multi.label,
+fieldset .number.label,
 fieldset .password.label,
 fieldset .radio.label,
 fieldset .recaptcha.label,
@@ -57,7 +57,6 @@ fieldset .text.label,
 fieldset .textarea.label
 {
 	margin-left: 1px;
-        padding: 0.3em;
 }
 
 fieldset .error.label {
@@ -95,6 +94,7 @@ fieldset .date label,
 fieldset .file label,
 fieldset .image label,
 fieldset .multi label,
+fieldset .number label,
 fieldset .password label,
 fieldset .radio label,
 fieldset .radiogroup label,

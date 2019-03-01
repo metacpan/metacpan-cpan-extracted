@@ -1,5 +1,13 @@
 Revision history for Dancer-Plugin-Auth-Google
 
+0.07    2019-02-28
+    - updated endpoints to OAuth via Google Identity Platform.
+    - remove calls to deprecated G+ endpoints.
+    - include "legacy_gplus" option to keep old data structure
+      on session('google_user').
+    - updated documentation to reflect changes.
+    - include documentation on how to pass 'state' data around.
+
 0.06    2014-12-27
     - added missing prereq.
 

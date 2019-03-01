@@ -1,4 +1,4 @@
-# AWS::IoT1Click::Project generated from spec 2.15.0
+# AWS::IoT1Click::Project generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoT1Click::Project',
@@ -34,8 +34,8 @@ package Cfn::Resource::Properties::AWS::IoT1Click::Project::PlacementTemplateVal
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has DefaultAttributes => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has DeviceTemplates => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has DefaultAttributes => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DeviceTemplates => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::IoT1Click::Project::DeviceTemplate',
@@ -56,7 +56,7 @@ package Cfn::Resource::Properties::AWS::IoT1Click::Project::DeviceTemplateValue 
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has CallbackOverrides => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CallbackOverrides => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeviceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

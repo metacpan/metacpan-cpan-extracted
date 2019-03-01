@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,20 +14,20 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 ddbace4e07168d1bffd59eda3ad456af2f6cc543 COPYRIGHT
+SHA1 3fa4d79f2b9fe498b53659150337d8a671bbefa6 COPYRIGHT
 SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
-SHA1 76f060146a9051b058acf0809aafe4ed5e231428 Changes
+SHA1 a295dda0e311ffa4adf40721c9abcbcf2a3ac86c Changes
 SHA1 16c85a37f747aa4442f6e19510108533a39b15f4 INSTALL
-SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
-SHA1 4a1b6f94f059e553c8ae23dcad4223ffb889992e MANIFEST
-SHA1 0904454c551942bcaf5b44f054cb22907f8304b9 META.json
-SHA1 28a39745d5d9f299f29c5efcb859182b1c451a80 META.yml
-SHA1 725c31c056e365ae77f9c365ba8899d0ec60563b Makefile.PL
-SHA1 a00aef75457798ffa5f46962fc34ee52b364b9b4 README
+SHA1 529a6c89bb1ec1ab70f21730c345dcbda3871ed8 LICENSE
+SHA1 2dae23bb19807eba339e21aa7a65cb77f14aece4 MANIFEST
+SHA1 3f0dbbf3e2bfcd8a42de454380d626bfbecc3698 META.json
+SHA1 a69171f867e0677f6145c329170049bd9974fb2d META.yml
+SHA1 2fff1b5222c91af9c44af66c24e11a692dc1f529 Makefile.PL
+SHA1 7298aa38a970b1dc92f3cf9169a97b42423837ff README
 SHA1 3f1e630b4ae3fe09038545a91c4f94d048d6098d dist.ini
-SHA1 b8890457493a9328e5377c1bfaa1cd65f1531f42 doap.ttl
+SHA1 4a70b89a7d210f67e229d16dc072c5fdfffda9da doap.ttl
 SHA1 3401e1a03180ab67b512e29dd81f51d5d56f678b examples/simple-subclassing.pl
-SHA1 53c63a2cabcf786111179cf46a0ea690f002f2be lib/Subclass/Of.pm
+SHA1 3d774d103c56713b3304fccd0dc581025d7ab48d lib/Subclass/Of.pm
 SHA1 1ab09c08bdb4a6116c9416b0c68b420e8511445a t/01basic.t
 SHA1 e8421bbeb2721011e411bad90ecb79087e6c1e5f t/02moose.t
 SHA1 79fcd8854d7cb50791e603b1e62e381ba1361f0a t/03moo.t
@@ -36,6 +36,7 @@ SHA1 7b83fe093b34af5348d50d612f2b102b4a8bdf43 t/05moomoose.t
 SHA1 d478419e7fbd52d078646c11945d600edc9e4c32 t/06roletiny.t
 SHA1 96f6bb43df02840a71f0f259b274a6f740cf169d t/07warnings.t
 SHA1 4d768615678270b0eb6900ddf26241fb93b65527 t/08lazy.t
+SHA1 8abcc0cc3f60cc7a4a92d185eee0376b13f6d846 t/09fieldhash.t
 SHA1 c1e272dfa3341d153d666006073c64a77b25360a t/lib/Local/Moo/Class.pm
 SHA1 ebc9b632a7d2c441e0716604491bd33592f0920d t/lib/Local/Moo/Role.pm
 SHA1 6bec6df570802063b96d7cda2c3316c76da47dcb t/lib/Local/Moose/Class.pm
@@ -45,9 +46,8 @@ SHA1 0cd3100d2817931848bedb9c02ae8402171f390d t/lib/Local/Mouse/Role.pm
 SHA1 3fc1e67c71bdb7f81db665db29cb40afef0338af t/lib/Local/Perl/Class.pm
 SHA1 9f2cce6f1cd88c7a1eaf4bfb5b60206e536d1e92 t/lib/Local/RoleTiny/Role.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAllEOAEACgkQzr+BKGoqfTnFRgCbBo6ev1LSfEFGG4qXPpZZGbbW
-B6sAn3ycva1h8v9sUORmr3K5VoUG2OCP
-=luhE
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCXHgRiQAKCRDOv4Eoaip9
+OVgfAJ9Gp0QhqIlZqT1SBdtYu7g9yNaMjACeKf/efh9DtWnXHJvf2G5pH64zr0M=
+=8c+Z
 -----END PGP SIGNATURE-----

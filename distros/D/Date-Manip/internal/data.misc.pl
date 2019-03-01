@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -18,8 +18,8 @@
 # greater than $keep_years.
 
 my($keep_years,$test_years);
-$keep_years = 50;
-$test_years = 60;
+$keep_years = 70;
+$test_years = $keep_years + 10;
 
 $curr_year  = (localtime)[5] + 1900;
 $keep_year  = $curr_year + $keep_years;

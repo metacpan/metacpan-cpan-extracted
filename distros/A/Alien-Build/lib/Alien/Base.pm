@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 
 sub import {
@@ -587,7 +587,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.55
+version 1.60
 
 =head1 SYNOPSIS
 
@@ -804,9 +804,11 @@ behaviour to the C<< <=> >> and C<cmp> operators.
 =head2 install_type
 
  my $install_type = Alien::MyLibrary->install_type;
+ my $bool = Alien::MyLibrary->install_type($install_type);
 
 Returns the install type that was used when C<Alien::MyLibrary> was
-installed.  Types include:
+installed.  If a type is provided (the second form in the synopsis)
+returns true if the actual install type matches.  Types include:
 
 =over 4
 

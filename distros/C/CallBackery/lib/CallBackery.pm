@@ -6,7 +6,7 @@ CallBackery - Appliance Frontend Builder
 
 =head1 SYNOPSIS
 
- reqquire Mojolicious::Commands;
+ require Mojolicious::Commands;
  Mojolicious::Commands->start_app('CallBackery');
 
 =head1 DESCRIPTION
@@ -33,15 +33,15 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.14.4';
+our $VERSION = '0.14.5';
 
 use Mojo::Base 'Mojolicious';
 
 =head2 config
 
 A hash pointer to the configuration object. See L<CallBackery::Config> for details.
-The default configuration file is located in etc/afb.cfg. You can override the
-path by setting the C<{CallBackery_CONF> environment variable.
+The default configuration file is located in etc/callbackery.cfg. You can override the
+path by setting the C<CALLBACKERY_CONF> environment variable.
 
 The config property is set automatically on startup.
 

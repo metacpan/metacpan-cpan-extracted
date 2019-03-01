@@ -1403,3 +1403,13 @@ Revision history for Graphics-Framebuffer
       Some issues still with 16 bit mode on texture or patterned filled
       objects.  Temporarily turning off C acceleration for those may minimize
       some of the issues.
+
+6.23  Feb 28, 2019
+
+      Numerous bug fixes and optimizations for 16 bit color mode.
+
+      Fills are now handled properly in 16 bit mode.
+
+      Example scripts have been adapted to handle the fixes in 16 bit mode.
+      Previously broken 16 bit code was bypassed, but now it works just like
+      the 24/32 bit routines.

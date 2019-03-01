@@ -20,7 +20,7 @@ no_index:
     - t
     - example
     - setup
-    - lib/Mojolicious/Command/generate/callbackery_app
+    - lib/Mojolicious/Command/Author/generate/callbackery_app
 requires:
   Config::Grammar: '1.12'
   Locale::PO: '0.27'
@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.14.4
+version: v0.14.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

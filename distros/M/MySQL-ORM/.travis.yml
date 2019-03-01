@@ -5,6 +5,9 @@ perl:
   - "5.22"
   - "5.20"
 
+services:
+  - mariadb
+
 before_install:
   - git clone git://github.com/haarg/perl-travis-helper
   - source perl-travis-helper/init

@@ -13,6 +13,7 @@ use MySQL::ORM::Generate::Class::ResultClass;
 use MySQL::ORM::Generate::Class::ResultClassX;
 use MySQL::ORM::Generate::Class::CustomRole;
 use SQL::Beautify;
+use Text::Trim 'trim';
 
 extends 'MySQL::ORM::Generate::Common';
 
@@ -339,6 +340,36 @@ method _get_method_selectx_one {
 	);
 }
 
+method _merge_sig_types (ArrayRef :$sig!) {
+
+	# for cases where you have nullable foreign keys in one table, but they 
+	# are required fields in the parent table
+	
+	# example:
+	#   Num|HashRef|Undef :$foo_id,
+    #   Num|HashRef       :$foo_id,
+   	
+   	my %cols;
+   	 
+	foreach my $param (@$sig) {
+		$param = trim $param;
+		my ($type, $colname) = split(/\s+/, $param);	
+		
+		my @types = split(/\|/, $type);	
+		push @{ $cols{$colname} }, @types;
+	}		
+	
+	my @sig;
+		
+	foreach my $col (sort keys %cols) {
+		my @types = @{ $cols{$col} };
+		my @uniq_types = uniq @types;		
+		push @sig, sprintf("    %s %s", join('|', sort @uniq_types), $col);
+	}	
+	
+	return @sig;
+}
+
 method _get_method_sigx (Bool :$exclude_autoinc = 0,
 						 Bool :$want_order_by = 0) {
 
@@ -356,7 +387,8 @@ method _get_method_sigx (Bool :$exclude_autoinc = 0,
 	}
 
 	@sig = uniq @sig;
-
+	@sig = $self->_merge_sig_types(sig => \@sig);	
+	
 	my $left_join = sprintf '    %s :%s%s', 'Bool', '$', 'left_join';
 	push @sig, $left_join;
 

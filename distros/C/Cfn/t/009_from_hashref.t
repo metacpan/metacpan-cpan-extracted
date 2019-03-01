@@ -67,7 +67,7 @@ while (my $file = $d->read){
   next if (not $file =~ m/\.json$/);
   my $content = read_file("$t_dir/$file");
   my $cfn;
-  diag "for file $t_dir/$file";
+  note "for file $t_dir/$file";
   eval { $cfn = Cfn->from_json($content) };
   if ($@){
     if ($@ =~ m/you may need to install the .* module/){

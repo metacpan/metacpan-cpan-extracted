@@ -1,0 +1,48 @@
+---
+abstract: 'Test core features of starch.'
+author:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+conflicts:
+  Starch: '< 0.12'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Starch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::Starch:
+    file: lib/Test/Starch.pm
+    version: '0.12'
+recommends:
+  Starch: '0.12'
+requires:
+  Moo: '2.000000'
+  Test2::V0: '0.000094'
+  Types::Common::String: '1.000005'
+  Types::Standard: '1.000005'
+  namespace::clean: '0.24'
+  perl: '5.008001'
+  strictures: '2.000000'
+resources:
+  bugtracker: https://github.com/bluefeet/Test-Starch/issues
+  homepage: https://github.com/bluefeet/Test-Starch
+  repository: git://github.com/bluefeet/Test-Starch.git
+version: '0.12'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

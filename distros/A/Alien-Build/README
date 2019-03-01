@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.55
+    version 1.60
 
 SYNOPSIS
 
@@ -57,7 +57,7 @@ DESCRIPTION
     Module::Build). One of the goals of this project is to remain installer
     agnostic.
 
-CONSTRUCTOR
+CONSTRUCTORS
 
  new
 
@@ -66,6 +66,20 @@ CONSTRUCTOR
     This creates a new empty instance of Alien::Build. Normally you will
     want to use load below to create an instance of Alien::Build from an
     alienfile recipe.
+
+ load
+
+     my $build = Alien::Build->load($alienfile);
+
+    This creates an Alien::Build instance with the given alienfile recipe.
+
+ resume
+
+     my $build = Alien::Build->resume($alienfile, $root);
+
+    Load a checkpointed Alien::Build instance. You will need the original
+    alienfile and the build root (usually _alien), and a build that had
+    been properly checkpointed using the checkpoint method below.
 
 PROPERTIES
 
@@ -85,9 +99,9 @@ PROPERTIES
      sub init
      {
        my($self, $meta) = @_;
-       
+     
        $meta->prop( plugin_fetch_newprotocol_foo => 'some value' );
-       
+      
        $meta->register_hook(
          some_hook => sub {
            my($build) = @_;
@@ -403,26 +417,16 @@ PROPERTIES
 
 METHODS
 
- load
-
-     my $build = Alien::Build->load($alienfile);
-
-    This creates an Alien::Build instance with the given alienfile recipe.
-
  checkpoint
 
      $build->checkpoint;
 
     Save any install or runtime properties so that they can be reloaded on
-    a subsequent run. This is useful if your build needs to be done in
-    multiple stages from a Makefile, such as with ExtUtils::MakeMaker.
-
- resume
-
-     my $build = Alien::Build->resume($alienfile, $root);
-
-    Load a checkpointed Alien::Build instance. You will need the original
-    alienfile and the build root (usually _alien).
+    a subsequent run in a separate process. This is useful if your build
+    needs to be done in multiple stages from a Makefile, such as with
+    ExtUtils::MakeMaker. Once checkpointed you can use the resume
+    constructor (documented above) to resume the probe/build/install]
+    process.
 
  root
 

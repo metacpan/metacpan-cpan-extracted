@@ -61,7 +61,7 @@ use utf8;
 use Encode;
 use open IO => ':utf8';
 use Carp;
-use List::Util qw(min max reduce sum pairmap);
+use List::Util qw(min max reduce sum pairmap first);
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
 use Data::Dumper;
@@ -136,7 +136,7 @@ my @optargs = (
     "l" => \$opt_l,
     "s" => \$opt_s,
     "width|W=i" => \$opt_W,
-    "view|v" => \$opt_view,
+    "view|v!" => \$opt_view,
     "ambiguous=s" => \$opt_ambiguous,
     "command!" => \$opt_command,
 
@@ -239,7 +239,7 @@ my $painter = do {
 ##
 ## setup cdifopts
 ##
-push @opt_cdifopts,
+unshift @opt_cdifopts,
     $opt_256   ? qw(--256)   : qw(--no-256)  ,
     $opt_graph ? qw(--graph) : qw(--no-graph),
     @default_opt_cdifopts;
@@ -392,7 +392,7 @@ while (<DIFF>) {
 	    @new = read_line(*DIFF, $n);
 	    $readfile and read_line(*NEW, $n);
 	}
-	map { s/^[<>] ?// } @old, @new;
+	map { s/^[<>]\s?/ / } @old, @new;
 	flush_buffer([], \@old, \@new);
     }
     #
@@ -433,7 +433,6 @@ while (<DIFF>) {
 	($nline) = $right =~ /^(\d+)/;
 
 	my @buf = merge_diffc(\@old, \@new);
-	map { map { s/^[-+! ] ?// } @$_ } @buf;
 	flush_buffer(@buf);
     }
     #
@@ -477,7 +476,6 @@ while (<DIFF>) {
 	print_command_n({ type => 'COMMAND' }, $command, $command);
 	my @buf = read_unified_2 \%read_opt, *DIFF, $o, $n;
 
-	map { map { s/^[-+ ]// } @$_ } @buf;
 	flush_buffer(@buf);
     }
     #
@@ -526,41 +524,39 @@ sub merge_diffc {
     my @n = @{+shift};
     my @buf;
 
-    die if grep { not /^[ \-\+\!][\t ]/ } @o, @n;
+    die if grep { not s/(?<= ^[ \-\+\!] ) [\t ]//x } @o, @n;
 
     while (@o or @n) {
 	my @slot = ([], [], []);
 	push @buf, @slot;
 
 	if (@o and @n) {
-	    while (@o and @n and $o[0] =~ /^ [\t ]/ and $n[0] =~ /^ [\t ]/) {
+	    while (@o and @n and $o[0] =~ /^ / and $n[0] =~ /^ /) {
 		push @{$slot[0]}, shift @o;
 		shift @n;
 	    }
 	}
 	elsif (@o) {
-	    push(@{$slot[0]}, shift @o) while @o and $o[0] =~ /^ [\t ]/;
+	    push(@{$slot[0]}, shift @o) while @o and $o[0] =~ /^ /;
 	}
 	elsif (@n) {
-	    push(@{$slot[0]}, shift @n) while @n and $n[0] =~ /^ [\t ]/;
+	    push(@{$slot[0]}, shift @n) while @n and $n[0] =~ /^ /;
 	}
 
-	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^\-[\t ]/;
+	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^\-/;
 	next if @{$slot[1]};
 
-	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^\+[\t ]/;
+	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^\+/;
 	next if @{$slot[2]};
 
-	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^![\t ]/;
-	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^![\t ]/;
+	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ s/^!/-/;
+	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ s/^!/+/;
     }
 
     @buf;
 }
 
 sub flush_buffer {
-
-    my($omark, $nmark) = ('-', '+');
 
     push @_, [] while @_ % 3;
 
@@ -574,12 +570,12 @@ sub flush_buffer {
 	    map { $_ ? [ ( splice @_, 0, 3 ) ] : [ [], [], [] ] }
 	    0 .. @_ / 3 ;
 	};
-	($omark, $nmark) = (' ', ' ');
     }
 
     while (my($s, $o, $n) = splice @_, 0, 3) {
 	for (@$s) {
-	    print_column_23(' ', $_, ' ', $_);
+	    s/^(.)// or die;
+	    print_column_23($1, $_, $1, $_);
 	    $oline++;
 	    $nline++;
 	}
@@ -587,8 +583,8 @@ sub flush_buffer {
 	while (@$o or @$n) {
 	    my $old = shift @$o;
 	    my $new = shift @$n;
-	    my $omark = $old ? $omark : ' ';
-	    my $nmark = $new ? $nmark : ' ';
+	    my $omark = $old ? $old =~ s/^(.)// && $1 : ' ';
+	    my $nmark = $new ? $new =~ s/^(.)// && $1 : ' ';
 
 	    print_column_23($omark, $old, $nmark, $new);
 
@@ -626,15 +622,13 @@ sub flush_buffer_3 {
 	    $mline++;
 	}
 
-	while (grep { @$_ > 0 } @d) {
+	while (first { @$_ > 0 } @d) {
 	    my $old = shift @{$d[0]};
 	    my $new = shift @{$d[1]};
 	    my $mrg = shift @{$d[2]};
-	    my $om = $old ? $old =~ s/^(?|(\-).|\s(\+))// && $1 : ' ';
-	    my $nm = $new ? $new =~ s/^(?|.(\-)|(\+)\s)// && $1 : ' ';
-	    my $mm = $mrg ? $mrg =~ s/^(?|(\+).|.(\+))//  && $1 : ' ';
-
-	    $om = $nm = $mm = ' ' if $opt_view;
+	    my $om = $old ? $old =~ s/^(?|(\-).| (\+)|( ) )// && $1 : ' ';
+	    my $nm = $new ? $new =~ s/^(?|.(\-)|(\+) |( ) )// && $1 : ' ';
+	    my $mm = $mrg ? $mrg =~ s/^(?|(\+).|.(\+)|( ) )// && $1 : ' ';
 
 	    print_column_23($om, $old, $nm, $new, $mm, $mrg);
 
@@ -1069,7 +1063,8 @@ Show table of ANSI 216 colors.
 
 =item B<--view>, B<-v>
 
-Viewer mode.  Display two files side-by-side in straightforward order.
+Viewer mode.  Display each files in straightforward order.  Without
+this option, unchanged lines are placed at the same position.
 
 =item B<--ambiguous>=I<width_spec>
 

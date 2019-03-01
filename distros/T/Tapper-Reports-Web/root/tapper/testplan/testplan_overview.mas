@@ -3,9 +3,11 @@ $path
 $overview
 </%args>
 % no warnings 'uninitialized';
+% if ($path) {
+  <h4>Testplan specification</h4>
   <h5>Path: <strong><% $path %></strong></h5>
   <br/>
-% if ($overview and ref $overview eq 'ARRAY') {
+%  if ($overview and ref $overview eq 'ARRAY') {
 %     foreach my $element(@{$overview}){
   <h5>&nbsp;&nbsp;&nbsp;&nbsp;- Element: <strong><% $element->{shortname} %></strong></h5>
     <table class="reportsectionmeta">
@@ -13,14 +15,18 @@ $overview
         <tr>
           <td colspan="2"><h5></h5></td>
         </tr>
+%   if ($element->{kernel}->[0]) {
         <tr>
           <th>Kernel</th>
           <td><% $element->{kernel}->[0] %></td>
         </tr>
+%   }
+%   if ($element->{image}->[0]) {
         <tr>
           <th>Root image</th>
           <td><% $element->{image}->[0] %></td>
         </tr>
+%   }
 %   if ($element->{xen_package}) {
         <tr>
           <th>Xen package</th>
@@ -51,5 +57,6 @@ $overview
     </table>
     <br/>
 %   }
+%  }
 % }
 

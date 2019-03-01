@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -46,21 +46,23 @@ while (@ARGV) {
     next;
   }
   if ($arg eq '--vpar') {
-    require Graph;
-    my $graph = Graph->new (directed=>1);
-    $graph->set_graph_attribute (name => $name);
-    $graph->set_graph_attribute (flow => 'north');
-    @ARGV = map {split /, /} @ARGV;
-    foreach my $v0 (0 .. $#ARGV) {
-      my $v1 = $v0 + 1;
-      $graph->add_vertex($v1);
-      my $p1 = $ARGV[$v0] || next;
-      $graph->add_edge ($v1,$p1);
-    }
-    # print "$graph\n";
-    # print $graph->vertices,"\n";
-    # print scalar $graph->vertices,"\n";
-    MyGraphs::Graph_view($graph);
+    @ARGV = map {split /, */} @ARGV;
+    MyGraphs::vpar_view([undef, @ARGV]);
+
+    # require Graph;
+    # my $graph = Graph->new (directed=>1);
+    # $graph->set_graph_attribute (name => $name);
+    # $graph->set_graph_attribute (flow => 'north');
+    # foreach my $v0 (0 .. $#ARGV) {
+    #   my $v1 = $v0 + 1;
+    #   $graph->add_vertex($v1);
+    #   my $p1 = $ARGV[$v0] || next;
+    #   $graph->add_edge ($v1,$p1);
+    # }
+    # # print "$graph\n";
+    # # print $graph->vertices,"\n";
+    # # print scalar $graph->vertices,"\n";
+    # MyGraphs::Graph_view($graph);
     last;
   }
   # if ($arg eq '--hog') {

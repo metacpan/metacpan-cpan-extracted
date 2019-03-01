@@ -10,8 +10,9 @@ use PiFlash::Inspector;
 use PiFlash::Hook;
 
 package PiFlash::MediaWriter;
-$PiFlash::MediaWriter::VERSION = '0.0.6';
+$PiFlash::MediaWriter::VERSION = '0.1.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
+use Try::Tiny;
 use File::Basename;
 use File::Slurp qw(slurp);
 
@@ -69,6 +70,79 @@ sub random_label
 		}
 	}
 	return $label;
+}
+
+# reread partition table, with retries if necessary
+sub reread_pt
+{
+	my $reason = shift;
+
+	# re-read partition table, use multiple tries if necessary
+	my $tries = 10;
+	while (1) {
+		try {
+			PiFlash::Command::cmd("reread partition table for $reason", PiFlash::Command::prog("sudo"),
+				PiFlash::Command::prog("blockdev"), "--rereadpt", PiFlash::State::output("path"));
+		};
+
+		# check for errors, retry if possible
+		if ($@) {
+			if (ref $@) {
+				# reference means unrecognized error - rethrow the exception
+				die $@;
+			} elsif ($@ =~ /exited with value 1/) {
+				# exit status 1 means retry
+				$tries--;
+				if ($tries > 0) {
+					# wait a second and try again - sync may need to settle
+					sleep 1;
+					next;
+				}
+				# otherwise fail for repeated failed retries
+				die $@;
+			} else {
+				# other unrecognized error - rethrow the exception
+				die $@;
+			}
+		}
+
+		# got through without an error - done
+		last;
+	}
+}
+
+# look up boot and root partition & filesystem info
+# save data in PiFlash::State::output
+sub get_sd_partitions
+{
+	my $output = PiFlash::State::output();
+	(exists $output->{partitions}) and return;
+	my @partitions = grep {/part\s*$/} PiFlash::Command::cmd2str("lsblk - find partitions",
+		PiFlash::Command::prog("lsblk"), "--list", PiFlash::State::output("path"));
+
+	if (@partitions) {
+		for (my $i=0; $i<scalar @partitions; $i++) {
+			$partitions[$i] =~ s/^([^\s]+)\s.*/$1/;
+		}
+		my $part_boot = $partitions[0];
+		my $num_root = scalar @partitions;
+		my $part_root = $partitions[$num_root-1];
+		PiFlash::State::output("num_boot", 0);
+		PiFlash::State::output("part_boot", $part_boot);
+		PiFlash::State::output("fstype_boot", PiFlash::Inspector::get_fstype("/dev/$part_boot"));
+		PiFlash::State::output("num_root", $num_root);
+		PiFlash::State::output("part_root", $part_root);
+		PiFlash::State::output("fstype_root", PiFlash::Inspector::get_fstype("/dev/$part_root"));
+	}
+	PiFlash::State::output("partitions", \@partitions);
+
+	if (PiFlash::State::verbose()) {
+		print "get_sd_partitions: ";
+		for my $key (qw(num_boot part_boot fstype_boot num_root part_root fstype_root)) {
+			print "$key=".(PiFlash::State::output($key) // "undef")." ";
+		}
+		print "\n";
+	}
 }
 
 # flash the output device from the input file
@@ -138,78 +212,69 @@ sub flash_device
 	}
 	say "- synchronizing buffers";
 	PiFlash::Command::cmd("sync", PiFlash::Command::prog("sync"));
+	reread_pt("post-sync"); # re-read partition table, use multiple tries if necessary
+	get_sd_partitions();
+	my @partitions = PiFlash::State::output("partitions");
 
-	# resize root filesystem if command-line flag is set
-	# resize flag is silently ignored for NOOBS images because it will re-image and resize
-	if (PiFlash::State::has_cli_opt("resize") and not PiFlash::State::has_input("NOOBS")) {
-		say "- resizing the partition";
-		# re-read partition table, use multiple tries if necessary
-		my $tries = 10;
-		while (1) {
-			eval {
-				PiFlash::Command::cmd("reread partition table for resize", PiFlash::Command::prog("sudo"),
-					PiFlash::Command::prog("blockdev"), "--rereadpt", PiFlash::State::output("path"));
-			};
+	# check if there are any partitions before partition-dependent processing
+	# protects from scenario (such as RISCOS) where whole-device filesystem has no partition table
+	if (@partitions) {
+		my $sd_name = basename(PiFlash::State::output("path"));
+		my $num_boot = PiFlash::State::output("num_boot");
+		my $part_boot = PiFlash::State::output("part_boot");
+		my $num_root = PiFlash::State::output("num_root");
+		my $part_root = PiFlash::State::output("part_root");
+		my $fstype_root = PiFlash::State::output("fstype_root");
 
-			# check for errors, retry if possible
-			if ($@) {
-				if (ref $@) {
-					# reference means unrecognized error - rethrow the exception
-					die $@;
-				} elsif ($@ =~ /exited with value 1/) {
-					# exit status 1 means retry
-					$tries--;
-					if ($tries > 0) {
-						# wait a second and try again - sync may need to settle
-						sleep 1;
-						next;
-					}
-					# otherwise fail for repeated failed retries
-					die $@;
-				} else {
-					# other unrecognized error - rethrow the exception
-					die $@;
-				}
-			}
+		# resize root filesystem if command-line flag is set
+		# resize flag is silently ignored for NOOBS images because it will re-image and resize
+		if (PiFlash::State::has_cli_opt("resize") and not PiFlash::State::has_input("NOOBS")) {
+			say "- resizing the partition";
 
-			# got through without an error - done
-			last;
-		}
-		my @partitions = grep {/part\s*$/} PiFlash::Command::cmd2str("lsblk - find partitions",
-			PiFlash::Command::prog("lsblk"), "--list", PiFlash::State::output("path"));
-
-		# check if there are any partitions before processing
-		# protects from scenario (such as RISCOS) where whole-device filesystem has no partition table
-		if (@partitions) {
-			for (my $i=0; $i<scalar @partitions; $i++) {
-				$partitions[$i] =~ s/^([^\s]+)\s.*/$1/;
-			}
-			my $sd_name = basename(PiFlash::State::output("path"));
-			my $boot_part = $partitions[0];
-			my $root_num = scalar @partitions;
-			my $root_part = $partitions[$root_num-1];
-			my $root_fstype = PiFlash::Inspector::get_fstype("/dev/$root_part");
-			if (PiFlash::State::verbose()) {
-				say "resizing: sd_name=$sd_name boot_part=$boot_part root_num=$root_num root_part=$root_part "
-					."root_fstype=".($root_fstype // "undef");
-			}
-			if ((defined $root_fstype) and $root_fstype =~ /^ext[234]/ ) {
+			if ((defined $fstype_root) and $fstype_root =~ /^ext[234]/ ) {
 				# ext2/3/4 filesystem can be resized
 				my @sfdisk_resize_input = ( ", +" );
 				PiFlash::Command::cmd2str(\@sfdisk_resize_input, "resize partition",
 					PiFlash::Command::prog("sudo"), PiFlash::Command::prog("sfdisk"), "--quiet", "--no-reread", "-N",
-					$root_num, PiFlash::State::output("path"));
+					$num_root, PiFlash::State::output("path"));
 				say "- checking the filesystem";
 				PiFlash::Command::cmd2str("filesystem check", PiFlash::Command::prog("sudo"),
-					PiFlash::Command::prog("e2fsck"), "-fy", "/dev/$root_part");
+					PiFlash::Command::prog("e2fsck"), "-fy", "/dev/$part_root");
 				say "- resizing the filesystem";
 				PiFlash::Command::cmd2str("resize filesystem", PiFlash::Command::prog("sudo"),
-					PiFlash::Command::prog("resize2fs"), "/dev/$root_part");
+					PiFlash::Command::prog("resize2fs"), "/dev/$part_root");
 			} else {
-				warn "unrecognized filesystem type ".($root_fstype // "")." - resize not attempted";
+				warn "unrecognized filesystem type ".($fstype_root // "")." - resize not attempted";
 			}
 		} else {
 			say "* partition resize skipped due to lack of partition table";
+		}
+
+		# check if any hooks are registered for filesystem access
+		if (PiFlash::Hook::has("fs_mount")) {
+			reread_pt("filesystem hooks"); # re-read partition table, use multiple tries if necessary
+			get_sd_partitions();
+			my @partitions = PiFlash::State::output("partitions");
+			my $fstype_boot = PiFlash::State::output("fstype_boot");
+			my $dev_boot = "/dev/".PiFlash::State::output("part_boot");
+			my $fstype_root = PiFlash::State::output("fstype_root");
+			my $dev_root = "/dev/".PiFlash::State::output("part_root");
+			my $mntdir = PiFlash::State::system("media_dir")."/piflash/sdcard";
+			my $mnt_boot = $mntdir."/boot";
+			my $mnt_root = $mntdir."/root";
+			PiFlash::Command::cmd("create mount point for boot fs", PiFlash::Command::prog("sudo"),
+				PiFlash::Command::prog("mkdir"), "-p", $mnt_boot );
+			PiFlash::Command::cmd("create mount point for root fs", PiFlash::Command::prog("sudo"),
+				PiFlash::Command::prog("mkdir"), "-p", $mnt_root );
+			PiFlash::Command::cmd("mount boot fs", PiFlash::Command::prog("sudo"), PiFlash::Command::prog("mount"),
+				"-t", $fstype_boot, $dev_boot, $mnt_boot);
+			PiFlash::Command::cmd("mount root fs", PiFlash::Command::prog("sudo"), PiFlash::Command::prog("mount"),
+				"-t", $fstype_root, $dev_root, $mnt_root);
+			PiFlash::Hook::fs_mount({boot => $mnt_boot, root => $mnt_root});
+			PiFlash::Command::cmd("unmount root fs", PiFlash::Command::prog("sudo"), PiFlash::Command::prog("umount"),
+				$mnt_root);
+			PiFlash::Command::cmd("unmount boot fs", PiFlash::Command::prog("sudo"), PiFlash::Command::prog("umount"),
+				$mnt_boot);
 		}
 	}
 
@@ -234,7 +299,7 @@ PiFlash::MediaWriter - write to Raspberry Pi SD card installation with scriptabl
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -252,7 +317,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

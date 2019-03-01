@@ -15,5 +15,4 @@ MYMETA.*
 ^.gitignore
 ^.svn\/
 ^Music-FretboardDiagram-
-^chord-diagram\.png
-^autumn-leaves\.png
+\.png$

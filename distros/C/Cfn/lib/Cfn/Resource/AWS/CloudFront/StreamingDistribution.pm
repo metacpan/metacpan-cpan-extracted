@@ -1,4 +1,4 @@
-# AWS::CloudFront::StreamingDistribution generated from spec 1.11.0
+# AWS::CloudFront::StreamingDistribution generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CloudFront::StreamingDistribution',
@@ -34,7 +34,7 @@ package Cfn::Resource::Properties::AWS::CloudFront::StreamingDistribution::Trust
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has AwsAccountNumbers => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AwsAccountNumbers => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -101,7 +101,7 @@ package Cfn::Resource::Properties::AWS::CloudFront::StreamingDistribution::Strea
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Aliases => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Aliases => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Comment => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Logging => (isa => 'Cfn::Resource::Properties::AWS::CloudFront::StreamingDistribution::Logging', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

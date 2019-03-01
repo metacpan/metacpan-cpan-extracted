@@ -1,6 +1,7 @@
 <%args>
     %reportlist
     $mark_report_id => 0
+    $testplan_id => 0
 </%args>
 % # ----------------------------------------------------------------------
 <%method single_report>
@@ -8,6 +9,7 @@
   $report
   $just_group_member => 0
   $mark_report_id    => 0
+  $testplan_id       => 0
   </%args>
 %               my $full_width   = 50;
 %               my $green_width  = sprintf("%d",        ($report->{success_ratio}||0)  * $full_width / 100);
@@ -65,7 +67,10 @@
                                                <% $report->{rga_id} %>
 %                                        }
 %                                        if ($report->{rgt_id}) {
-                                               <a href="/tapper/testruns/id/<% $report->{rgt_id} %>">testrun <% $report->{rgt_id} %></a><% ($report->{testrunscheduling_status} && $report->{testrunscheduling_status} ne 'finished') ? " (".$report->{testrunscheduling_status}.")" : "" %>
+                                               <a href="/tapper/testruns/id/<% $report->{rgt_id} %>">testrun <% $report->{rgt_id} %></a><% ($report->{testrunscheduling_status} && $report->{testrunscheduling_status} ne 'finished') ? " (".$report->{testrunscheduling_status}.")" : "" %>\
+% if ($testplan_id) {
+&nbsp;&nbsp;(<a href="/tapper/testplan/id/<% $testplan_id %>">tp<% $testplan_id %></a>)
+% }
 %                                        }
 %                         }
                         </td>
@@ -105,7 +110,7 @@
 %       my $rga_primary = $report->{rga_primary};
 %       my $rgt_primary = $report->{rgt_primary};
 %       # the lead report
-        <& SELF:single_report, report => $report, mark_report_id => $mark_report_id &>
+        <& SELF:single_report, report => $report, mark_report_id => $mark_report_id, testplan_id => $testplan_id &>
 %       # the remaining group reports, if group at all
 %       if ($rga_primary) {
 %             foreach my $subreport (sort { $b->{id} <=> $a->{id} } @{$rga{$rga_id} || []}) {

@@ -2,7 +2,7 @@ NAME
     Task::Tmp::spanel - Perl modules for Spanel
 
 VERSION
-    version 0.002
+    version 0.003
 
 TASK CONTENTS
   Included modules
@@ -42,10 +42,12 @@ TASK CONTENTS
    File::Spec
    File::Temp
    File::Which
+   File::Write::Rotate
    File::chdir
    File::chmod
    FindBin
    GDBM_File
+   Gepok
    Getopt::Long
    IO::CaptureOutput
    IO::File
@@ -53,6 +55,7 @@ TASK CONTENTS
    IO::Socket::UNIX
    IPC::System::Options
    LWP::UserAgent
+   Linux::Mounts
    List::MoreUtils
    List::Util
    Log::Log4perl
@@ -69,13 +72,17 @@ TASK CONTENTS
    Net::DNS
    Net::Domain::TLD
    POSIX
+   Parse::IPCommand
    Path::Class
+   Perinci::Access::Base::Patch::PeriAHS
    Perinci::Access::HTTP::Client
+   Perinci::Access::Schemeless::DBI
    Perinci::CmdLine
    Perinci::CmdLine::Lite
    Perinci::CmdLine::Server
    Perinci::Exporter
    Perinci::Sub::Util
+   Perinci::Sub::Wrapper::Patch::HandlePHPArray
    Proc::ChildError
    Proc::PID::File
    Quota
@@ -89,7 +96,9 @@ TASK CONTENTS
    URI
    URI::Escape
    UUID::Random
+   Unix::Passwd::File
    WWW::Mechanize
+   YAML::Syck
    YAML::XS
    autodie
    base

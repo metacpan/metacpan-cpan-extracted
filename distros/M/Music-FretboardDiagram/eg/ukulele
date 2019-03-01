@@ -3,14 +3,20 @@ use strict;
 use warnings;
 
 use Music::FretboardDiagram;
- 
+
 my $dia = Music::FretboardDiagram->new(
-    chord   => '0212',
-    strings => 4,
-    frets   => 6,
-    outfile => $0,
-    verbose => 1,
-    tuning  => [qw/A E C G/],
+    chord    => '4442',
+    position => 3,
+    strings  => 4,
+    frets    => 6,
+    size     => 25,
+    outfile  => $0,
+    type     => 'bmp',
+    #font     => '/path/to/TTF/font.ttf',
+    tuning   => [qw/A E C G/],
+    horiz    => 1,
+    grid     => 'gray',
+    verbose  => 1,
 );
- 
+
 $dia->draw();

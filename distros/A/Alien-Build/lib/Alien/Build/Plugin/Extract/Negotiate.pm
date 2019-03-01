@@ -9,7 +9,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 
 has '+format' => 'tar';
@@ -52,18 +52,11 @@ sub pick
       return 'Extract::ArchiveZip';
     }
     
-    # if we don't have Archive::Zip, check if we have the unzip command
-    elsif(Alien::Build::Plugin::Extract::CommandLine->available($format))
-    {
-      return 'Extract::CommandLine';
-    }
-    
-    # okay fine.  I will try to install Archive::Zip :(
-    # if this becomes a problem in the future we can
-    # create Alien::unzip and fallback on CommandLine instead.
+    # If it isn't available, then use the command-line unzip.  Alien::unzip will be used
+    # as necessary in environments where it isn't already installed.
     else
     {
-      return 'Extract::ArchiveZip';
+      return 'Extract::CommandLine';
     }
   }
   elsif($format eq 'tar.xz' || $format eq 'tar.Z')
@@ -94,7 +87,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.55
+version 1.60
 
 =head1 SYNOPSIS
 

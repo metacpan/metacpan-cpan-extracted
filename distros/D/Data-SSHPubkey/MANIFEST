@@ -1,0 +1,19 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Data/SSHPubkey.pm
+t/00-load.t
+t/10-pubkeys.t
+t/PEM.pub
+t/PKCS8.pub
+t/RFC4716.pub
+t/ecdsa.pub
+t/ed25519.pub
+t/pod-coverage.t
+t/pod.t
+t/rsa.pub
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

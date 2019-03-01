@@ -1,5 +1,5 @@
 package Acme::CPANAuthors::DualLife;
-$Acme::CPANAuthors::DualLife::VERSION = '0.44';
+$Acme::CPANAuthors::DualLife::VERSION = '0.46';
 #ABSTRACT: We are CPAN Authors of Dual Life core modules
 
 use strict;
@@ -7,8 +7,8 @@ use warnings;
 
 use Acme::CPANAuthors::Register (
   AMBS => q[Alberto Manuel Brandao Simoes],
-  AMS => q[Abhijit Menon-Sen],
   ANDK => q[Andreas J. Koenig],
+  ATOOMIC => q[Nicolas R.],
   AUDREYT => q[Audrey Tang],
   BINGOS => q[Chris Williams],
   CHORNY => q[Alexandr Ciornii],
@@ -24,13 +24,12 @@ use Acme::CPANAuthors::Register (
   FERREIRA => q[Adriano Ferreira],
   FLORA => q[Florian Ragwitz],
   GAAS => q[Gisle Aas],
-  GBARR => q[Graham Barr],
+  HAARG => q[Graham Knop],
   HMBRAND => q[H.Merijn Brand],
   ISHIGAKI => q[Kenichi Ishigaki],
   JDB => q[Jan Dubois],
   JDHEDDEN => q[Jerry D. Hedden],
   JESSE => q[Jesse Vincent],
-  JHI => q[Jarkko Hietaniemi],
   JKEENAN => q[James E Keenan],
   JPEACOCK => q[John Peacock],
   JSTOWE => q[Jonathan Stowe],
@@ -39,7 +38,6 @@ use Acme::CPANAuthors::Register (
   KHW => q[Karl Williamson],
   LEEJO => q[Lee Johnson],
   LEONT => q[Leon Timmermans],
-  LLAP => q[Leo Lapworth],
   MALLEN => q[Mark Allen],
   MAREKR => q[Marek Rouchal],
   MHX => q[Marcus Holland-Moritz],
@@ -70,7 +68,6 @@ use Acme::CPANAuthors::Register (
   TJENNESS => q[Tim Jenness],
   TODDR => q[Todd Rinaldo],
   TOMHUGHES => q[Tom Hughes],
-  WOLFSAGE => q[Matthew Horsfall (alh)],
   XSAWYERX => q[Sawyer X],
   ZEFRAM => q[Andrew Main (Zefram)],
 );
@@ -89,7 +86,7 @@ Acme::CPANAuthors::DualLife - We are CPAN Authors of Dual Life core modules
 
 =head1 VERSION
 
-version 0.44
+version 0.46
 
 =head1 SYNOPSIS
 
@@ -113,8 +110,8 @@ It is currently statically generated information, I hope to make it dynamic in t
 =head1 CONTAINED AUTHORS
 
   AMBS => q[Alberto Manuel Brandao Simoes],
-  AMS => q[Abhijit Menon-Sen],
   ANDK => q[Andreas J. Koenig],
+  ATOOMIC => q[Nicolas R.],
   AUDREYT => q[Audrey Tang],
   BINGOS => q[Chris Williams],
   CHORNY => q[Alexandr Ciornii],
@@ -130,13 +127,12 @@ It is currently statically generated information, I hope to make it dynamic in t
   FERREIRA => q[Adriano Ferreira],
   FLORA => q[Florian Ragwitz],
   GAAS => q[Gisle Aas],
-  GBARR => q[Graham Barr],
+  HAARG => q[Graham Knop],
   HMBRAND => q[H.Merijn Brand],
   ISHIGAKI => q[Kenichi Ishigaki],
   JDB => q[Jan Dubois],
   JDHEDDEN => q[Jerry D. Hedden],
   JESSE => q[Jesse Vincent],
-  JHI => q[Jarkko Hietaniemi],
   JKEENAN => q[James E Keenan],
   JPEACOCK => q[John Peacock],
   JSTOWE => q[Jonathan Stowe],
@@ -145,7 +141,6 @@ It is currently statically generated information, I hope to make it dynamic in t
   KHW => q[Karl Williamson],
   LEEJO => q[Lee Johnson],
   LEONT => q[Leon Timmermans],
-  LLAP => q[Leo Lapworth],
   MALLEN => q[Mark Allen],
   MAREKR => q[Marek Rouchal],
   MHX => q[Marcus Holland-Moritz],
@@ -176,7 +171,6 @@ It is currently statically generated information, I hope to make it dynamic in t
   TJENNESS => q[Tim Jenness],
   TODDR => q[Todd Rinaldo],
   TOMHUGHES => q[Tom Hughes],
-  WOLFSAGE => q[Matthew Horsfall (alh)],
   XSAWYERX => q[Sawyer X],
   ZEFRAM => q[Andrew Main (Zefram)],
 
@@ -192,7 +186,7 @@ Chris Williams
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Chris Williams.
+This software is copyright (c) 2019 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

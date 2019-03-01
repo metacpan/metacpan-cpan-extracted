@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,17 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
-plan tests => 8;
+plan tests => 20;
 
 use Graph::Maker::Petersen;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 10;
+  my $want_version = 13;
   ok ($Graph::Maker::Petersen::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Petersen->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Petersen->VERSION($want_version); 1 }, 1,
@@ -52,10 +49,18 @@ use Graph::Maker::Petersen;
 #------------------------------------------------------------------------------
 
 {
-  my $graph = Graph::Maker->new('Petersen');
+  my $graph = Graph::Maker->new('Petersen', undirected => 1);
   ok($graph->get_graph_attribute('name'),'Petersen');
   my $num_vertices = $graph->vertices;
   ok ($num_vertices, 10);
+
+  my $other = Graph->new (undirected => 1);
+  $other->add_cycle(1,2,3,4,5);
+  $other->add_cycle(6,8,10,7,9);
+  $other->add_edges([1,6],[2,7],[3,8],[4,9],[5,10]);
+  ok ($graph->eq($other)?1:0, 1);
+  # print "$graph\n";
+  # print "$other\n";
 }
 {
   my $graph = Graph::Maker->new('Petersen', N=>5, K=>2);
@@ -64,6 +69,37 @@ use Graph::Maker::Petersen;
   ok ($num_vertices, 10);
 }
 
+
+#------------------------------------------------------------------------------
+# no multi-edges
+
+foreach my $multiedged (0, 1) {
+  foreach my $undirected (1, 0) {
+    my $graph = Graph::Maker->new('Petersen',
+                                  N=>4, K=>2,
+                                  multiedged => $multiedged,
+                                  undirected => $undirected);
+
+    my $num_vertices = $graph->vertices;
+    my $num_edges = $graph->edges;
+    ok ($num_vertices, 8);
+    my $want_num_edges = 4+4+2;
+    if (!$undirected) { $want_num_edges *= 2; }
+    ok ($num_edges, $want_num_edges);
+  }
+}
+
+#------------------------------------------------------------------------------
+# POD 7,9 = 7,5 = 7,2
+
+{
+  my $graph_79 = Graph::Maker->new('Petersen', N=>7, K=>9);
+  my $graph_75 = Graph::Maker->new('Petersen', N=>7, K=>5);
+  my $graph_72 = Graph::Maker->new('Petersen', N=>7, K=>2);
+  ok($graph_79->eq($graph_75)?1:0, 1);
+  ok($graph_79->eq($graph_72)?1:0, 1);
+  ok($graph_75->eq($graph_72)?1:0, 1);
+}
 
 #------------------------------------------------------------------------------
 exit 0;

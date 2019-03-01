@@ -8,8 +8,9 @@ use PiFlash::State;
 use PiFlash::Command;
 
 package PiFlash::Inspector;
-$PiFlash::Inspector::VERSION = '0.0.6';
+$PiFlash::Inspector::VERSION = '0.1.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
+use Try::Tiny;
 use File::Basename;
 use File::Slurp qw(slurp);
 use File::LibMagic; # rpm: "dnf install perl-File-LibMagic", deb: "apt-get install libfile-libmagic-perl"
@@ -381,8 +382,11 @@ sub base
 sub get_fstype
 {
 	my $devpath = shift;
-	my $fstype = PiFlash::Command::cmd2str( "use lsblk to get fs type for $devpath", PiFlash::Command::prog("sudo"),
-		PiFlash::Command::prog("lsblk"), "--nodeps", "--noheadings", "--output", "FSTYPE", $devpath);
+	my $fstype;
+	try {
+		$fstype = PiFlash::Command::cmd2str( "use lsblk to get fs type for $devpath", PiFlash::Command::prog("sudo"),
+			PiFlash::Command::prog("lsblk"), "--nodeps", "--noheadings", "--output", "FSTYPE", $devpath);
+	};
 
 	# fallback: use blkid
 	if ((!defined $fstype) or $fstype =~ /^\s*$/) {
@@ -432,7 +436,7 @@ PiFlash::Inspector - PiFlash functions to inspect Linux system devices to flash 
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -458,7 +462,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

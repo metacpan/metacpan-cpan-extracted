@@ -2,7 +2,7 @@
 package Data::Hopen::Util::NameSet;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000012';
 
 # Docs {{{1
 

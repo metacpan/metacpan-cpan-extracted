@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl interface to the libusb-1.0 API.'
 author:
-  - 'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>'
+  - 'Simon Reinhardt <simon.reinhardt@physik.uni-r.de>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
@@ -32,5 +32,5 @@ resources:
   MailingList: https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users
   homepage: http://www.labmeasurement.de
   repository: git://github.com/lab-measurement/USB-LibUSB.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

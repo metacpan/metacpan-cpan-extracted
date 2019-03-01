@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -76,7 +76,7 @@ Graph::Maker->add_factory_type('binomial_tree' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde undirected Viswanathan Iyer Udaya Kumar Reddy Wiener subtrees OEIS Intl Math Engg
+=for stopwords Ryde undirected Viswanathan Iyer Udaya Kumar Reddy Wiener subtrees OEIS Intl Math Engg pre yyy indnum domnum
 
 =head1 NAME
 
@@ -94,12 +94,6 @@ Graph::Maker::BinomialTree - create binomial tree graph
 C<Graph::Maker::BinomialTree> creates a C<Graph.pm> graph of a binomial tree
 with N vertices.  Vertices are numbered from 0 at the root through to N-1.
 
-The parent of vertex n is that n with its lowest 1-bit cleared to 0.
-Conversely the children of a vertex n=xx1000 are xx1001, xx1010, xx1100, so
-each trailing 0 bit changed to a 1, provided that does not exceed the
-maximum N-1.  At the root the children are single bit powers-of-2 up to the
-high bit of the maximum N-1.
-
           __0___
          /  |   \        N => 8
         1   2    4
@@ -108,15 +102,24 @@ high bit of the maximum N-1.
                    |
                    7
 
+The parent of vertex n is that n with its lowest 1-bit cleared to 0.
+Conversely, the children of a vertex n=xx1000 are xx1001, xx1010, xx1100,
+each low 0 bit changed to a 1, provided doing so does not exceed the maximum
+vertex number N-1.  At the root, the children are single bit powers 2^p up
+to high bit of the limit N-1.
+
+By construction, the tree is labelled in pre-order since a vertex xx1000 has
+below it all xx1yyy.
+
 =head2 Order
 
-The C<order> parameter is another way to specify the number of vertices.
-A tree of order=k has N=2^k many vertices.  Such a tree has depth levels 0
-to k.  The number of vertices at depth d is the binomial coefficient
-binom(k,d), hence the name of the tree.
+Option C<order =E<gt> k> is another way to specify the number of vertices.
+A tree of order k has N=2^k many vertices.  Such a tree has depth levels 0
+to k inclusive.  The number of vertices at depth d is the binomial
+coefficient binom(k,d), hence the name of the tree.
 
 The N=8 example above is order=3 and the number of vertices at each depth is
-1,3,3,1 which are binomials (3,0) to (3,3).
+1,3,3,1 which are binomials (3,0) through (3,3).
 
 =for GP-Test  binomial(3,0) == 1
 
@@ -126,13 +129,14 @@ The N=8 example above is order=3 and the number of vertices at each depth is
 
 =for GP-Test  binomial(3,3) == 1
 
-A top-down definition is order k tree is two copies of k-1, one at the root
+A top-down definition is order k tree as two copies of k-1, one at the root
 and the other a child of that root.  In the N=8 order=3 example above, 0-3
-is an order=2 and 4-7 is another, with 4 starting as a child of the root 0.
+is an order=2 and 4-7 is another order=2, with 4 starting as a child of the
+root 0.
 
 A bottom-up definition is order k tree as order k-1 with a new leaf vertex
-added to each existing vertex.  The vertices of k-1 with an extra low 0-bit
-become the evens of k.  An extra low 1-bit is the new leaves.
+added to each existing vertex.  The vertices of k-1 with extra low 0-bit
+become the even vertices of k.  An extra low 1-bit is the new leaves.
 
 Binomial tree order=5 appears on the cover of Knuth "The Art of Computer
 Programming", volume 1, "Fundamental Algorithms", second edition.
@@ -171,15 +175,15 @@ The Wiener index of the binomial tree is calculated in
 =over
 
 K. Viswanathan Iyer and K. R. Udaya Kumar Reddy, "Wiener index of
-Binomial Trees and Fibonacci Trees", Intl J Math Engg with Comp, 2009.
-arxiv:0910.4432
+Binomial Trees and Fibonacci Trees", Intl J Math Engg with Comp, 2009,
+L<https://arxiv.org/abs/0910.4432>
 
 =back
 
-For order k it is
+Order k is
 
                 (k-1)*4^k + 2^k
-    Wiener(k) = ---------------  = 0, 1, 10, 68, 392, ...  (A192021)
+    Wiener(k) = ---------------  = 0, 1, 10, 68, 392, ... (A192021)
                        2
 
 =cut
@@ -200,7 +204,7 @@ For order k it is
 =pod
 
 The Wiener index is total distance between pairs of vertices, so the mean
-distance is, with binomial to choose 2 among the 2^k vertices,
+distance is, with binomial to choose 2 of the 2^k vertices,
 
                      Wiener(k)                k
    MeanDist(k) = ---------------- =  k-1 + -------      for k>=1
@@ -219,7 +223,7 @@ distance is, with binomial to choose 2 among the 2^k vertices,
 =pod
 
 The tree for kE<gt>=1 has diameter 2*k-1 between ends of the deepest and
-second-deepest subtrees of the root.  The mean distance as a fraction of the
+second-deepest subtrees of the root.  The mean distance as fraction of the
 diameter is then
 
     MeanDist(k)    1       1              1
@@ -244,20 +248,71 @@ diameter is then
 
 =pod
 
+=head2 Balanced Binary
+
+An ordered tree can be coded as pre-order balanced binary by writing at each
+vertex
+
+    1,  balanced binaries of children,  0
+
+The bottom-up definition above is a new leaf as new first child of each
+vertex.  That means the initial 1 becomes 110, so starting 10 for single
+vertex get repeated substitutions
+
+    10, 1100, 11011000, ...   (A210995)
+
+The top-down definition above is a copy of the tree as new last child, so
+one copy at *2 and one at *2^2^k, giving 
+
+    k-1:   1, tree k-1, 0
+    k:     1, tree k-1, 1, tree k-1, 0, 0
+
+    b(k) = (2^(2^k)+2) * b(k-1), starting b(0)=2
+         = 2*prod(i=1,k, 2^(2^i)+2)
+         = 2, 12, 216, 55728, 3652301664, ...  (A092124)
+
+=cut
+
+# GP-DEFINE  b(k) = if(k==0,2, (2^(2^k)+2) * b(k-1));
+# vector(10,k, vpar_to_balanced_binary(vpar_make_binomial_tree(2^k))) == \
+# vector(10,k, b(k))
+# GP-Test  vector(9,k, b(k)) == \
+# GP-Test  vector(9,k, (2^(2^k)+2) * b(k-1))  /* recurrence */
+# GP-Test  vector(10,k,k--; b(k)) == \
+# GP-Test  vector(10,k,k--; 2*prod(i=1,k, 2^(2^i)+2))  /* product */
+# GP-Test  vector(5,k,k--; b(k)) == \
+# GP-Test    [2, 12, 216, 55728, 3652301664]  /* samples */
+
+=pod
+
+The tree is already labelled in pre-order so balanced binary follows from
+the parent rule.  The balanced binary coding is 1 at a vertex and later 0
+when pre-order skips up past it.  A vertex with L many low 1-bits skips up
+past L many (including itself).
+
+    vertex n:  1, 0 x L     where L=CountLowOnes(n)
+
+The last L goes up only to the depth of the next vertex.  The balance can be
+completed by extending to total length 2N for N vertices.  The tree
+continued infinitely is
+
+    1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, ...   (A079559)
+    ^  ^     ^  ^        ^  ^     ^  ^
+    0  1     2  3        4  5     6  7
+
 =head2 Independence and Domination
 
 From the bottom-up definition above, a tree of even N has a perfect
 matching, being each odd n which is a leaf and its even attachment.  An odd
 N has a near-perfect matching (one vertex left over).
 
-The independence number is found by starting with each leaf in an
-independent set and its attachment vertex not.  Per the bottom-up definition
-this is all vertices.  If N odd then the unpaired existing even vertex can
-be included too, for independence number ceil(N/2).
+Like all trees with a perfect matching, the independence number is then half
+the vertices, and when N odd can include the unpaired and work outwards from
+there by matched pairs so indnum = ceil(N/2).
 
-The domination number similarly, by starting each leaf not in the dominating
-set and its attachment vertex in the set.  Again this is all vertices so
-domination number floor(N/2), except N=1 domination number 1.
+The domination number is found by starting each leaf not in the dominating
+set and its attachment vertex in the set.  This is all vertices so domnum =
+floor(N/2) except N=1 domination number 1.
 
 =head1 HOUSE OF GRAPHS
 
@@ -283,12 +338,16 @@ House of Graphs entries for the trees here include
 
 =item n=32 (order=5), L<https://hog.grinvin.org/ViewGraphInfo.action?id=21088>
 
+=item n=64 (order=6), L<https://hog.grinvin.org/ViewGraphInfo.action?id=33543>
+
+=item n=128 (order=6), L<https://hog.grinvin.org/ViewGraphInfo.action?id=33545>
+
 =back
 
 =head1 OEIS
 
-Entries in Sloane's Online Encyclopedia of Integer Sequences related to
-these graphs include
+Entries in Sloane's Online Encyclopedia of Integer Sequences related to the
+binomial tree include
 
 =over
 
@@ -297,6 +356,9 @@ L<http://oeis.org/A192021> (etc)
 =back
 
     A192021   Wiener index
+    A092124   pre-order balanced binary coding, decimal
+    A210995     binary
+    A079559     binary sequence of 0s and 1s
 
 =for GP-Test  vector(7,k,k--; Wiener(k)) == [0, 1, 10, 68, 392, 2064, 10272]
 
@@ -310,11 +372,13 @@ L<http://oeis.org/A192021> (etc)
 
 =head1 SEE ALSO
 
-L<Graph::Maker>, L<Graph::Maker::BalancedTree>
+L<Graph::Maker>,
+L<Graph::Maker::BalancedTree>,
+L<Graph::Maker::BinaryBeanstalk>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

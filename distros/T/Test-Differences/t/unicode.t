@@ -22,8 +22,8 @@ my $stderr = capture_error { system (
     '-e', '
         END { done_testing(); }
         eq_or_diff(
-            [        "\\N{U+2603}", "\\N{U+1F4A9}"],
-            [reverse "\\N{U+2603}", "\\N{U+1F4A9}"]
+            [        qq{\\N{U+2603}}, qq{\\N{U+1F4A9}}],
+            [reverse qq{\\N{U+2603}}, qq{\\N{U+1F4A9}}]
         )
     '
 ) };

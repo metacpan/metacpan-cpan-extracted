@@ -1,10 +1,10 @@
 # -*- Perl -*-
 #
-# Representation of individual OpenSSH authorized_keys entries, based on
+# representation of individual OpenSSH authorized_keys entries, based on
 # a study of the sshd(8) manual, along with the OpenSSH 5.2 sources.
-# This module only weakly validates the data; in particular, no effort
+# this module only weakly validates the data; in particular, no effort
 # is made to confirm whether the key options are actual valid options
-# for the version of OpenSSH in question.
+# for the version of OpenSSH in question
 
 package Config::OpenSSH::Authkey::Entry;
 
@@ -16,7 +16,7 @@ use Config::OpenSSH::Authkey::Entry::Options ();
 
 use Carp qw/croak/;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 # This limit is set for various things under OpenSSH code. Used here to
 # limit length of authorized_keys lines.
@@ -30,83 +30,94 @@ my $MIN_KEY_LENGTH = 42;
 # Data Parsing & Utility Methods - Internal
 
 my $_parse_entry = sub {
-  my $self = shift;
-  my $data = shift || q{};
+    my $self = shift;
+    my $data = shift || q{};
 
-  my ( $options, $key, $comment, $protocol, $keytype );
+    my ( $options, $key, $comment, $protocol, $keytype );
 
-  chomp $data;
+    chomp $data;
 
-  if ( $data =~ m/^\s*$/ or $data =~ m/^\s*#/ ) {
-    return ( 0, 'no public key data' );
-  } elsif ( length $data >= $MAX_PUBKEY_BYTES ) {
-    return ( 0, 'exceeds size limit' );
-  }
-
-  # OpenSSH supports leading whitespace before options or key. Strip
-  # this optional whitespace to simplify parsing.
-  $data =~ s/^[ \t]+//;
-
-ENTRY_LEXER: {
-    # Optional trailing comment (user@host, usually)
-    if ( defined $key and $data =~ m/ \G (.+) /cgx ) {
-      $comment = $1;
-
-      last ENTRY_LEXER;
+    if ( $data =~ m/^\s*$/ or $data =~ m/^\s*#/ ) {
+        return ( 0, 'no public key data' );
+    } elsif ( length $data >= $MAX_PUBKEY_BYTES ) {
+        return ( 0, 'exceeds size limit' );
     }
 
-    # SSH2 RSA or DSA public key
-    if ( !defined $key
-      and $data =~
-      m/ \G ( ssh-(rsa|dss) [ \t]+? [A-Za-z0-9+\/]+ =* ) [ \t]* /cgx ) {
+    # OpenSSH supports leading whitespace before options or key. Strip
+    # this optional whitespace to simplify parsing.
+    $data =~ s/^[ \t]+//;
 
-      $key = $1;
-      # follow the -t argument option to ssh-keygen(1)
-      $keytype = $2 eq 'rsa' ? 'rsa' : 'dsa';
-      $protocol = 2;
+  ENTRY_LEXER: {
+        # Optional trailing comment (user@host, usually)
+        if ( defined $key and $data =~ m/ \G (.+) /cgx ) {
+            $comment = $1;
 
-      redo ENTRY_LEXER;
+            last ENTRY_LEXER;
+        }
+
+        # SSH2 public keys
+        if ( !defined $key
+            and $data =~
+            m/ \G ( (ssh-(rsa|dss|ed25519)|ecdsa-sha2-nistp256) [ \t]+? [A-Za-z0-9+\/]+ =* ) [ \t]* /cgx
+        ) {
+
+            $key = $1;
+            my $type = $2;
+            my $subtype = $3;
+            # follow the -t argument option to ssh-keygen(1)
+            if ( $type =~ m/^ssh-/ ) {
+                if ( $subtype eq 'dss' ) {
+                    $keytype = 'dsa';
+                } else {
+                    $keytype = $subtype;
+                }
+            } else {
+                $keytype = 'ecdsa';
+            }
+            $protocol = 2;
+
+            redo ENTRY_LEXER;
+        }
+
+        # SSH1 RSA public key
+        if ( !defined $key
+            and $data =~ m/ \G ( \d{3,5} [ \t]+? \d+ [ \t]+? \d+ ) [ \t]* /cgx ) {
+
+            $key      = $1;
+            $keytype  = 'rsa1';
+            $protocol = 1;
+
+            redo ENTRY_LEXER;
+        }
+
+        # Optional leading options - may contain whitespace inside ""
+        if ( !defined $key and $data =~ m/ \G ([^ \t]+? [ \t]*) /cgx ) {
+            $options .= $1;
+
+            redo ENTRY_LEXER;
+        }
     }
 
-    # SSH1 RSA public key
-    if ( !defined $key
-      and $data =~ m/ \G ( \d{3,5} [ \t]+? \d+ [ \t]+? \d+ ) [ \t]* /cgx ) {
+    if ( !defined $key ) {
+        return ( 0, 'unable to parse public key' );
 
-      $key      = $1;
-      $keytype  = 'rsa1';
-      $protocol = 1;
+    } else {
+        $self->{_key}      = $key;
+        $self->{_protocol} = $protocol;
+        $self->{_keytype}  = $keytype;
 
-      redo ENTRY_LEXER;
+        if ( defined $options ) {
+            $options =~ s/\s*$//;
+            $self->{_options} = $options;
+        }
+
+        if ( defined $comment ) {
+            $comment =~ s/\s*$//;
+            $self->{_comment} = $comment;
+        }
     }
 
-    # Optional leading options - may contain whitespace inside ""
-    if ( !defined $key and $data =~ m/ \G ([^ \t]+? [ \t]*) /cgx ) {
-      $options .= $1;
-
-      redo ENTRY_LEXER;
-    }
-  }
-
-  if ( !defined $key ) {
-    return ( 0, 'unable to parse public key' );
-
-  } else {
-    $self->{_key}      = $key;
-    $self->{_protocol} = $protocol;
-    $self->{_keytype}  = $keytype;
-
-    if ( defined $options ) {
-      $options =~ s/\s*$//;
-      $self->{_options} = $options;
-    }
-
-    if ( defined $comment ) {
-      $comment =~ s/\s*$//;
-      $self->{_comment} = $comment;
-    }
-  }
-
-  return ( 1, 'ok' );
+    return ( 1, 'ok' );
 };
 
 ######################################################################
@@ -114,25 +125,25 @@ ENTRY_LEXER: {
 # Class methods
 
 sub new {
-  my $class = shift;
-  my $data  = shift;
+    my $class = shift;
+    my $data  = shift;
 
-  my $self = { _dup_of => 0 };
+    my $self = { _dup_of => 0 };
 
-  if ( defined $data ) {
-    my ( $is_parsed, $err_msg ) = $_parse_entry->( $self, $data );
-    if ( !$is_parsed ) {
-      croak $err_msg;
+    if ( defined $data ) {
+        my ( $is_parsed, $err_msg ) = $_parse_entry->( $self, $data );
+        if ( !$is_parsed ) {
+            croak $err_msg;
+        }
     }
-  }
 
-  bless $self, $class;
-  return $self;
+    bless $self, $class;
+    return $self;
 }
 
 sub split_options {
-  my $class = shift;
-  Config::OpenSSH::Authkey::Entry::Options->split_options(@_);
+    my $class = shift;
+    Config::OpenSSH::Authkey::Entry::Options->split_options(@_);
 }
 
 ######################################################################
@@ -140,76 +151,76 @@ sub split_options {
 # Instance methods
 
 sub parse {
-  my $self = shift;
-  my $data = shift || croak 'no data supplied to parse';
+    my $self = shift;
+    my $data = shift || croak 'no data supplied to parse';
 
-  my ( $is_parsed, $err_msg ) = $_parse_entry->( $self, $data );
-  if ( !$is_parsed ) {
-    croak $err_msg;
-  }
+    my ( $is_parsed, $err_msg ) = $_parse_entry->( $self, $data );
+    if ( !$is_parsed ) {
+        croak $err_msg;
+    }
 
-  return $self;
+    return $self;
 }
 
 sub as_string {
-  my $self   = shift;
-  my $string = q{};
+    my $self   = shift;
+    my $string = q{};
 
-  if ( exists $self->{_parsed_options} ) {
-    $string .= $self->{_parsed_options}->as_string . q{ };
+    if ( exists $self->{_parsed_options} ) {
+        $string .= $self->{_parsed_options}->as_string . q{ };
 
-  } elsif ( exists $self->{_options} and length $self->{_options} > 0 ) {
-    $string .= $self->{_options} . q{ };
-  }
+    } elsif ( exists $self->{_options} and length $self->{_options} > 0 ) {
+        $string .= $self->{_options} . q{ };
+    }
 
-  if ( !defined $self->{_key} or length $self->{_key} < $MIN_KEY_LENGTH ) {
-    croak 'no key material present';
-  }
-  $string .= $self->{_key};
+    if ( !defined $self->{_key} or length $self->{_key} < $MIN_KEY_LENGTH ) {
+        croak 'no key material present';
+    }
+    $string .= $self->{_key};
 
-  if ( exists $self->{_comment} and length $self->{_comment} > 0 ) {
-    $string .= q{ } . $self->{_comment};
-  }
+    if ( exists $self->{_comment} and length $self->{_comment} > 0 ) {
+        $string .= q{ } . $self->{_comment};
+    }
 
-  return $string;
+    return $string;
 }
 
 sub key {
-  my $self = shift;
-  my $key  = shift;
-  if ( defined $key ) {
-    my ( $is_parsed, $err_msg ) = $_parse_entry->( $self, $key );
-    if ( !$is_parsed ) {
-      croak $err_msg;
+    my $self = shift;
+    my $key  = shift;
+    if ( defined $key ) {
+        my ( $is_parsed, $err_msg ) = $_parse_entry->( $self, $key );
+        if ( !$is_parsed ) {
+            croak $err_msg;
+        }
     }
-  }
-  if ( !defined $self->{_key} or length $self->{_key} < $MIN_KEY_LENGTH ) {
-    croak 'no key material present';
-  }
-  return $self->{_key};
+    if ( !defined $self->{_key} or length $self->{_key} < $MIN_KEY_LENGTH ) {
+        croak 'no key material present';
+    }
+    return $self->{_key};
 }
 
 sub protocol {
-  shift->{_protocol} || 0;
+    shift->{_protocol} || 0;
 }
 
 sub keytype {
-  shift->{_keytype} || '';
+    shift->{_keytype} || '';
 }
 
 sub comment {
-  my $self    = shift;
-  my $comment = shift;
-  if ( defined $comment ) {
-    $self->{_comment} = $comment;
-  }
-  return defined $self->{_comment} ? $self->{_comment} : '';
+    my $self    = shift;
+    my $comment = shift;
+    if ( defined $comment ) {
+        $self->{_comment} = $comment;
+    }
+    return defined $self->{_comment} ? $self->{_comment} : '';
 }
 
 sub unset_comment {
-  my $self = shift;
-  delete $self->{_comment};
-  return 1;
+    my $self = shift;
+    delete $self->{_comment};
+    return 1;
 }
 
 # The leading (optional!) options can be dealt with as a string
@@ -217,76 +228,76 @@ sub unset_comment {
 # (get_option, set_option, unset_option).
 
 sub options {
-  my $self        = shift;
-  my $new_options = shift;
+    my $self        = shift;
+    my $new_options = shift;
 
-  if ( defined $new_options ) {
-    delete $self->{_parsed_options};
-    $self->{_options} = $new_options;
-  }
+    if ( defined $new_options ) {
+        delete $self->{_parsed_options};
+        $self->{_options} = $new_options;
+    }
 
-  my $options_str =
-    exists $self->{_parsed_options}
-    ? $self->{_parsed_options}->as_string
-    : $self->{_options};
-  return defined $options_str ? $options_str : '';
+    my $options_str =
+      exists $self->{_parsed_options}
+      ? $self->{_parsed_options}->as_string
+      : $self->{_options};
+    return defined $options_str ? $options_str : '';
 }
 
 sub unset_options {
-  my $self = shift;
-  delete $self->{_parsed_options};
-  delete $self->{_options};
-  return 1;
+    my $self = shift;
+    delete $self->{_parsed_options};
+    delete $self->{_options};
+    return 1;
 }
 
 sub get_option {
-  my $self = shift;
+    my $self = shift;
 
-  if ( !exists $self->{_parsed_options} ) {
-    $self->{_parsed_options} =
-      Config::OpenSSH::Authkey::Entry::Options->new( $self->{_options} );
-  }
+    if ( !exists $self->{_parsed_options} ) {
+        $self->{_parsed_options} =
+          Config::OpenSSH::Authkey::Entry::Options->new( $self->{_options} );
+    }
 
-  $self->{_parsed_options}->get_option(@_);
+    $self->{_parsed_options}->get_option(@_);
 }
 
 sub set_option {
-  my $self = shift;
+    my $self = shift;
 
-  if ( !exists $self->{_parsed_options} ) {
-    $self->{_parsed_options} =
-      Config::OpenSSH::Authkey::Entry::Options->new( $self->{_options} );
-  }
+    if ( !exists $self->{_parsed_options} ) {
+        $self->{_parsed_options} =
+          Config::OpenSSH::Authkey::Entry::Options->new( $self->{_options} );
+    }
 
-  $self->{_parsed_options}->set_option(@_);
+    $self->{_parsed_options}->set_option(@_);
 }
 
 sub unset_option {
-  my $self = shift;
+    my $self = shift;
 
-  if ( !exists $self->{_parsed_options} ) {
-    $self->{_parsed_options} =
-      Config::OpenSSH::Authkey::Entry::Options->new( $self->{_options} );
-  }
+    if ( !exists $self->{_parsed_options} ) {
+        $self->{_parsed_options} =
+          Config::OpenSSH::Authkey::Entry::Options->new( $self->{_options} );
+    }
 
-  $self->{_parsed_options}->unset_option(@_);
+    $self->{_parsed_options}->unset_option(@_);
 }
 
 sub duplicate_of {
-  my $self = shift;
-  my $ref  = shift;
+    my $self = shift;
+    my $ref  = shift;
 
-  if ( defined $ref ) {
-    $self->{_dup_of} = $ref;
-  }
+    if ( defined $ref ) {
+        $self->{_dup_of} = $ref;
+    }
 
-  return $self->{_dup_of};
+    return $self->{_dup_of};
 }
 
 sub unset_duplicate {
-  my $self = shift;
-  $self->{_dup_of} = 0;
-  return 1;
+    my $self = shift;
+    $self->{_dup_of} = 0;
+    return 1;
 }
 
 1;
@@ -359,9 +370,10 @@ Throws an exception if no key material present in the instance.
 
 =item B<keytype>
 
-Returns the type of the key, either C<rsa1> for a SSHv1 key, or C<rsa>
-or C<dsa> for the two different SSHv2 key types. This is the same format
-as the ssh-keygen(1) C<-t> option accepts.
+Returns the type of the key, either C<rsa1> for a SSHv1 key, or C<dsa>,
+C<ecdsa>, C<ed25519>, C<rsa> for SSH2 type keys. This is the same format
+as the L<ssh-keygen(1)> C<-t> option accepts, though modern C<ssh> have
+dropped support for C<rsa1>, hopefully.
 
 =item B<protocol>
 
@@ -472,9 +484,10 @@ thrig - Jeremy Mates (cpan:JMATES) C<< <jmates at cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright 2009-2010,2012,2015 by Jeremy Mates.
+Copyright 2009-2010,2012,2015,2019 by Jeremy Mates
 
-This module is free software; you can redistribute it and/or modify it
-under the Artistic License (2.0).
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/BSD-3-Clause>
+
 
 =cut

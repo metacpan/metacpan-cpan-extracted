@@ -11,7 +11,7 @@ use JSON::PP; # only this support sort_by(custom_func)
 use Capture::Tiny qw(capture);
 use Algorithm::Cron;
 
-our $VERSION = 14;
+our $VERSION = 15;
 
 sub new {
 	my $class = shift;

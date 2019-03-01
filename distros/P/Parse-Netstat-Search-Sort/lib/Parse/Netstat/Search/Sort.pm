@@ -12,11 +12,11 @@ Parse::Netstat::Search::Sort - Sorts the returned array from Parse::Netstat::Sea
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.0.1
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.0.1';
 
 
 =head1 SYNOPSIS
@@ -155,6 +155,13 @@ sub set_sort{
 		$sort='host_f';
 	}
 
+	if (! defined( $self->{sort_check}{$sort} ) ){
+		$self->{error}=1;
+		$self->{errorString}='"'.$sort.'" is not a valid sort type';
+		$self->warn;
+		return undef;
+	}
+	
 	$self->{sort}=$sort;
 
 	return 1;
@@ -209,21 +216,21 @@ sub sort{
 			} @found;
 		}elsif( $self->{sort} eq 'port_ff' ){
 			@found=sort  {
-				$a->{foreign_port} <=> $b->{foreign_port} or
-				$a->{local_port} <=> $b->{local_port}
+				&port_sort_helper( $a->{foreign_port} ) <=> &port_sort_helper( $b->{foreign_port} ) or
+				&port_sort_helper( $a->{local_port} ) <=> &port_sort_helper( $b->{local_port} )
 			} @found;
 		}elsif( $self->{sort} eq 'port_lf' ){
 			@found=sort  {
-				$a->{local_port} <=>  $b->{local_port} or
-				$a->{foreign_port} <=> $b->{foreign_port}
+				&port_sort_helper( $a->{local_port} ) <=> &port_sort_helper( $b->{local_port} ) or
+				&port_sort_helper( $a->{foreign_port} ) <=> &port_sort_helper( $b->{foreign_port} )
 			} @found;
 		}elsif( $self->{sort} eq 'port_f' ){
 			@found=sort  {
-				$a->{foreign_port} <=>  $b->{foreign_port}
+				&port_sort_helper( $a->{foreign_port} ) <=> &port_sort_helper( $b->{foreign_port} )
 			} @found;
 		}elsif( $self->{sort} eq 'port_l' ){
 			@found=sort  {
-				$a->{local_port} <=>  $b->{local_port}
+				&port_sort_helper( $a->{local_port} ) <=> &port_sort_helper( $b->{local_port} )
 			} @found;
 		}elsif( $self->{sort} eq 'state' ){
 			@found=sort  {
@@ -277,6 +284,24 @@ sub host_sort_helper{
 		return 0;
 	}
 	return $host;
+}
+
+=head2 port_sort_helper
+
+Internal function.
+
+Makes sure a port number is always returned.
+
+=cut
+
+sub port_sort_helper{
+	if (
+		( !defined($_[0]) ) ||
+		( $_[0] eq '*' )
+		){
+		return 0;
+	}
+	return $_[0];
 }
 
 =head1 ERROR CODES / FLAGS

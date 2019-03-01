@@ -89,7 +89,7 @@ $F->splash($VERSION) unless ($nosplash);
 my $benchmark;
 
 my $DORKSMILE;
-# if (0) { # This line only used for debugging
+
 $benchmark->{'Image Load'} = time;
 foreach my $file (@files) {
     next if ($file =~ /^\.+/ || $file =~ /Test|gif/ || -d "$images_path/$file");
@@ -127,7 +127,7 @@ foreach my $file (@files) {
 } ## end foreach my $file (@files)
 $benchmark->{'Image Load'} = time - $benchmark->{'Image Load'};
 $F->cls('OFF');
-
+# if (0) { # This line only used for debugging
 color_mapping();
 plotting();
 foreach my $flag (0 .. 1) {
@@ -188,10 +188,10 @@ blitting();
 blit_move();
 rotate();
 
- flipping();
+# flipping();
 monochrome();
 
-foreach my $m (1 .. 9) {    # We skip divide mode because it's stupid and I should never have added it
+foreach my $m (1 .. 8) {    # We skip divide mode because it's stupid and I should never have added it
     if ($m == MASK_MODE) {
         mask_drawing();
     } elsif ($m == UNMASK_MODE) {
@@ -1134,11 +1134,9 @@ sub rotate_truetype_fonts {
 sub flood_fill {
     print_it($F, 'Testing flood fill');
     $F->clip_reset();
-    my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
     $benchmark->{'Flood Fill'} = time;
-    my $saved = $F->acceleration();
-    $F->acceleration(PERL) if ($F->{'BITS'} == 16);
-    if ($XX > 255 && !$rpi) {
+    if ($XX > 255) { # && !$rpi) {
+        my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->polygon({ 'coordinates' => [220 * $xm, 190 * $ym, 1520 * $xm, 80 * $xm, 1160 * $xm, $YY, 960 * $xm, 540 * $ym, 760 * $xm, 780 * $ym] });
 
@@ -1150,7 +1148,6 @@ sub flood_fill {
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
 
-        #        $F->plot({x=>350*$xm,y=>250*$ym,pixel_size=>10});sleep 20;
         $F->fill({ 'x' => int(350 * $xm), 'y' => int(250 * $ym), 'texture' => $image });
 
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
@@ -1162,7 +1159,6 @@ sub flood_fill {
         $F->set_color({ 'red' => int(rand(256)), 'green' => int(rand(256)), 'blue' => int(rand(256)) });
         $F->fill({ 'x' => 3, 'y' => 3 });
     } ## end else [ if ($XX > 255 && !$rpi)]
-    $F->acceleration($saved);
     $benchmark->{'Flood Fill'} = sprintf('%.02f Seconds', (time - $benchmark->{'Flood Fill'}));
     sleep $delay if ($F->acceleration());
 } ## end sub flood_fill

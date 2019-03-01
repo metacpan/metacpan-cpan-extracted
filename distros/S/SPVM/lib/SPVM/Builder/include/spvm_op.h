@@ -174,6 +174,7 @@ enum {
   SPVM_OP_C_ID_CURRENT_PACKAGE,
   SPVM_OP_C_ID_FREE_TMP,
   SPVM_OP_C_ID_REFCNT,
+  SPVM_OP_C_ID_ALLOW,
 };
 
 extern const char* const SPVM_OP_C_ID_NAMES[];
@@ -248,6 +249,7 @@ struct SPVM_op {
     SPVM_SWITCH_INFO* switch_info;
     SPVM_CASE_INFO* case_info;
     SPVM_USE* use;
+    SPVM_ALLOW* allow;
     SPVM_CALL_SUB* call_sub;
     SPVM_FIELD_ACCESS* field_access;
     SPVM_ARRAY_FIELD_ACCESS* array_field_access;
@@ -266,6 +268,8 @@ struct SPVM_op {
   int8_t no_need_check;
   int8_t free_tmp_vars;
 };
+
+int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_OP* op_package_current, SPVM_OP* op_package_dist);
 
 SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line);
 
@@ -353,7 +357,8 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* package_var, SPVM_O
 SPVM_OP* SPVM_OP_build_my(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_arg(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages);
-SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package, SPVM_OP* sub_names, int32_t is_require);
+SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type, SPVM_OP* sub_names, int32_t is_require);
+SPVM_OP* SPVM_OP_build_allow(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_subname, SPVM_OP* op_terms);
 SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block);

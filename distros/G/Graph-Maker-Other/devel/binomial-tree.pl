@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017 Kevin Ryde
+# Copyright 2015, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -50,10 +50,15 @@ use Smart::Comments;
   # n=15 not
   # n=16 https://hog.grinvin.org/ViewGraphInfo.action?id=28507   order 4
   # n=32 https://hog.grinvin.org/ViewGraphInfo.action?id=21088   order 5
+  # n=64 https://hog.grinvin.org/ViewGraphInfo.action?id=33543
+  # n=128 https://hog.grinvin.org/ViewGraphInfo.action?id=33545
 
   require Graph::Maker::BinomialTree;
   my @graphs;
-  foreach my $N (0 .. 16) {
+  foreach my $N (
+                # 0 .. 16
+                 64, 128
+                ) {
     my $graph = Graph::Maker->new('binomial_tree',
                                   N => $N,
                                   undirected => 1,

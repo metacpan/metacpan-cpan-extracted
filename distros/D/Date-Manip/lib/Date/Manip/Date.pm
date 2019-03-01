@@ -1,5 +1,5 @@
 package Date::Manip::Date;
-# Copyright (c) 1995-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -27,7 +27,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.75';
+$VERSION='6.76';
 END { undef $VERSION; }
 
 ########################################################################
@@ -3374,10 +3374,10 @@ sub _calc_date_delta {
    ($err,$date2,$offset,$isdst,$abbrev) =
      $self->__calc_date_delta([@date],[@delta],$subtract,$business,$tz,$isdst);
 
-   if ($err) {
-      $$ret{'err'} = '[calc] Unable to perform calculation';
-   } elsif ($$date2[0]<0 || $$date2[0]>9999) {
+   if (ref($date2) eq 'ARRAY'  &&  ($$date2[0]<0 || $$date2[0]>9999)) {
       $$ret{'err'} = '[calc] Delta produces date outside valid range';
+   } elsif ($err) {
+      $$ret{'err'} = '[calc] Unable to perform calculation';
    } else {
       $$ret{'data'}{'set'}   = 1;
       $$ret{'data'}{'date'}  = $date2;
@@ -3796,6 +3796,8 @@ sub __calc_date_delta_exact {
         $dmt->_convert('__calc_date_delta_exact',$date,$tz,'GMT',$isdst);
 
       $date                               = $dmb->calc_date_time($date,$del,0);
+      return($err,$date,$offset,$isdst,$abbrev)
+        if ($$date[0] < 0  ||  $$date[0] > 9999);
 
       ($err,$date,$offset,$isdst,$abbrev) =
         $dmt->_convert('__calc_date_delta_exact',$date,'GMT',$tz,$isdst);
@@ -4078,7 +4080,8 @@ sub list_holidays {
    my $dmt = $$self{'tz'};
    my $dmb = $$dmt{'base'};
 
-   $y = $dmt->_now('y',1)  if (! $y);
+   $y = $$self{'data'}{'date'}[0]  if (! $y  &&  $$self{'data'}{'set'} == 1);
+   $y = $dmt->_now('y',1)          if (! $y);
    $self->_holidays($y-1);
    $self->_holidays($y);
    $self->_holidays($y+1);

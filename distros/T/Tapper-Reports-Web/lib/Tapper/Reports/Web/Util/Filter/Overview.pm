@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Util::Filter::Overview;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Util::Filter::Overview::VERSION = '5.0.13';
+$Tapper::Reports::Web::Util::Filter::Overview::VERSION = '5.0.14';
 
 
 
@@ -133,7 +133,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

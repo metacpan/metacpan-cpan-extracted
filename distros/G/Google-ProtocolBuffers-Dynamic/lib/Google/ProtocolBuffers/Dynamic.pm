@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.23'; # VERSION
+our $VERSION = '0.24'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -83,7 +83,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.23
+version 0.24
 
 =head1 SYNOPSIS
 
@@ -337,7 +337,10 @@ directly.
 =head2 new
 
     $dynamic = Google::ProtocolBuffers::Dynamic->new;
-    $dynamic = Google::ProtocolBuffers::Dynamic->new($search_path);
+    $dynamic = Google::ProtocolBuffers::Dynamic->new($root_directory);
+
+When specified, C<$root_directory> is used as base for relative paths in
+C<load_file>.
 
 =head2 load_file
 
@@ -348,9 +351,10 @@ constructor.
 
 =head2 load_string
 
-    $dynamic->load_string($string);
+    $dynamic->load_string($file_name, $string);
 
-Parses message definitions from a string.
+Parses message definitions from a string. The C<$file_name> parameter
+is only used to report errors, and can be the empty string.
 
 =head2 load_serialized_string
 
@@ -597,6 +601,13 @@ Only provide introspection information for services (see L</INTROSPECTION>).
 Generate a client implementation using L<Grpc::XS>.
 
 =back
+
+=head2 decode_blessed
+
+Enabled by default.
+
+Return blessed objects when decoding. When disabled, plain hashes are
+returned.
 
 =head1 KNOWN BUGS
 

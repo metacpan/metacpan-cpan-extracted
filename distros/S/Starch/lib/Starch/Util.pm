@@ -1,7 +1,7 @@
 package Starch::Util;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -22,11 +22,12 @@ our @EXPORT_OK;
 
 =head2 croak
 
-This is a custom L<Carp> C<croak> function which sets various
-standard starch packages as C<Internal> so that Carp looks
-deeper in the stack for something to blame which makes exceptions
-be more contextually useful for users of Starch and means we don't
-need to use confess which generates giant stack traces.
+This is a custom L<Carp> C<croak> function which finds and sets
+all installed C<Starch> and C<Test::Starch> modules as internal to
+Carp so that Carp looks deeper in the stack for something to blame
+which makes exceptions be more contextually useful for users of
+Starch and means we don't need to use confess which generates giant
+stack traces.
 
 =cut
 
@@ -34,7 +35,10 @@ my $all_modules;
 
 push @EXPORT_OK, 'croak';
 sub croak {
-    $all_modules ||= [ findallmod('Starch') ];
+    $all_modules ||= [
+        'Starch', findallmod('Starch'),
+        'Test::Starch', findallmod('Test::Starch'),
+    ];
     local @Carp::Internal{@$all_modules} = map { 1 } @$all_modules;
     return Carp::croak( @_ );
 }
@@ -68,7 +72,7 @@ __END__
 
 =head1 AUTHORS AND LICENSE
 
-See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+See L<Starch/AUTHORS> and L<Starch/LICENSE>.
 
 =cut
 

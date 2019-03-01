@@ -2,6 +2,7 @@
     $benchmark_operator
 </%args>
 
+%   if ( $benchmark_operator eq 'not like' ) { $benchmark_operator = 'not_like' }
 %   my @a_benchmark_operators = $c->controller('Tapper::Metareports')->get_benchmark_operators();
 %   for my $s_act_operator ( @a_benchmark_operators ) {
 %       if ( $benchmark_operator && $s_act_operator eq $benchmark_operator ) {

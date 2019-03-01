@@ -22,7 +22,7 @@ Version 0.04
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -60,15 +60,25 @@ Get content of  filter using Mojo:DOM
 my $DEBUG = 0;
 my $host;
 sub geturlcontent {
-    my $feed = shift;
-    $host= $1 if $feed=~/(http:\/\/[^\/]*)\//;
-    my $ua   = Mojo::UserAgent->new;
-    $ua->transactor->name( 'Mozilla/5.0 (Macintosh; '
+    my $url = shift;
+       $host= $1 if $url=~/(http:\/\/[^\/]*)\//;
+   my $ua= Mojo::UserAgent->new;
+      $ua->transactor->name( 'Mozilla/5.0 (Macintosh; '
+          . 'Intel Mac OS X 10_8_5) AppleWebKit/537.36 '
+          . '(KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36' ); 
+   my $recontent;
+   my $result = ( $ua->get($url) );
+    return $result->res->dom;
+}
+
+sub getfile {
+my ($url,$filename) = @_;
+my $ua = Mojo::UserAgent->new;
+   $ua->transactor->name( 'Mozilla/5.0 (Macintosh; '
           . 'Intel Mac OS X 10_8_5) AppleWebKit/537.36 '
           . '(KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36' );
-    my $recontent;
-    my $result = ( $ua->get($feed) );
-    return $result->res->dom;
+my $tx = $ua->get($url);
+$tx->res->content->asset->move_to($filename);
 }
 
 sub getdiv {
@@ -96,7 +106,7 @@ sub getndiv {
         $nrecontent .= $_->content;
         my $surl=$_->attr->{href} if $ind;
        #    $surl =  $host.$surl  unless $surl=~/https?:/;
-        $nrecontent .= $surl if $surl;
+        $nrecontent .= " ".$surl if $surl;
         $nrecontent .= "\n";
     }
     print "DEBUG:getndiv()\::OUT:\n", $nrecontent if $DEBUG;
@@ -117,7 +127,6 @@ sub gettext {
    
     $nrecontent .= "\n";
     print "DEBUG:getndiv()\::OUT:\n", $nrecontent if $DEBUG;
-   
     return $nrecontent;
 
 }

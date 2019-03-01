@@ -35,7 +35,6 @@ sub run {
 
     # Run it
     #print Dumper($outermost_scope);
-$DB::single = 1;
     my $dag_out = $dag->run($outermost_scope);
     #print Dumper($dag_out);
     #print Dumper($op->outputs);

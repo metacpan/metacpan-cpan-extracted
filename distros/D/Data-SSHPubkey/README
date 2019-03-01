@@ -1,0 +1,19 @@
+Data::SSHPubkey - utility function to parse SSH public keys with
+
+to install this module, use CPAN, for example:
+
+    cpanm Data::SSHPubkey
+
+run perldoc(1) on Data::SSHPubkey for additional documentation
+
+
+for the source code, see
+
+https://github.com/thrig/Data-SSHPubkey
+
+this can be built and installed by running
+
+    perl Makefile.PL
+    make
+    make test
+    make install

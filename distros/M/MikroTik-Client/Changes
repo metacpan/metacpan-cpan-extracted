@@ -1,3 +1,6 @@
+v0.501
+    - Fix connection tests.
+
 v0.500
     - Moved to AnyEvent.
 

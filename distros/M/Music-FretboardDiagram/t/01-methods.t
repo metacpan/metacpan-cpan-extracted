@@ -23,7 +23,7 @@ throws_ok {
 } qr/not a positive integer/, 'bogus size dies';
 throws_ok {
     $obj = Music::FretboardDiagram->new( chord => '54321' )
-} qr/Chord length and string length differ/, 'chord length not equal to strings';
+} qr/chord length and string number differ/, 'chord length not equal to strings';
 
 $obj = Music::FretboardDiagram->new( chord => 'xxxxxx' );
 isa_ok $obj, 'Music::FretboardDiagram';
@@ -34,35 +34,39 @@ is $obj->strings, 6, 'strings';
 is $obj->frets, 5, 'frets';
 is $obj->size, 30, 'size';
 is $obj->outfile, 'chord-diagram', 'outfile';
+is $obj->type, 'png', 'type';
 like $obj->font, qr/\.ttf$/, 'font';
+is $obj->horiz, 0, 'horiz';
+is $obj->grid, 'blue', 'grid';
 is_deeply $obj->tuning, [qw/E B G D A E/], 'tuning';
 is keys %{ $obj->fretboard }, 6, 'fretboard';
 is scalar @{ $obj->fretboard->{1} }, 12, 'fretboard';
+is $obj->showname, 1, 'showname';
 is $obj->verbose, 0, 'verbose';
 
 can_ok $obj, 'draw';
 
 my $note = 0;
 my $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
-is $x, 'E', 'E';
+is $x, 'E', 'open E';
 $note = 1;
 $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
-is $x, 'F', 'F';
+is $x, 'F', '1st fret F';
 
 $note = 0;
 $obj->position(13);
 $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
-is $x, 'E', 'E';
+is $x, 'E', '12th fret E';
 $note = 1;
 $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
-is $x, 'F', 'F';
+is $x, 'F', '13th fret F';
 
 $note = 0;
 $obj->position(25);
 $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
-is $x, 'E', 'E';
+is $x, 'E', '24th fret E';
 $note = 1;
 $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
-is $x, 'F', 'F';
+is $x, 'F', '25th fret F';
 
 done_testing();

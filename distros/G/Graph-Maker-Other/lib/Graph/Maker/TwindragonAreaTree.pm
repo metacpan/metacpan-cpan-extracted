@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -250,15 +250,20 @@ House of Graphs entries for twindragon area trees include
 
 =over
 
-=item level=0, L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  etc
 
-=item level=1, L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+=back
 
-=item level=2, L<https://hog.grinvin.org/ViewGraphInfo.action?id=594>  (path-4)
+=over
 
-=item level=3, L<https://hog.grinvin.org/ViewGraphInfo.action?id=700>
-
-=item level=4, L<https://hog.grinvin.org/ViewGraphInfo.action?id=28549>
+    1310   level=0, singleton
+    19655  level=1, path-2
+    594    level=2, path-4
+    700    level=3
+    28549  level=4
+    31086  level=5
+    33581  level=6
+    33583  level=7
 
 =back
 
@@ -285,7 +290,7 @@ L<http://www.archive.org/details/byte-magazine-1987-08>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

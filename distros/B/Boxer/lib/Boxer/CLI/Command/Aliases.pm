@@ -9,19 +9,18 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 
 use match::simple qw(match);
 use Boxer::CLI -command;
 
-use namespace::autoclean 0.16;
-
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 use constant {
 	abstract   => q[show aliases for boxer commands],

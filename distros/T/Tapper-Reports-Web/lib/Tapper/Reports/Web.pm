@@ -1,9 +1,9 @@
 package Tapper::Reports::Web;
-# git description: v5.0.12-7-g5c32af8
+# git description: v5.0.13-29-g8e7d44c
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Frontend web application based on Catalyst
-$Tapper::Reports::Web::VERSION = '5.0.13';
+$Tapper::Reports::Web::VERSION = '5.0.14';
 use 5.010;
 use strict;
 use warnings;
@@ -139,7 +139,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

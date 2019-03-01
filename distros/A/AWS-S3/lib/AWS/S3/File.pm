@@ -163,11 +163,17 @@ sub signed_url {
     my $s       = shift;
     my $expires = shift || time + 3600;
 
+	my $key = $s->key;
+
+	if ( ! $s->bucket->s3->honor_leading_slashes ) {
+		$key =~ s!^/!!;
+	}
+
     my $type = "GetPreSignedUrl";
     my $uri  = $s->bucket->s3->request(
         $type,
         bucket  => $s->bucket->name,
-        key     => $s->key,
+        key     => $key,
         expires => $expires,
     )->request;
 

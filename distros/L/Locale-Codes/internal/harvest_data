@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# Copyright (c) 2010-2018 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2019 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -22,7 +22,7 @@ use Text::Iconv;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.59';
+$VERSION='3.60';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -1716,7 +1716,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.59';
+\$VERSION='3.60';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

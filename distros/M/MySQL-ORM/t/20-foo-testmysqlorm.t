@@ -40,7 +40,7 @@ else {
 
 sub check {
 
-	use_ok("Foo::Testmysqlorm") || print "Bail out!\n";
+	use_ok("Foo::Testmysqlorm") || BAIL_OUT("failed to use module");
 	
 	my $dbh = get_dbh();
 	my $orm;
@@ -81,7 +81,7 @@ sub check {
 	my $steelers_id2 = $team->upsert(	team_name => 'steelers', league_id => $league_id, city => 'pittsburgh');
 	ok($steelers_id2 == $steelers_id);
 	
-	my $bears_id = $team->upsert(team_name => 'bears', league_id => $league_id, city => 'chicago');
+	my $bears_id = $team->upsert(team_name => 'bears', league_id => $league_id, city => 'chicago', owner_id => get_random_owner_id($orm));
 	ok($bears_id > $steelers_id);
 	
 	my @rows = $team->select;
@@ -104,6 +104,16 @@ sub check {
 	
 	@rows = $team->select;
 	ok(!@rows);
+}
+
+sub get_random_owner_id {
+
+	my $orm = shift;
+		
+	my $owner = $orm->Owner;
+	my $row = $owner->select_one;
+	
+	return $row->owner_id;
 }
 
 sub constructor {

@@ -20,24 +20,29 @@ $dia->draw;
 
 $dia->chord('132211');
 $dia->position(6);
+$dia->showname('Bbmaj7');
 $dia->outfile('Bbmaj7');
 $dia->draw;
 
 $dia->chord('x13231');
+$dia->showname('Ebmaj7');
 $dia->outfile('Ebmaj7');
 $dia->draw;
 
 $dia->chord('xx1222');
 $dia->position(7);
+$dia->showname(1);
 $dia->outfile('Ao7_1');
 $dia->draw;
 
 $dia->chord('x1413x');
 $dia->position(5);
+$dia->showname('D7b13');
 $dia->outfile('D7b13_1');
 $dia->draw;
 
 $dia->chord('xx1312');
+$dia->showname(1);
 $dia->outfile('Gmin6_1');
 $dia->draw;
 
@@ -47,26 +52,31 @@ $dia->outfile('Ao7_2');
 $dia->draw;
 
 $dia->chord('xx0312');
+$dia->showname('D7b13');
 $dia->outfile('D7b13_2');
 $dia->draw;
 
 $dia->chord('133131');
 $dia->position(3);
+$dia->showname('Gm-6');
 $dia->outfile('Gmin6_2');
 $dia->draw;
 
 $dia->chord('xx1322');
 $dia->position(5);
+$dia->showname(1);
 $dia->outfile('Gmin7');
 $dia->draw;
 
 $dia->chord('xx1323');
 $dia->position(4);
+$dia->showname('Gb7');
 $dia->outfile('Gb7');
 $dia->draw;
 
 $dia->chord('xx1322');
 $dia->position(3);
+$dia->showname(1);
 $dia->outfile('Fmin7');
 $dia->draw;
 

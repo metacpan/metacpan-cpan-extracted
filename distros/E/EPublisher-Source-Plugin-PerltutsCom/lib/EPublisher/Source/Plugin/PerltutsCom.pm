@@ -6,27 +6,29 @@ package EPublisher::Source::Plugin::PerltutsCom;
 use strict;
 use warnings;
 
-use Moo;
 use Encode;
 use File::Basename;
 use HTTP::Tiny;
 
 use parent qw( EPublisher::Source::Base );
 
-has ua => ( is => 'ro', default => sub { HTTP::Tiny->new } );
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
+our $UA;
 
 # implementing the interface to EPublisher::Source::Base
 sub load_source{
-    my ($self) = @_;
+    my ($self, $name) = @_;
 
     $self->publisher->debug( '100: start ' . __PACKAGE__ );
 
     my $options = $self->_config;
     
-    my $name = $options->{name};
-    return if !$name;
+    $name //= $options->{name};
+    if ( !$name ) {
+        $self->publisher->debug( '400: No tutorial name given' );
+        return;
+    }
 
     # fetching the requested tutorial from metacpan
     $self->publisher->debug( "103: fetch tutorial $name" );
@@ -41,7 +43,7 @@ sub _get_pod {
         'http://perltuts.com/tutorials/' . $name . '?format=pod'
     );
 
-    if ( $response !~ m{\A2} ) {
+    if ( $response->{status} !~ m{\A2} ) {
         $self->publisher->debug(
             "103: tutorial $name does not exist"
         );
@@ -78,6 +80,11 @@ sub _get_pod {
     return @pod;
 }
 
+sub ua {
+    $UA = HTTP::Tiny->new if !$UA;
+    $UA;
+}
+
 1;
 
 __END__
@@ -92,7 +99,7 @@ EPublisher::Source::Plugin::PerltutsCom - Get POD from tutorials published on pe
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 SYNOPSIS
 

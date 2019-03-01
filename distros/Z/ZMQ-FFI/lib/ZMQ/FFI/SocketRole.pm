@@ -1,5 +1,5 @@
 package ZMQ::FFI::SocketRole;
-$ZMQ::FFI::SocketRole::VERSION = '1.12';
+$ZMQ::FFI::SocketRole::VERSION = '1.14';
 use FFI::Platypus;
 use FFI::Platypus::Memory qw(malloc);
 
@@ -23,6 +23,13 @@ has type => (
 has socket_ptr => (
     is      => 'rw',
     default => -1,
+);
+
+# a weak reference to the context object
+has context => (
+    is       => 'ro',
+    required => 1,
+    weak_ref => 1,
 );
 
 # message struct to reuse when sending/receiving
@@ -111,7 +118,7 @@ ZMQ::FFI::SocketRole
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -36,50 +36,51 @@ use MyGraphs;
 
 plan tests => 4;
 
-# uncomment this to run the ### lines
-# use Smart::Comments;
-
 
 #------------------------------------------------------------------------------
 # POD HOG Shown
 
 {
-  my %shown = ('4' => 3,  # height=3
-               '5' => -1,
-               '6' => 4,  # height=4
-               '7' => -1,
-               '8' => 5,  # height=5
-               '13' => -1,  # height=8
+  my %shown_height = (1 => 1,
+                      2 => 2,
+                      4 => 3,
+                      6 => 4,
+                      8 => 5);
 
-               # maybe show
-               '1' => ,  # N=1 single vertex
-               '2' => ,  # N=2 path-2
+  my %shown = (1  => 1310,   # N=1 single vertex
+               2  => 19655,  # N=2 path-2
+               3  => 32234,  # N=3 path-3
+
+               4  => 500,    # height=3
+               5  => 30,
+               6  => 334,    # height=4
+               7  => 714,
+               8  => 502,    # height=5
+               13 => 60,
               );
   my $extras = 0;
   my %seen;
   foreach my $N (3 .. 64) {
     my $graph = Graph::Maker->new('binary_beanstalk', undirected => 1,
                                   N => $N);
-    if (defined (my $height = $shown{$N})) {
-      if ($height >= 1) {
-        my $gh = Graph::Maker->new('binary_beanstalk', undirected => 1,
-                                   height => $height);
-        ok ("$gh", "$graph", "N=$N height=$height");
-      }
+    if (defined (my $height = $shown_height{$N})) {
+      my $gh = Graph::Maker->new('binary_beanstalk', undirected => 1,
+                                 height => $height);
+      ok ("$gh", "$graph", "N=$N height=$height");
     }
 
+    my $key = "$N";
     my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
     $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
-    next if $seen{$g6_str}++;
-    my $key = "$N";
-    next if $shown{$key};
-    if (MyGraphs::hog_grep($g6_str)) {
-      my $name = $graph->get_graph_attribute('name');
-      MyTestHelpers::diag ("HOG $key not shown in POD");
-      MyTestHelpers::diag ($name);
-      MyTestHelpers::diag ($g6_str);
-      MyGraphs::Graph_view($graph);
-      $extras++;
+    if (my $id = $shown{$key}) {
+      MyGraphs::hog_compare($id, $g6_str);
+    } else {
+      if (MyGraphs::hog_grep($g6_str)) {
+        MyTestHelpers::diag ("HOG got $key, not shown in POD");
+        MyTestHelpers::diag ($g6_str);
+        MyGraphs::Graph_view($graph);
+        $extras++
+      }
     }
   }
   ok ($extras, 0);

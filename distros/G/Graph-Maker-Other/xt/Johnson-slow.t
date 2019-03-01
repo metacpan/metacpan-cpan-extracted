@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -41,8 +41,8 @@ plan tests => 23;
 # POD HOG Shown
 
 {
-  my %shown = ('4,2' => 1,
-               '5,2' => 1,
+  my %shown = ('4,2' => 226,
+               '5,2' => 21154,
               );
   my $extras = 0;
   my %seen;
@@ -50,15 +50,19 @@ plan tests => 23;
     foreach my $K (2 .. $N-2) {
       my $graph = Graph::Maker->new('Johnson', undirected => 1,
                                     N => $N, K => $K);
+      my $key = "$N,$K";
       my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
       $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
       next if $seen{$g6_str}++;
-      next if $shown{"$N,$K"};
-      if (MyGraphs::hog_grep($g6_str)) {
-        MyTestHelpers::diag ("HOG N=$N,K=$K not shown in POD");
-        MyTestHelpers::diag ($g6_str);
-        MyGraphs::Graph_view($graph);
-        $extras++
+      if (my $id = $shown{$key}) {
+        MyGraphs::hog_compare($id, $g6_str);
+      } else {
+        if (MyGraphs::hog_grep($g6_str)) {
+          MyTestHelpers::diag ("HOG got $key, not shown in POD");
+          MyTestHelpers::diag ($g6_str);
+          MyGraphs::Graph_view($graph);
+          $extras++
+        }
       }
     }
   }

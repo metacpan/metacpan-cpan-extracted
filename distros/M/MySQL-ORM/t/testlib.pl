@@ -9,10 +9,17 @@ use constant DBNAME => 'testmysqlorm';
 
 sub get_dbh {
 
-	my $dbh = DBI->connect(
-		'dbi:mysql:host=localhost',
-		'root', undef, { RaiseError => 1, PrintError => 0 }
-	);
+	my $dbh;
+
+	eval {
+		$dbh = DBI->connect( 'dbi:mysql:host=localhost',
+			'root', undef, { RaiseError => 1, PrintError => 0 } );
+	};
+
+	if ($@) {
+		$dbh = DBI->connect( 'dbi:mysql:host=127.0.0.1',
+			'root', undef, { RaiseError => 1, PrintError => 0 } );
+	};
 
 	eval { $dbh->do( "use " . DBNAME ); };
 

@@ -1,7 +1,6 @@
 Changes
 LICENSE
 MANIFEST
-META.yml
 Makefile.PL
 README
 eg/authkey-merge
@@ -14,5 +13,6 @@ t/040-authkey.t
 t/042-options.t
 t/authorized_keys
 t/pod.t
-SIGNATURE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

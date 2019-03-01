@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-FretboardDiagram
   repository: https://github.com/ology/Music-FretboardDiagram
-version: '0.0402'
+version: '0.1001'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -202,10 +202,14 @@ x_Dist_Zilla:
           spell_cmd: 'aspell list'
           stopwords:
             - PNG
+            - Pawe
             - TTF
             - fretboard
+            - horiz
             - png
+            - showname
             - th
+            - Świderski
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'

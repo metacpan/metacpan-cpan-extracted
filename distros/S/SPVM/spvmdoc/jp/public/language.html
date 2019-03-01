@@ -28,34 +28,18 @@
     <div class="header">
       <div class="container">
         <h1>
-          <img src="/images/spvm-logo.png">
-          SPVM言語仕様 1.0 ベータ
+          <a style="color:#333;text-decoration:none;" href="/language.html"><img src="/images/spvm-logo.png">SPVM 1.0 言語仕様</a>
         </h1>
       </div>
     </div>
     
     <div class="container">
-      <h2 id="language-summary">はじめに</h2>
+      <h2 id="language-summary">SPVM言語仕様</a></h2>
       <p>
-        SPVMの言語仕様です。SPVMは、静的な型を持ちPerlの文法で記述できるプログラム言語です。
+        <b>SPVM 1.0の言語仕様</b>がこのドキュメントには記述されています。SPVMは、1.0のリリースに向けて、ベータテスト中です。言語仕様は、警告なく変更されることがあります。
       </p>
       <p>
-        このドキュメントには、<b>SPVM言語仕様のすべて</b>が記載されます。
-      </p>
-      <p>
-        PerlからSPVM言語の利用については「SPVMエクスチェンジAPI仕様」を見てください。
-      </p>
-      <p>
-        SPVMからC/C++などのネイティブコードの利用については、「SPVMネイティブAPI仕様」を見てください。
-      </p>
-      <p>
-        SPVMの標準関数については、「SPVM標準関数仕様」を見てください。
-      </p>
-      <p>
-        SPVMの標準モジュールについては、「SPVM標準モジュール仕様」を見てください。
-      </p>
-      <p>
-        最終更新日 2019年2月8日
+        最終更新日 2019年2月27日
       </p>
       <h2 id="language-toc">目次</h2>
       <ul class="toc">
@@ -65,6 +49,7 @@
         <li><a href="#language-pod">POD</a></li>
         <li><a href="#language-package">パッケージ</a></li>
         <li><a href="#language-module">モジュール</a></li>
+        <li><a href="#language-allow-access">アクセス許可</a></li>
         <li><a href="#language-package-var">パッケージ変数</a></li>
         <li><a href="#language-field">フィールド</a></li>
         <li><a href="#language-sub">サブルーチン</a></li>
@@ -80,10 +65,7 @@
         <li><a href="#language-exception">例外処理</a></li>
         <li><a href="#language-interface">インターフェース</a></li>
         <li><a href="#language-weak-ref">ウィークリファレンス</a></li>
-        <li><a href="#language-term">項</a></li>
-        <li><a href="#language-expression">式</a></li>
-        <li><a href="#language-condition">条件</a></li>
-        <li><a href="#language-condition-part">条件部</a></li>
+        <li><a href="#language-expresssion">式</a></li>
         <li><a href="#language-literal">リテラル</a></li>
         <li><a href="#language-fat-comma">ファットカンマ</a></li>
         <li><a href="#language-string">文字列</a></li>
@@ -95,28 +77,23 @@
         <li><a href="#language-type-inference">型推論</a></li>
         <li><a href="#language-type-convertion">型変換</a></li>
         <li><a href="#language-thread">スレッドセーフ</a></li>
+        <li><a href="#language-auto-loaded-module">自動的に読み込まれるモジュール</a></li>
       </ul>
       
-      <h2 id="language-c99">C99準拠</h2>
+      <h2 id="language-c99">C99準拠</h2><!-- 2019/2/27 almost ok -->
       <ul class="list">
         <li><a href="#language-c99-spec">C99準拠のコンパイラとランタイム</a>
         <li><a href="#language-c99-type">C99との型の対応</a>
       </ul>
       
-      <h3 id="language-c99-spec">C99準拠のコンパイラとランタイム</h2>
+      <h3 id="language-c99-spec">C99準拠のコンパイラとランタイム</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMコンパイラおよびSPVMランタイムのソースコードは、<b>C言語で書かれ、C99に準拠</b>します。
       </p>
       <p>
-        数値演算における仕様は、C99に準拠します。C99で、未定義・処理系依存のものは、SPVMにおいても未定義・処理系依存です。<a href="#language-operator-arithmetic">算術演算子</a>の仕様では、C99における算術演算との対応が記述されます。
+        このことは、ユーザーが、C99以外のCのバージョンや、C++で書かれたコードをSPVMから呼び出せないという意味ではないので注意してください。SPVMのコンパイラとランタイムが、C99に準拠する必要があるという意味です。
       </p>
-      <p>
-        <a href="#language-type-convertion-numeric-to-string">数値から文字列への型変換</a>における仕様は、C99のsrpintfの「%g」フォーマットが仕様になります。
-      </p>
-      <p>
-        このことは、ユーザーが、C99以外のCのバージョンや、C++で、ネイティブコードをバインディングできないという意味ではないので注意してください。単に、SPVMのコンパイラとランタイムが、C99に準拠する必要があるという意味です。
-      </p>
-      <h3 id="language-c99-type">C99との型の対応</h2>
+      <h3 id="language-c99-type">C99との型の対応</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMの型は、C99の次の型と完全に一致します。
       </p>
@@ -226,7 +203,7 @@
               として定義されていた場合は、フィールドの型がint型で、フィールドの個数が2なので
             </p>
             <p>
-              C99のint32_t[2]型に一致します。
+              C99の「int32_t var[2];」で宣言された型に一致します。
             </p>
           </td>
         </tr>
@@ -234,7 +211,6 @@
       
       <h2 id="language-parser">構文解析</h2>
       <ul class="list">
-        <li><a href="#language-parser-encoding">ソースコードの文字コード</a>
         <li><a href="#language-parser-lalr">LALR(1)法</a>
         <li><a href="#language-parser-component">構成要素</a>
         <li><a href="#language-parser-line-terminater">行終端</a>
@@ -242,24 +218,20 @@
         <li><a href="#language-parser-identifier">識別子</a>
         <li><a href="#language-parser-separator">区切り文字</a>
         <li><a href="#language-parser-operator">演算子</a>
+        <li><a href="#language-parser-table">構文解析表</a></li>
       </ul>
       
-      <h3 id="language-parser-encoding">ソースコードの文字コード</h3>
-      <p>
-        SPVMのソースコードの文字コードは、BOMなしのUTF-8で記述されているとして解析されます。
-      </p>
-      
-      <h3 id="language-parser-lalr">LALR(1)法</h3>
+      <h3 id="language-parser-lalr">LALR(1)法</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMのソースコードは、LALR(1)法によって解析できます。yacc/bisonで生成されたパーサージェネレータによって解析することができます。
       </p>
       
-      <h3 id="language-parser-component">構成要素</h3>
+      <h3 id="language-parser-component">構成要素</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMのソースコードは「<a href="#language-parser-space-character">空白文字</a>」「<a href="#language-comment">コメント</a>」「<a href="#language-pod">POD</a>」「<a href="#language-literal">リテラル</a>」「<a href="#language-parser-identifier">識別子</a>」「<a href="#language-parser-keyword">キーワード</a>」「<a href="#language-parser-separator">区切り文字</a>」「<a href="#language-parser-operator">演算子</a>」で構成されます。
       </p>
       
-      <h3 id="language-parser-line-terminater">行終端</h3>
+      <h3 id="language-parser-line-terminater">行終端</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMのソースコードの行終端は、ASCIIコードの「LF」「CR」「CR LF」です。
       </p>
@@ -267,7 +239,7 @@
         行終端が現れたときは、適切に行番号がインクリメントされます。
       </p>
       
-      <h3 id="language-parser-space-character">空白文字</h3>
+      <h3 id="language-parser-space-character">空白文字</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMにおける空白文字はASCIIコードの「SP」「HT」「FF」と「<a href="#language-parser-line-terminater">行終端</a>」です。
       </p>
@@ -275,7 +247,7 @@
         空白文字はソースコード上では意味を持ちません。
       </p>
       
-      <h3 id="language-parser-identifier">識別子</h3>
+      <h3 id="language-parser-identifier">識別子</h3><!-- 2019/2/27 maybe ok -->
       <p>
         SPVMにおける識別子は「パッケージ名」「サブルーチン名」「フィールド名」「パッケージ変数名」「レキシカル変数名」です。
       </p>
@@ -287,7 +259,7 @@
         <li><a href="#language-parser-identifier-lex-var-name">レキシカル変数名</a></li>
       </ul>
       
-      <h4 id="language-parser-identifier-package-name">パッケージ名</h3>
+      <h4 id="language-parser-identifier-package-name">パッケージ名</h4><!-- 2019/2/27 almost ok -->
       <p>
         パッケージ名は、「ASCIIコードにおけるアルファベットあるいはアンダースコアの一文字以上」と「::」の組み合わせです。「::」は、含まれていなくてもかまいません。
       </p>
@@ -299,9 +271,6 @@
       </p>
       <p>
         アンダースコアは、二つ以上続いてはいけません。
-      </p>
-      <p>
-        パッケージ名が要求される場所で、不正なパッケージ名が現れた場合は、コンパイル時エラーが発生します。
       </p>
 <pre>
 # 正しいパッケージ名
@@ -317,15 +286,12 @@ Foo::Bar::
 Foo__Bar
 </pre>
 
-      <h4 id="language-parser-identifier-sub-name">サブルーチン名</h3>
+      <h4 id="language-parser-identifier-sub-name">サブルーチン名</h4><!-- 2019/2/27 almost ok -->
       <p>
         サブルーチン名は、「ASCIIコードにおけるアルファベットあるいはアンダースコアの一文字以上」です。
       </p>
       <p>
         アンダースコアは、二つ以上続いてはいけません。
-      </p>
-      <p>
-        サブルーチン名が要求される場所で、不正なサブルーチン名が現れた場合は、コンパイル時エラーが発生します。
       </p>
 <pre>
 # 正しいサブルーチン名
@@ -340,15 +306,12 @@ _foo_bar_
 foo__bar
 </pre>
 
-      <h4 id="language-parser-identifier-field-name">フィールド名</h3>
+      <h4 id="language-parser-identifier-field-name">フィールド名</h4><!-- 2019/2/27 almost ok -->
       <p>
         フィールド名は、「ASCIIコードにおけるアルファベットあるいはアンダースコアの一文字以上」です。
       </p>
       <p>
         アンダースコアは、二つ以上続いてはいけません。
-      </p>
-      <p>
-        フィールド名が要求される場所で、不正なフィールド名が現れた場合は、コンパイル時エラーが発生します。
       </p>
 <pre>
 # 正しいフィールド名
@@ -363,21 +326,15 @@ _foo_bar_
 foo__bar
 </pre>
 
-      <h4 id="language-parser-identifier-package-var-name">パッケージ変数名</h3>
+      <h4 id="language-parser-identifier-package-var-name">パッケージ変数名</h4><!-- 2019/2/27 maybe ok -->
       <p>
-        パッケージ変数名は、先頭が「$」で始まり、その後「ASCIIコードにおけるアルファベットあるいはアンダースコアの一文字以上」と「::」の組み合わせが続きます。
+        パッケージ変数名は、先頭が「$」で始まり、その後「ASCIIコードにおけるアルファベットあるいはアンダースコアの一文字以上」と「::」の組み合わせが続きます。「::」は含まれていなくてもかまいません。
       </p>
       <p>
         「$」の次に来る文字は、ASCIIコードにおけるアルファベットの大文字でなければなりません。
       </p>
       <p>
         アンダースコアは、二つ以上続いてはいけません。
-      </p>
-      <p>
-        パッケージ変数の定義においては、パッケージ変数名に「::」が含まれてはいけません。
-      </p>
-      <p>
-        パッケージ変数名が要求される場所で、不正なパッケージ変数名が現れた場合は、コンパイル時エラーが発生します。
       </p>
 <pre>
 # 正しいパッケージ変数名
@@ -392,18 +349,15 @@ $FOO__BAR
 $
 </pre>
 
-      <h4 id="language-parser-identifier-lex-var-name">レキシカル変数名</h3>
+      <h4 id="language-parser-identifier-lex-var-name">レキシカル変数名</h4><!-- 2019/2/27 maybe ok -->
       <p>
         レキシカル変数名は、先頭が「$」で始まり、その後「ASCIIコードにおけるアルファベットあるいはアンダースコアの一文字以上」が続きます。
       </p>
       <p>
-        「$」の次に来る文字は、ASCIIコードにおけるアルファベットの子文字でなければなりません。
+        「$」の次に来る文字は、ASCIIコードにおけるアルファベットの子文字あるいは、アンダースコアでなければなりません。
       </p>
       <p>
         アンダースコアは、二つ以上続いてはいけません。
-      </p>
-      <p>
-        レキシカル変数名が要求される場所で、不正なレキシカル変数名が現れた場合は、コンパイル時エラーが発生します。
       </p>
 <pre>
 # 正しいレキシカル変数名
@@ -417,12 +371,12 @@ $foo__bar
 $
 </pre>
 
-      <h3 id="language-parser-keyword">キーワード</h3>
+      <h3 id="language-parser-keyword">キーワード</h3><!-- 2019/2/27 maybe ok -->
       <p>
         SPVMにおけるキーワードは以下です。
       </p>
 <pre>
-byte BEGIN case croak default double elsif else enum eq
+allow byte BEGIN case croak default double elsif else enum eq
 eval for float gt ge has if interface_t isa int last length
 lt le long my native ne next new our object package private
 public precompile pointer_t return require rw ro self switch
@@ -430,8 +384,7 @@ sub string short scalar undef unless use void value_t while
 weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 </pre>
 
-
-      <h3 id="language-parser-separator">区切り文字</h3>
+      <h3 id="language-parser-separator">区切り文字</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMにおける区切り文字は以下です。
       </p>
@@ -439,7 +392,7 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 ( ) { } [ ] ; , -> =>
 </pre>
 
-      <h3 id="language-parser-operator">演算子</h3>
+      <h3 id="language-parser-operator">演算子</h3><!-- 2019/2/27 almost ok -->
       <p>
         SPVMにおける演算子は以下です。
       </p>
@@ -451,12 +404,16 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 \   $   @   .   .=
 </pre>
 
-      <h3 id="language-parser-table">構文解析表</h3>
+      <h3 id="language-parser-table">構文解析表</h3><!-- 2019/2/27 not ok -->
       <p>
-        yacc/bisonにおける、SPVM文法の構文解析表です。
+        SPVMの文法を表現する、yacc/bisonにおける構文解析表と、トークンとキーワード・演算子の対応表です。
       </p>
+      <p>
+        <b>SPVM文法のyacc/bisonにおける構文解析表</b>
+      </p>
+
 <pre>
-%token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE REQUIRE
+%token <opval> PACKAGE HAS SUB OUR ENUM MY SELF USE REQUIRE ALLOW
 %token <opval> DESCRIPTOR
 %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT EVAL
 %token <opval> NAME VAR_NAME CONSTANT PACKAGE_VAR_NAME EXCEPTION_VAR
@@ -465,7 +422,7 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 %token <opval> RETURN WEAKEN CROAK CURRENT_PACKAGE UNWEAKEN '[' '{' '('
 
 %type <opval> grammar
-%type <opval> opt_packages packages package package_block
+%type <opval> opt_packages packages package package_block refcnt
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
 %type <opval> sub anon_sub opt_args args arg invocant has use require our string_length
@@ -473,13 +430,13 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
 %type <opval> block eval_block begin_block if_require_statement
-%type <opval> unary_op binary_op comparison_op num_comparison_op str_comparison_op isa logical_op
+%type <opval> unary_op binary_op num_comparison_op str_comparison_op isa logical_op
 %type <opval> call_sub opt_vaarg
 %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
-%type <opval> deref ref assign inc dec
+%type <opval> deref ref assign inc dec allow
 %type <opval> new array_init
 %type <opval> my_var var package_var_access
-%type <opval> term opt_expressions expressions expression condition opt_expression
+%type <opval> expression opt_expressions expressions opt_expression
 %type <opval> field_name sub_name
 %type <opval> type basic_type array_type array_type_with_length ref_type  type_or_void
 
@@ -493,7 +450,7 @@ weaken wo __END__ __PACKAGE__ __FILE__ __LINE__
 %left <opval> SHIFT
 %left <opval> '+' '-' '.'
 %left <opval> MULTIPLY DIVIDE REMAINDER
-%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK
+%right <opval> LOGICAL_NOT BIT_NOT '@' REF DEREF PLUS MINUS CONVERT SCALAR LENGTH ISWEAK REFCNT
 %nonassoc <opval> INC DEC
 %left <opval> ARROW
 
@@ -531,6 +488,7 @@ declaration
   | enumeration
   | our ';'
   | use
+  | allow
   | begin_block
 
 begin_block
@@ -542,6 +500,9 @@ use
 
 require
   : REQUIRE basic_type
+
+allow
+  : ALLOW basic_type ';'
 
 enumeration
   : ENUM enumeration_block
@@ -564,6 +525,7 @@ enumeration_value
 
 our
   : OUR PACKAGE_VAR_NAME ':' opt_descriptors type
+
 has
   : HAS field_name ':' opt_descriptors type ';'
 
@@ -633,10 +595,10 @@ statement
   | ';'
 
 for_statement
-  : FOR '(' opt_expression ';' term ';' opt_expression ')' block
+  : FOR '(' opt_expression ';' expression ';' opt_expression ')' block
 
 while_statement
-  : WHILE '(' term ')' block
+  : WHILE '(' expression ')' block
 
 switch_statement
   : SWITCH '(' expression ')' block
@@ -651,13 +613,13 @@ if_require_statement
   : IF '(' require ')' block
 
 if_statement
-  : IF '(' term ')' block else_statement
-  | UNLESS '(' term ')' block else_statement
+  : IF '(' expression ')' block else_statement
+  | UNLESS '(' expression ')' block else_statement
 
 else_statement
   : /* NULL */
   | ELSE block
-  | ELSIF '(' term ')' block else_statement
+  | ELSIF '(' expression ')' block else_statement
 
 block 
   : '{' opt_statements '}'
@@ -668,10 +630,7 @@ eval_block
 opt_expressions
   :	/* Empty */
   |	expressions
-term
-  : expression
-  | condition
-
+    
 opt_expression
   : /* Empty */
   | expression
@@ -690,6 +649,7 @@ expression
   | array_init
   | array_length
   | string_length
+  | refcnt
   | my_var
   | binary_op
   | unary_op
@@ -700,7 +660,14 @@ expression
   | dec
   | '(' expressions ')'
   | CURRENT_PACKAGE
+  | isweak_field
+  | num_comparison_op
+  | str_comparison_op
+  | isa
+  | logical_op
 
+refcnt
+  : REFCNT var
 expressions
   : expressions ',' expression
   | expressions ','
@@ -731,17 +698,6 @@ binary_op
   | expression SHIFT expression
   | expression '.' expression
 
-condition
-  : comparison_op
-  | logical_op
-  | isweak_field ';'
-  | '(' condition ')'
-
-comparison_op
-  : num_comparison_op
-  | str_comparison_op
-  | isa
-
 num_comparison_op
   : expression NUMEQ expression
   | expression NUMNE expression
@@ -762,9 +718,9 @@ isa
   : expression ISA type
 
 logical_op
-  : term LOGICAL_OR term
-  | term LOGICAL_AND term
-  | LOGICAL_NOT term
+  : expression LOGICAL_OR expression
+  | expression LOGICAL_AND expression
+  | LOGICAL_NOT expression
 
 assign
   : expression ASSIGN expression
@@ -800,13 +756,13 @@ field_access
   | array_access '{' field_name '}'
 
 weaken_field
-  : WEAKEN field_access
+  : WEAKEN var ARROW '{' field_name '}'
 
 unweaken_field
-  : UNWEAKEN field_access
+  : UNWEAKEN var ARROW '{' field_name '}'
 
 isweak_field
-  : ISWEAK field_access
+  : ISWEAK var ARROW '{' field_name '}'
 
 array_length
   : '@' expression
@@ -851,7 +807,6 @@ basic_type
 
 ref_type
   : basic_type '&'
-
 array_type
   : basic_type '[' ']'
   | array_type '[' ']'
@@ -877,9 +832,274 @@ opt_sub_names
 sub_names
   : sub_names ',' sub_name
   | sub_name
-
 %%
 </pre>
+      <p>
+        <b>トークンとキーワード・演算子の対応表</b>
+      </p>
+      <table>
+        <tr>
+          <th>トークン</th><th>キーワード・演算子</th>
+        </tr>
+        <tr>
+          <td>PACKAGE</td><td>package</td>
+        </tr>
+        <tr>
+          <td>SUB</td><td>sub</td>
+        </tr>
+        <tr>
+          <td>OUR</td><td>our</td>
+        </tr>
+        <tr>
+          <td>ENUM</td><td>enum</td>
+        </tr>
+        <tr>
+          <td>MY</td><td>my</td>
+        </tr>
+        <tr>
+          <td>SELF</td><td>self</td>
+        </tr>
+        <tr>
+          <td>USE</td><td>use</td>
+        </tr>
+        <tr>
+          <td>REQUIRE</td><td>require</td>
+        </tr>
+        <tr>
+          <td>ALLOW</td><td>allow</td>
+        </tr>
+        <tr>
+          <td>DESCRIPTOR</td><td>descriptor</td>
+        </tr>
+        <tr>
+          <td>IF</td><td>if</td>
+        </tr>
+        <tr>
+          <td>UNLESS</td><td>unless</td>
+        </tr>
+        <tr>
+          <td>ELSIF</td><td>elsif</td>
+        </tr>
+        <tr>
+          <td>ELSE</td><td>else</td>
+        </tr>
+        <tr>
+          <td>FOR</td><td>for</td>
+        </tr>
+        <tr>
+          <td>WHILE</td><td>while</td>
+        </tr>
+        <tr>
+          <td>LAST</td><td>last</td>
+        </tr>
+        <tr>
+          <td>NEXT</td><td>next</td>
+        </tr>
+        <tr>
+          <td>SWITCH</td><td>switch</td>
+        </tr>
+        <tr>
+          <td>CASE</td><td>case</td>
+        </tr>
+        <tr>
+          <td>DEFAULT</td><td>default</td>
+        </tr>
+        <tr>
+          <td>EVAL</td><td>eval</td>
+        </tr>
+        <tr>
+          <td>NAME</td><td>name</td>
+        </tr>
+        <tr>
+          <td>VAR</td><td>var</td>
+        </tr>
+        <tr>
+          <td>CONSTANT</td><td>リテラル</td>
+        </tr>
+        <tr>
+          <td>PACKAGE_VAR_NAME</td><td>パッケージ変数名</td>
+        </tr>
+        <tr>
+          <td>EXCEPTION_VAR</td><td>$@</td>
+        </tr>
+        <tr>
+          <td>UNDEF</td><td>undef</td>
+        </tr>
+        <tr>
+          <td>VOID</td><td>void</td>
+        </tr>
+        <tr>
+          <td>BYTE</td><td>byte</td>
+        </tr>
+        <tr>
+          <td>SHORT</td><td>short</td>
+        </tr>
+        <tr>
+          <td>INT</td><td>int</td>
+        </tr>
+        <tr>
+          <td>LONG</td><td>long</td>
+        </tr>
+        <tr>
+          <td>FLOAT</td><td>float</td>
+        </tr>
+        <tr>
+          <td>DOUBLE</td><td>double</td>
+        </tr>
+        <tr>
+          <td>STRING</td><td>string</td>
+        </tr>
+        <tr>
+          <td>OBJECT</td><td>object</td>
+        </tr>
+        <tr>
+          <td>DOT3</td><td>...</td>
+        </tr>
+        <tr>
+          <td>FATCAMMA</td><td>=></td>
+        </tr>
+        <tr>
+          <td>RW</td><td>rw</td>
+        </tr>
+        <tr>
+          <td>RO</td><td>ro</td>
+        </tr>
+        <tr>
+          <td>WO</td><td>wo</td>
+        </tr>
+        <tr>
+          <td>BEGIN</td><td>BEGIN</td>
+        </tr>
+        <tr>
+          <td>NEW</td><td>new</td>
+        </tr>
+        <tr>
+          <td>RETURN</td><td>return</td>
+        </tr>
+        <tr>
+          <td>WEAKEN</td><td>weaken</td>
+        </tr>
+        <tr>
+          <td>CROAK</td><td>croak</td>
+        </tr>
+        <tr>
+          <td>CURRENT_PACKAGE</td><td>__PACKAGE__</td>
+        </tr>
+        <tr>
+          <td>UNWEAKEN</td><td>unweaken</td>
+        </tr>
+        <tr>
+          <td>ASSIGN</td><td>=</td>
+        </tr>
+        <tr>
+          <td>SPECIAL_ASSIGN</td><td>+=  -=  *=  /=  &=  |=  ^=  %=  &lt;&lt;=  &gt;&gt;=  &gt;&gt;&gt;= .=</td>
+        </tr>
+        <tr>
+          <td>LOGICAL_OR</td><td>||</td>
+        </tr>
+        <tr>
+          <td>LOGICAL_AND</td><td>&&</td>
+        </tr>
+        <tr>
+          <td>BIT_OR</td><td>|</td>
+        </tr>
+        <tr>
+          <td>BIT_XOR</td><td>&</td>
+        </tr>
+        <tr>
+          <td>NUMEQ</td><td>==</td>
+        </tr>
+        <tr>
+          <td>NUMNE</td><td>!=</td>
+        </tr>
+        <tr>
+          <td>STREQ</td><td>eq</td>
+        </tr>
+        <tr>
+          <td>STRNE</td><td>ne</td>
+        </tr>
+        <tr>
+          <td>NUMGT</td><td>&gt;</td>
+        </tr>
+        <tr>
+          <td>NUMGE</td><td>&gt;=</td>
+        </tr>
+        <tr>
+          <td>NUMLT</td><td>&lt;</td>
+        </tr>
+        <tr>
+          <td>NUMLE</td><td>&lt;=</td>
+        </tr>
+        <tr>
+          <td>STRGT</td><td>gt</td>
+        </tr>
+        <tr>
+          <td>STRGE</td><td>ge</td>
+        </tr>
+        <tr>
+          <td>STRLT</td><td>lt</td>
+        </tr>
+        <tr>
+          <td>STRLE</td><td>le</td>
+        </tr>
+        <tr>
+          <td>ISA</td><td>isa</td>
+        </tr>
+        <tr>
+          <td>SHIFT</td><td>&lt;&lt;  &gt;&gt;  &gt;&gt;&gt;</td>
+        </tr>
+        <tr>
+          <td>MULTIPLY</td><td>*</td>
+        </tr>
+        <tr>
+          <td>DIVIDE</td><td>/</td>
+        </tr>
+        <tr>
+          <td>REMAINDER</td><td>%</td>
+        </tr>
+        <tr>
+          <td>LOGICAL_NOT</td><td>!</td>
+        </tr>
+        <tr>
+          <td>BIT_NOT</td><td>~</td>
+        </tr>
+        <tr>
+          <td>REF</td><td>\</td>
+        </tr>
+        <tr>
+          <td>DEREF</td><td>$</td>
+        </tr>
+        <tr>
+          <td>PLUS</td><td>+</td>
+        </tr>
+        <tr>
+          <td>MINUS</td><td>-</td>
+        </tr>
+        <tr>
+          <td>CONVERT</td><td>(型名)</td>
+        </tr>
+        <tr>
+          <td>SCALAR</td><td>scalar</td>
+        </tr>
+        <tr>
+          <td>LENGTH</td><td>length</td>
+        </tr>
+        <tr>
+          <td>ISWEAK</td><td>isweak</td>
+        </tr>
+        <tr>
+          <td>REFCNT</td><td>refcnt</td>
+        </tr>
+        <tr>
+          <td>INC</td><td>++</td>
+        </tr>
+        <tr>
+          <td>DEC</td><td>--</td>
+        </tr>
+        <tr>
+          <td>ARROW</td><td>-></td>
+        </tr>
+      </table>
 
       <h2 id="language-comment">コメント</h2>
       <p>
@@ -1112,11 +1332,14 @@ package Foo {
 </pre>
       
       <h2 id="language-module">モジュール</h2>
-      <ul>
-        <li>モジュールの概要</li>
-        <li>モジュールの読み込み</li>
+      <ul class="list">
+        <li href="#language-module-summary">モジュールの概要</li>
+        <li href="#language-module-file-name">モジュールのファイル名</li>
+        <li href="#language-module-use">モジュールの読み込み</li>
+        <li href="#language-module-if-require">選択的なモジュールの読み込み</li>
       </ul>
-      <h3 class="language-module-summary">モジュールの概要</h3>
+      
+      <h3 id="language-module-summary">モジュールの概要</h3>
       <p>
         モジュールとは、SPVMのソースコードとして読み込むことができるひとつのファイルのことをいいます。
       </p>
@@ -1139,7 +1362,8 @@ package Foo::Bar::Baz {
 
 }
 </pre>
-      <h3 class="language-module-path">モジュールのファイル名</h3>
+
+      <h3 id="language-module-file-name">モジュールのファイル名</h3>
       <p>
         モジュールは、モジュールの読み込みパスに、以下のファイル名で配置される必要があります。
       </p>
@@ -1151,7 +1375,8 @@ Foo.spvm
 Foo/Bar.spvm
 Foo/Bar/Baz.spvm
 </pre>
-      <h3 class="language-module-load">モジュールの読み込み</h3>
+
+      <h3 id="language-module-use">モジュールの読み込み</h3>
       <p>
         モジュールを読み込むには、useキーワードを使用します。
       </p>
@@ -1173,7 +1398,8 @@ package Foo {
   use Foo;
 }
 </pre>
-      <h3 class="language-module-load-if-require">選択的なモジュールの読み込み</h3>
+
+      <h3 id="language-module-if-require">選択的なモジュールの読み込み</h3>
       <p>
         SPVMでは、モジュールが、検索パスに存在する場合だけ読み込み、そうでない場合は、ブロックの内部が存在しないことにできるif require文があります。これはC言語の「#ifdef」の一部の機能を実現するために設計されました。
       </p>
@@ -1223,6 +1449,28 @@ unless ($inteface) {
 my $result = $interface->foo(3);
 </pre>
 
+      <h2 id="language-allow-access">アクセス許可</h2>
+      <p>
+        デフォルトでは、プライベートなサブルーチン、フィールド、パッケージ変数には、パッケージの外部からは、アクセスすることができません。また、プライベートなパッケージは、パッケージの外部から、オブジェクトの生成を行うことができません。
+      </p>
+      <p>
+        外部のパッケージに対してアクセス許可を設定すると、外部のパッケージは、プライベートなサブルーチン、フィールド、パッケージ変数にアクセスすることができ、またオブジェクトの生成を行うことができます。
+      </p>
+<pre>
+allow パッケージ名;
+</pre>
+      <p>
+        allowキーワードは、パッケージの定義の直下で定義する必要があります。
+      </p>
+<pre>
+package Foo {
+  allow Bar;
+}
+</pre>
+      <p>
+        この例では、Fooにおいてprivateが指定されているサブルーチン、フィールド、パッケージ変数に、Barからアクセスすることができます。また、BarからFooのオブジェクトの生成を行うことができます。
+      </p>
+
       <h2 id="language-package-var">パッケージ変数</h2>
       <ul class="list">
         <li><a href="#language-package-var-definition">パッケージ変数の定義</a></li>
@@ -1246,7 +1494,7 @@ our パッケージ変数名 : 型名;
         パッケージ変数の定義には「<a href="#language-type">型名</a>」が必要です。型名には「数値型」と「オブジェクト型」を指定できます。
       </p>
       <p>
-        パッケージ変数名は「$」で始まり、次に「A-Z」、その後ろに、ひとつ以上の「a～z」「A～Z」「0～9」「_」を続けることができます。Perlと異なり、「$」の後ろには、必ず大文字の英数字が必要であることに注意してください。
+        パッケージ変数名は、<a href="#language-parser-identifier-package-var-name">パッケージ変数名</a>で定義されている名前の規則に従い、かつ「::」が含まれていてはいけません。そうでない場合は、コンパイル時エラーが発生します。
       </p>
       <p>
         パッケージ変数定義には、デスクリプタを合わせて指定することができます。複数のデスクリプタを空白を使って並べることができます。
@@ -2163,7 +2411,7 @@ eval {
       <h4 id="language-block-statement-if">ifブロック</h4>
 <pre>
 # ifブロック
-if (条件1) {
+if (式) {
 
 }
 </pre>
@@ -2171,7 +2419,7 @@ if (条件1) {
       <h4 id="language-block-statement-elsif">elsifブロック</h4>
 <pre>
 #elsifブロック
-elsif (条件2) {
+elsif (式) {
 
 }
 </pre>
@@ -2195,14 +2443,14 @@ for (my $i = 0; $i < 3; $i++) {
       <h4 id="language-block-statement-while">whileブロック</h4>
 <pre>
 # whileブロック
-while (条件) {
+while (式) {
 
 }
 </pre>
 
       <h4 id="language-block-statement-switch">switchブロック</h4>
 <pre>
-switch (条件) {
+switch (式) {
 
 }
 </pre>
@@ -2693,36 +2941,6 @@ $dval4->{t} = 2.5;
 my $z = $dval4->{z};
 </pre>
 
-      <h3 id="language-array-summary">配列の生成</h3>
-      
-      <h2 id="language-term">項</h2>
-      <p>
-        算術演算子の両辺、サブルーチンの引数、ifの条件部などになることができる文法の最小の単位を「項」と呼びます。
-      </p>
-      <p>
-        「項」には、「<a href="#language-expression">式</a>」と、<a href="#language-condition-part">条件部</a>のみに記述できる「<a href="#language-condition">条件</a>」があります。
-      </p>
-      <p>
-        式と条件の違いは、条件は、式として利用できないということだけです。
-      </p>
-      <p>
-        項は、代入演算子を除く、ほとんどの場合に、左から右の順番で評価されます。たとえば、以下の例では、3 * 3 が実行され結果は9になります。
-      </p>
-<pre>
-  my $i = 2;
-  my $j = ($i = 3）* $i;
-</pre>
-      <p>
-        exceptionサブルーチンが例外を発生させた場合は、$jの値は、10のままです。
-      </p>
-<pre>
-  my $j = 10;
-  eval {
-    excpetion() / ($j = 3);
-  };
-}
-</pre>
-
       <h2 id="language-ref">リファレンス</h2>
       <ul>
         <li><a href="language-ref-summary">リファレンスの概要</a></li>
@@ -2821,7 +3039,7 @@ $point_ref->{x} = 1;
       
       <h3 id="language-expression">式とは</h3>
       <p>
-        式とは、値の評価が可能な<a href="#language-term">項</a>のことです。
+        式とは、値の評価が可能な<a href="#language-expresssion">式</a>のことです。
       </p>
       <p>
         <b>式の一覧</b>
@@ -3677,104 +3895,6 @@ package Foo::Bar {
         上記の処理は、再帰的に行われます。
       </p>
 
-      <h2 id="language-condition">条件</h2>
-      <p>
-        条件は次の項目で定義されます。
-      </p>
-      <p>
-        <b>条件の一覧</b>
-      </p>
-      <ul class="list">
-        <li><a href="#language-operator-comparison">比較演算子</a></li>
-        <li><a href="#language-operator-logical">論理演算子</a></li>
-        <li>(条件)</li>
-      </ul>
-      <p>
-        条件の結果は、真または偽です。
-      </p>
-      <p>
-        最後の「(条件)」というのは、条件を「()」で囲ったという意味です。
-      </p>
-
-      <h2 id="language-condition-part">条件部</h2>
-      <p>
-        条件部とは、条件判定が行われる部分のことです。条件部には「<a href="#language-term">項</a>」が記述できます。
-      </p>
-      <p>
-        <b>if文のかっこの中</b>
-      </p>
-<pre>
-if (条件部) {
-
-}
-</pre>
-      <p>
-        <b>unless文のかっこの中</b>
-      </p>
-<pre>
-unless (条件部) {
-
-}
-</pre>
-      <p>
-        <b>forのかっこの中の二つ目</b>
-      </p>
-<pre>
-for (初期化;条件部;次の値;) {
-
-}
-</pre>
-      <p>
-        <b>whileのかっこの中</b>
-      </p>
-<pre>
-while (条件部) {
-
-}
-</pre>
-      <p>
-        <b>論理AND演算子の左右</b>
-      </p>
-<pre>
-条件部 && 条件部
-</pre>
-      <p>
-        <b>論理OR演算子の左右</b>
-      </p>
-<pre>
-条件部 || 条件部
-</pre>
-      <p>
-        <b>論理否定演算子の右側</b>
-      </p>
-<pre>
-!条件部
-</pre>
-      <p>
-        条件部に式が書かれた場合は、結果の型はint型です。
-      </p>
-      <p>
-        式は、<a href="#language-type-numeric">数値型</a>あるいは<a href="#language-type-object">オブジェクト型</a>あるいは<a href="#language-type-undef">未定義型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
-      </p>
-      <p>
-        条件部に式が書かれた場合は、型に応じた結果を返します。
-      </p>
-      <p>
-        式が<a href="#language-undef">未定義値</a>である場合は、0を返します。
-      </p>
-      <p>
-        式が、<a href="#language-type-numeric">数値型</a>の場合は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>が行われます。
-      </p>
-      <p>
-        型がint型の場合は、その値を返します。
-      </p>
-      <p>
-        型がlong型、float型、double型、オブジェクト型である場合は、C99における以下の演算と完全に一致する演算を行います。
-      </p>
-<pre>
-!!x
-</pre>
-      
       <h2 id="language-literal">リテラル</h2>
       <ul class="list">
         <li><a href="#language-literal-integer">整数リテラル</a></li>
@@ -4394,10 +4514,10 @@ undef
       
       <h3 id="language-operator-unary">単項演算子</h3>
       <p>
-        単項演算子とは、<a href="#language-term">項</a>の前に置かれる演算子のことをいいます。
+        単項演算子とは、<a href="#language-expresssion">式</a>の前に置かれる演算子のことをいいます。
       </p>
 <pre>
-単項演算子 項
+単項演算子 式
 </pre>
       <p>
         単項演算子には、<a href="#language-operator-unary-plus">単項プラス演算子</a>、<a href="#language-operator-unary-minus">単項マイナス演算子</a>、<a href="#language-operator-bit-not">ビット否定演算子</a>、<a href="#language-operator-logical-not">論理否定演算子</a>、<a href="#language-operator-array-legnth">配列長演算子</a>、<a href="#language-operator-string-legnth">文字列長演算子</a>があります。
@@ -4408,10 +4528,10 @@ undef
 
       <h3 id="language-operator-binary">二項演算子</h3>
       <p>
-        二項演算子とは、左項と右項の間に置かれる演算子のことをいいます。項については、<a href="#language-term">項</a>を参考にしてください。
+        二項演算子とは、左式と右式の間に置かれる演算子のことをいいます。項については、<a href="#language-expresssion">式</a>を参考にしてください。
       </p>
 <pre>
-左項 二項演算子 右項
+左式 二項演算子 右式
 </pre>
 
       <p>
@@ -4474,7 +4594,7 @@ my $ret = ($x += 2, $x + $y);
         単項プラス演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        単項プラス演算子の結果の型は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>された型です。
+        単項プラス演算子の戻り値の型は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>された型です。
       </p>
       <p>
         単項プラス演算子は例外を発生させません。
@@ -4508,7 +4628,7 @@ my $num = +10;
         単項マイナス演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        単項マイナス演算子の結果の型は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>された型です。
+        単項マイナス演算子の戻り値の型は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>された型です。
       </p>
       <p>
         単項マイナス演算子は例外を発生させません。
@@ -4542,7 +4662,7 @@ x + y;
         加算演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        加算演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        加算演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         加算演算子は、例外を発生させません。
@@ -4570,7 +4690,7 @@ x - y;
         減算演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        減算演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        減算演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         減算演算子は、例外を発生させません。
@@ -4598,7 +4718,7 @@ x * y;
         乗算演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        乗算演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        乗算演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         乗算演算子は、例外を発生させません。
@@ -4626,7 +4746,7 @@ x / y;
         除算演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        除算演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        除算演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         整数型に対する演算の場合には、除算演算子は、右辺が0であった場合に、例外が発生します。
@@ -4658,7 +4778,7 @@ x % y;
         剰余演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        剰余演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        剰余演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         剰余演算子は、右辺が0であった場合に、例外が発生します。
@@ -4820,7 +4940,7 @@ x & y;
         ビットAND演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        ビットAND演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        ビットAND演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         ビットAND演算子は、例外を発生させません。
@@ -4849,7 +4969,7 @@ x | y;
         ビットOR演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        ビットOR演算子の結果の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
+        ビットOR演算子の戻り値の型は、<a href="#language-type-convertion-binary-numeric-widening">二項数値拡大型変換</a>された型です。
       </p>
       <p>
         ビットOR演算子は、例外を発生させません。
@@ -4878,7 +4998,7 @@ x | y;
         ビット否定演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
-        ビット否定演算子の結果の型は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>された型です。
+        ビット否定演算子の戻り値の型は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>された型です。
       </p>
       <p>
         ビット否定演算子は例外を発生させません。
@@ -4983,7 +5103,7 @@ x >> y;
 
       <h3 id="language-operator-comparison">比較演算子</h3>
       <p>
-        比較演算子とは、左式と右式の間に置かれる演算子で、<a href="#language-condition">条件</a>を返す演算子のことをいいます。
+        比較演算子とは、左式と右式の間に置かれる演算子で、<a href="#language-expression">式</a>を返す演算子のことをいいます。
       </p>
 <pre>
 左式 比較演算子 右式
@@ -4994,7 +5114,7 @@ x >> y;
       
       <h3 id="language-operator-comparison-numeric">数値比較演算子</h3>
       <p>
-        数値比較演算子とは、数値あるいはオブジェクトのアドレスを比較するために、左式と右式の間に置かれる演算子で、<a href="#language-condition">条件</a>を返す演算子のことをいいます。
+        数値比較演算子とは、数値あるいはオブジェクトのアドレスを比較するために、左式と右式の間に置かれる演算子で、<a href="#language-expression">式</a>を返す演算子のことをいいます。
       </p>
 <pre>
 左式 数値比較演算子 右式
@@ -5086,17 +5206,17 @@ x >> y;
       </p>
 <pre>
 # 数値型の比較、オブジェクト型の比較
-x == y;
-x != y;
+(int32_t)(x == y);
+(int32_t)(x != y);
 
 # 数値型の比較
-x > y;
-x >= y;
-x < y;
-x <= y;
+(int32_t)(x > y);
+(int32_t)(x >= y);
+(int32_t)(x < y);
+(int32_t)(x <= y);
 </pre>
       <p>
-        数値比較演算子の結果の型は、int型です。真である場合は0以外の値を、偽である場合は0を返します。
+        数値比較演算子の戻り値の型は、int型です。
       </p>
       <p>
         数値比較演算子は、例外を発生させません。
@@ -5104,7 +5224,7 @@ x <= y;
 
       <h3 id="language-operator-comparison-string">文字列比較演算子</h3>
       <p>
-        文字列比較演算子とは、文字列を比較するために、左式と右式の間に置かれる演算子で、<a href="#language-condition">条件</a>を返す演算子のことをいいます。
+        文字列比較演算子とは、文字列を比較するために、左式と右式の間に置かれる演算子で、<a href="#language-expression">式</a>を返す演算子のことをいいます。
       </p>
 <pre>
 左式 文字列比較演算子 右式
@@ -5170,14 +5290,14 @@ x <= y;
         </tr>
       </table>
       <p>
-        文字列比較演算子の結果の型は、int型です。真である場合は0以外の値を、偽である場合は0を返します。
+        文字列比較演算子の戻り値の型は、int型です。条件が満たされた場合は1を、そうでない場合は0を返します。
       </p>
       <h3 id="language-operator-isa">isa演算子</h3>
       <p>
-        数値比較演算子とは、数値あるいはオブジェクトのアドレスを比較するために、左式と右式の間に置かれる演算子で、<a href="#language-condition">条件</a>を返す演算子のことをいいます。
+        数値比較演算子とは、数値あるいはオブジェクトのアドレスを比較するために、左式と右式の間に置かれる演算子で、<a href="#language-expression">式</a>を返す演算子のことをいいます。
       </p>
       <p>
-        isa演算子とはは、型の適合性をチェックするための演算子で、<a href="#language-condition">条件</a>を返します。
+        isa演算子とはは、型の適合性をチェックするための演算子で、<a href="#language-expression">式</a>を返します。
       </p>
 <pre>
 左式 isa 右型
@@ -5186,13 +5306,13 @@ x <= y;
         isa演算子は、右型に応じて、3種類の動作をします。
       </p>
       <p>
-        1. 右型が、<a href="#language-type-numeric">数値型</a>、<a href="#language-type-value">値型</a>、<a href="#language-type-any-object">汎用オブジェクト型</a>、<a href="#language-type-ref">リファレンス型</a>の場合は、コンパイル時に左式の型が右型と同一のものであるかをチェックします。同一であった場合は真を、そうでない場合は偽を返します。
+        1. 右型が、<a href="#language-type-numeric">数値型</a>、<a href="#language-type-value">値型</a>、<a href="#language-type-any-object">汎用オブジェクト型</a>、<a href="#language-type-ref">リファレンス型</a>の場合は、コンパイル時に左式の型が右型と同一のものであるかをチェックします。同一であった場合はint型で1を、そうでない場合は0を返します。
       </p>
       <p>
-        2. 右型が、<a href="#language-type-class">クラス型</a>であった場合は、実行時に左式の型が、クラス型と一致するかをチェックします。一致した場合は真を、そうでない場合は偽を返します。左式の型は、オブジェクト型でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+        2. 右型が、<a href="#language-type-class">クラス型</a>であった場合は、実行時に左式の型が、クラス型と一致するかをチェックします。一致した場合はint型で1を、そうでない場合は0を返します。左式の型は、オブジェクト型でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
       </p>
       <p>
-        3. 右型が、<a href="#language-type-interface">インターフェース型</a>であった場合は、実行時に左式の型がクラス型であり、そのクラスがインターフェースを満たすかどうかをチェックします。満たした場合は真を、そうでない場合は偽を返します。左式の型は、オブジェクト型でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+        3. 右型が、<a href="#language-type-interface">インターフェース型</a>であった場合は、実行時に左式の型がクラス型であり、そのクラスがインターフェースを満たすかどうかをチェックします。満たした場合はint型の1を、そうでない場合は0を返します。左式の型は、オブジェクト型でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
       </p>
       
       <h3 id="language-operator-logical">論理演算子</h3>
@@ -5200,30 +5320,33 @@ x <= y;
         論理演算子は、論理演算を行う演算子のことで、><a href="#language-operator-logical-and">論理AND演算子</a>、<a href="#language-operator-logical-or">論理OR演算子</a>、<a href="#language-operator-logical-not">論理否定演算子</a>からなります。
       </p>
       <p>
-        論理演算子は、<a href="#language-condition">条件</a>を返します。
+        論理演算子は、<a href="#language-expression">式</a>を返します。
       </p>
       
       <h3 id="language-operator-logical-and">論理AND演算子</h3>
       <p>
-        論理AND演算子とは、論理AND演算を行うために、「&&」で表現される、<a href="#language-term">項</a>をオペランドとする<a href="#language-operator-binary">二項演算子</a>です。
+        論理AND演算子とは、論理AND演算を行うために、「&&」で表現される、<a href="#language-expresssion">式</a>をオペランドとする<a href="#language-operator-binary">二項演算子</a>です。
       </p>
 <pre>
-左項 && 右項
+左式 && 右式
 </pre>
+      <p>
+        論理AND演算子の戻り値の型は、int型です。
+      </p>
       <p>
         論理AND演算子は次のように動作します。
       </p>
       <p>
-        1. 左項の評価が真であれば、右項を実行し、右項の評価が、真であれば、真を返し、右項の評価が偽であれば、偽を返します。
+        1. 左式に<a href="#language-type-convertion-bool">ブール型変換</a>を実行します。
       </p>
       <p>
-        2. 左項の評価が偽であれば、偽を返します。右項は実行されません。
+        2. 左式の値が0以外であれば、右式に対して、<a href="#language-type-convertion-bool">ブール型変換</a>を実行し、その値を返します。
       </p>
       <p>
-        論理AND演算子の結果の型は、int型です。
+        3. 左式の値が0であれば、その値を返します。
       </p>
       <p>
-        論理AND演算子は<a href="#language-condition">条件</a>を返します。
+        論理AND演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
         論理AND演算子は、例外を発生させません。
@@ -5231,25 +5354,28 @@ x <= y;
       
       <h3 id="language-operator-logical-and">論理OR演算子</h3>
       <p>
-        論理OR演算子とは、論理OR演算を行うために、「||」で表現される、<a href="#language-term">項</a>をオペランドとする<a href="#language-operator-binary">二項演算子</a>です。
+        論理OR演算子とは、論理OR演算を行うために、「||」で表現される、<a href="#language-expresssion">式</a>をオペランドとする<a href="#language-operator-binary">二項演算子</a>です。
       </p>
 <pre>
-左項 || 右項
+左式 || 右式
 </pre>
       <p>
         論理OR演算子は次のように動作します。
       </p>
       <p>
-        1. 左項の評価が真であれば、真を返します。右項は実行されません。
+        論理OR演算子の戻り値の型は、int型です。
       </p>
       <p>
-        2. 左項の評価が偽であれば、右項を実行し、右項の評価が、真であれば、真を返し、右項の評価が偽であれば、偽を返します。
+        1. 左式に<a href="#language-type-convertion-bool">ブール型変換</a>を実行します。
       </p>
       <p>
-        論理OR演算子の結果の型は、int型です。
+        2. 左式の値が0あれば、右式に対して、<a href="#language-type-convertion-bool">ブール型変換</a>を実行し、その値を返します。
       </p>
       <p>
-        論理OR演算子は<a href="#language-condition">条件</a>を返します。
+        3. 左式の値が0以外であれば、その値を返します。
+      </p>
+      <p>
+        論理OR演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
         論理OR演算子は、例外を発生させません。
@@ -5257,19 +5383,19 @@ x <= y;
 
       <h3 id="language-operator-logical-and">論理NOT演算子</h3>
       <p>
-        論理NOT演算子とは、論理NOT演算を行うために、項の左に置かれる演算子で、「!」で表現される<a href="#language-condition">条件</a>を返す<a href="#language-operator-binary">単項演算子</a>です。項については、<a href="#language-term">項</a>を参考にしてください。
+        論理NOT演算子とは、論理NOT演算を行うために、式の左に置かれる演算子で、「!」で表現される<a href="#language-expression">式</a>を返す<a href="#language-operator-binary">単項演算子</a>です。式については、<a href="#language-expresssion">式</a>を参考にしてください。
       </p>
 <pre>
-!項
+!式
 </pre>
       <p>
-        論理NOT演算子は、項が真であれば、偽を返します。項が偽であれば、真を返します。
+        論理NOT演算子の戻り値の型は、int型です。
       </p>
       <p>
-        論理NOT演算子の結果の型は、int型です。
+        論理NOT演算子は、式に<a href="#language-type-convertion-bool">ブール型変換</a>を実行し、その値が0の場合は1を、0以外の値の場合は、0を返します。
       </p>
       <p>
-        論理NOT演算子は<a href="#language-condition">条件</a>うぃを返します。
+        論理NOT演算子は<a href="#language-expression">式</a>を返します。
       </p>
       <p>
         論理NOT演算子は、例外を発生させません。
@@ -5548,10 +5674,10 @@ isweak オブジェクト式->{フィールド名};
         フィールドに保存される値の型は、<a href="#language-type-object">オブジェクト型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
       </p>
       <p>
-        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>だった場合は、偽を返します。これは、<a href="#language-condition">条件</a>です。
+        実行時にフィールドに保存されている値が、<a href="#language-undef">未定義値</a>だった場合は、偽を返します。これは、<a href="#language-expression">式</a>です。
       </p>
       <p>
-        isweak演算子は、フィールドがウィークリファレンスの場合は、真を、そうでない場合は偽を返します。これは、<a href="#language-condition">条件</a>です。
+        isweak演算子は、フィールドがウィークリファレンスの場合は、int型の1を、そうでない場合は0を返します。これは、<a href="#language-expression">式</a>です。
       </p>
 
       <h2 id="language-operator-precedence">演算子の優先順位</h2>
@@ -5589,7 +5715,7 @@ isweak オブジェクト式->{フィールド名};
             左結合
           </td>
           <td>
-            条件OR演算子「||」
+            論理OR演算子「||」
           </td>
         </tr>
         <tr>
@@ -5597,7 +5723,7 @@ isweak オブジェクト式->{フィールド名};
             左結合
           </td>
           <td>
-            条件AND演算子 「&&」
+            論理AND演算子 「&&」
           </td>
         </tr>
         <tr>
@@ -5679,7 +5805,7 @@ isweak オブジェクト式->{フィールド名};
             右結合
           </td>
           <td>
-            条件NOT演算子「!」<br>
+            論理NOT演算子「!」<br>
             ビットNOT演算子「~」<br>
             リファレンス演算子「\」<br>
             プラス演算子「+」<br>
@@ -5758,32 +5884,32 @@ a * (b + c)
         if文は、条件分岐を行うための文です。
       </p>
 <pre>
-if (項) {
+if (式) {
   
 }
 </pre>
       <p>
-        項が真の場合に、ブロックが実行されます。SPVMにおける真偽については<a href="#language-condition-part">条件部</a>を見てください。
+        式に<a href="#language-type-convertion-bool">ブール型変換</a>が実行され、値が0以外の場合に、ブロックが実行されます。
       </p>
       <p>
-        条件を複数書きたい場合には「elsif文」を続けることができます。 条件判定は上から実行され、項が真になった場合に対応するブロックが実行されます。
+        条件を複数書きたい場合には「elsif文」を続けることができます。 条件判定は上から実行され、それぞれの式に<a href="#language-type-convertion-bool">ブール型変換</a>が実行され、値が0以外の場合に対応するブロックが実行されます。
       </p>
 <pre>
-if (項) {
+if (式) {
   
 }
-elsif(項) {
+elsif(式) {
   
 }
 </pre>
       <p>
-        「else文」を使って、項が真ではなかった場合の処理を記述することができます。if文とelsif文の条件判定がすべて偽であった場合にelseのブロックの内部の文が実行されます。elsif文は、なくてもかまいません。
+        「else文」を使って、if文あるいは、elsif文が条件を満たさなかった場合の処理を記述することができます。if文とelsif文の条件判定がすべて偽であった場合にelseのブロックの内部の文が実行されます。elsif文は、なくてもかまいません。
       </p>
 <pre>
-if (項) {
+if (式) {
   
 }
-elsif(項) {
+elsif(式) {
   
 }
 else {
@@ -5814,7 +5940,7 @@ else {
       </p>
 <pre>
 {
-  if (項) {
+  if (式) {
     
   }
 }
@@ -5824,10 +5950,10 @@ else {
       </p>
 <pre>
 # 展開前
-if (項1) {
+if (式1) {
 
 }
-elsif (項2) {
+elsif (式2) {
 
 }
 else {
@@ -5835,10 +5961,10 @@ else {
 }
 
 # 展開後
-if (項1) {
+if (式1) {
 }
 else {
-  if (項2) {
+  if (式2) {
   
   }
   else {
@@ -5897,7 +6023,7 @@ switch (条件式) {
 }
 </pre>
       <p>
-        条件式は、<a href="#language-expression">式</a>を指定できます。式の型は、int型の値でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+        条件式は、<a href="#language-expression">式</a>を指定できます。条件式には、<a href="#language-type-convertion-bool">ブール型変換</a>が実行されます。
       </p>
       <p>
         case文で指定される定数は、int型の定数でなければなりません。enum型の値や、int型の定数サブルーチンは、int型の定数として、構文解析時に展開されるので、利用することができます。
@@ -5976,22 +6102,17 @@ switch ($code) {
         default文は、switchブロックの中で使うことができる、デフォルトの条件を指定するための文です。default文についての詳細は、<a href="#language-statement-switch">switch文</a>の解説を見てください。
       </p>
 
-      <h3 id="language-statement-switch">switch文</h3>
-      <p>
-        for文は、繰り返しを行うための文です。
-      </p>
-
       <h3 id="language-statement-while">while文</h3>
       <p>
         while文は、繰り返しを行うための文です。
       </p>
 <pre>
-while (条件項) {
+while (条件式) {
   
 }
 </pre>
       <p>
-        条件項、<a href="#language-term">項</a>を記述できます。条件項が真であった場合に、ブロックが実行されます。そうでない場合は、ブロックを抜けます。
+        条件式に、<a href="#language-expresssion">式</a>を記述できます。条件式に<a href="#language-type-convertion-bool">ブール型変換</a>が実行され、値が0以外の場合に、ブロックが実行されます。そうでない場合は、ブロックを抜けます。
       </p>
       <p>
         <b>while文のサンプル</b>
@@ -6018,7 +6139,7 @@ while (1) {
 </pre>
 
       <p>
-        whileブロックの内部では、<a href="#language-statement-next">next文</a>を使って、次に実行される条件項の直前に移動することができます。
+        whileブロックの内部では、<a href="#language-statement-next">next文</a>を使って、次に実行される条件式の直前に移動することができます。
       </p>
 <pre>
 my $i = 0;
@@ -6039,7 +6160,7 @@ while ($i < 5) {
       </p>
 <pre>
 {
-  while (条件項) {
+  while (条件式) {
     
   }
 }
@@ -6070,7 +6191,7 @@ my $num = 5;
         for文は、繰り返しを行うための文です。
       </p>
 <pre>
-for (初期化式; 条件項; インクリメント式) {
+for (初期化式; 条件式; インクリメント式) {
   
 }
 </pre>
@@ -6078,7 +6199,7 @@ for (初期化式; 条件項; インクリメント式) {
         初期化式には、<a href="#language-expression">式</a>を記述できます。一般的には、ループ変数の初期化などの式を記述します。初期化式は省略することが可能です。
       </p>
       <p>
-        条件項、<a href="#language-term">項</a>を記述できます。条件項が真であった場合に、ブロックが実行されます。そうでない場合は、ブロックを抜けます。
+        条件式、<a href="#language-expresssion">式</a>を記述できます。条件式に<a href="#language-type-convertion-bool">ブール型変換</a>が実行され、値が0以外の場合に、ブロックが実行されます。そうでない場合は、ブロックを抜けます。
       </p>
       <p>
         インクリメント式には、<a href="#language-expression">式</a>を記述できます。一般的には、ループ変数のインクリメントの式を記述します。インクリメント式は省略することが可能です。
@@ -6089,7 +6210,7 @@ for (初期化式; 条件項; インクリメント式) {
 <pre>
 {
   初期化式;
-  while (条件項) {
+  while (条件式) {
     
     
     
@@ -6114,7 +6235,7 @@ for (my $i = 0; $i < 5; $i++) {
       </p>
 
 <pre>
-for (初期化式; 条件項; インクリメント式) {
+for (初期化式; 条件式; インクリメント式) {
   
 }
 </pre>
@@ -7214,6 +7335,7 @@ my $objets : object[] = new int[3];
         <li><a href="#language-type-convertion-numeric-to-string">数値から文字列への型変換</a></li>
         <li><a href="#language-type-convertion-boxing">ボクシング変換</a></li>
         <li><a href="#language-type-convertion-unboxing">アンボクシング変換</a></li>
+        <li><a href="#language-type-convertion-bool">ブール型変換</a></li>
       </ul>
       
       <h3 id="language-type-convertion-typecast">型キャスト</h3>
@@ -7509,20 +7631,94 @@ my $str : string = $num;
         アンボクシング変換とは、数値オブジェクト型の値を、対応する数値型の値に変換する操作のことをいいます。
       </p>
       
-      <h3 id="language-type-convertion-numeric-to-string">数値から文字列への型変換</h3>
+      <h3 id="language-type-convertion-bool">ブール型変換</h3>
       <p>
-        数値から文字列への型変換とは、<a href="#language-type-numeric">数値型</a>が<a href="#language-type-string">文字列型</a>に変換される場合に適用される変換規則のことです。
+        ブール型変換とは、if文の条件部などで適用される、真偽値判定のために、適用される変換のことです。
       </p>
       <p>
-        数値型の値をC99のsprintfの「%g」フォーマットを使って、SPVMの文字列へ変換します。
+        <b>ブール型変換が行われる場所</b>
       </p>
+      <p>
+        <b>if文のかっこの中</b>
+      </p>
+<pre>
+if (条件部) {
 
+}
+</pre>
+      <p>
+        <b>unless文のかっこの中</b>
+      </p>
+<pre>
+unless (条件部) {
+
+}
+</pre>
+      <p>
+        <b>forのかっこの中の二つ目</b>
+      </p>
+<pre>
+for (初期化;条件部;次の値;) {
+
+}
+</pre>
+      <p>
+        <b>whileのかっこの中</b>
+      </p>
+<pre>
+while (条件部) {
+
+}
+</pre>
+      <p>
+        <b>論理AND演算子の左右</b>
+      </p>
+<pre>
+条件部 && 条件部
+</pre>
+      <p>
+        <b>論理OR演算子の左右</b>
+      </p>
+<pre>
+条件部 || 条件部
+</pre>
+      <p>
+        <b>論理否定演算子の右側</b>
+      </p>
+<pre>
+!条件部
+</pre>
+      <p>
+        ブール型変換で指定される式は、<a href="#language-type-numeric">数値型</a>あるいは<a href="#language-type-object">オブジェクト型</a>あるいは<a href="#language-type-undef">未定義型</a>でなければなりません。そうでない場合は、コンパイル時エラーが発生します。
+      </p>
+      <p>
+        ブール型変換の戻り値は、int型の式です。
+      </p>
+      <p>
+        式が<a href="#language-undef">未定義値</a>である場合は、0が返されます。
+      </p>
+      <p>
+        式が、<a href="#language-type-numeric">数値型</a>の場合は、<a href="#language-type-convertion-unary-numeric-widening">単項数値拡大型変換</a>が行われます。
+      </p>
+      <p>
+        式がint型の場合は、その値が返されます。
+      </p>
+      <p>
+        式がlong型、float型、double型、オブジェクト型である場合は、C99における以下の演算と完全に一致する演算を行い、結果が返されます。
+      </p>
+<pre>
+!!x
+</pre>
+      <p>
+        式がオブジェクト型の場合は、未定義値の場合は0、そうでない場合は1が返されます。
+      </p>
+      
       <h2 id="language-thread-safety">スレッドセーフ</h2>
       <ul class="list">
         <li><a href="#language-thread-safety-summary">スレッドセーフの概要</a></li>
         <li><a href="#language-thread-safety-condition">スレッドセーフの条件</a></li>
       </ul>
-      
+
       <h3 id="language-thread-safety-summary">スレッドセーフの概要</h3>
       <p>
         SPVMの言語仕様はスレッドをサポートしていません。SPVMの言語仕様はスレッドをサポートしていませんが、C/C++をバインディングすることによって、pthreadなどのC/C++のスレッドライブラリを呼び出すことは可能です。
@@ -7592,10 +7788,12 @@ sub foo : void ($thread_id : int) {
       
       <h2 id="language-auto-loaded-module">自動的に読み込まれるモジュール</h2>
       <p>
-        自動的に読み込まれるモジュールは以下です。<a href="language-use-module">use</a>キーワードによって読み込まなくても利用することができます。
+        自動的に読み込まれるモジュールです。<a href="#language-module-use">モジュールの読み込み</a>を行わないで利用することができます。
       </p>
       <ul class="list">
         <li>SPVM::CORE</li>
+        <li>SPVM::List</li>
+        <li>SPVM::Hash</li>
         <li>SPVM::Byte</li>
         <li>SPVM::Short</li>
         <li>SPVM::Int</li>
@@ -7603,6 +7801,23 @@ sub foo : void ($thread_id : int) {
         <li>SPVM::Float</li>
         <li>SPVM::Double</li>
       </ul>
+      
+      <h2 id="language-other">参考情報</h2>
+      <p>
+        SPVMの公式ドキュメントについては、「<a href="/">SPVMドキュメント</a>」を見てください。
+      </p>
+      <p>
+        PerlからSPVM言語の利用については「SPVMエクスチェンジAPI」を見てください。
+      </p>
+      <p>
+        SPVMからC/C++などのネイティブコードの利用については、「SPVMネイティブAPI」を見てください。
+      </p>
+      <p>
+        SPVMの標準関数については、「SPVM標準関数」を見てください。
+      </p>
+      <p>
+        SPVMの標準モジュールについては、「SPVM標準モジュール」を見てください。
+      </p>
     </div>
     <div class="footer">
       <div><a href="javascript:void(0)" class="to-top">▲</a></div>

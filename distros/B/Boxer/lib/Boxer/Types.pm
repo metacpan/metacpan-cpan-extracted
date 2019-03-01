@@ -9,24 +9,24 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean;
 
 use Path::Tiny;
 
-use Type::Library -base,
-	-declare => qw( DataDir ClassDir NodeDir SkelDir Basename Suite );
-use Type::Utils -all;
+use Type::Library -base, -declare => qw(
+	DataDir ClassDir NodeDir SkelDir Basename Suite SerializationList );
+use Type::Utils;
+use Types::Standard qw( ArrayRef Split Str Tuple StrMatch slurpy );
 use Types::Common::String qw(NonEmptySimpleStr LowerCaseSimpleStr);
 use Types::Path::Tiny qw(Dir);
 
-use namespace::autoclean 0.16;
-
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 declare DataDir, as Dir, coercion => 1, message {
 	'Must be an existing directory containing directories for boxer classes and/or boxer nodes';
@@ -51,6 +51,16 @@ declare Basename, as NonEmptySimpleStr,
 declare Suite, as LowerCaseSimpleStr,
 	coercion => 1,
 	message {'Must be a single lowercase word'};
+
+my $SerializationList = "Type::Tiny"->new(
+	name => 'SerializationList',
+	parent =>
+		Tuple [ slurpy ArrayRef [ StrMatch [qr{^(?:preseed|script)$}] ] ],
+);
+declare SerializationList,
+	as $SerializationList->plus_coercions( Split [qr/[^a-z]+/] ),
+	coercion => 1,
+	message {'Must be one or more of these words: preseed script'};
 
 =head1 AUTHOR
 

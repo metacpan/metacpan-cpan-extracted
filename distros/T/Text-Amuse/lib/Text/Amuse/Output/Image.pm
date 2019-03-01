@@ -12,15 +12,22 @@ Text::Amuse::Output::Image -- class to manage images
 The module is used internally by L<Text::Amuse>, so everything here is
 pretty much internal only (and underdocumented).
 
-=head1 METHODS/ACCESSORS
+=head1 CONSTRUCTORS
 
-=head2 new(filename => "hello.png", width => 50, wrap => 'l')
+=over 4
+
+=item new(filename => "hello.png", width => 50, wrap => 'l')
 
 Constructor. Accepts three options: C<filename>, C<width>, as a
 integer in percent, and C<wrap>, as a string denoting the position.
 C<filename> is mandatory.
 
 These arguments are saved in the objects and can be accessed with:
+=cut
+
+=back
+
+=head1 METHODS
 
 =over 4
 
@@ -41,8 +48,6 @@ long series of images without text.
 
 Please note that we concatenate the caption as is. It's up to the
 caller to pass an escaped string.
-
-=back
 
 =cut
 
@@ -119,6 +124,8 @@ sub desc {
     return shift->{desc};
 }
 
+=back
+
 =head2 Formatters
 
 =over 4
@@ -130,8 +137,6 @@ Width in percent
 =item width_latex
 
 Width as  '0.25\textwidth'
-
-=back
 
 =cut
 
@@ -153,10 +158,6 @@ sub width_latex {
     }
 }
 
-=head1 METHODS
-
-=over 4
-
 =item as_latex
 
 The LaTeX code for the image. Right and left floats uses the
@@ -169,22 +170,22 @@ The HTML code for the image. Classes used:
   img.embedimg {
       margin: 1em;
   }
-  
+
   div.image, div.float_image_f {
       margin: 1em;
       text-align: center;
       padding: 3px;
       background-color: white;
   }
-  
+
   div.float_image_r {
       float: right;
   }
-  
+
   div.float_image_l {
       float: left;
   }
-  
+
   div.float_image_f {
       clear: both;
       margin-left: auto;

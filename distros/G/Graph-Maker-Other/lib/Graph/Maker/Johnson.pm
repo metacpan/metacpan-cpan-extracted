@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -157,20 +157,20 @@ Graph::Maker::Johnson - create Johnson graphs
 C<Graph::Maker::Johnson> creates C<Graph.pm> graphs of Johnson graphs.  Each
 vertex is a K-many subset of the integers 1 to N.  Edges are between
 vertices which have K-1 integers the same and 1 integer different.  Vertex
-names are the list of integers separated by commas, such as "1,5,6,8".
+names are the list of K integers separated by commas, such as "1,5,6,8".
 
-An N,K graph is the same as an N,N-K (but different vertex names).
+An N,K graph is the same as an N,N-K but different vertex names.
 
-K=1 or K=N-1 is the complete-N graph.  For K=1 the vertex names are the same
-as C<Graph::Maker::Complete> (integers 1 to N).
+K=1 or K=N-1 is the complete-N graph.  For K=1, the vertex names are the
+same as C<Graph::Maker::Complete> (integers 1 to N).
 
 K=2 or K=N-2 is the triangular graph, which is the line graph of the
 complete-N graph.
 
-N=5,K=2 which is triangular-5 is the complement of the Petersen graph.  The
-Petersen graph can be considered as the Kneser 5,2 which is edges between
-pairs of integers with both different, whereas here edges between one
-different.  (Neither has edges for none different as that would be
+N=5,K=2, which is triangular-5, is the complement of the Petersen graph.
+The Petersen graph can be considered as the Kneser 5,2 which is edges
+between pairs of integers with both different, whereas here edges between
+one different.  (Neither has edges for none different as that would be
 self-loops.)
 
 =head1 FUNCTIONS
@@ -209,11 +209,12 @@ House of Graphs entries for the graphs here include
 =head1 SEE ALSO
 
 L<Graph::Maker>,
-L<Graph::Maker::Kneser>
+L<Graph::Maker::Kneser>,
+L<Graph::Maker::Petersen>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

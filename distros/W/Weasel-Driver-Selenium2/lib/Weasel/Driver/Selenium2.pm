@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Weasel driver wrapping Selenium::Remote::Driver
 
 =head1 VERSION
 
-0.05
+0.08
 
 =head1 SYNOPSIS
 
@@ -39,20 +39,32 @@ Selenium::Remote::Driver.
 
 =cut
 
+
+=head1 DEPENDENCIES
+
+This module wraps L<Selenium::Remote::Driver>, version 2.
+
+=cut
+
+
 package Weasel::Driver::Selenium2;
 
 use strict;
 use warnings;
 
+use namespace::autoclean;
+
 use MIME::Base64;
 use Selenium::Remote::Driver;
 use Time::HiRes;
 use Weasel::DriverRole;
+use Carp;
+use English qw(-no_match_vars);
 
 use Moose;
 with 'Weasel::DriverRole';
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 
 =head1 ATTRIBUTES
@@ -107,7 +119,8 @@ session is stopped and started or restarted.
 
 has 'caps' => (is => 'ro',
                isa => 'HashRef',
-               required => 1);
+               required => 1,
+              );
 
 =back
 
@@ -139,8 +152,13 @@ sub start {
     do {
         if ( defined  $self->{caps}{$_}) {
             my $capability_name = $_;
-            my $capability = $self->{caps}{$capability_name} =~ /\$\{([^\}]+)\}/;
-            $self->{caps}{$capability_name} = $ENV{$1} if $capability;
+            if ( $self->{caps}{$capability_name} =~
+                  /\$\{             # a dollar sign and opening brace
+                   ([^\}]+)         # any character not a closing brace
+                   \}/x             # a closing brace
+                ) {
+              $self->{caps}{$capability_name} = $ENV{$1};
+            }
         }
     } for (qw/browser_name remote_server_addr version platform/);
 
@@ -149,7 +167,7 @@ sub start {
     $self->_driver($driver);
     $self->set_wait_timeout($self->wait_timeout);
     $self->set_window_size($self->window_size);
-    $self->started(1);
+    return $self->started(1);
 }
 
 =item stop
@@ -161,7 +179,7 @@ sub stop {
     my $driver = $self->_driver;
 
     $driver->quit if defined $driver;
-    $self->started(0);
+    return $self->started(0);
 }
 
 =item find_all
@@ -193,7 +211,7 @@ sub find_all {
 sub get {
     my ($self, $url) = @_;
 
-    $self->_driver->get($url);
+    return $self->_driver->get($url);
 }
 
 =item wait_for
@@ -211,7 +229,7 @@ sub wait_for {
         return $rv if $rv;
 
         sleep $args{poll_delay};
-    } until (time() > $end);
+    } while (time() <= $end);
 
     return;
 }
@@ -224,7 +242,7 @@ sub wait_for {
 sub clear {
     my ($self, $id) = @_;
 
-    $self->_resolve_id($id)->clear;
+    return $self->_resolve_id($id)->clear;
 }
 
 =item click
@@ -235,10 +253,10 @@ sub click {
     my ($self, $element_id) = @_;
 
     if (defined $element_id) {
-        $self->_scroll($self->_resolve_id($element_id))->click;
+        return $self->_scroll($self->_resolve_id($element_id))->click;
     }
     else {
-        $self->_driver->click;
+        return $self->_driver->click;
     }
 }
 
@@ -249,7 +267,7 @@ sub click {
 sub dblclick {
     my ($self) = @_;
 
-    $self->_driver->dblclick;
+    return $self->_driver->dblclick;
 }
 
 =item execute_script
@@ -258,7 +276,7 @@ sub dblclick {
 
 sub execute_script {
     my $self = shift;
-    $self->_driver->execute_script(@_);
+    return $self->_driver->execute_script(@_);
 }
 
 =item get_attribute($id, $att_name)
@@ -276,9 +294,11 @@ sub get_attribute {
 =cut
 
 sub get_page_source {
-    my ($self) = @_;
+    my ($self,$fh) = @_;
 
-    return $self->_driver->get_page_source();
+    print {$fh} $self->_driver->get_page_source()
+       or croak "error saving page source: $ERRNO";
+    return;
 }
 
 =item get_text($id)
@@ -308,7 +328,7 @@ sub is_displayed {
 sub set_attribute {
     my ($self, $id, $att, $value) = @_;
 
-    $self->_resolve_id($id)->set_attribute($att, $value);
+    return $self->_resolve_id($id)->set_attribute($att, $value);
 }
 
 =item get_selected($id)
@@ -318,7 +338,7 @@ sub set_attribute {
 sub get_selected {
     my ($self, $id) = @_;
 
-    return $self->_resolve_id($id)->get_selected;
+    return $self->_resolve_id($id)->is_selected;
 }
 
 =item set_selected($id, $value)
@@ -332,7 +352,7 @@ sub set_selected {
     # as long as it's there... why not?
     # The other solution is to use is_selected to verify the current state
     # and toggling by click()ing
-    $self->_resolve_id($id)->set_selected($value);
+    return $self->_resolve_id($id)->set_selected($value);
 }
 
 =item screenshot($fh)
@@ -342,7 +362,9 @@ sub set_selected {
 sub screenshot {
     my ($self, $fh) = @_;
 
-    print $fh MIME::Base64::decode($self->_driver->screenshot);
+    print {$fh} MIME::Base64::decode($self->_driver->screenshot)
+        or croak "error saving screenshot: $ERRNO";
+    return;
 }
 
 =item send_keys($element_id, @keys)
@@ -367,7 +389,7 @@ sub tag_name {
 
 =back
 
-=head1 METHODS
+=head1 SUBROUTINES/METHODS
 
 This module implements the following methods in addition to the
 Weasel::DriverRole protocol methods:
@@ -388,7 +410,7 @@ sub set_wait_timeout {
 
     $driver->set_implicit_wait_timeout($value)
         if defined $driver;
-    $self->_set_wait_timeout($value);
+    return $self->_set_wait_timeout($value);
 }
 
 =item set_window_size
@@ -405,7 +427,7 @@ sub set_window_size {
 
     $driver->set_window_size(split /x/, $value)
         if defined $driver;
-    $self->_set_window_size($value);
+    return $self->_set_window_size($value);
 }
 
 =back
@@ -435,15 +457,27 @@ sub _scroll {
     return $id;
 }
 
-=head1 CONTRIBUTORS
+__PACKAGE__->meta()->make_immutable();
+
+=head1 AUTHOR
 
 Erik Huelsmann
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item Erik Huelsmann
+
+=item Yves Lavoie
+
+=back
 
 =head1 MAINTAINERS
 
 Erik Huelsmann
 
-=head1 BUGS
+=head1 BUGS AND LIMITATIONS
 
 Bugs can be filed in the GitHub issue tracker for the Weasel project:
  https://github.com/perl-weasel/weasel-driver-selenium2/issues
@@ -458,9 +492,9 @@ The source code repository for Weasel is at
 Community support is available through
 L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
-=head1 COPYRIGHT
+=head1 LICENSE AND COPYRIGHT
 
- (C) 2016  Erik Huelsmann
+ (C) 2016-2019  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

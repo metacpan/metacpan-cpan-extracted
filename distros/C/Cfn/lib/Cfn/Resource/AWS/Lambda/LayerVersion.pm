@@ -1,4 +1,4 @@
-# AWS::Lambda::LayerVersion generated from spec 2.20.0
+# AWS::Lambda::LayerVersion generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Lambda::LayerVersion',
@@ -44,7 +44,7 @@ package Cfn::Resource::Properties::AWS::Lambda::LayerVersion {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has CompatibleRuntimes => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has CompatibleRuntimes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Content => (isa => 'Cfn::Resource::Properties::AWS::Lambda::LayerVersion::Content', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LayerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

@@ -8,9 +8,9 @@
 ## Original version on Feb 15 2014
 ##
 
+use v5.14;
 use strict;
 use warnings;
-require 5.014;
 
 use open ":std" => ":encoding(utf8)";
 use Fcntl;
@@ -86,9 +86,11 @@ if (@ARGV) {
     @opt_exec or pod2usage();
 }
 
-use IO::Handle;
-(my $stdout = new IO::Handle)->fdopen(fileno(STDOUT), "w") or die;
-sub flush { $stdout->printflush(@_) }
+sub flush {
+    use IO::Handle;
+    state $stdout = IO::Handle->new->fdopen(fileno(STDOUT), "w") or die;
+    $stdout->printflush(@_);
+}
 
 use App::cdif::Command;
 my $old = new App::cdif::Command @opt_exec;

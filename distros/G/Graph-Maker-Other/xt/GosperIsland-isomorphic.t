@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -32,9 +32,6 @@ BEGIN { MyTestHelpers::nowarnings() }
 use lib 'devel/lib';
 use MyGraphs;
 use Graph::Maker::GosperIsland;
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 plan tests => 2;
 

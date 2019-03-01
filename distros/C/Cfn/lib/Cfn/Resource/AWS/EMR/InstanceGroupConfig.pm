@@ -1,4 +1,4 @@
-# AWS::EMR::InstanceGroupConfig generated from spec 1.11.0
+# AWS::EMR::InstanceGroupConfig generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceGroupConfig',
@@ -353,7 +353,7 @@ package Cfn::Resource::Properties::AWS::EMR::InstanceGroupConfig::ConfigurationV
   extends 'Cfn::Value::TypedValue';
   
   has Classification => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has ConfigurationProperties => (isa => 'Cfn::Value::Hash', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ConfigurationProperties => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Configurations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EMR::InstanceGroupConfig::Configuration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 

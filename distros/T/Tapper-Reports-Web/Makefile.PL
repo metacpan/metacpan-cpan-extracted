@@ -114,7 +114,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::WWW::Mechanize::Catalyst" => 0
   },
-  "VERSION" => "5.0.13",
+  "VERSION" => "5.0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }

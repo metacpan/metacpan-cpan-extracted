@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -34,7 +34,7 @@ use Graph::Maker::Petersen;
 use lib 'devel/lib';
 use MyGraphs;
 
-plan tests => 3;
+plan tests => 7;
 
 
 #------------------------------------------------------------------------------
@@ -48,6 +48,23 @@ plan tests => 3;
   ok (MyGraphs::Graph_is_isomorphic($hypercube, $petersen));
   # MyGraphs::Graph_view($petersen);
   # MyGraphs::Graph_view($hypercube);
+}
+
+{
+  # N=4,K=4 is Mobius Ladder 8 with 2 consecutive rungs removed
+
+  my $petersen  = Graph::Maker->new('Petersen', undirected => 1, N=>4, K=>2);
+  require Graph::Maker::Ladder;
+  foreach my $pos (1 .. 4) {
+    my $ladder = Graph::Maker->new('ladder', undirected => 1, rungs=>4);
+    $ladder->add_edge(1,8);   # ends 1,5 and 4,8, cross wired
+    $ladder->add_edge(5,4);
+
+    $ladder->delete_edge($pos, $pos+4);
+    my $next_pos = ($pos==4 ? 1 : $pos+1);
+    $ladder->delete_edge($next_pos, $next_pos+4);
+    ok (MyGraphs::Graph_is_isomorphic($ladder, $petersen));
+  }
 }
 
 {

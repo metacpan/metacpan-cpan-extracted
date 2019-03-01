@@ -1,5 +1,5 @@
 package ZMQ::FFI::ZMQ2::Raw;
-$ZMQ::FFI::ZMQ2::Raw::VERSION = '1.12';
+$ZMQ::FFI::ZMQ2::Raw::VERSION = '1.14';
 use FFI::Platypus;
 
 sub load {
@@ -119,7 +119,7 @@ ZMQ::FFI::ZMQ2::Raw
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

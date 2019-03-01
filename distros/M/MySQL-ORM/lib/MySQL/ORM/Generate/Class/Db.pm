@@ -116,6 +116,7 @@ method generate {
 		extends => ['MySQL::ORM'],
 		attribs => \@attr,
 		methods => \@methods,
+		overwrite => 0,
 	);
 	
 	$self->trace('exit');

@@ -15,6 +15,7 @@ AWS::S3 - Lightweight interface to Amazon S3 (Simple Storage Service)
     my $s3 = AWS::S3->new(
       access_key_id     => 'E654SAKIASDD64ERAF0O',
       secret_access_key => 'LgTZ25nCD+9LiCV6ujofudY1D6e2vfK0R4GLsI4H',
+      honor_leading_slashes => 0, # set to allow leading slashes in bucket names, defaults to 0
     );
 
     # Add a bucket:
@@ -129,6 +130,11 @@ Default is `s3.amazonaws.com`
 Optional.  Should be an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) or a subclass of it.
 
 Defaults to creating a new instance of [LWP::UserAgent::Determined](https://metacpan.org/pod/LWP::UserAgent::Determined)
+
+## honor\_leading\_slashes
+
+Optional. Boolean to set if bucket names should include any leading slashes
+when sent to S3 - defaults to zero
 
 # PUBLIC PROPERTIES
 

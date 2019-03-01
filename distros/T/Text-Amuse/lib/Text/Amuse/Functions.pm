@@ -37,7 +37,9 @@ interface to function calls.
 
 =head1 FUNCTIONS
 
-=head2 muse_format_line ($format, $string, [ $lang ])
+=over 4
+
+=item muse_format_line ($format, $string, [ $lang ])
 
 Output the given chunk in the desired format (C<html> or C<ltx>).
 
@@ -60,7 +62,7 @@ sub muse_format_line {
     return join("", @{ $out->process });
 }
 
-=head2 muse_fast_scan_header($file, $format);
+=item muse_fast_scan_header($file, $format);
 
 Open the file $file, which is supposed to be UTF-8 encoded. Decode the
 content and read its Muse header.
@@ -91,7 +93,7 @@ sub muse_fast_scan_header {
     return $directives;
 }
 
-=head2 muse_to_html($body);
+=item muse_to_html($body);
 
 Format the $body text (assumed to be decoded) as HTML and return it.
 Header is discarded.
@@ -99,7 +101,7 @@ Header is discarded.
 $body can also be a reference to a scalar to speed up the argument
 passing.
 
-=head2 muse_to_tex($body);
+=item muse_to_tex($body);
 
 Format the $body text (assumed to be decoded) as LaTeX and return it.
 Header is discarded
@@ -107,7 +109,7 @@ Header is discarded
 $body can also be a reference to a scalar to speed up the argument
 passing.
 
-=head2 muse_to_object($body);
+=item muse_to_object($body);
 
 Same as above, but returns the L<Text::Amuse> document instead.
 
@@ -154,7 +156,7 @@ sub _format_on_the_fly {
     }
 }
 
-=head2 muse_rewrite_header($file, { header1 => value, header2 => value2 })
+=item muse_rewrite_header($file, { header1 => value, header2 => value2 })
 
 Rewrite the headers of the given file, adding/replacing the header
 where appropriate.
@@ -193,6 +195,9 @@ sub muse_rewrite_header {
     move($rewritten, $file) or die "Cannot move $rewritten into $backup $!";
 }
 
+=back
+
+=cut
 
 1;
 

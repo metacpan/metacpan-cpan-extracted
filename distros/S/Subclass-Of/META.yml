@@ -9,8 +9,8 @@ build_requires:
   Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -28,7 +28,7 @@ optional_features: {}
 provides:
   Subclass::Of:
     file: lib/Subclass/Of.pm
-    version: '0.007'
+    version: '0.008'
 requires:
   Exporter::Tiny: '0'
   List::Util: '1.33'
@@ -42,4 +42,5 @@ resources:
   homepage: https://metacpan.org/release/Subclass-Of
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-subclass-of.git
-version: '0.007'
+version: '0.008'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

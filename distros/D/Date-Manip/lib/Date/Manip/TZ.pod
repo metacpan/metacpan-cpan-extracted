@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -649,13 +649,16 @@ Unix systems:
    file     /etc/timezone
    file     /etc/sysconfig/clock
    file     /etc/default/init
-   tzdata   /etc/localtime /usr/share/zoneinfo
    command  "/bin/date +%Z"
    command  "/usr/bin/date +%Z"
    command  "/usr/local/bin/date +%Z"
    cmdfield /bin/date             -2
    cmdfield /usr/bin/date         -2
    cmdfield /usr/local/bin/date   -2
+   command  "/bin/date +%z"
+   command  "/usr/bin/date +%z"
+   command  "/usr/local/bin/date +%z"
+   tzdata   /etc/localtime /usr/share/zoneinfo
    gmtoff
 
 The default methods for Windows systems are:

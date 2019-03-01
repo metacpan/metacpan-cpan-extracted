@@ -16,7 +16,7 @@ Text::Amuse::Output - Internal module for L<Text::Amuse> output
 The module is used internally by L<Text::Amuse>, so everything here is
 pretty much internal only (and underdocumented).
 
-=head1 Basic LaTeX preamble
+=head2 Basic LaTeX preamble
 
   \documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
   \usepackage{graphicx}
@@ -29,7 +29,7 @@ pretty much internal only (and underdocumented).
   \usepackage{longtable}
   \usepackage[normalem]{ulem}
   \usepackage{wrapfig}
-  
+
   % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
   \newcommand*{\forcelinebreak}{~\\\relax}
   % this also works
@@ -40,28 +40,30 @@ pretty much internal only (and underdocumented).
     \noindent \hrulefill%
     \bigskip%
   }
-  
+
   % reverse indentation for biblio and play
-  
+
   \newenvironment{amusebiblio}{
     \leftskip=\parindent
     \parindent=-\parindent
     \bigskip
     \indent
   }{\bigskip}
-  
+
   \newenvironment{amuseplay}{
     \leftskip=\parindent
     \parindent=-\parindent
     \bigskip
     \indent
   }{\bigskip}
-  
-  \newcommand{\Slash}{\slash\hspace{0pt}}
-  
-=head2 METHODS
 
-=head3 Text::Amuse::Output->new(document => $obj, format => "ltx")
+  \newcommand{\Slash}{\slash\hspace{0pt}}
+
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item Text::Amuse::Output->new(document => $obj, format => "ltx")
 
 Constructor. Format can be C<ltx> or C<html>, while document must be a
 L<Text::Amuse::Document> object.
@@ -82,9 +84,19 @@ sub new {
     bless $self, $class;
 }
 
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item _lang
+
+=cut
+
 sub _lang { shift->{_lang} };
 
-=head3 document
+=item document
 
 Accessor to the L<Text::Amuse::Document> object (read-only, but you
 may call its method on that.
@@ -95,7 +107,7 @@ sub document {
     return shift->{document};
 }
 
-=head3 fmt
+=item fmt
 
 Accessor to the current format (read-only);
 
@@ -105,11 +117,11 @@ sub fmt {
     return shift->{fmt};
 }
 
-=head3 is_html
+=item is_html
 
 True if the format is html
 
-=head3 is_latex
+=item is_latex
 
 True if the format is latex
 
@@ -123,7 +135,7 @@ sub is_html {
     return shift->fmt eq 'html';
 }
 
-=head3 process
+=item process
 
 This method returns a array ref with the processed chunks. To get
 a sensible output you will have to join the pieces yourself.
@@ -256,7 +268,7 @@ sub process {
     return \@pieces;
 }
 
-=head3 header
+=item header
 
 Return the formatted header as an hashref with key/value
 pairs.
@@ -273,10 +285,13 @@ sub header {
     return \%out;
 }
 
+=back
 
-=head2 INTERNAL METHODS
+=head2 Internal Methods
 
-=head3 add_footnote($element)
+=over 4
+
+=item add_footnote($element)
 
 Add the footnote to the internal list of found footnotes.
 
@@ -312,14 +327,13 @@ sub _add_secondary_footnote {
     push @{$self->{_sec_fn_list}}, $fn;
 }
 
-=head3 flush_footnotes
+=item flush_footnotes
 
 Return the list of primary footnotes found as a list of elements.
 
-=head3 flush_secondary_footnotes
+=item flush_secondary_footnotes
 
 Return the list of secondary footnotes found as a list of elements.
-
 
 =cut
 
@@ -338,7 +352,7 @@ sub flush_secondary_footnotes {
     return sort { $a->footnote_number <=> $b->footnote_number } @{delete $self->{_sec_fn_list}};
 }
 
-=head3 manage_html_footnote
+=item manage_html_footnote
 
 =cut
 
@@ -364,7 +378,7 @@ sub manage_html_footnote {
           qq{</p>\n};
 }
 
-=head3 blkstring 
+=item blkstring
 
 =cut
 
@@ -386,7 +400,7 @@ sub blkstring  {
     }
 }
 
-=head3 manage_regular($element_or_string, %options)
+=item manage_regular($element_or_string, %options)
 
 Main routine to transform a string to the given format
 
@@ -405,14 +419,7 @@ is the processed string, the second is the processed anchors string.
 
 =back
 
-=cut
-
-sub _get_unique_counter {
-    my $self = shift;
-    ++$self->{_unique_counter};
-}
-
-=head3 inline_elements($string)
+=item inline_elements($string)
 
 Parse the provided string into a list of L<Text::Amuse::InlineElement>
 objects.
@@ -852,7 +859,7 @@ sub _format_footnote {
     }
 }
 
-=head3 safe($string)
+=item safe($string)
 
 Be sure that the strings passed are properly escaped for the current
 format, to avoid command injection.
@@ -868,7 +875,7 @@ sub safe {
 }
 
 
-=head3 manage_paragraph
+=item manage_paragraph
 
 =cut
 
@@ -880,7 +887,7 @@ sub manage_paragraph {
     return $self->blkstring(start  => "p") . $self->format_anchors($el) . $body . $self->blkstring(stop => "p");
 }
 
-=head3 manage_header
+=item manage_header
 
 =cut
 
@@ -946,7 +953,7 @@ sub manage_header {
     return $leading . $body . $trailing . "\n";
 }
 
-=head3 add_to_table_of_contents
+=item add_to_table_of_contents
 
 When we catch an header, we save it in the Output object, so we can
 emit the ToC. Level 5 is excluded as per doc.
@@ -969,7 +976,7 @@ sub add_to_table_of_contents {
     return $index;
 }
 
-=head3 reset_toc_stack
+=item reset_toc_stack
 
 Clear out the list. This is called at the beginning of the main loop,
 so we don't collect duplicates over multiple runs.
@@ -981,7 +988,7 @@ sub reset_toc_stack {
     delete $self->{_toc_entries} if defined $self->{_toc_entries};
 }
 
-=head3 table_of_contents
+=item table_of_contents
 
 Emit the formatted ToC (if any). Please note that this method works
 even for the LaTeX format, even if does not produce usable output.
@@ -1026,7 +1033,7 @@ sub table_of_contents {
     return @toc;
 }
 
-=head3 manage_verse
+=item manage_verse
 
 =cut
 
@@ -1078,7 +1085,7 @@ sub _format_stanza {
         $eol = "<br />\n";
     }
     elsif ($self->is_latex) {
-        $eol = "\\forcelinebreak\n";
+        $eol = " \\\\\n";
     }
     else { die "Not reached" };
 
@@ -1091,9 +1098,9 @@ sub _format_stanza {
 }
 
 
-=head3 manage_comment
+=item manage_comment
 
-=head3 manage_inline_comment
+=item manage_inline_comment
 
 =cut
 
@@ -1122,7 +1129,7 @@ sub manage_comment {
       $body . $self->blkstring(stop => $el->type);
 }
 
-=head3 manage_table
+=item manage_table
 
 =cut
 
@@ -1138,7 +1145,7 @@ sub manage_table {
     else { die "Not reached" }
 }
 
-=head3 manage_table_html
+=item manage_table_html
 
 =cut
 
@@ -1177,7 +1184,7 @@ sub manage_table_html {
     return join("\n", @out);
 }
 
-=head3 manage_table_ltx
+=item manage_table_ltx
 
 =cut
 
@@ -1244,7 +1251,7 @@ sub manage_table_ltx {
     return $textable;
 }
 
-=head3 _split_table_in_hash
+=item _split_table_in_hash
 
 =cut
 
@@ -1288,7 +1295,7 @@ sub _split_table_in_hash {
     return $output;
 }
 
-=head3 manage_example
+=item manage_example
 
 =cut
 
@@ -1299,7 +1306,7 @@ sub manage_example {
       $body . $self->blkstring(stop => $el->type);
 }
 
-=head3 manage_hr
+=item manage_hr
 
 Put an horizontal rule
 
@@ -1317,7 +1324,7 @@ sub manage_hr {
     else { die "Not reached" }
 }
 
-=head3 manage_newpage
+=item manage_newpage
 
 If it's LaTeX, insert a newpage
 
@@ -1338,10 +1345,13 @@ sub manage_newpage {
     else { die "Not reached" }
 }
 
+=back
 
 =head2 Links management
 
-=head3 linkify($link)
+=over 4
+
+=item linkify($link)
 
 Here we see if it's a single one or a link/desc pair. Then dispatch
 
@@ -1377,7 +1387,7 @@ sub linkify {
     }
 }
 
-=head3 format_links
+=item format_links
 
 =cut
 
@@ -1414,7 +1424,7 @@ sub format_links {
     else { die "Not reached" }
 }
 
-=head3 format_single_link
+=item format_single_link
 
 =cut
 
@@ -1448,7 +1458,7 @@ sub format_single_link {
     else { die "Not reached" }
 }
 
-=head3 _url_safe_escape
+=item _url_safe_escape
 
 =cut
 
@@ -1461,13 +1471,15 @@ sub _url_safe_escape {
   return $escaped;
 }
 
+=back
+
 =head1 HELPERS
 
 Methods providing some fixed values
 
-=cut
+=over 4
 
-=head3 blk_table
+=item blk_table
 
 =cut
 
@@ -1805,7 +1817,7 @@ sub _build_blk_table {
 }
 
 
-=head3 image_re
+=item image_re
 
 Regular expression to match image links.
 
@@ -1822,7 +1834,7 @@ sub image_re {
 }
 
 
-=head3 find_image($link)
+=item find_image($link)
 
 Given the input string $link, return undef if it's not an image. If it
 is, return a Text::Amuse::Output::Image object.
@@ -1848,7 +1860,7 @@ sub find_image {
 }
 
 
-=head3 url_re
+=item url_re
 
 =cut
 
@@ -1864,7 +1876,7 @@ sub url_re {
 }
 
 
-=head3 html_table_mapping
+=item html_table_mapping
 
 =cut
 
@@ -1948,7 +1960,7 @@ sub _latex_header {
     }
 }
 
-=head3 format_anchors($element)
+=item format_anchors($element)
 
 Return a formatted string with the anchors found in the element.
 
@@ -1965,5 +1977,9 @@ sub format_anchors {
     }
     return $out;
 }
+
+=back
+
+=cut
 
 1;

@@ -203,6 +203,7 @@ lib/Cfn/Resource/AWS/ElasticLoadBalancingV2/TargetGroup.pm
 lib/Cfn/Resource/AWS/Elasticsearch/Domain.pm
 lib/Cfn/Resource/AWS/Events/EventBusPolicy.pm
 lib/Cfn/Resource/AWS/Events/Rule.pm
+lib/Cfn/Resource/AWS/FSx/FileSystem.pm
 lib/Cfn/Resource/AWS/GameLift/Alias.pm
 lib/Cfn/Resource/AWS/GameLift/Build.pm
 lib/Cfn/Resource/AWS/GameLift/Fleet.pm
@@ -251,6 +252,10 @@ lib/Cfn/Resource/AWS/Kinesis/StreamConsumer.pm
 lib/Cfn/Resource/AWS/KinesisAnalytics/Application.pm
 lib/Cfn/Resource/AWS/KinesisAnalytics/ApplicationOutput.pm
 lib/Cfn/Resource/AWS/KinesisAnalytics/ApplicationReferenceDataSource.pm
+lib/Cfn/Resource/AWS/KinesisAnalyticsV2/Application.pm
+lib/Cfn/Resource/AWS/KinesisAnalyticsV2/ApplicationCloudWatchLoggingOption.pm
+lib/Cfn/Resource/AWS/KinesisAnalyticsV2/ApplicationOutput.pm
+lib/Cfn/Resource/AWS/KinesisAnalyticsV2/ApplicationReferenceDataSource.pm
 lib/Cfn/Resource/AWS/KinesisFirehose/DeliveryStream.pm
 lib/Cfn/Resource/AWS/Lambda/Alias.pm
 lib/Cfn/Resource/AWS/Lambda/EventSourceMapping.pm
@@ -277,6 +282,7 @@ lib/Cfn/Resource/AWS/OpsWorks/Stack.pm
 lib/Cfn/Resource/AWS/OpsWorks/UserProfile.pm
 lib/Cfn/Resource/AWS/OpsWorks/Volume.pm
 lib/Cfn/Resource/AWS/OpsWorksCM/Server.pm
+lib/Cfn/Resource/AWS/RAM/ResourceShare.pm
 lib/Cfn/Resource/AWS/RDS/DBCluster.pm
 lib/Cfn/Resource/AWS/RDS/DBClusterParameterGroup.pm
 lib/Cfn/Resource/AWS/RDS/DBInstance.pm
@@ -291,6 +297,12 @@ lib/Cfn/Resource/AWS/Redshift/ClusterParameterGroup.pm
 lib/Cfn/Resource/AWS/Redshift/ClusterSecurityGroup.pm
 lib/Cfn/Resource/AWS/Redshift/ClusterSecurityGroupIngress.pm
 lib/Cfn/Resource/AWS/Redshift/ClusterSubnetGroup.pm
+lib/Cfn/Resource/AWS/RoboMaker/Fleet.pm
+lib/Cfn/Resource/AWS/RoboMaker/Robot.pm
+lib/Cfn/Resource/AWS/RoboMaker/RobotApplication.pm
+lib/Cfn/Resource/AWS/RoboMaker/RobotApplicationVersion.pm
+lib/Cfn/Resource/AWS/RoboMaker/SimulationApplication.pm
+lib/Cfn/Resource/AWS/RoboMaker/SimulationApplicationVersion.pm
 lib/Cfn/Resource/AWS/Route53/HealthCheck.pm
 lib/Cfn/Resource/AWS/Route53/HostedZone.pm
 lib/Cfn/Resource/AWS/Route53/RecordSet.pm
@@ -589,6 +601,7 @@ t/001_parse/waitconditionhandle.res
 t/001_parse/workspaces_workspace.res
 t/002_cfn_values.t
 t/003_resources.t
+t/004_resourceattributes.t
 t/005_dynamicvalues.t
 t/006_custom_resource.t
 t/007_functions.t
@@ -596,6 +609,7 @@ t/008_conditions.t
 t/009_from_hashref.t
 t/010_transform.t
 t/011_stack_metadata.t
+t/012_pseudoparams.t
 t/102_outputs.t
 t/105_dependson.t
 t/108_policy_addstatement.t

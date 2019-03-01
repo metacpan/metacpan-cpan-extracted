@@ -1,3 +1,8 @@
+0.12 2019-02-27
+    * Fix the test skip count in the case we encountered an error earlier
+      (Reported by SREZIC, addresses RT#128646)
+    * Ignore warnings when running the code compilation tests
+
 0.11 2019-02-26
     * Properly handle POST data. The data was previously quoted
       as if it were to be interpolated into Perl code even when it was

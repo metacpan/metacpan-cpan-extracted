@@ -2,17 +2,34 @@ NAME
     Boxer - system deployment ninja tricks
 
 VERSION
-    Version v1.2.0
+    Version v1.3.0
 
 DESCRIPTION
-    Framework for system deployment ninja tricks
+    Framework for system deployment ninja tricks.
+
+    See boxer for further information.
 
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>.
 
 SEE ALSO
-    boxer.
+    Debian Installer <https://www.debian.org/devel/debian-installer/>, tasksel
+    <https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html#s-tasks
+    el>, debconf preseeding <https://wiki.debian.org/DebianInstaller/Preseed>,
+    Hands-off <http://hands.com/d-i/>
+
+    Debian Pure Blends <https://wiki.debian.org/DebianPureBlends>
+
+    FAI class system <https://fai-project.org/fai-guide/#defining%20classes>
+
+    Debathena config-package-dev <https://debathena.mit.edu/config-packages/>
+
+    germinate <https://wiki.ubuntu.com/Germinate>
+
+    <https://freedombox.org/>, <https://solidbox.org/>,
+    <https://wiki.debian.org/Design>, <https://wiki.debian.org/DebianParl>,
+    <http://box.redpill.dk/>
 
 AUTHOR
     Jonas Smedegaard `<dr@jones.dk>`.

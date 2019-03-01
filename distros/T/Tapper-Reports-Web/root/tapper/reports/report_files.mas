@@ -23,7 +23,7 @@
 %     foreach my $file (@files) {
 
 	  <tr>
-            <th align="right"><a href="/tapper/reportfile/id/<% $file->{id}%>#reports/id/<% $report->id %>"><% $file->{filename} %></a></th>          <!--"-->
+            <th align="left"><a href="/tapper/reportfile/id/<% $file->{id}%>#reports/id/<% $report->id %>"><% $file->{filename} %></a></th>          <!--"-->
 <!--
             <td align="right"><% $file->{length_filecontent} %> Bytes (compressed)</td>
 -->

@@ -1,6 +1,13 @@
 
 Changelog for perl module AWS::S3
 
+0.18 2019-03-01
+  - Fix leading slashes defaults to off, see honor_leading_slashes arg
+
+0.17 2019-03-01
+  - Fix leading slashes in key names (GH #12)
+  - Fix lack of location shouldn't set it to undef (GH #11)
+
 0.16 2019-01-03
   - Remove dependency on Iterator::Paged
 

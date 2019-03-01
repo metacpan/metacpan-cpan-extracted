@@ -102,6 +102,17 @@ margin-bottom: 1.5em;
 margin-top: 0.5em;
 }
 
+a.ctlink
+{
+text-decoration: none;
+color: #585858;
+}
+
+a.ctlink:hover
+{
+text-decoration: underline;
+}
+
 a
 {
 text-decoration: underline;
@@ -692,6 +703,15 @@ table.reportfile h5
   padding: 0.5em 0em 0em 0em;
   }
 
+table.reportfile a
+{
+  text-decoration: none;
+  }
+
+table.reportfile a:hover
+{
+  text-decoration: underline;
+  }
 
 /* ----- overview list ----- */
 

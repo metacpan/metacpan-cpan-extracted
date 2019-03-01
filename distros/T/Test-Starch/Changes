@@ -1,0 +1,6 @@
+Revision history for Perl extension Test-Starch.
+
+0.12 2019-03-01T05:10:17Z
+
+ - Split Test::Starch, from Starch, into its own distro.
+

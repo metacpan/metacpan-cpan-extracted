@@ -30,5 +30,5 @@ requires:
   Test::More: 0
   Time::Piece: 0
   perl: 5.014
-version: 14
+version: 15
 x_serialization_backend: YAML version 1.27

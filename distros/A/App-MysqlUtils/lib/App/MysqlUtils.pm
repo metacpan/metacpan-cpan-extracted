@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2018-12-27'; # DATE
-our $VERSION = '0.014'; # VERSION
+our $DATE = '2019-02-28'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1013,13 +1013,31 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.014 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2018-12-27.
+This document describes version 0.015 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-02-28.
 
 =head1 SYNOPSIS
 
 This distribution includes the following CLI utilities:
 
 =over
+
+=item * L<mysql-copy-rows-adjust-pk>
+
+=item * L<mysql-drop-all-tables>
+
+=item * L<mysql-drop-dbs>
+
+=item * L<mysql-drop-tables>
+
+=item * L<mysql-find-identical-rows>
+
+=item * L<mysql-query>
+
+=item * L<mysql-run-pl-files>
+
+=item * L<mysql-run-sql-files>
+
+=item * L<mysql-sql-dump-extract-tables>
 
 =back
 
@@ -1652,7 +1670,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

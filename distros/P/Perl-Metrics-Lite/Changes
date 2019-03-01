@@ -1,7 +1,9 @@
 Revision history for Perl extension Perl::Metrics::Lite
 
+0.092 2019-02-28T13:39:24Z
+	* Use Minilla for release
 
-0.091 Web Mar 23:35:00 2019
+0.091 Web Feb 23:35:00 2019
 	* Upgrade Test::More
 
 0.09 Tue Feb 23:37:00 2019

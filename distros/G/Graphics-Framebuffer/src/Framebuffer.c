@@ -1463,16 +1463,16 @@ void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned ch
         unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
         loc16 += 2;
         if (color_order == 0) {
-            b5 = (rgb565 >> 11) & 31;
-            r5 = rgb565         & 31;
+            b5 = (rgb565 & 0xf800) >> 11;
+            r5 = (rgb565 & 0x001f);
         } else {
-            r5 = (rgb565 >> 11) & 31;
-            b5 = rgb565         & 31;
+            r5 = (rgb565 & 0xf800) >> 11;
+            b5 = (rgb565 & 0x001f);
         }
-        g6 = (rgb565 >> 5)  & 63;
+        g6 = (rgb565 & 0x07e0) >> 5;
         unsigned char r8 = (r5 * 527 + 23) >> 6;
         unsigned char g8 = (g6 * 259 + 33) >> 6;
-        unsigned char b8 = (b5 * 527 * 23) >> 6;
+        unsigned char b8 = (b5 * 527 + 23) >> 6;
         *((unsigned char*)(buf24 + loc24++)) = r8;
         *((unsigned char*)(buf24 + loc24++)) = g8;
         *((unsigned char*)(buf24 + loc24++)) = b8;
@@ -1490,16 +1490,16 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned ch
         unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
         loc16 += 2;
         if (color_order == 0) {
-            b5 = (rgb565 >> 11) & 31;
-            r5 = rgb565         & 31;
+            b5 = (rgb565 & 0xf800) >> 11;
+            r5 = (rgb565 & 0x001f);
         } else {
-            r5 = (rgb565 >> 11) & 31;
-            b5 = rgb565         & 31;
+            r5 = (rgb565 & 0xf800) >> 11;
+            b5 = (rgb565 & 0x001f);
         }
-        g6 = (rgb565 >> 5)  & 63;
+        g6 = (rgb565 & 0x07e0) >> 5;
         unsigned char r8 = (r5 * 527 + 23) >> 6;
         unsigned char g8 = (g6 * 259 + 33) >> 6;
-        unsigned char b8 = (b5 * 527 * 23) >> 6;
+        unsigned char b8 = (b5 * 527 + 23) >> 6;
         *((unsigned int*)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
         loc32 += 3;
         if (r8 == 0 && g8 == 0 && b8 ==0) {

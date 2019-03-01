@@ -43,9 +43,18 @@ method write_class (
 	ArrayRef :$extends,
 	ArrayRef :$attribs,
 	ArrayRef :$methods,
+	Bool     :$overwrite = 1
   ) {
 
 	$self->trace;
+	
+	if (!$overwrite) {
+		if (-f $file_name) {
+			say "skipping pre-existing $file_name";			
+			return;
+		}
+	}
+	
 	say "writing $file_name";
 
 	make_path dirname($file_name);
@@ -55,13 +64,19 @@ method write_class (
 
 	$self->_write( fh => $fh, text => "package $class_name;" );
 	$self->_write( fh => $fh );
-	
+
+	#
+	# use module section
+	#	
 	foreach my $mod (@$use) {
 		$self->_write( fh => $fh, text => "use $mod;" );
 	}
 
 	$self->_write( fh => $fh );
-	
+
+	#
+	# moose extends section
+	#	
 	if ( $extends and @$extends > 0 ) {
 
 		my @tmp;
@@ -77,6 +92,9 @@ method write_class (
 		$self->_write( fh => $fh );
 	}
 
+	#
+	# moose with section
+	#
 	if ( $with and @$with ) {
 
 		my @tmp;
@@ -93,7 +111,7 @@ method write_class (
 	}
 
 	#
-	# attribs
+	# moose attribs section
 	#
 	my @public;
 	my @private;
@@ -116,7 +134,7 @@ method write_class (
 	$self->_write( fh => $fh );
 
 	#
-	# methods
+	# moose methods section
 	#
 
 	@public  = ();
@@ -150,13 +168,14 @@ method write_class (
 ##############################################################################
 
 method _tidy (Str $file_name) {
-
-	system("perltidier -b -bext='/' $file_name");
+	
+	my $cmd = "perltidier -b -bext='/' $file_name 2>&1 | grep -v Subroutine";
+	pdump $cmd;
+	system($cmd);
 	return;
 		
-	local @ARGV = ('-b', "-bext='/'", $file_name);
-	
-	Perl::Tidy::Sweetened::perltidy();
+	#local @ARGV = ('-b', "-bext='/'", $file_name);
+	#Perl::Tidy::Sweetened::perltidy();
 }
 
 #method _tidy (Str $file_name) {

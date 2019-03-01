@@ -1,4 +1,4 @@
-# AWS::Cognito::IdentityPoolRoleAttachment generated from spec 1.11.0
+# AWS::Cognito::IdentityPoolRoleAttachment generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::IdentityPoolRoleAttachment',
@@ -112,8 +112,8 @@ package Cfn::Resource::Properties::AWS::Cognito::IdentityPoolRoleAttachment {
   extends 'Cfn::Resource::Properties';
   
   has IdentityPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has RoleMappings => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Roles => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has RoleMappings => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Roles => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

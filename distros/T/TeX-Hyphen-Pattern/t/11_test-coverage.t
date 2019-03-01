@@ -6,7 +6,7 @@ use utf8;
 
 use Test::More;
 
-our $VERSION = 0.103;
+our $VERSION = v1.1.1;
 
 if ( not $ENV{'AUTHOR_TESTING'} ) {
     my $msg =

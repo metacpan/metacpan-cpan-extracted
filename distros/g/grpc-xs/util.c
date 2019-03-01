@@ -279,13 +279,14 @@ void plugin_get_metadata(void *ptr, grpc_auth_metadata_context context,
 /* Cleanup function for plugin creds API */
 void plugin_destroy_state(void *ptr) {
   SV *state = (SV *)ptr;
+  SvREFCNT_dec(state);
 }
 
 #if defined(GRPC_VERSION_1_2)
 SV *grpc_slice_to_sv(grpc_slice slice) {
   char *slice_str = grpc_slice_to_c_string(slice);
-  SV *sv = newSVpv(slice_str, 0);
-  free(slice_str);
+  SV *sv = newSVpv(slice_str, GRPC_SLICE_LENGTH(slice));
+  gpr_free(slice_str);
   return sv;
 }
 

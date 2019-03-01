@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -25,7 +25,7 @@ use Graph::Maker::Star;
 use Graph::Maker::Wheel;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 
@@ -205,7 +205,7 @@ Graph::Maker->add_factory_type('Beineke' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde Beineke Combinatorial undirected Characterizations characterized
+=for stopwords Ryde Beineke Combinatorial undirected Characterizations characterized Subgraph
 
 =head1 NAME
 
@@ -265,10 +265,10 @@ not contain as induced sub-graphs any of these 9 graphs.
 
                                             G9 =  wheel-6
 
-G1 is the claw (star-4) and is created by C<Graph::Maker::Star>.  G9 is the
-wheel-6 and is created by C<Graph::Maker::Wheel>.  The drawing for G8 means
-edges 4-to-5 and 4-to-6.  Similarly in G6 2-to-5 and 2-to-6.  Beineke draw
-G8 as squares
+G1 is the claw (star-4) and is created using L<Graph::Maker::Star>.  G9 is
+the wheel-6 and is created using L<Graph::Maker::Wheel>.  The drawing for G8
+means edges 4-to-5 and 4-to-6.  Similarly in G6 2-to-5 and 2-to-6.  Beineke
+draws G8 as squares
 
     G8  2---3
         | / |
@@ -329,6 +329,8 @@ House of Graphs entries for the graphs here are
 
 =back
 
+And also
+
 =over
 
 =item 12-vertex union L<https://hog.grinvin.org/ViewGraphInfo.action?id=748>
@@ -345,7 +347,7 @@ L<Graph::Maker::Wheel>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

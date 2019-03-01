@@ -1,7 +1,7 @@
 package Starch::Factory;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -79,7 +79,7 @@ has base_state_class => (
 =head2 manager_class
 
 The anonymous class which extends L</base_manager_class> and has
-L</manager_roles> applied to it.
+L<Starch::Plugin::Bundle/manager_roles> applied to it.
 
 =cut
 
@@ -103,7 +103,7 @@ sub _build_manager_class {
 =head2 state_class
 
 The anonymous class which extends L</base_state_class> and has
-L</state_roles> applied to it.
+L<Starch::Plugin::Bundle/state_roles> applied to it.
 
 =cut
 
@@ -154,7 +154,7 @@ sub base_store_class {
 
 Given an absolute or relative store class name this will
 return an anonymous class which extends the store class
-and has L</store_roles> applied to it.
+and has L<Starch::Plugin::Bundle/store_roles> applied to it.
 
 =cut
 
@@ -201,7 +201,7 @@ __END__
 
 =head1 AUTHORS AND LICENSE
 
-See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+See L<Starch/AUTHORS> and L<Starch/LICENSE>.
 
 =cut
 

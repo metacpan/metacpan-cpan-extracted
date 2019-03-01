@@ -21,18 +21,19 @@ Files: t/01basic.t
 Copyright: This software is copyright (c) 2013 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+ examples/simple-subclassing.pl
+Copyright: Unknown
+License: Unknown
+
 Files: Changes
  META.json
  META.yml
  doap.ttl
-Copyright: Copyright 2017 Toby Inkster.
+Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
-
-Files: INSTALL
- LICENSE
- examples/simple-subclassing.pl
-Copyright: Unknown
-License: Unknown
 
 Files: COPYRIGHT
  CREDITS
@@ -42,27 +43,30 @@ License: public-domain
 
 Files: README
  lib/Subclass/Of.pm
-Copyright: This software is copyright (c) 2013, 2017 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: Makefile.PL
- dist.ini
-Copyright: Copyright 2013 Toby Inkster.
+Copyright: This software is copyright (c) 2013, 2017, 2019 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: t/08lazy.t
 Copyright: This software is copyright (c) 2017 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/09fieldhash.t
+Copyright: This software is copyright (c) 2019 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2017 by the copyright holder(s).
+ This software is Copyright (c) 2019 by the copyright holder(s).
  
  This is free software, licensed under:
  

@@ -1,5 +1,5 @@
 package ZMQ::FFI::ContextRole;
-$ZMQ::FFI::ContextRole::VERSION = '1.12';
+$ZMQ::FFI::ContextRole::VERSION = '1.14';
 use Moo::Role;
 
 use ZMQ::FFI::Util qw(current_tid);
@@ -40,7 +40,7 @@ has max_sockets => (
 has sockets => (
     is        => 'rw',
     lazy      => 1,
-    default   => sub { [] },
+    default   => sub { {} },
 );
 
 requires qw(
@@ -69,7 +69,7 @@ ZMQ::FFI::ContextRole
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

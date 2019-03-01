@@ -1,4 +1,4 @@
-# AWS::AppSync::Resolver generated from spec 2.15.0
+# AWS::AppSync::Resolver generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::Resolver',
@@ -34,7 +34,7 @@ package Cfn::Resource::Properties::AWS::AppSync::Resolver::PipelineConfigValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Functions => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Functions => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::AppSync::Resolver {

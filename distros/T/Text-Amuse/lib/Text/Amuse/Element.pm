@@ -12,7 +12,9 @@ Text::Amuse::Element - Helper for Text::Amuse
 Everything here is pretty much internal only, underdocumented and
 subject to change.
 
-=head3 new(%args)
+=over 4
+
+=item new(%args)
 
 Constructor
 
@@ -59,7 +61,7 @@ sub new {
     bless $self, $class;
 }
 
-=head3 rawline
+=item rawline
 
 Accessor to the raw input line
 
@@ -70,7 +72,7 @@ sub rawline {
     return $self->{rawline};
 }
 
-=head3 raw_without_anchors
+=item raw_without_anchors
 
 Return the original string, but with anchors stripped out.
 
@@ -86,7 +88,7 @@ sub _reset_rawline {
     $self->{rawline} = $line;
 }
 
-=head3 will_not_merge
+=item will_not_merge
 
 Attribute to mark if an element cannot be further merged
 
@@ -100,19 +102,19 @@ sub will_not_merge {
     return $self->{_will_not_merge};
 }
 
-=head2 anchors
+=item anchors
 
 A list of anchors for this element.
 
-=head2 add_to_anchors(@list)
+=item add_to_anchors(@list)
 
 Add the anchors passed to the constructor to this element.
 
-=head2 remove_anchors
+=item remove_anchors
 
 Empty the anchors array in the element
 
-=head2 move_anchors_to($element)
+=item move_anchors_to($element)
 
 Remove the anchors from this element and add them to the one passed as
 argument.
@@ -140,12 +142,15 @@ sub move_anchors_to {
     $self->remove_anchors;
 }
 
+=back
 
 =head2 ACCESSORS
 
 The following accessors set the value if an argument is provided. 
 
-=head3 block
+=over 4
+
+=item block
 
 The block the string belongs
 
@@ -159,7 +164,7 @@ sub block {
     return $self->{block} || $self->type;
 }
 
-=head3 type
+=item type
 
 The type
 
@@ -173,7 +178,7 @@ sub type {
     return $self->{type};
 }
 
-=head3 string
+=item string
 
 The string (without the indentation or the leading markup)
 
@@ -187,7 +192,7 @@ sub string {
     return $self->{string};
 }
 
-=head3 removed
+=item removed
 
 The portion of the string stripped out
 
@@ -201,7 +206,7 @@ sub removed {
     return $self->{removed};
 }
 
-=head3 style
+=item style
 
 The block style. Default to C<X>, read only. Used for aliases of tags,
 when closing it requires a matching style.
@@ -214,7 +219,7 @@ sub style {
     return $self->{style};
 }
 
-=head3 indentation
+=item indentation
 
 The indentation level, as a numerical value
 
@@ -224,7 +229,7 @@ sub indentation {
     return shift->{indentation};
 }
 
-=head3 footnote_number
+=item footnote_number
 
 The footnote number
 
@@ -234,7 +239,7 @@ sub footnote_number {
     return shift->{footnote_number};
 }
 
-=head3 footnote_symbol
+=item footnote_symbol
 
 The footnote symbol
 
@@ -244,7 +249,7 @@ sub footnote_symbol {
     return shift->{footnote_symbol};
 }
 
-=head3 footnote_index
+=item footnote_index
 
 The footnote index
 
@@ -257,7 +262,7 @@ sub footnote_index {
 
 
 
-=head2 attribute
+=item attribute
 
 Accessor to attribute
 
@@ -267,7 +272,7 @@ sub attribute {
     return shift->{attribute};
 }
 
-=head2 attribute_type
+=item attribute_type
 
 Accessor to attribute_type
 
@@ -278,7 +283,7 @@ sub attribute_type {
 }
 
 
-=head2 start_list_index
+=item start_list_index
 
 Accessor rw to start_list_index (defaults to 0)
 
@@ -295,9 +300,13 @@ sub start_list_index {
     return $self->{start_list_index};
 }
 
+=back
+
 =head2 HELPERS
 
-=head3 is_start_block($blockname)
+=over 4
+
+=item is_start_block($blockname)
 
 Return true if the element is a "startblock" of the required block name
 
@@ -313,7 +322,7 @@ sub is_start_block {
     }
 }
 
-=head3 is_stop_element($element)
+=item is_stop_element($element)
 
 Return true if the element is a matching stopblock for the element
 passed as argument.
@@ -333,7 +342,7 @@ sub is_stop_element {
     }
 }
 
-=head3 is_regular_maybe
+=item is_regular_maybe
 
 Return true if the element is "regular", i.e., it just have trailing
 white space
@@ -351,7 +360,7 @@ sub is_regular_maybe {
     }
 }
 
-=head3 can_merge_next 
+=item can_merge_next
 
 Return true if the element will merge the next one
 
@@ -378,7 +387,7 @@ sub can_merge_next {
     }
 }
 
-=head3 can_be_merged 
+=item can_be_merged
 
 Return true if the element will merge the next one. Only regular strings.
 
@@ -395,11 +404,11 @@ sub can_be_merged {
     }
 }
 
-=head3 can_be_in_list
+=item can_be_in_list
 
 Return true if the element can be inside a list
 
-=cut 
+=cut
 
 sub can_be_in_list {
     my $self = shift;
@@ -412,7 +421,7 @@ sub can_be_in_list {
     }
 }
 
-=head3 can_be_regular
+=item can_be_regular
 
 Return true if the element is quote, center, right
 
@@ -432,7 +441,7 @@ sub can_be_regular {
 }
 
 
-=head3 should_close_blocks
+=item should_close_blocks
 
 =cut
 
@@ -448,7 +457,7 @@ sub should_close_blocks {
 }
 
 
-=head3 add_to_string($string, $other_string, [...])
+=item add_to_string($string, $other_string, [...])
 
 Append (just concatenate) the given strings to the string attribute.
 
@@ -461,7 +470,7 @@ sub add_to_string {
     $self->string(join("", $orig, @args));
 }
 
-=head3 append($element)
+=item append($element)
 
 Append the element passed as argument to this one, setting the raw_line
 
@@ -488,7 +497,7 @@ sub append {
     $self->add_to_anchors($element->anchors);
 }
 
-=head3 can_append($element)
+=item can_append($element)
 
 =cut
 
@@ -512,7 +521,7 @@ sub can_append {
     return 0;
 }
 
-=head3 become_regular
+=item become_regular
 
 Set block to empty string and type to regular
 
@@ -524,7 +533,7 @@ sub become_regular {
     $self->block('');
 }
 
-=head3 element_number
+=item element_number
 
 Internal numbering of the element.
 
@@ -539,7 +548,7 @@ sub _set_element_number {
     $self->{element_number} = $num;
 }
 
-=head3 is_header
+=item is_header
 
 Return 1 if the element type is h1/h6, 0 otherwise.
 
@@ -554,5 +563,9 @@ sub is_header {
         return 0;
     }
 }
+
+=back
+
+=cut
 
 1;

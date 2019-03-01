@@ -1,0 +1,106 @@
+{
+   "abstract" : "specify type constraints of subroutines",
+   "author" : [
+      "kfly8 <kfly@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Function-Interface",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Function::Parameters" : "2.000003",
+            "Function::Return" : "0",
+            "Keyword::Simple" : "0",
+            "PPR" : "0",
+            "Type::Tiny" : "0",
+            "perl" : "5.014004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Function::Interface" : {
+         "file" : "lib/Function/Interface.pm",
+         "version" : "0.01"
+      },
+      "Function::Interface::Impl" : {
+         "file" : "lib/Function/Interface/Impl.pm",
+         "version" : "0.01"
+      },
+      "Function::Interface::Info" : {
+         "file" : "lib/Function/Interface/Info.pm",
+         "version" : "0.01"
+      },
+      "Function::Interface::Info::Function" : {
+         "file" : "lib/Function/Interface/Info/Function.pm",
+         "version" : "0.01"
+      },
+      "Function::Interface::Info::Function::Param" : {
+         "file" : "lib/Function/Interface/Info/Function/Param.pm",
+         "version" : "0.01"
+      },
+      "Function::Interface::Info::Function::ReturnParam" : {
+         "file" : "lib/Function/Interface/Info/Function/ReturnParam.pm",
+         "version" : "0.01"
+      },
+      "Types::Interface" : {
+         "file" : "lib/Types/Interface.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kfly8/p5-Function-Interface/issues"
+      },
+      "homepage" : "https://github.com/kfly8/p5-Function-Interface",
+      "repository" : {
+         "url" : "git://github.com/kfly8/p5-Function-Interface.git",
+         "web" : "https://github.com/kfly8/p5-Function-Interface"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:KFLY",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

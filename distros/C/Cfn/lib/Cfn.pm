@@ -66,6 +66,11 @@ package Cfn::TypeLibrary {
     where { $_ eq 'Delete' or $_ eq 'Retain' or $_ eq 'Snapshot' },
     message { "$_ is an invalid DeletionPolicy" };
 
+  subtype 'Cfn::Resource::UpdateReplacePolicy',
+    as 'Str',
+    where { $_ eq 'Delete' or $_ eq 'Retain' or $_ eq 'Snapshot' },
+    message { "$_ is an invalid UpdateReplacePolicy" };
+
   subtype 'Cfn::Value::ArrayOfPrimitives',
     as 'Cfn::Value::Array',
     where { @{ $_[0]->Value } == grep { $_->isa('Cfn::Value::Primitive') } @{ $_[0]->Value } },
@@ -345,9 +350,11 @@ package Cfn::TypeLibrary {
     'AWS::AccountId',
     'AWS::NotificationARNs',
     'AWS::NoValue',
+    'AWS::Partition',
     'AWS::Region',
     'AWS::StackId',
     'AWS::StackName',
+    'AWS::URLSuffix',
   ];
 
   coerce 'Cfn::Internal::Options',
@@ -364,6 +371,7 @@ package Cfn::Value {
 
 package Cfn::DynamicValue {
   use Moose;
+  use Scalar::Util qw/blessed/;
   extends 'Cfn::Value';
   has Value => (isa => 'CodeRef', is => 'rw', required => 1);
 
@@ -372,11 +380,24 @@ package Cfn::DynamicValue {
     return Moose::Util::TypeConstraints::find_type_constraint('Cfn::Value')->coerce($self->resolve_value(@_));
   }
 
+  sub _resolve_value {
+    my ($v, $args) = @_;
+    if (blessed($v) and $v->isa('Cfn::Value')) {
+      return $v->as_hashref(@$args);
+    } elsif (not blessed($v) and ref($v) eq 'HASH') {
+      return { map { ($_ => _resolve_value($v->{ $_ })) } keys %$v }
+    } elsif (not blessed($v) and ref($v) eq 'ARRAY') {
+      return [ map { _resolve_value($_) } @$v ]
+    } else {
+      return $v
+    }
+  }
+
   sub resolve_value {
     my $self = shift;
     my @args = reverse @_;
     my (@ret) = ($self->Value->(@args));
-    @ret = map { (not ref($_) or ref($_) eq 'HASH')?$_:$_->as_hashref(@args) } @ret;
+    @ret = map { _resolve_value($_, \@args) } @ret;
     return (@ret);
   }
 
@@ -638,6 +659,7 @@ package Cfn::Resource {
   has Metadata => (isa => 'Cfn::Value::Hash', is => 'rw', coerce => 1);
   has UpdatePolicy => (isa => 'Cfn::Resource::UpdatePolicy', is => 'rw', coerce => 1);
   has CreationPolicy => (isa => 'HashRef', is => 'rw');
+  has UpdateReplacePolicy => (isa => 'Cfn::Resource::UpdateReplacePolicy', is => 'rw');
 
   sub as_hashref {
     my $self = shift;
@@ -646,7 +668,7 @@ package Cfn::Resource {
       (map { $_ => $self->$_->as_hashref(@args) }
         grep { defined $self->$_ } qw/Properties Metadata UpdatePolicy/),
       (map { $_ => $self->$_ }
-        grep { defined $self->$_ } qw/Type DeletionPolicy DependsOn CreationPolicy Condition/),
+        grep { defined $self->$_ } qw/Type DeletionPolicy UpdateReplacePolicy DependsOn CreationPolicy Condition/),
     }
   }
 
@@ -860,8 +882,7 @@ package Cfn {
   has Description => (isa => 'Str', is => 'rw');
   has Transform => (isa => 'Cfn::Transform', is => 'rw', coerce => 1);
 
-  our $VERSION = '0.01';
-  #ABSTRACT: An object model for CloudFormation documents
+  our $VERSION = '0.02';
 
   has Parameters => (
     is => 'rw',
@@ -1066,6 +1087,11 @@ package Cfn {
     return $class->new(%$hashref);
   }
 
+  sub resolve_dynamicvalues {
+    my $self = shift;
+    return Cfn->from_hashref($self->as_hashref);
+  }
+
   sub as_hashref {
     my $self = shift;
     return {
@@ -1203,7 +1229,7 @@ This method creates a Cfn object from a JSON string that containes a CloudFormat
 
 =head3 json
 
-When serializing to JSON with C<as_json>, the encode method on on this object is called passing the
+When serializing to JSON with C<as_json>, the encode method on this object is called passing the
 documents hashref representation. By default the JSON generated is "ugly", that is, all in one line,
 but in canonical form (so a given serialization always has attributes in the same order).
 
@@ -1307,6 +1333,15 @@ C<as_hashref> triggers the serialization process of the document, which scans th
 object model asking it's components to serialize (calling their C<as_hashref>). Objects
 can decide how they serialize to a hashref.
 
+When C<$cfn->as_hashref> is invoked, all the dynamic values in the Cfn object will be 
+called with the C<$cfn> instance as the first parameter to their subroutine
+
+  $cfn->addResource('R1', 'AWS::IAM::User', Path => Cfn::DynamicValue->new(Value => sub {
+    my $cfn = shift;
+    return $cfn->ResourceCount + 41
+  }));
+  $cfn->as_hashref->{ Resources }->{ R1 }->{ Properties }->{ Path } # == 42
+
 =head3 as_json
 
 Returns a JSON representation of C<as_hashref>. Just a shortcut
@@ -1316,6 +1351,10 @@ Returns a JSON representation of C<as_hashref>. Just a shortcut
 Given a path in the format C<'Resources.R1.Properties.PropName'> it will return the value
 stored in PropName of the resource R1. Use C<'Resource.R1.Properties.ArrayProp.0'> to access
 Arrays.
+
+=head3 resolve_dynamicvalues
+
+Returns a new C<Cfn> object with all C<Cfn::DynamicValues> resolved.
 
 =head3 ResourcesOfType($type)
 
@@ -1469,6 +1508,15 @@ when as_hashref is called.
   $cfn->path_to('Resources.R1.Properties.Path') # isa Cfn::DynamicValue
   $cfn->path_to('Resources.R1.Properties.Path')->as_hashref # eq 'Hello'
 
+When C<$cfn->as_hashref> is invoked, all the dynamic values in the Cfn object will be 
+called with the C<$cfn> instance as the first parameter to their subroutine
+
+  $cfn->addResource('R1', 'AWS::IAM::User', Path => Cfn::DynamicValue->new(Value => sub {
+    my $cfn = shift;
+    return $cfn->ResourceCount + 41
+  }));
+  $cfn->as_hashref->{ Resources }->{ R1 }->{ Properties }->{ Path } # == 42
+
 =head2 Cfn::Value::Function
 
 All function statements derive from Cfn::Value::Function. 
@@ -1482,9 +1530,9 @@ of the reference in the C<Value> attribute. Note that the Value attribute contai
 another C<Cfn::Value>. It derives from C<Cfn::Value::Function>
 
   $cfn->addResource('R1', 'AWS::IAM::User', Path => { Ref => 'AWS::Region' });
-  $cfn->path_to('Resources.R1.Properties.Path') # isa Cfn::Value::Function::PseudoParam
+  $cfn->path_to('Resources.R1.Properties.Path') # isa Cfn::Value::Function::PseudoParameter
 
-=head2 Cfn::Value::Function::PseudoParam
+=head2 Cfn::Value::Function::PseudoParameter
 
 This is a subclass of C<Cfn::Value::Function::Ref> used to hold what CloudFormation
 calls PseudoParameters.

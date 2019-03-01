@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -36,7 +36,7 @@ require Graph::Maker::Keller;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 10;
+  my $want_version = 13;
   ok ($Graph::Maker::Keller::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::Keller->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::Keller->VERSION($want_version); 1 }, 1,

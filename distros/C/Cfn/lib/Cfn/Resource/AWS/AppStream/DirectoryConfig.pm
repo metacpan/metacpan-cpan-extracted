@@ -1,4 +1,4 @@
-# AWS::AppStream::DirectoryConfig generated from spec 2.15.0
+# AWS::AppStream::DirectoryConfig generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppStream::DirectoryConfig',
@@ -44,7 +44,7 @@ package Cfn::Resource::Properties::AWS::AppStream::DirectoryConfig {
   extends 'Cfn::Resource::Properties';
   
   has DirectoryName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has OrganizationalUnitDistinguishedNames => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OrganizationalUnitDistinguishedNames => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServiceAccountCredentials => (isa => 'Cfn::Resource::Properties::AWS::AppStream::DirectoryConfig::ServiceAccountCredentials', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 

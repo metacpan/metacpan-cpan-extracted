@@ -1,5 +1,14 @@
 Revision history for Tapper-Reports-Web
 
+5.0.14    2019-03-01
+        - testplans - lots of small tweaks everywhere
+        - Testplan Cancel, runs testrun cancel
+        - Continuous Testing page tweaks
+        - allow to hide MPCs from webgui
+        - use-case template fields reordered more naturally
+        - speed: facelifting the testplan view
+        - metarepors - adapt to new BenchmarkAnything comparator functions
+
 5.0.13    2017-03-07
         - fix sloppy grouping now needed for stricter MySQL 5.7
         - deactivate super-slow size info in reports

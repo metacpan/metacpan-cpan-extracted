@@ -94,9 +94,14 @@ See L</THROWING EXCEPTIONS> for how to throw exceptions for known errors.
 
 Stores may choose to support an interface for deleting old state data
 suitable for a cronjob.  To do this two methods must be declared,
-L</can_reap_expired> and L</reap_expires>.  See
-L<Starch::Store::Amazon::DynamoDB> for an example of a store which
-supports this feature.
+L<Starch::Store/can_reap_expired> and L<Starch::Store/reap_expired>.
+
+    sub can_reap_expired { 1 }
+    
+    sub reap_expired {
+        my ($self) = @_;
+        ...
+    }
 
 The actual implementation of how to reap old state data is a per-store
 and is something that will differ greatly between them.
@@ -188,7 +193,7 @@ and other parts of starch.  It holds a strong reference to the manager.
 
 =head1 AUTHORS AND LICENSE
 
-See L<Starch/AUTHOR>, L<Starch/CONTRIBUTORS>, and L<Starch/LICENSE>.
+See L<Starch/AUTHORS> and L<Starch/LICENSE>.
 
 =cut
 

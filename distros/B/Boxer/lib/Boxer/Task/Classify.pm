@@ -9,6 +9,7 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 use autodie qw(:all);
 use IPC::System::Simple;
 
@@ -19,19 +20,18 @@ use Boxer::World::Reclass;
 use Boxer::Part::Reclass;
 
 use Moo;
+use MooX::StrictConstructor;
 use Types::Standard qw( Maybe Str Undef );
 use Boxer::Types qw( DataDir ClassDir NodeDir Suite );
 extends 'Boxer::Task';
 
-use namespace::autoclean 0.16;
-
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 # permit callers to sloppily pass undefined values
 sub BUILDARGS

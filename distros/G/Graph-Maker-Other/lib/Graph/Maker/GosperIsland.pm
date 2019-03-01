@@ -1,4 +1,4 @@
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 
@@ -93,7 +93,7 @@ Graph::Maker->add_factory_type('Gosper_island' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde
+=for stopwords Ryde GosperIsland Gosper terdragon undirected
 
 =head1 NAME
 
@@ -155,11 +155,11 @@ level=2 is a 2x2x2 hex grid like L<Graph::Maker::HexGrid> can give.
 The graph size grows rapidly with the level,
 
     num hexagons = 7^k
-                 = 1, 7, 49, 343, 2401           (A000420)
+                 = 1, 7, 49, 343, 2401, ...    (A000420)
     num vertices = 2*7^k + 3^(k+1) + 1
-                 = 6, 24, 126, 768, 5046
+                 = 6, 24, 126, 768, 5046, ...
     num edges    = 3*7^k + 3^(k+1)
-                 = 6, 30, 174, 1110, 7446
+                 = 6, 30, 174, 1110, 7446, ...
 
 =cut
 
@@ -175,8 +175,8 @@ The graph size grows rapidly with the level,
 =pod
 
 These formulas follow from a bottom-up construction.  Each existing edge
-becomes 3 and inside each hexagon is a new hexagon and edges to the outside
-there to make the level 1 base figure.
+becomes 3 edges and inside each hexagon is a new hexagon and edges to the
+outside there to make the level 1 base figure.
 
 =cut
 
@@ -233,7 +233,7 @@ L<Graph::Maker::HexGrid>
 
 =head1 LICENSE
 
-Copyright 2017 Kevin Ryde
+Copyright 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

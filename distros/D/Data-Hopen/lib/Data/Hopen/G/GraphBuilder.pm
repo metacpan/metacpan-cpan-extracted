@@ -6,14 +6,13 @@ use Exporter 'import';
 
 our @EXPORT; BEGIN { @EXPORT=qw(make_GraphBuilder); }
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000012';
 
 use Class::Tiny {
-    name => sub { 'ANON' },     # Name is optional; it's here so the
-                                # constructor won't croak if you use one.
-
-    dag => undef,
-    node => undef,
+    name => 'ANON',     # Name is optional; it's here so the
+                        #   constructor won't croak if you use one.
+    dag => undef,       # The current G::DAG instance
+    node => undef,      # The last node added
 };
 
 use Class::Method::Modifiers qw(install_modifier);

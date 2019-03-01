@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -39,18 +39,19 @@ $| = 1;
   #  k=1 https://hog.grinvin.org/ViewGraphInfo.action?id=19655   path-2
   #  k=2 https://hog.grinvin.org/ViewGraphInfo.action?id=594     path-4
   #  k=3 https://hog.grinvin.org/ViewGraphInfo.action?id=700
-  #  k=4 not
-  #  k=5 not
+  #  k=4 https://hog.grinvin.org/ViewGraphInfo.action?id=28549
+  #  k=5 https://hog.grinvin.org/ViewGraphInfo.action?id=31086
   my @graphs;
-  foreach my $k (0 .. 4) {
+  foreach my $k (0 .. 8) {
     my $graph = Graph::Maker->new('twindragon_area_tree', level=>$k,
                                   undirected=>1);
+    # MyGraphs::Graph_branch_reduce($graph);
+    # if($k==3) { MyGraphs::Graph_view($graph); }
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }
-
 {
   # sample picture for POD
 

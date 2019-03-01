@@ -1,5 +1,5 @@
-TeX::Hyphen::Pattern version 0.103
-==================================
+TeX::Hyphen::Pattern version v1.1.1
+===================================
 
 This module can be used to provide TeX hyphenation patterns for use with
 TeX::Hyphen.
@@ -34,7 +34,7 @@ COPYRIGHT AND LICENCE
 
 TeX and OpenOffice.org pattern files copyrighted by their individual owners.
 
-Copyright (C) 2018 by Roland van Ipenburg
+Copyright (C) 2019 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

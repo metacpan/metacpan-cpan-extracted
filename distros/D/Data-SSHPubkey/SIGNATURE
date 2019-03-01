@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 13452e8ce806cfd8202d66d95a1257d3198ef7f7656293463a43e6c6c94c694a Changes
+SHA256 63d5dc9cd1ee16c57a818cb7aeac699734d09aa8b02483837af4e2f954e139e9 LICENSE
+SHA256 9efd0fd2b89f137f2fc7e4079d98e6607d14781d010f32adb8f81a84827c19fd MANIFEST
+SHA256 0a3b1128b7803ec6e6a58266c7067dc1e0e671ab5e42b400c4e968551bf5de38 META.json
+SHA256 76e5fbab4c8b5221d53f029d4d4763eb3e3c309e3ffc8b5954942144254650bc META.yml
+SHA256 b6afb3ecb72be0a1cbbb0158a700a297579d8c887d36093759d40ff86e8ba919 Makefile.PL
+SHA256 aa3ee19ca77bd7066e2060721cae31ee50b56b98e49df6e6926d9b7b248fbb9a README
+SHA256 0bb7b3fb19992d443bbcec236b784f50b97ffea811ed3821c5e4d49664c9b221 lib/Data/SSHPubkey.pm
+SHA256 380564454696588dd385d45e77cfa695a77f09f760781a4c98875e7d7816797e t/00-load.t
+SHA256 adea0c6c9ffd673809964dcf1ef6712d1726d318c553623a2cb2aa34d37a4718 t/10-pubkeys.t
+SHA256 7b612bc593e9d28f0d8f2747b4a55b5bf4923a9e60b8b7af729ccc21c597f33a t/PEM.pub
+SHA256 e08ba547862001ffc8b6296fb219f91d940fad6a34e3cd702e40506daa49efd9 t/PKCS8.pub
+SHA256 1e37ba7eeece4e31608f1cf85b915d980413f569dcb5b2012825d272a2e4e22c t/RFC4716.pub
+SHA256 7dd2b4b4dff1d3bd16ce7c021f31127199c36d97b46a04ee539c4ed912b4ff1f t/ecdsa.pub
+SHA256 e1ae9f94fdee92316fd70dcd060125d4ffb5c167392b5eb08dfe2c3cfe7637f0 t/ed25519.pub
+SHA256 991d717f1c17bc8f096224349e1bee0b683b57d439306c2009a23119a214fc98 t/pod-coverage.t
+SHA256 466dedeea6d589637e9046db287cb99c9df020d376a3704b63d9895e0a9f8c96 t/pod.t
+SHA256 bb76aef6256fa68a77a19b079afb74a98077240d246ac21d24326bdb2b48c9b8 t/rsa.pub
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJcd+1HAAoJEIGZLuHhLAOFvuUH/ArF7mYHWhmvEfpO1UQlGVH7
+5yxGvNFiV9zzvB5yBJ4vwiNW5b9QAHcv/eky1H3Fw2ylHNFbqDg7VX1N74FcdUoC
+vOPTUCfxGcwVBz96xyuZsKGNbt+EFFtJHKvEa3ro7uF/hw/LtGtzjYZRF9dYu4Vd
+So6wKlaU5hbotTwRuIU9vi/21vW+ZN5QScYi5T0jCgLqy0sQgJ9rXQwW9lxUhwVp
+0uODLq3kzHb3tN7rahOqKfna4CZXsLX3EYKL/Q3QKyb1lv3BvxOfSD2Kt88Y/1GH
+SRTsm35xB5WUaw2P2pDA6E5qX0WKsuPDYYQ5mZnfY0GPf8/+Am4qV56hz1SHKQI=
+=cYyd
+-----END PGP SIGNATURE-----

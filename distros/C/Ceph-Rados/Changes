@@ -1,5 +1,9 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.12  Fri  1 Mar 16:16:40 GMT 2019
+    - added test for SEGVs in IO.xs, and fixed those segfults by
+      only calling destroy/shutdown in global destruction
+
 0.11  Mon 25 Feb 14:41:41 GMT 2019
     - list context compatibility updates for Luminous+ Ceph builds
 

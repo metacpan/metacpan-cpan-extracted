@@ -35,6 +35,8 @@ package Cfn::Resource::Properties::Test1 {
   has Prop16 => (is => 'rw', isa => 'Cfn::Value', coerce => 1);
   has Prop17 => (is => 'rw', isa => 'Cfn::Value', coerce => 1);
   has Prop18 => (is => 'rw', isa => 'Cfn::Value', coerce => 1);
+  has Prop19 => (is => 'rw', isa => 'Cfn::Value', coerce => 1);
+  has Prop20 => (is => 'rw', isa => 'Cfn::Value', coerce => 1);
 }
 
 my $cfn = Cfn->new;
@@ -61,6 +63,8 @@ $cfn->addResource('t1', 'Test1',
   Prop16 => { 'Fn::Split' => [ 'del', 'Value' ] },
   Prop17 => { 'Fn::Sub' => [ 'String' ] },
   Prop18 => { 'Fn::Sub' => [ 'String', [ 'v1', 'v2', 'v3' ] ] },
+  Prop19 => { 'Fn::Cidr' => [ "192.168.0.0/24", 6, 5] },
+  Prop20 => { 'Fn::Transform' => { Name => 'macro name', Parameters => {key1 => 'value1', key2 => 'value2' } } }
 );
 
 
@@ -83,5 +87,7 @@ isa_ok($cfn->Resource('t1')->Properties->Prop15, 'Cfn::Value::Function');
 isa_ok($cfn->Resource('t1')->Properties->Prop16, 'Cfn::Value::Function');
 isa_ok($cfn->Resource('t1')->Properties->Prop17, 'Cfn::Value::Function');
 isa_ok($cfn->Resource('t1')->Properties->Prop18, 'Cfn::Value::Function');
+isa_ok($cfn->Resource('t1')->Properties->Prop19, 'Cfn::Value::Function');
+isa_ok($cfn->Resource('t1')->Properties->Prop20, 'Cfn::Value::Function');
 
 done_testing;

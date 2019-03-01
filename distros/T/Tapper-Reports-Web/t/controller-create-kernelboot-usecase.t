@@ -45,9 +45,9 @@ $mech->content_contains('This field is required', 'No form without use case acce
 die "No kernelbuild use case found" unless $kernel_build;
 
 $mech->submit_form(fields => {use_case => $kernel_build} , button => 'submit');
-$mech->content_contains('Use case details', 'Form to fill out use case details loaded');
+$mech->content_contains('Testrun details', 'Form to fill out use case details loaded');
 # if the content test fails, we need to know what page actually was shown
-diag($mech->content) unless $mech->content() =~ /Use case details/;
+diag($mech->content) unless $mech->content() =~ /Testrun details/;
 
 $mech->forms(0);
 $mech->submit_form(button => 'submit' );

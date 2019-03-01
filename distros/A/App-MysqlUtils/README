@@ -2,11 +2,29 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.014 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2018-12-27.
+    This document describes version 0.015 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2019-02-28.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
+
+    *   mysql-copy-rows-adjust-pk
+
+    *   mysql-drop-all-tables
+
+    *   mysql-drop-dbs
+
+    *   mysql-drop-tables
+
+    *   mysql-find-identical-rows
+
+    *   mysql-query
+
+    *   mysql-run-pl-files
+
+    *   mysql-run-sql-files
+
+    *   mysql-sql-dump-extract-tables
 
 FUNCTIONS
   mysql_copy_rows_adjust_pk
@@ -557,7 +575,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,9 @@
+1.007 - 2019/02/29
+- less verbose fail reason if pubkey is corrupt
+1.006 - 2019/02/28
+- don't crash on corrupted 'b' parameter in signature
+1.005 - 2019/02/28
+- fix in handling invalid DKIM signature headers: don't wait for more data
 1.004 - 2019/02/20
 - rename DKIM_* constants and description according to RFC 7601 2.7.1
   DKIM_SUCCESS is now DKIM_PASS etc

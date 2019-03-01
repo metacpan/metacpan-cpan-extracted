@@ -14,8 +14,7 @@
 % if ( $report ) {
 % my $report_name = $report->suite ? $report->suite->name : 'unknown suite';
     <h3>
-        Report
-        <strong><% $report->id %></strong>:
+        Report <% $report->id %>:
         <strong><a href="/tapper/reports/suite/<% $report_name %>"><% $report_name %></a></strong>
     </h3>
 
@@ -71,6 +70,7 @@
     <!-- ************************************************************ -->
 
         <& /tapper/reports/report_files.mas, report => $report &>
+        <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>
 
     <!-- ************************************************************ -->
 

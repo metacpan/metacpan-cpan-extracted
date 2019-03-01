@@ -15,6 +15,24 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
+6.76  2019-03-01
+  -  Fixed bug in Date::Manip::Date::list_holidays.
+        It was using 'now' instead of the stored date. Douglas DeStafeno
+
+  -  Reordered TZ detection methods
+        Moved checking the tzdata files to lower priority to avoid a pretty
+        unusual situation in docker. Sven Nierlein (GitHub #20)
+
+  -  Time zone fixes
+        Newest zoneinfo data (tzdata 2018i). Requested by Shawn C Carroll
+        (GitHub #28)
+
+6.75  2018-12-03
+  -  Fixed packaging problems
+        Version 6.74 was not packaged correctly. Version wasn't set
+        correctly in a few files and there were invalid entries in
+        Makefile.PL. RT 127870.
+
 6.74  2018-12-01
   -  Removed travis file from the tarball
         The tarball had a .travis.yml file in it that wasn't in the MANIFEST

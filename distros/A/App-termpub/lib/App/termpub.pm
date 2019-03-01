@@ -7,7 +7,7 @@ use Mojo::JSON 'encode_json', 'decode_json';
 use App::termpub::Renderer;
 use Curses;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 has 'epub';
 has chapters => sub { shift->epub->chapters };
@@ -179,11 +179,11 @@ sub set_chapter {
         }
         $self->history_index(0);
     }
+    $self->chapter($num);
+    $self->render_pad;
     $self->title( $self->chapters->[$num]->title );
     $self->set_mark;
-    $self->chapter($num);
     $self->line(0);
-    $self->render_pad;
     return;
 }
 

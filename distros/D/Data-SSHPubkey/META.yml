@@ -1,0 +1,30 @@
+---
+abstract: 'utility function to parse SSH public keys with'
+author:
+  - 'Jeremy Mates <jmates@cpan.org>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-SSHPubkey
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.010000'
+  strict: '0'
+resources:
+  repository: https://github.com/thrig/Data-SSHPubkey
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

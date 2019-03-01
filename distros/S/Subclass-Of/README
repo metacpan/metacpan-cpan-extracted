@@ -80,6 +80,15 @@ DESCRIPTION
         hash. The builder supports `is`, `isa` and `default` (which is always
         treated as lazy). It only builds accessors, *not* a constructor!
 
+        From Subclass::Of 0.008, you can pass `fieldhash => 1` to use
+        Hash::Util::FieldHash or Hash::FieldHash to store the attribute
+        inside-out, so the accessor will work for non-hashrefs.
+
+           use SubClass::Of "MyClass",
+              -has => [
+                  counter => [ is => "ro", isa => Int, fieldhash => 1 ],
+              ];
+
     `-package`
         The package name for the subclass. Usually you can ignore this;
         Subclass::Of will think one up of its own.
@@ -183,7 +192,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013, 2017 by Toby Inkster.
+    This software is copyright (c) 2013, 2017, 2019 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

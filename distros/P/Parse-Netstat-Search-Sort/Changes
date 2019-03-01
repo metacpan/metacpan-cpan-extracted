@@ -1,4 +1,9 @@
 Revision history for Parse-Netstat-Search-Sort
 
+0.0.1	 2018-02-28/05:10
+		 - Make sure it validates the sort type.
+		 - Make sure the port is always a numeric value.
+		   * becomes 0.
+
 0.0.0	 2019-02-25/02:30
 		 - Initial release.

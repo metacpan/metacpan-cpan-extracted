@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 163;
+plan tests => 165;
 
 foreach my $testfile (qw/comments
                          inline
@@ -31,6 +31,7 @@ foreach my $testfile (qw/comments
                          verse
                          verse-2
                          verse-3
+                         verse-4
                          example-3
                          table
                          links

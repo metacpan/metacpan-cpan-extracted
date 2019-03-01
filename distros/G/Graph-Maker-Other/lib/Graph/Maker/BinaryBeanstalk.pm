@@ -1,4 +1,4 @@
-# Copyright 2016, 2017 Kevin Ryde
+# Copyright 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 
@@ -116,78 +116,104 @@ Graph::Maker::BinaryBeanstalk - create binary beanstalk graph
 C<Graph::Maker::BinaryBeanstalk> creates C<Graph.pm> graphs of the binary
 beanstalk per OEIS A179016 etc.
 
-    12  13  14  15
-      \ /    \ /
-       10    11           height => 8
-         \  /
-           8   9
-            \ /
-         6   7
-          \ /
-           4   5
-            \ /
-         2   3
-          \ /
-           1
-           |
            0
+           |
+           1       height => 8  rows
+          / \
+         2   3
+            / \
+           4   5
+          / \
+         6   7
+            / \
+           8   9
+         /  \
+       10    11
+      / \    / \
+    12  13  14  15
 
-=for GP-Test  vector(16,n,n--; n-hammingweight(n)) == [0,0,1,1,3,3,4,4,7,7,8,8,10,10,11,11]
+=cut
 
-Vertices are integers starting at root 0.  Vertex n has parent
-n-CountOneBits(n).  For example 9 = 1001 binary has 2 1-bits so parent
-9-2=7.  For nE<gt>=1 each vertex has either 0 or 2 children, hence "binary"
-beanstalk.
+# GP-DEFINE  parent(n) = n - hammingweight(n);
+# GP-Test  vector(16,n,n--; parent(n)) == \
+# GP-Test    [0,0,1,1,3,3,4,4,7,7,8,8,10,10,11,11]  /* parent each */
 
-After the root there are exactly 0 or 2 children.  There are always 2
-children since if a given even vertex c has parent c-CountOneBits(c)=n then
-the next vertex c+1 has same
+=pod
 
-    parent(c+1) = (c+1) - (CountOneBits(c)+1)  = n
+Vertices are integers starting at root 0.  Vertex n has
 
-There are no more than 2 children since the next even vertex c+2 has 1-bit
-count
+    parent(n) = n - CountOneBits(n)
 
-    CountOneBits(c+2) <= CountOneBits(c) + 1
-    equality when c==0 mod 4, otherwise less
+For example 9 = 1001 binary has 2 1-bits so parent 9-2=7.
 
-due to flipping run of 1-bits at second lowest bit position.  So parent(c+2)
-E<gt>= c+2 - (CountOneBits(c)+1) = n+1, so not the same n parent of c.
+Other than the root 0, each vertex has either 0 or 2 children, hence
+"binary" beanstalk.  There are 2 children since if even n has parent
+n-CountOneBits(n)=p then the next vertex n+1 is same
 
-=for GP-Test  binary(14) == [1,1,1,0]
+    parent(n+1) = n+1 - CountOneBits(n+1)
+                = n+1 = (CountOneBits(n) + 1)    since n even
+                =  p
 
-This also means the parent n is always increasing, and therefore the
-vertices in a given row are contiguous integers.  That's so of the single
-vertex row 1 and thereafter remains so by parent number increasing.
+There are no more than 2 children since the next even n+2 has 1-bit count
+
+    CountOneBits(n+2) <= CountOneBits(n) + 1
+    equality when n==0 mod 4, otherwise less
+
+due to flipping run of 1-bits at second lowest bit position.  So parent(n+2)
+E<gt>= n+2 - (CountOneBits(n)+1) = p+1, so not the same parent p of n.
+
+=cut
+
+# GP-Test  binary(14) == [1,1,1,0]
+# GP-Test  vector(100,n,n*=2; parent(n+1)==parent(n)) == \
+# GP-Test  vector(100,n, 1)
+# GP-Test  vector(100,n,n*=2; parent(n+2)!=parent(n)) == \
+# GP-Test  vector(100,n, 1)
+# GP-Test  vector(100,n,n*=2; hammingweight(n+2) <= hammingweight(n)+1) == \
+# GP-Test  vector(100,n, 1)
+
+=pod
+
+
+This also means parent p is always increasing, and therefore the vertices in
+a given row are contiguous integers.  That's so of the single vertex row 1
+and thereafter remains so by parent number increasing.
 
 The vertices in a given row which have children are not always contiguous.
-The first gap occurs at depth 36 where the vertices with children are
-116,117,119 skipping 118.
+The first gap occurs at depth 36 where the vertices 116,117,119 have
+children and 118 does not.
 
-    120 121  122 123    124 125
-     \   /    \   /      \   /
-      116      117   118  119
-        \     /       \   /
+           /-----^------\
           112          113
-           \-----v------/
+        /     \       /   \
+      116      117   118  119         <-- depth=36
+     /   \    /   \      /   \
+    120 121  122 123    124 125
+
+=cut
+
+# GP-DEFINE  depth(n) = my(ret=0); while(n,ret++;n=parent(n)); ret;
+# GP-Test  vector(5,n,n--; depth(n)) == [0,1,2,2,3]
+# GP-Test  vector(4,n,n+=115; depth(n)) == [36,36,36,36]
+# GP-Test  vector(6,n,n+=119; parent(n)) == [116,116, 117,117, 119,119]
 
 =head2 Options
 
 C<height> specifies the height of the tree, as number of rows.  Height 1 is
-the root alone, height 2 is two rows being are vertices 0 and 1, etc.
+the root alone, height 2 is two rows being vertices 0 and 1, etc.
 
 C<N> specifies how many vertices, being vertex numbers 0 to N-1 inclusive.
 
 If both C<height> and C<N> are given then the tree stops at whichever
 C<height> or C<N> comes first.  Since vertex numbers in a row are
-contiguous, specifying height is equivalent to an N limit of the first
-vertex of the row after, so 1, 2, 4, 6, 8, etc (OEIS A213708).
+contiguous, specifying height is equivalent to an N = first vertex number of
+the row after = 1, 2, 4, 6, 8, ... (OEIS A213708).
 
 =head1 FUNCTIONS
 
 =over
 
-=item C<$graph = Graph::Maker-E<gt>new('binary_beanstalk', key =E<gt> value, ...)>
+=item C<$graph = Graph::Maker-E<gt>new ('binary_beanstalk', key =E<gt> value, ...)>
 
 The key/value parameters are
 
@@ -201,7 +227,7 @@ C<Graph-E<gt>new()>.
 Like C<Graph::Maker::BalancedTree>, if the graph is directed (the default)
 then edges are added both up and down between each parent and child.  Option
 C<undirected =E<gt> 1> creates an undirected graph and for it there is a
-single edge from parent to child.
+single edge between parent and child.
 
 =back
 
@@ -211,9 +237,11 @@ House of Graphs entries for graphs here include
 
 =over
 
-=item height=1 (N=1), L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (single vertex)
+=item height=1 (N=1), L<https://hog.grinvin.org/ViewGraphInfo.action?id=1310>  (singleton)
 
 =item height=2 (N=2), L<https://hog.grinvin.org/ViewGraphInfo.action?id=19655>  (path-2)
+
+=item N=3, <https://hog.grinvin.org/ViewGraphInfo.action?id=32234> path-3
 
 =item height=3 (N=4), L<https://hog.grinvin.org/ViewGraphInfo.action?id=500>  (claw)
 
@@ -240,7 +268,7 @@ L<http://oeis.org/A179016> (etc)
 
 =back
 
-    A011371    parent vertex, being n-CountOneBits(n)
+    A011371    parent vertex, n-CountOneBits(n)
     A213723    child vertex, smaller
     A213724    child vertex, bigger
 
@@ -270,7 +298,7 @@ L<http://oeis.org/A179016> (etc)
     A257126    nth leaf - nth non-leaf
     A257130    new high positions of nth leaf - nth non-leaf
     A218254    paths to root 0
-    A213707    positions of root 0 in these paths
+    A213707     positions of root 0 in these paths
 
     A218604    num vertices after trunk in row
     A213714    how many non-leaf vertices precede n
@@ -286,11 +314,12 @@ L<http://oeis.org/A179016> (etc)
 
 =head1 SEE ALSO
 
-L<Graph::Maker>, L<Graph::Maker::BinomialTree>
+L<Graph::Maker>,
+L<Graph::Maker::BinomialTree>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -82,4 +82,9 @@ LICENSE file included with this module.
 
 # SEE ALSO
 
-[Mojolicious::Routes](https://metacpan.org/pod/Mojolicious::Routes), [Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route), [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious::Plugin::Config)
+[Mojolicious::Guides::Routing](https://metacpan.org/pod/Mojolicious::Guides::Routing), [Mojolicious::Routes](https://metacpan.org/pod/Mojolicious::Routes),
+[Mojolicious::Routes::Route](https://metacpan.org/pod/Mojolicious::Routes::Route), [Mojolicious::Plugin::Config](https://metacpan.org/pod/Mojolicious::Plugin::Config)
+
+[Slovo](https://metacpan.org/pod/Slovo) has a pretty advanced routes configuration using
+[Mojolicious::Plugin::RoutesConfig](https://metacpan.org/pod/Mojolicious::Plugin::RoutesConfig).  Please look at
+Slovo/lib/Slovo/resources/etc/routes.conf.

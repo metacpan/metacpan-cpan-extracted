@@ -4,6 +4,8 @@ blit_transform - flip_horizontal - has known issues.  It only happens with
 some images.  I am not yet sure what the issue is.  Try instead rotating
 180 degrees and then flip_vertical, if you have issues.
 
+There may be other flipping issues, but this one is the most obvious.
+
 Some framebuffer drivers are tearfully slow.  I have noticed that the Nouveau
 framebuffer driver for NVidia is Molasses slow.  It's amazing how slow it is.
 Other framebuffer drivers are amazingly fast.  It's clear the Nouveau

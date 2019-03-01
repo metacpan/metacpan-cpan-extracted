@@ -1,4 +1,4 @@
-# AWS::CodeDeploy::DeploymentGroup generated from spec 2.8.0
+# AWS::CodeDeploy::DeploymentGroup generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup',
@@ -431,7 +431,7 @@ package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TriggerConf
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has TriggerEvents => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TriggerEvents => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TriggerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TriggerTargetArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -564,7 +564,7 @@ package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AutoRollbac
   extends 'Cfn::Value::TypedValue';
   
   has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Events => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Events => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmConfiguration',
@@ -598,7 +598,7 @@ package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup {
   has AlarmConfiguration => (isa => 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ApplicationName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has AutoRollbackConfiguration => (isa => 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AutoRollbackConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has AutoScalingGroups => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AutoScalingGroups => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Deployment => (isa => 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::Deployment', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeploymentConfigName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeploymentGroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');

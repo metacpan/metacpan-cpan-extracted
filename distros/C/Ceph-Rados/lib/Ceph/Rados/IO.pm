@@ -29,7 +29,7 @@ sub list {
 
 sub DESTROY {
     my $self = shift;
-    $self->destroy;
+    $self->destroy if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 }
 
 sub write {
@@ -98,7 +98,7 @@ sub read {
     my ($self, $oid, $len, $off) = @_;
     # if undefined is passed as len, we stat the obj first to get the correct len
     if (!defined($len)) {
-        ($len, undef) = $self->_stat($oid);
+        ($len, undef) = $self->stat($oid);
     }
     $off ||= 0;
     $self->_read($oid, $len, $off);
@@ -116,13 +116,13 @@ sub pool_required_alignment {
 
 sub mtime {
     my ($self, $oid) = @_;
-    my (undef, $mtime) = $self->_stat($oid);
+    my (undef, $mtime) = $self->stat($oid);
     $mtime;
 }
 
 sub size {
     my ($self, $oid) = @_;
-    my ($size, undef) = $self->_stat($oid);
+    my ($size, undef) = $self->stat($oid);
     $size;
 }
 

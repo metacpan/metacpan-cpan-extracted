@@ -1,5 +1,5 @@
 package ZMQ::FFI::Util;
-$ZMQ::FFI::Util::VERSION = '1.12';
+$ZMQ::FFI::Util::VERSION = '1.14';
 # ABSTRACT: zmq convenience functions
 
 use strict;
@@ -123,7 +123,7 @@ ZMQ::FFI::Util - zmq convenience functions
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 SYNOPSIS
 

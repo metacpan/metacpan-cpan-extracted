@@ -2,12 +2,12 @@ package Mojolicious::Plugin::RoutesConfig;
 use Mojo::Base 'Mojolicious::Plugin::Config', -signatures;
 use List::Util qw(first);
 
-our $VERSION   = 0.05;
+our $VERSION   = 0.06;
 our $AUTHORITY = 'cpan:BEROV';
 
 sub register {
   my ($self, $app, $conf) = @_;
-  my $file = $conf->{file};
+  my $file     = $conf->{file};
   my $file_msg = ($file ? ' in file ' . $file : '');
   $conf = $self->SUPER::register($app, $conf);
   $app->log->warn('No routes definitions found' . $file_msg . '...')
@@ -39,7 +39,7 @@ sub _generate_routes {
       next;
     }
     my $init_params = $rconf->{$init_method};
-    my $route = _call_method($routes, $init_method, $init_params);
+    my $route       = _call_method($routes, $init_method, $init_params);
     if ($init_method eq 'under') {    # recourse
       $self->_generate_routes($app, $route, $rconf->{routes}, $file_msg);
     }
@@ -166,7 +166,12 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-L<Mojolicious::Routes>, L<Mojolicious::Routes::Route>, L<Mojolicious::Plugin::Config>
+L<Mojolicious::Guides::Routing>, L<Mojolicious::Routes>,
+L<Mojolicious::Routes::Route>, L<Mojolicious::Plugin::Config>
+
+L<Slovo> has a pretty advanced routes configuration using
+L<Mojolicious::Plugin::RoutesConfig>.  Please look at
+Slovo/lib/Slovo/resources/etc/routes.conf.
 
 =cut
 

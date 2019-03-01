@@ -1,0 +1,294 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Parse::Netstat qw(parse_netstat);
+use Parse::Netstat::Colorizer;
+
+
+sub version{
+	print "cnetstat v. 0.0.0\n";
+}
+
+sub help{
+	&version;
+
+	print '
+-a   All connections, including LISTENing ones.
+-c <cidrs>  A comma seperated list of CIDRs to search for.
+--drp   Don\t resolve port names.
+-h   Print help info.
+-i   Invert the sort.
+-l   Equivalent of "-a -s listen". Can be combined with -s.
+-p <poorts>   A comma seperated list of ports to search for.
+-P <protocols>   A comma seperated list of protocols to search for.
+-s <states>   A comma seperated list of states to search for.
+-S <sort>   The sort method to use.
+-t   Don\'t fetch TCP connection information.
+-u   Don\'t fetch UDP connection information.
+-v   Print version info.
+';
+
+}
+
+# command line option holders
+my $tcp=0;
+my $udp=0;
+my $help=0;
+my $version=0;
+my $dont_resolve_ports=0;
+my $sort='none';
+my $cidr_string;
+my $ports_string;
+my $states_string;
+my $protocols_string;
+my $all=0;
+my $listening;
+my $invert=0;
+
+#set the default sort via ENV if requested
+if ( defined( $ENV{CNETSTAT_sort} ) ){
+	$sort=$ENV{CNETSTAT_sort};
+}
+
+# get the commandline options
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::Configure ('bundling');
+GetOptions(
+		   't'=>\$tcp,
+		   'u'=>\$udp,
+		   'version' => \$version,
+		   'v' => \$version,
+		   'help' => \$help,
+		   'h' => \$help,
+		   'a' => \$all,
+		   'l' => \$listening,
+		   'i' => \$invert,
+		   'drp' => \$dont_resolve_ports,
+		   'c=s' => \$cidr_string,
+		   'S=s' => \$sort,
+		   'p=s' => \$ports_string,
+		   's=s' => \$states_string,
+		   'P=s' => \$protocols_string,
+		   );
+
+# print version or help if requested
+if ( $help ){
+	&help;
+	exit 42;
+}
+if ( $version ){
+	&version;
+	exit 42;
+}
+
+# XOR the invert value if needed
+if ( defined( $ENV{CNETSTAT_invert} ) ){
+	$invert= $invert ^ $ENV{CNETSTAT_invert};
+}
+
+#init what is required for setting sort, incase we need to error here
+my $pnc=Parse::Netstat::Colorizer->new;
+my $sorter=$pnc->get_sort;
+$sorter->set_sort($sort);
+if ( $sorter->error ){
+	warn( '"$sort" is not a valid sort method' );
+	exit 255;
+}
+
+#process the CIDR list if requested
+my $search=$pnc->get_search;
+if (defined ( $cidr_string ) ){
+	my @cidrs=split(/\,/, $cidr_string);
+	$search->set_cidrs( \@cidrs );
+	if ( $search->error ){
+		warn( 'One of your CIDRs is invalid' );
+		exit 255;
+	}
+}
+
+#process the requested ports if needed
+if (defined( $ports_string ) ){
+	my @ports=split(/,/, $ports_string);
+	$search->set_ports( \@ports );
+	if ( $search->error ){
+		warn( 'One of your ports is invalid' );
+		exit 255;
+	}
+}
+
+# process the requested protocols if needed
+if ( defined( $protocols_string ) ){
+	my @protocols=split(/\,/, $protocols_string);
+	$search->set_protocols( \@protocols );
+	if ( $search->error ){
+		warn( 'Failed to the requested protocols' );
+		exit 255;
+	}
+}
+
+# invert if requested
+if ( defined($invert) ){
+	$pnc->set_invert($invert);
+}
+
+#process the requested ports if needed
+if (
+	(!defined( $states_string)) &&
+	$listening
+	){
+	# set states to listen if none are given
+	$states_string='listen';
+	$all=1;
+}elsif( defined( $states_string ) &&
+		$listening
+	   ){
+	$states_string='listen,'.$states_string;
+	$all=1;
+}
+if (defined( $states_string ) ){
+	my @states=split(/,/, $states_string);
+	$search->set_states( \@states );
+}
+
+# invert the TCP/UDP values for telling Parse::Netstat what we want
+$tcp=$tcp ^ 1;
+$udp=$udp ^ 1;
+
+# don't resolve the ports if asked not to
+if ( $dont_resolve_ports ){
+	$pnc->set_port_resolve;
+}
+
+# put together the command
+my $netstat_command='netstat -n';
+if ( $all ){
+	$netstat_command=$netstat_command.' -a';
+}
+
+my $res=parse_netstat(output => join("", `$netstat_command`), tcp=>$tcp, udp=>$udp, unix=>0,  flavor=>$^O);
+
+print $pnc->colorize($res);
+
+# figure out the exit code to use
+if ( $pnc->error ){
+	exit $pnc->error;
+}else{
+	exit 0;
+}
+
+=head1 NAME
+
+cnetstat - a netstat like utility that supports color and searching
+
+=head1 SYNOPSIS
+
+cnetstat [B<-t>] [B<-u>] [B<--drp>] [B<-S> <sort>] [B<-s> <states>] [B<-c> <CIDRs>] [B<-p> <ports>] [B<-P> <protocols>] [<-a>] [B<-l>] [B<-i>]
+
+=head1 FLAGS
+
+=head2 -a
+
+Show all connections, including those in the LISTEN state.
+
+=head2 -c <CIDRs>
+
+A comma seperated list of CIDRs to search for.
+
+=head2 --drp
+
+Don't resolve port numbers to names.
+
+=head2 -i
+
+Invert the sort.
+
+=head2 -l
+
+Show connections in the LISTEN state. This is the equivalent of '-a -s listen'. If combined
+with -s, it will display LISTENing sockets and whatever is specified via -s.
+
+=head2 -p <ports>
+
+A comma seperated list of ports to search for.
+
+=head2 -P <protocols>
+
+A comma seperated list of protocols to saerch for.
+
+=head2 -s <states>
+
+A comma seperated list of states to search for.
+
+=head2 -S <sort>
+
+The sort method to use. This is one of the supported
+methods by L<Parse::Netstat::Sort>.
+
+    host_f     Host, Foreign (default)
+    host_l     Host, Local
+    port_f     Port, Foriegn
+    port_l     Port, Local
+    state      State
+    protocol   Protocol
+    q_r        Queue, Receive
+    q_s        Queue, Send
+    none       No sorting is done.
+
+The ones below are dual sort and take noticably longer than the ones above.
+
+    host_ff    Host, Foreign First
+    host_lf    Host, Local First
+    port_ff    Port, Foreign First
+    port_lf    Port, Local First
+    q_rf       Queue, Receive First
+    q_sf       Queue, Send First
+
+=head2 -t
+
+Don't fetch TCP info.
+
+=head2 -u
+
+Don't fetch UDP info.
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 CNETSTAT_invert
+
+This is either 0 or 1. If defined it will be used for XORing the -i flag.
+
+    export CNETSTAT_invert=1
+    # run cnetstat inverted
+    cnetstat
+    # run it non-inverted, the opposite of what the -i flag normally is
+    cnetstat -i
+
+=head2 CNETSTAT_sort
+
+Sets the default sort method. -S overrides this.
+
+=head1 EXAMPLES
+
+    cnestat -s established,time_wait
+
+Return a list of connection that are in the established or time_wait state.
+
+    cnestat -c ::/0
+
+Return a list of all IPv6 addresses.
+
+    cnestat -c ::1/128,127.0.0.1/32
+
+Return all connections to localhost.
+
+    cnestat -c 192.168.15.2/32 -l
+
+Display all connections listening explicitly on 192.168.15.2.
+
+    cnetstat -S host_f -i
+
+Sort the connections by the foreign host and invert the results.
+
+=cut

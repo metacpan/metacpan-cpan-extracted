@@ -31,7 +31,13 @@ $all_testruns => undef
                  </li>
           </ul>
 %     } else {
-          <h3>Use case details</h3>
+          <h3>Testrun details</h3>
+         <h4>Values</h4>
+         <fieldset>
+         <% $form|n %>
+         <p>(*) Required</p>
+         <p><a href="/tapper/testruns/create">Back</a></p>
+         </fieldset>
 %         if ($description_text) {
               <p>
               <h4>Description</h4>
@@ -41,12 +47,6 @@ $all_testruns => undef
               </pre>
               </p>
 %        }
-         <h4>Values</h4>
-         <fieldset>
-         <% $form|n %>
-         <p>(*) Required</p>
-         <p><a href="/tapper/testruns/create">Back</a></p>
-         </fieldset>
 %    }
 % } else {
     <h1>Error: You followed an incorrect deep link. Session data is missing</h1>

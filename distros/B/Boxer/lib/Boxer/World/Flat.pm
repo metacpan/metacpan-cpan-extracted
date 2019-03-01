@@ -13,22 +13,22 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 use autodie;
 
 use Moo;
-extends 'Boxer::World';
+use MooX::StrictConstructor;
 use Types::Standard qw(Maybe Bool Tuple);
 use Types::TypeTiny qw(StringLike ArrayLike);
-
-use namespace::autoclean 0.16;
+extends 'Boxer::World';
 
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 =head1 DESCRIPTION
 
@@ -101,6 +101,57 @@ has nonfree => (
 	isa      => Bool,
 	required => 1,
 );
+
+sub as_file
+{
+	my ( $self, $file, $oldstyle ) = @_;
+
+	my $pkgs       = join( ',',      sort @{ $self->pkgs } );
+	my $pkgs_avoid = join( ',',      sort @{ $self->pkgs_avoid } );
+	my $pkgs_auto  = join( ',',      sort @{ $self->pkgs_auto } );
+	my $tweaks     = join( ";\\\n ", @{ $self->tweaks } );
+
+	my $pkglist = join( ' ', sort @{ $self->pkgs } );
+	$pkglist .= " \\\n ";
+	$pkglist .= join( ' ', sort map { $_ . '-' } @{ $self->pkgs_avoid } );
+	my $pkgautolist = join( ' ', sort @{ $self->pkgs_auto } );
+
+	my $tweaks_perl = $tweaks;
+	$tweaks_perl =~ s,chroot\s+/target\s+,,g;
+	$tweaks_perl =~ s,/target/,/,g;
+
+	# TODO: maybe move below (or only $''{ part?) to reclass parser
+	$tweaks_perl =~ s/\\\K''(?=n)|\$\K''(?=\{)//g;
+
+	my %vars = (
+		node        => $self->node,
+		suite       => $self->epoch,
+		pkgs        => $pkgs,
+		pkgs_avoid  => $pkgs_avoid,
+		pkgs_auto   => $pkgs_auto,
+		pkgdesc     => $self->pkgdesc,
+		pkglist     => $pkglist,
+		tweakdesc   => $self->tweakdesc,
+		tweaks      => $tweaks,
+		tweaks_perl => $tweaks_perl,
+		tweaklist   => $tweaks,
+		pkgautolist => $pkgautolist,
+		nonfree     => $self->nonfree,
+	);
+
+	# TODO: Drop oldstyle templating format
+	# (oldstyle preseed templates expect perl tweaks in regular tweaks string)
+	if ($oldstyle) {
+		my %altvars = %vars;
+		$altvars{tweaklist} = $tweaks_perl;
+		$file->create( \%altvars );
+	}
+	else {
+		$file->create( \%vars );
+	}
+
+	1;
+}
 
 =head1 AUTHOR
 

@@ -15,6 +15,7 @@
 %       if ( @{$charts} > 0 ) {
 %           for my $or_chart ( @{$charts} ) {
 %               my $or_chart_version = $or_chart->chart_versions->first;
+%               my $urlhint = substr($or_chart_version->chart_name, 0, 10) . ".." . substr($or_chart_version->chart_name, -10);
                 <div class="chart_boxs" chart="<% $or_chart_version->chart_id() %>">
                     <div class="chart_headers">
                         <div class="text">
@@ -27,7 +28,7 @@
                             <img src="/tapper/static/images/delete.small.png" title="delete" class="imgdel" />
                         </div>
                     </div>
-                    <a href="/tapper/metareports/detail?chart_tag=<% $c->req->params->{chart_tag} || 0 %>&amp;chart_id=<% $or_chart_version->chart_id() %>">
+                    <a href="/tapper/metareports/detail?chart_tag=<% $c->req->params->{chart_tag} || 0 %>&amp;chart_id=<% $or_chart_version->chart_id() %>#<% $urlhint %>">
                     <div class="charts" id="mainchart_<% $or_chart_version->chart_id() %>">
 %                       my @a_template_value;
 %                       for my $or_chart_line ( $or_chart_version->chart_lines ) {

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.04
+    version 0.05
 
 SYNOPSIS
 
@@ -12,6 +12,7 @@ SYNOPSIS
         
         use Moo;
         use Types::Mojo qw(MojoFile MojoCollection);
+        use Types::Standard qw(Int);
         
         has file => ( is => 'rw', isa => MojoFile, coerce => 1 );
         has coll => ( is => 'rw', isa => MojoCollection, coerce => 1 );

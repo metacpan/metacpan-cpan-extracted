@@ -9,20 +9,19 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 
 use Path::Tiny;
 use Module::Runtime qw/use_module/;
 use Boxer::CLI -command;
 
-use namespace::autoclean 0.16;
-
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 use constant {
 	abstract   => q[compose system recipe from reclass node],
@@ -56,9 +55,9 @@ sub opt_spec
 		[ "classdir=s", "location of classes (XDG datadir + suite/classes)" ],
 		[ "datadir=s",  "location containing nodes and classes" ],
 		[ "skeldir=s",  "location of skeleton files (use builtin)" ],
-		[ "format=s", "serialize recipe(s) in this format (preseed script)" ],
-		[ "nonfree",  "enable use of contrib and non-free code" ],
-		[ "verbose|v", "verbose output" ],
+		[ "format=s",   "serialize into these formats (preseed script)" ],
+		[ "nonfree",    "enable use of contrib and non-free code" ],
+		[ "verbose|v",  "verbose output" ],
 	);
 }
 
@@ -77,6 +76,7 @@ sub execute
 		use_module('Boxer::Task::Serialize')->new(
 			world   => $world,
 			skeldir => $opt->{skeldir},
+			format  => $opt->{format} || 'preseed script',
 			nonfree => $opt->{nonfree},
 			node    => $node,
 		)->run;

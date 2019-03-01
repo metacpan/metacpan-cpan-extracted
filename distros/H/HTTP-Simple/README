@@ -1,0 +1,186 @@
+NAME
+
+    HTTP::Simple - Simple procedural interface to HTTP::Tiny
+
+SYNOPSIS
+
+      perl -MHTTP::Simple -e'getprint(shift)' 'https://example.com'
+    
+      use HTTP::Simple;
+    
+      my $content = get 'https://example.com';
+    
+      if (mirror('https://example.com', '/path/to/file.html') == 304) { ... }
+    
+      if (is_success(getprint 'https://example.com')) { ... }
+    
+      postform('https://example.com', {foo => ['bar', 'baz']});
+    
+      postjson('https://example.com', [{bar => 'baz'}]);
+    
+      postfile('https://example.com', '/path/to/file.png');
+
+DESCRIPTION
+
+    This module is a wrapper of HTTP::Tiny that provides simplified
+    functions for performing HTTP requests in a similar manner to
+    LWP::Simple, but with slightly more useful error handling. For full
+    control of the request process and response handling, use HTTP::Tiny
+    directly.
+
+    IO::Socket::SSL is required for HTTPS requests with HTTP::Tiny.
+
+    Request methods that return the body content of the response will
+    return a byte string suitable for directly printing, but that may need
+    to be decoded for text operations.
+
+    The HTTP::Tiny object used by these functions to make requests can be
+    accessed as $HTTP::Simple::UA (for example, to configure the timeout,
+    or replace it with a compatible object like HTTP::Tinyish).
+
+    The JSON encoder used by the JSON functions defaults to a JSON::PP
+    instance, and can be accessed as $HTTP::Simple::JSON.
+
+FUNCTIONS
+
+    All functions are exported by default. Functions can also be requested
+    individually or with the tags :request, :status, or :all.
+
+ get
+
+      my $contents = get($url);
+
+    Retrieves the document at the given URL with a GET request and returns
+    it as a byte string. Throws an exception on connection or HTTP errors.
+
+ getjson
+
+      my $data = getjson($url);
+
+    Retrieves the JSON document at the given URL with a GET request and
+    decodes it from JSON to a Perl structure. Throws an exception on
+    connection, HTTP, or JSON errors.
+
+ head
+
+      my $headers = head($url);
+
+    Retrieves the headers at the given URL with a HEAD request and returns
+    them as a hash reference. Header field names are normalized to lower
+    case, and values may be an array reference if the header is repeated.
+    Throws an exception on connection or HTTP errors.
+
+ getprint
+
+      my $status = getprint($url);
+
+    Retrieves the document at the given URL with a GET request and prints
+    it as it is received. Returns the HTTP status code. Throws an exception
+    on connection errors.
+
+ getstore
+
+      my $status = getstore($url, $path);
+
+    Retrieves the document at the given URL with a GET request and stores
+    it to the given file path. Returns the HTTP status code. Throws an
+    exception on connection or filesystem errors.
+
+ mirror
+
+      my $status = mirror($url, $path);
+
+    Retrieves the document at the given URL with a GET request and mirrors
+    it to the given file path, using the If-Modified-Since headers to
+    short-circuit if the file exists and is new enough, and the
+    Last-Modified header to set its modification time. Returns the HTTP
+    status code. Throws an exception on connection, HTTP, or filesystem
+    errors.
+
+ postform
+
+      my $contents = postform($url, $form);
+
+    Sends a POST request to the given URL with the given hash or array
+    reference of form data serialized to application/x-www-form-urlencoded.
+    Returns the response body as a byte string. Throws an exception on
+    connection or HTTP errors.
+
+ postjson
+
+      my $contents = postjson($url, $data);
+
+    Sends a POST request to the given URL with the given data structure
+    encoded to JSON. Returns the response body as a byte string. Throws an
+    exception on connection, HTTP, or JSON errors.
+
+ postfile
+
+      my $contents = postfile($url, $path);
+      my $contents = postfile($url, $path, $content_type);
+
+    Sends a POST request to the given URL, streaming the contents of the
+    given file. The content type is passed as application/octet-stream if
+    not specified. Returns the response body as a byte string. Throws an
+    exception on connection, HTTP, or filesystem errors.
+
+ is_info
+
+      my $bool = is_info($status);
+
+    Returns true if the status code indicates an informational response
+    (1xx).
+
+ is_success
+
+      my $bool = is_success($status);
+
+    Returns true if the status code indicates a successful response (2xx).
+
+ is_redirect
+
+      my $bool = is_redirect($status);
+
+    Returns true if the status code indicates a redirection response (3xx).
+
+ is_error
+
+      my $bool = is_error($status);
+
+    Returns true if the status code indicates an error response (4xx or
+    5xx).
+
+ is_client_error
+
+      my $bool = is_client_error($status);
+
+    Returns true if the status code indicates a client error response
+    (4xx).
+
+ is_server_error
+
+      my $bool = is_server_error($status);
+
+    Returns true if the status code indicates a server error response
+    (5xx).
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    LWP::Simple, HTTP::Tinyish, ojo
+

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2016, 2017 Kevin Ryde
+# Copyright 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -36,6 +36,10 @@ require Graph::Maker::BinaryBeanstalk;
 
 # A218616   trunk with reversed subsections
 # A213718 n occurs A213712(n) times.
+#
+# number of runs binary beanstalk A255327=size of subtree, A255056=trunk
+# parent = A236840(vertex)   n - number of runs in n
+
 
 #------------------------------------------------------------------------------
 # A213722  num non-trunk,non-leaf v in range 2^n <= v < 2^(n+1)

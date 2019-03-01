@@ -1,7 +1,7 @@
 package Starch::Plugin::Trace::Manager;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Moo::Role;
 use namespace::clean;

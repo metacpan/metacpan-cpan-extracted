@@ -21,6 +21,7 @@ t/05moomoose.t
 t/06roletiny.t
 t/07warnings.t
 t/08lazy.t
+t/09fieldhash.t
 t/lib/Local/Moo/Class.pm
 t/lib/Local/Moo/Role.pm
 t/lib/Local/Moose/Class.pm

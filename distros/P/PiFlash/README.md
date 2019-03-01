@@ -49,18 +49,18 @@ Some programs and libraries must be installed on the system for piflash to work 
 
 On RPM-based Linux systems (Red Hat, Fedora, CentOS) the following command, run as root, will install the dependencies.
 
-        dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO perl-Exception-Class perl-Try-Tiny gzip unzip xz e2fsprogs dosfstools
+        dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO perl-Exception-Class perl-Try-Tiny perl-Module-Pluggable perl-File-Path perl-YAML-LibYAML gzip unzip xz e2fsprogs dosfstools
 
 On Deb-based Linux systems (Debian, Ubuntu, Raspbian) the following command, run as root, will install the dependencies.
 
-        apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl libio-all-perl libexception-class-perl libtry-tiny-perl gzip xz-utils e2fsprogs dosfstools
+        apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl libio-all-perl libexception-class-perl libtry-tiny-perl libmodule-pluggable-perl  libyaml-libyaml-perl gzip xz-utils e2fsprogs dosfstools
 
 On source-based or other Linux distributions, make sure the following are installed:
 
 - programs:
 blockdev, dd, echo, gunzip, lsblk, mkdir, mkfs.vfat, mount, perl, sfdisk, sudo, sync, true, umount, unzip, xz
 - libraries:
-libmagic/file-libs, File::LibMagic (perl), IO (perl), Exception::Class (perl), Try::Tiny (perl)
+libmagic/file-libs, File::LibMagic (perl), IO (perl), Exception::Class (perl), Try::Tiny (perl), Module::Pluggable (perl), YAML::LibYAML (perl), File::Path (perl)
 
 ## Piflash script
 

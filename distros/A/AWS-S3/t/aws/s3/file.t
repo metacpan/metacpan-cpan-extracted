@@ -27,10 +27,13 @@ $SIG{__DIE__} = \&confess;
 use_ok('AWS::S3');
 
 note( "construction" );
+
+foreach my $leading_slashes ( 0,1 ) {
 my $s3 = AWS::S3->new(
     access_key_id     => $ENV{AWS_ACCESS_KEY_ID}     // 'foo',
     secret_access_key => $ENV{AWS_SECRET_ACCESS_KEY} // 'bar',
     endpoint          => $ENV{AWS_ENDPOINT}          // 's3.baz.com',
+	honor_leading_slashes => $leading_slashes,
 );
 
 use_ok('AWS::S3::File');
@@ -39,7 +42,7 @@ use_ok('AWS::S3::Request::SetFileContents');
 
 monkey_patch_module();
 
-my $path = 'path/to/';
+my $path = '/path/to/';
 my $key  = $ENV{AWS_TEST_KEY} // "my+image.jpg";
 
 isa_ok(
@@ -89,7 +92,9 @@ ok( $file->update( contents => \'new contents' ),'update with args' );
 
 is(
     $file->signed_url( 1406712744 ),
-    'http://maibucket.s3.baz.com/' . $path . uri_escape( $key ) . '?AWSAccessKeyId=foo&Expires=1406712744&Signature=%2BEfymm%2BhjUfRLdQ3bS%2FJWrg9dc0%3D',
+	$leading_slashes
+		? 'http://maibucket.s3.baz.com//path/to/' . uri_escape( $key ) . '?AWSAccessKeyId=foo&Expires=1406712744&Signature=UFQFjzGYbijgPryEInzjT8EdmDU%3D'
+		: 'http://maibucket.s3.baz.com/path/to/'. uri_escape( $key ) . '?AWSAccessKeyId=foo&Expires=1406712744&Signature=%2BEfymm%2BhjUfRLdQ3bS%2FJWrg9dc0%3D',
     'signed_url'
 );
 
@@ -100,6 +105,7 @@ $mocked_response->{_msg} = '';
 
 ok( $file->delete,'->delete' );
 ok( $file->_get_contents,'_get_contents' );
+}
 
 done_testing();
 

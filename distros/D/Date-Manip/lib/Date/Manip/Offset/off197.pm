@@ -1,14 +1,14 @@
 package #
 Date::Manip::Offset::off197;
-# Copyright (c) 2008-2018 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Fri Nov 30 14:30:25 EST 2018
-#    Data version: tzdata2018g
-#    Code version: tzcode2018g
+#    Generated on: Thu Feb 28 13:08:00 EST 2019
+#    Data version: tzdata2018i
+#    Code version: tzcode2018i
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.75';
+$VERSION='6.76';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,11 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+10:22:16';
+$Offset        = '+10:14:52';
 
 %Offset        = (
    0 => [
-      'pacific/bougainville',
+      'asia/srednekolymsk',
       ],
 );
 

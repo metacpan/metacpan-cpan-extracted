@@ -230,7 +230,7 @@ country:
       tt: Trinidad and Tobago
       tv: Tuvalu
       tw: Taiwan (Province of China)
-      tz: Tanzania, United Republic of
+      tz: Tanzania, the United Republic of
       ua: Ukraine
       ug: Uganda
       um: United States Minor Outlying Islands
@@ -909,9 +909,9 @@ country:
       tajikistan: 
         - tj
         - Tajikistan
-      tanzania, united republic of: 
+      tanzania, the united republic of: 
         - tz
-        - Tanzania, United Republic of
+        - Tanzania, the United Republic of
       thailand: 
         - th
         - Thailand
@@ -1230,7 +1230,7 @@ country:
       tur: Turkey
       tuv: Tuvalu
       twn: Taiwan (Province of China)
-      tza: Tanzania, United Republic of
+      tza: Tanzania, the United Republic of
       uga: Uganda
       ukr: Ukraine
       umi: United States Minor Outlying Islands
@@ -1908,9 +1908,9 @@ country:
       tajikistan: 
         - tjk
         - Tajikistan
-      tanzania, united republic of: 
+      tanzania, the united republic of: 
         - tza
-        - Tanzania, United Republic of
+        - Tanzania, the United Republic of
       thailand: 
         - tha
         - Thailand
@@ -2228,7 +2228,7 @@ country:
       tt: Trinidad and Tobago
       tv: Tuvalu
       tw: Taiwan (Province of China)
-      tz: Tanzania, United Republic of
+      tz: Tanzania, the United Republic of
       ua: Ukraine
       ug: Uganda
       um: United States Minor Outlying Islands
@@ -2907,9 +2907,9 @@ country:
       tajikistan: 
         - tj
         - Tajikistan
-      tanzania, united republic of: 
+      tanzania, the united republic of: 
         - tz
-        - Tanzania, United Republic of
+        - Tanzania, the United Republic of
       thailand: 
         - th
         - Thailand
@@ -3218,7 +3218,7 @@ country:
       SV: El Salvador
       SX: Sint Maarten
       SY: Syrian Arab Republic
-      SZ: SWAZILAND
+      SZ: Eswatini
       TC: Turks and Caicos Islands
       TD: Chad
       TF: French Southern Territories
@@ -3505,6 +3505,9 @@ country:
       estonia: 
         - EE
         - Estonia
+      eswatini: 
+        - SZ
+        - Eswatini
       ethiopia: 
         - ET
         - Ethiopia
@@ -3979,9 +3982,6 @@ country:
       svalbard: 
         - XR
         - Svalbard
-      swaziland: 
-        - SZ
-        - SWAZILAND
       sweden: 
         - SE
         - Sweden
@@ -4310,7 +4310,7 @@ country:
       SVK: Slovakia
       SVN: Slovenia
       SWE: Sweden
-      SWZ: SWAZILAND
+      SWZ: Eswatini
       SXM: Sint Maarten
       SYC: Seychelles
       SYR: Syrian Arab Republic
@@ -4604,6 +4604,9 @@ country:
       estonia: 
         - EST
         - Estonia
+      eswatini: 
+        - SWZ
+        - Eswatini
       ethiopia: 
         - ETH
         - Ethiopia
@@ -5078,9 +5081,6 @@ country:
       svalbard: 
         - XSV
         - Svalbard
-      swaziland: 
-        - SWZ
-        - SWAZILAND
       sweden: 
         - SWE
         - Sweden
@@ -5407,7 +5407,7 @@ country:
       729: Sudan
       732: Western Sahara
       740: Suriname
-      748: SWAZILAND
+      748: Eswatini
       752: Sweden
       756: Switzerland
       760: Syrian Arab Republic
@@ -5703,6 +5703,9 @@ country:
       estonia: 
         - 233
         - Estonia
+      eswatini: 
+        - 748
+        - Eswatini
       ethiopia: 
         - 231
         - Ethiopia
@@ -6177,9 +6180,6 @@ country:
       svalbard: 
         - 930
         - Svalbard
-      swaziland: 
-        - 748
-        - SWAZILAND
       sweden: 
         - 752
         - Sweden
@@ -6534,7 +6534,7 @@ country:
       831: Guernsey
       832: Jersey
       833: Isle of Man
-      834: Tanzania, United Republic of
+      834: Tanzania, the United Republic of
       840: United States of America
       850: Virgin Islands (U.S.)
       854: Burkina Faso
@@ -7203,9 +7203,9 @@ country:
       tajikistan: 
         - 762
         - Tajikistan
-      tanzania, united republic of: 
+      tanzania, the united republic of: 
         - 834
-        - Tanzania, United Republic of
+        - Tanzania, the United Republic of
       thailand: 
         - 764
         - Thailand
@@ -7439,7 +7439,7 @@ country:
       MDV: Maldives
       MEX: Mexico
       MHL: Marshall Islands
-      MKD: Macedonia, The former Yugoslav Republic of
+      MKD: North Macedonia
       MLI: Mali
       MLT: Malta
       MMR: Myanmar
@@ -7523,7 +7523,7 @@ country:
       TUN: Tunisia
       TUR: Turkey
       TUV: Tuvalu
-      TZA: Tanzania, United Republic of
+      TZA: United Republic of Tanzania
       UGA: Uganda
       UKR: Ukraine
       UMI: United States Minor Outlying Islands
@@ -7940,9 +7940,6 @@ country:
       macao: 
         - MAC
         - Macao
-      macedonia, the former yugoslav republic of: 
-        - MKD
-        - Macedonia, The former Yugoslav Republic of
       madagascar: 
         - MDG
         - Madagascar
@@ -8039,6 +8036,9 @@ country:
       norfolk island: 
         - NFK
         - Norfolk Island
+      north macedonia: 
+        - MKD
+        - North Macedonia
       northern mariana islands: 
         - MNP
         - Northern Mariana Islands
@@ -8198,9 +8198,6 @@ country:
       tajikistan: 
         - TJK
         - Tajikistan
-      tanzania, united republic of: 
-        - TZA
-        - Tanzania, United Republic of
       thailand: 
         - THA
         - Thailand
@@ -8246,6 +8243,9 @@ country:
       united kingdom of great britain and northern ireland: 
         - GBR
         - United Kingdom of Great Britain and Northern Ireland
+      united republic of tanzania: 
+        - TZA
+        - United Republic of Tanzania
       united states minor outlying islands: 
         - UMI
         - United States Minor Outlying Islands
@@ -8522,13 +8522,13 @@ country:
       798: Tuvalu
       800: Uganda
       804: Ukraine
-      807: Macedonia, The former Yugoslav Republic of
+      807: North Macedonia
       818: Egypt
       826: United Kingdom of Great Britain and Northern Ireland
       831: Guernsey
       832: Jersey
       833: Isle of Man
-      834: Tanzania, United Republic of
+      834: United Republic of Tanzania
       840: United States of America
       850: Virgin Islands (U.S.)
       854: Burkina Faso
@@ -8936,9 +8936,6 @@ country:
       macao: 
         - 446
         - Macao
-      macedonia, the former yugoslav republic of: 
-        - 807
-        - Macedonia, The former Yugoslav Republic of
       madagascar: 
         - 450
         - Madagascar
@@ -9035,6 +9032,9 @@ country:
       norfolk island: 
         - 574
         - Norfolk Island
+      north macedonia: 
+        - 807
+        - North Macedonia
       northern mariana islands: 
         - 580
         - Northern Mariana Islands
@@ -9197,9 +9197,6 @@ country:
       tajikistan: 
         - 762
         - Tajikistan
-      tanzania, united republic of: 
-        - 834
-        - Tanzania, United Republic of
       thailand: 
         - 764
         - Thailand
@@ -9245,6 +9242,9 @@ country:
       united kingdom of great britain and northern ireland: 
         - 826
         - United Kingdom of Great Britain and Northern Ireland
+      united republic of tanzania: 
+        - 834
+        - United Republic of Tanzania
       united states minor outlying islands: 
         - 581
         - United States Minor Outlying Islands

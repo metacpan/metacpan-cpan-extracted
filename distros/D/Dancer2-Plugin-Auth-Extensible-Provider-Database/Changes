@@ -1,5 +1,11 @@
 Revision history for Dancer2-Plugin-Auth-Extensible-Provider-Database
 
+0.630 Thu Feb 28 11:12:31 2019 CET
+
+    * Fix FOREIGN_KEY typo in POD (Jason Lewis).
+    * Fix influece typo in POD (Yanick Champoux).
+    * Add cookbook entry for disabled users. (GH#6, simbabque)
+
 0.620 Thu  3 Nov 17:22:41 CET 2016
 
     * Update to new requirements of plugin version 0.620

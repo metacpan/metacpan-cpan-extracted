@@ -1,4 +1,4 @@
-# AWS::Config::ConfigurationRecorder generated from spec 1.11.0
+# AWS::Config::ConfigurationRecorder generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::ConfigurationRecorder',
@@ -36,7 +36,7 @@ package Cfn::Resource::Properties::AWS::Config::ConfigurationRecorder::Recording
   
   has AllSupported => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has IncludeGlobalResourceTypes => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has ResourceTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ResourceTypes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::Config::ConfigurationRecorder {

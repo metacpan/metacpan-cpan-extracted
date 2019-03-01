@@ -30,7 +30,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Subclass-Of";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-007>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-008>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-subclass-of>;
@@ -222,6 +222,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.007.tar.gz>;
 	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Subclass-Of/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Subclass-Of-0.008"^^xsd:string;
+	dc:issued            "2019-02-28"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support fieldhash=>1 to allow attributes to be stored inside-out when subclassing non-Moose/Mouse/Moo classes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Subclass-Of-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -9,26 +9,26 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 
 use Path::Tiny;
 use Template::Tiny;
 use File::ShareDir qw(dist_dir);
 
 use Moo;
+use MooX::StrictConstructor;
 use Types::Standard qw(Maybe);
 use Types::TypeTiny qw(HashLike);
 use Types::Path::Tiny qw(Dir File Path);
 use Boxer::Types qw(SkelDir Basename);
 
-use namespace::autoclean 0.16;
-
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 # permit callers to sloppily pass undefined values
 sub BUILDARGS
@@ -111,15 +111,9 @@ has skeleton_suffix => (
 	default => '.in',
 );
 
-has vars => (
-	is       => 'ro',
-	isa      => HashLike,
-	required => 1,
-);
-
 sub create
 {
-	my $self = shift;
+	my ( $self, $vars ) = @_;
 
 	my $template = Template::Tiny->new(
 		TRIM => 1,
@@ -128,7 +122,7 @@ sub create
 	my $content = '';
 	$template->process(
 		\$self->skeleton_path->slurp,
-		$self->vars,
+		$vars,
 		\$content
 	);
 	$self->file_path->spew( $content . "\n" );

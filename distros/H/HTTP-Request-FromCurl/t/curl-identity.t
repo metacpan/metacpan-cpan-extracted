@@ -164,7 +164,7 @@ sub compiles_ok( $code, $name ) {
         diag $stderr;
         diag "Exit code: ", $exit;
         fail($name);
-    } elsif( $stderr !~ /^\Q$tempname\E syntax OK\s*$/) {
+    } elsif( $stderr !~ /(^|\n)\Q$tempname\E syntax OK\s*$/) {
         diag $stderr;
         diag $code;
         fail($name);
@@ -205,7 +205,7 @@ sub request_identical_ok {
         diag join " ", @$cmd;
         diag $res->{error};
         SKIP: {
-            skip "$name compiles ok", 1;
+            skip "$name compiles ok", 2;
         };
         return;
     };

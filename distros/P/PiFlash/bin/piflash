@@ -26,7 +26,7 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -110,11 +110,11 @@ Some programs and libraries must be installed on the system for piflash to work 
 
 On RPM-based Linux systems (Red Hat, Fedora, CentOS) the following command, run as root, will install the dependencies.
 
-	dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO perl-Exception-Class gzip unzip xz e2fsprogs dosfstools
+	dnf install coreutils util-linux sudo perl file-libs perl-File-LibMagic perl-IO perl-Exception-Class perl-Try-Tiny perl-Module-Pluggable perl-File-Path perl-YAML-LibYAML gzip unzip xz e2fsprogs dosfstools
 
 On Deb-based Linux systems (Debian, Ubuntu, Raspbian) the following command, run as root, will install the dependencies.
 
-	apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl libio-all-perl libexception-class-perl gzip xz-utils e2fsprogs dosfstools
+	apt-get install coreutils util-linux klibc-utils sudo perl-base libmagic1 libfile-libmagic-perl libio-all-perl libexception-class-perl libtry-tiny-perl libmodule-pluggable-perl  libyaml-libyaml-perl gzip xz-utils e2fsprogs dosfstools
 
 On source-based or other Linux distributions, make sure the following are installed:
 
@@ -124,7 +124,7 @@ On source-based or other Linux distributions, make sure the following are instal
 blockdev, dd, echo, gunzip, lsblk, mkdir, mkfs.vfat, mount, perl, sfdisk, sudo, sync, true, umount, unzip, xz
 
 =item libraries:
-libmagic/file-libs, File::LibMagic (perl), IO (perl), Exception::Class (perl)
+libmagic/file-libs, File::LibMagic (perl), IO (perl), Exception::Class (perl), Module::Pluggable (perl), YAML::LibYAML (perl), File::Path (perl)
 
 =back
 
@@ -162,8 +162,6 @@ install configure prerequisites (see below), then build it:
 Then install it:
 
     % make install
-
-On Windows platforms, you should use `dmake` or `nmake`, instead of `make`.
 
 If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:
@@ -210,7 +208,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

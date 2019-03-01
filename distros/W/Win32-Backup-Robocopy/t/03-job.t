@@ -52,7 +52,7 @@ SKIP: {
 
 
 # a correct invocation
-$bkp->job(name=>'test',src=>'x:/',cron=>'0 0 25 1 *');
+$bkp->job(name=>'test',src=>'X:/supposed/to/not/exist/for/testing',cron=>'0 0 25 1 *');
 
 
 # jobs queue has one element

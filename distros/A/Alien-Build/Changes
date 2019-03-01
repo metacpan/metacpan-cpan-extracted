@@ -1,5 +1,35 @@
 Revision history for Alien-Build
 
+1.60      2019-03-01 03:16:23 -0500
+  - Documentation improvemens.  (gh#50, gh#84).
+
+1.59_01   2019-02-27 21:40:24 -0500
+  - Fix test fail for download negotiation plugin introduced in 1.58_01
+    which was expressed on systems without curl installed.
+
+1.58_01   2019-02-27 12:50:20 -0500
+  - Prefer Fetch::CurlCommand over Fetch::HTTPTiny for https when:
+     * Net::SSLeay and IO::Socket::SSL are not installed
+     * AND curl is installed
+     * AND curl supports https
+    This makes AB more reliable on platforms like OS X when openssl
+    is broken without a third party package system like homebrew,
+    and on older Perls like 5.8.x where Net::SSLeay frequently does
+    not install or pass tests.
+    The existing behavior of prefer Fetch::HTTPTiny when:
+     * Net::SSLeay and IO::Socket::SSL are already installed
+     * OR the URL is http
+     * OR curl is not already installed
+    is still in effect. (gh#93, gh#94)
+
+1.57_01   2019-02-26 08:52:34 -0500
+  - Test unzip command before blindly using it (tests were already
+    being made for tarballs) (gh#90)
+
+1.56_01   2019-02-24 14:09:23 -0500
+  - Prefer Alien::unzip over Archive::Zip.  The latter turns out to be broken
+    on one platform or another for much of the time.  (gh#74, gh#89).
+
 1.55      2019-02-24 11:35:29 -0500
   - Production release identical to 1.54_01
 

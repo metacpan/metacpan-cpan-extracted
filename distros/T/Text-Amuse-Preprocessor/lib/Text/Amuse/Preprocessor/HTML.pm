@@ -14,7 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( html_to_muse html_file_to_muse );
 
-our $VERSION = '0.55';
+our $VERSION = '0.59';
 
 =encoding utf8
 
@@ -72,9 +72,7 @@ my %preserved = (
 		 "strike" => [["<del>"], ["</del>"]],
 		 "del" => [["<del>"], ["</del>"]],
 		 "p" => ["\n\n", "\n\n"],
-		 "br" => ["\n\n", "\n\n"], # if you're asking why, a
-                                           # lot of pages use the br
-                                           # as a <p>
+		 "br" => ["\n<br>", "\n"],
 		 "div" => ["\n\n", "\n\n"],
 		 "center" => ["\n\n<center>\n", "\n</center>\n\n"],
 		 "right"  => ["\n\n<right>\n", "\n</right>\n\n"],

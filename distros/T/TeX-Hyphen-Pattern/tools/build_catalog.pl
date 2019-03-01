@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-BEGIN { our $VERSION = '0.103'; }
+BEGIN { our $VERSION = 'v1.1.1'; }
 
 use Carp qw(croak);
 use Cwd qw(abs_path);
@@ -225,7 +225,7 @@ Roland van Ipenburg  C<< <ipenburg@xs4all.nl> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 by Roland van Ipenburg
+Copyright 2019 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.2 or,

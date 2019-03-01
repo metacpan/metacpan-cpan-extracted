@@ -36,7 +36,7 @@
 #include "spvm_case_info.h"
 #include "spvm_array_field_access.h"
 #include "spvm_string_buffer.h"
-
+#include "spvm_allow.h"
 
 
 
@@ -174,7 +174,35 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "CURRENT_PACKAGE",
   "FREE_TMP",
   "REFCNT",
+  "ALLOW",
 };
+
+int32_t SPVM_OP_is_allowed(SPVM_COMPILER* compiler, SPVM_OP* op_package_current, SPVM_OP* op_package_dist) {
+  
+  SPVM_LIST* op_allows = op_package_dist->uv.package->op_allows;
+  
+  const char* current_package_name = op_package_current->uv.package->name;
+  const char* dist_package_name = op_package_dist->uv.package->name;
+  
+  int32_t is_allowed = 0;
+  if (strcmp(current_package_name, dist_package_name) == 0) {
+    is_allowed = 1;
+  }
+  else {
+    for (int32_t i = 0; i < op_allows->length; i++) {
+      SPVM_OP* op_allow = SPVM_LIST_fetch(op_allows, i);
+      SPVM_ALLOW* allow = op_allow->uv.allow;
+      SPVM_OP* op_type = allow->op_type;
+      const char* allow_basic_type_name = op_type->uv.type->basic_type->name;
+      if (strcmp(current_package_name, allow_basic_type_name) == 0) {
+        is_allowed = 1;
+        break;
+      }
+    }
+  }
+  
+  return is_allowed;
+}
 
 SPVM_OP* SPVM_OP_new_op_assign_bool(SPVM_COMPILER* compiler, SPVM_OP* op_operand, const char* file, int32_t line) {
   SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_BOOL, file, line);
@@ -1573,7 +1601,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           category_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
-          package->flag |= SPVM_PACKAGE_C_FLAG_PRIVATE;
+          // Default is private
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PUBLIC:
@@ -1597,7 +1625,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     SPVM_OP* op_decls = op_block->first;
     SPVM_OP* op_decl = op_decls->first;
     while ((op_decl = SPVM_OP_sibling(compiler, op_decl))) {
-      // Use declarations
+      // use declarations
       if (op_decl->id == SPVM_OP_C_ID_USE) {
         SPVM_LIST_push(package->op_uses, op_decl);
         
@@ -1617,6 +1645,10 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
             }
           }
         }
+      }
+      // allow declarations
+      else if (op_decl->id == SPVM_OP_C_ID_ALLOW) {
+        SPVM_LIST_push(package->op_allows, op_decl);
       }
       // Package var declarations
       else if (op_decl->id == SPVM_OP_C_ID_PACKAGE_VAR) {
@@ -2018,6 +2050,34 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         if (strlen(sub_name) == 0 && sub->call_type_id != SPVM_SUB_C_CALL_TYPE_ID_METHOD) {
           SPVM_COMPILER_error(compiler, "Anon subroutine must be method at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
         }
+
+        // If package is interface, sub must not be native
+        if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE && (sub->flag & SPVM_SUB_C_FLAG_NATIVE)) {
+          SPVM_COMPILER_error(compiler, "Subroutine of interface can't have native descriptor at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
+        }
+
+        // If package is interface, sub must not be precompile
+        if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE && (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE)) {
+          SPVM_COMPILER_error(compiler, "Subroutine of interface can't have precompile descriptor at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
+        }
+
+        // If package is interface, sub must not be precompile
+        if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE && (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE)) {
+          SPVM_COMPILER_error(compiler, "Subroutine of interface can't have precompile descriptor at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
+        }
+
+        // If package is interface, sub must not be precompile
+        if (!sub->op_block) {
+          if (package->category == SPVM_PACKAGE_C_CATEGORY_INTERFACE) {
+            // OK
+          }
+          else if (sub->flag & SPVM_SUB_C_FLAG_NATIVE) {
+            // OK
+          }
+          else {
+            SPVM_COMPILER_error(compiler, "Subroutine must have implementation block at %s line %d\n", sub->op_sub->file, sub->op_sub->line);
+          }
+        }
         
         SPVM_SUB* found_sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
         
@@ -2091,6 +2151,15 @@ SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op
   return op_use;
 }
 
+SPVM_OP* SPVM_OP_build_allow(SPVM_COMPILER* compiler, SPVM_OP* op_allow, SPVM_OP* op_type) {
+  
+  SPVM_ALLOW* allow = SPVM_ALLOW_new(compiler);
+  allow->op_type = op_type;
+  op_allow->uv.allow = allow;
+  
+  return op_allow;
+}
+
 SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_package_var, SPVM_OP* op_name, SPVM_OP* op_descriptors, SPVM_OP* op_type) {
   
   SPVM_PACKAGE_VAR* package_var = SPVM_PACKAGE_VAR_new(compiler);
@@ -2123,7 +2192,7 @@ SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_package_var, SPV
       
       switch (descriptor->id) {
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
-          package_var->flag |= SPVM_PACKAGE_VAR_C_FLAG_PRIVATE;
+          // Default is private
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PUBLIC:
@@ -2184,7 +2253,7 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
       
       switch (descriptor->id) {
         case SPVM_DESCRIPTOR_C_ID_PRIVATE:
-          field->flag |= SPVM_FIELD_C_FLAG_PRIVATE;
+          // Default is private
           access_control_descriptors_count++;
           break;
         case SPVM_DESCRIPTOR_C_ID_PUBLIC:
@@ -2258,24 +2327,37 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   }
   
   // Descriptors
+  int32_t access_control_descriptors_count = 0;
   if (op_descriptors) {
     SPVM_OP* op_descriptor = op_descriptors->first;
     while ((op_descriptor = SPVM_OP_sibling(compiler, op_descriptor))) {
       SPVM_DESCRIPTOR* descriptor = op_descriptor->uv.descriptor;
       
-      if (descriptor->id == SPVM_DESCRIPTOR_C_ID_NATIVE) {
-        sub->flag |= SPVM_SUB_C_FLAG_NATIVE;
-      }
-      else if (descriptor->id == SPVM_DESCRIPTOR_C_ID_PRECOMPILE) {
-        sub->flag |= SPVM_SUB_C_FLAG_PRECOMPILE;
-      }
-      else {
-        SPVM_COMPILER_error(compiler, "invalid subroutine descriptor %s", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_descriptors->file, op_descriptors->line);
+      switch (descriptor->id) {
+        case SPVM_DESCRIPTOR_C_ID_PRIVATE:
+          sub->flag |= SPVM_SUB_C_FLAG_PRIVATE;
+          access_control_descriptors_count++;
+          break;
+        case SPVM_DESCRIPTOR_C_ID_PUBLIC:
+          // Default is public
+          access_control_descriptors_count++;
+          break;
+        case SPVM_DESCRIPTOR_C_ID_NATIVE:
+          sub->flag |= SPVM_SUB_C_FLAG_NATIVE;
+          break;
+        case SPVM_DESCRIPTOR_C_ID_PRECOMPILE:
+          sub->flag |= SPVM_SUB_C_FLAG_PRECOMPILE;
+          break;
+        default:
+          SPVM_COMPILER_error(compiler, "invalid subroutine descriptor %s", SPVM_DESCRIPTOR_C_ID_NAMES[descriptor->id], op_descriptors->file, op_descriptors->line);
       }
     }
-
+    
     if ((sub->flag & SPVM_SUB_C_FLAG_NATIVE) && (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE)) {
       SPVM_COMPILER_error(compiler, "native and compile descriptor can't be used together", op_descriptors->file, op_descriptors->line);
+    }
+    if (access_control_descriptors_count > 1) {
+      SPVM_COMPILER_error(compiler, "public, private can be specifed only one in sub declaration at %s line %d\n", op_sub->file, op_sub->line);
     }
   }
 

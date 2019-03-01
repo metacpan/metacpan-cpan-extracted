@@ -14076,6 +14076,7 @@ language:
       dnj: Dan
       dnk: Dengka
       dnn: Dzuungoo
+      dno: Ndrulo
       dnr: Danaru
       dnt: Mid Grand Valley Dani
       dnu: Danau
@@ -14175,6 +14176,7 @@ language:
       dwu: Dhuwal
       dww: Dawawa
       dwy: Dhuwaya
+      dwz: Dewas Rai
       dya: Dyan
       dyb: Dyaberdyaber
       dyd: Dyugun
@@ -14604,7 +14606,7 @@ language:
       gnh: Lere
       gni: Gooniyandi
       gnj: Ngen
-      gnk: //Gana
+      gnk: Gana
       gnl: Gangulu
       gnm: Ginuman
       gnn: Gumatj
@@ -14727,7 +14729,7 @@ language:
       gwf: Gowro
       gwg: Moo
       gwi: Gwich'in
-      gwj: /Gwi
+      gwj: Gwi
       gwm: Awngthim
       gwn: Gwandara
       gwr: Gwere
@@ -14796,7 +14798,7 @@ language:
       hei: Heiltsuk
       hem: Hemba
       her: Herero
-      hgm: Hai//om
+      hgm: Haiom
       hgw: Haigwai
       hhi: Hoia Hoia
       hhr: Kerak
@@ -14859,7 +14861,7 @@ language:
       hna: Mina (Cameroon)
       hnd: Southern Hindko
       hne: Chhattisgarhi
-      hnh: //Ani
+      hnh: Ani
       hni: Hani
       hnj: Hmong Njua
       hnn: Hanunoo
@@ -14912,7 +14914,7 @@ language:
       htu: Hitu
       htx: Middle Hittite
       hub: Huambisa
-      huc: =/Hua
+      huc: Hua
       hud: Huaulu
       hue: San Francisco Del Mar Huave
       huf: Humene
@@ -15762,7 +15764,7 @@ language:
       ktw: Kato
       ktx: Kaxarari
       kty: Kango (Bas-Uele District)
-      ktz: Ju/'hoan
+      ktz: Juhoan
       kua: Kuanyama
       kub: Kutep
       kuc: Kwinsu
@@ -17028,7 +17030,7 @@ language:
       nge: Ngemba
       ngf: Trans-New Guinea languages
       ngg: Ngbaka Manza
-      ngh: N/u
+      ngh: Nu
       ngi: Ngizim
       ngj: Ngie
       ngk: Dalabon
@@ -17166,7 +17168,7 @@ language:
       nmk: Namakura
       nml: Ndemli
       nmm: Manangba
-      nmn: "!Xoo"
+      nmn: Xoo
       nmo: Moyon Naga
       nmp: Nimanbur
       nmq: Nambya
@@ -19645,7 +19647,7 @@ language:
       xaj: Ararandewara
       xak: Maku
       xal: Kalmyk
-      xam: /Xam
+      xam: Xam
       xan: Xamtanga
       xao: Khao
       xap: Apalachee
@@ -19694,7 +19696,7 @@ language:
       xdy: Malayic Dayak
       xeb: Eblan
       xed: Hdi
-      xeg: //Xegwi
+      xeg: Xegwi
       xel: Kelo
       xem: Kembayan
       xep: Epi-Olmec
@@ -20362,33 +20364,12 @@ language:
       zza: Zaza
       zzj: Zuojiang Zhuang
     name: 
-      "!xoo": 
-        - nmn
-        - "!Xoo"
       "'are'are": 
         - alu
         - "'Are'are"
       "'auhelawa": 
         - kud
         - "'Auhelawa"
-      //ani: 
-        - hnh
-        - //Ani
-      //gana: 
-        - gnq
-        - //Gana
-      //xegwi: 
-        - xeg
-        - //Xegwi
-      /gwi: 
-        - gwj
-        - /Gwi
-      /xam: 
-        - xam
-        - /Xam
-      =/hua: 
-        - huc
-        - =/Hua
       a'ou: 
         - aou
         - A'ou
@@ -21262,6 +21243,9 @@ language:
       anguthimri: 
         - awg
         - Anguthimri
+      ani: 
+        - hnh
+        - Ani
       ani phowa: 
         - ypn
         - Ani Phowa
@@ -25093,6 +25077,9 @@ language:
       desiya: 
         - dso
         - Desiya
+      dewas rai: 
+        - dwz
+        - Dewas Rai
       dewoin: 
         - dee
         - Dewoin
@@ -27283,6 +27270,9 @@ language:
       gwere: 
         - gwr
         - Gwere
+      gwi: 
+        - gwj
+        - Gwi
       gwich'in: 
         - gwi
         - Gwich'in
@@ -27322,15 +27312,15 @@ language:
       hahon: 
         - hah
         - Hahon
-      hai//om: 
-        - hgm
-        - Hai//om
       haida: 
         - hai
         - Haida
       haigwai: 
         - hgw
         - Haigwai
+      haiom: 
+        - hgm
+        - Haiom
       haiphong sign language: 
         - haf
         - Haiphong Sign Language
@@ -27727,6 +27717,9 @@ language:
       hu: 
         - huo
         - Hu
+      hua: 
+        - huc
+        - Hua
       huachipaeri: 
         - hug
         - Huachipaeri
@@ -28651,9 +28644,6 @@ language:
       ju: 
         - juu
         - Ju
-      ju/'hoan: 
-        - ktz
-        - Ju/'hoan
       juang: 
         - jun
         - Juang
@@ -28690,6 +28680,9 @@ language:
       judeo-yemeni arabic: 
         - jye
         - Judeo-Yemeni Arabic
+      juhoan: 
+        - ktz
+        - Juhoan
       jukun takum: 
         - jbu
         - Jukun Takum
@@ -34483,9 +34476,6 @@ language:
       n'ko: 
         - nqo
         - N'Ko
-      n/u: 
-        - ngh
-        - N/u
       na: 
         - nbt
         - Na
@@ -34879,6 +34869,9 @@ language:
       ndra'ngith: 
         - dgt
         - Ndra'ngith
+      ndrulo: 
+        - dno
+        - Ndrulo
       nduga: 
         - ndx
         - Nduga
@@ -35851,6 +35844,9 @@ language:
       ntomba: 
         - nto
         - Ntomba
+      nu: 
+        - ngh
+        - Nu
       nubaca: 
         - baf
         - Nubaca
@@ -43396,6 +43392,9 @@ language:
       xakriaba: 
         - xkr
         - Xakriaba
+      xam: 
+        - xam
+        - Xam
       xamtanga: 
         - xan
         - Xamtanga
@@ -43411,6 +43410,9 @@ language:
       xavante: 
         - xav
         - Xavante
+      xegwi: 
+        - xeg
+        - Xegwi
       xerente: 
         - xer
         - Xerente
@@ -43450,6 +43452,9 @@ language:
       xokleng: 
         - xok
         - Xokleng
+      xoo: 
+        - nmn
+        - Xoo
       xukuru: 
         - xoo
         - Xukuru

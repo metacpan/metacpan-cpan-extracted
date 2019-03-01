@@ -23,7 +23,9 @@ accessible via the L<Text::Amuse> class.
 
 =head1 METHODS
 
-=head3 new(file => $filename)
+=over 4
+
+=item new(file => $filename)
 
 =cut
 
@@ -101,7 +103,7 @@ sub _debug {
 }
 
 
-=head3 filename
+=item filename
 
 Return the filename of the processed file
 
@@ -112,7 +114,7 @@ sub filename {
     return $self->{filename}
 }
 
-=head3 attachments
+=item attachments
 
 Return the list of the filenames of the attached files, as linked.
 With an optional argument, store that file in the list.
@@ -134,11 +136,11 @@ sub attachments {
     }
 }
 
-=head3 bidi_document
+=item bidi_document
 
 Return true if the document uses a bidirectionl marker.
 
-=head3 set_bidi_document
+=item set_bidi_document
 
 Internal, set the bidi flag on.
 
@@ -153,13 +155,13 @@ sub set_bidi_document {
 }
 
 
-=head3 language_code
+=item language_code
 
 The language code of the document. This method will looks into the
 header of the document, searching for the keys C<lang> or C<language>,
 defaulting to C<en>.
 
-=head3 language
+=item language
 
 Same as above, but returns the human readable version, notably used by
 Babel, Polyglossia, etc.
@@ -241,7 +243,7 @@ sub language {
     return $self->{_doc_language};
 }
 
-=head3 parse_directives
+=item parse_directives
 
 Return an hashref with the directives found in the document.
 
@@ -340,7 +342,7 @@ sub _split_body_and_directives {
     $self->{directives_array} = $dir_array;
 }
 
-=head3 raw_header
+=item raw_header
 
 Accessor to the raw header of the muse file. The header is returned as
 hash, with key/value pairs. Please note: NOT an hashref.
@@ -355,12 +357,12 @@ sub raw_header {
     return %{$self->{raw_header}}
 }
 
-=head3 raw_body
+=item raw_body
 
 Accessor to the raw body of the muse file. The body is returned as a
 list of lines.
 
-=head3 directives_array
+=item directives_array
 
 This is very similar to raw_header, but store them in an array, so the
 header can be rewritten.
@@ -577,7 +579,7 @@ sub _parse_body {
     return \@parsed;
 }
 
-=head2 elements
+=item elements
 
 Return the list of the elements which compose the body, once they have
 properly parsed and packed. Footnotes are removed. (To get the
@@ -593,7 +595,7 @@ sub elements {
     return @{$self->{_parsed_document}}
 }
 
-=head3 get_footnote
+=item get_footnote
 
 Accessor to the internal footnotes hash. You can access the footnote
 with a numerical argument or even with a string like [123]
@@ -1218,5 +1220,8 @@ sub _list_element_is_a_progression {
     }
 }
 
+=back
+
+=cut
 
 1;

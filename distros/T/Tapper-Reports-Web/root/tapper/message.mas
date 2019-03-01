@@ -1,0 +1,8 @@
+% if (my $msg = $c->flash->{msg}) {
+<strong><% $msg |n %></strong>
+% }
+% if (my $error_msg = $c->flash->{error_msg}) {
+<pre>
+  <strong>Error:</strong> <% $error_msg %>
+</pre>
+% }

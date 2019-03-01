@@ -62,8 +62,17 @@ has '_uri' => (
 
 		# note we add some extra exceptions to uri_escape to prevent
 		# encoding of things like "/", ":", "="
-        $uri->path( uri_escape( $self->key,"^A-Za-z0-9\-\._~\/:=" ) )
-          if $m->has_attribute('key');
+        if ( $m->has_attribute('key') ) {
+            my $escaped_path = uri_escape( $self->key,"^A-Za-z0-9\-\._~\/:=" );
+
+            # if we have a leading slash in the key name we need to add *another*
+            # slash in the call to ->path to ensure it is retained
+            if ( $escaped_path =~ m!^/! && $self->s3->honor_leading_slashes ) {
+                $uri->path( '/'.$escaped_path )
+            } else {
+                $uri->path( $escaped_path )
+            }
+        }
 
         $uri->query_keywords( $self->_subresource )
           if $m->has_attribute('_subresource');

@@ -4,7 +4,6 @@ Makefile$
 \.bak$
 Build
 Build.bat
-META.*
 MYMETA.*
 .build/
 _build/

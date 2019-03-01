@@ -3,7 +3,7 @@ package Data::Hopen::Scope;
 use Data::Hopen::Base;
 use Exporter 'import';
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000012';
 
 # Class definition
 use Class::Tiny {
@@ -24,10 +24,10 @@ sub FIRST_ONLY { $_first_only }
 use constant _LOCAL => 'local';
 
 # What we use
-use Data::Hopen qw(getparameters);
 use Config;
-use POSIX ();
+use Data::Hopen qw(getparameters);
 use Data::Hopen::Util::Data qw(clone forward_opts);
+use POSIX ();
 use Set::Scalar;
 use Sub::ScopeFinalizer qw(scope_finalizer);
 
@@ -143,14 +143,14 @@ See also L</add>, below, which is part of the public API.
 
 # Handle $levels and invoke a function on the outer scope if appropriate.
 # Usage:
-#   $self->_invoke(coderef, $levels, [other args to be passed, starting with
-#                               invocant, if any]
+#   $self->_invoke('method_name', $levels, [other args to be passed, starting
+#                                           with invocant, if any]
 # A new levels value will be added to the end of the args as -levels=>$val.
 # Returns undef if there's no more traversing to be done.
 
 sub _invoke {
     my $self = shift or croak 'Need an instance';
-    my $coderef = shift or croak 'Need a coderef';
+    my $method_name = shift or croak 'Need a method name';
     my $levels = shift;
 
     # Handle 'local'-scoped searches by terminating when $self->local is set.
@@ -166,7 +166,8 @@ sub _invoke {
 
         unshift @_, $self->outer;
         push @_, -levels => $newlevels;
-        goto &$coderef;
+        my $coderef = $self->outer->can($method_name);
+        return $coderef->(@_) if $coderef;
     }
     return undef;
 } #_invoke()
@@ -191,11 +192,10 @@ sub find {
         # Therefore, '0' is not a valid name
     my $levels = $args{levels};
 
-    $DB::single=1;
     my $here = $self->_find_here($args{name}, $args{set});
     return $here if defined $here;
 
-    return $self->_invoke(\&find, $args{levels},
+    return $self->_invoke('find', $args{levels},
         forward_opts(\%args, {'-'=>1}, qw(name set))
     );
 } #find()
@@ -230,7 +230,7 @@ sub _fill_names {
 
     $self->_names_here($args{retval});    # Insert this scope's names
 
-    return $self->_invoke(\&_fill_names, $args{levels}, -retval=>$args{retval});
+    return $self->_invoke('_fill_names', $args{levels}, -retval=>$args{retval});
 } #_fill_names()
 
 =head2 as_hashref
@@ -259,20 +259,23 @@ sub as_hashref {
 } #as_hashref()
 
 # Implementation of as_hashref.  Mutates the provided $hrRetval.
-# TODO move this to subclasses.
 sub _fill_hashref {
     my ($self, %args) = getparameters('self', [qw(retval levels deep)], @_);
     my $hrRetval = $args{retval};
 
     # Innermost wins, so copy ours first.
-    foreach my $k (keys %{$self->_content}) {
+    my $names = Set::Scalar->new;
+    $self->_names_here($names);
+
+    foreach my $k (@$names) {
         unless(exists($hrRetval->{$k})) {   # An inner scope might have set it
+            my $val = $self->find($k, -levels => 0);
             $hrRetval->{$k} =
-                ($args{deep} ? clone($self->_content->{$k}) : $self->_content->{$k});
+                ($args{deep} ? clone($val) : $val);
         }
     }
 
-    return $self->_invoke(\&_fill_hashref, $args{levels},
+    return $self->_invoke('_fill_hashref', $args{levels},
         forward_opts(\%args, {'-'=>1}, qw(retval deep)));
 } #_fill_hashref()
 

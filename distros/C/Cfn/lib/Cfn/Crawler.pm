@@ -7,7 +7,19 @@ package Cfn::Crawler::Path;
 package Cfn::Crawler;
   use Moose;
 
+  has resolve_dynamicvalues => (is => 'ro', isa => 'Bool', default => 0);
+
   has cfn => (is => 'ro', isa => 'Cfn', required => 1);
+
+  has _resolved_cfn => (is => 'ro', isa => 'Cfn', lazy => 1, default => sub {
+    my $self = shift;
+    if ($self->resolve_dynamicvalues) {
+      return $self->cfn->resolve_dynamicvalues;
+    } else {
+      return $self->cfn;
+    }
+  });
+
   has criteria => (is => 'ro', isa => 'CodeRef', required => 1);
 
   has _all => (
@@ -65,9 +77,9 @@ package Cfn::Crawler;
     my $self = shift;
     my @results;
 
-    foreach my $c_name (sort $self->cfn->ConditionList) {
+    foreach my $c_name (sort $self->_resolved_cfn->ConditionList) {
       my $path = "Conditions.$c_name";
-      my $condition = $self->cfn->Condition($c_name);
+      my $condition = $self->_resolved_cfn->Condition($c_name);
 
       push @results, $self->_match($path, $condition);
 
@@ -85,9 +97,9 @@ package Cfn::Crawler;
     my $self = shift;
     my @results;
 
-    foreach my $md_name (sort $self->cfn->MetadataList) {
+    foreach my $md_name (sort $self->_resolved_cfn->MetadataList) {
       my $path = "Metadata.$md_name";
-      my $metadata = $self->cfn->MetadataItem($md_name);
+      my $metadata = $self->_resolved_cfn->MetadataItem($md_name);
 
       push @results, $self->_match($path, $metadata);
     }
@@ -99,9 +111,9 @@ package Cfn::Crawler;
     my $self = shift;
     my @results;
 
-    foreach my $m_name (sort $self->cfn->MappingList) {
+    foreach my $m_name (sort $self->_resolved_cfn->MappingList) {
       my $path = "Mappings.$m_name";
-      my $mapping = $self->cfn->Mapping($m_name);
+      my $mapping = $self->_resolved_cfn->Mapping($m_name);
 
       push @results, $self->_match($path, $mapping);
     }
@@ -113,9 +125,9 @@ package Cfn::Crawler;
     my $self = shift;
     my @results;
 
-    foreach my $p_name (sort $self->cfn->ParameterList) {
+    foreach my $p_name (sort $self->_resolved_cfn->ParameterList) {
       my $path = "Parameters.$p_name";
-      my $parameter = $self->cfn->Parameter($p_name);
+      my $parameter = $self->_resolved_cfn->Parameter($p_name);
 
       push @results, $self->_match($path, $parameter);
     }
@@ -127,9 +139,9 @@ package Cfn::Crawler;
     my $self = shift;
     my @results;
 
-    foreach my $o_name (sort $self->cfn->OutputList) {
+    foreach my $o_name (sort $self->_resolved_cfn->OutputList) {
       my $path = "Outputs.$o_name";
-      my $output = $self->cfn->Output($o_name);
+      my $output = $self->_resolved_cfn->Output($o_name);
 
       push @results, $self->_match($path, $output);
 
@@ -143,9 +155,9 @@ package Cfn::Crawler;
     my $self = shift;
     my @results;
 
-    foreach my $r_name (sort $self->cfn->ResourceList) {
+    foreach my $r_name (sort $self->_resolved_cfn->ResourceList) {
       my $path = "Resources.$r_name";
-      my $resource = $self->cfn->Resource($r_name);
+      my $resource = $self->_resolved_cfn->Resource($r_name);
 
       push @results, $self->_match($path, $resource);
 
@@ -198,7 +210,7 @@ package Cfn::Crawler;
         my $prop_value = $value->$prop_name;
         push @results, $self->_crawl_values("$path\.$prop_name", $prop_value);
       }
-    } elsif ($value->isa('CCfnX::DynamicValue')) {
+    } elsif ($value->isa('Cfn::DynamicValue')) {
       # A DynamicValue is not traversable
     } else {
       die "Unknown $value at $path";

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -33,9 +33,6 @@ use Graph::Maker::QuartetTree;
 
 use lib 'devel/lib';
 use MyGraphs ();
-
-# uncomment this to run the ### lines
-# use Smart::Comments;
 
 plan tests => 1;
 

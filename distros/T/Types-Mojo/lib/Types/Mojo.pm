@@ -14,15 +14,13 @@ use Type::Library
 use Type::Utils -all;
 use Types::Standard -types;
 
+use Carp;
 use Mojo::File;
 use Mojo::Collection;
 use Mojo::URL;
 use Scalar::Util qw(blessed);
-use List::Util qw(first);
 
-Type::Utils::extends(qw/Types::Standard/);
-
-our $VERSION = 0.04;
+our $VERSION = '0.05';
 
 my $meta = __PACKAGE__->meta;
 
@@ -32,9 +30,11 @@ $meta->add_type(
     constraint_generator => sub {
         return $meta->get_type('MojoCollection') if !@_;
 
-        my $type  = $_[0];
-        my $check = $meta->get_type( $_[0] );
-        
+        my $check = $_[0] // '';
+
+        croak "Parameter to MojoCollection[`a] expected to be a type constraint; got $check"
+            if !blessed $check || !$check->isa('Type::Tiny');
+
         return sub {
             return if !blessed $_ and $_->isa('Mojo::Collection');
 
@@ -133,7 +133,7 @@ Types::Mojo - Types related to Mojo
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -141,6 +141,7 @@ version 0.04
     
     use Moo;
     use Types::Mojo qw(MojoFile MojoCollection);
+    use Types::Standard qw(Int);
     
     has file => ( is => 'rw', isa => MojoFile, coerce => 1 );
     has coll => ( is => 'rw', isa => MojoCollection, coerce => 1 );

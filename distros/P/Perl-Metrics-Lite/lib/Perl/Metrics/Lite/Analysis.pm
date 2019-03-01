@@ -5,7 +5,7 @@ use warnings;
 use Carp qw(confess);
 use Perl::Metrics::Lite::Analysis::Util;
 
-our $VERSION = '0.05';
+our $VERSION = '0.092';
 
 my %_ANALYSIS_DATA = ();
 my %_FILES         = ();
@@ -119,7 +119,7 @@ object.
 
 =head1 VERSION
 
-This is VERSION 0.01
+This is VERSION 0.092
 
 =head1 DESCRIPTION
 

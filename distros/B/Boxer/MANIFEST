@@ -205,6 +205,7 @@ lib/Boxer/CLI.pm
 lib/Boxer/CLI/Command.pm
 lib/Boxer/CLI/Command/About.pm
 lib/Boxer/CLI/Command/Aliases.pm
+lib/Boxer/CLI/Command/Bootstrap.pm
 lib/Boxer/CLI/Command/Commands.pm
 lib/Boxer/CLI/Command/Compose.pm
 lib/Boxer/File/WithSkeleton.pm
@@ -212,6 +213,7 @@ lib/Boxer/Part.pm
 lib/Boxer/Part/Reclass.pm
 lib/Boxer/Role/Interact.pm
 lib/Boxer/Task.pm
+lib/Boxer/Task/Bootstrap.pm
 lib/Boxer/Task/Classify.pm
 lib/Boxer/Task/Serialize.pm
 lib/Boxer/Types.pm
@@ -223,7 +225,11 @@ share/skel/script.sh.in
 t/00_compile.t
 t/00_compile_scripts.t
 t/01_app_help.t
+t/bootstrap.t
+t/classify.t
+t/compose.t
 t/fixme.t
 t/minimumversion.t
+t/namespaces_clean.t
 t/pod.t
-t/world.t
+t/serialize.t

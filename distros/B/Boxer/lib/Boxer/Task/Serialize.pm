@@ -9,6 +9,7 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
+use namespace::autoclean 0.16;
 use autodie;
 
 use Path::Tiny;
@@ -16,20 +17,19 @@ use File::ShareDir qw(dist_dir);
 use Boxer::File::WithSkeleton;
 
 use Moo;
+use MooX::StrictConstructor;
 use Types::Standard qw( Bool Maybe Str Undef InstanceOf );
 use Types::Path::Tiny qw( Dir File Path );
-use Boxer::Types qw( SkelDir );
+use Boxer::Types qw( SkelDir SerializationList );
 extends 'Boxer::Task';
-
-use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 has world => (
 	is       => 'ro',
@@ -79,6 +79,13 @@ has node => (
 	required => 1,
 );
 
+has format => (
+	is       => 'ro',
+	isa      => SerializationList,
+	coerce   => 1,
+	required => 1,
+);
+
 has nonfree => (
 	is       => 'ro',
 	isa      => Bool,
@@ -92,58 +99,29 @@ sub run
 
 	my $world = $self->world->flatten( $self->node, $self->nonfree, );
 
-	my $pkgs       = join( ',',      sort @{ $world->pkgs } );
-	my $pkgs_avoid = join( ',',      sort @{ $world->pkgs_avoid } );
-	my $pkgs_auto  = join( ',',      sort @{ $world->pkgs_auto } );
-	my $tweaks     = join( ";\\\n ", @{ $world->tweaks } );
+	if ( grep( /^preseed$/, @{ $self->format } ) ) {
+		my $file = Boxer::File::WithSkeleton->new(
+			basename      => 'preseed.cfg',
+			skeleton_dir  => $self->skeldir,
+			skeleton_path => $self->infile,
+			file_dir      => $self->outdir,
+			file_path     => $self->outfile,
+		);
+		$world->as_file($file);
+	}
 
-	my $pkglist = join( ' ', sort @{ $world->pkgs } );
-	$pkglist .= " \\\n ";
-	$pkglist .= join( ' ', sort map { $_ . '-' } @{ $world->pkgs_avoid } );
-	my $pkgautolist = join( ' ', sort @{ $world->pkgs_auto } );
+	if ( grep( /^script$/, @{ $self->format } ) ) {
+		my $file = Boxer::File::WithSkeleton->new(
+			basename      => 'script.sh',
+			skeleton_dir  => $self->skeldir,
+			skeleton_path => $self->altinfile,
+			file_dir      => $self->outdir,
+			file_path     => $self->altoutfile,
+		);
+		$world->as_file( $file, 1 );
+	}
 
-	my $tweaks_perl = $tweaks;
-	$tweaks_perl =~ s,chroot\s+/target\s+,,g;
-	$tweaks_perl =~ s,/target/,/,g;
-
-	# TODO: maybe move below (or only $''{ part?) to reclass parser
-	$tweaks_perl =~ s/\\\K''(?=n)|\$\K''(?=\{)//g;
-
-	my %vars = (
-		node        => $self->node,
-		suite       => $world->epoch,
-		pkgs        => $pkgs,
-		pkgs_avoid  => $pkgs_avoid,
-		pkgs_auto   => $pkgs_auto,
-		pkgdesc     => $world->pkgdesc,
-		pkglist     => $pkglist,
-		tweakdesc   => $world->tweakdesc,
-		tweaks      => $tweaks,
-		tweaks_perl => $tweaks_perl,
-		tweaklist   => $tweaks,
-		pkgautolist => $pkgautolist,
-		nonfree     => $self->nonfree,
-	);
-	my %altvars = %vars;
-	$altvars{tweaklist} = $tweaks_perl;
-
-	Boxer::File::WithSkeleton->new(
-		basename      => 'preseed.cfg',
-		skeleton_dir  => $self->skeldir,
-		skeleton_path => $self->infile,
-		file_dir      => $self->outdir,
-		file_path     => $self->outfile,
-		vars          => \%vars,
-	)->create;
-
-	Boxer::File::WithSkeleton->new(
-		basename      => 'script.sh',
-		skeleton_dir  => $self->skeldir,
-		skeleton_path => $self->altinfile,
-		file_dir      => $self->outdir,
-		file_path     => $self->altoutfile,
-		vars          => \%altvars,
-	)->create;
+	1;
 }
 
 =head1 AUTHOR

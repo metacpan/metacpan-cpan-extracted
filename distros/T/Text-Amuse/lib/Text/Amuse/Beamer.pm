@@ -18,15 +18,23 @@ beamer documentclass body, wrapping the text into frames.
 The module is used internally by L<Text::Amuse>, so everything here is
 pretty much internal only (and underdocumented).
 
+=head1 CONSTRUCTORS
+
+=over 4
+
+=item new(latex => \@latex_chunks)
+
+=back
+
 =head1 METHODS
 
-=head2 new(latex => \@latex_chunks)
+=over 4
 
-=head2 latex
+=item latex
 
 Accessor to the latex arrayref passed at the constructor.
 
-=head2 process
+=item process
 
 Return the beamer body as a string.
 
@@ -112,5 +120,8 @@ sub _render {
     }
 }
 
+=back
+
+=cut
 
 1;

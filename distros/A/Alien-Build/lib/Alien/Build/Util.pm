@@ -7,10 +7,10 @@ use Path::Tiny qw( path );
 use Config;
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.60'; # VERSION
 
 
-our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config );
+our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config _ssl_reqs _has_ssl );
 
 # usage: _mirror $source_directory, $dest_direction, \%options
 #
@@ -28,7 +28,7 @@ sub _mirror
   require Alien::Build;
   require File::Find;
   require File::Copy;
-  
+
   File::Find::find({
     wanted => sub {
       next unless -e $File::Find::name;
@@ -84,7 +84,7 @@ sub _mirror
     },
     no_chdir => 1,
   }, "$src_root");
-  
+
   ();
 }
 
@@ -114,6 +114,26 @@ sub _perl_config
   $Config{$key};
 }
 
+sub _ssl_reqs
+{
+  return {
+    'Net::SSLeay' => '1.49',
+    'IO::Socket::SSL' => '1.56',
+  };
+}
+
+sub _has_ssl
+{
+  my %reqs = %{ _ssl_reqs() };
+  eval {
+    require Net::SSLeay;
+    die "need Net::SSLeay $reqs{'Net::SSLeay'}" unless Net::SSLeay->VERSION($reqs{'Net::SSLeay'});
+    require IO::Socket::SSL;
+    die "need IO::Socket::SSL $reqs{'IO::Socket::SSL'}" unless IO::Socket::SSL->VERSION($reqs{'IO::Socket::SSL'});
+  };
+  $@ eq '';
+}
+
 1;
 
 __END__
@@ -128,7 +148,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 1.55
+version 1.60
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.024;
 
 use ExtUtils::MakeMaker;
 
@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
     "bin/liquid_tidy"
   ],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Template::LiquidX::Tidy",
   "PREREQ_PM" => {
     "Exporter" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Output" => 0,
     "ok" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

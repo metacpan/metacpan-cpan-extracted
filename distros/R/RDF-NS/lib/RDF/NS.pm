@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '20181102';
+our $VERSION = '20190227';
 
 use Scalar::Util qw(blessed reftype);
 use File::ShareDir;
@@ -16,18 +16,18 @@ our $FORMATS = qr/ttl|n(otation)?3|sparql|xmlns|txt|beacon|json/;
 our $DATE_REGEXP = qr/^([0-9]{4})-?([0-9][0-9])-?([0-9][0-9])$/;
 
 sub new {
-    my $class = ref($_[0]) ? ref(shift) : shift;
-    my $from  = @_ % 2 ? shift : 1;
+    my $class = ref( $_[0] ) ? ref(shift) : shift;
+    my $from  = @_ % 2       ? shift      : 1;
     my %options = @_;
-    my $at   = $options{at} || 'any';
-    my $warn = $options{'warn'};
+    my $at      = $options{at} || 'any';
+    my $warn    = $options{'warn'};
     $from = $options{from} if exists $options{from};
     $from = 'any' if !$from or $from eq 1;
 
-    if ((ref($from) || '') eq 'HASH') {
+    if ( ( ref($from) || '' ) eq 'HASH' ) {
         my $self = bless $from, $class;
-        foreach my $prefix (keys %$self) {
-            unless( $self->SET( $prefix => $self->{$prefix}, $warn ) ) {
+        foreach my $prefix ( keys %$self ) {
+            unless ( $self->SET( $prefix => $self->{$prefix}, $warn ) ) {
                 delete $self->{$prefix};
             }
         }
@@ -37,19 +37,20 @@ sub new {
     if ( $from =~ $DATE_REGEXP ) {
         $at   = "$1$2$3";
         $from = 'any';
-    } elsif( $at =~ $DATE_REGEXP ) {
-        $at   = "$1$2$3";
-    } elsif ( $at !~ 'any' ) {
-        croak "RDF::NS expects 'any', '1' or a date as YYYY-MM-DD"; 
+    }
+    elsif ( $at =~ $DATE_REGEXP ) {
+        $at = "$1$2$3";
+    }
+    elsif ( $at !~ 'any' ) {
+        croak "RDF::NS expects 'any', '1' or a date as YYYY-MM-DD";
     }
 
-    my $self = bless { }, $class;
+    my $self = bless {}, $class;
     my $fh = $self->DATA($from);
     foreach (<$fh>) {
         chomp;
         next if /^#/;
-        my ($prefix, $namespace, $date) = split "\t", $_;
-		  next if ($namespace =~ m|^https?://example\.\w+?/|);
+        my ( $prefix, $namespace, $date ) = split "\t", $_;
         last if $date and $at ne 'any' and $date > $at;
 
         $self->SET( $prefix => $namespace, $warn );
@@ -59,29 +60,32 @@ sub new {
     $self;
 }
 
-sub DATA { # TODO: document
-    my ($self, $from) = @_;
-    $from = File::ShareDir::dist_file('RDF-NS', "prefix.cc" )
-        if ($from // 'any') eq 'any';
+sub DATA {    # TODO: document
+    my ( $self, $from ) = @_;
+    $from = File::ShareDir::dist_file( 'RDF-NS', "prefix.cc" )
+      if ( $from // 'any' ) eq 'any';
     croak "prefix file or date not found: $from"
-        unless -f $from;
-    open (my $fh, '<', $from) or croak "failed to open $from";
+      unless -f $from;
+    open( my $fh, '<', $from ) or croak "failed to open $from";
     $fh;
 }
 
 sub SET {
-    my ($self, $prefix, $namespace, $warn) = @_;
+    my ( $self, $prefix, $namespace, $warn ) = @_;
 
     if ( $prefix =~ /^(isa|can|new|uri)$/ ) {
         carp "Cannot support prefix '$prefix'" if $warn;
-    } elsif ( $prefix =~ /^[a-z][a-z0-9]*$/ ) {
+    }
+    elsif ( $prefix =~ /^[a-z][a-z0-9]*$/ ) {
         if ( $namespace =~ /^[a-z][a-z0-9]*:[^"<>]*$/ ) {
             $self->{$prefix} = $namespace;
             return 1;
-        } elsif( $warn ) {
+        }
+        elsif ($warn) {
             carp "Skipping invalid $prefix namespace $namespace";
         }
-    } elsif ( $warn ) {
+    }
+    elsif ($warn) {
         carp "Skipping unusual prefix '$prefix'";
     }
 
@@ -91,23 +95,24 @@ sub SET {
 *LOAD = *new;
 
 sub COUNT {
-    scalar keys %{$_[0]};
+    scalar keys %{ $_[0] };
 }
 
 sub FORMAT {
     my $self = shift;
     my $format = shift || "";
     $format = 'TTL' if $format =~ /^n(otation)?3$/i;
-    if (lc($format) =~ $FORMATS) {
+    if ( lc($format) =~ $FORMATS ) {
         $format = uc($format);
-        $self->$format( @_ );
-    } elsif ($format eq "") {
-        $self->MAP( sub { $self->{$_} } , @_ );
+        $self->$format(@_);
+    }
+    elsif ( $format eq "" ) {
+        $self->MAP( sub { $self->{$_} }, @_ );
     }
 }
 
 sub PREFIX {
-    my ($self, $uri) = @_;
+    my ( $self, $uri ) = @_;
     foreach my $prefix ( sort keys %$self ) {
         return $prefix if $uri eq $self->{$prefix};
     }
@@ -115,62 +120,65 @@ sub PREFIX {
 }
 
 sub PREFIXES {
-    my ($self, $uri) = @_;
+    my ( $self, $uri ) = @_;
     my @prefixes;
-    while ( my ($prefix, $namespace) = each %$self ) {
+    while ( my ( $prefix, $namespace ) = each %$self ) {
         push @prefixes, $prefix if $uri eq $namespace;
     }
-    return(sort(@prefixes));
+    return ( sort(@prefixes) );
 }
 
 sub REVERSE {
-    RDF::SN->new($_[0]);
+    RDF::SN->new( $_[0] );
 }
 
 sub TTL {
     my $self = shift;
-    $self->MAP( sub { "\@prefix $_: <".$self->{$_}."> ." } , @_ );
+    $self->MAP( sub { "\@prefix $_: <" . $self->{$_} . "> ." }, @_ );
 }
 
 sub SPARQL {
     my $self = shift;
-    $self->MAP( sub { "PREFIX $_: <".$self->{$_}.">" } , @_ );
+    $self->MAP( sub { "PREFIX $_: <" . $self->{$_} . ">" }, @_ );
 }
 
 sub XMLNS {
     my $self = shift;
-    $self->MAP( sub { "xmlns:$_=\"".$self->{$_}."\"" } , @_ );
+    $self->MAP( sub { "xmlns:$_=\"" . $self->{$_} . "\"" }, @_ );
 }
 
 sub TXT {
     my $self = shift;
-    $self->MAP( sub { "$_\t".$self->{$_} } , @_ );
+    $self->MAP( sub { "$_\t" . $self->{$_} }, @_ );
 }
 
 sub JSON {
     my $self = shift;
-    $self->MAP( sub { "\"$_\": \"".$self->{$_}."\"" } , @_ );
+    $self->MAP( sub { "\"$_\": \"" . $self->{$_} . "\"" }, @_ );
 }
 
 sub BEACON {
     my $self = shift;
-    $self->MAP( sub { "#PREFIX: ".$self->{$_} } , @_ );
+    $self->MAP( sub { "#PREFIX: " . $self->{$_} }, @_ );
 }
 
 sub SELECT {
     my $self = shift;
-    $self->MAP( sub { $_ => $self->{$_} } , @_ );
+    $self->MAP( sub { $_ => $self->{$_} }, @_ );
 }
 
 # functional programming rulez!
 sub MAP {
     my $self = shift;
     my $code = shift;
-    my @ns = @_ ? (grep { $self->{$_} } map { split /[|, ]+/ } @_) 
-        : keys %$self;
+    my @ns =
+      @_
+      ? ( grep { $self->{$_} } map { split /[|, ]+/ } @_ )
+      : keys %$self;
     if (wantarray) {
         return map { $code->() } sort @ns;
-    } else {
+    }
+    else {
         local $_ = $ns[0];
         return $code->();
     }
@@ -188,12 +196,12 @@ sub BLANK {
 sub uri {
     my $self = shift;
     return $1 if $_[0] =~ /^<([a-zA-Z][a-zA-Z+.-]*:.+)>$/;
-    return $self->BLANK($_[0]) if $_[0] =~ /^_(:.*)?$/;
+    return $self->BLANK( $_[0] ) if $_[0] =~ /^_(:.*)?$/;
     return unless shift =~ /^([a-z][a-z0-9]*)?([:_]([^:]+))?$/;
     my $ns = $self->{ defined $1 ? $1 : '' };
     return unless defined $ns;
     return $self->GET($ns) unless $3;
-    return $self->GET($ns.$3);
+    return $self->GET( $ns . $3 );
 }
 
 sub AUTOLOAD {
@@ -203,34 +211,36 @@ sub AUTOLOAD {
     my $ns = $self->{$1} or return;
     my $local = defined $3 ? $3 : shift;
     return $self->GET($ns) unless defined $local;
-    return $self->GET($ns.$local);
+    return $self->GET( $ns . $local );
 }
 
 sub UPDATE {
-    my ($self, $file, $date) = @_;
+    my ( $self, $file, $date ) = @_;
 
-    croak "RDF::NS expects a date as YYYY-MM-DD" 
-        unless $date and $date =~ $DATE_REGEXP;
-    $date = "$1$2$3"; 
+    croak "RDF::NS expects a date as YYYY-MM-DD"
+      unless $date and $date =~ $DATE_REGEXP;
+    $date = "$1$2$3";
 
     my $old = RDF::NS->new($file);
-    my (@create,@update,@delete);
+    my ( @create, @update, @delete );
 
-    open (my $fh, '>>', $file) or croak "failed to open $file";
+    open( my $fh, '>>', $file ) or croak "failed to open $file";
     my @lines;
 
-    while( my ($prefix,$namespace) = each %$self ) {
-        if (!exists $old->{$prefix}) {
+    while ( my ( $prefix, $namespace ) = each %$self ) {
+        if ( !exists $old->{$prefix} ) {
             push @create, $prefix;
-        } elsif ( $old->{$prefix} ne $namespace ) {
+        }
+        elsif ( $old->{$prefix} ne $namespace ) {
             push @update, $prefix;
-        } else {
+        }
+        else {
             next;
         }
         push @lines, "$prefix\t$namespace";
     }
-    while( my ($prefix,$namespace) = each %$old ) {
-        if (!exists $self->{$prefix}) {
+    while ( my ( $prefix, $namespace ) = each %$old ) {
+        if ( !exists $self->{$prefix} ) {
             push @delete, $prefix;
         }
     }
@@ -264,8 +274,8 @@ RDF::NS - Just use popular RDF namespace prefixes from prefix.cc
 
 =head1 SYNOPSIS
 
-  use RDF::NS '20181102';              # check at compile time
-  my $ns = RDF::NS->new('20181102');   # check at runtime
+  use RDF::NS '20190227';              # check at compile time
+  my $ns = RDF::NS->new('20190227');   # check at runtime
 
   $ns->foaf;               # http://xmlns.com/foaf/0.1/
   $ns->foaf_Person;        # http://xmlns.com/foaf/0.1/Person

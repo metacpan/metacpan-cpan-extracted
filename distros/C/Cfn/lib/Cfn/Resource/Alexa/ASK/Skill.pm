@@ -1,4 +1,4 @@
-# Alexa::ASK::Skill generated from spec 2.15.0
+# Alexa::ASK::Skill generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::Alexa::ASK::Skill',
@@ -34,7 +34,7 @@ package Cfn::Resource::Properties::Alexa::ASK::Skill::OverridesValue {
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Manifest => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Manifest => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::Alexa::ASK::Skill::SkillPackage',

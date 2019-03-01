@@ -1,4 +1,4 @@
-# AWS::IAM::UserToGroupAddition generated from spec 1.11.0
+# AWS::IAM::UserToGroupAddition generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IAM::UserToGroupAddition',
@@ -22,7 +22,7 @@ package Cfn::Resource::Properties::AWS::IAM::UserToGroupAddition {
   extends 'Cfn::Resource::Properties';
   
   has GroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Users => (isa => 'Cfn::Value::Array|Cfn::Value::Function', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Users => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;

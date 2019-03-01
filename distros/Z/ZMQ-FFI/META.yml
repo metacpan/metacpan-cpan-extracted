@@ -7,7 +7,6 @@ build_requires:
   List::Util: '0'
   Math::BigInt: '1.997'
   POSIX: '0'
-  Scalar::Util: '0'
   Sub::Override: '0'
   Sys::SigAction: '0'
   Test::Deep: '0'
@@ -23,7 +22,7 @@ configure_requires:
   FFI::CheckLib: '0.11'
   FFI::Platypus: '0.33'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,6 +39,7 @@ requires:
   Math::BigInt: '1.997'
   Moo: '1.004005'
   Moo::Role: '0'
+  Scalar::Util: '0'
   Sub::Exporter: '0'
   Try::Tiny: '0'
   bytes: '0'
@@ -53,6 +53,6 @@ requires:
 resources:
   bugtracker: https://github.com/calid/zmq-ffi/issues
   repository: git://github.com/calid/zmq-ffi.git
-version: '1.12'
-x_generated_by_perl: v5.22.1
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '1.14'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

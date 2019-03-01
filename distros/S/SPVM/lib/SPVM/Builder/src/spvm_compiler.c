@@ -124,6 +124,7 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
     SPVM_OP_build_use(compiler, op_use, op_type, NULL, 0);
     SPVM_LIST_push(compiler->op_use_stack, op_use);
   }
+
 #endif
 
   return compiler;
@@ -291,6 +292,7 @@ void SPVM_COMPILER_add_basic_types(SPVM_COMPILER* compiler) {
      SPVM_LIST_push(compiler->basic_types, basic_type);
      SPVM_HASH_insert(compiler->basic_type_symtable, basic_type->name, strlen(basic_type->name), basic_type);
   }
+
   // Add CORE basic_type
   {
      SPVM_BASIC_TYPE* basic_type = SPVM_BASIC_TYPE_new(compiler);

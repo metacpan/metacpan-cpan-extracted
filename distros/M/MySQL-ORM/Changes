@@ -1,5 +1,9 @@
 Revision history for MySQL-ORM
 
+0.05	fixed signatures for nullable foreign keys in the selectx methods
+
+0.04    skip pre-existing Dbname.pm files
+
 0.03	removed extraneous tmp dir
 
 0.02	fixed bug in lib/MySQL/ORM.pm

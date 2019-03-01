@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -176,26 +176,26 @@ sub BiStar_diameter {
 # POD HOG Shown
 
 {
-  my %shown = ('2,2' => 1,
-               '3,2' => 1,
-               '3,3' => 1,
-               '4,2' => 1,
-               '4,3' => 1,
-               '4,4' => 1,
-               '5,2' => 1,
-               '5,4' => 1,
-               '5,5' => 1,
-               '6,2' => 1,
-               '6,5' => 1,
-               '6,6' => 1,
-               '7,2' => 1,
-               '7,6' => 1,
-               '7,7' => 1,
-               '8,2' => 1,
-               '8,7' => 1,
-               '9,2' => 1,
-               '10,2' => 1,
-               '10,6' => 1,
+  my %shown = ('2,2' => 594,
+               '3,2' => 30,
+               '3,3' => 334,
+               '4,2' => 208,
+               '4,3' => 452,
+               '4,4' => 586,
+               '5,2' => 266,
+               '5,4' => 634,
+               '5,5' => 112,
+               '6,2' => 332,
+               '6,5' => 650,
+               '6,6' => 36,
+               '7,2' => 366,
+               '7,6' => 38,
+               '7,7' => 166,
+               '8,2' => 436,
+               '8,7' => 168,
+               '9,2' => 316,
+               '10,2' => 320,
+               '10,6' => 27414,
               );
   my $extras = 0;
   my %seen;
@@ -203,15 +203,19 @@ sub BiStar_diameter {
     foreach my $M (3 .. $N) {
       my $graph = Graph::Maker->new('bi_star', undirected => 1,
                                     N => $N, M => $M);
+      my $key = "$N,$M";
       my $g6_str = MyGraphs::Graph_to_graph6_str($graph);
       $g6_str = MyGraphs::graph6_str_to_canonical($g6_str);
-      next if $seen{$g6_str}++;
-      next if $shown{"$N,$M"};
-      if (MyGraphs::hog_grep($g6_str)) {
-        MyTestHelpers::diag ("HOG N=$N,M=$M not shown in POD");
-        MyTestHelpers::diag ($g6_str);
-        MyGraphs::Graph_view($graph);
-        $extras++
+      # next if $seen{$g6_str}++;
+      if (my $id = $shown{$key}) {
+        MyGraphs::hog_compare($id, $g6_str);
+      } else {
+        if (MyGraphs::hog_grep($g6_str)) {
+          MyTestHelpers::diag ("HOG got $key, not shown in POD");
+          MyTestHelpers::diag ($g6_str);
+          MyGraphs::Graph_view($graph);
+          $extras++
+        }
       }
     }
   }

@@ -1,5 +1,5 @@
 package Date::Manip::TZ_Base;
-# Copyright (c) 2010-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ use strict;
 use IO::File;
 
 our ($VERSION);
-$VERSION='6.75';
+$VERSION='6.76';
 END { undef $VERSION; }
 
 ########################################################################

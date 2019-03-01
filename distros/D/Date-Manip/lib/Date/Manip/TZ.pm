@@ -1,5 +1,5 @@
 package Date::Manip::TZ;
-# Copyright (c) 2008-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 2008-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ use Date::Manip::Base;
 use Data::Dumper;
 
 our $VERSION;
-$VERSION='6.75';
+$VERSION='6.76';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.
@@ -105,7 +105,6 @@ sub _init {
                                       file   /etc/timezone
                                       file   /etc/sysconfig/clock
                                       file   /etc/default/init
-                                      tzdata /etc/localtime /usr/share/zoneinfo
                                     ),
                                    'command',  '/bin/date +%Z',
                                    'command',  '/usr/bin/date +%Z',
@@ -117,6 +116,8 @@ sub _init {
                                    'command',  '/bin/date +%z',
                                    'command',  '/usr/bin/date +%z',
                                    'command',  '/usr/local/bin/date +%z',
+                                   qw( tzdata /etc/localtime /usr/share/zoneinfo
+                                    ),
                                    'gmtoff'
                                   ];
 
@@ -1354,6 +1355,7 @@ sub date_period {
    my @date = @$date;
    my $year = $date[0];
    my $dates= $dmb->_date_fields(@$date);
+   return ()  if ($year < 0  ||  $year > 9999);
 
    if ($wallclock) {
       # A wallclock date

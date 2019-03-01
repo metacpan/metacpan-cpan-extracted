@@ -1,7 +1,7 @@
 package Task::Tmp::spanel;
 
-our $DATE = '2019-02-26'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-03-01'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Perl modules for Spanel
@@ -18,7 +18,7 @@ Task::Tmp::spanel - Perl modules for Spanel
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 TASK CONTENTS
 
@@ -96,6 +96,8 @@ version 0.002
 
 =head3 L<File::Which>
 
+=head3 L<File::Write::Rotate>
+
 =head3 L<File::chdir>
 
 =head3 L<File::chmod>
@@ -103,6 +105,8 @@ version 0.002
 =head3 L<FindBin>
 
 =head3 L<GDBM_File>
+
+=head3 L<Gepok>
 
 =head3 L<Getopt::Long>
 
@@ -117,6 +121,8 @@ version 0.002
 =head3 L<IPC::System::Options>
 
 =head3 L<LWP::UserAgent>
+
+=head3 L<Linux::Mounts>
 
 =head3 L<List::MoreUtils>
 
@@ -150,9 +156,15 @@ version 0.002
 
 =head3 L<POSIX>
 
+=head3 L<Parse::IPCommand>
+
 =head3 L<Path::Class>
 
+=head3 L<Perinci::Access::Base::Patch::PeriAHS>
+
 =head3 L<Perinci::Access::HTTP::Client>
+
+=head3 L<Perinci::Access::Schemeless::DBI>
 
 =head3 L<Perinci::CmdLine>
 
@@ -163,6 +175,8 @@ version 0.002
 =head3 L<Perinci::Exporter>
 
 =head3 L<Perinci::Sub::Util>
+
+=head3 L<Perinci::Sub::Wrapper::Patch::HandlePHPArray>
 
 =head3 L<Proc::ChildError>
 
@@ -190,7 +204,11 @@ version 0.002
 
 =head3 L<UUID::Random>
 
+=head3 L<Unix::Passwd::File>
+
 =head3 L<WWW::Mechanize>
+
+=head3 L<YAML::Syck>
 
 =head3 L<YAML::XS>
 

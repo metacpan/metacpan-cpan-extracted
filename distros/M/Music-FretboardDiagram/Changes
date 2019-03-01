@@ -1,5 +1,46 @@
 Revision history for Music-FretboardDiagram
 
+0.1001 2019-02-28 04:53:27
+    - Collapse giant condition syntax used twice, into a subroutine.
+
+0.1000 2019-02-28 04:07:42
+    - Fix backwards horizontal drawing.
+
+0.0900 2019-02-28 02:20:27
+    - Draw neck position dots as on a real fretboard.
+
+0.0802 2019-02-28 00:49:02
+    - Adjust image dimensions slightly.
+
+0.0801 2019-02-27 23:54:00
+    - Fix chord name position for vertical drawing.
+
+0.0800 2019-02-27 23:21:06
+    - Allow the grid (strings and frets) color to be user defined.
+    - Improve documentation a bit.
+
+0.0703 2019-02-27 21:03:45
+    - Improve documentation ever so slightly.
+
+0.0702 2019-02-27 19:28:51
+    - Improve documentation.
+
+0.0701 2019-02-27 18:25:10
+    - Use the ->showname method in eg/autumn-leaves-shapes.
+    - Fix chord name diagram position math.
+    - Make eg/ukulele use the module SYNOPSIS parameters.
+
+0.0700 2019-02-27 15:44:26
+    - Add the showname attribute to show the computed chord name, a user defined string or not at all.
+
+0.0600 2019-02-27 15:03:07
+    - Fix the reversed strings/notes problem when horizontally diagramming.
+    - Improve verbose output.
+
+0.0500 2019-02-27 14:39:55
+    - Adjust die message for chord length vs strings.
+    - Allow horizontal diagramming.
+
 0.0402 2019-02-22 21:31:22
     - Clean up code a bit.
     - Die if the chord length does not equal the number of strings.

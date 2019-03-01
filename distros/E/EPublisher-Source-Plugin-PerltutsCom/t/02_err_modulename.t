@@ -8,7 +8,8 @@ use Test::More tests => 1;
 use EPublisher::Source::Plugin::PerltutsCom;
 
 {
-  package MockEPublisher;
+  package # private
+      MockEPublisher;
 
   use Test::More;
 

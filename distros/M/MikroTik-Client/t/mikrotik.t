@@ -14,6 +14,7 @@ use lib "$FindBin::Bin/lib";
 use Test::More;
 
 use AE;
+use Errno qw(ECONNREFUSED);
 use MikroTik::Client;
 use MikroTik::Client::Mockup;
 use Time::HiRes;
@@ -41,7 +42,7 @@ my $api = MikroTik::Client->new(
 
 # check connection
 my $res = $api->cmd('/resp');
-like $api->error, qr/Connection refused/, 'connection error';
+ok $! == ECONNREFUSED, 'connection error';
 $api->port($port);
 
 # check login

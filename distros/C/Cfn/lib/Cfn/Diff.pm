@@ -30,12 +30,24 @@ package Cfn::Diff::ResourcePropertyChange {
 
 package Cfn::Diff {
   use Moose;
-  extends 'Cfn';
 
-  has changes => (
+  has resolve_dynamicvalues => (
+    is => 'ro',
+    isa => 'Bool',
+    default => 0
+  );
+
+  sub changes { 
+    my $self = shift;
+    return $self->_changes if (defined $self->_changes);
+    $self->_changes([]);
+    $self->_do_diff;
+    return $self->_changes;
+  }
+
+  has _changes => (
     is => 'rw', 
     isa => 'ArrayRef[Cfn::Diff::Changes]', 
-    default => sub { [] },
     traits => [ 'Array' ],
     handles => {
       new_addition => 'push',
@@ -47,10 +59,10 @@ package Cfn::Diff {
   has left => (is => 'ro', isa => 'Cfn', required => 1);
   has right => (is => 'ro', isa => 'Cfn', required => 1);
 
-  sub diff {
+  sub _do_diff {
     my ($self) = @_;
-    my $old = $self->left;
-    my $new = $self->right;
+    my $old = ($self->resolve_dynamicvalues) ? $self->left->resolve_dynamicvalues : $self->left;
+    my $new = ($self->resolve_dynamicvalues) ? $self->right->resolve_dynamicvalues : $self->right;
 
     my %new_resources = map { ( $_ => 1 ) } $new->ResourceList;    
     my %old_resources = map { ( $_ => 1 ) } $old->ResourceList;    
@@ -58,7 +70,7 @@ package Cfn::Diff {
     foreach my $res (keys %new_resources) {
       if (exists $old_resources{ $res }) {
 
-        if (my @changes = $self->compare_resource($new->Resource($res), $old->Resource($res), $res)) {
+        if (my @changes = $self->_compare_resource($new->Resource($res), $old->Resource($res), $res)) {
           $self->new_change(@changes);
         }
 
@@ -74,7 +86,7 @@ package Cfn::Diff {
     }
   }
 
-  sub compare_resource {
+  sub _compare_resource {
     my ($self, $new_res, $old_res, $logical_id) = @_;
 
     my $new_res_type = $new_res->Type;
@@ -126,7 +138,7 @@ package Cfn::Diff {
       } elsif (not defined $old_val and     defined $new_val) {
         $change_description = 'Property Added';
       } elsif (    defined $old_val and     defined $new_val) {
-        if (not $self->properties_equal($new_val, $old_val, "$logical_id.$meth")) {
+        if (not $self->_properties_equal($new_val, $old_val, "$logical_id.$meth")) {
           $change_description = 'Property Changed';
         } else {
           next
@@ -148,7 +160,7 @@ package Cfn::Diff {
   }
 
   use Scalar::Util;
-  sub properties_equal {
+  sub _properties_equal {
     my ($self, $new, $old) = @_;
 
     if (blessed($new)){
@@ -157,12 +169,14 @@ package Cfn::Diff {
         return 0 if ($new->meta->name ne $old->meta->name);
 
         # Old and new are guaranteed to be the same type now, so just go on with new
-        if ($new->isa('Cfn::Value::Primitive')) {
+        if ($new->isa('Cfn::DynamicValue')) {
+          return 0;
+        } elsif ($new->isa('Cfn::Value::Primitive')) {
           return ($new->Value eq $old->Value);
         } elsif ($new->isa('Cfn::Value::Function')) {
-          return (($new->Function eq $old->Function) and $self->properties_equal($new->Value, $old->Value));
+          return (($new->Function eq $old->Function) and $self->_properties_equal($new->Value, $old->Value));
         } elsif ($new->isa('Cfn::Value')) {
-          return $self->properties_equal($new->as_hashref, $old->as_hashref);
+          return $self->_properties_equal($new->as_hashref, $old->as_hashref);
         } else {
           die "Don't know how to compare $new";
         }
@@ -179,13 +193,13 @@ package Cfn::Diff {
         } elsif (ref($new) eq 'ARRAY') {
           return 0 if (@$new != @$old);
           for (my $i = 0; $i < @$new; $i++) {
-            return 0 if (not $self->properties_equal($new->[$i], $old->[$i]));
+            return 0 if (not $self->_properties_equal($new->[$i], $old->[$i]));
           }
           return 1;
         } elsif (ref($new) eq 'HASH') {
           return 0 if ((keys %$new) != (keys %$old));
           foreach my $key (keys %$new) {
-            return 0 if (not $self->properties_equal($new->{ $key }, $old->{ $key }));
+            return 0 if (not $self->_properties_equal($new->{ $key }, $old->{ $key }));
           }
           return 1;
         } else {

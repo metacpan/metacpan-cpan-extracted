@@ -33,15 +33,15 @@ PPCODE:
     if (2 > items)
         XSRETURN_UNDEF;
 
-    for (i = items - 1; i > 0; i--) {
+    items--;
+    for (i = items; i > 0; i--) {
         SvGETMAGIC(ST(i));
         if (! SvROK(ST(i)) || SVt_PVAV != SvTYPE(SvRV(ST(i))))
             croak("Not an array reference");
     }
-    for (i = items - 1; i > 0; i--)
+    for (i = items; i > 0; i--)
         if (0 > av_len((AV *)SvRV(ST(i))))
             XSRETURN_UNDEF;
-    items--;
 
     Newx(in, items, AV*);
     for (i = items - 1; i >= 0; i--)
@@ -57,6 +57,7 @@ PPCODE:
 
     if (! CvISXSUB(cv)) {
         I32 gimme = G_VOID;
+        /* localize @_ */
         AV *av = save_ary(PL_defgv);
         /* @_ doesn't refcount it's contents. */
         AvREAL_off(av);
@@ -65,13 +66,16 @@ PPCODE:
         PUSH_MULTICALL(cv);
 
         for (i = 0; i >= 0; ) {
-            av_extend(av, items - 1);
             av_fill(av, items - 1);
 
             for (j = items - 1; j >= 0; j--)
                 AvARRAY(av)[j] = out[j];
 
+            ENTER;
+            SAVETMPS;
             MULTICALL;
+            FREETMPS;
+            LEAVE;
 
             for (i = items - 1; i >= 0; i--) {
                 idx[i]++;
@@ -98,7 +102,7 @@ PPCODE:
                 PUSHs(out[j]);
             PUTBACK;
 
-            call_sv((SV *)cv, G_VOID | G_DISCARD);
+            call_sv((SV *)cv, G_DISCARD | G_VOID);
 
             SPAGAIN;
 

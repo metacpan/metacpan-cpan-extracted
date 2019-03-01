@@ -11,8 +11,9 @@ use v5.18.0; # require 2014 or newer version of Perl
 # State class to hold program state, and print it all out in case of errors
 # this is a low-level package - it stores state data but at this level has no knowledge of what is being stored in it
 package PiFlash::State;
-$PiFlash::State::VERSION = '0.0.6';
+$PiFlash::State::VERSION = '0.1.0';
 use autodie;
+use YAML::XS; # RPM: perl-YAML-LibYAML, DEB: libyaml-libyaml-perl
 use Carp qw(croak);
 
 # ABSTRACT: PiFlash::State class to store configuration, device info and program state
@@ -30,7 +31,15 @@ sub init
 {
 	## no critic (ProhibitPackageVars)
 	my $class = shift;
-	(defined $PiFlash::State::state) and return; # don't damage data if called again
+	(defined $PiFlash::State::state) and return; # avoid damaging data if called again
+
+	# global security settings for YAML::XS parser
+	# since PiFlash can run parts as root, we don't want any external code to be run without user authorization
+	$YAML::XS::LoadBlessed = 0;
+	$YAML::XS::UseCode = 0;
+	$YAML::XS::LoadCode = 0;
+
+	# instantiate the state object as a singleton (only one instance in the system)
 	$PiFlash::State::state = {};
 	bless $PiFlash::State::state, $class;
 	my $self = $PiFlash::State::state;
@@ -144,6 +153,52 @@ sub error
 	croak "error: ".$message.(verbose() ? "\nProgram state dump...\n".odump($PiFlash::State::state,0) : "");
 }
 
+# read YAML configuration file
+sub read_config
+{
+	my $filepath = shift;
+
+	# if the provided file name exists and ...
+	if ( -f $filepath) {
+		# capture as many YAML documents as can be parsed from the configuration file
+		my @yaml_docs = eval { YAML::XS::LoadFile($filepath); };
+		if ($@) {
+			PiFlash::State->error("PiFlash::State::read_config error reading $filepath: $@");
+		}
+
+		# save the first YAML document as the configuration
+		my $yaml_config = shift @yaml_docs;
+		if (ref $yaml_config eq "HASH") {
+			# if it's a hash, then use all its mappings in PiFlash::State::config
+			$PiFlash::State::state->{config} = $yaml_config;
+		} else {
+			# otherwise save the reference in a config entry called config
+			PiFlash::State::config("config", $yaml_config);
+		}
+
+		# if any other YAML documents were parsed, save them as a list in a config called "docs"
+		# these are available for plugins but not currently defined
+		if (@yaml_docs) {
+			# save the YAML doc structures as a list
+			PiFlash::State::config("docs", \@yaml_docs);
+
+			# the first doc must be the table of contents with a list of metadata about following docs
+			# others after that are categorized by the plugin name in the metadata
+			my $toc = $yaml_docs[0];
+			if (ref $toc eq "ARRAY") {
+				PiFlash::State::plugin("docs", {toc => $toc});
+				my $docs = PiFlash::State::plugin("docs");
+				for (my $i=1; $i < scalar @yaml_docs; $i++) {
+					if (ref $yaml_docs[$i] eq "HASH" and exists $yaml_docs[$i]{plugin}) {
+						my $type = $yaml_docs[$i]{plugin};
+						$docs->{$type} = $yaml_docs[$i];
+					}
+				}
+			}
+		}
+	}
+}
+
 1;
 
 __END__
@@ -158,7 +213,7 @@ PiFlash::State - PiFlash::State class to store configuration, device info and pr
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -216,7 +271,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

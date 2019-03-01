@@ -1,0 +1,5 @@
+0.002     2019-03-01 14:46:46 EST
+  - Fix postfile test to avoid default PerlIO layers
+
+0.001     2019-03-01 00:35:01 EST
+  - First release

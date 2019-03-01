@@ -1,27 +1,27 @@
---- #YAML:1.0
-name:               IO-AIO-Util
-version:            0.09
-abstract:           useful functions missing from IO::AIO
+---
+abstract: 'useful functions missing from IO::AIO'
 author:
-    - gray <gray@cpan.org>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'gray <gray@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    File::Spec::Functions:  0
-    IO::AIO:              2
-    POSIX:                0
-    Test::More:           0
-resources:
-    repository:  http://github.com/gray/io-aio-util
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.54
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-AIO-Util
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5.57'
+  IO::AIO: '2'
+  POSIX: '0'
+resources:
+  repository: http://github.com/gray/io-aio-util
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

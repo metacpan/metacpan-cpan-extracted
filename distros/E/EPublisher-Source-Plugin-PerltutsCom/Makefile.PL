@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,14 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "EPublisher-Source-Plugin-PerltutsCom",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "EPublisher::Source::Plugin::PerltutsCom",
   "PREREQ_PM" => {
     "EPublisher" => "0.6",
     "Encode" => 0,
     "File::Basename" => 0,
     "HTTP::Tiny" => 0,
-    "Moo" => 0,
     "parent" => 0
   },
   "TEST_REQUIRES" => {
@@ -31,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.14",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "0.6",
+  "VERSION" => "0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +44,6 @@ my %FallbackPrereqs = (
   "File::Find" => 0,
   "File::Spec" => 0,
   "HTTP::Tiny" => 0,
-  "Moo" => 0,
   "Test::More" => 0,
   "Test::Pod" => "1.14",
   "Test::Pod::Coverage" => "1.08",

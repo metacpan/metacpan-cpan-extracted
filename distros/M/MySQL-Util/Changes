@@ -1,5 +1,9 @@
 Revision history for MySQL-Util
 
+0.37    - fixed bug in lib/MySQL/Util/Lite/PrimaryKey.pm where the incorrect
+          constraint was being returned which manifested in bad column values
+          in the get_id() methods after generation (thanks to Mike Svendsen)
+          
 0.36    - implemented MySQL::Util::Lite::PrimaryKey and 
 			MySQL::Util::Lite::AlternateKey
 		- added basic documentation for ::Lite*

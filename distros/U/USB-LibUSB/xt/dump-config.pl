@@ -16,7 +16,7 @@ GetOptions("vid|v=s", \$vid,
     or die "getopt";
 
 my $ctx = USB::LibUSB->init();
-my $handle = $ctx->open_device_with_vid_pid(hex $vid, hex $pid);
+my $handle = $ctx->open_device_with_vid_pid_unique(hex $vid, hex $pid);
 my $dev = $handle->get_device();
 my $config = $dev->get_config_descriptor(0);
 

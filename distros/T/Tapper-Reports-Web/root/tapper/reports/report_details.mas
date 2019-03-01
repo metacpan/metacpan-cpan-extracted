@@ -55,6 +55,7 @@
 %   foreach my $key (sort keys %failures) {
 %     my $report_name = $failures{$key}{name};
 %     my $machine_name = $failures{$key}{machine_name};
+%     my $report_description = $failures{$key}{report_description};
 %     if (my @report_failures = @{$failures{$key}{failures} || []}) {
         <tr>
           <td><a href="/tapper/reports/id/<% $key %>">
@@ -66,7 +67,7 @@
             </strong>
 %         }
           </a></td>
-          <th colspan="2"><u><% $report_name %></u>&nbsp;@&nbsp;<u><% $machine_name %></u></th>
+          <th colspan="2"><u><% $report_name %></u>&nbsp;@&nbsp;<u><% $machine_name %></u>&nbsp;@&nbsp;<u><% $report_description %></u></th>
         </tr>
 %       foreach my $failure (@report_failures) {
         <tr>

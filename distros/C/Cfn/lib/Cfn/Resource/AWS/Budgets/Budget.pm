@@ -1,4 +1,4 @@
-# AWS::Budgets::Budget generated from spec 2.3.0
+# AWS::Budgets::Budget generated from spec 2.22.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Budgets::Budget',
@@ -224,7 +224,7 @@ package Cfn::Resource::Properties::AWS::Budgets::Budget::BudgetDataValue {
   has BudgetLimit => (isa => 'Cfn::Resource::Properties::AWS::Budgets::Budget::Spend', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has BudgetName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has BudgetType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has CostFilters => (isa => 'Cfn::Value::Json', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CostFilters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CostTypes => (isa => 'Cfn::Resource::Properties::AWS::Budgets::Budget::CostTypes', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimePeriod => (isa => 'Cfn::Resource::Properties::AWS::Budgets::Budget::TimePeriod', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeUnit => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');

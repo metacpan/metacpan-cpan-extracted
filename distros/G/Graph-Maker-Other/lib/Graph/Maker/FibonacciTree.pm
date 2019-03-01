@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 # uncomment this to run the ### lines
@@ -272,7 +272,7 @@ __END__
 
 
 
-=for stopwords Ryde subtrees Steinhaus Stechert AVL ie undirected Viswanathan Iyer Udaya Kumar Reddy WTb preprint MeanDist OEIS
+=for stopwords Ryde subtrees Steinhaus Stechert AVL ie undirected Viswanathan Iyer Udaya Kumar Reddy Intl Math Engg WTb preprint MeanDist OEIS
 
 =head1 NAME
 
@@ -303,7 +303,7 @@ The default tree is in the style of
 
 =over
 
-Hugo Steinhaus "Mathematical Snapshots", Stechert, 1938, page 27
+Hugo Steinhaus, "Mathematical Snapshots", Stechert, 1938, page 27
 
 =back
 
@@ -446,8 +446,8 @@ above these are nodes 8 and 11.
      /    |    /
     7     8   9
 
-The effect of this is merely to repeat the second last row, ie. there is a
-single child under every node of the second last row.
+The effect of this is merely to repeat the second last row, ie. the last row
+is a single child under each node of the second last.
 
 =head1 FUNCTIONS
 
@@ -529,15 +529,15 @@ WTb formula in their preprint.  Is there a typo there?)
 They suggest an iteration to evaluate upwards.  Some generating function
 manipulations can also sum through to
 
-    WTb(k) = 1/10 * ( (2*k+13) * (F(k+2) + 1)*(F(k+2) + F(k+4))
-                      + F(k+2)*(10 - 29*F(k+4))  - 9*F(k+4) )
+    WTb(k) = 1/10 * ( (2*k+13)*(F(k+2) + 1)*(F(k+2) + F(k+4))
+                      - F(k+2)*(29*F(k+4) - 10)  - 9*F(k+4) )
 
-           = 0, 0, 1, 10, 50, 214, 802, 2802, 9275, ...    (A192019)
+           = 0, 0, 1, 10, 50, 214, 802, 2802, 9275, ...   (A192019)
 
 =cut
 
 # GP-DEFINE  WTb(k) = 1/10 * ( (2*k+13) * (F(k+2) + 1)*(F(k+2) + F(k+4)) \
-# GP-DEFINE                    + F(k+2)*(10 - 29*F(k+4)) - 9*F(k+4) );
+# GP-DEFINE                    - F(k+2)*(29*F(k+4) - 10)  - 9*F(k+4) )
 # GP-Test  my(v=[0,0,1,10,50,214,802,2802,9275,29580,91668,277924,828092,2433140]); vector(#v,k,k--; WTb(k))==v
 # GP-Test  vector(100,k,k--; WTb_by_recurrence(k))==vector(100,k,k--; WTb(k))
 
@@ -554,11 +554,11 @@ distinct vertices is
 The tree diameter is 2*k-3 which is attained between the deepest vertices of
 the left and right sub-trees.  A limit for MeanDist as a fraction of that
 diameter is found by noticing the diameter cancels 2*k in WTb and using
-F(k+n)/F(k) -E<gt> phi^n, where phi=(1+sqrt5)/2 is the Golden ratio
+F(k+n)/F(k) -E<gt> phi^n, where phi=(1+sqrt5)/2, the Golden ratio.
 
-    MeanDist(k)           1 + phi^2    2 + phi       1
-    ----------- ->  MTb = ---------  = -------  = -------
-    Diameter(k)              5            5       3 - phi
+    MeanDist(k)           1 + phi^2      2 + phi      1
+    ----------- ->  MTb = ---------    = ------- = -------
+    Diameter(k)              5              5      3 - phi
 
                 = 0.723606...   (A242671)
 
@@ -621,20 +621,24 @@ A further similar calculation for the full tree of height k gives
              = 0, 0, 2, 8, 23, 55, 120, 246, ...
 
     Wfull(k) = 1/10 * ( (2*k-1)*( 5*F(k+3)^2  + 2*( 2*F(k+3) + F(k+4)) )
-                        + 5*( F(k+4) - 6*F(k+3) + 18 )*F(k+4)
+                        + 5*F(k+4)*( F(k+4) - 6*F(k+3) + 18 )
                         - 91*F(k+2) - 10  );
              = 0, 0, 4, 32, 174, 744, 2834, 9946, ...
 
 =cut
 
 # GP-DEFINE  Dfull(k) = k*F(k+3) - F(k+5) + 5;
-# GP-Test  my(v=[0, 0, 2, 8, 23, 55, 120, 246, 484, 924]); vector(#v,k,k--; Dfull(k))==v
+# GP-Test  my(v=[0, 0, 2, 8, 23, 55, 120, 246, 484, 924]); \
+# GP-Test   vector(#v,k,k--; Dfull(k))==v
 # GP-DEFINE  Wfull(k) = {
 # GP-DEFINE    1/10 * ( (2*k-1)*( 5*F(k+3)^2 + 2*( 2*F(k+3) + F(k+4)) )
-# GP-DEFINE             + 5*( F(k+4) - 6*F(k+3) + 18 )*F(k+4)
+# GP-DEFINE             + 5*F(k+4)*( F(k+4) - 6*F(k+3) + 18 )
 # GP-DEFINE             - 91*F(k+2) - 10  );
 # GP-DEFINE  }
-# GP-Test  my(v=[0,0,4,32,174,744,2834,9946,33088]); vector(#v,k,k--; Wfull(k))==v
+# GP-Test  my(v=[0,0,4,32,174,744,2834,9946,33088]); \
+# GP-Test   vector(#v,k,k--; Wfull(k))==v
+# not in OEIS: 4, 32, 174, 744, 2834, 9946
+# gcd(vector(20,k,k+=5; Wfull(k)))
 
 =pod
 
@@ -712,7 +716,7 @@ L<Math::NumSeq::FibonacciWord>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

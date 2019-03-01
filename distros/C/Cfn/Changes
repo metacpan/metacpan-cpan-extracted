@@ -1,3 +1,21 @@
+0.02 2019-02-27
+  - Support for UpdateReplacePolicy 
+  - Add AWS::Partion and AWS::URLSuffix as PseudoParameters. They are now recognized as
+    Cfn::Value::Function::PseudoParameter
+  - Support for returning ArrayRefs and HashRefs from Cfn::DynamicValues. If the values
+    returned from a DynamicValue is itself a HashRef or an ArrayRef with DynamicValues 
+    too, they will get resolved too.
+  - The changes method on Cfn::Diff can be called directly instead of calling ->diff before
+  - Implements the resources in CloudFormation spec 2.24.0 (published as of 2019-02-25)
+  - Cfn gets a new method resolve_dynamicvalues that returns a new Cfn with all it's
+    Cfn::DynamicValues resolved
+  - Cfn::Diff by default doesn't dive in to Cfn::DynamicValues. It considers them as changes,
+    since the return value of a DynamicValue is not known beforehand.
+  - Cfn::Diff gets a new attribute resolve_dynamicvalues that when activated will resolve
+    all Cfn::DynamicValues before diffing
+  - Cfn::Crawl by default doesn't resolve Dynamic values, but now gets a resolve_dynamicvalues
+    attribute to resolve them before crawling
+
 0.01 2019-02-15
   - First release of this module as a separate entity from CloudDeploy.
     This module is the result of isolating the code in the CloudDeploy distribution,

@@ -8,7 +8,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.10.3";
+our $VERSION = "4.10.5";
 
 use Pod::Usage;
 
@@ -59,6 +59,8 @@ See individual manual of each command for detail.
 =head2 CPANM
 
     $ cpanm App::sdif
+    or
+    $ curl -sL http://cpanmin.us | perl - App::sdif
 
 =head1 SEE ALSO
 

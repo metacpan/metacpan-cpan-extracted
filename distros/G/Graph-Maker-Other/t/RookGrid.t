@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -32,14 +32,14 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 19;
+plan tests => 22;
 
 require Graph::Maker::RookGrid;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 10;
+  my $want_version = 13;
   ok ($Graph::Maker::RookGrid::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Maker::RookGrid->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Maker::RookGrid->VERSION($want_version); 1 }, 1,
@@ -76,6 +76,21 @@ require Graph::Maker::RookGrid;
   ok (join(',', sort {$a<=>$b} $graph->neighbours(2)), '1,3,4,6,10');
   ok (join(',', sort {$a<=>$b} $graph->neighbours(7)), '3,5,6,8,11');
 }
+
+# 2x2,2x3 = circular ladder, per POD
+# CircularLadder 1 rung gets self loops
+foreach my $N (2..4) {
+  my $rook = Graph::Maker->new('rook_grid', undirected => 1, dims => [2,$N]);
+  require Graph::Maker::CircularLadder;
+  my $circular_ladder = Graph::Maker->new('circular_ladder', undirected => 1,
+                                          rungs => $N);
+  ok ($circular_ladder->eq($rook)?1:0, ($N<=3 ? 1 : 0));
+
+  # print "$rook\n";
+  # print "$circular_ladder\n";
+  # require MyGraphs; MyGraphs::Graph_view($rook);
+}
+
 
 #------------------------------------------------------------------------------
 

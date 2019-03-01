@@ -1,4 +1,4 @@
-6.22 Feb 20, 2019
+6.23 Feb 28, 2019
 package Graphics::Framebuffer;
 
 =head1 NAME
@@ -2627,6 +2627,7 @@ sub draw_arc {
                 $p{'fill'} = $fill;
             } elsif (exists($params->{'texture'})) {
                 $pattern = $self->_generate_fill($w, $w, undef, $params->{'texture'});
+                $pattern = $self->_convert_16_to_24($pattern, RGB) if ($self->{'BITS'} == 16);
                 $image = Imager->new(
                     'xsize'             => $w,
                     'ysize'             => $w,
@@ -3518,9 +3519,8 @@ sub _fill_polygon {
         }
     } elsif (exists($params->{'texture'})) {
         $pattern = $self->_generate_fill($width, $height, undef, $params->{'texture'});
-
-        #    } elsif (exists($params->{'hatch'})) {
-        #        $pattern = $self->_generate_fill($width, $height, undef, $params->{'hatch'});
+#    } elsif (exists($params->{'hatch'})) {
+#        $pattern = $self->_generate_fill($width, $height, undef, $params->{'hatch'});
     }
     my $saved = { 'x' => $left, 'y' => $top, 'width' => $width, 'height' => $height };
     my $saved_mode = $self->{'DRAW_MODE'};
@@ -3556,8 +3556,8 @@ sub _fill_polygon {
             );
         }
         if (defined($pattern)) {
-            $pattern = $self->_convert_16_24($pattern, RGB) if ($self->{'BITS'} == 16);
-            $pimg = Imager->new();
+            $pattern = $self->_convert_16_to_24($pattern, RGB) if ($self->{'BITS'} == 16);
+            $pimg    = Imager->new();
             $pimg->read(
                 'xsize'             => $width,
                 'ysize'             => $height,
@@ -3609,174 +3609,102 @@ sub _generate_fill {
 
     my $gradient = '';
     my $bytes    = $self->{'BYTES'};
-    my $r_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'};
-    my $g_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'};
-    my $b_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'};
-    my $a_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'};
     if (ref($type) eq 'HASH') {    # texture
         if ($type->{'width'} != $width || $type->{'height'} != $height) {
-            if ($self->{'BITS'} > 16) {
-                my $new = $self->blit_transform(
-                    {
-                        'blit_data' => $type,
-                        'scale'     => {
-                            'scale_type' => 'nonprop',
-                            'x'          => 0,
-                            'y'          => 0,
-                            'width'      => $width,
-                            'height'     => $height
-                        }
-                    }
-                );
-                $gradient = $new->{'image'};
-            } else {    # We crop or duplicate instead of scale
-                my $w      = $type->{'width'};
-                my $wb     = $w * $bytes;
-                my $widthb = $width * $bytes;
-                my $h      = $type->{'height'};
-                $gradient  = $type->{'image'};
-                if ($w > $width) {
-                    my $new = '';
-                    foreach my $line (0 .. ($h - 1)) {
-                        $new .= substr($gradient, $line * $wb, $widthb);
-                    }
-                    $gradient = $new;
-                    $w        = $width;
-                } elsif ($w < $width) {
-                    my $new = '';
-                    foreach my $line (0 .. ($h - 1)) {
-                        my $index = $line * $wb;
-                        my $l     = '';
-                        while (length($l) < $widthb) {
-                            $l .= substr($gradient, $index, $wb);
-                        }
-                        $new .= substr($l, 0, $widthb);
-                    }
-                    $gradient = $new;
-                    $w        = $width;
+            my $new = $self->blit_transform(
+                {
+                    'blit_data' => $type,
+                      'scale'     => {
+                          'scale_type' => 'nonprop',
+                          'x'          => 0,
+                          'y'          => 0,
+                          'width'      => $width,
+                          'height'     => $height
+                      }
                 }
-                if ($h > $height) {
-                    $gradient = substr($gradient, 0, $widthb * $height);
-                    $h        = $height;
-                } elsif ($h < $height) {
-                    my $new   = '';
-                    $new      = $gradient x ($height / $h);
-                    $new      = substr($new, 0, $widthb * $height);
-                    $gradient = $new;
-                    $h        = $height;
-                }
-            }
+            );
+            $gradient = $new->{'image'};
         } else {
             $gradient = $type->{'image'};
         }
-    } elsif ($type =~ /horizontal/i) {    # Gradient
-        my @ac;
-        my @rc = multi_gradient($width, @{ $colors->{'red'} });
-        my @gc = multi_gradient($width, @{ $colors->{'green'} });
-        my @bc = multi_gradient($width, @{ $colors->{'blue'} });
-        if (exists($colors->{'alpha'})) {
-            @ac = multi_gradient($width, @{ $colors->{'alpha'} });
-        } else {
-            @ac = map {$_ = $self->{'COLOR_ALPHA'}} (1..(scalar(@bc)));
-        }
-        while (scalar(@rc) < $width) {
-            unshift(@rc, $rc[0]);
-            unshift(@gc, $gc[0]);
-            unshift(@bc, $bc[0]);
-            unshift(@ac, $ac[0]);
-        }
-        while (scalar(@rc) > $width) {
-            pop(@rc);
-            pop(@gc);
-            pop(@bc);
-            pop(@ac);
-        }
-        my $end = scalar(@rc) - 1;
-        foreach my $gcc (0 .. $end) {
-            if ($self->{'BITS'} == 32) {
-                $gradient .= pack('I', (
-                    ($rc[$gcc] << $r_offset) |
-                    ($gc[$gcc] << $g_offset) |
-                    ($bc[$gcc] << $b_offset) |
-                    ($ac[$gcc] << $a_offset)
-                ));
-            } elsif ($self->{'BITS'} == 24) {
-                my $temp = pack('I', (
-                    ($rc[$gcc] << $r_offset) |
-                    ($gc[$gcc] << $g_offset) |
-                    ($bc[$gcc] << $b_offset) |
-                    ($ac[$gcc] << $a_offset)
-                ));
-                chop($temp);
-                $gradient .= $temp;
-            } elsif ($self->{'BITS'} == 16) {
-                my $R = $rc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
-                my $G = $gc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
-                my $B = $bc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
-                # Color conversion is done in the pixel conversion
-                my $temp = pack('S',(
-                    ($R << $r_offset) |
-                    ($G << $g_offset) |
-                    ($B << $b_offset)
-                ));
-                $gradient .= $temp;
+    } elsif ($type =~ /vertical|horizontal/i) {
+        my $r_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'};
+        my $g_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'};
+        my $b_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'};
+        my $a_offset = $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'offset'};
+
+        my $r_length = $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'};
+        my $g_length = $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'};
+        my $b_length = $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'};
+        my $a_length = $self->{'vscreeninfo'}->{'bitfields'}->{'alpha'}->{'length'};
+
+        my $count = ($type =~ /horizontal/i) ? $width : $height;
+        my (@red,@green,@blue,@alpha);
+        @red   = @{ $colors->{'red'} };
+        @green = @{ $colors->{'green'} };
+        @blue  = @{ $colors->{'blue'} };
+        if ($self->{'BITS'} == 32) {
+            unless (exists($colors->{'alpha'})) {
+                @alpha = map {$_ = $self->{'COLOR_ALPHA'}} (1..$count);
+            } else {
+                @alpha = @{ $colors->{'alpha'} };
             }
         }
-        $gradient = $gradient x $height;
-    } elsif ($type =~ /vertical/i) {    # gradient
-        my @ac;
-        my @rc = multi_gradient($height, @{ $colors->{'red'} });
-        my @gc = multi_gradient($height, @{ $colors->{'green'} });
-        my @bc = multi_gradient($height, @{ $colors->{'blue'} });
-        if (exists($colors->{'alpha'})) {
-            @ac = multi_gradient($height, @{ $colors->{'alpha'} });
-        } else {
-            @ac = map {$_ = $self->{'COLOR_ALPHA'}} (1..(scalar(@bc)));
-        }
-        while (scalar(@rc) < $height) {
-            unshift(@rc, $rc[0]);
-            unshift(@gc, $gc[0]);
-            unshift(@bc, $bc[0]);
-            unshift(@ac, $ac[0]);
-        }
-        while (scalar(@rc) > $height) {
-            pop(@rc);
-            pop(@gc);
-            pop(@bc);
-            pop(@ac);
-        }
-        my $end = scalar(@rc) - 1;
-        foreach my $gcc (0 .. $end) {
-            if ($self->{'BITS'} == 32) {
-                $gradient .= pack('I', (
-                    ($rc[$gcc] << $r_offset) |
-                    ($gc[$gcc] << $g_offset) |
-                    ($bc[$gcc] << $b_offset) |
-                    ($ac[$gcc] << $a_offset)
-                )) x $width;
-            } elsif ($self->{'BITS'} == 24) {
-                my $temp = pack('I', (
-                    ($rc[$gcc] << $r_offset) |
-                    ($gc[$gcc] << $g_offset) |
-                    ($bc[$gcc] << $b_offset) |
-                    ($ac[$gcc] << $a_offset)
-                ));
-                chop($temp);
-                $gradient .= $temp x $width;
-            } elsif ($self->{'BITS'} == 16) {
-                my $R = $rc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
-                my $G = $gc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
-                my $B = $bc[$gcc] >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
-                # Color conversion is done in the pixel conversion
-                my $temp = pack('S',(
-                    ($R << $r_offset) |
-                    ($G << $g_offset) |
-                    ($B << $b_offset)
-                ));
-                $gradient .= $temp x $width;
+        my @rc  = multi_gradient($count, @red);
+        my @gc  = multi_gradient($count, @green);
+        my @bc  = multi_gradient($count, @blue);
+        my @ac  = multi_gradient($count, @alpha) if ($self->{'BITS'} == 32);
+        if ($type =~ /horizontal/i) {    # Gradient
+            my $end = $width - 1;
+            foreach my $gcc (0 .. $end) {
+                if ($self->{'BITS'} == 32) {
+                    $gradient .= pack('L', (
+                        ($rc[$gcc] << $r_offset) |
+                        ($gc[$gcc] << $g_offset) |
+                        ($bc[$gcc] << $b_offset) |
+                        ($ac[$gcc] << $a_offset)
+                    ));
+                } elsif ($self->{'BITS'} == 24) {
+                    $gradient .= pack('L', (
+                        ($rc[$gcc] << $r_offset) |
+                        ($gc[$gcc] << $g_offset) |
+                        ($bc[$gcc] << $b_offset)
+                    ));
+                } elsif ($self->{'BITS'} == 16) {
+                    $gradient .= pack('S', (
+                        (($rc[$gcc] >> 3) << $r_offset) |
+                        (($gc[$gcc] >> 2) << $g_offset) |
+                        (($bc[$gcc] >> 3) << $b_offset)
+                    ));
+                }
+            }
+            $gradient = $gradient x $height;
+        } elsif ($type =~ /vertical/i) {    # gradient
+            my $end = $height - 1;
+            foreach my $gcc (0 .. $end) {
+                if ($self->{'BITS'} == 32) {
+                    $gradient .= pack('L', (
+                        ($rc[$gcc] << $r_offset) |
+                        ($gc[$gcc] << $g_offset) |
+                        ($bc[$gcc] << $b_offset) |
+                        ($ac[$gcc] << $a_offset)
+                    )) x $width;
+                } elsif ($self->{'BITS'} == 24) {
+                    $gradient .= pack('L', (
+                        ($rc[$gcc] << $r_offset) |
+                        ($gc[$gcc] << $g_offset) |
+                        ($bc[$gcc] << $b_offset)
+                    )) x $width;
+                } elsif ($self->{'BITS'} == 16) {
+                    $gradient .= pack('S', (
+                        (($rc[$gcc] >> 3) << $r_offset) |
+                        (($gc[$gcc] >> 2) << $g_offset) |
+                        (($bc[$gcc] >> 3) << $b_offset)
+                    )) x $width;
+                }
             }
         }
-    } else {    # Hatch
+    } else {
         if ($width && $height) {
             my $img;
             eval {
@@ -4045,7 +3973,7 @@ sub set_color {
             ($A << $a_offset)
         ));
         $self->{$name} = substr($self->{$name},0,3) if ($self->{'BITS'} == 24);
-        $self->{"INT_$name"} = unpack('I', $self->{$name});
+        $self->{"INT_$name"} = unpack('L', $self->{$name});
     } elsif ($self->{'BITS'} == 16) {
         my $r = $R >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
         my $g = $G >> (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
@@ -4155,19 +4083,19 @@ sub pixel {
     my $self   = shift;
     my $params = shift;
 
-    my $fb          = $self->{'FB'};
-    my $x           = int($params->{'x'});
-    my $y           = int($params->{'y'});
-    my $color_order = $self->{'COLOR_ORDER'};
-    my $bytes       = $self->{'BYTES'};
+    my $x = int($params->{'x'});
+    my $y = int($params->{'y'});
 
     # Values outside of the clipping area return undefined.
     unless (($x > $self->{'XX_CLIP'}) || ($y > $self->{'YY_CLIP'}) || ($x < $self->{'X_CLIP'}) || ($y < $self->{'Y_CLIP'})) {
-#        $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
-        my ($color, $R, $G, $B, $A);
-        $A = $self->{'COLOR_ALPHA'};
-        my $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $bytes);
-        $color = substr($self->{'SCREEN'}, $index, $bytes);
+        my ($R, $G, $B);
+        my $index = ($self->{'BYTES_PER_LINE'} * ($y + $self->{'YOFFSET'})) + (($self->{'XOFFSET'} + $x) * $self->{'BYTES'});
+        my $color = substr($self->{'SCREEN'}, $index, $self->{'BYTES'});
+
+        return($color) if (exists($params->{'raw'})); # Bypass the mess below if floodfill is using this
+
+        my $color_order = $self->{'COLOR_ORDER'};
+        my $A           = $self->{'COLOR_ALPHA'};
         if ($self->{'BITS'} == 32) {
             if ($color_order == BGR) {
                 ($B, $G, $R, $A) = unpack("C$bytes", $color);
@@ -4198,31 +4126,10 @@ sub pixel {
             }
         } elsif ($self->{'BITS'} == 16) {
             my $C = unpack('S', $color);
-            if ($color_order == BGR) {
-                $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6) ? $C & 31 : $C & 63;
-                $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
-                $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'} < 6)   ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 31   : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 63;
-            } elsif ($color_order == BRG) {
-                $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6) ? $C & 31 : $C & 63;
-                $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'} < 6)   ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 31   : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 63;
-                $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
-            } elsif ($color_order == RGB) {
-                $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'} < 6) ? $C & 31 : $C & 63;
-                $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
-                $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6)  ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 31  : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 63;
-            } elsif ($color_order == RBG) {
-                $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'} < 6) ? $C & 31 : $C & 63;
-                $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6)  ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 31  : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 63;
-                $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
-            } elsif ($color_order == GRB) {
-                $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? $C & 31 : $C & 63;
-                $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'} < 6)  ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 31  : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 63;
-                $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 63;
-            } elsif ($color_order == GBR) {
-                $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? $C & 31 : $C & 63;
-                $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'})) & 63;
-                $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'} < 6)  ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 31  : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'})) & 63;
-            }
+
+            $B = ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'}  < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))  & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'offset'}))  & 63;
+            $G = ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'} < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'offset'})) & 63;
+            $R = ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'}   < 6) ? ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))   & 31 : ($C >> ($self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'offset'}))   & 63;
             $R = $R << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'red'}->{'length'});
             $G = $G << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'green'}->{'length'});
             $B = $B << (8 - $self->{'vscreeninfo'}->{'bitfields'}->{'blue'}->{'length'});
@@ -4264,16 +4171,14 @@ sub fill {
     my $x = int($params->{'x'});
     my $y = int($params->{'y'});
 
-    my %visited = ();
-    my @queue   = ();
-
     my $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-    my $back  = $pixel->{'raw'};
     my $bytes = $self->{'BYTES'};
 
     return if ($back eq $self->{'COLOR'});
-    unless ($self->{'ACCELERATED'}) {    # && $self->{'BITS'} > 16) {
-        my $background = $back;
+    unless ($self->{'ACCELERATED'}) {
+        my $background = $pixel->{'raw'};
+        my %visited    = ();
+        my @queue      = ();
 
         push(@queue, [$x, $y]);
 
@@ -4282,9 +4187,8 @@ sub fill {
             ($x, $y)     = @{$pointref};
             next if (($x < $self->{'X_CLIP'}) || ($x > $self->{'XX_CLIP'}) || ($y < $self->{'Y_CLIP'}) || ($y > $self->{'YY_CLIP'}));
             unless (exists($visited{"$x,$y"})) {
-                $pixel = $self->pixel({ 'x' => $x, 'y' => $y });
-                $back  = $pixel->{'raw'};
-                if ($back eq $background) {
+                $pixel = $self->pixel({ 'x' => $x, 'y' => $y, 'raw' => TRUE });
+                if ($pixel eq $background) {
                     $self->plot({ 'x' => $x, 'y' => $y });
                     $visited{"$x,$y"}++;
                     push(@queue, [$x + 1, $y]);
@@ -4328,7 +4232,10 @@ sub fill {
                 'height' => $height,
             }
         );
-        $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
+        if ($self->{'BITS'} == 16) {
+            $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB);
+            $pattern = $self->_convert_16_to_24($pattern, RGB) if (defined($pattern));
+        }
         eval {
             my $img = Imager->new(
                 'xsize'             => $width,
@@ -6458,30 +6365,30 @@ sub _convert_16_to_24 {
     my $color_order = shift;
 
     my $size = length($img);
-    if ($self->{'ACCELERATED'}) {
-        my $new_img = chr(0) x (($size / 2) * 3);
-        c_convert_16_24($img, $size, $new_img, $color_order);
-        return ($new_img);
-    }
     my $new_img = '';
-    my $black24 = chr(0)   x 3;
-    my $black16 = chr(0)   x 2;
-    my $white24 = chr(255) x 3;
-    my $white16 = chr(255) x 2;
-    my $idx     = 0;
-    while ($idx < $size) {
-        my $color = substr($img, $idx, 2);
+    if ($self->{'ACCELERATED'}) {
+        $new_img = chr(0) x (int(($size / 2) * 3) + 3);
+        c_convert_16_24($img, $size, $new_img, $color_order);
+    } else {
+        my $black24 = chr(0)   x 3;
+        my $black16 = chr(0)   x 2;
+        my $white24 = chr(255) x 3;
+        my $white16 = chr(255) x 2;
+        my $idx     = 0;
+        while ($idx < $size) {
+            my $color = substr($img, $idx, 2);
 
-        # Black and white can be optimized
-        if ($color eq $black16) {
-            $new_img .= $black24;
-        } elsif ($color eq $white16) {
-            $new_img .= $white24;
-        } else {
-            $color = $self->RGB565_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
-            $new_img .= $color->{'color'};
+            # Black and white can be optimized
+            if ($color eq $black16) {
+                $new_img .= $black24;
+            } elsif ($color eq $white16) {
+                $new_img .= $white24;
+            } else {
+                $color = $self->RGB565_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
+                $new_img .= $color->{'color'};
+            }
+            $idx += 2;
         }
-        $idx += 2;
     }
     return ($new_img);
 }
@@ -6494,30 +6401,30 @@ sub _convert_16_to_32 {
     my $color_order = shift;
 
     my $size = length($img);
-    if ($self->{'ACCELERATED'}) {
-        my $new_img = chr(0) x ($size * 4);
-        c_convert_16_32($img, $size, $new_img, $color_order);
-        return ($new_img);
-    }
     my $new_img = '';
-    my $black32 = chr(0)   x 4;
-    my $black16 = chr(0)   x 2;
-    my $white32 = chr(255) x 4;
-    my $white16 = chr(255) x 2;
-    my $idx     = 0;
-    while ($idx < $size) {
-        my $color = substr($img, $idx, 2);
+    if ($self->{'ACCELERATED'}) {
+        $new_img = chr(0) x (int($size * 2) + 4);
+        c_convert_16_32($img, $size, $new_img, $color_order);
+    } else {
+        my $black32 = chr(0)   x 4;
+        my $black16 = chr(0)   x 2;
+        my $white32 = chr(255) x 4;
+        my $white16 = chr(255) x 2;
+        my $idx     = 0;
+        while ($idx < $size) {
+            my $color = substr($img, $idx, 2);
 
-        # Black and white can be optimized
-        if ($color eq $black16) {
-            $new_img .= $black32;
-        } elsif ($color eq $white16) {
-            $new_img .= $white32;
-        } else {
-            $color = $self->RGB565_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
-            $new_img .= $color->{'color'};
+            # Black and white can be optimized
+            if ($color eq $black16) {
+                $new_img .= $black32;
+            } elsif ($color eq $white16) {
+                $new_img .= $white32;
+            } else {
+                $color = $self->RGB565_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
+                $new_img .= $color->{'color'};
+            }
+            $idx += 2;
         }
-        $idx += 2;
     }
     return ($new_img);
 }
@@ -6530,33 +6437,32 @@ sub _convert_24_to_16 {
     my $color_order = shift;
 
     my $size = length($img);
-    if ($self->{'ACCELERATED'}) {
-        my $new_img = chr(0) x (($size / 3) * 2);
-        c_convert_24_16($img, $size, $new_img, $color_order);
-        return ($new_img);
-    }
     my $new_img = '';
-    my $black24 = chr(0) x 3;
-    my $black16 = chr(0) x 2;
-    my $white24 = chr(255) x 3;
-    my $white16 = chr(255) x 2;
+    if ($self->{'ACCELERATED'}) {
+        $new_img = chr(0) x (int(($size / 3) * 2) + 2);
+        c_convert_24_16($img, $size, $new_img, $color_order);
+    } else {
+        my $black24 = chr(0) x 3;
+        my $black16 = chr(0) x 2;
+        my $white24 = chr(255) x 3;
+        my $white16 = chr(255) x 2;
 
-    my $idx = 0;
-    while ($idx < $size) {
-        my $color = substr($img, $idx, 3);
+        my $idx = 0;
+        while ($idx < $size) {
+            my $color = substr($img, $idx, 3);
 
-        # Black and white can be optimized
-        if ($color eq $black24) {
-            $new_img .= $black16;
-        } elsif ($color eq $white24) {
-            $new_img .= $white16;
-        } else {
-            $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
-            $new_img .= $color->{'color'};
+            # Black and white can be optimized
+            if ($color eq $black24) {
+                $new_img .= $black16;
+            } elsif ($color eq $white24) {
+                $new_img .= $white16;
+            } else {
+                $color = $self->RGB888_to_RGB565({ 'color' => $color, 'color_order' => $color_order });
+                $new_img .= $color->{'color'};
+            }
+            $idx += 3;
         }
-        $idx += 3;
     }
-
     return ($new_img);
 }
 
@@ -6570,7 +6476,7 @@ sub _convert_32_to_16 {
     my $size = length($img);
     my $new_img = '';
     if ($self->{'ACCELERATED'}) {
-        $new_img = chr(0) x ($size / 2);
+        $new_img = chr(0) x (int($size / 2) + 2);
         c_convert_32_16($img, $size, $new_img, $color_order);
     } else {
         my $black32 = chr(0) x 4;
@@ -6605,33 +6511,32 @@ sub _convert_32_to_24 {
     my $color_order = shift;
 
     my $size = length($img);
-    if ($self->{'ACCELERATED'}) {
-        my $new_img = chr(0) x ($size / 4) * 3;
-        c_convert_32_24($img, $size, $new_img, $color_order);
-        return ($new_img);
-    }
     my $new_img = '';
-    my $black32 = chr(0) x 4;
-    my $black24 = chr(0) x 3;
-    my $white32 = chr(255) x 4;
-    my $white24 = chr(255) x 3;
+    if ($self->{'ACCELERATED'}) {
+        $new_img = chr(0) x (int(($size / 4) * 3) + 3);
+        c_convert_32_24($img, $size, $new_img, $color_order);
+    } else {
+        my $black32 = chr(0) x 4;
+        my $black24 = chr(0) x 3;
+        my $white32 = chr(255) x 4;
+        my $white24 = chr(255) x 3;
 
-    my $idx = 0;
-    while ($idx < $size) {
-        my $color = substr($img, $idx, 4);
+        my $idx = 0;
+        while ($idx < $size) {
+            my $color = substr($img, $idx, 4);
 
-        # Black and white can be optimized
-        if ($color eq $black32) {
-            $new_img .= $black24;
-        } elsif ($color eq $white32) {
-            $new_img .= $white24;
-        } else {
-            $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
-            $new_img .= $color->{'color'};
+            # Black and white can be optimized
+            if ($color eq $black32) {
+                $new_img .= $black24;
+            } elsif ($color eq $white32) {
+                $new_img .= $white24;
+            } else {
+                $color = $self->RGBA8888_to_RGB888({ 'color' => $color, 'color_order' => $color_order });
+                $new_img .= $color->{'color'};
+            }
+            $idx += 4;
         }
-        $idx += 4;
     }
-
     return ($new_img);
 }
 
@@ -6643,33 +6548,32 @@ sub _convert_24_to_32 {
     my $color_order = shift;
 
     my $size = length($img);
-    if ($self->{'ACCELERATED'}) {
-        my $new_img = chr(0) x ($size / 3) * 4;
-        c_convert_24_32($img, $size, $new_img, $color_order);
-        return ($new_img);
-    }
     my $new_img = '';
-    my $black32 = chr(0) x 4;
-    my $black24 = chr(0) x 3;
-    my $white32 = chr(255) x 4;
-    my $white24 = chr(255) x 3;
+    if ($self->{'ACCELERATED'}) {
+        $new_img = chr(0) x (int(($size / 3) * 4) + 4);
+        c_convert_24_32($img, $size, $new_img, $color_order);
+    } else {
+        my $black32 = chr(0) x 4;
+        my $black24 = chr(0) x 3;
+        my $white32 = chr(255) x 4;
+        my $white24 = chr(255) x 3;
 
-    my $idx = 0;
-    while ($idx < $size) {
-        my $color = substr($img, $idx, 4);
+        my $idx = 0;
+        while ($idx < $size) {
+            my $color = substr($img, $idx, 4);
 
-        # Black and white can be optimized
-        if ($color eq $black24) {
-            $new_img .= $black32;
-        } elsif ($color eq $white24) {
-            $new_img .= $white32;
-        } else {
-            $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
-            $new_img .= $color->{'color'};
+            # Black and white can be optimized
+            if ($color eq $black24) {
+                $new_img .= $black32;
+            } elsif ($color eq $white24) {
+                $new_img .= $white32;
+            } else {
+                $color = $self->RGB888_to_RGBA8888({ 'color' => $color, 'color_order' => $color_order });
+                $new_img .= $color->{'color'};
+            }
+            $idx += 3;
         }
-        $idx += 3;
     }
-
     return ($new_img);
 }
 
@@ -6703,7 +6607,7 @@ sub RGB565_to_RGB888 {
     }
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
-    $b = int($b * 527 * 23) >> 6;
+    $b = int($b * 527 + 23) >> 6;
 
     my $color;
     if ($color_order == BGR) {
@@ -6754,7 +6658,7 @@ sub RGB565_to_RGBA8888 {
     }
     $r = int($r * 527 + 23) >> 6;
     $g = int($g * 259 + 33) >> 6;
-    $b = int($b * 527 * 23) >> 6;
+    $b = int($b * 527 + 23) >> 6;
 
     my $color;
     if ($color_order == BGR) {

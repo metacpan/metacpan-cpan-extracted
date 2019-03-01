@@ -48,7 +48,7 @@ WriteMakefile(
     },
     ABSTRACT_FROM     => 'lib/USB/LibUSB.pm', # retrieve abstract from module
     AUTHOR            =>
-    'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>',
+    'Simon Reinhardt <simon.reinhardt@physik.uni-r.de>',
     LICENSE           => 'perl',
     LIBS              => [$libs], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'

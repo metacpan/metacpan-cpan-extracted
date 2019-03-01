@@ -22,4 +22,4 @@ requires:
   perl: '5.01'
 resources:
   repository: https://git.oschina.net/ijz/Mojo-Zabbix
-version: '0.04'
+version: '0.05'

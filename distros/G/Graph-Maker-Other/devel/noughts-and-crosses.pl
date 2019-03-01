@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2017 Kevin Ryde
+# Copyright 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -89,7 +89,7 @@ $|=1;
       );
     last if $graph->vertices > 255;
     # $graph->delete_vertex('0000');   # sans root
-    # Graph_print_tikz($graph);
+    # MyGraphs::Graph_print_tikz($graph);
     push @graphs, $graph;
   }
   MyGraphs::hog_searches_html(@graphs);
@@ -108,7 +108,7 @@ $|=1;
       );
     my $name = $graph->get_graph_attribute ('name');
     print "$name\n";
-     Graph_print_tikz($graph);
+    MyGraphs::Graph_print_tikz($graph);
     my $num_vertices = $graph->vertices;
     my $num_edges    = $graph->edges;
     my $diameter = $graph->diameter || 0;

@@ -1,5 +1,5 @@
 package Date::Manip::Lang::swedish;
-# Copyright (c) 1996-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 1996-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.75';
+$VERSION='6.76';
 
 our($Language,@Encodings,$LangName,$YearAdded);
 @Encodings = qw(utf-8 ISO-8859-15 perl);

@@ -1,5 +1,11 @@
 Revision history for Perl extension Starch.
 
+0.12 2019-03-01T06:09:40Z
+
+ - Remove Test::Starch and add it as a dependency.
+ - Fix several POD errors.  Thanks CPANTS!
+ - Declare deps as modules, not distros.
+
 0.11 2019-02-20T15:54:38Z
 
  - Find installed modules with Module::Find in Starch::Util::croak(),

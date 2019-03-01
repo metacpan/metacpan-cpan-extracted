@@ -10,9 +10,11 @@ Makefile.PL
 README
 dist.ini
 lib/EPublisher/Source/Plugin/PerltutsCom.pm
+t/01_get_tutorial.t
 t/02_err_modulename.t
 t/95_pm_have_version.t
 t/96_pod_coverage.t
 t/97_pod.t
+t/TestUA.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t

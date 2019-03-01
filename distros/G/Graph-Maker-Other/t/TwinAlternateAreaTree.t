@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -29,14 +29,14 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-plan tests => 35;
+plan tests => 43;
 
 require Graph::Maker::TwinAlternateAreaTree;
 
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 10;
+  my $want_version = 13;
   ok ($Graph::Maker::TwinAlternateAreaTree::VERSION, $want_version,
       'VERSION variable');
   ok (Graph::Maker::TwinAlternateAreaTree->VERSION,  $want_version,
@@ -115,6 +115,12 @@ require Graph::Maker::TwinAlternateAreaTree;
   ok ($graph->has_edge(0,3)?1:0, 1);
   ok ($graph->has_edge(1,3)?1:0, 0);
   ok ($graph->has_edge(2,3)?1:0, 1);
+}
+
+foreach my $level (0 .. 7) {
+  my $graph = Graph::Maker->new('twin_alternate_area_tree', level => $level);
+  my $num_vertices = $graph->vertices;
+  ok ($num_vertices, 2**$level);
 }
 
 

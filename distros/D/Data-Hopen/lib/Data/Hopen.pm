@@ -22,7 +22,7 @@ use Data::Hopen::Util::NameSet;
 use Getargs::Mixed;
 use Storable ();
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000012';
 
 # Docs {{{1
 

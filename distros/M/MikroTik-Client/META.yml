@@ -23,4 +23,4 @@ resources:
   bugtracker: https://github.com/anparker/mikrotik-client/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/anparker/mikrotik-client.git
-version: v0.500
+version: v0.501

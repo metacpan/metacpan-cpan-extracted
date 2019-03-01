@@ -13,20 +13,21 @@ use utf8;
 use strictures 2;
 use version;
 use Role::Commons -all;
-
 use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.2.0
+Version v1.3.0
 
 =cut
 
-our $VERSION = version->declare("v1.2.0");
+our $VERSION = version->declare("v1.3.0");
 
 =head1 DESCRIPTION
 
-Framework for system deployment ninja tricks
+Framework for system deployment ninja tricks.
+
+See L<boxer> for further information.
 
 =head1 BUGS
 
@@ -35,7 +36,24 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Boxer>.
 
 =head1 SEE ALSO
 
-L<boxer>.
+L<Debian Installer|https://www.debian.org/devel/debian-installer/>,
+L<tasksel|https://www.debian.org/doc/manuals/debian-faq/ch-pkgtools.en.html#s-tasksel>,
+L<debconf preseeding|https://wiki.debian.org/DebianInstaller/Preseed>,
+L<Hands-off|http://hands.com/d-i/>
+
+L<Debian Pure Blends|https://wiki.debian.org/DebianPureBlends>
+
+L<FAI class system|https://fai-project.org/fai-guide/#defining%20classes>
+
+L<Debathena config-package-dev|https://debathena.mit.edu/config-packages/>
+
+L<germinate|https://wiki.ubuntu.com/Germinate>
+
+L<https://freedombox.org/>,
+L<https://solidbox.org/>,
+L<https://wiki.debian.org/Design>,
+L<https://wiki.debian.org/DebianParl>,
+L<http://box.redpill.dk/>
 
 =head1 AUTHOR
 

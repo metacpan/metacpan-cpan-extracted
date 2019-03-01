@@ -1,4 +1,4 @@
-# Copyright (c) 1995-2018 Sullivan Beck. All rights reserved.
+# Copyright (c) 1995-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -132,7 +132,7 @@ This returns a list of Date::Manip::Date objects containing all dates
 during a year which are holidays. The times will all be 00:00:00.
 
 If $y is not passed in, it will list the holidays in the same year as
-the date stored in $date.
+the date stored in $date (if any) or in the current year otherwise.
 
 =item B<list_events>
 

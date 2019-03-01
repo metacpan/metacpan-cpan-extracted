@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -38,7 +38,62 @@ use MyGraphs 'make_tree_iterator_edge_aref','edge_aref_to_Graph',
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 55;
+plan tests => 58;
+
+
+#------------------------------------------------------------------------------
+# Graph_all_cycles()
+
+{
+  my $graph = Graph->new (undirected => 1);
+  $graph->add_cycle(1,2,3,4);
+  $graph->add_cycle(5,6,7,8);
+  {
+    my @cycles = MyGraphs::Graph_find_all_cycles($graph);
+    @cycles = sort map {join(',',@$_)} @cycles;
+    ok (join(' ',@cycles), '1,2,3,4 5,6,7,8');
+  }
+  $graph->add_edge(1,5);
+  {
+    my @cycles = MyGraphs::Graph_find_all_cycles($graph);
+    @cycles = sort map {join(',',@$_)} @cycles;
+    ok (join(' ',@cycles), '1,2,3,4 5,6,7,8');
+  }
+}
+{
+  my $graph = Graph->new (undirected => 1);
+  $graph->add_cycle(1,2,3,4);
+  $graph->add_cycle(4,5,6,7);
+  my @cycles = MyGraphs::Graph_find_all_cycles($graph);
+  @cycles = sort map {join(',',@$_)} @cycles;
+  ok (join(' ',@cycles), '1,2,3,4 4,5,6,7');
+}
+
+
+#------------------------------------------------------------------------------
+### Graph_tree_minimal_domsets_count() of all trees ...
+
+{
+  my $count = 0;
+  my $bad = 0;
+ NUM_VERTICES: foreach my $num_vertices (0 .. 7) {
+    my $iterator_func = make_tree_iterator_edge_aref
+      (num_vertices => $num_vertices);
+
+    while (my $edge_aref = $iterator_func->()) {
+      my $graph = edge_aref_to_Graph($edge_aref);
+      my $by_prods = Graph_tree_minimal_domsets_count($graph);
+      my $by_pred = MyGraphs::Graph_minimal_domsets_count_by_pred($graph);
+
+      $count++;
+      if ($by_prods != $by_pred) {
+        last NUM_VERTICES if ++$bad > 10;
+      }
+    }
+  }
+  MyTestHelpers::diag("minimal_domsets_count tests $count");
+  ok ($bad, 0);
+}
 
 #------------------------------------------------------------------------------
 ### Graph_is_hanging_cycle() ...
@@ -82,32 +137,6 @@ plan tests => 55;
     ok ($by_prods, $by_pred, "path $n minimal_domsets_count");
   }
 }
-
-#------------------------------------------------------------------------------
-### Graph_tree_minimal_domsets_count() of all trees ...
-
-{
-  my $count = 0;
-  my $bad = 0;
- NUM_VERTICES: foreach my $num_vertices (0 .. 7) {
-    my $iterator_func = make_tree_iterator_edge_aref
-      (num_vertices => $num_vertices);
-
-    while (my $edge_aref = $iterator_func->()) {
-      my $graph = edge_aref_to_Graph($edge_aref);
-      my $by_prods = Graph_tree_minimal_domsets_count($graph);
-      my $by_pred = MyGraphs::Graph_minimal_domsets_count_by_pred($graph);
-
-      $count++;
-      if ($by_prods != $by_pred) {
-        last NUM_VERTICES if ++$bad > 10;
-      }
-    }
-  }
-  MyTestHelpers::diag("minimal_domsets_count tests $count");
-  ok ($bad, 0);
-}
-
 
 #------------------------------------------------------------------------------
 ### Graph_tree_domsets_count() of all trees ...

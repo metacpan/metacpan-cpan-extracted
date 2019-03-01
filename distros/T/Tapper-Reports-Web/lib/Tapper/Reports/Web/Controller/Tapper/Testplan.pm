@@ -1,6 +1,6 @@
 package Tapper::Reports::Web::Controller::Tapper::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Reports::Web::Controller::Tapper::Testplan::VERSION = '5.0.13';
+$Tapper::Reports::Web::Controller::Tapper::Testplan::VERSION = '5.0.14';
 use parent 'Tapper::Reports::Web::Controller::Base';
 
 use common::sense;
@@ -59,7 +59,21 @@ sub delete : Chained('id') PathPart('delete')
                         return;
                 }
         }
+}
 
+sub cancel : Chained('id') PathPart('cancel')
+{
+        my ($self, $c) = @_;
+
+        my $cmd = Tapper::Cmd::Testplan->new;
+        my $testplan_id = $c->stash->{testplan}->id;
+        my $retval = $cmd->cancel($testplan_id, "Cancelled testplan in WebGUI");
+        if ($retval) {
+            $c->response->body(qq(Can not cancel testplan: $retval));
+            return;
+        }
+        $c->flash->{msg} = "<strong>Cancelling this testplan is in progress...</strong><br/><br/>";
+        $c->res->redirect("/tapper/testplan/id/$testplan_id");
 }
 
 
@@ -115,7 +129,7 @@ sub index :Path :Args()
                                                                          ]});
                 my @details = $self->get_testrun_details($todays_instances);
                 if (@details) {
-                        push @{$c->stash->{testplan_days}}, { date               => $today,
+                        push @{$c->stash->{testplan_days}}, { date               => $yesterday,
                                                               testplan_instances => \@details,
                                                             };
                 }
@@ -139,18 +153,22 @@ sub get_testrun_details
                 foreach my $col ($instance->columns) {
                         $details->{$col} = $instance->$col;
                 }
-                $details->{count_unfinished} = int grep {$_->testrun_scheduling and
-                                                           $_->testrun_scheduling->status ne 'finished'} $instance->testruns->all;
-
 
                 my $testruns = $instance->testruns;
         TESTRUN:
-                while ( my $testrun = $testruns->next) {
-                        next TESTRUN if $testrun->testrun_scheduling->status ne 'finished';
-                        my $stats   = model('TestrunDB')->resultset('ReportgroupTestrunStats')->search({testrun_id => $testrun->id}, {rows => 1})->first;
+                while (my $testrun = $testruns->next)
+                {
+                    my $job = $testrun->testrun_scheduling;
+                    $details->{count_unfinished}++ if $job and $job->status ne 'finished';
+                    $details->{count_running}++    if $job and $job->status eq 'running';
+                    $details->{count_schedule}++   if $job and $job->status eq 'schedule';
+                    $details->{count_prepare}++    if $job and $job->status eq 'prepare';
 
-                        $details->{count_fail}++ if $stats and $stats->success_ratio  < 100;
-                        $details->{count_pass}++ if $stats and $stats->success_ratio == 100;
+                    next TESTRUN if $job->status ne 'finished';
+                    my $stats   = model('TestrunDB')->resultset('ReportgroupTestrunStats')->search({testrun_id => $testrun->id}, {rows => 1})->first;
+
+                    $details->{count_fail}++ if $stats and $stats->success_ratio  < 100;
+                    $details->{count_pass}++ if $stats and $stats->success_ratio == 100;
                 }
                 push @testplan_instances, $details;
         }
@@ -291,7 +309,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2019 by Advanced Micro Devices, Inc..
 
 This is free software, licensed under:
 

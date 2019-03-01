@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Mail::DKIM::Iterator;
 
-plan tests => 18;
+plan tests => 22;
 
 # basic tests with different canonicalizations and algorithms
 for my $c (qw(
@@ -55,7 +55,7 @@ for my $c (qw(
 	"data after signed body");
 }
 
-# expect verification perm-fail because of wrong pubkey
+# expect verification permerror because of wrong pubkey
 {
     my $ok = eval {
 	my $m = sign([mail()], s => 'bad');
@@ -88,7 +88,7 @@ for my $c (qw(
 	"DNS lookup failed");
 }
 
-# expect verification perm-fail because DKIM key has invalid syntax
+# expect verification permerror because DKIM key has invalid syntax
 {
     my $ok = eval {
 	my $m = sign([mail()], s => 'invalid' );
@@ -97,6 +97,50 @@ for my $c (qw(
     my $err = $@ || ($ok ? '':'unknown error');
     is( $err,"status status=permerror error=invalid or empty DKIM record\n",
 	"DKIM key invalid syntax");
+}
+
+# expect verification permerror because DKIM key has invalid syntax
+{
+    my $ok = eval {
+	my $m = sign([mail()], v => '2' );
+	verify([$m],dns());
+    };
+    my $err = $@ || ($ok ? '':'unknown error');
+    is( $err,"status status=permerror error=invalid DKIM-Signature header: bad DKIM signature version: 2 a=rsa-sha256\n",
+	"DKIM signature invalid syntax");
+}
+
+# expect verification permerror because of broken signature
+{
+    my $ok = eval {
+	my $m = sign([mail()], 'b' => 'foobar' );
+	verify([$m],dns());
+    };
+    my $err = $@ || ($ok ? '':'unknown error');
+    is( $err,"status status=permerror error=header sig corrupt\n",
+	"DKIM signature corrupt b");
+}
+
+# expect verification fail because of broken hash
+{
+    my $ok = eval {
+	my $m = sign([mail()], 'bh' => 'foobar' );
+	verify([$m],dns());
+    };
+    my $err = $@ || ($ok ? '':'unknown error');
+    is( $err,"status status=fail error=body hash mismatch\n",
+	"DKIM signature corrupt bh");
+}
+
+# expect verification permerror because of broken pubkey in DNS
+{
+    my $ok = eval {
+	my $m = sign([mail()], 's' => 'badkey' );
+	verify([$m],dns());
+    };
+    my $err = $@ || ($ok ? '':'unknown error');
+    is( $err,"status status=permerror error=using public key failed\n",
+	"DKIM signature corrupt pubkey");
 }
 
 
@@ -108,6 +152,9 @@ for my $c (qw(
 sub sign {
     my ($mail,%args) = @_;
     push @$mail,'';
+    my $v = delete $args{v};
+    my $b = delete $args{b};
+    my $bh = delete $args{bh};
     my $dkim = Mail::DKIM::Iterator->new( sign => {
 	d => 'example.com',
 	s => 'good',
@@ -135,6 +182,10 @@ sub sign {
     $rv->[0]->status == DKIM_PASS
 	or die "unexpected status ".( $rv->[0]->status // '<undef>' )."\n";
     my $dkim_sig = $rv->[0]->signature;
+    $dkim_sig =~s{\bv=1;}{v=$v} if defined $v;
+    $dkim_sig =~s{\bb=(?:[^;]+)(\z|;)}{b=$b$1} if defined $b;
+    $dkim_sig =~s{\bbh=(?:[^;]+)(\z|;)}{bh=$bh$1} if defined $bh;
+    #warn "XXXXX $dkim_sig\n";
     return $dkim_sig . $total_mail;
 }
 
@@ -193,6 +244,9 @@ v=DKIM1; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDOD/2mm2FfRCkBhtQkE3Wl2M3A9E8PJ
 DKIM_KEY
     'bad._domainkey.example.com' => <<'DKIM_KEY',
 v=DKIM1; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDwIRP/UC3SBsEmGqZ9ZJW3/DkMoGeLnQg1fWn7/zYtIxN2SnFCjxOCKG9v3b4jYfcTNh5ijSsq631uBItLa7od+v/RtdC2UzJ1lWT947qR+Rcac2gbto/NMqJ0fzfVjH4OuKhitdY9tf6mcwGjaNBcWToIMmPSPDdQPNUYckcQ2QIDAQAB
+DKIM_KEY
+    'badkey._domainkey.example.com' => <<'DKIM_KEY',
+v=DKIM1; p=foobar
 DKIM_KEY
     'no-dns._domainkey.example.com' => undef,
     'invalid._domainkey.example.com' => "And now for something completely different",

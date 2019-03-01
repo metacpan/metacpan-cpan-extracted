@@ -1,5 +1,5 @@
 package ZMQ::FFI::ErrorHelper;
-$ZMQ::FFI::ErrorHelper::VERSION = '1.12';
+$ZMQ::FFI::ErrorHelper::VERSION = '1.14';
 use Carp;
 use FFI::Platypus;
 use ZMQ::FFI::Util qw(zmq_version);
@@ -110,7 +110,7 @@ ZMQ::FFI::ErrorHelper
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =head1 AUTHOR
 

@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 1.26
+Version 1.27
 
 =cut
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 
 =head1 SYNOPSIS
@@ -26,34 +26,35 @@ Typical usage which should illustrate all the public methods
 
     use Text::Amuse;
     my $doc = Text::Amuse->new(file => "test.muse");
-    
+
     # get the title, author, etc. as an hashref
     my $html_directives = $doc->header_as_html;
-    
+
     # get the table of contents
     my $html_toc = $doc->toc_as_html;
-    
+
     # get the body
     my $html_body = $doc->as_html;
-    
+
     # same for LaTeX
     my $latex_directives = $doc->header_as_latex;
     my $latex_body = $doc->as_latex;
-    
+
     # do we need a \tableofcontents ?
     my $wants_toc = $doc->wants_toc; # (boolean)
-    
+
     # files attached
     my @images = $doc->attachments;
-    
+
     # at this point you can inject the values in a template, which is
     # left to the user. If you want an executable, please install
     # Text::Amuse::Compile.
-    
 
-=head1 CONSTRUCTOR
+=head1 CONSTRUCTORS
 
-=head3 new (file => $file)
+=over 4
+
+=item new (file => $file)
 
 Create a new Text::Amuse object. You should pass the named parameter
 C<file>, pointing to a muse file to process. Please note that you
@@ -101,15 +102,21 @@ sub new {
     bless $self, $class;
 }
 
-=head3 document
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item document
 
 Accessor to the L<Text::Amuse::Document> object. [Internal]
 
-=head3 file
+=item file
 
 Accessor to the file passed in the constructor (read-only)
 
-=head3 partials
+=item partials
 
 Return an hashref where the keys are the chunk indexes and the values
 are true, undef otherwise.
@@ -134,10 +141,13 @@ sub file {
     return shift->{file};
 }
 
+=back
 
 =head2 HTML output
 
-=head3 as_html
+=over 4
+
+=item as_html
 
 Output the HTML document (and cache it in the object)
 
@@ -190,7 +200,7 @@ sub as_html {
     return join("", @{ $self->{_html_output_strings} });
 }
 
-=head3 header_as_html
+=item header_as_html
 
 The directives of the document in HTML (title, authors, etc.),
 returned as an hashref.
@@ -210,7 +220,7 @@ sub header_as_html {
     return { %{ $self->{_cached_html_header} } };
 }
 
-=head3 toc_as_html
+=item toc_as_html
 
 Return the HTML formatted ToC, as a string.
 
@@ -239,7 +249,7 @@ sub toc_as_html {
     }
 }
 
-=head3 as_splat_html
+=item as_splat_html
 
 Return a list of strings, each of them is a html page resulting from
 the splitting of the as_html output. Linked footnotes as inserted at
@@ -253,7 +263,7 @@ sub as_splat_html {
 }
 
 
-=head3 raw_html_toc
+=item raw_html_toc
 
 Return an internal representation of the ToC
 
@@ -287,9 +297,13 @@ sub raw_html_toc {
     return @toc;
 }
 
+=back
+
 =head2 LaTeX output
 
-=head3 as_latex
+=over 4
+
+=item as_latex
 
 Output the (Xe)LaTeX document (and cache it in the object), as a
 string.
@@ -308,7 +322,7 @@ sub _latex_obj {
     return $self->{_ltx_doc};
 }
 
-=head3 as_splat_latex
+=item as_splat_latex
 
 Return a list of strings, each of them is a LaTeX chunk resulting from
 the splitting of the as_latex output.
@@ -329,7 +343,7 @@ sub as_splat_latex {
     return @{ $self->_get_splat_body($self->_latex_obj) };
 }
 
-=head3 as_beamer
+=item as_beamer
 
 Output the document as LaTeX, but wrap each section which doesn't
 contain a comment C<; noslide> inside a frame.
@@ -342,17 +356,17 @@ sub as_beamer {
     return Text::Amuse::Beamer->new(latex => $latex)->process;
 }
 
-=head3 wants_toc
+=item wants_toc
 
 Return true if a ToC is needed because we found some headings inside.
 
-=head3 wants_preamble
+=item wants_preamble
 
 Normally returns true. If partial output, only if the C<pre> string was passed.
 
 Preamble is the title page, or the title/author/date chunk.
 
-=head3 wants_postamble
+=item wants_postamble
 
 Normally returns true. If partial output, only if the C<post> string was passed.
 
@@ -395,7 +409,7 @@ sub wants_toc {
 }
 
 
-=head3 header_as_latex
+=item header_as_latex
 
 The LaTeX formatted header, as an hashref. Keys are not interpolated
 in any way.
@@ -411,9 +425,13 @@ sub header_as_latex {
     return { %{ $self->{_cached_latex_header} } };
 }
 
+=back
+
 =head2 Helpers
 
-=head3 attachments
+=over 4
+
+=item attachments
 
 Report the attachments (images) found, as a list.
 
@@ -425,13 +443,13 @@ sub attachments {
     return $self->document->attachments;
 }
 
-=head3 language_code
+=item language_code
 
 The language code of the document. This method will looks into the
 header of the document, searching for the keys C<lang> or C<language>,
 defaulting to C<en>.
 
-=head3 language
+=item language
 
 Same as above, but returns the human readable version, notably used by
 Babel, Polyglossia, etc.
@@ -442,7 +460,7 @@ sub _language_mapping {
     shift->document->_language_mapping;
 }
 
-=head3 header_defined
+=item header_defined
 
 Return a convenience hashref with the header fields set to true when
 they are defined in the document.
@@ -476,7 +494,7 @@ sub language {
     shift->document->language;
 }
 
-=head3 other_language_codes
+=item other_language_codes
 
 Always return undef, because in the current implementation you can't
 switch language in the middle of a text. But could be implemented in
@@ -488,7 +506,7 @@ sub other_language_codes {
     return;
 }
 
-=head3 other_languages
+=item other_languages
 
 Always return undef. When and if implemented, it should return an
 arrayref or undef.
@@ -500,7 +518,7 @@ sub other_languages {
     return;
 }
 
-=head3 hyphenation
+=item hyphenation
 
 Return a validated version of the C<#hyphenation> header, if present,
 or the empty string.
@@ -523,20 +541,20 @@ sub hyphenation {
     return $self->{_doc_hyphenation};
 }
 
-=head3 is_rtl
+=item is_rtl
 
 Return true if the language is RTL (ar, he, fa -- so far)
 
-=head3 is_bidi
+=item is_bidi
 
 Return true if the document use direction switches.
 
-=head3 html_direction
+=item html_direction
 
 Return the direction (rtl or ltr) of the document, based on the
 language
 
-=head3 font_script
+=item font_script
 
 Return the script of the language.
 
@@ -584,6 +602,8 @@ sub font_script {
                   );
     return $scripts{$self->language_code} || 'Latin';
 }
+
+=back
 
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
 

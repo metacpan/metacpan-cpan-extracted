@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019 Kevin Ryde
 
 # MyOEIS.pm is shared by several distributions.
 #
@@ -109,6 +109,7 @@ sub compare_values {
   my %option = @_;
   require MyTestHelpers;
   my $anum = $option{'anum'} || croak "Missing anum parameter";
+  my $name = $option{'name'}; if (!defined $name) { $name = ""; }
   my $func = $option{'func'} || croak "Missing func parameter";
   my ($bvalues, $lo, $filename) = MyOEIS::read_values
     ($anum,
@@ -137,7 +138,7 @@ sub compare_values {
   if (defined $Test::TestLevel) {
     require Test;
     local $Test::TestLevel = $Test::TestLevel + 1;
-    Test::skip (! $bvalues, $diff, undef, "$anum");
+    Test::skip (! $bvalues, $diff, undef, "$anum $name");
   } elsif (defined $diff) {
     print "$diff\n";
   }

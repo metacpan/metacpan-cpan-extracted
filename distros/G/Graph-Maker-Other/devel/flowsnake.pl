@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -122,9 +122,9 @@ use Graph::Maker::GosperIsland;
       last;
     }
 
-    Graph_view($graph, xy=>1);
+    MyGraphs::Graph_view($graph, xy=>1);
     push @graphs, $graph;
   }
-  hog_searches_html(@graphs);
+  MyGraphs::hog_searches_html(@graphs);
   exit 0;
 }

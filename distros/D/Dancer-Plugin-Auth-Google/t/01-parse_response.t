@@ -47,8 +47,4 @@ plan tests => 10;
     );
     is_deeply( $data, { bar => 'baz' }, 'able to parse valid JSON response (second attempt)' );
     is $error, undef, 'no error parsing valid JSON response (second attempt)';
-
-
 }
-
-

@@ -3,7 +3,7 @@ Locale::Codes::Country_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Mon Dec  3 12:37:02 EST 2018
+#    Generated on: Thu Feb 21 10:50:07 EST 2019
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.59';
+$VERSION='3.60';
 
 $Locale::Codes::Data{'country'}{'id'} = '0280';
 
@@ -280,7 +280,6 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       ],
    q(0071) => [
       q(Eswatini),
-      q(SWAZILAND),
       ],
    q(0072) => [
       q(Ethiopia),
@@ -527,6 +526,7 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       q(The former Yugoslav Republic of Macedonia),
       q(former Yugoslav Republic of Macedonia),
       q(Macedonia),
+      q(North Macedonia),
       ],
    q(0134) => [
       q(Madagascar),
@@ -832,9 +832,9 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       ],
    q(0217) => [
       q(Syrian Arab Republic),
-      q(Syrian Arab Republic (The)),
-      q(Syrian Arab Republic, The),
       q(The Syrian Arab Republic),
+      q(Syrian Arab Republic, The),
+      q(Syrian Arab Republic (The)),
       q(Syria),
       ],
    q(0218) => [
@@ -846,8 +846,9 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       q(Tajikistan),
       ],
    q(0220) => [
-      q(Tanzania, United Republic of),
-      q(Tanzania (United Republic of)),
+      q(Tanzania, the United Republic of),
+      q(Tanzania (the United Republic of)),
+      q(the United Republic of Tanzania),
       q(United Republic of Tanzania),
       q(Tanzania),
       ],
@@ -2243,6 +2244,10 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0119),
       q(6),
       ],
+   q(north macedonia) => [
+      q(0133),
+      q(7),
+      ],
    q(northern mariana islands) => [
       q(0166),
       q(0),
@@ -2607,10 +2612,6 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0214),
       q(1),
       ],
-   q(swaziland) => [
-      q(0071),
-      q(1),
-      ],
    q(sweden) => [
       q(0215),
       q(0),
@@ -2629,7 +2630,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       ],
    q(syrian arab republic (the)) => [
       q(0217),
-      q(1),
+      q(3),
       ],
    q(syrian arab republic, the) => [
       q(0217),
@@ -2653,13 +2654,13 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       ],
    q(tanzania) => [
       q(0220),
-      q(3),
+      q(4),
       ],
-   q(tanzania (united republic of)) => [
+   q(tanzania (the united republic of)) => [
       q(0220),
       q(1),
       ],
-   q(tanzania, united republic of) => [
+   q(tanzania, the united republic of) => [
       q(0220),
       q(0),
       ],
@@ -2825,7 +2826,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       ],
    q(the syrian arab republic) => [
       q(0217),
-      q(3),
+      q(1),
       ],
    q(the territory of the wallis and futuna islands) => [
       q(0245),
@@ -2846,6 +2847,10 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
    q(the united kingdom of great britain and northern ireland) => [
       q(0235),
       q(1),
+      ],
+   q(the united republic of tanzania) => [
+      q(0220),
+      q(2),
       ],
    q(the united states) => [
       q(0237),
@@ -2981,7 +2986,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       ],
    q(united republic of tanzania) => [
       q(0220),
-      q(2),
+      q(3),
       ],
    q(united states) => [
       q(0237),
@@ -7023,7 +7028,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(SZ) => [
          q(0071),
-         q(1),
+         q(0),
          ],
       q(TC) => [
          q(0230),
@@ -7087,7 +7092,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(TZ) => [
          q(0220),
-         q(3),
+         q(4),
          ],
       q(UA) => [
          q(0233),
@@ -8093,7 +8098,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(SWZ) => [
          q(0071),
-         q(1),
+         q(0),
          ],
       q(SXM) => [
          q(0202),
@@ -8165,7 +8170,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(TZA) => [
          q(0220),
-         q(3),
+         q(4),
          ],
       q(UGA) => [
          q(0232),
@@ -9183,7 +9188,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(748) => [
          q(0071),
-         q(1),
+         q(0),
          ],
       q(752) => [
          q(0215),
@@ -9279,7 +9284,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(834) => [
          q(0220),
-         q(3),
+         q(4),
          ],
       q(840) => [
          q(0237),
@@ -11015,7 +11020,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(MKD) => [
          q(0133),
-         q(0),
+         q(7),
          ],
       q(MLI) => [
          q(0138),
@@ -11351,7 +11356,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(TZA) => [
          q(0220),
-         q(0),
+         q(3),
          ],
       q(UGA) => [
          q(0232),
@@ -12361,7 +12366,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(807) => [
          q(0133),
-         q(0),
+         q(7),
          ],
       q(818) => [
          q(0066),
@@ -12385,7 +12390,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          ],
       q(834) => [
          q(0220),
-         q(0),
+         q(3),
          ],
       q(840) => [
          q(0237),

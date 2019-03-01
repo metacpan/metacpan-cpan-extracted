@@ -10,19 +10,36 @@ use PiFlash::Inspector;
 use PiFlash::MediaWriter;
 
 package PiFlash;
-$PiFlash::VERSION = '0.0.6';
+$PiFlash::VERSION = '0.1.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Getopt::Long; # included with perl
 use File::Basename; # included with perl
+use File::Path qw(make_path); # RPM: perl-File-Path, DEB: included with perl
+use Module::Pluggable require => 1; # RPM: perl-Module-Pluggable, DEB: libmodule-pluggable-perl
 
 # ABSTRACT: Raspberry Pi SD-flashing script with safety checks to avoid erasing the wrong device
 
 
+# return default list of state category names
+# this is made available externally so it can be accessed for testing
+sub state_categories {
+	return (
+		"cli_opt",		# options received from command line
+		"config",		# configuration settings loaded from YAML $XDG_CONFIG_DIR/piflash
+		"hook",			# hook functions: callbacks managed by PiFlash::Hook
+		"input",		# input file info from PiFlash::Inspector
+		"log",			# log of commands and events
+		"output",		# output device info from PiFlash::Inspector
+		"plugin",		# plugin modules assigned storage here
+		"system",		# system info from PiFlash::Inspector
+	);
+};
+
 # print program usage message
 sub usage
 {
-	say STDERR "usage: ".basename($0)." [--verbose] [--resize] input-file output-device";
-	say STDERR "       ".basename($0)." [--verbose] --SDsearch";
+	say STDERR "usage: ".basename($0)." [--verbose] [--resize] [--config conf-file] input-file output-device";
+	say STDERR "       ".basename($0)." [--verbose] [--config conf-file] --SDsearch";
 	say STDERR "       ".basename($0)." --version";
 	exit 1;
 }
@@ -41,14 +58,56 @@ sub num_readable
 	return sprintf "%4.2f%s", $num_base, $suffixes[$magnitude];
 }
 
+# initialize enabled plugins
+sub init_plugins
+{
+	# get list of available plugin modules
+	my $plugin_data = PiFlash::State::plugin();
+
+	# get list of enabled plugins from command line and config file
+	my %enabled;
+	if (PiFlash::State::has_cli_opt("plugin")) {
+		foreach my $plugin ( split(/[^\w:]+/, PiFlash::State::cli_opt("plugin") // "")) {
+			next if $plugin eq "";
+			$plugin =~ s/^.*:://;
+			$enabled{$plugin} = 1;
+		}
+	}
+	if (PiFlash::State::has_config("plugin")) {
+		foreach my $plugin ( split(/[^\w:]+/, PiFlash::State::config("plugin") // "")) {
+			next if $plugin eq "";
+			$plugin =~ s/^.*:://;
+			$enabled{$plugin} = 1;
+		}
+	}
+
+	# for each enabled plugin, allocate state storage, load its config (if any) and run its init method
+	my @plugins_available = PiFlash->plugins();
+	foreach my $plugin (@plugins_available) {
+		$plugin =~ /^PiFlash::Plugin::([A-Z]\w+)$/ or next;
+		my $modname = $1;
+		if (exists $enabled{$modname} and $plugin->can("init")) {
+			if (exists $plugin_data->{$modname}) {
+				next; # skip if its storage area exists
+			}
+			my @data;
+			if (exists $plugin_data->{docs}{$modname}) {
+				push @data, $plugin_data->{docs}{$modname};
+			}
+			$plugin_data->{$modname} = {};
+			$plugin->init($plugin_data->{$modname}, @data);
+		}
+	}
+}
+
 # piflash script main routine to be called from exception-handling wrapper
 sub piflash
 {
 	# initialize program state storage
-	PiFlash::State->init("system", "input", "output", "cli_opt", "log", "hook");
+	PiFlash::State->init(state_categories());
 
 	# collect and validate command-line arguments
-	do { GetOptions (PiFlash::State::cli_opt(), "verbose", "sdsearch", "version", "resize"); };
+	do { GetOptions (PiFlash::State::cli_opt(), "verbose", "sdsearch", "version", "resize", "config:s", "plugin:s"); };
 	if ($@) {
 		# in case of failure, add state info if verbose mode is set
 		PiFlash::State->error($@);
@@ -60,10 +119,36 @@ sub piflash
 		return;
 	}
 
-	# print usage info if 
-	if (($#ARGV != 1) and (!PiFlash::State::has_cli_opt("sdsearch"))) {
+	# read configuration
+	my $config_file;
+	if (PiFlash::State::has_cli_opt("config")) {
+		$config_file = PiFlash::State::cli_opt("config");
+	} else {
+		my $config_dir = $ENV{XDG_CONFIG_DIR} // ($ENV{HOME}."/.local");
+		make_path($config_dir);
+		$config_file = $config_dir."/piflash";
+	}
+	if ( -f $config_file ) {
+		PiFlash::State::read_config($config_file);
+	}
+
+	# print usage info if there aren't sufficient parameters to do anything
+	my $param_ok = 0;
+	if (PiFlash::State::has_cli_opt("sdsearch")) {
+		$param_ok = 1;
+	}
+	if ($#ARGV == 1 and -f $ARGV[0] and -b $ARGV[1]) {
+		$param_ok = 1;
+	}
+	# TODO insert subcommand processing here
+	if (!$param_ok) {
 		usage();
 	}
+
+	# initialize enabled plugins
+	# this has to be done after command line and configuration processing so we know what the user has enabled
+	# since PiFlash runs root code, plugins are disabled by default
+	init_plugins();
 
 	# collect system info: kernel specs and locations of needed programs
 	PiFlash::Inspector::collect_system_info();
@@ -74,6 +159,9 @@ sub piflash
 		PiFlash::Inspector::sd_search();
 		return;
 	}
+
+	# call hook for after reading command-line options
+	PiFlash::Hook::cli_options();
 
 	# set input and output paths
 	PiFlash::State::input("path", $ARGV[0]);
@@ -162,7 +250,7 @@ PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.0.6
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -184,7 +272,7 @@ Ian Kluft <cpan-dev@iankluft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017-2018 by Ian Kluft.
+This software is Copyright (c) 2017-2019 by Ian Kluft.
 
 This is free software, licensed under:
 

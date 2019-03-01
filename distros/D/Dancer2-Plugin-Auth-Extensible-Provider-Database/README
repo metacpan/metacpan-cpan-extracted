@@ -1,0 +1,413 @@
+NAME
+
+    Dancer2::Plugin::Auth::Extensible::Provider::Database - authenticate
+    via a database
+
+DESCRIPTION
+
+    This class is an authentication provider designed to authenticate users
+    against a database, using Dancer2::Plugin::Database to access a
+    database.
+
+    Crypt::SaltedHash is used to handle hashed passwords securely; you
+    wouldn't want to store plain text passwords now, would you? (If your
+    answer to that is yes, please reconsider; you really don't want to do
+    that, when it's so easy to do things right!)
+
+    See Dancer2::Plugin::Database for how to configure a database
+    connection appropriately; see the "CONFIGURATION" section below for how
+    to configure this authentication provider with database details.
+
+    See Dancer2::Plugin::Auth::Extensible for details on how to use the
+    authentication framework, including how to pick a more useful
+    authentication provider.
+
+CONFIGURATION
+
+    This provider tries to use sensible defaults, so you may not need to
+    provide much configuration if your database tables look similar to
+    those in the "SUGGESTED SCHEMA" section below.
+
+    The most basic configuration, assuming defaults for all options, and
+    defining a single authentication realm named 'users':
+
+        plugins:
+            Auth::Extensible:
+                realms:
+                    users:
+                        provider: 'Database'
+
+    You would still need to have provided suitable database connection
+    details to Dancer2::Plugin::Database, of course; see the docs for that
+    plugin for full details, but it could be as simple as, e.g.:
+
+        plugins:
+            Auth::Extensible:
+                realms:
+                    users:
+                        provider: 'Database'
+            Database:
+                driver: 'SQLite'
+                database: 'test.sqlite'
+                on_connect_do: ['PRAGMA foreign_keys = ON']
+                dbi_params:
+                    PrintError: 0
+                    RaiseError: 1
+
+    A full example showing all options:
+
+        plugins:
+            Auth::Extensible:
+                realms:
+                    users:
+                        provider: 'Database'
+                        # optionally set DB connection name to use (see named
+                        # connections in Dancer2::Plugin::Database docs)
+                        db_connection_name: 'foo'
+    
+                        # Optionally disable roles support, if you only want to check
+                        # for successful logins but don't need to use role-based access:
+                        disable_roles: 1
+    
+                        # optionally specify names of tables if they're not the defaults
+                        # (defaults are 'users', 'roles' and 'user_roles')
+                        users_table: 'users'
+                        roles_table: 'roles'
+                        user_roles_table: 'user_roles'
+    
+                        # optionally set the column names (see the SUGGESTED SCHEMA
+                        # section below for the default names; if you use them, they'll
+                        # Just Work)
+                        users_id_column: 'id'
+                        users_username_column: 'username'
+                        users_password_column: 'password'
+                        roles_id_column: 'id'
+                        roles_role_column: 'role'
+                        user_roles_user_id_column: 'user_id'
+                        user_roles_role_id_column: 'roles_id'
+
+    See the main Dancer2::Plugin::Auth::Extensible documentation for how to
+    configure multiple authentication realms.
+
+SUGGESTED SCHEMA
+
+    If you use a schema similar to the examples provided here, you should
+    need minimal configuration to get this authentication provider to work
+    for you.
+
+    The examples given here should be MySQL-compatible; minimal changes
+    should be required to use them with other database engines.
+
+ users table
+
+    You'll need a table to store user accounts in, of course. A suggestion
+    is something like:
+
+        CREATE TABLE users (
+            id       INTEGER     AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(32) NOT NULL       UNIQUE KEY,
+            password VARCHAR(40) NOT NULL
+        );
+
+    You will quite likely want other fields to store e.g. the user's name,
+    email address, etc; all columns from the users table will be returned
+    by the logged_in_user keyword for your convenience.
+
+ roles table
+
+    You'll need a table to store a list of available roles in (unless
+    you're not using roles - in which case, disable role support (see the
+    "CONFIGURATION" section).
+
+        CREATE TABLE roles (
+            id    INTEGER     AUTO_INCREMENT PRIMARY KEY,
+            role  VARCHAR(32) NOT NULL
+        );
+
+ user_roles table
+
+    Finally, (unless you've disabled role support) you'll need a table to
+    store user <-> role mappings (i.e. one row for every role a user has;
+    so adding extra roles to a user consists of adding a new role to this
+    table). It's entirely up to you whether you use an "id" column in this
+    table; you probably shouldn't need it.
+
+        CREATE TABLE user_roles (
+            user_id  INTEGER  NOT NULL,
+            role_id  INTEGER  NOT NULL,
+            UNIQUE KEY user_role (user_id, role_id)
+        );
+
+    If you're using InnoDB tables rather than the default MyISAM, you could
+    add a foreign key constraint for better data integrity; see the MySQL
+    documentation for details, but a table definition using foreign keys
+    could look like:
+
+        CREATE TABLE user_roles (
+            user_id  INTEGER, FOREIGN KEY (user_id) REFERENCES users (id),
+            role_id  INTEGER, FOREIGN KEY (role_id) REFERENCES roles (id),
+            UNIQUE KEY user_role (user_id, role_id)
+        ) ENGINE=InnoDB;
+
+ATTRIBUTES
+
+ dancer2_plugin_database
+
+    Lazy-loads the correct instance of Dancer2::Plugin::Database which
+    handles the following methods:
+
+      * plugin_database
+
+      This corresponds to the database keyword from
+      Dancer2::Plugin::Database.
+
+ database
+
+    The connected "plugin_database" using "db_connection_name".
+
+ db_connection_name
+
+    Optional.
+
+ users_table
+
+    Defaults to 'users'.
+
+ users_id_column
+
+    Defaults to 'id'.
+
+ users_username_column
+
+    Defaults to 'username'.
+
+ users_password_column
+
+    Defaults to 'password'.
+
+ roles_table
+
+    Defaults to 'roles'.
+
+ roles_id_column
+
+    Defaults to 'id'.
+
+ roles_role_column
+
+    Defaults to 'role'.
+
+ user_roles_table
+
+    Defaults to 'user_roles'.
+
+ user_roles_user_id_column
+
+    Defaults to 'user_id'.
+
+ user_roles_role_id_column
+
+    Defaults to 'role_id'.
+
+METHODS
+
+ authenticate_user $username, $password
+
+ create_user
+
+ get_user_details $username
+
+ get_user_roles $username
+
+ set_user_details
+
+ set_user_password
+
+COOKBOOK
+
+ Handle locked or disabled user accounts
+
+    (contributed by PerlDuck, Borodin and simbabque via Stack Overflow
+    <https://stackoverflow.com/questions/46746864>)
+
+    It's a good practice to not delete certain data, like user accounts.
+    But what do you do when you want to get rid of a user? Maybe an
+    employee left or was temporary suspended, or a user did not pay their
+    subscription fee. In those cases you would want the user data to stay
+    around, but they should not be able to log in any more.
+
+    Let's say there is a column disabled in an already existing user table.
+    It might hold a timestamp for when the user was disabled, and be NULL
+    if the user is active. By default, Dancer2::Plugin::Auth::Extensible
+    will give you this information as part of the user data, but to check
+    if the user is allowed to proceed would happen after the password has
+    been checked and they have already been logged in.
+
+    The following sections will describe two different ways of implementing
+    this. The first one is easier to implement, but only allows read
+    operations on the user table, while the second one requires a little
+    more effort, but will allow almost all operations to work. If you need
+    even more flexibility you will have to subclass and add a bit more
+    logic.
+
+  ... without changing any code
+
+    An easy way to achieve this is by adding a new view to your database
+    that only shows active users. Let's look at the following example
+    database.
+
+        -- user table
+        CREATE TABLE users (
+            id       INTEGER     PRIMARY KEY AUTOINCREMENT,
+            username VARCHAR(32) NOT NULL UNIQUE,
+            password VARCHAR(40) NOT NULL,
+            disabled TIMESTAMP   NULL
+        );
+    
+        -- active user view
+        CREATE VIEW active_users (id, username, password) AS
+            SELECT id, username, password FROM users WHERE disabled IS NULL;
+    
+        -- some data
+        INSERT INTO users ( username, password, disabled )
+        VALUES  ( 'Alice', 'test', null),
+                ( 'Bob', 'test', '2017-10-01 10:10:10');
+
+    Now all you need to do is change the "users_table" setting to point to
+    active_users instead of users.
+
+        # config.yml
+        plugins:
+            Auth::Extensible:
+                realms:
+                    users:
+                        provider: 'Database'
+                        users_table: 'active_users'
+
+    That's it. Your application will now only let active users log in,
+    because it has no way of knowing about the others. Only Alice will be
+    able to log in, but Bob has been disabled and the application will not
+    allow him to log in.
+
+    But be aware that this comes with a few drawbacks. If you want to use
+    Dancer2::Plugin::Auth::Extensible to also update user information, this
+    is now no longer possible because in most database engines you cannot
+    write data into a view.
+
+  ... by creating a subclass of this database provider
+
+    The alternative is to subclass this provider to add a little bit of
+    logic. You can add code to exclude users directly when the user data is
+    fetched, even before Dancer2::Plugin::Auth::Extensible verifies the
+    password. This way, inactive users can easily be discarded.
+
+    The following code is an example implementation specifically for the
+    user table outlined in the alternative solution above.
+
+        package Provider::Database::ActiveOnly;
+    
+        use Moo;
+        extends 'Dancer2::Plugin::Auth::Extensible::Provider::Database';
+    
+        around 'get_user_details' => sub {
+            my $orig = shift;
+            my $self = shift;
+    
+            # do nothing if we there was no user
+            my $user = $self->$orig(@_) or return;
+    
+            # do nothing if the user is disabled
+            return if $user->{disabled};
+    
+            return $user;
+        };
+    
+        1;
+
+    The code uses an around modifier from Moo to influence the
+    get_user_details method, so users that are disabled are never found.
+
+    To enable this new provider, you need to change the provider setting in
+    your configuration.
+
+        # config.yml
+        plugins:
+            Auth::Extensible:
+                realms:
+                    users:
+                        provider: 'Provider::Database::ActiveOnly'
+                        users_table: 'users'  # this is the default
+
+    With this custom subclass your application will be able to perform
+    write operations on active users, including making them inactive.
+    However, inactive users will be invisible to
+    Dancer2::Plugin::Auth::Extensible, so you cannot use this to turn
+    inactive users back on.
+
+    If you want that functionality, you will have to add a bit more logic
+    to your subclass. A possible approach could be to replace the
+    "authenticate_user" method.
+
+AUTHOR
+
+    David Precious, <davidp at preshweb.co.uk>
+
+    Dancer2 port of Dancer::Plugin::Auth::Extensible by:
+
+    Stefan Hornburg (Racke), <racke at linuxia.de>
+
+    Conversion to Dancer2's new plugin system in 2016 by:
+
+    Peter Mottram (SysPete), <peter at sysnix.com>
+
+BUGS / FEATURE REQUESTS
+
+    This is an early version; there may still be bugs present or features
+    missing.
+
+    This is developed on GitHub - please feel free to raise issues or pull
+    requests against the repo at:
+    https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-Database
+
+ACKNOWLEDGEMENTS
+
+    From Dancer2::Plugin::Auth::Extensible:
+
+    Valuable feedback on the early design of this module came from many
+    people, including Matt S Trout (mst), David Golden (xdg), Damien
+    Krotkine (dams), Daniel Perrett, and others.
+
+    Configurable login/logout URLs added by Rene (hertell)
+
+    Regex support for require_role by chenryn
+
+    Support for user_roles looking in other realms by Colin Ewen (casao)
+
+    LDAP provider added by Mark Meyer (ofosos)
+
+    Documentation fix by Vince Willems.
+
+    Henk van Oers (GH #8, #13).
+
+    Andrew Beverly (GH #6, #7, #10, #17, #22, #24, #25, #26). This includes
+    support for creating and editing users and manage user passwords.
+
+    Gabor Szabo (GH #11, #16, #18).
+
+    Evan Brown (GH #20, #32).
+
+    Jason Lewis (Unix provider problem, typo fix).
+
+    Yanick Champoux (typo fix).
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2012-16 David Precious. Copyright 2017-19 Stefan Hornburg
+    (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

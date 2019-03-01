@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 #
 # This file is part of Graph-Maker-Other.
 #
@@ -22,7 +22,7 @@ use strict;
 use Graph::Maker;
 
 use vars '$VERSION','@ISA';
-$VERSION = 10;
+$VERSION = 13;
 @ISA = ('Graph::Maker');
 
 
@@ -127,7 +127,7 @@ Graph::Maker->add_factory_type('Keller' => __PACKAGE__);
 
 __END__
 
-=for stopwords Ryde Keller cyclotomic tilings hypercubes Clebsh Subgraph subgraph undirected OEIS Uber luckenlose Einfullung des Raumes mit Wurfeln Reine und Angewandte Mathematik Crelle
+=for stopwords Ryde Keller cyclotomic tilings hypercubes Clebsch Subgraph subgraph undirected OEIS Uber luckenlose Einfullung des Raumes mit Wurfeln Reine und Angewandte Mathematik Crelle DIMACS
 
 =head1 NAME
 
@@ -146,21 +146,21 @@ C<Graph::Maker::Keller> creates a C<Graph.pm> graph of a Keller graph.  This
 is a graph form of Keller's conjecture on N-dimensional tilings by unit
 hypercubes.
 
-Keller graph N has 4^N vertices numbered 0 to 4^N-1.  These vertices are
-treated as base-4 integers.  Edges are between vertices differing in two or
-more digit positions and at least one of which is difference 2 mod 4.
+The Keller graph N has 4^N vertices numbered 0 to 4^N-1.  These vertices are
+treated as base-4 integers.  Edges are between vertices differing in 2 or
+more digit positions, at least one of which is difference = 2 mod 4.
 
     N         0  1   2     3      4       5
     vertices  1, 4, 16,   64,   256,   1024, ...  4^N
     degree    0, 0,  5,   34,   171,    776, ...  4^N - 3^N - N
     edges     0, 0, 40, 1088, 21888, 397312, ... (4^N-3^N-N)*4^N / 2
 
-Each vertex has the same degree since digit differences can all be taken
-mod 4.  Each vertex degree is 4^N - 3^N - N.  This is edges to 4^N vertices
-(including self) except no edge to those differing by only 0,1,3 in any or
-all digit positions, which is 3^N combinations (including no differences at
-all for vertex itself), and also no edge to vertices differing by 2 mod 4 at
-a single digit, which is N possible digit positions.
+Each vertex has the same degree (is regular) since digit differences can all
+be taken mod 4.  Each vertex degree is 4^N - 3^N - N.  This is edges to 4^N
+vertices (including self) except no edge to those differing by only 0,1,3 in
+any or all digit positions, which is 3^N combinations (including no
+differences at all for vertex itself), and also no edge to vertices
+differing by 2 mod 4 at a single digit, which is N possible digit positions.
 
 =for GP-Test  vector(6,N,N--; 4^N-3^N-N) == [0, 0, 5, 34, 171, 776]
 
@@ -171,14 +171,14 @@ a single digit, which is N possible digit positions.
 N=0 and N=1 have no edges since there are only 0 digits and 1 digit
 respectively, so nothing differs in 2 digit positions.
 
-N=2 (16 vertices and 40 edges) is the Clebsh graph and the 16-cyclotomic
-graph.
+N=2 (16 vertices and 40 edges) is the Clebsch graph, which is the
+16-cyclotomic graph.
 
 =head2 Subgraph
 
 C<subgraph =E<gt> 1> gives the subgraph of the Keller graph induced by
-neighbours of vertex 0.  This means the neighbours of vertex 0 (not
-including 0 itself) and the edges among those neighbours.
+neighbours of vertex 0.  This means the neighbours of vertex 0 (and not 0
+itself) and the edges among those neighbours.
 
     subgraph => 1
     N         0  1   2     3      4       5
@@ -193,7 +193,7 @@ including 0 itself) and the edges among those neighbours.
 =pod
 
 The number of vertices is the degree above.  This subgraph is of interest
-since the Keller graph is vertex transitive so the problem of finding a
+since the Keller graph is vertex transitive and so the problem of finding a
 clique of size k in the Keller graph is reduced to finding a clique of size
 k-1 in this subgraph.  The size of the maximum clique is related to Keller's
 conjecture.
@@ -258,9 +258,20 @@ O. H. Keller, "Uber die luckenlose Einfullung des Raumes mit Wurfeln",
 Journal fE<252>r die Reine und Angewandte Mathematik (Crelle's journal),
 volume 163, 1930, pages 231-248.
 
+The second DIMACS challenge 1993 included the N=4 subgraph among its
+benchmarks for comparing clique-finding algorithms,
+L<http://dimacs.rutgers.edu/Challenges/> =over
+
+=cut
+
+# in their binary form,
+# ftp://dimacs.rutgers.edu/pub/challenge/graph/benchmarks/clique/keller4.clq.b
+
+=pod
+
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018, 2019 Kevin Ryde
 
 This file is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

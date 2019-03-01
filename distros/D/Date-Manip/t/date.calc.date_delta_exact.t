@@ -1,9 +1,11 @@
 #!/usr/bin/perl -w
 
-use Test::Inter;
-$t = new Test::Inter 'date :: calc (date,exact delta)';
-$testdir = '';
-$testdir = $t->testdir();
+BEGIN {
+  use Test::Inter;
+  $t = new Test::Inter 'date :: calc (date,exact delta)';
+  $testdir = $t->testdir();
+}
+use lib "$testdir/../lib";
 
 use Date::Manip;
 if (DateManipVersion() >= 6.00) {

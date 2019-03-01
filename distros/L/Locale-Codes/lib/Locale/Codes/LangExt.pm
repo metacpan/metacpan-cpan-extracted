@@ -1,13 +1,13 @@
 package Locale::Codes::LangExt;
 # Copyright (C) 2001      Canon Research Centre Europe (CRE).
 # Copyright (C) 2002-2009 Neil Bowers
-# Copyright (c) 2010-2018 Sullivan Beck
+# Copyright (c) 2010-2019 Sullivan Beck
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'gen_mods' is run.
-#    Generated on: Mon Dec  3 12:38:09 EST 2018
+#    Generated on: Thu Feb 21 10:50:50 EST 2019
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ require 5.006;
 use Exporter qw(import);
 
 our($VERSION,@EXPORT);
-$VERSION   = '3.59';
+$VERSION   = '3.60';
 
 ################################################################################
 use if $] >= 5.027007, 'deprecate';

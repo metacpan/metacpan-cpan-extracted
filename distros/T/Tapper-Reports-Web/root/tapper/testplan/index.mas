@@ -8,12 +8,7 @@
 This list shows <b>testplans</b>. Note: For this testplan listing finished testruns are considered "FAIL"
 unless its success state is exactly 100%.
 
-% if ($c->flash->{error_msg}) {
-<pre>
-
-<strong>Error:</strong> <% $c->flash->{error_msg} %>
-</pre>
-% }
+<& /tapper/message.mas &>
 
 % if (not @$testplan_days) {
 <h4>No Testplan Instances found in the requested time frame</h4>
@@ -28,20 +23,24 @@ unless its success state is exactly 100%.
         <thead>
                 <tr>
                          <th>ID</th>
-                         <th>Created At (GMT)</th>
+                         <th>Updated At (local)</th>
                          <th>Name</th>
                          <th>Path</th>
                          <th>Success</th>
-                         <th>Testruns<br>(success/pending/fail)</th>
+                         <th>Testruns<br>(success/running/scheduled/fail)</th>
                 </tr>
         </thead>
         <tbody>
 %    foreach my $instance (@{$day->{testplan_instances} || [] }) {
 %    no warnings 'uninitialized';
 %    my $sum              = $instance->{count_pass} + $instance->{count_fail} + $instance->{count_unfinished};
-%    my $width_pass       = $sum ? $instance->{count_pass} / $sum : 0;
-%    my $width_fail       = $sum ? $instance->{count_fail} / $sum : 0;
-%    my $width_unfinished = $sum ? $instance->{count_unfinished} / $sum : 0;
+%    my $maxwidth         = 100;
+%    my $width_fail       = int($maxwidth * ($sum ? $instance->{count_fail}       / $sum : 0));
+%    my $width_pass       = int($maxwidth * ($sum ? $instance->{count_pass}       / $sum : 0));
+%    my $width_running    = int($maxwidth * ($sum ? $instance->{count_running}    / $sum : 0));
+%    my $width_schedule   = int($maxwidth * ($sum ? $instance->{count_schedule}   / $sum : 0));
+%    my $width_prepare    = int($maxwidth * ($sum ? $instance->{count_prepare}    / $sum : 0));
+
 %    my $path_link        = $instance->{path}; $path_link =~ s|/|\.|g;
                   <tr>
                         <td><a href="/tapper/testplan/id/<% $instance->{id} %>">tp<% $instance->{id} %></a></td>
@@ -62,10 +61,10 @@ unless its success state is exactly 100%.
                         </td>
                         <td>
                           <a href="/tapper/testplan/id/<% $instance->{id} %>" title="Click to show details">
-                            <img src="/tapper/static/images/green_bar.png" height="16" width="<% $width_pass * 100 %>"><img src="/tapper/static/images/yellow_bar.png" height="16" width="<% $width_unfinished * 100 %>"><img src="/tapper/static/images/red_bar.png" height="16" width="<% $width_fail * 100 %>">
+                            <img src="/tapper/static/images/green_bar.png" height="16" width="<% $width_pass %>"><img src="/tapper/static/images/yellow_bar.png" height="16" width="<% $width_running %>"><img src="/tapper/static/images/yellow_bar_dimmed.png" height="16" width="<% $width_prepare %>"><img src="/tapper/static/images/yellow_bar_dimmed.png" height="16" width="<% $width_schedule + $width_prepare %>"><img src="/tapper/static/images/red_bar.png" height="16" width="<% $width_fail %>">
                           </a>
                         </td>
-                        <td>(<% $instance->{count_pass} || 0 %>/<% $instance->{count_unfinished} || 0 %>/<% $instance->{count_fail} || 0 %>)</td>
+                        <td>(<% $instance->{count_pass} || 0 %>/<% $instance->{count_running} || 0 %>/<% ($instance->{count_schedule}+$instance->{count_prepare}) || 0 %>/<% $instance->{count_fail} || 0 %>)</td>
                 </tr>
 %    }
         </tbody>

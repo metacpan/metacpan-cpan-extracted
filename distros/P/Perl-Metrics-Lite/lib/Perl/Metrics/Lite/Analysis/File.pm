@@ -7,7 +7,7 @@ use Perl::Metrics::Lite::Analysis;
 use Perl::Metrics::Lite::Analysis::Util;
 use Perl::Metrics::Lite::Analysis::DocumentFactory;
 
-our $VERSION = '0.05';
+our $VERSION = '0.092';
 
 use Module::Pluggable
     require     => 1,

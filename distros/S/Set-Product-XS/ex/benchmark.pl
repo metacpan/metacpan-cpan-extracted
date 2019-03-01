@@ -2,11 +2,12 @@
 use strict;
 use warnings;
 
-use Algorithm::Loops qw(NestedLoops);
-use Benchmark::Dumb qw(:all);
-# use List::Gen ();
+use Benchmark qw(:all);
+
+use Algorithm::Loops ();
 use List::MapMulti ();
 use Math::Cartesian::Product 1.009 ();
+use Math::Prime::Util 0.73 ();
 use Set::CrossProduct;
 use Set::Product::PP ();
 use Set::Product::XS ();
@@ -19,41 +20,32 @@ my @set = (
     [1..5], [1..3], [1..4]
 );
 
-cmpthese 0, {
-    'Set::CrossProduct' => sub {
-        my $it = Set::CrossProduct->new(\@set);
-        while (my @s = $it->get) {
-            my $str = "@s";
-        }
+cmpthese -1, {
+    'Algorithm::Loops' => sub {
+        Algorithm::Loops::NestedLoops(\@set, sub {
+            my $str = "@_";
+        });
     },
-    # 'List::Gen' => sub {
-    #     my $it = List::Gen::cartesian { @_ } @set;
-    #     while (my @s = $it->next) {
-    #         my $str = "@s";
-    #     }
-    # },
     'List::MapMulti' => sub {
         List::MapMulti::mapm {
             my $str = "@_";
         } @set;
     },
-    'Set::Scalar' => sub {
-        my $it = Set::Scalar->cartesian_product_iterator(
-            map { Set::Scalar->new(@$_) } @set
-        );
-        while (my @s = $it->()) {
-            my $str = "@s";
-        }
-    },
-    'Algorithm::Loops' => sub {
-        NestedLoops(\@set, sub {
-            my $str = "@_";
-        });
-    },
     'Math::Cartesian::Product' => sub {
         Math::Cartesian::Product::cartesian {
             my $str = "@_";
         } @set;
+    },
+    'Math::Prime::Util' => sub {
+        Math::Prime::Util::forsetproduct {
+            my $str = "@_";
+        } @set;
+    },
+    'Set::CrossProduct' => sub {
+        my $it = Set::CrossProduct->new(\@set);
+        while (my @s = $it->get) {
+            my $str = "@s";
+        }
     },
     'Set::Product::PP' => sub {
         Set::Product::PP::product {
@@ -64,6 +56,14 @@ cmpthese 0, {
         Set::Product::XS::product {
             my $str = "@_";
         } @set;
+    },
+    'Set::Scalar' => sub {
+        my $it = Set::Scalar->cartesian_product_iterator(
+            map { Set::Scalar->new(@$_) } @set
+        );
+        while (my @s = $it->()) {
+            my $str = "@s";
+        }
     },
 };
 
