@@ -1,0 +1,28 @@
+---
+abstract: "postpone loading a module until it's actually used"
+author:
+  - 'Konstantin S. Uvarin <khedin@cpan.org>'
+build_requires:
+  Test::Exception: '0.03'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Module-Lazy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/dallaylaen/module-lazy-perl/issues
+  repository: https://github.com/dallaylaen/module-lazy-perl.git
+version: '0.01'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

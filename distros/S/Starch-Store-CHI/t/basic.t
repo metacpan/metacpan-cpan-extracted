@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strictures 2;
+use Test2::V0;
 
-use Test::More;
 use Test::Starch;
 
 Test::Starch->new(

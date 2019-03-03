@@ -62,6 +62,7 @@
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "Dist::Zilla" : "0",
             "Dist::Zilla::App::Command::xtest" : "0",
             "Dist::Zilla::Plugin::CheckExtraTests" : "0",
             "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0",
@@ -115,11 +116,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::WATERKIP" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/WATERKIP.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       },
       "Dist::Zilla::PluginBundle::Author::WATERKIP" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/WATERKIP.pm",
-         "version" : "2.1"
+         "version" : "2.2"
       }
    },
    "release_status" : "stable",
@@ -130,7 +131,7 @@
          "web" : "https://gitlab.com/waterkip/dist-zilla-pluginbundle-author-waterkip"
       }
    },
-   "version" : "2.1",
+   "version" : "2.2",
    "x_contributors" : [
       "Wesley Schwengle <wesley@schwengle.net>"
    ],

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use Quiq::Parameters;
 use Quiq::AnsiColor;
@@ -742,6 +742,17 @@ Pfad der Datei.
 
 =back
 
+=head4 Options
+
+=over 4
+
+=item -force => $bool (Default: 0)
+
+Lade die Datei auch im Falle von Warnungen hoch, z.B. dass die Datei
+im Wiki bereits existiert.
+
+=back
+
 =head4 Returns
 
 Response
@@ -771,7 +782,15 @@ L<File Upload per LWP|http://lwp.interglacial.com/ch05_07.htm>
 
 sub uploadFile {
     my $self = shift;
-    my $file = Quiq::Path->expandTilde(shift);
+
+    # Optionen und Argumente
+
+    my $force = 0;
+
+    my $argA = Quiq::Parameters->extractToVariables(\@_,1,1,
+        -force => \$force,
+    );
+    my $file = Quiq::Path->expandTilde(shift @$argA);
 
     # Edit-Token besorgen
     my $token = $self->getToken('edit');
@@ -783,6 +802,7 @@ sub uploadFile {
         token => $token,
         filename => $filename,
         file => [$file],
+        ignorewarnings => $force,
     );
 
 =pod
@@ -965,26 +985,26 @@ sub load {
 
         my $exists = $p->exists($varFile);
         if ($force || !$exists || $p->compare($file,$varFile)) {
-            my $res = $self->uploadFile($file);
-            # FIXME: Methode schreiben, die in die Tiefe abfragt
-            if ($res->{'upload'}->{'warnings'}) {
-                if (my $arr = $res->{'upload'}->{'warnings'}->{'duplicate'}) {
-                    print 'File exists';
-                    my $wikiName = $arr->[0];
-                    if (lc($wikiName) ne lc($cacheName)) {
-                        say " under the name: $arr->[0]";
-                    }
-                    else {
-                        say ": $arr->[0]";
-                    }
-                    # Wir kopieren die Datei nicht in den Cache
-                    return;
-                }
-            }
-            else {
+            my $res = $self->uploadFile($file,-force=>1);
+            #!! FIXME: Methode schreiben, die in die Tiefe abfragt
+            #if ($res->{'upload'}->{'warnings'}) {
+            #    if (my $arr = $res->{'upload'}->{'warnings'}->{'duplicate'}) {
+            #        print 'File exists';
+            #        my $wikiName = $arr->[0];
+            #        if (lc($wikiName) ne lc($cacheName)) {
+            #            say " under the name: $arr->[0]";
+            #        }
+            #        else {
+            #            say ": $arr->[0]";
+            #        }
+            #        # Wir kopieren die Datei nicht in den Cache
+            #        return;
+            #    }
+            #}
+            #else {
                 printf "File %s: %s\n",$exists? 'updated': 'created',
                     ucfirst $cacheName;
-            }
+            #}
             $p->copy($file,$varFile);
         }
 
@@ -1352,7 +1372,7 @@ sub log {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

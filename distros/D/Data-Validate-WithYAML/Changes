@@ -1,6 +1,11 @@
 Revision history for Data::Validate::WithYAML
 =============================================
 
+0.18    2019-03-02 11:14:00
+
+        + accept scalar reference as config
+        + improve tests
+
 0.16    2018-12-26 08:53:00
 
         + improve tests

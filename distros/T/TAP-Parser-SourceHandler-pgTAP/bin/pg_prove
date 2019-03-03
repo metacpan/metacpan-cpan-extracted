@@ -4,7 +4,7 @@ use strict;
 use App::Prove;
 use Getopt::Long;
 
-our $VERSION = '3.34';
+our $VERSION = '3.35';
 $|++;
 
 # Fire up the app, process args, and run the tests.

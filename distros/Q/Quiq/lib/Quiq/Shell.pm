@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use Time::HiRes ();
 use Quiq::Option;
@@ -66,6 +66,19 @@ Log Commands to STDOUT.
 
 Datei-Deskriptor, auf den die Logmeldungen geschrieben werden.
 
+=item logRewrite => $sub (Default: undef)
+
+Callback-Methode, die die Kommandozeile vor dem Logging umschreibt.
+Dies ist nützlich, falls die Kommandozeile ein Passwort enthält,
+das im Log ausgeixt werden soll. Die Methode wird auf dem
+Shell-Objekt gerufen:
+
+    logRewrite => sub {
+        my ($sh,$cmd) = @_;
+        # $cmd umschreiben
+        return $cmd;
+    },
+
 =item msgPrefix => $str (Default: '')
 
 Zeichenkette, die jeder Meldung im Log vorangestellt wird.
@@ -109,6 +122,7 @@ sub new {
         dirStack=>[],
         log=>0,
         logDest=>*STDOUT,
+        logRewrite=>undef,
         msgPrefix=>'',
         quiet=>0,
         time=>0,
@@ -555,17 +569,16 @@ Schreibe die Kommandozeile $cmd auf die Loghandle.
 sub _logCmd {
     my ($self,$cmd) = @_;
 
-    my $pre = $self->{'cmdPrefix'};
-    my $fd = $self->{'logDest'};
+    if (my $sub = $self->{'logRewrite'}) {
+        $cmd = $sub->($self,$cmd);
+    }
 
     my $esc = $self->{'cmdAnsiColor'};
-    if ($esc) {
-        my $a = Quiq::AnsiColor->new(1);
-        printf $fd "%s%s\n",$pre,$a->str($esc,$cmd);
-    }
-    else {
-        printf $fd "%s%s\n",$pre,$cmd;
-    }
+    my $a = Quiq::AnsiColor->new($esc);
+    $cmd = sprintf '%s%s',$self->{'cmdPrefix'},$a->str($esc,$cmd);
+
+    my $fd = $self->{'logDest'};
+    print $fd $cmd,"\n";
 
     return;
 }
@@ -574,7 +587,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

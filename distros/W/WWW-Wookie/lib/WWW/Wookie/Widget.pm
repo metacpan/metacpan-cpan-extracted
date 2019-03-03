@@ -1,4 +1,4 @@
-package WWW::Wookie::Widget 0.102;    # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::Wookie::Widget v1.1.1;    # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -69,7 +69,7 @@ WWW::Wookie::Widget - A client side representation of a widget
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget version 0.102
+This document describes WWW::Wookie::Widget version v1.1.1
 
 =head1 SYNOPSIS
 

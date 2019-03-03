@@ -1,5 +1,10 @@
 Revision history for Perl extension Starch-Store-Amazon-DynamoDB.
 
+0.07 2019-03-02T17:57:49Z
+
+ - Declare deps as modules, not distros.
+ - Remove Carp dependency.
+
 0.06 2019-02-20T18:48:27Z
 
  - Require Starch 0.11 so that we get the better croak.

@@ -1,5 +1,12 @@
 Revision history for Dist::Zilla::PluginBundle::Author::WATERKIP
 
+2.2       2019-03-02 10:39:12Z
+
+    * Add default CONTRIBUTERS
+    * Add default LICENSE
+    * Copy license from build
+    * Fix Dockerfile so the build works again
+
 2.1       2019-01-25 09:15:27Z
 
     * Add dependency to Dist::Zilla::Plugin::Repository v0.22

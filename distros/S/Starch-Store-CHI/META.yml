@@ -4,6 +4,7 @@ author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Test2::V0: '0.000094'
+  Test::Starch: '0.11'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -26,21 +27,24 @@ no_index:
 provides:
   Starch::Store::CHI:
     file: lib/Starch/Store/CHI.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   CHI: '0.58'
   Moo: '2.000000'
   Scalar::Util: '0'
-  Starch: '0.10'
-  Type::Tiny: '1.000005'
+  Starch: '0.11'
+  Types::Common::String: '1.000005'
+  Types::Standard: '1.000005'
   namespace::clean: '0.24'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Store-CHI/issues
   homepage: https://github.com/bluefeet/Starch-Store-CHI
   repository: git://github.com/bluefeet/Starch-Store-CHI.git
-version: '0.04'
+version: '0.05'
+x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

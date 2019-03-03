@@ -1,5 +1,17 @@
 Revision history for Test-DNS
 
+0.200     2019-03-02 23:41:37+02:00 Asia/Jerusalem
+        - All attributes are now immutable. If you need to change
+          anything (nameservers, the object, even the follow_cname
+          flag), create a new instance. Sorry and thank you.
+        - Only provide nameservers when they are specified.
+          (Otherwise, it won't look in /etc/resolv.conf.)
+        - Allow user to provide their own test names.
+        - Test methods now provide a proper, hopefully meaningful
+          return value.
+        - Simplify code considerably, make much more readable.
+        - Updating DNS records.
+
 0.13    03.09.11
         - only run tests if got $ENV{'AUTHOR_TESTING'} because I'm sick
         of releases like 0.10 - 0.13.

@@ -88,7 +88,8 @@ sub _create_local {
 This returns truthy once the connection is ready to use and falsy until then.
 In blocking I/O contexts the call will block.
 
-Note that this includes the initial C<Hello> message and its response.
+Note that this automatically handles D-Bus’s initial C<Hello> message and
+its response.
 
 Previously this function was called C<do_authn()> and did not wait for
 the C<Hello> message’s response. The older name is retained
@@ -106,10 +107,7 @@ sub initialize {
                 interface => 'org.freedesktop.DBus',
                 destination => 'org.freedesktop.DBus',
                 member => 'Hello',
-                on_return => sub {
-                    $self->{'_connection_name'} = $_[0]->get_body()->[0];
-                },
-            );
+            )->then( sub { $self->{'_connection_name'} = $_[0]->get_body()->[0]; } );
         };
 
         if (!$self->{'_connection_name'}) {
@@ -128,7 +126,7 @@ sub initialize {
     return 0;
 }
 
-*do_authn = \*initialize;
+*do_authn = *initialize;
 
 #----------------------------------------------------------------------
 
@@ -196,14 +194,20 @@ sub get_message {
     return $_[0]->get_message();
 }
 
-=head2 $name = I<OBJ>->get_connection_name()
+=head2 $name = I<OBJ>->get_unique_bus_name()
 
-Returns the name of the connection.
+Returns the connection’s unique bus name.
+
+C<get_connection_name()> is a historical alias for this method.
 
 =cut
 
-sub get_connection_name {
+sub get_unique_bus_name {
     return $_[0]->{'_connection_name'} || die 'No connection name known yet!';
+}
+
+BEGIN {
+    *get_connection_name = *get_unique_bus_name;
 }
 
 # undocumented for now

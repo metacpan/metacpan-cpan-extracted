@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware::Runtime;
 use warnings;
 use strict;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 use parent 'HTTP::AnyUA::Middleware';
 
@@ -55,7 +55,7 @@ HTTP::AnyUA::Middleware::Runtime - Middleware to determine response time
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::Wookie::Widget::Category 0.102;
+package WWW::Wookie::Widget::Category v1.1.1;
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ category
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget::Category version 0.102
+This document describes WWW::Wookie::Widget::Category version v1.1.1
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ use namespace::autoclean;
 
 # Use all the modules so we don't get weird dependency issues
 
-our $VERSION = '2.1';
+our $VERSION = '2.2';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -75,7 +75,8 @@ around copy_files_from_build => sub {
     my $self = shift;
     sort(uniq(
             $self->$orig(@_),
-            qw(Makefile.PL cpanfile Build.PL README README.md CONTRIBUTORS)
+            qw(Makefile.PL cpanfile Build.PL README README.md CONTRIBUTORS),
+            $self->license
     ));
 };
 
@@ -93,7 +94,7 @@ around copy_files_from_release => sub {
     my $self = shift;
     sort(uniq(
             $self->$orig(@_),
-            qw(LICENCE LICENSE CONTRIBUTING ppport.h INSTALL)
+            qw(CONTRIBUTING ppport.h INSTALL)
     ));
 };
 
@@ -367,7 +368,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.1
+version 2.2
 
 =head1 SYNOPSIS
 

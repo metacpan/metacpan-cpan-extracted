@@ -54,9 +54,9 @@ Starch-Plugin-Sereal GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch-Plugin-Sereal/issues](https://github.com/bluefeet/Starch-Plugin-Sereal/issues)
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

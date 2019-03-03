@@ -1,0 +1,22 @@
+Changes
+lib/Module/Lazy.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001-load.t
+t/002-tlib-sanity.t
+t/201-on-demand.t
+t/202-no-on-demand.t
+t/203-destroy.t
+t/204-can.t
+t/205-subclass.t
+t/206-isa.t
+t/401-wrong-usage.t
+t/lib/Module/Lazy/_/test/sample.pm
+t/lib/Module/Lazy/_/test/subclass.pm
+xt/pod-coverage.t
+xt/pod-spelling.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,7 +10,10 @@ use Protocol::DBus::Path;
 
 use Data::Dumper;
 
-my $path = Protocol::DBus::Path::login_session_message_bus();
+my @addrs = Protocol::DBus::Path::login_session_message_bus();
+
+my ($path) = map { $_->attribute('path') }  grep { $_->transport() eq 'unix' } @addrs;
+die 'No login session message bus!' if !$path;
 
 my $addr = Socket::pack_sockaddr_un($path);
 
@@ -33,11 +36,10 @@ $dbus->send_call(
     signature => 's',
     member => 'GetAll',
     body => ['org.freedesktop.DBus'],
-    on_return => sub {
-        $got_response = 1;
-        print "got getall response\n";
-        print Dumper shift;
-    },
-);
+)->then( sub {
+    $got_response = 1;
+    print "got getall response\n";
+    print Dumper shift;
+} );
 
 $dbus->get_message() while !$got_response;

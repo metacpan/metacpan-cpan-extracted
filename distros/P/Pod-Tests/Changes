@@ -1,6 +1,10 @@
 Changes for Perl extension Pod-Tests
 
-1.19 Sat 12 Jul 2008
+1.20      2019-03-02 20:48:22Z
+        - distribution tooling updates
+        - mark distribution as deprecated, in favour of Test-Inline
+
+1.19      2008-07-12
 	- Moving to a production version
 	- Changing to Module::Install to simplify maintenance
 	- Updating perl dependency to 5.005
@@ -9,29 +13,29 @@ Changes for Perl extension Pod-Tests
 	- Stopped using MANIFEST for the tests
 	- Various minor whitespace and layout tweaks
 
-0.18 Thu 22 Sep 2005
+0.18      2005-09-22
 	- Some last minor whitespace changes
 	- Moving to stable build now I have feedback from testers
 	- Reversion to Pod::Tests namespace complete
 
-0.17_01 Sat 17 Sep 2005
+0.17_01   2005-09-17
 	- Superceded by Test::Inline 2.0
 	- For compatibility reasons, split out a Pod-Tests dist from the
 	  main Test-Inline dist. This is now Pod::Tests again.
 	- Cleaned up some Pod to reflect the changes.
 	- Various other minor changes from the splitting out process
 
-0.16 Thu 18 Dec 2003
+0.16      2003-12-18
 	- Fixed binmode on STDOUT/STDERR  (thanks Max Maischein)
 
-0.15 Thu 11 Apr 2002
+0.15      2002-04-11
 	- Hacked in a solution for when code tries to redirect STDOUT or
 	  STDERR.  The behavior when redirecting STDOUT & STDERR is
 	  currently *UNDEFINED* but at least it doesn't blow up.
 	- Off-by-some line number bugs now fixed.  Embedded tests should
 	  report correct line numbers.  __LINE__ should now be correct.
 
-0.14 Thu 28 Feb 2002
+0.14      2002-02-28
 	- pod2test now provides an $Original_File
 	- Fixed handling of "print STDERR ..." in tests
 	- Fixed $_STDERR_ and $_STDOUT_ so they clear themselves
@@ -41,53 +45,53 @@ Changes for Perl extension Pod-Tests
 	  The minimum version of Test::More has been uped (again, thanks
 	  Wolfgang)
 
-0.13 Mon 18 Feb 2002
+0.13      2002-02-18
 	- pod2test now exits with 1 if it doesn't find any embedded tests
 
-0.12 Mon 12 Nov 2001
+0.12      2001-11-12
 	- An excuse to upload a new version to CPAN to get this back
 	  on the indexes.
 
-0.11 Thu 30 Aug 2001
+0.11      2001-08-30
 	- Fixed a bug in the testifypods example in Test::Inline::Tutorial
 	- pod2test will not generate a test file for POD which has no
 	  embedded tests.
 	- Testing code examples no longer considered experimental
 
-0.10 Wed 29 Aug 2001
+0.10      2001-08-29
 	- Pod::Tests is now officially named Test::Inline
 	- Pod::Tests::Tutorial renamed Test::Inline::Tutorial
 	- Tests are now lexically isolated
 	- Works back to 5.004 now (Thanks to Tatsuhiko Miyagawa)
 	- "=also begin example" is now "=for example begin"
 
-0.08 Mon 13 Aug 2001
+0.08      2001-08-13
 	- Now reporting the line numbers of the orignal POD entries in
 	  tests.
 	- Put in warning about tests being lexically isolated next version.
 	- Documented that "=also for example" will never work.
 	- Fixed bug with tests at the very end of the file.
 
-0.07 Wed 18 Jul 2001
+0.07      2001-07-18
 	- oops, forgot to put the tutorial file into the MANIFEST
 
-0.06 Tue 17 Jul 2001
+0.06      2001-07-17
 	- Added Pod::Tests::Tutorial docs.
 
-0.05 Fri 29 Jun 2001
+0.05      2001-06-29
 	- Greatly extended the abilities of testing example code.
 
-0.04 Fri 29 Jun 2001      *UNRELEASED*
+0.04      2001-06-29      *UNRELEASED*
 	- Fixed a bug with pod2test puking if there's no tests
 	- Added RFC 183 into the dist.
 	- Fixed up testing of example code
 
-0.03 Tue 12 Jun 2001
+0.03      2001-06-12
 	- Now using Test::More and the no_plan feature in pod2tests
 	- Multiple tests in one block supported!
 	- Actually usable.
 
-0.02 Sun  4 Mar 2001
+0.02      2001-03-04
 	- Moved build_examples() and build_tests() to Pod::Tests
 	- Fixed and documented multiple parsing.
 	- Added examples
@@ -96,5 +100,5 @@ Changes for Perl extension Pod-Tests
 	- Removed bogus Pod::Parser dependency
 	- Fixed and tested pod2test
 
-0.01 Thu  1 Feb 2001
+0.01      2001-02-01
 	- First version escaped

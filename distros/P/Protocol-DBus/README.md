@@ -18,8 +18,7 @@ For blocking I/O:
         destination => 'org.freedesktop.DBus',
         signature => 's',
         body => [ 'org.freedesktop.DBus' ],
-        on_return => sub { my ($msg) = @_ },
-    );
+    )->then( sub { my $msg = shift; ..  } );
 
     my $msg = $dbus->get_message();
 
@@ -63,40 +62,47 @@ For non-blocking I/O:
 
 # DESCRIPTION
 
-This is an original, pure-Perl implementation of client logic for
+This is an original, pure-Perl implementation of client messaging logic for
 [the D-Bus protocol](https://dbus.freedesktop.org/doc/dbus-specification.html).
 
 It’s not much more than an implementation of the wire protocol; it doesn’t
 know about objects, services, or anything else besides the actual messages.
-That said, what’s here already should allow implementation of anything you
-can do with D-Bus; moreover, it would not be difficult to implement
-convenience logic—e.g., to mimic interfaces like [Net::DBus](https://metacpan.org/pod/Net::DBus)—on top of
-what is here now.
+This is fine, of course, if all you want to do is, e.g., replace
+an invocation of `gdbus` or `dbus-send` with pure Perl.
 
-Right now this distribution is an experimental effort. If you use it in your
-project, be sure to check the changelog before deploying a new version. Please
-file bug reports as appropriate.
+If you want an interface that mimics D-Bus’s actual object system,
+you’ll need to implement it yourself or to look elsewhere.
+(See ["SEE ALSO"](#see-also) below.)
 
-See [Protocol::DBus::Client](https://metacpan.org/pod/Protocol::DBus::Client) and the above sample for a starting point.
+# STATUS
+
+This project is in BETA status. While the API should be pretty stable now,
+breaking changes can still happen. If you use this module
+in your project, you **MUST** check the changelog before deploying a new
+version. Please file bug reports as appropriate.
 
 # EXAMPLES
 
-See the distribution’s `examples/` directory.
+See [Protocol::DBus::Client](https://metacpan.org/pod/Protocol::DBus::Client) and the above sample for a starting point.
+
+Also see the distribution’s `examples/` directory.
 
 # NOTES
 
 - UNIX FD support requires that [Socket::MsgHdr](https://metacpan.org/pod/Socket::MsgHdr) be loaded at
 authentication time.
+- Certain OSes may require [Socket::MsgHdr](https://metacpan.org/pod/Socket::MsgHdr) to function.
+(Linux, notably, does not.) It depends if your OS can send local socket
+credentials without recourse to `sendmsg(2)`.
 - EXTERNAL and DBUS\_COOKIE\_SHA1 authentication is supported.
 
 # TODO
 
-- Add conveniences like match rule logic.
 - Improve parsing of bus paths in environment variables.
 - Add more tests.
 
 # SEE ALSO
 
-[Net::DBus](https://metacpan.org/pod/Net::DBus) uses libdbus (via XS) as its backend. It’s more mature and
-more idiomatic as to how a D-Bus application is normally written, but
-it’s also heavier, and it doesn’t appear to support passing filehandles.
+The most mature, stable D-Bus implementation in Perl is [Net::DBus](https://metacpan.org/pod/Net::DBus),
+an XS binding to [libdbus](https://www.freedesktop.org/wiki/Software/dbus/),
+the reference D-Bus implementation.

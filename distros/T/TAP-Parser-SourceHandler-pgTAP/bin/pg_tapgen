@@ -6,7 +6,7 @@ use DBI;
 use DBD::Pg;
 use Getopt::Long;
 use File::Spec;
-our $VERSION = '3.34';
+our $VERSION = '3.35';
 
 Getopt::Long::Configure (qw(bundling));
 
@@ -447,7 +447,8 @@ sub _hasc {
               FROM pg_catalog.pg_namespace n
               JOIN pg_catalog.pg_class c      ON c.relnamespace = n.oid
               JOIN pg_catalog.pg_constraint x ON c.oid = x.conrelid
-             WHERE c.relhaspkey = true
+              JOIN pg_catalog.pg_index i      ON c.oid = i.indrelid
+             WHERE i.indisprimary = true
                AND n.nspname = ?
                AND c.relname = ?
                AND x.contype = ?

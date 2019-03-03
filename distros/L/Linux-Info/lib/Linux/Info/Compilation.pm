@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '1.4'; # VERSION
+our $VERSION = '1.5'; # VERSION
 
 =head1 NAME
 
@@ -181,7 +181,7 @@ Notation examples:
 Both argumnents have to be set as a hash reference.
 
 Note: the operators < > = ! are not available any more. It's possible that in further releases
-could be different changes for C<search()> and C<psfind()>. So please take a look to the 
+could be different changes for C<search()> and C<psfind()>. So please take a look to the
 documentation if you use it.
 
 =head1 EXPORTS
@@ -254,9 +254,11 @@ BEGIN {
             use strict 'refs';
             my ( $self, $sub, @keys ) = @_;
             return () unless $self->{$stat};
+
             if ($sub) {
                 my $ref = $self->{$stat};
                 return () unless exists $ref->{$sub};
+
                 if (@keys) {
                     return @{ $ref->{$sub} }{@keys};
                 }

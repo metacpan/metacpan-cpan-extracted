@@ -9,7 +9,7 @@ use YAML::Tiny;
 
 # ABSTRACT: Validation framework that can be configured with YAML files
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our $errstr  = '';
 
 
@@ -259,31 +259,41 @@ sub fieldinfo {
 sub _yaml_config{
     my ($self,$file) = @_;
     
-    if(defined $file and -e $file){
+    if ( ref $file and 'SCALAR' eq ref $file ) {
+        eval {
+            $self->{config} = YAML::Tiny->read_string( ${$file} );
+            1;
+        } or do {
+            $errstr = $@;
+            return;
+        };
+    }
+    elsif(defined $file and -e $file){
         eval {
             $self->{config} = YAML::Tiny->read( $file );
             1;
         } or do { 
             $errstr = $@;
-            return undef;
+            return;
         };
-
-        if ( $self->_no_steps ) {
-            $self->_add_fields( $self->{config}->[0], '' );
-        }
-        else {
-            for my $section(keys %{$self->{config}->[0]}){
-                my $sec_hash = $self->{config}->[0]->{$section};
-                $self->_add_fields( $sec_hash, $section );
-            }
-        }
     }
     elsif(defined $file){
         $errstr = 'file does not exist';
-        return undef;
+        return;
     }
     else {
         $errstr = 'Need path to YAML file';
+        return;
+    }
+
+    if ( $self->_no_steps ) {
+        $self->_add_fields( $self->{config}->[0], '' );
+    }
+    else {
+        for my $section(keys %{$self->{config}->[0]}){
+            my $sec_hash = $self->{config}->[0]->{$section};
+            $self->_add_fields( $sec_hash, $section );
+        }
     }
 
     return $self->{config};
@@ -403,7 +413,7 @@ Data::Validate::WithYAML - Validation framework that can be configured with YAML
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

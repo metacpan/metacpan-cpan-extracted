@@ -265,9 +265,9 @@ Data-Xslate GitHub issue tracker:
 
 [https://github.com/bluefeet/Data-Xslate/issues](https://github.com/bluefeet/Data-Xslate/issues)
 
-# AUTHOR
+# AUTHORS
 
-Aran Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

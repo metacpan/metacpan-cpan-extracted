@@ -1,10 +1,10 @@
-package Pod::Tests;
+package Pod::Tests; # git description: v1.19-5-gb954a11
 
 =pod
 
 =head1 NAME
 
-Pod::Tests - Extracts embedded tests and code examples from POD
+Pod::Tests - (DEPRECATED) Extracts embedded tests and code examples from POD
 
 =head1 SYNOPSIS
 
@@ -52,13 +52,8 @@ embarking on this.
 
 use 5.005;
 use strict;
-use vars qw($VERSION);
-BEGIN {
-	$VERSION = '1.19';
-}
 
-
-
+our $VERSION = '1.20';
 
 
 #####################################################################

@@ -155,9 +155,9 @@ Starch-Store-Amazon-DynamoDB GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch-Store-Amazon-DynamoDB/issues](https://github.com/bluefeet/Starch-Store-Amazon-DynamoDB/issues)
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

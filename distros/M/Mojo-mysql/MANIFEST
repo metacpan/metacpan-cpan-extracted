@@ -21,7 +21,6 @@ lib/Mojo/mysql/PubSub.pm
 lib/Mojo/mysql/Results.pm
 lib/Mojo/mysql/Transaction.pm
 lib/SQL/Abstract/mysql.pm
-LICENSE
 local/async_query_in_flight.pl
 local/TODO
 Makefile.PL
@@ -34,8 +33,10 @@ t/connection.t
 t/crud.t
 t/database.t
 t/json.t
+t/mariadb.t
 t/migrations.t
 t/migrations/test.sql
+t/mysql.t
 t/mysql_auto_reconnect.t
 t/mysql_lite_app.t
 t/pubsub.t

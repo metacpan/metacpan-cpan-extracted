@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use Quiq::Option;
 
@@ -237,7 +237,7 @@ Ein Ausschnitt aus der produzierten Ausgabe:
 
 =item @tuples
 
-Liste von Tripeln [$level, $node, ...]. Die Komponenten ... werden
+Liste von Tupeln [$level, $node, ...]. Die Komponenten ... werden
 transparent weitergereicht.
 
 =back
@@ -256,7 +256,7 @@ Objekt zurück.
 # -----------------------------------------------------------------------------
 
 sub new {
-    my ($class,$tripleA) = @_;
+    my ($class,$tupleA) = @_;
 
     # Tupel in interne Liste umkopieren. Die interne Liste besitzt
     # am Anfang ein weiteres Feld mit einem "Verbindungskennzeichen". Die
@@ -266,7 +266,7 @@ sub new {
     # dessen Wert hier auf 0.
 
     my @arr;
-    for (@$tripleA) {
+    for (@$tupleA) {
         # [$follow,$level,$node,...]
         push @arr,[0,@$_];
     }
@@ -399,16 +399,19 @@ sub asText {
     my $self = shift;
     # @_: @opt
 
+    my $direction = 'down';
     my $format = 'tree';
     my $getText = sub {return shift};
 
     Quiq::Option->extract(\@_,
+        -direction => \$direction,
         -format => \$format,
         -getText => \$getText,
     );
 
-    my $str = '';
     my $lineA = $self->get('lineA');
+
+    my $str = '';
 
     if ($format eq 'tree') {
         # Array, das für jede Einrückungsspalte angibt, ob dort eine
@@ -437,13 +440,15 @@ sub asText {
             #     Y  $rest
             #
             # wobei "Y  $rest" nur bei einem mehrzeiligen Knoten-Text
-            # existiert. Y ist dann ein |, wenn das Verbindugskennzeichen
+            # existiert. Y ist dann ein |, wenn das Verbindungskennzeichen
             # für Ebene $level gesetzt ist, sonst ein Leerzeichen.
             # X existiert nicht beim ersten Knoten, sonst ist X
-            # konstant ein |.
+            # konstant ein |. Bei Direction 'down' wird X oberhalb,
+            # bei 'up' unterhalb des Blocks hinzugefügt.
 
             my ($line1,$rest) = split /\n/,$getText->($node,@args),2;
-            my $block = sprintf "%s+--%s\n",$i? "|\n": '',$line1;
+
+            my $block = sprintf "+--%s\n",$line1;
 
             if ($rest) {
                 if ($follow[$level]) {
@@ -455,28 +460,49 @@ sub asText {
                 $block .= $rest;
             }
 
+            # Wenn 'down' setzen wir | auf die Zeile davor,
+            # bei 'up' setzen wir | auf die Zeile danach.
+
+            if ($i) {
+                $block = $direction eq 'down'? "|\n$block": "$block|\n";
+            }
+
             # Einrückungs-Block und Knoten-Block zusammenfügen
 
             $block =~ s/^/$indent/mg;
-            $str .= $block;
+
+            if ($direction eq 'down') {
+                $str .= $block;
+            }
+            else { # up
+                $str = $block.$str;
+            }
         }
+
+        # $str =~ s/^...//mg;
     }
     elsif ($format eq 'debug') {
         for (@$lineA) {
             my ($follow,$level,$node,@args) = @$_;
             $str .= sprintf "%d %d %s%s%s\n",
-                $level,
                 $follow,
+                $level,
                 '  ' x $level,
-                $node,
-                @args? join(' ',@args): '';
+                $getText->($node,@args), # $node,
+                @args? ' '.join('|',map {$_ // 'undef'} @args): '';
         }
     }
     elsif ($format eq 'compact') {
         for (@$lineA) {
             my ($follow,$level,$node,@args) = @$_;
             my ($line1,$rest) = split /\n/,$getText->($node,@args),2;
-            $str .= sprintf "%s%s\n",'  ' x $level,$line1;
+            my $block = sprintf "%s%s\n",'  ' x $level,$line1;
+            if ($direction eq 'down') {
+                $str .= $block;
+            }
+            else { # up
+                $str = $block.$str;
+            }
         }
     }
     else {
@@ -485,7 +511,7 @@ sub asText {
             Format => $format,
         );
     }
-    
+
     return $str;
 }
 
@@ -493,7 +519,7 @@ sub asText {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

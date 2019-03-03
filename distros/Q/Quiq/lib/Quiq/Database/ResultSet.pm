@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -42,6 +42,9 @@ Datensätzen.
     $tab = $class->new($rowClass,\@titles);
     $tab = $class->new($rowClass,\@titles,\@rows,@keyVal);
     
+    $tab = $class->new(\@titles);
+    $tab = $class->new(\@titles,\@rows,@keyVal);
+    
     $newTab = $tab->new;
     $newTab = $tab->new(\@rows);
 
@@ -51,6 +54,9 @@ Instantiiere ein Tabellen-Objekt und liefere eine Referenz auf dieses
 Objekt zurück.
 
 Die Arrays @titles und @rows werden von der Methode I<nicht> kopiert.
+
+Ist $rowClass nicht angegeben, wird $class->defaultRowClass() als
+Row-Klasse angenommen.
 
 Als Objektmethode gerufen, wird ein neues Tabellen-Objekt mit
 $rowClass und $titles aus dem existierenden Tabellenobjekt
@@ -66,12 +72,12 @@ sub new {
     my ($class,$self) = Quiq::Object->this(shift);
 
     if ($self) {
-        my $rows = shift || [];
+        my $rowA = shift || [];
 
         $self = $class->SUPER::new(
             rowClass=>$self->rowClass,
             titles=>scalar $self->titles,
-            rows=>$rows,
+            rows=>$rowA,
             stmt=>'',
             hits=>0,
             startTime=>scalar(Time::HiRes::gettimeofday),
@@ -81,15 +87,15 @@ sub new {
         );
     }
     else {
-        my $rowClass = shift;
+        my $rowClass = ref $_[0]? $class->defaultRowClass: shift;
         my $titles = shift;
-        my $rows = shift || [];
+        my $rowA = shift || [];
         # @_: @keyVal
 
         $self = $class->SUPER::new(
             rowClass=>$rowClass,
             titles=>$titles,
-            rows=>$rows,
+            rows=>$rowA,
             stmt=>'',
             hits=>0,
             startTime=>scalar(Time::HiRes::gettimeofday),
@@ -918,9 +924,8 @@ sub asTable {
 
     # Statement
 
-    if ($info >= 3) {
-        $str .= $self->stmt;
-        $str .= "\n\n";
+    if ($info >= 3 && (my $stmt = $self->stmt)) {
+        $str .= "$stmt\n\n";
     }
     if ($info >= 2) {
         # Kolumnenbezeichnungen
@@ -965,10 +970,12 @@ sub asTable {
     if ($info) {
         # Statistik
 
-        my $duration = $self->execTime + $self->fetchTime;
-        $str .= sprintf "\n%s rows, %s",
-            $self->count,
-            Quiq::Duration->new($duration)->asShortString(-precision=>3);
+        $str .= sprintf "\n%s rows",$self->count;
+        if (my $duration = $self->execTime + $self->fetchTime) {
+            $str .= ', '.Quiq::Duration->new($duration)->asShortString(
+                -precision=>3,
+            );
+        }
     }
     if ($msg) {
         $str .= $msg;
@@ -1055,7 +1062,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

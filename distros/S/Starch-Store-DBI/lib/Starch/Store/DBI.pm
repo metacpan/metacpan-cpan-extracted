@@ -1,6 +1,7 @@
 package Starch::Store::DBI;
-
-$Starch::Store::DBI::VERSION = '0.03';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -15,9 +16,8 @@ Starch::Store::DBI - Starch storage backend using DBI.
                 $dsn,
                 $username,
                 $password,
-                { RaiseError => 1 },
+                { RaiseError=>1, AutoCommit=>1 },
             ],
-            table => 'my_states',
         },
     );
 
@@ -48,7 +48,6 @@ use Scalar::Util qw( blessed );
 use Data::Serializer::Raw;
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with qw(
@@ -316,8 +315,6 @@ Set L<Starch::Store/remove>.
 sub set {
     my ($self, $id, $namespace, $data, $expires) = @_;
 
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
-
     my $key = $self->stringify_key( $id, $namespace );
 
     my $dbh = $self->dbh();
@@ -352,8 +349,6 @@ sub set {
 sub get {
     my ($self, $id, $namespace) = @_;
 
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
-
     my $key = $self->stringify_key( $id, $namespace );
 
     my $dbh = $self->dbh();
@@ -376,8 +371,6 @@ sub get {
 
 sub remove {
     my ($self, $id, $namespace) = @_;
-
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
 
     my $key = $self->stringify_key( $id, $namespace );
 
@@ -402,9 +395,9 @@ Starch-Store-DBI GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch-Store-DBI/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

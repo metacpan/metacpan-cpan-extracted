@@ -3,7 +3,10 @@ abstract: 'Record store timing information to statsd.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
+  Starch: '0.11'
+  Starch::Store: '0.11'
   Test2::V0: '0.000094'
+  Test::Starch: '0.11'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -26,18 +29,24 @@ no_index:
 provides:
   Starch::Plugin::Net::Statsd:
     file: lib/Starch/Plugin/Net/Statsd.pm
-    version: '0.04'
+    version: '0.05'
   Starch::Plugin::Net::Statsd::Manager:
     file: lib/Starch/Plugin/Net/Statsd/Manager.pm
-    version: '0.04'
+    version: '0.05'
   Starch::Plugin::Net::Statsd::Store:
     file: lib/Starch/Plugin/Net/Statsd/Store.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Moo: '2.000000'
+  Moo::Role: '2.000000'
   Net::Statsd: '0.11'
-  Starch: '0.10'
-  Type::Tiny: '1.000005'
+  Starch::Plugin::Bundle: '0.11'
+  Starch::Plugin::ForManager: '0.11'
+  Starch::Plugin::ForStore: '0.11'
+  Time::HiRes: '0'
+  Try::Tiny: '0.18'
+  Types::Common::Numeric: '1.000005'
+  Types::Common::String: '1.000005'
   namespace::clean: '0.24'
   perl: '5.008001'
   strictures: '2.000000'
@@ -45,6 +54,7 @@ resources:
   bugtracker: https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues
   homepage: https://github.com/bluefeet/Starch-Plugin-Net-Statsd
   repository: git://github.com/bluefeet/Starch-Plugin-Net-Statsd.git
-version: '0.04'
+version: '0.05'
+x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

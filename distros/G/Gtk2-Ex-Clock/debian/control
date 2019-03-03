@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017, 2018 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Clock.
 #
@@ -24,14 +24,14 @@ Source: libgtk2-ex-clock-perl
 Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
-Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.1
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 4.2.1
 Homepage: http://user42.tuxfamily.org/gtk2-ex-clock/index.html
-Bugs: mailto:user42@zip.com.au
+Bugs: mailto:user42_kevin@yahoo.com.au
 
 Package: libgtk2-ex-clock-perl
 Architecture: all
-Depends: perl (>= 5.8), libgtk2-perl (>= 1:1.200), libgtk2-perl, libglib-ex-objectbits-perl (>= 2), libi18n-langinfo-wide-perl (>= 2), libtie-tz-perl, libtime-hires-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}
+Depends: perl (>= 5.8), libgtk2-perl (>= 1:1.200), libglib-ex-objectbits-perl (>= 2), libi18n-langinfo-wide-perl (>= 2), libtie-tz-perl, libtime-hires-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}
 Suggests: libdatetime-perl, libdatetime-timezone-perl
 Description: Simple clock widget for Gtk2-Perl
  Gtk2::Ex::Clock is a simple widget displaying a time like "23:59".

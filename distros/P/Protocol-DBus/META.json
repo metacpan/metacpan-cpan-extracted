@@ -36,6 +36,7 @@
             "IO::Framed" : "0.15",
             "IO::SigGuard" : "0.13",
             "Module::Load" : "0",
+            "Promise::ES6" : "0",
             "X::Tiny" : "0",
             "parent" : "0",
             "perl" : "5.01"
@@ -65,6 +66,6 @@
          "web" : "https://github.com/FGasper/p5-Protocol-DBus"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

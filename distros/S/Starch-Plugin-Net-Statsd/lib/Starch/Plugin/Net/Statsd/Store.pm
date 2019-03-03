@@ -1,6 +1,7 @@
 package Starch::Plugin::Net::Statsd::Store;
-
-our $VERSION = '0.04';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.05';
 
 use Net::Statsd;
 use Types::Common::String -types;
@@ -8,12 +9,9 @@ use Time::HiRes qw( gettimeofday tv_interval );
 use Try::Tiny;
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::ForStore
-);
+with 'Starch::Plugin::ForStore';
 
 has statsd_path => (
     is  => 'lazy',
@@ -44,8 +42,6 @@ sub _build_statsd_full_path {
 foreach my $method (qw( set get remove )) {
     around $method => sub{
         my ($orig, $self, @args) = @_;
-
-        local $Carp::Internal{ (__PACKAGE__) } = 1;
 
         return $self->$orig( @args ) if $self->isa('Starch::Store::Layered');
 

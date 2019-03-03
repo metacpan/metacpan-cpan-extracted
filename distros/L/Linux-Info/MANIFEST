@@ -37,6 +37,7 @@ t/010-sysinfo.t
 t/020-cpustats.t
 t/030-procstats.t
 t/040-memstat.t
+t/041-memstat.t
 t/050-pgswstats.t
 t/060-netstats.t
 t/070-sockstats.t

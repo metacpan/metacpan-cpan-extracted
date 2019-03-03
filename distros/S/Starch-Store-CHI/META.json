@@ -45,22 +45,25 @@
             "CHI" : "0.58",
             "Moo" : "2.000000",
             "Scalar::Util" : "0",
-            "Starch" : "0.10",
-            "Type::Tiny" : "1.000005",
+            "Starch" : "0.11",
+            "Types::Common::String" : "1.000005",
+            "Types::Standard" : "1.000005",
             "namespace::clean" : "0.24",
+            "perl" : "5.008001",
             "strictures" : "2.000000"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0.000094"
+            "Test2::V0" : "0.000094",
+            "Test::Starch" : "0.11"
          }
       }
    },
    "provides" : {
       "Starch::Store::CHI" : {
          "file" : "lib/Starch/Store/CHI.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -74,10 +77,11 @@
          "web" : "https://github.com/bluefeet/Starch-Store-CHI"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

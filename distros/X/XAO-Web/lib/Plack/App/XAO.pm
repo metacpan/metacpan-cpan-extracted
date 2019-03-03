@@ -5,7 +5,7 @@ use CGI::Cookie;
 use CGI::PSGI;
 use Plack::App::File;
 use Plack::Builder;
-use Plack::Util::Accessor qw(site);
+use Plack::Util::Accessor qw(site fake_https);
 use XAO::Utils;
 use XAO::Web;
 
@@ -29,6 +29,13 @@ sub call {
 
     $sitename=~/^[\w-]+$/ ||
         die "Invalid site name\n";
+
+    # It is useful sometimes to let the code think it's running in HTTPS
+    # environment, when in reality it is not -- for instance if there
+    # is an immediate HTTPS proxy and there is no point in encrypting
+    # twice.
+    #
+    $env->{'psgi.url_scheme'}='https' if $self->fake_https;
 
     # Plack does not set up HTTPS in its environment. And CGI::PSGI
     # fails to detect https environment without that.
@@ -185,6 +192,20 @@ L<Apache::XAO> module uses:
 
 That has a benefit of automatically prepending images with the site home
 directory path, whatever it happens to be.
+
+=head2 Fake HTTPS
+
+It is useful sometimes to let the code think it's running in HTTPS
+environment, when in reality it is not -- for instance if there
+is an immediate HTTPS proxy and there is no point in encrypting
+twice.
+
+Use 'fake_https' parameter to achieve that:
+
+    mount '/' => Plack::App::XAO->new(
+        site        => 'example'
+        fake_https  => 1,
+    )->to_app(),
 
 =head1 EXPORTS
 

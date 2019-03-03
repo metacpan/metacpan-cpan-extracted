@@ -18,8 +18,7 @@ Protocol::DBus::Peer - base class for a D-Bus peer
         path => '/org/freedesktop/DBus',
         destination => 'org.freedesktop.DBus',
         body => [ 'org.freedesktop.DBus' ],
-        on_return => sub { my ($msg) = @_ },
-    );
+    )->then( sub { .. } );
 
     my $msg = $dbus->get_message();
 
@@ -42,6 +41,7 @@ implementation.)
 =cut
 
 use Call::Context;
+use Promise::ES6;
 
 use Protocol::DBus::Message;
 use Protocol::DBus::Parser;
@@ -55,7 +55,7 @@ use Protocol::DBus::WriteMsg;
 
 This returns a single instace of L<Protocol::DBus::Message>, or undef if
 no message is available. It will also fire the appropriate “on_return”
-method on METHOD_RETURN messages.
+method on METHOD_RETURN or ERROR messages.
 
 The backend I/O logic reads data in chunks; thus, if there is a message
 already available in the read buffer, no I/O is done. If you’re doing
@@ -101,38 +101,50 @@ sub flush_write_queue {
 Send a METHOD_CALL message.
 
 %OPTS are C<path>, C<interface>, C<member>, C<destination>, C<signature>,
-C<body>, and C<on_return>. These do as you’d expect, with the following
-caveats:
+and C<body>. These do as you’d expect, but note that C<body>, if given,
+must be an array reference.
 
-=over
+The return value is an instance of L<Promise::ES6> that will resolve when
+a METHOD_RETURN arrives in response, or reject when an ERROR arrives. The
+promise both resolves and rejects with a L<Protocol::DBus::Message> instance
+that represents the response.
 
-=item * C<body>, if given, must be an array reference. See
-L<Protocol::DBus::Message> for a discussion of how to map between D-Bus and
-Perl.
-
-=item * The C<on_return> callback receives the server’s response
-message (NB: either METHOD_RETURN or ERROR) as argument.
-
-=back
+Note that exceptions can still happen (outside of the promise), e.g., if
+your input is invalid or if there’s a socket I/O error.
 
 =cut
+
+use constant _METHOD_RETURN_NUM => Protocol::DBus::Message::Header::MESSAGE_TYPE()->{'METHOD_RETURN'};
 
 sub send_call {
     my ($self, %opts) = @_;
 
-    my $cb = delete $opts{'on_return'};
-
-    my $ret = $self->_send_msg(
+    $self->_send_msg(
         %opts,
         type => 'METHOD_CALL',
     );
 
-    if ($cb) {
+    # Don’t create a promise if we were called in void context.
+    return defined(wantarray) && do {
         my $serial = $self->{'_last_sent_serial'};
-        $self->{'_on_return'}{$serial} = $cb;
-    }
 
-    return $ret;
+        # Keep references to $self out of the callback
+        # in order to avoid memory leaks.
+        my $on_return_hr = $self->{'_on_return'} ||= {};
+
+        return Promise::ES6->new( sub {
+            my ($resolve, $reject) = @_;
+
+            $on_return_hr->{$serial} = sub {
+                if ($_[0]->get_type() == _METHOD_RETURN_NUM()) {
+                    $resolve->($_[0]);
+                }
+                else {
+                    $reject->($_[0]);
+                }
+            };
+        } );
+    };
 }
 
 =head2 I<OBJ>->send_return( $ORIG_MSG, %OPTS )
@@ -140,16 +152,9 @@ sub send_call {
 Send a METHOD_RETURN message.
 
 Arguments are similar to C<send_call()> except for the header differences
-that the D-Bus specification describes. Also:
-
-=over
-
-=item * C<destination> is taken from the $ORIG_MSG. (Behavior is
+that the D-Bus specification describes. Also, C<destination> is not given
+directly but is instead inferred from the $ORIG_MSG. (Behavior is
 undefined if this parameter is given directly.)
-
-=item * There is no C<on_return> parameter.
-
-=back
 
 =cut
 
@@ -195,8 +200,8 @@ sub _response_fields_from_orig_msg {
 
 =head2 I<OBJ>->send_signal( %OPTS )
 
-Like C<send_call()> but sends a signal rather than a method call.
-There is no C<on_return> parameter.
+Like C<send_call()> but sends a signal rather than a method call,
+and a promise is not returned.
 
 =cut
 

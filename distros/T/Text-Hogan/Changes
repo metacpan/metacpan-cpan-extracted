@@ -1,5 +1,11 @@
 Revision history for perl module Text::Hogan
 
+2.01 2019-03-02
+    * The inevitable tiny point release after the 2.0 to fix a typo in the docs :)
+
+2.00 2019-03-02
+    * Small change with a big effect: Ricky Morse added an optimiation to the compile stage which makes the handling of large input files of character strings much more efficient. Compilation around 10x faster for a 20KB file of Japanese text.
+
 1.09 2019-02-23
     * Loads of great Perlish refactors from Yanick Champoux <3
 

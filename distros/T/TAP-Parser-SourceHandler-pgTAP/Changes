@@ -1,5 +1,11 @@
 Revision history for Perl extension TAP::Parser::SourceHandler::pgTAP.
 
+3.35  2019-03-02T19:18:31Z
+     - Fixed Postgres 11 primary key query incompatibility in `pg_tapgen` by
+       checking the `pg_index.indisprimary` column instead of
+       `pg_catalog.relhaspkey`, since the latter has been removed. Thanks to
+       @KiriakosGeorgiou for the report (#19).
+
 3.34  2018-11-28T03:04:53Z
      - Added function-checksum tests to the output of `pg_tapgen`, thanks to
        Marc Cousin (PR #17).
@@ -101,4 +107,3 @@ Revision history for Perl extension TAP::Parser::SourceHandler::pgTAP.
         App::Prove and pgTAP.
       - Rewrote `pg_prove` to use App::Prove, thus gaining most of its
         features.
-        

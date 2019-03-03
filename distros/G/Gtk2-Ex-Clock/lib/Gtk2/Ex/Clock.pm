@@ -1,4 +1,4 @@
-# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Clock.
 #
@@ -15,6 +15,18 @@
 # You should have received a copy of the GNU General Public License along
 # with Gtk2-Ex-Clock.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# MAYBE:
+# ->update to force redraw for time() or localtime TZ change.
+# time() change would normally be external (as root), and generally not
+# notified to running programs anyway.
+# TZ change within the program would be a bit unusual.
+# A forced redraw might be good enough usually.  An update wouldn't redraw
+# if in fact no text change.
+# Some program-wide update all clocks would probably be more use than one by
+# one.
+
+
 package Gtk2::Ex::Clock;
 use 5.008;
 use strict;
@@ -30,7 +42,7 @@ use Glib::Ex::SourceIds;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 use constant _DEFAULT_FORMAT => '%H:%M';
 
@@ -308,13 +320,13 @@ somewhere unobtrusive in a realtime or semi-realtime application.  The
 right-hand end of a menubar is a good place for instance, depending on user
 preferences.
 
-In the default minutes display all a Clock costs in the program is a timer
+In the default minutes display, all a Clock costs in the program is a timer
 waking once a minute to change a C<Gtk2::Label>.
 
 If you've got a 7-segment LED style font you can display alarm clock style
-by selecting that font in the usual ways from an RC file setting or Pango
-markup.  F<examples/7seg.pl> in the sources does it with Pango markup and
-Harvey Twyman's font.  (Unzip into your F<~/.fonts> directory.)
+by selecting that font in the usual ways from RC file setting or Pango
+markup.  F<examples/7seg.pl> does it with Pango markup and Harvey Twyman's
+font.  (Unzip into your F<~/.fonts> directory.)
 
 =over
 
@@ -376,8 +388,8 @@ the time, and restored so other parts of the program are not affected.  See
 the C<tzset> man page or the GNU C Library manual under "TZ Variable" for
 possible settings.
 
-For a C<DateTime::TimeZone> object the offsets in it and a C<DateTime>
-object's C<< $dt->strftime >> are used for the display.  That C<strftime>
+For a C<DateTime::TimeZone> object, the offsets in it and a C<DateTime>
+object's C<< $dt->strftime() >> are used for the display.  That C<strftime>
 method may have more conversions than what the C library offers.
 
 The C<timezone> and C<timezone-string> properties act on the same underlying
@@ -400,23 +412,23 @@ requested resolution worth of real time has elapsed.
 =back
 
 The properties of C<Gtk2::Label> and C<Gtk2::Misc> will variously control
-padding, alignment, etc.  See the F<examples> directory in the sources for
-some complete programs displaying clocks in various forms.
+padding, alignment, etc.  See the F<examples> directory for some complete
+programs displaying clocks in various forms.
 
 =head1 LOCALIZATIONS
 
-For a string C<timezone> property the C<POSIX::strftime> function gets
+For a string C<timezone> property, the C<POSIX::strftime()> function gets
 localized day names etc from C<LC_TIME> in the usual way.  Generally Perl
 does a suitable C<setlocale(LC_TIME)> at startup so the usual settings take
 effect automatically.
 
-For a C<DateTime::TimeZone> object the DateTime C<strftime> gets
-localizations from the C<< DateTime->DefaultLocale >> (see L<DateTime>).
+For a C<DateTime::TimeZone> object, the DateTime C<strftime()> gets
+localizations from the C<< DateTime->DefaultLocale() >> (see L<DateTime>).
 Generally you must make a call to set C<DefaultLocale> yourself at some
 point early in the program.
 
-The C<format> string can include wide-char unicode in Perl's usual fashion,
-for both plain C<strftime> and C<DateTime>.  The plain C<strftime> uses
+The C<format> string can include wide-char unicode in Perl's usual way, for
+both plain C<strftime> and C<DateTime>.  The plain C<strftime> uses
 C<POSIX::Wide::strftime()> so characters in the format are not limited to
 what's available in the locale charset.
 
@@ -441,23 +453,34 @@ object if nervous.
 
 Any code making localized changes to C<TZ> should be careful not to run the
 main loop with the change in force.  Doing so is probably a bad idea for
-many reasons, but in particular if a clock widget showing the default local
-time could update to the different C<TZ>.  Things like C<< $dialog->run >>
+many reasons, but in particular a clock widget showing the default local
+time could update to the different C<TZ>.  Things like C<< $dialog->run() >>
 iterate the main loop.
 
 The display is designed for a resolution no faster than 1 second, so the
 DateTime C<%N> format format for nanoseconds is fairly useless.  It ends up
 displaying a value some 20 to 30 milliseconds past the 1 second boundary
 because that's when the clock updates.  A faster time display is of course
-possible, capped by some frame rate and the speed of the X server, but would
-more likely be something more like a stopwatch than time of day.
-Incidentally C<Gtk2::Label> as used in the Clock here isn't a particularly
-efficient base for rapid updates.
+possible, capped by some frame rate and the speed of the X server, but that
+would be something more like a stopwatch than time of day.  Incidentally
+C<Gtk2::Label> as used in the Clock here isn't a particularly efficient base
+for rapid updates.
+
+=head1 BUGS
+
+The current code assumes that the numbers, weekday names, etc from
+C<strftime> won't have any "<" which might look like Pango markup.  This
+works in practice, but for C<DateTime> extras perhaps the output should be
+quoted.  Or perhaps it's good not to quote so a method could give some
+markup.  For now the suggestion is don't put "<" in conversion output so as
+not to rely on whether it's quoted or not.
 
 =head1 SEE ALSO
 
 C<strftime(3)>, C<tzset(3)>, L<Gtk2>, L<Gtk2::Label>, L<Gtk2::Misc>,
 L<DateTime::TimeZone>, L<DateTime>, L<POSIX::Wide>
+
+L<Tk::SevenSegmentDisplay>
 
 =head1 HOME PAGE
 
@@ -465,7 +488,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-clock/index.html>
 
 =head1 LICENSE
 
-Gtk2-Ex-Clock is Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
+Gtk2-Ex-Clock is Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2017, 2019 Kevin Ryde
 
 Gtk2-Ex-Clock is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

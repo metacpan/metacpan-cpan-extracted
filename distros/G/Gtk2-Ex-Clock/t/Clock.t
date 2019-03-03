@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Clock.
 #
@@ -29,7 +29,7 @@ BEGIN { MyTestHelpers::nowarnings() }
 require Gtk2::Ex::Clock;
 
 {
-  my $want_version = 15;
+  my $want_version = 16;
   is ($Gtk2::Ex::Clock::VERSION, $want_version, 'VERSION variable');
   is (Gtk2::Ex::Clock->VERSION,  $want_version, 'VERSION class method');
 

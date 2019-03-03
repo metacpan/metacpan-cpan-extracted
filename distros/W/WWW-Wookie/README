@@ -1,5 +1,5 @@
-WWW::Wookie version 0.102
-=======================================================
+WWW::Wookie version v1.1.1
+==========================
 
 This is a Perl implementation of the Wookie Connector Framework. It is intended
 to map the java implementation which should be considered the reference

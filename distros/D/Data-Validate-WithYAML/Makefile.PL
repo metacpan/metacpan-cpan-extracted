@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Data::Validate::WithYAML",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Scalar::Util" => 0,
+    "Scalar::Util" => "1.5",
     "YAML::Tiny" => "1.70"
   },
   "TEST_REQUIRES" => {
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Temp" => 0,
   "FindBin" => 0,
-  "Scalar::Util" => 0,
+  "Scalar::Util" => "1.5",
   "Test::Exception" => 0,
   "Test::More" => 0,
   "YAML::Tiny" => "1.70"

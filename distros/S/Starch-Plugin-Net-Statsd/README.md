@@ -73,9 +73,9 @@ Starch-Plugin-Net-Statsd GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues](https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues)
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

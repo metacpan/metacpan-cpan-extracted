@@ -3,25 +3,26 @@ abstract: 'Test DNS queries and zone configuration'
 author:
   - 'Sawyer X <xsawyerx@cpan.org>'
 build_requires:
-  English: 0
-  File::Find: 0
-  File::Temp: 0
-  Module::Build: 0.3601
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.102400'
-license: perl
+generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-DNS
-requires:
-  Moose: 0
-  Net::DNS: 0
-  Set::Object: 0
-  Test::Builder::Module: 0
-  Test::Deep: 0
-version: 0.13
+provides:
+  Test::DNS:
+    file: lib/Test/DNS.pm
+    version: '0.200'
+resources:
+  bugtracker: https://github.com/xsawyerx/test-dns/issues
+  repository: git://github.com/xsawyerx/test-dns.git
+version: '0.200'
+x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,37 +17,37 @@ name: WWW-Wookie
 provides:
   WWW::Wookie:
     file: lib/WWW/Wookie.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Connector::Exceptions:
     file: lib/WWW/Wookie/Connector/Exceptions.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Connector::Service:
     file: lib/WWW/Wookie/Connector/Service.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Connector::Service::Interface:
     file: lib/WWW/Wookie/Connector/Service/Interface.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Server::Connection:
     file: lib/WWW/Wookie/Server/Connection.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::User:
     file: lib/WWW/Wookie/User.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Widget:
     file: lib/WWW/Wookie/Widget.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Widget::Category:
     file: lib/WWW/Wookie/Widget/Category.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Widget::Instance:
     file: lib/WWW/Wookie/Widget/Instance.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Widget::Instances:
     file: lib/WWW/Wookie/Widget/Instances.pm
-    version: '0.102'
+    version: v1.1.1
   WWW::Wookie::Widget::Property:
     file: lib/WWW/Wookie/Widget/Property.pm
-    version: '0.102'
+    version: v1.1.1
 recommends:
   CGI: '0'
   Getopt::Long: '0'
@@ -89,5 +89,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/WWW-Wookie
-version: '0.102'
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

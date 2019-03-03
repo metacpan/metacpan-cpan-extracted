@@ -1,0 +1,12 @@
+Revision history for MIDI-Util
+
+0.0300 2019-03-02 13:19:22
+    - Add the new_track() function.
+    - Improve tests.
+
+0.0200 2019-03-02 10:47:28
+    - Correct function name.
+
+0.0100 2019-03-01 19:58:14
+    - Ported from https://github.com/ology/Music/blob/master/MIDIUtil.pm
+    - Minted by Dist::Zilla.

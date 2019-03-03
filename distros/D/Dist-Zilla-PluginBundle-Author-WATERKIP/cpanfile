@@ -1,4 +1,5 @@
 requires "Data::Dumper" => "0";
+requires "Dist::Zilla" => "0";
 requires "Dist::Zilla::App::Command::xtest" => "0";
 requires "Dist::Zilla::Plugin::CheckExtraTests" => "0";
 requires "Dist::Zilla::Plugin::CheckPrereqsIndexed" => "0";

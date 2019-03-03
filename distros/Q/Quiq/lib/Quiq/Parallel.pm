@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use Quiq::Path;
 use Quiq::Parameters;
@@ -309,7 +309,7 @@ sub runFetch {
                 # Lenke stdout und stderr in Ausgabedateien in Verzeichnis
                 # $dir um. Die Umlenkung gilt auch für Child-Prozesse.
 
-                my $file = sprintf '%s/%06d.out',$dir,$i;
+                my $file = $p->expandTilde(sprintf '%s/%06d.out',$dir,$i);
 
                 CORE::close STDOUT;
                 CORE::open STDOUT,'>',$file or $class->throw;
@@ -345,7 +345,7 @@ sub runFetch {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

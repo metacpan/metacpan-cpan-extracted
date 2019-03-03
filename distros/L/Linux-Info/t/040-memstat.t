@@ -1,8 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use Linux::Info;
-use Scalar::Util qw(openhandle);
+use Linux::Info::MemStats;
+use Scalar::Util qw(openhandle looks_like_number);
 
 unless ( -r '/proc/meminfo' ) {
     plan skip_all =>
@@ -10,64 +10,58 @@ unless ( -r '/proc/meminfo' ) {
     exit;
 }
 
-my @memstats = qw(
-  memused
-  memfree
-  memusedper
-  memtotal
-  buffers
-  cached
-  realfree
-  realfreeper
-  swapused
-  swapfree
-  swapusedper
-  swaptotal
-  swapcached
-  active
-  inactive
-);
+my $stats = Linux::Info::MemStats->new();
+isa_ok( $stats, 'Linux::Info::MemStats' );
+can_ok( $stats, qw(new get get_more) );
 
-my @memstats26  = qw(committed_as);
-my @memstats269 = qw(commitlimit);
-
-open( my $fh, '<', '/proc/sys/kernel/osrelease' ) or report_missing($!);
+open( my $fh, '<', '/proc/sys/kernel/osrelease' )
+  or
+  diag("This system does not have a readable /proc/sys/kernel/osrelease: $!");
 
 if ( openhandle($fh) ) {
-    my @rls = split /\./, <$fh>;
-    close $fh;
-    my $sys = Linux::Info->new();
-    $sys->set( memstats => 1 );
-    my $stats = $sys->get;
-
-    if ( $rls[0] < 6 ) {
-        plan tests => 15;
-    }
-    else {
-        push @memstats, $_ for @memstats26;
-        if ( $rls[1] < 9 ) {
-            plan tests => 16;
-        }
-        else {
-            plan tests => 17;
-            push @memstats, $_ for @memstats269;
-        }
-    }
+    note( 'Testing get() on kernel ' . kernel_version($fh) );
+    my @memstats = (
+        'memused',    'memfree',  'memusedper',  'memtotal',
+        'buffers',    'cached',   'realfree',    'realfreeper',
+        'swapused',   'swapfree', 'swapusedper', 'swaptotal',
+        'swapcached', 'active',   'inactive',    'committed_as',
+        'commitlimit'
+    );
+    my $mem_info_ref = $stats->get();
+    isa_ok( $mem_info_ref, 'HASH', 'what reference get() returned' );
+    my @data = explain($mem_info_ref);
+    note('Testing mostly basic expected information availability');
 
     foreach my $stat (@memstats) {
-        ok( defined $stats->memstats->{$stat}, "checking memstats $stat" )
-          or diag( "This system doesn't include $stat: "
-              . explain( $stats->memstats ) );
+
+      SKIP: {
+
+            skip "this system lacks $stat", 2
+              unless ( exists( $mem_info_ref->{$stat} ) );
+
+            ok( exists( $mem_info_ref->{$stat} ), "$stat is available" );
+
+            ok( looks_like_number( $mem_info_ref->{$stat} ),
+                "$stat has numeric value" )
+              or diag("$stat is missing: @data");
+        }
     }
 }
 else {
     plan skip_all => 'This system does not provide memstat features';
-    exit;
 }
 
-sub report_missing {
-    my $error = shift;
-    diag(
-"This system does not have a readable /proc/sys/kernel/osrelease: $error"
-    );
+done_testing;
+
+sub kernel_version {
+    my $fh = shift;
+    my $rls;
+
+    {
+        local $/ = undef;
+        $rls = <$fh>;
+    }
+
+    close $fh;
+    return $rls;
 }

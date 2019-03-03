@@ -1,7 +1,10 @@
 Revision history for Perl extension WWW::Wookie.
 
+v1.1.1 Sat Mar  2 06:40:52 UTC 2019
+	- Fixes RT#128686
+
 0.102 Sat Apr 22 16:06:09 UTC 2017
-    - Fixed RT#121287
+    - Fixes RT#121287
 
 0.101 Sun Aug  7 14:26:03 UTC 2016
     - Retired Wookie http://attic.apache.org/projects/wookie.html

@@ -1,11 +1,11 @@
 package Starch::Plugin::TimeoutStore;
 use 5.010001;
 use strictures 2;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
-Starch::Plugin::TimeoutStore - Throw an exception if store access surpass a timeout.
+Starch::Plugin::TimeoutStore - Throw an exception if store access surpasses a timeout.
 
 =head1 SYNOPSIS
 
@@ -42,9 +42,7 @@ use Sys::SigAction qw( timeout_call );
 use Moo::Role;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::ForStore
-);
+with 'Starch::Plugin::ForStore';
 
 =head1 OPTIONAL STORE ARGUMENTS
 
@@ -93,9 +91,9 @@ foreach my $method (qw( set get remove )) {
 1;
 __END__
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

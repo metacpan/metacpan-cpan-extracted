@@ -1,4 +1,4 @@
-package WWW::Wookie::User 0.102;    # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::Wookie::User v1.1.1;    # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -81,7 +81,7 @@ WWW::Wookie::User - represent a possible user of a widget
 
 =head1 VERSION
 
-This document describes WWW::Wookie::User version 0.102
+This document describes WWW::Wookie::User version v1.1.1
 
 =head1 SYNOPSIS
 

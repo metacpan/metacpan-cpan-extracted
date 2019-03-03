@@ -1,7 +1,7 @@
 {
    "abstract" : "Templatize your data.",
    "author" : [
-      "Aran Deltac <bluefeet@gmail.com>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.4",
@@ -44,8 +44,9 @@
          "requires" : {
             "Carp" : "0",
             "Storable" : "0",
-            "Text::Xslate" : "3",
-            "Tie::Hash" : "0"
+            "Text::Xslate" : "v3.0.0",
+            "Tie::Hash" : "0",
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -57,7 +58,7 @@
    "provides" : {
       "Data::Xslate" : {
          "file" : "lib/Data/Xslate.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -71,10 +72,11 @@
          "web" : "https://github.com/bluefeet/Data-Xslate"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

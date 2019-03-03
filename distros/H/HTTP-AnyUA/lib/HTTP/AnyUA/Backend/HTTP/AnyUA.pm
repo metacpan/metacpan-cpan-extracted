@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend::HTTP::AnyUA;
 use warnings;
 use strict;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
@@ -36,7 +36,7 @@ HTTP::AnyUA::Backend::HTTP::AnyUA - A unified programming interface for HTTP::An
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,4 @@
-package WWW::Wookie 0.102;    # -*- cperl; cperl-indent-level: 4 -*-
+package WWW::Wookie v1.1.1;    # -*- cperl; cperl-indent-level: 4 -*-
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ WWW::Wookie - Apache Wookie Connector Framework implementation
 
 =head1 VERSION
 
-This document describes WWW::Wookie version 0.102, which is probably the
+This document describes WWW::Wookie version v1.1.1, which is probably the
 latest version because the Wookie project is retired
 L<http://attic.apache.org/projects/wookie.html>
 

@@ -32,12 +32,11 @@ for my $func ( qw( GetConnectionUnixUser GetConnectionCredentials ) ) {
         destination => 'org.freedesktop.DBus',
         signature => 's',
         member => $func,
-        body => [ $dbus->get_connection_name() ],
-        on_return => sub {
-            $got_response = 1;
-            print Dumper shift;
-        },
-    );
+        body => [ $dbus->get_unique_bus_name() ],
+    )->then( sub {
+        $got_response = 1;
+        print Dumper shift;
+    } );
 
     $dbus->get_message() while !$got_response;
 }

@@ -18,6 +18,7 @@ my @files = (
     'lib/HTTP/AnyUA/Backend/Net/Curl/Easy.pm',
     'lib/HTTP/AnyUA/Middleware.pm',
     'lib/HTTP/AnyUA/Middleware/ContentLength.pm',
+    'lib/HTTP/AnyUA/Middleware/RequestHeaders.pm',
     'lib/HTTP/AnyUA/Middleware/Runtime.pm',
     'lib/HTTP/AnyUA/Util.pm',
     't/00-compile.t',
@@ -38,6 +39,7 @@ my @files = (
     't/22-redirects.t',
     't/23-content-coderef.t',
     't/40-middleware-content-length.t',
+    't/40-middleware-request-headers.t',
     't/40-middleware-runtime.t',
     't/app.psgi',
     't/lib/MockBackend.pm',
@@ -46,14 +48,14 @@ my @files = (
     'xt/author/clean-namespaces.t',
     'xt/author/critic.t',
     'xt/author/eol.t',
+    'xt/author/minimum-version.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-coverage.t',
     'xt/author/pod-no404s.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/minimum-version.t'
+    'xt/release/distmeta.t'
 );
 
 notabs_ok($_) foreach @files;

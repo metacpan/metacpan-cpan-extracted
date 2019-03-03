@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware;
 use warnings;
 use strict;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 sub _croak { require Carp; Carp::croak(@_) }
 sub _usage { _croak("Usage: @_\n") }
@@ -64,7 +64,7 @@ HTTP::AnyUA::Middleware - A base class for HTTP::AnyUA middleware
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ version 0.901
         # Maybe do something with the request args here.
 
         # Let backend handle the response:
-        my $response = $self->backend($method, $url, $args);
+        my $response = $self->backend->request($method, $url, $args);
 
         my $handle_response = sub {
             my $response = shift;

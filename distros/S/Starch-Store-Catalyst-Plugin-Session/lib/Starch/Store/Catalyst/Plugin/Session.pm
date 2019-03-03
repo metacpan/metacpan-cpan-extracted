@@ -1,6 +1,7 @@
 package Starch::Store::Catalyst::Plugin::Session;
-
-$Starch::Store::Catalyst::Plugin::Session::VERSION = '0.04';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -36,7 +37,6 @@ use Types::Common::String -types;
 use Starch::Util qw( load_prefixed_module );
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with qw(
@@ -53,7 +53,7 @@ after BUILD => sub{
 };
 
 {
-    package # NO CPAN INDEX
+    package # NO INDEX
         Starch::FakeCatalystContext;
 
     use Moose;
@@ -170,8 +170,6 @@ See L<Starch::Store/remove>.  Calls C<delete_session_data> on L</store>.
 sub set {
     my ($self, $id, $namespace, $data, $expires) = @_;
 
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
-
     $self->store->store_session_data( "session:$id", $data );
 
     return;
@@ -180,15 +178,11 @@ sub set {
 sub get {
     my ($self, $id, $namespace) = @_;
 
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
-
     return $self->store->get_session_data( "session:$id" );
 }
 
 sub remove {
     my ($self, $id, $namespace) = @_;
-
-    local $Carp::Internal{ (__PACKAGE__) } = 1;
 
     $self->store->delete_session_data( "session:$id" );
 
@@ -205,9 +199,9 @@ Starch-Store-Catalyst-Plugin-Session GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

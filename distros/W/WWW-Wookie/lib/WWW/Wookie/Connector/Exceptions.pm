@@ -1,5 +1,5 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::Wookie::Connector::Exceptions 0.102;
+package WWW::Wookie::Connector::Exceptions v1.1.1;
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ WWW::Wookie::Connector::Exceptions - Handles exception information
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Connector::Exceptions version 0.102
+This document describes WWW::Wookie::Connector::Exceptions version v1.1.1
 
 =head1 SYNOPSIS
 

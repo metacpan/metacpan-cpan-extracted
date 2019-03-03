@@ -4,6 +4,7 @@ author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Test2::V0: '0.000094'
+  Test::Starch: '0.11'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -26,18 +27,21 @@ no_index:
 provides:
   Starch::Plugin::Sereal:
     file: lib/Starch/Plugin/Sereal.pm
-    version: '0.03'
+    version: '0.04'
 requires:
-  Moo: '2.000000'
-  Sereal: '3.003'
-  Starch: '0.10'
-  Type::Tiny: '1.000005'
+  Moo::Role: '2.000000'
+  Sereal::Decoder: '3.003'
+  Sereal::Encoder: '3.003'
+  Starch::Plugin::ForManager: '0.10'
+  Types::Standard: '1.000005'
   namespace::clean: '0.24'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Plugin-Sereal/issues
   homepage: https://github.com/bluefeet/Starch-Plugin-Sereal
   repository: git://github.com/bluefeet/Starch-Plugin-Sereal.git
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.04'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

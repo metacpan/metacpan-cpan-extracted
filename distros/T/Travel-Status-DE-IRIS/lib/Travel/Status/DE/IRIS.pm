@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -445,9 +445,12 @@ sub get_realtime {
 			my $msgid = $e_m->getAttribute('id');
 			my $ts    = $e_m->getAttribute('ts');
 
-			# 0 and 1 (with key "f") are related to canceled trains and
-			# do not appear to hold information
-			if ( defined $value and $value > 1 ) {
+           # 0 and 1 (with key "f") are related to canceled trains and
+           # do not appear to hold information (or at least none we can access).
+           # All observed cases of message ID 900 were related to bus
+           # connections ("Anschlussbus wartet"). We can't access which bus
+           # it refers to, so we don't show that either.
+			if ( defined $value and $value > 1 and $value != 900 ) {
 				$messages{$msgid} = [ $ts, $type, $value ];
 			}
 		}
@@ -610,7 +613,7 @@ Travel::Status::DE::IRIS - Interface to IRIS based web departure monitors.
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 DESCRIPTION
 
@@ -749,7 +752,7 @@ L<https://github.com/derf/Travel-Status-DE-IRIS>
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

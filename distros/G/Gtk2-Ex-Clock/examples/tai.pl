@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010 Kevin Ryde
+# Copyright 2010, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Clock.
 #
@@ -21,11 +21,11 @@
 # Display of TAI atomic time using DateTime::TimeZone::TAI, together with
 # GMT/UTC and local time for comparison.
 #
-# As of May 2010 TAI is ahead of UTC by 34 seconds.  The earth rotates a
+# As of March 2019, TAI is ahead of UTC by 37 seconds.  The earth rotates a
 # little slower than once every 86400 SI seconds, and in fact the speed of
 # rotation varies very slightly.  The cumulative amount slower has added up
-# to 34 SI seconds so far.
-#.
+# to 37 SI seconds so far.
+#
 
 use strict;
 use warnings;

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use YAML::XS 0.41;
-our $VERSION = '1.4'; # VERSION
+our $VERSION = '1.5'; # VERSION
 
 =head1 NAME
 

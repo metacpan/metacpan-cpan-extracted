@@ -4,7 +4,7 @@ use warnings;
 use Carp qw(croak);
 use Time::HiRes 1.9725;
 use YAML::XS 0.41;
-our $VERSION = '1.4'; # VERSION
+our $VERSION = '1.5'; # VERSION
 
 =head1 NAME
 

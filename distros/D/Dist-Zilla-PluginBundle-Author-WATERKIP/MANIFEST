@@ -19,6 +19,7 @@ profiles/default/profile.ini
 profiles/default/skel/CONTRIBUTORS
 profiles/default/skel/Changes
 profiles/default/skel/Dockerfile
+profiles/default/skel/LICENSE
 profiles/default/skel/MANIFEST.SKIP
 profiles/default/skel/Makefile.PL
 profiles/default/skel/README.md

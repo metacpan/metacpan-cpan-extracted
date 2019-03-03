@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
-use Test2::V0;
+use 5.008001;
 use strict;
 use warnings;
+use Test2::V0;
 
 use Data::Xslate;
 

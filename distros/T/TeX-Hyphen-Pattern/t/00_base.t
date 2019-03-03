@@ -6,7 +6,7 @@ use utf8;
 
 use Test::More;
 
-our $VERSION = v1.1.1;
+our $VERSION = v1.1.2;
 
 if ( $ENV{'AUTHOR_TESTING'} ) {
     eval {

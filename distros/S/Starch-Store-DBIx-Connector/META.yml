@@ -6,6 +6,7 @@ build_requires:
   DBD::SQLite: '1.46'
   JSON: '2.00'
   Test2::V0: '0.000094'
+  Test::Starch: '0.11'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -28,20 +29,24 @@ no_index:
 provides:
   Starch::Store::DBIx::Connector:
     file: lib/Starch/Store/DBIx/Connector.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   DBIx::Connector: '0.53'
+  Data::Serializer: '0.60'
+  Data::Serializer::Raw: '0.02'
   Moo: '2.000000'
   Scalar::Util: '0'
-  Starch: '0.10'
-  Starch::Store::DBI: '0.03'
-  Type::Tiny: '1.000005'
+  Starch::Store: '0.11'
+  Types::Common::String: '1.000005'
+  Types::Standard: '1.000005'
   namespace::clean: '0.24'
+  perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Starch-Store-DBIx-Connector/issues
   homepage: https://github.com/bluefeet/Starch-Store-DBIx-Connector
   repository: git://github.com/bluefeet/Starch-Store-DBIx-Connector.git
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.04'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

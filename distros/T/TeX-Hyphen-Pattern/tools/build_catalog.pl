@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use 5.014000;
 
-BEGIN { our $VERSION = 'v1.1.1'; }
+BEGIN { our $VERSION = 'v1.1.2'; }
 
 use Carp qw(croak);
 use Cwd qw(abs_path);
@@ -127,7 +127,7 @@ sub patterns {
         $package = ucfirst $package;
         return if ( $package =~ /$CASE_CONFLICT/xmgs );
         my $filename = $package . $PM_EXT;
-        my $content = read_file( $File::Find::name, 'binmode' => ':utf8' );
+        my $content  = read_file( $File::Find::name, 'binmode' => ':utf8' );
 
         if ( my ($encoding) = $content =~ /$ENCODINGS/xmis ) {
             $encoding =~ s/($ISO)(\d)/$1$DASH$2/xmgis;

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 # -----------------------------------------------------------------------------
 
@@ -539,7 +539,7 @@ sub value {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '1.09';
+$Text::Hogan::Template::VERSION = '2.01';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ sub v {
     my ($self, $str) = @_;
     $str //= "";
 
-    my $re = join '', '[', ( sort keys %mapping ), ']';
+    my $re = join('', '[', ( sort keys %mapping ), ']');
 
     $str =~ s/($re)/$mapping{$1}/ge;
 
@@ -365,7 +365,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 1.09
+version 2.01
 
 =head1 SYNOPSIS
 
@@ -387,10 +387,19 @@ Optionally takes a hashref of partials.
 
     say $template->render({ name => "Dino" }, { hello => "Hello, {{name}}!" });
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Started out statement-for-statement copied from hogan.js by Twitter!
 
-Alex Balhatchet (alex@balhatchet.net)
+Initial translation by Alex Balhatchet (alex@balhatchet.net)
+
+Further improvements from:
+
+Ed Freyfogle
+Mohammad S Anwar
+Ricky Morse
+Tom Hukins
+Tony Finch
+Yanick Champoux
 
 =cut

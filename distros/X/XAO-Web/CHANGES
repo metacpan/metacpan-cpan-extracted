@@ -1,6 +1,25 @@
 https://github.com/amaltsev/XAO-Web
 -----------------------------------
 
+commit c26fcab6b96b8a2e84ab245918b36ad8ee9914b2
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sat Mar 2 09:35:44 2019 -0800
+
+    1.76 Fake HTTPS parameter for Plack::App::XAO
+
+commit 6d2bc977443776ad1d3171569d1eb5b5be04a8bf
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Wed Jan 9 18:20:27 2019 -0800
+
+    1.75 Fixed <%URL%> in PSGI environment
+    
+    Due to PSGI setting PATH_INFO and REQUEST_URI to the same value CGI.pm
+    returns an empty value for url(-absolute => 1). That seems wrong, but
+    that is what it is.
+    
+    Changed to use request_uri() instead, which works in both Apache and
+    PSGI.
+
 commit 5ee03eea8570a7e74911f2a836c44c503d719d9e
 Merge: 3eb6edc 87175f5
 Author: Andrew Maltsev <am@ejelta.com>
@@ -75,16 +94,4 @@ Date:   Fri Oct 19 17:34:23 2018 -0700
     
     No functional changes in XAO::Web, just a dependency on XAO::Base 1.22
     for library projects support.
-
-commit fe589b38d58fee94d8b50954d80a3572e62516bc
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Sep 14 17:13:20 2018 -0700
-
-    Updated Dockerfile for DBD::MariaDB and MariaDB 10.3
-
-commit e14e7878f43e18d77b3198f2595046801de1d93f
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Aug 25 07:44:01 2018 -0700
-
-    Force ExtUtils::MakeMaker 6.64
 

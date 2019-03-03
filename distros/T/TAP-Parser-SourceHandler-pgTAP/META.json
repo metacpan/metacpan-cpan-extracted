@@ -39,7 +39,7 @@
    "provides" : {
       "TAP::Parser::SourceHandler::pgTAP" : {
          "file" : "lib/TAP/Parser/SourceHandler/pgTAP.pm",
-         "version" : "3.34"
+         "version" : "3.35"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/theory/tap-parser-sourcehandler-pgtap"
       }
    },
-   "version" : "3.34",
+   "version" : "3.35",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -24,7 +24,7 @@ $dns->is_ns( {
         ( map { "ns$_.eu.bitnames.com" } 1 .. 2 ),
         ( map { "ns$_.us.bitnames.com" } 1 .. 3 ),
     ],
-    'microsoft.com' => [ map { "ns$_.msft.net"        } 1 .. 5   ],
+    'microsoft.com' => [ map { "ns$_.msft.net"        } 1 .. 4   ],
 } );
 
 done_testing();

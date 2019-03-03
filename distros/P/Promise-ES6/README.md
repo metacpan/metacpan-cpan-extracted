@@ -33,6 +33,7 @@ The interface is the same, except:
 
 - Promise resolutions and rejections accept exactly one argument,
 not a list. (This accords with the standard.)
+- Unhandled rejections are reported via `warn()`.
 - A `finally()` method is defined.
 
 # COMPATIBILITY

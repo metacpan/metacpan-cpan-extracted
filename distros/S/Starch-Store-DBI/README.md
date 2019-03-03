@@ -11,9 +11,8 @@ Starch::Store::DBI - Starch storage backend using DBI.
                 $dsn,
                 $username,
                 $password,
-                { RaiseError => 1 },
+                { RaiseError=>1, AutoCommit=>1 },
             ],
-            table => 'my_states',
         },
     );
 
@@ -123,9 +122,9 @@ Starch-Store-DBI GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch-Store-DBI/issues](https://github.com/bluefeet/Starch-Store-DBI/issues)
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

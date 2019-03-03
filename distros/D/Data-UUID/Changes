@@ -1,5 +1,16 @@
 Revision history for Perl extension Data::UUID.
 
+1.224     2019-03-02
+  - No changes since 1.223
+
+1.223     2019-02-14 (TRIAL)
+  - Use File::Spec to get tmpdir instead of hardcoding (thanks, Desmond
+  Daignault)
+
+1.222     2018-04-29 (TRIAL)
+  - Properly quote C strings passed in DEFINE (thanks, Salvador Fadiño)
+  - Fix memory leak by decreasing reference count (thanks, Daniel Spang)
+
 1.221     2015-08-10
   - documentation improvements
 

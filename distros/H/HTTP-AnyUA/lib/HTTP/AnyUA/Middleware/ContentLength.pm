@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware::ContentLength;
 use warnings;
 use strict;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 use parent 'HTTP::AnyUA::Middleware';
 
@@ -39,7 +39,7 @@ HTTP::AnyUA::Middleware::ContentLength - Middleware to add Content-Length header
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

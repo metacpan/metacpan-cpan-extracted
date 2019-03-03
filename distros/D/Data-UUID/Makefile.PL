@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 use Config;
 use Getopt::Long qw(GetOptions :config pass_through);
 use Pod::Usage qw(pod2usage);
+use File::Spec;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
@@ -39,6 +40,29 @@ use Pod::Usage qw(pod2usage);
     }
 };
 
+sub c_quote {
+    my $str = shift;
+    $str =~ s{([^\w/:_+\-\. ])}{sprintf "\\%03o", ord $1}ge;
+    qq("$str");
+}
+
+sub shell_quote {
+    my $str = shift;
+    return '""' if $str eq '';
+    if ($^O eq 'MSWin32') {
+        if ($str =~ /[ \t\n\x0b"]/) {
+            $str =~ s{(\\+)(?="|\z)}{$1$1}g;
+            $str =~ s{"}{\\"}g;
+            return qq("$str");
+        }
+        return $str;
+    }
+    else {
+        $str =~ s/'/'\\''/g;
+        return qq('$str');
+    }
+}
+
 WriteMakefile(
   ($] >= 5.005 ## Add these new keywords supported since 5.005
   ? (ABSTRACT_FROM => 'UUID.pm', # retrieve abstract from module
@@ -72,12 +96,7 @@ WriteMakefile(
 
     print "Configured options (run perl Makefile.PL --help for how to change this):\n";
 
-    my $d;
-    if ($^O eq 'MSWin32' and -d "c:/tmp/") {
-     $d="c:/tmp";
-    } else {
-     $d=eval { require File::Spec; File::Spec->tmpdir; } || '/var/tmp';
-    }
+    my $d = File::Spec->tmpdir;
     $d = $opt{s} || $d;
     print "\tUUID state storage: $d\n";
     $d =~ s/\\/\\\\/g if $^O eq 'MSWin32';
@@ -91,10 +110,10 @@ WriteMakefile(
     chmod(0666, sprintf("%s/%s", $d, ".UUID_NODEID"));
     chmod(0666, sprintf("%s/%s", $d, ".UUID_STATE"));
     return {
-      DEFINE => qq(-D_STDIR=\\"$d\\")
-              . qq( -D__$Config{osname}__)
-              . qq( -D_DEFAULT_UMASK=$m)
-    };
+      DEFINE => '-D_STDIR=' . shell_quote(c_quote($d))
+              . ' -D' . shell_quote("__$Config{osname}__")
+              . ' -D_DEFAULT_UMASK=' . shell_quote($m)
+           };
   }
 );
 

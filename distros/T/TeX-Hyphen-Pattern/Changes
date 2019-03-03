@@ -1,14 +1,16 @@
 Revision history for TeX-Hyphen-Pattern
 
+v1.1.2 Fri Mar  1 19:38:10 UTC 2019
+	- Fixes MANIFEST test failures on Windows (RT#128682)
 
 v1.1.1 Wed Feb 27 21:10:50 UTC 2019
-	- Fixed MANIFEST test failures (RT#128617)
+	- Fixes MANIFEST test failures (RT#128617)
 
 0.103 Sat Jul 21 12:43:58 UTC 2018
-    - Fixed fallback modules namespace
+    - Fixes fallback modules namespace
 
 0.102 Fri Jul 20 19:49:14 UTC 2018
-    - Fixed case sensitive issue with TeX/Tex namespace
+    - Fixes case sensitive issue with TeX/Tex namespace
 
 0.101 Sun Jul 15 14:02:58 UTC 2018
     - Introduced fallbacks for mapping old labels to new modules
@@ -43,10 +45,10 @@ v1.1.1 Wed Feb 27 21:10:50 UTC 2019
        Tuned author tests
 
 0.03  Thu Jul 30 00:05:52 2009
-       Fixed missing TeX::Hyphen skip_all test (RT#48303)
+       Fixes missing TeX::Hyphen skip_all test (RT#48303)
 
 0.02  Wed Jul 29 17:20:12 2009
-       Fixed No warnings test failures (RT#48297 and RT#48298)
+       Fixes No warnings test failures (RT#48297 and RT#48298)
 
 0.01  Wed Jul 29 03:40:18 2009
        Initial release.

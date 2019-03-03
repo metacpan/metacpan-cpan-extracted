@@ -6,7 +6,7 @@ use 5.010;
 use warnings;
 use strict;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 use HTTP::AnyUA::Util;
 use Module::Loader;
@@ -330,7 +330,7 @@ HTTP::AnyUA - An HTTP user agent programming interface unification layer
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

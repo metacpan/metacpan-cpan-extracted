@@ -1,8 +1,9 @@
-#!perl 
+#!/usr/bin/env perl
 
 use strict;
+use warnings;
+
 use Test::More;
-use Data::Dumper;
 use FindBin;
 
 BEGIN {
@@ -79,6 +80,10 @@ done_testing();
 sub flatten {
     my $data = shift;
 
-    my $string = join ', ', map{ "$_ => $data->{$_}" }sort keys %{$data};
+    my $string = join ', ', map{
+        my $value = defined $data->{$_} ? $data->{$_} : '<undefined>';
+        "$_ => $value";
+    }sort keys %{$data};
+
     return $string;
 }

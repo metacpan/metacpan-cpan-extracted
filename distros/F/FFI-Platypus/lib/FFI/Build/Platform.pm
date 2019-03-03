@@ -10,7 +10,7 @@ use File::Temp ();
 use Capture::Tiny ();
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '0.84'; # VERSION
+our $VERSION = '0.86'; # VERSION
 
 
 sub new
@@ -393,7 +393,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 0.84
+version 0.86
 
 =head1 SYNOPSIS
 

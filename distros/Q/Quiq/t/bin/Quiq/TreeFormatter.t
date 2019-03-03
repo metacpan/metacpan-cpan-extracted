@@ -103,18 +103,18 @@ sub test_unitTest_debug: Test(1) {
     $self->is($t->asText(-format=>'debug'),Quiq::Unindent->string(q~
     0 0 A
     1 1   B
-    2 1     C
-    3 0       D
-    2 1     E
-    2 0     F
-    3 0       G
-    4 0         H
+    1 2     C
+    0 3       D
+    1 2     E
+    0 2     F
+    0 3       G
+    0 4         H
     1 1   I
     1 1   J
-    2 1     K
-    2 0     L
-    1 0   M
-    2 0     N
+    1 2     K
+    0 2     L
+    0 1   M
+    0 2     N
     ~));
 }
 

@@ -70,9 +70,9 @@ Starch-Store-Catalyst-Plugin-Session GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session/issues](https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session/issues)
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

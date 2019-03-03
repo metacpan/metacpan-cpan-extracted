@@ -1,7 +1,7 @@
 package Starch::Store::Amazon::DynamoDB;
 use 5.014000;
 use strictures 2;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -475,9 +475,9 @@ Starch-Store-Amazon-DynamoDB GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch-Store-Amazon-DynamoDB/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

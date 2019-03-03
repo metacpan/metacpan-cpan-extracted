@@ -42,26 +42,35 @@
       },
       "runtime" : {
          "requires" : {
+            "Catalyst::Component" : "0",
             "Catalyst::Plugin::Session" : "0.40",
+            "Catalyst::Plugin::Session::Store" : "0",
+            "Class::C3::Adopt::NEXT" : "0.10",
             "Log::Any" : "1.03",
             "Moo" : "2.000000",
-            "Starch" : "0.10",
-            "Type::Tiny" : "1.000005",
+            "Moose" : "1.23",
+            "Moose::Meta::Class" : "1.23",
+            "Starch::Store" : "0.11",
+            "Starch::Util" : "0.11",
+            "Types::Common::String" : "1.000005",
+            "Types::Standard" : "1.000005",
             "namespace::clean" : "0.24",
+            "perl" : "5.008001",
             "strictures" : "2.000000"
          }
       },
       "test" : {
          "requires" : {
             "Catalyst::Plugin::Session::Store::File" : "0.18",
-            "Test2::V0" : "0.000094"
+            "Test2::V0" : "0.000094",
+            "Test::Starch" : "0.11"
          }
       }
    },
    "provides" : {
       "Starch::Store::Catalyst::Plugin::Session" : {
          "file" : "lib/Starch/Store/Catalyst/Plugin/Session.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -75,10 +84,11 @@
          "web" : "https://github.com/bluefeet/Starch-Store-Calatlyst-Plugin-Session"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

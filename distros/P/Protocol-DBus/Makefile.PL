@@ -33,6 +33,7 @@ WriteMakefile1(
         'Call::Context' => 0,
         'IO::Framed' => 0.15,
         'IO::SigGuard' => 0.13,
+        'Promise::ES6' => 0,
     },
 
     TEST_REQUIRES => {

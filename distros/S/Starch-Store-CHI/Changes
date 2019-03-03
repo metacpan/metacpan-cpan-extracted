@@ -1,5 +1,12 @@
 Revision history for Perl extension Starch-Store-CHI.
 
+0.05 2019-03-02T17:59:26Z
+
+ - Declare deps as modules, not distros.
+ - Remove typo Carp::Interal, which isn't necessary anyways.
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.04 2019-02-18T05:55:48Z
 
  - Fix cpanfile for Test2::V0.

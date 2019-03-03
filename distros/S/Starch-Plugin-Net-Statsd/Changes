@@ -1,9 +1,14 @@
 Revision history for Perl extension Starch-Plugin-Net-Statsd.
 
+0.05 2019-03-02T20:51:18Z
+
+ - Declare deps as modules, not distros.
+ - Remove Carp::Internal calls which are no longer necessary.
+
 0.04 2019-02-19T14:17:32Z
 
  - Fix tests under FreeBSD and Windows.
- - Require perl 5.8 per Minilla.
+ - Require perl 5.8.1.
  - Simplify VERSION declarations.
 
 0.03 2019-02-18T06:02:53Z

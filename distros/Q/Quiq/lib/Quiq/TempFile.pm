@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use overload '""' => sub {${$_[0]}}, 'cmp' => sub{${$_[0]} cmp $_[1]};
 use File::Temp ();
@@ -102,7 +102,7 @@ sub new {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

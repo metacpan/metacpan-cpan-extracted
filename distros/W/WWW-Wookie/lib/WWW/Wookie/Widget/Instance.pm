@@ -1,5 +1,5 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::Wookie::Widget::Instance 0.102;
+package WWW::Wookie::Widget::Instance v1.1.1;
 use strict;
 use warnings;
 
@@ -84,7 +84,7 @@ WWW::Wookie::Widget::Instance - An instance of a widget for use on the client
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget::Instance version 0.102
+This document describes WWW::Wookie::Widget::Instance version v1.1.1
 
 =head1 SYNOPSIS
 

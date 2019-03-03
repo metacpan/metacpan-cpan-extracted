@@ -1,4 +1,13 @@
-liblinux-info-perl (1.4) trusty; urgency=low
+liblinux-info-perl (1.5) trusty; urgency=low
+  * Bug fixes for custom Linux kernels in openvz
+  simfs from openvz containers was added as a valid file system. Fixed
+    how meminfo information was being tested: instead of checking what
+    memory information the kernel should return, validating if the data
+    was correctly parsed, since we have no control of what is available
+    by the kernel. Refactored the tests to include more information.
+    Properly testing the interface of Linux::Info::MemStats. Added the
+    method get_more() to Linux::Info::MemStats to parse everything from
+    /proc/meminfo instead of what it considers as valid. 
   * Fixed disk usage test
   The default class was missing the XFS filesystem as a valid type.
     Refactored the test a bit to be more clear on the result when
@@ -90,5 +99,5 @@ liblinux-info-perl (1.4) trusty; urgency=low
   * Initial release 
   * Initial commit 
 
- -- Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>  Tue, 19 Feb 2019 17:46:59 +0000
+ -- Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>  Sat,  2 Mar 2019 14:03:15 +0000
 

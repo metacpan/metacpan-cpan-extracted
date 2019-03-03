@@ -1,6 +1,7 @@
 package Catalyst::Plugin::Starch::Cookie;
-
-$Catalyst::Plugin::Starch::Cookie::VERSION = '0.04';
+use 5.010001;
+use strictures 2;
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -30,7 +31,6 @@ L<Catalyst::Plugin::Starch>.
 use Class::Method::Modifiers qw( fresh );
 
 use Moose::Role;
-use strictures 2;
 use namespace::clean;
 
 =head1 COMPATIBILITY

@@ -152,6 +152,7 @@ t/ffi/complex_double.c
 t/ffi/complex_float.c
 t/ffi/double.c
 t/ffi/float.c
+t/ffi/gh117.c
 t/ffi/longdouble.c
 t/ffi/memcmp4.c
 t/ffi/meta.c
@@ -200,6 +201,7 @@ t/ffi_probe_runner.t
 t/ffi_probe_runner_builder.t
 t/ffi_probe_runner_result.t
 t/forks.t
+t/gh117.t
 t/lib/Test/Cleanup.pm
 t/lib/Test/Platypus.pm
 t/threads.t

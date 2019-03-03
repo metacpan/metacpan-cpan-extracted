@@ -3,7 +3,7 @@ package Promise::ES6;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf-8
 
@@ -45,6 +45,8 @@ The interface is the same, except:
 =item * Promise resolutions and rejections accept exactly one argument,
 not a list. (This accords with the standard.)
 
+=item * Unhandled rejections are reported via C<warn()>.
+
 =item * A C<finally()> method is defined.
 
 =back
@@ -84,6 +86,7 @@ sub then {
     my $new = {
         _on_resolve => $on_resolve,
         _on_reject => $on_reject,
+        _warned_unhandled_reject => $self->{'_warned_unhandled_reject'},
     };
 
     bless $new, (ref $self);
@@ -115,6 +118,12 @@ sub _finish {
 
     if ($self->{"_on_$how"}) {
         if ( eval { $value = $self->{"_on_$how"}->($value); 1 } ) {
+
+            # This is here so that a rejection that’s caught
+            # after-the-fact will “reset”. That way further promises
+            # in the chain will warn() on rejection.
+            delete $self->{'_warned_unhandled_reject'};
+
             $how = 'resolve';
         }
         else {
@@ -142,6 +151,13 @@ sub _finish {
             $self->{'_finished_how'} = $repromise_how;
 
             $_->_finish($repromise_how, $repromise_value) for @{ $self->{'_dependents'} };
+
+            if ($repromise_how eq 'reject' && !@{ $self->{'_dependents'} }) {
+                $self->{'_warned_unhandled_reject'} ||= do {
+                    my $ref = ref $self;
+                    warn "$ref: Unhandled rejection: $repromise_value";
+                };
+            }
         }
     };
 

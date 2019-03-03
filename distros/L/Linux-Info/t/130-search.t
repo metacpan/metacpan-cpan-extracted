@@ -29,9 +29,8 @@ foreach my $key (qw/cpustats procstats memstats/) {
     ok( exists $foo->{$key} && ref( $foo->{$key} ) eq 'HASH', "checking $key" );
 }
 SKIP: {
-    if ( !%{ $stat->diskusage } ) {
-        skip "df returned nothing.  Might be in a chroot.", 1;
-    }
+    skip "df returned nothing.  Might be in a chroot.", 2
+      unless ( %{ $stat->diskusage } );
     ok( exists $foo->{diskusage}, 'disk usage info is available' );
     is( ref( $foo->{diskusage} ), 'HASH' );
 }

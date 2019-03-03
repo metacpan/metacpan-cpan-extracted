@@ -6,7 +6,7 @@ use utf8;
 
 use Test::More;
 
-our $VERSION = v1.1.1;
+our $VERSION = v1.1.2;
 
 ## no critic qw(ProhibitCascadingIfElse)
 if ( not $ENV{'TEST_SIGNATURE'} ) {

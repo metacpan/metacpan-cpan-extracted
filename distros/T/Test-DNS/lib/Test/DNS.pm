@@ -1,31 +1,41 @@
-use strict;
-use warnings;
 package Test::DNS;
-BEGIN {
-  $Test::DNS::VERSION = '0.13';
-}
 # ABSTRACT: Test DNS queries and zone configuration
-
+$Test::DNS::VERSION = '0.200';
 use Moose;
 use Net::DNS;
 use Test::Deep 'cmp_bag';
 use Set::Object 'set';
-use base 'Test::Builder::Module';
+use parent 'Test::Builder::Module';
+
+use constant {
+    'MIN_HASH_ARGS' => 3,
+    'MAX_HASH_ARGS' => 4,
+};
 
 has 'nameservers' => (
-    is      => 'rw',
-    isa     => 'ArrayRef',
-    default => sub { [] },
-    trigger => sub {
-        my ( $self, $nameservers ) = @_;
-        $self->object->nameservers( @{$nameservers} );
-    },
+    'is'        => 'ro',
+    'isa'       => 'ArrayRef',
+    'predicate' => 'has_nameservers',
 );
 
-has 'object' => ( is => 'ro', isa => 'Net::DNS::Resolver', lazy_build => 1 );
+has 'object' => (
+    'is'      => 'ro',
+    'isa'     => 'Net::DNS::Resolver',
+    'lazy'    => 1,
+    'builder' => '_build_object',
+);
 
-has 'follow_cname' => ( is => 'rw', isa => 'Bool', default => 0 );
-has 'warnings'     => ( is => 'rw', isa => 'Bool', default => 1 );
+has 'follow_cname' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => sub {0},
+);
+
+has 'warnings' => (
+    'is'      => 'ro',
+    'isa'     => 'Bool',
+    'default' => sub {1},
+);
 
 my $CLASS = __PACKAGE__;
 
@@ -38,82 +48,85 @@ sub _build_object {
     my $self = shift;
 
     return Net::DNS::Resolver->new(
-        nameservers => $self->nameservers,
+        # Only pass nameservers if we have nameservers
+        ( 'nameservers' => $self->nameservers )x!! $self->has_nameservers,
     );
+}
+
+sub _is_hash_format {
+    my ( $self, $type, $hashref, $test_name, $extra ) = @_;
+
+    # special hash construct
+    # $self, $type, $hashref
+    # OR
+    # $self, $type, $hashref, $test_name
+    return
+           @_ >= MIN_HASH_ARGS()
+        && @_ <= MAX_HASH_ARGS()
+        &&  ref $hashref eq 'HASH'
+        && !ref $test_name
+        &&  ref \$test_name eq 'SCALAR';
+}
+
+sub _handle_record { ## no critic (Subroutines::RequireArgUnpacking);
+    my $self = shift;
+
+    $self->_is_hash_format(@_)
+        and return $self->_handle_hash_format(@_);
+
+    return $self->is_record(@_);
 }
 
 sub _handle_hash_format {
     my ( $self, $type, $hashref, $test_name, $extra ) = @_;
-    my $EMPTY = q{};
-    $test_name ||= $EMPTY;
 
-    # special hash construct
-    if ( @_ >= 3 || @_ <= 4 ) {
-        # $self, $type, $hashref             OR
-        # $self, $type, $hashref, $test_name
-        if ( ref $hashref eq 'HASH' &&
-           ! ref $test_name         &&
-             ref \$test_name eq 'SCALAR' ) {
-            # $hashref is hashref
-            # $test_name isn't a ref
-            # \$test_name is a SCALAR ref
-            while ( my ( $domain, $ips ) = each %{$hashref} ) {
-                $self->is_record( $type, $domain, $ips, $test_name );
-            }
-
-            return 1;
-        }
+    # $hashref is hashref
+    # $test_name isn't a ref
+    # \$test_name is a SCALAR ref
+    my $all_passed = 1;
+    foreach my $domain ( keys %{$hashref} ) {
+        my $ips = $hashref->{$domain};
+        $self->is_record( $type, $domain, $ips, $test_name )
+            or $all_passed = 0;
     }
 
-    return;
+    return $all_passed;
 }
 
 # A -> IP
 sub is_a {
-    my ( $self, $domain, $ips, $test_name ) = @_;
-    $self->_handle_hash_format( 'A', $domain, $ips, $test_name ) ||
-        $self->is_record( 'A', $domain, $ips, $test_name );
-    return;
+    my $self = shift;
+    return $self->_handle_record( 'A', @_ );
 }
 
 # PTR -> A
 sub is_ptr {
-    my ( $self, $ip, $domains, $test_name ) = @_;
-    $self->_handle_hash_format( 'PTR', $ip, $domains, $test_name ) ||
-        $self->is_record( 'PTR', $ip, $domains );
-    return;
+    my $self = shift;
+    return $self->_handle_record( 'PTR', @_ );
 }
 
 # Domain -> NS
 sub is_ns {
-    my ( $self, $domain, $ns, $test_name ) = @_;
-    $self->_handle_hash_format( 'NS', $domain, $ns, $test_name ) ||
-        $self->is_record( 'NS', $domain, $ns );
-    return;
+    my $self = shift;
+    return $self->_handle_record( 'NS', @_ );
 }
 
 # Domain -> MX
 sub is_mx {
-    my ( $self, $domain, $mx, $test_name ) = @_;
-    $self->_handle_hash_format( 'MX', $domain, $mx, $test_name ) ||
-        $self->is_record( 'MX', $domain, $mx );
-    return;
+    my $self = shift;
+    return $self->_handle_record( 'MX', @_ );
 }
 
 # Domain -> CNAME
 sub is_cname {
-    my ( $self, $domain, $cname, $test_name ) = @_;
-    $self->_handle_hash_format( 'CNAME', $domain, $cname, $test_name ) ||
-        $self->is_record( 'CNAME', $domain, $cname );
-    return;
+    my $self = shift;
+    return $self->_handle_record( 'CNAME', @_ );
 }
 
 # Domain -> TXT
 sub is_txt {
-    my ( $self, $domain, $txt, $test_name ) = @_;
-    $self->_handle_hash_format( 'TXT', $domain, $txt, $test_name ) ||
-        $self->is_record( 'TXT', $domain, $txt );
-    return;
+    my $self = shift;
+    return $self->_handle_record( 'TXT', @_ );
 }
 
 sub _get_method {
@@ -127,8 +140,7 @@ sub _get_method {
         'TXT'   => 'txtdata',
     );
 
-    my $method = $method_by_type{$type};
-    return $method ? $method : 0;
+    return $method_by_type{$type} || 0;
 }
 
 sub _recurse_a_records {
@@ -157,15 +169,16 @@ sub _recurse_a_records {
 sub is_record {
     my ( $self, $type, $input, $expected, $test_name ) = @_;
 
-    my $res        = $self->object;
-    my $tb         = $CLASS->builder;
-    my $method     = $self->_get_method($type);
-    my $query_res  = $res->query( $input, $type );
-    my $COMMASPACE = q{, };
-    my $results    = set();
+    my $res       = $self->object;
+    my $tb        = $CLASS->builder;
+    my $method    = $self->_get_method($type);
+    my $query_res = $res->query( $input, $type );
+    my $results   = set();
 
-    ( ref $expected eq 'ARRAY' ) || ( $expected = [ $expected ] );
-    $test_name ||= "[$type] $input -> " . join $COMMASPACE, @{$expected};
+    ref $expected eq 'ARRAY'
+        or $expected = [$expected];
+
+    $test_name ||= "[$type] $input -> " . join ', ', @{$expected};
 
     if (!$query_res) {
         $self->_warn( $type, "'$input' has no query result" );
@@ -187,15 +200,14 @@ sub is_record {
         }
     }
 
-    cmp_bag( [ $results->members ], $expected, $test_name );
-
-    return;
+    return cmp_bag( [ $results->members ], $expected, $test_name );
 }
 
 sub _warn {
     my ( $self, $type, $msg ) = @_;
 
-    $self->warnings || return;
+    $self->warnings
+        or return;
 
     chomp $msg;
     my $tb = $CLASS->builder;
@@ -204,11 +216,16 @@ sub _warn {
     return;
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 1;
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -216,7 +233,7 @@ Test::DNS - Test DNS queries and zone configuration
 
 =head1 VERSION
 
-version 0.13
+version 0.200
 
 =head1 SYNOPSIS
 
@@ -230,7 +247,7 @@ configuration in the world or on a specific DNS server, for example.
 
     $dns->is_ptr( '1.2.3.4' => 'single.ptr.record.com' );
     $dns->is_ptr( '1.2.3.4' => [ 'one.ptr.record.com', 'two.ptr.record.com' ] );
-    $dns->is_ns( 'google.com' => [ map { "ns$_.google.com" } 1 .. 4 ] );
+    $dns->is_ns( 'google.com' => [ map "ns$_.google.com", 1 .. 4 ] );
     $dns->is_a( 'ns1.google.com' => '216.239.32.10' );
 
     ...
@@ -239,7 +256,7 @@ configuration in the world or on a specific DNS server, for example.
 
 Test::DNS allows you to run tests which translate as DNS queries. It's simple to
 use and abstracts all the difficult query checks from you. It has a built-in
-tests naming scheme so you don't really have to name your tests (as shown in all
+tests naming scheme so you don't have to name your tests (as shown in all
 the examples) even though it supports the option.
 
     use Test::DNS;
@@ -260,7 +277,7 @@ For example:
     my $dns = Test::DNS->new();
     $dns->is_ns( 'my.domain' => [ 'ns1.my.domain', 'ns2.my.domain' ] );
     # or
-    $dns->is_ns( 'my.domain' => [ map { "ns$_.my.domain" } 1 .. 5 ] );
+    $dns->is_ns( 'my.domain' => [ map "ns$_.my.domain", 1 .. 5 ] );
 
 You can set the I<follow_cname> option if your PTR returns a CNAME instead of an
 A record and you want to test the A record instead of the CNAME. This happened
@@ -273,7 +290,7 @@ chaining if one has such an odd case.
 New in version 0.04 is the option to give a hashref as the testing values (not
 including a test name as well), which makes things much easier to test if you
 want to run multiple tests and don't want to write multiple lines. This helps
-connect Test::DNS with freshly-parsed data (YAML/JSON/XML/etc.).
+connect L<Test::DNS> with freshly-parsed data (YAML/JSON/XML/etc.).
 
     use Test::DNS;
     use YAML 'LoadFile';
@@ -299,7 +316,9 @@ This module is completely Object Oriented, nothing is exported.
 
 Same as in L<Net::DNS>. Sets the nameservers, accepts an arrayref.
 
-    $dns->nameservers( [ 'IP1', 'DOMAIN' ] );
+    my $dns = Test::DNS->new(
+        'nameservers' => [ 'IP1', 'DOMAIN' ],
+    );
 
 =head2 warnings($boolean)
 
@@ -309,7 +328,9 @@ record doesn't a query result or incorrect types?
 This helps avoid common misconfigurations. You should probably keep it, but if
 it bugs you, you can stop it using:
 
-    $dns->warnings(0);
+    my $dns = Test::DNS->new(
+        'warnings' => 0,
+    );
 
 Default: 1 (on).
 
@@ -323,7 +344,9 @@ know that.
 If you want want Test::DNS to follow every CNAME recursively till it reaches the
 actual A record and compare B<that> A record, use this option.
 
-    $dns->follow_cname(1);
+    my $dns = Test::DNS->new(
+        'follow_cname' => 1,
+    );
 
 Default: 0 (off).
 
@@ -333,87 +356,101 @@ Default: 0 (off).
 
 Check the A record resolving of domain or subdomain.
 
-$ip can be an arrayref.
+C<$ip> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_a( 'domain' => 'IP' );
 
     $dns->is_a( 'domain', [ 'IP1', 'IP2' ] );
 
+Returns false if the assertion fails.
+
 =head2 is_ns( $domain, $ips, [$test_name] )
 
 Check the NS record resolving of a domain or subdomain.
 
-$ip can be an arrayref.
+C<$ip> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_ns( 'domain' => 'IP' );
 
     $dns->is_ns( 'domain', [ 'IP1', 'IP2' ] );
 
+Returns false if the assertion fails.
+
 =head2 is_ptr( $ip, $domains, [$test_name] )
 
 Check the PTR records of an IP.
 
-$domains can be an arrayref.
+C<$domains> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_ptr( 'IP' => 'ptr.records.domain' );
 
     $dns->is_ptr( 'IP', [ 'first.ptr.domain', 'second.ptr.domain' ] );
 
+Returns false if the assertion fails.
+
 =head2 is_mx( $domain, $domains, [$test_name] )
 
 Check the MX records of a domain.
 
-$domains can be an arrayref.
+C<$domains> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_mx( 'domain' => 'mailer.domain' );
 
     $dns->is_ptr( 'domain', [ 'mailer1.domain', 'mailer2.domain' ] );
 
+Returns false if the assertion fails.
+
 =head2 is_cname( $domain, $domains, [$test_name] )
 
 Check the CNAME records of a domain.
 
-$domains can be an arrayref.
+C<$domains> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_cname( 'domain' => 'sub.domain' );
 
     $dns->is_cname( 'domain', [ 'sub1.domain', 'sub2.domain' ] );
 
+Returns false if the assertion fails.
+
 =head2 is_txt( $domain, $txt, [$test_name] )
 
 Check the TXT records of a domain.
 
-$txt can be an arrayref.
+C<$txt> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_txt( 'domain' => 'v=spf1 -all' );
 
     $dns->is_txt( 'domain', [ 'sub1.domain', 'sub2.domain' ] );
 
+Returns false if the assertion fails.
+
 =head2 is_record( $type, $input, $expected, [$test_name] )
 
 The general function all the other is_* functions run.
 
-$type is the record type (CNAME, A, NS, PTR, MX, etc.).
+C<$type> is the record type (CNAME, A, NS, PTR, MX, etc.).
 
-$input is the domain or IP you're testing.
+C<$input> is the domain or IP you're testing.
 
-$expected can be an arrayref.
+C<$expected> can be an arrayref.
 
-$test_name is not mandatory.
+C<$test_name> is not mandatory.
 
     $dns->is_record( 'CNAME', 'domain', 'sub.domain', 'test_name' );
+
+Returns false if the assertion fails.
 
 =head2 BUILD
 
@@ -493,7 +530,7 @@ L<http://search.cpan.org/dist/Test-DNS/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 Sawyer X.
+Copyright 2019 Sawyer X.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -503,17 +540,14 @@ See http://dev.perl.org/licenses/ for more information.
 
 =head1 AUTHOR
 
-  Sawyer X <xsawyerx@cpan.org>
+Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Sawyer X.
+This software is Copyright (c) 2019 by Sawyer X.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
-
-
-__END__
-

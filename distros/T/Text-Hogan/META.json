@@ -56,7 +56,7 @@
          "web" : "http://github.com/kaoru/Text-Hogan"
       }
    },
-   "version" : "1.09",
+   "version" : "2.01",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0214"
 }
 

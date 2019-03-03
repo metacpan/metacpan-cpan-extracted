@@ -1,4 +1,4 @@
-package TeX::Hyphen::Pattern v1.1.1;    # -*- cperl; cperl-indent-level: 4 -*-
+package TeX::Hyphen::Pattern v1.1.2;    # -*- cperl; cperl-indent-level: 4 -*-
 use Moose;
 use 5.014000;
 use utf8;
@@ -71,7 +71,7 @@ Log::Log4perl->easy_init($ERROR);
 my $log = get_logger();
 
 has 'label' => ( 'is' => 'rw', 'isa' => 'Str', 'default' => $DEFAULT_LABEL );
-has '_cache' => ( 'is' => 'rw', 'isa' => 'HashRef', 'default' => sub { {} } );
+has '_cache' => ( 'is' => 'rw', 'isa' => 'HashRef',  'default' => sub { {} } );
 has '_plugs' => ( 'is' => 'rw', 'isa' => 'ArrayRef', 'default' => sub { [] } );
 
 sub filename {
@@ -166,7 +166,7 @@ sub _replug {
     if ( !@available ) {
         $log->warn( sprintf $LOG{'NO_MATCH_PARTIAL'}, $module );
         if ( exists $FALLBACK{$label} ) {
-            $module = $PLUGGABLE . $FALLBACK{$label};
+            $module    = $PLUGGABLE . $FALLBACK{$label};
             @available = grep { /^$module/xmgis } $self->available();
         }
     }
@@ -203,7 +203,7 @@ patterns for use with TeX::Hyphen.
 
 =head1 VERSION
 
-This is version v1.1.1. To prevent plugging in of incompatible modules the
+This is version v1.1.2. To prevent plugging in of incompatible modules the
 version of the pluggable modules must be the same as this module.
 
 =head1 SYNOPSIS
@@ -303,7 +303,7 @@ L<TeX::Hyphen|TeX::Hyphen>.  Versions up to and including 0.140 don't support
 C<utf8>, so patterns using C<utf8> that are included in this package have a
 version number 0.00 to ignore them. Should you patch
 L<TeX::Hyphen|TeX::Hyphen> yourself by inserting a C<binmode FILE, ":utf8";>
-you can change those version numbers to v1.1.1 to include them.
+you can change those version numbers to v1.1.2 to include them.
 
 =back
 

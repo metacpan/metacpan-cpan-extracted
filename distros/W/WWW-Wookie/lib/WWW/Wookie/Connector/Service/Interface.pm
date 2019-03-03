@@ -6,7 +6,7 @@ use warnings;
 use utf8;
 use 5.020000;
 
-our $VERSION = '0.102';
+our $VERSION = 'v1.1.1';
 
 use Moose::Role qw/requires/;
 requires 'getAvailableServices';
@@ -42,7 +42,7 @@ L<WWW::Wookie::Connector::Service|WWW::Wookie::Connector::Service>
 =head1 VERSION
 
 This document describes WWW::Wookie::Connector::Service::Interface version
-0.102
+v1.1.1
 
 =head1 SYNOPSIS
 

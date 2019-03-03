@@ -42,24 +42,27 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "2.000000",
-            "Sereal" : "3.003",
-            "Starch" : "0.10",
-            "Type::Tiny" : "1.000005",
+            "Moo::Role" : "2.000000",
+            "Sereal::Decoder" : "3.003",
+            "Sereal::Encoder" : "3.003",
+            "Starch::Plugin::ForManager" : "0.10",
+            "Types::Standard" : "1.000005",
             "namespace::clean" : "0.24",
+            "perl" : "5.008001",
             "strictures" : "2.000000"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0.000094"
+            "Test2::V0" : "0.000094",
+            "Test::Starch" : "0.11"
          }
       }
    },
    "provides" : {
       "Starch::Plugin::Sereal" : {
          "file" : "lib/Starch/Plugin/Sereal.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -73,7 +76,8 @@
          "web" : "https://github.com/bluefeet/Starch-Plugin-Sereal"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "version" : "0.04",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

@@ -1,6 +1,7 @@
 package Starch::Store::CHI;
-
-$Starch::Store::CHI::VERSION = '0.04';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -79,7 +80,6 @@ use Types::Common::String -types;
 use Scalar::Util qw( blessed );
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 with qw(
@@ -149,8 +149,6 @@ Set L<Starch::Store/remove>.
 sub set {
     my ($self, $id, $namespace, $data, $expires) = @_;
 
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
-
     $self->chi->set(
         $self->stringify_key( $id, $namespace ),
         $data,
@@ -163,8 +161,6 @@ sub set {
 sub get {
     my ($self, $id, $namespace) = @_;
 
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
-
     return $self->chi->get(
         $self->stringify_key( $id, $namespace ),
     );
@@ -172,8 +168,6 @@ sub get {
 
 sub remove {
     my ($self, $id, $namespace) = @_;
-
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
 
     $self->chi->remove(
         $self->stringify_key( $id, $namespace ),
@@ -192,9 +186,9 @@ Starch-Store-CHI GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch-Store-CHI/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend;
 use warnings;
 use strict;
 
-our $VERSION = '0.901'; # VERSION
+our $VERSION = '0.902'; # VERSION
 
 
 
@@ -40,7 +40,7 @@ HTTP::AnyUA::Backend - A base class for HTTP::AnyUA backends
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 

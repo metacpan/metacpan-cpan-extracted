@@ -4,21 +4,25 @@ debian/changelog
 debian/compat
 debian/control
 debian/copyright
-debian/patches/pod-examples-dir.diff
 debian/rules
 debian/source/format
 debian/watch
 devel/cldr.pl
+devel/misc/Clock-maxsize.pm
+devel/misc/Clock-pango.pm
+devel/misc/t-clock.pl
 devel/run-one.pl
 devel/run.pl
 devel/screenshot.pl
 devel/strftime.pl
 devel/tai.pl
 devel/time-mock.pl
+devel/tk-strfclock.pl
 devel/unmapped.pl
 examples/7seg.pl
 examples/builder.pl
 examples/datetime.pl
+examples/gtk2-ex-clock.desktop
 examples/gtk2-ex-clock.pl
 examples/simple.pl
 examples/standalone.pl
@@ -27,7 +31,6 @@ examples/twoline.pl
 examples/world-aatw.pl
 examples/world.pl
 inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Gtk2/Ex/Clock.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -40,10 +43,19 @@ t/Clock-load.t
 t/Clock-weaken.t
 t/Clock.t
 t/MyTestHelpers.pm
+xt/0-desktop-file-validate.t
+xt/0-examples-xrefs.t
 xt/0-exe-shebang.t
+xt/0-file-is-part-of.t
 xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
 xt/0-Test-DistManifest.t
 xt/0-Test-Pod.t
 xt/0-Test-Synopsis.t
 xt/0-Test-YAML-Meta.t
-META.yml                                 Module meta-data (added by MakeMaker)
+xtools/my-check-spelling.sh
+xtools/my-deb.sh
+xtools/my_pod2html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

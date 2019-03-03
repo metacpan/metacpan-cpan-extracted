@@ -35,7 +35,7 @@ my $client_cr = sub {
 
     $client->initialize();
 
-    ok( $client->get_connection_name(), 'Connection name is set after initialize()' );
+    ok( $client->get_unique_bus_name(), 'Unique bus name is set after initialize()' );
 
     my $msg = $client->get_message();
 

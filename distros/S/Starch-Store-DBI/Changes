@@ -1,5 +1,12 @@
 Revision history for Perl extension Starch-Store-DBI.
 
+0.04 2019-03-02T18:01:48Z
+
+ - Declare deps as modules, not distros.
+ - Remove typo Carp::Interal, which isn't necessary anyways.
+ - Require perl 5.8.1.
+ - Simplify VERSION declarations.
+
 0.03 2019-02-18T05:42:28Z
 
  - Migrate tests from Test::Simple to Test2::V0.

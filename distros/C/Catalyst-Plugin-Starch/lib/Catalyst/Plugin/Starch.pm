@@ -1,6 +1,7 @@
 package Catalyst::Plugin::Starch;
-
-$Catalyst::Plugin::Starch::VERSION = '0.04';
+use 5.010001;
+use strictures 2;
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -64,7 +65,6 @@ use Class::Method::Modifiers qw( fresh );
 
 use Moose::Role;
 use MooseX::ClassAttribute;
-use strictures 2;
 use namespace::clean;
 
 =head1 COMPATIBILITY
@@ -463,9 +463,9 @@ Catalyst-Plugin-Starch GitHub issue tracker:
 
 L<https://github.com/bluefeet/Catalyst-Plugin-Starch/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

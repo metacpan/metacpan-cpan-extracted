@@ -1,7 +1,7 @@
 ---
 abstract: 'Templatize your data.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Test2::V0: '0.000071'
 configure_requires:
@@ -26,17 +26,19 @@ no_index:
 provides:
   Data::Xslate:
     file: lib/Data/Xslate.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Carp: '0'
   Storable: '0'
-  Text::Xslate: '3'
+  Text::Xslate: v3.0.0
   Tie::Hash: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/Data-Xslate/issues
   homepage: https://github.com/bluefeet/Data-Xslate
   repository: git://github.com/bluefeet/Data-Xslate.git
-version: '0.05'
+version: '0.06'
+x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

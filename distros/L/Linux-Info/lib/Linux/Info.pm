@@ -6,7 +6,7 @@ use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
 
-our $VERSION = '1.4'; # VERSION
+our $VERSION = '1.5'; # VERSION
 
 =head1 NAME
 
@@ -38,22 +38,25 @@ Linux::Info - API in Perl to recover information about the running Linux OS
 
 Linux::Info is a fork from L<Sys::Statistics::Linux> distribution.
 
-L<Sys::Statistics::Linux> is a front-end module and gather different linux system information
-like processor workload, memory usage, network and disk statistics and a lot more. Refer the
-documentation of the distribution modules to get more information about all possible statistics.
+L<Sys::Statistics::Linux> is a front-end module and gather different linux
+system information like processor workload, memory usage, network and disk
+statistics and a lot more. Refer the documentation of the distribution modules
+to get more information about all possible statistics.
 
 =head1 MOTIVATION
 
-L<Sys::Statistics::Linux> is a great distribution (and I used it a lot), but it was built to recover
-only Linux statistics when I was also looking for other additional information about the OS.
+L<Sys::Statistics::Linux> is a great distribution (and I used it a lot), but it
+was built to recover only Linux statistics when I was also looking for other
+additional information about the OS.
 
-Linux::Info will provide additional information not available in L<Sys::Statistics::Linux>, as
-general processor information and hopefully apply patches and suggestions not implemented in the
-original project.
+Linux::Info will provide additional information not available in
+L<Sys::Statistics::Linux>, as general processor information and hopefully apply
+patches and suggestions not implemented in the original project.
 
-L<Sys::Statistics::Linux> is also more forgiving regarding compatibility with older perls interpreters,
-modules version that it depends on and even older OS. If you find that C<Linux::Info> is not available to your
-old system, you should try it.
+L<Sys::Statistics::Linux> is also more forgiving regarding compatibility with
+older perls interpreters, modules version that it depends on and even older OS.
+If you find that C<Linux::Info> is not available to your old system, you should
+try it.
 
 =head2 What is different from Sys::Statistics::Linux?
 
@@ -257,6 +260,34 @@ It's possible to call C<new()> with a hash reference of options.
     );
 
     my $lxs = Linux::Info->new(\%options);
+=cut
+
+sub new {
+    my $class = shift;
+    my $self  = bless { obj => {} }, $class;
+
+    my @options = qw(
+      CpuStats  ProcStats
+      MemStats  PgSwStats NetStats
+      SockStats DiskStats DiskUsage
+      LoadAVG   FileStats Processes
+    );
+
+    foreach my $opt (@options) {
+
+        # backward compatibility
+        $self->{opts}->{$opt} = 0;
+        $self->{maps}->{$opt} = $opt;
+
+        # new style
+        my $lcopt = lc($opt);
+        $self->{opts}->{$lcopt} = 0;
+        $self->{maps}->{$lcopt} = $opt;
+    }
+
+    $self->set(@_) if @_;
+    return $self;
+}
 
 =head2 set()
 
@@ -279,11 +310,70 @@ It's possible to call C<set()> with a hash reference of options.
     );
 
     $lxs->set(\%options);
+=cut
+
+sub set {
+    my $self  = shift;
+    my $class = ref $self;
+    my $args  = ref( $_[0] ) eq 'HASH' ? shift : {@_};
+    my $opts  = $self->{opts};
+    my $obj   = $self->{obj};
+    my $maps  = $self->{maps};
+
+    confess 'Linux::Info::SysInfo cannot be instantiated from Linux::Info'
+      if ( exists( $args->{sysinfo} ) );
+
+    foreach my $opt ( keys( %{$args} ) ) {
+
+        confess "invalid delta option '$opt'"
+          unless ( exists( $opts->{$opt} ) );
+
+        if ( ref( $args->{$opt} ) ) {
+            $opts->{$opt} = delete $args->{$opt}->{init} || 1;
+        }
+        elsif ( $args->{$opt} !~ qr/^[012]\z/ ) {
+            confess "invalid value for '$opt'";
+        }
+        else {
+            $opts->{$opt} = $args->{$opt};
+        }
+
+        if ( $opts->{$opt} ) {
+            my $package = $class . '::' . $maps->{$opt};
+
+            # require module - require know which modules are loaded
+            # and doesn't load a module twice.
+            my $require = $package;
+            $require =~ s/::/\//g;
+            $require .= '.pm';
+            require $require;
+
+            if ( !$obj->{$opt} ) {
+                if ( ref( $args->{$opt} ) ) {
+                    $obj->{$opt} = $package->new( %{ $args->{$opt} } );
+                }
+                else {
+                    $obj->{$opt} = $package->new();
+                }
+            }
+
+            # get initial statistics if the function init() exists
+            # and the option is set to 1
+            if ( $opts->{$opt} == 1 && UNIVERSAL::can( $package, 'init' ) ) {
+                $obj->{$opt}->init();
+            }
+
+        }
+        elsif ( exists $obj->{$opt} ) {
+            delete $obj->{$opt};
+        }
+    }
+}
 
 =head2 get()
 
-Call C<get()> to get the collected statistics. C<get()> returns a L<Linux::Info::Compilation>
-object.
+Call C<get()> to get the collected statistics. C<get()> returns a
+L<Linux::Info::Compilation> object.
 
     my $lxs  = Linux::Info->new(\%options);
     sleep(1);
@@ -303,11 +393,32 @@ Now the statistcs are available with
 
 Take a look to the documentation of L<Linux::Info::Compilation> for more information.
 
+=cut
+
+sub get {
+    my ( $self, $time ) = @_;
+    sleep $time if $time;
+    my %stat = ();
+
+    foreach my $opt ( keys %{ $self->{opts} } ) {
+        if ( $self->{opts}->{$opt} ) {
+            $stat{$opt} = $self->{obj}->{$opt}->get();
+            if ( $opt eq 'netstats' ) {
+                $stat{netinfo} = $self->{obj}->{$opt}->get_raw();
+            }
+        }
+    }
+
+    return Linux::Info::Compilation->new( \%stat );
+}
+
+
 =head2 init()
 
-The call of C<init()> initiate all activated statistics that are necessary for deltas. That could
-be helpful if your script runs in a endless loop with a high sleep interval. Don't forget that if
-you call C<get()> that the statistics are deltas since the last time they were initiated.
+The call of C<init()> initiate all activated statistics that are necessary for
+deltas. That could be helpful if your script runs in a endless loop with a high
+sleep interval. Don't forget that if you call C<get()> that the statistics are
+deltas since the last time they were initiated.
 
 The following example would calculate average statistics for 30 minutes:
 
@@ -319,8 +430,8 @@ The following example would calculate average statistics for 30 minutes:
         my $stat = $lxs->get;
     }
 
-If you just want a current snapshot of the system each 30 minutes and not the average
-then the following example would be better for you:
+If you just want a current snapshot of the system each 30 minutes and not the
+average then the following example would be better for you:
 
     # do not initiate cpustats
     my $lxs = Linux::Info->new( cpustats => 2 );
@@ -331,8 +442,8 @@ then the following example would be better for you:
         sleep(1800);             # sleep until the next run
     }
 
-If you want to write a simple command line utility that prints the current workload
-to the screen then you can use something like this:
+If you want to write a simple command line utility that prints the current
+workload to the screen then you can use something like this:
 
     my @order = qw(user system iowait idle nice irq softirq total);
     printf "%-20s%8s%8s%8s%8s%8s%8s%8s%8s\n", 'time', @order;
@@ -346,20 +457,45 @@ to the screen then you can use something like this:
             $time, @{$cpu->{cpu}}{@order};
     }
 
+=cut
+
+sub init {
+    my $self  = shift;
+    my $class = ref $self;
+
+    foreach my $opt ( keys %{ $self->{opts} } ) {
+        if ( $self->{opts}->{$opt} > 0
+            && UNIVERSAL::can( ref( $self->{obj}->{$opt} ), 'init' ) )
+        {
+            $self->{obj}->{$opt}->init();
+        }
+    }
+}
+
 =head2 settime()
 
-Call C<settime()> to define a POSIX formatted time stamp, generated with localtime().
+Call C<settime()> to define a POSIX formatted time stamp, generated with
+localtime().
 
     $lxs->settime('%Y/%m/%d %H:%M:%S');
 
-To get more information about the formats take a look at C<strftime()> of POSIX.pm
-or the manpage C<strftime(3)>.
+To get more information about the formats take a look at C<strftime()> of
+POSIX.pm or the manpage C<strftime(3)>.
+
+=cut
+
+sub settime {
+    my $self   = shift;
+    my $format = @_ ? shift : '%Y-%m-%d %H:%M:%S';
+    $self->{timeformat} = $format;
+}
 
 =head2 gettime()
 
-C<gettime()> returns a POSIX formatted time stamp, @foo in list and $bar in scalar context.
-If the time format isn't set then the default format "%Y-%m-%d %H:%M:%S" will be set
-automatically. You can also set a time format with C<gettime()>.
+C<gettime()> returns a POSIX formatted time stamp, @foo in list and $bar in
+scalar context. If the time format isn't set then the default format
+"%Y-%m-%d %H:%M:%S" will be set automatically. You can also set a time format
+with C<gettime()>.
 
     my $date_time = $lxs->gettime;
 
@@ -370,6 +506,14 @@ Or
 Or
 
     my ($date, $time) = $lxs->gettime('%Y/%m/%d %H:%M:%S');
+=cut
+
+sub gettime {
+    my $self = shift;
+    $self->settime(@_) unless $self->{timeformat};
+    my $tm = strftime( $self->{timeformat}, localtime );
+    return wantarray ? split /\s+/, $tm : $tm;
+}
 
 =head1 EXAMPLES
 
@@ -468,133 +612,5 @@ You should have received a copy of the GNU General Public License
 along with Linux Info.  If not, see <http://www.gnu.org/licenses/>.
 
 =cut
-
-sub new {
-    my $class = shift;
-    my $self = bless { obj => {} }, $class;
-
-    my @options = qw(
-      CpuStats  ProcStats
-      MemStats  PgSwStats NetStats
-      SockStats DiskStats DiskUsage
-      LoadAVG   FileStats Processes
-    );
-
-    foreach my $opt (@options) {
-        # backward compatibility
-        $self->{opts}->{$opt} = 0;
-        $self->{maps}->{$opt} = $opt;
-
-        # new style
-        my $lcopt = lc($opt);
-        $self->{opts}->{$lcopt} = 0;
-        $self->{maps}->{$lcopt} = $opt;
-    }
-
-    $self->set(@_) if @_;
-    return $self;
-}
-
-sub set {
-    my $self  = shift;
-    my $class = ref $self;
-    my $args  = ref( $_[0] ) eq 'HASH' ? shift : {@_};
-    my $opts  = $self->{opts};
-    my $obj   = $self->{obj};
-    my $maps  = $self->{maps};
-
-
-    confess 'Linux::Info::SysInfo cannot be instantiated from Linux::Info'
-      if ( exists( $args->{sysinfo} ) );
-
-    foreach my $opt ( keys( %{$args} ) ) {
-
-        confess "invalid delta option '$opt'"
-          unless ( exists( $opts->{$opt} ) );
-
-        if ( ref( $args->{$opt} ) ) {
-            $opts->{$opt} = delete $args->{$opt}->{init} || 1;
-        }
-        elsif ( $args->{$opt} !~ qr/^[012]\z/ ) {
-            confess "invalid value for '$opt'";
-        }
-        else {
-            $opts->{$opt} = $args->{$opt};
-        }
-
-        if ( $opts->{$opt} ) {
-            my $package = $class . '::' . $maps->{$opt};
-
-            # require module - require know which modules are loaded
-            # and doesn't load a module twice.
-            my $require = $package;
-            $require =~ s/::/\//g;
-            $require .= '.pm';
-            require $require;
-
-            if ( !$obj->{$opt} ) {
-                if ( ref( $args->{$opt} ) ) {
-                    $obj->{$opt} = $package->new( %{ $args->{$opt} } );
-                }
-                else {
-                    $obj->{$opt} = $package->new();
-                }
-            }
-
-            # get initial statistics if the function init() exists
-            # and the option is set to 1
-            if ( $opts->{$opt} == 1 && UNIVERSAL::can( $package, 'init' ) ) {
-                $obj->{$opt}->init();
-            }
-
-        }
-        elsif ( exists $obj->{$opt} ) {
-            delete $obj->{$opt};
-        }
-    }
-}
-
-sub init {
-    my $self  = shift;
-    my $class = ref $self;
-
-    foreach my $opt ( keys %{ $self->{opts} } ) {
-        if ( $self->{opts}->{$opt} > 0
-            && UNIVERSAL::can( ref( $self->{obj}->{$opt} ), 'init' ) )
-        {
-            $self->{obj}->{$opt}->init();
-        }
-    }
-}
-
-sub get {
-    my ( $self, $time ) = @_;
-    sleep $time if $time;
-    my %stat = ();
-
-    foreach my $opt ( keys %{ $self->{opts} } ) {
-        if ( $self->{opts}->{$opt} ) {
-            $stat{$opt} = $self->{obj}->{$opt}->get();
-            if ( $opt eq 'netstats' ) {
-                $stat{netinfo} = $self->{obj}->{$opt}->get_raw();
-            }
-        }
-    }
-
-    return Linux::Info::Compilation->new( \%stat );
-}
-
-sub settime {
-    my $self = shift;
-    my $format = @_ ? shift : '%Y-%m-%d %H:%M:%S';
-    $self->{timeformat} = $format;
-}
-
-sub gettime {
-    my $self = shift;
-    $self->settime(@_) unless $self->{timeformat};
-    my $tm = strftime( $self->{timeformat}, localtime );
-    return wantarray ? split /\s+/, $tm : $tm;
-}
 
 1;

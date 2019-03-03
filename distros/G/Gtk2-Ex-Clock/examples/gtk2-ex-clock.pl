@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2011 Kevin Ryde
 
 # This file is part of Gtk2-Ex-Clock.
 #
@@ -24,7 +24,7 @@ use Getopt::Long;
 use Gtk2 '-init';
 use Gtk2::Ex::Clock;
 
-our $VERSION = 15;
+our $VERSION = 16;
 
 my ($foreground, $background, $geometry, $use_noshrink);
 my %clock_properties;
@@ -188,12 +188,15 @@ gtk2-ex-clock.pl -- simple digital clock program
 
 =head1 DESCRIPTION
 
-C<gtk2-ex-clock.pl> displays a digital clock using C<Gtk2::Ex::Clock>.  It's
-pretty simple, and there's a dozen other clock programs doing the same
-thing, but this one uses C<Gtk2::Ex::Clock>, and optionally
-C<DateTime::TimeZone>.
+This is a little program displaying a digital clock using
+C<Gtk2::Ex::Clock>, and optionally C<DateTime::TimeZone>.
 
-Button-1 drags the clock around (plus any usual key/button combination the
+This is only meant as a bit of fun with the clock widget, since running up
+the whole of Perl-Gtk2 uses much more memory than you'd like from a clock
+program.  Adding a clock widget to a Perl-Gtk2 application doesn't cost much
+extra, but running it standalone is a little wasteful.
+
+Button-1 drags the clock around (as might any key/button combination the
 window manager also offers for that).  Button-3 pops up a menu to quit.  On
 a two-button mouse button-3 is usually the right hand button.
 
@@ -274,7 +277,7 @@ L<http://user42.tuxfamily.org/gtk2-ex-clock/index.html>
 
 =head1 LICENSE
 
-Gtk2-Ex-Clock is Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+Gtk2-Ex-Clock is Copyright 2007, 2008, 2009, 2010, 2011 Kevin Ryde
 
 Gtk2-Ex-Clock is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

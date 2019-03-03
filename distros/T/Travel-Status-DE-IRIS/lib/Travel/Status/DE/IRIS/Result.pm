@@ -15,7 +15,7 @@ use List::Compare;
 use List::MoreUtils qw(none uniq firstval);
 use Scalar::Util qw(weaken);
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 my %translation = (
 	2  => 'Polizeiliche Ermittlung',
@@ -99,7 +99,9 @@ my %translation = (
 	98 => 'Sonstige Qualitätsmängel',
 	99 => 'Verzögerungen im Betriebsablauf',
 
-	#900 => 'Anschlussbus wartet(?)',
+	# Occasionally, there's a message with ID 900. In all cases observed so far,
+	# it was used for "Anschlussbus wartet". However, as we don't know which bus
+	# it refers to, we don't show it to users.
 );
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
@@ -472,7 +474,7 @@ sub canceled_stops {
 sub classes {
 	my ($self) = @_;
 
-	my @classes = split( //, $self->{classes} );
+	my @classes = split( //, $self->{classes} // q{} );
 
 	return @classes;
 }
@@ -809,7 +811,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 DESCRIPTION
 
@@ -1442,7 +1444,7 @@ Travel::Status::DE::IRIS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

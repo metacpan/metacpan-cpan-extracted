@@ -38,7 +38,7 @@ while (!$dbus->initialize()) {
     }
 }
 
-printf "done authn; connection name: %s\n", $dbus->get_connection_name();
+printf "done authn; unique bus name: %s\n", $dbus->get_unique_bus_name();
 
 #----------------------------------------------------------------------
 
@@ -51,12 +51,11 @@ $dbus->send_call(
     signature => 's',
     member => 'GetAll',
     body => ['org.freedesktop.DBus'],
-    on_return => sub {
-        $got_response = 1;
-        print "got getall response\n";
-        print Dumper shift;
-    },
-);
+)->then( sub {
+    $got_response = 1;
+    print "got getall response\n";
+    print Dumper shift;
+} );
 
 while (!$got_response) {
     my $win = $dbus->pending_send() || q<>;

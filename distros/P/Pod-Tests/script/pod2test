@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-pod2test - Convert embedded tests and code examples to .t files
+pod2test - (DEPRECATED) Convert embedded tests and code examples to .t files
 
 =head1 SYNOPSIS
 
@@ -32,10 +32,8 @@ specified with -M. B<UNIMPLEMENTED>
 
 use 5.005;
 use strict;
-use vars qw($VERSION);
-BEGIN {
-	$VERSION = '1.19';
-}
+
+our $VERSION = '1.20';
 
 use File::Spec ();
 use Pod::Tests ();

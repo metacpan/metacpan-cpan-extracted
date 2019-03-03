@@ -22,7 +22,7 @@ $dns->is_mx( {
             'aspmx.l.google.com',
             map { "alt$_.aspmx.l.google.com" } 1 .. 4,
         ],
-        'microsoft.com' => 'mail.messaging.microsoft.com',
+        'microsoft.com' => 'microsoft-com.mail.protection.outlook.com',
 } );
 
 done_testing();

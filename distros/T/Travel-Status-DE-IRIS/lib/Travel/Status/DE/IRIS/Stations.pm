@@ -17,7 +17,7 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 my @stations = (
 
@@ -1592,7 +1592,6 @@ my @stations = (
 	[ 'KDW',  'Düsseldorf Wehrhahn',         8001582, 6.79817300, 51.2284470 ],
 	[ 'KDBE', 'Düsseldorf-Benrath',          8001584, 6.87893100, 51.1622930 ],
 	[ 'KDBH', 'Düsseldorf-Bilk',             8001585, 6.77557800, 51.2079940 ],
-	[ 'KDBI', 'Düsseldorf-Bilk',             8001585, 6.77557800, 51.2079940 ],
 	[ 'KDD',  'Düsseldorf-Derendorf',        8001586, 6.79451200, 51.2476240 ],
 	[ 'KDDH', 'Düsseldorf-Derendorf',        8001586, 6.79451200, 51.2476240 ],
 	[ 'KDE',  'Düsseldorf-Eller',            8001587, 6.85192700, 51.2026700 ],
@@ -9013,7 +9012,7 @@ Travel::Status::DE::IRIS(3pm).
 
 Station data: Copyright (C) 2016 by DB Station&Service AG, Europaplatz 1, 10557 Berlin, Germany
 
-Lookup code: Copyright (C) 2014-2018 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Lookup code: Copyright (C) 2014-2019 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

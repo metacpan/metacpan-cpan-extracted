@@ -32,6 +32,8 @@ t/18_datatypes.t
 t/19_die.t
 t/20_plugin_no_check.t
 t/21_plugin_does_not_exist.t
+t/22_config_as_string.t
+t/23_invalid_refs.t
 t/Data/Validate/WithYAML/Plugin/TestNoCheck.pm
 t/Data/Validate/WithYAML/Plugin/TestPlugin.pm
 t/author-pod-coverage.t

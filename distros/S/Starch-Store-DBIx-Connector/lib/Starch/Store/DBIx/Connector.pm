@@ -1,6 +1,7 @@
 package Starch::Store::DBIx::Connector;
-
-$Starch::Store::DBIx::Connector::VERSION = '0.03';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -17,7 +18,6 @@ Starch::Store::DBIx::Connector - Starch storage backend using DBIx::Connector.
                 $password,
                 { RaiseError=>1, AutoCommit=>1 },
             ],
-            table => 'my_states',
         },
     );
 
@@ -25,29 +25,38 @@ Starch::Store::DBIx::Connector - Starch storage backend using DBIx::Connector.
 
 This L<Starch> store uses L<DBIx::Connector> to set and get state data.
 
-Very little is documented in this module as it is just a subclass
-of L<Starch::Store::DBI> modified to use L<DBIx::Connector>
-instead of L<DBI>.
+The table in your database should contain three columns.  This
+is the SQLite syntax for creating a compatible table which you
+can modify to work for your particular database's syntax:
+
+    CREATE TABLE starch_states (
+        key TEXT NOT NULL PRIMARY KEY,
+        data TEXT NOT NULL,
+        expiration INTEGER NOT NULL
+    )
 
 =cut
 
 use DBIx::Connector;
 use Types::Standard -types;
+use Types::Common::String -types;
 use Scalar::Util qw( blessed );
+use Data::Serializer::Raw;
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
-extends 'Starch::Store::DBI';
+with qw(
+    Starch::Store
+);
 
 after BUILD => sub{
-  my ($self) = @_;
+    my ($self) = @_;
 
-  # Get this loaded as early as possible.
-  $self->connector();
+    # Get this loaded as early as possible.
+    $self->connector();
 
-  return;
+    return;
 };
 
 =head1 REQUIRED ARGUMENTS
@@ -64,18 +73,17 @@ constructor in with Starch so that starch doesn't build its own.
 
 =cut
 
-
-has '+_dbh_arg' => (
+has _connector_arg => (
+    is       => 'ro',
     isa      => (InstanceOf[ 'DBIx::Connector' ]) | ArrayRef,
     init_arg => 'connector',
-    reader   => '_connector_arg',
+    required => 1,
 );
 
-has '+dbh' => (
+has connector => (
+    is       => 'lazy',
     isa      => InstanceOf[ 'DBIx::Connector' ],
     init_arg => undef,
-    reader   => 'connector',
-    builder  => '_build_connector',
 );
 sub _build_connector {
     my ($self) = @_;
@@ -87,6 +95,46 @@ sub _build_connector {
 }
 
 =head1 OPTIONAL ARGUMENTS
+
+=head2 serializer
+
+A L<Data::Serializer::Raw> for serializing the state data for storage
+in the L</data_column>.  Can be specified as string containing the
+serializer name, a hash ref of Data::Serializer::Raw arguments, or as a
+pre-created Data::Serializer::Raw object.  Defaults to C<JSON>.
+
+Consider using the C<JSON> or C<Sereal> serializers for speed.
+
+C<Sereal> will likely be the fastest and produce the most compact data.
+
+=cut
+
+has _serializer_arg => (
+    is       => 'ro',
+    isa      => ((InstanceOf[ 'Data::Serializer::Raw' ]) | HashRef) | NonEmptySimpleStr,
+    init_arg => 'serializer',
+    default  => 'JSON',
+);
+
+has serializer => (
+    is       => 'lazy',
+    isa      => InstanceOf[ 'Data::Serializer::Raw' ],
+    init_arg => undef,
+);
+sub _build_serializer {
+    my ($self) = @_;
+
+    my $serializer = $self->_serializer_arg();
+    return $serializer if blessed $serializer;
+
+    if (ref $serializer) {
+        return Data::Serializer::Raw->new( %$serializer );
+    }
+
+    return Data::Serializer::Raw->new(
+        serializer => $serializer,
+    );
+}
 
 =head2 method
 
@@ -119,6 +167,171 @@ has mode => (
     isa => (Enum['ping', 'fixup', 'no_ping']) | Undef,
 );
 
+=head2 table
+
+The table name where states are stored in the database.
+Defaults to C<starch_states>.
+
+=cut
+
+has table => (
+    is      => 'ro',
+    isa     => NonEmptySimpleStr,
+    default => 'starch_states',
+);
+
+=head2 key_column
+
+The column in the L</table> where the state ID is stored.
+Defaults to C<key>.
+
+=cut
+
+has key_column => (
+    is      => 'ro',
+    isa     => NonEmptySimpleStr,
+    default => 'key',
+);
+
+=head2 data_column
+
+The column in the L</table> which will hold the state
+data.  Defaults to C<data>.
+
+=cut
+
+has data_column => (
+    is      => 'ro',
+    isa     => NonEmptySimpleStr,
+    default => 'data',
+);
+
+=head2 expiration_column
+
+The column in the L</table> which will hold the epoch time
+when the state should be expired.  Defaults to C<expiration>.
+
+=cut
+
+has expiration_column => (
+    is      => 'ro',
+    isa     => NonEmptySimpleStr,
+    default => 'expiration',
+);
+
+=head1 ATTRIBUTES
+
+=head2 insert_sql
+
+The SQL used to create state data.
+
+=cut
+
+has insert_sql => (
+    is       => 'lazy',
+    isa      => NonEmptyStr,
+    init_arg => undef,
+);
+sub _build_insert_sql {
+    my ($self) = @_;
+
+    return sprintf(
+        'INSERT INTO %s (%s, %s, %s) VALUES (?, ?, ?)',
+        $self->table(),
+        $self->key_column(),
+        $self->data_column(),
+        $self->expiration_column(),
+    );
+}
+
+=head2 update_sql
+
+The SQL used to update state data.
+
+=cut
+
+has update_sql => (
+    is       => 'lazy',
+    isa      => NonEmptyStr,
+    init_arg => undef,
+);
+sub _build_update_sql {
+    my ($self) = @_;
+
+    return sprintf(
+        'UPDATE %s SET %s=?, %s=? WHERE %s=?',
+        $self->table(),
+        $self->data_column(),
+        $self->expiration_column(),
+        $self->key_column(),
+    );
+}
+
+=head2 exists_sql
+
+The SQL used to confirm whether state data already exists.
+
+=cut
+
+has exists_sql => (
+    is       => 'lazy',
+    isa      => NonEmptyStr,
+    init_arg => undef,
+);
+sub _build_exists_sql {
+    my ($self) = @_;
+
+    return sprintf(
+        'SELECT 1 FROM %s WHERE %s = ?',
+        $self->table(),
+        $self->key_column(),
+    );
+}
+
+=head2 select_sql
+
+The SQL used to retrieve state data.
+
+=cut
+
+has select_sql => (
+    is       => 'lazy',
+    isa      => NonEmptyStr,
+    init_arg => undef,
+);
+sub _build_select_sql {
+    my ($self) = @_;
+
+    return sprintf(
+        'SELECT %s, %s FROM %s WHERE %s = ?',
+        $self->data_column(),
+        $self->expiration_column(),
+        $self->table(),
+        $self->key_column(),
+    );
+}
+
+=head2 delete_sql
+
+The SQL used to delete state data.
+
+=cut
+
+has delete_sql => (
+    is       => 'lazy',
+    isa      => NonEmptyStr,
+    init_arg => undef,
+);
+sub _build_delete_sql {
+    my ($self) = @_;
+
+    return sprintf(
+        'DELETE FROM %s WHERE %s = ?',
+        $self->table(),
+        $self->key_column(),
+    );
+}
+
 =head1 METHODS
 
 =head2 set
@@ -140,10 +353,81 @@ Set L<Starch::Store/remove>.
 our $dbh;
 sub dbh { $dbh }
 
+sub set {
+    my ($self, $id, $namespace, $data, $expires) = @_;
+
+    my $key = $self->stringify_key( $id, $namespace );
+
+    my $dbh = $self->dbh();
+
+    my $sth = $dbh->prepare_cached(
+        $self->exists_sql(),
+    );
+
+    my ($exists) = $dbh->selectrow_array( $sth, undef, $key );
+
+    $data = $self->serializer->serialize( $data );
+    $expires += time();
+
+    if ($exists) {
+        my $sth = $self->dbh->prepare_cached(
+            $self->update_sql(),
+        );
+
+        $sth->execute( $data, $expires, $key );
+    }
+    else {
+        my $sth = $self->dbh->prepare_cached(
+            $self->insert_sql(),
+        );
+
+        $sth->execute( $key, $data, $expires );
+    }
+
+    return;
+}
+
+sub get {
+    my ($self, $id, $namespace) = @_;
+
+    my $key = $self->stringify_key( $id, $namespace );
+
+    my $dbh = $self->dbh();
+
+    my $sth = $dbh->prepare_cached(
+        $self->select_sql(),
+    );
+
+    my ($data, $expiration) = $dbh->selectrow_array( $sth, undef, $key );
+
+    return undef if !defined $data;
+
+    if ($expiration and $expiration < time()) {
+        $self->remove( $id, $namespace );
+        return undef;
+    }
+
+    return $self->serializer->deserialize( $data );
+}
+
+sub remove {
+    my ($self, $id, $namespace) = @_;
+
+    my $key = $self->stringify_key( $id, $namespace );
+
+    my $dbh = $self->dbh();
+
+    my $sth = $dbh->prepare_cached(
+        $self->delete_sql(),
+    );
+
+    $sth->execute( $key );
+
+    return;
+}
+
 around qw( set get remove ) => sub{
     my ($orig, $self, @args) = @_;
-
-    local $Carp::Interal{ (__PACKAGE__) } = 1;
 
     my $method = $self->method();
     my $mode = $self->mode();
@@ -167,9 +451,9 @@ Starch-Store-DBIx-Connector GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch-Store-DBIx-Connector/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

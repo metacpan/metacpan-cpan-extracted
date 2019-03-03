@@ -1,5 +1,10 @@
 Revision history for HTTP-AnyUA.
 
+0.902     2019-03-02 14:07:59-07:00 MST7MDT
+
+  * Add RequestHeaders middleware
+  * Fix an error in the middleware synopsis
+
 0.901     2017-11-05 22:05:57-07:00 MST7MDT
 
   * Add middleware

@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::PluginBundle::Author::WATERKIP",
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
+    "Dist::Zilla" => 0,
     "Dist::Zilla::App::Command::xtest" => 0,
     "Dist::Zilla::Plugin::CheckExtraTests" => 0,
     "Dist::Zilla::Plugin::CheckPrereqsIndexed" => 0,
@@ -69,7 +70,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.1",
+  "VERSION" => "2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,6 +79,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
+  "Dist::Zilla" => 0,
   "Dist::Zilla::App::Command::xtest" => 0,
   "Dist::Zilla::Plugin::CheckExtraTests" => 0,
   "Dist::Zilla::Plugin::CheckPrereqsIndexed" => 0,

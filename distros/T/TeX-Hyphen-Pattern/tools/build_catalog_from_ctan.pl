@@ -17,7 +17,7 @@ use File::Slurp qw(read_file);
 use LWP::Simple qw(getstore);
 use Perl::Tidy;
 
-our $VERSION = v1.1.1;
+our $VERSION = v1.1.2;
 use Readonly;
 
 ## no critic qw(prohibitCallsToUnexportedSubs)

@@ -1,6 +1,7 @@
 package Starch::Plugin::Net::Statsd;
-
-our $VERSION = '0.04';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -39,12 +40,9 @@ will be turned into log messages before this store gets to see them.
 =cut
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
-with qw(
-    Starch::Plugin::Bundle
-);
+with 'Starch::Plugin::Bundle';
 
 sub bundled_plugins {
     return [qw(
@@ -97,9 +95,9 @@ Starch-Plugin-Net-Statsd GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch-Plugin-Net-Statsd/issues>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 

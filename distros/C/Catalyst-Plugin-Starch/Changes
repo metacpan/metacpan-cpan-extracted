@@ -1,5 +1,11 @@
 Revision history for Perl extension Catalyst-Plugin-Starch.
 
+0.05 2019-03-02T20:53:45Z
+
+ - Declare deps as modules, not distros.
+ - Require perl 5.10.1.
+ - Simplify VERSION declarations.
+
 0.04 2019-02-18T06:28:05Z
 
  - Support update_session_cookie.

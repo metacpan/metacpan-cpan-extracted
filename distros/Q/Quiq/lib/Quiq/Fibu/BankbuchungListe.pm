@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.134;
+our $VERSION = 1.135;
 
 use Quiq::Formatter;
 use Quiq::Fibu::Bankbuchung;
@@ -214,7 +214,7 @@ sub summe {
 
 =head1 VERSION
 
-1.134
+1.135
 
 =head1 AUTHOR
 

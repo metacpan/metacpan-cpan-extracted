@@ -1,5 +1,5 @@
 package Text::Hogan::Compiler;
-$Text::Hogan::Compiler::VERSION = '1.09';
+$Text::Hogan::Compiler::VERSION = '2.01';
 use Text::Hogan::Template;
 
 use 5.10.0;
@@ -33,9 +33,10 @@ sub new {
 }
 
 sub scan {
-    my ($self, $text, $options) = @_;
+    my ($self, $text_orig, $options) = @_;
+    my $text = [ split //, $text_orig ];
 
-    my $len = length $text;
+    my $len = scalar(@$text);
     my ($IN_TEXT, $IN_TAG_TYPE, $IN_TAG) = (0, 1, 2);
     my $state = $IN_TEXT;
     my $tag_type = undef;
@@ -91,7 +92,8 @@ sub scan {
     };
 
     my $change_delimiters = sub {
-        my ($text, $index) = @_;
+        my ($text_orig, $index) = @_;
+        my $text = join('', @$text_orig);
 
         my $close = '=' . $ctag;
         my $close_index = index($text, $close, $index);
@@ -301,7 +303,7 @@ sub stringify_substitutions {
         push @items, sprintf('"%s" => sub { my ($self,$c,$p,$t,$i) = @_; %s }', esc($key), $obj->{$key});
     }
 
-    return sprintf("{ %s }", join(", ", @items));
+    return sprintf("{ %s }", join(', ', @items));
 }
 
 sub stringify_partials {
@@ -316,7 +318,7 @@ sub stringify_partials {
     }
 
     return sprintf('"partials" => { %s }, "subs" => %s',
-        join(",", @partials),
+        join(',', @partials),
         stringify_substitutions($code_obj->{'subs'})
     );
 }
@@ -401,7 +403,12 @@ sub esc {
 
 sub char_at {
     my ($text, $index) = @_;
-    return substr($text, $index, 1);
+    if (ref($text) eq 'ARRAY') {
+        return $text->[$index];
+    }
+    else {
+        return substr($text, $index, 1);
+    }
 }
 
 sub choose_method {
@@ -516,7 +523,7 @@ my %cache;
 
 sub cache_key {
     my ($text, $options) = @_;
-    return join("||", $text, !!$options->{'as_string'}, !!$options->{'numeric_string_as_string'}, !!$options->{'disable_lambda'}, ($options->{'delimiters'} || ""), ($options->{'allow_whitespace_before_hashmark'} || 0));
+    return join('||', $text, !!$options->{'as_string'}, !!$options->{'numeric_string_as_string'}, !!$options->{'disable_lambda'}, ($options->{'delimiters'} || ""), ($options->{'allow_whitespace_before_hashmark'} || 0));
 }
 
 sub compile {
@@ -555,7 +562,7 @@ Text::Hogan::Compiler - parse templates and output Perl code
 
 =head1 VERSION
 
-version 1.09
+version 2.01
 
 =head1 SYNOPSIS
 
@@ -598,7 +605,7 @@ delimiter-switching functionality.
 'allow_whitespace_before_hashmark' is a boolean. If true,tags are allowed
 to have space(s) between the delimiters and the opening sigil ('#', '/', '^', '<', etc.).
 
-	my $tokens = Text::Hogan::Compiler->new->scan("Hello{{ # foo }}, again{{ / foo }}.", { allow_whitespace_before_hashmark => 1 });
+    my $tokens = Text::Hogan::Compiler->new->scan("Hello{{ # foo }}, again{{ / foo }}.", { allow_whitespace_before_hashmark => 1 });
 
 =head2 parse
 
@@ -667,20 +674,30 @@ As long as you are consistent with your use of encoding in your template
 variables and your context variables, everything should just work. You can use
 byte strings or character strings and you'll get what you expect.
 
-However be aware that compilation is much slower when using character strings!
-The tokenization does a lot of character-by-character operations using
-substr(), length(), etc. which are much slower when operating on character
-strings than byte strings.
+The only danger would be if you use byte strings of a multi-byte encoding and
+you happen to get a clash with your delimiters, eg. if your 4 byte kanji
+character happens to contain the ASCII '<' and '%' characters next to each
+other. I have no idea what the likelihood of that is, but hopefully if you're
+working with non-ASCII character sets you're also using Perl's unicode
+character strings features.
 
-I would still recommend you use character strings for your own sanity of
-course! Just be aware that you will gain a lot of performance by pre-compiling
-your templates, either using the as_string option of compile or just using a
-compile-once render-lots pattern in your code.
+Compiling long character string inputs with Text::Hogan used to be extremely
+slow but an optimisation added in version 2.00 has made the overhead much more
+manageable.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Started out statement-for-statement copied from hogan.js by Twitter!
 
-Alex Balhatchet (alex@balhatchet.net)
+Initial translation by Alex Balhatchet (alex@balhatchet.net)
+
+Further improvements from:
+
+Ed Freyfogle
+Mohammad S Anwar
+Ricky Morse
+Tom Hukins
+Tony Finch
+Yanick Champoux
 
 =cut

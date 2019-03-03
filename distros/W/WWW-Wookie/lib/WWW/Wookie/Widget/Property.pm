@@ -1,5 +1,5 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-package WWW::Wookie::Widget::Property 0.102;
+package WWW::Wookie::Widget::Property v1.1.1;
 use strict;
 use warnings;
 
@@ -73,7 +73,7 @@ WWW::Wookie::Widget::Property - Property class
 
 =head1 VERSION
 
-This document describes WWW::Wookie::Widget::Property version 0.102
+This document describes WWW::Wookie::Widget::Property version v1.1.1
 
 =head1 SYNOPSIS
 

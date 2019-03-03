@@ -29,7 +29,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Scalar::Util" : "0",
+            "Scalar::Util" : "1.5",
             "YAML::Tiny" : "1.70"
          }
       },
@@ -47,7 +47,7 @@
    "provides" : {
       "Data::Validate::WithYAML" : {
          "file" : "lib/Data/Validate/WithYAML.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "http://github.com/reneeb/Data-Validate-WithYAML"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",

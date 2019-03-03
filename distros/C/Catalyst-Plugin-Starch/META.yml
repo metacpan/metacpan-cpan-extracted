@@ -3,6 +3,7 @@ abstract: 'Catalyst session plugin via Starch.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
+  Moose: '2.0000'
   Test2::V0: '0.000094'
   Test::WWW::Mechanize::PSGI: '0.35'
 configure_requires:
@@ -27,25 +28,30 @@ no_index:
 provides:
   Catalyst::Plugin::Starch:
     file: lib/Catalyst/Plugin/Starch.pm
-    version: '0.04'
+    version: '0.05'
   Catalyst::Plugin::Starch::Cookie:
     file: lib/Catalyst/Plugin/Starch/Cookie.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Catalyst: '5.90001'
+  Catalyst::Exception: '0'
   Class::Method::Modifiers: '2.00'
-  Moose: '2.0000'
+  Moose::Role: '2.0000'
   MooseX::ClassAttribute: '0.27'
+  Scalar::Util: '0'
   Starch: '0.10'
-  Type::Tiny: '1.000005'
+  Types::Common::String: '1.000005'
+  Types::Standard: '1.000005'
   namespace::clean: '0.24'
+  perl: '5.010001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/Catalyst-Plugin-Starch/issues
   homepage: https://github.com/bluefeet/Catalyst-Plugin-Starch
   repository: git://github.com/bluefeet/Catalyst-Plugin-Starch.git
-version: '0.04'
+version: '0.05'
+x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -24,7 +24,10 @@ sub get_message {
 
     if (!$self->{'_bodysz'}) {
         if (defined recv( $self->{'_s'}, my $peek, 16, Socket::MSG_PEEK() )) {
-            if ( 16 == length $peek ) {
+            if (!length $peek) {
+                die "D-Bus connection closed unexpectedly!";
+            }
+            elsif ( 16 == length $peek ) {
                 @{$self}{'_bodysz', '_hdrsz'} = unpack(
                     (0 == index($peek, 'B')) ? _BE_INIT_UNPACK() : _LE_INIT_UNPACK(),
                     $peek,

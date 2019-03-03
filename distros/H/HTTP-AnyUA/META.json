@@ -4,7 +4,7 @@
       "Charles McGarvey <chazmcgarvey@brokenzipper.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,6 @@
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::Author::CCM" : "0",
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -43,6 +42,7 @@
             "Test::MinimumVersion" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::No404s" : "0",
@@ -82,7 +82,6 @@
             "Test2::API" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "lib" : "0"
          },
          "suggests" : {
@@ -101,55 +100,59 @@
    "provides" : {
       "HTTP::AnyUA" : {
          "file" : "lib/HTTP/AnyUA.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend" : {
          "file" : "lib/HTTP/AnyUA/Backend.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::AnyEvent::HTTP" : {
          "file" : "lib/HTTP/AnyUA/Backend/AnyEvent/HTTP.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::Furl" : {
          "file" : "lib/HTTP/AnyUA/Backend/Furl.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::HTTP::AnyUA" : {
          "file" : "lib/HTTP/AnyUA/Backend/HTTP/AnyUA.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::HTTP::Tiny" : {
          "file" : "lib/HTTP/AnyUA/Backend/HTTP/Tiny.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::LWP::UserAgent" : {
          "file" : "lib/HTTP/AnyUA/Backend/LWP/UserAgent.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::Mojo::UserAgent" : {
          "file" : "lib/HTTP/AnyUA/Backend/Mojo/UserAgent.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Backend::Net::Curl::Easy" : {
          "file" : "lib/HTTP/AnyUA/Backend/Net/Curl/Easy.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Middleware" : {
          "file" : "lib/HTTP/AnyUA/Middleware.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Middleware::ContentLength" : {
          "file" : "lib/HTTP/AnyUA/Middleware/ContentLength.pm",
-         "version" : "0.901"
+         "version" : "0.902"
+      },
+      "HTTP::AnyUA::Middleware::RequestHeaders" : {
+         "file" : "lib/HTTP/AnyUA/Middleware/RequestHeaders.pm",
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Middleware::Runtime" : {
          "file" : "lib/HTTP/AnyUA/Middleware/Runtime.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       },
       "HTTP::AnyUA::Util" : {
          "file" : "lib/HTTP/AnyUA/Util.pm",
-         "version" : "0.901"
+         "version" : "0.902"
       }
    },
    "release_status" : "stable",
@@ -164,8 +167,9 @@
          "web" : "https://github.com/chazmcgarvey/HTTP-AnyUA"
       }
    },
-   "version" : "0.901",
+   "version" : "0.902",
    "x_authority" : "cpan:CCM",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "x_generated_by_perl" : "v5.28.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

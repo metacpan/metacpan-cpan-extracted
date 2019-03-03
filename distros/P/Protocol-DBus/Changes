@@ -1,5 +1,14 @@
 Revision history for Perl module Protocol::DBus
 
+0.09
+- BREAKING CHANGE: send_call() no longer accepts “on_return”. Instead,
+the method returns an instance of Promise::ES6. This affords more
+flexibility than “on_return” and relieves callers of the responsibility
+to determine whether the response succeeded or failed.
+- Rename get_connection_name() to get_unique_bus_name(). (The former
+name is retained as an alias.)
+- Parser.pm now detects prematurely shut-down connections.
+
 0.08 Wed 9 Jan 2019
 - Document the send_return(), send_error(), and send_signal() methods.
 - Switch to native byte order as default rather than little-endian.
