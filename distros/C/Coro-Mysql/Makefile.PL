@@ -11,8 +11,27 @@ print <<EOF;
 **
 ** To adjust include and library path, edit the Makefile.PL, near the end.
 **
+** The default is to look for mariadb_config, followed by mysql_config.
+**
 
 EOF
+
+my $cfg = (system "mariadb_config --cflags >/dev/null 2>&1")
+   ? "mysql_config"
+   : "mariadb_config";
+
+print "Using '$cfg' to get compile settings.\n\n";
+
+sub cfg {
+   my $param = join " ", @_;
+
+   my $val = qx<$cfg $param>;
+   $val =~ y/[\r\n]/  /;
+
+   print "$cfg $param: $val\n";
+
+   $val
+}
 
 my %wm = (
     dist	=> {
@@ -30,8 +49,8 @@ my %wm = (
     NAME => "Coro::Mysql",
     VERSION_FROM => "Mysql.pm",
 
-    INC => '-I/usr/include/mysql',
-    LIBS => ['-L/usr/lib -lmysqlclient'],
+    INC => (cfg "--include"),
+    LIBS => [cfg "--libs_r"],
 );
 
 if (eval "require EV::MakeMaker; require Coro::MakeMaker; 1") {
@@ -54,3 +73,4 @@ EOF
 }
 
 WriteMakefile %wm;
+

@@ -9,6 +9,7 @@
 #include "pl_eval.h"
 #include "pl_console.h"
 #include "pl_eventloop.h"
+#include "ppport.h"
 
 #if !defined(EVENTLOOP_DEBUG)
 #define EVENTLOOP_DEBUG 0       /* set to 1 to debug with printf */
@@ -144,7 +145,7 @@ static void expire_timers(V8Context* ctx) {
             fflush(stderr);
 #endif
             if (timer_count >= MAX_TIMERS) {
-                // TODO error out of here
+                /* TODO error out of here */
                 pl_show_error(ctx, "out of timer slots, max is %ld", (long) MAX_TIMERS);
                 fflush(stderr);
             }
@@ -222,12 +223,12 @@ static void create_timer(const FunctionCallbackInfo<Value>& args)
     V8Context* ctx = (V8Context*) v8_val->Value();
 
     if (timer_count >= MAX_TIMERS) {
-        // TODO: error out of here
+        /* TODO: error out of here */
         pl_show_error(ctx, "Too many timers, max is %ld", (long) MAX_TIMERS);
         abort();
     }
     if (args.Length() != 3) {
-        // TODO: error out of here
+        /* TODO: error out of here */
         pl_show_error(ctx, "create_timer() needs 3 args, got %d", args.Length());
         abort();
     }
@@ -275,7 +276,7 @@ static void delete_timer(const FunctionCallbackInfo<Value>& args)
     V8Context* ctx = (V8Context*) v8_val->Value();
 
     if (args.Length() != 1) {
-        // TODO: error out of here
+        /* TODO: error out of here */
         pl_show_error(ctx, "delete_timer() needs 1 arg, got %d", args.Length());
         abort();
     }
@@ -380,7 +381,7 @@ int pl_register_eventloop_functions(V8Context* ctx)
 SV* pl_run_function_in_event_loop(pTHX_ V8Context* ctx, const char* func)
 {
     /* Start a zero timer which will call our function from the event loop. */
-    // TODO: stop using a fixed size buffer
+    /* TODO: stop using a fixed size buffer */
     char js[1024];
     sprintf(js, "setTimeout(function() { %s(); }, 0);", func);
     pl_eval(aTHX_ ctx, js);

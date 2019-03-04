@@ -3,6 +3,7 @@
 #include "pl_console.h"
 #include "pl_eventloop.h"
 #include "pl_v8.h"
+#include "ppport.h"
 
 #define PL_GC_RUNS 2
 
@@ -23,8 +24,7 @@ static void ReportException(pTHX_ V8Context* ctx, TryCatch* try_catch)
     const char* exception_string = ToCString(exception);
     Local<Message> message = try_catch->Message();
     if (message.IsEmpty()) {
-        // V8 didn't provide any extra information about this error; just
-        // print the exception.
+        /* V8 didn't provide extra info about error; just print exception. */
         Perl_sv_catpvf(aTHX_ buffer, "%s\n", exception_string);
     } else {
         Local<Context> context(isolate->GetCurrentContext());
@@ -35,24 +35,24 @@ static void ReportException(pTHX_ V8Context* ctx, TryCatch* try_catch)
             Local<String>::Cast(stack_trace_string)->Length() > 0);
 
         if (!has_stack_trace) {
-            // Print (filename):(line number):
+            /* Print (filename):(line number): */
             String::Utf8Value filename(isolate, message->GetScriptOrigin().ResourceName());
             const char* filename_string = ToCString(filename);
             int linenum = message->GetLineNumber(context).FromJust();
             Perl_sv_catpvf(aTHX_ buffer, "%s:%i: ", filename_string, linenum);
         }
 
-        // Print (message).
+        /* Print (message). */
         Perl_sv_catpvf(aTHX_ buffer, "error: %s\n", exception_string);
 
 #if 0
-        // Print offending line of source code.
+        /* Print offending line of source code. */
         String::Utf8Value sourceline(
                 isolate, message->GetSourceLine(context).ToLocalChecked());
         const char* sourceline_string = ToCString(sourceline);
         Perl_sv_catpvf(aTHX_ buffer, "%s\n", sourceline_string);
 
-        // Print wavy underline (GetUnderline is deprecated).
+        /* Print wavy underline (GetUnderline is deprecated). */
         int start = message->GetStartColumn(context).FromJust();
         for (int i = 0; i < start; i++) {
             Perl_sv_catpvf(aTHX_ buffer, " ");
@@ -64,7 +64,7 @@ static void ReportException(pTHX_ V8Context* ctx, TryCatch* try_catch)
         Perl_sv_catpvf(aTHX_ buffer, "\n");
 #endif
 
-        // Print stacktrace if any
+        /* Print stacktrace if any */
         if (has_stack_trace) {
             String::Utf8Value stack_trace(isolate, stack_trace_string);
             const char* stack_trace_string = ToCString(stack_trace);
@@ -90,7 +90,7 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
     bool ok = true;
     do {
         if (file) {
-            // Create a string containing the file name.
+            /* Create a string containing the file name. */
             Local<String> name;
             ok = String::NewFromUtf8(ctx->isolate, file, NewStringType::kNormal).ToLocal(&name);
             if (!ok) {
@@ -102,7 +102,7 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
             }
         }
 
-        // Create a string containing the JavaScript source code.
+        /* Create a string containing the JavaScript source code. */
         Local<String> source;
         ok = String::NewFromUtf8(ctx->isolate, code, NewStringType::kNormal).ToLocal(&source);
         if (!ok) {
@@ -111,7 +111,7 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
 
         Perf perf;
 
-        // Compile the source code.
+        /* Compile the source code. */
         pl_stats_start(aTHX_ ctx, &perf);
         Local<Script> script;
         ok = Script::Compile(context, source, origin).ToLocal(&script);
@@ -120,7 +120,7 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
             break;
         }
 
-        // Run the script to get the result.
+        /* Run the script to get the result. */
         pl_stats_start(aTHX_ ctx, &perf);
         Local<Value> result;
         ok = script->Run(context).ToLocal(&result);
@@ -129,11 +129,11 @@ SV* pl_eval(pTHX_ V8Context* ctx, const char* code, const char* file)
             break;
         }
 
-        // Convert the result into Perl data
+        /* Convert the result into Perl data */
         Local<Object> object = Local<Object>::Cast(result);
         ret = pl_v8_to_perl(aTHX_ ctx, object);
 
-        // Launch eventloop; this call only returns after the eventloop terminates.
+        /* Launch eventloop; call only returns after eventloop terminates. */
         eventloop_run(ctx);
     } while (0);
     if (!ok) {

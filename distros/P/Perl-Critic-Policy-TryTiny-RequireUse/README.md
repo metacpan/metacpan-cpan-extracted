@@ -27,13 +27,10 @@ and [TryCatch](https://metacpan.org/pod/TryCatch) modules which also export the 
 solution to this problem (as the author has reported to me).  Consider it as an
 alternative to this policy.
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
-
-# CONTRIBUTORS
-
-- Graham TerMarsch <graham@howlingfrog.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Graham TerMarsch <graham@howlingfrog.com>
 
 # ACKNOWLEDGEMENTS
 

@@ -1,0 +1,161 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+winja - Windows日本語版のための醜いパッチ
+
+
+=head1 概要
+
+    use winja;
+
+
+=head1 説明
+
+winja は、
+Windows 日本語版上で動作する Perl がファイル・パスを正常に取り扱えるようにするためのモジュールである。
+Perl バージョン 5.18.0以降で動作する。
+
+このモジュールは、
+Windows 日本語版のファイル・パスに使われている
+文字コード CP932
+の一部のマルチバイト文字が第2バイトにパス区切り文字と同じ
+0x5C
+を持つために発生する問題
+( いわゆる x5C問題 )
+を抑止する。
+( x5C問題については
+ウィキペディア『Shift_JIS』
+E<lt>https://ja.wikipedia.org/wiki/Shift_JISE<gt>
+の『2バイト目が5C等になりうることによる問題』セクションを参照 )
+
+あなたがWindows日本語版( 以降、Win32-JP と表記する )上でPerlを使っていて、
+マルチバイト文字を含むファイル・パスを扱う可能性があり、
+あなたのコードが以下のモジュールをロードしたり、
+内部でこれらのモジュールを使っているモジュールをロードするならば、
+それらの前にこのモジュールをロードしよう。
+( 少なくとも Perl バージョン 5.18.0 以降であれば、
+コアPerl自体は x5C問題に対応している。
+『歷史』セクションを参照 )
+
+=over 2
+
+=item * File::Spec または File::Spec::Functions
+
+=item * File::Basename
+
+=item * Cwd
+
+=back
+
+つまり、Win32-JP上でファイル・パスを扱う場合は
+このモジュールをロードするほうが安全である。
+
+(使用例)
+
+    use strict;
+    use warnings;
+    
+    use winja;
+
+    use File::Spec;
+    ...
+
+
+=head1 注意
+
+このモジュールがロードされると、
+Cwdモジュールのfast*()関数は もはや "fast" ではなくなる。
+fast*()関数 ( 例えば fastcwd() ) は
+fastの付かない関数
+( 例えば cwd() )
+と同じコードで実装されているからである。
+
+
+=head1 制約
+
+このモジュールは Win32-JP 上でのみ動作する。
+
+Windows日本語版上のPerl以外にはインストールできない
+( テストに失敗するだろう )。
+
+Windows日本語版上のPerl以外に強制インストールしたとしても、
+モジュールのロードに失敗する
+(ロード時にOSと言語をチェックしている)。
+
+
+=head1 歷史
+
+このモジュールは、Perl 5.0.3 の頃から開発が始まった。
+
+当時のPerlコアが x5C問題に対応しておらず、
+ファイル・パスを扱う以下のコア関数と『説明』セクションで挙げた
+コア・モジュールが蘋蘩に問題を起こしていたため、
+間に合わせでパッチ・モジュールを書き始めたのがきっかけだった:
+
+=over 2
+
+=item open(), opendir(), mkdir(), rmdir(), chdir()
+=item stat(), lstat()
+
+=back
+
+XSの知識に乏しいこともあり
+ピュアperl のパッチ・コードを実装したが、
+コア関数のx5C問題クリアは やっかいで、
+コードは複雑をきわめ、
+コード量は現在の倍以上あった。
+それらには、
+File::stat
+の補正コードも含まれていた。
+
+winjaはうまく機能したが、ファイルテスト演算子には対応できなかった。
+ファイルテスト演算子を上書きする方法がわからなかったからだ。
+
+Perlコアが x5C問題に対応した時期は定かではないが、
+少なくとも バージョン 5.18.0 以降は
+上述のコア関数とファイルテスト演算子は問題を起こさくなった。
+
+現在は winjaの要求するPerl最小バージョンを 5.18.0 に設定した上で
+コア関数と File::stat 関連のコードは除去されている。
+
+
+=head1 著作権 および ライセンス
+
+Copyright (C) KPEE.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=head1 著作者
+
+KPEE E<lt>kpee.cpanx@gmail.comE<gt>
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

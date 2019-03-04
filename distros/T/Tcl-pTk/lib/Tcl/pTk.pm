@@ -1,6 +1,6 @@
 package Tcl::pTk;
 
-our ($VERSION) = ('0.95');
+our ($VERSION) = ('0.96');
 
 use strict;
 use Tcl;
@@ -24,6 +24,9 @@ BEGIN{
   }
 };
 
+# Variable to hold error if fileevent is unavailable
+# (e.g. no sys/ioctl.ph available)
+our ( $_FE_unavailable );
 
 use Tcl::pTk::Widget;
 use Tcl::pTk::MainWindow;
@@ -1371,10 +1374,10 @@ sub ALL_EVENTS{ Tcl::ALL_EVENTS()};
 
 # Wrappers for the Tk color functions (for compatibility with perl/tk)
 sub NORMAL_BG{
-        if($^O eq 'cygwin' || $^O =~ /win32/ ){
+        if($^O eq 'cygwin' || $^O eq 'MSWin32' ){
                 return 'systembuttonface';
         }
-        elsif( $^O =~ /darwin/i ){ # MacOS
+        elsif( $^O eq 'darwin' ){ # MacOS
                 return 'systemWindowBody';
         }
         else{ # Must be unix
@@ -1383,10 +1386,10 @@ sub NORMAL_BG{
 }
 
 sub ACTIVE_BG{
-        if($^O eq 'cygwin' || $^O =~ /win32/ ){
+        if($^O eq 'cygwin' || $^O eq 'MSWin32' ){
                 return 'systembuttonface';
         }
-        elsif( $^O =~ /darwin/i ){ # MacOS
+        elsif( $^O eq 'darwin' ){ # MacOS
                 return 'systemButtonFacePressed';
         }
         else{ # Must be unix
@@ -1395,10 +1398,10 @@ sub ACTIVE_BG{
 }
 
 sub SELECT_BG{
-        if($^O eq 'cygwin' || $^O =~ /win32/ ){
+        if($^O eq 'cygwin' || $^O eq 'MSWin32' ){
                 return 'SystemHighlight';
         }
-        elsif( $^O =~ /darwin/i ){ # MacOS
+        elsif( $^O eq 'darwin' ){ # MacOS
                 return 'systemHighlightSecondary';
         }
         else{ # Must be unix

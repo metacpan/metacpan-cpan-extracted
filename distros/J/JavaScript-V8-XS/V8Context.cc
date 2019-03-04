@@ -9,8 +9,9 @@
 #include "pl_inlined.h"
 #include "pl_stats.h"
 #include "V8Context.h"
+#include "ppport.h"
 
-#define V8_PROFILE_RESET     0  // set to 1 to profile
+#define V8_PROFILE_RESET     0  /* set to 1 to profile */
 
 #define PROGRAM_NAME         "JavaScript-V8-XS"
 #define ICU_DTL_DATA         "icudtl.dat"
@@ -97,10 +98,12 @@ V8Context::~V8Context()
     delete create_params.array_buffer_allocator;
 
 #if 0
-    // We should terminate v8 at some point.  However, because the calling code
-    // may create multiple instances of V8Context, whether "nested" or
-    // "sequential", we cannot just assume we should do this.  For now, we just
-    // *never* terminate v8.
+    /*
+     * We should terminate v8 at some point.  However, because the calling code
+     * may create multiple instances of V8Context, whether "nested" or
+     * "sequential", we cannot just assume we should do this.  For now, we just
+     * *never* terminate v8.
+     */
     V8Context::terminate_v8();
 #endif
 }
@@ -180,7 +183,7 @@ SV* V8Context::eval(const char* code, const char* file)
     ENTER_SCOPE;
     set_up();
 
-    // performance is tracked inside this call
+    /* performance is tracked inside this call */
     return pl_eval(aTHX_ this, code, file);
 }
 
@@ -251,7 +254,7 @@ void V8Context::set_up()
     double t0 = now_us();
 #endif
 
-    // Create a new Isolate and make it the current one.
+    /* Create a new Isolate and make it the current one. */
     isolate = Isolate::New(create_params);
 
 #if defined(V8_PROFILE_RESET) && V8_PROFILE_RESET > 0
@@ -260,28 +263,28 @@ void V8Context::set_up()
 
     ENTER_SCOPE;
 
-    // Create the persistent objects that store our context.
+    /* Create the persistent objects that store our context. */
     persistent_context = new Persistent<Context>;
     persistent_template = new Persistent<ObjectTemplate>;
 
-    // Create a template for the global object.
+    /* Create a template for the global object. */
     Local<ObjectTemplate> object_template = ObjectTemplate::New(isolate);
 
-    // Register callbacks to native functions in the template
+    /* Register callbacks to native functions in the template */
     pl_register_native_functions(this, object_template);
 
-    // Create a new context and reset the persistent objects.
+    /* Create a new context and reset the persistent objects. */
     Local<Context> context = Context::New(isolate, 0, object_template);
     persistent_context->Reset(isolate, context);
     persistent_template->Reset(isolate, object_template);
 
-    // Register eventloop handlers.
+    /* Register eventloop handlers. */
     pl_register_eventloop_functions(this);
 
-    // Register inlined JS code.
+    /* Register inlined JS code. */
     pl_register_inlined_functions(this);
 
-    // Register console handlers.
+    /* Register console handlers. */
     pl_register_console_functions(this);
 
 #if defined(V8_PROFILE_RESET) && V8_PROFILE_RESET > 0
@@ -349,11 +352,11 @@ const char* get_data_path()
         if (found < num_locations) {
             continue;
         }
-        // found all required files -- yipee!
+        /* found all required files -- yipee! */
         return locations[j];
     }
 
-    // fallback -- it might fail
+    /* fallback -- it might fail */
     return ".";
 }
 
@@ -363,15 +366,15 @@ void V8Context::initialize_v8()
         return;
     }
 
-    // get location for our V8 binary files
+    /* get location for our V8 binary files */
     const char* data_path = get_data_path();
 
-    // initialize ICU, make it point to that path
+    /* initialize ICU, make it point to that path */
     char icu_dtl_data[1024];
     sprintf(icu_dtl_data, "%s/%s", data_path, ICU_DTL_DATA);
     V8::InitializeICUDefaultLocation(PROGRAM_NAME, icu_dtl_data);
 
-    // initialize V8 with the appropriate blob files
+    /* initialize V8 with the appropriate blob files */
     char natives_blob[1024];
     char snapshot_blob[1024];
     sprintf(natives_blob, "%s/%s", data_path, V8_NATIVES_BLOB);

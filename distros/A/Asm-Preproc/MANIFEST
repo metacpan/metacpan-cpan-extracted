@@ -1,4 +1,3 @@
-.gitignore
 Changes
 lib/Asm/Preproc.pm
 lib/Asm/Preproc/Lexer.pm
@@ -32,3 +31,5 @@ t/Preproc-stream.t
 t/Token-error.t
 t/Token-new.t
 t/utils.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

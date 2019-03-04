@@ -1,80 +1,80 @@
 [
    {
-      "File" : [
+      "File": [
          {
-            "id" : "file_new",
-            "label" : "New"
+            "id": "file_new",
+            "label": "New"
          },
          {
-            "id" : "file_open",
-            "label" : "Open"
+            "id": "file_open",
+            "label": "Open"
          },
          {
-            "id" : "file_save",
-            "label" : "Save"
+            "id": "file_save",
+            "label": "Save"
          }
       ]
    },
    {
-      "Edit" : [
+      "Edit": [
          {
-            "id" : "edit_cut",
-            "label" : "Cut"
+            "id": "edit_cut",
+            "label": "Cut"
          },
          {
-            "id" : "edit_copy",
-            "label" : "Copy"
+            "id": "edit_copy",
+            "label": "Copy"
          },
          {
-            "id" : "edit_paste",
-            "label" : "Paste"
+            "id": "edit_paste",
+            "label": "Paste"
          },
          {
-            "_blame_" : [
+            "_blame_": [
                {
-                  "diff" : {
-                     "D" : [
+                  "diff": {
+                     "D": [
                         {
-                           "D" : {
-                              "Edit" : {
-                                 "D" : [
+                           "D": {
+                              "Edit": {
+                                 "D": [
                                     {
-                                       "I" : 3,
-                                       "R" : null
+                                       "I": 3,
+                                       "R": null
                                     },
                                     {
-                                       "R" : {
-                                          "id" : "edit_find",
-                                          "label" : "Find"
+                                       "R": {
+                                          "id": "edit_find",
+                                          "label": "Find"
                                        }
                                     },
                                     {
-                                       "R" : null
+                                       "R": null
                                     }
                                  ]
                               }
                            },
-                           "I" : 1
+                           "I": 1
                         }
                      ]
                   },
-                  "rule_id" : 0
+                  "rule_id": 0
                }
             ],
-            "id" : "edit_settings",
-            "label" : "Settings"
+            "id": "edit_settings",
+            "label": "Settings"
          }
       ]
    },
    {
-      "View" : [
+      "View": [
          {
-            "id" : "view_encoding",
-            "label" : "Encoding"
+            "id": "view_encoding",
+            "label": "Encoding"
          },
          {
-            "id" : "view_wrapping",
-            "label" : "Text wrapping"
+            "id": "view_wrapping",
+            "label": "Text wrapping"
          }
       ]
    }

@@ -1,5 +1,12 @@
 Revision history for App-NDTools
 
+0.6.3   2019-03-03
+        - ndproc: show mod usage when unknown arg used in mod invocation
+        - ndproc: rules conditions implemented (--cond opt)
+        - ndproc-Insert: --structure opt added
+        - all: emitting JSON format corrected
+        - refactorings, docs improvements
+
 0.6.2   2018-11-19
         - nddiff: --full-headers opt is no longer supported
         - nddiff: JSON Patch output format supported

@@ -1,10 +1,15 @@
 This is the change log for the perl extension PApp::SQL.
 
+2.002 Mon Mar  4 07:24:49 CET 2019
+	- support DBD::MAriaDB is sql_insertid.
+        - use DBI's last_insert_id method as fallback, with
+          all undef parameters.
+
 2.001 Sat Oct  7 17:52:36 CEST 2017
 	- protip: avoid postgres, it's an inefficient pile of garbage code.
 	- work around DBD::Pg (and only DBD::Pg) unnecessarily modifying
           the first argument of bind_param, likely due to some misguided
-          implementation of some unneecessary extensions requiring
+          implementation of some unneccessary extensions requiring
           non-standard syntax for bind_param. bleah.
         - minor av_fetch optimisation.
 

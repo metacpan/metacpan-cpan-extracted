@@ -1,1 +1,5 @@
 name = "Perl-Critic-Policy-TryTiny-RequireBlockTermination"
+authority="cpan:BLUEFEET"
+
+[ReleaseTest]
+MinimumVersion = false

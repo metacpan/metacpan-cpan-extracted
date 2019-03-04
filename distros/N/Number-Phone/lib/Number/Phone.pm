@@ -2,13 +2,18 @@ package Number::Phone;
 
 use strict;
 
+use File::ShareDir;
+use File::Spec::Functions qw(catfile);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+
 use Scalar::Util 'blessed';
 
 use Number::Phone::Country qw(noexport);
 use Number::Phone::StubCountry;
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '3.4006';
+our $VERSION = '3.5000';
 
 my $NOSTUBS = 0;
 sub import {
@@ -19,6 +24,31 @@ sub import {
   }
 }
 
+sub _find_data_file {
+    my $wanted = shift;
+
+    # giant ball of hate because lib::abs doesn't work on Windows
+    my $this_file = __FILE__;
+    my $this_dir  = dirname($this_file);
+    
+    my @candidate_files = (
+         # if this is $devdir/lib ...
+         catfile($this_dir, qw(.. .. lib .. share), $wanted),
+         # if this is $devdir/blib/lib ...
+         catfile($this_dir, qw(.. .. .. blib lib .. .. share), $wanted),
+         # if this has been installed
+         catfile(File::ShareDir::dist_dir('Number-Phone'), $wanted),
+    );
+    my $file = (grep { -e $_ } @candidate_files)[0];
+
+    if(!$file) {
+        die(
+            "Couldn't find a UK data file amongst:\n".
+            join('', map { "  $_\n" } @candidate_files)
+        );
+    }
+    return $file;
+}
 
 my @is_methods = qw(
     is_valid is_allocated is_in_use
@@ -157,7 +187,7 @@ The prefix codes in 3.4003 and earlier were managed by hand and so got out
 of date. After that release they are mostly derived from libphonenumber.
 libphonenumber's data includes carrier selection codes when they are
 mandatory for dialling so those are now included. This sometimes means that
-some random carrier has been arbitrarily priveleged over others.
+some random carrier has been arbitrarily privileged over others.
 
 =head1 COMPATIBILTY WITH libphonenumber
 

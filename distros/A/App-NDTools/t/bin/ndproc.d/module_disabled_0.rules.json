@@ -1,15 +1,15 @@
 [
    {
-      "modname" : "Remove",
-      "path" : "{files}"
+      "modname": "Remove",
+      "path": "{files}"
    },
    {
-      "modname" : "Insert",
-      "path" : "{numcpu}",
-      "value" : 32
+      "modname": "Insert",
+      "path": "{numcpu}",
+      "value": 32
    },
    {
-      "modname" : "Remove",
-      "path" : "{mtime}"
+      "modname": "Remove",
+      "path": "{mtime}"
    }
 ]

@@ -1,5 +1,7 @@
 Revision history for MySQL-ORM
 
+0.06 	Update by_param to private _by_param
+
 0.05	fixed signatures for nullable foreign keys in the selectx methods
 
 0.04    skip pre-existing Dbname.pm files

@@ -3,7 +3,7 @@ package Module::Lazy;
 use 5.008;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -62,39 +62,52 @@ No extra options (except from target module name) are allowed.
 
 =cut
 
+my $dont;
 my %seen;
+my $inc_stub = "pending load by ".__PACKAGE__;
+
 sub import {
     my ($class, $target, @rest) = @_;
 
-    croak "Usage: use Module::Lazy 'Module::Name';"
-        unless defined $target and @rest == 0;
+    # bare use statement is ok
+    return unless defined $target;
+
+    croak "Usage: use Module::Lazy 'Module::Name'; extra options not supported"
+        unless @rest == 0;
 
     # return ASAP if already loaded by us or Perl itself
     return if $seen{$target};
     my $mod = $target;
     $mod =~ s,::,/,g;
     $mod .= ".pm";
+
     return if $INC{$mod};
+    return _load( $target, $mod )
+        if $dont;
 
     croak "Bad module name '$target'"
         unless $target =~ /^[A-Za-z_][A-Za-z_0-9]*(?:::[A-Za-z_0-9]+)*$/;
 
     $seen{$target} = $mod;
 
-    our $AUTOLOAD;
+    # If $target is later require'd directly,
+    # autoload and destroy will be overwritten and will cause a warning.
+    # Preventing them from being loaded seems like a lesser evil.
+    $INC{$mod} = $inc_stub;
+
     _set_function( $target, AUTOLOAD => sub {
-        _load( $target );
+        our $AUTOLOAD;
+        $AUTOLOAD =~ s/.*:://;
         my $jump = _jump( $target, $AUTOLOAD );
         goto $jump;
     } );
 
+    # Provide DESTROY just in case someone blesses an object directly
+    #     without ever loading a module
+    _set_function( $target, DESTROY => _jump( $target, DESTROY => "no_die" ) );
+
     foreach (qw( can isa )) {
-        my $name = $_; # separate variable to close over
-        _set_function( $target, $name => sub {
-            _load( $target );
-            my $jump = _jump( $target, $name );
-            goto $jump;
-        });
+        _set_function( $target, $_ => _jump( $target, $_ ) );
     };
 };
 
@@ -117,43 +130,59 @@ sub unimport {
     croak "usage: no Module::Lazy;"
         if @_;
 
+    $dont++;
     # sort keys to ensure load order stability in case of bugs
     foreach (sort keys %seen) {
-        _load($_);
+        _inflate($_);
     };
 };
 
 my %known_method;
-sub _load {
+sub _inflate {
     my $target = shift;
 
+    # TODO distinguish between "not seen" and "already loaded"
     my $mod = delete $seen{$target};
     croak "Module '$target' was never loaded via Module::Lazy, that's possibly a bug"
         unless $mod;
+
+    croak "Module '$target' already loaded from '$INC{$mod}'"
+        unless $INC{$mod} and $INC{$mod} eq $inc_stub;
 
     # reset stub methods prior to loading
     foreach (keys %{ $known_method{$target} || {} }) {
         _set_function( $target, $_ => undef );
     };
 
+    # make the module loadable again
+    delete $INC{$mod};
+    _load( $target, $mod );
+};
+
+sub _load {
+    my ($target, $mod) = @_;
+
     package
         Module::Lazy::_::quarantine;
 
     local $Carp::Internal{ __PACKAGE__ } = 1;
     require $mod;
-    # TODO maybe import()
+    # TODO maybe $target->import()
 };
 
 sub _jump {
     my ($target, $todo, $nodie) = @_;
 
-    $todo =~ s/.*:://;
-    my $jump = $target->can($todo);
+    return sub {
+        _inflate( $target );
 
-    croak qq{Can't locate object method "$todo" via package "$target"}
-        unless $jump or $nodie;
+        my $jump = $target->can($todo);
+        goto $jump
+            if $jump; # TODO should also check it's a CODEREF
 
-    return $jump;
+        croak qq{Can't locate object method "$todo" via package "$target"}
+            unless $nodie;
+    };
 };
 
 sub _set_function {
@@ -177,16 +206,16 @@ Konstantin S. Uvarin, C<< <khedin@cpan.org> >>
 
 =over
 
-=item * import() is not called on the modules being loaded.
-The decision is yet to be made whether it's good or bad.
+=item * C<use mro 'c3';> does not work with lazy-loaded parent classes.
 
-=item * C<no Module::Lazy> should prevent further demand-loading.
+=item * C<import()> is not called on the modules being loaded.
+The decision is yet to be made whether it's good or bad.
 
 =item * no way to preload prototyped exported functions
 (that's what L<autouse> does),
 but maybe there should be?
 
-=item * certainly not enough interoperability tests (C<use mro 'c3'>?).
+=item * certainly not enough interoperability tests.
 
 =back
 

@@ -4,6 +4,22 @@
 -- ------------------------------------------------------
 -- Server version	5.5.60-MariaDB
 
+use `testmysqlorm_fk`;
+
+drop table if exists `fk_test`;
+
+CREATE TABLE `fk_test` (
+  `fk_test_id` int(11) NOT NULL AUTO_INCREMENT,
+  `fk_test_code` varchar(20) NOT NULL,
+  `fk_test_name` varchar(20) NOT NULL,
+  PRIMARY KEY (`fk_test_id`),
+  UNIQUE KEY `fk_test_ak` (`fk_test_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+insert into fk_test( fk_test_code, fk_test_name) values ('fk_test_code1', 'fk_test_name1');
+
+use testmysqlorm;
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -26,10 +42,12 @@ CREATE TABLE `league` (
   `league_id` int(11) NOT NULL AUTO_INCREMENT,
   `league_name` varchar(20) NOT NULL,
   `sport_id` int(11) NOT NULL,
+  `fk_test_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`league_id`),
   UNIQUE KEY `league_name_ak` (`league_name`,`sport_id`),
   KEY `sport_id` (`sport_id`),
-  CONSTRAINT `league_ibfk_1` FOREIGN KEY (`sport_id`) REFERENCES `sport` (`sport_id`)
+  CONSTRAINT `league_ibfk_1` FOREIGN KEY (`sport_id`) REFERENCES `sport` (`sport_id`),
+  CONSTRAINT `league_ibfk_2` FOREIGN KEY (`fk_test_id`) REFERENCES `testmysqlorm_fk`.`fk_test` (`fk_test_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

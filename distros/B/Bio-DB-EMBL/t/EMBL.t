@@ -3,36 +3,36 @@
 
 use strict;
 
-BEGIN { 
-    use Bio::Root::Test;
+BEGIN {
+    use Test::Most tests => 16;
+    use Test::RequiresInternet;
 
-    test_begin(-tests => 16,
-               -requires_modules    => [qw(IO::String
-                                           LWP::UserAgent
-                                           HTTP::Request::Common)],
-               -requires_networking => 1);
-
+    # test_begin(-tests => 16,
+    #            -requires_modules    => [qw(IO::String
+    #                                        LWP::UserAgent
+    #                                        HTTP::Request::Common)],
+    #            -requires_networking => 1);
     use_ok('Bio::DB::EMBL');
 }
 
-my $verbose = test_debug();
+my $verbose = $ENV{'BIOPERLDEBUG'};
 
 my ($db,$seq,$seqio);
 # get a single seq
 
 $seq = $seqio = undef;
 
-SKIP: { 
-    ok defined($db = Bio::DB::EMBL->new(-verbose=>$verbose)); 
+SKIP: {
+    ok defined($db = Bio::DB::EMBL->new(-verbose=>$verbose));
     ok(defined($seq = $db->get_Seq_by_acc('J00522')));
-    is( $seq->length, 408); 
+    is( $seq->length, 408);
     ok defined ($db->request_format('fasta'));
-	
+
     eval {ok(defined($seq = $db->get_Seq_by_acc('J02231')))};
 	skip('could not connect to embl',2) if $@;
     like( $seq->id, qr/J02231/);
-    is( $seq->length, 200); 
-    ok( defined($db = Bio::DB::EMBL->new(-verbose=>$verbose, 
+    is( $seq->length, 200);
+    ok( defined($db = Bio::DB::EMBL->new(-verbose=>$verbose,
 					-retrievaltype => 'tempfile')));
     eval {ok(defined($seqio = $db->get_Stream_by_id(['AEE33958'])))};
 	skip('could not connect to embl',2) if $@;
@@ -47,7 +47,7 @@ SKIP: {
     $db = Bio::DB::EMBL->new(-verbose => $verbose,
 			    -retrievaltype => 'tempfile',
 			    -format => 'fasta'
-			    ); 
+			    );
     eval{ok( defined($seqio = $db->get_Stream_by_acc(['J00522 AF303112 J02231'])))};
 	skip('could not connect to embl',3) if $@;
     my %seqs;

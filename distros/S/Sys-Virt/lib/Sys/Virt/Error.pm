@@ -406,6 +406,10 @@ The libSSH socket client
 
 The resource control subsystem
 
+=item Sys::Virt::Error::FROM_FIREWALLD
+
+The firewalld service
+
 =back
 
 =head2 ERROR CODE CONSTANTS

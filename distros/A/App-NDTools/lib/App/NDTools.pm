@@ -17,11 +17,11 @@ App::NDTools - Command line tools for nested structures
 
 =head1 VERSION
 
-Version 0.6.2
+Version 0.6.3
 
 =cut
 
-our $VERSION = "0.6.2";
+our $VERSION = "0.6.3";
 
 =head1 DESCRIPTION
 
@@ -100,7 +100,7 @@ L<Struct::Diff>, L<Struct::Path>, L<Struct::Path::PerlStyle>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Michael Samoglyadov
+Copyright 2016-2019 Michael Samoglyadov
 
  This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software

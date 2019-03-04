@@ -1,5 +1,5 @@
 {
-   "abstract" : "Add 32nd, 64th and tuple durations to MIDI-Perl",
+   "abstract" : "Add 32nd, 64th and tuplet durations to MIDI-Perl",
    "author" : [
       "Gene Boggs <gene@cpan.org>"
    ],
@@ -60,7 +60,7 @@
          "web" : "https://github.com/ology/Music-Duration"
       }
    },
-   "version" : "0.0602",
+   "version" : "0.0605",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -300,6 +300,7 @@
                      "sixtyfourth",
                      "th",
                      "thirtysecond",
+                     "tuplet",
                      "tx",
                      "txn",
                      "ty",
@@ -460,6 +461,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

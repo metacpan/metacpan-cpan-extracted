@@ -4,16 +4,41 @@ use warnings;
 use strict; 
 
 use Carp;
+use Try::Tiny;
+use Scalar::Util qw(blessed);
 
 # ABSTRACT: Plugin to check Phone numbers (basic check)
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 
 sub check {
-    my ($class, $value) = @_;
+    my ($class, $value, $config) = @_;
     
     croak "no value to check" unless defined $value;
+
+    if ( $config && $config->{country} ) {
+        my $country = $config->{country};
+        my $return = 0;
+        my $number;
+        my $error;
+
+        require 'Number/Phone.pm';
+
+        try {
+            $number = Number::Phone->new( $country, $value );
+
+            return if !blessed $number;
+
+            $error = 'No support for ' . $country if $number->isa('Number::Phone::StubCountry');
+
+            $return = 1;
+        };
+
+        croak $error if $error;
+
+        return $return;
+    }
     
     my $return = 0;
     $value =~ s/\s//g;
@@ -30,13 +55,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Validate::WithYAML::Plugin::Phone - Plugin to check Phone numbers (basic check)
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

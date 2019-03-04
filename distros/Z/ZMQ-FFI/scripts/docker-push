@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+version=$1
+
+if [ -z "$version" ]; then
+    echo "docker-push <version>"
+    exit 1
+fi
+
+for t in $version latest ubuntu; do
+    docker push calid/zmq-ffi-testenv:$t
+done

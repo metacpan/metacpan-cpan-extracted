@@ -1,13 +1,13 @@
 [
    {
-      "Edit" : [
+      "Edit": [
          {
-            "id" : "edit_settings",
-            "label" : "Settings"
+            "id": "edit_settings",
+            "label": "Settings"
          },
          {
-            "id" : "edit_find",
-            "label" : "Find"
+            "id": "edit_find",
+            "label": "Find"
          }
       ]
    }

@@ -1,3 +1,9 @@
+1.03	2019-03-03
+
+	Other
+	* Use Class::Accessor instead of Class::XSAccessor to remove
+	  dependencies from XS modules.
+
 1.02	2015-12-28
 	Other
 	* Add link to git repository

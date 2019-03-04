@@ -14,10 +14,9 @@ unless (
     exit;
 }
 
-
 {
     my $builder = DateTime::Format::Builder->new();
-    my $parser = $builder->parser( { strptime => '%Y-%m-%d' } );
+    my $parser  = $builder->parser( { strptime => '%Y-%m-%d' } );
 
     memory_cycle_ok(
         $parser,

@@ -54,8 +54,8 @@ class V8Context {
         HV* stats;
         HV* msgs;
         long pagesize_bytes;
-        size_t max_allocated_bytes;  // unused for now
-        double max_timeout_us;       // unused for now
+        size_t max_allocated_bytes;  /* unused for now */
+        double max_timeout_us;       /* unused for now */
 
         static uint64_t GetTypeFlags(const Local<Value>& v);
     private:

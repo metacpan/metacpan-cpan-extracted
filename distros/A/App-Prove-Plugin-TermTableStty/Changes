@@ -1,4 +1,12 @@
 Revision history for App-Prove-Plugin-TermTableStty
 
+0.03      2019-03-03 12:30:58 -0500
+  - Use POSIX compliant script for mock stty.
+    Should fix test fail on FreeBSD and others.
+    (gh#1, gh#2)
+
+0.02      2019-03-03 08:12:35 -0500
+  - Add configure time check for stty command.
+
 0.01      2018-12-06 20:37:27 -0500
   - initial version

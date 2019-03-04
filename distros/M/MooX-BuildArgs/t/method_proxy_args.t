@@ -1,8 +1,12 @@
 #!/usr/bin/env perl
+use 5.008001;
+use strictures 2;
 use Test2::V0;
 
 {
     package Foo;
+    use strictures 2;
+
     use Moo;
     with 'MooX::MethodProxyArgs';
     has bar => ( is=>'ro' );

@@ -1,19 +1,19 @@
 [
    {
-      "modname" : "Remove",
-      "path" : [
+      "modname": "Remove",
+      "path": [
          "[1]{Edit}[5]"
       ]
    },
    {
-      "modname" : "Remove",
-      "path" : [
+      "modname": "Remove",
+      "path": [
          "[1]{Edit}[3]"
       ]
    },
    {
-      "modname" : "Remove",
-      "path" : [
+      "modname": "Remove",
+      "path": [
          "[1]{Edit}[1]"
       ]
    }

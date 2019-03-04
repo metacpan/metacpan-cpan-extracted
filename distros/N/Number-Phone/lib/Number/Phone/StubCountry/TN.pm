@@ -22,60 +22,53 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '[2-57-9]',
+                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          (?:
-            (?:
-              3[0-2]|
-              7\\d
-            )\\d{3}|
-            81200
-          )\\d{3}
-        ',
-                'specialrate' => '(8[12]10\\d{4})|(88\\d{6})',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            (?:
-              3[0-2]|
-              7\\d
-            )\\d{3}|
-            81200
-          )\\d{3}
-        ',
-                'toll_free' => '8010\\d{4}',
-                'voip' => '',
                 'mobile' => '
+          3(?:
+            001|
+            [12]40
+          )\\d{4}|
           (?:
             (?:
               [259]\\d|
               4[0-6]
-            )\\d\\d|
+            )\\d|
             3(?:
-              001|
-              1(?:
-                [1-35]\\d|
-                40
-              )|
-              240|
-              (?:
-                6[0-4]|
-                91
-              )\\d
+              1[1-35]|
+              6[0-4]|
+              91
             )
-          )\\d{4}
+          )\\d{5}
         ',
-                'pager' => ''
+                'geographic' => '
+          81200\\d{3}|
+          (?:
+            3[0-2]|
+            7\\d
+          )\\d{6}
+        ',
+                'pager' => '',
+                'specialrate' => '(8[12]10\\d{4})|(88\\d{6})',
+                'voip' => '',
+                'fixed_line' => '
+          81200\\d{3}|
+          (?:
+            3[0-2]|
+            7\\d
+          )\\d{6}
+        ',
+                'toll_free' => '8010\\d{4}',
+                'personal_number' => ''
               };
 my %areanames = (
   21670 => "Ben\ Arous",

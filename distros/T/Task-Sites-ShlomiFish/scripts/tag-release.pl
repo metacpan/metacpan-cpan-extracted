@@ -17,7 +17,7 @@ if (!defined ($version))
 }
 
 my @cmd = (
-    "hg", "tag", "-m",
+    "git", "tag", "-m",
     "Tagging the Task-Sites-ShlomiFish release as $version",
     "Perl/Task-Sites-ShlomiFish/releases/$version",
 );

@@ -22,44 +22,33 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{3})',
                   'format' => '$1-$2',
                   'leading_digits' => '
             [2-6]|
             7[014]|
             8[05]
-          '
+          ',
+                  'pattern' => '(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
+                  'pattern' => '(\\d{4})(\\d{3})',
+                  'format' => '$1 $2'
+                },
+                {
                   'format' => '$1 $2',
                   'leading_digits' => '
             7[578]|
             8
-          '
-                },
-                {
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{4})(\\d{3})'
+          ',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            2\\d|
-            3[1-8]|
-            4[1-4]|
-            [56]0|
-            7[0149]|
-            8[05]
-          )\\d{3}
-        ',
-                'toll_free' => '0800\\d{3}',
                 'fixed_line' => '
           (?:
             2\\d|
@@ -70,15 +59,26 @@ my $validators = {
             8[05]
           )\\d{3}
         ',
-                'specialrate' => '',
+                'toll_free' => '0800\\d{3}',
                 'personal_number' => '',
+                'geographic' => '
+          (?:
+            2\\d|
+            3[1-8]|
+            4[1-4]|
+            [56]0|
+            7[0149]|
+            8[05]
+          )\\d{3}
+        ',
+                'pager' => '',
                 'mobile' => '
           (?:
             7[578]|
             8[46-9]
           )\\d{5}
         ',
-                'pager' => '',
+                'specialrate' => '',
                 'voip' => ''
               };
 

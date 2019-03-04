@@ -1,0 +1,1 @@
+{"name":"Gtk3","dist":"Gtk3-0.034","target":"Gtk3","version":0.034,"pathname":"X/XA/XAOC/Gtk3-0.034.tar.gz","provides":{"Gtk3::Gdk::EventMask":{"file":"lib/Gtk3.pm","version":0.034},"Gtk3":{"file":"lib/Gtk3.pm","version":0.034}}}

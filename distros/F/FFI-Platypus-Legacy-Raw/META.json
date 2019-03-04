@@ -40,8 +40,8 @@
       },
       "runtime" : {
          "requires" : {
-            "FFI::Build" : "0.83",
-            "FFI::Platypus" : "0.83",
+            "FFI::Build" : "0.86",
+            "FFI::Platypus" : "0.86",
             "Ref::Util" : "0",
             "perl" : "5.008001"
          }
@@ -67,7 +67,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Alessandro Ghedini (ghedo, ALEXBIO)",
       "Graham Ollis <plicease@cpan.org>",
@@ -77,8 +77,8 @@
       "David Steinbrunner (dsteinbrunner)",
       "Olivier Mengu\u00e9 (DOLMEN)"
    ],
-   "x_generated_by_perl" : "v5.29.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
    "x_use_unsafe_inc" : 0
 }
 

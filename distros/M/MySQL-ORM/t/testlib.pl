@@ -6,6 +6,9 @@ use File::Which;
 use File::Path 'remove_tree';
 
 use constant DBNAME => 'testmysqlorm';
+use constant DBNAME_FK => 'testmysqlorm_fk';
+
+my $MysqlHost = "localhost";
 
 sub get_dbh {
 
@@ -17,6 +20,7 @@ sub get_dbh {
 	};
 
 	if ($@) {
+	    $MysqlHost = "127.0.0.1";
 		$dbh = DBI->connect( 'dbi:mysql:host=127.0.0.1',
 			'root', undef, { RaiseError => 1, PrintError => 0 } );
 	};
@@ -62,7 +66,7 @@ sub get_mysql_cmdline {
 
 	my $cmd = 'mysql ';
 	$cmd .= '-u root ';
-	$cmd .= '-h localhost ';
+	$cmd .= "-h $MysqlHost ";
 	$cmd .= '-D testmysqlorm ';
 
 	return $cmd;
@@ -71,8 +75,11 @@ sub get_mysql_cmdline {
 sub drop_db {
 
 	my $dbh = get_dbh();
-	$dbh->do("drop database if exists testmysqlorm");
-	verbose("dropped testmysqlorm");
+	$dbh->do("drop database if exists " . DBNAME);
+	verbose("dropped " . DBNAME);
+	
+	$dbh->do("drop database if exists " . DBNAME_FK);
+	verbose("dropped " . DBNAME_FK);
 }
 
 sub verbose {
@@ -85,7 +92,8 @@ sub verbose {
 sub load_db {
 
 	my $dbh = get_dbh();
-	$dbh->do("create database testmysqlorm");
+	$dbh->do("create database " . DBNAME);
+	$dbh->do("create database " . DBNAME_FK);
 
 	my $cmd = get_mysql_cmdline();
 
@@ -105,7 +113,7 @@ sub load_db {
 	$cmd = sprintf( "%s < %s", get_mysql_cmdline(), $file );
 	sysprint($cmd);
 
-	verbose("loaded testmysqlorm");
+	verbose("loaded " . DBNAME);
 }
 
 sub sysprint {

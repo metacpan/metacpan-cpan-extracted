@@ -1,0 +1,1 @@
+{"target":"Role::Tiny","name":"Role::Tiny","version":2.000006,"pathname":"H/HA/HAARG/Role-Tiny-2.000006.tar.gz","dist":"Role-Tiny-2.000006","provides":{"Role::Tiny":{"version":2.000006,"file":"lib/Role/Tiny.pm"},"Role::Tiny::With":{"file":"lib/Role/Tiny/With.pm","version":2.000006}}}

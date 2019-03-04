@@ -4,9 +4,11 @@ author:
   - 'Ian Kluft <cpan-dev@iankluft.com>'
 build_requires:
   Data::Dumper: '0'
+  Module::Build: '0.28'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010'
 license: apache
@@ -14,6 +16,9 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: PiFlash
+no_index:
+  directory:
+    - inc
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -34,5 +39,5 @@ requires:
 resources:
   homepage: https://github.com/ikluft/piflash
   repository: https://github.com/ikluft/piflash.git
-version: 0.1.0
+version: 0.2.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

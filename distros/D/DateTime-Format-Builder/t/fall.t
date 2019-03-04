@@ -6,7 +6,7 @@ use Test::More;
 use DateTime::Format::Builder;
 
 SKIP: {
-    my @three = map { "DateTime::Format::$_" } qw( HTTP Mail IBeat );
+    my @three = map {"DateTime::Format::$_"} qw( HTTP Mail IBeat );
     my @fails;
     for my $mod (@three) {
         eval "require $mod";
@@ -15,13 +15,13 @@ SKIP: {
     skip "@fails not installed.", 3 if @fails;
 
     eval qq|package DateTime::Format::Fall;|
-        . join( "", map { "use $_;\n" } @three ) . q|
+        . join( "", map {"use $_;\n"} @three ) . q|
         use DateTime::Format::Builder (
         parsers => { parse_datetime => [
         |
         . join(
         "",
-        map { qq|sub { eval { $_->parse_datetime( \$_[1] ) } },\n| } @three
+        map {qq|sub { eval { $_->parse_datetime( \$_[1] ) } },\n|} @three
         )
         . q|
         ]});

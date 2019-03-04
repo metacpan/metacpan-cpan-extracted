@@ -1,5 +1,5 @@
 package Task::BeLike::SHLOMIF;
-$Task::BeLike::SHLOMIF::VERSION = '0.0.3';
+$Task::BeLike::SHLOMIF::VERSION = '0.0.4';
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ Task::BeLike::SHLOMIF - Be like SHLOMIF / Shlomi Fish.
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 TASK CONTENTS
 
@@ -37,12 +37,44 @@ version 0.0.3
 
 =head3 L<Test::Pod>
 
+=head2 Favourite Apps
+
+=head3 L<App::Countdown>
+
+=head3 L<App::CSV2Chart>
+
+=head3 L<App::Deps::Verify>
+
+=head3 L<App::Du::Analyze>
+
+=head3 L<App::Gezer>
+
+=head3 L<App::Git::Info>
+
+=head3 L<App::Nopaste>
+
+=head3 L<App::Notifier::Client>
+
+=head3 L<App::Notifier::Service>
+
+=head3 L<App::Sky>
+
+=head3 L<App::Timestamper>
+
+=head3 L<App::Timestamper::Format>
+
+=head3 L<App::intrunningsum>
+
+=head3 L<App::intsum>
+
+=head3 L<App::stopw>
+
 Removed: pkg Term::ReadLine::Perl5 - not compatible with bleadperl/etc. -
 see https://github.com/rocky/p5-Term-ReadLine-Perl5/issues/18 .
 
 =head1 VERSION
 
-version 0.0.3
+version 0.0.4
 
 =head1 AUTHOR
 

@@ -22,32 +22,42 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223705;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             [1-6]|
             7[24-68]
           ',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3,4})'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1',
                   'leading_digits' => '7',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'pager' => '',
                 'mobile' => '7[0137]\\d{7}',
+                'geographic' => '
+          17\\d{6}|
+          (?:
+            [12][2-68]|
+            3[2358]|
+            4[2-58]|
+            5[2-6]|
+            6[3-58]|
+            7[24-68]
+          )\\d{5}
+        ',
+                'pager' => '',
                 'specialrate' => '',
-                'personal_number' => '',
+                'voip' => '',
                 'fixed_line' => '
           17\\d{6}|
           (?:
@@ -60,17 +70,7 @@ my $validators = {
           )\\d{5}
         ',
                 'toll_free' => '',
-                'geographic' => '
-          17\\d{6}|
-          (?:
-            [12][2-68]|
-            3[2358]|
-            4[2-58]|
-            5[2-6]|
-            6[3-58]|
-            7[24-68]
-          )\\d{5}
-        '
+                'personal_number' => ''
               };
 
     sub new {

@@ -11,7 +11,7 @@ use DateTime::Format::Builder::Parser;
         sub { $_[1] . $x }
     };
     my @cbs = ( map { $new_sub->($_) } qw( a b c d e f g ) );
-    my $cb = DateTime::Format::Builder::Parser->merge_callbacks(@cbs);
+    my $cb  = DateTime::Format::Builder::Parser->merge_callbacks(@cbs);
     is( $cb->( input => "x" ) => "xabcdefg", "Callback chaining works." );
 
     my $cbr = DateTime::Format::Builder::Parser->merge_callbacks( \@cbs );
@@ -23,7 +23,7 @@ use DateTime::Format::Builder::Parser;
 
 {
     my $inout = sub { $_[0] . "foo" };
-    my $cb = DateTime::Format::Builder::Parser->merge_callbacks($inout);
+    my $cb    = DateTime::Format::Builder::Parser->merge_callbacks($inout);
     is( $cb->("foo") => "foofoo", "Single callback works." );
 }
 

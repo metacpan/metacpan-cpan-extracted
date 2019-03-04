@@ -1,13 +1,13 @@
 ---
 abstract: 'Perl interface to USB Test & Measurement (USBTMC) backend.'
 author:
-  - 'Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>'
+  - 'Simon Reinhardt <simon.reinhardt@physik.uni-r.de>'
 build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/lab-measurement/USB-TMC/issues
   homepage: http://www.labmeasurement.de/
   repository: https://github.com/lab-measurement/USB-TMC.git
-version: '0.007'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.009'
+x_serialization_backend: 'YAML::Tiny version 1.70'

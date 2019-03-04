@@ -19,7 +19,7 @@ use warnings;
 use Carp;
 use Iterator::Simple qw( is_iterator );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 #------------------------------------------------------------------------------
 

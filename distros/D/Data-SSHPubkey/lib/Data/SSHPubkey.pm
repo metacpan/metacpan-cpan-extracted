@@ -14,9 +14,12 @@ use Carp qw(croak);
 
 require Exporter;
 our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(&pubkeys);
+our @EXPORT_OK = qw(&pubkeys %ssh_pubkey_types);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
+
+our %ssh_pubkey_types;
+@ssh_pubkey_types{qw(ecdsa ed25519 rsa PEM PKCS8 RFC4716)} = ();
 
 sub pubkeys {
     my ($input) = @_;
@@ -27,18 +30,18 @@ sub pubkeys {
         if ( $line =~ m{^(-----BEGIN RSA PUBLIC KEY-----)} ) {
             my $key = $1;
             my ( $ok, $data ) = _until_end( $fh, '-----END RSA PUBLIC KEY-----' );
-            croak "could not parse PEM pubkey" unless $ok;
+            croak "could not parse PEM pubkey: $data" unless defined $ok;
             push @keys, [ 'PEM', $key . $/ . $data ];
         } elsif ( $line =~ m{^(-----BEGIN PUBLIC KEY-----)} ) {
             my $key = $1;
             my ( $ok, $data ) = _until_end( $fh, '-----END PUBLIC KEY-----' );
-            croak "could not parse PKCS8 pubkey" unless $ok;
+            croak "could not parse PKCS8 pubkey: $data" unless defined $ok;
             push @keys, [ 'PKCS8', $key . $/ . $data ];
 
         } elsif ( $line =~ m{^(---- BEGIN SSH2 PUBLIC KEY ----)} ) {
             my $key = $1;
             my ( $ok, $data ) = _until_end( $fh, '---- END SSH2 PUBLIC KEY ----' );
-            croak "could not parse RFC4716 pubkey" unless $ok;
+            croak "could not parse RFC4716 pubkey: $data" unless defined $ok;
             push @keys, [ 'RFC4716', $key . $/ . $data ];
         } elsif (
             # long enough for a RSA 4096-bit key, a bit too genereous
@@ -54,9 +57,9 @@ sub pubkeys {
     return \@keys;
 }
 
-# KLUGE this will very likely need changes depending on what clients in
-# the while send in with this format, as I really only deal with OpenSSH
-# type keys and not this form (e.g. skip Comment: or such fields?)
+# this (probably incorrectly) enforces RFC 4716 parsing on all of the
+# multiline formats so may not be correct for the other two formats,
+# though attempts are made at supporting them
 sub _until_end {
     my ( $fh, $fin ) = @_;
     my $ok;
@@ -67,9 +70,49 @@ sub _until_end {
             $ok = 1;
             last;
         }
-        if ( $line =~ m/^(.{1,80})$/ ) {    # TODO tighten this up...
-            $ret .= $1 . $/;
+
+        # RFC 4716 "implementations SHOULD be prepared to read files
+        # using any of the common line termination sequence[s]"
+        $line =~ s/(\012|\015|\015\012)$//;
+
+        # RFC 4716 "line[s] ... MUST NOT be longer than 72 8-bit bytes
+        # excluding line termination characters" (TODO bytes vs. characters)
+        return undef, "line $. too long" if length $line > 72;
+
+        # RFC 4716 ignore "key file header" fields as this code pretends
+        # that it cannot recognize any
+        if ( $line =~ m/:/ ) {
+            if ( $line =~ m/\\$/ ) {
+                do {
+                    $line = readline $fh;
+                    return undef, "continued to EOF" if eof $fh;
+                    $line =~ s/(\012|\015|\015\012)$//;
+                    return undef, "cline $. too long" if length $line > 72;
+                } until $line !~ m/\\$/;
+            }
+            next;
         }
+
+        # RFC 4253 section 6.6 indicates there can be a "signature
+        # format identifier"; those are KLUGE not supported by this
+        # module as I don't know what that specific encoding looks like.
+        # go with a sloppy Base64ish match, meanwhile, as that is what
+        # OpenSSH generates as output
+        if ( $line =~ m{^([A-Za-z0-9+/=]{1,72})$} ) {
+            $ret .= $1 . $/;
+            next;
+        }
+
+        # support RFC 822 by way of RFC 1421 PEM header extensions that
+        # begin with leading whitespace (sloppy, should only happen for
+        # header lines)
+        next if $line =~ m{^[ \t]};
+
+        # support RFC 1421 PEM blank line (poorly, as all blank lines
+        # are ignored)
+        next if $line =~ m{^$};
+
+        return undef, "fell off end of parser at line $.";
     }
     return $ok, $ret;
 }
@@ -95,15 +138,29 @@ Data::SSHPubkey - utility function to parse SSH public keys with
 
 C<Data::SSHPubkey> parses SSH public keys, or at least some of those
 supported by C<ssh-keygen(1)>. It may be prudent to check any uploaded
-data with C<ssh-keygen> though this module should help extract that from
-web form upload data or the like to get to that step.
+data with C<ssh-keygen> though this module should help extract said data
+from a web form upload or the like to get to that step.
 
-Currently supported public key types:
+Currently supported public key types (the possible values that C<$type>
+above may contain):
 
   ecdsa ed25519 rsa
   PEM PKCS8 RFC4716
 
 Neither SSH1 keys nor SSH2 DSA keys are supported.
+
+The C<$pubkey> data will not include any tailing comments; those are
+stripped. The C<$pubkey> data will not end with a newline; that must
+be added by your software as necessary when writing out the public
+keys. POSIX mandates an ultimate newline, and the shell C<read>
+command is buggy by default if that ultimate newline is missing:
+
+  $ (echo data; echo -n loss) | while read line; do echo $line; done
+
+Inner newlines for the multiline SSH public key types (C<PEM>, C<PKCS8>,
+and C<RFC4716>) will be standardized to the C<$/> variable. This may
+cause problems if C<ssh-keygen(1)> or equivalent on some platform
+demands a specific newline sequence that is not C<$/>.
 
 =head1 SUBROUTINE
 
@@ -120,9 +177,14 @@ be due to the data passed in by the caller, or possibly the system has
 run out of memory, or something.
 
 The return format is a reference to a list of C<[ $type, $pubkey ]>
-lists.
+sublists.
 
 =back
+
+=head1 VARIABLE
+
+The C<%Data::SSHPubkey::ssh_pubkey_types> hash contains as its keys the
+SSH public key types supported by this module.
 
 =head1 BUGS
 
@@ -138,20 +200,50 @@ L<https://github.com/thrig/Data-SSHPubkey>
 
 =head2 Known Issues
 
-Probably not enough guards or checks against hostile input (too much
-data, etc).
+Probably not enough guards or checks against hostile input (too many
+lines of input, for one).
 
-Support for the
+Support for the C<PEM> and especially C<PKCS8> formats is a bit sloppy,
+and the base64 matching is done by a regex that may accept data that is
+not valid base64.
 
-  PEM PKCS8 RFC4716
+Support for various RFC 4253 formats is likely lacking (see below or
+the comments in the code).
 
-key types is pretty weak and needs improvement.
+More tests are necessary for more edge cases.
+
+If the input uses fancy encodings (where fancy is anything not ASCII)
+lines longer than 72 8-bit bytes may be accepted. Something like
+C<read_binary> from L<File::Slurper> should avoid this case as the key
+data is a subset of ASCII (header values or comments that are ignored by
+this module could be UTF-8 or possibly anything else).
 
 =head1 SEE ALSO
 
 L<Config::OpenSSH::Authkey> - older module more aimed at management of
 C<~/.ssh/authorized_keys> data and not specifically public keys. It does
 have support for SSH2 DSA or SSH1 keys, though.
+
+=over 4
+
+=item RFC 822
+
+Definition of white space used in various formats C<[ \t]>.
+
+=item RFC 1421
+
+PEM format details.
+
+=item RFC 4253
+
+Mentioned by RFC 4716 but it is unclear to me what the section 6.6
+"Public Key Algorithms" formats exactly are.
+
+=item RFC 4716
+
+Secure Shell (SSH) public key file format.
+
+=back
 
 =head1 AUTHOR
 

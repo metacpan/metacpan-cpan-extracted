@@ -1,5 +1,7 @@
 use strict;
 use Test::More 0.98 tests => 2;
+use Test::More::UTF8;
+
 use File::Share 'dist_dir';
 my $dir = dist_dir('Data-Pokemon-Go');
 

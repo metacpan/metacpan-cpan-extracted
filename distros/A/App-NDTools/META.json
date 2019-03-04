@@ -58,7 +58,7 @@
             "Storable" : "0",
             "Struct::Diff" : "0.97",
             "Struct::Diff::MergePatch" : "0.01",
-            "Struct::Path" : "0.81",
+            "Struct::Path" : "0.83",
             "Struct::Path::PerlStyle" : "0.9",
             "Term::ANSIColor" : "0",
             "perl" : "5.01"
@@ -71,5 +71,5 @@
          "url" : "https://github.com/mr-mixas/NDTools"
       }
    },
-   "version" : "v0.6.2"
+   "version" : "v0.6.3"
 }

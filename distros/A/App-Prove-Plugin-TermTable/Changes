@@ -1,5 +1,8 @@
 Revision history for App-Prove-Plugin-TermTable
 
+0.03      2019-03-03 08:07:32 -0500
+  - Update platform fail diagnostic.
+
 0.02      2018-05-13 15:07:09 -0400
   - first CPAN release
 

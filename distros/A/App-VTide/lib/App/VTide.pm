@@ -17,7 +17,7 @@ use App::VTide::Hooks;
 use Path::Tiny;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.7');
+our $VERSION = version->new('0.1.8');
 
 has config => (
     is      => 'rw',
@@ -50,7 +50,7 @@ sub run {
             },
             auto_complete => sub {
                 my ($option, $auto, $errors) = @_;
-                my $sub_command = $option->cmd;
+                my $sub_command = $option->files->[0] || '';
                 if ( $sub_command eq '--' ) {
                     print join ' ', sort @sub_commands;
                     return;
@@ -69,6 +69,23 @@ sub run {
                 } or do {
                     print join ' ', grep {/$sub_command/xms} sort @sub_commands;
                 }
+            },
+            auto_complete_shortener => sub {
+                my ($getopt, @args) = @_;
+                my $sub_command = shift @args || '';
+
+                if ( grep {/^$sub_command./} @sub_commands ) {
+                    $getopt->cmd($sub_command);
+                }
+                elsif ( ! $self->sub_commands->{$sub_command} ) {
+                    $getopt->cmd( $ENV{VTIDE_DIR} ? 'edit' : 'start' );
+                    unshift @args, $sub_command;
+                }
+                else {
+                    $getopt->cmd($sub_command) if ! $getopt->cmd;
+                }
+
+                return @args;
             },
             sub_command   => $self->sub_commands,
             help_package  => __PACKAGE__,
@@ -167,7 +184,7 @@ App::VTide - A vim/tmux based IDE for the terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide version 0.1.7
+This documentation refers to App::VTide version 0.1.8
 
 =head1 SYNOPSIS
 

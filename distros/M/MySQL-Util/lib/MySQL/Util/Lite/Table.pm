@@ -123,7 +123,7 @@ method get_primary_key () {
 	if ($pk_name) {
 		return MySQL::Util::Lite::PrimaryKey->new(
 			name => $pk_name,
-			table_name => $self->name,
+			table_name => $self->get_fq_name,
 			_util => $self->_util,
 			);			
 	}	
@@ -154,7 +154,7 @@ method get_columns {
 method _build_columns{
 
 	my @cols;
-	my $aref = $self->_util->describe_table( $self->name );
+	my $aref = $self->_util->describe_table( $self->get_fq_name );
 	foreach my $col (@$aref) {
 
 		push @cols, $self->new_column($col);

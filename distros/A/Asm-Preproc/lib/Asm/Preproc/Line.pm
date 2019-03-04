@@ -15,7 +15,7 @@ Asm::Preproc::Line - One line of text retrieved from the input
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 #------------------------------------------------------------------------------
 
@@ -66,23 +66,21 @@ Creates an identical copy as a new object.
 =cut
 
 #------------------------------------------------------------------------------
-use Class::XSAccessor::Array {
-	accessors 		=> {
-		text		=> 0,
-		file		=> 1,
-		line_nr		=> 2,
-	},
-};
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
+		'text',
+		'file',
+		'line_nr',
+	);
 
 sub new { 
-	#my($class, $text, $file, $line_nr) = @_;
-	my $class = shift;
-	bless [@_], $class;
+	my($class, $text, $file, $line_nr) = @_;
+	bless {text => $text, file => $file, line_nr => $line_nr}, $class;
 }
 
 sub clone {
 	my $self = shift;
-	bless [@$self], ref($self);
+	bless {%$self}, ref($self);
 }
 
 #------------------------------------------------------------------------------

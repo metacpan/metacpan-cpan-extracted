@@ -12,7 +12,7 @@ use overload
   'bool' => \&_bool;
 
 # ABSTRACT: Perl bindings to the portable FFI library (libffi)
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 sub _bool {
   my $ffi = shift;
@@ -169,7 +169,7 @@ FFI::Platypus::Legacy::Raw - Perl bindings to the portable FFI library (libffi)
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

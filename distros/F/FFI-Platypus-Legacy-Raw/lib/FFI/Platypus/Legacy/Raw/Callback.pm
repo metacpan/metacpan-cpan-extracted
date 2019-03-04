@@ -6,7 +6,7 @@ use FFI::Platypus::Memory qw( strdup free );
 use FFI::Platypus::Legacy::Raw::Platypus;
 
 # ABSTRACT: FFI::Platypus::Legacy::Raw function pointer type
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub new
@@ -78,7 +78,7 @@ FFI::Platypus::Legacy::Raw::Callback - FFI::Platypus::Legacy::Raw function point
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

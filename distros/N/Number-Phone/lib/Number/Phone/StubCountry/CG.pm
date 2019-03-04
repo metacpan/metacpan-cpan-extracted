@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
                 {
@@ -31,31 +31,31 @@ my $formatters = [
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '[02]',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'leading_digits' => '8',
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '8'
+                  'leading_digits' => '[02]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '222[1-589]\\d{5}',
-                'personal_number' => '',
                 'specialrate' => '(
           80(?:
             0\\d\\d|
             11[0-4]
           )\\d{4}
         )',
-                'geographic' => '222[1-589]\\d{5}',
-                'toll_free' => '',
                 'voip' => '',
                 'mobile' => '0[14-6]\\d{7}',
-                'pager' => ''
+                'pager' => '',
+                'geographic' => '222[1-589]\\d{5}',
+                'toll_free' => '',
+                'personal_number' => '',
+                'fixed_line' => '222[1-589]\\d{5}'
               };
 my %areanames = (
   2422221 => "Cuvette",

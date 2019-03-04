@@ -1,10 +1,14 @@
 package DateTime::Format::Builder::Tutorial;
 
+our $VERSION = '0.82';
+
 # ABSTRACT: Quick class on using Builder
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -12,7 +16,7 @@ DateTime::Format::Builder::Tutorial - Quick class on using Builder
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 CREATING A CLASS
 
@@ -140,7 +144,7 @@ I<set_time_zone> method, or I<time_zone> argument.
 But how to get this scrap of code into your parser? You
 might be tempted to call the parser something else and build
 a small wrapper. There's no need though because an option is
-provided for preprocesing dates:
+provided for preprocessing dates:
 
     parse_datetime => [
         [ preprocess => \&_parse_tz ], # Only changed line!
@@ -295,17 +299,6 @@ writing the replacement) can be found in the F<examples>
 directory of the Builder distribution, along with similar
 variants of other common modules.
 
-=head1 SUPPORT
-
-Any errors you see in this document, please log them with
-CPAN RT system via the web or email:
-
-    http://perl.dellah.org/rt/dtbuilder
-    bug-datetime-format-builder@rt.cpan.org
-
-This makes it much easier for me to track things and thus means
-your problem is less likely to be neglected.
-
 =head1 LICENSE AND COPYRIGHT
 
 Copyright E<copy> Iain Truskett, 2003. All rights reserved.
@@ -324,6 +317,25 @@ http://datetime.perl.org/
 
 L<perl>, L<DateTime>, L<DateTime::Format::Builder>
 
+=head1 SUPPORT
+
+Any errors you see in this document, please log them with
+CPAN RT system via the web or email:
+
+    http://perl.dellah.org/rt/dtbuilder
+    bug-datetime-format-builder@rt.cpan.org
+
+This makes it much easier for me to track things and thus means
+your problem is less likely to be neglected.
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime-Format-Builder can be found at L<https://github.com/houseabsolute/DateTime-Format-Builder>.
+
 =head1 AUTHORS
 
 =over 4
@@ -340,10 +352,13 @@ Iain Truskett
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

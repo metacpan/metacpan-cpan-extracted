@@ -15,13 +15,15 @@ use Data::Pokemon::Go::Skill;
 my $skill = Data::Pokemon::Go::Skill->new();
 
 my $all = {};
+our @All = ();
 foreach my $region (qw|Kanto Johto Hoenn Alola Sinnoh|){
     my $data = YAML::XS::LoadFile("$dir/$region.yaml");
-    map{ $data->{$_}{'name'} = $_ } keys %$data;
-    %$all = ( %$all, %$data );
+    map{
+        $all->{ $_->{'Name'}{'ja'} } = $_;
+        push @All, $_->{'Name'}{'ja'};
+    } @$data;
 }
 
-our @All = map{ $_->{name} } sort{ $a->{ID} cmp $b->{ID} } values %$all;
 enum 'PokemonName' => \@All;
 has name => ( is => 'rw', isa => 'PokemonName' );
 

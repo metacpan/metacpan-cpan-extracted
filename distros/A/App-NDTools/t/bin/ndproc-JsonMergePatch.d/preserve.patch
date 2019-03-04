@@ -1,10 +1,10 @@
 {
-   "false" : true,
-   "list" : [
+   "false": true,
+   "list": [
       true,
       true,
       false,
       false
    ],
-   "true" : false
+   "true": false
 }

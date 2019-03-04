@@ -46,6 +46,20 @@ for my $name (sort keys %{$ndproc->{MODS}}) {
     }};
     like($out, qr/\d+\.\d+.*/, "$name: version must be a number");
     is($err, '', "$name: STDOUT must remain empty for --version");
+
+    # each module should have this options
+    my $opts = { $ndproc->{MODS}->{$name}->new()->arg_opts() };
+    for (qw(
+        blame!
+        cond=s@
+        help|h
+        path=s@
+        preserve=s@
+        version|V
+    )) {
+        next if ($_ eq 'path=s@' and $name eq 'Merge'); # has it's own format
+        ok(exists $opts->{$_}, "Common opt '$_' missing in module $name");
+    }
 }
 
-done_testing(keys(%{$ndproc->{MODS}}) * 7);
+done_testing(keys(%{$ndproc->{MODS}}) * 13 - 1);

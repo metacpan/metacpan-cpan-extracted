@@ -1,6 +1,6 @@
 {
-   "ifmt" : null,
-   "ofmt" : "JSON",
-   "pretty" : 1,
-   "verbose" : 0
+   "ifmt": null,
+   "ofmt": "JSON",
+   "pretty": 1,
+   "verbose": 0
 }

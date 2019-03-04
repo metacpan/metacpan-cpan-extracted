@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Base FFI::Platypus::Legacy::Raw pointer type
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub new {
@@ -26,7 +26,7 @@ FFI::Platypus::Legacy::Raw::Ptr - Base FFI::Platypus::Legacy::Raw pointer type
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

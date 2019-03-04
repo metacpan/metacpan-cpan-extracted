@@ -1,6 +1,6 @@
 package Tcl::pTk::DragDrop::Rect;
 
-our ($VERSION) = ('0.95');
+our ($VERSION) = ('0.96');
 
 use strict;
 use Carp;

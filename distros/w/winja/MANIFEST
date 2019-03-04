@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/winja.pm
+lib/winja/JP.pod
+t/00-load.t
+t/01-os_check.t
+t/02-cwd.t
+t/03-filespec.t
+t/04-specfunctions.t
+t/05-basename.t
+t/lib/Util.pm
+META.yml
+MANIFEST

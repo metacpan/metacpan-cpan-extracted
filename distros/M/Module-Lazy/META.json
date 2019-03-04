@@ -23,7 +23,8 @@
       "build" : {
          "requires" : {
             "Test::Exception" : "0.03",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Warn" : "0.32"
          }
       },
       "configure" : {
@@ -48,7 +49,7 @@
          "web" : "https://github.com/dallaylaen/module-lazy-perl"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

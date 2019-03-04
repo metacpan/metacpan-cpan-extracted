@@ -1,5 +1,14 @@
 Change log for PiFlash
 
+0.2.0 2019-03-03T22:56:17-08:00 America/Los_Angeles
+ [BUG FIXES]
+ - require Linux platform to build or test, in response to reports of
+   automated tests failing on unsupported FreeBSD
+
+ [MINOR]
+ - change Dist::Zilla configuration to use ModuleBuild instead of
+   ExtUtils::MakeMaker
+
 0.1.0 2019-02-28T11:45:04-08:00 America/Los_Angeles
  [DOCS]
  - Updated installation package dependencies for RPM & DEB systems

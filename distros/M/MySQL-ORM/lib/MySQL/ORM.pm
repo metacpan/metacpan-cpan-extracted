@@ -9,7 +9,7 @@ use Data::Printer alias => 'pdump';
 use SQL::Abstract::Complete;
 use MySQL::Util::Lite;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -36,6 +36,13 @@ has dbh => (
 		my $self = shift;
 		$self->dbh->{FetchHashKeyName} = 'NAME_lc';
 	}
+);
+
+has schema_name => (
+    is => 'ro',
+    isa => 'Str',
+    lazy => 1,
+    builder => '_build_schema_name'
 );
 
 
@@ -105,9 +112,11 @@ method select (
 	if ($order_by) {
 		$other->{order_by} = $order_by;
 	}
+	
+	my $fq_table = $self->_fq_table($table);
 
 	my ( $stmt, @bind ) =
-	  $self->_sql->select( $table, $columns, $where, $other );
+	  $self->_sql->select( $fq_table, $columns, $where, $other );
 	$stmt .= " for update" if $for_update;
 	$stmt =~ s/^select/select distinct/ if $distinct;
 
@@ -162,7 +171,9 @@ method select_one (
 method delete (Str     :$table!,
                HashRef :$where) {
 
-	my ( $stmt, @bind ) = $self->_sql->delete( $table, $where );
+    my $fq_table = $self->_fq_table($table);
+    
+	my ( $stmt, @bind ) = $self->_sql->delete( $fq_table, $where );
 	my $rows = $self->dbh->do( $stmt, undef, @bind );
 
 	return $rows;
@@ -174,7 +185,9 @@ method update (
     HashRef :$where = {}
     ) {
 
-	my ( $stmt, @bind ) = $self->_sql->update( $table, $values, $where );
+    my $fq_table = $self->_fq_table($table);
+    
+	my ( $stmt, @bind ) = $self->_sql->update( $fq_table, $values, $where );
 
 	return $self->dbh->do( $stmt, undef, @bind );
 }
@@ -184,6 +197,8 @@ method upsert (Str     :$table!,
 
 	my $into_cols = join( ', ', keys(%$values) );
 
+    my $fq_table = $self->_fq_table($table);
+    
 	my @bind;
 	my @on_dup_bind;
 	my @on_dup_clause;
@@ -201,7 +216,7 @@ method upsert (Str     :$table!,
 
 	my $sql = qq{
         insert into 
-            $table 
+            $fq_table 
             ($into_cols)
         values
             ($values_qmarks)
@@ -244,7 +259,9 @@ method insert (Str     :$table,
                HashRef :$values,
                Bool	   :$ignore = 0) {
 
-	my ( $stmt, @bind ) = $self->_sql->insert( $table, $values );
+    my $fq_table = $self->_fq_table($table);
+    
+	my ( $stmt, @bind ) = $self->_sql->insert( $fq_table, $values );
 
 	if ($ignore) {
 		$stmt =~ s/^insert /insert ignore /i;
@@ -299,6 +316,10 @@ method prune_ddl_args (ArrayRef $args) {
 # private methods
 ##############################################################################
 
+method _fq_table(Str $table){
+    return $self->schema_name . "." . $table;
+}
+
 method _is_pk_autoinc (Str $table) {
 
 	my $t  = $self->_schema->get_table($table);
@@ -324,14 +345,20 @@ method _build_schema {
 	return $self->__lite->get_schema;
 }
 
+method _build_schema_name {
+    my $dbh = $self->dbh;
+	my $schema = $dbh->selectrow_arrayref("select schema()")->[0];
+	
+	return $schema;
+}
+
 method _build__lite {
 	
-	my $dbh = $self->dbh;
-	my $schema = $dbh->selectrow_arrayref("select schema()")->[0];
-	my $clone = $dbh->clone;
+	my $schema = $self->schema_name;
+	my $clone = $self->dbh->clone;
 	$clone->do("use $schema");
 	
-	return MySQL::Util::Lite->new( dbh => $clone );
+	return MySQL::Util::Lite->new( dbh => $clone, span => 1 );
 }
 
 1;

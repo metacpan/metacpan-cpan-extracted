@@ -22,20 +22,21 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223703;
+our $VERSION = 1.20190303205538;
 
 my $formatters = [
                 {
-                  'national_rule' => '($1)',
-                  'leading_digits' => '
-            1(?:
-              [2-79]|
-              8[2-9]
-            )|
-            [24-8]
-          ',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d)(\\d{7})'
+                  'leading_digits' => '
+            1[2-79]|
+            [25-8]|
+            (?:
+              18|
+              4
+            )[2-9]
+          ',
+                  'pattern' => '(\\d)(\\d{7})',
+                  'national_rule' => '($1)'
                 },
                 {
                   'leading_digits' => '3',
@@ -43,32 +44,32 @@ my $formatters = [
                   'pattern' => '(\\d{3})(\\d{7})'
                 },
                 {
+                  'format' => '$1-$2-$3',
                   'leading_digits' => '
             1(?:
               800|
               9
             )
           ',
-                  'format' => '$1-$2-$3',
+                  'pattern' => '(\\d)(\\d{3})(\\d{7})',
                   'intl_format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{3})(\\d{7})'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '[124-8][2-9]\\d{6}',
                 'personal_number' => '',
+                'toll_free' => '1800\\d{7}',
+                'fixed_line' => '[124-8][2-9]\\d{6}',
+                'voip' => '',
                 'specialrate' => '(
           19(?:
             0[01]|
             4[78]
           )\\d{7}
         )',
-                'toll_free' => '1800\\d{7}',
-                'geographic' => '[124-8][2-9]\\d{6}',
-                'voip' => '',
                 'pager' => '',
+                'geographic' => '[124-8][2-9]\\d{6}',
                 'mobile' => '
           3(?:
             0[0-5]|

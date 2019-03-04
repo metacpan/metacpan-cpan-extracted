@@ -2,6 +2,7 @@
 #define PL_EVENTLOOP_H_
 
 #include "V8Context.h"
+#include "ppport.h"
 
 int eventloop_run(V8Context* ctx);
 

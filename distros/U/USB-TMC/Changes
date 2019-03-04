@@ -1,5 +1,8 @@
 Revision history for Perl extension USB::TMC
 
+0.008 2019-03-04
+    - Adapt for API changes in USB::LibUSB 0.06
+
 0.007 2018-03-22
     - Add clear_without_output_clear method for Yokogawa GS200
 

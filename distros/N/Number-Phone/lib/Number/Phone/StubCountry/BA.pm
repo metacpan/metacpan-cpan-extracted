@@ -22,46 +22,41 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})',
-                  'intl_format' => 'NA',
                   'format' => '$1-$2',
-                  'leading_digits' => '[2-9]'
+                  'leading_digits' => '[2-9]',
+                  'pattern' => '(\\d{3})(\\d{3})',
+                  'intl_format' => 'NA'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2-$3',
-                  'leading_digits' => '[3-5]',
-                  'national_rule' => '0$1'
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             6[1-356]|
             [7-9]
           ',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'leading_digits' => '[3-5]',
+                  'format' => '$1 $2-$3'
+                },
+                {
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3 $4',
                   'leading_digits' => '6',
-                  'format' => '$1 $2 $3 $4'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(8[12]\\d{6})|(9[0246]\\d{6})|(
-          70(?:
-            3[0146]|
-            [56]0
-          )\\d{4}
-        )',
                 'personal_number' => '',
+                'toll_free' => '8[08]\\d{6}',
                 'fixed_line' => '
           (?:
             3(?:
@@ -83,6 +78,25 @@ my $validators = {
             )
           )\\d{5}
         ',
+                'voip' => '',
+                'specialrate' => '(8[12]\\d{6})|(9[0246]\\d{6})|(
+          70(?:
+            3[0146]|
+            [56]0
+          )\\d{4}
+        )',
+                'mobile' => '
+          6(?:
+            0(?:
+              3\\d|
+              40
+            )|
+            [1-356]\\d|
+            44[0-6]|
+            71[137]
+          )\\d{5}
+        ',
+                'pager' => '',
                 'geographic' => '
           (?:
             3(?:
@@ -103,21 +117,7 @@ my $validators = {
               9[2-4689]
             )
           )\\d{5}
-        ',
-                'toll_free' => '8[08]\\d{6}',
-                'voip' => '',
-                'mobile' => '
-          6(?:
-            0(?:
-              3\\d|
-              40
-            )|
-            [1-356]\\d|
-            44[0-6]|
-            71[137]
-          )\\d{5}
-        ',
-                'pager' => ''
+        '
               };
 my %areanames = (
   38730 => "Central\ Bosnia\ Canton",

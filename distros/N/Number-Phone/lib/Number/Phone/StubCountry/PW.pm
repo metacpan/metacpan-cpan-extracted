@@ -22,58 +22,18 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2',
                   'leading_digits' => '[2-9]',
+                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'mobile' => '
-          (?:
-            6[2-4689]0|
-            77\\d|
-            88[0-4]
-          )\\d{4}
-        ',
                 'pager' => '',
-                'personal_number' => '',
-                'specialrate' => '',
-                'fixed_line' => '
-          (?:
-            2(?:
-              55|
-              77
-            )|
-            345|
-            488|
-            5(?:
-              35|
-              44|
-              87
-            )|
-            6(?:
-              22|
-              54|
-              79
-            )|
-            7(?:
-              33|
-              47
-            )|
-            8(?:
-              24|
-              55|
-              76
-            )|
-            900
-          )\\d{4}
-        ',
                 'geographic' => '
           (?:
             2(?:
@@ -104,7 +64,47 @@ my $validators = {
             900
           )\\d{4}
         ',
-                'toll_free' => ''
+                'mobile' => '
+          (?:
+            6[2-4689]0|
+            77\\d|
+            88[0-4]
+          )\\d{4}
+        ',
+                'specialrate' => '',
+                'voip' => '',
+                'fixed_line' => '
+          (?:
+            2(?:
+              55|
+              77
+            )|
+            345|
+            488|
+            5(?:
+              35|
+              44|
+              87
+            )|
+            6(?:
+              22|
+              54|
+              79
+            )|
+            7(?:
+              33|
+              47
+            )|
+            8(?:
+              24|
+              55|
+              76
+            )|
+            900
+          )\\d{4}
+        ',
+                'toll_free' => '',
+                'personal_number' => ''
               };
 my %areanames = (
   68025 => "Sonsorol\ State\ and\ Hatohobei\ State",

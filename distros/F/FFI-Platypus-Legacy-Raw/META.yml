@@ -20,8 +20,8 @@ meta-spec:
   version: '1.4'
 name: FFI-Platypus-Legacy-Raw
 requires:
-  FFI::Build: '0.83'
-  FFI::Platypus: '0.83'
+  FFI::Build: '0.86'
+  FFI::Platypus: '0.86'
   Ref::Util: '0'
   perl: '5.008001'
 resources:
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/Perl5-FFI/FFI-Platypus-Legacy-Raw/issues
   homepage: https://metacpan.org/pod/FFI::Platypus::Legacy::Raw
   repository: git://github.com/Perl5-FFI/FFI-Platypus-Legacy-Raw.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Alessandro Ghedini (ghedo, ALEXBIO)'
   - 'Graham Ollis <plicease@cpan.org>'
@@ -38,6 +38,6 @@ x_contributors:
   - 'Brian Wightman (MidLifeXis, MLX)'
   - 'David Steinbrunner (dsteinbrunner)'
   - 'Olivier Mengué (DOLMEN)'
-x_generated_by_perl: v5.29.4
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

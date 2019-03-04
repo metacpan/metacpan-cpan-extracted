@@ -14,14 +14,11 @@ This policy complains if this exists in a Moo class as it triggers Moose to be
 loaded and metaclass created, which defeats some of the benefits you get using
 Moo instead of Moose.
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
-
-## CONTRIBUTORS
-
-- Kivanc Yazan <kyzn@users.noreply.github.com>
-- Graham TerMarsch <graham@howlingfrog.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Kivanc Yazan <kyzn@users.noreply.github.com>
+    Graham TerMarsch <graham@howlingfrog.com>
 
 # ACKNOWLEDGEMENTS
 

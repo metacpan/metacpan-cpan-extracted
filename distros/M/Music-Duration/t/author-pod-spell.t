@@ -39,6 +39,7 @@ nd
 sixtyfourth
 th
 thirtysecond
+tuplet
 tx
 txn
 ty

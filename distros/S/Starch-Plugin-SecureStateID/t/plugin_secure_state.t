@@ -2,11 +2,16 @@
 #use strictures 2;
 
 use Test::More;
+use Test::Starch;
 use Starch;
 
 eval "use Math::Random::Secure;";
 plan skip_all => "Math::Random::Secure is not installed."
     if $@;
+
+Test::Starch->new(
+    plugins => ['::SecureStateID'],
+)->test();
 
 my $secure_rand_called = 0;
 {

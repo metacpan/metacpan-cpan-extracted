@@ -1,53 +1,53 @@
 [
    {
-      "diff" : {
-         "D" : {
-            "files" : {
-               "D" : {
-                  "/etc/cron.d/beta" : {
-                     "A" : "* * * * * root sleep 5"
+      "diff": {
+         "D": {
+            "files": {
+               "D": {
+                  "/etc/cron.d/beta": {
+                     "A": "* * * * * root sleep 5"
                   },
-                  "/etc/hostname" : {
-                     "N" : "beta",
-                     "O" : "alpha"
+                  "/etc/hostname": {
+                     "N": "beta",
+                     "O": "alpha"
                   }
                }
             },
-            "fqdn" : {
-               "N" : "beta.example.org",
-               "O" : "alpha.example.org"
+            "fqdn": {
+               "N": "beta.example.org",
+               "O": "alpha.example.org"
             },
-            "mtime" : {
-               "N" : 1462431002,
-               "O" : 1462431001
+            "mtime": {
+               "N": 1462431002,
+               "O": 1462431001
             }
          }
       },
-      "rule_id" : 0,
-      "source" : "_cfg.beta.json"
+      "rule_id": 0,
+      "source": "_cfg.beta.json"
    },
    {
-      "diff" : {
-         "D" : {
-            "files" : {
-               "D" : {
-                  "/etc/hostname" : {
-                     "N" : "gamma",
-                     "O" : "beta"
+      "diff": {
+         "D": {
+            "files": {
+               "D": {
+                  "/etc/hostname": {
+                     "N": "gamma",
+                     "O": "beta"
                   }
                }
             },
-            "fqdn" : {
-               "N" : "gamma.example.org",
-               "O" : "beta.example.org"
+            "fqdn": {
+               "N": "gamma.example.org",
+               "O": "beta.example.org"
             },
-            "mtime" : {
-               "N" : 1462431003,
-               "O" : 1462431002
+            "mtime": {
+               "N": 1462431003,
+               "O": 1462431002
             }
          }
       },
-      "rule_id" : 1,
-      "source" : "_cfg.gamma.json"
+      "rule_id": 1,
+      "source": "_cfg.gamma.json"
    }
 ]

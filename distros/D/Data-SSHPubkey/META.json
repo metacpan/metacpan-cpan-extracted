@@ -39,7 +39,8 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
+            "File::Spec" : "0",
+            "Test::Most" : "0",
             "lib" : "0"
          }
       }
@@ -50,6 +51,6 @@
          "url" : "https://github.com/thrig/Data-SSHPubkey"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

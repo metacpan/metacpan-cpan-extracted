@@ -22,62 +22,56 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223705;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '[579]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'leading_digits' => '[579]'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '',
-                'geographic' => '
-          (?:
-            (?:
-              2[02-9]|
-              88
-            )\\d|
-            3(?:
-              [5-7]\\d|
-              8[0-8]
-            )|
-            48[4-9]
-          )\\d\\d
-        ',
-                'fixed_line' => '
-          (?:
-            (?:
-              2[02-9]|
-              88
-            )\\d|
-            3(?:
-              [5-7]\\d|
-              8[0-8]
-            )|
-            48[4-9]
-          )\\d\\d
-        ',
-                'personal_number' => '',
+                'voip' => '90[1-9]\\d{4}',
                 'specialrate' => '(
           (?:
             3[03]|
             900\\d
           )\\d{3}
         )',
+                'geographic' => '
+          (?:
+            38[0-8]|
+            48[4-9]
+          )\\d\\d|
+          (?:
+            2[02-9]|
+            3[4-7]|
+            88
+          )\\d{3}
+        ',
                 'pager' => '',
                 'mobile' => '
+          57[2-5]\\d{4}|
           (?:
-            5(?:
-              [0-689]\\d|
-              7[2-5]
-            )|
-            7[013-7]\\d
-          )\\d{4}
+            5[0-689]|
+            7[013-7]
+          )\\d{5}
         ',
-                'voip' => '90[1-9]\\d{4}'
+                'personal_number' => '',
+                'toll_free' => '',
+                'fixed_line' => '
+          (?:
+            38[0-8]|
+            48[4-9]
+          )\\d\\d|
+          (?:
+            2[02-9]|
+            3[4-7]|
+            88
+          )\\d{3}
+        '
               };
 
     sub new {

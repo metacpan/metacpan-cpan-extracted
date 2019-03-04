@@ -9,7 +9,7 @@ use Log::Log4Cli;
 use Struct::Diff 0.96 qw(patch);
 use Struct::Path 0.80 qw(path);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub MODINFO { "Apply nested diff to the structure" }
 
@@ -69,6 +69,12 @@ Patch - Apply nested diff to the structure
 =item B<--[no]blame>
 
 Blame calculation toggle. Enabled by default.
+
+=item B<--cond> E<lt>pathE<gt>
+
+Apply rule when condition met only. Condition is met when path leads to at
+least one item in the structure. May be used several times (in this case
+conditions are AND'ed).
 
 =item B<--path> E<lt>pathE<gt>
 

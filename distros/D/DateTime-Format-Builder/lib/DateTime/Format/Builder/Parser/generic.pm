@@ -1,21 +1,19 @@
 package DateTime::Format::Builder::Parser::generic;
-{
-  $DateTime::Format::Builder::Parser::generic::VERSION = '0.81';
-}
+
 use strict;
 use warnings;
+
+our $VERSION = '0.82';
+
 use Carp;
 use Params::Validate qw(
     validate SCALAR CODEREF UNDEF
 );
 
-
-
 sub new {
     my $class = shift;
     bless {@_}, $class;
 }
-
 
 sub generic_parser {
     my $class = shift;
@@ -84,7 +82,6 @@ sub generic_parser {
     };
 }
 
-
 {
     no strict 'refs';
     for (qw( valid_params params )) {
@@ -100,13 +97,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DateTime::Format::Builder::Parser::generic - Useful routines
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 METHODS
 
@@ -195,10 +194,6 @@ Rather than attempt to explain how it all works, I think it's best if
 you take a look at F<Regex.pm> and F<Strptime.pm> as examples and
 work from there.
 
-=head1 SUPPORT
-
-See L<DateTime::Format::Builder> for details.
-
 =head1 SEE ALSO
 
 C<datetime@perl.org> mailing list.
@@ -207,6 +202,16 @@ http://datetime.perl.org/
 
 L<perl>, L<DateTime>, L<DateTime::Format::Builder>,
 L<DateTime::Format::Builder::Parser>.
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime-Format-Builder can be found at L<https://github.com/houseabsolute/DateTime-Format-Builder>.
 
 =head1 AUTHORS
 
@@ -224,10 +229,13 @@ Iain Truskett
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

@@ -1,14 +1,13 @@
 package DateTime::Format::Builder::Parser::Dispatch;
-{
-  $DateTime::Format::Builder::Parser::Dispatch::VERSION = '0.81';
-}
+
 use strict;
 use warnings;
+
+our $VERSION = '0.82';
+
 use vars qw( %dispatch_data );
 use Params::Validate qw( CODEREF validate );
 use DateTime::Format::Builder::Parser;
-
-
 
 {
     no strict 'refs';
@@ -53,13 +52,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DateTime::Format::Builder::Parser::Dispatch - Dispatch parsers by group
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -118,14 +119,10 @@ A list of strings, meaning: use these groups in this order.
 Groups are specified much like the example in the L<SYNOPSIS>.
 They follow the same format as when you specify them for methods.
 
-=head1 SIDEEFFECTS
+=head1 SIDE EFFECTS
 
 Your group parser can also be a Dispatch parser. Thus you could
 potentially end up with an infinitely recursive parser.
-
-=head1 SUPPORT
-
-See L<DateTime::Format::Builder> for details.
 
 =head1 SEE ALSO
 
@@ -135,6 +132,16 @@ http://datetime.perl.org/
 
 L<perl>, L<DateTime>,
 L<DateTime::Format::Builder>
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime-Format-Builder can be found at L<https://github.com/houseabsolute/DateTime-Format-Builder>.
 
 =head1 AUTHORS
 
@@ -152,10 +159,13 @@ Iain Truskett
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

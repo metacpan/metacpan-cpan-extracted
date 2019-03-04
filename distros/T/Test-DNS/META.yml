@@ -20,9 +20,9 @@ name: Test-DNS
 provides:
   Test::DNS:
     file: lib/Test/DNS.pm
-    version: '0.200'
+    version: '0.201'
 resources:
   bugtracker: https://github.com/xsawyerx/test-dns/issues
   repository: git://github.com/xsawyerx/test-dns.git
-version: '0.200'
+version: '0.201'
 x_serialization_backend: 'YAML::Tiny version 1.73'

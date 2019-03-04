@@ -43,6 +43,7 @@
             "CPAN::Meta" : "0",
             "CPAN::Meta::Requirements" : "2.121",
             "CPAN::Meta::YAML" : "0",
+            "CPAN::Perl::Releases" : "0",
             "Compress::Bzip2" : "0",
             "Compress::Zlib" : "0",
             "Data::Dumper" : "0",
@@ -89,6 +90,6 @@
          "url" : "https://github.com/andk/cpanpm"
       }
    },
-   "version" : "2.22",
+   "version" : "2.25",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -18,7 +18,7 @@ my $top = MainWindow->new(-title => 'MessageBox Test');
 #  of different behavior on win32 vs linux
 $top->after(1000, 
         sub{
-                if( $^O !~ /mswin/i ){
+                if( $^O ne 'MSWin32' ){
                         ok(1); 
                         exit(); # No using $top->destroy here, because we get grab error messages on linux
                                 #  But if we use this on windows, we get crashes.

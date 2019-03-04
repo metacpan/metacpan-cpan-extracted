@@ -1,10 +1,10 @@
 {
    "abstract" : "Perl interface to USB Test & Measurement (USBTMC) backend.",
    "author" : [
-      "Simon Reinhardt <simon.reinhardt@stud.uni-regensburg.de>"
+      "Simon Reinhardt <simon.reinhardt@physik.uni-r.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
       "x_IRC" : "'irc://chat.freenode.net/#labmeasurement'",
       "x_MailingList" : "'https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users'"
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

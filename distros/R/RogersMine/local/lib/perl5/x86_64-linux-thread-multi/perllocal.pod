@@ -1,0 +1,418 @@
+=head2 Sun Mar  3 15:51:12 2019: C<Module> L<ExtUtils::Depends|ExtUtils::Depends>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.405>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:13 2019: C<Module> L<ExtUtils::PkgConfig|ExtUtils::PkgConfig>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.16>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:26 2019: C<Module> L<Glib|Glib>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.329>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:35 2019: C<Module> L<Cairo|Cairo>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.106>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:37 2019: C<Module> L<Cairo::GObject|Cairo::GObject>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.004>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:38 2019: C<Module> L<Role::Tiny|Role::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.000006>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:41 2019: C<Module> L<Sub::Quote|Sub::Quote>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.005001>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:42 2019: C<Module> L<Sub::Exporter::Progressive|Sub::Exporter::Progressive>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.001013>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:42 2019: C<Module> L<Devel::GlobalDestruction|Devel::GlobalDestruction>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.14>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:43 2019: C<Module> L<Class::Method::Modifiers|Class::Method::Modifiers>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.12>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:44 2019: C<Module> L<Moo|Moo>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.003004>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Sun Mar  3 15:51:44 2019: C<Module> L<Try::Tiny|Try::Tiny>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.30>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Mar  4 15:11:09 2019: C<Module> L<Glib::Object::Introspection|Glib::Object::Introspection>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.047>
+
+=item *
+
+C<EXE_FILES: bin/perli11ndoc>
+
+=back
+
+=head2 Mon Mar  4 15:11:09 2019: C<Module> L<Gtk3|Gtk3>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.034>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Mar  4 18:01:21 2019: C<Module> L<indirect|indirect>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.38>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Mar  4 18:01:24 2019: C<Module> L<B::Hooks::OP::Check|B::Hooks::OP::Check>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.22>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Mar  4 18:01:25 2019: C<Module> L<bareword::filehandles|bareword::filehandles>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.006>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Mar  4 18:01:26 2019: C<Module> L<multidimensional|multidimensional>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.014>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Mon Mar  4 18:01:26 2019: C<Module> L<strictures|strictures>
+
+=over 4
+
+=item *
+
+C<installed into: /home/gfr/rogers-mine/pl/rogers_mine/local/lib/perl5>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.000005>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

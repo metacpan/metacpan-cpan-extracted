@@ -1,20 +1,18 @@
 package DateTime::Format::Builder::Parser;
-{
-  $DateTime::Format::Builder::Parser::VERSION = '0.81';
-}
+
 use strict;
 use warnings;
+
+our $VERSION = '0.82';
+
 use Carp qw( croak );
 use Params::Validate qw(
     validate SCALAR CODEREF UNDEF ARRAYREF
 );
 use Scalar::Util qw( weaken );
 
-
-
-
 sub on_fail {
-    my ( $self, $input, $parent ) = @_;
+    my ( $self, $input ) = @_;
     my $maker = $self->maker;
     if ( $maker and $maker->can('on_fail') ) {
         $maker->on_fail($input);
@@ -31,7 +29,7 @@ sub no_parser {
 sub new {
     my $class = shift;
     $class = ref($class) || $class;
-    my $i    = 0;
+
     my $self = bless {
         on_fail => \&on_fail,
         parser  => \&no_parser,
@@ -77,11 +75,9 @@ sub set_fail {
     $self;
 }
 
-
 my @callbacks = qw( on_match on_fail postprocess preprocess );
 
 {
-
 
     my %params = (
         common => {
@@ -103,23 +99,20 @@ my @callbacks = qw( on_match on_fail postprocess preprocess );
         },
     );
 
-
     sub params {
-        my $self = shift;
+        my $self   = shift;
         my $caller = ref $self || $self;
-        return { map { %$_ } @params{ $caller, 'common' } };
+        return { map {%$_} @params{ $caller, 'common' } };
     }
-
 
     my $all_params;
 
     sub params_all {
         return $all_params if defined $all_params;
-        my %all_params = map { %$_ } values %params;
+        my %all_params = map {%$_} values %params;
         $_->{optional} = 1 for values %all_params;
         $all_params = \%all_params;
     }
-
 
     my %inverse;
 
@@ -140,13 +133,11 @@ my @callbacks = qw( on_match on_fail postprocess preprocess );
         1;
     }
 
-
     sub whose_params {
         my $param = shift;
         return $inverse{$param};
     }
 }
-
 
 sub create_single_object {
     my ($self) = shift;
@@ -186,7 +177,6 @@ sub create_single_parser {
     $from->$method(%args);
 }
 
-
 sub merge_callbacks {
     my $self = shift;
 
@@ -216,7 +206,6 @@ sub merge_callbacks {
         $rv;
     };
 }
-
 
 sub create_multiple_parsers {
     my $class = shift;
@@ -286,10 +275,10 @@ sub create_multiple_parsers {
     $obj->set_parser($parser);
 }
 
-
 sub sort_parsers {
     my $class = shift;
-    my ( $options, $specs ) = @_;
+    shift;
+    my ($specs) = @_;
     my ( %lengths, @others );
 
     for my $spec (@$specs) {
@@ -342,7 +331,6 @@ sub chain_parsers {
     };
 }
 
-
 sub create_parser {
     my $class = shift;
     if ( not ref $_[0] ) {
@@ -369,16 +357,11 @@ sub create_parser {
     }
 }
 
-
-# Find all our workers
-{
-    use Class::Factory::Util 1.6;
-
-    foreach my $worker ( __PACKAGE__->subclasses ) {
-        eval "use DateTime::Format::Builder::Parser::$worker;";
-        die $@ if $@;
-    }
-}
+require DateTime::Format::Builder::Parser::Dispatch;
+require DateTime::Format::Builder::Parser::generic;
+require DateTime::Format::Builder::Parser::Quick;
+require DateTime::Format::Builder::Parser::Regex;
+require DateTime::Format::Builder::Parser::Strptime;
 
 1;
 
@@ -388,13 +371,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DateTime::Format::Builder::Parser - Parser creation
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -406,8 +391,6 @@ version 0.81
 This is a utility class for L<DateTime::Format::Builder> that
 handles creation of parsers. It is to here that C<Builder> delegates
 most of its responsibilities.
-
-=head1 CONSTRUCTORS
 
 =head1 METHODS
 
@@ -421,7 +404,7 @@ They are presented, grouped according to use.
 
 These methods allow implementations to have validation of
 their arguments in a standard manner and due to C<Parser>'s
-impelementation, these methods also allow C<Parser> to
+implementation, these methods also allow C<Parser> to
 determine which implementation to use.
 
 =head3 Common parameters
@@ -455,7 +438,7 @@ B<label>
 =item *
 
 B<length> may be a number or an arrayref of numbers
-indicating the length of the input. This lets us optimise in
+indicating the length of the input. This lets us optimize in
 the case of static length input. If supplying an arrayref of
 numbers, please keep the number of numbers to a minimum.
 
@@ -491,7 +474,7 @@ a parser specification.
 Internal function which merely returns to which class a
 parameter is unique. If not unique, returns C<undef>.
 
-=head2 Organising and Creating Parsers
+=head2 Organizing and Creating Parsers
 
 =head3 create_single_parser
 
@@ -663,10 +646,6 @@ In particular, C<preprocess>, C<on_match>, C<on_fail> and
 C<postprocess>. See the L<main Builder|DateTime::Format::Builder>
 docs for the appropriate placing of calls to the callbacks.
 
-=head1 SUPPORT
-
-See L<DateTime::Format::Builder> for details.
-
 =head1 SEE ALSO
 
 C<datetime@perl.org> mailing list.
@@ -682,6 +661,16 @@ L<DateTime::Format::Builder::Parser::Dispatch>,
 L<DateTime::Format::Builder::Parser::Quick>,
 L<DateTime::Format::Builder::Parser::Regex>,
 L<DateTime::Format::Builder::Parser::Strptime>.
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime-Format-Builder can be found at L<https://github.com/houseabsolute/DateTime-Format-Builder>.
 
 =head1 AUTHORS
 
@@ -699,10 +688,13 @@ Iain Truskett
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

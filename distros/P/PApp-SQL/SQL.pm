@@ -47,7 +47,7 @@ use DBI ();
 BEGIN {
    use base qw(Exporter DynaLoader);
 
-   $VERSION = '2.001';
+   $VERSION = '2.002';
    @EXPORT = qw(
          sql_exec  sql_fetch  sql_fetchall  sql_exists sql_insertid $sql_exec
          sql_uexec sql_ufetch sql_ufetchall sql_uexists
@@ -300,6 +300,7 @@ directly after executing the insert statement that created it. This is
 what is actually returned for various databases. If your database is
 missing, please send me an e-mail on how to implement this ;)
 
+ mariadb:  first C<AUTO_INCREMENT> column set to NULL
  mysql:    first C<AUTO_INCREMENT> column set to NULL
  postgres: C<oid> column (is there a way to get the last SERIAL?)
  sybase:   C<IDENTITY> column of the last insert (slow)
@@ -315,13 +316,14 @@ sub sql_insertid($) {
    my $dbh = $sth->{Database};
    my $driver = $dbh->{Driver}{Name};
 
+   $driver eq "MariaDB"  and return $sth->{mariadb_insertid};
    $driver eq "mysql"    and return $sth->{mysql_insertid};
    $driver eq "Pg"       and return $sth->{pg_oid_status};
    $driver eq "Sybase"   and return sql_fetch ($dbh, 'SELECT @@IDENTITY');
    $driver eq "Informix" and return $sth->{ix_sqlerrd}[1];
    $driver eq "SQLite"   and return sql_fetch ($dbh, 'SELECT last_insert_rowid ()');
 
-   Carp::croak "sql_insertid does not support the dbd driver '$driver', at";
+   $dbh->last_insert_id (undef, undef, undef, undef)
 }
 
 =item [old-size] = cachesize [new-size]

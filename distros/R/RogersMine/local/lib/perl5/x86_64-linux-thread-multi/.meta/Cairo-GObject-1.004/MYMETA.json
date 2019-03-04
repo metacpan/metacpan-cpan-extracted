@@ -1,0 +1,61 @@
+{
+   "abstract" : "Integrate Cairo into the Glib type system",
+   "author" : [
+      "gtk2-perl Team <gtk-perl-list at gnome dot org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Cairo-GObject",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cairo" : "1.080",
+            "ExtUtils::Depends" : "0.2",
+            "ExtUtils::PkgConfig" : "1.0",
+            "Glib" : "1.224"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Cairo-GObject [at] rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Cairo-GObject"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net/",
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-2.1.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnome.org/perl-Cairo-GObject",
+         "web" : "http://git.gnome.org/browse/perl-Cairo-GObject/"
+      },
+      "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
+   },
+   "version" : "1.004",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

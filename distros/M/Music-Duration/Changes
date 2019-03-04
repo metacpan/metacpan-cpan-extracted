@@ -1,5 +1,18 @@
 Revision history for Music-Duration
 
+0.0605 2019-03-03 13:33:21
+    - Improved documentation.
+    - Added the eg/polyrhythm progam.
+
+0.0604 2019-03-03 11:38:17
+    - Added a synonym for the tuple() function - tuplet().
+    - Attempted to code The Black Page in eg/.
+    - Updated documentation.
+
+0.0603 2019-03-03 01:56:44
+    - Removed unneeded code.
+    - Improved documentation.
+
 0.0602 2018-10-05 21:06:11
     - Improved documentation.
     - Increased expected digits of precision in test.

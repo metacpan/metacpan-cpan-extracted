@@ -1,5 +1,14 @@
 Revision history for Alien-Libxml2
 
+0.05      2019-03-03 14:36:02 -0500
+  - Use http instead of ftp to fetch libxml2 sources.
+
+0.04_01   2018-07-10 14:15:41 -0400
+  - Fixed the blacklist of bad versions of libxml2.  It is based
+    on the list of versions rejected by XML-LibXML.
+  - As with XML-LibXML, you can force Alien-Libxml2 to install by
+    setting the environment variable FORCE to a true value.
+
 0.03      2017-09-22 06:46:14 -0400
   - Look for libxml2 in some standard places.
     OS X, for example provides a libxml2, but (unhelpfully) does not

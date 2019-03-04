@@ -63,17 +63,17 @@ is		$line->file, 	'', 		"no file";
 # regexp match on text
 isa_ok 	$line = Asm::Preproc::Line->new("text\n", "f1", 3),
 		'Asm::Preproc::Line';
-ok $line->text =~ /\G(.)/gcxs, "match";
+ok $line->{text} =~ /\G(.)/gcxs, "match";
 is $1, "t", "t";
-ok $line->text =~ /\G(.)/gcxs, "match";
+ok $line->{text} =~ /\G(.)/gcxs, "match";
 is $1, "e", "e";
-ok $line->text =~ /\G(.)/gcxs, "match";
+ok $line->{text} =~ /\G(.)/gcxs, "match";
 is $1, "x", "x";
-ok $line->text =~ /\G(.)/gcxs, "match";
+ok $line->{text} =~ /\G(.)/gcxs, "match";
 is $1, "t", "t";
-ok $line->text =~ /\G(.)/gcxs, "match";
+ok $line->{text} =~ /\G(.)/gcxs, "match";
 is $1, "\n", "newline";
-ok $line->text =~ /\G\z/gcxs, "match";
+ok $line->{text} =~ /\G\z/gcxs, "match";
 
 #------------------------------------------------------------------------------
 # error
@@ -167,6 +167,6 @@ is_equal;
 # overload fallback
 isa_ok 	$line = Asm::Preproc::Line->new("text\n", "f1", 3),
 		'Asm::Preproc::Line';
-like "$line", qr/^Asm::Preproc::Line=ARRAY\(0x[0-9a-f]+\)$/i, "overload fallback";
+like "$line", qr/^Asm::Preproc::Line=HASH\(0x[0-9a-f]+\)$/i, "overload fallback";
 
 done_testing();

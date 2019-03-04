@@ -1,16 +1,16 @@
 {
-   "false" : false,
-   "list" : [
+   "false": false,
+   "list": [
       true,
       false,
       true,
       false
    ],
-   "same" : {
-      "false" : false,
-      "true" : true
+   "same": {
+      "false": false,
+      "true": true
    },
-   "true" : {
-      "new" : "substructure"
+   "true": {
+      "new": "substructure"
    }
 }

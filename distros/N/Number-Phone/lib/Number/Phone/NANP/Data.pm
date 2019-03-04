@@ -2,8 +2,13 @@
 
 
 
-  # Copyright 2011 David Cantrell, derived from data from libphonenumber
-  # http://code.google.com/p/libphonenumber/
+  # Copyright 2011 David Cantrell
+  #
+  # Uses data from:
+  #   libphonenumber      http://code.google.com/p/libphonenumber/
+  #   CNAC                http://www.cnac.ca/
+  #   NANPA               https://www.nationalpooling.com/
+  #   Local Calling Guide https://localcallingguide.com/
   #
   # Licensed under the Apache License, Version 2.0 (the "License");
   # you may not use this file except in compliance with the License.
@@ -21,7 +26,7 @@
   use strict;
   use warnings;
   use vars qw(%areanames %fixed_line_regexes %mobile_regexes);
-our $VERSION = 1.20181205223659;
+our $VERSION = 1.20190303205439;
 
 
 
@@ -32091,9 +32096,9 @@ $fixed_line_regexes{SX} = '7215(?:4[2-8]|8[239]|9[056])\d{4}';
 $mobile_regexes{SX} = '7215(?:1[02]|2\d|5[034679]|8[014-8])\d{4}';
 $fixed_line_regexes{TC} = '649(?:712|9(?:4\d|50))\d{4}';
 $mobile_regexes{TC} = '649(?:2(?:3[129]|4[1-7])|3(?:3[1-389]|4[1-8])|4[34][1-3])\d{4}';
-$fixed_line_regexes{TT} = '868(?:2(?:01|[23]\d)|6(?:0[7-9]|1[02-8]|2[1-9]|[3-69]\d|7[0-79])|82[124])\d{4}';
+$fixed_line_regexes{TT} = '868(?:2(?:01|1[89]|[23]\d)|6(?:0[7-9]|1[02-8]|2[1-9]|[3-69]\d|7[0-79])|82[124])\d{4}';
 $mobile_regexes{TT} = '868(?:2(?:6[6-9]|[7-9]\d)|[37](?:0[1-9]|1[02-9]|[2-9]\d)|4[6-9]\d|6(?:20|78|8\d))\d{4}';
 $fixed_line_regexes{VC} = '784(?:266|3(?:6[6-9]|7\d|8[0-24-6])|4(?:38|5[0-36-8]|8[0-8])|5(?:55|7[0-2]|93)|638|784)\d{4}';
 $mobile_regexes{VC} = '784(?:4(?:3[0-5]|5[45]|89|9[0-8])|5(?:2[6-9]|3[0-4]))\d{4}';
-$fixed_line_regexes{VG} = '284(?:(?:229|774|8(?:52|6[459]))\d|4(?:22\d|9(?:[45]\d|6[0-5])))\d{3}';
-$mobile_regexes{VG} = '284(?:(?:3(?:0[0-3]|4[0-7]|68|9[34])|54[0-57])\d|4(?:(?:4[0-6]|68)\d|9(?:6[6-9]|9\d)))\d{3}';
+$fixed_line_regexes{VG} = '284496[0-5]\d{3}|284(?:229|4(?:22|9[45])|774|8(?:52|6[459]))\d{4}';
+$mobile_regexes{VG} = '284496[6-9]\d{3}|284(?:3(?:0[0-3]|4[0-7]|68|9[34])|4(?:4[0-6]|68|99)|54[0-57])\d{4}';

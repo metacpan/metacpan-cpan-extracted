@@ -22,9 +22,21 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
+                {
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2',
+                  'leading_digits' => '16',
+                  'pattern' => '(\\d{2})(\\d{3,4})'
+                },
+                {
+                  'leading_digits' => '13',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})',
+                  'intl_format' => 'NA'
+                },
                 {
                   'pattern' => '(\\d{3})(\\d{3})',
                   'leading_digits' => '19',
@@ -32,44 +44,26 @@ my $formatters = [
                   'intl_format' => 'NA'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{3,4})',
                   'intl_format' => 'NA',
-                  'format' => '$1 $2',
-                  'leading_digits' => '19'
-                },
-                {
-                  'format' => '$1 $2',
-                  'leading_digits' => '16',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3,4})'
-                },
-                {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})',
-                  'intl_format' => 'NA',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '13'
-                },
-                {
                   'pattern' => '(\\d{3})(\\d{4})',
-                  'leading_digits' => '1802',
                   'format' => '$1 $2',
-                  'intl_format' => 'NA'
+                  'leading_digits' => '1802'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,4})',
+                  'intl_format' => 'NA',
+                  'leading_digits' => '19',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{4})(\\d{3,4})'
+                },
+                {
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2,4})',
                   'leading_digits' => '16',
                   'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '[2378]',
-                  'national_rule' => '(0$1)'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             14|
@@ -77,57 +71,24 @@ my $formatters = [
           '
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})',
+                  'national_rule' => '(0$1)',
+                  'pattern' => '(\\d)(\\d{4})(\\d{4})',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '[2378]'
+                },
+                {
                   'leading_digits' => '
             1(?:
               30|
               [89]
             )
           ',
-                  'format' => '$1 $2 $3'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{4})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            [237]\\d{5}|
-            8(?:
-              51(?:
-                0(?:
-                  0[03-9]|
-                  [1247]\\d|
-                  3[2-9]|
-                  5[0-8]|
-                  6[1-9]|
-                  8[0-6]
-                )|
-                1(?:
-                  1[69]|
-                  [23]\\d|
-                  4[0-4]
-                )
-              )|
-              (?:
-                [6-8]\\d{3}|
-                9(?:
-                  [02-9]\\d\\d|
-                  1(?:
-                    [0-57-9]\\d|
-                    6[0135-9]
-                  )
-                )
-              )\\d
-            )
-          )\\d{3}
-        ',
-                'toll_free' => '
-          180(?:
-            0\\d{3}|
-            2
-          )\\d{3}
-        ',
-                'personal_number' => '',
                 'specialrate' => '(
           13(?:
             00\\d{3}|
@@ -135,7 +96,15 @@ my $validators = {
           )\\d{3}|
           13\\d{4}
         )|(190[0-26]\\d{6})',
-                'fixed_line' => '
+                'voip' => '
+          1471\\d{5}|
+          (?:
+            145|
+            550
+          )\\d{6}
+        ',
+                'pager' => '16\\d{3,7}',
+                'geographic' => '
           (?:
             [237]\\d{5}|
             8(?:
@@ -178,15 +147,44 @@ my $validators = {
             9[017-9]
           )\\d{6}
         ',
-                'pager' => '16\\d{3,7}',
-                'voip' => '
+                'toll_free' => '
+          180(?:
+            0\\d{3}|
+            2
+          )\\d{3}
+        ',
+                'personal_number' => '',
+                'fixed_line' => '
           (?:
-            14(?:
-              5\\d|
-              71
-            )|
-            550\\d
-          )\\d{5}
+            [237]\\d{5}|
+            8(?:
+              51(?:
+                0(?:
+                  0[03-9]|
+                  [1247]\\d|
+                  3[2-9]|
+                  5[0-8]|
+                  6[1-9]|
+                  8[0-6]
+                )|
+                1(?:
+                  1[69]|
+                  [23]\\d|
+                  4[0-4]
+                )
+              )|
+              (?:
+                [6-8]\\d{3}|
+                9(?:
+                  [02-9]\\d\\d|
+                  1(?:
+                    [0-57-9]\\d|
+                    6[0135-9]
+                  )
+                )
+              )\\d
+            )
+          )\\d{3}
         '
               };
 my %areanames = (

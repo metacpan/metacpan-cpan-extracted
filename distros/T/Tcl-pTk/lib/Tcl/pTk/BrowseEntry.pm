@@ -9,7 +9,7 @@
 
 package Tcl::pTk::BrowseEntry;
 
-our ($VERSION) = ('0.95');
+our ($VERSION) = ('0.96');
 
 use Tcl::pTk qw(Ev);
 use Carp;

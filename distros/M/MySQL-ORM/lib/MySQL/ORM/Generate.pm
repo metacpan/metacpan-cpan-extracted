@@ -110,7 +110,7 @@ method _prune_tables (ArrayRef $tables) {
 
 method _build_lite {
 
-	return MySQL::Util::Lite->new( dbh => $self->dbh );
+	return MySQL::Util::Lite->new( dbh => $self->dbh, span => 1 );
 }
 
 1;

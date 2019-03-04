@@ -1,0 +1,39 @@
+---
+abstract: 'Colorfull output.'
+author:
+  - '@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-KemonoFriends-Color
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::KemonoFriends::Color:
+    file: lib/Acme/KemonoFriends/Color.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/yukinea/Acme-KemonoFriends-Color/issues
+  homepage: https://github.com/yukinea/Acme-KemonoFriends-Color
+  repository: git://github.com/yukinea/Acme-KemonoFriends-Color.git
+version: '0.01'
+x_contributors:
+  - 'yukinea <yuki.931322@gmail.com>'
+x_static_install: 1

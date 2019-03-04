@@ -1,6 +1,9 @@
 Summary of important user-visible changes for Bio-DB-EMBL
 ---------------------------------------------------------
 
+1.7.4     2019-03-03 23:01:55-06:00 America/Chicago
+  * Fix test issues with Bio::Root::Test
+
 1.7.3     2019-03-01 12:35:12-06:00 America/Chicago
   * First release after split from bioperl-live.
   * Remove Bio::DB::RefSeq dependency, which isn't tested outside of Bio::DB::RefSeq

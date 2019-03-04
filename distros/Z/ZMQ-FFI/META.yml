@@ -20,9 +20,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
   FFI::CheckLib: '0.11'
-  FFI::Platypus: '0.33'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,7 +31,7 @@ requires:
   Carp: '0'
   Class::XSAccessor: '1.18'
   Exporter: '0'
-  FFI::Platypus: '0.33'
+  FFI::Platypus: '0.86'
   FFI::Platypus::Buffer: '0'
   FFI::Platypus::Memory: '0'
   Import::Into: '1.002005'
@@ -53,6 +52,5 @@ requires:
 resources:
   bugtracker: https://github.com/calid/zmq-ffi/issues
   repository: git://github.com/calid/zmq-ffi.git
-version: '1.14'
-x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '1.15'
+x_serialization_backend: 'YAML::Tiny version 1.70'

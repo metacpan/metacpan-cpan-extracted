@@ -34,7 +34,7 @@ long total_memory_pages(void)
      */
     FILE* fp = 0;
     do {
-        long size, resident, share, text, lib, data, dirty;
+        long size, resident, share, text, lib, data, pdirty;
         int nread;
         fp = fopen(FILE_MEMORY_STATUS, "r");
         if (!fp) {
@@ -42,7 +42,7 @@ long total_memory_pages(void)
             break;
         }
         nread = fscanf(fp, "%ld %ld %ld %ld %ld %ld %ld",
-                       &size, &resident, &share, &text, &lib, &data, &dirty);
+                       &size, &resident, &share, &text, &lib, &data, &pdirty);
         if (nread != 7) {
             /* silently ignore, avoid noisy errors */
             break;

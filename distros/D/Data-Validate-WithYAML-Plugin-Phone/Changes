@@ -1,6 +1,17 @@
 Revision history for Data::Validate::WithYAML::Plugin::Phone
 ============================================================
 
+0.06    2019-02-04 18:08:00
+
+        * improve tests
+        * fix typo in prereq list (thanks to @manwar)
+        * die if a country is selected that isn't supported by Number::Phone
+
+0.05    2019-02-03 12:22:00
+
+        * add support for country specific checks (via Number::Phone)
+        * add/fix tests
+
 0.04    2014-06-24
 
         * improved regex

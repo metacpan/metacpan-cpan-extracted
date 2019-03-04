@@ -32,11 +32,13 @@ extern "C" {
 #if MYSQL_VERSION_ID < 50100
 typedef       I8 *xgptr;
 typedef       I8 *const cxgptr;
-typedef int    xlen;
+typedef int   xsize_t;
+typedef int   xssize_t;
 #else
 typedef       U8 *xgptr;
 typedef const U8 *cxgptr;
-typedef size_t xlen;
+typedef size_t xsize_t;
+typedef size_t xssize_t;
 #endif
 
 enum enum_vio_type
@@ -60,9 +62,9 @@ Vio* vio_new_win32shared_memory(NET *net,HANDLE handle_file_map,
                                 HANDLE event_client_wrote,
                                 HANDLE event_client_read,
                                 HANDLE event_conn_closed);
-xlen vio_read_pipe(Vio *vio, xgptr buf, xlen size);
-xlen vio_write_pipe(Vio *vio, xcgptr buf, xlen size);
-xlen vio_close_pipe(Vio * vio);
+xsize_t vio_read_pipe(Vio *vio, xgptr buf, xsize_t size);
+xsize_t vio_write_pipe(Vio *vio, xcgptr buf, xsize_t size);
+xsize_t vio_close_pipe(Vio * vio);
 #else
 #define HANDLE void *
 #endif /* __WIN__ */
@@ -71,9 +73,9 @@ void	vio_delete(Vio* vio);
 int	vio_close(Vio* vio);
 void    vio_reset(Vio* vio, enum enum_vio_type type,
                   my_socket sd, HANDLE hPipe, uint flags);
-xlen	vio_read(Vio *vio, xgptr buf, xlen size);
-xlen    vio_read_buff(Vio *vio, xgptr buf, xlen size);
-xlen	vio_write(Vio *vio, cxgptr buf, xlen size);
+xsize_t	vio_read(Vio *vio, xgptr buf, xsize_t size);
+xsize_t    vio_read_buff(Vio *vio, xgptr buf, xsize_t size);
+xsize_t	vio_write(Vio *vio, cxgptr buf, xsize_t size);
 int	vio_blocking(Vio *vio, my_bool onoff, my_bool *old_mode);
 my_bool	vio_is_blocking(Vio *vio);
 /* setsockopt TCP_NODELAY at IPPROTO_TCP level, when possible */
@@ -139,7 +141,6 @@ typedef unsigned char uchar;
 #if defined(MARIADB_BASE_VERSION) && MYSQL_VERSION_ID >= 100010
 
 #define DESC_IS_PTR 1
-
 struct st_vio
 {
   my_socket		sd;		/* my_socket - real or imaginary */
@@ -197,8 +198,8 @@ struct st_vio
   /* function pointers. They are similar for socket/SSL/whatever */
   void    (*viodelete)(Vio*);
   int     (*vioerrno)(Vio*);
-  xlen    (*read)(Vio*, xgptr, xlen);
-  xlen    (*write)(Vio*, cxgptr, xlen);
+  xssize_t (*read)(Vio*, xgptr, xsize_t);
+  xssize_t (*write)(Vio*, cxgptr, xsize_t);
   int     (*vioblocking)(Vio*, my_bool, my_bool *);
   my_bool (*is_blocking)(Vio*);
   int     (*viokeepalive)(Vio*, my_bool);

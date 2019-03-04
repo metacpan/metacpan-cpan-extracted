@@ -22,43 +22,37 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{7})',
                   'national_rule' => '(0$1)',
+                  'leading_digits' => '80',
+                  'format' => '$1 $2',
+                  'pattern' => '(\\d{3})(\\d{5})'
+                },
+                {
+                  'national_rule' => '(0$1)',
+                  'pattern' => '(\\d)(\\d{7})',
                   'leading_digits' => '1',
                   'format' => '$1 $2'
                 },
                 {
                   'national_rule' => '(0$1)',
+                  'leading_digits' => '[4-8]',
                   'format' => '$1 $2',
-                  'leading_digits' => '
-            [4-7]|
-            8[2-4]
-          ',
                   'pattern' => '(\\d{2})(\\d{6})'
                 },
                 {
-                  'format' => '$1 $2',
-                  'leading_digits' => '8',
-                  'national_rule' => '(0$1)',
-                  'pattern' => '(\\d{3})(\\d{5})'
-                },
-                {
-                  'leading_digits' => '9',
                   'format' => '$1 $2 $3',
+                  'leading_digits' => '9',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'mobile' => '9\\d{8}',
-                'pager' => '',
                 'personal_number' => '80[24]\\d{5}',
-                'specialrate' => '(801\\d{5})|(805\\d{5})',
+                'toll_free' => '800\\d{5}',
                 'fixed_line' => '
           (?:
             1\\d|
@@ -69,6 +63,9 @@ my $validators = {
             8[2-4]
           )\\d{6}
         ',
+                'voip' => '',
+                'specialrate' => '(801\\d{5})|(805\\d{5})',
+                'mobile' => '9\\d{8}',
                 'geographic' => '
           (?:
             1\\d|
@@ -79,7 +76,7 @@ my $validators = {
             8[2-4]
           )\\d{6}
         ',
-                'toll_free' => '800\\d{5}'
+                'pager' => ''
               };
 my %areanames = (
   511 => "Lima\/Callao",

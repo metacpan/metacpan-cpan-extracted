@@ -1,0 +1,51 @@
+---
+abstract: 'dirty patch for handling pathname on MSWin32::Ja_JP.cp932'
+author:
+  - 'kpee  C<< <kpee.cpanx@gmail.com> >>'
+build_requires:
+  Encode: '0'
+  File::Path: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.15, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: winja
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  CORE::GLOBAL:
+    file: lib/winja.pm
+  winja:
+    file: lib/winja.pm
+    version: v1.0.1
+requires:
+  Cwd: '0'
+  Encode: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  File::stat: '0'
+  Scalar::Util: '0'
+  Symbol: '0'
+  Win32::API: '0'
+  perl: '5.018000'
+  version: '0'
+version: 1.0.1
+x_authority: cpan:KPEE
+x_contributors:
+  - 'KPEE <kpee.cpan@gmail.com>'
+  - 'KPEE <kpee.cpanx@gmail.com>'
+  - 'kpee <kpee.jp@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,6 +2,7 @@
 #define PL_STATS_H
 
 #include "V8Context.h"
+#include "ppport.h"
 
 struct Perf {
     double t0, t1;

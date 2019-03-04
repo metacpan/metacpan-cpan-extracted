@@ -13,6 +13,11 @@ t/204-can.t
 t/205-subclass.t
 t/206-isa.t
 t/401-wrong-usage.t
+t/601-autoload.t
+t/602-nodestroy.t
+t/603-require-after.t
+t/lib/Module/Lazy/_/test/autoload.pm
+t/lib/Module/Lazy/_/test/nodestroy.pm
 t/lib/Module/Lazy/_/test/sample.pm
 t/lib/Module/Lazy/_/test/subclass.pm
 xt/pod-coverage.t

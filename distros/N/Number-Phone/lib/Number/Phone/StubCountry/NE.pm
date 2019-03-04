@@ -22,35 +22,26 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '
-            09|
-            2[01]|
-            8[04589]|
-            9
-          ',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'leading_digits' => '08',
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
-                  'format' => '$1 $2 $3'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '
+            [089]|
+            2[01]
+          '
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          (?:
-            8[04589]|
-            9\\d
-          )\\d{6}
-        ',
-                'pager' => '',
-                'voip' => '',
-                'geographic' => '
+                'fixed_line' => '
           2(?:
             0(?:
               20|
@@ -71,8 +62,14 @@ my $validators = {
         ',
                 'toll_free' => '08\\d{6}',
                 'personal_number' => '',
-                'specialrate' => '(09\\d{6})',
-                'fixed_line' => '
+                'mobile' => '
+          (?:
+            8[04589]|
+            9\\d
+          )\\d{6}
+        ',
+                'pager' => '',
+                'geographic' => '
           2(?:
             0(?:
               20|
@@ -90,7 +87,9 @@ my $validators = {
               88
             )
           )\\d{4}
-        '
+        ',
+                'specialrate' => '(09\\d{6})',
+                'voip' => ''
               };
 my %areanames = (
   227202 => "Niamey",

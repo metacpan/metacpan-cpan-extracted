@@ -56,7 +56,7 @@ WriteMakefile(
         'Storable'                  => 0,
         'Struct::Diff'              => 0.97,
         'Struct::Diff::MergePatch'  => 0.01,
-        'Struct::Path'              => 0.81,
+        'Struct::Path'              => 0.83,
         'Struct::Path::PerlStyle'   => 0.90,
         'Term::ANSIColor'           => 0,
     },

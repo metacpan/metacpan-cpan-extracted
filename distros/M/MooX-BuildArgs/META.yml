@@ -26,31 +26,36 @@ no_index:
 provides:
   MooX::BuildArgs:
     file: lib/MooX/BuildArgs.pm
-    version: '0.06'
+    version: '0.07'
   MooX::BuildArgsHooks:
     file: lib/MooX/BuildArgsHooks.pm
-    version: '0.06'
+    version: '0.07'
   MooX::MethodProxyArgs:
     file: lib/MooX/MethodProxyArgs.pm
-    version: '0.06'
+    version: '0.07'
   MooX::Rebuild:
     file: lib/MooX/Rebuild.pm
-    version: '0.06'
+    version: '0.07'
   MooX::SingleArg:
     file: lib/MooX/SingleArg.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Carp: '0'
+  Class::Method::Modifiers: '2.05'
   Data::MethodProxy: '0.03'
-  Moo: '2'
+  Moo: '2.000000'
+  Moo::Object: '0'
+  Moo::Role: '2.000000'
   Scalar::Util: '0'
   namespace::clean: '0.24'
-  strictures: '2'
+  perl: '5.008001'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/MooX-BuildArgs/issues
   homepage: https://github.com/bluefeet/MooX-BuildArgs
   repository: git://github.com/bluefeet/MooX-BuildArgs.git
-version: '0.06'
+version: '0.07'
+x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Peter Pentchev <roam@ringlet.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

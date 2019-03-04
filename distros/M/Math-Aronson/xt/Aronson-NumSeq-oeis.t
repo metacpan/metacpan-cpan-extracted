@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2019 Kevin Ryde
 
 # This file is part of Math-Aronson.
 #
@@ -82,30 +82,18 @@ sub numeq_array {
   my $numseq  = Math::NumSeq::Aronson->new (conjunctions => 0);
   ok ($numseq->oeis_anum, $anum, "$anum oeis_anum()");
 
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    foreach my $n (1 .. @$bvalues) {
-      my ($i, $value) = $numseq->next;
-      if (! defined $value) {
-        last;
-      }
-      push @got, $value;
-    }
-    MyTestHelpers::diag ("$anum has $#$bvalues values");
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  ### bvalues: @$bvalues
-  ### @got
-  my $diff = $bvalues && diff_nums(\@got, $bvalues);
-  skip (! $bvalues,
-        $diff,
-        undef, "$anum -- English T, without conjunctions");
-  if (defined $diff) {
-    MyTestHelpers::diag ("got     ". join(',', map {defined() ? $_ : 'undef'} @got));
-    MyTestHelpers::diag ("bvalues ". join(',', map {defined() ? $_ : 'undef'} @$bvalues));
-  }
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => 'English T, without conjunctions',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         foreach (1 .. $count) {
+           my ($i, $value) = $numseq->next or last;
+           push @got, $value;
+         }
+         return \@got;
+       });
 }
 
 #------------------------------------------------------------------------------
@@ -117,30 +105,18 @@ sub numeq_array {
                                             conjunctions => 0);
   ok ($numseq->oeis_anum, $anum, "$anum oeis_anum()");
 
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    foreach my $n (1 .. @$bvalues) {
-      my ($i, $value) = $numseq->next;
-      if (! defined $value) {
-        last;
-      }
-      push @got, $value;
-    }
-    MyTestHelpers::diag ("$anum has $#$bvalues values");
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  ### bvalues: @$bvalues
-  ### @got
-  my $diff = $bvalues && diff_nums(\@got, $bvalues);
-  skip (! $bvalues,
-        $diff,
-        undef, "$anum -- English H, without conjunctions");
-  if (defined $diff) {
-    MyTestHelpers::diag ("got     ". join(',', map {defined() ? $_ : 'undef'} @got));
-    MyTestHelpers::diag ("bvalues ". join(',', map {defined() ? $_ : 'undef'} @$bvalues));
-  }
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => 'English H, without conjunctions',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         foreach (1 .. $count) {
+           my ($i, $value) = $numseq->next or last;
+           push @got, $value;
+         }
+         return \@got;
+       });
 }
 
 #------------------------------------------------------------------------------
@@ -152,30 +128,18 @@ sub numeq_array {
                                             conjunctions => 0);
   ok ($numseq->oeis_anum, $anum, "$anum oeis_anum()");
 
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    foreach my $n (1 .. @$bvalues) {
-      my ($i, $value) = $numseq->next;
-      if (! defined $value) {
-        last;
-      }
-      push @got, $value;
-    }
-    MyTestHelpers::diag ("$anum has $#$bvalues values");
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  ### bvalues: @$bvalues
-  ### @got
-  my $diff = $bvalues && diff_nums(\@got, $bvalues);
-  skip (! $bvalues,
-        $diff,
-        undef, "$anum -- English I, without conjunctions");
-  if (defined $diff) {
-    MyTestHelpers::diag ("got     ". join(',', map {defined() ? $_ : 'undef'} @got));
-    MyTestHelpers::diag ("bvalues ". join(',', map {defined() ? $_ : 'undef'} @$bvalues));
-  }
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => 'English I, without conjunctions',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         foreach (1 .. $count) {
+           my ($i, $value) = $numseq->next or last;
+           push @got, $value;
+         }
+         return \@got;
+       });
 }
 
 #------------------------------------------------------------------------------
@@ -185,73 +149,48 @@ sub numeq_array {
   my $anum = 'A081023';
   my $numseq  = Math::NumSeq::Aronson->new (lying => 1,
                                             # not enough to tell if difference
-                                             conjunctions => 0,
+                                            conjunctions => 0,
                                            );
   ok ($numseq->oeis_anum, $anum, "$anum oeis_anum()");
 
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    foreach my $n (1 .. @$bvalues) {
-      my ($i, $value) = $numseq->next;
-      if (! defined $value) {
-        last;
-      }
-      push @got, $value;
-    }
-    MyTestHelpers::diag ("$anum has $#$bvalues values");
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  ### bvalues: @$bvalues
-  ### @got
-  my $diff = $bvalues && diff_nums(\@got, $bvalues);
-  skip (! $bvalues,
-        $diff,
-        undef, "$anum -- English T, lying");
-  if (defined $diff) {
-    MyTestHelpers::diag ("got     ". join(',', map {defined() ? $_ : 'undef'} @got));
-    MyTestHelpers::diag ("bvalues ". join(',', map {defined() ? $_ : 'undef'} @$bvalues));
-  }
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => 'English T, lying',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         foreach (1 .. $count) {
+           my ($i, $value) = $numseq->next or last;
+           push @got, $value;
+         }
+         return \@got;
+       });
 }
 
-#------------------------------------------------------------------------------
 # A081024 -- English T, lying, complement
-
 {
   my $anum = 'A081024';
   my $numseq  = Math::NumSeq::Aronson->new (lying => 1,
                                             # not enough to tell if difference
                                             conjunctions => 0,
                                            );
-
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    my $value = 0;
-    my $upto = 0;
-    foreach my $n (1 .. @$bvalues) {
-      while ($upto == $value) {
-        (undef, $value) = $numseq->next;
-        $upto++;
-      }
-      push @got, $upto;
-      $upto++;
-    }
-    MyTestHelpers::diag ("$anum has $#$bvalues values");
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  ### bvalues: @$bvalues
-  ### @got
-  my $diff = $bvalues && diff_nums(\@got, $bvalues);
-  skip (! $bvalues,
-        $diff,
-        undef, "$anum -- English T, lying, complement");
-  if (defined $diff) {
-    MyTestHelpers::diag ("got     ". join(',', map {defined() ? $_ : 'undef'} @got));
-    MyTestHelpers::diag ("bvalues ". join(',', map {defined() ? $_ : 'undef'} @$bvalues));
-  }
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => 'English T, lying, complement',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         my $start = 1;
+         while (@got < $count) {
+           my ($i, $value) = $numseq->next or last;
+           foreach my $c ($start .. $value-1) {    # values not in $numseq
+             push @got, $c;
+             last if @got >= $count;
+           }
+           $start = $value+1;
+         }
+         return \@got;
+       });
 }
 
 
@@ -263,30 +202,18 @@ sub numeq_array {
   my $numseq  = Math::NumSeq::Aronson->new (lang => 'fr');
   ok ($numseq->oeis_anum, $anum, "$anum oeis_anum()");
 
-  my ($bvalues, $lo, $filename) = MyOEIS::read_values($anum);
-  my @got;
-  if ($bvalues) {
-    foreach my $n (1 .. @$bvalues) {
-      my ($i, $value) = $numseq->next;
-      if (! defined $value) {
-        last;
-      }
-      push @got, $value;
-    }
-    MyTestHelpers::diag ("$anum has $#$bvalues values");
-  } else {
-    MyTestHelpers::diag ("$anum not available");
-  }
-  ### bvalues: @$bvalues
-  ### @got
-  my $diff = $bvalues && diff_nums(\@got, $bvalues);
-  skip (! $bvalues,
-        $diff,
-        undef, "$anum -- French");
-  if (defined $diff) {
-    MyTestHelpers::diag ("got     ". join(',', map {defined() ? $_ : 'undef'} @got));
-    MyTestHelpers::diag ("bvalues ". join(',', map {defined() ? $_ : 'undef'} @$bvalues));
-  }
+  MyOEIS::compare_values
+      (anum => $anum,
+       name => 'French',
+       func => sub {
+         my ($count) = @_;
+         my @got;
+         foreach (1 .. $count) {
+           my ($i, $value) = $numseq->next or last;
+           push @got, $value;
+         }
+         return \@got;
+       });
 }
 
 #------------------------------------------------------------------------------

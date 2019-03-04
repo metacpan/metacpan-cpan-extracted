@@ -1,0 +1,6 @@
+Summary of important user-visible changes for Bio-DB-NCBIHelper
+---------------------------------------------------------------
+
+1.7.3     2019-03-02 23:05:20-06:00 America/Chicago
+  * First release after split from bioperl-live
+  * Remove Bio::DB::RefSeq dependency, which isn't tested outside of Bio::DB::RefSeq.

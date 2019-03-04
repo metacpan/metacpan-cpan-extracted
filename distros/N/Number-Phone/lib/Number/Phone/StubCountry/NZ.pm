@@ -22,30 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'format' => '$1-$2 $3',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
+                  'leading_digits' => '[89]0',
+                  'format' => '$1 $2 $3',
+                  'national_rule' => '0$1'
+                },
+                {
                   'leading_digits' => '
             24|
             [346]|
             7[2-57-9]|
             9[2-9]
           ',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            80|
-            9
-          ',
+                  'format' => '$1-$2 $3',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'national_rule' => '0$1'
                 },
                 {
+                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
                   'leading_digits' => '
             2(?:
               10|
@@ -54,62 +53,61 @@ my $formatters = [
             [59]|
             80
           ',
-                  'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})',
-                  'national_rule' => '0$1',
+                  'leading_digits' => '2[028]',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '2[028]'
+                  'pattern' => '(\\d{2})(\\d{3,4})(\\d{4})',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'leading_digits' => '[278]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,5})',
+                  'leading_digits' => '
+            2(?:
+              [169]|
+              7[0-35-9]
+            )|
+            7|
+            86
+          ',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3,5})'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'pager' => '[28]6\\d{6,7}',
-                'mobile' => '
-          2(?:
-            [0-28]\\d?|
-            [79]
-          )\\d{7}|
-          21\\d{6}
+                'fixed_line' => '
+          24099\\d{3}|
+          (?:
+            3[2-79]|
+            [49][2-9]|
+            6[235-9]|
+            7[2-57-9]
+          )\\d{6}
         ',
-                'voip' => '',
+                'personal_number' => '70\\d{7}',
                 'toll_free' => '
           508\\d{6,7}|
           80\\d{6,8}
         ',
+                'pager' => '[28]6\\d{6,7}',
                 'geographic' => '
+          24099\\d{3}|
           (?:
-            24099|
-            (?:
-              3[2-79]|
-              [49][2-9]|
-              6[235-9]|
-              7[2-57-9]
-            )\\d{3}
-          )\\d{3}
+            3[2-79]|
+            [49][2-9]|
+            6[235-9]|
+            7[2-57-9]
+          )\\d{6}
         ',
-                'fixed_line' => '
-          (?:
-            24099|
-            (?:
-              3[2-79]|
-              [49][2-9]|
-              6[235-9]|
-              7[2-57-9]
-            )\\d{3}
-          )\\d{3}
+                'mobile' => '
+          2[0-28]\\d{8}|
+          2[0-27-9]\\d{7}|
+          21\\d{6}
         ',
-                'specialrate' => '(90\\d{6,7})',
-                'personal_number' => '70\\d{7}'
+                'voip' => '',
+                'specialrate' => '(90\\d{6,7})'
               };
 my %areanames = (
   6424 => "Scott\ Base",

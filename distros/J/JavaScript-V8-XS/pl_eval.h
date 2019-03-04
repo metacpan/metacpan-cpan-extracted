@@ -3,6 +3,7 @@
 
 #include <v8.h>
 #include "pl_config.h"
+#include "ppport.h"
 
 using namespace v8;
 class V8Context;

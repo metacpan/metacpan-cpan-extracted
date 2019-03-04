@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ "x$1" == "xsize" ]; then
+if [ "$1" = "size" ]; then
   echo "77 140"
 else
   echo "bad"

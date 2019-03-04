@@ -1,6 +1,6 @@
 =head1 NAME
 
-Coro::Mysql - let other threads run while doing mysql requests
+Coro::Mysql - let other threads run while doing mysql/mariadb requests
 
 =head1 SYNOPSIS
 
@@ -11,32 +11,23 @@ Coro::Mysql - let other threads run while doing mysql requests
 =head1 DESCRIPTION
 
 (Note that in this manual, "thread" refers to real threads as implemented
-by the Coro module, not to the built-in windows process emulation which
-unfortunately is also called "threads")
+by the L<Coro> module, not to the built-in windows process emulation which
+unfortunately is also called "threads").
 
 This module replaces the I/O handlers for a database connection, with the
-effect that "patched" database handles no longer block the all threads of
-a process, but only the thread that does the request.
+effect that "patched" database handles no longer block all threads of a
+process, but only the thread that does the request. It should work for
+both L<DBD::mysql> and L<DBD::MariaDB> connections and a wide range of
+mariadb/mysql client libraries.
 
 This can be used to make parallel sql requests using Coro, or to do other
-stuff while mysql is rumbling in the background.
+stuff while mariadb is rumbling in the background.
 
 =head2 CAVEAT
 
 Note that this module must be linked against exactly the same (shared,
-possibly not working with all OSes) F<libmysqlclient> library as
-DBD::mysql, otherwise it will not work.
-
-Also, this module requires a header file that apparently isn't installed
-everywhere (F<violite.h>), and therefore comes with it's own copy, which
-might or might not be compatible to the F<violite.h> of your library -
-when in doubt, make sure all the libmysqlclient header files are installed
-and delete the F<violite.h> header that comes with this module.
-
-On the good side, this module does a multitude of checks to ensure that
-the libray versions match on the binary level, so on incompatibilities you
-should expect an exception when trying to unblock a handle, rather than
-data corruption.
+possibly not working with all OSes) F<libmariadb>/F<libmysqlclient>
+library as L<DBD::MariaDB>/L<DBD::mysql>, otherwise it will not work.
 
 Also, while this module makes database handles non-blocking, you still
 cannot run multiple requests in parallel on the same database handle. If
@@ -81,7 +72,7 @@ cancellation.
 
 =head1 FUNCTIONS
 
-Coro::Mysql offers a single user-accessible function:
+Coro::Mysql offers these functions, the only one that oyu usually need is C<unblock>:
 
 =over 4
 
@@ -107,7 +98,7 @@ sub readable { &Coro::Handle::FH::readable }
 sub writable { &Coro::Handle::FH::writable }
 
 BEGIN {
-   our $VERSION = 1.27;
+   our $VERSION = '2.1';
 
    require XSLoader;
    XSLoader::load Coro::Mysql::, $VERSION;
@@ -136,22 +127,58 @@ It is also safe to pass C<undef>, so code like this is works as expected:
 sub unblock {
    my ($DBH) = @_;
 
-   if ($DBH && $DBH->{Driver}{Name} eq "mysql") {
-      my $sock = $DBH->{sock};
+   if ($DBH) {
+      my $mariadb = $DBH->{Driver}{Name} eq "MariaDB";
+      if ($mariadb or $DBH->{Driver}{Name} eq "mysql") {
+         my $sock   = $mariadb ? $DBH->{mariadb_sock} : $DBH->{sock};
+         my $sockfd = $mariadb ? $DBH->mariadb_sockfd : $DBH->{sockfd};
+         my $cvers  = $mariadb ? $DBH->{mariadb_clientversion} : $DBH->{mysql_clientversion};
 
-      open my $fh, "+>&" . $DBH->{sockfd}
-         or croak "Coro::Mysql unable to clone mysql fd";
+         open my $fh, "+>&$sockfd"
+            or croak "Coro::Mysql unable to dup mariadb/mysql fd";
 
-      if (AnyEvent::detect ne "AnyEvent::Impl::EV" || !_use_ev) {
-         require Coro::Handle;
-         $fh = Coro::Handle::unblock ($fh);
+         if (AnyEvent::detect ne "AnyEvent::Impl::EV" || !_use_ev) {
+            require Coro::Handle;
+            $fh = Coro::Handle::unblock ($fh);
+         }
+
+         _patch $sock, $sockfd, $cvers, $fh, tied *$$fh;
       }
-
-      _patch $sock, $DBH->{sockfd}, $DBH->{mysql_clientversion}, $fh, tied *$$fh;
    }
 
    $DBH
 }
+
+=item $bool = Coro::Mysql::is_unblocked $DBH
+
+Returns true iff the database handle was successfully patched for
+non-blocking operations.
+
+=cut
+
+sub is_unblocked {
+   my ($DBH) = @_;
+
+   if ($DBH) {
+      my $mariadb = $DBH->{Driver}{Name} eq "MariaDB";
+      if ($mariadb or $DBH->{Driver}{Name} eq "mysql") {
+         my $sock = $mariadb ? $DBH->{mariadb_sock} : $DBH->{sock};
+         return _is_patched $sock
+      }
+   }
+
+   0
+}
+
+=item $bool = Coro::Mysql::have_ev
+
+Returns true if this Coro::Mysql installation is compiled with special
+support for L<EV> or not.
+
+Even if compiled in, it will only be used if L<EV> is actually the
+AnyEvent event backend.
+
+=cut
 
 1;
 
@@ -178,7 +205,7 @@ restore any previous value of $PApp::SQL::DBH, however):
       Coro::on_enter { $PApp::SQL::DBH = $dbh };
 
       $cb->();
-   }  
+   }
 
 This function makes it possible to easily use L<PApp::SQL> with
 L<Coro::Mysql>, without worrying about database handles.
@@ -212,6 +239,13 @@ L<Coro>, L<PApp::SQL> (a user friendly but efficient wrapper around DBI).
 This module was initially hacked together within a few hours on a long
 flight to Malaysia, and seems to have worked ever since, with minor
 adjustments for newer libmysqlclient libraries.
+
+Well, at least until mariadb introduced the new Pluggable Virtual IO API
+in mariadb 10.3, which changed and broke everything. On the positive
+side, the old system was horrible to use, as many GNU/Linux distributions
+forgot to include the required heaqder files and there were frequent small
+changes, while the new PVIO system seems to be "official" and hopefully
+better supported.
 
 =head1 AUTHOR
 

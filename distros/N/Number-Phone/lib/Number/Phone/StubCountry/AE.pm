@@ -22,20 +22,20 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223701;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
                 {
                   'leading_digits' => '
-            600[25]|
-            800
+            60|
+            8
           ',
                   'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{2,9})'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})',
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
             [236]|
@@ -43,30 +43,30 @@ my $formatters = [
           '
                 },
                 {
-                  'leading_digits' => '5',
+                  'pattern' => '(\\d{3})(\\d)(\\d{5})',
                   'format' => '$1 $2 $3',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'leading_digits' => '[479]'
                 },
                 {
-                  'leading_digits' => '[479]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '5',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d)(\\d{5})'
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
                 'voip' => '',
-                'mobile' => '5[024-68]\\d{7}',
-                'pager' => '',
-                'fixed_line' => '[2-4679][2-8]\\d{6}',
                 'specialrate' => '(700[05]\\d{5})|(900[02]\\d{5})|(600[25]\\d{5})',
-                'personal_number' => '',
+                'mobile' => '5[024-68]\\d{7}',
                 'geographic' => '[2-4679][2-8]\\d{6}',
+                'pager' => '',
+                'personal_number' => '',
                 'toll_free' => '
           400\\d{6}|
           800\\d{2,9}
-        '
+        ',
+                'fixed_line' => '[2-4679][2-8]\\d{6}'
               };
 
     sub new {

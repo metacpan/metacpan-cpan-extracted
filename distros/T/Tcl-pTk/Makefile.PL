@@ -45,42 +45,6 @@ however default autodetection should be fine with freebsd as well.
 EOT
 }
 
-my %makeArgs = (
-    NAME => "Tcl::pTk",
-    VERSION_FROM => 'lib/Tcl/pTk.pm',
-    LICENSE => 'perl_5',
-    EXE_FILES => \@SCRIPTS,
-    META_MERGE => {
-        "meta-spec" => { version => 2 },
-        no_index => { directory => [ qw! benchmarks TableMatrixDemos lib/Tcl/pTk/demos ! ] },
-        keywords => [ qw/ Tk Tcl Tix GUI /],
-        resources => {
-            repository => {
-                type => 'git',
-                url => 'https://github.com/chrstphrchvz/perl-tcl-ptk.git',
-                web => 'https://github.com/chrstphrchvz/perl-tcl-ptk',
-            },
-            MailingList => 'mailto:tcltk@perl.org',
-        },
-    },
-    PREREQ_PM => {
-	Tcl => 0.90,
-	'Class::ISA' => 0.36,
-	'Sub::Name' => 0.05,
-    }
-);
-
-# Remove META_MERGE parameter for older versions of ExtUtils::MakeMaker
-my $MMversion = $ExtUtils::MakeMaker::VERSION;
-#print "VERSION = $MMversion\n";
-$MMversion =~ s/_\d+$//; # Get rid of underscores in the version for numeric compare
-delete $makeArgs{META_MERGE} if( $MMversion < 6.45 );
-
-WriteMakefile(
-%makeArgs
-);
-
-
 
 if ($test_for_tk) {
     my $res = `$tclsh test-for-tk.tcl`;
@@ -144,3 +108,37 @@ EOS
     }
 }
 
+my %makeArgs = (
+    NAME => "Tcl::pTk",
+    VERSION_FROM => 'lib/Tcl/pTk.pm',
+    LICENSE => 'perl_5',
+    EXE_FILES => \@SCRIPTS,
+    META_MERGE => {
+        "meta-spec" => { version => 2 },
+        no_index => { directory => [ qw! benchmarks TableMatrixDemos lib/Tcl/pTk/demos ! ] },
+        keywords => [ qw/ Tk Tcl Tix GUI /],
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'https://github.com/chrstphrchvz/perl-tcl-ptk.git',
+                web => 'https://github.com/chrstphrchvz/perl-tcl-ptk',
+            },
+            MailingList => 'mailto:tcltk@perl.org',
+        },
+    },
+    PREREQ_PM => {
+	Tcl => 0.90,
+	'Class::ISA' => 0.36,
+	'Sub::Name' => 0.05,
+    }
+);
+
+# Remove META_MERGE parameter for older versions of ExtUtils::MakeMaker
+my $MMversion = $ExtUtils::MakeMaker::VERSION;
+#print "VERSION = $MMversion\n";
+$MMversion =~ s/_\d+$//; # Get rid of underscores in the version for numeric compare
+delete $makeArgs{META_MERGE} if( $MMversion < 6.45 );
+
+WriteMakefile(
+%makeArgs
+);

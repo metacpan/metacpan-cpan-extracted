@@ -38,23 +38,43 @@ Options:
         Use JSON as output diff format. It's just a shortcut for "--ofmt
         JSON".
 
-    --ofmt <TERM|JSON|YAML|JSONMERGEPATCH|JSONPATCH>
-        Force specified output format usage. "TERM" is used by default;
-        YAML::XS should be installed for YAML support, see "LIMITATIONS" in
-        App::NDTools for more info.
+    --ofmt <JSON|JSONMERGEPATCH|JSONPATCH|RULES|TERM|YAML>
+        Force specified output format usage.
+
+        JSON    JSON serialized Nested-Diff
+                <https://github.com/mr-mixas/Nested-Diff>
+
+        JSONMERGEPATCH
+                JSON Merge Patch rfc7396
+                <https://tools.ietf.org/html/rfc7396>
+
+        JSONPATCH
+                JSON Patch rfc6902 <https://tools.ietf.org/html/rfc6902>
+
+        RULES   JSON serialized rules for ndproc.
+
+        TERM    Human friendly, colored terminal diff. Used by default.
+
+        YAML    YAML serialized Nested-Diff
+                <https://github.com/mr-mixas/Nested-Diff>. YAML::XS should
+                be installed for YAML support, see "LIMITATIONS" in
+                App::NDTools for more info.
 
     --[no]pretty
-        On/Off pretty-print for default and JSON formats. Full headers will
-        be printed in default mode if disabled. Enabled by default.
+        On/Off pretty-print for JSON serialized and TERM formats. Full
+        headers will be printed in TERM mode if disabled. Enabled by
+        default.
 
     --quiet|-q
         Don't show diff, only exit code shows exists diff or not.
 
     --rules
-        Dump diff as rules for ndproc.
+        Dump diff as rules for ndproc. Deprecated and will be removed soon.
+        "--ofmt rules" should be used instead.
 
     --show <file>
-        Visualize JSON/YAML formatted diff.
+        Visualize JSON/YAML formatted Nested Diff
+        <https://github.com/mr-mixas/Nested-Diff>.
 
     --verbose|-v [int]
         Increase verbosity, max level is 4.

@@ -6,7 +6,7 @@
 
 package Tcl::pTk::Widget;
 
-our ($VERSION) = ('0.95');
+our ($VERSION) = ('0.96');
 
 use IO::Handle; 
 
@@ -2117,6 +2117,15 @@ sub Unbusy
 # Perl-based fileevent implementation. This only performs 'readable' fileevent polling
 #   TODO. Modify the Tcl package to support the Tcl's CreateFileHandler sub so we can implement
 #         fileevent similar to the way perl/tk and python's tkinter does it.
+
+# Include ioctl defaults for non-windows
+unless( $^O eq 'MSWin32'){
+    eval { require 'sys/ioctl.ph' };
+    # Store any error for later
+    # (e.g. no sys/ioctl.ph available)
+    $Tcl::pTk::_FE_unavailable = $@;
+}
+
 sub fileevent{
         my $widget = shift;
         my $handle = shift; # Handle to check
@@ -2124,6 +2133,11 @@ sub fileevent{
         my $cb     = shift; # Callback to execute, set to undef or blank to cancel a fileevent
         my $delay  = shift || 250; # Default polling interval/delay is 250 mS
         
+        if ($Tcl::pTk::_FE_unavailable) {
+                croak("fileevent is unavailable, reason:\n"
+                    . "$Tcl::pTk::_FE_unavailable\n");
+        }
+
         $handle->autoflush;
         
         croak("Error, fileevent mode = '$mode'. Only 'readable' mode currently handled") unless( $mode eq 'readable');
@@ -2141,13 +2155,6 @@ sub fileevent{
         
         # Turn cb into a callback
         $cb = Tcl::pTk::Callback->new($cb);
-        
-        # Include ioctl defaults for non-windows
-        unless( $^O =~ /mswin32/i){
-                no warnings;
-                local $^W = 0; # get rid of warning messages with ioctl.ph on unix
-                require 'sys/ioctl.ph';
-        }
         
         $widget->_FE_helper($handle, $cb, $widget, $delay);
         
@@ -2173,7 +2180,7 @@ sub _FE_helper{
    my $size;
    my $handleEOF;
    # Windows version of checking if io handle is readable
-   if( $^O =~ /mswin32/i){
+   if( $^O eq 'MSWin32'){
    
            # See how big the hande is, if non-zero, read it
            $size = -s $handle;

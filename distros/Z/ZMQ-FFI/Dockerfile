@@ -74,8 +74,8 @@ RUN cd zmq_msg_size \
     && ./print_libzmq_msg_size >> zmq_msg_sizes
 
 FROM zmq-base as dzil-base
-RUN apt-get install -y cpanminus && apt-get clean \
-    && cpanm -v Dist::Zilla
+RUN apt-get install -y cpanminus libdist-zilla-perl libterm-ui-perl \
+    && apt-get clean
 
 FROM dzil-base as zmq-ffi-base
 COPY . /zmq-ffi/
@@ -84,8 +84,8 @@ RUN cd /zmq-ffi && dzil listdeps --missing | cpanm -v
 RUN apt-get -y purge gcc g++ autoconf automake libtool-bin pkg-config \
     libssl-dev zlib1g-dev uuid-dev \
     && apt -y autoremove \
-    && rm -r /var/lib/apt/lists/* ~/.cpanm /zmq-ffi /usr/local/share/man \
-             /usr/share/doc
+    && rm -r /var/lib/apt/lists/* ~/.cpanm /zmq-ffi /usr/local/share/man/* \
+             /usr/share/doc/*
 
 FROM scratch
 COPY --from=zmq-ffi-base / /

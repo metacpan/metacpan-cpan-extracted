@@ -1,10 +1,10 @@
 {
-   "D" : {
-      "fqdn" : {
-         "D" : null
+   "D": {
+      "fqdn": {
+         "D": null
       },
-      "mtime" : {
-         "I" : 4
+      "mtime": {
+         "I": 4
       }
    }
 }

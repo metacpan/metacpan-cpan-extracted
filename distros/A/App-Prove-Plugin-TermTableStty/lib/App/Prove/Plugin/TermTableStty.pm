@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 # ABSTRACT: Set the size of the console for Term::Table using stty size
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub load
@@ -32,7 +32,7 @@ App::Prove::Plugin::TermTableStty - Set the size of the console for Term::Table 
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 

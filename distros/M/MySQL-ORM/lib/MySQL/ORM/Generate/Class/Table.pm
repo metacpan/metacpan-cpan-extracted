@@ -370,6 +370,29 @@ method _merge_sig_types (ArrayRef :$sig!) {
 	return @sig;
 }
 
+method _sort_sig (ArrayRef :$sig!) {
+
+	# sort signature
+	
+	# example:
+	#   Num|HashRef|Undef :$foo_id,
+    #   Num|HashRef       :$foo_id,
+   	
+   	sub _by_param {
+   	    $a =~ /:\$(\w+)/;
+   	    my $left_param = $1;
+   	    
+   	    $b =~ /:\$(\w+)/;
+   	    my $right_param = $1;
+   	    
+   	    $left_param cmp $right_param;
+   	}
+   	
+   	@$sig = sort _by_param @$sig;
+   	
+   	return @$sig;
+}
+
 method _get_method_sigx (Bool :$exclude_autoinc = 0,
 						 Bool :$want_order_by = 0) {
 
@@ -387,7 +410,8 @@ method _get_method_sigx (Bool :$exclude_autoinc = 0,
 	}
 
 	@sig = uniq @sig;
-	@sig = $self->_merge_sig_types(sig => \@sig);	
+	@sig = $self->_merge_sig_types(sig => \@sig);
+	@sig = $self->_sort_sig(sig => \@sig);
 	
 	my $left_join = sprintf '    %s :%s%s', 'Bool', '$', 'left_join';
 	push @sig, $left_join;
@@ -406,14 +430,14 @@ method _get_table2alias_map {
 
 	my %map;
 
-	#$map{ $self->table->get_fq_name } = 't' . $num;
-	$map{ $self->table->name } = 't' . $num;
+	$map{ $self->table->get_fq_name } = 't' . $num;
+	#$map{ $self->table->name } = 't' . $num;
 	$num++;
 
 	foreach my $t ( $self->table->get_parent_tables ) {
 
-		#		$map{ $t->get_fq_name } = 't' . $num;
-		$map{ $t->name } = 't' . $num;
+		$map{ $t->get_fq_name } = 't' . $num;
+		#$map{ $t->name } = 't' . $num;
 
 		$num++;
 	}
@@ -434,32 +458,34 @@ method _get_method_selectx {
 
 	foreach my $col ( $self->table->get_columns ) {
 		push @select, sprintf( "t1.%s", $col->name );
-		$arg2table{ $col->name } = $self->table->name;
+		$arg2table{ $col->name } = $self->table->get_fq_name;
 	}
 
 	foreach my $t ( $self->table->get_parent_tables ) {
 		foreach my $c ( $t->get_columns ) {
 			if ( !$arg2table{ $c->name } ) {
-				push @select, sprintf("%s.%s", $table2alias{$t->name}, $c->name);
-				$arg2table{ $c->name } = $t->name;
+				push @select, sprintf("%s.%s", $table2alias{$t->get_fq_name}, $c->name);
+				$arg2table{ $c->name } = $t->get_fq_name;
 			}
 		}
 	}
 
-	#	my @from = ( sprintf( '%s %s', $self->table->get_fq_name, 't1' ) );
-	my @from = ( sprintf( '%s %s', $self->table->name, 't1' ) );
+	my @from = ( sprintf( '%s %s', $self->table->get_fq_name, 't1' ) );
+	#my @from = ( sprintf( '%s %s', $self->table->name, 't1' ) );
 
 	foreach my $fk ( $self->table->get_foreign_keys ) {
 		foreach my $con ( $fk->get_column_constraints ) {
+		    
+		    my $con_parent_fq = $con->parent_schema_name . "." .$con->parent_table_name;
 
 			push @from, 'left join';
 			push @from,
 			  sprintf(
 				"%s %s on (t1.%s = %s.%s)",
-				$con->parent_table_name,
-				$table2alias{ $con->parent_table_name },
+				$con_parent_fq,
+				$table2alias{ $con_parent_fq },
 				$con->column_name,
-				$table2alias{ $con->parent_table_name },
+				$table2alias{ $con_parent_fq },
 				$con->parent_column_name,
 			  );
 		}
@@ -631,6 +657,8 @@ method _get_method_sig_array (ArrayRef :$columns = [],
 		  $col->name;
 		push @sig, $line;
 	}
+	
+	@sig = $self->_sort_sig(sig => \@sig);
 
 	if ($want_order_by) {
 		my $line = sprintf '    %s :%s%s', 'ArrayRef', '$', 'order_by';

@@ -1,35 +1,35 @@
 [
    {
-      "blame" : 0,
-      "modname" : "Remove",
-      "path" : [
+      "blame": 0,
+      "modname": "Remove",
+      "path": [
          ""
       ],
-      "strict" : 1
+      "strict": 1
    },
    {
-      "modname" : "Merge",
-      "path" : "{files}",
-      "source" : "_cfg.beta.json",
-      "strict" : 1,
-      "style" : "R_OVERRIDE"
+      "modname": "Merge",
+      "path": "{files}",
+      "source": "_cfg.beta.json",
+      "strict": 1,
+      "style": "R_OVERRIDE"
    },
    {
-      "modname" : "Merge",
-      "path" : [
+      "modname": "Merge",
+      "path": [
          "{files}"
       ],
-      "source" : "_cfg.gamma.json",
-      "strict" : 1,
-      "style" : "R_OVERRIDE"
+      "source": "_cfg.gamma.json",
+      "strict": 1,
+      "style": "R_OVERRIDE"
    },
    {
-      "modname" : "Merge",
-      "path" : [
+      "modname": "Merge",
+      "path": [
          ""
       ],
-      "source" : null, # merge to itself
-      "strict" : 1,
-      "style" : "L_OVERRIDE"
+      "source": null,
+      "strict": 1,
+      "style": "L_OVERRIDE"
    }
 ]

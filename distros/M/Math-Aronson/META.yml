@@ -1,39 +1,35 @@
---- #YAML:1.0
-name:               Math-Aronson
-version:            9
-abstract:           Generate Aronson's sequence.
+---
+abstract: "Generate Aronson's sequence."
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            gpl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Lingua::EN::Numbers:  1.01
-    Lingua::FR::Numbers:  0.04
-    perl:                 5.004
-resources:
-    homepage:  http://user42.tuxfamily.org/math-aronson/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - xt
-        - devel
-        - examples
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-optional_features:
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            Test::Weaken:         2.002
-            Test::Weaken::ExtraBits:  1
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Aronson
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
 recommends:
-    Lingua::Any::Numbers:  0.21
-    Unicode::Normalize:   0
+  Lingua::Any::Numbers: '0.21'
+  Unicode::Normalize: '0'
+requires:
+  Lingua::EN::Numbers: '1.01'
+  Lingua::FR::Numbers: '0.04'
+  perl: '5.004'
+resources:
+  homepage: http://user42.tuxfamily.org/math-aronson/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

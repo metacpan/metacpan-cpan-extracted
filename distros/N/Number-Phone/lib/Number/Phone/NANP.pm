@@ -9,7 +9,7 @@ use Number::Phone::NANP::Data;
 
 use Number::Phone::Country qw(noexport);
 
-our $VERSION = '1.6000';
+our $VERSION = '1.7000';
 
 my $cache = {};
 
@@ -71,6 +71,90 @@ The following methods from Number::Phone are overridden:
 
 The constructor, you should never have to call this yourself. To create an
 object the canonical incantation is C<Number::Phone->new('+1 ...')>.
+
+=item operator
+
+For some countries operator data is available.
+
+=cut
+
+# some faffing about to re-open the database if we fork
+my $WORDLENGTH;
+my $datafh;
+my $pid = -1;
+sub _datafh {
+    if(!$datafh || $pid != $$) {
+        my $file = Number::Phone::_find_data_file('Number-Phone-NANP-Data.db');
+        open($datafh, '< :raw :bytes', $file) || die("Can't read $file: $!");
+        read($datafh, my $header, 8);
+        die("$file isn't the right format\n") unless($header eq 'NANPOP'.chr(0).chr(0));
+        read($datafh, $WORDLENGTH, 1);
+        $WORDLENGTH = ord($WORDLENGTH);
+        $pid = $$;
+    }
+    return $datafh;
+}
+
+sub operator {
+    my $self = shift;
+
+    # file needs to be open so we have a $WORDLENGTH
+    $self->_datafh();
+
+    (my $number = ${$self}) =~ s/\D//g;
+    my $ten_thousands = substr($number, 1, 6);
+
+    $ten_thousands -= 200000; # area codes below 200 are invalid
+    return $self->_get_data_starting_from_pointer_at_offset($WORDLENGTH * $ten_thousands);
+}
+
+sub _get_data_starting_from_pointer_at_offset {
+    my($self, $offset) = @_;
+
+    my $pointer = $self->_get_pointer_at_offset($offset);
+    return undef unless($pointer);
+
+    my $block_type = $self->_get_block_type_at_offset($pointer);
+    $pointer += 1;
+
+    if($block_type == 0) {
+        # $pointer points at a string
+        return $self->_get_string_at_offset($pointer);
+    } elsif($block_type == 1) {
+        # $pointer points at a block of pointers
+        (my $number = ${$self}) =~ s/\D//g;
+        my $thousands = substr($number, 7, 1); # the seventh digit
+        return $self->_get_data_starting_from_pointer_at_offset($pointer + $WORDLENGTH * $thousands);
+    } else {
+        die("Don't know how to handle a block of type $block_type at ".($pointer - 1)."\n");
+    }
+}
+
+sub _get_block_type_at_offset {
+    my($self, $offset) = @_;
+
+    seek($self->_datafh(), $offset, 0);
+    read($self->_datafh(), my $block_type, 1);
+    return ord($block_type);
+}
+
+sub _get_string_at_offset {
+    my($self, $offset) = @_;
+
+    seek($self->_datafh(), $offset, 0);
+    read($self->_datafh(), my $chars, 1);
+    $chars = unpack('C', $chars);
+    read($self->_datafh(), my $string, $chars);
+    return $string;
+}
+
+sub _get_pointer_at_offset {
+    my($self, $offset) = @_;
+
+    seek($self->_datafh(), $offset, 0);
+    read($self->_datafh(), my $pointer, $WORDLENGTH);
+    return unpack('N', $pointer);
+}
 
 =item is_valid
 

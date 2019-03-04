@@ -1,17 +1,17 @@
 {
-   "changed" : {
-      "float" : 3.1415,
-      "integer" : 1000000001,
-      "negative" : 100
+   "changed": {
+      "float": 3.1415,
+      "integer": 1000000001,
+      "negative": 100
    },
-   "number_vs_string" : "2",
-   "same" : [
-        0,
-        0.0,
-        -1000000,
-        0.0000000001
+   "number_vs_string": "2",
+   "same": [
+      0,
+      0,
+      -1000000,
+      1e-10
    ],
-   "undistinguishable" : {
-        "0 vs -0" : -0,
+   "undistinguishable": {
+      "0 vs -0": 0
    }
 }

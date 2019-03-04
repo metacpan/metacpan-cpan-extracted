@@ -1,5 +1,6 @@
 #include "pl_util.h"
 #include "pl_stats.h"
+#include "ppport.h"
 
 static void save_stat(pTHX_ V8Context* ctx, const char* category, const char* name, double value)
 {

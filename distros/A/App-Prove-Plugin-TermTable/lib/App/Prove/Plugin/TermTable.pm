@@ -6,7 +6,7 @@ use 5.008001;
 use Term::Size::Any qw( chars );
 
 # ABSTRACT: Set the size of the console for Term::Table
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub load
@@ -32,7 +32,7 @@ App::Prove::Plugin::TermTable - Set the size of the console for Term::Table
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

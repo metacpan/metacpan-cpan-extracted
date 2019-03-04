@@ -22,14 +22,15 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [];
 
 my $validators = {
-                'geographic' => '18[1-8]\\d{3,6}',
-                'toll_free' => '800\\d{4,6}',
                 'personal_number' => '',
+                'toll_free' => '800\\d{4,6}',
+                'fixed_line' => '18[1-8]\\d{3,6}',
+                'voip' => '',
                 'specialrate' => '([67]00\\d{5,6})|(
           (?:
             10|
@@ -48,7 +49,6 @@ my $validators = {
           )|
           20[2-59]\\d\\d
         )',
-                'fixed_line' => '18[1-8]\\d{3,6}',
                 'mobile' => '
           (?:
             4[0-8]|
@@ -56,7 +56,7 @@ my $validators = {
           )\\d{4,8}
         ',
                 'pager' => '',
-                'voip' => ''
+                'geographic' => '18[1-8]\\d{3,6}'
               };
 my %areanames = (
   35813 => "North\ Karelia",

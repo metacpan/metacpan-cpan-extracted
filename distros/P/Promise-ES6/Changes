@@ -1,6 +1,9 @@
 Revision history for Perl module Promise::ES6
 
-0.03 Sat 2 March 2019
+0.04 Mon 4 Mar 2019
+- Fix missing test dependency. (doh!)
+
+0.03 Sat 2 Mar 2019
 - warn() on unhandled promise rejection.
 
 0.02 Wed 13 Feb 2019

@@ -9,7 +9,7 @@ use Log::Log4Cli;
 use App::NDTools::Slurp qw(s_decode s_encode);
 use Struct::Path 0.80 qw(path);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub MODINFO { "Modify structure using external process" }
 
@@ -79,6 +79,12 @@ Blame calculation toggle. Enabled by default.
 
 Command to run. JSON encoded structure passed to it's STDIN and it's STDOUT
 applied to original structure. Exit 0 expected for success.
+
+=item B<--cond> E<lt>pathE<gt>
+
+Apply rule when condition met only. Condition is met when path leads to at
+least one item in the structure. May be used several times (in this case
+conditions are AND'ed).
 
 =item B<--path> E<lt>pathE<gt>
 

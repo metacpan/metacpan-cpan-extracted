@@ -56,7 +56,7 @@ require Image::Base::Imager;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 11;
+my $want_version = 12;
 ok ($Image::Base::Imager::VERSION,
     $want_version,
     'VERSION variable');

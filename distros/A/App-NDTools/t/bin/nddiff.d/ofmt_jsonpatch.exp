@@ -1,22 +1,22 @@
 [
    {
-      "op" : "replace",
-      "path" : "/mtime",
-      "value" : 1462431002
+      "op": "replace",
+      "path": "/mtime",
+      "value": 1462431002
    },
    {
-      "op" : "replace",
-      "path" : "/fqdn",
-      "value" : "beta.example.org"
+      "op": "replace",
+      "path": "/fqdn",
+      "value": "beta.example.org"
    },
    {
-      "op" : "replace",
-      "path" : "/files/~1etc~1hostname",
-      "value" : "beta"
+      "op": "replace",
+      "path": "/files/~1etc~1hostname",
+      "value": "beta"
    },
    {
-      "op" : "add",
-      "path" : "/files/~1etc~1cron.d~1beta",
-      "value" : "* * * * * root sleep 5"
+      "op": "add",
+      "path": "/files/~1etc~1cron.d~1beta",
+      "value": "* * * * * root sleep 5"
    }
 ]

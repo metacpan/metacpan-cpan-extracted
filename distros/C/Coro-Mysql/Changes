@@ -1,7 +1,22 @@
 Revision history for Perl extension Coro::Mysql
 
+2.1  Mon Mar  4 12:40:34 CET 2019
+	- first attempt at supporting DBD::MariaDB.
+        - new Coro::Mysql::is_unblocked function.
+        - new Coro::Mysql::have_ev function.
+	- updated docs to remove violite scare and add newest history.
+
+2.0  Mon Mar  4 06:15:03 CET 2019
+        - major port to new MARIADB_PVIO structure (Pluggable Virtual
+          IO) - so, yay, finally no more header file hacking because an
+          official API exists, but since it is new, the PVIO api is quite
+          broken, and due to the massive changes involved, not sure about
+          backwards compatibility or stability. Seems to work for me.
+	- use mariadb_config or mysql_config commands to find includes
+          and libraries.
+
 1.27 Tue Jun  3 15:38:29 CEST 2014
-	- grrr, remove dbeugging code again.
+	- grrr, remove debugging code again.
 
 1.26 Tue Jun  3 15:37:40 CEST 2014
 	- fix a use-after-free corruption bug when closing database

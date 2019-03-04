@@ -67,6 +67,7 @@ t/bin/nddiff.d/json_omitted_index.exp
 t/bin/nddiff.d/json_U.exp
 t/bin/nddiff.d/ofmt_jsonmergepatch.exp
 t/bin/nddiff.d/ofmt_jsonpatch.exp
+t/bin/nddiff.d/ofmt_rules.exp
 t/bin/nddiff.d/ofmt_yaml.exp
 t/bin/nddiff.d/rules.exp
 t/bin/nddiff.d/term_array_0.exp
@@ -163,6 +164,7 @@ t/bin/ndproc-Insert.d/bool_2.exp
 t/bin/ndproc-Insert.d/bool_3.exp
 t/bin/ndproc-Insert.d/bool_4.exp
 t/bin/ndproc-Insert.d/bool_5.exp
+t/bin/ndproc-Insert.d/cond_true.exp
 t/bin/ndproc-Insert.d/file.exp
 t/bin/ndproc-Insert.d/file_fmt_raw.a.json
 t/bin/ndproc-Insert.d/file_fmt_raw.b.json
@@ -176,6 +178,7 @@ t/bin/ndproc-Insert.d/path.exp
 t/bin/ndproc-Insert.d/path_absent.exp
 t/bin/ndproc-Insert.d/path_empty.exp
 t/bin/ndproc-Insert.d/string.exp
+t/bin/ndproc-Insert.d/structure.exp
 t/bin/ndproc-Insert.d/undef_0.exp
 t/bin/ndproc-Insert.d/undef_1.exp
 t/bin/ndproc-Insert.t

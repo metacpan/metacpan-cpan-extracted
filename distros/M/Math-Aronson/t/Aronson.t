@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Math-Aronson.
 #
@@ -50,7 +50,7 @@ sub numeq_array {
 # VERSION
 
 {
-  my $want_version = 9;
+  my $want_version = 10;
   ok ($Math::Aronson::VERSION, $want_version, 'VERSION variable');
   ok (Math::Aronson->VERSION,  $want_version, 'VERSION class method');
 

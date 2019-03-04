@@ -1,6 +1,7 @@
 package MooX::Rebuild;
-
-$MooX::Rebuild::VERSION = '0.06';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -31,7 +32,6 @@ order to capture the original arguments used to create an object.
 =cut
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 with 'MooX::BuildArgs';
@@ -87,22 +87,9 @@ L<MooX::SingleArg>
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS AND LICENSE
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+See L<MooX::BuildArgs/AUTHORS> and L<MooX::BuildArgs/LICENSE>.
 
-=head1 CONTRIBUTORS
-
-=over
-
-=item *
-
-Peter Pentchev <roamE<64>ringlet.net>
-
-=back
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+=cut
 

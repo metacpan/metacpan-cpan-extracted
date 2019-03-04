@@ -3,6 +3,9 @@
 #include "pl_console.h"
 #include "pl_v8.h"
 
+#define NEED_sv_2pv_flags_GLOBAL
+#include "ppport.h"
+
 #define PL_GC_RUNS 2
 
 #define PL_JSON_CLASS                         "JSON::PP"
@@ -12,10 +15,12 @@
 
 using namespace v8;
 
-// A way to compare Local<Object> instances via operator<, which is what a
-// std::map requires for its keys.
-//
-// Notice that we define operator(), NOT operator<.
+/*
+ * A way to compare Local<Object> instances via operator<, which is what a
+ * std::map requires for its keys.
+ *
+ * Notice that we define operator(), NOT operator<.
+ */
 struct LocalObjectCompare
 {
     bool operator() (const Local<Object>& lhs, const Local<Object>& rhs) const
@@ -25,10 +30,10 @@ struct LocalObjectCompare
     }
 };
 
-// maps from Perl to JavaScript -- SV* to Local<Object>
+/* maps from Perl to JavaScript -- SV* to Local<Object> */
 typedef std::map<void*, Local<Object>> MapP2J;
 
-// maps from JavaScript to Perl -- Object* to SV*
+/* maps from JavaScript to Perl -- Object* to SV* */
 typedef std::map<Local<Object>, void*, LocalObjectCompare> MapJ2P;
 
 struct FuncData {
@@ -51,10 +56,12 @@ static void perl_caller(const FunctionCallbackInfo<Value>& args)
 #if 1
     Local<External> v8_val = Local<External>::Cast(args.Data());
 #else
-    // If args.This() returned the same bject as GetFunction() on the function
-    // template we used to create the function, this would work; alas, it
-    // doesn't work, so we have to pass the data we want so that args.Data()
-    // can return it.
+    /*
+     * If args.This() returned the same bject as GetFunction() on the function
+     * template we used to create the function, this would work; alas, it
+     * doesn't work, so we have to pass the data we want so that args.Data()
+     * can return it.
+     */
     Local<Name> v8_key = String::NewFromUtf8(isolate, "__perl_callback", NewStringType::kNormal).ToLocalChecked();
     Local<Function> v8_func = Local<Function>::Cast(args.This());
     Local<External> v8_val = Local<External>::Cast(v8_func->Get(v8_key));
@@ -127,27 +134,29 @@ static SV* pl_v8_to_perl_impl(pTHX_ V8Context* ctx, const Local<Object>& object,
         Local<Name> v8_key = String::NewFromUtf8(ctx->isolate, "__perl_callback", NewStringType::kNormal).ToLocalChecked();
         Local<External> v8_val = Local<External>::Cast(object->Get(v8_key));
         FuncData* data = (FuncData*) v8_val->Value();
-        ret = data->func;
+        if (data && data->func) {
+            ret = data->func;
+        }
     }
     else if (object->IsArray()) {
         MapJ2P::iterator k = seen.find(object);
         if (k != seen.end()) {
             SV* values = (SV*) k->second;
             /* TODO: weaken reference? */
-            ret = newRV(values);
+            ret = newRV_inc(values);
         } else {
             AV* values_array = newAV();
             SV* values = sv_2mortal((SV*) values_array);
-            ret = newRV(values);
+            ret = newRV_inc(values);
             seen[object] = values;
 
             Local<Array> array = Local<Array>::Cast(object);
             int array_top = array->Length();
             for (int j = 0; j < array_top; ++j) {
                 Local<Value> value = array->Get(j);
-                // TODO: check we got a valid value
+                /* TODO: check we got a valid value */
                 Local<Object> elem = Local<Object>::Cast(value);
-                // TODO: check we got a valid element
+                /* TODO: check we got a valid element */
 
                 SV* nested = sv_2mortal(pl_v8_to_perl_impl(aTHX_ ctx, elem, seen));
                 if (!nested) {
@@ -164,25 +173,25 @@ static SV* pl_v8_to_perl_impl(pTHX_ V8Context* ctx, const Local<Object>& object,
         if (k != seen.end()) {
             SV* values = (SV*) k->second;
             /* TODO: weaken reference? */
-            ret = newRV(values);
+            ret = newRV_inc(values);
         } else {
             HV* values_hash = newHV();
             SV* values = sv_2mortal((SV*) values_hash);
-            ret = newRV(values);
+            ret = newRV_inc(values);
             seen[object] = values;
 
             Local<Array> property_names = object->GetOwnPropertyNames();
             int hash_top = property_names->Length();
             for (int j = 0; j < hash_top; ++j) {
                 Local<Value> v8_key = property_names->Get(j);
-                // TODO: check we got a valid key
+                /* TODO: check we got a valid key */
 
                 String::Utf8Value key(ctx->isolate, v8_key->ToString());
                 Local<Value> value = object->Get(v8_key);
-                // TODO: check we got a valid value
+                /* TODO: check we got a valid value */
 
                 Local<Object> obj = Local<Object>::Cast(value);
-                // TODO: check we got a valid object
+                /* TODO: check we got a valid object */
 
                 SV* nested = sv_2mortal(pl_v8_to_perl_impl(aTHX_ ctx, obj, seen));
                 if (!nested) {
@@ -208,7 +217,10 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
 {
     Local<Object> ret = Local<Object>::Cast(Null(ctx->isolate));
     if (SvTYPE(value) >= SVt_PVMG) {
-        // any Perl SV that has magic (think tied objects) needs to have that magic actually called to retrieve the value
+        /*
+         * any Perl SV that has magic (think tied objects) needs to have that
+         * magic actually called to retrieve the value
+         */
         mg_get(value);
     }
     if (!SvOK(value)) {
@@ -251,8 +263,8 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
                         break; /* could not get element */
                     }
                     const Local<Object> nested = pl_perl_to_v8_impl(aTHX_ *elem, ctx, seen, 0);
-                    // TODO: check for validity
-                    //  croak("Could not create JS element for array\n");
+                    /* TODO: check for validity */
+                    /*  croak("Could not create JS element for array\n"); */
                     array->Set(j, nested);
                 }
             }
@@ -290,11 +302,11 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
                     if (!value) {
                         continue; /* invalid value */
                     }
-                    SvUTF8_on(value); /* yes, always */ // TODO: only for strings?
+                    SvUTF8_on(value); /* yes, always */ /* TODO: only for strings? */
 
                     const Local<Object> nested = pl_perl_to_v8_impl(aTHX_ value, ctx, seen, 0);
-                    // TODO: check for validity
-                    //  croak("Could not create JS element for hash\n");
+                    /* TODO: check for validity */
+                    /*  croak("Could not create JS element for hash\n"); */
 
                     Local<Value> v8_key = String::NewFromUtf8(ctx->isolate, kstr, NewStringType::kNormal).ToLocalChecked();
                     object->Set(v8_key, nested);
@@ -432,13 +444,13 @@ SV* pl_instanceof_global_or_property(pTHX_ V8Context* ctx, const char* oname, co
     Context::Scope context_scope(context);
 
     Local<Object> oobject;
-    bool found = find_object(ctx, oname, context, oobject); // look up object
+    bool found = find_object(ctx, oname, context, oobject); /* look up object */
     if (found) {
         Local<Object> cobject;
-        found = find_object(ctx, cname, context, cobject); // look up class
+        found = find_object(ctx, cname, context, cobject); /* look up class */
         if (found) {
             Maybe<bool> ok = oobject->InstanceOf(context, cobject);
-            if (ok.ToChecked()) { // check if object instanceof class
+            if (ok.ToChecked()) { /* check if object instanceof class */
                 ret = &PL_sv_yes;
             }
         }
@@ -459,7 +471,7 @@ SV* pl_global_objects(pTHX_ V8Context* ctx)
     AV* values = newAV();
     for (uint32_t j = 0; j < property_names->Length(); ++j) {
         Local<Value> v8_key = property_names->Get(j);
-        // TODO: check we got a valid key
+        /* TODO: check we got a valid key */
         String::Utf8Value key(ctx->isolate, v8_key->ToString());
         SV* name = sv_2mortal(newSVpvn(*key, key.length()));
         if (av_store(values, count, name)) {
@@ -467,11 +479,11 @@ SV* pl_global_objects(pTHX_ V8Context* ctx)
             ++count;
         }
     }
-    return newRV((SV*) values);
+    return newRV_inc((SV*) values);
 }
 int pl_run_gc(V8Context* ctx)
 {
-    // Run PL_GC_RUNS GC rounds
+    /* Run PL_GC_RUNS GC rounds */
     for (int j = 0; j < PL_GC_RUNS; ++j) {
         ctx->isolate->LowMemoryNotification();
     }
@@ -490,32 +502,32 @@ bool find_parent(V8Context* ctx, const char* name, Local<Context>& context, Loca
         }
         int length = pos - start;
         if (length <= 0) {
-            // invalid name
+            /* invalid name */
             break;
         }
         slot = String::NewFromUtf8(ctx->isolate, name + start, NewStringType::kNormal, length).ToLocalChecked();
         if (name[pos] == '\0') {
-            // final element, we are done
+            /* final element, we are done */
             found = true;
             break;
         }
         Local<Value> child;
         if (parent->Has(slot)) {
-            // parent has a slot with that name
+            /* parent has a slot with that name */
             child = parent->Get(slot);
         }
         else if (!create) {
-            // we must not create the missing slot, we are done
+            /* we must not create the missing slot, we are done */
             break;
         }
         else {
-            // create the missing slot and go on
+            /* create the missing slot and go on */
             child = Object::New(ctx->isolate);
             parent->Set(slot, child);
         }
         parent = Local<Object>::Cast(child);
         if (!child->IsObject()) {
-            // child in slot is not an object
+            /* child in slot is not an object */
             break;
         }
         start = pos + 1;
@@ -529,11 +541,11 @@ bool find_object(V8Context* ctx, const char* name, Local<Context>& context, Loca
     Local<Object> parent;
     Local<Value> slot;
     if (!find_parent(ctx, name, context, parent, slot)) {
-        // could not find parent
+        /* could not find parent */
         return false;
     }
     if (!parent->Has(slot)) {
-        // parent doesn't have a slot with that name
+        /* parent doesn't have a slot with that name */
         return false;
     }
     Local<Value> child = parent->Get(slot);

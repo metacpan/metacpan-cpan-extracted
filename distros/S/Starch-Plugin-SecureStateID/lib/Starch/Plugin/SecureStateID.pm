@@ -1,5 +1,5 @@
 package Starch::Plugin::SecureStateID;
-$Starch::Plugin::SecureStateID::VERSION = '0.001';
+$Starch::Plugin::SecureStateID::VERSION = '0.002';
 # ABSTRACT: use cryptographically secure random when making state IDs
 
 use Math::Random::Secure ();
@@ -55,7 +55,7 @@ Starch::Plugin::SecureStateID - use cryptographically secure random when making 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Andrew Sterling Hanenkamp.
+This software is copyright (c) 2019 by Andrew Sterling Hanenkamp.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

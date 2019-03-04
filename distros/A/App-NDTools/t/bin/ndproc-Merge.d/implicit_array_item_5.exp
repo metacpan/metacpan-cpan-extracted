@@ -1,9 +1,9 @@
 [
    {
-      "Edit" : [
+      "Edit": [
          {
-            "id" : "edit_replace",
-            "label" : "Replace"
+            "id": "edit_replace",
+            "label": "Replace"
          }
       ]
    }

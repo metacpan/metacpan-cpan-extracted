@@ -1,9 +1,8 @@
 package Perl::Critic::Policy::TryTiny::RequireBlockTermination;
-
-$Perl::Critic::Policy::TryTiny::RequireBlockTermination::VERSION = '0.02';
-
+use 5.008001;
 use strict;
 use warnings;
+our $VERSION = '0.03';
 
 use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification :ppi };
@@ -103,9 +102,9 @@ to support the author is happy to accept requests and patches.
 Note that this policy should be just as useful with other similar modules such as
 L<Try::Catch> and L<TryCatch>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -118,4 +117,6 @@ development this distribution would not exist.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

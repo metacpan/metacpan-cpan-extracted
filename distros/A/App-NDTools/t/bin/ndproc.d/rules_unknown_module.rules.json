@@ -1,12 +1,12 @@
 [
    {
-      "modname" : "Remove",
-      "path" : [
+      "modname": "Remove",
+      "path": [
          "[1]{Edit}[5]"
       ],
-      "strict" : null
+      "strict": null
    },
    {
-      "modname" : "UnKn0wn-M0duLe_n@me",
+      "modname": "UnKn0wn-M0duLe_n@me"
    }
 ]

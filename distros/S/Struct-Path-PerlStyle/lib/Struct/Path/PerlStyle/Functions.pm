@@ -5,9 +5,15 @@ use strict;
 use warnings FATAL => 'all';
 use parent 'Exporter';
 
+use Scalar::Util qw(looks_like_number);
+
 our @EXPORT_OK = qw(
+    BACK
     back
 );
+
+# INPORTANT: upper case should be used for function names to avoid clashes
+# with existing perl functions and operators.
 
 =head1 NAME
 
@@ -22,24 +28,30 @@ Nothing is exported by default.
 
 =head1 Functions
 
-=head2 back
+=head2 BACK, back
 
 Step back count times
 
-    back(3); # go back 3 steps
+    BACK(3); # go back 3 steps
 
 C<undef> returned when requested amount is greater than current step.
+Lower-case 'back' is just an alias to 'BACK' for backward compatibility;
+deprecated and will be removed in the future.
 
 =cut
 
-sub back {
+sub BACK {
     my $steps = defined $_[0] ? $_[0] : 1;
 
-    return undef if ($steps > @{$_{path}});
+    return undef unless (looks_like_number $steps and int($steps) == $steps);
+    return 1 if ($steps == 0);
+    return undef if ($steps < 0 or $steps > @{$_{path}});
 
     splice @{$_{path}}, -$steps;
     splice @{$_{refs}}, -$steps;
 }
+
+*back = \&BACK; # for backward compatibility, deprecated
 
 =head1 AUTHOR
 
@@ -87,7 +99,7 @@ L<Struct::Path>, L<Struct::Diff>, L<perldsc>, L<perldata>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Michael Samoglyadov.
+Copyright 2018-2019 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+# This is a partial, attempt at coding Frank Zappa's, "The Black Page" score.
+# https://www.scribd.com/doc/26974069/Frank-Zappa-The-Black-Page-1-Melody-Score
+
+use strict;
+use warnings;
+
+use lib $ENV{HOME} . '/sandbox/MIDI-Util/lib';
+use MIDI::Util;
+use Music::Duration;
+
+my $score = MIDI::Util::setup_score( bpm => 60 );
+
+$score->n( 'qn', 'B4' );
+$score->n( 'yn', 'Fs4' );
+$score->n( 'yn', 'Fs4' );
+$score->n( 'yn', 'Cs4' );
+$score->n( 'yn', 'B4' );
+$score->n( 'den', 'A5' );
+$score->n( 'sn', 'G5' );
+$score->n( 'den', 'E5' );
+$score->n( 'en', 'A5' );
+$score->n( 'sn', 'Fs5' );
+
+Music::Duration::tuplet( 'hn', 'z', 5 );
+
+$score->n( 'tsn', 'G5' );
+$score->n( 'tsn', 'C5' );
+$score->n( 'tsn', 'F5' );
+$score->n( 'en', 'A5' );
+$score->n( 'tsn', 'E5' );
+$score->r('tsn');
+$score->n( 'tsn', 'D5' );
+$score->n( 'qn', 'C5' );
+$score->n( 'zhn', 'A5' );
+$score->n( 'zhn', 'E5' );
+$score->n( 'zhn', 'F5' );
+$score->n( 'zhn', 'D5' );
+
+$score->n( 'den', 'Cs4' );
+$score->n( 'yn', 'D4' );
+$score->n( 'yn', 'G5' );
+$score->n( 'dhn', 'E4' );
+
+Music::Duration::tuplet( 'en', 'z', 5 );
+Music::Duration::tuplet( 'qn', 'z', 7 );
+
+$score->n( 'yn', 'C4' );
+$score->n( 'yn', 'E4' );
+$score->n( 'yn', 'D4' );
+$score->n( 'yn', 'F4' );
+$score->n( 'yn', 'E4' );
+$score->n( 'yn', 'G4' );
+$score->n( 'yn', 'F5' );
+$score->n( 'yn', 'D4' );
+$score->n( 'ten', 'A5' );
+$score->n( 'ten', 'C5' );
+$score->n( 'ten', 'E5' );
+$score->n( 'zen', 'E5' );
+$score->n( 'zen', 'F5' );
+$score->n( 'zen', 'E5' );
+$score->n( 'zen', 'D5' );
+$score->n( 'zen', 'A4' );
+$score->n( 'zqn', 'Bf4' );
+$score->n( 'zqn', 'C4' );
+$score->n( 'zqn', 'C4' );
+$score->n( 'zqn', 'D4' );
+$score->n( 'zqn', 'D4' );
+$score->n( 'zqn', 'E4' );
+$score->n( 'zqn', 'F4' );
+$score->n( 'zqn', 'A5' );
+$score->n( 'zqn', 'G4' );
+$score->n( 'zqn', 'G4' );
+$score->n( 'zqn', 'D4' );
+$score->n( 'zqn', 'F4' );
+$score->n( 'zqn', 'F4' );
+$score->n( 'zqn', 'E4' );
+
+$score->write_score("$0.mid");

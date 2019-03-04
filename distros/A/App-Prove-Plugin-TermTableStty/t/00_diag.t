@@ -10,9 +10,8 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
-  Cwd
-  Env
   ExtUtils::MakeMaker
+  File::Which
   Test2::V0
 );
 

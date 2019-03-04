@@ -8,6 +8,8 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/black-page
+eg/polyrhythm
 lib/Music/Duration.pm
 t/00-compile.t
 t/01-methods.t

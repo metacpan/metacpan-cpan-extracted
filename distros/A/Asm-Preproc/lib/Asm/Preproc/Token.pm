@@ -15,7 +15,7 @@ Asm::Preproc::Token - One token retrieved from the input
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Data::Dump 'dump';
 use Asm::Preproc::Line;
@@ -69,18 +69,19 @@ Creates an identical copy as a new object.
 =cut
 
 #------------------------------------------------------------------------------
-use Class::XSAccessor::Array {
-	accessors => {
-		type		=> 0,
-		value		=> 1,
-		_line		=> 2,		
-	},
-	predicates => {
-		_has_line	=> 2,
-	},
-};
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
+		'type',
+		'value',
+		'_line',
+);
 
 # create line on demand
+sub _has_line {
+	my $self = shift;
+	return defined($self->_line);
+}
+
 sub line {
 	my $self = shift;
 	$self->_has_line or $self->_line( Asm::Preproc::Line->new );
@@ -88,14 +89,13 @@ sub line {
 }
 
 sub new { 
-	#my($class, $type, $value, $line) = @_;
-	my $class = shift;
-	bless [@_], $class;
+	my($class, $type, $value, $line) = @_;
+	bless {type => $type, value => $value, _line => $line}, $class;
 }
 
 sub clone {
 	my $self = shift;
-	bless [$self->type, $self->value, $self->line->clone], ref($self);
+	bless {type => $self->type, value => $self->value, _line => $self->line->clone}, ref($self);
 }
 
 #------------------------------------------------------------------------------

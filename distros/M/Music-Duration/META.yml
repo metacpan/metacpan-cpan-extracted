@@ -1,5 +1,5 @@
 ---
-abstract: 'Add 32nd, 64th and tuple durations to MIDI-Perl'
+abstract: 'Add 32nd, 64th and tuplet durations to MIDI-Perl'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
@@ -26,7 +26,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-Duration
   repository: https://github.com/ology/Music-Duration
-version: '0.0602'
+version: '0.0605'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -218,6 +218,7 @@ x_Dist_Zilla:
             - sixtyfourth
             - th
             - thirtysecond
+            - tuplet
             - tx
             - txn
             - ty

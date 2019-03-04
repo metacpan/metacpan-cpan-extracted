@@ -116,7 +116,7 @@ method generate {
 		extends => ['MySQL::ORM'],
 		attribs => \@attr,
 		methods => \@methods,
-		overwrite => 0,
+		overwrite => 1,
 	);
 	
 	$self->trace('exit');
@@ -157,7 +157,7 @@ method _get_build_table_body {
     	}
     
     	load $want_class;
-    	return $want_class->new(dbh => $self->dbh);
+    	return $want_class->new(dbh => $self->dbh, schema_name => $self->db_name);
 	';
 
 	return $body;

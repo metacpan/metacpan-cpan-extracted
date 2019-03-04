@@ -17,7 +17,7 @@ WriteMakefile(
 	ABSTRACT_FROM		=> 'lib/Iterator/Simple/Lookahead.pm',
 	AUTHOR         		=> 'Paulo Custodio <pscust@cpan.org>',
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	MIN_PERL_VERSION	=> 5.8.1,
+	MIN_PERL_VERSION	=> 5.8.0,
 	LICENSE 			=> 'perl_5',
 	META_MERGE 			=> {
             resources => {

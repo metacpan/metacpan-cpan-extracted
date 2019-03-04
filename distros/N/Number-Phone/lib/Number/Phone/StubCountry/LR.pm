@@ -22,47 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205539;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})',
                   'leading_digits' => '[45]',
                   'format' => '$1 $2 $3'
                 },
                 {
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '2',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
+                  'leading_digits' => '2',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'national_rule' => '0$1',
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '[23578]',
-                  'national_rule' => '0$1'
+                  'leading_digits' => '[3578]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'mobile' => '
-          (?:
-            (?:
-              (?:
-                20|
-                77|
-                88
-              )\\d|
-              330|
-              555
-            )\\d|
-            4[67]
-          )\\d{5}|
-          5\\d{6}
-        ',
-                'pager' => '',
+                'toll_free' => '',
+                'personal_number' => '',
                 'fixed_line' => '
           (?:
             2\\d{3}|
@@ -75,14 +60,28 @@ my $validators = {
             [34]\\d
           )\\d{4}
         )',
-                'personal_number' => '',
+                'voip' => '',
                 'geographic' => '
           (?:
             2\\d{3}|
             33333
           )\\d{4}
         ',
-                'toll_free' => ''
+                'pager' => '',
+                'mobile' => '
+          (?:
+            (?:
+              330|
+              555|
+              (?:
+                77|
+                88
+              )\\d
+            )\\d|
+            4[67]
+          )\\d{5}|
+          5\\d{6}
+        '
               };
 
     sub new {

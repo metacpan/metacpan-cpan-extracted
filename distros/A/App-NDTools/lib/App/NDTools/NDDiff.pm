@@ -16,7 +16,7 @@ use Struct::Path 0.80 qw(path path_delta);
 use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 use Term::ANSIColor qw(color);
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 my $JSON = JSON->new->canonical->allow_nonref;
 my %COLOR;

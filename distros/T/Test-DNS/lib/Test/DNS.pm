@@ -1,10 +1,9 @@
 package Test::DNS;
 # ABSTRACT: Test DNS queries and zone configuration
-$Test::DNS::VERSION = '0.200';
+$Test::DNS::VERSION = '0.201';
 use Moose;
 use Net::DNS;
 use Test::Deep 'cmp_bag';
-use Set::Object 'set';
 use parent 'Test::Builder::Module';
 
 use constant {
@@ -144,7 +143,7 @@ sub _get_method {
 }
 
 sub _recurse_a_records {
-    my ( $self, $set, $rr ) = @_;
+    my ( $self, $results, $rr ) = @_;
     my $res = $self->object;
 
     if ( $rr->type eq 'CNAME' ) {
@@ -155,12 +154,12 @@ sub _recurse_a_records {
         if ($query) {
             my @records = $query->answer;
             foreach my $record (@records) {
-                $self->_recurse_a_records( $set, $record );
+                $self->_recurse_a_records( $results, $record );
             }
         }
     } elsif ( $rr->type eq 'A' ) {
         my $a_method = $self->_get_method('A');
-        $set->insert( $rr->$a_method );
+        $results->{ $rr->$a_method } = 1;
     }
 
     return;
@@ -173,7 +172,7 @@ sub is_record {
     my $tb        = $CLASS->builder;
     my $method    = $self->_get_method($type);
     my $query_res = $res->query( $input, $type );
-    my $results   = set();
+    my $results   = {};
 
     ref $expected eq 'ARRAY'
         or $expected = [$expected];
@@ -196,11 +195,11 @@ sub is_record {
                 $self->_warn( $type, 'got incorrect RR type: ' . $rr->type );
             }
         } else {
-            $results->insert( $rr->$method );
+            $results->{ $rr->$method } = 1;
         }
     }
 
-    return cmp_bag( [ $results->members ], $expected, $test_name );
+    return cmp_bag( [ keys %{$results} ], $expected, $test_name );
 }
 
 sub _warn {
@@ -233,7 +232,7 @@ Test::DNS - Test DNS queries and zone configuration
 
 =head1 VERSION
 
-version 0.200
+version 0.201
 
 =head1 SYNOPSIS
 
@@ -479,8 +478,6 @@ L<Moose>
 L<Net::DNS>
 
 L<Test::Deep>
-
-L<Set::Object>
 
 =head1 AUTHOR
 

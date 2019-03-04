@@ -1,4 +1,4 @@
-Copyright 2011, 2012 Kevin Ryde
+Copyright 2011, 2012, 2019 Kevin Ryde
 
 This file is part of Image-Base-Imager.
 
@@ -17,6 +17,8 @@ with Image-Base-Imager.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 12, March 2019
+    - SIGNATURE bigger key
 
 Version 11, November 2012
     - xy() allow for x,y outside image size

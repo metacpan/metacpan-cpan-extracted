@@ -14,7 +14,7 @@ use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
 
 use App::NDTools::Slurp qw(s_decode s_encode);
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub MODINFO { "Merge structures according provided rules" }
 
@@ -224,6 +224,12 @@ Merge - merge structures according provided rules
 =item B<--[no]blame>
 
 Blame calculation toggle. Enabled by default.
+
+=item B<--cond> E<lt>pathE<gt>
+
+Apply rule when condition met only. Condition is met when path leads to at
+least one item in the structure. May be used several times (in this case
+conditions are AND'ed).
 
 =item B<--ignore> E<lt>pathE<gt>
 

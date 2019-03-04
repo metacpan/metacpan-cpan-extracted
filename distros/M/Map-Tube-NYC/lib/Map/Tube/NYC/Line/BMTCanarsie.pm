@@ -1,6 +1,6 @@
 package Map::Tube::NYC::Line::BMTCanarsie;
 
-$Map::Tube::NYC::Line::BMTCanarsie::VERSION   = '0.63';
+$Map::Tube::NYC::Line::BMTCanarsie::VERSION   = '0.64';
 $Map::Tube::NYC::Line::BMTCanarsie::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::NYC::Line::BMTCanarsie - NYC Subway Map: BMT Canarsie Line.
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =head1 DESCRIPTION
 

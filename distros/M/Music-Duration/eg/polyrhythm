@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib $ENV{HOME} . '/sandbox/MIDI-Util/lib';
+use MIDI::Util;
+use Music::Duration;
+
+Music::Duration::tuplet( 'wn', 'a', 5 );
+Music::Duration::tuplet( 'wn', 'b', 6 );
+Music::Duration::tuplet( 'wn', 'c', 7 );
+Music::Duration::tuplet( 'wn', 'f', 9 );
+Music::Duration::tuplet( 'wn', 'g', 10 );
+Music::Duration::tuplet( 'wn', 'h', 11 );
+Music::Duration::tuplet( 'wn', 'i', 12 );
+Music::Duration::tuplet( 'wn', 'j', 13 );
+Music::Duration::tuplet( 'wn', 'k', 14 );
+Music::Duration::tuplet( 'wn', 'l', 15 );
+
+my $bars = 13;
+
+my $score = MIDI::Util::setup_score( bpm => 60 );
+
+$score->synch(
+    \&pulse,
+    \&poly,
+);
+
+$score->write_score("$0.mid");
+
+sub pulse {
+    my $s = shift;
+
+    MIDI::Util::set_chan_patch( $s, 0, 34 );
+
+    for ( 1 .. $bars ) {
+        $s->n( 'en', 'C4' ) for 1 .. 8;
+    }
+}
+
+sub poly {
+    my $s = shift;
+
+    MIDI::Util::set_chan_patch( $s, 1, 7 );
+
+    my $note = 'G4';
+
+    $s->n( 'qn', $note ) for 1 .. 4;
+    $s->n( 'awn', $note ) for 1 .. 5;
+    $s->n( 'bwn', $note ) for 1 .. 6;
+    $s->n( 'cwn', $note ) for 1 .. 7;
+    $s->n( 'en', $note ) for 1 .. 8;
+    $s->n( 'fwn', $note ) for 1 .. 9;
+    $s->n( 'gwn', $note ) for 1 .. 10;
+    $s->n( 'hwn', $note ) for 1 .. 11;
+    $s->n( 'iwn', $note ) for 1 .. 12;
+    $s->n( 'jwn', $note ) for 1 .. 13;
+    $s->n( 'kwn', $note ) for 1 .. 14;
+    $s->n( 'lwn', $note ) for 1 .. 15;
+    $s->n( 'sn', $note ) for 1 .. 16;
+}

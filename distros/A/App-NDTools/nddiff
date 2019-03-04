@@ -66,16 +66,44 @@ Ignore substructure. May be used several times.
 
 Use JSON as output diff format. It's just a shortcut for C<--ofmt JSON>.
 
-=item B<--ofmt> E<lt>TERM|JSON|YAML|JSONMERGEPATCH|JSONPATCHE<gt>
+=item B<--ofmt> E<lt>JSON|JSONMERGEPATCH|JSONPATCH|RULES|TERM|YAMLE<gt>
 
-Force specified output format usage. C<TERM> is used by default; L<YAML::XS>
-should be installed for YAML support, see L<App::NDTools/LIMITATIONS> for
-more info.
+Force specified output format usage.
+
+=over 8
+
+=item JSON
+
+JSON serialized L<Nested-Diff|https://github.com/mr-mixas/Nested-Diff>
+
+=item JSONMERGEPATCH
+
+JSON Merge Patch L<rfc7396|https://tools.ietf.org/html/rfc7396>
+
+=item JSONPATCH
+
+JSON Patch L<rfc6902|https://tools.ietf.org/html/rfc6902>
+
+=item RULES
+
+JSON serialized rules for L<ndproc>.
+
+=item TERM
+
+Human friendly, colored terminal diff. Used by default.
+
+=item YAML
+
+YAML serialized L<Nested-Diff|https://github.com/mr-mixas/Nested-Diff>.
+L<YAML::XS> should be installed for YAML support, see
+L<App::NDTools/LIMITATIONS> for more info.
+
+=back
 
 =item B<--[no]pretty>
 
-On/Off pretty-print for default and JSON formats. Full headers will be printed
-in default mode if disabled. Enabled by default.
+On/Off pretty-print for JSON serialized and TERM formats. Full headers will be
+printed in TERM mode if disabled. Enabled by default.
 
 =item B<--quiet|-q>
 
@@ -83,11 +111,13 @@ Don't show diff, only exit code shows exists diff or not.
 
 =item B<--rules>
 
-Dump diff as rules for L<ndproc>.
+Dump diff as rules for L<ndproc>. B<Deprecated and will be removed
+soon>. C<--ofmt rules> should be used instead.
 
 =item B<--show> E<lt>fileE<gt>
 
-Visualize JSON/YAML formatted diff.
+Visualize JSON/YAML formatted
+L<Nested Diff|https://github.com/mr-mixas/Nested-Diff>.
 
 =item B<--verbose|-v> [int]
 
@@ -133,7 +163,7 @@ L<App::NDTools::NDDiff>, L<Struct::Diff>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+Copyright 2016-2019 Michael Samoglyadov C<< <mixas at cpan.org> >>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of GNU General Public License 3 or later versions.

@@ -48,7 +48,9 @@ sub check {
 		$orm = Foo::Testmysqlorm->new(dbh => $dbh);
 	};
 	ok(!$@) or BAIL_OUT($@);
-	ok($orm);	
+	ok($orm);
+	
+	my ($fk_id) = $dbh->selectrow_array("select fk_test_id from testmysqlorm_fk.fk_test");
 	
 	my $sport = $orm->Sport;
 	ok($sport);
@@ -57,11 +59,16 @@ sub check {
 	ok($sport_id);	
 
 	my $league = $orm->League;	
-	my $league_id = $league->insert(league_name => 'nfl', sport_id => $sport_id);
+	my $league_id = $league->insert(league_name => 'nfl', sport_id => $sport_id, fk_test_id => $fk_id);
 	ok($league_id); 
 	
 	my $league_id2 = $league->insert(league_name => 'c f l', sport_id => $sport_id);
 	ok($league_id2);
+	
+	# Test selectx / cross schema generation
+	my ($nfl) = $orm->League->selectx( fk_test_code => 'fk_test_code1');
+	is( $nfl->league_name, 'nfl');
+	is( $nfl->fk_test_name, 'fk_test_name1');
 
 	my $rows_affected = $league->update(league_id => $league_id2, set => Foo::Testmysqlorm::League::ResultClass->new(league_name => 'cfl'));
 	ok($rows_affected == 1);

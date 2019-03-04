@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mash
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '0'
+  Encode: '2.21'
+  Exporter: '0'
+  File::Basename: '0'
+  JSON: '2.93'
+  List::Util: '0'
+  Thread::Queue: '0'
+  perl: '5.012000'
+  threads: '0'
+  threads::shared: '0'
+resources:
+  repository: git://github.com/lskatz/perl-mash.git
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

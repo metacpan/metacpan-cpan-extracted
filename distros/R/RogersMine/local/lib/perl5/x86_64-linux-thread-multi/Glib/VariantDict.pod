@@ -1,0 +1,99 @@
+=head1 NAME
+
+Glib::VariantDict
+
+=cut
+
+=head1 HIERARCHY
+
+  Glib::Boxed
+  +----Glib::VariantDict
+
+
+
+=cut
+
+
+=head1 METHODS
+
+=head2 variantdict = Glib::VariantDict-E<gt>B<new> ($from_asv)
+
+=over
+
+=item * $from_asv (Glib::Variant) 
+
+=back
+
+Since: glib 2.40
+
+=head2 boolean = $dict-E<gt>B<contains> ($key)
+
+=over
+
+=item * $key (string) 
+
+=back
+
+Since: glib 2.40
+
+=head2 variant = $dict-E<gt>B<end> 
+
+Since: glib 2.40
+
+=head2 $dict-E<gt>B<insert_value> ($key, $value)
+
+=over
+
+=item * $key (string) 
+
+=item * $value (Glib::Variant) 
+
+=back
+
+Since: glib 2.40
+
+=head2 variant = $dict-E<gt>B<lookup_value> ($key, $expected_type)
+
+=over
+
+=item * $key (string) 
+
+=item * $expected_type (Glib::VariantType) 
+
+=back
+
+Since: glib 2.40
+
+=head2 boolean = $dict-E<gt>B<remove> ($key)
+
+=over
+
+=item * $key (string) 
+
+=back
+
+Since: glib 2.40
+
+
+
+=cut
+
+
+=head1 SEE ALSO
+
+L<Glib>, L<Glib::Boxed>
+
+
+=cut
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2011 by the gtk2-perl team.
+
+This software is licensed under the LGPL.  See L<Glib> for a full notice.
+
+
+
+=cut
+

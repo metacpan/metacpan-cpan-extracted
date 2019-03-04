@@ -2,20 +2,38 @@
 abstract: 'Plugin to check Phone numbers (basic check)'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  Number::Phone: '0'
+  Number::Phone::BR: '0'
+  Test::CheckManifest: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Validate-WithYAML-Plugin-Phone
+provides:
+  Data::Validate::WithYAML::Plugin::Phone:
+    file: lib/Data/Validate/WithYAML/Plugin/Phone.pm
+    version: '0.06'
 requires:
-  Data::Validate::WithYAML: '0.11'
+  Carp: '0'
+  Data::Validate::WithYAML: '0.18'
+  Try::Tiny: '0'
 resources:
   bugtracker: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-Phone/issues
   homepage: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-Phone
   repository: git://github.com/reneeb/Data-Validate-WithYAML-Plugin-Phone.git
-version: '0.04'
+version: '0.06'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'reneeb <reneeb@dca9f4a1-6dba-46ad-9046-e9fb5d59a48b>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

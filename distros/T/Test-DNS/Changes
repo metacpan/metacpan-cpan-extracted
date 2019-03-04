@@ -1,5 +1,8 @@
 Revision history for Test-DNS
 
+0.201     2019-03-03 15:03:41+02:00 Asia/Jerusalem
+        - Removed Set::Object dependency. (Should fix tests.)
+
 0.200     2019-03-02 23:41:37+02:00 Asia/Jerusalem
         - All attributes are now immutable. If you need to change
           anything (nameservers, the object, even the follow_cname

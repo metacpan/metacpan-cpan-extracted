@@ -13,7 +13,7 @@
 
 package IO::Socket::SSL;
 
-our $VERSION = '2.063';
+our $VERSION = '2.064';
 
 use IO::Socket;
 use Net::SSLeay 1.46;
@@ -74,8 +74,13 @@ my $session_upref;   # SSL_SESSION_up_ref is implemented
 my %sess_cb;         # SSL_CTX_sess_set_(new|remove)_cb
 my $check_partial_chain; # use X509_V_FLAG_PARTIAL_CHAIN if available
 
+my $openssl_version;
+my $netssleay_version;
+
 BEGIN {
-    $can_client_sni = Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x10000000;
+    $openssl_version = Net::SSLeay::OPENSSL_VERSION_NUMBER();
+    $netssleay_version = do { no warnings; $Net::SSLeay::VERSION + 0.0; };
+    $can_client_sni = $openssl_version >= 0x10000000;
     $can_server_sni = defined &Net::SSLeay::get_servername;
     $can_npn = defined &Net::SSLeay::P_next_proto_negotiated &&
 	! Net::SSLeay::constant("LIBRESSL_VERSION_NUMBER");
@@ -83,12 +88,12 @@ BEGIN {
 	# available but removed the actual functionality from these functions.
     $can_alpn = defined &Net::SSLeay::CTX_set_alpn_protos;
     $can_ecdh =
-	(Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x1010000f) ? 'auto' :
+	($openssl_version >= 0x1010000f) ? 'auto' :
 	defined(&Net::SSLeay::CTX_set_ecdh_auto) ? 'can_auto' :
 	(defined &Net::SSLeay::CTX_set_tmp_ecdh &&
 	    # There is a regression with elliptic curves on 1.0.1d with 64bit
 	    # http://rt.openssl.org/Ticket/Display.html?id=2975
-	    ( Net::SSLeay::OPENSSL_VERSION_NUMBER() != 0x1000104f
+	    ( $openssl_version != 0x1000104f
 	    || length(pack("P",0)) == 4 )) ? 'tmp_ecdh' :
 	    '';
     $set_groups_list =
@@ -96,14 +101,14 @@ BEGIN {
 	defined &Net::SSLeay::CTX_set1_curves_list ? \&Net::SSLeay::CTX_set1_curves_list :
 	undef;
     $can_multi_cert = $can_ecdh
-	&& Net::SSLeay::OPENSSL_VERSION_NUMBER() >= 0x10002000;
+	&& $openssl_version >= 0x10002000;
     $can_ocsp = defined &Net::SSLeay::OCSP_cert2ids
 	# OCSP got broken in 1.75..1.77
-	&& ($Net::SSLeay::VERSION < 1.75 || $Net::SSLeay::VERSION > 1.77);
+	&& ($netssleay_version < 1.75 || $netssleay_version > 1.77);
     $can_ocsp_staple = $can_ocsp
 	&& defined &Net::SSLeay::set_tlsext_status_type;
     $can_tckt_keycb  = defined &Net::SSLeay::CTX_set_tlsext_ticket_getkey_cb
-	&& $Net::SSLeay::VERSION >= 1.80;  
+	&& $netssleay_version >= 1.80;  
     $can_pha = defined &Net::SSLeay::CTX_set_post_handshake_auth;
 
     if (defined &Net::SSLeay::SESSION_up_ref) {
@@ -1615,7 +1620,7 @@ sub dump_peer_certificate {
 }
 
 if ( defined &Net::SSLeay::get_peer_cert_chain
-    && $Net::SSLeay::VERSION >= 1.58 ) {
+    && $netssleay_version >= 1.58 ) {
     *peer_certificates = sub {
 	my $self = shift;
 	my $ssl = $self->_get_ssl_object || return;
@@ -2715,6 +2720,8 @@ sub new {
 	    } elsif ($set_groups_list) {
 		$set_groups_list->($_,$curve) or return IO::Socket::SSL->error(
 		    "failed to set ECDH groups/curves on context");
+		# needed for OpenSSL 1.0.2 if ($can_ecdh eq 'can_auto') {
+		Net::SSLeay::CTX_set_ecdh_auto($_,1) if $can_ecdh eq 'can_auto';
 	    } elsif ($curve =~m{:}) {
 		return IO::Socket::SSL->error(
 		    "SSL_CTX_groups_list or SSL_CTX_curves_list not implemented");
@@ -2743,11 +2750,16 @@ sub new {
     my @accept_fp;
     if ( my $fp = $arg_hash->{SSL_fingerprint} ) {
 	for( ref($fp) ? @$fp : $fp) {
-	    my ($algo,$pubkey,$digest) = m{^([\w-]+)\$(pub\$)?([a-f\d:]+)$}i;
-	    return IO::Socket::SSL->_internal_error("invalid fingerprint '$_'",9)
-		if ! $algo;
-	    $algo = lc($algo);
+	    my ($algo,$pubkey,$digest) = m{^(?:([\w-]+)\$)?(pub\$)?([a-f\d:]+)$}i
+		or return IO::Socket::SSL->_internal_error("invalid fingerprint '$_'",9);
 	    ( $digest = lc($digest) ) =~s{:}{}g;
+	    $algo ||=
+		length($digest) == 32 ? 'md5' :
+		length($digest) == 40 ? 'sha1' :
+		length($digest) == 64 ? 'sha256' :
+		return IO::Socket::SSL->_internal_error(
+		    "cannot detect hash algorithem from fingerprint '$_'",9);
+	    $algo = lc($algo);
 	    push @accept_fp,[ $algo, $pubkey || '', pack('H*',$digest) ]
 	}
     }

@@ -1,0 +1,1 @@
+{"pathname":"X/XA/XAOC/Glib-Object-Introspection-0.047.tar.gz","provides":{"Glib::Object::Introspection::Install::Files":{"file":"build/IFiles.pm"},"Glib::Object::Introspection":{"version":0.047,"file":"lib/Glib/Object/Introspection.pm"}},"name":"Glib::Object::Introspection","target":"Glib::Object::Introspection","dist":"Glib-Object-Introspection-0.047","version":0.047}

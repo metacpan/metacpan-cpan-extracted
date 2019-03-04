@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '21',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{2})(\\d{3,4})'
+                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d)(\\d{2})(\\d{3,4})',
+                  'national_rule' => '0$1'
                 },
                 {
                   'national_rule' => '0$1',
@@ -39,52 +39,47 @@ my $formatters = [
                 },
                 {
                   'pattern' => '(\\d{4})(\\d{3})',
-                  'national_rule' => '0$1',
                   'leading_digits' => '9090',
                   'format' => '$1 $2',
+                  'national_rule' => '0$1',
                   'intl_format' => 'NA'
                 },
                 {
+                  'format' => '$1/$2 $3 $4',
                   'leading_digits' => '2',
-                  'format' => '$1/$2 $3 $4',
-                  'national_rule' => '0$1',
-                  'pattern' => '(\\d)(\\d{3})(\\d{3})(\\d{2})'
+                  'pattern' => '(\\d)(\\d{3})(\\d{3})(\\d{2})',
+                  'national_rule' => '0$1'
                 },
                 {
                   'national_rule' => '0$1',
-                  'format' => '$1/$2 $3 $4',
-                  'leading_digits' => '[3-5]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
-                },
-                {
-                  'national_rule' => '0$1',
-                  'leading_digits' => '[689]',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'leading_digits' => '[689]'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[3-5]',
+                  'format' => '$1/$2 $3 $4',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'pager' => '9090\\d{3}',
-                'mobile' => '
-          9(?:
-            0(?:
-              [1-8]\\d|
-              9[1-9]
+                'fixed_line' => '
+          (?:
+            2(?:
+              16|
+              [2-9]\\d{3}
             )|
-            (?:
-              1[0-24-9]|
-              [45]\\d
-            )\\d
-          )\\d{5}
+            [3-5][1-8]\\d{3}
+          )\\d{4}|
+          (?:
+            2|
+            [3-5][1-8]
+          )1[67]\\d{3}|
+          [3-5][1-8]16\\d\\d
         ',
-                'voip' => '
-          6(?:
-            02|
-            5[0-4]|
-            9[0-6]
-          )\\d{6}
-        ',
+                'personal_number' => '',
                 'toll_free' => '800\\d{6}',
                 'geographic' => '
           (?:
@@ -100,27 +95,28 @@ my $validators = {
           )1[67]\\d{3}|
           [3-5][1-8]16\\d\\d
         ',
+                'pager' => '9090\\d{3}',
+                'mobile' => '
+          909[1-9]\\d{5}|
+          9(?:
+            0[1-8]|
+            1[0-24-9]|
+            [45]\\d
+          )\\d{6}
+        ',
+                'voip' => '
+          6(?:
+            02|
+            5[0-4]|
+            9[0-6]
+          )\\d{6}
+        ',
                 'specialrate' => '(8[5-9]\\d{7})|(
           9(?:
             00|
             [78]\\d
           )\\d{6}
-        )|(96\\d{7})',
-                'personal_number' => '',
-                'fixed_line' => '
-          (?:
-            2(?:
-              16|
-              [2-9]\\d{3}
-            )|
-            [3-5][1-8]\\d{3}
-          )\\d{4}|
-          (?:
-            2|
-            [3-5][1-8]
-          )1[67]\\d{3}|
-          [3-5][1-8]16\\d\\d
-        '
+        )|(96\\d{7})'
               };
 my %areanames = (
   4212 => "Bratislava",

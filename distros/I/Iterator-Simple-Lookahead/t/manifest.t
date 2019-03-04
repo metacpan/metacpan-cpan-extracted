@@ -13,4 +13,4 @@ unless ( $ENV{RELEASE_TESTING} ) {
 eval "use Test::CheckManifest 1.42";
 plan skip_all => "Test::CheckManifest 1.42 required" if $@;
 ok_manifest({exclude => ['/.git', '/tools'],
-			 filter => [qr/\.git/]});
+			 filter => [qr/^\.git|^\.travis\.yml/]});

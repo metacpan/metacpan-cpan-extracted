@@ -34,15 +34,15 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =cut
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
-    use Struct::Path qw(spath);
+    use Struct::Path qw(path);
     use Struct::Path::PerlStyle qw(path2str str2path);
 
     my $nested = {
@@ -103,7 +103,7 @@ see L<Safe> for more info. Some path related functions provided by
 L<Struct::Path::PerlStyle::Functions>.
 
     [](/pattern/mods)           # match array values by regular expression
-    []{foo}(eq "bar" && back)   # select hashes which have pair 'foo' => 'bar'
+    []{foo}(eq "bar" && BACK)   # select hashes which have pair 'foo' => 'bar'
 
 There are two global variables available whithin safe compartment: C<$_> which
 refers to value and C<%_> which provides current path via key C<path> (in
@@ -119,12 +119,12 @@ Aliases may be defined via global variable
 
     $Struct::Path::PerlStyle::ALIASES = {
         foo => '{some}{long}{path}',
-        bar => '{and}{one}{more}{step}'
+        bar => '{and}{few}{steps}{more}'
     };
 
 and then
 
-    <foo><bar>      # expands to '{some}{long}{path}{and}{one}{more}{step}'
+    <foo><bar>      # expands to '{some}{long}{path}{and}{few}{steps}{more}'
 
 or as option for C<str2path>:
 
@@ -459,7 +459,7 @@ L<perldsc>, L<perldata>, L<Safe>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Michael Samoglyadov.
+Copyright 2016-2019 Michael Samoglyadov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

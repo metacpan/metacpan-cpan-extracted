@@ -22,39 +22,45 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[5-7]',
-                  'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})'
+                  'intl_format' => 'NA',
+                  'leading_digits' => '[89]',
+                  'format' => '$1',
+                  'pattern' => '(\\d{6})'
                 },
                 {
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d{4})(\\d{6})'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})',
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[5-7]'
+                },
+                {
+                  'pattern' => '(\\d{4})(\\d{6})',
+                  'format' => '$1 $2'
                 }
               ];
 
 my $validators = {
-                'voip' => '5[158]\\d{6}',
-                'mobile' => '6[16]\\d{6}',
-                'pager' => '',
                 'personal_number' => '',
-                'specialrate' => '(7[178]\\d{6})',
+                'toll_free' => '',
                 'fixed_line' => '
           0549(?:
             8[0157-9]|
             9\\d
           )\\d{4}
         ',
+                'voip' => '5[158]\\d{6}',
+                'specialrate' => '(7[178]\\d{6})',
                 'geographic' => '
           0549(?:
             8[0157-9]|
             9\\d
           )\\d{4}
         ',
-                'toll_free' => ''
+                'pager' => '',
+                'mobile' => '6[16]\\d{6}'
               };
 
     sub new {

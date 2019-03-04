@@ -1,0 +1,56 @@
+Revision history for Win32-JA-PathPatch
+
+1.0.1 2019-03-03T05:17:55Z
+
+1.0.1 2019-03-03T05:15:41Z
+    - Fix PODs
+
+1.0.0 2019-03-02T10:01:00Z
+    - Fix normalization
+    - Fix code around Cwd override
+    - Add and enhance tests
+
+0.3.7 2019-02-27T04:25:21Z
+    - Remove about following override code:
+        stat, lstat, File::stat::stat, File::stat::lstat
+
+0.3.6 2019-02-26T18:13:11Z
+    - Required Perl minimum version decames 5.18.0
+    - Remove about following override code:
+        chdir, mkdir, rmdir, opendir, glob, open
+    - Fix normalizing path
+    - Check required OS-LOCALE more robust
+    - Add test utility module
+    - Add Win32::API to required module ( used for OS-LOCALE check )
+    - Add some test_requires for new test utility module
+
+0.3.5 2016-07-10T03:11:57Z
+    Bump up to perl 5.24
+
+0.3.4 2015-03-04T12:22:21Z
+    FIX: none-numeric VERSION is extracted from File::Spec::*
+
+0.3.3 2014-09-28T06:27:02Z
+	Change VCS to Minilla
+	CHANGE: distname to 'winja'(by restrictions of Minilla)
+	FIX: 'xt/minilla/permissions.t' kicks declaration the same package name as CPAN module for hacking
+	FIX: bad regexp of prefix-x5c
+	FIX: delete unnecessary part of POD
+	FIX: fill some part of POD
+
+0.3.2  Sat Jul 12 23:40:11 2014
+	FIX: open: use Symbol
+
+0.3.1  --unknown datetime--
+	IMPROVE: more robust and clean code.
+	ADDED: pod(but it's boilerplate yet)
+
+0.3    Fri Feb 22 00:00:00 2013
+	CHANGE: modulename to 'winja' and distname to 'Win32-JA-PathPatch'
+
+0.0.2  Sun Jun 01 15:28:22 2013
+	FIX: open();
+
+0.0.1  Fri Feb 22 22:38:57 2013
+	First version.
+

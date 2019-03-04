@@ -1,4 +1,4 @@
-Copyright 2010, 2011, 2012 Kevin Ryde
+Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 This file is part of Math-Aronson.
 
@@ -17,6 +17,9 @@ You can get a copy of the GNU General Public License online at
 
 
 
+
+Version 10, March 2019
+    - SIGNATURE bigger key
 
 Version 9, June 2012
     - tests fix optional weaken ExtraBits

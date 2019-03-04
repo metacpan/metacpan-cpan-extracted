@@ -13,5 +13,6 @@ on configure => sub {
 
 on test => sub {
     requires 'Test::More', '1.302';
+    requires 'Test::More::UTF8', '0.05';
     requires 'Text::CSV_XS', '1.34';
 };

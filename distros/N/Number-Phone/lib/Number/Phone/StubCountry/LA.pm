@@ -22,54 +22,42 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205539;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             2[13]|
             3[14]|
             [4-8]
           ',
                   'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'national_rule' => '0$1'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3 $4',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})',
                   'leading_digits' => '3',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})'
+                  'format' => '$1 $2 $3 $4',
+                  'national_rule' => '0$1'
                 },
                 {
-                  'national_rule' => '0$1',
-                  'leading_digits' => '2',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{3})',
                   'format' => '$1 $2 $3 $4',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{3})'
+                  'leading_digits' => '2',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
                 'mobile' => '
           20(?:
-            2[2389]|
+            [29]\\d|
             5[24-689]|
-            7[6-8]|
-            9[1-35-9]
+            7[6-8]
           )\\d{6}
         ',
                 'pager' => '',
-                'specialrate' => '(30\\d{7})',
-                'personal_number' => '',
-                'fixed_line' => '
-          (?:
-            2[13]|
-            [35-7][14]|
-            41|
-            8[1468]
-          )\\d{6}
-        ',
                 'geographic' => '
           (?:
             2[13]|
@@ -78,6 +66,17 @@ my $validators = {
             8[1468]
           )\\d{6}
         ',
+                'voip' => '',
+                'specialrate' => '(30\\d{7})',
+                'fixed_line' => '
+          (?:
+            2[13]|
+            [35-7][14]|
+            41|
+            8[1468]
+          )\\d{6}
+        ',
+                'personal_number' => '',
                 'toll_free' => ''
               };
 

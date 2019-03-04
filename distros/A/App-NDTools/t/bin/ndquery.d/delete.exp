@@ -1,7 +1,7 @@
 {
-   "files" : {
-      "/etc/hostname" : "alpha",
-      "/etc/resolv.conf" : "nameserver 8.8.8.8"
+   "files": {
+      "/etc/hostname": "alpha",
+      "/etc/resolv.conf": "nameserver 8.8.8.8"
    },
-   "fqdn" : "alpha.example.org"
+   "fqdn": "alpha.example.org"
 }

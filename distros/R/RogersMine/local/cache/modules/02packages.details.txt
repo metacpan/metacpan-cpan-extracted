@@ -1,0 +1,80 @@
+File:         02packages.details.txt
+URL:          http://www.perl.com/CPAN/modules/02packages.details.txt
+Description:  Package names found in cpanfile.snapshot
+Columns:      package name, version, path
+Intended-For: Automated fetch routines, namespace documentation.
+Written-By:   Carton v1.0.34
+Line-Count:   71
+Last-Updated: Mon Mar  4 12:01:19 2019
+
+Cairo                             1.106  X/XA/XAOC/Cairo-1.106.tar.gz
+Cairo::GObject                    1.004  X/XA/XAOC/Cairo-GObject-1.004.tar.gz
+Cairo::GObject::Install::Files    undef  X/XA/XAOC/Cairo-GObject-1.004.tar.gz
+Cairo::Install::Files             undef  X/XA/XAOC/Cairo-1.106.tar.gz
+Class::Method::Modifiers           2.12  E/ET/ETHER/Class-Method-Modifiers-2.12.tar.gz
+Devel::GlobalDestruction           0.14  H/HA/HAARG/Devel-GlobalDestruction-0.14.tar.gz
+ExtUtils::Depends                 0.405  X/XA/XAOC/ExtUtils-Depends-0.405.tar.gz
+ExtUtils::PkgConfig                1.16  X/XA/XAOC/ExtUtils-PkgConfig-1.16.tar.gz
+Glib                              1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Bytes                       1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::CodeGen                     1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Error                       1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Flags                       1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::GenPod                      1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Install::Files              undef  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::MakeHelper                  1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object                      1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object::_LazyLoader         1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object::Introspection       0.047  X/XA/XAOC/Glib-Object-Introspection-0.047.tar.gz
+Glib::Object::Introspection::Install::Files undef  X/XA/XAOC/Glib-Object-Introspection-0.047.tar.gz
+Glib::Object::Property            1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object::Property::Readable  1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object::Property::ReadWrite 1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object::Property::Writable  1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Object::Subclass            1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::ParseXSDoc                  1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Glib::Variant                     1.329  X/XA/XAOC/Glib-1.329.tar.gz
+Gtk3                              0.034  X/XA/XAOC/Gtk3-0.034.tar.gz
+Gtk3::Gdk::EventMask              0.034  X/XA/XAOC/Gtk3-0.034.tar.gz
+Method::Generate::Accessor        undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Method::Generate::BuildAll        undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Method::Generate::Constructor     undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Method::Generate::DemolishAll     undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Module::Build                    0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Base              0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Compat            0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Config            0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Cookbook          0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Dumper            0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Notes             0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::aix     0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::cygwin  0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::darwin  0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::Default 0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::MacOS   0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::os2     0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::Unix    0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::VMS     0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::VOS     0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::Platform::Windows 0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::PodParser         0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Build::PPMMaker          0.4224  L/LE/LEONT/Module-Build-0.4224.tar.gz
+Module::Runtime                   0.016  Z/ZE/ZEFRAM/Module-Runtime-0.016.tar.gz
+Moo                            2.003004  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::_mro                         undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::_strictures                  undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::_Utils                       undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::HandleMoose                  undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::HandleMoose::_TypeMap        undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::HandleMoose::FakeConstructor undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::HandleMoose::FakeMetaClass   undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::Object                       undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::Role                      2.003004  H/HA/HAARG/Moo-2.003004.tar.gz
+Moo::sification                   undef  H/HA/HAARG/Moo-2.003004.tar.gz
+oo                                undef  H/HA/HAARG/Moo-2.003004.tar.gz
+Role::Tiny                     2.000006  H/HA/HAARG/Role-Tiny-2.000006.tar.gz
+Role::Tiny::With               2.000006  H/HA/HAARG/Role-Tiny-2.000006.tar.gz
+Sub::Defer                     2.005001  H/HA/HAARG/Sub-Quote-2.005001.tar.gz
+Sub::Exporter::Progressive     0.001013  F/FR/FREW/Sub-Exporter-Progressive-0.001013.tar.gz
+Sub::Quote                     2.005001  H/HA/HAARG/Sub-Quote-2.005001.tar.gz
+Try::Tiny                          0.30  E/ET/ETHER/Try-Tiny-0.30.tar.gz

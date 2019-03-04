@@ -7,7 +7,7 @@ use FFI::Platypus;
 use base qw( Exporter );
 
 # ABSTRACT: Private class for FFI::Platypus::Legacy::Raw
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 our @EXPORT = qw( _ffi _ffi_libc _ffi_package );
 
@@ -92,7 +92,7 @@ FFI::Platypus::Legacy::Raw::Platypus - Private class for FFI::Platypus::Legacy::
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 AUTHOR
 

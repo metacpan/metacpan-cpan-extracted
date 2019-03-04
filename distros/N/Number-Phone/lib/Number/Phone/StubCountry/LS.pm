@@ -22,25 +22,25 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205539;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[2568]',
                   'format' => '$1 $2',
+                  'leading_digits' => '[2568]',
                   'pattern' => '(\\d{4})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '2\\d{7}',
-                'specialrate' => '',
-                'personal_number' => '',
-                'geographic' => '2\\d{7}',
-                'toll_free' => '800[256]\\d{4}',
                 'voip' => '',
+                'specialrate' => '',
+                'geographic' => '2\\d{7}',
+                'pager' => '',
                 'mobile' => '[56]\\d{7}',
-                'pager' => ''
+                'personal_number' => '',
+                'toll_free' => '800[256]\\d{4}',
+                'fixed_line' => '2\\d{7}'
               };
 my %areanames = (
   26622 => "Maseru",

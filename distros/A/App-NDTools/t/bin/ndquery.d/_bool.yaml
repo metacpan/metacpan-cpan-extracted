@@ -1,16 +1,16 @@
 [
    {
-      "FALSE" : false,
-      "TRUE" : true,
-      "array" : [
+      "FALSE": false,
+      "TRUE": true,
+      "array": [
          true,
          false
       ]
    },
    [
       {
-         "FALSE" : false,
-         "TRUE" : true
+         "FALSE": false,
+         "TRUE": true
       },
       true,
       false

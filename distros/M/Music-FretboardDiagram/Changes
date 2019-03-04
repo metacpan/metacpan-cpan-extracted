@@ -1,5 +1,8 @@
 Revision history for Music-FretboardDiagram
 
+0.1002 2019-03-03 23:39:09
+    - Add the Mojolicious program eg/chord-diagram.pl.
+
 0.1001 2019-02-28 04:53:27
     - Collapse giant condition syntax used twice, into a subroutine.
 

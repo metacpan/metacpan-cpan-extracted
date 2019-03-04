@@ -107,7 +107,7 @@ methods. Internal methods are usually preceded with a _
 # Let the code begin...
 
 package Bio::DB::EMBL;
-$Bio::DB::EMBL::VERSION = '1.7.3';
+$Bio::DB::EMBL::VERSION = '1.7.4';
 use strict;
 use vars qw($MODVERSION %HOSTS %FORMATMAP  $DEFAULTFORMAT);
 

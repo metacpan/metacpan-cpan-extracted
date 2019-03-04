@@ -2,6 +2,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+/* mariadb/mysql uses all these reserved macro names, and probably more :( */
+#undef read
+#undef write
+#undef close
+
 #include <mysql.h>
 
 #include "EXTERN.h"
@@ -21,14 +26,56 @@ typedef U16 uint16;
 static CV *readable, *writable;
 static int use_ev;
 
-#include "violite.h"
+#if MARIADB_VERSION_ID >= 100300
+
+  typedef unsigned char uchar; /* bug? */
+  #include <ma_pvio.h>
+
+  #define PVIO 1
+  #define VIOPTR MARIADB_PVIO *
+  #define VIOM(vio) (vio)->methods
+  #define vioblocking blocking
+  #define vioclose close
+  #define VIODATA(vio) (vio)->data
+  /* ma_pvio_get_socket would be it, but it's only declared, not defined */
+  #define VIOSD(vio) mysql_get_socket ((vio)->mysql)
+  #define VIO_READ_BUFFER_SIZE PVIO_READ_AHEAD_CACHE_SIZE
+  #define my_to_vio(sock) (sock)->net.pvio
+
+  #define OURDATAPTR ((ourdata *)vio->methods)
+
+  typedef       uchar *xgptr;
+  typedef const uchar *cxgptr;
+  typedef size_t  xsize_t;
+  typedef ssize_t xssize_t;
+  typedef my_bool xmy_bool;
+
+#else
+
+  #include "violite.h"
+
+  #define PVIO 0
+  #define VIOPTR Vio *
+  #define VIOM(vio) vio
+  #define VIODATA(vio) (vio)->desc
+  #define VIOSD(vio) (vio)->sd
+  #define my_to_vio(sock) (sock)->net.vio
+
+  typedef int xmy_bool;
+
+#endif
 
 #define CoMy_MAGIC 0x436f4d79
 
 typedef struct {
+#if PVIO
+  /* must be first member */
+  struct st_ma_pvio_methods methods;
+#else
 #if DESC_IS_PTR
   char desc[30];
   const char *old_desc;
+#endif
 #endif
   int magic;
   SV *corohandle_sv, *corohandle;
@@ -37,20 +84,26 @@ typedef struct {
   ev_io rw, ww;
 #endif
   char buf[VIO_READ_BUFFER_SIZE];
-  size_t  (*old_read)(Vio*, uchar *, size_t);
-  size_t  (*old_write)(Vio*, const uchar *, size_t);
-  int     (*old_vioclose)(Vio*);
+#if PVIO
+  struct st_ma_pvio_methods *oldmethods;
+#else
+  xssize_t  (*old_read)(VIOPTR, uchar *, size_t);
+  xssize_t  (*old_write)(VIOPTR, const uchar *, size_t);
+  xmy_bool (*old_close)(VIOPTR);
+#endif
 } ourdata;
 
+#ifndef OURDATAPTR
 #if DESC_IS_PTR
 # define OURDATAPTR (*(ourdata **)&((vio)->desc))
 #else
 # define DESC_OFFSET 22
 # define OURDATAPTR (*((ourdata **)((vio)->desc + DESC_OFFSET)))
 #endif
+#endif
 
-static xlen
-our_read (Vio *vio, xgptr p, xlen len)
+static xssize_t
+our_read (VIOPTR vio, xgptr p, xsize_t len)
 {
   ourdata *our = OURDATAPTR;
 
@@ -59,11 +112,11 @@ our_read (Vio *vio, xgptr p, xlen len)
       int rd;
       my_bool dummy;
 
-      vio->vioblocking (vio, 0, &dummy);
+      VIOM (vio)->vioblocking (vio, 0, &dummy);
 
       for (;;)
         {
-          rd = recv (vio->sd, our->buf, sizeof (our->buf), 0);
+          rd = recv (VIOSD (vio), our->buf, sizeof (our->buf), 0);
 
           if (rd >= 0 || errno != EAGAIN)
             break;
@@ -104,17 +157,17 @@ our_read (Vio *vio, xgptr p, xlen len)
   return len;
 }
 
-static xlen
-our_write (Vio *vio, cxgptr p, xlen len)
+static xssize_t
+our_write (VIOPTR vio, cxgptr p, xsize_t len)
 {
   char *ptr = (char *)p;
   my_bool dummy;
 
-  vio->vioblocking (vio, 0, &dummy);
+  VIOM (vio)->vioblocking (vio, 0, &dummy);
 
   while (len > 0)
     {
-      int wr = send (vio->sd, ptr, len, 0);
+      int wr = send (VIOSD (vio), ptr, len, 0);
 
       if (wr > 0)
         {
@@ -152,18 +205,18 @@ our_write (Vio *vio, cxgptr p, xlen len)
   return ptr - (char *)p;
 }
 
-static int
-our_close (Vio *vio)
+static xmy_bool
+our_close (VIOPTR vio)
 {
   ourdata *our = OURDATAPTR;
 
-  if (vio->read != our_read)
+  if (VIOM (vio)->read != our_read)
     croak ("vio.read has unexpected content during unpatch - wtf?");
 
-  if (vio->write != our_write)
+  if (VIOM (vio)->write != our_write)
     croak ("vio.write has unexpected content during unpatch - wtf?");
 
-  if (vio->vioclose != our_close)
+  if (VIOM (vio)->vioclose != our_close)
     croak ("vio.vioclose has unexpected content during unpatch - wtf?");
 
 #if HAVE_EV
@@ -181,13 +234,17 @@ our_close (Vio *vio)
   vio->desc = our->old_desc;
 #endif
 
-  vio->vioclose = our->old_vioclose;
-  vio->write    = our->old_write;
-  vio->read     = our->old_read;
+#if PVIO
+  vio->methods = our->oldmethods;
+#else
+  VIOM (vio)->vioclose = our->old_close;
+  VIOM (vio)->write    = our->old_write;
+  VIOM (vio)->read     = our->old_read;
+#endif
 
   Safefree (our);
 
-  vio->vioclose (vio);
+  VIOM (vio)->vioclose (vio);
 }
 
 #if HAVE_EV
@@ -233,7 +290,7 @@ _patch (IV sock, int fd, unsigned long client_version, SV *corohandle_sv, SV *co
 	CODE:
 {
 	MYSQL *my = (MYSQL *)sock;
-        Vio *vio = my->net.vio;
+        VIOPTR vio = my_to_vio (my);
         ourdata *our;
 
         /* matching versions are required but not sufficient */
@@ -244,18 +301,22 @@ _patch (IV sock, int fd, unsigned long client_version, SV *corohandle_sv, SV *co
         if (fd != my->net.fd)
           croak ("DBD::mysql fd and libmysql disagree - library mismatch, unsupported transport or API changes?");
 
-        if (fd != vio->sd)
+        if (fd != VIOSD (vio))
           croak ("DBD::mysql fd and vio-sd disagree - library mismatch, unsupported transport or API changes?");
 #if MYSQL_VERSION_ID < 100010 && !defined(MARIADB_BASE_VERSION)
-        if (vio->vioclose != vio_close)
+        if (VIOM (vio)->vioclose != vio_close)
           croak ("vio.vioclose has unexpected content - library mismatch, unsupported transport or API changes?");
 
-        if (vio->write != vio_write)
+        if (VIOM (vio)->write != vio_write)
           croak ("vio.write has unexpected content - library mismatch, unsupported transport or API changes?");
 
-        if (vio->read != vio_read
-            && vio->read != vio_read_buff)
+        if (VIOM (vio)->read != vio_read
+            && VIOM (vio)->read != vio_read_buff)
           croak ("vio.read has unexpected content - library mismatch, unsupported transport or API changes?");
+#endif
+#if PVIO
+        if (vio->type != PVIO_TYPE_UNIXSOCKET && vio->type != PVIO_TYPE_SOCKET)
+          croak ("connection type mismatch: Coro::Mysql only supports 'unixsocket' and 'socket' types at this time");
 #endif
 
         Newz (0, our, 1, ourdata);
@@ -265,10 +326,21 @@ _patch (IV sock, int fd, unsigned long client_version, SV *corohandle_sv, SV *co
 #if HAVE_EV
         if (use_ev)
           {
-            ev_io_init (&(our->rw), iocb, vio->sd, EV_READ);
-            ev_io_init (&(our->ww), iocb, vio->sd, EV_WRITE);
+            ev_io_init (&(our->rw), iocb, VIOSD (vio), EV_READ);
+            ev_io_init (&(our->ww), iocb, VIOSD (vio), EV_WRITE);
           }
 #endif
+#if PVIO
+        /* with pvio, we replace methods by our own struct,
+         * both becauase the original might be read-only,
+         * and because we have no private data member, so the
+         * methods pointer includes our data as well
+         */
+        our->methods = *vio->methods;
+        our->oldmethods = vio->methods;
+        vio->methods = &our->methods;
+#else
+        OURDATAPTR = our;
 #if DESC_IS_PTR
         our->old_desc = vio->desc;
         strncpy (our->desc, vio->desc, sizeof (our->desc));
@@ -276,14 +348,33 @@ _patch (IV sock, int fd, unsigned long client_version, SV *corohandle_sv, SV *co
 #else
         vio->desc [DESC_OFFSET - 1] = 0;
 #endif
-        OURDATAPTR = our;
+        our->old_close = VIOM (vio)->vioclose;
+        our->old_write = VIOM (vio)->write;
+        our->old_read  = VIOM (vio)->read;
+#endif
 
-        our->old_vioclose = vio->vioclose;
-        our->old_write    = vio->write;
-        our->old_read     = vio->read;
-
-        vio->vioclose = our_close;
-        vio->write    = our_write;
-        vio->read     = our_read;
+        /* with pvio, this patches our own struct */
+        VIOM (vio)->vioclose = our_close;
+        VIOM (vio)->write    = our_write;
+        VIOM (vio)->read     = our_read;
 }
+
+int
+_is_patched (IV sock)
+	CODE:
+{
+	MYSQL *my = (MYSQL *)sock;
+        VIOPTR vio = my_to_vio (my);
+        RETVAL = VIOM (vio)->write == our_write;
+}
+        OUTPUT: RETVAL
+
+int
+have_ev ()
+	CODE:
+        RETVAL = 0;
+#if HAVE_EV
+        RETVAL = 1;
+#endif
+        OUTPUT: RETVAL
 

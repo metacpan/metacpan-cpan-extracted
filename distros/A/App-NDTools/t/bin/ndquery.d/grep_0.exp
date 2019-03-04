@@ -1,15 +1,15 @@
 [
    {
-      "File" : [
+      "File": [
          {
-            "id" : "file_open"
+            "id": "file_open"
          }
       ]
    },
    {
-      "View" : [
+      "View": [
          {
-            "id" : "view_wrapping"
+            "id": "view_wrapping"
          }
       ]
    }

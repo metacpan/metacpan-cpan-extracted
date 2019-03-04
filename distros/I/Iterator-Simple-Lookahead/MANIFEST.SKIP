@@ -1,5 +1,6 @@
-# git
-\.git$
+# git, travis
+^\.git
+^\.travis
 
 # Komodo project file
 \.kpf$

@@ -1,8 +1,13 @@
 #!/usr/bin/env perl
+use 5.008001;
+use strictures 2;
 use Test2::V0;
 
 {
     package Foo;
+    use 5.008001;
+    use strictures 2;
+
     use Moo;
     with 'MooX::SingleArg';
     __PACKAGE__->single_arg('bar');

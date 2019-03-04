@@ -1,35 +1,30 @@
-{---}
-{abstract: 'Preprocessor to be called from an assembler'}
-{author:}
-{  - 'Paulo Custodio <pscust@cpan.org>'}
-{build_requires:}
-{  ExtUtils::MakeMaker: '0'}
-{configure_requires:}
-{  ExtUtils::MakeMaker: '0'}
-{dynamic_config: 1}
-{generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'}
-{license: unknown}
-{meta-spec:}
-{  url: http://module-build.sourceforge.net/META-spec-v1.4.html}
-{  version: '1.4'}
-{name: Asm-Preproc}
-{no_index:}
-{  directory:}
-{    - t}
-{    - inc}
-{requires:}
-{  Carp: '0'}
-{  Class::XSAccessor: '1.18'}
-{  Class::XSAccessor::Array: '1.18'}
-{  Data::Dump: '1.17'}
-{  File::Find: '0'}
-{  File::Slurp: '9999.13'}
-{  File::Spec: '0'}
-{  Iterator::Simple::Lookahead: '0.06'}
-{  Test::More: '0.96'}
-{  Text::Template: '1.45'}
-{  perl: '5.01'}
-{resources:}
-{  repository: git://github.com/pauloscustodio/perl-Asm-Preproc.git}
-{version: '1.02'}
-{x_serialization_backend: 'CPAN::Meta::YAML version 0.016'}
+---
+abstract: 'Preprocessor to be called from an assembler'
+author:
+  - 'Paulo Custodio <pscust@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Asm-Preproc
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: '0.51'
+  Data::Dump: '1.23'
+  File::Slurp: '9999.26'
+  Iterator::Simple::Lookahead: '0.09'
+  Test::More: '1.302162'
+  Text::Template: '1.55'
+  perl: '5.01'
+resources: {}
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

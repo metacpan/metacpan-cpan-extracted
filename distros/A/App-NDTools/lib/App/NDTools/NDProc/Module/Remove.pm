@@ -8,7 +8,7 @@ use Log::Log4Cli;
 use Struct::Path 0.80 qw(path);
 use Struct::Path::PerlStyle 0.80 qw(path2str);
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub MODINFO { "Remove specified parts from structure" }
 
@@ -61,6 +61,12 @@ Remove - remove specified parts from structure
 =item B<--[no]blame>
 
 Blame calculation toggle. Enabled by default.
+
+=item B<--cond> E<lt>pathE<gt>
+
+Apply rule when condition met only. Condition is met when path leads to at
+least one item in the structure. May be used several times (in this case
+conditions are AND'ed).
 
 =item B<--path> E<lt>pathE<gt>
 

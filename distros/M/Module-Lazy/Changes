@@ -1,5 +1,12 @@
 Revision history for Module-Lazy
 
+0.03    Sun Mar 3 2019
+        - Allow use Module::Lazy; w/o argument
+        - Fix deps, add more tests
+
+0.02    Sun Mar 3 2019
+        - Fix bug with DESTROY being called before loading a package
+
 0.01    Sat Mar 2 2019
         - Initial release. Has `use Module::Load "Some::Module";`
           and `no Module::Load;`

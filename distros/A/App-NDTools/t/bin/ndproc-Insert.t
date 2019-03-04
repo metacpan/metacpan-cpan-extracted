@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use File::Copy qw(copy);
 use Test::File::Contents;
-use Test::More tests => 28;
+use Test::More tests => 33;
 
 use App::NDTools::Test;
 
@@ -222,6 +222,22 @@ run_ok(
     test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
 );
 
+$test = "structure";
+run_ok(
+    name => $test,
+    pre => sub { copy("_empty_hash.json", "$test.got") },
+    cmd => [ @cmd, '--path', '{value}', '--structure', '{"a": "b"}', "$test.got" ],
+    test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
+);
+
+$test = "structure_corrupted";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '--path', '{value}', '--structure', '{"a":}', "$test.got" ],
+    stderr => qr/ FATAL] Failed to decode 'JSON'/,
+    exit => 4,
+);
+
 $test = "undef_0";
 run_ok(
     name => $test,
@@ -245,5 +261,29 @@ run_ok(
     cmd => [ @cmd, '--path', '{value}', "$test.got" ],
     stderr => qr/ERROR] Value to insert should be defined/,
     exit => 1,
+);
+
+$test = "cond_false";
+run_ok(
+    name => $test,
+    pre => sub { copy("_empty_hash.json", "$test.got") },
+    cmd => [ @cmd, '--cond', '(0)', '--path', '{key}', '--string', 'val', "$test.got" ],
+    test => sub { files_eq_or_diff("_empty_hash.json", "$test.got", $test) },
+);
+
+$test = "cond_false_one_of";
+run_ok(
+    name => $test,
+    pre => sub { copy("_empty_hash.json", "$test.got") },
+    cmd => [ @cmd, '--cond', '(1)', '--cond', '(0)', '--cond', '(2)', '--path', '{key}', '--string', 'val', "$test.got" ],
+    test => sub { files_eq_or_diff("_empty_hash.json", "$test.got", $test) },
+);
+
+$test = "cond_true";
+run_ok(
+    name => $test,
+    pre => sub { copy("_empty_hash.json", "$test.got") },
+    cmd => [ @cmd, '--cond', '(1)', '--path', '{key}', '--string', 'val', "$test.got" ],
+    test => sub { files_eq_or_diff("$test.exp", "$test.got", $test) },
 );
 

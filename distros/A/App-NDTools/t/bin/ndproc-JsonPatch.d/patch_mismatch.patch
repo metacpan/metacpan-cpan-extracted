@@ -1,21 +1,21 @@
 [
    {
-      "op" : "replace",
-      "path" : "/true",
-      "value" : false
+      "op": "replace",
+      "path": "/true",
+      "value": false
    },
    {
-      "op" : "add",
-      "path" : "/list/3",
-      "value" : false
+      "op": "add",
+      "path": "/list/3",
+      "value": false
    },
    {
-      "op" : "remove",
-      "path" : "/list/1"
+      "op": "remove",
+      "path": "/list/1"
    },
    {
-      "op" : "replace",
-      "path" : "/false",
-      "value" : true
+      "op": "replace",
+      "path": "/false",
+      "value": true
    }
 ]

@@ -9,7 +9,7 @@ use v5.18.0; # require 2014 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Command;
-$PiFlash::Command::VERSION = '0.1.0';
+$PiFlash::Command::VERSION = '0.2.0';
 use autodie;
 use POSIX; # included with perl
 use IO::Handle; # rpm: "dnf install perl-IO", deb: included with perl
@@ -313,7 +313,7 @@ PiFlash::Command - process/command running utilities for piflash
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
 

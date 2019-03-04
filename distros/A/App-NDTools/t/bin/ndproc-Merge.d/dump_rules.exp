@@ -1,33 +1,33 @@
 [
    {
-      "modname" : "Merge",
-      "path" : [
+      "modname": "Merge",
+      "path": [
          "{common}",
          {
-            "merge" : "{fqdn}",
-            "style" : "L_OVERRIDE"
+            "merge": "{fqdn}",
+            "style": "L_OVERRIDE"
          }
       ],
-      "source" : "../beta.json",
-      "strict" : 0,
-      "style" : "R_OVERRIDE"
+      "source": "../beta.json",
+      "strict": 0,
+      "style": "R_OVERRIDE"
    },
    {
-      "modname" : "Merge",
-      "path" : [
+      "modname": "Merge",
+      "path": [
          "{common}",
          {
-            "merge" : "{mtime}",
-            "style" : "R_REPLACE"
+            "merge": "{mtime}",
+            "style": "R_REPLACE"
          },
          "{another}",
          {
-            "merge" : "{one_more}",
-            "strict" : 0
+            "merge": "{one_more}",
+            "strict": 0
          }
       ],
-      "source" : "../gamma.json",
-      "strict" : 1,
-      "style" : "L_REPLACE"
+      "source": "../gamma.json",
+      "strict": 1,
+      "style": "L_REPLACE"
    }
 ]

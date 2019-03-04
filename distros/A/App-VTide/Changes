@@ -1,5 +1,16 @@
 Revision history for App-VTide
 
+0.1.8   2019-03-04
+        Updating for release of version 0.1.8
+        Adding new manifest files to skip (Ivan Wills)
+        Better code comment (Ivan Wills)
+        Changed recent to list newest first (Ivan Wills)
+        Fixed issue when no arguments passed (Ivan Wills)
+        Fixing up how autocompletion (Ivan Wills)
+        Setting the minimum required version of Getopt::Alt to 0.5.2 (Ivan Wills)
+        Fixing the way sub-command if found for auto-complete (Ivan Wills)
+        Adding logs about command run (Ivan Wills)
+
 0.1.7   2019-01-06
         Updating for release of version 0.1.7
         Fixning config dependencies (Ivan Wills)

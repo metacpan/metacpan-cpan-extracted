@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Net::SSLeay: '1.46'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,7 +19,6 @@ no_index:
     - t
     - inc
 requires:
-  Mozilla::CA: '0'
   Net::SSLeay: '1.46'
   Scalar::Util: '0'
 resources:
@@ -26,5 +26,5 @@ resources:
   homepage: https://github.com/noxxi/p5-io-socket-ssl
   license: http://dev.perl.org/licenses/
   repository: https://github.com/noxxi/p5-io-socket-ssl
-version: '2.063'
+version: '2.064'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

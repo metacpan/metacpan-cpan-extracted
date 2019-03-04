@@ -22,59 +22,53 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205539;
 
 my $formatters = [
                 {
-                  'pattern' => '([23]\\d)(\\d{2})(\\d{3})(\\d{2})',
-                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})(\\d{2})',
                   'leading_digits' => '[23]',
-                  'format' => '$1 $2 $3 $4'
+                  'format' => '$1 $2 $3 $4',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          20(?:
-            2\\d{2}|
-            4[47]\\d|
-            5[3467]\\d|
-            6[279]\\d|
-            7(?:
-              2[29]|
-              [35]\\d
-            )|
-            8[268]\\d|
-            9[245]\\d
-          )\\d{4}
-        ',
                 'toll_free' => '',
                 'personal_number' => '',
-                'specialrate' => '',
                 'fixed_line' => '
+          2072[29]\\d{4}|
           20(?:
-            2\\d{2}|
-            4[47]\\d|
-            5[3467]\\d|
-            6[279]\\d|
-            7(?:
-              2[29]|
-              [35]\\d
-            )|
-            8[268]\\d|
-            9[245]\\d
-          )\\d{4}
+            2\\d|
+            4[47]|
+            5[3467]|
+            6[279]|
+            7[35]|
+            8[268]|
+            9[245]
+          )\\d{5}
         ',
+                'specialrate' => '',
+                'voip' => '22\\d{7}',
                 'mobile' => '3[2-49]\\d{7}',
-                'pager' => '',
-                'voip' => '22\\d{7}'
+                'geographic' => '
+          2072[29]\\d{4}|
+          20(?:
+            2\\d|
+            4[47]|
+            5[3467]|
+            6[279]|
+            7[35]|
+            8[268]|
+            9[245]
+          )\\d{5}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   2612022 => "Antananarivo",
-  2612042 => "Ambatolampy",
   2612044 => "Antsirabe",
   2612047 => "Ambositra",
-  2612048 => "Mid\-West\ Madagascar",
   2612053 => "Toamasina",
   2612054 => "Ambatondrazaka",
   2612056 => "Moramanga",
@@ -99,7 +93,15 @@ my %areanames = (
       $number =~ s/(^\+261|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
-      $number =~ s/^(?:0)//;
+      my $prefix = qr/^(?:0|([24-9]\d{6})$)/;
+      my @matches = $number =~ /$prefix/;
+      if (defined $matches[-1]) {
+        no warnings 'uninitialized';
+        $number =~ s/$prefix/20$1/;
+      }
+      else {
+        $number =~ s/$prefix//;
+      }
       $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self->is_valid() ? $self : undef;
     }

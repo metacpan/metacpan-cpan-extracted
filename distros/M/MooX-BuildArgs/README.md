@@ -38,13 +38,10 @@ Returns a hashref containing the captured arguments.
 - [MooX::Rebuild](https://metacpan.org/pod/MooX::Rebuild)
 - [MooX::SingleArg](https://metacpan.org/pod/MooX::SingleArg)
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
-
-# CONTRIBUTORS
-
-- Peter Pentchev <roam@ringlet.net>
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Peter Pentchev <roam@ringlet.net>
 
 # LICENSE
 

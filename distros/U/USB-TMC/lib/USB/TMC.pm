@@ -60,7 +60,7 @@ use strict;
 use warnings;
 
 package USB::TMC;
-$USB::TMC::VERSION = '0.007';
+$USB::TMC::VERSION = '0.009';
 use USB::LibUSB;
 use Moose;
 use MooseX::Params::Validate 'validated_list';
@@ -312,6 +312,11 @@ sub _find_usbtmc_interface {
     my $config     = $self->device()->get_active_config_descriptor();
     my @interfaces = @{ $config->{interface} };
     for my $interface (@interfaces) {
+        if (@{$interface} > 1) {
+            $self->_debug("Interface with multiple alternates?!");
+        }
+        # Assume that we have only one alternate setting
+        $interface = $interface->[0];
         if (   $interface->{bInterfaceClass} == 0xFE
             && $interface->{bInterfaceSubClass} == 3 ) {
             my $number = $interface->{bInterfaceNumber};
@@ -329,6 +334,7 @@ sub _get_endpoint_addresses {
 
     my $config    = $self->device()->get_active_config_descriptor();
     my $interface = $config->{interface}[$interface_number];
+    $interface = $interface->[0]; # Assume one altenate setting
     my @endpoints = @{ $interface->{endpoint} };
 
     if ( @endpoints != 2 && @endpoints != 3 ) {
@@ -960,7 +966,7 @@ Feel free to contact us at the #labmeasurement channel on Freenode IRC.
 
 =head1 AUTHOR
 
-Simon Reinhardt, E<lt>simon.reinhardt@stud.uni-regensburg.deE<gt>
+Simon Reinhardt, E<lt>simon.reinhardt@physik.uni-r.deE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

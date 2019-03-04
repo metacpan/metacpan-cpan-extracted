@@ -1,5 +1,7 @@
 Revision history for MySQL-Util
 
+0.38    -  Use fully qualified db name when searching for columns/keys.
+
 0.37    - fixed bug in lib/MySQL/Util/Lite/PrimaryKey.pm where the incorrect
           constraint was being returned which manifested in bad column values
           in the get_id() methods after generation (thanks to Mike Svendsen)

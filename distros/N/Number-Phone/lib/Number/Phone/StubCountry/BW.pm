@@ -22,29 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[2-6]',
                   'format' => '$1 $2',
-                  'pattern' => '(\\d{3})(\\d{4})'
-                },
-                {
                   'leading_digits' => '90',
-                  'format' => '$1 $2',
                   'pattern' => '(\\d{2})(\\d{5})'
                 },
                 {
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'format' => '$1 $2',
+                  'leading_digits' => '[2-6]'
+                },
+                {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '7',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{3})'
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'personal_number' => '',
-                'specialrate' => '(90\\d{5})',
                 'fixed_line' => '
           (?:
             2(?:
@@ -77,7 +75,15 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'personal_number' => '',
                 'toll_free' => '',
+                'mobile' => '
+          77200\\d{3}|
+          7(?:
+            [1-6]\\d|
+            7[014-8]
+          )\\d{5}
+        ',
                 'geographic' => '
           (?:
             2(?:
@@ -110,6 +116,7 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'pager' => '',
                 'voip' => '
           79(?:
             1(?:
@@ -119,16 +126,7 @@ my $validators = {
             2[0-2]\\d
           )\\d{3}
         ',
-                'pager' => '',
-                'mobile' => '
-          7(?:
-            [1-6]\\d{3}|
-            7(?:
-              [014-8]\\d\\d|
-              200
-            )
-          )\\d{3}
-        '
+                'specialrate' => '(90\\d{5})'
               };
 my %areanames = (
   26724 => "Francistown",

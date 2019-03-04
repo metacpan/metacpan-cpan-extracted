@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 use File::Copy qw(copy);
 use File::Spec::Functions qw(catfile);
 use Test::File::Contents;
-use Test::More tests => 25;
+use Test::More tests => 26;
 
 use App::NDTools::Test;
 
@@ -44,6 +44,14 @@ run_ok(
     stderr => sub { file_contents_eq_or_diff("$test.exp", shift, $test) },
 );
 $0 = $orig_program_name; # just in case
+
+$test = "unsupported_mod_opt";
+run_ok(
+    name => $test,
+    cmd => [ @cmd, '-m', 'Pipe', '--unsupported-opt' ],
+    stderr => qr/Name:\n    Pipe /,
+    exit => 1
+);
 
 ### bin specific tests
 

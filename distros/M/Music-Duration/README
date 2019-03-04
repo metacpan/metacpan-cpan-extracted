@@ -1,9 +1,9 @@
 This archive contains the distribution Music-Duration,
-version 0.0602:
+version 0.0605:
 
-  Add 32nd, 64th and tuple durations to MIDI-Perl
+  Add 32nd, 64th and tuplet durations to MIDI-Perl
 
-This software is copyright (c) 2018 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

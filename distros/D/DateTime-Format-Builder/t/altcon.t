@@ -60,7 +60,7 @@ sub do_check {
     );
     for my $epoch ( sort keys %epochs ) {
         my $check = $epochs{$epoch};
-        my $dt = $parser->parse( 'DateTime::Format::Builder', $epoch );
+        my $dt    = $parser->parse( 'DateTime::Format::Builder', $epoch );
         isa_ok( $dt => 'DateTime' );
         is( $dt->datetime => $check, "Epoch of $epoch to $check" );
     }

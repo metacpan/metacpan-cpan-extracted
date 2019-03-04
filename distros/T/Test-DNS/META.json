@@ -43,7 +43,7 @@
    "provides" : {
       "Test::DNS" : {
          "file" : "lib/Test/DNS.pm",
-         "version" : "0.200"
+         "version" : "0.201"
       }
    },
    "release_status" : "stable",
@@ -57,7 +57,7 @@
          "web" : "https://github.com/xsawyerx/test-dns"
       }
    },
-   "version" : "0.200",
+   "version" : "0.201",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

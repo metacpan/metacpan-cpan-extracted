@@ -67,7 +67,17 @@ Return the name of the snapshot
 =item my $xml = $domss->get_xml_description($flags)
 
 Returns an XML document containing a complete description of
-the domain's configuration.
+the domain's configuration. The C<$flags> parameter
+accepts the following constants
+
+=over 4
+
+=item Sys::Virt::DomainSnapshot::XML_SECURE
+
+Include security sensitive information in the XML dump, such as
+passwords.
+
+=back
 
 =item $domss->delete($flags)
 

@@ -56,6 +56,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "0.95",
+   "version" : "0.96",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

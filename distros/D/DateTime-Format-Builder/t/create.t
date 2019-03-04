@@ -88,20 +88,20 @@ my @parsers = (
     sub ClassHasNew::new { return 'new' }
 
     eval q[
-	package ClassHasNew;
-	use DateTime::Format::Builder
-	    parsers => {
-		parse_datetime => [
-		{
-		    regex => qr/^(\d{4})(\d\d)(d\d)(\d\d)(\d\d)(\d\d)$/,
-		    params => [qw( year month day hour minute second )],
-		},
-		{
-		    regex => qr/^(\d{4})(\d\d)(\d\d)$/,
-		    params => [qw( year month day )],
-		},
-		],
-	    };
+    package ClassHasNew;
+    use DateTime::Format::Builder
+        parsers => {
+        parse_datetime => [
+        {
+            regex => qr/^(\d{4})(\d\d)(d\d)(\d\d)(\d\d)(\d\d)$/,
+            params => [qw( year month day hour minute second )],
+        },
+        {
+            regex => qr/^(\d{4})(\d\d)(\d\d)$/,
+            params => [qw( year month day )],
+        },
+        ],
+        };
     ];
     ok( !$@, "No errors when creating the class." );
     is( ClassHasNew->new, 'new', "Don't overwrite existing new() method" );
@@ -112,15 +112,15 @@ my @parsers = (
     sub ClassHasNewMethod::new { return 'new' }
 
     eval q[
-	package ClassHasNewMethod;
-	use DateTime::Format::Builder
-	    parsers => {
-		new =>
-		{
-		    regex => qr/^(\d{4})(\d\d)(d\d)(\d\d)(\d\d)(\d\d)$/,
-		    params => [qw( year month day hour minute second )],
-		},
-	    };
+    package ClassHasNewMethod;
+    use DateTime::Format::Builder
+        parsers => {
+        new =>
+        {
+            regex => qr/^(\d{4})(\d\d)(d\d)(\d\d)(\d\d)(\d\d)$/,
+            params => [qw( year month day hour minute second )],
+        },
+        };
     ];
     ok( $@, "Should have errors when creating class." );
     like(
@@ -138,16 +138,16 @@ my @parsers = (
     sub ClassHasNewOver::new { return 'new' }
 
     eval q[
-	package ClassHasNewOver;
-	use DateTime::Format::Builder
+    package ClassHasNewOver;
+    use DateTime::Format::Builder
             constructor => 1,
-	    parsers => {
-		parse_datetime =>
-		{
-		    regex => qr/^(\d{4})(\d\d)(d\d)(\d\d)(\d\d)(\d\d)$/,
-		    params => [qw( year month day hour minute second )],
-		},
-	    };
+        parsers => {
+        parse_datetime =>
+        {
+            regex => qr/^(\d{4})(\d\d)(d\d)(\d\d)(\d\d)(\d\d)$/,
+            params => [qw( year month day hour minute second )],
+        },
+        };
     ];
     ok( $@, "Should have errors when creating class." );
     like(

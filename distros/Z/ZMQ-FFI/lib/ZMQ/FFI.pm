@@ -1,5 +1,5 @@
 package ZMQ::FFI;
-$ZMQ::FFI::VERSION = '1.14';
+$ZMQ::FFI::VERSION = '1.15';
 # ABSTRACT: version agnostic Perl bindings for zeromq using ffi
 
 use strict;
@@ -65,7 +65,7 @@ ZMQ::FFI - version agnostic Perl bindings for zeromq using ffi
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

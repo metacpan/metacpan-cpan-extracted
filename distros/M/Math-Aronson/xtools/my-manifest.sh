@@ -21,7 +21,9 @@
 
 
 set -e
-mv MANIFEST MANIFEST.old || true
+if [ -e MANIFEST ]; then
+  mv MANIFEST MANIFEST.old || true
+fi
 touch SIGNATURE
 (
   make manifest 2>&1;

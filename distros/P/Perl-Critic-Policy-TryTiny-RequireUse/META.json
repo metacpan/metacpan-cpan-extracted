@@ -42,20 +42,23 @@
       },
       "runtime" : {
          "requires" : {
-            "Perl::Critic" : "1.123"
+            "Perl::Critic::Policy" : "1.123",
+            "Perl::Critic::Utils" : "1.123",
+            "Readonly" : "2.00",
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0.000094",
-            "Try::Tiny" : "0.19"
+            "Perl::Critic" : "1.123",
+            "Test2::V0" : "0.000094"
          }
       }
    },
    "provides" : {
       "Perl::Critic::Policy::TryTiny::RequireUse" : {
          "file" : "lib/Perl/Critic/Policy/TryTiny/RequireUse.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -69,11 +72,12 @@
          "web" : "https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireUse"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>",
       "Graham TerMarsch <graham@howlingfrog.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

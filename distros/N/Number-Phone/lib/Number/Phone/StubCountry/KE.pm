@@ -22,70 +22,68 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205539;
 
 my $formatters = [
                 {
                   'pattern' => '(\\d{2})(\\d{5,7})',
-                  'leading_digits' => '[24-6]',
                   'format' => '$1 $2',
+                  'leading_digits' => '[24-6]',
                   'national_rule' => '0$1'
                 },
                 {
-                  'format' => '$1 $2',
-                  'leading_digits' => '7',
                   'national_rule' => '0$1',
+                  'leading_digits' => '[17]',
+                  'format' => '$1 $2',
                   'pattern' => '(\\d{3})(\\d{6})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
                   'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3,4})',
                   'leading_digits' => '[89]',
                   'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'toll_free' => '800[24-8]\\d{5,6}',
-                'geographic' => '
-          20\\d{6,7}|
-          (?:
-            4[0-6]|
-            5\\d|
-            6[0-24-9]
-          )\\d{7}|
-          (?:
-            4[0245]|
-            6[014-9]
-          )\\d{6}|
-          5[1-79]\\d{5,6}|
-          (?:
-            4[245]|
-            6[01457-9]
-          )\\d{5}
-        ',
-                'fixed_line' => '
-          20\\d{6,7}|
-          (?:
-            4[0-6]|
-            5\\d|
-            6[0-24-9]
-          )\\d{7}|
-          (?:
-            4[0245]|
-            6[014-9]
-          )\\d{6}|
-          5[1-79]\\d{5,6}|
-          (?:
-            4[245]|
-            6[01457-9]
-          )\\d{5}
-        ',
-                'specialrate' => '(900[02-9]\\d{5})',
                 'personal_number' => '',
+                'toll_free' => '800[24-8]\\d{5,6}',
+                'fixed_line' => '
+          (?:
+            4[245]|
+            5[1-79]|
+            6[01457-9]
+          )\\d{5,7}|
+          (?:
+            4[136]|
+            5[08]|
+            62
+          )\\d{7}|
+          (?:
+            [24]0|
+            66
+          )\\d{6,7}
+        ',
+                'voip' => '',
+                'specialrate' => '(900[02-9]\\d{5})',
+                'geographic' => '
+          (?:
+            4[245]|
+            5[1-79]|
+            6[01457-9]
+          )\\d{5,7}|
+          (?:
+            4[136]|
+            5[08]|
+            62
+          )\\d{7}|
+          (?:
+            [24]0|
+            66
+          )\\d{6,7}
+        ',
                 'pager' => '',
-                'mobile' => '7\\d{8}',
-                'voip' => ''
+                'mobile' => '[17]\\d{8}'
               };
 my %areanames = (
   2542 => "Nairobi",

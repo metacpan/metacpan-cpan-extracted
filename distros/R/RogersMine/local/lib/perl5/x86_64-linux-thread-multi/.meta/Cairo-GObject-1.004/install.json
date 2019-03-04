@@ -1,0 +1,1 @@
+{"provides":{"Cairo::GObject::Install::Files":{"file":"build/IFiles.pm"},"Cairo::GObject":{"file":"lib/Cairo/GObject.pm","version":1.004}},"version":1.004,"name":"Cairo::GObject","target":"Cairo::GObject","dist":"Cairo-GObject-1.004","pathname":"X/XA/XAOC/Cairo-GObject-1.004.tar.gz"}

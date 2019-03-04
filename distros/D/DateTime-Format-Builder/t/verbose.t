@@ -54,7 +54,7 @@ SKIP: {
     isa_ok( $parser => 'SampleClass1' );
 
     my $input = "20040506";
-    my $dt = eval { $parser->parse_datetime($input) };
+    my $dt    = eval { $parser->parse_datetime($input) };
     isa_ok( $dt => 'DateTime' );
 
     # Should have some data awaiting us now.

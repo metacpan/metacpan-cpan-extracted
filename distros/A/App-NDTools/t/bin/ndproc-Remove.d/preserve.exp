@@ -1,45 +1,45 @@
 [
    {
-      "File" : [
+      "File": [
          {
-            "id" : "file_new"
+            "id": "file_new"
          },
          {
-            "id" : "file_open"
+            "id": "file_open"
          },
          {
-            "id" : "file_save"
+            "id": "file_save"
          }
       ]
    },
    {
-      "Edit" : [
+      "Edit": [
          {
-            "id" : "edit_cut"
+            "id": "edit_cut"
          },
          {
-            "id" : "edit_copy"
+            "id": "edit_copy"
          },
          {
-            "id" : "edit_paste"
-         },
-         null,
-         {
-            "id" : "edit_find"
+            "id": "edit_paste"
          },
          null,
          {
-            "id" : "edit_settings"
+            "id": "edit_find"
+         },
+         null,
+         {
+            "id": "edit_settings"
          }
       ]
    },
    {
-      "View" : [
+      "View": [
          {
-            "id" : "view_encoding"
+            "id": "view_encoding"
          },
          {
-            "id" : "view_wrapping"
+            "id": "view_wrapping"
          }
       ]
    }

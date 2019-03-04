@@ -22,33 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223703;
+our $VERSION = 1.20190303205539;
 
 my $formatters = [
                 {
-                  'national_rule' => '0$1',
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '70',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'national_rule' => '0$1'
+                },
+                {
+                  'leading_digits' => '[57]',
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '[348]',
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '
-            5|
-            79
-          ',
-                  'format' => '$1 $2 $3 $4'
-                },
-                {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '7'
+                  'format' => '$1 $2 $3 $4',
+                  'leading_digits' => '[348]',
+                  'national_rule' => '0$1'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
                 'mobile' => '
           (?:
             5(?:
@@ -61,8 +57,6 @@ my $validators = {
             790
           )\\d{6}
         ',
-                'voip' => '706\\d{6}',
-                'toll_free' => '800\\d{6}',
                 'geographic' => '
           (?:
             3(?:
@@ -80,6 +74,9 @@ my $validators = {
             )
           )\\d{6}
         ',
+                'pager' => '',
+                'voip' => '706\\d{6}',
+                'specialrate' => '',
                 'fixed_line' => '
           (?:
             3(?:
@@ -97,8 +94,8 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'specialrate' => '',
-                'personal_number' => ''
+                'personal_number' => '',
+                'toll_free' => '800\\d{6}'
               };
 
     sub new {

@@ -1,5 +1,19 @@
 Summary of Changes to Tcl::pTk
 
+Release 0.96:  2019-03-03
+
+ * For consistency, use the exact platform name strings when checking `$^O`,
+   and use `eq`/`ne` if checking for only one particular platform
+   (e.g. `$^O eq/ne 'MSWin32'` rather than `$^O =~/!~ m/win32/i` or `m/mswin/i`)
+ * Revert change from 0.81: Don't write Makefile if Makefile.PL
+   is supposed to exit when `package require Tk` fails,
+   whether due to Tk not being installed (`can't find package Tk`)
+   or no X is server available (`couldn't connect to display ""`);
+   should address many of the FAIL reports for 0.95
+ * Skip fileevent tests if sys/ioctl.ph not available (RT #128627)
+ * Mark fileevent tests as TODO on BSD/macOS rather than
+   skipping immediately (RT #125662)
+
 Release 0.95:  2019-02-25
 
  * Improve several tests: can now PASS

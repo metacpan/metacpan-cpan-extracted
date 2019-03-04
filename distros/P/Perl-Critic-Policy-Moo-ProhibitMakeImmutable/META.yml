@@ -3,6 +3,7 @@ abstract: 'Makes sure that Moo classes do not contain calls to make_immutable.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
+  Perl::Critic: '1.123'
   Test2::V0: '0.000094'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,17 +27,20 @@ no_index:
 provides:
   Perl::Critic::Policy::Moo::ProhibitMakeImmutable:
     file: lib/Perl/Critic/Policy/Moo/ProhibitMakeImmutable.pm
-    version: '0.04'
+    version: '0.05'
 requires:
-  Perl::Critic: '1.123'
+  Perl::Critic::Policy: '1.123'
+  Perl::Critic::Utils: '1.123'
+  Readonly: '2.00'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/Perl-Critic-Policy-Moo-ProhibitMakeImmutable/issues
   homepage: https://github.com/bluefeet/Perl-Critic-Policy-Moo-ProhibitMakeImmutable
   repository: git://github.com/bluefeet/Perl-Critic-Policy-Moo-ProhibitMakeImmutable.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
   - 'Graham TerMarsch <graham@howlingfrog.com>'
   - 'Kivanc Yazan <kyzn@users.noreply.github.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -1,5 +1,8 @@
 Revision history for Task-BeLike-SHLOMIF
 
+0.0.4      2019-03-04
+    - Add some App::* apps.
+
 0.0.3      2018-05-21
     - Fix deps on bleadperl.
 

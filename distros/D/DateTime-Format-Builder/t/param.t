@@ -16,7 +16,7 @@ my $sample = 'SampleClassWithArgs1';
                 my %p = (@_);
                 $p{parsed}->{time_zone} = $p{args}->[0];
                 1;
-                }
+            }
         }
     );
 

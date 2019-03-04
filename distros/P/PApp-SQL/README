@@ -213,6 +213,7 @@ DESCRIPTION
         database is missing, please send me an e-mail on how to implement
         this ;)
 
+         mariadb:  first C<AUTO_INCREMENT> column set to NULL
          mysql:    first C<AUTO_INCREMENT> column set to NULL
          postgres: C<oid> column (is there a way to get the last SERIAL?)
          sybase:   C<IDENTITY> column of the last insert (slow)

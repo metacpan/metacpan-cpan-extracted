@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use GD::Graph::radar;
+
+my $radar = GD::Graph::radar->new(400, 400);
+#$radar->{nmarkers} = 9;
+
+my $image = $radar->plot([
+    [qw( a    b  c    d    e    f    g  h    i )],
+    [qw( 3.2  9  4.4  3.9  4.1  4.3  7  6.1  5 )]
+]);
+
+print $image->png;

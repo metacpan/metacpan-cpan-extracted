@@ -35,8 +35,7 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Dylan Cali <calid1984\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "FFI::CheckLib" => "0.11",
-    "FFI::Platypus" => "0.33"
+    "FFI::CheckLib" => "0.11"
   },
   "DISTNAME" => "ZMQ-FFI",
   "LICENSE" => "perl",
@@ -45,7 +44,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Class::XSAccessor" => "1.18",
     "Exporter" => 0,
-    "FFI::Platypus" => "0.33",
+    "FFI::Platypus" => "0.86",
     "FFI::Platypus::Buffer" => 0,
     "FFI::Platypus::Memory" => 0,
     "Import::Into" => "1.002005",
@@ -79,7 +78,7 @@ my %WriteMakefileArgs = (
     "locale" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.14",
+  "VERSION" => "1.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,7 +89,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::XSAccessor" => "1.18",
   "Exporter" => 0,
-  "FFI::Platypus" => "0.33",
+  "FFI::Platypus" => "0.86",
   "FFI::Platypus::Buffer" => 0,
   "FFI::Platypus::Memory" => 0,
   "Import::Into" => "1.002005",

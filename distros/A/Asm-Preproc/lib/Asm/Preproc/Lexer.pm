@@ -20,7 +20,7 @@ use Text::Template 'fill_in_string';
 use Asm::Preproc::Line;
 use Asm::Preproc::Token;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 #------------------------------------------------------------------------------
 
@@ -160,15 +160,13 @@ lexing subroutine. The copied object has all pending input cleared.
 =cut
 
 #------------------------------------------------------------------------------
-use base 'Iterator::Simple::Lookahead';
-use Class::XSAccessor {			# additional attributes
-	accessors 		=> [
+use base 'Iterator::Simple::Lookahead', 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'_lexer',				# lexer iterator
 		'_input',				# input iterator		
 		'_line',				# current line being processed
 		'_text',				# text being parsed
-	],
-};
+);
 
 sub new { 
 	my($class) = @_;

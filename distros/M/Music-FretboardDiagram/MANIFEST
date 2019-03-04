@@ -10,6 +10,7 @@ README
 README.md
 dist.ini
 eg/autumn-leaves-shapes
+eg/chord-diagram.pl
 eg/ukulele
 lib/Music/FretboardDiagram.pm
 t/00-compile.t

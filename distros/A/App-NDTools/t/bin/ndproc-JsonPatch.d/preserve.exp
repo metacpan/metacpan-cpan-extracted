@@ -1,14 +1,14 @@
 {
-   "false" : true,
-   "list" : [
+   "false": true,
+   "list": [
       true,
       true,
       false,
       false
    ],
-   "same" : {
-      "false" : false,
-      "true" : true
+   "same": {
+      "false": false,
+      "true": true
    },
-   "true" : true
+   "true": true
 }

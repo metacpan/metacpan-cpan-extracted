@@ -228,7 +228,16 @@ parameter is unused and defaults to zero.
 =item $xml = $dom->managed_save_get_xml_description($flags=0)
 
 Get the XML in the managed save image. The C<$flags>
-parameter is unused and defaults to zero.
+parameter accepts the following constants
+
+=over 4
+
+=item Sys::Virt::Domain::SAVE_IMAGE_XML_SECURE
+
+Include security sensitive information in the XML dump, such as
+passwords.
+
+=back
 
 =item $dom->core_dump($filename[, $flags])
 
@@ -1065,6 +1074,13 @@ set to 0 or omitted, libvirt will choose a suitable default. Some
 hypervisors do not support this feature and will return an error if
 this field is used and is not 0.
 
+=item C<Sys::Virt::Domain::MIGRATE_PARAM_BANDWIDTH_POSTCOPY>
+
+The maximum bandwidth (in MiB/s) that will be used for migration
+during post-copy phase. If set to 0 or omitted, libvirt will choose
+a suitable default. Some hypervisors do not support this feature and
+return an error if this field is used and is not 0.
+
 =item C<Sys::Virt::Domain::MIGRATE_PARAM_LISTEN_ADDRESS>
 
 The address on which to listen for incoming migration connections.
@@ -1284,13 +1300,22 @@ defaults to zero.
 
 Set the maximum allowed bandwidth during migration of the guest.
 The C<bandwidth> parameter is measured in MB/second.
-The C<$flags> parameter is currently unused and defaults to zero.
+The C<$flags> parameter takes zero or more of the constants:
+
+=over 4
+
+=item $Sys::Virt::Domain::MIGRATE_MAX_SPEED_POSTCOPY
+
+Set the post-copy speed instead of the pre-copy speed.
+
+=back
 
 =item $bandwidth = $dom->migrate_get_max_speed($flags=0)
 
 Get the maximum allowed bandwidth during migration fo the guest.
 The returned <bandwidth> value is measured in MB/second.
-The C<$flags> parameter is currently unused and defaults to zero.
+The C<$flags> parameter is accepts the same constants as
+C<migrate_set_max_speed>.
 
 =item $dom->migrate_set_compression_cache($cacheSize, $flags=0)
 
@@ -1423,7 +1448,7 @@ Delete an existing IOThread by the C<$iothread> value from the guest domain.
 The C<$flags> parameter accepts one or more the CONFIG OPTION constants
 documented later, and defaults to 0 if omitted.
 
-=item $dom->set_iothread($iothread, $params, $nparams, $flags=0)
+=item $dom->set_iothread($iothread, $params, $flags=0)
 
 Set parameters for the IOThread by the C<$iothread> value on the guest domain.
 The C<$params> parameter is a hash reference whose keys are the

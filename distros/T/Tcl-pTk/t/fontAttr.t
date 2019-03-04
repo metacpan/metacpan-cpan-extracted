@@ -36,7 +36,7 @@ my @fontNames = (
 );
 
 # Skip unix-style fonts on windows
-my $win = $^O =~ /mswin/i;
+my $win = $^O eq 'MSWin32';
 
 foreach my $fontName(@fontNames){
         

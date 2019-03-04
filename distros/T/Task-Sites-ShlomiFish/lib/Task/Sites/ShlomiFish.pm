@@ -3,7 +3,7 @@ package Task::Sites::ShlomiFish;
 use warnings;
 use strict;
 
-use 5.008;
+use 5.014;
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Task::Sites::ShlomiFish - Specifications for modules needed for building www.shl
 
 =cut
 
-our $VERSION = '0.0212';
+our $VERSION = '0.0213';
 
 =head1 DESCRIPTION
 

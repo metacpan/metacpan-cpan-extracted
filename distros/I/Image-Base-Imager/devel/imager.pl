@@ -25,6 +25,23 @@ use Imager;
 use Smart::Comments;
 
 {
+  # read/write "raw"
+
+  require Image::Base::Imager;
+  my $image = Image::Base::Imager->new (-width => 50, -height => 20);
+  $image->rectangle (0,0, 49,29, 'black', 1); # filled
+
+  $image->rectangle (-10,-10,6,6, 'white',1);
+
+  $image->save('/tmp/x.raw');
+  system ("ls -l /tmp/x.raw");
+  system ("file /tmp/x.raw");
+  print 50*20*3,"\n";
+
+  exit 0;
+}
+
+{
   # rectangle off-screen
 
   require Image::Base::Imager;

@@ -12,17 +12,23 @@ use Tcl::pTk;
 use IO::File;
 
 use Test;
+my %theplan = (tests => 1);
 if ($^O =~ m/darwin|dragonfly|freebsd|netbsd|openbsd/) {
-        print "1..0 # Skipped: fileevent is not working on BSD and macOS, see RT #125662\n";
+        print "# fileevent is not working on BSD and macOS, see RT #125662\n";
+        $theplan{'todo'} = [1];
+}
+if ($Tcl::pTk::_FE_unavailable) {
+        print "1..0 # Skipped: fileevent is unavailable, reason:\n"
+            . "# $Tcl::pTk::_FE_unavailable\n";
         exit;
 }
-plan tests => 1;
+plan %theplan;
 
 my $mw = MainWindow->new(-title => "fileevent Test");
 
 my $command = qq("$^X" t/fileeventSubProcesses);
 
-my $lineFromFile; # Last line read from the file 
+my $lineFromFile = ''; # Last line read from the file 
 
 $| = 1;  # Pipes hot
 

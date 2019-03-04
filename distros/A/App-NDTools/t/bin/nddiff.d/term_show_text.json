@@ -1,8 +1,8 @@
 {
-   "D" : {
-      "text" : {
-         "N" : "Common line,\nanother common line.\nAnd one more common line.\nStill a common line, but last, next will be different.\nFirst string for b.\nSecond striing for b.\nThird string, belongs to file b.\nAnd fourth. Again to b.\nWow! Common strings began! =)\nAnother common line.\nDifferent line. BBbbbbb!!\nBbbbb!!\nB!\n",
-         "O" : "Common line,\nanother common line.\nAnd one more common line.\nStill a common line, but last, next will be different.\nFirst string for a.\nSecond striing for a.\nThird string, belongs to file a.\nAnd fourth. Again to a.\nWow! Common strings began! =)\nAnother common line.\nDifferent line. AAaaaaa!!\nAaaaa!!\nA!\n"
+   "D": {
+      "text": {
+         "N": "Common line,\nanother common line.\nAnd one more common line.\nStill a common line, but last, next will be different.\nFirst string for b.\nSecond striing for b.\nThird string, belongs to file b.\nAnd fourth. Again to b.\nWow! Common strings began! =)\nAnother common line.\nDifferent line. BBbbbbb!!\nBbbbb!!\nB!\n",
+         "O": "Common line,\nanother common line.\nAnd one more common line.\nStill a common line, but last, next will be different.\nFirst string for a.\nSecond striing for a.\nThird string, belongs to file a.\nAnd fourth. Again to a.\nWow! Common strings began! =)\nAnother common line.\nDifferent line. AAaaaaa!!\nAaaaa!!\nA!\n"
       }
    }
 }

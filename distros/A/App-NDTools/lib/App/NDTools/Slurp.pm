@@ -31,6 +31,7 @@ our %FORMATS = (
         canonical => 1,
         pretty => 1,
         relaxed => 1,
+        space_before => 0,
     },
 );
 
@@ -189,6 +190,7 @@ sub s_encode($$;$) {
                 )->allow_nonref($o->{allow_nonref}
                 )->canonical($o->{canonical}
                 )->pretty($o->{pretty}
+                )->space_before($o->{space_before}
             )->encode($data);
         };
     } elsif ($format eq 'YAML') {

@@ -1,5 +1,5 @@
 NAME
-    Coro::Mysql - let other threads run while doing mysql requests
+    Coro::Mysql - let other threads run while doing mysql/mariadb requests
 
 SYNOPSIS
      use Coro::Mysql;
@@ -9,30 +9,21 @@ SYNOPSIS
 DESCRIPTION
     (Note that in this manual, "thread" refers to real threads as
     implemented by the Coro module, not to the built-in windows process
-    emulation which unfortunately is also called "threads")
+    emulation which unfortunately is also called "threads").
 
     This module replaces the I/O handlers for a database connection, with
-    the effect that "patched" database handles no longer block the all
-    threads of a process, but only the thread that does the request.
+    the effect that "patched" database handles no longer block all threads
+    of a process, but only the thread that does the request. It should work
+    for both DBD::mysql and DBD::MariaDB connections and a wide range of
+    mariadb/mysql client libraries.
 
     This can be used to make parallel sql requests using Coro, or to do
-    other stuff while mysql is rumbling in the background.
+    other stuff while mariadb is rumbling in the background.
 
   CAVEAT
     Note that this module must be linked against exactly the same (shared,
-    possibly not working with all OSes) libmysqlclient library as
-    DBD::mysql, otherwise it will not work.
-
-    Also, this module requires a header file that apparently isn't installed
-    everywhere (violite.h), and therefore comes with it's own copy, which
-    might or might not be compatible to the violite.h of your library - when
-    in doubt, make sure all the libmysqlclient header files are installed
-    and delete the violite.h header that comes with this module.
-
-    On the good side, this module does a multitude of checks to ensure that
-    the libray versions match on the binary level, so on incompatibilities
-    you should expect an exception when trying to unblock a handle, rather
-    than data corruption.
+    possibly not working with all OSes) libmariadb/libmysqlclient library as
+    DBD::MariaDB/DBD::mysql, otherwise it will not work.
 
     Also, while this module makes database handles non-blocking, you still
     cannot run multiple requests in parallel on the same database handle. If
@@ -74,7 +65,8 @@ CANCELLATION
     cancellation.
 
 FUNCTIONS
-    Coro::Mysql offers a single user-accessible function:
+    Coro::Mysql offers these functions, the only one that oyu usually need
+    is "unblock":
 
     $DBH = Coro::Mysql::unblock $DBH
         This function takes a DBI database handles and "patches" it so it
@@ -93,6 +85,17 @@ FUNCTIONS
 
            my $dbh = DBI->connect ($database, $user, $pass)->Coro::Mysql::unblock
               or die $DBI::errstr;
+
+    $bool = Coro::Mysql::is_unblocked $DBH
+        Returns true iff the database handle was successfully patched for
+        non-blocking operations.
+
+    $bool = Coro::Mysql::have_ev
+        Returns true if this Coro::Mysql installation is compiled with
+        special support for EV or not.
+
+        Even if compiled in, it will only be used if EV is actually the
+        AnyEvent event backend.
 
 USAGE EXAMPLE
     This example uses PApp::SQL and Coro::on_enter to implement a function
@@ -146,6 +149,13 @@ HISTORY
     This module was initially hacked together within a few hours on a long
     flight to Malaysia, and seems to have worked ever since, with minor
     adjustments for newer libmysqlclient libraries.
+
+    Well, at least until mariadb introduced the new Pluggable Virtual IO API
+    in mariadb 10.3, which changed and broke everything. On the positive
+    side, the old system was horrible to use, as many GNU/Linux
+    distributions forgot to include the required heaqder files and there
+    were frequent small changes, while the new PVIO system seems to be
+    "official" and hopefully better supported.
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

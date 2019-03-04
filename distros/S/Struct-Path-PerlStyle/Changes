@@ -1,5 +1,11 @@
 Revision history for Struct-Path-PerlStyle
 
+0.92    2019-03-03
+        - back() renamed to BACK()
+        - return undef when not an int passed to BACK()
+        - return 1, but do nothing when zero passed to BACK()
+        - docs fixed
+
 0.91    2018-12-16
         - move to new Struct::Path format for hash regs
         - cosmetics

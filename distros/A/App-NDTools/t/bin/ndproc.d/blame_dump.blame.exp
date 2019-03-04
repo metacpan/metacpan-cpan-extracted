@@ -1,31 +1,31 @@
 [
    {
-      "diff" : {
-         "D" : [
+      "diff": {
+         "D": [
             {
-               "D" : {
-                  "Edit" : {
-                     "D" : [
+               "D": {
+                  "Edit": {
+                     "D": [
                         {
-                           "I" : 3,
-                           "R" : null
+                           "I": 3,
+                           "R": null
                         },
                         {
-                           "R" : {
-                              "id" : "edit_find",
-                              "label" : "Find"
+                           "R": {
+                              "id": "edit_find",
+                              "label": "Find"
                            }
                         },
                         {
-                           "R" : null
+                           "R": null
                         }
                      ]
                   }
                },
-               "I" : 1
+               "I": 1
             }
          ]
       },
-      "rule_id" : 0
+      "rule_id": 0
    }
 ]

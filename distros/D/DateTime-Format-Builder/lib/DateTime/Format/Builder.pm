@@ -1,12 +1,10 @@
 package DateTime::Format::Builder;
-{
-  $DateTime::Format::Builder::VERSION = '0.81';
-}
 
 use strict;
 use warnings;
 
-use 5.005;
+our $VERSION = '0.82';
+
 use Carp;
 use DateTime 1.00;
 use Params::Validate 0.72 qw(
@@ -82,7 +80,7 @@ sub create_class {
 }
 
 sub create_constructor {
-    my $class = shift;
+    shift;
     my ( $target, $intended, $value ) = @_;
 
     my $new = $target . "::new";
@@ -110,7 +108,7 @@ sub create_constructor {
 }
 
 sub create_parser {
-    my $class = shift;
+    my $class  = shift;
     my @common = ( maker => $class );
     if ( @_ == 1 ) {
         my $parsers = shift;
@@ -126,22 +124,26 @@ sub create_parser {
     }
 }
 
-
+# This creates the end methods. Coderefs die on bad parses, return C<DateTime>
+# objects on good parse.
 sub create_end_parser {
     my ( $class, $parsers ) = @_;
     $class->create_method( $class->create_parser($parsers) );
 }
 
 sub create_method {
-    my ( $class, $parser ) = @_;
+    shift;
+    my ($parser) = @_;
+
     return sub {
         my $self = shift;
         $parser->parse( $self, @_ );
-        }
+    };
 }
 
 sub on_fail {
-    my ( $class, $input ) = @_;
+    shift;
+    my ($input) = @_;
 
     my $pkg;
     my $i = 0;
@@ -227,13 +229,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 DateTime::Format::Builder - Create DateTime parser classes and objects.
 
 =head1 VERSION
 
-version 0.81
+version 0.82
 
 =head1 SYNOPSIS
 
@@ -269,9 +273,6 @@ for exposing of the module's innards to any subclasses, or
 for when you need to do something slightly beyond what I
 expected.
 
-This creates the end methods. Coderefs die on bad parses,
-return C<DateTime> objects on good parse.
-
 =head1 TUTORIAL
 
 See L<DateTime::Format::Builder::Tutorial>.
@@ -296,7 +297,7 @@ to throw an error.
 
 Multiple parser specifications can also specify C<on_fail>
 with a coderef as an argument in the options block. This
-will take precedence over the inheritable and over-ridable
+will take precedence over the inheritable and overrideable
 method.
 
 That said, don't throw real errors from callbacks in
@@ -852,7 +853,7 @@ parse failed an error will be thrown.
 
 =head2 format_datetime
 
-If you call this function, it will throw an errror.
+If you call this function, it will throw an error.
 
 =head1 LONGER EXAMPLES
 
@@ -863,45 +864,30 @@ the modules at the time of writing them.
 
 =head1 THANKS
 
-Dave Rolsky (DROLSKY) for kickstarting the DateTime project,
-writing L<DateTime::Format::ICal> and
-L<DateTime::Format::MySQL>, and some much needed review.
+Dave Rolsky (DROLSKY) for kickstarting the DateTime project, writing
+L<DateTime::Format::ICal> and L<DateTime::Format::MySQL>, and some much needed
+review.
 
-Joshua Hoblitt (JHOBLITT) for the concept, some of the API,
-impetus for writing the multilength code (both one length with
-multiple parsers and single parser with multiple lengths),
-blame for the Regex custom constructor code,
-spotting a bug in Dispatch,
-and more much needed review.
+Joshua Hoblitt (JHOBLITT) for the concept, some of the API, impetus for
+writing the multi-length code (both one length with multiple parsers and
+single parser with multiple lengths), blame for the Regex custom constructor
+code, spotting a bug in Dispatch, and more much needed review.
 
-Kellan Elliott-McCrea (KELLAN) for even more review,
-suggestions, L<DateTime::Format::W3CDTF> and the encouragement to
-rewrite these docs almost 100%!
+Kellan Elliott-McCrea (KELLAN) for even more review, suggestions,
+L<DateTime::Format::W3CDTF> and the encouragement to rewrite these docs almost
+100%!
 
-Claus FE<auml>rber (CFAERBER) for having me get around to
-fixing the auto-constructor writing, providing the
-'args'/'self' patch, and suggesting the multi-callbacks.
+Claus Färber (CFAERBER) for having me get around to fixing the
+auto-constructor writing, providing the 'args'/'self' patch, and suggesting
+the multi-callbacks.
 
-Rick Measham (RICKM) for L<DateTime::Format::Strptime>
-which Builder now supports.
+Rick Measham (RICKM) for L<DateTime::Format::Strptime> which Builder now
+supports.
 
-Matthew McGillis for pointing out that C<on_fail> overriding
-should be simpler.
+Matthew McGillis for pointing out that C<on_fail> overriding should be
+simpler.
 
 Simon Cozens (SIMON) for saying it was cool.
-
-=head1 SUPPORT
-
-Support for this module is provided via the datetime@perl.org email
-list. See http://lists.perl.org/ for more details.
-
-Alternatively, log them via the CPAN RT system via the web or email:
-
-    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime%3A%3AFormat%3A%3ABuilder
-    bug-datetime-format-builder@rt.cpan.org
-
-This makes it much easier for me to track things and thus means
-your problem is less likely to be neglected.
 
 =head1 SEE ALSO
 
@@ -911,6 +897,33 @@ http://datetime.perl.org/
 
 L<perl>, L<DateTime>, L<DateTime::Format::Builder::Tutorial>,
 L<DateTime::Format::Builder::Parser>
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Builder> or via email to L<bug-datetime-format-builder@rt.cpan.org|mailto:bug-datetime-format-builder@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for DateTime-Format-Builder can be found at L<https://github.com/houseabsolute/DateTime-Format-Builder>.
+
+=head1 DONATIONS
+
+If you'd like to thank me for the work I've done on this module, please
+consider making a "donation" to me via PayPal. I spend a lot of free time
+creating free software, and would appreciate any support you'd care to offer.
+
+Please note that B<I am not suggesting that you must do this> in order for me
+to continue working on this particular software. I will continue to do so,
+inasmuch as I have in the past, for as long as it interests me.
+
+Similarly, a donation made in this way will probably not make me work on this
+software much more, unless I get so many donations that I can consider working
+on free software full time (let's all have a chuckle at that together).
+
+To donate, log into PayPal and send money to autarch@urth.org, or use the
+button at L<http://www.urth.org/~autarch/fs-donation.html>.
 
 =head1 AUTHORS
 
@@ -926,12 +939,35 @@ Iain Truskett
 
 =back
 
+=head1 CONTRIBUTORS
+
+=for stopwords Daisuke Maki Ian Truskett (no author)
+
+=over 4
+
+=item *
+
+Daisuke Maki <daisuke@endeworks.jp>
+
+=item *
+
+Ian Truskett <spoon@cpan.org>
+
+=item *
+
+(no author) <(no author)@49043108-e40d-0410-ab17-85caa8b5b18d>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Dave Rolsky.
+This software is Copyright (c) 2019 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

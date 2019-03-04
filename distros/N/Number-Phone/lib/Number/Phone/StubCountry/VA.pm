@@ -22,23 +22,30 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223705;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [];
 
 my $validators = {
-                'voip' => '55\\d{8}',
-                'mobile' => '
-          33\\d{9}|
-          3[1-9]\\d{8}|
-          3[2-9]\\d{7}
+                'fixed_line' => '06698\\d{1,6}',
+                'toll_free' => '
+          80(?:
+            0\\d{3}|
+            3
+          )\\d{3}
         ',
-                'pager' => '',
                 'personal_number' => '
           1(?:
             78\\d|
             99
           )\\d{6}
+        ',
+                'pager' => '',
+                'geographic' => '06698\\d{1,6}',
+                'mobile' => '
+          33\\d{9}|
+          3[1-9]\\d{8}|
+          3[2-9]\\d{7}
         ',
                 'specialrate' => '(
           84(?:
@@ -47,34 +54,25 @@ my $validators = {
           )\\d{3}
         )|(
           (?:
-            (?:
-              0878|
-              1(?:
-                44|
-                6[346]
-              )\\d
-            )\\d\\d|
+            0878\\d\\d|
             89(?:
               2|
-              (?:
-                4[5-9]|
-                (?:
-                  5[5-9]|
-                  9
-                )\\d\\d
-              )\\d
+              4[5-9]\\d
             )
           )\\d{3}|
-          89[45][0-4]\\d\\d
+          89[45][0-4]\\d\\d|
+          (?:
+            1(?:
+              44|
+              6[346]
+            )|
+            89(?:
+              5[5-9]|
+              9
+            )
+          )\\d{6}
         )',
-                'fixed_line' => '06698\\d{1,6}',
-                'geographic' => '06698\\d{1,6}',
-                'toll_free' => '
-          80(?:
-            0\\d{3}|
-            3
-          )\\d{3}
-        '
+                'voip' => '55\\d{8}'
               };
 my %areanames = (
   39010 => "Genoa",

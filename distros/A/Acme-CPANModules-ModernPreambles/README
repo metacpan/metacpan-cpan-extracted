@@ -1,0 +1,85 @@
+NAME
+    Acme::CPANModules::ModernPreambles - Modules that offer modern preambles
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::ModernPreambles (from Perl distribution
+    Acme-CPANModules-ModernPreambles), released on 2019-03-03.
+
+DESCRIPTION
+    Modules that offer modern preambles.
+
+    The overwhelming convention for coding Perl properly code is to at least
+    add the following preamble:
+
+     use strict;
+     use warnings;
+
+    to the beginning of your code. But some people say that's not enough,
+    and they develop modules/pragmas that bundle the above incantation plus
+    some additional stuffs. For example:
+
+     use Modern::Perl '2018';
+
+    is equivalent to:
+
+     use strict;
+     use warnings;
+     use feature ':5.26';
+     mro::set_mro( scalar caller(), 'c3' );
+
+    I think Modern::Perl is one of the first to popularize this modern
+    preamble concept and a bunch of similar preambles emerged. This list
+    catalogs them.
+
+    Meanwhile, you can also use:
+
+     use v5.12; # enables strict and warnings, as well as all 5.12 features (see L<feature> for more details on new features of each perl release)
+
+    and so on, but this also means you set a minimum Perl version.
+
+INCLUDED MODULES
+    *   Alt::common::sense::TOBYINK
+
+    *   common::sense
+
+    *   latest
+
+    *   Modern::Perl
+
+    *   nonsense
+
+    *   perl5
+
+    *   perl5i
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ModernPreambles>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ModernPreambles>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Mode
+    rnPreambles>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

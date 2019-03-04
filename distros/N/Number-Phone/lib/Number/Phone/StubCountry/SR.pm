@@ -22,45 +22,29 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{3})',
-                  'format' => '$1-$2',
-                  'leading_digits' => '
-            [2-4]|
-            5[2-58]
-          '
-                },
-                {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '5',
+                  'leading_digits' => '56',
                   'format' => '$1-$2-$3'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
+                  'pattern' => '(\\d{3})(\\d{3})',
                   'format' => '$1-$2',
-                  'leading_digits' => '[6-8]'
+                  'leading_digits' => '[2-5]'
+                },
+                {
+                  'pattern' => '(\\d{3})(\\d{4})',
+                  'leading_digits' => '[6-8]',
+                  'format' => '$1-$2'
                 }
               ];
 
 my $validators = {
+                'pager' => '',
                 'geographic' => '
-          (?:
-            2[1-3]|
-            3[0-7]|
-            (?:
-              4|
-              68
-            )\\d|
-            5[2-58]
-          )\\d{4}
-        ',
-                'toll_free' => '',
-                'personal_number' => '',
-                'specialrate' => '',
-                'fixed_line' => '
           (?:
             2[1-3]|
             3[0-7]|
@@ -77,8 +61,21 @@ my $validators = {
             8[125-9]
           )\\d{5}
         ',
-                'pager' => '',
-                'voip' => '56\\d{4}'
+                'specialrate' => '',
+                'voip' => '56\\d{4}',
+                'fixed_line' => '
+          (?:
+            2[1-3]|
+            3[0-7]|
+            (?:
+              4|
+              68
+            )\\d|
+            5[2-58]
+          )\\d{4}
+        ',
+                'toll_free' => '',
+                'personal_number' => ''
               };
 
     sub new {

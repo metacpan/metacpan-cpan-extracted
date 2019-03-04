@@ -6,6 +6,7 @@ README
 lib/Data/SSHPubkey.pm
 t/00-load.t
 t/10-pubkeys.t
+t/20-rfc4716.t
 t/PEM.pub
 t/PKCS8.pub
 t/RFC4716.pub

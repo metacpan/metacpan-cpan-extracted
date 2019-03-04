@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017, 2019 Kevin Ryde
 
 # This file is part of Math-Aronson.
 #
@@ -24,7 +24,7 @@ use Carp;
 #use Devel::Comments;
 
 use vars '$VERSION';
-$VERSION = 9;
+$VERSION = 10;
 
 # maybe a hi=>$limit option to stop the ret or queue building up beyond a
 # desired point
@@ -247,8 +247,8 @@ But for example using letter "F" instead gives a finite sequence,
     $it = Math::Aronson->new (letter => 'F');  # 1, 7 only
 
 This is "F is the first, seventh" giving 1, 7 but ends there as there's no
-more "F"s in "seventh".  See F<examples/terminate.pl> in the sources to run
-thorough which letters seem to terminate or not.
+more "F"s in "seventh".  See F<examples/terminate.pl> to run thorough which
+letters seem to terminate or not.
 
 =head2 OEIS
 
@@ -427,7 +427,7 @@ http://user42.tuxfamily.org/math-aronson/index.html
 
 =head1 LICENSE
 
-Math-Aronson is Copyright 2010, 2011, 2012 Kevin Ryde
+Math-Aronson is Copyright 2010, 2011, 2012, 2017, 2019 Kevin Ryde
 
 Math-Aronson is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

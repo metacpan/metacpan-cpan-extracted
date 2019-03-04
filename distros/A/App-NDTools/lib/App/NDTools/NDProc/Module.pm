@@ -12,7 +12,7 @@ use Getopt::Long qw(GetOptionsFromArray :config bundling pass_through);
 use Log::Log4Cli;
 use Storable qw(dclone);
 use Struct::Path 0.80 qw(path);
-use Struct::Path::PerlStyle 0.80 qw(str2path path2str);
+use Struct::Path::PerlStyle 0.90 qw(str2path path2str);
 
 sub MODINFO { "n/a" }
 
@@ -21,6 +21,7 @@ sub arg_opts {
 
     return (
         'blame!' => \$self->{OPTS}->{blame}, # just to set opt in rule
+        'cond=s@' => \$self->{OPTS}->{cond},
         'help|h' => sub {
             $self->{OPTS}->{help} = 1;
             die "!FINISH";

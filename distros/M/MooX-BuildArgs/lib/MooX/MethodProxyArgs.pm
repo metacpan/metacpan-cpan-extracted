@@ -1,6 +1,7 @@
 package MooX::MethodProxyArgs;
-
-$MooX::MethodProxyArgs::VERSION = '0.06';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.07';
 
 =head1 NAME
 
@@ -39,7 +40,6 @@ information on how method proxies work.
 use Data::MethodProxy;
 
 use Moo::Role;
-use strictures 2;
 use namespace::clean;
 
 with 'MooX::BuildArgsHooks';
@@ -49,10 +49,16 @@ my $mproxy = Data::MethodProxy->new();
 around TRANSFORM_BUILDARGS => sub{
     my ($orig, $class, $args) = @_;
 
-    return $class->$orig(
-        $mproxy->render( $args ),
-    );
+    $args = $class->TRANSFORM_METHOD_PROXY_ARGS_BUILDARGS( $args );
+
+    return $class->$orig( $args );
 };
+
+sub TRANSFORM_METHOD_PROXY_ARGS_BUILDARGS {
+    my ($class, $args) = @_;
+
+    return $mproxy->render( $args );
+}
 
 1;
 __END__
@@ -79,22 +85,9 @@ L<MooX::SingleArg>
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS AND LICENSE
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+See L<MooX::BuildArgs/AUTHORS> and L<MooX::BuildArgs/LICENSE>.
 
-=head1 CONTRIBUTORS
-
-=over
-
-=item *
-
-Peter Pentchev <roamE<64>ringlet.net>
-
-=back
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+=cut
 

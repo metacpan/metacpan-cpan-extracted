@@ -42,20 +42,23 @@
       },
       "runtime" : {
          "requires" : {
-            "Perl::Critic" : "1.123"
+            "Perl::Critic::Policy" : "1.123",
+            "Perl::Critic::Utils" : "1.123",
+            "Readonly" : "2.00",
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0.000094",
-            "Try::Tiny" : "0.19"
+            "Perl::Critic" : "1.123",
+            "Test2::V0" : "0.000094"
          }
       }
    },
    "provides" : {
       "Perl::Critic::Policy::TryTiny::RequireBlockTermination" : {
          "file" : "lib/Perl/Critic/Policy/TryTiny/RequireBlockTermination.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -69,10 +72,11 @@
          "web" : "https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireBlockTermination"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

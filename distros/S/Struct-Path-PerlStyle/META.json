@@ -35,6 +35,7 @@
          "requires" : {
             "Carp" : "0",
             "Safe" : "0",
+            "Scalar::Util" : "1.18",
             "Text::Balanced" : "0",
             "parent" : "0",
             "perl" : "5.01",
@@ -50,5 +51,5 @@
          "url" : "https://github.com/mr-mixas/Struct-Path-PerlStyle.pm"
       }
    },
-   "version" : "0.91"
+   "version" : "0.92"
 }

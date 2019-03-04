@@ -79,7 +79,7 @@ use Sys::Virt::NWFilterBinding;
 use Sys::Virt::DomainSnapshot;
 use Sys::Virt::Stream;
 
-our $VERSION = '5.0.0';
+our $VERSION = '5.1.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -932,8 +932,8 @@ unused and defaults to zero.
 =item $xml = $conn->get_save_image_xml_description($file, $flags=1)
 
 Retrieve the current XML configuration associated with the virtual
-machine's save image identified by C<$file>. The C<$flags> parameter is currently
-unused and defaults to zero.
+machine's save image identified by C<$file>. The C<$flags> parameter
+accepts the same constants as C<Sys::Virt::Domain::managed_save_get_xml_description>.
 
 =item my $dom = $conn->get_domain_by_name($name)
 

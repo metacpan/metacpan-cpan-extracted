@@ -6,7 +6,7 @@
 
 package Tcl::pTk::After;
 
-our ($VERSION) = ('0.95');
+our ($VERSION) = ('0.96');
 
 use Carp;
 

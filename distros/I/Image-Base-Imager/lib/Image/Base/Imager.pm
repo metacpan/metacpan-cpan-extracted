@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Imager.
 #
@@ -35,7 +35,7 @@ use vars '$VERSION', '@ISA';
 use Image::Base;
 @ISA = ('Image::Base');
 
-$VERSION = 11;
+$VERSION = 12;
 
 # uncomment this to run the ### lines
 # use Smart::Comments '###';
@@ -395,27 +395,48 @@ C<Image::Base::Imager> is a subclass of C<Image::Base>,
 C<Image::Base::Imager> extends C<Image::Base> to create or
 update image files using the C<Imager> module.
 
-As of Imager 0.80 the supported file formats for read and write include PNG,
-JPEG, TIFF, PNM, GIF, BMP, and ICO (including CUR).  See L<Imager::Files>
-for the full list.
+As of Imager 0.80 the supported file formats for read and write include the
+following.  See L<Imager::Files> for the full list.
+
+    PNG
+    JPEG
+    TIFF
+    PNM
+    GIF
+    BMP
+    ICO  (including CUR)
+
+The Imager "raw" format is the image RGB bytes and nothing else.  It can't
+be read with C<load()> here since the read requires size and further
+parameters describing the data.  Writing a raw file with C<save()> works.
+
+=head2 Colour Names
 
 Colour names are anything recognised by C<Imager::Color>.  As of Imager 0.80
-this means the GIMP F<Named_Colors> if you have the GIMP installed, the X11
-F<rgb.txt>, hex "#RGB", "#RRGGBB", etc.  The system F<rgb.txt> is used if
-available, otherwise a copy in C<Imager::Color::Table>.  An C<Imager::Color>
-object can also be given.
+this means named colours from
+
+    /usr/share/gimp/palettes/Named_Colors   GIMP, if available
+    /usr/share/X11/rgb.txt                  X11, if available
+    Imager::Color::Table                    copy of rgb.txt
+
+Or hex forms
+
+    "#RGB"
+    "#RRGGBB"
+    
+An C<Imager::Color> object can also be given instead of a string.
 
 =head2 Paletted Images
 
 For a paletted image, if Imager is given a colour not already in the palette
 then it converts the whole image to RGB.  C<Image::Base::Imager> doesn't try
-do anything about that yet.  An C<add_colours> can pre-load the palette.
+do anything about that yet.  An C<add_colours()> can pre-load the palette.
 
 The C<Image::Base> intention is just to throw colour names at drawing
 functions, so perhaps C<Image::Base::Imager> should extend the palette when
 necessary, or choose a close colour if full.  But an
-C<$imager-E<gt>to_paletted> after all drawing might come out better than
-colours as drawing proceeds.
+C<$imager-E<gt>to_paletted()> after drawing might give close-colour merging
+rather than allocating as drawing proceeds.
 
 =head1 FUNCTIONS
 
@@ -444,10 +465,10 @@ Or an C<Imager> object can be given,
 Draw an ellipse within the rectangle with top-left corner C<$x1>,C<$y1> and
 bottom-right C<$x2>,C<$y2>.  Optional C<$fill> true means a filled ellipse.
 
-In the current implementation circles an odd number of pixels
+In the current implementation circles with an odd number of pixels
 (ie. width==height and odd) are drawn with Imager and ellipses and even
-circles as such go to C<Image::Base>.  This is a bit inconsistent but uses
-the features of Imager as far as possible and its drawing should be faster.
+circles go to C<Image::Base>.  This is a bit inconsistent but uses the
+features of Imager as far as possible and its drawing should be faster.
 
 =item C<$i-E<gt>diamond ($x0, $y0, $x1, $y1, $colour)>
 
@@ -469,8 +490,8 @@ want that (or not by default).
 Save to C<-file>, or with a C<$filename> argument set C<-file> then save to
 that.
 
-The file format is taken from the C<-file_format> (see below) if that was
-set by a C<load> or explicit C<set>, otherwise Imager follows the filename
+The file format is taken from C<-file_format> (see below) if that was set by
+a C<load()> or explicit C<set()>, otherwise Imager follows the filename
 extension.  In both cases if format or extension is unrecognised then
 C<save()> croaks.
 
@@ -481,8 +502,8 @@ drawing functions.
 
     $image->add_colours ('red', 'green', '#FF00FF');
 
-For a non-paletted image C<add_colours> does nothing since in that case each
-pixel has RGB component values, rather than an index into a palette.
+For a non-paletted image C<add_colours()> does nothing since in that case
+each pixel has RGB component values, rather than an index into a palette.
 
 =back
 
@@ -502,14 +523,14 @@ The underlying C<Imager> object.
 
 =item C<-file_format> (string or C<undef>)
 
-The file format as a string like "png" or "jpeg", or C<undef> if unknown or
+The file format as a string like "png" or "jpeg"; or C<undef> if unknown or
 never set.
 
 After C<load()> the C<-file_format> is the format read.  Setting
 C<-file_format> can change the format for a subsequent C<save()>.
 
 This is held in the imager "i_format" tag and passed as the C<type> when
-saving.  If C<undef> when saving, Imager will look at the filename
+saving.  If C<undef> when saving then Imager will look at the filename
 extension.
 
 There's no attempt to check or validate the C<-file_format> value, since
@@ -526,7 +547,7 @@ C<cur_hotspotx> and C<cur_hotspoty> tags in the Imager object.
 =item C<-ncolours> (integer, read-only)
 
 The number of colours allocated in the palette, or C<undef> on a
-non-paletted image.  (The Imager C<colorcount>.)
+non-paletted image.  (The Imager C<colorcount()>.)
 
 This is similar to the C<-ncolours> of C<Image::Xpm>.
 
@@ -537,8 +558,8 @@ compression method.  JPEG compresses by reducing colours and resolution in
 ways that are not too noticeable to the human eye.  100 means full quality,
 no such reductions.  C<undef> means the Imager default, which is 75.
 
-C<-quality_percent> becomes the C<jpegquality> and C<tiff_jpegquality>
-options to the Imager write (see L<Imager::Files/JPEG> and
+C<-quality_percent> becomes C<jpegquality> and C<tiff_jpegquality> options
+to the Imager C<write()> (see L<Imager::Files/JPEG> and
 L<Imager::Files/TIFF>).  TIFF is only affected if its C<tiff_compression>
 tag is set to "jpeg" using Imager C<settag()> (the default is "packbits").
 
@@ -558,7 +579,7 @@ http://user42.tuxfamily.org/image-base-imager/index.html
 
 =head1 LICENSE
 
-Image-Base-Imager is Copyright 2010, 2011, 2012 Kevin Ryde
+Image-Base-Imager is Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 Image-Base-Imager is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

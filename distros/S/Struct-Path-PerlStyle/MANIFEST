@@ -8,7 +8,7 @@ t/00-load.t
 t/_common.pm
 t/aliases.t
 t/arrays.t
-t/functions.t
+t/func-BACK.t
 t/generic.t
 t/hashes-keys.t
 t/hashes-regs.t

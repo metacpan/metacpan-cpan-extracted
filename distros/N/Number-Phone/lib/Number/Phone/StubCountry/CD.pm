@@ -22,58 +22,56 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
                 {
                   'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
                   'leading_digits' => '88',
+                  'format' => '$1 $2 $3',
                   'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{5})',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2',
-                  'leading_digits' => '[1-6]'
+                  'leading_digits' => '[1-6]',
+                  'format' => '$1 $2'
                 },
                 {
+                  'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'national_rule' => '0$1',
-                  'format' => '$1 $2 $3',
-                  'leading_digits' => '1'
+                  'leading_digits' => '1',
+                  'format' => '$1 $2 $3'
                 },
                 {
-                  'leading_digits' => '[89]',
-                  'format' => '$1 $2 $3',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '[89]',
+                  'format' => '$1 $2 $3'
                 }
               ];
 
 my $validators = {
-                'pager' => '',
-                'mobile' => '
-          (?:
-            8(?:
-              [0-2459]\\d\\d|
-              8
-            )|
-            9[017-9]\\d\\d
-          )\\d{5}
+                'personal_number' => '',
+                'toll_free' => '',
+                'fixed_line' => '
+          12\\d{7}|
+          [1-6]\\d{6}
         ',
                 'voip' => '',
-                'toll_free' => '',
+                'specialrate' => '',
+                'mobile' => '
+          88\\d{5}|
+          (?:
+            8[0-2459]|
+            9[017-9]
+          )\\d{7}
+        ',
                 'geographic' => '
           12\\d{7}|
           [1-6]\\d{6}
         ',
-                'personal_number' => '',
-                'specialrate' => '',
-                'fixed_line' => '
-          12\\d{7}|
-          [1-6]\\d{6}
-        '
+                'pager' => ''
               };
 my %areanames = (
   2431 => "Kinshasa",

@@ -38,6 +38,21 @@
       },
       "runtime" : {
          "requires" : {
+            "App::CSV2Chart" : "0",
+            "App::Countdown" : "0",
+            "App::Deps::Verify" : "0",
+            "App::Du::Analyze" : "0",
+            "App::Gezer" : "0",
+            "App::Git::Info" : "0",
+            "App::Nopaste" : "0",
+            "App::Notifier::Client" : "0",
+            "App::Notifier::Service" : "0",
+            "App::Sky" : "0",
+            "App::Timestamper" : "0",
+            "App::Timestamper::Format" : "0",
+            "App::intrunningsum" : "0",
+            "App::intsum" : "0",
+            "App::stopw" : "0",
             "Dist::Zilla::PluginBundle::SHLOMIF" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Xhtml" : "0",
@@ -63,7 +78,7 @@
    "provides" : {
       "Task::BeLike::SHLOMIF" : {
          "file" : "lib/Task/BeLike/SHLOMIF.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -78,10 +93,10 @@
          "web" : "https://github.com/shlomif/Task-BeLike-SHLOMIF"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.4",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026002"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
@@ -416,7 +431,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

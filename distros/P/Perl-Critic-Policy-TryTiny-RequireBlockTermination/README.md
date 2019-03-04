@@ -49,9 +49,9 @@ to support the author is happy to accept requests and patches.
 Note that this policy should be just as useful with other similar modules such as
 [Try::Catch](https://metacpan.org/pod/Try::Catch) and [TryCatch](https://metacpan.org/pod/TryCatch).
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

@@ -78,7 +78,7 @@ L<App::NDTools::NDPatch>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Michael Samoglyadov C<< <mixas at cpan.org> >>.
+Copyright 2016-2019 Michael Samoglyadov C<< <mixas at cpan.org> >>.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of GNU General Public License 3 or later versions.

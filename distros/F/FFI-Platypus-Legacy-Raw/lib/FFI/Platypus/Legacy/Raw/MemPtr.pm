@@ -8,7 +8,7 @@ use FFI::Platypus::Memory qw( malloc free memcpy );
 use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
 
 # ABSTRACT: FFI::Platypus::Legacy::Raw memory pointer type
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 our @ISA = qw( FFI::Platypus::Legacy::Raw::Ptr );
 
@@ -102,7 +102,7 @@ FFI::Platypus::Legacy::Raw::MemPtr - FFI::Platypus::Legacy::Raw memory pointer t
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

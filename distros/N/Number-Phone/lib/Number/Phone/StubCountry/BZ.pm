@@ -22,53 +22,41 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223702;
+our $VERSION = 1.20190303205537;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '[2-8]',
-                  'format' => '$1-$2'
+                  'format' => '$1-$2',
+                  'pattern' => '(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d)(\\d{3})(\\d{4})(\\d{3})',
-                  'format' => '$1-$2-$3-$4'
+                  'format' => '$1-$2-$3-$4',
+                  'pattern' => '(\\d)(\\d{3})(\\d{4})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'voip' => '',
-                'pager' => '',
-                'mobile' => '6[0-35-7]\\d{5}',
-                'personal_number' => '',
-                'specialrate' => '',
                 'fixed_line' => '
           (?:
-            2(?:
-              [02]\\d|
-              36
-            )|
-            [3-58][02]\\d|
-            7(?:
-              [02]\\d|
-              32
-            )
-          )\\d{4}
+            236|
+            732
+          )\\d{4}|
+          [2-578][02]\\d{5}
         ',
                 'toll_free' => '0800\\d{7}',
+                'personal_number' => '',
+                'mobile' => '6[0-35-7]\\d{5}',
                 'geographic' => '
           (?:
-            2(?:
-              [02]\\d|
-              36
-            )|
-            [3-58][02]\\d|
-            7(?:
-              [02]\\d|
-              32
-            )
-          )\\d{4}
-        '
+            236|
+            732
+          )\\d{4}|
+          [2-578][02]\\d{5}
+        ',
+                'pager' => '',
+                'specialrate' => '',
+                'voip' => ''
               };
 my %areanames = (
   5012 => "Belize\ District",

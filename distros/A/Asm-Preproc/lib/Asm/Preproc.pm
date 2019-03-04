@@ -19,7 +19,7 @@ use File::Spec;
 use Asm::Preproc::Line;
 use Iterator::Simple::Lookahead;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 #------------------------------------------------------------------------------
 
@@ -63,38 +63,36 @@ read in the given order.
 
 #------------------------------------------------------------------------------
 # Asm::Preproc::File : current file being read
-use Class::XSAccessor::Array {
-	class			=> 'Asm::Preproc::File',
-	accessors		=> {
-		iter		=> 0,		# iter() to read each line
-		file		=> 1,		# file name
-		line_nr		=> 2,		# current line number
-		line_inc	=> 3,		# line number increment
-	},
+{
+	package # hide from indexer
+		Asm::Preproc::File;
+	use base 'Class::Accessor';
+	__PACKAGE__->mk_accessors(
+		'iter',			# iter() to read each line
+		'file',			# file name
+		'line_nr',		# current line number
+		'line_inc',		# line number increment
+	);
+
+	sub new {
+		my($class, $iter, $file) = @_;
+		bless {iter => $iter, file => $file, line_nr => 0, line_inc => 1}, $class;
+	}
 };
-sub Asm::Preproc::File::new {
-	#my($class, $iter, $file) = @_;
-	my $class = shift;
-	bless [@_, 0, 1], $class;
-}
 
 #------------------------------------------------------------------------------
 # Asm::Preproc : stack of stuff to read
-use Class::XSAccessor::Array {
-	accessors		=> {
-		_stack		=> 0,		# stack of Asm::Preproc::File
-		_path		=> 1,		# path of search directories
-	},
-};
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
+		'_stack',		# stack of Asm::Preproc::File
+		'_path',		# path of search directories
+);
 
 use constant TOP 		=> -1;		# top of stack, i.e. current input file
 
 sub new {
 	my($class, @files) = @_;
-	my $self = bless [
-				[],			# stack
-				[],			# path
-		], $class;
+	my $self = bless {_stack => [], _path => []}, $class;
 	$self->include($_) for reverse @files;
 	return $self;
 }

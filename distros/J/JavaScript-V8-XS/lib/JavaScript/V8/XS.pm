@@ -7,7 +7,7 @@ use JSON::PP;
 use Text::Trim qw(trim rtrim);
 use XSLoader;
 
-our $VERSION = '0.000009';
+our $VERSION = '0.000010';
 XSLoader::load( __PACKAGE__, $VERSION );
 
 our @EXPORT_OK = qw[];
@@ -49,7 +49,7 @@ JavaScript::V8::XS - Perl XS binding for the V8 Javascript embeddable engine
 
 =head1 VERSION
 
-Version 0.000009
+Version 0.000010
 
 =head1 SYNOPSIS
 
@@ -252,9 +252,9 @@ number of rounds that were effectively run.
 
 =over 4
 
-=item * L<< https://metacpan.org/pod/JavaScript::V8 >>
+=item * L<JavaScript::V8>
 
-=item * L<< https://metacpan.org/pod/JavaScript::Duktape::XS >>
+=item * L<JavaScript::Duktape::XS>
 
 =back
 

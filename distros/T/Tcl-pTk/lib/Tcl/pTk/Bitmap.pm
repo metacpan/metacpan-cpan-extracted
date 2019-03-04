@@ -1,6 +1,6 @@
 package Tcl::pTk::Bitmap;
 
-our ($VERSION) = ('0.95');
+our ($VERSION) = ('0.96');
 
 require Tcl::pTk;
 require Tcl::pTk::Image;

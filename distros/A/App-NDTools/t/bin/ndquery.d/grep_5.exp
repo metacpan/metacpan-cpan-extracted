@@ -1,24 +1,24 @@
 [
    {
-      "View" : [
+      "View": [
          {
-            "id" : "view_encoding"
+            "id": "view_encoding"
          },
          {
-            "id" : "view_wrapping"
+            "id": "view_wrapping"
          }
       ]
    },
    {
-      "File" : [
+      "File": [
          {
-            "id" : "file_new"
+            "id": "file_new"
          },
          {
-            "id" : "file_open"
+            "id": "file_open"
          },
          {
-            "id" : "file_save"
+            "id": "file_save"
          }
       ]
    }

@@ -4,14 +4,13 @@
 
 typedef void (*Handler)(const FunctionCallbackInfo<Value>& args);
 
-// Extracts a C string from a V8 Utf8Value.
+/* Extracts a C string from a V8 Utf8Value. */
 static const char* ToCString(const String::Utf8Value& value)
 {
     return *value ? *value : "<string conversion failed>";
 }
 
-// Prints its arguments on stdout separated by spaces and ending with a
-// newline.
+/* Prints arguments on stdout separated by spaces, ending with newline. */
 static void native_print(const FunctionCallbackInfo<Value>& args)
 {
     bool first = true;
@@ -30,7 +29,7 @@ static void native_print(const FunctionCallbackInfo<Value>& args)
     fflush(stdout);
 }
 
-// Return a string with the current version for v8.
+/* Return a string with the current version for v8. */
 static void native_version(const FunctionCallbackInfo<Value>& args)
 {
     args.GetReturnValue().Set(
@@ -38,7 +37,7 @@ static void native_version(const FunctionCallbackInfo<Value>& args)
                 NewStringType::kNormal).ToLocalChecked());
 }
 
-// Return a double with the current timestamp in ms.
+/* Return a double with the current timestamp in ms. */
 static void native_now_ms(const FunctionCallbackInfo<Value>& args)
 {
     double now = now_us() / 1000.0;

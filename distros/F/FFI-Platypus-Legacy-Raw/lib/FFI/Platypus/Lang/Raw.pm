@@ -5,7 +5,7 @@ use warnings;
 use base qw( FFI::Platypus::Lang::C );
 
 # ABSTRACT: Types for use with FFI::Platypus::Legacy::Raw
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 my %types;
@@ -49,7 +49,7 @@ FFI::Platypus::Lang::Raw - Types for use with FFI::Platypus::Legacy::Raw
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

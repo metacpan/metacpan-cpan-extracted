@@ -16,7 +16,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-Sites-ShlomiFish",
    "prereqs" : {
@@ -54,8 +54,8 @@
             "Games::Solitaire::Verify::Base" : "0",
             "HTML::Links::Localize" : "0",
             "HTML::Selector::XPath" : "0",
+            "HTML::T5" : "0",
             "HTML::TextToHTML" : "0",
-            "HTML::Tidy" : "0",
             "HTML::TokeParser::Simple" : "0",
             "HTML::TreeBuilder::LibXML" : "0",
             "HTML::Widgets::NavMenu::ToJSON" : "0",
@@ -93,7 +93,7 @@
             "XML::Parser" : "0",
             "XML::Writer" : "0",
             "base" : "0",
-            "perl" : "5.008",
+            "perl" : "5.014",
             "strict" : "0",
             "utf8" : "0",
             "vars" : "0",
@@ -104,7 +104,7 @@
    "provides" : {
       "Task::Sites::ShlomiFish" : {
          "file" : "lib/Task/Sites/ShlomiFish.pm",
-         "version" : "0.0212"
+         "version" : "0.0213"
       }
    },
    "release_status" : "stable",
@@ -117,6 +117,6 @@
          "url" : "https://github.com/thewml/latemp"
       }
    },
-   "version" : "0.0212",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.0213",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

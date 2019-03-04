@@ -1,7 +1,7 @@
 [
    {
-      "modname" : "Remove",
-      "path" : [
+      "modname": "Remove",
+      "path": [
          "{some}[0..5]"
       ]
    }

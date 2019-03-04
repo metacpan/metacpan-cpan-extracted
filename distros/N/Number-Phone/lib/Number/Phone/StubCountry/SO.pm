@@ -22,71 +22,62 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20181205223704;
+our $VERSION = 1.20190303205540;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{2})(\\d{4})',
                   'format' => '$1 $2',
-                  'leading_digits' => '8[125]'
+                  'leading_digits' => '8[125]',
+                  'pattern' => '(\\d{2})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{6})',
                   'format' => '$1',
-                  'leading_digits' => '[134]'
+                  'leading_digits' => '[134]',
+                  'pattern' => '(\\d{6})'
                 },
                 {
+                  'pattern' => '(\\d)(\\d{6})',
                   'leading_digits' => '
-            [15]|
+            1|
             2[0-79]|
             3[0-46-8]|
-            4[0-7]
+            4[0-7]|
+            59
           ',
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d)(\\d{6})'
+                  'format' => '$1 $2'
                 },
                 {
+                  'pattern' => '(\\d)(\\d{7})',
                   'leading_digits' => '
             24|
             [67]
           ',
-                  'format' => '$1 $2',
-                  'pattern' => '(\\d)(\\d{7})'
+                  'format' => '$1 $2'
                 },
                 {
-                  'format' => '$1 $2 $3',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             [348]|
             64|
             79[0-8]|
             90
           ',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'format' => '$1 $2 $3'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{5,7})',
-                  'leading_digits' => '[12679]',
-                  'format' => '$1 $2'
+                  'format' => '$1 $2',
+                  'leading_digits' => '
+            1|
+            28|
+            6[1-35-9]|
+            799|
+            9[2-9]
+          '
                 }
               ];
 
 my $validators = {
-                'geographic' => '
-          (?:
-            1\\d|
-            2[0-79]|
-            3[0-46-8]|
-            4[0-7]|
-            59
-          )\\d{5}|
-          (?:
-            [134]\\d|
-            8[125]
-          )\\d{4}
-        ',
-                'toll_free' => '',
-                'specialrate' => '',
-                'personal_number' => '',
                 'fixed_line' => '
           (?:
             1\\d|
@@ -100,34 +91,46 @@ my $validators = {
             8[125]
           )\\d{4}
         ',
+                'personal_number' => '',
+                'toll_free' => '',
                 'mobile' => '
+          28\\d{5}|
           (?:
+            6[1-9]|
+            79
+          )\\d{6,7}|
+          (?:
+            15|
+            24|
             (?:
-              15|
-              (?:
-                3[59]|
-                4[89]|
-                6[1-9]|
-                79|
-                8[08]
-              )\\d|
-              9(?:
-                0[67]|
-                [2-9]
-              )
+              3[59]|
+              4[89]|
+              8[08]
             )\\d|
-            2(?:
-              4\\d|
-              8
+            60|
+            7[1-8]|
+            9(?:
+              0[67]|
+              [2-9]
             )
-          )\\d{5}|
-          (?:
-            6\\d|
-            7[1-9]
           )\\d{6}
         ',
+                'geographic' => '
+          (?:
+            1\\d|
+            2[0-79]|
+            3[0-46-8]|
+            4[0-7]|
+            59
+          )\\d{5}|
+          (?:
+            [134]\\d|
+            8[125]
+          )\\d{4}
+        ',
                 'pager' => '',
-                'voip' => ''
+                'voip' => '',
+                'specialrate' => ''
               };
 my %areanames = (
   2521 => "Mogadishu",
