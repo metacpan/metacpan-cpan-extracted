@@ -7,7 +7,7 @@ use Moo;
 
 with 'Catmandu::Importer';
 
-use constant BASE_URL       => 'http://inspirehep.net/';
+use constant BASE_URL       => 'https://inspirehep.net/';
 use constant DEFAULT_FORMAT => 'endnote';
 
 has base => ( is => 'ro', default => sub { return BASE_URL; } );

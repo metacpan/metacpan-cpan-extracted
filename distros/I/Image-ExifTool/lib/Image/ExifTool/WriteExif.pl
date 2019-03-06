@@ -344,7 +344,8 @@ sub UpdateTiffEnd($$)
 
 #------------------------------------------------------------------------------
 # Validate image data size
-# Inputs: 0) ExifTool ref, 1) validate info hash ref, 2) flag to issue error
+# Inputs: 0) ExifTool ref, 1) validate info hash ref,
+#         2) flag to issue error (ie. we're writing)
 # - issues warning or error if problems found
 sub ValidateImageData($$$;$)
 {
@@ -378,7 +379,10 @@ sub ValidateImageData($$$;$)
         my $bitsPerPixel = 0;
         $bitsPerPixel += $_ foreach @bitsPerSample;
         my $expectedBytes = int(($$vInfo{0x100} * $$vInfo{0x101} * $bitsPerPixel + 7) / 8);
-        if ($expectedBytes != $totalBytes) {
+        if ($expectedBytes != $totalBytes and
+            # (this problem seems normal for certain types of RAW files...)
+            $$et{TIFF_TYPE} !~ /^(K25|KDC|MEF|ORF|SRF)$/)
+        {
             my ($adj, $minor);
             if ($expectedBytes > $totalBytes) {
                 $adj = 'Under'; # undersized is a bigger problem because we may lose data
@@ -388,8 +392,6 @@ sub ValidateImageData($$$;$)
                 $minor = 1;
             }
             my $msg = "${adj}sized $dirName $$byteCountInfo[0]{Name} ($totalBytes bytes, but expected $expectedBytes)";
-            # this problem seems normal for certain types of RAW files...
-            $minor = 1 if $$et{TIFF_TYPE} =~ /^(K25|KDC|MEF|ORF|SRF)$/;
             if (not defined $minor) {
                 # this is a serious error if we are writing the file and there
                 # is a chance that we may not copy all of the image data
@@ -2548,7 +2550,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

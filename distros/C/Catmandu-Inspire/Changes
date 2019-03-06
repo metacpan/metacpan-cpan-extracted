@@ -1,5 +1,8 @@
 Revision history for Catmandu-Inspire
 
+0.300  2019-03-06 10:51:15 CET
+	- update of deps
+
 0.265  2014-08-11 10:57:24 CEST
 	- build process; cpanfile
 

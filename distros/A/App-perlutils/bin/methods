@@ -1,0 +1,2 @@
+#!/bin/sh
+perl -e 'use App::Pimpd; print join(", ", grep {defined &{"App::Pimpd::$_"}} sort keys %{"App::Pimpd::"}), "\n"'

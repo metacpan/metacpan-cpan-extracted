@@ -4,7 +4,7 @@
       "bbon <bbon@mail.ru>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "CSS::Sass" : "0",
+            "CSS::Sass" : "v3.4.0",
             "Template" : "0",
             "Template::Plugin::Filter" : "0",
             "perl" : "5.008001"
@@ -57,7 +57,7 @@
    "provides" : {
       "Template::Plugin::Filter::Scss" : {
          "file" : "lib/Template/Plugin/Filter/Scss.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -71,8 +71,9 @@
          "web" : "https://github.com/bbon/Template-Plugin-Filter-Scss"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "mr.bbon <nu@nu-nu.ru>"
-   ]
+   ],
+   "x_static_install" : 1
 }

@@ -1,0 +1,7 @@
+Revision history for Graph-Traverse
+
+0.02  2019-03-06 08:25:44 MST
+        - Bump Perl version for package-with-version syntax
+
+0.01  2019-03-05 19:18:57 MST
+        - Initial release

@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use 5.008001;
 
-# ABSTRACT: Simplified alternative to Alien::FFI that uses system libffi
-our $VERSION = '0.21'; # VERSION
+# ABSTRACT: (Deprecated) Simplified alternative to Alien::FFI that uses system libffi
+our $VERSION = '0.23'; # VERSION
 
 
 1;
@@ -18,17 +18,26 @@ __END__
 
 =head1 NAME
 
-Alt::Alien::FFI::System - Simplified alternative to Alien::FFI that uses system libffi
+Alt::Alien::FFI::System - (Deprecated) Simplified alternative to Alien::FFI that uses system libffi
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 
  env PERL_ALT_INSTALL=OVERWRITE cpanm Alt::Alien::FFI::System
 
 =head1 DESCRIPTION
+
+B<DEPRECATED>: As noted below, this distribution was intended
+for use by system integrators packaging L<FFI::Platypus> that
+didn't want to add the real L<Alien::FFI> and its dependencies
+to their build chain.  As of version 0.69, L<FFI::Platypus>
+will use C<pkg-config> and the system C<libffi> if it is already
+installed, and skip the install of L<Alien::FFI>. Thus, this
+module is now redundant.  It may be removed from CPAN, but not
+before January 1st 2020.
 
 This distribution provides an alternative implementation of
 L<Alien::FFI> that is geared toward system integrators when

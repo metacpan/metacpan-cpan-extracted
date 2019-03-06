@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,8 +19,9 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '7.15'
+  Mojolicious: '8.12'
 resources:
   bugtracker: https://github.com/jamadam/WWW-Crawler-Mojo/issues
   repository: https://github.com/jamadam/WWW-Crawler-Mojo
-version: '0.20'
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -46,9 +46,6 @@
             "Encode" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
-            "File::stat" : "0",
-            "Scalar::Util" : "0",
-            "Symbol" : "0",
             "Win32::API" : "0",
             "perl" : "5.018000",
             "version" : "0"
@@ -68,11 +65,11 @@
       },
       "winja" : {
          "file" : "lib/winja.pm",
-         "version" : "v1.0.1"
+         "version" : "v1.0.2"
       }
    },
    "release_status" : "stable",
-   "version" : "1.0.1",
+   "version" : "1.0.2",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpan@gmail.com>",

@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.34 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.35 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.34 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.34
+    Author::Plicease.*   2.35
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -234,6 +234,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.34 {
         maybe appveyor      => $self->payload->{appveyor},
         maybe travis_user   => $self->payload->{travis_user} // $self->payload->{github_user},
         maybe appveyor_user => $self->payload->{appveyor_user},
+        maybe cirrus_user   => $self->payload->{cirrus_user},
       },
     ]);
 
@@ -332,7 +333,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 
@@ -529,7 +530,11 @@ Set the travis user name (defaults to github_user).
 
 =head2 appveyor_user
 
-Set the appveyor username.
+Set the appveyor username (defaults to plicease).
+
+=head2 cirrus_user
+
+Set the cirrus-ci user (defaults to same as travis_user, which itself defaults to plicease).
 
 =head2 copy_mb
 

@@ -1,6 +1,9 @@
 Revision history for Win32-JA-PathPatch
 
-1.0.1 2019-03-03T05:17:55Z
+1.0.2 2019-03-05T09:46:46Z
+
+1.0.2 2019-03-05T09:45:12Z
+    - Remove unused prereqs
 
 1.0.1 2019-03-03T05:15:41Z
     - Fix PODs

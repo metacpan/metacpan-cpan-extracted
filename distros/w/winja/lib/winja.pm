@@ -1,7 +1,7 @@
 package winja;
 use 5.018000;
 use version;
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.2';
 
 use utf8;
 
@@ -63,8 +63,6 @@ use warnings;
 use strict;
 
 require Cwd;
-require Scalar::Util;
-require File::stat;
 require File::Spec;
 require File::Basename;
 use Encode;

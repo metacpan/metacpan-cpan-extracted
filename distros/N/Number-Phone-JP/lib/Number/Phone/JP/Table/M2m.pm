@@ -3,12 +3,12 @@ package Number::Phone::JP::Table::M2m;
 use strict;
 use warnings;
 
-our $VERSION = '0.20190204';
+our $VERSION = '0.20190301';
 
-# Table last modified: 2019-02-04
+# Table last modified: 2019-03-01
 our %TEL_TABLE = (
     # Pref => q<Assoc-Pref-Regex>,
-    20 => '(?:(?:2(?:[0-24-689]\d|3[0-6]|7[0-3])|3(?:3[0-5]|[0-2]\d)|1\d{2})\d{5})',
+    20 => '(?:(?:3(?:[0-24-6]\d|3[0-5]|7[0-2])|2(?:[0-689]\d|7[0-3])|1\d{2})\d{5})',
 );
 
 1;

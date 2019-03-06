@@ -50,7 +50,7 @@ method get_moose_type {
 	if ( $type =~ /varchar/i ) {
 		$str = 'Str|HashRef';
 	}
-	elsif ( $type =~ /timestamp/i ) {
+	elsif ( $type =~ /timestamp/i || $type =~ /datetime/i) {
 		$str = 'Str|HashRef';
 	}
 	elsif ( $type =~ /enum/i ) {

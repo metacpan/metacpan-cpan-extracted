@@ -3,6 +3,7 @@ lib/Net/RDAP/Base.pm
 lib/Net/RDAP/EPPStatusMap.pm
 lib/Net/RDAP/Error.pm
 lib/Net/RDAP/Event.pm
+lib/Net/RDAP/Help.pm
 lib/Net/RDAP/ID.pm
 lib/Net/RDAP/Link.pm
 lib/Net/RDAP/Notice.pm
@@ -13,6 +14,8 @@ lib/Net/RDAP/Object/Entity.pm
 lib/Net/RDAP/Object/IPNetwork.pm
 lib/Net/RDAP/Object/Nameserver.pm
 lib/Net/RDAP/Registry.pm
+lib/Net/RDAP/Registry/IANARegistry.pm
+lib/Net/RDAP/Registry/IANARegistry/Service.pm
 lib/Net/RDAP/Remark.pm
 lib/Net/RDAP/SearchResult.pm
 lib/Net/RDAP/Service.pm

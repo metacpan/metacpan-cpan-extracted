@@ -27,6 +27,10 @@ perlmulticore.h - implements the Perl Multicore Specification
   do_the_C_thing ();
   perlinterp_acquire ();
 
+  // optional, in BOOT section:
+
+  perlmulticore_support ();
+
 =head1 DESCRIPTION
 
 This documentation is the abridged version of the full documention at
@@ -120,6 +124,30 @@ This could be added to perl's C<CPPFLAGS> when configuring perl on
 platforms that do not support threading at all for example.
 
 
+=head1 ADVERTISING MULTICORE API SUPPORT
+
+To help users find out whether a particular build of your module is, in
+fact, multicore enabled, you can invoke the C<perlmulticore_support>
+macro in your C<BOOT:> section, e.g.:
+
+
+   MODULE = My::Mod    PACKAGE = My::Mod::Pkg
+
+   BOOT:
+      perlmulticore_support ();
+
+What this does is set the C<$My::Mod::PERLMULTICORE_SUPPORT> variable to
+the major API version * 1000 + minor version, for example, version C<1002>
+introduced this feature.
+
+For this to work, the C<cv> parameter passed to C<BOOT:> must still be
+in scope. To ensure this, either invoke the macro early in your C<BOOT:>
+section, or don't declare a local variable called C<cv>, either of which
+should be easy to do.
+
+Note that this is I<optional>, so you don't have to do that.
+
+
 =head1 AUTHOR
 
    Marc A. Lehmann <perlmulticore@schmorp.de>
@@ -136,13 +164,18 @@ license: L<https://creativecommons.org/publicdomain/zero/1.0/>.
 
 */
 
+/* version history
+ * 1.1 (1001) 2015-07-03: initial release.
+ * 1.2 (1002) 2019-03-03: introduce optional perlmulticore_support macro.
+ */
 #define PERL_MULTICORE_MAJOR 1 /* bumped on incompatible changes */
-#define PERL_MULTICORE_MINOR 1 /* bumped on every change */
+#define PERL_MULTICORE_MINOR 2 /* bumped on every change */
 
 #if PERL_MULTICORE_DISABLE
 
-#define perlinterp_release() do { } while (0)
-#define perlinterp_acquire() do { } while (0)
+#define perlinterp_release()    do { } while (0)
+#define perlinterp_acquire()    do { } while (0)
+#define perlmulticore_support() do { } while (0)
 
 #else
 
@@ -207,6 +240,12 @@ perl_multicore_init (void)
   /* call the real (or dummy) implementation now */
   perlinterp_release ();
 }
+
+#define perlmulticore_support() \
+  sv_setiv (get_sv ( \
+      form ("%s::PERLMULTICORE_SUPPORT", HvNAME (GvSTASH (CvGV (cv)))), \
+      GV_ADD | GV_ADDMULTI), \
+    PERL_MULTICORE_MAJOR * 1000 + PERL_MULTICORE_MINOR); \
 
 END_EXTERN_C
 

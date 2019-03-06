@@ -1,9 +1,12 @@
 revision history for Data-SSHPubkey. see also the git repo
 
+0.03    2019-03-04
+        support passed filehandles (pairs well with ssh-keyscan). more
+        docs, more tests
+
 0.02    2019-03-02
         improve parsing of various public keys. add hash of known key
         types. more tests
 
 0.01    2019-02-27
         first version, released on an unsuspecting world
-

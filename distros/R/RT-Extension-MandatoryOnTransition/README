@@ -36,10 +36,6 @@ DESCRIPTION
     TimeTaken
         Requires that the Worked field on the update page is non-zero.
 
-    Owner
-        Requires that the ticket has a real Owner or the real Owner will be
-        set on the update page.
-
     A larger set of basic fields may be supported in future releases. If
     you'd like to see additional fields added, please email your request to
     the bug address at the bottom of this documentation.
@@ -96,7 +92,7 @@ CONFIGURATION
 
         Set( %MandatoryOnTransition,
             'QueueName' => {
-                'from -> to' => [ 'BasicField', 'CF.MyField', ],
+                'from -> to' => [ 'BasicField', 'CF.MyField', 'CustomRole.MyRole' ],
             },
         );
 
@@ -115,7 +111,7 @@ CONFIGURATION
 
         Set( %MandatoryOnTransition,
             Helpdesk => {
-                '* -> resolved' => ['TimeWorked', 'CF.Resolution'],
+                '* -> resolved'      => ['TimeWorked', 'CF.Resolution', 'CustomRole.Analyst'],
             },
             '*' => {
                 '* -> resolved' => ['CF.Category'],
@@ -124,6 +120,31 @@ CONFIGURATION
 
     The transition syntax is similar to that found in RT's Lifecycles. See
     perldoc /opt/rt4/etc/RT_Config.pm.
+
+  Requiring role values
+    You can require any core or custom role on a RT::Ticket object, below is
+    an example of requiring a custom role "customer" be set on transition
+    from open and the owner also be set for the ticket on transition from a
+    status of open.
+
+        Set( %MandatoryOnTransition,
+            'General' => {
+                '* -> resolved' => ['CustomRole.customer', 'Owner'],
+            },
+        );
+
+  Role Membership in a Group
+    Roles can require the members of the role to also be a member of a group
+    before satisfying to mandatory condition. Below we require that the
+    Owner role be set and that the member it is set to is a member of the
+    group 'SupportReps' or 'Admins'.
+
+        Set( %MandatoryOnTransition,
+            'General' => {
+                'open -> *' => ['Owner'],
+                'Owner' => { transition => 'open -> *', group => ['SupportReps', 'Admins'] },
+            }
+        );
 
   Restrictions on Queue Transitions
     The default behavior for MandatoryOnTransition operates on status
@@ -214,9 +235,14 @@ IMPLEMENTATION DETAILS
 
   Methods
    RequiredFields
-    Returns two array refs of required fields for the described status
-    transition. The first is core fields, the second is CF names. Returns
-    empty array refs on error or if nothing is required.
+    Returns three array refs of required fields for the described status
+    transition. The first is core fields, the second is CF names, the third
+    is roles. Returns empty array refs on error or if nothing is required.
+
+    A fourth returned parameter is a hashref of must-have values for custom
+    fields.
+
+    The fifth parameter is a hashref of groups a role member must be in.
 
     Takes a paramhash with the keys Ticket, Queue, From, and To. Ticket
     should be an object. Queue should be a name. From and To should be

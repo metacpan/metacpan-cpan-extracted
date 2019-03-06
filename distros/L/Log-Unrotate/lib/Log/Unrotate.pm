@@ -1,6 +1,6 @@
 package Log::Unrotate;
 {
-  $Log::Unrotate::VERSION = '1.32';
+  $Log::Unrotate::VERSION = '1.33';
 }
 
 use strict;
@@ -12,7 +12,7 @@ Log::Unrotate - Incremental log reader with a transparent rotation handling
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 
@@ -322,7 +322,11 @@ sub _get_last_line ($) {
 sub _last_line ($) {
     my ($self) = @_;
     my $last_line = $self->{LastLine} || $self->_get_last_line();
-    $last_line =~ /(.{0,255})$/ and $last_line = $1;
+
+    # $last_line =~ /(.{0,255})$/ and $last_line = $1;
+    chomp $last_line; $last_line = substr($last_line, -255);
+    $last_line =~ m/\n([^\n]*)$/s and $last_line = $1;
+
     return $last_line;
 }
 

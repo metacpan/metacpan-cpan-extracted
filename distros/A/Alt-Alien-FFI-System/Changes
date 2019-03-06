@@ -1,5 +1,16 @@
 Revision history for Alt-Alien-FFI-System
 
+0.23      2019-03-06 09:51:25 -0500
+  - Update IRC in metadata
+
+0.22      2019-03-06 09:48:17 -0500
+  - This module is now DEPRECATED in favor of just
+    installing FFI-Platypus with pkg-config and libffi
+    already installed.
+  - This distribution may be removed from CPAN on or
+    after 1 January 2020.
+  - Move dist to Perl5-FF github org
+
 0.21      2018-06-01 07:57:41 -0400
   - Update to match the real Alien::FFI 0.21
 

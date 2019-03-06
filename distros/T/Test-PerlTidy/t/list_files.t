@@ -8,8 +8,10 @@ use Test::More tests => 1;
 use Test::PerlTidy;
 
 my @wanted_files = sort qw(
+  Build.PL
   Makefile.PL
   lib/Test/PerlTidy.pm
+  t/00-compile.t
   t/critic.t
   t/exclude_files.t
   t/exclude_perltidy.t
@@ -21,6 +23,9 @@ my @wanted_files = sort qw(
   t/strict.t
 );
 
-my @found_files = Test::PerlTidy::list_files('.');
+@wanted_files = map { s/\//\\/g; $_ } @wanted_files if $^O eq 'MSWin32';
+
+my @found_files =
+  Test::PerlTidy::list_files( path => '.', exclude => [ qr/blib|xt/, ], );
 
 is_deeply( \@wanted_files, \@found_files );

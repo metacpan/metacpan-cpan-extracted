@@ -9,6 +9,7 @@ Makefile.PL
 README
 alienfile
 author.yml
+corpus/foo-1.00.zip
 dist.ini
 lib/Alien/unzip.pm
 maint/cip-before-install

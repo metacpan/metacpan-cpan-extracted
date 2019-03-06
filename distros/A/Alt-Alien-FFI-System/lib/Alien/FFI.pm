@@ -6,7 +6,7 @@ use 5.008001;
 use Carp qw( croak );
 
 # ABSTRACT: Get libffi compiler and linker flags
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 sub new
@@ -83,7 +83,7 @@ foreach my $linkage ('share','static')
     my $sub = sub {
       unless(defined $value)
       {
-        print "command = $pkg_config $flags libffi\n";
+        #print "command = $pkg_config $flags libffi\n";
         $value = `$pkg_config $flags libffi`;
         die "package libffi not found" if $?;
         chomp $value;
@@ -119,7 +119,7 @@ Alien::FFI - Get libffi compiler and linker flags
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 

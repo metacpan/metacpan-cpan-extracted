@@ -1,5 +1,8 @@
 Revision history for Plack-Middleware-CrossOrigin
 
+0.014 - 2019-03-05
+  - fix wildcards being able to match numbers
+
 0.013 - 2019-02-14
   - Allow using wildcards inside origins to match partial host names
   - Convert packaging from Dist::Zilla to Distar

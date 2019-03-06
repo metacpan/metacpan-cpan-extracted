@@ -26,7 +26,7 @@ WWW::Crawler::Mojo is a web crawling framework written in Perl on top of mojo to
 ## Requirements
 
 * Perl 5.16 or higher
-* Mojolicious 6.0 or higher
+* Mojolicious 8.12 or higher
 
 ## Installation
 
@@ -41,9 +41,9 @@ WWW::Crawler::Mojo is a web crawling framework written in Perl on top of mojo to
     $bot->on(res => sub {
         my ($bot, $scrape, $job, $res) = @_;
         
-        for my $job ($scrape->($css_selector)) {
-        	if (...) {
-            	$bot->enqueue($job);
+        for my $child_job ($scrape->($css_selector)) {
+            if (...) {
+                $bot->enqueue($child_job);
             }
         }
     });
@@ -83,9 +83,9 @@ Restrict following URLs by depth.
     $bot->on(res => sub {
         my ($bot, $scrape, $job, $res) = @_;
         
-        for my $job ($scrape->()) {
-            next unless ($job->depth < 5)
-            $bot->enqueue($job);
+        for my $child_job ($scrape->()) {
+            next unless ($child_job->depth < 5)
+            $bot->enqueue($child_job);
         }
     });
 
@@ -94,18 +94,8 @@ Restrict following URLs by host.
     $bot->on(res => sub {
         my ($bot, $scrape, $job, $res) = @_;
         
-        for my $job ($scrape->()) {
-            $bot->enqueue($job) if $job->url->host eq 'example.com';
-        }
-    });
-
-Restrict following URLs by referrer's host.
-
-    $bot->on(res => sub {
-        my ($bot, $scrape, $job, $res) = @_;
-        
-        for my $job ($scrape->()) {
-            $bot->enqueue($job) if $job->referrer->url->host eq 'example.com';
+        for my $child_job ($scrape->()) {
+            $bot->enqueue($child_job) if $child_job->url->host eq 'example.com';
         }
     });
 
@@ -114,8 +104,9 @@ Excepting following URLs by path.
     $bot->on(res => sub {
         my ($bot, $scrape, $job, $res) = @_;
         
-        for my $job ($scrape->()) {
-            $bot->enqueue($job) unless ($job->url->path =~ qr{^/foo/});
+        for my $child_job ($scrape->()) {
+            $bot->enqueue($child_job)
+                                unless ($child_job->url->path =~ qr{^/foo/});
         }
     });
 
@@ -125,14 +116,14 @@ Crawl only preset URLs.
         my ($bot, $scrape, $job, $res) = @_;
         # DO SOMETHING
     });
-	
-	$bot->enqueue(
-    	'http://example.com/1',
-    	'http://example.com/3',
-    	'http://example.com/5',
+    
+    $bot->enqueue(
+        'http://example.com/1',
+        'http://example.com/3',
+        'http://example.com/5',
     );
-	
-	$bot->crawl;
+    
+    $bot->crawl;
 
 Speed up.
 
@@ -160,13 +151,13 @@ You can fulfill any prerequisites such as login form submittion so that a login 
 
 ## Broad crawling
 
-Althogh the module is only well tested for "focused crawl" at this point,
+Althogh the module is only well tested for "focused crawling" at this point,
 you can also use it for endless crawling by taking special care of memory usage including;
 
 * Restrict queue size by yourself.
 * Replace redundant detecter code.
 
-	$bot->queue->redundancy(sub {...});
+    $bot->queue->redundancy(sub {...});
 
 ## Copyright
 
@@ -174,4 +165,3 @@ Copyright (C) jamadam
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
-

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 require Number::Phone::JP::Table::Mobile;
 
-our $VERSION = '0.20190204';
+our $VERSION = '0.20190301';
 
 no warnings 'once';
 our %TEL_TABLE = %Number::Phone::JP::Table::Mobile::TEL_TABLE;

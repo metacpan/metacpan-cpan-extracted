@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( File::Spec FindBin base strict warnings );
+  } qw( File::Spec File::Temp FindBin base strict warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build"        => "0.32",
+    "Alien::Build"        => "1.19",
     "Alien::Build::MM"    => "0.32",
     "ExtUtils::MakeMaker" => "6.52"
   },
@@ -61,13 +61,15 @@ my %WriteMakefileArgs = (
     "Alien::Base" => "0.038"
   },
   "TEST_REQUIRES" => {
+    "File::chdir" => 0,
+    "Path::Tiny"  => 0,
     "Test2::V0"   => "0.000060",
     "Test::Alien" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test"    => {
     "TESTS" => "t/*.t"
-    }
+  }
 );
 
 my %FallbackPrereqs = (
@@ -75,6 +77,8 @@ my %FallbackPrereqs = (
   "Alien::Build"        => "0.32",
   "Alien::Build::MM"    => "0.32",
   "ExtUtils::MakeMaker" => "6.52",
+  "File::chdir"         => 0,
+  "Path::Tiny"          => 0,
   "Test2::V0"           => "0.000060",
   "Test::Alien"         => 0
 );

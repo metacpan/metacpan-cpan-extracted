@@ -57,6 +57,26 @@ if ($^O =~ /linux/ && $Config{usemymalloc} eq "y") {
 EOF
 }
 
+print <<EOF;
+
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+
+Coro::Multicore cna do some simple checks to make sure perlinterp_release
+is called only with a valid perl context, and perlinterp_acquire without,
+ensuring that they are always called in proper pairs. This is very useful
+for development of your XS module.
+
+This costs a bit of performance though, so it is disabled by default.
+
+The environment variable CORO_MULTICORE_CHECK can be used to ste a
+default for this answer.
+
+EOF
+
+my $extra = prompt ("Enable extra checks?", $ENV{CORO_MULTICORE_CHECK} ? "y" : "n") =~ /[Yy]/;
+
+my $define = sprintf "-DRECURSION_CHECK=%d", $extra;
+
 WriteMakefile(Coro::MakeMaker::coro_args(
     dist	=> {
 	            PREOP	=> 'pod2text Multicore.pm | tee README >$(DISTVNAME)/README; chmod -R u=rwX,go=rX . ;',
@@ -67,6 +87,7 @@ WriteMakefile(Coro::MakeMaker::coro_args(
     VERSION_FROM => "Multicore.pm",
     CONFIGURE_REQUIRES => { "ExtUtils::MakeMaker" => 6.52, "Canary::Stability" => 0, "Coro" => 6.44 },
     TEST_REQUIRES => { "Coro" => 6.44 },
+    DEFINE       => $define,
     PREREQ_PM    => { "Coro" => 6.44, "AnyEvent" => 7 },
     INC          => $INC,
     LIBS         => $LIBS,

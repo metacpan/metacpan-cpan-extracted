@@ -199,8 +199,6 @@ lib/DBIx/Class/Migration/Tutorial/ThirdMigration.pod
 lib/DBIx/Class/Migration/Types.pm
 lib/Test/DBIx/Class/FixtureCommand/Population.pm
 t/.devdir
-t/.install-version-storage.t.swp
-t/.script.t.swp
 t/help.t
 t/ignore_views.t
 t/install-version-storage.t

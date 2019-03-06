@@ -1,0 +1,67 @@
+CHANGES
+
+20190305.001    2019-03-05
+
+            Minimal versions of PerlTidy and Perl.
+            Convert to Dist-Zilla.
+            Thanks to MANWAR .
+
+20190305    2019-03-05
+
+            Fix test errors caused by new Perl::Tidy.
+            Apply pull-requests from
+            https://github.com/larryl/Test-PerlTidy/pulls . Thanks to
+            @plicease .
+
+20130104     2013-01-04
+
+ -  Fix test errors caused by Perl::Tidy::perltidy v20121207
+            no longer vertically aligning "=~".  Test::PerlTidy now
+            requires Perl::Tidy::perltidy >= v20121207.
+
+20120621     2012-06-21
+
+ -  Fix errors caused by Perl::Tidy::perltidy now disallowing
+            a scalar reference as the "stderr" option.
+
+20120621     2012-06-21
+
+ -  Some cleanup:
+
+ 1) MANIFEST was missing t/_perltidyrc.txt
+
+ 2) Updated build instructions in README
+
+ 3) Updated .gitignore
+
+20110323     2011-03-23
+
+    -  Add dependency on "parent" for CPANTESTERS
+
+20110320     2011-03-20
+
+ -  Resolve several open bugs and feature requests:
+
+ 1) Allow specifying top-level path to start search for files to test
+    (instead of always using ".").
+
+ 2) Allow specifying a perltidyrc file to test against.
+
+ 3) Allow specifying files or directories to exclude from testing.
+
+ 4) Fix so distribution passes its own tidyness tests.
+
+20080429     2008-04-29
+
+    -  A file is tidy wrt a version of Perl::Tidy
+            (even Test::PerlTidy fell prey to this subtle issue)
+
+20070903     2007-09-03
+
+    -  Added File::Finder as a prereq
+            Changed the META.yml file to be valid YAML
+            Added a CHANGES file
+
+20070911     2007-09-11
+
+    -  Changed to Makefile.PL to try to make build more reliable

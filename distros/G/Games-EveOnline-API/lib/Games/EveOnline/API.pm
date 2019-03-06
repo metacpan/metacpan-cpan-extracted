@@ -1,10 +1,11 @@
 package Games::EveOnline::API;
-$Games::EveOnline::API::VERSION = '0.07';
 use Moo;
+
+our $VERSION = '0.08';
 
 =head1 NAME
 
-Games::EveOnline::API - A simple Perl wrapper around the EveOnline XML API.
+Games::EveOnline::API - A simple Perl wrapper around the EveOnline XML API. (DEPRECATED)
 
 =head1 SYNOPSIS
 
@@ -21,6 +22,10 @@ Games::EveOnline::API - A simple Perl wrapper around the EveOnline XML API.
     my $characters  = $eapi->characters();
     my $sheet       = $eapi->character_sheet( character_id => $character_id );
     my $in_training = $eapi->skill_in_training( character_id => $character_id );
+
+=head1 DEPRECATED
+
+This module is no longer being maintained as the XML API is no more.
 
 =head1 DESCRIPTION
 
@@ -1448,19 +1453,10 @@ L<WebService::EveOnline>
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
-
-=head1 CONTRIBUTORS
-
-=over
-
-=item *
-
-Andrey Chips Kuzmin <chipsoid@cpan.org>
-
-=back
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Andrey Chips Kuzmin <chipsoid@cpan.org>
 
 =head1 LICENSE
 

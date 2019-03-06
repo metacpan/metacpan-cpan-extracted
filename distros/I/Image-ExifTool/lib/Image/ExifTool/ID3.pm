@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.50';
+$VERSION = '1.51';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -853,7 +853,12 @@ sub ConvertTimeStamp($)
     }
     my $m = int($time / 60);
     my $s = $time - $m * 60;
-    return sprintf('[%s%.2d:%05.2f]', $h, $m, $s) . substr($val, pos($val));
+    my $ss = sprintf('%05.2f', $s);
+    if ($ss >= 60) {
+        $ss = '00.00';
+        ++$m >= 60 and $m -= 60, ++$h;
+    }
+    return sprintf('[%s%.2d:%s]', $h, $m, $ss) . substr($val, pos($val));
 }
 
 #------------------------------------------------------------------------------
@@ -1549,7 +1554,7 @@ other types of audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

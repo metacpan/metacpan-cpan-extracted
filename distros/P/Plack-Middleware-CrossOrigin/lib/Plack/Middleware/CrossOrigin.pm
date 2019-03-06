@@ -2,7 +2,7 @@ package Plack::Middleware::CrossOrigin;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 $VERSION =~ tr/_//d;
 
 use 5.008;
@@ -103,7 +103,7 @@ sub prepare_app {
         map qr/\A(?:$_)\z/,
         join '|',
         map +(
-            join '[a-z.-]*',
+            join '[a-z0-9.-]*',
             map quotemeta,
             split /\*/, $_, -1
         ),

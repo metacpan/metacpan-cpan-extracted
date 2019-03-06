@@ -58,7 +58,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.101'; # our $VERSION = '';
+$VERSION = '0.103'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH
@@ -4944,36 +4944,22 @@ sub use_modish
 			$" = " ";
 			#$" = ",";
 
-			unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) )
-			{
-				print $tee "rm -f $to/rad/*\n";
-				`rm -f $to/rad/*`;
-				print $tee "perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces \r\n";
-				`perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces `;
-				#print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces);\r\n";
-				#modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
+			print $tee "rm -f $to/rad/*\n";
+			`rm -f $to/rad/*`;
+			print $tee "perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces \r\n";
+			#`perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces `;
+			`perl ./Modish.pm $to/cfg/$fileconfig $zonenumber  @surfaces `;
+			#print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces);\r\n";
+			#modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
 
-				`cp -f $shdname $oldshdname`;
-				print $tee "cp -f $shdname $oldshdname\n";
-				`cp -f $shdaname $oldshdaname`;
-				print $tee "cp -f $shdname $oldshdname\n";
-				`cp -f $modshdaname $shdaname`;
-				print $tee "cp -f $modshdaname $shdaname\n";
-			}
-			else
-			{
-				print $tee "del /y $to/rad/*\r\n";
-				`rm -f $to/rad/*`;
-				print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces)\r\n";
-				modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
+			`cp -f $shdname $oldshdname`;
+			print $tee "cp -f $shdname $oldshdname\n";
+			`cp -f $shdaname $oldshdaname`;
+			print $tee "cp -f $shdname $oldshdname\n";
+			`cp -f $modshdaname $shdaname`;
+			print $tee "cp -f $modshdaname $shdaname\n";
 
-				`xcopy  /e /c /r /y $shdname $oldshdname`;
-				print $tee "xcopy  /e /c /r /y $shdname $oldshdname\r\n";
-				`xcopy  /e /c /r /y $shdaname $oldshdname`;
-				print $tee "xcopy  /e /c /r /y $shdname $oldshdname\r\n";
-				`xcopy  /e /c /r /y $modshdaname $shdaname`;
-				print $tee "xcopy  /e /c /r /y $modshdaname $shdaname\r\n";
-			}
+
 			$" = " ";
 			if ( -e $modshdaname )
 			{
@@ -5004,7 +4990,7 @@ YYY
 			}
 			else
 			{
-				say $tee "NO .mod.shda FILE HERE. STOPPING.";
+				say $tee "NO .mod.shda FILE HERE. STOPPING.";####################
 				die;
 			}
 		}

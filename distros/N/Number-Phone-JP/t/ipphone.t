@@ -2517,11 +2517,6 @@ ok($tel->set_number('050 88071234')->is_valid_number, 'checking for 050 88071234
 ok($tel->set_number('050 88081234')->is_valid_number, 'checking for 050 88081234');
 ok($tel->set_number('050 88091234')->is_valid_number, 'checking for 050 88091234');
 ok($tel->set_number('050 88101234')->is_valid_number, 'checking for 050 88101234');
-ok($tel->set_number('050 88641234')->is_valid_number, 'checking for 050 88641234');
-ok($tel->set_number('050 88651234')->is_valid_number, 'checking for 050 88651234');
-ok($tel->set_number('050 88661234')->is_valid_number, 'checking for 050 88661234');
-ok($tel->set_number('050 88671234')->is_valid_number, 'checking for 050 88671234');
-ok($tel->set_number('050 88681234')->is_valid_number, 'checking for 050 88681234');
 ok($tel->set_number('050 88801234')->is_valid_number, 'checking for 050 88801234');
 ok($tel->set_number('050 88811234')->is_valid_number, 'checking for 050 88811234');
 ok($tel->set_number('050 88821234')->is_valid_number, 'checking for 050 88821234');
@@ -7920,6 +7915,11 @@ ok(!$tel->set_number('050 88601234')->is_valid_number, 'checking for 050 8860123
 ok(!$tel->set_number('050 88611234')->is_valid_number, 'checking for 050 88611234');
 ok(!$tel->set_number('050 88621234')->is_valid_number, 'checking for 050 88621234');
 ok(!$tel->set_number('050 88631234')->is_valid_number, 'checking for 050 88631234');
+ok(!$tel->set_number('050 88641234')->is_valid_number, 'checking for 050 88641234');
+ok(!$tel->set_number('050 88651234')->is_valid_number, 'checking for 050 88651234');
+ok(!$tel->set_number('050 88661234')->is_valid_number, 'checking for 050 88661234');
+ok(!$tel->set_number('050 88671234')->is_valid_number, 'checking for 050 88671234');
+ok(!$tel->set_number('050 88681234')->is_valid_number, 'checking for 050 88681234');
 ok(!$tel->set_number('050 88691234')->is_valid_number, 'checking for 050 88691234');
 ok(!$tel->set_number('050 88701234')->is_valid_number, 'checking for 050 88701234');
 ok(!$tel->set_number('050 88711234')->is_valid_number, 'checking for 050 88711234');

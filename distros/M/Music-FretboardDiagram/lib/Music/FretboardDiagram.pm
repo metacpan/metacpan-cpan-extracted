@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1002';
+our $VERSION = '0.1101';
 
 use Moo;
 use strictures 2;
@@ -77,6 +77,12 @@ has horiz => (
 );
 
 
+has image => (
+    is      => 'ro',
+    default => sub { 0 },
+);
+
+
 has grid => (
     is      => 'ro',
     default => sub { 'blue' },
@@ -128,8 +134,7 @@ sub draw {
     my ($self) = @_;
 
     if ( $self->horiz ) {
-        $self->_draw_horiz;
-        return;
+        return $self->_draw_horiz;
     }
 
     my $WHITE = 'white';
@@ -269,7 +274,12 @@ sub draw {
         );
     }
 
-    $self->_output_image($i);
+    if ( $self->image ) {
+        return $i;
+    }
+    else {
+        $self->_output_image($i);
+    }
 }
 
 sub _draw_horiz {
@@ -412,7 +422,12 @@ sub _draw_horiz {
         );
     }
 
-    $self->_output_image($i);
+    if ( $self->image ) {
+        return $i;
+    }
+    else {
+        $self->_output_image($i);
+    }
 }
 
 sub _fret_match {
@@ -465,7 +480,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1002
+version 0.1101
 
 =head1 SYNOPSIS
 
@@ -494,10 +509,11 @@ version 0.1002
     font     => '/path/to/TTF/font.ttf',
     tuning   => [qw/A E C G/],
     horiz    => 1,
+    image    => 1,
     grid     => 'gray',
     verbose  => 1,
   );
-  $dia->draw;
+  my $image = $dia->draw;
 
 =head1 DESCRIPTION
 
@@ -626,6 +642,14 @@ the 6th string at the bottom, and frets numbered from left to right.
 
 Default: 0
 
+=head2 image
+
+  $image = $dia->image;
+
+Return the image from the B<draw> method instead of writing to a file.
+
+Default: 0
+
 =head2 grid
 
   $grid = $dia->grid;
@@ -684,7 +708,7 @@ Render the requested chord diagram as an image file of the given B<type>.
 
 =head1 THANK YOU
 
-Paweł Świderski for the horizontal drawing suggestion
+Paweł Świderski for the horizontal drawing and webservice suggestions
 
 =head1 SEE ALSO
 

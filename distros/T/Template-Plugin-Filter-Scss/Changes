@@ -1,5 +1,9 @@
 Revision history for Perl extension Template-Plugin-Filter-Scss
 
+0.02 2019-03-06T16:04:30Z
+
+    - correct cpanfile (for tests) and POD
+
 0.01 2016-11-03T15:26:06Z
 
     - original version

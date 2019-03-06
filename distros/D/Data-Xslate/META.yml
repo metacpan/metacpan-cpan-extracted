@@ -26,7 +26,7 @@ no_index:
 provides:
   Data::Xslate:
     file: lib/Data/Xslate.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Carp: '0'
   Storable: '0'
@@ -37,9 +37,10 @@ resources:
   bugtracker: https://github.com/bluefeet/Data-Xslate/issues
   homepage: https://github.com/bluefeet/Data-Xslate
   repository: git://github.com/bluefeet/Data-Xslate.git
-version: '0.06'
+version: '0.07'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

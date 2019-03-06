@@ -1,8 +1,10 @@
+.gitignore
+.travis.yml
 Changes
 LICENSE
 MANIFEST
 Makefile.PL
-README.pod
+README.md
 lib/Text/Control.pm
 t/001_load.t
 t/002_functions.t

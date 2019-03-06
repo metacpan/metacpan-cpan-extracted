@@ -1,0 +1,89 @@
+---
+sections:
+- award_emoji:
+    head: AWARD EMOJI METHODS
+    doc_url: http://docs.gitlab.com/ce/api/award_emoji.html
+- branches:
+    head: BRANCH METHODS
+    doc_url: http://doc.gitlab.com/ce/api/branches.html
+- builds:
+    head: BUILD METHODS
+    doc_url: http://docs.gitlab.com/ce/api/builds.html
+- build_triggers:
+    head: BUILD TRIGGER METHODS
+    doc_url: http://docs.gitlab.com/ce/api/build_triggers.html
+- build_variables:
+    head: BUILD VARIABLE METHODS
+    doc_url: http://docs.gitlab.com/ce/api/build_variables.html
+- commits:
+    doc_url: http://doc.gitlab.com/ce/api/commits.html
+    head: COMMIT METHODS
+- deploy_keys:
+    head: DEPLOY KEY METHODS
+    doc_url: http://doc.gitlab.com/ce/api/deploy_keys.html
+- groups:
+    head: GROUP METHODS
+    doc_url: http://doc.gitlab.com/ce/api/groups.html
+- issues:
+    head: ISSUE METHODS
+    doc_url: http://doc.gitlab.com/ce/api/issues.html
+- keys:
+    head: KEY METHODS
+    doc_url: http://docs.gitlab.com/ce/api/keys.html
+- labels:
+    head: LABEL METHODS
+    doc_url: http://doc.gitlab.com/ce/api/labels.html
+- merge_requests:
+    head: MERGE REQUEST METHODS
+    doc_url: http://doc.gitlab.com/ce/api/merge_requests.html
+- milestones:
+    head: MILESTONE METHODS
+    doc_url: http://doc.gitlab.com/ce/api/milestones.html
+- licenses:
+    head: OPEN SOURCE LICENSES METHODS
+    doc_url: http://docs.gitlab.com/ce/api/licenses.html
+- namespaces:
+    head: NAMESPACE METHODS
+    doc_url: http://docs.gitlab.com/ce/api/namespaces.html
+- notes:
+    head: NOTE METHODS
+    doc_url: http://doc.gitlab.com/ce/api/notes.html
+- projects:
+    head: PROJECT METHODS
+    doc_url: http://doc.gitlab.com/ce/api/projects.html
+- project_snippets:
+    head: PROJECT SNIPPET METHODS
+    doc_url: http://doc.gitlab.com/ce/api/project_snippets.html
+- repositories:
+    head: REPOSITORY METHODS
+    doc_url: http://doc.gitlab.com/ce/api/repositories.html
+- repository_files:
+    head: FILE METHODS
+    doc_url: http://doc.gitlab.com/ce/api/repository_files.html
+- runners:
+    head: RUNNER METHODS
+    doc_url: http://docs.gitlab.com/ce/api/runners.html
+- services:
+    head: SERVICE METHODS
+    doc_url: http://doc.gitlab.com/ce/api/services.html
+- session:
+    head: SESSION METHODS
+    doc_url: http://doc.gitlab.com/ce/api/session.html
+- settings:
+    head: SETTINGS METHODS
+    doc_url: http://docs.gitlab.com/ce/api/settings.html
+- sidekiq:
+    head: SIDEKIQ METHODS
+    doc_url: http://docs.gitlab.com/ce/api/sidekiq_metrics.html
+- snippets:
+    head: USER SNIPPET METHODS
+    doc_url: http://docs.gitlab.com/ce/api/snippets.html
+- system_hooks:
+    head: SYSTEM HOOK METHODS
+    doc_url: http://doc.gitlab.com/ce/api/system_hooks.html
+- tags:
+    head: TAG METHODS
+    doc_url: http://docs.gitlab.com/ce/api/tags.html
+- users:
+    head: USER METHODS
+    doc_url: http://doc.gitlab.com/ce/api/users.html

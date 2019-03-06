@@ -1,0 +1,66 @@
+<%init>
+return if $ExcludeCustomRoles || !$defaults{Status};
+
+my ($core, $cfs, $roles) = RT::Extension::MandatoryOnTransition->RequiredFields(
+    Ticket  => $TicketObj,
+    To      => $defaults{Status},
+);
+return unless @$roles;
+
+my @roles;
+foreach my $role ( @{$roles} ) {
+    next if $role eq 'Owner';
+
+    if ( $role =~ s/^CustomRole\.//i ) {
+        my $role_object = RT::CustomRole->new( $session{CurrentUser} );
+        my ( $ret, $msg ) = $role_object->Load($role);
+        unless ($ret) {
+            RT::Logger->error("Unable to load custom role $role: $msg");
+            next;
+        }
+
+        # Modify page already contains single member role groups
+        next if $role_object->SingleValue;
+
+        push @roles, $role_object;
+    }
+    else {
+        my $role_group = RT::Group->new( $session{CurrentUser} );
+        # Handle core roles like Requestor, Cc, AdminCc
+        my ( $ret, $msg ) = $role_group->LoadRoleGroup( Object => $TicketObj, Name => $role );
+        if ($ret) {
+            push @roles, $role_group;
+        }
+        else {
+            RT::Logger->error("Unable to load role $role: $msg");
+        }
+    }
+
+}
+
+for my $role (@roles) {
+    my $input = 'Add' . ( $role->isa('RT::Group') ? $role->Name : $role->GroupType );
+
+    push @$Fields, {
+        name => loc( 'Add [_1]', $role->Name ),
+        comp => '/Elements/EmailInput',
+        args => {
+            Name               => $input,
+            Autocomplete       => 1,
+            AutocompleteNobody => 0,
+            AutocompleteReturn => "Email",
+            Size               => 20,
+            Default            => $defaults{$input},
+
+        }
+    };
+}
+
+</%init>
+
+<%args>
+$TicketObj
+$Fields
+$ExcludeCustomRoles => 0
+%defaults => ()
+</%args>

@@ -11,17 +11,6 @@ lib/Log/Unrotate.pm
 lib/Log/Unrotate/Cursor.pm
 lib/Log/Unrotate/Cursor/File.pm
 lib/Log/Unrotate/Cursor/Null.pm
-liblog-unrotate-perl_1.31.dsc
-liblog-unrotate-perl_1.31.tar.gz
-liblog-unrotate-perl_1.31_all.deb
-liblog-unrotate-perl_1.31_amd64.build
-liblog-unrotate-perl_1.31_amd64.changes
-liblog-unrotate-perl_1.32.dsc
-liblog-unrotate-perl_1.32.tar.gz
-liblog-unrotate-perl_1.32_all.deb
-liblog-unrotate-perl_1.32_amd64.build
-liblog-unrotate-perl_1.32_amd64.changes
-liblog-unrotate-perl_1.32_amd64.upload
 t/Utils.pm
 t/bin.t
 t/cursor.t
@@ -30,3 +19,4 @@ t/pod.t
 t/pod_coverage.t
 t/release-pod-coverage.t
 t/release-pod-syntax.t
+META.json                                Module JSON meta-data (added by MakeMaker)

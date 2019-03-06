@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.35      2019-03-05 21:44:16 -0500
+  - Add some hooks for cirrus-ci badge in the README a la appveyor and travis
+
 2.34      2019-02-22 03:58:42 -0500
   - add [Author::Plicease::Core] to newly minted dists
   - Add appveyor_user to [Author::Plicease::MarkDownCleanup]

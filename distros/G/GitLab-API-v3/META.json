@@ -1,27 +1,43 @@
 {
    "abstract" : "A complete GitLab API v3 client. (DEPRECATED)",
    "author" : [
-      "Aran Deltac <bluefeet@gmail.com>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "GitLab-API-v3",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -44,16 +60,25 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "CPAN::Meta" : "2.120900"
-         },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
             "Log::Any::Adapter::TAP" : "v0.2.0",
-            "Test::More" : "0",
             "Test::Simple" : "0.94"
          }
+      }
+   },
+   "provides" : {
+      "GitLab::API::v3" : {
+         "file" : "lib/GitLab/API/v3.pm",
+         "version" : "1.05"
+      },
+      "GitLab::API::v3::Constants" : {
+         "file" : "lib/GitLab/API/v3/Constants.pm"
+      },
+      "GitLab::API::v3::Paginator" : {
+         "file" : "lib/GitLab/API/v3/Paginator.pm"
+      },
+      "GitLab::API::v3::RESTClient" : {
+         "file" : "lib/GitLab/API/v3/RESTClient.pm"
       }
    },
    "release_status" : "stable",
@@ -63,13 +88,21 @@
       },
       "homepage" : "https://github.com/bluefeet/GitLab-API-v3",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/bluefeet/GitLab-API-v3.git",
+         "url" : "git://github.com/bluefeet/GitLab-API-v3.git",
          "web" : "https://github.com/bluefeet/GitLab-API-v3"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Dave Webb <github@d5ve.com>",
+      "Dotan Dimet <dotan@corky.net>",
+      "José Joaquín Atria <jjatria@gmail.com>",
+      "Marek R. Sotola <Marek.R.Sotola@nasa.gov>",
+      "Nigel Gregoire <nigelgregoire@gmail.com>",
+      "trunov-ms <trunov.ms@gmail.com>"
+   ],
    "x_deprecated" : 1,
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }
-

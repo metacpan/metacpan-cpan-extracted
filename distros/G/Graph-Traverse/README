@@ -1,0 +1,152 @@
+NAME
+
+    Graph::Traverse - A traverse() method for the Graph module.
+
+SYNOPSIS
+
+        use Graph;
+        use Graph::Traverse;
+    
+        my $g = Graph->new();
+        $g->add_path(qw(A B1 B2 C));
+        $g->add_path(qw(A D1 D2 C));
+    
+        my $vertices = $g->traverse('A');
+        # $vertices now is ['B', 'C', 'D'] or some combination thereof
+    
+        my $paths = $g->traverse('A', {hash => 1});
+        # $paths contains a hash like this:
+        # { 'B1' => { 'vertex' => 'B1',
+        #             'path' => ['A', 'B1'],
+        #             'weight' => 1 },
+        #   'B2' => { 'vertex' => 'B2',
+        #             'path' => ['A', 'B1', 'B2'],
+        #             'weight' => 2 },
+        #   'D1' => { 'vertex' => 'D1',
+        #             'path' => ['A', 'D1'],
+        #             'weight' => 1 },
+        #   'D2' => { 'vertex' => 'D2',
+        #             'path' => ['A', 'D1', 'D2'],
+        #             'weight' => 2 },
+        #   'C' =>  { 'vertex' => 'C',
+        #             'path' => ['A', 'D1', 'D2', 'C'],
+        #             'weight' => 3 }
+        # }
+
+METHODS
+
+    The only method resides in the Graph package (not Graph::Traverse) so
+    that any descendant of Graph can call it.
+
+ traverse ( START_VERTEX, [ \{OPTS} ] );
+
+ traverse ( \[START_VERTICES] , [ \{OPTS} ] );
+
+    Traverses edges from the start vertex (or vertices) [either a single
+    vertex's name, or an array of vertex names, may be passed], finding
+    adjacent vertices using the 'next' function (by default, 'successors'),
+    until either a maximum accumulated edge weight ('max' option, if given)
+    is exceeded (by default using the 'weight' attribute, or specify an
+    'attribute'), or until a callback function ('cb') returns a nonzero
+    value. By default, the return value is the list of vertices encountered
+    in the search.
+
+    Note that as we traverse the graph, we may encounter the same vertex
+    several times, but only the shortest path (lowest weight) will be
+    retained.
+
+    The following options are available:
+
+    hash
+
+      Use with a nonzero value to return a hash where keys are vertex
+      names, and values are as follows:
+
+      vertex
+
+	The current (found) vertex.
+
+      path
+
+	The path from the starting vertex (or one of the starting vertices)
+	to the current vertex.
+
+      weight
+
+	The accumulated weight from the starting vertex. By default, each
+	edge's 'weight' attribute is used; see options 'attribute' and
+	'vertex'.
+
+      terminal
+
+	If the 'cb' option is provided, this is the value that the function
+	returned at this vertex.
+
+    attribute
+
+      The edge (or vertex) attribute to use as each edge's (vertex's)
+      weight.
+
+    max
+
+      A maximum weight, above which the traversal will terminate. If
+      undefined, the traversal continues either until there are no more
+      vertices to search (e.g., no further successors), or until the
+      callback function (if any) returns a nonzero value.
+
+    default
+
+      The default weight value for an edge (or vertex).
+
+    vertex
+
+      If this option is true, accumulate the weight of each successive
+      vertex, rather than the weights of the edges.
+
+    cb
+
+      A callback function which is called for each discovered vertex. It is
+      called as follows:
+
+          &$callback($self, $vertex, $weight, $opts))
+
+      Where the arguments are: the Graph object itself; the name of the
+      current vertex; the accumulated weight at that vertex; and the
+      options hash as passed to traverse().
+
+      If the callback function returns a nonzero value, the successors (or
+      whatever vertices might be returned by the 'next' function) beyond
+      the current vertex are not searched. The callback's value at each
+      vertex will be saved in the returned hash, if any.
+
+      Note that multiple paths to a given vertex may cause multiple
+      callbacks with varying weights.
+
+    weights
+
+      Use option 'weights', with a nonzero value, to obtain a returned list
+      of vertex=>weight_value.
+
+    next
+
+      The name of a Graph method to find adjacent vertices. By default,
+      'successors' is used; alternate useful values include 'predecessors'
+      and 'neighbors'.
+
+AUTHOR
+
+    William Lindley <wlindley@wlindley.com>
+
+COPYRIGHT
+
+    Copyright 2019, William Lindley
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Graph
+

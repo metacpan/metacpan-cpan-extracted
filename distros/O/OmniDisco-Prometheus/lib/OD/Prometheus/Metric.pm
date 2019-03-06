@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package OD::Prometheus::Metric;
-$OD::Prometheus::Metric::VERSION = '0.003';
+$OD::Prometheus::Metric::VERSION = '0.005';
 use v5.24;
 use Moose;
 use Data::Printer;
@@ -14,7 +14,7 @@ OD::Prometheus::Metric - Class representing a Prometheus metric
 
 =head1 VERSION
 
-version 0.003
+version 0.005
 
 =cut
 

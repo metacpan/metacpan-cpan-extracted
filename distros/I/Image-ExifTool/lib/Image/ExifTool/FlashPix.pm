@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.34';
+$VERSION = '1.36';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -1164,10 +1164,7 @@ my %fpxFileType = (
     9.2 => {
         Name => 'Word97',
         Mask => 0x0010,
-        PrintConv => {
-            0x0000 => 'No',
-            0x0010 => 'Yes',
-        },
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
 );
 
@@ -1188,6 +1185,7 @@ my %fpxFileType = (
     ModifyDate => {
         Groups => { 2 => 'Time' },
         Format => 'int64u',
+        Priority => 0,
         RawConv => q{
             $val = $val * 1e-7 - 11644473600;   # convert to seconds since 1970
             return $val > 0 ? $val : undef;
@@ -1520,9 +1518,15 @@ sub ProcessContents($$$)
 sub ProcessWordDocument($$$)
 {
     my ($et, $dirInfo, $tagTablePtr) = @_;
-    $et->ProcessBinaryData($dirInfo, $tagTablePtr);
     my $dataPt = $$dirInfo{DataPt} or return 0;
     my $dirLen = length $$dataPt;
+    # validate the FIB signature
+    unless ($dirLen > 2 and Get16u($dataPt,0) == 0xa5ec) {
+        $et->WarnOnce('Invalid FIB signature', 1);
+        return 0;
+    }
+    $et->ProcessBinaryData($dirInfo, $tagTablePtr); # process FIB
+    # continue parsing the WordDocument stream until we find the FibRgFcLcb
     my $pos = 32;
     return 0 if $pos + 2 > $dirLen;
     my $n = Get16u($dataPt, $pos);  # read csw
@@ -2362,7 +2366,7 @@ JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

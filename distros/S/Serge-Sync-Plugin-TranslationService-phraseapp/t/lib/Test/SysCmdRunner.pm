@@ -9,6 +9,8 @@ use Encode qw(decode encode_utf8 decode_utf8);
 use File::Path;
 use File::Spec::Functions qw(catfile);
 use Cwd;
+use Env;
+use Clone qw(clone);
 
 our $UNIX_PATH_SEPARATOR = '/';
 our $WINDOWS_PATH_SEPARATOR = '\\';
@@ -31,6 +33,8 @@ sub new {
 
 sub start {
     my ($self) = @_;
+
+    $self->{env} = clone(\%ENV);
 
     if ($self->{init}) {
         $self->{commands} = [];
@@ -69,6 +73,7 @@ sub run_cmd {
 
         my $commands_ref = $self->{commands};
 
+
         die "$command not found" unless ref($commands_ref) eq 'ARRAY';
 
         my @commands = @$commands_ref;
@@ -80,10 +85,29 @@ sub run_cmd {
         die "$command not found" unless $expected_command;
         die "$command not found" unless $expected_command->{command};
         die "$command not found as expected (found $expected_command->{command})" if $expected_command->{command} ne $command;
+
+        my $command_env = $expected_command->{env};
+
+        my $env_diff = hash_diff($command_env, \%ENV);
+
+        if (%$env_diff) {
+            my @keys = keys %{ $env_diff };
+            my $env_key = shift @keys;
+            my $expected_value = $command_env->{$env_key};
+            my $found_value = $ENV{$env_key};
+
+            die "ENV $env_key not found as expected (expected '$expected_value' found '$found_value')";
+        }
     } else {
         $expected_command = {
             command  => $command
         };
+
+        my $env_diff = hash_diff(\%ENV, $self->{env});
+
+        if ($env_diff) {
+            $expected_command->{env} = $env_diff;
+        }
 
         my $commands_ref = $self->{commands};
 
@@ -177,5 +201,24 @@ sub parse_json {
 
     return $tree;
 }
+
+sub hash_diff {
+    my ($first, $second) = @_;
+
+    my $diff = {};
+
+    if ($first) {
+        foreach my $k (sort keys %{ $first }) {
+            if (not exists $second->{$k} or not defined $second->{$k}) {
+                $diff->{$k} = $first->{$k}
+            } elsif ($first->{$k} ne $second->{$k}) {
+                $diff->{$k} = $first->{$k}
+            }
+        }
+    }
+
+    return $diff;
+}
+
 
 1;

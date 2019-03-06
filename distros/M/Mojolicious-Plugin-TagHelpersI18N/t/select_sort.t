@@ -4,13 +4,11 @@ use Mojolicious::Lite;
 
 use Test::More;
 use Test::Mojo;
-use FindBin;
+use File::Basename;
+
+use lib dirname(__FILE__);
 
 use utf8;
-
-use lib 'lib';
-use lib '../lib';
-use lib $FindBin::Bin;
 
 use_ok 'Mojolicious::Plugin::TagHelpersI18N';
 

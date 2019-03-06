@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.7.0
+Version 1.8.0
 
 =cut
 
-our $VERSION = 'v1.7.0';
+our $VERSION = 'v1.8.0';
 
 =head1 SYNOPSIS
 
@@ -2642,6 +2642,18 @@ sub list_bundles {
     return $self->get( $url, "Content-Type" => 'application/json', );
 }
 
+=head2 get_bundle_metadata( $name )
+
+Downloads a previously created bundle currently stored in the system
+
+=cut
+
+sub get_bundle_metadata {
+    my ( $self, $bundle ) = @_;
+    my $url = $self->_api_url() . '/support/bundles/' . $bundle;
+    return $self->get( $url, "Content-Type" => 'application/json', );
+}
+
 =head2 get_bundle( $name )
 
 Downloads a previously created bundle currently stored in the system
@@ -2650,7 +2662,7 @@ Downloads a previously created bundle currently stored in the system
 
 sub get_bundle {
     my ( $self, $bundle ) = @_;
-    my $url = $self->_api_url() . '/support/bundles/' . $bundle;
+    my $url = $self->_api_url() . '/support/bundles/' . $bundle . '/archive';
     return $self->get( $url, "Content-Type" => 'application/json', );
 }
 

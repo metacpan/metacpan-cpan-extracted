@@ -10,10 +10,10 @@ use lib dirname(__FILE__)."/lib"; # t/lib
 require Module::Lazy;
 
 Module::Lazy->import( "Module::Lazy::_::test::sample" );
-is $Module::Lazy::_::test::sample::VERSION, undef, "module not loaded yet";
+is $Module::Lazy::_::test::sample::loaded, undef, "module not loaded yet";
 
 Module::Lazy->unimport;
-is $Module::Lazy::_::test::sample::VERSION, 42, "module loaded now";
+is $Module::Lazy::_::test::sample::loaded, 1, "module loaded now";
 
 
 

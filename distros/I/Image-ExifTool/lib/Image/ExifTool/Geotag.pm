@@ -24,7 +24,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.55';
+$VERSION = '1.57';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
@@ -52,6 +52,7 @@ my %xmlTag = (
     vdop        => 'vdop',      # GPX
     pdop        => 'pdop',      # GPX
     sat         => 'nsats',     # GPX
+    atemp       => 'atemp',     # GPX (Garmin 550t)
     when        => 'time',      # KML
     coordinates => 'coords',    # KML
     coord       => 'coords',    # KML, as written by Google Location History
@@ -77,9 +78,20 @@ my %fixInfoKeys = (
     track  => [ 'track', 'speed' ],
     alt    => [ 'alt' ],
     orient => [ 'dir', 'pitch', 'roll' ],
+    atemp  => [ 'atemp' ],
 );
 
 my %isOrient = ( dir => 1, pitch => 1, roll => 1 ); # test for orientation key
+
+# conversion factors for GPSSpeed
+my %speedConv = (
+    'K' => 1.852,       # km/h per knot
+    'M' => 1.150779448, # mph per knot
+    'k' => 'K',         # (allow lower case)
+    'm' => 'M',
+    'km/h' => 'K',      # (allow other formats)
+    'mph' => 'M',
+);
 
 my $secPerDay = 24 * 3600;      # a useful constant
 
@@ -243,6 +255,8 @@ sub LoadTrackLog($$;$)
                             # validate altitude
                             undef $$fix{alt} if defined $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
                             $$has{alt} = 1 if $$fix{alt};   # set "has altitude" flag if appropriate
+                        } elsif ($tag eq 'atemp') {
+                            $$has{atemp} = 1;
                         }
                     }
                 }
@@ -282,6 +296,8 @@ sub LoadTrackLog($$;$)
                                     # validate altitude
                                     undef $$fix{alt} if defined $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
                                     $$has{alt} = 1 if $$fix{alt};   # set "has altitude" flag if appropriate
+                                } elsif ($tag eq 'atemp') {
+                                    $$has{atemp} = 1;
                                 }
                             }
                         }
@@ -924,7 +940,7 @@ sub SetGeoValues($$;$)
                 # loop through available fix information categories
                 # (pos, track, alt, orient)
                 my ($category, $key);
-Category:       foreach $category (qw{pos track alt orient}) {
+Category:       foreach $category (qw{pos track alt orient atemp}) {
                     next unless $$has{$category};
                     my ($f, $p0b, $p1b, $f0b);
                     # loop through specific fix information keys
@@ -1024,8 +1040,18 @@ Category:       foreach $category (qw{pos track alt orient}) {
             }
             @r = $et->SetNewValue(GPSTrack => $$tFix{track}, %opts);
             @r = $et->SetNewValue(GPSTrackRef => (defined $$tFix{track} ? 'T' : undef), %opts);
-            @r = $et->SetNewValue(GPSSpeed => $$tFix{speed}, %opts);
-            @r = $et->SetNewValue(GPSSpeedRef => (defined $$tFix{speed} ? 'N' : undef), %opts);
+            my ($spd, $ref);
+            if (defined($spd = $$tFix{speed})) {
+                $ref = $$et{OPTIONS}{GeoSpeedRef};
+                if ($ref and defined $speedConv{$ref}) {
+                    $ref = $speedConv{$ref} if $speedConv{$speedConv{$ref}};
+                    $spd *= $speedConv{$ref};
+                } else {
+                    $ref = 'N';     # knots by default
+                }
+            }
+            @r = $et->SetNewValue(GPSSpeed => $spd, %opts);
+            @r = $et->SetNewValue(GPSSpeedRef => $ref, %opts);
         }
         if ($$has{orient}) {
             my $tFix = $fix;
@@ -1038,6 +1064,15 @@ Category:       foreach $category (qw{pos track alt orient}) {
             # Note: GPSPitch and GPSRoll are non-standard, and must be user-defined
             @r = $et->SetNewValue(GPSPitch => $$tFix{pitch}, %opts);
             @r = $et->SetNewValue(GPSRoll => $$tFix{roll}, %opts);
+        }
+        if ($$has{atemp}) {
+            my $tFix = $fix;
+            if (not defined $$fix{atemp} and defined $iExt) {
+                # (not all fixes have atemp, so try interpolating specifically for this)
+                my $p = FindFix($et,'atemp',$times,$points,$iExt,$iDir,$geoMaxExtSecs);
+                $tFix = $p if $p;
+            }
+            @r = $et->SetNewValue(AmbientTemperature => $$tFix{atemp}, %opts);
         }
         unless ($xmp) {
             my ($latRef, $lonRef);
@@ -1062,8 +1097,8 @@ Category:       foreach $category (qw{pos track alt orient}) {
         # reset any GPS values we might have already set
         foreach (qw(GPSLatitude GPSLatitudeRef GPSLongitude GPSLongitudeRef
                     GPSAltitude GPSAltitudeRef GPSDateStamp GPSTimeStamp GPSDateTime
-                    GPSTrack GPSTrackRef GPSSpeed GPSSpeedRef
-                    GPSImgDirection GPSImgDirectionRef GPSPitch GPSRoll))
+                    GPSTrack GPSTrackRef GPSSpeed GPSSpeedRef GPSImgDirection
+                    GPSImgDirectionRef GPSPitch GPSRoll AmbientTemperature))
         {
             my @r = $et->SetNewValue($_, undef, %opts);
         }
@@ -1261,7 +1296,7 @@ user-defined tags, GPSPitch and GPSRoll, must be active.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

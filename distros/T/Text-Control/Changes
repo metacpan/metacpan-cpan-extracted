@@ -1,7 +1,10 @@
 Revision history for Perl module Text::Control
 
+0.4 Wed Mar 6 2019
+    - Convert README.pod to README.md. (No production changes.)
+
 0.3 Fri Aug 24 2018
-    - Fix LICENSE (again)
+    - Fix LICENSE (again).
 
 0.2 Fri Aug 24 2018
     - Fix LICENSE.

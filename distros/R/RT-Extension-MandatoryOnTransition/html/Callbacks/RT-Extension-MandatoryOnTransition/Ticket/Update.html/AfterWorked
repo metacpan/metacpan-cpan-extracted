@@ -2,11 +2,11 @@
 $Ticket
 </%args>
 <%init>
-my ($core, $cfs) = RT::Extension::MandatoryOnTransition->RequiredFields(
+my ($core, $cfs, $roles) = RT::Extension::MandatoryOnTransition->RequiredFields(
     Ticket  => $Ticket,
     To      => $ARGS{'Status'} || $ARGS{'DefaultStatus'},
 );
-return unless @$cfs;
+return unless @$cfs or @$roles;
 
 my $comp = '/Elements/EditCustomFields';
 my %obj_args = ( Object => $Ticket );
@@ -17,11 +17,59 @@ if (!$m->comp_exists('/Elements/EditCustomFields')) {
     %obj_args = ( TicketObj => $Ticket );
 }
 
+my @roles;
+foreach my $role (@{$roles}) {
+    next if $role eq 'Owner';
+
+    if ( $role =~ s/^CustomRole\.//i ) {
+        my $role_object = RT::CustomRole->new($session{CurrentUser});
+        my ($ret, $msg) = $role_object->Load($role);
+        unless ( $ret ) {
+            RT::Logger->error("Unable to load custom role $role: $msg");
+            next;
+        }
+
+        # Update page already contains single member role groups
+        next if $role_object->SingleValue;
+
+        push @roles, $role_object;
+    } else {
+        # Handle core roles like Requestor, Cc, AdminCc
+        my $role_group = RT::Group->new($session{CurrentUser});
+        my ($ret, $msg) = $role_group->LoadRoleGroup(Object => $Ticket, Name => $role);
+        if ( $ret ) {
+            push @roles, $role_group;
+        }
+        else {
+            RT::Logger->error("Unable to load role $role: $msg");
+        }
+    }
+}
 </%init>
 %# 'Named' is handled by this extension in the MassageCustomFields callback
-<& $comp,
-    %ARGS,
-    %obj_args,
-    InTable     => 1,
-    Named       => $cfs,
-    &>
+% if ( @$cfs ) {
+    <& $comp,
+        %ARGS,
+        %obj_args,
+        InTable     => 1,
+        Named       => $cfs,
+        &>
+% }
+% if ( @$roles ) {
+%     foreach my $role (@roles) {
+%       my $input = 'Add' . ( $role->isa('RT::Group') ? $role->Name : $role->GroupType );
+        <tr>
+            <td class="label"><&|/l, loc($role->Name) &>Add [_1]</&>:</td>
+            <td class="entry">
+                <& /Elements/EmailInput,
+                    Name               => $input,
+                    Autocomplete       => 1,
+                    AutocompleteNobody => 0,
+                    AutocompleteReturn => "Email",
+                    Size               => 20,
+                    Default            => $ARGS{$input},
+                &>
+            </td>
+        </tr>
+%     }
+% }

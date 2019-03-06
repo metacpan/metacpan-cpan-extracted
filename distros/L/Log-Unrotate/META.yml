@@ -1,36 +1,40 @@
 ---
 abstract: 'Incremental log reader with a transparent rotation handling'
 author:
-  - 'Andrei Mishchenko <druxa@yandex-team.ru>'
-  - 'Vyacheslav Matjukhin <mmcleric@yandex-team.ru>'
+  - 'Andrei Mishchenko <druxa@yandex-team.ru>, Vyacheslav Matjukhin <mmcleric@yandex-team.ru>'
 build_requires:
-  Exporter: 0
-  File::Copy: 0
-  File::Path: 0
-  File::stat: 0
-  Test::Exception: 0
-  Test::More: 0
-  Test::NoWarnings: 0
+  Exporter: '0'
+  File::Copy: '0'
+  File::Path: '0'
+  File::stat: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoWarnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300025, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Log-Unrotate
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
-  Digest::MD5: 0
-  Fcntl: 0
-  File::Basename: 0
-  File::Temp: 0.15
-  Getopt::Long: 2.33
-  IO::Handle: 0
-  Pod::Usage: 0
-  base: 0
-  overload: 0
-  strict: 0
-  warnings: 0
-version: 1.32
+  Carp: '0'
+  Digest::MD5: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Temp: '0.15'
+  Getopt::Long: '2.33'
+  IO::Handle: '0'
+  Pod::Usage: '0'
+  base: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+version: '1.33'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

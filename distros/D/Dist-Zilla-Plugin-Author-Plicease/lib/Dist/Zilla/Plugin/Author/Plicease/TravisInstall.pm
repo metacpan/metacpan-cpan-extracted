@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::TravisInstall 2.34 {
+package Dist::Zilla::Plugin::Author::Plicease::TravisInstall 2.35 {
 
   use 5.014;
   use Moose;
@@ -71,7 +71,7 @@ Dist::Zilla::Plugin::Author::Plicease::TravisInstall - Generate travis install s
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

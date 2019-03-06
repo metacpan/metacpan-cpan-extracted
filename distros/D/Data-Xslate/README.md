@@ -98,7 +98,7 @@ As well as using array values in a template:
 
 Data structures of any arbitrary depth and complexity are handled
 correctly, and keys from any level can be referred to following
-the ["SCOPE"](#scope) rules.
+the ["Scope"](#scope) rules.
 
 ## Substitution
 
@@ -128,7 +128,7 @@ when you want to substitute an array or hash:
     }
     # { foo=>[1,2,3], bar=>[1,2,3] }
 
-The keys in substitution follow the ["SCOPE"](#scope) rules.
+The keys in substitution follow the ["Scope"](#scope) rules.
 
 ## Nested Keys
 
@@ -147,8 +147,8 @@ other.
 
 ## Key Paths
 
-When referring to other values in ["TEMPLATING"](#templating), ["SUBSTITUTION"](#substitution), or
-["NESTED KEYS"](#nested-keys) you are specifying a path made up of keys for this module
+When referring to other values in ["Templating"](#templating), ["Substitution"](#substitution), or
+["Nested Keys"](#nested-keys) you are specifying a path made up of keys for this module
 to walk and find a value to retrieve.
 
 So, when you specify a key path such as `foo.bar` you are looking for a hash
@@ -165,7 +165,7 @@ the default.
 
 ## Scope
 
-When using either ["SUBSTITUTION"](#substitution) or ["TEMPLATING"](#templating) you specify a key to be
+When using either ["Substitution"](#substitution) or ["Templating"](#templating) you specify a key to be
 acted on.  This key is found using scope-aware rules where the key is searched for
 in a similar fashion to how you'd expect when dealing with lexical variables in
 programming.
@@ -268,6 +268,7 @@ Data-Xslate GitHub issue tracker:
 # AUTHORS
 
     Aran Clary Deltac <bluefeet@gmail.com>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # ACKNOWLEDGEMENTS
 

@@ -1,0 +1,5 @@
+#!/bin/sh
+# Get VERSION info from Perl modules
+
+MODULE=$1
+perl -M$MODULE -E "say $MODULE->VERSION"

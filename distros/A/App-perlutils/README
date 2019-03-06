@@ -1,0 +1,50 @@
+NAME
+    App::perlutils - utils for perl development
+
+DESCRIPTION
+    A few useful utilities for perl developers.
+
+SCRIPTS
+  depends
+    list dependencies for perl modules or scripts, with core info.
+
+  findinc
+    list all files in @INC. With LS_COLORS!
+
+  func
+    list all functions defined in **/*.p[lm]
+
+  methods
+    TODO
+
+  version
+    get VERSION info from a perl module
+
+  version_up
+    bump $VERSION.
+
+REPORTING BUGS
+    Report bugs and/or feature requests on rt.cpan.org, the repository issue
+    tracker or directly to m@japh.se
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      m@japh.se
+      L<~/|http://japh.se>
+      L<git|http://github.com/trapd00r>
+
+CONTRIBUTORS
+    None required yet.
+
+COPYRIGHT
+    Copyright 2019- THIS MODULEs "AUTHOR" and "CONTRIBUTORS" as listed
+    above.
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    ~/ <http://japh.se>
+

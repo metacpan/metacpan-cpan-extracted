@@ -3,18 +3,30 @@ abstract: 'Talk to a Gitlab installation via its API. (DEPRECATED)'
 author:
   - 'Alan Young <harleypig@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::Spec: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Gitlab
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Net::Gitlab:
+    file: lib/Net/Gitlab.pm
+    version: '0.09'
 requires:
   Carp: '0'
   HTTP::Request: '0'
@@ -27,7 +39,12 @@ requires:
 resources:
   bugtracker: https://github.com/bluefeet/Net-Gitlab/issues
   homepage: https://github.com/bluefeet/Net-Gitlab
-  repository: https://github.com/bluefeet/Net-Gitlab.git
-version: '0.08'
+  repository: git://github.com/bluefeet/Net-Gitlab.git
+version: '0.09'
+x_authority: cpan:BLUEFEET
+x_contributors:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_deprecated: 1
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -79,6 +79,7 @@ my $ua = WWW::Crawler::Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
                 "HTTP/1.1 200 OK\x0d\x0a"
               . "Content-Type: text/html\x0d\x0a\x0d\x0a",
           );
+          $stream->close_gracefully;
         }
       );
     }
@@ -102,6 +103,7 @@ my $ua = WWW::Crawler::Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
                 "HTTP/1.1 200 OK\x0d\x0a"
               . "Content-Type: text/html\x0d\x0a\x0d\x0a",
           );
+          $stream->close_gracefully;
         }
       );
     }
@@ -125,6 +127,7 @@ my $ua = WWW::Crawler::Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
                 "HTTP/1.1 200 OK\x0d\x0a"
               . "Content-Type: text/html\x0d\x0a\x0d\x0a",
           );
+          $stream->close_gracefully;
         }
       );
     }
@@ -154,6 +157,7 @@ $ua = WWW::Crawler::Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
               . "Content-Length: 0\x0d\x0a\x0d\x0a"
               . "Content-Type: text/html\x0d\x0a\x0d\x0a",
           );
+          $stream->close_gracefully;
         }
       );
     }
@@ -174,6 +178,7 @@ $ua = WWW::Crawler::Mojo::UserAgent->new(ioloop => Mojo::IOLoop->singleton);
                 "HTTP/1.1 302 Found\x0d\x0a"
               . "Location: http://127.0.0.1:$port1\x0d\x0a\x0d\x0a",
           );
+          $stream->close_gracefully;
         }
       );
     }

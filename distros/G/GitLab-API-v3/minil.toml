@@ -1,0 +1,6 @@
+author = "Aran Deltac <bluefeet@gmail.com>"
+authority="cpan:BLUEFEET"
+tag_format="v%v"
+
+[Metadata]
+x_deprecated = 1

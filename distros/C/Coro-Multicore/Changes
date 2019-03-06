@@ -3,7 +3,14 @@ Revision history for Perl extension Coro::Multicore.
 TODO: idle timeout, like IO::AIO
 
 TODO: add examples
-TODO: mysql perlmulticore more to do
+
+1.02 Tue Mar  5 13:31:03 CET 2019
+	- make extra sanity checks configurable.
+        - abort, not croak, when checks fail, as error is in XS code.
+	- improve portability to non-gcc-compatible compilers, where perl falls
+          back to a slow workaround that requires dTHX.
+        - do not start first thread at module load, this is not required and
+          potentially harmful with the current model.
 
 1.01 Tue Aug 14 18:52:05 CEST 2018
 	- attempt to port to strawberry perl, but it has too many broken functions

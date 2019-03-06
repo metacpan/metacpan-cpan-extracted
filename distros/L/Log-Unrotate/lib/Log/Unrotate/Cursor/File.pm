@@ -1,6 +1,6 @@
 package Log::Unrotate::Cursor::File;
 {
-  $Log::Unrotate::Cursor::File::VERSION = '1.32';
+  $Log::Unrotate::Cursor::File::VERSION = '1.33';
 }
 
 use strict;
@@ -16,7 +16,7 @@ Log::Unrotate::Cursor::File - file keeping unrotate position
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 

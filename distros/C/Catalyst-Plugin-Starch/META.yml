@@ -28,10 +28,10 @@ no_index:
 provides:
   Catalyst::Plugin::Starch:
     file: lib/Catalyst/Plugin/Starch.pm
-    version: '0.05'
+    version: '0.06'
   Catalyst::Plugin::Starch::Cookie:
     file: lib/Catalyst/Plugin/Starch/Cookie.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Catalyst: '5.90001'
   Catalyst::Exception: '0'
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/bluefeet/Catalyst-Plugin-Starch/issues
   homepage: https://github.com/bluefeet/Catalyst-Plugin-Starch
   repository: git://github.com/bluefeet/Catalyst-Plugin-Starch.git
-version: '0.05'
+version: '0.06'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'

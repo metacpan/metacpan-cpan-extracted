@@ -154,7 +154,7 @@ database connection with the following DSN:
 
     DBD:SQLite:[path to target_dir]/[db_file_name].db
 
-Where c<\[path to target\_dir\]> is ["target\_dir"](#target_dir) and \[db\_file\_name\] is a converted
+Where `[path to target_dir]` is ["target\_dir"](#target_dir) and \[db\_file\_name\] is a converted
 version of ["schema\_class"](#schema_class).  For example if you set [schema\_class](https://metacpan.org/pod/schema_class) to:
 
     MyApp::Schema
@@ -270,15 +270,13 @@ using monotonic versioning.
 
 ## dbic\_dh\_args
 
-Accepts HashRef.  Required and defaults to an empty hashref.
+Accepts HashRef.  Required and defaults to a hashref setting
+`sql_translator_args`'s `quote_identifiers` to a true value, which
+despite being documented as the default, is not the case in practice.
 
 Used to pass custom args when building a [DBIx::Class::DeploymentHandler](https://metacpan.org/pod/DBIx::Class::DeploymentHandler).
 Please see the docs for that class for more.  Useful args might be `databases`,
 `to_version` and `force_overwrite`.
-
-Defaults to a hash setting `sql_translator_args`'s `quote_identifiers`
-to a true value, which despite being documented as the default, is not
-the case in practice.
 
 ## dbic\_dh
 

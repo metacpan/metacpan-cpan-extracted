@@ -66,8 +66,9 @@ with tag keys.  Below is an explanation of the meaning of each special key:
   problem.  May set ExifTool CHECK_WARN datamember for success with a warning.
 
   GROUPS : A hash lookup for the default group names for all entries in this
-  table. If not specified, the Group 0 and 1 names will be set automatically
-  according to the name of the module.
+  table.  If not specified, the default Group 0 and 1 names will be set
+  automatically according to the name of the module, and the default Group 2
+  name will be set to 'Other'.
 
   FORMAT : Specifies the default tag Format, and corresponding pointer increment
   for entries in a BinaryData table.  Defaults to 'int8u' for BinaryData tables
@@ -264,7 +265,8 @@ numerical.
 
   Notes         : Notes for this tag in the HTML TagNames documentation.
 
-  Groups        : Hash lookup for group names for this tag.
+  Groups        : Hash lookup for group names for this tag.  If not specified,
+                  defaults to the GROUPS specified in the table definition.
 
   Format        : Only valid for BinaryData, EXIF and IPTC tables.  For a Binary
                   or EXIF table, this gives the format that is used to convert
@@ -424,9 +426,13 @@ numerical.
                   MakerNotes tags are permanent unless otherwise specified.
 
                   'PrintHex' - specifies that unknown PrintConv values should
-                  be printed in hex (eg. 'Unknown (0x01)').  Also causes
+                  be printed in hex (eg. 'Unknown (0x1)').  Also causes
                   numerical tag values to be printed in hex in the HTML tag name
-                  documentation.
+                  documentation, padded to the number of digits given by the
+                  PrintHex value.
+
+                  'PrintSort' - causes PrintConv values to be sorted by value
+                  rather than key in the HTML tag name documentation.
 
                   'PrintString' - flag set to force PrintConv values to be
                   printed as strings in the documentation.
@@ -450,8 +456,8 @@ numerical.
 
                   'PutFirst' - [EXIF only] flag to place this value before IFD0
                   when writing (ie. immediately after TIFF header).  Only used
-                  for main IFD's (IFD0, IFD1, etc) and IFD's where SubIFD flag
-                  is set to 2 (currently only ExifIFD).
+                  for values in main IFD's (IFD0, IFD1, etc) and IFD's where
+                  SubIFD flag is set to 2 (currently only ExifIFD).
 
                   'RawJoin' - [List tags only] Joins raw List-type tag values
                   into a single string with a space separator, allowing
@@ -663,9 +669,13 @@ numerical.
   Mask          : [BinaryData tags only] Bitmask for this value.  (Multiple tags
                   may have the same index by using floating point indices.  An
                   unknown tag will only be generated for a certain TagID if
-                  there is no integral TagID for that tag.)  The Mask is applied
-                  before evaluating RawConv.  When Mask is used, PrintHex=1 is
-                  implied unless otherwise defined.
+                  there is no integral TagID for that tag.)  The Mask and
+                  BitShift are applied before evaluating RawConv.
+
+  BitShift      : [Mask tags only] Bit shift for Mask-ed values.  If not
+                  specified, set to the number of trailing bits in the Mask.
+                  When reading, the value is shifted by this number of bits
+                  after the Mask is applied.
 
   Condition     : If given, specifies scalar which is evaluated as a Perl
                   expression at extraction time to decide whether the tag is
@@ -747,19 +757,20 @@ numerical.
                   tag is written.  The value is a hash reference.  The hash keys
                   are the names of the tags to write, and the values are
                   evaluated to obtain the ValueConv values of each tag (or undef
-                  to delete the tag).  In the eval, $val is the Raw value of the
-                  parent tag (which may be undef if the tag is being deleted,
-                  and should not be modified because it will affect subsequent
-                  WriteAlso tags), and the %opts hash may be accessed to modify
-                  SetNewValue options for each tag.  By default, Type is set to
-                  "ValueConv" and the Protected option has bit 0x02 set to allow
-                  writing of Protected tags that aren't directly writable.  The
-                  AddValue, DelValue, Shift and Replace options from the parent
-                  tag are also defined, but no other options are set by default.
-                  Previous new values of WriteAlso tags have already been
-                  removed prior to the eval if the Replace option was used for
-                  the parent tag.  If an empty warning is issued ("\n"), the
-                  target tag is not written and no error is reported.
+                  to delete the tag).  In the eval, $val is the new Raw value of
+                  the parent tag (which may be undef if the tag is being
+                  deleted, and should not be modified because it will affect
+                  subsequent WriteAlso tags), and the %opts hash may be accessed
+                  to modify SetNewValue options for each tag.  By default, Type
+                  is set to "ValueConv" and the Protected option has bit 0x02
+                  set to allow writing of Protected tags that aren't directly
+                  writable.  The AddValue, DelValue, Shift and Replace options
+                  from the parent tag are also defined, but no other options are
+                  set by default. Previous new values of WriteAlso tags have
+                  already been removed prior to the eval if the Replace option
+                  was used for the parent tag.  If an empty warning is issued
+                  ("\n"), the target tag is not written and no error is
+                  reported.
 
   WriteCheck    : If given, specifies a scalar which is evaluated as a Perl
                   expression for a one-time validatation the Raw value being

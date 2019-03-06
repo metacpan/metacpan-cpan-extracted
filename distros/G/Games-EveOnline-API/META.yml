@@ -1,18 +1,32 @@
 ---
-abstract: 'A simple Perl wrapper around the EveOnline XML API.'
+abstract: 'A simple Perl wrapper around the EveOnline XML API. (DEPRECATED)'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Test::Simple: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Games-EveOnline-API
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Games::EveOnline::API:
+    file: lib/Games/EveOnline/API.pm
+    version: '0.08'
 requires:
   LWP::UserAgent: '0'
   Moo: '1.004005'
@@ -21,5 +35,12 @@ requires:
 resources:
   bugtracker: https://github.com/bluefeet/Games-EveOnline-API/issues
   homepage: https://github.com/bluefeet/Games-EveOnline-API
-  repository: https://github.com/bluefeet/Games-EveOnline-API.git
-version: '0.07'
+  repository: git://github.com/bluefeet/Games-EveOnline-API.git
+version: '0.08'
+x_authority: cpan:BLUEFEET
+x_contributors:
+  - 'Andrey Kuzmin <chips@reg.ru>'
+  - 'Aran Deltac <aran@ziprecruiter.com>'
+x_deprecated: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

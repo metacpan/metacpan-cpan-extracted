@@ -10,7 +10,7 @@ use HTML::Parser;
 use HTML::Form;
 use Digest::MD5();
 
-our $VERSION = '9.00';
+our $VERSION = '9.01';
 
 # $Id: $
 # $Log: LaPoste.pm,v $
@@ -246,6 +246,7 @@ sub _GET_content {
 sub _list_accounts {
     my ($self, $response) = @_;
     my $html = $response->content;
+    #_output("/tmp/t.html", $html);
     my @l = _list_accounts_one_page($self, $html);
 
     if ($self->{all_accounts}) {
@@ -263,7 +264,7 @@ sub _list_accounts_one_page {
     my ($url, $name, $owner, $account_no, $balance_cb);
 
     foreach (split("\n", $html)) {
-        if ($flag eq 'url' && m!<a href="(.*?)"!) {
+        if ($flag eq 'url' && m!<a href="(.*?)"! || m!redirigerVersCU16\('(.*?)'\)!) {
             $url = $1;
         } elsif (m!<h3>(.*?)\s*</h3>(?:<span>(.*)</span>)?!) {
             $name = $1;
@@ -305,7 +306,6 @@ sub _list_cb_accounts {
 	my ($account, $account_no, $balance) = grep { $_ ne '' } @$_;
 	if (ref $account && $account_no) {
 	    my $url = $account->[1];
-	    $url =~ s/typeRecherche=1$/typeRecherche=10/; # 400 last operations
 	    {
 	        name => $account->[0],
 	        account_no => $account_no, 
@@ -413,12 +413,14 @@ sub type       { $_[0]{type} }
 sub currency   { 'EUR' }
 sub statements { 
     my ($self) = @_;
-    $self->{url} or return;
+    my $url = $self->{url} or return;
+    $url =~ s/typeRecherche=1$/typeRecherche=10/; # 400 last operations
+
     $self->{statements} ||= do {
     my $retry;
       retry:
 	$self->{feedback}->("get statements") if $self->{feedback};
-	my $response = $self->{ua}->request(HTTP::Request->new(GET => $self->{url}));
+	my $response = $self->{ua}->request(HTTP::Request->new(GET => $url));
 	$response->is_success or die "can't access account $self->{name} statements\n" . $response->error_as_HTML;
 
 	my $html = $response->content;
@@ -438,6 +440,7 @@ sub statements {
 	[ map {
 	    my ($date, $description, $amount) = @$_;
 	    my ($day, $month, $year) = $date =~ m|(\d+)/(\d+)/(\d+)|;
+            print STDERR $date, "\n";
 	    Finance::Bank::LaPoste::Statement->new(day => $day, month => $month, year => $year, description => $description, amount => $amount);
 	} @$l ];
     };

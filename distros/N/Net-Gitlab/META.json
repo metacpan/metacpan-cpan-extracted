@@ -4,24 +4,40 @@
       "Alan Young <harleypig@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Net-Gitlab",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
-            "Test::Pod" : "1.41"
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -37,14 +53,15 @@
          }
       },
       "test" : {
-         "recommends" : {
-            "CPAN::Meta" : "2.120900"
-         },
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
             "Test::More" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Net::Gitlab" : {
+         "file" : "lib/Net/Gitlab.pm",
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -54,13 +71,17 @@
       },
       "homepage" : "https://github.com/bluefeet/Net-Gitlab",
       "repository" : {
-         "type" : "git",
-         "url" : "https://github.com/bluefeet/Net-Gitlab.git",
+         "url" : "git://github.com/bluefeet/Net-Gitlab.git",
          "web" : "https://github.com/bluefeet/Net-Gitlab"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
    "x_deprecated" : 1,
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }
-

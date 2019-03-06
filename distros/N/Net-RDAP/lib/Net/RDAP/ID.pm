@@ -45,7 +45,7 @@ sub identifier { $_[0]->{'identifier'} }
 
 =head1 COPYRIGHT
 
-Copyright 2018 CentralNic Ltd. All rights reserved.
+Copyright 2019 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.022';
+$JMAP::Tester::VERSION = '0.025';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -151,6 +151,19 @@ sub _set_cookie {
   );
 }
 
+#pod =attr default_using
+#pod
+#pod This is an arrayref of strings that specify which capabilities the client
+#pod wishes to use. (See L<https://jmap.io/spec-core.html#the-request-object>
+#pod for more info). By default, JMAP::Tester will not send a 'using' parameter.
+#pod
+#pod =cut
+
+has default_using => (
+  is => 'rw',
+  predicate => '_has_default_using',
+);
+
 #pod =attr default_arguments
 #pod
 #pod This is a hashref of arguments to be put into each method call.  It's
@@ -180,6 +193,46 @@ has default_arguments => (
   default => sub {  {}  },
 );
 
+#pod =attr accounts
+#pod
+#pod This is an arrayref of accounts, provided by the client session object.  This
+#pod method will return a list when accounts have been configured.
+#pod
+#pod =cut
+
+has _accounts => (
+  is        => 'rw',
+  init_arg  => undef,
+  predicate => '_has_accounts',
+);
+
+sub accounts {
+  return unless $_[0]->_has_accounts;
+  return @{ $_[0]->_accounts }
+}
+
+#pod =method primary_account_for
+#pod
+#pod   my $account_id = $tester->primary_account_for($using);
+#pod
+#pod This returns the primary accountId to be used for the given capability, or
+#pod undef if none is available.  This is only useful if the tester has been
+#pod configured from a client session.
+#pod
+#pod =cut
+
+has _primary_accounts => (
+  is        => 'rw',
+  init_arg  => undef,
+  predicate => '_has_primary_accounts',
+);
+
+sub primary_account_for {
+  my ($self, $using) = @_;
+  return unless $self->_has_primary_accounts;
+  return $self->_primary_accounts->{ $using };
+}
+
 #pod =method request
 #pod
 #pod   my $result = $jtest->request([
@@ -205,6 +258,9 @@ has default_arguments => (
 #pod at least, failures are L<JMAP::Tester::Result::Failure> objects.  More refined
 #pod failure objects may exist in the future.  Successful requests return
 #pod L<JMAP::Tester::Response> objects.
+#pod
+#pod Before the JMAP request is made, each triple is passed to a method called
+#pod C<munge_method_triple>, which can tweak the method however it likes.
 #pod
 #pod =cut
 
@@ -250,6 +306,11 @@ sub request {
 
     $copy->[1] = \%arg;
 
+    # Originally, I had a second argument, \%stash, which was the same for the
+    # whole ->request, so you could store data between munges.  Removed, for
+    # now, as YAGNI. -- rjbs, 2019-03-04
+    $self->munge_method_triple($copy);
+
     push @suffixed, $copy;
   }
 
@@ -257,6 +318,10 @@ sub request {
 
   $request = $request->{methodCalls}
     if $ENV{JMAP_TESTER_NO_WRAPPER} && _ARRAY0($input_request);
+
+  if ($self->_has_default_using && ! exists $request->{using}) {
+    $request->{using} = $self->default_using;
+  }
 
   my $json = $self->json_encode($request);
 
@@ -300,6 +365,8 @@ sub request {
 
   return $self->_jresponse_from_hresponse($http_res);
 }
+
+sub munge_method_triple {}
 
 sub _jresponse_from_hresponse {
   my ($self, $http_res) = @_;
@@ -352,9 +419,15 @@ has _logger => (
 
 #pod =method upload
 #pod
-#pod   my $result = $tester->upload($mime_type, $blob_ref, \%arg);
+#pod   my $result = $tester->upload(\%arg);
 #pod
-#pod This uploads the given blob, which should be given as a reference to a string.
+#pod Required arguments are:
+#pod
+#pod   accountId - the account for which we're uploading (no default)
+#pod   type      - the content-type we want to provide to the server
+#pod   blob      - the data to upload. Must be a reference to a string
+#pod
+#pod This uploads the given blob.
 #pod
 #pod The return value will either be a L<failure
 #pod object|JMAP::Tester::Result::Failure> or an L<upload
@@ -363,19 +436,32 @@ has _logger => (
 #pod =cut
 
 sub upload {
-  my ($self, $mime_type, $blob_ref) = @_;
+  my ($self, $arg) = @_;
   # TODO: support blob as handle or sub -- rjbs, 2016-11-17
 
+  my $uri = $self->upload_uri;
+
   Carp::confess("can't upload without upload_uri")
-    unless $self->upload_uri;
+    unless $uri;
+
+  for my $param (qw(accountId type blob)) {
+    my $value = $arg->{ $param };
+
+    Carp::confess("missing required parameter $param")
+      unless defined $value;
+
+    if ($param eq 'accountId') {
+      $uri =~ s/\{$param\}/$value/g;
+    }
+  }
 
   my $post = HTTP::Request->new(
-    POST => $self->upload_uri,
+    POST => $uri,
     [
-      'Content-Type' => $mime_type,
+      'Content-Type' => $arg->{type},
       $self->_maybe_auth_header,
     ],
-    $$blob_ref,
+    ${ $arg->{blob} },
   );
 
   # Or our sub below leaks us
@@ -734,6 +820,9 @@ sub configure_from_client_session {
     }
   }
 
+  $self->_primary_accounts($client_session->{primaryAccounts});
+  $self->_accounts($client_session->{accounts});
+
   return;
 }
 
@@ -790,7 +879,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.022
+version 0.025
 
 =head1 OVERVIEW
 
@@ -843,6 +932,12 @@ There is also L<JMAP::Tester::Response/"as_stripped_pairs">.
 
 =head1 ATTRIBUTES
 
+=head2 default_using
+
+This is an arrayref of strings that specify which capabilities the client
+wishes to use. (See L<https://jmap.io/spec-core.html#the-request-object>
+for more info). By default, JMAP::Tester will not send a 'using' parameter.
+
 =head2 default_arguments
 
 This is a hashref of arguments to be put into each method call.  It's
@@ -865,7 +960,20 @@ The request will effectively be:
 
   [ [ "eatPies", { "a": 100, "c": 3 }, "a" ] ]
 
+=head2 accounts
+
+This is an arrayref of accounts, provided by the client session object.  This
+method will return a list when accounts have been configured.
+
 =head1 METHODS
+
+=head2 primary_account_for
+
+  my $account_id = $tester->primary_account_for($using);
+
+This returns the primary accountId to be used for the given capability, or
+undef if none is available.  This is only useful if the tester has been
+configured from a client session.
 
 =head2 request
 
@@ -893,11 +1001,20 @@ at least, failures are L<JMAP::Tester::Result::Failure> objects.  More refined
 failure objects may exist in the future.  Successful requests return
 L<JMAP::Tester::Response> objects.
 
+Before the JMAP request is made, each triple is passed to a method called
+C<munge_method_triple>, which can tweak the method however it likes.
+
 =head2 upload
 
-  my $result = $tester->upload($mime_type, $blob_ref, \%arg);
+  my $result = $tester->upload(\%arg);
 
-This uploads the given blob, which should be given as a reference to a string.
+Required arguments are:
+
+  accountId - the account for which we're uploading (no default)
+  type      - the content-type we want to provide to the server
+  blob      - the data to upload. Must be a reference to a string
+
+This uploads the given blob.
 
 The return value will either be a L<failure
 object|JMAP::Tester::Result::Failure> or an L<upload
@@ -962,6 +1079,10 @@ Ricardo SIGNES <rjbs@cpan.org>
 =item *
 
 Alfie John <alfiej@fastmail.fm>
+
+=item *
+
+Matthew Horsfall <alh@fastmailteam.com>
 
 =item *
 

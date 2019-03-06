@@ -1,4 +1,9 @@
-The Term::ExtendedColor project uses git for versioning. Please refer to
-the git repository if you're looking for a detailed list of changes.
-
-See https://github.com/trapd00r/Term-ExtendedColor
+0.502  2019-03-06
+  - No longer reset all attributes upon calling attribute functions with
+    zero args. Only the relevant attribute will be reset.
+  - Calling fg() and bg() with zero args will now reset the foreground /
+    background color.
+  - Add a new feature that allows for passing a raw combination of
+    colors and attributes to the coloring functions.
+  - Stop using 38;<attribute> since it's broken because of broken
+    implementation in terminals.

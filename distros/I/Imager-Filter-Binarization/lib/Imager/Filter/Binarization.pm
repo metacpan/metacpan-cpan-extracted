@@ -29,8 +29,8 @@ sub binarize_with_niblack {
     my $h_half_1 = int(($h-1)/2);
     my $h_half_2 = int($h/2);
 
-    my $summerize_method = __PACKAGE__->can("summerize_" . $ctx->{param}{method});
-    die "Unknown method: $ctx->{param}{method}" unless $summerize_method;
+    my $summarize_method = __PACKAGE__->can("summarize_" . $ctx->{param}{method});
+    die "Unknown method: $ctx->{param}{method}" unless $summarize_method;
 
     for my $y (0 .. $img_bound_y) {
         for my $x (0..$img_bound_x) {
@@ -42,14 +42,14 @@ sub binarize_with_niblack {
             my $center = $img_copy->getpixel( x=> $x, y => $y );
             my @px = map { $img_copy->getscanline(y => $_, x => $x_0, width => $w_) } ($y_0 .. $y_1);
 
-            my $new_px = $summerize_method->($ctx, $center, \@px);
+            my $new_px = $summarize_method->($ctx, $center, \@px);
 
             $img->setpixel( y => $y, x => $x, color => $new_px);
         }
     }
 }
 
-sub summerize_niblack {
+sub summarize_niblack {
     my ($ctx, $current_pixel, $pixels) = @_;
     my @c = map { ($_->rgba)[0] } @$pixels;
     my $v = vector(@c);
@@ -58,7 +58,7 @@ sub summerize_niblack {
     return [ (($c > $T) ? 255 : 0) , 0, 0 ];
 }
 
-sub summerize_sauvola {
+sub summarize_sauvola {
     my ($ctx, $current_pixel, $pixels) = @_;
     my @c = map { ($_->rgba)[0] } @$pixels;
     my $v = vector(@c);
@@ -86,7 +86,7 @@ Imager::Filter::Binarization - A collection of image binarization algorthims as 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'Simplified alternative to Alien::FFI that uses system libffi'
+abstract: '(Deprecated) Simplified alternative to Alien::FFI that uses system libffi'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,9 +23,12 @@ requires:
   IPC::Cmd: '0'
   perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/Alt-Alien-FFI-System/issues
-  homepage: https://metacpan.org/pod/Alt::Alien::FFI::System
-  repository: git://github.com/plicease/Alt-Alien-FFI-System.git
-version: '0.21'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/Perl5-FFI/FFI-Platypus/issues
+  homepage: https://alienfile.org
+  repository: git://github.com/Perl5-FFI/Alt-Alien-FFI-System.git
+version: '0.23'
+x_deprecated: 1
+x_generated_by_perl: v5.29.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_use_unsafe_inc: 0

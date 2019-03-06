@@ -1,9 +1,13 @@
 Revision history for Perl extension MooX-PluginKit.
 
+0.06 2019-03-06T07:43:58Z
+
+ - Declare deps as modules, not distros.
+
 0.05 2019-02-19T14:18:54Z
 
  - Fix missing DOES under perl 5.8 by using UNIVERSAL::DOES.
- - Require perl 5.8 per Minilla.
+ - Require perl 5.8.1.
  - Simplify VERSION declarations.
 
 0.04 2019-02-18T06:12:19Z

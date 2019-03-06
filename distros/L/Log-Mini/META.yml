@@ -28,7 +28,7 @@ no_index:
 provides:
   Log::Mini:
     file: lib/Log/Mini.pm
-    version: v0.0.2
+    version: v0.0.3
   Log::Mini::LoggerBase:
     file: lib/Log/Mini/LoggerBase.pm
   Log::Mini::LoggerFILE:
@@ -44,6 +44,6 @@ resources:
   bugtracker: https://github.com/alpha6/Log-Mini/issues
   homepage: https://github.com/alpha6/Log-Mini
   repository: git://github.com/alpha6/Log-Mini.git
-version: 0.0.2
+version: 0.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 x_static_install: 1

@@ -418,7 +418,7 @@ sub ShiftTime($$;$$)
 #
 # insert shifted time components back into original string
 #
-    my ($i, $err);
+    my $i;
     for ($i=0; $i<@toTime; ++$i) {
         next unless defined $time[$i] and defined $toTime[$i];
         my ($v, $d, $s);
@@ -447,11 +447,9 @@ sub ShiftTime($$;$$)
         my $sig = $len - length $s;
         my $dec = $d ? length($d) - 1 : 0;
         my $newNum = sprintf($dec ? "$s%0$sig.${dec}f" : "$s%0${sig}d", $nv);
-        length($newNum) != $len and $err = 1;
         substr($val, $pos - $len, $len) = $newNum;
-        pos($val) = $pos;
+        pos($val) = $pos + length($newNum) - $len;
     }
-    $err and return "Error packing shifted time ($val)";
     $_[0] = $val;   # return shifted value
     return undef;   # success!
 }
@@ -615,7 +613,7 @@ limited to the range 1970 to 2038 on 32-bit systems.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

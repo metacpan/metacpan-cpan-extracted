@@ -2,7 +2,7 @@ package Data::Xslate;
 use 5.008001;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Text::Xslate;
 use Carp qw( croak );
@@ -339,7 +339,7 @@ As well as using array values in a template:
 
 Data structures of any arbitrary depth and complexity are handled
 correctly, and keys from any level can be referred to following
-the L</SCOPE> rules.
+the L</Scope> rules.
 
 =head2 Substitution
 
@@ -369,7 +369,7 @@ when you want to substitute an array or hash:
     }
     # { foo=>[1,2,3], bar=>[1,2,3] }
 
-The keys in substitution follow the L</SCOPE> rules.
+The keys in substitution follow the L</Scope> rules.
 
 =head2 Nested Keys
 
@@ -388,8 +388,8 @@ other.
 
 =head2 Key Paths
 
-When referring to other values in L</TEMPLATING>, L</SUBSTITUTION>, or
-L</NESTED KEYS> you are specifying a path made up of keys for this module
+When referring to other values in L</Templating>, L</Substitution>, or
+L</Nested Keys> you are specifying a path made up of keys for this module
 to walk and find a value to retrieve.
 
 So, when you specify a key path such as C<foo.bar> you are looking for a hash
@@ -406,7 +406,7 @@ the default.
 
 =head2 Scope
 
-When using either L</SUBSTITUTION> or L</TEMPLATING> you specify a key to be
+When using either L</Substitution> or L</Templating> you specify a key to be
 acted on.  This key is found using scope-aware rules where the key is searched for
 in a similar fashion to how you'd expect when dealing with lexical variables in
 programming.
@@ -509,6 +509,7 @@ L<https://github.com/bluefeet/Data-Xslate/issues>
 =head1 AUTHORS
 
     Aran Clary Deltac <bluefeet@gmail.com>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 ACKNOWLEDGEMENTS
 

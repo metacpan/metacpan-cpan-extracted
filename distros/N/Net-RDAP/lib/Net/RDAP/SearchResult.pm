@@ -42,7 +42,7 @@ the search parameters.
 
 =head1 COPYRIGHT
 
-Copyright 2018 CentralNic Ltd. All rights reserved.
+Copyright 2019 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

@@ -1,0 +1,80 @@
+Revision history for Perl extension App-ucpan
+
+1.00 2019-03-05T09:09:55Z
+
+1.00 2019-03-05T09:07:07Z
+    - Improve help message
+    - Fix and improve POD in ucpan
+    - Add *.log to .gitignore
+
+0.21 2019-03-04T09:39:28Z
+    - Fix log to leak to screen ( on non-MSWin32 )
+    - Change location of config file
+    - Enhance debug mode
+
+0.20 2019-03-04T02:50:24Z
+    - Fix inner subroutine
+    - Fix crash on recovery mode
+
+0.19 2019-02-22T14:40:16Z
+    - Fix crash in non MSWin32 environment
+
+0.18 2019-02-11T20:09:34Z
+    - Add prereqs.
+
+0.17 2019-02-11T19:11:04Z
+    - Add prereqs.
+    - Fix sub ref.
+
+0.16 2019-02-07T07:19:01Z
+    - Fix our 'VERSION'
+
+0.15 2018-12-13T03:41:41Z
+    - Change file mode
+
+0.14 2017-07-30T04:40:06Z
+    - Lint code
+
+0.13 2016-11-26T09:35:48Z
+    - Record elapse time in .ucpandb
+
+0.12 2016-06-11T23:41:25Z
+    - Report elapse time for each installing
+
+0.11 2016-03-06T08:56:47Z
+    - Fix using incorrect object for folding
+
+0.10 2015-10-23T15:10:33Z
+    - new feature - fold 'mod' field
+
+0.09 2015-06-09T01:38:00Z
+    - fix on specific term(such as GNUscreen) buffered STDOUT/STDERR
+
+0.08 2015-06-07T05:26:50Z
+    - fix bad report of up-to-date modules
+
+0.07 2015-06-07T05:16:21Z
+    - BUG FIX
+
+0.06 2015-01-25T13:50:26Z
+    - fix remove bad line via perltidy
+
+0.05 2015-01-25T13:24:26Z
+    - fix usage prints to STDOUT now
+
+0.04 2014-12-28T09:23:22Z
+    - option 'version' and 'help' now works well
+
+0.03 2014-12-26T14:17:51Z
+    - improve add elapse time indicate on phase 1 & phase 2
+    - change width-height if terminal-type is unknown
+    - change code eol to LF
+
+0.02 2014-11-29T16:29:49Z
+
+    - improvement: report elapse time for phase CHECK and INSTALL
+
+0.01 2014-09-15T13:18:11Z
+
+    - original version
+

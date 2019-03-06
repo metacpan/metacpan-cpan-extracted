@@ -11,11 +11,12 @@ sub new {
 	}, $package);
 }
 
-sub domain	{ $_[0]->fetch('domain',	$_[1]->name)		}
-sub ip 		{ $_[0]->fetch('ip',		$_[1]->prefix)		}
-sub autnum 	{ $_[0]->fetch('autnum',	$_[1]->toasplain)	}
-sub entity 	{ $_[0]->fetch('entity',	$_[1]->handle)		}
-sub nameserver	{ $_[0]->fetch('nameserver',	$_[1]->name)		}
+sub help	{ $_[0]->fetch('help'					) }
+sub domain	{ $_[0]->fetch('domain',	$_[1]->name		) }
+sub ip 		{ $_[0]->fetch('ip',		$_[1]->prefix		) }
+sub autnum 	{ $_[0]->fetch('autnum',	$_[1]->toasplain	) }
+sub entity 	{ $_[0]->fetch('entity',	$_[1]->handle		) }
+sub nameserver	{ $_[0]->fetch('nameserver',	$_[1]->name		) }
 
 sub fetch {
 	my ($self, $type, $handle, %params) = @_;
@@ -25,7 +26,10 @@ sub fetch {
 	$uri->path_segments(grep { defined } ($uri->path_segments, $type, $handle));
 	$uri->query_form(%params);
 
-	return $self->client->fetch($uri);
+	my %opt;
+	$opt{'class_override'} = 'help' if ('help' eq $type);
+
+	return $self->client->fetch($uri, %opt);
 }
 
 sub base	{ $_[0]->{'base'}   }
@@ -66,6 +70,12 @@ L<Net::RDAP::Service> - an interface to an RDAP server.
 	#
 
 	my $result = $svc->domains('name' => 'ex*mple.com');
+
+	#
+	# get help:
+	#
+
+	my $help = $svc->help;
 
 =head1 DESCRIPTION
 
@@ -149,9 +159,21 @@ in the string.
 
 These methods all return L<Net::RDAP::SearchResult> objects.
 
+=head2 Help
+
+Each RDAP server has a "help" endpoint which provides "helpful
+information" (command syntax, terms of service, privacy policy,
+rate-limiting policy, supported authentication methods, supported
+extensions, technical support contact, etc.). This information may be
+obtained by performing a C<help> query:
+
+	my $help = $svc->help;
+
+The return value is a L<Net::RDAP::Object::Help> object.
+
 =head1 COPYRIGHT
 
-Copyright 2018 CentralNic Ltd. All rights reserved.
+Copyright 2019 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

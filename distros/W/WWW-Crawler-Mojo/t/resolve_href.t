@@ -8,7 +8,7 @@ use lib catdir(dirname(__FILE__), 'lib');
 use Test::More;
 use WWW::Crawler::Mojo;
 use WWW::Crawler::Mojo::ScraperUtil 'resolve_href';
-use Test::More tests => 70;
+use Test::More tests => 74;
 
 my $base;
 my $tmp;
@@ -155,3 +155,14 @@ is resolve_href($base, '//www.eclipse.org/forums/'),
 $base = 'https://www.eclipse.org/forums/index.php/f/48/';
 is resolve_href($base, '//www.eclipse.org/forums/'),
   'https://www.eclipse.org/forums/', 'right url';
+
+# Additional real world use case
+$base = 'https://example.com/';
+is resolve_href($base, ' foo'),
+  'https://example.com/foo', 'right url';
+is resolve_href($base, 'foo '),
+  'https://example.com/foo', 'right url';
+is resolve_href($base, 'foo bar'),
+  'https://example.com/foo%20bar', 'right url';
+is resolve_href($base, "foo\nbar"),
+  'https://example.com/foobar', 'right url';

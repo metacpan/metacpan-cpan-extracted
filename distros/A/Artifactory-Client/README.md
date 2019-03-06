@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.7.0
+Version 1.8.0
 
 # SYNOPSIS
 
@@ -841,6 +841,10 @@ Create a new support bundle
 ## list\_bundles
 
 Lists previously created bundle currently stored in the system
+
+## get\_bundle\_metadata( $name )
+
+Downloads a previously created bundle currently stored in the system
 
 ## get\_bundle( $name )
 

@@ -67,11 +67,11 @@
    "provides" : {
       "Catalyst::Plugin::Starch" : {
          "file" : "lib/Catalyst/Plugin/Starch.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Catalyst::Plugin::Starch::Cookie" : {
          "file" : "lib/Catalyst/Plugin/Starch/Cookie.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -85,7 +85,7 @@
          "web" : "https://github.com/bluefeet/Catalyst-Plugin-Starch"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"

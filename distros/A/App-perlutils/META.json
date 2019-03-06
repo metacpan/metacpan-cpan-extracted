@@ -1,0 +1,58 @@
+{
+   "abstract" : "utils for perl development",
+   "author" : [
+      "Magnus Woldrich <m@japh.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-perlutils",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find::Rule" : "0",
+            "File::LibMagic" : "0",
+            "File::LsColor" : "0",
+            "Term::ExtendedColor" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::perlutils" : {
+         "file" : "lib/App/perlutils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/perlutils.git",
+         "web" : "https://github.com/trapd00r/perlutils",
+         "x_bugtracker" : "https://github.com/trapd00r/perlutils/issues"
+      }
+   },
+   "version" : "0.028",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

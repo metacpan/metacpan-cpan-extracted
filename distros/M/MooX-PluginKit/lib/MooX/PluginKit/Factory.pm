@@ -1,6 +1,7 @@
 package MooX::PluginKit::Factory;
-
-our $VERSION = '0.05';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -33,7 +34,6 @@ use Types::Common::String -types;
 use Module::Runtime qw( require_module );
 
 use Moo;
-use strictures 2;
 use namespace::clean;
 
 =head1 ARGUMENTS
@@ -133,5 +133,7 @@ __END__
 
 =head1 AUTHORS AND LICENSE
 
-See L<MooX::PluginKit/AUTHOR> and L<MooX::PluginKit/LICENSE>.
+See L<MooX::PluginKit/AUTHORS> and L<MooX::PluginKit/LICENSE>.
+
+=cut
 

@@ -1,0 +1,5 @@
+---
+- notes: notes = GET /projects/:project_id/:thing_type/:thing_id/notes
+- note: note = GET /projects/:project_id/:thing_type/:thing_id/notes/:note_id
+- create_note: POST /projects/:project_id/:thing_type/:thing_id/notes?
+- edit_note: PUT /projects/:project_id/:thing_type/:thing_id/notes/:note_id?

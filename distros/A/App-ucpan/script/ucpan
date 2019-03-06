@@ -1,0 +1,1163 @@
+#!/usr/bin/perl
+use utf8;
+use feature qw/say/;
+use strict;
+
+use YAML;
+use File::Which ();
+use File::HomeDir;
+use Path::Class;
+
+use Getopt::Long qw/:config bundling/;
+my $CHECK_ONLY;
+my $SHOW_SKIPS;
+my $IGNORE_SKIP;
+my $RECOVER;
+my %DEBUG;
+my ( $DUMP, $LOAD );    # for debug only
+my $CPANM_OPT;
+
+my $CONFIGDIR = $INC[0];
+
+my $CONFIG = {
+    updater_distname => 'App-cpanminus',
+    updater_options  => $CPANM_OPT,
+    cfg_file         => file( $DEBUG{enable} ? '.' : $CONFIGDIR, '.ucpandb' ),
+};
+
+my $APPNAME = file( $0 )->basename;
+BEGIN {
+    $APPNAME = file( $0 )->basename;    
+}
+sub usage {
+    return << "EO_USAGE";
+Usage: $APPNAME [command | options...]
+    Commands:
+        -s, --show-fails      Display FAILED MODULES and exit
+        -c, --check-only      Check updated modules and exit
+        -r, --recover         Recover recoding file againt unwanted bugs
+        -v, --version         Show software version
+        -h, --help            Display this message
+
+    Options:
+        -f, --force-try       Include FAILED MODULES to update
+        --configure-timeout   Set timeout of module configure phase
+        --build-timeout       Set timeout of module build phase
+        --test-timeout        Set timeout of module test phase
+EO_USAGE
+}
+
+BEGIN {
+    $CPANM_OPT = [];
+    my $succession = sub { push @$CPANM_OPT, "--$_[0]=$_[1]"; };
+    warn( usage() ), exit
+        unless Getopt::Long::GetOptions(
+        'v|version' => sub {
+use version;
+our $VERSION = version->declare('1.00');
+            print __PACKAGE__->VERSION, $/;
+            exit;
+        },
+        'h|help'       => sub { say usage(); exit; },
+        's|show-skips' => \$SHOW_SKIPS,
+        'c|check-only' => \$CHECK_ONLY,
+        'f|force-try'  => \$IGNORE_SKIP,
+        'r|recover'    => \$RECOVER,
+        'D|debug:s'    => sub {
+            shift;    # skip option-str
+            my $value = shift;    # debug level
+            if ($value) {
+                my @item = split ',', $value;
+                for my $i (@item) {
+                    if ( $i =~ /^verbose(?:=(\d+))?$/ ) {
+                        $DEBUG{verbose} = defined $1 ? $1 : 1;
+                    }
+                    elsif ( $i =~ /^fakelib(?:=(\d+))?$/ ) {
+                        $DEBUG{fakelib} = $1 || './fakelib';
+                    }
+                }
+            }
+            else {
+                $DEBUG{verbose} = 1;
+            }
+            if ( $DEBUG{verbose} ) {
+                eval {
+                    require Smart::Comments
+                        && Smart::Comments->import(
+                        '#' x ( $DEBUG{verbose} + 2 ) );
+                };
+            }
+            $DEBUG{enable} = 1;
+        },
+        'dump-to|dump=s'      => \$DUMP,
+        'load-from|load=s'    => \$LOAD,
+        'configure-timeout=i' => $succession,
+        'build-timeout=i'     => $succession,
+        'test-timeout=i'      => $succession,
+        );
+}
+
+use constant USE_FAKELIB => ( $DEBUG{fakelib} ? 1 : 0 );
+
+#== Console Configuration ~~ ADDED: 2013/08/29
+BEGIN {
+    if ( $^O eq 'MSWin32' ) {
+        eval         { require Win32::Console::ANSI }
+            and eval { Win32::Console::ANSI->import() };
+    }
+}
+use Term::ANSIColor;
+my ( $screenX, $screenY );
+if ( $ENV{COLUMNS} ) {
+    $screenX = $ENV{COLUMNS};
+    $screenY = $ENV{LINES};
+}
+else {
+    require Term::ReadKey;
+    ( $screenX, $screenY ) = eval { Term::ReadKey::GetTerminalSize() };
+}
+
+my $old_fh = select STDOUT;
+$| = 1;
+select STDERR;
+$| = 1;
+select $old_fh;
+
+#== PROGRAM CONFIGURATION is here!!
+my $FAKELIB;
+if (USE_FAKELIB) {
+    ( $FAKELIB = file($DEBUG{fakelib})->absolute ) =~ s!\\!/!g;
+    push @{ $CONFIG->{updater_options} }, "--local-lib-contained=$FAKELIB";
+}
+if ( $DEBUG{enable} ) {
+    warn "=" x 20 . " DEBUGGING MODE " . "=" x 20 . $/;
+    warn sprintf "%25s: %s$/", 'Smart-Comments', 'LEVEL-' . $DEBUG{verbose}
+        if $DEBUG{verbose};
+    warn sprintf "%25s: %s$/", 'Option', join( $/ . ' ' x 26, @$CPANM_OPT );
+}
+
+#== RECOVER MODE ==#
+if ($RECOVER) {
+    eval { require File::Copy } or die $@;
+    *STDERR->autoflush;
+
+    my $f = $CONFIG->{cfg_file};
+    do { warn "$f not exist...ABORT!!"; exit; } unless -f $f;
+    my $c = YAML::LoadFile $f;
+    my $count;
+    for ( keys %{ $c->{SKIP} } ) {
+        if ( $c->{SKIP}->{$_}->{fail_at} =~ /^(?:UNKNOWN|\?)$/ ) {
+            delete $c->{SKIP}->{$_};
+            $count++;
+        }
+    }
+    if ($count) {
+        print STDERR "Backup $f...$/";
+        File::Copy::copy( $f, $f . '-BACKUP' )
+            or die "Can't rename $f to -BACKUP";
+        print STDERR "Saving $f...";
+        eval { YAML::DumpFile $f, $c }
+            or die "$/Can't save config-file: $f: $@";
+        print STDERR "Done!!(purged $count entries)";
+    }
+    else {
+        print STDERR "$f: up-to-date.";
+    }
+    exit;
+}
+
+$CONFIG->{user_setting}
+    = -r $CONFIG->{cfg_file} ? YAML::LoadFile( $CONFIG->{cfg_file} ) : {};
+
+#== Custom STDERR
+my $FH_ORG_STDERR;
+open $FH_ORG_STDERR, '>&STDERR';
+$FH_ORG_STDERR->autoflush;
+# make doing warn() correctly
+local $SIG{__WARN__} = sub {
+    *STDERR = $FH_ORG_STDERR;
+    CORE::warn(@_);
+};
+
+my %outdated;
+my %added;
+my %aliases;
+
+my $pr_colored = sub {
+    my $color = join ' ', @_;
+    return sub {
+        print {$FH_ORG_STDERR} colored( join( $,, @_ ), $color );
+    };
+};
+sub pr_black;
+sub pr_red;
+sub pr_green;
+sub pr_yellow;
+sub pr_blue;
+sub pr_magenta;
+sub pr_cyan;
+sub pr_white;
+{
+    no strict 'refs';
+    for my $color (qw/red green yellow blue magenta cyan white /) {
+        *{ __PACKAGE__ . '::pr_' . $color } = $pr_colored->( 'bold', $color );
+    }
+    *{ __PACKAGE__ . '::pr_black' } = sub {
+        my $tail = pop @_;
+        my $nl   = chomp($tail) ? $/ : '';
+        print {$FH_ORG_STDERR} color('black on_white'), @_, $tail;
+        print {$FH_ORG_STDERR} color('reset'), $nl;
+    };
+}
+
+#== for reporting
+my $mod_fold = sub {
+    local $_ = shift();
+    my $limit = shift();
+    my @self;
+    while ( length > $limit ) {
+        s/(.{,$limit}::)// || s/(.{,$limit-1})// || last;
+        push @self, $1;
+    }
+    return @self, $_;
+};
+
+## common vars
+my $skip_entries;
+my ( $fn, $fc, $fl, $fs );
+my $output_format;
+
+( $fn, $fc, $fl ) = qw/32 10 10/;
+$fs            = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
+$output_format = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
+    ($fn) x 2, ($fc) x 2, ($fl) x 2, ($fs) x 2;
+
+my $output_format_fold_head = $output_format;
+$output_format_fold_head =~ s/%/%-/;
+
+## set foldize
+my $fold_mod = Foldize->new( width => $fn, delimiter => "::" );
+
+## Phase 0: show_skips
+goto PHASE_1 unless $SHOW_SKIPS;
+
+pr_black qq|>>> Show FAILED Modules...$/|;
+$skip_entries = $CONFIG->{user_setting}->{SKIP};
+
+my @mods;
+@mods = sort { $a->{module} cmp $b->{module} }
+    map {
+    my @a = @{ $skip_entries->{$_}->{modules} };
+    my $f = $skip_entries->{$_}->{fail_at};
+    $_->{fail_at} = $f for @a;
+    @a
+    } keys %$skip_entries;
+pr_cyan sprintf( $output_format, 'Name', 'Current', 'Latest', 'Fail at...' );
+for my $e (@mods) {
+    my ( $mod, $current, $new, $phase );
+    $mod     = $fold_mod->parse( $e->{module} );
+    $current = $e->{current};
+    $new     = $e->{new};
+    $phase   = $e->{fail_at};
+    printf( $output_format_fold_head, $mod->get, '', '', '' )
+        while $mod->length > 2;
+    printf( $output_format, $mod->get,
+        $current => $new,
+        $phase
+    );
+}
+exit;
+
+#
+## helper functions--------
+# hack: kill -9,$pid[perlport#kill@win32] does not work on perl-5.18. taskkill instead.
+sub _kill_group {
+    my ($pid) = @_;
+    if ( $^O ne 'MSWin32' || $] >= 5.020 )
+    {    # bug on Win32 is resolved on perl-5.20
+        CORE::kill -9, $pid;
+    }
+    else {    # but collapsed on perl-5.18
+        system 'taskkill /F /T /PID ' . $pid . ' >NUL 2>&1';
+    }
+}
+
+## Phase 1: check outdated
+PHASE_1:
+
+#my @checkers = qw/cpan-outdated/;
+my @checkers       = qw/cpan-outdated-coro cpan-outdated/;
+my @avail_checkers = grep {$_} map { File::Which::which($_) } @checkers;
+die "Cannot find CPAN-update-checker(@checkers)" unless @avail_checkers;
+my $checker;
+for my $c (@avail_checkers) {
+    system "perl -wc $c >" . File::Spec->devnull . " 2>&1";
+    next if $?;
+    $checker = $c;
+    last;
+}
+die "No CPAN-update-checker is avail" unless $checker;
+
+$CONFIG->{checker} = _build_pipecmd( $checker, qw/--verbose/,
+    USE_FAKELIB ? ("--local-lib=$FAKELIB") : () );
+# list of succeed & skipped
+my @skipped;
+my $num_of_upgrade;
+
+if ($LOAD) {
+    my $file = file($LOAD);
+    print "Loading update list from " . $file . " ...";
+    %outdated       = %{ YAML::LoadFile($file) };
+    $num_of_upgrade = scalar keys %outdated;
+    print " done." . $/;
+    goto PHASE_2;
+}
+pr_black qq|>>> Checking Outdated Modules...$/|;
+$skip_entries = $CONFIG->{user_setting}->{SKIP};
+( $fn, $fc, $fl ) = qw/32 10 10/;
+$fs = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
+
+# $output_format = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
+# ($fn) x 2, ($fc) x 2, ($fl) x 2, ($fs) x 2;
+my $reader = sub {
+    my ($line) = @_;
+    chomp $line;
+    my ( $mod, $current, $new, $file ) = split /\s+/, $line;
+    $file =~ s{([^/]+/){2}}{};
+    my ( $dist_name, $dist_version ) = $file =~ m#([^/]+?)-v?([\d.]+)[.]#;
+    $dist_name =~ s#\..*##;
+    print STDERR "$file:Can't determine FILENAME" unless $dist_name;
+    $dist_version = version->parse($dist_version);
+    $current      = version->parse($current);
+    $new          = version->parse($new);
+    my $phase = '';
+    my $mod_f = $fold_mod->parse($mod);
+# Checking SKIP ENTRIES
+    if ( my $old = $skip_entries->{$dist_name} ) {
+
+        $phase = $skip_entries->{$dist_name}->{fail_at} || '?';
+        if ( $IGNORE_SKIP or $old->{version} < $dist_version ) {
+            delete $skip_entries->{$dist_name};
+        }
+        unless ($IGNORE_SKIP) {
+            printf( $output_format_fold_head, $mod_f->get, '', '', '' )
+                while $mod_f->length > 1;
+            printf( $output_format, $mod_f->get, $current, $new, $phase );
+            return;
+        }
+    }
+    $outdated{$dist_name} //= +{
+        file    => $file,
+        modules => [],
+        version => $dist_version->numify,
+    };
+    push @{ $outdated{$dist_name}->{modules} },
+        {
+        module  => $mod,
+        current => $current->numify,
+        new     => $new->numify,
+        };
+    $num_of_upgrade++;
+    pr_yellow sprintf( $output_format_fold_head, $mod_f->get, '', '', '' )
+        while $mod_f->length > 1;
+    pr_yellow sprintf $output_format, $mod_f->get, $current, $new, $phase;
+    return;
+};
+
+pr_cyan sprintf( $output_format, 'Name', 'Current', 'Latest', 'Fail at...' );
+
+## run cpan-outdated[-coro]
+{
+    my $start_time = time;
+    if ( my $pid = open my $pipe, '-|',
+        join( ' ', map( qq{"$_"}, @{ $CONFIG->{checker} }, '2>&1' ) ) )
+    {
+        ## trap for cleanup children
+        local $SIG{INT} = sub { _kill_group($pid); };
+        $reader->($_) while <$pipe>;
+        close $pipe;
+        waitpid $pid, 0;
+        my $elapsed = time - $start_time;
+        pr_spent_time($elapsed);
+    }
+    elsif ( !defined $pid ) {
+        die "$CONFIG->{checker} start FAILED!!";
+    }
+}
+if ($DUMP) {
+    YAML::DumpFile( file($DUMP), \%outdated );
+}
+exit if $CHECK_ONLY;
+
+PHASE_2:
+## Phase 2: Upgrading
+
+# vars
+my $count_of_upgrade;
+my $total_upgrade;
+my $total_added;
+my $phase;
+
+# set color-output
+my %pr = (
+    HEADER      => \&pr_cyan,
+    NOTE        => \&pr_yellow,
+    FAIL        => \&pr_red,
+    SUCCESS     => \&pr_green,
+    INIT        => \&pr_yellow,
+    FETCH       => \&pr_magenta,
+    CONFIG      => \&pr_magenta,
+    BUILD       => \&pr_magenta,
+    TEST        => \&pr_magenta,
+    INSTALL     => \&pr_magenta,
+    IN_PROGRESS => \&pr_magenta,
+    WARN        => \&pr_magenta,
+    DEFAULT     => sub { print {$FH_ORG_STDERR} @_; },
+);
+
+sub pr {
+    my ( $phase, @args ) = @_;
+    my $sub = $pr{$phase};
+    return $sub->(@args) if $sub;
+    $pr{DEFAULT}->(@args);
+}
+
+# skip this phase if up-to-date
+goto PHASE_3 unless %outdated;
+
+my $cpanm_file = File::Which::which('cpanm');
+$cpanm_file =~ s/\\/\//g;
+
+# override system & symlink in App::cpanminus::script
+if ($^O eq 'MSWin32'){
+    no warnings 'once';
+    *App::cpanminus::script::system = sub {
+        my $cmd = shift;
+        $cmd .= ' 2>&1';
+        CORE::system $cmd;
+    };
+    *CORE::GLOBAL::symlink = sub {
+        my ( $org, $dest ) = @_;
+        return 1 unless ( $org || $dest );
+        ( $org, $dest ) = map file($_)->stringify, $org, $dest;
+        my $flag = '';
+        if ( -d $org ) {
+            $flag = '/J';
+            rmdir $dest;
+        }
+        !system qq{mklink $flag "$dest" "$org" >NUL};
+    };
+}
+
+#== customizing cpanm!!
+
+eval qq{require '$cpanm_file'};
+my $app = App::cpanminus::script->new;
+
+# give undef as dummy. this is needed for build argv correctly
+$app->parse_options( @{ $CONFIG->{updater_options} }, undef );
+pop @{ $app->{argv} };
+
+pr_black qq|>>> Upgrading outdated modules$/|;
+
+my @outdated = sort keys %outdated;
+{
+#=== DEBUGGING_MODE: use FAKELIB as PERL5LIB
+    local $ENV{PERL5LIB} = $FAKELIB if USE_FAKELIB;
+    my $ORG_STDERR = \*STDERR;
+    open STDOUT, '>', File::Spec->devnull;
+    open STDERR, '>&STDOUT';
+    my $state  = +{};
+    my $ispace = ' ' x 2;    # indent witdh
+    my $org_m;
+    local $SIG{INT} = sub { _kill_group($$); };
+    {
+        no strict 'refs';
+        $org_m
+            = +{ map { $_ => \&{ "App::cpanminus::script::" . $_ } }
+                qw/_diag install_module fetch_module configure build test install run_timeout/
+               };
+    }
+    my $pid;
+    *App::cpanminus::script::run_exec = sub {
+        my ( $self, $cmd ) = @_;
+
+        if ( ref $cmd eq 'ARRAY' ) {
+            unless ( $self->{verbose} ) {
+                $cmd = "@$cmd >> " . $self->shell_quote( $self->{log} ) . " 2>&1";
+            }
+            exec $cmd;
+        }
+        else {
+            unless ( $self->{verbose} ) {
+                $cmd .= " >> " . $self->shell_quote( $self->{log} ) . " 2>&1";
+            }
+            exec $cmd;
+        }
+    };
+    *App::cpanminus::script::run_timeout = sub {
+## run_timeout_arg[cmd]: $_[1]
+        goto &{ $org_m->{run_timeout} }
+            unless &App::cpanminus::script::WIN32;
+        my ( $self, $cmd, $timeout ) = @_;
+        $cmd = $self->shell_quote(@$cmd) if ref $cmd eq 'ARRAY';
+        my $cmd_wrap
+            = $cmd . ' >> ' . $self->shell_quote( $self->{log} ) . ' 2>&1';
+        my ( $pid, $pipe, $exit_code );
+        local $SIG{ALRM} = sub {
+            CORE::die "alarm\n";
+        };
+        eval {
+            $pid = system 1, $cmd_wrap;
+            alarm $timeout;
+            waitpid $pid, 0;
+            $exit_code = $?;
+            alarm 0;
+        };
+        if ( $@ && $@ eq "alarm\n" ) {
+#                        local *STDERR = $ORG_STDERR;
+            $state->{phase} .= "(Timeout)";
+            pr_progress($state);
+            pr( FAIL => "Timeout!!.." );
+            local $STDERR = $ORG_STDERR;
+            $self->diag_fail(
+                "Timed out (> ${timeout}s). Use --verbose to retry.");
+            _kill_group($pid);
+            waitpid $pid, 0;
+            return;
+        }
+        return !$exit_code;
+    };
+    my $diag_msg;
+    *App::cpanminus::script::_diag = sub {
+        my ( $self, $m, $a, $e ) = @_;
+        $diag_msg = $m;
+        chomp $diag_msg;
+        $state->{fail} = ( $state->{phase} || 'N/A' ) if $e;
+        goto &{ $org_m->{_diag} };
+    };
+    *App::cpanminus::script::install_module = sub {
+        my ( $self, $m, $d, $v ) = @_;
+        return 1 if $self->{seen}{$m};
+        my ( $dist, $mod, $ver, $file )
+            = @{ $self->resolve_name($m) }
+            {qw/dist module module_version pathname/};
+### INSTALL_MODULE: +{MODULE=>$mod,DIST=>$dist,VERSION=>$ver,FILE=>$file}
+        my ( $target, @mods );
+        if ( !$outdated{$dist} ) {
+            ($file) = $file =~ m#([^/]+/[^/]+)$#;
+            $added{$dist} = +{
+                file    => $file,
+                version => $ver,
+                modules => [
+                    +{  module  => $mod,
+                        current => undef,
+                        new     => $ver,
+                     }
+                ],
+            };
+            @mods   = ($mod);
+            $target = \$added{$dist};
+        }
+        else {
+            @mods = map $_->{module}, @{ $outdated{$dist}->{modules} };
+            $count_of_upgrade++;
+            $target = \$outdated{$dist};
+        }
+        $state = +{
+            prev  => $state,
+            depth => $d,
+            curr  => $dist,
+        };
+        if ( ( $d || 0 ) > ( $state->{prev}{depth} || 0 ) ) {
+            unless ( $state->{prev}{in}{$d}++ ) {
+                $state->{prev}{dependency}++;
+                pr_progress( $state->{prev} );
+                pr( IN_PROGRESS => "Dependency found!" . $/ );
+            }
+        }
+        elsif ( ( $d || 0 ) < ( $state->{prev}{depth} || 0 ) ) {
+            pr( DEFAULT => $/ );
+        }
+        pr( DEFAULT => $ispace x $state->{depth} );
+        pr( HEADER  => "($d)" ) if USE_FAKELIB;
+        pr( HEADER  => $dist );
+        pr( NOTE    => ' [', join( ', ', @mods ), ']' ) if @mods;
+        pr( NOTE =>
+                sprintf( qq{ (%d/%d)}, $count_of_upgrade, $num_of_upgrade ) )
+            if !$state->{depth};
+        pr( DEFAULT => $/ );
+
+        my $elapse_one;
+        my $res = do {
+            $elapse_one = time;
+            my $r = &{ $org_m->{install_module} };
+            $elapse_one = time() - $elapse_one;
+            $r;
+        };
+
+        if ($res) {
+### $diag_msg
+            if ( $diag_msg =~ /up to date/i ) {
+                $$target->{status} = 1;
+                $total_upgrade++;
+                pr(       SUCCESS => $ispace x $state->{depth}
+                        . "Up to date"
+                        . $/ );
+            }
+            elsif ( $$target and !$$target->{fail_at} ) {
+                $$target->{status}        = 1;
+                $$target->{time_required} = $elapse_one;
+                $total_upgrade++;
+                pr_progress($state);
+                pr( SUCCESS => "SUCCESS" );
+                pr( DEFAULT => "($elapse_one sec)" . $/ );
+            }
+            elsif ($$target) {
+                pr( ( $$target->{status} ? 'SUCCESS' : 'FAIL' ) =>
+                        $ispace x $state->{depth} . "Already tried" . $/ );
+            }
+            if ( !$outdated{$dist} ) {
+                my $t = delete $added{$dist};
+                $t->{status}        = 1;
+                $t->{time_required} = $elapse_one;
+                $outdated{$dist}    = +{%$t};
+                $total_upgrade--;
+                $total_added++;
+            }
+        }
+        else {
+            $$target->{fail_at}
+                = $state->{dependency} ? 'Dependency' : $state->{fail};
+            $$target->{time_required} = $elapse_one;
+            $outdated{$dist} ||= delete $added{$dist};
+            if ( $state->{in}{ $d + 1 } ) {
+                $state->{progress_prev} = undef;
+                pr( DEFAULT => $ispace x $state->{depth} );
+                pr( DEFAULT => '--> ' . $dist . '...' );
+            }
+            elsif ( $state->{fail} !~ /timeout/i ) {
+                pr_progress($state);
+            }
+            pr( FAIL    => "FAIL" );
+            pr( DEFAULT => "($elapse_one sec)" . $/ );
+        }
+        $state = $state->{prev};
+        return $res;
+    };
+    *App::cpanminus::script::fetch_module = sub {
+        $state->{phase} = "Fetch";
+        pr( FETCH => $ispace x $state->{depth},
+            $state->{progress_prev} = "Fetch.."
+          );
+        goto &{ $org_m->{fetch_module} };
+    };
+    *App::cpanminus::script::configure = sub {
+## configure_ARGS: @_
+        if ( $state->{in} ) {
+            $state->{in} = $state->{progress_prev} = undef;
+            pr( DEFAULT => $ispace x $state->{depth}, '-->' );
+            pr( HEADER  => "[$state->{curr}]" );
+        }
+        pr_progress($state);
+        pr( CONFIG => $state->{progress_prev} = "Configure.." );
+        $state->{phase} = "Configure";
+        goto &{ $org_m->{configure} };
+    };
+    *App::cpanminus::script::build = sub {
+        if ( $state->{in} ) {
+            $state->{in} = $state->{progress_prev} = undef;
+            pr( DEFAULT => $ispace x $state->{depth}, '-->' );
+            pr( HEADER  => "[$state->{curr}]" );
+        }
+        pr_progress($state);
+        pr( BUILD => $state->{progress_prev} = "Build.." );
+        $state->{phase} = "Build";
+        goto &{ $org_m->{build} };
+    };
+    *App::cpanminus::script::test = sub {
+        pr_progress($state);
+        pr( TEST => $state->{progress_prev} = "Test.." );
+        $state->{phase} = "Test";
+        goto &{ $org_m->{test} };
+    };
+    *App::cpanminus::script::install = sub {
+        pr_progress($state);
+        pr( INSTALL => $state->{progress_prev} = "Install.." );
+        $state->{phase} = "Install";
+        goto &{ $org_m->{install} };
+    };
+
+    for my $method (qw/setup_home init_tools configure_mirrors/) {
+        $app->${method};
+    }
+    for my $method (qw/setup_home init_tools configure_mirrors/) {
+        no strict 'refs';
+        no warnings 'redefine';
+        *{ 'App::cpanminus::script::' . $method } = sub { };
+    }
+## run cpanm
+    my $start_time = time;
+    for my $key (@outdated) {
+        my $module_first = $outdated{$key}->{modules}[0]{module};
+        my $file         = $outdated{$key}->{file};
+        $state = +{ curr => $file, depth => 0 };
+        push @{ $app->{argv} }, $module_first;
+        $app->doit;
+        pop @{ $app->{argv} };
+        pr( DEFAULT => $/ );
+    }
+    my $elapsed = time - $start_time;
+    pr_spent_time($elapsed);
+}
+
+## Phase 3: display SUCCESS & FAILED modules
+PHASE_3:
+
+if ( !%outdated ) {
+    say $/, q|--- Nothing to upgrade ---|;
+}
+else {
+    my @success
+        = map { @{ $_->{modules} } }
+        delete(
+        @outdated{ grep { $outdated{$_}->{status} } keys %outdated } );
+    pr_black $/ . qq{**************** SUMMARY ****************} . $/;
+    if (@success) {
+        pr_green qq|Upgrade Success| . q|-| x 50 . $/;
+        printf "%28.28s   %-10.10s %-10.10s$/", "Name", "Current", "Latest";
+        for my $data (@success) {
+            my ( $mod, $cur, $new ) = @{$data}{qw/module current new/};
+            $cur ||= '~';
+            pr_green
+                sprintf( "%28.28s   %-10.10s %-10.10s$/", $mod, $cur, $new );
+        }
+        $CONFIG->{user_setting}->{INSTALLED} = \@success;
+    }
+    my $total_fail;
+    if ( %outdated = ( %outdated, %added ) ) {
+        pr_red qq|Fail to upgrade| . q|-| x 50 . $/;
+        printf "%28.28s   %-10.10s %-10.10s %-10.10s$/",
+            "Name",
+            "Current",
+            "Latest", "Fail at...";
+        for my $fail_mod ( keys %outdated ) {
+### require: $outdated{$fail_mod}->{modules}
+            $outdated{$fail_mod}->{fail_at} //= 'UNKNOWN';
+### failed:  $outdated{$fail_mod}->{modules}
+            my @od    = @{ $outdated{$fail_mod}->{modules} || [] };
+            my $phase = $outdated{$fail_mod}->{fail_at};
+            $total_fail += @od;
+            for my $mod (@od) {
+                pr_red sprintf( "%28.28s   %-10.10s %-10.10s %-25.25s$/",
+                    @{$mod}{qw/module current new/}, $phase );
+            }
+            $CONFIG->{user_setting}->{SKIP}->{$fail_mod}
+                = $outdated{$fail_mod};
+        }
+    }
+    print $/;
+    pr_green $total_upgrade, $total_upgrade > 1 ? " modules" : " module",
+        " upgraded.", $/
+        if $total_upgrade;
+    pr_green $total_added, $total_added > 1 ? " modules" : " module",
+        " added.", $/
+        if $total_added;
+    pr_red $total_fail, " module", $total_fail > 1 ? "s" : "", " FAILURE.", $/
+        if $total_fail;
+}
+
+_save_config();
+say qq|$/All Done.|;
+
+exit;
+
+## EO_MAIN_CODE
+
+sub pr_spent_time {
+    return unless @_;
+    my ($elapsed) = @_;
+    my $str = '  ' . ( $elapsed + 0 ) . 'sec.  ';
+    printf {$FH_ORG_STDERR}
+        sprintf( '%%%d.%ds', ( $screenX - length($str) - 2 ) x 2 ), ' ';
+    pr_black $str. $/;
+}
+
+sub pr_progress {
+    my ($state) = @_;
+    return unless my $prev = $state->{progress_prev};
+    pr( DEFAULT => ( "\b" x length $prev ) . $prev );
+}
+
+sub _save_config {
+    YAML::DumpFile( $CONFIG->{cfg_file}, $CONFIG->{user_setting} );
+}
+
+sub _build_pipecmd {
+    return [ $^X, '-e', '$|=1;' . "require '" . shift . "';", "--", @_ ];
+}
+
+{
+
+    package Foldize;
+    use strict;
+    use warnings;
+    use utf8;
+
+    use bytes;
+
+    my $DEF_WIDTH = 80;
+    my $DEF_DELIM = ' ';
+
+    sub new {
+        my $class = shift;
+        my %args;
+        if ( $_[0] . "" eq 'HASH' ) {
+            %args = %{ $_[0] };
+        }
+        else {
+            %args = @_;
+        }
+        $args{width}     //= $DEF_WIDTH;
+        $args{delimiter} //= $args{delim} || $DEF_DELIM;
+        $args{delimiter_width} = length $args{delimiter};
+        bless \%args, $class;
+    }
+
+    sub parse {
+        my $self        = shift;
+        my $width       = $self->{width};
+        my $delim       = $self->{delimiter};
+        my $delim_width = $self->{delimiter_width};
+        my ($line)      = @_;
+
+        if ( length($line) <= $width ) {
+            $self->{_pool}   = [$line];
+            $self->{_length} = 1;
+        }
+        else {
+            my @pool;
+            my @chunks = split $delim, $line;
+            $line = "";
+
+            for my $chunk (@chunks) {
+                while ( length($line) > $width ) {
+                    push @pool, substr( $line, 0, $width - 1 ) . '-';
+                    $line = substr( $line, $width - 1 );
+                }
+                if ( length($line) ) {
+                    if (length($line) + length($chunk) + $delim_width
+                        > $width )
+                    {
+                        push @pool, $line;
+                        $line = $delim . $chunk;
+                    }
+                    else {
+                        $line .= $delim . $chunk;
+                    }
+                }
+                else {
+                    $line = $chunk;
+                }
+            }
+            while ( length($line) > $width ) {
+                push @pool, substr( $line, 0, $width - 1 ) . '-';
+                $line = substr( $line, $width - 1 );
+            }
+            push @pool, $line if $line ne "";
+            $self->{_pool}   = [@pool];
+            $self->{_length} = @pool + 0;
+        }
+        $self;
+    }
+
+    sub length {
+        my $self = shift;
+        $self->{_length};
+    }
+
+    sub get {
+        my $self = shift;
+        $self->{_length} || return;
+        my $value = shift @{ $self->{_pool} };
+        $self->{_length} = @{ $self->{_pool} } + 0;
+        $value;
+    }
+}
+__END__
+
+=head1 NAME
+
+ucpan - improved CPAN modules updater
+
+
+=head1 SYNOPSIS
+
+    ucpan      # update outdated modules,
+               # but skip previously failed modules
+    ucpan -f   # update outdated modules even if failed previously
+    ucpan -s   # show previously failed modules and exit
+    ucpan -c   # check outdated modules and exit
+
+
+=head1 DESCRIPTION
+
+ucpan is module update program.
+
+This program has the following advantages over executing "cpan-outdated | cpanm" from the command line.
+
+=over 4
+
+=over 2
+
+=item * Display the outdated module list in easy-to-see table format.
+
+=item * Display the progress from fetch to install compactly (in principle, in one line).
+
+=item * Display summary of results in table format.
+
+=back
+
+=back
+
+This program are executed in the following order.
+
+=over 4
+
+=item 1. Check Phase
+
+Outdated modules are checked and listed.
+The version number of the module that failed in
+the previous execution record is compared with
+the latest version number and
+if not updated it is marked to skip the installation.
+The list is displayed in tabular form.
+
+    (example)
+    >>> Checking Outdated Modules...
+                        Name    Current     Latest    Fail at...
+                   App::Cpan       1.66      1.675
+                Archive::Tar    2.24_01       2.32
+                    B::Debug       1.24       1.26
+                      bigint       0.47       0.51
+                        Carp       1.42       1.50
+              Compress::Zlib      2.074      2.084    Test
+                           .........
+            Unicode::Collate       1.19       1.27
+          Unicode::Normalize       1.25       1.26
+                     version     0.9917     0.9924
+                                                           7sec.
+
+The update target and the skip module are displayed in a color-coded manner.
+
+=item 2. Installation Phase
+
+Outdated modules are sequentially installed for each distribution.
+The progress of installation will be displayed in one line,
+one by one in order of fetch, build, test, installation.
+If it fails in the middle, "Failure" is displayed,
+and it moves to the next module.
+If a dependent module is found,
+the display is indented and the same process is done.
+
+    (example)
+    >>> Upgrading outdated modules
+    (0)Archive-Tar [Archive::Tar] (1/57)
+    Fetch..Configure..Build..Test..FAIL(23 sec)
+
+    (0)B-Debug [B::Debug] (2/57)
+    Fetch..Configure..Build..Test..Install..SUCCESS(10 sec)
+
+    (0)CPAN [App::Cpan] (3/57)
+    Fetch..Configure..Dependency found!
+      (1)Compress-Bzip2 [Compress::Bzip2]
+      Fetch..Configure..Build..Test..Install..SUCCESS(47 sec)
+      (1)File-HomeDir [File::HomeDir]
+      Fetch..Configure..Dependency found!
+        (2)File-Which [File::Which]
+        Fetch..Configure..Build..Test..Install..SUCCESS(8 sec)
+      -->[File-HomeDir]Build..Test..Install..SUCCESS(19 sec)
+      (1)Module-Build [Module::Build]
+      Fetch..Configure..Build..Test..FAIL(88 sec)
+    ......
+      (1)Archive-Zip [Archive::Zip]
+      Fetch..Configure..Dependency found!
+        (2)Test-MockModule [Test::MockModule]
+        Fetch..FAIL(0 sec)
+      --> Archive-Zip...FAIL(1 sec)
+    --> CPAN...FAIL(709 sec)
+
+    (0)Carp [Carp] (9/57)
+    Fetch..Configure..
+
+Ongoing process, SUCCESS, FAIL etc are color coded.
+
+Installation logs and working files are placed under $HOME/.cpanm (like L<cpanm>).
+
+=item 3. Result Phase
+
+The results sammary of the installation will be displayed in tabular form with a list of successes and failures, and displayed the number of successful modules, added modules and failed modules.
+
+    (example)
+    **************** SUMMARY ****************
+    Upgrade Success----------------------------------------------
+        Compress::Raw::Bzip2   2.074      2.084
+                   Net::HTTP   ~          6.18
+              HTML::Entities   ~          3.69
+                HTTP::Daemon   ~          6.01
+             Config::Perl::V   0.280      0.310
+        ......
+          Filter::Util::Call   1.550      1.590
+                  Test::YAML   ~          1.07
+    Fail to upgrade----------------------------------------------
+                   App::Cpan   1.660      1.675      Dependency
+                     IO::Pty              1.12       Configure
+                Archive::Tar   2.240100   2.320      Test
+           ExtUtils::Command   7.240      7.340      Test
+            Test::MockModule              v0.170.0   Fetch
+                     DB_File   1.840      1.843      Build
+      Math::BigInt::FastCalc   0.500500   0.500800   Dependency
+    47 modules upgraded.
+    32 modules added.
+    20 modules FAILURE.
+
+=back
+
+
+=head1 COMMANDS
+
+The commands can control the execution of this program.
+
+Only one command can be specified to determine the execution mode.
+If the command is not specified,
+it is executed in the check and installation mode.
+
+=over 4
+
+=item -c, --check-only
+
+Check updated modules and exit.
+
+=item -s, --show-fails
+
+Display previously failed modules list in table format and exit.
+Note that this list is generated from previous execution record,
+therefore, the latest version number of modules installed without this program after the last execution is not reflected.
+
+=item -r, --recover
+
+Recover recoding file againt unwanted result.
+In this mode, failed modules are removed from the previous execution record except test failure.
+
+=item -v, --version
+
+Display the version number.
+
+=item -h, --help
+
+Display the help message.
+
+=back
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item -f, --force-try
+
+Also add modules marked as skipped by checking.
+
+
+=item --configure-timeout
+
+Specify the timeout length (in seconds) to wait for the configure.
+Current default values are: 60
+
+
+=item --build-timeout
+
+Specify the timeout length (in seconds) to wait for the build.
+Current default values are: 3600
+
+
+=item --test-timeout
+
+Specify the timeout length (in seconds) to wait for the build.
+Current default values are: 1800
+
+
+=back
+
+=head1 RECODING FILE
+
+The previous result is recorded in the recoding file of this program.
+Normally you do not need to edit this file.
+
+The recoding file is named .ucpandb and placed in the top of @INC (ie. $INC[0]).
+For example, if using local::lib, it is placed in /your/local/lib/$Config{archname}/.ucpandb.
+This is to ensure that the settings do not interfere with running this program for different Perl environments.
+
+In the recording file, the following items are recorded in YAML format.
+
+=over 4
+
+=item Successful module
+
+Module name, preinstallation version, installed version
+
+=item Failed distribution
+
+Distribution file path, distribution version, module name of included module, version before installation, latest version, reason (for example, build, test, test timeout), processing time (seconds)
+
+=back
+
+=head1 BRIEF EXPLANATION OF THE MECHANISM
+
+At first, the previous execution record is loaded from the recoding file.
+
+In Check Phase, information on outdated modules is gathered via L<cpan-outdated>. The module to be skipped is determined by collating with the previous execution record.
+
+In Installation Phase, the installation work is progressed using the function of loaded L<cpanm> (yes, loading L<cpanm>). Success of the result, which phases of the work failed, etc. are recorded.
+
+In Result Phase, the summary is assembled and displayed based on the record of the installation.
+
+Finally, the execution record is written to the recoding file.
+
+=head1 SPECIAL FEATURE FOR WIN32
+
+In the Win32 environment, the following matters have been improved for L<cpanm>.
+
+=over 4
+
+=item Symbolic link
+
+L<cpanm> creates a symbolic link of the latest build log and working directory directly under $HOME/.cpanm,
+but it is not created under Win32 environment.
+ucpan can emulate symlink() and create it using Win32's mklink command.
+(There is no one working in FAT32 environment anymore, is it?)
+
+=item Timeout
+
+L<cpanm> ignores the --*-timeout option in Win32 environment,
+but in Win32 environment SIGALARM can also be used to implement timeout processing.
+ucpan implements this.
+
+=back
+
+=head1 SEE ALSO
+
+L<App::ucpan>, L<App::cpanminus>, L<cpanm>
+
+=head1 LICENSE
+
+Copyright (C) KPEE.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+KPEE E<lt>kpee.cpan@gmail.comE<gt>
+
+=cut

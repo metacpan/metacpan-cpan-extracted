@@ -9,6 +9,11 @@ Template::Plugin::Filter::Base64 - encoding b64 filter for Template Toolkit
         Hello, world!
     [% END %]
 
+    [% USE Filter.Base64 trim => 1 %]
+    [% FILTER b64 safeurl => 1 %]
+        Hello, world!
+    [% END %]
+
 # OPTIONS
 
 - trim
@@ -23,9 +28,13 @@ Template::Plugin::Filter::Base64 - encoding b64 filter for Template Toolkit
 
     Optional. If true, call the function MIME::Base64::encode\_base64( $bytes, '' ) whith empty string for the parameter $eol. The returned encoded string is broken into lines of no more than 76 characters each and it will end with $eol unless it is empty. Pass an empty string as second argument if you do not want the encoded string to be broken into lines
 
+- safeurl (bool)
+
+    Optional. If true call MIME::Base64::encode\_base64url, no other options do matter except ["trim"](#trim)
+
 # SEE ALSO
 
-MIME::Base64 - Encoding and decoding of base64 strings [http://search.cpan.org/~gaas/MIME-Base64/Base64.pm](http://search.cpan.org/~gaas/MIME-Base64/Base64.pm)
+MIME::Base64 - Encoding and decoding of base64 strings [https://metacpan.org/pod/MIME::Base64](https://metacpan.org/pod/MIME::Base64)
 
 # LICENSE
 
@@ -33,6 +42,12 @@ Copyright (C) bbon.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+# THANKS
+
+gnatyna [https://github.com/gnatyna](https://github.com/gnatyna)
+
+gilgamesh44
 
 # AUTHOR
 

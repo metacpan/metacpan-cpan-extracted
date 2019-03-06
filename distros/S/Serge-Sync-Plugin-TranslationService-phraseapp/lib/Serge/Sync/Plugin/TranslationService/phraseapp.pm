@@ -8,7 +8,7 @@ use strict;
 use Serge::Util qw(subst_macros);
 use version;
 
-our $VERSION = qv('0.901.0');
+our $VERSION = qv('0.902.0');
 
 sub name {
     return 'PhraseApp translation software (https://phraseapp.com) synchronization plugin';
@@ -47,7 +47,7 @@ sub validate_data {
 sub run_phraseapp_cli {
     my ($self, $action, $langs, $capture) = @_;
 
-    $ENV{'PHRASEAPP_CONFIG'} = $self->{data}->{config_file};
+    local $ENV{'PHRASEAPP_CONFIG'} = $self->{data}->{config_file};
 
     my $command = $action;
 

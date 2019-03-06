@@ -1,0 +1,31 @@
+---
+abstract: 'utils for perl development'
+author:
+  - 'Magnus Woldrich <m@japh.se>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-perlutils
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  App::perlutils:
+    file: lib/App/perlutils.pm
+requires:
+  File::Find::Rule: '0'
+  File::LibMagic: '0'
+  File::LsColor: '0'
+  Term::ExtendedColor: '0'
+resources:
+  repository: https://github.com/trapd00r/perlutils.git
+version: '0.028'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

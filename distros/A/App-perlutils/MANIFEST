@@ -1,0 +1,12 @@
+Makefile.PL
+bin/depends
+bin/findinc
+bin/func
+bin/methods
+bin/version
+bin/version_up
+MANIFEST
+lib/App/perlutils.pm
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

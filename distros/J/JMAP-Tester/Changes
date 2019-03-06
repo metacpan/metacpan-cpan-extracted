@@ -1,5 +1,15 @@
 Revision history for JMAP-Tester
 
+0.025     2019-03-06 09:16:33-05:00 America/New_York
+        - allow for template variables in upload URI also
+
+0.024     2019-03-04 16:03:30-05:00 America/New_York
+        - add account and primary account accounting
+
+0.023     2019-03-04 14:51:46-05:00 America/New_York
+        - add default_using attribute, because using is what we're all using
+          now
+
 0.022     2018-12-06 06:24:38+11:00 Australia/Melbourne
         - bytes_ref now returns a *reference* to a byte string
         - allow created_creation_ids to work even if created is empty

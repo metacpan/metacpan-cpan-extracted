@@ -1,5 +1,12 @@
 Revision history for Music-FretboardDiagram
 
+0.1101 2019-03-04 13:38:08
+    - Fix crucial SYNOPSIS example!
+
+0.1100 2019-03-04 13:30:56
+    - Return the generated image from the ->draw method if the image attribute is set.
+    - Improve the eg/chord-diagram.pl program.
+
 0.1002 2019-03-03 23:39:09
     - Add the Mojolicious program eg/chord-diagram.pl.
 

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Render exceptions as text in command line user agents",
+   "author" : [
+      "Marcus Ramberg <marcus.ramberg@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-TextExceptions",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8.0",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/marcusramberg/mojolicious-plugin-textexceptions/issues"
+      },
+      "homepage" : "https://github.com/marcusramberg/mojolicious-plugin-textexceptions",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/marcusramberg/mojolicious-plugin-textexceptions.git",
+         "web" : "https://github.com/marcusramberg/mojolicious-plugin-textexceptions"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

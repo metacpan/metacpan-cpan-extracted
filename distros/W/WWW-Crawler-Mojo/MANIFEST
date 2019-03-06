@@ -4,6 +4,8 @@ example/basic.pl
 example/checkbot.pl
 example/pages.pl
 example/search.pl
+lib/.DS_Store
+lib/Devel/.DS_Store
 lib/WWW/Crawler/Mojo.pm
 lib/WWW/Crawler/Mojo/Job.pm
 lib/WWW/Crawler/Mojo/Queue.pm

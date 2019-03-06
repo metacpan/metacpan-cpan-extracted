@@ -7,6 +7,7 @@ use Test::WWW::Mechanize::PSGI;
 
 {
     package MyApp::Controller::Root;
+    BEGIN { $INC{'MyApp/Controller/Root.pm'} = 1 }
     use Moose;
     use Test2::V0 qw( !meta );
     BEGIN { extends 'Catalyst::Controller' }
@@ -83,6 +84,7 @@ use Test::WWW::Mechanize::PSGI;
 
 {
     package MyApp;
+    BEGIN { $INC{'MyApp.pm'} = 1 }
     use Catalyst qw(
         Starch
         Starch::Cookie

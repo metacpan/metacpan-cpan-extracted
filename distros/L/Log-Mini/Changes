@@ -1,5 +1,8 @@
 Revision history for Perl extension Log-Mini
 
+0.0.3 2019-03-05T15:48:33Z
+    - Unused say feature was removed
+
 0.0.2 2019-02-22T08:01:23Z
 
     - Undefined warning was fixed

@@ -8,7 +8,7 @@ use base qw( Template::Plugin::Filter );
 
 use CSS::Sass;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub init {
     my ($self) = @_;
@@ -102,7 +102,9 @@ The default is 'NESTED'.
 
 =head1 SEE ALSO
 
-CSS::Sass - Compile .scss files using libsass L<http://search.cpan.org/~ocbnet/CSS-Sass/lib/CSS/Sass.pm>
+CSS::Sass - Compile .scss files using libsass L<https://metacpan.org/pod/CSS::Sass>
+
+Compass-mixins for libsass L<https://github.com/Igosuki/compass-mixins>
 
 =head1 LICENSE
 

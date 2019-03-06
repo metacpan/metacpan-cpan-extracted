@@ -1,5 +1,9 @@
 Revision history for Net-Gitlab
 
+0.09 2019-03-06T06:02:26Z
+
+ - Migrate build tooling from Dist::Zilla to Minilla.
+
 0.08 2018-09-06
 
  - Utilize the x_deprecated META flag.

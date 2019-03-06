@@ -7,9 +7,6 @@ requires 'Cwd';
 requires 'Encode';
 requires 'File::Basename';
 requires 'File::Spec';
-requires 'File::stat';
-requires 'Scalar::Util';
-requires 'Symbol';
 requires 'version';
 
 test_requires 'Test::More';

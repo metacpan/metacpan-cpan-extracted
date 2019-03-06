@@ -10,10 +10,10 @@ use lib dirname(__FILE__)."/lib"; # t/lib
 require Module::Lazy;
 
 Module::Lazy->import( "Module::Lazy::_::test::sample" );
-is $Module::Lazy::_::test::sample::VERSION, undef, "not loaded yet";
+is $Module::Lazy::_::test::sample::loaded, undef, "not loaded yet";
 
 Module::Lazy->import( "Module::Lazy::_::test::sample" );
-is $Module::Lazy::_::test::sample::VERSION, undef, "not loaded second time";
+is $Module::Lazy::_::test::sample::loaded, undef, "not loaded second time";
 
 my $new = eval {
     Module::Lazy::_::test::sample->new;
@@ -21,5 +21,5 @@ my $new = eval {
 is $@, '', "no exception on new()";
 
 is ref $new, "Module::Lazy::_::test::sample", "new() worked";
-is $Module::Lazy::_::test::sample::VERSION, 42, "loaded module at this point";
+is $Module::Lazy::_::test::sample::loaded, 1, "loaded module at this point";
 

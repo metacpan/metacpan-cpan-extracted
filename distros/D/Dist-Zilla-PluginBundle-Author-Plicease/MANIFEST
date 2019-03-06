@@ -14,6 +14,7 @@ example/unbundle.pl
 inc/mymm.pl
 inc/run/before_build.pl
 lib/Dist/Zilla/PluginBundle/Author/Plicease.pm
+maint/cip-before-install
 t/00_diag.t
 t/01_use.t
 t/unbundle.t

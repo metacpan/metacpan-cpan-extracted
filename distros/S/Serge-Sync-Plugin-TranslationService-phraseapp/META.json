@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Serge-Sync-Plugin-TranslationService-phraseapp",
    "prereqs" : {
@@ -55,8 +55,8 @@
          "web" : "https://github.com/dragosv/serge-plugins"
       }
    },
-   "version" : "0.901.0",
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "JSON::XS version 4.0"
+   "version" : "0.902.0",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }
 

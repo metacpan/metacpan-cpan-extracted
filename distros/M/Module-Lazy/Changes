@@ -1,5 +1,10 @@
 Revision history for Module-Lazy
 
+0.04    Tue Mar 5 2019
+        - API Add PERL_LAZYLOAD_DISABLE, PERL_LAZYLOAD_DEBUG env variables
+        - BUG don't try inflating already loaded modules in unimport()
+        - BUG Add workaround to 'use Module x.yy' via fake VERSION number
+
 0.03    Sun Mar 3 2019
         - Allow use Module::Lazy; w/o argument
         - Fix deps, add more tests

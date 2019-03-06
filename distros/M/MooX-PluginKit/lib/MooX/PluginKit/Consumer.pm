@@ -1,6 +1,7 @@
 package MooX::PluginKit::Consumer;
-
-our $VERSION = '0.05';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -48,7 +49,6 @@ use Scalar::Util qw( blessed );
 use Carp qw( croak );
 use Exporter qw();
 
-use strictures 2;
 use namespace::clean;
 
 our @EXPORT = qw(
@@ -444,5 +444,7 @@ __END__
 
 =head1 AUTHORS AND LICENSE
 
-See L<MooX::PluginKit/AUTHOR> and L<MooX::PluginKit/LICENSE>.
+See L<MooX::PluginKit/AUTHORS> and L<MooX::PluginKit/LICENSE>.
+
+=cut
 

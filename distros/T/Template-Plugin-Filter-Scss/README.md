@@ -44,7 +44,9 @@ Template::Plugin::Filter::Scss - CSS::Sass filter for Template Toolkit
 
 # SEE ALSO
 
-CSS::Sass - Compile .scss files using libsass [http://search.cpan.org/~ocbnet/CSS-Sass/lib/CSS/Sass.pm](http://search.cpan.org/~ocbnet/CSS-Sass/lib/CSS/Sass.pm)
+CSS::Sass - Compile .scss files using libsass [https://metacpan.org/pod/CSS::Sass](https://metacpan.org/pod/CSS::Sass)
+
+Compass-mixins for libsass [https://github.com/Igosuki/compass-mixins](https://github.com/Igosuki/compass-mixins)
 
 # LICENSE
 

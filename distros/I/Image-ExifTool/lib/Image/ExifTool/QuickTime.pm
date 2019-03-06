@@ -42,7 +42,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '2.18';
+$VERSION = '2.21';
 
 sub ProcessMOV($$;$);
 sub ProcessKeys($$$);
@@ -53,6 +53,7 @@ sub ProcessSampleDesc($$$);
 sub ProcessHybrid($$$);
 sub ProcessRights($$$);
 sub Process_mebx($$$); # (in QuickTimeStream.pl)
+sub ProcessTTAD($$$); # (in QuickTimeStream.pl)
 sub ParseItemLocation($$);
 sub ParseItemInfoEntry($$);
 sub ParseItemPropAssoc($$);
@@ -380,7 +381,10 @@ my %eeStd = ( stco => 1, co64 => 1, stsz => 1, stz2 => 1, stsc => 1, stts => 1 )
 # boxes for the various handler types that we want to save when ExtractEmbedded is enabled
 my %eeBox = (
     # (note: vide is only processed if specific atoms exist in the VideoSampleDesc)
-    vide => { %eeStd, JPEG => 1 }, # (add avcC to parse H264 stream)
+    vide => { %eeStd,
+        JPEG => 1,
+        # avcC => 1, # (uncomment to parse H264 stream)
+    },
     text => { %eeStd },
     meta => { %eeStd },
     sbtl => { %eeStd },
@@ -801,8 +805,9 @@ my %eeBox = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => q{
-        Tags defined by the Spherical Video V2 specification (see
-        https://github.com/google/spatial-media/blob/master/docs/spherical-video-v2-rfc.md).
+        Tags defined by the Spherical Video V2 specification.  See
+        L<https://github.com/google/spatial-media/blob/master/docs/spherical-video-v2-rfc.md>
+        for the specification.
     },
     svhd => {
         Name => 'MetadataSource',
@@ -965,7 +970,7 @@ my %eeBox = (
         Name => 'HTCTrack',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Track' },
     },
-   'gps ' => {  # GPS data written by Novatek cameras
+   'gps ' => {  # GPS data written by Novatek cameras (parsed in QuickTimeStream.pl)
         Name => 'GPSDataList',
         Unknown => 1,
         Binary => 1,
@@ -1908,6 +1913,11 @@ my %eeBox = (
     # @etc - 4 bytes all zero (Samsung WB30F)
     # saut - 4 bytes all zero (Samsung SM-N900T)
     # smrd - string "TRUEBLUE" (Samsung SM-C101)
+    # ---- TomTom Bandit Action Cam ----
+    TTMD => {
+        Name => 'TomTomMetaData',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TomTom' },
+    },
     # ---- Unknown ----
     # CDET - 128 bytes (unknown origin)
 #
@@ -1940,6 +1950,26 @@ my %eeBox = (
     # 2 - values: 0
     # 3 - values: FileSize minus 12 (why?)
     # 4 - values: 12
+);
+
+# TomTom Bandit Action Cam metadata (ref PH)
+%Image::ExifTool::QuickTime::TomTom = (
+    PROCESS_PROC => \&ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    NOTES => 'Tags found in TomTom Bandit Action Cam MP4 videos.',
+    TTAD => {
+        Name => 'TomTomAD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::Stream',
+            ProcessProc => \&Image::ExifTool::QuickTime::ProcessTTAD,
+        },
+    },
+    TTHL => { Name => 'TomTomHL', Binary => 1, Unknown => 1 }, # (mostly zeros)
+    # (TTID values are different for each video)
+    TTID => { Name => 'TomTomID', ValueConv => 'unpack("x4H*",$val)' },
+    TTVI => { Name => 'TomTomVI', Format => 'int32u', Unknown => 1 }, # seen: "0 1 61 508 508"
+    # TTVD seen: "normal 720p 60fps 60fps 16/9 wide 1x"
+    TTVD => { Name => 'TomTomVD', ValueConv => 'my @a = ($val =~ /[\x20-\x7f]+/g); "@a"' },
 );
 
 # User-specific media data atoms (ref 11)
@@ -6581,7 +6611,9 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::QuickTime');
 #
 sub AUTOLOAD
 {
-    if ($AUTOLOAD eq 'Image::ExifTool::QuickTime::Process_mebx') {
+    if ($AUTOLOAD eq 'Image::ExifTool::QuickTime::Process_mebx' or
+        $AUTOLOAD eq 'Image::ExifTool::QuickTime::ProcessTTAD')
+    {
         require 'Image/ExifTool/QuickTimeStream.pl';
         no strict 'refs';
         return &$AUTOLOAD(@_);
@@ -6774,7 +6806,12 @@ sub PrintChapter($)
     $dur -= $h * 3600;
     my $m = int($dur / 60);
     my $s = $dur - $m * 60;
-    return sprintf("[%d:%.2d:%06.3f] %s",$h,$m,$s,$title);
+    my $ss = sprintf('%06.3f', $s);
+    if ($ss >= 60) {
+        $ss = '00.000';
+        ++$m >= 60 and $m -= 60, ++$h;
+    }
+    return sprintf("[%d:%.2d:%s] %s",$h,$m,$ss,$title);
 }
 
 #------------------------------------------------------------------------------
@@ -7512,6 +7549,8 @@ sub ProcessMOV($$;$)
         SetByteOrder('MM');
         $$et{PRIORITY_DIR} = 'XMP';   # have XMP take priority
     }
+    $$raf{NoBuffer} = 1 if $et->Options('FastScan'); # disable buffering in FastScan mode
+
     if ($$et{OPTIONS}{ExtractEmbedded}) {
         $ee = 1;
         $unkOpt = $$et{OPTIONS}{Unknown};
@@ -8017,7 +8056,7 @@ information from QuickTime and MP4 video, M4A audio, and HEIC image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

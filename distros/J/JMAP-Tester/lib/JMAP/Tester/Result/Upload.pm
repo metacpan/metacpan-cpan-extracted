@@ -3,7 +3,7 @@ use strict;
 
 package JMAP::Tester::Result::Upload;
 # ABSTRACT: what you get when you upload a blob
-$JMAP::Tester::Result::Upload::VERSION = '0.022';
+$JMAP::Tester::Result::Upload::VERSION = '0.025';
 use Moo;
 with 'JMAP::Tester::Role::HTTPResult';
 
@@ -58,7 +58,7 @@ JMAP::Tester::Result::Upload - what you get when you upload a blob
 
 =head1 VERSION
 
-version 0.022
+version 0.025
 
 =head1 OVERVIEW
 

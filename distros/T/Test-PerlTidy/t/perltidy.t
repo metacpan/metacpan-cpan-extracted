@@ -8,4 +8,7 @@ use Test::PerlTidy;
 
 my $perltidyrc = File::Spec->catfile( 't', '_perltidyrc.txt' );
 
-run_tests( perltidyrc => $perltidyrc );
+run_tests(
+    exclude    => [ qr/xt/, qr/00-comp/, qr/Build\.PL/, qr/Makefile\.PL/, ],
+    perltidyrc => $perltidyrc
+);

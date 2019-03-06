@@ -105,7 +105,7 @@ sub self { (grep { 'self' eq $_->rel } $_[0]->links)[0] }
 
 =head1 COPYRIGHT
 
-Copyright 2018 CentralNic Ltd. All rights reserved.
+Copyright 2019 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

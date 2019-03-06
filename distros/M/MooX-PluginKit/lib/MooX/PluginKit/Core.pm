@@ -1,6 +1,7 @@
 package MooX::PluginKit::Core;
-
-our $VERSION = '0.05';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -24,7 +25,6 @@ use Module::Runtime qw( require_module is_module_name );
 require UNIVERSAL::DOES
     unless defined &UNIVERSAL::DOES;
 
-use strictures 2;
 use namespace::clean;
 
 use Exporter qw( import );
@@ -260,5 +260,7 @@ __END__
 
 =head1 AUTHORS AND LICENSE
 
-See L<MooX::PluginKit/AUTHOR> and L<MooX::PluginKit/LICENSE>.
+See L<MooX::PluginKit/AUTHORS> and L<MooX::PluginKit/LICENSE>.
+
+=cut
 

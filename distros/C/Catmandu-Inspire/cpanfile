@@ -9,11 +9,11 @@ on configure => sub {
 };
 
 on test => sub {
-    requires 'Test::More', '0.88';
+    requires 'Test::More', '>=1.30';
     requires 'Test::Exception', '0.32';
 };
 
-requires 'Catmandu', '0.9204';
-requires 'Moo', '1.004';
-requires 'Furl', '0.41';
-requires 'Catmandu::XML', '0.14';
+requires 'Catmandu', '>=1.10';
+requires 'Moo', '0';
+requires 'Furl', '3.13';
+requires 'Catmandu::XML', '0.16';

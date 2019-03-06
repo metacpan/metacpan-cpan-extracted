@@ -201,9 +201,9 @@ with plugins and consumers.  This API should be formalized with documentation, o
 a final state that can be relied on to not change much.  For now, don't use anything in there
 directly.
 
-# AUTHOR
+# AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 # ACKNOWLEDGEMENTS
 

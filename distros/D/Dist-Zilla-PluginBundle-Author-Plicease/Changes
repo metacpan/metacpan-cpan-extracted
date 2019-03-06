@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.35      2019-03-06 08:06:26 -0500
+
+2.35      2019-03-05 21:48:06 -0500
+  - Require plicease plugin 2.35
+  - Add cirrus_user attributes
+
 2.34      2019-02-22 04:00:15 -0500
   - Require plicease plugsin 2.34
   - Add appveyor_user and travis_user attributes

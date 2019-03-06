@@ -96,7 +96,7 @@ value.</p>
 <tr><td>FILE_ORDER</td><td>Hash of numbers to give the sequence the tags were
     extracted from file, keyed by tag key</td></tr>
 
-<tr><td>FILE_EXT</td><td>File extension (JPG, PEF, AVI, etc...) May be undefined if
+<tr><td>FILE_EXT</td><td>Upper-case file extension (JPG, PEF, AVI, etc...) May be undefined if
     file has no extension.</td></tr>
 
 <tr><td>FILE_SEQUENCE</td><td>File sequence number when extracting information</td></tr>
@@ -134,7 +134,8 @@ value.</p>
 <tr><td>LOW_PRIORITY_DIR</td><td>Lookup based on directory name for directories where
     undefined Priority tags get set to Priority 0 (eg. PreviewIFD in all images,
     and IFD1 in JPEG images).  This is equivalent to setting PRIORITY to 0 for
-    the tag table only for a specific directory name.</td></tr>
+    the tag table only for a specific directory name.  A '*' entry in the lookup
+    causes the priority of tags in any directory to be lowered.</td></tr>
 
 <tr><td>Make</td><td>Camera make set during reading and writing</td></tr>
 

@@ -252,6 +252,7 @@ my %ignorePrintConv = map { $_ => 1 } qw(OTHER BITMASK Notes);
 #           CreateGroups => [internal use] createGroups hash ref from related tags
 #           ListOnly => [internal use] set only list or non-list tags
 #           SetTags => [internal use] hash ref to return tagInfo refs of set tags
+#           Sanitized => [internal use] set to avoid double-sanitizing the value
 # Returns: number of tags set (plus error string in list context)
 # Notes: For tag lists (like Keywords), call repeatedly with the same tag name for
 #        each value in the list.  Internally, the new information is stored in
@@ -326,7 +327,7 @@ sub SetNewValue($;$$%)
     }
     # un-escape as necessary and make sure the Perl UTF-8 flag is OFF for the value
     # if perl is 5.6 or greater (otherwise our byte manipulations get corrupted!!)
-    $self->Sanitize(\$value) if defined $value and not ref $value;
+    $self->Sanitize(\$value) if defined $value and not ref $value and not $options{Sanitized};
 
     # set group name in options if specified
     ($options{Group}, $tag) = ($1, $2) if $tag =~ /(.*):(.+)/;
@@ -523,7 +524,7 @@ sub SetNewValue($;$$%)
             my ($match) = grep /^\Q$tag\E$/i, keys %Image::ExifTool::Shortcuts::Main;
             undef $err;
             if ($match) {
-                $options{NoShortcut} = 1;
+                $options{NoShortcut} = $options{Sanitized} = 1;
                 foreach $tag (@{$Image::ExifTool::Shortcuts::Main{$match}}) {
                     my ($n, $e) = $self->SetNewValue($tag, $value, %options);
                     $numSet += $n;
@@ -1827,8 +1828,11 @@ sub SetFileName($$;$$$)
     # don't replace existing file
     if ($self->Exists($newName) and (not defined $usedFlag or $usedFlag)) {
         if ($file ne $newName or $opt eq 'Link') {
-            $self->Warn("File '${newName}' already exists");
-            return -1;
+            # allow for case-insensitive filesystem
+            if ($opt eq 'Link' or not $self->IsSameFile($file, $newName)) {
+                $self->Warn("File '${newName}' already exists");
+                return -1;
+            }
         } else {
             $self->Warn('File name is unchanged');
             return 0;
@@ -2606,7 +2610,7 @@ sub Sanitize($$)
         if ($$self{OPTIONS}{Escape} eq 'XML') {
             $$valPt = Image::ExifTool::XMP::UnescapeXML($$valPt);
         } elsif ($$self{OPTIONS}{Escape} eq 'HTML') {
-            $$valPt = Image::ExifTool::HTML::UnescapeHTML($$valPt);
+            $$valPt = Image::ExifTool::HTML::UnescapeHTML($$valPt, $$self{OPTIONS}{Charset});
         }
     }
 }
@@ -3105,6 +3109,33 @@ sub IsWritable($)
 }
 
 #------------------------------------------------------------------------------
+# Check to see if these are the same file
+# Inputs: 0) ExifTool ref, 1) first file name, 2) second file name
+# Returns: true if file names reference the same file
+sub IsSameFile($$$)
+{
+    my ($self, $file, $file2) = @_;
+    return 0 unless lc $file eq lc $file2;  # (only looking for differences in case)
+    my ($isSame, $interrupted);
+    my $tmp1 = "${file}_ExifTool_tmp_$$";
+    my $tmp2 = "${file2}_ExifTool_tmp_$$";
+    {
+        local *TMP1;
+        local $SIG{INT} = sub { $interrupted = 1 };
+        if ($self->Open(\*TMP1, $tmp1, '>')) {
+            close TMP1;
+            $isSame = 1 if $self->Exists($tmp2);
+            $self->Unlink($tmp1);
+        }
+    }
+    if ($interrupted and $SIG{INT}) {
+        no strict 'refs';
+        &{$SIG{INT}}();
+    }
+    return $isSame;
+}
+
+#------------------------------------------------------------------------------
 # Create directory for specified file
 # Inputs: 0) ExifTool ref, 1) complete file name including path
 # Returns: 1 = directory created, 0 = nothing done, -1 = error
@@ -3219,6 +3250,8 @@ sub ReverseLookup($$)
     if ($val =~ /^Unknown\s*\((.*)\)$/i) {
         $val = $1;    # was unknown
         if ($val =~ /^0x([\da-fA-F]+)$/) {
+            # disable "Hexadecimal number > 0xffffffff non-portable" warning
+            local $SIG{'__WARN__'} = sub { };
             $val = hex($val);   # convert hex value
         }
     } else {
@@ -4486,7 +4519,7 @@ sub InverseDateTime($$;$$)
     my ($self, $val, $tzFlag, $dateOnly) = @_;
     my ($rtnVal, $tz);
     # strip off timezone first if it exists
-    if ($val =~ s/([+-])(\d{1,2}):?(\d{2})\s*$//i) {
+    if ($val =~ s/([+-])(\d{1,2}):?(\d{2})\s*(DST)?$//i) {
         $tz = sprintf("$1%.2d:$3", $2);
     } elsif ($val =~ s/Z$//i) {
         $tz = 'Z';
@@ -6515,7 +6548,7 @@ sub WriteBinaryData($$$)
     my @varInfo = @varOffsets;
     my $tagInfo;
     $dataPt = \$newData;
-    foreach $tagInfo ($self->GetNewTagInfoList($tagTablePtr)) {
+    foreach $tagInfo (sort { $$a{TagID} <=> $$b{TagID} } $self->GetNewTagInfoList($tagTablePtr)) {
         my $tagID = $$tagInfo{TagID};
         # evaluate conditional tags now if necessary
         if (ref $$tagTablePtr{$tagID} eq 'ARRAY' or $$tagInfo{Condition}) {
@@ -6557,7 +6590,7 @@ sub WriteBinaryData($$$)
         next unless defined $newVal;    # can't delete from a binary table
         # only write masked bits if specified
         my $mask = $$tagInfo{Mask};
-        $newVal = ($newVal & $mask) | ($val & ~$mask) if defined $mask;
+        $newVal = (($newVal << $$tagInfo{BitShift}) & $mask) | ($val & ~$mask) if $mask;
         # set the size
         if ($$tagInfo{DataTag} and not $$tagInfo{IsOffset}) {
             warn 'Internal error' unless $newVal == 0xfeedfeed;
@@ -6685,7 +6718,7 @@ used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

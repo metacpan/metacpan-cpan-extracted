@@ -5,6 +5,7 @@ html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/create/BeforeCreate
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/AfterWorked
 html/Callbacks/RT-Extension-MandatoryOnTransition/m/ticket/reply/BeforeUpdate
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Create.html/BeforeCreate
+html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Elements/EditBasics/MassageFields
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Elements/EditCustomFields/MassageCustomFields
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/Modify.html/Default
 html/Callbacks/RT-Extension-MandatoryOnTransition/Ticket/ModifyAll.html/Default
@@ -38,6 +39,6 @@ xt/basic.t
 xt/immutable_core_for_update.t
 xt/mandatory_on_create.t
 xt/queue_change.t
-xt/require_owner_for_resolve.t
 xt/required_fields.t
+xt/roles.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

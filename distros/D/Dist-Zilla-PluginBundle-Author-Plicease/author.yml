@@ -23,6 +23,7 @@ pod_spelling_system:
     - appveyor
     - bakeini
     - EUMM
+    - ci
 
 pod_coverage:
   private:

@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 12;
+use Test::More;
 
 my $m;
 
@@ -53,5 +53,28 @@ $input = q~[% USE Filter.Base64 dont_broken_into_lines_each_76_char => 1 %]
 
 ok($parser->process(\$input), 'Template process method with filter 3 is ok');
 ok($out eq 'CiAgICAgICAgQmVhdGFlIHBsYW5lIGF1cmVzLCBxdWFlIG5vbiB2b2NlbSBmb3JpcyBzb25hbnRlbSwgc2VkIGludHVzIGF1c2N1bHRhbnQgdmVyaXRhdGVtIGRvY2VudGVtCiAgICA=', 'Test-filter 3 output correct');
+
+
+
+$out = '';
+$input = q~[% USE Filter.Base64 dont_broken_into_lines_each_76_char => 1, trim => 1 %]
+    [% FILTER b64 safeurl => 1  %]
+        abcdn?
+    [% END %]
+~;
+
+ok($parser->process(\$input), 'Template process method with filter 4 is ok');
+is($out, 'YWJjZG4_', 'Test-filter 4 safeurl output correct');
+
+
+$out = '';
+$input = q~[% USE Filter.Base64 dont_broken_into_lines_each_76_char => 1, trim => 1 %]
+    [% FILTER b64 safeurl => 0  %]
+        abcdn?
+    [% END %]
+~;
+
+ok($parser->process(\$input), 'Template process method with filter 5 is ok');
+is($out, 'YWJjZG4/', 'Test-filter 5 safeurl output correct');
 
 done_testing();

@@ -1,5 +1,9 @@
 package GitLab::API::v3;
-$GitLab::API::v3::VERSION = '1.04';
+
+our $VERSION = '1.05';
+
+=encoding utf8
+
 =head1 NAME
 
 GitLab::API::v3 - A complete GitLab API v3 client. (DEPRECATED)
@@ -4007,39 +4011,15 @@ for more information.
 Alternatively, you can
 L<open a ticket|https://github.com/bluefeet/GitLab-API-v3/issues>.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
-
-=head2 CONTRIBUTORS
-
-=over
-
-=item *
-
-Dotan Dimet <dotanE<64>corky.net>
-
-=item *
-
-Nigel Gregoire <nigelgregoireE<64>gmail.com>
-
-=item *
-
-trunov-ms <trunov.msE<64>gmail.com>
-
-=item *
-
-Marek R. Sotola <Marek.R.SotolaE<64>nasa.gov>
-
-=item *
-
-José Joaquín Atria <jjatriaE<64>gmail.com>
-
-=item *
-
-Dave Webb <githubE<64>d5ve.com>
-
-=back
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Dotan Dimet <dotan@corky.net>
+    Nigel Gregoire <nigelgregoire@gmail.com>
+    trunov-ms <trunov.ms@gmail.com>
+    Marek R. Sotola <Marek.R.Sotola@nasa.gov>
+    José Joaquín Atria <jjatria@gmail.com>
+    Dave Webb <github@d5ve.com>
 
 =head1 ACKNOWLEDGEMENTS
 

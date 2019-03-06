@@ -4,9 +4,7 @@ LICENSE
 META.json
 README.md
 cpanfile
-cpanmw.bat
 lib/App/cpanmw.pm
-minil.toml
 script/cpanmw
 t/00_compile.t
 META.yml

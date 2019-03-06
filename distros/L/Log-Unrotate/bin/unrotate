@@ -11,7 +11,7 @@ unrotate - reads lines from log using Log::Unrotate and given pos file
 
 =head1 VERSION
 
-version 1.32
+version 1.33
 
 =head1 SYNOPSIS
 

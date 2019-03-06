@@ -9,6 +9,10 @@
 
         my $rdap = Net::RDAP->new;
 
+        #
+        # traditional lookup:
+        #
+
         # get domain info:
         $object = $rdap->domain(Net::DNS::Domain->new('example.com'));
 
@@ -17,7 +21,22 @@
         $object = $rdap->ip(Net::IP->new('2001:DB8::/32'));
 
         # get info about AS numbers:
-        $object = $rdap->ip(Net::ASN->new(65536));
+        $object = $rdap->autnum(Net::ASN->new(65536));
+
+        #
+        # search functions:
+        #
+
+        my $server = Net::RDAP::Service->new("https://www.example.com/rdap");
+
+        # search for domains by name:
+        my $result = $server->domains('name' => 'ex*mple.com');
+
+        # search for entities by name:
+        my $result = $server->entities('fn' => 'J*n Doe');
+
+        # search for nameservers by IP address:
+        my $result = $server->nameservers('ip' => '192.168.56.101');
 
 # DESCRIPTION
 
@@ -45,9 +64,8 @@ interface to information about all unique Internet identifiers.
 
         $rdap = Net::RDAP->new(%OPTIONS);
 
-Constructor method, returns a new object.
-
-Supported options:
+Constructor method, returns a new object. %OPTIONS is optional, but
+may contain any of the following options:
 
 - `use_cache` - if true, copies of RDAP responses are stored on
 disk, and are updated if the copy on the server is more up-to-date.
@@ -67,6 +85,19 @@ either a "forward" domain (such as `example.com`) or a "reverse"
 domain (such as `168.192.in-addr.arpa`).
 
 If there was an error, this method will return a [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error).
+
+### Note on Internationalised Domain Names (IDNs)
+
+Domain names which contain characters other than those from the ASCII-compatible
+range must be encoded into "A-label" (or "Punycode") format before being passed
+to `Net::DNS::Domain`. You can use `Net::LibIDN` or `Net::LibIDN2` to
+perform this encoding:
+
+        use Net::LibIDN;
+
+        my $name = "espécime.com";
+
+        my $domain = $rdap->domain->(Net::DNS::Domain->new(idn_to_ascii($name, 'UTF-8')));
 
 ## IP Lookup
 
@@ -107,11 +138,11 @@ per RFC 8521.
 
 ## Directly Fetching Known Resources
 
-        $object = $rdap->fetch($url);
+        $object = $rdap->fetch($url, %OPTIONS);
 
-        $object = $rdap->fetch($link);
+        $object = $rdap->fetch($link, %OPTIONS);
 
-        $object = $rdap->fetch($object);
+        $object = $rdap->fetch($object, %OPTIONS);
 
 The first and second forms of the `fetch()` method retrieve the
 resource identified by `$url` or `$link` (which must be either a
@@ -143,6 +174,21 @@ example:
 In order for this form to work, the object must have a `self` link:
 [Net::RDAP](https://metacpan.org/pod/Net::RDAP) will auto-create one for objects that don't have one if it
 can.
+
+`%OPTIONS` is an optional hash containing additional options for the query.
+The following options are supported:
+
+- `user` and `pass`: if provided, they will be sent to the
+server in an HTTP Basic Authorization header field.
+- `class_override`: allows you to set or override the
+`objectClassName` property in RDAP responses.
+
+## Performing Searches
+
+RDAP supports a limited search capability, but you need to know in
+advance which RDAP server you want to send the search query to. The
+`Net::RDAP::Service` class allows you to prepare and submit search
+queries to specific RDAP servers.
 
 ## RDAP User Agent
 
@@ -177,6 +223,7 @@ RDAP-related modules that all work together. They are:
     - [Net::RDAP::ID](https://metacpan.org/pod/Net::RDAP::ID)
     - [Net::RDAP::Object](https://metacpan.org/pod/Net::RDAP::Object), and its submodules:
         - [Net::RDAP::Error](https://metacpan.org/pod/Net::RDAP::Error)
+        - [Net::RDAP::Help](https://metacpan.org/pod/Net::RDAP::Help)
         - [Net::RDAP::Object::Autnum](https://metacpan.org/pod/Net::RDAP::Object::Autnum)
         - [Net::RDAP::Object::Domain](https://metacpan.org/pod/Net::RDAP::Object::Domain)
         - [Net::RDAP::Object::Entity](https://metacpan.org/pod/Net::RDAP::Object::Entity)
@@ -232,7 +279,7 @@ Protocol (RDAP) Object Tagging
 
 # COPYRIGHT
 
-Copyright 2018 CentralNic Ltd. All rights reserved.
+Copyright 2019 CentralNic Ltd. All rights reserved.
 
 # LICENSE
 

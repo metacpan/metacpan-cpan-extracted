@@ -7,16 +7,14 @@ use warnings;
 
 use Mojolicious::Plugin::TagHelpers;
 
-our $VERSION = 0.03;
+our $VERSION = '0.04';
 
 use Mojo::Collection;
 use Mojo::Util qw(deprecated xml_escape);
 use Scalar::Util 'blessed';
 use Unicode::Collate;
 
-use Data::Dumper;
-
-use parent 'Mojolicious::Plugin';
+use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -26,7 +24,6 @@ sub register {
         _select_field(@_, collate => $collate )
     } );
 
-    $config ||= {};
     $app->attr(
         translation_method => $config->{method} || 'l'
     );
@@ -37,14 +34,22 @@ sub _prepare {
 
     my %translated;
     my $index = 0;
+
+    $options = [$options] if ref $options ne 'ARRAY';
+
     for my $option ( @{$options} ) {
-        if (ref $option eq 'HASH') {
+        my $ref = ref $option;
+
+        if ( !$ref ) {
+            $option = [$option => $option];
+        }
+        elsif ( $ref eq 'HASH') {
             deprecated
                 'hash references are DEPRECATED in favor of Mojo::Collection objects';
-            $option = Mojo::Collection->new(each %$option);
-        }
 
-        $option = [$option => $option] unless ref $option eq 'ARRAY';
+            my @values = map{ [ $_ => $option->{$_} ] } sort keys %{$option};
+            $option = Mojo::Collection->new( '' => [ @values ] );
+        }
 
         if ( !$attr{no_translation} ) {
             my $method   = $self->app->translation_method;
@@ -69,7 +74,7 @@ sub _prepare {
 sub _select_field {
     my ($self, $name, $options, %attrs) = (shift, shift, shift, @_);
 
-    my %values = map { $_ => 1 } @{ $self->every_param($name) || [] };
+    my %values = map { $_ => 1 } @{ $self->every_param($name) };
 
     my %opts;
     my @fields = qw(no_translation sort collate);
@@ -79,13 +84,6 @@ sub _select_field {
 
     my $groups = '';
     for my $group (@$options) {
-
-        # DEPRECATED in Top Hat!
-        if (ref $group eq 'HASH') {
-            deprecated
-                'hash references are DEPRECATED in favor of Mojo::Collection objects';
-            $group = Mojo::Collection->new(each %$group);
-        }
 
         # "optgroup" tag
         if (blessed $group && $group->isa('Mojo::Collection')) {
@@ -118,7 +116,7 @@ Mojolicious::Plugin::TagHelpersI18N - TagHelpers with I18N support
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

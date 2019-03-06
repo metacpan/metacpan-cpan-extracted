@@ -4,7 +4,7 @@ author:
   - 'Athanasios Douitsis <aduitsis@cpan.org>'
 build_requires:
   Module::Build: '0.28'
-  Test::More: '0'
+  Test2::V0: '0'
   perl: v5.24.0
 configure_requires:
   Module::Build: '0.28'
@@ -19,24 +19,29 @@ name: OmniDisco-Prometheus
 provides:
   OD::Prometheus::Client:
     file: lib/OD/Prometheus/Client.pm
-    version: '0.003'
+    version: '0.005'
   OD::Prometheus::Metric:
     file: lib/OD/Prometheus/Metric.pm
-    version: '0.003'
+    version: '0.005'
+  OD::Prometheus::Set:
+    file: lib/OD/Prometheus/Set.pm
+    version: '0.005'
   OmniDisco::Prometheus:
     file: lib/OmniDisco/Prometheus.pm
-    version: '0.003'
+    version: '0.005'
 requires:
   Data::Printer: '0'
   LWP::UserAgent: '0'
   Moose: '0'
   Regexp::Common: '0'
+  Scalar::Util: '0'
+  overload: '0'
   perl: v5.24.0
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/aduitsis/omnidisco-prometheus
   repository: https://github.com/aduitsis/omnidisco-prometheus.git
-version: '0.003'
-x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.005'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

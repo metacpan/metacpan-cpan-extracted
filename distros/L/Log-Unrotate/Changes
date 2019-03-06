@@ -1,5 +1,9 @@
 Revision history for Log-Unrotate
 
+1.33    Wed Mar 06, 2019
+        * improve performance when commiting position after a long line
+        * build infrastructure for this module was lost under the sands of time, so deb packages are not included anymore
+
 1.32    Wed Jul 17, 2013
         * do not write same position to pos history
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 NAME
 
@@ -49,11 +49,6 @@ field on the update page.
 =item TimeTaken
 
 Requires that the Worked field on the update page is non-zero.
-
-=item Owner
-
-Requires that the ticket has a real Owner or the real Owner will be set on
-the update page.
 
 =back
 
@@ -127,7 +122,7 @@ config option.  This option takes the generic form of:
 
     Set( %MandatoryOnTransition,
         'QueueName' => {
-            'from -> to' => [ 'BasicField', 'CF.MyField', ],
+            'from -> to' => [ 'BasicField', 'CF.MyField', 'CustomRole.MyRole' ],
         },
     );
 
@@ -146,7 +141,7 @@ Category selection before resolving tickets in every other queue.
 
     Set( %MandatoryOnTransition,
         Helpdesk => {
-            '* -> resolved' => ['TimeWorked', 'CF.Resolution'],
+            '* -> resolved'      => ['TimeWorked', 'CF.Resolution', 'CustomRole.Analyst'],
         },
         '*' => {
             '* -> resolved' => ['CF.Category'],
@@ -155,6 +150,32 @@ Category selection before resolving tickets in every other queue.
 
 The transition syntax is similar to that found in RT's Lifecycles.  See
 C<perldoc /opt/rt4/etc/RT_Config.pm>.
+
+=head2 Requiring role values
+
+You can require any core or custom role on a RT::Ticket object, below is an
+example of requiring a custom role "customer" be set on transition from open
+and the owner also be set for the ticket on transition from a status of open.
+
+    Set( %MandatoryOnTransition,
+        'General' => {
+            '* -> resolved' => ['CustomRole.customer', 'Owner'],
+        },
+    );
+
+=head2 Role Membership in a Group
+
+Roles can require the members of the role to also be a member of a group
+before satisfying to mandatory condition. Below we require that the Owner
+role be set and that the member it is set to is a member of the group
+'SupportReps' or 'Admins'.
+
+    Set( %MandatoryOnTransition,
+        'General' => {
+            'open -> *' => ['Owner'],
+            'Owner' => { transition => 'open -> *', group => ['SupportReps', 'Admins'] },
+        }
+    );
 
 =head2 Restrictions on Queue Transitions
 
@@ -257,27 +278,29 @@ pair to %CORE_FOR_UPDATE and/or %CORE_FOR_CREATE.
 
 =cut
 
-our @CORE_SUPPORTED  = qw(Content TimeWorked TimeTaken Owner);
-our @CORE_TICKET     = qw(TimeWorked Owner);
+our @CORE_SUPPORTED  = qw(Content TimeWorked TimeTaken);
+our @CORE_TICKET     = qw(TimeWorked);
 our %CORE_FOR_UPDATE = (
     TimeWorked  => 'UpdateTimeWorked',
     TimeTaken   => 'UpdateTimeWorked',
     Content     => 'UpdateContent',
-    Owner       => 'Owner',
 );
 our %CORE_FOR_CREATE = (
     TimeWorked  => 'TimeWorked',
     Content     => 'Content',
-    Owner       => 'Owner',
 );
 
 =head2 Methods
 
 =head3 RequiredFields
 
-Returns two array refs of required fields for the described status transition.
-The first is core fields, the second is CF names.  Returns empty array refs
-on error or if nothing is required.
+Returns three array refs of required fields for the described status transition.
+The first is core fields, the second is CF names, the third is roles.  Returns
+empty array refs on error or if nothing is required.
+
+A fourth returned parameter is a hashref of must-have values for custom fields.
+
+The fifth parameter is a hashref of groups a role member must be in.
 
 Takes a paramhash with the keys Ticket, Queue, From, and To.  Ticket should be
 an object.  Queue should be a name.  From and To should be statuses.  If you
@@ -318,12 +341,12 @@ sub RequiredFields {
 
     my ($from_queue, $to_queue) = ($args{Queue}, $args{ToQueue} || $args{Queue});
 
-    return ([], []) unless ($from and $to) or ($from_queue and $to_queue );
+    return ([], [], []) unless ($from and $to) or ($from_queue and $to_queue );
 
     my %config = ();
     %config = $self->Config($args{Queue});
 
-    return ([], []) unless %config;
+    return ([], [], []) unless %config;
 
    $to ||= '';
    $from ||= '';
@@ -340,6 +363,8 @@ sub RequiredFields {
     my @core = grep { !/^CF\./i && $core_supported{$_} } @$required;
     my @cfs  =  map { /^CF\.(.+)$/i; $1; }
                grep { /^CF\./i } @$required;
+    my @roles = map { /^(:?[CustomRole\.]?.+)$/i; $1; }
+               grep { /^CustomRole\.|^AdminCc|^Cc|^Requestor|^Owner/i } @$required;
 
     # Pull out any must_be or must_not_be rules
     my %cf_must_values = ();
@@ -359,7 +384,49 @@ sub RequiredFields {
             }
         }
     }
-    return (\@core, \@cfs, \%cf_must_values);
+
+    my %role_group_values;
+    my $queue_id;
+    if ( $args{Ticket} ) {
+        $queue_id = $args{Ticket}->Queue;
+    }
+    else {
+        my $queue = RT::Queue->new( RT->SystemUser );
+        $queue->Load($args{Queue});
+        $queue_id = $queue->id;
+    }
+
+    foreach my $role (@roles){
+        if ( $role =~ /^CustomRole\.(.*)/i ) {
+            my $cr = RT::CustomRole->new(RT->SystemUser);
+            my $role_name = $1;
+            my ($ret, $msg) = $cr->Load($role_name);
+            if ( not $cr and $cr->Id ) {
+                RT::Logger->error("Could not load Custom role $role_name: $msg");
+                @roles = grep { $_ ne $role } @roles;
+                next;
+            } elsif ( not $cr->IsAdded($queue_id) or $cr->Disabled ) {
+                RT::Logger->error("Custom role $role_name is not applied to: " . $args{Ticket}->QueueObj->Name );
+                @roles = grep { $_ ne $role } @roles;
+                next;
+            }
+        }
+        if ( $config{$role} ){
+            my $transition = $config{$role}->{'transition'};
+            unless ( $transition ){
+                RT->Logger->error("No transition defined in group rules for $role");
+                next;
+            }
+
+            if ( $transition eq "$from -> $to"
+                || $transition eq "* -> $to"
+                || $transition eq "$from -> *" ) {
+
+                $role_group_values{$role} = $config{$role};
+            }
+        }
+    }
+    return (\@core, \@cfs, \@roles, \%cf_must_values, \%role_group_values);
 }
 
 =head3 CheckMandatoryFields
@@ -426,15 +493,14 @@ sub CheckMandatoryFields {
         return \@errors;
     }
 
-    my ($core, $cfs, $must_values) = $self->RequiredFields(
+    my ($core, $cfs, $roles, $must_values, $role_group_values) = $self->RequiredFields(
         Ticket  => $args{'Ticket'},
         Queue   => $args{'Queue'} ? $args{'Queue'}->Name : undef,
         From    => $args{'From'},
         To      => $args{'To'},
         NewQueue => $$ARGSRef{'Queue'},
     );
-
-    return \@errors unless @$core or @$cfs;
+    return \@errors unless @$core or @$cfs or @$roles;
 
     my $transition =  ($args{'From'} ||'') ne ($args{'To'} || '') ? 'Status' : 'Queue';
 
@@ -457,36 +523,6 @@ sub CheckMandatoryFields {
             : $CORE_FOR_CREATE{$field};
         next unless $arg;
 
-        if ($field eq 'Owner') {
-            my $value;
-
-            # There are 2 Owner fields on Jumbo page, copied the same handling from it.
-            if (ref $ARGSRef->{$arg}) {
-                foreach my $owner (@{$ARGSRef->{$arg}}) {
-                    if (defined($owner) && $owner =~ /\D/) {
-                        $value = $owner unless ($args{'Ticket'}->OwnerObj->Name eq $owner);
-                    }
-                    elsif (length $owner) {
-                        $value = $owner unless ($args{'Ticket'}->OwnerObj->id == $owner);
-                    }
-                }
-            }
-            else {
-                $value = $ARGSRef->{$arg};
-            }
-
-            if (($value || $args{'Ticket'}->$field()) == $RT::Nobody->id) {
-                push @errors,
-                  $CurrentUser->loc(
-                    "[_1] is required when changing [_2] to [_3]",
-                    $field,
-                    $CurrentUser->loc($transition),
-                    $CurrentUser->loc($field_label{$transition})
-                  );
-                next;
-            }
-        }
-
         next if defined $ARGSRef->{$arg} and length $ARGSRef->{$arg};
 
         # Do we have a value currently?
@@ -498,6 +534,230 @@ sub CheckMandatoryFields {
         push @errors,
           $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",
             $label, $CurrentUser->loc($transition),  $CurrentUser->loc($field_label{$transition}));
+    }
+
+    if (@$roles and $args{'To'}) {
+        foreach my $role (@$roles) {
+            my $role_values;
+            my $role_arg = $role;
+            my $role_name = $role;
+
+            my $role_object;
+            my @role_values;
+
+            my $value;
+
+            if ( $role =~ /^CustomRole\.(.+)/ ) {
+                $role_name = $1;
+                $role_object = RT::CustomRole->new( $CurrentUser );
+
+                my ( $ret, $msg ) = $role_object->Load($role_name);
+                push @errors, $CurrentUser->loc("Could not load object for [_1]", $role_name) unless $ret;
+                unless ( $ret ) {
+                    RT::Logger->error("Unable to load custom role $role_name: $msg");
+                    next;
+                }
+
+                $role_arg = $role_object->GroupType;
+
+                # No need to load current value for single-member custom roles
+                # as new passed value will override current one
+                if ( !$role_object->SingleValue && $args{Ticket} ) {
+
+                    $role_arg = "Add$role_arg";
+                    $role_values = $args{Ticket}->RoleGroup( $role_object->GroupType );
+                    if ( $role_values ) {
+                        push @role_values, grep { $_->id != $RT::Nobody->id } @{ $role_values->UserMembersObj->ItemsArrayRef };
+                    }
+                    else {
+                        RT::Logger->error( "Unable to load role group for " . $role_object->GroupType );
+                    }
+                }
+            }
+            else {
+                if ( $role eq 'Owner' ) {
+
+                    # There are 2 Owner fields on Jumbo page, copied the same handling from it.
+                    if ( ref $ARGSRef->{$role} ) {
+                        foreach my $owner ( @{ $ARGSRef->{$role} } ) {
+                            if ( defined($owner) && $owner =~ /\D/ ) {
+                                $value = $owner unless ( $args{'Ticket'}->OwnerObj->Name eq $owner );
+                            }
+                            elsif ( length $owner ) {
+                                $value = $owner unless ( $args{'Ticket'}->OwnerObj->id == $owner );
+                            }
+                        }
+                    }
+                    else {
+                        $value = $ARGSRef->{$role};
+                    }
+                }
+                else {
+                    $role_arg = "Add$role";
+                }
+
+                if ( $args{Ticket} ) {
+                    $role_values = RT::Group->new( $args{Ticket}->CurrentUser );
+                    my ( $ret, $msg ) = $role_values->LoadRoleGroup(
+                        Object => $args{Ticket},
+                        Name   => $role,
+                    );
+                    if ($ret) {
+                        push @role_values,
+                          grep { $_->id != $RT::Nobody->id } @{ $role_values->UserMembersObj->ItemsArrayRef };
+                    }
+                    else {
+                        push @errors, $CurrentUser->loc("Failed to load role $role for ticket");
+                    }
+                }
+            }
+
+            $value = $ARGSRef->{$role_arg} unless $role eq 'Owner';
+
+            if ($value) {
+
+                my $user = RT::User->new( RT->SystemUser );
+                $user->Load($value);
+                $user->LoadByEmail($value) unless $user->id;
+
+                if ( $user->id ) {
+                    if ( $role eq 'Owner' || ( $role_object && $role_object->SingleValue ) ) {
+                        if ( $user->id == $RT::Nobody->id ) {
+                            undef @role_values if @role_values;
+                        }
+                        else {
+                            @role_values = $user;
+                        }
+                    }
+                    else {
+                        push @role_values, $user unless $user->id == $RT::Nobody->id;
+                    }
+                }
+                else {
+                    # RT can automatically create users with email addresses.
+                    if ( $value =~ /@/ ) {
+                        push @role_values, $value;
+                    }
+                    else {
+                        push @errors, $CurrentUser->loc( "Could not load user: [_1]", $value );
+                    }
+                }
+            }
+            else {
+                if ( $role_object && $role_object->SingleValue ) {
+                    undef @role_values if @role_values;
+                }
+                delete $ARGSRef->{$role_arg};
+            }
+
+            # Handle multi-members roles on Jumbo page
+            my @values;
+
+            if ( $role =~ /^(AdminCc|Cc|Requestors)$/i || ( $role_object && !$role_object->SingleValue ) ) {
+                my $type = $role_object ? $role_object->GroupType : $role;
+
+                for my $arg ( keys %$ARGSRef ) {
+                    if ( $arg =~ /^WatcherTypeEmail(\d+)/ ) {
+                        my $num = $1;
+                        next unless $ARGSRef->{$arg} eq $type;
+                        my $address = $ARGSRef->{ 'WatcherAddressEmail' . $num };
+                        next unless $address;
+
+                        push @values, $address;
+                    }
+                    elsif ( $arg =~ /^Ticket-DeleteWatcher-Type-$type-Principal-(\d+)$/ ) {
+                        my $del_id = $1;
+                        @role_values = grep { ref $_ ? $_->id != $del_id : $_ } @role_values;
+                    }
+                }
+            }
+
+            for my $value (@values) {
+                my $user = RT::User->new( RT->SystemUser );
+                $user->Load($value);
+                $user->LoadByEmail($value) unless $user->id;
+
+                if ( $user->id ) {
+                    push @role_values, $user unless $user->id == $RT::Nobody->id;
+                }
+                else {
+                    # RT can automatically create users with email addresses.
+                    if ( $value =~ /@/ ) {
+                        push @role_values, $value;
+                    }
+                    else {
+                        push @errors, $CurrentUser->loc( "Could not load user: [_1]", $value );
+                    }
+                }
+            }
+
+            # Handle multi-members roles on Create page
+            if ( $role =~ /^(AdminCc|Cc|Requestors)$/i || ( $role_object && !$role_object->SingleValue ) ) {
+                my $type = $role_object ? $role_object->GroupType : $role;
+
+                if ( $ARGSRef->{$role} ) {
+                    for my $value ( RT::EmailParser->ParseEmailAddress( $ARGSRef->{$role} ) ) {
+                        my $user = RT::User->new( RT->SystemUser );
+                        $user->LoadByEmail($value);
+
+                        if ( $user->id ) {
+                            push @role_values, $user unless $user->id == $RT::Nobody->id;
+                        }
+                        else {
+                            # RT can automatically create users with email addresses.
+                            if ( $value =~ /@/ ) {
+                                push @role_values, $value;
+                            }
+                            else {
+                                push @errors, $CurrentUser->loc( "Could not load user: [_1]", $value );
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            # Check for mandatory group configuration, supports multiple groups where only
+            # one true case needs to be found.
+            if ( $role_group_values->{$role}->{group} ) {
+                my $has_valid_member;
+
+                foreach my $group_name ( @{ $role_group_values->{$role}->{group} } ) {
+                    my $group = RT::Group->new( RT->SystemUser );
+
+                    my ( $ret, $msg ) = $group->LoadUserDefinedGroup($group_name);
+                    unless ( $ret ) {
+                        RT::Logger->error("Failed to load group: $group_name : $msg");
+                        next;
+                    }
+
+                    foreach my $member (@role_values) {
+                        next unless ref $member; # Only check users alrady exist
+
+                        $has_valid_member = $group->HasMemberRecursively( $member->Id );
+                        last if $has_valid_member;
+                    }
+                    last if $has_valid_member;
+                }
+
+                unless ( $has_valid_member ) {
+                    my $roles = join( ' or ', @{ $role_group_values->{$role}->{group} } );
+                    push @errors,
+                        $CurrentUser->loc( "A member of group [_1] is required for role: [_2]", $roles, $role_name );
+                    next;
+                }
+            }
+
+
+            if ( not scalar @role_values ) {
+                push @errors, $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",
+                    $role_name,
+                    $CurrentUser->loc($transition),
+                    $CurrentUser->loc( $args{'To'} )
+                );
+                next;
+            }
+        }
     }
 
     return \@errors unless @$cfs;

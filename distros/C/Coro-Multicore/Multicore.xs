@@ -29,17 +29,29 @@
   #define SvREFCNT_dec_NN(sv) SvREFCNT_dec (sv)
 #endif
 
+#ifndef SvREFCNT_dec_simple_void_NN
+  #define SvREFCNT_dec_simple_void_NN(sv) SvREFCNT_dec (sv)
+#endif
+
 #ifndef SvREFCNT_inc_NN
   #define SvREFCNT_inc_NN(sv) SvREFCNT_inc (sv)
 #endif
 
-#define RECURSION_CHECK 0
+#ifndef RECURSION_CHECK
+  #define RECURSION_CHECK 0
+#endif
 
 static X_TLS_DECLARE(current_key);
 #if RECURSION_CHECK
 static X_TLS_DECLARE(check_key);
 #endif
 
+static void
+fatal (const char *msg)
+{
+  write (2, msg, strlen (msg));
+  abort ();
+}
 
 static s_epipe ep;
 static void *perl_thx;
@@ -192,7 +204,7 @@ pmapi_release (void)
 {
   #if RECURSION_CHECK
   if (X_TLS_GET (check_key))
-    croak ("perlinterp_release () called without valid perl context");
+    fatal ("FATAL: perlinterp_release () called without valid perl context");
 
   X_TLS_SET (check_key, &check_key);
   #endif
@@ -204,7 +216,7 @@ pmapi_release (void)
     }
 
   struct tctx *ctx = tctx_get ();
-  ctx->coro = SvREFCNT_inc_NN (CORO_CURRENT);
+  ctx->coro = SvREFCNT_inc_simple_NN (CORO_CURRENT);
   ctx->wait_f = 0;
 
   X_TLS_SET (current_key, ctx);
@@ -235,7 +247,7 @@ pmapi_acquire (void)
 
   #if RECURSION_CHECK
   if (X_TLS_GET (check_key) != &check_key)
-    croak ("perlinterp_acquire () called with valid perl context");
+    fatal ("FATAL: perlinterp_acquire () called with valid perl context");
 
   X_TLS_SET (check_key, 0);
   #endif
@@ -291,10 +303,12 @@ BOOT:
 
 	I_CORO_API ("Coro::Multicore");
 
+        if (0) { /*D*/
         X_LOCK (release_m);
         while (idle < min_idle)
           start_thread ();
         X_UNLOCK (release_m);
+        }
 
         /* not perfectly efficient to do it this way, but it is simple */
 	perl_multicore_init (); /* calls release */
@@ -353,7 +367,7 @@ poll (...)
           {
             struct tctx *ctx = tctxs_get (&acquirers);
             CORO_READY ((SV *)ctx->coro);
-            SvREFCNT_dec_NN ((SV *)ctx->coro);
+            SvREFCNT_dec_simple_void_NN ((SV *)ctx->coro);
             ctx->coro = 0;
           }
 	X_UNLOCK (acquire_m);

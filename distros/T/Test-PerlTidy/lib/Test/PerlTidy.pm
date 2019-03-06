@@ -1,7 +1,9 @@
 package Test::PerlTidy;
 
+use 5.014;
 use strict;
 use warnings;
+use English qw( -no_match_vars );
 
 use parent 'Exporter';
 
@@ -10,15 +12,15 @@ use vars qw( @EXPORT );    ## no critic (Modules::ProhibitAutomaticExportation)
 
 use Carp;
 use File::Finder;
-use File::Slurp;
+use Path::Tiny qw( path );
 use File::Spec;
 use IO::File;
-use Perl::Tidy;
+use Perl::Tidy 20181120;
 use Test::Builder;
 use Text::Diff;
 
 our $VERSION;
-$VERSION = '20130104';
+$VERSION = '20190305';
 
 my $test = Test::Builder->new;
 
@@ -67,7 +69,11 @@ sub is_file_tidy {
 
     # If there were perltidy errors report them and return.
     $stderr_fh->seek( 0, 0 );
-    my $stderr = read_file($stderr_fh);
+    binmode $stderr_fh, ':encoding(UTF-8)' or croak "error setting binmode $!";
+    my $stderr = do {
+        local $INPUT_RECORD_SEPARATOR = undef;
+        <$stderr_fh>;
+    };
     if ($stderr) {
         unless ($MUTE) {
             $test->diag("perltidy reported the following errors:\n");
@@ -80,7 +86,7 @@ sub is_file_tidy {
     # Do not worry about trailing newlines.
     #
     $code_to_tidy =~ s/[\r\n]+$//;
-    $tidied_code =~ s/[\r\n]+$//;
+    $tidied_code  =~ s/[\r\n]+$//;
     if ( $code_to_tidy eq $tidied_code ) {
         return 1;
     }
@@ -118,8 +124,6 @@ sub list_files {
 
     $path ||= q{.};
 
-    $test->BAIL_OUT('You need to specify which directory to scan') unless $path;
-
     $test->BAIL_OUT(qq{The directory "$path" does not exist}) unless -d $path;
 
     my $excludes = $args{exclude} || ['blib/'];    # exclude blib by default
@@ -129,9 +133,12 @@ sub list_files {
 
     my $finder = File::Finder->type('f')->name(qr{[.](?:pl|pm|PL|t)$});
     $finder->{options}->{untaint} = 1;
+    $finder->{options}->{untaint_pattern} =
+      qr{^((\p{IsAlphabetic}:)?[-+@\w./~[(][)] ]+)$}x ## no critic (Variables::ProhibitPunctuationVars)
+      if $OSNAME eq 'MSWin32';
     my @files = $finder->in($path);
 
-    my %keep = map { File::Spec->canonpath($_) => 1 } @files;
+    my %keep     = map { File::Spec->canonpath($_) => 1 } @files;
     my @excluded = ();
 
     foreach my $file ( keys %keep ) {
@@ -167,7 +174,7 @@ sub load_file {
     return unless -f $filename;
 
     # Slurp the file.
-    my $content = read_file($filename);
+    my $content = path($filename)->slurp_utf8;
     return $content;
 }
 
@@ -175,9 +182,17 @@ sub load_file {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Test::PerlTidy - check that all your files are tidy.
+Test::PerlTidy
+
+=head1 VERSION
+
+version 20190305.001
 
 =head1 SYNOPSIS
 
@@ -206,6 +221,16 @@ Fear not though - now you too can have your very own formatting
 gestapo in the form of Test::PerlTidy! Simply add a test file as
 suggested above and any file ending in .pl, .pm, .t or .PL will cause
 a test fail unless it is exactly as perltidy would like it to be.
+
+=for stopwords Hmmm perltidy cvs perltidyrc subdirectories listref canonified pre von der Leszczynski perl
+
+=head1 NAME
+
+Test::PerlTidy - check that all your files are tidy.
+
+=head1 VERSION
+
+version 20190305.001
 
 =head1 REASONS TO DO THIS
 
@@ -350,5 +375,15 @@ Copyright 2007 Edmund von der Burg, all rights reserved.
 This library is free software . You can redistribute it and/or modify
 it under the same terms as perl itself.
 
-=cut
+=head1 AUTHOR
 
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Edmund von der Burg.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

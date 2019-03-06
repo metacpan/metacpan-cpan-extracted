@@ -87,7 +87,7 @@ sub ProcessCTMD($$$);
 sub ProcessExifInfo($$$);
 sub SwapWords($);
 
-$VERSION = '3.98';
+$VERSION = '4.07';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -101,7 +101,8 @@ $VERSION = '3.98';
      },
     -1 => 'n/a',
      1 => 'Canon EF 50mm f/1.8',
-     2 => 'Canon EF 28mm f/2.8',
+     2 => 'Canon EF 28mm f/2.8 or Sigma Lens',
+     2.1 => 'Sigma 24mm f/2.8 Super Wide II', #ClaudeJolicoeur
      # (3 removed in current Kamisaka list)
      3 => 'Canon EF 135mm f/2.8 Soft', #15/32
      4 => 'Canon EF 35-105mm f/3.5-4.5 or Sigma Lens', #28
@@ -359,7 +360,8 @@ $VERSION = '3.98';
     188 => 'Canon EF 70-200mm f/4L USM + 2x', #PH
     189 => 'Canon EF 70-200mm f/4L USM + 2.8x', #32
     190 => 'Canon EF 100mm f/2.8 Macro USM', # (+USM ref 42)
-    191 => 'Canon EF 400mm f/4 DO IS', #9
+    191 => 'Canon EF 400mm f/4 DO IS or Sigma Lens', #9
+    191.1 => 'Sigma 500mm f/4 DG OS HSM', #AndrewSheih
     193 => 'Canon EF 35-80mm f/4-5.6 USM', #32
     194 => 'Canon EF 80-200mm f/4.5-5.6 USM', #32
     195 => 'Canon EF 35-105mm f/4.5-5.6 USM', #32
@@ -432,6 +434,9 @@ $VERSION = '3.98';
     368 => 'Sigma 14-24mm f/2.8 DG HSM | A or other Sigma Lens', #IB (A018)
     368.1 => 'Sigma 20mm f/1.4 DG HSM | A', #50 (newer firmware)
     368.2 => 'Sigma 50mm f/1.4 DG HSM | A', #50
+    368.3 => 'Sigma 40mm f/1.4 DG HSM | A', #IB (018)
+    368.4 => 'Sigma 60-600mm f/4.5-6.3 DG OS HSM | S', #IB (018)
+    368.5 => 'Sigma 28mm f/1.4 DG HSM | A', #IB (A019)
     # Note: LensType 488 (0x1e8) is reported as 232 (0xe8) in 7D CameraSettings
     488 => 'Canon EF-S 15-85mm f/3.5-5.6 IS USM', #PH
     489 => 'Canon EF 70-300mm f/4-5.6L IS USM', #Gerald Kapounek
@@ -451,7 +456,8 @@ $VERSION = '3.98';
     495.1 => 'Sigma 24-70mm F2.8 DG OS HSM | A', #IB (017)
     496 => 'Canon EF 200-400mm f/4L IS USM', #PH
     499 => 'Canon EF 200-400mm f/4L IS USM + 1.4x', #50
-    502 => 'Canon EF 28mm f/2.8 IS USM', #PH
+    502 => 'Canon EF 28mm f/2.8 IS USM or Tamron Lens', #PH
+    502.1 => 'Tamron 35mm f/1.8 Di VC USD (F012)', #forum9757
     503 => 'Canon EF 24mm f/2.8 IS USM', #PH
     504 => 'Canon EF 24-70mm f/4L IS USM', #PH
     505 => 'Canon EF 35mm f/2 IS USM', #PH
@@ -492,6 +498,7 @@ $VERSION = '3.98';
     4156 => 'Canon EF 50mm f/1.8 STM', #42
     4157 => 'Canon EF-M 18-150mm 1:3.5-6.3 IS STM', #42
     4158 => 'Canon EF-S 18-55mm f/4-5.6 IS STM', #PH
+    4159 => 'Canon EF-M 32mm f/1.4 STM', #42
     4160 => 'Canon EF-S 35mm f/2.8 Macro IS STM', #42
     # (Nano USM lenses - 0x90xx)
     36910 => 'Canon EF 70-300mm f/4-5.6 IS II USM', #42
@@ -750,6 +757,7 @@ $VERSION = '3.98';
     0x4180000 => 'PowerShot G1 X Mark III', #IB
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
     0x801     => 'PowerShot SX740 HS',
+    0x805     => 'PowerShot SX70 HS',
 
 # (see http://cweb.canon.jp/e-support/faq/answer/digitalcamera/10447-1.html for PowerShot/IXUS/IXY names)
 
@@ -849,6 +857,7 @@ $VERSION = '3.98';
     0x80000422 => 'EOS Rebel T100 / 4000D / 3000D', #IB (3000D in China; Kiss? - PH)
     0x80000424 => 'EOR R', #IB
     0x80000432 => 'EOS Rebel T7 / 2000D / 1500D / Kiss X90', #IB
+    0x80000433 => 'EOS RP',
 );
 
 my %canonQuality = (
@@ -1792,8 +1801,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'ColorData8',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData8' },
         },
-        {   # (int16u[1820]) - M50, ref PH
-            Condition => '$count == 1820',
+        {   # (int16u[1816|1820|1824]) - M50 (1820) ref PH, EOS R (1824), EOS RP, SX70 (1816) ref IB
+            Condition => '$count == 1816 or $count == 1820 or $count == 1824',
             Name => 'ColorData9',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData9' },
         },
@@ -1871,8 +1880,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'VignettingCorrUnknown2',
         Condition => '$$valPt !~ /^\0\0\0\0/',
         SubDirectory => {
-            # (the size word is at byte 4 for version 3 of this structure)
-            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart+4,$size)',
+            # (the size word is at byte 4 for version 3 of this structure, but not always!)
+            # Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart+4,$size)',
             TagTable => 'Image::ExifTool::Canon::VignettingCorrUnknown',
         },
     }],
@@ -2030,7 +2039,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             9 => 'MOV', # (S95 MOV)
             10 => 'MP4', # (SX280 MP4)
             11 => 'CRM', #PH (C200 CRM)
-            13 => 'CR3', #PH (NC)
+            12 => 'CR3', #PH (EOS R)
+            13 => 'CR3+JPEG', #PH (EOS R)
         },
     },
     10 => {
@@ -7774,7 +7784,7 @@ my %ciMaxFocal = (
     },
 );
 
-# Color data (MakerNotes tag 0x4001, count=1820) (ref PH)
+# Color data (MakerNotes tag 0x4001, count=1820,etc) (ref PH)
 %Image::ExifTool::Canon::ColorData9 = (
     %binaryDataAttrs,
     FORMAT => 'int16s',
@@ -7788,6 +7798,8 @@ my %ciMaxFocal = (
         RawConv => '$$self{ColorDataVersion} = $val',
         PrintConv => {
             16 => '16 (M50)',
+            17 => '17 (EOS R)',     # (and PowerShot SX740HS)
+            18 => '18 (EOS RP)',    # (and PowerShot SX70HS)
         },
     },
     0x47 => { Name => 'WB_RGGBLevelsAsShot',     Format => 'int16s[4]' },
@@ -8542,7 +8554,7 @@ my %filterConv = (
 # Canon CNOP atoms (ref PH)
 %Image::ExifTool::Canon::CNOP = (
     GROUPS => { 0 => 'MakerNotes', 1 => 'Canon', 2 => 'Video' },
-    # CNFB - 52 bytes (7DmkII,M50)
+    # CNFB - 52 bytes (7DmkII,M50,C200)
     # CNMI - 4 bytes: "0x20000001" (C200)
     # CNCM - 48 bytes: original file name in bytes 24-31 (C200)
 );
@@ -9461,7 +9473,7 @@ Canon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2018, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2019, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

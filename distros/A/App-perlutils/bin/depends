@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+# abstract: list dependencies for perl modules/scripts, with core info
+
+use vars qw($VERSION);
+our $VERSION = '0.014';
+
+use strict;
+use File::Find::Rule;
+use File::LibMagic ':easy';
+use Module::CoreList;
+use Term::ExtendedColor qw(fg);
+use File::LsColor qw(ls_color);
+
+my $file = shift;
+
+my @perls;
+if(-d $file) {
+  my $ff = File::Find::Rule->new;
+  $ff->file;
+  $ff->name('*.pm', '*.pl');
+  @perls = grep{!/blib/ } $ff->in( $file );
+}
+elsif(-f $file) {
+  @perls = $file;
+}
+
+if(!@perls) {
+  my $ff = File::Find::Rule->new;
+  $ff->file;
+  @perls = grep{!/(?:blib|[.]git)/ } $ff->in( '.' );
+  @perls = grep{ MagicFile($_) =~ m/perl/i } @perls;
+}
+
+
+@perls or print "No Perl files found.\n" and exit;
+
+my %result = %{ get_modules(@perls) };
+
+my $previous;
+for my $file(sort(keys(%result))) {
+  if($previous ne $file) {
+    $previous = $file;
+    print "\n";
+  }
+
+  for my $module(@{$result{$file}}) {
+    my ($in_core) = Module::CoreList->find_modules($module);
+    if($in_core) {
+      printf("%s %s (perl v%s)\n",
+        ls_color($file),
+        $module,
+        fg('blue4', Module::CoreList->first_release_by_date($module))
+      );
+      next;
+    }
+    printf("%s %s\n", ls_color($file), $module);
+  }
+}
+
+
+sub get_modules {
+  my @files = @_;
+
+  my %used_modules;
+
+  for my $file(@files) {
+    open(my $fh, '<', $file) or die($!);
+    $file =~ s|.+/(.+)$|$1|;
+    while(chomp(my $line = <$fh>)) {
+      if( $line =~ m/\s*(?:use|require)\s+(\S+).*;/ ) {
+        push(@{ $used_modules{$file} }, $1);
+      }
+    }
+  }
+  return \%used_modules;
+}

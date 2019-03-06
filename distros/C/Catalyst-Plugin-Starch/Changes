@@ -1,5 +1,10 @@
 Revision history for Perl extension Catalyst-Plugin-Starch.
 
+0.06 2019-03-06T07:39:48Z
+
+ - Hopefully fix an odd, test-only, module load issue:
+   http://cpantesters.org/cpan/report/bd8a7800-6bf9-1014-92e3-77cacc8b0502
+
 0.05 2019-03-02T20:53:45Z
 
  - Declare deps as modules, not distros.

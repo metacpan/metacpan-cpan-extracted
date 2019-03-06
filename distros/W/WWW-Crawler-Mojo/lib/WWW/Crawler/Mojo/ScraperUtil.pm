@@ -91,7 +91,7 @@ sub html_handler_presets {
             push(@{$seed{$name}}, $e->{value}) if $name;
           }
           if ($name) {
-            if (grep { $_ eq $type } qw{text hidden number}) {
+            if (grep { $_ eq $type } qw{text hidden number password date}) {
               push(@{$seed{$name}}, $e->{value});
             }
             elsif (grep { $_ eq $type } qw{checkbox}) {
@@ -103,7 +103,7 @@ sub html_handler_presets {
           }
         }
       );
-
+      
       return [
         $dom->{action} || '',
         uc($dom->{method} || 'GET'),
@@ -146,7 +146,7 @@ sub reduce_html_handlers {
 
 sub resolve_href {
   my ($base, $href) = @_;
-  $href =~ s{\s}{}g;
+  $href =~ s{^\s|\s$|\n}{}g;
   $href = ref $href ? $href : Mojo::URL->new($href);
   $base = ref $base ? $base : Mojo::URL->new($base);
   my $abs        = $href->fragment(undef)->to_abs($base);

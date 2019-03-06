@@ -4,7 +4,7 @@
       "KPEE."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.0.15",
    "license" : [
       "perl_5"
    ],
@@ -55,13 +55,15 @@
    "provides" : {
       "App::cpanmw" : {
          "file" : "lib/App/cpanmw.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
-      "KPEE <kpee.cpan@gmail.com>"
-   ]
+      "KPEE <kpee.cpan@gmail.com>",
+      "KPEE <kpee.cpanx@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

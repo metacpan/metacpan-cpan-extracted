@@ -1,10 +1,10 @@
 {
-   "abstract" : "Simplified alternative to Alien::FFI that uses system libffi",
+   "abstract" : "(Deprecated) Simplified alternative to Alien::FFI that uses system libffi",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -59,17 +59,20 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/Alt-Alien-FFI-System/issues"
+         "web" : "https://github.com/Perl5-FFI/FFI-Platypus/issues"
       },
-      "homepage" : "https://metacpan.org/pod/Alt::Alien::FFI::System",
+      "homepage" : "https://alienfile.org",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/Alt-Alien-FFI-System.git",
-         "web" : "https://github.com/plicease/Alt-Alien-FFI-System"
-      }
+         "url" : "git://github.com/Perl5-FFI/Alt-Alien-FFI-System.git",
+         "web" : "https://github.com/Perl5-FFI/Alt-Alien-FFI-System"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "version" : "0.23",
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.29.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_use_unsafe_inc" : 0
 }
 

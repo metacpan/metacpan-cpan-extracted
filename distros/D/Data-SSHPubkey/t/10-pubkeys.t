@@ -64,4 +64,12 @@ $deeply->(
     \%onlytypes, "all types tested for"
 );
 
-plan tests => 3 + 4 * scalar @keyfiles
+open my $fh, '<', File::Spec->catfile( 't', $keyfiles[0] ) or die "huh? $!";
+binmode $fh;
+$ret = Data::SSHPubkey::pubkeys($fh);
+is( scalar @$ret, 1,     "one key" );
+is( $ret->[0][0], "PEM", "first key is PEM" );
+
+dies_ok { Data::SSHPubkey::pubkeys };
+
+plan tests => 6 + 4 * scalar @keyfiles

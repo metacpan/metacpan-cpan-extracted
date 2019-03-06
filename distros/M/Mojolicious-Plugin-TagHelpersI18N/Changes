@@ -1,6 +1,11 @@
 History for Mojolicious::Plugin::TagHelpersI18N
 ===============================================
 
+0.04  2019-03-05 15:03:00
+
+      * improve option handling
+      * add tests
+
 0.03  2014-12-11
 
       [IMPROVEMENTS]

@@ -1,18 +1,17 @@
-#!/usr/bin/perl
+#!perl
 use 5.008001;
 use strict;
 use File::Which;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 $App::cpanmw::VERSION = $VERSION;
 
-my ( $IS_WIN32, $IS_WIN60 );
+use constant IS_WIN32 => $^O eq 'MSWin32';
+use constant IS_WIN60 => IS_WIN32 && $ENV{HOMEPATH} && $ENV{HOMEPATH} =~ /^\\Users\\/;
 
 # Conditional load
 BEGIN {
-    $IS_WIN32 = $^O eq 'MSWin32';
-    $IS_WIN60 = $IS_WIN32 && $ENV{HOMEPATH} && $ENV{HOMEPATH} =~ /^\\Users\\/;
-    if ($IS_WIN32) {
+    if (IS_WIN32) {
         require Win32::Console::ANSI;
         Win32::Console::ANSI->import();
     }
@@ -27,7 +26,7 @@ my $cpanm_file = File::Which::which 'cpanm';
 $cpanm_file =~ s/\\/\//g;
 
 # override system & symlink for App::cpanminus::script
-if ($IS_WIN32) {
+if (IS_WIN32) {
     no warnings 'once';
     *App::cpanminus::script::system = sub {
         my $cmd = shift;
@@ -36,7 +35,7 @@ if ($IS_WIN32) {
     };
     # hack for making 'latest-build' as symlink
     # Windows6.x can make symlink via 'mklink' utility
-    if ($IS_WIN60) {
+    if (IS_WIN60) {
         *CORE::GLOBAL::symlink = sub {
             my ( $org, $dest ) = @_;
             return 1 unless ( $org || $dest );
@@ -60,13 +59,12 @@ my $org_m;
     no strict 'refs';
     $org_m = +{
         map { $_ => \&{ "App::cpanminus::script::" . $_ } }
-#            qw/diag diag_ok diag_fail run_timeout/ };
-            qw/_diag run_timeout/
+           qw/_diag show_help show_version/
     };
 }
 
 ## Hooks for Win6.0
-if ($IS_WIN60) {
+if (IS_WIN60) {
 # hack: kill -9,$pid[perlport#kill@win32] does not work on perl-5.18.
 #       use 'taskkill' instead.
     *_kill_group = sub {
@@ -132,7 +130,7 @@ if ($IS_WIN60) {
         elsif ( $arg[1] =~ /^==>/ ) {
             $arg[1] =~ s/(Found dependencies)/colored($1,'bold magenta')/e;
         }
-        elsif ( $arg[1] =~ s/^(Successfully \S*)/colored($1,'bold green')/e )
+        elsif ( $arg[1] =~ s/^(Successfully \S+)(\s+\S+)/colored($1,'bold green') . colored($2, 'bold yellow')/e )
         {
         }
         elsif ( $_[0]->{verbose} ) {
@@ -166,8 +164,8 @@ if ($IS_WIN60) {
         require IO::Callback;
         my $cb = sub {
             my $s = shift;
-            $s =~ s/cpanm /cpanmw /g;
-            $s =~ s/PERL_CPANM_OPT /PERL_CPANM_OPT( not CPANM*W* ) /g;
+            $s =~ s/\bcpanm\b/cpanmw/g;
+            $s =~ s/ PERL_CPANM_OPT / PERL_CPANM_OPT( not PERL_CPANMW_OPT ) /g;
             print STDOUT $s;
         };
         my $fh = IO::Callback->new( '>', $cb );
@@ -203,49 +201,76 @@ cpanmw - the cpanm wrapper
 
 This script is wrapper for L<cpanm>.
 
-It can use like cpanm, but has some features.
+Commands and options are completely the same as L<cpanm>.
+See L<cpanm> for details.
+
+It can use like L<cpanm>, but has some features.
 
 =over 4
 
-=item - colorized messages and keywords
+=item - Display color-coded phrases and keywords
 
-    This feature requires L<Win32::Console::ANSI> on MSWin32.
+Several phrases and keywords are displayed in different colors.
 
-=item - Supports --<PHASE>-timeout options
-on MSWin32
+=over 2
 
-    In cpanm they are replaced to --<PHASE>.
+=item * BOLD GREEN for Success
 
-=item - Create ~/.cpanm/build.log as hardlink on MSWin32
+=item * BOLD RED for Fail and Error messages
 
-    Requires Windows 6.0(Vista) or later.
-    Otherwise, it is copied from work directory.
+=item * BOLD YELLOW for Module-Name and Dist-Name
 
-=item - Create ~/.cpanm/latest-build/ as junction point on MSWin32
+=item * CYAN for Progress Keywords (eg. Fetching..., Building...)
 
-    Requires the same conditions about OS version.
-    Doesn't create it if not.
+=item * YELLOW for Outputs from L<cpanm> (except from external tool)
 
 =back
 
-Commands and options are completely the same as cpanm.
-See L<cpanm> for details.
+This feature requires L<Win32::Console::ANSI> on Win32.
 
-=head1 DEPENDENCIES
+=item - Supports --****-timeout options on Win32
 
-App::cpanminus
+In L<cpanm>, --****-timeout option is ignored on Win32.
+cpanmw makes it possible by emulates this.
 
-File::Which
+=item - Create ~/.cpanm/build.log as symbolic link on Win32
 
-FindBin
+Perl-CORE does not support symlink,
+so L<cpanm> is skip this process.
+cpanmw emulates symlink by using Windows' "mklink" command,
+then make it possible.
 
-Term::ANSIColor
+This feature requires Windows 6.0(aka. Windows Vista) or later.
+Otherwise, it is copied from work directory
+(This is the default behavior of L<cpanm>)
 
-Win32::Console::ANSI ( MSWin32 only )
+=over 4
 
-IO::Callback
+=item NOTE: If an error "permission denied" occurs...
 
-version
+=over 2
+
+Your user account does not have administrator privileges
+(exactly authority "SeCreateSymbolicLinkPrivilege" is required).
+
+You can check by typing the following,
+then check the error message.
+
+    > cd %Temp% && mklink foo bar
+
+=back
+
+=back
+
+=item - Create ~/.cpanm/latest-build/ as junction point on Win32
+
+cpanmw makes this possible by the mechanism of previous section.
+
+Doesn't create it if not.
+
+This feature requires Windows 5.0(aka. Windows 2000) or later.
+
+=back
 
 =head1 AUTHOR
 
@@ -258,8 +283,7 @@ This library is free software; you can redistribute it and/or modify it under th
 
 =head1 SEE ALSO
 
-L<App::cpanminus>
-
+L<App::cpanminus>,
 L<cpanm>
 
 =cut

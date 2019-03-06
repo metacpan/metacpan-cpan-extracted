@@ -11,17 +11,17 @@ subtest "no args" => sub {
 };
 
 subtest "by name" => sub {
-    catch_run('test1');
+    catch_run('a');
     done_testing(1);
 };
 
 subtest "by tag1" => sub {
-    catch_run('[tag1]');
-    done_testing(4);
+    catch_run('[single]');
+    done_testing(3);
 };
 
 subtest "by tag2" => sub {
-    catch_run('[tag2]');
+    catch_run('[multi]');
     done_testing(2);
 };
 
@@ -30,7 +30,7 @@ subtest "import" => sub {
     {
         no warnings 'redefine';
         local *Test::More::done_testing = sub { $called = 1};
-        Test::Catch->import("[tag2]");
+        Test::Catch->import("[multi]");
     }
     ok($called);
     done_testing(3);

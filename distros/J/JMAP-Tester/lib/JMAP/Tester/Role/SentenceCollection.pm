@@ -1,5 +1,5 @@
 package JMAP::Tester::Role::SentenceCollection;
-$JMAP::Tester::Role::SentenceCollection::VERSION = '0.022';
+$JMAP::Tester::Role::SentenceCollection::VERSION = '0.025';
 use Moo::Role;
 
 requires 'sentence_broker';
@@ -345,7 +345,7 @@ JMAP::Tester::Role::SentenceCollection
 
 =head1 VERSION
 
-version 0.022
+version 0.025
 
 =head1 METHODS
 

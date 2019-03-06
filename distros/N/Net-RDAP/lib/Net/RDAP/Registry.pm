@@ -8,7 +8,15 @@ use File::stat;
 use HTTP::Request::Common;
 use JSON;
 use Net::RDAP::UA;
+use Net::RDAP::Registry::IANARegistry;
 use vars qw($UA $REGISTRY);
+use constant {
+	IP4_URL	=> 'https://data.iana.org/rdap/ipv4.json',
+	IP6_URL => 'https://data.iana.org/rdap/ipv6.json',
+	DNS_URL => 'https://data.iana.org/rdap/dns.json',
+	ASN_URL => 'https://data.iana.org/rdap/asn.json',
+	TAG_URL => 'https://data.iana.org/rdap/object-tags.json',
+};
 use strict;
 
 #
@@ -32,6 +40,7 @@ L<Net::RDAP::Registry> - an interface to the IANA RDAP registries.
 	$url = Net::RDAP::Registry->get_url(Net::IP->new('192.168.0.1'));
 	$url = Net::RDAP::Registry->get_url(Net::IP->new('2001:DB8::/32'));
 	$url = Net::RDAP::Registry->get_url(Net::ASN->new(65536));
+	$url = Net::RDAP::Registry->get_url("ABC123-TAG");
 
 =head1 DESCRIPTION
 
@@ -102,28 +111,27 @@ sub ip {
 	my ($package, $ip) = @_;
 	croak(sprintf('Argument to %s->ip() must be a Net::IP', $package)) unless ('Net::IP' eq ref($ip));
 
-	my $registry = $package->load_registry(4 == $ip->version ? 'https://data.iana.org/rdap/ipv4.json' : 'https://data.iana.org/rdap/ipv6.json');
+	my $registry = $package->load_registry(4 == $ip->version ? IP4_URL : IP6_URL);
 	return undef if (!$registry);
 
-	my $matches = {};
-	SERVICE: foreach my $service (@{$registry->{'services'}}) {
-		VALUE: foreach my $value (@{$service->[0]}) {
+	my %matches;
+	SERVICE: foreach my $service ($registry->services) {
+		VALUE: foreach my $value ($service->registries) {
 			my $range = Net::IP->new($value);
 
 			if ($range->overlaps($ip)) {
-				$matches->{$value} = $service->[1];
+				$matches{$value} = $package->get_best_url($service->urls);
 				last VALUE;
-
 			}
 		}
 	}
 
-	return undef if (scalar(keys(%{$matches})) < 1);
+	return undef if (scalar(keys(%matches)) < 1);
 
 	# prefer the service with the longest prefix length
-	my @urls = @{$matches->{(sort { Net::IP->new($b)->prefixlen <=> Net::IP->new($a)->prefixlen } keys(%{$matches}))[0]}};
+	my $longest = (sort { Net::IP->new($b)->prefixlen <=> Net::IP->new($a)->prefixlen } keys(%matches))[0];
 
-	return $package->assemble_url($package->get_best_url(@urls), 'ip', split(/\//, $ip->prefix));
+	return $package->assemble_url($matches{$longest}, 'ip', split(/\//, $ip->prefix));
 }
 
 #
@@ -133,41 +141,41 @@ sub autnum {
 	my ($package, $autnum) = @_;
 	croak(sprintf('Argument to %s->autnum() must be a Net::ASN', $package)) unless ('Net::ASN' eq ref($autnum));
 
-	my $registry = $package->load_registry('https://data.iana.org/rdap/asn.json');
+	my $registry = $package->load_registry(ASN_URL);
 	return undef if (!$registry);
 
-	my $matches = {};
-	SERVICE: foreach my $service (@{$registry->{'services'}}) {
-		VALUE: foreach my $value (@{$service->[0]}) {
+	my %matches;
+	SERVICE: foreach my $service ($registry->services) {
+		VALUE: foreach my $value ($service->registries) {
 			if ($value == $autnum->toasplain) {
-				# exact match, create an entry for NNNN-NNN where both sides are
+				# exact match, create an entry for NNNN-NNNN where both sides are
 				# the same (simplifies sorting later)
-				$matches = { sprintf('%d-%d', $value, $value) => $service->[1] };
+				$matches{sprintf('%d-%d', $value, $value)} = $package->get_best_url($service->urls);
 				last SERVICE;
 
 			} elsif ($value =~ /^(\d+)-(\d+)$/) {
 				if ($1 <= $autnum->toasplain && $autnum->toasplain <= $2) {
-					$matches->{$value} = $service->[1];
+					$matches{sprintf('%d-%d', $value, $value)} = $package->get_best_url($service->urls);
 					last VALUE;
 				}
 			}
 		}
 	}
 
-	return undef if (scalar(keys(%{$matches})) < 1);
+	return undef if (scalar(keys(%matches)) < 1);
 
-	my @ranges = keys(%{$matches});
+	my @ranges = keys(%matches);
+
 	# convert array of NNNN-NNNN strings to array of array refs
 	my @pairs = map { [ split(/-/, $_, 2) ] } @ranges;
 
 	# sort by descending order of the "width" of the range
 	my @sorted = sort { $b->{1} - $b->{0} <=> $a->{1} - $a->{0} } @pairs;
 
-	my $range = sprintf('%d-%d', @{$sorted[0]});
+	# prefer the narrowest (more specific) range
+	my $closest = sprintf('%d-%d', @{$sorted[0]});
 
-	my @urls = @{$matches->{$range}};
-
-	return $package->assemble_url($package->get_best_url(@urls), 'autnum', $autnum->toasplain);
+	return $package->assemble_url($matches{$closest}, 'autnum', $autnum->toasplain);
 }
 
 #
@@ -177,25 +185,20 @@ sub domain {
 	my ($package, $domain) = @_;
 	croak(sprintf('Argument to %s->domain() must be a Net::DNS::Domain', $package)) unless ('Net::DNS::Domain' eq ref($domain));
 
-	my $registry = $package->load_registry('https://data.iana.org/rdap/dns.json');
+	my $registry = $package->load_registry(DNS_URL);
 	return undef if (!$registry);
 
-	my $matches = {};
-	SERVICE: foreach my $service (@{$registry->{'services'}}) {
-		VALUE: foreach my $value (@{$service->[0]}) {
-			if (lc($domain->name) eq lc($value)) {
-				$matches = { $value => $service->[1] };
-				last SERVICE;
-
-			} elsif ($domain->name =~ /\.$value$/i) {
-				$matches->{$value} = $service->[1];
+	my %matches;
+	SERVICE: foreach my $service ($registry->services) {
+		VALUE: foreach my $value ($service->registries) {
+			if ($domain->name =~ /\.$value$/i) {
+				$matches{$value} = $package->get_best_url($service->urls);
 				last VALUE;
-
 			}
 		}
 	}
 
-	if (scalar(keys(%{$matches})) < 1) {
+	if (scalar(keys(%matches)) < 1) {
 		if ($domain->name =~ /\.(in-addr|ip6)\.arpa$/) {
 			# special workaround for the lack of .arpa in the RDAP registry
 			return $package->reverse_domain($domain);
@@ -207,9 +210,9 @@ sub domain {
 
 	} else {
 		# prefer the service with the longest domain name
-		my @urls = @{$matches->{(sort { length($b) <=> length($a) } keys(%{$matches}))[0]}};
+		my $parent = (sort { length($b) <=> length($a) } keys(%matches))[0];
 
-		return $package->assemble_url($package->get_best_url(@urls), 'domain', $domain->name);
+		return $package->assemble_url($matches{$parent}, 'domain', $domain->name);
 	}
 }
 
@@ -275,19 +278,22 @@ sub reverse_domain {
 	return URI->new_abs(sprintf('../../domain/%s', $domain->name), $url);
 }
 
+#
+# get URL for a tagged entity
+#
 sub entity {
 	my ($package, $handle) = @_;
 
 	my @parts = split(/-/, $handle);
 	my $tag = pop(@parts);
 
-	my $registry = $package->load_registry('https://data.iana.org/rdap/object-tags.json');
+	my $registry = $package->load_registry(TAG_URL);
 	return undef if (!$registry);
 
-	foreach my $service (@{$registry->{'services'}}) {
-		foreach my $value (@{$service->[1]}) {
-			# unlike the other registries we are only looking for an exact match as there is no hierarchy to tag
-			return $package->assemble_url($package->get_best_url(@{$service->[2]}), 'entity', $handle) if (lc($value) eq lc($tag));
+	foreach my $service ($registry->services) {
+		foreach my $value ($service->registries) {
+			# unlike the other registries we are only looking for an exact match, as there is no hierarchy:
+			return $package->assemble_url($package->get_best_url($service->urls), 'entity', $handle) if (lc($value) eq lc($tag));
 		}
 	}
 
@@ -296,7 +302,8 @@ sub entity {
 
 #
 # load a registry. uses (in order of preference) an in-memory cache, a JSON file on disk,
-# or a resource on the IANA website.
+# or a resource on the IANA website. returns a Net::RDAP::Registry::IANARegistry object
+# (or undef)
 #
 sub load_registry {
 	my ($package, $url) = @_;
@@ -340,10 +347,10 @@ sub load_registry {
 		}
 
 		if (-e $file) {
-			return from_json(read_file($file));
+			$REGISTRY->{$url} = Net::RDAP::Registry::IANARegistry->new(from_json(read_file($file)));
 
 		} else {
-			return undef;
+			$REGISTRY->{$url} = undef;
 
 		}
 	}
@@ -358,34 +365,35 @@ sub load_registry {
 sub get_best_url {
 	my ($package, @urls) = @_;
 
-	my @https = grep { $_ =~ /^https/ } @urls;
+	my @https = grep { 'https' eq lc($_->scheme) } @urls;
+
 	if (scalar(@https)) {
-		return URI->new($https[0]);
+		return shift(@https);
 
 	} else {
-		return URI->new($urls[0]);
+		return shift(@urls);
 
 	}
 }
 
 #
-# contatenate a URI with a bunch of path segments
+# concatenate a URL with a bunch of path segments
 # this method deals with URI objects which have
 # trailing slashes
 #
 sub assemble_url {
-	my ($package, $uri, @segments) = @_;
+	my ($package, $url, @segments) = @_;
 
-	$uri->path_segments(grep { length > 0 } $uri->path_segments, @segments);
+	$url->path_segments(grep { length > 0 } ($url->path_segments, @segments));
 
-	return $uri;
+	return $url;
 }
 
 =pod
 
 =head1 COPYRIGHT
 
-Copyright 2018 CentralNic Ltd. All rights reserved.
+Copyright 2019 CentralNic Ltd. All rights reserved.
 
 =head1 LICENSE
 

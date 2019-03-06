@@ -1,6 +1,7 @@
 package MooX::PluginKit;
-
-our $VERSION = '0.05';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.06';
 
 # I don't do anything.
 
@@ -219,9 +220,9 @@ with plugins and consumers.  This API should be formalized with documentation, o
 a final state that can be relied on to not change much.  For now, don't use anything in there
 directly.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -234,4 +235,6 @@ development this distribution would not exist.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

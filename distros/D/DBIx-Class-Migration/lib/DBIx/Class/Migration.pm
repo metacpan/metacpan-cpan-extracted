@@ -1,6 +1,6 @@
 package DBIx::Class::Migration;
 
-our $VERSION = "0.063";
+our $VERSION = "0.064";
 $VERSION = eval $VERSION;
 
 use Moose;
@@ -195,7 +195,6 @@ sub dbic_dh {
   _log_die "A \$VERSION needs to be specified in your schema class ${\$self->_infer_schema_class}"
   unless $self->schema->schema_version;
 
-
   my $dh = $self->deployment_handler_class->new({
     schema => $self->schema,
     %dbic_dh_args, @args,
@@ -388,7 +387,8 @@ sub _prepare_fixture_data_dir {
 
 sub build_dbic_fixtures_init_args {
   my $self = shift;
-  my $version = $self->dbic_dh->version_storage_is_installed ?
+  my $version = $self->dbic_dh_args->{to_version};
+  $version ||= $self->dbic_dh->version_storage_is_installed ?
     $self->dbic_dh->database_version : do {
       print "Since this database is not versioned, we will assume version ";
       print "${\$self->dbic_dh->schema_version}\n";
@@ -565,7 +565,6 @@ before [qw/install upgrade downgrade/], sub {
     %ENV,
     DBIC_MIGRATION_FIXTURES_CLASS => $self->dbic_fixture_class,
     DBIC_MIGRATION_FIXTURES_INIT_ARGS => JSON::MaybeXS->new->encode($self->build_dbic_fixtures_init_args),
-#    DBIC_MIGRATION_FIXTURES_OBJ => $self->build_dbic_fixtures,
     DBIC_MIGRATION_SCHEMA_CLASS => $self->schema_class,
     DBIC_MIGRATION_TARGET_DIR => $self->target_dir,
     DBIC_MIGRATION_FIXTURE_DIR => catdir($self->target_dir, 'fixtures', $self->dbic_dh->schema_version),
@@ -748,7 +747,7 @@ database connection with the following DSN:
 
     DBD:SQLite:[path to target_dir]/[db_file_name].db
 
-Where c<[path to target_dir]> is L</target_dir> and [db_file_name] is a converted
+Where C<[path to target_dir]> is L</target_dir> and [db_file_name] is a converted
 version of L</schema_class>.  For example if you set L<schema_class> to:
 
     MyApp::Schema
@@ -864,15 +863,13 @@ using monotonic versioning.
 
 =head2 dbic_dh_args
 
-Accepts HashRef.  Required and defaults to an empty hashref.
+Accepts HashRef.  Required and defaults to a hashref setting
+C<sql_translator_args>'s C<quote_identifiers> to a true value, which
+despite being documented as the default, is not the case in practice.
 
 Used to pass custom args when building a L<DBIx::Class::DeploymentHandler>.
 Please see the docs for that class for more.  Useful args might be C<databases>,
 C<to_version> and C<force_overwrite>.
-
-Defaults to a hash setting C<sql_translator_args>'s C<quote_identifiers>
-to a true value, which despite being documented as the default, is not
-the case in practice.
 
 =head2 dbic_dh
 

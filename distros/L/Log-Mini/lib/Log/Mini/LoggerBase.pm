@@ -3,9 +3,6 @@ package Log::Mini::LoggerBase;
 use strict;
 use warnings;
 
-use feature qw(say);
-use Data::Dumper;
-
 use Carp qw(croak);
 use List::Util qw(first);
 use Time::Moment;

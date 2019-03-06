@@ -9,11 +9,12 @@ plugin 'Probe::CommandLine' => (
 
 share {
 
+  # start_url 'ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz';
+  # start_url 'https://sourceforge.net/projects/infozip/files/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz',
+  # Sourceforge sucks, and github has a world class CDN
+  start_url 'https://alienfile.org/mirror/unzip60.tar.gz';
 
-  plugin Download => (
-    #url => 'ftp://ftp.info-zip.org/pub/infozip/src/unzip60.tgz',
-    url => 'https://sourceforge.net/projects/infozip/files/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz',
-  );
+  plugin 'Download';
 
   plugin Extract => 'tar.gz';
 

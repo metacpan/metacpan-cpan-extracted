@@ -16,15 +16,21 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(&pubkeys %ssh_pubkey_types);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our %ssh_pubkey_types;
 @ssh_pubkey_types{qw(ecdsa ed25519 rsa PEM PKCS8 RFC4716)} = ();
 
 sub pubkeys {
     my ($input) = @_;
+    croak "input must be string, GLOB, or scalar ref" if !defined $input;
     my $fh;
-    open $fh, '<', $input or croak "could not open $input: $!";
+    if ( ref $input eq 'GLOB' ) {
+        $fh = $input;
+    } else {
+        open $fh, '<', $input or croak "could not open $input: $!";
+        binmode $fh;
+    }
     my @keys;
     while ( my $line = readline $fh ) {
         if ( $line =~ m{^(-----BEGIN RSA PUBLIC KEY-----)} ) {
@@ -126,20 +132,36 @@ Data::SSHPubkey - utility function to parse SSH public keys with
 
 =head1 SYNOPSIS
 
-  use Data::SSHPubkey;
+  use Data::SSHPubkey qw(pubkeys);
 
-  my $keylist = Data::SSHPubkey::pubkeys( $file_or_scalarref );
+  # a Mojo app might accept public keys from clients, e.g.
+  #   cat /etc/ssh/*.pub | curl ... --data-urlencode pk@- http...
+  # this case is supported via a scalar reference
+  my $keylist = pubkeys( \$c->param('pk') );
   for my $ref ( @$keylist ) {
       my ($type, $pubkey) = @$ref;
       ...
   }
 
+  # a key collection host could instead wrap ssh-keyscan(1) and
+  # pass in a file handle
+  open( my $fh, '-|', qw(ssh-keyscan --), $host ) or die ...
+  binmode $fh;
+  my $keylist = pubkeys($fh);
+
+  # a string will be treated as a file to open and read
+  my $keylist = pubkeys( "/etc/ssh/ssh_host_ed25519_key.pub" );
+
+  # if you do not care about the key types, extract only the pub
+  # keys with something like
+  ... = map { $_->[1] } @$keylist;
+
 =head1 DESCRIPTION
 
 C<Data::SSHPubkey> parses SSH public keys, or at least some of those
-supported by C<ssh-keygen(1)>. It may be prudent to check any uploaded
-data with C<ssh-keygen> though this module should help extract said data
-from a web form upload or the like to get to that step.
+supported by L<ssh-keygen(1)>. It may be prudent to check any uploaded
+data against C<ssh-keygen> though this module should help extract said
+data from a web form upload or the like to get to that step.
 
 Currently supported public key types (the possible values that C<$type>
 above may contain):
@@ -161,6 +183,9 @@ Inner newlines for the multiline SSH public key types (C<PEM>, C<PKCS8>,
 and C<RFC4716>) will be standardized to the C<$/> variable. This may
 cause problems if C<ssh-keygen(1)> or equivalent on some platform
 demands a specific newline sequence that is not C<$/>.
+
+The types C<PEM>, C<PKCS8>, and C<RFC4716> will need conversion for use
+with OpenSSH; see the C<-i -m ...> options to L<ssh-keygen(1)>.
 
 =head1 SUBROUTINE
 
@@ -213,12 +238,15 @@ the comments in the code).
 More tests are necessary for more edge cases.
 
 If the input uses fancy encodings (where fancy is anything not ASCII)
-lines longer than 72 8-bit bytes may be accepted. Something like
-C<read_binary> from L<File::Slurper> should avoid this case as the key
-data is a subset of ASCII (header values or comments that are ignored by
-this module could be UTF-8 or possibly anything else).
+lines longer than 72 8-bit bytes may be accepted. C<read_binary> from
+L<File::Slurper> or a traditional C<binmode $fh> should avoid this case
+as the key data looked for is only a subset of ASCII (header values or
+comments that are ignored by this module could be UTF-8 or possibly
+anything else).
 
 =head1 SEE ALSO
+
+L<ssh-keygen(1)>, L<ssh-keyscan(1)>
 
 L<Config::OpenSSH::Authkey> - older module more aimed at management of
 C<~/.ssh/authorized_keys> data and not specifically public keys. It does

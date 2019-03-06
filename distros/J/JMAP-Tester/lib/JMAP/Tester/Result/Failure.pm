@@ -3,7 +3,7 @@ use strict;
 
 package JMAP::Tester::Result::Failure;
 # ABSTRACT: what you get when your JMAP request utterly fails
-$JMAP::Tester::Result::Failure::VERSION = '0.022';
+$JMAP::Tester::Result::Failure::VERSION = '0.025';
 use Moo;
 with 'JMAP::Tester::Role::HTTPResult';
 
@@ -41,7 +41,7 @@ JMAP::Tester::Result::Failure - what you get when your JMAP request utterly fail
 
 =head1 VERSION
 
-version 0.022
+version 0.025
 
 =head1 OVERVIEW
 

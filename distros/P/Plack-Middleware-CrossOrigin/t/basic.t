@@ -355,6 +355,15 @@ test_psgi
 
         $req = HTTP::Request->new(GET => 'http://localhost/', [
             'Access-Control-Request-Method' => 'GET',
+            'Origin' => 'http://www2.example.com',
+        ]);
+        $res = $cb->($req);
+
+        is $res->header('Access-Control-Allow-Origin'), 'http://www2.example.com',
+          'wildcard as partial domain matches numbers';
+
+        $req = HTTP::Request->new(GET => 'http://localhost/', [
+            'Access-Control-Request-Method' => 'GET',
             'Origin' => 'http://www.example2.com',
         ]);
         $res = $cb->($req);

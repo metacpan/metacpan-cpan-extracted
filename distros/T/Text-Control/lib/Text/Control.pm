@@ -3,7 +3,7 @@ package Text::Control;
 use strict;
 use warnings;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 my $CTRL_PATTERN = '[\x00-\x19\x7f-\xff]';
 
@@ -91,7 +91,7 @@ Felipe Gasper (FELIPE)
 
 =head1 REPOSITORY
 
-https://github.com/FGasper/p5-Text-Control
+L<https://github.com/FGasper/p5-Text-Control>
 
 =head1 COPYRIGHT
 
