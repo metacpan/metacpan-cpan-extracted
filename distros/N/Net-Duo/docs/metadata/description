@@ -1,0 +1,24 @@
+[Duo Security](https://duosecurity.com/) is a cloud second-factor
+authentication service that supports a wide variety of different
+mechanisms for a user to establish a second authentication factor.  It is
+intended to supplement local authentication systems, such as
+password-based authentication, with an unrelated second factor: possession
+of a device, or access to a phone.  Duo Security provides direct
+integration with a variety of applications and a self-service web sign-up
+interface, but for more control, it also provides several RESTful APIs
+that can perform all possible actions on Duo accounts, users, and their
+devices.
+
+This module implements a client for the Duo REST APIs.  It differs from
+the sample Perl implementation provided by Duo in that it attempts to wrap
+the Duo data model and JSON information in Perl objects and provide
+logical and convenient methods on those objects to make writing Perl
+clients of Duo simpler and easier.  It tries to abstract portions of the
+API, such as the endpoint URLs, that allow for more natural and less
+cluttered Perl code than manipulating the JSON data structures directly.
+
+The API implementation is currently incomplete and contains just the calls
+required by Stanford's integration.  Only the Auth and Admin APIs are
+implemented, and both are partial.  However, the Net::Duo `call`,
+`call_json`, and `call_json_paged` methods can be used to make calls to
+APIs that aren't fully implemented.

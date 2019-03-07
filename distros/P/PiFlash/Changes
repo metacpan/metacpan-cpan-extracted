@@ -1,5 +1,17 @@
 Change log for PiFlash
 
+0.2.1 2019-03-07T03:46:40-08:00 America/Los_Angeles
+ [BUG FIXES]
+ - fix non-portable symbol table insertion which was causing segfault in
+   can_ok test on Perl 5.24
+ - fix name of environment variable to override program path when program
+   name contains a hyphen
+ - fix test for PiFlash::Command not to use hard-coded /usr/bin/true - that
+   was only succeeding on RedHat/Fedora
+
+ [REVISION]
+ - reorg tests for PiFlash::Command so it can compute number of tests
+
 0.2.0 2019-03-03T22:56:17-08:00 America/Los_Angeles
  [BUG FIXES]
  - require Linux platform to build or test, in response to reports of

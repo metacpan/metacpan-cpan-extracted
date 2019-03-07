@@ -1,9 +1,11 @@
 #!/usr/bin/env perl
 use v5.14;
 
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.5';
 
 use List::Util qw(any);
+use JSON;
+my $JSON = JSON->new->pretty->utf8->canonical;
 
 ## get options
 use Getopt::Long;
@@ -13,7 +15,7 @@ my %opt;
 GetOptions(
     \%opt,           'help|h|?', 'sparql|q=s',   'scheme|s=s',
     'directory|d=s', 'name|n=s', 'language|l=s', 'quiet|q',
-    'verbose|v',     'version',
+    'verbose|v',     'debug',    'version',
 ) or exit 1;
 say "skos2jskos $VERSION" and exit if $opt{version};
 if ( $opt{help} or ( !$opt{sparql} && !@ARGV ) ) {
@@ -26,6 +28,7 @@ die "output directory not found: " . $opt{directory} . "\n"
   unless -d $opt{directory};
 
 $opt{language} //= 'en';
+$opt{verbose} = 2 if $opt{debug};
 
 ## Logging methods
 use Term::ANSIColor;
@@ -49,9 +52,14 @@ sub info($) {               ## no critic
     say( $colored ? colored( $_[0], 'green' ) : $_[0] );
 }
 
-sub trace($) {              ## no critic
+sub debug($) {              ## no critic
     return unless $opt{verbose};
     say( $colored ? colored( $_[0], 'white' ) : $_[0] );
+}
+
+sub trace($) {              ## no critic
+    return unless $opt{verbose} > 1;
+    say $_[0];
 }
 
 ## check where to get RDF data from
@@ -68,7 +76,7 @@ elsif ( $ARGV[0] =~ qr{^https?://} ) {
     info "Reading RDF from $ARGV[0]";
     RDF::Trine->default_useragent->ssl_opts( verify_hostname => 0 );
     RDF::Trine::Parser->parse_url_into_model( $ARGV[0], $source );
-    trace $source->size . " triples";
+    debug $source->size . " triples";
 }
 else {
     info "Reading RDF files";
@@ -76,7 +84,7 @@ else {
     foreach my $file (@ARGV) {
         my $parser = RDF::Trine::Parser->guess_parser_by_filename($file);
         $parser->parse_file_into_model( "file://$file", $file, $source );
-        trace $source->size - $size . " triples from $file";
+        debug $source->size - $size . " triples from $file";
         $size = $source->size;
     }
 }
@@ -92,7 +100,7 @@ PREFIX vann: <http://purl.org/vocab/vann/>
 SELECT * WHERE {
 SPARQL
 
-    #    trace $query;
+    trace $query;
 
     my $q =
       $opt{sparql}
@@ -121,9 +129,18 @@ sub prefLabel {
     $entity->{prefLabel}->{$language} = $value;
 }
 
+sub equal {
+    my ( $a, $b ) = @_;
+    return 1 if $a eq $b or $a == $b;
+    if ( 'HASH' eq ref $a && 'HASH' eq ref $b ) {
+        return 1 if ( $a->{uri} && $a->{uri} eq $b->{uri} );
+        return $JSON->encode($a) eq $JSON->encode($b);
+    }
+}
+
 sub pushUnique {
     my ( $list, $value ) = @_;
-    return if any { $_ eq $value } @$list;
+    return if any { equal( $_, $value ) } @$list;
     push @$list, $value;
 }
 
@@ -137,6 +154,15 @@ sub uriSet {
     my ( $entity, $property, $node ) = @_;
     return unless $node;
     pushUniqueUri( $entity->{$property} //= [], $node->uri_value );
+}
+
+sub agent {
+    my ( $entity, $field, $node ) = @_;
+    if ( $node && $node->is_literal ) {
+        my $language = language($node) // 'und';
+        my $agent = { prefLabel => { $language => $node->literal_value } };
+        pushUnique( $entity->{$field} //= [], $agent );
+    }    # TODO: if resource
 }
 
 sub notation {
@@ -158,8 +184,6 @@ sub note {
 }
 
 ## Export JSKOS method
-use JSON;
-my $JSON = JSON->new->pretty->utf8->canonical;
 
 sub export {
     my ( $file, $jskos ) = @_;
@@ -167,7 +191,7 @@ sub export {
     $file = $opt{directory} . '/' . $file;
     open my $fh, '>', $file;
     print $fh $JSON->encode($jskos);
-    trace $file;
+    debug $file;
 }
 
 ## convert concept scheme
@@ -196,6 +220,8 @@ my $res = sparql(<<SPARQL);
 OPTIONAL { <$uri> skos:notation ?notation } .
 OPTIONAL { <$uri> vann:preferredNamespacePrefix ?notation } .
 OPTIONAL { <$uri> dct:description ?description } .
+OPTIONAL { <$uri> dct:creator ?creator } .
+OPTIONAL { <$uri> dct:contributor ?contributor } .
 SPARQL
 
 fatal "Concept scheme <$uri> not found or incomplete"
@@ -207,6 +233,8 @@ $res->each(
         prefLabel( $scheme, $s->{title} );
         notation( $scheme, $s->{notation} );
         note( $scheme, $s->{description}, 'definition' );
+        agent( $scheme, 'creator',     $s->{creator} );
+        agent( $scheme, 'contributor', $s->{contributor} );
     }
 );
 
@@ -215,11 +243,7 @@ $res->each( sub { uriSet( $scheme, 'topConcepts', $_[0]->{c} ) } );
 $scheme->{topConcepts} = [ sort @{ $scheme->{topConcepts} } ]
   if $scheme->{topConcepts};
 
-# TODO:
-# - dc:creator, dct:creator
-# - dct:licence
-# - notation
-# - altLabel
+debug "Found " . @{ $scheme->{topConcepts} || [] } . " explicit top concepts";
 
 info "Exporting JSKOS scheme";
 export( 'scheme.json', $scheme );
@@ -234,6 +258,7 @@ my $concepts = {};
 $res = sparql(<<SPARQL);
 ?c skos:inScheme <$opt{scheme}> .
 OPTIONAL { ?c skos:prefLabel ?pLabel } .
+OPTIONAL { ?c skos:scopeNote ?scopeNote } .
 OPTIONAL { ?c skos:notation ?notation } .
 OPTIONAL { ?c skos:narrower ?narrower } .
 SPARQL
@@ -243,7 +268,7 @@ $res->each(
         my $uri = $row->{c}->uri_value;
 
         unless ( defined $concepts->{$uri} ) {
-            trace "$uri";
+            debug "$uri";
             $concepts->{$uri} = {
                 uri      => $uri,
                 type     => ['http://www.w3.org/2004/02/skos/core#Concept'],
@@ -255,6 +280,7 @@ $res->each(
 
         notation( $concept, $row->{notation} );
         prefLabel( $concept, $row->{pLabel} );
+        note( $concept, $row->{scopeNote}, 'scopeNote' );
         uriSet( $concept, 'narrower', $row->{narrower} );
     }
 );
@@ -277,7 +303,7 @@ skos2jskos - convert SKOS/RDF to JSKOS
 
 This script can be used to convert SKOS data from local RDF files, URL, or
 SPARQL-endpoint to L<JSKOS format|https://gbv.github.io/jskos/> (SKOS in
-JSON-LD). The script is aligned with JSKOS 0.1.0 but it does not cover all
+JSON-LD). The script is aligned with JSKOS 0.4.4 but it does not cover all
 possible fields yet.
 
 On success the following files are created in normalized JSON:
@@ -294,8 +320,8 @@ JKSOS description of all concepts
 
 =back
 
-Location and name of the files can be controlled with options C<--directory>
-and C<--name>.
+Location of the files can be controlled with option C<--directory> and option
+C<--name> can be used to prepend a prefix to each file.
 
 Conversion is not optimized for speed so be patient!
 
@@ -329,6 +355,10 @@ Don't show status messages
 =item --verbose | -v
 
 Show detailed processing messages
+
+=item --debug
+
+Show more detailed processing information
 
 =item --scheme | -s
 

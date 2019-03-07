@@ -69,13 +69,13 @@ xt/author/live/jigsaw/md5-get.t
 xt/author/live/jigsaw/md5.t
 xt/author/live/jigsaw/neg-get.t
 xt/author/live/jigsaw/neg.t
+xt/author/live/jigsaw/redirect-post.t
 xt/author/live/jigsaw/te.t
 xt/author/live/online.t
 xt/author/minimum-version.t
 xt/author/misc/dbmrobot
 xt/author/misc/get-callback
 xt/author/misc/get-file
-xt/author/misc/pod.t
 xt/author/mojibake.t
 xt/author/net/cache-timeouts.t
 xt/author/net/cgi-bin/moved

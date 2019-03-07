@@ -9,12 +9,14 @@ use ExtUtils::MakeMaker;
 # http://blogs.perl.org/users/michal_wojciechowski/2011/11/github-friendly-readme-files-with-extutils-makemaker-and-module-build.html
 my $preop =
   'perldoc -uT $(VERSION_FROM) | tee $(DISTVNAME)/README.pod > README.pod;' .
-  'pod2text README.pod | tee $(DISTVNAME)/README > README';
+  'pod2text README.pod | tee $(DISTVNAME)/README > README;' .
+'';
 
 WriteMakefile1(
   NAME         => 'Mash',
   VERSION_FROM => 'lib/Mash.pm',
   EXE_FILES    => [
+    #"bin/Mash/mash",
   ],
   PREREQ_PM    => {
     # Core modules
@@ -32,9 +34,10 @@ WriteMakefile1(
   },
   BUILD_REQUIRES => {
     'Test::More'     => 0.47,
+    #'File::Utils'    => 0,
   },
   MIN_PERL_VERSION => '5.12.0',
-  LICENSE          => "GPLv3",
+  LICENSE          => "gpl_3",
   dist=>{
     COMPRESS => "gzip -9f",
     SUFFIX   => "gz",

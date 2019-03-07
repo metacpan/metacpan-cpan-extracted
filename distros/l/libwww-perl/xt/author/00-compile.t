@@ -116,7 +116,10 @@ foreach my $file (@scripts)
 
 
 
+TODO: {
+local $TODO = 'Data::Dump::Trace warns on 5.8' if $] < '5.009';
 is(scalar(@warnings), 0, 'no warnings found')
     or diag 'got warnings: ', explain(\@warnings);
+}
 
 BAIL_OUT("Compilation problems") if !Test::More->builder->is_passing;

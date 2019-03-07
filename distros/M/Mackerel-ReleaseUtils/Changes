@@ -1,5 +1,8 @@
 Revision history for Perl extension Mackerel-ReleaseUtils
 
+v0.2.4 2019-03-07T08:02:27Z
+    - Support simply expanded binding in Makefile
+
 v0.2.3 2017-10-28T08:01:36Z
     - dies when ghch exits with non-0 exit status
 

@@ -1,5 +1,24 @@
                       User-Visible Net::Duo Changes
 
+Net::Duo 1.02 (2019-03-06)
+
+    Add basic support for paginated queries via a new call_json_paged()
+    method in Net::Duo.  Enable that support for the users() and
+    integrations() methods in Net::Duo::Admin in advance of the March 15,
+    2019 deadline for the Duo API change requiring paginated calls.  This
+    support makes repeated calls until all objects have been returned and
+    doesn't expose the pagination to the caller.  (#127964)
+
+    Change documentation URLs to point to duo.com instead of
+    duosecurity.com, following upstream redirects.  Remove the reference
+    to the Verify API, which no longer appears to be a separate API.
+
+    Update to rra-c-util 8.0:
+
+    * Add SPDX-License-Identifier information to imported files.
+    * Fix some formatting issues with latest perltidy.
+    * Exclude more files from strictness checks.
+
 Net::Duo 1.01 (2015-08-16)
 
     Adjust for an incompatible change in JSON::XS 3.0 that broke magical

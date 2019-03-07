@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::Dad;
-$DBIx::Class::DeploymentHandler::Dad::VERSION = '0.002222';
+$DBIx::Class::DeploymentHandler::Dad::VERSION = '0.002223';
 # ABSTRACT: Parent class for DeploymentHandlers
 
 use Moose;
@@ -25,7 +25,10 @@ has to_version => (
   lazy_build => 1,
 );
 
-sub _build_to_version { $_[0]->schema_version }
+sub _build_to_version {
+  my $version = $_[0]->schema_version;
+  ref($version) ? $version->numify : $version;
+}
 
 has schema_version => (
   is         => 'ro',
@@ -262,7 +265,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2019 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

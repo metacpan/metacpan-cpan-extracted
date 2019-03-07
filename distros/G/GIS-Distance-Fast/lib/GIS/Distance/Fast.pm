@@ -1,5 +1,25 @@
 package GIS::Distance::Fast;
-$GIS::Distance::Fast::VERSION = '0.08';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.09';
+
+our @ISA;
+
+eval {
+    require XSLoader;
+    XSLoader::load('GIS::Distance::Fast', $VERSION);
+    1;
+} or do {
+    require DynaLoader;
+    push @ISA, 'DynaLoader';
+    bootstrap GIS::Distance::Fast $VERSION;
+};
+
+1;
+__END__
+
+=encoding utf8
+
 =head1 NAME
 
 GIS::Distance::Fast - C implementation of GIS::Distance formulas.
@@ -16,46 +36,28 @@ outperform the Perl equivelent by at least 2x.
 This module need not be used directly.  L<GIS::Distance> will automatically
 use the ::Fast formulas when they are available.
 
-=cut
-
-use strictures 1;
-
-our @ISA;
-our $VERSION;
-
-eval {
-    require XSLoader;
-    XSLoader::load('GIS::Distance::Fast', $VERSION);
-    1;
-} or do {
-    require DynaLoader;
-    push @ISA, 'DynaLoader';
-    bootstrap GIS::Distance::Fast $VERSION;
-};
-
-1;
-__END__
-
 =head1 FORMULAS
 
-L<GIS::Distance::Formula::Cosine::Fast>
+L<GIS::Distance::Fast::Cosine>
 
-L<GIS::Distance::Formula::Haversine::Fast>
+L<GIS::Distance::Fast::Haversine>
 
-L<GIS::Distance::Formula::Vincenty::Fast>
+L<GIS::Distance::Fast::Vincenty>
 
-=head1 BUGS
+=head1 SUPPORT
 
-The L<GIS::Distance::Formula::Vincenty::Fast> produces slightly different results than
-L<GIS::Distance::Formula::Vincenty>.  Read the POD for L<GIS::Distance::Formula::Vincenty::Fast>
-for details.
+Please submit bugs and feature requests to the GIS-Distance-Fast GitHub issue tracker:
 
-=head1 AUTHOR
+L<https://github.com/bluefeet/GIS-Distance-Fast/issues>
 
-Aran Clary Deltac <bluefeet@cpan.org>
+=head1 AUTHORS
+
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

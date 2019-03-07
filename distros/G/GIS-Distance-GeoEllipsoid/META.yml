@@ -1,0 +1,45 @@
+---
+abstract: 'Geo::Ellipsoid distance calculations.'
+author:
+  - 'Aran Clary Deltac <bluefeet@cpan.org>'
+build_requires:
+  Test2::V0: '0.000094'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GIS-Distance-GeoEllipsoid
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  GIS::Distance::GeoEllipsoid:
+    file: lib/GIS/Distance/GeoEllipsoid.pm
+    version: '0.10'
+requires:
+  GIS::Distance: '0.10'
+  Geo::Ellipsoid: '0.902'
+  namespace::clean: '0.24'
+  perl: '5.008001'
+  strictures: '2.000000'
+resources:
+  bugtracker: https://github.com/bluefeet/GIS-Distance-GeoEllipsoid/issues
+  homepage: https://github.com/bluefeet/GIS-Distance-GeoEllipsoid
+  repository: git://github.com/bluefeet/GIS-Distance-GeoEllipsoid.git
+version: '0.10'
+x_authority: cpan:BLUEFEET
+x_contributors:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

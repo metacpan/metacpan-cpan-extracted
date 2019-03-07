@@ -19,12 +19,13 @@ my %WriteMakefileArgs = (
     "Serge" => "1.3.2"
   },
   "TEST_REQUIRES" => {
+    "Clone" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.902.0",
+  "VERSION" => "0.902.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Clone" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

@@ -3,6 +3,7 @@
 # Test suite for user handling in the Admin API.
 #
 # Written by Russ Allbery <rra@cpan.org>
+# Copyright 2019 Russ Allbery <rra@cpan.org>
 # Copyright 2014
 #     The Board of Trustees of the Leland Stanford Junior University
 #
@@ -23,6 +24,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
 
 use 5.014;
 use strict;
@@ -58,19 +61,36 @@ $mock->expect(
     {
         method        => 'GET',
         uri           => '/admin/v1/users',
-        response_file => 't/data/responses/users.json',
+        content       => { limit => 500, offset => 0 },
+        response_file => 't/data/responses/users-1.json',
+        next_offset   => 1,
+        total_objects => 2,
+    }
+);
+$mock->expect(
+    {
+        method        => 'GET',
+        uri           => '/admin/v1/users',
+        content       => { limit => 500, offset => 1 },
+        response_file => 't/data/responses/users-2.json',
+        next_offset   => undef,
+        total_objects => 2,
     }
 );
 note('Testing users endpoint with no search');
 my @users = $duo->users;
 
-# Should be an array of a single user.
-is(scalar(@users), 1, 'users method returns a single user');
+# Should be an array of two users.
+is(scalar(@users), 2, 'users method returns correct number of users');
 
 # Verify that the returned user is correct.
-my $raw      = slurp('t/data/responses/users.json');
-my $expected = $json->decode($raw)->[0];
-is_admin_user($users[0], $expected);
+my @expected;
+for my $file ('users-1.json', 'users-2.json') {
+    my $raw = slurp("t/data/responses/$file");
+    push(@expected, $json->decode($raw)->[0]);
+}
+is_admin_user($users[0], $expected[0]);
+is_admin_user($users[1], $expected[1]);
 
 # Now, try a user call with a specified username.
 $mock->expect(
@@ -85,8 +105,8 @@ note('Testing users endpoint with search for jdoe');
 my $user = $duo->user('jdoe');
 
 # Verify that the returned user is correct.
-$raw      = slurp('t/data/responses/user.json');
-$expected = $json->decode($raw)->[0];
+my $raw      = slurp('t/data/responses/user.json');
+my $expected = $json->decode($raw)->[0];
 is_admin_user($user, $expected);
 
 # Convert the full user to JSON and compare that with the expected JSON.
@@ -213,9 +233,9 @@ is_admin_user($user, $expected);
 # Request bypass codes for a user.
 $mock->expect(
     {
-        method  => 'POST',
-        uri     => "/admin/v1/users/$id/bypass_codes",
-        content => { count => 2, valid_secs => 3600 },
+        method        => 'POST',
+        uri           => "/admin/v1/users/$id/bypass_codes",
+        content       => { count => 2, valid_secs => 3600 },
         response_data => ['567891', '857231'],
     }
 );

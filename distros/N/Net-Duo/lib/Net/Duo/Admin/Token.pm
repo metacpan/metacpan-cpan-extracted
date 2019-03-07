@@ -2,8 +2,10 @@
 #
 # This class wraps the Duo representation of a single Duo token, as returned
 # by (for example) the Admin /tokens REST endpoint.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Admin::Token 1.01;
+package Net::Duo::Admin::Token 1.02;
 
 use 5.014;
 use strict;
@@ -251,10 +253,14 @@ DEALINGS IN THE SOFTWARE.
 
 L<Net::Duo::Admin>
 
-L<Duo Admin API for tokens|https://www.duosecurity.com/docs/adminapi#tokens>
+L<Duo Admin API for tokens|https://www.duo.com/docs/adminapi#tokens>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

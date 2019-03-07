@@ -3338,6 +3338,24 @@
       "os_string" : "WinVista",
       "robot" : null
    },
+   "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/F3E)" : {
+      "engine_beta" : null,
+      "engine_major" : null,
+      "engine_minor" : null,
+      "engine_version" : null,
+      "match" : [
+         "ie",
+         "ie4up",
+         "ie55up",
+         "ie5up",
+         "ie7",
+         "trident",
+         "win32",
+         "windows",
+         "winnt",
+         "winvista"
+      ]
+   },
    "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/5.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; HPDTDF; Tablet PC 2.0; .NET4.0C; .NET4.0E; SE 2.X MetaSr 1.0)" : {
       "browser" : "ie",
       "browser_major" : "7",
@@ -10783,6 +10801,15 @@
       "os_string" : "Mac OS X",
       "os_version" : "10.11",
       "robot" : null
+   },
+   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36" : {
+      "match" : [
+         "chrome",
+         "mac",
+         "macosx",
+         "webkit"
+      ],
+      "u2f" : 1
    },
    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_2) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.41 Safari/535.1" : {
       "browser" : "chrome",
@@ -18398,6 +18425,19 @@
       "os_version" : "4.2",
       "robot" : null
    },
+   "Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_2 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) GSA/65.0.225212226 Mobile/14F89 Safari/6" : {
+      "browser_major" : null,
+      "browser_minor" : null,
+      "browser_version" : null,
+      "match" : [
+         "device",
+         "ios",
+         "iphone",
+         "mobile",
+         "safari",
+         "webkit"
+      ]
+   },
    "Mozilla/5.0 (iPhone; CPU iPhone OS 12_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/10 Mobile/16A366 Safari/605.1.15 GAYL/2.0.8b1" : {
       "browser_major" : 10,
       "browser_minor" : null,
@@ -20319,7 +20359,8 @@
       "robot_major" : "1",
       "robot_minor" : ".8",
       "robot_name" : "Apache Nutch",
-      "robot_version" : "1.8"
+      "robot_version" : "1.8",
+      "u2f" : null
    },
    "visionutils/0.2" : {
       "browser_major" : 0,

@@ -9,8 +9,10 @@
 # This module serves as a base class for such objects and does the dirty work
 # of constructing an object from decoded JSON data and building the accessors
 # automatically from a field specification.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Object 1.01;
+package Net::Duo::Object 1.02;
 
 use 5.014;
 use strict;
@@ -509,6 +511,10 @@ L<Net::Duo>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

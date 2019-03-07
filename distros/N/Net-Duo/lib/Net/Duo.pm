@@ -1,16 +1,18 @@
 # Perl interface for the Duo multifactor authentication service.
 #
 # This Perl module collection provides a Perl interface to the Duo multifactor
-# authentication service (https://www.duosecurity.com/).  It differs from the
-# Perl API sample code in that it abstracts some of the API details and throws
-# rich exceptions rather than requiring the caller deal with JSON data
-# structures directly.
+# authentication service (https://www.duo.com/).  It differs from the Perl API
+# sample code in that it abstracts some of the API details and throws rich
+# exceptions rather than requiring the caller deal with JSON data structures
+# directly.
 #
 # This module is intended primarily for use as a base class for more
 # specialized Perl modules implementing the specific Duo APIs, but it can also
 # be used directly to make generic API calls.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo 1.01;
+package Net::Duo 1.02;
 
 use 5.014;
 use strict;
@@ -209,15 +211,15 @@ sub call {
 # $path     - URL path to the REST endpoint to call
 # $args_ref - Reference to a hash of additional arguments
 #
-# Returns: Reference to hash corresponding to the JSON result
+# Returns: Full raw JSON response
 #  Throws: Net::Duo::Exception on any failure
-sub call_json {
+sub _call_json_internal {
     my ($self, $method, $path, $args_ref) = @_;
 
     # Use the simpler call() method to do most of the work.  This returns the
     # HTTP::Response object.  Retrieve the content of the response as well.
     my $response = $self->call($method, $path, $args_ref);
-    my $content = $response->decoded_content;
+    my $content  = $response->decoded_content;
 
     # If the content was empty, we have a failure of some sort.
     if (!defined($content)) {
@@ -246,12 +248,72 @@ sub call_json {
         die Net::Duo::Exception->api($data, $content);
     }
 
-    # Return the response portion of the reply.
+    # Return the response portion of the reply and the metadata if available
+    # and called in a list context.
     if (!defined($data->{response})) {
         my $error = 'no response key in JSON reply';
         die Net::Duo::Exception->protocol($error, $content);
     }
+    return $data;
+}
+
+# Make a generic Duo API call that returns JSON and do the return status
+# checking that's common to most of the Duo API calls.  There are a few
+# exceptions, like /logo, which do not return JSON and therefore cannot be
+# called using this method).
+#
+# $self     - Net::Duo object
+# $method   - HTTP method (GET, PUT, POST, or DELETE)
+# $path     - URL path to the REST endpoint to call
+# $args_ref - Reference to a hash of additional arguments
+#
+# Returns: Full raw JSON response
+#  Throws: Net::Duo::Exception on any failure
+sub call_json {
+    my ($self, $method, $path, $args_ref) = @_;
+    my $data = $self->_call_json_internal($method, $path, $args_ref);
     return $data->{response};
+}
+
+# Make a generic Duo API that returns paginated data.
+#
+# $self     - Net::Duo object
+# $method   - HTTP method (GET, PUT, POST, or DELETE)
+# $path     - URL path to the REST endpoint to call
+# $args_ref - Reference to a hash of additional arguments
+#
+# Returns: Reference to hash corresponding to the JSON result
+#  Throws: Net::Duo::Exception on any failure
+sub call_json_paged {
+    my ($self, $method, $path, $args_ref) = @_;
+    my $offset = 0;
+    my @response;
+    my $more_data = 1;
+
+    # Iterate over repeated calls to get paginated data.
+    while ($more_data) {
+        my $call_args_ref = $args_ref ? { %{$args_ref} } : {};
+        $call_args_ref->{offset} = $offset;
+        $call_args_ref->{limit}  = 500;
+        my $data = $self->_call_json_internal($method, $path, $call_args_ref);
+
+        # For paginated data, the response must be a list.
+        if (ref($data->{response}) ne 'ARRAY') {
+            my $error = 'body of paginated response not an array';
+            die Net::Duo::Exception->protocol($error);
+        }
+        push(@response, @{ $data->{response} });
+
+        # Continue if we have more paginated data.
+        if ($data->{metadata} && exists($data->{metadata}{next_offset})) {
+            $offset = $data->{metadata}{next_offset};
+        } else {
+            $more_data = 0;
+        }
+    }
+
+    # Return accumulated results.
+    return \@response;
 }
 
 1;
@@ -260,7 +322,7 @@ __END__
 =for stopwords
 API LWP libwww perl JSON CPAN auth APIs namespace prepended ARGS hostname
 username Auth AUTH sublicense MERCHANTABILITY NONINFRINGEMENT Allbery
-multifactor
+multifactor URI
 
 =head1 NAME
 
@@ -398,6 +460,13 @@ Duo and throwing a Net::Duo::Exception object on call failure.
 This method cannot be used with the small handful of API calls that do not
 return JSON, such as the Auth API C</logo> endpoint.
 
+=item call_json_paged(METHOD, PATH[, ARGS])
+
+The same as call_json(), except for endpoints that require pagination.
+This will make repeated calls to call_json() with increasing offsets until
+it has retrieved all of the objects, and then return them all as a single
+response.  It always uses a C<limit> setting of 500.
+
 =back
 
 =head1 AUTHOR
@@ -408,6 +477,8 @@ Russ Allbery <rra@cpan.org>
 
 Copyright 2014 The Board of Trustees of the Leland Stanford Junior
 University
+
+Copyright 2019 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -429,14 +500,16 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Duo Auth API|https://www.duosecurity.com/docs/authapi>
+L<Duo Auth API|https://www.duo.com/docs/authapi>
 
-L<Duo Verify API|https://www.duosecurity.com/docs/duoverify>
-
-L<Duo Admin API|https://www.duosecurity.com/docs/adminapi>
+L<Duo Admin API|https://www.duo.com/docs/adminapi>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

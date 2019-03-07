@@ -6,7 +6,7 @@ use Config;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build and make available libffi
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 
@@ -25,7 +25,7 @@ Alien::FFI - Build and make available libffi
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,11 @@ Check that a library is available for FFI
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Petr Pisar (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 

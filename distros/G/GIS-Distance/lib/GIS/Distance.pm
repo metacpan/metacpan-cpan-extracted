@@ -1,5 +1,84 @@
 package GIS::Distance;
-$GIS::Distance::VERSION = '0.09';
+use 5.008001;
+use strictures 2;
+our $VERSION = '0.10';
+
+use Class::Measure::Length qw( length );
+use Carp qw( croak );
+use namespace::clean;
+
+sub new {
+    my ($class, $formula, @args) = @_;
+
+    $formula ||= 'Haversine';
+
+    my $self = bless {
+        formula => $formula,
+        args    => \@args,
+    }, $class;
+
+    foreach my $module (
+        "GIS::Distance::Fast::${formula}",
+        "GIS::Distance::$formula",
+
+        # Continue supporting the older package names:
+        "GIS::Distance::Formula::${formula}::Fast",
+        "GIS::Distance::Formula::$formula",
+
+        # Support custom formula classes:
+        $formula,
+    ) {
+        my $code = $module->can('distance');
+
+        if (!$code) {
+            local $@;
+            my $loaded_ok = eval( "require $module; 1" );
+
+            if (!$loaded_ok) {
+                die $@ if $@ !~ m{^Can't locate};
+                next;
+            }
+
+            $code = $module->can('distance');
+            die "$module does not have a distance() function" if !$code;
+        }
+
+        $self->{module} = $module;
+        $self->{code} = $code;
+        last;
+    }
+
+    die "Cannot find a GIS::Distance formula module for $formula"
+        if !$self->{code};
+
+    return $self;
+};
+
+sub formula { $_[0]->{formula} }
+sub args { $_[0]->{args} }
+sub module { $_[0]->{module} }
+
+sub distance {
+    my $self = shift;
+
+    croak 'Four arguments must be passed to distance()' if @_!=4;
+
+    return length( $self->distance_km(@_), 'km' );
+}
+
+sub distance_km {
+    my $self = shift;
+
+    croak 'Four arguments must be passed to distance_km()' if @_!=4;
+
+    return $self->{code}->( @_, @{$self->{args}} );
+}
+
+1;
+__END__
+
+=encoding utf8
+
 =head1 NAME
 
 GIS::Distance - Calculate geographic distances.
@@ -8,10 +87,10 @@ GIS::Distance - Calculate geographic distances.
 
     use GIS::Distance;
     
+    # Use the GIS::Distance::Haversine formula by default:
     my $gis = GIS::Distance->new();
-    $gis->formula( 'Polar' );  # Optional, default is Haversine.
     
-    # Or:
+    # Or choose a different formula:
     my $gis = GIS::Distance->new( 'Polar' );
     
     my $distance = $gis->distance( $lat1,$lon1 => $lat2,$lon2 );
@@ -24,98 +103,52 @@ This module calculates distances between geographic points on, at the moment,
 plant Earth.  Various formulas are available that provide different levels of
 accuracy versus calculation speed tradeoffs.
 
-All distances are returned as L<Class::Measure> objects.
-
-=cut
-
-use Types::Standard -types;
-use Type::Utils -all;
-
-use Moo;
-use strictures 1;
-use namespace::clean;
-
-around BUILDARGS => sub{
-    my $orig = shift;
-    my $class = shift;
-
-    if (@_==1 and ref($_[0]) ne 'HASH') {
-        return { formula => $_[0] };
-    }
-
-    return $class->$orig( @_ );
-};
-
 =head1 METHODS
 
 =head2 distance
 
-  my $distance = $gis->distance( $lat1,$lon1 => $lat2,$lon2 );
+    my $distance = $gis->distance( $lat1,$lon1 => $lat2,$lon2 );
 
 Returns a L<Class::Measure::Length> object for the distance between the
-two degree lats/lons.  The distance is calculated using whatever formula
-the object is set to use.
+two degree lats/lons.
+
+See L</distance_km> to return raw kilometers instead.
+
+=head2 distance_km
+
+This works just like L</distance> but return a raw kilometer measurement.
 
 =head1 ATTRIBUTES
 
 =head2 formula
 
-This is an object who's class inherits from L<GIS::Distance::Formula>.  This
-object is used to calculate distance.  The formula may be specified as either
-a blessed object, or as a string, such as "Haversine" or any of the other formulas.
+Returns the formula name which was passed as the first argument to C<new()>.
 
-If you specify the formula as a string then a few different class names will be
-searched for.  So, if you did:
+The formula can be specified as a partial or full module name for that
+formula.  For example, if the formula is set to C<Haversine> as in:
 
-  $gis->formula( 'Haversine' );
+    my $gis = GIS::Distance->new( 'Haversine' );
 
-Then this list of packages would automatically be looked for.  The first one that
-exists will be created and used:
+Then the following modules will be looked for in order:
 
-  GIS::Distance::Formula::Haversine::Fast
-  GIS::Distance::Formula::Haversine
-  Haversine
+    GIS::Distance::Fast::Haversine
+    GIS::Distance::Haversine
+    Haversine
 
-If you are using your own custom formula class make sure it applies
-the L<GIS::Distance::Formula> role.
-
-Note that a ::Fast version of the class will be looked for first.  By default
-the ::Fast versions of the formulas, written in C, are not available and the
-pure perl ones will be used instead.  If you would like the ::Fast formulas
+Note that a C<Fast::> version of the class will be looked for first.  By default
+the C<Fast::> versions of the formulas, written in C, are not available and the
+pure perl ones will be used instead.  If you would like the C<Fast::> formulas
 then install L<GIS::Distance::Fast> and they will be automatically used.
 
-=cut
+=head2 args
 
-my $formula_type = declare 'GISDistanceFormula',
-    as HasMethods[ 'distance' ];
+Returns the formula arguments, an array ref, containing the rest of the
+arguments passed to C<new()>.  Most formulas do not take arguments.  If
+they do it will be described in their respective documentation.
 
-coerce $formula_type,
-    from Str,
-    via {
-        my $class = $_;
-        foreach my $full_class (
-            "GIS::Distance::Formula::${class}::Fast",
-            "GIS::Distance::Formula::$class",
-            $class,
-        ) {
-            local $@;
-            my $success = eval( "require $full_class; 1" );
-            return $full_class->new() if $success;
-            die $@ if $@ !~ m{^Can't locate};
-        }
-        die( qq{The GIS::Distance formula "$class" cannot be found} );
-    };
+=head2 module
 
-has formula => (
-    is      => 'rw',
-    isa     => $formula_type,
-    coerce  => 1,
-    default => 'Haversine',
-    handles => ['distance'],
-);
-
-1;
-__END__
+Returns the fully qualified module name that L</formula> resolved to.
 
 =head1 SEE ALSO
 
@@ -125,19 +158,19 @@ which distance calculations can be made.
 
 =head1 FORMULAS
 
-L<GIS::Distance::Formula::Cosine>
+L<GIS::Distance::Cosine>
 
-L<GIS::Distance::Formula::GeoEllipsoid>
+L<GIS::Distance::GeoEllipsoid>
 
-L<GIS::Distance::Formula::GreatCircle>
+L<GIS::Distance::GreatCircle>
 
-L<GIS::Distance::Formula::Haversine>
+L<GIS::Distance::Haversine>
 
-L<GIS::Distance::Formula::MathTrig>
+L<GIS::Distance::MathTrig>
 
-L<GIS::Distance::Formula::Polar>
+L<GIS::Distance::Polar>
 
-L<GIS::Distance::Formula::Vincenty>
+L<GIS::Distance::Vincenty>
 
 =head1 TODO
 
@@ -150,27 +183,33 @@ this module to accept input as either lat/lon pairs, or as GIS::Coord objects.
 
 =item *
 
-Create an extension to DBIx::Class with the same goal as L<Geo::Distance>'s
-closest() method.
+Create some sort of equivalent to L<Geo::Distance>'s closest() method.
 
 =item *
 
-Write a super accurate formula module called GIS::Distance::Geoid.  Some
-very useful info is at L<http://en.wikipedia.org/wiki/Geoid>.
+Write a formula module called GIS::Distance::Geoid.  Some very useful info is
+at L<http://en.wikipedia.org/wiki/Geoid>.
 
 =back
 
 =head1 BUGS
 
-Both the L<GIS::Distance::Formula::GreatCircle> and L<GIS::Distance::Formula::Polar> formulas are
-broken.  Read their respective man pages for details.
+See L<GIS::Distance::Polar/BROKEN>.
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Aran Clary Deltac <bluefeet@cpan.org>
+Please submit bugs and feature requests to the GIS-Distance GitHub issue tracker:
+
+L<https://github.com/bluefeet/GIS-Distance/issues>
+
+=head1 AUTHORS
+
+    Aran Clary Deltac <bluefeet@cpan.org>
 
 =head1 LICENSE
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

@@ -19,10 +19,12 @@ do { my $x = {
                                       'Parallel::ForkManager' => '1.19',
                                       'Perl::Critic' => '1.132',
                                       'Perl::Tidy' => '20180220',
+                                      'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::Code::TidyAll' => '0.50',
                                       'Test::More' => '0.96',
                                       'Test::Pod' => '1.41',
+                                      'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.014'
                                     }

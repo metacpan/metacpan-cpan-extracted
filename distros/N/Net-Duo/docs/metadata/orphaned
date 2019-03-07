@@ -1,0 +1,5 @@
+You should use the Perl code provided by Duo instead, since it will be
+more up-to-date with current features.  I no longer maintain a large Duo
+deployment, and my current company uses Python instead.  That said, I do
+still think this package provides a nicer object framework for the Duo API
+in Perl; if you agree, please feel free to adopt it and maintain it!

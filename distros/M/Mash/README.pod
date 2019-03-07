@@ -12,15 +12,22 @@ A module to read `mash info` output and transform it
   use warnings;
   use Mash;
 
-  # Quick example
-
   # Sketch all fastq files into one mash file.
+  # Mash sketching is not implemented in this module.
   system("mash sketch *.fastq.gz > all.msh");
   die if $?;
+
   # Read the mash file.
   my $msh = Mash->new("all.msh");
   # All-vs-all distances
   my $distHash = $msh->dist($msh);
+
+  # Read a mash file, write it to a json-formatted file
+  my $msh2 = Mash->new("all.msh");
+  $msh2->writeJson("all.json");
+  # Read the json file
+  my $mashJson = Mash->new("all.json");
+  my $dist = $msh2->dist($mashJson); # yields a zero distance
 
 =head1 DESCRIPTION
 
@@ -34,7 +41,7 @@ This is a module to read mash files produced by the Mash executable. For more in
 
 Create a new instance of Mash.  One object per set of files.
 
-  Arguments:  Sketch filename
+  Arguments:  Sketch filename (valid types/extensions are .msh, .json, .json.gz)
               Hash of options (none so far)
   Returns:    Mash object
 
@@ -47,11 +54,43 @@ Create a new instance of Mash.  One object per set of files.
 
 =over
 
-=item $msh->file("filename.msh")
+=item $msh->loadMsh("filename.msh")
 
 Changes which file is used in the object and updates internal object information. This method is ordinarily used internally only.
 
   Arguments: One mash file
+  Returns:   self
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->loadJson("filename.msh")
+
+Changes which file is used in the object and updates internal object information. This method is ordinarily used internally only.
+
+  Arguments: One JSON file describing a Mash sketch
+  Returns:   self
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->writeJson("filename.json")
+
+Writes contents to a file in JSON format
+
+  Arguments: One filename
   Returns:   self
 
 =back
@@ -88,6 +127,8 @@ Aliases: distance(), mashDist()
 
 Returns the number of sketches in common and the total number of sketches between two lists.
 The return type is an array of two elements.
+This function is used internally with $msh->dist and assumes that the 
+hashes are already sorted.
 
   Arguments: A list of integers
              A list of integers
@@ -100,6 +141,24 @@ The return type is an array of two elements.
     my($common, $total) = Mash::raw_mash_distance($R1,$R2);
     # $common => 2
     # $total  => 3
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->fix()
+
+Fixes a mash sketch if it is broken at all. For now this
+just sorts hashes but this subroutine could contain more
+fixes in the future.
+
+  Arguments: None
+  Returns:   $self
 
 =back
 

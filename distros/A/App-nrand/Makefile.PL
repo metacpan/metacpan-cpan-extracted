@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::nrand",
   "PREREQ_PM" => {
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.50",
     "Math::Random::GaussianRange" => 0,
     "Math::Random::NormalDistribution" => 0,
     "strict" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Math::Random::GaussianRange" => 0,

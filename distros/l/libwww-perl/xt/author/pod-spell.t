@@ -138,6 +138,7 @@ Krüger
 Kubb
 König
 LWP
+LaBelle
 Laker
 Langfeldt
 Langheinrich
@@ -179,6 +180,7 @@ Newell
 Nicolai
 Nierstrasz
 Nigel
+Nik
 Ntlm
 Olaf
 Olly
@@ -342,6 +344,7 @@ michealgong
 michiel
 mmcleric
 murphy
+nalabelle
 naveedm9
 nawglan
 nigelgregoire
@@ -364,6 +367,7 @@ sburke
 schwern
 shaohua
 shildreth
+simbabque
 skaji
 slaven
 sprout

@@ -1,0 +1,96 @@
+{
+    "name": "Net::Duo",
+    "version": "1.02",
+    "synopsis": "API for Duo multifactor authentication service",
+    "maintainer": "Russ Allbery <rra@cpan.org>",
+    "orphaned": true,
+    "copyrights": [
+        {
+            "holder": "Russ Allbery <rra@cpan.org>",
+            "years": "2015, 2018-2019",
+        },
+        {
+            "holder": "The Board of Trustees of the Leland Stanford Junior University",
+            "years": "2014",
+        },
+    ],
+    "license": "Expat",
+    "build": {
+        "lancaster": true,
+        "type": "Module::Build",
+    },
+    "support": {
+        "cpan": "Net-Duo",
+        "email": "rra@cpan.org",
+        "web": "https://www.eyrie.org/~eagle/software/net-duo/",
+    },
+    "vcs": {
+        "type": "Git",
+        "url": "https://git.eyrie.org/git/perl/net-duo.git",
+        "browse": "https://git.eyrie.org/?p=perl/net-duo.git",
+        "github": "rra/net-duo",
+        "openhub": "https://www.openhub.net/p/net-duo",
+        "travis": "rra/net-duo",
+    },
+    "distribution": {
+        "section": "perl",
+        "tarname": "Net-Duo",
+        "version": "net-duo",
+        "cpan": "Net-Duo",
+    },
+    "packaging": {
+        "debian": "libnet-duo-perl",
+    },
+    "docs": {
+        "api": [
+            {
+                "name": "api/duo",
+                "title": "Net::Duo",
+            },
+            {
+                "name": "api/admin",
+                "title": "Net::Duo::Admin",
+            },
+            {
+                "name": "api/admin-group",
+                "title": "Net::Duo::Admin::Group",
+            },
+            {
+                "name": "api/admin-integration",
+                "title": "Net::Duo::Admin::Integration",
+            },
+            {
+                "name": "api/admin-phone",
+                "title": "Net::Duo::Admin::Phone",
+            },
+            {
+                "name": "api/admin-token",
+                "title": "Net::Duo::Admin::Token",
+            },
+            {
+                "name": "api/admin-user",
+                "title": "Net::Duo::Admin::User",
+            },
+            {
+                "name": "api/auth",
+                "title": "Net::Duo::Auth",
+            },
+            {
+                "name": "api/auth-async",
+                "title": "Net::Duo::Auth::Async",
+            },
+            {
+                "name": "api/exception",
+                "title": "Net::Duo::Exception",
+            },
+            {
+                "name": "api/mock-agent",
+                "title": "Net::Duo::Mock::Agent",
+            },
+            {
+                "name": "api/object",
+                "title": "Net::Duo::Object",
+            },
+        ],
+    },
+}

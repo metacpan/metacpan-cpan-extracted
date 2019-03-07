@@ -4,7 +4,7 @@
       "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,6 +31,7 @@
             "Context::Preserve" : "0.01",
             "DBIx::Class" : "0.08121",
             "Log::Contextual" : "0.005005",
+            "Module::Runtime" : "0.001",
             "Moo" : "1.003",
             "Moose" : "1",
             "MooseX::Role::Parameterized" : "0.18",
@@ -67,7 +68,8 @@
          "web" : "https://github.com/frioux/DBIx-Class-DeploymentHandler"
       }
    },
-   "version" : "0.002222",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.002223",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

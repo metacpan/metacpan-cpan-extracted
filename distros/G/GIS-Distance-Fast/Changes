@@ -1,32 +1,46 @@
-Revision history for Perl extension GIS::Distance::Fast.
+Revision history for Perl extension GIS-Distance-Fast.
 
-0.08      2015-06-11
+0.09 2019-03-07T17:09:53Z
+
+ - Removed Moo/Type::Tiny, all unecessary.
+ - Move GIS::Distance::Formula::*::Fast modules to GIS::Distance::Fast::*.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+
+0.08 2015-06-11
+
  - Move to Moo.
 
-0.07      2012-03-24
+0.07 2012-03-24
+
  - Release with Dist::Zilla.
 
-0.06 : 2010-02-02
+0.06 2010-02-02
+
  - Require GIS::Distance 0.07 for Any::Moose support.
  - Use Any::Moose.
 
-0.05 : 2010-01-31
+0.05 2010-01-31
+
  - Use fabs() instead of abs() in Vincenting calculations.
  - Use higher-precision PI that comes with math.h in all formulas.
 
-0.04 : 2010-01-30
+0.04 2010-01-30
+
  - Docs were still stating that Inline::C was being used.
  - Updated to require latest GIS::Distance version.
 
-0.03 : 2009-07-20
+0.03 2009-07-20
+
  - Replaced Inline::C with real XS.
  - Add tests for pod, pod coverage, and perl critic.
 
-0.02 : 2008-03-23
+0.02 2008-03-23
+
  - Fixed some documentation typos that were using GID instead of GIS.
  - Added a TEST COVERAGE section with output from Devel::Cover.
  - Added dependencies for Inline::C and Inline::Files to make.
 
-0.01 : 2008-03-16
+0.01 2008-03-16
+
  - First release.
 

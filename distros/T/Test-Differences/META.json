@@ -4,7 +4,7 @@
       "David Cantrell <david@cantrell.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -48,6 +48,6 @@
          "url" : "https://github.com/DrHyde/Test-Differences"
       }
    },
-   "version" : "0.66",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.67",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

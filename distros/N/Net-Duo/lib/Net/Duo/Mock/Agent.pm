@@ -8,8 +8,10 @@
 # All tests are reported by Test::More, and no effort is made to produce a
 # predictable number of test results.  This means that any calling test
 # program should probably not specify a plan and instead use done_testing().
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Mock::Agent 1.01;
+package Net::Duo::Mock::Agent 1.02;
 
 use 5.014;
 use strict;
@@ -68,7 +70,7 @@ sub _verify_signature {
     $args = join(q{&}, sort(split(m{&}xms, $args)));
 
     # Generate the hash of the request and check it.
-    my $data = join("\n", $date, $method, $host, $path, $args);
+    my $data      = join("\n", $date, $method, $host, $path, $args);
     my $signature = hmac_sha1_hex($data, $self->{secret_key});
     is($password, $signature, 'Signature');
     return;
@@ -88,16 +90,17 @@ sub request {
     my ($self, $request) = @_;
 
     # Throw an exception if we got an unexpected call.
-    if (!$self->{expected}) {
+    if (!@{ $self->{expected} }) {
         croak('saw an unexpected request');
     }
+    my $expected = shift(@{ $self->{expected} });
 
     # Verify the signature on the request.  We continue even if it doesn't
     # verify and check the rest of the results.
     $self->_verify_signature($request);
 
     # Ensure the method and URI match what we expect, and extract the content.
-    is($request->method, $self->{expected}{method}, 'Method');
+    is($request->method, $expected->{method}, 'Method');
     my $uri = $request->uri;
     my $content;
     if ($request->method eq 'GET') {
@@ -109,7 +112,7 @@ sub request {
     } else {
         $content = $request->content // q{};
     }
-    is($uri, $self->{expected}{uri}, 'URI');
+    is($uri, $expected->{uri}, 'URI');
 
     # Decode the content.
     my @pairs = split(m{&}xms, $content // q{});
@@ -122,15 +125,14 @@ sub request {
     }
 
     # Check the content.
-    if ($self->{expected}{content}) {
-        is_deeply(\%content, $self->{expected}{content}, 'Content');
+    if ($expected->{content}) {
+        is_deeply(\%content, $expected->{content}, 'Content');
     } else {
         is($content, q{}, 'Content');
     }
 
-    # Return the configured response and clear state.
-    my $response = $self->{expected}{response};
-    delete $self->{expected};
+    # Return the configured response.
+    my $response = $expected->{response};
     return $response;
 }
 
@@ -171,6 +173,9 @@ sub new {
     # Create the JSON decoder that we'll use for subsequent operations.
     $self->{json} = JSON->new->utf8(1);
 
+    # Create the queue of expected requests.
+    $self->{expected} = [];
+
     # Bless and return the new object.
     bless($self, $class);
     return $self;
@@ -189,6 +194,8 @@ sub new {
 #   response      - HTTP::Response object to return to the caller
 #   response_data - Partial data structure to add to generic JSON in response
 #   response_file - File containing JSON to return as a respose
+#   next_offset   - Return paging metadata with this next_offset key
+#   total_objects - Value for the paging metadata if next_offset is given
 #
 # Returns: undef
 #  Throws: Text exception on invalid parameters
@@ -197,7 +204,7 @@ sub expect {
     my ($self, $args_ref) = @_;
 
     # Verify consistency of the arguments.
-    my @response_args = qw(response response_data response_file);
+    my @response_args  = qw(response response_data response_file);
     my $response_count = grep { defined($args_ref->{$_}) } @response_args;
     if ($response_count < 1) {
         croak('no response, response_data, or response_file specified');
@@ -221,16 +228,29 @@ sub expect {
             my $data     = $self->{json}->decode($contents);
             $reply = { stat => 'OK', response => $data };
         }
+        if (defined($args_ref->{next_offset})) {
+            $reply->{metadata} = {
+                next_offset   => $args_ref->{next_offset},
+                prev_offset   => 0,
+                total_objects => $args_ref->{total_objects},
+            };
+        } elsif (exists($args_ref->{next_offset})) {
+            $reply->{metadata} = {
+                prev_offset   => 0,
+                total_objects => $args_ref->{total_objects},
+            };
+        }
         $response->content($self->{json}->encode($reply));
     }
 
     # Set the expected information for call verification later.
-    $self->{expected} = {
+    my $expected = {
         method   => uc($args_ref->{method}),
         uri      => 'https://' . $self->{api_hostname} . $args_ref->{uri},
         content  => $args_ref->{content},
         response => $response,
     };
+    push(@{ $self->{expected} }, $expected);
     return;
 }
 
@@ -306,7 +326,8 @@ exception of the user_agent argument, which is ignored).
 
 =item expect(ARGS)
 
-Expect a REST API call from Net::Duo.
+Expect a REST API call from Net::Duo.  This method can be called multiple
+times to build up a queue of expected requests.
 
 ARGS is used to specify both the expected request data and the response
 to return to the caller.  The same response is returned regardless of
@@ -357,6 +378,18 @@ of the C<response> key in the returned success response to the client.
 A file containing JSON that will be included as the value of the
 C<response> key in the returned success response to the client.
 
+=item next_offset
+
+Return paging metadata in the response, setting the C<next_offset> key to
+this value, the C<prev_offset> key to 0, and the C<total_objects> key to
+the value of the I<total_objects> parameter, which must be specified as
+well.  Set this to C<undef> to include pagination information but without
+a C<next_offset> key.
+
+=item total_objects
+
+Value to return in the C<total_objects> key in the paging metadata.
+
 =back
 
 =item request(REQUEST)
@@ -389,6 +422,8 @@ Russ Allbery <rra@cpan.org>
 Copyright 2014 The Board of Trustees of the Leland Stanford Junior
 University
 
+Copyright 2019 Russ Allbery <rra@cpan.org>
+
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
@@ -413,6 +448,10 @@ L<Net::Duo>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

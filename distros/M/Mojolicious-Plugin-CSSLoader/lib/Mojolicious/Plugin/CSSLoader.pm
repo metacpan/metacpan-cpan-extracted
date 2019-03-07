@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Mojolicious::Plugin';
 
-our $VERSION = 0.07;
+our $VERSION = '0.08';
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -38,11 +38,14 @@ sub register {
 
         return if $format ne 'html';
         return if !$c->stash->{__CSSLOADERFILES__};
+        return if 'ARRAY' ne ref $c->stash->{__CSSLOADERFILES__};
 
         my $load_css =
             join "\n", 
                 map{
                     my ($file,$config) = @{ $_ };
+                    $file //= '';
+
                     my $local_base  = $config->{no_base} ? '' : $base;
 
                     $local_base  = $c->url_for( $local_base ) if $local_base;
@@ -81,11 +84,13 @@ sub register {
                         $ie_end = sprintf "%s<![endif]-->", $end_extra;
                     }
 
-                    $config->{no_file} ? 
+                    my $return = $config->{no_file} ? 
                          qq~$ie_start<style type="text/css">$file</style>$ie_end~ :
                          qq~$ie_start<link rel="stylesheet" href="$local_base$file"$local_media/>$ie_end~;
+
+                    $file ? $return : ();
                 }
-                @{ $c->stash->{__CSSLOADERFILES__} || [] };
+                @{ $c->stash->{__CSSLOADERFILES__} };
 
         return if !$load_css;
 
@@ -107,7 +112,7 @@ Mojolicious::Plugin::CSSLoader - move css loading to the end of the document
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

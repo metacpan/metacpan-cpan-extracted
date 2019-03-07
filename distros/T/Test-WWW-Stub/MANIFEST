@@ -10,5 +10,6 @@ lib/Test/WWW/Stub/Intercepter.pm
 minil.toml
 t/00_compile.t
 t/10_feature.t
+t/11_unregister_bug.t
 META.yml
 MANIFEST

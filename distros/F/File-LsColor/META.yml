@@ -18,9 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  Term::ExtendedColor: '0.182'
+  Term::ExtendedColor: '0.500'
   perl: '5.004'
 resources:
   repository: https://github.com/trapd00r/File-LsColor.git
-version: '0.350'
+version: '0.352'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

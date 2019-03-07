@@ -318,7 +318,7 @@ if you do this.
 
 =cut
 
-our $VERSION = "0.66"; # or "0.001_001" for a dev release
+our $VERSION = "0.67"; # or "0.001_001" for a dev release
 $VERSION = eval $VERSION;
 
 use Exporter;
@@ -407,6 +407,8 @@ sub eq_or_diff {
 
     my @widths;
 
+    local $Data::Dumper::Deparse   = 1
+        unless($Test::Differences::NoDeparse);
     local $Data::Dumper::Indent    = 1;
     local $Data::Dumper::Purity    = 0;
     local $Data::Dumper::Terse     = 1;
@@ -556,6 +558,16 @@ This was carefully explained to me in words of two syllables or less by
 Yves Orton <demerphq@hotmail.com>.  The plan to address this is to allow
 you to select Data::Denter or some other module of your choice as an
 option.
+
+=head2 Code-refs
+
+Test::Differences turns on C<$Data::Dumper::Deparse>, so any code-refs in your
+data structures will be turned into text before they are examined, using
+L<B::Deparse>. The precise text generated for a sub-ref might not be what you
+expect as it is generated from the compiled version of the code, but it should
+at least be consistent and spot differences correctly.
+
+You can turn this behaviour off by setting C<$Test::Differences::NoDeparse>.
 
 =head1 AUTHORS
 

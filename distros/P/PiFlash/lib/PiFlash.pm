@@ -10,7 +10,7 @@ use PiFlash::Inspector;
 use PiFlash::MediaWriter;
 
 package PiFlash;
-$PiFlash::VERSION = '0.2.0';
+$PiFlash::VERSION = '0.2.1';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Getopt::Long; # included with perl
 use File::Basename; # included with perl
@@ -250,7 +250,7 @@ PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

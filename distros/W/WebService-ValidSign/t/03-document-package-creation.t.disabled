@@ -1,0 +1,58 @@
+use strict;
+use warnings;
+use Test::More 0.96;
+
+use WebService::ValidSign::Object::Document;
+use WebService::ValidSign::Object::DocumentPackage;
+use WebService::ValidSign::Object::Signer;
+use WebService::ValidSign;
+
+my $document_package = WebService::ValidSign::Object::DocumentPackage->new(
+    name => 'Policy package'
+);
+
+my $signer_one = WebService::ValidSign::Object::Signer->new(
+    custom_id  => 'Client1',
+    email      => 'john.smith@example.com',
+    first_name => 'John',
+    last_name  => 'Smith',
+);
+
+my $signer_two = WebService::ValidSign::Object::Signer->new(
+    email      => 'patty.galant@example.com',
+    first_name => 'Patty',
+    last_name  => 'Galant',
+);
+
+$document_package->add_signer($signer_one);
+$document_package->add_signer($signer_two);
+
+my $document_one = WebService::ValidSign::Object::Document->new_from_path(
+    path => __FILE__,
+);
+
+my $document_two = WebService::ValidSign::Object::Document->new_from_path(
+    path => __FILE__,
+);
+
+$document_one->add_signature(
+    signer   => $signer_one,
+    page     => 0,
+    position => [100, 100],
+);
+
+$document_two->add_signature(
+    signer   => $signer_two,
+    page     => 0,
+    position => [100, 100],
+);
+
+$document_package->add_document($document_one, $document_two);
+
+my $client = WebService::ValidSign->new(
+    api_key => 'Foo',
+    api_uri => 'https://try.validsign.nl'
+);
+my $result = $client->create_document_package($document_package);
+
+done_testing;

@@ -1,0 +1,12 @@
+Perl 5.14 or later and Module::Build 0.28 or later are required to build
+this module.  The following additional Perl modules are required to use
+it:
+
+* JSON
+* HTTP::Message
+* LWP::UserAgent 6.00 or later (part of libwww-perl)
+* Perl6::Slurp
+* Sub::Install
+* URI::Escape (part of URI)
+
+All are available on CPAN.

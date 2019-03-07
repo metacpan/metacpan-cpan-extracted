@@ -5,7 +5,7 @@ use warnings;
 no strict;
 no warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our $BREAK_AFTER_FORK = 1;
 
@@ -35,7 +35,7 @@ sub import {
 
 sub _fork {
 
-  if ($BREAK_ON_FORK) {
+  if ($BREAK_AFTER_FORK) {
 
     my $pid = &CORE::fork;
 

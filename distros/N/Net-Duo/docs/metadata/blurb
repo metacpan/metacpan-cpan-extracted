@@ -1,0 +1,7 @@
+Net::Duo provides an object-oriented Perl interface for the Duo Security
+REST APIs.  It attempts to abstract some of the API details and provide an
+object-oriented view of the returned objects in order to make use of the
+API in Perl code more natural than dealing with JSON data structures
+directly.  Currently, some parts of the Auth and Admin APIs are
+implemented alongside with generic methods to call any of the JSON-based
+APIs.

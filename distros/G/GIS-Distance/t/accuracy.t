@@ -1,9 +1,9 @@
 #!/usr/bin/env perl
-use strictures 1;
+use 5.008001;
+use strictures 2;
+use Test2::V0;
 
-use Test::More;
-
-use_ok( 'GIS::Distance' );
+use GIS::Distance;
 
 my $test_cases = {
     'Canoga Park to San Francisco' => [ 34.202361, -118.601875,  37.752258, -122.441254,   524.347542197146, 'km'],
@@ -14,8 +14,7 @@ my $test_cases = {
 };
 my $test_case_count = @{[ keys %$test_cases ]} + 0;
 
-my $gis = GIS::Distance->new();
-my $formulas = [qw( Vincenty Cosine Haversine MathTrig GreatCircle )];
+my $formulas = [qw( Cosine GreatCircle Haversine MathTrig Vincenty )];
 
 foreach my $formula (@$formulas) {
     subtest "run $formula" => sub {
@@ -24,20 +23,11 @@ foreach my $formula (@$formulas) {
     };
 }
 
-subtest 'run GeoEllipsoid' => sub {
-    eval { require Geo::Ellipsoid };
-    plan skip_all => 'Geo::Ellipsoid is not installed' if $@;
-
-    test_formula( 'GeoEllipsoid' );
-
-    done_testing;
-};
-
 done_testing;
 
 sub test_formula {
     my ($formula) = @_;
-    $gis->formula( 'GIS::Distance::Formula::'.$formula );
+    my $gis = GIS::Distance->new( "GIS::Distance::$formula" );
     foreach my $title (keys %$test_cases) {
         my $case     = $test_cases->{$title};
         my $unit     = $case->[5];

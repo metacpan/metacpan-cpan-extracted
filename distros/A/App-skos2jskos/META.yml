@@ -8,7 +8,7 @@ build_requires:
   Test::PerlTidy: '0'
   Test::RequiresInternet: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001'
 license: gpl
@@ -34,4 +34,4 @@ resources:
   bugtracker: https://github.com/gbv/skos2jskos/issues
   homepage: https://github.com/gbv/skos2jskos
   repository: https://github.com/gbv/skos2jskos.git
-version: 0.1.4
+version: 0.1.5

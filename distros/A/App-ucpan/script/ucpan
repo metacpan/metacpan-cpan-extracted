@@ -5,7 +5,6 @@ use strict;
 
 use YAML;
 use File::Which ();
-use File::HomeDir;
 use Path::Class;
 
 use Getopt::Long qw/:config bundling/;
@@ -54,7 +53,7 @@ BEGIN {
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
 use version;
-our $VERSION = version->declare('1.00');
+our $VERSION = version->declare('1.01');
             print __PACKAGE__->VERSION, $/;
             exit;
         },

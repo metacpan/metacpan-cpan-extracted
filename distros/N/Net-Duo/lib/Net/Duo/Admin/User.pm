@@ -2,8 +2,10 @@
 #
 # This class wraps the Duo representation of a single Duo user, as returned by
 # (for example) the Admin /users REST endpoint.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Admin::User 1.01;
+package Net::Duo::Admin::User 1.02;
 
 use 5.014;
 use strict;
@@ -459,10 +461,14 @@ DEALINGS IN THE SOFTWARE.
 
 L<Net::Duo::Admin>
 
-L<Duo Admin API for users|https://www.duosecurity.com/docs/adminapi#users>
+L<Duo Admin API for users|https://www.duo.com/docs/adminapi#users>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

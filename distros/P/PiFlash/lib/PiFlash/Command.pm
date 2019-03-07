@@ -9,7 +9,7 @@ use v5.18.0; # require 2014 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Command;
-$PiFlash::Command::VERSION = '0.2.0';
+$PiFlash::Command::VERSION = '0.2.1';
 use autodie;
 use POSIX; # included with perl
 use IO::Handle; # rpm: "dnf install perl-IO", deb: included with perl
@@ -279,7 +279,7 @@ sub prog
 
 	# if we didn't have the location of the program, look for it and cache the result
 	my $envprog = (uc $progname)."_PROG";
-	$envprog =~ s/\W+/_/g; # collapse any sequences of non-alphanumeric/non-underscore to a single underscore
+	$envprog =~ s/[\W-]+/_/g; # collapse any sequences of non-alphanumeric/non-underscore to a single underscore
 	if (exists $ENV{$envprog} and -x $ENV{$envprog}) {
 		$prog->{$progname} = $ENV{$envprog};
 		return $prog->{$progname};
@@ -295,7 +295,7 @@ sub prog
 
 	# if we get here, we didn't find a known secure location for the program
 	PiFlash::State->error("unknown secure location for $progname - install it or set "
-			.(uc $progname."_PROG")." to point to it");
+			."$envprog to point to it");
 }
 ## use critic
 
@@ -313,7 +313,7 @@ PiFlash::Command - process/command running utilities for piflash
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

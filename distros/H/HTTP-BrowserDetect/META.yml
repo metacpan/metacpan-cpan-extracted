@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.21'
+version: '3.22'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -140,6 +140,131 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::OALDERS/ExecDir'
       version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories:
+            - bin
+            - lib
+          spell_cmd: ''
+          stopwords:
+            - Alders
+            - "Alders'"
+            - AnnoCPAN
+            - Atsushi
+            - Cebrin
+            - Firebird
+            - Florian
+            - Heiko
+            - Iceweasel
+            - KHTML
+            - Kato
+            - Kurihara
+            - Latypoff
+            - McGregor
+            - Oatis
+            - Pelzer
+            - Purkis
+            - Rask
+            - RealPlayer
+            - Rifkin
+            - Ritter
+            - Smidsrod
+            - Sorcinelli
+            - UserAgent
+            - Voelker
+            - WAP
+            - WebKit
+            - WinNT
+            - Yoshiki
+            - adm
+            - ahrefs
+            - altavista
+            - aol
+            - apache
+            - applecoremedia
+            - askjeeves
+            - audrey
+            - avantgo
+            - baidu
+            - bingbot
+            - browsex
+            - dalvik
+            - ds
+            - dsi
+            - elinks
+            - facebook
+            - firefox
+            - galeon
+            - getright
+            - golib
+            - googleadsbot
+            - googleadsense
+            - googlebot
+            - googlebotimage
+            - googlebotnews
+            - googlebotvideo
+            - googlefavicon
+            - googlemobile
+            - icab
+            - ie
+            - indy
+            - infoseek
+            - iopener
+            - ios
+            - ipad
+            - iphone
+            - ipod
+            - ipsagent
+            - khtml
+            - kindlefire
+            - konqueror
+            - linkchecker
+            - linkexchange
+            - lotusnotes
+            - lycos
+            - macosx
+            - macppc
+            - merlynkline
+            - mj
+            - mozilla
+            - msn
+            - msnmobile
+            - msoffice
+            - nav
+            - navgold
+            - neoplanet
+            - netfront
+            - netscape
+            - nutch
+            - obigo
+            - phplib
+            - polaris
+            - ps
+            - psp
+            - pubsub
+            - puf
+            - realplayer
+            - rubylib
+            - seamonkey
+            - specialarchiver
+            - staroffice
+            - ucbrowser
+            - userAgent
+            - wap
+            - webkit
+            - webos
+            - webtv
+            - wget
+            - winnt
+            - winphone
+            - yandex
+            - yandexbot
+            - yandeximages
+          wordlist: Pod::Wordlist
+      name: '@Author::OALDERS/Test::PodSpelling'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::OALDERS/PodSyntaxTests'
@@ -412,7 +537,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.21
+          tag: v3.22
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

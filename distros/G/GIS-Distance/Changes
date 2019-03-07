@@ -1,29 +1,44 @@
-Revision history for Perl extension GIS::Distance.
+Revision history for Perl extension GIS-Distance.
 
-0.09      2015-06-11
+0.10 2019-03-07T16:28:48Z
+
+ - Moved GIS::Distance::GeoEllipsoid to a separate distro.
+ - Added the distance_km() method to GIS::Distance.
+ - Removed Moo/Type::Tiny, all unecessary, simple OO.
+ - Move GIS::Distance::Formula:: modules to GIS::Distance::.
+ - Migrate build tooling from Dist::Zilla to Minilla.
+
+0.09 2015-06-11
+
  - Move away from Any::Moose to Moo (yay!).
  - Better formula loading logic.
  - Support single-arg (formula) GIS::Distance instantiation.
 
-0.08      2012-03-23
+0.08 2012-03-23
+
  - Release with Dist::Zilla.
  - Fix Great Circle formula to use ** instead of ^.
 
-0.07 : 2010-02-02
+0.07 2010-02-02
+
  - Use Any::Moose instead of Moose directly.
  - Declare namespace::autoclean dependency.
 
-0.06 : 2010-01-30
+0.06 2010-01-30
+
  - Minor build updates to include some extra info (github, etc).
 
-0.05 : 2010-01-30
+0.05 2010-01-30
+
  - Speed improvements under Moose (now uses immutable).
 
-0.04 : 2009-06-29
+0.04 2009-06-29
+
  - Fixed for latest Moose.
  - Fixed for latest Class::Measure.
 
 0.03
+
  - Fixed for latest Moose.
  - Reduced the README to a one-liner.
  - Added docs to GIS::Distance::Formula.
@@ -33,7 +48,8 @@ Revision history for Perl extension GIS::Distance.
  - Added a one liner to the SYNOPSIS showing how to used the returned distance object.
  - Added a TEST COVERAGE section with output from Devel::Cover.
 
-0.02 : 2008-03-16
+0.02 2008-03-16
+
  - Added Geoid to the TODO section.
  - Using Module::Install now.
  - Moved all formulas in to the GIS::Distance::Formula namespace.
@@ -44,7 +60,8 @@ Revision history for Perl extension GIS::Distance.
  - Fixed POD testing.
  - Changed version scheme to use the simple x.xx format.
 
-0.01001 : 2006-09-20
+0.01001 2006-09-20
+
  - Added basic META.yml.
  - Geo::Ellipsoid support.
  - Added a TODO section.
@@ -52,20 +69,23 @@ Revision history for Perl extension GIS::Distance.
  - GreatCircle formula marked as broken.
  - Added a dev script for graphing the deviations in the formulas.
 
-0.01000 : 2006-09-19
+0.01000 2006-09-19
+
  - Renamed from Geo::Distance to GIS::Distance.
  - Moved distance calculations in to their own modules.
  - Use Class::Measure::Length to handle distance return values.
  - Test POD syntax.
 
-Revision history for Perl extension Geo::Distance.
+Revision history for Perl extension Geo-Distance.
 
-0.11 : 2005-09-01
+0.11 2005-09-01
+
  - Fixed some errors in the documentation.
  - Added an highly accurate ellipsoid formula.
  - lon_field and lat_field were not being used by closest. (D. Hageman)
 
-0.10 : 2005-07-11
+0.10 2005-07-11
+
  - The closest() method has a changed argument syntax and no longer
    supports array searches.
  - The closest() method works!
@@ -73,7 +93,8 @@ Revision history for Perl extension Geo::Distance.
  - Tweaked docs.
  - Added some tests (yay!).
 
-0.09 : 2005-04-01
+0.09 2005-04-01
+
  - Modified the todo list to include ideas for future algorithms.
  - Fixed the nautical mile, mile, yard, and light second units.
  - Added the British spellings for kilometre, metre, and centimetre.
@@ -82,11 +103,13 @@ Revision history for Perl extension Geo::Distance.
  - The totw.pl script was written by Ren and can be used to
    take over the world.
 
-0.08 : 2005-03-20
+0.08 2005-03-20
+
  - Updated the README description.
  - Removed debug print()s.  Eeek!
 
-0.07 : 2005-03-16
+0.07 2005-03-16
+
  - Intermixed documentation with code so it is easier to keep
    the docs up-to-date.
  - OO interface only - method interface completely removed.
@@ -95,11 +118,13 @@ Revision history for Perl extension Geo::Distance.
  - Added "nautical mile" unit type.
  - Reworked the closest() function.
 
-0.06 : 2004-06-29
+0.06 2004-06-29
+
  - Optional Haversine formula.
  - Misc documentation tweaks.
 
-0.05 : 2003-03-19
+0.05 2003-03-19
+
  - Added a note in the documentation about the
    inaccuracies of using Math::Trig.
  - The 'mile' unit was being calculated wrong which
@@ -108,7 +133,8 @@ Revision history for Perl extension Geo::Distance.
    on that no longer exists.
  - Documentation tweaks as usual.
 
-0.04 : 2003-02-18
+0.04 2003-02-18
+
  - Documentation revised once again.
  - Added reg_unit() for adding your own unit type.
  - find_closest has been overhauled:
@@ -128,16 +154,22 @@ Revision history for Perl extension Geo::Distance.
  - Enhanced tests.  Now we're actually doing some
    real testing.  Need more tests tho.
 
-0.03 : 2003-02-15
+0.03 2003-02-15
+
  - Documentation modified.
  - Added find_closest() which accepts a $dbh for
    searching in an SQL database.
  - distance_dirty() can now accept locations as
    array refs.
 
-0.02 : 2003-02-14
+0.02 2003-02-14
+
  - Based on a suggestion by Jack D. I migrated the code
    to use Math::Trig for most of the distance math.
  - POD documentation written.
  - Object oriented interface created.
+
+0.01
+
+ - First version.
 

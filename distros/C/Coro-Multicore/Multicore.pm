@@ -246,7 +246,7 @@ use Coro ();
 use AnyEvent ();
 
 BEGIN {
-   our $VERSION = '1.02';
+   our $VERSION = '1.03';
 
    use XSLoader;
    XSLoader::load __PACKAGE__, $VERSION;

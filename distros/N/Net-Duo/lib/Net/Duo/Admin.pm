@@ -2,12 +2,14 @@
 #
 # This Perl module collection provides a Perl interface to the Admin API
 # integration for the Duo multifactor authentication service
-# (https://www.duosecurity.com/).  It differs from the Perl API sample code in
-# that it wraps all the returned data structures in objects with method calls,
+# (https://www.duo.com/).  It differs from the Perl API sample code in that it
+# wraps all the returned data structures in objects with method calls,
 # abstracts some of the API details, and throws rich exceptions rather than
 # requiring the caller deal with JSON data structures directly.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Admin 1.01;
+package Net::Duo::Admin 1.02;
 
 use 5.014;
 use strict;
@@ -32,7 +34,7 @@ sub integrations {
     my ($self) = @_;
 
     # Make the Duo call and get the decoded result.
-    my $result = $self->call_json('GET', '/admin/v1/integrations');
+    my $result = $self->call_json_paged('GET', '/admin/v1/integrations');
 
     # Convert the returned integrations into Net::Duo::Admin::Integration
     # objects.
@@ -135,7 +137,7 @@ sub user {
     my ($self, $username) = @_;
 
     # Make the Duo call and get the decoded result.
-    my $args = { username => $username };
+    my $args   = { username => $username };
     my $result = $self->call_json('GET', '/admin/v1/users', $args);
 
     # Convert the returned user into a Net::Duo::Admin::User object.
@@ -159,8 +161,8 @@ sub users {
     my ($self, $username) = @_;
 
     # Make the Duo call and get the decoded result.
-    my $args = $username ? { username => $username } : undef;
-    my $result = $self->call_json('GET', '/admin/v1/users', $args);
+    my $args   = $username ? { username => $username } : undef;
+    my $result = $self->call_json_paged('GET', '/admin/v1/users', $args);
 
     # Convert the returned users into Net::Duo::Admin::User objects.
     my @users;
@@ -386,6 +388,8 @@ Russ Allbery <rra@cpan.org>
 Copyright 2014 The Board of Trustees of the Leland Stanford Junior
 University
 
+Copyright 2019 Russ Allbery <rra@cpan.org>
+
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
@@ -406,10 +410,14 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Duo Auth API|https://www.duosecurity.com/docs/authapi>
+L<Duo Auth API|https://www.duo.com/docs/authapi>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

@@ -9,7 +9,6 @@ use Encode qw(decode encode_utf8 decode_utf8);
 use File::Path;
 use File::Spec::Functions qw(catfile);
 use Cwd;
-use Env;
 use Clone qw(clone);
 
 our $UNIX_PATH_SEPARATOR = '/';

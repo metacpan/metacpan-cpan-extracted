@@ -22,13 +22,14 @@ t/01-detect.t
 t/03-language.t
 t/04-random-order.t
 t/05_robot.t
-t/99_blank_ua.t
+t/99-warnings.t
 t/add-field.pl
 t/make-more-useragents.pl
 t/more-useragents.json
 t/perlcriticrc
 t/useragents.json
 tidyall.ini
+xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/synopsis.t
 xt/author/tidyall.t

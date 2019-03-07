@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,40 +15,40 @@ name: Net-Duo
 provides:
   Net::Duo:
     file: lib/Net/Duo.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Admin:
     file: lib/Net/Duo/Admin.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Admin::Group:
     file: lib/Net/Duo/Admin/Group.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Admin::Integration:
     file: lib/Net/Duo/Admin/Integration.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Admin::Phone:
     file: lib/Net/Duo/Admin/Phone.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Admin::Token:
     file: lib/Net/Duo/Admin/Token.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Admin::User:
     file: lib/Net/Duo/Admin/User.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Auth:
     file: lib/Net/Duo/Auth.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Auth::Async:
     file: lib/Net/Duo/Auth/Async.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Exception:
     file: lib/Net/Duo/Exception.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Mock::Agent:
     file: lib/Net/Duo/Mock/Agent.pm
-    version: '1.01'
+    version: '1.02'
   Net::Duo::Object:
     file: lib/Net/Duo/Object.pm
-    version: '1.01'
+    version: '1.02'
 requires:
   JSON: '0'
   LWP::UserAgent: '6.00'
@@ -58,7 +58,7 @@ requires:
   perl: '5.014'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-Duo
-  license: http://opensource.org/licenses/mit-license.php
+  license: http://www.opensource.org/licenses/mit-license.php
   repository: git://git.eyrie.org/perl/duo.git
-version: '1.01'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

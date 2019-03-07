@@ -15,7 +15,6 @@ PiFlash::State->init(@top_level_params);
 plan tests => (scalar @top_level_params) * 6 + 6;
 
 # test existence of symtab entries
-my $symtab = \%PiFlash::State::;
 foreach my $tlp_name (@top_level_params) {
 	can_ok("PiFlash::State", $tlp_name);
 	can_ok("PiFlash::State", "has_".$tlp_name);

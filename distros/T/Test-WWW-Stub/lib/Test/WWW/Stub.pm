@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 use Carp ();
 use Guard;  # guard
@@ -48,15 +48,10 @@ sub import {
 sub register {
     my ($class, $uri_or_re, $app_or_res) = @_;
     $app_or_res //= [200, [], []];
-    my $old_handler = $Intercepter->get_handler($uri_or_re);
 
-    $Intercepter->register($uri_or_re, $app_or_res);
+    my $handler = $Intercepter->register($uri_or_re, $app_or_res);
     defined wantarray && return guard {
-        if ($old_handler) {
-            $Intercepter->register($uri_or_re, $old_handler);
-        } else {
-            $Intercepter->unregister($uri_or_re);
-        }
+        $Intercepter->unregister($uri_or_re, $handler);
     };
 }
 

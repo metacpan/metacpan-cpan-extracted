@@ -68,7 +68,7 @@ for development of your XS module.
 
 This costs a bit of performance though, so it is disabled by default.
 
-The environment variable CORO_MULTICORE_CHECK can be used to ste a
+The environment variable CORO_MULTICORE_CHECK can be used to set a
 default for this answer.
 
 EOF

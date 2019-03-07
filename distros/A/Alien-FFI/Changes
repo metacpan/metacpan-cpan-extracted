@@ -1,5 +1,8 @@
 Revision history for Alien-FFI
 
+0.23      2019-03-07 11:47:25 -0500
+  - Fix test for big-endian systems.  (gh#7 ppisar++)
+
 0.22      2018-08-28 10:37:44 -0400
   - Additional failure diagnostics
 

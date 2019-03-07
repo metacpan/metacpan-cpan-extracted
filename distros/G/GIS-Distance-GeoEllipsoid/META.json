@@ -1,0 +1,82 @@
+{
+   "abstract" : "Geo::Ellipsoid distance calculations.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GIS-Distance-GeoEllipsoid",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GIS::Distance" : "0.10",
+            "Geo::Ellipsoid" : "0.902",
+            "namespace::clean" : "0.24",
+            "perl" : "5.008001",
+            "strictures" : "2.000000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "GIS::Distance::GeoEllipsoid" : {
+         "file" : "lib/GIS/Distance/GeoEllipsoid.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/GIS-Distance-GeoEllipsoid/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/GIS-Distance-GeoEllipsoid",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/GIS-Distance-GeoEllipsoid.git",
+         "web" : "https://github.com/bluefeet/GIS-Distance-GeoEllipsoid"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

@@ -1,7 +1,7 @@
 package App::skos2jskos;
 use v5.14;
 
-our $VERSION = '0.1.4';
+our $VERSION = '0.1.5';
 
 1;
 

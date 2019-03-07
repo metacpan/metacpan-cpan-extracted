@@ -5,7 +5,7 @@ use File::LsColor qw(ls_color_custom ls_color can_ls_color parse_ls_colors);
 
 is(
   (ls_color_custom('*.c=38;5;100;1', 'main.c'))[0],
-  "\e[38;5;100m\e[38;1mmain.c\e[m",
+  "\e[38;5;100m\e[1mmain.c\e[m",
   'ls_color_custom() OK',
 );
 

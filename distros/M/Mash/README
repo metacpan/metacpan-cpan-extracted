@@ -8,15 +8,22 @@ SYNOPSIS
       use warnings;
       use Mash;
 
-      # Quick example
-
       # Sketch all fastq files into one mash file.
+      # Mash sketching is not implemented in this module.
       system("mash sketch *.fastq.gz > all.msh");
       die if $?;
+
       # Read the mash file.
       my $msh = Mash->new("all.msh");
       # All-vs-all distances
       my $distHash = $msh->dist($msh);
+
+      # Read a mash file, write it to a json-formatted file
+      my $msh2 = Mash->new("all.msh");
+      $msh2->writeJson("all.json");
+      # Read the json file
+      my $mashJson = Mash->new("all.json");
+      my $dist = $msh2->dist($mashJson); # yields a zero distance
 
 DESCRIPTION
     This is a module to read mash files produced by the Mash executable. For
@@ -28,15 +35,28 @@ METHODS
     Mash->new("filename.msh",\%options);
         Create a new instance of Mash. One object per set of files.
 
-          Arguments:  Sketch filename
+          Arguments:  Sketch filename (valid types/extensions are .msh, .json, .json.gz)
                       Hash of options (none so far)
           Returns:    Mash object
 
-    $msh->file("filename.msh")
+    $msh->loadMsh("filename.msh")
         Changes which file is used in the object and updates internal object
         information. This method is ordinarily used internally only.
 
           Arguments: One mash file
+          Returns:   self
+
+    $msh->loadJson("filename.msh")
+        Changes which file is used in the object and updates internal object
+        information. This method is ordinarily used internally only.
+
+          Arguments: One JSON file describing a Mash sketch
+          Returns:   self
+
+    $msh->writeJson("filename.json")
+        Writes contents to a file in JSON format
+
+          Arguments: One filename
           Returns:   self
 
     $msh->dist($msh2)
@@ -53,7 +73,8 @@ METHODS
     Mash::raw_mash_distance($array1, $array2)
         Returns the number of sketches in common and the total number of
         sketches between two lists. The return type is an array of two
-        elements.
+        elements. This function is used internally with $msh->dist and
+        assumes that the hashes are already sorted.
 
           Arguments: A list of integers
                      A list of integers
@@ -66,6 +87,13 @@ METHODS
             my($common, $total) = Mash::raw_mash_distance($R1,$R2);
             # $common => 2
             # $total  => 3
+
+    $msh->fix()
+        Fixes a mash sketch if it is broken at all. For now this just sorts
+        hashes but this subroutine could contain more fixes in the future.
+
+          Arguments: None
+          Returns:   $self
 
 COPYRIGHT AND LICENSE
     MIT license.

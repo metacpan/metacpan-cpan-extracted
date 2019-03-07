@@ -1,0 +1,111 @@
+{
+   "name" : "PACKAGENAME",
+   "type" : "PACKAGE",
+   "status" : "SENT",
+   "autocomplete" : true,
+   "description" : "",
+   "emailMessage" : "",
+   "language" : "nl",
+   "sender" : {
+      "email" : "SENDERS_EMAIL@ADDRESS.com"
+   },
+   "roles" : [
+      {
+         "id" : "Signer1",
+         "index" : 0,
+         "name" : "Signer1",
+         "signers" : [
+            {
+               "email" : "SIGNERS_EMAIL@ADDRESS.com",
+               "firstName" : "FIRSTNAME",
+               "id" : "Signer1",
+               "lastName" : "LASTNAME",
+               "name" : "Signer1",
+               "phone" : "000000000000",
+               "auth" : {
+                  "challenges" : [],
+                  "scheme" : "NONE"
+               },
+               "knowledgeBasedAuthentication" : null
+            }
+         ],
+         "type" : "SIGNER"
+      },
+      {
+         "id" : "Signer1",
+         "index" : 0,
+         "name" : "Signer1",
+         "signers" : [
+            {
+               "email" : "SIGNERS_EMAIL@ADDRESS.com",
+               "firstName" : "FIRSTNAME",
+               "id" : "Signer1",
+               "lastName" : "LASTNAME",
+               "name" : "Signer1",
+               "phone" : "000000000000",
+               "auth" : {
+                  "challenges" : [],
+                  "scheme" : "NONE"
+               },
+               "knowledgeBasedAuthentication" : null
+            }
+         ],
+         "type" : "SIGNER"
+      }
+   ],
+   "settings" : {
+      "ceremony" : {
+         "inPerson" : false
+      }
+   },
+   "documents" : [
+      {
+         "approvals" : [
+            {
+               "fields" : [
+                  {
+                     "extract" : true,
+                     "extractAnchor" : {
+                        "anchorPoint" : "TOPLEFT",
+                        "characterIndex" : 0,
+                        "height" : 100,
+                        "index" : 0,
+                        "leftOffset" : 0,
+                        "text" : "TEXT_IN_YOUR_DOCUMENT_THAT_LOCATES_THE_SIGNATURE",
+                        "topOffset" : 0,
+                        "width" : 300
+                     },
+                     "subtype" : "CAPTURE",
+                     "type" : "SIGNATURE"
+                  }
+               ],
+               "role" : "Signer1"
+            },
+            {
+               "fields" : [
+                  {
+                     "extract" : true,
+                     "extractAnchor" : {
+                        "anchorPoint" : "TOPLEFT",
+                        "characterIndex" : 0,
+                        "height" : 100,
+                        "index" : 0,
+                        "leftOffset" : 0,
+                        "text" : "TEXT_IN_YOUR_DOCUMENT_THAT_LOCATES_THE_SIGNATURE",
+                        "topOffset" : 0,
+                        "width" : 300
+                     },
+                     "subtype" : "CAPTURE",
+                     "type" : "SIGNATURE"
+                  }
+               ],
+               "role" : "Signer1"
+            }
+         ],
+         "extract" : true,
+         "fields" : [],
+         "id" : "DOCUMENTID",
+         "name" : "DOCUMENTNAME"
+      }
+   ]
+}

@@ -36,7 +36,7 @@
             "Test::CPAN::Changes" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0.07",
-            "Test::More" : "0.94",
+            "Test::More" : "0.98",
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
@@ -75,9 +75,9 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.26",
       "requires" : {
          "share" : {
             "Archive::Tar" : "0",
@@ -94,8 +94,12 @@
          "system" : {}
       }
    },
-   "x_generated_by_perl" : "v5.29.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Petr Pisar (ppisar)"
+   ],
+   "x_generated_by_perl" : "v5.29.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_use_unsafe_inc" : 0
 }
 

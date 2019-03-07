@@ -44,7 +44,6 @@
          "requires" : {
             "App::cpanminus" : "0",
             "App::cpanoutdated" : "0",
-            "File::HomeDir" : "0",
             "File::Which" : "0",
             "Path::Class" : "0",
             "YAML" : "0",
@@ -61,11 +60,11 @@
    "provides" : {
       "App::ucpan" : {
          "file" : "lib/App/ucpan.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
-   "version" : "1.00",
+   "version" : "1.01",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpanx@gmail.com>"

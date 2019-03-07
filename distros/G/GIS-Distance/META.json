@@ -1,0 +1,114 @@
+{
+   "abstract" : "Calculate geographic distances.",
+   "author" : [
+      "Aran Clary Deltac <bluefeet@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "GIS-Distance",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "GIS::Distance::Fast" : "0.04"
+         },
+         "requires" : {
+            "Class::Measure::Length" : "0",
+            "Const::Fast" : "0.014",
+            "Math::Trig" : "0",
+            "namespace::clean" : "0.24",
+            "perl" : "5.008001",
+            "strictures" : "2.000000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000094"
+         }
+      }
+   },
+   "provides" : {
+      "GIS::Distance" : {
+         "file" : "lib/GIS/Distance.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::Constants" : {
+         "file" : "lib/GIS/Distance/Constants.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::Cosine" : {
+         "file" : "lib/GIS/Distance/Cosine.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::GreatCircle" : {
+         "file" : "lib/GIS/Distance/GreatCircle.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::Haversine" : {
+         "file" : "lib/GIS/Distance/Haversine.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::MathTrig" : {
+         "file" : "lib/GIS/Distance/MathTrig.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::Polar" : {
+         "file" : "lib/GIS/Distance/Polar.pm",
+         "version" : "0.10"
+      },
+      "GIS::Distance::Vincenty" : {
+         "file" : "lib/GIS/Distance/Vincenty.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bluefeet/GIS-Distance/issues"
+      },
+      "homepage" : "https://github.com/bluefeet/GIS-Distance",
+      "repository" : {
+         "url" : "git://github.com/bluefeet/GIS-Distance.git",
+         "web" : "https://github.com/bluefeet/GIS-Distance"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:BLUEFEET",
+   "x_contributors" : [
+      "Aran Clary Deltac <bluefeet@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

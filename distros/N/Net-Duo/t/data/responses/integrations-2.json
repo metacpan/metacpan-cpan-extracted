@@ -1,0 +1,18 @@
+[
+    {
+        "enroll_policy": "enroll",
+        "greeting": "Welcome to Duo.",
+        "groups_allowed": [],
+        "integration_key": "GHZWAFDZZPV4G99B37VQ",
+        "ip_whitelist": [],
+        "ip_whitelist_enroll_policy": "enforce",
+        "name": "Web Application",
+        "notes": "",
+        "secret_key": "98DFAfvqQVRIADFadfdPDORfcNf8LeXIbCWwHazY7",
+        "self_service_allowed": false,
+        "trusted_device_days": 0,
+        "type": "websdk",
+        "username_normalization_policy": "None",
+        "visual_style": "default"
+    }
+]

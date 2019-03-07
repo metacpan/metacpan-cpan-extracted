@@ -1,0 +1,62 @@
+---
+abstract: 'Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.'
+author:
+  - 'Gérald Sédrati-Dinet <gibus@cpan.org>'
+build_requires:
+  File::Find: '0'
+  File::Temp: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::NoWarnings: '0'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-SpreadRevolutionaryDate
+provides:
+  App::SpreadRevolutionaryDate:
+    file: lib/App/SpreadRevolutionaryDate.pm
+    version: '0.06'
+  App::SpreadRevolutionaryDate::Config:
+    file: lib/App/SpreadRevolutionaryDate/Config.pm
+    version: '0.06'
+  App::SpreadRevolutionaryDate::Freenode:
+    file: lib/App/SpreadRevolutionaryDate/Freenode.pm
+    version: '0.06'
+  App::SpreadRevolutionaryDate::Freenode::Bot:
+    file: lib/App/SpreadRevolutionaryDate/Freenode/Bot.pm
+    version: '0.06'
+  App::SpreadRevolutionaryDate::Mastodon:
+    file: lib/App/SpreadRevolutionaryDate/Mastodon.pm
+    version: '0.06'
+  App::SpreadRevolutionaryDate::Twitter:
+    file: lib/App/SpreadRevolutionaryDate/Twitter.pm
+    version: '0.06'
+requires:
+  AppConfig: '0'
+  Bot::BasicBot: '0'
+  DateTime::Calendar::FrenchRevolutionary: '0'
+  File::HomeDir: '0'
+  Mastodon::Client: '0'
+  Net::Async::HTTP: '0.43'
+  Net::OAuth: '0.25'
+  Net::Twitter::Lite::WithAPIv1_1: '0'
+  namespace::clean: '0'
+  open: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-SpreadRevolutionaryDate
+  homepage: http://search.cpan.org/dist/App-SpreadRevolutionaryDate/
+  repository: git://github.com/gibus/SpreadRevolutionaryDate.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,6 +1,9 @@
 Revision history for Perl extension App-ucpan
 
-1.00 2019-03-05T09:09:55Z
+1.01 2019-03-07T02:22:16Z
+
+1.01 2019-03-07T02:05:35Z
+    - Purge unused prereqs
 
 1.00 2019-03-05T09:07:07Z
     - Improve help message

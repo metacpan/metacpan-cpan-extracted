@@ -1,19 +1,19 @@
 #!/usr/bin/env perl
-use strictures 1;
+use 5.008001;
+use strictures 2;
+use Test2::V0;
 
-use Test::More;
-
-use_ok( 'GIS::Distance' );
+use GIS::Distance;
 
 my @coords = ( 34.202361, -118.601875,  37.752258, -122.441254 );
 my @formulas = qw( Haversine Cosine Vincenty );
 my $gis = GIS::Distance->new();
 
 foreach my $formula (@formulas) {
-    $gis->formula( 'GIS::Distance::Formula::'.$formula );
+    my $s_gis = GIS::Distance->new( "GIS::Distance::$formula" );
     my $s_length = $gis->distance( @coords )->km();
 
-    $gis->formula( 'GIS::Distance::Formula::'.$formula.'::Fast' );
+    my $f_gis = GIS::Distance->new( "GIS::Distance::Fast::$formula" );
     my $f_length = $gis->distance( @coords )->km();
 
     is_close( $s_length, $f_length, $formula );
@@ -31,4 +31,3 @@ sub is_close {
         pass( "$description - $num1 =~ $num2" );
     }
 }
-

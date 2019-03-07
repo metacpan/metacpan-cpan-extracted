@@ -11,7 +11,7 @@ use v5.18.0; # require 2014 or newer version of Perl
 # State class to hold program state, and print it all out in case of errors
 # this is a low-level package - it stores state data but at this level has no knowledge of what is being stored in it
 package PiFlash::State;
-$PiFlash::State::VERSION = '0.2.0';
+$PiFlash::State::VERSION = '0.2.1';
 use autodie;
 use YAML::XS; # RPM: perl-YAML-LibYAML, DEB: libyaml-libyaml-perl
 use Carp qw(croak);
@@ -44,9 +44,6 @@ sub init
 	bless $PiFlash::State::state, $class;
 	my $self = $PiFlash::State::state;
 
-	# get symbol table for State package so we can add accessor functions named for top-level hashes
-	my $symtab = \%PiFlash::State::;
-
 	# loop through parameters adding each name as a top-level state hash and accessor functions
 	while (scalar @_ > 0) {
 		my $top_level_param = shift;
@@ -56,29 +53,36 @@ sub init
 
 		# generate class accessor methods named for the parameter
 		{
+			## no critic (ProhibitNoStrict)
+			no strict qw(refs);
+
 			# accessor fieldname()
-			$symtab->{$top_level_param} = sub {
-				my $name = shift;
-				my $value = shift;
-				if (defined $value) {
-					# got name & value - set the new value for name
-					$self->{$top_level_param}{$name} = $value;
-					return;
-				} elsif (defined $name) {
-					# got only name - return the value/ref of name
-					return (exists $self->{$top_level_param}{$name})
-						? $self->{$top_level_param}{$name}
-						: undef;
-				} else {
-					# no name or value - return ref to top-level hash (top_level_parameter from init() context)
-					return $self->{$top_level_param};
-				}
-			};
+			if (! $class->can($top_level_param)) { 
+				*{$class."::".$top_level_param} = sub {
+					my $name = shift;
+					my $value = shift;
+					if (defined $value) {
+						# got name & value - set the new value for name
+						$self->{$top_level_param}{$name} = $value;
+						return;
+					} elsif (defined $name) {
+						# got only name - return the value/ref of name
+						return (exists $self->{$top_level_param}{$name})
+							? $self->{$top_level_param}{$name}
+							: undef;
+					} else {
+						# no name or value - return ref to top-level hash (top_level_parameter from init() context)
+						return $self->{$top_level_param};
+					}
+				};
+			}
 
 			# accessor has_fieldname()
-			$symtab->{"has_".$top_level_param} = sub {
-				my $name = shift;
-				return ((exists $self->{$top_level_param}) and (exists $self->{$top_level_param}{$name}));
+			if (! $class->can("has_".$top_level_param)) {
+				*{$class."::has_".$top_level_param} = sub {
+					my $name = shift;
+					return ((exists $self->{$top_level_param}) and (exists $self->{$top_level_param}{$name}));
+				};
 			}
 		}
 	}
@@ -213,12 +217,16 @@ PiFlash::State - PiFlash::State class to store configuration, device info and pr
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
  # initialize: creates empty sub-objects and accessor functions as shown below
  PiFlash::State->init("system", "input", "output", "cli_opt", "log");
+
+ # better initialization - use PiFlash's state category list function
+ my @categories = PiFlash::state_categories();
+ PiFlash::State->init(@categories);
 
  # core functions
  $bool = PiFlash::State::verbose()

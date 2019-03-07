@@ -7,8 +7,10 @@
 # recover additional information.  If the caller doesn't care about the
 # details, it provides a stringification that is suitable for simple error
 # messages.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Exception 1.01;
+package Net::Duo::Exception 1.02;
 
 use 5.014;
 use strict;
@@ -346,6 +348,10 @@ L<Net::Duo>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

@@ -3,8 +3,10 @@
 # This class wraps the transaction ID returned by Duo from an asynchronous
 # authentication and provides a method to long-poll the status of that
 # authentication attempt.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Auth::Async 1.01;
+package Net::Duo::Auth::Async 1.02;
 
 use 5.014;
 use strict;
@@ -190,10 +192,14 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<Duo Auth API|https://www.duosecurity.com/docs/authapi>
+L<Duo Auth API|https://www.duo.com/docs/authapi>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

@@ -2,8 +2,10 @@
 #
 # This class wraps the Duo representation of a single Duo group, as returned
 # by (for example) the Admin /groups REST endpoint.
+#
+# SPDX-License-Identifier: MIT
 
-package Net::Duo::Admin::Group 1.01;
+package Net::Duo::Admin::Group 1.02;
 
 use 5.014;
 use strict;
@@ -253,10 +255,14 @@ DEALINGS IN THE SOFTWARE.
 
 L<Net::Duo::Admin>
 
-L<Duo Admin API for groups|https://www.duosecurity.com/docs/adminapi#groups>
+L<Duo Admin API for groups|https://www.duo.com/docs/adminapi#groups>
 
 This module is part of the Net::Duo distribution.  The current version of
 Net::Duo is available from CPAN, or directly from its web site at
-L<http://www.eyrie.org/~eagle/software/net-duo/>.
+L<https://www.eyrie.org/~eagle/software/net-duo/>.
 
 =cut
+
+# Local Variables:
+# copyright-at-end-flag: t
+# End:

@@ -4,6 +4,11 @@ TODO: idle timeout, like IO::AIO
 
 TODO: add examples
 
+1.03 Wed Mar  6 17:37:18 CET 2019
+	- the recursioon check (disabled by default) wrongly triggered
+          when multicore was completely _disabled_, instead of acting
+          like a nop.
+
 1.02 Tue Mar  5 13:31:03 CET 2019
 	- make extra sanity checks configurable.
         - abort, not croak, when checks fail, as error is in XS code.

@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-WWW-Stub
 
+0.09 2019-03-07T07:06:34Z
+    - Restore to proper state when localize guard object has released in a different order (#21)
+
 0.08 2018-11-08T03:04:13Z
     - Use registered patterns after sorting by length, to deal with hash randomization. (#20, thanks to papix)
 

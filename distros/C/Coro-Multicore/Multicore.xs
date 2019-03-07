@@ -202,18 +202,18 @@ start_thread (void)
 static void
 pmapi_release (void)
 {
+  if (! ((thread_enable ? thread_enable : global_enable) & 1))
+    {
+      X_TLS_SET (current_key, 0);
+      return;
+    }
+
   #if RECURSION_CHECK
   if (X_TLS_GET (check_key))
     fatal ("FATAL: perlinterp_release () called without valid perl context");
 
   X_TLS_SET (check_key, &check_key);
   #endif
-
-  if (! ((thread_enable ? thread_enable : global_enable) & 1))
-    {
-      X_TLS_SET (current_key, 0);
-      return;
-    }
 
   struct tctx *ctx = tctx_get ();
   ctx->coro = SvREFCNT_inc_simple_NN (CORO_CURRENT);
@@ -245,15 +245,15 @@ pmapi_acquire (void)
   int jeret;
   struct tctx *ctx = X_TLS_GET (current_key);
 
+  if (!ctx)
+    return;
+
   #if RECURSION_CHECK
   if (X_TLS_GET (check_key) != &check_key)
     fatal ("FATAL: perlinterp_acquire () called with valid perl context");
 
   X_TLS_SET (check_key, 0);
   #endif
-
-  if (!ctx)
-    return;
 
   X_LOCK (acquire_m);
 
@@ -339,6 +339,8 @@ scoped_disable ()
         CORO_ENTERLEAVE_SCOPE_HOOK (set_thread_enable, (void *)2, set_thread_enable, (void *)0);
         ENTER; /* see Guard.xs */
 
+#if 0
+
 U32
 min_idle_threads (U32 min = NO_INIT)
 	CODE:
@@ -349,7 +351,8 @@ min_idle_threads (U32 min = NO_INIT)
         X_UNLOCK (acquire_m);
         OUTPUT:
         RETVAL
-	
+
+#endif
 
 int
 fd ()

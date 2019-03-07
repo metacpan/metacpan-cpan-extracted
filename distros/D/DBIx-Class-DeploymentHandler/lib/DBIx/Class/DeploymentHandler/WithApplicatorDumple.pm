@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::WithApplicatorDumple;
-$DBIx::Class::DeploymentHandler::WithApplicatorDumple::VERSION = '0.002222';
+$DBIx::Class::DeploymentHandler::WithApplicatorDumple::VERSION = '0.002223';
 use MooseX::Role::Parameterized;
 use Module::Runtime 'use_module';
 use namespace::autoclean;

@@ -1,6 +1,11 @@
 Revision history for Mojolicious::Plugin::JavaScript::Console
 =============================================================
 
+0.03    2019-03-06
+
+  * update dist.ini
+  * add tests
+
 0.02    2015-03-01
 
   [MISC]

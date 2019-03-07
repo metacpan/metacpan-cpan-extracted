@@ -31,15 +31,15 @@ test2(unsigned char input_value)
   ffi_cif         ffi_cif;
   ffi_type       *args[1];
   void           *values[1];
-  unsigned char   return_value;
+  ffi_arg         return_value;
   
   args[0] = &ffi_type_uint8;
   
-  if(ffi_prep_cif(&ffi_cif, FFI_DEFAULT_ABI, 1, &ffi_type_uint8, args) == FFI_OK)
+  if(ffi_prep_cif(&ffi_cif, FFI_DEFAULT_ABI, 1, &ffi_type_uchar, args) == FFI_OK)
   {
     values[0] = &input_value;
     ffi_call(&ffi_cif, FFI_FN(doublechaar), &return_value, values);
-    return return_value;
+    return (int)(unsigned char)return_value;
   }
   return -1;
 }

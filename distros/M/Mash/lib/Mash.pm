@@ -9,7 +9,7 @@ use Data::Dumper;
 use JSON ();
 use Encode qw/encode decode/;
 
-our $VERSION = 0.1;
+our $VERSION = 0.5;
 
 our @EXPORT_OK = qw(raw_mash_distance);
 
@@ -32,15 +32,22 @@ A module to read `mash info` output and transform it
   use warnings;
   use Mash;
 
-  # Quick example
-
   # Sketch all fastq files into one mash file.
+  # Mash sketching is not implemented in this module.
   system("mash sketch *.fastq.gz > all.msh");
   die if $?;
+
   # Read the mash file.
   my $msh = Mash->new("all.msh");
   # All-vs-all distances
   my $distHash = $msh->dist($msh);
+
+  # Read a mash file, write it to a json-formatted file
+  my $msh2 = Mash->new("all.msh");
+  $msh2->writeJson("all.json");
+  # Read the json file
+  my $mashJson = Mash->new("all.json");
+  my $dist = $msh2->dist($mashJson); # yields a zero distance
 
 =head1 DESCRIPTION
 
@@ -54,7 +61,7 @@ This is a module to read mash files produced by the Mash executable. For more in
 
 Create a new instance of Mash.  One object per set of files.
 
-  Arguments:  Sketch filename
+  Arguments:  Sketch filename (valid types/extensions are .msh, .json, .json.gz)
               Hash of options (none so far)
   Returns:    Mash object
 
@@ -68,6 +75,7 @@ sub new{
   my $self={
     file      => $filename,
     kmer      => -1, # eg, 21
+    preserveCase=>-1,# eg, false
     alphabet  => "", # eg, AGCT
     canonical => -1, # eg, true/false
     sketchSize=> -1, # eg, 1000
@@ -81,7 +89,18 @@ sub new{
                      #  hashes  => list of integers
   };
   bless($self,$class);
-  $self->file($filename);
+
+  if(!defined($filename)){
+    die "ERROR: no file was given to ".$class."->new";
+    return {};
+  }
+  if(!-e $filename){
+    die "ERROR: could not find file $filename";
+  }
+
+  $self->loadMsh($filename)
+    or $self->loadJson($filename)
+    or die "ERROR: could not load $filename as either msh or json";
 
   return $self;
 }
@@ -91,7 +110,7 @@ sub new{
 
 =over
 
-=item $msh->file("filename.msh")
+=item $msh->loadMsh("filename.msh")
 
 Changes which file is used in the object and updates internal object information. This method is ordinarily used internally only.
 
@@ -102,25 +121,20 @@ Changes which file is used in the object and updates internal object information
 
 =cut
 
-sub file{
+sub loadMsh{
   my($self,$msh)=@_;
   
-  if(!   $msh){
-    die "ERROR: no file was given to \$self->file";
-    return {};
-  }
-  if(!-e $msh){
-    die "ERROR: could not find file $msh";
-  }
-
   my $json=JSON->new;
   $json->utf8;           # If we only expect characters 0..255. Makes it fast.
   $json->allow_nonref;   # can convert a non-reference into its corresponding string
   $json->allow_blessed;  # encode method will not barf when it encounters a blessed reference
   $json->pretty;         # enables indent, space_before and space_after
 
-  my $jsonStr = `mash info -d $msh`;
-  die "ERROR running mash on $msh" if $?;
+  my $jsonStr = `mash info -d $msh 2>/dev/null`;
+  #die "ERROR running mash on $msh" if $?;
+  if($?){
+    return 0;
+  }
 
   # Need to check for valid utf8 or not
   eval{ my $strCopy=$jsonStr; decode('utf8', $strCopy, Encode::FB_CROAK) }
@@ -128,10 +142,105 @@ sub file{
 
   my $mashInfo = $json->decode($jsonStr);
 
-  for my $key(qw(kmer alphabet canonical sketchSize= hashType hashBits hashSeed sketches)){
+  for my $key(qw(kmer preserveCase alphabet canonical sketchSize hashType hashBits hashSeed sketches)){
     $$self{$key} = $$mashInfo{$key};
   }
   
+  return $self;
+}
+
+=pod
+
+=over
+
+=item $msh->loadJson("filename.msh")
+
+Changes which file is used in the object and updates internal object information. This method is ordinarily used internally only.
+
+  Arguments: One JSON file describing a Mash sketch
+  Returns:   self
+
+=back
+
+=cut
+
+sub loadJson{
+  my($self,$filename)=@_;
+  
+  my $json=JSON->new;
+  $json->utf8;           # If we only expect characters 0..255. Makes it fast.
+  $json->allow_nonref;   # can convert a non-reference into its corresponding string
+  $json->allow_blessed;  # encode method will not barf when it encounters a blessed reference
+  $json->pretty;         # enables indent, space_before and space_after
+
+  my $jsonStr="";
+  my $fh;
+  if($filename=~/\.gz$/i){
+    open($fh, "gzip -cd '$filename' |") or die "ERROR: could not gzip -cd $filename: $!";
+  } else {
+    open($fh, $filename) or die "ERROR: could not read $filename: $!";
+  }
+  while(<$fh>){
+    $jsonStr.=$_;
+  }
+  close $fh;
+
+  # Need to check for valid utf8 or not
+  eval{ my $strCopy=$jsonStr; decode('utf8', $strCopy, Encode::FB_CROAK) }
+    or die "ERROR: this file has non-utf8 characters: $filename";
+
+  my $mashInfo = eval{
+    $json->decode($jsonStr);
+  };
+  if($@){
+    return 0;
+  }
+
+  for my $key(qw(kmer preserveCase alphabet canonical sketchSize hashType hashBits hashSeed sketches)){
+    $$self{$key} = $$mashInfo{$key};
+  }
+
+  return $self;
+}
+
+=pod
+
+=over
+
+=item $msh->writeJson("filename.json")
+
+Writes contents to a file in JSON format
+
+  Arguments: One filename
+  Returns:   self
+
+=back
+
+=cut
+
+sub writeJson{
+  my($self, $filename) = @_;
+
+  my $json=JSON->new;
+  $json->utf8;           # If we only expect characters 0..255. Makes it fast.
+  $json->allow_nonref;   # can convert a non-reference into its corresponding string
+  $json->allow_blessed;  # encode method will not barf when it encounters a blessed reference
+  $json->pretty;         # enables indent, space_before and space_after
+  
+  my $hash={};
+  for my $key(qw(kmer preserveCase alphabet canonical sketchSize hashType hashBits hashSeed sketches)){
+    $$hash{$key} = $$self{$key};
+  }
+
+  my $fh;
+  if($filename=~/\.gz$/){
+    open($fh, " | gzip -c > $filename") or die "ERROR: could not write gzipped contents to $filename: $!";
+  } else {
+    open($fh, ">", $filename) or die "ERROR: could not write to $filename: $!";
+  }
+  print $fh $json->encode($hash);
+  close $fh;
+
   return $self;
 }
 
@@ -174,8 +283,14 @@ sub dist{
       my $toName   = $$other{sketches}[$j]{name};
 
       my ($common, $total) = raw_mash_distance($fromHashes, $toHashes);
+      if($total == 0){
+        die "Internal error: total kmers compared between $fromName and $toName were zero!";
+      }
       my $jaccard = $common/$total;
-      my $mashDist= -1/$k * log(2*$jaccard / (1+$jaccard));
+      my $mashDist = 0; # by default
+      if($jaccard > 0){
+        $mashDist= -1/$k * log(2*$jaccard / (1+$jaccard));
+      }
       $mashDist = sprintf("%0.7f", $mashDist); # rounding to maintain compatibility with exec
       $dist{$fromName}{$toName} = $mashDist;
       $dist{$toName}{$fromName} = $mashDist;
@@ -199,6 +314,8 @@ sub mashDist{
 
 Returns the number of sketches in common and the total number of sketches between two lists.
 The return type is an array of two elements.
+This function is used internally with $msh->dist and assumes that the 
+hashes are already sorted.
 
   Arguments: A list of integers
              A list of integers
@@ -220,40 +337,36 @@ The return type is an array of two elements.
 sub raw_mash_distance{
   my($hashes1, $hashes2) = @_;
 
-  my @sketch1 = sort {$a <=> $b} @$hashes1;
-  my @sketch2 = sort {$a <=> $b} @$hashes2;
-
   my $i      = 0;
   my $j      = 0;
   my $common = 0;
   my $total  = 0;
 
-  my $sketch_size = @sketch1;
-  while($total < $sketch_size && $i < @sketch1 && $j < @sketch2){
-    my $ltgt = ($sketch1[$i] <=> $sketch2[$j]); # -1 if sketch1 is less than, +1 if sketch1 is greater than
+  my $sketch_size = @$hashes1;
+  my $sketch_size2= @$hashes2;
+  while($total < $sketch_size && $i < $sketch_size && $j < $sketch_size2){
 
-    if($ltgt == -1){
-      $i += 1;
-    } elsif($ltgt == 1){
-      $j += 1;
-    } elsif($ltgt==0) {
-      $i += 1;
-      $j += 1;
-      $common += 1;
-    } else {
-      die "Internal error";
-    }
+    if($$hashes1[$i] < $$hashes2[$j]){
+      $i+=1;
+    } elsif($$hashes1[$i] > $$hashes2[$j]){
+      $j+=1;
+    } elsif($$hashes1[$i] == $$hashes2[$j]){
+      $i+=1;
+      $j+=1;
+      $common+=1;
+    } 
 
     $total += 1;
   }
 
-  if($total < $sketch_size){
-    if($i < @sketch1){
-      $total += @sketch1 - 1;
+  #if($total < $sketch_size){
+  if($total < $sketch_size || $total < $sketch_size2){
+    if($i < $sketch_size){
+      $total += $sketch_size - 1;
     }
 
-    if($j < @sketch2){
-      $total += @sketch2 - 1;
+    if($j < $sketch_size2){
+      $total += $sketch_size2 - 1;
     }
 
     if($total > $sketch_size){
@@ -264,6 +377,33 @@ sub raw_mash_distance{
   return ($common, $total);
 }
 
+=pod
+
+=over
+
+=item $msh->fix()
+
+Fixes a mash sketch if it is broken at all. For now this
+just sorts hashes but this subroutine could contain more
+fixes in the future.
+
+  Arguments: None
+  Returns:   $self
+
+=back
+
+=cut
+
+sub fix{
+  my($self) = @_;
+
+  for my $sketches(@{ $self->{sketches} }){
+    my @sortedHashes = sort {$a <=> $b} @{ $$sketches{hashes} };
+    $$sketches{hashes} = \@sortedHashes;
+  }
+
+  return $self;
+}
 
 ##### Utility methods
 

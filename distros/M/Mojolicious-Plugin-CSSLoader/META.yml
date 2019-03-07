@@ -2,16 +2,21 @@
 abstract: 'move css loading to the end of the document'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojolicious-Plugin-CSSLoader
+provides:
+  Mojolicious::Plugin::CSSLoader:
+    file: lib/Mojolicious/Plugin/CSSLoader.pm
+    version: '0.08'
 requires:
   Mojolicious: '5.55'
   perl: '5.010001'
@@ -19,4 +24,8 @@ resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-CSSLoader/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-CSSLoader
   repository: http://github.com/reneeb/Mojolicious-Plugin-CSSLoader.git
-version: '0.07'
+version: '0.08'
+x_contributors:
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

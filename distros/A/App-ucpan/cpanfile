@@ -1,7 +1,6 @@
 requires 'perl', '5.008001';
 
 requires 'File::Which', 0;
-requires 'File::HomeDir', 0;
 requires 'Path::Class', 0;
 requires 'YAML', 0;
 requires 'App::cpanminus', 0;

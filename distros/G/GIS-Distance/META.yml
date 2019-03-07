@@ -1,29 +1,69 @@
 ---
 abstract: 'Calculate geographic distances.'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@cpan.org>'
 build_requires:
-  Test::Simple: '0.94'
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: GIS-Distance
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  GIS::Distance:
+    file: lib/GIS/Distance.pm
+    version: '0.10'
+  GIS::Distance::Constants:
+    file: lib/GIS/Distance/Constants.pm
+    version: '0.10'
+  GIS::Distance::Cosine:
+    file: lib/GIS/Distance/Cosine.pm
+    version: '0.10'
+  GIS::Distance::GreatCircle:
+    file: lib/GIS/Distance/GreatCircle.pm
+    version: '0.10'
+  GIS::Distance::Haversine:
+    file: lib/GIS/Distance/Haversine.pm
+    version: '0.10'
+  GIS::Distance::MathTrig:
+    file: lib/GIS/Distance/MathTrig.pm
+    version: '0.10'
+  GIS::Distance::Polar:
+    file: lib/GIS/Distance/Polar.pm
+    version: '0.10'
+  GIS::Distance::Vincenty:
+    file: lib/GIS/Distance/Vincenty.pm
+    version: '0.10'
 recommends:
   GIS::Distance::Fast: '0.04'
-  Geo::Ellipsoid: '0.902'
 requires:
-  Class::Measure: '0'
-  Math::Complex: '0'
-  Moo: '1.006000'
-  Type::Tiny: '1'
-  namespace::clean: '0'
-  strictures: '1'
+  Class::Measure::Length: '0'
+  Const::Fast: '0.014'
+  Math::Trig: '0'
+  namespace::clean: '0.24'
+  perl: '5.008001'
+  strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/GIS-Distance/issues
+  homepage: https://github.com/bluefeet/GIS-Distance
   repository: git://github.com/bluefeet/GIS-Distance.git
-version: '0.09'
+version: '0.10'
+x_authority: cpan:BLUEFEET
+x_contributors:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

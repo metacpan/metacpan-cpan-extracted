@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.22
+    version 0.23
 
 SYNOPSIS
 
@@ -61,7 +61,11 @@ SEE ALSO
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Petr Pisar (ppisar)
 
 COPYRIGHT AND LICENSE
 

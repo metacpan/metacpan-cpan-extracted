@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e59116f690700cf0e8653a02232fc9b67fe17c8f Build.PL
+SHA1 c0487c665034e505be1d10477646845334686e9d Changes
+SHA1 8913592f25a2415226ca0dad6b8254822b01c9ed INSTALL
+SHA1 cc721a9eb9d8d3c2f7c04c7a98128ecbff3cc539 LICENSE
+SHA1 0ffa593bf0ad57f342459a10b2d38c86510db665 MANIFEST
+SHA1 9a30d00149e036ee57502cb7dbd2c621691c606b META.json
+SHA1 eae099cbbcf13b79d156132c96b8108b9205d724 META.yml
+SHA1 b28f06db4a495d05114147fdc99f89bf21e645ab Makefile.PL
+SHA1 05faa1abac5a1d578d608d267d9f88ddf18b25c2 README
+SHA1 2fd61b912fd917cdb98404a782161bc33f7e0e3d TODO
+SHA1 83bf6580345b55139a363a212236ec2766d32c2c bin/spread-revolutionary-date
+SHA1 b3c7244a7b59fec22f9b78000820a5a0b1b47135 dist.ini
+SHA1 7c2ae4ea344ec035ab11f0ebc4c12bb8540a642d etc/sample-spread-revolutionary-date.conf
+SHA1 3163cdcfc3dee4a952ad7cda52b8e7a4c21c4156 lib/App/SpreadRevolutionaryDate.pm
+SHA1 a1e9411b6909ce20c8ad55216496b8eb4e96e78f lib/App/SpreadRevolutionaryDate/Config.pm
+SHA1 7b62437635a336d1fd11cfad56cedb19e407b995 lib/App/SpreadRevolutionaryDate/Freenode.pm
+SHA1 f14ac6aadf31ac61c7e66a2815c124ccf514291b lib/App/SpreadRevolutionaryDate/Freenode/Bot.pm
+SHA1 53f20a12eca242f607727ce156198d79c5b606cb lib/App/SpreadRevolutionaryDate/Mastodon.pm
+SHA1 780d62436d25242cc913114ee6d3770ef8aeb0d0 lib/App/SpreadRevolutionaryDate/Twitter.pm
+SHA1 8f5227d4330933f1e2a1c0199f51ba498fefba00 t/00-compile.t
+SHA1 d21b1831883c78db56c90cd0e25a726669bc7f67 t/config.t
+SHA1 17eca6798ae33e95edb14ace96dc29c7cbeee5cd t/locale.t
+SHA1 024f4243ebd02f76a4b64e581298c4130395dd1b t/objects.t
+SHA1 b66ef70a1e50de4159e6114a15d3ae1410b50794 xt/authentication.t
+SHA1 d2915cfa82130b512ac495c396272507289c71b1 xt/author/clean-namespaces.t
+SHA1 e5c139a6f9a43e3a3ea96f4cdeaf6652905b8275 xt/author/critic.t
+SHA1 bdc1041d38d1adea231c283ff64f682b5cc592a5 xt/author/eol.t
+SHA1 b713112c18e85966b8aecb804273878e56dce881 xt/author/no-tabs.t
+SHA1 1639baff80158ad8856d743e70a74cfa50718b8d xt/author/pod-coverage.t
+SHA1 cf0de85aa819a1efdcf04e7ae78ff7ecdb90e138 xt/author/pod-syntax.t
+SHA1 645cec4fa63cb59f7f59665ed2cf02d48db5c11c xt/author/portability.t
+SHA1 1517da2877e118cd0286aceaa759448bdf599e42 xt/freenode.t
+SHA1 a87120145ca814ee9b45c5bbb63f0b344a0fa5a8 xt/freenode_fake_credentials.t
+SHA1 3f76162dc81a350840914dfdbb83180a234dd07d xt/mastodon.t
+SHA1 68c2b0b456d6446eaf37b343aa47ea5918b9a66c xt/release/distmeta.t
+SHA1 cfc7fc13aea54c0abc8829c8aa2ff68113f5f2c9 xt/release/kwalitee.t
+SHA1 0edfc8d4cd249829ad3aa1298ccbdc69dffea45f xt/release/unused-vars.t
+SHA1 4c6ad0d353cbf9b7406eb3f87a6b96ca1d4f75b7 xt/twitter.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCXIF6wQAKCRDz3XhnulP5
+P7roAKCcMJNGCvFuYColkz52tuo5XcVrDwCcCJ/iG1kI7+N3AnAXn7//kl32Z7Q=
+=VQQS
+-----END PGP SIGNATURE-----

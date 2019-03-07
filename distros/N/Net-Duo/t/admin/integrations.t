@@ -3,6 +3,7 @@
 # Test suite for integration handling in the Admin API.
 #
 # Written by Russ Allbery <rra@cpan.org>
+# Copyright 2019 Russ Allbery <rra@cpan.org>
 # Copyright 2014
 #     The Board of Trustees of the Leland Stanford Junior University
 #
@@ -23,6 +24,8 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
 
 use 5.014;
 use strict;
@@ -58,20 +61,36 @@ $mock->expect(
     {
         method        => 'GET',
         uri           => '/admin/v1/integrations',
-        response_file => 't/data/responses/integrations.json',
+        content       => { limit => 500, offset => 0 },
+        response_file => 't/data/responses/integrations-1.json',
+        next_offset   => 1,
+        total_objects => 2,
+    }
+);
+$mock->expect(
+    {
+        method        => 'GET',
+        uri           => '/admin/v1/integrations',
+        content       => { limit => 500, offset => 1 },
+        response_file => 't/data/responses/integrations-2.json',
+        next_offset   => undef,
+        total_objects => 2,
     }
 );
 note('Testing integrations endpoint');
 my @integrations = $duo->integrations;
 
-# Should be an array of a single integration
-is(scalar(@integrations), 1, 'integrations method returns one object');
-my $integration = $integrations[0];
+# Should be an array of two integrations.
+is(scalar(@integrations), 2, 'integrations method returns two objects');
 
 # Verify that the returned integration is correct.
-my $raw      = slurp('t/data/responses/integrations.json');
-my $expected = $json->decode($raw)->[0];
-is_admin_integration($integration, $expected);
+my @expected;
+for my $file ('integrations-1.json', 'integrations-2.json') {
+    my $raw = slurp("t/data/responses/$file");
+    push(@expected, $json->decode($raw)->[0]);
+}
+is_admin_integration($integrations[0], $expected[0]);
+is_admin_integration($integrations[1], $expected[1]);
 
 # Create a new integration.  Make sure we include some zero_or_one fields.
 my $data = {
@@ -97,11 +116,11 @@ $mock->expect(
 
 # Attempt the create call.
 note('Testing integration create endpoint');
-$integration = Net::Duo::Admin::Integration->create($duo, $data);
+my $integration = Net::Duo::Admin::Integration->create($duo, $data);
 
 # Verify that the returned group is correct.  (Just use the same return data.)
-$raw      = slurp('t/data/responses/integration.json');
-$expected = $json->decode($raw);
+my $raw      = slurp('t/data/responses/integration.json');
+my $expected = $json->decode($raw);
 is_admin_integration($integration, $expected);
 
 # Convert the full integration to JSON and compare that with the expected

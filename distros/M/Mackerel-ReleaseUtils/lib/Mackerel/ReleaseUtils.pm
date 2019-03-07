@@ -15,7 +15,7 @@ use Path::Tiny qw/path/;
 use POSIX qw(setlocale LC_TIME);
 use Scope::Guard qw/guard/;
 use Time::Piece qw/localtime/;
-use version; our $VERSION = version->declare("v0.2.3");
+use version; our $VERSION = version->declare("v0.2.4");
 
 use parent 'Exporter';
 
@@ -191,7 +191,7 @@ sub update_makefile {
     my $next_version = shift;
     replace 'Makefile' => sub {
         my $content = shift;
-        $content =~ s/^VERSION = .*?\n/VERSION = $next_version\n/ms;
+        $content =~ s/^VERSION( *:*= *).*?\n/VERSION$1$next_version\n/ms;
         $content;
     };
 }

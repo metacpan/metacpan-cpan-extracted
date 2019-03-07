@@ -48,6 +48,6 @@
          "web" : "https://github.com/hoehrmann/Devel-vscode"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }
