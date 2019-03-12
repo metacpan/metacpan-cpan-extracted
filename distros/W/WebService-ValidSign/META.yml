@@ -15,9 +15,11 @@ build_requires:
   Test::Most: '0'
   perl: '5.006'
 configure_requires:
+  CPAN::Meta::Requirements: '2.120620'
   ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
   perl: '5.006'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
@@ -27,49 +29,49 @@ name: WebService-ValidSign
 provides:
   WebService::ValidSign:
     file: lib/WebService/ValidSign.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::API:
     file: lib/WebService/ValidSign/API.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::API::Account:
     file: lib/WebService/ValidSign/API/Account.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::API::Auth:
     file: lib/WebService/ValidSign/API/Auth.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::API::Constructor:
     file: lib/WebService/ValidSign/API/Constructor.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::API::DocumentPackage:
     file: lib/WebService/ValidSign/API/DocumentPackage.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object:
     file: lib/WebService/ValidSign/Object.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::Auth:
     file: lib/WebService/ValidSign/Object/Auth.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::Ceremony:
     file: lib/WebService/ValidSign/Object/Ceremony.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::Document:
     file: lib/WebService/ValidSign/Object/Document.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::DocumentPackage:
     file: lib/WebService/ValidSign/Object/DocumentPackage.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::Sender:
     file: lib/WebService/ValidSign/Object/Sender.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::Signature:
     file: lib/WebService/ValidSign/Object/Signature.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Object::Signer:
     file: lib/WebService/ValidSign/Object/Signer.pm
-    version: '0.001'
+    version: '0.002'
   WebService::ValidSign::Types:
     file: lib/WebService/ValidSign/Types.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Config::Any: '0'
@@ -83,10 +85,11 @@ requires:
   LWP::UserAgent: '0'
   List::Util: '0'
   Module::Pluggable::Object: '0'
-  Moo: '0'
+  Moo: '1.006000'
   Moo::Role: '0'
   Moose: '0'
   Pod::Usage: '0'
+  String::CamelSnakeKebab: '0'
   Type::Library: '0'
   Type::Utils: '0'
   Types::Standard: '0'
@@ -95,7 +98,7 @@ requires:
   perl: '5.006'
 resources:
   repository: git://gitlab.com/waterkip/webservice-validsign.git
-version: '0.001'
+version: '0.002'
 x_contributors:
   - 'Wesley Schwengle <wesley@schwengle.net>'
 x_generated_by_perl: v5.28.1

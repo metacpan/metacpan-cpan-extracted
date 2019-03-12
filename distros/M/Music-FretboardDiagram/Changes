@@ -1,5 +1,14 @@
 Revision history for Music-FretboardDiagram
 
+0.1201 2019-03-12 09:45:54
+    - Improve the eg example programs.
+
+0.1200 2019-03-10 17:46:28
+    - Draw the strings, frets and dots with user definable colors.
+
+0.1102 2019-03-09 13:25:11
+    - Hide ugly, reused syntax in the ->_note_at method.
+
 0.1101 2019-03-04 13:38:08
     - Fix crucial SYNOPSIS example!
 

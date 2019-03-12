@@ -12,7 +12,8 @@ use PiFlash::State;
 # initialize program state storage
 my @top_level_params = PiFlash::state_categories();
 PiFlash::State->init(@top_level_params);
-plan tests => (scalar @top_level_params) * 6 + 6;
+my @cli_params = ("verbose", "logging");
+plan tests => (scalar @top_level_params) * 6 + 3 + (scalar @cli_params)*3;
 
 # test existence of symtab entries
 foreach my $tlp_name (@top_level_params) {
@@ -32,11 +33,16 @@ ok(PiFlash::State::has_log("foo"), "log{foo} defined after assignment");
 is(PiFlash::State::log("foo"), 1, "log{foo} correct value after assignment");
 
 
-# verbose() tests
-is(PiFlash::State::verbose(), 0, "verbose is false by default");
-PiFlash::State::cli_opt("verbose", 1);
-is(PiFlash::State::verbose(), 1, "verbose is true when set to 1");
-PiFlash::State::cli_opt("verbose", 0);
-is(PiFlash::State::verbose(), 0, "verbose is false when set to 0");
+# CLI parameters (verbose/logging) tests
+foreach my $cli_param (@cli_params) {
+	## no critic (ProhibitStringyEval)
+	my $test_sub = sub { return eval "PiFlash::State::$cli_param()"; };
+	## use critic (ProhibitStringyEval)
+	is($test_sub->(), 0, "$cli_param is false by default");
+	PiFlash::State::cli_opt($cli_param, 1);
+	is($test_sub->(), 1, "$cli_param is true when set to 1");
+	PiFlash::State::cli_opt($cli_param, 0);
+	is($test_sub->(), 0, "$cli_param is false when set to 0");
+}
 
 1;

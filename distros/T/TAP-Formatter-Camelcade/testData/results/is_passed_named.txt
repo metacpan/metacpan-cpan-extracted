@@ -1,0 +1,10 @@
+teamcity[enteredTheMatrix timestamp='2019-03-10T12:56:49.973']
+teamcity[testingStarted timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='myfile://testData/tests/is_passed_named.t' name='testData/tests/is_passed_named.t' nodeId='myfile://testData/tests/is_passed_named.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='with name' nodeId='myfile://testData/tests/is_passed_named.t-0-with name-1' parentNodeId='myfile://testData/tests/is_passed_named.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='with name' nodeId='myfile://testData/tests/is_passed_named.t-0-with name-1' parentNodeId='myfile://testData/tests/is_passed_named.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='testData/tests/is_passed_named.t' name='testData/tests/is_passed_named.t' nodeId='myfile://testData/tests/is_passed_named.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+All tests successful.
+Files=1, Tests=1, TEST_MODE_STATS;
+Result: PASS
+teamcity[testingFinished timestamp='2019-03-10T12:56:49.973']

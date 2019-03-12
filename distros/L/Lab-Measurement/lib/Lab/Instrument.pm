@@ -1,6 +1,7 @@
 package Lab::Instrument;
+$Lab::Instrument::VERSION = '3.680';
 #ABSTRACT: Instrument base class
-$Lab::Instrument::VERSION = '3.671';
+
 use strict;
 use warnings;
 
@@ -1318,7 +1319,7 @@ Lab::Instrument - Instrument base class
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -1538,7 +1539,7 @@ Probably many, with all the porting. This will get better.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2009       Andreas K. Huettel
@@ -1549,6 +1550,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
             2014       Alexei Iankilevitch, Christian Butschkow
             2016       Charles Lane, Simon Reinhardt
             2017       Andreas K. Huettel
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

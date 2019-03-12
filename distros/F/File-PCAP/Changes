@@ -1,6 +1,17 @@
 Revision history for File-PCAP
 
-v0.0.7  Thu May  3 21:58:22 CEST 2018
+v0.1.0 Sun Mar 10 10:35:32 CET 2019
+	- File::PCAP::ACAP2PCAP: use 'gmtime' and 'timegm' instead of
+	  'localtime' and 'timelocal' to determine startday
+	- fixes bug #128748, thanks to Slaven Rezić
+
+v0.0.8 Fri Mar  8 08:12:32 CET 2019
+	- File::PCAP::ACAP2PCAP: option 'startday' to set the starting
+	  day for the capture
+	- bin/acap2pcap: add option 'startday'
+	- File::PCAP::Reader: fix Bug #128720, thanks to Chris Marshall (CHM)
+
+v0.0.7 Thu Mar  7 08:44:14 CET 2019
 	- changed File::PCAP::Reader->next_packet() to return nothing on
 	  end of file
 	- File::PCAP::ACAP2PCAP: Switch to next day when time of a

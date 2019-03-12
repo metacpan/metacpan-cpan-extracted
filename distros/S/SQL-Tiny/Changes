@@ -1,0 +1,12 @@
+Revision history for Perl module SQL::Tiny
+
+0.02 2019-03-13 00:40:14 CST
+
+    - Added 'group_by' capability to sql_select.
+
+    - Added ':all' export tag.
+
+
+0.01 2019-03-08 23:40:27 CST
+
+    - First version.

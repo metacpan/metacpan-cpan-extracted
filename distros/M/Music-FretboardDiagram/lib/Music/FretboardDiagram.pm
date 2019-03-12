@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Draw fretboard chord diagrams
 
-our $VERSION = '0.1101';
+our $VERSION = '0.1201';
 
 use Moo;
 use strictures 2;
@@ -83,9 +83,21 @@ has image => (
 );
 
 
-has grid => (
+has string_color => (
     is      => 'ro',
     default => sub { 'blue' },
+);
+
+
+has fret_color => (
+    is      => 'ro',
+    default => sub { 'darkgray' },
+);
+
+
+has dot_color => (
+    is      => 'ro',
+    default => sub { 'black' },
 );
 
 
@@ -139,8 +151,7 @@ sub draw {
 
     my $WHITE = 'white';
     my $BLACK = 'black';
-    my $GRAY  = 'gray';
-    my $GRID  = $self->grid;
+    my $TAN   = 'tan';
     my $SPACE = $self->size;
 
     my @chord;
@@ -160,23 +171,10 @@ sub draw {
         warn 'WARNING: Font ', $self->font, " not found\n";
     }
 
-    # Draw the vertical string lines
-    for my $string ( 0 .. $self->strings - 1 ) {
-        $i->line(
-            color => $GRID,
-            x1    => $SPACE + $string * $SPACE,
-            y1    => $SPACE,
-            x2    => $SPACE + $string * $SPACE,
-            y2    => $SPACE + ($self->frets - 1) * $SPACE,
-            aa    => 1,
-            endp  => 1
-        );
-    }
- 
     # Draw the horizontal fret lines
     for my $fret ( 0 .. $self->frets - 1 ) {
         $i->line(
-            color => $GRID,
+            color => $self->fret_color,
             x1    => $SPACE,
             y1    => $SPACE + $fret * $SPACE,
             x2    => $SPACE + ($self->strings - 1) * $SPACE,
@@ -200,12 +198,25 @@ sub draw {
 
         if ( $self->_fret_match($fret) ) {
             $i->circle(
-                color => $GRAY,
+                color => $TAN,
                 r     => $SPACE / 8,
                 x     => $SPACE * $self->strings / 2 + $SPACE / 2,
                 y     => $SPACE + $fret * $SPACE + $SPACE / 2,
             ) if ( $SPACE + $fret * $SPACE + $SPACE / 2 ) < ( $SPACE * $self->frets );
         }
+    }
+
+    # Draw the vertical string lines
+    for my $string ( 0 .. $self->strings - 1 ) {
+        $i->line(
+            color => $self->string_color,
+            x1    => $SPACE + $string * $SPACE,
+            y1    => $SPACE,
+            x2    => $SPACE + $string * $SPACE,
+            y2    => $SPACE + ($self->frets - 1) * $SPACE,
+            aa    => 1,
+            endp  => 1
+        );
     }
 
     # Draw the note/mute markers
@@ -242,13 +253,13 @@ sub draw {
             );
         }
         else {
-            my $temp = $self->fretboard->{$string}[ ($self->position + $note - 1) % @{ $self->fretboard->{1} } ];
+            my $temp = $self->_note_at($string, $note);
             push @chord, $temp;
 
             print "Dot at $note,$string = $temp\n" if $self->verbose;
 
             $i->circle(
-                color => $BLACK,
+                color => $self->dot_color,
                 r     => $SPACE / 5,
                 x     => $SPACE + ($self->strings - $string) * $SPACE,
                 y     => $SPACE + $SPACE / 2 + ($note - 1) * $SPACE,
@@ -287,8 +298,7 @@ sub _draw_horiz {
 
     my $WHITE = 'white';
     my $BLACK = 'black';
-    my $GRAY  = 'gray';
-    my $GRID  = $self->grid;
+    my $TAN   = 'tan';
     my $SPACE = $self->size;
 
     my @chord;
@@ -308,23 +318,10 @@ sub _draw_horiz {
         warn 'WARNING: Font ', $self->font, " not found\n";
     }
 
-    # Draw the horizontal string lines
-    for my $string ( 0 .. $self->strings - 1 ) {
-        $i->line(
-            color => $GRID,
-            y1    => $SPACE + $string * $SPACE,
-            x1    => $SPACE,
-            y2    => $SPACE + $string * $SPACE,
-            x2    => $SPACE + ($self->frets - 1) * $SPACE,
-            aa    => 1,
-            endp  => 1
-        );
-    }
- 
     # Draw the vertical fret lines
     for my $fret ( 0 .. $self->frets - 1 ) {
         $i->line(
-            color => $GRID,
+            color => $self->fret_color,
             y1    => $SPACE,
             x1    => $SPACE + $fret * $SPACE,
             y2    => $SPACE + ($self->strings - 1) * $SPACE,
@@ -348,12 +345,25 @@ sub _draw_horiz {
 
         if ( $self->_fret_match($fret) ) {
             $i->circle(
-                color => $GRAY,
+                color => $TAN,
                 r     => $SPACE / 8,
                 y     => $SPACE * $self->strings / 2 + $SPACE / 2,
                 x     => $SPACE + $fret * $SPACE + $SPACE / 2,
             ) if ( $SPACE + $fret * $SPACE + $SPACE / 2 ) < ( $SPACE * $self->frets );
         }
+    }
+
+    # Draw the horizontal string lines
+    for my $string ( 0 .. $self->strings - 1 ) {
+        $i->line(
+            color => $self->string_color,
+            y1    => $SPACE + $string * $SPACE,
+            x1    => $SPACE,
+            y2    => $SPACE + $string * $SPACE,
+            x2    => $SPACE + ($self->frets - 1) * $SPACE,
+            aa    => 1,
+            endp  => 1
+        );
     }
 
     # Draw the note/mute markers
@@ -390,13 +400,13 @@ sub _draw_horiz {
             );
         }
         else {
-            my $temp = $self->fretboard->{$string}[ ($self->position + $note - 1) % @{ $self->fretboard->{1} } ];
+            my $temp = $self->_note_at($string, $note);
             unshift @chord, $temp;
 
             print "Dot at fret:$note, string:$string = $temp\n" if $self->verbose;
 
             $i->circle(
-                color => $BLACK,
+                color => $self->dot_color,
                 r     => $SPACE / 5,
                 y     => $SPACE + ($string - 1) * $SPACE,
                 x     => $SPACE + $SPACE / 2 + ($note - 1) * $SPACE,
@@ -454,6 +464,11 @@ sub _fret_match {
         ( $self->position + $fret == 24 );
 }
 
+sub _note_at {
+    my ($self, $string, $n) = @_;
+    return $self->fretboard->{$string}[ ($self->position + $n - 1) % @{ $self->fretboard->{1} } ];
+}
+
 sub _output_image {
     my ($self, $img) = @_;
     my $name = $self->outfile . '.' . $self->type;
@@ -480,7 +495,7 @@ Music::FretboardDiagram - Draw fretboard chord diagrams
 
 =head1 VERSION
 
-version 0.1101
+version 0.1201
 
 =head1 SYNOPSIS
 
@@ -495,7 +510,7 @@ version 0.1101
   $dia->chord('xx0232');
   $dia->position(5);
   $dia->outfile('mystery-chord');
-  $dia->showname('Xb'); # "X flat"
+  $dia->showname('Xb dim'); # "X flat diminished"
   $dia->draw;
 
   $dia = Music::FretboardDiagram->new(
@@ -510,8 +525,10 @@ version 0.1101
     tuning   => [qw/A E C G/],
     horiz    => 1,
     image    => 1,
-    grid     => 'gray',
     verbose  => 1,
+    string_color => 'black',
+    fret_color   => 'darkgray',
+    dot_color    => 'blue',
   );
   my $image = $dia->draw;
 
@@ -520,12 +537,16 @@ version 0.1101
 A C<Music::FretboardDiagram> object draws fretboard chord diagrams including
 neck position and chord name annotations for guitar, ukulele, banjo, etc.
 
-Below are examples of a vertical guitar diagram and a horizontal ukulele diagram:
+=begin html
 
-=for html <br>
+Here are examples of a vertical guitar diagram and a horizontal ukulele diagram:
+
+<br>
 <img src="https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/chord-diagram.png">
 <img src="https://raw.githubusercontent.com/ology/Music-FretboardDiagram/master/ukulele.png">
 <br>
+
+=end html
 
 =head1 ATTRIBUTES
 
@@ -650,13 +671,29 @@ Return the image from the B<draw> method instead of writing to a file.
 
 Default: 0
 
-=head2 grid
+=head2 string_color
 
-  $grid = $dia->grid;
+  $string_color = $dia->string_color;
 
-The diagram grid (strings and frets) color.
+The diagram string color.
 
 Default: blue
+
+=head2 fret_color
+
+  $fret_color = $dia->fret_color;
+
+The diagram fret color.
+
+Default: darkgray
+
+=head2 dot_color
+
+  $dot_color = $dia->dot_color;
+
+The diagram finger position dot color.
+
+Default: black
 
 =head2 fretboard
 

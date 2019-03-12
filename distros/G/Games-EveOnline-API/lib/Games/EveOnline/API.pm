@@ -1,7 +1,7 @@
 package Games::EveOnline::API;
 use Moo;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -1457,6 +1457,7 @@ L<WebService::EveOnline>
 
     Aran Clary Deltac <bluefeet@gmail.com>
     Andrey Chips Kuzmin <chipsoid@cpan.org>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 LICENSE
 

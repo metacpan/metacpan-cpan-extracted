@@ -3,11 +3,11 @@
 
 use strict;
 use warnings;
-use v5.18.0; # require 2014 or newer version of Perl
+use v5.14.0; # require 2011 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Hook;
-$PiFlash::Hook::VERSION = '0.2.1';
+$PiFlash::Hook::VERSION = '0.2.2';
 use Carp qw(confess);
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 
@@ -125,7 +125,7 @@ PiFlash::Hook - named dispatch/hook library for PiFlash
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 

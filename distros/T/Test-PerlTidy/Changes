@@ -1,5 +1,16 @@
 CHANGES
 
+20190309.001    2019-03-09
+
+            * Fix for minimal Perl::Tidy version in META.yml
+                See https://rt.cpan.org/Ticket/Display.html?id=128765 .
+
+20190309        2019-03-09
+
+            * Replace File::Finder (
+                See https://rt.cpan.org/Ticket/Display.html?id=127453 . )
+            * Try to fix test failures on MSWin32
+
 20190305.001    2019-03-05
 
             Minimal versions of PerlTidy and Perl.

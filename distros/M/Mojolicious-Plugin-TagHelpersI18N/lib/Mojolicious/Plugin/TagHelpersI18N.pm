@@ -7,7 +7,7 @@ use warnings;
 
 use Mojolicious::Plugin::TagHelpers;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Mojo::Collection;
 use Mojo::Util qw(deprecated xml_escape);
@@ -116,7 +116,7 @@ Mojolicious::Plugin::TagHelpersI18N - TagHelpers with I18N support
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

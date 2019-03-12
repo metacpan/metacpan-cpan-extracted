@@ -1,15 +1,20 @@
 package Hash::Fold;
 
-use Carp qw(confess);
-use Moose;
+use Moo;
 use Scalar::Util qw(refaddr);
+use Types::Standard qw(Str CodeRef);
 
+# TODO switch to Exporter::Tiny?
 use Sub::Exporter -setup => {
     exports => [
         (map { $_ => \&_build_unary_export } qw(fold unfold flatten unflatten)),
         (map { $_ => \&_build_nary_export  } qw(merge)),
     ],
 };
+
+# XXX this declaration must be on a single line
+# https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
+use version 0.77; our $VERSION = version->declare('v1.0.0');
 
 use constant {
     ARRAY => 1,
@@ -18,28 +23,26 @@ use constant {
     VALUE => 1,
 };
 
-our $VERSION = '0.1.2';
-
 has on_object => (
-    isa      => 'CodeRef',
+    isa      => CodeRef,
     is       => 'ro',
     default  => sub { sub { $_[1] } }, # return the value unchanged
 );
 
 has on_cycle => (
-    isa      => 'CodeRef',
+    isa      => CodeRef,
     is       => 'ro',
     default  => sub { sub { } }, # do nothing
 );
 
 has hash_delimiter => (
-    isa      => 'Str',
+    isa      => Str,
     is       => 'ro',
     default  => '.',
 );
 
 has array_delimiter => (
-    isa      => 'Str',
+    isa      => Str,
     is       => 'ro',
     default  => '.',
 );
@@ -54,7 +57,7 @@ around BUILDARGS => sub {
         $args->{array_delimiter} = $delimiter
             unless (exists $args->{array_delimiter});
 
-        $args->{hash_delimiter}  = $delimiter
+        $args->{hash_delimiter} = $delimiter
             unless (exists $args->{hash_delimiter});
     }
 
@@ -71,6 +74,22 @@ sub fold {
     return $self->_merge($hash, $prefix, $target, $seen);
 }
 
+sub _build_path {
+    my ($self, $steps) = @_;
+
+    my @path = map {
+        $_->[VALUE],
+        ($_->[TYPE] == ARRAY ?
+            $self->array_delimiter :
+            ($_->[TYPE] == HASH ? $self->hash_delimiter : ''))
+    } @$steps;
+
+    # last element is a delimiter; don't need that
+    pop @path;
+
+    return join '', @path;
+}
+
 sub unfold {
     my $self = shift;
     my $hash = _check_hash(shift);
@@ -82,7 +101,33 @@ sub unfold {
     for my $key (sort keys %$hash) {
         my $value = $hash->{$key};
         my $steps = $self->_split($key);
-        $self->_set($target, $steps, $value);
+
+        eval { $self->_set($target, $steps, $value) };
+
+        if ($@) {
+            my $error = $@;
+            my $o_steps = $self->_split($key);
+            my $context_type = $o_steps->[@$o_steps - @$steps - 1][TYPE];
+            my ($article, $type) = $context_type == ARRAY ?
+                qw[an array] :
+                ($context_type == HASH ? qw[a hash] : (undef, undef));
+
+            # want everything that was removed from $steps
+            splice(@$o_steps, -1, @$steps + 1);
+
+            my $path = $self->_build_path($o_steps);
+            my $message = defined($type) ?
+                "Attempt to use non-${type} ($path) as ${article} ${type}" :
+                "unanticipated error: $error";
+
+            require Hash::Fold::Error;
+
+            Hash::Fold::Error->throw({
+                message => $message,
+                path => $path,
+                type => $type
+            });
+        }
     }
 
     return $target;
@@ -125,11 +170,12 @@ sub _build_nary_export {
             $args = shift;
             $custom_options = @_ == 1 ? shift : { @_ };
         } else {
-            $args = [ @_ ];
+            $args = [@_];
             $custom_options = {};
         }
 
         my $folder = $class->new({ %$base_options, %$custom_options });
+
         return $folder->$name(@$args);
     }
 }
@@ -147,7 +193,12 @@ sub _check_hash {
             $type = 'undef';
         }
 
-        confess "invalid argument: expected unblessed HASH reference, got: $type";
+        require Hash::Fold::Error;
+
+        Hash::Fold::Error->throw({
+            message => "invalid argument: expected unblessed HASH reference, got: $type",
+            type => $type,
+        });
     }
 
     return $hash;
@@ -193,16 +244,21 @@ sub _split {
     my $hash_delimiter_pattern = quotemeta($hash_delimiter);
     my $array_delimiter_pattern = quotemeta($array_delimiter);
     my $same_delimiter = $array_delimiter eq $hash_delimiter;
-    my $split_pattern = length($hash_delimiter) >= length($array_delimiter)
-        ? qr{((?:$hash_delimiter_pattern)|(?:$array_delimiter_pattern))}
-        : qr{((?:$array_delimiter_pattern)|(?:$hash_delimiter_pattern))};
+    my $split_pattern;
+
+    if (length($hash_delimiter) >= length($array_delimiter)) {
+        $split_pattern = qr{((?:$hash_delimiter_pattern)|(?:$array_delimiter_pattern))};
+    } else {
+        $split_pattern = qr{((?:$array_delimiter_pattern)|(?:$hash_delimiter_pattern))};
+    }
+
     my @split = split $split_pattern, $path;
     my @steps;
 
     # since we require the argument to fold (and unfold) to be a hashref,
     # the top-level keys must always be hash keys (strings) rather than
     # array indices (numbers)
-    push @steps, [ HASH, shift @split ];
+    push @steps, [HASH, shift @split];
 
     while (@split) {
         my $delimiter = shift @split;
@@ -211,15 +267,15 @@ sub _split {
         if ($same_delimiter) {
             # tie-breaker
             if (($step eq '0') || ($step =~ /^[1-9]\d*$/)) { # no leading 0
-                push @steps, [ ARRAY, $step ];
+                push @steps, [ARRAY, $step];
             } else {
-                push @steps, [ HASH, $step ];
+                push @steps, [HASH, $step];
             }
         } else {
             if ($delimiter eq $array_delimiter) {
-                push @steps, [ ARRAY, $step ];
+                push @steps, [ARRAY, $step];
             } else {
-                push @steps, [ HASH, $step ];
+                push @steps, [HASH, $step];
             }
         }
     }
@@ -233,7 +289,7 @@ sub _merge {
     # "localize" the $seen hash: we want to catch circular references (i.e.
     # an unblessed hashref or arrayref which contains (at some depth) a
     # reference to itself), but don't want to prevent repeated references
-    # e.g. { foo => $object, bar => $object } is OK. To achieve this, we need
+    # i.e. { foo => $object, bar => $object } is OK. To achieve this, we need
     # to "localize" the $seen hash i.e. do the equivalent of "local $seen".
     # However, perl doesn't allow lexical variables to be localized, so we have
     # to do it manually.
@@ -306,19 +362,19 @@ sub _merge {
 
 # the action depends on the number of steps:
 #
-#     1: e.g. [ 'foo' ]:
+#     1: e.g. ['foo']:
 #
 #        $context->{foo} = $value
 #
-#     2: e.g. [ 'foo', 42 ]:
+#     2: e.g. ['foo', 42]:
 #
 #        $context = $context->{foo} ||= []
 #        $context->[42] = $value
 #
-#     3 (or more): e.g. [ 'foo', 42, 'bar' ]:
+#     3 (or more): e.g. ['foo', 42, 'bar']:
 #
 #        $context = $context->{foo} ||= []
-#        return $self->_set($context, [ 42, 'bar' ], $value)
+#        return $self->_set($context, [42, 'bar'], $value)
 #
 # Note that the 2 case can be implemented in the same way as the 3
 # (or more) case.
@@ -346,8 +402,6 @@ sub _set {
 
     return @$steps ? $self->_set($context, $steps, $value) : $value;
 }
-
-__PACKAGE__->meta->make_immutable;
 
 1;
 
@@ -419,7 +473,7 @@ imported with options baked in e.g.:
 =head1 OPTIONS
 
 As described above, the following options can be supplied as constructor args,
-import args, or per-function overrides. Under the hood, they are (L<Moose>)
+import args, or per-function overrides. Under the hood, they are (L<Moo>)
 attributes which can be wrapped and overridden like any other attributes.
 
 =head2 array_delimiter
@@ -450,7 +504,7 @@ B<Type>: (Hash::Fold, Ref) -> None, ro
 A callback invoked whenever L<"fold"> encounters a circular reference i.e. a
 reference which contains itself as a nested value.
 
-The callback takes two arguments: the Hash::Fold instance and the value e.g.:
+The callback is passed two arguments: the Hash::Fold instance and the value e.g.:
 
     sub on_cycle {
         my ($folder, $value) = @_;
@@ -473,9 +527,9 @@ A callback invoked whenever L<"fold"> encounters a value for which the
 L<"is_object"> method returns true i.e. any reference that isn't an unblessed
 arrayref or unblessed hashref. This callback can be used to modify
 the value e.g. to return a traversable value (e.g. unblessed hashref)
-in place of a terminal (e.g.  blessed hashref).
+in place of a terminal (e.g. blessed hashref).
 
-The callback takes two arguments: the Hash::Fold instance and the object e.g.:
+The callback is passed two arguments: the Hash::Fold instance and the object e.g.:
 
     use Scalar::Util qw(blessed);
 
@@ -506,7 +560,7 @@ dotted keys. The delimiter can be overridden via the L<"delimiter">,
 L<"array_delimiter"> and L<"hash_delimiter"> options.
 
 Unblessed arrayrefs and unblessed hashrefs are traversed. All other values
-(e.g. strings, regexps, objects &c.) are treated as terminals and passed
+(e.g. strings, regexps, objects etc.) are treated as terminals and passed
 through verbatim, although this can be overridden by supplying a suitable
 L<"on_object"> callback.
 
@@ -532,10 +586,10 @@ Provided as an alias for L<"unfold">.
 
 B<Signature>: (HashRef [, HashRef... ]) -> HashRef
 
-B<Signature>: (ArrayRef[HashRef] [, Hash|HashRef ]) -> HashRef
+B<Signature>: (ArrayRef<HashRef> [, Hash|HashRef ]) -> HashRef
 
 Takes a list of hashrefs which are then flattened, merged into one (in the
-order provided i.e.  with precedence given to the rightmost arguments) and
+order provided i.e. with precedence given to the rightmost arguments) and
 unflattened i.e. shorthand for:
 
     unflatten { map { %{ flatten $_ } } @_ }
@@ -556,13 +610,40 @@ This method is called from L<"fold"> to determine whether a value should be
 passed to the L<"on_object"> callback.
 
 It is passed each value encountered while traversing a hashref and returns true
-for all references (e.g.  regexps, globs, objects &c.) apart from unblessed
+for all references (e.g. regexps, globs, objects etc.) apart from unblessed
 arrayrefs and unblessed hashrefs, and false for all other
 values (i.e. unblessed hashrefs, unblessed arrayrefs, and non-references).
 
+=head1 ERRORS
+
+Objects of the class L<Hash::Fold::Error> are thrown upon error. The object
+stringifies to an error message with a strack trace.
+
+=over
+
+=item Invalid Argument
+
+If an input argument is not a hash, an error object will be thrown with the C<type>
+attribute set to the unexpected type of the argument.
+
+=item Incompatible path component
+
+If, during the course of an L</unfold>/L</unflatten> or a L</merge>, incompatible
+types are found along the same paths in the structures, an error
+object will be thrown with the C<path> attribute set to the path with
+the incorrect type, and the C<type> attribute set to the unexpected
+type. For example, the following paths would be incompatible:
+
+   foo.0 = 2
+   foo = 3
+
+- as C<foo> cannot be both a scalar and an array.
+
+=back
+
 =head1 VERSION
 
-0.1.2
+1.0.0
 
 =head1 SEE ALSO
 
@@ -580,13 +661,19 @@ values (i.e. unblessed hashrefs, unblessed arrayrefs, and non-references).
 
 =head1 AUTHOR
 
-chocolateboy <chocolate@cpan.org>
+=over
+
+=item * chocolateboy <chocolate@cpan.org>
+
+=item * djerius <djerius@cpan.org>
+
+=back
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014-2015, chocolateboy.
+Copyright (c) 2014-2019 by chocolateboy.
 
-This module is free software. It may be used, redistributed and/or modified
-under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the
+terms of the Artistic License 2.0.
 
 =cut

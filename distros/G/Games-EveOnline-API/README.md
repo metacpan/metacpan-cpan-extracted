@@ -597,6 +597,7 @@ Returns a hashref with the following structure:
 
     Aran Clary Deltac <bluefeet@gmail.com>
     Andrey Chips Kuzmin <chipsoid@cpan.org>
+    Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # LICENSE
 

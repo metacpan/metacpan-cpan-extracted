@@ -1,6 +1,6 @@
 use utf8;
 package File::ArchivableFormats::Plugin::DANS;
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 use Moose;
 use namespace::autoclean;
 
@@ -331,7 +331,7 @@ File::ArchivableFormats::Plugin::DANS - DANS module for archivable formats
 
 =head1 VERSION
 
-version 1.5
+version 1.6
 
 =head1 SEE ALSO
 

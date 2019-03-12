@@ -4,6 +4,7 @@ requires 'RDF::Trine';
 requires 'RDF::Query';
 requires 'RDF::Query::Client';
 requires 'List::Util', '1.33';
+requires 'JSON';
 
 test_requires 'Test::More';
 test_requires 'Test::Output';

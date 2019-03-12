@@ -1,6 +1,7 @@
 package Lab::Generic::CLOptions;
+$Lab::Generic::CLOptions::VERSION = '3.680';
 #ABSTRACT: Global command line option processing
-$Lab::Generic::CLOptions::VERSION = '3.671';
+
 use Getopt::Long qw/:config pass_through/;
 
 our $DEBUG        = 0;
@@ -25,16 +26,17 @@ Lab::Generic::CLOptions - Global command line option processing
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2014       Andreas K. Huettel
             2015       Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

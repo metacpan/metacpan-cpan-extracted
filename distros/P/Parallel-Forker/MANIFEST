@@ -2,12 +2,13 @@
 Changes
 lib/Parallel/Forker.pm
 lib/Parallel/Forker/Process.pm
+INSTALL.SKIP
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
 README
-readme.texi
+README.pod
 t/00_pod.t
 t/01_manifest.t
 t/03_spaces.t

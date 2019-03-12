@@ -1,22 +1,51 @@
 ---
-abstract: 'Calculate Distances and Closest Locations'
+abstract: 'Calculate distances and closest locations. (DEPRECATED)'
 author:
-  - 'Aran Deltac <bluefeet@gmail.com>'
+  - 'Aran Clary Deltac <bluefeet@cpan.org>'
 build_requires:
-  Test::Fatal: 0.007
-  Test::Simple: 0.94
+  Test2::V0: '0.000094'
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Geo-Distance
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Geo::Distance:
+    file: lib/Geo/Distance.pm
+    version: '0.24'
 requires:
-  Math::Complex: 0
+  Carp: '0'
+  Const::Fast: '0.014'
+  GIS::Distance: '0.14'
+  GIS::Distance::Constants: '0.14'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/Geo-Distance/issues
+  homepage: https://github.com/bluefeet/Geo-Distance
   repository: git://github.com/bluefeet/Geo-Distance.git
-version: 0.20
+version: '0.24'
+x_authority: cpan:BLUEFEET
+x_contributors:
+  - 'Anirvan Chatterjee <anirvan@base.mx.org>'
+  - 'Anirvan Chatterjee <anirvan@users.noreply.github.com>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+  - 'Niko Tyni <ntyni@debian.org>'
+  - 'gray <gray@cpan.org>'
+  - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'
+x_deprecated: 1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

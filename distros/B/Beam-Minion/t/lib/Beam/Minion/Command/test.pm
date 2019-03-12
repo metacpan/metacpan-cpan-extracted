@@ -9,5 +9,6 @@ loaded and run correctly.
 =cut
 
 our @ARGS;
+sub new { bless {}, shift }
 sub run { @ARGS = @_ }
 1;

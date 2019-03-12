@@ -1,5 +1,5 @@
 ---
-abstract: 'turn on strict and make most warnings fatal'
+abstract: 'Turn on strict and make most warnings fatal'
 author:
   - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
 build_requires:
@@ -23,7 +23,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=strictures
   license: http://dev.perl.org/licenses/
   repository: https://github.com/p5sagit/strictures.git
-version: '2.000005'
+version: '2.000006'
 x_authority: cpan:MSTROUT
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'

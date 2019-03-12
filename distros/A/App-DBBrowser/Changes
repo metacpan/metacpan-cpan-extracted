@@ -1,6 +1,12 @@
 Revision history for App-DBBrowser
 
 
+2.069    2019-03-09
+        - Attach/detach database: fix file name hash key.
+
+2.068    2019-03-08
+        - Update filter column names.
+
 2.067    2019-02-25
         - Code refactoring.
 

@@ -8,6 +8,7 @@ use Image::ExifTool qw(:Public);
 use Image::Size;
 use Clone qw(clone);
 use FB3::Euristica;
+use URI::Escape;
 use utf8;
 
 my %NS = (
@@ -1053,7 +1054,7 @@ sub AssembleContent {
     if ($Item->{'type'} =~ /^application\/xhtml/) { # Видимо, текст
 
       my $ContentFile = $X->{'ContentDir'}.'/'.$Item->{'href'};
-      $ContentFile =~ s/%20/ /g;
+      $ContentFile = uri_unescape($ContentFile);
 
       $X->Msg("Fix strange text\n");
       $X->_bs('Strange', 'Зачистка странностей');
@@ -1081,7 +1082,7 @@ sub AssembleContent {
 
       $X->_bs('parse_epub_xhtml', 'xml-парсинг файлов epub [Открытие, первичные преобразования, парсинг]');
       my $Content;
-      open my $FO,"<".$ContentFile;
+      open my $FO,"<".$ContentFile or $X->Error("can't open file $ContentFile $!");
       map {$Content.=$_} <$FO>;
       close $FO;
 
@@ -1348,7 +1349,7 @@ sub ProcessHref {
   my $Href = $Node->getAttribute('href') || "";
 
   $Href = $X->trim_soft($Href);
-  my ($Link, $Anchor) = split /\#/, $Href, 2;
+  my ($Link, $Anchor) = split(/\#/, $Href, 2);
 
   my $NewHref =
   $Href ?
@@ -1357,13 +1358,19 @@ sub ProcessHref {
           : '#'.($Anchor ? 'link_' : '').$X->Path2ID( ($Link
                                                        ?$Href: #внешний section
                                                        basename($RelPath)."#".$Anchor #текущий section
-                                                       ), $RelPath , 'process_href')
+                                                       ), $RelPath , 'process_href',
+                                                        'skip' #не падать, если внешняя ссыль кривая
+                                                      )
         : '';
 
-  $X->{'href_list'}->{$NewHref} = $Href if $X->trim($NewHref) ne '';     
-  $Node->setAttribute('xlink:href' => $NewHref);
+  if (defined($NewHref)) {
+    $X->{'href_list'}->{$NewHref} = $Href if $X->trim($NewHref) ne '';
+    $Node->setAttribute('xlink:href' => $NewHref);
+  } else {
+    $Node->parentNode->removeChild( $Node );
+  }
 
-  return $Node;  
+  return $Node;
 }
 
 sub TransformTo {

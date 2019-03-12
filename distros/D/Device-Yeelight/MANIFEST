@@ -1,0 +1,15 @@
+Changes
+lib/Device/Yeelight.pm
+lib/Device/Yeelight/Light.pm
+examples/discovery.pl
+examples/play_scene.pl
+examples/properties.pl
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

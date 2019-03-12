@@ -1,0 +1,5 @@
+name = "JSON-Feed"
+badges = ['travis', 'codecov', 'metacpan']
+authority="cpan:GUGOD"
+
+module_maker="ModuleBuildTiny"

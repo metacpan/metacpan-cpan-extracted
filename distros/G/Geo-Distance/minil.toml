@@ -1,0 +1,5 @@
+name = "Geo-Distance"
+authority="cpan:BLUEFEET"
+
+[Metadata]
+x_deprecated = 1

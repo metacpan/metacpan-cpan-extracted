@@ -1,14 +1,14 @@
 #
 # This file is part of ElasticSearchX-Model
 #
-# This software is Copyright (c) 2018 by Moritz Onken.
+# This software is Copyright (c) 2019 by Moritz Onken.
 #
 # This is free software, licensed under:
 #
 #   The (three-clause) BSD License
 #
 package ElasticSearchX::Model::Index;
-$ElasticSearchX::Model::Index::VERSION = '2.0.0';
+$ElasticSearchX::Model::Index::VERSION = '2.0.1';
 use Moose;
 use Module::Find ();
 use Class::Load  ();
@@ -139,7 +139,7 @@ ElasticSearchX::Model::Index
 
 =head1 VERSION
 
-version 2.0.0
+version 2.0.1
 
 =head1 ATTRIBUTES
 
@@ -230,7 +230,7 @@ Moritz Onken
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Moritz Onken.
+This software is Copyright (c) 2019 by Moritz Onken.
 
 This is free software, licensed under:
 

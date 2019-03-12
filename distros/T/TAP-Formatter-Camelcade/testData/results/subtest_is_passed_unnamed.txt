@@ -1,0 +1,12 @@
+teamcity[enteredTheMatrix timestamp='2019-03-10T12:56:49.973']
+teamcity[testingStarted timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='myfile://testData/tests/subtest_is_passed_unnamed.t' name='testData/tests/subtest_is_passed_unnamed.t' nodeId='myfile://testData/tests/subtest_is_passed_unnamed.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='Wrapping subtest' name='Wrapping subtest' nodeId='Wrapping subtest-1' parentNodeId='myfile://testData/tests/subtest_is_passed_unnamed.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='Unnamed test (#1)' nodeId='Wrapping subtest-1-Unnamed test (#1)-2' parentNodeId='Wrapping subtest-1' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='Unnamed test (#1)' nodeId='Wrapping subtest-1-Unnamed test (#1)-2' parentNodeId='Wrapping subtest-1' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='Wrapping subtest' name='Wrapping subtest' nodeId='Wrapping subtest-1' parentNodeId='myfile://testData/tests/subtest_is_passed_unnamed.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='testData/tests/subtest_is_passed_unnamed.t' name='testData/tests/subtest_is_passed_unnamed.t' nodeId='myfile://testData/tests/subtest_is_passed_unnamed.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+All tests successful.
+Files=1, Tests=1, TEST_MODE_STATS;
+Result: PASS
+teamcity[testingFinished timestamp='2019-03-10T12:56:49.973']

@@ -1,5 +1,16 @@
 Revision history for Perl module X::Tiny
 
+0.17 Mon Mar 11 2019
+- Fix the fix to the test from RT #128809. (Blegh, oops.)
+
+0.16 Sun Mar 10 2019
+- No production changes.
+- Adjust test not to assume that Test::More doesn’t load overload.pm.
+  (RT #128809)
+- Fix Makefile.PL to mention GitHub bug tracker.
+- Remove superfluous autodie.pm dependency.
+- Switch from README.pod to README.md.
+
 0.15 Fri Aug 24 2018
 - Fix LICENSE file (again).
 

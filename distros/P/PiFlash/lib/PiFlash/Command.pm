@@ -5,11 +5,11 @@ use warnings;
 
 use strict;
 use warnings;
-use v5.18.0; # require 2014 or newer version of Perl
+use v5.14.0; # require 2011 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Command;
-$PiFlash::Command::VERSION = '0.2.1';
+$PiFlash::Command::VERSION = '0.2.2';
 use autodie;
 use POSIX; # included with perl
 use IO::Handle; # rpm: "dnf install perl-IO", deb: included with perl
@@ -49,7 +49,7 @@ sub cmd_log
 {
 	# record all command return codes, stdout & stderr in a new top-level store in State
 	# it's overhead but useful for problem-reporting, troubleshooting, debugging and testing
-	if (PiFlash::State::verbose()) {
+	if (PiFlash::State::verbose() or PiFlash::State::logging()) {
 		my $log = PiFlash::State::log();
 		if (!exists $log->{cmd}) {
 			$log->{cmd} = [];
@@ -313,7 +313,7 @@ PiFlash::Command - process/command running utilities for piflash
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 

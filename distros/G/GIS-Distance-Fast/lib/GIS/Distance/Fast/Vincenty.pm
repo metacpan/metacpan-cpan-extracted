@@ -1,16 +1,14 @@
 package GIS::Distance::Fast::Vincenty;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 use GIS::Distance::Fast;
-use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
-    my $c = GIS::Distance::Fast::vincenty_distance( @_ );
-
-    return $c / 1000;
+{
+    no strict 'refs';
+    *distance = \&GIS::Distance::Fast::vincenty_distance;
 }
 
 1;

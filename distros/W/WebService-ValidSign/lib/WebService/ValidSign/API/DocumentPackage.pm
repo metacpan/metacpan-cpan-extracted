@@ -1,12 +1,11 @@
 package WebService::ValidSign::API::DocumentPackage;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use namespace::autoclean;
 
 # ABSTRACT: A REST API client for ValidSign
 
 use WebService::ValidSign::Object::Sender;
-use Data::Dumper;
 use HTTP::Request;
 use HTTP::Request::Common;
 use Carp qw(croak);
@@ -49,6 +48,7 @@ sub create_with_documents {
     my $request = $self->_add_documents($package, $uri, $json);
 
     my $response = $self->call_api($request);
+    $package->id($response->{id});
     return $response->{id};
 }
 
@@ -138,7 +138,7 @@ WebService::ValidSign::API::DocumentPackage - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

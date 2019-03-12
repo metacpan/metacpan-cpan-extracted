@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.0.1';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.2.0';
 use strict;
 use warnings;
 
@@ -34,14 +34,17 @@ sub abstract
 
 sub opt_spec
 {
-    return ( [ "output|o=s", "Output path" ] );
+    return ( [ "output|o=s", "Output path" ],
+        [ 'exec|e=s@', "Execute command on the output" ] );
 }
 
 sub execute
 {
     my ( $self, $opt, $args ) = @_;
 
-    my $workbook  = Excel::Writer::XLSX->new( $opt->{output} );
+    my $fn        = $opt->{output};
+    my $exe       = $opt->{exec} // [];
+    my $workbook  = Excel::Writer::XLSX->new($fn);
     my $worksheet = $workbook->add_worksheet();
     my $bold      = $workbook->add_format( bold => 1 );
 
@@ -230,6 +233,10 @@ sub execute
 
     $workbook->close();
 
+    if (@$exe)
+    {
+        system( @$exe, $fn );
+    }
     return;
 }
 
@@ -247,7 +254,7 @@ App::CSV2Chart::Command::xlsx
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.0
 
 =head1 NAME
 
@@ -255,7 +262,7 @@ csv2chart xlsx - generate an .xlsx file with an embedded chart from CSV data
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.0
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

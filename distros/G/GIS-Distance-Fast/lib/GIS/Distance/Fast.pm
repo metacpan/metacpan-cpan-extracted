@@ -1,7 +1,7 @@
 package GIS::Distance::Fast;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 our @ISA;
 
@@ -40,7 +40,11 @@ use the ::Fast formulas when they are available.
 
 L<GIS::Distance::Fast::Cosine>
 
+L<GIS::Distance::Fast::GreatCircle>
+
 L<GIS::Distance::Fast::Haversine>
+
+L<GIS::Distance::Fast::Polar>
 
 L<GIS::Distance::Fast::Vincenty>
 

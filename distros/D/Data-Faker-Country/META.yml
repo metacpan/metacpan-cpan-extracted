@@ -1,0 +1,46 @@
+---
+abstract: 'Provides country and ISO country code generation'
+author:
+  - 'Tom Molesworth <TEAM@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.98'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Faker-Country
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Data::Faker::Country:
+    file: lib/Data/Faker/Country.pm
+    version: '0.001'
+requires:
+  Data::Faker: '0'
+  Locale::Country: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/team-at-cpan/Data-Faker-Country/issues
+  homepage: https://github.com/team-at-cpan/Data-Faker-Country
+  repository: https://github.com/team-at-cpan/Data-Faker-Country.git
+version: '0.001'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

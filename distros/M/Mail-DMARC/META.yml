@@ -84,14 +84,16 @@ resources:
   bugtracker: https://github.com/msimerson/mail-dmarc/issues
   homepage: https://github.com/msimerson/mail-dmarc/wiki
   repository: git://github.com/msimerson/mail-dmarc.git
-version: '1.20181001'
+version: '1.20190308'
 x_contributors:
   - 'Benny Pedersen <me@junc.eu>'
   - 'ColocateUSA.net <company@colocateusa.net>'
   - 'Jean Paul Galea <jeanpaul@yubico.com>'
   - 'Jean Paul Galea <jp@galea.se>'
   - 'Making GitHub Delicious. <iron@waffle.io>'
+  - 'Marc Bradshaw <marc_at_github@fastmail.com>'
   - 'Marc Bradshaw <marc@marcbradshaw.net>'
+  - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
   - 'Priyadi Iman Nurcahyo <priyadi@priyadi.net>'
   - 'Priyadi Iman Nurcahyo <priyadi@users.noreply.github.com>'
   - 'Ricardo Signes <rjbs@cpan.org>'

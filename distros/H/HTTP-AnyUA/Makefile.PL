@@ -39,9 +39,10 @@ my %WriteMakefileArgs = (
     "Test2::API" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "lib" => 0
+    "lib" => 0,
+    "namespace::clean" => 0
   },
-  "VERSION" => "0.902",
+  "VERSION" => "0.903",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,6 +68,7 @@ my %FallbackPrereqs = (
   "Time::Local" => 0,
   "bytes" => 0,
   "lib" => 0,
+  "namespace::clean" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

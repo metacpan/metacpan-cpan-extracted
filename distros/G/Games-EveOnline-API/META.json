@@ -45,6 +45,7 @@
             "LWP::UserAgent" : "0",
             "Moo" : "1.004005",
             "Type::Tiny" : "0.044",
+            "URI" : "0",
             "XML::Simple" : "0"
          }
       },
@@ -57,7 +58,7 @@
    "provides" : {
       "Games::EveOnline::API" : {
          "file" : "lib/Games/EveOnline/API.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -71,13 +72,14 @@
          "web" : "https://github.com/bluefeet/Games-EveOnline-API"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Andrey Kuzmin <chips@reg.ru>",
-      "Aran Deltac <aran@ziprecruiter.com>"
+      "Aran Deltac <aran@ziprecruiter.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_deprecated" : 1,
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

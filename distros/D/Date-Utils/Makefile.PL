@@ -22,14 +22,14 @@ WriteMakefile(
         'Moo::Role'               => '2.000000',
         'namespace::autoclean'    => '0.28',
         'Term::ANSIColor::Markup' => '0.06',
-        'Date::Exception'         => '0.03',
+        'Date::Exception'         => '0.07',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Utils-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Utils' => { file => 'lib/Date/Utils.pm', version => '0.24' },
+            'Date::Utils' => { file => 'lib/Date/Utils.pm', version => '0.25' },
         },
         resources => {
             repository => {

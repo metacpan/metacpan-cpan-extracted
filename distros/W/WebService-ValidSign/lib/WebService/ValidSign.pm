@@ -1,5 +1,5 @@
 package WebService::ValidSign;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use namespace::autoclean;
 
@@ -7,8 +7,6 @@ use namespace::autoclean;
 
 use Module::Pluggable::Object;
 use List::Util qw(first);
-
-my @API_PLUGINS;
 
 has auth => (
     is      => 'ro',
@@ -29,32 +27,36 @@ has account => (
     builder => 1,
 );
 
+{
+    my @API_PLUGINS;
+    my $search_path = 'WebService::ValidSign::API';
+    sub __build_api_package {
+        my ($self, $pkg) = @_;
+
+        if (!@API_PLUGINS) {
+            my $finder = Module::Pluggable::Object->new(
+                search_path => $search_path,
+                require     => 1,
+            );
+            @API_PLUGINS = $finder->plugins;
+        }
+
+        if (my $plugin = first { $pkg eq $_ } @API_PLUGINS) {
+            return $pkg->new(
+                $self->args_builder,
+                $pkg eq 'WebService::ValidSign::API::Auth' ? () : (
+                    auth => $self->auth,
+                )
+            );
+        }
+        die sprintf("Unable to load '%s', not found in search path: '%s'!\n",
+            $pkg, $search_path);
+    }
+}
+
 sub _build_auth {
     my $self = shift;
     return $self->__build_api_package('WebService::ValidSign::API::Auth');
-}
-
-sub __build_api_package {
-    my ($self, $pkg) = @_;
-
-    if (!@API_PLUGINS) {
-        my $finder = Module::Pluggable::Object->new(
-            search_path => 'WebService::ValidSign::API',
-            require     => 1,
-        );
-        @API_PLUGINS = $finder->plugins;
-    }
-
-    if (my $plugin = first { $pkg eq $_ } @API_PLUGINS) {
-        return $pkg->new(
-            $self->args_builder,
-            $pkg eq 'WebService::ValidSign::API::Auth' ? () : (
-                auth => $self->auth,
-            )
-        );
-    }
-    die sprintf("Unable to load '%s', not found in search path: '%s'!\n",
-        $pkg, 'Webservice::ValidSign::API');
 }
 
 sub _build_package {
@@ -83,7 +85,7 @@ WebService::ValidSign - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -110,14 +112,15 @@ version 0.001
     }
     $documentpackage->sender($senders->[0]);
 
-    my $signers = $client->account->senders(search => $sender);
-    if (!@$senders) {
-        die "Unable to find sender $opts{senders}\n";
+    my $signers = $client->account->senders(search => $signer);
+    if (!@$signers) {
+        die "Unable to find sender $signer\n";
     }
-    elsif (@$senders > 1) {
-        die "Multiple senders found for $opts{senders}\n";
+    # at this moment only one signer is supported
+    elsif (@$signers > 1) {
+        die "Multiple senders found for $signer}\n";
     }
-    $documentpackage->add_signer('rolename' => $sender);
+    $documentpackage->add_signer('rolename' => signers->[0]);
 
     my @documents = qw(
         /path/to/documents/foo.bar
@@ -143,6 +146,9 @@ without notice.
 
 =head1 ATTRIBUTES
 
+This module extends L<WebService::ValidSign::API::Constructor> and all of its
+attributes.
+
 =over
 
 =item secret
@@ -157,7 +163,25 @@ The API URI endpoint as described in the Application Integrator's Guide
 
 An L<LWP::UserAgent> object.
 
+=item auth
+
+An L<WebService::ValidSign::API::Auth> object. Build for you.
+
+=item package
+
+An L<WebService::ValidSign::API::DocumentPackage> object. Build for you.
+
+=item account
+
+An L<WebService::ValidSign::API::Account> object. Build for you.
+
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+This module has been made possible by my employer L<Mintlab
+B.V.|https://mintlab.nl> who uses this module in their open source product
+L<Zaaksysteem|https://zaaksysteem.nl>.
 
 =head1 AUTHOR
 

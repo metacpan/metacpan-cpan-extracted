@@ -1,4 +1,15 @@
-0.16 2019-03-07T06:28:35Z
+0.17 2019-03-12T04:26:25Z
+
+0.17 2019-03-12T04:24:20Z
+
+    - Bump version
+
+0.16 2019-03-07T07:07:14Z
+
+    - Avoid SQL syntax error: column IN () (charsbar) #26
+    - Add disconnect method explicitly to pass tests for windows (twata1) #25
+
+0.15 2017-04-19T01:41:02Z
 
     - Fix failed tests with Perl 5.25.11 (miniuchi) #24
 

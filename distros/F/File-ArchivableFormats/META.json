@@ -51,10 +51,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Archive::Zip" : "0",
             "File::Basename" : "0",
-            "File::LibMagic" : "0",
-            "Image::ExifTool" : "0",
+            "File::MimeInfo::Magic" : "0",
             "List::Util" : "0",
             "Module::Pluggable::Object" : "0",
             "Moose" : "0",
@@ -81,15 +79,15 @@
    "provides" : {
       "File::ArchivableFormats" : {
          "file" : "lib/File/ArchivableFormats.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "File::ArchivableFormats::Plugin" : {
          "file" : "lib/File/ArchivableFormats/Plugin.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       },
       "File::ArchivableFormats::Plugin::DANS" : {
          "file" : "lib/File/ArchivableFormats/Plugin/DANS.pm",
-         "version" : "1.5"
+         "version" : "1.6"
       }
    },
    "release_status" : "stable",
@@ -100,11 +98,11 @@
          "web" : "https://gitlab.com/waterkip/File-ArchivableFormats"
       }
    },
-   "version" : "1.5",
+   "version" : "1.6",
    "x_contributors" : [
       "Wesley Schwengle <wesley@schwengle.net>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

@@ -1,7 +1,7 @@
 package GIS::Distance::MathTrig;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Math::Trig qw( great_circle_distance deg2rad );
 use GIS::Distance::Constants qw( :all );
@@ -43,17 +43,11 @@ is used which in turn interfaces with the various formula modules.
 
 =head1 FORMULA
 
+As stated in the L<Math::Trig> POD:
+
     lat0 = 90 degrees - phi0
     lat1 = 90 degrees - phi1
     d = R * arccos(cos(lat0) * cos(lat1) * cos(lon1 - lon01) + sin(lat0) * sin(lat1))
-
-As stated in the L<Math::Trig> POD.
-
-=head1 SEE ALSO
-
-L<GIS::Distanc>
-
-L<Math::Trig>
 
 =head1 AUTHORS AND LICENSE
 

@@ -1,6 +1,7 @@
 package Lab::SCPI;
+$Lab::SCPI::VERSION = '3.680';
 #ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
-$Lab::SCPI::VERSION = '3.671';
+
 use 5.010;
 use warnings;
 no warnings 'recursion';
@@ -9,7 +10,6 @@ use strict;
 use Carp;
 use English;    # avoid editor nonsense with odd special variables
 use Exporter 'import';
-
 
 our @EXPORT = qw( scpi_match scpi_parse scpi_canon
     scpi_flat scpi_parse_sequence );
@@ -570,7 +570,7 @@ Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and paramet
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 Interface
 
@@ -680,10 +680,11 @@ if $thing = array ref -> flat is an array ref to flat hashes
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane, Simon Reinhardt
             2017       Andreas K. Huettel
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

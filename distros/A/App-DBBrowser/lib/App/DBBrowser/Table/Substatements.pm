@@ -54,7 +54,7 @@ sub select {
         $choices = [ @pre, @{$sql->{cols}} ];
     }
     $sql->{select_cols} = [];
-    $sql->{alias} = { %{$sql->{alias}} };
+    #$sql->{alias} = { %{$sql->{alias}} };
     my @bu;
 
     COLUMNS: while ( 1 ) {
@@ -76,7 +76,7 @@ sub select {
             push @{$sql->{select_cols}}, @{$choices}[@idx];
             return 1;
         }
-        elsif ( $choices->[ $idx[0] ] eq $expand_sign ) {
+        elsif ( $choices->[$idx[0]] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( ! defined $ext_col ) {
@@ -373,7 +373,7 @@ sub group_by {
             }
             return 1;
         }
-        elsif ( $choices->[ $idx[0] ] eq $expand_sign ) {
+        elsif ( $choices->[$idx[0]] eq $expand_sign ) {
             my $ext = App::DBBrowser::Table::Extensions->new( $sf->{i}, $sf->{o}, $sf->{d} );
             my $ext_col = $ext->extended_col( $sql, $clause );
             if ( defined $ext_col ) {

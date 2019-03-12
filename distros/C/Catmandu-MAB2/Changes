@@ -1,5 +1,8 @@
 Changelog for Catmandu-MAB2
 
+0.22  2019-03-08 17:35:44 CET
+ - gh#10 fix parsing of subfields
+
 0.21  2017-10-16 17:44:43 CEST
  - warn and skip faulty fields
  - fix regex for record fields

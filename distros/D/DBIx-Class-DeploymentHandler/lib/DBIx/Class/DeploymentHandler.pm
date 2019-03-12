@@ -1,16 +1,17 @@
 package DBIx::Class::DeploymentHandler;
-$DBIx::Class::DeploymentHandler::VERSION = '0.002223';
+$DBIx::Class::DeploymentHandler::VERSION = '0.002227';
 # ABSTRACT: Extensible DBIx::Class deployment
 
-use Moose;
+use Moo;
 
-has initial_version => (is => 'ro', lazy_build => 1);
+has initial_version => (is => 'lazy');
 sub _build_initial_version { $_[0]->database_version }
 
 extends 'DBIx::Class::DeploymentHandler::Dad';
 # a single with would be better, but we can't do that
 # see: http://rt.cpan.org/Public/Bug/Display.html?id=46347
-with 'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
+use DBIx::Class::DeploymentHandler::WithApplicatorDumple;
+with WithApplicatorDumple(
     interface_role       => 'DBIx::Class::DeploymentHandler::HandlesDeploy',
     class_name           => 'DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator',
     delegate_name        => 'deploy_method',
@@ -18,20 +19,20 @@ with 'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
     attributes_to_copy   => [qw(
       ignore_ddl databases script_directory sql_translator_args force_overwrite
     )],
-  },
-  'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
+  ),
+  WithApplicatorDumple(
     interface_role       => 'DBIx::Class::DeploymentHandler::HandlesVersioning',
     class_name           => 'DBIx::Class::DeploymentHandler::VersionHandler::Monotonic',
     delegate_name        => 'version_handler',
     attributes_to_assume => [qw( initial_version schema_version to_version )],
-  },
-  'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
+  ),
+  WithApplicatorDumple(
     interface_role       => 'DBIx::Class::DeploymentHandler::HandlesVersionStorage',
     class_name           => 'DBIx::Class::DeploymentHandler::VersionStorage::Standard',
     delegate_name        => 'version_storage',
     attributes_to_assume => ['schema'],
     attributes_to_copy   => [qw(version_source version_class)],
-  };
+  );
 with 'DBIx::Class::DeploymentHandler::WithReasonableDefaults';
 
 sub prepare_version_storage_install {
@@ -114,7 +115,7 @@ or for upgrades:
 C<DBIx::Class::DeploymentHandler> is, as its name suggests, a tool for
 deploying and upgrading databases with L<DBIx::Class>.  It is designed to be
 much more flexible than L<DBIx::Class::Schema::Versioned>, hence the use of
-L<Moose> and lots of roles.
+L<Moo> and lots of roles.
 
 C<DBIx::Class::DeploymentHandler> itself is just a recommended set of roles
 that we think will not only work well for everyone, but will also yield the
@@ -273,6 +274,27 @@ charities that can do much more good than I will with your money.
 L<http://www.charitynavigator.org/index.cfm?bay=search.summary&orgid=6901>
 
 =head1 METHODS
+
+This is just a "stub" section to make clear
+that the bulk of implementation is documented in
+L<DBIx::Class::DeploymentHandler::Dad>. Since that is implemented using
+L<Moo> class, see L<DBIx::Class::DeploymentHandler::Dad/ATTRIBUTES>
+and L<DBIx::Class::DeploymentHandler::Dad/"ORTHODOX METHODS"> for
+available attributes to pass to C<new>, and methods callable on the
+resulting object.
+
+=head2 new
+
+  my $s = My::Schema->connect(...);
+  my $dh = DBIx::Class::DeploymentHandler->new({
+    schema              => $s,
+    databases           => 'SQLite',
+    sql_translator_args => { add_drop_table => 0 },
+  });
+
+See L<DBIx::Class::DeploymentHandler::Dad/ATTRIBUTES> and
+L<DBIx::Class::DeploymentHandler::Dad/"ORTHODOX METHODS"> for available
+attributes to pass to C<new>.
 
 =head2 prepare_version_storage_install
 

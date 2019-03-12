@@ -1,0 +1,11 @@
+Changes
+Copying
+Artistic
+MANIFEST
+MANIFEST.SKIP
+README
+Makefile.PL
+Stat.pm
+t/jiffy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

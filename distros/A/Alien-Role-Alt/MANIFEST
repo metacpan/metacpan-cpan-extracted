@@ -14,7 +14,6 @@ corpus/lib/auto/share/dist/Alien-libfoo1/_alien/alien.json
 corpus/lib/auto/share/dist/Alien-libfoo2/_alien/alien.json
 dist.ini
 lib/Alien/Role/Alt.pm
-maint/travis-install-mods
 t/00_diag.t
 t/01_use.t
 t/alien_role_alt.t

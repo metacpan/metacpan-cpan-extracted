@@ -51,14 +51,13 @@
     breaks             break             broke             breaking          broken
     breeds             breed             bred              breeding          bred
     brings             bring             brought           bringing          brought
-    broadcasts         broadcast         broadcast         broadcasting      broadcast
     builds             build             built             building          built
     burns              burn              burnt             burning           burnt
     bursts             burst             burst             bursting          burst
     busts              bust              bust              busting           bust
    *buys              *buy              *bought           *buying           *bought
     caches             cache             cached            caching           cached
-    casts              cast              cast              casting           cast
+   *casts             *cast             *cast             *casting          *cast
     catches            catch             caught            catching          caught
     chooses            choose            chose             choosing          chosen
    *clads             *clad             *clad             *cladding         *clad
@@ -88,7 +87,6 @@
     flies              fly               flew              flying            flown
     flings             fling             flung             flinging          flung
     forbids            forbid            forbade           forbidding        forbidden
-    forecasts          forecast          forecast          forecasting       forecast
     foresees           foresee           foresaw           foreseeing        foreseen
     foretells          foretell          foretold          foretelling       foretold
     forgets            forget            forgot            forgetting        forgotten

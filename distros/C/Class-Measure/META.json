@@ -42,7 +42,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Sub::Exporter" : "0.982"
+            "Carp" : "0",
+            "Sub::Exporter" : "0.982",
+            "perl" : "5.008001"
          }
       },
       "test" : {
@@ -54,11 +56,11 @@
    "provides" : {
       "Class::Measure" : {
          "file" : "lib/Class/Measure.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Class::Measure::Length" : {
          "file" : "lib/Class/Measure/Length.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -72,10 +74,11 @@
          "web" : "https://github.com/bluefeet/Class-Measure"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
-      "Aran Deltac <bluefeet@gmail.com>"
+      "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

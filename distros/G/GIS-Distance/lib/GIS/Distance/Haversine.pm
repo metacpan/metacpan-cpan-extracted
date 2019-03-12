@@ -1,7 +1,7 @@
 package GIS::Distance::Haversine;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Math::Trig qw( deg2rad );
 use GIS::Distance::Constants qw( :all );
@@ -18,10 +18,23 @@ sub distance {
     my $dlon = $lon2 - $lon1;
     my $dlat = $lat2 - $lat1;
     my $a = (sin($dlat/2)) ** 2 + cos($lat1) * cos($lat2) * (sin($dlon/2)) ** 2;
-    my $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+    my $c = 2 * atan2(sqrt($a), sqrt(abs(1-$a)));
 
     return $KILOMETER_RHO * $c;
 }
+
+# Eric Samuelson recommended this formula.
+# http://forums.devshed.com/t54655/sc3d021a264676b9b440ea7cbe1f775a1.html
+# http://williams.best.vwh.net/avform.htm
+# It seems to produce the same results at the hsin formula, so...
+#
+# my $dlon = $lon2 - $lon1;
+# my $dlat = $lat2 - $lat1;
+# my $a = (sin($dlat / 2)) ** 2
+#     + cos($lat1) * cos($lat2) * (sin($dlon / 2)) ** 2;
+# $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+#
+# Maybe test for speed before tossing?
 
 1;
 __END__
@@ -37,6 +50,9 @@ GIS::Distance::Haversine - Exact spherical distance calculations.
 This is the default distance calculation for L<GIS::Distance> as
 it keeps a good balance between speed and accuracy.
 
+A faster (XS) version of this formula is available as
+L<GIS::Distance::Fast::Haversine>.
+
 Normally this module is not used directly.  Instead L<GIS::Distance>
 is used which in turn interfaces with the various formula modules.
 
@@ -47,12 +63,6 @@ is used which in turn interfaces with the various formula modules.
     a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
     c = 2 * atan2( sqrt(a), sqrt(1-a) )
     d = R * c
-
-=head1 SEE ALSO
-
-L<GIS::Distanc>
-
-L<GIS::Distance::Fast::Haversine>
 
 =head1 RESOURCES
 

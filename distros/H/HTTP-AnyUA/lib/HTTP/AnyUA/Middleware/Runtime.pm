@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware::Runtime;
 use warnings;
 use strict;
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 use parent 'HTTP::AnyUA::Middleware';
 
@@ -29,7 +29,7 @@ sub request {
     };
 
     if ($self->response_is_future) {
-        $resp->transform(
+        $resp = $resp->transform(
             done => $handle_response,
             fail => $handle_response,
         );
@@ -55,7 +55,7 @@ HTTP::AnyUA::Middleware::Runtime - Middleware to determine response time
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 

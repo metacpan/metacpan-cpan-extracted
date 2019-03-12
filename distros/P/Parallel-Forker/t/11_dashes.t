@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 # DESCRIPTION: Perl ExtUtils: Type 'make test' to test this package
 #
-# Copyright 2003-2017 by Wilson Snyder.  This program is free software;
+# Copyright 2003-2019 by Wilson Snyder.  This program is free software;
 # you can redistribute it and/or modify it under the terms of either the GNU
 # Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 ######################################################################
@@ -28,7 +28,7 @@ sub didit { $Didit{$_[0]->name} = 1 }
 sub a_test {
     my $failit = shift;
 
-    my $fork = new Parallel::Forker (use_sig_child=>1);
+    my $fork = new Parallel::Forker(use_sig_child=>1);
     $SIG{CHLD} = sub { Parallel::Forker::sig_child($fork); };
     $SIG{TERM} = sub { $fork->kill_tree_all('TERM') if $fork && $fork->in_parent; die "Quitting...\n"; };
     ok(1, "sig");
@@ -142,7 +142,7 @@ sub a_test {
 #        |
 #        f
 {
-  my $fork = new Parallel::Forker (use_sig_child=>1);
+  my $fork = new Parallel::Forker(use_sig_child=>1);
   $SIG{CHLD} = sub { Parallel::Forker::sig_child($fork); };
   $SIG{TERM} = sub { $fork->kill_tree_all('TERM') if $fork && $fork->in_parent; die "Quitting...\n"; };
 

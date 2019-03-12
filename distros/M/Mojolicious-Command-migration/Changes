@@ -18,3 +18,7 @@ Revision history for Perl module Mojolicious::Command::migration
 0.15 2016-10-31
     - drop AUTO_INCREMENT from alter table
     - add AFTER to alter table
+
+0.16 2018-12-27
+    - add rm method
+    - add diff method

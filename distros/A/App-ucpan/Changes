@@ -1,6 +1,15 @@
 Revision history for Perl extension App-ucpan
 
-1.01 2019-03-07T02:22:16Z
+1.02 2019-03-11T10:07:14Z
+
+1.02 2019-03-11T10:03:51Z
+    - Install modules securely
+    - Enable some options related from cpanm|cpan-outdated
+    - Fix option behavior
+    - Strict location of recoding file
+    - Make signal control more robust
+    - Improve help message
+    - Update and improve POD
 
 1.01 2019-03-07T02:05:35Z
     - Purge unused prereqs

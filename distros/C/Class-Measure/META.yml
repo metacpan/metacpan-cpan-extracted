@@ -26,18 +26,21 @@ no_index:
 provides:
   Class::Measure:
     file: lib/Class/Measure.pm
-    version: '0.06'
+    version: '0.07'
   Class::Measure::Length:
     file: lib/Class/Measure/Length.pm
-    version: '0.06'
+    version: '0.07'
 requires:
+  Carp: '0'
   Sub::Exporter: '0.982'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/Class-Measure/issues
   homepage: https://github.com/bluefeet/Class-Measure
   repository: git://github.com/bluefeet/Class-Measure.git
-version: '0.06'
+version: '0.07'
+x_authority: cpan:BLUEFEET
 x_contributors:
-  - 'Aran Deltac <bluefeet@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

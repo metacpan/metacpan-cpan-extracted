@@ -5,6 +5,7 @@ use Getopt::Long qw(:config posix_default bundling);
 use App::DubiousHTTP::Tests;
 use App::DubiousHTTP::Tests::Common;
 use App::DubiousHTTP::TestServer;
+use Data::Dumper;
 
 sub usage {
     print STDERR "ERROR: @_\n" if @_;
@@ -33,6 +34,8 @@ Options for server mode:
  --fast-feedback    Don't collect all results and send them at once at the end
                     but send parts of the output earlier so that the recipient
 		    needs to collect them. This saves memory in the client too.
+ --wwwroot D        basedir for own payloads, default ./static
+		    See below for how to setup your own payload
 
 Options for pcap mode:
 
@@ -45,6 +48,51 @@ Options for pcap mode:
 		   This is the default if arguments are given.
  --filter-all      Like --filter-any, but include stream only if all reports
 		   show a match.
+
+Setting up your own payload:
+
+The default payload for evasion tests is the EICAR test virus which gets served
+as ZIP file eicar.zip and if this gets not detected as plain TXT file eicar.txt.
+To verify that the firewall does not block innocent files novirus.txt is used.
+All of these payloads are builtin.
+
+It is possible to setup own payload as following:
+
+ 1. Reserve a directory for the payload files.
+    The default is ./static but an alternative can be specified with --wwwroot
+
+ 2. Add your own payloads to this directory as files which contain HTTP header
+    (without status line) and body. If the header line "X-Virus: ..." is given
+    the file is considered a malicious payload (like EICAR) and otherwise the
+    payload is considered innocent. Example:
+
+	Content-type: application/octet-stream
+	Content-Disposition: attachment; filename=virus.exe
+	X-Virus: my-own-test-virus
+
+	... data of test virus ...
+
+ 3. Optionally add a brotli compressed version of the payload. While deflate,
+    gzip and lzma compressions are done dynamically the brotli version need to
+    be provided or testing for brotli support can not be done.
+    Simply add the compressed version as filename.brotli (i.e. virus.exe.brotli
+    or similar). The optional HTTP header of this file will be ignored.
+
+ 4. Specify the payload in the URL, i.e.  http://ip:port/auto/all/virus.exe.
+    In this simple form the custom virus.exe is considered malicious and the
+    builtin novirus.txt will be used to check for overblocking.
+
+    A more complex version would be:
+    http://ip:port/auto/all/virus.zip|virus.exe|mynovirus.exe
+    Assuming the virus.* contains the X-Virus header while mynovirus.exe does
+    not it will first check with a fully correct and simple response if the
+    firewall blocks virus.zip. If not it will retry with virus.exe and if this
+    is not blocked too it will assume that the firewall is not able to block the
+    virus at all. But if any of these will result in a block it will use it for
+    all the further tests. Since mynovirus.exe does not contain the X-Virus
+    header it will assumed to be innocent and used to check for overblocking
+    instead of the builtin novirus.txt.
+
 
 USAGE
     exit(1);
@@ -66,6 +114,9 @@ if ( $mode eq 'server' ) {
 	'fast-feedback' => \$FAST_FEEDBACK,
 	'cert=s'   => \$cert,
 	'key=s'    => \$key,
+	'wwwroot=s' => sub {
+	    App::DubiousHTTP::Tests::Common->basedir($_[1]);
+	}
     ) or usage();
 
     my $addr = shift(@ARGV) or usage('no listen address given');
@@ -111,21 +162,39 @@ sub make_pcaps {
 	'filter-all' => sub { $filter_any = 0; },
     ) or usage();
 
-    my %include;
+    my $include;
+    my $only_path;
     for (@ARGV) {
 	open( my $fh,'<',$_ ) or die "open $_: $!";
+	my $lines;
+	$include ||= {};
 	while (<$fh>) {
-	    my ($code,$string,$page) = m{^ ([INW]) \| (\S+) \| (/\S+) } or next;
-	    $page =~s{^(/\w+)/[^/]+/(.*)}{$1/$testfile/$2} or next;
-	    my $v = $string =~m{match|success} ? 1:0;
-	    if (!exists $include{$page}) {
-		$include{$page} = $v;
+	    my ($page,$v);
+	    if ((my $code,my $string,$page) = m{^ ([INW]) \| (\S+) \| (/\S+) }) {
+		die "mixed input" if $only_path;
+		$only_path = 0;
+		$page =~s{^(/\w+)/[^/]+/(.*)}{$1/$testfile/$2} or next;
+		$lines++;
+		$v = $string =~m{match|success} ? 1:0;
+	    } elsif (m{^(/\w+)/[^/]+/(.*)\s*$}) {
+		die "mixed input" if defined $only_path && ! $only_path;
+		$lines++;
+		$only_path = 1;
+		$page = "$1/$testfile/$2";
+		warn "duplicate $page" if exists $include->{$page};
+		$v = 1;
+	    } elsif ($only_path) {
+		die "invalid line: $_" if m{\S};
+	    }
+	    if (!exists $include->{$page}) {
+		$include->{$page} = $v;
 	    } elsif ($filter_any) {
-		$include{$page} = 1 if $v;
+		$include->{$page} = 1 if $v;
 	    } else {
-		$include{$page} = 0 if !$v;
+		$include->{$page} = 0 if !$v;
 	    }
 	}
+	print STDERR "only_path=$only_path lines=$lines include=".int(keys %$include)."\n";
     }
 
     my $pcap;
@@ -146,41 +215,51 @@ sub make_pcaps {
     my $base = 0;
     for my $cat ( App::DubiousHTTP::Tests->categories ) {
 	$cat->TESTS or next;
-	$base += 5000;
 	my $pc = $pcap;
-	my $port = $base;
 	for my $tst ( $cat->TESTS ) {
 	    my $valid = $tst->VALID;
-	    $port = 10*int($port/10+1);
+	    my $port = 10*$tst->NUM_ID;
 	    $port += $valid>0 ? $valid : $valid<0 ? 4-$valid : 9;
 
-	    my $xurl = $tst->url($testfile);
-	    my $url = url_encode($xurl);
-	    if (!%include) {
-	    } elsif (!exists $include{$url}) {
+	    my $url = $tst->url($testfile);
+	    my $xurl = url_encode($url);
+	    if (!$include) {
+	    } elsif (!exists $include->{$url} && !exists $include->{$xurl}) {
+		if ($only_path) {
+		    warn "skip $url\n";
+		    next;
+		}
 		warn "$url not in existing reports - including anyway\n";
-	    } elsif (!$include{$url}) {
+	    } elsif (!$include->{$url} && !$include->{$xurl}) {
 		warn "skip $url\n";
 		next;
+	    } else {
+		warn "match $url\n";
 	    }
 
+	    delete $include->{$url};
+	    delete $include->{$xurl};
+
+	    my @manifest = ($port, $url,$tst->DESCRIPTION);
 	    if (!$pc) {
 		( my $id = $cat->ID.'-'.$tst->ID ) =~s{[^\w\-.,;+=]+}{_}g;
-		my $file = "$pcap_prefix$id.pcap";
+		my $file = "$pcap_prefix$id.$port.pcap";
+		push @manifest,$file;
 		$pc = Net::PcapWriter->new($file)
 		    or die "failed to create $file: $!";
 	    }
 
 	    my $conn = $pc->tcp_conn('1.1.1.1',$port,'8.8.8.8',80);
-	    $conn->write(0, "GET $url HTTP/1.1\r\nHost: evader.example.com\r\n\r\n" );
+	    $conn->write(0, "GET $xurl HTTP/1.1\r\nHost: evader.example.com\r\n\r\n" );
 	    for( $tst->make_response($testfile) ) {
 		$conn->write(1, $_ );
 	    }
 
-	    print $manifest "$port | $xurl | ".$tst->DESCRIPTION."\n" if $manifest;
+	    print $manifest join(" | ",@manifest),"\n" if $manifest;
 	    undef $pc if !$pcap;
 	}
     }
+    die Dumper($include) if $include && %$include;
 }
 
 ############################ work as server
@@ -205,7 +284,8 @@ sub serve {
 	    }
 	    return "HTTP/1.1 200 ok\r\nContent-type: text/html\r\n".
 		"X-ID: $path\r\n".
-		"Content-length: ".length($body)."\r\n"
+		"Content-length: ".length($body)."\r\n\r\n".
+		$body;
 	}
 
 	local $BASE_URL = "http://$listen";
@@ -257,7 +337,7 @@ sub serve {
 
 	if ( $page eq 'ALL' && $cat ) {
 	    for ( App::DubiousHTTP::Tests->categories ) {
-		return $_->make_index_page(undef,,$spec,$rqhdr)
+		return $_->make_index_page(undef,$spec,$rqhdr)
 		    if $_->ID eq $cat;
 	    }
 	}

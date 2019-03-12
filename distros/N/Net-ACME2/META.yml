@@ -1,5 +1,5 @@
 ---
-abstract: 'L<IETF|https://www.ietf.org>-standard ACME (Let’s Encrypt) client'
+abstract: 'Client logic for the ACME (Let’s Encrypt) protocol'
 author:
   - 'Felipe Gasper'
 build_requires:
@@ -39,6 +39,7 @@ requires:
   parent: '0.225'
   perl: '5.008009'
 resources:
+  bugtracker: https://github.com/FGasper/p5-Net-ACME2/issues
   repository: https://github.com/FGasper/p5-Net-ACME2.git
-version: '0.25'
+version: '0.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

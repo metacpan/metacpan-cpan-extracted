@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use v5.14;
 
-our $VERSION = '0.1.5';
+our $VERSION = '0.1.6';
 
 use List::Util qw(any);
 use JSON;
@@ -272,7 +272,7 @@ $res->each(
             $concepts->{$uri} = {
                 uri      => $uri,
                 type     => ['http://www.w3.org/2004/02/skos/core#Concept'],
-                inScheme => [ $opt{scheme} ],
+                inScheme => [ { uri => $opt{scheme} } ],
             };
         }
 

@@ -13,8 +13,6 @@ WriteMakefile(
     MIN_PERL_VERSION => 5.010000,
 
     PREREQ_PM    => {
-        'autodie'                  => 0,
-        'parent'                   => 0,
         'Module::Load'  => 0,
         'overload' => 0,
     },
@@ -26,9 +24,13 @@ WriteMakefile(
                 url  => 'https://github.com/FGasper/p5-X-Tiny.git',
                 web  => 'https://github.com/FGasper/p5-X-Tiny',
             },
+            bugtracker => {
+                web => 'https://github.com/FGasper/p5-X-Tiny/issues',
+            },
         },
     },
     TEST_REQUIRES => {
+        'parent'          => 0,
         'Test::More'      => 0,
         'Test::Simple'    => 0,
     },

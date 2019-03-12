@@ -16,27 +16,26 @@ my $test_data = get_test_data();
 
 sub test_nav_menu
 {
-    local $Test::Builder::Level = $Test::Builder::Level+1;
-    my $rendered = shift;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    my $rendered        = shift;
     my $expected_string = shift;
-    my $test_blurb = shift;
+    my $test_blurb      = shift;
 
-    my @result = (@{$rendered->{html}});
+    my @result = ( @{ $rendered->{html} } );
 
-    my @expected = (split(/\n/, $expected_string));
+    my @expected = ( split( /\n/, $expected_string ) );
 
-    is_deeply (\@result, \@expected, $test_blurb);
+    is_deeply( \@result, \@expected, $test_blurb );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/hello/",
-        @{$test_data->{'minimal'}},
+        @{ $test_data->{'minimal'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -50,19 +49,17 @@ sub test_nav_menu
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for minimal - 1");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu for minimal - 1" );
 }
-
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'two_sites'}},
+        @{ $test_data->{'two_sites'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -88,7 +85,7 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for minimal - 2");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu for minimal - 2" );
 }
 
 # This test tests that an expand_re directive should not cause
@@ -97,12 +94,11 @@ EOF
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'expand_re'}},
+        @{ $test_data->{'expand_re'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -125,7 +121,7 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for expand_re");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu for expand_re" );
 }
 
 # This test tests that an empty expand_re directive works after a successful
@@ -135,12 +131,11 @@ EOF
     $string =~ s{ofisvniowgvnoaifnaoiwfb$}{};
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'expand_re'}},
+        @{ $test_data->{'expand_re'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -163,7 +158,8 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for empty expand_re after successful pattern match");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu for empty expand_re after successful pattern match" );
 }
 
 # This test tests the show_always directive which causes the entire
@@ -171,12 +167,11 @@ EOF
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'show_always'}},
+        @{ $test_data->{'show_always'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -217,7 +212,7 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with show_always");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu with show_always" );
 }
 
 # This test tests a menu auto-expands if the current URL is an item
@@ -225,12 +220,11 @@ EOF
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/bio.html",
-        @{$test_data->{'items_in_sub'}},
+        @{ $test_data->{'items_in_sub'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -256,18 +250,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with a selected sub-item");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu with a selected sub-item" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'separator'}},
+        @{ $test_data->{'separator'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -300,18 +294,17 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with Separators");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu with Separators" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'hidden_item'}},
+        @{ $test_data->{'hidden_item'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -334,19 +327,17 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with Hidden Item");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu with Hidden Item" );
 }
-
 
 {
     my $nav_menu = HTML::Widgets::NavMenu::HeaderRole->new(
         'path_info' => "/good/",
-        @{$test_data->{'header_role'}},
+        @{ $test_data->{'header_role'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -377,18 +368,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with a role of \"header\"");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu with a role of \"header\"" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu::HeaderRole->new(
         'path_info' => "/me/",
-        @{$test_data->{'header_role'}},
+        @{ $test_data->{'header_role'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -419,19 +410,19 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with a selected item with a role of \"header\" ");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu with a selected item with a role of \"header\" " );
 }
 
 # Test the selective expand. (test #1)
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/bio/test.html",
-        @{$test_data->{'selective_expand'}},
+        @{ $test_data->{'selective_expand'} },
         'ul_classes' => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -463,19 +454,19 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Selective Expand Nav-Menu #1");
+    test_nav_menu( $rendered, $expected_string,
+        "Selective Expand Nav-Menu #1" );
 }
 
 # Test the selective expand. (test #2)
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/open-source/bits.html",
-        @{$test_data->{'selective_expand'}},
+        @{ $test_data->{'selective_expand'} },
         'ul_classes' => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -504,18 +495,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Selective Expand Nav-Menu #2");
+    test_nav_menu( $rendered, $expected_string,
+        "Selective Expand Nav-Menu #2" );
 }
 
 # This is a test for the url_type directive.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/darling/",
-        @{$test_data->{'url_type_menu'}},
+        @{ $test_data->{'url_type_menu'} },
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul>
@@ -532,7 +523,7 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for url_type - 1");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu for url_type - 1" );
 }
 
 # This is a test for the rec_url_type directive.
@@ -541,11 +532,10 @@ EOF
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/darling/",
-        @{$test_data->{'rec_url_type_menu'}},
+        @{ $test_data->{'rec_url_type_menu'} },
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul>
@@ -571,18 +561,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for rec_url_type - 1");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu for rec_url_type - 1" );
 }
 
 # Test the url_is_abs directive
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/hello/",
-        @{$test_data->{'url_is_abs_menu'}},
+        @{ $test_data->{'url_is_abs_menu'} },
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul>
@@ -596,19 +586,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu for url_is_asb - 1");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu for url_is_asb - 1" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/bio/test.html",
-        @{$test_data->{'mixed_expand_menu'}},
+        @{ $test_data->{'mixed_expand_menu'} },
         'current_host' => "default",
-        'ul_classes' => [ "one", "two", "three" ],
+        'ul_classes'   => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -640,20 +629,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Mixed Expand Nav-Menu #1");
+    test_nav_menu( $rendered, $expected_string, "Mixed Expand Nav-Menu #1" );
 }
-
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/bio/test.html",
-        @{$test_data->{'mixed_expand_menu'}},
+        @{ $test_data->{'mixed_expand_menu'} },
         'current_host' => "other",
-        'ul_classes' => [ "one", "two", "three" ],
+        'ul_classes'   => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -673,19 +660,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Mixed Expand Nav-Menu #2");
+    test_nav_menu( $rendered, $expected_string, "Mixed Expand Nav-Menu #2" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/open-source/not-exist/",
-        @{$test_data->{'mixed_expand_menu'}},
+        @{ $test_data->{'mixed_expand_menu'} },
         'current_host' => "other",
-        'ul_classes' => [ "one", "two", "three" ],
+        'ul_classes'   => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -714,18 +700,17 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Mixed Expand Nav-Menu #3");
+    test_nav_menu( $rendered, $expected_string, "Mixed Expand Nav-Menu #3" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/base/",
-        @{$test_data->{'special_chars_menu'}},
+        @{ $test_data->{'special_chars_menu'} },
         'current_host' => "default",
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul>
@@ -742,19 +727,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Special Chars Nav Menu");
+    test_nav_menu( $rendered, $expected_string, "Special Chars Nav Menu" );
 }
 
 # Test a special chars-based URL.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/<hello>&\"you\"/",
-        @{$test_data->{'special_chars_menu'}},
+        @{ $test_data->{'special_chars_menu'} },
         'current_host' => "default",
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul>
@@ -771,36 +755,35 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Nav Menu with a special chars URL.");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu with a special chars URL." );
 }
 
 # Test a special chars-based URL.
 {
-    my %args = (@{$test_data->{'special_chars_menu'}});
-    delete($args{'current_host'});
+    my %args = ( @{ $test_data->{'special_chars_menu'} } );
+    delete( $args{'current_host'} );
     eval {
-    my $nav_menu = HTML::Widgets::NavMenu->new(
-        'path_info' => "/<hello>&\"you\"/",
-        %args,
-    );
+        my $nav_menu = HTML::Widgets::NavMenu->new(
+            'path_info' => "/<hello>&\"you\"/",
+            %args,
+        );
     };
 
     # TEST
-    like ($@, qr!^Current host!,
-        "Checking for exception");
+    like( $@, qr!^Current host!, "Checking for exception" );
 }
 
 # This is to test that the cb2 is working properly.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/not-exist/",
-        @{$test_data->{'mixed_expand_menu'}},
+        @{ $test_data->{'mixed_expand_menu'} },
         'current_host' => "other",
-        'ul_classes' => [ "one", "two", "three" ],
+        'ul_classes'   => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -820,19 +803,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Mixed Expand Nav-Menu #4");
+    test_nav_menu( $rendered, $expected_string, "Mixed Expand Nav-Menu #4" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/open-source/",
-        @{$test_data->{'mixed_expand_menu'}},
+        @{ $test_data->{'mixed_expand_menu'} },
         'current_host' => "default",
-        'ul_classes' => [ "one", "two", "three" ],
+        'ul_classes'   => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -852,19 +834,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Mixed Expand Nav-Menu #5");
+    test_nav_menu( $rendered, $expected_string, "Mixed Expand Nav-Menu #5" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/humour/by-others/foo.html",
-        @{$test_data->{'non_capturing_expand'}},
+        @{ $test_data->{'non_capturing_expand'} },
         'current_host' => "default",
-        'ul_classes' => [ "one", "two", "three" ],
+        'ul_classes'   => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -896,7 +877,7 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Non Capturing Expand");
+    test_nav_menu( $rendered, $expected_string, "Non Capturing Expand" );
 }
 
 # This test tests that the URLs do not have "./" prepended to them
@@ -904,13 +885,12 @@ EOF
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/bio.html",
-        @{$test_data->{'items_in_sub'}},
-        'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
+        @{ $test_data->{'items_in_sub'} },
+        'ul_classes'   => [ "navbarmain", ("navbarnested") x 5 ],
         no_leading_dot => 1,
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -936,18 +916,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "no_leading_dot removes the extra ./");
+    test_nav_menu( $rendered, $expected_string,
+        "no_leading_dot removes the extra ./" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu::HeaderRole->new(
         'path_info' => "/me/",
-        @{$test_data->{'header_role_with_empty_cat'}},
+        @{ $test_data->{'header_role_with_empty_cat'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -981,20 +961,19 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string,
-        "Nav Menu with an empty header role.");
+    test_nav_menu( $rendered, $expected_string,
+        "Nav Menu with an empty header role." );
 }
 
 # Test HTML::Widgets::NavMenu::JQueryTreeView .
 {
     my $nav_menu = HTML::Widgets::NavMenu::JQueryTreeView->new(
         'path_info' => "/me/bio/test.html",
-        @{$test_data->{'selective_expand'}},
+        @{ $test_data->{'selective_expand'} },
         'ul_classes' => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -1035,19 +1014,19 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "HTML::Widgets::NavMenu::JQueryTreeView #1");
+    test_nav_menu( $rendered, $expected_string,
+        "HTML::Widgets::NavMenu::JQueryTreeView #1" );
 }
 
 # Test HTML::Widgets::NavMenu::JQueryTreeView with hidden.
 {
     my $nav_menu = HTML::Widgets::NavMenu::JQueryTreeView->new(
         'path_info' => "/me/",
-        @{$test_data->{'hidden_item'}},
+        @{ $test_data->{'hidden_item'} },
         'ul_classes' => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -1070,19 +1049,19 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "JQTreeView Nav Menu with Hidden Item");
+    test_nav_menu( $rendered, $expected_string,
+        "JQTreeView Nav Menu with Hidden Item" );
 }
 
 # Test HTML::Widgets::NavMenu::JQueryTreeView with li_id.
 {
     my $nav_menu = HTML::Widgets::NavMenu::JQueryTreeView->new(
         'path_info' => "/me/",
-        @{$test_data->{'with_ids_nav_menu'}},
+        @{ $test_data->{'with_ids_nav_menu'} },
         'ul_classes' => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -1105,20 +1084,19 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string,
-        "JQTreeView Nav Menu with li_id");
+    test_nav_menu( $rendered, $expected_string,
+        "JQTreeView Nav Menu with li_id" );
 }
 
 # Test HTML::Widgets::NavMenu (non-JQueryTreeView) with li_id.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'with_ids_nav_menu'}},
+        @{ $test_data->{'with_ids_nav_menu'} },
         'ul_classes' => [ "one", "two", "three" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="one">
@@ -1141,6 +1119,6 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string,
-        "Non-JQTreeView Nav Menu with li_id");
+    test_nav_menu( $rendered, $expected_string,
+        "Non-JQTreeView Nav Menu with li_id" );
 }

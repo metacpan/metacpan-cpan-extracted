@@ -1,6 +1,6 @@
 package Lab::Instrument::Source;
 #ABSTRACT: Generic voltage source base class
-$Lab::Instrument::Source::VERSION = '3.671';
+$Lab::Instrument::Source::VERSION = '3.680';
 use strict;
 use warnings;
 use 5.010;
@@ -564,7 +564,7 @@ Lab::Instrument::Source - Generic voltage source base class
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 DESCRIPTION
 
@@ -771,7 +771,7 @@ This class inherits the gate protection mechanism.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2009       Andreas K. Huettel, Daniela Taubert

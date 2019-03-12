@@ -2,8 +2,8 @@ NAME
     File::RsyBak - Backup files/directories with histories, using rsync
 
 VERSION
-    This document describes version 0.360 of File::RsyBak (from Perl
-    distribution File-RsyBak), released on 2018-09-30.
+    This document describes version 0.361 of File::RsyBak (from Perl
+    distribution File-RsyBak), released on 2019-03-11.
 
 SYNOPSIS
     From your Perl program:
@@ -115,7 +115,7 @@ DESCRIPTION
         been tested on those platforms.
 
 HOW IT WORKS
-  First-time backup
+  First-time backup (when TARGET does not yet exist)
     First, we lock target directory to prevent other backup process from
     interfering:
 
@@ -129,8 +129,8 @@ HOW IT WORKS
     If copy finishes successfully, we rename temporary directory to final
     directory 'current':
 
-     rename   TARGET/.tmp    TARGET/current
      touch    TARGET/.current.timestamp
+     rename   TARGET/.tmp    TARGET/current
 
     If copy fails in the middle, TARGET/.tmp will still be lying around and
     the next backup run will just continue the rsync process:
@@ -142,8 +142,8 @@ HOW IT WORKS
      unlock   TARGET/.lock
 
   Subsequent backups (after TARGET/current exists)
-    First, we lock target directory to prevent other backup process to
-    interfere:
+    First, we lock target directory to prevent other backup process from
+    interfering:
 
      flock    TARGET/.lock
 
@@ -155,8 +155,10 @@ HOW IT WORKS
     If rsync finishes successfully, we rename target directories:
 
      rename   TARGET/current TARGET/hist.<timestamp>
-     rename   TARGET/.tmp    TARGET/current
      touch    TARGET/.current.timestamp
+     rename   TARGET/.tmp    TARGET/current
+
+    where <timestamp> is the mtime of TARGET/.current.timestamp file.
 
     If rsync fails in the middle, TARGET/.tmp will be lying around and the
     next backup run will just continue the rsync process.
@@ -210,7 +212,7 @@ FUNCTIONS
   backup
     Usage:
 
-     backup(%args) -> [status, msg, result, meta]
+     backup(%args) -> [status, msg, payload, meta]
 
     Backup files/directories with histories, using rsync.
 
@@ -283,7 +285,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -364,7 +366,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011
+    This software is copyright (c) 2019, 2017, 2015, 2014, 2013, 2012, 2011
     by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

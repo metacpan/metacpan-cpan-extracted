@@ -1,6 +1,6 @@
 package Lab::Connection::DEBUG::Trace;
 #ABSTRACT: ???
-$Lab::Connection::DEBUG::Trace::VERSION = '3.671';
+$Lab::Connection::DEBUG::Trace::VERSION = '3.680';
 use 5.010;
 use warnings;
 use strict;
@@ -32,11 +32,11 @@ Lab::Connection::DEBUG::Trace - ???
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane
             2017       Andreas K. Huettel

@@ -1,5 +1,9 @@
 Revision history for App-skos2jskos
 
+0.1.6  2019-03-08 09:10:04 CET
+    - Fix field inScheme
+    - Add missing dependency JSON
+
 0.1.5  2019-03-07 13:42:16 CET
     - Add option --debug
     - Include creator and contributor in scheme

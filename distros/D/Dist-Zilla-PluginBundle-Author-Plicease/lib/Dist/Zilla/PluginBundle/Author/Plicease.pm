@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.35 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.36 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.35 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.35
+    Author::Plicease.*   2.36
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -172,11 +172,11 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.35 {
     
       $self->_my_add_plugin([
         'MetaResources' => {
-          'homepage' => $self->payload->{homepage} || "https://metacpan.org/pod/@{[ do { my $foo = $name; $foo =~ s/-/::/g; $foo }]}",
-          'bugtracker.web'  => sprintf("https://github.com/%s/%s/issues", $user, $repo),
-          'repository.url'  => sprintf("git://github.com/%s/%s.git",      $user, $repo),
-          'repository.web'  => sprintf("https://github.com/%s/%s",        $user, $repo),
-          'repository.type' => 'git',
+          'homepage' => $self->payload->{homepage}                 || "https://metacpan.org/pod/@{[ do { my $foo = $name; $foo =~ s/-/::/g; $foo }]}",
+          'bugtracker.web'  => $self->payload->{'bugtracker.web'}  || sprintf("https://github.com/%s/%s/issues", $user, $repo),
+          'repository.url'  => $self->payload->{'repository.web'}  || sprintf("git://github.com/%s/%s.git",      $user, $repo),
+          'repository.web'  => $self->payload->{'repository.web'}  || sprintf("https://github.com/%s/%s",        $user, $repo),
+          'repository.type' => $self->payload->{'repository.type'} || 'git',
           maybe 'x_IRC' => $self->payload->{irc},
         },
       ]);
@@ -333,7 +333,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.35
+version 2.36
 
 =head1 SYNOPSIS
 

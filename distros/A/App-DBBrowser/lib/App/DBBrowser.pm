@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.067';
+our $VERSION = '2.069';
 
 use Encode                qw( decode );
 use File::Basename        qw( basename );
@@ -80,8 +80,8 @@ sub __init {
         $app_dir = catdir( $home, '.db_browser' );
     }
     mkdir $app_dir or die $! if ! -d $app_dir;
-    $sf->{i}{home_dir}      = $home;
-    $sf->{i}{app_dir}       = $app_dir;
+    $sf->{i}{home_dir}   = $home;
+    $sf->{i}{app_dir}    = $app_dir;
     $sf->{i}{f_settings} = catfile $app_dir, 'general_settings.json';
     # check all info
 
@@ -308,7 +308,7 @@ sub run {
 
             SCHEMA: while ( 1 ) {
 
-                my $db_string = 'DB '. basename( $db ) . '';
+                my $db_string = 'DB ' . basename( $db ) . '';
                 my $schema;
                 if ( $sf->{redo_schema} ) {
                     $schema = delete $sf->{redo_schema};
@@ -357,7 +357,7 @@ sub run {
                     delete $ENV{TC_RESET_AUTO_UP};
                     $schema =~ s/^[-\ ]\s//;
                 }
-                $db_string = 'DB '. basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
+                $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . $schema : '' ) . '';
                 $sf->{d}{schema}       = $schema;
                 $sf->{d}{user_schemas} = $user_schemas;
                 $sf->{d}{sys_schemas}  = $sys_schemas;
@@ -392,7 +392,7 @@ sub run {
                 #if ( $sf->{backup_qtn} ) {
                 #    for my $table ( @user_tables ) {
                 #        my $tmp = delete $tables_info->{$table};
-                #        $table = '['. $tmp->[1] . ']' . $tmp->[2];
+                #        $table = '[' . $tmp->[1] . ']' . $tmp->[2];
                 #        $tables_info->{$table} = $tmp;
                 #    }
                 #}
@@ -693,7 +693,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.067
+Version 2.069
 
 =head1 DESCRIPTION
 

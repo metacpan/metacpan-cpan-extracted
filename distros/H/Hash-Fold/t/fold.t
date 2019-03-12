@@ -23,6 +23,7 @@ sub folds_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my $got;
+
     eval {
         $got = fold($hash, $options);
 
@@ -81,9 +82,9 @@ sub folds_ok {
     folds_ok $hash => $want;
 }
 
-# seeing a value more than once is not the same thing as seeing a value inside itself
-# (circular reference). make sure the former doesn't trigger the callback associated
-# with the latter
+# seeing a value more than once is not the same thing as seeing a value inside
+# itself (circular reference). make sure the former doesn't trigger the callback
+# associated with the latter
 {
     my $seen   = 0;
     my $on_cycle = sub { $seen = 1 };
@@ -149,7 +150,8 @@ sub folds_ok {
     is_deeply \@seen, [ $circular, $circular ];
 }
 
-# on_object: trigger the on_object type for a Regexp, a GLOB, and a blessed object
+# on_object: trigger the on_object callback for a Regexp, a GLOB, and a blessed
+# object
 {
     my @on_object;
 
@@ -185,7 +187,8 @@ sub folds_ok {
     is_deeply \@on_object, [ $regexp, $glob, $object ];
 }
 
-# on_object: trigger the on_object callback for an object and turn it into a non-terminal
+# on_object: trigger the on_object callback for an object and turn it into a
+# non-terminal
 {
     my $expand_terminal = sub {
         my ($folder, $value) = @_;
@@ -221,15 +224,16 @@ sub folds_ok {
     is_deeply $got_without_expand, $want_without_expand;
     is_deeply $got_with_expand, $want_with_expand;
 
-    # the folder options shouldn't make a difference here as far as unfolding is concerned
+    # the folder options shouldn't make a difference here as far as unfolding is
+    # concerned
     is_deeply $folder_without_expand->unfold($got_without_expand), $hash; # roundtrip
     is_deeply $folder_with_expand->unfold($got_with_expand), $hash; # roundtrip
 }
 
 # on_object: combine terminal expansion with the circular-reference check i.e.
 # if we convert a terminal into an unblessed hashref, we should detect a
-# circular reference in that hashref. check that the nested self-reference
-# is detected and returned as a terminal
+# circular reference in that hashref. check that the nested self-reference is
+# detected and returned as a terminal
 {
     my $expand_terminal = sub {
         my ($folder, $value) = @_;
@@ -260,8 +264,8 @@ sub folds_ok {
     folds_ok $hash => $want, on_object => $expand_terminal;
 }
 
-# squashed bug: make sure empty arrays and hashes are handled correctly
-# (i.e. not removed!)
+# squashed bug: make sure empty arrays and hashes are handled correctly (i.e.
+# not removed!)
 {
     my $hash = {
         array => [ [], {} ],
@@ -281,7 +285,7 @@ sub folds_ok {
     folds_ok $hash => $want;
 }
 
-# Noted potential failure in code
+# noted potential failure in code
 {
     my $hash = {
         foo => 'bar',
@@ -298,7 +302,7 @@ sub folds_ok {
     folds_ok $hash => $want;
 }
 
-# Failing extension of noted potential failure in code
+# failing extension of noted potential failure in code
 TODO: {
     my $hash = {
         bar => {
@@ -314,6 +318,6 @@ TODO: {
         'bar.baz'    => 'quux',
     };
 
-    local $TODO = "Array/hash ambiguity not resolved correctly at the moment";
+    local $TODO = 'Array/hash ambiguity not resolved correctly at the moment';
     folds_ok $hash => $want;
 }

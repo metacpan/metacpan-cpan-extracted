@@ -1,5 +1,5 @@
 package Text::Hogan::Compiler;
-$Text::Hogan::Compiler::VERSION = '2.01';
+$Text::Hogan::Compiler::VERSION = '2.02';
 use Text::Hogan::Template;
 
 use 5.10.0;
@@ -562,7 +562,7 @@ Text::Hogan::Compiler - parse templates and output Perl code
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 
@@ -696,6 +696,7 @@ Further improvements from:
 Ed Freyfogle
 Mohammad S Anwar
 Ricky Morse
+Jerrad Pierce
 Tom Hukins
 Tony Finch
 Yanick Champoux

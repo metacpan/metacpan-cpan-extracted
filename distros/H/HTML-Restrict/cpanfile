@@ -6,15 +6,13 @@ requires "List::Util" => "1.33";
 requires "Moo" => "1.002000";
 requires "Scalar::Util" => "0";
 requires "Sub::Quote" => "0";
-requires "Type::Library" => "0";
 requires "Type::Tiny" => "1.002001";
-requires "Type::Utils" => "0";
+requires "Types::Standard" => "1.000001";
 requires "URI" => "0";
 requires "namespace::clean" => "0";
 requires "perl" => "5.006";
 requires "strict" => "0";
 requires "version" => "0";
-requires "warnings" => "0";
 
 on 'test' => sub {
   requires "ExtUtils::MakeMaker" => "0";
@@ -22,6 +20,7 @@ on 'test' => sub {
   requires "Test::Fatal" => "0";
   requires "Test::More" => "0";
   requires "perl" => "5.006";
+  requires "warnings" => "0";
 };
 
 on 'test' => sub {
@@ -51,6 +50,7 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.12";
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.014";
+  requires "warnings" => "0";
 };
 
 on 'develop' => sub {

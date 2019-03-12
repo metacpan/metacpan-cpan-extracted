@@ -1,0 +1,42 @@
+Device-Yeelight
+
+Yeelight smart LED products support remote control through WiFi. When user
+received the smart LED device for the first time, he/she needs to complete a
+configuration procedure to provision the router's SSID and password to the
+device. This procedure is normally called SmartConfig or QuickConnect. Due to
+security consideration, the protocol used for SmartConfig is proprietary, which
+means no 3rd party could know about it or use it. However, after the device is
+connected to the router, it can be seen by all the devices under the same
+network, thus could also be controlled by 3rd party equipment that understands
+the inter-operation control protocol.
+
+This Perl module implements local device discovery via Yeeling specific SSDP
+protocol and sending commands via control protocol in the JSON format.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+	perldoc Device::Yeelight
+	perldoc Device::Yeelight::Light
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2019 Jan Baier
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

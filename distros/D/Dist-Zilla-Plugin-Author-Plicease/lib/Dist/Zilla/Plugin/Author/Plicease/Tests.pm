@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Tests 2.35 {
+package Dist::Zilla::Plugin::Author::Plicease::Tests 2.36 {
 
   use 5.014;
   use Moose;
@@ -187,7 +187,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.35
+version 2.36
 
 =head1 SYNOPSIS
 

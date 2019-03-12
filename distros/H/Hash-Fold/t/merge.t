@@ -6,7 +6,8 @@ use warnings;
 use Data::Dumper qw(Dumper);
 use Hash::Fold qw(merge);
 use Storable qw(dclone);
-use Test::More tests => 9;
+use Test::Fatal;
+use Test::More tests => 10;
 
 sub merge_ok {
     my ($args, $want) = @_;
@@ -14,7 +15,11 @@ sub merge_ok {
     my $sub_got = merge(@$args);
     my $method_got = $folder->merge(@$args);
 
-    local ($Data::Dumper::Terse, $Data::Dumper::Indent, $Data::Dumper::Sortkeys) = (1, 1, 1);
+    local (
+        $Data::Dumper::Terse,
+        $Data::Dumper::Indent,
+        $Data::Dumper::Sortkeys
+    ) = (1, 1, 1);
 
     # report errors with the caller's line number
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -50,8 +55,8 @@ sub merge_ok {
     };
 }
 
-# where there are conflicts, confirm the rightmost array takes precedence
-# (also confirms more than 2 hashes can be merged)
+# where there are conflicts, confirm the rightmost array takes precedence (also
+# confirms more than 2 hashes can be merged)
 {
     my $hash1 = {
         foo => 1,
@@ -89,3 +94,58 @@ sub merge_ok {
     merge_ok [ $got ], $want;
     isnt merge($got), $want; # different refs
 }
+
+# nice error message if merging incompatible structures
+subtest 'incompatible structures' => sub {
+    # check single path component and multiple components separately
+    # to make sure there's no off-by-one error.
+
+    my $test = sub {
+        my ($component, $array, $scalar, $hash) = @_;
+        like(
+            exception { merge($array, $scalar) },
+                qr/attempt to use non-array \($component\) as an array/i, 'array on scalar'
+        );
+
+        like(
+            exception { merge($scalar, $array) },
+                qr/attempt to use non-array \($component\) as an array/i, 'scalar on array'
+        );
+
+        like(
+            exception { merge($scalar, $hash) },
+                qr/attempt to use non-hash \($component\) as a hash/i, 'scalar on hash'
+        );
+
+        like(
+            exception { merge($hash, $scalar) },
+                qr/attempt to use non-hash \($component\) as a hash/i, 'hash on scalar'
+        );
+
+        like(
+            exception { merge($hash, $array) },
+                qr/attempt to use non-hash \($component\) as a hash/i, 'hash on array'
+        );
+
+        like(
+            exception { merge($array, $hash) },
+                qr/attempt to use non-hash \($component\) as a hash/i, 'array on hash'
+        );
+    };
+
+    subtest 'single path component' => $test, 'foo',
+        { foo => [ 'a', 'b', 'c' ], },
+        { foo => 3, },
+        { foo => { a => 1 } };
+
+    subtest 'multiple path components, hash' => $test, 'foo.a',
+        { foo => { a => [ 'a', 'b', 'c' ] }, },
+        { foo => { a => 3 }, },
+        { foo => { a => { b => 1 } } };
+
+    subtest 'multiple path components, array ' => $test, 'foo.0',
+        { foo => [ [ 'a', 'b', 'c' ] ], },
+        { foo => [ 3 ], },
+        { foo => [ { b => 1 } ] };
+
+};

@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::LinuxGPIB;
-$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.671';
+$Lab::Moose::Connection::LinuxGPIB::VERSION = '3.680';
 #ABSTRACT: Connection back end to the LinuxGpib library and kernel drivers
 
 
@@ -24,6 +24,7 @@ use LinuxGpib qw/
     ibwrt
     ibtmo
     ibclr
+    ibconfig
     /;
 
 
@@ -203,6 +204,38 @@ sub Clear {
 
 }
 
+
+sub set_termchar {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        timeout_param,
+        termchar => { isa => 'Str' },
+    );
+    my $timeout = $self->_timeout_arg(%args);
+    $self->_set_timeout( timeout => $timeout );
+    my $termchar = ord( $args{termchar} );
+    my $ibsta = ibconfig( $self->device_descriptor, 0xf, $termchar );
+    $self->_croak_on_err( ibsta => $ibsta, name => 'ibconfig set_termchar' );
+}
+
+
+# With default LinuxGPIB configuration, the END bit of ibsta will be set
+# when the eos char is received (see IbcEndBitIsNormal mode of ibconfig).
+
+sub enable_read_termchar {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        timeout_param
+    );
+    my $timeout = $self->_timeout_arg(%args);
+    $self->_set_timeout( timeout => $timeout );
+    my $ibsta = ibconfig( $self->device_descriptor, 0xc, 1 );
+    $self->_croak_on_err(
+        ibsta => $ibsta,
+        name  => 'ibconfig enable_termchar'
+    );
+}
+
 sub _set_timeout {
     my ( $self, %args ) = validated_hash(
         \@_,
@@ -300,7 +333,7 @@ Lab::Moose::Connection::LinuxGPIB - Connection back end to the LinuxGpib library
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -317,7 +350,7 @@ version 3.671
 
 This module provides a connection interface to
 L<Linux-GPIB|http://linux-gpib.sourceforge.net/>. See
-L<Lab::Measurement::Backends> for more information on Linux-GPIB and it's Perl
+L<Lab::Measurement::Backends> for more information on Linux-GPIB and its Perl
 backend.
 
 =head1 METHODS
@@ -453,12 +486,25 @@ Croak on write error.
 
 Call device clear (ibclr) on the connection.
 
+=head2 set_termchar
+
+ $connection->set_termchar(termchar => "\r");
+
+Set the end-of-string byte
+
+=head2 enable_read_termchar
+
+ $connection->enable_read_termchar();
+
+Enable termination of reads when eos character is received.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

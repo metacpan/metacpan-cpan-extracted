@@ -37,6 +37,7 @@ lib/DBIx/Class/DeploymentHandler/VersionStorage/Standard/VersionResult.pm
 lib/DBIx/Class/DeploymentHandler/VersionStorage/Standard/VersionResultSet.pm
 lib/DBIx/Class/DeploymentHandler/WithApplicatorDumple.pm
 lib/DBIx/Class/DeploymentHandler/WithReasonableDefaults.pm
+t/00-report-prereqs.t
 t/02-instantiation-alt-result-class.t
 t/02-instantiation-no-ddl.t
 t/02-instantiation-wo-component.t

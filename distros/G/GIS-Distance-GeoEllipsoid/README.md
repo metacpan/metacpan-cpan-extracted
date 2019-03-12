@@ -32,7 +32,7 @@ details about how it works.
 
 # SEE ALSO
 
-[GIS::Distanc](https://metacpan.org/pod/GIS::Distanc)
+[GIS::Distance](https://metacpan.org/pod/GIS::Distance)
 
 [Geo::Ellipsoid](https://metacpan.org/pod/Geo::Ellipsoid)
 

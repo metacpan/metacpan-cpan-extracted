@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.36      2019-03-10 19:37:45 -0400
+  - Bump version for bundle
+
 2.35      2019-03-05 21:44:16 -0500
   - Add some hooks for cirrus-ci badge in the README a la appveyor and travis
 

@@ -33,8 +33,12 @@
       },
       "develop" : {
          "requires" : {
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
+            "Test::More" : "0.98",
             "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
@@ -44,6 +48,7 @@
          "requires" : {
             "App::cpanminus" : "0",
             "App::cpanoutdated" : "0",
+            "Config" : "0",
             "File::Which" : "0",
             "Path::Class" : "0",
             "YAML" : "0",
@@ -60,11 +65,11 @@
    "provides" : {
       "App::ucpan" : {
          "file" : "lib/App/ucpan.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.02",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpanx@gmail.com>"

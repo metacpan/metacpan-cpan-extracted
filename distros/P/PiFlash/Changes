@@ -1,5 +1,16 @@
 Change log for PiFlash
 
+0.2.2 2019-03-07T17:24:45-08:00 America/Los_Angeles
+ [DOCS]
+ - remove automatic generation of README from POD in bin/piflash - it's
+   redundant with README.md needed for GitHub
+
+ [REVISION]
+ - lower Perl version requirement from 5.18 (2013) to 5.14 (2011) to match
+   the era of the Raspberry Pi
+ - add logging mode to clean up test output - log command results without
+   verbose output
+
 0.2.1 2019-03-07T03:46:40-08:00 America/Los_Angeles
  [BUG FIXES]
  - fix non-portable symbol table insertion which was causing segfault in

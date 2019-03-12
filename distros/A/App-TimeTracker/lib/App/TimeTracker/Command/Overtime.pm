@@ -134,7 +134,7 @@ App::TimeTracker::Command::Overtime - Tells you if you have already worked enoug
 
 =head1 VERSION
 
-version 2.025
+version 2.026
 
 =head1 DESCRIPTION
 

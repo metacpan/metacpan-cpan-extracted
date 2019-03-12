@@ -75,7 +75,7 @@ sub get_stmt {
         $tmp[0] =~ s/^\s//;
     }
     elsif ( $stmt_type eq 'Union' ) {
-        @tmp = $used_for eq 'print' ? "SELECT * FROM (" :"(";
+        @tmp = $used_for eq 'print' ? "SELECT * FROM (" : "(";
         my $count = 0;
         for my $ref ( @{$sql->{subselect_data}} ) {
             ++$count;
@@ -139,6 +139,7 @@ sub __select_cols {
     my @cols = @{$sql->{select_cols}} ? @{$sql->{select_cols}} : ( @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} );
     if ( ! @cols ) {
         if ( $sf->{i}{special_table} eq 'join' ) {
+            # join: use qualified col names in the prepare stmt (diff cols could have the same name)
             return ' ' . join ', ', @{$sql->{cols}};
         }
         else {
@@ -200,7 +201,7 @@ sub stmt_placeholder_to_value {
     my $rx_placeholder = qr/(?<=(?:,|\s|\())\?(?=(?:,|\s|\)|$))/;
     for my $arg ( @$args ) {
         my $arg_copy;
-        if( $quote && $arg && ! looks_like_number $arg ) {
+        if ( $quote && $arg && ! looks_like_number $arg ) {
             $arg_copy = $sf->{d}{dbh}->quote( $arg );
         }
         else {

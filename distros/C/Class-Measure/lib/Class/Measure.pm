@@ -1,6 +1,10 @@
 package Class::Measure;
+use 5.008001;
+use strict;
+use warnings;
+our $VERSION = '0.07';
 
-$Class::Measure::VERSION = '0.06';
+=encoding utf8
 
 =head1 NAME
 
@@ -13,18 +17,15 @@ See L<Class::Measure::Length> for some examples.
 =head1 DESCRIPTION
 
 This is a base class that is inherited by the Class::Measure 
-classes.  This distribution comes with the class L<Class::Measure::Length>. 
+classes.  This distribution comes with the class L<Class::Measure::Length>.
 
-The classes L<Class::Measure::Area>, L<Class::Measure::Mass>, 
-L<Class::Measure::Space>, L<Class::Measure::Temperature>, 
+The classes L<Class::Measure::Area>, L<Class::Measure::Mass>,
+L<Class::Measure::Space>, L<Class::Measure::Temperature>,
 and L<Class::Measure::Volume> are planned and will be added soon.
 
 The methods described here are available in all Class::Measure classes.
 
 =cut
-
-use strict;
-use warnings;
 
 use Carp qw( croak );
 
@@ -41,31 +42,36 @@ our $type_aliases = {};
 
 =head2 new
 
-  my $m = new Class::Measure::Length( 1, 'inch' );
+    my $m = new Class::Measure::Length( 1, 'inch' );
 
-Creates a new measurement object.  You must pass an initial 
+Creates a new measurement object.  You must pass an initial
 measurement and default unit.
 
-In most cases the measurement class that you are useing 
-will export a method to create new measurements. For 
-example L<Class::Measure::Length> exports the 
-length() method.
+In most cases the measurement class that you are using
+will export a method to create new measurements.  For
+example L<Class::Measure::Length> exports the
+C<length()> method.
 
 =cut
 
 sub new {
     my $class = shift;
-    $class = ref($class) || $class;
-    croak('You cannot create a '.__PACKAGE__.' object') if( $class eq __PACKAGE__ );
-    croak('Invalid number of arguments') if( (@_+0) != 2 );
-    my $self = bless {}, $class;
-    $self->set_value( @_ );
-    return $self;
+
+    my $unit = pop;
+    $unit = $type_aliases->{$class}->{$unit} || $unit if $unit;
+
+    croak 'Unknown Class::Measure unit'
+        unless $unit and $type_convs->{$class}->{$unit};
+
+    return bless {
+        unit => $unit,
+        values => { $unit => shift },
+    }, $class;
 }
 
 =head2 unit
 
-  my $unit = $m->unit;
+  my $unit = $m->unit();
 
 Returns the object's default unit.
 
@@ -78,7 +84,7 @@ sub unit {
 
 =head2 set_unit
 
-  $m->set_unit( 'feet' );
+    $m->set_unit( 'feet' );
 
 Sets the default unit of the measurement.
 
@@ -89,38 +95,37 @@ sub set_unit {
     my $unit = $self->_unalias( shift );
     $self->_conv( $unit );
     $self->{unit} = $unit;
+    return;
 }
 
 =head2 value
 
-  my $yards = $m->value('yards');
-  my $val = $m->value;
-  print "$m is the same as $val when in a string\n";
+    my $yards = $m->value('yards');
+    my $val = $m->value();
+    print "$m is the same as $val when in a string\n";
 
-Retrieves the value of the measurement in the 
-default unit.  You may specify a unit in which 
+Retrieves the value of the measurement in the
+default unit.  You may specify a unit in which
 case the value is converted to the unit and returned.
 
-This method is also used to handle overloading of 
+This method is also used to handle overloading of
 stringifying the object.
 
 =cut
 
 sub value {
     my $self = shift;
-    if( @_ ){
-        return $self->_conv(shift);
-    }
+    return $self->_conv(shift) if @_;
     return $self->{values}->{$self->{unit}};
 }
 
 =head2 set_value
 
-  my $m = length( 0, 'inches' );
-  $m->set_value( 12 ); # 12 inches.
-  $m->set_value( 1, 'foot' ); # 1 foot.
+    my $m = length( 0, 'inches' );
+    $m->set_value( 12 ); # 12 inches.
+    $m->set_value( 1, 'foot' ); # 1 foot.
 
-Sets the measurement in the default unit.  You may 
+Sets the measurement in the default unit.  You may
 specify a new default unit as well.
 
 =cut
@@ -129,16 +134,17 @@ sub set_value {
     my $self = shift;
     $self->{unit} = $self->_unalias(pop @_) if( @_>1 );
     $self->{values} = { $self->{unit} => shift };
+    return;
 }
 
 =head2 reg_units
 
-  Class::Measure::Length->reg_units(
-    'inch', 'foot', 'yard'
-  );
+    Class::Measure::Length->reg_units(
+        'inch', 'foot', 'yard'
+    );
 
-Registers one or more units for use in the specified 
-class.  Units should be in the singular, most common, 
+Registers one or more units for use in the specified
+class.  Units should be in the singular, most common,
 form.
 
 =cut
@@ -148,22 +154,28 @@ sub reg_units {
     my $class = ref($self) || $self;
     my $convs = $type_convs->{$class} ||= {};
     foreach my $unit (@_){
-        if( defined $convs->{$unit} ){ croak('This unit has already been defined'); }
-        eval('*' . $class . '::' . $unit. ' = sub{
-            my ($self, $value) = @_;
-            if (defined $value) {
-                $self->set_value( $value, $unit );
-            } else {
-                return $self->value( $unit );
-            }
-        }');
+        croak('This unit has already been defined') if $convs->{$unit};
         $convs->{$unit} = {};
+
+        no strict 'refs';
+        *{"${class}::${unit}"} = _build_unit_sub( $unit );
     }
+    return;
+}
+
+sub _build_unit_sub {
+    my ($unit) = @_;
+
+    return sub{
+        my $self = shift;
+        return $self->set_value( shift(), $unit ) if @_;
+        return $self->_conv( $unit );
+    };
 }
 
 =head2 units
 
-  my @units = Class::Measure::Length->units();
+    my @units = Class::Measure::Length->units();
 
 Returns a list of all registered units.
 
@@ -177,15 +189,15 @@ sub units {
 
 =head2 reg_aliases
 
-  Class::Measure::Length->reg_aliases(
-    ['feet','ft'] => 'foot',
-    ['in','inches'] => 'inch',
-    'yards' => 'yard'
-  );
+    Class::Measure::Length->reg_aliases(
+        ['feet','ft'] => 'foot',
+        ['in','inches'] => 'inch',
+        'yards' => 'yard'
+    );
 
-Register alternate names for units.  Expects two 
-arguments per unit to alias.  The first argument 
-being the alias (scalar) or aliases (array ref), and 
+Register alternate names for units.  Expects two
+arguments per unit to alias.  The first argument
+being the alias (scalar) or aliases (array ref), and
 the second argument being the unit to alias them to.
 
 =cut
@@ -198,41 +210,41 @@ sub reg_aliases {
     while( @_ ){
         my @aliases = ( ref($_[0]) ? @{shift()} : shift );
         my $unit = shift;
-        croak('Unkown unit "'.$unit.'" to alias to') unless( defined $type_convs->{$class}->{$unit} );
+        croak('Unknown unit "'.$unit.'" to alias to') unless( defined $type_convs->{$class}->{$unit} );
         foreach my $alias (@aliases){
             if( defined $aliases->{$alias} ){ croak('Alias already in use'); }
             $aliases->{$alias} = $unit;
-            eval('*' . $class . '::' . $alias. ' = sub{
-                my ($self, $value) = @_;
-                return $self->$unit($value);
-            }');
+
+            no strict 'refs';
+            *{"${class}::${alias}"} = *{"${class}::${unit}"};
         }
     }
+    return;
 }
 
 =head2 reg_convs
 
-  Class::Measure::Length->reg_convs(
-    12, 'inches' => 'foot',
-    'yard' => '3', 'feet'
-  );
+    Class::Measure::Length->reg_convs(
+        12, 'inches' => 'foot',
+        'yard' => '3', 'feet'
+    );
 
-Registers a unit conversion.  There are three distinct 
-ways to specify a new conversion.  Each requires three 
+Registers a unit conversion.  There are three distinct
+ways to specify a new conversion.  Each requires three
 arguments.
 
-  $count1, $unit1 => $unit2
-  $unit1 => $count2, $unit2
+    $count1, $unit1 => $unit2
+    $unit1 => $count2, $unit2
 
-These first two syntaxes create automatic reverse conversions 
-as well.  So, saying there are 12 inches in a foot implies 
+These first two syntaxes create automatic reverse conversions
+as well.  So, saying there are 12 inches in a foot implies
 that there are 1/12 feet in an inch.
 
-  $unit1 => $unit2, $sub
+    $unit1 => $unit2, $sub
 
-The third syntax accepts a subroutine as the last argument 
-the subroutine will be called with the value of $unit1 and 
-it's return value will be assigned to $unit2.  This 
+The third syntax accepts a subroutine as the last argument
+the subroutine will be called with the value of $unit1 and
+it's return value will be assigned to $unit2.  This
 third syntax does not create a reverse conversion automatically.
 
 =cut
@@ -264,6 +276,7 @@ sub reg_convs {
         }
     }
     $type_paths->{$class} = {};
+    return;
 }
 
 sub _unalias {
@@ -271,7 +284,7 @@ sub _unalias {
     my $class = ref($self) || $self;
     my $unit = shift;
     return $unit if( defined $type_convs->{$class}->{$unit} );
-    return $type_aliases->{$class}->{$unit} || croak('Unkown unit or alias "'.$unit.'"');
+    return $type_aliases->{$class}->{$unit} || croak('Unknown unit or alias "'.$unit.'"');
 }
 
 sub _conv {
@@ -362,6 +375,7 @@ sub _ol_add {
         $two->set_value( $one + $two->value );
         return $two;
     }
+    return;
 }
 
 sub _ol_sub {
@@ -378,6 +392,7 @@ sub _ol_sub {
         $two->set_value( $one - $two->value );
         return $two;
     }
+    return;
 }
 
 sub _ol_mult {
@@ -392,6 +407,7 @@ sub _ol_mult {
         $two->set_value( $one * $two->value );
         return $two;
     }
+    return;
 }
 
 sub _ol_div {
@@ -406,6 +422,7 @@ sub _ol_div {
         $two->set_value( $one / $two->value );
         return $two;
     }
+    return;
 }
 
 sub _ol_str {
@@ -414,12 +431,23 @@ sub _ol_str {
 }
 
 1;
+__END__
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Aran Clary Deltac <bluefeet@cpan.org>
+Please submit bugs and feature requests to the
+Class-Measure GitHub issue tracker:
+
+L<https://github.com/bluefeet/Class-Measure/issues>
+
+=head1 AUTHORS
+
+    Aran Clary Deltac <bluefeet@cpan.org>
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
 

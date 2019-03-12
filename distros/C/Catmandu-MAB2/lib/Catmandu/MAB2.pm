@@ -1,6 +1,6 @@
 package Catmandu::MAB2;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use strict;
 use warnings;

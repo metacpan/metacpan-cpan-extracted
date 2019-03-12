@@ -1,6 +1,13 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
-2.35      2019-03-06 08:06:26 -0500
+2.36      2019-03-10 19:40:18 -0400
+  - Require plicease plugin 2.35
+  - overrides for [MetaResources] now available:
+     * homepage
+     * bugtracker.web
+     * repository.url
+     * repository.web
+     * repository.type
 
 2.35      2019-03-05 21:48:06 -0500
   - Require plicease plugin 2.35

@@ -1,7 +1,7 @@
 package GIS::Distance::GreatCircle;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Math::Trig qw( deg2rad asin );
 use GIS::Distance::Constants qw( :all );
@@ -41,6 +41,9 @@ L<Math::Trig>'s great_circle_distance() which doesn't actually
 appear to use the actual Great Circle Distance formula (more like
 Cosine).
 
+A faster (XS) version of this formula is available as
+L<GIS::Distance::Fast::GreatCircle>.
+
 Normally this module is not used directly.  Instead L<GIS::Distance>
 is used which in turn interfaces with the various formula modules.
 
@@ -51,10 +54,6 @@ is used which in turn interfaces with the various formula modules.
         cos( lat1 ) * cos( lat2 ) * 
         ( sin(( lon1 - lon2 )/2) )**2
     ) )
-
-=head1 SEE ALSO
-
-L<GIS::Distanc>
 
 =head1 AUTHORS AND LICENSE
 

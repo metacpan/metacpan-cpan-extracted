@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::LogBlock;
 #ABSTRACT: Sweep add-on for matrix logging
-$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.671';
+$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.680';
 use Role::Tiny;
 requires qw/LOG write_LOG/;
 
@@ -87,7 +87,7 @@ Lab::XPRESS::Sweep::LogBlock - Sweep add-on for matrix logging
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -132,7 +132,7 @@ Index of the target data file (default: 0).
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel

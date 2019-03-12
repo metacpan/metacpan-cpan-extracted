@@ -11,7 +11,7 @@ use HTML::ParseBrowser;
 use Mojo::ByteStream;
 use version 0.77;
 
-our $VERSION = 0.06;
+our $VERSION = '0.08';
 
 sub register {
     my ($self, $app, $config) = @_;
@@ -35,11 +35,13 @@ sub register {
             return '' if !$asset;
         }
 
-        if ( $_[1] && $_[1]->{inplace} ) {
+        if ( $_[1]->{inplace} ) {
             my ($file,$config) = @_;
             my $local_base = $config->{no_base} ? '' : $base;
 
             $local_base = $c->url_for( $local_base ) if $local_base;
+
+            $config->{no_file} = 1 if $config->{js};
 
             my $js = $config->{no_file} ? 
                 qq~<script type="text/javascript">$file</script>~ :
@@ -48,6 +50,8 @@ sub register {
         }
 
         push @{ $c->stash->{__JSLOADERFILES__} }, [ @_ ];
+
+        return 1;
     } );
 
     $app->hook( after_render => sub {
@@ -55,23 +59,32 @@ sub register {
 
         return if $format ne 'html';
         return if !$c->stash->{__JSLOADERFILES__};
+        return if 'ARRAY' ne ref $c->stash->{__JSLOADERFILES__};
 
-        my $load_js = join "\n", 
-                      map{
-                          my ($file,$config) = @{ $_ };
-                          my $local_base = $config->{no_base} ? '' : $base;
+        my $load_js =
+            join "\n", 
+                 map{
+                     my ($file,$config) = @{ $_ };
 
-                          $local_base = $c->url_for( $local_base ) if $local_base;
+                     $file //= '';
 
-                          if ( $config->{no_file} and $config->{on_ready} ) {
-                              $file = sprintf '$(document).ready( function(){%s});', $file;
-                          }
+                     my $local_base = $config->{no_base} ? '' : $base;
 
-                          $config->{no_file} ? 
-                              qq~<script type="text/javascript">$file</script>~ :
-                              qq~<script type="text/javascript" src="$local_base$file"></script>~;
-                      }
-                      @{ $c->stash->{__JSLOADERFILES__} || [] };
+                     $config->{no_file} = 1 if $config->{js};
+
+                     $local_base = $c->url_for( $local_base ) if $local_base;
+
+                     if ( $config->{no_file} and $config->{on_ready} ) {
+                         $file = sprintf '$(document).ready( function(){%s});', $file;
+                     }
+
+                     my $return = $config->{no_file} ? 
+                         qq~<script type="text/javascript">$file</script>~ :
+                         qq~<script type="text/javascript" src="$local_base$file"></script>~;
+
+                     $file ? $return : ();
+                 }
+                 @{ $c->stash->{__JSLOADERFILES__} };
 
         return if !$load_js;
 
@@ -89,27 +102,20 @@ sub _match_browser {
 
     my $ua_string = $c->req->headers->user_agent;
     my $ua        = HTML::ParseBrowser->new( $ua_string );
+    my $name      = $ua->name; 
+    my $browser   = $config->{browser};
 
-    return if !$ua;
-
-    my $name    = $ua->name; 
-    my $browser = $config->{browser};
-
-    if ( !exists $browser->{$name} && !exists $browser->{default} ) {
-        return;
-    }
-    elsif ( !exists $browser->{$name} && exists $browser->{default} ) {
-        return 1;
+    if ( !exists $browser->{$name} ) {
+        return exists $browser->{default} ? 1 : '';
     }
 
     my ($op,$version) = $browser->{$name} =~ m{\A\s*([lg]t|!)?\s*([0-9\.]+)};
 
     return if !defined $version;
 
-    if ( !$op || ( $op ne 'gt' and $op ne 'lt' and $op ne '!' ) ) {
-        return version->parse( $ua->v ) == version->parse( $version );
-    }
-    elsif ( $op eq 'gt' ) {
+    $op = '' if !defined $op;
+
+    if ( $op eq 'gt' ) {
         return version->parse( $version ) <= version->parse( $ua->v );
     }
     elsif ( $op eq 'lt' ) {
@@ -119,7 +125,7 @@ sub _match_browser {
         return version->parse( $version ) != version->parse( $ua->v );
     }
 
-    return;
+    return version->parse( $ua->v ) == version->parse( $version );
 }
 
 1;
@@ -136,7 +142,7 @@ Mojolicious::Plugin::JSLoader - move js loading to the end of the document
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 

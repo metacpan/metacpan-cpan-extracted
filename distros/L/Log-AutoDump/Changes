@@ -1,5 +1,13 @@
 Revision history for Log-AutoDump
 
+0.15    added debug_block() for nice big block log statements
+
+0.14    accidental release
+
+0.13    untracked changes
+
+0.12    untracked changes
+
 0.11    remove abort()
 
 0.10    fix abort()

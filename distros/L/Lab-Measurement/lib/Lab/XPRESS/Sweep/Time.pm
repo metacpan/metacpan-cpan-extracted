@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Time;
 #ABSTRACT: Simple time-controlled repeater
-$Lab::XPRESS::Sweep::Time::VERSION = '3.671';
+$Lab::XPRESS::Sweep::Time::VERSION = '3.680';
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use Statistics::Descriptive;
@@ -169,7 +169,7 @@ Lab::XPRESS::Sweep::Time - Simple time-controlled repeater
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -266,7 +266,7 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler

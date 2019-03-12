@@ -1,5 +1,5 @@
 {
-   "abstract" : "Makes sure that Moo classes do not contain calls to make_immutable.",
+   "abstract" : "Makes sure that Moo classes do not contain calls to make_immutable. (DEPRECATED)",
    "author" : [
       "Aran Clary Deltac <bluefeet@gmail.com>"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Perl::Critic::Policy::Moo::ProhibitMakeImmutable" : {
          "file" : "lib/Perl/Critic/Policy/Moo/ProhibitMakeImmutable.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -72,12 +72,14 @@
          "web" : "https://github.com/bluefeet/Perl-Critic-Policy-Moo-ProhibitMakeImmutable"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
+   "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>",
       "Graham TerMarsch <graham@howlingfrog.com>",
       "Kivanc Yazan <kyzn@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

@@ -358,7 +358,7 @@ sub read_db_config_files {
     my ( $sf ) = @_;
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, {} );
     my $plugin = $sf->{i}{plugin};
-    $plugin=~ s/^App::DBBrowser::DB:://;
+    $plugin =~ s/^App::DBBrowser::DB:://;
     my $file_name = sprintf( $sf->{conf_file_fmt}, $plugin );
     my $db_opt;
     if ( -f $file_name && -s $file_name ) {

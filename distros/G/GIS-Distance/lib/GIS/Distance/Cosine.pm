@@ -1,7 +1,7 @@
 package GIS::Distance::Cosine;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Math::Trig qw( deg2rad acos );
 use GIS::Distance::Constants qw( :all );
@@ -29,19 +29,18 @@ __END__
 
 =head1 NAME
 
-GIS::Distance::Cosine - Cosine distance calculations.
+GIS::Distance::Cosine - Spherical law of cosines distance calculations.
 
 =head1 DESCRIPTION
 
 Although this formula is mathematically exact, it is unreliable for
 small distances because the inverse cosine is ill-conditioned.
 
+A faster (XS) version of this formula is available as
+L<GIS::Distance::Fast::Cosine>.
+
 Normally this module is not used directly.  Instead L<GIS::Distance>
 is used which in turn interfaces with the various formula modules.
-
-=head1 ARGUMENTS
-
-Takes none.
 
 =head1 FORMULA
 
@@ -52,9 +51,7 @@ Takes none.
 
 =head1 SEE ALSO
 
-L<GIS::Distanc>
-
-L<GIS::Distance::Fast::Cosine>
+L<https://en.wikipedia.org/wiki/Spherical_law_of_cosines>
 
 =head1 AUTHORS AND LICENSE
 

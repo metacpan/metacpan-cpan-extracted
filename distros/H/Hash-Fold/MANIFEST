@@ -1,5 +1,6 @@
 Changes
 lib/Hash/Fold.pm
+lib/Hash/Fold/Error.pm
 Makefile.PL
 MANIFEST			This list of files
 README

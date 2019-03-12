@@ -50,7 +50,7 @@ package Astro::Coord::ECI::Sun;
 use strict;
 use warnings;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 use base qw{Astro::Coord::ECI};
 
@@ -710,14 +710,14 @@ sub time_set {
     $self->{debug} and print <<eod;
 Debug sun - @{[strftime '%d-%b-%Y %H:%M:%S', gmtime( $time )]}
     T  = $T
-    L0 = @{[_rad2deg ($L0)]} degrees
-    M  = @{[_rad2deg ($M)]} degrees
+    L0 = @{[rad2deg ($L0)]} degrees
+    M  = @{[rad2deg ($M)]} degrees
     e  = $e
-    C  = @{[_rad2deg ($C)]} degrees
-    O  = @{[_rad2deg ($O)]} degrees
+    C  = @{[rad2deg ($C)]} degrees
+    O  = @{[rad2deg ($O)]} degrees
     R  = @{[$R / AU]} AU
-    omega = @{[_rad2deg ($omega)]} degrees
-    lambda = @{[_rad2deg ($lambda)]} degrees
+    omega = @{[rad2deg ($omega)]} degrees
+    lambda = @{[rad2deg ($lambda)]} degrees
 eod
 
     $self->ecliptic (0, $lambda, $R);
@@ -784,7 +784,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2018 by Thomas R. Wyant, III
+Copyright (C) 2005-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

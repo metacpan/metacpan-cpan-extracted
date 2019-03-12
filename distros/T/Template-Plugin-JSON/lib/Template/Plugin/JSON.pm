@@ -1,17 +1,17 @@
-#!/usr/bin/perl
-
 use 5.006;
 
-package Template::Plugin::JSON;
+package Template::Plugin::JSON; # git description: v0.07-6-g80fc733
+# ABSTRACT: Adds a .json vmethod for all TT values.
+
 use Moose;
 
-use JSON ();
+use JSON::MaybeXS 'JSON';
 
 use Carp qw/croak/;
 
 extends qw(Moose::Object Template::Plugin);
 
-our $VERSION = "0.07";
+our $VERSION = '0.08';
 
 
 has context => (
@@ -38,7 +38,7 @@ sub BUILDARGS {
 	my $args;
 
 	if ( @args == 1 and not ref $args[0] ) {
-		warn "Single argument form is deprecated, this module always uses JSON/JSON::XS now";
+		warn "Single argument form is deprecated, this module always uses JSON::PP/Cpanel::JSON::XS now";
 	}
 
 	$args = ref $args[0] ? $args[0] : {};
@@ -49,7 +49,7 @@ sub BUILDARGS {
 sub _build_json_converter {
 	my $self = shift;
 
-	my $json = JSON->new->allow_nonref(1);
+	my $json = JSON()->new->allow_nonref(1);
 
 	my $args = $self->json_args;
 
@@ -85,9 +85,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Template::Plugin::JSON - Adds a .json vmethod for all TT values.
+
+=head1 VERSION
+
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -110,44 +116,58 @@ Template::Plugin::JSON - Adds a .json vmethod for all TT values.
 This plugin provides a C<.json> vmethod to all value types when loaded. You
 can also decode a json string back to a data structure.
 
-It will load the L<JSON> module (you probably want L<JSON::XS> installed for
-automatic speed ups).
+It will load the L<JSON::MaybeXS> module, which will use L<Cpanel::JSON::XS>
+when possible and fall back to L<JSON::PP> otherwise.
 
-Any options on the USE line are passed through to the JSON object, much like L<JSON/to_json>.
+Any options on the USE line are passed through to the JSON object, much like L<Cpanel::JSON::XS/to_json>.
 
 =head1 SEE ALSO
 
-L<JSON>, L<Template::Plugin>
+L<JSON::MaybeXS>, L<Template::Plugin>
 
-=head1 VERSION CONTROL
+=head1 SUPPORT
 
-L<https://github.com/neilb/Template-Plugin-JSON>
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Template-Plugin-JSON>
+(or L<bug-Template-Plugin-JSON@rt.cpan.org|mailto:bug-Template-Plugin-JSON@rt.cpan.org>).
 
 =head1 AUTHOR
 
-Yuval Kogman <nothingmuch@woobling.org>
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT & LICENSE
+=head1 CONTRIBUTORS
 
-Copyright (c) 2006, 2008 Infinity Interactive, Yuval Kogman.
+=for stopwords Neil Bowers Karen Etheridge Graham Barr Leo Lapworth perigrin
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+=over 4
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+=item *
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
+Neil Bowers <neil@bowers.com>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Graham Barr <gbarr@pobox.com>
+
+=item *
+
+Leo Lapworth <leo@cuckoo.org>
+
+=item *
+
+perigrin <perigrin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is Copyright (c) 2006 by Yuval Kogman.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
-

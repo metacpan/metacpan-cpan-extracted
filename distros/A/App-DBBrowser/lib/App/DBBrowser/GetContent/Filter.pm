@@ -136,9 +136,8 @@ sub __empty_to_null {
 }
 
 
-sub __choose_columns {
-    my ( $sf, $sql ) = @_;
-    my $aoa = $sql->{insert_into_args};
+sub __prepare_header_and_mark {
+    my ( $sf, $aoa ) = @_;
     my $row_count = @$aoa;
     my $col_count = @{$aoa->[0]};
     my @empty = ( 0 ) x $col_count;
@@ -150,15 +149,39 @@ sub __choose_columns {
             ++$empty[$c];
         }
     }
-    my $mark = [ grep { $empty[$_] < $row_count } 0 .. $#empty ];
+    my $mark = [];
+    my $header = [];
+    for my $i ( 0 .. $#empty ) {
+        if ( $empty[$i] < $row_count ) {
+            push @$mark, $i;
+            if ( length $aoa->[0][$i] ) {
+                $header->[$i] = $aoa->[0][$i];
+            }
+            else {
+                $header->[$i] = 'tmp_' . ( $i + 1 );
+            }
+        }
+        else {
+            $header->[$i] = '--';
+        }
+    }
     if ( @$mark == $col_count ) {
         $mark = undef; # no preselect if all cols have entries
     }
+    return $header, $mark;
+}
+
+
+
+sub __choose_columns {
+    my ( $sf, $sql ) = @_;
+    my $aoa = $sql->{insert_into_args};
+    my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
     # Choose
     my $col_idx = choose_a_subset(
-        \@{$aoa->[0]},
+        $header,
         { back => '<<', confirm => $sf->{i}{ok}, index => 1, mark => $mark, layout => 0, all_by_default => 1,
-            name => 'Cols: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse}, order => 0 } # order
+          name => 'Cols: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse}, order => 0 } # order
     );
     if ( ! defined $col_idx ) {
         return;
@@ -434,10 +457,11 @@ sub __split_table {
 sub __split_column {
     my ( $sf, $sql, $waiting ) = @_;
     my $aoa = $sql->{insert_into_args};
+    my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
     my @pre = ( undef );
     # Choose
     my $idx = choose(
-        [ @pre, @{$aoa->[0]} ],
+        [ @pre, @{$header} ],
         { %{$sf->{i}{lyt_m}}, prompt => 'Choose Column:', index => 1 }
     );
     if ( ! $idx ) {
@@ -540,9 +564,10 @@ sub __search_and_replace {
         $info = sprintf $info_fmt, $pattern, $replacement, $mods_str;
         $ax->print_sql( $sql, $waiting );
         my $aoa = $sql->{insert_into_args};
+        my ( $header, $mark ) = $sf->__prepare_header_and_mark( $aoa );
         # Choose
         my $col_idx = choose_a_subset(
-            $aoa->[0],
+            $header,
             { back => '<<', confirm => $sf->{i}{ok}, index => 1, layout => 0, info => $info,
             name => 'Columns: ', clear_screen => 0, mouse => $sf->{o}{table}{mouse}, all_by_default => 1 }
         );

@@ -1,10 +1,11 @@
 package WebService::ValidSign::Object;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 
 # ABSTRACT: A ValidSign object in use for the API
 
 use Types::Standard qw(Str);
+use String::CamelSnakeKebab qw(lower_camel_case lower_snake_case);
 
 has id => (
     is        => 'rw',
@@ -17,6 +18,15 @@ has type => (
     isa      => Str,
     required => 1,
 );
+
+around BUILDARGS => sub {
+    my $orig  = shift;
+    my $class = shift;
+    my %args  = @_;
+
+    return $orig->($class,
+        map { lower_snake_case($_) => $args{$_} } keys %args);
+};
 
 sub TO_JSON {
     my $self = shift;
@@ -38,7 +48,11 @@ sub TO_JSON {
                 $value = undef if !keys %$value;
             }
         }
-        $result{$name} = $value if defined $value;
+
+        if (defined $value) {
+            $name = lower_camel_case($name);
+            $result{$name} = $value if defined $value;
+        }
 
     }
     return \%result;
@@ -58,7 +72,7 @@ WebService::ValidSign::Object - A ValidSign object in use for the API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

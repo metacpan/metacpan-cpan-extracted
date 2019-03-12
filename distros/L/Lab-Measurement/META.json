@@ -93,7 +93,7 @@
             "integer" : "0",
             "namespace::autoclean" : "0.20",
             "parent" : "0",
-            "perl" : "5.014",
+            "perl" : "5.020",
             "sigtrap" : "0",
             "strict" : "0",
             "utf8" : "0",
@@ -117,7 +117,8 @@
             "Test::Tester" : "0",
             "Text::Diff" : "0",
             "aliased" : "0",
-            "lib" : "0"
+            "lib" : "0",
+            "perl" : "5.020"
          }
       }
    },
@@ -135,7 +136,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.671",
+   "version" : "3.680",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

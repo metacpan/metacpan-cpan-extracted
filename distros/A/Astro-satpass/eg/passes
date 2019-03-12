@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
@@ -15,7 +15,7 @@ use Pod::Usage;
 use POSIX qw{ strftime };
 use Time::Local;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 # Map -want-events values to TLE event codes.
 my %wanted_event_map = (
@@ -23,6 +23,7 @@ my %wanted_event_map = (
     m	=> [ PASS_EVENT_MAX ],
     l	=> [ PASS_EVENT_SHADOWED, PASS_EVENT_LIT ],
     t	=> [ PASS_EVENT_DAY ],
+    b	=> [ PASS_EVENT_BRIGHTEST ],
 );
 
 # The effect of the event on the number of satellites above the horizon.
@@ -44,7 +45,7 @@ my %opt = (
     start		=> 'today',
     'time-format'	=> '%d-%b-%Y %H:%M:%S',
     twilight		=> 6,
-    'want-events'	=> 'rmlt',
+    'want-events'	=> 'rmltb',
 );
 
 # The usual options, since we GetOptions() more than once.
@@ -52,7 +53,9 @@ my @lgl_opt = (
     'help|?' => sub { pod2usage( { verbose => 2 } ) },
     qw{
 	body-template=s dump-headers event-template=s finish=s
-	geometric! gmt!  height=f horizon=f join=s latitude=f
+	geometric! gmt!  height=f horizon=f
+	identity|spacetrack_identity|spacetrack-identity!
+	join=s latitude=f
 	longitude=f password=s split start=s time-format=s twilight=f
 	username=s want-events=s visible!
     }
@@ -63,13 +66,19 @@ my %want_event;	# Desired events.
 my %want_oid;	# Desired OID, with names if any.
 
 # Process the initialization file.
-{
-    my $fn =
-    $^O eq 'darwin' ? "$ENV{HOME}/Library/Application Support/passes.ini" :
+foreach my $fn (
+    $^O eq 'darwin' ? (
+	"$ENV{HOME}/Library/Application Support/passes.ini",
+	"$ENV{HOME}/.risesetrc",
+    ) :
     $^O eq 'MSWin32' ? "$ENV{APPDATA}/passes.ini" :
     $^O eq 'VMS' ? 'SYS$LOGIN:passes.ini' :
-	"$ENV{HOME}/.risesetrc";
-    -f $fn and load_file( $fn );
+	"$ENV{HOME}/.risesetrc"
+) {
+    -f $fn
+	or next;
+    load_file( $fn );
+    last;
 }
 
 # Parse the -file option off the command line. If found, load the file.
@@ -82,7 +91,7 @@ $opt{file} and load_file( $opt{file} );
 # Finally, process the command line. If we do not have the required
 # information by this time, die.
 GetOptions( \%opt, @lgl_opt )
-    and $opt{username} and $opt{password}
+    and ( $opt{identity} || $opt{username} && $opt{password} )
     and defined $opt{latitude} and defined $opt{longitude}
     or die "Bad options. Use -help for help.\n";
 
@@ -112,8 +121,13 @@ my $twilight = deg2rad( - $opt{twilight} );
 
 # Instantiate an object to access the Space Track web site.
 my $st = Astro::SpaceTrack->new(
-    username => $opt{username},
-    password => $opt{password},
+    ( $opt{identity} ?
+	( identity	=> 1 ) :
+	(
+	    username => $opt{username},
+	    password => $opt{password},
+	)
+    ),
     dump_headers => ( $opt{'dump-headers'} ? 15 : 0 ),
     with_name => 1,
 );
@@ -146,6 +160,7 @@ my @of_interest = Astro::Coord::ECI::TLE::Set->aggregate(
 	    station => $station,	# Observer
 	    twilight => $twilight,	# Twilight.
 	    visible => $opt{visible},	# Visible passes only if true.
+	    pass_variant => PASS_VARIANT_BRIGHTEST,
 	},
 	$rslt->content() ) );
 
@@ -622,11 +637,12 @@ as follows:
  r = rise and set;
  m = maximum elevation (culmination);
  l = illumination (passing into sunlight or shadow);
- t = beginning or end of twilight
+ t = beginning or end of twilight;
+ b = brightest.
 
 =back
 
-The default is 't'.
+The default is C<'rmltb'>.
 
 =head1 FILES
 
@@ -673,8 +689,9 @@ An example configuration file might look like this:
 The name and location of the default configuration file depend on the
 host operating system.
 
-For Darwin (Mac OS X) the default configuration file is
-F<$HOME/Library/Application Support/passes.ini>.
+For Darwin (Mac OS X) the default configuration file is the first found
+of F<$HOME/Library/Application Support/passes.ini> or
+F<$HOME/.risesetrc>.
 
 For MSWin32 the default configuration file is F<%APPDATA%/passes.ini>.
 
@@ -694,7 +711,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2018 by Thomas R. Wyant, III
+Copyright (C) 2010-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

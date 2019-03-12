@@ -27,14 +27,24 @@ use constant {
 my $basedir = 'static/';
 sub basedir { $basedir = pop }
 
+# some AV will find the EICAR test virus just by checking for the string
+# anywhere and not matter which postfix/prefix. That's not how this was supposed
+# to work but anyway - make sure that they don't find it here.
+my $eicar = 'X5O!P'.'%@AP[4'.'\PZX54'.'(P^)7CC)'.'7}$EICA'.'R-STAND'.'ARD-ANT'
+    .'IVIRU'.'S-TEST-FILE!$H+H*';
+
 {
     my %bro = (
 	"Don't be afraid to look at this message. It is completely harmless. Really!"
 	    => decode_base64('G0oAAIyUq+1oRZSkJ0v1kiZ2hk1hs4NDDti/XVogkErgISv5M41kDrdKRMH7fRK8YAmyXwFNYppR3EBMbVhyBA=='),
-	'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
+	$eicar
 	    => decode_base64('G0MAABQhyezgvJQnNVXciUrtsAEHrvlk0bTzGSRPqOdwPRhITMNtn+G6LB8+EYrC/LjqijSZFRhTlo5XllmqeTHxsABuVSsB'),
     );
-    sub bro_compress { return $bro{shift()} }
+    sub bro_compress {
+	my $plain = shift;
+	$bro{$plain} = shift if @_;
+	return $bro{$plain};
+    }
 }
 
 my %builtin = (
@@ -46,20 +56,20 @@ my %builtin = (
     'eicar.txt' => [ 
 	"Content-type: application/octet-stream\r\n".
 	"Content-disposition: attachment; filename=\"download.txt\"\r\n",
-	'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*',
+	$eicar,
 	'EICAR test virus',
     ],
     # EICAR test virus with junk behind (proper antivirus should not match
     'eicar-junk.txt' => [ 
 	"Content-type: application/octet-stream\r\n".
 	"Content-disposition: attachment; filename=\"download.txt\"\r\n",
-	'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*WHATEVER',
+	$eicar.'WHATEVER',
     ],
     # EICAR test virus prefixed with junk (proper antivirus should not match)
     'junk-eicar.txt' => [ 
 	"Content-type: application/octet-stream\r\n".
 	"Content-disposition: attachment; filename=\"download.txt\"\r\n",
-	'WHATEVERX5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*',
+	'WHATEVER'.$eicar,
     ],
     # zipped novirus
     'novirus.zip' => [ 
@@ -71,8 +81,8 @@ my %builtin = (
     'eicar.zip' => [ 
 	"Content-type: application/octet-stream\r\n".
 	"Content-disposition: attachment; filename=\"download.zip\"\r\n",
-	decode_base64('UEsDBAoAAAAAADJHi0c8z1FoRAAAAEQAAAAJABwAZWljYXIuY29tVVQJAAPvgWpWjqBmV3V4CwABBOkDAAAE6QMAAFg1TyFQJUBBUFs0XFBaWDU0KFBeKTdDQyk3fSRFSUNBUi1TVEFOREFSRC1BTlRJVklSVVMtVEVTVC1GSUxFISRIK0gqUEsBAh4DCgAAAAAAMkeLRzzPUWhEAAAARAAAAAkAGAAAAAAAAQAAAKCBAAAAAGVpY2FyLmNvbVVUBQAD74FqVnV4CwABBOkDAAAE6QMAAFBLBQYAAAAAAQABAE8AAACHAAAAAAA='),
-	'EICAR test virus in zip file',
+	decode_base64('UEsDBBQAAgAIABFKjkk8z1FoRgAAAEQAAAAJAAAAZWljYXIuY29tizD1VwxQdXAMiDaJCYiKMDXRCIjTNHd21jSvVXH1dHYM0g0OcfRzcQxy0XX0C/EM8wwKDdYNcQ0O0XXz9HFVVPHQ9tACAFBLAQIUAxQAAgAIABFKjkk8z1FoRgAAAEQAAAAJAAAAAAAAAAAAAAC2gQAAAABlaWNhci5jb21QSwUGAAAAAAEAAQA3AAAAbQAAAAAA'),
+	'EICAR test virus as zip file',
     ],
     'warn.png' => [ "Content-type: image/png\r\n", decode_base64( <<'IMAGE' ) ],
 iVBORw0KGgoAAAANSUhEUgAAABkAAAAZCAIAAABLixI0AAAAI0lEQVQ4y2N8fkObgUqAiYF6YNSs
@@ -219,23 +229,42 @@ FAVICON
 );
 
 
+my %cache;
 sub content {
     my ($page,$spec) = @_;
     $page =~s{^/+}{};
-    my ($hdr,$data);
+    if (my $e = $cache{$page}) {
+	return @$e;
+    }
+
+    my ($hdr,$data,$bad);
+    if ( $basedir && -f "$basedir/$page" && open( my $fh,'<',"$basedir/$page" )) {
+	$data = do { local $/; <$fh> };
+	if ($data =~s{\A((?:\w+(?:-\w*)*:.*\r?\n){1,10})\r?\n}{}) {
+	    # assume header + body
+	    ( $hdr = $1 ) =~s{\r?\n}{\r\n}g;
+	    $bad = $1 if $hdr =~s{^X-Virus:[ \t]*(.*\S)[ \t]*\r?\n}{}mi;
+	    # check if we have a brotli compressed version
+	    if (open($fh,'<',"$basedir/$page.brotli")
+		and my $brotli = do { local $/; <$fh> }) {
+		# remove optional header
+		$brotli =~s{\A((?:\w+(?:-\w*)*:.*\r?\n){1,10})\r?\n}{};
+		bro_compress($data,$brotli);
+	    }
+	} else {
+	    $hdr =
+		$page =~m{\.js$} ? "Content-type: application/javascript\r\n" :
+		$page =~m{\.css$} ? "Content-type: text/css\r\n" :
+		$page =~m{\.html?$} ? "Content-type: text/html\r\n" :
+		$page =~m{\.(gif|png|jpeg)$} ? "Content-type: image/$1\r\n" :
+		"Content-type: application/octet-stream\r\n";
+	}
+	$cache{$page} = [ $hdr,$data,$bad ];
+	return ($hdr,$data,$bad);
+    }
     if ( my $builtin = $builtin{$page} ) {
 	$builtin = $builtin->($spec,"/$page") if ref($builtin) eq 'CODE';
 	return @$builtin;
-    } 
-    if ( $basedir && open( my $fh,'<',"$basedir/$page" )) {
-	$hdr = 
-	    $page =~m{\.js$} ? "Content-type: application/javascript\r\n" :
-	    $page =~m{\.css$} ? "Content-type: text/css\r\n" :
-	    $page =~m{\.html?$} ? "Content-type: text/html\r\n" :
-	    $page =~m{\.(gif|png|jpeg)$} ? "Content-type: image/$1\r\n" :
-	    "";
-	$data = do { local $/; <$fh> };
-	return ($hdr,$data);
     }
     return;
 }
@@ -384,7 +413,7 @@ sub zlib_compress {
 {
     my ($path2num,$num2path);
     sub load_nummap {
-	my $maxold = @_>1 ? pop(@_) : 9999;
+	my $maxold = @_>1 ? pop(@_) : 1999;
 	$num2path = eval(
 	    "require App::DubiousHTTP::Tests::TestID;".
 	    "App::DubiousHTTP::Tests::TestID->num2path"

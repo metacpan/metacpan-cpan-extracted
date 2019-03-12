@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Constants;
 # ABSTRACT: Distribution-wide constants for Bio::MUST::Core
-$Bio::MUST::Core::Constants::VERSION = '0.190500';
+$Bio::MUST::Core::Constants::VERSION = '0.190690';
 use strict;
 use warnings;
 
@@ -118,7 +118,7 @@ Bio::MUST::Core::Constants - Distribution-wide constants for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.190500
+version 0.190690
 
 =head1 AUTHOR
 

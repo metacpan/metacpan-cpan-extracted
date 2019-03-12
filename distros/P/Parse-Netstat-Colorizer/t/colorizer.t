@@ -128,8 +128,18 @@ $pnc->set_invert;
 $invert=$pnc->get_invert;
 ok( !defined($invert) , 'invert, 1')or diag('"'.$invert.'" returned for invert reset instead of "undef"');
 
+# no_color test
+my $no_color=$pnc->get_no_color;
+ok( $no_color eq '0' , 'no_color, 1')or diag('"'.$no_color.'" returned for default no_color instead of "0"');
+$pnc->set_no_color(1);
+$no_color=$pnc->get_no_color;
+ok( $no_color eq '1' , 'no_color, 2')or diag('"'.$no_color.'" returned for no_color instead of "1"');
+$pnc->set_no_color;
+$no_color=$pnc->get_no_color;
+ok( !defined($no_color) , 'no_color, 3')or diag('"'.$no_color.'" returned for no_color reset of "undef"');
+
 my $colorized=$pnc->colorize($res);
 ok( $pnc->error  eq '', 'colorize, 1')or diag('"'.$pnc->error.'" set for a error code when attempting to colorize');
 ok( defined($colorized), 'colorize, 2')or diag('Undef returned upon attempting to colorize $res');
 
-done_testing(10);
+done_testing(13);

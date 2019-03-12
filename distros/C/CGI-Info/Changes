@@ -1,5 +1,8 @@
 Revision history for CGI-Info
 
+0.69	Sat  9 Mar 19:28:32 EST 2019
+	Added logdir()
+
 0.68	Fri Dec  7 08:14:21 EST 2018
 	Allow a parameter to have the value 0
 

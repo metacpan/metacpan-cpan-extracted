@@ -31,3 +31,4 @@ verbose = 11
 [Variables::ProhibitPunctuationVars]
     allow = $@ $!
 
+[-ValuesAndExpressions::RequireNumberSeparators]

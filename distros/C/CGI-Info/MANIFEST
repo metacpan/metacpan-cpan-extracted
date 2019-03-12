@@ -31,6 +31,7 @@ t/json.t
 t/kwalitee.t
 t/lib/MyLogger.pm
 t/links.t
+t/logdir.t
 t/manifest.t
 t/metrics.t
 t/namespaces.t

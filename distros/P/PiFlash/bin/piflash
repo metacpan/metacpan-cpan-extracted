@@ -3,7 +3,7 @@
 # by Ian Kluft
 use strict;
 use warnings;
-use v5.18.0; # require 2014 or newer version of Perl
+use v5.14.0; # require 2011 or newer version of Perl
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use PiFlash;
 
@@ -26,7 +26,7 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 

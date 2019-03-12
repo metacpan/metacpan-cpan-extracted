@@ -11,11 +11,11 @@ Module::Starter - a simple starter kit for any module
 
 =head1 VERSION
 
-Version 1.75
+Version 1.76
 
 =cut
 
-our $VERSION = '1.75';
+our $VERSION = '1.76';
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ L<http://cpanratings.perl.org/dist/Module-Starter>
 
 L<https://github.com/xsawyerx/module-starter/issues>
 
-=item * Metacpan
+=item * Search CPAN
 
 L<https://metacpan.org/release/Module-Starter>
 

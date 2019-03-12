@@ -4,6 +4,9 @@ package MockBackend;
 use warnings;
 use strict;
 
+use Scalar::Util qw(blessed);
+use namespace::clean;
+
 use parent 'HTTP::AnyUA::Backend';
 
 
@@ -27,6 +30,8 @@ Get the requests the backend has handled so far.
 =cut
 
 sub requests { @{$_[0]->{requests} || []} }
+
+sub response_is_future { blessed($_[0]->{response}) && $_[0]->{response}->isa('Future') }
 
 sub request {
     my $self = shift;

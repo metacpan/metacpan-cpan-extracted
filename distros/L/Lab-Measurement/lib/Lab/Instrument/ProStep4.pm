@@ -1,6 +1,6 @@
 package Lab::Instrument::ProStep4;
 #ABSTRACT: ProStep4 step motor
-$Lab::Instrument::ProStep4::VERSION = '3.671';
+$Lab::Instrument::ProStep4::VERSION = '3.680';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Lab::Instrument;
@@ -596,11 +596,11 @@ Lab::Instrument::ProStep4 - ProStep4 step motor
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow, Stefan Geissler
             2014-2015  Christian Butschkow

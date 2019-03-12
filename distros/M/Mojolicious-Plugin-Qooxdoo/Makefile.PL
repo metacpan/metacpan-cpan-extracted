@@ -14,6 +14,9 @@ WriteMakefile(
   PREREQ_PM    => {
     'Mojolicious' => '8'
   },
+  BUILD_REQUIRES => {
+    'CPAN::Uploader' => 0
+  },
   META_MERGE   => {
     requires  => {perl => '5.010001'},
     resources => {

@@ -3964,6 +3964,7 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+#include <sys/types.h>
 #include <fcntl.h>
 int main (void)
 {
@@ -4078,6 +4079,7 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+#include <sys/types.h>
 #include <fcntl.h>
 int main (void)
 {
@@ -4421,6 +4423,7 @@ else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
+#include <sys/types.h>
 #include <fcntl.h>
 int main (void)
 {
@@ -4589,13 +4592,11 @@ else
 #include "perl.h"
 #include "XSUB.h"
 
-int res;
 int main (void)
 {
    return PL_statcache.st_atimensec
         + PL_statcache.st_mtimensec
         + PL_statcache.st_ctimensec;
-   return 0;
 }
 
 _ACEOF
@@ -4624,7 +4625,6 @@ else
 #include "perl.h"
 #include "XSUB.h"
 
-int res;
 int main (void)
 {
    return PL_statcache.st_atim.tv_nsec
@@ -4647,6 +4647,99 @@ $as_echo "#define HAVE_ST_XTIMESPEC 1" >>confdefs.h
 
 
 # apparently, True64 uses st_u[amc]time, aix uses at_[amc]time_n and apple uses st_[amc,birth]timespec?
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for st_birthtimensec" >&5
+$as_echo_n "checking for st_birthtimensec... " >&6; }
+if ${ac_cv_birthtimensec+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main (void)
+{
+   return PL_statcache.st_birthtime + PL_statcache.st_birthtimensec;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_birthtimensec=yes
+else
+  ac_cv_birthtimensec=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_birthtimensec" >&5
+$as_echo "$ac_cv_birthtimensec" >&6; }
+test $ac_cv_birthtimensec = yes &&
+$as_echo "#define HAVE_ST_BIRTHTIMENSEC 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for st_birthtimespec" >&5
+$as_echo_n "checking for st_birthtimespec... " >&6; }
+if ${ac_cv_birthtimespec+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main (void)
+{
+   return PL_statcache.st_birthtim.tv_sec + PL_statcache.st_birthtim.tv_nsec;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_birthtimespec=yes
+else
+  ac_cv_birthtimespec=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_birthtimespec" >&5
+$as_echo "$ac_cv_birthtimespec" >&6; }
+test $ac_cv_birthtimespec = yes &&
+$as_echo "#define HAVE_ST_BIRTHTIMESPEC 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for st_gen" >&5
+$as_echo_n "checking for st_gen... " >&6; }
+if ${ac_cv_st_gen+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main (void)
+{
+   return PL_statcache.st_gen;
+}
+
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  ac_cv_st_gen=yes
+else
+  ac_cv_st_gen=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_st_gen" >&5
+$as_echo "$ac_cv_st_gen" >&6; }
+test $ac_cv_st_gen = yes &&
+$as_echo "#define HAVE_ST_GEN 1" >>confdefs.h
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure

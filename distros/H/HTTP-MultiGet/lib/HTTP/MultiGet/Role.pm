@@ -9,6 +9,7 @@ use JSON qw();
 use Data::Dumper;
 use Carp qw(croak);
 use namespace::clean;
+use Ref::Util qw(is_plain_arrayref);
 
 BEGIN { 
   with 'Log::LogMethods','Data::Result::Moo';
@@ -192,7 +193,8 @@ sub cb {
   my ($self)=@_;
   return $self->{cb} if exists $self->{cb};
   my $code=sub {
-    my ($mg,$request,$response)=@_;
+    my ($mg,$ref,$response)=@_;
+    my $request=is_plain_arrayref($ref) ? $ref->[0] : $ref;
     unless(exists $self->pending->{$request}) {
 
       $self->log_error("Request wasn't found!");
@@ -243,7 +245,8 @@ sub queue_request {
   my ($self,$request,$cb)=@_;
   $cb=$self->get_block_cb unless defined($cb);
   my $id=$self->agent->add_cb($request,$self->cb);
-  $self->pending->{$request}=[$id,$cb];
+  my $req=is_plain_arrayref($request) ? $request->[0] : $request;
+  $self->pending->{$req}=[$id,$cb];
   return $id;
 }
 

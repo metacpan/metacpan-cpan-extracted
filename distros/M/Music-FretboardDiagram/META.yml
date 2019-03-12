@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-FretboardDiagram
   repository: https://github.com/ology/Music-FretboardDiagram
-version: '0.1101'
+version: '0.1201'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -204,6 +204,7 @@ x_Dist_Zilla:
             - PNG
             - Pawe
             - TTF
+            - darkgray
             - fretboard
             - horiz
             - png

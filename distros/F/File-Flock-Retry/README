@@ -1,72 +1,136 @@
-SYNOPSIS
+NAME
+    File::Flock::Retry - Yet another flock module
 
+VERSION
+    This document describes version 0.631 of File::Flock::Retry (from Perl
+    distribution File-Flock-Retry), released on 2019-03-12.
+
+SYNOPSIS
      use File::Flock::Retry;
-    
+
      # try to acquire exclusive lock. if fail to acquire lock within 60s, die.
      my $lock = File::Flock::Retry->lock($file);
-    
+
      # explicitly unlock
      $lock->release;
-    
+
      # automatically unlock if object is DESTROY-ed.
      undef $lock;
 
 DESCRIPTION
-
     This is yet another flock module. It is a more lightweight alternative
     to File::Flock with some other differences:
 
-      * OO interface only
+    *   OO interface only
 
-      * Autoretry (by default for 60s) when trying to acquire lock
+    *   Autoretry (by default for 60s) when trying to acquire lock
 
-      I prefer this approach to blocking/waiting indefinitely or failing
-      immediately.
+        I prefer this approach to blocking/waiting indefinitely or failing
+        immediately.
+
+CAVEATS
+    Not yet tested on Windows. Some filesystems do not support inode?
 
 METHODS
+  lock
+    Usage:
 
- $lock = File::Flock::Retry->lock($path, \%opts)
+     $lock = File::Flock::Retry->lock($path, \%opts)
 
-    Attempt to acquire an exclusive lock on $path. $path will be created if
-    not already exists. If $path is already locked by another process, will
-    retry every second for a number of seconds (by default 60). Will die if
-    failed to acquire lock after all retries.
+    Attempt to acquire an exclusive lock on $path. By default, $path will be
+    created if not already exists (see "mode"). If $path is already locked
+    by another process, will retry every second for a number of seconds (by
+    default 60). Will die if failed to acquire lock after all retries.
 
     Will automatically unlock if $lock goes out of scope. Upon unlock, will
-    remove $path if it was created and is still empty (this behavior is the
-    same as File::Flock).
+    remove $path if it was created by "lock" and is still empty (this
+    behavior is the same as "File::Flock").
 
     Available options:
 
-      * retries => int (default: 60)
+    *   mode
 
-      Number of retries (equals number of seconds, since retry is done
-      every second).
+        Integer. Default: O_CREAT | O_RDWR.
 
-      * shared => bool (default: 0)
+        File open mode, to be passed to Perl's "sysopen()". For example, if
+        you want to avoid race condition between creating and locking the
+        file, you might want to use "O_CREAT | O_EXCL | O_RDWR" to fail when
+        the file already exists. Note that the constants are available after
+        you do a "use Fcntl ':DEFAULT';".
 
-      By default, an exclusive lock (LOCK_EX) is attempted. However, if
-      this option is set to true, a shared lock (LOCK_SH) is attempted.
+    *   retries
 
- $lock->unlock
+        Integer. Default: 60.
 
-    Unlock.
+        Number of retries (equals number of seconds, since retry is done
+        every second).
 
- $lock->release
+    *   shared
 
-    Synonym for unlock().
+        Boolean. Default: 0.
 
-CAVEATS
+        By default, an exclusive lock (LOCK_EX) is attempted. However, if
+        this option is set to true, a shared lock (LOCK_SH) is attempted.
 
-    Not yet tested on Windows. Some filesystems do not support inode?
+  unlock
+    Usage:
+
+     $lock->unlock
+
+    Unlock. will remove lock file if it was created by "lock" and is still
+    empty (this behavior is the same as "File::Flock").
+
+  release
+    Usage:
+
+     $lock->release
+
+    Synonym for "unlock".
+
+  handle
+    Usage:
+
+     my $fh = $lock->handle;
+
+    Return the file handle.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Flock-Retry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Flock-Retry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Flock-Retry>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-    File::Flock
+    File::Flock, a bit too heavy in terms of dependencies and startup
+    overhead, for my taste. It depends on things like File::Slurp and
+    Data::Structure::Util (which loads Digest::MD5, Storable, among others).
 
     File::Flock::Tiny which is also tiny, but does not have the autoremove
     and autoretry capability which I want. See also:
-    https://github.com/trinitum/perl-File-Flock-Tiny/issues/1
+    <https://github.com/trinitum/perl-File-Flock-Tiny/issues/1>
 
     flock() Perl function.
+
+    An alternative to flock() is just using sysopen() with O_CREAT|O_EXCL
+    mode to create lock files. This is supported on more filesystems
+    (particularly network filesystems which lack flock()).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

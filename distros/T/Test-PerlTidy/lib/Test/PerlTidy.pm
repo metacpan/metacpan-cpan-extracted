@@ -11,7 +11,6 @@ use vars qw( @EXPORT );    ## no critic (Modules::ProhibitAutomaticExportation)
 @EXPORT = qw( run_tests );
 
 use Carp;
-use File::Finder;
 use Path::Tiny qw( path );
 use File::Spec;
 use IO::File;
@@ -126,17 +125,17 @@ sub list_files {
 
     $test->BAIL_OUT(qq{The directory "$path" does not exist}) unless -d $path;
 
-    my $excludes = $args{exclude} || ['blib/'];    # exclude blib by default
+    my $excludes = $args{exclude}
+      || [ $OSNAME eq 'MSWin32' ? qr{^blib[/\\]} : 'blib/' ]
+      ;    # exclude blib by default
 
     $test->BAIL_OUT('exclude should be an array')
       unless ref $excludes eq 'ARRAY';
 
-    my $finder = File::Finder->type('f')->name(qr{[.](?:pl|pm|PL|t)$});
-    $finder->{options}->{untaint} = 1;
-    $finder->{options}->{untaint_pattern} =
-      qr{^((\p{IsAlphabetic}:)?[-+@\w./~[(][)] ]+)$}x ## no critic (Variables::ProhibitPunctuationVars)
-      if $OSNAME eq 'MSWin32';
-    my @files = $finder->in($path);
+    my @files;
+    path($path)
+      ->visit( sub { push @files, $_ if $_->is_file && /[.](?:pl|pm|PL|t)\z/; },
+        { recurse => 1 } );
 
     my %keep     = map { File::Spec->canonpath($_) => 1 } @files;
     my @excluded = ();
@@ -192,7 +191,7 @@ Test::PerlTidy
 
 =head1 VERSION
 
-version 20190305.001
+version 20190309.001
 
 =head1 SYNOPSIS
 
@@ -230,7 +229,7 @@ Test::PerlTidy - check that all your files are tidy.
 
 =head1 VERSION
 
-version 20190305.001
+version 20190309.001
 
 =head1 REASONS TO DO THIS
 

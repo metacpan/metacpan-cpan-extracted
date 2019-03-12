@@ -13,7 +13,7 @@ Lab::XPRESS::Examples::Example3_2samples_2files - XPRESS for DUMMIES - Example 3
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 Abstract
 
@@ -353,7 +353,7 @@ And that's it!
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

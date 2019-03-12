@@ -98,3 +98,9 @@ Revision history for Lingua-EN-Inflexion
       returns 'am'.
 
     * Improved robustness of "<preposition> <pronoun>" inflexions
+
+
+0.001008  Tue Mar 12 12:17:47 2019
+
+    * Fixed inflexion of 'backcast' and other '*cast' variants.
+      (Thanks, Jeff!)

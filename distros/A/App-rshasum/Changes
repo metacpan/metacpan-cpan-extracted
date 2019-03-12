@@ -1,0 +1,11 @@
+Revision history for App-rshasum
+
+0.2.0       2019-03-11
+    - Avoid emitting a leading "./" prefix for files in the root.
+        - Added a test for that under t/run.t .
+
+0.0.2       2019-03-09
+    - Improve the error handling and docs.
+
+0.0.1       2019-03-09
+    - First version, released on an unsuspecting world

@@ -6,6 +6,8 @@ use Test::More 0.88;
 plan skip_all => 'Extra tests disabled on perls <= 5.008003' unless "$]" >= 5.008_004;
 
 use File::Temp;
+use File::Spec;
+use File::Path qw(mkpath rmtree);
 use Cwd 'cwd';
 
 my %extras;
@@ -30,7 +32,9 @@ my $cwd = cwd;
 for my $version ( 1, 2 ) {
 
   my $tempdir = File::Temp::tempdir('strictures-XXXXXX', CLEANUP => 1, TMPDIR => 1);
-  chdir $tempdir;
+  my $subtemp = File::Spec->catdir($tempdir, 'sub1', 'sub2');
+  mkpath $subtemp;
+  chdir $subtemp;
 
   local $strictures::Smells_Like_VCS = undef;
   eval qq{
@@ -55,7 +59,7 @@ use strictures $version;
   }
 
   chdir $cwd;
-  rmdir $tempdir;
+  rmtree $tempdir;
 
   local $strictures::Smells_Like_VCS = 1;
 

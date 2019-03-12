@@ -1,0 +1,65 @@
+NAME
+    Acme::CPANModules::Parse::UnixCommands - Modules that parse output of
+    Unix commands
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::Parse::UnixCommands (from Perl distribution
+    Acme-CPANModules-Parse-UnixCommands), released on 2019-03-10.
+
+DESCRIPTION
+    Modules that parse output of Unix commands.
+
+INCLUDED MODULES
+    *   Parse::Netstat - Parse netstat output
+
+    *   Parse::Netstat::win32 - Parse netstat output
+
+    *   Parse::Netstat::linux - Parse netstat output
+
+    *   Parse::Netstat::freebsd - Parse netstat output
+
+    *   Parse::Netstat::darwin - Parse netstat output
+
+    *   Parse::Netstat::solaris - Parse netstat output
+
+    *   Cisco::ShowIPRoute::Parser - Parse Cisco "show ip route" command
+
+    *   IPTables::Parse - Parse iptables output
+
+    *   Proc::ProcessTable - Parse "ps ax" output
+
+    *   Parse::IPCommand - Parse linux "ip" command output
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-Parse-UnixCommands>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-Parse-UnixCommands>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Pars
+    e-UnixCommands>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+    Acme::CPANModules::Parse::UnixConfigs
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

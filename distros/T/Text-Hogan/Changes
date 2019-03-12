@@ -1,5 +1,8 @@
 Revision history for perl module Text::Hogan
 
+2.02 2019-03-10
+    * Add Jerrad Pierce to the list of contributors. He inspired Ricky Morse's optimisation after a conversation they had at a Boston.pm meetup.
+
 2.01 2019-03-02
     * The inevitable tiny point release after the 2.0 to fix a typo in the docs :)
 

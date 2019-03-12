@@ -1,0 +1,48 @@
+---
+abstract: 'Syndication with JSON.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Feed
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::Feed:
+    file: lib/JSON/Feed.pm
+    version: '0.001'
+  JSON::Feed::Types:
+    file: lib/JSON/Feed/Types.pm
+requires:
+  FindBin: '0'
+  JSON: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Ref::Util: '0'
+  Try::Tiny: '0'
+  Type::Tiny: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/gugod/JSON-Feed/issues
+  homepage: https://github.com/gugod/JSON-Feed
+  repository: git://github.com/gugod/JSON-Feed.git
+version: '0.001'
+x_authority: cpan:GUGOD
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

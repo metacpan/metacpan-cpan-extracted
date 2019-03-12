@@ -1,5 +1,5 @@
 package WebService::ValidSign::Object::Ceremony;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 extends 'WebService::ValidSign::Object';
 
@@ -15,14 +15,6 @@ has in_person => (
     default => 0,
 );
 
-around TO_JSON => sub {
-    my $orig = shift;
-    my $self = shift;
-    my $rv = $orig->($self, @_);
-    $rv->{inPerson} = delete $rv->{in_person};
-    return $rv;
-};
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -37,7 +29,7 @@ WebService::ValidSign::Object::Ceremony - A ceremony object
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

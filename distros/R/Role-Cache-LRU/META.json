@@ -1,5 +1,5 @@
 {
-   "abstract" : "Add LRU caching to any Moo classes.",
+   "abstract" : "LRU caching role for Moo class.",
    "author" : [
       "Kian Meng, Ang."
    ],
@@ -37,11 +37,13 @@
             "App::CISetup" : "0",
             "App::Software::License" : "0",
             "Dist::Milla" : "v1.0.20",
+            "Dist::Zilla::App::Command::cover" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
             "Test::MinimumVersion" : "0",
             "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
@@ -69,6 +71,7 @@
             "Test::HasVersion" : "0",
             "Test::Kwalitee" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Warn" : "0"
          }
@@ -86,7 +89,7 @@
          "web" : "https://github.com/kianmeng/role-cache-lru"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
       "Kian Meng Ang <kianmeng@users.noreply.github.com>"
    ],

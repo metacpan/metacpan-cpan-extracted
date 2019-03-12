@@ -1,1 +1,5 @@
 name = "Perl-Critic-Policy-Moo-ProhibitMakeImmutable"
+authority="cpan:BLUEFEET"
+
+[Metadata]
+x_deprecated = 1

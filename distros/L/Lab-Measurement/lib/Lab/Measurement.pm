@@ -1,6 +1,7 @@
 package Lab::Measurement;
+$Lab::Measurement::VERSION = '3.680';
 #ABSTRACT: Log, describe and plot data on the fly
-$Lab::Measurement::VERSION = '3.671';
+
 use strict;
 use warnings;
 use Lab::Generic;
@@ -10,7 +11,7 @@ use Exporter 'import';
 use Lab::XPRESS::hub qw(DataFile Sweep Frame Instrument Connection);
 our @EXPORT = qw(DataFile Sweep Frame Instrument Connection);
 
-carp  <<"EOF";
+carp <<"EOF";
 \"use Lab::Measurement;\" imports the legacy interface of Lab::Measurement.
 Please consider porting your measurement scripts to the new, Moose-based code.
 Documentation can be found at https://www.labmeasurement.de/
@@ -29,7 +30,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -69,7 +70,7 @@ API; its documentation can be found on the Lab::Measurement homepage.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2005-2006  Daniel Schroeer
             2011       Andreas K. Huettel
@@ -78,6 +79,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2016       Andreas K. Huettel, Simon Reinhardt
             2017-2018  Andreas K. Huettel
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

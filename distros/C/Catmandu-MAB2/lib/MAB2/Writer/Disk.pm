@@ -1,6 +1,6 @@
 package MAB2::Writer::Disk;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use strict;
 use charnames ':full';

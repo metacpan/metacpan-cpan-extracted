@@ -9,8 +9,9 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/DancerDiagram.pm
 eg/autumn-leaves-shapes
-eg/chord-diagram.pl
+eg/mojo-diagram.pl
 eg/ukulele
 lib/Music/FretboardDiagram.pm
 t/00-compile.t

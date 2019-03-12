@@ -1,5 +1,5 @@
 package Data::JSONSchema::Ajv::src::04;
-$Data::JSONSchema::Ajv::src::04::VERSION = '0.05';
+$Data::JSONSchema::Ajv::src::04::VERSION = '0.06';
 our $src = join '', (<DATA>);
 
 =head1 NAME
@@ -8,7 +8,7 @@ Data::JSONSchema::Ajv::src::04
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 WHAT
 

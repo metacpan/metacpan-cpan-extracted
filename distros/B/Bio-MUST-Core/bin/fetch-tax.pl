@@ -170,7 +170,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.190500
+version 0.190690
 
 =head1 USAGE
 

@@ -16,7 +16,7 @@ use SQL::Translator::Diff;
 no warnings;
 use Data::Dumper;
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 has description => 'MySQL migration tool';
 has usage       => sub { shift->extract_usage };
@@ -48,10 +48,11 @@ sub run {
 	my @args = @_;
 
 	die $self->usage unless my $action = shift @args;
-	die $self->usage unless $action ~~ [qw/status prepare install upgrade downgrade/];
+	die $self->usage unless $action ~~ [qw/status prepare install upgrade downgrade rm diff/];
 
 	GetOptionsFromArray \@args,
 		'to-version=s' => sub { $self->params->{'to-version'} = $_[1] },
+		'version=s'    => sub { $self->params->{'version'   } = $_[1] },
 		'force'        => sub { $self->params->{force       } = 1     },
 	;
 
@@ -359,42 +360,8 @@ sub prepare {
 			filename => "$paths->{source_deploy}/$last_version/001_auto.yml",
 		)->{schema};
 
-		for ($source_schema->get_tables) {
-			$_->{options} = [grep {!$_->{'AUTO_INCREMENT'}} @{ $_->{options} }];
-		}
-		for ($target_schema->get_tables) {
-			$_->{options} = [grep {!$_->{'AUTO_INCREMENT'}} @{ $_->{options} }];
-		}
-		my $diff = SQL::Translator::Diff->new({
-			output_db               => 'MySQL',
-			source_schema           => $source_schema,
-			target_schema           => $target_schema,
-			ignore_index_names      => 1,
-			ignore_constraint_names => 1,
-			caseopt                 => 1
-		})->compute_differences;
-
-		my $h = {};
-		for my $table(keys %{ $diff->{table_diff_hash} || {} }) {
-			for my $field (@{$diff->{table_diff_hash}->{$table}->{fields_to_create}}) {
-				$h->{$table}->{$field->name} = [grep {$_->order == $field->{order} - 1} $field->table->get_fields]->[0]->{name};
-			}
-		}
-		$diff = $diff->produce_diff_sql;
-
-		if (%$h) {
-			my @res = split "\n\n", $diff;
-			for my $s (@res) {
-				my ($t, $a) = $s =~ /ALTER TABLE ([^\s]+) ([^;]+)/;
-
-				for ($a =~ /ADD COLUMN ([^\s]+) /g) {
-					$s =~ s/ADD COLUMN $_ (.*)([\,\;])/ADD COLUMN $_ $1 AFTER $h->{$t}->{$_}$2/g;
-				}
-			}
-
-			$diff = join "\n\n", @res;
-		}
-
+		my $diff = $self->_diff($target_schema, $source_schema);
+		
 		if ($diff =~ /No differences/) {
 			say "Nothing to upgrade. Exit";
 
@@ -434,6 +401,80 @@ sub prepare {
 	say "Done";
 }
 
+sub diff {
+	my $self  = shift;
+	my $paths = $self->paths;
+
+	my $last_version = $self->get_last_version;
+
+	say "Schema version: $last_version";
+
+	if (my $version = $self->deployed->{version}) {
+		say "Deployed database is $version";
+	}
+
+	if ($self->db_is_empty) {
+		say "Nothing to diff. Database is empty.";
+
+		return;
+	}
+
+	my $schema1 = $self->get_schema(to => 'YAML')->{schema};
+	my $schema2 = $self->get_schema(
+		from     => 'YAML',
+		filename => "$paths->{source_deploy}/$last_version/001_auto.yml",
+	)->{schema};
+
+	my $diff   = $self->_diff($schema1, $schema2);
+	say "==== BEGIN SQL ====";
+	say $diff;
+	say "==== END SQL ====";
+}
+
+sub _diff {
+	my $self = shift;
+	my $schema1 = shift || return;
+	my $schema2 = shift || return;
+
+	for ($schema1->get_tables) {
+		$_->{options} = [grep {!$_->{'AUTO_INCREMENT'}} @{ $_->{options} }];
+	}
+	for ($schema2->get_tables) {
+		$_->{options} = [grep {!$_->{'AUTO_INCREMENT'}} @{ $_->{options} }];
+	}
+	my $diff = SQL::Translator::Diff->new({
+		output_db               => 'MySQL',
+		source_schema           => $schema2,
+		target_schema           => $schema1,
+		ignore_index_names      => 1,
+		ignore_constraint_names => 1,
+		caseopt                 => 1
+	})->compute_differences;
+
+	my $h = {};
+	for my $table(keys %{ $diff->{table_diff_hash} || {} }) {
+		for my $field (@{$diff->{table_diff_hash}->{$table}->{fields_to_create}}) {
+			$h->{$table}->{$field->name} = [grep {$_->order == $field->{order} - 1} $field->table->get_fields]->[0]->{name};
+		}
+	}
+	$diff = $diff->produce_diff_sql;
+
+	if (%$h) {
+		my @res = split "\n\n", $diff;
+		for my $s (@res) {
+			my ($t, $a) = $s =~ /ALTER TABLE ([^\s]+) ([^;]+)/;
+
+			for ($a =~ /ADD COLUMN ([^\s]+) /g) {
+				$s =~ s/ADD COLUMN $_ (.*)([\,\;])/ADD COLUMN $_ $1 AFTER $h->{$t}->{$_}$2/g;
+			}
+		}
+
+		$diff = join "\n\n", @res;
+	}
+
+	return $diff;
+}
+
 sub get_last_version {
 	my $self = shift;
 
@@ -457,6 +498,8 @@ sub save_migration {
 
 	my $dir = dirname $p->{path};
 	make_path $dir unless -d $dir;
+
+	return 'No input data to save!' unless $p->{data};
 
 	open my $fh, '>', $p->{path} or return $!;
 	print $fh $p->{data};
@@ -541,7 +584,19 @@ sub deployment_statements {
 	return [];
 }
 
+sub rm {
+	my $self  = shift;
+	my $paths = $self->paths;
+	say 'Params --version in required' unless my $version = $self->params->{version};
+
+	remove_tree "$paths->{source_deploy}/$version";
+	remove_tree "$paths->{db_deploy}/$version";
+	remove_tree "$paths->{db_upgrade}/".($version-1)."-$version";
+	remove_tree "$paths->{db_downgrade}/$version-".($version-1);
+}
+
 1;
+
 
 =pod
 
@@ -553,7 +608,7 @@ Mojolicious::Command::migration — MySQL migration tool for Mojolicious
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
  
@@ -563,10 +618,12 @@ version 0.15
   
   Commands:
     status     : Current database and schema version
+    diff       : SQL diff with last version.
     install    : Install a version to the database.
     prepare    : Makes deployment files for your database
     upgrade    : Upgrade the database.
     downgrade  : Downgrade the database.
+    rm         : Remove files of migration by version number.
  
 =head1 DESCRIPTION
  
@@ -587,6 +644,9 @@ from
 
   $ app->config->{db}->{mysql}
 
+Use can force command without saving state with param --force. Example:
+$ app migration downgrade --force
+
 All deploy files saves to relative directory 'share/'. You can change it with 'MOJO_MIGRATION_SHARE' environment.
 Current project state saves to 'tmp/.deploy_status' file. You can change directory with 'MOJO_MIGRATION_TMP' environment.
 
@@ -601,6 +661,10 @@ Note: we create directories automatically
   Deployed database is 20
 
 Returns the state of the deployed database (if it is deployed) and the state of the current schema version. Sends this as a string to STDOUT
+
+=head2 rm
+ 
+  $ app migration rm --version 123
 
 =head2 prepare
 

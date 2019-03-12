@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.025';
+$JMAP::Tester::VERSION = '0.026';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -195,8 +195,8 @@ has default_arguments => (
 
 #pod =attr accounts
 #pod
-#pod This is an arrayref of accounts, provided by the client session object.  This
-#pod method will return a list when accounts have been configured.
+#pod This method will return a list of pairs mapping accountIds to accounts
+#pod as provided by the client session object if any have been configured.
 #pod
 #pod =cut
 
@@ -208,7 +208,7 @@ has _accounts => (
 
 sub accounts {
   return unless $_[0]->_has_accounts;
-  return @{ $_[0]->_accounts }
+  return %{ $_[0]->_accounts }
 }
 
 #pod =method primary_account_for
@@ -879,7 +879,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 OVERVIEW
 
@@ -962,8 +962,8 @@ The request will effectively be:
 
 =head2 accounts
 
-This is an arrayref of accounts, provided by the client session object.  This
-method will return a list when accounts have been configured.
+This method will return a list of pairs mapping accountIds to accounts
+as provided by the client session object if any have been configured.
 
 =head1 METHODS
 

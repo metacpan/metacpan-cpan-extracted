@@ -142,6 +142,19 @@ EOT
 }
 
 {
+    my $infile = file('test', 'new_seqs.ali');
+    my $ali = $class->load($infile);
+
+    my $exp_new_seq_ids = [
+        'Arabidopsis thaliana@ABC123#NEW#',
+        'Arabidopsis thaliana@XWZ789#NEW#',
+    ];
+
+    is_deeply [ map { $_->full_id } $ali->all_new_seqs ], $exp_new_seq_ids,
+        'got expected seq_ids for new seqs';
+}
+
+{
     my $infile = file('test', 'AhHMA4_clustalw.ali');
     my $ali = $class->load($infile);
     cmp_store(

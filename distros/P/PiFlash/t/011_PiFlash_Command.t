@@ -351,7 +351,7 @@ plan tests => 1 + (scalar @prog_tests)*3 + (scalar @fork_exec_tests)*9;
 # initialize program state storage
 my @top_level_params = PiFlash::state_categories();
 PiFlash::State->init(@top_level_params);
-PiFlash::State::cli_opt("verbose", 1); # required to keep logs of commands
+PiFlash::State::cli_opt("logging", 1); # required to keep logs of commands
 
 # test forking a simple process that returns a true value using fork_child()
 {

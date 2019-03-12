@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package Code::Statistics::Reporter;
-{
-  $Code::Statistics::Reporter::VERSION = '1.112980';
-}
-
+$Code::Statistics::Reporter::VERSION = '1.190680';
 # ABSTRACT: creates reports statistics and outputs them
 
 use 5.004;
@@ -136,7 +133,11 @@ sub _prepare_target_types {
 
     $target_types{$_}->{type} = $_ for keys %target_types;
 
-    return [ values %target_types ];
+    my $i     = 0;
+    my %pref  = map +( $_ => ++$i ), reverse qw( RootDocument Block Sub nop );
+    my @types = reverse sort { ( $pref{$a} || 0 ) <=> ( $pref{$b} || 0 ) } reverse sort keys %target_types;
+
+    return [ map $target_types{$_}, @types ];
 }
 
 sub _process_target_type {
@@ -250,9 +251,9 @@ sub _col_short_name {
 
 1;
 
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -260,7 +261,7 @@ Code::Statistics::Reporter - creates reports statistics and outputs them
 
 =head1 VERSION
 
-version 1.112980
+version 1.190680
 
 =head2 reports
     Creates a report on given code statistics and outputs it in some way.
@@ -271,14 +272,16 @@ Christian Walde <mithaldu@yahoo.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2010 by Christian Walde.
 
-This is free software, licensed under:
+Christian Walde has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
 
-  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
 
 =cut
-
 
 __DATA__
 __[ dos_template ]__

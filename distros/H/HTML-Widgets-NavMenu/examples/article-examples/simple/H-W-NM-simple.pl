@@ -35,47 +35,43 @@ a:hover { background-color : palegreen; }
 }
 EOF
 
-my $nav_menu_tree =
-{
-    'host' => "default",
-    'text' => "Top 1",
+my $nav_menu_tree = {
+    'host'  => "default",
+    'text'  => "Top 1",
     'title' => "T1 Title",
-    'subs' =>
-    [
+    'subs'  => [
         {
             'text' => "Home",
-            'url' => "",
+            'url'  => "",
         },
         {
-            'text' => "About Me",
+            'text'  => "About Me",
             'title' => "About Myself",
-            'url' => "me/",
+            'url'   => "me/",
         },
         {
-            'text' => "Links",
+            'text'  => "Links",
             'title' => "Hyperlinks to other Pages",
-            'url' => "links/",
+            'url'   => "links/",
         },
     ],
 };
 
-my %hosts =
-(
-    'hosts' =>
-    {
-        'default' =>
-        {
-            'base_url' => ("http://web-cpan.berlios.de/modules/" .
-                "HTML-Widgets-NavMenu/article/examples/simple/dest/"),
+my %hosts = (
+    'hosts' => {
+        'default' => {
+            'base_url' => (
+                      "http://web-cpan.berlios.de/modules/"
+                    . "HTML-Widgets-NavMenu/article/examples/simple/dest/"
+            ),
         },
     },
 );
 
-my @pages =
-(
+my @pages = (
     {
-        'path' => "",
-        'title' => "John Doe's Homepage",
+        'path'    => "",
+        'title'   => "John Doe's Homepage",
         'content' => <<'EOF',
 <p>
 Hi! This is the homepage of John Doe. I hope you enjoy your stay here.
@@ -83,8 +79,8 @@ Hi! This is the homepage of John Doe. I hope you enjoy your stay here.
 EOF
     },
     {
-        'path' => "me/",
-        'title' => "About Myself",
+        'path'    => "me/",
+        'title'   => "About Myself",
         'content' => <<'EOF',
 <p>
 My name is John Doe and I've been exploring the art and science of creating
@@ -94,8 +90,8 @@ subject, and think everyone should be interested in them.
 EOF
     },
     {
-        'path' => "links/",
-        'title' => "Cool Links",
+        'path'    => "links/",
+        'title'   => "Cool Links",
         'content' => <<'EOF',
 <h2>Perl-Related Links</h2>
 
@@ -117,33 +113,33 @@ EOF
 
 foreach my $page (@pages)
 {
-    my $path = $page->{'path'};
-    my $title = $page->{'title'};
-    my $content = $page->{'content'};
-    my $nav_menu =
-        HTML::Widgets::NavMenu->new(
-            path_info => "/$path",
-            current_host => "default",
-            hosts => \%hosts,
-            tree_contents => $nav_menu_tree,
-        );
+    my $path     = $page->{'path'};
+    my $title    = $page->{'title'};
+    my $content  = $page->{'content'};
+    my $nav_menu = HTML::Widgets::NavMenu->new(
+        path_info     => "/$path",
+        current_host  => "default",
+        hosts         => \%hosts,
+        tree_contents => $nav_menu_tree,
+    );
 
     my $nav_menu_results = $nav_menu->render();
 
-    my $nav_menu_text = join("\n", @{$nav_menu_results->{'html'}});
+    my $nav_menu_text = join( "\n", @{ $nav_menu_results->{'html'} } );
 
     my $file_path = $path;
-    if (($file_path =~ m{/$}) || ($file_path eq ""))
+    if ( ( $file_path =~ m{/$} ) || ( $file_path eq "" ) )
     {
         $file_path .= "index.html";
     }
     my $full_path = "dest/$file_path";
     $full_path =~ m{^(.*)/[^/]+$};
+
     # mkpath() throws an exception if it isn't successful, which will cause
     # this program to terminate. This is what we want.
-    mkpath($1, 0, 0755);
-    open my $out, ">", $full_path or
-        die "Could not open \"$full_path\" for writing!";
+    mkpath( $1, 0, 0755 );
+    open my $out, ">", $full_path
+        or die "Could not open \"$full_path\" for writing!";
 
     print {$out} <<"EOF";
 <?xml version="1.0" encoding="iso-8859-1"?>

@@ -3,6 +3,7 @@ abstract: 'TagHelpers with I18N support'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
   File::Basename: '0'
   Test::Mojo: '0'
   Test::More: '0'
@@ -18,7 +19,7 @@ name: Mojolicious-Plugin-TagHelpersI18N
 provides:
   Mojolicious::Plugin::TagHelpersI18N:
     file: lib/Mojolicious/Plugin/TagHelpersI18N.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Mojolicious: '8'
   Mojolicious::Plugin::I18N: '0'
@@ -28,8 +29,9 @@ resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-TagHelpersI18N/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-TagHelpersI18N
   repository: http://github.com/reneeb/Mojolicious-Plugin-TagHelpersI18N.git
-version: '0.04'
+version: '0.05'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

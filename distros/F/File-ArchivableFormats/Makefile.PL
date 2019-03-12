@@ -17,10 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "File::ArchivableFormats",
   "PREREQ_PM" => {
-    "Archive::Zip" => 0,
     "File::Basename" => 0,
-    "File::LibMagic" => 0,
-    "Image::ExifTool" => 0,
+    "File::MimeInfo::Magic" => 0,
     "List::Util" => 0,
     "Module::Pluggable::Object" => 0,
     "Moose" => 0,
@@ -38,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.5",
+  "VERSION" => "1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,15 +44,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Archive::Zip" => 0,
   "File::Basename" => 0,
-  "File::LibMagic" => 0,
+  "File::MimeInfo::Magic" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Image::ExifTool" => 0,
   "List::Util" => 0,
   "MIME::Types" => 0,
   "Module::Pluggable::Object" => 0,

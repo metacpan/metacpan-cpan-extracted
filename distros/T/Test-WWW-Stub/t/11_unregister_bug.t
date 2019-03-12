@@ -20,18 +20,18 @@ sub test_pass {
 sub issue_19 : Tests {
     my $self = shift;
 
-    my $g1 = Test::WWW::Stub->register('https://example.com/OVERRIDE' => [ 500, [], [] ]);
+    my $g1 = Test::WWW::Stub->register('http://example.com/OVERRIDE' => [ 500, [], [] ]);
     {
         my $code;
-        my $warnings = [ warnings { $code = $self->ua->get('https://example.com/OVERRIDE')->code; } ];
+        my $warnings = [ warnings { $code = $self->ua->get('http://example.com/OVERRIDE')->code; } ];
         cmp_deeply $warnings, [], 'no warnings';
         is $code, 500, 'stub by g1';
     }
 
-    my $g2 = Test::WWW::Stub->register('https://example.com/OVERRIDE' => [ 400, [], [] ]);
+    my $g2 = Test::WWW::Stub->register('http://example.com/OVERRIDE' => [ 400, [], [] ]);
     {
         my $code;
-        my $warnings = [ warnings { $code = $self->ua->get('https://example.com/OVERRIDE')->code; } ];
+        my $warnings = [ warnings { $code = $self->ua->get('http://example.com/OVERRIDE')->code; } ];
         cmp_deeply $warnings, [], 'no warnings';
         is $code, 400, 'stub by g2';
     }
@@ -39,7 +39,7 @@ sub issue_19 : Tests {
     $g1 = undef;
     {
         my $code;
-        my $warnings = [ warnings { $code = $self->ua->get('https://example.com/OVERRIDE')->code; } ];
+        my $warnings = [ warnings { $code = $self->ua->get('http://example.com/OVERRIDE')->code; } ];
         cmp_deeply $warnings, [], 'no warnings';
         is $code, 400, 'still stub by g2';
     }
@@ -47,7 +47,7 @@ sub issue_19 : Tests {
     $g2 = undef;
     {
         my $code;
-        my $warnings = [ warnings { $code = $self->ua->get('https://example.com/OVERRIDE')->code; } ];
+        my $warnings = [ warnings { $code = $self->ua->get('http://example.com/OVERRIDE')->code; } ];
         cmp_deeply $warnings, [ re('Unexpected external access:') ], 'warnings appeared';
     }
 }

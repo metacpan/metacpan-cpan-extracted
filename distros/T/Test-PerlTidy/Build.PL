@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Test-PerlTidy",
-  "dist_version" => "20190305.001",
+  "dist_version" => "20190309.001",
   "license" => "perl",
   "module_name" => "Test::PerlTidy",
   "recursive_test_files" => 1,
@@ -27,7 +27,6 @@ my %module_build_args = (
     "Carp" => 0,
     "English" => 0,
     "Exporter" => 0,
-    "File::Finder" => 0,
     "File::Spec" => 0,
     "IO::File" => 0,
     "Path::Tiny" => 0,

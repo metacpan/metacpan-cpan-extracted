@@ -1,10 +1,36 @@
 Revision history for Perl extension GIS-Distance.
 
+0.14 2019-03-10T05:04:54Z
+
+ - Add GIS::Distance::ALT formula.
+ - Removed distance_km().
+
+0.13 2019-03-09T12:32:55Z
+
+ - Add abs() to Haversine.
+ - Added GIS::Distance::Null, the fastest formula yet.
+
+0.12 2019-03-08T18:32:13Z
+
+ - Added the distance_metal() method to GIS::Distance.
+ - Various documentation edits, including a new SPEED section.
+
+0.11 2019-03-07T22:23:02Z
+
+ - Support the GIS_DISTANCE_PP environment variable.
+ - Don't support older ::Formula modules, makes no sense and
+   they wouldn't work anyways.
+ - Declare Carp dep.
+ - Lots and lots of documentation edits.
+ - Recommend the newer GIS::Distance::Fast.
+
 0.10 2019-03-07T16:28:48Z
 
+ - WARNING: The GIS::Distance object is now immutable, thus the
+   formula can no longer be set with the formula attribute!
  - Moved GIS::Distance::GeoEllipsoid to a separate distro.
  - Added the distance_km() method to GIS::Distance.
- - Removed Moo/Type::Tiny, all unecessary, simple OO.
+ - Removed Moo and Type::Tiny, all unecessary, simple OO.
  - Move GIS::Distance::Formula:: modules to GIS::Distance::.
  - Migrate build tooling from Dist::Zilla to Minilla.
 

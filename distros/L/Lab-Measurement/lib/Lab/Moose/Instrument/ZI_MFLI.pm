@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.671';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.680';
 #ABSTRACT: Zurich Instruments MFLI Lock-in Amplifier
 
 use 5.010;
@@ -64,6 +64,12 @@ sub get_frequency {
 
 }
 
+sub get_frq {
+    my $self = shift;
+    return $self->get_frequency(@_);
+}
+
+
 
 sub set_frequency {
     my ( $self, $value, %args ) = validated_setter(
@@ -77,6 +83,12 @@ sub set_frequency {
             value => $value
         )
     );
+}
+
+
+sub set_frq {
+    my $self = shift;
+    return $self->set_frequency(@_);
 }
 
 
@@ -193,6 +205,87 @@ sub set_amplitude_range {
             value => $value
         )
     );
+}
+
+
+sub set_output_status {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [ 0, 1 ] ) },
+    );
+
+    return $self->sync_set_value(
+        path  => $self->device() . "/sigouts/0/on",
+        type  => 'I',
+        value => $value,
+    );
+}
+
+cache offset_voltage => ( getter => 'get_offset_voltage' );
+
+
+sub get_offset_voltage {
+    my $self = shift;
+    return $self->cached_offset_voltage(
+        $self->get_value(
+            path => $self->device() . "/sigouts/0/offset",
+            type => 'D'
+        )
+    );
+}
+
+
+sub set_offset_voltage {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => 'Num' }
+    );
+    return $self->cached_offset_voltage(
+        $self->sync_set_value(
+            path  => $self->device() . "/sigouts/0/offset",
+            type  => 'D',
+            value => $value
+        )
+    );
+}
+
+
+sub set_offset_status {
+    my ( $self, $value, %args ) = validated_setter(
+        \@_,
+        value => { isa => enum( [ 0, 1 ] ) },
+    );
+
+    return $self->sync_set_value(
+        path  => $self->device() . "/sigouts/0/add",
+        type  => 'I',
+        value => $value,
+    );
+}
+
+#
+# compatibility with XPRESS::Sweep::Voltage sweep
+#
+
+sub get_level {
+    my $self = shift;
+    return $self->get_offset_voltage();
+}
+
+sub sweep_to_level {
+    my $self = shift;
+    my ( $target, $time, $stepwidth ) = @_;
+    $self->set_offset_voltage( value => $target );
+}
+
+sub config_sweep {
+    croak "ZI_MFLI only supports step/list sweep with 'jump => 1'";
+}
+
+sub set_voltage {
+    my $self  = shift;
+    my $value = shift;
+    $self->set_offset_voltage( value => $value );
 }
 
 #
@@ -337,7 +430,7 @@ Lab::Moose::Instrument::ZI_MFLI - Zurich Instruments MFLI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -375,11 +468,19 @@ C<set_tc> will not work.
 
 Get oscillator frequency.
 
+=head2 get_frq
+
+Alias for L</get_frequency>.
+
 =head2 set_frequency
 
  $mfli->set_frequency(value => 10000);
 
 Set oscillator frequency.
+
+=head2 set_frq
+
+Alias for L</set_frequency>.
 
 =head2 get_voltage_sens
 
@@ -429,6 +530,28 @@ Get range of voltage output.
 
 Set amplitude of voltage output.
 
+=head2 set_output_status
+
+ $mfli->set_output_status(value => 1); # Enable output
+ $mfli->set_output_status(value => 0); # Disable output
+
+=head2 get_offset_voltage
+
+ my $offset = $mfli->get_offset_voltage();
+
+Get DC offset.
+
+=head2 set_offset_voltage
+
+ $mfli->set_offset_voltage(value => 1e-3);
+
+Set DC offset.
+
+=head2 set_offset_status
+
+ $mfli->set_offset_status(value => 1); # Enable offset voltage
+ $mfli->set_offset_status(value => 0); # Disable offset voltage
+
 =head2 get_phase
 
  my $phase = $mfli->get_phase(demod => 0);
@@ -476,9 +599,10 @@ Get demodulator X and Y output measurement values.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -18,21 +18,23 @@ $concepts = [ sort { $a->{uri} cmp $b->{uri} } @$concepts ];
 
 #note explain $concepts;
 
-is_deeply $concepts, [
+is_deeply $concepts,
+  [
     {
-        inScheme  => ['http://example.org/'],
-        notation  => ["\x{2603}"],
+        inScheme => [ { uri => 'http://example.org/' } ],
+        notation => ["\x{2603}"],
         prefLabel => { en => 'A', de => "\x{c4}" },
-        type      => ['http://www.w3.org/2004/02/skos/core#Concept'],
-        uri       => 'http://example.org/A',
-        narrower  => [ { uri => 'http://example.org/B' } ]
+        type     => ['http://www.w3.org/2004/02/skos/core#Concept'],
+        uri      => 'http://example.org/A',
+        narrower => [ { uri => 'http://example.org/B' } ]
     },
     {
-        inScheme  => ['http://example.org/'],
-        notation  => ["\x{2639}"],
-        type      => ['http://www.w3.org/2004/02/skos/core#Concept'],
-        uri       => 'http://example.org/B',
+        inScheme => [ { uri => 'http://example.org/' } ],
+        notation => ["\x{2639}"],
+        type => ['http://www.w3.org/2004/02/skos/core#Concept'],
+        uri  => 'http://example.org/B',
     }
-  ], 'converted concepts';
+  ],
+  'converted concepts';
 
 done_testing;

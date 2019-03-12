@@ -9,7 +9,7 @@ Module::Starter::App - the code behind the command line program
 use warnings;
 use strict;
 
-our $VERSION = '1.75';
+our $VERSION = '1.76';
 
 use File::Spec;
 use Getopt::Long;
@@ -82,6 +82,7 @@ sub _process_command_line {
         'author=s'   => \$config{author},
         'email=s'    => \$config{email},
         'license=s'  => \$config{license},
+        genlicense   => \$config{genlicense},
         'minperl=s'  => \$config{minperl},
         'fatalize'   => \$config{fatalize},
 

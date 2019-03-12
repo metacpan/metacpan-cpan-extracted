@@ -1,5 +1,10 @@
 Revision history for File::ArchivableFormats
 
+1.6       2019-03-09 17:40:35Z
+
+    * Remove dependencies of Archive::Zip and File::LibMagic in favor of
+      File::MimeInfo::Magic
+
 1.5       2019-02-15 07:29:24Z
 
     * Maintainer only changes:

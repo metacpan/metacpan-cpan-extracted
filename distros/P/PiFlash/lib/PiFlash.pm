@@ -3,14 +3,14 @@
 # by Ian Kluft
 use strict;
 use warnings;
-use v5.18.0; # require 2014 or newer version of Perl
+use v5.14.0; # require 2011 or newer version of Perl
 use PiFlash::State;
 use PiFlash::Command;
 use PiFlash::Inspector;
 use PiFlash::MediaWriter;
 
 package PiFlash;
-$PiFlash::VERSION = '0.2.1';
+$PiFlash::VERSION = '0.2.2';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Getopt::Long; # included with perl
 use File::Basename; # included with perl
@@ -38,8 +38,8 @@ sub state_categories {
 # print program usage message
 sub usage
 {
-	say STDERR "usage: ".basename($0)." [--verbose] [--resize] [--config conf-file] input-file output-device";
-	say STDERR "       ".basename($0)." [--verbose] [--config conf-file] --SDsearch";
+	say STDERR "usage: ".basename($0)." [--verbose | --logging] [--resize] [--config conf-file] input-file output-device";
+	say STDERR "       ".basename($0)." [--verbose | --logging] [--config conf-file] --SDsearch";
 	say STDERR "       ".basename($0)." --version";
 	exit 1;
 }
@@ -107,9 +107,17 @@ sub piflash
 	PiFlash::State->init(state_categories());
 
 	# collect and validate command-line arguments
-	do { GetOptions (PiFlash::State::cli_opt(), "verbose", "sdsearch", "version", "resize", "config:s", "plugin:s"); };
+	do { GetOptions (PiFlash::State::cli_opt(),
+		"config:s",
+		"logging",
+		"plugin:s",
+		"resize",
+		"sdsearch",
+		"verbose",
+		"version",
+		); };
 	if ($@) {
-		# in case of failure, add state info if verbose mode is set
+		# in case of failure, add state info if verbose or logging mode is set
 		PiFlash::State->error($@);
 	}
 
@@ -227,7 +235,7 @@ sub main
 		say STDERR "$0 failed: $@";
 		return 1;
 	} else {
-		if (PiFlash::State::verbose()) {
+		if (PiFlash::State::verbose() or PiFlash::State::logging()) {
 			say "Program state dump...\n".PiFlash::State::odump($PiFlash::State::state,0);
 		}
 	}
@@ -250,7 +258,7 @@ PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 

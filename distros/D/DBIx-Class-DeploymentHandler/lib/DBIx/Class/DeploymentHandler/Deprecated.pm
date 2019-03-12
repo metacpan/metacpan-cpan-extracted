@@ -1,54 +1,47 @@
 package DBIx::Class::DeploymentHandler::Deprecated;
-$DBIx::Class::DeploymentHandler::Deprecated::VERSION = '0.002223';
+$DBIx::Class::DeploymentHandler::Deprecated::VERSION = '0.002227';
 # ABSTRACT: (DEPRECATED) Use this if you are stuck in the past
 
-use Moose;
-use Moose::Util 'apply_all_roles';
+use Moo;
+require Moo::Role;
 
 sub initial_version { return $_[0]->database_version }
 
 extends 'DBIx::Class::DeploymentHandler::Dad';
 # a single with would be better, but we can't do that
 # see: http://rt.cpan.org/Public/Bug/Display.html?id=46347
-with 'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
+use DBIx::Class::DeploymentHandler::WithApplicatorDumple;
+with WithApplicatorDumple(
     interface_role       => 'DBIx::Class::DeploymentHandler::HandlesDeploy',
     class_name           => 'DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::Deprecated',
     delegate_name        => 'deploy_method',
     attributes_to_assume => ['schema'],
     attributes_to_copy   => [qw( script_directory databases sql_translator_args )],
-  },
-  'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
+  ),
+  WithApplicatorDumple(
     interface_role       => 'DBIx::Class::DeploymentHandler::HandlesVersionStorage',
     class_name           => 'DBIx::Class::DeploymentHandler::VersionStorage::Deprecated',
     delegate_name        => 'version_storage',
     attributes_to_assume => ['schema'],
-  };
+  );
 with 'DBIx::Class::DeploymentHandler::WithReasonableDefaults';
 
 sub BUILD {
   my $self = shift;
 
-  if ($self->schema->can('ordered_versions') && $self->schema->ordered_versions) {
-    apply_all_roles(
-      $self,
-      'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
-        interface_role       => 'DBIx::Class::DeploymentHandler::HandlesVersioning',
-        class_name           => 'DBIx::Class::DeploymentHandler::VersionHandler::ExplicitVersions',
-        delegate_name        => 'version_handler',
-        attributes_to_assume => [qw( database_version schema_version to_version )],
-      }
-    );
-  } else {
-    apply_all_roles(
-      $self,
-      'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
-        interface_role       => 'DBIx::Class::DeploymentHandler::HandlesVersioning',
-        class_name           => 'DBIx::Class::DeploymentHandler::VersionHandler::DatabaseToSchemaVersions',
-        delegate_name        => 'version_handler',
-        attributes_to_assume => [qw( database_version schema_version to_version )],
-      }
-    );
-  }
+  my $schema = $self->schema;
+  my $class_name =
+    ($schema->can('ordered_versions') && $schema->ordered_versions)
+      ? 'ExplicitVersions' : 'DatabaseToSchemaVersions';
+  Moo::Role->apply_roles_to_object(
+    $self,
+    WithApplicatorDumple(
+      interface_role       => 'DBIx::Class::DeploymentHandler::HandlesVersioning',
+      class_name           => 'DBIx::Class::DeploymentHandler::VersionHandler::' . $class_name,
+      delegate_name        => 'version_handler',
+      attributes_to_assume => [qw( database_version schema_version to_version )],
+    )
+  );
   # the following is just a hack so that ->version_storage
   # won't be lazy
   $self->version_storage;

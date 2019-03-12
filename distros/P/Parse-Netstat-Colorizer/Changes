@@ -1,4 +1,10 @@
 Revision history for Parse-Netstat-Colorizer
 
+0.1.0	 2019-03-03/03:50
+		 -Add inversion support to cnetstat.
+		 -Add PTR and regexp PTR support to cnetstat.
+		 -Add PTR resolving options.
+		 -Add NO_COLOR support.
+
 0.0.0	 2019-02-28/04:30
 		 -Initial release.

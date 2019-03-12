@@ -3,12 +3,12 @@
 
 use strict;
 use warnings;
-use v5.18.0; # require 2014 or newer version of Perl
+use v5.14.0; # require 2011 or newer version of Perl
 use PiFlash::State;
 use PiFlash::Command;
 
 package PiFlash::Inspector;
-$PiFlash::Inspector::VERSION = '0.2.1';
+$PiFlash::Inspector::VERSION = '0.2.2';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Try::Tiny;
 use File::Basename;
@@ -436,7 +436,7 @@ PiFlash::Inspector - PiFlash functions to inspect Linux system devices to flash 
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 SYNOPSIS
 

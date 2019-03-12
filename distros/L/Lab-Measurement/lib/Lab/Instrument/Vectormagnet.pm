@@ -1,6 +1,6 @@
 package Lab::Instrument::Vectormagnet;
 #ABSTRACT: ???
-$Lab::Instrument::Vectormagnet::VERSION = '3.671';
+$Lab::Instrument::Vectormagnet::VERSION = '3.680';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Math::Trig;
@@ -635,11 +635,11 @@ Lab::Instrument::Vectormagnet - ???
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Christian Butschkow
             2014       Andreas K. Huettel

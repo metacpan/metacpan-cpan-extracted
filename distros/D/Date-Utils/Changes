@@ -1,5 +1,8 @@
 Revision history for Date::Utils
 
+0.25  Sat Mar 09 10:10:00 2019
+      - Updated dependency on Date::Exception v0.07.
+
 0.24  Thu Nov 15 12:10:00 2018
       - Used namespace::autoclean instead.
 

@@ -1,0 +1,57 @@
+{
+   "abstract" : "automatically return a true value when a file is required",
+   "author" : [
+      "chocolateboy <chocolate@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "true",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Function::Parameters" : "2.001003",
+            "Moo" : "2.003004"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "B::Hooks::OP::Annotation" : "0.44",
+            "B::Hooks::OP::Check" : "0.22",
+            "ExtUtils::Depends" : "0.405",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::OP::Annotation" : "0.44",
+            "B::Hooks::OP::Check" : "0.22",
+            "Devel::StackTrace" : "2.03",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/chocolateboy/true/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/chocolateboy/true"
+      }
+   },
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

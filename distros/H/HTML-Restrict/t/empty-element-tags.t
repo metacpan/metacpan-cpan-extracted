@@ -12,9 +12,9 @@ one element open & close break no space<br/>
 EOF
 
 my $after = <<'EOF';
-two element open & close break<br></br>
-one element open & close break <br>
-one element open & close break no space<br>
+two element open &amp; close break<br></br>
+one element open &amp; close break <br>
+one element open &amp; close break no space<br>
 EOF
 
 my $hr = HTML::Restrict->new(

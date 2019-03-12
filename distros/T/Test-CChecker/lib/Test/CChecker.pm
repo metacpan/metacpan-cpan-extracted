@@ -22,14 +22,36 @@ our @EXPORT = qw(
   compile_output_to_note
 );
 
+my $warn_deprecated = do {
+
+  my $warned = 0;
+
+  sub
+  {
+    return if $warned++;
+    my $tb = __PACKAGE__->builder;
+    $tb->diag('');
+    $tb->diag('');
+    $tb->diag('');
+    $tb->diag(' ********************************************* ');
+    $tb->diag(' * WARNING:                                  * ');
+    $tb->diag(' * Test::CChecker has been deprecated!       * ');
+    $tb->diag(' * Please use Test::Alien instead.           * ');
+    $tb->diag(' ********************************************* ');
+    $tb->diag('');
+    $tb->diag('');
+  }
+};
+
 # ABSTRACT: Test-time utilities for checking C headers, libraries, or OS features (DEPRECATED)
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 do {
   my $cc;
   sub cc ()
   {
+    $warn_deprecated->();
     $cc ||= ExtUtils::CChecker->new( quiet => 0 );
   }
 };
@@ -39,6 +61,7 @@ my $output = '';
 
 sub compile_run_ok ($;$)
 {
+  $warn_deprecated->();
   my($args, $message) = @_;
   $message ||= "compile ok";
   my $cc = cc();
@@ -63,6 +86,7 @@ sub compile_run_ok ($;$)
 
 sub compile_ok ($;$)
 {
+  $warn_deprecated->();
   my($args, $message) = @_;
   $message ||= "compile ok";
   $args = ref $args ? $args : { source => $args };
@@ -99,6 +123,7 @@ sub compile_ok ($;$)
 
 sub compile_with_alien ($)
 {
+  $warn_deprecated->();
   my $alien = shift;
   $alien = $alien->new unless ref $alien;
 
@@ -130,18 +155,21 @@ sub compile_with_alien ($)
 
 sub compile_output_to_nowhere ()
 {
+  $warn_deprecated->();
   $output = '';
 }
 
 
 sub compile_output_to_diag ()
 {
+  $warn_deprecated->();
   $output = 'diag';
 }
 
 
 sub compile_output_to_note ()
 {
+  $warn_deprecated->();
   $output = 'note';
 }
 
@@ -159,7 +187,7 @@ Test::CChecker - Test-time utilities for checking C headers, libraries, or OS fe
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -209,6 +237,7 @@ This is mainly useful for adding compiler or linker flags:
 
 =head2 compile_run_ok
 
+ compile_run_ok $c_source;
  compile_run_ok $c_source, $message;
 
  compile_run_ok {
@@ -217,7 +246,7 @@ This is mainly useful for adding compiler or linker flags:
    extra_linker_flags => \@libs,
  }, $message;
 
-This test attempts to compile the given c_source and passes if it
+This test attempts to compile the given c source and passes if it
 runs with return value of zero.  The first argument can be either
 a string containing the C source code, or a hashref (which will
 be passed unmodified as a hash to L<ExtUtils::CChecker> C<try_compile_run>).

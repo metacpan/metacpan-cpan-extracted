@@ -1,5 +1,22 @@
 Revision history for Perl extension GIS-Distance-Fast.
 
+0.12 2019-03-10T06:45:47Z
+
+ - Add GIS::Distance::Fast::ALT formula.
+ - Add fabs() to Haversine.
+ - Added GIS::Distance::Fast::Null, for measuring distances at the center
+   of a singularity.
+
+0.11 2019-03-08T18:35:36Z
+
+ - Performance improvements.
+ - Added GIS::Distance::Fast::GreatCircle.
+ - Added GIS::Distance::Fast::Polar.
+
+0.10 2019-03-07T23:17:02Z
+
+ - Depend on GIS::Distance 0.11+.
+
 0.09 2019-03-07T17:09:53Z
 
  - Removed Moo/Type::Tiny, all unecessary.

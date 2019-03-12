@@ -11,7 +11,7 @@ install:
   - path C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;C:\strawberry\c\bin;%PATH%
   # get gnuplot
   # - ps: Invoke-WebRequest https://sourceforge.net/projects/gnuplot/files/gnuplot/5.2.0/gp520-win64-mingw.exe/download -OutFile gp.exe -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox
-  - ps: Invoke-WebRequest http://mirrors.ctan.org/graphics/gnuplot/5.2.4/gp524-win64-mingw_3.exe -OutFile gp.exe
+  - ps: Invoke-WebRequest https://github.com/lab-measurement/Lab-Measurement-Homepage/raw/master/gp524-win64-mingw_3.exe -OutFile gp.exe
   - start /wait gp.exe /VERYSILENT /SUPPRESSMSGBOXES
   - path "C:\Program Files\gnuplot\bin";%PATH% 
   - perl -V

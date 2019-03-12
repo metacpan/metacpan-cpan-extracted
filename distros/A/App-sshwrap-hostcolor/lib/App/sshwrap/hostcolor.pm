@@ -1,59 +1,112 @@
 package App::sshwrap::hostcolor;
 
-our $DATE = '2018-10-10'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-03-12'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
+use Fcntl ':DEFAULT';
+use File::Flock::Retry;
+
+use Exporter qw(import);
+our @EXPORT_OK = qw(get_history_entry add_history_entry read_history_file);
+
 my $histname = ".sshwrap-hostcolor.history";
 
 sub _history_path {
     require PERLANCAR::File::HomeDir;
 
-    my $homedir = PERLANCAR::File::HomeDir::get_my_home_dir() or do {
-        log_info "Couldn't get current user's homedir, bailing out";
-        return;
-    };
+    my $homedir = PERLANCAR::File::HomeDir::get_my_home_dir()
+        or die "Couldn't get current user's homedir";
     return "$homedir/$histname";
 }
 
 sub read_history_file {
-    my $histpath = _history_path or return {};
+    my $key = shift;
 
-    log_trace "Reading history file $histpath ...";
+    my $histpath = _history_path();
+
     open my $fh, "<", $histpath or do {
-        log_info "Couldn't read $histpath ($!), bailing out";
+        log_trace "Cannot open history file $histpath: $!";
         return {};
     };
-    my $hist = {};
+
+    my $history = {};
     while (<$fh>) {
         /\S/ or next;
         /^\s*#/ and next;
         chomp;
-        my @f = split /\s+/, $_;
-        $hist->{$f[0]} = $f[1];
+        my @f = split /\s+/, $_, 2;
+        $history->{$f[0]} = $f[1];
     }
-    $hist;
+    $history;
 }
 
-sub write_history_file {
-    my $hist = shift;
+sub get_history_entry {
+    my $key = shift;
 
-    my $histpath = _history_path or return;
+    my $histpath = _history_path();
 
-    log_trace "Writing history file $histpath ...";
-    open my $fh, ">", $histpath or do {
-        log_info "Couldn't write $histpath ($!), bailing out";
-        return;
-    };
+    log_trace "Opening history file $histpath ...";
+    my $lock = File::Flock::Retry->lock($histpath);
+    my $fh = $lock->handle;
+    seek $fh, 0, 0;
 
-    for (sort keys %$hist) {
-        print $fh "$_\t$hist->{$_}\n";
+    while (<$fh>) {
+        /\S/ or next;
+        /^\s*#/ and next;
+        chomp;
+        my @f = split /\s+/, $_, 2;
+        if ($f[0] eq $key) {
+            log_trace "Found entry for '%s' in history file: %s",
+                $key, $f[1];
+            return $f[1];
+        }
     }
-    close $fh;
+    log_trace "No entry found for '%s' in history file", $key;
+    undef;
+}
+
+sub add_history_entry {
+    my ($key, $val) = @_;
+
+    my $histpath = _history_path();
+
+    log_trace "Opening history file $histpath ...";
+    my $lock = File::Flock::Retry->lock($histpath);
+    my $fh = $lock->handle;
+    seek $fh, 0, 0;
+
+    my @lines;
+    my $found;
+    while (<$fh>) {
+        /\S/ or next;
+        /^\s*#/ and next;
+        chomp;
+        my @f = split /\s+/, $_, 2;
+        if ($f[0] eq $key) {
+            if ($found) {
+                log_trace "Duplicate entry '' in history file, removing";
+                next;
+            }
+            log_trace "Replacing entry for '%s' in history file: %s -> %s",
+                $key, $f[1], $val;
+            $f[1] = $val;
+            $found++;
+        }
+        push @lines, "$f[0]\t$f[1]\n";
+    }
+    unless ($found) {
+        log_trace "Adding entry for '%s' in history file: %s", $key, $val;
+        push @lines, "$key\t$val\n";
+    }
+
+    seek $fh, 0, 0;
+    print $fh @lines;
+    truncate $fh, tell($fh);
 }
 
 1;
@@ -71,7 +124,7 @@ App::sshwrap::hostcolor - SSH wrapper script to remember the terminal background
 
 =head1 VERSION
 
-This document describes version 0.006 of App::sshwrap::hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-10-10.
+This document describes version 0.008 of App::sshwrap::hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2019-03-12.
 
 =head1 SYNOPSIS
 
@@ -101,7 +154,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

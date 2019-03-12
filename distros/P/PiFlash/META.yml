@@ -33,11 +33,11 @@ requires:
   Try::Tiny: '0'
   YAML::XS: '0'
   autodie: '0'
-  perl: v5.18.0
+  perl: v5.14.0
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/ikluft/piflash
   repository: https://github.com/ikluft/piflash.git
-version: 0.2.1
+version: 0.2.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

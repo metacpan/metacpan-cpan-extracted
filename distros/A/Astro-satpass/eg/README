@@ -40,6 +40,10 @@ iss
     predict visibility for the next week from the given location, which
     is hard-coded as 80 Wellington Street Ottawa Ontario Canada.
 
+maidenhead
+    This Perl script converts posiitons between latitude/longitude and
+    Maidenhead locator grid positions.
+
 passes
     This Perl script is kind of a "poor man's satpass", which downloads
     TLE data for the requested satellites (Astro::SpaceTrack and a Space

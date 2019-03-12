@@ -116,6 +116,12 @@
 902f 1|Zeitschrift
 904aDE-101‡DE-101
 
+### 02020nM2.01200024      h
+001 47918-4
+542aISSN 0724-8679
+545axISSN 0724-8679 = C'tyISSN 0724-8679 = C't
+545a$xISSN 0724-8679 = C't$yISSN 0724-8679 = C't
+
 ### 00914nM2.01200024      h
 001 246797-5
 002a19991119
@@ -964,37 +970,3 @@
 531z820919-4            Darin aufgeg. --->‡Le Gaulois
 532z820942-x            1919,11.Nov.-1.Dez. dafür Streikersatzbl. --->‡La presse de Paris
 700 |070‡ZDB
-
-### 00587nM2.01200024      h
-001 1142708-5
-002a19991121
-003 20080226134105
-004 20110211
-025a016714660
-025z1142708-5
-026 ZDB1142708-5
-030 b|zucz|z|||37
-036aXA-FR
-037bfre
-050 a|ac||||||||||
-052 z||||||zw||||||
-057 uuuu|||uuuu
-070 9001
-070aDNB
-070b0001
-331 Le Figaro
-335 le journal non politique
-405 1.1826,15.Jan. - 9.1834,1.Dez. = Nr. 1-333; damit Ersch. eingest.
-410 Paris
-425b1826
-425c1834
-523 Periodizität: wöchentl.
-527z2412496-5           Digital. Ausg. --->‡Le figaro
-537 (üa/Z)
-610 Mikrofilm-Ausg.
-610aParis : ACRPP
-673b1019630-4           Paris
-700 |070‡ZDB
-700z|100
-700z|z101
-

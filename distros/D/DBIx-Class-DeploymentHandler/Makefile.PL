@@ -20,19 +20,21 @@ my %WriteMakefileArgs = (
     "Carp::Clan" => 0,
     "Context::Preserve" => "0.01",
     "DBIx::Class" => "0.08121",
+    "IO::All" => "0.55",
     "Log::Contextual" => "0.005005",
     "Module::Runtime" => "0.001",
-    "Moo" => "1.003",
-    "Moose" => 1,
-    "MooseX::Role::Parameterized" => "0.18",
-    "Path::Class" => "0.26",
+    "Moo" => 2,
+    "Package::Variant" => 0,
     "SQL::Translator" => "0.11005",
+    "Sub::Exporter" => 0,
     "Sub::Exporter::Progressive" => 0,
     "Text::Brew" => "0.02",
     "Try::Tiny" => 0,
+    "Type::Tiny" => "1.004004",
     "autodie" => 0,
     "namespace::autoclean" => 0,
-    "parent" => "0.225"
+    "parent" => "0.225",
+    "version" => "0.9924"
   },
   "TEST_REQUIRES" => {
     "DBD::SQLite" => "1.35",
@@ -42,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Requires" => "0.06",
     "aliased" => 0
   },
-  "VERSION" => "0.002223",
+  "VERSION" => "0.002227",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/deploy_methods/*.t t/version_handlers/*.t t/version_storages/*.t"
   }
@@ -56,23 +58,25 @@ my %FallbackPrereqs = (
   "DBD::SQLite" => "1.35",
   "DBIx::Class" => "0.08121",
   "File::Temp" => 0,
+  "IO::All" => "0.55",
   "Log::Contextual" => "0.005005",
   "Module::Runtime" => "0.001",
-  "Moo" => "1.003",
-  "Moose" => 1,
-  "MooseX::Role::Parameterized" => "0.18",
-  "Path::Class" => "0.26",
+  "Moo" => 2,
+  "Package::Variant" => 0,
   "SQL::Translator" => "0.11005",
+  "Sub::Exporter" => 0,
   "Sub::Exporter::Progressive" => 0,
   "Test::Fatal" => "0.006",
   "Test::More" => "0.88",
   "Test::Requires" => "0.06",
   "Text::Brew" => "0.02",
   "Try::Tiny" => 0,
+  "Type::Tiny" => "1.004004",
   "aliased" => 0,
   "autodie" => 0,
   "namespace::autoclean" => 0,
-  "parent" => "0.225"
+  "parent" => "0.225",
+  "version" => "0.9924"
 );
 
 

@@ -22,7 +22,7 @@ my %module_build_args = (
     "Ian Kluft <cpan-dev\@iankluft.com>"
   ],
   "dist_name" => "PiFlash",
-  "dist_version" => "0.2.1",
+  "dist_version" => "0.2.2",
   "license" => "apache",
   "module_name" => "PiFlash",
   "recursive_test_files" => 1,
@@ -40,7 +40,7 @@ my %module_build_args = (
     "Try::Tiny" => 0,
     "YAML::XS" => 0,
     "autodie" => 0,
-    "perl" => "v5.18.0",
+    "perl" => "v5.14.0",
     "strict" => 0,
     "warnings" => 0
   },

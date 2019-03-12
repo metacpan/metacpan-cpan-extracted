@@ -23,14 +23,15 @@
     }
     $documentpackage->sender($senders->[0]);
 
-    my $signers = $client->account->senders(search => $sender);
-    if (!@$senders) {
-        die "Unable to find sender $opts{senders}\n";
+    my $signers = $client->account->senders(search => $signer);
+    if (!@$signers) {
+        die "Unable to find sender $signer\n";
     }
-    elsif (@$senders > 1) {
-        die "Multiple senders found for $opts{senders}\n";
+    # at this moment only one signer is supported
+    elsif (@$signers > 1) {
+        die "Multiple senders found for $signer}\n";
     }
-    $documentpackage->add_signer('rolename' => $sender);
+    $documentpackage->add_signer('rolename' => signers->[0]);
 
     my @documents = qw(
         /path/to/documents/foo.bar
@@ -56,6 +57,9 @@ without notice.
 
 # ATTRIBUTES
 
+This module extends [WebService::ValidSign::API::Constructor](https://metacpan.org/pod/WebService::ValidSign::API::Constructor) and all of its
+attributes.
+
 - secret
 
     Your API key
@@ -67,3 +71,21 @@ without notice.
 - lwp
 
     An [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) object.
+
+- auth
+
+    An [WebService::ValidSign::API::Auth](https://metacpan.org/pod/WebService::ValidSign::API::Auth) object. Build for you.
+
+- package
+
+    An [WebService::ValidSign::API::DocumentPackage](https://metacpan.org/pod/WebService::ValidSign::API::DocumentPackage) object. Build for you.
+
+- account
+
+    An [WebService::ValidSign::API::Account](https://metacpan.org/pod/WebService::ValidSign::API::Account) object. Build for you.
+
+# ACKNOWLEDGEMENTS
+
+This module has been made possible by my employer [Mintlab
+B.V.](https://mintlab.nl) who uses this module in their open source product
+[Zaaksysteem](https://zaaksysteem.nl).

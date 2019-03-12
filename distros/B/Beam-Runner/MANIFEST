@@ -45,4 +45,5 @@ t/share/undocumented.yml
 t/single.t
 t/steps.t
 t/timeout/alarm.t
+t/util.t
 weaver.ini

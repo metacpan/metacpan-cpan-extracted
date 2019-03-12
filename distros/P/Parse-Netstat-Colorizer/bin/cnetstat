@@ -17,13 +17,19 @@ sub help{
 	print '
 -a   All connections, including LISTENing ones.
 -c <cidrs>  A comma seperated list of CIDRs to search for.
+--ci   Invert the CIDRs saerch.
 --drp   Don\t resolve port names.
 -h   Print help info.
 -i   Invert the sort.
 -l   Equivalent of "-a -s listen". Can be combined with -s.
--p <poorts>   A comma seperated list of ports to search for.
+-n   Don\'t resolve IPs to PTRs.
+--nc  Don\'t colorize the output.
+-p <ports>   A comma seperated list of ports to search for.
+--pi   Invert the port search.
 -P <protocols>   A comma seperated list of protocols to search for.
+--Pi   invert the protocol search.
 -s <states>   A comma seperated list of states to search for.
+--si   Incert the state search.
 -S <sort>   The sort method to use.
 -t   Don\'t fetch TCP connection information.
 -u   Don\'t fetch UDP connection information.
@@ -46,6 +52,16 @@ my $protocols_string;
 my $all=0;
 my $listening;
 my $invert=0;
+my $ptrs_string;
+my $rptrs_string;
+my $ports_invert;
+my $rptrs_invert;
+my $ptrs_invert;
+my $cidr_invert;
+my $states_invert;
+my $protocols_invert;
+my $no_color=0;
+my $no_use_ptr=0;
 
 #set the default sort via ENV if requested
 if ( defined( $ENV{CNETSTAT_sort} ) ){
@@ -67,10 +83,20 @@ GetOptions(
 		   'i' => \$invert,
 		   'drp' => \$dont_resolve_ports,
 		   'c=s' => \$cidr_string,
+		   'ci'=> \$cidr_invert,
 		   'S=s' => \$sort,
 		   'p=s' => \$ports_string,
+		   'pi' => \$ports_invert,
 		   's=s' => \$states_string,
+		   'si' => \$states_invert,
 		   'P=s' => \$protocols_string,
+		   'Pi' => \$protocols_invert,
+		   'ptr=s' => \$ptrs_string,
+		   'ptri' => \$ptrs_invert,
+		   'rptr=s' => \$rptrs_string,
+		   'rptri' => \$rptrs_invert,
+		   'nc' => \$no_color,
+		   'n' => \$no_use_ptr,
 		   );
 
 # print version or help if requested
@@ -87,8 +113,16 @@ if ( $version ){
 if ( defined( $ENV{CNETSTAT_invert} ) ){
 	$invert= $invert ^ $ENV{CNETSTAT_invert};
 }
+# XOR the -n value if needed
+if ( defined( $ENV{CNETSTAT_ptr} ) ){
+	$no_use_ptr = $no_use_ptr ^ $ENV{CNETSTAT_ptr};
+}
+# same for the no color
+if ( defined( $ENV{NO_COLOR} ) ){
+	$no_color = $no_color ^ 1;
+}
 
-#init what is required for setting sort, incase we need to error here
+# init what is required for setting sort, incase we need to error here
 my $pnc=Parse::Netstat::Colorizer->new;
 my $sorter=$pnc->get_sort;
 $sorter->set_sort($sort);
@@ -97,7 +131,7 @@ if ( $sorter->error ){
 	exit 255;
 }
 
-#process the CIDR list if requested
+# process the CIDR list if requested
 my $search=$pnc->get_search;
 if (defined ( $cidr_string ) ){
 	my @cidrs=split(/\,/, $cidr_string);
@@ -106,9 +140,11 @@ if (defined ( $cidr_string ) ){
 		warn( 'One of your CIDRs is invalid' );
 		exit 255;
 	}
+
+	$search->set_cidrs_invert( $cidr_invert );
 }
 
-#process the requested ports if needed
+# process the requested ports if needed
 if (defined( $ports_string ) ){
 	my @ports=split(/,/, $ports_string);
 	$search->set_ports( \@ports );
@@ -116,6 +152,24 @@ if (defined( $ports_string ) ){
 		warn( 'One of your ports is invalid' );
 		exit 255;
 	}
+
+	$search->set_ports_invert( $ports_invert );
+}
+
+# process the PTR string if needed
+if (defined( $ptrs_string ) ){
+	my @ptrs=split(/,/, $ptrs_string);
+	$search->set_ptrs( \@ptrs );
+
+	$search->set_ptrs_invert( $ptrs_invert );
+}
+
+# process the regexp PTR string if needed
+if (defined( $rptrs_string ) ){
+	my @rptrs=split(/,/, $rptrs_string);
+	$search->set_ptrs_r( \@rptrs );
+
+	$search->set_ptrs_r_invert( $rptrs_invert );
 }
 
 # process the requested protocols if needed
@@ -126,11 +180,23 @@ if ( defined( $protocols_string ) ){
 		warn( 'Failed to the requested protocols' );
 		exit 255;
 	}
+
+	$search->set_protocols_invert( $protocols_invert );
 }
 
 # invert if requested
-if ( defined($invert) ){
+if ( defined( $invert ) ){
 	$pnc->set_invert($invert);
+}
+
+# invert if requested
+if ( $no_use_ptr ){
+	$pnc->set_ptr_resolve(0);
+}
+
+# invert if requested
+if ( defined( $no_color ) ){
+	$pnc->set_no_color($no_color);
 }
 
 #process the requested ports if needed
@@ -150,6 +216,8 @@ if (
 if (defined( $states_string ) ){
 	my @states=split(/,/, $states_string);
 	$search->set_states( \@states );
+
+	$search->set_state_invert( $states_invert );
 }
 
 # invert the TCP/UDP values for telling Parse::Netstat what we want
@@ -185,6 +253,7 @@ cnetstat - a netstat like utility that supports color and searching
 =head1 SYNOPSIS
 
 cnetstat [B<-t>] [B<-u>] [B<--drp>] [B<-S> <sort>] [B<-s> <states>] [B<-c> <CIDRs>] [B<-p> <ports>] [B<-P> <protocols>] [<-a>] [B<-l>] [B<-i>]
+[B<--nc>] [<--ptr> <ptrs>] [B<--rptrs> <regexs>] [B<--Si>] [B<--si>] [B<--ci>] [B<--pi>] [B<--Pi>] [B<--ptri>] [B<--rptri>]
 
 =head1 FLAGS
 
@@ -195,6 +264,10 @@ Show all connections, including those in the LISTEN state.
 =head2 -c <CIDRs>
 
 A comma seperated list of CIDRs to search for.
+
+=head2 --ci
+
+Invert the CIDR search.
 
 =head2 --drp
 
@@ -209,17 +282,51 @@ Invert the sort.
 Show connections in the LISTEN state. This is the equivalent of '-a -s listen'. If combined
 with -s, it will display LISTENing sockets and whatever is specified via -s.
 
+=head2 --nc
+
+Don't colorize the output. If The NO_COLOR environment variable is set, then it will it will
+also not be colorized and this flag will be inverted.
+
 =head2 -p <ports>
 
 A comma seperated list of ports to search for.
+
+=head2 --pi
+
+Invert the port search.
+
+=head2 --ptr <ptrs>
+
+A comma seperated list of PTRs to search for.
+
+=head2 --ptri
+
+Invert the PTR search.
 
 =head2 -P <protocols>
 
 A comma seperated list of protocols to saerch for.
 
+=head2 --Pi
+
+Invert the protocol search.
+
+=head2 --rptr <regexs>
+
+A comma seperated list of regular expressions to use for
+matching PTRs.
+
+=head2 --rptri
+
+Invert the regex PTR search.
+
 =head2 -s <states>
 
 A comma seperated list of states to search for.
+
+=head2 --si
+
+Invert the state ssearch.
 
 =head2 -S <sort>
 
@@ -269,6 +376,18 @@ This is either 0 or 1. If defined it will be used for XORing the -i flag.
 
 Sets the default sort method. -S overrides this.
 
+=head2 NO_COLOR
+
+If this is set, The output will not be colorized. If this is set, the --nc
+flag is also inverted.
+
+=head2 RES_NAMESERVERS
+
+A space-separated list of nameservers to query used by L<Net::DNS::Resolver>.
+
+There are a few more possible ones, but this is the most useful one and that documentation
+really belongs to that module.
+
 =head1 EXAMPLES
 
     cnestat -s established,time_wait
@@ -290,5 +409,23 @@ Display all connections listening explicitly on 192.168.15.2.
     cnetstat -S host_f -i
 
 Sort the connections by the foreign host and invert the results.
+
+    cnetstat -c 10.0.0.0/24 --ci
+
+Show connections that are either not locally or remotely part of the
+10.0.0.0/24 subnet.
+
+    cnetstat --ptr foo.bar
+
+Find connections to/from IPs that have a PTR record of foo.bar.
+
+    cnetstat --rptr foo
+
+Find connections to/from IPs that a PTR record that matches the regexp
+/foo/.
+
+    cnetstat --ptr foo.bar --ptri
+
+Find connections to/from IPs that do not have a PTR record of foo.bar.
 
 =cut

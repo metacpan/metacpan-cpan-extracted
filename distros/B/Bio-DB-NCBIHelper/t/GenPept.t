@@ -4,14 +4,8 @@
 use strict;
 
 BEGIN {
-	use Bio::Root::Test;
-
-	test_begin(-tests => 21,
-			   -requires_modules => [qw(IO::String
-									    LWP::UserAgent
-										HTTP::Request::Common)],
-			   -requires_networking => 1);
-
+	use Test::Most tests => 21;
+	use Test::RequiresInternet;
 	use_ok('Bio::DB::GenPept');
 }
 
@@ -50,13 +44,13 @@ $seq = $seqio = undef;
 ok $gb = Bio::DB::GenPept->new('-delay' => 0);
 SKIP: {
     eval {$seq = $gb->get_Seq_by_id('195055');};
-    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests", 10 if $@;
+    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests: $@", 10 if $@;
     is $seq->length, $expected_lengths{$seq->display_id}, $seq->display_id;
     eval {$seq = $gb->get_Seq_by_acc('AAC06201');};
-    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests", 9 if $@;
+    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests $@", 9 if $@;
     is $seq->length, $expected_lengths{$seq->display_id}, $seq->display_id;
     eval {$seqio = $gb->get_Stream_by_id([qw(AAC06201 195055)]);};
-    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests", 8 if $@;
+    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests: $@", 8 if $@;
     my $done = 0;
     while( my $s = $seqio->next_seq ) {
         is $s->length, $expected_lengths{$s->display_id}, $s->display_id;
@@ -66,7 +60,7 @@ SKIP: {
     is $done, 2;
     # swissprot genpept parsing
     eval {$seq = $gb->get_Seq_by_acc('P31383');};
-    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests", 5 if $@;
+    skip "Couldn't connect to Genbank with Bio::DB::GenPept.pm. Skipping those tests: $@", 5 if $@;
     is $seq->length, $expected_lengths{$seq->display_id}, $seq->display_id;
 
     # test dbsource stuff

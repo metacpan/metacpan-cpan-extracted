@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Step::Voltage;
-$Lab::Moose::Sweep::Step::Voltage::VERSION = '3.671';
+$Lab::Moose::Sweep::Step::Voltage::VERSION = '3.680';
 #ABSTRACT: Voltage sweep.
 
 
@@ -40,7 +40,7 @@ Lab::Moose::Sweep::Step::Voltage - Voltage sweep.
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ Default filename extension: C<'Voltage='>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt

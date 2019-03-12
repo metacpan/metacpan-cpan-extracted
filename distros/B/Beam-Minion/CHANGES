@@ -1,5 +1,11 @@
 Changelog for Beam-Minion
 
+0.016     2019-03-07 21:05:08-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed a problem that caused commands to not work at all
+
 0.015     2018-11-03 14:16:37-05:00 America/Chicago
 
     [Fixed]

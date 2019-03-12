@@ -26,7 +26,8 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
-                                      'Test::Vars' => '0.014'
+                                      'Test::Vars' => '0.014',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -39,15 +40,13 @@ do { my $x = {
                                       'Moo' => '1.002000',
                                       'Scalar::Util' => '0',
                                       'Sub::Quote' => '0',
-                                      'Type::Library' => '0',
                                       'Type::Tiny' => '1.002001',
-                                      'Type::Utils' => '0',
+                                      'Types::Standard' => '1.000001',
                                       'URI' => '0',
                                       'namespace::clean' => '0',
                                       'perl' => '5.006',
                                       'strict' => '0',
-                                      'version' => '0',
-                                      'warnings' => '0'
+                                      'version' => '0'
                                     }
                     },
        'test' => {
@@ -59,7 +58,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0',
-                                   'perl' => '5.006'
+                                   'perl' => '5.006',
+                                   'warnings' => '0'
                                  }
                  }
      };

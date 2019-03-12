@@ -5,6 +5,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "perliol.h"
 
 #if !defined mg_findext
 # define mg_findext(sv,type,vtbl) mg_find (sv, type)
@@ -19,16 +20,6 @@
 #include <limits.h>
 #include <fcntl.h>
 #include <sched.h>
-
-#if HAVE_SYS_MKDEV_H
-# include <sys/mkdev.h>
-#elif HAVE_SYS_SYSMACROS_H
-# include <sys/sysmacros.h>
-#endif
-
-#if _POSIX_MEMLOCK || _POSIX_MEMLOCK_RANGE || _POSIX_MAPPED_FILES
-# include <sys/mman.h>
-#endif
 
 /* the incompetent fool that created musl keeps __linux__, refuses
  * to implement any linux standard apis, and also has no way to test
@@ -86,6 +77,7 @@
   #undef dup2
   #undef abort
   #undef pipe
+  #undef utime
 
   #define EIO_STRUCT_STAT struct _stati64
   #define EIO_STRUCT_STATI64
@@ -117,6 +109,16 @@
 
 #include "config.h"
 
+#if HAVE_SYS_MKDEV_H
+# include <sys/mkdev.h>
+#elif HAVE_SYS_SYSMACROS_H
+# include <sys/sysmacros.h>
+#endif
+
+#if _POSIX_MEMLOCK || _POSIX_MEMLOCK_RANGE || _POSIX_MAPPED_FILES
+# include <sys/mman.h>
+#endif
+
 #if HAVE_ST_XTIMENSEC
 # define ATIMENSEC PL_statcache.st_atimensec
 # define MTIMENSEC PL_statcache.st_mtimensec
@@ -129,6 +131,23 @@
 # define ATIMENSEC 0
 # define MTIMENSEC 0
 # define CTIMENSEC 0
+#endif
+
+#if HAVE_ST_BIRTHTIMENSEC
+# define BTIMESEC  PL_statcache.st_birthtime
+# define BTIMENSEC PL_statcache.st_birthtimensec
+#elif HAVE_ST_BIRTHTIMESPEC
+# define BTIMESEC  PL_statcache.st_birthtim.tv_sec
+# define BTIMENSEC PL_statcache.st_birthtim.tv_nsec
+#else
+# define BTIMESEC  0
+# define BTIMENSEC 0
+#endif
+
+#if HAVE_ST_GEN
+# define ST_GEN    PL_statcache.st_gen
+#else
+# define ST_GEN    0
 #endif
 
 #include "schmorp.h"
@@ -405,6 +424,8 @@ done:
 }
 
 /*****************************************************************************/
+
+static int close_fd; /* dummy fd to close fds via dup2 */
 
 enum {
   FLAG_SV2_RO_OFF = 0x40, /* data was set readonly */
@@ -797,6 +818,12 @@ req_invoke (eio_req *req)
             else
               PUSHs (sv_result);
             break;
+
+#if 0
+          case EIO_CLOSE:
+            PerlIOUnix_refcnt_dec (req->int1);
+            break;
+#endif
 
           case EIO_DUP2: /* EIO_DUP2 actually means aio_close(), so fudge result value */
             if (req->result > 0)
@@ -1255,6 +1282,7 @@ BOOT:
 
     const_eio (MCL_FUTURE)
     const_eio (MCL_CURRENT)
+    const_eio (MCL_ONFAULT)
 
     const_eio (MS_ASYNC)
     const_eio (MS_INVALIDATE)
@@ -1302,6 +1330,24 @@ BOOT:
     newCONSTSUB (aio_stash, (char *)civ[-1].name, newSViv (civ[-1].iv));
 
   newCONSTSUB (aio_stash, "PAGESIZE", newSViv (PAGESIZE));
+
+  /* allocate dummy pipe fd for aio_close */
+  {
+    int pipefd [2];
+
+    if (
+#ifdef _WIN32
+      _pipe (pipefd, 1, _O_BINARY) < 0
+#else
+      pipe (pipefd) < 0
+      || fcntl (pipefd [0], F_SETFD, FD_CLOEXEC) < 0
+#endif
+      || close (pipefd [1]) < 0
+    )
+      croak ("IO::AIO: unable to create dummy pipe for aio_close");
+
+    close_fd = pipefd [0];
+  }
 
   reinit ();
 }
@@ -1434,32 +1480,37 @@ void
 aio_close (SV *fh, SV *callback = &PL_sv_undef)
 	PPCODE:
 {
-        static int close_fd = -1; /* dummy fd to close fds via dup2 */
 	int fd = s_fileno_croak (fh, 0);
         dREQ;
+#if 0
+        /* partially duplicate logic in s_fileno */
+	SvGETMAGIC (fh);
 
-        if (expect_false (close_fd < 0))
+	if (SvROK (fh))
+	  {
+	    fh = SvRV (fh);
+	    SvGETMAGIC (fh);
+	  }
+
+        if (SvTYPE (fh) == SVt_PVGV)
           {
-            int pipefd [2];
+            /* perl filehandle */
+            PerlIOUnix_refcnt_inc (fd);
+            do_close ((GV *)fh, 1);
 
-            if (
-#ifdef _WIN32
-              _pipe (pipefd, 1, _O_BINARY) < 0
-#else
-              pipe (pipefd) < 0
-              || fcntl (pipefd [0], F_SETFD, FD_CLOEXEC) < 0
-#endif
-              || close (pipefd [1]) < 0
-            )
-              abort (); /*D*/
-
-            close_fd = pipefd [0];
+            req->type = EIO_CLOSE;
+            req->int1 = fd;
+            /*req->sv2  = newSVsv (fh);*/ /* since we stole the fd, no need to keep the fh */
           }
-
-        req->type = EIO_DUP2;
-        req->int1 = close_fd;
-        req->sv2  = newSVsv (fh);
-        req->int2 = fd;
+        else
+#endif
+          {
+            /* fd number */
+            req->type = EIO_DUP2;
+            req->int1 = close_fd;
+            req->sv2  = newSVsv (fh);
+            req->int2 = fd;
+          }
 
         REQ_SEND;
 }
@@ -1643,28 +1694,36 @@ aio_stat (SV8 *fh_or_path, SV *callback = &PL_sv_undef)
 void
 st_xtime ()
 	ALIAS:
-           st_atime = 1
-           st_mtime = 2
-           st_ctime = 4
-           st_xtime = 7
+           st_atime = 0x01
+           st_mtime = 0x02
+           st_ctime = 0x04
+           st_btime = 0x08
+           st_xtime = 0x0f
 	PPCODE:
-        EXTEND (SP, 3);
-        if (ix & 1) PUSHs (newSVnv (PL_statcache.st_atime + 1e-9 * ATIMENSEC));
-        if (ix & 2) PUSHs (newSVnv (PL_statcache.st_mtime + 1e-9 * MTIMENSEC));
-        if (ix & 4) PUSHs (newSVnv (PL_statcache.st_ctime + 1e-9 * CTIMENSEC));
+        EXTEND (SP, 4);
+        if (ix & 0x01) PUSHs (newSVnv (PL_statcache.st_atime + 1e-9 * ATIMENSEC));
+        if (ix & 0x02) PUSHs (newSVnv (PL_statcache.st_mtime + 1e-9 * MTIMENSEC));
+        if (ix & 0x04) PUSHs (newSVnv (PL_statcache.st_ctime + 1e-9 * CTIMENSEC));
+        if (ix & 0x08) PUSHs (newSVnv (BTIMESEC              + 1e-9 * BTIMENSEC));
 
 void
 st_xtimensec ()
 	ALIAS:
-           st_atimensec = 1
-           st_mtimensec = 2
-           st_ctimensec = 4
-           st_xtimensec = 7
+           st_atimensec = 0x01
+           st_mtimensec = 0x02
+           st_ctimensec = 0x04
+           st_btimensec = 0x08
+           st_xtimensec = 0x0f
+           st_btimesec  = 0x10
+           st_gen       = 0x20
 	PPCODE:
-        EXTEND (SP, 3);
-        if (ix & 1) PUSHs (newSViv (ATIMENSEC));
-        if (ix & 2) PUSHs (newSViv (MTIMENSEC));
-        if (ix & 4) PUSHs (newSViv (CTIMENSEC));
+        EXTEND (SP, 4);
+        if (ix & 0x01) PUSHs (newSViv (ATIMENSEC));
+        if (ix & 0x02) PUSHs (newSViv (MTIMENSEC));
+        if (ix & 0x04) PUSHs (newSViv (CTIMENSEC));
+        if (ix & 0x08) PUSHs (newSViv (BTIMENSEC));
+        if (ix & 0x10) PUSHs (newSVuv (BTIMESEC));
+        if (ix & 0x20) PUSHs (newSVuv (ST_GEN));
 
 UV
 major (UV dev)
@@ -2160,7 +2219,7 @@ mremap (SV *scalar, STRLEN new_length, int flags = MREMAP_MAYMOVE, IV new_addres
         RETVAL
 
 int
-madvise (SV *scalar, STRLEN offset = 0, SV *length = &PL_sv_undef, IV advice_or_prot)
+madvise (SV *scalar, IV offset = 0, SV *length = &PL_sv_undef, IV advice_or_prot)
 	ALIAS:
         mprotect = 1
         CODE:
@@ -2191,7 +2250,7 @@ madvise (SV *scalar, STRLEN offset = 0, SV *length = &PL_sv_undef, IV advice_or_
         RETVAL
 
 int
-munlock (SV *scalar, STRLEN offset = 0, SV *length = &PL_sv_undef)
+munlock (SV *scalar, IV offset = 0, SV *length = &PL_sv_undef)
         CODE:
 {
 	STRLEN svlen;
@@ -2216,6 +2275,14 @@ munlock (SV *scalar, STRLEN offset = 0, SV *length = &PL_sv_undef)
 #endif
 }
         OUTPUT:
+        RETVAL
+
+int
+mlockall (int flags)
+	PROTOTYPE: $;
+        CODE:
+        RETVAL = eio_mlockall_sync (flags);
+	OUTPUT:
         RETVAL
 
 int

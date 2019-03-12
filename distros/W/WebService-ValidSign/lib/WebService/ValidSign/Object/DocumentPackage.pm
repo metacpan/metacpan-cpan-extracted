@@ -1,6 +1,6 @@
 ## Please see file perltidy.ERR
 package WebService::ValidSign::Object::DocumentPackage;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 
 extends 'WebService::ValidSign::Object';
@@ -121,13 +121,6 @@ sub count_roles {
     return scalar keys %{$self->roles};
 }
 
-#around TO_JSON => sub {
-#    my $orig = shift;
-#    my $self = shift;
-#
-#    return $orig->($self, @_);
-#};
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -142,7 +135,7 @@ WebService::ValidSign::Object::DocumentPackage - A ValidSign DocumentPackage obj
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

@@ -80,10 +80,10 @@ my $documentpackage = WebService::ValidSign::Object::DocumentPackage->new(
 if ($sender) {
     my $senders = $client->account->senders(search => $sender);
     if (!@$senders) {
-        die "Unable to find sender $opts{senders}\n";
+        die "Unable to find sender $senders\n";
     }
     elsif (@$senders > 1) {
-        die "Multiple senders found for $opts{senders}\n";
+        die "Multiple senders found for $senders\n";
     }
     $documentpackage->sender($senders->[0]);
 }
@@ -93,14 +93,14 @@ if ($signers) {
 
     my $i = 0;
     foreach (@{$s}) {
-        my $senders = $client->account->senders(search => $sender);
+        my $senders = $client->account->senders(search => $s);
         if (!@$senders) {
-            die "Unable to find sender $opts{senders}\n";
+            die "Unable to find sender $s\n";
         }
         elsif (@$senders > 1) {
-            die "Multiple senders found for $opts{senders}\n";
+            die "Multiple senders found for $s\n";
         }
-        $documentpackage->add_signer(sprintf("%s-%03d", "signer", $i) => $sender);
+        $documentpackage->add_signer(sprintf("%s-%03d", "signer", $i) => $senders->[0]);
         $i++;
     }
 }
@@ -119,7 +119,7 @@ if ($files) {
 
 
 my $id = $client->package->create($documentpackage);
-print "Created package with ID $id", $/;
+printf "Created package with ID %s%s", $documentpackage->id , $/;
 print Dumper $client->package->details($documentpackage);
 
 __END__
@@ -134,7 +134,7 @@ vs-poc.pl - Create a ValidSign document package from the command line
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

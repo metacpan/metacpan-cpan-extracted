@@ -36,6 +36,9 @@ WriteMakefile(
                 url  => 'https://github.com/FGasper/p5-Net-ACME2.git',
                 web  => 'https://github.com/FGasper/p5-Net-ACME2',
             },
+            bugtracker => {
+                web => 'https://github.com/FGasper/p5-Net-ACME2/issues',
+            },
         },
     },
     TEST_REQUIRES => {

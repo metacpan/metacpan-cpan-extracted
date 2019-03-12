@@ -2,7 +2,7 @@ package Perl::Critic::Policy::Moo::ProhibitMakeImmutable;
 use 5.008001;
 use strict;
 use warnings;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification :ppi };
@@ -92,7 +92,7 @@ __END__
 =head1 NAME
 
 Perl::Critic::Policy::Moo::ProhibitMakeImmutable - Makes sure that Moo classes
-do not contain calls to make_immutable.
+do not contain calls to make_immutable. (DEPRECATED)
 
 =head1 DESCRIPTION
 
@@ -104,6 +104,13 @@ leave in:
 This policy complains if this exists in a Moo class as it triggers Moose to be
 loaded and metaclass created, which defeats some of the benefits you get using
 Moo instead of Moose.
+
+=head1 DEPRECATED
+
+This module has lost its usefulness as L<Moo>'s behavior is now clearly
+documented as NOT loading Moose when C<make_immutable> is called.
+
+Read more about the L<Moo/meta> method for details of the current behavior.
 
 =head1 AUTHORS
 

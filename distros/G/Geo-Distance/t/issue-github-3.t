@@ -1,20 +1,17 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strict;
 use warnings;
+use Test2::V0;
 
-# https://github.com/bluefeet/Geo-Distance/issues/3
-# Square root of negative value
-
-use Test::More;
-use Test::Fatal;
-
-BEGIN { use_ok('Geo::Distance') }
+use Geo::Distance;
 
 my $geo = Geo::Distance->new();
 
 is(
-    exception { $geo->distance("mile", 175, 12, -5, -12) },
+    dies { $geo->distance('mile', 175, 12, -5, -12) },
     undef,
+    'did not die',
 );
 
 done_testing;

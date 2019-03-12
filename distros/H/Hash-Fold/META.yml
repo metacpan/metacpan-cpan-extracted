@@ -3,11 +3,13 @@ abstract: 'flatten and unflatten nested hashrefs'
 author:
   - 'chocolateboy <chocolate@cpan.org>'
 build_requires:
+  Test::Fatal: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  version: '0.77'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,11 +20,13 @@ no_index:
     - t
     - inc
 requires:
-  Moose: '0'
+  Moo: '0'
   Sub::Exporter: '0'
-  perl: '5.008003'
+  Throwable::Error: '0'
+  Types::Standard: '0'
+  perl: '5.008000'
 resources:
   bugtracker: https://github.com/chocolateboy/Hash-Fold/issues
   repository: https://github.com/chocolateboy/Hash-Fold
-version: v0.1.2
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

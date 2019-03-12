@@ -1,6 +1,6 @@
 package Lab::Instrument::DummySource;
 #ABSTRACT: Dummy voltage source
-$Lab::Instrument::DummySource::VERSION = '3.671';
+$Lab::Instrument::DummySource::VERSION = '3.680';
 use warnings;
 use strict;
 use 5.010;
@@ -137,7 +137,7 @@ Lab::Instrument::DummySource - Dummy voltage source
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 DESCRIPTION
 
@@ -156,7 +156,7 @@ Only developers will ever make use of this class.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Alois Dirnaichner

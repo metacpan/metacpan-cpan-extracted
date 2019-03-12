@@ -35,6 +35,7 @@
             "JSON" : "2.97001",
             "Moo" : "2.003004",
             "MooX::Role::Parameterized" : "0.082",
+            "NetAddr::IP" : "4.079",
             "Role::REST::Client" : "0.23",
             "Role::REST::Client::Auth::Basic" : "0.05",
             "Sub::Retry" : "0.06",
@@ -57,66 +58,50 @@
          "web" : "https://github.com/abraxxa/Net-Cisco-FMC-v1"
       }
    },
-   "version" : "0.002001",
+   "version" : "0.003001",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.028000"
+         "version" : "5.028001"
       },
       "plugins" : [
          {
-            "class" : "Dist::Zilla::Plugin::GatherDir",
-            "config" : {
-               "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
-                  "exclude_match" : [],
-                  "follow_symlinks" : 0,
-                  "include_dotfiles" : 0,
-                  "prefix" : "",
-                  "prune_directory" : [],
-                  "root" : "."
-               }
-            },
-            "name" : "@Basic/GatherDir",
-            "version" : "6.012"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::PruneCruft",
-            "name" : "@Basic/PruneCruft",
+            "name" : "@Filter/PruneCruft",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
-            "name" : "@Basic/ManifestSkip",
+            "name" : "@Filter/ManifestSkip",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
-            "name" : "@Basic/MetaYAML",
+            "name" : "@Filter/MetaYAML",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
-            "name" : "@Basic/License",
+            "name" : "@Filter/License",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
-            "name" : "@Basic/Readme",
+            "name" : "@Filter/Readme",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
-            "name" : "@Basic/ExtraTests",
+            "name" : "@Filter/ExtraTests",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@Basic/ExecDir",
+            "name" : "@Filter/ExecDir",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
-            "name" : "@Basic/ShareDir",
+            "name" : "@Filter/ShareDir",
             "version" : "6.012"
          },
          {
@@ -126,27 +111,27 @@
                   "default_jobs" : 1
                }
             },
-            "name" : "@Basic/MakeMaker",
+            "name" : "@Filter/MakeMaker",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
-            "name" : "@Basic/Manifest",
+            "name" : "@Filter/Manifest",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
-            "name" : "@Basic/TestRelease",
+            "name" : "@Filter/TestRelease",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
-            "name" : "@Basic/ConfirmRelease",
+            "name" : "@Filter/ConfirmRelease",
             "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
-            "name" : "@Basic/UploadToCPAN",
+            "name" : "@Filter/UploadToCPAN",
             "version" : "6.012"
          },
          {
@@ -270,6 +255,39 @@
             "version" : "6.012"
          },
          {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "config" : {
+               "Dist::Zilla::Role::FileWatcher" : {
+                  "version" : "0.006"
+               }
+            },
+            "name" : "ReadmeAnyFromPod",
+            "version" : "0.163250"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "name" : "CopyFilesFromBuild",
+            "version" : "0.170880"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     "LICENSE"
+                  ],
+                  "exclude_match" : [],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "GatherDir",
+            "version" : "6.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "PodSyntaxTests",
             "version" : "6.012"
@@ -318,6 +336,7 @@
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
                      "Changes",
+                     "README.md",
                      "dist.ini"
                   ],
                   "allow_dirty_match" : [],
@@ -341,6 +360,7 @@
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
                      "Changes",
+                     "README.md",
                      "dist.ini"
                   ],
                   "allow_dirty_match" : [],
@@ -364,7 +384,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002001",
+                  "tag" : "0.003001",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -477,7 +497,7 @@
          "version" : "6.012"
       }
    },
-   "x_generated_by_perl" : "v5.28.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

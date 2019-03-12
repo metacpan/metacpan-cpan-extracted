@@ -1,23 +1,34 @@
 Revision history for Hash-Fold
 
-0.1.2 Fri 4 Dec 04:47:18 2015
+1.0.0 2019-03-11
+
+    - bump minimum perl version from v5.6 to v5.8
+    - switch from Moose to Moo (#2) (djerius)
+    - improve error reporting (#3) (djerius)
+
+0.1.2 2015-12-04
+
     - when deserializing, prefer the longest delimiter in the
       case where the array and hash delimiters share a common
-      prefix (thanks, tsibley)
+      prefix (thanks, Thomas Sibley)
 
-0.1.1 Tue May 13 06:34:27 2014
+0.1.1 2014-05-13
+
     - doc cleanup: separate types/signatures from POD headers
 
-0.1.0 Wed May 7 12:40:38 2014
+0.1.0 2014-05-07
+
     - fix bug that prevented empty arrayrefs and hashrefs being serialized
     - add merge method/function
     - rename on_seen -> on_cycle
     - document options/attributes and OO/functional usage
     - rm redundant (for now) t/unfold.t
 
-0.0.2 Wed Apr 16 10:21:05 2014
+0.0.2 2014-04-16
+
     - fix test typo that was causing OOM errors
     - doc fixlets
 
-0.0.1 Tue Apr 15 15:15:53 2014
+0.0.1 2014-04-15
+
     - initial release

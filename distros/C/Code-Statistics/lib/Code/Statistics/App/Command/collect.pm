@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package Code::Statistics::App::Command::collect;
-{
-  $Code::Statistics::App::Command::collect::VERSION = '1.112980';
-}
-
+$Code::Statistics::App::Command::collect::VERSION = '1.190680';
 # ABSTRACT: the shell command handler for stat collection
 
 use Code::Statistics::App -command;
@@ -34,7 +31,10 @@ sub execute {
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ Code::Statistics::App::Command::collect - the shell command handler for stat col
 
 =head1 VERSION
 
-version 1.112980
+version 1.190680
 
 =head1 AUTHOR
 
@@ -50,11 +50,13 @@ Christian Walde <mithaldu@yahoo.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2010 by Christian Walde.
 
-This is free software, licensed under:
+Christian Walde has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
 
-  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
 
 =cut
-

@@ -17,7 +17,7 @@ do { my $x = {
                                       'Term::ANSIColor' => '0',
                                       'Types::Path::Tiny' => '0',
                                       'Types::Standard' => '0',
-                                      'perl' => '5.008'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {

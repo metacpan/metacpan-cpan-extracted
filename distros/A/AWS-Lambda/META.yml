@@ -1,0 +1,55 @@
+---
+abstract: "It's Perl support for AWS Lambda Custom Runtime."
+author:
+  - '@gmail.com>'
+build_requires:
+  File::Slurp: '9999.25'
+  Test::Deep: '1.128'
+  Test::More: '0.98'
+  Test::SharedFork: '0'
+  Test::TCP: '2.19'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: AWS-Lambda
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  AWS::Lambda:
+    file: lib/AWS/Lambda.pm
+    version: v0.0.1
+  AWS::Lambda::Bootstrap:
+    file: lib/AWS/Lambda/Bootstrap.pm
+  AWS::Lambda::Context:
+    file: lib/AWS/Lambda/Context.pm
+  AWS::Lambda::PSGI:
+    file: lib/AWS/Lambda/PSGI.pm
+requires:
+  HTTP::Tiny: '0.076'
+  JSON::Types: '0.05'
+  JSON::XS: '4.0'
+  Plack: '1.0047'
+  Try::Tiny: '0.30'
+  perl: '5.026000'
+resources:
+  bugtracker: https://github.com/shogo82148/p5-aws-lambda/issues
+  homepage: https://github.com/shogo82148/p5-aws-lambda
+  repository: git://github.com/shogo82148/p5-aws-lambda.git
+version: 0.0.1
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

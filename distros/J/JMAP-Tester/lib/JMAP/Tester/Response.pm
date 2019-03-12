@@ -2,7 +2,7 @@ use v5.10.0;
 
 package JMAP::Tester::Response;
 # ABSTRACT: what you get in reply to a succesful JMAP request
-$JMAP::Tester::Response::VERSION = '0.025';
+$JMAP::Tester::Response::VERSION = '0.026';
 use Moo;
 with 'JMAP::Tester::Role::SentenceCollection', 'JMAP::Tester::Role::HTTPResult';
 
@@ -58,7 +58,7 @@ JMAP::Tester::Response - what you get in reply to a succesful JMAP request
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 OVERVIEW
 

@@ -1,3 +1,23 @@
+0.104		2019-03-09	T. R. Wyant
+    Correct error message definition in sgp4r().
+
+    Have the null model return its invocant.
+
+    Nutation and obquity subroutines now warn on first use. These (and
+    equation_of_time(), which uses them) are deprecated in favor of the
+    relevant methods. The motivation was to allow higher-accuracy
+    implementations where appropriate (e.g.
+    Astro::Coord::ECI::VSOP87D::*).
+
+    Try to kill undef errs in 'brightest' calc.
+
+    Correct version in Southern-hemisphere and ::Utils deprecation
+    notices.
+
+    Add eg/maidenhead
+
+    Make ::TLE::Iridium optional in script/satpass
+
 0.103		2018-11-03	T. R. Wyant
     RT 127488: Load default Sun class before use
     

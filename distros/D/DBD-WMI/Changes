@@ -1,41 +1,45 @@
-v0.10 20180512
-+ Fix list of prerequisites, spotted and corrected by by MANWAR
+0.11 2019-03-10
+    * Fix contents of META.*.
+      This addresses Github issue #3 , reported by Tomohiro Hosaka.
 
-v0.09 20180511
-+ Allow supplying a username and password
-  Submitted by David Flink (unixrulez@hotmail.com)
+0.10 2018-05-12
+    * Fix list of prerequisites, spotted and corrected by by MANWAR
 
-v0.08 20170621
-. Fix typo in SYNOPSIS section (reported 2009 ...)
-  This addresses RT #46254, reported by gkmoberg1@yahoo.com
-  Fix by reneeb
+0.09 2018-05-11
+    * Allow supplying a username and password.
+      Submitted by David Flink (unixrulez@hotmail.com)
 
-v0.07 20150113
-- Added eg/usb-drive.pl to show how to handle added/removed drive letters
-- Added hint in documentation
-* Need to merge with actual 0.06
-- Added license
+0.08 2017-06-21
+    * Fix typo in SYNOPSIS section (reported 2009 ...). 
+      This addresses RT #46254, reported by gkmoberg1@yahoo.com.
+      Fix by reneeb.
 
-v0.06 20090116
-- Fixed Makefile.PL to list File::Accessor prerequisite, no code changes
+0.07 2015-01-13
+    * Added eg/usb-drive.pl to show how to handle added/removed drive letters
+    * Added hint in documentation
+    * Need to merge with actual 0.06
+    * Added license
 
-v0.05 20070819
-- Fixed 99-versions.t, no code changes
+0.06 2009-01-16
+    * Fixed Makefile.PL to list File::Accessor prerequisite, no code changes
 
-v0.04 20061026
-- Fixed bug in ASSOCIATORS OF query (and other queries) where a single '*' column
-  wasn't regarded as valid result
-- Some tests
+0.05 2007-08-19
+    * Fixed 99-versions.t, no code changes
 
-v0.03 20061025
-- Fixed leaked $dbh
-- Added column remapping
-- First test added
+0.04 2006-10-26
+    * Fixed bug in ASSOCIATORS OF query (and other queries) where a single '*' column
+      wasn't regarded as valid result
+    * Some tests
 
-v0.02 20060801
-- added data_sources
-- added meta-tests
-- added $VERSION
+0.03 2006-10-25
+    * Fixed leaked $dbh
+    * Added column remapping
+    * First test added
 
-v0.01 20060801
-- escaping from the mists
+0.02 2006-08-01
+    * added data_sources
+    * added meta-tests
+    * added $VERSION
+
+0.01 2006-08-01
+    * escaping from the mists

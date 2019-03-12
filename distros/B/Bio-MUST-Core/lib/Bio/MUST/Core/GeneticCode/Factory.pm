@@ -1,6 +1,6 @@
 package Bio::MUST::Core::GeneticCode::Factory;
 # ABSTRACT: Genetic code factory based on NCBI gc.prt file
-$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.190500';
+$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.190690';
 use Moose;
 use namespace::autoclean;
 
@@ -532,7 +532,7 @@ Bio::MUST::Core::GeneticCode::Factory - Genetic code factory based on NCBI gc.pr
 
 =head1 VERSION
 
-version 0.190500
+version 0.190690
 
 =head1 SYNOPSIS
 

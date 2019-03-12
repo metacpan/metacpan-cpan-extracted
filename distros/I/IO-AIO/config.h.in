@@ -69,6 +69,15 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
+/* birthtime nanosecond access by st_birthtimensec */
+#undef HAVE_ST_BIRTHTIMENSEC
+
+/* birthtime nanosecond access by st_birthtimespec */
+#undef HAVE_ST_BIRTHTIMESPEC
+
+/* stat st_gen member */
+#undef HAVE_ST_GEN
+
 /* stat nanosecond access by st_xtimensec */
 #undef HAVE_ST_XTIMENSEC
 

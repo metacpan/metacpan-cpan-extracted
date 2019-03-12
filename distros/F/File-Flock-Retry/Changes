@@ -1,3 +1,23 @@
+0.631   2019-03-12 (PERLANCAR)
+
+	- Add method: handle().
+
+	- Add lock() option: mode.
+
+	- [doc] Mention sysopen() with O_CREAT|O_EXCL as an alternative to
+	  flock().
+
+
+0.630   2019-03-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Expand on why File::Flock is too heavyweight.
+
+	- [doc] Note about lock file removal in unlock() documentation,
+	  some POD formatting to make methods more linkable.
+
+
 0.62    2017-07-01 (PERLANCAR)
 
         - [doc] Format link with L<>.

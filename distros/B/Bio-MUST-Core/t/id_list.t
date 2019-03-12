@@ -13,6 +13,26 @@ use Bio::MUST::Core::Utils qw(cmp_store);
 
 my $class = 'Bio::MUST::Core::IdList';
 
+{
+    my $list = $class->new( ids => [ map { "seq$_" } 1..3 ] );
+    cmp_ok $list->count_indices, '==', 3,
+        'got expected number of indices: 3';
+
+    $list->add_id( map { "seq$_" } 4..6 );
+    cmp_ok $list->count_indices, '==', 6,
+        'got expected number of indices after array expansion: 6';
+}
+
+{
+    my $list = $class->new();
+
+    $list->add_id('seq1');
+    $list->add_id('seq2');
+    $list->add_id('seq3');
+    cmp_ok $list->count_indices, '==', 3,
+        'got expected number of indices after stepwise array expansion: 3';
+}
+
 my @exp_ids = (
     'Acholeplasma laidlawii_441768@162448101',
     'Curvibacter putative_667019@260221396',

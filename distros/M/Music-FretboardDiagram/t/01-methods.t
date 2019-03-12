@@ -37,7 +37,8 @@ is $obj->outfile, 'chord-diagram', 'outfile';
 is $obj->type, 'png', 'type';
 like $obj->font, qr/\.ttf$/, 'font';
 is $obj->horiz, 0, 'horiz';
-is $obj->grid, 'blue', 'grid';
+is $obj->string_color, 'blue', 'string_color';
+is $obj->fret_color, 'darkgray', 'fret_color';
 is_deeply $obj->tuning, [qw/E B G D A E/], 'tuning';
 is keys %{ $obj->fretboard }, 6, 'fretboard';
 is scalar @{ $obj->fretboard->{1} }, 12, 'fretboard';
@@ -47,26 +48,26 @@ is $obj->verbose, 0, 'verbose';
 can_ok $obj, 'draw';
 
 my $note = 0;
-my $x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
+my $x = $obj->_note_at(1, $note);
 is $x, 'E', 'open E';
 $note = 1;
-$x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
+$x = $obj->_note_at(1, $note);
 is $x, 'F', '1st fret F';
 
 $note = 0;
 $obj->position(13);
-$x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
+$x = $obj->_note_at(1, $note);
 is $x, 'E', '12th fret E';
 $note = 1;
-$x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
+$x = $obj->_note_at(1, $note);
 is $x, 'F', '13th fret F';
 
 $note = 0;
 $obj->position(25);
-$x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
+$x = $obj->_note_at(1, $note);
 is $x, 'E', '24th fret E';
 $note = 1;
-$x = $obj->fretboard->{1}[ ($obj->position + $note - 1) % @{ $obj->fretboard->{1} } ];
+$x = $obj->_note_at(1, $note);
 is $x, 'F', '25th fret F';
 
 done_testing();

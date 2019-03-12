@@ -1,6 +1,6 @@
 package Lab::Connection::Mock;
 #ABSTRACT: ???
-$Lab::Connection::Mock::VERSION = '3.671';
+$Lab::Connection::Mock::VERSION = '3.680';
 use warnings;
 use strict;
 use 5.010;
@@ -128,11 +128,11 @@ Lab::Connection::Mock - ???
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel

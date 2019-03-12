@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 How to read the documentation
 
@@ -209,6 +209,20 @@ And for the SR830 lock-in amplifier:
  my $xy = $lia->get_xy();
  # Print contents of $xy hashref
  say "x = $xy->{x}, y = $xy->{y}";
+
+=head2 Connection logging
+
+We can monitor the commands sent to the instrument by specifying a log file in
+the constructor:
+
+ my $lia = instrument(
+     type => 'SR830',
+     connection_type => 'VISA::GPIB',
+     connection_options => {pad => 1},
+     log_file => 'some_file.yml'
+ );
+
+All communication will be logged in the human readable file F<some_file.yml>.  
 
 =head1 Types of instrument drivers
 
@@ -931,7 +945,7 @@ L<Lab::Measurement::Developer>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2006       Daniel Schroeer
             2010       Daniel Schroeer
@@ -939,6 +953,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
             2016       Andreas K. Huettel, Simon Reinhardt
             2017       Andreas K. Huettel
             2018       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -14,7 +14,7 @@ my $test_cases = {
 };
 my $test_case_count = @{[ keys %$test_cases ]} + 0;
 
-my $formulas = [qw( Cosine GreatCircle Haversine MathTrig Vincenty )];
+my $formulas = [qw( ALT Cosine GreatCircle Haversine MathTrig Vincenty )];
 
 foreach my $formula (@$formulas) {
     subtest "run $formula" => sub {

@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ no_index:
 provides:
   Protocol::WebSocket:
     file: lib/Protocol/WebSocket.pm
-    version: '0.24'
+    version: '0.26'
   Protocol::WebSocket::Client:
     file: lib/Protocol/WebSocket/Client.pm
   Protocol::WebSocket::Cookie:
@@ -61,17 +61,19 @@ resources:
   bugtracker: https://github.com/vti/protocol-websocket/issues
   homepage: https://github.com/vti/protocol-websocket
   repository: git://github.com/vti/protocol-websocket.git
-version: '0.24'
+version: '0.26'
 x_contributors:
   - 'Anton Petrusevich <anton.petrusevich@lycos.com>'
   - 'BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>'
   - 'Chia-liang Kao <clkao@clkao.org>'
+  - 'Daniel Kamil Kozar <dkk089@gmail.com>'
   - 'Eric Wastl <topaz.github@lt3.us>'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Joao Orui <joao@joao.jp>'
   - 'Jon Gentle <atrodo@atrodo.org>'
   - 'Jonathan Barber <jonathan.barber@gmail.com>'
   - 'Lee Aylward <lee@laylward.com>'
+  - 'Max Maischein <corion@corion.net>'
   - 'Michal Špaček <tupinek@gmail.com>'
   - 'Neil Bowers <neil@bowers.com>'
   - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'
@@ -79,3 +81,4 @@ x_contributors:
   - 'vti <viacheslav.t@gmail.com>'
   - 'vti <vti@clarive.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

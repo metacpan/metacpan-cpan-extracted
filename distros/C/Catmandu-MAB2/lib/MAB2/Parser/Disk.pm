@@ -1,6 +1,6 @@
 package MAB2::Parser::Disk;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use strict;
 use warnings;
@@ -82,7 +82,7 @@ sub _decode {
         {
             # check if data contains subfield indicators
             if ( $data =~ m/\s*($SUBFIELD_INDICATOR|\$)(.*)/ ) {
-                my $subfield_indicator = $1;
+                my $subfield_indicator = $1 eq '$' ? '\$' : $1;
                 push
                     @record,
                     [
@@ -90,7 +90,7 @@ sub _decode {
                     $ind,
                     map { ( substr( $_, 0, 1 ), substr( $_, 1 ) ) }
                         split /$subfield_indicator/,
-                    $1
+                    $2
                     ];
             }
             else {

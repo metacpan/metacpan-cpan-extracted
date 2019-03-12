@@ -2,9 +2,13 @@
 abstract: 'interface to the Windows WMI'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,8 +18,16 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Class::Accessor: '0'
+  DBI: '0'
+  Win32::OLE: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   repository: git://github.com/Corion/dbd-wmi.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

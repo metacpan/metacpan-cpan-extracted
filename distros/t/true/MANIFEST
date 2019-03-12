@@ -1,6 +1,7 @@
 Changes
 lib/true.pm
 lib/true/VERSION.pm
+LICENSE.md
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -8,7 +9,7 @@ ppport.h
 README
 t/01_compile.t
 t/eval.t
-t/exception.todo
+t/exception.t
 t/leak.t
 t/lib/bad.pl
 t/lib/Bad.pm
@@ -29,17 +30,19 @@ t/lib/IndirectCompileTimeException.pm
 t/lib/IndirectNestedUnimport.pm
 t/lib/IndirectTopLevelUnimport.pm
 t/lib/IndirectTrueLoadUntrue.pm
+t/lib/RoleWithMethod.pm
 t/lib/TestSubclass.pm
 t/lib/Ugly.pm
 t/lib/UglyWithSubclass.pm
 t/lib/UglyWithSubSubclass.pm
 t/lib/Untrue1.pm
 t/lib/Untrue2.pm
-t/pod.t
 t/require.t
 t/require_subclass.t
+t/rt-124745.t
 t/unimport.t
 t/use.t
 t/use_subclass.t
 t/version.t
 true.xs
+META.json                                Module JSON meta-data (added by MakeMaker)

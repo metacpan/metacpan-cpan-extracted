@@ -1,4 +1,5 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strict;
 use warnings;
 use Test2::V0;
@@ -14,7 +15,7 @@ eval{ MeasureTest->new };
 ok( $@, 'invalid number of arguments' );
 
 eval{ MeasureTest->new( 2, 'inches' ) };
-ok( $@, 'unkown unit' );
+ok( $@, 'unknown unit' );
 
 MeasureTest->reg_units(
     qw( inch foot yard centimeter meter )

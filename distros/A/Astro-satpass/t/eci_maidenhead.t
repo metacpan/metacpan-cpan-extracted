@@ -7407,11 +7407,11 @@ sub latlon {
     my ( $lat, $lon ) = $sta->geodetic();
     foreach ( $lat, $lon ) {
 	$_ = rad2deg( $_ );
-	m/ \A [+-]? ( \d+ ) [.] ( 0* ) /smx;
-	my ( $left, $right ) = ( $1, $2 );
-	defined $right or $right = '';
-	my $places = $left ? 6 - length $left : 6 + length $right;
-	$_ = sprintf '%.*f', $places, $_;
+	my ( $left ) = m/ \A [+-]? ( \d+ ) /smx;
+	$left
+	    or $left = '';
+	my $places = 6 - length $left;
+	$_ = sprintf "%.${places}f", $_;
     }
     return ( $lat, $lon );
 }

@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Frequency;
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.671';
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.680';
 #ABSTRACT: Frequency sweep
 
 use Lab::XPRESS::Sweep;
@@ -24,6 +24,7 @@ sub new {
                 Lab::Instrument::SignalRecovery726x   Lab::Instrument::SR830
                 Lab::Instrument::HP83732A             Lab::Instrument::MG369xB
                 Lab::Instrument::RSSMB100A   Lab::Moose::Instrument::RS_SMB
+                Lab::Moose::Instrument::ZI_MFIA Lab::Moose::Instrument::ZI_MFLI
                 /
         ],
         allowed_sweep_modes => [ 'list', 'step' ],
@@ -99,7 +100,7 @@ Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -258,12 +259,13 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
             2014       Andreas K. Huettel
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -90,6 +90,21 @@ note 'MAB2::Parser::Disk';
         'first field'
     );
     ok( $parser->next()->{_id} eq '54251-9', 'next record' );
+    $record = $parser->next();
+    is_deeply(
+        $record->{record}->[-1],
+        [   "545", "a", "x", "ISSN 0724-8679 = C't",
+            "y",   "ISSN 0724-8679 = C't"
+        ],
+        'got $ subfields'
+    );
+    is_deeply(
+        $record->{record}->[-2],
+        [   "545", "a", "x", "ISSN 0724-8679 = C't",
+            "y",   "ISSN 0724-8679 = C't"
+        ],
+        'got <UNIT SEPERATOR> subfields'
+    );
 
 }
 

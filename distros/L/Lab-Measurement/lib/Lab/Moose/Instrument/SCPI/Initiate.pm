@@ -1,6 +1,6 @@
 package Lab::Moose::Instrument::SCPI::Initiate;
 #ABSTRACT: Role for the SCPI INITiate subsystem used by Rohde&Schwarz
-$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.671';
+$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.680';
 use Moose::Role;
 use Lab::Moose::Instrument
     qw/validated_no_param_setter validated_setter validated_getter/;
@@ -48,7 +48,7 @@ Lab::Moose::Instrument::SCPI::Initiate - Role for the SCPI INITiate subsystem us
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 METHODS
 
@@ -66,7 +66,7 @@ Start a new single sweep.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt

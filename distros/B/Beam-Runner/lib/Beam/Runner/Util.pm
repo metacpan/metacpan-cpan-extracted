@@ -1,5 +1,5 @@
 package Beam::Runner::Util;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Utilities for Beam::Runner command classes
 
 #pod =head1 SYNOPSIS
@@ -47,7 +47,7 @@ our $PATHS_SEP = $^O eq 'MSWin32' ? ';' : ':';
 
 sub find_containers {
     my %containers;
-    for my $dir ( split /:/, $ENV{BEAM_PATH} ) {
+    for my $dir ( split /$PATHS_SEP/, $ENV{BEAM_PATH} // '' ) {
         my $p = path( $dir );
         my $i = $p->iterator( { recurse => 1, follow_symlinks => 1 } );
         while ( my $file = $i->() ) {
@@ -117,7 +117,7 @@ Beam::Runner::Util - Utilities for Beam::Runner command classes
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

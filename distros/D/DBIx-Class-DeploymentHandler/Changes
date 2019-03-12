@@ -1,5 +1,23 @@
 Revision history for DBIx-Class-DeploymentHandler
 
+0.002227  2019-03-11 05:58:07+00:00 Europe/London
+ - test version-objects in 5.8-10 compatible way
+
+0.002226  2019-03-11 03:14:04+00:00 Europe/London
+ - relax the Pg chunk-splitting when no ";"
+ - better test of version-object on schema
+
+0.002225  2019-03-11 01:56:47+00:00 Europe/London
+ - convert to Type::Tiny
+ - Port to Moo
+ - convert parameterised role to Package::Variant
+ - convert file-handling to IO::All
+
+0.002224  2019-03-09 05:16:47+00:00 Europe/London
+ - binmode on all filehandles so lines always end LF - thanks @wchristian
+ - more sophisticated SQL parsing handles Pg $$ stuff - thanks @mrenvoize
+   for report
+
 0.002223  2019-03-07 01:36:36+00:00 Europe/London
  - handle "package NAME VERSION" in a DBIx::Class::Schema - $VERSION
    will be object
@@ -12,6 +30,7 @@ Revision history for DBIx-Class-DeploymentHandler
 0.002221  2017-09-27 21:19:42-04:00 America/New_York
  - Allow easy changing the version storage table name, which makes subclassing
    much less painful (Thanks Andrew Gregory!)
+ - Above change renamed database_version => initial_version
  - Fix args passed to SQL::Translator::Diff
  - Add Michael McClimon as comaint
 

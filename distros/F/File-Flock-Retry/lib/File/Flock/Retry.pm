@@ -1,13 +1,13 @@
 package File::Flock::Retry;
 
-our $DATE = '2017-07-01'; # DATE
-our $VERSION = '0.62'; # VERSION
+our $DATE = '2019-03-12'; # DATE
+our $VERSION = '0.631'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Fcntl ':flock';
+use Fcntl ':DEFAULT', ':flock';
 
 sub lock {
     my ($class, $path, $opts) = @_;
@@ -18,6 +18,7 @@ sub lock {
     $h{path}    = $path;
     $h{retries} = $opts->{retries} // 60;
     $h{shared}  = $opts->{shared} // 0;
+    $h{mode}    = $opts->{mode} // (O_CREAT | O_RDWR);
 
     my $self = bless \%h, $class;
     $self->_lock;
@@ -40,7 +41,7 @@ sub _lock {
         $tries++;
 
         # 1
-        open $self->{_fh}, ">>", $path
+        sysopen $self->{_fh}, $path, $self->{mode}
             or die "Can't open lock file '$path': $!";
 
         # 2
@@ -107,6 +108,11 @@ sub unlock {
     $self->_unlock;
 }
 
+sub handle {
+    my $self = shift;
+    $self->{_fh};
+}
+
 sub DESTROY {
     my $self = shift;
     $self->_unlock;
@@ -127,7 +133,7 @@ File::Flock::Retry - Yet another flock module
 
 =head1 VERSION
 
-This document describes version 0.62 of File::Flock::Retry (from Perl distribution File-Flock-Retry), released on 2017-07-01.
+This document describes version 0.631 of File::Flock::Retry (from Perl distribution File-Flock-Retry), released on 2019-03-12.
 
 =head1 SYNOPSIS
 
@@ -165,39 +171,73 @@ Not yet tested on Windows. Some filesystems do not support inode?
 
 =head1 METHODS
 
-=head2 $lock = File::Flock::Retry->lock($path, \%opts)
+=head2 lock
 
-Attempt to acquire an exclusive lock on C<$path>. C<$path> will be created if
-not already exists. If $path is already locked by another process, will retry
-every second for a number of seconds (by default 60). Will die if failed to
-acquire lock after all retries.
+Usage:
+
+ $lock = File::Flock::Retry->lock($path, \%opts)
+
+Attempt to acquire an exclusive lock on C<$path>. By default, C<$path> will be
+created if not already exists (see L</mode>). If C<$path> is already locked by
+another process, will retry every second for a number of seconds (by default
+60). Will die if failed to acquire lock after all retries.
 
 Will automatically unlock if C<$lock> goes out of scope. Upon unlock, will
-remove C<$path> if it was created and is still empty (this behavior is the same
-as C<File::Flock>).
+remove C<$path> if it was created by L</lock> and is still empty (this behavior
+is the same as C<File::Flock>).
 
 Available options:
 
 =over
 
-=item * retries => int (default: 60)
+=item * mode
+
+Integer. Default: O_CREAT | O_RDWR.
+
+File open mode, to be passed to Perl's C<sysopen()>. For example, if you want to
+avoid race condition between creating and locking the file, you might want to
+use C<< O_CREAT | O_EXCL | O_RDWR >> to fail when the file already exists. Note
+that the constants are available after you do a C<< use Fcntl ':DEFAULT'; >>.
+
+=item * retries
+
+Integer. Default: 60.
 
 Number of retries (equals number of seconds, since retry is done every second).
 
-=item * shared => bool (default: 0)
+=item * shared
+
+Boolean. Default: 0.
 
 By default, an exclusive lock (LOCK_EX) is attempted. However, if this option is
 set to true, a shared lock (LOCK_SH) is attempted.
 
 =back
 
-=head2 $lock->unlock
+=head2 unlock
 
-Unlock.
+Usage:
 
-=head2 $lock->release
+ $lock->unlock
 
-Synonym for C<unlock()>.
+Unlock. will remove lock file if it was created by L</lock> and is still empty
+(this behavior is the same as C<File::Flock>).
+
+=head2 release
+
+Usage:
+
+ $lock->release
+
+Synonym for L</unlock>.
+
+=head2 handle
+
+Usage:
+
+ my $fh = $lock->handle;
+
+Return the file handle.
 
 =head1 HOMEPAGE
 
@@ -217,7 +257,10 @@ feature.
 
 =head1 SEE ALSO
 
-L<File::Flock>
+L<File::Flock>, a bit too heavy in terms of dependencies and startup overhead,
+for my taste. It depends on things like L<File::Slurp> and
+L<Data::Structure::Util> (which loads L<Digest::MD5>, L<Storable>, among
+others).
 
 L<File::Flock::Tiny> which is also tiny, but does not have the autoremove and
 autoretry capability which I want. See also:
@@ -225,13 +268,17 @@ L<https://github.com/trinitum/perl-File-Flock-Tiny/issues/1>
 
 flock() Perl function.
 
+An alternative to flock() is just using sysopen() with O_CREAT|O_EXCL mode to
+create lock files. This is supported on more filesystems (particularly network
+filesystems which lack flock()).
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

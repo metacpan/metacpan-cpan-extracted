@@ -15,11 +15,13 @@ my $captures = {
   '$y' => \2,
 };
 my $prelude = capture_unroll '$captures', $captures, 4;
-my $out = eval
-  $prelude
-  . '[ $x, $y ]';
-is "$@", '', 'capture_unroll produces valid code';
-is_deeply $out, [ 1, 2 ], 'unrolled variables get correct values';
+{
+  my $sub = eval
+    "sub { $prelude"
+    . '[ $x, $y ] }';
+  is "$@", '', 'capture_unroll produces valid code';
+  is_deeply $sub->(), [ 1, 2 ], 'unrolled variables get correct values';
+}
 
 like exception {
   capture_unroll '$captures', { '&foo' => \sub { 5 } }, 4;
@@ -32,10 +34,10 @@ like exception {
 
     [ $x, $y ];
   }, '$x, $y', $prelude;
-  my $out = eval $inlined_code;
+  my $sub = eval "sub { $inlined_code }";
   is "$@", '', 'inlinify produces valid code'
     or diag "code:\n$inlined_code";
-  is_deeply $out, [ 1, 2 ], 'inlinified code get correct values';
+  is_deeply $sub->(), [ 1, 2 ], 'inlinified code get correct values';
   unlike $inlined_code, qr/my \(\$x, \$y\) = \@_;/,
     "matching variables aren't reassigned";
 }
@@ -48,10 +50,10 @@ like exception {
 
     [ $x, $y, our $baz ];
   }, '$x, $y', $prelude;
-  my $out = eval $inlined_code;
+  my $sub = eval "sub { $inlined_code }";
   is "$@", '', 'inlinify produces valid code'
     or diag "code:\n$inlined_code";
-  is_deeply $out, [ 1, 2, 3 ], 'inlinified code get correct values';
+  is_deeply $sub->(), [ 1, 2, 3 ], 'inlinified code get correct values';
   unlike $inlined_code, qr/my \(\$x, \$y\) = \@_;/,
     "matching variables aren't reassigned";
 }
@@ -62,10 +64,10 @@ like exception {
 
     [ $d, $f ];
   }, '$x, $y', $prelude;
-  my $out = eval $inlined_code;
+  my $sub = eval "sub { $inlined_code }";
   is "$@", '', 'inlinify with unmatched params produces valid code'
     or diag "code:\n$inlined_code";
-  is_deeply $out, [ 1, 2 ], 'inlinified code get correct values';
+  is_deeply $sub->(), [ 1, 2 ], 'inlinified code get correct values';
 }
 
 {
@@ -73,10 +75,52 @@ like exception {
     my $z = $_[0];
     $z;
   }, '$y', $prelude;
-  my $out = eval $inlined_code;
+  my $sub = eval "sub { $inlined_code }";
   is "$@", '', 'inlinify with out @_ produces valid code'
     or diag "code:\n$inlined_code";
-  is $out, 2, 'inlinified code get correct values';
+  is $sub->(), 2, 'inlinified code get correct values';
+}
+
+{
+  my $inlined_code = inlinify q{
+    my $z = $_[0];
+    $z;
+  }, '@_', $prelude;
+  my $sub = eval "sub { $inlined_code }";
+  is "$@", '', 'inlinify with @_ as args produces valid code'
+    or diag "code:\n$inlined_code";
+  is $sub->(5), 5, 'inlinified code get correct values';
+}
+
+{
+  my $inlined_code = inlinify q{
+    my $z = $_[0];
+    $z;
+  }, '$x', $prelude, 1;
+  my $sub = eval "sub { [ $inlined_code, \@_ ] }";
+  is "$@", '', 'inlinify with local produces valid code'
+    or diag "code:\n$inlined_code";
+  is_deeply $sub->(5), [1, 5], 'inlinified code get correct values';
+}
+
+{
+  my $inlined_code = inlinify q{
+    219;
+  }, undef, $prelude;
+  my $sub = eval "sub { $inlined_code }";
+  is "$@", '', 'inlinify without args produces valid code'
+    or diag "code:\n$inlined_code";
+  is $sub->(), 219, 'inlinified code get correct values';
+}
+
+{
+  my $inlined_code = inlinify q{
+    219;
+  }, '@_', undef;
+  my $sub = eval "sub { $inlined_code }";
+  is "$@", '', 'inlinify without extra produces valid code'
+    or diag "code:\n$inlined_code";
+  is $sub->(), 219, 'inlinified code get correct values';
 }
 
 done_testing;

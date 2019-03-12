@@ -7,7 +7,7 @@ package Lingua::EN::Inflexion::Verbs;
 use 5.010; use strict; use warnings;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 
-our $VERSION = 20180505.223034;
+our $VERSION = 20190312.121005;
 
 my $plural_of = {
   abides         => "abide",
@@ -34,14 +34,12 @@ my $plural_of = {
   breaks         => "break",
   breeds         => "breed",
   brings         => "bring",
-  broadcasts     => "broadcast",
   builds         => "build",
   burns          => "burn",
   bursts         => "burst",
   busts          => "bust",
   caches         => "cache",
   can            => "can",
-  casts          => "cast",
   catches        => "catch",
   changes        => "change",
   chooses        => "choose",
@@ -75,7 +73,6 @@ my $plural_of = {
   flings         => "fling",
   follows        => "follow",
   forbids        => "forbid",
-  forecasts      => "forecast",
   foresees       => "foresee",
   foretells      => "foretell",
   forgets        => "forget",
@@ -251,14 +248,12 @@ my $singular_of = {
   "break"         => "breaks",
   "breed"         => "breeds",
   "bring"         => "brings",
-  "broadcast"     => "broadcasts",
   "build"         => "builds",
   "burn"          => "burns",
   "burst"         => "bursts",
   "bust"          => "busts",
   "cache"         => "caches",
   "can"           => "can",
-  "cast"          => "casts",
   "catch"         => "catches",
   "change"        => "changes",
   "choose"        => "chooses",
@@ -292,7 +287,6 @@ my $singular_of = {
   "fly"           => "flies",
   "follow"        => "follows",
   "forbid"        => "forbids",
-  "forecast"      => "forecasts",
   "foresee"       => "foresees",
   "foretell"      => "foretells",
   "forget"        => "forgets",
@@ -532,9 +526,6 @@ my $past_of = {
   "bring"            => "brought",
   "bringing"         => "brought",
   "brings"           => "brought",
-  "broadcast"        => "broadcast",
-  "broadcasting"     => "broadcast",
-  "broadcasts"       => "broadcast",
   "broken"           => "broke",
   "brought"          => "brought",
   "build"            => "built",
@@ -556,9 +547,6 @@ my $past_of = {
   "caches"           => "cached",
   "caching"          => "cached",
   "can"              => "could",
-  "cast"             => "cast",
-  "casting"          => "cast",
-  "casts"            => "cast",
   "catch"            => "caught",
   "catches"          => "caught",
   "catching"         => "caught",
@@ -684,9 +672,6 @@ my $past_of = {
   "forbidden"        => "forbade",
   "forbidding"       => "forbade",
   "forbids"          => "forbade",
-  "forecast"         => "forecast",
-  "forecasting"      => "forecast",
-  "forecasts"        => "forecast",
   "foresee"          => "foresaw",
   "foreseeing"       => "foresaw",
   "foreseen"         => "foresaw",
@@ -1339,9 +1324,6 @@ my $pres_part_of = {
   "bring"            => "bringing",
   "bringing"         => "bringing",
   "brings"           => "bringing",
-  "broadcast"        => "broadcasting",
-  "broadcasting"     => "broadcasting",
-  "broadcasts"       => "broadcasting",
   "broke"            => "breaking",
   "broken"           => "breaking",
   "brought"          => "bringing",
@@ -1365,9 +1347,6 @@ my $pres_part_of = {
   "caching"          => "caching",
   "came"             => "coming",
   "can"              => "_",
-  "cast"             => "casting",
-  "casting"          => "casting",
-  "casts"            => "casting",
   "catch"            => "catching",
   "catches"          => "catching",
   "catching"         => "catching",
@@ -1499,9 +1478,6 @@ my $pres_part_of = {
   "forbidden"        => "forbidding",
   "forbidding"       => "forbidding",
   "forbids"          => "forbidding",
-  "forecast"         => "forecasting",
-  "forecasting"      => "forecasting",
-  "forecasts"        => "forecasting",
   "foresaw"          => "foreseeing",
   "foresee"          => "foreseeing",
   "foreseeing"       => "foreseeing",
@@ -2198,9 +2174,6 @@ my $past_part_of = {
   "bring"            => "brought",
   "bringing"         => "brought",
   "brings"           => "brought",
-  "broadcast"        => "broadcast",
-  "broadcasting"     => "broadcast",
-  "broadcasts"       => "broadcast",
   "broke"            => "broken",
   "broken"           => "broken",
   "brought"          => "brought",
@@ -2224,9 +2197,6 @@ my $past_part_of = {
   "caching"          => "cached",
   "came"             => "come",
   "can"              => "_",
-  "cast"             => "cast",
-  "casting"          => "cast",
-  "casts"            => "cast",
   "catch"            => "caught",
   "catches"          => "caught",
   "catching"         => "caught",
@@ -2358,9 +2328,6 @@ my $past_part_of = {
   "forbidden"        => "forbidden",
   "forbidding"       => "forbidden",
   "forbids"          => "forbidden",
-  "forecast"         => "forecast",
-  "forecasting"      => "forecast",
-  "forecasts"        => "forecast",
   "foresaw"          => "foreseen",
   "foresee"          => "foreseen",
   "foreseeing"       => "foreseen",
@@ -2985,6 +2952,7 @@ sub convert_to_plural {
         when (m{(.*)bears$}i) { return "${1}bear"; }
         when (m{(.*)bids$}i) { return "${1}bid"; }
         when (m{(.*)buys$}i) { return "${1}buy"; }
+        when (m{(.*)casts$}i) { return "${1}cast"; }
         when (m{(.*)clads$}i) { return "${1}clad"; }
         when (m{(.*)cuts$}i) { return "${1}cut"; }
         when (m{(.*)does$}i) { return "${1}do"; }
@@ -3094,6 +3062,7 @@ sub convert_to_singular {
         when (m{(.*)bear$}i) { return "${1}bears"; }
         when (m{(.*)bid$}i) { return "${1}bids"; }
         when (m{(.*)buy$}i) { return "${1}buys"; }
+        when (m{(.*)cast$}i) { return "${1}casts"; }
         when (m{(.*)clad$}i) { return "${1}clads"; }
         when (m{(.*)cut$}i) { return "${1}cuts"; }
         when (m{(.*)do$}i) { return "${1}does"; }
@@ -3206,6 +3175,8 @@ sub convert_to_past {
         when (m{(.*)bid$}i) { return "${1}bade"; }
         when (m{(.*)buys$}i) { return "${1}bought"; }
         when (m{(.*)buy$}i) { return "${1}bought"; }
+        when (m{(.*)casts$}i) { return "${1}cast"; }
+        when (m{(.*)cast$}i) { return "${1}cast"; }
         when (m{(.*)clads$}i) { return "${1}clad"; }
         when (m{(.*)clad$}i) { return "${1}clad"; }
         when (m{(.*)cuts$}i) { return "${1}cut"; }
@@ -3412,6 +3383,8 @@ sub convert_to_pres_part {
         when (m{(.*)bid$}i) { return "${1}bidding"; }
         when (m{(.*)buys$}i) { return "${1}buying"; }
         when (m{(.*)buy$}i) { return "${1}buying"; }
+        when (m{(.*)casts$}i) { return "${1}casting"; }
+        when (m{(.*)cast$}i) { return "${1}casting"; }
         when (m{(.*)clads$}i) { return "${1}cladding"; }
         when (m{(.*)clad$}i) { return "${1}cladding"; }
         when (m{(.*)cuts$}i) { return "${1}cutting"; }
@@ -3616,6 +3589,8 @@ sub convert_to_past_part {
         when (m{(.*)bid$}i) { return "${1}bidden"; }
         when (m{(.*)buys$}i) { return "${1}bought"; }
         when (m{(.*)buy$}i) { return "${1}bought"; }
+        when (m{(.*)casts$}i) { return "${1}cast"; }
+        when (m{(.*)cast$}i) { return "${1}cast"; }
         when (m{(.*)clads$}i) { return "${1}clad"; }
         when (m{(.*)clad$}i) { return "${1}clad"; }
         when (m{(.*)cuts$}i) { return "${1}cut"; }
@@ -3818,6 +3793,7 @@ sub is_plural {
         when (m{\A(.*)bear$}i) { return 1 }
         when (m{\A(.*)bid$}i) { return 1 }
         when (m{\A(.*)buy$}i) { return 1 }
+        when (m{\A(.*)cast$}i) { return 1 }
         when (m{\A(.*)clad$}i) { return 1 }
         when (m{\A(.*)cut$}i) { return 1 }
         when (m{\A(.*)do$}i) { return 1 }
@@ -3928,6 +3904,7 @@ sub is_singular {
         when (m{\A(.*)bears$}i) { return 1 }
         when (m{\A(.*)bids$}i) { return 1 }
         when (m{\A(.*)buys$}i) { return 1 }
+        when (m{\A(.*)casts$}i) { return 1 }
         when (m{\A(.*)clads$}i) { return 1 }
         when (m{\A(.*)cuts$}i) { return 1 }
         when (m{\A(.*)does$}i) { return 1 }
@@ -4036,6 +4013,7 @@ sub is_past {
         when (m{\A(.*)bore$}i) { return 1 }
         when (m{\A(.*)bade$}i) { return 1 }
         when (m{\A(.*)bought$}i) { return 1 }
+        when (m{\A(.*)cast$}i) { return 1 }
         when (m{\A(.*)clad$}i) { return 1 }
         when (m{\A(.*)cut$}i) { return 1 }
         when (m{\A(.*)did$}i) { return 1 }
@@ -4143,6 +4121,7 @@ sub is_pres_part {
         when (m{\A(.*)bearing$}i) { return 1 }
         when (m{\A(.*)bidding$}i) { return 1 }
         when (m{\A(.*)buying$}i) { return 1 }
+        when (m{\A(.*)casting$}i) { return 1 }
         when (m{\A(.*)cladding$}i) { return 1 }
         when (m{\A(.*)cutting$}i) { return 1 }
         when (m{\A(.*)doing$}i) { return 1 }
@@ -4249,6 +4228,7 @@ sub is_past_part {
         when (m{\A(.*)borne$}i) { return 1 }
         when (m{\A(.*)bidden$}i) { return 1 }
         when (m{\A(.*)bought$}i) { return 1 }
+        when (m{\A(.*)cast$}i) { return 1 }
         when (m{\A(.*)clad$}i) { return 1 }
         when (m{\A(.*)cut$}i) { return 1 }
         when (m{\A(.*)done$}i) { return 1 }

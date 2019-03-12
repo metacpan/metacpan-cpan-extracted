@@ -1,14 +1,14 @@
 #!perl
 
-our $DATE = '2018-10-10'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-03-12'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use App::sshwrap::hostcolor;
+use App::sshwrap::hostcolor qw(get_history_entry add_history_entry);
 use AppLib::sshwrap;
 use Getopt::Long qw(:config bundling no_ignore_case);
 use XTerm::Util qw(get_term_bgcolor set_term_bgcolor);
@@ -35,34 +35,21 @@ sub init {
     $env = $ENV{SSHWRAP_HOSTCOLOR_AUTO} // '';
 }
 
-my $history;
-sub read_history {
-    $history = App::sshwrap::hostcolor::read_history_file();
-    #log_trace "history=%s", $history;
-}
-
-sub write_history {
-    return unless $history;
-    App::sshwrap::hostcolor::write_history_file($history);
-}
-
 sub set_hostcolor {
     return unless defined $userhost;
-    read_history();
-    if ($history->{$userhost}) {
-        log_info "Setting host color ($userhost -> $history->{$userhost})";
-        set_term_bgcolor($history->{$userhost});
+    my $color = get_history_entry($userhost);
+    if (defined $color) {
+        log_info "Using history color '$color' for $userhost";
     } elsif ($env eq 'random-dark') {
         require Color::RGB::Util;
-        $history->{$userhost} =
-            Color::RGB::Util::rand_rgb_color('000000', '3f3f3f');
-        set_term_bgcolor($history->{$userhost});
+        $color = Color::RGB::Util::rand_rgb_color('000000', '3f3f3f');
+        log_info "Assigning random dark color '$color' for $userhost";
     } elsif ($env eq 'random-light') {
         require Color::RGB::Util;
-        $history->{$userhost} =
-            Color::RGB::Util::rand_rgb_color('c0c0c0', 'ffffff');
-        set_term_bgcolor($history->{$userhost});
+        $color = Color::RGB::Util::rand_rgb_color('c0c0c0', 'ffffff');
+        log_info "Assigning random light color '$color' for $userhost";
     }
+    set_term_bgcolor($color) if defined $color;
 }
 
 sub get_hostcolor {
@@ -70,9 +57,8 @@ sub get_hostcolor {
 
     my $color = get_term_bgcolor();
     if ($color) {
-        log_info "Recording host color $userhost -> $color";
-        $history->{$userhost} = $color;
-        write_history();
+        log_info "Remembering host color $userhost -> $color";
+        add_history_entry($userhost, $color);
     }
     if ($origcolor) {
         set_term_bgcolor($origcolor);
@@ -112,7 +98,7 @@ sshwrap-hostcolor - SSH wrapper script to remember the terminal background you u
 
 =head1 VERSION
 
-This document describes version 0.006 of sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-10-10.
+This document describes version 0.008 of sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2019-03-12.
 
 =head1 SYNOPSIS
 
@@ -196,7 +182,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

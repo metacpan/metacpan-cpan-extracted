@@ -1,5 +1,5 @@
 NAME
-    strictures - turn on strict and make most warnings fatal
+    strictures - Turn on strict and make most warnings fatal
 
 SYNOPSIS
       use strictures 2;

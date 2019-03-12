@@ -1,5 +1,10 @@
 Revision history for Perl extension HTML::Widgets::NavMenu.
 
+1.0704  2019-03-11
+    - Convert to dzil.
+    - Try to fix broken provides (e.g:
+    https://metacpan.org/search?q=HTML%3A%3AWidgets%3A%3ANavMenu%3A%3AObject )
+
 1.0703  2015-06-10
     - Fix broken links to the examples' version control repositories.
         - Thanks to Anne for inspiring it.

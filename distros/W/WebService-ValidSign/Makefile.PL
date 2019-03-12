@@ -10,7 +10,9 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "A REST API client for ValidSign",
   "AUTHOR" => "Wesley Schwengle <waterkip\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0
+    "CPAN::Meta::Requirements" => "2.120620",
+    "ExtUtils::MakeMaker" => 0,
+    "Module::Metadata" => 0
   },
   "DISTNAME" => "WebService-ValidSign",
   "EXE_FILES" => [
@@ -32,10 +34,11 @@ my %WriteMakefileArgs = (
     "LWP::UserAgent" => 0,
     "List::Util" => 0,
     "Module::Pluggable::Object" => 0,
-    "Moo" => 0,
+    "Moo" => "1.006000",
     "Moo::Role" => 0,
     "Moose" => 0,
     "Pod::Usage" => 0,
+    "String::CamelSnakeKebab" => 0,
     "Type::Library" => 0,
     "Type::Utils" => 0,
     "Types::Standard" => 0,
@@ -54,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Most" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,10 +82,11 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "List::Util" => 0,
   "Module::Pluggable::Object" => 0,
-  "Moo" => 0,
+  "Moo" => "1.006000",
   "Moo::Role" => 0,
   "Moose" => 0,
   "Pod::Usage" => 0,
+  "String::CamelSnakeKebab" => 0,
   "Sub::Override" => 0,
   "Test::Exception" => 0,
   "Test::Lib" => 0,
@@ -95,6 +99,9 @@ my %FallbackPrereqs = (
   "namespace::autoclean" => 0
 );
 
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+requires('JSON::XS', '4.02') if $] > 5.026 && has_module('JSON::XS', '4.01');
+
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
   delete $WriteMakefileArgs{TEST_REQUIRES};
@@ -106,3 +113,39 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
+
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+sub _add_prereq {
+  my ($mm_key, $module, $version_or_range) = @_;
+  $version_or_range ||= 0;
+  warn "$module already exists in $mm_key (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $WriteMakefileArgs{$mm_key}{$module}
+      and $WriteMakefileArgs{$mm_key}{$module} ne '0'
+      and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
+  warn "$module already exists in FallbackPrereqs (at version $WriteMakefileArgs{$mm_key}{$module}) -- need to do a sane metamerge!"
+    if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
+        and $FallbackPrereqs{$module} ne $version_or_range;
+  $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;
+  return;
+}
+
+sub has_module {
+  my ($module, $version_or_range) = @_;
+  require Module::Metadata;
+  my $mmd = Module::Metadata->new_from_module($module);
+  return undef if not $mmd;
+  return $mmd->version($module) if not defined $version_or_range;
+
+  require CPAN::Meta::Requirements;
+  my $req = CPAN::Meta::Requirements->new;
+  $req->add_string_requirement($module => $version_or_range);
+  return 1 if $req->accepts_module($module => $mmd->version($module));
+  return 0;
+}
+
+sub requires { goto &runtime_requires }
+
+sub runtime_requires {
+  my ($module, $version_or_range) = @_;
+  _add_prereq(PREREQ_PM => $module, $version_or_range);
+}

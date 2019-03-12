@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "JSON" => "2.97001",
     "Moo" => "2.003004",
     "MooX::Role::Parameterized" => "0.082",
+    "NetAddr::IP" => "4.079",
     "Role::REST::Client" => "0.23",
     "Role::REST::Client::Auth::Basic" => "0.05",
     "Sub::Retry" => "0.06",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "1.302140"
   },
-  "VERSION" => "0.002001",
+  "VERSION" => "0.003001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "JSON" => "2.97001",
   "Moo" => "2.003004",
   "MooX::Role::Parameterized" => "0.082",
+  "NetAddr::IP" => "4.079",
   "Role::REST::Client" => "0.23",
   "Role::REST::Client::Auth::Basic" => "0.05",
   "Sub::Retry" => "0.06",

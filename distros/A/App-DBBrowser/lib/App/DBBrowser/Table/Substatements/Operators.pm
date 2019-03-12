@@ -299,7 +299,7 @@ sub __between_op {
     if ( ! defined $value_1 ) {
         return;
     }
-    $sql->{$stmt} .= ' ' . '?' .      ' AND';
+    $sql->{$stmt} .= ' ' . '?' . ' AND';
     push @{$sql->{$args}}, $value_1;
     $ax->print_sql( $sql );
     # Readline

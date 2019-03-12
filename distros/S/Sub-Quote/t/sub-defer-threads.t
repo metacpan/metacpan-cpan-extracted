@@ -1,3 +1,9 @@
+BEGIN {
+  if ("$]" <= 5.008005) {
+    print "1..0 # SKIP threads too unstable until perl 5.8.5\n";
+    exit 0;
+  }
+}
 use lib 't/lib';
 use ThreadsCheck;
 use strict;

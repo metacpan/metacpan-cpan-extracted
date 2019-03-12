@@ -9,6 +9,7 @@ use Parse::Netstat::Search;
 use Parse::Netstat::Search::Sort;
 use Term::ANSIColor;
 use Text::Table;
+use Net::DNS;
 
 =head1 NAME
 
@@ -16,11 +17,11 @@ Parse::Netstat::Colorizer - Searches and colorizes the output from Parse::Netsta
 
 =head1 VERSION
 
-Version 0.0.0
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.0';
+our $VERSION = '0.1.0';
 
 
 =head1 SYNOPSIS
@@ -50,6 +51,8 @@ Sorting and searching is handled via L<Parse::Netsat::Search> and
 L<Parse::Netstat::Search::Sort>. Their objects for tweaking can be
 fetched via get_sort and get_search.
 
+L<Net::DNS::Resolver> is used for resolving hostnames.
+
 =head1 METHODS
 
 =head2 new
@@ -75,6 +78,9 @@ sub new {
 			  port_resolve=>1,
 			  search=>Parse::Netstat::Search->new,
 			  sort=>Parse::Netstat::Search::Sort->new,
+			  resolver=>Net::DNS::Resolver->new,
+			  use_ptr=>1,
+			  no_color=>0,
 			  };
 	bless $self;
 
@@ -133,16 +139,34 @@ sub colorize{
 	}
 
 	# Holds colorized lines for the table.
-	my @colored=([
-				 color('underline white').'Proto'.color('reset'),
-				 color('underline white').'SendQ'.color('reset'),
-				 color('underline white').'RecvQ'.color('reset'),
-				 color('underline white').'Local Host'.color('reset'),
-				 color('underline white').'Port'.color('reset'),
-				 color('underline white').'Remote Host'.color('reset'),
-				 color('underline white').'Port'.color('reset'),
-				 color('underline white').'State'.color('reset'),
-				 ]);
+
+	my @colored;
+
+	if ( $self->{no_color} ){
+		push( @colored, ([
+						  color('underline').'Proto'.color('reset'),
+						  color('underline').'SendQ'.color('reset'),
+						  color('underline').'RecvQ'.color('reset'),
+						  color('underline').'Local Host'.color('reset'),
+						  color('underline').'Port'.color('reset'),
+						  color('underline').'Remote Host'.color('reset'),
+						  color('underline').'Port'.color('reset'),
+						  color('underline').'State'.color('reset'),
+						  ])
+			 );
+	}else{
+		push( @colored, ([
+						  color('underline white').'Proto'.color('reset'),
+						  color('underline white').'SendQ'.color('reset'),
+						  color('underline white').'RecvQ'.color('reset'),
+						  color('underline white').'Local Host'.color('reset'),
+						  color('underline white').'Port'.color('reset'),
+						  color('underline white').'Remote Host'.color('reset'),
+						  color('underline white').'Port'.color('reset'),
+						  color('underline white').'State'.color('reset'),
+						  ])
+			 );
+	}
 
 	# process each connection
 	my $conn=pop(@found);
@@ -167,18 +191,48 @@ sub colorize{
 			}
 		}
 
-		my @new_line=(
-					  color('BRIGHT_YELLOW').$conn->{proto}.color('reset'),
-					  color('BRIGHT_CYAN').$conn->{sendq}.color('reset'),
-					  color('BRIGHT_RED').$conn->{recvq}.color('reset'),
-					  color('BRIGHT_GREEN').$conn->{local_host}.color('reset'),
-					  color('GREEN').$port_l.color('reset'),
-					  color('BRIGHT_MAGENTA').$conn->{foreign_host}.color('reset'),
-					  color('MAGENTA').$port_f.color('reset'),
-					  color('BRIGHT_BLUE').$conn->{state}.color('reset'),
-					  );
+		if ( $self->{use_ptr} ){
+			my $answer_f=$self->{resolver}->search( $conn->{foreign_host} );
+			my $answer_l=$self->{resolver}->search( $conn->{local_host} );
 
-		push( @colored, \@new_line );
+			if ( defined( $answer_f->{answer}[0] ) &&
+				 ( ref( $answer_f->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
+				){
+				$conn->{foreign_host}=lc($answer_f->{answer}[0]->ptrdname);
+			}
+
+			if ( defined( $answer_l->{answer}[0] ) &&
+				 ( ref( $answer_l->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
+				){
+				$conn->{local_host}=lc($answer_l->{answer}[0]->ptrdname);
+			}
+		}
+
+		if ( $self->{no_color} ){
+			push( @colored, ([
+							  $conn->{proto},
+							  $conn->{sendq},
+							  $conn->{recvq},
+							  $conn->{local_host},
+							  $port_l,
+							  $conn->{foreign_host},
+							  $port_f,
+							  $conn->{state},
+					  ])
+				 );
+		}else{
+			push( @colored, ([
+							  color('BRIGHT_YELLOW').$conn->{proto}.color('reset'),
+							  color('BRIGHT_CYAN').$conn->{sendq}.color('reset'),
+							  color('BRIGHT_RED').$conn->{recvq}.color('reset'),
+							  color('BRIGHT_GREEN').$conn->{local_host}.color('reset'),
+							  color('GREEN').$port_l.color('reset'),
+							  color('BRIGHT_MAGENTA').$conn->{foreign_host}.color('reset'),
+							  color('MAGENTA').$port_f.color('reset'),
+							  color('BRIGHT_BLUE').$conn->{state}.color('reset'),
+					  ])
+				 );
+		}
 
 		$conn=pop(@found);
 	}
@@ -207,6 +261,25 @@ sub get_invert{
 	return $self->{invert};
 }
 
+=head2 get_no_color
+
+This returns a boolean as to if the return
+is to be colorized or not.
+
+    my $no_color=$pnc->get_no_color;
+
+=cut
+
+sub get_no_color{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{no_color};
+}
+
 =head2 get_port_resolve
 
 This gets the port_resolve value, which is if it should try to resolve
@@ -226,6 +299,46 @@ sub get_port_resolve{
 	}
 
 	return $self->{port_resolve};
+}
+
+=head2 get_ptr_resolve
+
+This gets the current setting for if it should resolve
+IPs to PTRs or not.
+
+The returned value is a boolean and defaults to 1.
+
+    my $use_ptr=$pnc->get_ptr_resolve;
+
+=cut
+
+sub get_ptr_resolve{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{use_ptr};
+}
+
+=head2 get_resolver
+
+This returns the L<Net::DNS::Resolver> object used
+for resolving IPs to PTRs.
+
+    my $resolver=$pnc->get_resolver;
+
+=cut
+
+sub get_resolver{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{resolver};
 }
 
 =head1 get_search
@@ -276,7 +389,7 @@ returned sort or not.
     $pnc->set_invert;
 
     # the results will be inverted
-    $pnc->set_invert;
+    $pnc->set_invert(1);
 
 =cut
 
@@ -288,6 +401,32 @@ sub set_invert{
 	}
 
 	$self->{invert}=$_[1];
+
+	return 1;
+}
+
+=head2 set_no_color
+
+This sets wether or not the return from
+colorized should be colored or not.
+
+    # sets it to false, the default
+    $pnc->set_no_color;
+
+    # the results will by the default console
+    # text color when printed
+    $pnc->set_no_color(1);
+
+=cut
+
+sub set_no_color{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	$self->{no_color}=$_[1];
 }
 
 =head2 set_port_resolve
@@ -312,6 +451,30 @@ sub set_port_resolve{
 	}
 
 	$self->{port_resolve}=$_[1];
+}
+
+=head2 set_ptr_resolve
+
+This sets wether or not it will resolve IPs to PTRs.
+
+One value is taken and that is a perl boolean.
+
+    # sets it to true, the default
+    $pnc->set_ptr_resolve(1);
+
+    # set it false, don't resolve the ports
+    $pnc->set_ptr_resolve;
+
+=cut
+
+sub set_ptr_resolve{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	$self->{use_ptr}=$_[1];
 }
 
 =head

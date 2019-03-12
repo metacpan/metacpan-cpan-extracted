@@ -12,7 +12,7 @@ use Scalar::Util qw(weaken);
 use strict;
 use vars qw($Debug $VERSION $HashId);
 
-$VERSION = '1.234';
+$VERSION = '1.246';
 
 $Debug = $Parallel::Forker::Debug;
 $HashId = 0;
@@ -52,7 +52,7 @@ sub _new {
 	    push @{$self->{_forkref}{_labels}{$self->{label}}}, $self;
 	}
     }
-    $self->_calc_runable();   # Recalculate
+    $self->_calc_runable();  # Recalculate
     return $self;
 }
 
@@ -66,7 +66,7 @@ sub DESTROY {
 sub name { return $_[0]->{name}; }
 sub label { return $_[0]->{label}; }
 sub pid { return $_[0]->{pid}; }
-sub status { return $_[0]->{status}; }   # Maybe undef
+sub status { return $_[0]->{status}; }  # Maybe undef
 sub status_ok { return defined $_[0]->{status} && $_[0]->{status}==0; }
 sub forkref { return $_[0]->{_forkref}; }
 
@@ -104,7 +104,7 @@ sub _calc_eqns {
     my $runable_eqn = "";
     my $parerr_eqn  = "";
     my $ignerr;
-    my $flip_op = '';     # ~ or ^ or empty
+    my $flip_op = '';  # ~ or ^ or empty
     my $between_op     = '&&';
     my $between_op_not = '||';
     my $need_op_next = 0;
@@ -233,9 +233,9 @@ sub run {
 	delete $self->{_forkref}{_runable}{$self->{name}};
     } else {
 	$self->{run_on_start}->($self);
-	exit(0);	# Don't close anything
+	exit(0);  # Don't close anything
     }
-    return $self;   # So can chain commands
+    return $self;  # So can chain commands
 }
 
 sub run_after {
@@ -243,7 +243,7 @@ sub run_after {
     # @_ = objects to add as prereqs
     ($self->{_state} eq 'idle') or croak "%Error: Must set run_after's before marking the process ready,";
     push @{$self->{run_after}}, @_;
-    return $self;   # So can chain commands
+    return $self;  # So can chain commands
 }
 
 sub reap {
@@ -311,10 +311,10 @@ sub poll {
     my $self = shift;
     return undef if !$self->{pid};
 
-    my $got = waitpid ($self->{pid}, WNOHANG);
+    my $got = waitpid($self->{pid}, WNOHANG);
     if ($got!=0) {
 	if ($got>0) {
-	    $self->{status} = $?;	# convert wait return to status
+	    $self->{status} = $?;  # convert wait return to status
 	} else {
 	    $self->{status} = undef;
 	    carp "%Warning: waitpid($self->{pid}) returned -1 instead of status; perhaps you're ignoring SIG{CHLD}?"
@@ -342,7 +342,7 @@ sub poll {
 sub kill {
     my $self = shift;
     my $signal = shift || 9;
-    CORE::kill ($signal, $self->{pid}) if $self->{pid};
+    CORE::kill($signal, $self->{pid}) if $self->{pid};
     # We don't remove it's pid, we'll get a child exit that will do it
 }
 
@@ -353,20 +353,20 @@ sub kill_tree {
     my @proc = (_subprocesses($self->{pid}), $self->{pid});
     foreach my $pid (@proc) {
 	print "  Fork Kill -$signal $pid (child of $pid)\n" if $Debug;
-	CORE::kill ($signal, $pid);
+	CORE::kill($signal, $pid);
     }
     # We don't remove it's pid, we'll get a child exit that will do it
 }
 
 sub format_time {
     my $secs = shift;
-    return sprintf ("%02d:%02d:%02d", int($secs/3600), int(($secs%3600)/60), $secs % 60);
+    return sprintf("%02d:%02d:%02d", int($secs/3600), int(($secs%3600)/60), $secs % 60);
 }
 
 sub format_loctime {
     my $time = shift;
     my ($sec,$min,$hour) = localtime($time);
-    return sprintf ("%02d:%02d:%02d", $hour, $min, $sec);
+    return sprintf("%02d:%02d:%02d", $hour, $min, $sec);
 }
 
 sub _write_tree_line {
@@ -378,11 +378,11 @@ sub _write_tree_line {
 	my $state = uc $self->{_state};
 	$state .= "-ok"  if $self->is_done && $self->status_ok;
 	$state .= "-err" if $self->is_done && !$self->status_ok;
-	return sprintf ("%s %-27s  %-8s  %s\n",
-			"--", #x$level
-			$self->{name},
-			$state,  # DONE-err is longest
-			($self->{comment}||""));
+	return sprintf("%s %-27s  %-8s  %s\n",
+		       "--", #x$level
+		       $self->{name},
+		       $state,  # DONE-err is longest
+		       ($self->{comment}||""));
     } elsif ($linenum == 1) {
 	if ($self->{start_time}) {
 	    $cmt .= "Start ".format_loctime($self->{start_time});
@@ -399,11 +399,11 @@ sub _write_tree_line {
     } elsif ($linenum == 4) {
 	$cmt .= "ErrEqn = ".$self->{_parerr_eqn_text}  if defined $self->{_parerr_eqn_text} ;
     }
-    return sprintf ("%s %-27s  %-8s  %s\n",
-		    "  ", #x$level
-		    "",
-		    "",
-		    $cmt);
+    return sprintf("%s %-27s  %-8s  %s\n",
+		   "  ", #x$level
+		   "",
+		   "",
+		   $cmt);
 }
 
 sub _subprocesses {
@@ -496,17 +496,17 @@ Returns true if the process is in the runable state.
 
 Returns true if the process is in the running state.
 
-=item kill (<signal>)
+=item kill(<signal>)
 
 Send the specified signal to the process if it is running.  If no signal is
 specified, send a SIGKILL (9).
 
-=item kill_tree (<signal>)
+=item kill_tree(<signal>)
 
 Send the specified signal to the process (and its subchildren) if it is
 running.  If no signal is specified, send a SIGKILL (9).
 
-=item kill_tree_all (<signal>)
+=item kill_tree_all(<signal>)
 
 Send a signal to this child (and its subchildren) if it is running.  If no
 signal is specified, send a SIGKILL (9).
@@ -581,7 +581,7 @@ undef.
 The latest version is available from CPAN and from
 L<http://www.veripool.org/>.
 
-Copyright 2002-2017 by Wilson Snyder.  This package is free software; you
+Copyright 2002-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License
 Version 2.0.

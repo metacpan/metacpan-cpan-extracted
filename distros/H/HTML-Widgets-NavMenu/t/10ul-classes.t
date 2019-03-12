@@ -14,25 +14,24 @@ my $test_data = get_test_data();
 
 sub test_nav_menu
 {
-    my $rendered = shift;
+    my $rendered        = shift;
     my $expected_string = shift;
-    my $test_blurb = shift;
+    my $test_blurb      = shift;
 
-    my @result = (@{$rendered->{html}});
+    my @result = ( @{ $rendered->{html} } );
 
-    my @expected = (split(/\n/, $expected_string));
+    my @expected = ( split( /\n/, $expected_string ) );
 
-    is_deeply (\@expected, \@result, $test_blurb);
+    is_deeply( \@expected, \@result, $test_blurb );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'two_sites'}},
+        @{ $test_data->{'two_sites'} },
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul>
@@ -58,7 +57,8 @@ sub test_nav_menu
 EOF
 
     # TEST
-    test_nav_menu($rendered, $expected_string, "Testing ul classes for no CSS class to be assigned.");
+    test_nav_menu( $rendered, $expected_string,
+        "Testing ul classes for no CSS class to be assigned." );
 }
 
 # This test tests the show_always directive which causes the entire
@@ -66,12 +66,11 @@ EOF
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'show_always'}},
+        @{ $test_data->{'show_always'} },
         'ul_classes' => [ "FirstClass", "secondclass 2C", "ThirdClass" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="FirstClass">
@@ -112,19 +111,18 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu ($rendered, $expected_string, "Nav Menu with depth classes");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu with depth classes" );
 }
 
 # This test tests the escaping of the class names.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'show_always'}},
+        @{ $test_data->{'show_always'} },
         'ul_classes' => [ "F&F Class", "sec<h>", "T\"C" ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="F&amp;F Class">
@@ -165,6 +163,6 @@ EOF
 EOF
 
     # TEST
-    test_nav_menu ($rendered, $expected_string, "Nav Menu with depth classes");
+    test_nav_menu( $rendered, $expected_string, "Nav Menu with depth classes" );
 }
 

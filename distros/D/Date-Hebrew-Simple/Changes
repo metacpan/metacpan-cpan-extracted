@@ -1,5 +1,8 @@
 Revision history for Date::Hebrew::Simple
 
+0.11  Tue Mar 12 15:10:00 2019
+      - Updated dependency on Date::Utils v0.25.
+
 0.10  Mon Dec 17 04:45:00 2018
       - Updated dependency on Date::Utils v0.24.
 

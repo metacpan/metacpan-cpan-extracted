@@ -39,9 +39,15 @@ my %module = (
     'LICENSE'       => 'perl',
     'VERSION_FROM'  => $main_file, # finds $VERSION
     'PREREQ_PM'     => {
+                        'strict'       => 0,
+                        'warnings'     => 0,
                         'Getopt::Long' => '2.36', # GetOptionsFromArray
                         'DBI'          => 0,
+                        'Module::Load' => 0,
                       }, # e.g., Module::Name => 1.1
+    'EXE_FILES' => [
+        'bin/run-sql.pl',
+    ],
     'TEST_REQUIRES' => {
         'Test::More'   => 0,
         'Data::Dumper' => 0,

@@ -76,7 +76,6 @@
             "List::Util" : "1.42",
             "Log::Log4perl" : "1.47",
             "MIME::Base64" : "3.15",
-            "Mail::Sender" : "v0.8.23",
             "Math::Random::ISAAC::XS" : "1.004",
             "Mojolicious" : "6.65",
             "Moose" : "2.1604",
@@ -85,8 +84,6 @@
             "MooseX::Singleton" : "0.29",
             "MooseX::StrictConstructor" : "0.19",
             "Net::DNS" : "1.05",
-            "Net::LDAP" : "0.65",
-            "Net::XMPP" : "1.05",
             "NetAddr::IP" : "4.078",
             "POSIX" : "1.53",
             "Parallel::WorkUnit" : "1.009",
@@ -136,11 +133,11 @@
    "provides" : {
       "JCM::Boilerplate" : {
          "file" : "lib/JCM/Boilerplate.pm",
-         "version" : "2.182001"
+         "version" : "2.190700"
       },
       "JTM::Boilerplate" : {
          "file" : "lib/JTM/Boilerplate.pm",
-         "version" : "2.182001"
+         "version" : "2.190700"
       }
    },
    "release_status" : "stable",
@@ -154,7 +151,7 @@
          "web" : "https://github.com/jmaslak/JTM-Boilerplate"
       }
    },
-   "version" : "2.182001",
+   "version" : "2.190700",
    "x_contributor_covenant" : {
       "version" : 0.02
    },

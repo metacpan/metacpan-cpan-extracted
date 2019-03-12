@@ -14,7 +14,9 @@ t/00-load.t
 t/01-fpw.t
 t/02-fpa.t
 t/03-fpr.t
+t/04-version.t
 t/bug-125230-cross-midnight.t
+t/bug-128748-startday-localtime.t
 t/data/02-asa-clipped.dump
 t/data/02-pix.dump
 t/data/03-raw-ip.pcap

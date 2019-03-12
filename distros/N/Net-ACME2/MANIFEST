@@ -4,6 +4,7 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
+README.md
 eval_bug.readme
 examples/dns-01.pl
 examples/http-01.pl

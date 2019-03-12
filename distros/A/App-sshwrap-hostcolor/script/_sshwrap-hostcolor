@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-10-10'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2019-03-12'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=ssh
@@ -61,7 +61,7 @@ _sshwrap-hostcolor - Shell completer for ssh (sshwrap-hostcolor)
 
 =head1 VERSION
 
-This document describes version 0.006 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2018-10-10.
+This document describes version 0.008 of _sshwrap-hostcolor (from Perl distribution App-sshwrap-hostcolor), released on 2019-03-12.
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

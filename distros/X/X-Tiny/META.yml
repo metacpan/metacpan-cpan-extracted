@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
   Test::Simple: '0'
+  parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,11 +22,10 @@ no_index:
     - inc
 requires:
   Module::Load: '0'
-  autodie: '0'
   overload: '0'
-  parent: '0'
   perl: '5.01'
 resources:
+  bugtracker: https://github.com/FGasper/p5-X-Tiny/issues
   repository: https://github.com/FGasper/p5-X-Tiny.git
-version: '0.15'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

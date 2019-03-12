@@ -1,6 +1,10 @@
 History for Mojolicious::Plugin::TagHelpersI18N
 ===============================================
 
+0.05  2019-03-08 15:02:00
+
+      * Added missing test prereq Capture::Tiny as suggested by CPANTS. (thanks manwar)
+
 0.04  2019-03-05 15:03:00
 
       * improve option handling

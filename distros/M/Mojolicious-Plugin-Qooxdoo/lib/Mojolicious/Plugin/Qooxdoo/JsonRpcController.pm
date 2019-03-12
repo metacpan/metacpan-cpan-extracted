@@ -6,19 +6,24 @@ use warnings;
 use Mojo::JSON qw(encode_json decode_json);
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Promise;
+use Storable qw(dclone);
 
 use Encode;
 
 
 has toUTF8 => sub { find_encoding('utf8') };
 
-our $VERSION = '0.908';
+our $VERSION = '1.0.5';
 
 has 'service';
 
 has 'crossDomain';
+
 has 'requestId';
+
 has 'methodName';
+
+has 'rpcParams';
 
 has log => sub { shift->app->log };
 
@@ -97,7 +102,7 @@ sub dispatch {
     };
     $self->methodName($method);
 
-    my $params  = $data->{params} || []; # is a reference, so "unpack" it
+    $self->rpcParams($data->{params} // []);
  
     # invocation of method in class according to request 
     my $reply = eval {
@@ -131,18 +136,12 @@ sub dispatch {
              message => "method $method does not exist.", 
              code=> 4
         } if not $self->can($method);
-        if ($log->level eq 'debug'){
-            my $debug = encode_json($params);
-            if (not $ENV{MOJO_QX_FULL_RPC_DETAILS}){
-                if (length($debug) > 60){
-                    $debug = substr($debug,0,60) . ' [...]';
-                }
-            }
-            $log->debug("call $method(".$debug.")");
-        }
+
+        $self->logRpcCall($method,dclone($self->rpcParams));
+        
         # reply
         no strict 'refs';
-        return $self->$method(@$params);
+        return $self->$method(@{$self->rpcParams});
     };
     if ($@){
         $self->renderJsonRpcError($@);
@@ -170,20 +169,39 @@ sub dispatch {
     }
 }
 
+sub logRpcCall {
+    my $self = shift;
+    if ($self->log->level eq 'debug'){
+        my $method = shift;
+        my $request = encode_json(shift);
+        if (not $ENV{MOJO_QX_FULL_RPC_DETAILS}){
+            if (length($request) > 60){
+                $request = substr($request,0,60) . ' [...]';
+            }
+        }
+        $self->log->debug("call $method(".$request.")");
+    }
+}
+
 sub renderJsonRpcResult {
 	my $self = shift;
 	my $data = shift;
-    my $reply = encode_json({ id => $self->requestId, result => $data });
+    my $reply = { id => $self->requestId, result => $data };
+    $self->logRpcReturn(dclone($reply));
+    $self->finalizeJsonRpcReply(encode_json($reply));
+}
+
+sub logRpcReturn {
+    my $self = shift;
     if ($self->log->level eq 'debug'){
-        my $debug = $reply;
+        my $debug = encode_json(shift);
         if (not $ENV{MOJO_QX_FULL_RPC_DETAILS}){
             if (length($debug) > 60){
-               $debug = substr($debug,0,60) . ' [...]';
+                $debug = substr($debug,0,60) . ' [...]';
             }
         }
         $self->log->debug("return ".$debug);
     }
-    $self->finalizeJsonRpcReply($reply);
 }
 
 sub renderJsonRpcError {

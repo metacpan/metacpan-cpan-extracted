@@ -1,0 +1,62 @@
+{
+   "abstract" : "move js loading to the end of the document",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-JSLoader",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::ParseBrowser" : "1.06",
+            "Mojolicious" : "4.71",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::JSLoader" : {
+         "file" : "lib/Mojolicious/Plugin/JSLoader.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-JSLoader/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-JSLoader",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-JSLoader.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-JSLoader"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

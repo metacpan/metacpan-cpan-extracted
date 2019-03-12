@@ -9,10 +9,9 @@ use base 'Mojo::Base';
 
 use Data::Dumper;
 use Mojo::Content::Single;
+use Mojo::Util qw(gzip);
 
-our $VERSION = '1.12';
-
-use Compress::Zlib ();
+our $VERSION = '1.13';
 
 __PACKAGE__->attr( min_bytes => 500 );
 __PACKAGE__->attr( max_bytes => 500000 );
@@ -49,7 +48,7 @@ sub maybe_gzip {
     eval { local $/; $body = <$body> } if ref $body;
     die "Response body is an unsupported kind of reference" if ref $body;
 
-    my $zipped = Compress::Zlib::memGzip( $body );
+    my $zipped = gzip $body;
 
     $res->content( Mojo::Content::Single->new );
     $res->body( $zipped );
@@ -73,7 +72,7 @@ MojoX::Encode::Gzip - Gzip a Mojo::Message::Response
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =head1 SYNOPSIS
 

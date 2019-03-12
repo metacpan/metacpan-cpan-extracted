@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -1241,7 +1241,7 @@ side effect of calling $tle->universal ($time).
 
 =cut
 
-sub null {}
+sub null { return $_[0] }
 
 
 =item @elements = Astro::Coord::ECI::TLE->parse( @data );
@@ -2318,7 +2318,7 @@ sub _pass_compute_brightest {
     $latest -= 1;
     @wrk > 1
 	or do {
-	carp 'No magnitude calculation done: only one illuminated position';
+	# carp 'No magnitude calculation done: only one illuminated position';
 	return;
     };
 
@@ -2344,7 +2344,7 @@ sub _pass_compute_brightest {
 
 	# The next interval becomes the brightest and second-brightest
 	# time found.
-	@wrk = sort { $a->[1] <=> $b->[1] } @wrk;
+	@wrk = sort { $a->[1] <=> $b->[1] } grep { defined $_->[1] } @wrk;
 	( $earliest, $latest ) = sort { $a <=> $b }
 	    map { $wrk[$_][0] } 0, 1;
     }
@@ -5229,9 +5229,9 @@ use constant SGP4R_ERROR_1 => dualvar (1, SGP4R_ERROR_MEAN_ECCEN);
 use constant SGP4R_ERROR_MEAN_MOTION =>
     'Sgp4r 2: Mean motion < 0.0';
 use constant SGP4R_ERROR_2 => dualvar (2, SGP4R_ERROR_MEAN_MOTION);
-use constant SGP4R_INST_ECCEN =>
+use constant SGP4R_ERROR_INST_ECCEN =>
     'Sgp4r 3: Instantaneous eccentricity < 0 or > 1';
-use constant SGP4R_ERROR_3 => dualvar (3, SGP4R_INST_ECCEN);
+use constant SGP4R_ERROR_3 => dualvar (3, SGP4R_ERROR_INST_ECCEN);
 use constant SGP4R_ERROR_LATUSRECTUM =>
     'Sgp4r 4: Semi-latus rectum < 0';
 use constant SGP4R_ERROR_4 => dualvar (4, SGP4R_ERROR_LATUSRECTUM);
@@ -8262,7 +8262,7 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Thu, 12 Apr 2018 22:44:14 GMT
+# Last-Modified: Sun, 03 Mar 2019 02:50:29 GMT
 
 %magnitude_table = (
   '00694' => 3.5,
@@ -8957,7 +8957,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2018 by Thomas R. Wyant, III
+Copyright (C) 2005-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

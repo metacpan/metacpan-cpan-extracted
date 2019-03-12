@@ -1,4 +1,12 @@
 Revision history for Role-Cache-LRU
 
+0.03  2019-03-13 00:57:36 +08
+        - Update module description
+
+0.02  2019-03-13 00:49:06 +08
+        - Fix issue raised by Perl's Critic
+        - Ensure 100% code coverage
+        - Add missing modules
+
 0.01  2019-02-09 13:07:44 +08
         - Initial release

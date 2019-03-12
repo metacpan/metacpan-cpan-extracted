@@ -45,15 +45,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bio::Root::Test" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
+    "Test::Most" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "1.7.3",
+  "VERSION" => "1.7.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -66,7 +66,6 @@ my %FallbackPrereqs = (
   "Bio::DB::WebDBSeqI" => 0,
   "Bio::Root::IO" => 0,
   "Bio::Root::Root" => 0,
-  "Bio::Root::Test" => 0,
   "Bio::SeqIO" => 0,
   "Bio::Taxon" => 0,
   "Bio::WebAgent" => 0,
@@ -80,6 +79,7 @@ my %FallbackPrereqs = (
   "LWP::UserAgent" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::Most" => 0,
   "Test::RequiresInternet" => 0,
   "URI" => 0,
   "URI::Escape" => 0,

@@ -30,7 +30,7 @@ my $yoko = Instrument(
 );
 
 my $sweep = Sweep(
-    'Voltage',
+    'Level',
     {
         instrument => $yoko,
         mode       => 'step',

@@ -42,7 +42,7 @@ like($value_b, qr/Zurich Instruments/, "GetValueB");
 
 ($rv, my $error_string) = ziAPIGetError(ZI_ERROR_LENGTH);
 is($rv, 0, "ziAPIGetError retval");
-is($error_string, "Provided Buffer is too small", "ziAPIGetError");
+like($error_string, qr/Provided Buffer is too small/i, "ziAPIGetError");
 
 
 

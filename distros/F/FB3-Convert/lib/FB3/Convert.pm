@@ -15,13 +15,14 @@ use File::Copy qw(copy);
 use File::Temp qw/ tempfile tempdir /;
 use FB3::Validator;
 use utf8;
+use URI::Escape;
 use Encode qw(encode_utf8 decode_utf8);
 use XML::Entities;
 use XML::Entities::Data;
 use Time::HiRes qw(gettimeofday sleep);
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.24;
+our $VERSION = 0.25;
 
 =head1 NAME
 
@@ -590,7 +591,7 @@ sub Content2Tree {
   my $X = shift;
   my $Obj = shift;
   my $Content = $Obj->{'content'};
-  my $File = $Obj->{'file'};
+  my $File = uri_unescape($Obj->{'file'});
 
   $Content = $X->trim($Content);
 
@@ -612,7 +613,7 @@ sub Content2Tree {
 
   return {
     content => $X->NormalizeTree($Result),
-    ID => $X->Path2ID($File,undef,'main_section'), #main-sectioon
+    ID => $X->Path2ID(uri_unescape($File),undef,'main_section'), #main-sectioon
     ID_SUB => $X->UUID(), #sub-section
   };
 }
@@ -746,7 +747,7 @@ sub ConvertIds {
   if ($RelPath && exists $Attributes->{'id'}) {
    my $Href = $RelPath."#".$Attributes->{'id'};
     #так же должны быть преобразованы <a href !!!
-    my $Id = $X->Path2ID($Href,undef,'convert_id');
+    my $Id = $X->Path2ID(uri_unescape($Href),undef,'convert_id');
     $Attributes->{'id'} = 'link_'.$Id;
     $X->{'id_list'}->{$Attributes->{'id'}} = $Href;
   }
@@ -759,6 +760,7 @@ sub Path2ID {
   my $DestPath = shift || return undef; #Искомый путь
   my $LocalPath = shift || undef; #путь, относительно которого вычисляем Искомый
   my $Debug = shift;
+  my $Skip = shift;
 
   unless ($LocalPath) {
     $LocalPath = $X->{'ContentDir'}; #Если не указан, работаем от корневой папки с контентом
@@ -766,7 +768,7 @@ sub Path2ID {
     $LocalPath = dirname($X->RealPath($X->{'ContentDir'}.'/'.$LocalPath));
   }
 
-  my $Link = $X->RealPath($LocalPath.'/'.$DestPath, $Debug);
+  my $Link = $X->RealPath($LocalPath.'/'.$DestPath, $Debug, $Skip);
   my $Path = $X->UUID($Link);
 
   return $Path;
@@ -787,7 +789,7 @@ sub RealPath {
     $RealPath = undef if !$Skip && !-f $RealPath2 && !-d $RealPath2;
   }
 
-  $X->Error("Wrong path!\n$! $Path".($Debug?' ('.$Debug.')':'')) unless $RealPath;
+  $X->Error("Wrong path!\n$! $Path".($Debug?' ('.$Debug.')':'')) if !$RealPath && !$Skip;
   return $RealPath;
 }
 
@@ -1183,7 +1185,7 @@ sub ValidEMAIL{
 
 sub ShitFixFile {
   my $X = shift;
-  my $Fname = shift;
+  my $Fname = uri_unescape(shift);
 
   my $Content;
   open my $Fo,"<".$Fname or $X->Error("Can't open file $Fname: $!");

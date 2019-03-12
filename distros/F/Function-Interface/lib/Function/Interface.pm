@@ -3,7 +3,7 @@ package Function::Interface;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Carp qw(croak confess);
 use Keyword::Simple;

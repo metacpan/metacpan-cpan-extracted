@@ -1,3 +1,10 @@
+0.21 2019-03-09
+    * Use Module::Load to load renderers
+    * Check if a class isa Text::Table, otherwise dispatch to Text::Table::Any
+      This allows for rendering tables as HTML easily if you
+      install Text::Table::Any
+    * Properly install C<run-sql.pl>
+
 0.20 2018-10-28
     * Re-release including proper META.* information
     * no need to upgrade

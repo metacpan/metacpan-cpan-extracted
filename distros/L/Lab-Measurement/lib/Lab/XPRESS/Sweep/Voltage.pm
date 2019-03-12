@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Voltage;
-$Lab::XPRESS::Sweep::Voltage::VERSION = '3.671';
+$Lab::XPRESS::Sweep::Voltage::VERSION = '3.680';
 #ABSTRACT: Voltage sweep
 
 use Lab::XPRESS::Sweep;
@@ -27,7 +27,7 @@ sub new {
                 Lab::Instrument::Yokogawa7651 Lab::Instrument::Keithley2400
                 Lab::Instrument::YokogawaGS200 Lab::Instrument::DummySource
                 Lab::Instrument::SR830::AuxOut Lab::Moose::Instrument::DummySource
-                Lab::Moose::Instrument::YokogawaGS200/
+                Lab::Moose::Instrument::YokogawaGS200 Lab::Moose::Instrument::ZI_MFLI Lab::Moose::Instrument::ZI_MFIA/
         ],
         allowed_sweep_modes => [ 'continuous', 'list', 'step' ],
         number_of_points    => [undef]
@@ -167,7 +167,7 @@ Lab::XPRESS::Sweep::Voltage - Voltage sweep
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -344,7 +344,7 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Stefan Geissler
             2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
@@ -352,6 +352,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
             2015       Alois Dirnaichner
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,6 +1,6 @@
 package Lab::Bus::USBtmc;
 #ABSTRACT: USBtmc (Test & Measurement) Linux kernel driver bus
-$Lab::Bus::USBtmc::VERSION = '3.671';
+$Lab::Bus::USBtmc::VERSION = '3.680';
 # "sys/ioctl.ph" throws a warning about FORTIFY_SOURCE, but
 # this alternate is (perhaps?) not present on all systems,
 # so do a workaround
@@ -475,7 +475,7 @@ Lab::Bus::USBtmc - USBtmc (Test & Measurement) Linux kernel driver bus
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -632,7 +632,7 @@ and many more...
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2012       Hermann Kraus
             2016       Charles Lane, Simon Reinhardt

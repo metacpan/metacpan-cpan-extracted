@@ -1,14 +1,11 @@
 #!/usr/bin/env perl
+use 5.008001;
 use strict;
 use warnings;
+use Test2::V0;
 
-# https://github.com/bluefeet/Geo-Distance/issues/2
-# "^" used instead of "**"
-
-use Test::More;
+use Geo::Distance;
 use Math::Trig qw( asin );
-
-BEGIN { use_ok('Geo::Distance') }
 
 my $geo = Geo::Distance->new();
 $geo->formula('gcd');
@@ -19,11 +16,17 @@ my $old_value = old_gcd( $geo, 'mile', "-81.044","35.244", "-80.8272","35.1935" 
 $geo->formula('hsin');
 my $control_value = $geo->distance( 'mile', "-81.044","35.244", "-80.8272","35.1935" );
 
-ok( abs($new_value - $control_value) < 0.00000000001, 'gcd now produces same result as hsin' ) or
-    diag "$new_value is not equal to $control_value";
+cmp_ok(
+    abs($new_value - $control_value), '<', 0.00000000001,
+    'gcd now produces same result as hsin',
+);
 
-ok( abs($old_value - $control_value) > 0.00000000001, 'old gcd did not produce same result as hsin' ) or
-    diag "$old_value is equal to $control_value";
+cmp_ok(
+    abs($old_value - $control_value), '>', 0.00000000001,
+    'old gcd did not produce same result as hsin',
+);
+
+done_testing;
 
 sub old_gcd {
     my($geo,$unit,$lon1,$lat1,$lon2,$lat2) = @_;
@@ -38,5 +41,3 @@ sub old_gcd {
 
     return $unit * $c;
 }
-
-done_testing;

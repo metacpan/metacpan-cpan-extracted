@@ -1,5 +1,5 @@
 package WebService::ValidSign::Object::Document;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 extends 'WebService::ValidSign::Object';
 
@@ -24,17 +24,9 @@ around TO_JSON => sub {
     my $orig = shift;
     my $self = shift;
 
-    my $meta = $self->meta;
-    my %result;
-    for my $attr ($meta->get_all_attributes) {
-        my $name  = $attr->name;
-        next if $name eq 'path';
-        my $value = $attr->get_value($self);
-        my $type  = $attr->type_constraint;
-        $result{$name} = $value if defined $value;
-
-    }
-    return \%result;
+    my $rv = $orig->($self, @_);
+    delete $rv->{path};
+    return $rv;
 };
 
 __PACKAGE__->meta->make_immutable;
@@ -51,7 +43,7 @@ WebService::ValidSign::Object::Document - A ValidSign Document object
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

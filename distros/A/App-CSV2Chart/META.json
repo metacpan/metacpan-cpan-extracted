@@ -59,11 +59,11 @@
    "provides" : {
       "App::CSV2Chart" : {
          "file" : "lib/App/CSV2Chart.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.2.0"
       },
       "App::CSV2Chart::Command::xlsx" : {
          "file" : "lib/App/CSV2Chart/Command/xlsx.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/shlomif/CSV2Chart"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -466,6 +466,16 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
             "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeMarkdownFromPod",
+            "config" : {
+               "Dist::Zilla::Role::FileWatcher" : {
+                  "version" : "0.006"
+               }
+            },
+            "name" : "ReadmeMarkdownFromPod",
+            "version" : "0.141140"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::TidyAll",

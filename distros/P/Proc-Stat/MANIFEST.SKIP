@@ -1,0 +1,17 @@
+blib
+work
+Makefile$
+Sniffer.c
+config.log
+config.status
+config.h
+nc.sniffer
+\.bs$
+\.o$
+\.sav$
+\.yml$
+\.old$
+tmp
+DEADJOE
+~$
+N*\.\d+\.tar\.gz$

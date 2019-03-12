@@ -9,7 +9,7 @@ requires "Pod::Simple::SimpleTree" => "0";
 requires "Term::ANSIColor" => "0";
 requires "Types::Path::Tiny" => "0";
 requires "Types::Standard" => "0";
-requires "perl" => "5.008";
+requires "perl" => "5.010";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";

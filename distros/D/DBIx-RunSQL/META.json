@@ -34,7 +34,10 @@
          "requires" : {
             "DBI" : "0",
             "Getopt::Long" : "2.36",
-            "perl" : "5.006"
+            "Module::Load" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -59,7 +62,7 @@
          "web" : "https://github.com/Corion/dbix--runsql"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 2.27203",
    "x_static_install" : 1
 }

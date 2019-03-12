@@ -203,6 +203,7 @@ sub defaults {
 				 ##-- editorial stuff
 				 q(note[@type='editorial']),	   ##-- editorial note
 				 qw(del),			   ##-- deleted material
+				 qw(metamark),			   ##-- editorial markup
 				],
 	  sort_addkey_xpaths => [
 	                         ##-- BE CAREFUL: only add keys (de-serialize) if you're also adding appropriate

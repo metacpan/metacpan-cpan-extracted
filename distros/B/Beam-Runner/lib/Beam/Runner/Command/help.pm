@@ -1,5 +1,5 @@
 package Beam::Runner::Command::help;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Get help for the given service(s)
 
 #pod =head1 SYNOPSIS
@@ -69,7 +69,7 @@ Beam::Runner::Command::help - Get help for the given service(s)
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

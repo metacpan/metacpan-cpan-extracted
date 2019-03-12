@@ -1,5 +1,12 @@
 Revision history for Test-CChecker
 
+0.10      2019-03-10 20:57:17 -0400
+  - Archiving github repository, you can file bugs with Alien-Build.
+    at https://github.com/Perl5-Alien/Alien-Build
+    although support will likely be limited to helping you upgrade to
+    Test::Alien
+  - Switch to EUMM
+
 0.08      2016-04-25 17:24:46 -0400
   - Officially deprecating in favor of Test::Alien
 

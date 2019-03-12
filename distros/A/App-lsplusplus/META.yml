@@ -25,5 +25,5 @@ requires:
   Time::Local: '0.16'
 resources:
   repository: https://github.com/trapd00r/ls--.git
-version: '0.56'
+version: '0.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

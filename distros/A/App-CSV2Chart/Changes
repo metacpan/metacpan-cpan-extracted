@@ -1,4 +1,8 @@
 Revision history for App-CSV2Chart
 
+0.2.0   2019-03-09
+    - Add the --exec flag.
+    - Add some docs.
+
 0.0.1   2019-03-02
     - First version, released on an unsuspecting world

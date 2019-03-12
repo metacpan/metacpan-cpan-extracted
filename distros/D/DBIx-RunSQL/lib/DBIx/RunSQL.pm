@@ -1,9 +1,10 @@
 package DBIx::RunSQL;
 use strict;
+use warnings;
 use DBI;
+use Module::Load 'load';
 
-use vars qw($VERSION);
-$VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 NAME
 
@@ -374,9 +375,27 @@ sub format_results {
                       ;
 
         } else {
-            my $t= $options{formatter}->new(@columns);
-            $t->load( @$res );
-            $result= $t;
+            my $class = $options{ formatter };
+
+            if( !( $class->can('table') || $class->can('new'))) {
+                # Try to load the module, just in case it isn't present in
+                # memory already
+
+                eval { load $class; };
+            };
+            
+            # Now dispatch according to the apparent type
+            if( !$class->isa('Text::Table') and my $table = $class->can('table') ) {
+                # Text::Table::Any interface
+                $result = $table->( header_row => 1,
+                    rows => [\@columns, @$res ],
+                );
+            } else {;
+                # Text::Table interface
+                my $t= $options{formatter}->new(@columns);
+                $t->load( @$res );
+                $result= $t;
+            };
         };
     };
     "$result"; # Yes, sorry - we stringify everything

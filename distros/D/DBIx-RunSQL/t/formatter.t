@@ -45,7 +45,7 @@ is_deeply [split /\r?\n/, $result],
 
 package Text::Table::JIRA;
 use strict;
-use vars '@ISA';
+our @ISA;
 require Text::Table;
 BEGIN {
     @ISA = 'Text::Table';

@@ -1,0 +1,15 @@
+Changes
+lib/SQL/Tiny.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/delete.t
+t/insert.t
+t/select.t
+t/update.t
+
+# No need to ship this.
+# t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

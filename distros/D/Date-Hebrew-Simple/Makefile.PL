@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
-        'Date::Utils'          => '0.24',
+        'Date::Utils'          => '0.25',
         'Date::Calc'           => '6.0',
         'Time::localtime'      => '1.02',
     },
@@ -30,7 +30,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Date::Hebrew::Simple' => { file => 'lib/Date/Hebrew/Simple.pm', version => '0.10' },
+            'Date::Hebrew::Simple' => { file => 'lib/Date/Hebrew/Simple.pm', version => '0.11' },
         },
         resources => {
             repository => {

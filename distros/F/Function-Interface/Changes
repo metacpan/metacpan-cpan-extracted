@@ -1,5 +1,8 @@
 Revision history for Perl extension Function-Interface
 
+0.02 2019-03-12T16:33:06Z
+    - [BUGFIX] rename Types::Interface to Function::Interface::Types
+
 0.01 2019-03-01T03:53:13Z
 
     - original version

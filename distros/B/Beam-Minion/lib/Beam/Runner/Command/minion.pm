@@ -1,5 +1,5 @@
 package Beam::Runner::Command::minion;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Command for L<beam> to run distributed tasks
 
 #pod =head1 SYNOPSIS
@@ -35,7 +35,7 @@ sub run {
         }
         die "Error loading module '$cmd_class': $@\n";
     }
-    return $cmd_class->run( @args );
+    return $cmd_class->new->run( @args );
 }
 
 1;
@@ -50,7 +50,7 @@ Beam::Runner::Command::minion - Command for L<beam> to run distributed tasks
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

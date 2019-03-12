@@ -4,6 +4,7 @@ author:
   - 'Tatsuhiko Miyagawa'
 build_requires:
   HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
   LWP::UserAgent: '0'
   Test::Fatal: '0.006'
   Test::More: '0.88'
@@ -28,19 +29,21 @@ no_index:
 requires:
   Cookie::Baker: '0.10'
   Digest::HMAC_SHA1: '1.03'
-  Digest::SHA1: '0'
+  Digest::SHA: '0'
   Plack: '0.9910'
 resources:
   bugtracker: https://github.com/plack/Plack-Middleware-Session/issues
   homepage: https://github.com/plack/Plack-Middleware-Session
   repository: https://github.com/plack/Plack-Middleware-Session.git
-version: '0.32'
+version: '0.33'
 x_contributors:
   - 'Alex Vandiver <alex@chmrr.net>'
   - 'Florian Schlichting <fsfs@debian.org>'
   - 'franck cuny <franck@lumberjaph.net>'
+  - 'Graham Knop <gknop@omniti.com>'
   - 'Graham Knop <haarg@haarg.org>'
   - 'Ivan Baidakou <basiliscos@openmailbox.com>'
+  - 'James E Keenan <jkeenan@cpan.org>'
   - 'John Lifsey <john.lifsey@inspire.com>'
   - 'Lee Aylward <lee@laylward.com>'
   - 'lestrrat <lestrrat+github@gmail.com>'

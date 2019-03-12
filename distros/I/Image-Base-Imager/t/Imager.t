@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2019 Kevin Ryde
 
 # This file is part of Image-Base-Imager.
 #
@@ -56,7 +56,7 @@ require Image::Base::Imager;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 12;
+my $want_version = 13;
 ok ($Image::Base::Imager::VERSION,
     $want_version,
     'VERSION variable');
@@ -334,9 +334,9 @@ END {
                                         -height => 1,
                                         -file_format => $test_file_format);
   unlink $temp_filename;
-  open OUT, "> $temp_filename" or die;
+  open OUT, "> $temp_filename" or die "Cannot open $temp_filename: $!";
   $image->save_fh (\*OUT);
-  close OUT or die;
+  close OUT or die "Cannot close $temp_filename: $!";
   ok (-s $temp_filename > 0,
       1,
       'save_fh() not empty');
@@ -347,9 +347,9 @@ END {
 
 {
   my $image = Image::Base::Imager->new;
-  open IN, "< $temp_filename" or die;
+  open IN, "< $temp_filename" or die "Cannot open $temp_filename: $!";
   $image->load_fh (\*IN);
-  close IN or die;
+  close IN or die "Cannot close $temp_filename: $!";
   ok ($image->get('-file_format'),
       $test_file_format,
       'load_fh() -file_format');
@@ -396,15 +396,15 @@ if (! $have_cur) {
   ok ($image->get ('-hoty'), 4, 'get(-hoty)');
 
   $image->save($temp_filename);
-  open IN, "< $temp_filename" or die;
+  open IN, "< $temp_filename" or die "Cannot open $temp_filename: $!";
   my $content_one = do { local $/; <IN> }; # slurp
-  close IN or die;
+  close IN or die "Cannot close $temp_filename: $!";
 
   $image->set (-hotx => 7, -hoty => 8);
   $image->save($temp_filename);
-  open IN, "< $temp_filename" or die;
+  open IN, "< $temp_filename" or die "Cannot open $temp_filename: $!";
   my $content_two = do { local $/; <IN> }; # slurp
-  close IN or die;
+  close IN or die "Cannot close $temp_filename: $!";
 
   ok ($content_one ne $content_two,
       1,

@@ -28,7 +28,7 @@ no_index:
 provides:
   Data::ObjectDriver:
     file: lib/Data/ObjectDriver.pm
-    version: '0.16'
+    version: '0.17'
   Data::ObjectDriver::BaseObject:
     file: lib/Data/ObjectDriver/BaseObject.pm
   Data::ObjectDriver::BaseView:
@@ -92,7 +92,7 @@ resources:
   bugtracker: https://github.com/sixapart/data-objectdriver/issues
   homepage: https://github.com/sixapart/data-objectdriver
   repository: git://github.com/sixapart/data-objectdriver.git
-version: '0.16'
+version: '0.17'
 x_authority: cpan:SIXAPART
 x_contributors:
   - 'Adam Thomason <athomason@sixapart.com>'

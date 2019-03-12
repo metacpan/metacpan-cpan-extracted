@@ -1,5 +1,5 @@
 package Beam::Runnable::AllowUsers;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Only allow certain users to run a command
 
 #pod =head1 SYNOPSIS
@@ -80,7 +80,7 @@ Beam::Runnable::AllowUsers - Only allow certain users to run a command
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

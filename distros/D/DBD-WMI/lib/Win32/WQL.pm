@@ -2,7 +2,7 @@ package Win32::WQL;
 use strict;
 use Win32::OLE; #  qw(EVENTS);
 # Events support will follow later
-use base 'Class::Accessor';
+use parent 'Class::Accessor';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ is a compatibility layer over this module.
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 Win32::OLE->Option(Warn => 3);
 

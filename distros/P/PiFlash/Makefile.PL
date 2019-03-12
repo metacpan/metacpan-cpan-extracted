@@ -5,7 +5,7 @@ use Devel::AssertOS qw[Linux];
 use strict;
 use warnings;
 
-use 5.018000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "bin/piflash"
   ],
   "LICENSE" => "apache",
-  "MIN_PERL_VERSION" => "5.018000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "PiFlash",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.2.1",
+  "VERSION" => "0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }

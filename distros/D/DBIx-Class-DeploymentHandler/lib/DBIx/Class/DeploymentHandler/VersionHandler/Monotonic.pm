@@ -1,7 +1,7 @@
 package DBIx::Class::DeploymentHandler::VersionHandler::Monotonic;
-$DBIx::Class::DeploymentHandler::VersionHandler::Monotonic::VERSION = '0.002223';
-use Moose;
-use DBIx::Class::DeploymentHandler::Types;
+$DBIx::Class::DeploymentHandler::VersionHandler::Monotonic::VERSION = '0.002227';
+use Moo;
+use DBIx::Class::DeploymentHandler::Types -all;
 
 # ABSTRACT: Obvious version progressions
 
@@ -10,23 +10,22 @@ use Carp 'croak';
 with 'DBIx::Class::DeploymentHandler::HandlesVersioning';
 
 has schema_version => (
-  isa      => 'DBIx::Class::DeploymentHandler::VersionNonObj',
+  isa      => VersionNonObj,
   coerce   => 1,
   is       => 'ro',
   required => 1,
 );
 
 has initial_version => (
-  isa      => 'Int',
+  isa      => Int,
   is       => 'ro',
   required => 1,
 );
 
 has to_version => (
-  isa        => 'DBIx::Class::DeploymentHandler::VersionNonObj',
+  isa        => VersionNonObj,
   coerce     => 1,
-  is         => 'ro',
-  lazy_build => 1,
+  is         => 'lazy',
 );
 
 sub _build_to_version {
@@ -36,8 +35,9 @@ sub _build_to_version {
 
 has _version => (
   is         => 'rw',
-  isa        => 'Int',
-  lazy_build => 1,
+  isa        => Int,
+  builder    => \&_build__version,
+  lazy       => 1,
 );
 
 sub _inc_version { $_[0]->_version($_[0]->_version + 1 ) }

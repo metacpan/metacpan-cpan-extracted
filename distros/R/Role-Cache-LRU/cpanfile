@@ -16,6 +16,7 @@ on test => sub {
     requires 'Test::HasVersion';
     requires 'Test::Kwalitee';
     requires 'Test::More';
+    requires 'Test::Perl::Critic';
     requires 'Test::Pod::Coverage';
     requires 'Test::Warn';
 };
@@ -25,4 +26,6 @@ on 'develop' => sub {
     requires 'App::CISetup';
     requires 'App::Software::License';
     requires 'Dist::Milla';
+    requires 'Dist::Zilla::App::Command::cover';
+
 };

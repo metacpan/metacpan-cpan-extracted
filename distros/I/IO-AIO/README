@@ -471,9 +471,10 @@ FUNCTIONS
 
     aio_stat $fh_or_path, $callback->($status)
     aio_lstat $fh, $callback->($status)
-        Works like perl's "stat" or "lstat" in void context. The callback
-        will be called after the stat and the results will be available
-        using "stat _" or "-s _" etc...
+        Works almost exactly like perl's "stat" or "lstat" in void context.
+        The callback will be called after the stat and the results will be
+        available using "stat _" or "-s _" and other tests (with the
+        exception of "-B" and "-T").
 
         The pathname passed to "aio_stat" must be absolute. See API NOTES,
         above, for an explanation.
@@ -550,9 +551,10 @@ FUNCTIONS
         $atime and $mtime being undef). Fractional times are supported if
         the underlying syscalls support them.
 
-        When called with a pathname, uses utimes(2) if available, otherwise
-        utime(2). If called on a file descriptor, uses futimes(2) if
-        available, otherwise returns ENOSYS, so this is not portable.
+        When called with a pathname, uses utimensat(2) or utimes(2) if
+        available, otherwise utime(2). If called on a file descriptor, uses
+        futimens(2) or futimes(2) if available, otherwise returns ENOSYS, so
+        this is not portable.
 
         Examples:
 
@@ -1016,10 +1018,13 @@ FUNCTIONS
 
     aio_mlockall $flags, $callback->($status)
         Calls the "mlockall" function with the given $flags (a combination
-        of "IO::AIO::MCL_CURRENT" and "IO::AIO::MCL_FUTURE").
+        of "IO::AIO::MCL_CURRENT", "IO::AIO::MCL_FUTURE" and
+        "IO::AIO::MCL_ONFAULT").
 
         On systems that do not implement "mlockall", this function returns
-        -1 and sets errno to "ENOSYS".
+        -1 and sets errno to "ENOSYS". Similarly, flag combinations not
+        supported by the system result in a return value of -1 with errno
+        being set to "EINVAL".
 
         Note that the corresponding "munlockall" is synchronous and is
         documented under "MISCELLANEOUS FUNCTIONS".
@@ -1453,6 +1458,17 @@ FUNCTIONS
            IO::AIO::poll_wait, IO::AIO::poll_cb
               while IO::AIO::nreqs;
 
+        This function can be useful at program aborts, to make sure
+        outstanding I/O has been done ("IO::AIO" uses an "END" block which
+        already calls this function on normal exits), or when you are merely
+        using "IO::AIO" for its more advanced functions, rather than for
+        async I/O, e.g.:
+
+           my ($dirs, $nondirs);
+           IO::AIO::aio_scandir "/tmp", 0, sub { ($dirs, $nondirs) = @_ };
+           IO::AIO::flush;
+           # $dirs, $nondirs are now set
+
     IO::AIO::max_poll_reqs $nreqs
     IO::AIO::max_poll_time $seconds
         These set the maximum number of requests (default 0, meaning
@@ -1616,25 +1632,48 @@ FUNCTIONS
     not supported or could not be detected, a fractional part of 0 is
     returned, so it is always safe to call these functions.
 
-    $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime
-        Return the access, modication or change time, respectively,
+    $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime,
+    IO::AIO::st_btime
+        Return the access, modication, change or birth time, respectively,
         including fractional part. Due to the limited precision of floating
         point, the accuracy on most platforms is only a bit better than
         milliseconds for times around now - see the *nsec* function family,
         below, for full accuracy.
 
-    ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtime
-        Returns access, modification and change time all in one go, and
-        maybe more times in the future version.
+        File birth time is only available when the OS and perl support it
+        (on FreeBSD and NetBSD at the time of this writing, although support
+        is adaptive, so if your OS/perl gains support, IO::AIO can take
+        avdantage of it). On systems where it isn't available, 0 is
+        currently returned, but this might change to "undef" in a future
+        version.
+
+    ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtime
+        Returns access, modification, change and birth time all in one go,
+        and maybe more times in the future version.
 
     $nanoseconds = IO::AIO::st_atimensec, IO::AIO::st_mtimensec,
-    IO::AIO::st_ctimensec
-        Return the fractional access, modifcation or change time, in
+    IO::AIO::st_ctimensec, IO::AIO::st_btimensec
+        Return the fractional access, modifcation, change or birth time, in
         nanoseconds, as an integer in the range 0 to 999999999.
 
-    ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtimensec
-        Like the functions above, but returns all three times in one go (and
+        Note that no accessors are provided for access, modification and
+        change times - you need to get those from "stat _" if required ("int
+        IO::AIO::st_atime" and so on will *not* generally give you the
+        correct value).
+
+    $seconds = IO::AIO::st_btimesec
+        The (integral) seconds part of the file birth time, if available.
+
+    ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtimensec
+        Like the functions above, but returns all four times in one go (and
         maybe more in future versions).
+
+    $counter = IO::AIO::st_gen
+        Returns the generation counter (in practice this is just a random
+        number) of the file. This is only available on platforms which have
+        this member in their "struct stat" (most BSDs at the time of this
+        writing) and generally only to the root usert. If unsupported, 0 is
+        returned, but this might change to "undef" in a future version.
 
     Example: print the high resolution modification time of /etc, using
     "stat", and "IO::AIO::aio_stat".
@@ -1816,6 +1855,10 @@ FUNCTIONS
 
         On systems where this call is not supported or is not emulated, this
         call returns falls and sets $! to "ENOSYS".
+
+    IO::AIO::mlockall $flags
+        Calls the "eio_mlockall_sync" function, which is like
+        "aio_mlockall", but is blocking.
 
     IO::AIO::munlock $scalar, $offset = 0, $length = undef
         Calls the "munlock" function, undoing the effects of a previous

@@ -107,6 +107,8 @@ u_cmp_eql omega => timegm( 0, 0, 0, 10, 3, 87 ), .19640,
 
 # TODO drop the following
 
+=begin comment
+
 u_cmp_eql nutation_in_longitude => timegm( 0, 0, 0, 10, 3, 87 ),
     -1.8364e-5, '%.5f',	# Tolerance .5 seconds of arc
     'nutation_in_longitude: Midnight Nov 3 1987: Meeus ex 22.a';
@@ -121,6 +123,10 @@ u_cmp_eql obliquity => timegm( 0, 0, 0, 10, 3, 87 ), 0.409167475225493,
 u_cmp_eql equation_of_time => timegm( 0, 0, 0, 13, 9, 92 ),
     13 * 60 + 42.7, '%.1f',	# Tolerance .1 second
     'equation_of_time: Midnight Oct 13 1992: Meeus ex 28b';
+
+=end comment
+
+=cut
 
 # TODO drop the preceding
 
@@ -333,13 +339,22 @@ sub u_cmp_eql (@) {
 	my $got;
 	if ( ARRAY_REF eq ref $want ) {
 	    ( my $inx, $want ) = @{ $want };
-	    my @rslt = $code->( @{ $arg } );
+	    my @rslt;
+	    {
+		# The following package() statement seems to be the most
+		# convenient way to get warnings and errors reported
+		# where the test occurs rather than here.
+		package Astro::Coord::ECI::Utils;
+		@rslt = $code->( @{ $arg } );
+	    }
 	    if ( 1 == @rslt && ARRAY_REF eq ref $rslt[0] ) {
 		$got = $rslt[0][$inx];
 	    } else {
 		$got = $rslt[$inx];
 	    }
 	} else {
+	    # See above for the rationale for the package() statement.
+	    package Astro::Coord::ECI::Utils;
 	    $got = $code->( @{ $arg } );
 	}
 	if ( ! defined $want ) {

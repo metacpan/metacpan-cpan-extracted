@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package Code::Statistics::Target::Block;
-{
-  $Code::Statistics::Target::Block::VERSION = '1.112980';
-}
-
+$Code::Statistics::Target::Block::VERSION = '1.190680';
 # ABSTRACT: represents a block in perl code
 
 use Moose;
@@ -20,7 +17,10 @@ sub find_targets {
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -28,7 +28,7 @@ Code::Statistics::Target::Block - represents a block in perl code
 
 =head1 VERSION
 
-version 1.112980
+version 1.190680
 
 =head2 find_targets
     Returns all PPI::Structure::Block elements found in the given file.
@@ -39,11 +39,13 @@ Christian Walde <mithaldu@yahoo.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2010 by Christian Walde.
 
-This is free software, licensed under:
+Christian Walde has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
 
-  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
 
 =cut
-

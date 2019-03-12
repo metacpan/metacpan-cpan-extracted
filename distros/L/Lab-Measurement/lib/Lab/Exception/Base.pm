@@ -1,6 +1,6 @@
 package Lab::Exception::Base;
 #ABSTRACT: Exception base class
-$Lab::Exception::Base::VERSION = '3.671';
+$Lab::Exception::Base::VERSION = '3.680';
 #
 # This is for comfy optional adding of custom methods via our own exception base class later
 #
@@ -45,11 +45,11 @@ Lab::Exception::Base - Exception base class
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2014       Andreas K. Huettel
             2016       Simon Reinhardt

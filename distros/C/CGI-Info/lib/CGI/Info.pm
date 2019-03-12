@@ -8,9 +8,10 @@ use Class::Autouse qw{Carp File::Spec};
 use Socket;	# For AF_INET
 use 5.006_001;
 use Log::Any qw($log);
-use Cwd;
+# use Cwd;
 use JSON::Parse;
 use List::MoreUtils;	# Can go when expect goes
+use Sys::Path;
 
 use namespace::clean;
 
@@ -20,11 +21,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.68
+Version 0.69
 
 =cut
 
-our $VERSION = '0.68';
+our $VERSION = '0.69';
 
 =head1 SYNOPSIS
 
@@ -1257,6 +1258,33 @@ sub rootdir {
 	return $script_name;
 }
 
+=head2 logdir
+
+Gets and sets the name of a directory that you can use to store logs in.
+
+=cut
+
+sub logdir {
+	my $self = shift;
+	my $dir = shift;
+
+	if(defined($dir)) {
+		# No sanity testing is done
+		return $self->{_logdir} = $dir;
+	}
+
+	foreach my $rc($self->{_logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
+		if(defined($rc) && length($rc) && (-d $rc) && (-w $rc)) {
+			$dir = $rc;
+			last;
+		}
+	}
+	Carp::carp("Can't determine logdir") if((!defined($dir)) || (length($dir) == 0));
+	$self->{_logdir} ||= $dir;
+
+	return $dir;
+}
+
 =head2 is_robot
 
 Is the visitor a real person or a robot?
@@ -1711,7 +1739,7 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2018 Nigel Horne.
+Copyright 2010-2019 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

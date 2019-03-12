@@ -6,7 +6,7 @@ use Test2::V0;
 use GIS::Distance;
 
 my @coords = ( 34.202361, -118.601875,  37.752258, -122.441254 );
-my @formulas = qw( Haversine Cosine Vincenty );
+my @formulas = qw( ALT Cosine GreatCircle Haversine Polar Vincenty );
 my $gis = GIS::Distance->new();
 
 foreach my $formula (@formulas) {

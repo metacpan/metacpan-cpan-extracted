@@ -1,7 +1,7 @@
 package File::RsyBak;
 
-our $DATE = '2018-09-30'; # DATE
-our $VERSION = '0.360'; # VERSION
+our $DATE = '2019-03-11'; # DATE
+our $VERSION = '0.361'; # VERSION
 
 use 5.010001;
 use strict;
@@ -379,7 +379,7 @@ File::RsyBak - Backup files/directories with histories, using rsync
 
 =head1 VERSION
 
-This document describes version 0.360 of File::RsyBak (from Perl distribution File-RsyBak), released on 2018-09-30.
+This document describes version 0.361 of File::RsyBak (from Perl distribution File-RsyBak), released on 2019-03-11.
 
 =head1 SYNOPSIS
 
@@ -495,7 +495,7 @@ on those platforms.
 
 =head1 HOW IT WORKS
 
-=head2 First-time backup
+=head2 First-time backup (when TARGET does not yet exist)
 
 First, we lock target directory to prevent other backup process from
 interfering:
@@ -510,8 +510,8 @@ Then we copy source to temporary directory:
 If copy finishes successfully, we rename temporary directory to final directory
 'current':
 
- rename   TARGET/.tmp    TARGET/current
  touch    TARGET/.current.timestamp
+ rename   TARGET/.tmp    TARGET/current
 
 If copy fails in the middle, TARGET/.tmp will still be lying around and the next
 backup run will just continue the rsync process:
@@ -524,7 +524,8 @@ Finally, we remove lock:
 
 =head2 Subsequent backups (after TARGET/current exists)
 
-First, we lock target directory to prevent other backup process to interfere:
+First, we lock target directory to prevent other backup process from
+interfering:
 
  flock    TARGET/.lock
 
@@ -535,8 +536,10 @@ Then we rsync source to target directory (using --link-dest=TARGET/current):
 If rsync finishes successfully, we rename target directories:
 
  rename   TARGET/current TARGET/hist.<timestamp>
- rename   TARGET/.tmp    TARGET/current
  touch    TARGET/.current.timestamp
+ rename   TARGET/.tmp    TARGET/current
+
+where <timestamp> is the mtime of TARGET/.current.timestamp file.
 
 If rsync fails in the middle, TARGET/.tmp will be lying around and the next
 backup run will just continue the rsync process.
@@ -593,7 +596,7 @@ TARGET/hist3.<timestamp85> comes along.
 
 Usage:
 
- backup(%args) -> [status, msg, result, meta]
+ backup(%args) -> [status, msg, payload, meta]
 
 Backup files/directories with histories, using rsync.
 
@@ -672,7 +675,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -764,7 +767,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

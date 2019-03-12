@@ -10,8 +10,8 @@ use base 'HTML::Widgets::NavMenu::Iterator::NavMenu';
 sub get_open_sub_menu_tags
 {
     my $self = shift;
-    return ("<br class=\"hello\" />",
-        $self->gen_ul_tag({'depth' => $self->stack->len()}));
+    return ( "<br class=\"hello\" />",
+        $self->gen_ul_tag( { 'depth' => $self->stack->len() } ) );
 }
 
 sub get_currently_active_text
@@ -31,10 +31,8 @@ sub _get_nav_menu_traverser
 {
     my $self = shift;
 
-    return
-        MyCustom::NavMenu::Iterator->new(
-            $self->_get_nav_menu_traverser_args()
-        );
+    return MyCustom::NavMenu::Iterator->new(
+        $self->_get_nav_menu_traverser_args() );
 }
 
 package main;
@@ -51,15 +49,15 @@ my $test_data = get_test_data();
 
 sub validate_nav_menu
 {
-    my $rendered = shift;
+    my $rendered        = shift;
     my $expected_string = shift;
-    my $test_blurb = shift;
+    my $test_blurb      = shift;
 
-    my @result = (@{$rendered->{html}});
+    my @result = ( @{ $rendered->{html} } );
 
-    my @expected = (split(/\n/, $expected_string));
+    my @expected = ( split( /\n/, $expected_string ) );
 
-    is_deeply (\@expected, \@result, $test_blurb);
+    is_deeply( \@expected, \@result, $test_blurb );
 }
 
 # This test tests that an inherited nav menu similar to what Stephen Petersen
@@ -67,12 +65,11 @@ sub validate_nav_menu
 {
     my $nav_menu = MyCustom::NavMenu->new(
         'path_info' => "/me/",
-        @{$test_data->{'show_always'}},
+        @{ $test_data->{'show_always'} },
         'ul_classes' => [ "navbarmain", ("navbarnested") x 5 ],
     );
 
-    my $rendered =
-        $nav_menu->render();
+    my $rendered = $nav_menu->render();
 
     my $expected_string = <<"EOF";
 <ul class="navbarmain">
@@ -113,10 +110,7 @@ sub validate_nav_menu
 EOF
 
     # TEST
-    validate_nav_menu(
-        $rendered,
-        $expected_string,
-        "Nav Menu with show_always"
-    );
+    validate_nav_menu( $rendered, $expected_string,
+        "Nav Menu with show_always" );
 }
 

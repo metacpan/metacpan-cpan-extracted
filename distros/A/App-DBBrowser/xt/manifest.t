@@ -4,4 +4,4 @@ use warnings;
 
 use Test::CheckManifest;
 
-ok_manifest( { filter => [ qr/\.git/ ] } );
+ok_manifest();

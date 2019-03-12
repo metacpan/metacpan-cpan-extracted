@@ -1,0 +1,79 @@
+# -*- Perl -*-
+# See copyright, etc in below POD section.
+######################################################################
+
+=pod
+
+=head1 NAME
+
+Parallel::Forker README file
+
+=head1 DESCRIPTION
+
+Parallel::Forker manages parallel processes that are either subroutines or
+system commands.  Forker supports most of the features in all the other
+little packages out there, with the addition of being able to specify
+complicated expressions to determine which processes run after others, or
+run when others fail.
+
+=head1 INSTALLATION
+
+Skip this section if Parallel::Forker has already been installed.
+
+=head2 Supported Systems
+
+Parallel::Forker should run on any system with Perl.
+
+=head2 CPAN Installation
+
+=over 4
+
+Easiest installation is using the "CPAN" command line that comes with Perl.
+After configuring CPAN the first time, simply
+
+   $ cpan
+   cpan> install Parallel::Forker
+
+Read the rest of this file for details on the programs provided.
+
+=back
+
+=head2 Manual Installation
+
+=over 4
+
+Download the latest version from L<http://www.perl.org/CPAN/>.
+
+C<cd> to the directory containing this README notice.
+
+Type C<perl Makefile.PL> to configure for your system.
+
+Type C<make> to compile.
+
+Type C<make test> to check the package.
+
+Type C<make install> to install the programs and any data files and
+documentation.
+
+=back
+
+=head1 USAGE
+
+See the L<Parallel::Forker> manpage after installation.
+
+=head1 DISTRIBUTION
+
+The latest version is available from CPAN.
+
+Copyright 2002-2019 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=cut

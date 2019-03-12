@@ -2,7 +2,7 @@
 #
 # This file is part of ElasticSearchX-Model
 #
-# This software is Copyright (c) 2018 by Moritz Onken.
+# This software is Copyright (c) 2019 by Moritz Onken.
 #
 # This is free software, licensed under:
 #

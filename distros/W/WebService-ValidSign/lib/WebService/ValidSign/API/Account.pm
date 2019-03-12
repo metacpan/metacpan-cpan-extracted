@@ -1,13 +1,12 @@
 package WebService::ValidSign::API::Account;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use namespace::autoclean;
 
 # ABSTRACT: A REST API client for ValidSign
 
 use WebService::ValidSign::Object::Sender;
-use Data::Dumper;
 
 has action_endpoint => (
     is      => 'ro',
@@ -46,13 +45,7 @@ sub senders {
     my $response = $self->call_api($request);
     my @senders;
     foreach (@{$response->{results}}) {
-        push(@senders, WebService::ValidSign::Object::Sender->new(
-            id         => $_->{id},
-            type       => $_->{type},
-            last_name  => $_->{lastName},
-            first_name => $_->{firstName},
-            email      => $_->{email},
-        ));
+        push(@senders, WebService::ValidSign::Object::Sender->new(%{$_}));
     }
 
     return \@senders;
@@ -74,7 +67,7 @@ WebService::ValidSign::API::Account - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

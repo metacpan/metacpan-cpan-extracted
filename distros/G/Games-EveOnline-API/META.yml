@@ -26,21 +26,23 @@ no_index:
 provides:
   Games::EveOnline::API:
     file: lib/Games/EveOnline/API.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   LWP::UserAgent: '0'
   Moo: '1.004005'
   Type::Tiny: '0.044'
+  URI: '0'
   XML::Simple: '0'
 resources:
   bugtracker: https://github.com/bluefeet/Games-EveOnline-API/issues
   homepage: https://github.com/bluefeet/Games-EveOnline-API
   repository: git://github.com/bluefeet/Games-EveOnline-API.git
-version: '0.08'
+version: '0.10'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Andrey Kuzmin <chips@reg.ru>'
   - 'Aran Deltac <aran@ziprecruiter.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_deprecated: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

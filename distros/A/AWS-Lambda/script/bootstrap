@@ -1,0 +1,9 @@
+#!/opt/bin/perl
+
+use strict;
+use warnings;
+use utf8;
+use AWS::Lambda::Bootstrap;
+
+my $bootstrap = AWS::Lambda::Bootstrap->new;
+$bootstrap->handle_events;

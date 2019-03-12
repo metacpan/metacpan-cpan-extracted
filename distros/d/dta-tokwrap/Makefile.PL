@@ -7,7 +7,9 @@ use utf8;
 
 ##----------------------------------------------------------------------
 ## sanity checks
-die("OS $^O not supported") if ($^O =~ /win32/i);
+BEGIN {
+  die("OS $^O not supported") if ($^O =~ /win32/i);
+}
 
 ##-- always re-generate MYMETA.*
 foreach my $f (qw(META.yml META.json MYMETA.yml MYMETA.json)) {

@@ -1,5 +1,10 @@
 Revision history for HTTP-AnyUA.
 
+0.903     2019-03-09 12:33:20-07:00 MST7MDT
+
+  * Fix bug in Runtime middleware calling ->transform in void context for
+    backends returning Futures.
+
 0.902     2019-03-02 14:07:59-07:00 MST7MDT
 
   * Add RequestHeaders middleware

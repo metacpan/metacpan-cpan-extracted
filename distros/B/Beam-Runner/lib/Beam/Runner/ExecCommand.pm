@@ -1,5 +1,5 @@
 package Beam::Runner::ExecCommand;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Run an external command
 
 #pod =head1 SYNOPSIS
@@ -66,7 +66,7 @@ Beam::Runner::ExecCommand - Run an external command
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

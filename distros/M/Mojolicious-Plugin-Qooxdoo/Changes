@@ -1,5 +1,11 @@
 Revision history for Mojolicious::Pugin::Qooxdoo
 
+1.0.3 2019-03-08
+  - have explicit functions for loggin in the rpc controller
+
+1.0.2 2019-03-08
+  - added property params to the controller so that the parameters can be queried even in places where they are not passed as an argument
+
 1.0.0 2018-11-26
   - add support for Mojo::Promise responses
   

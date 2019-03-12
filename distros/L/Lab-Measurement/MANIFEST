@@ -205,6 +205,9 @@ lib/Lab/Moose/Instrument/Lakeshore340.pm
 lib/Lab/Moose/Instrument/LinearStepSweep.pm
 lib/Lab/Moose/Instrument/Log.pm
 lib/Lab/Moose/Instrument/OI_Common.pm
+lib/Lab/Moose/Instrument/OI_IPS.pm
+lib/Lab/Moose/Instrument/OI_IPS/Strunk_3He.pm
+lib/Lab/Moose/Instrument/OI_ITC503.pm
 lib/Lab/Moose/Instrument/OI_Mercury/Magnet.pm
 lib/Lab/Moose/Instrument/OI_Triton.pm
 lib/Lab/Moose/Instrument/RS_FSV.pm
@@ -269,10 +272,12 @@ lib/Lab/XPRESS/Examples/Example2_Gate_IV_scan.pod
 lib/Lab/XPRESS/Examples/Example3_2samples_2files.pod
 lib/Lab/XPRESS/Examples/Example4_3d_scan.pod
 lib/Lab/XPRESS/Sweep.pm
+lib/Lab/XPRESS/Sweep/Amplitude.pm
 lib/Lab/XPRESS/Sweep/DietersCrazyTempSweep.pm
 lib/Lab/XPRESS/Sweep/Dummy.pm
 lib/Lab/XPRESS/Sweep/Frame.pm
 lib/Lab/XPRESS/Sweep/Frequency.pm
+lib/Lab/XPRESS/Sweep/Level.pm
 lib/Lab/XPRESS/Sweep/LogBlock.pm
 lib/Lab/XPRESS/Sweep/Magnet.pm
 lib/Lab/XPRESS/Sweep/Motor.pm
@@ -286,7 +291,6 @@ lib/Lab/XPRESS/Sweep/Voltage.pm
 lib/Lab/XPRESS/Utilities/Utilities.pm
 lib/Lab/XPRESS/hub.pm
 perltidyrc
-scripts/lab-update.pl
 t/00-load.t
 t/Analysis/DataAnalysis.t
 t/Analysis/TDS2024TraceData.dat
@@ -355,6 +359,7 @@ t/XPRESS/LogBlock.t
 t/XPRESS/Sweep-Voltage.t
 t/XPRESS/Sweep-Voltage.yml
 t/pod.t
+t/update-ids.pl
 'utilities/labview/LV Socket Com.txt'
 'utilities/labview/LV Socket Com.vi'
 utilities/udev-rules/70-usbtmc.rules

@@ -13,7 +13,7 @@ isa_ok($af, "File::ArchivableFormats");
 {
     note "Supported file type for DANS";
 
-    open my $file, '<', catfile(qw(t 100-fileformats.t));
+    open my $file, '<', 'README.md';
     my $status = $af->identify_from_fh($file);
 
     my %expect = (

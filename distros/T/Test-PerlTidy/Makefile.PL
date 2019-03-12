@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "English" => 0,
     "Exporter" => 0,
-    "File::Finder" => 0,
     "File::Spec" => 0,
     "IO::File" => 0,
     "Path::Tiny" => 0,
@@ -43,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "Test::Perl::Critic" => 0
   },
-  "VERSION" => "20190305.001",
+  "VERSION" => "20190309.001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +53,6 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "English" => 0,
   "Exporter" => 0,
-  "File::Finder" => 0,
   "File::Spec" => 0,
   "IO::File" => 0,
   "IO::Handle" => 0,

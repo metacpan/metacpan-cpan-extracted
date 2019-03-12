@@ -1,5 +1,8 @@
 Revision history for JMAP-Tester
 
+0.026     2019-03-08 15:48:29-05:00 America/New_York
+        - fix reference type of accounts collection (thanks, WOLFSAGE)
+
 0.025     2019-03-06 09:16:33-05:00 America/New_York
         - allow for template variables in upload URI also
 

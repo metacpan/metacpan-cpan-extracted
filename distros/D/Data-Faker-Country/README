@@ -1,0 +1,36 @@
+NAME
+
+    Data::Faker::Country - provides country support for Data::Faker
+
+SYNOPSIS
+
+     use Data::Faker;
+     use feature qw(say);
+     my $faker = Data::Faker->new;
+     say "Example country:          " . $faker->country;
+     say "Example ISO country code: " . $faker->country_code;
+
+DESCRIPTION
+
+    Provides two methods in Data::Faker:
+
+METHODS
+
+ country
+
+    Returns a single scalar country name (in English) as a Unicode string.
+
+ country_code
+
+    Returns a single scalar 2-character ISO-3166 country code as a Unicode
+    string.
+
+AUTHOR
+
+    Tom Molesworth <TEAM@cpan.org>
+
+LICENSE
+
+    Copyright Tom Molesworth 2019. Licensed under the same terms as Perl
+    itself.
+

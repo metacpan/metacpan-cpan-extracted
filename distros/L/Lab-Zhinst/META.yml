@@ -31,5 +31,5 @@ resources:
   MailingList: https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users
   homepage: http://www.labmeasurement.de
   repository: git://github.com/lab-measurement/Lab-Zhinst.git
-version: '1.02'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

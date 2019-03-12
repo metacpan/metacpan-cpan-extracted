@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl-Critic-Policy-Moo-ProhibitMakeImmutable.
 
+0.06 2019-03-12T17:02:51Z
+
+ - Deprecate.
+
 0.05 2019-03-03T18:40:22Z
 
  - Declare deps as modules, not distros.

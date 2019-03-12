@@ -1,6 +1,6 @@
 package Lab::Bus::MODBUS_RS232;
 #ABSTRACT: RS232/RS485 MODBUS RTU protocol bus
-$Lab::Bus::MODBUS_RS232::VERSION = '3.671';
+$Lab::Bus::MODBUS_RS232::VERSION = '3.680';
 #
 # MODBUS bus driver.
 # The MODBUS standard defines a protocol to access the memory of connected devices,
@@ -385,7 +385,7 @@ Lab::Bus::MODBUS_RS232 - RS232/RS485 MODBUS RTU protocol bus
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -466,7 +466,7 @@ This is a prototype...
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2011-2012  Andreas K. Huettel, Florian Olbrich
             2016       Simon Reinhardt

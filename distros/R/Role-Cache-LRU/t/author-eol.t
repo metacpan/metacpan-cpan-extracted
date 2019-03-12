@@ -19,6 +19,7 @@ my @files = (
     't/00-compile.t',
     't/000-report-versions.t',
     't/00_setget.t',
+    't/author-critic.t',
     't/author-eol.t',
     't/author-minimum-version.t',
     't/author-pod-coverage.t',

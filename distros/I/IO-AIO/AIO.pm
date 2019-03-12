@@ -173,7 +173,7 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.54;
+   our $VERSION = 4.71;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
@@ -543,9 +543,10 @@ be emulated by simply reading the data, which would have a similar effect.
 
 =item aio_lstat $fh, $callback->($status)
 
-Works like perl's C<stat> or C<lstat> in void context. The callback will
-be called after the stat and the results will be available using C<stat _>
-or C<-s _> etc...
+Works almost exactly like perl's C<stat> or C<lstat> in void context. The
+callback will be called after the stat and the results will be available
+using C<stat _> or C<-s _> and other tests (with the exception of C<-B>
+and C<-T>).
 
 The pathname passed to C<aio_stat> must be absolute. See API NOTES, above,
 for an explanation.
@@ -624,9 +625,10 @@ Works like perl's C<utime> function (including the special case of $atime
 and $mtime being undef). Fractional times are supported if the underlying
 syscalls support them.
 
-When called with a pathname, uses utimes(2) if available, otherwise
-utime(2). If called on a file descriptor, uses futimes(2) if available,
-otherwise returns ENOSYS, so this is not portable.
+When called with a pathname, uses utimensat(2) or utimes(2) if available,
+otherwise utime(2). If called on a file descriptor, uses futimens(2)
+or futimes(2) if available, otherwise returns ENOSYS, so this is not
+portable.
 
 Examples:
 
@@ -1109,12 +1111,68 @@ sub aio_scandir($$;$) {
          return $grp->result () if $_[0];
          my $now = time;
          my $hash1 = join ":", (stat _)[0,1,3,7,9];
+         my $rdxflags = READDIR_DIRS_FIRST;
+
+         if ((stat _)[3] < 2) {
+            # at least one non-POSIX filesystem exists
+            # that returns useful DT_type values: btrfs,
+            # so optimise for this here by requesting dents
+            $rdxflags |= READDIR_DENTS;
+         }
 
          # read the directory entries
          aioreq_pri $pri;
-         add $grp aio_readdirx $wd, READDIR_DIRS_FIRST, sub {
-            my $entries = shift
+         add $grp aio_readdirx $wd, $rdxflags, sub {
+            my ($entries, $flags) = @_
                or return $grp->result ();
+
+            if ($rdxflags & READDIR_DENTS) {
+               # if we requested type values, see if we can use them directly.
+
+               # if there were any DT_UNKNOWN entries then we assume we
+               # don't know. alternatively, we could assume that if we get
+               # one DT_DIR, then all directories are indeed marked with
+               # DT_DIR, but this seems not required for btrfs, and this
+               # is basically the "btrfs can't get it's act together" code
+               # branch.
+               unless ($flags & READDIR_FOUND_UNKNOWN) {
+                  # now we have valid DT_ information for all entries,
+                  # so use it as an optimisation without further stat's.
+                  # they must also all be at the beginning of @$entries
+                  # by now.
+
+                  my $dirs;
+
+                  if (@$entries) {
+                     for (0 .. $#$entries) {
+                        if ($entries->[$_][1] != DT_DIR) {
+                           # splice out directories
+                           $dirs = [splice @$entries, 0, $_];
+                           last;
+                        }
+                     }
+
+                     # if we didn't find any non-dir, then all entries are dirs
+                     unless ($dirs) {
+                        ($dirs, $entries) = ($entries, []);
+                     }
+                  } else {
+                     # directory is empty, so there are no sbdirs
+                     $dirs = [];
+                  }
+
+                  # either splice'd the directories out or the dir was empty.
+                  # convert dents to filenames
+                  $_ = $_->[0] for @$dirs;
+                  $_ = $_->[0] for @$entries;
+
+                  return $grp->result ($dirs, $entries);
+               }
+
+               # cannot use, so return to our old ways
+               # by pretending we only scanned for names.
+               $_ = $_->[0] for @$entries;
+            }
 
             # stat the dir another time
             aioreq_pri $pri;
@@ -1385,11 +1443,14 @@ C<$data> gets destroyed.
 
 =item aio_mlockall $flags, $callback->($status)
 
-Calls the C<mlockall> function with the given C<$flags> (a combination of
-C<IO::AIO::MCL_CURRENT> and C<IO::AIO::MCL_FUTURE>).
+Calls the C<mlockall> function with the given C<$flags> (a
+combination of C<IO::AIO::MCL_CURRENT>, C<IO::AIO::MCL_FUTURE> and
+C<IO::AIO::MCL_ONFAULT>).
 
 On systems that do not implement C<mlockall>, this function returns C<-1>
-and sets errno to C<ENOSYS>.
+and sets errno to C<ENOSYS>. Similarly, flag combinations not supported
+by the system result in a return value of C<-1> with errno being set to
+C<EINVAL>.
 
 Note that the corresponding C<munlockall> is synchronous and is
 documented under L<MISCELLANEOUS FUNCTIONS>.
@@ -1784,6 +1845,7 @@ automatically bumps it up to C<2>.
 
 =back
 
+
 =head2 SUPPORT FUNCTIONS
 
 =head3 EVENT PROCESSING AND EVENT LOOP INTEGRATION
@@ -1858,6 +1920,16 @@ Strictly equivalent to:
    IO::AIO::poll_wait, IO::AIO::poll_cb
       while IO::AIO::nreqs;
 
+This function can be useful at program aborts, to make sure outstanding
+I/O has been done (C<IO::AIO> uses an C<END> block which already calls
+this function on normal exits), or when you are merely using C<IO::AIO>
+for its more advanced functions, rather than for async I/O, e.g.:
+
+   my ($dirs, $nondirs);
+   IO::AIO::aio_scandir "/tmp", 0, sub { ($dirs, $nondirs) = @_ };
+   IO::AIO::flush;
+   # $dirs, $nondirs are now set
+
 =item IO::AIO::max_poll_reqs $nreqs
 
 =item IO::AIO::max_poll_time $seconds
@@ -1892,6 +1964,7 @@ program get the CPU sometimes even under high AIO load.
               cb => &IO::AIO::poll_cb);
 
 =back
+
 
 =head3 CONTROLLING THE NUMBER OF THREADS
 
@@ -1989,6 +2062,7 @@ practical limit on the number of outstanding requests.
 
 =back
 
+
 =head3 STATISTICAL INFORMATION
 
 =over
@@ -2015,6 +2089,7 @@ but not yet processed by poll_cb).
 
 =back
 
+
 =head3 SUBSECOND STAT TIME ACCESS
 
 Both C<aio_stat>/C<aio_lstat> and perl's C<stat>/C<lstat> functions can
@@ -2039,28 +2114,51 @@ returned, so it is always safe to call these functions.
 
 =over 4
 
-=item $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime
+=item $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime, IO::AIO::st_btime
 
-Return the access, modication or change time, respectively, including
-fractional part. Due to the limited precision of floating point, the
-accuracy on most platforms is only a bit better than milliseconds for
-times around now - see the I<nsec> function family, below, for full
+Return the access, modication, change or birth time, respectively,
+including fractional part. Due to the limited precision of floating point,
+the accuracy on most platforms is only a bit better than milliseconds
+for times around now - see the I<nsec> function family, below, for full
 accuracy.
 
-=item ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtime
+File birth time is only available when the OS and perl support it (on
+FreeBSD and NetBSD at the time of this writing, although support is
+adaptive, so if your OS/perl gains support, IO::AIO can take avdantage of
+it). On systems where it isn't available, C<0> is currently returned, but
+this might change to C<undef> in a future version.
 
-Returns access, modification and change time all in one go, and maybe more
-times in the future version.
+=item ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtime
 
-=item $nanoseconds = IO::AIO::st_atimensec, IO::AIO::st_mtimensec, IO::AIO::st_ctimensec
+Returns access, modification, change and birth time all in one go, and
+maybe more times in the future version.
 
-Return the fractional access, modifcation or change time, in nanoseconds,
+=item $nanoseconds = IO::AIO::st_atimensec, IO::AIO::st_mtimensec, IO::AIO::st_ctimensec, IO::AIO::st_btimensec
+
+Return the fractional access, modifcation, change or birth time, in nanoseconds,
 as an integer in the range C<0> to C<999999999>.
 
-=item ($atime, $mtime, $ctime, ...) = IO::AIO::st_xtimensec
+Note that no accessors are provided for access, modification and
+change times - you need to get those from C<stat _> if required (C<int
+IO::AIO::st_atime> and so on will I<not> generally give you the correct
+value).
 
-Like the functions above, but returns all three times in one go (and maybe
+=item $seconds = IO::AIO::st_btimesec
+
+The (integral) seconds part of the file birth time, if available.
+
+=item ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtimensec
+
+Like the functions above, but returns all four times in one go (and maybe
 more in future versions).
+
+=item $counter = IO::AIO::st_gen
+
+Returns the generation counter (in practice this is just a random number)
+of the file. This is only available on platforms which have this member in
+their C<struct stat> (most BSDs at the time of this writing) and generally
+only to the root usert. If unsupported, C<0> is returned, but this might
+change to C<undef> in a future version.
 
 =back
 
@@ -2084,6 +2182,7 @@ Output of the awbove on my system, showing reduced and full accuracy:
 
    stat(/etc) mtime: 1534043702.020808
    aio_stat(/etc) mtime: 1534043702.020807792
+
 
 =head3 MISCELLANEOUS FUNCTIONS
 
@@ -2256,6 +2355,11 @@ implemented, but not supported and might go away in a future version.
 
 On systems where this call is not supported or is not emulated, this call
 returns falls and sets C<$!> to C<ENOSYS>.
+
+=item IO::AIO::mlockall $flags
+
+Calls the C<eio_mlockall_sync> function, which is like C<aio_mlockall>,
+but is blocking.
 
 =item IO::AIO::munlock $scalar, $offset = 0, $length = undef
 

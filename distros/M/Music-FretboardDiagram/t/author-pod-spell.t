@@ -25,6 +25,7 @@ Music
 PNG
 Pawe
 TTF
+darkgray
 fretboard
 gene
 horiz

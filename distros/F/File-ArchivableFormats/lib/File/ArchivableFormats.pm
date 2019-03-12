@@ -5,27 +5,16 @@ use namespace::autoclean;
 # ABSTRACT: Be able to select archivable formats
 
 use File::Basename qw(fileparse);
-use File::LibMagic;
-use Image::ExifTool qw(ImageInfo);
+use File::MimeInfo::Magic;
 use List::Util qw(first);
 use Module::Pluggable::Object;
 use Moose::Util::TypeConstraints;
-# Only using it for insert dependency in cpanfile/Makefile.PL for
-# Distzilla
-use Archive::Zip qw();
 
-our $VERSION = '1.5';
+our $VERSION = '1.6';
 
 subtype 'PluginRole'
     => as 'Object'
     => where sub { $_->does('File::ArchivableFormats::Plugin') };
-
-has magic => (
-    is      => 'ro',
-    isa     => 'File::LibMagic',
-    lazy    => 1,
-    default => sub { return File::LibMagic->new(); },
-);
 
 has driver => (
     is        => 'ro',
@@ -71,22 +60,13 @@ sub identify_via_libexif {
 sub identify_from_fh {
     my ($self, $fh) = @_;
 
-    my $info = $self->identify_via_libexif($fh);
-    if (!$info) {
-        $info = $self->magic->info_from_handle($fh);
-    }
+    my $info = { mime_type => mimetype($fh)} ;
     return $self->identify_from_mimetype($info->{mime_type});
 }
 
 sub identify_from_path {
     my ($self, $path) = @_;
-
-    my $info = $self->identify_via_libexif($path);
-    if (!$info) {
-        $info = $self->magic->info_from_filename($path);
-        return $self->identify_from_mimetype($info->{mime_type});
-    }
-    return $self->identify_from_mimetype($info->{mime_type});
+    return $self->identify_from_fh($path);
 }
 
 sub parse_extension {
@@ -136,7 +116,7 @@ File::ArchivableFormats - Be able to select archivable formats
 
 =head1 VERSION
 
-version 1.5
+version 1.6
 
 =head1 SYNOPSIS
 

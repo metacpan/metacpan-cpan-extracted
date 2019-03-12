@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 OVERVIEW
 
@@ -216,6 +216,8 @@ alias: L<Lab::Moose::Instrument::Agilent34410A>
 
 contains support for temperature sensor and He/N2 level meters.
 
+=item * L<Lab::Moose::Instrument::OI_IPS>
+
 =back
 
 =head3 Temperature control devices
@@ -225,6 +227,8 @@ contains support for temperature sensor and He/N2 level meters.
 =item * L<Lab::Moose::Instrument::OI_Triton>
 
 =item * L<Lab::Moose::Instrument::Lakeshore340>
+
+=item * L<Lab::Moose::Instrument::OI_ITC503>
 
 =back
 
@@ -431,6 +435,10 @@ alias: C<Lab::Moose::Connection::VISA_GPIB>
 =item * L<Lab::XPRESS::Sweep::Temperature>
 
 =item * L<Lab::XPRESS::Sweep::PulseLength>
+
+=item * L<Lab::XPRESS::Sweep::Amplitude>
+
+=item * L<Lab::XPRESS::Sweep::Level>
 
 =item * L<Lab::XPRESS::Sweep::LogBlock>
 
@@ -660,10 +668,11 @@ Computer Physics Communications 234, 216 (2019); doi:10.1016/j.cpc.2018.07.024
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

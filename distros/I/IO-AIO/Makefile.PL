@@ -62,7 +62,7 @@ EOF
       $ENV{CFLAGS}   = $Config{ccflags};
       $ENV{LDFLAGS}  = "$Config{ldflags} $Config{ccdlflags}";
       $ENV{LINKER}   = $Config{ld}; # nonstandard
-      $ENV{LIBS}     = "-L$Config{archlibexp}/CORE -L$Config{privlibexp} -lperl $Config{libs}";
+      $ENV{LIBS}     = "-L$Config{archlibexp}/CORE -L$Config{privlibexp} -lperl $Config{perllibs}";
 
       system $ENV{SHELL}, -c => "./configure --prefix \Q$Config{prefixexp}\E"
          and exit $? >> 8;

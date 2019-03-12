@@ -1,9 +1,9 @@
 This archive contains the distribution ExtUtils-Manifest,
-version 1.71:
+version 1.72:
 
   Utilities to write and check a MANIFEST file
 
-This software is copyright (c) 2018 by Andreas Koenig.
+This software is copyright (c) 2002 by Andreas Koenig.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

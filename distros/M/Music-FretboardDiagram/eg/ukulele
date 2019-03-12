@@ -15,8 +15,10 @@ my $dia = Music::FretboardDiagram->new(
     #font     => '/path/to/TTF/font.ttf',
     tuning   => [qw/A E C G/],
     horiz    => 1,
-    grid     => 'gray',
     verbose  => 1,
+    string_color => 'blue',
+    fret_color   => 'darkgray',
+    dot_color    => 'gray',
 );
 
 $dia->draw();

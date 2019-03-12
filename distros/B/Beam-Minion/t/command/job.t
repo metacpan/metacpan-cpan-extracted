@@ -19,6 +19,7 @@ use warnings;
 use Test::More;
 use Test::Lib;
 use Test::Fatal;
+use Beam::Runner::Command::minion;
 use Beam::Minion::Command::job;
 use File::Temp;
 use FindBin ();
@@ -57,6 +58,18 @@ subtest 'BEAM_MINION must be set' => sub {
         },
         qr{You must set the BEAM_MINION environment variable},
         'BEAM_MINION missing raises exception';
+};
+
+subtest 'can call through Beam::Runner::Command::minion' => sub {
+    my $mock = Mock::MonkeyPatch->patch(
+        'Minion::Command::minion::job::run',
+        sub { },
+    );
+
+    Beam::Runner::Command::minion->run( 'job', '-w' );
+
+    ok $mock->called, 'Minion::Command::minion::job->run called';
+    is_deeply $mock->method_arguments, [qw( -w )], 'arguments are correct';
 };
 
 done_testing;

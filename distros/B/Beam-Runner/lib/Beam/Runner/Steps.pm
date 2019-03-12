@@ -1,5 +1,5 @@
 package Beam::Runner::Steps;
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 # ABSTRACT: Run a series of steps
 
 #pod =head1 SYNOPSIS
@@ -55,7 +55,7 @@ Beam::Runner::Steps - Run a series of steps
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

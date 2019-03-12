@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+use strictures 2;
+
+use Benchmark qw( cmpthese );
+use List::Util qw( any );
+
+use Geo::Distance;
+BEGIN { *Geo::Distance::new_distance = \&Geo::Distance::distance }
+use Geo::Distance::XS;
+
+# Geo::Distance::new_distance() proxies to GIS::Distance.
+# Geo::Distance::distance() is installed by Geo::Distance::XS.
+# Geo::Distance::old_distance() is pure-perl, pre GIS::Distance gutting.
+
+my $geo = Geo::Distance->new();
+$geo->formula('null');
+
+my $gis_xs = GIS::Distance->new( 'GIS::Distance::Fast::Null' );
+my $gis_pp = GIS::Distance->new( 'GIS::Distance::Null' );
+
+my @coords = ( 34.202361, -118.601875,  37.752258, -122.441254 );
+
+my @tests = (
+    ['Geo::Distance::new_distance-gis_xs' => sub{
+        return $geo->new_distance( 'kilometer', @coords );
+    }],
+    ['Geo::Distance::distance-geo_xs' => sub{
+        return $geo->distance( 'kilometer', @coords );
+    }],
+    ['Geo::Distance::old_distance-geo_pp' => sub{
+        return $geo->old_distance( 'kilometer', @coords );
+    }],
+
+    ['GIS::Distance::distance-xs' => sub{
+        return $gis_xs->distance( @coords )->km();
+    }],
+    ['GIS::Distance::distance-pp' => sub{
+        return $gis_pp->distance( @coords )->km();
+    }],
+
+    ['GIS::Distance::distance_metal-xs' => sub{
+        return $gis_xs->distance_metal( @coords );
+    }],
+    ['GIS::Distance::distance_metal-pp' => sub{
+        return $gis_pp->distance_metal( @coords );
+    }],
+
+    ['Geo::Distance::XS::distance-xs' => sub{
+        return Geo::Distance::XS::distance(
+            $geo, 'kilometer', @coords,
+        );
+    }],
+    ['GIS::Distance::Fast::Null::distance-xs' => sub{
+        return GIS::Distance::Fast::Null::distance(
+            @coords,
+        );
+    }],
+    ['GIS::Distance::Null::distance-pp' => sub{
+        return GIS::Distance::Null::distance(
+            @coords,
+        );
+    }],
+);
+
+# Run them all once in case there are runtime errors.
+$_->[1]->() for @tests;
+
+@tests = (
+    grep {
+        my $test = $_;
+        any { $test->[0] eq $_ } @ARGV;
+    }
+    @tests
+) if @ARGV;
+
+cmpthese(
+    5_000_000,
+    { map { @$_ } @tests },
+);

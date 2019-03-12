@@ -26,25 +26,25 @@ no_index:
 provides:
   Function::Interface:
     file: lib/Function/Interface.pm
-    version: '0.01'
+    version: '0.02'
   Function::Interface::Impl:
     file: lib/Function/Interface/Impl.pm
-    version: '0.01'
+    version: '0.02'
   Function::Interface::Info:
     file: lib/Function/Interface/Info.pm
-    version: '0.01'
+    version: '0.02'
   Function::Interface::Info::Function:
     file: lib/Function/Interface/Info/Function.pm
-    version: '0.01'
+    version: '0.02'
   Function::Interface::Info::Function::Param:
     file: lib/Function/Interface/Info/Function/Param.pm
-    version: '0.01'
+    version: '0.02'
   Function::Interface::Info::Function::ReturnParam:
     file: lib/Function/Interface/Info/Function/ReturnParam.pm
-    version: '0.01'
-  Types::Interface:
-    file: lib/Types/Interface.pm
-    version: '0.01'
+    version: '0.02'
+  Function::Interface::Types:
+    file: lib/Function/Interface/Types.pm
+    version: '0.02'
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -58,7 +58,9 @@ resources:
   bugtracker: https://github.com/kfly8/p5-Function-Interface/issues
   homepage: https://github.com/kfly8/p5-Function-Interface
   repository: git://github.com/kfly8/p5-Function-Interface.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:KFLY
+x_contributors:
+  - 'Kenta Kobayashi <kentafly88@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

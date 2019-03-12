@@ -44,6 +44,7 @@ my @whitelist = qw/
     Lab::Measurement::Manual
 
     Lab::Moose::Connection::VISA_GPIB
+    Lab::Moose::Instrument::OI_IPS::Strunk_3He
     Lab::Moose::Sweep::DataFile
 
     Lab::MultiChannelInstrument

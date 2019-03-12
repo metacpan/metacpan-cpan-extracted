@@ -30,7 +30,6 @@ sub new {
     else {
         $sf->{join_types} = [ 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'FULL JOIN', 'CROSS JOIN' ];
     }
-    $sf->{joined_join_types} = join '|', map { quotemeta } @{$sf->{join_types}};
     $sf->{i}{stmt_types} = [ 'Join' ];
     bless $sf, $class;
 }

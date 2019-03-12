@@ -1,5 +1,11 @@
 Revision history for Perl module Net::ACME2
 
+0.26 11 March 2019
+- No production changes.
+- Upgrade declared status to production-ready.
+- Update documentation to link to publication of RFC 8555.
+- Link to GitHub issues tracker in distribution metadata.
+
 0.25 6 November 2018
 - BREAKING (?) CHANGE: Convert get_authorization() to POST-as-GET.
   See 0.24 for a discussion of the impact of this change. This complements

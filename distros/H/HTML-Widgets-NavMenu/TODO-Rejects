@@ -1,9 +1,9 @@
 * Refactor get_next_coords().
 
-    - I don't see too much point to it. It is working as it is, and it's 
+    - I don't see too much point to it. It is working as it is, and it's
     only one function that doesn't affect the rest of the code.
 
-* Create a base class for classes with 'subs' functionality - like 
+* Create a base class for classes with 'subs' functionality - like
 get_nth_sub, add_sub, num_subs, etc. Both ..::Node and ..::Item share it.
 
     - They have slightly different semantics, and besides - it's not
@@ -12,7 +12,7 @@ get_nth_sub, add_sub, num_subs, etc. Both ..::Node and ..::Item share it.
 * Future direction: generate the tree once and then be able to render
 it for different path_info()/current_host() configurations. (and the
 generated tree re-used by all other members).
-   
+
     - the problem is that the expand() operations and the expanded()
     flag depends on this combination. Thus, the generated tree is
     different for any path_info()/current_host().

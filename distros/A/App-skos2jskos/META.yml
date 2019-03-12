@@ -25,6 +25,7 @@ no_index:
     - eg
     - examples
 requires:
+  JSON: '0'
   List::Util: '1.33'
   RDF::Query: '0'
   RDF::Query::Client: '0'
@@ -34,4 +35,4 @@ resources:
   bugtracker: https://github.com/gbv/skos2jskos/issues
   homepage: https://github.com/gbv/skos2jskos
   repository: https://github.com/gbv/skos2jskos.git
-version: 0.1.5
+version: 0.1.6

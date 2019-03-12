@@ -24,10 +24,21 @@ my %WriteMakefileArgs = (
   'PREREQ_PM' => {
     'overload' => '0'
   },
-  'VERSION' => '1.200000',
+  'VERSION' => '1.200002',
   'test' => {
     'TESTS' => 't/*.t'
-  }
+  },
+  (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+     'meta-spec' => { version => 2 },
+     resources => {
+        repository => {
+           type => 'git',
+           url  => 'https://github.com/ollyg/Net-LDAP-FilterBuilder.git',
+           web  => 'https://github.com/ollyg/Net-LDAP-FilterBuilder',
+        },
+     }})
+     : ()
+  ),
 );
 
 

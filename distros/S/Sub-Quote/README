@@ -169,6 +169,27 @@ SUBROUTINES
 
     Sanitizes a value so that it can be used in an identifier.
 
+ENVIRONMENT
+  SUB_QUOTE_DEBUG
+    Causes code to be output to "STDERR" before being evaled. Several forms
+    are supported:
+
+    1   All subs will be output.
+
+    "/foo/"
+        Subs will be output if their code matches the given regular
+        expression.
+
+    "simple_identifier"
+        Any sub with the given name will be output.
+
+    "Full::identifier"
+        A sub matching the full name will be output.
+
+    "Package::Name::"
+        Any sub in the given package (including anonymous subs) will be
+        output.
+
 CAVEATS
     Much of this is just string-based code-generation, and as a result, a
     few caveats apply.

@@ -30,11 +30,11 @@ Log::AutoDump - Log with automatic dumping of references and objects.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.15
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.15';
 
 $VERSION = eval $VERSION;
 
@@ -488,7 +488,17 @@ sub is_trace
 sub debug
 {
     my $self = shift;
-    $self->msg( DEBUG, @_ ) if $self->is_debug;
+
+    if ( scalar( @_ ) == 1 && $_[ 0 ] =~ /^#/ && $_[ 0 ] =~ /#$/ )
+    {
+        $self->msg( DEBUG, '#' x length( $_[ 0 ] ) ) if $self->is_debug;
+        $self->msg( DEBUG, @_ ) if $self->is_debug;
+        $self->msg( DEBUG, '#' x length( $_[ 0 ] ) ) if $self->is_debug;
+    }
+    else
+    {
+        $self->msg( DEBUG, @_ ) if $self->is_debug;
+    }
     return $self;
 }
 
@@ -498,6 +508,7 @@ sub is_debug
     return 1 if $self->level >= DEBUG;
     return 0;
 }
+
 
 =head4 info
 

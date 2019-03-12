@@ -12,7 +12,7 @@ lib/Function/Interface/Info.pm
 lib/Function/Interface/Info/Function.pm
 lib/Function/Interface/Info/Function/Param.pm
 lib/Function/Interface/Info/Function/ReturnParam.pm
-lib/Types/Interface.pm
+lib/Function/Interface/Types.pm
 minil.toml
 t/01_function_interface/import.t
 t/01_function_interface/import_options.t
@@ -22,5 +22,14 @@ t/02_function_interface_info/function.t
 t/02_function_interface_info/function/param.t
 t/02_function_interface_info/function/return_param.t
 t/02_function_interface_info/info.t
+t/04_function_interface_types/impl_of.t
+t/lib/Bar.pm
+t/lib/Foo.pm
+t/lib/FooBar.pm
+t/lib/FooClone.pm
+t/lib/FooNotImpl.pm
+t/lib/FooObject.pm
+t/lib/IBar.pm
+t/lib/IFoo.pm
 META.yml
 MANIFEST

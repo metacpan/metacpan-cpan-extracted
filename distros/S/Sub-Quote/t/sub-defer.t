@@ -54,6 +54,14 @@ my $four_defer = defer_sub 'Foo::four' => sub {
 };
 is($four_defer, \&Foo::four, 'four defer installed');
 
+my $unnamed_defer = defer_sub undef ,=> sub {
+  die 'remade - wtf' if $made{'unnamed'};
+  $made{'unnamed'} = sub { 'dwarg' };
+};
+my $unnamed_result = $unnamed_defer->();
+ok $made{'unnamed'}, 'unnamed deferred subs generate subs';
+is $unnamed_result, 'dwarg', 'unnamed deferred subs call generated sub properly';
+
 # somebody somewhere wraps up around the deferred installer
 no warnings qw/redefine/;
 my $orig = Foo->can('four');
@@ -156,6 +164,16 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   my $sub = defer_sub undef, sub { +sub :lvalue { $foo } }, { attributes => [ 'lvalue' ]};
   $sub->() = 'foo';
   is $foo, 'foo', 'attributes are applied to deferred subs';
+}
+
+{
+  my $error;
+  eval {
+    my $sub = defer_sub undef, sub { sub { "gorf" } }, { attributes => [ 'oh boy' ] };
+    1;
+  } or $error = $@;
+  like $error, qr/invalid attribute/,
+    'invalid attributes are rejected';
 }
 
 {
@@ -285,6 +303,47 @@ is( $made{'Bar::Baz::one'}, undef, 'sub-package not undefered by undefer_package
   is_deeply defer_info($undeferred),
     [ 'Foo::blorp', $gen, { attributes => [ 'lvalue' ] }, $undeferred ],
     'defer_info on undeferred gives name, generator, options after undefer';
+}
+
+is defer_info(undef), undef, 'defer_info on undef gives undef';
+
+{
+  my $x;
+  my $sub = sub {
+    $x++;
+    (caller(0))[3];
+  };
+  Sub::Defer::_install_coderef('Blorp::foo', 'Farg::foo', $sub);
+  is \&Blorp::foo, $sub,
+    '_install_coderef properly installs subs';
+
+  SKIP: {
+    skip 'no sub naming module available', 1
+      unless Sub::Defer::_CAN_SUBNAME;
+
+    is Blorp::foo(), 'Farg::foo',
+      '_install_coderef properly names subs';
+  }
+  my $sub2 = sub {
+    $x++;
+    (caller(0))[3];
+  };
+  Sub::Defer::_install_coderef('Blorp::foo', 'Farg::foo', $sub2);
+  is \&Blorp::foo, $sub2,
+    '_install_coderef properly replaces subs';
+}
+
+{
+  my $x;
+  my $sub = sub { $x = 1; sub { $x } };
+  my $deferred = defer_sub undef, $sub;
+  my $info = $Sub::Defer::DEFERRED{$deferred};
+  undef $deferred;
+  # simulate reused memory address
+  @{$Sub::Defer::DEFERRED{$sub}} = @$info;
+  undefer_sub($sub);
+  is $x, undef,
+    'undefer_sub does not operate on non-deferred sub with reused memory address';
 }
 
 done_testing;

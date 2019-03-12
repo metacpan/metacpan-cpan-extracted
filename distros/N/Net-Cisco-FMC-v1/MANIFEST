@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Net/Cisco/FMC/v1.pm
+lib/Net/Cisco/FMC/v1/Role/FixAccessruleLiterals.pm
 lib/Net/Cisco/FMC/v1/Role/ObjectMethods.pm
 lib/Net/Cisco/FMC/v1/Role/REST/Client.pm
 t/author-pod-coverage.t

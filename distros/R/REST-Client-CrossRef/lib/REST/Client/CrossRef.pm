@@ -2,14 +2,21 @@ package REST::Client::CrossRef;
 use strict;
 use warnings;
 use Moo;
+
 use JSON;
 use URI::Escape;
 use REST::Client;
 
-#use Data::Dumper;
+use Data::Dumper;
 use Carp;
 use Log::Any;
 use HTTP::Cache::Transparent;
+
+#use JSON::MultiValueOrdered;
+#use YAML;
+use JSON::Path;
+
+use namespace::clean;
 
 =head1 NAME
 
@@ -17,11 +24,11 @@ REST::Client::CrossRef - Read data from CrossRef using its REST API
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.005';
 
 =head1 VERSION
 
-Version 0.003
+Version 0.005
 
 =cut
 
@@ -47,7 +54,7 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
    #cache the data with HTTP::Cache::Transparent
    $cr->init_cache(
     {   BasePath => ".\cache",
-        NoUpdate => => 60 * 60,
+        NoUpdate => 60 * 60,
         verbose  => 0
     });
 
@@ -92,7 +99,7 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
 
     $cr->init_cache(
     {   BasePath => "C:\\Windows\\Temp\\perl",
-        NoUpdate => => 60 * 60,
+        NoUpdate => 60 * 60,
         verbose  => 0
     });
 
@@ -114,7 +121,7 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
         $data = $cr->get_next();
     }
 
-    Example of one of the item in the output above
+    Example output:
 
     author : Wilke, Ingrid;
     MacLeod, Allan M.;
@@ -130,15 +137,74 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
     published-print/date-parts : 2002, 12, 1, 
     title : Detectors: Time-Domain Terahertz Science Improves Relativistic Electron-Beam Diagnostics
     volume : 13
-    end of data :    
+    end of data :  
 
+    my $cr = REST::Client::CrossRef->new(
+        mailto        => 'dokpe@unifr.ch',
+        spit_raw_data => 0,
+        add_end_flag  => 1,
+        json_path     => [
+            ['$.items[*].author[*]'],
+            ['$.items[*].title'], 
+            ['$.items[*].container-title'],
+            ['$.items[*].volume'], ['$.items[*].issue'], ['$.items[*].page'], 
+            ['$.items[*].issued..date-parts'],
+            ['$.items[*].published-print..date-parts']
+        ],
+        json_path_callback => { '$.items[*].author[*]' => \&unfold_authors },
+    );
+    
+    sub unfold_authors {
+        my ($data_ar) = @_;
+        my @res;
+        for my $aut (@$data_ar) {
+            my $line;
+            if ( $aut->{affiliation} ) {
+                my @aff;
+                for my $hr ( @{$aut->{affiliation}} ) {
+                    my @aff = values %$hr;
+                    $aff[0] =~ s/\r/ /g;
+                    $line .= " " . $aff[0];
+                }
+            }
+            my $fn = (defined $aut->{given}) ?( ", " . $aut->{given} . "; " ): "; "; 
+            push @res,  $aut->{family} . $fn . ($line // "");
+        }
+        return \@res;
+    }
+
+     my $data = $cr->article_from_doi($doi);
+     next unless $data;
+    for my $row (@$data) {
+        if ( !$row ) {
+            print "\n";
+            next;
+        }
+        while ( my ( $f, $v ) = each %$row ) {
+            print "$f : $v \n";
+        }
+    }
+
+    Example of output:
+    $.items[*].author[*] : Pelloni, Michelle;  University of Basel, Department of Chemistry, Mattenstrasse 24a, BPR 1096, CH 4002 Basel, Switzerland
+    Cote, Paul;  School of Chemistry and Biochemistry, University of Geneva, Quai Ernest Ansermet 30, CH-1211 Geneva, Switzerland
+    ....
+    Warding, Tom.;  University of Basel, Department of Chemistry, Mattenstrasse 24a, BPR 1096, CH 4002 Basel, Switzerland
+    $.items[*].title : Chimeric Artifact for Artificial Metalloenzymes
+    $.items[*].container-title : ACS Catalysis
+    $.items[*].volume : 8
+    $.items[*].issue : 2
+    $.items[*].page : 14-18
+    $.items[*].issued..date-parts : 2018, 1, 24
+    $.items[*].published-print..date-parts : 2018, 2, 2
+      
      my $cr = REST::Client::CrossRef->new( mailto => 'you@somewher.com'
        ,keys_to_keep => [["breakdowns/id", "id"], ["location"], [ "primary-name", "breakdowns/primary-name", "name" ]],
       ); 
 
     $cr->init_cache(
         {   BasePath => "C:\\Windows\\Temp\\perl",
-            NoUpdate => => 60 * 60,
+            NoUpdate => 60 * 60,
             verbose  => 0
         });
 
@@ -182,10 +248,11 @@ has rows => (
     default => sub {0},
     isa     => sub { croak "rows must be under 1000" unless $_[0] < 1000 }
 );
-has code   => ( is => 'rw' );
-has sleep  => ( is => 'rw', default => sub {0} );
-has log    => ( is => 'lazy' );
-has client => ( is => 'lazy' );
+has code    => ( is => 'rw' );
+has sleep   => ( is => 'rw', default => sub {0} );
+has log     => ( is => 'lazy' );
+has client  => ( is => 'lazy' );
+has decoder => ( is => 'lazy' );
 
 =head2  C<$cr = REST::Client::CrossRef-E<gt>new( ... mailto =E<gt> your@email.here, ...)>
 
@@ -232,14 +299,36 @@ has add_end_flag => ( is => 'lazy', default => sub {1} );
 
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... keys_to_keep =E<gt> [[key1, key1a, ...], [key2], ... ], ...)>
 
-An array ref of array ref, the inner array refs give a key name and the possible alternative key for the same value, 
+An array ref of array ref, the inner array refs give a key name and the possible alternative keys for the same value, 
 for example [ "primary-name", "breakdowns/primary-name", "name" ] in the member road (url ending with /members).
-The ordering of the array ref is preserved in the output.
-In effect only if spit_raw_data is false.
+The keys enumeration starts below C<message>, or C<message> - C<items> if the result is a list.
+This filters the values that are returned and preserves the ordering of the array ref given in argument.
+The ouput is an array ref of hash ref, each hash having the key and the values. 
+Values are flattened as string. In effect only if spit_raw_data is false.
 
 =cut
 
 has keys_to_keep => ( is => 'lazy' );
+
+=head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... json_path =E<gt> [[$path1, path1a, ...], [path2], ... ], ...)>
+
+An array ref of array ref, the inner array refs give a L<JSONPath|https://goessner.net/articles/JsonPath/>  
+and the possible alternative path for the same value. See also L<JSON::Path>.
+The output, ordering, filtering and flattening is as above. In effect only if spit_raw_data is false.
+The path starts below the C<message> key in the JSON data.
+
+=cut
+
+has json_path => ( is => 'lazy' );
+
+=head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... json_path_callback =E<gt> {$path =E<gt> \&some_function }>
+
+An hash ref that associates a JSON path and a function that will be run on the data return by C<$jpath-E<gt>values($json_data)>.
+The function must accept an array ref as first argument and must return an array ref.
+
+=cut
+
+has json_path_callback => ( is => 'lazy' );
 
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... version =E<gt> "v1", ... )>
 
@@ -273,6 +362,14 @@ sub _build_client {
     $client;
 }
 
+sub _build_decoder {
+    my $self = shift;
+    return JSON->new;
+
+    #return JSON::MultiValueOrdered->new;
+
+}
+
 sub _build_log {
     my ($self) = @_;
     Log::Any->get_logger( category => ref($self) );
@@ -300,37 +397,42 @@ sub init_cache {
     HTTP::Cache::Transparent::init($href);
 }
 
-sub _build_keys_to_keep {
+sub _build_filter {
     my ( $self, $ar ) = @_;
 
     #die Dumper $self->{keys_to_keep};
     # die "ar:" . Dumper $ar;
+    my %filter;
+    for my $filter_name (qw(keys_to_keep json_path)) {
 
-    my %keys_to_keep;
-    my $pos;
-    my %pos_seen;
-    my %key_seen;
+        #  my %keys_to_keep;
+        next if ( !exists $ar->{$filter_name} );
+        my $pos;
+        my %pos_seen;
+        my %key_seen;
 
-    for my $ar ( @{ $self->{keys_to_keep} } ) {
-        $pos++;
-        for my $k (@$ar) {
-            $keys_to_keep{$k}     = $pos - 1;
-            $pos_seen{ $pos - 1 } = 0;
-            $key_seen{ $pos - 1 } = $k;
+        for my $ar ( @{ $self->{$filter_name} } ) {
+            $pos++;
+            for my $k (@$ar) {
+                $filter{$k}           = $pos - 1;
+                $pos_seen{ $pos - 1 } = 0;
+                $key_seen{ $pos - 1 } = $k;
+            }
+
         }
-
+        $self->{pos_seen}     = \%pos_seen;
+        $self->{key_seen}     = \%key_seen;
+        $self->{$filter_name} = \%filter;
     }
-    $self->{pos_seen}     = \%pos_seen;
-    $self->{key_seen}     = \%key_seen;
-    $self->{keys_to_keep} = \%keys_to_keep;
 
 }
 
 sub BUILD {
 
     my ( $self, $ar ) = @_;
-    $self->_build_keys_to_keep( $ar->{keys_to_keep} )
-        if ( $ar->{keys_to_keep} );
+    croak "Can't use both keys_to_keep and json_path"
+        if ( $ar->{json_path} && $ar->{keys_to_keep} );
+    $self->_build_filter($ar);
 }
 
 sub _crossref_get_request {
@@ -344,6 +446,7 @@ sub _crossref_get_request {
     if ($query_ar) {
 
         for my $p (@$query_ar) {
+
             #print "$p\n";
             push @params, $p;
 
@@ -377,10 +480,11 @@ sub _crossref_get_request {
     $self->log->notice(" ");
     $self->log->notice("requesting: $url");
     my $response = $self->client->GET($url);
-
-    my $backoff    = $response->responseHeader('Backoff')     // 0;
-    my $retryAfter = $response->responseHeader('Retry-After') // 0;
-    my $code       = $response->responseCode();
+    my $val      = $response->responseHeader('Backoff');
+    my $backoff  = defined $val ? $val : 0;
+    $val = $response->responseHeader('Retry-After');
+    my $retryAfter = defined $val ? $val : 0;
+    my $code = $response->responseCode();
 
     $self->log->notice("> Code: $code");
     $self->log->notice("> Backoff: $backoff");
@@ -394,7 +498,7 @@ sub _crossref_get_request {
         $self->sleep($backoff);
     }
     elsif ( $code eq '429' || $code eq '503' ) {
-        $self->sleep( $retryAfter // 60 );
+        $self->sleep( defined $retryAfter ? $retryAfter : 60 );
         return;
     }
 
@@ -422,9 +526,9 @@ sub _get_metadata {
     #my $hr        = decode_json $response->responseContent;
 
     my $hr =
-        $self->test_data()
-        ? decode_json( $self->test_data() )
-        : decode_json( $response->responseContent );
+          $self->test_data()
+        ? $self->_decode_json( $self->test_data() )
+        : $self->_decode_json( $response->responseContent );
     my $res_count = $hr->{message}->{'total-results'};
 
     #print $res_count;
@@ -462,9 +566,9 @@ sub _get_page_metadata {
 
         #my $hr        = decode_json $response->responseContent;
         my $hr =
-            $self->test_data()
-            ? decode_json( $self->test_data() )
-            : decode_json $response->responseContent;
+              $self->test_data()
+            ? $self->_decode_json( $self->test_data() )
+            : $self->_decode_json( $response->responseContent );
         my $res_count = $hr->{message}->{'total-results'};
         if ( defined $res_count ) {
 
@@ -490,34 +594,65 @@ sub _get_page_metadata {
 sub _display_data {
     my ( $self, $hr ) = @_;
 
-    #my $keys;
-    my $data_ar;
-    if ( $hr->{message}->{items} ) {
-        $data_ar = $hr->{message}->{items};
+    return $hr if ( $self->spit_raw_data );
+    my $formatter = REST::Client::CrossRef::Unfolder->new;
+
+    # print Dumper($hr->{message}), "\n";
+    if ( defined $self->{json_path} ) {
+
+        my %result;
+        my %keys = %{ $self->{json_path} };
+        for my $path ( keys %keys ) {
+
+            #print $path, "\n";
+            my $jpath = JSON::Path->new($path);
+            my @val   = $jpath->values( $hr->{message} );
+
+            # print Dumper(@val);
+            if (   $self->{json_path_callback}
+                && $self->{json_path_callback}->{$path} )
+            {
+                my @data;
+                my $cb = $self->{json_path_callback}->{$path};
+                eval { @data = @{ $cb->( \@val ) }; };
+                croak "Json callback failed : $@\n" if ($@);
+                $result{$path} = join( "\n", @data );
+
+            }
+            elsif (@val) {
+
+                # print $path, " ", Dumper(@val), "\n";
+                my %res_part;
+                %res_part = %{ $formatter->_unfold_array( \@val, [$path] ) };
+                @result{ keys %res_part } = values %res_part;
+            }
+
+        }
+
+        return $self->_sort_output( $self->{json_path}, \%result );
+
     }
-    else {
-        $data_ar = [ $hr->{message} ];
+    elsif ( defined $self->{keys_to_keep} ) {
 
-        #die Dumper $data_ar;
-    }
+        #print Dumper @$data_ar,"\n";
+        #$YAML::UseCode =1;
+        #return Dump(@$data_ar);
+        my $data_ar;
+        if ( $hr->{message}->{items} ) {
+            $data_ar = $hr->{message}->{items};
+        }
+        else {
+            $data_ar = [ $hr->{message} ];
 
-    # my $result_hr;
-    #my $keys_ar;
+            #die Dumper $data_ar;
+        }
 
-    # $result_hr={};
-    if ( !$self->spit_raw_data ) {
         my $new_ar;
 
         #$data_ar :array ref of rows items
-        my @data;
 
         for my $data_hr (@$data_ar) {
 
-            #my $result_hr={};
-            # my $result_hr;
-            # $self->_unfold_hash( $data_hr, $keys_ar, $result_hr );
-
-            my $formatter = REST::Client::CrossRef::Unfolder->new;
             $formatter->set_keys_to_keep( $self->{keys_to_keep} )
                 if $self->{keys_to_keep};
 
@@ -527,71 +662,75 @@ sub _display_data {
             my $result_hr = $formatter->_unfold_hash($data_hr);
 
             #  $self->log->debug("display_data\n", Dumper $result_hr);
+            return $self->_sort_output( $self->{keys_to_keep}, $result_hr )
 
-            if ( $self->{keys_to_keep} ) {
+        }
+    }
 
-                # die;
-                my %keys_to_keep = %{ $self->{keys_to_keep} };
-                my %pos_seen     = %{ $self->{pos_seen} };
-                my %key_seen     = %{ $self->{key_seen} };
-                $pos_seen{$_} = 0 foreach ( keys %pos_seen );
+}
 
-                my @item_data;
-                for my $key ( keys %$result_hr ) {
+sub _sort_output {
+    my ( $self, $filter_hr, $result_hr ) = @_;
 
-                    my $pos = $keys_to_keep{$key};
-                    next unless defined $pos;
+    my @data;
 
-                    # print "pos undef for $key\n" unless defined $pos;
-                    #$key_unseen{$pos}= $key;
-                    $pos_seen{$pos} = 1;
-                    my $value =
-                        ( defined $result_hr->{$key} )
-                        ? $result_hr->{$key}
-                        : "";
-                    $self->log->debug( $key, " - ", $value );
-                    $item_data[$pos] = { $key => $value };
+    if ($filter_hr) {
 
-                }
+        my %keys_to_keep = %{$filter_hr};
+        my %pos_seen     = %{ $self->{pos_seen} };
+        my %key_seen     = %{ $self->{key_seen} };
+        $pos_seen{$_} = 0 foreach ( keys %pos_seen );
 
-                my @unseen = grep { !$pos_seen{$_} } keys %pos_seen;
+        my @item_data;
+        for my $key ( keys %$result_hr ) {
 
-                #die Dumper $res if (@unseen);
-                for my $pos (@unseen) {
-                    $item_data[$pos] = { $key_seen{$pos}, "" };
+            my $pos = $keys_to_keep{$key};
+            next unless defined $pos;
 
-                    #push @data, { $key_seen{$pos}, "" };
-                }
-                push @data, @item_data;
-                push @data, undef if $self->add_end_flag;
-
-            }
-            else {
-                my @keys;
-                if ( $self->{sort_output} ) {
-                    @keys = sort { lc($a) cmp lc($b) } keys %$result_hr;
-                }
-                else {
-                    @keys = keys %$result_hr;
-                }
-                for my $k (@keys) {
-
-                    #push @$new_ar, [ { $k, $result_hr->{$k} } ];
-                    push @data, { $k, $result_hr->{$k} };
-                }
-
-           #push @$new_ar, [ { "end of data", "\n" } ] if $self->add_end_flag;
-                push @data, { "end of data", "\n" } if $self->add_end_flag;
-            }
+            # print "pos undef for $key\n" unless defined $pos;
+            #$key_unseen{$pos}= $key;
+            $pos_seen{$pos} = 1;
+            my $value =
+                ( defined $result_hr->{$key} )
+                ? $result_hr->{$key}
+                : "";
+            $self->log->debug( $key, " - ", $value );
+            $item_data[$pos] = { $key => $value };
 
         }
 
-        #return $new_ar;
-        return \@data;
+        my @unseen = grep { !$pos_seen{$_} } keys %pos_seen;
+
+        #die Dumper $res if (@unseen);
+        for my $pos (@unseen) {
+            $item_data[$pos] = { $key_seen{$pos}, "" };
+
+            #push @data, { $key_seen{$pos}, "" };
+        }
+        push @data, @item_data;
+        push @data, undef if $self->add_end_flag;
+
     }
     else {
-        return $hr;
+        my @keys;
+        if ( $self->{sort_output} ) {
+            @keys = sort { lc($a) cmp lc($b) } keys %$result_hr;
+        }
+        else {
+            @keys = keys %$result_hr;
+        }
+        for my $k (@keys) {
+
+            #push @$new_ar, [ { $k, $result_hr->{$k} } ];
+            push @data, { $k, $result_hr->{$k} };
+        }
+
+        #push @$new_ar, [ { "end of data", "\n" } ] if $self->add_end_flag;
+        push @data, { "end of data", "\n" } if $self->add_end_flag;
     }
+
+    return \@data;
+
 }
 
 =head2 C<$cr-E<gt>rows( $row_value )>
@@ -612,7 +751,7 @@ accepted, author, group-title, DOI, is-referenced-by-count, updated-by, event, c
 funder, translator, archive, published-print, alternative-id, subject, subtitle, published-online, publisher-location, 
 content-domain, reference, title, link, type, publisher, volume, references-count, ISBN, issn-type, assertion, 
 deposited, page, content-created, short-container-title, relation, editor.
-Use keys_to_keep to define an ordering in the ouptut. Use select to filter the fields to be returned from the server.
+Use keys_to_keep or json_path to define an ordering in the ouptut. Use select to filter the fields to be returned from the server.
 
 =cut
 
@@ -774,7 +913,7 @@ The corresponding values are passed in a second array, in the same order.
 Beware that searching with first and family name is treated as an OR not and AND:
 C<query_works([qw(name name)], [qw(Tom Smith)], $select)> will retrieve all the works where and author has Tom in the name field or all works where an author has Smith in the name field.
 See C<works_from_doi> above for the fields that can be selected.
-Use keys_to_keep to define an ordering in the ouptut. Use select to filter the fields to be returned from the server.
+Use keys_to_keep or json_path to define an ordering in the ouptut. Use select to filter the fields to be returned from the server.
 =cut
 
 sub query_works {
@@ -873,7 +1012,7 @@ sub agencies_from_dois {
         my $response =
             $self->_crossref_get_request( "/works/" . $doi . "/agency" );
         if ($response) {
-            my $hr = decode_json $response->responseContent;
+            my $hr = $self->_decode_json( $response->responseContent );
 
             # my @items = $hr->{message}->{items};
             my $res = $self->_display_data($hr);
@@ -925,6 +1064,13 @@ sub _set_cursor {
         # print "_set_cursor: undef\n";
         $self->cursor(undef);
     }
+}
+
+sub _decode_json {
+    my ( $self, $json ) = @_;
+    my $data = $self->decoder->decode($json);
+    return $data;
+
 }
 
 #=for comment
@@ -1039,41 +1185,48 @@ sub _unfold_array {
         my @all;
         for my $aut (@$ar) {
             if ( $aut->{sequence} eq 'first' ) {
-                if ($aut->{family}) {
-                $first =
-                      "\n". $aut->{family}
-                    . ( defined $aut->{given} ? ", " . $aut->{given} : " " )
-                    . $self->_unfold_affiliation( $aut->{affiliation} );
+                if ( $aut->{family} ) {
+                    $first =
+                          "\n"
+                        . $aut->{family}
+                        . (
+                        defined $aut->{given} ? ", " . $aut->{given} : " " )
+                        . $self->_unfold_affiliation( $aut->{affiliation} );
                     push @first, $first;
-                } 
-                elsif ($aut->{name}) {
-                     $first = "\n" . $aut->{name}
-                    . $self->_unfold_affiliation( $aut->{affiliation} );
+                }
+                elsif ( $aut->{name} ) {
+                    $first = "\n"
+                        . $aut->{name}
+                        . $self->_unfold_affiliation( $aut->{affiliation} );
                     push @groups, $first;
 
                 }
-             
 
             }
             else {
-                if ($aut->{family}) {
-                push @all,
-                      "\n"
-                    . $aut->{family}
-                    . ( defined $aut->{given} ? ", " . $aut->{given} : " " )
-                    . $self->_unfold_affiliation( $aut->{affiliation} );
+                if ( $aut->{family} ) {
+                    push @all,
+                          "\n"
+                        . $aut->{family}
+                        . (
+                        defined $aut->{given} ? ", " . $aut->{given} : " " )
+                        . $self->_unfold_affiliation( $aut->{affiliation} );
                 }
-                elsif ($aut->{name}) {
-                    push @groups, "\n" . $aut->{name}
-                    . $self->_unfold_affiliation( $aut->{affiliation} );
+                elsif ( $aut->{name} ) {
+                    push @groups,
+                          "\n"
+                        . $aut->{name}
+                        . $self->_unfold_affiliation( $aut->{affiliation} );
 
                 }
             }
 
         }
+
         # die Dumper(@groups);
         unshift @all, @first;
         unshift @all, @groups;
+
         #print Dumper(@all);
         $res_hr->{$key} = join( "", @all );
 
@@ -1128,7 +1281,7 @@ sub _unfold_array {
                 }
                 else {
                     # print "key3: ", $key, "\n";
-                    $res_hr->{$last_key} .= $val . ", ";
+                    $res_hr->{$last_key} .= $val;
                 }
 
             }
@@ -1178,6 +1331,7 @@ The following modules are required in order to use this one
      Log::Any => 1.049,
      HTTP::Cache::Transparent => 1.4,
      Carp => 1.40,
+     JSON::Path => 0.420
 
 =head1 BUGS
 

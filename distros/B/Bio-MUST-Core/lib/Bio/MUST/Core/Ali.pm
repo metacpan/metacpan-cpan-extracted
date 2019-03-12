@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.190500';
+$Bio::MUST::Core::Ali::VERSION = '0.190690';
 use Moose;
 use namespace::autoclean;
 
@@ -103,6 +103,11 @@ sub get_seq_with_id {
         unless $seq;
 
     return $seq;
+}
+
+
+sub all_new_seqs {
+    return shift->filter_seqs( sub { $_->is_new } );
 }
 
 
@@ -795,7 +800,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.190500
+version 0.190690
 
 =head1 SYNOPSIS
 
@@ -1038,6 +1043,14 @@ the matching logic.
     my @long_seqs = $ali->filter_seqs( sub { $_->nomiss_seq_len > 500 } );
 
 This method requires a single argument.
+
+=head2 all_new_seqs
+
+Returns all the sequences of the Ali tagged as #NEW# (not an array reference).
+
+    my @new_seqs = $ali->all_new_seqs;
+
+This method does not accept any arguments.
 
 =head2 all_seq_ids
 

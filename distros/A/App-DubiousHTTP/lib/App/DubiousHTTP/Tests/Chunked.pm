@@ -81,6 +81,7 @@ DESC
     # safari does not like it, so mark it as uncommon
     [ UNCOMMON_VALID, 'chunked,clen200' => 'chunking and content-length header with double length, served chunked'],
     [ UNCOMMON_VALID, 'chunked,clen50'  => 'chunking and content-length header with half length, served chunked'],
+    [ UNCOMMON_VALID, 'chunked,clen-big'  => 'chunking and content-length header with huge length, served chunked'],
     [ INVALID, 'addjunk,chunked,clen50'  => 'content+junk, chunked, content-length header includes content only' ],
 
     [ 'INVALID: chunking is only allowed with HTTP/1.1' ],
@@ -134,6 +135,7 @@ DESC
     [ UNCOMMON_VALID,'chunkednl-' => "chunked header followed by empty with continuation line, served chunked"],
     [ UNCOMMON_VALID,'nl-nl-chunked' => "chunked header with double continuation line, served chunked"],
     [ UNCOMMON_VALID,'nl-nl-chunked-nl-' => "chunked header with double continuation line and continuation afterwareds, served chunked"],
+    [ UNCOMMON_VALID,'huge-white-space-chunked' => "'Transfer-Encoding:<lots of space>chunked'"],
 
     [ 'INVALID: invalid variations on "chunked" value' ],
     [ INVALID, 'chu' => '"chu" not "chunked"'],
@@ -179,6 +181,10 @@ DESC
     [ INVALID, 'xte,chunked,clen,do_clen,gzip' => "double Transfer-Encoding: first junk, last chunked. Also Content-length header. Not served chunked. Compressed with gzip." ],
     [ INVALID, 'chunked,clen,do_clen' => 'chunking and content-length, not served chunked'],
     [ INVALID, 'chunked,clen,do_clen,gzip' => 'chunking and content-length, not served chunked. Compressed with gzip.'],
+    [ INVALID, 'emptyte,chunked,do_chunked,gzip' => "double Transfer-Encoding: first empty, last chunked. Served chunked and gzipped." ],
+    [ INVALID, 'emptyte,chunked,do_clen,gzip' => "double Transfer-Encoding: first empty, last chunked. Served with content-length and gzipped." ],
+    [ INVALID, 'chunked,emptyte,do_chunked,gzip' => "double Transfer-Encoding: first chunked, last empty. Served chunked and gzipped." ],
+    [ INVALID, 'chunked,emptyte,do_clen,gzip' => "double Transfer-Encoding: first chunked, last empty. Served with content-length and gzipped." ],
 
     [ 'INVALID: hiding the Transfer-Encoding header' ],
     [ INVALID, 'space-colon-chunked,do_chunked' => '"Transfer-Encoding<space>:", served chunked' ],
@@ -227,6 +233,8 @@ sub make_response {
 	    s{lf}{\n}g;
 	    s{cr}{\r}g;
 	    $hdr .= "Transfer-Encoding: $_\r\nConnection: close\r\n";
+	} elsif ( $_ eq 'huge-white-space-chunked') {
+	    $hdr .= "Transfer-Encoding: ". ( ' ' x 10000 )."chunked\r\nConnection: close\r\n";
 	} elsif ( m{^(space|tab|cr|colon)-colon-chunked$} ) {
 	    my $c = $1;
 	    $c =~s{space}{ }g;
@@ -248,6 +256,8 @@ sub make_response {
 	    $hdr .= "Transfer-Encoding: chu\r\nConnection: close\r\n"
 	} elsif ( $_ eq 'ce-chunked' ) {
 	    $hdr .= "Content-Encoding: chunked\r\nConnection: close\r\n"
+	} elsif ( $_ eq 'clen-big') {
+	    $clen = 1_000_000_000;
 	} elsif ( $_ =~ m{^clen(\d+)?$} ) {
 	    $clen = $1 || 100;
 	} elsif ( $_ eq 'http10' ) {
@@ -262,6 +272,8 @@ sub make_response {
 	    $hdr .= "Transfer-Encoding: chunked;\r\nConnection: close\r\n"
 	} elsif ( $_ eq 'rfc2047' ) {
 	    $hdr .= "Transfer-Encoding: =?UTF-8?B?Y2h1bmtlZAo=?=\r\nConnection: close\r\n";
+	} elsif ( $_ eq 'emptyte' ) {
+	    $hdr .= "Transfer-Encoding: \r\nConnection: close\r\n";
 	} elsif ( $_ eq 'xte' ) {
 	    $hdr .= "Transfer-Encoding: lalala\r\nConnection: close\r\n";
 	} elsif ( m{^(chunk-ext-|nofinal$|eof-inchunk$)} ) {
@@ -305,7 +317,9 @@ sub make_response {
 	    (my $d = $1 ) =~ s{\\([0-7]{3})}{ chr(oct($1)) }eg;
 	    $finalchunk = $d;
 	} elsif ( $_ eq 'addjunk' ) {
-	    $data .= "x" x length($data);
+	    # fake PKZIP magic for confusion
+	    my $junk = "PK\003\004" x int(length($data)/4+1);
+	    $data .= substr($junk,0,length($data));
 	} elsif ( $_ eq 'gzip' ) {
 	    $data = _compress($data,'gzip');
 	    $hdr .= "Content-Encoding: gzip\r\n";

@@ -1,0 +1,184 @@
+{
+	"version": "https://jsonfeed.org/version/1",
+	"title": "Manton Reece",
+	"icon": "https://micro.blog/manton/avatar.jpg",
+	"home_page_url": "https://www.manton.org/",
+	"feed_url": "https://www.manton.org/feed.json",
+	"items": [
+			{
+				"id": "http://manton.micro.blog/2019/03/06/theres-no-homebrew.html",
+				
+				"content_html": "<p>There&rsquo;s no Homebrew Website Club in Austin tonight. We&rsquo;ll regroup in April. (Thanks again to everyone who made it to IndieWebCamp Austin! Seeya next time.)</p>\n",
+				"date_published": "2019-03-06T15:51:51-06:00",
+				"url": "https://www.manton.org/2019/03/06/theres-no-homebrew.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/03/04/some-great-basketball.html",
+				
+				"content_html": "<p>Some great basketball tonight: Spurs holding on with a 1-point win over the Nuggets. Pelicans close game in Utah. And still underway, the Lakers first of 2 must-win games against the Clippers. 🏀</p>\n",
+				"date_published": "2019-03-04T23:03:25-06:00",
+				"url": "https://www.manton.org/2019/03/04/some-great-basketball.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/03/04/vincent-ritter-has.html",
+				
+				"content_html": "<p>Vincent Ritter has more iOS invites <a href=\"https://vincentritter.com/2019/03/04/gluon-opening-more-testflight-spots-calling-all-android-testers\">for his Micro.blog app</a>. He&rsquo;s also looking for Android testers.</p>\n",
+				"date_published": "2019-03-04T15:19:38-06:00",
+				"url": "https://www.manton.org/2019/03/04/vincent-ritter-has.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/03/04/im-the-guest.html",
+				
+				"content_html": "<p>I&rsquo;m the guest on <a href=\"https://monday.micro.blog/2019/03/03/episode-more-questions.html\">this week&rsquo;s Micro Monday</a>, answering questions about Micro.blog.</p>\n",
+				"date_published": "2019-03-04T07:49:08-06:00",
+				"url": "https://www.manton.org/2019/03/04/im-the-guest.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/03/03/core-int-on.html",
+				"title": "Core Int on IndieWebCamp and business",
+				"content_html": "<p>We just published <a href=\"https://coreint.org/2019/03/episode-362-existential-business-crisis/\">episode 362 of Core Intuition</a>. From the show notes:</p>\n\n<blockquote>\n<p>Manton and Daniel talk about how IndieWebCamp Austin went, and reflect on the virtues of the diverse “open web” community. They react to a debate between Jeff Atwood &amp; David Heinemeier Hansson about their purportedly different approaches to business. Finally, they talk about Daniel’s increasingly glum feelings about his business, Daniel makes some self-assessment of shortcomings, and the two of them talk about making small, productive tweaks to increase revenues.</p>\n</blockquote>\n\n<p>You can subscribe in <a href=\"https://itunes.apple.com/us/podcast/core-intuition/id281777685?mt=2\">Apple Podcasts</a>, <a href=\"https://overcast.fm/itunes281777685/core-intuition\">Overcast</a>, or <a href=\"https://castro.fm/podcast/be595b35-7679-42a8-b98f-4c9f7e575735\">Castro</a>. Thanks for listening!</p>\n",
+				"date_published": "2019-03-03T10:21:25-06:00",
+				"url": "https://www.manton.org/2019/03/03/core-int-on.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/28/automatically-save-to.html",
+				"title": "Automatically save to Internet Archive",
+				"content_html": "<p>There was a session at IndieWebCamp Austin about broken links and archiving web sites. As part of the discussion, <a href=\"http://tantek.com/\">Tantek</a> mentioned how he saves all his blog posts and tweets to the Internet Archive as part of his posting workflow. I&rsquo;ve just added a setting like that to Micro.blog under Posts → Design:</p>\n\n<p><img src=\"https://www.manton.org/uploads/2019/b80d126bc8.png\" alt=\"Checkbox screenshot\" border=\"0\" width=\"319\" height=\"48\" style=\"width: 319px;\" /></p>\n\n<p>This is off by default for now, but if you enable it, any new posts will be saved to the Internet Archive automatically. It waits about 5 minutes before saving them just in case you have any last-minute edits.</p>\n\n<p>I still want to do more with archiving. As amazing as the Internet Archive is, I don&rsquo;t think we should count on it to have a complete archive of the web. But this is a simple feature you can enable in your blog if it&rsquo;s hosted on Micro.blog, and we can expand it based on feedback. (For example, maybe archiving pages you link to as well.)</p>\n",
+				"date_published": "2019-02-28T12:52:18-06:00",
+				"url": "https://www.manton.org/2019/02/28/automatically-save-to.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/28/having-a-distinct.html",
+				"title": "Having a distinct web site",
+				"content_html": "<p><a href=\"http://bradfrost.com/blog/post/write-on-your-own-website/\">Brad Frost shares a couple of stories</a> about how people have remembered his writing because he has his own blog. He puts it very clearly:</p>\n\n<blockquote>\n<p>Writing on your own website associates your thoughts and ideas with you as a person. Having a distinct website design helps strengthen that association.</p>\n</blockquote>\n\n<p>This is why we encourage everyone to have their own blog and use their own domain name, and why Micro.blog-hosted blogs have multiple built-in designs as well as support for completely custom themes. <a href=\"https://manton.org/2018/12/06/161911.html\">I highlighted a few custom designs</a> in the 12 days of microblogging series, and <a href=\"https://www.youtube.com/watch?v=MLUWnrMKVdg\">I recorded a YouTube screencast last month</a> explaining how to import and customize new themes.</p>\n",
+				"date_published": "2019-02-28T11:23:20-06:00",
+				"url": "https://www.manton.org/2019/02/28/having-a-distinct.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/27/ill-be-the.html",
+				
+				"content_html": "<p>I&rsquo;ll be the guest in the next Micro Monday, catching up with <a href=\"https://micro.blog/macgenie\">@macgenie</a> on recent Micro.blog improvements and answering your questions! Let us know if you have any questions or topics to cover.</p>\n",
+				"date_published": "2019-02-27T16:08:38-06:00",
+				"url": "https://www.manton.org/2019/02/27/ill-be-the.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/27/i-added-a.html",
+				
+				"content_html": "<p>I added <a href=\"http://help.micro.blog/2019/api-indieauth/\">a help page</a> with an introduction to IndieAuth for Micro.blog developers. This is best for web apps and desktop apps where the user is often already signed in.</p>\n",
+				"date_published": "2019-02-27T10:06:30-06:00",
+				"url": "https://www.manton.org/2019/02/27/i-added-a.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/27/episodes-of-micro.html",
+				"title": "50 episodes of Micro Monday",
+				"content_html": "<p>This week Jean published the 50th episode of <a href=\"https://monday.micro.blog/\">Micro Monday</a>! There are even more episodes than that if you count the bonus episodes. As she said on the show, it&rsquo;s amazing what can happen when you&rsquo;re consistent about recording every week.</p>\n\n<p><a href=\"https://monday.micro.blog/2019/02/25/episode-jonathan-lacour.html\">The latest episode</a> features Jonathan LaCour:</p>\n\n<blockquote>\n<p>You know him best as <a href=\"https://micro.blog/cleverdevil\">@cleverdevil</a>, the creator of utilities that enhance your microblog such as <a href=\"https://github.com/cleverdevil/microgram\">microgram</a> (an Instagram-like photo grid page), and <a href=\"https://github.com/cleverdevil/micromemories\">micromemories</a> (a Facebook-like “On This Day” feature). We talk about the Indieweb and <a href=\"https://github.com/cleverdevil/ditchbook\">ditching Facebook with ditchbook</a>. We even mention dogs and karaoke.</p>\n</blockquote>\n\n<p>Thanks to all the guests over the last year, and to everyone who has listened. I&rsquo;ve loved hearing the stories — putting voices to some of the profile photos in my timeline, and getting inspired each week to keep improving Micro.blog.</p>\n",
+				"date_published": "2019-02-27T09:06:07-06:00",
+				"url": "https://www.manton.org/2019/02/27/episodes-of-micro.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/25/thinking-about-our.html",
+				
+				"content_html": "<p>Thinking about our Micro.blog APIs after IndieWebCamp Austin. There are a lot! Probably not even a complete list: RSS, JSON Feed, MetaWeblog, Micropub, ActivityPub, Microformats, WebSub, rssCloud, Webmention, IndieAuth, and now Microsub.</p>\n",
+				"date_published": "2019-02-25T13:51:44-06:00",
+				"url": "https://www.manton.org/2019/02/25/thinking-about-our.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/25/indiewebcamp-austin-wrapup.html",
+				"title": "IndieWebCamp Austin 2019 wrap-up",
+				"content_html": "<p>We had the 2nd IndieWebCamp Austin over the weekend. As I did after <a href=\"https://www.manton.org/2017/12/12/indiewebcamp-austin-wrapup.html\">the 1st IndieWebCamp Austin</a>, I&rsquo;m going to summarize some of what I took away from the event.</p>\n\n<p>Saturday morning started with my quick introduction to the IndieWeb, some thoughts from the perspective of Micro.blog, and then laying out the schedule for IndieWebCamp. Next up, Aaron Parecki gave a keynote on the state of social readers: how we can use apps to both read other people&rsquo;s blogs and also reply to posts.</p>\n\n<p>There was a time for personal site demos, where any attendee could show their web site and talk a little about what they&rsquo;ve done with it recently or what improvements they might want to make. We then had a planning session, proposing ideas for sessions to organize the schedule for the afternoon. This is the un-conference style that I&rsquo;m still getting used to, but which is really effective at shaping the conference for what attendees are actually interested in.</p>\n\n<p>For the Sunday hack day, I focused on 2 things: experimenting with a Micro.blog export for the Blog Archive Format that <a href=\"https://www.manton.org/2017/11/24/blog-archive-format.html\">I proposed here</a>, and implementing the Microsub API in Micro.blog as a server. Along the way I also improved Micro.blog&rsquo;s support for replies via Micropub.</p>\n\n<p>Having everyone in the same room is a great chance to bounce ideas off one another or find and fix bugs. <a href=\"http://micro.corntoole.com/\">Cornelius Toole</a> was also working on a script to create archive files, so we were able to work together and brainstorm on whether this could be used to transfer podcasts between providers. <a href=\"https://aaronparecki.com/\">Aaron Parecki</a> and I talked through a couple aspects of the Microsub and Micropub APIs that needed tweaking.</p>\n\n<p>I&rsquo;ll have more to share about the Blog Archive Format when it&rsquo;s live on Micro.blog. I&rsquo;ve been testing it this morning with a fix that wasn&rsquo;t ready in time for my IndeWebCamp demo.</p>\n\n<p>If you&rsquo;re interested in attending an IndieWebCamp, <a href=\"https://2019.indieweb.org/\">there will be several more this year</a> at cities from New Haven to Berlin, including IndieWeb Summit in Portland in June. I&rsquo;m always inspired to see what people are working on, and it usually leads to new features in Micro.blog as well. Thanks again to everyone who made it to IndieWebCamp Austin!</p>\n",
+				"date_published": "2019-02-25T10:25:14-06:00",
+				"url": "https://www.manton.org/2019/02/25/indiewebcamp-austin-wrapup.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/23/wrapping-up-the.html",
+				
+				"content_html": "<p>Wrapping up the first day of IndieWebCamp, <a href=\"https://aaronparecki.com/\">Aaron Parecki</a> is live-coding a simple blogging engine to demo social readers. Great example of the IndieWeb building blocks and interoperability between services.</p>\n",
+				"date_published": "2019-02-23T17:06:12-06:00",
+				"url": "https://www.manton.org/2019/02/23/wrapping-up-the.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/22/excited-for-indiewebcamp.html",
+				
+				"content_html": "<p>Excited for IndieWebCamp tomorrow. If you&rsquo;re disappointed in modern social networks and looking for what&rsquo;s next on the open web, I hope you&rsquo;ll join us at Capital Factory in Austin. More details and <a href=\"https://2019.indieweb.org/austin\">registration here</a>.</p>\n",
+				"date_published": "2019-02-22T15:14:51-06:00",
+				"url": "https://www.manton.org/2019/02/22/excited-for-indiewebcamp.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/22/first-time-at.html",
+				
+				"content_html": "<p>First time at Capital Factory? Look for these doors tomorrow inside the building lobby. You can still <a href=\"https://2019.indieweb.org/austin\">register for IndieWebCamp here</a>. $5 or free when you blog about the event!</p>\n\n<p><img src=\"https://www.manton.org/uploads/2019/edbe167b39.jpg\" width=\"600\" height=\"600\" alt=\"\" /></p>\n",
+				"date_published": "2019-02-22T13:04:04-06:00",
+				"url": "https://www.manton.org/2019/02/22/first-time-at.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/22/indiewebcamp-starts-tomorrow.html",
+				
+				"content_html": "<p><a href=\"https://2019.indieweb.org/austin\">IndieWebCamp</a> starts tomorrow. I&rsquo;m downtown this morning, heading over to Capital Factory to do a walk-through of the venue and make sure we&rsquo;re all good for the weekend.</p>\n",
+				"date_published": "2019-02-22T10:44:31-06:00",
+				"url": "https://www.manton.org/2019/02/22/indiewebcamp-starts-tomorrow.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/22/marzipan.html",
+				"title": "Marzipan 2021",
+				"content_html": "<p>On <a href=\"https://coreint.org/361\">the latest Core Intuition</a> we covered <a href=\"https://www.bloomberg.com/news/articles/2019-02-20/apple-is-said-to-target-combining-iphone-ipad-mac-apps-by-2021\">this Bloomberg article from Mark Gurman</a> about Marzipan. Many bloggers have written about it this week, skeptical that Marzipan will ever produce great Mac apps, but maybe we&rsquo;re not giving enough credit to Apple&rsquo;s strategy. Let&rsquo;s start with this part of the article:</p>\n\n<blockquote>\n<p>By 2021, developers will be able to merge iPhone, iPad, and Mac applications into one app or what is known as a “single binary.” This means developers won’t have to submit their work to different Apple App Stores, allowing iOS apps to be downloaded directly from Mac computers &ndash; effectively combining the stores.</p>\n</blockquote>\n\n<p>Marzipan is a multi-year effort. It exists today mostly as a prototype, not meant for developers, with obvious limitations such as iOS-like controls and sheets poking through in the UI. The next phase will be much more mature. And then by 2021 we&rsquo;ll have more polish and a consistent App Store submission experience across platforms.</p>\n\n<p>What we can&rsquo;t predict yet is how users will react to third-party apps. An assumption in the Mac developer community is that native, all-AppKit macOS apps will always be better than iOS apps ported with Marzipan. I believe that too. Apps originally designed for the Mac will have more thought put to the windows, controls, menus — everything that makes an app Mac-like.</p>\n\n<p>But familiarity might be an advantage. What if users end up <em>preferring</em> Marzipan apps simply because they want their apps to work exactly the same across multiple platforms? What if Marzipan is more than &ldquo;good enough&rdquo;, but actually exactly what users are looking for, seeing their favorite iOS apps on macOS for the first time? (Again, not the Marzipan of today, which isn&rsquo;t ready, but the Marzipan of a couple years from now.)</p>\n\n<p>With a unified App Store in 2021, I think it&rsquo;s likely that Apple will encourage universal apps that have a single price for running across iPhone, iPad, and Mac. While this seems unfair by traditional Mac development standards — when developing for AppKit could be a completely different codebase and depth of features, justifying a separate purchase — for Marzipan it seems reasonable to pay once and get the app everywhere.</p>\n\n<p>Marzipan looks like a very different transition than what we went through with Carbon and Cocoa. <a href=\"https://www.manton.org/2003/08/05/carbon-and-cocoa.html\">As I blogged about in 2003</a>, you could start using Cocoa windows and controls directly in a Carbon app. For Marzipan, it doesn&rsquo;t appear that you can mix AppKit into a UIKit app. If this holds true, it will split Mac development into 2 paths.</p>\n\n<p>I plan to keep Micro.blog using AppKit, for now. But I wouldn&rsquo;t bet against Marzipan, and I&rsquo;ll be looking for what Apple says at WWDC. Not what they say about Marzipan itself, but about AppKit. If the usual &ldquo;What&rsquo;s New in Cocoa&rdquo; session at WWDC is missing or filled with very minor tweaks to AppKit, the writing will be on the wall that UIKit is where we should put all our attention, even on the Mac.</p>\n",
+				"date_published": "2019-02-22T10:04:38-06:00",
+				"url": "https://www.manton.org/2019/02/22/marzipan.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/22/writing-a-post.html",
+				
+				"content_html": "<p>Writing a post today that links back to one of my blog posts from 2003! Love it when that happens. You never know what ordinary blog posts today will take on new significance 15+ years from now.</p>\n",
+				"date_published": "2019-02-22T08:43:39-06:00",
+				"url": "https://www.manton.org/2019/02/22/writing-a-post.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/21/why-attend-indiewebcamp.html",
+				"title": "Why attend IndieWebCamp",
+				"content_html": "<p>This weekend is IndieWebCamp Austin, an event for bloggers, web developers, designers, and anyone who wants to create something for their own web site, or to build tools based on IndieWeb standards. You can <a href=\"https://2019.indieweb.org/austin\">register here</a>. After my first IndieWebCamp, <a href=\"https://www.manton.org/2017/12/12/indiewebcamp-austin-wrapup.html\">I wrote</a>:</p>\n\n<blockquote>\n<p>There’s nothing like meeting in person with other members of the community. I know this from attending Apple developer conferences, but the weekend in Austin only underscored that I should be more active in the larger web community as well.</p>\n</blockquote>\n\n<p>It&rsquo;s invaluable to chat with someone in person. This year, we&rsquo;ll have IndieWeb co-founders Tantek Çelik and Aaron Parecki back in Austin. I&rsquo;m looking forward to hearing how the IndieWeb has moved forward in the last year.</p>\n\n<p><a href=\"https://www.manton.org/2017/12/09/session-planning-at.html\"><img src=\"https://www.manton.org/uploads/2018/abeb3afaef.jpg\" width=\"150\" height=\"150\" alt=\"Sticky notes\" border=\"0\" align=\"right\" hspace=\"15\" vspace=\"5\" style=\"width: 150px; max-width: 150px;\" /></a> The first day of IndieWebCamp is for introductions and sessions. Topics for sessions are based on what attendees want to hear about, so the planning is done with sticky notes that can be rearranged to find a schedule that works for everyone. This is a photo I took from IndieWebCamp in 2017.</p>\n\n<p>I look at IndieWebCamp as a way to take a break from the day-to-day routine and get inspired again — to improve my own web site or discover a new part of Micro.blog to work on. As I was talking about with Daniel on <a href=\"https://coreint.org/361\">the latest Core Intuition</a>, because the 2nd day of IndieWebCamp is a hack day, it&rsquo;s also a great environment to work on something you&rsquo;ve had trouble finishing… or starting! There are other people around to help answer questions, and a nice block of time to focus on one thing.</p>\n\n<p>If you&rsquo;re in the Austin area, hope to see you there on Saturday! You can <a href=\"https://2019.indieweb.org/austin\">learn more here</a>.</p>\n",
+				"date_published": "2019-02-21T11:03:20-06:00",
+				"url": "https://www.manton.org/2019/02/21/why-attend-indiewebcamp.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/20/doors-open-for.html",
+				
+				"content_html": "<p>Doors open for IndieWebCamp Austin at 9am on Saturday. We&rsquo;ll have coffee and breakfast tacos. Full schedule and registration details: <a href=\"https://2019.indieweb.org/austin\">2019.indieweb.org/austin</a> ☕</p>\n",
+				"date_published": "2019-02-20T15:10:51-06:00",
+				"url": "https://www.manton.org/2019/02/20/doors-open-for.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/20/we-just-posted.html",
+				
+				"content_html": "<p>We just posted <a href=\"https://coreint.org/2019/02/episode-361-this-is-an-opportunity/\">Core Intuition 361</a>. Looking forward to IndieWebCamp Austin and talking about whether new Marzipan rumors will influence our plans this year.</p>\n",
+				"date_published": "2019-02-20T14:12:03-06:00",
+				"url": "https://www.manton.org/2019/02/20/we-just-posted.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/20/started-the-day.html",
+				
+				"content_html": "<p>Started the day with JuiceLand. Love these silly prints on the wall.</p>\n\n<p><img src=\"https://www.manton.org/uploads/2019/effbe7a646.jpg\" width=\"600\" height=\"600\" alt=\"\" /></p>\n",
+				"date_published": "2019-02-20T11:28:32-06:00",
+				"url": "https://www.manton.org/2019/02/20/started-the-day.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/20/this-weeks-micro.html",
+				
+				"content_html": "<p><a href=\"https://monday.micro.blog/2019/02/17/episode-tom-cutting.html\">This week&rsquo;s Micro Monday</a> features Tom Cutting of Stickman Diaries. &ldquo;One of the things I like about Micro.blog is that I don’t feel like I’m performing. If somebody likes it, they like it. I’m doing it really for myself, as a record of things.&rdquo;</p>\n",
+				"date_published": "2019-02-20T08:36:15-06:00",
+				"url": "https://www.manton.org/2019/02/20/this-weeks-micro.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/19/got-to-see.html",
+				
+				"content_html": "<p>Got to see a few things in Fort Worth with family over the weekend. Great to have some time to explore instead of just driving through.</p>\n\n<p><img src=\"https://www.manton.org/uploads/2019/7067fbad5c.jpg\" width=\"600\" height=\"600\" alt=\"\" /></p>\n",
+				"date_published": "2019-02-19T21:02:22-06:00",
+				"url": "https://www.manton.org/2019/02/19/got-to-see.html"
+			},
+			{
+				"id": "http://manton.micro.blog/2019/02/19/indiewebcamp-austin-is.html",
+				
+				"content_html": "<p>IndieWebCamp Austin is this weekend! You can still <a href=\"https://2019.indieweb.org/austin\">register here</a>.</p>\n",
+				"date_published": "2019-02-19T15:25:26-06:00",
+				"url": "https://www.manton.org/2019/02/19/indiewebcamp-austin-is.html"
+			}
+	]
+}

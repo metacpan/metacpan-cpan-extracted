@@ -60,7 +60,7 @@
    "provides" : {
       "CPAN::Audit" : {
          "file" : "lib/CPAN/Audit.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "CPAN::Audit::DB" : {
          "file" : "lib/CPAN/Audit/DB.pm"
@@ -95,7 +95,7 @@
          "web" : "https://github.com/vti/cpan-audit"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_authority" : "cpan:VTI",
    "x_contributors" : [
       "James Raspass <jraspass@gmail.com>",

@@ -14,7 +14,6 @@ dist.ini
 examples/naughty-strings.pl
 examples/sanitize-file.pl
 lib/HTML/Restrict.pm
-lib/HTML/Restrict/Types.pm
 perlcriticrc
 perltidyrc
 t/00-load.t

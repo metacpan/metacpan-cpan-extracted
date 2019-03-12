@@ -36,10 +36,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-RsyBak
   homepage: https://metacpan.org/release/File-RsyBak
   repository: git://github.com/perlancar/perl-File-RsyBak.git
-version: '0.360'
+version: '0.361'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -112,7 +112,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Filter/Rinci::AbstractFromMeta'
@@ -132,7 +132,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Filter/CheckChangeLog'
-      version: '0.04'
+      version: '0.05'
     -
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Filter/CheckMetaResources'
@@ -144,7 +144,7 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000031'
+          Module::Metadata: '1.000033'
           version: '0.006'
       name: '@Filter/CheckSelfDependency'
       version: '0.011'
@@ -191,55 +191,55 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -267,11 +267,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
@@ -283,11 +283,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
-              version: '0.121550'
+              version: '0.163250'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.014'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
@@ -329,8 +329,9 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@Filter/Test::Compile'
-      version: '2.054'
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@Filter/Test::Perl::Critic'
@@ -338,7 +339,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Filter/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -445,113 +446,14 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.009'
 x_Dist_Zilla_Plugin_Depak:
-  packed_dists:
-    Capture-Tiny: 0
-    Class-Inspector: 0
-    Clone-PP: 0
-    Color-ANSI-Util: 0
-    Complete-Bash: 0
-    Complete-Common: 0
-    Complete-Env: 0
-    Complete-File: 0
-    Complete-Fish: 0
-    Complete-Getopt-Long: 0
-    Complete-Path: 0
-    Complete-Tcsh: 0
-    Complete-Util: 0
-    Complete-Zsh: 0
-    Config-IOD-Reader: 0
-    Data-Check-Structure: 0
-    Data-Clean: 0
-    Data-Clean-JSON: 0
-    Data-Dmp: 0
-    Data-Dump: 0
-    Data-ModeMerge: 0
-    Data-Sah: 0
-    Data-Sah-Coerce: 0
-    Data-Sah-Normalize: 0
-    Data-Sah-Resolve: 0
-    Data-Sah-Util-Type: 0
-    File-Flock-Retry: 0
-    File-RsyBak: 0
-    File-ShareDir: 0
-    File-ShareDir-Tarball: 0
-    File-Slurper: 0
-    File-Which: 0
-    File-chdir: 0
-    Function-Fallback-CoreOrPP: 0
-    Getopt-Long-Negate-EN: 0
-    Getopt-Long-Util: 0
-    HTTP-Tiny: 0
-    HTTP-Tiny-UNIX: 0
-    IO-Tty: 0
-    IPC-Run: 0
-    IPC-System-Options: 0
-    JSON: 0
-    JSON-MaybeXS: 0
-    JSON-PP: 0
-    Lingua-EN-Numbers-Ordinate: 0
-    Lingua-EN-PluralToSingular: 0
-    Log-ger: 0
-    Log-ger-App: 0
-    Log-ger-Layout-Pattern: 0
-    Log-ger-Output-Composite: 0
-    Log-ger-Output-File: 0
-    Log-ger-Output-Screen: 0
-    Log-ger-Output-Syslog: 0
-    Mo: 0
-    Module-Installed-Tiny: 0
-    Monkey-Patch-Action: 0
-    Nodejs-Util: 0
-    Number-Format-BigFloat: 0
-    PERLANCAR-File-HomeDir: 0
-    PERLANCAR-Module-List: 0
-    Perinci-Access-Lite: 0
-    Perinci-AccessUtil: 0
-    Perinci-CmdLine-Help: 0
-    Perinci-CmdLine-Lite: 0
-    Perinci-CmdLine-Util-Config: 0
-    Perinci-Object: 0
-    Perinci-Result-Format-Lite: 0
-    Perinci-Sub-Complete: 0
-    Perinci-Sub-ConvertArgs-Argv: 0
-    Perinci-Sub-ConvertArgs-Array: 0
-    Perinci-Sub-DepChecker: 0
-    Perinci-Sub-GetArgs-Argv: 0
-    Perinci-Sub-GetArgs-Array: 0
-    Perinci-Sub-Normalize: 0
-    Perinci-Sub-To-CLIDocData: 0
-    Perinci-Sub-Util: 0
-    Proc-ChildError: 0
-    Progress-Any: 0
-    Progress-Any-Output-TermProgressBarColor: 0
-    Regexp-Stringify: 0
-    Role-Tiny: 0
-    Sah-Schemas-Rinci: 0
-    Scalar-Util-Numeric-PP: 0
-    Sort-BySpec: 0
-    String-Elide-Parts: 0
-    String-LineNumber: 0
-    String-PerlQuote: 0
-    String-ShellQuote: 0
-    String-Wildcard-Bash: 0
-    Sub-Delete: 0
-    Text-ANSI-Util: 0
-    Text-Table-ASV: 0
-    Text-Table-Any: 0
-    Text-Table-Tiny: 0
-    Text-sprintfn: 0
-    Tie-IxHash: 0
-    Time-Duration: 0
-    YAML-Old: 0
-    experimental: 0
+  packed_dists: ~
   packed_modules:
-    Capture::Tiny: '0.44'
-    Class::Inspector: '1.28'
-    Class::Inspector::Functions: '1.28'
-    Clone::PP: 1.06
-    Color::ANSI::Util: '0.160'
-    Complete::Bash: '0.31'
+    Capture::Tiny: '0.46'
+    Class::Inspector: '1.31'
+    Class::Inspector::Functions: '1.31'
+    Clone::PP: 1.07
+    Color::ANSI::Util: '0.162'
+    Complete::Bash: '0.320'
     Complete::Common: '0.22'
     Complete::Env: '0.400'
     Complete::File: '0.43'
@@ -561,13 +463,14 @@ x_Dist_Zilla_Plugin_Depak:
     Complete::Tcsh: '0.02'
     Complete::Util: '0.600'
     Complete::Zsh: '0.03'
-    Config::IOD::Base: '0.340'
-    Config::IOD::Expr: '0.340'
-    Config::IOD::Reader: '0.340'
+    Config::IOD::Base: '0.342'
+    Config::IOD::Expr: '0.342'
+    Config::IOD::INI::Reader: '0.342'
+    Config::IOD::Reader: '0.342'
     Data::Check::Structure: '0.04'
-    Data::Clean: '0.49'
-    Data::Clean::FromJSON: '0.38'
-    Data::Clean::JSON: '0.38'
+    Data::Clean: '0.502'
+    Data::Clean::FromJSON: '0.391'
+    Data::Clean::JSON: '0.391'
     Data::Dmp: '0.23'
     Data::Dump: '1.23'
     Data::Dump::FilterContext: ~
@@ -582,113 +485,142 @@ x_Dist_Zilla_Plugin_Depak:
     Data::ModeMerge::Mode::KEEP: '0.35'
     Data::ModeMerge::Mode::NORMAL: '0.35'
     Data::ModeMerge::Mode::SUBTRACT: '0.35'
-    Data::Sah: '0.893'
-    Data::Sah::Coerce: '0.026'
-    Data::Sah::Coerce::js::bool::float: '0.026'
-    Data::Sah::Coerce::js::bool::str: '0.026'
-    Data::Sah::Coerce::js::date::float_epoch: '0.026'
-    Data::Sah::Coerce::js::date::obj_Date: '0.026'
-    Data::Sah::Coerce::js::date::str: '0.026'
-    Data::Sah::Coerce::js::duration::float_secs: '0.026'
-    Data::Sah::Coerce::js::duration::str_iso8601: '0.026'
-    Data::Sah::Coerce::perl::bool::str: '0.026'
-    Data::Sah::Coerce::perl::date::float_epoch: '0.026'
-    Data::Sah::Coerce::perl::date::obj_DateTime: '0.026'
-    Data::Sah::Coerce::perl::date::obj_TimeMoment: '0.026'
-    Data::Sah::Coerce::perl::date::str_iso8601: '0.026'
-    Data::Sah::Coerce::perl::duration::float_secs: '0.026'
-    Data::Sah::Coerce::perl::duration::obj_DateTimeDuration: '0.026'
-    Data::Sah::Coerce::perl::duration::str_human: '0.026'
-    Data::Sah::Coerce::perl::duration::str_iso8601: '0.026'
-    Data::Sah::Coerce::perl::float::str_percent: '0.026'
-    Data::Sah::Coerce::perl::int::str_percent: '0.026'
-    Data::Sah::CoerceCommon: '0.026'
-    Data::Sah::CoerceJS: '0.026'
-    Data::Sah::Compiler: '0.893'
-    Data::Sah::Compiler::Prog: '0.893'
-    Data::Sah::Compiler::Prog::TH: '0.893'
-    Data::Sah::Compiler::Prog::TH::all: '0.893'
-    Data::Sah::Compiler::Prog::TH::any: '0.893'
-    Data::Sah::Compiler::TH: '0.893'
-    Data::Sah::Compiler::TextResultRole: '0.893'
-    Data::Sah::Compiler::human: '0.893'
-    Data::Sah::Compiler::human::TH: '0.893'
-    Data::Sah::Compiler::human::TH::Comparable: '0.893'
-    Data::Sah::Compiler::human::TH::HasElems: '0.893'
-    Data::Sah::Compiler::human::TH::Sortable: '0.893'
-    Data::Sah::Compiler::human::TH::all: '0.893'
-    Data::Sah::Compiler::human::TH::any: '0.893'
-    Data::Sah::Compiler::human::TH::array: '0.893'
-    Data::Sah::Compiler::human::TH::bool: '0.893'
-    Data::Sah::Compiler::human::TH::buf: '0.893'
-    Data::Sah::Compiler::human::TH::cistr: '0.893'
-    Data::Sah::Compiler::human::TH::code: '0.893'
-    Data::Sah::Compiler::human::TH::date: '0.893'
-    Data::Sah::Compiler::human::TH::duration: '0.893'
-    Data::Sah::Compiler::human::TH::float: '0.893'
-    Data::Sah::Compiler::human::TH::hash: '0.893'
-    Data::Sah::Compiler::human::TH::int: '0.893'
-    Data::Sah::Compiler::human::TH::num: '0.893'
-    Data::Sah::Compiler::human::TH::obj: '0.893'
-    Data::Sah::Compiler::human::TH::re: '0.893'
-    Data::Sah::Compiler::human::TH::str: '0.893'
-    Data::Sah::Compiler::human::TH::undef: '0.893'
-    Data::Sah::Compiler::perl: '0.893'
-    Data::Sah::Compiler::perl::TH: '0.893'
-    Data::Sah::Compiler::perl::TH::all: '0.893'
-    Data::Sah::Compiler::perl::TH::any: '0.893'
-    Data::Sah::Compiler::perl::TH::array: '0.893'
-    Data::Sah::Compiler::perl::TH::bool: '0.893'
-    Data::Sah::Compiler::perl::TH::buf: '0.893'
-    Data::Sah::Compiler::perl::TH::cistr: '0.893'
-    Data::Sah::Compiler::perl::TH::code: '0.893'
-    Data::Sah::Compiler::perl::TH::date: '0.893'
-    Data::Sah::Compiler::perl::TH::duration: '0.893'
-    Data::Sah::Compiler::perl::TH::float: '0.893'
-    Data::Sah::Compiler::perl::TH::hash: '0.893'
-    Data::Sah::Compiler::perl::TH::int: '0.893'
-    Data::Sah::Compiler::perl::TH::num: '0.893'
-    Data::Sah::Compiler::perl::TH::obj: '0.893'
-    Data::Sah::Compiler::perl::TH::re: '0.893'
-    Data::Sah::Compiler::perl::TH::str: '0.893'
-    Data::Sah::Compiler::perl::TH::undef: '0.893'
-    Data::Sah::Human: '0.893'
-    Data::Sah::Lang: '0.893'
-    Data::Sah::Lang::fr_FR: '0.893'
-    Data::Sah::Lang::id_ID: '0.893'
-    Data::Sah::Lang::zh_CN: '0.893'
+    Data::Sah: '0.895'
+    Data::Sah::Coerce: '0.033'
+    Data::Sah::Coerce::js::bool::float: '0.033'
+    Data::Sah::Coerce::js::bool::str: '0.033'
+    Data::Sah::Coerce::js::date::float_epoch: '0.033'
+    Data::Sah::Coerce::js::date::obj_Date: '0.033'
+    Data::Sah::Coerce::js::date::str: '0.033'
+    Data::Sah::Coerce::js::datenotime::float_epoch: '0.033'
+    Data::Sah::Coerce::js::datenotime::obj_Date: '0.033'
+    Data::Sah::Coerce::js::datenotime::str: '0.033'
+    Data::Sah::Coerce::js::datetime::float_epoch: '0.033'
+    Data::Sah::Coerce::js::datetime::obj_Date: '0.033'
+    Data::Sah::Coerce::js::datetime::str: '0.033'
+    Data::Sah::Coerce::js::duration::float_secs: '0.033'
+    Data::Sah::Coerce::js::duration::str_iso8601: '0.033'
+    Data::Sah::Coerce::js::timeofday::str_hms: '0.033'
+    Data::Sah::Coerce::perl::bool::str: '0.033'
+    Data::Sah::Coerce::perl::date::float_epoch: '0.033'
+    Data::Sah::Coerce::perl::date::float_epoch_always: '0.033'
+    Data::Sah::Coerce::perl::date::obj_DateTime: '0.033'
+    Data::Sah::Coerce::perl::date::obj_TimeMoment: '0.033'
+    Data::Sah::Coerce::perl::date::str_iso8601: '0.033'
+    Data::Sah::Coerce::perl::datenotime::float_epoch: '0.033'
+    Data::Sah::Coerce::perl::datenotime::float_epoch_always: '0.033'
+    Data::Sah::Coerce::perl::datenotime::obj_DateTime: '0.033'
+    Data::Sah::Coerce::perl::datenotime::obj_TimeMoment: '0.033'
+    Data::Sah::Coerce::perl::datenotime::str_iso8601: '0.033'
+    Data::Sah::Coerce::perl::datetime::float_epoch: '0.033'
+    Data::Sah::Coerce::perl::datetime::float_epoch_always: '0.033'
+    Data::Sah::Coerce::perl::datetime::obj_DateTime: '0.033'
+    Data::Sah::Coerce::perl::datetime::obj_TimeMoment: '0.033'
+    Data::Sah::Coerce::perl::datetime::str_iso8601: '0.033'
+    Data::Sah::Coerce::perl::duration::float_secs: '0.033'
+    Data::Sah::Coerce::perl::duration::obj_DateTimeDuration: '0.033'
+    Data::Sah::Coerce::perl::duration::str_human: '0.033'
+    Data::Sah::Coerce::perl::duration::str_iso8601: '0.033'
+    Data::Sah::Coerce::perl::float::str_percent: '0.033'
+    Data::Sah::Coerce::perl::int::str_percent: '0.033'
+    Data::Sah::Coerce::perl::timeofday::obj_DateTimeOfDay: '0.033'
+    Data::Sah::Coerce::perl::timeofday::str_hms: '0.033'
+    Data::Sah::CoerceCommon: '0.033'
+    Data::Sah::CoerceJS: '0.033'
+    Data::Sah::Compiler: '0.895'
+    Data::Sah::Compiler::Prog: '0.895'
+    Data::Sah::Compiler::Prog::TH: '0.895'
+    Data::Sah::Compiler::Prog::TH::all: '0.895'
+    Data::Sah::Compiler::Prog::TH::any: '0.895'
+    Data::Sah::Compiler::TH: '0.895'
+    Data::Sah::Compiler::TextResultRole: '0.895'
+    Data::Sah::Compiler::human: '0.895'
+    Data::Sah::Compiler::human::TH: '0.895'
+    Data::Sah::Compiler::human::TH::Comparable: '0.895'
+    Data::Sah::Compiler::human::TH::HasElems: '0.895'
+    Data::Sah::Compiler::human::TH::Sortable: '0.895'
+    Data::Sah::Compiler::human::TH::all: '0.895'
+    Data::Sah::Compiler::human::TH::any: '0.895'
+    Data::Sah::Compiler::human::TH::array: '0.895'
+    Data::Sah::Compiler::human::TH::bool: '0.895'
+    Data::Sah::Compiler::human::TH::buf: '0.895'
+    Data::Sah::Compiler::human::TH::cistr: '0.895'
+    Data::Sah::Compiler::human::TH::code: '0.895'
+    Data::Sah::Compiler::human::TH::date: '0.895'
+    Data::Sah::Compiler::human::TH::datenotime: '0.895'
+    Data::Sah::Compiler::human::TH::datetime: '0.895'
+    Data::Sah::Compiler::human::TH::duration: '0.895'
+    Data::Sah::Compiler::human::TH::float: '0.895'
+    Data::Sah::Compiler::human::TH::hash: '0.895'
+    Data::Sah::Compiler::human::TH::int: '0.895'
+    Data::Sah::Compiler::human::TH::num: '0.895'
+    Data::Sah::Compiler::human::TH::obj: '0.895'
+    Data::Sah::Compiler::human::TH::re: '0.895'
+    Data::Sah::Compiler::human::TH::str: '0.895'
+    Data::Sah::Compiler::human::TH::timeofday: '0.895'
+    Data::Sah::Compiler::human::TH::undef: '0.895'
+    Data::Sah::Compiler::perl: '0.895'
+    Data::Sah::Compiler::perl::TH: '0.895'
+    Data::Sah::Compiler::perl::TH::all: '0.895'
+    Data::Sah::Compiler::perl::TH::any: '0.895'
+    Data::Sah::Compiler::perl::TH::array: '0.895'
+    Data::Sah::Compiler::perl::TH::bool: '0.895'
+    Data::Sah::Compiler::perl::TH::buf: '0.895'
+    Data::Sah::Compiler::perl::TH::cistr: '0.895'
+    Data::Sah::Compiler::perl::TH::code: '0.895'
+    Data::Sah::Compiler::perl::TH::date: '0.895'
+    Data::Sah::Compiler::perl::TH::datenotime: '0.895'
+    Data::Sah::Compiler::perl::TH::datetime: '0.895'
+    Data::Sah::Compiler::perl::TH::duration: '0.895'
+    Data::Sah::Compiler::perl::TH::float: '0.895'
+    Data::Sah::Compiler::perl::TH::hash: '0.895'
+    Data::Sah::Compiler::perl::TH::int: '0.895'
+    Data::Sah::Compiler::perl::TH::num: '0.895'
+    Data::Sah::Compiler::perl::TH::obj: '0.895'
+    Data::Sah::Compiler::perl::TH::re: '0.895'
+    Data::Sah::Compiler::perl::TH::str: '0.895'
+    Data::Sah::Compiler::perl::TH::timeofday: '0.895'
+    Data::Sah::Compiler::perl::TH::undef: '0.895'
+    Data::Sah::Human: '0.895'
+    Data::Sah::Lang: '0.895'
+    Data::Sah::Lang::fr_FR: '0.895'
+    Data::Sah::Lang::id_ID: '0.895'
+    Data::Sah::Lang::zh_CN: '0.895'
     Data::Sah::Normalize: '0.050'
     Data::Sah::Resolve: '0.007'
-    Data::Sah::Type::BaseType: '0.893'
-    Data::Sah::Type::Comparable: '0.893'
-    Data::Sah::Type::HasElems: '0.893'
-    Data::Sah::Type::Sortable: '0.893'
-    Data::Sah::Type::all: '0.893'
-    Data::Sah::Type::any: '0.893'
-    Data::Sah::Type::array: '0.893'
-    Data::Sah::Type::bool: '0.893'
-    Data::Sah::Type::buf: '0.893'
-    Data::Sah::Type::cistr: '0.893'
-    Data::Sah::Type::code: '0.893'
-    Data::Sah::Type::date: '0.893'
-    Data::Sah::Type::duration: '0.893'
-    Data::Sah::Type::float: '0.893'
-    Data::Sah::Type::hash: '0.893'
-    Data::Sah::Type::int: '0.893'
-    Data::Sah::Type::num: '0.893'
-    Data::Sah::Type::obj: '0.893'
-    Data::Sah::Type::re: '0.893'
-    Data::Sah::Type::str: '0.893'
-    Data::Sah::Type::undef: '0.893'
-    Data::Sah::Util::Func: '0.893'
-    Data::Sah::Util::Role: '0.893'
+    Data::Sah::Type::BaseType: '0.895'
+    Data::Sah::Type::Comparable: '0.895'
+    Data::Sah::Type::HasElems: '0.895'
+    Data::Sah::Type::Sortable: '0.895'
+    Data::Sah::Type::all: '0.895'
+    Data::Sah::Type::any: '0.895'
+    Data::Sah::Type::array: '0.895'
+    Data::Sah::Type::bool: '0.895'
+    Data::Sah::Type::buf: '0.895'
+    Data::Sah::Type::cistr: '0.895'
+    Data::Sah::Type::code: '0.895'
+    Data::Sah::Type::date: '0.895'
+    Data::Sah::Type::datenotime: '0.895'
+    Data::Sah::Type::datetime: '0.895'
+    Data::Sah::Type::duration: '0.895'
+    Data::Sah::Type::float: '0.895'
+    Data::Sah::Type::hash: '0.895'
+    Data::Sah::Type::int: '0.895'
+    Data::Sah::Type::num: '0.895'
+    Data::Sah::Type::obj: '0.895'
+    Data::Sah::Type::re: '0.895'
+    Data::Sah::Type::str: '0.895'
+    Data::Sah::Type::timeofday: '0.895'
+    Data::Sah::Type::undef: '0.895'
+    Data::Sah::Util::Func: '0.895'
+    Data::Sah::Util::Role: '0.895'
     Data::Sah::Util::Type: '0.46'
-    Data::Sah::Util::Type::Date: '0.893'
-    Data::Sah::Util::TypeX: '0.893'
+    Data::Sah::Util::Type::Date: '0.895'
+    Data::Sah::Util::TypeX: '0.895'
     File::Flock::Retry: '0.62'
-    File::RsyBak: '0.360'
+    File::RsyBak: '0.361'
     File::RsyBak::Packed: '0.360'
-    File::ShareDir: '1.102'
+    File::ShareDir: '1.116'
     File::ShareDir::Tarball: 0.2.2
     File::Slurper: '0.009'
     File::Which: '1.21'
@@ -700,39 +632,39 @@ x_Dist_Zilla_Plugin_Depak:
     HTTP::Tiny::UNIX: '0.051'
     IO::Pty: '1.12'
     IO::Tty: '1.12'
-    IPC::Run: '0.94'
-    IPC::Run::Debug: '0.90'
-    IPC::Run::IO: '0.90'
-    IPC::Run::Timer: '0.90'
-    IPC::Run::Win32Helper: '0.90'
-    IPC::Run::Win32IO: '0.90'
-    IPC::Run::Win32Pump: '0.90'
-    IPC::System::Options: '0.330'
-    JSON: '2.90'
-    JSON::MaybeXS: '1.003007'
-    JSON::PP: '2.27300'
+    IPC::Run: '0.96'
+    IPC::Run::Debug: '0.96'
+    IPC::Run::IO: '0.96'
+    IPC::Run::Timer: '0.96'
+    IPC::Run::Win32Helper: '0.96'
+    IPC::Run::Win32IO: '0.96'
+    IPC::Run::Win32Pump: '0.96'
+    IPC::System::Options: '0.331'
+    JSON: '2.94'
+    JSON::MaybeXS: '1.003009'
+    JSON::PP: 2.27400_02
     JSON::PP::Boolean: ~
     Lingua::EN::Numbers::Ordinate: '1.04'
-    Lingua::EN::PluralToSingular: '0.18'
-    Log::ger: '0.023'
-    Log::ger::App: '0.006'
-    Log::ger::Format: '0.023'
-    Log::ger::Format::None: '0.023'
-    Log::ger::Heavy: '0.023'
-    Log::ger::Layout: '0.023'
+    Lingua::EN::PluralToSingular: '0.19'
+    Log::ger: '0.025'
+    Log::ger::App: '0.009'
+    Log::ger::Format: '0.025'
+    Log::ger::Format::None: '0.025'
+    Log::ger::Heavy: '0.025'
+    Log::ger::Layout: '0.025'
     Log::ger::Layout::Pattern: '0.001'
-    Log::ger::Output: '0.023'
-    Log::ger::Output::Array: '0.023'
-    Log::ger::Output::ArrayML: '0.023'
-    Log::ger::Output::Composite: '0.007'
+    Log::ger::Output: '0.025'
+    Log::ger::Output::Array: '0.025'
+    Log::ger::Output::ArrayML: '0.025'
+    Log::ger::Output::Composite: '0.008'
     Log::ger::Output::File: '0.006'
-    Log::ger::Output::Null: '0.023'
-    Log::ger::Output::Screen: '0.007'
-    Log::ger::Output::String: '0.023'
+    Log::ger::Output::Null: '0.025'
+    Log::ger::Output::Screen: '0.008'
+    Log::ger::Output::String: '0.025'
     Log::ger::Output::Syslog: '0.001'
-    Log::ger::Plugin: '0.023'
-    Log::ger::Plugin::MultilevelLog: '0.023'
-    Log::ger::Util: '0.023'
+    Log::ger::Plugin: '0.025'
+    Log::ger::Plugin::MultilevelLog: '0.025'
+    Log::ger::Util: '0.025'
     Mo: '0.40'
     Mo::Golf: '0.40'
     Mo::Inline: '0.40'
@@ -756,25 +688,24 @@ x_Dist_Zilla_Plugin_Depak:
     Monkey::Patch::Action::Handle: '0.061'
     Nodejs::Util: '0.012'
     Number::Format::BigFloat: '0.001'
-    PERLANCAR::File::HomeDir: '0.05'
-    PERLANCAR::Module::List: '0.003005'
+    PERLANCAR::File::HomeDir: '0.060'
     Perinci::Access::Lite: '0.14'
     Perinci::AccessUtil: '0.06'
-    Perinci::CmdLine::Base: '1.815'
+    Perinci::CmdLine::Base: '1.817'
     Perinci::CmdLine::Help: '0.170'
-    Perinci::CmdLine::Lite: '1.815'
+    Perinci::CmdLine::Lite: '1.817'
     Perinci::CmdLine::Util::Config: '1.721'
-    Perinci::Object: '0.30'
-    Perinci::Object::EnvResult: '0.30'
-    Perinci::Object::EnvResultMulti: '0.30'
-    Perinci::Object::EnvResultTable: '0.30'
-    Perinci::Object::Function: '0.30'
-    Perinci::Object::Metadata: '0.30'
-    Perinci::Object::Package: '0.30'
-    Perinci::Object::ResMeta: '0.30'
-    Perinci::Object::Variable: '0.30'
+    Perinci::Object: '0.310'
+    Perinci::Object::EnvResult: '0.310'
+    Perinci::Object::EnvResultMulti: '0.310'
+    Perinci::Object::EnvResultTable: '0.310'
+    Perinci::Object::Function: '0.310'
+    Perinci::Object::Metadata: '0.310'
+    Perinci::Object::Package: '0.310'
+    Perinci::Object::ResMeta: '0.310'
+    Perinci::Object::Variable: '0.310'
     Perinci::Result::Format::Lite: '0.274'
-    Perinci::Sub::Complete: '0.931'
+    Perinci::Sub::Complete: '0.932'
     Perinci::Sub::ConvertArgs::Argv: '0.10'
     Perinci::Sub::ConvertArgs::Array: '0.08'
     Perinci::Sub::DepChecker: '0.11'
@@ -794,13 +725,13 @@ x_Dist_Zilla_Plugin_Depak:
     Regexp::Stringify: '0.06'
     Role::Tiny: '2.000005'
     Role::Tiny::With: '2.000005'
-    Sah::Schema::rinci::function_meta: 1.1.82.3
-    Sah::Schema::rinci::meta: 1.1.82.3
-    Sah::Schema::rinci::result_meta: 1.1.82.3
-    Sah::SchemaR::rinci::function_meta: 1.1.82.3
-    Sah::SchemaR::rinci::meta: 1.1.82.3
-    Sah::SchemaR::rinci::result_meta: 1.1.82.3
-    Sah::Schemas::Rinci: 1.1.82.3
+    Sah::Schema::rinci::function_meta: 1.1.87.0
+    Sah::Schema::rinci::meta: 1.1.87.0
+    Sah::Schema::rinci::result_meta: 1.1.87.0
+    Sah::SchemaR::rinci::function_meta: 1.1.87.0
+    Sah::SchemaR::rinci::meta: 1.1.87.0
+    Sah::SchemaR::rinci::result_meta: 1.1.87.0
+    Sah::Schemas::Rinci: 1.1.87.0
     Scalar::Util::Numeric::PP: '0.04'
     Sort::BySpec: '0.03'
     String::Elide::Parts: '0.07'
@@ -809,19 +740,19 @@ x_Dist_Zilla_Plugin_Depak:
     String::ShellQuote: '1.04'
     String::Wildcard::Bash: '0.03'
     Sub::Delete: '1.00002'
-    Test::Config::IOD::Common: '0.340'
-    Test::Data::Sah: '0.893'
-    Test::Data::Sah::Human: '0.893'
-    Test::Data::Sah::Perl: '0.893'
+    Test::Config::IOD::Common: '0.342'
+    Test::Data::Sah: '0.895'
+    Test::Data::Sah::Human: '0.895'
+    Test::Data::Sah::Perl: '0.895'
     Text::ANSI::BaseUtil: '0.22'
     Text::ANSI::Util: '0.22'
     Text::Table::ASV: '0.001'
-    Text::Table::Any: '0.092'
+    Text::Table::Any: '0.094'
     Text::Table::Tiny: '0.04'
     Text::sprintfn: '0.08'
     Tie::IxHash: '1.23'
     Time::Duration: '1.20'
-    YAML::Old: '1.07'
+    YAML::Old: '1.23'
     YAML::Old::Dumper: ~
     YAML::Old::Dumper::Base: ~
     YAML::Old::Error: ~
@@ -833,6 +764,7 @@ x_Dist_Zilla_Plugin_Depak:
     YAML::Old::Tag: ~
     YAML::Old::Types: ~
     experimental: '0.016'
+    subroutines: '0.001'
 x_authority: cpan:PERLANCAR
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

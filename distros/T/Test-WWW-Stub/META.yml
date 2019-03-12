@@ -30,7 +30,7 @@ no_index:
 provides:
   Test::WWW::Stub:
     file: lib/Test/WWW/Stub.pm
-    version: '0.09'
+    version: '0.10'
   Test::WWW::Stub::Handler:
     file: lib/Test/WWW/Stub/Handler.pm
   Test::WWW::Stub::Intercepter:
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/astj/p5-Test-WWW-Stub/issues
   homepage: https://github.com/astj/p5-Test-WWW-Stub
   repository: git://github.com/astj/p5-Test-WWW-Stub.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Takumi Akiyama <t.akiym@gmail.com>'

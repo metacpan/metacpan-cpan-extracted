@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34410A;
-$Lab::Moose::Instrument::HP34410A::VERSION = '3.671';
+$Lab::Moose::Instrument::HP34410A::VERSION = '3.680';
 #ABSTRACT: HP 34410A digital multimeter.
 
 use 5.010;
@@ -92,7 +92,7 @@ Lab::Moose::Instrument::HP34410A - HP 34410A digital multimeter.
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ Perform voltage/current measurement.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
 

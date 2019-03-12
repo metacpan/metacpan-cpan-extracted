@@ -1,6 +1,7 @@
+requires 'LWP::UserAgent';
 requires 'Moo' => '1.004005';
 requires 'Type::Tiny' => '0.044';
-requires 'LWP::UserAgent';
+requires 'URI';
 requires 'XML::Simple';
 
 on test => sub {

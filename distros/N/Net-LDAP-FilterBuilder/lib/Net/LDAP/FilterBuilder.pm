@@ -1,6 +1,6 @@
 package Net::LDAP::FilterBuilder;
 BEGIN {
-  $Net::LDAP::FilterBuilder::VERSION = '1.200000';
+  $Net::LDAP::FilterBuilder::VERSION = '1.200002';
 }
 
 use strict;
@@ -100,7 +100,7 @@ Net::LDAP::FilterBuilder - Build LDAP filter statements
 
 =head1 VERSION
 
-version 1.200000
+version 1.200002
 
 =head1 SYNOPSIS
 
@@ -165,7 +165,7 @@ The value returned is an object, but stringifies to the current query:
  # prints "success"
 
 However you can refine the filter statement using three additional methods for
-the logical operations C<and>, C<or> and C<not>, as shown in the L<"SYOPSIS">
+the logical operations C<and>, C<or> and C<not>, as shown in the L<"SYNOPSIS">
 section, above, and the L<"METHODS"> section below.
 
 There are two ways to refine a filter. Either call the logic method with a new

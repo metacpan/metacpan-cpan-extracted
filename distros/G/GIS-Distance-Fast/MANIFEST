@@ -6,10 +6,16 @@ README.md
 cpanfile
 lib/GIS/Distance/Fast.pm
 lib/GIS/Distance/Fast.xs
+lib/GIS/Distance/Fast/ALT.pm
 lib/GIS/Distance/Fast/Cosine.pm
+lib/GIS/Distance/Fast/GreatCircle.pm
 lib/GIS/Distance/Fast/Haversine.pm
+lib/GIS/Distance/Fast/Null.pm
+lib/GIS/Distance/Fast/Polar.pm
 lib/GIS/Distance/Fast/Vincenty.pm
 minil.toml
+ppport.h
 t/accuracy.t
+t/null.t
 META.yml
 MANIFEST

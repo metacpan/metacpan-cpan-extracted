@@ -3,7 +3,7 @@ package Function::Interface::Impl;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Class::Load qw(load_class try_load_class);
 use Scalar::Util qw(blessed);

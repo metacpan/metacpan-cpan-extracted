@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.190500';
+$Bio::MUST::Core::IdList::VERSION = '0.190690';
 use Moose;
 use namespace::autoclean;
 
@@ -44,8 +44,10 @@ has '_index_for' => (
     lazy     => 1,
     builder  => '_build_index_for',
     handles  => {
-        is_listed => 'defined',
-        index_for => 'get',
+      count_indices   => 'count',
+            is_listed => 'defined',
+            index_for => 'get',
+        set_index     => 'set',
     },
 );
 
@@ -56,16 +58,31 @@ has '_index_for' => (
 # to benefit from SeqId methods (e.g., auto-removal of first '_'). This is
 # the most flexible approach without costing too much in CPU-time.
 
-# Note: the private hash is not updated once (lazily) built
-
 sub _build_index_for {
     my $self = shift;
+
+    # build private hash from internal array
     my $i = 0;
-    return { map { $_->full_id => $i++ } $self->all_seq_ids };
+    return { map { $_->full_id => $i++ }  $self->all_seq_ids };
 }
 
 ## use critic
 
+after 'add_id' => sub {
+    my $self = shift;
+
+    # check if there are indeed ids not yet in private hash
+    # Note: this might not be the case when adding ids in an empty list
+    my $n = $self->count_ids;
+    my $i = $self->count_indices;
+    return if $n == $i;
+
+    # update private hash from internal array
+    $self->set_index(
+             map { $_->full_id => $i++ } ($self->all_seq_ids)[$i..$n-1]
+    );
+    return;
+};
 
 
 sub all_seq_ids {
@@ -272,7 +289,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.190500
+version 0.190690
 
 =head1 SYNOPSIS
 

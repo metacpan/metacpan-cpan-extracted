@@ -80,7 +80,7 @@
          "web" : "https://github.com/fastmail/JMAP-Tester"
       }
    },
-   "version" : "0.025",
+   "version" : "0.026",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026003"
@@ -452,7 +452,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.025",
+                  "tag" : "0.026",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },

@@ -3,6 +3,7 @@ use utf8;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 
 {
     package MyCache;
@@ -28,5 +29,13 @@ is($got, 1024, 'expect default cache size matched');
 $cacher->set_cache_size(10);
 $got = $cacher->get_cache_size();
 is($got, 10, 'expect default new cache size matched');
+
+dies_ok {
+    $cacher->set_cache_size(-1);
+} 'Expect error throw when cache size < 1';
+
+dies_ok {
+    $cacher->set_cache_size(0);
+} 'Expect error throw when cache size = 1';
 
 done_testing;

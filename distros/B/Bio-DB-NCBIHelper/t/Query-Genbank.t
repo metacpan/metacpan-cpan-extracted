@@ -4,26 +4,21 @@
 use strict;
 
 BEGIN {
-	use Bio::Root::Test;
-	
-	test_begin(-tests => 18,
-			   -requires_modules => [qw(IO::String
-									    LWP::UserAgent
-										HTTP::Request::Common)],
-			   -requires_networking => 1);
-	
+	use Test::Most tests => 18;
+	use Test::RequiresInternet;
+
 	use_ok('Bio::DB::Query::GenBank');
 	use_ok('Bio::DB::GenBank');
 }
 
 my %expected_lengths = (
-                        'MUSIGHBA1' => 408,  
-                        'AF303112'  => 1611, 
-                        'AF041456'  => 1156, 
-                        'AY080910'  => 798,  
-                        'AY080909'  => 1042, 
-                        'AF155220'  => 1172, 
-                        'AF442768'  => 2547, 
+                        'MUSIGHBA1' => 408,
+                        'AF303112'  => 1611,
+                        'AF041456'  => 1156,
+                        'AY080910'  => 798,
+                        'AY080909'  => 1042,
+                        'AF155220'  => 1172,
+                        'AF442768'  => 2547,
                         );
 
 my ($gb, $seq, $seqio, $seqin, $query);
@@ -44,7 +39,7 @@ SKIP: {
     my $done = 0;
     while (my $s = $seqio->next_seq) {
         is $s->length, $expected_lengths{$s->display_id}, $s->display_id;
-        undef $gb; # test the case where the db is gone, 
+        undef $gb; # test the case where the db is gone,
         # but the pipeline should remain until seqio goes away
         $done++;
     }

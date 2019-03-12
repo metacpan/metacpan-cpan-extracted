@@ -1,12 +1,14 @@
 use strict;
 use warnings;
 package App::DubiousHTTP;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 
 1;
 __END__
 
-=head1 NAME App::DubiousHTTP - test security systems with dubious HTTP
+=head1 NAME
+
+App::DubiousHTTP - test security systems with dubious HTTP
 
 =head1 DESCRIPTION
 

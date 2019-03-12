@@ -1,8 +1,8 @@
 package DBIx::Class::DeploymentHandler::VersionStorage::Deprecated;
-$DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VERSION = '0.002223';
-use Moose;
+$DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VERSION = '0.002227';
+use Moo;
 use DBIx::Class::DeploymentHandler::LogImporter ':log';
-
+use DBIx::Class::DeploymentHandler::Types -all;
 
 # ABSTRACT: (DEPRECATED) Use this if you are stuck in the past
 
@@ -12,7 +12,7 @@ has schema => (
 );
 
 has version_rs => (
-  isa        => 'DBIx::Class::ResultSet',
+  isa        => InstanceOf['DBIx::Class::ResultSet'],
   is         => 'ro',
   builder    => '_build_version_rs',
   handles    => [qw( database_version version_storage_is_installed )],

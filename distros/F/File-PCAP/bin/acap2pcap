@@ -8,11 +8,12 @@ use File::PCAP::ACAP2PCAP;
 use Getopt::Long;
 use Pod::Usage;
 
-use version; our $VERSION = qv('v0.0.7');
+use version; our $VERSION = qv('v0.1.0');
 
 my %opt = ();
 my @optdefs = qw(
 	dlt=i
+    startday=s
     help|?
     man
     output=s
@@ -29,6 +30,9 @@ if (exists $opt{dlt}) {
 }
 if (exists $opt{output}) {
 	$a2popts->{output} = $opt{output};
+}
+if (exists $opt{startday}) {
+	$a2popts->{startday} = $opt{startday};
 }
 
 if (scalar @ARGV) {                     # either open the file and parse ...
@@ -75,7 +79,11 @@ Specify the data link type for the PCAP file.
 
 =head2 --output
 
-Specify the name of the PCAP file (default: I<< asa.pcap >>)
+Specify the name of the PCAP file (default: I<< asa.pcap >>).
+
+=head2 --startday $date
+
+Specify the starting day of the capture as YYYY-MM-DD (default: today).
 
 =head1 DESCRIPTION
 

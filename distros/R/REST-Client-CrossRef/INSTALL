@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.003
+    Version 0.005
 
 INSTALLATION
 
@@ -16,7 +16,7 @@ INSTALLATION
        make test
        make install
 
-    On windows use nmake or dmake instead of make.
+    On windows use nmake, dmake or gmake instead of make.
 
     To install this module into a specific directory, do: perl Makefile.PL
     PREFIX=/name/of/the/directory ...the rest is the same...
@@ -25,12 +25,13 @@ INSTALLATION
 
 DEPENDENCIES
 
-            REST::Client    273
             JSON    2.9
-            URI::Escape     3.31
-            Test::More      1.001014
-            HTTP::Cache::Transparent        1.4
-            Moo     2.001001
+            JSON::Path      0.42
             Log::Any        1.049
+            REST::Client    273
+            Moo     2.001001
+            Test::More      1.001014
             Carp    1.4
+            URI::Escape     3.31
+            HTTP::Cache::Transparent        1.4
 

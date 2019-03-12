@@ -3,14 +3,13 @@ abstract: 'Test-time utilities for checking C headers, libraries, or OS features
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Module::Build: '0.28'
-  Test::More: '0.94'
-  perl: '5.006'
+  Test::More: '0.98'
+  perl: '5.008001'
 configure_requires:
-  Module::Build: '0.28'
-  perl: '5.006'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +18,14 @@ name: Test-CChecker
 requires:
   Capture::Tiny: '0'
   ExtUtils::CChecker: '0.09'
-  File::Temp: '0'
   Test::Builder::Module: '0'
-  base: '0'
-  perl: '5.006'
+  perl: '5.008001'
 resources:
-  bugtracker: https://github.com/Perl5-Alien/Test-CChecker/issues
-  homepage: http://perl.wdlabs.com/Test-CChecker
+  bugtracker: https://github.com/Perl5-Alien/Alien-Build
+  homepage: https://metacpan.org/pod/Test::CChecker
   repository: git://github.com/Perl5-Alien/Test-CChecker.git
-version: '0.08'
+version: '0.10'
 x_deprecated: 1
+x_generated_by_perl: v5.29.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

@@ -14,24 +14,24 @@ my $test_data = get_test_data();
 
 sub validate_site_map
 {
-    my $results = shift;
+    my $results         = shift;
     my $expected_string = shift;
-    my $test_blurb = shift;
+    my $test_blurb      = shift;
 
     my @result = @$results;
 
-    my @expected = (split(/\n/, $expected_string));
+    my @expected = ( split( /\n/, $expected_string ) );
 
-    is_deeply(\@expected, \@result, $test_blurb);
+    is_deeply( \@expected, \@result, $test_blurb );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "hello/",
-        @{$test_data->{'minimal'}},
+        @{ $test_data->{'minimal'} },
     );
 
-    my $results = $nav_menu->gen_site_map();
+    my $results       = $nav_menu->gen_site_map();
     my $expected_text = <<"EOF";
 <ul>
 <li>
@@ -44,35 +44,32 @@ sub validate_site_map
 EOF
 
     # TEST
-    validate_site_map($results, $expected_text, "site_map #1");
+    validate_site_map( $results, $expected_text, "site_map #1" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
-        'path_info' => "hello/",
+        'path_info'    => "hello/",
         'current_host' => "default",
         'hosts' => { 'default' => { 'base_url' => "http://www.hello.com/" }, },
-        'tree_contents' =>
-        {
-            'host' => "default",
-            'text' => "Top 1",
-            'title' => "T1 Title",
+        'tree_contents' => {
+            'host'      => "default",
+            'text'      => "Top 1",
+            'title'     => "T1 Title",
             'expand_re' => "",
-            'subs' =>
-            [
+            'subs'      => [
                 {
                     'text' => "Home",
-                    'url' => "",
+                    'url'  => "",
                 },
                 {
-                    'text' => "About Me",
+                    'text'  => "About Me",
                     'title' => "About Myself",
-                    'url' => "me/",
-                    'subs' =>
-                    [
+                    'url'   => "me/",
+                    'subs'  => [
                         {
-                            'url' => "round/hello/personal.html",
-                            'text' => "Bio",
+                            'url'   => "round/hello/personal.html",
+                            'text'  => "Bio",
                             'title' => "Biography of Myself",
                         },
                     ],
@@ -81,7 +78,7 @@ EOF
         },
     );
 
-    my $results = $nav_menu->gen_site_map();
+    my $results       = $nav_menu->gen_site_map();
     my $expected_text = <<"EOF";
 <ul>
 <li>
@@ -98,17 +95,18 @@ EOF
 </li>
 </ul>
 EOF
+
     # TEST
-    validate_site_map($results, $expected_text, "site_map #2");
+    validate_site_map( $results, $expected_text, "site_map #2" );
 }
 
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "hello/world/",
-        @{$test_data->{'two_sites'}},
+        @{ $test_data->{'two_sites'} },
     );
 
-    my $results = $nav_menu->gen_site_map();
+    my $results       = $nav_menu->gen_site_map();
     my $expected_text = <<"EOF";
 <ul>
 <li>
@@ -146,48 +144,47 @@ EOF
 </li>
 </ul>
 EOF
+
     # TEST
-    validate_site_map($results, $expected_text, "site_map - complex");
+    validate_site_map( $results, $expected_text, "site_map - complex" );
 }
 
 # Now testing that the separator is safely skipped and does not generate
 # a double </li>
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
-        'path_info' => "hello/",
+        'path_info'    => "hello/",
         'current_host' => "default",
         'hosts' => { 'default' => { 'base_url' => "http://www.hello.com/" }, },
-        'tree_contents' =>
-        {
-            'host' => "default",
-            'text' => "Top 1",
-            'title' => "T1 Title",
+        'tree_contents' => {
+            'host'      => "default",
+            'text'      => "Top 1",
+            'title'     => "T1 Title",
             'expand_re' => "",
-            'subs' =>
-            [
+            'subs'      => [
                 {
                     'text' => "Home",
-                    'url' => "",
+                    'url'  => "",
                 },
                 {
-                    'text' => "About Me",
+                    'text'  => "About Me",
                     'title' => "About Myself",
-                    'url' => "me/",
+                    'url'   => "me/",
                 },
                 {
                     'separator' => 1,
-                    'skip' => 1,
+                    'skip'      => 1,
                 },
                 {
-                    'text' => "Hoola",
+                    'text'  => "Hoola",
                     'title' => "Hoola Hoop",
-                    'url' => "me-too/",
+                    'url'   => "me-too/",
                 },
             ],
         },
     );
 
-    my $results = $nav_menu->gen_site_map();
+    my $results       = $nav_menu->gen_site_map();
     my $expected_text = <<"EOF";
 <ul>
 <li>
@@ -201,15 +198,16 @@ EOF
 </li>
 </ul>
 EOF
+
     # TEST
-    validate_site_map($results, $expected_text, "site_map - separator");
+    validate_site_map( $results, $expected_text, "site_map - separator" );
 }
 
 # This is a test for the rec_url_type directive.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/darling/",
-        @{$test_data->{'rec_url_type_menu'}},
+        @{ $test_data->{'rec_url_type_menu'} },
     );
 
     my $results = $nav_menu->gen_site_map();
@@ -236,20 +234,16 @@ EOF
 </li>
 </ul>
 EOF
+
     # TEST
-    validate_site_map($results, $expected_text, "site_map - rec_url_type");
+    validate_site_map( $results, $expected_text, "site_map - rec_url_type" );
 }
-
-
-
-
-
 
 # This is a test for the url_is_abs directive.
 {
     my $nav_menu = HTML::Widgets::NavMenu->new(
         'path_info' => "/darling/",
-        @{$test_data->{'url_is_abs_menu'}},
+        @{ $test_data->{'url_is_abs_menu'} },
     );
 
     my $results = $nav_menu->gen_site_map();
@@ -270,6 +264,7 @@ EOF
 </li>
 </ul>
 EOF
+
     # TEST
-    validate_site_map($results, $expected_text, "site_map - url_is_abs");
+    validate_site_map( $results, $expected_text, "site_map - url_is_abs" );
 }

@@ -1,67 +1,51 @@
 package DBIx::Class::DeploymentHandler::WithApplicatorDumple;
-$DBIx::Class::DeploymentHandler::WithApplicatorDumple::VERSION = '0.002223';
-use MooseX::Role::Parameterized;
-use Module::Runtime 'use_module';
-use namespace::autoclean;
+$DBIx::Class::DeploymentHandler::WithApplicatorDumple::VERSION = '0.002227';
+use strict;
+use warnings;
 
-# this is at least a little ghetto and not super well
-# thought out.  Take a look at the following at some
-# point to clean it all up:
-#
-# http://search.cpan.org/~jjnapiork/MooseX-Role-BuildInstanceOf-0.06/lib/MooseX/Role/BuildInstanceOf.pm
-# http://github.com/rjbs/role-subsystem/blob/master/lib/Role/Subsystem.pm
+use Package::Variant
+  importing => {
+     'Module::Runtime' => ['use_module'],
+     'Moo::Role' => ['has'],
+  },
+  subs => [qw(has use_module)];
 
-parameter interface_role => (
-  isa      => 'Str',
-  required => 1,
-);
+sub make_variant {
+  my ($class, $target, %args) = @_;
 
-parameter class_name => (
-  isa      => 'Str',
-  required => 1,
-);
+  my $interface_role = $args{interface_role}
+    or die 'interface_role is required!';
 
-parameter delegate_name => (
-  isa      => 'Str',
-  required => 1,
-);
+  my $class_name = $args{class_name}
+    or die 'class_name is required!';
 
-parameter attributes_to_copy => (
-  isa => 'ArrayRef[Str]',
-  default => sub {[]},
-);
+  my $delegate_name = $args{delegate_name}
+    or die 'delegate_name is required!';
 
-parameter attributes_to_assume => (
-  isa => 'ArrayRef[Str]',
-  default => sub {[]},
-);
-
-role {
-  my $p = shift;
-
-  my $class_name = $p->class_name;
+  my $attributes_to_copy = $args{attributes_to_copy} || [];
+  my $attributes_to_assume = $args{attributes_to_assume} || [];
 
   use_module($class_name);
 
-  my $meta = Class::MOP::class_of($class_name);
+  my $meta = Moo->_constructor_maker_for($class_name);
+  my $class_attrs = $meta->all_attribute_specs;
 
-  has $_->name => %{ $_->clone }
-    for grep { $_ } map $meta->find_attribute_by_name($_), @{ $p->attributes_to_copy };
+  has $_ => %{ $class_attrs->{$_} }
+    for grep $class_attrs->{$_}, @$attributes_to_copy;
 
-  has $p->delegate_name => (
-    is         => 'ro',
-    lazy_build => 1,
-    does       => $p->interface_role,
-    handles    => $p->interface_role,
+  has $delegate_name => (
+    is         => 'lazy',
+    does       => $interface_role,
+    handles    => $interface_role,
   );
 
-  method '_build_'.$p->delegate_name => sub {
+  install '_build_'.$delegate_name => sub {
     my $self = shift;
 
     $class_name->new({
       map { $_ => $self->$_ }
-        @{ $p->attributes_to_assume },
-        @{ $p->attributes_to_copy   },
+        @$attributes_to_assume,
+        @$attributes_to_copy,
     })
   };
 };

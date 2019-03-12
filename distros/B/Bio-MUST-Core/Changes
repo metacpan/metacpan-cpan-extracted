@@ -1,3 +1,9 @@
+0.190690  2019-03-10 01:18:33+01:00 Europe/Brussels
+	- Additions
+	  - Ali: added method all_new_seqs
+	- Fixes
+	  - IdList: fixed private hash not being updated after adding new ids
+	  
 0.190500  2019-02-19 15:41:48+01:00 Europe/Brussels
     - Additions
       - binaries: added --item-type 'strain' to fetch-tax.pl

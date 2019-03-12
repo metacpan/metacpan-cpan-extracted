@@ -42,8 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "GIS::Distance" : "0.10",
-            "GIS::Distance::Constants" : "0.10",
+            "GIS::Distance" : "0.14",
+            "GIS::Distance::Constants" : "0.14",
             "namespace::clean" : "0.24",
             "perl" : "5.008001",
             "strictures" : "2.000000"
@@ -58,19 +58,35 @@
    "provides" : {
       "GIS::Distance::Fast" : {
          "file" : "lib/GIS/Distance/Fast.pm",
-         "version" : "0.09"
+         "version" : "0.12"
+      },
+      "GIS::Distance::Fast::ALT" : {
+         "file" : "lib/GIS/Distance/Fast/ALT.pm",
+         "version" : "0.12"
       },
       "GIS::Distance::Fast::Cosine" : {
          "file" : "lib/GIS/Distance/Fast/Cosine.pm",
-         "version" : "0.09"
+         "version" : "0.12"
+      },
+      "GIS::Distance::Fast::GreatCircle" : {
+         "file" : "lib/GIS/Distance/Fast/GreatCircle.pm",
+         "version" : "0.12"
       },
       "GIS::Distance::Fast::Haversine" : {
          "file" : "lib/GIS/Distance/Fast/Haversine.pm",
-         "version" : "0.09"
+         "version" : "0.12"
+      },
+      "GIS::Distance::Fast::Null" : {
+         "file" : "lib/GIS/Distance/Fast/Null.pm",
+         "version" : "0.12"
+      },
+      "GIS::Distance::Fast::Polar" : {
+         "file" : "lib/GIS/Distance/Fast/Polar.pm",
+         "version" : "0.12"
       },
       "GIS::Distance::Fast::Vincenty" : {
          "file" : "lib/GIS/Distance/Fast/Vincenty.pm",
-         "version" : "0.09"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -84,7 +100,7 @@
          "web" : "https://github.com/bluefeet/GIS-Distance-Fast"
       }
    },
-   "version" : "0.09",
+   "version" : "0.12",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Deltac <aran@ziprecruiter.com>"

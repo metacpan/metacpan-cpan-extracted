@@ -1,6 +1,11 @@
 Summary of important user-visible changes for Bio-DB-NCBIHelper
 ---------------------------------------------------------------
 
+1.7.4     2019-03-10 21:29:52-05:00 America/Chicago
+  * Switch away from Bio::Root::Test
+  * Add '-email' parameter, which allows lower delay interval at NCBI (currently
+    requires setting the '-delay' parameter separately).
+
 1.7.3     2019-03-02 23:05:20-06:00 America/Chicago
   * First release after split from bioperl-live
   * Remove Bio::DB::RefSeq dependency, which isn't tested outside of Bio::DB::RefSeq.

@@ -68,6 +68,7 @@ dnl solaris major/minor
 AC_CHECK_HEADERS([sys/mkdev.h])
 
 AC_CACHE_CHECK([for splice, vmsplice and tee], ac_cv_linux_splice, [AC_LINK_IFELSE([AC_LANG_SOURCE([
+#include <sys/types.h>
 #include <fcntl.h>
 int main (void)
 {
@@ -136,13 +137,11 @@ AC_CACHE_CHECK(for st_xtimensec, ac_cv_xtimensec, [AC_COMPILE_IFELSE([AC_LANG_SO
 #include "perl.h"
 #include "XSUB.h"
 
-int res;
 int main (void)
 {
    return PL_statcache.st_atimensec
         + PL_statcache.st_mtimensec
         + PL_statcache.st_ctimensec;
-   return 0;
 }
 ]])],ac_cv_xtimensec=yes,ac_cv_xtimensec=no)])
 test $ac_cv_xtimensec = yes && AC_DEFINE(HAVE_ST_XTIMENSEC, 1, stat nanosecond access by st_xtimensec)
@@ -152,7 +151,6 @@ AC_CACHE_CHECK(for st_xtimespec, ac_cv_xtimespec, [AC_COMPILE_IFELSE([AC_LANG_SO
 #include "perl.h"
 #include "XSUB.h"
 
-int res;
 int main (void)
 {
    return PL_statcache.st_atim.tv_nsec
@@ -163,6 +161,42 @@ int main (void)
 test $ac_cv_xtimespec = yes && AC_DEFINE(HAVE_ST_XTIMESPEC, 1, stat nanosecond access by st_xtimespec)
 
 # apparently, True64 uses st_u[amc]time, aix uses at_[amc]time_n and apple uses st_[amc,birth]timespec?
+
+AC_CACHE_CHECK(for st_birthtimensec, ac_cv_birthtimensec, [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main (void)
+{
+   return PL_statcache.st_birthtime + PL_statcache.st_birthtimensec;
+}
+]])],ac_cv_birthtimensec=yes,ac_cv_birthtimensec=no)])
+test $ac_cv_birthtimensec = yes && AC_DEFINE(HAVE_ST_BIRTHTIMENSEC, 1, birthtime nanosecond access by st_birthtimensec)
+
+AC_CACHE_CHECK(for st_birthtimespec, ac_cv_birthtimespec, [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main (void)
+{
+   return PL_statcache.st_birthtim.tv_sec + PL_statcache.st_birthtim.tv_nsec;
+}
+]])],ac_cv_birthtimespec=yes,ac_cv_birthtimespec=no)])
+test $ac_cv_birthtimespec = yes && AC_DEFINE(HAVE_ST_BIRTHTIMESPEC, 1, birthtime nanosecond access by st_birthtimespec)
+
+AC_CACHE_CHECK(for st_gen, ac_cv_st_gen, [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+int main (void)
+{
+   return PL_statcache.st_gen;
+}
+]])],ac_cv_st_gen=yes,ac_cv_st_gen=no)])
+test $ac_cv_st_gen = yes && AC_DEFINE(HAVE_ST_GEN, 1, stat st_gen member)
 
 AC_OUTPUT
 

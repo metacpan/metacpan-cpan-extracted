@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware::RequestHeaders;
 use warnings;
 use strict;
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 use parent 'HTTP::AnyUA::Middleware';
 
@@ -59,7 +59,7 @@ HTTP::AnyUA::Middleware::RequestHeaders - Middleware to add custom request heade
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 

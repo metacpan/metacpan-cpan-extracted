@@ -8,7 +8,7 @@ use DBICDHTest;
 use aliased
    'DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::Deprecated';
 
-use Path::Class 'file';
+use IO::All;
 use File::Temp 'tempdir';
 
 my $dbh = DBICDHTest::dbh();
@@ -32,7 +32,7 @@ VERSION1: {
    $dm->prepare_deploy;
 
    ok(
-      -f file($sql_dir, qw(DBICVersion-Schema-1.0-SQLite.sql )),
+      io->file($sql_dir, qw(DBICVersion-Schema-1.0-SQLite.sql ))->exists,
       '1.0 schema gets generated properly'
    );
 
@@ -63,7 +63,7 @@ VERSION2: {
       'DBIC::DH::DM::SQLT::Deprecated gets instantiated correctly w/ version 2.0'
    );
 
-   $version = $s->schema_version;
+   $version = $s->schema_version->numify + 0;
    $dm->prepare_deploy;
    $dm->prepare_upgrade({
      from_version => '1.0',

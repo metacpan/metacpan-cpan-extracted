@@ -7,7 +7,7 @@ use File::Spec;
 use File::Find;
 use strict;
 
-my @files;
+my @files = ('Makefile.PL', 'MANIFEST', 'MANIFEST.SKIP', glob 't/*.t');
 
 my $blib = File::Spec->catfile(qw(blib lib));
 find(\&wanted, grep { -d } ($blib, 'bin'));

@@ -6,8 +6,8 @@ use 5.008001;
 use Role::Tiny;
 use Alien::Base 1.45;
 
-# ABSTRACT: Alien::Base role that supports alternates
-our $VERSION = '0.04'; # VERSION
+# ABSTRACT: (Deprecated) Alien::Base role that supports alternates
+our $VERSION = '0.05'; # VERSION
 
 
 1;
@@ -20,11 +20,11 @@ __END__
 
 =head1 NAME
 
-Alien::Role::Alt - Alien::Base role that supports alternates
+Alien::Role::Alt - (Deprecated) Alien::Base role that supports alternates
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Graham Ollis.
+This software is copyright (c) 2017,2018,2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

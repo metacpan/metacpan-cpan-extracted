@@ -1,66 +1,65 @@
-1 Parallel::Forker
-******************
+NAME
 
-This is the Parallel::Forker Package.
+    Parallel::Forker README file
 
-1.1 Copyright
-=============
+DESCRIPTION
 
-This package is Copyright 2002-2017 by Wilson Snyder
-<wsnyder@wsnyder.org>.
+    Parallel::Forker manages parallel processes that are either subroutines
+    or system commands. Forker supports most of the features in all the
+    other little packages out there, with the addition of being able to
+    specify complicated expressions to determine which processes run after
+    others, or run when others fail.
 
-   This program is free software; you can redistribute it and/or modify
-it under the terms of either the GNU Lesser General Public License
-Version 3 or the Perl Artistic License Version 2.0.
+INSTALLATION
 
-   This code is provided with no warranty of any kind, and is used
-entirely at your own risk.
+    Skip this section if Parallel::Forker has already been installed.
 
-1.2 Summary
-===========
+  Supported Systems
 
-Parallel::Forker manages parallel processes that are either subroutines
-or system commands.  Forker supports most of the features in all the
-other little packages out there, with the addition of being able to
-specify complicated expressions to determine which processes run after
-others, or run when others fail.
+    Parallel::Forker should run on any system with Perl.
 
-1.3 Description
-===============
+  CPAN Installation
 
-See the Parallel::Forker manpage for a detailed description of this
-package.
+        Easiest installation is using the "CPAN" command line that comes
+        with Perl. After configuring CPAN the first time, simply
 
-1.4 Obtaining Distribution
-==========================
+           $ cpan
+           cpan> install Parallel::Forker
 
-The latest version is available at `http://www.perl.org/CPAN/', and
-from `http://www.veripool.org/'.
+        Read the rest of this file for details on the programs provided.
 
-1.5 Supported Systems
-=====================
+  Manual Installation
 
-This version of Parallel::Forker has been built and tested on:
+        Download the latest version from <http://www.perl.org/CPAN/>.
 
-   * i386-linux
+        "cd" to the directory containing this README notice.
 
-   It should run on any system with Perl.  It may be easily modified to
-support other compilers.
+        Type "perl Makefile.PL" to configure for your system.
 
-1.6 Installation
-================
+        Type "make" to compile.
 
-  1. `cd' to the directory containing this README notice.
+        Type "make test" to check the package.
 
-  2. Type `perl Makefile.PL' to configure the package for your system.
+        Type "make install" to install the programs and any data files and
+        documentation.
 
-  3. Type `make' to compile.
+USAGE
 
-  4. Type `make test' to check the compilation.
+    See the Parallel::Forker manpage after installation.
 
-  5. Type `make install' to install the programs and any data files and
-     documentation.
+DISTRIBUTION
 
-  6. See the `man Parallel::Forker' manpage for usage information.
+    The latest version is available from CPAN.
 
+    Copyright 2002-2019 by Wilson Snyder. This package is free software; you
+    can redistribute it and/or modify it under the terms of either the GNU
+    Lesser General Public License Version 3 or the Perl Artistic License
+    Version 2.0.
+
+    This code is provided with no warranty of any kind, and is used entirely
+    at your own risk.
+
+AUTHORS
+
+    Wilson Snyder <wsnyder@wsnyder.org>
 

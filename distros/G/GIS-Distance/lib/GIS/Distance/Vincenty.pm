@@ -1,7 +1,7 @@
 package GIS::Distance::Vincenty;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Math::Trig qw( deg2rad pi tan atan asin );
 use namespace::clean;
@@ -78,6 +78,9 @@ greater. In the UK, if you measure the distance from Land's End to John O'
 Groats using WGS-84, it will be 28m - 0.003% - greater than using the Airy
 ellipsoid, which provides a better fit for the UK.
 
+A faster (XS) version of this formula is available as
+L<GIS::Distance::Fast::Vincenty>.
+
 Normally this module is not used directly.  Instead L<GIS::Distance>
 is used which in turn interfaces with the various formula modules.
 
@@ -115,12 +118,6 @@ is used which in turn interfaces with the various formula modules.
     delta_sigma = bb*sin_sigma*(cos2sigma_m+bb/4*(cos_sigma*(-1+2*cos2sigma_m*cos2sigma_m)-
       bb/6*cos2sigma_m*(-3+4*sin_sigma*sin_sigma)*(-3+4*cos2sigma_m*cos2sigma_m)))
     c = b*aa*(sigma-delta_sigma)
-
-=head1 SEE ALSO
-
-L<GIS::Distanc>
-
-L<GIS::Distance::Fast::Vincenty>
 
 =head1 RESOURCES
 

@@ -5,13 +5,13 @@
 [![CPAN](https://img.shields.io/cpan/v/CGI-Info.svg)](http://search.cpan.org/~nhorne/CGI-Info/)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
 
-# CGI::Info
+# NAME
 
-Information about the CGI environment
+CGI::Info - Information about the CGI environment
 
 # VERSION
 
-Version 0.68
+Version 0.69
 
 # SYNOPSIS
 
@@ -299,6 +299,10 @@ This can be run as a class or object method.
 
         print CGI::Info->rootdir();
 
+## logdir
+
+Gets and sets the name of a directory that you can use to store logs in.
+
 ## is\_robot
 
 Is the visitor a real person or a robot?
@@ -420,10 +424,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Info)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/CGI-Info](http://annocpan.org/dist/CGI-Info)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-Info](http://cpanratings.perl.org/d/CGI-Info)
@@ -434,6 +434,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2018 Nigel Horne.
+Copyright 2010-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

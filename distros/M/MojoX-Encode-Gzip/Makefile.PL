@@ -16,11 +16,12 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "MojoX::Encode::Gzip",
   "PREREQ_PM" => {
-    "Compress::Zlib" => 0,
-    "Mojolicious" => "7.75",
+    "Mojolicious" => "7.75"
+  },
+  "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.12",
+  "VERSION" => "1.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -28,7 +29,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Compress::Zlib" => 0,
   "Mojolicious" => "7.75",
   "Test::More" => 0
 );

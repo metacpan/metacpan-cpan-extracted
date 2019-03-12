@@ -44,6 +44,7 @@
             "Socket" : "0",
             "String::Clean::XSS" : "0",
             "Sys::Hostname" : "0",
+            "Sys::Path" : "0",
             "URI::Heuristic" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006002"
@@ -76,6 +77,6 @@
          "x_repository" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.68",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.69",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

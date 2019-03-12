@@ -1,5 +1,8 @@
 ##-*- Mode: ChangeLog; coding: utf-8; -*-
 
+v0.90 Mon, 11 Mar 2019 12:36:38 +0100 moocow
+	* mkbx0: ignore 'metamark'
+
 v0.89 Fri, 22 Feb 2019 09:31:13 +0100 moocow
 	* top-level Makefile.PL tweaks
 	  - META.* re-generation fixes

@@ -1,4 +1,4 @@
-Hash-Fold version 0.1.2
+Hash-Fold version 1.0.0
 ===========================
 
 This module provides functional and OO interfaces which can be used to flatten, unflatten and merge nested hashrefs.
@@ -16,13 +16,13 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Moose
+    Moo
     Sub::Exporter
+    Types::Standard
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014-2015 by chocolateboy
+Copyright (c) 2014-2019 by chocolateboy
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.0 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under the
+terms of the Artistic License 2.0.

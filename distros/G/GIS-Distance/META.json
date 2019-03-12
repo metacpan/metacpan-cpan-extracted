@@ -42,9 +42,10 @@
       },
       "runtime" : {
          "recommends" : {
-            "GIS::Distance::Fast" : "0.04"
+            "GIS::Distance::Fast" : "0.09"
          },
          "requires" : {
+            "Carp" : "0",
             "Class::Measure::Length" : "0",
             "Const::Fast" : "0.014",
             "Math::Trig" : "0",
@@ -62,35 +63,43 @@
    "provides" : {
       "GIS::Distance" : {
          "file" : "lib/GIS/Distance.pm",
-         "version" : "0.10"
+         "version" : "0.14"
+      },
+      "GIS::Distance::ALT" : {
+         "file" : "lib/GIS/Distance/ALT.pm",
+         "version" : "0.14"
       },
       "GIS::Distance::Constants" : {
          "file" : "lib/GIS/Distance/Constants.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       },
       "GIS::Distance::Cosine" : {
          "file" : "lib/GIS/Distance/Cosine.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       },
       "GIS::Distance::GreatCircle" : {
          "file" : "lib/GIS/Distance/GreatCircle.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       },
       "GIS::Distance::Haversine" : {
          "file" : "lib/GIS/Distance/Haversine.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       },
       "GIS::Distance::MathTrig" : {
          "file" : "lib/GIS/Distance/MathTrig.pm",
-         "version" : "0.10"
+         "version" : "0.14"
+      },
+      "GIS::Distance::Null" : {
+         "file" : "lib/GIS/Distance/Null.pm",
+         "version" : "0.14"
       },
       "GIS::Distance::Polar" : {
          "file" : "lib/GIS/Distance/Polar.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       },
       "GIS::Distance::Vincenty" : {
          "file" : "lib/GIS/Distance/Vincenty.pm",
-         "version" : "0.10"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -104,7 +113,7 @@
          "web" : "https://github.com/bluefeet/GIS-Distance"
       }
    },
-   "version" : "0.10",
+   "version" : "0.14",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Clary Deltac <bluefeet@gmail.com>"

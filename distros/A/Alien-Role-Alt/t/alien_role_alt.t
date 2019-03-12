@@ -4,6 +4,17 @@ use Alien::Role::Alt;
 use lib 'corpus/lib';
 use Alien::libfoo2;
 
+diag '';
+diag '';
+diag '';
+diag '*********************************************';
+diag '* WARNING:                                  *';
+diag '* Alien::Role::Alt has been deprecated!     *';
+diag '* Please use Alien::Build instead.          *';
+diag '*********************************************';
+diag '';
+diag '';
+
 subtest 'test a share install' => sub {
 
   alien_ok 'Alien::libfoo2';

@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+RELEASE.md
 cpanfile
 lib/Test/WWW/Stub.pm
 lib/Test/WWW/Stub/Handler.pm

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Range;
-$Lab::Moose::Instrument::SCPI::Sense::Range::VERSION = '3.671';
+$Lab::Moose::Instrument::SCPI::Sense::Range::VERSION = '3.680';
 #ABSTRACT: Role for the SCPI SENSe:$function:RANGe subsystem.
 
 use Moose::Role;
@@ -49,7 +49,7 @@ Lab::Moose::Instrument::SCPI::Sense::Range - Role for the SCPI SENSe:$function:R
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 METHODS
 
@@ -63,7 +63,7 @@ Query/Set the input range.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
 

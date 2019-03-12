@@ -4,7 +4,7 @@
       "Mathias Weidner <mamawe@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_2"
    ],
@@ -28,19 +28,19 @@
    "provides" : {
       "File::PCAP" : {
          "file" : "lib/File/PCAP.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.1.0"
       },
       "File::PCAP::ACAP2PCAP" : {
          "file" : "lib/File/PCAP/ACAP2PCAP.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.1.0"
       },
       "File::PCAP::Reader" : {
          "file" : "lib/File/PCAP/Reader.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.1.0"
       },
       "File::PCAP::Writer" : {
          "file" : "lib/File/PCAP/Writer.pm",
-         "version" : "v0.0.7"
+         "version" : "v0.1.0"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "v0.0.7",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

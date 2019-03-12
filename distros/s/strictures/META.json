@@ -1,5 +1,5 @@
 {
-   "abstract" : "turn on strict and make most warnings fatal",
+   "abstract" : "Turn on strict and make most warnings fatal",
    "author" : [
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
@@ -68,7 +68,7 @@
          "web" : "https://github.com/p5sagit/strictures"
       }
    },
-   "version" : "2.000005",
+   "version" : "2.000006",
    "x_authority" : "cpan:MSTROUT",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
@@ -78,5 +78,5 @@
       "Christian Walde <walde.christian@googlemail.com>",
       "Diab Jerius <djerius@cfa.harvard.edu>"
    ],
-   "x_serialization_backend" : "JSON::MaybeXS version 1.004"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

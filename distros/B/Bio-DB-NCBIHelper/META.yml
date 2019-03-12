@@ -6,12 +6,12 @@ author:
   - 'Jason Stajich <jason@bioperl.org>'
   - 'Lincoln Stein <lstein@cshl.org>'
 build_requires:
-  Bio::Root::Test: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::Exception: '0'
   Test::More: '0'
+  Test::Most: '0'
   Test::RequiresInternet: '0'
   perl: '5.006'
 configure_requires:
@@ -49,7 +49,7 @@ resources:
   bugtracker: https://github.com/bioperl/bio-db-ncbihelper/issues
   homepage: https://metacpan.org/release/Bio-DB-NCBIHelper
   repository: git://github.com/bioperl/bio-db-ncbihelper.git
-version: 1.7.3
+version: 1.7.4
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -218,7 +218,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: Bio-DB-NCBIHelper-v1.7.3
+          tag: Bio-DB-NCBIHelper-v1.7.4
           tag_format: '%N-v%v'
           tag_message: '%N-v%v'
         Dist::Zilla::Role::Git::Repo:

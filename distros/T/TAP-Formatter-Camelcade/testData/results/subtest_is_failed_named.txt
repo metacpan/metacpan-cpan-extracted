@@ -1,0 +1,22 @@
+teamcity[enteredTheMatrix timestamp='2019-03-10T12:56:49.973']
+teamcity[testingStarted timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='myfile://testData/tests/subtest_is_failed_named.t' name='testData/tests/subtest_is_failed_named.t' nodeId='myfile://testData/tests/subtest_is_failed_named.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='Wrapping subtest' name='Wrapping subtest' nodeId='Wrapping subtest-1' parentNodeId='myfile://testData/tests/subtest_is_failed_named.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='with name' nodeId='Wrapping subtest-1-with name-2' parentNodeId='Wrapping subtest-1' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFailed actual='Actual |' |n text' details='#   Failed test |'with name|'|n#   at testData/tests/subtest_is_failed_named.t line 6.|n#          got: |'Actual |' |n#  text|'|n#     expected: |'Expe|'cted|n# text|'|n# Looks like you failed 1 test of 1.' expected='Expe|'cted|ntext' message='' name='with name' nodeId='Wrapping subtest-1-with name-2' parentNodeId='Wrapping subtest-1' timestamp='2019-03-10T12:56:49.973' type='comparisonFailure']
+teamcity[testFinished duration='42' name='with name' nodeId='Wrapping subtest-1-with name-2' parentNodeId='Wrapping subtest-1' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='Wrapping subtest' name='Wrapping subtest' nodeId='Wrapping subtest-1' parentNodeId='myfile://testData/tests/subtest_is_failed_named.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[message status='WARNING' text='' timestamp='2019-03-10T12:56:49.973']
+teamcity[message status='WARNING' text='#   Failed test |'Wrapping subtest|'' timestamp='2019-03-10T12:56:49.973']
+teamcity[message status='WARNING' text='#   at testData/tests/subtest_is_failed_named.t line 7.' timestamp='2019-03-10T12:56:49.973']
+teamcity[message status='WARNING' text='# Looks like you failed 1 test of 1.' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='testData/tests/subtest_is_failed_named.t' name='testData/tests/subtest_is_failed_named.t' nodeId='myfile://testData/tests/subtest_is_failed_named.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+
+Test Summary Report
+-------------------
+testData/tests/subtest_is_failed_named.t (Wstat: 256 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 1
+Files=1, Tests=1, TEST_MODE_STATS;
+Result: FAIL
+teamcity[testingFinished timestamp='2019-03-10T12:56:49.973']

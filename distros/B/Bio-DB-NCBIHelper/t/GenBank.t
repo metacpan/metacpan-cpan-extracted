@@ -4,14 +4,8 @@
 use strict;
 
 BEGIN {
-	use Bio::Root::Test;
-
-	test_begin(-tests => 44,
-			   -requires_modules => [qw(IO::String
-									    LWP::UserAgent
-										HTTP::Request::Common)],
-			   -requires_networking => 1);
-
+	use Test::Most tests => 44;
+	use Test::RequiresInternet;
 	use_ok('Bio::DB::GenBank');
 }
 
@@ -31,7 +25,7 @@ my ($gb, $seq, $seqio, $seqin);
 # Bio::DB::GenBank
 #
 
-ok $gb = Bio::DB::GenBank->new('-delay'=>0), 'Bio::DB::GenBank';
+ok $gb = Bio::DB::GenBank->new(), 'Bio::DB::GenBank';
 
 # get a single seq
 SKIP: {

@@ -1,5 +1,9 @@
 Revision history for Perl module Code-Statistics
 
+1.190680  2019-03-09 11:56:44+01:00 Europe/Berlin
+    - updated dist.ini to 2018
+    - stabilize order of targets output by the reporter against hash randomness
+
 1.112980  2011-10-26 01:33:52 Asia/Kamchatka
     - fixed argument-less calling of commands, ( thanks to Gregor Goldbach )
 

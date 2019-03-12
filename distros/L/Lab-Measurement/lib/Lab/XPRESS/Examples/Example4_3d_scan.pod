@@ -13,7 +13,7 @@ Lab::XPRESS::Examples::Example4_3d_scan - XPRESS for DUMMIES - Example 4
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 Abstract
 
@@ -403,7 +403,7 @@ and switch the frequency generator of once we are done to not heat the sample un
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
 

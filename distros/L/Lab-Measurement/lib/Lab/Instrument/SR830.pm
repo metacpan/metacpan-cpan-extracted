@@ -1,6 +1,7 @@
 package Lab::Instrument::SR830;
+$Lab::Instrument::SR830::VERSION = '3.680';
 #ABSTRACT: Stanford Research SR830 lock-in amplifier
-$Lab::Instrument::SR830::VERSION = '3.671';
+
 use strict;
 use Lab::Instrument;
 use Data::Dumper;
@@ -65,7 +66,8 @@ sub get_frq {
 }
 
 sub set_amplitude {
-    my ( $self, $ampl ) = @_;
+    my $self = shift;
+    my ($ampl) = $self->_check_args( \@_, ['value'] );
     $self->write("SLVL $ampl");
     my $realampl = $self->query("SLVL?");
     chomp $realampl;
@@ -266,7 +268,7 @@ Lab::Instrument::SR830 - Stanford Research SR830 lock-in amplifier
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -379,7 +381,7 @@ command to change a property like amplitude or time constant might have to be ex
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2009       Andreas K. Huettel, Daniela Taubert
             2010       Andreas K. Huettel, Daniel Schroeer
@@ -388,6 +390,7 @@ This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
             2014       Alois Dirnaichner, Andreas K. Huettel
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

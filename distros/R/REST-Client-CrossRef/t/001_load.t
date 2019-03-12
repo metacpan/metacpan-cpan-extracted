@@ -12,7 +12,7 @@ my $jdata_member = <<'END';
 {"status":"ok","message-type":"member","message-version":"1.0.0","message":{"last-status-check-time":1539154440433,"primary-name":"Journal of Dentistry Indonesia","counts":{"total-dois":405,"current-dois":54,"backfile-dois":351},"breakdowns":{"dois-by-issued-year":[[2008,212],[2013,81],[2018,20],[2017,19],[2015,16],[2016,15],[2014,13],[2010,10],[2011,9],[2009,9],[2012,1]]},"prefixes":["10.14693"],"coverage":{"affiliations-current":0.0,"similarity-checking-current":0.0,"funders-backfile":0.0,"licenses-backfile":0.0,"funders-current":0.0,"affiliations-backfile":0.0,"resource-links-backfile":0.0,"orcids-backfile":0.0,"update-policies-current":0.0,"open-references-backfile":0.0,"orcids-current":0.0,"similarity-checking-backfile":0.0,"references-backfile":0.0,"award-numbers-backfile":0.0,"update-policies-backfile":0.0,"licenses-current":0.0,"award-numbers-current":0.0,"abstracts-backfile":0.0,"resource-links-current":0.0,"abstracts-current":0.0,"open-references-current":0.0,"references-current":0.0},"prefix":[{"value":"10.14693","name":"Journal of Dentistry Indonesia","public-references":false,"reference-visibility":"limited"}],"id":5740,"tokens":["journal","of","dentistry","indonesia"],"counts-type":{"all":{"journal-article":405},"current":{"journal-article":54},"backfile":{"journal-article":351}},"coverage-type":{"all":{"journal-article":{"last-status-check-time":1539154437884,"affiliations":0.0,"abstracts":0.0,"orcids":0.0,"licenses":0.0,"references":0.0,"funders":0.0,"similarity-checking":0.0,"award-numbers":0.0,"update-policies":0.0,"resource-links":0.0,"open-references":0.0}},"backfile":{"journal-article":{"last-status-check-time":1539154437030,"affiliations":0.0,"abstracts":0.0,"orcids":0.0,"licenses":0.0,"references":0.0,"funders":0.0,"similarity-checking":0.0,"award-numbers":0.0,"update-policies":0.0,"resource-links":0.0,"open-references":0.0}},"current":{"journal-article":{"last-status-check-time":1539154436314,"affiliations":0.0,"abstracts":0.0,"orcids":0.0,"licenses":0.0,"references":0.0,"funders":0.0,"similarity-checking":0.0,"award-numbers":0.0,"update-policies":0.0,"resource-links":0.0,"open-references":0.0}}},"flags":{"deposits-abstracts-current":false,"deposits-orcids-current":false,"deposits":true,"deposits-affiliations-backfile":false,"deposits-update-policies-backfile":false,"deposits-similarity-checking-backfile":false,"deposits-award-numbers-current":false,"deposits-resource-links-current":false,"deposits-articles":true,"deposits-affiliations-current":false,"deposits-funders-current":false,"deposits-references-backfile":false,"deposits-abstracts-backfile":false,"deposits-licenses-backfile":false,"deposits-award-numbers-backfile":false,"deposits-open-references-backfile":false,"deposits-open-references-current":false,"deposits-references-current":false,"deposits-resource-links-backfile":false,"deposits-orcids-backfile":false,"deposits-funders-backfile":false,"deposits-update-policies-current":false,"deposits-similarity-checking-current":false,"deposits-licenses-current":false},"location":"Building C, Level 3, Faculty of Dentistry Universitas indonesia Jalan Salemba Raya No. 4 Jalan Salemba Raya No.4 Jakarta 10430 Indonesia","names":["Journal of Dentistry Indonesia"]}}
 END
 
-use Test::More tests => 6;
+use Test::More;
 use Data::Dumper;
 
 BEGIN { use_ok('REST::Client::CrossRef'); }
@@ -53,7 +53,17 @@ $client = REST::Client::CrossRef->new( spit_raw_data => 1 );
 $data = $client->get_types();
 
 # print Dumper($data), "\n";
+my $tests_run;
 my $items_ar = $data->{message}->{items};
-my $total    = @$items_ar;
-cmp_ok( $total, '>=', 20, "got number of types from CrossRef" );
+if (! defined $items_ar) {
+    $tests_run=5;
+}
+else {
+    my $total    = @$items_ar;
+    cmp_ok( $total, '>=', 20, "got number of types from CrossRef" );
+    $tests_run=6;
+}
+done_testing($tests_run);
+
+
 

@@ -4,13 +4,13 @@
       "chocolateboy <chocolate@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Hash-Fold",
    "no_index" : {
@@ -22,19 +22,23 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Test::Fatal" : "0",
             "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "version" : "0.77"
          }
       },
       "runtime" : {
          "requires" : {
-            "Moose" : "0",
+            "Moo" : "0",
             "Sub::Exporter" : "0",
-            "perl" : "5.008003"
+            "Throwable::Error" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.008000"
          }
       }
    },
@@ -47,6 +51,6 @@
          "url" : "https://github.com/chocolateboy/Hash-Fold"
       }
    },
-   "version" : "v0.1.2",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

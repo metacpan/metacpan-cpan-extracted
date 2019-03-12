@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 use strict;
+use warnings;
 use DBIx::RunSQL;
+
+our $VERSION = '0.21';
 
 my $exitcode = DBIx::RunSQL->handle_command_line('myapp', \@ARGV);
 exit $exitcode;
@@ -60,6 +63,8 @@ Use a different formatter for table output. Supported formatters are
   tab - output results as tab delimited columns
 
   Text::Table - output results as ASCII table
+
+  Text::Table::Any - output results as various formats
 
 =item C<--force>
 

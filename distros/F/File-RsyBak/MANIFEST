@@ -9,7 +9,6 @@ README
 depak.conf
 dist.ini
 lib/File/RsyBak.pm
-lib/File/RsyBak/Packed.pm
 script/rsybak
 t/00-compile.t
 t/01-basics.t

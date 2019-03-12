@@ -22,11 +22,12 @@ my %WriteMakefileArgs = (
     "Unicode::Collate" => 0
   },
   "TEST_REQUIRES" => {
+    "Capture::Tiny" => 0,
     "File::Basename" => 0,
     "Test::Mojo" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,6 +35,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Capture::Tiny" => 0,
   "File::Basename" => 0,
   "Mojolicious" => 8,
   "Mojolicious::Plugin::I18N" => 0,

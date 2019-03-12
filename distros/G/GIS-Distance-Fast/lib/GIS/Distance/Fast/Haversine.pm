@@ -1,16 +1,14 @@
 package GIS::Distance::Fast::Haversine;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.09';
+our $VERSION = '0.12';
 
 use GIS::Distance::Fast;
-use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
-    my $c = GIS::Distance::Fast::haversine_distance( @_ );
-
-    return $KILOMETER_RHO * $c;
+{
+    no strict 'refs';
+    *distance = \&GIS::Distance::Fast::haversine_distance;
 }
 
 1;

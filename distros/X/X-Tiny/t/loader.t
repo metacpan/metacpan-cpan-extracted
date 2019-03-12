@@ -2,17 +2,12 @@ use strict;
 use warnings;
 
 use Test::More;
-plan tests => 6;
+plan tests => 5;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use MyDist::X ();
-
-ok(
-    !overload->can('StrVal'),
-    'overload.pm is not loaded by default',
-);
 
 my %lines;
 

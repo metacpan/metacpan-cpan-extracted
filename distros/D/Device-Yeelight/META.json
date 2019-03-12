@@ -1,0 +1,45 @@
+{
+   "abstract" : "Controller for Yeelight smart devices",
+   "author" : [
+      "Jan Baier <jan.baier@amagical.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Yeelight",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO" : "1.38",
+            "IO::Socket::Multicast" : "1.12",
+            "JSON" : "2.97",
+            "perl" : "5.026"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

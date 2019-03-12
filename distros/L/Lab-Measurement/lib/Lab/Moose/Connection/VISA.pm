@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::VISA;
-$Lab::Moose::Connection::VISA::VERSION = '3.671';
+$Lab::Moose::Connection::VISA::VERSION = '3.680';
 #ABSTRACT: Connection back end to National Instruments' VISA library.
 
 
@@ -94,6 +94,31 @@ sub _set_visa_attribute {
     $self->_handle_status( $status, "viSetAttribute" );
 }
 
+
+sub set_termchar {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        timeout_param,
+        termchar => { isa => 'Str' },
+    );
+
+    my $timeout = $self->_timeout_arg(%args);
+    $self->_set_timeout( timeout => $timeout );
+    my $termchar = ord( $args{termchar} );
+    $self->_set_visa_attribute( attribute => VI_ATTR_TERMCHAR, $termchar );
+}
+
+
+sub enable_read_termchar {
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        timeout_param
+    );
+    my $timeout = $self->_timeout_arg(%args);
+    $self->_set_timeout( timeout => $timeout );
+    $self->_set_visa_attribute( attribute => VI_ATTR_TERMCHAR_EN, VI_TRUE );
+}
+
 sub gen_resource_name {
     return shift->resource_name();
 }
@@ -143,7 +168,9 @@ sub Read {
         $result .= $data;
         $read_length -= length($data);
 
-        if ( $status == VI_SUCCESS or $status == VI_SUCCESS_MAX_CNT ) {
+        if (   $status == VI_SUCCESS
+            or $status == VI_SUCCESS_TERM_CHAR
+            or $status == VI_SUCCESS_MAX_CNT ) {
             last;
         }
     }
@@ -204,7 +231,7 @@ Lab::Moose::Connection::VISA - Connection back end to National Instruments' VISA
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -216,13 +243,26 @@ version 3.671
      connection_options => {resource_name => $resource_name}
  );
 
+=head2 set_termchar
+
+ $connection->set_termchar(termchar => "\r");
+
+Set the end-of-string byte
+
+=head2 enable_read_termchar
+
+ $connection->enable_read_termchar();
+
+Enable termination of reads when eos character is received.
+
 =head1 METHODS
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
+            2019       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -4,20 +4,13 @@ use 5.006;
 package HTML::Restrict;
 
 use version;
-our $VERSION = 'v2.5.0';
+our $VERSION = 'v3.0.0';
 
 use Carp qw( croak );
 use Data::Dump qw( dump );
-use HTML::Entities qw( encode_entities );
 use HTML::Parser ();
-use HTML::Restrict::Types qw(
-    ArrayRef
-    Bool
-    CodeRef
-    HashRef
-    Int
-    MaxParserLoops
-);
+use HTML::Entities qw( encode_entities );
+use Types::Standard 1.000001 qw[ Bool HashRef ArrayRef CodeRef ];
 use List::Util 1.33 qw( any none );
 use Scalar::Util qw( reftype weaken );
 use Sub::Quote 'quote_sub';
@@ -42,12 +35,6 @@ has debug => (
     is      => 'rw',
     isa     => Bool,
     default => 0,
-);
-
-has max_parser_loops => (
-    is      => 'rw',
-    isa     => MaxParserLoops,
-    default => 25,
 );
 
 has parser => (
@@ -280,6 +267,7 @@ sub _build_parser {
             sub {
                 my ( $p, $text ) = @_;
                 print "text: $text\n" if $self->debug;
+                $text = _fix_text_encoding($text);
                 if ( !@{ $self->_stripper_stack } ) {
                     $self->_processed( ( $self->_processed || q{} ) . $text );
                 }
@@ -313,29 +301,6 @@ sub _build_parser {
 }
 
 sub process {
-    my $self = shift;
-
-    my $cleaned = $self->_process(@_);
-    return $cleaned if !$cleaned;
-
-    my $previous_iteration = $cleaned;
-
-    my $i = 1;    # We already cleaned once just above
-
-    while ( $i < $self->max_parser_loops ) {
-        $i++;
-        my $new = $self->_process($previous_iteration);
-        last if $new eq $previous_iteration;
-        if ( $i == $self->max_parser_loops ) {
-            die sprintf( 'Could not clean input after %s attempts', $i );
-        }
-
-        $previous_iteration = $new;
-    }
-    return $previous_iteration;
-}
-
-sub _process {
     my $self = shift;
 
     # returns undef if no value was passed
@@ -388,6 +353,39 @@ sub _delete_tag_from_stack {
     return;
 }
 
+# regex for entities that don't require a terminating semicolon
+my ($short_entity_re)
+    = map qr/$_/i,
+    join '|',
+    '#x[0-9a-f]+',
+    '#[0-9]+',
+    grep !/;\z/,
+    sort keys %HTML::Entities::entity2char;
+
+# semicolon required
+my ($complete_entity_re)
+    = map qr/$_/i,
+    join '|',
+    grep /;\z/,
+    sort keys %HTML::Entities::entity2char;
+
+sub _fix_text_encoding {
+    my $text = shift;
+    $text =~ s{
+        &
+        (?:
+          ($short_entity_re);?
+        |
+          ($complete_entity_re)
+        )?
+    }{
+          defined $1  ? "&$1;"
+        : defined $2  ? "&$2"
+                      : "&amp;"
+    }xgie;
+    return encode_entities( $text, '<>' );
+}
+
 1;    # End of HTML::Restrict
 
 # ABSTRACT: Strip unwanted HTML tags and attributes
@@ -404,7 +402,7 @@ HTML::Restrict - Strip unwanted HTML tags and attributes
 
 =head1 VERSION
 
-version v2.5.0
+version v3.0.0
 
 =head1 SYNOPSIS
 
@@ -634,30 +632,6 @@ feature is off by default.
     my $hr = HTML::Restrict->new( allow_comments => 1 );
     $html = $hr->process( $html );
     # $html is now: "<!-- comments! -->foo"
-
-=item * max_parser_loops => [Integer]
-
-Defaults to 25.  Should never be less than 2.
-
-As of v2.4.0, calling C<process()> will force the parser to clean the text
-multiple times, stopping only once the text is no longer changed or once
-C<max_parser_loops> has been reached.
-
-The reason for this is that L<HTML::Parser> could take malformed HTML and turn
-it into well formed HTML.  This can defeat our processing logic and allow
-malicious input to be returned.  In order to mitigate this, we will clean all
-input at least two times.  If the second attempt at cleaning does not match
-the previous attempt, we will make a third attempt and so on.  This helps to
-ensure that we get the expected output.
-
-If we are unable to get unchanged values after reaching C<max_parser_loops>, an
-exception will be thrown.  Returning partially cleaned text would be wrong, as
-would be returning C<undef> or an empty string.  Throwing an exception forces
-the user to choose the appropriate way of dealing with this.
-
-If you choose to set this value, please note that it can be no less than 2, or
-the parser will never be able to make a comparison with a previous value.  An
-exception will be thrown if you attempt to set this to a value less than 2.
 
 =item * replace_img => [0|1|CodeRef]
 

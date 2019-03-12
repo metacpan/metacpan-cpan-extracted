@@ -1,5 +1,13 @@
 Changelog for Beam-Runner
 
+0.016     2019-03-07 21:06:19-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed a warning in utility function when BEAM_PATH environment
+      variable is not set. This was causing a warning in the
+      Beam::Minion 'job' command (which doesn't need containers).
+
 0.015     2019-01-15 00:04:26-05:00 America/New_York
 
     [Added]

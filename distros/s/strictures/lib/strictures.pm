@@ -10,7 +10,7 @@ BEGIN {
   *_CAN_GOTO_VERSION = ("$]" >= 5.010000) ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000006';
 $VERSION =~ tr/_//d;
 
 our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
@@ -27,6 +27,7 @@ our @WARNING_CATEGORIES = grep { exists $warnings::Offsets{$_} } qw(
     experimental::lexical_subs
     experimental::lexical_topic
     experimental::postderef
+    experimental::private_use
     experimental::re_strict
     experimental::refaliasing
     experimental::regex_sets
@@ -250,7 +251,7 @@ EOE
 __END__
 =head1 NAME
 
-strictures - turn on strict and make most warnings fatal
+strictures - Turn on strict and make most warnings fatal
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,22 @@
 Revision history for WebService-ValidSign
 
+0.002     2019-03-08 05:25:19Z
+
+    * CPAN-testers report issues with JSON::XS 4.01 which is buggy on
+      perl 5.026 and up. This has been fixed by JSON::XS 4.02. Test with
+      Dist::Zilla::Plugin::DynamicPrereqs to set the requirement to
+      JSON::XS 4.02, otherwise we bump the required JSON::XS module to
+      4.02
+    * CPAN-testers report issues with Moo < 1.006000, bump the
+      requirement for Moo to 1.006000
+    * Testing with Zaaksysteem showed an issue with create_with_document
+      where the package ID wasn't set after a create
+    * Enhance the builders of objects to accept camelCase and snake_case for
+      arguments so you can make an object directly from the JSON
+    * Enhance the TO_JSON to automaticly convert snake_case to camelCase
+      so objects are serialized to JSON correctly without having to
+      override the TO_JSON every time.
+
 0.001     2019-03-07 13:54:09Z
 
     * Initial release of WebService::ValidSign

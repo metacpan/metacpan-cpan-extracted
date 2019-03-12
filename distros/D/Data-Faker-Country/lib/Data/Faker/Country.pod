@@ -1,0 +1,54 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Data::Faker::Country
+at lib/Data/Faker/Country.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Data::Faker::Country - provides country support for L<Data::Faker>
+
+=head1 SYNOPSIS
+
+ use Data::Faker;
+ use feature qw(say);
+ my $faker = Data::Faker->new;
+ say "Example country:          " . $faker->country;
+ say "Example ISO country code: " . $faker->country_code;
+
+=head1 DESCRIPTION
+
+Provides two methods in L<Data::Faker>:
+
+=head1 METHODS
+
+=head2 country
+
+Returns a single scalar country name (in English) as a Unicode string.
+
+=head2 country_code
+
+Returns a single scalar 2-character ISO-3166 country code as a Unicode string.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Data::Faker>
+
+L<import|Data::Faker/import>, L<methods|Data::Faker/methods>, L<new|Data::Faker/new>, L<register_plugin|Data::Faker/register_plugin>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2019. Licensed under the same terms as Perl itself.
+

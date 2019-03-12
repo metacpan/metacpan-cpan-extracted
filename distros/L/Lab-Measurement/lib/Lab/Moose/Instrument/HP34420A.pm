@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HP34420A;
-$Lab::Moose::Instrument::HP34420A::VERSION = '3.671';
+$Lab::Moose::Instrument::HP34420A::VERSION = '3.680';
 #ABSTRACT: HP 34420A nanovolt meter.
 
 # So far only one channel. Could add support for two channels
@@ -71,7 +71,7 @@ Lab::Moose::Instrument::HP34420A - HP 34420A nanovolt meter.
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ Set/get used measurement channel. Allowed values: C<FRON[1], FRON2>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
 

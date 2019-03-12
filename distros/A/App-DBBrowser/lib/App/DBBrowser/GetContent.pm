@@ -237,7 +237,7 @@ sub __parse_settings_file {
     my ( $sf, $i ) = @_;
     if    ( $i == 0 ) { return '(Text::CSV - sep[' . $sf->{o}{csv}{sep_char}    . '])' }
     elsif ( $i == 1 ) { return '(split - sep['     . $sf->{o}{split}{field_sep} . '])' }
-    elsif ( $i == 2 ) { return '(Spreadsheet::Read)'                                  }
+    elsif ( $i == 2 ) { return '(Spreadsheet::Read)'                                   }
 }
 
 

@@ -4,13 +4,13 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "MojoX-Encode-Gzip",
    "prereqs" : {
@@ -28,8 +28,11 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Zlib" : "0",
-            "Mojolicious" : "7.75",
+            "Mojolicious" : "7.75"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0"
          }
       }
@@ -37,7 +40,7 @@
    "provides" : {
       "MojoX::Encode::Gzip" : {
          "file" : "lib/MojoX/Encode/Gzip.pm",
-         "version" : "1.12"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
@@ -52,7 +55,7 @@
          "web" : "http://github.com/reneeb/MojoX-Encode-Gzip"
       }
    },
-   "version" : "1.12",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "version" : "1.13",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

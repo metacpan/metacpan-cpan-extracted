@@ -55,11 +55,6 @@ has user => sub {
     return $obj;
 };
 
-has log => sub {
-    my $log = shift->app->log;
-    return $log;
-};
-
 has pluginMap => sub {
     my $map = shift->config->cfgHash->{PLUGIN};
     return $map;
@@ -70,6 +65,75 @@ sub allow_rpc_access {
     my $self = shift;
     my $method = shift;
     return (exists $allow{$method} and ($allow{$method} == 1 or $self->user->isUserAuthenticated));
+}
+
+# dataCleaner($data,qr{keyMatch})
+
+sub dataCleaner {
+    my $self = shift;
+    my $data = shift;
+    my $match = shift;
+    my $type = ref $data;
+    for ($type) {
+        /ARRAY/ && do {
+            $self->dataCleaner($_,$match) for @$data;
+        };
+        /HASH/ && do {
+            for my $key (keys %$data) {
+                my $value = $data->{$key};
+                if (ref $value){
+                    $self->dataCleaner($value,$match);
+                }
+                if ($value =~ /$match/){
+                    $data->{$key} = 'xxx';
+                }
+            }
+        }
+    }
+}
+
+=head2 logRpcCall
+
+set CALLBACKERY_RPC_LOG for extensive logging messages. Note that all values with keys matching /password|_pass/ do get replaced with 'xxx' in the output.
+
+=cut
+
+# our own logging
+sub logRpcCall {
+    my $self = shift;
+    if ($ENV{CALLBACKERY_RPC_LOG}){
+        my $method = shift;
+        my $data = shift;
+        $self->dataCleaner($data,qr{(?i)(?:password|_pass)});
+        my $userId = eval { $self->user->userId } // 'UnknowUser';
+        my $remoteAddr = $self->tx->remote_address;
+        $self->log->debug("[$userId|$remoteAddr] CALL $method(".encode_json($data).")");
+    }
+    else {
+        $self->SUPER::logRpcCall(@_);
+    }
+}
+
+=head2 logRpcReturn
+
+set CALLBACKERY_RPC_LOG for extensive logging messages. Note that all values with keys matching /password|_pass/ do get replaced with 'xxx' in the output.
+
+=cut
+
+# our own logging
+sub logRpcReturn {
+    my $self = shift;
+    if ($ENV{CALLBACKERY_RPC_LOG}){
+        my $data = shift;
+        $self->dataCleaner($data,qr{(?i)(?:password|_pass)});
+        my $userId = eval { $self->user->userId } // 'UnknowUser';
+        my $remoteAddr = $self->tx->remote_address;
+        $self->log->debug("[$userId|$remoteAddr] RETURN ".encode_json($data).")");
+    }
+    else {
+        $self->SUPER::logRpcReturn(@_);
+    }
+
 }
 
 =head2 ping()

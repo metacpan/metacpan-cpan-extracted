@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous::Voltage;
-$Lab::Moose::Sweep::Continuous::Voltage::VERSION = '3.671';
+$Lab::Moose::Sweep::Continuous::Voltage::VERSION = '3.680';
 #ABSTRACT: Continuous sweep of voltage
 
 
@@ -27,7 +27,7 @@ Lab::Moose::Sweep::Continuous::Voltage - Continuous sweep of voltage
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ version 3.671
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
 

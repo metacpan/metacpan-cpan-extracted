@@ -4,6 +4,17 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.680 2019-03-11
+  * Moose LinuxGPIB connection: add support for end-of-string byte
+  * Moose VISA connection: add support for end-of-string byte
+  * Add Moose driver for Oxford Instruments ITC503, including
+    a Helium-3 system "heat_sorb" sub
+  * Add Moose driver for Oxford Instruments IPS magnet power supply
+  * KeysightB2901A: fix issue with USB::TMC interface
+  * Zurich Instruments MFLI/MFIA: make compatible with
+    frequency sweep, add support for DC bias voltage
+  * Add general "level sweep"
+
 3.671 2018-12-08
   * Live plots: Add support for minimal time interval between redraws
   * Add Moose Power sweep support

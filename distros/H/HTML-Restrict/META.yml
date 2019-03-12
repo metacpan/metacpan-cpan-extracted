@@ -8,6 +8,7 @@ build_requires:
   Test::Fatal: '0'
   Test::More: '0'
   perl: '5.006'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
@@ -32,20 +33,18 @@ requires:
   Moo: '1.002000'
   Scalar::Util: '0'
   Sub::Quote: '0'
-  Type::Library: '0'
   Type::Tiny: '1.002001'
-  Type::Utils: '0'
+  Types::Standard: '1.000001'
   URI: '0'
   namespace::clean: '0'
   perl: '5.006'
   strict: '0'
   version: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/oalders/html-restrict/issues
   homepage: https://github.com/oalders/html-restrict
   repository: https://github.com/oalders/html-restrict.git
-version: v2.5.0
+version: v3.0.0
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -78,7 +77,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.83'
+      version: '0.13'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -463,7 +462,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: vv2.5.0
+          tag: vv3.0.0
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -531,6 +530,23 @@ x_Dist_Zilla:
       name: Prereqs
       version: '6.012'
     -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: Changes
+          signed: 0
+          tag: v3.0.0
+          tag_format: '%v'
+          tag_message: '%v'
+        Dist::Zilla::Role::Git::Repo:
+          git_version: 2.20.1
+          repo_root: .
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: Git::Tag
+      version: '2.045'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.012'
@@ -588,4 +604,4 @@ x_contributors:
   - 'perlpong <calyx238@gmail.com>'
   - 'skaufman <sam@socialflow.com>'
 x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

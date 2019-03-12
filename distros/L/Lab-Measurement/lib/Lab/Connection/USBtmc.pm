@@ -1,6 +1,6 @@
 package Lab::Connection::USBtmc;
 #ABSTRACT: F</dev/usbtmc> Linux USB Test&Measurement kernel driver connection
-$Lab::Connection::USBtmc::VERSION = '3.671';
+$Lab::Connection::USBtmc::VERSION = '3.680';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -96,7 +96,7 @@ Lab::Connection::USBtmc - F</dev/usbtmc> Linux USB Test&Measurement kernel drive
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
   Copyright 2011       Andreas K. Huettel, Florian Olbrich
             2012       Florian Olbrich, Hermann Kraus

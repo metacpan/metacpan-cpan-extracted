@@ -7,7 +7,7 @@ use warnings;
 
 =head1 NAME
 
-Net::ACME2 - L<IETF|https://www.ietf.org>-standard ACME (Let’s Encrypt) client
+Net::ACME2 - Client logic for the ACME (Let’s Encrypt) protocol
 
 X<Lets Encrypt> X<Let's Encrypt> X<letsencrypt>
 
@@ -83,25 +83,16 @@ L<Net::ACME2::LetsEncrypt>.
 
 =head1 DESCRIPTION
 
-This library implements client logic for the L<IETF|https://www.ietf.org>-standard ACME
-(Automated Certificate Management Environment) protocol. As of this
-writing, that protocol remains in development; the latest draft will
-be available from L<https://datatracker.ietf.org/doc/draft-ietf-acme-acme/>.
-
-Net::ACME2 derives from L<Net::ACME>, which implements the
-(significantly different) earlier draft of that protocol as initially
-deployed by L<Let’s Encrypt|http://letsencrypt.org>.
+This library implements client logic for the
+ACME (Automated Certificate Management Environment) protocol, as
+standardized in L<RFC 8555|https://www.rfc-editor.org/rfc/rfc8555.txt>
+and popularized by L<Let’s Encrypt|http://letsencrypt.org>.
 
 =head1 STATUS
 
-This is a beta-grade implementation. While the underlying protocol
-is L<in use for production|https://community.letsencrypt.org/t/acme-v2-production-environment-wildcards/55578>,
-it’s still not finalized; consequently, this distribution remains
-subject to change. It is expected that any further breaking changes
-will be small, but you still B<MUST> check the changelog before upgrading!
-
-B<NOTE>: As of version 0.25, Net::ACME2 implements the “POST-as-GET”
-logic described in the latest ACME protocol draft.
+This is a production-grade implementation. While breaking changes at this
+point are unlikely, please always check the changelog before upgrading to
+a new version of this module.
 
 =head1 FEATURES
 
@@ -109,7 +100,7 @@ logic described in the latest ACME protocol draft.
 
 =item * Support for both ECDSA and RSA encrytion.
 
-=item * Support for http-01, dns-01, and tls-alpn-01 challenges.
+=item * Support for http-01, dns-01, and L<tls-alpn-01|https://datatracker.ietf.org/doc/draft-ietf-acme-tls-alpn/> challenges.
 
 =item * Comprehensive error handling with typed, L<X::Tiny>-based exceptions.
 
@@ -143,7 +134,7 @@ use Net::ACME2::HTTP;
 use Net::ACME2::Order;
 use Net::ACME2::Authorization;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use constant {
     _JWK_THUMBPRINT_DIGEST => 'sha256',
@@ -587,8 +578,11 @@ simple as possible.)
 
 =head1 SEE ALSO
 
-L<Crypt::Perl> provides pure-Perl cryptography for this library. See the
-present library distribution’s F</examples> directory for sample usage
+L<Crypt::Perl> provides this library’s cryptography backend. See
+this distribution’s F</examples> directory for sample usage
 to generate keys and CSRs.
+
+L<Net::ACME> implements client logic for the variant of this
+protocol that Let’s Encrypt first deployed.
 
 =cut

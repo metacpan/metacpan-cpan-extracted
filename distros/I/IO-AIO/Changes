@@ -25,7 +25,6 @@ TODO: rewrite rmtree et al. to support working directories (also speed them up)
 TODO: maybe IO::AIO leaks fds when requests are cancelled? maybe initialise result to -1?
 TODO: aio_wd should use O_PATH on linux, due to lacking O_SEARCH (http://comments.gmane.org/gmane.linux.file-systems/33611)
       http://www.openwall.com/lists/musl/2013/02/23/4
-TODO: maybe copy some hacks from PerlIOStdio_invalidate_fileno for faster close on certain platforms
 TODO: copy_file_range, copy_file_range
 TODO: FIDEDUPERANGE, file_ioctl.c
 TODO: mincore
@@ -36,6 +35,37 @@ TODO: define useful rules for [[$wd, $path], $path] &c and implement them
 TODO: https://github.com/coreutils/coreutils/blob/master/src/stat.c maybe IO::AIO::FSID
 TODO: mlock2, MLOCK_ONFAULT
 TODO: dup3, pipe2, accept4
+TODO: dump config.log when automated testign and configure fails
+TODO: ns time resolution in utime
+
+4.71 Sun Mar 10 13:09:26 CET 2019
+	- due to an error in the linux manpages, the configure tests
+          for readahead, sync_file_range, splice etc. failed. This has been fixed.
+
+4.7  Mon Mar  4 11:28:13 CET 2019
+	- majorly speed up scandir for the very special case of a non-POSIX
+          filesystem that nevertheless reports valid dt_type information.
+          The only known filesystem of this type is currently btrfs, which
+          didn't get it's act together to implement POSIX semantics in all
+          these years, and I am tired of waiting.
+	- add IO::AIO::MCL_ONFAULT for mlockall, add IO::AIO::mlockall.
+	- neither sys/mkdev.h nor sys/sysmacros.h were included, even when they
+          were detected by autoconf.
+
+4.6  Sat Aug 25 21:58:36 CEST 2018
+	- add st_btime, st_btimesec, st_btimensec and st_gen accessors,
+          mostly for bsds which expose birthtime and st_gen members (netbsd, freebsd
+          but only st_gen on openbsd because they compiled their perl without support
+          for birthtimes).
+        - fix madvise and munlock to properly support negative offsets.
+        - allocate fd for the aio_close at boot time, to guarantee it working
+          later, rather than calling abort when it fails. also avoids
+          close-on-exec race issues after module load.
+        - #undef utime on win32, maybe this helps some reports of utime hangs.
+        - minor doc improvements.
+        - minor configure cleanups.
+        - use $Config{perllibs} instead of libs for configure. might help people
+          who didn't install all perl dependencies (might break things as well).
 
 4.54 Tue Aug 14 13:54:48 CEST 2018
 	- include sys/mkdev.h or sys/sysmacros.h if available.

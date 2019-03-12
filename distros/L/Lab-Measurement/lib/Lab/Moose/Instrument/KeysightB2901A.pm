@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightB2901A;
-$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.671';
+$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.680';
 #ABSTRACT: Agilent/Keysight B2901A voltage/current sourcemeter.
 
 use 5.010;
@@ -41,7 +41,9 @@ around default_connection_options => sub {
     my $self     = shift;
     my $options  = $self->$orig();
     my $usb_opts = {
-        vid => 0x0957, pid => 0x8b18    # Agilent vid!
+        vid => 0x0957, pid => 0x8b18,    # Agilent vid!
+        reset_device => 0
+        , # Problem of the B2901A: https://community.keysight.com/thread/36706
     };
     $options->{USB} = $usb_opts;
     $options->{'VISA::USB'} = $usb_opts;
@@ -155,7 +157,7 @@ Lab::Moose::Instrument::KeysightB2901A - Agilent/Keysight B2901A voltage/current
 
 =head1 VERSION
 
-version 3.671
+version 3.680
 
 =head1 SYNOPSIS
 
@@ -273,9 +275,9 @@ For XPRESS voltage sweep. Equivalent to C<< set_level(value => $value) >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by the Lab::Measurement team; in detail:
+This software is copyright (c) 2019 by the Lab::Measurement team; in detail:
 
-  Copyright 2018       Simon Reinhardt
+  Copyright 2018-2019  Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

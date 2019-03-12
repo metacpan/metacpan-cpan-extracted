@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware;
 use warnings;
 use strict;
 
-our $VERSION = '0.902'; # VERSION
+our $VERSION = '0.903'; # VERSION
 
 sub _croak { require Carp; Carp::croak(@_) }
 sub _usage { _croak("Usage: @_\n") }
@@ -64,7 +64,7 @@ HTTP::AnyUA::Middleware - A base class for HTTP::AnyUA middleware
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 
@@ -89,7 +89,7 @@ version 0.902
         };
 
         if ($self->response_is_future) {
-            $response->transform(
+            $response = $response->transform(
                 done => $handle_response,
                 fail => $handle_response,
             );

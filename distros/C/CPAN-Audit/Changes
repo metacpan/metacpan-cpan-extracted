@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN-Audit
 
+0.15 2019-03-09T09:47:36Z
+
+    - regenerate database fixing Plack-Middleware-Session distribution name
+
 0.14 2019-01-26T10:23:21Z
 
     [ADVISORIES]

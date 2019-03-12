@@ -11,13 +11,19 @@ t/leaks.t
 t/lib/ErrorLocation.pm
 t/lib/InlineModule.pm
 t/lib/ThreadsCheck.pm
+t/quotify-5.6.t
 t/quotify.t
 t/sub-defer-no-subname.t
 t/sub-defer-threads.t
 t/sub-defer.t
 t/sub-quote-threads.t
 t/sub-quote.t
+t/subname-none.t
+t/subname-sub-name-preload.t
+t/subname-sub-name.t
+t/subname-sub-util.t
 xt/release/kwalitee.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

@@ -6,4 +6,10 @@ Revision history for Perl module REST::Client::CrossRef
 0.002 
     - removed my email from the pod...
 0.003
-    - corrected authors unfolding since occurence : first can be found twice
+    - corrected authors unfolding since occurence=first can be found twice, one for person, one for group authors
+0.004
+    - replace // by defined ? : to pass the tests with perl 5.8
+    - Use JSON::Path to extract and manipulate json data
+0.005
+    - use namespace::clean
+    - test for undef when connecting to Crossref, if undef skip the last test

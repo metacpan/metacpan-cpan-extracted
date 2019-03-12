@@ -11,6 +11,7 @@ my %OPT;
 GetOptions(
   'verbose|v:1' => \$OPT{'verbose'},           
   'help|h' => \$OPT{'help'},
+  'force|f' => \$OPT{'force'},
   'source|s=s' => \$OPT{'source'},
   'src_type|st=s' => \$OPT{'src_type'},
   'destination_dir|dd=s' => \$OPT{'dd'},
@@ -37,11 +38,14 @@ GetOptions(
 my $XsdPath = $OPT{xsd_dir} || FB3::SchemasDirPath();
 my $XslPath = dist_dir('FB3-Convert');
 
-if ($OPT{'vl'}) {
-  my $Obj = new FB3::Convert(empty=>1);
-  my $Valid = $Obj->Validate('path'=>$OPT{'vl'},'xsd'=>$XsdPath);
-  print $Valid;
-  exit;
+if ( $OPT{'vl'} ) {
+  my $Error = FB3::Convert->new('empty' => 1)->Validate('path' => $OPT{'vl'}, 'xsd' => $XsdPath);
+  unless ( $Error ) {
+    printf("\n%s is valid FB3 document\n\n", $OPT{'vl'});
+    exit 0;
+  }
+  printf("\n%s is NOT valid FB3 document\n\n%s\n", $OPT{'vl'}, $Error);
+  exit 1;
 }
 
 $OPT{'source'} = $ARGV[0] unless $OPT{'source'};
@@ -95,9 +99,9 @@ $Obj->Msg("FB3: ".$FB3Path." created\n","w");
 $Obj->_bs('validate_fb3','Валидация полученного FB3');
 my $ValidErr = $Obj->Validate('xsd'=>$XsdPath);
 $Obj->_be('validate_fb3');
-print $ValidErr;
+print $ValidErr if $ValidErr;
 
-if ($OPT{'df'} && !$ValidErr) {
+if ($OPT{'df'} && (!$ValidErr || $OPT{'force'}) ) {
   $Obj->_bs('pack','Упаковка FB3 -> zip');
   $Obj->FB3_2_Zip();
   $Obj->_be('pack');
@@ -114,10 +118,11 @@ $Obj->_bf();
 sub help {
   print <<_END
   
-  USAGE: convert2fb3.pl --source|s= <input.file> [--verbose|v] [--help|h] [--destination_dir|dd <dest.fb3> | --destination_file|df] [--src_type|st] [--name|n] [--metadata|md] [--validate|vl=] [--euristic|e] [--euristic_debug|ed] [--phantomjs|phjs]
+  USAGE: convert2fb3.pl --source|s= <input.file> [--verbose|v] [--help|h] [--force|f] [--destination_dir|dd <dest.fb3> | --destination_file|df] [--src_type|st] [--name|n] [--metadata|md] [--validate|vl=] [--euristic|e] [--euristic_debug|ed] [--phantomjs|phjs]
   
   --help|h              : print this text
   --verbose|v           : print processing status. Show parsing warnings if Verbose > 1
+  --force|f             : ignore validation error
   --src_type|st         : source format (fb2|epub)
   --source|s            : path to source file
   --destination_dir|dd  : path for non zipped fb3

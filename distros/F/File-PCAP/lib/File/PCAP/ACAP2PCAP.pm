@@ -13,11 +13,11 @@ File::PCAP::ACAP2PCAP - convert ASA capture to PCAP
 
 =head1 VERSION
 
-Version v0.0.7
+Version v0.1.0
 
 =cut
 
-use version; our $VERSION = qv('v0.0.7');
+use version; our $VERSION = qv('v0.1.0');
 
 =head1 SYNOPSIS
 
@@ -37,8 +37,9 @@ Creates a new object, takes a hash reference as argument with
 the following keys:
 
  my $a2p = File::PCAP::ACAP2PCAP( {
-     dlt    => $dlt,                # data link type, see below
-     output => $fname,              # filename for PCAP output
+     dlt      => $dlt,              # data link type, see below
+     output   => $fname,            # filename for PCAP output
+     startday => $day,              # day the first packet was captured
  } );
 
 The data link type is put in the PCAP global header.
@@ -47,6 +48,14 @@ There are some versions of Cisco software that output raw IP headers.
 For these use 101 (Raw IP) and for more information on data link types, see
 L<http://www.tcpdump.org/linktypes.html>.
 
+The startday argument allows to provide a different day for the first
+captured packet, it defaults to the current day.
+All timestamps in the generated packet capture are based on 00:00 UTC of
+this day. If there are timestamps that are smaller than previously parsed
+timestamps, a new day is assumed and the base value for the timestamps is
+increased by 86400 (one day). You may want to provide this argument with
+a date in the past when a packet capture runs over midnight.
+
 =cut
 
 sub new {
@@ -54,8 +63,6 @@ sub new {
 	my $type = ref($self) || $self;
 	
 	my $now   = time;
-	my @today = localtime($now);
-	$today[0] = $today[1] = $today[2] = 0;
 
 	my $fpwargs = {};
 	if (exists $args->{dlt}) {
@@ -72,7 +79,7 @@ sub new {
 	
 	$self = bless {
 		state        => 'unknown',
-		sot          => timegm(@today), # start of today
+		sot          => _get_startday($now,$args), # start of today
         last_sec     => 0,
 		now          => $now,
 		fpw          => $fpw,
@@ -118,6 +125,25 @@ my $r_dscr = qr/^\s*([0-9]+): ([0-9]{2}):([0-9]{2}):([0-9]{2})\.([0-9]+)\s+(.+)$
 my $r_mdsc = qr/^\s+(\S.*)$/;
 my $r_stop = qr/^([0-9]+) packets? shown$/;
 my $r_dump = qr/^(0x[0-9a-f]+)\s+([0-9a-f][0-9a-f ]{38})\s{8}(.+)$/;
+
+# The function _get_startday() determines the date that the first read
+# captured package should be in. It defaults to the current day.
+#
+# Beware, this assumes UTZ as timezone.
+#
+sub _get_startday {
+    my ($now,$args) = @_;
+	my @today = gmtime($now);
+	$today[0] = $today[1] = $today[2] = 0;
+    if (my $startday = $args->{startday}) {
+        if ($startday =~ /^(\d{4})-?(\d{2})-?(\d{2})$/) {
+            $today[5] = $1 - 1900;
+            $today[4] = $2 -1;
+            $today[3] = $3;
+        }
+    }
+    return timegm(@today);
+} # _get_startday()
 
 # The function _read_line() reads the input one line at a time and
 # decides what to do with that line.

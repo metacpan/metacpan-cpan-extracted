@@ -1,7 +1,7 @@
 package GIS::Distance;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.10';
+our $VERSION = '0.14';
 
 use Class::Measure::Length qw( length );
 use Carp qw( croak );
@@ -17,17 +17,13 @@ sub new {
         args    => \@args,
     }, $class;
 
-    foreach my $module (
-        "GIS::Distance::Fast::${formula}",
-        "GIS::Distance::$formula",
+    my @modules;
+    push @modules, "GIS::Distance::Fast::${formula}"
+        unless $ENV{GIS_DISTANCE_PP} or $ENV{GEO_DISTANCE_PP};
+    push @modules, "GIS::Distance::$formula";
+    push @modules, $formula;
 
-        # Continue supporting the older package names:
-        "GIS::Distance::Formula::${formula}::Fast",
-        "GIS::Distance::Formula::$formula",
-
-        # Support custom formula classes:
-        $formula,
-    ) {
+    foreach my $module (@modules) {
         my $code = $module->can('distance');
 
         if (!$code) {
@@ -63,15 +59,15 @@ sub distance {
 
     croak 'Four arguments must be passed to distance()' if @_!=4;
 
-    return length( $self->distance_km(@_), 'km' );
+    return length(
+        $self->{code}->( @_, @{$self->{args}} ),
+        'km',
+    );
 }
 
-sub distance_km {
+sub distance_metal {
     my $self = shift;
-
-    croak 'Four arguments must be passed to distance_km()' if @_!=4;
-
-    return $self->{code}->( @_, @{$self->{args}} );
+    return $self->{code}->( @_ );
 }
 
 1;
@@ -100,8 +96,12 @@ GIS::Distance - Calculate geographic distances.
 =head1 DESCRIPTION
 
 This module calculates distances between geographic points on, at the moment,
-plant Earth.  Various formulas are available that provide different levels of
-accuracy versus calculation speed tradeoffs.
+planet Earth.  Various L</FORMULAS> are available that provide different levels
+of accuracy versus speed.
+
+L<GIS::Distance::Fast>, a separate distribution, ships with C implmentations of
+some of the formulas shipped with GIS::Distance.  If you're looking for speed
+then install it and the ::Fast formulas will be automatically used by this module.
 
 =head1 METHODS
 
@@ -112,11 +112,15 @@ accuracy versus calculation speed tradeoffs.
 Returns a L<Class::Measure::Length> object for the distance between the
 two degree lats/lons.
 
-See L</distance_km> to return raw kilometers instead.
+See L</distance_metal> to return raw kilometers instead.
 
-=head2 distance_km
+=head2 distance_metal
 
-This works just like L</distance> but return a raw kilometer measurement.
+This works just like L</distance>, but always returns raw kilometers, does no
+argument checking and ignores any formula L</args>.  Calling this gets you pretty
+close to the fastest bare metal speed you can get.  The speed improvements of
+calling this is noticeable over millions of iterations only and you've got to
+decide if its worth the safety and features you are dropping.
 
 =head1 ATTRIBUTES
 
@@ -140,27 +144,61 @@ the C<Fast::> versions of the formulas, written in C, are not available and the
 pure perl ones will be used instead.  If you would like the C<Fast::> formulas
 then install L<GIS::Distance::Fast> and they will be automatically used.
 
+You may disable the automatic use of the C<Fast::> formulas by setting the
+C<GIS_DISTANCE_PP> environment variable.
+
 =head2 args
 
 Returns the formula arguments, an array ref, containing the rest of the
-arguments passed to C<new()>.  Most formulas do not take arguments.  If
-they do it will be described in their respective documentation.
+arguments passed to C<new()> (anything passed after the L</formula>).
+Most formulas do not take arguments.  If they do it will be described in
+their respective documentation.
 
 =head2 module
 
 Returns the fully qualified module name that L</formula> resolved to.
 
-=head1 SEE ALSO
+=head1 SPEED
 
-L<GIS::Distance::Fast> - C implmentation of some of the formulas
-shipped with GIS::Distance.  This greatly increases the speed at
-which distance calculations can be made.
+Not that this module is slow, but if you're doing millions of distance
+calculations you may find that adjusting your code a bit may make it
+faster.  Here are some options.
+
+Install L<GIS::Distance::Fast>.
+
+Use L</distance_metal> instead of L</distance>.
+
+Call the undocumented C<distance()> function that each formula module
+has.  For example you could bypass this module entirely and just do:
+
+    use GIS::Distance::Fast::Haversine;
+    my $km = GIS::Distance::Fast::Haversine::distance( @coords );
+
+The above would be the ultimate speed demon (as shown in benchmarking)
+but throws away some flexibility and adds some foot-gun support.
+
+=head1 COORDINATES
+
+When passing latitudinal and longitudinal coordinates to L</distance>
+they must always be in decimal degree format.  Here is some sample code
+for converting from other formats to decimal:
+
+    # DMS to Decimal
+    my $decimal = $degrees + ($minutes/60) + ($seconds/3600);
+    
+    # Precision Six Integer to Decimal
+    my $decimal = $integer * .000001;
+
+If you want to convert from decimal radians to degrees you can use L<Math::Trig>'s
+rad2deg function.
 
 =head1 FORMULAS
 
-L<GIS::Distance::Cosine>
+These formulas come with this distribution:
 
-L<GIS::Distance::GeoEllipsoid>
+L<GIS::Distance::ALT>
+
+L<GIS::Distance::Cosine>
 
 L<GIS::Distance::GreatCircle>
 
@@ -168,9 +206,46 @@ L<GIS::Distance::Haversine>
 
 L<GIS::Distance::MathTrig>
 
+L<GIS::Distance::Null>
+
 L<GIS::Distance::Polar>
 
 L<GIS::Distance::Vincenty>
+
+These formulas are available on CPAN:
+
+L<GIS::Distance::Fast::ALT>
+
+L<GIS::Distance::Fast::Cosine>
+
+L<GIS::Distance::Fast::GreatCircle>
+
+L<GIS::Distance::Fast::Haversine>
+
+L<GIS::Distance::Fast::Polar>
+
+L<GIS::Distance::Fast::Vincenty>
+
+L<GIS::Distance::GeoEllipsoid>
+
+=head1 SEE ALSO
+
+L<GIS::Distance::Lite> was long ago forked from GIS::Distance and modified
+to have less dependencies.  Since then GIS::Distance itself has become
+tremendously lighter dep-wise, and is still maintained, I suggest you not
+use GIS::Distance::Lite.
+
+L<Geo::Distance> has long been deprecated in favor of using this module.
+
+L<Geo::Distance::XS> used to be used by L<Geo::Distance> but no longer does.
+
+L<Geo::Inverse> seems to do some distance calculation using L<Geo::Ellipsoid>
+but if you look at the source code it clearly states that the entire meat of
+it is copied from Geo::Ellipsoid... so I'm not sure why it exists... just use
+Geo::Ellipsoid or L<GIS::Distance::GeoEllipsoid> which wraps Geo::Ellipsoid
+into the GIS::Distance interface.
+
+L<Geo::Distance::Google> looks pretty neat.
 
 =head1 TODO
 
@@ -180,6 +255,8 @@ L<GIS::Distance::Vincenty>
 
 Create a GIS::Coord class that represents a geographic coordinate.  Then modify
 this module to accept input as either lat/lon pairs, or as GIS::Coord objects.
+This would make coordinate conversion as described in L</COORDINATES> automatic.
+Maybe use L<Geo::Point>.
 
 =item *
 
@@ -190,11 +267,16 @@ Create some sort of equivalent to L<Geo::Distance>'s closest() method.
 Write a formula module called GIS::Distance::Geoid.  Some very useful info is
 at L<http://en.wikipedia.org/wiki/Geoid>.
 
+=item *
+
+Make L<GIS::Distance::Google> (or some such name) and wrap it around
+L<Geo::Distance::Google> (most likely).
+
+=item *
+
+Figure out why L<GIS::Distance::Polar> has issues.
+
 =back
-
-=head1 BUGS
-
-See L<GIS::Distance::Polar/BROKEN>.
 
 =head1 SUPPORT
 

@@ -1,5 +1,10 @@
 Revision history for Alien-Role-Alt
 
+0.05      2019-03-11 11:01:50 -0400
+  - Deprecated.  GitHub Repository is archived.
+    Tickets can be opened on the Alien-Build issue tracker,
+    though you should just stop using this role now.
+
 0.04      2018-06-25 05:38:15 -0400
   - Alien::Role::Alt is now an empty role;
     alt capability is now in Alien::Build core

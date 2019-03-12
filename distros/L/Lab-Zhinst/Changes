@@ -1,5 +1,9 @@
 Revision history for perl module Lab::Zhinst
 
+2.00 2019-03-09
+
+ - Add support for LabOne 18.05 and 18.12 (Remove dropped symbols)
+
 1.02 2017-10-09
 
  - s/new/Init/ in SYNOPSIS

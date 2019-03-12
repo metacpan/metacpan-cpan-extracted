@@ -11,7 +11,7 @@ use Parallel::Forker::Process;
 use strict;
 use vars qw($Debug $VERSION);
 
-$VERSION = '1.234';
+$VERSION = '1.246';
 
 ######################################################################
 #### CONSTRUCTOR
@@ -161,7 +161,7 @@ sub poll {
     my $nrunning = grep { not $_->poll } (values %{$self->{_running}});
 
     if (!($self->{max_proc} && $nrunning >= $self->{max_proc})) {
-	foreach my $procref (sort {$a->{name} cmp $b->{name}}   # Lanch in named order
+	foreach my $procref (sort {$a->{name} cmp $b->{name}}  # Lanch in named order
 			     values %{$self->{_runable}}) {
 	    last if ($self->{max_proc} && $nrunning >= $self->{max_proc});
 	    $procref->run;
@@ -288,7 +288,7 @@ sub write_tree {
 	}
 	$line .= $lines[$row][0]||"";
 	$line =~ s/\s+$//;
-	print $fh "$line\n"; #if $line !~ /^\s*$/;
+	print $fh "$line\n";  #if $line !~ /^\s*$/;
     }
 
     $fh->close();
@@ -339,7 +339,7 @@ Parallel::Forker - Parallel job forking and management
 
    # Other functions
    $Fork->poll();       # Service any active children
-   foreach my $proc ($Fork->running()) {   # Loop on each running child
+   foreach my $proc ($Fork->running()) {  # Loop on each running child
 
    while ($Fork->is_any_left) {
        $Fork->poll;
@@ -375,7 +375,7 @@ For more examples, see the tests.
 
 =over 4
 
-=item $self->find_proc_name (<name>)
+=item $self->find_proc_name(<name>)
 
 Returns one or more Parallel::Forker::Process objects for the given name (one
 object returned) or label (one or more objects returned).  Returns undef if no
@@ -390,17 +390,17 @@ created the Forker object).
 
 Return true if any processes are running, or runnable (need to run).
 
-=item $self->kill_all (<signal>)
+=item $self->kill_all(<signal>)
 
 Send a signal to all running children.  You probably want to call this only
 from the parent process that created the Parallel::Forker object, wrap the
 call in "if ($self->in_parent)."
 
-=item $self->kill_tree_all (<signal>)
+=item $self->kill_tree_all(<signal>)
 
 Send a signal to all running children and their subchildren.
 
-=item $self->max_proc (<number>)
+=item $self->max_proc(<number>)
 
 Specify the maximum number of processes that the poll method will run at
 any one time.  Defaults to undef, which runs all possible jobs at once.
@@ -409,7 +409,7 @@ then rely on Parallel::Forker's poll method to move the processes from the
 ready state to the run state.  (You should not call ->run yourself, as this
 starts a new process immediately, ignoring max_proc.)
 
-=item $self->new (<parameters>)
+=item $self->new(<parameters>)
 
 Create a new manager object.  There may be more than one manager in any
 application, but applications taking advantage of the sig_child handler
@@ -437,7 +437,7 @@ See if any children need work, and service them.  Start up to max_proc
 processes that are "ready" by calling their run method.  Non-blocking;
 always returns immediately.
 
-=item $self->process (<process_name>)
+=item $self->process(<process_name>)
 
 Return Parallel::Forker::Process object for the specified process name, or
 undef if none is found.  See also find_proc_name.
@@ -466,7 +466,7 @@ run, and destroyed.
 Return Parallel::Forker::Process objects for all processes that are
 currently running.
 
-=item $self->schedule (<parameters>)
+=item $self->schedule(<parameters>)
 
 Register a new process perhaps for later running.  Returns a
 Parallel::Forker::Process object.  Parameters are passed by name as
@@ -532,7 +532,7 @@ in the C<$SIG{CHLD}> handler.
 Return hash containing statistics with keys of state names, and values with
 number of processes in each state.
 
-=item $self->use_sig_child ( 0 | 1 )
+=item $self->use_sig_child( 0 | 1 )
 
 This should always be called with a 0 or 1.  If you install a C<$SIG{CHLD}>
 handler which calls your Parallel::Forker object's C<sig_child> method, you
@@ -545,7 +545,7 @@ warning.
 
 Wait until there are no running or runable jobs left.
 
-=item $self->write_tree (filename => <filename>)
+=item $self->write_tree(filename => <filename>)
 
 Print a dump of the execution tree.
 
@@ -556,7 +556,7 @@ Print a dump of the execution tree.
 The latest version is available from CPAN and from
 L<http://www.veripool.org/>.
 
-Copyright 2002-2017 by Wilson Snyder.  This package is free software; you
+Copyright 2002-2019 by Wilson Snyder.  This package is free software; you
 can redistribute it and/or modify it under the terms of either the GNU
 Lesser General Public License Version 3 or the Perl Artistic License
 Version 2.0.

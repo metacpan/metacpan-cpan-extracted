@@ -1,5 +1,24 @@
 Revision history for Sub::Quote
 
+2.006003 - 2019-03-10
+  - releasing as stable
+
+2.006_002 - 2019-01-29
+  - Fix quotifying of backslashes in utf8-flagged strings on perl 5.10.0.
+
+2.006_001 - 2019-01-07
+  - avoid warnings or failures on new perls when testing quoting UTF-8 strings
+  - test quotify output under utf8 pragma
+  - fix quoting of negative NaN
+
+2.006_000 - 2018-12-29
+  - don't test threads behavior on perl < 5.8.5, since they are too unstable
+  - more tests
+  - preserve inf, nan, and false in quotify
+  - improve accuracy of quotified floating point numbers
+  - SUB_QUOTE_DEBUG can now be set to sub names, package names, or a regex to
+    match against the code to filter which generated subs are printed to STDERR.
+
 2.005001 - 2018-04-20
   - add a workaround for test failures on early 5.8 releases with threads
 

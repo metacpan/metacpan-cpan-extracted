@@ -58,7 +58,8 @@ do { my $x = {
                                    'Test2::API' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'namespace::clean' => '0'
                                  },
                    'suggests' => {
                                    'AnyEvent::HTTP' => '0',

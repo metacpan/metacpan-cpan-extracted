@@ -1,4 +1,9 @@
-
+0.06  - 08-Mar-2019
+- Bumped Ajv to 6.8.1
+- Changed min version Perl back to 5.18 re
+    https://github.com/pjlsergeant/p5-data-jsonschema-ajv/issues/2
+- Bumped minimum JavaScript-Duktape-XS to get access to fixes from
+    https://github.com/gonzus/JavaScript-Duktape-XS/issues/17
 0.05  - 29-May-2018
 - Using Ajv 6.5.0
 - Support drafts 04, 06, 07

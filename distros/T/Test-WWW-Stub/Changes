@@ -1,5 +1,8 @@
 Revision history for Perl extension Test-WWW-Stub
 
+0.10 2019-03-08T04:01:45Z
+    - Fixed tests which does not pass without LWP::Protocol::https, which is not declared as dependency (#22)
+
 0.09 2019-03-07T07:06:34Z
     - Restore to proper state when localize guard object has released in a different order (#21)
 

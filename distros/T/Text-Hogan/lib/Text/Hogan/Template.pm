@@ -1,5 +1,5 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '2.01';
+$Text::Hogan::Template::VERSION = '2.02';
 use strict;
 use warnings;
 
@@ -365,7 +365,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 2.01
+version 2.02
 
 =head1 SYNOPSIS
 
@@ -398,6 +398,7 @@ Further improvements from:
 Ed Freyfogle
 Mohammad S Anwar
 Ricky Morse
+Jerrad Pierce
 Tom Hukins
 Tony Finch
 Yanick Champoux

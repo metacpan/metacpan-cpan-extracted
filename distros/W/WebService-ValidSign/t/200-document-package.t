@@ -16,7 +16,7 @@ my $json = $jsonxs->encode($document_package);
 
 # In the comparison this becomes a JSON::PP::Boolean
 my $expect = $document_package->TO_JSON;
-$expect->{auto_complete} = ignore();
+$expect->{autoComplete} = ignore();
 $expect->{settings} = ignore();
 
 cmp_deeply(

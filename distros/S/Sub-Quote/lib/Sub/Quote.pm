@@ -14,15 +14,31 @@ use B ();
 BEGIN {
   *_HAVE_IS_UTF8 = defined &utf8::is_utf8 ? sub(){1} : sub(){0};
   *_HAVE_PERLSTRING = defined &B::perlstring ? sub(){1} : sub(){0};
+  *_BAD_BACKSLASH_ESCAPE = _HAVE_PERLSTRING() && "$]" == 5.010_000 ? sub(){1} : sub(){0};
 }
 
-our $VERSION = '2.005001';
+our $VERSION = '2.006003';
 $VERSION = eval $VERSION;
 
 our @EXPORT = qw(quote_sub unquote_sub quoted_from_sub qsub);
 our @EXPORT_OK = qw(quotify capture_unroll inlinify sanitize_identifier);
 
 our %QUOTED;
+
+my %escape;
+if (_BAD_BACKSLASH_ESCAPE) {
+  %escape = (
+    (map +(chr($_) => sprintf '\x%02x', $_), 0 .. 0x31, 0x7f),
+    "\t" => "\\t",
+    "\n" => "\\n",
+    "\r" => "\\r",
+    "\f" => "\\f",
+    "\b" => "\\b",
+    "\a" => "\\a",
+    "\e" => "\\e",
+    (map +($_ => "\\$_"), qw(" \ $ @)),
+  );
+}
 
 sub quotify {
   my $value = $_[0];
@@ -32,9 +48,29 @@ sub quotify {
   : (!(_HAVE_IS_UTF8 && utf8::is_utf8($value))
     && length( (my $dummy = '') & $value )
     && 0 + $value eq $value
-    && $value * 0 == 0
-  ) ? $value
-  : _HAVE_PERLSTRING  ? B::perlstring($value)
+  ) ? (
+    $value != $value ? (
+      $value eq -CORE::sin(9**9**9)
+        ? '(-CORE::sin(9**9**9))' # -nan
+        : 'CORE::sin(9**9**9)'    # nan
+    )
+    : $value == 9**9**9 ? '(9**9**9)'      # inf
+    : $value == -9**9**9 ? '(-9**9**9)'    # -inf
+    : int($value) == $value ? $value       # integer
+    : do {
+      my $float = sprintf('%.20f', $value);
+      $float =~ s/(\.[0-9]+?)0+\z/$1/;
+      $float;
+    }
+  )
+  : !length($value) && eval { use warnings 'FATAL' => 'numeric'; $value == 0 } ? '(!1)' # false
+  : _BAD_BACKSLASH_ESCAPE && _HAVE_IS_UTF8 && utf8::is_utf8($value) ? do {
+    $value =~ s/(["\$\@\\[:cntrl:]]|[^\x00-\x7f])/
+      $escape{$1} || sprintf('\x{%x}', ord($1))
+    /ge;
+    qq["$value"];
+  }
+  : _HAVE_PERLSTRING ? B::perlstring($value)
   : qq["\Q$value\E"];
 }
 
@@ -58,6 +94,8 @@ sub capture_unroll {
 
 sub inlinify {
   my ($code, $args, $extra, $local) = @_;
+  $args = '()'
+    if !defined $args;
   my $do = 'do { '.($extra||'');
   if ($code =~ s/^(\s*package\s+([a-zA-Z0-9:]+);)//) {
     $do .= $1;
@@ -234,7 +272,25 @@ sub unquote_sub {
       . "  }".($name ? "\n  \$\$_UNQUOTED = \\&${name}" : '') . ";\n"
       . "}\n"
       . "1;\n";
-    $ENV{SUB_QUOTE_DEBUG} && warn $make_sub;
+    if (my $debug = $ENV{SUB_QUOTE_DEBUG}) {
+      if ($debug =~ m{^([^\W\d]\w*(?:::\w+)*(?:::)?)$}) {
+        my $filter = $1;
+        my $match
+          = $filter =~ /::$/ ? $package.'::'
+          : $filter =~ /::/  ? $package.'::'.($name||'__ANON__')
+          : ($name||'__ANON__');
+        warn $make_sub
+          if $match eq $filter;
+      }
+      elsif ($debug =~ m{\A/(.*)/\z}s) {
+        my $filter = $1;
+        warn $make_sub
+          if $code =~ $filter;
+      }
+      else {
+        warn $make_sub;
+      }
+    }
     {
       no strict 'refs';
       local *{"${package}::${name}"} if $name;
@@ -466,6 +522,37 @@ Exported by default.
 Arguments: $identifier
 
 Sanitizes a value so that it can be used in an identifier.
+
+=head1 ENVIRONMENT
+
+=head2 SUB_QUOTE_DEBUG
+
+Causes code to be output to C<STDERR> before being evaled.  Several forms are
+supported:
+
+=over 4
+
+=item C<1>
+
+All subs will be output.
+
+=item C</foo/>
+
+Subs will be output if their code matches the given regular expression.
+
+=item C<simple_identifier>
+
+Any sub with the given name will be output.
+
+=item C<Full::identifier>
+
+A sub matching the full name will be output.
+
+=item C<Package::Name::>
+
+Any sub in the given package (including anonymous subs) will be output.
+
+=back
 
 =head1 CAVEATS
 

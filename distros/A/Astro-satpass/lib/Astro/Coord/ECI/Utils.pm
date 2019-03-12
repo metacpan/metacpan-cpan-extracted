@@ -10,7 +10,7 @@ Astro::Coord::ECI::Utils - Utility routines for astronomical calculations
 
 =head1 DEPRECATION NOTICE
 
-As of release [% next_version %], subroutines C<equation_of_time()>,
+As of release 0.101, subroutines C<equation_of_time()>,
 C<nutation_in_longitude()>, C<nutation_in_obliquity()>, and
 C<obliquity()> are deprecated in favor of
 L<Astro::Coord::ECI|Asto::Coord::ECI> methods C<equation_of_time()>,
@@ -21,10 +21,10 @@ The motivation for this change is to give higher-accuracy classes a way
 to provide higher-accuracy versions of these calculations to the
 L<Astro::Coord::ECI|Astro::Coord::ECI> coordinate-transformation code.
 
-At the first release after February 25 2019 these will warn on the first
-use, as will the first attempt to call C<equation_of_time()> and
-C<obliquity()> as a subroutine (i.e. with a first argument that looks
-like a number). Six months later all calls will result in a warning, and
+As of version 0.104 these warn on the first use, as will the first
+attempt to call C<equation_of_time()> and C<obliquity()> as a subroutine
+(i.e. with a first argument that looks like a number). At the first
+release after September 1 2019 all calls will result in a warning, and
 six months after that all calls will be fatal.
 
 =head1 DESCRIPTION
@@ -136,7 +136,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.103';
+our $VERSION = '0.104';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -1540,18 +1540,18 @@ EOD
 {
     my %deprecate = (
 	equation_of_time	=> {
-	    level	=> 0,
+	    level	=> 1,
 	},
 	nutation_in_longitude	=> {
-	    level	=> 0,
+	    level	=> 1,
 	    method	=> 'nutation',
 	},
 	nutation_in_obliquity	=> {
-	    level	=> 0,
+	    level	=> 1,
 	    method	=> 'nutation',
 	},
 	obliquity	=> {
-	    level	=> 0,
+	    level	=> 1,
 	},
     );
 
@@ -1615,7 +1615,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2018 by Thomas R. Wyant, III
+Copyright (C) 2005-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
