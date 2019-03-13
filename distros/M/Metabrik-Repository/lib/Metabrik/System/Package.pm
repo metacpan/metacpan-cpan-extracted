@@ -1,5 +1,5 @@
 #
-# $Id: Package.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Package.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # system::package Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -25,6 +25,7 @@ sub brik_properties {
          is_os => [ qw(os) ],
          is_os_ubuntu => [ ],
          is_os_debian => [ ],
+         is_os_kali => [ ],
          is_os_freebsd => [ ],
          is_os_centos => [ ],
          is_installed => [ qw(package|$package_list) ],
@@ -37,6 +38,7 @@ sub brik_properties {
          'Metabrik::System::Os' => [ ],
          'Metabrik::System::Ubuntu::Package' => [ ],
          'Metabrik::System::Debian::Package' => [ ],
+         'Metabrik::System::Kali::Package' => [ ],
          'Metabrik::System::Freebsd::Package' => [ ],
          'Metabrik::System::Centos::Package' => [ ],
       },
@@ -55,6 +57,9 @@ sub get_system_package {
    }
    elsif ($os eq 'debian') {
       $sp = Metabrik::System::Debian::Package->new_from_brik_init($self) or return;
+   }
+   elsif ($os eq 'kali') {
+      $sp = Metabrik::System::Kali::Package->new_from_brik_init($self) or return;
    }
    elsif ($os eq 'freebsd') {
       $sp = Metabrik::System::Freebsd::Package->new_from_brik_init($self) or return;
@@ -182,6 +187,12 @@ sub is_os_debian {
    return $self->is_os('debian');
 }
 
+sub is_os_kali {
+   my $self = shift;
+
+   return $self->is_os('kali');
+}
+
 sub is_os_freebsd {
    my $self = shift;
 
@@ -235,7 +246,7 @@ Metabrik::System::Package - system::package Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

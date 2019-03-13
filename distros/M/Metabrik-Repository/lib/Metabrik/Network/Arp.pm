@@ -1,5 +1,5 @@
 #
-# $Id: Arp.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Arp.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # network::arp Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Frame Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable cache poison eui64 discover scan eui-64) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -55,6 +55,7 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(dsniff libnet-libdnet-perl) ],
          debian => [ qw(dsniff libnet-libdnet-perl) ],
+         kali => [ qw(dsniff libnet-libdnet-perl) ],
          freebsd => [ qw(libdnet) ],
       },
    };
@@ -355,7 +356,7 @@ Metabrik::Network::Arp - network::arp Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

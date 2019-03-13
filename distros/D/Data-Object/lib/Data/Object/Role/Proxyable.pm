@@ -1,62 +1,55 @@
-# ABSTRACT: Proxyable Object Role for Perl 5
 package Data::Object::Role::Proxyable;
 
 use strict;
 use warnings;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Role;
-use Data::Object::Library;
-use Data::Object::Signatures;
 
 use Carp ();
 
-our $VERSION = '0.61'; # VERSION
+# BUILD
 
-method AUTOLOAD () {
+sub AUTOLOAD {
+  my ($self) = @_;
 
   my (@namespace) = our $AUTOLOAD =~ /^(.+)::(.+)$/;
 
   my ($package, $method) = @namespace;
 
-  unshift @_, $self;
-
   my $build = $package->can('BUILDPROXY');
+
   my $error = qq(Can't locate object method "$method" via package "$package");
 
-  Carp::confess($error) unless $build && ref($build) eq 'CODE';
+  Carp::croak($error) unless $build && ref($build) eq 'CODE';
 
   my $proxy = $build->($package, $method, @_);
 
-  Carp::confess($error) unless $proxy && ref($proxy) eq 'CODE';
+  Carp::croak($error) unless $proxy && ref($proxy) eq 'CODE';
 
   goto &$proxy;
-
 }
 
-method DESTROY () {
-
-  ;    # noop
-
+sub DESTROY {
+  return;
 }
+
+# METHODS
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Role::Proxyable - Proxyable Object Role for Perl 5
+Data::Object::Role::Proxyable
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Proxyable Role
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -68,9 +61,13 @@ version 0.61
 
     my ($class, $method, @args) = @_;
 
-    return sub { ... }; # process method call ...
+    return if $method eq 'execute'; # die with method missing error
+
+    return sub { time }; # process method call
 
   }
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -79,101 +76,28 @@ data objects which meet the criteria for being proxyable. This role provides a
 wrapper around the AUTOLOAD routine which processes calls to routines which
 don't exist.
 
-=head1 SEE ALSO
+=cut
 
-=over 4
+=head1 METHODS
 
-=item *
+This package implements the following methods.
 
-L<Data::Object::Array>
+=cut
 
-=item *
+=head2 autoload
 
-L<Data::Object::Class>
+  $self->AUTOLOAD($class, $method, @args);
 
-=item *
+The AUTOLOAD method is called when the object doesn't have the method being
+called. This method is called and handled automatically.
 
-L<Data::Object::Class::Syntax>
+=cut
 
-=item *
+=head2 destroy
 
-L<Data::Object::Code>
+  $self->DESTROY();
 
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
-
-=back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+The DESTROY method is called when the object goes out of scope. This method is
+called and handled automatically.
 
 =cut

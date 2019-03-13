@@ -14,13 +14,14 @@ Direct drawing for 32/24/16 bit framebuffers
 
 Drawing is this simple
 
- $fb->cls();
+ $fb->cls('OFF');
  $fb->set_color({'red' => 255, 'green' => 255, 'blue' => 255, 'alpha' => 255});
  $fb->plot({'x' => 28, 'y' => 79,'pixel_size' => 1});
  $fb->drawto({'x' => 405,'y' => 681,'pixel_size' => 1});
  $fb->circle({'x' => 200, 'y' => 200, 'radius' => 100, 'filled' => 1});
  $fb->polygon({'coordinates' => [20,20,  53,3,  233,620], 'pixel_size' => 5});
  $fb->box({'x' => 95, 'y' => 100, 'xx' => 400, 'yy' => 600, 'filled' => 1});
+ $fb->cls('ON');
 
  # ... and many many more
 
@@ -187,7 +188,7 @@ Indicates if C code or hardware acceleration is being used.
 
  0 = Perl code only
  1 = Some functions accelerated by compiled code (Default)
- 2 = All of #1 plus additional functions accelerated by hardware
+ 2 = All of #1 plus additional functions accelerated by hardware (currently not supported)
 
 =back
 
@@ -206,7 +207,7 @@ The following constants can be used in the various methods.  Each method example
 
 The value of the constant is in parenthesis:
 
-CONSTANT (value)
+B<CONSTANT> (value)
 
 Boolean constants
 
@@ -385,6 +386,7 @@ use Imager::Fill;                                                # For hatch fil
 use Imager::Fountain;                                            #
 use Imager::Font::Wrap;
 use Graphics::Framebuffer::Splash;                               # The splash code is here
+### THREADS ###
 
 Imager->preload; # The Imager documentation says to do this, but doesn't give much of an explanation why.  However, I assume it is to initialize global variables ahead of time.
 
@@ -395,7 +397,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.23';
+    our $VERSION   = '6.24';
     our @ISA       = qw(Exporter Graphics::Framebuffer::Splash);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -471,9 +473,9 @@ DESTROY { # Always clean up after yourself before exiting
 use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERSION;
 
 /* Copyright 2018-2019 Richard Kelsch, All Rights Reserved
- * See the Perl documentation for Graphics::Framebuffer for licensing information.
- * 
- * Version:  6.13
+   See the Perl documentation for Graphics::Framebuffer for licensing information.
+
+   Version:  6.24
 */
 
 #include <stdlib.h>
@@ -504,17 +506,17 @@ use Inline C => <<'C_CODE','name' => 'Graphics::Framebuffer', 'VERSION' => $VERS
 #define GBR           4
 #define GRB           5
 
-#define integer_(X) ((int)(X))
-#define round_(X) ((int)(((double)(X))+0.5))
-#define decimal_(X) (((double)(X))-(double)integer_(X))
+#define integer_(X)  ((int)(X))
+#define round_(X)    ((int)(((double)(X))+0.5))
+#define decimal_(X)  (((double)(X))-(double)integer_(X))
 #define rdecimal_(X) (1.0-decimal_(X))
-#define swap_(a, b) do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
+#define swap_(a, b)  do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
 
 /* Global Structures */
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
-/* This gets the framebuffer info and populates the above structures, then runs them to Perl */
+// This gets the framebuffer info and populates the above structures, then runs them to Perl
 void c_get_screen_info(char *fb_file) {
     int fbfd = 0;
 
@@ -523,9 +525,8 @@ void c_get_screen_info(char *fb_file) {
     ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
     close(fbfd);
 
-   /*
-    * This monstrosity pushes the needed values on Perl's stack, like "return" does.
-    */
+    // This monstrosity pushes the needed values on Perl's stack, like "return" does.
+
     Inline_Stack_Vars;
     Inline_Stack_Reset;
 
@@ -586,20 +587,20 @@ void c_get_screen_info(char *fb_file) {
  * Normally I would add code to properly place the RGB values according to
  * color order, but in reality, that can be done solely when the color value
  * itself is defined, so the colors are in the correct order before even
- * arriving at this routine. */
+ * arriving at this routine.
+*/
 void c_plot(
     char *framebuffer,
     short x, short y,
-    unsigned char draw_mode,
+    short x_clip, short y_clip, short xx_clip, short yy_clip,
     unsigned int color,
     unsigned int bcolor,
+    unsigned char alpha,
+    unsigned char draw_mode,
     unsigned char bytes_per_pixel,
     unsigned char bits_per_pixel,
     unsigned int bytes_per_line,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip,
-    short xoffset, short yoffset,
-    unsigned char alpha)
+    short xoffset, short yoffset)
 {
     if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) {
         x += xoffset;
@@ -893,18 +894,16 @@ void c_plot(
 
 void c_line(
     char *framebuffer,
-    short x1, short y1,
-    short x2, short y2,
-    unsigned char draw_mode,
+    short x1, short y1, short x2, short y2,
+    short x_clip, short y_clip, short xx_clip, short yy_clip,
     unsigned int color,
     unsigned int bcolor,
+    unsigned char alpha,
+    unsigned char draw_mode,
     unsigned char bytes_per_pixel,
     unsigned char bits_per_pixel,
     unsigned int bytes_per_line,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip,
-    short xoffset, short yoffset,
-    unsigned char alpha)
+    short xoffset, short yoffset)
 {
     short shortLen = y2 - y1;
     short longLen  = x2 - x1;
@@ -927,14 +926,14 @@ void c_line(
         if (longLen > 0) {
             longLen += y1;
             for (count = 0x8000 + (x1 << 16); y1 <= longLen; ++y1) {
-                c_plot(framebuffer, count >> 16, y1, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+                c_plot(framebuffer, count >> 16, y1, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
                 count += decInc;
             }
             return;
         }
         longLen += y1;
         for (count = 0x8000 + (x1 << 16); y1 >= longLen; --y1) {
-            c_plot(framebuffer, count >> 16, y1, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+            c_plot(framebuffer, count >> 16, y1, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
             count -= decInc;
         }
         return;
@@ -942,14 +941,14 @@ void c_line(
     if (longLen > 0) {
         longLen += x1;
         for (count = 0x8000 + (y1 << 16); x1 <= longLen; ++x1) {
-            c_plot(framebuffer, x1, count >> 16, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+            c_plot(framebuffer, x1, count >> 16, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
             count += decInc;
         }
         return;
     }
     longLen += x1;
     for (count = 0x8000 + (y1 << 16); x1 >= longLen; --x1) {
-        c_plot(framebuffer, x1, count >> 16, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+        c_plot(framebuffer, x1, count >> 16, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
         count -= decInc;
     }
 }
@@ -957,20 +956,16 @@ void c_line(
 /* Reads in rectangular screen data as a string to a previously allocated buffer */
 void c_blit_read(
     char *framebuffer,
-    short screen_width,
-    short screen_height,
+    short screen_width, short screen_height,
     unsigned int bytes_per_line,
-    short xoffset,
-    short yoffset,
+    short xoffset, short yoffset,
     char *blit_data,
-    short x, short y,
-    short w, short h,
+    short x, short y, short w, short h,
     unsigned char bytes_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip)
+    short x_clip, short y_clip, short xx_clip, short yy_clip)
 {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
@@ -1011,20 +1006,16 @@ void c_blit_read(
 /* Blits a rectangle of graphics to the screen using the specified draw mode */
 void c_blit_write(
     char *framebuffer,
-    short screen_width,
-    short screen_height,
+    short screen_width, short screen_height,
     unsigned int bytes_per_line,
-    unsigned short xoffset,
-    unsigned short yoffset,
+    short xoffset, short yoffset,
     char *blit_data,
-    short x, short y,
-    short w, short h,
+    short x, short y, short w, short h,
     unsigned char bytes_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip)
+    short x_clip, short y_clip, short xx_clip, short yy_clip)
 {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
@@ -1034,6 +1025,7 @@ void c_blit_write(
     short vertical;
     unsigned int bline = w * bytes_per_pixel;
 
+    /* Fastest is unclipped normal mode */
     if (draw_mode == NORMAL_MODE && x >= x_clip && xx <= xx_clip && y >= y_clip && yy <= yy_clip) {
         unsigned char *source = blit_data;
         unsigned char *dest   = &framebuffer[(fb_y * bytes_per_line) + (fb_x * bytes_per_pixel)];
@@ -1398,7 +1390,7 @@ void c_blit_write(
                                         unsigned int vhz       = vbl + hzpixel;
                                         unsigned int yvhz      = yvbl + hzpixel;
                                         unsigned int xhbp_yvbl = xhbp + yvbl;
-                                        if ((*((unsigned int*)(framebuffer + xhbp_yvbl )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                        if ((*((unsigned int*)(framebuffer + xhbp_yvbl )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel for color testing
                                             *((unsigned int*)(framebuffer + xhbp_yvbl )) = *((unsigned int*)(blit_data + vhz ));
                                         }
                                     }
@@ -1420,7 +1412,7 @@ void c_blit_write(
                                         unsigned int vhz       = vbl + hzpixel;
                                         unsigned int yvhz      = yvbl + hzpixel;
                                         unsigned int xhbp_yvbl = xhbp + yvbl;
-                                        if (*((unsigned int*)(framebuffer + xhbp + yvhz )) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                        if (*((unsigned int*)(framebuffer + xhbp + yvhz )) == (bcolor & 0xFFFFFF00)) {
                                             *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
                                             *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
                                             *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
@@ -1837,8 +1829,7 @@ void c_blit_write(
 void c_rotate(
     char *image,
     char *new_img,
-    short width,
-    short height,
+    short width, short height,
     unsigned short wh,
     double degrees,
     unsigned char bytes_per_pixel)
@@ -1884,11 +1875,6 @@ void c_rotate(
     }
 }
 
-void c_flip_both(char* pixels, short width, short height, unsigned short bytes) {
-    c_flip_vertical(pixels,width,height,bytes);
-    c_flip_horizontal(pixels,width,height,bytes);
-}
-
 void c_flip_horizontal(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
     short y;
     short x;
@@ -1919,10 +1905,25 @@ void c_flip_vertical(char *pixels, short width, short height, unsigned char byte
           memcpy(low,high,stride);   // Copy the upper line to the lower
           memcpy(high, row, stride); // Copy the saved copy to the upper line
     }
-    free(row);
+    free(row); // Release the temporary buffer
+}
+
+void c_flip_both(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
+    c_flip_vertical(
+        pixels,
+        width,height,
+        bytes_per_pixel
+    );
+    c_flip_horizontal(
+        pixels,
+        width,height,
+        bytes_per_pixel
+    );
 }
 
 /* bitmap conversions */
+
+/* Convert an RGB565 bitmap to an RGB888 bitmap */
 void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned char color_order ) {
     unsigned int loc16 = 0;
     unsigned int loc24 = 0;
@@ -1933,7 +1934,7 @@ void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned ch
     while(loc16 < size16) {
         unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
         loc16 += 2;
-        if (color_order == 0) {
+        if (color_order == RGB) {
             b5 = (rgb565 & 0xf800) >> 11;
             r5 = (rgb565 & 0x001f);
         } else {
@@ -1973,9 +1974,9 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned ch
         unsigned char b8 = (b5 * 527 + 23) >> 6;
         *((unsigned int*)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
         loc32 += 3;
-        if (r8 == 0 && g8 == 0 && b8 ==0) {
+        if (r8 == 0 && g8 == 0 && b8 ==0) { // Black is always treated as a clear mask
             *((unsigned char*)(buf32 + loc32++)) = 0;
-        } else {
+        } else { // Anything but black is opague
             *((unsigned char*)(buf32 + loc32++)) = 255;
         }
     }
@@ -1992,13 +1993,12 @@ void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned cha
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-        if (color_order == 0) {
+        if (color_order == RGB) {
             rgb565 = (b5 << 11) | (g6 << 5) | r5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         } else {
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         }
+        *((unsigned short*)(buf16 + loc16)) = rgb565;
         loc16 += 2;
     }
 }
@@ -2012,17 +2012,15 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned cha
         unsigned char r8 = crgb & 255;
         unsigned char g8 = (crgb >> 8) & 255;
         unsigned char b8 = (crgb >> 16) & 255;
-//        unsigned char a8 = (crgb >> 24) & 255; // This is not used, but is needed
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-        if (color_order == 0) {
+        if (color_order == RGB) {
             rgb565 = (b5 << 11) | (g6 << 5) | r5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         } else {
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         }
+        *((unsigned short*)(buf16 + loc16)) = rgb565;
         loc16 += 2;
     }
 }
@@ -2109,23 +2107,29 @@ void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, un
         }
         m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
 
-        if (bytes_per_pixel >= 3) {
-            *(pixels + idx)     = m;
-            *(pixels + idx + 1) = m;
-            *(pixels + idx + 2) = m;
-        } else { // 2
-            rgb565                             = 0;
-            rgb565                             = (m << 11) | (m << 6) | m;
-            *((unsigned short*)(pixels + idx)) = rgb565;
+        switch(bytes_per_pixel) {
+            case 4 :
+                if (m == 0)  {
+                    *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16);
+                } else {
+                    *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16) | 0xFF000000;
+                }
+                break;
+            case 3 :
+                *(pixels + idx)     = m;
+                *(pixels + idx + 1) = m;
+                *(pixels + idx + 2) = m;
+                break;
+            case 2 :
+                rgb565                             = 0;
+                rgb565                             = (m << 11) | (m << 6) | m;
+                *((unsigned short*)(pixels + idx)) = rgb565;
+                break;
         }
     }
 }
 
-
 C_CODE
-
-
-our $THIS_CONSOLE = 1;
 
 our @HATCHES    = Imager::Fill->hatches;
 our @COLORORDER = (qw( RGB RBG BGR BRG GBR GRB ));
@@ -2171,7 +2175,7 @@ Sets the default (global) foreground color for when 'attribute_reset' is called.
    'alpha' => 255
  }
 
-Do not use this to change colors, as "set_color" is intended for that.  Use this to set the DEFAULT foreground color for when "attribute_reset" is called.
+* Do not use this to change colors, as "set_color" is intended for that.  Use this to set the DEFAULT foreground color for when "attribute_reset" is called.
 
 =item B<BACKGROUND>
 
@@ -2184,7 +2188,7 @@ Sets the default (global) background color for when 'attribute_reset' is called.
    'alpha' => 0
  }
 
-Do not use this to change background colors, as "set_b_color" is intended for that.  Use this to set the DEFAULT background color.
+* Do not use this to change background colors, as "set_b_color" is intended for that.  Use this to set the DEFAULT background color for when "attribute_reset" is called.
 
 =item B<SPLASH>
 
@@ -2271,6 +2275,7 @@ sub new {
     # kind of became this mess.  I could change it, but it likely would break any
     # code that directly uses values.
     my $this;
+    $ENV{'PATH'} = '/usr/bin:/bin:/usr/local/bin'; # Testing doesn't work in taint mode unless this is here.
     my $self = {
         'SCREEN'        => '',            # The all mighty framebuffer
 
@@ -2295,7 +2300,7 @@ sub new {
         'COLOR'       => undef,           # Global foreground color (Raw string)
         'B_COLOR'     => undef,           # Global Background Color
         'DRAW_MODE'   => NORMAL_MODE,     # Drawing mode (Normal default)
-        'DIAGNOSTICS' => FALSE,
+        'DIAGNOSTICS' => FALSE,           # Determines if diagnostics are shown when images are loaded.
 
         'PIXEL_TYPES'  => [
             'Packed Pixels',
@@ -2471,11 +2476,10 @@ sub new {
         'CENTER_Y'    => CENTER_Y,                              #   Constants for centering
         'CENTER_XY'   => CENTER_XY,                             #   Constants for centering
 
-        # These are no longer used, but here in case someone uses them #####
         'WAIT_FOR_CONSOLE' => FALSE,
         'NO_FGCONSOLE'     => TRUE,
-        'CONSOLE'          => 1,
         'THIS_CONSOLE'     => 1,
+        'CONSOLE'          => 1,
         ####################################################################
 
         ## Set up the Framebuffer driver "constants" defaults
@@ -2591,7 +2595,7 @@ sub new {
         @_
     };
 
-    unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices
+    unless (defined($self->{'FB_DEVICE'})) {     # We scan for all 32 possible devices at both possible locations
         foreach my $dev (0 .. 31) {
             foreach my $prefix (qw(/dev/fb /dev/graphics/fb)) {
                 if (-e "$prefix$dev") {
@@ -2602,7 +2606,10 @@ sub new {
             last if (defined($self->{'FB_DEVICE'}));
         }
     }
-    $ENV{'PATH'} = '/usr/bin:/bin:/usr/local/bin';
+    $self->{'CONSOLE'} = `cat /sys/class/tty/tty0/active`;
+    $self->{'CONSOLE'} =~ s/\D+//gs;
+    $self->{'CONSOLE'} += 0;
+    $self->{'THIS_CONSOLE'} = $self->{'THIS_CONSOLE'};
     if ( ! defined($ENV{'DISPLAY'}) && defined($self->{'FB_DEVICE'}) && $self->{'FB_DEVICE'} !~ /virtual/i && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                                                   # We have to be in binary mode first
         $|++;
@@ -3212,7 +3219,7 @@ Sets or returns the drawing mode, depending on how it is called.
                                    # the existing pixel value (usually not
                                    # too useful, but here for completeness)
 
- $fb->draw_mode(DUVIDE_MODE);      # Draws the new pixel on the screen
+ $fb->draw_mode(DIVIDE_MODE);      # Draws the new pixel on the screen
                                    # by mathematically dividing it with the
                                    # existing pixel value (usually not too
                                    # useful, but here for completeness)
@@ -3223,7 +3230,9 @@ Sets or returns the drawing mode, depending on how it is called.
 sub draw_mode {
     my $self = shift;
     if (@_) {
-        $self->{'DRAW_MODE'} = int(shift);
+        my $mode = int(shift);
+        # If not a valid value, then it defaults to normal mode
+        $self->{'DRAW_MODE'} = ($mode <= 10 && $mode >= 0) ? $mode : NORMAL_MODE;
     } else {
         return ($self->{'DRAW_MODE'});
     }
@@ -3536,16 +3545,15 @@ sub plot {
             c_plot(
                 $self->{'SCREEN'},
                 $x, $y,
-                $self->{'DRAW_MODE'},
+                $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
                 $self->{'INT_COLOR'},
                 $self->{'INT_B_COLOR'},
+                $self->{'COLOR_ALPHA'},
+                $self->{'DRAW_MODE'},
                 $self->{'BYTES'},
                 $self->{'BITS'},
                 $self->{'BYTES_PER_LINE'},
-                $self->{'X_CLIP'},  $self->{'Y_CLIP'},
-                $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
                 $self->{'XOFFSET'}, $self->{'YOFFSET'},
-                $self->{'COLOR_ALPHA'}
             );
         } else {
             # Only plot if the pixel is within the clipping region
@@ -3680,7 +3688,7 @@ Draws a line, in the foreground color, from point x,y to point xx,yy.  Clipping 
     'xx'          => 100,
     'yy'          => 332
     'pixel_size'  => 1,
-    'antialiased' => 1
+    'antialiased' => TRUE
  });
 
 =back
@@ -3709,7 +3717,7 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
     'radius'      => 50,
     'angle'       => 30.3, # Compass coordinates (0-360)
     'pixel_size'  => 3,
-    'antialiased' => 0
+    'antialiased' => FALSE
  });
 
 =back
@@ -3747,7 +3755,7 @@ Draws a line, in the foreground color, from the last plotted position to the pos
     'x'           => 50,
     'y'           => 60,
     'pixel_size'  => 2,
-    'antialiased' => 1
+    'antialiased' => TRUE
  });
 
 =back
@@ -3757,12 +3765,11 @@ Draws a line, in the foreground color, from the last plotted position to the pos
 =cut
 
 sub drawto {
-    ##########################################################
-    # Perfectly horizontal line drawing is optimized by      #
-    # using the BLIT functions.  This assists greatly with   #
-    # drawing filled objects.  In fact, it's hundreds of     #
-    # times faster!                                          #
-    ##########################################################
+    ##########################################################################
+    # For Perl, Perfectly horizontal line drawing is optimized by using the  #
+    # BLIT functions.  This assists greatly with drawing filled objects.  In #
+    # fact, it's hundreds of times faster!                                   #
+    ##########################################################################
     my $self   = shift;
     my $params = shift;
 
@@ -3770,7 +3777,6 @@ sub drawto {
     my $y_end = int($params->{'y'});
     my $size  = int($params->{'pixel_size'} || 1);
 
-    my ($width, $height);
     my $start_x     = $self->{'X'};
     my $start_y     = $self->{'Y'};
     my $antialiased = $params->{'antialiased'} || 0;
@@ -3781,19 +3787,19 @@ sub drawto {
         c_line(
             $self->{'SCREEN'},
             $start_x, $start_y, $x_end, $y_end,
-            $self->{'DRAW_MODE'},
+            $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
             $self->{'INT_COLOR'},
             $self->{'INT_B_COLOR'},
+            $self->{'COLOR_ALPHA'},
+            $self->{'DRAW_MODE'},
             $self->{'BYTES'},
             $self->{'BITS'},
             $self->{'BYTES_PER_LINE'},
-            $self->{'X_CLIP'},  $self->{'Y_CLIP'}, $self->{'XX_CLIP'}, $self->{'YY_CLIP'},
             $self->{'XOFFSET'}, $self->{'YOFFSET'},
-            $self->{'COLOR_ALPHA'},
             # $antialiased,
         );
     } else {
-
+        my ($width, $height);
         # Determines if the coordinates sent were right-side-up or up-side-down.
         if ($start_x > $x_end) {
             $width = $start_x - $x_end;
@@ -4240,10 +4246,10 @@ sub draw_arc {
             );
             unless ($self->{'DRAW_MODE'}) {
                 if ($self->{'ACCELERATED'}) {
-                    $draw_mode = $self->{'DRAW_MODE'};
+                    $draw_mode           = $self->{'DRAW_MODE'};
                     $self->{'DRAW_MODE'} = MASK_MODE;
                 } else {
-                    $saved = $self->blit_read($saved);
+                    $saved            = $self->blit_read($saved);
                     $saved->{'image'} = $self->_convert_16_to_24($saved->{'image'}, RGB) if ($self->{'BITS'} == 16);
                     $img->read(
                         'xsize'             => $w,
@@ -4281,7 +4287,7 @@ sub draw_arc {
             } elsif (exists($params->{'texture'})) {
                 $pattern = $self->_generate_fill($w, $w, undef, $params->{'texture'});
                 $pattern = $self->_convert_16_to_24($pattern, RGB) if ($self->{'BITS'} == 16);
-                $image = Imager->new(
+                $image   = Imager->new(
                     'xsize'             => $w,
                     'ysize'             => $w,
                     'raw_datachannels'  => max(3, $bytes),
@@ -4581,9 +4587,9 @@ sub ellipse {
     my $EllipseError = 0;
     my $StoppingX    = $TwoBSquare * $XRadius;
     my $StoppingY    = 0;
-    my $history_on   = FALSE;
-    $history_on      = TRUE if (exists($self->{'history'}));
+    my $history_on   = (exists($self->{'history'})) ? TRUE : FALSE;
 
+    # The history prevents double drawing
     $self->{'history'} = {} unless ($history_on || !$filled || $size > 1);
     my ($red, $green, $blue, $pattern, $plen, @rc, @gc, @bc);
     my $gradient  = FALSE;
@@ -5091,8 +5097,8 @@ sub polygon {
 
     my $size       = int($params->{'pixel_size'} || 1);
     my $aa         = $params->{'antialiased'} || 0;
-    my $history_on = FALSE;
-    $history_on    = TRUE if (exists($self->{'history'}));
+    my $history_on = (exists($self->{'history'})) ? TRUE : FALSE;
+
     if ($params->{'filled'}) {
         $self->_fill_polygon($params);
     } else {
@@ -6679,7 +6685,7 @@ Scales the image to "width" x "height".  This is the same as how scale works in 
                                    #              width x height exactly.
          },
 
-         'monochrome' => 1         # Makes the image data monochrome
+         'monochrome' => TRUE      # Makes the image data monochrome
      }
  );
 
@@ -6725,10 +6731,10 @@ sub blit_transform {
                 'ysize'             => $height,
                 'raw_datachannels'  => max(3, $bytes),
                 'raw_storechannels' => max(3, $bytes),
-                'raw_interleave'    => 0,
+                'raw_interleave'    => FALSE,
                 'data'              => $image,
                 'type'              => 'raw',
-                'allow_incomplete'  => 1
+                'allow_incomplete'  => TRUE
             );
             my $dest = Imager->new();
             $dest->read(
@@ -6736,10 +6742,10 @@ sub blit_transform {
                 'ysize'             => $params->{'merge'}->{'dest_blit_data'}->{'height'},
                 'raw_datachannels'  => max(3, $bytes),
                 'raw_storechannels' => max(3, $bytes),
-                'raw_interleave'    => 0,
+                'raw_interleave'    => FALSE,
                 'data'              => $params->{'merge'}->{'dest_blit_data'}->{'image'},
                 'type'              => 'raw',
-                'allow_incomplete'  => 1
+                'allow_incomplete'  => TRUE
             );
             $dest->compose(
                 'src' => $img,
@@ -6752,7 +6758,7 @@ sub blit_transform {
                 'type'          => 'raw',
                 'datachannels'  => max(3, $bytes),
                 'storechannels' => max(3, $bytes),
-                'interleave'    => 0,
+                'interleave'    => FALSE,
                 'data'          => \$data
             );
         };
@@ -6854,10 +6860,10 @@ sub blit_transform {
                     'ysize'             => $height,
                     'raw_storechannels' => max(3, $bytes),
                     'raw_datachannels'  => max(3, $bytes),
-                    'raw_interleave'    => 0,
+                    'raw_interleave'    => FALSE,
                     'data'              => $image,
                     'type'              => 'raw',
-                    'allow_incomplete'  => 1
+                    'allow_incomplete'  => TRUE
                 );
                 my $rotated;
                 if (abs($degrees) == 90 || abs($degrees) == 180 || abs($degrees) == 270) {
@@ -6871,7 +6877,7 @@ sub blit_transform {
                 $img->write(
                     'type'          => 'raw',
                     'storechannels' => max(3, $bytes),
-                    'interleave'    => 0,
+                    'interleave'    => FALSE,
                     'data'          => \$data
                 );
                 $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
@@ -6897,10 +6903,10 @@ sub blit_transform {
                 'ysize'             => $height,
                 'raw_storechannels' => max(3, $bytes),
                 'raw_datachannels'  => max(3, $bytes),
-                'raw_interleave'    => 0,
+                'raw_interleave'    => FALSE,
                 'data'              => $image,
                 'type'              => 'raw',
-                'allow_incomplete'  => 1
+                'allow_incomplete'  => TRUE
             );
 
             $img = $img->convert('preset' => 'addalpha') if ($self->{'BITS'} == 32);
@@ -6916,7 +6922,7 @@ sub blit_transform {
             $scaledimg->write(
                 'type'          => 'raw',
                 'storechannels' => max(3, $bytes),
-                'interleave'    => 0,
+                'interleave'    => FALSE,
                 'data'          => \$data
             );
         };
@@ -7165,9 +7171,9 @@ If you are trying to print on top of other graphics, then normal drawing mode wo
      'text'         => 'Hello World!',
      'font_path'    => '/usr/share/fonts/truetype', # Optional
      'face'         => 'Arial.ttf',                 # Optional
-     'bounding_box' => 1,
+     'bounding_box' => TRUE,
      'center'       => CENTER_X,
-     'antialias'    => 1
+     'antialias'    => TRUE
  });
 
  $fb->ttf_print($bounding_box);
@@ -7187,7 +7193,7 @@ Here's a shortcut:
          'text'         => 'Hello World!',
          'font_path'    => '/usr/share/fonts/truetype', # Optional
          'face'         => 'Arial.ttf',                 # Optional
-         'bounding_box' => 1,
+         'bounding_box' => TRUE,
          'rotate'       => 45,    # optonal
          'center'       => CENTER_X,
          'antialias'    => 1,
@@ -7228,8 +7234,8 @@ sub ttf_print {
     my $center_mode = $params->{'center'}       || 0;
     my $font_path   = $params->{'font_path'}    || $self->{'FONT_PATH'};
     my $aa          = $params->{'antialias'}    || FALSE;
-    my $P_color = $params->{'color'} if (exists($params->{'color'}));
-    my $sizew = $TTF_h;
+    my $P_color     = $params->{'color'} if (exists($params->{'color'}));
+    my $sizew       = $TTF_h;
     $sizew *= $params->{'wscale'} if (exists($params->{'wscale'}) && defined($params->{'wscale'}));
     my $pfont = "$font_path/$face";
 
@@ -7333,7 +7339,7 @@ sub ttf_print {
                     'type'              => 'raw',
                     'raw_datachannels'  => max(3, $bytes),
                     'raw_storechannels' => max(3, $bytes),
-                    'raw_interleave'    => 0,
+                    'raw_interleave'    => FALSE,
                     'xsize'             => $TTF_pw,
                     'ysize'             => $TTF_ph
                 );
@@ -7427,8 +7433,8 @@ sub ttf_paragraph {
     my $P_color   = $params->{'color'} if (exists($params->{'color'}));
     my $pfont     = "$font_path/$face";
 
-    $TTF_x -= $self->{'X_CLIP'};
-    $TTF_y -= $self->{'Y_CLIP'};
+    $TTF_x  -= $self->{'X_CLIP'};
+    $TTF_y  -= $self->{'Y_CLIP'};
     $justify = lc($justify);
     $justify =~ s/justified/fill/;
     $pfont   =~ s#/+#/#g;    # Get rid of doubled up slashes
@@ -7717,13 +7723,10 @@ sub load_image {
 
     my @odata;
     my @Img;
-    my ($x, $y, $xs, $ys, $w, $h, $last_img);
-    my $bench_scale;
-    my $bench_rotate;
-    my $bench_convert;
+    my ($x, $y, $xs, $ys, $w, $h, $last_img, $bench_scale, $bench_rotate, $bench_convert);
     my $bench_start = time;
-    my $bench_total = time;
-    my $bench_load  = time;
+    my $bench_total = $bench_start;
+    my $bench_load  = $bench_start;
     my $color_order = $self->{'COLOR_ORDER'};
     if ($params->{'file'} =~ /\.(gif|png)$/i) {
         eval { @Img = Imager->read_multi('file' => $params->{'file'},); };
@@ -7734,7 +7737,7 @@ sub load_image {
     }
     $bench_load = sprintf('%.03f', time - $bench_load);
     unless (defined($Img[0])) {
-        warn __LINE__ . " I can't get Imager to set up an image buffer!  Check your Imager installation.\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
+        warn __LINE__ . " I can't get Imager to set up an image buffer $params->{'file'}!  Check your Imager installation.\n", Imager->errstr(), "\n" if ($self->{'SHOW_ERRORS'});
     } else {
         foreach my $img (@Img) {
             next unless (defined($img));
@@ -7778,7 +7781,7 @@ sub load_image {
                 $img      = $img->convert('preset' => 'rgb');
                 $channels = $img->getchannels();
             }
-            my $bits     = $img->bits();
+            my $bits = $img->bits();
 
             # Scale the image, if asked to
             if ($params->{'file'} =~ /\.(gif|png)$/i && !exists($params->{'width'}) && !exists($params->{'height'})) {
@@ -7820,7 +7823,7 @@ sub load_image {
                 $img = $img->convert('preset' => 'addalpha') if ($channels == 3);
                 $img->write(
                     'type'          => 'raw',
-                    'interleave'    => 0,
+                    'interleave'    => FALSE,
                     'datachannels'  => 4,
                     'storechannels' => 4,
                     'data'          => \$data
@@ -7834,7 +7837,7 @@ sub load_image {
                 $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
                 $img->write(
                     'type'          => 'raw',
-                    'interleave'    => 0,
+                    'interleave'    => FALSE,
                     'datachannels'  => 3,
                     'storechannels' => 3,
                     'data'          => \$data
@@ -7844,7 +7847,7 @@ sub load_image {
                 $img = $img->convert('preset' => 'noalpha') if ($channels == 4);
                 $img->write(
                     'type'          => 'raw',
-                    'interleave'    => 0,
+                    'interleave'    => FALSE,
                     'datachannels'  => 3,
                     'storechannels' => 3,
                     'data'          => \$data
@@ -7971,7 +7974,6 @@ sub screen_dump {
     my $self   = shift;
     my $params = shift;
 
-#    $self->wait_for_console() if ($self->{'WAIT_FOR_CONSOLE'});
     my $filename         = $params->{'file'} || 'screendump.jpg';
     my $bytes            = $self->{'BYTES'};
     my ($width, $height) = ($self->{'XRES'}, $self->{'YRES'});
@@ -7987,10 +7989,10 @@ sub screen_dump {
         'ysize'             => $scrn->{'height'},
         'raw_datachannels'  => max(3, $bytes),
         'raw_storechannels' => max(3, $bytes),
-        'raw_interleave'    => 0,
+        'raw_interleave'    => FALSE,
         'data'              => $scrn->{'image'},
         'type'              => 'raw',
-        'allow_incomplete'  => 1
+        'allow_incomplete'  => TRUE
     );
     my %p = (
         'type' => $type || 'raw',
@@ -8089,7 +8091,7 @@ sub _convert_24_to_16 {
     my $img         = shift;
     my $color_order = shift;
 
-    my $size = length($img);
+    my $size    = length($img);
     my $new_img = '';
     if ($self->{'ACCELERATED'}) {
         $new_img = chr(0) x (int(($size / 3) * 2) + 2);
@@ -8126,7 +8128,7 @@ sub _convert_32_to_16 {
     my $img         = shift;
     my $color_order = shift;
 
-    my $size = length($img);
+    my $size    = length($img);
     my $new_img = '';
     if ($self->{'ACCELERATED'}) {
         $new_img = chr(0) x (int($size / 2) + 2);
@@ -8163,7 +8165,7 @@ sub _convert_32_to_24 {
     my $img         = shift;
     my $color_order = shift;
 
-    my $size = length($img);
+    my $size    = length($img);
     my $new_img = '';
     if ($self->{'ACCELERATED'}) {
         $new_img = chr(0) x (int(($size / 4) * 3) + 3);
@@ -8200,7 +8202,7 @@ sub _convert_24_to_32 {
     my $img         = shift;
     my $color_order = shift;
 
-    my $size = length($img);
+    my $size    = length($img);
     my $new_img = '';
     if ($self->{'ACCELERATED'}) {
         $new_img = chr(0) x (int(($size / 3) * 4) + 4);
@@ -8316,8 +8318,7 @@ sub RGB565_to_RGBA8888 {
     my $color;
     if ($color_order == BGR) {
         ($r, $g, $b) = ($b, $g, $r);
-
-        #    } elsif ($color_order == RGB) {
+#    } elsif ($color_order == RGB) {
     } elsif ($color_order == BRG) {
         ($r, $g, $b) = ($b, $r, $g);
     } elsif ($color_order == RBG) {
@@ -8505,19 +8506,27 @@ sub vsync {
 
 =head2 which_console
 
-** DEPRECIATED, Now only returns 1,1
+Returns the active console and the expected console
+
+ my ($active_console, $expected_console) = $fb->which_console();
 
 =cut
 
 sub which_console {
     my $self = shift;
-    $self->{'THIS_CONSOLE'} = $THIS_CONSOLE;
+    $self->{'THIS_CONSOLE'} = `cat /sys/class/tty/tty0/active`;
+    $self->{'THIS_CONSOLE'} =~ s/\D+//gs;
+    $self->{'THIS_CONSOLE'} += 0; # Force numeric
     return ($self->{'THIS_CONSOLE'}, $self->{'CONSOLE'});
 }
 
 =head2 active_console
 
-** DEPRECIATED, Now always returns TRUE
+Indicates if the current console is the expected console.  It returns true or false.
+
+ if ($self->active_console()) {
+      # Do something
+ }
 
 =cut
 
@@ -8532,7 +8541,11 @@ sub active_console {
 
 =head2 wait_for_console
 
-** DEPRECIATED, Now never blocks and auto-blocking is disabled.
+Blocks actions until the expected console is active.  The expected console is determined at the time the module is initialized.
+
+Due to speed considerations, YOU must do use this to do blocking, if desired.  If you expect to be changing active consoles, then you will need to use this.  However, if you do not plan to do ever change consoles when running this module, then don't use this feature, as your results will be faster.
+
+If a TRUE or FALSE is passed to this, then you can enable or disable blocking for subsequent calls.
 
 =cut
 
@@ -8542,7 +8555,7 @@ sub wait_for_console {
         $self->{'WAIT_FOR_CONSOLE'} = (shift =~ /^(true|on|1|enable)$/i) ? TRUE : FALSE;
     } else {
         while (!$self->active_console()) {
-            sleep .5;
+            sleep .1;
         }
     }
 }
@@ -8594,7 +8607,7 @@ sub _get_ioctl {
     ##########################################################
 
     # This really needs to be moved over to the C routines, as the structure really is hard to parse for different processor long types
-
+    # ... aaaaand ... I did
     my $command = shift;
     my $format  = shift;
     my $fb      = shift;
@@ -8659,6 +8672,8 @@ Use "blit_read" and "blit_write" to save portions of the screen instead of redra
 =head2 SPRITES
 
 Someone asked me about sprites.  Well, that's what blitting is for.  You'll have to do your own collision detection.  Using the "XOR" drawing mode, you can "erase" a sprite by rewriting it to the screen via xor.
+
+Listen folks, this library does everything in software, so your results will vary depending on CPU speed and screen resolution.
 
 =head2 HORIZONTAL "MAGIC"
 
@@ -8726,10 +8741,6 @@ This forces the module to pretend it is rendering for a smaller resolution (by p
 
 If you get this behavior, then it is a bug, and the author needs to be notified, although as of version 6.06 this should no longer be an issue.
 
-So how does that help you right now?  Try installing the program F<fbset> via your package manager, then rerun the F<primitives.pl> script without the "x" or "y" options.  If it works, then that is your immediate solution.
-
-How does that suddenly fix things?  Calculating the screen size involves complex data structures returned by an ioget call, and Perl handles these very poorly, as it is not very good with typedef size, and the data can end up being in the wrong place.  The "fbset" utility can just tell us what these values are correctly, and the module uses it as a last resort.  Thus now the module can set up the screen correctly, and not cause a crash.  This crash happens because it is trying to access memory that has not been allocated to it.
-
 =item B< It Only Partially Renders >
 
 Yeah this can look weird.  This is likely because there's some buffering going on.  The module attempts to turn it off, but if, for some reason, it is buffering anyway, try adding the following to points in your code where displaying a full render is necessary:
@@ -8744,9 +8755,7 @@ Well, either your system doesn't have a framebuffer driver, or perhaps the modul
 
 First, make sure your system has a framebuffer by seeing if F</dev/fb0> (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev", then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with "modprobe -a drivername" (replacing "drivername" with the actual driver name).
 
-Second, ok, you have a framebuffer driver, but nothing is showing, or it's all funky looking.  Now make sure you have the program F<fbset> installed.  It's used as a last resort by this module to figure out how to draw on the screen when all else fails.  To see if you have "fbset" installed, just type "fbset -i" and it should show you information about the framebuffer.  If you get an error, then you need to install "fbset".
-
-Third, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "sparky", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "sparky" to the "video" group:
+Second, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "B<video>" group.  Let's say the account is called "sparky", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "sparky" to the "video" group:
 
    sudo usermod -a -G video sparky
 
@@ -8822,7 +8831,7 @@ A copy of this license is included in the 'LICENSE' file in this distribution.
 
 =head1 VERSION
 
-Version 6.23 (Feb 28, 2019)
+Version 6.24 (Mar 13, 2019)
 
 =head1 THANKS
 

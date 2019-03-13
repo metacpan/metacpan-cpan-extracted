@@ -1,7 +1,7 @@
 ---
 abstract: 'Calculate geographic distances.'
 author:
-  - 'Aran Clary Deltac <bluefeet@cpan.org>'
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
   Test2::V0: '0.000094'
 configure_requires:
@@ -26,34 +26,34 @@ no_index:
 provides:
   GIS::Distance:
     file: lib/GIS/Distance.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::ALT:
     file: lib/GIS/Distance/ALT.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::Constants:
     file: lib/GIS/Distance/Constants.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::Cosine:
     file: lib/GIS/Distance/Cosine.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::GreatCircle:
     file: lib/GIS/Distance/GreatCircle.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::Haversine:
     file: lib/GIS/Distance/Haversine.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::MathTrig:
     file: lib/GIS/Distance/MathTrig.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::Null:
     file: lib/GIS/Distance/Null.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::Polar:
     file: lib/GIS/Distance/Polar.pm
-    version: '0.14'
+    version: '0.15'
   GIS::Distance::Vincenty:
     file: lib/GIS/Distance/Vincenty.pm
-    version: '0.14'
+    version: '0.15'
 recommends:
   GIS::Distance::Fast: '0.09'
 requires:
@@ -61,6 +61,7 @@ requires:
   Class::Measure::Length: '0'
   Const::Fast: '0.014'
   Math::Trig: '0'
+  Scalar::Util: '0'
   namespace::clean: '0.24'
   perl: '5.008001'
   strictures: '2.000000'
@@ -68,9 +69,7 @@ resources:
   bugtracker: https://github.com/bluefeet/GIS-Distance/issues
   homepage: https://github.com/bluefeet/GIS-Distance
   repository: git://github.com/bluefeet/GIS-Distance.git
-version: '0.14'
+version: '0.15'
 x_authority: cpan:BLUEFEET
-x_contributors:
-  - 'Aran Clary Deltac <bluefeet@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

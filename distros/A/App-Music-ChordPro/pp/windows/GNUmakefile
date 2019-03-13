@@ -1,11 +1,11 @@
-# gmake file for MS Windows + CitrusPerl
-# Based on 64-bit gmake and CitrusPerl 5.24 with wxWidgets 3.0.
+# gmake file for MS Windows + StrawberryPerl
+# Based on 64-bit gmake and StrawberryPerl 5.28 with wxWidgets 3.0.
 
 SCRIPT := ../../script
 
 .ONESHELL :
 
-all :	clean chordpro.exe wxchordpro.exe iss a2crd.exe
+all :	clean chordpro.exe wxchordpro.exe iss
 
 PP := pp
 
@@ -17,11 +17,8 @@ chordpro.exe :: chordpro.pp
 # To set PATH from the makefile, we need .ONESHELL pseudo target above.
 
 wxchordpro.exe :: chordpro.pp wxchordpro.pp ../common/wxchordpro.pp
-	set path=C:\\perl\\vendor\\lib\\Alien\\wxWidgets\\msw_3_0_2_uni_gcc_1_2\\lib;%path%
+	set path=C:\\Strawberry\\perl\\site\\lib\\Alien\\wxWidgets\\msw_3_0_2_uni_gcc_3_4\\lib;%path%
 	${PP} --output=wxchordpro.exe @wxchordpro.pp ${SCRIPT}/wxchordpro.pl
-
-a2crd.exe :: a2crd.pp
-	${PP} --output=a2crd.exe @a2crd.pp ${SCRIPT}/a2crd.pl
 
 ISC := 	"C:\\Program Files (x86)\\Inno Setup 5\\Compil32.exe"
 DST :=  "C:\\Users\\Johan\\Documents\\ChordPro"
@@ -39,5 +36,5 @@ iss ::	install innosetup.iss
 # NOTE: THIS IS FOR TESTING/DEVELOPMENT ONLY.
 
 clean ::
-	-del chordpro.exe wxchordpro.exe a2crd.exe *.pp.deps
+	-del chordpro.exe wxchordpro.exe *.pp.deps
 	-del ${DST}\\*.exe

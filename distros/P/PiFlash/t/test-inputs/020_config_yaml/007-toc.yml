@@ -1,0 +1,13 @@
+# test fewer TOC entries than attachments
+foo: bar
+---
+- type: Test1
+- type: Test2
+---
+data: Test1
+foo: bar
+---
+data: Test2
+ping: pong
+---
+data: Test3

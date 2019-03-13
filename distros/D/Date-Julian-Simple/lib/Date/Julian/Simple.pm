@@ -1,6 +1,6 @@
 package Date::Julian::Simple;
 
-$Date::Julian::Simple::VERSION   = '0.06';
+$Date::Julian::Simple::VERSION   = '0.07';
 $Date::Julian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Julian::Simple - Represents Julian date.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 

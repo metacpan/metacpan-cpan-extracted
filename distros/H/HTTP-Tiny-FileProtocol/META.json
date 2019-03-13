@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -33,11 +33,21 @@
             "File::Spec" : "0",
             "HTTP::Tiny" : "0",
             "LWP::MediaTypes" : "6.02",
-            "Pod::Coverage::TrustPod" : "0",
-            "Test::LongString" : "0",
-            "Test::More" : "0",
             "perl" : "5.010001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::LongString" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTTP::Tiny::FileProtocol" : {
+         "file" : "lib/HTTP/Tiny/FileProtocol.pm",
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -52,7 +62,11 @@
          "web" : "http://github.com/reneeb/HTTP-Tiny-FileProtocol"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "version" : "0.06",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

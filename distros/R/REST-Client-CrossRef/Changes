@@ -13,3 +13,5 @@ Revision history for Perl module REST::Client::CrossRef
 0.005
     - use namespace::clean
     - test for undef when connecting to Crossref, if undef skip the last test
+0.006
+    - missing namespace::clean dependency in makefile.pl

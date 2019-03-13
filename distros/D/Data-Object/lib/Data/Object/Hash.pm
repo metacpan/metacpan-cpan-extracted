@@ -1,79 +1,688 @@
-# ABSTRACT: Hash Object for Perl 5
 package Data::Object::Hash;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  croak
+  load
+);
 
-with 'Data::Object::Role::Hash';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Collection
+  Data::Object::Rule::Comparison
+  Data::Object::Rule::Defined
+  Data::Object::Rule::List
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '~~'     => 'data',
+  '%{}'    => 'self',
+  fallback => 1
+);
 
-  my $arg  = @args > 1 && !(@args % 2) ? {@args} : $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
-  Data::Object::throw('Type Instantiation Error: Not a HashRef')
-    unless ref($arg) eq 'HASH';
+  unless (ref($arg) eq 'HASH') {
+    croak('Instantiation Error: Not a HashRef');
+  }
 
   return bless $arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new$/;
+sub self {
+  return shift;
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub roles {
+  return cast([@roles]);
+}
 
-  my $results = $self->$orig(@args);
+sub rules {
+  return cast([@rules]);
+}
 
-  return Data::Object::deduce_deep($results);
+# DISPATCHERS
 
-};
+sub clear {
+  my ($self, @args) = @_;
 
-around 'list' => fun($orig, $self, @args) {
+  try {
+    my $func = 'Data::Object::Func::Hash::Clear';
 
-  my $results = $self->$orig(@args);
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
 
-  return wantarray ? (@$results) : $results;
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
-};
+sub count {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Count';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub defined {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Defined';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub delete {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Delete';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Each';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each_key {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::EachKey';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each_n_values {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::EachNValues';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each_value {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::EachValue';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub empty {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Empty';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub eq {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Eq';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub exists {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Exists';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub filter_exclude {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::FilterExclude';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub filter_include {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::FilterInclude';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub fold {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Fold';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Ge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub get {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Get';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub grep {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Grep';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub gt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Gt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub head {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Head';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub invert {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Invert';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub iterator {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Iterator';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub join {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Join';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub keys {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Keys';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub le {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Le';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub length {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Length';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub list {
+  my ($self) = @_;
+
+  my @retv = (map cast($_), %$self);
+
+  return wantarray ? (@retv) : cast([@retv]);
+}
+
+sub lookup {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Lookup';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Lt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub map {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Map';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub merge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Merge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ne {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Ne';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub pairs {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Pairs';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub reset {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Reset';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub reverse {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Reverse';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub set {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Set';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub slice {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Slice';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub sort {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Sort';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub tail {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Tail';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub unfold {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Unfold';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub values {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Hash::Values';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Hash - Hash Object for Perl 5
+Data::Object::Hash
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Hash Class
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object::Hash;
 
   my $hash = Data::Object::Hash->new({1..4});
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -84,7 +693,54 @@ returning a new array reference. Unless stated, it may be safe to assume that
 the following methods copy, modify and return new hash references based on their
 function.
 
+=cut
+
 =head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 new
+
+  # given 1..4
+
+  my $hash = Data::Object::Hash->new(1..4);
+  my $hash = Data::Object::Hash->new({1..4});
+
+The new method expects a list or hash reference and returns a new class
+instance.
+
+=cut
+
+=head2 self
+
+  # given $hash
+
+  my $self = $hash->self();
+
+The self method returns the calling object (noop).
+
+=cut
+
+=head2 roles
+
+  # given $hash
+
+  $hash->roles;
+
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=cut
+
+=head2 rules
+
+  my $rules = $hash->rules();
+
+The rules method returns consumed rules.
+
+=cut
 
 =head2 clear
 
@@ -95,6 +751,8 @@ function.
 The clear method is an alias to the empty method. This method returns a
 L<Data::Object::Hash> object. This method is an alias to the empty method.
 
+=cut
+
 =head2 count
 
   # given {1..4}
@@ -104,14 +762,7 @@ L<Data::Object::Hash> object. This method is an alias to the empty method.
 The count method returns the total number of keys defined. This method returns
 a L<Data::Object::Number> object.
 
-=head2 data
-
-  # given $hash
-
-  $hash->data; # original value
-
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+=cut
 
 =head2 defined
 
@@ -125,6 +776,8 @@ The defined method returns true if the value matching the key specified in the
 argument if defined, otherwise returns false. This method returns a
 L<Data::Object::Number> object.
 
+=cut
+
 =head2 delete
 
   # given {1..8}
@@ -135,23 +788,7 @@ The delete method returns the value matching the key specified in the argument
 and returns the value. This method returns a data type object to be determined
 after execution.
 
-=head2 detract
-
-  # given $hash
-
-  $hash->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head2 dump
-
-  # given {1..4}
-
-  $hash->dump; # '{1=>2,3=>4}'
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 each
 
@@ -168,6 +805,8 @@ current position in the loop. This method supports codification, i.e, takes an
 argument which can be a codifiable string, a code reference, or a code data type
 object. This method returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 each_key
 
   # given {1..8}
@@ -181,6 +820,8 @@ reference supplied in the argument, passing the routine the key at the current
 position in the loop. This method supports codification, i.e, takes an argument
 which can be a codifiable string, a code reference, or a code data type object.
 This method returns a L<Data::Object::Hash> object.
+
+=cut
 
 =head2 each_n_values
 
@@ -200,6 +841,8 @@ until all values have been seen. This method supports codification, i.e, takes
 an argument which can be a codifiable string, a code reference, or a code data
 type object. This method returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 each_value
 
   # given {1..8}
@@ -214,6 +857,8 @@ position in the loop. This method supports codification, i.e, takes an argument
 which can be a codifiable string, a code reference, or a code data type object.
 This method returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 empty
 
   # given {1..8}
@@ -223,6 +868,8 @@ This method returns a L<Data::Object::Hash> object.
 The empty method drops all elements from the hash. This method returns a
 L<Data::Object::Hash> object. Note: This method modifies the hash.
 
+=cut
+
 =head2 eq
 
   # given $hash
@@ -231,6 +878,8 @@ L<Data::Object::Hash> object. Note: This method modifies the hash.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 exists
 
@@ -243,6 +892,8 @@ The exists method returns true if the value matching the key specified in the
 argument exists, otherwise returns false. This method returns a
 L<Data::Object::Number> object.
 
+=cut
+
 =head2 filter_exclude
 
   # given {1..8}
@@ -253,6 +904,8 @@ The filter_exclude method returns a hash reference consisting of all key/value
 pairs in the hash except for the pairs whose keys are specified in the
 arguments. This method returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 filter_include
 
   # given {1..8}
@@ -262,6 +915,8 @@ arguments. This method returns a L<Data::Object::Hash> object.
 The filter_include method returns a hash reference consisting of only key/value
 pairs whose keys are specified in the arguments. This method returns a
 L<Data::Object::Hash> object.
+
+=cut
 
 =head2 fold
 
@@ -274,6 +929,8 @@ pairs whose keys are paths (using dot-notation where the segments correspond to
 nested hash keys and array indices) mapped to the nested values. This method
 returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 ge
 
   # given $hash
@@ -282,6 +939,8 @@ returns a L<Data::Object::Hash> object.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 get
 
@@ -292,6 +951,8 @@ This method will throw an exception if called.
 The get method returns the value of the element in the hash whose key
 corresponds to the key specified in the argument. This method returns a data
 type object to be determined after execution.
+
+=cut
 
 =head2 grep
 
@@ -311,6 +972,8 @@ supports codification, i.e, takes an argument which can be a codifiable string,
 a code reference, or a code data type object. This method returns a
 L<Data::Object::Hash> object.
 
+=cut
+
 =head2 gt
 
   # given $hash
@@ -320,6 +983,8 @@ L<Data::Object::Hash> object.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
+=cut
+
 =head2 head
 
   # given $hash
@@ -328,6 +993,8 @@ This method will throw an exception if called.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 invert
 
@@ -339,6 +1006,8 @@ The invert method returns the hash after inverting the keys and values
 respectively. Note, keys with undefined values will be dropped, also, this
 method modifies the hash. This method returns a L<Data::Object::Hash> object.
 Note: This method modifies the hash.
+
+=cut
 
 =head2 iterator
 
@@ -355,6 +1024,8 @@ next element in the hash until all elements have been seen, at which point
 the iterator will return an undefined value. This method returns a
 L<Data::Object::Code> object.
 
+=cut
+
 =head2 join
 
   # given $hash
@@ -363,6 +1034,8 @@ L<Data::Object::Code> object.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 keys
 
@@ -373,6 +1046,8 @@ This method will throw an exception if called.
 The keys method returns an array reference consisting of all the keys in the
 hash. This method returns a L<Data::Object::Array> object.
 
+=cut
+
 =head2 le
 
   # given $hash
@@ -381,6 +1056,8 @@ hash. This method returns a L<Data::Object::Array> object.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 length
 
@@ -391,6 +1068,8 @@ This method will throw an exception if called.
 The length method returns the number of keys in the hash. This method
 return a L<Data::Object::Number> object.
 
+=cut
+
 =head2 list
 
   # given $hash
@@ -399,6 +1078,8 @@ return a L<Data::Object::Number> object.
 
 The list method returns a shallow copy of the underlying hash reference as an
 array reference. This method return a L<Data::Object::Array> object.
+
+=cut
 
 =head2 lookup
 
@@ -416,6 +1097,8 @@ can not be resolved. Please note, keys containing dots (periods) are not
 handled. This method returns a data type object to be determined after
 execution.
 
+=cut
+
 =head2 lt
 
   # given $hash
@@ -424,6 +1107,8 @@ execution.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 map
 
@@ -439,6 +1124,8 @@ current position in the loop and returning a new hash reference containing the
 elements for which the argument returns a value or non-empty list. This method
 returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 merge
 
   # given {1..8}
@@ -452,14 +1139,7 @@ merges hash references only, all other data types are assigned with precendence
 given to the value being merged. This method returns a L<Data::Object::Hash>
 object.
 
-=head2 methods
-
-  # given $hash
-
-  $hash->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
+=cut
 
 =head2 ne
 
@@ -470,15 +1150,7 @@ returns a L<Data::Object::Array> object.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
-=head2 new
-
-  # given 1..4
-
-  my $hash = Data::Object::Hash->new(1..4);
-  my $hash = Data::Object::Hash->new({1..4});
-
-The new method expects a list or hash reference and returns a new class
-instance.
+=cut
 
 =head2 pairs
 
@@ -490,14 +1162,7 @@ The pairs method is an alias to the pairs_array method. This method returns a
 L<Data::Object::Array> object. This method is an alias to the pairs_array
 method.
 
-=head2 print
-
-  # given {1..4}
-
-  $hash->print; # '{1=>2,3=>4}'
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
+=cut
 
 =head2 reset
 
@@ -509,6 +1174,8 @@ The reset method returns nullifies the value of each element in the hash. This
 method returns a L<Data::Object::Hash> object. Note: This method modifies the
 hash.
 
+=cut
+
 =head2 reverse
 
   # given {1..8,9,undef}
@@ -519,24 +1186,7 @@ The reverse method returns a hash reference consisting of the hash's keys and
 values inverted. Note, keys with undefined values will be dropped. This method
 returns a L<Data::Object::Hash> object.
 
-=head2 roles
-
-  # given $hash
-
-  $hash->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 say
-
-  # given {1..4}
-
-  $hash->say; # '{1=>2,3=>4}\n'
-
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
+=cut
 
 =head2 set
 
@@ -551,6 +1201,8 @@ the key specified by the argument after updating it to the value of the second
 argument. This method returns a data type object to be determined after
 execution.
 
+=cut
+
 =head2 slice
 
   # given {1..8}
@@ -561,6 +1213,8 @@ The slice method returns a hash reference containing the elements in the hash
 at the key(s) specified in the arguments. This method returns a
 L<Data::Object::Hash> object.
 
+=cut
+
 =head2 sort
 
   # given $hash
@@ -569,6 +1223,8 @@ L<Data::Object::Hash> object.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 tail
 
@@ -579,24 +1235,7 @@ This method will throw an exception if called.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
-=head2 throw
-
-  # given $hash
-
-  $hash->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
-
-=head2 type
-
-  # given $hash
-
-  $hash->type; # HASH
-
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 unfold
 
@@ -610,6 +1249,8 @@ where the segments correspond to nested hash keys and array indices), are used
 to created nested hash and/or array references. This method returns a
 L<Data::Object::Hash> object.
 
+=cut
+
 =head2 values
 
   # given {1..8}
@@ -620,57 +1261,15 @@ L<Data::Object::Hash> object.
 The values method returns an array reference consisting of the values of the
 elements in the hash. This method returns a L<Data::Object::Array> object.
 
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Hash>
-role and implements proxy methods as documented herewith.
-
-=head1 CODIFICATION
-
-Certain methods provided by the this module support codification, a process
-which converts a string argument into a code reference which can be used to
-supply a callback to the method called. A codified string can access its
-arguments by using variable names which correspond to letters in the alphabet
-which represent the position in the argument list. For example:
-
-  $hash->example('$a + $b * $c', 100);
-
-  # if the example method does not supply any arguments automatically then
-  # the variable $a would be assigned the user-supplied value of 100,
-  # however, if the example method supplies two arguments automatically then
-  # those arugments would be assigned to the variables $a and $b whereas $c
-  # would be assigned the user-supplied value of 100
-
-  # e.g.
-
-  $hash->each('the value at $key is $value');
-
-  # or
-
-  $hash->each_n_values(4, 'the value at $key0 is $value0');
-
-  # etc
-
-Any place a codified string is accepted, a coderef or L<Data::Object::Code>
-object is also valid. Arguments are passed through the usual C<@_> list.
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Collection>
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -679,14 +1278,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
-
-=item *
-
-L<Data::Object::Role::List>
 
 =item *
 
@@ -702,101 +1293,28 @@ L<Data::Object::Role::Type>
 
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
+L<Data::Object::Rule::Collection>
 
 =item *
 
-L<Data::Object::Class>
+L<Data::Object::Rule::Comparison>
 
 =item *
 
-L<Data::Object::Class::Syntax>
+L<Data::Object::Rule::Defined>
 
 =item *
 
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::List>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

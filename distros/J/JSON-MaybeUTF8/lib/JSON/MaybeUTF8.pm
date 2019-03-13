@@ -1,9 +1,10 @@
 package JSON::MaybeUTF8;
+# ABSTRACT: Simple wrapper for explicit JSON Unicode text/UTF-8 byte functions
 
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 =head1 NAME
 
@@ -31,6 +32,8 @@ This is a trivial wrapper around two other modules.
 
 =cut
 
+use feature qw(state);
+
 use JSON::MaybeXS;
 use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 
@@ -46,8 +49,6 @@ our %EXPORT_TAGS = (
     v1 => [ @EXPORT_OK ],
 );
 
-my $json = JSON::MaybeXS->new;
-
 =head2 decode_json_utf8
 
 Given a UTF-8-encoded JSON byte string, returns a Perl data
@@ -55,7 +56,10 @@ structure.
 
 =cut
 
-sub decode_json_utf8 { $json->decode(decode_utf8(shift)) }
+sub decode_json_utf8 {
+    state $json = JSON::MaybeXS->new;
+    $json->decode(decode_utf8(shift))
+}
 
 =head2 encode_json_utf8
 
@@ -64,7 +68,10 @@ byte string.
 
 =cut
 
-sub encode_json_utf8 { encode_utf8($json->encode(shift)) }
+sub encode_json_utf8 {
+    state $json = JSON::MaybeXS->new;
+    encode_utf8($json->encode(shift))
+}
 
 =head2 decode_json_text
 
@@ -73,7 +80,10 @@ Perl's internal encoding), returns a Perl data structure.
 
 =cut
 
-sub decode_json_text { $json->decode(shift) }
+sub decode_json_text {
+    state $json = JSON::MaybeXS->new;
+    $json->decode(shift)
+}
 
 =head2 encode_json_text
 
@@ -82,7 +92,10 @@ of Unicode characters (in Perl's internal encoding).
 
 =cut
 
-sub encode_json_text { $json->encode(shift) }
+sub encode_json_text {
+    state $json = JSON::MaybeXS->new;
+    $json->encode(shift)
+}
 
 1;
 

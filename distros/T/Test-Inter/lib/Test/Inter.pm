@@ -1,5 +1,5 @@
 package Test::Inter;
-# Copyright (c) 2010-2015 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -13,7 +13,7 @@ use File::Basename;
 use IO::File;
 
 our($VERSION);
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 ###############################################################################
 # BASE METHODS
@@ -51,6 +51,8 @@ sub new {
                'mode'     => 'test', # mode to run script in
                'width'    => 80,     # width of terminal
                'features' => {},     # a list of available features
+               'use_lib'  => 'on',   # whether to run 'use lib' when loading
+                                     # this module
 
                'skipall'  => '',     # the reason for skipping all
                                      # remaining tests
@@ -127,7 +129,23 @@ sub new {
    $$self{'testdir'} = $TDIR;
    $$self{'libdir'}  = \@LIBDIR;
 
+   $self->use_lib();
+
    return $self;
+}
+
+sub use_lib {
+   my($self,$val) = @_;
+   if (defined $val) {
+      $$self{'use_lib'} = $val;
+      return;
+   }
+
+   if ($$self{'use_lib'} eq 'on') {
+      foreach my $dir (@{ $$self{'libdir'} }) {
+         eval "use lib '$dir'";
+      }
+   }
 }
 
 sub testdir {

@@ -4,8 +4,8 @@ use warnings;
 use Test::More;
 use Test::TypeTiny;
 
-use Data::Object qw(deduce);
-use Data::Object::Library qw(
+use Data::Object::Export qw(deduce);
+use Data::Object::Config::Library qw(
   HashObj
   HashObject
   Object

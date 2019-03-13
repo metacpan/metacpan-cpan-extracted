@@ -8,7 +8,7 @@ my($valid,$vers);
 
 if ($ENV{'RELEASE_TESTING'}) {
    my $dir = getcwd();
-   if ($dir =~ m,(?:/|^)Test\-Inter\-(\d+\.\d+)/t,) {
+   if ($dir =~ m,(?:/|^)Test\-Inter\-(\d+\.\d+),) {
       $vers  = $1;
       $valid = 1;
    } else {

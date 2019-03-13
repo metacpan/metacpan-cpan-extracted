@@ -1,5 +1,5 @@
 #
-# $Id: Cluster.pm,v 07f83089ef07 2018/09/17 10:14:06 gomor $
+# $Id: Cluster.pm,v df6bb56e9d04 2019/01/22 07:59:49 gomor $
 #
 # client::elasticsearch::cluster Brik
 #
@@ -15,7 +15,7 @@ use base qw(Metabrik::Client::Elasticsearch);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 07f83089ef07 $',
+      revision => '$Revision: df6bb56e9d04 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -34,6 +34,7 @@ sub brik_properties {
          put_settings => [ qw(settings) ],
          exclude => [ qw(node) ],
          include => [ qw(node) ],
+         reset_settings_transient_cluster_routing_allocation => [ ],
       },
    };
 }
@@ -151,6 +152,26 @@ sub include {
    return $self->put_settings($settings);
 }
 
+#
+# PUT _cluster/settings
+# {
+#   "transient": {
+#     "cluster.routing.allocation.*": null
+#   }
+# }
+#
+sub reset_settings_transient_cluster_routing_allocation {
+   my $self = shift;
+
+   my $settings = {
+      transient => {
+         'cluster.routing.allocation.*' => undef,
+      },
+   };
+
+   return $self->put_settings($settings);
+}
+
 1;
 
 __END__
@@ -161,7 +182,7 @@ Metabrik::Client::Elasticsearch::Cluster - client::elasticsearch::cluster Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

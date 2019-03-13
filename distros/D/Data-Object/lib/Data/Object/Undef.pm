@@ -1,65 +1,187 @@
-# ABSTRACT: Undef Object for Perl 5
 package Data::Object::Undef;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  croak
+  load
+);
 
-with 'Data::Object::Role::Undef';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Comparison
+  Data::Object::Rule::Defined
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '0+'     => 'data',
+  'bool'   => 'data',
+  '~~'     => 'data',
+  fallback => 1
+);
 
-  my $arg  = $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
-  Data::Object::throw('Type Instantiation Error: Not an Undefined value')
-    if defined $arg;
+  if (defined $arg) {
+    croak('Instantiation Error: Not an Undef');
+  }
 
   return bless \$arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new$/;
+sub roles {
+  return cast([@roles]);
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub rules {
+  return cast([@rules]);
+}
 
-  my $results = $self->$orig(@args);
+# DISPATCHERS
 
-  return Data::Object::deduce_deep($results);
+sub defined {
+  my ($self, @args) = @_;
 
-};
+  try {
+    my $func = 'Data::Object::Func::Undef::Defined';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub eq {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Undef::Eq';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub gt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Undef::Gt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Undef::Ge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Undef::Lt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub le {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Undef::Le';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ne {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Undef::Ne';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Undef - Undef Object for Perl 5
+Data::Object::Undef
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Undef Class
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -67,111 +189,20 @@ version 0.61
 
   my $undef = Data::Object::Undef->new(undef);
 
+=cut
+
 =head1 DESCRIPTION
 
 Data::Object::Undef provides routines for operating on Perl 5 undefined
 data. Undef methods work on undefined values.
 
+=cut
+
 =head1 METHODS
 
-=head2 data
+This package implements the following methods.
 
-  # given $undef
-
-  $undef->data; # original value
-
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
-
-=head2 defined
-
-  # given undef
-
-  $undef->defined ? 'Yes' : 'No'; # No
-
-The defined method always returns false. This method returns a
-L<Data::Object::Number> object.
-
-=head2 detract
-
-  # given $undef
-
-  $undef->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head2 dump
-
-  # given $undef
-
-  $undef->dump; # 'undef'
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
-
-=head2 eq
-
-  # given $undef
-
-  $undef->eq; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
-
-=head2 ge
-
-  # given $undef
-
-  $undef->ge; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
-
-=head2 gt
-
-  # given $undef
-
-  $undef->gt; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
-
-=head2 le
-
-  # given $undef
-
-  $undef->le; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
-
-=head2 lt
-
-  # given $undef
-
-  $undef->lt; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
-
-=head2 methods
-
-  # given $undef
-
-  $undef->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 ne
-
-  # given $undef
-
-  $undef->ne; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=cut
 
 =head2 new
 
@@ -181,14 +212,7 @@ This method will throw an exception if called.
 
 The new method expects an undefined value and returns a new class instance.
 
-=head2 print
-
-  # given $undef
-
-  $undef->print; # 'undef'
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
+=cut
 
 =head2 roles
 
@@ -199,53 +223,100 @@ returns true. This method returns a L<Data::Object::Number> object.
 The roles method returns the list of roles attached to object. This method
 returns a L<Data::Object::Array> object.
 
-=head2 say
+=cut
+
+=head2 rules
+
+  my $rules = $undef->rules();
+
+The rules method returns consumed rules.
+
+=cut
+
+=head2 defined
+
+  # given undef
+
+  $undef->defined ? 'Yes' : 'No'; # No
+
+The defined method always returns false. This method returns a
+L<Data::Object::Number> object.
+
+=cut
+
+=head2 eq
 
   # given $undef
 
-  $undef->say; # 'undef\n'
+  $undef->eq; # exception thrown
 
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
 
-=head2 throw
+=cut
 
-  # given $undef
-
-  $undef->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
-
-=head2 type
+=head2 gt
 
   # given $undef
 
-  $undef->type; # UNDEF
+  $undef->gt; # exception thrown
 
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
 
-=head1 COMPOSITION
+=cut
 
-This package inherits all functionality from the L<Data::Object::Role::Undef>
-role and implements proxy methods as documented herewith.
+=head2 ge
+
+  # given $undef
+
+  $undef->ge; # exception thrown
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=cut
+
+=head2 lt
+
+  # given $undef
+
+  $undef->lt; # exception thrown
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=cut
+
+=head2 le
+
+  # given $undef
+
+  $undef->le; # exception thrown
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=cut
+
+=head2 ne
+
+  # given $undef
+
+  $undef->ne; # exception thrown
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -254,10 +325,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
 
 =item *
 
@@ -271,107 +338,22 @@ L<Data::Object::Role::Throwable>
 
 L<Data::Object::Role::Type>
 
-=item *
-
-L<Data::Object::Role::Value>
-
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
+L<Data::Object::Rule::Comparison>
 
 =item *
 
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::Defined>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

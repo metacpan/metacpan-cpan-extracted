@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.5.2');
+our $VERSION = version->new('0.5.3');
 our $EXIT    = 1;
 
 has options => (
@@ -328,7 +328,7 @@ sub process {
             }
             if ($self->has_conf_section
                 && $self->conf_section
-                && $self->conf_section == $opt_name
+                && $self->conf_section eq $opt_name
                 && @args_orig
             ) {
                 $self->opt(
@@ -600,7 +600,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.5.2.
+This documentation refers to Getopt::Alt version 0.5.3.
 
 =head1 SYNOPSIS
 
@@ -905,7 +905,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.5.2 and earlier
+B<Note>: This is different from version 0.5.3 and earlier
 
 =head1 DIAGNOSTICS
 

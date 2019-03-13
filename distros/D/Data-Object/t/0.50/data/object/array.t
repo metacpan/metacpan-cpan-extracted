@@ -4,13 +4,12 @@ use Test::More;
 
 use_ok 'Data::Object::Array';
 
-ok Data::Object::Array->does('Data::Object::Role::Collection');
-ok Data::Object::Array->does('Data::Object::Role::Comparison');
-ok Data::Object::Array->does('Data::Object::Role::Defined');
+ok Data::Object::Array->does('Data::Object::Rule::Collection');
+ok Data::Object::Array->does('Data::Object::Rule::Comparison');
+ok Data::Object::Array->does('Data::Object::Rule::Defined');
 ok Data::Object::Array->does('Data::Object::Role::Detract');
 ok Data::Object::Array->does('Data::Object::Role::Dumper');
-ok Data::Object::Array->does('Data::Object::Role::Item');
-ok Data::Object::Array->does('Data::Object::Role::List');
+ok Data::Object::Array->does('Data::Object::Rule::List');
 ok Data::Object::Array->does('Data::Object::Role::Output');
 ok Data::Object::Array->does('Data::Object::Role::Throwable');
 ok Data::Object::Array->does('Data::Object::Role::Type');
@@ -87,13 +86,17 @@ can_ok 'Data::Object::Array', 'values';
 
 subtest 'test instantiation' => sub {
   eval { Data::Object::Array->new };
-  like $@, qr/Type Instantiation Error/;
+  like $@, qr/Instantiation Error/;
 
   eval { Data::Object::Array->new(1) };
-  like $@, qr/Type Instantiation Error/;
+  like $@, qr/Instantiation Error/;
 
-  my $a1 = Data::Object::Array->new(1, 2);
-  is_deeply $a1, [1, 2];
+  # argument lists are deprecated
+  # my $a1 = Data::Object::Array->new(1, 2);
+  # is_deeply $a1, [1, 2];
+
+  eval { Data::Object::Array->new(1, 2) };
+  like $@, qr/Instantiation Error/;
 
   my $a2 = Data::Object::Array->new([1, 2]);
   is_deeply $a2, [1, 2];

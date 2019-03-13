@@ -1,886 +1,549 @@
-# ABSTRACT: Object Orientation for Perl 5
 package Data::Object;
+
+use 5.014;
 
 use strict;
 use warnings;
 
-use 5.014;
+use parent 'Data::Object::Config';
 
-use Carp;
-use Scalar::Util;
-use Sub::Quote;
+our $VERSION = '0.90'; # VERSION
 
-use Exporter qw(import);
-
-our $NAMESPACE = 'Data::Object';
-
-our $VERSION = '0.61'; # VERSION
-
-my @CORE = grep !/^(data|type)_/, our @EXPORT_OK = qw(
-  codify
-  const
-  data_array
-  data_code
-  data_float
-  data_hash
-  data_integer
-  data_number
-  data_regexp
-  data_scalar
-  data_string
-  data_undef
-  data_universal
-  deduce
-  deduce_deep
-  deduce_type
-  detract
-  detract_deep
-  immutable
-  load
-  prototype
-  reify
-  throw
-  type_array
-  type_code
-  type_float
-  type_hash
-  type_integer
-  type_number
-  type_regexp
-  type_scalar
-  type_string
-  type_undef
-  type_universal
-);
-
-our %EXPORT_TAGS = (
-  all  => [@EXPORT_OK],
-  core => [@CORE],
-  data => [grep m/^data_/, @EXPORT_OK],
-  type => [grep m/^type_/, @EXPORT_OK],
-);
-
-sub new {
-
-  shift and goto &deduce_deep;
-
-}
-
-sub const ($$) {
-
-  my $name = shift;
-  my $data = shift;
-
-  my $class = caller(0);
-  $class = caller(1) if $NAMESPACE eq $class;
-
-  my $fqsn = $name =~ /(::|')/ ? $name : "${class}::${name}";
-
-  no strict 'refs';
-  no warnings 'redefine';
-
-  *{$fqsn} = sub () { (ref $data eq "CODE") ? goto &$data : $data };
-
-  return $data;
-
-}
-
-sub codify ($;$) {
-
-  my $code = shift;
-  my $refs = shift;
-
-  $code = reify($code);
-
-  if ($code->type eq 'UNDEF') {
-
-    # as you were !!!
-    $code = q{ @_ };
-
-  }
-
-  elsif ($code->type eq 'CODE') {
-
-    my $func = $code;
-
-    # perform inception !!!
-    $refs->{'$exec'} = \$func;
-    $code = q{ goto &{$exec} };
-
-  }
-
-  # (facepalm) purely for backwards compatibility
-  my $vars = sprintf 'my ($%s) = @_;', join ',$', 'a' .. 'z';
-  my $body = sprintf '%s do { %s; }', $vars, "$code" // '@_';
-
-  my $func = Sub::Quote::quote_sub($body, ref($refs) ? $refs : {});
-
-  return $func;
-
-}
-
-sub immutable ($) {
-
-  my $class = load("${NAMESPACE}::Immutable");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub load ($) {
-
-  my $class = shift;
-
-  my $failed = !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
-  my $loaded;
-
-  my $error = do {
-    local $@;
-    $loaded = $class->can('new') || eval "require $class; 1";
-    $@;
-  };
-
-  croak "Error attempting to load $class: $error"
-    if $error
-    or $failed
-    or not $loaded;
-
-  return $class;
-
-}
-
-sub prototype (@) {
-
-  my $class = load("${NAMESPACE}::Prototype");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub reify ($) {
-
-  goto &deduce_deep;
-
-}
-
-sub throw (@) {
-
-  my $class = load("${NAMESPACE}::Exception");
-
-  unshift @_, $class and goto $class->can('throw');
-
-}
-
-sub data_array ($) {
-
-  my $class = load("${NAMESPACE}::Array");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_code ($) {
-
-  my $class = load("${NAMESPACE}::Code");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_float ($) {
-
-  my $class = load("${NAMESPACE}::Float");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_hash ($) {
-
-  my $class = load("${NAMESPACE}::Hash");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_integer ($) {
-
-  my $class = load("${NAMESPACE}::Integer");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_number ($) {
-
-  my $class = load("${NAMESPACE}::Number");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_regexp ($) {
-
-  my $class = load("${NAMESPACE}::Regexp");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_scalar ($) {
-
-  my $class = load("${NAMESPACE}::Scalar");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_string ($) {
-
-  my $class = load("${NAMESPACE}::String");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_undef (;$) {
-
-  my $class = load("${NAMESPACE}::Undef");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub data_universal ($) {
-
-  my $class = load("${NAMESPACE}::Universal");
-
-  unshift @_, $class and goto $class->can('new');
-
-}
-
-sub deduce ($) {
-
-  my $data = shift;
-
-  # return undefined
-  if (not defined $data) {
-    return data_undef $data;
-  }
-
-  # handle blessed
-  elsif (Scalar::Util::blessed($data)) {
-    return data_regexp $data if $data->isa('Regexp');
-    return $data;
-  }
-
-  # handle defined
-  else {
-
-    # handle references
-    if (ref $data) {
-      return data_array $data if 'ARRAY' eq ref $data;
-      return data_hash $data  if 'HASH' eq ref $data;
-      return data_code $data  if 'CODE' eq ref $data;
-    }
-
-    # handle non-references
-    else {
-      if (Scalar::Util::looks_like_number($data)) {
-        return data_float $data  if $data =~ /\./;
-        return data_number $data if $data =~ /^\d+$/;
-        return data_integer $data;
-      }
-      else {
-        return data_string $data;
-      }
-    }
-
-    # handle unhandled
-    return data_scalar $data;
-
-  }
-
-  # fallback
-  return data_undef $data;
-
-}
-
-sub deduce_deep {
-
-  my @data = @_;
-
-  for my $data (@data) {
-    my $type;
-
-    $data = deduce($data);
-    $type = deduce_type($data);
-
-    if ($type and $type eq 'HASH') {
-      for my $i (keys %$data) {
-        my $val = $data->{$i};
-        $data->{$i} = ref($val) ? deduce_deep($val) : deduce($val);
-      }
-    }
-
-    if ($type and $type eq 'ARRAY') {
-      for (my $i = 0; $i < @$data; $i++) {
-        my $val = $data->[$i];
-        $data->[$i] = ref($val) ? deduce_deep($val) : deduce($val);
-      }
-    }
-  }
-
-  return wantarray ? (@data) : $data[0];
-
-}
-
-sub deduce_type ($) {
-
-  my $data = shift;
-
-  $data = deduce $data;
-
-  return "ARRAY" if $data->isa("${NAMESPACE}::Array");
-  return "HASH"  if $data->isa("${NAMESPACE}::Hash");
-  return "CODE"  if $data->isa("${NAMESPACE}::Code");
-
-  return "FLOAT"   if $data->isa("${NAMESPACE}::Float");
-  return "NUMBER"  if $data->isa("${NAMESPACE}::Number");
-  return "INTEGER" if $data->isa("${NAMESPACE}::Integer");
-
-  return "STRING" if $data->isa("${NAMESPACE}::String");
-  return "SCALAR" if $data->isa("${NAMESPACE}::Scalar");
-  return "REGEXP" if $data->isa("${NAMESPACE}::Regexp");
-
-  return "UNDEF"     if $data->isa("${NAMESPACE}::Undef");
-  return "UNIVERSAL" if $data->isa("${NAMESPACE}::Universal");
-
-  return undef;
-
-}
-
-sub detract ($) {
-
-  my $data = shift;
-
-  $data = deduce $data;
-
-  my $type = deduce_type $data;
-
-INSPECT:
-  return $data unless $type;
-
-  return [@$data] if $type eq 'ARRAY';
-  return {%$data} if $type eq 'HASH';
-  return $$data if $type eq 'REGEXP';
-  return $$data if $type eq 'FLOAT';
-  return $$data if $type eq 'NUMBER';
-  return $$data if $type eq 'INTEGER';
-  return $$data if $type eq 'STRING';
-  return undef  if $type eq 'UNDEF';
-
-  if ($type eq 'SCALAR' or $type eq 'UNIVERSAL') {
-
-    $type = Scalar::Util::reftype($data) // '';
-
-    return [@$data] if $type eq 'ARRAY';
-    return {%$data} if $type eq 'HASH';
-    return $$data if $type eq 'FLOAT';
-    return $$data if $type eq 'INTEGER';
-    return $$data if $type eq 'NUMBER';
-    return $$data if $type eq 'REGEXP';
-    return $$data if $type eq 'SCALAR';
-    return $$data if $type eq 'STRING';
-    return undef  if $type eq 'UNDEF';
-
-    if ($type eq 'REF') {
-      $type = deduce_type($data = $$data) and goto INSPECT;
-    }
-
-  }
-
-  if ($type eq 'CODE') {
-    return sub { goto &{$data} };
-  }
-
-  return undef;
-
-}
-
-sub detract_deep {
-
-  my @data = @_;
-
-  for my $data (@data) {
-    $data = detract($data);
-
-    if ($data and 'HASH' eq ref $data) {
-      for my $i (keys %$data) {
-        my $val = $data->{$i};
-        $data->{$i} = ref($val) ? detract_deep($val) : detract($val);
-      }
-    }
-
-    if ($data and 'ARRAY' eq ref $data) {
-      for (my $i = 0; $i < @$data; $i++) {
-        my $val = $data->[$i];
-        $data->[$i] = ref($val) ? detract_deep($val) : detract($val);
-      }
-    }
-  }
-
-  return wantarray ? (@data) : $data[0];
-
-}
-
-{
-
-  # aliases
-  no warnings 'once';
-
-  *type_array     = *data_array;
-  *type_code      = *data_code;
-  *type_float     = *data_float;
-  *type_hash      = *data_hash;
-  *type_integer   = *data_integer;
-  *type_number    = *data_number;
-  *type_regexp    = *data_regexp;
-  *type_scalar    = *data_scalar;
-  *type_string    = *data_string;
-  *type_undef     = *data_undef;
-  *type_universal = *data_universal;
-
-}
+# BUILD
+# METHODS
 
 1;
-
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object - Object Orientation for Perl 5
+Data::Object
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Modern Perl Development Framework and Standard Library
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object;
 
+  fun hello_world($name) {
+    say "Hello, $name.";
+  }
+
+=cut
+
+=head1 DESCRIPTION
+
+Data-Object is a robust development framework for modern Perl development,
+embracing Perl's multi-paradigm programming nature, flexibility and vast
+ecosystem that millions of engineers already know and love.
+
+This framework aims to provide a standardized and cohesive set of classes,
+types, objects, functions, patterns, and tools for jump-starting application
+development with modern conventions and best practices.
+
+The power of this framework comes from the extendable (yet fully optional) type
+library which is integrated into the object system and type-constrainable
+subroutine signatures (supporting functions, methods and method modifiers). We
+also provide classes which wrap Perl 5 native data types and provides methods
+for operating on the data.
+
+Contrary to popular opinion, modern Perl programming can be extremely
+structured and quite beautiful, leveraging many advanced concepts found on
+other languages, and some which aren't. Abilities like method modification
+(augmenting), reflection, advanced object-orientation, type-constrainable
+object attributes, type-constrainable subroutine signatures (with named and
+positional arguments), as well roles (similar to mixins or interfaces in other
+languages).
+
+=cut
+
+=head1 INSTALLATION
+
+If you have cpanm, you only need one line:
+
+  $ cpanm -qn Data::Object
+
+If you don't have cpanm, get it! It takes less than a minute, otherwise:
+
+  $ curl -L https://cpanmin.us | perl - -qn Data::Object
+
+Add C<Data::Object> to the list of dependencies in C<cpanfile>:
+
+  requires "Data::Object" => "0.90"; # 0.90 or newer
+
+If cpanm doesn't have permission to install modules to the current perl, it
+will automatically set up and install to a local::lib in your home directory.
+See the L<local::lib|local::lib> documentation for details on enabling it in
+your environment. We recommend using a
+L<Perlbrew|https://github.com/gugod/app-perlbrew> or
+L<Plenv|https://github.com/tokuhirom/plenv> environment. These tools will help
+you manage multiple perl installations in your C<$HOME> directory. They are
+completely isolated perl installations.
+
+=cut
+
+=head1 GETTING STARTED
+
+This creates a class representing a person which greets another person.
+
+  package Person;
+
+  use Data::Object Class, App;
+
+  has name => (
+    is => 'ro',
+    isa => 'Str'
+  );
+
+  method hello(Person $person) {
+    return 'Hello '. $person->name .', How are you?';
+  }
+
+  1;
+
+This creates a function that returns how one person greet another person.
+
+  #!perl
+
+  use Person;
+
+  use Data::Object Core, App;
+
+  fun greetings(Person $p1, Person $p2) {
+    return $p1->hello($p2);
+  }
+
+  my $p1 = Person->new(name => 'Jane');
+  my $p2 = Person->new(name => 'June');
+
+  say(greetings($p1, $p2)); # Hey June
+
+This demonstrates much of the power of this framework in one simple example. If
+you're new to Perl, the code above creates a class with a single (read-only
+string) attribute called C<name> and a single method called C<hello>, then
+registers the class in a user-defined type-library called C<App> where all
+user-defined type constraints will be stored and retrieved (and reified).
+
+The class method takes a single argument which must be an instance of the class
+being created. The C<main> program (namespace) initializes the framework and
+specifies the user-defined type library to use in the creation of a single
+function C<greetings> which takes two arguments which must both be instances of
+the class we just created. It's important to note that in order for the code
+above to execute, the C<App> type library must exist. This could be as simple
+as:
+
+  package App;
+
+  use Type::Library -base;
+
+  1;
+
+That having been explained, it's also important to note that while this example
+showcases much of what's possible with this framework, all of the
+sophistication is totally optional.  For example, method and function
+signatures are optionally typed, so the declarations would work just as well
+without the types specified. In fact, you could then remove the C<App> type
+library declarations from both packages and even resort rewriting the method
+and function as plain-old Perl subroutines. This flexibility to be able to
+enable more advanced capabilities is common in the Perl ecosystem and is one of
+the things we love most. The wiring-up of things! If you're familiar with Perl,
+this framework is in-part the wiring up of L<Moo> (with L<Moose> support),
+L<Type::Tiny>, L<Function::Parameters>, L<Try::Tiny> and data objects in a
+cooperative and cohesive way that feels like it's native to the language.
+
+=cut
+
+=head1 PACKAGE CLASS
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/object');
+
+  "$space"
+  # Data::Object
+
+  $space->path;
+  # Data/Object
+
+  $space->file;
+  # Data/Object.pm
+
+  $space->children;
+  # ['Data/Object/Array.pm', ...]
+
+The package class, L<Data::Object::Space>, provides methods of loading,
+blessing, inspecting, and otherwise operating on packages.
+
+=cut
+
+=head1 TYPE SYSTEM
+
+  package Config;
+
+  use Data::Object Class;
+
+  has 'data' => (
+    is  => 'ro',
+    isa => 'HashRef',
+    req => 1
+  );
+
+  method json() {
+    return new_json;
+  }
+
+  method save(PathObj $path) {
+    return $path->write($self->data->dump);
+  }
+
+  1;
+
+The type system and core type library offered in
+L<Data::Object::Config::Library> provide type constraints for the most common
+types of objects and values. These type constraints can be declared in class
+attribute declarations as well as in method and function signatures.
+
+The type-constrainable aspects of the Data-Object framework are context-aware,
+i.e. the framework provides mechanisms for mapping user-defined type libraries
+to namespaces so that user-defined types can be used in type validation
+alongside core types. This prevents any need to extend the core type library
+and prevents type constraint naming collisions across applications.
+
+=cut
+
+=head1 OBJECT SYSTEM
+
+  package App::Person;
+
+  use Data::Object Class, App;
+
+  has 'fname';
+  has 'lname';
+
+  has 'parents' => (
+    is  => 'ro',
+    isa => 'Tuple[AppPerson, AppPerson]',
+    lzy => 1
+  );
+
+
+The underlying object system uses L<Moo> which is a light-weight L<Moose>
+compatible framework for declaring classes, attributes, and method-modifiers,
+as well as constructing objects, with clear and concise syntax. Data-Object
+takes this functionality further by providing an integrated type system and
+syntactic sugar around the class attribute declaration.
+
+=cut
+
+=head1 TYPE BUILDER
+
+  package App::Type::Label;
+
+  use parent 'Data::Object::Type';
+
+  sub name {
+    return 'Label';
+  }
+
+  sub parent {
+    return 'Str';
+  }
+
+  sub coercions {
+    my $coercions = [];
+
+    push @$coercions, 'Str', sub { shift =~ s/\W//gr };
+
+    return $coercions;
+  }
+
+  sub validation {
+    my ($self, $data) = @_;
+
+    return if !$data;
+
+    return $data !~ /\W/;
+  }
+
+  1;
+
+The type system provided is based on the L<Type::Tiny> system and takes
+advantage of many of the features and functions available, such as coercion and
+parameterization. The L<Data::Object::Config::Library> library is itself a
+L<Type::Library>, and extends the L<Types::Standard>, L<Types::TypeTiny>,
+L<Types::Common::Numeric> and L<Types::Common::String> libraries, and provides
+additional types based on the classes, roles and rules offered as part of this
+framework.
+
+Many of the Data-Object type constraints are defined via an abstract base
+class, L<Data::Object::Type>, which makes the super-class a type-constraint
+builder, which is then registered with the Data-Object type library. This base
+class provides a pattern for easily defining type constraints with coercions
+and which might be parameterized that can be registered in any L<Type::Library>
+library.
+
+=cut
+
+=head1 ROLES AND RULES
+
+  package Persona;
+
+  use Data::Object Rule;
+
+  requires 'id';
+  requires 'fname';
+  requires 'lname';
+  requires 'created';
+  requires 'updated';
+
+  around created() {
+    # do something ...
+    return $self->$orig;
+  }
+
+  around updated() {
+    # do something ...
+    return $self->$orig;
+  }
+
+  1;
+
+Roles offer us a way to reuse behavior without relying on inheritance. Rules
+are roles but meant to establish by convention the separation of interface
+declaration and behavior abstraction, i.e. rules are where we put the
+“interface” rules, and roles are where we put the behavior.
+
+=cut
+
+=head1 SINGLETON SUPPORT
+
+  package App::Config;
+
+  use Data::Object State;
+
+  extends 'Config';
+
+  has 'datastore';
+  has 'environment';
+  has 'servers';
+
+  1;
+
+Occasionally it makes sense to declare some persistent state and the
+L<Data::Object::State> class allows you to do that with all of the features and
+benefits of a L<Moo> or L<Moose> derived object.
+
+=cut
+
+=head1 PODISH PARSER
+
+  package App::Command;
+
+  use Data::Object Data;
+
+  =help
+
+  fetches results from the api
+
+  =cut
+
+  my $data = Data::Object::Data->new;
+
+  my $help = $data->content('help');
+
+  1;
+
+The pod-ish parser, offered in L<Data::Object::Data>, allows you to parse files
+and packages and extract pod-like sections of information. This is a powerful
+ability that rethinks what, why and how we use POD (plain old documentation)
+data, and opens up your application to make use of this data in cool new ways.
+
+=cut
+
+=head1 DISPATCHERS
+
+  use Data::Object::Dispatch;
+
+  my $package = 'Logger';
+
+  my $dispatch1 = Data::Object::Dispatch->new($package);
+
+  $dispatch1->call(@args);
+
+  my $dispatch2 = Data::Object::Dispatch->new($package, 'log', time);
+
+  $dispatch2->call('Something went wrong');
+
+  # i.e. Logger::log(time, 'Something went wrong')
+
+Dispatchers are basically closures which when called execute subroutines in a
+package, and can be curried. This concept is often found in functional
+programming and is extremely powerful in that it creates an inversion of
+control by allowing the closure creator to decide how the call will be
+executed. The L<Data::Object::Dispatch> class can be used directly or
+subclassed to create sophisticated applications.
+
+=cut
+
+=head1 FUNCTION SIGNATURES
+
+  use Data::Object;
+
+  fun output($string) {
+    say $string;
+  }
+
+  fun collect(Any @args) {
+    return (map do('dump', $_), @args);
+  }
+
+  output(collect(@data));
+
+Everything offered by this framework is optional and one of its best features
+is the type-constrainable method and function signatures which leverages the
+core type library and can easily interoperate with a user-defined type library
+(or libraries).
+
+=cut
+
+=head1 CALLER CONFIGURATION
+
+  package Authenticatable;
+
+  use Data::Object Rule;
+
+  package Authentication;
+
+  use Data::Object Role;
+
+  package User;
+
+  use Data::Object Class;
+
+  with 'Authentication';
+  with 'Authenticatable';
+
+It's an important and intentional design decision to make this framework highly
+configurable. It's really Perlish that way. Using the L<do> and L<Data::Object>
+modules is the entry point into this framework and is where the configuration
+of the various features begins. The import process has been designed to be
+idempotent, and declaring the use of the same module multiple times with
+different parameters is encouraged.
+
+=cut
+
+=head1 CONSTRUCTOR FUNCTIONS
+
+  use Data::Object;
+
+  my $file = do('path', 'dump.json');
+  my $json = do('json' $file->slurp);
+
+  say(do('dump', $json));
+
+The constructor functions offered through L<Data::Object::Export>, when called,
+return instances of the classes they're associated with. They are merely a
+convenience and provide a way to quickly load a class and construct an object
+at runtime. These functions can be proxied to by the special (albeit slightly
+evil) C<do> function, which overloads the core “do” function. This
+super-function is made available to every namespace where the Data-Object
+framework is configured.
+
+=cut
+
+=head1 DATA TYPE OBJECTS
+
+  use Data::Object::Code;
+
   # returns a code object
-  my $object = Data::Object->new(sub{ join ' ', @_ });
+  my $code = Data::Object::Code->new(sub{ join ' ', @_ });
 
-  # returns true
-  $object->isa('Data::Object::Code');
+  # returns truthy
+  $code->isa('Data::Object::Code');
 
-  # returns a string object
+  # returns a string object representing 'Hello World'
   my $string = $code->call('Hello', 'World');
 
   # returns a new string object
   $string = $string->split('')->reverse->join('')->uppercase;
 
-  # returns a number object (returns true) and outputs "DLROW OLLEH"
+  # returns a number object (returns truthy) and outputs "DLROW OLLEH"
   my $result = $string->say;
 
-  # returns true
+  # returns truthy
   $result->isa('Data::Object::Number');
 
-=head1 DESCRIPTION
-
-Data::Object is a framework for writing structured and highly object-oriented
-Perl 5 software programs. Additionally, this distribution provides classes
-which wrap Perl 5 native data types and provides methods for operating on the
-data.
-
-=head1 EXPORTS
-
-=head2 all
-
-  use Data::Object qw(:all);
-
-The all export tag will export all exportable functions.
-
-=head2 core
-
-  use Data::Object qw(:core);
-
-The core export tag will export the exportable functions C<const>, C<deduce>,
-C<deduce_deep>, C<detract>, C<detract_deep>, C<immutable>, C<load>, C<prototype>,
-C<reify>, and C<throw> exclusively.
-
-=head2 data
-
-  use Data::Object qw(:data);
-
-The data export tag will export all exportable functions whose names are
-prefixed with the word "data".
-
-=head2 type
-
-  use Data::Object qw(:type);
-
-The type export tag will export all exportable functions whose names are
-prefixed with the word "type".
-
-=head1 FUNCTIONS
-
-=head2 const
-
-  # given 1.098765;
-
-  const VERSION => 1.098765;
-
-The const function creates a constant function using the name and expression
-supplied to it. A constant function is a function that does not accept any
-arguments and whose result(s) are deterministic.
-
-=head2 data_array
-
-  # given [2..5];
-
-  $object = data_array [2..5];
-  $object->isa('Data::Object::Array');
-
-The data_array function returns a L<Data::Object::Array> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_array> function is an alias to this function.
-
-=head2 data_code
-
-  # given sub { 1 };
-
-  $object = data_code sub { 1 };
-  $object->isa('Data::Object::Code');
-
-The data_code function returns a L<Data::Object::Code> instance which wraps the
-provided data type and can be used to perform operations on the data. The
-C<type_code> function is an alias to this function.
-
-=head2 data_float
-
-  # given 5.25;
-
-  $object = data_float 5.25;
-  $object->isa('Data::Object::Float');
-
-The data_float function returns a L<Data::Object::Float> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_float> function is an alias to this function.
-
-=head2 data_hash
-
-  # given {1..4};
-
-  $object = data_hash {1..4};
-  $object->isa('Data::Object::Hash');
-
-The data_hash function returns a L<Data::Object::Hash> instance which wraps the
-provided data type and can be used to perform operations on the data. The
-C<type_hash> function is an alias to this function.
-
-=head2 data_integer
-
-  # given -100;
-
-  $object = data_integer -100;
-  $object->isa('Data::Object::Integer');
-
-The data_integer function returns a L<Data::Object::Object> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_integer> function is an alias to this function.
-
-=head2 data_number
-
-  # given 100;
-
-  $object = data_number 100;
-  $object->isa('Data::Object::Number');
-
-The data_number function returns a L<Data::Object::Number> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_number> function is an alias to this function.
-
-=head2 data_regexp
-
-  # given qr/test/;
-
-  $object = data_regexp qr/test/;
-  $object->isa('Data::Object::Regexp');
-
-The data_regexp function returns a L<Data::Object::Regexp> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_regexp> function is an alias to this function.
-
-=head2 data_scalar
-
-  # given \*main;
-
-  $object = data_scalar \*main;
-  $object->isa('Data::Object::Scalar');
-
-The data_scalar function returns a L<Data::Object::Scalar> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_scalar> function is an alias to this function.
-
-=head2 data_string
-
-  # given 'abcdefghi';
-
-  $object = data_string 'abcdefghi';
-  $object->isa('Data::Object::String');
-
-The data_string function returns a L<Data::Object::String> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_string> function is an alias to this function.
-
-=head2 data_undef
-
-  # given undef;
-
-  $object = data_undef undef;
-  $object->isa('Data::Object::Undef');
-
-The data_undef function returns a L<Data::Object::Undef> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_undef> function is an alias to this function.
-
-=head2 data_universal
-
-  # given 0;
-
-  $object = data_universal 0;
-  $object->isa('Data::Object::Universal');
-
-The data_universal function returns a L<Data::Object::Universal> instance which
-wraps the provided data type and can be used to perform operations on the data.
-The C<type_universal> function is an alias to this function.
-
-=head2 deduce
-
-  # given qr/\w+/;
-
-  $object = deduce qr/\w+/;
-  $object->isa('Data::Object::Regexp');
-
-The deduce function returns a data type object instance based upon the deduced
-type of data provided.
-
-=head2 deduce_deep
-
-  # given {1,2,3,{4,5,6,[-1]}}
-
-  $deep = deduce_deep {1,2,3,{4,5,6,[-1]}};
-
-  # Data::Object::Hash {
-  #   1 => Data::Object::Number ( 2 ),
-  #   3 => Data::Object::Hash {
-  #      4 => Data::Object::Number ( 5 ),
-  #      6 => Data::Object::Array [ Data::Object::Integer ( -1 ) ],
-  #   },
-  # }
-
-The deduce_deep function returns a data type object. If the data provided is
-complex, this function traverses the data converting all nested data to objects.
-Note: Blessed objects are not traversed.
-
-=head2 deduce_type
-
-  # given qr/\w+/;
-
-  $type = deduce_type qr/\w+/; # REGEXP
-
-The deduce_type function returns a data type description for the type of data
-provided, represented as a string in capital letters.
-
-=head2 detract
-
-  # given bless({1..4}, 'Data::Object::Hash');
-
-  $object = detract $object; # {1..4}
-
-The detract function returns a value of native type, based upon the underlying
-reference of the data type object provided.
-
-=head2 detract_deep
-
-  # given {1,2,3,{4,5,6,[-1, 99, bless({}), sub { 123 }]}};
-
-  my $object = deduce_deep $object;
-  my $revert = detract_deep $object; # produces ...
-
-  # {
-  #   '1' => 2,
-  #   '3' => {
-  #     '4' => 5,
-  #     '6' => [ -1, 99, bless({}, 'main'), sub { ... } ]
-  #     }
-  # }
-
-The detract_deep function returns a value of native type. If the data provided
-is complex, this function traverses the data converting all nested data type
-objects into native values using the objects underlying reference. Note:
-Blessed objects are not traversed.
-
-=head2 immutable
-
-  # given [1,2,3];
-
-  $object = immutable data_array [1,2,3];
-  $object->isa('Data::Object::Array); # via Data::Object::Immutable
-
-The immutable function makes the data type object provided immutable. This
-function loads L<Data::Object::Immutable> and returns the object provided as an
-argument.
-
-=head2 load
-
-  # given 'List::Util';
-
-  $package = load 'List::Util'; # List::Util if loaded
-
-The load function attempts to dynamically load a module and either dies or
-returns the package name of the loaded module.
-
-=head2 prototype
-
-  # given ('$name' => [is => 'ro']);
-
-  my $proto  = data_prototype '$name' => [is => 'ro'];
-  my $class  = $proto->create; # via Data::Object::Prototype
-  my $object = $class->new(name => '...');
-
-The prototype function returns a prototype object which can be used to
-generate classes, objects, and derivatives. This function loads
-L<Data::Object::Prototype> and returns an object based on the arguments
-provided.
-
-=head2 reify
-
-  # given [1..9];
-
-  $array = reify [1..9]; # Data::Object::Array
-
-The reify function will determine the type of the value provided and return it
-as a data type object. This method is an alias to the C<deduce_deep> function.
-
-=head2 throw
-
-  # given $message;
-
-  throw $message; # An exception (...) was thrown in -e at line 1
-
-The throw function will dynamically load and throw an exception object. This
-function takes all arguments accepted by the L<Data::Object::Exception> class.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item *
-
-L<Data::Object::Array>
-
-=item *
-
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
-
-=back
+This framework also provides classes which wrap Perl 5 native data types and
+provides methods for operating on that data, e.g. L<Data::Object::Array>,
+L<Data::Object::Code>, L<Data::Object::Hash>, and L<Data::Object::String>, to
+name a few. These are referred to as the data type classes which construct data
+objects.
 
 =cut
 
-=head1 AUTHOR
+=head1 FUNCTION CLASSES
 
-Al Newkirk <al@iamalnewkirk.com>
+  my $data = Data::Object::Array->new([1..4]);
 
-=head1 CONTRIBUTOR
+  my $sets = [];
 
-=for stopwords Anthony Brummett
+  my $func = Data::Object::Func::Array::EachNValues->new(
+    arg1 => $data,
+    arg2 => 2,
+    arg3 => fun ($v1, $v2) { push $@sets, [$v1, $v2]; }
+  );
 
-Anthony Brummett <abrummet@genome.wustl.edu>
+  my $result = $func->execute;
 
-=head1 COPYRIGHT AND LICENSE
+Each data type class' methods correspond to a function class which encapsulates
+the subroutine logic, enforces its signature, provides execution automation,
+and establishes an architecture that's easy to evolve and maintain. These
+classes provide the logic that gets executed whenever a method call is made on
+a data object.
 
-This software is copyright (c) 2018 by Al Newkirk.
+=cut
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+=head1 STANDARD LIBRARY
+
+  # Data::Object::Any
+  # Data::Object::Array
+  # Data::Object::Class
+  # Data::Object::Cli
+  # Data::Object::Code
+  # Data::Object::Config
+  # Data::Object::Data
+  # Data::Object::Dispatch
+  # Data::Object::Exception
+  # Data::Object::Float
+  # Data::Object::Hash
+  # Data::Object::Integer
+  # Data::Object::Json
+  # Data::Object::Kind
+  # Data::Object::Number
+  # Data::Object::Path
+  # Data::Object::Regexp
+  # Data::Object::Replace
+  # Data::Object::Role
+  # Data::Object::Rule
+  # Data::Object::Scalar
+  # Data::Object::Search
+  # Data::Object::Space
+  # Data::Object::State
+  # Data::Object::String
+  # Data::Object::Template
+  # Data::Object::Type
+  # Data::Object::Undef
+  # Data::Object::Yaml
+  # etc
+
+The framework is meant to offer a kind-of standard library of functionality,
+concepts, and patterns for developing modern Perl applications. Again,
+everything provided is optional and has been designed to be configurable.
 
 =cut

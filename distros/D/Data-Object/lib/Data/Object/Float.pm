@@ -1,73 +1,244 @@
-# ABSTRACT: Float Object for Perl 5
 package Data::Object::Float;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  croak
+  load
+);
 
-with 'Data::Object::Role::Float';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Comparison
+  Data::Object::Rule::Defined
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '~~'     => 'data',
+  fallback => 1
+);
 
-  my $arg  = $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
-  $arg =~ s/^\+//;    # not keen on this but ...
-
-  Data::Object::throw('Type Instantiation Error: Not a Floating-Point Number')
-    unless defined($arg) && !ref($arg) && Scalar::Util::looks_like_number($arg);
+  if (defined $arg) {
+    $arg =~ s/^\+//; # not keen on this but ...
+  }
+  if (!defined($arg) || ref($arg)) {
+    croak('Instantiation Error: Not a Float');
+  }
+  if (!Scalar::Util::looks_like_number($arg)) {
+    croak('Instantiation Error: Not a Float');
+  }
 
   return bless \$arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new$/;
+sub roles {
+  return cast([@roles]);
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub rules {
+  return cast([@rules]);
+}
 
-  my $results = $self->$orig(@args);
+# DISPATCHERS
 
-  return Data::Object::deduce_deep($results);
+sub defined {
+  my ($self, @args) = @_;
 
-};
+  try {
+    my $func = 'Data::Object::Func::Float::Defined';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub downto {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Downto';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub eq {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Eq';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Ge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub gt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Gt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub le {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Le';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Lt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ne {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Ne';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub to {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::To';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub upto {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Float::Upto';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Float - Float Object for Perl 5
+Data::Object::Float
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Float Class
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object::Float;
 
   my $float = Data::Object::Float->new(9.9999);
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -80,16 +251,42 @@ opposed to returning a new float. Unless stated, it may be safe to assume that
 the following methods copy, modify and return new floats based on their
 function.
 
+=cut
+
 =head1 METHODS
 
-=head2 data
+This package implements the following methods.
+
+=cut
+
+=head2 new
+
+  # given 9.9999
+
+  my $float = Data::Object::Float->new(9.9999);
+
+The new method expects a floating-point number and returns a new class instance.
+
+=cut
+
+=head2 roles
 
   # given $float
 
-  $float->data; # original value
+  $float->roles;
 
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=cut
+
+=head2 rules
+
+  my $rules = $float->rules();
+
+The rules method returns consumed rules.
+
+=cut
 
 =head2 defined
 
@@ -101,14 +298,7 @@ The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
 L<Data::Object::Number> object.
 
-=head2 detract
-
-  # given $float
-
-  $float->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
+=cut
 
 =head2 downto
 
@@ -120,14 +310,7 @@ The downto method returns an array reference containing integer decreasing
 values down to and including the limit. This method returns a
 L<Data::Object::Array> object.
 
-=head2 dump
-
-  # given 1.23
-
-  $float->dump; # '1.23'
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 eq
 
@@ -137,6 +320,8 @@ This method returns a L<Data::Object::String> object.
 
 The eq method performs a numeric equality operation. This method returns a
 L<Data::Object::Number> object representing a boolean.
+
+=cut
 
 =head2 ge
 
@@ -148,6 +333,8 @@ The ge method returns true if the argument provided is greater-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
 object.
 
+=cut
+
 =head2 gt
 
   # given 1.23
@@ -156,6 +343,8 @@ object.
 
 The gt method performs a numeric greater-than comparison. This method returns a
 L<Data::Object::Number> object representing a boolean.
+
+=cut
 
 =head2 le
 
@@ -167,6 +356,8 @@ The le method returns true if the argument provided is less-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
 object.
 
+=cut
+
 =head2 lt
 
   # given 1.23
@@ -176,14 +367,7 @@ object.
 The lt method performs a numeric less-than comparison. This method returns a
 L<Data::Object::Number> object representing a boolean.
 
-=head2 methods
-
-  # given $float
-
-  $float->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
+=cut
 
 =head2 ne
 
@@ -194,51 +378,7 @@ returns a L<Data::Object::Array> object.
 The ne method performs a numeric equality operation. This method returns a
 L<Data::Object::Number> object representing a boolean.
 
-=head2 new
-
-  # given 9.9999
-
-  my $float = Data::Object::Float->new(9.9999);
-
-The new method expects a floating-point number and returns a new class instance.
-
-=head2 print
-
-  # given 1.23
-
-  $float->print; # '1.23'
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
-
-=head2 roles
-
-  # given $float
-
-  $float->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 say
-
-  # given 1.23
-
-  $float->say; # '1.23\n'
-
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
-
-=head2 throw
-
-  # given $float
-
-  $float->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
+=cut
 
 =head2 to
 
@@ -252,14 +392,7 @@ decreasing values to and including the limit in ascending or descending order
 based on the value of the floating-point object. This method returns a
 L<Data::Object::Array> object.
 
-=head2 type
-
-  # given $float
-
-  $float->type; # FLOAT
-
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 upto
 
@@ -271,24 +404,15 @@ The upto method returns an array reference containing integer increasing
 values up to and including the limit. This method returns a
 L<Data::Object::Array> object.
 
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Float>
-role and implements proxy methods as documented herewith.
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -297,14 +421,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
-
-=item *
-
-L<Data::Object::Role::Numeric>
 
 =item *
 
@@ -318,107 +434,22 @@ L<Data::Object::Role::Throwable>
 
 L<Data::Object::Role::Type>
 
-=item *
-
-L<Data::Object::Role::Value>
-
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
+L<Data::Object::Rule::Comparison>
 
 =item *
 
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::Defined>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

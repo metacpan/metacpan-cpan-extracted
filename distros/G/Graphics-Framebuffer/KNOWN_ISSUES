@@ -6,6 +6,9 @@ some images.  I am not yet sure what the issue is.  Try instead rotating
 
 There may be other flipping issues, but this one is the most obvious.
 
+UNMASK drawing for 16 bit displays may have issues.  Use MASK mode in
+reverse as an alternate workaround.
+
 Some framebuffer drivers are tearfully slow.  I have noticed that the Nouveau
 framebuffer driver for NVidia is Molasses slow.  It's amazing how slow it is.
 Other framebuffer drivers are amazingly fast.  It's clear the Nouveau
@@ -23,3 +26,4 @@ Nouveau driver.  Other drivers do this quickly, even the Intel driver.  I am
 assuming the other drivers use a DMA routine to transfer the memory address
 framebuffer to the real framebuffer, or map the actual framebuffer to real
 memory, although I suspect most do it via DMA transfers.
+

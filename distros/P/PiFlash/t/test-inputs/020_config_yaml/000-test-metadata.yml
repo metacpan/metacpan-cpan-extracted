@@ -1,0 +1,11 @@
+%YAML 1.1
+---
+# metadata about tests, and this file is also used as plain YAML to run one set of tests
+"002-dup-yaml.yml":
+    bad: true
+"005-toc.yml":
+    toc: true
+"006-toc.yml":
+    toc: true
+"007-toc.yml":
+    toc: true

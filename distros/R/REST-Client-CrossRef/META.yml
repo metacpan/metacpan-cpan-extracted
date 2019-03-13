@@ -27,5 +27,6 @@ requires:
   REST::Client: '273'
   Test::More: '1.001014'
   URI::Escape: '3.31'
-version: '0.005'
+  namespace::clean: '0.26'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

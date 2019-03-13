@@ -7,10 +7,10 @@ plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
     1;
 );
 
-use Data::Object 'type_hash';
+use Data::Object::Export 'type_hash';
 use Scalar::Util 'refaddr';
 
-can_ok 'Data::Object', 'type_hash';
+can_ok 'Data::Object::Export', 'type_hash';
 
 subtest 'test the type_hash function' => sub {
   my $hash1 = type_hash { 1 .. 4 };

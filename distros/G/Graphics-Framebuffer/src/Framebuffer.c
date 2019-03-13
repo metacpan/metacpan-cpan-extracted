@@ -1,8 +1,8 @@
 
 /* Copyright 2018-2019 Richard Kelsch, All Rights Reserved
- * See the Perl documentation for Graphics::Framebuffer for licensing information.
- * 
- * Version:  6.13
+   See the Perl documentation for Graphics::Framebuffer for licensing information.
+
+   Version:  6.24
 */
 
 #include <stdlib.h>
@@ -33,17 +33,17 @@
 #define GBR           4
 #define GRB           5
 
-#define integer_(X) ((int)(X))
-#define round_(X) ((int)(((double)(X))+0.5))
-#define decimal_(X) (((double)(X))-(double)integer_(X))
+#define integer_(X)  ((int)(X))
+#define round_(X)    ((int)(((double)(X))+0.5))
+#define decimal_(X)  (((double)(X))-(double)integer_(X))
 #define rdecimal_(X) (1.0-decimal_(X))
-#define swap_(a, b) do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
+#define swap_(a, b)  do { __typeof__(a) tmp;  tmp = a; a = b; b = tmp; } while(0)
 
 /* Global Structures */
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
-/* This gets the framebuffer info and populates the above structures, then runs them to Perl */
+// This gets the framebuffer info and populates the above structures, then runs them to Perl
 void c_get_screen_info(char *fb_file) {
     int fbfd = 0;
 
@@ -52,9 +52,8 @@ void c_get_screen_info(char *fb_file) {
     ioctl(fbfd, FBIOGET_VSCREENINFO, &vinfo);
     close(fbfd);
 
-   /*
-    * This monstrosity pushes the needed values on Perl's stack, like "return" does.
-    */
+    // This monstrosity pushes the needed values on Perl's stack, like "return" does.
+
     Inline_Stack_Vars;
     Inline_Stack_Reset;
 
@@ -115,20 +114,20 @@ void c_get_screen_info(char *fb_file) {
  * Normally I would add code to properly place the RGB values according to
  * color order, but in reality, that can be done solely when the color value
  * itself is defined, so the colors are in the correct order before even
- * arriving at this routine. */
+ * arriving at this routine.
+*/
 void c_plot(
     char *framebuffer,
     short x, short y,
-    unsigned char draw_mode,
+    short x_clip, short y_clip, short xx_clip, short yy_clip,
     unsigned int color,
     unsigned int bcolor,
+    unsigned char alpha,
+    unsigned char draw_mode,
     unsigned char bytes_per_pixel,
     unsigned char bits_per_pixel,
     unsigned int bytes_per_line,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip,
-    short xoffset, short yoffset,
-    unsigned char alpha)
+    short xoffset, short yoffset)
 {
     if (x >= x_clip && x <= xx_clip && y >= y_clip && y <= yy_clip) {
         x += xoffset;
@@ -422,18 +421,16 @@ void c_plot(
 
 void c_line(
     char *framebuffer,
-    short x1, short y1,
-    short x2, short y2,
-    unsigned char draw_mode,
+    short x1, short y1, short x2, short y2,
+    short x_clip, short y_clip, short xx_clip, short yy_clip,
     unsigned int color,
     unsigned int bcolor,
+    unsigned char alpha,
+    unsigned char draw_mode,
     unsigned char bytes_per_pixel,
     unsigned char bits_per_pixel,
     unsigned int bytes_per_line,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip,
-    short xoffset, short yoffset,
-    unsigned char alpha)
+    short xoffset, short yoffset)
 {
     short shortLen = y2 - y1;
     short longLen  = x2 - x1;
@@ -456,14 +453,14 @@ void c_line(
         if (longLen > 0) {
             longLen += y1;
             for (count = 0x8000 + (x1 << 16); y1 <= longLen; ++y1) {
-                c_plot(framebuffer, count >> 16, y1, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+                c_plot(framebuffer, count >> 16, y1, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
                 count += decInc;
             }
             return;
         }
         longLen += y1;
         for (count = 0x8000 + (x1 << 16); y1 >= longLen; --y1) {
-            c_plot(framebuffer, count >> 16, y1, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+            c_plot(framebuffer, count >> 16, y1, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
             count -= decInc;
         }
         return;
@@ -471,14 +468,14 @@ void c_line(
     if (longLen > 0) {
         longLen += x1;
         for (count = 0x8000 + (y1 << 16); x1 <= longLen; ++x1) {
-            c_plot(framebuffer, x1, count >> 16, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+            c_plot(framebuffer, x1, count >> 16, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
             count += decInc;
         }
         return;
     }
     longLen += x1;
     for (count = 0x8000 + (y1 << 16); x1 >= longLen; --x1) {
-        c_plot(framebuffer, x1, count >> 16, draw_mode, color, bcolor, bytes_per_pixel, bits_per_pixel, bytes_per_line, x_clip, y_clip, xx_clip, yy_clip, xoffset, yoffset, alpha);
+        c_plot(framebuffer, x1, count >> 16, x_clip, y_clip, xx_clip, yy_clip, color, bcolor, alpha, draw_mode, bytes_per_pixel, bits_per_pixel, bytes_per_line, xoffset, yoffset);
         count -= decInc;
     }
 }
@@ -486,20 +483,16 @@ void c_line(
 /* Reads in rectangular screen data as a string to a previously allocated buffer */
 void c_blit_read(
     char *framebuffer,
-    short screen_width,
-    short screen_height,
+    short screen_width, short screen_height,
     unsigned int bytes_per_line,
-    short xoffset,
-    short yoffset,
+    short xoffset, short yoffset,
     char *blit_data,
-    short x, short y,
-    short w, short h,
+    short x, short y, short w, short h,
     unsigned char bytes_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip)
+    short x_clip, short y_clip, short xx_clip, short yy_clip)
 {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
@@ -540,20 +533,16 @@ void c_blit_read(
 /* Blits a rectangle of graphics to the screen using the specified draw mode */
 void c_blit_write(
     char *framebuffer,
-    short screen_width,
-    short screen_height,
+    short screen_width, short screen_height,
     unsigned int bytes_per_line,
-    unsigned short xoffset,
-    unsigned short yoffset,
+    short xoffset, short yoffset,
     char *blit_data,
-    short x, short y,
-    short w, short h,
+    short x, short y, short w, short h,
     unsigned char bytes_per_pixel,
     unsigned char draw_mode,
     unsigned char alpha,
     unsigned int bcolor,
-    short x_clip, short y_clip,
-    short xx_clip, short yy_clip)
+    short x_clip, short y_clip, short xx_clip, short yy_clip)
 {
     short fb_x = xoffset + x;
     short fb_y = yoffset + y;
@@ -563,6 +552,7 @@ void c_blit_write(
     short vertical;
     unsigned int bline = w * bytes_per_pixel;
 
+    /* Fastest is unclipped normal mode */
     if (draw_mode == NORMAL_MODE && x >= x_clip && xx <= xx_clip && y >= y_clip && yy <= yy_clip) {
         unsigned char *source = blit_data;
         unsigned char *dest   = &framebuffer[(fb_y * bytes_per_line) + (fb_x * bytes_per_pixel)];
@@ -927,7 +917,7 @@ void c_blit_write(
                                         unsigned int vhz       = vbl + hzpixel;
                                         unsigned int yvhz      = yvbl + hzpixel;
                                         unsigned int xhbp_yvbl = xhbp + yvbl;
-                                        if ((*((unsigned int*)(framebuffer + xhbp_yvbl )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                        if ((*((unsigned int*)(framebuffer + xhbp_yvbl )) & 0xFFFFFF00) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel for color testing
                                             *((unsigned int*)(framebuffer + xhbp_yvbl )) = *((unsigned int*)(blit_data + vhz ));
                                         }
                                     }
@@ -949,7 +939,7 @@ void c_blit_write(
                                         unsigned int vhz       = vbl + hzpixel;
                                         unsigned int yvhz      = yvbl + hzpixel;
                                         unsigned int xhbp_yvbl = xhbp + yvbl;
-                                        if (*((unsigned int*)(framebuffer + xhbp + yvhz )) == (bcolor & 0xFFFFFF00)) { // Ignore alpha channel
+                                        if (*((unsigned int*)(framebuffer + xhbp + yvhz )) == (bcolor & 0xFFFFFF00)) {
                                             *(framebuffer + xhbp_yvbl )     = *(blit_data + vhz );
                                             *(framebuffer + xhbp_yvbl  + 1) = *(blit_data + vhz  + 1);
                                             *(framebuffer + xhbp_yvbl  + 2) = *(blit_data + vhz  + 2);
@@ -1366,8 +1356,7 @@ void c_blit_write(
 void c_rotate(
     char *image,
     char *new_img,
-    short width,
-    short height,
+    short width, short height,
     unsigned short wh,
     double degrees,
     unsigned char bytes_per_pixel)
@@ -1413,11 +1402,6 @@ void c_rotate(
     }
 }
 
-void c_flip_both(char* pixels, short width, short height, unsigned short bytes) {
-    c_flip_vertical(pixels,width,height,bytes);
-    c_flip_horizontal(pixels,width,height,bytes);
-}
-
 void c_flip_horizontal(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
     short y;
     short x;
@@ -1448,10 +1432,25 @@ void c_flip_vertical(char *pixels, short width, short height, unsigned char byte
           memcpy(low,high,stride);   // Copy the upper line to the lower
           memcpy(high, row, stride); // Copy the saved copy to the upper line
     }
-    free(row);
+    free(row); // Release the temporary buffer
+}
+
+void c_flip_both(char* pixels, short width, short height, unsigned char bytes_per_pixel) {
+    c_flip_vertical(
+        pixels,
+        width,height,
+        bytes_per_pixel
+    );
+    c_flip_horizontal(
+        pixels,
+        width,height,
+        bytes_per_pixel
+    );
 }
 
 /* bitmap conversions */
+
+/* Convert an RGB565 bitmap to an RGB888 bitmap */
 void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned char color_order ) {
     unsigned int loc16 = 0;
     unsigned int loc24 = 0;
@@ -1462,7 +1461,7 @@ void c_convert_16_24( char* buf16, unsigned int size16, char* buf24, unsigned ch
     while(loc16 < size16) {
         unsigned short rgb565 = *((unsigned short*)(buf16 + loc16));
         loc16 += 2;
-        if (color_order == 0) {
+        if (color_order == RGB) {
             b5 = (rgb565 & 0xf800) >> 11;
             r5 = (rgb565 & 0x001f);
         } else {
@@ -1502,9 +1501,9 @@ void c_convert_16_32( char* buf16, unsigned int size16, char* buf32, unsigned ch
         unsigned char b8 = (b5 * 527 + 23) >> 6;
         *((unsigned int*)(buf32 + loc32)) = r8 | (g8 << 8) | (b8 << 16);
         loc32 += 3;
-        if (r8 == 0 && g8 == 0 && b8 ==0) {
+        if (r8 == 0 && g8 == 0 && b8 ==0) { // Black is always treated as a clear mask
             *((unsigned char*)(buf32 + loc32++)) = 0;
-        } else {
+        } else { // Anything but black is opague
             *((unsigned char*)(buf32 + loc32++)) = 255;
         }
     }
@@ -1521,13 +1520,12 @@ void c_convert_24_16(char* buf24, unsigned int size24, char* buf16, unsigned cha
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-        if (color_order == 0) {
+        if (color_order == RGB) {
             rgb565 = (b5 << 11) | (g6 << 5) | r5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         } else {
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         }
+        *((unsigned short*)(buf16 + loc16)) = rgb565;
         loc16 += 2;
     }
 }
@@ -1541,17 +1539,15 @@ void c_convert_32_16(char* buf32, unsigned int size32, char* buf16, unsigned cha
         unsigned char r8 = crgb & 255;
         unsigned char g8 = (crgb >> 8) & 255;
         unsigned char b8 = (crgb >> 16) & 255;
-//        unsigned char a8 = (crgb >> 24) & 255; // This is not used, but is needed
         unsigned char r5 = ( r8 * 249 + 1014 ) >> 11;
         unsigned char g6 = ( g8 * 253 + 505  ) >> 10;
         unsigned char b5 = ( b8 * 249 + 1014 ) >> 11;
-        if (color_order == 0) {
+        if (color_order == RGB) {
             rgb565 = (b5 << 11) | (g6 << 5) | r5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         } else {
             rgb565 = (r5 << 11) | (g6 << 5) | b5;
-            *((unsigned short*)(buf16 + loc16)) = rgb565;
         }
+        *((unsigned short*)(buf16 + loc16)) = rgb565;
         loc16 += 2;
     }
 }
@@ -1638,17 +1634,24 @@ void c_monochrome(char *pixels, unsigned int size, unsigned char color_order, un
         }
         m = (unsigned char) round(0.2126 * r + 0.7152 * g + 0.0722 * b);
 
-        if (bytes_per_pixel >= 3) {
-            *(pixels + idx)     = m;
-            *(pixels + idx + 1) = m;
-            *(pixels + idx + 2) = m;
-        } else { // 2
-            rgb565                             = 0;
-            rgb565                             = (m << 11) | (m << 6) | m;
-            *((unsigned short*)(pixels + idx)) = rgb565;
+        switch(bytes_per_pixel) {
+            case 4 :
+                if (m == 0)  {
+                    *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16);
+                } else {
+                    *((unsigned int*)(pixels + idx)) = m | (m << 8) | (m << 16) | 0xFF000000;
+                }
+                break;
+            case 3 :
+                *(pixels + idx)     = m;
+                *(pixels + idx + 1) = m;
+                *(pixels + idx + 2) = m;
+                break;
+            case 2 :
+                rgb565                             = 0;
+                rgb565                             = (m << 11) | (m << 6) | m;
+                *((unsigned short*)(pixels + idx)) = rgb565;
+                break;
         }
     }
 }
-
-
-C_CODE

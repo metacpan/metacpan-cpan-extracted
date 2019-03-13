@@ -21,12 +21,15 @@ quite difficult to get working so far.  I haven't given up.
 
 ==============================================================================
 
-* Completely accelerate all primitive drawing
+* Completely C accelerate all primitive drawing
 
 Currently only some functions are C code accelerated.  More are added as work
 progresses.
 
 The slowest will be addressed first.
+
+Realistically though, I doubt some specific routines will be converted, as
+they would be determined to be sufficiently quick.
 
 ==============================================================================
 
@@ -42,14 +45,18 @@ increase in speed won't hurt either.
 
 Having the appropriate hardware for this would make it a lot easier, which I
 do not have.  So right now this would be lucky guesses.  Want to donate or
-loan one?
+loan one?  Due to the fact bit shifting would be involved heavily, I do not
+expect the code to be as fast as 32 bit drawing.
 
 ==============================================================================
 
-* Add 8 bit palletized drawing.
+* Add 8 bit palletized (VGA) drawing.
 
-Not sure about this, as not much of anything uses it now days.
+Not sure about this, as not much of anything uses it now days.  If someone has
+a specific need for this, then I may add it, but otherwise no.
 
 ==============================================================================
 
 * Requests are seriously considered for new features or system compatibility.
+
+Many features this module have were as a result of user requests.

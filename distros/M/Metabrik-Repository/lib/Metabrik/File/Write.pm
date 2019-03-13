@@ -1,5 +1,5 @@
 #
-# $Id: Write.pm,v 50c217684c90 2018/07/17 12:37:05 gomor $
+# $Id: Write.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # file::write Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 50c217684c90 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -180,7 +180,7 @@ Metabrik::File::Write - file::write Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

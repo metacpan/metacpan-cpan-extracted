@@ -1,5 +1,5 @@
 #
-# $Id: Virtualbox.pm,v 8db9610c2999 2018/09/17 15:39:24 gomor $
+# $Id: Virtualbox.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # system::virtualbox Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 8db9610c2999 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -63,6 +63,7 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(virtualbox) ],
          debian => [ qw(virtualbox) ],
+         kali => [ qw(virtualbox) ],
       },
    };
 }
@@ -475,7 +476,7 @@ Metabrik::System::Virtualbox - system::virtualbox Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

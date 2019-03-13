@@ -1,5 +1,5 @@
 #
-# $Id: Address.pm,v de0c829662da 2018/10/09 14:39:51 gomor $
+# $Id: Address.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # network::address Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: de0c829662da $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable netmask convert ascii) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -678,7 +678,7 @@ Metabrik::Network::Address - network::address Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -1,0 +1,151 @@
+package Data::Object::Func::Hash::Fold;
+
+use Data::Object Class;
+
+extends 'Data::Object::Func::Hash';
+
+# BUILD
+
+has arg1 => (
+  is => 'ro',
+  isa => 'Object',
+  req => 1
+);
+
+has arg2 => (
+  is => 'ro',
+  isa => 'Str',
+  opt => 1
+);
+
+has arg3 => (
+  is => 'ro',
+  isa => 'HashRef',
+  opt => 1
+);
+
+has arg4 => (
+  is => 'ro',
+  isa => 'HashRef',
+  opt => 1
+);
+
+# METHODS
+
+sub execute {
+  my ($self) = @_;
+
+  my ($data, $path, $store, $cache) = $self->unpack;
+
+  my $folded = _folding($data, $path, $store, $cache);
+
+  return $folded;
+}
+
+sub mapping {
+  return ('arg1', 'arg2', 'arg3', 'arg4');
+}
+
+# PRIVATE
+
+sub _folding {
+  my ($data, $path, $store, $cache) = @_;
+
+  $store ||= {};
+  $cache ||= {};
+
+  my $ref = ref($data);
+  my $obj = Scalar::Util::blessed($data);
+  my $adr = Scalar::Util::refaddr($data);
+  my $tmp = {%$cache};
+
+  if ($adr && $tmp->{$adr}) {
+    $store->{$path} = $data;
+  } elsif ($ref eq 'HASH' || ($obj and $obj->isa('Data::Object::Hash'))) {
+    $tmp->{$adr} = 1;
+    if (%$data) {
+      for my $key (sort(keys %$data)) {
+        my $place = $path ? join('.', $path, $key) : $key;
+        my $value = $data->{$key};
+        _folding($value, $place, $store, $tmp);
+      }
+    } else {
+      $store->{$path} = {};
+    }
+  } elsif ($ref eq 'ARRAY' || ($obj and $obj->isa('Data::Object::Array'))) {
+    $tmp->{$adr} = 1;
+    if (@$data) {
+      for my $idx (0 .. $#$data) {
+        my $place = $path ? join(':', $path, $idx) : $idx;
+        my $value = $data->[$idx];
+        _folding($value, $place, $store, $tmp);
+      }
+    } else {
+      $store->{$path} = [];
+    }
+  } else {
+    $store->{$path} = $data if $path;
+  }
+
+  return $store;
+}
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Object::Func::Hash::Fold
+
+=cut
+
+=head1 ABSTRACT
+
+Data-Object Hash Function (Fold) Class
+
+=cut
+
+=head1 SYNOPSIS
+
+  use Data::Object::Func::Hash::Fold;
+
+  my $func = Data::Object::Func::Hash::Fold->new(@args);
+
+  $func->execute;
+
+=cut
+
+=head1 DESCRIPTION
+
+Data::Object::Func::Hash::Fold is a function object for Data::Object::Hash.
+
+=cut
+
+=head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 execute
+
+  my $data = Data::Object::Hash->new({3,[4,5,6],7,{8,8,9,9}});
+
+  my $func = Data::Object::Func::Hash::Fold->new(
+    arg1 => $data
+  );
+
+  my $result = $func->execute;
+
+Executes the function logic and returns the result.
+
+=cut
+
+=head2 mapping
+
+  my @data = $self->mapping;
+
+Returns the ordered list of named function object arguments.
+
+=cut

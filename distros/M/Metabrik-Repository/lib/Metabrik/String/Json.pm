@@ -1,5 +1,5 @@
 #
-# $Id: Json.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Json.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # string::json Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable encode decode) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -31,13 +31,17 @@ sub encode {
    my ($data) = @_;
 
    $self->brik_help_run_undef_arg('encode', $data) or return;
-   $self->brik_help_run_invalid_arg('encode', $data, 'ARRAY', 'HASH') or return;
+   $self->brik_help_run_invalid_arg('encode', $data, 'ARRAY', 'HASH')
+      or return;
 
    $self->log->debug("encode: data[$data]");
 
    my $encoded = '';
    eval {
-      $encoded = JSON::XS::encode_json($data);
+      my $j = JSON::XS->new;
+      $j->relaxed(1);
+      $j->utf8(1);
+      $encoded = $j->encode($data);
    };
    if ($@) {
       chomp($@);
@@ -59,6 +63,7 @@ sub decode {
    eval {
       my $j = JSON::XS->new;
       $j->relaxed(1);
+      $j->utf8(1);
       $decoded = $j->decode($data);
    };
    if ($@) {
@@ -97,7 +102,7 @@ Metabrik::String::Json - string::json Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

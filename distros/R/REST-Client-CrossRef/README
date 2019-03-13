@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.005
+    Version 0.006
 
 INSTALLATION
 
@@ -25,15 +25,16 @@ INSTALLATION
 
 DEPENDENCIES
 
+            HTTP::Cache::Transparent        1.4
+            URI::Escape     3.31
+            Carp    1.4
             JSON    2.9
             JSON::Path      0.42
-            Log::Any        1.049
-            REST::Client    273
+            namespace::clean        0.26
             Moo     2.001001
+            Log::Any        1.049
             Test::More      1.001014
-            Carp    1.4
-            URI::Escape     3.31
-            HTTP::Cache::Transparent        1.4
+            REST::Client    273
 
 DESCRIPTION
 

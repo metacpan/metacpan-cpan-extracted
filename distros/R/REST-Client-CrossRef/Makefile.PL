@@ -18,5 +18,6 @@ WriteMakefile(
                      'HTTP::Cache::Transparent'=> 1.4,
                      'Carp'=>1.40,
                      'JSON::Path' => 0.420,
+                     'namespace::clean' => 0.26,
                     },
 );

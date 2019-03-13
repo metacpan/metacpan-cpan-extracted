@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Log::Dispatchouli;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::VERSION = '2.016';
+$Log::Dispatchouli::VERSION = '2.017';
 use Carp ();
 use File::Spec ();
 use Log::Dispatch;
@@ -123,6 +123,7 @@ our @CARP_NOT = qw(Log::Dispatchouli::Proxy);
 #pod                 fatal log messages will not be logged to these
 #pod                 (default: stderr)
 #pod   config_id   - a name for this logger's config; rarely needed!
+#pod   syslog_socket - a value for Sys::Syslog's "socket" arg; default: "native"
 #pod
 #pod The log path is either F</tmp> or the value of the F<DISPATCHOULI_PATH> env var.
 #pod
@@ -154,8 +155,8 @@ sub new {
     $pid_prefix
     ? (
         callbacks => sub {
-	  "[$$] ". {@_}->{message}
-	},
+          "[$$] ". {@_}->{message}
+        },
       )
     : ()
   );
@@ -202,7 +203,7 @@ sub new {
         facility  => $arg->{facility},
         ident     => $ident,
         logopt    => 'pid',
-        socket    => 'native',
+        socket    => $arg->{syslog_socket} || 'native',
         callbacks => sub {
           ( my $m = {@_}->{message} ) =~ s/\n/<LF>/g;
           $m
@@ -697,7 +698,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.016
+version 2.017
 
 =head1 SYNOPSIS
 
@@ -766,6 +767,7 @@ Valid arguments are:
                 fatal log messages will not be logged to these
                 (default: stderr)
   config_id   - a name for this logger's config; rarely needed!
+  syslog_socket - a value for Sys::Syslog's "socket" arg; default: "native"
 
 The log path is either F</tmp> or the value of the F<DISPATCHOULI_PATH> env var.
 
@@ -1045,7 +1047,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Matt Phillips Olivier Mengué Randy Stauner Sawyer X
+=for stopwords Christopher J. Madsen Dagfinn Ilmari Mannsåker Dan Book George Hartzell Jon Stuart Matt Phillips Olivier Mengué Randy Stauner Sawyer X
 
 =over 4
 
@@ -1067,6 +1069,10 @@ George Hartzell <hartzell@alerce.com>
 
 =item *
 
+Jon Stuart <jon@fastmailteam.com>
+
+=item *
+
 Matt Phillips <mattp@cpan.org>
 
 =item *
@@ -1085,7 +1091,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Ricardo SIGNES.
+This software is copyright (c) 2019 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

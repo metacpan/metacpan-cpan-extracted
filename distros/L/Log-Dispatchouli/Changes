@@ -1,5 +1,9 @@
 Revision history for Log-Dispatchouli
 
+2.017     2019-03-12 21:10:26-04:00 America/New_York
+        - syslog_socket can now be supplied to replace the native socket for
+          Sys::Syslog (thanks, Jon Stuart!)
+
 2.016     2018-02-21 12:47:46-05:00 America/New_York
         - the Proxy logger now respects the same overloading as the root logger
         - muted works as a constructor argument (thanks, Dan Book)

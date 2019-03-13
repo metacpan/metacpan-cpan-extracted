@@ -1,149 +1,50 @@
-# ABSTRACT: Role Declaration for Perl 5
 package Data::Object::Role;
 
 use strict;
 use warnings;
 
-use 5.014;
-
 use Data::Object;
-use Scalar::Util;
 
 use parent 'Moo::Role';
 
-our $VERSION = '0.61'; # VERSION
+# BUILD
+# METHODS
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Role - Role Declaration for Perl 5
+Data::Object::Role
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Role Declaration
+
+=cut
 
 =head1 SYNOPSIS
 
   package Persona;
 
-  use Data::Object::Role;
+  use Data::Object Role;
 
-  extends 'Entity';
-  with  'Identity';
+  with 'Relatable';
 
-  has id => ( is => 'ro' );
+  has handle => (
+    is => 'ro',
+    isa => 'Str'
+  );
 
   1;
 
+=cut
+
 =head1 DESCRIPTION
 
-Data::Object::Role inherits all methods and behaviour from L<Moo::Role>. Please
-see that documentation for more usage information. Additionally, see
-L<Data::Object::Role::Syntax> which provides a DSL that makes declaring roles
-easier and more fun.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item *
-
-L<Data::Object::Array>
-
-=item *
-
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
-
-=back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Data::Object::Role modifies the consuming package making it a role.
 
 =cut

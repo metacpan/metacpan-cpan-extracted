@@ -1,4 +1,4 @@
-# Copyright (c) 2010-2015 Sullivan Beck. All rights reserved.
+# Copyright (c) 2010-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -317,6 +317,7 @@ methods:
    mode
    skip_all
    width
+   use_lib
 
 =item B<version>
 
@@ -477,6 +478,26 @@ WIDTH is the width of the terminal (for printing out failed test
 information). It defaults to 80, but it can be set to any width (and
 lines longer then this are truncated). If WIDTH is set to 0, no
 truncation is done.
+
+=item B<use_lib>
+
+   $o = new Test::Inter 'use_lib' => VALUE;
+   $o->use_lib(VALUE);
+   $o->use_lib();
+
+By default, the library included in the module distribution will be added
+to the search path for modules, so a 'use MODULE' line should find the
+version stored in this module distribution.
+
+If VALUE is set to 'off', the search path will not be modified automatically.
+
+You may add the library path at a later time by calling:
+
+   $o->use_lib('on');
+   $o->use_lib();
+
+Note: both calls must be used. The first sets the option, the second actually
+modifies the search path.
 
 =item B<skip_all>
 
@@ -1170,11 +1191,14 @@ it is formatted:
 
 =item TI_QUIET
 
-How verbose the test script is.
+How verbose the test script is.  Values are 0 (most verbose) to 2
+(least verbose).
 
 =item TI_MODE
 
-How the output is formatted.
+How the output is formatted.  Values are 'inter' (interactive mode) or
+'test' (test suite mode).  Interactive mode is easier to read.  Test mode
+is for running as part of a test suite.
 
 =item TI_WIDTH
 

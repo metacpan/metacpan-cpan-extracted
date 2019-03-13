@@ -14,10 +14,10 @@ subtest 'test the exists method' => sub {
   my $exists   = $array->exists(@argument);
 
   isnt refaddr($array), refaddr($exists);
-  is $exists, '';
+  is $exists, 0;
 
   isa_ok $array,  'Data::Object::Array';
-  isa_ok $exists, 'Data::Object::String';
+  isa_ok $exists, 'Data::Object::Number';
 };
 
 ok 1 and done_testing;

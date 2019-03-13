@@ -63,7 +63,7 @@ Some lower clocked ARM devices may be too slow for practical use of all of the m
 
 Here's what I have tested this module on (all 1920x1080x32):
 
-* **Raspberry PI2** - Tollerable, I did 16 bit mode testing and coding on this machine.  Using a Perlbrew custom compiled Perl helps a bit.  The Raspberry PI (and RP2) are configured, by default, to be in 16 bit graphics mode.  This is not the best mode if you are going to be loading images or rendering TrueType text, as color space conversions can take a long time (with acceleration off).  Overall, 32 bit mode works best on this machine, especially for image loading and text rendering.  This performance limitation can, however, be minimized using the C acceleration features, if you still wish to use the 16 bit display mode.
+* **Raspberry PI2/3** - Tollerable, I did 16 bit mode testing and coding on this machine.  Using a Perlbrew custom compiled Perl helps a bit.  The Raspberry PI are configured, by default, to be in 16 bit graphics mode.  This is not the best mode if you are going to be loading images or rendering TrueType text, as color space conversions can take a long time (with acceleration off).  Overall, 32 bit mode works best on this machine, especially for image loading and text rendering.  This performance limitation can, however, be minimized using the C acceleration features, if you still wish to use the 16 bit display mode.
 
 * **Odroid XU3/XU4** - Surprisingly fast.  All methods plenty fast enough for heavy use.  Works great with threads too, 8 of them (when done properly).  Most coding for this module is done on this machine at 1920x1080x32.  This is fast enough for full screen (1920 x 1080 or less) animations at 30 fps.  If your resolution is lower, then your FPS rating will be higher.
 
@@ -99,7 +99,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2018 Richard Kelsch
+Copyright (C) 2013-2019 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 

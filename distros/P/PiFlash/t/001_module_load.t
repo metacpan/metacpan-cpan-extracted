@@ -3,14 +3,22 @@
 
 use strict;
 use warnings;
+use Test::More;
 
-use Test::More tests => 6;                      # last test to print
+my @classes = qw(
+	PiFlash::Command
+	PiFlash::Hook
+	PiFlash::Inspector
+	PiFlash::MediaWriter
+	PiFlash::Object
+	PiFlash::Plugin
+	PiFlash::State
+	PiFlash
+	);
+plan tests => scalar @classes;
 
-require_ok( 'PiFlash::State' );
-require_ok( 'PiFlash::Command' );
-require_ok( 'PiFlash::Inspector' );
-require_ok( 'PiFlash::MediaWriter' );
-require_ok( 'PiFlash::Hook' );
-require_ok( 'PiFlash' );
+foreach my $class (@classes) {
+	require_ok($class);
+}
 
 1;

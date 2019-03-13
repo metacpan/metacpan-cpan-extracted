@@ -382,7 +382,7 @@ sub show {
         'FB_DEVICE'   => $dev,
         'SPLASH'      => $display,
     );
-
+    $FB->cls('OFF') if ($display);
     $FB->set_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 255 });
     my @pics = shuffle(@{$ps});
     my $p    = scalar(@pics);
@@ -434,6 +434,7 @@ sub show {
         $idx = 0 if ($idx >= $p);
     } ## end while ($RUNNING && $idx <...)
     $FB->rbox({ 'x' => $X, 'y' => $Y, 'width' => $W, 'height' => $H, 'filled' => 1 });
+    $FB->cls('ON') if ($display);
     return(1);
 } ## end sub show
 

@@ -1,5 +1,5 @@
 #
-# $Id: Log.pm,v 25fdfba6a43e 2018/10/30 17:07:37 gomor $
+# $Id: Log.pm,v a38b58d4db2f 2019/03/13 10:00:56 gomor $
 #
 # core::log Brik
 #
@@ -8,14 +8,14 @@ use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.31';
+our $VERSION = '1.40';
 our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 25fdfba6a43e $',
+      revision => '$Revision: a38b58d4db2f $',
       tags => [ qw(main core) ],
       attributes => {
          color => [ qw(0|1) ],
@@ -292,7 +292,7 @@ L<Metabrik>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

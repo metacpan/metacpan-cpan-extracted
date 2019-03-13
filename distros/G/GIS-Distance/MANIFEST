@@ -4,7 +4,8 @@ LICENSE
 META.json
 README.md
 author/bench
-author/check-distance
+author/cpanfile
+author/distances
 cpanfile
 lib/GIS/Distance.pm
 lib/GIS/Distance/ALT.pm
@@ -18,6 +19,7 @@ lib/GIS/Distance/Polar.pm
 lib/GIS/Distance/Vincenty.pm
 minil.toml
 t/accuracy.t
+t/geo_point.t
 t/null.t
 t/polar.t
 META.yml

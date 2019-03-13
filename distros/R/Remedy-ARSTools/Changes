@@ -1,5 +1,9 @@
 Revision history for Perl extension Remedy::ARSTools.
 
+1.22	Tue Mar 12 14:16:21 CDT 2019
+	enum values may contain chars that will hork up the non-case-sensitive regex match.
+	this fix does an || <val> eq <enum> to end around that.
+	
 1.21	Fri Jan 15 10:56:23 CST 2016
 	when LoadARSConfig() detects a stale config (or missing schema) it will now MERGE the missing
 	data into the config file, rather than blow away the old one and replace it with a new one

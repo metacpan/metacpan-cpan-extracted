@@ -13,12 +13,12 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "TAP-Formatter-Camelcade",
-  "LICENSE" => "perl",
+  "LICENSE" => "apache",
   "NAME" => "TAP::Formatter::Camelcade",
   "PREREQ_PM" => {
     "Test::Harness" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

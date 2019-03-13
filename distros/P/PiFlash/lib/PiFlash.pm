@@ -5,17 +5,17 @@ use strict;
 use warnings;
 use v5.14.0; # require 2011 or newer version of Perl
 use PiFlash::State;
+use PiFlash::Plugin;
 use PiFlash::Command;
 use PiFlash::Inspector;
 use PiFlash::MediaWriter;
 
 package PiFlash;
-$PiFlash::VERSION = '0.2.2';
+$PiFlash::VERSION = '0.3.1';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Getopt::Long; # included with perl
 use File::Basename; # included with perl
 use File::Path qw(make_path); # RPM: perl-File-Path, DEB: included with perl
-use Module::Pluggable require => 1; # RPM: perl-Module-Pluggable, DEB: libmodule-pluggable-perl
 
 # ABSTRACT: Raspberry Pi SD-flashing script with safety checks to avoid erasing the wrong device
 
@@ -51,56 +51,13 @@ sub num_readable
 	my $num = shift;
 	my @suffixes = qw(bytes KB MB GB TB PB EB ZB);
 	my $magnitude = int(log($num)/log(1024));
-	if ($magnitude > $#suffixes) {
-		$magnitude = $#suffixes;
+	if ($magnitude > scalar @suffixes) {
+		$magnitude = scalar @suffixes;
 	}
 	my $num_base = $num/(1024**($magnitude));
 	return sprintf "%4.2f%s", $num_base, $suffixes[$magnitude];
 }
 
-# initialize enabled plugins
-sub init_plugins
-{
-	# get list of available plugin modules
-	my $plugin_data = PiFlash::State::plugin();
-
-	# get list of enabled plugins from command line and config file
-	my %enabled;
-	if (PiFlash::State::has_cli_opt("plugin")) {
-		foreach my $plugin ( split(/[^\w:]+/, PiFlash::State::cli_opt("plugin") // "")) {
-			next if $plugin eq "";
-			$plugin =~ s/^.*:://;
-			$enabled{$plugin} = 1;
-		}
-	}
-	if (PiFlash::State::has_config("plugin")) {
-		foreach my $plugin ( split(/[^\w:]+/, PiFlash::State::config("plugin") // "")) {
-			next if $plugin eq "";
-			$plugin =~ s/^.*:://;
-			$enabled{$plugin} = 1;
-		}
-	}
-
-	# for each enabled plugin, allocate state storage, load its config (if any) and run its init method
-	my @plugins_available = PiFlash->plugins();
-	foreach my $plugin (@plugins_available) {
-		$plugin =~ /^PiFlash::Plugin::([A-Z]\w+)$/ or next;
-		my $modname = $1;
-		if (exists $enabled{$modname} and $plugin->can("init")) {
-			if (exists $plugin_data->{$modname}) {
-				next; # skip if its storage area exists
-			}
-			my @data;
-			if (exists $plugin_data->{docs}{$modname}) {
-				push @data, $plugin_data->{docs}{$modname};
-			}
-			$plugin_data->{$modname} = {};
-			$plugin->init($plugin_data->{$modname}, @data);
-		}
-	}
-}
-
-# piflash script main routine to be called from exception-handling wrapper
 sub piflash
 {
 	# initialize program state storage
@@ -156,7 +113,7 @@ sub piflash
 	# initialize enabled plugins
 	# this has to be done after command line and configuration processing so we know what the user has enabled
 	# since PiFlash runs root code, plugins are disabled by default
-	init_plugins();
+	PiFlash::Plugin->init_plugins();
 
 	# collect system info: kernel specs and locations of needed programs
 	PiFlash::Inspector::collect_system_info();
@@ -258,7 +215,7 @@ PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.1
 
 =head1 SYNOPSIS
 
@@ -266,13 +223,19 @@ version 0.2.2
 
 =head1 DESCRIPTION
 
+See the L<piflash> program for details on installation and command-line usage.
+
 This is the top-level command-line processing level of the L<piflash> script to flash an SD card for a Raspberry Pi
 single-board computer. The main function serves as an exception catching wrapper which calls the piflash function
 to process the command line.
 
 =head1 SEE ALSO
 
-L<piflash>, L<PiFlash::Command>, L<PiFlash::Inspector>, L<PiFlash::MediaWriter>, L<PiFlash::State>
+L<PiFlash::Command>, L<PiFlash::Inspector>, L<PiFlash::MediaWriter>, L<PiFlash::State>
+
+L<https://metacpan.org/release/PiFlash> - main PiFlash release page on MetaCPAN
+
+L<https://github.com/ikluft/piflash> - PiFlash repository on GitHub
 
 =head1 AUTHOR
 

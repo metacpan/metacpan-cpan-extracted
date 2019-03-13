@@ -1,0 +1,109 @@
+package Data::Object::Func::Array::None;
+
+use Data::Object Class;
+
+extends 'Data::Object::Func::Array';
+
+# BUILD
+
+has arg1 => (
+  is => 'ro',
+  isa => 'Object',
+  req => 1
+);
+
+has arg2 => (
+  is => 'ro',
+  isa => 'Str | CodeRef',
+  req => 1
+);
+
+has args => (
+  is => 'ro',
+  isa => 'ArrayRef[Any]',
+  opt => 1
+);
+
+# METHODS
+
+sub execute {
+  my ($self) = @_;
+
+  my ($data, $code, @args) = $self->unpack;
+
+  my $found = 0;
+
+  for (my $i = 0; $i < @$data; $i++) {
+    my $index = $i;
+    my $value = $data->[$i];
+    my $refs = {'$index' => \$index, '$value' => \$value};
+    $found++ if $self->codify($code, $refs)->($value, @args);
+  }
+
+  return $found ? 0 : 1;
+}
+
+sub mapping {
+  return ('arg1', 'arg2', '@args');
+}
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Object::Func::Array::None
+
+=cut
+
+=head1 ABSTRACT
+
+Data-Object Array Function (None) Class
+
+=cut
+
+=head1 SYNOPSIS
+
+  use Data::Object::Func::Array::None;
+
+  my $func = Data::Object::Func::Array::None->new(@args);
+
+  $func->execute;
+
+=cut
+
+=head1 DESCRIPTION
+
+Data::Object::Func::Array::None is a function object for Data::Object::Array.
+
+=cut
+
+=head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 execute
+
+  my $data = Data::Object::Array->new([1..4]);
+
+  my $func = Data::Object::Func::Array::None->new(
+    arg1 => $data,
+    arg2 => sub { $_[0] > 5 }
+  );
+
+  my $result = $func->execute;
+
+Executes the function logic and returns the result.
+
+=cut
+
+=head2 mapping
+
+  my @data = $self->mapping;
+
+Returns the ordered list of named function object arguments.
+
+=cut

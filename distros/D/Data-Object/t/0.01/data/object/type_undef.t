@@ -7,10 +7,10 @@ plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
     1;
 );
 
-use Data::Object 'type_undef';
+use Data::Object::Export 'type_undef';
 use Scalar::Util 'refaddr';
 
-can_ok 'Data::Object', 'type_undef';
+can_ok 'Data::Object::Export', 'type_undef';
 
 subtest 'test the type_undef function' => sub {
   my $undef1 = type_undef undef;

@@ -1,5 +1,5 @@
 #
-# $Id: Xml.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Xml.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # string::xml Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable encode decode) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -26,7 +26,10 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(libexpat1-dev libxml2-dev) ],
          debian => [ qw(libexpat1-dev libxml2-dev) ],
+         kali => [ qw(libexpat1-dev libxml2-dev) ],
          freebsd => [ qw(expat libxml2) ],
+         centos => [ qw(expat-devel libxml2-devel) ],
+         redhat => [ qw(expat-devel libxml2-devel) ],
       },
    };
 }
@@ -68,7 +71,7 @@ Metabrik::String::Xml - string::xml Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -1,5 +1,5 @@
 #
-# $Id: Redis.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Redis.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # server::redis Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -45,6 +45,7 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(redis-server) ],
          debian => [ qw(redis-server) ],
+         kali => [ qw(redis-server) ],
          freebsd => [ qw(redis) ],
       },
    };
@@ -227,7 +228,7 @@ Metabrik::Server::Redis - server::redis Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

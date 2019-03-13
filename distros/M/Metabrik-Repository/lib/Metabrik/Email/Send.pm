@@ -1,5 +1,5 @@
 #
-# $Id: Send.pm,v 372122273c49 2018/02/07 09:05:11 gomor $
+# $Id: Send.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # email::send Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Smtp);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 372122273c49 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable smtp) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -23,6 +23,10 @@ sub brik_properties {
          subject => [ qw(subject) ],
          server => [ qw(server) ],
          port => [ qw(port) ],
+         hello => [ qw(hello) ],
+         auth_mechanism => [ qw(none|GSSAPI) ],
+         username => [ qw(username) ],
+         password => [ qw(password) ],
       },
       attributes_default => {
          from => 'from@example.com',
@@ -117,7 +121,7 @@ Metabrik::Email::Send - email::send Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

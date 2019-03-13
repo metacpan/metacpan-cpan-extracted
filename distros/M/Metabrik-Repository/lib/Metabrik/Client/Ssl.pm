@@ -1,5 +1,5 @@
 #
-# $Id: Ssl.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Ssl.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # client::ssl Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable tls) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -36,6 +36,9 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(libssl-dev) ],
          debian => [ qw(libssl-dev) ],
+         kali => [ qw(libssl-dev) ],
+         centos => [ qw(openssl-devel) ],
+         redhat => [ qw(openssl-devel) ],
       },
    };
 }
@@ -52,24 +55,28 @@ sub verify_server {
 
    my $host = $parsed->{host};
    my $port = $parsed->{port};
-   $self->log->info("verify_server: trying host [".$parsed->{host}."] with port [".$parsed->{port}."]");
+
+   $self->log->debug("verify_server: trying host [".$parsed->{host}."] ".
+      "with port [".$parsed->{port}."]");
 
    my $client = IO::Socket::SSL->new(
       PeerHost => $parsed->{host},
       PeerPort => $parsed->{port},
-      #SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
-      #SSL_verifycn_name => $parsed->{host},
-      #SSL_verifycn_scheme => 'http',
+      SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_PEER(),
+      SSL_verifycn_name => $parsed->{host},
+      SSL_verifycn_scheme => 'http',
    );
    if (! defined($client) && ! length($!)) {
-      $self->log->info("verify_server: not verified: [".$IO::Socket::SSL::SSL_ERROR."]");
+      $self->log->verbose("verify_server: not verified: [".
+         $IO::Socket::SSL::SSL_ERROR."]");
       return 0;
    }
    elsif (! defined($client)) {
-      return $self->log->error("verify_server: connection failed with error: [$!]");
+      return $self->log->error("verify_server: connection failed with ".
+         "error: [$!]");
    }
 
-   $self->log->info("verify_server: verified");
+   $self->log->verbose("verify_server: verified");
 
    return 1;
 }
@@ -478,7 +485,7 @@ Metabrik::Client::Ssl - client::ssl Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

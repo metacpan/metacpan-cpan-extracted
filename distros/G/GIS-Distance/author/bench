@@ -1,79 +1,242 @@
 #!/usr/bin/env perl
 use strictures 2;
 
+use GIS::Distance;
 use Benchmark qw( cmpthese );
 use List::Util qw( any );
+use List::MoreUtils qw( zip uniq );
+use Module::Find qw( findallmod );
+use Getopt::Long;
 
-use Geo::Distance;
-BEGIN { *Geo::Distance::new_distance = \&Geo::Distance::distance }
-use Geo::Distance::XS;
+Getopt::Long::Configure(qw(
+    gnu_getopt no_ignore_case
+));
 
-# Geo::Distance::new_distance() proxies to GIS::Distance.
-# Geo::Distance::distance() is installed by Geo::Distance::XS.
-# Geo::Distance::old_distance() is pure-perl, pre GIS::Distance gutting.
+GetOptions(
+    'formula|f=s' => \my @formulas,
 
-my $geo = Geo::Distance->new();
-$geo->formula('null');
+    'pp!'         => \my $do_pp,
+    'xs!'         => \my $do_xs,
+    'geo'         => \my $do_geo,
 
-my $gis_xs = GIS::Distance->new( 'GIS::Distance::Fast::Null' );
-my $gis_pp = GIS::Distance->new( 'GIS::Distance::Null' );
+    'iters|i=i'   => \my $iters,
+    'dry-run|n'   => \my $dry_run,
 
-my @coords = ( 34.202361, -118.601875,  37.752258, -122.441254 );
+    'h|help'      => \my $help,
+) or die "Unable to process options!\n";
 
-my @tests = (
-    ['Geo::Distance::new_distance-gis_xs' => sub{
-        return $geo->new_distance( 'kilometer', @coords );
-    }],
-    ['Geo::Distance::distance-geo_xs' => sub{
-        return $geo->distance( 'kilometer', @coords );
-    }],
-    ['Geo::Distance::old_distance-geo_pp' => sub{
-        return $geo->old_distance( 'kilometer', @coords );
-    }],
+if ($help) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage( -verbose => 2 );
+    exit 0;
+}
 
-    ['GIS::Distance::distance-xs' => sub{
-        return $gis_xs->distance( @coords )->km();
-    }],
-    ['GIS::Distance::distance-pp' => sub{
-        return $gis_pp->distance( @coords )->km();
-    }],
+@formulas = split(/,/, join(',', @formulas));
 
-    ['GIS::Distance::distance_metal-xs' => sub{
-        return $gis_xs->distance_metal( @coords );
-    }],
-    ['GIS::Distance::distance_metal-pp' => sub{
-        return $gis_pp->distance_metal( @coords );
-    }],
+$iters ||= 5_000_000;
 
-    ['Geo::Distance::XS::distance-xs' => sub{
-        return Geo::Distance::XS::distance(
-            $geo, 'kilometer', @coords,
-        );
-    }],
-    ['GIS::Distance::Fast::Null::distance-xs' => sub{
-        return GIS::Distance::Fast::Null::distance(
-            @coords,
-        );
-    }],
-    ['GIS::Distance::Null::distance-pp' => sub{
-        return GIS::Distance::Null::distance(
-            @coords,
-        );
-    }],
+$do_pp = 1 if !defined $do_pp;
+$do_xs = 1 if !defined $do_xs;
+
+my %gis_to_geo;
+
+if ($do_geo) {
+    require Geo::Distance;
+    Geo::Distance->import();
+    *Geo::Distance::new_distance = \&Geo::Distance::distance;
+    require Geo::Distance::XS;
+    Geo::Distance::XS->import();
+
+    # Geo::Distance::new_distance() proxies to GIS::Distance.
+    # Geo::Distance::distance() is installed by Geo::Distance::XS.
+    # Geo::Distance::old_distance() is pure-perl, pre GIS::Distance gutting.
+
+    %gis_to_geo = (reverse %Geo::Distance::GEO_TO_GIS_FORMULA_MAP);
+}
+
+my @installed_modules = (
+    grep { $_ !~ m{::Formula} }
+    grep { $_ ne 'GIS::Distance::Constants' }
+    grep { $_ ne 'GIS::Distance::Fast' }
+    findallmod('GIS::Distance')
 );
+
+my %installed_modules_lookup = map { $_=>1 } @installed_modules;
+
+my @all_formulas = (
+    uniq
+    map { s{^GIS::Distance::}{}r }
+    map { s{^GIS::Distance::Fast::}{}r }
+    @installed_modules
+);
+
+@formulas = @all_formulas if !@formulas;
+
+my @coords = ( 34.202361, -118.601875, 37.752258, -122.441254 );
+my @geo_coords = @coords[1,0,3,2];
+
+my @tests;
+
+foreach my $formula (sort @formulas) {
+    my $pp_module = "GIS::Distance::$formula";
+    if ($do_pp and $installed_modules_lookup{$pp_module}) {
+        my $gis = GIS::Distance->new( $pp_module );
+        my $code = $pp_module->can('distance');
+
+        push @tests, (
+            ["PP $formula - GIS::Distance->distance" => sub{
+                return $gis->distance( @coords )->km();
+            }],
+            ["PP $formula - GIS::Distance->distance_metal" => sub{
+                return $gis->distance_metal( @coords );
+            }],
+            ["PP $formula - $pp_module\::distance" => sub{
+                return $code->( @coords );
+            }],
+        );
+    }
+
+    my $xs_module = "GIS::Distance::Fast::$formula";
+    if ($do_xs and $installed_modules_lookup{$xs_module}) {
+        my $gis = GIS::Distance->new( $xs_module );
+        my $code = $xs_module->can('distance');
+
+        push @tests, (
+            ["XS $formula - GIS::Distance->distance" => sub{
+                return $gis->distance( @coords )->km();
+            }],
+            ["XS $formula - GIS::Distance->distance_metal" => sub{
+                return $gis->distance_metal( @coords );
+            }],
+            ["XS $formula - $xs_module\::distance" => sub{
+                return $code->( @coords );
+            }],
+        );
+    }
+
+    my $geo_formula = $gis_to_geo{ $formula };
+    if ($do_geo and $geo_formula) {
+        my $geo = Geo::Distance->new();
+        $geo->formula( $geo_formula );
+
+        push @tests, (
+            ["PP $geo_formula - Geo::Distance->old_distance" => sub{
+                return $geo->old_distance( 'kilometer', @geo_coords );
+            }],
+        ) if $do_pp;
+
+        push @tests, (
+            ["XS $geo_formula - Geo::Distance->new_distance" => sub{
+                return $geo->new_distance( 'kilometer', @geo_coords );
+            }],
+            ["XS $geo_formula - Geo::Distance::XS->distance" => sub{
+                return $geo->distance( 'kilometer', @geo_coords );
+            }],
+            ["XS $geo_formula - Geo::Distance::XS::distance" => sub{
+                return Geo::Distance::XS::distance(
+                    $geo, 'kilometer', @geo_coords,
+                );
+            }],
+        ) if $do_xs;
+    }
+}
+
+if ($dry_run) {
+    print "Tests to run:\n";
+    print(
+        map { " - $_\n" }
+        sort
+        map { $_->[0] }
+        @tests
+    );
+    exit;
+}
 
 # Run them all once in case there are runtime errors.
-$_->[1]->() for @tests;
-
-@tests = (
-    grep {
-        my $test = $_;
-        any { $test->[0] eq $_ } @ARGV;
-    }
-    @tests
-) if @ARGV;
+foreach my $test (@tests) { $test->[1]->() }
 
 cmpthese(
-    5_000_000,
+    $iters,
     { map { @$_ } @tests },
 );
+
+__END__
+
+=head1 NAME
+
+author/bench - Benchmark formulas and the various interfaces to them.
+
+=head1 SYNOPSIS
+
+    # Benchmark every GIS::Distance and GIS::Distance::Fast formula.
+    author/bench
+    
+    # Show which benchmarks would be run for every GIS::Distance::Fast
+    # and Geo::Distance::XS formula, but don't run them.
+    author/bench --geo --no-pp --dry-run
+    
+    # Displays this handy documentation!
+    author/bench --help
+
+=head1 OPTIONS
+
+=head2 formula
+
+    --formula=<formula-short-name>
+    --formaul=Null
+    -f Haversine -f Cosine
+
+By default all formulas will be considered for benchmarking.
+If you'd like to limit this then you can specify one or more
+formulas with this option.
+
+=head2 pp
+
+    --no-pp
+
+Disable the C<pp> option, meaning no pure-perl formulas will
+be included.
+
+=head2 xs
+
+    --no-xs
+
+Disable the C<xs> option, meaning no XS formulas will
+be included.
+
+=head2 geo
+
+    --geo
+
+L<Geo::Distance> and/or L<Geo::Distance::XS> formulas will be
+included.
+
+=head2 iters
+
+    --iters=100
+    -i 10000000
+
+The number of iterations to benchmark each formula against.
+
+The default is C<5,000,000>.
+
+=head2 dry-run
+
+    --dry-run
+    -n
+
+Lists all the benchmarks which would be run, but does not run them.
+
+=head2 help
+
+    --help
+    -h
+
+Displays this handy documentation!
+
+=head1 AUTHORS AND LICENSE
+
+See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+
+=cut
+

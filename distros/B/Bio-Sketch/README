@@ -4,22 +4,21 @@ NAME
 SYNOPSIS
     An interface module for Sketches, e.g., Mash
 
-                    use strict;
-                    use warnings;
-                    use Bio::Sketch::Mash;
-                
-                    # Produce a sketch file file.fastq.gz.msh
-                    system("mash sketch file.fastq.gz");
-                    # Read the sketch
-                    my $sketch = Bio::Sketch::Mash->new("file.fastq.gz.msh");
-                    $sketch->writeJson("file.fastq.gz.json");
+        use strict;
+        use warnings;
+        use Bio::Sketch::Mash;
+    
+        # Produce a sketch file file.fastq.gz.msh
+        system("mash sketch file.fastq.gz");
+        # Read the sketch
+        my $sketch = Bio::Sketch::Mash->new("file.fastq.gz.msh");
+        $sketch->writeJson("file.fastq.gz.json");
 
-        Bio::Sketch->new("file.msh", \%options);
-
+    Bio::Sketch->new("file.msh", \%options);
         Create a new Sketch instance. One object per file.
 
           Arguments: Sketch filename
-                           Hash of options
+          Hash of options
           Returns:   Sketch object
 
     $sketch->sketch("file.fastq.gz");

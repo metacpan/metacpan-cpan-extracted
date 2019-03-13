@@ -1,12 +1,12 @@
 {
-   "abstract" : "Object Orientation for Perl 5",
+   "abstract" : "Modern Perl Development Framework",
    "author" : [
       "Al Newkirk <al@iamalnewkirk.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,19 +21,33 @@
       },
       "runtime" : {
          "requires" : {
+            "Exporter::Tiny" : "1.002001",
+            "Function::Parameters" : "2.001003",
+            "Import::Into" : "1.002005",
+            "JSON::Tiny" : "0.58",
             "Moo" : "2.000001",
+            "Path::Tiny" : "0.108",
+            "Role::Tiny" : "2.000006",
             "Sub::Quote" : "2.005001",
+            "Template::Tiny" : "1.12",
             "Type::Tiny" : "1.000005",
-            "Type::Tiny::Signatures" : "0.08",
+            "YAML::Tiny" : "1.73",
             "perl" : "v5.14.0"
          }
       },
       "test" : {
          "requires" : {
+            "Exporter::Tiny" : "1.002001",
+            "Function::Parameters" : "2.001003",
+            "Import::Into" : "1.002005",
+            "JSON::Tiny" : "0.58",
             "Moo" : "2.000001",
+            "Path::Tiny" : "0.108",
+            "Role::Tiny" : "2.000006",
             "Sub::Quote" : "2.005001",
+            "Template::Tiny" : "1.12",
             "Type::Tiny" : "1.000005",
-            "Type::Tiny::Signatures" : "0.08",
+            "YAML::Tiny" : "1.73",
             "perl" : "v5.14.0"
          }
       }
@@ -50,7 +64,7 @@
          "web" : "https://github.com/iamalnewkirk/data-object"
       }
    },
-   "version" : "0.61",
+   "version" : "0.90",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Anthony Brummett <abrummet@genome.wustl.edu>"

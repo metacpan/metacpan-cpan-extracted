@@ -1,5 +1,5 @@
 #
-# $Id: Generate.pm,v d09557af2531 2018/10/19 08:12:42 gomor $
+# $Id: Generate.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # address::generate Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: d09557af2531 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable ipv4 ipv6 public routable reserved) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -244,7 +244,7 @@ Metabrik::Address::Generate - address::generate Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

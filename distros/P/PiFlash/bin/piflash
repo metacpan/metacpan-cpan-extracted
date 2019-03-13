@@ -26,7 +26,7 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.1
 
 =head1 SYNOPSIS
 

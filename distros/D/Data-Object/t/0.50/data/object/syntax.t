@@ -2,6 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
+BEGIN {
+  # most of this functionality has been moved to Data::Object::Config::Class
+  plan skip_all => 'Functionality now available through Data::Object::Config::Class';
+}
+
 use Data::Object::Syntax ();
 
 can_ok 'Data::Object::Syntax', 'alt';

@@ -1,0 +1,12 @@
+requires 'Benchmark';
+requires 'Getopt::Long';
+requires 'List::MoreUtils';
+requires 'List::Util';
+requires 'Module::Find';
+requires 'Pod::Usage';
+requires 'strictures';
+
+requires 'GIS::Distance';
+recommends 'GIS::Distance::Fast';
+recommends 'Geo::Distance';
+recommends 'Geo::Distance::XS';

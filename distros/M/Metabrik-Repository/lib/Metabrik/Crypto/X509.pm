@@ -1,5 +1,5 @@
 #
-# $Id: X509.pm,v 50c217684c90 2018/07/17 12:37:05 gomor $
+# $Id: X509.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # crypto::x509 Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 50c217684c90 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable openssl ssl pki certificate) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -317,7 +317,9 @@ sub parse_certificate_string {
    my $self = shift;
    my ($string) = @_;
 
-   $self->brik_help_run_undef_arg('parse_certificate_string', $string) or return;
+   $self->brik_help_run_undef_arg('parse_certificate_string', $string)
+      or return;
+
    if (! length($string)) {
       return $self->log->error("parse_certificate_string: empty string found");
    }
@@ -344,7 +346,8 @@ sub parse_certificate_string {
 
    my $decoded = Crypt::X509->new(cert => $string);
    if ($decoded->error) {
-      return $self->log->error("parse_certificate_string: failed: ".$decoded->error);;
+      return $self->log->error("parse_certificate_string: failed: ".
+         $decoded->error);
    }
 
    return $decoded;
@@ -360,7 +363,7 @@ Metabrik::Crypto::X509 - crypto::x509 Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

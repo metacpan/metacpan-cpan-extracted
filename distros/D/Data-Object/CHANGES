@@ -1,7 +1,182 @@
 Changelog for Data-Object
 
-0.61 2018-12-28T20:52:28
+0.90 2019-03-13T14:29:54
+ - Fixed Hash iterator sorting test failure
+ - Fixed Hash list and map sorting test failure
+ - Refactored POD generator
+ - Updated POD
+ - Remove unused package Config/Core
+ - Remove BUILD, BUILDARGS, and import tests and pod requirements
+ - Remove all instances of the args() method from "value" classes
+ - Added package variable access to Space
+ - Added pluck and renamed find to item in Data
+ - Added extra POD sections to main module
+ - Fixed proxy to handle wantarray
+ - Shortened "do" POD
+ - Fixed exports in Config
+ - Added types documentation to Library
+ - Registered type constraints for for JSON, Path, Yaml and Template
+ - Removed .head from gitignore
+ - Added Json and Yaml functions tests
+ - Added support for JSON::Tiny, Path::Tiny, Yaml::Tiny and Template::Tiny
+ - Fixed argument list in Proxyable
+ - Fixed-up Cli import statements
+ - Fixed bless method in Space
+ - Implemented missing type constraints
+ - Fixed headers
+ - Added class method to Kind, and tweaked Func base class
+ - Fixed overloading and reverted import experiment
+ - Added BUILD and METHODS markers
+ - Added config_kind and Export/do test
+ - Remove Config/Script functionality
+ - Removed exportable vars from Export
+ - Removed test for constructor method
+ - Removed constructor method
+ - Deprecated new subroutine test
+ - Made auto-export cleaner
+ - Removed overloaded qr from Detract role
+ - Cleaned up overloading in Exception
+ - Added tests for pl and pm (special) configs
+ - Added pl, pm, and kind config\nAdded feature state to all configs\nAdded
+   carp to all configs\nFixed Data-Object configs
+ - Cleaned up signatures import list
+ - Updated to return the func class return value
+ - Updated search func class to return Search object
+ - Updated replace func class to return Replace object
+ - Updated child and sibling methods to take a list of arguments\nFixed
+   methods and functions routines
+ - Added Role::Tiny to dependencies
+ - Fixed class declaration in Func classes
+ - Merge special "do" functionality
+ - Made new private methods in Space public
+ - Made core classes into Kinds
+ - Fixed package introspection in Space
+ - Updated Dispatch so initial function not required
+ - Better croaking and new private methods in Space
+ - Added concept of a Kind
+ - Cleaned up Type methods method
+ - Added tests and updated POD
+ - Defaults to main
+ - Added id and cop methods, and better parsing regexp to Space
+ - Refactored to use Space cop method
+ - Updated Data/Object installation POD
+ - Added bless, build and call to Space
+ - Make children and siblings methods return objects
+ - Added initial tests for Data class
+ - Added initial tests for Space class
+ - Added MANIFEST.SKIP
+ - Initial implementation of Space class
+ - Stash: WIP
+ - Initial implementation of Data class
+ - Update CLI Implementation
+ - Re-generated POD
+ - Updated POD in tests
+ - Fixed POD descriptions for some methods/functions
+ - Fixed POD type declarations for functions
+ - Added CLI Implementation
+ - Support for name-only attributes
+ - Better exception implementation with stack-tracing
+ - Renamed Singleton to State
+ - Added experimental auto-type-library-registration functionality
+ - Removed Perl version declarations
+ - Cleaned imports and added tests for new configs
+ - Refactored package configuration
+ - Renamed Spec namespace to Rule
+ - Ported over POD for Undef
+ - Ported over POD for Scalar
+ - Ported over POD for String
+ - Ported over POD for Regexp
+ - Ported over POD for Number
+ - Ported over POD for Integer
+ - Ported over POD for Hash
+ - Ported over POD for Float
+ - Fixed POD var for Array
+ - Ported over POD for Code
+ - Ported over POD for Array
+ - Updated POD and POD generation for type-constraints
+ - Moved lindering POD from classes into tests
+ - Updated POD for Data::Object::Export functions
+ - Updates to POD
+ - Added exported-functions section to POD generator
+ - Removed unnecessary VERSION strings
+ - Updated the do and data-object abstracts
+ - Update the project abstract
+ - Removed abstract comment from packages
+ - Added POD generation to the build process
+ - Restored meta-files in builds
+ - Update license and build instructions
+ - Added generated POD files
+ - Update POD in tests
+ - Replace lorem-ipsum on test files
+ - Added Search and Replace type constraints
+ - Move RegexpResult into Search and Replace classes
+ - Renamed Regexp-Result to RegexpResult
+ - Removed POD files
+ - Fixed sorting issue in tests
+ - Steamlined the .travis.yml instructions
+ - Fixed failing tests and Syntax keyword functions
+ - Removed Value role requirement
+ - Found and added more missing tests
+ - Test checking ignores underscore prefixed routines
+ - Added missing tests
+ - Implemented testing framework
+ - Resolved regression testing issues
+ - Fixed unimported functions
+ - Re-organized Data-Object, Config and Export namespaces
+ - Cleaned-up object classes
+ - Updated function classes
+ - Added Types::TypeTiny *Like types
+ - Created core functions
+ - Refactored core objects
+ - Always import Type::Tiny
+ - Refactored Exception and created Catchable role
+ - Fixed logic error in Exception and Throwable
+ - Updated dispatch to use goto over call
+ - Fixed Class and Role has keyword function req/opt options
+ - Localized global package variables, and dispatched throwing
+ - Added initial package tests
+ - Move POD into seperate files
+ - Formatting and comment removal
+ - Implemented class and role modified has keyword
+ - Removed 0.50 role tests
+ - Implemented Func and Spec namespaces
+ - Made data objects proxyable
+ - Flattened all roles and usages
+ - Refactored routines and modifiers
+ - Added type-checking for after, around and before
+ - Build 0.80
+
+0.80 2019-01-16T03:42:04
+ - Built release version 0.80
+ - Fixed ordering where data_any occurs
+ - Moved Universal namespaces to Any
+ - Reorganized Data::Object::Config
+ - Refactor type library
+ - Move Data::Object::Library to Data::Object::Config::Type
+ - Move Data::Object::Signatures to Data::Object::Config::Routine
+ - Move Export namespace to Config
+ - Add basic tests for new functions
+ - Add ability to delete namespaces
+ - Create functions for module name casing
+ - Rename "do" flags
+ - Better type reifier
+ - Cleanup Data::Object::Library
+ - Remove Data::Object::Util
+ - Fix Singleton implementation
+ - Rename reifiy to cast
+ - Fixed README errors
+ - Build 0.70
+
+0.70 2019-01-07T13:14:22
+ - Built release version 0.70
+ - Added exportable functions for better composability
+ - Added placeholder caller modifying export modules
+ - Moved functions into Export namespace
+ - Update dist.ini to generate a MYMETA.yml
+
+0.61 2018-12-28T20:33:19
  - Built release version 0.61
+ - Tidy source and update build scripts (#15)
 
 0.60 2018-12-14T03:45:40
  - Built release version 0.60

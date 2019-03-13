@@ -7,10 +7,10 @@ plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
     1;
 );
 
-use Data::Object 'type_number';
+use Data::Object::Export 'type_number';
 use Scalar::Util 'refaddr';
 
-can_ok 'Data::Object', 'type_number';
+can_ok 'Data::Object::Export', 'type_number';
 
 subtest 'test the type_number function - pure number' => sub {
   my $number1 = type_number 123;

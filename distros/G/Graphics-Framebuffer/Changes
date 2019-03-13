@@ -1413,3 +1413,15 @@ Revision history for Graphics-Framebuffer
       Example scripts have been adapted to handle the fixes in 16 bit mode.
       Previously broken 16 bit code was bypassed, but now it works just like
       the 24/32 bit routines.
+
+6.24  Feb 13, 2019
+
+      Some minor changes to the C routines to make stack operations more
+      efficient.  Also fixed the order of the functions to prevent warning
+      messages in compilation.
+
+      Re-instantiated the previously depreciated active console identification
+      methods.  Unlike the previous ways they were implemented, by being
+      built into the module, they are now left to the user to exploit.
+
+      The Makefile.PL was updated.

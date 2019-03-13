@@ -59,6 +59,7 @@ t/100_type_mapping.t
 t/102_service_mapping.t
 t/105_package_mapping.t
 t/107_package_prefix_mapping.t
+t/108_message_prefix_mapping.t
 t/110_mixed_mapping.t
 t/115_simplified_mapping.t
 t/140_parse_string.t
@@ -110,6 +111,9 @@ t/proto/mapping/test1.proto
 t/proto/mapping/test2.proto
 t/proto/mapping/test3.proto
 t/proto/message.proto
+t/proto/message_prefix/a.proto
+t/proto/message_prefix/b.proto
+t/proto/message_prefix/r.proto
 t/proto/oneof.proto
 t/proto/options.proto
 t/proto/order.proto

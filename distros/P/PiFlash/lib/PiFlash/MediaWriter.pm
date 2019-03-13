@@ -10,7 +10,7 @@ use PiFlash::Inspector;
 use PiFlash::Hook;
 
 package PiFlash::MediaWriter;
-$PiFlash::MediaWriter::VERSION = '0.2.2';
+$PiFlash::MediaWriter::VERSION = '0.3.1';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Try::Tiny;
 use File::Basename;
@@ -299,7 +299,7 @@ PiFlash::MediaWriter - write to Raspberry Pi SD card installation with scriptabl
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.1
 
 =head1 SYNOPSIS
 

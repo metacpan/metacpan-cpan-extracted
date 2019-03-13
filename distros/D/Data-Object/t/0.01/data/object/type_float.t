@@ -7,10 +7,10 @@ plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
     1;
 );
 
-use Data::Object 'type_float';
+use Data::Object::Export 'type_float';
 use Scalar::Util 'refaddr';
 
-can_ok 'Data::Object', 'type_float';
+can_ok 'Data::Object::Export', 'type_float';
 
 subtest 'test the type_float function' => sub {
   my $float1 = type_float 345.56;

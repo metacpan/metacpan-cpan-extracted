@@ -4,12 +4,13 @@
 use strict;
 use warnings;
 use v5.14.0; # require 2011 or newer version of Perl
-use PiFlash::State;
 
 package PiFlash::Hook;
-$PiFlash::Hook::VERSION = '0.2.2';
+$PiFlash::Hook::VERSION = '0.3.1';
 use Carp qw(confess);
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
+use parent 'PiFlash::Object';
+use PiFlash::State;
 
 # ABSTRACT: named dispatch/hook library for PiFlash
 
@@ -18,6 +19,13 @@ use autodie; # report errors instead of silently continuing ("die" actions are u
 ## no critic (ProhibitPackageVars)
 our %hooks;
 ## use critic
+
+# required parameter list
+# used by PiFlash::Object for new() method
+sub object_params
+{
+	return qw(name code origin);
+}
 
 # use AUTOLOAD to call a named hook as if it were a class method
 our $AUTOLOAD;
@@ -54,31 +62,6 @@ sub add
 		$hooks{$name} = [];
 	}
 	push @{$hooks{$name}}, PiFlash::Hook::new({name => $name, code => $coderef, origin => [caller]});
-}
-
-# new() - internal function to instantiate hook object
-# this should only be called from add() with coderef/caller/origin parameters
-sub new
-{
-	my $class = shift;
-	my $params = shift;
-
-	my $self = {};
-	bless $self, $class;
-
-	# initialize
-	foreach my $key (keys %$params) {
-		$self->{$key} = $params->{$key};
-	}
-	my @missing;
-	foreach my $required ("name", "code", "origin") {
-		exists $self->{$required} or push @missing, $required;
-	}
-	if (@missing) {
-		confess "PiFlash::Hook::new() missing required parameters: ".join(" ", @missing);
-	}
-
-	return $self;
 }
 
 # check if there are any hooks registered for a name
@@ -125,7 +108,7 @@ PiFlash::Hook - named dispatch/hook library for PiFlash
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.1
 
 =head1 SYNOPSIS
 

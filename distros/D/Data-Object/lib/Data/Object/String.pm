@@ -1,71 +1,570 @@
-# ABSTRACT: String Object for Perl 5
 package Data::Object::String;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  croak
+  load
+);
 
-with 'Data::Object::Role::String';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Comparison
+  Data::Object::Rule::Defined
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '~~'     => 'data',
+  fallback => 1
+);
 
-  my $arg  = $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
-  Data::Object::throw('Type Instantiation Error: Not a String')
-    unless defined($arg) && not ref($arg);
+  $arg = $arg ? "$arg" : "";
+
+  if (!defined($arg) || ref($arg)) {
+    croak('Instantiation Error: Not a String');
+  }
 
   return bless \$arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new$/;
+sub roles {
+  return cast([@roles]);
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub rules {
+  return cast([@rules]);
+}
 
-  my $results = $self->$orig(@args);
+# DISPATCHERS
 
-  return Data::Object::deduce_deep($results);
+sub append {
+  my ($self, @args) = @_;
 
-};
+  try {
+    my $func = 'Data::Object::Func::String::Append';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub camelcase {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Camelcase';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub chomp {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Chomp';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub chop {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Chop';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub concat {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Concat';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub contains {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Contains';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub defined {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Defined';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub eq {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Eq';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Ge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub gt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Gt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub hex {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Hex';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub index {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Index';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lc {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Lc';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lcfirst {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Lcfirst';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub length {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Length';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lines {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Lines';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lowercase {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Lowercase';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub le {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Le';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Lt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ne {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Ne';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub replace {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Replace';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub reverse {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Reverse';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub rindex {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Rindex';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub snakecase {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Snakecase';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub split {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Split';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub strip {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Strip';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub titlecase {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Titlecase';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub trim {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Trim';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub uc {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Uc';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ucfirst {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Ucfirst';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub uppercase {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Uppercase';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub words {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::String::Words';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::String - String Object for Perl 5
+Data::Object::String
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object String Class
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object::String;
 
   my $string = Data::Object::String->new('abcedfghi');
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -77,7 +576,42 @@ modify the string itself as opposed to returning a new string. Unless stated, it
 may be safe to assume that the following methods copy, modify and return new
 strings based on their function.
 
+=cut
+
 =head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 new
+
+  # given abcedfghi
+
+  my $string = Data::Object::String->new('abcedfghi');
+
+The new method expects a string and returns a new class instance.
+
+=cut
+
+=head2 roles
+
+  # given $string
+
+  $string->roles;
+
+The roles method returns the list of roles attached to object. This method
+returns an array value.
+
+=cut
+
+=head2 rules
+
+  my $rules = $any->rules();
+
+The rules method returns consumed rules.
+
+=cut
 
 =head2 append
 
@@ -87,7 +621,9 @@ strings based on their function.
 
 The append method modifies and returns the string with the argument list
 appended to it separated using spaces. This method returns a
-L<Data::Object::String> object.
+string object.
+
+=cut
 
 =head2 camelcase
 
@@ -101,6 +637,8 @@ separated by 1 or more non-alphanumeric characters) is capitalized. Note, this
 method modifies the string. This method returns a L<Data::Object::String>
 object.
 
+=cut
+
 =head2 chomp
 
   # given "name, age, dob, email\n"
@@ -110,7 +648,9 @@ object.
 The chomp method is a safer version of the chop method, it's used to remove the
 newline (or the current value of $/) from the end of the string. Note, this
 method modifies and returns the string. This method returns a
-L<Data::Object::String> object.
+string object.
+
+=cut
 
 =head2 chop
 
@@ -121,7 +661,9 @@ L<Data::Object::String> object.
 The chop method removes the last character of a string and returns the character
 chopped. It is much more efficient than "s/.$//s" because it neither scans nor
 copies the string. Note, this method modifies and returns the string. This
-method returns a L<Data::Object::String> object.
+method returns a string value.
+
+=cut
 
 =head2 concat
 
@@ -130,7 +672,9 @@ method returns a L<Data::Object::String> object.
   $string->concat('DEF', 'GHI'); # ABCDEFGHI
 
 The concat method modifies and returns the string with the argument list
-appended to it. This method returns a L<Data::Object::String> object.
+appended to it. This method returns a string value.
+
+=cut
 
 =head2 contains
 
@@ -149,14 +693,7 @@ argument is a regular expression reference, the search will be performed using
 the regular expression engine. This method returns a L<Data::Object::Number>
 object.
 
-=head2 data
-
-  # given $string
-
-  $string->data; # original value
-
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+=cut
 
 =head2 defined
 
@@ -166,25 +703,9 @@ object. This method is an alias to the detract method.
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
-L<Data::Object::Number> object.
+number object.
 
-=head2 detract
-
-  # given $string
-
-  $string->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head2 dump
-
-  # given 'exciting'
-
-  $string->dump; # 'exciting'
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 eq
 
@@ -193,7 +714,9 @@ This method returns a L<Data::Object::String> object.
   $string->eq('Exciting'); # 0
 
 The eq method returns true if the argument provided is equal to the value
-represented by the object. This method returns a L<Data::Object::Number> object.
+represented by the object. This method returns a number value.
+
+=cut
 
 =head2 ge
 
@@ -205,6 +728,8 @@ The ge method returns true if the argument provided is greater-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
 object.
 
+=cut
+
 =head2 gt
 
   # given 'exciting'
@@ -212,7 +737,9 @@ object.
   $string->gt('Exciting'); # 1
 
 The gt method returns true if the argument provided is greater-than the value
-represented by the object. This method returns a L<Data::Object::Number> object.
+represented by the object. This method returns a number value.
+
+=cut
 
 =head2 hex
 
@@ -223,6 +750,8 @@ represented by the object. This method returns a L<Data::Object::Number> object.
 The hex method returns the value resulting from interpreting the string as a
 hex string. This method returns a data type object to be determined after
 execution.
+
+=cut
 
 =head2 index
 
@@ -242,6 +771,8 @@ searching from (also known as the base). By default, starts searching from the
 beginning of the string. This method returns a data type object to be determined
 after execution.
 
+=cut
+
 =head2 lc
 
   # given 'EXCITING'
@@ -249,7 +780,9 @@ after execution.
   $string->lc; # exciting
 
 The lc method returns a lowercased version of the string. This method returns a
-L<Data::Object::String> object. This method is an alias to the lowercase method.
+string object. This method is an alias to the lowercase method.
+
+=cut
 
 =head2 lcfirst
 
@@ -258,7 +791,43 @@ L<Data::Object::String> object. This method is an alias to the lowercase method.
   $string->lcfirst; # eXCITING
 
 The lcfirst method returns a the string with the first character lowercased.
-This method returns a L<Data::Object::String> object.
+This method returns a string value.
+
+=cut
+
+=head2 length
+
+  # given 'longggggg'
+
+  $string->length; # 9
+
+The length method returns the number of characters within the string. This
+method returns a number value.
+
+=cut
+
+=head2 lines
+
+  # given "who am i?\nwhere am i?\nhow did I get here"
+
+  $string->lines; # ['who am i?','where am i?','how did i get here']
+
+The lines method breaks the string into pieces, split on 1 or more newline
+characters, and returns an array reference consisting of the pieces. This method
+returns an array value.
+
+=cut
+
+=head2 lowercase
+
+  # given 'EXCITING'
+
+  $string->lowercase; # exciting
+
+The lowercase method is an alias to the lc method. This method returns a
+string object.
+
+=cut
 
 =head2 le
 
@@ -270,33 +839,7 @@ The le method returns true if the argument provided is less-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
 object.
 
-=head2 length
-
-  # given 'longggggg'
-
-  $string->length; # 9
-
-The length method returns the number of characters within the string. This
-method returns a L<Data::Object::Number> object.
-
-=head2 lines
-
-  # given "who am i?\nwhere am i?\nhow did I get here"
-
-  $string->lines; # ['who am i?','where am i?','how did i get here']
-
-The lines method breaks the string into pieces, split on 1 or more newline
-characters, and returns an array reference consisting of the pieces. This method
-returns a L<Data::Object::Array> object.
-
-=head2 lowercase
-
-  # given 'EXCITING'
-
-  $string->lowercase; # exciting
-
-The lowercase method is an alias to the lc method. This method returns a
-L<Data::Object::String> object.
+=cut
 
 =head2 lt
 
@@ -305,16 +848,9 @@ L<Data::Object::String> object.
   $string->lt('Exciting'); # 0
 
 The lt method returns true if the argument provided is less-than the value
-represented by the object. This method returns a L<Data::Object::Number> object.
+represented by the object. This method returns a number value.
 
-=head2 methods
-
-  # given $string
-
-  $string->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
+=cut
 
 =head2 ne
 
@@ -323,24 +859,9 @@ returns a L<Data::Object::Array> object.
   $string->ne('Exciting'); # 1
 
 The ne method returns true if the argument provided is not equal to the value
-represented by the object. This method returns a L<Data::Object::Number> object.
+represented by the object. This method returns a number value.
 
-=head2 new
-
-  # given abcedfghi
-
-  my $string = Data::Object::String->new('abcedfghi');
-
-The new method expects a string and returns a new class instance.
-
-=head2 print
-
-  # given 'exciting'
-
-  $string->print; # 'exciting'
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
+=cut
 
 =head2 replace
 
@@ -355,7 +876,9 @@ The replace method performs a smart search and replace operation and returns the
 modified string (if any modification occurred). This method optionally takes a
 replacement modifier as it's final argument. Note, this operation expects the
 2nd argument to be a replacement String. This method returns a
-L<Data::Object::String> object.
+string object.
+
+=cut
 
 =head2 reverse
 
@@ -364,7 +887,9 @@ L<Data::Object::String> object.
   $string->reverse; # Hello, world
 
 The reverse method returns a string where the characters in the string are in
-the opposite order. This method returns a L<Data::Object::String> object.
+the opposite order. This method returns a string value.
+
+=cut
 
 =head2 rindex
 
@@ -388,24 +913,7 @@ searching from (beginning at or before the position). By default, starts
 searching from the end of the string. This method returns a data type object to
 be determined after execution.
 
-=head2 roles
-
-  # given $string
-
-  $string->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 say
-
-  # given 'exciting'
-
-  $string->say; # 'exciting\n'
-
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
+=cut
 
 =head2 snakecase
 
@@ -418,7 +926,9 @@ non-alphanumeric characters and each word (group of alphanumeric characters
 separated by 1 or more non-alphanumeric characters) is capitalized. The only
 difference between this method and the camelcase method is that this method
 ensures that the first character will always be lowercased. Note, this method
-modifies the string. This method returns a L<Data::Object::String> object.
+modifies the string. This method returns a string value.
+
+=cut
 
 =head2 split
 
@@ -434,7 +944,9 @@ chunk by the argument (string or regexp object), and returns that list as an
 array reference. This method optionally takes a second argument which would be
 the limit (number of matches to capture). Note, this operation expects the 1st
 argument to be a Regexp object or a String. This method returns a
-L<Data::Object::Array> object.
+array object.
+
+=cut
 
 =head2 strip
 
@@ -444,17 +956,9 @@ L<Data::Object::Array> object.
 
 The strip method returns the string replacing occurences of 2 or more
 whitespaces with a single whitespace. This method returns a
-L<Data::Object::String> object.
+string object.
 
-=head2 throw
-
-  # given $string
-
-  $string->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
+=cut
 
 =head2 titlecase
 
@@ -465,7 +969,9 @@ If captured this method returns a L<Data::Object::Exception> object.
 The titlecase method returns the string capitalizing the first character of
 each word (group of alphanumeric characters separated by 1 or more whitespaces).
 Note, this method modifies the string. This method returns a
-L<Data::Object::String> object.
+string object.
+
+=cut
 
 =head2 trim
 
@@ -474,16 +980,9 @@ L<Data::Object::String> object.
   $string->trim; # system is   ready
 
 The trim method removes 1 or more consecutive leading and/or trailing spaces
-from the string. This method returns a L<Data::Object::String> object.
+from the string. This method returns a string value.
 
-=head2 type
-
-  # given $string
-
-  $string->type; # STRING
-
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 uc
 
@@ -492,7 +991,9 @@ This method returns a L<Data::Object::String> object.
   $string->uc; # EXCITING
 
 The uc method returns an uppercased version of the string. This method returns a
-L<Data::Object::String> object. This method is an alias to the uppercase method.
+string object. This method is an alias to the uppercase method.
+
+=cut
 
 =head2 ucfirst
 
@@ -501,7 +1002,9 @@ L<Data::Object::String> object. This method is an alias to the uppercase method.
   $string->ucfirst; # Exciting
 
 The ucfirst method returns a the string with the first character uppercased.
-This method returns a L<Data::Object::String> object.
+This method returns a string value.
+
+=cut
 
 =head2 uppercase
 
@@ -510,7 +1013,9 @@ This method returns a L<Data::Object::String> object.
   $string->uppercase; # EXCITING
 
 The uppercase method is an alias to the uc method. This method returns a
-L<Data::Object::String> object.
+string object.
+
+=cut
 
 =head2 words
 
@@ -520,30 +1025,17 @@ L<Data::Object::String> object.
 
 The words method splits the string into a list of strings, separating each
 group of characters by 1 or more consecutive spaces, and returns that list as an
-array reference. This method returns a L<Data::Object::Array> object.
+array reference. This method returns an array value.
 
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::String>
-role and implements proxy methods as documented herewith.
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Alphabetic>
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -552,10 +1044,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
 
 =item *
 
@@ -569,107 +1057,22 @@ L<Data::Object::Role::Throwable>
 
 L<Data::Object::Role::Type>
 
-=item *
-
-L<Data::Object::Role::Value>
-
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
+L<Data::Object::Rule::Comparison>
 
 =item *
 
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::Defined>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

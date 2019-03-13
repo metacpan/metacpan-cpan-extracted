@@ -66,12 +66,10 @@ my @type_constraints = qw(
   Undef
   UndefObj
   UndefObject
-  UniversalObj
-  UniversalObject
   Value
 );
 
-use_ok 'Data::Object::Library', ':types';
+use_ok 'Data::Object::Config::Library', ':types';
 can_ok 'main',                  @type_constraints;
 
 ok 1 and done_testing;

@@ -12,10 +12,10 @@ subtest 'test the defined method' => sub {
   my $defined = $array->defined(2);
 
   isnt refaddr($array), refaddr($defined);
-  is $defined, '';
+  is $defined, 0;
 
   isa_ok $array,   'Data::Object::Array';
-  isa_ok $defined, 'Data::Object::String';
+  isa_ok $defined, 'Data::Object::Number';
 
   $defined = $array->defined(1);
 

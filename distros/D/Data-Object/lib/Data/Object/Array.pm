@@ -1,79 +1,973 @@
-# ABSTRACT: Array Object for Perl 5
 package Data::Object::Array;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  croak
+  load
+);
 
-with 'Data::Object::Role::Array';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Collection
+  Data::Object::Rule::Comparison
+  Data::Object::Rule::Defined
+  Data::Object::Rule::List
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '~~'     => 'data',
+  '@{}'    => 'self',
+  fallback => 1
+);
 
-  my $arg  = @args > 1 ? [@args] : $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
-  Data::Object::throw('Type Instantiation Error: Not an ArrayRef')
-    unless ref($arg) eq 'ARRAY';
+  unless (ref($arg) eq 'ARRAY') {
+    croak('Instantiation Error: Not a ArrayRef');
+  }
 
   return bless $arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new$/;
+sub self {
+  return shift;
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub roles {
+  return cast([@roles]);
+}
 
-  my $results = $self->$orig(@args);
+sub rules {
+  return cast([@rules]);
+}
 
-  return Data::Object::deduce_deep($results);
+# DISPATCHERS
 
-};
+sub all {
+  my ($self, @args) = @_;
 
-around 'list' => fun($orig, $self, @args) {
+  try {
+    my $func = 'Data::Object::Func::Array::All';
 
-  my $results = $self->$orig(@args);
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
 
-  return wantarray ? (@$results) : $results;
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
-};
+sub any {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Any';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub clear {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Clear';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub count {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Count';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub defined {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Defined';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub delete {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Delete';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Each';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each_key {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::EachKey';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each_n_values {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::EachNValues';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub each_value {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::EachValue';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub empty {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Empty';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub eq {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Eq';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub exists {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Exists';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub first {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::First';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Ge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub get {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Get';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub grep {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Grep';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub gt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Gt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub hash {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Hash';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub hashify {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Hashify';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub head {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Head';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub invert {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Invert';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub iterator {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Iterator';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub join {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Join';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub keyed {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Keyed';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub keys {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Keys';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub last {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Last';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub le {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Le';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub length {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Length';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub list {
+  my ($self) = @_;
+
+  my @retv = (map cast($_), @$self);
+
+  return wantarray ? (@retv) : cast([@retv]);
+}
+
+sub lt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Lt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub map {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Map';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub max {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Max';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub min {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Min';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ne {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Ne';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub none {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::None';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub nsort {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Nsort';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub one {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::One';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub pairs {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Pairs';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub pairs_array {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::PairsArray';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub pairs_hash {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::PairsHash';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub part {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Part';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub pop {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Pop';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub push {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Push';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub random {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Random';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub reverse {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Reverse';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub rotate {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Rotate';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub rnsort {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Rnsort';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub rsort {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Rsort';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub set {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Set';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub shift {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Shift';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub size {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Size';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub slice {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Slice';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub sort {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Sort';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub sum {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Sum';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub tail {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Tail';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub unique {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Unique';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub unshift {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Unshift';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub values {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Array::Values';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Array - Array Object for Perl 5
+Data::Object::Array
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Array Class
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object::Array;
 
   my $array = Data::Object::Array->new([1..9]);
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -84,19 +978,66 @@ to returning a new array reference. Unless stated, it may be safe to assume that
 the following methods copy, modify and return new array references based on
 their function.
 
+=cut
+
 =head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 new
+
+  # given 1..9
+
+  my $array = Data::Object::Array->new(1..9);
+  my $array = Data::Object::Array->new([1..9]);
+
+The new method expects a list or array reference and returns a new class
+instance.
+
+=cut
+
+=head2 self
+
+  my $self = $array->self();
+
+The self method returns the calling object (noop).
+
+=cut
+
+=head2 roles
+
+  # given $array
+
+  $array->roles;
+
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=cut
+
+=head2 rules
+
+  my $rules = $array->rules();
+
+The rules method returns consumed rules.
+
+=cut
 
 =head2 all
 
   # given [2..5]
 
   $array->all('$value > 1'); # 1; true
-  $array->all('$value > 3'); # 0; false
+  $array->all('$value > 3'); # 0; false|
 
 The all method returns true if all of the elements in the array meet the
 criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
+
+=cut
 
 =head2 any
 
@@ -110,6 +1051,8 @@ criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 clear
 
   # given ['a'..'g']
@@ -120,6 +1063,8 @@ The clear method is an alias to the empty method. This method returns a
 L<Data::Object::Undef> object. This method is an alias to the empty method.
 Note: This method modifies the array.
 
+=cut
+
 =head2 count
 
   # given [1..5]
@@ -129,14 +1074,7 @@ Note: This method modifies the array.
 The count method returns the number of elements within the array. This method
 returns a L<Data::Object::Number> object.
 
-=head2 data
-
-  # given $array
-
-  $array->data; # original value
-
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+=cut
 
 =head2 defined
 
@@ -149,6 +1087,8 @@ The defined method returns true if the element within the array at the index
 specified by the argument meets the criteria for being defined, otherwise it
 returns false. This method returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 delete
 
   # given [1..5]
@@ -160,23 +1100,7 @@ index specified by the argument after removing it from the array. This method
 returns a data type object to be determined after execution. Note: This method
 modifies the array.
 
-=head2 detract
-
-  # given $array
-
-  $array->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head2 dump
-
-  # given [1..5]
-
-  $array->dump; # '[1,2,3,4,5]'
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 each
 
@@ -194,6 +1118,8 @@ the current position in the loop. This method supports codification, i.e, takes
 an argument which can be a codifiable string, a code reference, or a code data
 type object. This method returns a L<Data::Object::Array> object.
 
+=cut
+
 =head2 each_key
 
   # given ['a'..'g']
@@ -208,6 +1134,8 @@ code reference supplied in the argument, passing the routine the index at the
 current position in the loop. This method supports codification, i.e, takes an
 argument which can be a codifiable string, a code reference, or a code data type
 object. This method returns a L<Data::Object::Array> object.
+
+=cut
 
 =head2 each_n_values
 
@@ -227,6 +1155,8 @@ values until all values have been seen. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Array> object.
 
+=cut
+
 =head2 each_value
 
   # given ['a'..'g']
@@ -242,6 +1172,8 @@ current position in the loop. This method supports codification, i.e, takes an
 argument which can be a codifiable string, a code reference, or a code data type
 object. This method returns a L<Data::Object::Array> object.
 
+=cut
+
 =head2 empty
 
   # given ['a'..'g']
@@ -251,6 +1183,8 @@ object. This method returns a L<Data::Object::Array> object.
 The empty method drops all elements from the array. This method returns a
 L<Data::Object::Array> object. Note: This method modifies the array.
 
+=cut
+
 =head2 eq
 
   # given $array
@@ -259,6 +1193,8 @@ L<Data::Object::Array> object. Note: This method modifies the array.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 exists
 
@@ -271,6 +1207,8 @@ The exists method returns true if the element within the array at the index
 specified by the argument exists, otherwise it returns false. This method
 returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 first
 
   # given [1..5]
@@ -279,6 +1217,8 @@ returns a L<Data::Object::Number> object.
 
 The first method returns the value of the first element in the array. This
 method returns a data type object to be determined after execution.
+
+=cut
 
 =head2 ge
 
@@ -289,6 +1229,8 @@ method returns a data type object to be determined after execution.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
+=cut
+
 =head2 get
 
   # given [1..5]
@@ -298,6 +1240,8 @@ This method will throw an exception if called.
 The get method returns the value of the element in the array at the index
 specified by the argument. This method returns a data type object to be
 determined after execution.
+
+=cut
 
 =head2 grep
 
@@ -317,6 +1261,8 @@ codification, i.e, takes an argument which can be a codifiable string, a code
 reference, or a code data type object. This method returns a
 L<Data::Object::Array> object.
 
+=cut
+
 =head2 gt
 
   # given $array
@@ -325,6 +1271,8 @@ L<Data::Object::Array> object.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 hash
 
@@ -335,6 +1283,8 @@ This method will throw an exception if called.
 The hash method returns a hash reference where each key and value pairs
 corresponds to the index and value of each element in the array. This method
 returns a L<Data::Object::Hash> object.
+
+=cut
 
 =head2 hashify
 
@@ -349,6 +1299,8 @@ method supports codification, i.e, takes an argument which can be a codifiable
 string, a code reference, or a code data type object. Note, undefined elements
 will be dropped. This method returns a L<Data::Object::Hash> object.
 
+=cut
+
 =head2 head
 
   # given [9,8,7,6,5]
@@ -358,6 +1310,8 @@ will be dropped. This method returns a L<Data::Object::Hash> object.
 The head method returns the value of the first element in the array. This
 method returns a data type object to be determined after execution.
 
+=cut
+
 =head2 invert
 
   # given [1..5]
@@ -366,6 +1320,8 @@ method returns a data type object to be determined after execution.
 
 The invert method returns an array reference containing the elements in the
 array in reverse order. This method returns a L<Data::Object::Array> object.
+
+=cut
 
 =head2 iterator
 
@@ -382,6 +1338,8 @@ in the array until all elements have been seen, at which point the iterator
 will return an undefined value. This method returns a L<Data::Object::Code>
 object.
 
+=cut
+
 =head2 join
 
   # given [1..5]
@@ -394,6 +1352,8 @@ joined by the join-string specified by the argument. Note: If the argument is
 omitted, an empty string will be used as the join-string. This method returns a
 L<Data::Object::String> object.
 
+=cut
+
 =head2 keyed
 
   # given [1..5]
@@ -404,6 +1364,8 @@ The keyed method returns a hash reference where the arguments become the keys,
 and the elements of the array become the values. This method returns a
 L<Data::Object::Hash> object.
 
+=cut
+
 =head2 keys
 
   # given ['a'..'d']
@@ -412,6 +1374,8 @@ L<Data::Object::Hash> object.
 
 The keys method returns an array reference consisting of the indicies of the
 array. This method returns a L<Data::Object::Array> object.
+
+=cut
 
 =head2 last
 
@@ -422,6 +1386,8 @@ array. This method returns a L<Data::Object::Array> object.
 The last method returns the value of the last element in the array. This method
 returns a data type object to be determined after execution.
 
+=cut
+
 =head2 le
 
   # given $array
@@ -430,6 +1396,8 @@ returns a data type object to be determined after execution.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 length
 
@@ -440,6 +1408,8 @@ This method will throw an exception if called.
 The length method returns the number of elements in the array. This method
 returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 list
 
   # given $array
@@ -449,6 +1419,8 @@ returns a L<Data::Object::Number> object.
 The list method returns a shallow copy of the underlying array reference as an
 array reference. This method return a L<Data::Object::Array> object.
 
+=cut
+
 =head2 lt
 
   # given $array
@@ -457,6 +1429,8 @@ array reference. This method return a L<Data::Object::Array> object.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 map
 
@@ -474,6 +1448,8 @@ current position in the loop and returning a new array reference containing
 the elements for which the argument returns a value or non-empty list. This
 method returns a L<Data::Object::Array> object.
 
+=cut
+
 =head2 max
 
   # given [8,9,1,2,3,4,5]
@@ -484,14 +1460,7 @@ The max method returns the element in the array with the highest numerical
 value. All non-numerical element are skipped during the evaluation process. This
 method returns a L<Data::Object::Number> object.
 
-=head2 methods
-
-  # given $array
-
-  $array->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
+=cut
 
 =head2 min
 
@@ -503,6 +1472,8 @@ The min method returns the element in the array with the lowest numerical
 value. All non-numerical element are skipped during the evaluation process. This
 method returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 ne
 
   # given $array
@@ -512,15 +1483,7 @@ method returns a L<Data::Object::Number> object.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
-=head2 new
-
-  # given 1..9
-
-  my $array = Data::Object::Array->new(1..9);
-  my $array = Data::Object::Array->new([1..9]);
-
-The new method expects a list or array reference and returns a new class
-instance.
+=cut
 
 =head2 none
 
@@ -534,6 +1497,8 @@ criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 nsort
 
   # given [5,4,3,2,1]
@@ -542,6 +1507,8 @@ data type object. This method returns a L<Data::Object::Number> object.
 
 The nsort method returns an array reference containing the values in the array
 sorted numerically. This method returns a L<Data::Object::Array> object.
+
+=cut
 
 =head2 one
 
@@ -555,6 +1522,8 @@ criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 pairs
 
   # given [1..5]
@@ -564,6 +1533,8 @@ data type object. This method returns a L<Data::Object::Number> object.
 The pairs method is an alias to the pairs_array method. This method returns a
 L<Data::Object::Array> object. This method is an alias to the pairs_array
 method.
+
+=cut
 
 =head2 pairs_array
 
@@ -576,6 +1547,8 @@ where each sub-array reference has two elements corresponding to the index and
 value of each element in the array. This method returns a L<Data::Object::Array>
 object.
 
+=cut
+
 =head2 pairs_hash
 
   # given [1..5]
@@ -585,6 +1558,8 @@ object.
 The pairs_hash method returns a hash reference where each key and value pairs
 corresponds to the index and value of each element in the array. This method
 returns a L<Data::Object::Hash> object.
+
+=cut
 
 =head2 part
 
@@ -600,6 +1575,8 @@ codification, i.e, takes an argument which can be a codifiable string, a code
 reference, or a code data type object. This method returns a
 L<Data::Object::Array> object.
 
+=cut
+
 =head2 pop
 
   # given [1..5]
@@ -610,14 +1587,7 @@ The pop method returns the last element of the array shortening it by one. Note,
 this method modifies the array. This method returns a data type object to be
 determined after execution. Note: This method modifies the array.
 
-=head2 print
-
-  # given [1..5]
-
-  $array->print; # '[1,2,3,4,5]'
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
+=cut
 
 =head2 push
 
@@ -629,6 +1599,8 @@ The push method appends the array by pushing the agruments onto it and returns
 itself. This method returns a data type object to be determined after execution.
 Note: This method modifies the array.
 
+=cut
+
 =head2 random
 
   # given [1..5]
@@ -637,6 +1609,8 @@ Note: This method modifies the array.
 
 The random method returns a random element from the array. This method returns a
 data type object to be determined after execution.
+
+=cut
 
 =head2 reverse
 
@@ -647,24 +1621,7 @@ data type object to be determined after execution.
 The reverse method returns an array reference containing the elements in the
 array in reverse order. This method returns a L<Data::Object::Array> object.
 
-=head2 rnsort
-
-  # given [5,4,3,2,1]
-
-  $array->rnsort; # [5,4,3,2,1]
-
-The rnsort method returns an array reference containing the values in the
-array sorted numerically in reverse. This method returns a
-L<Data::Object::Array> object.
-
-=head2 roles
-
-  # given $array
-
-  $array->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
+=cut
 
 =head2 rotate
 
@@ -679,6 +1636,20 @@ becomes the last element and the second element becomes the first element each
 time this method is called. This method returns a L<Data::Object::Array> object.
 Note: This method modifies the array.
 
+=cut
+
+=head2 rnsort
+
+  # given [5,4,3,2,1]
+
+  $array->rnsort; # [5,4,3,2,1]
+
+The rnsort method returns an array reference containing the values in the
+array sorted numerically in reverse. This method returns a
+L<Data::Object::Array> object.
+
+=cut
+
 =head2 rsort
 
   # given ['a'..'d']
@@ -689,15 +1660,7 @@ The rsort method returns an array reference containing the values in the array
 sorted alphanumerically in reverse. This method returns a L<Data::Object::Array>
 object.
 
-=head2 say
-
-  # given [1..5]
-
-  $array->say; # '[1,2,3,4,5]\n'
-
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
+=cut
 
 =head2 set
 
@@ -710,6 +1673,8 @@ specified by the argument after updating it to the value of the second argument.
 This method returns a data type object to be determined after execution. Note:
 This method modifies the array.
 
+=cut
+
 =head2 shift
 
   # given [1..5]
@@ -720,6 +1685,8 @@ The shift method returns the first element of the array shortening it by one.
 This method returns a data type object to be determined after execution. Note:
 This method modifies the array.
 
+=cut
+
 =head2 size
 
   # given [1..5]
@@ -728,6 +1695,8 @@ This method modifies the array.
 
 The size method is an alias to the length method. This method returns a
 L<Data::Object::Number> object. This method is an alias to the length method.
+
+=cut
 
 =head2 slice
 
@@ -739,6 +1708,8 @@ The slice method returns an array reference containing the elements in the
 array at the index(es) specified in the arguments. This method returns a
 L<Data::Object::Array> object.
 
+=cut
+
 =head2 sort
 
   # given ['d','c','b','a']
@@ -747,6 +1718,8 @@ L<Data::Object::Array> object.
 
 The sort method returns an array reference containing the values in the array
 sorted alphanumerically. This method returns a L<Data::Object::Array> object.
+
+=cut
 
 =head2 sum
 
@@ -758,6 +1731,8 @@ The sum method returns the sum of all values for all numerical elements in the
 array. All non-numerical element are skipped during the evaluation process. This
 method returns a L<Data::Object::Number> object.
 
+=cut
+
 =head2 tail
 
   # given [1..5]
@@ -768,24 +1743,7 @@ The tail method returns an array reference containing the second through the
 last elements in the array omitting the first. This method returns a
 L<Data::Object::Array> object.
 
-=head2 throw
-
-  # given $array
-
-  $array->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
-
-=head2 type
-
-  # given $array
-
-  $array->type; # ARRAY
-
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 unique
 
@@ -795,6 +1753,8 @@ This method returns a L<Data::Object::String> object.
 
 The unique method returns an array reference consisting of the unique elements
 in the array. This method returns a L<Data::Object::Array> object.
+
+=cut
 
 =head2 unshift
 
@@ -806,6 +1766,8 @@ The unshift method prepends the array by pushing the agruments onto it and
 returns itself. This method returns a data type object to be determined after
 execution. Note: This method modifies the array.
 
+=cut
+
 =head2 values
 
   # given [1..5]
@@ -816,57 +1778,15 @@ The values method returns an array reference consisting of the elements in the
 array. This method essentially copies the content of the array into a new
 container. This method returns a L<Data::Object::Array> object.
 
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Array>
-role and implements proxy methods as documented herewith.
-
-=head1 CODIFICATION
-
-Certain methods provided by the this module support codification, a process
-which converts a string argument into a code reference which can be used to
-supply a callback to the method called. A codified string can access its
-arguments by using variable names which correspond to letters in the alphabet
-which represent the position in the argument list. For example:
-
-  $array->example('$a + $b * $c', 100);
-
-  # if the example method does not supply any arguments automatically then
-  # the variable $a would be assigned the user-supplied value of 100,
-  # however, if the example method supplies two arguments automatically then
-  # those arugments would be assigned to the variables $a and $b whereas $c
-  # would be assigned the user-supplied value of 100
-
-  # e.g.
-
-  $array->each('the value at $index is $value');
-
-  # or
-
-  $array->each_n_values(4, 'the value at $index0 is $value0');
-
-  # etc
-
-Any place a codified string is accepted, a coderef or L<Data::Object::Code>
-object is also valid. Arguments are passed through the usual C<@_> list.
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Collection>
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -875,14 +1795,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
-
-=item *
-
-L<Data::Object::Role::List>
 
 =item *
 
@@ -898,101 +1810,28 @@ L<Data::Object::Role::Type>
 
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
+L<Data::Object::Rule::Collection>
 
 =item *
 
-L<Data::Object::Class>
+L<Data::Object::Rule::Comparison>
 
 =item *
 
-L<Data::Object::Class::Syntax>
+L<Data::Object::Rule::Defined>
 
 =item *
 
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::List>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

@@ -1,6 +1,10 @@
 Change history for HTTP::Tiny::FileProtocol
 ===========================================
 
+0.06  2019-03-12 21:50:00
+
+      * update dist.ini
+
 0.05  2017-10-06T13:47:00
 
       update dist.ini:

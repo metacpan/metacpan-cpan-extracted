@@ -9,16 +9,14 @@ use Inline::MakeMaker;
 use Term::ANSIColor;
 
 if (defined($ENV{'DISPLAY'})) {
-    print "\n\n",colored(['red'],qq(****************************************************************************
-        * Graphics::Framebuffer should not be installed from within X-Windows!     *
-        *                                                                          *
-        * You should install it from the console itself, and not a console window. *
-        ****************************************************************************
-    )),colored(['yellow'],qq(
-        If you insist on installing from within X-Windows, please keep in mind that
-        the tests will show nothing, as they will be unable to draw to the screen,
-        since X-Windows is using it.  Thus the tests will run in emulation mode only.
-    ));
+    print "\n\n",
+      colored(['white on_red'],'******************************************************************************'),"\n",
+      colored(['white on_red'],'* Graphics::Framebuffer should not be installed from within X-Windows!  You  *'),"\n",
+      colored(['white on_red'],'* should install it from the console itself, and not a console window.       *'),"\n",
+      colored(['white on_red'],'******************************************************************************'),"\n",
+      colored(['black on_yellow'],'If you insist on installing from within X-Windows, please keep in mind that   '),"\n",
+      colored(['black on_yellow'],'the tests will show nothing, as they will be unable to draw to the screen,    '),"\n",
+      colored(['black on_yellow'],'since X-Windows is using it.  Thus the tests will run in emulation mode only. '),"\n";
     sleep 1;
 }
 
@@ -34,7 +32,7 @@ if (defined($ENV{'DISPLAY'})) {
 my $t = '  ';
 my $name = '========================== Graphics::Framebuffer =============================';
 my $line = '------------------------------------------------------------------------------';
-print "\n",colored(['bright_yellow on_blue'],$name),"\n";
+print colored(['bright_yellow on_blue'],$name),"\n";
 
 print colored(['bright_yellow'],'Adding C to Module...');
 my $ccode = slurp_file('src/Framebuffer.c');
@@ -87,7 +85,7 @@ if (WriteMakefile(
     print "The ",'"', colored(['bold cyan'],'examples'), qq{" directory (in this package) has some handy scripts to help get\nyou started, and show you how to use the module.  Just 'perldoc' on each to\nsee how to use them:\n\n};
 
     print $t,colored(['bold green'],'primitives.pl'),"         - This script will pretty much demonstrate all of\n                          the capabilities of this module.\n\n";
-    print $t,colored(['bold green'],'threaded_slideshow.pl')," - This script shows all of the images in a specific\n                          path.  It divides your screen by how many threads,\n                          and dedicates a thread to each portion to show an\n                          image.\n\n";
+    print $t,colored(['bold green'],'threaded_slideshow.pl')," - This script shows all of the images in a specific\n                          path.  It divides your screen by how many threads,\n                          and dedicates two threads to each portion to show an\n                          image.\n\n";
     print $t,colored(['bold green'],'slideshow.pl'),"          - This script shows all of the images in a specific\n                          path (full screen, if asked).\n\n";
     print $t,colored(['bold green'],'viewpic.pl'),"            - This script shows one specific image (or\n                          animation).\n\n";
     print $t,colored(['bold green'],'dump.pl'),"               - This script does a diagnostic variable dump to the\n                          file 'dump.log', for the author to help you with\n                          troubleshooting.\n\n";

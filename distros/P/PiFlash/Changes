@@ -1,5 +1,27 @@
 Change log for PiFlash
 
+0.3.1 2019-03-13T01:19:06-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - remove README from RPM spec file, which blocked Dist::Zilla from 0.3.0
+   release to GitHub after upload to CPAN
+
+0.3.0 2019-03-13T00:59:24Z America/Los_Angeles
+ [DOCS]
+ - remove 2nd automatic generation of README from POD in bin/piflash - it's
+   redundant with README.md needed for GitHub
+ - add plugin documentation in new PiFlash::Plugin module
+
+ [MINOR]
+ - move plugin code to new PiFlash::Plugin module
+ - add PiFlash::Object to provide a common new() which came from
+   PiFlash::Hook but is also needed for PiFlash::Plugin
+
+ [REVISION]
+ - Dist::Zilla configuration - move git plugins before @Basic plugins as
+   recommended in docs
+ - expand unit tests for PiFlash::State and PiFlash::Command
+ - expand unit tests for plugins
+
 0.2.2 2019-03-07T17:24:45-08:00 America/Los_Angeles
  [DOCS]
  - remove automatic generation of README from POD in bin/piflash - it's

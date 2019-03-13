@@ -1,5 +1,9 @@
 Revision history for Perl extension Metabrik.
 
+1.40.0 Wed 13 Mar 11:00:33 CET 2019
+   - update: copyright notice
+   - new: support for Kali Linux operating system
+
 1.31.0 Tue 30 Oct 18:07:00 CET 2018
    - bugfix: creates ~/metabrik on first run if it doesn't exist
 

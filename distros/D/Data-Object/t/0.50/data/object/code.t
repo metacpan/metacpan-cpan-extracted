@@ -4,10 +4,9 @@ use Test::More;
 
 use_ok 'Data::Object::Code';
 
-ok Data::Object::Code->does('Data::Object::Role::Defined');
+ok Data::Object::Code->does('Data::Object::Rule::Defined');
 ok Data::Object::Code->does('Data::Object::Role::Detract');
 ok Data::Object::Code->does('Data::Object::Role::Dumper');
-ok Data::Object::Code->does('Data::Object::Role::Item');
 ok Data::Object::Code->does('Data::Object::Role::Throwable');
 ok Data::Object::Code->does('Data::Object::Role::Type');
 

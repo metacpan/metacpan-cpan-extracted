@@ -4,13 +4,19 @@ args
 config
 cpan
 diag
+Dist
 ENV
 eq
 foo
 foreach
 func
+GitHub
+github
 hashref
 hashrefs
+html
+http
+https
 isnt
 listref
 listrefs
@@ -26,6 +32,7 @@ parens
 perl
 perl's
 qw
+rt
 sbeck
 testdir
 testnum

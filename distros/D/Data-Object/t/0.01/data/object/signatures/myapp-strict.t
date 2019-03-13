@@ -2,8 +2,9 @@ use lib 't/0.01/lib';
 
 use Test::More;
 
-use Data::Object::Signatures ':strict' => qw(MyApp::Types);
-use Data::Object qw(deduce);
+use Data::Object::Config::Signatures ':strict' => qw(MyApp::Types);
+use Data::Object::Export qw(deduce);
+use Data::Object::Registry;
 
 fun greeting (AllCaps $name) {
   return "hello, $name";

@@ -1,5 +1,5 @@
 #
-# $Id: Csv.pm,v 8f67b8413777 2018/01/18 09:31:29 gomor $
+# $Id: Csv.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # file::csv Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 8f67b8413777 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -546,7 +546,7 @@ Metabrik::File::Csv - file::csv Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

@@ -11,7 +11,7 @@ use Class::Interface qw/interface/;
 #   * Other Sketch software implementation, e.g., Finch
 #   * Ability to write different formats
 
-our $VERSION = 0.1;
+our $VERSION = 0.3;
 
 =pod
 
@@ -19,41 +19,51 @@ our $VERSION = 0.1;
 
 Sketch interface module
 
+=over
+
+=back
+
 =head1 SYNOPSIS
 
 An interface module for Sketches, e.g., Mash
 
-		use strict;
-		use warnings;
-		use Bio::Sketch::Mash;
-		
-		# Produce a sketch file file.fastq.gz.msh
-		system("mash sketch file.fastq.gz");
-		# Read the sketch
-		my $sketch = Bio::Sketch::Mash->new("file.fastq.gz.msh");
-		$sketch->writeJson("file.fastq.gz.json");
+    use strict;
+    use warnings;
+    use Bio::Sketch::Mash;
+    
+    # Produce a sketch file file.fastq.gz.msh
+    system("mash sketch file.fastq.gz");
+    # Read the sketch
+    my $sketch = Bio::Sketch::Mash->new("file.fastq.gz.msh");
+    $sketch->writeJson("file.fastq.gz.json");
 
 =over
+
+=back
 
 =cut
 
 =pod
+
+=over
 
 =item Bio::Sketch->new("file.msh", \%options);
 
 Create a new Sketch instance.  One object per file.
 
   Arguments: Sketch filename
-	           Hash of options
+  Hash of options
   Returns:   Sketch object
 
 =back
 
 =cut
 
-sub new{...;};
+sub new{};
 
 =pod
+
+=over
 
 =item $sketch->sketch("file.fastq.gz");
 
@@ -66,9 +76,11 @@ Sketch a raw reads or assembly file
 
 =cut
 
-sub sketch{...;};
+sub sketch{;};
 
 =pod
+
+=over
 
 =item $sketch->dist($other);
 
@@ -81,9 +93,11 @@ Find the distance between two sketches
 
 =cut
 
-sub dist{...;};
+sub dist{;};
 
 =pod
+
+=over
 
 =item $sketch->paste([$other, $other2...]);
 
@@ -96,5 +110,5 @@ Merge two sketches
 
 =cut
 
-sub paste{...;};
+sub paste{;};
 

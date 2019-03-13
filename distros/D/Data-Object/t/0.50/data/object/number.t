@@ -4,16 +4,16 @@ use Test::More;
 
 use_ok 'Data::Object::Number';
 
-ok Data::Object::Number->does('Data::Object::Role::Comparison');
-ok Data::Object::Number->does('Data::Object::Role::Defined');
+ok Data::Object::Number->does('Data::Object::Rule::Comparison');
+ok Data::Object::Number->does('Data::Object::Rule::Defined');
 ok Data::Object::Number->does('Data::Object::Role::Detract');
 ok Data::Object::Number->does('Data::Object::Role::Dumper');
-ok Data::Object::Number->does('Data::Object::Role::Item');
-ok Data::Object::Number->does('Data::Object::Role::Numeric');
 ok Data::Object::Number->does('Data::Object::Role::Output');
 ok Data::Object::Number->does('Data::Object::Role::Throwable');
 ok Data::Object::Number->does('Data::Object::Role::Type');
-ok Data::Object::Number->does('Data::Object::Role::Value');
+
+# no longer supported
+# ok Data::Object::Number->does('Data::Object::Role::Value');
 
 can_ok 'Data::Object::Number', 'abs';
 can_ok 'Data::Object::Number', 'atan2';

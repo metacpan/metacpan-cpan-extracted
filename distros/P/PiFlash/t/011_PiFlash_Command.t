@@ -42,6 +42,19 @@ sub expand
 	return $value;
 }
 
+# find a program's expected location to verify PiFlash::Command::prog()
+sub find_prog
+{
+	my $prog = shift;
+
+	foreach my $path ("/usr/bin", "/sbin", "/usr/sbin", "/bin") {
+		if (-x "$path/$prog") {
+			return "$path/$prog";
+		}
+	}
+	# return undef value by default
+}
+
 # test PiFlash::Command::prog()
 sub test_prog
 {
@@ -80,16 +93,31 @@ sub test_prog
 	if (!exists $params->{expected_exception}) {
 		is($prog->{$progname}, $progpath, "$test_set: path in cache: $progname -> ".($progpath // "(undef)"));
 		if (defined $progpath) {
-			ok(-e $progpath, "$test_set: path points to executable program");
+			ok(-x $progpath, "$test_set: path points to executable program");
 		} else {
 			fail("$test_set: path points to executable program (undefined)");
 		}
 		is($exception, '', "$test_set: no exceptions");
+
+		# verify program is in expected location
+		my $expected_path = find_prog($progname);
+		my $envprog = PiFlash::Command::envprog($progname);
+		my $reason = "default";
+		if (exists $ENV{$envprog} and -x $ENV{$envprog}) {
+			if (-x $expected_path) {
+				$reason = "default, ignore ENV{$envprog}";
+			} else {
+				$expected_path = $ENV{$envprog};
+				$reason = "ENV{$envprog}";
+			}
+		}
+		is($progpath, $expected_path, "$test_set: expected at $expected_path by $reason");
 	} else {
 		ok(!exists $prog->{$progname}, "$test_set: path not in cache as expected after exception");
 		is($progpath, undef, "$test_set: path undefined after expected exception");
 		my $expected_exception = expand($params, "expected_exception");
 		like($exception, qr/$expected_exception/, "$test_set: expected exception");
+		pass("$test_set: $progname has no location due to expected exception");
 	}
 
 	# restore environment and remove test-fixture data from it
@@ -209,23 +237,22 @@ sub test_fork_exec
 #
 
 # strings used for tests
-# test string: random text intended to look different from normal output
+# test string: uses Latin text for intention to appear obviously out of place outside the context of these tests
 my $test_string = "Ad astra per alas porci";
 # (what it means: Latin for "to the stars on the wings of a pig", motto used by author John Steinbeck after a teacher
-# once told him he'd only be a writer when pigs fly)
+# once told him he'd only be a successful writer when pigs fly)
 
 # test PiFlash::Command::prog() and check for existence of prerequisite programs for following tests
-my $trueprog;
-foreach my $path ("/usr/bin", "/sbin", "/usr/sbin", "/bin") {
-	if (-x "$path/true") {
-		$trueprog = "$path/true";
-		last;
-	}
-}
+my $trueprog = find_prog("true");
 if (!defined $trueprog) {
 	BAIL_OUT("This system doesn't have a 'true' program? Tests were counting on one to be there.");
 }
+
+# test fixtures for program path tests
+# these also fill the path cache for commands used in later fork-exec tests
 my @prog_tests = (
+	{ progname => "true" },
+	{ progname => "false" },
 	{ progname => "cat" },
 	{ progname => "echo" },
 	{ progname => "sh" },
@@ -235,15 +262,39 @@ my @prog_tests = (
 		expected_exception => "unknown secure location for \$progname",
 	},
 	{
-		env => {
-			XYZZY_NOTFOUND_PROG => $trueprog,
-		},
+		env => { XYZZY_NOTFOUND_PROG => $trueprog },
 		progname => "xyzzy-notfound",
 	},
-);
+	{
+		env => { ECHO_PROG => $trueprog },
+		progname => "echo",
+	},
+	);
 
 # data for fork_exec() test sets
 my @fork_exec_tests = (
+	# test capturing true result with fork_exec()
+	# runs command: true
+	{
+		cmdname => "true command",
+		cmdline => [q{$true}],
+		returncode => 0,
+		expected_out => undef,
+		expected_err => undef,
+	},
+
+	# test capturing false result with fork_exec()
+	# runs command: false
+	# exception expected during this test
+	{
+		cmdname => "false command",
+		cmdline => [q{$false}],
+		returncode => 1,
+		expected_out => undef,
+		expected_err => undef,
+		expected_exception => "\$cmdname command exited with value \$returncode",
+	},
+
 	# test capturing output of a fixed string from a program with fork_exec()
 	# runs command: echo "$test_string"
 	{
@@ -252,6 +303,15 @@ my @fork_exec_tests = (
 		returncode => 0,
 		expected_out => $test_string,
 		expected_err => undef,
+	},
+
+	# test capturing an error output
+	{
+		cmdname => "echo string to stderr",
+		cmdline => [q{$sh}, "-c", qq{\$echo $test_string >&2}],
+		returncode => 0,
+		expected_out => undef,
+		expected_err => $test_string,
 	},
 
 	# test sending input and receiving the same string back as output from a program with fork_exec()
@@ -266,10 +326,13 @@ my @fork_exec_tests = (
 		expected_err => undef,
 	},
 
-	# test capturing an error output
+	# test sending input and receiving the same string back in stderr with fork_exec()
+	# runs command: cat
+	# input piped to the program: $test_string
 	{
-		cmdname => "echo string to stderr",
-		cmdline => [q{$sh}, "-c", qq{\$echo $test_string >&2}],
+		input => [ $test_string ],
+		cmdname => "cat input to stderr",
+		cmdline => [q{$sh}, "-c", qq{\$cat >&2}],
 		returncode => 0,
 		expected_out => undef,
 		expected_err => $test_string,
@@ -292,6 +355,28 @@ my @fork_exec_tests = (
 		cmdname => "return errorcode \$returncode",
 		cmdline => [q{$sh}, "-c", q{exit $returncode}],
 		returncode => 2,
+		expected_out => undef,
+		expected_err => undef,
+		expected_exception => "\$cmdname command exited with value \$returncode",
+	},
+
+	# test capturing an error 3 result
+	# exception expected during this test
+	{
+		cmdname => "return errorcode \$returncode",
+		cmdline => [q{$sh}, "-c", q{exit $returncode}],
+		returncode => 3,
+		expected_out => undef,
+		expected_err => undef,
+		expected_exception => "\$cmdname command exited with value \$returncode",
+	},
+
+	# test capturing an error 255 result
+	# exception expected during this test
+	{
+		cmdname => "return errorcode \$returncode",
+		cmdline => [q{$sh}, "-c", q{exit $returncode}],
+		returncode => 255,
 		expected_out => undef,
 		expected_err => undef,
 		expected_exception => "\$cmdname command exited with value \$returncode",
@@ -346,12 +431,12 @@ my @fork_exec_tests = (
 	},
 );
 
-plan tests => 1 + (scalar @prog_tests)*3 + (scalar @fork_exec_tests)*9;
+plan tests => 1 + (scalar @prog_tests)*4 + (scalar @fork_exec_tests)*9;
 
 # initialize program state storage
 my @top_level_params = PiFlash::state_categories();
 PiFlash::State->init(@top_level_params);
-PiFlash::State::cli_opt("logging", 1); # required to keep logs of commands
+PiFlash::State::cli_opt("logging", 1); # logging required to keep logs of commands (like verbose but no output)
 
 # test forking a simple process that returns a true value using fork_child()
 {
@@ -377,7 +462,7 @@ PiFlash::Command::prog(); # init cache
 
 # use prog cache from previous tests to check for existence of prerequisite programs for following tests
 my $prog = PiFlash::State::system("prog");
-my @prog_names = qw(cat echo sh kill);
+my @prog_names = qw(true false cat echo sh kill);
 my @missing;
 foreach my $progname (@prog_names) {
 	if (!exists $prog->{$progname}) {

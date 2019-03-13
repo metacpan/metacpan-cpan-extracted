@@ -24,11 +24,11 @@ REST::Client::CrossRef - Read data from CrossRef using its REST API
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =cut
 

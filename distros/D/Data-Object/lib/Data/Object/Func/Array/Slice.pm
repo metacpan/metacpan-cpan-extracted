@@ -1,0 +1,94 @@
+package Data::Object::Func::Array::Slice;
+
+use Data::Object Class;
+
+extends 'Data::Object::Func::Array';
+
+# BUILD
+
+has arg1 => (
+  is => 'ro',
+  isa => 'Object',
+  req => 1
+);
+
+has args => (
+  is => 'ro',
+  isa => 'ArrayRef[Any]',
+  req => 1
+);
+
+# METHODS
+
+sub execute {
+  my ($self) = @_;
+
+  my ($data, @args) = $self->unpack;
+
+  return [@$data[@args]];
+}
+
+sub mapping {
+  return ('arg1', '@args');
+}
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Object::Func::Array::Slice
+
+=cut
+
+=head1 ABSTRACT
+
+Data-Object Array Function (Slice) Class
+
+=cut
+
+=head1 SYNOPSIS
+
+  use Data::Object::Func::Array::Slice;
+
+  my $func = Data::Object::Func::Array::Slice->new(@args);
+
+  $func->execute;
+
+=cut
+
+=head1 DESCRIPTION
+
+Data::Object::Func::Array::Slice is a function object for Data::Object::Array.
+
+=cut
+
+=head1 METHODS
+
+This package implements the following methods.
+
+=cut
+
+=head2 execute
+
+  my $data = Data::Object::Array->new([1..4]);
+
+  my $func = Data::Object::Func::Array::Slice->new(
+    arg1 => $data,
+    args => [0,1]
+  );
+
+  my $result = $func->execute;
+
+Executes the function logic and returns the result.
+
+=cut
+
+=head2 mapping
+
+  my @data = $self->mapping;
+
+Returns the ordered list of named function object arguments.
+
+=cut

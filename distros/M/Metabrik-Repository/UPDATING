@@ -1,3 +1,8 @@
+20190313
+   AFFECTS: api::onyphe
+  - api::onyphe has been removed from this repository, it is hosted on
+    Github now: https://github.com/onyphe/client
+
 20180403
    AFFECTS: client::elasticsearch
    - client::elasticsearch now uses datadir Attribute and export_as_csv Command now saves 

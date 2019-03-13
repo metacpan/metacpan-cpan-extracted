@@ -40,11 +40,12 @@
             "Moo" : "2.001001",
             "REST::Client" : "273",
             "Test::More" : "1.001014",
-            "URI::Escape" : "3.31"
+            "URI::Escape" : "3.31",
+            "namespace::clean" : "0.26"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

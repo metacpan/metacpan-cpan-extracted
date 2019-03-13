@@ -1,3 +1,7 @@
+0.004
+    Fixed testing issues on Windows
+    Suppressed using local RC for tests, may affect results and output
+
 0.003
     Added support for parallel running
 

@@ -1,88 +1,234 @@
-# ABSTRACT: Scalar Object for Perl 5
 package Data::Object::Scalar;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  load
+);
 
-with 'Data::Object::Role::Scalar';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Comparison
+  Data::Object::Rule::Defined
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '~~'     => 'data',
+  fallback => 1
+);
 
-  my $arg  = $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
   if (Scalar::Util::blessed($arg) && $arg->isa('Regexp') && $^V <= v5.12.0) {
     $arg = do { \(my $q = qr/$arg/) };
   }
 
   return bless ref($arg) ? $arg : \$arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new$/;
+sub roles {
+  return cast([@roles]);
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub rules {
+  return cast([@rules]);
+}
 
-  my $results = $self->$orig(@args);
+# DISPATCHERS
 
-  return Data::Object::deduce_deep($results);
+sub defined {
+  my ($self, @args) = @_;
 
-};
+  try {
+    my $func = 'Data::Object::Func::Scalar::Defined';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub eq {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Scalar::Eq';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ge {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Scalar::Ge';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub gt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Scalar::Gt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub le {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Scalar::Le';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub lt {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Scalar::Lt';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub ne {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = 'Data::Object::Func::Scalar::Ne';
+
+    return cast(load($func)->new($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Scalar - Scalar Object for Perl 5
+Data::Object::Scalar
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Scalar Class
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object::Scalar;
 
-  my $scalar = Data::Object::Scalar->new(\12345);
+  my $scalar = Data::Object::Scalar->new(\*main);
+
+=cut
 
 =head1 DESCRIPTION
 
 Data::Object::Scalar provides routines for operating on Perl 5 scalar
 objects. Scalar methods work on data that meets the criteria for being a scalar.
 
+=cut
+
 =head1 METHODS
 
-=head2 data
+This package implements the following methods.
+
+=cut
+
+=head2 new
+
+  # given \*main
+
+  my $scalar = Data::Object::Scalar->new(\*main);
+
+The new method expects a scalar reference and returns a new class instance.
+
+=cut
+
+=head2 roles
 
   # given $scalar
 
-  $scalar->data; # original value
+  $scalar->roles;
 
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=cut
+
+=head2 rules
+
+  my $rules = $scalar->rules;
+
+The rules method returns consumed rules.
+
+=cut
 
 =head2 defined
 
@@ -94,23 +240,7 @@ The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
 L<Data::Object::Number> object.
 
-=head2 detract
-
-  # given $scalar
-
-  $scalar->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head2 dump
-
-  # given $scalar
-
-  $scalar->dump;
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
+=cut
 
 =head2 eq
 
@@ -121,6 +251,8 @@ This method returns a L<Data::Object::String> object.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
+=cut
+
 =head2 ge
 
   # given $scalar
@@ -129,6 +261,8 @@ This method will throw an exception if called.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 gt
 
@@ -139,6 +273,8 @@ This method will throw an exception if called.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
+=cut
+
 =head2 le
 
   # given $scalar
@@ -147,6 +283,8 @@ This method will throw an exception if called.
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=cut
 
 =head2 lt
 
@@ -157,14 +295,7 @@ This method will throw an exception if called.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
-=head2 methods
-
-  # given $scalar
-
-  $scalar->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
+=cut
 
 =head2 ne
 
@@ -175,79 +306,15 @@ returns a L<Data::Object::Array> object.
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
-=head2 new
-
-  # given \12345
-
-  my $scalar = Data::Object::Scalar->new(\12345);
-
-The new method expects a scalar reference and returns a new class instance.
-
-=head2 print
-
-  # given $scalar
-
-  $scalar->print;
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
-
-=head2 roles
-
-  # given $scalar
-
-  $scalar->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 say
-
-  # given $scalar
-
-  $scalar->say;
-
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
-
-=head2 throw
-
-  # given $scalar
-
-  $scalar->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
-
-=head2 type
-
-  # given $scalar
-
-  $scalar->type; # SCALAR
-
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Scalar>
-role and implements proxy methods as documented herewith.
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -256,10 +323,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
 
 =item *
 
@@ -273,107 +336,22 @@ L<Data::Object::Role::Throwable>
 
 L<Data::Object::Role::Type>
 
-=item *
-
-L<Data::Object::Role::Value>
-
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
+L<Data::Object::Rule::Comparison>
 
 =item *
 
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::Defined>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

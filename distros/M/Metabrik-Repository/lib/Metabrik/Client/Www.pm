@@ -1,5 +1,5 @@
 #
-# $Id: Www.pm,v 0c01574109db 2018/01/29 13:08:02 gomor $
+# $Id: Www.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # client::www Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 0c01574109db $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable browser http javascript screenshot) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -32,6 +32,7 @@ sub brik_properties {
          max_redirects => [ qw(count) ],
          client => [ qw(object) ],
          _last => [ qw(object|INTERNAL) ],
+         _last_code => [ qw(code|INTERNAL) ],
       },
       attributes_default => {
          ssl_verify => 0,
@@ -74,6 +75,7 @@ sub brik_properties {
          mirror => [ qw(url|$url_list output|OPTIONAL datadir|OPTIONAL) ],
          parse => [ qw(html) ],
          get_last => [ ],
+         get_last_code => [ ],
       },
       require_modules => {
          'Progress::Any::Output' => [ ],
@@ -84,6 +86,7 @@ sub brik_properties {
          'LWP::UserAgent' => [ ],
          'LWP::UserAgent::ProgressAny' => [ ],
          'HTTP::Request' => [ ],
+         'HTTP::Request::Common' => [ ],
          'WWW::Mechanize' => [ ],
          'Mozilla::CA' => [ ],
          'HTML::Form' => [ ],
@@ -101,6 +104,9 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(libssl-dev phantomjs) ],
          debian => [ qw(libssl-dev phantomjs) ],
+         kali => [ qw(libssl-dev phantomjs) ],
+         centos => [ qw(openssl-devel) ],
+         redhat => [ qw(openssl-devel) ],
       },
    };
 }
@@ -109,7 +115,7 @@ sub create_user_agent {
    my $self = shift;
    my ($uri, $username, $password) = @_;
 
-   $self->log->verbose("create_user_agent: creating agent");
+   $self->log->debug("create_user_agent: creating agent");
 
    $uri ||= $self->uri;
    if ($self->ssl_verify) {
@@ -192,10 +198,10 @@ sub create_user_agent {
       }
    }
 
-   $username ||= $self->username;
-   $password ||= $self->password;
+   $username = defined($username) ? $username : $self->username;
+   $password = defined($password) ? $password : $self->password;
    if (defined($username) && defined($password)) {
-      $self->log->verbose("create_user_agent: using Basic authentication");
+      $self->log->debug("create_user_agent: using Basic authentication");
       $mech->cookie_jar({});
       $mech->credentials($username, $password);
    }
@@ -225,8 +231,8 @@ sub _method {
 
    $self->timeout(0);
 
-   $username ||= $self->username;
-   $password ||= $self->password;
+   $username = defined($username) ? $username : $self->username;
+   $password = defined($password) ? $password : $self->password;
    my $client = $self->client;
    if (! defined($self->client)) {
       $client = $self->create_user_agent($uri, $username, $password) or return;
@@ -256,6 +262,11 @@ sub _method {
       }
       if ($method eq 'post' || $method eq 'put') {
          $response = $client->$method($uri, Content => $data);
+      }
+      elsif ($method eq 'patch') {
+         # https://stackoverflow.com/questions/23910962/how-to-send-a-http-patch-request-with-lwpuseragent
+         my $req = HTTP::Request::Common::PATCH($uri, [ %$data ]);
+         $response = $client->request($req);
       }
       elsif ($method eq 'options' || $method eq 'patch') {
          my $req = HTTP::Request->new($method, $uri, $add_headers);
@@ -790,12 +801,13 @@ sub mirror {
          return $self->log->error("mirror: mirroring URL [$url] to local file [$output] failed: $@");
       }
       my $code = $rc->code;
+      $self->_last_code($code);
       if ($code == 200) {
          push @files, $output;
-         $self->log->info("mirror: downloading URL [$url] to local file [$output] done");
+         $self->log->verbose("mirror: downloading URL [$url] to local file [$output] done");
       }
       elsif ($code == 304) { # Not modified
-         $self->log->info("mirror: file [$output] not modified since last check");
+         $self->log->verbose("mirror: file [$output] not modified since last check");
       }
       else {
          return $self->log->error("mirror: error while mirroring URL [$url] with code: [$code]");
@@ -820,6 +832,12 @@ sub get_last {
    return $self->_last;
 }
 
+sub get_last_code {
+   my $self = shift;
+
+   return $self->_last_code;
+}
+
 1;
 
 __END__
@@ -830,7 +848,7 @@ Metabrik::Client::Www - client::www Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

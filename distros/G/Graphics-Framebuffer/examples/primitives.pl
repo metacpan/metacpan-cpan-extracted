@@ -11,8 +11,9 @@ use Graphics::Framebuffer;
 use List::Util qw(min max shuffle);
 use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
+use Data::Dumper;
 
-# use Data::Dumper::Simple; $Data::Dumper::Sortkeys=1;
+# use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 our $F;
 our $FR;
@@ -47,7 +48,6 @@ chomp(my @files = readdir($DIR));
 closedir($DIR);
 
 our @IMAGES;
-our @SMALL_IMAGES;
 our $STAMP = sprintf('%.1', time);
 
 if (defined($new_x)) {
@@ -92,117 +92,177 @@ my $DORKSMILE;
 
 $benchmark->{'Image Load'} = time;
 foreach my $file (@files) {
-    next if ($file =~ /^\.+/ || $file =~ /Test|gif/ || -d "$images_path/$file");
-    print_it($F, "Loading Images > $file", '00FFFFFF', undef, 1);
+    next if ($file =~ /^\.+/ || $file =~ /Test|gif/i || -d "$images_path/$file");
+    print_it($F,"Loading Image > $file", '00FFFFFF', undef, 1);
     my $image = $F->load_image(
         {
-            'x'            => 1,
-            'y'            => 1,
-            'width'        => $XX,
-            'height'       => $F->{'H_CLIP'},
-            'file'         => "$images_path/$file",
-            'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
-            'center'       => CENTER_XY,
+            'x'            => 0,
+              'y'            => 0,
+              'width'        => $XX,
+              'height'       => $F->{'H_CLIP'},
+              'file'         => "$images_path/$file",
+              'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
+              'center'       => CENTER_XY,
         }
     );
-    unless ($file =~ /Solid/i) {
-        push(@IMAGES, $image) if (defined($image));
-        $image = $F->load_image(
-            {
-                'x'            => 0,
-                'y'            => 0,
-                'width'        => $XX * .5,
-                'height'       => $F->{'H_CLIP'} * .5,
-                'file'         => "$images_path/$file",
-                'convertalpha' => ($file =~ /wolf|Crescent/i) ? 1 : 0,
-                'center'       => CENTER_XY,
-            }
-        );
-        push(@SMALL_IMAGES, $image) if (defined($image));
-        $BW = scalar(@IMAGES) - 1 if ($file =~ /wolf/i);
-    } else {
-        $DORKSMILE = $image;
+    if (defined($image)) {
+        if ($file =~ /Solid/) {
+            $DORKSMILE = $image;
+        } else {
+            push(@IMAGES, $image);
+        }
     }
+}
 
-} ## end foreach my $file (@files)
 $benchmark->{'Image Load'} = time - $benchmark->{'Image Load'};
-$F->cls('OFF');
-# if (0) { # This line only used for debugging
-color_mapping();
-plotting();
-foreach my $flag (0 .. 1) {
-    lines($flag);
-    angle_lines($flag);
-    polygons($flag);
+$F->cls();
+
+##################################
+my %func = (
+    'Color Mapping'                     => \&color_mapping,
+    'Plotting'                          => \&plotting,
+    'Lines'                             => sub { lines(0); },
+    'Angle Lines'                       => sub { angle_lines(0); },
+    'Polygons'                          => sub { polygons(0); },
+    'Antialiased Lines'                 => sub { lines(1); },
+    'Antialiased Angle Lines'           => sub { angle_lines(1); },
+    'Antialiased Polygons'              => sub { polygons(1); },
+    'Boxes'                             => \&boxes,
+    'Rounded Boxes'                     => \&rounded_boxes,
+    'Circles'                           => \&circles,
+    'Ellipses'                          => \&ellipses,
+    'Arcs'                              => \&arcs,
+    'Poly Arcs'                         => \&poly_arcs,
+    'Beziers'                           => \&beziers,
+    'Filled Boxes'                      => \&filled_boxes,
+    'Filled Rounded Boxes'              => \&filled_rounded_boxes,
+    'Filled Circles'                    => \&filled_circles,
+    'Filled Ellipses'                   => \&filled_ellipses,
+    'Filled Pies'                       => \&filled_pies,
+    'Filled Polygons'                   => \&filled_polygons,
+    'Hatch Filled Boxes'                => \&hatch_filled_boxes,
+    'Hatch Filled Rounded Boxes'        => \&hatch_filled_rounded_boxes,
+    'Hatch Filled Circles'              => \&hatch_filled_circles,
+    'Hatch Filled Ellipses'             => \&hatch_filled_ellipses,
+    'Hatch Filled Pies'                 => \&hatch_filled_pies,
+    'Hatch Filled Polygons'             => \&hatch_filled_polygons,
+    'Vertical Gradient Boxes'           => sub { gradient_boxes('vertical'); },
+    'Vertical Gradient Rounded Boxes'   => sub { gradient_rounded_boxes('vertical'); },
+    'Vertical Gradient Circles'         => sub { gradient_circles('vertical'); },
+    'Vertical Gradient Ellipses'        => sub { gradient_ellipses('vertical'); },
+    'Vertical Gradient Pies'            => sub { gradient_pies('vertical'); },
+    'Vertical Gradient Polygons'        => sub { gradient_polygons('vertical'); },
+    'Horizontal Gradient Boxes'         => sub { gradient_boxes('horizontal'); },
+    'Horizontal Gradient Rounded Boxes' => sub { gradient_rounded_boxes('horizontal'); },
+    'Horizontal Gradient Circles'       => sub { gradient_circles('horizontal'); },
+    'Horizontal Gradient Ellipses'      => sub { gradient_ellipses('horizontal'); },
+    'Horizontal Gradient Pies'          => sub { gradient_pies('horizontal'); },
+    'Horizontal Gradient Polygons'      => sub { gradient_polygons('horizontal'); },
+    'Texture Filled Boxes'              => \&texture_filled_boxes,
+    'Texture Filled Rounded Boxes'      => \&texture_filled_rounded_boxes,
+    'Texture Filled Circles'            => \&texture_filled_circles,
+    'Texture Filled Ellipses'           => \&texture_filled_ellipses,
+    'Texture Filled Pies'               => \&texture_filled_pies,
+    'Texture Filled Polygons'           => \&texture_filled_polygons,
+    'Flood Fill'                        => \&flood_fill,
+    'TrueType Fonts'                    => \&truetype_fonts,
+    'TrueType Printing'                 => \&truetype_printing,
+    'Rotate TrueType Fonts'             => \&rotate_truetype_fonts,
+    'Color Replace None-Clipped'        => sub { color_replace(0); },
+    'Color Replace Clipped'             => sub { color_replace(1); },
+    'Blitting'                          => \&blitting,
+    'Blit Move'                         => \&blit_move,
+    'Rotate'                            => \&rotate,
+    'Flipping'                          => \&flipping,
+    'Monochrome'                        => \&monochrome,
+    'XOR Mode Drawing'                  => sub { mode_drawing(1); },
+    'OR Mode Drawing'                   => sub { mode_drawing(2); },
+    'AND Mode Drawing'                  => sub { mode_drawing(3); },
+    'MASK Mode Drawing'                 => sub { mode_drawing(4); },
+    'UNMASK Mode Drawing'               => sub { mode_drawing(5); },
+    'ALPHA Mode Drawing'                => sub { mode_drawing(6); },
+    'ADD Mode Drawing'                  => sub { mode_drawing(7); },
+    'SUBTRACT Mode Drawing'             => sub { mode_drawing(8); },
+    'MULTIPLY Mode Drawing'             => sub { mode_drawing(9); },
+    'DIVIDE Mode Drawing'               => sub { mode_drawing(10); },
+    'Animated'                          => \&animated,
+);
+
+my @order = (
+    'Color Mapping',
+    'Plotting',
+    'Lines',
+    'Angle Lines',
+    'Polygons',
+    'Antialiased Lines',
+    'Antialiased Angle Lines',
+    'Antialiased Polygons',
+    'Boxes',
+    'Rounded Boxes',
+    'Circles',
+    'Ellipses',
+    'Arcs',
+    'Poly Arcs',
+    'Beziers',
+    'Filled Boxes',
+    'Filled Rounded Boxes',
+    'Filled Circles',
+    'Filled Ellipses',
+    'Filled Pies',
+    'Filled Polygons',
+    'Hatch Filled Boxes',
+    'Hatch Filled Rounded Boxes',
+    'Hatch Filled Circles',
+    'Hatch Filled Ellipses',
+    'Hatch Filled Pies',
+    'Hatch Filled Polygons',
+    'Vertical Gradient Boxes',
+    'Vertical Gradient Rounded Boxes',
+    'Vertical Gradient Circles',
+    'Vertical Gradient Ellipses',
+    'Vertical Gradient Pies',
+    'Vertical Gradient Polygons',
+    'Horizontal Gradient Boxes',
+    'Horizontal Gradient Rounded Boxes',
+    'Horizontal Gradient Circles',
+    'Horizontal Gradient Ellipses',
+    'Horizontal Gradient Pies',
+    'Horizontal Gradient Polygons',
+    'Texture Filled Boxes',
+    'Texture Filled Rounded Boxes',
+    'Texture Filled Circles',
+    'Texture Filled Ellipses',
+    'Texture Filled Pies',
+    'Texture Filled Polygons',
+    'Flood Fill',
+    'TrueType Fonts',
+    'TrueType Printing',
+    'Rotate TrueType Fonts',
+    'Color Replace None-Clipped',
+    'Color Replace Clipped',
+    'Blitting',
+    'Blit Move',
+    'Rotate',
+#    'Flipping',
+    'Monochrome',
+    'XOR Mode Drawing',
+    'OR Mode Drawing',
+    'AND Mode Drawing',
+    'MASK Mode Drawing',
+    'UNMASK Mode Drawing',
+    'ALPHA Mode Drawing',
+    'ADD Mode Drawing',
+    'SUBTRACT Mode Drawing',
+#    'MULTIPLY Mode Drawing',
+#    'DIVIDE Mode Drawing',
+    'Animated',
+);
+
+foreach my $name (@order) {
+    $func{$name}->();
 }
-boxes();
-rounded_boxes();
-circles();
-ellipses();
-arcs();
-poly_arcs();
-beziers();
 
-filled_boxes();
-filled_rounded_boxes();
-filled_circles();
-filled_ellipses();
-filled_pies();
-filled_polygons();
-
-hatch_filled_boxes();
-hatch_filled_rounded_boxes();
-hatch_filled_circles();
-hatch_filled_ellipses();
-hatch_filled_pies();
-hatch_filled_polygons();
-
-foreach my $d (qw(vertical horizontal)) {
-    gradient_boxes($d);
-    gradient_rounded_boxes($d);
-    gradient_circles($d);
-    gradient_ellipses($d);
-    gradient_pies($d);
-    gradient_polygons($d);
-} ## end foreach my $d (qw(vertical horizontal))
-
-texture_filled_boxes();
-texture_filled_rounded_boxes();
-texture_filled_circles();
-texture_filled_ellipses();
-texture_filled_pies();
-texture_filled_polygons();
-
-flood_fill();
-
-truetype_fonts();
-truetype_printing();
-
-# rotate_truetype_fonts();
-
-foreach my $flag (0 .. 1) {
-    color_replace($flag);
-}
-
-blitting();
-blit_move();
-rotate();
-
-# flipping();
-monochrome();
-
-foreach my $m (1 .. 8) {    # We skip divide mode because it's stupid and I should never have added it
-    if ($m == MASK_MODE) {
-        mask_drawing();
-    } elsif ($m == UNMASK_MODE) {
-        unmask_drawing();
-    } elsif ($m == ALPHA_MODE) {
-        alpha_drawing();
-    } else {
-        mode_drawing($m);
-    }
-} ## end foreach my $m (1 .. 9)
-animated();
+##################################
 
 $F->clip_reset();
 $F->attribute_reset();
@@ -1058,13 +1118,13 @@ sub truetype_fonts {
 } ## end sub truetype_fonts
 
 sub truetype_printing {
-    print_it($F,'Testing TrueType Font Word Wrapping');
+    print_it($F,'Testing TrueType Font Word Wrapping (May Take Time)');
     $benchmark->{'TrueType Wrapping'} = time;
     $F->ttf_paragraph(
         {
             'x'       => 0,
             'y'       => 30,
-            'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 150,
+            'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 400,
             'justify' => 'justified',
             'size'    => int($YY/75),
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
@@ -1084,9 +1144,9 @@ sub truetype_printing {
         {
             'x'       => $XX / 4,
             'y'       => ($YY / 4) + 30,
-            'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 20,
+            'text'    => 'The quick brown fox jumps over the lazy dog.  ' x 200,
             'justify' => 'justified',
-            'size'    => int($YY/75),
+            'size'    => int($YY/33),
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
@@ -1177,10 +1237,11 @@ sub color_replace {
     my $y = $F->{'YRES'} / 4;
 
     $F->blit_write($DORKSMILE);
+    my $pixel = $F->pixel({'x' => $XX / 2, 'y' => 50});
     $F->clip_set({ 'x' => $x, 'y' => $y, 'xx' => $x * 3, 'yy' => $y * 3 }) if ($clipped);
-    my $r = 193;
-    my $g = 177;
-    my $b = 164;
+    my $r = $pixel->{'red'};
+    my $g = $pixel->{'green'};
+    my $b = $pixel->{'blue'};
     my $s = time + $delay;
     while (time < $s) {
         my $R = int(rand(256));
@@ -1214,8 +1275,19 @@ sub blitting {
     print_it($F, 'Testing Image blitting');
     $benchmark->{'Image Blitting'} = 0;
     my $s = time + $delay;
+    my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+    $image = $F->blit_transform(
+        {
+            'blit_data' => $image,
+            'scale' => {
+                'x'      => 0,
+                'y'      => 0,
+                'width'  => $XX * .5,
+                'height' => $F->{'H_CLIP'} * .5,
+            }
+        }
+    );
     while (time < $s) {
-        my $image = $SMALL_IMAGES[int(rand(scalar(@IMAGES)))];
 
         $image->{'x'} = abs(rand($XX - $image->{'width'}));
         $image->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $image->{'height'}));
@@ -1229,7 +1301,18 @@ sub blit_move {
     print_it($F, 'Testing Image Moving');
     $benchmark->{'Image Moving'} = 0;
     $F->attribute_reset();
-    my $image = $SMALL_IMAGES[int(rand(scalar(@IMAGES)))];
+    my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+    $image = $F->blit_transform(
+        {
+            'blit_data' => $image,
+            'scale' => {
+                'x'      => 0,
+                'y'      => 0,
+                'width'  => $XX * .5,
+                'height' => $F->{'H_CLIP'} * .5,
+            }
+        }
+    );
     $F->blit_write({ %{$image}, 'x' => 10, 'y' => 10 });
     my $x = 10;
     my $y = 10;
@@ -1248,7 +1331,18 @@ sub blit_move {
 sub rotate {
     print_it($F, 'Scaling image for Rotate Test', 'FFFF00FF');
 
-    my $image = { %{ $SMALL_IMAGES[int(rand(scalar(@IMAGES)))] } };
+    my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+    $image = $F->blit_transform(
+        {
+            'blit_data' => $image,
+            'scale' => {
+                'x'      => 0,
+                'y'      => 0,
+                'width'  => $XX * .5,
+                'height' => $F->{'H_CLIP'} * .5,
+            }
+        }
+    );
     foreach my $p (0 .. 1) {
         my $angle = 0;
 
@@ -1375,7 +1469,18 @@ sub flipping {
 } ## end sub flipping
 
 sub monochrome {
-    my $image = $SMALL_IMAGES[int(rand(scalar(@IMAGES)))];
+    my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+    $image = $F->blit_transform(
+        {
+            'blit_data' => $image,
+            'scale' => {
+                'x'      => 0,
+                'y'      => 0,
+                'width'  => $XX * .5,
+                'height' => $F->{'H_CLIP'} * .5,
+            }
+        }
+    );
 
     print_it($F, 'Testing Monochrome Image blitting');
     $benchmark->{'Monochrome Image Blitting'} = 0;
@@ -1390,6 +1495,7 @@ sub monochrome {
 
         $benchmark->{'Monochrome Image Blitting'}++;
     } ## end while (time < $s)
+    sleep  $delay;
 } ## end sub monochrome
 
 sub animated {
@@ -1472,53 +1578,61 @@ sub animated {
 
 sub mode_drawing {
     my $mode  = shift;
-    my @modes = qw( NORMAL XOR OR AND MASK UNMASK ALPHA ADD SUBTRACT MULTIPLY DIVIDE );
-    print_it($F, 'Testing "' . $modes[$mode] . '" Drawing Mode');
-    my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
-    my $image2;
-    do {
-        $image2 = $IMAGES[int(rand(scalar(@IMAGES)))];
-    } until ($image2->{'image'} ne $image->{'image'});
+    if ($mode == MASK_MODE) {
+        mask_drawing();
+    } elsif ($mode == UNMASK_MODE) {
+        unmask_drawing();
+    } elsif ($mode == ALPHA_MODE) {
+        alpha_drawing();
+    } else {
+        my @modes = qw( NORMAL XOR OR AND MASK UNMASK ALPHA ADD SUBTRACT MULTIPLY DIVIDE );
+        print_it($F, 'Testing "' . $modes[$mode] . '" Drawing Mode');
+        my $image = $IMAGES[int(rand(scalar(@IMAGES)))];
+        my $image2;
+        do {
+            $image2 = $IMAGES[int(rand(scalar(@IMAGES)))];
+        } until ($image2->{'image'} ne $image->{'image'});
 
-    if ($mode == AND_MODE) {
-        $F->set_b_color({ 'red' => 255, 'green' => 255, 'blue' => 255 });
-        $F->cls();
-    }
+        if ($mode == AND_MODE) {
+            $F->set_b_color({ 'red' => 255, 'green' => 255, 'blue' => 255 });
+            $F->cls();
+        }
 
-    $F->normal_mode();
-    $F->blit_write($image);
+        $F->normal_mode();
+        $F->blit_write($image);
 
-    sleep 1;
-
-    $F->{'DRAW_MODE'} = $mode;
-    $F->blit_write($image2);
-
-    my $size = int(($YY - $F->{'Y_CLIP'}) / 3);
-    my $mid  = int($XX / 2);
-
-    $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 0 });
-    $F->circle({ 'x' => $mid - ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
-
-    $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
-    $F->circle({ 'x' => $mid, 'y' => $F->{'Y_CLIP'} + $size, 'radius' => $size, 'filled' => 1 });
-
-    $F->set_color({ 'red' => 0, 'green' => 0, 'blue' => 255 });
-    $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
-
-    if ($mode == XOR_MODE) {
         sleep 1;
-        $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
 
-        $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
-        $F->circle({ 'x' => $mid, 'y' => $F->{'Y_CLIP'} + $size, 'radius' => $size, 'filled' => 1 });
+        $F->{'DRAW_MODE'} = $mode;
+        $F->blit_write($image2);
+
+        my $size = int(($YY - $F->{'Y_CLIP'}) / 3);
+        my $mid  = int($XX / 2);
 
         $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 0 });
         $F->circle({ 'x' => $mid - ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
 
-        $F->blit_write($image2);
+        $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
+        $F->circle({ 'x' => $mid, 'y' => $F->{'Y_CLIP'} + $size, 'radius' => $size, 'filled' => 1 });
 
-    } ## end if ($mode == XOR_MODE)
-    sleep $delay;
+        $F->set_color({ 'red' => 0, 'green' => 0, 'blue' => 255 });
+        $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
+
+        if ($mode == XOR_MODE) {
+            sleep 1;
+            $F->circle({ 'x' => $mid + ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
+
+            $F->set_color({ 'red' => 0, 'green' => 255, 'blue' => 0 });
+            $F->circle({ 'x' => $mid, 'y' => $F->{'Y_CLIP'} + $size, 'radius' => $size, 'filled' => 1 });
+
+            $F->set_color({ 'red' => 255, 'green' => 0, 'blue' => 0 });
+            $F->circle({ 'x' => $mid - ($size / 2), 'y' => $F->{'Y_CLIP'} + $size * 2, 'radius' => $size, 'filled' => 1 });
+
+            $F->blit_write($image2);
+
+        } ## end if ($mode == XOR_MODE)
+        sleep $delay;
+    }
 } ## end sub mode_drawing
 
 sub alpha_drawing {
@@ -1557,7 +1671,6 @@ sub alpha_drawing {
 } ## end sub alpha_drawing
 
 sub mask_drawing {
-
     $F->attribute_reset();
     print_it($F, 'Testing MASK Drawing Mode');
 
@@ -1579,9 +1692,10 @@ sub mask_drawing {
 } ## end sub mask_drawing
 
 sub unmask_drawing {
-
+    $F->attribute_reset();
     print_it($F, 'Testing UNMASK Drawing Mode');
 
+    $F->set_b_color({ 'red' => 0, 'green' => 0, 'blue' => 0, 'alpha' => 0 });
     my $h = int($YY - $F->{'Y_CLIP'});
     my $image2;
     my $image1 = $IMAGES[$BW];

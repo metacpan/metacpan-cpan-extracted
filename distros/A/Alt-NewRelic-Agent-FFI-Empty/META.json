@@ -1,0 +1,74 @@
+{
+   "abstract" : "NewRelic::Agent::FFI interface that doesn't do anything",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alt-NewRelic-Agent-FFI-Empty",
+   "no_index" : {
+      "file" : [
+         "lib/NewRelic/Agent/FFI.pm",
+         "lib/NewRelic/Agent/FFI/Procedural.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FFI::Platypus" : "0",
+            "Test2::V0" : "0.000060",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/NewRelic-Agent-FFI"
+      },
+      "homepage" : "https://metacpan.org/pod/Alt::NewRelic::Agent::FFI::Empty",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alt-NewRelic-Agent-FFI-Empty.git",
+         "web" : "https://github.com/plicease/Alt-NewRelic-Agent-FFI-Empty"
+      }
+   },
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
+   "x_use_unsafe_inc" : 0
+}
+

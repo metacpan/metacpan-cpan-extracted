@@ -1,0 +1,32 @@
+---
+abstract: "NewRelic::Agent::FFI interface that doesn't do anything"
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  FFI::Platypus: '0'
+  Test2::V0: '0.000060'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alt-NewRelic-Agent-FFI-Empty
+no_index:
+  file:
+    - lib/NewRelic/Agent/FFI.pm
+    - lib/NewRelic/Agent/FFI/Procedural.pm
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/plicease/NewRelic-Agent-FFI
+  homepage: https://metacpan.org/pod/Alt::NewRelic::Agent::FFI::Empty
+  repository: git://github.com/plicease/Alt-NewRelic-Agent-FFI-Empty.git
+version: '0.02'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

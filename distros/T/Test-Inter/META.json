@@ -4,7 +4,7 @@
       "Sullivan Beck (sbeck@cpan.org)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
    "provides" : {
       "Test::Inter" : {
          "file" : "lib/Test/Inter.pm",
-         "version" : "1.07"
+         "version" : "1.08"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "web" : "https://github.com/SBECK-github/Test-Inter"
       }
    },
-   "version" : "1.07",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.01"
 }

@@ -1,5 +1,9 @@
 Revision history for Getopt-Alt
 
+0.5.3   2019-03-13
+        Updating for release of version 0.5.3
+        Too much js programming forgetting my Perl (Ivan Wills)
+
 0.5.2   2019-02-28
         Updating for release of version 0.5.2
         Fixing up how autocompletion (Ivan Wills)

@@ -7,10 +7,10 @@ plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
     1;
 );
 
-use Data::Object 'type_array';
+use Data::Object::Export 'type_array';
 use Scalar::Util 'refaddr';
 
-can_ok 'Data::Object', 'type_array';
+can_ok 'Data::Object::Export', 'type_array';
 
 subtest 'test the type_array function' => sub {
   my $array1 = type_array [1 .. 5];

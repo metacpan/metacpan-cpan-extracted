@@ -1,0 +1,15 @@
+# test more TOC entries than attachments
+foo: bar
+---
+- type: Test1
+- type: Test2
+- type: Test3
+- type: Test4
+---
+data: Test1
+foo: bar
+---
+data: Test2
+ping: pong
+---
+data: Test3

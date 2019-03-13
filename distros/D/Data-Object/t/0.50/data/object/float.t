@@ -4,16 +4,17 @@ use Test::More;
 
 use_ok 'Data::Object::Float';
 
-ok Data::Object::Float->does('Data::Object::Role::Comparison');
-ok Data::Object::Float->does('Data::Object::Role::Defined');
+ok Data::Object::Float->does('Data::Object::Rule::Comparison');
+ok Data::Object::Float->does('Data::Object::Rule::Defined');
 ok Data::Object::Float->does('Data::Object::Role::Detract');
 ok Data::Object::Float->does('Data::Object::Role::Dumper');
-ok Data::Object::Float->does('Data::Object::Role::Item');
-ok Data::Object::Float->does('Data::Object::Role::Numeric');
+# no longer supported
+# ok Data::Object::Float->does('Data::Object::Role::Numeric');
 ok Data::Object::Float->does('Data::Object::Role::Output');
 ok Data::Object::Float->does('Data::Object::Role::Throwable');
 ok Data::Object::Float->does('Data::Object::Role::Type');
-ok Data::Object::Float->does('Data::Object::Role::Value');
+# no longer supported
+# ok Data::Object::Float->does('Data::Object::Role::Value');
 
 can_ok 'Data::Object::Float', 'data';
 can_ok 'Data::Object::Float', 'defined';

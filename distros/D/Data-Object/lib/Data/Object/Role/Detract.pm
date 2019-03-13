@@ -1,55 +1,40 @@
-# ABSTRACT: Detract Object Role for Perl 5
 package Data::Object::Role::Detract;
 
 use strict;
 use warnings;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Role;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
 
-our $VERSION = '0.61'; # VERSION
+# BUILD
+# METHODS
 
-use overload (
-  '0+'     => 'data',
-  '""'     => 'data',
-  '~~'     => 'data',
-  'bool'   => 'data',
-  'qr'     => 'data',
-  fallback => 1,
-);
-
-method data () {
-
-  return $self->detract;
-
+sub data {
+  goto \&detract;
 }
 
-method detract () {
+sub detract {
+  my ($data) = @_;
 
-  return Data::Object::detract_deep($self);
+  require Data::Object::Export;
 
+  return Data::Object::Export::detract_deep($data);
 }
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Role::Detract - Detract Object Role for Perl 5
+Data::Object::Role::Detract
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Detract Role
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -57,126 +42,33 @@ version 0.61
 
   with 'Data::Object::Role::Detract';
 
+=cut
+
 =head1 DESCRIPTION
 
 Data::Object::Role::Detract provides routines for operating on Perl 5
 data objects which meet the criteria for being detractable.
 
+=cut
+
 =head1 METHODS
+
+This package implements the following methods.
+
+=cut
 
 =head2 data
 
-  # given $detract
+  my $data = $self->data();
 
-  $detract->data; # original value
+The data method returns the underlying data structure.
 
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+=cut
 
 =head2 detract
 
-  # given $detract
+  my $detract = $self->detract();
 
-  $detract->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item *
-
-L<Data::Object::Array>
-
-=item *
-
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
-
-=back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+The detract method returns the underlying data structure.
 
 =cut

@@ -1,80 +1,144 @@
-# ABSTRACT: Regexp Object for Perl 5
 package Data::Object::Regexp;
 
-use strict;
-use warnings;
+use Try::Tiny;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Class;
-use Data::Object::Library;
-use Data::Object::Regexp::Result;
-use Data::Object::Signatures;
-use Scalar::Util;
+use Data::Object::Export qw(
+  cast
+  croak
+  load
+);
 
-with 'Data::Object::Role::Regexp';
+map with($_), my @roles = qw(
+  Data::Object::Role::Detract
+  Data::Object::Role::Dumper
+  Data::Object::Role::Output
+  Data::Object::Role::Throwable
+  Data::Object::Role::Type
+);
 
-our $VERSION = '0.61'; # VERSION
+map with($_), my @rules = qw(
+  Data::Object::Rule::Defined
+);
 
-method new ($class: @args) {
+use overload (
+  '""'     => 'data',
+  '~~'     => 'data',
+  fallback => 1
+);
 
-  my $arg  = $args[0];
+use parent 'Data::Object::Kind';
+
+# BUILD
+
+sub new {
+  my ($class, $arg) = @_;
+
   my $role = 'Data::Object::Role::Type';
 
-  $arg = $arg->data
-    if Scalar::Util::blessed($arg)
-    and $arg->can('does')
-    and $arg->does($role);
+  if (Scalar::Util::blessed($arg)) {
+    $arg = $arg->data if $arg->can('does') && $arg->does($role);
+  }
 
-  Data::Object::throw('Type Instantiation Error: Not a RegexpRef')
-    unless defined($arg) && !!re::is_regexp($arg);
+  if (!defined($arg) || !re::is_regexp($arg)) {
+    croak('Instantiation Error: Not a RegexpRef');
+  }
 
   return bless \$arg, $class;
-
 }
 
-our @METHODS = @{__PACKAGE__->methods};
+# METHODS
 
-my $exclude = qr/^data|detract|new|replace|search$/;
+sub roles {
+  return cast([@roles]);
+}
 
-around [grep { !/$exclude/ } @METHODS] => fun($orig, $self, @args) {
+sub rules {
+  return cast([@rules]);
+}
 
-  my $results = $self->$orig(@args);
+# DISPATCHERS
 
-  return Data::Object::deduce_deep($results);
+sub defined {
+  my ($self, @args) = @_;
 
-};
+  try {
+    my $func = $self->_funcs('defined');
 
-around ['search', 'replace'] => fun($orig, $self, @args) {
+    return cast($func->build($self, @args)->execute);
+  }
+  catch {
+    my $error = $_;
 
-  my $results = Data::Object::Regexp::Result->new($self->$orig(@args));
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
 
-  return $results;
+# METHODS
 
-};
+sub search {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = $self->_funcs('search');
+
+    return $func->build($self, @args)->execute;
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub replace {
+  my ($self, @args) = @_;
+
+  try {
+    my $func = $self->_funcs('replace');
+
+    return $func->build($self, @args)->execute;
+  }
+  catch {
+    my $error = $_;
+
+    $self->throw(ref($error) ? $error->message : "$error");
+  };
+}
+
+sub _funcs {
+  my ($self, $name) = @_;
+
+  return if !$name;
+
+  my $space = $self->space;
+
+  return $space->parent->child('func', $space->base, $name);
+}
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Regexp - Regexp Object for Perl 5
+Data::Object::Regexp
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Regexp Class
+
+=cut
 
 =head1 SYNOPSIS
 
   use Data::Object::Regexp;
 
-  my $re = Data::Object::Regexp->new(qr(something to match against));
+  my $re = Data::Object::Regexp->new(qr(\w+));
+
+=cut
 
 =head1 DESCRIPTION
 
@@ -82,16 +146,43 @@ Data::Object::Regexp provides routines for operating on Perl 5 regular
 expressions. Data::Object::Regexp methods work on data that meets the criteria
 for being a regular expression.
 
+=cut
+
 =head1 METHODS
 
-=head2 data
+This package implements the following methods.
+
+=cut
+
+=head2 new
+
+  # given qr(something to match against)
+
+  my $re = Data::Object::Regexp->new(qr(something to match against));
+
+The new method expects a regular-expression object and returns a new class
+instance.
+
+=cut
+
+=head2 roles
 
   # given $regexp
 
-  $regexp->data; # original value
+  $regexp->roles;
 
-The data method returns the original and underlying value contained by the
-object. This method is an alias to the detract method.
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=cut
+
+=head2 rules
+
+  my $rules = $regexp->rules();
+
+The rules method returns consumed rules.
+
+=cut
 
 =head2 defined
 
@@ -103,139 +194,7 @@ The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
 L<Data::Object::Number> object.
 
-=head2 detract
-
-  # given $regexp
-
-  $regexp->detract; # original value
-
-The detract method returns the original and underlying value contained by the
-object.
-
-=head2 dump
-
-  # given qr(test)
-
-  $regexp->dump; # qr/(?^u:test)/
-
-The dump method returns returns a string representation of the object.
-This method returns a L<Data::Object::String> object.
-
-=head2 eq
-
-  # given qr(test)
-
-  $regexp->eq(qr(test)); # 1
-
-The eq method returns true if the argument provided is equal to the value
-represented by the object. This method returns a L<Data::Object::Number> object.
-
-=head2 ge
-
-  # given qr(test)
-
-  $regexp->ge(qr(test)); # 1
-
-The ge method returns true if the argument provided is greater-than or equal-to
-the value represented by the object. This method returns a Data::Object::Number
-object.
-
-=head2 gt
-
-  # given qr(test)
-
-  $regexp->gt(qr(test)); # 0
-
-The gt method returns true if the argument provided is greater-than the value
-represented by the object. This method returns a L<Data::Object::Number> object.
-
-=head2 le
-
-  # given qr(test)
-
-  $regexp->le(qr(test)); # 1
-
-The le method returns true if the argument provided is less-than or equal-to
-the value represented by the object. This method returns a Data::Object::Number
-object.
-
-=head2 lt
-
-  # given qr(test)
-
-  $regexp->lt(qr(test)); # 0
-
-The lt method returns true if the argument provided is less-than the value
-represented by the object. This method returns a L<Data::Object::Number> object.
-
-=head2 methods
-
-  # given $regexp
-
-  $regexp->methods;
-
-The methods method returns the list of methods attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 ne
-
-  # given qr(test)
-
-  $regexp->ne(qr(test)); # 1
-
-The ne method returns true if the argument provided is not equal to the value
-represented by the object. This method returns a L<Data::Object::Number> object.
-
-=head2 new
-
-  # given qr(something to match against)
-
-  my $re = Data::Object::Regexp->new(qr(something to match against));
-
-The new method expects a regular-expression object and returns a new class
-instance.
-
-=head2 print
-
-  # given qr(test)
-
-  $regexp->print; # 'qr/(?^u:test)/'
-
-The print method outputs the value represented by the object to STDOUT and
-returns true. This method returns a L<Data::Object::Number> object.
-
-=head2 replace
-
-  # given qr(test)
-
-  $re->replace('this is a test', 'drill');
-  $re->replace('test 1 test 2 test 3', 'drill', 'gi');
-
-The replace method performs a regular expression substitution on the given
-string. The first argument is the string to match against.  The second argument
-is the replacement string.  The optional third argument might be a string
-representing flags to append to the s///x operator, such as 'g' or 'e'.  This
-method will always return a L<Data::Object::Regexp::Result> object which can be
-used to introspect the result of the operation.
-
-=head2 roles
-
-  # given $regexp
-
-  $regexp->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=head2 say
-
-  # given qr(test)
-
-  $regexp->say; # 'qr/(?^u:test)/\n'
-
-The say method outputs the value represented by the object appended with a
-newline to STDOUT and returns true. This method returns a L<Data::Object::Number>
-object.
+=cut
 
 =head2 search
 
@@ -245,50 +204,34 @@ object.
   $re->search('this does not match', 'gi');
 
 The search method performs a regular expression match against the given string
-This method will always return a L<Data::Object::Regexp::Result> object which
+This method will always return a L<Data::Object::Search> object which
 can be used to introspect the result of the operation.
 
-=head2 throw
+=cut
 
-  # given $regexp
+=head2 replace
 
-  $regexp->throw;
+  # given qr(test)
 
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns a L<Data::Object::Exception> object.
+  $re->replace('this is a test', 'drill');
+  $re->replace('test 1 test 2 test 3', 'drill', 'gi');
 
-=head2 type
+The replace method performs a regular expression substitution on the given
+string. The first argument is the string to match against. The second argument
+is the replacement string. The optional third argument might be a string
+representing flags to append to the s///x operator, such as 'g' or 'e'.  This
+method will always return a L<Data::Object::Replace> object which can be
+used to introspect the result of the operation.
 
-  # given $regexp
-
-  $regexp->type; # REGEXP
-
-The type method returns a string representing the internal data type object name.
-This method returns a L<Data::Object::String> object.
-
-=head1 COMPOSITION
-
-This package inherits all functionality from the L<Data::Object::Role::Regexp>
-role and implements proxy methods as documented herewith.
+=cut
 
 =head1 ROLES
 
-This package is comprised of the following roles.
+This package inherits all behavior from the folowing role(s):
+
+=cut
 
 =over 4
-
-=item *
-
-L<Data::Object::Role::Alphabetic>
-
-=item *
-
-L<Data::Object::Role::Comparison>
-
-=item *
-
-L<Data::Object::Role::Defined>
 
 =item *
 
@@ -297,10 +240,6 @@ L<Data::Object::Role::Detract>
 =item *
 
 L<Data::Object::Role::Dumper>
-
-=item *
-
-L<Data::Object::Role::Item>
 
 =item *
 
@@ -314,107 +253,18 @@ L<Data::Object::Role::Throwable>
 
 L<Data::Object::Role::Type>
 
-=item *
-
-L<Data::Object::Role::Value>
-
 =back
 
-=head1 SEE ALSO
+=head1 RULES
+
+This package adheres to the requirements in the folowing rule(s):
+
+=cut
 
 =over 4
 
 =item *
 
-L<Data::Object::Array>
-
-=item *
-
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
+L<Data::Object::Rule::Defined>
 
 =back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut

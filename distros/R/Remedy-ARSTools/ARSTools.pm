@@ -23,7 +23,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $errstr %currency_codes);
 @ISA 		= qw(Exporter);
 @EXPORT		= qw(&ParseDBDiary &EncodeDBDiary);
 @EXPORT_OK	= qw($VERSION $errstr);
-$VERSION	= 1.21;
+$VERSION	= 1.22;
 
 ## this is a global lookup table for currencies
 our %currency_codes = (
@@ -832,7 +832,7 @@ sub CheckFields {
                                         #translate it
                                         my $cnt = 0; my $found = 0;
                                         foreach my $val (@{$self->{'ARSConfig'}->{$p{'Schema'}}->{'fields'}->{$field}->{'vals'}}){
-                                                if ($p{'Fields'}->{$field} =~/^$val$/i){ $p{'Fields'}->{$field} = $cnt; $found = 1; last; }
+						if (($p{'Fields'}->{$field} =~/^$val$/i) || ($p{'Fields'}->{$field} eq $val)){ $p{'Fields'}->{$field} = $cnt; $found = 1; last; }
                                                 $cnt ++;
                                         }
                                         

@@ -1,10 +1,11 @@
 package GIS::Distance;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Class::Measure::Length qw( length );
 use Carp qw( croak );
+use Scalar::Util qw( blessed );
 use namespace::clean;
 
 sub new {
@@ -57,10 +58,21 @@ sub module { $_[0]->{module} }
 sub distance {
     my $self = shift;
 
-    croak 'Four arguments must be passed to distance()' if @_!=4;
+    my @coords;
+    foreach my $coord (@_) {
+        if ((blessed($coord)||'') eq 'Geo::Point') {
+            push @coords, $coord->latlong();
+            next;
+        }
+
+        push @coords, $coord;
+    }
+
+    croak 'Invalid arguments passsed to distance()'
+        if @coords!=4;
 
     return length(
-        $self->{code}->( @_, @{$self->{args}} ),
+        $self->{code}->( @coords, @{$self->{args}} ),
         'km',
     );
 }
@@ -89,7 +101,7 @@ GIS::Distance - Calculate geographic distances.
     # Or choose a different formula:
     my $gis = GIS::Distance->new( 'Polar' );
     
-    my $distance = $gis->distance( $lat1,$lon1 => $lat2,$lon2 );
+    my $distance = $gis->distance( $lat1, $lon1, $lat2, $lon2 );
     
     print $distance->meters();
 
@@ -107,20 +119,50 @@ then install it and the ::Fast formulas will be automatically used by this modul
 
 =head2 distance
 
-    my $distance = $gis->distance( $lat1,$lon1 => $lat2,$lon2 );
+    my $distance = $gis->distance( $lat1, $lon1, $lat2, $lon2 );
+    
+    my $point1 = Geo::Point->latlong( $lat1, $lon1 );
+    my $point2 = Geo::Point->latlong( $lat2, $lon2 );
+    my $distance = $gis->distance( $point1, $point2 );
+
+Takes either two decimal latitude and longitude pairs, or two L<Geo::Point>
+objects.
 
 Returns a L<Class::Measure::Length> object for the distance between the
 two degree lats/lons.
 
-See L</distance_metal> to return raw kilometers instead.
+See L</distance_metal> for a faster, but less feature rich, method.
 
 =head2 distance_metal
 
-This works just like L</distance>, but always returns raw kilometers, does no
-argument checking and ignores any formula L</args>.  Calling this gets you pretty
-close to the fastest bare metal speed you can get.  The speed improvements of
-calling this is noticeable over millions of iterations only and you've got to
-decide if its worth the safety and features you are dropping.
+This works just like L</distance> except for:
+
+=over
+
+=item *
+
+Does not accept L<Geo::Point> objects.  Only decimal latitude and longitude
+pairs.
+
+=item *
+
+Does not return a L<Class::Measure> object.  Instead kilometers are always
+returned.
+
+=item *
+
+Does no argument checking.
+
+=item *
+
+Does not support formula L</args>, which are needed by at least the
+L<GIS::Distance::GeoEllipsoid> formula.
+
+=back
+
+Calling this gets you pretty close to the fastest bare metal speed you can get.
+The speed improvements of calling this is noticeable over millions of iterations
+only and you've got to decide if its worth the safety and features you are dropping.
 
 =head1 ATTRIBUTES
 
@@ -161,10 +203,11 @@ Returns the fully qualified module name that L</formula> resolved to.
 =head1 SPEED
 
 Not that this module is slow, but if you're doing millions of distance
-calculations you may find that adjusting your code a bit may make it
-faster.  Here are some options.
+calculations a second you may find that adjusting your code a bit may
+make it faster.  Here are some options.
 
-Install L<GIS::Distance::Fast>.
+Install L<GIS::Distance::Fast> to get the XS variants for most of the
+PP formulas.
 
 Use L</distance_metal> instead of L</distance>.
 
@@ -176,6 +219,29 @@ has.  For example you could bypass this module entirely and just do:
 
 The above would be the ultimate speed demon (as shown in benchmarking)
 but throws away some flexibility and adds some foot-gun support.
+
+Here's some benchmarks for these options:
+
+    PP Haversine - GIS::Distance->distance                   125913/s
+    XS Haversine - GIS::Distance->distance                   203335/s
+    PP Haversine - GIS::Distance->distance_metal             366569/s
+    PP Haversine - GIS::Distance::Haversine::distance        390320/s
+    XS Haversine - GIS::Distance->distance_metal            3289474/s
+    XS Haversine - GIS::Distance::Fast::Haversine::distance 8064516/s
+
+You can run your own benchmarks using the included C<author/bench>
+script.  The above results were produced with:
+
+    author/bench -f Haversine
+
+Even the slowest result was C<125913/s>, which is C<125.913/ms>, which
+means each call took about C<0.0079ms>.
+
+In conclusion, if you can justify the speed gain, switching to
+L</distance_metal> and installing L<GIS::Distance::Fast>, seems
+the ideal setup.
+
+As always, YMMV.
 
 =head1 COORDINATES
 
@@ -196,97 +262,119 @@ rad2deg function.
 
 These formulas come with this distribution:
 
+=over
+
+=item *
+
 L<GIS::Distance::ALT>
+
+=item *
 
 L<GIS::Distance::Cosine>
 
+=item *
+
 L<GIS::Distance::GreatCircle>
+
+=item *
 
 L<GIS::Distance::Haversine>
 
+=item *
+
 L<GIS::Distance::MathTrig>
+
+=item *
 
 L<GIS::Distance::Null>
 
+=item *
+
 L<GIS::Distance::Polar>
+
+=item *
 
 L<GIS::Distance::Vincenty>
 
+=back
+
 These formulas are available on CPAN:
+
+=over
+
+=item *
 
 L<GIS::Distance::Fast::ALT>
 
+=item *
+
 L<GIS::Distance::Fast::Cosine>
+
+=item *
 
 L<GIS::Distance::Fast::GreatCircle>
 
+=item *
+
 L<GIS::Distance::Fast::Haversine>
+
+=item *
 
 L<GIS::Distance::Fast::Polar>
 
+=item *
+
 L<GIS::Distance::Fast::Vincenty>
+
+=item *
 
 L<GIS::Distance::GeoEllipsoid>
 
+=back
+
 =head1 SEE ALSO
 
-L<GIS::Distance::Lite> was long ago forked from GIS::Distance and modified
-to have less dependencies.  Since then GIS::Distance itself has become
-tremendously lighter dep-wise, and is still maintained, I suggest you not
-use GIS::Distance::Lite.
-
-L<Geo::Distance> has long been deprecated in favor of using this module.
-
-L<Geo::Distance::XS> used to be used by L<Geo::Distance> but no longer does.
-
-L<Geo::Inverse> seems to do some distance calculation using L<Geo::Ellipsoid>
-but if you look at the source code it clearly states that the entire meat of
-it is copied from Geo::Ellipsoid... so I'm not sure why it exists... just use
-Geo::Ellipsoid or L<GIS::Distance::GeoEllipsoid> which wraps Geo::Ellipsoid
-into the GIS::Distance interface.
-
-L<Geo::Distance::Google> looks pretty neat.
-
-=head1 TODO
-
-=over 4
+=over
 
 =item *
 
-Create a GIS::Coord class that represents a geographic coordinate.  Then modify
-this module to accept input as either lat/lon pairs, or as GIS::Coord objects.
-This would make coordinate conversion as described in L</COORDINATES> automatic.
-Maybe use L<Geo::Point>.
+L<Geo::Distance> - Is deprecated in favor of using this module.
 
 =item *
 
-Create some sort of equivalent to L<Geo::Distance>'s closest() method.
+L<Geo::Distance::Google> - While in the Geo::Distance, namespace this isn't
+actually related to Geo::Distance at all.  Might be useful.
 
 =item *
 
-Write a formula module called GIS::Distance::Geoid.  Some very useful info is
-at L<http://en.wikipedia.org/wiki/Geoid>.
+L<GIS::Distance::Lite> - An old fork of this module, not recommended.
 
 =item *
 
-Make L<GIS::Distance::Google> (or some such name) and wrap it around
-L<Geo::Distance::Google> (most likely).
+L<Geo::Distance::XS> - Used to be used by L<Geo::Distance> but no longer is.
 
 =item *
 
-Figure out why L<GIS::Distance::Polar> has issues.
+L<Geo::Ellipsoid> - Or use L<GIS::Distance::GeoEllipsoid> for a uniform
+interface.
+
+=item *
+
+L<Geo::Inverse> - Does some distance calculations, but seems less than useful
+as all the code looks to be taken from L<Geo::Ellipsoid>.
 
 =back
 
 =head1 SUPPORT
 
-Please submit bugs and feature requests to the GIS-Distance GitHub issue tracker:
+Please submit bugs and feature requests to the
+GIS-Distance GitHub issue tracker:
 
 L<https://github.com/bluefeet/GIS-Distance/issues>
 
 =head1 AUTHORS
 
-    Aran Clary Deltac <bluefeet@cpan.org>
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 LICENSE
 

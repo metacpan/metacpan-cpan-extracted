@@ -11,7 +11,7 @@ use v5.14.0; # require 2011 or newer version of Perl
 # State class to hold program state, and print it all out in case of errors
 # this is a low-level package - it stores state data but at this level has no knowledge of what is being stored in it
 package PiFlash::State;
-$PiFlash::State::VERSION = '0.2.2';
+$PiFlash::State::VERSION = '0.3.1';
 use autodie;
 use YAML::XS; # RPM: perl-YAML-LibYAML, DEB: libyaml-libyaml-perl
 use Carp qw(croak);
@@ -119,7 +119,9 @@ sub odump
 		# process scalar reference
 		return ("    " x $level).($$obj // "undef")."\n";
 	}
-	if (ref $obj eq "HASH" or ref $obj eq "PiFlash::State") {
+	if (ref $obj eq "HASH" or ref $obj eq "PiFlash::State"
+		or (ref $obj =~ /^PiFlash::/ and $obj->isa("PiFlash::Object")))
+	{
 		# process hash reference
 		my $str = "";
 		foreach my $key (sort {lc $a cmp lc $b} keys %$obj) {
@@ -200,8 +202,9 @@ sub read_config
 				PiFlash::State::plugin("docs", {toc => $toc});
 				my $docs = PiFlash::State::plugin("docs");
 				for (my $i=1; $i < scalar @yaml_docs; $i++) {
-					if (ref $yaml_docs[$i] eq "HASH" and exists $yaml_docs[$i]{plugin}) {
-						my $type = $yaml_docs[$i]{plugin};
+					($i <= scalar @$toc) or next;
+					if (ref $yaml_docs[$i] eq "HASH" and exists $toc->[$i-1]{type}) {
+						my $type = $toc->[$i-1]{type};
 						$docs->{$type} = $yaml_docs[$i];
 					}
 				}
@@ -224,7 +227,7 @@ PiFlash::State - PiFlash::State class to store configuration, device info and pr
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.1
 
 =head1 SYNOPSIS
 

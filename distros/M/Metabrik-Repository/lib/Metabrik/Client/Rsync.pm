@@ -1,5 +1,5 @@
 #
-# $Id: Rsync.pm,v 5db309a16909 2018/07/25 13:52:23 gomor $
+# $Id: Rsync.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # client::rsync Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 5db309a16909 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable network) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -34,6 +34,7 @@ sub brik_properties {
       need_packages => {
          ubuntu => [ qw(rsync) ],
          debian => [ qw(rsync) ],
+         kali => [ qw(rsync) ],
       },
       require_binaries => {
          rsync => [ ],
@@ -74,7 +75,7 @@ Metabrik::Client::Rsync - client::rsync Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

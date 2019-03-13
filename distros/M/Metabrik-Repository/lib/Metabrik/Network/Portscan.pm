@@ -1,5 +1,5 @@
 #
-# $Id: Portscan.pm,v 76c9b59191bd 2018/06/17 11:12:14 gomor $
+# $Id: Portscan.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # network::portscan Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Network::Device);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 76c9b59191bd $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable scan syn port synscan tcpscan) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -563,7 +563,7 @@ Metabrik::Network::Portscan - network::portscan Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

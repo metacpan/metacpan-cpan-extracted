@@ -9,7 +9,7 @@ use v5.14.0; # require 2011 or newer version of Perl
 use PiFlash::State;
 
 package PiFlash::Command;
-$PiFlash::Command::VERSION = '0.2.2';
+$PiFlash::Command::VERSION = '0.3.1';
 use autodie;
 use POSIX; # included with perl
 use IO::Handle; # rpm: "dnf install perl-IO", deb: included with perl
@@ -256,6 +256,16 @@ sub cmd2str
 }
 ## use critic
 
+# generate name of environment variable for where to find a command
+# this is broken out as a separate function for tests to use it
+sub envprog
+{
+	my $progname = shift;
+	my $envprog = (uc $progname)."_PROG";
+	$envprog =~ s/[\W-]+/_/g; # collapse any sequences of non-alphanumeric/non-underscore to a single underscore
+	return $envprog;
+}
+
 # look up secure program path
 ## no critic (RequireFinalReturn)
 sub prog
@@ -278,8 +288,7 @@ sub prog
 	}
 
 	# if we didn't have the location of the program, look for it and cache the result
-	my $envprog = (uc $progname)."_PROG";
-	$envprog =~ s/[\W-]+/_/g; # collapse any sequences of non-alphanumeric/non-underscore to a single underscore
+	my $envprog = envprog($progname);
 	if (exists $ENV{$envprog} and -x $ENV{$envprog}) {
 		$prog->{$progname} = $ENV{$envprog};
 		return $prog->{$progname};
@@ -313,7 +322,7 @@ PiFlash::Command - process/command running utilities for piflash
 
 =head1 VERSION
 
-version 0.2.2
+version 0.3.1
 
 =head1 SYNOPSIS
 

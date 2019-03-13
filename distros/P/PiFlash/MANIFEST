@@ -8,7 +8,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.md
 bin/piflash
 dist.ini
@@ -21,6 +20,8 @@ lib/PiFlash/Command.pm
 lib/PiFlash/Hook.pm
 lib/PiFlash/Inspector.pm
 lib/PiFlash/MediaWriter.pm
+lib/PiFlash/Object.pm
+lib/PiFlash/Plugin.pm
 lib/PiFlash/State.pm
 t/000_platform.t
 t/001_module_load.t
@@ -30,9 +31,13 @@ t/020_config_yaml.t
 t/021_plugin.t
 t/author-critic.t
 t/author-pod-syntax.t
-t/test-inputs/020_config_yaml/000-simple.yml
-t/test-inputs/020_config_yaml/001-dup-yaml-bad.yml
-t/test-inputs/020_config_yaml/002-multi-doc.yml
-t/test-inputs/020_config_yaml/003-scalar.yml
+t/test-inputs/020_config_yaml/000-test-metadata.yml
+t/test-inputs/020_config_yaml/001-simple.yml
+t/test-inputs/020_config_yaml/002-dup-yaml.yml
+t/test-inputs/020_config_yaml/003-multi-doc.yml
+t/test-inputs/020_config_yaml/004-scalar.yml
+t/test-inputs/020_config_yaml/005-toc.yml
+t/test-inputs/020_config_yaml/006-toc.yml
+t/test-inputs/020_config_yaml/007-toc.yml
 t/test-inputs/021_plugin/000-no-docs.yml
 t/test-inputs/021_plugin/001-multi-doc.yml

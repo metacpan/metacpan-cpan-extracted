@@ -9,6 +9,8 @@ For using with [Perl5 plugin for IntelliJ products](https://github.com/Camelcade
 - Published on [meta::cpan](https://metacpan.org/release/TAP-Formatter-Camelcade)
 - Packaged with [Dist::Zilla](https://github.com/rjbs/Dist-Zilla)
 - CI with [TravisCI](https://travis-ci.org/) and [perl-helpers](https://github.com/travis-perl/helpers)
+- Smoked on [CPANTesters](http://www.cpantesters.org/distro/T/TAP-Formatter-Camelcade.html)
+- [CPAN Testers Matrix](http://matrix.cpantesters.org/?dist=TAP-Formatter-Camelcade)
 
 ## See also
 

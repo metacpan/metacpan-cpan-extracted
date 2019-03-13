@@ -28,7 +28,7 @@ DEPENDENCIES
 
    This module requires these other programs and modules:
 
-   A. For Debian-based systems
+   A. For Debian-based systems (Ubuntu, Debian, Kali)
 
    apt-get
    sudo
@@ -45,7 +45,7 @@ DEPENDENCIES
    devel/mercurial
    devel/p5-App-cpanminus
 
-   C. For CentOS systems
+   C. For CentOS-based systems (CentOS, RedHat)
 
    yum
    sudo
@@ -81,7 +81,7 @@ DEPENDENCIES
 
 COPYRIGHT AND LICENSE
 
-   Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+   Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
    You may distribute this module under the terms of The BSD 3-Clause License.
    See LICENSE file in the source distribution archive.

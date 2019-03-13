@@ -48,15 +48,15 @@ DEBIAN BASED SYSTEMS (Ubuntu, Mint, Raspian, etc):
 
   sudo apt update
   sudo apt install build-essential linux-headers libimager-perl \
-   libinline-c-perl libmath-gradient-perl libmath-bezier-perl libfile-map-perl \
-   libtest-more-perl libsys-cpu-perl fonts-wine
+   libinline-c-perl libmath-gradient-perl libmath-bezier-perl \
+   libfile-map-perl libtest-more-perl libsys-cpu-perl fonts-wine
 
 REDHAT BASED SYSTEMS (Fedora, CentOS, etc):
 
   sudo yum update
   sudo yum upgrade kernel-headers build-essential perl-math-gradient \
-    perl-test-more perl-math-bezier perl-file-map perl-imager perl-inline-c \
-    perl-sys-cpu
+    perl-test-more perl-math-bezier perl-file-map perl-imager \
+    perl-inline-c perl-sys-cpu
 
 With that out of the way, you can now install this module.
 
@@ -103,16 +103,16 @@ methods in this module, but the best way to find out is to run
 
 Here's what I have tested this module on (all 1920x1080x32):
 
-Raspberry PI2   - Tollerable, I did 16 bit mode testing and coding on this
+Raspberry PI2/3 - Tollerable, I did 16 bit mode testing and coding on this
                 - machine.  Using a Perlbrew custom compiled Perl helps a bit.
-                - The Raspberry PI (and RP2) are configured, by default, to be
-                - in 16 bit graphics mode.  This is not the best mode if you
-                - are going to be loading images or rendering TrueType text,
-                - as color space conversions can take a long time (with
-                - acceleration off).  Overall, 32 bit mode works best on this
-                - machine, especially for image loading and text rendering.
-                - This performance limitation can, however, be minimized using
-                - the C acceleration features, if you still wish to use the 16
+                - The Raspberry PI are configured, by default, to be in 16 bit
+                - graphics mode.  This is not the best mode if you are going
+                - to be loading images or rendering TrueType text, as color
+                - space conversions can take a long time (with acceleration
+                - off).  Overall, 32 bit mode works best on this machine,
+                - especially for image loading and text rendering.  This
+                - performance limitation can, however, be minimized using the
+                - C acceleration features, if you still wish to use the 16
                 - bit display mode.
 
 Odroid XU3/XU4  - Surprisingly fast.  All methods plenty fast enough for heavy
@@ -126,7 +126,7 @@ Atom 1.60 GHz   - Decent, not nearly as fast as the Odroid XU3/4.  Works good
 with NVidia     - with threads too (when done properly).  Great for normal
 Nouveau driver  - graphical apps and static displayed output.  Recent versions
                 - of the Nouveau framebuffer driver have become noticably
-                - slower now days though.
+                - slower now days though.  Oh my goodness, it's slow.
 
 2.6 GHz MacBook - Blazingly fast. Most primitives draw nearly instantly.
 with VirtualBox -
@@ -144,7 +144,7 @@ Native with     - when handling a framebuffer.  It's actually disgraceful at
 CPU and two     - using any DMA for the memory copy of the framebuffer, but
 Nvidia 1080Ti's - CPU itself for transfers.  Running Virtual Box on Windows
                 = is much faster than running Linux natively with the 
-                - Nouveau framebuffer drivers.  Sad, really sad.
+                - Nouveau framebuffer drivers!  Sad, really sad.
 
 SUPPORT AND DOCUMENTATION
 
@@ -179,10 +179,10 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2018 Richard Kelsch
+Copyright (C) 2013-2019 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+under the terms of either: the GNU General Public License version 3, as
+published by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.

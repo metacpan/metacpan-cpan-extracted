@@ -1,3 +1,4 @@
+requires 'perl', '>= 5.010';
 requires 'JSON::MaybeXS', 0;
 requires 'Unicode::UTF8', 0;
 requires 'Exporter', 0;

@@ -16,27 +16,26 @@ my $debug_mode = exists $ENV{DEBUG};
 
 # base class for plugin testing and 3 test classes that inhert from it
 package TestBase {
-	# init class method is part of the plugin interface, called from PiFlash::init_plugins()
+	use parent 'PiFlash::Plugin';
+	# init class method is part of the plugin interface
+	# called from PiFlash::Object->new() via PiFlash::Plugin->init_plugins()
 	sub init
 	{
-		my $class = shift;
-		my $storage = shift;
-		my $config = shift;
+		my $self = shift;
 
 		# save data indicating which class/subclass was here
-		$storage->{class} = $class;
-		$storage->{status} = "enabled";
-		$storage->{config} = $config;
+		$self->{class} = ref $self;
+		$self->{status} = "enabled";
 	}
 };
 package PiFlash::Plugin::Test1 {
-	our @ISA = qw(TestBase);
+	our @ISA = 'TestBase';
 };
 package PiFlash::Plugin::Test2 {
-	our @ISA = qw(TestBase);
+	our @ISA = 'TestBase';
 };
 package PiFlash::Plugin::Test3 {
-	our @ISA = qw(TestBase);
+	our @ISA = 'TestBase';
 };
 
 # initialize program state storage
@@ -85,22 +84,23 @@ sub plugin_tests
 	my $test_name = $mode.join("", @$bits);
 
 	# initialize the plugins
-	eval { PiFlash::init_plugins(); };
+	eval { PiFlash::Plugin->init_plugins(); };
 
 	# run tests
 	my $plugin_data = PiFlash::State::plugin();
 	is("$@", '', "$filepath/$test_name 1: no exceptions");
 	for (my $modnum=0; $modnum<scalar @$bits; $modnum++) {
 		my $modname = sprintf "Test%d", $modnum+1;
+		my $plugin_class = "PiFlash::Plugin::".$modname;
+		my $plugin_obj = $plugin_class->get_data();
 		my $subtest = $modnum*2 + 2;
 		if ($bits->[$modnum]) {
-			is($plugin_data->{$modname}{status}, "enabled", "$filepath/$test_name/$modnum ".($subtest).": enabled");
-			is_deeply($plugin_data->{$modname}{config}, $plugin_data->{docs}{$modname},
+			is($plugin_obj->{status}, "enabled", "$filepath/$test_name/$modnum ".($subtest).": enabled");
+			is_deeply($plugin_obj->{config}, $plugin_data->{docs}{$modname},
 				"$filepath/$test_name/$modnum ".($subtest+1).": data match");
 		} else {
-			ok(!exists $plugin_data->{$modname}, "$filepath/$test_name/$modnum ".($subtest).": disabled");
-			ok(!exists $plugin_data->{$modname}{config},
-				"$filepath/$test_name/$modnum ".($subtest+1).": no data"); # freebie same as previous
+			ok(!PiFlash::State::has_plugin($modname), "$filepath/$test_name/$modnum ".($subtest).": disabled");
+			pass("$filepath/$test_name/$modnum ".($subtest+1).": no data"); # always missing if module is missing
 		}
 	}
 	$debug_mode and print STDERR "debug plugin_tests: ".Dumper($PiFlash::State::state);
@@ -116,7 +116,7 @@ my @files = sort grep { /^[^.]/ and -f "$input_dir/$_" } readdir($dh);
 closedir $dh;
 
 # compute number of tests:
-#    8 combinations of enabled/disabled plugins for 3 test classes (2^3)
+#    8 combinations of enabled/disabled plugins for 3 test classes (2^3) to check for interference between plugins
 #    x 2 passes enabling plugins from CLI or config
 #    x 7 tests per file
 #    x n files
@@ -139,4 +139,3 @@ foreach my $file ( @files ) {
 }
 
 1;
-

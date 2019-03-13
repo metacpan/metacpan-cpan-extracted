@@ -1,7 +1,7 @@
 package GIS::Distance::MathTrig;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Math::Trig qw( great_circle_distance deg2rad );
 use GIS::Distance::Constants qw( :all );

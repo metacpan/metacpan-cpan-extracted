@@ -1,5 +1,5 @@
 #
-# $Id: Dns.pm,v 29229640649c 2018/04/26 11:58:09 gomor $
+# $Id: Dns.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # audit::dns Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 29229640649c $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -188,7 +188,7 @@ Metabrik::Audit::Dns - audit::dns Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

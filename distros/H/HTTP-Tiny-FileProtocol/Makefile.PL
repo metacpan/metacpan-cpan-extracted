@@ -21,12 +21,14 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "File::Spec" => 0,
     "HTTP::Tiny" => 0,
-    "LWP::MediaTypes" => "6.02",
+    "LWP::MediaTypes" => "6.02"
+  },
+  "TEST_REQUIRES" => {
     "Pod::Coverage::TrustPod" => 0,
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,45 +1,42 @@
-# ABSTRACT: Throwable Object Role for Perl 5
 package Data::Object::Role::Throwable;
 
 use strict;
 use warnings;
 
-use 5.014;
-
-use Data::Object;
 use Data::Object::Role;
-use Data::Object::Library;
-use Data::Object::Signatures;
-use Scalar::Util;
 
-our $VERSION = '0.61'; # VERSION
+# BUILD
+# METHODS
 
-method throw (@args) {
+sub throw {
+  my ($self, @args) = @_;
 
-  my $message = (@args % 2 == 1) ? shift : undef;
-  my $class   = Data::Object::load('Data::Object::Exception');
+  require Data::Object::Export;
 
-  @_ = ($class => (object => $self, message => $message));
+  my $class = Data::Object::Export::load('Data::Object::Exception');
+
+  unshift @args, ref($args[0]) ? 'object' : 'message' if @args == 1;
+
+  @_ = ($class => (object => $self, @args));
 
   goto $class->can('throw');
-
 }
 
 1;
 
-__END__
-
-=pod
-
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-Data::Object::Role::Throwable - Throwable Object Role for Perl 5
+Data::Object::Role::Throwable
 
-=head1 VERSION
+=cut
 
-version 0.61
+=head1 ABSTRACT
+
+Data-Object Throwable Role
+
+=cut
 
 =head1 SYNOPSIS
 
@@ -47,118 +44,25 @@ version 0.61
 
   with 'Data::Object::Role::Throwable';
 
+=cut
+
 =head1 DESCRIPTION
 
 Data::Object::Role::Throwable provides routines for operating on Perl 5
 data objects which meet the criteria for being throwable.
 
+=cut
+
 =head1 METHODS
+
+This package implements the following methods.
+
+=cut
 
 =head2 throw
 
-  # given $throwable
+  $self->throw($message);
 
-  $throwable->throw;
-
-The throw method terminates the program using the core die keyword, passing the
-object to the L<Data::Object::Exception> class as the named parameter C<object>.
-If captured this method returns an exception value.
-
-=head1 SEE ALSO
-
-=over 4
-
-=item *
-
-L<Data::Object::Array>
-
-=item *
-
-L<Data::Object::Class>
-
-=item *
-
-L<Data::Object::Class::Syntax>
-
-=item *
-
-L<Data::Object::Code>
-
-=item *
-
-L<Data::Object::Float>
-
-=item *
-
-L<Data::Object::Hash>
-
-=item *
-
-L<Data::Object::Integer>
-
-=item *
-
-L<Data::Object::Number>
-
-=item *
-
-L<Data::Object::Role>
-
-=item *
-
-L<Data::Object::Role::Syntax>
-
-=item *
-
-L<Data::Object::Regexp>
-
-=item *
-
-L<Data::Object::Scalar>
-
-=item *
-
-L<Data::Object::String>
-
-=item *
-
-L<Data::Object::Undef>
-
-=item *
-
-L<Data::Object::Universal>
-
-=item *
-
-L<Data::Object::Autobox>
-
-=item *
-
-L<Data::Object::Immutable>
-
-=item *
-
-L<Data::Object::Library>
-
-=item *
-
-L<Data::Object::Prototype>
-
-=item *
-
-L<Data::Object::Signatures>
-
-=back
-
-=head1 AUTHOR
-
-Al Newkirk <al@iamalnewkirk.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by Al Newkirk.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+The throw method throws an exception with the object and message.
 
 =cut

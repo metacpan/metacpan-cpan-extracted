@@ -48,9 +48,6 @@
       "Metabrik::Api::Cvesearch" : {
          "file" : "lib/Metabrik/Api/Cvesearch.pm"
       },
-      "Metabrik::Api::Onyphe" : {
-         "file" : "lib/Metabrik/Api/Onyphe.pm"
-      },
       "Metabrik::Api::Shodan" : {
          "file" : "lib/Metabrik/Api/Shodan.pm"
       },
@@ -102,8 +99,14 @@
       "Metabrik::Client::Elasticsearch::Cluster" : {
          "file" : "lib/Metabrik/Client/Elasticsearch/Cluster.pm"
       },
+      "Metabrik::Client::Elasticsearch::Indices" : {
+         "file" : "lib/Metabrik/Client/Elasticsearch/Indices.pm"
+      },
       "Metabrik::Client::Elasticsearch::Query" : {
          "file" : "lib/Metabrik/Client/Elasticsearch/Query.pm"
+      },
+      "Metabrik::Client::Elasticsearch::Tasks" : {
+         "file" : "lib/Metabrik/Client/Elasticsearch/Tasks.pm"
       },
       "Metabrik::Client::Imap" : {
          "file" : "lib/Metabrik/Client/Imap.pm"
@@ -518,7 +521,7 @@
       },
       "Metabrik::Repository" : {
          "file" : "lib/Metabrik/Repository.pm",
-         "version" : "1.31"
+         "version" : "1.40"
       },
       "Metabrik::Server::Dns" : {
          "file" : "lib/Metabrik/Server/Dns.pm"
@@ -700,6 +703,15 @@
       "Metabrik::System::Gphotofs" : {
          "file" : "lib/Metabrik/System/Gphotofs.pm"
       },
+      "Metabrik::System::Kali::Package" : {
+         "file" : "lib/Metabrik/System/Kali/Package.pm"
+      },
+      "Metabrik::System::Kali::Service" : {
+         "file" : "lib/Metabrik/System/Kali/Service.pm"
+      },
+      "Metabrik::System::Kali::User" : {
+         "file" : "lib/Metabrik/System/Kali/User.pm"
+      },
       "Metabrik::System::Libvirt" : {
          "file" : "lib/Metabrik/System/Libvirt.pm"
       },
@@ -788,6 +800,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "1.31",
+   "version" : "1.40",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

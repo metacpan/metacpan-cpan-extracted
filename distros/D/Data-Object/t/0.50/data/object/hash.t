@@ -4,13 +4,12 @@ use Test::More;
 
 use_ok 'Data::Object::Hash';
 
-ok Data::Object::Hash->does('Data::Object::Role::Collection');
-ok Data::Object::Hash->does('Data::Object::Role::Comparison');
-ok Data::Object::Hash->does('Data::Object::Role::Defined');
+ok Data::Object::Hash->does('Data::Object::Rule::Collection');
+ok Data::Object::Hash->does('Data::Object::Rule::Comparison');
+ok Data::Object::Hash->does('Data::Object::Rule::Defined');
 ok Data::Object::Hash->does('Data::Object::Role::Detract');
 ok Data::Object::Hash->does('Data::Object::Role::Dumper');
-ok Data::Object::Hash->does('Data::Object::Role::Item');
-ok Data::Object::Hash->does('Data::Object::Role::List');
+ok Data::Object::Hash->does('Data::Object::Rule::List');
 ok Data::Object::Hash->does('Data::Object::Role::Output');
 ok Data::Object::Hash->does('Data::Object::Role::Throwable');
 ok Data::Object::Hash->does('Data::Object::Role::Type');
@@ -68,13 +67,17 @@ can_ok 'Data::Object::Hash', 'values';
 
 subtest 'test instantiation' => sub {
   eval { Data::Object::Hash->new };
-  like $@, qr/Type Instantiation Error/;
+  like $@, qr/Instantiation Error/;
 
   eval { Data::Object::Hash->new(1) };
-  like $@, qr/Type Instantiation Error/;
+  like $@, qr/Instantiation Error/;
 
-  my $h1 = Data::Object::Hash->new(1, 2);
-  is_deeply $h1, {1, 2};
+  # argument lists are deprecated
+  # my $h1 = Data::Object::Hash->new(1, 2);
+  # is_deeply $h1, {1, 2};
+
+  eval { Data::Object::Hash->new(1, 2) };
+  like $@, qr/Instantiation Error/;
 
   my $h2 = Data::Object::Hash->new({1, 2});
   is_deeply $h2, {1, 2};

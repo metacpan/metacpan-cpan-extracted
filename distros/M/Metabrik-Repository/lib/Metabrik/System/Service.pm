@@ -1,5 +1,5 @@
 #
-# $Id: Service.pm,v 6fa51436f298 2018/01/12 09:27:33 gomor $
+# $Id: Service.pm,v 6bd6acfc81d5 2019/03/13 09:56:26 gomor $
 #
 # system::service Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 6fa51436f298 $',
+      revision => '$Revision: 6bd6acfc81d5 $',
       tags => [ qw(unstable daemon) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -27,8 +27,9 @@ sub brik_properties {
       },
       require_modules => {
          'Metabrik::System::Os' => [ ],
-         'Metabrik::System::Debian::Service' => [ ],
          'Metabrik::System::Ubuntu::Service' => [ ],
+         'Metabrik::System::Debian::Service' => [ ],
+         'Metabrik::System::Kali::Service' => [ ],
          'Metabrik::System::Centos::Service' => [ ],
       },
       require_binaries => {
@@ -48,6 +49,9 @@ sub get_system_service {
    }
    elsif ($os eq 'debian') {
       $ss = Metabrik::System::Debian::Service->new_from_brik_init($self) or return;
+   }
+   elsif ($os eq 'kali') {
+      $ss = Metabrik::System::Kali::Service->new_from_brik_init($self) or return;
    }
    elsif ($os eq 'centos') {
       $ss = Metabrik::System::Centos::Service->new_from_brik_init($self) or return;
@@ -204,7 +208,7 @@ Metabrik::System::Service - system::service Brik
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2014-2018, Patrice E<lt>GomoRE<gt> Auffret
+Copyright (c) 2014-2019, Patrice E<lt>GomoRE<gt> Auffret
 
 You may distribute this module under the terms of The BSD 3-Clause License.
 See LICENSE file in the source distribution archive.

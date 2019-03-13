@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
+plan skip_all => "Test Error: $@" unless eval q(
+    require Data::Object::Any;
     require Data::Object::Array;
     require Data::Object::Code;
     require Data::Object::Float;
@@ -12,14 +13,13 @@ plan skip_all => 'Missing implicit dependencies. Tests skipped.' unless eval q(
     require Data::Object::Scalar;
     require Data::Object::String;
     require Data::Object::Undef;
-    require Data::Object::Universal;
     1;
 );
 
-use Data::Object 'deduce_type';
+use Data::Object::Export 'deduce_type';
 use Scalar::Util 'refaddr';
 
-can_ok 'Data::Object', 'deduce_type';
+can_ok 'Data::Object::Export', 'deduce_type';
 subtest 'test the deduce_type function' => sub {
   my $array = deduce_type [1 .. 5];
   is $array, 'ARRAY';
