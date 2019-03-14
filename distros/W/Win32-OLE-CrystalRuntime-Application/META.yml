@@ -1,17 +1,28 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Win32-OLE-CrystalRuntime-Application
-version:      0.12
-version_from: lib/Win32/OLE/CrystalRuntime/Application.pm
-installdirs:  site
+--- #YAML:1.0
+name:               Win32-OLE-CrystalRuntime-Application
+version:            0.16
+abstract:           Perl Interface to the CrystalRuntime.Application OLE Object
+author:
+    - Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)
+license:            bsd
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
 requires:
-    constant:                      0
-    DateTime:                      0
-    strict:                        0
-    Test::Simple:                  0.44
-    vars:                          0
-    Win32::OLE:                    0
-    Win32::OLE::Variant:           0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+    constant:             0
+    DateTime:             0
+    strict:               0
+    Test::Simple:         0.44
+    vars:                 0
+    Win32::OLE:           0
+    Win32::OLE::Variant:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,24 @@
+language: perl
+addons:
+  apt:
+    packages:
+      - libgsl0ldbl
+      - gsl-bin
+      - libgsl0-dev
+      - autoconf
+      - zlib1g
+      - zlib1g-dbg
+      - zlib1g-dev
+      - zlibc
+perl:
+  - "5.24-shrplib"
+before_install:
+  - yes | sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update
+  - sudo apt-get install g++-5 gcc-5
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+  - export PATH=$PATH:$(pwd)/bin/Mash-2.1.1
+  - echo $PATH
+  - pwd
+  # /home/travis/build/lskatz/perl-mash/t/../bin/Mash-2.1.1/mash
+

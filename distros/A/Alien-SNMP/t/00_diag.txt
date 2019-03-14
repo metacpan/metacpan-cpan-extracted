@@ -1,6 +1,5 @@
 Alien::Base
-ExtUtils::CChecker
 File::ShareDir
-Test::CChecker
 Test::More
+Test::Alien
 parent

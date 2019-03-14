@@ -118,6 +118,17 @@ has userInfo => sub {
 };
 
 
+=head2 $self->loginName
+
+returns a human readable login name for the current user
+
+=cut
+
+has loginName => sub {
+    shift->userInfo->{cbuser_login} // '*UNKNOWN*';
+};
+
+
 =head2 $self->sessionConf
 
 Extracts the session config from the cookie from the X-Session-Cookie header or the xsc parameter.

@@ -13,12 +13,15 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "TAP-Formatter-Camelcade",
-  "LICENSE" => "apache",
+  "LICENSE" => "perl",
   "NAME" => "TAP::Formatter::Camelcade",
   "PREREQ_PM" => {
     "Test::Harness" => 0
   },
-  "VERSION" => "0.004",
+  "TEST_REQUIRES" => {
+    "Test::Simple" => "1.302162"
+  },
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -26,7 +29,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Test::Harness" => 0
+  "Test::Harness" => 0,
+  "Test::Simple" => "1.302162"
 );
 
 

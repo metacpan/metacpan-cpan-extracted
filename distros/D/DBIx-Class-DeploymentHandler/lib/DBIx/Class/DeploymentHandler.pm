@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler;
-$DBIx::Class::DeploymentHandler::VERSION = '0.002227';
+$DBIx::Class::DeploymentHandler::VERSION = '0.002228';
 # ABSTRACT: Extensible DBIx::Class deployment
 
 use Moo;

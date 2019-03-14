@@ -23,5 +23,15 @@ WriteMakefile(
         #'Foo::Bar::Module' => '5.0401',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'Giblog-*' },
+    clean => { FILES => 'Giblog-* t/tmp' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/yuki-kimoto/giblog.git',
+                web  => 'https://github.com/yuki-kimoto/giblog',
+            },
+        },
+    },
 );

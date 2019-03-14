@@ -18,17 +18,20 @@ my %WriteMakefileArgs = (
   "NAME" => "HTTP::Tiny::FileProtocol",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Fcntl" => 0,
     "File::Basename" => 0,
-    "File::Spec" => 0,
+    "File::Copy" => 0,
+    "File::stat" => 0,
     "HTTP::Tiny" => 0,
     "LWP::MediaTypes" => "6.02"
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
     "Pod::Coverage::TrustPod" => 0,
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,8 +40,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Fcntl" => 0,
   "File::Basename" => 0,
+  "File::Copy" => 0,
   "File::Spec" => 0,
+  "File::stat" => 0,
   "HTTP::Tiny" => 0,
   "LWP::MediaTypes" => "6.02",
   "Pod::Coverage::TrustPod" => 0,

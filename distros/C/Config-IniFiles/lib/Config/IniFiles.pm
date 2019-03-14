@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '3.000001';
+our $VERSION = '3.000002';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -742,7 +742,7 @@ HERE_DOC_LOOP:
             sprintf( '%d: %s',
                 $startline, qq#no end marker ("$eotmark") found# )
         );
-        $self->_rollback();
+        $self->_rollback($fh);
         return $RET_BREAK;
     }
 
@@ -2381,7 +2381,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 3.000001
+version 3.000002
 
 =head1 SYNOPSIS
 
@@ -2398,7 +2398,7 @@ sections can be grouped, and settings can be accessed from a tied hash.
 
 =head1 VERSION
 
-version 3.000001
+version 3.000002
 
 =head1 FILE FORMAT
 

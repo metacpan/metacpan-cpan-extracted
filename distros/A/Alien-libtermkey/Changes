@@ -1,5 +1,11 @@
 Revision history for Alien-libtermkey
 
+0.22    2019-03-14 13:54:03
+        [CHANGES]
+         * Wrap libtermkey 0.22:
+            + Bugfix for missing termios handling
+            + Bugfix to unit tests on BSD platforms
+
 0.21    2019-02-19 15:13:51
         [CHANGES]
          * Wrap libtermkey 0.21:

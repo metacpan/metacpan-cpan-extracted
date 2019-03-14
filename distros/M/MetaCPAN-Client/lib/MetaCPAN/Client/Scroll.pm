@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Scroll;
 # ABSTRACT: A MetaCPAN::Client scroller
-$MetaCPAN::Client::Scroll::VERSION = '2.025000';
+$MetaCPAN::Client::Scroll::VERSION = '2.026000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_hashref >;
@@ -134,7 +134,7 @@ sub _fetch_next {
         { content => $self->_id }
     );
 
-    croak "failed to fetch next scolled batch"
+    croak "failed to fetch next scrolled batch"
         unless $res->{status} == 200;
 
     my $content = decode_json $res->{content};
@@ -165,7 +165,7 @@ MetaCPAN::Client::Scroll - A MetaCPAN::Client scroller
 
 =head1 VERSION
 
-version 2.025000
+version 2.026000
 
 =head1 METHODS
 

@@ -1,3 +1,6 @@
+0.005
+    Test reuirements, proper version of Test::Simple
+
 0.004
     Fixed testing issues on Windows
     Suppressed using local RC for tests, may affect results and output

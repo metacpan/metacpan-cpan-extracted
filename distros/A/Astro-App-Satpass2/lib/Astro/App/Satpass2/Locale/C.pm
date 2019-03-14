@@ -11,7 +11,7 @@ use Astro::Coord::ECI::TLE 0.059 qw{ :constants };
 use Astro::App::Satpass2::Utils qw{ @CARP_NOT };
 use Scalar::Util ();
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 my @event_names;
 $event_names[PASS_EVENT_NONE]		= '';
@@ -648,7 +648,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2018 by Thomas R. Wyant, III
+Copyright (C) 2014-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

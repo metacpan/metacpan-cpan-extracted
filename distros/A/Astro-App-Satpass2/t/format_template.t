@@ -16,8 +16,17 @@ use Astro::Coord::ECI 0.077;
 use Astro::Coord::ECI::Moon 0.077;
 use Astro::Coord::ECI::Sun 0.077;
 use Astro::Coord::ECI::TLE 0.077 qw{ :constants };
-use Astro::Coord::ECI::TLE::Iridium 0.077;
 use Astro::Coord::ECI::Utils 0.077 qw{ deg2rad time_gm };
+
+{
+    local $@ = undef;
+
+    use constant HAVE_TLE_IRIDIUM	=> eval {
+	require Astro::Coord::ECI::TLE::Iridium;
+	Astro::Coord::ECI::TLE::Iridium->VERSION( 0.077 );
+	1;
+    } || 0;
+}
 
 use Cwd ();
 use Time::Local;
@@ -44,7 +53,7 @@ None
 2 88888  72.8435 115.9689 0086731  52.6988 110.5714 16.05824518  105
 EOD
 
-$sat->rebless( 'iridium' );
+HAVE_TLE_IRIDIUM and $sat->rebless( 'iridium' );
 
 my $ft = Astro::App::Satpass2::Format::Template->new()->gmt( 1 );
 
@@ -112,48 +121,53 @@ is $ft->format(
 2011-04-01 22:02:40 Moon set
 EOD
 
-is $ft->format(
-    template	=> 'flare',
-    data	=> [
-	    {
-		angle => 0.262059013150469,
-		appulse => {
-		    angle => 1.02611236331053,
-		    body => $sun,
-		},
-		area => 5.01492326975883e-12,
-		azimuth => 2.2879991425019,
-		body => $sat,
-		center => {
-		    body => Astro::Coord::ECI->new()->eci(
-			-239.816850881829,
-			4844.88846601786,
-			4147.86073518313,
+SKIP: {
+    HAVE_TLE_IRIDIUM
+	or skip 'Astro::Coord::ECI::TLE::Iridium not installed', 1;
+
+    is $ft->format(
+	template	=> 'flare',
+	data	=> [
+		{
+		    angle => 0.262059013150469,
+		    appulse => {
+			angle => 1.02611236331053,
+			body => $sun,
+		    },
+		    area => 5.01492326975883e-12,
+		    azimuth => 2.2879991425019,
+		    body => $sat,
+		    center => {
+			body => Astro::Coord::ECI->new()->eci(
+			    -239.816850881829,
+			    4844.88846601786,
+			    4147.86073518313,
+			),
+			magnitude => -9.19948076848716,
+		    },
+		    elevation => 0.494460647040746,
+		    magnitude => 3.92771062285379,
+		    mma => 0,
+		    range => 410.943432358706,
+		    specular => 0,
+		    station => $sta,
+		    status => '',
+		    time => time_gm( 44, 7, 10, 13, 9, 1980 ) + .606786,
+		    type => 'am',
+		    virtual_image => Astro::Coord::ECI->new()->eci(
+			-126704974.030369,
+			66341250.3306362,
+			-42588590.3666171,
 		    ),
-		    magnitude => -9.19948076848716,
 		},
-		elevation => 0.494460647040746,
-		magnitude => 3.92771062285379,
-		mma => 0,
-		range => 410.943432358706,
-		specular => 0,
-		station => $sta,
-		status => '',
-		time => time_gm( 44, 7, 10, 13, 9, 1980 ) + .606786,
-		type => 'am',
-		virtual_image => Astro::Coord::ECI->new()->eci(
-		    -126704974.030369,
-		    66341250.3306362,
-		    -42588590.3666171,
-		),
-	    },
-	] ), <<'EOD', 'Flare';
+	    ] ), <<'EOD', 'Flare';
                                                      Degre
                                                       From   Center Center
 Time     Name         Eleva  Azimuth      Range Magn   Sun  Azimuth  Range
 1980-10-13
 10:07:45 None          28.3 131.1 SE      410.9  3.9 night 300.8 NW  412.5
 EOD
+}
 
 is $ft->format(
     template	=> 'list',
@@ -338,21 +352,28 @@ is $ft->format(
 2011-04-01 04:00:00     Moon  333 waning crescent     5%
 EOD
 
+my $iridium_stuff = HAVE_TLE_IRIDIUM ? <<'EOD' : '';
+
+                                           MMA 0 mirror angle 15.0 magnitude 3.9
+                                           MMA 1 Geometry does not allow reflection
+                                           MMA 2 Geometry does not allow reflection
+EOD
+chomp $iridium_stuff;
+
 is $ft->format(
     template	=> 'position',
     data	=> {
 	    bodies	=> [ $sat, $moon ],
 	    station	=> $sta,
 	    time	=> time_gm( 45, 7, 10, 13, 9, 1980 ),
-	} ), <<'EOD', 'Position';
+	} ), <<"EOD", 'Position';
 1980-10-13 10:07:45
             Name Eleva  Azimuth      Range               Epoch Illum
-            None  28.4 130.7 SE      409.9 1980-10-01 23:41:24 lit
-                                           MMA 0 mirror angle 15.0 magnitude 3.9
-                                           MMA 1 Geometry does not allow reflection
-                                           MMA 2 Geometry does not allow reflection
+            None  28.4 130.7 SE      409.9 1980-10-01 23:41:24 lit$iridium_stuff
             Moon -55.8  59.2 NE   406685.1
 EOD
+
+$sat->rebless( 'tle' );	# No more Iridium stuff, since we know we can do it.
 
 $ft->local_coord( 'azel' );
 is $ft->format(
@@ -365,9 +386,6 @@ is $ft->format(
 1980-10-13 10:07:45
             Name Eleva  Azimuth               Epoch Illum
             None  28.4 130.7 SE 1980-10-01 23:41:24 lit
-                                MMA 0 mirror angle 15.0 magnitude 3.9
-                                MMA 1 Geometry does not allow reflection
-                                MMA 2 Geometry does not allow reflection
             Moon -55.8  59.2 NE
 EOD
 
@@ -382,9 +400,6 @@ is $ft->format(
 1980-10-13 10:07:45
             Name  Azimuth      Range               Epoch Illum
             None 130.7 SE      409.9 1980-10-01 23:41:24 lit
-                                     MMA 0 mirror angle 15.0 magnitude 3.9
-                                     MMA 1 Geometry does not allow reflection
-                                     MMA 2 Geometry does not allow reflection
             Moon  59.2 NE   406685.1
 EOD
 
@@ -400,9 +415,6 @@ is $ft->format(
                     Right
             Name Ascensio Decli               Epoch Illum
             None 09:17:51  -8.5 1980-10-01 23:41:24 lit
-                                MMA 0 mirror angle 15.0 magnitude 3.9
-                                MMA 1 Geometry does not allow reflection
-                                MMA 2 Geometry does not allow reflection
             Moon 16:26:42 -17.2
 EOD
 
@@ -418,9 +430,6 @@ is $ft->format(
                     Right
             Name Ascensio Decli      Range               Epoch Illum
             None 09:17:51  -8.5      409.9 1980-10-01 23:41:24 lit
-                                           MMA 0 mirror angle 15.0 magnitude 3.9
-                                           MMA 1 Geometry does not allow reflection
-                                           MMA 2 Geometry does not allow reflection
             Moon 16:26:42 -17.2   406685.1
 EOD
 

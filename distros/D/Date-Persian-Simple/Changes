@@ -1,5 +1,8 @@
 Revision history for Date::Persian::Simple
 
+0.21  Thu Mar 14 16:30:00 2019
+      - Updated dependency on Date::Utils v0.25.
+
 0.20  Tue Nov 20 18:10:00 2018
       - Used namespace::autoclean instead.
 

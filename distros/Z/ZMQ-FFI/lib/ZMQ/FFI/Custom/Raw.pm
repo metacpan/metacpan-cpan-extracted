@@ -1,5 +1,5 @@
 package ZMQ::FFI::Custom::Raw;
-$ZMQ::FFI::Custom::Raw::VERSION = '1.15';
+$ZMQ::FFI::Custom::Raw::VERSION = '1.17';
 sub load {
     my ($soname) = @_;
 
@@ -69,7 +69,7 @@ ZMQ::FFI::Custom::Raw
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 AUTHOR
 

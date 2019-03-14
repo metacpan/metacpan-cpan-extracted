@@ -22,8 +22,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::File" => 0,
     "Getopt::Long::Complete" => 0,
-    "Log::ger" => "0.011",
-    "ShellCompleter::Util" => 0,
+    "Log::ger" => "0.023",
+    "ShellCompleter::Util" => "0.030",
     "strict" => 0,
     "warnings" => 0
   },
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.11",
+  "VERSION" => "0.120",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,8 +46,8 @@ my %FallbackPrereqs = (
   "Getopt::Long::Complete" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.011",
-  "ShellCompleter::Util" => 0,
+  "Log::ger" => "0.023",
+  "ShellCompleter::Util" => "0.030",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

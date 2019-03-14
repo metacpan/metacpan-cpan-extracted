@@ -19,4 +19,6 @@ no_index:
     - inc
 requires:
   perl: '5.006'
-version: '0.01'
+resources:
+  repository: https://github.com/yuki-kimoto/giblog.git
+version: '0.02'

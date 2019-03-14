@@ -15,6 +15,10 @@ t/02_get_file.t
 t/03_get_xlsx.t
 t/04_mirror.t
 t/04_not_found.t
+t/05_get_error.t
+t/06_build_response.t
+t/07_mirror_error.t
+t/08_cando.t
 t/ascii_table.xlsx
 t/author-pod-coverage.t
 t/author-pod-syntax.t

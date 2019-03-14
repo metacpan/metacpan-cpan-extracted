@@ -1,5 +1,5 @@
 package ZMQ::FFI::ContextRole;
-$ZMQ::FFI::ContextRole::VERSION = '1.15';
+$ZMQ::FFI::ContextRole::VERSION = '1.17';
 use Moo::Role;
 
 use ZMQ::FFI::Util qw(current_tid);
@@ -69,7 +69,7 @@ ZMQ::FFI::ContextRole
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 AUTHOR
 

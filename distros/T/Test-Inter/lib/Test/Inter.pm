@@ -11,9 +11,10 @@ use warnings;
 use strict;
 use File::Basename;
 use IO::File;
+use Cwd 'abs_path';
 
 our($VERSION);
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 ###############################################################################
 # BASE METHODS
@@ -101,33 +102,32 @@ sub new {
       print "\nRunning $name...\n";
    }
 
-   # Find the test directory
-   #
-   # Scripts will either be run:
-   #    directly (look at $0)
-   #    as a test suite (look for ./t and ../t)
+   # We assume that the module is distributed in a directory with the correct
+   # hierarchy.  This is:
+   #      /some/path      MODDIR
+   #                /t    TESTDIR
+   #                /lib  LIBDIR
+   # We'll find the full path to each.
 
-   my($TDIR,@LIBDIR);
+   my($moddir,$testdir,$libdir);
+
    if (-f "$0") {
-      my $COM = $0;
-      $TDIR   = dirname($COM);
-      $TDIR   = '.'  if (! $TDIR);
-   } elsif (-d 't') {
-      $TDIR   = 't';
-   } else {
-      $TDIR   = '.';
+      $moddir = dirname(dirname(abs_path($0)));
+   } elsif (-d "./t") {
+      $moddir = dirname(abs_path('.'));
+   } elsif (-d "../t") {
+      $moddir = dirname(abs_path('..'));
+   }
+   if (-d "$moddir/t") {
+      $testdir = "$moddir/t";
+   }
+   if (-d "$moddir/lib") {
+      $libdir  = "$moddir/lib";
    }
 
-   @LIBDIR = ('.');
-   if (-d "$TDIR/lib") {
-      push(@LIBDIR,"$TDIR/lib");
-   }
-   if (-d "$TDIR/../lib") {
-      push(@LIBDIR,"$TDIR/../lib");
-   }
-
-   $$self{'testdir'} = $TDIR;
-   $$self{'libdir'}  = \@LIBDIR;
+   $$self{'moddir'}  = $moddir;
+   $$self{'testdir'} = $testdir;
+   $$self{'libdir'}  = $libdir;
 
    $self->use_lib();
 
@@ -142,14 +142,20 @@ sub use_lib {
    }
 
    if ($$self{'use_lib'} eq 'on') {
-      foreach my $dir (@{ $$self{'libdir'} }) {
+      foreach my $dir ($$self{'libdir'},$$self{'testdir'}) {
+         next  if (! defined $dir);
          eval "use lib '$dir'";
       }
    }
 }
 
 sub testdir {
-   my($self) = @_;
+   my($self,$req) = @_;
+   if ($req  &&  $req eq 'mod') {
+      return $$self{'moddir'};
+   } elsif ($req  &&  $req eq 'lib') {
+      return $$self{'libdir'};
+   }
    return $$self{'testdir'};
 }
 
@@ -301,7 +307,7 @@ sub require_ok {
    $main::TI_NUM++  unless ($mode eq 'feature');
 
    my $pack = caller;
-   my @inc  = map { "unshift(\@INC,'$_');\n" } @{ $$self{'libdir'} };
+   my @inc  = map { "unshift(\@INC,'$_');\n" } ($$self{'libdir'},$$self{'testdir'});
 
    my($desc,$code);
 
@@ -315,10 +321,12 @@ REQUIRE
    } else {
       $module = qq['$module'] unless $self->_is_module_name($module);
       $desc   = "require $module";
+      my $p   = "package";   # So the following do not get picked up by cpantorpm-depreq
+      my $r   = "require";
       $code   = <<REQUIRE;
-package $pack;
+$p $pack;
 @inc
-require $module;
+$r $module;
 1;
 REQUIRE
    }
@@ -416,10 +424,11 @@ USE
       my $imports = (@args ? 'qw(' . join(' ',@args) . ')' : '');
       $desc = "use $module $vers $imports";
 
-      my @inc  = map { "unshift(\@INC,'$_');\n" } @{ $$self{'libdir'} };
+      my @inc  = map { "unshift(\@INC,'$_');\n" } ($$self{'libdir'},$$self{'testdir'});
 
+      my $p   = "package";   # So the following do not get picked up by cpantorpm-depreq
       $code = <<USE;
-package $pack;
+$p $pack;
 @inc
 use $module $vers $imports;
 1;

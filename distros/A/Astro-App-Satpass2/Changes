@@ -1,3 +1,10 @@
+0.038		2019-03-13	T. R. Wyant
+    The 'model' setting is no longer ignored. It is now actually applied
+    to the TLE objects when loading them, and a change in value causes
+    all loaded TLEs to be modified as well.
+
+    Make ::TLE::Iridium optional.
+
 0.037		2018-10-28	T. R. Wyant
     Fix test failure in t/locale.t. I hope. Some of the CPAN testers
     get errors like

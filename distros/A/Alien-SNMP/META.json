@@ -16,14 +16,15 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
             "IO::Socket::SSL" : "1.56",
-            "Net::SSLeay" : "1.49"
+            "Net::SSLeay" : "1.49",
+            "Software::License" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "Alien::Base" : "0.020",
-            "ExtUtils::CChecker" : "0.10",
             "File::ShareDir" : "1.03",
             "Module::Build" : "0.42",
             "PkgConfig" : "0.14026",
@@ -41,7 +42,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::CChecker" : "0",
+            "Test::Alien" : "0.16",
             "Test::More" : "0.94",
             "perl" : "5.010001"
          }
@@ -50,15 +51,18 @@
    "provides" : {
       "Alien::SNMP" : {
          "file" : "lib/Alien/SNMP.pm",
-         "version" : "2.000000"
+         "version" : "2.001000"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://opensource.org/licenses/BSD-3-Clause"
-      ]
+      ],
+      "repository" : {
+         "url" : "http://github.com/ollyg/Alien-SNMP"
+      }
    },
-   "version" : "2.000000",
+   "version" : "2.001000",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

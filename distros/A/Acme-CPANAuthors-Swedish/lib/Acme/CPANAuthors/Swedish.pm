@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use Acme::CPANAuthors::Register (
   ABERGMAN  => 'Artur Bergman',
@@ -13,7 +13,6 @@ use Acme::CPANAuthors::Register (
   HOBBESTIG => 'Natal Ngétal',
   OLOF      => 'Olof Johansson',
   WOLDRICH  => 'Magnus Woldrich',
-  OLOF      => 'Olof Johansson',
 );
 
 1;

@@ -30,7 +30,7 @@
             "Carp::Clan" : "0",
             "Context::Preserve" : "0.01",
             "DBIx::Class" : "0.08121",
-            "IO::All" : "0.55",
+            "IO::All" : "0.87",
             "Log::Contextual" : "0.005005",
             "Module::Runtime" : "0.001",
             "Moo" : "2",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/frioux/DBIx-Class-DeploymentHandler"
       }
    },
-   "version" : "0.002227",
+   "version" : "0.002228",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

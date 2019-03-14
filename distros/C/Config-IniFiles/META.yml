@@ -40,7 +40,7 @@ name: Config-IniFiles
 provides:
   Config::IniFiles:
     file: lib/Config/IniFiles.pm
-    version: '3.000001'
+    version: '3.000002'
 requires:
   Carp: '0'
   Fcntl: '0'
@@ -57,7 +57,7 @@ resources:
   bugtracker: https://github.com/shlomif/perl-Config-IniFiles/issues
   homepage: http://metacpan.org/release/Config-IniFiles
   repository: git://github.com/shlomif/perl-Config-IniFiles.git
-version: '3.000001'
+version: '3.000002'
 x_Dist_Zilla:
   perl:
     version: '5.028001'

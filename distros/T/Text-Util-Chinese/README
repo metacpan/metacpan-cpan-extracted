@@ -8,8 +8,8 @@ Exportable Subroutines
     extract_words( $input_iter ) #=> ArrayRef[Str]
 
       This extracts words from Chinese text. A word in Chinese text is a
-      token token with N charaters. These N characters is often used
-      together in the input and therefore should be a meaningful unit.
+      token with N charaters. These N characters is often used together in
+      the input and therefore should be a meaningful unit.
 
       The input parameter is a iterator -- a subroutine that must return a
       string of Chinese text each time it is invoked. Or, when the input is
@@ -27,6 +27,34 @@ Exportable Subroutines
       It is likely that this subroutine returns an empty ArrayRef with no
       contents. It is only useful when the volume of input is a leats a few
       thousands of characters. The more, the better.
+
+    extract_presuf( $input_iter, $output_cb, $opts ) #=> HashRef
+
+      This subroutine extract meaningful tokens that are prefix or suffix
+      of input. Comparing to extract_word, it yields extracted tokens
+      frequently by calling $output_cb.
+
+      It is used like this:
+
+          my $extracted = extract_presuf(
+              \&next_input,
+              sub {
+                  my ($token, $extracted) = @_;
+      
+                  ...
+              },
+              { threshold => 9 }
+          );
+
+      The $output_cb callback is passed two arguments. The first one is the
+      new $token that appears more then $threshold times as a prefix and as
+      a suffix. The second arguments is a HashRef with keys being the set
+      of all extracted tokens. The very same HashRef is also going to be
+      the return value of this subroutine.
+
+      The 3rd argument is a HashRef with parameters to the internal
+      algorithm. So far threshold is the only one with default value being
+      9.
 
 AUTHORS
 

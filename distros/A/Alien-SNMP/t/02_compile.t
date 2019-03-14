@@ -1,26 +1,28 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::CChecker;
+use Test::Alien;
 use Alien::SNMP;
 
-plan tests => 1;
+alien_ok 'Alien::SNMP';
 
-compile_output_to_note;
-
-compile_with_alien 'Alien::SNMP';
-
-compile_run_ok <<'C_CODE', "basic compile test";
+xs_ok <<'XS_CODE'
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/version.h>
 
-int
-main(int argc, char *argv[])
-{
-  const char *version;
-  version = netsnmp_get_version();
-  return 0;
-}
-C_CODE
+MODULE = SNMP PACKAGE = SNMP
 
-1;
+const char *
+netsnmp_get_version()
+
+XS_CODE
+, with_subtest {
+  my $version;
+  ok $version = SNMP::netsnmp_get_version();
+  note "version = $version";
+};
+
+done_testing;

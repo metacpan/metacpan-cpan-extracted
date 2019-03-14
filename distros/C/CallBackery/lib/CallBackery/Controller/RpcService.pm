@@ -67,24 +67,28 @@ sub allow_rpc_access {
     return (exists $allow{$method} and ($allow{$method} == 1 or $self->user->isUserAuthenticated));
 }
 
-# dataCleaner($data,qr{keyMatch})
+# dataCleaner($data)
+
+has passMatch => sub {
+    qr{(?i)(?:password|_pass)};
+};
 
 sub dataCleaner {
     my $self = shift;
     my $data = shift;
-    my $match = shift;
+    my $match = $self->passMatch;
     my $type = ref $data;
     for ($type) {
         /ARRAY/ && do {
-            $self->dataCleaner($_,$match) for @$data;
+            $self->dataCleaner($_) for @$data;
         };
         /HASH/ && do {
             for my $key (keys %$data) {
                 my $value = $data->{$key};
                 if (ref $value){
-                    $self->dataCleaner($value,$match);
+                    $self->dataCleaner($value);
                 }
-                if ($value =~ /$match/){
+                elsif ($key =~ /$match/){
                     $data->{$key} = 'xxx';
                 }
             }
@@ -104,8 +108,8 @@ sub logRpcCall {
     if ($ENV{CALLBACKERY_RPC_LOG}){
         my $method = shift;
         my $data = shift;
-        $self->dataCleaner($data,qr{(?i)(?:password|_pass)});
-        my $userId = eval { $self->user->userId } // 'UnknowUser';
+        $self->dataCleaner($data);
+        my $userId = eval { $self->user->loginName } // '*UNKNOWN*';
         my $remoteAddr = $self->tx->remote_address;
         $self->log->debug("[$userId|$remoteAddr] CALL $method(".encode_json($data).")");
     }
@@ -125,8 +129,8 @@ sub logRpcReturn {
     my $self = shift;
     if ($ENV{CALLBACKERY_RPC_LOG}){
         my $data = shift;
-        $self->dataCleaner($data,qr{(?i)(?:password|_pass)});
-        my $userId = eval { $self->user->userId } // 'UnknowUser';
+        $self->dataCleaner($data);
+        my $userId = eval { $self->user->loginName } // '*UNKNOWN*';
         my $remoteAddr = $self->tx->remote_address;
         $self->log->debug("[$userId|$remoteAddr] RETURN ".encode_json($data).")");
     }

@@ -27,6 +27,8 @@ Add support for timing tests:
    ok 1  (12 ms)
    ok 2  (23 ms)
 
+Name each test (and break on test name) even if tests defined in a string.
+
 =========================================================================
 OLD STUFF
 

@@ -6,7 +6,7 @@ use Win32::OLE::CrystalRuntime::Application::Report;
 use Win32::OLE;
 use DateTime;
 
-our $VERSION='0.12';
+our $VERSION='0.16';
 our $PACKAGE=__PACKAGE__;
 
 =head1 NAME
@@ -42,7 +42,7 @@ The perl Version
 
 =head1 DESCRIPTION
 
-This package allows automation of generating Crystal Reports with Perl.  This package connects to the Crystal Runtime Application OLE object.  You MUST have a license for the Crystal Reports server-side component "Report Designer Control (RDC)" in order for this to work.
+This package allows automation of generating Crystal Reports with Perl.  This package connects to the Crystal Runtime Application OLE object provided by craxddrt.dll (Crystal Reports ActiveX Designer Design and Runtime Library).  You MUST have a license for the Crystal Reports server-side component "Report Designer Control (RDC)" in order for this to work.
 
                                                Perl API       
                                                   |           
@@ -149,7 +149,11 @@ sub report {
 
 =head2 GetVersion
 
-Returns $application->ole->GetVersion
+Returns the Version of Craxddrt.dll (Crystal Reports ActiveX Designer Design and Runtime Library)
+
+  printf "GetVersion = %s.\n", $application->GetVersion;
+
+Example: GetVersion = 8964.
 
 =cut
 
@@ -157,9 +161,33 @@ sub GetVersion {shift->ole->GetVersion};
 
 =head1 BUGS
 
+Log on RT and contact the Author.
+
 =head1 SUPPORT
 
-Please try Business Objects.
+DavisNetworks.com supports all Perl applications including this package.
+
+=head2 Trouble Shooting
+
+  perl -MWin32::OLE -e "Win32::OLE->CreateObject(q{CrystalRuntime.Application}); print Win32::OLE->LastError, qq{\n}"
+
+Note: This package has only been tested on Crystal Report Server X1R2 on Windows Server 2003. 
+
+=over
+
+=item Error: 'perl' is not recognized as an internal or external command,
+
+Resolution: Install Perl. I run ActiveState Perl 5.10 which has DBD::Oracle drivers.
+
+=item Error: Can't locate Win32/OLE.pm in @INC
+
+Resolution: Install Win32::OLE.
+
+=item Error: Win32::OLE(0.1709) error 0x800401f3: "Invalid class string"
+
+Resolution: Install Crystal Runtime Application OLE object provided by craxddrt.dll (Crystal Reports ActiveX Designer Design and Runtime Library) which is available in their server product and certain developer products.
+
+=back
 
 =head1 AUTHOR
 

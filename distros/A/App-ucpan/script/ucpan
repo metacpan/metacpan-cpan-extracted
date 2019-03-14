@@ -78,23 +78,34 @@ EO_USAGE
 
     my $set_debugging = sub {
         shift;    # skip option-str
+        $DEBUG{verbose} = 0;
+        $DEBUG{head} = 1;
         my $value = shift;
         if ($value) {
             my @item = split ',', $value;
+            my @bads;
             for my $i (@item) {
-                if ( $i =~ /^verbose(?:=(\d+))?$/ ) {
+                if ( $i =~ /^v(?:erbose)?(?:=(\d+))?$/ ) {
                     $DEBUG{verbose} = defined $1 ? $1 : 1;
                 }
-                elsif($i =~ /^no-?verbose$/) {
-                    $DEBUG{verbose} = 0;
-                }
-                elsif ( $i =~ /^fakelib(?:=(.+))?$/ ) {
+                elsif ( $i =~ /^(?:fl|fakelib)(?:=(.+))?$/ ) {
                     $DEBUG{fakelib} = $1 || './fakelib';
                 }
+                elsif ( $i =~ /^(?:nh|nohead)$/ ) {
+                    $DEBUG{head} = 0;
+                }
+                elsif ( $i =~ /^(?:i|maxitem)(?:=(\d+))?/ ) {
+                    $DEBUG{maxitem} = $1 || 10;
+                }
+                else {
+                    push @bads, $i;
+                }
             }
-        }
-        else {
-            $DEBUG{verbose} = 1;
+            if (@bads) {
+                warn "Unknown DEBUG option: $_\n" for @bads;
+                warn "$APPNAME abort.\n";
+                exit 9;
+            }
         }
         if ( $DEBUG{verbose} ) {
             eval {
@@ -103,6 +114,10 @@ EO_USAGE
                     '#' x ( $DEBUG{verbose} + 2 ) );
             };
         }
+        if ( $DEBUG{fakelib} ) {
+            ( $DEBUG{fakelib} = dir( $DEBUG{fakelib} )->absolute )
+                =~ s:\\:/:g;
+        }
         $DEBUG{enable} = 1;
     };
     Getopt::Long::Configure('bundling');
@@ -110,7 +125,7 @@ EO_USAGE
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.02');
+            our $VERSION = version->declare('1.03');
             print __PACKAGE__->VERSION, $/;
             exit;
         },
@@ -166,12 +181,7 @@ else {
 }
 
 #== PROGRAM CONFIGURATION
-if ($DEBUG{fakelib}) {
-    my $FAKELIB;
-    ( $FAKELIB = file($DEBUG{fakelib}) ) =~ s!\\!/!g;
-    push @{ $CONFIG->{checker_options} }, "--L=$FAKELIB";
-    push @{ $CONFIG->{updater_options} }, "--L=$FAKELIB";
-}
+my $RECFILEBASE = '.ucpandb';
 {    # set config file path
     my $dir;
     my $file;
@@ -182,13 +192,26 @@ if ($DEBUG{fakelib}) {
     else {
         $dir = $INC[0];
     }
-    $file = file( $dir, '.ucpandb' );
+    $file = file( $dir, $RECFILEBASE );
     $file =~ s!\\!/!g;
     $CONFIG->{cfg_file} = $file;
 }
-if ( $DEBUG{enable} ) {
+if ( $DEBUG{fakelib} ) {
+    my $FAKELIB = $DEBUG{fakelib};
+    $ENV{PERL5LIB}            = "$FAKELIB/lib/perl5";
+    $ENV{PERL_LOCAL_LIB_ROOT} = $FAKELIB;
+    $ENV{PERL_MB_OPT}         = "--install_base=$FAKELIB";
+    $ENV{PERL_MM_OPT}         = "INSTALL_BASE=$FAKELIB";
+    $ENV{PERL_CPANM_HOME}     = $FAKELIB;
+    $CONFIG->{cfg_file} = file($FAKELIB,$RECFILEBASE);
+}
+if ( $DEBUG{head} ) {
     warn "=" x 20 . " DEBUGGING MODE " . "=" x 20 . $/;
-    warn sprintf "%25s: %s$/", 'Smart-Comments', 'LEVEL-' . $DEBUG{verbose};
+    warn sprintf "%25s: %s$/", 'Verbose Level', $DEBUG{verbose};
+    warn sprintf "%25s: %s$/", 'Debug Option',
+        join( ' ',
+        map {"$_=$DEBUG{$_}"}
+        grep { $_ !~ /^(?:enable|verbose|head)/ } keys %DEBUG );
     warn sprintf "%25s: %s$/", 'Checker Option', join( ' ', @{ $CONFIG->{checker_options} } );
     warn sprintf "%25s: %s$/", 'Updater Option', join( ' ', @{ $CONFIG->{updater_options} } );
     warn sprintf "%25s: %s$/", 'Config File', $CONFIG->{cfg_file};
@@ -282,18 +305,36 @@ my $mod_fold = sub {
 ## common vars
 my $skip_entries;
 my ( $fn, $fc, $fl, $fs );
-my $output_format;
-
 ( $fn, $fc, $fl ) = qw/32 10 10/;
 $fs            = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
-$output_format = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
+my $output_format_3 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds$/},
+    ($fn) x 2, ($fc) x 2, ($fl) x 2;
+my $output_format_4 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
     ($fn) x 2, ($fc) x 2, ($fl) x 2, ($fs) x 2;
 
-my $output_format_fold_head = $output_format;
-$output_format_fold_head =~ s/%/%-/;
+my $output_format_fold_head = sprintf qq{%%-%d.%ds}, ($fn) x 2;
 
 ## set foldize
 my $fold_mod = Foldize->new( width => $fn, delimiter => "::" );
+
+sub make_table_row {
+    my $e = shift;
+    my $r = '';
+    my ( $mod, $current, $new, $phase );
+    $mod     = $fold_mod->parse( $e->{module} );
+    $current = $e->{current};
+    $new     = $e->{new};
+    $phase   = $e->{fail_at};
+    $r .= sprintf( $output_format_fold_head, $mod->get )
+        while $mod->length > 2;
+    my $format = $phase ? $output_format_4 : $output_format_3;
+    $r .= sprintf(
+        $format, $mod->get,
+        $current => $new,
+        $phase
+    );
+    return $r;
+}
 
 ## Show Skips
 if ( $SHOW_SKIPS ) {
@@ -308,20 +349,8 @@ if ( $SHOW_SKIPS ) {
     $_->{fail_at} = $f for @a;
     @a
     } keys %$skip_entries;
-    pr_cyan sprintf( $output_format, 'Name', 'Current', 'Latest', 'Fail at...' );
-    for my $e (@mods) {
-        my ( $mod, $current, $new, $phase );
-        $mod     = $fold_mod->parse( $e->{module} );
-        $current = $e->{current};
-        $new     = $e->{new};
-        $phase   = $e->{fail_at};
-        printf( $output_format_fold_head, $mod->get, '', '', '' )
-        while $mod->length > 2;
-        printf( $output_format, $mod->get,
-            $current => $new,
-            $phase
-        );
-    }
+    pr_cyan sprintf( $output_format_4, 'Name', 'Current', 'Latest', 'Fail at...' );
+    print make_table_row($_) for @mods;
     exit;
 }
 
@@ -375,9 +404,8 @@ $skip_entries = $CONFIG->{user_setting}->{SKIP};
 ( $fn, $fc, $fl ) = qw/32 10 10/;
 $fs = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
 
-# $output_format = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
-# ($fn) x 2, ($fc) x 2, ($fl) x 2, ($fs) x 2;
 my $reader = sub {
+    return if $DEBUG{maxitem} && keys(%outdated) >= $DEBUG{maxitem};
     my ($line) = @_;
     chomp $line;
     my ( $mod, $current, $new, $file ) = split /\s+/, $line;
@@ -388,19 +416,16 @@ my $reader = sub {
     $dist_version = version->parse($dist_version);
     $current      = version->parse($current);
     $new          = version->parse($new);
-    my $phase = '';
-    my $mod_f = $fold_mod->parse($mod);
+    my $info = +{ module=>$mod, current=>$current, new=>$new };
 # Checking SKIP ENTRIES
     if ( my $old = $skip_entries->{$dist_name} ) {
 
-        $phase = $skip_entries->{$dist_name}->{fail_at} || '?';
+        $info->{fail_at} = $skip_entries->{$dist_name}->{fail_at} || '?';
         if ( $IGNORE_SKIP or $old->{version} < $dist_version ) {
             delete $skip_entries->{$dist_name};
         }
         unless ($IGNORE_SKIP) {
-            printf( $output_format_fold_head, $mod_f->get, '', '', '' )
-                while $mod_f->length > 1;
-            printf( $output_format, $mod_f->get, $current, $new, $phase );
+            print make_table_row( $info );
             return;
         }
     }
@@ -416,13 +441,11 @@ my $reader = sub {
         current => $current->numify,
         new     => $new->numify,
         };
-    pr_yellow sprintf( $output_format_fold_head, $mod_f->get, '', '', '' )
-        while $mod_f->length > 1;
-    pr_yellow sprintf $output_format, $mod_f->get, $current, $new, $phase;
+    pr_yellow make_table_row($info);
     return;
 };
 
-pr_cyan sprintf( $output_format, 'Name', 'Current', 'Latest', 'Fail at...' );
+pr_cyan sprintf( $output_format_4, 'Name', 'Current', 'Latest', 'Fail at...' );
 
 ## run cpan-outdated
 {
@@ -533,7 +556,7 @@ my @outdated = sort keys %outdated;
         no strict 'refs';
         $org_m
             = +{ map { $_ => \&{ "App::cpanminus::script::" . $_ } }
-                qw/_diag install_module fetch_module configure build test install run_timeout/
+                qw/_diag install_module fetch_module configure build test install/
                };
     }
     my $pid;
@@ -557,9 +580,7 @@ my @outdated = sort keys %outdated;
                 alarm 0;
             };
             if ( $@ && $@ eq "alarm\n" ) {
-                $state->{phase} .= "(Timeout)";
                 pr_progress($state);
-                pr( FAIL => "Timeout!!.." );
                 local $STDERR = $ORG_STDERR;
                 $self->diag_fail(
                     "Timed out (> ${timeout}s). Use --verbose to retry.");
@@ -574,6 +595,9 @@ my @outdated = sort keys %outdated;
     *App::cpanminus::script::_diag = sub {
         my ( $self, $m, $a, $e ) = @_;
         $state->{fail} = ( $state->{phase} || 'N/A' ) if $e;
+        if ( $m =~ /^! Timed out/ ) {
+            $state->{phase} .= "(Timeout)";
+        }
     };
     *App::cpanminus::script::install_module = sub {
         my ( $self, $m, $d, $v ) = @_;
@@ -619,7 +643,6 @@ my @outdated = sort keys %outdated;
             pr( DEFAULT => $/ );
         }
         pr( DEFAULT => $ispace x $state->{depth} );
-        pr( HEADER  => "($d)" ) if $DEBUG{enable};
         pr( HEADER  => $dist );
         pr( NOTE    => ' [', join( ', ', @mods ), ']' ) if @mods;
         pr( NOTE =>
@@ -673,11 +696,12 @@ my @outdated = sort keys %outdated;
             if ( $state->{in}{ $d + 1 } ) {
                 $state->{progress_prev} = undef;
                 pr( DEFAULT => $ispace x $state->{depth} );
-                pr( DEFAULT => '--> ' . $dist . '...' );
+                pr( DEFAULT => '--> ' . $dist . '..' );
             }
-            elsif ( $state->{fail} !~ /timeout/i ) {
+            else {
                 pr_progress($state);
             }
+            pr( FAIL => "Timeout!!.." ) if $state->{fail} =~ /timeout/i;
             pr( FAIL    => "FAIL" );
             pr( DEFAULT => "($elapse_one sec)" . $/ );
         }
@@ -765,19 +789,19 @@ else {
     pr_black $/ . qq{**************** SUMMARY ****************} . $/;
     if (@success) {
         pr_green qq|Upgrade Success| . q|-| x 50 . $/;
-        printf "%28.28s   %-10.10s %-10.10s$/", "Name", "Current", "Latest";
+        printf $output_format_3, "Name", "Current", "Latest";
         for my $data (@success) {
             my ( $mod, $cur, $new ) = @{$data}{qw/module current new/};
             $cur ||= '~';
             pr_green
-                sprintf( "%28.28s   %-10.10s %-10.10s$/", $mod, $cur, $new );
+                make_table_row( +{ module=>$mod, current=>$cur, new=>$new } );
         }
         $CONFIG->{user_setting}->{INSTALLED} = \@success;
     }
     my $total_fail;
     if ( %outdated = ( %outdated, %added ) ) {
         pr_red qq|Fail to upgrade| . q|-| x 50 . $/;
-        printf "%28.28s   %-10.10s %-10.10s %-10.10s$/",
+        printf $output_format_4,
             "Name",
             "Current",
             "Latest", "Fail at...";
@@ -786,11 +810,13 @@ else {
             $outdated{$fail_mod}->{fail_at} //= 'UNKNOWN';
 ### failed:  $outdated{$fail_mod}->{modules}
             my @od    = @{ $outdated{$fail_mod}->{modules} || [] };
-            my $phase = $outdated{$fail_mod}->{fail_at};
+            my $info = {};
+            $info->{fail_at} = $outdated{$fail_mod}->{fail_at};
             $total_fail += @od;
             for my $mod (@od) {
-                pr_red sprintf( "%28.28s   %-10.10s %-10.10s %-25.25s$/",
-                    @{$mod}{qw/module current new/}, $phase );
+            @{$info}{qw/module current new/}= @{$mod}{qw/module current new/};
+            $info->{current} //= '~';
+                pr_red make_table_row($info);
             }
             $CONFIG->{user_setting}->{SKIP}->{$fail_mod}
                 = $outdated{$fail_mod};
@@ -817,7 +843,7 @@ exit;
 sub pr_spent_time {
     return unless @_;
     my ($elapsed) = @_;
-    my $str = '  ' . ( $elapsed + 0 ) . 'sec.  ';
+    my $str = '  ' . ( $elapsed + 0 ) . 'sec.';
     printf
         sprintf( '%%%d.%ds', ( $screenX - length($str) - 2 ) x 2 ), ' ';
     pr_black $str. $/;
@@ -1110,7 +1136,7 @@ Display the help message.
 
 =item -f, --force-try
 
-Also add modules marked as skipped by checking.
+Also install modules marked as skipped.
 
 =item -l, --local-lib
 
@@ -1164,7 +1190,7 @@ Current default value is 1800
 
 =item --no-sudo
 
-Switch to the root user with sudo or Not when installing modules,
+Switch to the root user with sudo when installing modules,
 or deny this.
 
 See L<cpanm> for more detail.

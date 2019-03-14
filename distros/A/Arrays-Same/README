@@ -1,0 +1,42 @@
+NAME
+    Arrays::Same - Test if two arrays are identical
+
+SYNOPSIS
+            use Arrays::Same -all;
+        
+            if (arrays_same_i(\@a, \@b)) {
+                    ...;
+            }
+
+DESCRIPTION
+    This module exports two XS functions which test whether a pair of arrays
+    are identical. To be considered identical, the arrays must be of equal
+    length, and contain the same elements in the same order:
+
+    The `arrays_same_i` function compares the elements as integers.
+
+    The `arrays_same_s` function compares the elements as strings, and is
+    case-sensitive.
+
+    Both functions make the assumption that the arrays are simple lists of
+    non-reference scalars. They do not support overloading, etc, but dualvars
+    should work.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Arrays-Same>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2019 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

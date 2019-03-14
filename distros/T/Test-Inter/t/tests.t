@@ -1,7 +1,17 @@
 #!/usr/bin/perl
 
+use warnings 'all';
+use strict;
+BEGIN {
+   if (-d "lib") {
+      use lib "./lib";
+   } elsif (-d "../lib") {
+      use lib "../lib";
+   }
+}
+
 use Test::Inter;
-$o = new Test::Inter;
+my $ti = new Test::Inter $0;
 
 sub func {
   my(@args) = @_;
@@ -12,7 +22,7 @@ sub func {
   return @ret;
 }
 
-$o->tests(func  => \&func,
+$ti->tests(func  => \&func,
           tests => "foo        => 3
 
                     a ab       => 1 2
@@ -28,7 +38,7 @@ $o->tests(func  => \&func,
                     (,a,b c)   => 1 3
                    ");
 
-$o->tests(func     => \&func,
+$ti->tests(func     => \&func,
           expected => [ [1,2] ],
           tests    => "a ab
 
@@ -37,7 +47,7 @@ $o->tests(func     => \&func,
                        e ef
                       ");
 
-$o->tests(func     => \&func,
+$ti->tests(func     => \&func,
           expected => "1 2",
           tests    => "a ab
 
@@ -46,11 +56,11 @@ $o->tests(func     => \&func,
                        e ef
                       ");
 
-$o->tests(tests    => " '' ''
+$ti->tests(tests    => " '' ''
 
                         [] []
 
                         {} {}
                       ");
 
-$o->done_testing();
+$ti->done_testing();

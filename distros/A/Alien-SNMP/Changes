@@ -1,3 +1,8 @@
+2.001000 - 2019-03-13
+
+  * Switch from Test::CChecker to Test::Alien (plicease)
+  * Add repository metadata (plicease)
+
 2.000000 - 2019-02-24
 
   * Merged master

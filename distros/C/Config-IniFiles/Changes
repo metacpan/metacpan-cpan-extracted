@@ -1,3 +1,7 @@
+3.000002    2019-03-14
+    * Fix error with missing here doc end marker
+        - Thanks to Igor Korchynskyi .
+
 3.000001    2019-01-16
     * Fix typos
         - https://rt.cpan.org/Public/Bug/Display.html?id=128267

@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::HandlesDeploy;
-$DBIx::Class::DeploymentHandler::HandlesDeploy::VERSION = '0.002227';
+$DBIx::Class::DeploymentHandler::HandlesDeploy::VERSION = '0.002228';
 use Moo::Role;
 
 # ABSTRACT: Interface for deploy methods

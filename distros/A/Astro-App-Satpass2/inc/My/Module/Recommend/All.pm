@@ -11,7 +11,7 @@ our @ISA = qw{ My::Module::Recommend::Any };
 use Carp;
 use Exporter qw{ import };
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 our @EXPORT_OK = qw{ __all };
 
@@ -98,7 +98,7 @@ Tom Wyant (wyant at cpan dot org)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2018 by Thomas R. Wyant, III
+Copyright (C) 2016-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

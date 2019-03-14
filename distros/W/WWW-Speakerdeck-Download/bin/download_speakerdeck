@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+# PODNAME: download_speakerdeck
+# ABSTRACT: script to download decks from speakerdeck
+
+use v5.10;
+
+use strict;
+use warnings;
+
+use WWW::Speakerdeck::Download;
+
+if ( !$ARGV[0] || !$ARGV[1] ) {
+    say "Usage: $0 <user> <deckname> [<target>]
+    e.g. $0 reneeb_perl is-mojolicious-web-only
+      or $0 reneeb_perl is-mojolicious-web-only /path/to/test.pdf";
+
+    exit;
+}
+
+my $client = WWW::Speakerdeck::Download->new;
+$client->download( @ARGV );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+download_speakerdeck - script to download decks from speakerdeck
+
+=head1 VERSION
+
+version 0.01
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

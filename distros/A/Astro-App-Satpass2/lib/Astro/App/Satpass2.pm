@@ -23,10 +23,18 @@ use Astro::Coord::ECI::Moon 0.077;
 use Astro::Coord::ECI::Star 0.077;
 use Astro::Coord::ECI::Sun 0.077;
 use Astro::Coord::ECI::TLE 0.077 qw{:constants}; # This needs at least 0.059.
-use Astro::Coord::ECI::TLE::Iridium 0.077;	# This needs at least 0.049.
 use Astro::Coord::ECI::TLE::Set 0.077;
 # The following includes @CARP_NOT.
 use Astro::Coord::ECI::Utils 0.077 qw{ :all };	# This needs at least 0.077.
+
+{
+    local $@ = undef;
+    use constant HAVE_TLE_IRIDIUM	=> eval {
+	require Astro::Coord::ECI::TLE::Iridium;
+	Astro::Coord::ECI::TLE::Iridium->VERSION( 0.077 );
+	1;
+    } || 0;
+}
 
 use Clone ();
 use Cwd ();
@@ -66,7 +74,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -373,8 +381,9 @@ my %static = (
     illum	=> SUN_CLASS_DEFAULT,
     latitude => undef,		# degrees
     longitude => undef,		# degrees
-    max_mirror_angle => rad2deg(
-	Astro::Coord::ECI::TLE::Iridium->DEFAULT_MAX_MIRROR_ANGLE ),
+    max_mirror_angle => HAVE_TLE_IRIDIUM ? rad2deg(
+	Astro::Coord::ECI::TLE::Iridium->DEFAULT_MAX_MIRROR_ANGLE ) :
+	undef,
     model => 'model',
 #   pending => undef,		# Continued input line if it exists.
     pass_variant	=> PASS_VARIANT_NONE,
@@ -419,7 +428,6 @@ sub new {
     $self->{_help_module} = {
 	''	=> __PACKAGE__,
 	eci => 'Astro::Coord::ECI',
-	iridium => 'Astro::Coord::ECI::TLE::Iridium',
 	moon => 'Astro::Coord::ECI::Moon',
 	set => 'Astro::Coord::ECI::TLE::Set',
 	sun => SUN_CLASS_DEFAULT,
@@ -428,6 +436,8 @@ sub new {
 	tle => 'Astro::Coord::ECI::TLE',
 	utils => 'Astro::Coord::ECI::Utils',
     };
+    HAVE_TLE_IRIDIUM
+	and $self->{_help_module}{iridium} = 'Astro::Coord::ECI::TLE::Iridium';
     bless $self, $class;
     $self->_frame_push(initial => []);
     $self->set(stdout => select());
@@ -851,6 +861,8 @@ sub export : Verb() {
 sub flare : Verb( algorithm=s am! choose=s@ day! dump! pm! questionable|spare! quiet! tz|zone=s )
 {
     my ( $self, $opt, @args ) = __arguments( @_ );
+    HAVE_TLE_IRIDIUM
+	or $self->wail( 'Astro::Coord::ECI::TLE::Iridium not available' );
     my $pass_start = $self->__parse_time (
 	shift @args, $self->_get_today_noon());
     my $pass_end = $self->__parse_time (shift @args || '+7');
@@ -1419,6 +1431,7 @@ sub load : Verb( verbose! ) {
 
     my $attrs = {
 	illum	=> $self->get( 'illum' ),
+	model	=> $self->get( 'model' ),
 	sun	=> $self->_sky_object( 'sun' ),
     };
 
@@ -2347,6 +2360,9 @@ sub _set_model {
     Astro::Coord::ECI::TLE->is_valid_model( $val )
 	or $self->wail(
 	"'$val' is not a valid Astro::Coord::ECI::TLE model" );
+    foreach my $body ( @{ $self->{bodies} } ) {
+	$body->set( model => $val );
+    }
     return ( $self->{$name} = $val );
 }
 
@@ -3098,8 +3114,9 @@ sub status : Verb( name! reload! ) {
 	@data = sort {$a->[3] cmp $b->[3]} @data if $opt->{name};
 	$output .= '';	# Don't want it to be undef.
 
-	my $encoder = Astro::Coord::ECI::TLE::Iridium->can(
-	    '__encode_operational_status' ) || sub { return $_[2] };
+	my $encoder = ( HAVE_TLE_IRIDIUM &&
+	    Astro::Coord::ECI::TLE::Iridium->can(
+	    '__encode_operational_status' ) ) || sub { return $_[2] };
 
 	foreach my $tle (@data) {
 	    my $status = $encoder->( undef, status => $tle->[2] );
@@ -3230,7 +3247,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2018 by Thomas R. Wyant, III
+Copyright (C) 2009-2019 by Thomas R. Wyant, III
 
 EOD
 }
@@ -6154,6 +6171,10 @@ some modules, as follows:
  tle -------- Astro::Coord::ECI::TLE
  utils ------ Astro::Coord::ECI::Utils
 
+The C<iridium> help is available only if
+L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium> can
+be loaded.
+
 The viewer is whatever is the default for your system.
 
 Under Mac OS 9 or below, this method simply returns an apology, since
@@ -7953,6 +7974,9 @@ The default is the same as for
 L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium>.
 Again, see that documentation for more detail.
 
+If L<Astro::Coord::ECI::TLE::Iridium|Astro::Coord::ECI::TLE::Iridium>
+can not be loaded, the default is C<undef>.
+
 =head2 model
 
 This string attribute specifies the model to be used to predict the
@@ -8820,7 +8844,7 @@ Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 by Thomas R. Wyant, III
+Copyright (C) 2009-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

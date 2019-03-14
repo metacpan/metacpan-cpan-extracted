@@ -13,6 +13,16 @@ use Cwd qw{ cwd };
 use File::HomeDir;
 use Scalar::Util 1.26 qw{ blessed };
 
+{
+    local $@ = undef;
+
+    use constant HAVE_TLE_IRIDIUM	=> eval {
+	require Astro::Coord::ECI::TLE::Iridium;
+	Astro::Coord::ECI::TLE::Iridium->VERSION( 0.077 );
+	1;
+    } || 0;
+}
+
 $| = 1;	## no critic (RequireLocalizedPunctuationVars)
 
 use Astro::App::Satpass2;
@@ -176,27 +186,41 @@ execute 'foo >>>bar', 'Syntax error near >>>',
 execute 'foo', 'Unknown interactive method \'foo\'',
     'Unknown interactive method';
 
-execute 'alias', <<'EOD', 'Default aliases';
+execute 'alias', HAVE_TLE_IRIDIUM ? <<'EOD' : <<'EOD', 'Default aliases';
 alias iridium Astro::Coord::ECI::TLE::Iridium
 alias moon Astro::Coord::ECI::Moon
 alias sun Astro::Coord::ECI::Sun
 alias tle Astro::Coord::ECI::TLE
 EOD
+alias moon Astro::Coord::ECI::Moon
+alias sun Astro::Coord::ECI::Sun
+alias tle Astro::Coord::ECI::TLE
+EOD
 
-execute 'alias fubar iridium', undef, 'Add an alias';
+execute 'alias fubar sun', undef, 'Add an alias';
 
-execute 'alias', <<'EOD', 'Confirm addition of alias';
-alias fubar Astro::Coord::ECI::TLE::Iridium
+execute 'alias', HAVE_TLE_IRIDIUM ? <<'EOD' : <<'EOD',
+alias fubar Astro::Coord::ECI::Sun
 alias iridium Astro::Coord::ECI::TLE::Iridium
 alias moon Astro::Coord::ECI::Moon
 alias sun Astro::Coord::ECI::Sun
 alias tle Astro::Coord::ECI::TLE
 EOD
+alias fubar Astro::Coord::ECI::Sun
+alias moon Astro::Coord::ECI::Moon
+alias sun Astro::Coord::ECI::Sun
+alias tle Astro::Coord::ECI::TLE
+EOD
+    'Confirm addition of alias';
 
 execute 'alias fubar \'\'', undef, 'Remove new alias';
 
-execute 'alias', <<'EOD', 'Confirm alias removal';
+execute 'alias', HAVE_TLE_IRIDIUM ? <<'EOD' : <<'EOD', 'Confirm alias removal';
 alias iridium Astro::Coord::ECI::TLE::Iridium
+alias moon Astro::Coord::ECI::Moon
+alias sun Astro::Coord::ECI::Sun
+alias tle Astro::Coord::ECI::TLE
+EOD
 alias moon Astro::Coord::ECI::Moon
 alias sun Astro::Coord::ECI::Sun
 alias tle Astro::Coord::ECI::TLE
@@ -457,20 +481,25 @@ execute 'status clear', undef, 'Clear status for testing' ;
 
 execute 'status', '', 'Nothing in status' ;
 
-execute q{status add 88888 iridium + 'Iridium 88888'}, undef,
-    'Pretend OID 88888 is an Iridium' ;
+SKIP: {
+    HAVE_TLE_IRIDIUM
+	or skip 'Astro::Coord::ECI::TLE::Iridium not installed', 3;
 
-execute 'status', <<'EOD', 'Iridium 88888 in status';
+    execute q{status add 88888 iridium + 'Iridium 88888'}, undef,
+	'Pretend OID 88888 is an Iridium' ;
+
+    execute 'status', <<'EOD', 'Iridium 88888 in status';
 status add 88888 iridium + 'Iridium 88888' ''
 EOD
 
-execute q{flare '19801013T000000Z' '+1'}, <<'EOD', 'Predict flare';
+    execute q{flare '19801013T000000Z' '+1'}, <<'EOD', 'Predict flare';
                                                      Degre
                                                       From   Center Center
 Time     Name         Eleva  Azimuth      Range Magn   Sun  Azimuth  Range
 1980/10/13
 05:43:26               29.9  48.1 NE      412.9 -0.4 night  76.2 E    49.9
 EOD
+}
 
 execute 'choose 88888', undef, 'Keep OID 88888, losing all others';
 
@@ -800,9 +829,13 @@ execute 'pass -chronological 19801013T000000Z +1', <<'EOD',
 EOD
     'Pass in chronological format';
 
-execute 'set pass_variant brightest', undef, 'Set pass variant brightest';
+SKIP: {
+    HAVE_TLE_IRIDIUM
+	or skip 'Astro::Coord::ECI::TLE::Iridium not installed', 3;
 
-execute 'pass 19801013T000000Z +1', <<'EOD',
+    execute 'set pass_variant brightest', undef, 'Set pass variant brightest';
+
+    execute 'pass 19801013T000000Z +1', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Magn Event
 
 1980/10/13     88888 -
@@ -813,7 +846,7 @@ execute 'pass 19801013T000000Z +1', <<'EOD',
 EOD
     'Pass with brightest event';
 
-execute 'pass -nobrightest 19801013T000000Z +1', <<'EOD',
+    execute 'pass -nobrightest 19801013T000000Z +1', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Event
 
 1980/10/13     88888 -
@@ -822,6 +855,7 @@ execute 'pass -nobrightest 19801013T000000Z +1', <<'EOD',
 05:46:37   0.0  29.7 NE     1778.5  64.0515   17.6896   224.9 lit   set
 EOD
     'Pass without brightest, via -nobrightest';
+}
 
 execute 'set pass_variant nobrightest', undef, 'Clear pass variant brightest';
 
@@ -830,7 +864,11 @@ set pass_variant none
 EOD
     'Ensure pass_variant is clear';
 
-execute 'pass -brightest 19801013T000000Z +1', <<'EOD',
+SKIP:{
+    HAVE_TLE_IRIDIUM
+	or skip 'Astro::Coord::ECI::TLE::Iridium not installed', 1;
+
+    execute 'pass -brightest 19801013T000000Z +1', <<'EOD',
     Time Eleva  Azimuth      Range Latitude Longitude Altitud Illum Magn Event
 
 1980/10/13     88888 -
@@ -840,6 +878,7 @@ execute 'pass -brightest 19801013T000000Z +1', <<'EOD',
 05:46:37   0.0  29.7 NE     1778.5  64.0515   17.6896   224.9 lit        set
 EOD
     'Pass with brightest event via -brightest';
+}
 
 # TODO pass -events
 

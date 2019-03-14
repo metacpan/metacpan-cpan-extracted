@@ -5,7 +5,7 @@
 
 package Alien::libtermkey;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use POSIX qw( WEXITSTATUS );
 
@@ -35,7 +35,7 @@ provides a simple access to its configuration. If not, the process of
 installing it will install a locally-bundled copy of the library into perl's
 arch-specific library directory.
 
-This module bundles F<libtermkey> version 0.21.
+This module bundles F<libtermkey> version 0.22.
 
 =head1 METHODS
 

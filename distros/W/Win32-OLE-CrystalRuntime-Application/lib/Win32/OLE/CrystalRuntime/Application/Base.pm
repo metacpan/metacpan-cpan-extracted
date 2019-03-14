@@ -2,7 +2,7 @@ package Win32::OLE::CrystalRuntime::Application::Base;
 use strict;
 use warnings;
 
-our $VERSION='0.11';
+our $VERSION='0.16';
 
 =head1 NAME
 

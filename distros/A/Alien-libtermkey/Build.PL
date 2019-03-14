@@ -6,9 +6,9 @@ use Alien::make::Module::Build;
 
 my $build = Alien::make::Module::Build->new(
    module_name => 'Alien::libtermkey',
-   tarball => 'libtermkey-0.21.tar.gz',
+   tarball => 'libtermkey-0.22.tar.gz',
    pkgconfig_module => "termkey",
-   pkgconfig_version => "0.21",
+   pkgconfig_version => "0.22",
    use_bundled => ( scalar grep { $_ eq "--use-bundled" } @ARGV ),
 
    alien_requires => [

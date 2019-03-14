@@ -47,9 +47,11 @@ lib/ZMQ/FFI/ZMQ4/Socket.pm
 lib/ZMQ/FFI/ZMQ4_1/Context.pm
 lib/ZMQ/FFI/ZMQ4_1/Raw.pm
 lib/ZMQ/FFI/ZMQ4_1/Socket.pm
+scripts/Dockerfile.perl-zmq-base
 scripts/docker-build
 scripts/docker-push
 scripts/docker-release-shell
+scripts/docker-test-install
 scripts/gen_modules.pl
 scripts/gen_zmq_constants.pl
 scripts/print_zmq_msg_size.c

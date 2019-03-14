@@ -1,15 +1,25 @@
 #!/usr/bin/perl
 
+use warnings 'all';
+use strict;
+BEGIN {
+   if (-d "lib") {
+      use lib "./lib";
+   } elsif (-d "../lib") {
+      use lib "../lib";
+   }
+}
+
 use Test::Inter;
-$o = new Test::Inter;
+my $ti = new Test::Inter $0;
 
 sub func1 {
-  my($output) = @_;
+  my($tiutput) = @_;
 
   my @lines = ("First line",
                "Second line",
                "Third line");
-  open(OUT,">$output");
+  open(OUT,">$tiutput");
   foreach my $line (@lines) {
      print OUT "$line\n";
   }
@@ -17,18 +27,18 @@ sub func1 {
 }
 
 sub func2 {
-  my($input,$output) = @_;
+  my($input,$tiutput) = @_;
   open(IN,$input);
-  open(OUT,">$output");
+  open(OUT,">$tiutput");
   my @lines = <IN>;
   print OUT @lines;
   close(IN);
   close(OUT);
 }
 
-$o->file(\&func1,'',         '','file.1.exp','No input');
+$ti->file(\&func1,'',         '','file.1.exp','No input');
 
-$o->file(\&func2,'file.2.in','','file.2.exp','File copy');
+$ti->file(\&func2,'file.2.in','','file.2.exp','File copy');
 
-$o->done_testing();
+$ti->done_testing();
 

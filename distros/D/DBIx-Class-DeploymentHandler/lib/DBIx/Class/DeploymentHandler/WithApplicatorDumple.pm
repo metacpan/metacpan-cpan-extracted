@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::WithApplicatorDumple;
-$DBIx::Class::DeploymentHandler::WithApplicatorDumple::VERSION = '0.002227';
+$DBIx::Class::DeploymentHandler::WithApplicatorDumple::VERSION = '0.002228';
 use strict;
 use warnings;
 

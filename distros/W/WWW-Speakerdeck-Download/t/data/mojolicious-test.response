@@ -1,0 +1,89 @@
+HTTP/1.1 404 Not Found
+X-Frame-Options: SAMEORIGIN
+Via: 1.1 vegur
+Server: Cowboy
+Strict-Transport-Security: max-age=0; includeSubDomains
+Content-Type: text/html; charset=utf-8
+X-Runtime: 0.245757
+X-Request-Id: 65462ab1-4f55-41ab-b501-221c2d586f70
+Cache-Control: no-cache
+Set-Cookie: _secure_speakerd_session=MWZkaDJQWmdRREVyblFCZFlMaXZXV3hOWWt2NmZCSXhRejZFazZsZkR1bXVpajNJRk9sUkMwa2NBMEQ4MGwrek9BSjlpMDhiODZtY0lkdmhrNzUzY1RCYzhsdGNQeXhtR0U2bnZoVXJRYVhEdi9rTDA1SjNTbng0RFlROGtzbnA3Z3RNdzZ5UjlveEExZHBMeXFXU2lXRHFqWjFxQXRpRzdSTWhHM1VlaDNHVExqeXluQW5WQXNSR3F0WTFCbWcyLS1vYnFjVVJDTWtkUnplRjkzUnRRRjBBPT0%3D--a102169deca0b813aede8bcacd4391b6106aa0c5; path=/; expires=Thu, 28 Mar 2019 14:37:50 -0000; secure; HttpOnly
+X-Xss-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+Connection: close
+Date: Thu, 14 Mar 2019 14:37:50 GMT
+Vary: Accept-Encoding
+Content-Length: 3109
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Deck Not Found - Speaker Deck</title>
+    <link rel="stylesheet" media="screen" href="https://d2dfho4r6t7asi.cloudfront.net/assets/application-6779f35accf6775feb80206410e06d442e089d71d91596e4a283f993731efa7a.css" />
+<script src="https://d2dfho4r6t7asi.cloudfront.net/assets/application-7f1c5632dffea96fdf37.js"></script>
+<link rel="icon" type="image/png" href="https://d2dfho4r6t7asi.cloudfront.net/assets/favicon-c0fe5475f88a65b817c8cc7c0fedc01b7acc17fe27628fa13ca3f96e56e16977.png" />
+<link rel="apple-touch-icon" type="image/png" href="https://d2dfho4r6t7asi.cloudfront.net/assets/favicon-c0fe5475f88a65b817c8cc7c0fedc01b7acc17fe27628fa13ca3f96e56e16977.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="l47CzEt//FTQLWSpdFJ+BvU1I7McrvGwPqKMxWcyz0rTycpXiP+WcdSrC34wsi40gBl4+GBAn8SBWgowPCV7ZQ==" />
+
+
+    
+  </head>
+  <body class="focused py-md-4">
+    
+    <div class="d-flex container-full-height align-items-center justify-content-center p-3 flex-column">
+      <div class="focused-card card container-sm w-100">
+        
+        <div class="w-100 focused-container">
+          <div class="text-center mb-4 font-weight-bold">
+            <img alt="Speaker Deck" class="focused-logo" src="https://d2dfho4r6t7asi.cloudfront.net/assets/mark-f4be6df1e05965cac9f98e664a6c35f5ffdd0207385d07464a9214d6cdf76082.svg" /> Speaker Deck
+          </div>
+          <h2>Deck Not Found</h2>
+<p>The deck you are looking for could not be found. Try going <a href="/">home</a> or perusing our <a href="/p/featured">featured decks</a> instead.</p>
+
+        </div>
+        
+      </div>
+      
+    </div>
+    <script src="https://d2dfho4r6t7asi.cloudfront.net/assets/stats-dd214f1dc3f3069dcb9a.js"></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-19290517-1']);
+    _gaq.push(['_setDomainName', '.speakerdeck.com']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+    <script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : '491686710857561',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.12'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+  </body>
+</html>
+
+

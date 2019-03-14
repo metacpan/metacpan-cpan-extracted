@@ -544,9 +544,16 @@ but they will be printed if the B<quiet> method is set to 1.
 
 =item B<testdir>
 
-Occasionally, it may be necessary to know the directory where the
-tests live (for example, there may be a config or data file in there).
-This method will return the directory.
+   $o->testdir();
+   $o->testdir('mod');
+   $o->testdir('lib');
+
+Occasionally, it may be necessary to know the directory where Test::Inter
+gets some of it's information.  By default, the directory containing the
+tests will be returned, but if the optional argument 'mod' is included,
+it will return the path to the module distribution (which should include
+both a lib and t subdirerctory).  If the argument 'lib' is included, it
+will return the directory where the libraries are stored.
 
 =back
 

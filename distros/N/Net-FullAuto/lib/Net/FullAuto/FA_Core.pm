@@ -506,6 +506,7 @@ BEGIN {
                      $handle->{_shell}=$shell;
                   }
                }
+               $handle->{_shell}||='';
                if ((-1<index $handle->{_shell}, 'bash') ||
                      (-1<index $handle->{_shell}, 'ksh')) {
                   ($stdout,$stderr)=$handle->cmd(

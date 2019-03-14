@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2019-03-14'; # DATE
+our $VERSION = '0.120'; # VERSION
 
 # NO_PERINCI_CMDLINE_SCRIPT
 # FRAGMENT id=shcompgen-hint completer=1 for=youtube-dl
@@ -32,6 +32,7 @@ my $comp_dir = sub {
     Complete::File::complete_file(word=>$args{word}, filter=>'d');
 };
 
+binmode(STDOUT, ":encoding(utf8)");
 run_shell_completer_for_getopt_long_app(
     # General Options:
     'help|h' => undef,
@@ -216,7 +217,7 @@ _youtube-dl - Shell completer for youtube-dl
 
 =head1 VERSION
 
-This document describes version 0.11 of _youtube-dl (from Perl distribution App-ShellCompleter-YoutubeDl), released on 2017-07-10.
+This document describes version 0.120 of _youtube-dl (from Perl distribution App-ShellCompleter-YoutubeDl), released on 2019-03-14.
 
 =head1 SYNOPSIS
 
@@ -254,7 +255,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

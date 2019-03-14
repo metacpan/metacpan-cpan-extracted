@@ -1,4 +1,11 @@
 
+1.17      2019-03-14 04:05:15+00:00 UTC
+
+1.16_01   2019-03-13 03:40:02+00:00 UTC (TRIAL RELEASE)
+
+    - Need FFI::Platypus specified as a configure dependency
+      (GH#42 - thanks @eserte)
+
 1.15      2019-03-03 10:14:00+00:00 UTC
 
     - Bump FFI::Platypus dependency version to 0.86

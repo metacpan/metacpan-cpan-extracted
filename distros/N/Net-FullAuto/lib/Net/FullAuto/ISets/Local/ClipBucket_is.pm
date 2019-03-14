@@ -1788,6 +1788,7 @@ END
    my $second_pass=0;
    my $third_pass=0;
    my $fourth_pass=0;
+   my $fifth_pass=0;
    while (1) {
       my $output=Net::FullAuto::FA_Core::fetch($handle);
       last if $output=~/$prompt/ && $first_pass;
@@ -1806,9 +1807,12 @@ END
             $second_pass=1;
          } elsif (!$third_pass) {
             $handle->{_cmd_handle}->print(
+               'GRANT FILE ON *.* TO clipbucket@localhost;');   
+         } elsif (!$fourth_pass) {
+            $handle->{_cmd_handle}->print(
                'GRANT ALL PRIVILEGES ON clipbucket.* TO clipbucket@localhost;');
             $third_pass=1;
-         } elsif (!$fourth_pass) {
+         } elsif (!$fifth_pass) {
             $handle->{_cmd_handle}->print('flush privileges;');
             $fourth_pass=1;
          } else {

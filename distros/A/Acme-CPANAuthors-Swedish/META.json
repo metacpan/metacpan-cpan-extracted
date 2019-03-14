@@ -45,6 +45,6 @@
          "web" : "https://github.com/trapd00r/Acme-CPANAuthors-Swedish"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

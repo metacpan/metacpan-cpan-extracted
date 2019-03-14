@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VersionResult;
-$DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VersionResult::VERSION = '0.002227';
+$DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VersionResult::VERSION = '0.002228';
 # ABSTRACT: (DEPRECATED) The old way to store versions in the database
 
 use strict;

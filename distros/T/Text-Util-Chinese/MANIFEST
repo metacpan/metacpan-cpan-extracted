@@ -9,3 +9,5 @@ cpanfile
 examples/extract-words.pl
 lib/Text/Util/Chinese.pm
 metamerge.json
+t/extract-presuf.t
+t/extract-words.t

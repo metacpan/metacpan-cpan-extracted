@@ -1,0 +1,71 @@
+{
+   "abstract" : "Test if two arrays are identical",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Arrays-Same",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Exporter::Shiny" : "1.000000"
+         },
+         "requires" : {
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Arrays::Same" : {
+         "file" : "lib/Arrays/Same.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Arrays-Same"
+      },
+      "homepage" : "https://metacpan.org/release/Arrays-Same",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Arrays-Same/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

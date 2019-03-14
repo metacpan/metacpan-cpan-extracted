@@ -9,7 +9,7 @@ use constant True => Win32::OLE::Variant->new(VT_BOOL, 1);
 use constant False=> Win32::OLE::Variant->new(VT_BOOL, 0);
 use DateTime;
 
-our $VERSION='0.12';
+our $VERSION='0.16';
 
 =head1 NAME
 
@@ -89,8 +89,8 @@ sub ole {
   unless (defined $self->{"ole"}) {
     if (-r $self->filename) {
       printf qq{%s: Constructing Report OLE Object with file "%s"\r\n}, DateTime->now, $self->filename if $self->debug > 7;
-
-      $self->{"ole"}=$self->application->ole->OpenReport($self->filename, crOpenReportByTempCopy);
+      my $filename=$self->filename;
+      $self->{"ole"}=$self->application->ole->OpenReport("$filename", crOpenReportByTempCopy); #force stringification
       die(Win32::OLE->LastError) if Win32::OLE->LastError;
       die("Error: Cannot create OLE report object") unless ref($self->ole) eq "Win32::OLE";
 
@@ -149,6 +149,8 @@ Tables where you do not want to reset the schema alias them with a "_" (e.g. 'SE
 Current Limitations: Oracle support for crdb_oracle.dll only
 Current Limitations: SubReports are only searched one level deep; not recursive.
 
+See Also: Schema Helpers Section
+
 =cut
 
 sub setConnectionProperties {
@@ -183,14 +185,41 @@ sub setConnectionProperties {
       $table->ConnectionProperties("Password")->{'Value'} = $data{"Password"};
       die(Win32::OLE->LastError) if Win32::OLE->LastError;
       if (defined $data{"Schema"}) {
-        unless ($table->Name=~m/^Command/ or $table->Name=~m/^_/) {
-          $table->{'Location'} = sprintf("%s.%s", $data{"Schema"}, $table->Location);
+        my $schema="";
+        my $stpre  = $self->shadow_schema_prefixed_token;  #defaults to "_pre_"
+        my $stpost = $self->shadow_schema_postfixed_token; #defaults to "_post_"
+        if ($table->Name=~m/^Command/) {
+          #Skip these
+        } elsif ($stpre and $self->shadow_schema_prefixed and $table->Name=~m/^$stpre/) {
+          $schema=$self->shadow_schema_prefixed . $data{"Schema"};
+        } elsif ($stpost and $self->shadow_schema_postfixed and $table->Name=~m/^$stpost/) {
+          $schema=$data{"Schema"} . $self->shadow_schema_postfixed;
+        } elsif ($table->Name=~m/^_/) {
+          #skip these
+        } else {
+          $schema=$data{"Schema"};  #we default to Redefinition
+        }
+        if ($schema) {
+          printf "%s: Table: %s, Alias: %s, Setting Schema: %s\r\n", 
+             DateTime->now, $table->Location, $table->Name, $schema if $self->debug > 8;
+          $table->{'Location'} = sprintf("%s.%s", $schema, $table->Location);
           die(Win32::OLE->LastError) if Win32::OLE->LastError;
         }
       }
+    } elsif ($table->DllName eq "crdb_ado.dll") {
+      #Contributed 2019 - Rob Clark, Ash Grove Cement Company, License BSD
+      die(Win32::OLE->LastError) if Win32::OLE->LastError;
+      $table->ConnectionProperties("Data Source")->{'Value'}         = $data{"Data Source"};
+      die(Win32::OLE->LastError) if Win32::OLE->LastError;
+      $table->ConnectionProperties("Integrated Security")->{'Value'} = $data{"Integrated Security"};
+      die(Win32::OLE->LastError) if Win32::OLE->LastError;
+      $table->ConnectionProperties("User ID")->{'Value'}             = $data{"User ID"};
+      die(Win32::OLE->LastError) if Win32::OLE->LastError;
+      $table->ConnectionProperties("Password")->{'Value'}            = $data{"Password"};
+      die(Win32::OLE->LastError) if Win32::OLE->LastError;
    #} elsif ($table->DllName eq "crdb_whatever.dll") { #Add other drivers here but we currently only use Oracle!
     } else {
-      printf qq{%s: Warning: Expected report to be developed against a known database driver like Crystal Reports Oracle Driver (crdb_oracle.dll).  However, I found: "%s".  I will not attempt to change database source on table "%s".\r\n}, DateTime->now, $table->DllName, $table->Name;
+      printf qq{%s: Warning: Expected report to be developed against a known database driver like Crystal Reports Oracle Driver (crdb_oracle.dll) or Microsoft ADO (crdb_ado.dll).  However, I found: "%s".  I will not attempt to change database source on table "%s".\r\n}, DateTime->now, $table->DllName, $table->Name;
     }
   }
   return $self;
@@ -222,6 +251,7 @@ sub setParameters {
       warn(sprintf(qq{%s: Warning: Report Parameter "%s" is not defined.\r\n}, DateTime->now, $key));
     }
   }
+  return $self;
 }
 
 =head2 export
@@ -260,7 +290,8 @@ sub export {
   $self->ole->ExportOptions->{'ExcelShowGridLines'} = True;
   die(Win32::OLE->LastError) if Win32::OLE->LastError;
 
-  $self->ole->ExportOptions->{'DiskFileName'} = $opt->{'filename'};
+  my $filename=$opt->{'filename'}; #supports objects
+  $self->ole->ExportOptions->{'DiskFileName'} = "$filename";
   die(Win32::OLE->LastError) if Win32::OLE->LastError;
 
   $self->ole->ExportOptions->{'HTMLFileName'} = $opt->{'filename'};
@@ -434,6 +465,95 @@ Note: This is currently only one level deep and not recursive!!!
 =cut
 
 sub subreports {shift->objects(type=>crSubreportObject())};
+
+=head1 Schema Helpers
+
+Schema Helpers are only used if you set the "Schema" property in the setConnectionProperties method.
+
+When moving a Crystal Report rpt file among development, alpha and production database typically the schema changes.  These functions will help you redefine the schemas so that you can develop a report against a development database, test the same report against an alpha database, and deploy the same exact report to production. 
+
+These helpers trigger from the prefix of the table alias since the schema is not available from the runtime OLE object.
+
+=head2 shadow_schema_prefixed
+
+Set the trailing part of the schema on these schemas.  This is popular for alias or "shadow" type schema configurations.  
+
+Default: "SHADOW_"
+
+Example: "SELECT * FROM SHADOW_DEV1.TABLE1 _pre_table1" becomes "SELECT * FROM SHADOW_PROD1.TABLE1 _pre_table1"
+
+=cut
+
+sub shadow_schema_prefixed {
+  my $self=shift;
+  $self->{"shadow_schema_prefixed"}=shift
+    if @_;
+  $self->{"shadow_schema_prefixed"}="SHADOW_"
+    unless defined ($self->{"shadow_schema_prefixed"});
+  return $self->{"shadow_schema_prefixed"};
+}
+
+=head2 shadow_schema_postfixed
+
+Set the leading part of the schema on these schemas.  This is popular for alias or "shadow" type schema configurations.  
+
+Default: "_SHADOW"
+
+Example: "SELECT * FROM DEV1_SHADOW.TABLE1 _post_table1" becomes "SELECT * FROM PROD1_SHADOW.TABLE1 _post_table1"
+
+=cut
+
+sub shadow_schema_postfixed {
+  my $self=shift;
+  $self->{"shadow_schema_postfixed"}=shift
+    if @_;
+  $self->{"shadow_schema_postfixed"}="_SHADOW"
+    unless defined ($self->{"shadow_schema_postfixed"});
+  return $self->{"shadow_schema_postfixed"};
+}
+
+=head2 shadow_schema_prefixed_token
+
+Token used in the table alias
+
+Default: "_pre_"
+  
+  $report->shadow_schema_prefixed_token("_token_");
+
+Example: "SELECT * FROM SHADOW_DEV1.TABLE _token_table1" becomes "SELECT * FROM SHADOW_PROD1.TABLE _token_table1"
+
+=cut
+
+sub shadow_schema_prefixed_token {
+  my $self=shift;
+  $self->{"shadow_schema_prefixed_token"}=shift
+    if @_;
+  $self->{"shadow_schema_prefixed_token"}="_pre_"
+    unless defined $self->{"shadow_schema_prefixed_token"};
+  return $self->{"shadow_schema_prefixed_token"};
+}
+
+=head2 shadow_schema_postfixed_token
+
+Token used in the table alias
+
+Default: "_post_"
+
+  $report->shadow_schema_postfixed("_DAPI");
+  $report->shadow_schema_postfixed_token("_dapi_");
+
+Example: "SELECT * FROM DEV1_DAPI.TABLE1 _dapi_table1" becomes "SELECT * FROM PROD1_DAPI.TABLE1 _dapi_table1"
+
+=cut
+
+sub shadow_schema_postfixed_token {
+  my $self=shift;
+  $self->{"shadow_schema_postfixed_token"}=shift
+    if @_;
+  $self->{"shadow_schema_postfixed_token"}="_post_"
+    unless defined $self->{"shadow_schema_postfixed_token"};
+  return $self->{"shadow_schema_postfixed_token"};
+}
 
 =head1 BUGS
 

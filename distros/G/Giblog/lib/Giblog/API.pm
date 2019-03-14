@@ -17,71 +17,11 @@ sub new {
   return bless $self, $class;
 }
 
-sub get_proto_dir {
-  my ($self, $module_name) = @_;
-  
-  my $proto_dir = $self->module_rel_file($module_name, 'proto');
-  
-  return $proto_dir;
-}
+sub giblog { shift->{giblog} }
 
-sub create_website {
-  my ($self, $home_dir, $proto_dir) = @_;
-  
-  unless (defined $home_dir) {
-    confess "Website name must be specifed\n";
-  }
-  
-  if (-f $home_dir) {
-    confess "Website \"$home_dir\" is already exists\n";
-  }
-  
-  unless (-d $proto_dir) {
-    confess "proto diretory can't specified\n";
-  }
+sub config { shift->giblog->config }
 
-  # Create website directory
-  $self->create_dir($home_dir);
-
-  # Copy command proto files to user directory
-  my @files;
-  find(
-    {
-      wanted => sub {
-        my $proto_file = $File::Find::name;
-        
-        # Skip directory
-        return unless -f $proto_file;
-        
-        my $rel_file = $proto_file;
-        $rel_file =~ s/^\Q$proto_dir\E[\/|\\]//;
-        
-        my $user_file = "$home_dir/$rel_file";
-        my $user_dir = dirname $user_file;
-        mkpath $user_dir;
-        
-        copy $proto_file, $user_file
-          or confess "Can't copy $proto_file to $user_file: $!";
-      },
-      no_chdir => 1,
-    },
-    $proto_dir
-  );
-}
-
-sub run_command {
-  my ($self, $command_name, @argv) = @_;
-  
-  # Command is implemented in command
-  my $command_class = "Giblog::Command::$command_name";
-  eval "use $command_class;";
-  if ($@) {
-    confess "Can't load command $command_class:\n$!\n$@";
-  }
-  my $command = $command_class->new(api => $self);
-
-  $command->run(@argv);
-}
+sub giblog_dir { shift->giblog->giblog_dir };
 
 sub read_config {
   my $self = shift;
@@ -90,34 +30,32 @@ sub read_config {
   
   # Read config
   my $config;
-  unless (defined $giblog->{config}) {
-    my $config_file = $self->rel_file('giblog.conf');
-    
-    my $config_content = $self->slurp_file($config_file);
-    
-    $config = eval $config_content
-      or confess "Can't parse config file \"$config_file\"";
-    
-    $giblog->{config} = $config;
+  if (defined $giblog->{config}) {
+    confess "Config is already loaded";
   }
+  
+  my $config_file = $self->rel_file('giblog.conf');
+  
+  my $config_content = $self->slurp_file($config_file);
+  
+  $config = eval $config_content
+    or confess "Can't parse config file \"$config_file\"";
+    
+  unless (ref $config eq 'HASH') {
+    confess "\"$config_file\" must end with hash reference";
+  }
+  
+  $giblog->{config} = $config;
   
   return $config;
 }
 
-sub config { shift->giblog->config }
-sub giblog_dir { shift->giblog->giblog_dir };
-
-sub rel_file {
-  my ($self, $file) = @_;
+sub clear_config {
+  my $self = shift;
   
-  my $giblog_dir = $self->giblog->giblog_dir;
+  my $giblog = $self->giblog;
   
-  if (defined $giblog_dir) {
-    return "$giblog_dir/$file";
-  }
-  else {
-    return $file;
-  }
+  $giblog->{config} = undef;
 }
 
 sub create_dir {
@@ -152,7 +90,92 @@ sub slurp_file {
   return $content;
 }
 
-sub module_rel_file {
+sub run_command {
+  my ($self, $command_name, @argv) = @_;
+  
+  # Command is implemented in command
+  my $command_class = "Giblog::Command::$command_name";
+  eval "use $command_class;";
+  if ($@) {
+    confess "Can't load command $command_class:\n$!\n$@";
+  }
+  my $command = $command_class->new(api => $self);
+
+  $command->run(@argv);
+}
+
+sub _get_proto_dir {
+  my ($self, $module_name) = @_;
+  
+  my $proto_dir = $self->_module_rel_file($module_name, 'proto');
+  
+  return $proto_dir;
+}
+
+sub create_website_from_proto {
+  my ($self, $home_dir, $module_name) = @_;
+  
+  unless (defined $home_dir) {
+    confess "Home directory must be specifed\n";
+  }
+  
+  if (-f $home_dir) {
+    confess "Home directory \"$home_dir\" is already exists\n";
+  }
+  
+  my $proto_dir = $self->_get_proto_dir($module_name);
+  
+  unless (defined $proto_dir) {
+    confess "proto diretory can't specified\n";
+  }
+
+  unless (-d $proto_dir) {
+    confess "Can't find proto diretory $proto_dir\n";
+  }
+
+  # Create website directory
+  $self->create_dir($home_dir);
+
+  # Copy command proto files to user directory
+  my @files;
+  find(
+    {
+      wanted => sub {
+        my $proto_file = $File::Find::name;
+        
+        # Skip directory
+        return unless -f $proto_file;
+        
+        my $rel_file = $proto_file;
+        $rel_file =~ s/^\Q$proto_dir\E[\/|\\]//;
+        
+        my $user_file = "$home_dir/$rel_file";
+        my $user_dir = dirname $user_file;
+        mkpath $user_dir;
+        
+        copy $proto_file, $user_file
+          or confess "Can't copy $proto_file to $user_file: $!";
+      },
+      no_chdir => 1,
+    },
+    $proto_dir
+  );
+}
+
+sub rel_file {
+  my ($self, $file) = @_;
+  
+  my $giblog_dir = $self->giblog->giblog_dir;
+  
+  if (defined $giblog_dir) {
+    return "$giblog_dir/$file";
+  }
+  else {
+    return $file;
+  }
+}
+
+sub _module_rel_file {
   my ($self, $module_name, $rel_file) = @_;
   
   my $command_rel_path = $module_name;
@@ -173,8 +196,6 @@ sub module_rel_file {
   return $file;
 }
 
-sub giblog { shift->{giblog} }
-
 sub get_templates_files {
   my $self = shift;
 
@@ -193,7 +214,7 @@ sub get_templates_files {
         # Skip common files
         return if $template_file =~ /^\Q$templates_dir\/common/;
         
-        my $template_file_base = $_;
+        my $template_file_base = basename $_;
         
         # Skip hidden file
         return if $template_file_base =~ /^\./;
@@ -221,21 +242,6 @@ sub get_content {
   my $content = $self->slurp_file($template_file);
   
   $data->{content} = $content;
-}
-
-sub write_to_public_file {
-  my ($self, $data) = @_;
-  
-  my $content = $data->{content};
-  my $file = $data->{file};
-  
-  # public file
-  my $public_file = $self->rel_file("public/$file");
-  my $public_dir = dirname $public_file;
-  mkpath $public_dir;
-  
-  # Write to public file
-  $self->write_to_file($public_file, $content);
 }
 
 my $inline_elements_re = qr/^<(span|em|strong|abbr|acronym|dfn|q|cite|sup|sub|code|var|kbd|samp|bdo|font|big|small|b|i|s|strike|u|tt|a|label|object|applet|iframe|button|textarea|select|basefont|img|br|input|script|map)\b/;
@@ -302,11 +308,12 @@ sub parse_title {
 
   my $content = $data->{content};
   
-  unless (defined $data->{'title'}) {
-    if ($content =~ m|class="title"[^>]*?>([^<]*?)<|) {
-      my $title = $1;
-      $data->{title} = $title;
-    }
+  if ($content =~ m|class="title"[^>]*?>([^<]*?)<|) {
+    my $title = $1;
+    $data->{title} = $title;
+  }
+  else {
+    $data->{title} = undef;
   }
 }
 
@@ -317,39 +324,20 @@ sub parse_title_from_first_h_tag {
 
   my $content = $data->{content};
   
-  unless (defined $data->{'title'}) {
-    if ($content =~ m|<\s*h[1-6]\b[^>]*?>([^<]*?)<|) {
-      my $title = $1;
-      $data->{title} = $title;
-    }
-  }
-}
-
-sub add_page_link_to_first_h_tag {
-  my ($self, $data) = @_;
-  
-  my $giblog = $self->giblog;
-
-  my $content = $data->{content};
-  
-  # Add page link
-  my $file = $data->{file};
-  my $path;
-  if ($file eq 'index.html') {
-    $path = '/';
+  if ($content =~ m|<\s*h[1-6]\b[^>]*?>([^<]*?)<|) {
+    my $title = $1;
+    $data->{title} = $title;
   }
   else {
-    $path = "/$file";
+    $data->{title} = undef;
   }
-  
-  $content =~ s|(<\s*h[1-6]\b[^>]*?>)([^<]*?)<|$1<a href="$path">$2</a><|;
-
-  $data->{'content'} = $content;
 }
 
 sub add_page_link {
-  my ($self, $data) = @_;
-  
+  my ($self, $data, $opt) = @_;
+
+  $opt ||= {};
+
   my $giblog = $self->giblog;
 
   my $content = $data->{content};
@@ -357,14 +345,50 @@ sub add_page_link {
   # Add page link
   my $file = $data->{file};
   my $path;
-  if ($file eq 'index.html') {
-    $path = '/';
+  my $root = $opt->{root};
+  if (defined $root) {
+    if ($file eq $root) {
+      $path = "/";
+    }
+    else {
+      $path = "/$file";
+    }
   }
   else {
     $path = "/$file";
   }
   
   $content =~ s|class="title"[^>]*?>([^<]*?)<|class="title"><a href="$path">$1</a><|;
+  
+  $data->{'content'} = $content;
+}
+
+sub add_page_link_to_first_h_tag {
+  my ($self, $data, $opt) = @_;
+  
+  $opt ||= {};
+  
+  my $giblog = $self->giblog;
+
+  my $content = $data->{content};
+  
+  # Add page link
+  my $file = $data->{file};
+  my $path;
+  my $root = $opt->{root};
+  if (defined $root) {
+    if ($file eq $root) {
+      $path = "/";
+    }
+    else {
+      $path = "/$file";
+    }
+  }
+  else {
+    $path = "/$file";
+  }
+  
+  $content =~ s|(<\s*h[1-6]\b[^>]*?>)([^<]*?)<|$1<a href="$path">$2</a><|;
 
   $data->{'content'} = $content;
 }
@@ -376,11 +400,17 @@ sub parse_description {
 
   my $content = $data->{content};
   
-  if ($content =~ m|class="description"[^>]*?>([^<]*?)<|) {
+  if ($content =~ m|class="description"[^>]*?>([^<]*?)<|s) {
     my $description = $1;
-    unless (defined $data->{'description'}) {
-      $data->{'description'} = $description;
-    }
+
+    # trim space
+    $description =~ s/^\s+//;
+    $description =~ s/\s+$//;
+
+    $data->{'description'} = $description;
+  }
+  else {
+    $data->{'description'} = undef;
   }
 }
 
@@ -392,18 +422,19 @@ sub parse_description_from_first_p_tag {
   my $content = $data->{content};
   
   # Create description from first p tag
-  unless (defined $data->{'description'}) {
-    if ($content =~ m|<\s?p\b[^>]*?>(.*?)<\s?/\s?p\s?>|s) {
-      my $description = $1;
-      # remove tag
-      $description =~ s/<.*?>//g;
-      
-      # trim space
-      $description =~ s/^\s+//;
-      $description =~ s/\s+$//;
-      
-      $data->{'description'} = $description;
-    }
+  if ($content =~ m|<\s?p\b[^>]*?>(.*?)<\s?/\s?p\s?>|s) {
+    my $description = $1;
+    # remove tag
+    $description =~ s/<.*?>//g;
+    
+    # trim space
+    $description =~ s/^\s+//;
+    $description =~ s/\s+$//;
+    
+    $data->{'description'} = $description;
+  }
+  else {
+    $data->{'description'} = undef;
   }
 }
 
@@ -417,9 +448,7 @@ sub parse_keywords {
   # keywords
   if ($content =~ m|class="keywords"[^>]*?>([^<]*?)<|) {
     my $keywords = $1;
-    unless (defined $data->{'keywords'}) {
-      $data->{'keywords'} = $1;
-    }
+    $data->{'keywords'} = $1;
   }
 }
 
@@ -433,9 +462,7 @@ sub parse_first_img_src {
   # image
   if ($content =~ /<\s*img\b.*?\bsrc\s*=\s*"([^"]*?)"/s) {
     my $image = $1;
-    unless (defined $data->{'image'}) {
-      $data->{'image'} = $image;
-    }
+    $data->{'img_src'} = $image;
   }
 }
 
@@ -492,7 +519,7 @@ sub add_meta_title {
   # Title
   my $title = $data->{title};
   if (defined $title) {
-    $meta .= "\n<title>$title</title>\n";
+    $meta .= "\n<title>$title</title>";
   }
   
   $data->{meta} = $meta;
@@ -508,13 +535,13 @@ sub add_meta_description {
   # Title
   my $description = $data->{description};
   if (defined $description) {
-    $meta .= qq(\n<meta name="description" content="$description">\n);
+    $meta .= qq(\n<meta name="description" content="$description">);
   }
   
   $data->{meta} = $meta;
 }
 
-sub prepare_wrap {
+sub read_common_templates {
   my ($self, $data) = @_;
   
   my $common_meta_file = $self->rel_file('templates/common/meta.html');
@@ -542,6 +569,21 @@ sub prepare_wrap {
   $data->{bottom} = $common_bottom_content;
 }
 
+sub write_to_public_file {
+  my ($self, $data) = @_;
+  
+  my $content = $data->{content};
+  my $file = $data->{file};
+  
+  # public file
+  my $public_file = $self->rel_file("public/$file");
+  my $public_dir = dirname $public_file;
+  mkpath $public_dir;
+  
+  # Write to public file
+  $self->write_to_file($public_file, $content);
+}
+
 1;
 
 =head1 NAME
@@ -550,66 +592,644 @@ Giblog::API - Giblog API
 
 =head1 DESCRIPTION
 
-Giblog API is APIs to manipulate HTML contents.
+Giblog::API defines sevral methods to manipulate HTML contents.
 
 =head1 METHODS
 
 =head2 new
 
-=head2 get_proto_dir
+  my $api = Giblog::API->new(%params);
 
-=head2 create_website
+Create L<Giblog::API> object.
 
-=head2 run_command
+B<Parameters:>
 
-=head2 read_config
+=over 4
 
-=head2 config
+=item * giblog
 
-=head2 giblog_dir
+Set L<Giblog> object.
 
-=head2 rel_file
+By C<giblog> method, you can access this parameter.
 
-=head2 create_dir
+  my $giblog = $api->giblog;
 
-=head2 create_file
-
-=head2 write_to_file
-
-=head2 slurp_file
-
-=head2 module_rel_file
+=back
 
 =head2 giblog
 
+  my $giblog = $api->giblog;
+
+Get L<Giblog> object.
+
+=head2 config
+
+  my $config = $api->config;
+
+Get Giblog config. This is hash reference.
+
+Config is loaded by C<read_config> method.
+
+If config is not loaded, this method return undef.
+
+=head2 giblog_dir
+
+  my $giblog_dir = $api->giblog_dir;
+
+Get Giblog home directory.
+
+=head2 read_config
+
+  my $config = $api->read_config;
+
+Parse "giblog.conf" in Giblog home directory and return hash reference.
+
+"giblog.conf" must end with correct hash reference.
+  
+  # giblog.conf
+  {
+    site_title => 'mysite',
+    site_url => 'http://somesite.example',
+  }
+
+Otherwise exception occur.
+
+After calling read_config, You can also get config by C<config> method.
+
+=head2 clear_config
+
+  $api->clear_config;
+
+Clear config. Set undef to config.
+
+=head2 create_dir
+
+  $api->create_dir($dir);
+
+Create directory.
+
+If Creating directory fail, exception occur.
+
+=head2 create_file
+
+  $api->create_file($file);
+
+Create file.
+
+If Creating file fail, exception occur.
+
+=head2 write_to_file
+
+  $api->write_to_file($file, $content);
+
+Write content to file. Content is encoded to UTF-8.
+
+If file is not exists, file is created automatically.
+
+If Creating file fail, exception occur.
+
+=head2 slurp_file
+
+  my $content = $api->slurp_file($file);
+
+Get file content. Content is decoded from UTF-8.
+
+If file is not exists, exception occur.
+
+=head2 rel_file
+
+  my $file = $api->rel_file('foo/bar');
+
+Get combined path of giblog home directory and specified relative path.
+
+If home directory is not set, return specified path.
+
+=head2 run_command
+
+  $api->run_command($command_name, @args);
+
+Load command class and create object and execute "run" method.
+
+For example, if command name is "build", then "Giblog::Command::build" is loaded, and the object is created and, "run" method is executed.
+
+If module loading fail, exception occur.
+
+=head2 create_website_from_proto
+
+  $api->create_website_from_proto($home_dir, $module_name);
+
+Create website home directory and copy files from prototype directory.
+
+Prototype directory is automatically detected from module name.
+
+If module name is "Giblog::Command::new_foo" and loading path is "lib/Giblog/Command/new_foo.pm", path of prototype directory is "lib/Giblog/Command/new_foo/proto".
+
+  lib/Giblog/Command/new_foo.pm
+                    /new_foo/proto
+
+Module must be loaded before calling "create_website_from_proto". otherwise exception occur.
+
+If home directory is not specified, exception occur.
+
+If home directory already exists, exception occur.
+
+If creating directory fail, exception occur.
+
+If proto directory corresponding to module name is not specified, exception occur.
+
+If proto direcotry corresponding to module name is not found, exception occur.
+
 =head2 get_templates_files
+
+  $api->get_templates_files;
+
+Get file names in "templates" directory in giblog home directory.
+
+Files in "templates/common" directory and hidden files(which start with ".") is not contained.
+
+Got file name is relative name from "templates" directory.
+
+For example,
+
+  index.html
+  blog/20190312121345.html
+  blog/20190314452341.html
 
 =head2 get_content
 
-=head2 write_to_public_file
+  $api->get_content($data);
+
+Get content from relative file name from "templates" directory. Content is decoded from UTF-8.
+
+B<INPUT:>
+
+  $data->{file}
+
+B<OUTPUT:>
+
+  $data->{content}
+  
+B<Example:>
+  
+  # Get content from templates/index.html
+  $data->{file} = 'index.html';
+  $api->get_content($data);
+  my $content = $data->{content};
 
 =head2 parse_giblog_syntax
 
+  $api->parse_giblog_syntax($data);
+
+Parse input text as "Giblog syntax", and return output.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+  
+B<Example:>
+  
+  # Get content from templates/index.html
+  $data->{content} = <<'EOS';
+  Hello World!
+
+  <b>Hi, Yuki</b>
+
+  <div>
+    OK
+  </div>
+
+  <pre>
+  my $foo = 1 > 3 && 2 < 5;
+  </pre>
+  EOS
+  
+  $api->parse_giblog_syntax($data);
+  my $content = $data->{content};
+
+B<Giblog syntax>
+
+Giblog syntax is simple syntax to write content easily.
+
+=over 4
+
+=item * Add p tag automatically
+
+Add p tag to inline element starting from the beginning of line.
+
+  # Input
+  Hello World!
+  
+  <b>Hi, Yuki</b>
+  
+  <div>
+    OK
+  </div>
+  
+  # Output
+  <p>
+    Hello World!
+  </p>
+  <p>
+    <b>Hi, Yuki</b>
+  </p>
+  <div>
+    OK
+  </div>
+
+Empty line is deleted.
+
+=item * Escape E<&gt;>, E<&lt;> in pre tag
+
+If the pre tag starts at the beginning of the line and the end tag of pre starts at the beginning of the line, do HTML escapes ">" and "<" between them.
+  
+  # Input
+  <pre>
+  my $foo = 1 > 3 && 2 < 5;
+  </pre>
+
+  # Output
+  <pre>
+  my $foo = 1 &gt; 3 && 2 &lt; 5;
+  </pre>
+
+=back
+
 =head2 parse_title
+
+  $api->parse_title($data);
+
+Get title from text of tag which class name is "title".
+
+If parser can't get title, title become undef.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{title}
+
+B<Example:>
+  
+  # Get title
+  $data->{content} = <<'EOS';
+  <div class="title">Perl Tutorial</div>
+  EOS
+  $api->parse_title($data);
+  my $title = $data->{title};
 
 =head2 parse_title_from_first_h_tag
 
-=head2 add_page_link_to_first_h_tag
+  $api->parse_title_from_first_h_tag($data);
+
+Get title from text of first h1, h2, h3, h4, h5, h6 tag.
+
+If parser can't get title, title become undef.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{title}
+
+B<Example:>
+  
+  # Get title
+  $data->{content} = <<'EOS';
+  <h1>Perl Tutorial</h1>
+  EOS
+  $api->parse_title_from_first_h_tag($data);
+  my $title = $data->{title};
 
 =head2 add_page_link
 
+  $api->add_page_link($data);
+  $api->add_page_link($data, $opt);
+
+Add page link to text of tag which class name is "title".
+
+If parser can't get title, content is not changed.
+
+B<INPUT:>
+
+  $data->{file}
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+"file" is relative path from "templates" directory.
+
+If added link is the path which combine "/" and value of "file".
+
+if $opt->{root} is specifed and this match $data->{file}, added link is "/".
+
+B<Example: entry page>
+  
+  # Add page link
+  $data->{file} = 'blog/20181012123456.html';
+  $data->{content} = <<'EOS';
+  <div class="title">Perl Tutorial</div>
+  EOS
+  $api->add_page_link($data);
+  my $content = $data->{content};
+
+Content is changed to
+
+  <div class="title"><a href="/blog/20181012123456.html">Perl Tutorial</a></div>
+
+B<Example: top page>
+
+  # Add page link
+  $data->{file} = 'index.html';
+  $data->{content} = <<'EOS';
+  <div class="title">Perl Tutorial</div>
+  EOS
+  $api->add_page_link($data);
+  my $content = $data->{content};
+
+Content is changed to
+
+  <div class="title"><a href="/">Perl Tutorial</a></div>
+
+=head2 add_page_link_to_first_h_tag
+
+  $api->add_page_link_to_first_h_tag($data);
+  $api->add_page_link_to_first_h_tag($data, $opt);
+
+Add page link to text of first h1, h2, h3, h4, h5, h6 tag.
+
+If parser can't get title, content is not changed.
+
+B<INPUT:>
+
+  $data->{file}
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+"file" is relative path from "templates" directory.
+
+If added link is the path which combine "/" and value of "file".
+
+if $opt->{root} is specifed and this match $data->{file}, added link is "/".
+
+B<Example: entry page>
+  
+  # Add page link
+  $data->{file} = 'blog/20181012123456.html';
+  $data->{content} = <<'EOS';
+  <h1>Perl Tutorial</h1>
+  EOS
+  $api->add_page_link_to_first_h_tag($data);
+  my $content = $data->{content};
+
+Content is changed to
+
+  <h1><a href="/blog/20181012123456.html">Perl Tutorial</a></h1>
+
+B<Example: top page>
+
+  # Add page link
+  $data->{file} = 'index.html';
+  $data->{content} = <<'EOS';
+  <h1>Perl Tutorial</h1>
+  EOS
+  $api->add_page_link_to_first_h_tag($data);
+  my $content = $data->{content};
+
+Content is changed to
+
+  <h1><a href="/">Perl Tutorial</a></h1>
+
 =head2 parse_description
+
+  $api->parse_description($data);
+
+Get description from text of tag which class name is "description".
+
+Both of left spaces and right spaces is removed. This is Unicode space.
+
+If parser can't get description, description become undef.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{description}
+
+B<Example:>
+  
+  # Get description
+  $data->{content} = <<'EOS';
+  <div class="description">
+    Perl Tutorial is site for beginners of Perl 
+  </div>
+  EOS
+  $api->parse_description($data);
+  my $description = $data->{description};
 
 =head2 parse_description_from_first_p_tag
 
+  $api->parse_description_from_first_p_tag($data);
+
+Get description from text of first p tag.
+
+HTML tag is removed.
+
+Both of left spaces and right spaces is removed. This is Unicode space.
+
+If parser can't get description, description become undef.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{description}
+
+B<Example:>
+  
+  # Get description
+  $data->{content} = <<'EOS';
+  <p>
+    Perl Tutorial is site for beginners of Perl 
+  </p>
+  <p>
+    Foo, Bar
+  </p>
+  EOS
+  $api->parse_description_from_first_p_tag($data);
+  my $description = $data->{description};
+
+Description is "Perl Tutorial is site for beginners of Perl".
+
 =head2 parse_keywords
+
+  $api->parse_keywords($data);
+
+Get keywords from text of tag which class name is "keywords".
+
+If parser can't get keywords, keywords become undef.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{keywords}
+
+B<Example:>
+  
+  # Get keywords
+  $data->{content} = <<'EOS';
+  <div class="keywords">Perl Tutorial</div>
+  EOS
+  $api->parse_keywords($data);
+  my $keywords = $data->{keywords};
 
 =head2 parse_first_img_src
 
-=head2 wrap
+  $api->parse_first_img_src($data);
+
+Get image src from src attribute of first img tag.
+
+If parser can't get image src, image src become undef.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{img_src}
+
+B<Example:>
+  
+  # Get first_img_src
+  $data->{content} = <<'EOS';
+<img class="ppp" src="/path">
+  EOS
+  $api->parse_first_img_src($data);
+  my $img_src = $data->{img_src};
+
+=head2 read_common_templates
+
+  $api->read_common_templates($data);
+
+Read common templates in "templates/common" directory.
+
+The follwoing templates is loaded. Content is decoded from UTF-8.
+
+"meta.html", "header.html", "footer.html", "side.html", "top.html", "bottom.html"
+
+B<OUTPUT:>
+
+  $data->{meta}
+  $data->{header}
+  $data->{footer}
+  $data->{side}
+  $data->{top}
+  $data->{bottom}
 
 =head2 add_meta_title
 
+Add title tag to meta section.
+
+B<INPUT:>
+
+  $data->{title}
+  $data->{meta}
+
+B<OUTPUT:>
+
+  $data->{meta}
+
+If value of "meta" is "foo" and "title" is "Perl Tutorial", output value of "meta" become "foo\n<title>Perl Tutorial</title>"
+
 =head2 add_meta_description
 
-=head2 prepare_wrap
+Add meta description tag to meta section.
+
+B<INPUT:>
+
+  $data->{description}
+  $data->{meta}
+
+B<OUTPUT:>
+
+  $data->{meta}
+
+If value of "meta" is "foo" and "description" is "Perl is good", output value of "meta" become "foo\n<meta name="description" content="Perl is good">"
+
+=head2 wrap
+
+Wrap content by common templates.
+
+B<INPUT:>
+
+  $data->{content}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+Output is the following HTML.
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      $data->{meta}
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          $data->{header}
+        </div>
+        <div class="main">
+          <div class="entry">
+            <div class="top">
+              $data->{top}
+            </div>
+            <div class="content">
+              $data->{content}
+            </div>
+            <div class="bottom">
+              $data->{bottom}
+            </div>
+          </div>
+          <div class="side">
+            $data->{side}
+          </div>
+        </div>
+        <div class="footer">
+          $data->{footer}
+        </div>
+      </div>
+    </body>
+  </html>
+
+=head2 write_to_public_file
+
+Write content to file in "public" directory. Content is encoded to UTF-8.
+
+If value of "file" is "index.html", write path become "public/index.html"
+
+B<INPUT:>
+
+  $data->{content}
+  $data->{file}

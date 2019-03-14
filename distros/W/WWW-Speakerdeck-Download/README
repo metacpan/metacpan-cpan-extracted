@@ -1,0 +1,46 @@
+NAME
+
+    WWW::Speakerdeck::Download - Download a deck from speakerdeck.com
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+        use WWW::Speakerdeck::Download;
+        
+        my $client = WWW::Speakerdeck::Download->new;
+        $client->download('reneeb_perl', 'is-mojolicious-web-only');
+
+METHODS
+
+ download
+
+    Returns 1 if the deck was downloaded, croaks otherwise.
+
+       $client->download('reneeb_perl', 'is-mojolicious-web-only');
+       $client->download('reneeb_perl', 'is-mojolicious-web-only', '/path/to/target.pdf');
+
+ATTRIBUTES
+
+      * base_url
+
+      Default: https://speakerdeck.com
+
+      * ua
+
+      A Mojo::UserAgent (or one of its subclasses) object.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

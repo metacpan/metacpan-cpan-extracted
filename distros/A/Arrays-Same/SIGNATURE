@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 404b462b67141e58109135346ff6049415e4c81b COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 2652740a7770a8da19c569dbd65bee591912d8f6 Changes
+SHA1 7ba7e77ca5f3d30f16918cf1e6bcfd147d78e44d INSTALL
+SHA1 529a6c89bb1ec1ab70f21730c345dcbda3871ed8 LICENSE
+SHA1 1f54021c2ff8406e517d3ed253099e84ce64bf09 MANIFEST
+SHA1 be50071134deb36db0790d1fe2fb8b513da6d363 META.json
+SHA1 b06de32de6c33dfa7d4f8da5105632b939e46025 META.yml
+SHA1 ef25417339d2e7091cd6da0f0797bf052d5ddcca Makefile.PL
+SHA1 47c9a4895526cd30925ed3032a80be8b2570da91 README
+SHA1 21d61fa5a30dc184fe87415cb583ab3dfdca3258 Same.xs
+SHA1 23b05d95c10c660545ca1636390e662127f64986 dist.ini
+SHA1 c54fd6c86aa25ca48f9f2457166594446ccec304 doap.ttl
+SHA1 39032536b28b4e1f3f20fe66cbe0266b5c0387b1 lib/Arrays/Same.pm
+SHA1 0387876a26a5d0041504c72afb3561be5b379f56 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCXIkl4wAKCRDOv4Eoaip9
+OS8AAKCFmevQ2cuizQOysDgjQ4zN/nqP0QCgnnkvS715R/uVajc9iC3czVPWV3w=
+=xMeG
+-----END PGP SIGNATURE-----

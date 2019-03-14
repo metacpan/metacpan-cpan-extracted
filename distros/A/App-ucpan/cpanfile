@@ -11,11 +11,3 @@ requires 'version', 0;
 on 'test' => sub {
     requires 'Test::More', '0.98';
 };
-
-on 'develop' => sub {
-    requires 'Test::More', '0.98';
-    requires 'File::Spec', '0';
-    requires 'File::Path', '0';
-    requires 'File::Temp', '0';
-};
-

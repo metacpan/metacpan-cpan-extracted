@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -48,12 +48,12 @@ has [qw(
 use constant {
 	RES_OK                 => 'RES_OK',
 	RES_WAIT               => 'RES_WAIT',
+	RES_TIMEOUT            => 'RES_TIMEOUT',
 	RES_ERROR              => 'RES_ERROR',
 	RES_OTHER              => 'RES_OTHER', # 'dunno'
 	WORK_OK                => 0,           # exit codes for work method
 	WORK_PING_TIMEOUT      => 92,
 	WORK_CONNECTION_CLOSED => 91,
-
 };
 
 sub new {
@@ -242,7 +242,7 @@ sub call_nb {
 	my $inargs = $args{inargs} // '{}';
 	my $waitcb = $args{waitcb}; # optional
 	my $rescb = $args{resultcb} // die 'no result callback?';
-	my $timeout = $args{timeout} // $self->timeout * 5; # a bit hackish..
+	my $timeout = $args{timeout} // 0; # accommodate existing code where this didn't work
 	my $reqauth = $args{reqauth};
 	my $inargsj;
 
@@ -269,7 +269,14 @@ sub call_nb {
 	my $delay = Mojo::IOLoop->delay->steps(
 		sub {
 			my $d = shift;
-			$self->conn->call($method, $inargs, $d->begin(0), 1);
+			my $end = $d->begin(0);
+			if ($timeout > 0) {
+				Mojo::IOLoop->timer($timeout => sub { 
+					$d->pass(undef, {result => [RES_TIMEOUT, {}]});
+					$end->(); 
+				});
+			}
+			$self->conn->call($method, $inargs, $end, 1);
 		},
 		sub {
 			#print Dumper(@_);

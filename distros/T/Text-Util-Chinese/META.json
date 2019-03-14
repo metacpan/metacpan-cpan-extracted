@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "App::ModuleBuildTiny version 0.023",
    "license" : [
-      "unrestricted"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -33,7 +33,7 @@
    "provides" : {
       "Text::Util::Chinese" : {
          "file" : "lib/Text/Util/Chinese.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -44,7 +44,7 @@
          "web" : "https://github.com/gugod/Text-Util-Chinese"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : "1"
 }

@@ -34,17 +34,17 @@ sub class_to_distname {
 }
 
 sub build {
-  my $class = shift->schema_class;
+  my $given_class = my $class = shift->schema_class;
   File::ShareDir::ProjectDistDir->import('dist_dir',
     filename => filename_from_class($class));
 
   my $sharedir;
   while($class) {
     last if $sharedir = eval { dist_dir( class_to_distname($class) ) };
-    last unless $class =~s/::[^\:\:]+$//;
+    last unless $class =~s/::[^:]+$//;
   }
 
-  return $sharedir || _log_die "Can't find a share ($sharedir) for $class";
+  return $sharedir || _log_die "Can't find a share for $given_class";
 
 }
 

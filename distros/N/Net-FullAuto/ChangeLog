@@ -20,6 +20,13 @@
 #######################################################################
 
 
+2019-03-13  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000465 released
+
+        * New Local ISet Ampache_is.pm.
+
+
 2019-01-02  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000464 released

@@ -1,5 +1,5 @@
 package ZMQ::FFI::SocketRole;
-$ZMQ::FFI::SocketRole::VERSION = '1.15';
+$ZMQ::FFI::SocketRole::VERSION = '1.17';
 use FFI::Platypus;
 use FFI::Platypus::Memory qw(malloc);
 
@@ -118,7 +118,7 @@ ZMQ::FFI::SocketRole
 
 =head1 VERSION
 
-version 1.15
+version 1.17
 
 =head1 AUTHOR
 

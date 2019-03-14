@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Favorite;
 # ABSTRACT: A Favorite data object
-$MetaCPAN::Client::Favorite::VERSION = '2.025000';
+$MetaCPAN::Client::Favorite::VERSION = '2.026000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -43,13 +43,24 @@ MetaCPAN::Client::Favorite - A Favorite data object
 
 =head1 VERSION
 
-version 2.025000
+version 2.026000
 
 =head1 SYNOPSIS
+
+    # Query favorites for a given distribution:
 
     my $favorites = $mcpan->favorite( {
         distribution => 'Moose'
     } );
+
+
+    # Total number of matches ("how many favorites does the dist have?"):
+
+    print $favorites->total;
+
+
+    # Iterate over the favorite matches
+
     while ( my $fav = $favorites->next ) { ... }
 
 =head1 DESCRIPTION

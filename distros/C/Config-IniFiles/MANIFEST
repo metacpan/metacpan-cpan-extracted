@@ -51,6 +51,7 @@ t/34trailing-comments-double-delimeter.t
 t/35reload-config-no-file.t
 t/35section-iterators.t
 t/36php-compat.t
+t/37here-doc-no-end-marker.t
 t/allowed-comment-chars.ini
 t/array.ini
 t/bad.ini
@@ -64,6 +65,7 @@ t/en.ini
 t/end-of-line-comment.ini
 t/es.ini
 t/for-27-empty.ini
+t/here-doc-no-end-marker.ini
 t/lib/Config/IniFiles/Debug.pm
 t/lib/Config/IniFiles/Slurp.pm
 t/lib/Config/IniFiles/TestPaths.pm

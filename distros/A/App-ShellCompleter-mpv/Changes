@@ -1,3 +1,9 @@
+0.061   2019-03-14 (PERLANCAR)
+
+	- Add binmode(STDOUT,utf8) to avoid perl's wide character output
+	  warning.
+
+
 0.060   2018-12-05 (PERLANCAR)
 
 	- [refactor] Extract list of options to module so it's usable by

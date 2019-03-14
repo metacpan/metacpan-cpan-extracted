@@ -1,5 +1,5 @@
 package HTTP::Tiny::FileProtocol;
-$HTTP::Tiny::FileProtocol::VERSION = '0.06';
+$HTTP::Tiny::FileProtocol::VERSION = '0.07';
 # ABSTRACT: Add support for file:// protocol to HTTP::Tiny
 
 use strict;
@@ -7,6 +7,9 @@ use warnings;
 
 use HTTP::Tiny;
 use File::Basename;
+use File::Copy;
+use File::stat;
+use Fcntl qw(S_IRUSR);
 use LWP::MediaTypes;
 use Carp;
 
@@ -33,12 +36,14 @@ my $orig_mirror = *HTTP::Tiny::mirror{CODE};
 
     (my $path = $url) =~ s{\Afile://}{};
 
-    if ( !-e $path ) {
+    my $st = stat $path;
+
+    if ( !$st ) {
         $status = 404;
         $reason = 'File Not Found';
         return _build_response( $url, $success, $status, $reason, $content, $content_type );
     }
-    elsif ( !-r $path ) {
+    elsif ( not $st->cando( S_IRUSR ) ) {
         $status = 403;
         $reason = 'Permission Denied';
         return _build_response( $url, $success, $status, $reason, $content, $content_type );
@@ -52,20 +57,14 @@ my $orig_mirror = *HTTP::Tiny::mirror{CODE};
     $success = 1;
 
     {
-        if ( open my $fh, '<', $path ) {
-            local $/;
-            binmode $fh;
+        open my $fh, '<', $path;
+        local $/;
+        binmode $fh;
 
-            $content = <$fh>;
-            close $fh;
+        $content = <$fh>;
+        close $fh;
 
-            $content_type = LWP::MediaTypes::guess_media_type( $path );
-        }
-        else {
-            $status = 500;
-            $reason = 'Internal Server Error';
-            return _build_response( $url, $success, $status, $reason, $content, $content_type );
-        }
+        $content_type = LWP::MediaTypes::guess_media_type( $path );
     }
 
     return _build_response( $url, $success, $status, $reason, $content, $content_type );
@@ -81,26 +80,12 @@ my $orig_mirror = *HTTP::Tiny::mirror{CODE};
         return $self->$orig_mirror( $url, $file, $args || {});
     }
 
-    my $tempfile = $file . int(rand(2**31));
-
-    require Fcntl;
-    sysopen my $fh, $tempfile, Fcntl::O_CREAT()|Fcntl::O_EXCL()|Fcntl::O_WRONLY()
-        or croak(qq/Error: Could not create temporary file $tempfile for downloading: $!\n/);
-    binmode $fh;
-
     my $response = $self->get( $url, $args || {} );
+    return $response if !$response->{success};
 
-    if ( $response->{success} ) {
-        print {$fh} $response->{content};
+    (my $path = $url) =~ s{\Afile://}{};
+    copy $path, $file;
 
-        rename $tempfile, $file
-            or croak(qq/Error replacing $file with $tempfile: $!\n/);
-    }
-
-    close $fh
-        or croak(qq/Error: Caught error closing temporary file $tempfile: $!\n/);
-
-    unlink $tempfile;
     return $response;
 };
 
@@ -142,7 +127,7 @@ HTTP::Tiny::FileProtocol - Add support for file:// protocol to HTTP::Tiny
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

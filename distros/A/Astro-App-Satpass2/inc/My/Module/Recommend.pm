@@ -20,6 +20,11 @@ if ( $] ge '5.012' ) {
 my %misbehaving_os = map { $_ => 1 } qw{ MSWin32 cygwin };
 
 my @optionals = (
+    __any( 'Astro::Coord::ECI::TLE::Iridium'	=> <<'EOD' ),
+      This module is needed if you wish to compute Iridium Classic flare
+      events. If you do not intend to do this, this module is not
+      needed.
+EOD
     __any( 'Astro::SIMBAD::Client'	=> <<'EOD' ),
       This module is required for the 'lookup' subcommand of the
       Astro::App::Satpass2 sky() method, which retrieves astronomical
@@ -273,7 +278,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2018 by Thomas R. Wyant, III
+Copyright (C) 2010-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

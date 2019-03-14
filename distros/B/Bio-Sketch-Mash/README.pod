@@ -1,0 +1,184 @@
+=pod
+
+=head1 NAME
+
+Bio::Sketch::Mash
+
+=head1 SYNOPSIS
+
+A module to read `mash info` output and transform it
+
+  use strict;
+  use warnings;
+  use Bio::Sketch::Mash;
+
+  # Sketch all fastq files into one mash file.
+  # Mash sketching is not implemented in this module.
+  system("mash sketch *.fastq.gz > all.msh");
+  die if $?;
+
+  # Read the mash file.
+  my $msh = Bio::Sketch::Mash->new("all.msh");
+  # All-vs-all distances
+  my $distHash = $msh->dist($msh);
+
+  # Read a mash file, write it to a json-formatted file
+  my $msh2 = Bio::Sketch::Mash->new("all.msh");
+  $msh2->writeJson("all.json");
+  # Read the json file
+  my $mashJson = Bio::Sketch::Mash->new("all.json");
+  my $dist = $msh2->dist($mashJson); # yields a zero distance
+
+=head1 DESCRIPTION
+
+This is a module to read mash files produced by the Mash executable. For more information on Mash, see L<mash.readthedocs.org>.  This module is capable of reading mash files.  Future versions will read/write mash files.
+
+=head1 METHODS
+
+=over
+
+=item Bio::Sketch::Mash->new("filename.msh",\%options);
+
+Create a new instance of Bio::Sketch::Mash.  One object per set of files.
+
+  Arguments:  Sketch filename (valid types/extensions are .msh, .json, .json.gz)
+              Hash of options (none so far)
+  Returns:    Bio::Sketch::Mash object
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->loadMsh("filename.msh")
+
+Changes which file is used in the object and updates internal object information. This method is ordinarily used internally only.
+
+  Arguments: One mash file
+  Returns:   self
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->loadJson("filename.msh")
+
+Changes which file is used in the object and updates internal object information. This method is ordinarily used internally only.
+
+  Arguments: One JSON file describing a Mash sketch
+  Returns:   self
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->writeJson("filename.json")
+
+Writes contents to a file in JSON format
+
+  Arguments: One filename
+  Returns:   self
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->dist($msh2)
+
+Returns a hash describing distances between sketches represented by
+this object and another object. If there are multiple sketches per
+object, then all sketches in this object will be compared against
+all sketches in the other object.
+
+  Arguments: One Bio::Sketch::Mash object
+  Returns:   reference to a hash of hashes. Each value is a number.
+
+Aliases: distance(), mashDist()
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item Bio::Sketch::Mash::raw_mash_distance($array1, $array2)
+
+Returns the number of sketches in common and the total number of sketches between two lists.
+The return type is an array of two elements.
+This function is used internally with $msh->dist and assumes that the 
+hashes are already sorted.
+
+  Arguments: A list of integers
+             A list of integers
+  Returns:   (countOfInCommon, totalNumber)
+
+  Example:
+    
+    my $R1 = [1,2,3];
+    my $R2 = [1,2,4];
+    my($common, $total) = Bio::Sketch::Mash::raw_mash_distance($R1,$R2);
+    # $common => 2
+    # $total  => 3
+
+=back
+
+
+=cut
+
+=pod
+
+=over
+
+=item $msh->fix()
+
+Fixes a mash sketch if it is broken at all. For now this
+just sorts hashes but this subroutine could contain more
+fixes in the future.
+
+  Arguments: None
+  Returns:   $self
+
+=back
+
+
+=cut
+
+=pod
+
+=head1 COPYRIGHT AND LICENSE
+
+MIT license.
+
+=head1 AUTHOR
+
+Author:  Lee Katz <lkatz@cdc.gov>
+
+For additional help, go to https://github.com/lskatz/perl-mash
+
+CPAN module at http://search.cpan.org/~lskatz/perl-mash
+
+
+=cut
+

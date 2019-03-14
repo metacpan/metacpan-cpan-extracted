@@ -1,0 +1,32 @@
+---
+abstract: 'Download a deck from speakerdeck.com'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Speakerdeck-Download
+provides:
+  WWW::Speakerdeck::Download:
+    file: lib/WWW/Speakerdeck/Download.pm
+    version: '0.01'
+requires:
+  Mojolicious: '8'
+  Scalar::Util: '0'
+  perl: '5.020001'
+resources:
+  bugtracker: http://github.com/reneeb/WWW-Speakerdeck-Download/issues
+  homepage: http://github.com/reneeb/WWW-Speakerdeck-Download
+  repository: http://github.com/reneeb/WWW-Speakerdeck-Download.git
+version: '0.01'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

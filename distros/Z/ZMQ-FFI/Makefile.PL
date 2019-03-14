@@ -35,7 +35,8 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Dylan Cali <calid1984\@gmail.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
-    "FFI::CheckLib" => "0.11"
+    "FFI::CheckLib" => "0.11",
+    "FFI::Platypus" => "0.86"
   },
   "DISTNAME" => "ZMQ-FFI",
   "LICENSE" => "perl",
@@ -78,7 +79,7 @@ my %WriteMakefileArgs = (
     "locale" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.15",
+  "VERSION" => "1.17",
   "test" => {
     "TESTS" => "t/*.t"
   }

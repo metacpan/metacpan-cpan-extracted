@@ -1,0 +1,22 @@
+.travis.yml
+bin/v2.1.1.tar.gz
+lib/Bio/Sketch/Mash.pm
+lib/capnproto-c++-0.7.0.tar.gz
+Makefile.PL
+MANIFEST			This list of files
+README
+README.pod
+t/00_setup.t
+t/01_env.t
+t/02_makeSketches.t
+t/03_readSketches.t
+t/data/PNUSAL003567_R1_.fastq.gz
+t/data/PNUSAL003567_R1_.fastq.gz.msh
+t/data/PNUSAL003567_R1_.fastq.gz.msh.json
+t/data/PNUSAL003567_R1_.fastq.gz.msh.json.gz
+t/data/PNUSAL003567_R2_.fastq.gz
+t/data/PNUSAL003567_R2_.fastq.gz.msh
+t/data/PNUSAL003567_R2_.fastq.gz.msh.json
+t/data/PNUSAL003567_R2_.fastq.gz.msh.json.gz
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

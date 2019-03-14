@@ -84,7 +84,7 @@
    "provides" : {
       "Config::IniFiles" : {
          "file" : "lib/Config/IniFiles.pm",
-         "version" : "3.000001"
+         "version" : "3.000002"
       }
    },
    "release_status" : "stable",
@@ -99,7 +99,7 @@
          "web" : "https://github.com/shlomif/perl-Config-IniFiles"
       }
    },
-   "version" : "3.000001",
+   "version" : "3.000002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -541,6 +541,6 @@
       }
    },
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

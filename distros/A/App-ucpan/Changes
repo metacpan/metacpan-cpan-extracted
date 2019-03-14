@@ -1,6 +1,10 @@
 Revision history for Perl extension App-ucpan
 
-1.02 2019-03-11T10:07:14Z
+1.03 2019-03-14T11:55:16Z
+    - Tweak UI
+    - Report a failure due to timeout
+    - Show undefined values explicitly on the screen
+    - Fix and tweak POD
 
 1.02 2019-03-11T10:03:51Z
     - Install modules securely

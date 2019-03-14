@@ -1,0 +1,762 @@
+HTTP/1.1 200 OK
+Vary: Accept-Encoding
+Server: Cowboy
+Set-Cookie: _secure_speakerd_session=S1hjL0hxUlZENUpleGxpNndMSWNGdXMzNDREYUppWDY2SWw4eExmWDJkMjdUQWVQK05jc3AwM3hTeUwyaGdKQ25DaFpOY1F4N0xkTzdRdFNNcEoxREp1V2VaTXlFR0VGTEtuc1d3VjRJdkhhNE1FejRNaHdHWGNIcVdENHRTTUtjcHpDdExwUDVBOHd3bFArcDN3aVB0dG1PbkFxLzJWcGNoYTdkTllCZFZjcDNmRGdINlI3NWVQUytQZEpPV2JzZlM0VDBMZzJxdEJ5UTNTOXpDZ2tOYU1kQ2I4WGxXL210bDUvT0tTZElxZz0tLU5xL01PS0JyT3VhRThSZHcwREZFcEE9PQ%3D%3D--7a6c24b5a77b32c2a1924655074717dcadba2be6; path=/; expires=Thu, 28 Mar 2019 16:35:53 -0000; secure; HttpOnly
+Date: Thu, 14 Mar 2019 16:35:53 GMT
+X-Frame-Options: SAMEORIGIN
+Via: 1.1 vegur
+Content-Length: 38301
+Strict-Transport-Security: max-age=0; includeSubDomains
+ETag: W/"5a20fd7ad818bf2aac68d30fb97138de"
+Content-Type: text/html; charset=utf-8
+Connection: close
+X-Runtime: 0.403321
+Cache-Control: max-age=0, private, must-revalidate
+X-Content-Type-Options: nosniff
+X-Xss-Protection: 1; mode=block
+X-Request-Id: e7a65168-990a-4dfd-ba37-d54a71fba409
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Is Mojolicious web only? - Speaker Deck</title>
+    <link rel="stylesheet" media="screen" href="https://d2dfho4r6t7asi.cloudfront.net/assets/application-6779f35accf6775feb80206410e06d442e089d71d91596e4a283f993731efa7a.css" />
+<script src="https://d2dfho4r6t7asi.cloudfront.net/assets/application-7f1c5632dffea96fdf37.js"></script>
+<link rel="icon" type="image/png" href="https://d2dfho4r6t7asi.cloudfront.net/assets/favicon-c0fe5475f88a65b817c8cc7c0fedc01b7acc17fe27628fa13ca3f96e56e16977.png" />
+<link rel="apple-touch-icon" type="image/png" href="https://d2dfho4r6t7asi.cloudfront.net/assets/favicon-c0fe5475f88a65b817c8cc7c0fedc01b7acc17fe27628fa13ca3f96e56e16977.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="QA/JMtBi4azxAQ4u1xgF7SSIoYAeDOShY68mnDxZLVokNAEUI/ZLxg6W1hBB6J2kKXlOqRj9Jx0bwKO9k66X9A==" />
+
+
+      <link rel="alternate" type="application/json+oembed" href="https://speakerdeck.com/oembed.json?url=https%3A%2F%2Fspeakerdeck.com%2Freneeb_perl%2Fis-mojolicious-web-only" title="Is Mojolicious web only?" />
+
+  <meta property="og:url" content="https://speakerdeck.com/reneeb_perl/is-mojolicious-web-only" />
+  <meta property="og:site_name" content="Speaker Deck" />
+  <meta property="og:title" content="Is Mojolicious web only?" />
+  <meta property="og:description" content="" />
+  <meta property="og:type" content="website" />
+  <meta property="og:author" content="https://www.facebook.com/SpeakerDeck" />
+  <meta property="og:image" content="https://speakerd.s3.amazonaws.com/presentations/c20659255724453f83f68657db6531a9/slide_0.jpg?500420" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@speakerdeck">
+  <meta name="twitter:creator" content="@speakerdeck">
+  <meta name="twitter:title" content="Is Mojolicious web only?">
+  <meta name="twitter:description" content="">
+  <meta name="twitter:image:src" content="https://speakerd.s3.amazonaws.com/presentations/c20659255724453f83f68657db6531a9/slide_0.jpg?500420">
+  <link rel="canonical" href="https://speakerdeck.com/reneeb_perl/is-mojolicious-web-only" />
+
+  <meta name="stats-owner_id" content="46929" />
+  <meta name="stats-talk_id" content="500679" />
+  <meta name="stats-view_type" content="talk" />
+
+    
+  </head>
+  <body class="sd-app">
+    
+    <div class="sd-menu d-md-none">
+  <div class="container sd-menu-fixed-container">
+    <div class="sd-brand">
+      <a class="sd-brand-logo" href="/">
+        <img alt="Speaker Deck" src="https://d2dfho4r6t7asi.cloudfront.net/assets/mark-f4be6df1e05965cac9f98e664a6c35f5ffdd0207385d07464a9214d6cdf76082.svg" /> <span class="d-none d-md-inline">Speaker Deck</span>
+</a>    </div>
+
+      <nav class="sd-fixed-nav">
+        <div class="sd-nav-main js-toggle-container">
+          <ul class="sd-nav-fixed-group nav toggle-flex-when-off">
+            <li class="sd-nav-item d-md-block d-none">
+              <form action="https://www.google.com/cse" id="cse-search-box" class="form-inline ml-5 ml-md-3">
+                <input type="hidden" name="cx" value="010150859881542981030:hqhxyxpwtc4">
+                <input type="hidden" name="ie" value="UTF-8">
+                <input type="text" name="q" id="q" value="" placeholder="Search..." class="form-control search-input mr-2">
+                <input type="submit" name="sa" value="Search" class="btn btn-outline-primary d-inline-block d-md-none d-lg-inline-block">
+              </form>
+            </li>
+            <li class="sd-nav-item nav-item">
+            </li>
+            <li class="sd-nav-item nav-item">
+              <a class="sd-nav-link nav-link" href="/signin">
+                Sign in
+</a>            </li>
+            <li class="sd-nav-item nav-item">
+              <a class="btn btn-primary" href="/signup">
+                Sign up <span class="d-none d-md-inline">for free</span>
+</a>            </li>
+            <li class="sd-nav-item d-block d-md-none">
+              <button class="btn btn-link mr-2 js-toggle-trigger">
+                <svg class="icon icon-search "><use xlink:href="/icons/icons.svg#icon-search"></use></svg>
+              </button>
+            </li>
+          </ul>
+          <ul class="sd-nav-fixed-group nav toggle-flex-when-on">
+            <li class="sd-nav-item">
+              <form action="https://www.google.com/cse" id="cse-search-box" class="form-inline ml-5 ml-md-3">
+                <input type="hidden" name="cx" value="010150859881542981030:hqhxyxpwtc4">
+                <input type="hidden" name="ie" value="UTF-8">
+                <div class="row">
+                  <div class="col col-auto pr-0">
+                    <input type="text" name="q" id="q" value="" placeholder="Search..." class="form-control search-input mr-2">
+                  </div>
+                  <div class="col col-auto">
+                    <input type="submit" name="sa" value="Search" class="btn btn-outline-primary d-inline-block d-md-none d-lg-inline-block">
+                  </div>
+                </div>
+              </form>
+            </li>
+            <li class="sd-nav-item pr-2">
+              <button class="btn btn-link js-toggle-trigger">
+                <svg class="icon icon-x "><use xlink:href="/icons/icons.svg#icon-x"></use></svg>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </nav>
+  </div>
+</div>
+
+    
+    
+    <div class="sd-main">
+      
+
+
+<div class="deck">
+  <div class="deck-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/c20659255724453f83f68657db6531a9/preview_slide_0.jpg?500420')"></div>
+  
+  <div class="deck-header d-none d-md-block js-toggle-container">
+    <div class="container d-flex align-items-center w-100">
+      <div class="deck-header-logo py-3 flex-grow-0">
+        <a class="sd-brand-logo" href="/">
+          <img alt="Speaker Deck" src="https://d2dfho4r6t7asi.cloudfront.net/assets/mark-white-8d908558fe78e8efc8118c6fe9b9b1a9846b182c503bdc6902f97df4ddc9f3af.svg" />
+</a>      </div>
+      <h4 class="deck-header-title flex-grow-1 flex-shrink-0 w-100 d-none mx-3 d-md-block p-3 text-center m-0 text-white text-truncate toggle-block-when-off">
+        Is Mojolicious web only?
+      </h4>
+      <div class="deck-header-user-nav toggle-block-when-on ml-auto">
+        <form action="https://www.google.com/cse" id="cse-search-box" class="form-inline ml-5 ml-md-3">
+          <input type="hidden" name="cx" value="010150859881542981030:hqhxyxpwtc4">
+          <input type="hidden" name="ie" value="UTF-8">
+          <input type="text" name="q" id="q" value="" placeholder="Search..." class="form-control form-control-inverse search-input mr-2">
+          <input type="submit" name="sa" value="Search" class="btn btn-success d-inline-block d-md-none d-lg-inline-block">
+        </form>
+      </div>
+      <div class="deck-header-user-nav toggle-block-when-on">
+        <button class="btn btn-link mr-2 js-toggle-trigger">
+          <svg class="icon icon-x "><use xlink:href="/icons/icons.svg#icon-x"></use></svg>
+        </button>
+      </div>
+      <div class="deck-header-user-nav toggle-block-when-off">
+        <button class="btn btn-link mr-2 js-toggle-trigger">
+          <svg class="icon icon-search "><use xlink:href="/icons/icons.svg#icon-search"></use></svg>
+        </button>
+      </div>
+      <div class="deck-header-user-nav flex-grow-0 dropdown py-3">
+        
+      </div>
+    </div>
+  </div>
+
+  
+<div class="deck-embed js-deck-embed" data-ratio="1.77777777777778" data-state="processed">
+    <div class="speakerdeck-embed" data-title="false" data-skip-resize="true" data-id="c20659255724453f83f68657db6531a9" data-ratio="1.77777777777778"></div>
+</div>
+
+
+  <div class="deck-meta">
+    <div class="container">
+      <div class="row align-items-center justify-content-between">
+        <div class="col-md-auto col-12 py-3">
+          <div class="row align-items-center justify-content-between justify-content-md-start">
+            <a class="d-flex align-items-center font-weight-bold text-white col-auto" href="/reneeb_perl">
+              <span class="mr-2">
+                <img class="avatar" src="//secure.gravatar.com/avatar/07b86e788c12e66f05d3bb7099aa1967?s=47" alt="07b86e788c12e66f05d3bb7099aa1967?s=47" />
+              </span>
+              <span>
+                Renee
+              </span>
+</a>            <div class="col-auto text-muted">
+              March 07, 2019
+            </div>
+          </div>
+        </div>
+        <div class="col-md-auto col-12 py-md-3 pb-3">
+          <div class="row justify-content-between justify-content-md-start">
+              <div class="col-auto mr-auto mr-md-0">
+                <a class="text-white font-weight-bold" href="/c/technology">
+                  <svg class="icon icon-folder "><use xlink:href="/icons/icons.svg#icon-folder"></use></svg> Technology
+</a>              </div>
+            <div class="col-auto">
+              <div class="js-stargazer animated">
+      <a class="text-white font-weight-bold" title="Star this deck" href="/signin?return_to=%2Freneeb_perl%2Fis-mojolicious-web-only">
+        <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 0
+</a></div>
+
+            </div>
+            <div class="col-auto text-white font-weight-bold">
+              <span title="13 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 13</span>
+            </div>
+            <div class="col-auto text-white font-weight-bold">
+              <a title="Download PDF" href="https://speakerd.s3.amazonaws.com/presentations/c20659255724453f83f68657db6531a9/mojo.pdf"><svg class="icon icon-dl "><use xlink:href="/icons/icons.svg#icon-download"></use></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style media="screen">
+.native-js  {
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+.native-banner {
+  display: flex;
+  padding: 20px 20px;
+  text-decoration: none;
+
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.native-banner .native-img {
+  margin-right: 20px;
+  max-height: 50px;
+  line-height: 0;
+}
+
+.native-banner .native-main {
+  display: flex;
+  max-width: 1024px;
+  margin: 0 auto;
+
+  flex-grow: 1;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.native-banner .native-details {
+  display: flex;
+  margin-right: 20px;
+
+  flex-flow: column nowrap;
+}
+
+.native-banner .native-company {
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.native-banner .native-desc {
+  letter-spacing: 1px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+
+.native-banner .native-cta {
+  padding: 10px 16px;
+  border-radius: 3px;
+  box-shadow: 0 6px 13px 0 hsla(0, 0%, 0%, .15);
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 1px;
+  line-height: 1;
+  font-weight: 400;
+  font-size: 12px;
+  transition: all .3s ease-in-out;
+  transform: translateY(-1px);
+}
+
+.native-banner .native-cta:hover {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+.native-source {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 5px;
+  border-top: 0;
+  border-top-left-radius: 3px;
+  background: repeating-linear-gradient(-45deg, transparent, transparent 5px, hsla(0, 0%, 0%, .025) 5px, hsla(0, 0%, 0%, .025) 10px) hsla(203, 11%, 95%, .4);
+  color: #111;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  font-weight: 600;
+  font-size: 7px;
+}
+
+
+@media only screen and (min-width: 320px) and (max-width: 759px) {
+  .native-banner,
+  .native-banner .native-main {
+    flex-flow: column nowrap;
+  }
+
+  .native-banner .native-img,
+  .native-banner .native-details {
+    margin: 0;
+  }
+
+  .native-banner .native-img {
+    display: none;
+  }
+
+  .native-banner .native-company {
+    letter-spacing: 1px;
+  }
+
+  .native-banner .native-details {
+    text-align:  left;
+    font-size: 14px;
+  }
+
+  .native-banner .native-cta {
+    display: none;
+  }
+}
+</style>
+<script src="//m.servedby-buysellads.com/monetization.js" type="text/javascript"></script>
+<div class="native-js"></div>
+<script>
+(function(){
+  if(typeof _bsa !== 'undefined' && _bsa) {
+      _bsa.init('custom', 'CK7I4K3Y', 'placement:speakerdeckcom',
+        {
+          target: '.native-js',
+          template: `
+<a href="##link##" class="native-banner" style="background: linear-gradient(-30deg, ##backgroundColor##E5, ##backgroundColor##E5 45%, ##backgroundColor## 45%) #fff;">
+    <div class="native-main">
+      <img class="native-img" img src="##logo##">
+      <div class="native-details" style="color: ##textColor##">
+        <span class="native-company">Sponsored by ##company##</span>
+        <span class="native-desc">##description##</span>
+      </div>
+      <span class="native-cta" style="color: ##ctaTextColor##; background-color: ##ctaBackgroundColor##;">##callToAction##</span>
+    </div>
+  </a>
+`,
+        }
+      );
+    }
+})();
+</script>
+
+<div class="container container-lg py-md-5 py-3">
+  <h1 class="mb-4">Is Mojolicious web only?</h1>
+  <div class="row align-items-center mb-4">
+    <div class="col-md-auto col-12 mr-md-auto mb-4 mb-md-0">
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <a href="/reneeb_perl"><img class="avatar avatar-large" src="//secure.gravatar.com/avatar/07b86e788c12e66f05d3bb7099aa1967?s=128" alt="07b86e788c12e66f05d3bb7099aa1967?s=128" /></a>
+        </div>
+        <div class="col-auto pl-0">
+          <h4 class="m-0"><a class="text-dark" href="/reneeb_perl">Renee</a></h4>
+          <div class="text-muted">March 07, 2019</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-auto col-12">
+      <div class="btn-group d-flex" role="group">
+        
+        <a href="https://twitter.com/intent/tweet?url=https://speakerdeck.com/reneeb_perl/is-mojolicious-web-only&text=Is+Mojolicious+web+only%3F" class="btn btn-outline-primary w-100">
+          <svg class="icon icon-twitter "><use xlink:href="/icons/icons.svg#icon-twitter"></use></svg> Tweet
+        </a>
+        <button class="facebook-share btn btn-outline-primary w-100">
+          <svg class="icon icon-facebook "><use xlink:href="/icons/icons.svg#icon-facebook"></use></svg> Share
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="carbon-container">
+        <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CK7D553I&placement=speakerdeckcom" id="_carbonads_js"></script>
+      </div>
+</div>
+
+<div class="bg-lightest border-top">
+  <div class="container py-md-4 py-3">
+    <h2 class="mb-4">Want more?</h2>
+    <div class="row">
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/reneeb_perl/mysql-workbench-als-quelle-fur-perl-code" title="MySQL Workbench als Quelle für Perl-Code">
+      <div class="card deck-preview" data-id="a95b6712f85544378aaec6a14697b4bc" data-slide-count="49" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/a95b6712f85544378aaec6a14697b4bc/preview_slide_0.jpg?500670">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/a95b6712f85544378aaec6a14697b4bc/preview_slide_0.jpg?500670');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/a95b6712f85544378aaec6a14697b4bc/preview_slide_0.jpg?500670');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/07b86e788c12e66f05d3bb7099aa1967?s=48" alt="07b86e788c12e66f05d3bb7099aa1967?s=48" /> Mar  7, 2019
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 0
+            </div>
+            <div class="py-3">
+              <span title="10 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 10</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/reneeb_perl/cpan-games" title="CPAN Games">
+      <div class="card deck-preview" data-id="091541c4837947ba8588ba1843a75542" data-slide-count="23" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/091541c4837947ba8588ba1843a75542/preview_slide_0.jpg?500732">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/091541c4837947ba8588ba1843a75542/preview_slide_0.jpg?500732');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/091541c4837947ba8588ba1843a75542/preview_slide_0.jpg?500732');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/07b86e788c12e66f05d3bb7099aa1967?s=48" alt="07b86e788c12e66f05d3bb7099aa1967?s=48" /> Mar  7, 2019
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 0
+            </div>
+            <div class="py-3">
+              <span title="95 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 95</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/reneeb_perl/otrs-opm-installer" title="OTRS::OPM::Installer">
+      <div class="card deck-preview" data-id="31bbd54b932040d887ecfe683c91306a" data-slide-count="18" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/31bbd54b932040d887ecfe683c91306a/preview_slide_0.jpg?419965">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/31bbd54b932040d887ecfe683c91306a/preview_slide_0.jpg?419965');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/31bbd54b932040d887ecfe683c91306a/preview_slide_0.jpg?419965');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/07b86e788c12e66f05d3bb7099aa1967?s=48" alt="07b86e788c12e66f05d3bb7099aa1967?s=48" /> Dec  7, 2017
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 0
+            </div>
+            <div class="py-3">
+              <span title="47 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 47</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/afnizarnur/easily-structure-and-communicate-ideas-using-wireframe" title="Easily Structure &amp; Communicate Ideas using Wireframe ">
+      <div class="card deck-preview" data-id="b54a0d1746ae428fa734ab129df6ed6c" data-slide-count="62" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/b54a0d1746ae428fa734ab129df6ed6c/preview_slide_0.jpg?492987">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/b54a0d1746ae428fa734ab129df6ed6c/preview_slide_0.jpg?492987');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/b54a0d1746ae428fa734ab129df6ed6c/preview_slide_0.jpg?492987');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/a9b18bbab50a3afb80222c0a85e710d0?s=48" alt="A9b18bbab50a3afb80222c0a85e710d0?s=48" /> Feb 12, 2019
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 25
+            </div>
+            <div class="py-3">
+              <span title="1,300 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 1.3k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/jacobian/how-to-ace-a-technical-interview" title="How to Ace a Technical Interview">
+      <div class="card deck-preview" data-id="cf34b2337dbe42d29adeaec4b04f09e3" data-slide-count="51" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/cf34b2337dbe42d29adeaec4b04f09e3/preview_slide_0.jpg?496748">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/cf34b2337dbe42d29adeaec4b04f09e3/preview_slide_0.jpg?496748');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/cf34b2337dbe42d29adeaec4b04f09e3/preview_slide_0.jpg?496748');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/2f5463832ccb768ccb4a1ca3607c27ef?s=48" alt="2f5463832ccb768ccb4a1ca3607c27ef?s=48" /> Feb 23, 2019
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 26
+            </div>
+            <div class="py-3">
+              <span title="1,747 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 1.7k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/lynnandtonic/art-the-web-and-tiny-ux" title="Art, The Web, and Tiny UX">
+      <div class="card deck-preview" data-id="a6f09ce505e740f98bc816afa763e872" data-slide-count="143" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/a6f09ce505e740f98bc816afa763e872/preview_slide_0.jpg?477234">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/a6f09ce505e740f98bc816afa763e872/preview_slide_0.jpg?477234');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/a6f09ce505e740f98bc816afa763e872/preview_slide_0.jpg?477234');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/d67fff74178013024d833b3eec6cf27f?s=48" alt="D67fff74178013024d833b3eec6cf27f?s=48" /> Oct  7, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 145
+            </div>
+            <div class="py-3">
+              <span title="7,162 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 7.2k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/revolveconf/creatively-recalculating-your-daily-design-routine" title="Creatively Recalculating Your Daily Design Routine">
+      <div class="card deck-preview" data-id="53bccbecf4aa455a81b6fd3d6178d099" data-slide-count="89" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/53bccbecf4aa455a81b6fd3d6178d099/preview_slide_0.jpg?477729">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/53bccbecf4aa455a81b6fd3d6178d099/preview_slide_0.jpg?477729');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/53bccbecf4aa455a81b6fd3d6178d099/preview_slide_0.jpg?477729');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/48c098b6579220a67a6ba949be6e4b5a?s=48" alt="48c098b6579220a67a6ba949be6e4b5a?s=48" /> Nov 13, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 112
+            </div>
+            <div class="py-3">
+              <span title="3,689 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 3.7k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/maltzj/code-reviewing-like-a-champion" title="Code Reviewing Like a Champion">
+      <div class="card deck-preview" data-id="3c09f9c42e12490d87f92f7c6ad8aa25" data-slide-count="48" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/3c09f9c42e12490d87f92f7c6ad8aa25/preview_slide_0.jpg?455068">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/3c09f9c42e12490d87f92f7c6ad8aa25/preview_slide_0.jpg?455068');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/3c09f9c42e12490d87f92f7c6ad8aa25/preview_slide_0.jpg?455068');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/c7393b7ba7ec9c8890dd77d209fbb3c9?s=48" alt="C7393b7ba7ec9c8890dd77d209fbb3c9?s=48" /> Jul 20, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 364
+            </div>
+            <div class="py-3">
+              <span title="23,309 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 23k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/scottboms/imperfection-machines-the-place-of-print-at-facebook" title="Imperfection Machines: The Place of Print at Facebook">
+      <div class="card deck-preview" data-id="b4e937028d5141ecb94f6c673997c8e1" data-slide-count="101" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/b4e937028d5141ecb94f6c673997c8e1/preview_slide_0.jpg?453039">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/b4e937028d5141ecb94f6c673997c8e1/preview_slide_0.jpg?453039');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/b4e937028d5141ecb94f6c673997c8e1/preview_slide_0.jpg?453039');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/7c8469ee8c9e594c65c59b919626c08d?s=48" alt="7c8469ee8c9e594c65c59b919626c08d?s=48" /> Jun 14, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 186
+            </div>
+            <div class="py-3">
+              <span title="7,456 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 7.5k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/lauravandoore/building-a-scalable-design-system-with-sketch" title="Building a Scalable Design System with Sketch">
+      <div class="card deck-preview" data-id="f8937bc10245428ea8901efe6c18cb5d" data-slide-count="63" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/f8937bc10245428ea8901efe6c18cb5d/preview_slide_0.jpg?450769">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/f8937bc10245428ea8901efe6c18cb5d/preview_slide_0.jpg?450769');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/f8937bc10245428ea8901efe6c18cb5d/preview_slide_0.jpg?450769');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/1177e050db6bafe62885362edf6e3537?s=48" alt="1177e050db6bafe62885362edf6e3537?s=48" /> Jun 19, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 311
+            </div>
+            <div class="py-3">
+              <span title="16,996 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 17k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/wjessup/building-better-people-how-to-give-real-time-feedback-that-sticks" title="Building Better People: How to give real-time feedback that sticks.">
+      <div class="card deck-preview" data-id="a17deadbf4b84544b4975ff2e4c66902" data-slide-count="29" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/a17deadbf4b84544b4975ff2e4c66902/preview_slide_0.jpg?449488">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/a17deadbf4b84544b4975ff2e4c66902/preview_slide_0.jpg?449488');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/a17deadbf4b84544b4975ff2e4c66902/preview_slide_0.jpg?449488');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/9952dfcd5d338f8a8e7175c8a8f65fb5?s=48" alt="9952dfcd5d338f8a8e7175c8a8f65fb5?s=48" /> Jun 18, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 233
+            </div>
+            <div class="py-3">
+              <span title="8,380 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 8.4k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+          <div class="col-12 col-md-6 col-lg-4 mb-5">
+    <a href="/lemiorhan/10-git-anti-patterns-you-should-be-aware-of" title="10 Git Anti Patterns You Should be Aware of">
+      <div class="card deck-preview" data-id="1eaed7dabacb4f9b9c96b08de38eb9e1" data-slide-count="60" data-cover-image="https://speakerd.s3.amazonaws.com/presentations/1eaed7dabacb4f9b9c96b08de38eb9e1/preview_slide_0.jpg?447453">
+        <div class="deck-preview-image">
+          <div class="content"></div>
+          <div class="deck-preview-slide" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/1eaed7dabacb4f9b9c96b08de38eb9e1/preview_slide_0.jpg?447453');"></div>
+          <div class="deck-preview-background" style="background-image: url('https://speakerd.s3.amazonaws.com/presentations/1eaed7dabacb4f9b9c96b08de38eb9e1/preview_slide_0.jpg?447453');"></div>
+          <div class="deck-preview-slide deck-preview-scrub-slide"></div>
+          <div class="deck-preview-background deck-preview-scrub-background"></div>
+          <div class="deck-preview-scrubber"></div>
+        </div>
+        <div class="deck-preview-meta d-flex px-3 justify-content-between">
+          <div class="py-3 pr-1">
+            <img class="avatar avatar-sm" src="//secure.gravatar.com/avatar/dafc4723e9a1c067796c0fec6f509774?s=48" alt="Dafc4723e9a1c067796c0fec6f509774?s=48" /> Jun  7, 2018
+          </div>
+            <div class="py-3">
+              <svg class="icon icon-star "><use xlink:href="/icons/icons.svg#icon-star"></use></svg> 471
+            </div>
+            <div class="py-3">
+              <span title="28,800 views"><svg class="icon icon-eye "><use xlink:href="/icons/icons.svg#icon-eye"></use></svg> 29k</span>
+            </div>
+        </div>
+      </div>
+    </a>
+  </div>
+
+    </div>
+  </div>
+</div>
+
+    </div>
+
+    <footer class="d-block border-top">
+  <div class="container py-3 py-md-5 text-muted">
+    <div class="row text-center text-md-left">
+      <div class="col-12 col-md-auto mr-auto mb-3 mb-md-0">
+        <div class="copyright-text mb-3 mb-md-0">Copyright &copy; 2019 <a href="https://fewerandfaster.com">Fewer and Faster</a> LLC.</div>
+        <div>All slide content and descriptions are owned by their&nbsp;creators.</div>
+      </div>
+      <div class="col-12 col-md-auto">
+        <a href="/faq">F.A.Q.</a> &nbsp;
+        <a href="/tos">Terms</a> &nbsp;
+        <a href="/privacy">Privacy</a> &nbsp;
+        <a href="/dmca">DMCA</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    <script src="https://d2dfho4r6t7asi.cloudfront.net/assets/stats-dd214f1dc3f3069dcb9a.js"></script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-19290517-1']);
+    _gaq.push(['_setDomainName', '.speakerdeck.com']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+    <script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : '491686710857561',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.12'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "https://connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+  </body>
+</html>
+

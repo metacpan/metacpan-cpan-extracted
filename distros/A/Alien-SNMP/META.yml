@@ -3,14 +3,15 @@ abstract: 'Build and install Net-SNMP'
 author:
   - 'Eric A. Miller <emiller AT cpan DOT org>'
 build_requires:
+  Alien::Base::ModuleBuild: '0'
   IO::Socket::SSL: '1.56'
   Net::SSLeay: '1.49'
-  Test::CChecker: '0'
+  Software::License: '0'
+  Test::Alien: '0.16'
   Test::More: '0.94'
   perl: '5.010001'
 configure_requires:
   Alien::Base: '0.020'
-  ExtUtils::CChecker: '0.10'
   File::ShareDir: '1.03'
   Module::Build: '0.42'
   PkgConfig: '0.14026'
@@ -26,7 +27,7 @@ name: Alien-SNMP
 provides:
   Alien::SNMP:
     file: lib/Alien/SNMP.pm
-    version: '2.000000'
+    version: '2.001000'
 requires:
   Alien::Base: '0.020'
   File::ShareDir: '1.03'
@@ -34,5 +35,6 @@ requires:
   perl: '5.010001'
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '2.000000'
+  repository: http://github.com/ollyg/Alien-SNMP
+version: '2.001000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

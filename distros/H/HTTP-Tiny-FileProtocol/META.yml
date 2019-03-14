@@ -3,6 +3,7 @@ abstract: 'Add support for file:// protocol to HTTP::Tiny'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires:
+  File::Spec: '0'
   Pod::Coverage::TrustPod: '0'
   Test::LongString: '0'
   Test::More: '0'
@@ -18,11 +19,13 @@ name: HTTP-Tiny-FileProtocol
 provides:
   HTTP::Tiny::FileProtocol:
     file: lib/HTTP/Tiny/FileProtocol.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Carp: '0'
+  Fcntl: '0'
   File::Basename: '0'
-  File::Spec: '0'
+  File::Copy: '0'
+  File::stat: '0'
   HTTP::Tiny: '0'
   LWP::MediaTypes: '6.02'
   perl: '5.010001'
@@ -30,7 +33,7 @@ resources:
   bugtracker: http://github.com/reneeb/HTTP-Tiny-FileProtocol/issues
   homepage: http://github.com/reneeb/HTTP-Tiny-FileProtocol
   repository: http://github.com/reneeb/HTTP-Tiny-FileProtocol.git
-version: '0.06'
+version: '0.07'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'reneeb <info@perl-services.de>'

@@ -3,9 +3,11 @@ abstract: 'framework for more readable interactive test scripts'
 author:
   - 'Sullivan Beck (sbeck@cpan.org)'
 build_requires:
-  Cwd: '0'
   ExtUtils::MakeMaker: '0'
+  File::Find::Rule: '0'
   Test::More: '0'
+  Test::Pod: '1.00'
+  Test::Pod::Coverage: '1.00'
 configure_requires:
   ExtUtils::MakeMaker: '6.30'
 dynamic_config: 1
@@ -22,12 +24,13 @@ no_index:
 provides:
   Test::Inter:
     file: lib/Test/Inter.pm
-    version: '1.08'
+    version: '1.09'
 requires:
+  Cwd: '0'
   File::Basename: '0'
   IO::File: '0'
   perl: '5.006'
 resources:
   repository: git://github.com/SBECK-github/Test-Inter.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

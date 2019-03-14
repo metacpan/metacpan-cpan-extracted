@@ -37,5 +37,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/giblog.git",
+         "web" : "https://github.com/yuki-kimoto/giblog"
+      }
+   },
+   "version" : "0.02"
 }

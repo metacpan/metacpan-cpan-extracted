@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp::Clan" => 0,
     "Context::Preserve" => "0.01",
     "DBIx::Class" => "0.08121",
-    "IO::All" => "0.55",
+    "IO::All" => "0.87",
     "Log::Contextual" => "0.005005",
     "Module::Runtime" => "0.001",
     "Moo" => 2,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Requires" => "0.06",
     "aliased" => 0
   },
-  "VERSION" => "0.002227",
+  "VERSION" => "0.002228",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/deploy_methods/*.t t/version_handlers/*.t t/version_storages/*.t"
   }
@@ -58,7 +58,7 @@ my %FallbackPrereqs = (
   "DBD::SQLite" => "1.35",
   "DBIx::Class" => "0.08121",
   "File::Temp" => 0,
-  "IO::All" => "0.55",
+  "IO::All" => "0.87",
   "Log::Contextual" => "0.005005",
   "Module::Runtime" => "0.001",
   "Moo" => 2,

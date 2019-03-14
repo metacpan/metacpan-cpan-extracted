@@ -4,7 +4,9 @@ use 5.008007;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+use Getopt::Long 'GetOptions';
+
+our $VERSION = '0.02';
 
 sub new {
   my $class = shift;

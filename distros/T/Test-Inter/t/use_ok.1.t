@@ -1,21 +1,25 @@
 #!/usr/bin/perl
 
+use warnings 'all';
 use strict;
-use warnings;
-
-our($o);
+my $ti;
 
 BEGIN {
-  use Test::Inter;
-  $o = new Test::Inter;
+   if (-d "lib") {
+      use lib "./lib";
+   } elsif (-d "../lib") {
+      use lib "../lib";
+   }
+
+   use Test::Inter;
+   $ti = new Test::Inter $0;
+
+   $ti->use_ok('5.004');
+   $ti->use_ok('Config'); 
+   $ti->use_ok('Xxx::Yyy','forbid');
+   $ti->use_ok('Symbol','feature'); 
+   $ti->use_ok('Xxx::Zzz','feature'); 
+   $ti->use_ok('Storable',1.01);
 }
-
-BEGIN { $o->use_ok('5.004'); }
-BEGIN { $o->use_ok('Config'); }
-BEGIN { $o->use_ok('Xxx::Yyy','forbid'); }
-BEGIN { $o->use_ok('Symbol','feature'); }
-BEGIN { $o->use_ok('Xxx::Zzz','feature'); }
-BEGIN { $o->use_ok('Storable',1.01); }
-
-$o->done_testing();
+$ti->done_testing();
 

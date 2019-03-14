@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Exporter};
 
-our $VERSION     = '0.12';
+our $VERSION     = '0.16';
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = ();
 

@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-mpv
   homepage: https://metacpan.org/release/App-ShellCompleter-mpv
   repository: git://github.com/perlancar/perl-App-ShellCompleter-mpv.git
-version: '0.060'
+version: '0.061'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -105,7 +105,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

@@ -1,18 +1,22 @@
 #!/usr/bin/perl
 
+use warnings 'all';
 use strict;
-use warnings;
-
-our($o);
+my $ti;
 
 BEGIN {
-  use Test::Inter;
-  $o = new Test::Inter;
+   if (-d "lib") {
+      use lib "./lib";
+   } elsif (-d "../lib") {
+      use lib "../lib";
+   }
+
+   use Test::Inter;
+   $ti = new Test::Inter $0;
+
+   $ti->use_ok('7.001','forbid'); 
+   $ti->use_ok('Config','myconfig'); 
+   $ti->use_ok('Storable',1.01,'dclone'); 
 }
-
-BEGIN { $o->use_ok('7.001','forbid'); }
-BEGIN { $o->use_ok('Config','myconfig'); }
-BEGIN { $o->use_ok('Storable',1.01,'dclone'); }
-
-$o->done_testing();
+$ti->done_testing();
 

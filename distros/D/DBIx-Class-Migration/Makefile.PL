@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Config::MySQL" => "0.02",
     "DBD::SQLite" => "1.46",
     "DBIx::Class::DeploymentHandler" => "0.002223",
-    "DBIx::Class::Fixtures" => "1.001028",
+    "DBIx::Class::Fixtures" => "1.001039",
     "DBIx::Class::Schema::Loader" => "0.07042",
     "Devel::PartialDump" => "0.17",
     "File::Copy" => 0,
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => "0.34",
     "Test::Requires" => "0.10"
   },
-  "VERSION" => "0.065",
+  "VERSION" => "0.067",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -63,7 +63,7 @@ my %FallbackPrereqs = (
   "Config::MySQL" => "0.02",
   "DBD::SQLite" => "1.46",
   "DBIx::Class::DeploymentHandler" => "0.002223",
-  "DBIx::Class::Fixtures" => "1.001028",
+  "DBIx::Class::Fixtures" => "1.001039",
   "DBIx::Class::Schema::Loader" => "0.07042",
   "Devel::PartialDump" => "0.17",
   "File::Copy" => 0,

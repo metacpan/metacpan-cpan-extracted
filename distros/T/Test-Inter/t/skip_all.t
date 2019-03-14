@@ -1,14 +1,21 @@
 #!/usr/bin/perl
 
+use warnings 'all';
 use strict;
-use warnings;
+BEGIN {
+   if (-d "lib") {
+      use lib "./lib";
+   } elsif (-d "../lib") {
+      use lib "../lib";
+   }
+}
+
 use Test::Inter;
+my $ti = new Test::Inter $0;
 
-my $o = new Test::Inter;
-
-$o->skip_all("testing skip_all");
-$o->plan(3);
-$o->_ok("Test 1");
-$o->diag("Test 1 diagnostic message");
-$o->_ok("Test 2");
-$o->_ok("Test 3");
+$ti->skip_all("testing skip_all");
+$ti->plan(3);
+$ti->_ok("Test 1");
+$ti->diag("Test 1 diagnostic message");
+$ti->_ok("Test 2");
+$ti->_ok("Test 3");

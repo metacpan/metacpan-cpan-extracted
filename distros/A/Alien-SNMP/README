@@ -2,7 +2,7 @@ NAME
     Alien::SNMP - Alien package for the Net-SNMP library
 
 VERSION
-    Version 1.000001
+    Version 2.001000
 
 SYNOPSIS
      use Alien::SNMP;
