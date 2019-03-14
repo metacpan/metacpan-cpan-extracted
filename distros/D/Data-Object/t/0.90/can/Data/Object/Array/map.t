@@ -31,7 +31,7 @@ method returns a L<Data::Object::Array> object.
 
 =signature
 
-map(CodeRef $arg1, Any $arg2) : DoArray
+map(CodeRef $arg1, Any $arg2) : ArrayObject
 
 =type
 

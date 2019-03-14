@@ -24,7 +24,7 @@ returns a data type object to be determined after execution.
 
 =signature
 
-sqrt(Int $arg1) : DoInt
+sqrt(Int $arg1) : IntObject
 
 =type
 

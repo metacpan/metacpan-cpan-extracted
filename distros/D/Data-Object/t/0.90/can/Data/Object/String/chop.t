@@ -26,7 +26,7 @@ method returns a string value.
 
 =signature
 
-chop() : DoStr
+chop() : StrObject
 
 =type
 

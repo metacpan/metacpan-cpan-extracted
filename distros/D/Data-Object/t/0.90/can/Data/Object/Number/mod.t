@@ -28,7 +28,7 @@ argment. This method returns a L<Data::Object::Number> object.
 
 =signature
 
-mod() : DoNum
+mod() : NumObject
 
 =type
 

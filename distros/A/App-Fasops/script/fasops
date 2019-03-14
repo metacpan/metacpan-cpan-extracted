@@ -60,6 +60,7 @@ cat t/example.fas | perl -I lib script/fasops xlsx stdin -l 50 --outgroup -o exa
 cat t/example.fas | perl -I lib script/fasops xlsx stdin --nosingle -o example.xlsx
 cat t/example.fas | perl -I lib script/fasops xlsx stdin --noindel -o example.xlsx
 cat t/example.fas | perl -I lib script/fasops xlsx stdin --nocomplex -o example.xlsx
+cat t/example.fas | perl -I lib script/fasops xlsx stdin --min 0.3 --max 0.7 -o example.xlsx
 rm example.xlsx example.outgroup.xlsx
 perl -I lib/ t/15-xlsx.t
 

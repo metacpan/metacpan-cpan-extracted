@@ -1,5 +1,9 @@
 Revision history for App-Fasops
 
+0.6.3 2019-03-14T19:45:27Z
+
+    - Add --min and --max to `fasops xlsx`
+
 0.6.2 2019-02-01T23:35:08Z
 
     - Add parse_block_array() to Common.pm

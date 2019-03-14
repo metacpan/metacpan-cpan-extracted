@@ -154,67 +154,48 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  # given qr(something to match against)
-
-  my $re = Data::Object::Regexp->new(qr(something to match against));
-
-The new method expects a regular-expression object and returns a new class
-instance.
-
-=cut
-
-=head2 roles
-
-  # given $regexp
-
-  $regexp->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=cut
-
-=head2 rules
-
-  my $rules = $regexp->rules();
-
-The rules method returns consumed rules.
-
-=cut
-
 =head2 defined
 
-  # given $regexp
-
-  $regexp->defined; # 1
+  defined() : NumObject
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
 L<Data::Object::Number> object.
 
+=over 4
+
+=item defined example
+
+  # given $regexp
+
+  $regexp->defined; # 1
+
+=back
+
 =cut
 
-=head2 search
+=head2 new
 
-  # given qr((test))
+  new(RegexpRef $arg1) : RegexpObject
 
-  $re->search('this is a test');
-  $re->search('this does not match', 'gi');
+The new method expects a regular-expression object and returns a new class
+instance.
 
-The search method performs a regular expression match against the given string
-This method will always return a L<Data::Object::Search> object which
-can be used to introspect the result of the operation.
+=over 4
+
+=item new example
+
+  # given qr(something to match against)
+
+  my $re = Data::Object::Regexp->new(qr(something to match against));
+
+=back
 
 =cut
 
 =head2 replace
 
-  # given qr(test)
-
-  $re->replace('this is a test', 'drill');
-  $re->replace('test 1 test 2 test 3', 'drill', 'gi');
+  replace(Str $arg1, Str $arg2) : StrObject
 
 The replace method performs a regular expression substitution on the given
 string. The first argument is the string to match against. The second argument
@@ -222,6 +203,73 @@ is the replacement string. The optional third argument might be a string
 representing flags to append to the s///x operator, such as 'g' or 'e'.  This
 method will always return a L<Data::Object::Replace> object which can be
 used to introspect the result of the operation.
+
+=over 4
+
+=item replace example
+
+  # given qr(test)
+
+  $re->replace('this is a test', 'drill');
+  $re->replace('test 1 test 2 test 3', 'drill', 'gi');
+
+=back
+
+=cut
+
+=head2 roles
+
+  roles() : ArrayRef
+
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item roles example
+
+  # given $regexp
+
+  $regexp->roles;
+
+=back
+
+=cut
+
+=head2 rules
+
+  rules() : ArrayRef
+
+The rules method returns consumed rules.
+
+=over 4
+
+=item rules example
+
+  my $rules = $regexp->rules();
+
+=back
+
+=cut
+
+=head2 search
+
+  search(Str $arg1) : SearchObject
+
+The search method performs a regular expression match against the given string
+This method will always return a L<Data::Object::Search> object which
+can be used to introspect the result of the operation.
+
+=over 4
+
+=item search example
+
+  # given qr((test))
+
+  $re->search('this is a test');
+  $re->search('this does not match', 'gi');
+
+=back
 
 =cut
 

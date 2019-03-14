@@ -24,7 +24,7 @@ in the array. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-unique() : DoArray
+unique() : ArrayObject
 
 =type
 

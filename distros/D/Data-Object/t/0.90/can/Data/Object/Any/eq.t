@@ -21,7 +21,7 @@ The eq method returns truthy if argument and object data are equal.
 
 =signature
 
-eq(Any $arg1) : DoNum
+eq(Any $arg1) : NumObject
 
 =type
 

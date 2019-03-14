@@ -201,110 +201,190 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  # given \*main
-
-  my $scalar = Data::Object::Scalar->new(\*main);
-
-The new method expects a scalar reference and returns a new class instance.
-
-=cut
-
-=head2 roles
-
-  # given $scalar
-
-  $scalar->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=cut
-
-=head2 rules
-
-  my $rules = $scalar->rules;
-
-The rules method returns consumed rules.
-
-=cut
-
 =head2 defined
 
-  # given $scalar
-
-  $scalar->defined; # 1
+  defined() : NumObject
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
 L<Data::Object::Number> object.
 
+=over 4
+
+=item defined example
+
+  # given $scalar
+
+  $scalar->defined; # 1
+
+=back
+
 =cut
 
 =head2 eq
+
+  eq(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item eq example
 
   # given $scalar
 
   $scalar->eq; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 ge
 
+  ge(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item ge example
+
   # given $scalar
 
   $scalar->ge; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 gt
 
+  gt(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item gt example
+
   # given $scalar
 
   $scalar->gt; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 le
 
+  le(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item le example
+
   # given $scalar
 
   $scalar->le; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 lt
 
+  lt(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item lt example
+
   # given $scalar
 
   $scalar->lt; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 ne
 
+  ne(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item ne example
+
   # given $scalar
 
   $scalar->ne; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
+
+=cut
+
+=head2 new
+
+  new(ScalarRef $arg1) : ScalarObject
+
+The new method expects a scalar reference and returns a new class instance.
+
+=over 4
+
+=item new example
+
+  # given \*main
+
+  my $scalar = Data::Object::Scalar->new(\*main);
+
+=back
+
+=cut
+
+=head2 roles
+
+  roles() : ArrayRef
+
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item roles example
+
+  # given $scalar
+
+  $scalar->roles;
+
+=back
+
+=cut
+
+=head2 rules
+
+  rules() : ArrayRef
+
+The rules method returns consumed rules.
+
+=over 4
+
+=item rules example
+
+  my $rules = $scalar->rules;
+
+=back
 
 =cut
 

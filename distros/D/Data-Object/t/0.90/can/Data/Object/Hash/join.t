@@ -24,7 +24,7 @@ This method will throw an exception if called.
 
 =signature
 
-join() : DoStr
+join() : StrObject
 
 =type
 

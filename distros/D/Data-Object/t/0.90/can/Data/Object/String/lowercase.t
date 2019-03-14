@@ -24,7 +24,7 @@ string object.
 
 =signature
 
-lowercase() : DoStr
+lowercase() : StrObject
 
 =type
 

@@ -24,7 +24,7 @@ returns a L<Data::Object::Float> object.
 
 =signature
 
-log() : DoFloat
+log() : FloatObject
 
 =type
 

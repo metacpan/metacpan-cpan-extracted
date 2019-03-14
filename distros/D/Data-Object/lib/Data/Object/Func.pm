@@ -119,44 +119,84 @@ This package implements the following methods.
 
 =cut
 
+=head2 configure
+
+  configure(ClassName $arg1, Any @args) : HashRef
+
+Converts positional args to named args.
+
+=over 4
+
+=item configure example
+
+  my $configure = $func->configure();
+
+=back
+
+=cut
+
 =head2 execute
+
+  execute() : Object
+
+Executes the function logic and returns the result.
+
+=over 4
+
+=item execute example
 
   my $func = Data::Object::Func->new();
 
   my $result = $func->execute;
 
-Executes the function logic and returns the result.
-
-=cut
-
-=head2 configure
-
-  my $configure = $func->configure();
-
-Converts positional args to named args.
+=back
 
 =cut
 
 =head2 mapping
 
-  my @data = $func->mapping;
+  mapping() : (Str)
 
 Returns the ordered list of named function object arguments.
+
+=over 4
+
+=item mapping example
+
+  my @data = $func->mapping;
+
+=back
 
 =cut
 
 =head2 recurse
 
-  my $recurse = $func->recurse();
+  recurse(Object $arg1, Any @args) : Any
 
 Recurses into the function object.
+
+=over 4
+
+=item recurse example
+
+  my $recurse = $func->recurse();
+
+=back
 
 =cut
 
 =head2 unpack
 
-  my $unpack = $func->unpack();
+  unpack() : (Any)
 
 Returns a list of positional args from the named args.
+
+=over 4
+
+=item unpack example
+
+  my $unpack = $func->unpack();
+
+=back
 
 =cut

@@ -23,7 +23,7 @@ results of the regular expression operation.
 
 =signature
 
-postmatched() : DoStr | DoUndef
+postmatched() : StrObject | UndefObject
 
 =type
 

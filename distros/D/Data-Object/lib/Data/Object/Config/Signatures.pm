@@ -174,51 +174,99 @@ This package implements the following functions.
 
 =cut
 
-=head2 settings
-
-  my $settings = settings();
-
-The settings function returns the settings for Function::Parameters
-configuration.
-
-=cut
-
-=head2 func_settings
-
-  my $func_settings = func_settings();
-
-The func_settings function returns the fun-keyword configuration.
-
-=cut
-
-=head2 meth_settings
-
-  my $meth_settings = meth_settings();
-
-The meth_settings function returns the method-keyword configuration.
-
-=cut
-
 =head2 aftr_settings
 
-  my $aftr_settings = aftr_settings();
+  aftr_settings(Str $arg1, Object $arg2) : (Str, HashRef)
 
 The aftr_settings function returns the after-keyword configuration.
 
-=cut
+=over 4
 
-=head2 befr_settings
+=item aftr_settings example
 
-  my $befr_settings = befr_settings();
+  my $aftr_settings = aftr_settings();
 
-The befr_settings function returns the before-keyword configuration.
+=back
 
 =cut
 
 =head2 arnd_settings
 
-  my $arnd_settings = arnd_settings();
+  arnd_settings(Str $arg1, Object $arg2) : (Str, HashRef)
 
 The arnd_settings function returns the around-keyword configuration.
+
+=over 4
+
+=item arnd_settings example
+
+  my $arnd_settings = arnd_settings();
+
+=back
+
+=cut
+
+=head2 befr_settings
+
+  befr_settings(Str $arg1, Object $arg2) : (Str, HashRef)
+
+The befr_settings function returns the before-keyword configuration.
+
+=over 4
+
+=item befr_settings example
+
+  my $befr_settings = befr_settings();
+
+=back
+
+=cut
+
+=head2 func_settings
+
+  func_settings(Str $arg1, Object $arg2) : (Str, HashRef)
+
+The func_settings function returns the fun-keyword configuration.
+
+=over 4
+
+=item func_settings example
+
+  my $func_settings = func_settings();
+
+=back
+
+=cut
+
+=head2 meth_settings
+
+  meth_settings(Str $arg1, Object $arg2) : (Str, HashRef)
+
+The meth_settings function returns the method-keyword configuration.
+
+=over 4
+
+=item meth_settings example
+
+  my $meth_settings = meth_settings();
+
+=back
+
+=cut
+
+=head2 settings
+
+  settings(Str $arg1, Any @args) : HashRef
+
+The settings function returns the settings for Function::Parameters
+configuration.
+
+=over 4
+
+=item settings example
+
+  my $settings = settings();
+
+=back
 
 =cut

@@ -30,7 +30,7 @@ object.
 
 =signature
 
-iterator() : DoCode
+iterator() : CodeObject
 
 =type
 

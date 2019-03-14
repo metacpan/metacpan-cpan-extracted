@@ -24,7 +24,7 @@ from the string. This method returns a string value.
 
 =signature
 
-trim() : DoStr
+trim() : StrObject
 
 =type
 

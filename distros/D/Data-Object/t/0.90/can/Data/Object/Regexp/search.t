@@ -26,7 +26,7 @@ can be used to introspect the result of the operation.
 
 =signature
 
-search(Str $arg1) : DoSearch
+search(Str $arg1) : SearchObject
 
 =type
 

@@ -24,7 +24,7 @@ data type object to be determined after execution.
 
 =signature
 
-random() : DoNum
+random() : NumObject
 
 =type
 

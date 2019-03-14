@@ -24,7 +24,7 @@ string object. This method is an alias to the lowercase method.
 
 =signature
 
-lc() : DoStr
+lc() : StrObject
 
 =type
 

@@ -25,7 +25,7 @@ method returns a L<Data::Object::Number> object.
 
 =signature
 
-sum() : DoNum
+sum() : NumObject
 
 =type
 

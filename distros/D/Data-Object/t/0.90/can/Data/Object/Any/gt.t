@@ -21,7 +21,7 @@ The gt method returns truthy if argument is greater then the object data.
 
 =signature
 
-gt(Any $arg1) : DoNum
+gt(Any $arg1) : NumObject
 
 =type
 

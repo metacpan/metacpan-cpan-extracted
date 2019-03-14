@@ -204,109 +204,189 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  # given undef
-
-  my $undef = Data::Object::Undef->new(undef);
-
-The new method expects an undefined value and returns a new class instance.
-
-=cut
-
-=head2 roles
-
-  # given $undef
-
-  $undef->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=cut
-
-=head2 rules
-
-  my $rules = $undef->rules();
-
-The rules method returns consumed rules.
-
-=cut
-
 =head2 defined
+
+  defined() : NumObject
+
+The defined method always returns false. This method returns a
+L<Data::Object::Number> object.
+
+=over 4
+
+=item defined example
 
   # given undef
 
   $undef->defined ? 'Yes' : 'No'; # No
 
-The defined method always returns false. This method returns a
-L<Data::Object::Number> object.
+=back
 
 =cut
 
 =head2 eq
 
+  eq(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item eq example
+
   # given $undef
 
   $undef->eq; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
-
-=cut
-
-=head2 gt
-
-  # given $undef
-
-  $undef->gt; # exception thrown
-
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 ge
 
+  ge(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item ge example
+
   # given $undef
 
   $undef->ge; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
-=head2 lt
+=head2 gt
 
-  # given $undef
-
-  $undef->lt; # exception thrown
+  gt(Any $arg1) : NumObject
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=over 4
+
+=item gt example
+
+  # given $undef
+
+  $undef->gt; # exception thrown
+
+=back
 
 =cut
 
 =head2 le
 
+  le(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item le example
+
   # given $undef
 
   $undef->le; # exception thrown
 
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg1) : NumObject
+
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
+
+=over 4
+
+=item lt example
+
+  # given $undef
+
+  $undef->lt; # exception thrown
+
+=back
 
 =cut
 
 =head2 ne
 
+  ne(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item ne example
+
   # given $undef
 
   $undef->ne; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
+
+=cut
+
+=head2 new
+
+  new(Undef $arg1) : UndefObject
+
+The new method expects an undefined value and returns a new class instance.
+
+=over 4
+
+=item new example
+
+  # given undef
+
+  my $undef = Data::Object::Undef->new(undef);
+
+=back
+
+=cut
+
+=head2 roles
+
+  roles() : ArrayRef
+
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item roles example
+
+  # given $undef
+
+  $undef->roles;
+
+=back
+
+=cut
+
+=head2 rules
+
+  rules() : ArrayRef
+
+The rules method returns consumed rules.
+
+=over 4
+
+=item rules example
+
+  my $rules = $undef->rules();
+
+=back
 
 =cut
 

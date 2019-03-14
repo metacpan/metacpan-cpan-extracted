@@ -26,7 +26,7 @@ C<type_scalar> function is an alias to this function.
 
 =signature
 
-data_scalar(Any $arg1) : DoScalar
+data_scalar(Any $arg1) : ScalarObject
 
 =type
 

@@ -28,7 +28,7 @@ object.
 
 =signature
 
-merge() : DoHash
+merge() : HashObject
 
 =type
 

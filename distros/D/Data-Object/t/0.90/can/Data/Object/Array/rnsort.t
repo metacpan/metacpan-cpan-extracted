@@ -25,7 +25,7 @@ L<Data::Object::Array> object.
 
 =signature
 
-rnsort() : DoArray
+rnsort() : ArrayObject
 
 =type
 

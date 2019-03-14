@@ -26,7 +26,7 @@ string object.
 
 =signature
 
-chomp() : DoStr
+chomp() : StrObject
 
 =type
 

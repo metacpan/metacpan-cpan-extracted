@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-Class-DeploymentHandler",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "DBIx::Class::DeploymentHandler",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "Log::Contextual" => "0.005005",
     "Module::Runtime" => "0.001",
     "Moo" => 2,
-    "Package::Variant" => 0,
+    "MooX::Role::Parameterized" => "0.082",
     "SQL::Translator" => "0.11005",
     "Sub::Exporter" => 0,
     "Sub::Exporter::Progressive" => 0,
@@ -32,7 +33,6 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "Type::Tiny" => "1.004004",
     "autodie" => 0,
-    "namespace::autoclean" => 0,
     "parent" => "0.225",
     "version" => "0.9924"
   },
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Requires" => "0.06",
     "aliased" => 0
   },
-  "VERSION" => "0.002228",
+  "VERSION" => "0.002230",
   "test" => {
     "TESTS" => "t/*.t t/bugs/*.t t/deploy_methods/*.t t/version_handlers/*.t t/version_storages/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "Log::Contextual" => "0.005005",
   "Module::Runtime" => "0.001",
   "Moo" => 2,
-  "Package::Variant" => 0,
+  "MooX::Role::Parameterized" => "0.082",
   "SQL::Translator" => "0.11005",
   "Sub::Exporter" => 0,
   "Sub::Exporter::Progressive" => 0,
@@ -74,7 +74,6 @@ my %FallbackPrereqs = (
   "Type::Tiny" => "1.004004",
   "aliased" => 0,
   "autodie" => 0,
-  "namespace::autoclean" => 0,
   "parent" => "0.225",
   "version" => "0.9924"
 );

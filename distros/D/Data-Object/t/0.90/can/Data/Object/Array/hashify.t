@@ -28,7 +28,7 @@ will be dropped. This method returns a L<Data::Object::Hash> object.
 
 =signature
 
-hashify(CodeRef $arg1, Any $arg2) : DoHash
+hashify(CodeRef $arg1, Any $arg2) : HashObject
 
 =type
 

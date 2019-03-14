@@ -23,7 +23,7 @@ information about the results of the regular expression operation.
 
 =signature
 
-name() : DoStr
+name() : StrObject
 
 =type
 

@@ -29,7 +29,7 @@ returns a L<Data::Object::Hash> object.
 
 =signature
 
-map(CodeRef $arg1, Any $arg2) : DoArray
+map(CodeRef $arg1, Any $arg2) : ArrayObject
 
 =type
 

@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::Dad;
-$DBIx::Class::DeploymentHandler::Dad::VERSION = '0.002228';
+$DBIx::Class::DeploymentHandler::Dad::VERSION = '0.002230';
 # ABSTRACT: Parent class for DeploymentHandlers
 
 use Moo;

@@ -26,7 +26,7 @@ returns a L<Data::Object::Number> object.
 
 =signature
 
-exists(Int $arg1) : DoNum
+exists(Int $arg1) : NumObject
 
 =type
 

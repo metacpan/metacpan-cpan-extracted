@@ -24,7 +24,7 @@ method returns a L<Data::Object::Float> object.
 
 =signature
 
-cos() : DoNum
+cos() : NumObject
 
 =type
 

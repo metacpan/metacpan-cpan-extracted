@@ -24,7 +24,7 @@ string object. This method is an alias to the uppercase method.
 
 =signature
 
-uc() : DoStr
+uc() : StrObject
 
 =type
 

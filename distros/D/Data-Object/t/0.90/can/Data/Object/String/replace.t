@@ -30,7 +30,7 @@ string object.
 
 =signature
 
-replace(Str $arg1, Str $arg2) : DoStr
+replace(Str $arg1, Str $arg2) : StrObject
 
 =type
 

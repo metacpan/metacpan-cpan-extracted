@@ -28,7 +28,7 @@ Note: This method modifies the array.
 
 =signature
 
-rotate() : DoArray
+rotate() : ArrayObject
 
 =type
 

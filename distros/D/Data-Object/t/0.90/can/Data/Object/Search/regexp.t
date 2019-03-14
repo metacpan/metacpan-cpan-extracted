@@ -23,7 +23,7 @@ expression operation.
 
 =signature
 
-regexp() : DoRegexp
+regexp() : RegexpObject
 
 =type
 

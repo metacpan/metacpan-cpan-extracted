@@ -130,6 +130,14 @@ This package implements the following methods.
 
 =head2 execute
 
+  execute() : Object
+
+Executes the function logic and returns the result.
+
+=over 4
+
+=item execute example
+
   my $data = Data::Object::Hash->new({3,[4,5,6],7,{8,8,9,9}});
 
   my $func = Data::Object::Func::Hash::Fold->new(
@@ -138,14 +146,22 @@ This package implements the following methods.
 
   my $result = $func->execute;
 
-Executes the function logic and returns the result.
+=back
 
 =cut
 
 =head2 mapping
 
-  my @data = $self->mapping;
+  mapping() : (Str)
 
 Returns the ordered list of named function object arguments.
+
+=over 4
+
+=item mapping example
+
+  my @data = $self->mapping;
+
+=back
 
 =cut

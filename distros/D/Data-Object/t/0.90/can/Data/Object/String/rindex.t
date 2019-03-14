@@ -37,7 +37,7 @@ be determined after execution.
 
 =signature
 
-rindex(Str $arg1, Num $arg2) : DoNum
+rindex(Str $arg1, Num $arg2) : NumObject
 
 =type
 

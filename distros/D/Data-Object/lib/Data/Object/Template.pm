@@ -99,18 +99,34 @@ This package implements the following methods.
 
 =head2 buildproxy
 
+  BUILDPROXY(Any @args) : Any
+
+The BUILDPROXY method handles resolving missing-methods via autoloaded. This
+method is never called directly.
+
+=over 4
+
+=item BUILDPROXY example
+
   # given $template
 
   $template->BUILDPROXY(...);
 
   # ...
 
-The BUILDPROXY method handles resolving missing-methods via autoloaded. This
-method is never called directly.
+=back
 
 =cut
 
 =head2 origin
+
+  origin() : Str
+
+The origin method returns the package name of the proxy used.
+
+=over 4
+
+=item origin example
 
   # given $template
 
@@ -118,23 +134,19 @@ method is never called directly.
 
   # ...
 
-The origin method returns the package name of the proxy used.
-
-=cut
-
-=head2 source
-
-  # given $source
-
-  $template->source();
-
-  # Template::Tiny
-
-The source method returns the underlying proxy object used.
+=back
 
 =cut
 
 =head2 render
+
+  render(Str $arg1, HashRef $arg2) : Str
+
+The render method renders the given template interpolating the given variables.
+
+=over 4
+
+=item render example
 
   # given $template
 
@@ -142,6 +154,26 @@ The source method returns the underlying proxy object used.
 
   # ...
 
-The render method renders the given template interpolating the given variables.
+=back
+
+=cut
+
+=head2 source
+
+  source() : Object
+
+The source method returns the underlying proxy object used.
+
+=over 4
+
+=item source example
+
+  # given $source
+
+  $template->source();
+
+  # Template::Tiny
+
+=back
 
 =cut

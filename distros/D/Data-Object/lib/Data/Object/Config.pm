@@ -576,323 +576,619 @@ This package implements the following functions.
 
 =head2 choose
 
-  choose('class');
+  choose(Str $arg1) : ArrayRef
 
 The choose function returns the configuration (plans) based on the argument passed.
 
-=cut
+=over 4
 
-=head2 prepare
+=item choose example
 
-  prepare($package, $type);
+  choose('class');
 
-The prepare function returns configuration plans based on the arguments passed.
-
-=cut
-
-=head2 process
-
-  process($caller, $plans);
-
-The process function executes a series of plans on behalf of the caller.
-
-=cut
-
-=head2 prepare_add
-
-  prepare_add($package, $function);
-
-The prepare_add function returns an add-plan for the arguments passed.
-
-=cut
-
-=head2 process_add
-
-  process_add($caller, $plan);
-
-The process_add function executes the add-plan on behalf of the caller.
-
-=cut
-
-=head2 prepare_call
-
-  prepare_call($function, @args);
-
-The prepare_call function returns a call-plan for the arguments passed.
-
-=cut
-
-=head2 process_call
-
-  process_call($caller, $plan);
-
-The process_call function executes the call-plan on behalf of the caller.
-
-=cut
-
-=head2 prepare_use
-
-  prepare_use($package, @args);
-
-The prepare_use function returns a use-plan for the arguments passed.
-
-=cut
-
-=head2 process_use
-
-  process_use($caller, $plan);
-
-The process_use function executes the use-plan on behalf of the caller.
-
-=cut
-
-=head2 subject
-
-  subject('-Role', 'Role');
-
-The subject function returns truthy if both arguments match alphanumerically (not case-sensitive).
+=back
 
 =cut
 
 =head2 config
 
-  my $plans = config;
+  config(ArrayRef $arg1) : ArrayRef
 
 The config function returns plans for configuring a package with the standard
 L<Data::Object> setup.
 
-=cut
+=over 4
 
-=head2 config_cli
+=item config example
 
-  my $plans = config_cli;
+  my $plans = config;
 
-The config_cli function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Cli>.
+=back
 
 =cut
 
 =head2 config_array
 
-  my $plans = config_array;
+  config_array() : ArrayRef
 
 The config_array function returns plans for configuring the package to be a
 L<Data::Object::Class> which extends L<Data::Object::Array>.
 
-=cut
+=over 4
 
-=head2 config_code
+=item config_array example
 
-  my $plans = config_code;
+  my $plans = config_array;
 
-The config_code function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Code>.
-
-=cut
-
-=head2 config_dispatch
-
-  my $plans = config_dispatch;
-
-The config_dispatch function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Dispatch>.
-
-=cut
-
-=head2 config_exception
-
-  my $plans = config_exception;
-
-The config_exception function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Exception>.
-
-=cut
-
-=head2 config_float
-
-  my $plans = config_float;
-
-The config_float function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Float>.
-
-=cut
-
-=head2 config_hash
-
-  my $plans = config_hash;
-
-The config_hash function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Hash>.
-
-=cut
-
-=head2 config_integer
-
-  my $plans = config_integer;
-
-The config_integer function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Integer>.
-
-=cut
-
-=head2 config_json
-
-  my $plans = config_json;
-
-The config_json function returns plans for configuring the package to have a
-C<json> function that loads a L<Data::Object::Json> object.
-
-=cut
-
-=head2 config_kind
-
-  my $plans = config_kind;
-
-The config_kind function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Kind>.
-
-=cut
-
-=head2 config_number
-
-  my $plans = config_number;
-
-The config_number function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Number>.
-
-=cut
-
-=head2 config_path
-
-  my $plans = config_path;
-
-The config_path function returns plans for configuring the package to have a
-C<path> function that loads a L<Data::Object::Path> object.
-
-=cut
-
-=head2 config_regexp
-
-  my $plans = config_regexp;
-
-The config_regexp function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Regexp>.
-
-=cut
-
-=head2 config_replace
-
-  my $plans = config_replace;
-
-The config_replace function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Replace>.
-
-=cut
-
-=head2 config_scalar
-
-  my $plans = config_scalar;
-
-The config_scalar function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Scalar>.
-
-=cut
-
-=head2 config_search
-
-  my $plans = config_search;
-
-The config_search function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Search>.
-
-=cut
-
-=head2 config_state
-
-  my $plans = config_state;
-
-The config_state function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::State>.
-
-=cut
-
-=head2 config_string
-
-  my $plans = config_string;
-
-The config_string function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::String>.
-
-=cut
-
-=head2 config_tmpl
-
-  my $plans = config_tmpl;
-
-The config_tmpl function returns plans for configuring the package to have a
-C<tmpl> function that loads a L<Data::Object::Template> object.
-
-=cut
-
-=head2 config_try
-
-  my $plans = config_try;
-
-The config_try function returns plans for configuring the package to have
-C<try> and C<catch> constructs for trapping exceptions.
-
-=cut
-
-=head2 config_type
-
-  my $plans = config_type;
-
-The config_type function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Type>.
-
-=cut
-
-=head2 config_yaml
-
-  my $plans = config_yaml;
-
-The config_yaml function returns plans for configuring the package to have a
-C<yaml> function that loads a L<Data::Object::Yaml> object.
-
-=cut
-
-=head2 config_undef
-
-  my $plans = config_undef;
-
-The config_undef function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Undef>.
+=back
 
 =cut
 
 =head2 config_class
 
-  my $plans = config_class;
+  config_class() : ArrayRef
 
 The config_class function returns plans for configuring the package to be a
 L<Data::Object::Class>.
+
+=over 4
+
+=item config_class example
+
+  my $plans = config_class;
+
+=back
+
+=cut
+
+=head2 config_cli
+
+  config_cli() : ArrayRef
+
+The config_cli function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Cli>.
+
+=over 4
+
+=item config_cli example
+
+  my $plans = config_cli;
+
+=back
+
+=cut
+
+=head2 config_code
+
+  config_code() : ArrayRef
+
+The config_code function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Code>.
+
+=over 4
+
+=item config_code example
+
+  my $plans = config_code;
+
+=back
+
+=cut
+
+=head2 config_dispatch
+
+  config_dispatch() : ArrayRef
+
+The config_dispatch function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Dispatch>.
+
+=over 4
+
+=item config_dispatch example
+
+  my $plans = config_dispatch;
+
+=back
+
+=cut
+
+=head2 config_exception
+
+  config_exception() : ArrayRef
+
+The config_exception function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Exception>.
+
+=over 4
+
+=item config_exception example
+
+  my $plans = config_exception;
+
+=back
+
+=cut
+
+=head2 config_float
+
+  config_float() : ArrayRef
+
+The config_float function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Float>.
+
+=over 4
+
+=item config_float example
+
+  my $plans = config_float;
+
+=back
+
+=cut
+
+=head2 config_hash
+
+  config_hash() : ArrayRef
+
+The config_hash function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Hash>.
+
+=over 4
+
+=item config_hash example
+
+  my $plans = config_hash;
+
+=back
+
+=cut
+
+=head2 config_integer
+
+  config_integer() : ArrayRef
+
+The config_integer function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Integer>.
+
+=over 4
+
+=item config_integer example
+
+  my $plans = config_integer;
+
+=back
+
+=cut
+
+=head2 config_json
+
+  config_json() : ArrayRef
+
+The config_json function returns plans for configuring the package to have a
+C<json> function that loads a L<Data::Object::Json> object.
+
+=over 4
+
+=item config_json example
+
+  my $plans = config_json;
+
+=back
+
+=cut
+
+=head2 config_kind
+
+  config_kind() : ArrayRef
+
+The config_kind function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Kind>.
+
+=over 4
+
+=item config_kind example
+
+  my $plans = config_kind;
+
+=back
+
+=cut
+
+=head2 config_number
+
+  config_number() : ArrayRef
+
+The config_number function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Number>.
+
+=over 4
+
+=item config_number example
+
+  my $plans = config_number;
+
+=back
+
+=cut
+
+=head2 config_path
+
+  config_path() : ArrayRef
+
+The config_path function returns plans for configuring the package to have a
+C<path> function that loads a L<Data::Object::Path> object.
+
+=over 4
+
+=item config_path example
+
+  my $plans = config_path;
+
+=back
+
+=cut
+
+=head2 config_regexp
+
+  config_regexp() : ArrayRef
+
+The config_regexp function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Regexp>.
+
+=over 4
+
+=item config_regexp example
+
+  my $plans = config_regexp;
+
+=back
+
+=cut
+
+=head2 config_replace
+
+  config_replace() : ArrayRef
+
+The config_replace function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Replace>.
+
+=over 4
+
+=item config_replace example
+
+  my $plans = config_replace;
+
+=back
 
 =cut
 
 =head2 config_role
 
-  my $plans = config_role;
+  config_role() : ArrayRef
 
 The config_role function returns plans for configuring the package to be a
 L<Data::Object::Role>.
+
+=over 4
+
+=item config_role example
+
+  my $plans = config_role;
+
+=back
 
 =cut
 
 =head2 config_rule
 
-  my $plans = config_rule;
+  config_rule() : ArrayRef
 
 The config_rule function returns plans for configuring a package to be a
 L<Data::Object::Rule>.
+
+=over 4
+
+=item config_rule example
+
+  my $plans = config_rule;
+
+=back
+
+=cut
+
+=head2 config_scalar
+
+  config_scalar() : ArrayRef
+
+The config_scalar function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Scalar>.
+
+=over 4
+
+=item config_scalar example
+
+  my $plans = config_scalar;
+
+=back
+
+=cut
+
+=head2 config_search
+
+  config_search() : ArrayRef
+
+The config_search function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Search>.
+
+=over 4
+
+=item config_search example
+
+  my $plans = config_search;
+
+=back
+
+=cut
+
+=head2 config_state
+
+  config_state() : ArrayRef
+
+The config_state function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::State>.
+
+=over 4
+
+=item config_state example
+
+  my $plans = config_state;
+
+=back
+
+=cut
+
+=head2 config_string
+
+  config_string() : ArrayRef
+
+The config_string function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::String>.
+
+=over 4
+
+=item config_string example
+
+  my $plans = config_string;
+
+=back
+
+=cut
+
+=head2 config_tmpl
+
+  config_tmpl() : ArrayRef
+
+The config_tmpl function returns plans for configuring the package to have a
+C<tmpl> function that loads a L<Data::Object::Template> object.
+
+=over 4
+
+=item config_tmpl example
+
+  my $plans = config_tmpl;
+
+=back
+
+=cut
+
+=head2 config_try
+
+  config_try() : ArrayRef
+
+The config_try function returns plans for configuring the package to have
+C<try> and C<catch> constructs for trapping exceptions.
+
+=over 4
+
+=item config_try example
+
+  my $plans = config_try;
+
+=back
+
+=cut
+
+=head2 config_type
+
+  config_type() : ArrayRef
+
+The config_type function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Type>.
+
+=over 4
+
+=item config_type example
+
+  my $plans = config_type;
+
+=back
+
+=cut
+
+=head2 config_undef
+
+  config_undef() : ArrayRef
+
+The config_undef function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Undef>.
+
+=over 4
+
+=item config_undef example
+
+  my $plans = config_undef;
+
+=back
+
+=cut
+
+=head2 config_yaml
+
+  config_yaml() : ArrayRef
+
+The config_yaml function returns plans for configuring the package to have a
+C<yaml> function that loads a L<Data::Object::Yaml> object.
+
+=over 4
+
+=item config_yaml example
+
+  my $plans = config_yaml;
+
+=back
+
+=cut
+
+=head2 prepare
+
+  prepare(Str $arg1, Str $arg2) : ArrayRef
+
+The prepare function returns configuration plans based on the arguments passed.
+
+=over 4
+
+=item prepare example
+
+  prepare($package, $type);
+
+=back
+
+=cut
+
+=head2 prepare_add
+
+  prepare_add(Str $arg1, Str $arg2) : ArrayRef
+
+The prepare_add function returns an add-plan for the arguments passed.
+
+=over 4
+
+=item prepare_add example
+
+  prepare_add($package, $function);
+
+=back
+
+=cut
+
+=head2 prepare_call
+
+  prepare_call(Str $arg1, Any @args) : ArrayRef
+
+The prepare_call function returns a call-plan for the arguments passed.
+
+=over 4
+
+=item prepare_call example
+
+  prepare_call($function, @args);
+
+=back
+
+=cut
+
+=head2 prepare_use
+
+  prepare_use(Str $arg1, Any @args) : ArrayRef
+
+The prepare_use function returns a use-plan for the arguments passed.
+
+=over 4
+
+=item prepare_use example
+
+  prepare_use($package, @args);
+
+=back
+
+=cut
+
+=head2 process
+
+  process(Str $arg1, ArrayRef $arg2) : Any
+
+The process function executes a series of plans on behalf of the caller.
+
+=over 4
+
+=item process example
+
+  process($caller, $plans);
+
+=back
+
+=cut
+
+=head2 process_add
+
+  process_add(Str $arg1, ArrayRef $arg2) : Any
+
+The process_add function executes the add-plan on behalf of the caller.
+
+=over 4
+
+=item process_add example
+
+  process_add($caller, $plan);
+
+=back
+
+=cut
+
+=head2 process_call
+
+  process_call(Str $arg1, ArrayRef $arg2) : Any
+
+The process_call function executes the call-plan on behalf of the caller.
+
+=over 4
+
+=item process_call example
+
+  process_call($caller, $plan);
+
+=back
+
+=cut
+
+=head2 process_use
+
+  process_use(Str $arg1, ArrayRef $arg2) : Any
+
+The process_use function executes the use-plan on behalf of the caller.
+
+=over 4
+
+=item process_use example
+
+  process_use($caller, $plan);
+
+=back
+
+=cut
+
+=head2 subject
+
+  subject(Str $arg1, Str $arg2) : Int
+
+The subject function returns truthy if both arguments match alphanumerically (not case-sensitive).
+
+=over 4
+
+=item subject example
+
+  subject('-Role', 'Role');
+
+=back
 
 =cut

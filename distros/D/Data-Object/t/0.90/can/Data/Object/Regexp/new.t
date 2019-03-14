@@ -24,7 +24,7 @@ instance.
 
 =signature
 
-new(RegexpRef $arg1) : DoRegexp
+new(RegexpRef $arg1) : RegexpObject
 
 =type
 

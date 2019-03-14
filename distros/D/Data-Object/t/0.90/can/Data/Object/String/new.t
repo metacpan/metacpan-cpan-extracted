@@ -23,7 +23,7 @@ The new method expects a string and returns a new class instance.
 
 =signature
 
-new(Str $arg1) : DoStr
+new(Str $arg1) : StrObject
 
 =type
 

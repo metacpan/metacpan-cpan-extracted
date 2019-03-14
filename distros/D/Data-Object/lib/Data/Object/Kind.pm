@@ -62,17 +62,34 @@ This package implements the following methods.
 
 =head2 class
 
+  class() : Str
+
+The class method returns the class name for the given class or object.
+
+=over 4
+
+=item class example
+
   # given $self (Foo::Bar)
 
   $self->class();
 
   # Foo::Bar (string)
 
-The class method returns the class name for the given class or object.
+=back
 
 =cut
 
 =head2 space
+
+  space(Str $arg1) : Object
+
+The space method returns a L<Data::Object::Space> object for the given class,
+object or argument.
+
+=over 4
+
+=item space example
 
   # given $self (Foo::Bar)
 
@@ -84,7 +101,6 @@ The class method returns the class name for the given class or object.
 
   # Foo::Baz (space object)
 
-The space method returns a L<Data::Object::Space> object for the given class,
-object or argument.
+=back
 
 =cut

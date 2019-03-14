@@ -21,7 +21,7 @@ Output stringified object data.
 
 =signature
 
-print() : DoNum
+print() : NumObject
 
 =type
 

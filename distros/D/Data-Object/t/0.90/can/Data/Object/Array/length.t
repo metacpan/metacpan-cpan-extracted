@@ -24,7 +24,7 @@ returns a L<Data::Object::Number> object.
 
 =signature
 
-length() : DoNum
+length() : NumObject
 
 =type
 

@@ -21,7 +21,7 @@ Output stringified object data with newline.
 
 =signature
 
-say() : DoNum
+say() : NumObject
 
 =type
 

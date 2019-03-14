@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::VersionStorage::Deprecated;
-$DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VERSION = '0.002228';
+$DBIx::Class::DeploymentHandler::VersionStorage::Deprecated::VERSION = '0.002230';
 use Moo;
 use DBIx::Class::DeploymentHandler::LogImporter ':log';
 use DBIx::Class::DeploymentHandler::Types -all;

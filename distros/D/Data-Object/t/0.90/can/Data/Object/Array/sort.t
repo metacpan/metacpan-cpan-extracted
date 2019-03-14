@@ -24,7 +24,7 @@ sorted alphanumerically. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-sort() : DoArray
+sort() : ArrayObject
 
 =type
 

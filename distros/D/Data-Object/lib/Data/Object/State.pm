@@ -90,8 +90,16 @@ This package implements the following methods.
 
 =head2 renew
 
-  my $RENEW = $self->RENEW(@args);
+  RENEW(Any @args) : Object
 
 The RENEW method resets the state and returns a new singleton.
+
+=over 4
+
+=item RENEW example
+
+  my $RENEW = $self->RENEW(@args);
+
+=back
 
 =cut

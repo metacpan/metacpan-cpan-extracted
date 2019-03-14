@@ -71,6 +71,20 @@ like( $result->error, qr{doesn't exist}, 'infile not exists' );
     is( $sheet->{Cells}[13][4]{Val}, "G", "Cell content 2" );
 }
 
+{    # population --min --max
+    my $temp = Path::Tiny->tempfile;
+    $result = test_app( 'App::Fasops' => [ qw(xlsx t/example.fas --min 0.3 --max 0.7 -o ), $temp->stringify ] );
+    is( ( scalar grep {/\S/} split( /\n/, $result->stdout ) ), 3, 'line count' );
+    unlike( $result->stdout, qr{Section \[4}, 'sections 4 not writed' );
+
+    my $xlsx  = Spreadsheet::XLSX->new( $temp->stringify );
+    my $sheet = $xlsx->{Worksheet}[0];
+
+    # row-col
+    is( $sheet->{Cells}[13][1]{Val}, "D1", "Cell content 1" );
+    is( $sheet->{Cells}[13][5]{Val}, "T", "Cell content 2" );
+}
+
 {    # outgroup
     my $temp = Path::Tiny->tempfile;
     $result = test_app(

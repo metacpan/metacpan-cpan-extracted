@@ -584,52 +584,29 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  # given abcedfghi
-
-  my $string = Data::Object::String->new('abcedfghi');
-
-The new method expects a string and returns a new class instance.
-
-=cut
-
-=head2 roles
-
-  # given $string
-
-  $string->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns an array value.
-
-=cut
-
-=head2 rules
-
-  my $rules = $any->rules();
-
-The rules method returns consumed rules.
-
-=cut
-
 =head2 append
 
-  # given 'firstname'
-
-  $string->append('lastname'); # firstname lastname
+  append() : StrObject
 
 The append method modifies and returns the string with the argument list
 appended to it separated using spaces. This method returns a
 string object.
 
+=over 4
+
+=item append example
+
+  # given 'firstname'
+
+  $string->append('lastname'); # firstname lastname
+
+=back
+
 =cut
 
 =head2 camelcase
 
-  # given 'hello world'
-
-  $string->camelcase; # HelloWorld
+  camelcase() : StrObject
 
 The camelcase method modifies the string such that it will no longer have any
 non-alphanumeric characters and each word (group of alphanumeric characters
@@ -637,46 +614,93 @@ separated by 1 or more non-alphanumeric characters) is capitalized. Note, this
 method modifies the string. This method returns a L<Data::Object::String>
 object.
 
+=over 4
+
+=item camelcase example
+
+  # given 'hello world'
+
+  $string->camelcase; # HelloWorld
+
+=back
+
 =cut
 
 =head2 chomp
 
-  # given "name, age, dob, email\n"
-
-  $string->chomp; # name, age, dob, email
+  chomp() : StrObject
 
 The chomp method is a safer version of the chop method, it's used to remove the
 newline (or the current value of $/) from the end of the string. Note, this
 method modifies and returns the string. This method returns a
 string object.
 
+=over 4
+
+=item chomp example
+
+  # given "name, age, dob, email\n"
+
+  $string->chomp; # name, age, dob, email
+
+=back
+
 =cut
 
 =head2 chop
 
-  # given "this is just a test."
-
-  $string->chop; # this is just a test
+  chop() : StrObject
 
 The chop method removes the last character of a string and returns the character
 chopped. It is much more efficient than "s/.$//s" because it neither scans nor
 copies the string. Note, this method modifies and returns the string. This
 method returns a string value.
 
+=over 4
+
+=item chop example
+
+  # given "this is just a test."
+
+  $string->chop; # this is just a test
+
+=back
+
 =cut
 
 =head2 concat
+
+  concat(Any $arg1) : StrObject
+
+The concat method modifies and returns the string with the argument list
+appended to it. This method returns a string value.
+
+=over 4
+
+=item concat example
 
   # given 'ABC'
 
   $string->concat('DEF', 'GHI'); # ABCDEFGHI
 
-The concat method modifies and returns the string with the argument list
-appended to it. This method returns a string value.
+=back
 
 =cut
 
 =head2 contains
+
+  contains(Str | RegexpRef $arg1) : NumObject
+
+The contains method searches the string for the string specified in the
+argument and returns true if found, otherwise returns false. If the argument is
+a string, the search will be performed using the core index function. If the
+argument is a regular expression reference, the search will be performed using
+the regular expression engine. This method returns a L<Data::Object::Number>
+object.
+
+=over 4
+
+=item contains example
 
   # given 'Nullam ultrices placerat nibh vel malesuada.'
 
@@ -686,74 +710,122 @@ appended to it. This method returns a string value.
   $string->contains(qr/trices/); # 1; true
   $string->contains(qr/itrices/); # 0; false
 
-The contains method searches the string for the string specified in the
-argument and returns true if found, otherwise returns false. If the argument is
-a string, the search will be performed using the core index function. If the
-argument is a regular expression reference, the search will be performed using
-the regular expression engine. This method returns a L<Data::Object::Number>
-object.
+=back
 
 =cut
 
 =head2 defined
 
-  # given $string
-
-  $string->defined; # 1
+  defined() : NumObject
 
 The defined method returns true if the object represents a value that meets the
 criteria for being defined, otherwise it returns false. This method returns a
 number object.
 
+=over 4
+
+=item defined example
+
+  # given $string
+
+  $string->defined; # 1
+
+=back
+
 =cut
 
 =head2 eq
+
+  eq(Any $arg1) : NumObject
+
+The eq method returns true if the argument provided is equal to the value
+represented by the object. This method returns a number value.
+
+=over 4
+
+=item eq example
 
   # given 'exciting'
 
   $string->eq('Exciting'); # 0
 
-The eq method returns true if the argument provided is equal to the value
-represented by the object. This method returns a number value.
+=back
 
 =cut
 
 =head2 ge
 
-  # given 'exciting'
-
-  $string->ge('Exciting'); # 1
+  ge(Any $arg1) : NumObject
 
 The ge method returns true if the argument provided is greater-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
 object.
 
+=over 4
+
+=item ge example
+
+  # given 'exciting'
+
+  $string->ge('Exciting'); # 1
+
+=back
+
 =cut
 
 =head2 gt
+
+  gt(Any $arg1) : NumObject
+
+The gt method returns true if the argument provided is greater-than the value
+represented by the object. This method returns a number value.
+
+=over 4
+
+=item gt example
 
   # given 'exciting'
 
   $string->gt('Exciting'); # 1
 
-The gt method returns true if the argument provided is greater-than the value
-represented by the object. This method returns a number value.
+=back
 
 =cut
 
 =head2 hex
 
-  # given '0xaf'
-
-  string->hex; # 175
+  hex() : Str
 
 The hex method returns the value resulting from interpreting the string as a
 hex string. This method returns a data type object to be determined after
 execution.
 
+=over 4
+
+=item hex example
+
+  # given '0xaf'
+
+  string->hex; # 175
+
+=back
+
 =cut
 
 =head2 index
+
+  index(Str $arg1, Num $arg2) : NumObject
+
+The index method searches for the argument within the string and returns the
+position of the first occurrence of the argument. This method optionally takes a
+second argument which would be the position within the string to start
+searching from (also known as the base). By default, starts searching from the
+beginning of the string. This method returns a data type object to be determined
+after execution.
+
+=over 4
+
+=item index example
 
   # given 'unexplainable'
 
@@ -764,106 +836,195 @@ execution.
   $string->index('explain', 3); # -1
   $string->index('explained'); # -1
 
-The index method searches for the argument within the string and returns the
-position of the first occurrence of the argument. This method optionally takes a
-second argument which would be the position within the string to start
-searching from (also known as the base). By default, starts searching from the
-beginning of the string. This method returns a data type object to be determined
-after execution.
+=back
 
 =cut
 
 =head2 lc
 
+  lc() : StrObject
+
+The lc method returns a lowercased version of the string. This method returns a
+string object. This method is an alias to the lowercase method.
+
+=over 4
+
+=item lc example
+
   # given 'EXCITING'
 
   $string->lc; # exciting
 
-The lc method returns a lowercased version of the string. This method returns a
-string object. This method is an alias to the lowercase method.
+=back
 
 =cut
 
 =head2 lcfirst
 
-  # given 'EXCITING'
-
-  $string->lcfirst; # eXCITING
+  lc() : StrObject
 
 The lcfirst method returns a the string with the first character lowercased.
 This method returns a string value.
 
-=cut
+=over 4
 
-=head2 length
-
-  # given 'longggggg'
-
-  $string->length; # 9
-
-The length method returns the number of characters within the string. This
-method returns a number value.
-
-=cut
-
-=head2 lines
-
-  # given "who am i?\nwhere am i?\nhow did I get here"
-
-  $string->lines; # ['who am i?','where am i?','how did i get here']
-
-The lines method breaks the string into pieces, split on 1 or more newline
-characters, and returns an array reference consisting of the pieces. This method
-returns an array value.
-
-=cut
-
-=head2 lowercase
+=item lcfirst example
 
   # given 'EXCITING'
 
-  $string->lowercase; # exciting
+  $string->lcfirst; # eXCITING
 
-The lowercase method is an alias to the lc method. This method returns a
-string object.
+=back
 
 =cut
 
 =head2 le
 
-  # given 'exciting'
-
-  $string->le('Exciting'); # 0
+  le(Any $arg1) : NumObject
 
 The le method returns true if the argument provided is less-than or equal-to
 the value represented by the object. This method returns a Data::Object::Number
 object.
 
+=over 4
+
+=item le example
+
+  # given 'exciting'
+
+  $string->le('Exciting'); # 0
+
+=back
+
+=cut
+
+=head2 length
+
+  length() : NumObject
+
+The length method returns the number of characters within the string. This
+method returns a number value.
+
+=over 4
+
+=item length example
+
+  # given 'longggggg'
+
+  $string->length; # 9
+
+=back
+
+=cut
+
+=head2 lines
+
+  lines() : ArrayObject
+
+The lines method breaks the string into pieces, split on 1 or more newline
+characters, and returns an array reference consisting of the pieces. This method
+returns an array value.
+
+=over 4
+
+=item lines example
+
+  # given "who am i?\nwhere am i?\nhow did I get here"
+
+  $string->lines; # ['who am i?','where am i?','how did i get here']
+
+=back
+
+=cut
+
+=head2 lowercase
+
+  lowercase() : StrObject
+
+The lowercase method is an alias to the lc method. This method returns a
+string object.
+
+=over 4
+
+=item lowercase example
+
+  # given 'EXCITING'
+
+  $string->lowercase; # exciting
+
+=back
+
 =cut
 
 =head2 lt
+
+  lt(Any $arg1) : NumObject
+
+The lt method returns true if the argument provided is less-than the value
+represented by the object. This method returns a number value.
+
+=over 4
+
+=item lt example
 
   # given 'exciting'
 
   $string->lt('Exciting'); # 0
 
-The lt method returns true if the argument provided is less-than the value
-represented by the object. This method returns a number value.
+=back
 
 =cut
 
 =head2 ne
 
-  # given 'exciting'
-
-  $string->ne('Exciting'); # 1
+  ne(Any $arg1) : NumObject
 
 The ne method returns true if the argument provided is not equal to the value
 represented by the object. This method returns a number value.
 
+=over 4
+
+=item ne example
+
+  # given 'exciting'
+
+  $string->ne('Exciting'); # 1
+
+=back
+
+=cut
+
+=head2 new
+
+  new(Str $arg1) : StrObject
+
+The new method expects a string and returns a new class instance.
+
+=over 4
+
+=item new example
+
+  # given abcedfghi
+
+  my $string = Data::Object::String->new('abcedfghi');
+
+=back
+
 =cut
 
 =head2 replace
+
+  replace(Str $arg1, Str $arg2) : StrObject
+
+The replace method performs a smart search and replace operation and returns the
+modified string (if any modification occurred). This method optionally takes a
+replacement modifier as it's final argument. Note, this operation expects the
+2nd argument to be a replacement String. This method returns a
+string object.
+
+=over 4
+
+=item replace example
 
   # given 'Hello World'
 
@@ -872,26 +1033,43 @@ represented by the object. This method returns a number value.
   $string->replace(qr/world/i, 'Universe'); # Hello Universe
   $string->replace(qr/.*/, 'Nada'); # Nada
 
-The replace method performs a smart search and replace operation and returns the
-modified string (if any modification occurred). This method optionally takes a
-replacement modifier as it's final argument. Note, this operation expects the
-2nd argument to be a replacement String. This method returns a
-string object.
+=back
 
 =cut
 
 =head2 reverse
 
-  # given 'dlrow ,olleH'
-
-  $string->reverse; # Hello, world
+  reverse() : ArrayObject
 
 The reverse method returns a string where the characters in the string are in
 the opposite order. This method returns a string value.
 
+=over 4
+
+=item reverse example
+
+  # given 'dlrow ,olleH'
+
+  $string->reverse; # Hello, world
+
+=back
+
 =cut
 
 =head2 rindex
+
+  rindex(Str $arg1, Num $arg2) : NumObject
+
+The rindex method searches for the argument within the string and returns the
+position of the last occurrence of the argument. This method optionally takes a
+second argument which would be the position within the string to start
+searching from (beginning at or before the position). By default, starts
+searching from the end of the string. This method returns a data type object to
+be determined after execution.
+
+=over 4
+
+=item rindex example
 
   # given 'explain the unexplainable'
 
@@ -906,20 +1084,48 @@ the opposite order. This method returns a string value.
   $string->rindex('explain', 0); # 0
   $string->rindex('explained'); # -1
 
-The rindex method searches for the argument within the string and returns the
-position of the last occurrence of the argument. This method optionally takes a
-second argument which would be the position within the string to start
-searching from (beginning at or before the position). By default, starts
-searching from the end of the string. This method returns a data type object to
-be determined after execution.
+=back
+
+=cut
+
+=head2 roles
+
+  roles() : ArrayRef
+
+The roles method returns the list of roles attached to object. This method
+returns an array value.
+
+=over 4
+
+=item roles example
+
+  # given $string
+
+  $string->roles;
+
+=back
+
+=cut
+
+=head2 rules
+
+  rules() : ArrayRef
+
+The rules method returns consumed rules.
+
+=over 4
+
+=item rules example
+
+  my $rules = $any->rules();
+
+=back
 
 =cut
 
 =head2 snakecase
 
-  # given 'hello world'
-
-  $string->snakecase; # helloWorld
+  snakecase() : StrObject
 
 The snakecase method modifies the string such that it will no longer have any
 non-alphanumeric characters and each word (group of alphanumeric characters
@@ -928,16 +1134,21 @@ difference between this method and the camelcase method is that this method
 ensures that the first character will always be lowercased. Note, this method
 modifies the string. This method returns a string value.
 
+=over 4
+
+=item snakecase example
+
+  # given 'hello world'
+
+  $string->snakecase; # helloWorld
+
+=back
+
 =cut
 
 =head2 split
 
-  # given 'name, age, dob, email'
-
-  $string->split(', '); # ['name', 'age', 'dob', 'email']
-  $string->split(', ', 2); # ['name', 'age, dob, email']
-  $string->split(qr/\,\s*/); # ['name', 'age', 'dob', 'email']
-  $string->split(qr/\,\s*/, 2); # ['name', 'age, dob, email']
+  split(RegexpRef $arg1, Num $arg2) : ArrayObject
 
 The split method splits the string into a list of strings, separating each
 chunk by the argument (string or regexp object), and returns that list as an
@@ -946,86 +1157,155 @@ the limit (number of matches to capture). Note, this operation expects the 1st
 argument to be a Regexp object or a String. This method returns a
 array object.
 
+=over 4
+
+=item split example
+
+  # given 'name, age, dob, email'
+
+  $string->split(', '); # ['name', 'age', 'dob', 'email']
+  $string->split(', ', 2); # ['name', 'age, dob, email']
+  $string->split(qr/\,\s*/); # ['name', 'age', 'dob', 'email']
+  $string->split(qr/\,\s*/, 2); # ['name', 'age, dob, email']
+
+=back
+
 =cut
 
 =head2 strip
 
-  # given 'one,  two,  three'
-
-  $string->strip; # one, two, three
+  strip() : StrObject
 
 The strip method returns the string replacing occurences of 2 or more
 whitespaces with a single whitespace. This method returns a
 string object.
 
+=over 4
+
+=item strip example
+
+  # given 'one,  two,  three'
+
+  $string->strip; # one, two, three
+
+=back
+
 =cut
 
 =head2 titlecase
 
-  # given 'mr. john doe'
-
-  $string->titlecase; # Mr. John Doe
+  titlecase() : StrObject
 
 The titlecase method returns the string capitalizing the first character of
 each word (group of alphanumeric characters separated by 1 or more whitespaces).
 Note, this method modifies the string. This method returns a
 string object.
 
+=over 4
+
+=item titlecase example
+
+  # given 'mr. john doe'
+
+  $string->titlecase; # Mr. John Doe
+
+=back
+
 =cut
 
 =head2 trim
+
+  trim() : StrObject
+
+The trim method removes 1 or more consecutive leading and/or trailing spaces
+from the string. This method returns a string value.
+
+=over 4
+
+=item trim example
 
   # given ' system is   ready   '
 
   $string->trim; # system is   ready
 
-The trim method removes 1 or more consecutive leading and/or trailing spaces
-from the string. This method returns a string value.
+=back
 
 =cut
 
 =head2 uc
 
+  uc() : StrObject
+
+The uc method returns an uppercased version of the string. This method returns a
+string object. This method is an alias to the uppercase method.
+
+=over 4
+
+=item uc example
+
   # given 'exciting'
 
   $string->uc; # EXCITING
 
-The uc method returns an uppercased version of the string. This method returns a
-string object. This method is an alias to the uppercase method.
+=back
 
 =cut
 
 =head2 ucfirst
 
+  uc() : StrObject
+
+The ucfirst method returns a the string with the first character uppercased.
+This method returns a string value.
+
+=over 4
+
+=item ucfirst example
+
   # given 'exciting'
 
   $string->ucfirst; # Exciting
 
-The ucfirst method returns a the string with the first character uppercased.
-This method returns a string value.
+=back
 
 =cut
 
 =head2 uppercase
 
+  uppercase() : StrObject
+
+The uppercase method is an alias to the uc method. This method returns a
+string object.
+
+=over 4
+
+=item uppercase example
+
   # given 'exciting'
 
   $string->uppercase; # EXCITING
 
-The uppercase method is an alias to the uc method. This method returns a
-string object.
+=back
 
 =cut
 
 =head2 words
 
-  # given "is this a bug we're experiencing"
-
-  $string->words; # ["is","this","a","bug","we're","experiencing"]
+  words() : ArrayObject
 
 The words method splits the string into a list of strings, separating each
 group of characters by 1 or more consecutive spaces, and returns that list as an
 array reference. This method returns an array value.
+
+=over 4
+
+=item words example
+
+  # given "is this a bug we're experiencing"
+
+  $string->words; # ["is","this","a","bug","we're","experiencing"]
+
+=back
 
 =cut
 

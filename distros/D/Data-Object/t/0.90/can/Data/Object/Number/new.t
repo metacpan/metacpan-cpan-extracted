@@ -23,7 +23,7 @@ The new method expects a number and returns a new class instance.
 
 =signature
 
-new(Int $arg1) : DoNum
+new(Int $arg1) : NumObject
 
 =type
 

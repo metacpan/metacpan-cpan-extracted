@@ -27,7 +27,7 @@ L<Data::Object::Hash> object.
 
 =signature
 
-unfold() : DoHash
+unfold() : HashObject
 
 =type
 

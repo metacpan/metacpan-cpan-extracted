@@ -86,18 +86,34 @@ This package implements the following methods.
 
 =head2 autoload
 
-  $self->AUTOLOAD($class, $method, @args);
+  AUTOLOAD(Str $arg1, Str $arg2, Any @args) : Any
 
 The AUTOLOAD method is called when the object doesn't have the method being
 called. This method is called and handled automatically.
+
+=over 4
+
+=item AUTOLOAD example
+
+  $self->AUTOLOAD($class, $method, @args);
+
+=back
 
 =cut
 
 =head2 destroy
 
-  $self->DESTROY();
+  DESTROY() : Any
 
 The DESTROY method is called when the object goes out of scope. This method is
 called and handled automatically.
+
+=over 4
+
+=item DESTROY example
+
+  $self->DESTROY();
+
+=back
 
 =cut

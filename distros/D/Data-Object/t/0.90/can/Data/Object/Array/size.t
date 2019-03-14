@@ -24,7 +24,7 @@ L<Data::Object::Number> object. This method is an alias to the length method.
 
 =signature
 
-size() : DoNum
+size() : NumObject
 
 =type
 

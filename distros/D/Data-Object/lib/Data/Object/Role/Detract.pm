@@ -59,16 +59,32 @@ This package implements the following methods.
 
 =head2 data
 
-  my $data = $self->data();
+  data() : Any
 
 The data method returns the underlying data structure.
+
+=over 4
+
+=item data example
+
+  my $data = $self->data();
+
+=back
 
 =cut
 
 =head2 detract
 
-  my $detract = $self->detract();
+  detract() : Any
 
 The detract method returns the underlying data structure.
+
+=over 4
+
+=item detract example
+
+  my $detract = $self->detract();
+
+=back
 
 =cut

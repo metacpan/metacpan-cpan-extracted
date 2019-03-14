@@ -240,116 +240,16 @@ This package implements the following methods.
 
 =cut
 
-=head2 from_file
-
-  # given $data
-
-  $data->from_file($file);
-
-  # ...
-
-The from_data method returns content for the given file to be passed to the
-constructor.
-
-=cut
-
-=head2 from_data
-
-  # given $data
-
-  $data->from_data($class);
-
-  # ...
-
-The from_data method returns content for the given class to be passed to the
-constructor.
-
-=cut
-
-=head2 file
-
-  # given $data
-
-  $data->file($args);
-
-  # ...
-
-The file method returns the contents of a file which contains pod-like sections
-for a given filename.
-
-=cut
-
-=head2 data
-
-  # given $data
-
-  $data->data($class);
-
-  # ...
-
-The data method returns the contents from the C<DATA> and C<END> sections of a
-package.
-
-=cut
-
-=head2 item
-
-  =pod help
-
-  Example content
-
-  =cut
-
-  # given $data
-
-  $data->item('help');
-
-  # {,...}
-
-The item method returns metadata for the pod-like section that matches the
-given string.
-
-=cut
-
-=head2 list
-
-  =pod help
-
-  Example content
-
-  =cut
-
-  # given $data
-
-  $data->list('pod');
-
-  # [,...]
-
-The list method returns metadata for each pod-like section that matches the
-given string.
-
-=cut
-
-=head2 pluck
-
-  =pod help
-
-  Example content
-
-  =cut
-
-  # given $data
-
-  $data->pluck('item', 'help');
-
-  # {,...}
-
-The pluck method splices and returns metadata for the pod-like section that
-matches the given list or item by name.
-
-=cut
-
 =head2 content
+
+  content(Str $arg1) : Str
+
+The content method returns the pod-like section where the name matches the
+given string.
+
+=over 4
+
+=item content example
 
   =pod help
 
@@ -363,12 +263,21 @@ matches the given list or item by name.
 
   # Example content
 
-The content method returns the pod-like section where the name matches the
-given string.
+=back
 
 =cut
 
 =head2 contents
+
+  contents(Str $arg1) : ArrayRef
+
+The contents method returns all pod-like sections that start with the given
+string, e.g. C<pod> matches C<=pod foo>. This method returns an arrayref of
+data for the matched sections.
+
+=over 4
+
+=item contents example
 
   =pod help
 
@@ -382,13 +291,158 @@ given string.
 
   # [,...]
 
-The contents method returns all pod-like sections that start with the given
-string, e.g. C<pod> matches C<=pod foo>. This method returns an arrayref of
-data for the matched sections.
+=back
+
+=cut
+
+=head2 data
+
+  data(Str $arg1) : ArrayRef
+
+The data method returns the contents from the C<DATA> and C<END> sections of a
+package.
+
+=over 4
+
+=item data example
+
+  # given $data
+
+  $data->data($class);
+
+  # ...
+
+=back
+
+=cut
+
+=head2 file
+
+  file(Str $arg1) : ArrayRef
+
+The file method returns the contents of a file which contains pod-like sections
+for a given filename.
+
+=over 4
+
+=item file example
+
+  # given $data
+
+  $data->file($args);
+
+  # ...
+
+=back
+
+=cut
+
+=head2 from_data
+
+  from_data(Str $arg1) : Str
+
+The from_data method returns content for the given class to be passed to the
+constructor.
+
+=over 4
+
+=item from_data example
+
+  # given $data
+
+  $data->from_data($class);
+
+  # ...
+
+=back
+
+=cut
+
+=head2 from_file
+
+  from_file(Str $arg1) : Str
+
+The from_data method returns content for the given file to be passed to the
+constructor.
+
+=over 4
+
+=item from_file example
+
+  # given $data
+
+  $data->from_file($file);
+
+  # ...
+
+=back
+
+=cut
+
+=head2 item
+
+  item(Str $arg1) : HashRef
+
+The item method returns metadata for the pod-like section that matches the
+given string.
+
+=over 4
+
+=item item example
+
+  =pod help
+
+  Example content
+
+  =cut
+
+  # given $data
+
+  $data->item('help');
+
+  # {,...}
+
+=back
+
+=cut
+
+=head2 list
+
+  list(Str $arg1) : ArrayRef
+
+The list method returns metadata for each pod-like section that matches the
+given string.
+
+=over 4
+
+=item list example
+
+  =pod help
+
+  Example content
+
+  =cut
+
+  # given $data
+
+  $data->list('pod');
+
+  # [,...]
+
+=back
 
 =cut
 
 =head2 parser
+
+  parser(Str $arg1) : ArrayRef
+
+The parser method extracts pod-like sections from a given string and returns an
+arrayref of metadata.
+
+=over 4
+
+=item parser example
 
   # given $data
 
@@ -396,7 +450,33 @@ data for the matched sections.
 
   # [,...]
 
-The parser method extracts pod-like sections from a given string and returns an
-arrayref of metadata.
+=back
+
+=cut
+
+=head2 pluck
+
+  pluck(Str $arg1, Str $arg2) : HashRef
+
+The pluck method splices and returns metadata for the pod-like section that
+matches the given list or item by name.
+
+=over 4
+
+=item pluck example
+
+  =pod help
+
+  Example content
+
+  =cut
+
+  # given $data
+
+  $data->pluck('item', 'help');
+
+  # {,...}
+
+=back
 
 =cut

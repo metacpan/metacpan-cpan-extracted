@@ -25,7 +25,7 @@ L<Data::Object::Hash> object.
 
 =signature
 
-keyed(Str $arg1) : DoHash
+keyed(Str $arg1) : HashObject
 
 =type
 

@@ -26,7 +26,7 @@ string object.
 
 =signature
 
-titlecase() : DoStr
+titlecase() : StrObject
 
 =type
 

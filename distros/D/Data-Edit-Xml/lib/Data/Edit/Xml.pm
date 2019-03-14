@@ -15,7 +15,7 @@
 # putFirstCut might check that the cut node is not above the target node.
 
 package Data::Edit::Xml;
-our $VERSION = 20190314;
+our $VERSION = 20190315;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -30147,7 +30147,7 @@ if (1) {                                                                        
 END
 
  $a->ditaConvertConceptToTask;
- owf(q(/home/phil/z/z/z/out.xml), -p $a);
+#owf(q(/home/phil/z/z/z/out.xml), -p $a);
 
  ok nws(-p $a) eq nws(<<END);
 <task id="x1">
@@ -30342,7 +30342,7 @@ if (1) {                                                                        
 END
 
   $a->ditaConvertSimpleTableToTable;
- owf(q(/home/phil/z/z/z/out.xml), -p $a);
+# owf(q(/home/phil/z/z/z/out.xml), -p $a);
 
   ok -p $a eq <<END;
 <table>

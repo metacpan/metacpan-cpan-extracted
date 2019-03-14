@@ -986,123 +986,144 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  # given 1..9
-
-  my $array = Data::Object::Array->new(1..9);
-  my $array = Data::Object::Array->new([1..9]);
-
-The new method expects a list or array reference and returns a new class
-instance.
-
-=cut
-
-=head2 self
-
-  my $self = $array->self();
-
-The self method returns the calling object (noop).
-
-=cut
-
-=head2 roles
-
-  # given $array
-
-  $array->roles;
-
-The roles method returns the list of roles attached to object. This method
-returns a L<Data::Object::Array> object.
-
-=cut
-
-=head2 rules
-
-  my $rules = $array->rules();
-
-The rules method returns consumed rules.
-
-=cut
-
 =head2 all
 
-  # given [2..5]
-
-  $array->all('$value > 1'); # 1; true
-  $array->all('$value > 3'); # 0; false|
+  all(CodeRef $arg1, Any @args) : NumObject
 
 The all method returns true if all of the elements in the array meet the
 criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item all example
+
+  # given [2..5]
+
+  $array->all('$value > 1'); # 1; true
+  $array->all('$value > 3'); # 0; false|
+
+=back
+
 =cut
 
 =head2 any
 
-  # given [2..5]
-
-  $array->any('$value > 5'); # 0; false
-  $array->any('$value > 3'); # 1; true
+  any(CodeRef $arg1, Any @args) : NumObject
 
 The any method returns true if any of the elements in the array meet the
 criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item any example
+
+  # given [2..5]
+
+  $array->any('$value > 5'); # 0; false
+  $array->any('$value > 3'); # 1; true
+
+=back
+
 =cut
 
 =head2 clear
 
-  # given ['a'..'g']
-
-  $array->clear; # []
+  clear() : Object
 
 The clear method is an alias to the empty method. This method returns a
 L<Data::Object::Undef> object. This method is an alias to the empty method.
 Note: This method modifies the array.
 
+=over 4
+
+=item clear example
+
+  # given ['a'..'g']
+
+  $array->clear; # []
+
+=back
+
 =cut
 
 =head2 count
+
+  count() : NumObject
+
+The count method returns the number of elements within the array. This method
+returns a L<Data::Object::Number> object.
+
+=over 4
+
+=item count example
 
   # given [1..5]
 
   $array->count; # 5
 
-The count method returns the number of elements within the array. This method
-returns a L<Data::Object::Number> object.
+=back
 
 =cut
 
 =head2 defined
+
+  defined() : NumObject
+
+The defined method returns true if the element within the array at the index
+specified by the argument meets the criteria for being defined, otherwise it
+returns false. This method returns a L<Data::Object::Number> object.
+
+=over 4
+
+=item defined example
 
   # given [1,2,undef,4,5]
 
   $array->defined(2); # 0; false
   $array->defined(1); # 1; true
 
-The defined method returns true if the element within the array at the index
-specified by the argument meets the criteria for being defined, otherwise it
-returns false. This method returns a L<Data::Object::Number> object.
+=back
 
 =cut
 
 =head2 delete
 
-  # given [1..5]
-
-  $array->delete(2); # 3
+  delete(Int $arg1) : Any
 
 The delete method returns the value of the element within the array at the
 index specified by the argument after removing it from the array. This method
 returns a data type object to be determined after execution. Note: This method
 modifies the array.
 
+=over 4
+
+=item delete example
+
+  # given [1..5]
+
+  $array->delete(2); # 3
+
+=back
+
 =cut
 
 =head2 each
+
+  each(CodeRef $arg1, Any @args) : Object
+
+The each method iterates over each element in the array, executing the code
+reference supplied in the argument, passing the routine the index and value at
+the current position in the loop. This method supports codification, i.e, takes
+an argument which can be a codifiable string, a code reference, or a code data
+type object. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item each example
 
   # given ['a'..'g']
 
@@ -1112,15 +1133,23 @@ modifies the array.
       ...
   });
 
-The each method iterates over each element in the array, executing the code
-reference supplied in the argument, passing the routine the index and value at
-the current position in the loop. This method supports codification, i.e, takes
-an argument which can be a codifiable string, a code reference, or a code data
-type object. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 each_key
+
+  each_key(CodeRef $arg1, Any @args) : Object
+
+The each_key method iterates over each element in the array, executing the
+code reference supplied in the argument, passing the routine the index at the
+current position in the loop. This method supports codification, i.e, takes an
+argument which can be a codifiable string, a code reference, or a code data type
+object. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item each_key example
 
   # given ['a'..'g']
 
@@ -1129,15 +1158,23 @@ type object. This method returns a L<Data::Object::Array> object.
       ...
   });
 
-The each_key method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the index at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 each_n_values
+
+  each_n_values(Num $arg1, CodeRef $arg2, Any @args) : Object
+
+The each_n_values method iterates over each element in the array, executing
+the code reference supplied in the argument, passing the routine the next n
+values until all values have been seen. This method supports codification, i.e,
+takes an argument which can be a codifiable string, a code reference, or a code
+data type object. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item each_n_values example
 
   # given ['a'..'g']
 
@@ -1149,15 +1186,23 @@ object. This method returns a L<Data::Object::Array> object.
       ...
   });
 
-The each_n_values method iterates over each element in the array, executing
-the code reference supplied in the argument, passing the routine the next n
-values until all values have been seen. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 each_value
+
+  each_key(CodeRef $arg1, Any @args) : Object
+
+The each_value method iterates over each element in the array, executing the
+code reference supplied in the argument, passing the routine the value at the
+current position in the loop. This method supports codification, i.e, takes an
+argument which can be a codifiable string, a code reference, or a code data type
+object. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item each_value example
 
   # given ['a'..'g']
 
@@ -1166,92 +1211,130 @@ data type object. This method returns a L<Data::Object::Array> object.
       ...
   });
 
-The each_value method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the value at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 empty
 
+  empty() : Object
+
+The empty method drops all elements from the array. This method returns a
+L<Data::Object::Array> object. Note: This method modifies the array.
+
+=over 4
+
+=item empty example
+
   # given ['a'..'g']
 
   $array->empty; # []
 
-The empty method drops all elements from the array. This method returns a
-L<Data::Object::Array> object. Note: This method modifies the array.
+=back
 
 =cut
 
 =head2 eq
 
-  # given $array
-
-  $array->eq; # exception thrown
+  eq(Any $arg1) : NumObject
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
+=over 4
+
+=item eq example
+
+  # given $array
+
+  $array->eq; # exception thrown
+
+=back
+
 =cut
 
 =head2 exists
+
+  exists(Int $arg1) : NumObject
+
+The exists method returns true if the element within the array at the index
+specified by the argument exists, otherwise it returns false. This method
+returns a L<Data::Object::Number> object.
+
+=over 4
+
+=item exists example
 
   # given [1,2,3,4,5]
 
   $array->exists(5); # 0; false
   $array->exists(0); # 1; true
 
-The exists method returns true if the element within the array at the index
-specified by the argument exists, otherwise it returns false. This method
-returns a L<Data::Object::Number> object.
+=back
 
 =cut
 
 =head2 first
 
+  first() : Any
+
+The first method returns the value of the first element in the array. This
+method returns a data type object to be determined after execution.
+
+=over 4
+
+=item first example
+
   # given [1..5]
 
   $array->first; # 1
 
-The first method returns the value of the first element in the array. This
-method returns a data type object to be determined after execution.
+=back
 
 =cut
 
 =head2 ge
 
+  ge(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item ge example
+
   # given $array
 
   $array->ge; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 get
 
-  # given [1..5]
-
-  $array->get(0); # 1;
+  get(Int $arg1) : Any
 
 The get method returns the value of the element in the array at the index
 specified by the argument. This method returns a data type object to be
 determined after execution.
 
+=over 4
+
+=item get example
+
+  # given [1..5]
+
+  $array->get(0); # 1;
+
+=back
+
 =cut
 
 =head2 grep
 
-  # given [1..5]
-
-  $array->grep(sub{
-      shift >= 3
-  });
-
-  # [3,4,5]
+  grep(CodeRef $arg1, Any @args) : ArrayObject
 
 The grep method iterates over each element in the array, executing the
 code reference supplied in the argument, passing the routine the value at the
@@ -1261,37 +1344,64 @@ codification, i.e, takes an argument which can be a codifiable string, a code
 reference, or a code data type object. This method returns a
 L<Data::Object::Array> object.
 
+=over 4
+
+=item grep example
+
+  # given [1..5]
+
+  $array->grep(sub{
+      shift >= 3
+  });
+
+  # [3,4,5]
+
+=back
+
 =cut
 
 =head2 gt
+
+  gt(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item gt example
 
   # given $array
 
   $array->gt; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 hash
 
-  # given [1..5]
-
-  $array->hash; # {0=>1,1=>2,2=>3,3=>4,4=>5}
+  hash() : HashObject
 
 The hash method returns a hash reference where each key and value pairs
 corresponds to the index and value of each element in the array. This method
 returns a L<Data::Object::Hash> object.
 
+=over 4
+
+=item hash example
+
+  # given [1..5]
+
+  $array->hash; # {0=>1,1=>2,2=>3,3=>4,4=>5}
+
+=back
+
 =cut
 
 =head2 hashify
 
-  # given [1..5]
-
-  $array->hashify; # {1=>1,2=>1,3=>1,4=>1,5=>1}
-  $array->hashify(sub { shift % 2 }); # {1=>1,2=>0,3=>1,4=>0,5=>1}
+  hashify(CodeRef $arg1, Any $arg2) : HashObject
 
 The hashify method returns a hash reference where the elements of array become
 the hash keys and the corresponding values are assigned a value of 1. This
@@ -1299,31 +1409,70 @@ method supports codification, i.e, takes an argument which can be a codifiable
 string, a code reference, or a code data type object. Note, undefined elements
 will be dropped. This method returns a L<Data::Object::Hash> object.
 
+=over 4
+
+=item hashify example
+
+  # given [1..5]
+
+  $array->hashify; # {1=>1,2=>1,3=>1,4=>1,5=>1}
+  $array->hashify(sub { shift % 2 }); # {1=>1,2=>0,3=>1,4=>0,5=>1}
+
+=back
+
 =cut
 
 =head2 head
+
+  head() : Any
+
+The head method returns the value of the first element in the array. This
+method returns a data type object to be determined after execution.
+
+=over 4
+
+=item head example
 
   # given [9,8,7,6,5]
 
   my $head = $array->head; # 9
 
-The head method returns the value of the first element in the array. This
-method returns a data type object to be determined after execution.
+=back
 
 =cut
 
 =head2 invert
 
-  # given [1..5]
-
-  $array->invert; # [5,4,3,2,1]
+  invert() : Any
 
 The invert method returns an array reference containing the elements in the
 array in reverse order. This method returns a L<Data::Object::Array> object.
 
+=over 4
+
+=item invert example
+
+  # given [1..5]
+
+  $array->invert; # [5,4,3,2,1]
+
+=back
+
 =cut
 
 =head2 iterator
+
+  iterator() : CodeObject
+
+The iterator method returns a code reference which can be used to iterate over
+the array. Each time the iterator is executed it will return the next element
+in the array until all elements have been seen, at which point the iterator
+will return an undefined value. This method returns a L<Data::Object::Code>
+object.
+
+=over 4
+
+=item iterator example
 
   # given [1..5]
 
@@ -1332,107 +1481,179 @@ array in reverse order. This method returns a L<Data::Object::Array> object.
       say $value; # 1
   }
 
-The iterator method returns a code reference which can be used to iterate over
-the array. Each time the iterator is executed it will return the next element
-in the array until all elements have been seen, at which point the iterator
-will return an undefined value. This method returns a L<Data::Object::Code>
-object.
+=back
 
 =cut
 
 =head2 join
 
-  # given [1..5]
-
-  $array->join; # 12345
-  $array->join(', '); # 1, 2, 3, 4, 5
+  join(Str $arg1) : StrObject
 
 The join method returns a string consisting of all the elements in the array
 joined by the join-string specified by the argument. Note: If the argument is
 omitted, an empty string will be used as the join-string. This method returns a
 L<Data::Object::String> object.
 
+=over 4
+
+=item join example
+
+  # given [1..5]
+
+  $array->join; # 12345
+  $array->join(', '); # 1, 2, 3, 4, 5
+
+=back
+
 =cut
 
 =head2 keyed
 
-  # given [1..5]
-
-  $array->keyed('a'..'d'); # {a=>1,b=>2,c=>3,d=>4}
+  keyed(Str $arg1) : HashObject
 
 The keyed method returns a hash reference where the arguments become the keys,
 and the elements of the array become the values. This method returns a
 L<Data::Object::Hash> object.
 
+=over 4
+
+=item keyed example
+
+  # given [1..5]
+
+  $array->keyed('a'..'d'); # {a=>1,b=>2,c=>3,d=>4}
+
+=back
+
 =cut
 
 =head2 keys
+
+  keys() : ArrayObject
+
+The keys method returns an array reference consisting of the indicies of the
+array. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item keys example
 
   # given ['a'..'d']
 
   $array->keys; # [0,1,2,3]
 
-The keys method returns an array reference consisting of the indicies of the
-array. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 last
 
+  last() : Any
+
+The last method returns the value of the last element in the array. This method
+returns a data type object to be determined after execution.
+
+=over 4
+
+=item last example
+
   # given [1..5]
 
   $array->last; # 5
 
-The last method returns the value of the last element in the array. This method
-returns a data type object to be determined after execution.
+=back
 
 =cut
 
 =head2 le
 
+  le(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item le example
+
   # given $array
 
   $array->le; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
 
 =cut
 
 =head2 length
 
+  length() : NumObject
+
+The length method returns the number of elements in the array. This method
+returns a L<Data::Object::Number> object.
+
+=over 4
+
+=item length example
+
   # given [1..5]
 
   $array->length; # 5
 
-The length method returns the number of elements in the array. This method
-returns a L<Data::Object::Number> object.
+=back
 
 =cut
 
 =head2 list
 
+  list() : ArrayObject
+
+The list method returns a shallow copy of the underlying array reference as an
+array reference. This method return a L<Data::Object::Array> object.
+
+=over 4
+
+=item list example
+
   # given $array
 
   my $list = $array->list;
 
-The list method returns a shallow copy of the underlying array reference as an
-array reference. This method return a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 lt
 
-  # given $array
-
-  $array->lt; # exception thrown
+  lt(Any $arg1) : NumObject
 
 This method is a consumer requirement but has no function and is not implemented.
 This method will throw an exception if called.
 
+=over 4
+
+=item lt example
+
+  # given $array
+
+  $array->lt; # exception thrown
+
+=back
+
 =cut
 
 =head2 map
+
+  map(CodeRef $arg1, Any $arg2) : ArrayObject
+
+The map method iterates over each element in the array, executing the
+code reference supplied in the argument, passing the routine the value at the
+current position in the loop and returning a new array reference containing
+the elements for which the argument returns a value or non-empty list. This
+method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item map example
 
   # given [1..5]
 
@@ -1442,130 +1663,216 @@ This method will throw an exception if called.
 
   # [2,3,4,5,6]
 
-The map method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the value at the
-current position in the loop and returning a new array reference containing
-the elements for which the argument returns a value or non-empty list. This
-method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 max
 
-  # given [8,9,1,2,3,4,5]
-
-  $array->max; # 9
+  max() : Any
 
 The max method returns the element in the array with the highest numerical
 value. All non-numerical element are skipped during the evaluation process. This
 method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item max example
+
+  # given [8,9,1,2,3,4,5]
+
+  $array->max; # 9
+
+=back
+
 =cut
 
 =head2 min
 
-  # given [8,9,1,2,3,4,5]
-
-  $array->min; # 1
+  min() : Any
 
 The min method returns the element in the array with the lowest numerical
 value. All non-numerical element are skipped during the evaluation process. This
 method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item min example
+
+  # given [8,9,1,2,3,4,5]
+
+  $array->min; # 1
+
+=back
+
 =cut
 
 =head2 ne
+
+  ne(Any $arg1) : NumObject
+
+This method is a consumer requirement but has no function and is not implemented.
+This method will throw an exception if called.
+
+=over 4
+
+=item ne example
 
   # given $array
 
   $array->ne; # exception thrown
 
-This method is a consumer requirement but has no function and is not implemented.
-This method will throw an exception if called.
+=back
+
+=cut
+
+=head2 new
+
+  new(ArrayRef $arg1) : ArrayObject
+
+The new method expects a list or array reference and returns a new class
+instance.
+
+=over 4
+
+=item new example
+
+  # given 1..9
+
+  my $array = Data::Object::Array->new(1..9);
+  my $array = Data::Object::Array->new([1..9]);
+
+=back
 
 =cut
 
 =head2 none
 
-  # given [2..5]
-
-  $array->none('$value <= 1'); # 1; true
-  $array->none('$value <= 2'); # 0; false
+  none(CodeRef $arg1, Any $arg2) : NumObject
 
 The none method returns true if none of the elements in the array meet the
 criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item none example
+
+  # given [2..5]
+
+  $array->none('$value <= 1'); # 1; true
+  $array->none('$value <= 2'); # 0; false
+
+=back
+
 =cut
 
 =head2 nsort
+
+  nsort() : ArrayObject
+
+The nsort method returns an array reference containing the values in the array
+sorted numerically. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item nsort example
 
   # given [5,4,3,2,1]
 
   $array->nsort; # [1,2,3,4,5]
 
-The nsort method returns an array reference containing the values in the array
-sorted numerically. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 one
 
-  # given [2..5]
-
-  $array->one('$value == 5'); # 1; true
-  $array->one('$value == 6'); # 0; false
+  one(CodeRef $arg1, Any $arg2) : NumObject
 
 The one method returns true if only one of the elements in the array meet the
 criteria set by the operand and rvalue. This method supports codification, i.e,
 takes an argument which can be a codifiable string, a code reference, or a code
 data type object. This method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item one example
+
+  # given [2..5]
+
+  $array->one('$value == 5'); # 1; true
+  $array->one('$value == 6'); # 0; false
+
+=back
+
 =cut
 
 =head2 pairs
 
-  # given [1..5]
-
-  $array->pairs; # [[0,1],[1,2],[2,3],[3,4],[4,5]]
+  pairs() : ArrayObject
 
 The pairs method is an alias to the pairs_array method. This method returns a
 L<Data::Object::Array> object. This method is an alias to the pairs_array
 method.
 
+=over 4
+
+=item pairs example
+
+  # given [1..5]
+
+  $array->pairs; # [[0,1],[1,2],[2,3],[3,4],[4,5]]
+
+=back
+
 =cut
 
 =head2 pairs_array
 
-  # given [1..5]
-
-  $array->pairs_array; # [[0,1],[1,2],[2,3],[3,4],[4,5]]
+  pairs() : ArrayObject
 
 The pairs_array method returns an array reference consisting of array references
 where each sub-array reference has two elements corresponding to the index and
 value of each element in the array. This method returns a L<Data::Object::Array>
 object.
 
+=over 4
+
+=item pairs_array example
+
+  # given [1..5]
+
+  $array->pairs_array; # [[0,1],[1,2],[2,3],[3,4],[4,5]]
+
+=back
+
 =cut
 
 =head2 pairs_hash
 
-  # given [1..5]
-
-  $array->pairs_hash; # {0=>1,1=>2,2=>3,3=>4,4=>5}
+  pairs() : ArrayObject
 
 The pairs_hash method returns a hash reference where each key and value pairs
 corresponds to the index and value of each element in the array. This method
 returns a L<Data::Object::Hash> object.
 
+=over 4
+
+=item pairs_hash example
+
+  # given [1..5]
+
+  $array->pairs_hash; # {0=>1,1=>2,2=>3,3=>4,4=>5}
+
+=back
+
 =cut
 
 =head2 part
 
-  # given [1..10]
-
-  $array->part(sub { shift > 5 }); # [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]]
+  part(CodeRef $arg1, Any $arg2) : Tuple[ArrayRef, ArrayRef]
 
 The part method iterates over each element in the array, executing the
 code reference supplied in the argument, using the result of the code reference
@@ -1575,55 +1882,147 @@ codification, i.e, takes an argument which can be a codifiable string, a code
 reference, or a code data type object. This method returns a
 L<Data::Object::Array> object.
 
+=over 4
+
+=item part example
+
+  # given [1..10]
+
+  $array->part(sub { shift > 5 }); # [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]]
+
+=back
+
 =cut
 
 =head2 pop
 
-  # given [1..5]
-
-  $array->pop; # 5
+  pop() : Any
 
 The pop method returns the last element of the array shortening it by one. Note,
 this method modifies the array. This method returns a data type object to be
 determined after execution. Note: This method modifies the array.
 
+=over 4
+
+=item pop example
+
+  # given [1..5]
+
+  $array->pop; # 5
+
+=back
+
 =cut
 
 =head2 push
 
-  # given [1..5]
-
-  $array->push(6,7,8); # [1,2,3,4,5,6,7,8]
+  push(Any $arg1) : Any
 
 The push method appends the array by pushing the agruments onto it and returns
 itself. This method returns a data type object to be determined after execution.
 Note: This method modifies the array.
 
+=over 4
+
+=item push example
+
+  # given [1..5]
+
+  $array->push(6,7,8); # [1,2,3,4,5,6,7,8]
+
+=back
+
 =cut
 
 =head2 random
+
+  random() : NumObject
+
+The random method returns a random element from the array. This method returns a
+data type object to be determined after execution.
+
+=over 4
+
+=item random example
 
   # given [1..5]
 
   $array->random; # 4
 
-The random method returns a random element from the array. This method returns a
-data type object to be determined after execution.
+=back
 
 =cut
 
 =head2 reverse
 
-  # given [1..5]
-
-  $array->reverse; # [5,4,3,2,1]
+  reverse() : ArrayObject
 
 The reverse method returns an array reference containing the elements in the
 array in reverse order. This method returns a L<Data::Object::Array> object.
 
+=over 4
+
+=item reverse example
+
+  # given [1..5]
+
+  $array->reverse; # [5,4,3,2,1]
+
+=back
+
+=cut
+
+=head2 rnsort
+
+  rnsort() : ArrayObject
+
+The rnsort method returns an array reference containing the values in the
+array sorted numerically in reverse. This method returns a
+L<Data::Object::Array> object.
+
+=over 4
+
+=item rnsort example
+
+  # given [5,4,3,2,1]
+
+  $array->rnsort; # [5,4,3,2,1]
+
+=back
+
+=cut
+
+=head2 roles
+
+  roles() : ArrayRef
+
+The roles method returns the list of roles attached to object. This method
+returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item roles example
+
+  # given $array
+
+  $array->roles;
+
+=back
+
 =cut
 
 =head2 rotate
+
+  rotate() : ArrayObject
+
+The rotate method rotates the elements in the array such that first elements
+becomes the last element and the second element becomes the first element each
+time this method is called. This method returns a L<Data::Object::Array> object.
+Note: This method modifies the array.
+
+=over 4
+
+=item rotate example
 
   # given [1..5]
 
@@ -1631,152 +2030,257 @@ array in reverse order. This method returns a L<Data::Object::Array> object.
   $array->rotate; # [3,4,5,1,2]
   $array->rotate; # [4,5,1,2,3]
 
-The rotate method rotates the elements in the array such that first elements
-becomes the last element and the second element becomes the first element each
-time this method is called. This method returns a L<Data::Object::Array> object.
-Note: This method modifies the array.
-
-=cut
-
-=head2 rnsort
-
-  # given [5,4,3,2,1]
-
-  $array->rnsort; # [5,4,3,2,1]
-
-The rnsort method returns an array reference containing the values in the
-array sorted numerically in reverse. This method returns a
-L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 rsort
 
-  # given ['a'..'d']
-
-  $array->rsort; # ['d','c','b','a']
+  rsort() : ArrayObject
 
 The rsort method returns an array reference containing the values in the array
 sorted alphanumerically in reverse. This method returns a L<Data::Object::Array>
 object.
 
+=over 4
+
+=item rsort example
+
+  # given ['a'..'d']
+
+  $array->rsort; # ['d','c','b','a']
+
+=back
+
+=cut
+
+=head2 rules
+
+  rules() : ArrayRef
+
+The rules method returns consumed rules.
+
+=over 4
+
+=item rules example
+
+  my $rules = $array->rules();
+
+=back
+
+=cut
+
+=head2 self
+
+  self() : Object
+
+The self method returns the calling object (noop).
+
+=over 4
+
+=item self example
+
+  my $self = $array->self();
+
+=back
+
 =cut
 
 =head2 set
 
-  # given [1..5]
-
-  $array->set(4,6); # [1,2,3,4,6]
+  set(Str $arg1, Any $arg2) : Any
 
 The set method returns the value of the element in the array at the index
 specified by the argument after updating it to the value of the second argument.
 This method returns a data type object to be determined after execution. Note:
 This method modifies the array.
 
+=over 4
+
+=item set example
+
+  # given [1..5]
+
+  $array->set(4,6); # [1,2,3,4,6]
+
+=back
+
 =cut
 
 =head2 shift
 
-  # given [1..5]
-
-  $array->shift; # 1
+  shift() : Any
 
 The shift method returns the first element of the array shortening it by one.
 This method returns a data type object to be determined after execution. Note:
 This method modifies the array.
 
+=over 4
+
+=item shift example
+
+  # given [1..5]
+
+  $array->shift; # 1
+
+=back
+
 =cut
 
 =head2 size
+
+  size() : NumObject
+
+The size method is an alias to the length method. This method returns a
+L<Data::Object::Number> object. This method is an alias to the length method.
+
+=over 4
+
+=item size example
 
   # given [1..5]
 
   $array->size; # 5
 
-The size method is an alias to the length method. This method returns a
-L<Data::Object::Number> object. This method is an alias to the length method.
+=back
 
 =cut
 
 =head2 slice
 
-  # given [1..5]
-
-  $array->slice(2,4); # [3,5]
+  slice(Any $arg1) : Any
 
 The slice method returns an array reference containing the elements in the
 array at the index(es) specified in the arguments. This method returns a
 L<Data::Object::Array> object.
 
+=over 4
+
+=item slice example
+
+  # given [1..5]
+
+  $array->slice(2,4); # [3,5]
+
+=back
+
 =cut
 
 =head2 sort
+
+  sort() : ArrayObject
+
+The sort method returns an array reference containing the values in the array
+sorted alphanumerically. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item sort example
 
   # given ['d','c','b','a']
 
   $array->sort; # ['a','b','c','d']
 
-The sort method returns an array reference containing the values in the array
-sorted alphanumerically. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 sum
 
-  # given [1..5]
-
-  $array->sum; # 15
+  sum() : NumObject
 
 The sum method returns the sum of all values for all numerical elements in the
 array. All non-numerical element are skipped during the evaluation process. This
 method returns a L<Data::Object::Number> object.
 
+=over 4
+
+=item sum example
+
+  # given [1..5]
+
+  $array->sum; # 15
+
+=back
+
 =cut
 
 =head2 tail
 
-  # given [1..5]
-
-  $array->tail; # [2,3,4,5]
+  tail() : Any
 
 The tail method returns an array reference containing the second through the
 last elements in the array omitting the first. This method returns a
 L<Data::Object::Array> object.
 
+=over 4
+
+=item tail example
+
+  # given [1..5]
+
+  $array->tail; # [2,3,4,5]
+
+=back
+
 =cut
 
 =head2 unique
+
+  unique() : ArrayObject
+
+The unique method returns an array reference consisting of the unique elements
+in the array. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item unique example
 
   # given [1,1,1,1,2,3,1]
 
   $array->unique; # [1,2,3]
 
-The unique method returns an array reference consisting of the unique elements
-in the array. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 
 =head2 unshift
 
-  # given [1..5]
-
-  $array->unshift(-2,-1,0); # [-2,-1,0,1,2,3,4,5]
+  unshift() : Any
 
 The unshift method prepends the array by pushing the agruments onto it and
 returns itself. This method returns a data type object to be determined after
 execution. Note: This method modifies the array.
 
+=over 4
+
+=item unshift example
+
+  # given [1..5]
+
+  $array->unshift(-2,-1,0); # [-2,-1,0,1,2,3,4,5]
+
+=back
+
 =cut
 
 =head2 values
+
+  values(Str $arg1) : ArrayObject
+
+The values method returns an array reference consisting of the elements in the
+array. This method essentially copies the content of the array into a new
+container. This method returns a L<Data::Object::Array> object.
+
+=over 4
+
+=item values example
 
   # given [1..5]
 
   $array->values; # [1,2,3,4,5]
 
-The values method returns an array reference consisting of the elements in the
-array. This method essentially copies the content of the array into a new
-container. This method returns a L<Data::Object::Array> object.
+=back
 
 =cut
 

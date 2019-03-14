@@ -24,7 +24,7 @@ represented by the object. This method returns a number value.
 
 =signature
 
-ne(Any $arg1) : DoNum
+ne(Any $arg1) : NumObject
 
 =type
 

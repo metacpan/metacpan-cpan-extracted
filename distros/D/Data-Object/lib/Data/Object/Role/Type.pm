@@ -75,16 +75,32 @@ This package implements the following methods.
 
 =head2 methods
 
-  my $methods = $self->methods();
+  methods() : ArrayRef
 
 The methods method returns all object functions and methods.
+
+=over 4
+
+=item methods example
+
+  my $methods = $self->methods();
+
+=back
 
 =cut
 
 =head2 type
 
-  my $type = $self->type();
+  type() : StrObject
 
 The type method returns object type string.
+
+=over 4
+
+=item type example
+
+  my $type = $self->type();
+
+=back
 
 =cut

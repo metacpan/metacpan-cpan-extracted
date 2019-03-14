@@ -24,7 +24,7 @@ hash. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-keys() : DoArray
+keys() : ArrayObject
 
 =type
 

@@ -1,6 +1,18 @@
 Changelog for Data-Object
 
-0.90 2019-03-13T14:29:54
+0.91 2019-03-14T21:06:09
+ - Updated tests and subroutine signature docs
+ - Regenerated POD
+ - Update bin/pod to generate with signatures
+ - Update bin/pod to sort subs in finder
+ - Added missing Try::Tiny dependency
+ - Removed document tests which fails on CPAN
+ - Fixed sub finder in t/0.90/can.t
+ - Fixed sub finder in bin/pod
+ - Build 0.90 (#157)
+
+0.90 2019-03-13T14:30:16
+ - Built release version 0.90
  - Fixed Hash iterator sorting test failure
  - Fixed Hash list and map sorting test failure
  - Refactored POD generator

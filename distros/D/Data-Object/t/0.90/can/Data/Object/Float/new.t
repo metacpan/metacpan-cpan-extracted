@@ -23,7 +23,7 @@ The new method expects a floating-point number and returns a new class instance.
 
 =signature
 
-new(Num $arg1) : DoFloat
+new(Num $arg1) : FloatObject
 
 =type
 

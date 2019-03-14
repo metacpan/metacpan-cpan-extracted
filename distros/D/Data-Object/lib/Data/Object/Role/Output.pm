@@ -63,16 +63,32 @@ This package implements the following methods.
 
 =head2 print
 
-  my $print = $self->print();
+  print() : NumObject
 
 Output stringified object data.
+
+=over 4
+
+=item print example
+
+  my $print = $self->print();
+
+=back
 
 =cut
 
 =head2 say
 
-  my $say = $self->say();
+  say() : NumObject
 
 Output stringified object data with newline.
+
+=over 4
+
+=item say example
+
+  my $say = $self->say();
+
+=back
 
 =cut

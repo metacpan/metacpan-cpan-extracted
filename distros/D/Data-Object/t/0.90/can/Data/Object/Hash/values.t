@@ -25,7 +25,7 @@ elements in the hash. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-values(Str $arg1) : DoArray
+values(Str $arg1) : ArrayObject
 
 =type
 

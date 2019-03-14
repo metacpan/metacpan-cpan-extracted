@@ -118,56 +118,112 @@ This package implements the following methods.
 
 =head2 def
 
-  my $def = $registry->def();
+  def() : Str
 
 Returns the default type library.
+
+=over 4
+
+=item def example
+
+  my $def = $registry->def();
+
+=back
 
 =cut
 
 =head2 get
 
-  my $get = $registry->get($key);
+  get(Str $arg1) : Any
 
 The get method returns the value of the element with the specific key.
+
+=over 4
+
+=item get example
+
+  my $get = $registry->get($key);
+
+=back
 
 =cut
 
 =head2 lut
 
-  my $lut = $registry->lut($key);
+  lut(Str $arg1) : ArrayRef
 
 Returns the lookup table for a given namespace.
+
+=over 4
+
+=item lut example
+
+  my $lut = $registry->lut($key);
+
+=back
 
 =cut
 
 =head2 obj
 
-  my $obj = $registry->obj($key);
+  obj(ClassName $arg1) : InstanceOf[Type::Registry]
 
 Return the L<Type::Registry> object for a given namespace.
+
+=over 4
+
+=item obj example
+
+  my $obj = $registry->obj($key);
+
+=back
 
 =cut
 
 =head2 rem
 
-  my $rem = $registry->rem($key, $val);
+  rem(Str $arg1, Str $arg2) : Str
 
 Remove the registered type library from a given namespace.
+
+=over 4
+
+=item rem example
+
+  my $rem = $registry->rem($key, $val);
+
+=back
 
 =cut
 
 =head2 set
 
-  my $set = $registry->set($key, $val);
+  set(Str $arg1, Any $arg2) : Any
 
 Set the supplied key and value, and return the value.
+
+=over 4
+
+=item set example
+
+  my $set = $registry->set($key, $val);
+
+=back
 
 =cut
 
 =head2 tns
 
-  my $tns = $registry->tns();
+  tns() : HashRef
 
 Returns the registered type-namespaces.
+
+=over 4
+
+=item tns example
+
+  my $tns = $registry->tns();
+
+=back
 
 =cut

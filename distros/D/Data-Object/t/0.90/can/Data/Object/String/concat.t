@@ -24,7 +24,7 @@ appended to it. This method returns a string value.
 
 =signature
 
-concat(Any $arg1) : DoStr
+concat(Any $arg1) : StrObject
 
 =type
 

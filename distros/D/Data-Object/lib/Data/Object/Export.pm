@@ -780,28 +780,313 @@ This package implements the following functions.
 
 =cut
 
-=head2 do
+=head2 cast
 
-  # given file syntax
+  cast(Any $arg1) : Any
 
-  do 'file.pl'
+The cast function returns a Data::Object for the data provided. If the data
+passed is blessed then that same object will be returned.
 
-  # given block syntax
+=over 4
 
-  do { @{"${class}::ISA"} }
+=item cast example
 
-  # given func-args syntax
+  # given [1..4]
 
-  do('any', [1..4]); # Data::Object::Any
+  my $array = cast([1..4]); # Data::Object::Array
 
-The do function is a special constructor function that is automatically
-exported into the consuming package. It overloads and extends the core C<do>
-function, supporting the core functionality and adding a new feature, and
-exists to dispatch to exportable Data-Object functions and other dispatchers.
+=back
+
+=cut
+
+=head2 class_file
+
+  class_file(Str $arg1) : Str
+
+The class_file function convertss a class name to a class file.
+
+=over 4
+
+=item class_file example
+
+  # given 'Foo::Bar'
+
+  class_file('Foo::Bar'); # foo_bar
+
+=back
+
+=cut
+
+=head2 class_name
+
+  class_name(Str $arg1) : Str
+
+The class_name function converts a string to a class name.
+
+=over 4
+
+=item class_name example
+
+  # given 'foo-bar'
+
+  class_name('foo-bar'); # Foo::Bar
+
+=back
+
+=cut
+
+=head2 class_path
+
+  class_path(Str $arg1) : Str
+
+The class_path function converts a class name to a class file.
+
+=over 4
+
+=item class_path example
+
+  # given 'Foo::BarBaz'
+
+  class_path('Foo::BarBaz'); 'Foo/BarBaz.pm'
+
+=back
+
+=cut
+
+=head2 codify
+
+  codify(Str $arg1) : CodeRef
+
+The codify function returns a parameterized coderef from a string.
+
+=over 4
+
+=item codify example
+
+  my $coderef = codify('$a + $b + $c', 1, 2);
+
+  # $coderef->(3) returns 6
+
+=back
+
+=cut
+
+=head2 const
+
+  const(Str $arg1, Any $arg2) : CodeRef
+
+The const function creates a constant function using the name and expression
+supplied to it. A constant function is a function that does not accept any
+arguments and whose result(s) are deterministic.
+
+=over 4
+
+=item const example
+
+  # given 1.098765;
+
+  const VERSION => 1.098765;
+
+=back
+
+=cut
+
+=head2 data_any
+
+  data_any(Any $arg1) : Object
+
+The data_any function returns a L<Data::Object::Any> instance which
+wraps the provided data type and can be used to perform operations on the data.
+The C<type_any> function is an alias to this function.
+
+=over 4
+
+=item data_any example
+
+  # given 0;
+
+  $object = data_any 0;
+  $object->isa('Data::Object::Any');
+
+=back
+
+=cut
+
+=head2 data_array
+
+  data_array(ArrayRef $arg1) : ArrayObject
+
+The data_array function returns a Data::Object::Array instance which wraps the
+provided data type and can be used to perform operations on the data. The
+type_array function is an alias to this function.
+
+=over 4
+
+=item data_array example
+
+  # given [2..5];
+
+  $data = data_array [2..5];
+  $data->isa('Data::Object::Array');
+
+=back
+
+=cut
+
+=head2 data_code
+
+  data_code(CodeRef $arg1) : CodeObject
+
+The data_code function returns a L<Data::Object::Code> instance which wraps the
+provided data type and can be used to perform operations on the data. The
+C<type_code> function is an alias to this function.
+
+=over 4
+
+=item data_code example
+
+  # given sub { 1 };
+
+  $object = data_code sub { 1 };
+  $object->isa('Data::Object::Code');
+
+=back
+
+=cut
+
+=head2 data_data
+
+  data_data(Str $arg1) : Object
+
+The data_data function returns a L<Data::Object::Data> instance which parses
+pod-ish data in files and packages.
+
+=over 4
+
+=item data_data example
+
+  # given Foo::Bar;
+
+  $object = data_data 'Foo::Bar';
+  $object->isa('Data::Object::Data');
+
+=back
+
+=cut
+
+=head2 data_dispatch
+
+  data_dispatch(Str $arg1) : Object
+
+The data_dispatch function returns a L<Data::Object::Dispatch> instance which
+extends L<Data::Object::Code> and dispatches to routines in the given package.
+
+=over 4
+
+=item data_dispatch example
+
+  # given Foo::Bar;
+
+  $object = data_dispatch 'Foo::Bar';
+  $object->isa('Data::Object::Dispatch');
+
+=back
+
+=cut
+
+=head2 data_exception
+
+  data_exception(Any @args) : Object
+
+The data_exception function returns a L<Data::Object::Exception> instance which can
+be thrown.
+
+=over 4
+
+=item data_exception example
+
+  # given {,...};
+
+  $object = data_exception {,...};
+  $object->isa('Data::Object::Exception');
+
+=back
+
+=cut
+
+=head2 data_float
+
+  data_float(Str $arg1) : FloatObject
+
+The data_float function returns a L<Data::Object::Float> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_float> function is an alias to this function.
+
+=over 4
+
+=item data_float example
+
+  # given 5.25;
+
+  $object = data_float 5.25;
+  $object->isa('Data::Object::Float');
+
+=back
+
+=cut
+
+=head2 data_hash
+
+  data_hash(HashRef $arg1) : HashObject
+
+The data_hash function returns a L<Data::Object::Hash> instance which wraps the
+provided data type and can be used to perform operations on the data. The
+C<type_hash> function is an alias to this function.
+
+=over 4
+
+=item data_hash example
+
+  # given {1..4};
+
+  $object = data_hash {1..4};
+  $object->isa('Data::Object::Hash');
+
+=back
+
+=cut
+
+=head2 data_integer
+
+  data_integer(Int $arg1) : IntObject
+
+The data_integer function returns a L<Data::Object::Object> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_integer> function is an alias to this function.
+
+=over 4
+
+=item data_integer example
+
+  # given -100;
+
+  $object = data_integer -100;
+  $object->isa('Data::Object::Integer');
+
+=back
 
 =cut
 
 =head2 data_json
+
+  data_json(Any @args) : Any
+
+The data_json function encodes Perl data to JSON or decodes JSON strings to
+Perl.
+
+=over 4
+
+=item data_json example
 
   # given $string
 
@@ -811,23 +1096,142 @@ exists to dispatch to exportable Data-Object functions and other dispatchers.
 
   my $string = data_json($data);
 
-The data_json function encodes Perl data to JSON or decodes JSON strings to
-Perl.
+=back
+
+=cut
+
+=head2 data_number
+
+  data_number(Num $arg1) : NumObject
+
+The data_number function returns a L<Data::Object::Number> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_number> function is an alias to this function.
+
+=over 4
+
+=item data_number example
+
+  # given 100;
+
+  $object = data_number 100;
+  $object->isa('Data::Object::Number');
+
+=back
 
 =cut
 
 =head2 data_path
 
-  # given $filepath
-
-  my $path = data_path($filepath);
+  data_path(Any @args) : Any
 
 The data_path function returns a L<Data::Object::Path> object for the given
 path.
 
+=over 4
+
+=item data_path example
+
+  # given $filepath
+
+  my $path = data_path($filepath);
+
+=back
+
+=cut
+
+=head2 data_regexp
+
+  data_regexp(RegexpRef $arg1) : RegexpObject
+
+The data_regexp function returns a L<Data::Object::Regexp> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_regexp> function is an alias to this function.
+
+=over 4
+
+=item data_regexp example
+
+  # given qr/test/;
+
+  $object = data_regexp qr/test/;
+  $object->isa('Data::Object::Regexp');
+
+=back
+
+=cut
+
+=head2 data_scalar
+
+  data_scalar(Any $arg1) : ScalarObject
+
+The data_scalar function returns a L<Data::Object::Scalar> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_scalar> function is an alias to this function.
+
+=over 4
+
+=item data_scalar example
+
+  # given \*main;
+
+  $object = data_scalar \*main;
+  $object->isa('Data::Object::Scalar');
+
+=back
+
+=cut
+
+=head2 data_space
+
+  data_space(Str $arg1) : Object
+
+The data_space function returns a L<Data::Object::Space> instance which
+provides methods for operating on package and namespaces.
+
+=over 4
+
+=item data_space example
+
+  # given Foo::Bar;
+
+  $object = data_space 'Foo::Bar';
+  $object->isa('Data::Object::Space');
+
+=back
+
+=cut
+
+=head2 data_string
+
+  data_string(Str $arg1) : StrObject
+
+The data_string function returns a L<Data::Object::String> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_string> function is an alias to this function.
+
+=over 4
+
+=item data_string example
+
+  # given 'abcdefghi';
+
+  $object = data_string 'abcdefghi';
+  $object->isa('Data::Object::String');
+
+=back
+
 =cut
 
 =head2 data_tmpl
+
+  data_tmpl(Any @args) : Any
+
+The data_tmpl function returns a L<Data::Object::Template> object.
+
+=over 4
+
+=item data_tmpl example
 
   # given ($content, $variables)
 
@@ -835,11 +1239,41 @@ path.
 
   my $data = $tmpl->render($content, $variables);
 
-The data_tmpl function returns a L<Data::Object::Template> object.
+=back
+
+=cut
+
+=head2 data_undef
+
+  data_undef(Undef $arg1) : UndefObject
+
+The data_undef function returns a L<Data::Object::Undef> instance which wraps
+the provided data type and can be used to perform operations on the data. The
+C<type_undef> function is an alias to this function.
+
+=over 4
+
+=item data_undef example
+
+  # given undef;
+
+  $object = data_undef undef;
+  $object->isa('Data::Object::Undef');
+
+=back
 
 =cut
 
 =head2 data_yaml
+
+  data_yaml(Any @args) : Any
+
+The data_yaml function encodes Perl data to YAML or decodes YAML strings to
+Perl.
+
+=over 4
+
+=item data_yaml example
 
   # given $string
 
@@ -849,411 +1283,59 @@ The data_tmpl function returns a L<Data::Object::Template> object.
 
   my $string = data_yaml($data);
 
-The data_yaml function encodes Perl data to YAML or decodes YAML strings to
-Perl.
-
-=cut
-
-=head2 data_any
-
-  # given 0;
-
-  $object = data_any 0;
-  $object->isa('Data::Object::Any');
-
-The data_any function returns a L<Data::Object::Any> instance which
-wraps the provided data type and can be used to perform operations on the data.
-The C<type_any> function is an alias to this function.
-
-=cut
-
-=head2 data_array
-
-  # given [2..5];
-
-  $data = data_array [2..5];
-  $data->isa('Data::Object::Array');
-
-The data_array function returns a Data::Object::Array instance which wraps the
-provided data type and can be used to perform operations on the data. The
-type_array function is an alias to this function.
-
-=cut
-
-=head2 data_code
-
-  # given sub { 1 };
-
-  $object = data_code sub { 1 };
-  $object->isa('Data::Object::Code');
-
-The data_code function returns a L<Data::Object::Code> instance which wraps the
-provided data type and can be used to perform operations on the data. The
-C<type_code> function is an alias to this function.
-
-=cut
-
-=head2 data_data
-
-  # given Foo::Bar;
-
-  $object = data_data 'Foo::Bar';
-  $object->isa('Data::Object::Data');
-
-The data_data function returns a L<Data::Object::Data> instance which parses
-pod-ish data in files and packages.
-
-=cut
-
-=head2 data_dispatch
-
-  # given Foo::Bar;
-
-  $object = data_dispatch 'Foo::Bar';
-  $object->isa('Data::Object::Dispatch');
-
-The data_dispatch function returns a L<Data::Object::Dispatch> instance which
-extends L<Data::Object::Code> and dispatches to routines in the given package.
-
-=cut
-
-=head2 data_exception
-
-  # given {,...};
-
-  $object = data_exception {,...};
-  $object->isa('Data::Object::Exception');
-
-The data_exception function returns a L<Data::Object::Exception> instance which can
-be thrown.
-
-=cut
-
-=head2 data_float
-
-  # given 5.25;
-
-  $object = data_float 5.25;
-  $object->isa('Data::Object::Float');
-
-The data_float function returns a L<Data::Object::Float> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_float> function is an alias to this function.
-
-=cut
-
-=head2 data_hash
-
-  # given {1..4};
-
-  $object = data_hash {1..4};
-  $object->isa('Data::Object::Hash');
-
-The data_hash function returns a L<Data::Object::Hash> instance which wraps the
-provided data type and can be used to perform operations on the data. The
-C<type_hash> function is an alias to this function.
-
-=cut
-
-=head2 data_integer
-
-  # given -100;
-
-  $object = data_integer -100;
-  $object->isa('Data::Object::Integer');
-
-The data_integer function returns a L<Data::Object::Object> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_integer> function is an alias to this function.
-
-=cut
-
-=head2 data_number
-
-  # given 100;
-
-  $object = data_number 100;
-  $object->isa('Data::Object::Number');
-
-The data_number function returns a L<Data::Object::Number> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_number> function is an alias to this function.
-
-=cut
-
-=head2 data_regexp
-
-  # given qr/test/;
-
-  $object = data_regexp qr/test/;
-  $object->isa('Data::Object::Regexp');
-
-The data_regexp function returns a L<Data::Object::Regexp> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_regexp> function is an alias to this function.
-
-=cut
-
-=head2 data_scalar
-
-  # given \*main;
-
-  $object = data_scalar \*main;
-  $object->isa('Data::Object::Scalar');
-
-The data_scalar function returns a L<Data::Object::Scalar> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_scalar> function is an alias to this function.
-
-=cut
-
-=head2 data_space
-
-  # given Foo::Bar;
-
-  $object = data_space 'Foo::Bar';
-  $object->isa('Data::Object::Space');
-
-The data_space function returns a L<Data::Object::Space> instance which
-provides methods for operating on package and namespaces.
-
-=cut
-
-=head2 data_string
-
-  # given 'abcdefghi';
-
-  $object = data_string 'abcdefghi';
-  $object->isa('Data::Object::String');
-
-The data_string function returns a L<Data::Object::String> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_string> function is an alias to this function.
-
-=cut
-
-=head2 data_undef
-
-  # given undef;
-
-  $object = data_undef undef;
-  $object->isa('Data::Object::Undef');
-
-The data_undef function returns a L<Data::Object::Undef> instance which wraps
-the provided data type and can be used to perform operations on the data. The
-C<type_undef> function is an alias to this function.
-
-=cut
-
-=head2 immutable
-
-  # given [1,2,3];
-
-  $object = immutable data_array [1,2,3];
-  $object->isa('Data::Object::Array); # via Data::Object::Immutable
-
-The immutable function makes the data type object provided immutable. This
-function loads L<Data::Object::Immutable> and returns the object provided as an
-argument.
-
-=cut
-
-=head2 library
-
-  library; # Type::Library
-
-The library function returns the default L<Type::Library> object where all core
-type constraints are registered.
-
-=cut
-
-=head2 prototype
-
-  # given ('$name' => [is => 'ro']);
-
-  my $proto  = data_prototype '$name' => [is => 'ro'];
-  my $class  = $proto->create; # via Data::Object::Prototype
-  my $object = $class->new(name => '...');
-
-The prototype function returns a prototype object which can be used to
-generate classes, objects, and derivatives. This function loads
-L<Data::Object::Prototype> and returns an object based on the arguments
-provided.
-
-=cut
-
-=head2 registry
-
-  registry; # Data::Object::Registry
-
-The registry function returns the registry singleton object where mapping
-between namespaces and type libraries are registered.
-
-=cut
-
-=head2 reify
-
-  # given 'Str';
-
-  $type = reify 'Str'; # Type::Tiny
-
-The reify function will construct a L<Type::Tiny> type constraint object for
-the type expression provided.
-
-=cut
-
-=head2 throw
-
-  # given $message;
-
-  throw $message; # An exception (...) was thrown in -e at line 1
-
-The throw function will dynamically load and throw an exception object. This
-function takes all arguments accepted by the L<Data::Object::Exception> class.
-
-=cut
-
-=head2 cast
-
-  # given [1..4]
-
-  my $array = cast([1..4]); # Data::Object::Array
-
-The cast function returns a Data::Object for the data provided. If the data
-passed is blessed then that same object will be returned.
-
-=cut
-
-=head2 const
-
-  # given 1.098765;
-
-  const VERSION => 1.098765;
-
-The const function creates a constant function using the name and expression
-supplied to it. A constant function is a function that does not accept any
-arguments and whose result(s) are deterministic.
-
-=cut
-
-=head2 codify
-
-  my $coderef = codify('$a + $b + $c', 1, 2);
-
-  # $coderef->(3) returns 6
-
-The codify function returns a parameterized coderef from a string.
-
-=cut
-
-=head2 dispatch
-
-  my $dispatch = dispatch('main');
-
-  # $dispatch->('run') calls main::run
-
-The dispatch function return a Data::Object::Dispatch object which is a handle
-that let's you call into other packages.
-
-=cut
-
-=head2 dump
-
-  # given {1..8}
-
-  say dump {1..8};
-
-The dump function returns a string representation of the data passed.
-
-=cut
-
-=head2 load
-
-  # given 'List::Util';
-
-  $package = load 'List::Util'; # List::Util if loaded
-
-The load function attempts to dynamically load a module and either dies or
-returns the package name of the loaded module.
-
-=cut
-
-=head2 namespace
-
-  # given Types::Standard
-
-  namespace('App', 'Types::Standard');
-
-The namespace function registers a type library with a namespace in the
-registry so that typed operations know where to look for type context-specific
-constraints.
+=back
 
 =cut
 
 =head2 deduce
+
+  deduce(Any $arg1) : Any
+
+The deduce function returns a data type object instance based upon the deduced
+type of data provided.
+
+=over 4
+
+=item deduce example
 
   # given qr/\w+/;
 
   $object = deduce qr/\w+/;
   $object->isa('Data::Object::Regexp');
 
-The deduce function returns a data type object instance based upon the deduced
-type of data provided.
-
-=cut
-
-=head2 deduce_defined
-
-  # given $data
-
-  deduce_defined($data);
-
-The deduce_defined function returns truthy if the argument is defined.
+=back
 
 =cut
 
 =head2 deduce_blessed
 
+  deduce_blessed(Any $arg1) : Int
+
+The deduce_blessed function returns truthy if the argument is blessed.
+
+=over 4
+
+=item deduce_blessed example
+
   # given $data
 
   deduce_blessed($data);
 
-The deduce_blessed function returns truthy if the argument is blessed.
-
-=cut
-
-=head2 deduce_references
-
-  # given $data
-
-  deduce_references($data);
-
-The deduce_references function returns a Data::Object object based on the type
-of argument reference provided.
-
-=cut
-
-=head2 deduce_numberlike
-
-  # given $data
-
-  deduce_numberlike($data);
-
-The deduce_numberlike function returns truthy if the argument is numberlike.
-
-=cut
-
-=head2 deduce_stringlike
-
-  # given $data
-
-  deduce_stringlike($data);
-
-The deduce_stringlike function returns truthy if the argument is stringlike.
+=back
 
 =cut
 
 =head2 deduce_deep
+
+  deduce_deep(Any $arg1) : Any
+
+The deduce_deep function returns a data type object. If the data provided is
+complex, this function traverses the data converting all nested data to objects.
+Note: Blessed objects are not traversed.
+
+=over 4
+
+=item deduce_deep example
 
   # given {1,2,3,{4,5,6,[-1]}}
 
@@ -1267,35 +1349,133 @@ The deduce_stringlike function returns truthy if the argument is stringlike.
   #   },
   # }
 
-The deduce_deep function returns a data type object. If the data provided is
-complex, this function traverses the data converting all nested data to objects.
-Note: Blessed objects are not traversed.
+=back
+
+=cut
+
+=head2 deduce_defined
+
+  deduce_defined(Any $arg1) : Int
+
+The deduce_defined function returns truthy if the argument is defined.
+
+=over 4
+
+=item deduce_defined example
+
+  # given $data
+
+  deduce_defined($data);
+
+=back
+
+=cut
+
+=head2 deduce_numberlike
+
+  deduce_numberlike(Any $arg1) : Int
+
+The deduce_numberlike function returns truthy if the argument is numberlike.
+
+=over 4
+
+=item deduce_numberlike example
+
+  # given $data
+
+  deduce_numberlike($data);
+
+=back
+
+=cut
+
+=head2 deduce_references
+
+  deduce_references(Any $arg1) : Int
+
+The deduce_references function returns a Data::Object object based on the type
+of argument reference provided.
+
+=over 4
+
+=item deduce_references example
+
+  # given $data
+
+  deduce_references($data);
+
+=back
+
+=cut
+
+=head2 deduce_stringlike
+
+  deduce_stringlike(Any $arg1) : Int
+
+The deduce_stringlike function returns truthy if the argument is stringlike.
+
+=over 4
+
+=item deduce_stringlike example
+
+  # given $data
+
+  deduce_stringlike($data);
+
+=back
 
 =cut
 
 =head2 deduce_type
 
+  deduce_type(Any $arg1) : Str
+
+The deduce_type function returns a data type description for the type of data
+provided, represented as a string in capital letters.
+
+=over 4
+
+=item deduce_type example
+
   # given qr/\w+/;
 
   $type = deduce_type qr/\w+/; # REGEXP
 
-The deduce_type function returns a data type description for the type of data
-provided, represented as a string in capital letters.
+=back
 
 =cut
 
 =head2 detract
 
-  # given bless({1..4}, 'Data::Object::Hash');
-
-  $object = detract $object; # {1..4}
+  detract(Any $arg1) : Any
 
 The detract function returns a value of native type, based upon the underlying
 reference of the data type object provided.
 
+=over 4
+
+=item detract example
+
+  # given bless({1..4}, 'Data::Object::Hash');
+
+  $object = detract $object; # {1..4}
+
+=back
+
 =cut
 
 =head2 detract_deep
+
+  detract_deep(Any $arg1) : Any
+
+The detract_deep function returns a value of native type. If the data provided
+is complex, this function traverses the data converting all nested data type
+objects into native values using the objects underlying reference. Note:
+Blessed objects are not traversed.
+
+=over 4
+
+=item detract_deep example
 
   # given {1,2,3,{4,5,6,[-1, 99, bless({}), sub { 123 }]}};
 
@@ -1310,59 +1490,263 @@ reference of the data type object provided.
   #     }
   # }
 
-The detract_deep function returns a value of native type. If the data provided
-is complex, this function traverses the data converting all nested data type
-objects into native values using the objects underlying reference. Note:
-Blessed objects are not traversed.
+=back
 
 =cut
 
-=head2 class_file
+=head2 dispatch
 
-  # given 'Foo::Bar'
+  dispatch(Str $arg1) : Object
 
-  class_file('Foo::Bar'); # foo_bar
+The dispatch function return a Data::Object::Dispatch object which is a handle
+that let's you call into other packages.
 
-The class_file function convertss a class name to a class file.
+=over 4
+
+=item dispatch example
+
+  my $dispatch = dispatch('main');
+
+  # $dispatch->('run') calls main::run
+
+=back
 
 =cut
 
-=head2 class_name
+=head2 do
 
-  # given 'foo-bar'
+  do(Str $arg1, Any @args) : Any
 
-  class_name('foo-bar'); # Foo::Bar
+The do function is a special constructor function that is automatically
+exported into the consuming package. It overloads and extends the core C<do>
+function, supporting the core functionality and adding a new feature, and
+exists to dispatch to exportable Data-Object functions and other dispatchers.
 
-The class_name function converts a string to a class name.
+=over 4
+
+=item do example
+
+  # given file syntax
+
+  do 'file.pl'
+
+  # given block syntax
+
+  do { @{"${class}::ISA"} }
+
+  # given func-args syntax
+
+  do('any', [1..4]); # Data::Object::Any
+
+=back
 
 =cut
 
-=head2 class_path
+=head2 dump
 
-  # given 'Foo::BarBaz'
+  dump(Any $arg1) : Str
 
-  class_path('Foo::BarBaz'); 'Foo/BarBaz.pm'
+The dump function returns a string representation of the data passed.
 
-The class_path function converts a class name to a class file.
+=over 4
+
+=item dump example
+
+  # given {1..8}
+
+  say dump {1..8};
+
+=back
+
+=cut
+
+=head2 immutable
+
+  immutable(Any $arg1) : Any
+
+The immutable function makes the data type object provided immutable. This
+function loads L<Data::Object::Immutable> and returns the object provided as an
+argument.
+
+=over 4
+
+=item immutable example
+
+  # given [1,2,3];
+
+  $object = immutable data_array [1,2,3];
+  $object->isa('Data::Object::Array); # via Data::Object::Immutable
+
+=back
+
+=cut
+
+=head2 library
+
+  library() : Object
+
+The library function returns the default L<Type::Library> object where all core
+type constraints are registered.
+
+=over 4
+
+=item library example
+
+  library; # Type::Library
+
+=back
+
+=cut
+
+=head2 load
+
+  load(Str $arg1) : ClassName
+
+The load function attempts to dynamically load a module and either dies or
+returns the package name of the loaded module.
+
+=over 4
+
+=item load example
+
+  # given 'List::Util';
+
+  $package = load 'List::Util'; # List::Util if loaded
+
+=back
+
+=cut
+
+=head2 namespace
+
+  namespace(ClassName $arg1, ClassName $arg2) : Str
+
+The namespace function registers a type library with a namespace in the
+registry so that typed operations know where to look for type context-specific
+constraints.
+
+=over 4
+
+=item namespace example
+
+  # given Types::Standard
+
+  namespace('App', 'Types::Standard');
+
+=back
 
 =cut
 
 =head2 path_class
 
+  path_class(Str $arg1) : Str
+
+The path_class function converts a path to a class name.
+
+=over 4
+
+=item path_class example
+
   # given 'foo/bar_baz'
 
   path_class('foo/bar_baz'); # Foo::BarBaz
 
-The path_class function converts a path to a class name.
+=back
 
 =cut
 
 =head2 path_name
 
+  path_name(Str $arg1) : Str
+
+The path_name function converts a class name to a path.
+
+=over 4
+
+=item path_name example
+
   # given 'Foo::BarBaz'
 
   path_name('Foo::BarBaz'); # foo-bar_baz
 
-The path_name function converts a class name to a path.
+=back
+
+=cut
+
+=head2 prototype
+
+  prototype(Any @args) : Object
+
+The prototype function returns a prototype object which can be used to
+generate classes, objects, and derivatives. This function loads
+L<Data::Object::Prototype> and returns an object based on the arguments
+provided.
+
+=over 4
+
+=item prototype example
+
+  # given ('$name' => [is => 'ro']);
+
+  my $proto  = data_prototype '$name' => [is => 'ro'];
+  my $class  = $proto->create; # via Data::Object::Prototype
+  my $object = $class->new(name => '...');
+
+=back
+
+=cut
+
+=head2 registry
+
+  registry() : Object
+
+The registry function returns the registry singleton object where mapping
+between namespaces and type libraries are registered.
+
+=over 4
+
+=item registry example
+
+  registry; # Data::Object::Registry
+
+=back
+
+=cut
+
+=head2 reify
+
+  reify(Str $arg1) : Object
+
+The reify function will construct a L<Type::Tiny> type constraint object for
+the type expression provided.
+
+=over 4
+
+=item reify example
+
+  # given 'Str';
+
+  $type = reify 'Str'; # Type::Tiny
+
+=back
+
+=cut
+
+=head2 throw
+
+  throw(Any @args) : Object
+
+The throw function will dynamically load and throw an exception object. This
+function takes all arguments accepted by the L<Data::Object::Exception> class.
+
+=over 4
+
+=item throw example
+
+  # given $message;
+
+  throw $message; # An exception (...) was thrown in -e at line 1
+
+=back
 
 =cut

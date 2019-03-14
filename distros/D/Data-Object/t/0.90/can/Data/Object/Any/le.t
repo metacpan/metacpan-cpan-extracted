@@ -21,7 +21,7 @@ The le method returns truthy if argument is lesser or equal to the object data.
 
 =signature
 
-le(Any $arg1) : DoNum
+le(Any $arg1) : NumObject
 
 =type
 

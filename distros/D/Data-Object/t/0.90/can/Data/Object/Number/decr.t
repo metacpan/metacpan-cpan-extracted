@@ -24,7 +24,7 @@ a data type object to be determined after execution.
 
 =signature
 
-decr(Num $arg1) : DoNum
+decr(Num $arg1) : NumObject
 
 =type
 

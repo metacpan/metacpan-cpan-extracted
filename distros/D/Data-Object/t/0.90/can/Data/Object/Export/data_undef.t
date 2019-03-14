@@ -26,7 +26,7 @@ C<type_undef> function is an alias to this function.
 
 =signature
 
-data_undef(Undef $arg1) : DoUndef
+data_undef(Undef $arg1) : UndefObject
 
 =type
 

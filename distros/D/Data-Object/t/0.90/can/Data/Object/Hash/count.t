@@ -24,7 +24,7 @@ a L<Data::Object::Number> object.
 
 =signature
 
-count() : DoNum
+count() : NumObject
 
 =type
 

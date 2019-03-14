@@ -25,7 +25,7 @@ instance.
 
 =signature
 
-new(HashRef $arg1) : DoHash
+new(HashRef $arg1) : HashObject
 
 =type
 

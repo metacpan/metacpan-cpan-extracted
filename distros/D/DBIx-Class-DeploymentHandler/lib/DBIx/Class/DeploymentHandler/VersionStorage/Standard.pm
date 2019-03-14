@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::VersionStorage::Standard;
-$DBIx::Class::DeploymentHandler::VersionStorage::Standard::VERSION = '0.002228';
+$DBIx::Class::DeploymentHandler::VersionStorage::Standard::VERSION = '0.002230';
 use Moo;
 use DBIx::Class::DeploymentHandler::LogImporter ':log';
 use DBIx::Class::DeploymentHandler::Types -all;

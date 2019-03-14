@@ -25,7 +25,7 @@ instance.
 
 =signature
 
-new(ArrayRef $arg1) : DoArray
+new(ArrayRef $arg1) : ArrayObject
 
 =type
 

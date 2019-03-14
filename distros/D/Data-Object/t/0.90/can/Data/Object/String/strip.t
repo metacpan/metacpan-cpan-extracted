@@ -25,7 +25,7 @@ string object.
 
 =signature
 
-strip() : DoStr
+strip() : StrObject
 
 =type
 

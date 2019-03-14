@@ -24,7 +24,7 @@ sorted numerically. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-nsort() : DoArray
+nsort() : ArrayObject
 
 =type
 

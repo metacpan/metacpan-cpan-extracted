@@ -25,7 +25,7 @@ returns an array value.
 
 =signature
 
-lines() : DoArray
+lines() : ArrayObject
 
 =type
 

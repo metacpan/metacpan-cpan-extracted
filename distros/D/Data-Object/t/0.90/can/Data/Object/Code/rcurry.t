@@ -26,7 +26,7 @@ returns a L<Data::Object::Code> object.
 
 =signature
 
-rcurry(Any $arg1) : DoCode
+rcurry(Any $arg1) : CodeObject
 
 =type
 

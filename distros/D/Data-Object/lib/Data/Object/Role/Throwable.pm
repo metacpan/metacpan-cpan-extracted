@@ -61,8 +61,16 @@ This package implements the following methods.
 
 =head2 throw
 
-  $self->throw($message);
+  throw(Str $arg1) : Object
 
 The throw method throws an exception with the object and message.
+
+=over 4
+
+=item throw example
+
+  $self->throw($message);
+
+=back
 
 =cut

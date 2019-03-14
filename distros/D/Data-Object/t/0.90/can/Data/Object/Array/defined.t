@@ -26,7 +26,7 @@ returns false. This method returns a L<Data::Object::Number> object.
 
 =signature
 
-defined() : DoNum
+defined() : NumObject
 
 =type
 

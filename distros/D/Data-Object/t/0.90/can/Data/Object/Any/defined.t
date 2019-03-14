@@ -21,7 +21,7 @@ The defined method returns truthy for defined data.
 
 =signature
 
-defined() : DoNum
+defined() : NumObject
 
 =type
 

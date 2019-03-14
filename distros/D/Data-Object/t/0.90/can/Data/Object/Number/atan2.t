@@ -24,7 +24,7 @@ method returns a L<Data::Object::Float> object.
 
 =signature
 
-atan2(Num $arg1) : DoNum
+atan2(Num $arg1) : NumObject
 
 =type
 

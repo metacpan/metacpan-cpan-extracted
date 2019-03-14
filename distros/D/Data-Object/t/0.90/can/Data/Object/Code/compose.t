@@ -33,7 +33,7 @@ L<Data::Object::Code> object.
 
 =signature
 
-compose(CodeRef $arg1, Any $arg2) : DoCode
+compose(CodeRef $arg1, Any $arg2) : CodeObject
 
 =type
 

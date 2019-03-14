@@ -24,7 +24,7 @@ This method returns a string value.
 
 =signature
 
-uc() : DoStr
+uc() : StrObject
 
 =type
 

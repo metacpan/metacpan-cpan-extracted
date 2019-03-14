@@ -23,7 +23,7 @@ expression operation.
 
 =signature
 
-count() : DoNum
+count() : NumObject
 
 =type
 

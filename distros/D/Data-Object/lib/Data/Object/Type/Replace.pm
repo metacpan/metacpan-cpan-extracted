@@ -67,26 +67,50 @@ This package implements the following methods.
 
 =cut
 
-=head2 name
-
-  my $name = $self->name();
-
-The name method returns the name of the data type.
-
-=cut
-
 =head2 aliases
+
+  aliases() : ArrayRef
+
+The aliases method returns aliases to register in the type library.
+
+=over 4
+
+=item aliases example
 
   my $aliases = $self->aliases();
 
-The aliases method returns aliases to register in the type library.
+=back
+
+=cut
+
+=head2 name
+
+  name() : StrObject
+
+The name method returns the name of the data type.
+
+=over 4
+
+=item name example
+
+  my $name = $self->name();
+
+=back
 
 =cut
 
 =head2 validation
 
-  my $validation = $self->validation();
+  validation(Object $arg1) : NumObject
 
 The validation method returns truthy if type check is valid.
+
+=over 4
+
+=item validation example
+
+  my $validation = $self->validation();
+
+=back
 
 =cut

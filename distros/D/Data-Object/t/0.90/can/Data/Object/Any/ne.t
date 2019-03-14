@@ -21,7 +21,7 @@ The ne method returns truthy if argument and object data are not equal.
 
 =signature
 
-ne(Any $arg1) : DoNum
+ne(Any $arg1) : NumObject
 
 =type
 

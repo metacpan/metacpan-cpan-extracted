@@ -27,7 +27,7 @@ L<Data::Object::String> object.
 
 =signature
 
-join(Str $arg1) : DoStr
+join(Str $arg1) : StrObject
 
 =type
 

@@ -22,7 +22,7 @@ contains information about the results of the regular expression operation.
 
 =signature
 
-initial() : DoStr
+initial() : StrObject
 
 =type
 

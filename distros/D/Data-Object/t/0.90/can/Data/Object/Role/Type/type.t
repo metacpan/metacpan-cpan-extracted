@@ -21,7 +21,7 @@ The type method returns object type string.
 
 =signature
 
-type() : DoStr
+type() : StrObject
 
 =type
 

@@ -71,19 +71,10 @@ sub test_exists {
   return;
 }
 
-sub test_documents {
-  my ($path) = @_;
-
-  ok -f "lib/$path.pod", "lib/$path.pod exists";
-
-  return;
-}
-
 sub test_modules {
   my ($path) = @_;
 
   test_exists($path);
-  test_documents($path);
   test_sections($path);
 
   return;

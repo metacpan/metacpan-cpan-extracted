@@ -55,8 +55,16 @@ This package implements the following methods.
 
 =head2 catch
 
-  my $catch = $self->catch($object, 'App::Exception');
+  catch(Object $arg1, ClassName $arg2) : Int
 
 Returns truthy if the objects passed are of the same kind.
+
+=over 4
+
+=item catch example
+
+  my $catch = $self->catch($object, 'App::Exception');
+
+=back
 
 =cut

@@ -23,7 +23,7 @@ expression operation.
 
 =signature
 
-matched() : DoStr | DoUndef
+matched() : StrObject | UndefObject
 
 =type
 

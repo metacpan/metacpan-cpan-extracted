@@ -9,7 +9,6 @@ my @notes = @ARGV ? @ARGV : qw(C E G);
 
 my $m = Music::Intervals->new(
     notes    => \@notes,
-#    semitones => 15,
     justin   => 1,
     equalt   => 1,
     chords   => 1,
@@ -17,16 +16,17 @@ my $m = Music::Intervals->new(
     interval => 1,
     freqs    => 1,
     prime    => 1,
+    integer  => 1,
 );
 $m->process;
 print Dumper
-#    $m->notes,
-#    $m->chord_names,
-#    $m->natural_frequencies,
+    $m->chord_names,
+    $m->natural_frequencies,
     $m->natural_intervals,
     $m->natural_cents,
     $m->natural_prime_factors,
-#    $m->eq_tempered_frequencies,
-#    $m->eq_tempered_intervals,
+    $m->eq_tempered_frequencies,
+    $m->eq_tempered_intervals,
     $m->eq_tempered_cents,
+    $m->integer_notation,
 ;

@@ -24,7 +24,7 @@ array reference. This method return a L<Data::Object::Array> object.
 
 =signature
 
-list() : DoArray
+list() : ArrayObject
 
 =type
 

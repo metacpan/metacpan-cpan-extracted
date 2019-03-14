@@ -24,7 +24,7 @@ method returns a number value.
 
 =signature
 
-length() : DoNum
+length() : NumObject
 
 =type
 

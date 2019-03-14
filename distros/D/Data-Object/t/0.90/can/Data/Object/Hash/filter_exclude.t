@@ -25,7 +25,7 @@ arguments. This method returns a L<Data::Object::Hash> object.
 
 =signature
 
-filter_exclude(Str @args) : DoHash
+filter_exclude(Str @args) : HashObject
 
 =type
 

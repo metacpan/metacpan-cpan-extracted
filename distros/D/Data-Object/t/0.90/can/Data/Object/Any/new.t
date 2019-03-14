@@ -21,7 +21,7 @@ Construct a new object.
 
 =signature
 
-new(Any $arg1) : DoAny
+new(Any $arg1) : AnyObject
 
 =type
 

@@ -23,7 +23,7 @@ regular expression operation.
 
 =signature
 
-string() : DoStr
+string() : StrObject
 
 =type
 

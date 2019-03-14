@@ -24,7 +24,7 @@ method returns a data type object to be determined after execution.
 
 =signature
 
-sin() : DoInt
+sin() : IntObject
 
 =type
 

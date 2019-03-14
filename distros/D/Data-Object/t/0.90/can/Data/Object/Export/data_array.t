@@ -26,7 +26,7 @@ type_array function is an alias to this function.
 
 =signature
 
-data_array(ArrayRef $arg1) : DoArray
+data_array(ArrayRef $arg1) : ArrayObject
 
 =type
 

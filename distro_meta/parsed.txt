@@ -54330,3 +54330,9 @@ G/GU/GUGOD/Text-Util-Chinese-0.02.tar.gz
 M/MR/MRDVT/Win32-OLE-CrystalRuntime-Application-0.16.zip
 R/RE/RENEEB/WWW-Speakerdeck-Download-0.01.tar.gz
 C/CA/CALID/ZMQ-FFI-1.17.tar.gz
+W/WA/WANGQ/App-Fasops-0.6.3.tar.gz
+H/HU/HURRICUP/Bundle-Camelcade-0.001.tar.gz
+P/PR/PRBRENAN/Data-Edit-Xml-20190315.tar.gz
+A/AW/AWNCORP/Data-Object-0.91.tar.gz
+E/ET/ETJ/DBIx-Class-DeploymentHandler-0.002230.tar.gz
+G/GE/GENE/Music-Intervals-0.0503.tar.gz

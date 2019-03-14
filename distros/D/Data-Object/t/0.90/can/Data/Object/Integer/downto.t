@@ -25,7 +25,7 @@ L<Data::Object::Array> object.
 
 =signature
 
-downto(Int $arg1) : DoArray
+downto(Int $arg1) : ArrayObject
 
 =type
 

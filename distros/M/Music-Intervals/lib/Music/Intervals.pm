@@ -1,11 +1,9 @@
 package Music::Intervals;
-BEGIN {
-  $Music::Intervals::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
 # ABSTRACT: Mathematical breakdown of musical intervals
 use strict;
 use warnings;
-our $VERSION = '0.0502';
+our $VERSION = '0.0503';
 
 use Moo;
 use Algorithm::Combinatorics qw( combinations );
@@ -15,7 +13,6 @@ use MIDI::Pitch qw( name2freq );
 use Number::Fraction;
 use Music::Scales;
 use Music::Intervals::Ratios;
-
 
 
 has cents     => ( is => 'ro', default => sub { 0 } );
@@ -33,42 +30,79 @@ has concert   => ( is => 'ro', default => sub { 440 } );
 has size      => ( is => 'ro', default => sub { 3 } );
 has tonic     => ( is => 'ro', default => sub { 'C' } );
 has semitones => ( is => 'ro', default => sub { 12 } );
-has temper    => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    $self->semitones * 100 / log(2) },
+
+has temper => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        $self->semitones * 100 / log(2);
+    },
 );
-has notes => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    return [ get_scale_notes( $self->tonic ) ] },
+has notes => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return [ get_scale_notes( $self->tonic ) ]
+    },
 );
-has scale => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    return [ map { eval "$Music::Intervals::Ratios::ratio->{$_}{ratio}" } @{ $self->notes } ] },
+has scale => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return [ map { eval "$Music::Intervals::Ratios::ratio->{$_}{ratio}" } @{ $self->notes } ]
+    },
 );
-has _note_index => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    return { map { $_ => eval "$Music::Intervals::Ratios::ratio->{$_}{ratio}" } @{ $self->notes } } },
+has _note_index => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return { map { $_ => eval "$Music::Intervals::Ratios::ratio->{$_}{ratio}" } @{ $self->notes } }
+    },
 );
-has _ratio_index => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    return { map { $_ => $Music::Intervals::Ratios::ratio->{$_}{ratio} } @{ $self->notes } } },
+has _ratio_index => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return { map { $_ => $Music::Intervals::Ratios::ratio->{$_}{ratio} } @{ $self->notes } }
+    },
 );
-has _ratio_name_index => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
-    return {
-        map { $Music::Intervals::Ratios::ratio->{$_}{ratio} => {
-            symbol => $_,
-            name   => $Music::Intervals::Ratios::ratio->{$_}{name} }
-        } keys %$Music::Intervals::Ratios::ratio } },
+has _ratio_name_index => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return {
+            map { $Music::Intervals::Ratios::ratio->{$_}{ratio} => {
+                symbol => $_,
+                name   => $Music::Intervals::Ratios::ratio->{$_}{name} }
+            } keys %$Music::Intervals::Ratios::ratio
+        }
+    },
 );
-has tonic_frequency => ( is => 'ro', lazy => 1, default => sub { my $self = shift;
+has tonic_frequency => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
         return $self->concert * (2 ** (1 / $self->semitones)) ** (-9) # XXX Hardcoding: 9th key above middle-C
     },
 );
 
-has chord_names => ( is => 'rw', default => sub { {} } );
-has natural_frequencies => ( is => 'rw', default => sub { {} } );
-has natural_intervals => ( is => 'rw', default => sub { {} } );
-has natural_cents => ( is => 'rw', default => sub { {} } );
-has natural_prime_factors => ( is => 'rw', default => sub { {} } );
+has chord_names             => ( is => 'rw', default => sub { {} } );
+has natural_frequencies     => ( is => 'rw', default => sub { {} } );
+has natural_intervals       => ( is => 'rw', default => sub { {} } );
+has natural_cents           => ( is => 'rw', default => sub { {} } );
+has natural_prime_factors   => ( is => 'rw', default => sub { {} } );
 has eq_tempered_frequencies => ( is => 'rw', default => sub { {} } );
-has eq_tempered_intervals => ( is => 'rw', default => sub { {} } );
-has eq_tempered_cents => ( is => 'rw', default => sub { {} } );
-has integer_notation => ( is => 'rw', default => sub { {} } );
+has eq_tempered_intervals   => ( is => 'rw', default => sub { {} } );
+has eq_tempered_cents       => ( is => 'rw', default => sub { {} } );
+has integer_notation        => ( is => 'rw', default => sub { {} } );
+
 
 sub process
 {
@@ -94,8 +128,8 @@ sub process
         if ( $self->integer )
         {
             $self->integer_notation->{"@$c integer_notation"} = {
-                map { $_ => 
-                    sprintf '%.0f', $self->midikey + $self->semitones * log( ($self->tonic_frequency * (eval $self->_ratio_index->{$_})) / $self->concert ) / log(2)
+                map { $_ => sprintf '%.0f',
+                    $self->midikey + $self->semitones * log( ($self->tonic_frequency * (eval $self->_ratio_index->{$_})) / $self->concert ) / log(2)
                 } @$c
             };
         }
@@ -105,9 +139,9 @@ sub process
             if ( $self->freqs )
             {
                 $self->natural_frequencies->{"@$c natural_frequencies"} = {
-                    map {
-                        $_ => {
-                             sprintf('%.3f', $self->tonic_frequency * eval $self->_ratio_index->{$_}) => { $self->_ratio_index->{$_} => $Music::Intervals::Ratios::ratio->{$_}{name} }
+                    map { $_ => {
+                        sprintf('%.3f', $self->tonic_frequency * eval $self->_ratio_index->{$_})
+                            => { $self->_ratio_index->{$_} => $Music::Intervals::Ratios::ratio->{$_}{name} }
                         }
                     } @$c
                 };
@@ -173,6 +207,7 @@ sub process
     }
 }
 
+
 sub dyads
 {
     my $self = shift;
@@ -200,6 +235,7 @@ sub dyads
 
     return %dyads;
 }
+
 
 sub ratio_factorize {
     my $dyad = shift;
@@ -242,24 +278,27 @@ Music::Intervals - Mathematical breakdown of musical intervals
 
 =head1 VERSION
 
-version 0.0502
+version 0.0503
 
 =head1 SYNOPSIS
 
   use Music::Intervals;
-  $m = Music::Intervals->new(
-    notes => [qw( C E G B )],
-    size => 3,
-    chords => 1,
-    justin => 1,
-    equalt => 1,
-    freqs => 1,
-    interval => 1,
-    cents => 1,
-    prime => 1,
-    integer => 1,
+
+  my $m = Music::Intervals->new(
+    notes    => [qw/C E G B/], # Default: C major scale
+    size     => 3,             # Must be <= the notes
+    chords   => 1,             # Required for chord names
+    justin   => 1,             # Required for natural_*
+    equalt   => 1,             # Required for eq_tempered_*
+    freqs    => 1,             # Required for *_frequencies
+    interval => 1,             # Required for *_intervals
+    cents    => 1,             # Required for *_cents
+    prime    => 1,             # Required for prime factors
+    integer  => 1,             # Required for integer notation
   );
+
   $m->process;
+
   # Then
   print Dumper # any of:
     $m->chord_names,
@@ -274,10 +313,10 @@ version 0.0502
   ;
 
   # Find known intervals
-  $name = $m->by_ratio($ratio);
+  $name  = $m->by_ratio($ratio);
   $ratio = $m->by_name($interval_name);
 
-  # Show all the known intervals (the "notes" attribute above):
+  # Show all the known intervals:
   perl -MData::Dumper -MMusic::Intervals::Ratios -e'print Dumper $Music::Intervals::Ratios::ratio'
 
 =head1 DESCRIPTION
@@ -290,50 +329,106 @@ mean, the measurements of the notes and the intervals between them.
 
 * This module only handles equal temperament for the 12-tone scale only. *
 
-=head1 METHODS
+=head1 ATTRIBUTES
 
-=head2 new()
+=head2 cents
 
-  $x = Music::Intervals->new(%arguments);
+Show divisions of the octave.
 
-=head2 Attributes and defaults
+Default: 0
 
-=over 4
+=head2 chords
 
-=item cents: 0 - divisions of the octave
+Show chord names.
 
-=item chords: 0 - chord names
+Default: 0
 
-=item equalt: 0 - equal temperament
+=head2 rootless
 
-=item justin: 0 - just intonation
+Show chord names with no root.
 
-=item integer: 0 - integer notation
+Default: 0
 
-=item freqs: 0 - frequencies
+=head2 equalt
 
-=item interval: 0 - note intervals
+Show equal temperament.
 
-=item prime: 0 - prime factorization
+Default: 0
 
-=item rootless: 0 - show chord names with no root
+=head2 justin
 
-=item octave: 4 - use the fourth octave
+Show just intonation.
 
-=item concert: 440 - concert pitch
+Default: 0
 
-=item size: 3 - chord size
+=head2 integer
 
-=item tonic: C - root of the computations
+Show integer notation.
+
+Default: 0
+
+=head2 freqs
+
+Show frequencies.
+
+Default: 0
+
+=head2 interval
+
+Show note intervals.
+
+Default: 0
+
+=head2 prime
+
+Show prime factorization.
+
+Default: 0
+
+=head2 octave
+
+The octave to use.
+
+Default: 4
+
+=head2 concert
+
+Concert pitch.
+
+Default: 440
+
+=head2 size
+
+Chord size
+
+Default: 3
+
+=head2 tonic
+
+The root of the computations.
+
+Default: C
 
 * Currently (and for the foreseeable future) this will remain the only value
 that produces sane results.
 
-=item semitones: 12 - number of notes in the scale
+=head2 semitones
 
-=item temper: semitones * 100 / log(2) - physical distance between notes
+Number of notes in the scale.
 
-=item notes: [ C D E F G A B ] - actual notes to use in the computation
+Default: 12
+
+=head2 temper
+
+Physical distance between notes.
+
+Default: semitones * 100 / log(2)
+
+=head2 notes
+
+The actual notes to use in the computation.
+
+Default: [ C D E F G A B ]
 
 The list of notes may be any of the keys in the L<Music::Intervals::Ratios>
 C<ratio> hashref.  This is very very long and contains useful intervals such as
@@ -348,7 +443,7 @@ A few examples:
  * [qw( C 11h 7h )]
  * [qw( C pM3 pM7 )]
 
-For natural_intervals() this example produces the following:
+For B<natural_intervals> this last example produces the following:
 
  'C pM3 pM7' => {
    'C pM3' => { '81/64' => 'Pythagorean major third' },
@@ -359,7 +454,65 @@ For natural_intervals() this example produces the following:
 Note that case matters for interval names.  For example, "M" means major and "m"
 means minor.
 
-=back
+=head2 midikey
+
+Default: 69
+
+=head2 chord_names
+
+Computed hashref
+
+=head2 eq_tempered_cents
+
+Computed hashref
+
+=head2 eq_tempered_frequencies
+
+Computed hashref
+
+=head2 eq_tempered_intervals
+
+Computed hashref
+
+=head2 integer_notation
+
+Computed hashref
+
+=head2 natural_cents
+
+Computed hashref
+
+=head2 natural_frequencies
+
+Computed hashref
+
+=head2 natural_intervals
+
+Computed hashref
+
+=head2 natural_prime_factors
+
+Computed hashref
+
+=head1 METHODS
+
+=head2 new()
+
+  $x = Music::Intervals->new(%arguments);
+
+Create a new C<Music::Intervals> object.
+
+=head2 process()
+
+Do the actual computations!
+
+=head2 dyads()
+
+Return pairs of the given combinations with fractional and pitch ratio parts.
+
+=head2 ratio_factorize()
+
+Return the dyadic fraction as a prime factored expression.
 
 =head2 by_name()
 
@@ -370,18 +523,21 @@ Return a known ratio or undef.
 
 =head2 by_ratio()
 
- $name = $m->by_ratio($ratio);
+ $name = $m->by_ratio('1/1');
+ # { 'symbol' => 'C', 'name' => 'unison, perfect prime, tonic' }
 
 Return a known ratio name or undef.
 
 =head1 SEE ALSO
 
+The F<t/> tests and F<eg/> example in this distribution
+
 For the time being, you will need to look at the source of
-C<Music::Intervals::Ratios> for the note and interval names.
+L<Music::Intervals::Ratios> for the note and interval names.
 
 L<Music::Intervals::Numeric> for numeric-only note-intervals
 
-L<https://github.com/ology/Music/blob/master/intervals>
+L<https://github.com/ology/Music/blob/master/intervals> - The predecessor to this module
 
 L<http://en.wikipedia.org/wiki/List_of_musical_intervals>
 
@@ -395,7 +551,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

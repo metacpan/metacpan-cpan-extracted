@@ -25,7 +25,7 @@ object.
 
 =signature
 
-le(Any $arg1) : DoNum
+le(Any $arg1) : NumObject
 
 =type
 

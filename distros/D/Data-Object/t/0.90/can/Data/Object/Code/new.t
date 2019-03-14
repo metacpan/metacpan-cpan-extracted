@@ -23,7 +23,7 @@ The new method expects a code reference and returns a new class instance.
 
 =signature
 
-new(CodeRef $arg1) : DoCode
+new(CodeRef $arg1) : CodeObject
 
 =type
 

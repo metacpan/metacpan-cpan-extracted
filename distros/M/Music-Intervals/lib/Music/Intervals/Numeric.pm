@@ -1,7 +1,5 @@
 package Music::Intervals::Numeric;
-BEGIN {
-  $Music::Intervals::Numeric::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
 # ABSTRACT: Mathematical breakdown of musical intervals
 use strict;
 use warnings;
@@ -12,7 +10,6 @@ use Algorithm::Combinatorics qw( combinations );
 use Math::Factor::XS qw( prime_factors );
 use Number::Fraction;
 use Music::Intervals::Ratio;
-
 
 
 has notes     => ( is => 'ro', default => sub { [] } );
@@ -30,6 +27,7 @@ has frequencies => ( is => 'rw', default => sub { {} } );
 has intervals => ( is => 'rw', default => sub { {} } );
 has cent_vals => ( is => 'rw', default => sub { {} } );
 has prime_factor => ( is => 'rw', default => sub { {} } );
+
 
 sub process
 {
@@ -79,6 +77,7 @@ sub process
     }
 }
 
+
 sub dyads
 {
     my $self = shift;
@@ -98,6 +97,7 @@ sub dyads
 
     return %dyads;
 }
+
 
 sub ratio_factorize {
     my $dyad = shift;
@@ -128,7 +128,7 @@ Music::Intervals::Numeric - Mathematical breakdown of musical intervals
 
 =head1 VERSION
 
-version 0.0502
+version 0.0503
 
 =head1 SYNOPSIS
 
@@ -148,7 +148,7 @@ version 0.0502
   $m->cent_vals;
   $m->prime_factor;
 
-  # Show all the known intervals (the "notes" attribute above):
+  # Show all the known intervals:
   perl -MData::Dumper -MMusic::Intervals::Ratio -e'print Dumper $Music::Intervals::Ratio::ratio'
 
 =head1 DESCRIPTION
@@ -160,37 +160,95 @@ This module reveals the "guts" of chords within a given tonality.  By guts I
 mean, the measurements of the notes and the intervals between them, in just
 intonation.
 
+=head1 ATTRIBUTES
+
+=head2 cent
+
+Show divisions of the octave
+
+Default: 0
+
+=head2 freq
+
+Show frequencies
+
+Default: 0
+
+=head2 interval
+
+Show note intervals
+
+Default: 0
+
+=head2 prime
+
+Show prime factorization
+
+Default: 0
+
+=head2 size
+
+Chord size
+
+Default: 3
+
+=head2 semitones
+
+Number of notes in the scale
+
+Default: 12
+
+=head2 temper
+
+Physical distance between notes
+
+Default: semitones * 100 / log(2)
+
+=head2 notes
+
+The actual notes to use in the computation
+
+Default: [ 1/1 5/4 3/2 ]  (C E G)
+
+The list of notes may be any of the keys in the L<Music::Intervals::Ratio>
+C<ratio> hashref.  This is very very long and contains useful intervals such as
+those of the common scale and even the Pythagorean intervals, too.
+
+=head2 cent_vals
+
+Computed hashref
+
+=head2 frequencies
+
+Computed hashref
+
+=head2 intervals
+
+Computed hashref
+
+=head2 prime_factor
+
+Computed hashref
+
 =head1 METHODS
 
 =head2 new()
 
   $x = Music::Intervals->new(%arguments);
 
-=head2 Attributes and defaults
+Create a new C<Music::Intervals> object.
 
-=over
+=head2 process()
 
-=item cent: 0 - divisions of the octave
+Do the actual computations!
 
-=item freq: 0 - frequencies
+=head2 dyads()
 
-=item interval: 0 - note intervals
+Return pairs of the given combinations with fractional and pitch ratio parts.
 
-=item prime: 0 - prime factorization
+=head2 ratio_factorize()
 
-=item size: 3 - chord size
-
-=item semitones: 12 - number of notes in the scale
-
-=item temper: semitones * 100 / log(2) - physical distance between notes
-
-=item notes: [ 1/1 5/4 3/2 ] - C E G - actual notes to use in the computation
-
-The list of notes may be any of the keys in the L<Music::Intervals::Ratio>
-C<ratio> hashref.  This is very very long and contains useful intervals such as
-those of the common scale and even the Pythagorean intervals, too.
-
-=back
+Return the dyadic fraction as a prime factored expression.
 
 =head1 SEE ALSO
 
@@ -211,7 +269,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

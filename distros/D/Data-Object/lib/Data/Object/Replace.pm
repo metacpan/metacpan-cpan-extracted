@@ -166,109 +166,197 @@ This package implements the following methods.
 
 =head2 captures
 
-  my $captures = $result->captures();
+  captures() : ArrayObject
 
 The captures method returns the capture groups from the result object which
 contains information about the results of the regular expression operation.
+
+=over 4
+
+=item captures example
+
+  my $captures = $result->captures();
+
+=back
 
 =cut
 
 =head2 count
 
-  my $count = $result->count();
+  count() : NumObject
 
 The count method returns the number of match occurrences from the result object
 which contains information about the results of the regular expression
 operation.
 
+=over 4
+
+=item count example
+
+  my $count = $result->count();
+
+=back
+
 =cut
 
 =head2 initial
 
-  my $initial = $result->initial();
+  initial() : StrObject
 
 The initial method returns the unaltered string from the result object which
 contains information about the results of the regular expression operation.
+
+=over 4
+
+=item initial example
+
+  my $initial = $result->initial();
+
+=back
 
 =cut
 
 =head2 last_match_end
 
-  my $last_match_end = $result->last_match_end();
+  last() : Any
 
 The last_match_end method returns an array of offset positions into the string
 where the capture(s) stopped matching from the result object which contains
 information about the results of the regular expression operation.
 
+=over 4
+
+=item last_match_end example
+
+  my $last_match_end = $result->last_match_end();
+
+=back
+
 =cut
 
 =head2 last_match_start
 
-  my $last_match_start = $result->last_match_start();
+  last() : Any
 
 The last_match_start method returns an array of offset positions into the
 string where the capture(s) matched from the result object which contains
 information about the results of the regular expression operation.
 
-=cut
+=over 4
 
-=head2 named_captures
+=item last_match_start example
 
-  my $named_captures = $result->named_captures();
+  my $last_match_start = $result->last_match_start();
 
-The named_captures method returns a hash containing the requested named regular
-expressions and captured string pairs from the result object which contains
-information about the results of the regular expression operation.
+=back
 
 =cut
 
 =head2 matched
 
-  my $matched = $result->matched();
+  matched() : StrObject | UndefObject
 
 The matched method returns the portion of the string that matched from the
 result object which contains information about the results of the regular
 expression operation.
 
+=over 4
+
+=item matched example
+
+  my $matched = $result->matched();
+
+=back
+
 =cut
 
-=head2 prematched
+=head2 named_captures
 
-  my $prematched = $result->prematched();
+  name() : StrObject
 
-The prematched method returns the portion of the string before the regular
-expression matched from the result object which contains information about the
-results of the regular expression operation.
+The named_captures method returns a hash containing the requested named regular
+expressions and captured string pairs from the result object which contains
+information about the results of the regular expression operation.
+
+=over 4
+
+=item named_captures example
+
+  my $named_captures = $result->named_captures();
+
+=back
 
 =cut
 
 =head2 postmatched
 
-  my $postmatched = $result->postmatched();
+  postmatched() : StrObject | UndefObject
 
 The postmatched method returns the portion of the string after the regular
 expression matched from the result object which contains information about the
 results of the regular expression operation.
 
+=over 4
+
+=item postmatched example
+
+  my $postmatched = $result->postmatched();
+
+=back
+
+=cut
+
+=head2 prematched
+
+  prematched() : StrObject | UndefObject
+
+The prematched method returns the portion of the string before the regular
+expression matched from the result object which contains information about the
+results of the regular expression operation.
+
+=over 4
+
+=item prematched example
+
+  my $prematched = $result->prematched();
+
+=back
+
 =cut
 
 =head2 regexp
 
-  my $regexp = $result->regexp();
+  regexp() : RegexpObject
 
 The regexp method returns the regular expression used to perform the match from
 the result object which contains information about the results of the regular
 expression operation.
 
+=over 4
+
+=item regexp example
+
+  my $regexp = $result->regexp();
+
+=back
+
 =cut
 
 =head2 string
 
-  my $string = $result->string();
+  string() : StrObject
 
 The string method returns the string matched against the regular expression
 from the result object which contains information about the results of the
 regular expression operation.
+
+=over 4
+
+=item string example
+
+  my $string = $result->string();
+
+=back
 
 =cut
 

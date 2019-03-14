@@ -24,7 +24,7 @@ This method will throw an exception if called.
 
 =signature
 
-sort() : DoArray
+sort() : ArrayObject
 
 =type
 

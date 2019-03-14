@@ -26,7 +26,7 @@ L<Data::Object::Code> object.
 
 =signature
 
-curry(CodeRef $arg1) : DoCode
+curry(CodeRef $arg1) : CodeObject
 
 =type
 

@@ -24,7 +24,7 @@ method for rounding. This method returns a L<Data::Object::Number> object.
 
 =signature
 
-int() : DoInt
+int() : IntObject
 
 =type
 

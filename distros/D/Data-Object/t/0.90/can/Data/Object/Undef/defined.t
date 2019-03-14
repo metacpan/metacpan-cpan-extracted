@@ -24,7 +24,7 @@ L<Data::Object::Number> object.
 
 =signature
 
-defined() : DoNum
+defined() : NumObject
 
 =type
 

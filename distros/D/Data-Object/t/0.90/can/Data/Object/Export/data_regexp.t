@@ -26,7 +26,7 @@ C<type_regexp> function is an alias to this function.
 
 =signature
 
-data_regexp(RegexpRef $arg1) : DoRegexp
+data_regexp(RegexpRef $arg1) : RegexpObject
 
 =type
 

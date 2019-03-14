@@ -21,7 +21,7 @@ The ge method returns truthy if argument is greater or equal to the object data.
 
 =signature
 
-ge(Any $arg1) : DoNum
+ge(Any $arg1) : NumObject
 
 =type
 

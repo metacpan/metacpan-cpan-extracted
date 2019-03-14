@@ -1,5 +1,8 @@
 Revision history for Music-Intervals
 
+0.0503 2019-03-14 14:27:39
+    - Improved documentation.
+
 0.0502 2014-10-25
     - Re-added the natural_freqencies() test.
 

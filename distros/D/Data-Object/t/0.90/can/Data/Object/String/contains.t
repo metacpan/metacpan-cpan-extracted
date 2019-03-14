@@ -32,7 +32,7 @@ object.
 
 =signature
 
-contains(Str | RegexpRef $arg1) : DoNum
+contains(Str | RegexpRef $arg1) : NumObject
 
 =type
 

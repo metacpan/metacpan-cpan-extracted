@@ -26,7 +26,7 @@ C<type_integer> function is an alias to this function.
 
 =signature
 
-data_integer(Int $arg1) : DoInt
+data_integer(Int $arg1) : IntObject
 
 =type
 

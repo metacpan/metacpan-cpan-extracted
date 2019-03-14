@@ -117,18 +117,34 @@ This package implements the following methods.
 
 =head2 buildproxy
 
+  BUILDPROXY(Any @args) : CodeRef
+
+The BUILDPROXY method handles resolving missing-methods via autoloaded. This
+method is never called directly.
+
+=over 4
+
+=item BUILDPROXY example
+
   # given $path
 
   $path->BUILDPROXY(...);
 
   # ...
 
-The BUILDPROXY method handles resolving missing-methods via autoloaded. This
-method is never called directly.
+=back
 
 =cut
 
 =head2 origin
+
+  origin() : Str
+
+The origin method returns the package name of the proxy used.
+
+=over 4
+
+=item origin example
 
   # given $origin
 
@@ -136,11 +152,19 @@ method is never called directly.
 
   # Path::Tiny
 
-The origin method returns the package name of the proxy used.
+=back
 
 =cut
 
 =head2 source
+
+  source() : Object
+
+The source method returns the underlying proxy object used.
+
+=over 4
+
+=item source example
 
   # given $source
 
@@ -148,11 +172,19 @@ The origin method returns the package name of the proxy used.
 
   # Path::Tiny (object)
 
-The source method returns the underlying proxy object used.
+=back
 
 =cut
 
 =head2 string
+
+  string() : Str
+
+The string method returns the string representation of the object.
+
+=over 4
+
+=item string example
 
   # given $path
 
@@ -160,6 +192,6 @@ The source method returns the underlying proxy object used.
 
   # ...
 
-The string method returns the string representation of the object.
+=back
 
 =cut

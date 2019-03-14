@@ -24,7 +24,7 @@ This method will throw an exception if called.
 
 =signature
 
-eq(Any $arg1) : DoNum
+eq(Any $arg1) : NumObject
 
 =type
 

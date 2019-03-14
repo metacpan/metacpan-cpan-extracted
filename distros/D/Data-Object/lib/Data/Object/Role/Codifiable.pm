@@ -55,8 +55,16 @@ This package implements the following methods.
 
 =head2 codify
 
-  my $codify = $self->codify('($a * $b) + 1_000_000');
+  codify(Object $arg1, Any @args) : CodeRef
 
 Returns a parameterized coderef from a string.
+
+=over 4
+
+=item codify example
+
+  my $codify = $self->codify('($a * $b) + 1_000_000');
+
+=back
 
 =cut

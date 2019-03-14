@@ -142,32 +142,64 @@ This package implements the following methods.
 
 =head2 data
 
-  my $data = $exception->data();
+  data() : Any
 
 data
+
+=over 4
+
+=item data example
+
+  my $data = $exception->data();
+
+=back
 
 =cut
 
 =head2 dump
 
-  my $dump = $exception->dump();
+  dump() : Str
 
 The dump method returns a string representation of the underlying data.
+
+=over 4
+
+=item dump example
+
+  my $dump = $exception->dump();
+
+=back
 
 =cut
 
 =head2 explain
 
-  my $explain = $exception->explain();
+  explain() : Str
 
 Returns a complete stack trace if the exception was thrown.
+
+=over 4
+
+=item explain example
+
+  my $explain = $exception->explain();
+
+=back
 
 =cut
 
 =head2 throw
 
-  $exception->throw();
+  throw(Str $arg1) : Object
 
 Throw error with object and message.
+
+=over 4
+
+=item throw example
+
+  $exception->throw();
+
+=back
 
 =cut

@@ -66,7 +66,7 @@ sub subroutines {
     import
   );
 
-  my @files = map { /^(?:$re)\s+([a-zA-Z]\w+).*/ } source("lib/$path.pm");
+  my @files = map { /^(?:$re)\s+([a-zA-Z]\w+).*\{$/ } source("lib/$path.pm");
 
   return (grep !$ignore{$_}, @files);
 }

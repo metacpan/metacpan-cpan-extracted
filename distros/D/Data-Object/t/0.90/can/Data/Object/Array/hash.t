@@ -25,7 +25,7 @@ returns a L<Data::Object::Hash> object.
 
 =signature
 
-hash() : DoHash
+hash() : HashObject
 
 =type
 

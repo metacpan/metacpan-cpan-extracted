@@ -26,7 +26,7 @@ C<type_float> function is an alias to this function.
 
 =signature
 
-data_float(Str $arg1) : DoFloat
+data_float(Str $arg1) : FloatObject
 
 =type
 

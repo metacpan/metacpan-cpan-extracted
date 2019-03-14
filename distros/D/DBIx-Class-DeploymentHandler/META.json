@@ -34,7 +34,7 @@
             "Log::Contextual" : "0.005005",
             "Module::Runtime" : "0.001",
             "Moo" : "2",
-            "Package::Variant" : "0",
+            "MooX::Role::Parameterized" : "0.082",
             "SQL::Translator" : "0.11005",
             "Sub::Exporter" : "0",
             "Sub::Exporter::Progressive" : "0",
@@ -42,8 +42,8 @@
             "Try::Tiny" : "0",
             "Type::Tiny" : "1.004004",
             "autodie" : "0",
-            "namespace::autoclean" : "0",
             "parent" : "0.225",
+            "perl" : "5.010",
             "version" : "0.9924"
          }
       },
@@ -73,7 +73,7 @@
          "web" : "https://github.com/frioux/DBIx-Class-DeploymentHandler"
       }
    },
-   "version" : "0.002228",
+   "version" : "0.002230",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

@@ -26,7 +26,7 @@ returns a L<Data::Object::Hash> object.
 
 =signature
 
-fold(Str $arg1, HashRef $arg2, HashRef $arg3) : DoHash
+fold(Str $arg1, HashRef $arg2, HashRef $arg3) : HashObject
 
 =type
 

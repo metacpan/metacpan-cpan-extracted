@@ -24,7 +24,7 @@ L<Data::Object::Number> object representing a boolean.
 
 =signature
 
-eq(Any $arg1) : DoNum
+eq(Any $arg1) : NumObject
 
 =type
 

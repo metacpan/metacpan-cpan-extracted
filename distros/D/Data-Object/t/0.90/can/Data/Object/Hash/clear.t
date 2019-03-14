@@ -24,7 +24,7 @@ L<Data::Object::Hash> object. This method is an alias to the empty method.
 
 =signature
 
-clear() : DoArray
+clear() : ArrayObject
 
 =type
 

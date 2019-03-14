@@ -33,7 +33,7 @@ L<Data::Object::Hash> object.
 
 =signature
 
-grep(CodeRef $arg1, Any $arg2) : DoArray
+grep(CodeRef $arg1, Any $arg2) : ArrayObject
 
 =type
 

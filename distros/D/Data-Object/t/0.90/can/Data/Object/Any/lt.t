@@ -21,7 +21,7 @@ The lt method returns truthy if argument is lesser than the object data.
 
 =signature
 
-lt(Any $arg1) : DoNum
+lt(Any $arg1) : NumObject
 
 =type
 

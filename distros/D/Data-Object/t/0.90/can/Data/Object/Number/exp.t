@@ -32,7 +32,7 @@ number. This method returns a L<Data::Object::Float> object.
 
 =signature
 
-exp() : DoNum
+exp() : NumObject
 
 =type
 

@@ -24,7 +24,7 @@ the opposite order. This method returns a string value.
 
 =signature
 
-reverse() : DoArray
+reverse() : ArrayObject
 
 =type
 

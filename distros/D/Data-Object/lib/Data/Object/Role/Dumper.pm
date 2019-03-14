@@ -71,8 +71,16 @@ This package implements the following methods.
 
 =head2 dump
 
-  my $dump = $self->dump();
+  dump() : Str
 
 The dump method returns a string representation of the underlying data.
+
+=over 4
+
+=item dump example
+
+  my $dump = $self->dump();
+
+=back
 
 =cut

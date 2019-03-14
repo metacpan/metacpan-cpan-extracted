@@ -24,7 +24,7 @@ L<Data::Object::Integer> object.
 
 =signature
 
-neg() : DoInt
+neg() : IntObject
 
 =type
 

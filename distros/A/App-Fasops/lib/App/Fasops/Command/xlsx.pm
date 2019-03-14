@@ -15,7 +15,7 @@ sub abstract {
 sub opt_spec {
     return (
         [ "outfile|o=s", "Output filename" ],
-        [ "length|l=i", "the threshold of alignment length", { default => 1 } ],
+        [ "length|l=i", "the threshold of alignment length", { default => 1 }, ],
         [ 'wrap=i',     'wrap length',                       { default => 50 }, ],
         [ 'spacing=i',  'wrapped line spacing',              { default => 1 }, ],
         [ 'colors=i',   'number of colors',                  { default => 15 }, ],
@@ -24,6 +24,8 @@ sub opt_spec {
         [ 'noindel',   'omit indels', ],
         [ 'nosingle',  'omit singleton SNPs and indels', ],
         [ 'nocomplex', 'omit complex SNPs and indels', ],
+        [ 'min=f',     'minimal frequency', ],
+        [ 'max=f',     'maximal frequency', ],
         { show_defaults => 1, }
     );
 }
@@ -283,6 +285,13 @@ sub get_vars {
             next;
         }
 
+        if ( defined $opt->{min} and $site->{indel_freq} / $seq_count < $opt->{min} ) {
+            next;
+        }
+        if ( defined $opt->{max} and $site->{indel_freq} / $seq_count > $opt->{max} ) {
+            next;
+        }
+
         $site->{var_type} = 'indel';
         $variations{ $site->{indel_start} } = $site;
     }
@@ -293,6 +302,13 @@ sub get_vars {
         }
 
         if ( $opt->{nosingle} and $site->{snp_freq} <= 1 ) {
+            next;
+        }
+
+        if ( defined $opt->{min} and $site->{snp_freq} / $seq_count < $opt->{min} ) {
+            next;
+        }
+        if ( defined $opt->{max} and $site->{snp_freq} / $seq_count > $opt->{max} ) {
             next;
         }
 

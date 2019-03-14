@@ -25,7 +25,7 @@ L<Data::Object::Number> object.
 
 =signature
 
-pow() : DoNum
+pow() : NumObject
 
 =type
 

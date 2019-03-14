@@ -25,7 +25,7 @@ array reference. This method returns an array value.
 
 =signature
 
-words() : DoArray
+words() : ArrayObject
 
 =type
 

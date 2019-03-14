@@ -27,7 +27,7 @@ object.
 
 =signature
 
-camelcase() : DoStr
+camelcase() : StrObject
 
 =type
 

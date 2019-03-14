@@ -26,7 +26,7 @@ C<type_string> function is an alias to this function.
 
 =signature
 
-data_string(Str $arg1) : DoStr
+data_string(Str $arg1) : StrObject
 
 =type
 

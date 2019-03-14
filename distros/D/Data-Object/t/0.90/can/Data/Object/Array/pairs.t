@@ -25,7 +25,7 @@ method.
 
 =signature
 
-pairs() : DoArray
+pairs() : ArrayObject
 
 =type
 

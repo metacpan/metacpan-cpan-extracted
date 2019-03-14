@@ -24,7 +24,7 @@ This method will throw an exception if called.
 
 =signature
 
-le(Any $arg1) : DoNum
+le(Any $arg1) : NumObject
 
 =type
 

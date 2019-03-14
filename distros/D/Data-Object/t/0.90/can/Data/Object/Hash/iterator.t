@@ -30,7 +30,7 @@ L<Data::Object::Code> object.
 
 =signature
 
-iterator() : DoCode
+iterator() : CodeObject
 
 =type
 

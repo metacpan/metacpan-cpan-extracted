@@ -1,0 +1,268 @@
+{
+   "abstract" : "Bundle of modules used by Perl5 plugin for IntelliJ IDEs",
+   "author" : [
+      "Alexandr Evstigneev <hurricup@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bundle-Camelcade",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "App::Prove::Plugin::PassEnv" : "0",
+            "App::cpanminus" : "0",
+            "B::Deparse" : "0",
+            "Config" : "0",
+            "Devel::Camelcadedb" : "0",
+            "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "JSON" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0",
+            "TAP::Formatter::Camelcade" : "0",
+            "Test::Harness" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Prove::Plugin::PassEnv" : "0",
+            "App::cpanminus" : "0",
+            "B::Deparse" : "0",
+            "Config" : "0",
+            "Devel::Camelcadedb" : "0",
+            "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0",
+            "File::Find" : "0",
+            "JSON" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0",
+            "TAP::Formatter::Camelcade" : "0",
+            "Test::Harness" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Camelcade/Bundle-Camelcade/issues"
+      },
+      "homepage" : "https://github.com/Camelcade/Bundle-Camelcade",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Camelcade/Bundle-Camelcade.git",
+         "web" : "https://github.com/Camelcade/Bundle-Camelcade"
+      }
+   },
+   "version" : "0.001",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.024004"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [
+                     "META.json"
+                  ],
+                  "exclude_match" : [
+                     ".+?\\.iml"
+                  ],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "GatherDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "PruneCruft",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "ManifestSkip",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "MetaYAML",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "ExtraTests",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "ShareDir",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "MakeMaker",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "Manifest",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "TestRelease",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "ConfirmRelease",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "UploadToCPAN",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "configure",
+                  "type" : "requires"
+               }
+            },
+            "name" : "ConfigureRequires",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "GithubMeta",
+            "version" : "0.58"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Contributors",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Contributors" : {
+                  "git_version" : "2.21.0",
+                  "include_authors" : 1,
+                  "include_releaser" : 1,
+                  "order_by" : "name",
+                  "paths" : [],
+                  "remove" : "..."
+               }
+            },
+            "name" : "Git::Contributors",
+            "version" : "0.035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.012"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "6.012"
+      }
+   },
+   "x_contributors" : [
+      "Alexand Evstigneev <hurricup@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
+}
+

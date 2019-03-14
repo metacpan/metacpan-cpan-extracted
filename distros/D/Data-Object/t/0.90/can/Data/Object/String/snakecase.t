@@ -28,7 +28,7 @@ modifies the string. This method returns a string value.
 
 =signature
 
-snakecase() : DoStr
+snakecase() : StrObject
 
 =type
 

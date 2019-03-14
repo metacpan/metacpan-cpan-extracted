@@ -25,7 +25,7 @@ object.
 
 =signature
 
-rsort() : DoArray
+rsort() : ArrayObject
 
 =type
 

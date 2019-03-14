@@ -23,7 +23,7 @@ The new method expects an undefined value and returns a new class instance.
 
 =signature
 
-new(Undef $arg1) : DoUndef
+new(Undef $arg1) : UndefObject
 
 =type
 

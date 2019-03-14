@@ -59,9 +59,17 @@ This package implements the following methods.
 
 =head2 new
 
-  my $data = Data::Object::Dispatch->new("Data::Object::Export");
+  new(ClassName $arg1, Any @args) : Object
 
 Construct a new object.
+
+=over 4
+
+=item new example
+
+  my $data = Data::Object::Dispatch->new("Data::Object::Export");
+
+=back
 
 =cut
 

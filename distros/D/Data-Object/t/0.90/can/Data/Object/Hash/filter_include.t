@@ -25,7 +25,7 @@ L<Data::Object::Hash> object.
 
 =signature
 
-filter_include(Str @args) : DoHash
+filter_include(Str @args) : HashObject
 
 =type
 

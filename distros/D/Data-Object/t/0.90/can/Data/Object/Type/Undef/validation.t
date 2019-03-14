@@ -21,7 +21,7 @@ The validation method returns truthy if type check is valid.
 
 =signature
 
-validation(Object $arg1) : DoNum
+validation(Object $arg1) : NumObject
 
 =type
 

@@ -25,7 +25,7 @@ hash.
 
 =signature
 
-reset() : DoHash
+reset() : HashObject
 
 =type
 

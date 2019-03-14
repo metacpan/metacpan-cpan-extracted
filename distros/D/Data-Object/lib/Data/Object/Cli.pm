@@ -142,53 +142,85 @@ This package implements the following methods.
 
 =cut
 
-=head2 env
-
-  # given $cli
-
-  $cli->env;
-
-The env method returns the environment variables in the running process.
-
-=cut
-
 =head2 args
+
+  args() : ArrayRef
+
+The args method returns the ordered arguments passed to the constructor or cli.
+
+=over 4
+
+=item args example
 
   # given $cli
 
   $cli->args;
 
-The args method returns the ordered arguments passed to the constructor or cli.
+=back
+
+=cut
+
+=head2 env
+
+  env() : HashRef
+
+The env method returns the environment variables in the running process.
+
+=over 4
+
+=item env example
+
+  # given $cli
+
+  $cli->env;
+
+=back
+
+=cut
+
+=head2 main
+
+  main(HashRef :$env, ArrayRef :$args, HashRef :$opts) : Any
+
+The main method is (by convention) the starting point for an automatically
+executed subclass, i.e. this method is run by default if the subclass is run as
+a script. This method should be overriden by the subclass. This method is
+called with the named arguments C<env>, C<args> and C<opts>.
+
+=over 4
+
+=item main example
+
+  # given $cli
+
+  $cli->main(%args);
+
+=back
 
 =cut
 
 =head2 opts
 
-  # given $cli
-
-  $cli->opts;
+  opts() : HashRef
 
 The opts method returns the parsed options passed to the constructor or cli,
 based on the specifications defined in the specs method.
 
-=cut
+=over 4
 
-=head2 run
+=item opts example
 
   # given $cli
 
-  $cli->run;
+  $cli->opts;
 
-The run method automatically executes the subclass unless it's being imported
-by another package.
+=back
 
 =cut
 
 =head2 parse
 
-  # given $cli
-
-  $cli->parse($data, $specs, $meta);
+  parse(ArrayRef $arg1, ArrayRef $arg2, ArrayRef $arg3) : HashRef
 
 The parse method parses command-line options using L<Getopt::Long> and does not
 mutate C<@ARGV>. The first argument should be an arrayref containing the data
@@ -197,28 +229,52 @@ Getopt::Long option specifications. The third argument (optionally) should be
 additional options to be passed along to
 L<Getopt::Long::Configure|Getopt::Long/Configuring-Getopt::Long>.
 
-=cut
+=over 4
 
-=head2 main
+=item parse example
 
   # given $cli
 
-  $cli->main(%args);
+  $cli->parse($data, $specs, $meta);
 
-The main method is (by convention) the starting point for an automatically
-executed subclass, i.e. this method is run by default if the subclass is run as
-a script. This method should be overriden by the subclass. This method is
-called with the named arguments C<env>, C<args> and C<opts>.
+=back
+
+=cut
+
+=head2 run
+
+  run() : Any
+
+The run method automatically executes the subclass unless it's being imported
+by another package.
+
+=over 4
+
+=item run example
+
+  # given $cli
+
+  $cli->run;
+
+=back
 
 =cut
 
 =head2 specs
 
+  specs() : (Str)
+
+The specs method (if present) returns a list of L<Getopt::Long> option
+specifications. This method should be overriden by the subclass.
+
+=over 4
+
+=item specs example
+
   # given $cli
 
   $cli->specs;
 
-The specs method (if present) returns a list of L<Getopt::Long> option
-specifications. This method should be overriden by the subclass.
+=back
 
 =cut

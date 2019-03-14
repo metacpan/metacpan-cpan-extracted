@@ -26,7 +26,7 @@ C<type_hash> function is an alias to this function.
 
 =signature
 
-data_hash(HashRef $arg1) : DoHash
+data_hash(HashRef $arg1) : HashObject
 
 =type
 

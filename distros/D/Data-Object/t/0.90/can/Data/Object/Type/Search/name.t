@@ -21,7 +21,7 @@ The name method returns the name of the data type.
 
 =signature
 
-name() : DoStr
+name() : StrObject
 
 =type
 

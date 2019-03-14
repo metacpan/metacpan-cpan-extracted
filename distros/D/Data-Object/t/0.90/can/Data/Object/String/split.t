@@ -31,7 +31,7 @@ array object.
 
 =signature
 
-split(RegexpRef $arg1, Num $arg2) : DoArray
+split(RegexpRef $arg1, Num $arg2) : ArrayObject
 
 =type
 

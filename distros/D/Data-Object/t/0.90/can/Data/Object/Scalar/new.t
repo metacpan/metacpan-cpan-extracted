@@ -23,7 +23,7 @@ The new method expects a scalar reference and returns a new class instance.
 
 =signature
 
-new(ScalarRef $arg1) : DoScalar
+new(ScalarRef $arg1) : ScalarObject
 
 =type
 

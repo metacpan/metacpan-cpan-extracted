@@ -30,7 +30,7 @@ argument as the rvalue. This method returns a L<Data::Object::Code> object.
 
 =signature
 
-conjoin(CodeRef $arg1) : DoCode
+conjoin(CodeRef $arg1) : CodeObject
 
 =type
 

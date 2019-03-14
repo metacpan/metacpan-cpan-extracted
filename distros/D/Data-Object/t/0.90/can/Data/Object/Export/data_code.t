@@ -26,7 +26,7 @@ C<type_code> function is an alias to this function.
 
 =signature
 
-data_code(CodeRef $arg1) : DoCode
+data_code(CodeRef $arg1) : CodeObject
 
 =type
 

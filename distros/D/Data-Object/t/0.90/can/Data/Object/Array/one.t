@@ -27,7 +27,7 @@ data type object. This method returns a L<Data::Object::Number> object.
 
 =signature
 
-one(CodeRef $arg1, Any $arg2) : DoNum
+one(CodeRef $arg1, Any $arg2) : NumObject
 
 =type
 

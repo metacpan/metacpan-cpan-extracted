@@ -590,7 +590,312 @@ This package implements the following methods.
 
 =cut
 
+=head2 append
+
+  append(Str $arg1) : Object
+
+The append method modifies the object by appending to the package namespace
+parts.
+
+=over 4
+
+=item append example
+
+  # given $space (Foo::Bar)
+
+  $space->append('baz');
+
+  "$space"
+
+  # Foo::Bar::Baz
+
+=back
+
+=cut
+
+=head2 array
+
+  array(Str $arg1) : Any
+
+The array method returns the value for the given package array variable name.
+
+=over 4
+
+=item array example
+
+  # given Foo/Bar
+
+  $space->array('EXPORT');
+
+  # (,...)
+
+=back
+
+=cut
+
+=head2 arrays
+
+  arrays() : ArrayRef
+
+The arrays method searches the package namespace for arrays and returns
+their names.
+
+=over 4
+
+=item arrays example
+
+  # given Foo/Bar
+
+  $space->arrays();
+
+  # [,...]
+
+=back
+
+=cut
+
+=head2 base
+
+  base() : Str
+
+The base method returns the last segment of the package namespace parts.
+
+=over 4
+
+=item base example
+
+  # given $space (Foo::Bar)
+
+  $space->base();
+
+  # Bar
+
+=back
+
+=cut
+
+=head2 bless
+
+  bless(Any $arg1 = {}) : Object
+
+The bless method blesses the given value into the package namespace and returns
+an object. If no value is given, an empty hashref is used.
+
+=over 4
+
+=item bless example
+
+  # given $space (Foo::Bar)
+
+  $space->bless();
+
+  # bless({}, 'Foo::Bar')
+
+=back
+
+=cut
+
+=head2 build
+
+  build(Any @args) : Object
+
+The build method attempts to call C<new> on the package namespace and if
+successful returns the resulting object.
+
+=over 4
+
+=item build example
+
+  # given $space (Foo::Bar)
+
+  $space->build(@args);
+
+  # bless(..., 'Foo::Bar')
+
+=back
+
+=cut
+
+=head2 call
+
+  call(Any @args) : Any
+
+The call method attempts to call the given subroutine on the package namespace and if
+successful returns the resulting value.
+
+=over 4
+
+=item call example
+
+  # given $space (Foo::Bar)
+
+  $space->call(@args);
+
+  # ...
+
+=back
+
+=cut
+
+=head2 child
+
+  child(Str $arg1) : Object
+
+The child method returns a new L<Data::Object::Space> object for the child
+package namespace.
+
+=over 4
+
+=item child example
+
+  # given $space (Foo::Bar)
+
+  $space->child('baz');
+
+  # Foo::Bar::Baz
+
+=back
+
+=cut
+
+=head2 children
+
+  children() : ArrayRef
+
+The children method searches C<%INC> and C<@INC> and retuns a list of
+L<Data::Object::Space> objects for each child namespace found (one level deep).
+
+=over 4
+
+=item children example
+
+  # given $space (Foo::Bar)
+
+  $space->children();
+
+  # ['Foo::Bar::Baz', ...]
+
+=back
+
+=cut
+
+=head2 cop
+
+  cop(Any @args) : CodeRef
+
+The cop method attempts to curry the given subroutine on the package namespace and if
+successful returns a closure.
+
+=over 4
+
+=item cop example
+
+  # given $space (Foo::Bar)
+
+  $space->cop(@args);
+
+  # ...
+
+=back
+
+=cut
+
+=head2 file
+
+  file(Str $arg1 = '%s') : Str
+
+The file method returns a file string for the package namespace. This method
+optionally takes a format string.
+
+=over 4
+
+=item file example
+
+  # given $space (Foo::Bar)
+
+  $space->file();
+
+  # Foo/Bar.pm
+
+  $space->file('lib/%s');
+
+  # lib/Foo/Bar.pm
+
+=back
+
+=cut
+
+=head2 functions
+
+  functions() : ArrayRef
+
+The functions method searches the package namespace for functions and returns
+their names.
+
+=over 4
+
+=item functions example
+
+  # given Foo/Bar
+
+  $space->functions();
+
+  # [,...]
+
+=back
+
+=cut
+
+=head2 hash
+
+  hash(Str $arg1) : Any
+
+The hashes method returns the value for the given package hash variable name.
+
+=over 4
+
+=item hash example
+
+  # given Foo/Bar
+
+  $space->hash('EXPORT_TAGS');
+
+  # (,...)
+
+=back
+
+=cut
+
+=head2 hashes
+
+  hashes() : ArrayRef
+
+The hashes method searches the package namespace for hashes and returns
+their names.
+
+=over 4
+
+=item hashes example
+
+  # given Foo/Bar
+
+  $space->hashes();
+
+  # [,...]
+
+=back
+
+=cut
+
 =head2 id
+
+  id() : Str
+
+The id method returns the fully-qualified package name as a label.
+
+=over 4
+
+=item id example
 
   # given $space (Foo::Bar)
 
@@ -598,11 +903,105 @@ This package implements the following methods.
 
   # Foo_Bar
 
-The id method returns the fully-qualified package name as a label.
+=back
+
+=cut
+
+=head2 load
+
+  load() : Str
+
+The load method check whether the package namespace is already loaded and if
+not attempts to load the package. If the package is not loaded and is not
+loadable, this method will throw an exception using C<croak>. If the package is
+loadable, this method returns truthy with the package name.
+
+=over 4
+
+=item load example
+
+  # given $space (Foo::Bar)
+
+  $space->load();
+
+  # throws exception, unless Foo::Bar is loadable
+
+=back
+
+=cut
+
+=head2 methods
+
+  methods() : ArrayRef
+
+The methods method searches the package namespace for methods and returns
+their names.
+
+=over 4
+
+=item methods example
+
+  # given Foo/Bar
+
+  $space->methods();
+
+  # [,...]
+
+=back
+
+=cut
+
+=head2 name
+
+  name() : Str
+
+The name method returns the fully-qualified package name.
+
+=over 4
+
+=item name example
+
+  # given $space (Foo::Bar)
+
+  $space->name;
+
+  # Foo::Bar
+
+=back
+
+=cut
+
+=head2 parent
+
+  parent() : Str
+
+The parent method returns a new L<Data::Object::Space> object for the parent
+package namespace.
+
+=over 4
+
+=item parent example
+
+  # given $space (Foo::Bar)
+
+  $space->parent();
+
+  # Foo
+
+=back
 
 =cut
 
 =head2 parse
+
+  parse(Str $arg1) : ArrayRef
+
+The parse method parses the string argument and returns an arrayref of package
+namespace segments (parts) suitable for object construction.
+
+=over 4
+
+=item parse example
 
   # given Foo::Bar
 
@@ -626,106 +1025,19 @@ The id method returns the fully-qualified package name as a label.
 
   # ['FooBar']
 
-The parse method parses the string argument and returns an arrayref of package
-namespace segments (parts) suitable for object construction.
-
-=cut
-
-=head2 call
-
-  # given $space (Foo::Bar)
-
-  $space->call(@args);
-
-  # ...
-
-The call method attempts to call the given subroutine on the package namespace and if
-successful returns the resulting value.
-
-=cut
-
-=head2 cop
-
-  # given $space (Foo::Bar)
-
-  $space->cop(@args);
-
-  # ...
-
-The cop method attempts to curry the given subroutine on the package namespace and if
-successful returns a closure.
-
-=cut
-
-=head2 bless
-
-  # given $space (Foo::Bar)
-
-  $space->bless();
-
-  # bless({}, 'Foo::Bar')
-
-The bless method blesses the given value into the package namespace and returns
-an object. If no value is given, an empty hashref is used.
-
-=cut
-
-=head2 build
-
-  # given $space (Foo::Bar)
-
-  $space->build(@args);
-
-  # bless(..., 'Foo::Bar')
-
-The build method attempts to call C<new> on the package namespace and if
-successful returns the resulting object.
-
-=cut
-
-=head2 child
-
-  # given $space (Foo::Bar)
-
-  $space->child('baz');
-
-  # Foo::Bar::Baz
-
-The child method returns a new L<Data::Object::Space> object for the child
-package namespace.
-
-=cut
-
-=head2 load
-
-  # given $space (Foo::Bar)
-
-  $space->load();
-
-  # throws exception, unless Foo::Bar is loadable
-
-The load method check whether the package namespace is already loaded and if
-not attempts to load the package. If the package is not loaded and is not
-loadable, this method will throw an exception using C<croak>. If the package is
-loadable, this method returns truthy with the package name.
-
-=cut
-
-=head2 used
-
-  # given $space (Foo::Bar)
-
-  $space->used();
-
-  # undef, unless Foo::Bar is in %INC
-
-The used method searches C<%INC> for the package namespace and if found returns
-the filepath and complete filepath for the loaded package, otherwise returns
-undef.
+=back
 
 =cut
 
 =head2 parts
+
+  parts() : ArrayRef
+
+The parts method returns an arrayref of package namespace segments (parts).
+
+=over 4
+
+=item parts example
 
   # given $space (Foo::Bar)
 
@@ -733,131 +1045,20 @@ undef.
 
   # ['Foo', 'Bar']
 
-The parts method returns an arrayref of package namespace segments (parts).
-
-=cut
-
-=head2 parent
-
-  # given $space (Foo::Bar)
-
-  $space->parent();
-
-  # Foo
-
-The parent method returns a new L<Data::Object::Space> object for the parent
-package namespace.
-
-=cut
-
-=head2 sibling
-
-  # given $space (Foo::Bar)
-
-  $space->sibling('Baz');
-
-  # Foo::Baz
-
-The sibling method returns a new L<Data::Object::Space> object for the sibling
-package namespace.
-
-=cut
-
-=head2 append
-
-  # given $space (Foo::Bar)
-
-  $space->append('baz');
-
-  "$space"
-
-  # Foo::Bar::Baz
-
-The append method modifies the object by appending to the package namespace
-parts.
-
-=cut
-
-=head2 prepend
-
-  # given $space (Foo::Bar)
-
-  $space->prepend('via');
-
-  "$space"
-
-  # Via::Foo::Bar
-
-The prepend method modifies the object by prepending to the package namespace
-parts.
-
-=cut
-
-=head2 base
-
-  # given $space (Foo::Bar)
-
-  $space->base();
-
-  # Bar
-
-The base method returns the last segment of the package namespace parts.
-
-=cut
-
-=head2 children
-
-  # given $space (Foo::Bar)
-
-  $space->children();
-
-  # ['Foo::Bar::Baz', ...]
-
-The children method searches C<%INC> and C<@INC> and retuns a list of
-L<Data::Object::Space> objects for each child namespace found (one level deep).
-
-=cut
-
-=head2 siblings
-
-  # given $space (Foo::Bar)
-
-  $space->siblings();
-
-  # ['Foo::Baz', ...]
-
-The siblings method searches C<%INC> and C<@INC> and retuns a list of
-L<Data::Object::Space> objects for each sibling namespace found (one level deep).
-
-=cut
-
-=head2 name
-
-  # given $space (Foo::Bar)
-
-  $space->name;
-
-  # Foo::Bar
-
-The name method returns the fully-qualified package name.
-
-=cut
-
-=head2 root
-
-  # given $space (root => 'Foo', parts => 'Bar')
-
-  $space->root();
-
-  # ['Foo']
-
-The root method returns the root package namespace segments (parts). Sometimes
-separating the C<root> from the C<parts> helps identify how subsequent child
-objects were derived.
+=back
 
 =cut
 
 =head2 path
+
+  path(Str $arg1) : Str
+
+The path method returns a path string for the package namespace. This method
+optionally takes a format string.
+
+=over 4
+
+=item path example
 
   # given $space (Foo::Bar)
 
@@ -869,130 +1070,65 @@ objects were derived.
 
   # lib/Foo/Bar
 
-The path method returns a path string for the package namespace. This method
-optionally takes a format string.
+=back
 
 =cut
 
-=head2 file
+=head2 prepend
+
+  prepend(Str $arg1) : Object
+
+The prepend method modifies the object by prepending to the package namespace
+parts.
+
+=over 4
+
+=item prepend example
 
   # given $space (Foo::Bar)
 
-  $space->file();
+  $space->prepend('via');
 
-  # Foo/Bar.pm
+  "$space"
 
-  $space->file('lib/%s');
+  # Via::Foo::Bar
 
-  # lib/Foo/Bar.pm
-
-The file method returns a file string for the package namespace. This method
-optionally takes a format string.
+=back
 
 =cut
 
-=head2 type
+=head2 root
 
-  # given $space (Foo/Bar.pod)
+  root() : Str
 
-  $space->type();
+The root method returns the root package namespace segments (parts). Sometimes
+separating the C<root> from the C<parts> helps identify how subsequent child
+objects were derived.
 
-  # pod
+=over 4
 
-The type method returns the parsed filetype and defaults to C<pm>. This value
-is used when calling the C<file> method.
+=item root example
 
-=cut
+  # given $space (root => 'Foo', parts => 'Bar')
 
-=head2 variables
+  $space->root();
 
-  # given Foo/Bar
+  # ['Foo']
 
-  $space->variables();
-
-  # [,...]
-
-The variables method searches the package namespace for variables and returns
-their names.
-
-=cut
-
-=head2 scalar
-
-  # given Foo/Bar
-
-  $space->scalar('VERSION');
-
-  # 0.01
-
-The scalar method returns the value for the given package scalar variable name.
-
-=cut
-
-=head2 scalars
-
-  # given Foo/Bar
-
-  $space->scalars();
-
-  # [,...]
-
-The scalars method searches the package namespace for scalars and returns
-their names.
-
-=cut
-
-=head2 array
-
-  # given Foo/Bar
-
-  $space->array('EXPORT');
-
-  # (,...)
-
-The array method returns the value for the given package array variable name.
-
-=cut
-
-=head2 arrays
-
-  # given Foo/Bar
-
-  $space->arrays();
-
-  # [,...]
-
-The arrays method searches the package namespace for arrays and returns
-their names.
-
-=cut
-
-=head2 hash
-
-  # given Foo/Bar
-
-  $space->hash('EXPORT_TAGS');
-
-  # (,...)
-
-The hashes method returns the value for the given package hash variable name.
-
-=cut
-
-=head2 hashes
-
-  # given Foo/Bar
-
-  $space->hashes();
-
-  # [,...]
-
-The hashes method searches the package namespace for hashes and returns
-their names.
+=back
 
 =cut
 
 =head2 routine
+
+  routine(Str $arg1) : CodeRef
+
+The routine method returns the subroutine reference for the given subroutine
+name.
+
+=over 4
+
+=item routine example
 
   # given Foo/Bar
 
@@ -1000,12 +1136,20 @@ their names.
 
   # ...
 
-The routine method returns the subroutine reference for the given subroutine
-name.
+=back
 
 =cut
 
 =head2 routines
+
+  routines() : ArrayRef
+
+The routines method searches the package namespace for routines and returns
+their names.
+
+=over 4
+
+=item routines example
 
   # given Foo/Bar
 
@@ -1013,33 +1157,153 @@ name.
 
   # [,...]
 
-The routines method searches the package namespace for routines and returns
-their names.
+=back
 
 =cut
 
-=head2 methods
+=head2 scalar
+
+  scalar(Str $arg1) : Any
+
+The scalar method returns the value for the given package scalar variable name.
+
+=over 4
+
+=item scalar example
 
   # given Foo/Bar
 
-  $space->methods();
+  $space->scalar('VERSION');
 
-  # [,...]
+  # 0.01
 
-The methods method searches the package namespace for methods and returns
-their names.
+=back
 
 =cut
 
-=head2 functions
+=head2 scalars
+
+  scalars() : ArrayRef
+
+The scalars method searches the package namespace for scalars and returns
+their names.
+
+=over 4
+
+=item scalars example
 
   # given Foo/Bar
 
-  $space->functions();
+  $space->scalars();
 
   # [,...]
 
-The functions method searches the package namespace for functions and returns
+=back
+
+=cut
+
+=head2 sibling
+
+  sibling(Str $arg1) : Object
+
+The sibling method returns a new L<Data::Object::Space> object for the sibling
+package namespace.
+
+=over 4
+
+=item sibling example
+
+  # given $space (Foo::Bar)
+
+  $space->sibling('Baz');
+
+  # Foo::Baz
+
+=back
+
+=cut
+
+=head2 siblings
+
+  siblings() : ArrayRef
+
+The siblings method searches C<%INC> and C<@INC> and retuns a list of
+L<Data::Object::Space> objects for each sibling namespace found (one level deep).
+
+=over 4
+
+=item siblings example
+
+  # given $space (Foo::Bar)
+
+  $space->siblings();
+
+  # ['Foo::Baz', ...]
+
+=back
+
+=cut
+
+=head2 type
+
+  type() : Str
+
+The type method returns the parsed filetype and defaults to C<pm>. This value
+is used when calling the C<file> method.
+
+=over 4
+
+=item type example
+
+  # given $space (Foo/Bar.pod)
+
+  $space->type();
+
+  # pod
+
+=back
+
+=cut
+
+=head2 used
+
+  used() : ArrayRef | Undef
+
+The used method searches C<%INC> for the package namespace and if found returns
+the filepath and complete filepath for the loaded package, otherwise returns
+undef.
+
+=over 4
+
+=item used example
+
+  # given $space (Foo::Bar)
+
+  $space->used();
+
+  # undef, unless Foo::Bar is in %INC
+
+=back
+
+=cut
+
+=head2 variables
+
+  variables() : ArrayRef
+
+The variables method searches the package namespace for variables and returns
 their names.
+
+=over 4
+
+=item variables example
+
+  # given Foo/Bar
+
+  $space->variables();
+
+  # [,...]
+
+=back
 
 =cut

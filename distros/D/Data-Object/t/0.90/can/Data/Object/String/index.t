@@ -33,7 +33,7 @@ after execution.
 
 =signature
 
-index(Str $arg1, Num $arg2) : DoNum
+index(Str $arg1, Num $arg2) : NumObject
 
 =type
 

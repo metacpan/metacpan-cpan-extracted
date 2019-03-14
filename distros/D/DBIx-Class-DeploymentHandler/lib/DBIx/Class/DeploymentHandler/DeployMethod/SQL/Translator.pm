@@ -1,5 +1,5 @@
 package DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator;
-$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002228';
+$DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator::VERSION = '0.002230';
 use Moo;
 
 # ABSTRACT: Manage your SQL and Perl migrations in nicely laid out directories

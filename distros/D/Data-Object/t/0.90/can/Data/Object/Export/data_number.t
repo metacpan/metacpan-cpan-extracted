@@ -26,7 +26,7 @@ C<type_number> function is an alias to this function.
 
 =signature
 
-data_number(Num $arg1) : DoNum
+data_number(Num $arg1) : NumObject
 
 =type
 

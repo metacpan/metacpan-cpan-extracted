@@ -200,83 +200,163 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  my $any = Data::Object::Any->new(\*main);
-
-Construct a new object.
-
-=cut
-
-=head2 roles
-
-  my $roles = $any->roles();
-
-The roles method returns consumed roles.
-
-=cut
-
-=head2 rules
-
-  my $rules = $any->rules();
-
-The rules method returns consumed rules.
-
-=cut
-
 =head2 defined
+
+  defined() : NumObject
+
+The defined method returns truthy for defined data.
+
+=over 4
+
+=item defined example
 
   my $defined = $self->defined();
 
-The defined method returns truthy for defined data.
+=back
 
 =cut
 
 =head2 eq
 
-  my $eq = $self->eq();
+  eq(Any $arg1) : NumObject
 
 The eq method returns truthy if argument and object data are equal.
 
-=cut
+=over 4
 
-=head2 gt
+=item eq example
 
-  my $gt = $self->gt();
+  my $eq = $self->eq();
 
-The gt method returns truthy if argument is greater then the object data.
+=back
 
 =cut
 
 =head2 ge
 
-  my $ge = $self->ge();
+  ge(Any $arg1) : NumObject
 
 The ge method returns truthy if argument is greater or equal to the object data.
 
+=over 4
+
+=item ge example
+
+  my $ge = $self->ge();
+
+=back
+
 =cut
 
-=head2 lt
+=head2 gt
 
-  my $lt = $self->lt();
+  gt(Any $arg1) : NumObject
 
-The lt method returns truthy if argument is lesser than the object data.
+The gt method returns truthy if argument is greater then the object data.
+
+=over 4
+
+=item gt example
+
+  my $gt = $self->gt();
+
+=back
 
 =cut
 
 =head2 le
 
-  my $le = $self->le();
+  le(Any $arg1) : NumObject
 
 The le method returns truthy if argument is lesser or equal to the object data.
+
+=over 4
+
+=item le example
+
+  my $le = $self->le();
+
+=back
+
+=cut
+
+=head2 lt
+
+  lt(Any $arg1) : NumObject
+
+The lt method returns truthy if argument is lesser than the object data.
+
+=over 4
+
+=item lt example
+
+  my $lt = $self->lt();
+
+=back
 
 =cut
 
 =head2 ne
 
-  my $ne = $self->ne();
+  ne(Any $arg1) : NumObject
 
 The ne method returns truthy if argument and object data are not equal.
+
+=over 4
+
+=item ne example
+
+  my $ne = $self->ne();
+
+=back
+
+=cut
+
+=head2 new
+
+  new(Any $arg1) : AnyObject
+
+Construct a new object.
+
+=over 4
+
+=item new example
+
+  my $any = Data::Object::Any->new(\*main);
+
+=back
+
+=cut
+
+=head2 roles
+
+  roles() : ArrayRef
+
+The roles method returns consumed roles.
+
+=over 4
+
+=item roles example
+
+  my $roles = $any->roles();
+
+=back
+
+=cut
+
+=head2 rules
+
+  rules() : ArrayRef
+
+The rules method returns consumed rules.
+
+=over 4
+
+=item rules example
+
+  my $rules = $any->rules();
+
+=back
 
 =cut
 

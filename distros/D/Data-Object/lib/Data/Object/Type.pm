@@ -233,117 +233,229 @@ This package implements the following methods.
 
 =cut
 
-=head2 new
-
-  my $data = Data::Object::Type->new();
-
-Construct a new object.
-
-=cut
-
-=head2 name
-
-  my $name = $data->name();
-
-The name method returns the name of the data type.
-
-=cut
-
 =head2 aliases
 
-  my $aliases = $data->aliases();
+  aliases() : ArrayRef
 
 The aliases method returns aliases to register in the type library.
 
-=cut
+=over 4
 
-=head2 coercions
+=item aliases example
 
-  my $coercions = $data->coercions();
+  my $aliases = $data->aliases();
 
-The coercions method returns coercions to configure on the type constraint.
-
-=cut
-
-=head2 parent
-
-  my $parent = $data->parent();
-
-The parent method represents the type expression (or parent type) that its type
-should derive from.
-
-=cut
-
-=head2 library
-
-  my $library = $data->library();
-
-The library method returns an instance of the type library instance.
-
-=cut
-
-=head2 namespace
-
-  my $namespace = $data->namespace();
-
-The namespace method returns the name of the data type.
-
-=cut
-
-=head2 register
-
-  my $register = $data->register();
-
-The register method registers the built type constraint in the specified type
-library.
-
-=cut
-
-=head2 validator
-
-  my $validator = $data->validator();
-
-The validator method returns the built type constraint object.
-
-=cut
-
-=head2 options
-
-  my $options = $data->options();
-
-The options method is used internally to create the options for building the
-L<Type::Tiny> type constraint.
-
-=cut
-
-=head2 validation
-
-  my $validation = $self->validation();
-
-The validation method returns truthy if type check is valid.
+=back
 
 =cut
 
 =head2 coercion_generator
 
-  my $coercion_generator = $self->coercion_generator();
+  coercion_generator(Object $arg1, Object $arg2, Object $arg3) : Object
 
 coercion_generator
+
+=over 4
+
+=item coercion_generator example
+
+  my $coercion_generator = $self->coercion_generator();
+
+=back
+
+=cut
+
+=head2 coercions
+
+  coercions() : ArrayRef
+
+The coercions method returns coercions to configure on the type constraint.
+
+=over 4
+
+=item coercions example
+
+  my $coercions = $data->coercions();
+
+=back
 
 =cut
 
 =head2 constraint_generator
 
-  my $constraint_generator = $self->constraint_generator();
+  const(Str $arg1, Any $arg2) : Any
 
 constraint_generator
+
+=over 4
+
+=item constraint_generator example
+
+  my $constraint_generator = $self->constraint_generator();
+
+=back
 
 =cut
 
 =head2 explaination_generator
 
-  my $explaination_generator = $self->explaination_generator();
+  explaination(Object $arg1, Object $arg2, Str $arg3) : Any
 
 The explaination_generator method returns the explaination for the type check failure.
+
+=over 4
+
+=item explaination_generator example
+
+  my $explaination_generator = $self->explaination_generator();
+
+=back
+
+=cut
+
+=head2 library
+
+  library() : Any
+
+The library method returns an instance of the type library instance.
+
+=over 4
+
+=item library example
+
+  my $library = $data->library();
+
+=back
+
+=cut
+
+=head2 name
+
+  name() : StrObject
+
+The name method returns the name of the data type.
+
+=over 4
+
+=item name example
+
+  my $name = $data->name();
+
+=back
+
+=cut
+
+=head2 namespace
+
+  name() : StrObject
+
+The namespace method returns the name of the data type.
+
+=over 4
+
+=item namespace example
+
+  my $namespace = $data->namespace();
+
+=back
+
+=cut
+
+=head2 new
+
+  new() : Object
+
+Construct a new object.
+
+=over 4
+
+=item new example
+
+  my $data = Data::Object::Type->new();
+
+=back
+
+=cut
+
+=head2 options
+
+  options(Any $arg1) : (Str, Any)
+
+The options method is used internally to create the options for building the
+L<Type::Tiny> type constraint.
+
+=over 4
+
+=item options example
+
+  my $options = $data->options();
+
+=back
+
+=cut
+
+=head2 parent
+
+  parent() : Str
+
+The parent method represents the type expression (or parent type) that its type
+should derive from.
+
+=over 4
+
+=item parent example
+
+  my $parent = $data->parent();
+
+=back
+
+=cut
+
+=head2 register
+
+  register() : DoType
+
+The register method registers the built type constraint in the specified type
+library.
+
+=over 4
+
+=item register example
+
+  my $register = $data->register();
+
+=back
+
+=cut
+
+=head2 validation
+
+  validation(Object $arg1) : NumObject
+
+The validation method returns truthy if type check is valid.
+
+=over 4
+
+=item validation example
+
+  my $validation = $self->validation();
+
+=back
+
+=cut
+
+=head2 validator
+
+  validator() : Object
+
+The validator method returns the built type constraint object.
+
+=over 4
+
+=item validator example
+
+  my $validator = $data->validator();
+
+=back
 
 =cut

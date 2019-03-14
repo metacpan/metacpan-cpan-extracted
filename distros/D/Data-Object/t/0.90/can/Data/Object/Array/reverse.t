@@ -24,7 +24,7 @@ array in reverse order. This method returns a L<Data::Object::Array> object.
 
 =signature
 
-reverse() : DoArray
+reverse() : ArrayObject
 
 =type
 

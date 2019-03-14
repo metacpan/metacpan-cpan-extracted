@@ -1,8 +1,6 @@
 package Music::Intervals::Ratio;
-$Music::Intervals::Ratio::VERSION = '0.0502';
-BEGIN {
-  $Music::Intervals::Ratio::AUTHORITY = 'cpan:GENE';
-}
+$Music::Intervals::Ratio::VERSION = '0.0503';
+our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
@@ -472,7 +470,7 @@ Music::Intervals::Ratio
 
 =head1 VERSION
 
-version 0.0502
+version 0.0503
 
 =head1 AUTHOR
 
@@ -480,7 +478,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
