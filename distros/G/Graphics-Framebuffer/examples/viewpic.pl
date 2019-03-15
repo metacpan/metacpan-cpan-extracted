@@ -11,11 +11,11 @@ use Time::HiRes qw(sleep time alarm);
 use Getopt::Long;
 
 # use Data::Dumper::Simple;$Data::Dumper::Sortkeys=1;
-
+exit(0) unless(scalar(@ARGV));
 my $file = $ARGV[-1];
 
-my $full    = 0;
-my $noclear = 0;
+my $full    = FALSE;
+my $noclear = FALSE;
 my $delay   = 10;
 my $alpha   = 255;
 
@@ -27,10 +27,12 @@ GetOptions(
 );
 
 our $f = Graphics::Framebuffer->new(
-    'SPLASH'      => 0,
-    'SHOW_ERRORS' => 0,
+    'SPLASH'      => FALSE,
+    'SHOW_ERRORS' => FALSE,
     'RESET'       => 1 - $noclear,
 );
+
+$SIG{'KILL'} = $SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = sub { exec('reset'); };
 
 my $info = $f->screen_dimensions();
 
@@ -65,7 +67,7 @@ if (ref($image) eq 'ARRAY') {
     }
     $f->blit_write($image);
     sleep $delay if ($delay);
-} ## end else [ if (ref($image) eq 'ARRAY')]
+}
 
 =head1 NAME
 
@@ -89,7 +91,7 @@ Tells it to scale (proportionally) all images (and animations) to full screen.
 
 =item B<--alpha>=1-254
 
-Alpha value to overlay an image on what is already there.  Usually used to just dim the image.
+Alpha value to overlay an image on what is already there.  Usually used to just dim the image.  Comes in handy for using with fbterm to make a background image.
 
 =item B<--wait>=seconds
 
@@ -99,7 +101,7 @@ Wait number of seconds before returning (0=don't wait)
 
 =head1 COPYRIGHT
 
-Copyright 2010 - 2019 Richard Kelsch
+Copyright (C) 2010 - 2019 Richard Kelsch
 All Rights Reserved
 
 =head1 LICENSE

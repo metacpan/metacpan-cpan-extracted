@@ -1,13 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-BEGIN {
-  use Test::Inter;
-  $t = new Test::Inter 'CountSigFigs';
-}
+use warnings;
+use strict;
+use Test::Inter;
+my $ti = new Test::Inter $0;
 
-BEGIN { $t->use_ok('Math::SigFigs'); }
+$ti->use_ok('Math::SigFigs');
 
-$tests="
+my $tests="
 
 x      =>
 
@@ -39,10 +39,10 @@ x      =>
 
 ";
 
-$t->tests(func  => \&CountSigFigs,
-          tests => $tests);
+$ti->tests(func  => \&CountSigFigs,
+           tests => $tests);
 
-$t->done_testing();
+$ti->done_testing();
 1;
 
 # Local Variables:

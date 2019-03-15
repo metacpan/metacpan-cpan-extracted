@@ -1,6 +1,10 @@
 Revision history for Tie::CheckVariables.
 =========================================
 
+0.07  2019-03-15 09:23:00
+    - fix typos thanks to @manwar
+    - fix dist.ini
+
 0.06  2019-01-21 09:08:00
     - fix typos thanks to @manwar
     - fix code in synopsis

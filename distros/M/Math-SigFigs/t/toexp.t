@@ -1,13 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-BEGIN {
-  use Test::Inter;
-  $t = new Test::Inter '_ToExp';
-}
+use warnings;
+use strict;
+use Test::Inter;
+my $ti = new Test::Inter $0;
 
-BEGIN { $t->use_ok('Math::SigFigs'); }
+$ti->use_ok('Math::SigFigs');
 
-$tests="
+my $tests="
 
 ''  123   456   0  => 123.456 0
 
@@ -25,9 +25,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&Math::SigFigs::_ToExp,
+$ti->tests(func  => \&Math::SigFigs::_ToExp,
           tests => $tests);
-$t->done_testing();
+$ti->done_testing();
 1;
 
 # Local Variables:

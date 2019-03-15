@@ -111,7 +111,7 @@ sub logRpcCall {
         $self->dataCleaner($data);
         my $userId = eval { $self->user->loginName } // '*UNKNOWN*';
         my $remoteAddr = $self->tx->remote_address;
-        $self->log->debug("[$userId|$remoteAddr] CALL $method(".encode_json($data).")");
+        $self->log->info("[$userId|$remoteAddr] CALL $method(".encode_json($data).")");
     }
     else {
         $self->SUPER::logRpcCall(@_);
@@ -132,7 +132,7 @@ sub logRpcReturn {
         $self->dataCleaner($data);
         my $userId = eval { $self->user->loginName } // '*UNKNOWN*';
         my $remoteAddr = $self->tx->remote_address;
-        $self->log->debug("[$userId|$remoteAddr] RETURN ".encode_json($data).")");
+        $self->log->info("[$userId|$remoteAddr] RETURN ".encode_json($data));
     }
     else {
         $self->SUPER::logRpcReturn(@_);

@@ -1,3 +1,4 @@
+perl -I../lib _version.t 1
 perl -I../lib add.t 1
 perl -I../lib count.t 1
 perl -I../lib div.t 1

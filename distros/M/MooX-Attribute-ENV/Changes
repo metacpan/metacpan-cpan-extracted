@@ -1,0 +1,5 @@
+0.02 2019-03-15
+ - partition out ENV-related attribute keys so Moose not blow up
+
+0.01 2019-03-15
+ - initial release

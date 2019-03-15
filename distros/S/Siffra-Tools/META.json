@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Siffra-Tools",
    "no_index" : {
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

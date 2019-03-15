@@ -2,56 +2,8 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
-1.00  1996-12-05
-  - Initial creation
-
-1.01  1997-01-28
-  - Used croak and changed die's to confess.
-  - "101" is now returned as "101." .
-  - Fixed where 9.99 wasn't being correctly returned with 1 sigfig.
-    Kyle Krom
-
-1.02  2000-01-10
-  - Fixed where 1249.01 wasn't correctly rounded to 1200.
-    Janna Wemekamp
-
-1.03  2003-09-11
-  - Fixed a bug where I left off the sign.  Steve Reaser
-  - Fixed a bug in subSF where numbers ending in zero were truncated.
-    Andrew Grall
-
-1.04  2005-06-30
-  - Complete rewrite of addSF.
-     * stopped using sprintf (which does not return the same results on
-       all platforms.
-     * replaced IsReal with Simplify.
-
-1.05  2007-02-22
-  - Fixed a bug where subSF didn't work with some values.
-
-1.06  2008-05-05
-  - Updated test.pl.
-  - Added Build.PL and several other things to meet requirements on
-    http://cpants.perl.org/
-
-1.07  2008-05-08
-  - Additional changes to meet requirements on http://cpants.perl.org/
-
-1.08  2008-05-09
-  - Final changes to meet requirements on http://cpants.perl.org/
-  - Bug fix so it won't fail with "Too early to specify a build action"
-
-1.09  2009-09-24
-  - FormatSigFigs will preserve a '+' sign.  Denby Angus
-  - Better handling a value of 0.  Denby Angus
-
-1.10  2015-07-10
-  - Switched test suite to Test::Inter
-  - Changed HISTORY file to new Changes specification.
-  - Put repository on GitHub.  Gabor Szabo
-  - Improved POD documentation formatting.
-  - Improved test suite (and made a number of simplifications to the module)
-    based on Devel::Cover.  Test suite now has 100% coverage.
+1.21  2019-03-15
+  - Removed warning with newer versions of perl
 
 1.20  2016-10-03
   - Added some examples to the docs that illustrate trailing zero handling.
@@ -64,4 +16,53 @@ Any suggestions, bug reports, or donations :-) should be sent to me.
   - Return numbers in their simplest form (without trailing decimal points
     when they are not required)
 
-1.21
+1.10  2015-07-10
+  - Switched test suite to Test::Inter
+  - Changed HISTORY file to new Changes specification.
+  - Put repository on GitHub.  Gabor Szabo
+  - Improved POD documentation formatting.
+  - Improved test suite (and made a number of simplifications to the module)
+    based on Devel::Cover.  Test suite now has 100% coverage.
+
+1.09  2009-09-24
+  - FormatSigFigs will preserve a '+' sign.  Denby Angus
+  - Better handling a value of 0.  Denby Angus
+
+1.08  2008-05-09
+  - Final changes to meet requirements on http://cpants.perl.org/
+  - Bug fix so it won't fail with "Too early to specify a build action"
+
+1.07  2008-05-08
+  - Additional changes to meet requirements on http://cpants.perl.org/
+
+1.06  2008-05-05
+  - Updated test.pl.
+  - Added Build.PL and several other things to meet requirements on
+    http://cpants.perl.org/
+
+1.05  2007-02-22
+  - Fixed a bug where subSF didn't work with some values.
+
+1.04  2005-06-30
+  - Complete rewrite of addSF.
+     * stopped using sprintf (which does not return the same results on
+       all platforms.
+     * replaced IsReal with Simplify.
+
+1.03  2003-09-11
+  - Fixed a bug where I left off the sign.  Steve Reaser
+  - Fixed a bug in subSF where numbers ending in zero were truncated.
+    Andrew Grall
+
+1.02  2000-01-10
+  - Fixed where 1249.01 wasn't correctly rounded to 1200.
+    Janna Wemekamp
+
+1.01  1997-01-28
+  - Used croak and changed die's to confess.
+  - "101" is now returned as "101." .
+  - Fixed where 9.99 wasn't being correctly returned with 1 sigfig.
+    Kyle Krom
+
+1.00  1996-12-05
+  - Initial creation

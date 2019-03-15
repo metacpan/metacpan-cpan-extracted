@@ -23,12 +23,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "FindBin" => 0,
     "Pod::Coverage::TrustPod" => 0,
-    "Test::CheckManifest" => "1.38",
+    "Test::CheckManifest" => "1.42",
     "Test::More" => 0,
     "Test::Pod::Coverage" => 0,
     "Types::Standard" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,
-  "Test::CheckManifest" => "1.38",
+  "Test::CheckManifest" => "1.42",
   "Test::More" => 0,
   "Test::Pod::Coverage" => 0,
   "Types::Standard" => 0

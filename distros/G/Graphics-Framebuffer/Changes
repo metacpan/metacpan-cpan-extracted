@@ -1414,7 +1414,7 @@ Revision history for Graphics-Framebuffer
       Previously broken 16 bit code was bypassed, but now it works just like
       the 24/32 bit routines.
 
-6.24  Feb 13, 2019
+6.24  Mar 13, 2019
 
       Some minor changes to the C routines to make stack operations more
       efficient.  Also fixed the order of the functions to prevent warning
@@ -1425,3 +1425,37 @@ Revision history for Graphics-Framebuffer
       built into the module, they are now left to the user to exploit.
 
       The Makefile.PL was updated.
+
+6.25  Mar 14, 2019
+
+      Made improvements to the "examples/threaded_slideshow.pl" script.  It
+      now waits on the splash screen correctly.  It also loads images while
+      waiting to display the current one.
+
+      Added alternate spelling for CENTER constants to allow for CENTRE as
+      well (to keep the British and Canadian folks smiling).
+
+      Updated the "examples/template.pl" script.
+
+      Fixed the unable to exit bug for some of the "examples/" scripts.  I
+      have no idea why they weren't exiting, but I force an exit with signal
+      handlers that fix the problem (square peg, round role).
+
+      Other bug fixes and improvements to the "examples/" scripts.
+
+      Added rudimentary mouse handling routines.  This handler uses the
+      "alarm" call of Perl to do mouse polling and drawing.  If you know how
+      to do threads, then I suggest using your own thread that loops and
+      updates shared variables based on the mouse status, rather than these
+      routines.  However, these are here if you need them.
+
+      Added a new "examples/mouse.pl" script to demonstrate the mouse.  Like I
+      said, it is rudimentary.
+
+6.26  Mar 15, 2019
+
+      Made some improvements to the slideshow example scripts.  These scripts
+      now use the current path as the default, if none is passed to them.
+
+      Also made attempts at making the "_console" methods workable... they're
+      flakey still.

@@ -1,13 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-BEGIN {
-  use Test::Inter;
-  $t = new Test::Inter 'FormatSigFigs';
-}
+use warnings;
+use strict;
+use Test::Inter;
+my $ti = new Test::Inter $0;
 
-BEGIN { $t->use_ok('Math::SigFigs'); }
+$ti->use_ok('Math::SigFigs');
 
-$tests="
+my $tests="
 
 2400 1 => 2000
 
@@ -381,9 +381,9 @@ $tests="
 
 ";
 
-$t->tests(func  => \&FormatSigFigs,
-          tests => $tests);
-$t->done_testing();
+$ti->tests(func  => \&FormatSigFigs,
+           tests => $tests);
+$ti->done_testing();
 1;
 # Local Variables:
 # mode: cperl

@@ -1,13 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-BEGIN {
-  use Test::Inter;
-  $t = new Test::Inter '_Simplify';
-}
+use warnings;
+use strict;
+use Test::Inter;
+my $ti = new Test::Inter $0;
 
-BEGIN { $t->use_ok('Math::SigFigs'); }
+$ti->use_ok('Math::SigFigs');
 
-$tests="
+my $tests="
 
 ####### Invalid
 
@@ -195,9 +195,9 @@ a10          =>
 
 ";
 
-$t->tests(func  => \&Math::SigFigs::_Simplify,
-          tests => $tests);
-$t->done_testing();
+$ti->tests(func  => \&Math::SigFigs::_Simplify,
+           tests => $tests);
+$ti->done_testing();
 1;
 
 # Local Variables:

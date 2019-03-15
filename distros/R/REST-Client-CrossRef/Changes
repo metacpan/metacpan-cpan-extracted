@@ -15,3 +15,8 @@ Revision history for Perl module REST::Client::CrossRef
     - test for undef when connecting to Crossref, if undef skip the last test
 0.006
     - missing namespace::clean dependency in makefile.pl
+0.007
+    - gives an output when neither json_path nor keys_to_keep are defined and 
+      spit_raw_data is set to 0
+    - keys_to_keep and json_path received the same data: 
+      an array of items if a list is return, a one row array below message for a single item

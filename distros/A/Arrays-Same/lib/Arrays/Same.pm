@@ -5,7 +5,7 @@ use warnings;
 package Arrays::Same;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.001';
+our $VERSION   = '0.002';
 
 require XSLoader;
 'Arrays::Same'->XSLoader::load($VERSION);

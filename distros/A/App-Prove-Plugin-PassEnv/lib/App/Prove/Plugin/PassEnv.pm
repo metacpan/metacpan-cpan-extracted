@@ -1,5 +1,5 @@
 package App::Prove::Plugin::PassEnv;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 # ABSTRACT: a prove plugin to pass environment variables
 

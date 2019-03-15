@@ -60,11 +60,23 @@ C<()> if C<$N> is not a number.
   0240    2
   0.03    1
   0.030   2
+  1.2e2   2
+
+The number zero is not as well defined as other numbers.  I have seen
+different answers for this.  I have seen answers that say that '0' has
+0, 1, or infinite significant figures and for '0.00', I have seen the
+number of significant figures given as 0, 1, 2, and 3.  Everyone agrees
+on how to count signficant figures for non-zero numbers... but that
+agreement doesn't hold true for zero.  At this time, this module will return:
+
+  $N      $n
+  -----   --
   0       1
   0.0     1
   0.00    2
-  1.2e2   2
   0.0e2   1
+
+I may try to improve the handling of zero at some point.
 
 =item B<FormatSigFigs>
 
@@ -122,6 +134,23 @@ will by necessity return the string "2400" which does NOT have 3
 significant figures.  This is not a bug.  It is simply a fundamental
 problem with working with significant figures when not using scientific
 notation.
+
+=item B<The number zero is ambiguous>
+
+There is not a universally accepted way to specify the number of significant
+figures that the number 0 has.
+
+=item B<perl cannot preserve significant figures in numbers>
+
+If you run:
+
+   CountSigFigs(20.00);
+     => 1
+   CountSigFigs("20.00");
+     => 4
+
+This is simply due to the way that numbers are stored.  When using this
+module, use numbers stored as strings in order to avoid unexpected results.
 
 =back
 

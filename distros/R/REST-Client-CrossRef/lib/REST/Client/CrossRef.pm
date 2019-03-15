@@ -7,7 +7,7 @@ use JSON;
 use URI::Escape;
 use REST::Client;
 
-use Data::Dumper;
+#use Data::Dumper;
 use Carp;
 use Log::Any;
 use HTTP::Cache::Transparent;
@@ -24,11 +24,11 @@ REST::Client::CrossRef - Read data from CrossRef using its REST API
 
 =cut
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 VERSION
 
-Version 0.006
+Version 0.007
 
 =cut
 
@@ -114,6 +114,7 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
         last unless $data;
 
         for my $row (@$data) {
+            print "\n" unless ($row);
             for my $field (keys %$row) {
                 print $field, ": ", $row->{$field}. "\n";
             }
@@ -137,19 +138,18 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
     published-print/date-parts : 2002, 12, 1, 
     title : Detectors: Time-Domain Terahertz Science Improves Relativistic Electron-Beam Diagnostics
     volume : 13
-    end of data :  
 
     my $cr = REST::Client::CrossRef->new(
         mailto        => 'dokpe@unifr.ch',
         spit_raw_data => 0,
         add_end_flag  => 1,
         json_path     => [
-            ['$.items[*].author[*]'],
-            ['$.items[*].title'], 
-            ['$.items[*].container-title'],
-            ['$.items[*].volume'], ['$.items[*].issue'], ['$.items[*].page'], 
-            ['$.items[*].issued..date-parts'],
-            ['$.items[*].published-print..date-parts']
+            ['$.author[*]'],
+            ['$.title'], 
+            ['$.container-title'],
+            ['$.volume'], ['$.issue'], ['$.page'], 
+            ['$.issued..date-parts'],
+            ['$.published-print..date-parts']
         ],
         json_path_callback => { '$.items[*].author[*]' => \&unfold_authors },
     );
@@ -186,17 +186,17 @@ This module use L<CrossRef REST API|https://github.com/CrossRef/rest-api-doc> to
     }
 
     Example of output:
-    $.items[*].author[*] : Pelloni, Michelle;  University of Basel, Department of Chemistry, Mattenstrasse 24a, BPR 1096, CH 4002 Basel, Switzerland
+    $.author[*] : Pelloni, Michelle;  University of Basel, Department of Chemistry, Mattenstrasse 24a, BPR 1096, CH 4002 Basel, Switzerland
     Cote, Paul;  School of Chemistry and Biochemistry, University of Geneva, Quai Ernest Ansermet 30, CH-1211 Geneva, Switzerland
     ....
     Warding, Tom.;  University of Basel, Department of Chemistry, Mattenstrasse 24a, BPR 1096, CH 4002 Basel, Switzerland
-    $.items[*].title : Chimeric Artifact for Artificial Metalloenzymes
-    $.items[*].container-title : ACS Catalysis
-    $.items[*].volume : 8
-    $.items[*].issue : 2
-    $.items[*].page : 14-18
-    $.items[*].issued..date-parts : 2018, 1, 24
-    $.items[*].published-print..date-parts : 2018, 2, 2
+    $.title : Chimeric Artifact for Artificial Metalloenzymes
+    $.container-title : ACS Catalysis
+    $.volume : 8
+    $.issue : 2
+    $.page : 14-18
+    $.issued..date-parts : 2018, 1, 24
+    $.published-print..date-parts : 2018, 2, 2
       
      my $cr = REST::Client::CrossRef->new( mailto => 'you@somewher.com'
        ,keys_to_keep => [["breakdowns/id", "id"], ["location"], [ "primary-name", "breakdowns/primary-name", "name" ]],
@@ -265,9 +265,9 @@ has mailto => ( is => 'lazy', default => sub {0} );
 
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... sort_output =E<gt>1, ...)>
 
-Rows can sorted using the key name with sort_ouput => 1.
+Rows can be sorted using the key name with sort_ouput => 1.
 Default to 0.
-In effect only if spit_raw_data is false.
+In effect only if C<spit_raw_data> is false.
 
 =cut
 
@@ -277,8 +277,8 @@ has test_data   => ( is => 'lazy', default => sub {0} );
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... spit_raw_data =E<gt>1, ...)>
 
 Display the data as a hashref if 0 or as an array ref of hasref, 
-where each hashref is a row of key => value. 
-Default to 0.
+where each hashref is a row of key => value that can be sorted with sort_ouput => 1. 
+C<spit_raw_data> default to 0.
 
 =cut
 
@@ -288,10 +288,8 @@ has page_start_at => ( is => 'rw',   default => sub {0} );
 
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... add_end_flag =E<gt>1, ...)>
 
-Add an 'end of data' key at the end of an item field.
-Add undef after an item field when keys_to_keep is defined.
+Add undef after an item's fields.
 Default to 1.
-In effect only if spit_raw_data is false.
 
 =cut
 
@@ -299,7 +297,7 @@ has add_end_flag => ( is => 'lazy', default => sub {1} );
 
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... keys_to_keep =E<gt> [[key1, key1a, ...], [key2], ... ], ...)>
 
-An array ref of array ref, the inner array refs give a key name and the possible alternative keys for the same value, 
+An array ref of array ref, the inner array ref give a key name and the possible alternative keys for the same value, 
 for example [ "primary-name", "breakdowns/primary-name", "name" ] in the member road (url ending with /members).
 The keys enumeration starts below C<message>, or C<message> - C<items> if the result is a list.
 This filters the values that are returned and preserves the ordering of the array ref given in argument.
@@ -314,8 +312,8 @@ has keys_to_keep => ( is => 'lazy' );
 
 An array ref of array ref, the inner array refs give a L<JSONPath|https://goessner.net/articles/JsonPath/>  
 and the possible alternative path for the same value. See also L<JSON::Path>.
+The json path starts below C<message>, or C<message> - C<items> if the result is a list.
 The output, ordering, filtering and flattening is as above. In effect only if spit_raw_data is false.
-The path starts below the C<message> key in the JSON data.
 
 =cut
 
@@ -330,11 +328,19 @@ The function must accept an array ref as first argument and must return an array
 
 has json_path_callback => ( is => 'lazy' );
 
+=head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... json_path_safe =E<gt> "0", ... )>
+
+To turn off the message C<non-safe evaluation, died at...> set this to 0.
+Default to 1.
+
+=cut
+
+has json_path_safe => (is => 'lazy', default=> sub{1});
+
 =head2 C<$cr = REST::Client::CrossRef-E<gt>new( ... version =E<gt> "v1", ... )>
 
 To use a defined version of the api.
 See L<https://github.com/CrossRef/rest-api-doc#api-versioning>
-
 
 =cut
 
@@ -407,6 +413,8 @@ sub _build_filter {
 
         #  my %keys_to_keep;
         next if ( !exists $ar->{$filter_name} );
+
+        #print "_build_filter: $filter_name\n";
         my $pos;
         my %pos_seen;
         my %key_seen;
@@ -543,13 +551,14 @@ sub _get_metadata {
         #die $self->spit_raw_data;
         #$self->_display_data($hr);
     }
-    $self->_display_data($hr);
+    return $self->_display_data($hr);
 }
 
 sub _get_page_metadata {
     my ( $self, $path, $param_ar ) = @_;
 
     my $response;
+    my $out;
     $self->cursor(undef);
     if ($param_ar) {
         my $filter = join( ",", @$param_ar );
@@ -570,6 +579,7 @@ sub _get_page_metadata {
             ? $self->_decode_json( $self->test_data() )
             : $self->_decode_json( $response->responseContent );
         my $res_count = $hr->{message}->{'total-results'};
+
         if ( defined $res_count ) {
 
             # print "from metadata: ", $res_count, "\n";
@@ -579,15 +589,17 @@ sub _get_page_metadata {
                 my $returned_items_count = @{ $hr->{message}->{items} };
 
                 $self->{last_page_items_count} = $returned_items_count;
-                $self->_display_data($hr);
+                $out = $self->_display_data($hr);
 
             }
         }
         else {    #singleton
-            $self->_display_data($hr);
+            $out = $self->_display_data($hr);
 
         }
     }
+
+    return $out;
 
 }
 
@@ -595,66 +607,69 @@ sub _display_data {
     my ( $self, $hr ) = @_;
 
     return $hr if ( $self->spit_raw_data );
-    my $formatter = REST::Client::CrossRef::Unfolder->new;
+    my $formatter = REST::Client::CrossRef::Unfolder->new();
 
-    # print Dumper($hr->{message}), "\n";
+    my $data_ar;
+    if ( $hr->{message}->{items} ) {
+        $data_ar = $hr->{message}->{items};
+    }
+    else {
+        $data_ar = [ $hr->{message} ];
+    }
+
+    my @data;
     if ( defined $self->{json_path} ) {
 
         my %result;
         my %keys = %{ $self->{json_path} };
+        my %selectors;
+        $JSON::Path::Safe=$self->json_path_safe;
         for my $path ( keys %keys ) {
 
             #print $path, "\n";
-            my $jpath = JSON::Path->new($path);
-            my @val   = $jpath->values( $hr->{message} );
-
-            # print Dumper(@val);
-            if (   $self->{json_path_callback}
-                && $self->{json_path_callback}->{$path} )
-            {
-                my @data;
-                my $cb = $self->{json_path_callback}->{$path};
-                eval { @data = @{ $cb->( \@val ) }; };
-                croak "Json callback failed : $@\n" if ($@);
-                $result{$path} = join( "\n", @data );
-
-            }
-            elsif (@val) {
-
-                # print $path, " ", Dumper(@val), "\n";
-                my %res_part;
-                %res_part = %{ $formatter->_unfold_array( \@val, [$path] ) };
-                @result{ keys %res_part } = values %res_part;
-            }
-
+            $selectors{$path} = JSON::Path->new($path);
         }
 
-        return $self->_sort_output( $self->{json_path}, \%result );
+        for my $data_hr (@$data_ar) {
+
+            for my $path ( keys %selectors ) {
+
+                #my @val   = $jpath->values( $hr->{message} );
+                my @val = $selectors{$path}->values($data_hr);
+
+                if (   $self->{json_path_callback}
+                    && $self->{json_path_callback}->{$path} )
+                {
+                    my @data;
+                    my $cb = $self->{json_path_callback}->{$path};
+                    eval { @data = @{ $cb->( \@val ) }; };
+                    croak "Json callback failed : $@\n" if ($@);
+                    $result{$path} = join( "\n", @data );
+
+                }
+                elsif (@val) {
+
+                    my %res_part;
+                    %res_part =
+                        %{ $formatter->_unfold_array( \@val, [$path] ) };
+                    @result{ keys %res_part } = values %res_part;
+                }
+
+            }
+
+            push @data,
+                @{ $self->_sort_output( $self->{json_path}, \%result ) };
+        }
 
     }
     elsif ( defined $self->{keys_to_keep} ) {
 
-        #print Dumper @$data_ar,"\n";
-        #$YAML::UseCode =1;
-        #return Dump(@$data_ar);
-        my $data_ar;
-        if ( $hr->{message}->{items} ) {
-            $data_ar = $hr->{message}->{items};
-        }
-        else {
-            $data_ar = [ $hr->{message} ];
-
-            #die Dumper $data_ar;
-        }
-
         my $new_ar;
 
         #$data_ar :array ref of rows items
+        $formatter->set_keys_to_keep( $self->{keys_to_keep} );
 
         for my $data_hr (@$data_ar) {
-
-            $formatter->set_keys_to_keep( $self->{keys_to_keep} )
-                if $self->{keys_to_keep};
 
             #https://www.perlmonks.org/?node_id=1224994
             #my $result_hr = {};
@@ -662,11 +677,32 @@ sub _display_data {
             my $result_hr = $formatter->_unfold_hash($data_hr);
 
             #  $self->log->debug("display_data\n", Dumper $result_hr);
-            return $self->_sort_output( $self->{keys_to_keep}, $result_hr )
+            push @data,
+                @{ $self->_sort_output( $self->{keys_to_keep}, $result_hr ) };
 
         }
-    }
 
+    }
+    else { #neither json_path nor keys_to_keep defined, spit_raw_data set to 0
+
+        for my $data_hr (@$data_ar) {
+            my $val_hr = $formatter->_unfold_hash($data_hr);
+            my @keys;
+            if ( $self->{sort_output} ) {
+                @keys = sort { lc($a) cmp lc($b) } keys %$val_hr;
+            }
+            else {
+                @keys = keys %$val_hr;
+            }
+            for my $k (@keys) {
+                push @data, { $k, $val_hr->{$k} };
+            }
+
+            push @data, undef if $self->add_end_flag;
+        }
+
+    }
+    return \@data;
 }
 
 sub _sort_output {
@@ -701,11 +737,9 @@ sub _sort_output {
 
         my @unseen = grep { !$pos_seen{$_} } keys %pos_seen;
 
-        #die Dumper $res if (@unseen);
         for my $pos (@unseen) {
             $item_data[$pos] = { $key_seen{$pos}, "" };
 
-            #push @data, { $key_seen{$pos}, "" };
         }
         push @data, @item_data;
         push @data, undef if $self->add_end_flag;
@@ -721,12 +755,10 @@ sub _sort_output {
         }
         for my $k (@keys) {
 
-            #push @$new_ar, [ { $k, $result_hr->{$k} } ];
             push @data, { $k, $result_hr->{$k} };
         }
 
-        #push @$new_ar, [ { "end of data", "\n" } ] if $self->add_end_flag;
-        push @data, { "end of data", "\n" } if $self->add_end_flag;
+        push @data, undef if $self->add_end_flag;
     }
 
     return \@data;
@@ -1016,6 +1048,7 @@ sub agencies_from_dois {
 
             # my @items = $hr->{message}->{items};
             my $res = $self->_display_data($hr);
+            return $res if ($self->spit_raw_data);
             push @results, $res;
 
         }
@@ -1073,23 +1106,24 @@ sub _decode_json {
 
 }
 
-#=for comment
 package REST::Client::CrossRef::Unfolder;
 
 #use Data::Dumper;
 use Carp;
 use Log::Any;
-use Moo;
 
-extends 'REST::Client::CrossRef';
+sub new {
+    my ($class) = shift;
+    my $self = { logger => Log::Any->get_logger( category => "unfolder" ), };
+    return bless $self, $class;
 
-#=for comment
-has 'log' => (
-    is      => 'ro',
-    default => sub { Log::Any->get_logger( category => "unfolder" ) },
-);
+}
 
-#=cut
+sub log {
+    my $self = shift;
+    return $self->{logger};
+}
+
 # This setting of the array ref could be removed since the ordering in display_data
 # also remove the keys that are not wanted. But the hash builded is smaller
 # with adding only the key that are needed.
@@ -1136,14 +1170,6 @@ sub _unfold_hash {
                 if ( ref $raw_hr->{$k} );
             my $key = join( "/", @$key_ar );
 
-=for comment
-             if ( $self->{keys_to_keep} ) {
-                 $self->log->debug("key with key_to_keep set : ", $key, " value: ",  $raw_hr->{$k} );
-                $result_hr->{$key} = $raw_hr->{$k}
-                    if ( defined $self->{keys_to_keep}->{$key} );
-            }
-=cut
-
             if (   defined $self->{keys_to_keep}
                 && defined $self->{keys_to_keep}->{$key} )
             {
@@ -1158,10 +1184,7 @@ sub _unfold_hash {
 
         }
 
-        # $result_hr->{$key} = $raw_hr->{$k};
         my $tmp = pop @$key_ar;
-
-        #   print " removed ", $tmp, "\n";
 
     }
 
@@ -1223,11 +1246,8 @@ sub _unfold_array {
 
         }
 
-        # die Dumper(@groups);
         unshift @all, @first;
         unshift @all, @groups;
-
-        #print Dumper(@all);
         $res_hr->{$key} = join( "", @all );
 
     }
@@ -1254,20 +1274,6 @@ sub _unfold_array {
             }
             else {
 
-=for comment
-                if ( $self->{keys_to_keep} ) {
-                    return unless defined $self->{keys_to_keep}->{$last_key};
-
-                    # return { $key, "" } unless ( $res_hr->{$key} );
-                    if ( defined $val ) {
-                        $res_hr->{$last_key} .= $val . ", ";
-                    }
-                    else {
-                        $res_hr->{$last_key} = "";
-                    }
-                }
-=cut
-
                 if (   defined $self->{keys_to_keep}
                     && defined $self->{keys_to_keep}->{$last_key} )
                 {
@@ -1280,7 +1286,6 @@ sub _unfold_array {
 
                 }
                 else {
-                    # print "key3: ", $key, "\n";
                     $res_hr->{$last_key} .= $val;
                 }
 
@@ -1296,8 +1301,6 @@ sub _unfold_array {
 sub _unfold_affiliation {
     my ( $self, $ar ) = @_;
     my $line = ";";
-
-    #die Dumper $ar;
     my @aff;
     for my $hr (@$ar) {
 

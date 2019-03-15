@@ -132,10 +132,7 @@ examples/MusicBase/t/use.t
 examples/MusicBase/t/web.t
 lib/Catalyst/TraitFor/Model/DBIC/Schema/FromMigration.pm
 lib/Catalyst/TraitFor/Model/DBIC/Schema/FromMigration/_MigrationHelper.pm
-lib/DBIx/Class/.Migration.pm.swp
 lib/DBIx/Class/Migration.pm
-lib/DBIx/Class/Migration/.Population.pm.swp
-lib/DBIx/Class/Migration/.Script.pm.swp
 lib/DBIx/Class/Migration/FAQ.pod
 lib/DBIx/Class/Migration/Features.pod
 lib/DBIx/Class/Migration/MySQLSandbox.pm
@@ -202,7 +199,6 @@ lib/DBIx/Class/Migration/Tutorial/ThirdMigration.pod
 lib/DBIx/Class/Migration/Types.pm
 lib/Test/DBIx/Class/FixtureCommand/Population.pm
 t/.devdir
-t/.script.t.swp
 t/help.t
 t/ignore_views.t
 t/install-version-storage.t

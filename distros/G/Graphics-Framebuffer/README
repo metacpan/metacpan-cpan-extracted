@@ -13,6 +13,10 @@ However, most open-sourced drivers, seem to work fine.  VirtualBox drivers
 work too.  You must also have the appropriate permissions to write to this
 device (usually membership with group "video").
 
+NOTE:  Sometimes if you force grub to set a vga mode, a VESA console
+       framebuffer driver will load, and then you can have a framebuffer with
+       proprietary drivers.
+
 **** ATTENTION CPAN TESTERS!  Please make sure the above is noted before ****
 **** testing (and marking a fail)                                        ****
 

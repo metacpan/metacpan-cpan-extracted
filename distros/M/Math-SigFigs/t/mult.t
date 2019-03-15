@@ -1,13 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-BEGIN {
-  use Test::Inter;
-  $t = new Test::Inter 'multSF';
-}
+use warnings;
+use strict;
+use Test::Inter;
+my $ti = new Test::Inter $0;
 
-BEGIN { $t->use_ok('Math::SigFigs','multSF'); }
+$ti->use_ok('Math::SigFigs','multSF');
 
-$tests="
+my $tests="
 
 1.234     2.1       => 2.6
 
@@ -37,9 +37,9 @@ __undef__ __undef__ =>
 
 ";
 
-$t->tests(func  => \&multSF,
+$ti->tests(func  => \&multSF,
           tests => $tests);
-$t->done_testing();
+$ti->done_testing();
 1;
 
 # Local Variables:

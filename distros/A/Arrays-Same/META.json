@@ -36,10 +36,8 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "Exporter::Shiny" : "1.000000"
-         },
          "requires" : {
+            "Exporter::Shiny" : "1.000000",
             "perl" : "5.008008"
          }
       },
@@ -52,7 +50,7 @@
    "provides" : {
       "Arrays::Same" : {
          "file" : "lib/Arrays/Same.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -64,8 +62,13 @@
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-arrays-same.git",
+         "web" : "https://github.com/tobyink/p5-arrays-same"
+      },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Arrays-Same/project"
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

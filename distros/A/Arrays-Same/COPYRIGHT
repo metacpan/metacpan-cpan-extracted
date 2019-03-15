@@ -11,17 +11,17 @@ Files: Changes
 Copyright: Copyright 2019 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- Same.xs
-Copyright: Unknown
-License: Unknown
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
+
+Files: INSTALL
+ LICENSE
+ Same.xs
+Copyright: Unknown
+License: Unknown
 
 Files: README
  lib/Arrays/Same.pm

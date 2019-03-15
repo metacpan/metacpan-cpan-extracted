@@ -10,30 +10,42 @@ use_ok 'Local::Schema';
 my $dir = tempdir(DIR => 't', CLEANUP => 1);
 
 lives_ok {
-  DBIx::Class::Migration::Script->run_with_options(argv => [
+  local @ARGV = (
     "status",
     "--schema_class" => 'Local::Schema',
     "--target_dir" => $dir,
-  ]);
-}; 
+  );
+  DBIx::Class::Migration::Script->run_with_options;
+} 'status = ok';
+
+lives_ok {
+  local $ENV{DBIC_MIGRATION_SCHEMA_CLASS} = 'Local::Schema';
+  local @ARGV = (
+    "status",
+    "--target_dir" => $dir,
+  );
+  DBIx::Class::Migration::Script->run_with_options;
+} 'status = ok with ENV';
 
 throws_ok {
-  DBIx::Class::Migration::Script->run_with_options(argv => [
+  # MooX::Options on ->new failing prints to STDERR, doesn't re-throw
+  local @ARGV = (
     "status",
     "--schema_class" => 'Local::Schema',
     "--target_dir" => $dir,
     "--database" => 'DefinitelyNotValid',
-  ]);
-} qr/Unknown database type/;
-
-local $Local::Schema::VERSION = undef;
+  );
+  DBIx::Class::Migration::Script->run_with_options;
+} qr/Unknown database type/, 'status invalid db = right message';
 
 throws_ok {
-  DBIx::Class::Migration::Script->run_with_options(argv => [
+  local $Local::Schema::VERSION = undef;
+  local @ARGV = (
     "status",
     "--schema_class" => 'Local::Schema',
     "--target_dir" => $dir,
-  ]);
-} qr/A \$VERSION needs to be specified in your schema class Local\:\:Schema/;
+  );
+  DBIx::Class::Migration::Script->run_with_options;
+} qr/A \$VERSION needs to be specified in your schema class Local\:\:Schema/, 'status no version = not ok';
 
 done_testing;

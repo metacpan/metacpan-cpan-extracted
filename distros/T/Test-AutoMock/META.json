@@ -1,0 +1,98 @@
+{
+   "abstract" : "A mock that can be used with a minimum setup",
+   "author" : [
+      "Masahiro Honma <hiratara@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-AutoMock",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Test::AutoMock" : {
+         "file" : "lib/Test/AutoMock.pm",
+         "version" : "0.01"
+      },
+      "Test::AutoMock::Manager" : {
+         "file" : "lib/Test/AutoMock/Manager.pm"
+      },
+      "Test::AutoMock::Mock::Basic" : {
+         "file" : "lib/Test/AutoMock/Mock/Basic.pm"
+      },
+      "Test::AutoMock::Mock::Functions" : {
+         "file" : "lib/Test/AutoMock/Mock/Functions.pm"
+      },
+      "Test::AutoMock::Mock::Overloaded" : {
+         "file" : "lib/Test/AutoMock/Mock/Overloaded.pm"
+      },
+      "Test::AutoMock::Mock::TieArray" : {
+         "file" : "lib/Test/AutoMock/Mock/TieArray.pm"
+      },
+      "Test::AutoMock::Mock::TieHash" : {
+         "file" : "lib/Test/AutoMock/Mock/TieHash.pm"
+      },
+      "Test::AutoMock::Patch" : {
+         "file" : "lib/Test/AutoMock/Patch.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hiratara/p5-Test-AutoMock/issues"
+      },
+      "homepage" : "https://github.com/hiratara/p5-Test-AutoMock",
+      "repository" : {
+         "url" : "git://github.com/hiratara/p5-Test-AutoMock.git",
+         "web" : "https://github.com/hiratara/p5-Test-AutoMock"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Masahiro Honma <hira.tara@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
+}

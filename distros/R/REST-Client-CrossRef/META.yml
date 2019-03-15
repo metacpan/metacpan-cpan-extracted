@@ -28,5 +28,5 @@ requires:
   Test::More: '1.001014'
   URI::Escape: '3.31'
   namespace::clean: '0.26'
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

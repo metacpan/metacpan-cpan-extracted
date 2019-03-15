@@ -16,6 +16,7 @@ examples/images/Ryuko.jpg
 examples/images/Solid.jpg
 examples/images/Stance_Flag.jpg
 examples/images/Test_Pattern.jpg
+examples/mouse.pl
 examples/primitives.pl
 examples/slideshow.pl
 examples/template.pl
@@ -25,6 +26,7 @@ ignore.txt
 KNOWN_ISSUES
 lib/Graphics/Framebuffer.pm
 lib/Graphics/Framebuffer/Splash.pm
+lib/Graphics/Framebuffer/Mouse.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

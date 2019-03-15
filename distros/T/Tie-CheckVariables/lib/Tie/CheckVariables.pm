@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.06;
+our $VERSION = '0.07';
   
 my %hash = (
     integer => qr{^[-+]?\d+$},
@@ -126,7 +126,7 @@ Tie::CheckVariables - check/validate variables for their data type
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ You can specify a subroutine that is invoked on error:
   $scalar = 'a'; # ERROR! is printed
   untie $scalar;
 
-=head1 USE YOUR OWN DATATYPE
+=head1 USE YOUR OWN DATA TYPE
 
 =head2 register
 

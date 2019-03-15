@@ -1,38 +1,37 @@
 package Catalyst::TraitFor::Model::DBIC::Schema::FromMigration::_MigrationHelper;
 
-use Moose;
-use DBIx::Class::Migration::Types 'LoadableClass';
+use Moo;
+use DBIx::Class::Migration::Types -all;
 
 has 'migration_class',
   is => 'ro',
   isa => LoadableClass,
   default => 'DBIx::Class::Migration',
   required => 1,
-  coerce => 1;
+  ;
 
 has 'schema_class',
   is => 'ro';
 
 has 'migration_init_args',
   is => 'ro',
-  isa => 'HashRef',
+  isa => HashRef,
   default => sub { +{} },
   auto_deref => 1;
 
 has 'default_fixtures',
   is => 'ro',
-  isa => 'ArrayRef',
+  isa => ArrayRef,
   auto_deref => 1,
   predicate => 'has_default_fixtures';
 
 has 'install_if_needed',
   is => 'ro',
-  isa => 'HashRef|Bool',
+  isa => HashRef|Bool,
   predicate => 'has_install_if_needed';
 
 has 'migration',
-  is => 'ro',
-  lazy_build => 1;
+  is => 'lazy';
 
 sub _build_migration {
   my %init = (my $self = shift)->migration_init_args;

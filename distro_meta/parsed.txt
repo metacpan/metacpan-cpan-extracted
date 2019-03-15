@@ -54336,3 +54336,17 @@ P/PR/PRBRENAN/Data-Edit-Xml-20190315.tar.gz
 A/AW/AWNCORP/Data-Object-0.91.tar.gz
 E/ET/ETJ/DBIx-Class-DeploymentHandler-0.002230.tar.gz
 G/GE/GENE/Music-Intervals-0.0503.tar.gz
+O/OL/OLIVER/App-Netdisco-2.041001.tar.gz
+H/HU/HURRICUP/App-Prove-Plugin-PassEnv-0.002.tar.gz
+T/TO/TOBYINK/Arrays-Same-0.002.tar.gz
+O/OE/OETIKER/CallBackery-0.14.9.tar.gz
+E/ET/ETJ/DBIx-Class-Migration-0.068.tar.gz
+L/LU/LUIZBENE/ExtUtils-ModuleMaker-Siffra-0.01.tar.gz
+R/RK/RKELSCH/Graphics-Framebuffer-6.26.tar.gz
+S/SB/SBECK/Math-SigFigs-1.21.tar.gz
+E/ET/ETJ/MooX-Attribute-ENV-0.02.tar.gz
+R/RA/RAPPAZF/REST-Client-CrossRef-0.007.tar.gz
+L/LU/LUIZBENE/Siffra-Bootstrap-0.02.tar.gz
+L/LU/LUIZBENE/Siffra-Tools-0.03.tar.gz
+H/HI/HIRATARA/Test-AutoMock-0.01.tar.gz
+R/RE/RENEEB/Tie-CheckVariables-0.07.tar.gz

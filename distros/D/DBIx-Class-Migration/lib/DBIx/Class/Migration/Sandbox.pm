@@ -1,8 +1,9 @@
 package DBIx::Class::Migration::Sandbox;
 
-use Moose::Role;
+use Moo::Role;
 use Log::Any;
 use Carp 'croak';
+use DBIx::Class::Migration::Types -all;
 
 has target_dir => (is=>'ro', required=>1);
 has schema_class => (is=>'ro', required=>1);
@@ -15,7 +16,7 @@ sub log_die {
 
 has log => (
     is  => 'ro',
-    isa => 'Log::Any::Proxy',
+    isa => InstanceOf['Log::Any::Proxy'],
     default => sub { Log::Any->get_logger( category => 'DBIx::Class::Migration') },
 );
 
@@ -31,7 +32,7 @@ DBIx::Class::Migration::Sandbox - DB Sandbox Role
 
     package MyApp::Schema::Sandbox;
 
-    use Moose;
+    use Moo;
     with 'DBIx::Class::Migration::Sandbox';
 
     sub make_sandbox {

@@ -1,5 +1,3 @@
-.travis.yml
-Build.PL
 Changes
 examples/count
 examples/format
@@ -13,13 +11,14 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
+t/_pod.t
+t/_pod_coverage.t
+t/_version.t
 t/add.t
 t/count.t
 t/div.t
 t/format.t
 t/mult.t
-t/pod.t
-t/pod_coverage.t
 t/runtests
 t/runtests.bat
 t/simplify.t

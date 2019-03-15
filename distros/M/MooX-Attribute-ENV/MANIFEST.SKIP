@@ -1,0 +1,12 @@
+MANIFEST.SKIP.bak
+MANIFEST.bak
+.git\/
+^.gitignore
+^.travis.yml
+blib\/
+MYMETA\..*
+^MooX-Attribute-ENV-\d.*
+^Makefile$
+^Makefile.bak$
+pm_to_blib
+\.swp$

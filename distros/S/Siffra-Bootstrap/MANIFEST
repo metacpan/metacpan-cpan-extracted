@@ -5,6 +5,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
+Siffra-Bootstrap-0.01.tar.gz
 t/001_load.t
 t/pod-coverage.t
 t/pod.t

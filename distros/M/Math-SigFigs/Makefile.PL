@@ -20,8 +20,14 @@ my %script_prereq = (
 );
 
 my %test_prereq = (
-   'Test::Inter'              => '0',
+   'Cwd'                      => '0',
+   'File::Basename'           => '0',
+   'File::Find::Rule'         => '0',
+   'IO::File'                 => '0',
+   'Test::Inter'              => '1.09',
    'Test::More'               => '0',
+   'Test::Pod'                => '1.00',
+   'Test::Pod::Coverage'      => '1.00',
 );
 
 my %config_prereq = (
@@ -37,7 +43,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Math::SigFigs",
-   VERSION          => "1.20",
+   VERSION          => "1.21",
    ABSTRACT         => "do math with correct handling of significant figures",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -57,8 +63,8 @@ WriteMakefile(
     ? (META_ADD => {
           provides     => {
              'Math::SigFigs' => {
-                file    => 'SigFigs.pm',
-                version => '1.20',
+                file    => 'lib/Math/SigFigs.pm',
+                version => '1.21',
              },
 
           },

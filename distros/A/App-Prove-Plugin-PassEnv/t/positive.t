@@ -37,7 +37,7 @@ do_pass(`$basic_command`, 'Pass with env variable directly');
 delete $ENV{PASSED_VAR};
 
 SKIP:{
-    skip "Skipping on Windows system", 3 if $^O eq 'MsWin32';
+    skip "Skipping on Windows system", 3 if $^O eq 'MSWin32';
     do_pass(`env PROVE_PASS_PASSED_VAR=testVar $basic_command`, 'Pass env variable with env');
     do_pass(`env PASSED_VAR=testVar $basic_command`, 'Pass env variable directly with env');
     do_fail(`env PROVE_PASS_PASSED_VAR=wrongVal $basic_command`, 'Pass wrong env variable with env');

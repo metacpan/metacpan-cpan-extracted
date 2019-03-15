@@ -13,10 +13,10 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-Prove-Plugin-PassEnv",
-  "LICENSE" => "perl",
+  "LICENSE" => "apache",
   "NAME" => "App::Prove::Plugin::PassEnv",
   "PREREQ_PM" => {},
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }

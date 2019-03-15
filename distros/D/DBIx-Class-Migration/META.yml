@@ -27,6 +27,7 @@ requires:
   DBIx::Class::Fixtures: '1.001039'
   DBIx::Class::Schema::Loader: '0.07042'
   Devel::PartialDump: '0.17'
+  Exporter: '5.57'
   File::Copy: '0'
   File::Path: '0'
   File::ShareDir::ProjectDistDir: '1.000004'
@@ -35,20 +36,19 @@ requires:
   JSON::MaybeXS: '0'
   Log::Any: '1.707'
   Module::Find: '0.13'
-  Moose: '2.2006'
-  MooseX::Attribute::ENV: '0.02'
-  MooseX::Getopt: '0.68'
-  MooseX::Traits::Pluggable: '0.12'
-  MooseX::Types: '0.45'
-  MooseX::Types::LoadableClass: '0.013'
+  Moo: '2'
+  MooX::Attribute::ENV: '0'
+  MooX::Options: '4.103'
+  MooX::Traits: '0.005'
   Pod::Parser: '1.63'
   SQL::Translator: '0.11021'
   Text::Brew: '0.02'
+  Type::Tiny: '1.004004'
   version: '0.9912'
 resources:
   bugtracker: https://github.com/jjn1056/DBIx-Class-Migration/issues
   homepage: https://github.com/jjn1056/DBIx-Class-Migration
   repository: https://github.com/jjn1056/DBIx-Class-Migration.git
-version: '0.067'
+version: '0.068'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -1,0 +1,54 @@
+---
+abstract: 'A mock that can be used with a minimum setup'
+author:
+  - 'Masahiro Honma <hiratara@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-AutoMock
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::AutoMock:
+    file: lib/Test/AutoMock.pm
+    version: '0.01'
+  Test::AutoMock::Manager:
+    file: lib/Test/AutoMock/Manager.pm
+  Test::AutoMock::Mock::Basic:
+    file: lib/Test/AutoMock/Mock/Basic.pm
+  Test::AutoMock::Mock::Functions:
+    file: lib/Test/AutoMock/Mock/Functions.pm
+  Test::AutoMock::Mock::Overloaded:
+    file: lib/Test/AutoMock/Mock/Overloaded.pm
+  Test::AutoMock::Mock::TieArray:
+    file: lib/Test/AutoMock/Mock/TieArray.pm
+  Test::AutoMock::Mock::TieHash:
+    file: lib/Test/AutoMock/Mock/TieHash.pm
+  Test::AutoMock::Patch:
+    file: lib/Test/AutoMock/Patch.pm
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/hiratara/p5-Test-AutoMock/issues
+  homepage: https://github.com/hiratara/p5-Test-AutoMock
+  repository: git://github.com/hiratara/p5-Test-AutoMock.git
+version: '0.01'
+x_contributors:
+  - 'Masahiro Honma <hira.tara@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

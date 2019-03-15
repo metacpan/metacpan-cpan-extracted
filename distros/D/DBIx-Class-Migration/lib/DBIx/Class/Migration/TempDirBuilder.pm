@@ -1,11 +1,12 @@
 package DBIx::Class::Migration::TempDirBuilder;
 
-use Moose;
+use Moo;
 use File::Temp 'tempdir';
+use DBIx::Class::Migration::Types -all;
 
 has schema_class => (
   is => 'ro',
-  isa => 'Str',
+  isa => Str,
   required => 1);
 
 sub build { tempdir( CLEANUP=>1 ) }

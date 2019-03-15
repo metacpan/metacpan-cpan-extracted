@@ -20,22 +20,26 @@ my $meta = {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
                         runtime   => {
-                                       recommends => { "Exporter::Shiny" => "1.000000" },
-                                       requires   => { perl => 5.008008 },
+                                       requires => { "Exporter::Shiny" => "1.000000", "perl" => 5.008008 },
                                      },
                         test      => { requires => { "Test::More" => 0.96 } },
                       },
   "provides"       => {
-                        "Arrays::Same" => { file => "lib/Arrays/Same.pm", version => 0.001 },
+                        "Arrays::Same" => { file => "lib/Arrays/Same.pm", version => 0.002 },
                       },
   "release_status" => "stable",
   "resources"      => {
                         bugtracker   => { web => "http://rt.cpan.org/Dist/Display.html?Queue=Arrays-Same" },
                         homepage     => "https://metacpan.org/release/Arrays-Same",
                         license      => ["http://dev.perl.org/licenses/"],
+                        repository   => {
+                                          type => "git",
+                                          url  => "git://github.com/tobyink/p5-arrays-same.git",
+                                          web  => "https://github.com/tobyink/p5-arrays-same",
+                                        },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Arrays-Same/project",
                       },
-  "version"        => 0.001,
+  "version"        => 0.002,
 };
 
 my %dynamic_config;

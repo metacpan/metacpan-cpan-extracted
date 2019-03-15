@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
@@ -40,7 +40,7 @@ WHAT TO DO WHEN CHECK FAILS
       $scalar = 'a'; # ERROR! is printed
       untie $scalar;
 
-USE YOUR OWN DATATYPE
+USE YOUR OWN DATA TYPE
 
  register
 

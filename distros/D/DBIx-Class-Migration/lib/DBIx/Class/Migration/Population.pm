@@ -1,20 +1,19 @@
 package DBIx::Class::Migration::Population;
 
-use Moose;
+use Moo;
 use version 0.77;
 use File::Spec::Functions 'catdir', 'catfile';
 use File::ShareDir::ProjectDistDir 0.3.1 ();
-use MooseX::Types::LoadableClass 'LoadableClass';
-use Class::Load 'load_class';
+use DBIx::Class::Migration::Types -all;
 
 has schema_class => (
   is => 'ro',
   predicate=>'has_schema_class',
   required=>0,
   isa => LoadableClass,
-  coerce=>1);
+);
 
-has schema_args => (is=>'ro', isa=>'ArrayRef', lazy_build=>1);
+has schema_args => (is=>'lazy', isa=>ArrayRef);
 
   sub _generate_filename_for_default_db {
     my ($schema_class) = @_;
@@ -33,7 +32,7 @@ has schema_args => (is=>'ro', isa=>'ArrayRef', lazy_build=>1);
     [ _generate_dsn($self->schema_class, $self->target_dir), '', '' ];
   }
 
-has schema => (is=>'ro', lazy_build=>1, predicate=>'has_schema');
+has schema => (is=>'lazy', predicate=>'has_schema');
 
   sub _build_schema {
     my ($self) = @_;
@@ -44,9 +43,9 @@ has target_dir_builder_class => (
   is => 'ro',
   default => 'DBIx::Class::Migration::ShareDirBuilder',
   isa => LoadableClass,
-  coerce=>1);
+);
 
-has target_dir_builder => ( is => 'ro', lazy_build => 1);
+has target_dir_builder => (is => 'lazy');
 
   sub _infer_schema_class {
     my $self = shift;
@@ -61,7 +60,7 @@ has target_dir_builder => ( is => 'ro', lazy_build => 1);
       ->new(schema_class=>$inferred_schema_class);
   }
 
-has target_dir => (is=>'ro', isa=>'Str', lazy_build=>1);
+has target_dir => (is=>'lazy', isa=>Str);
 
   sub _build_target_dir {
     shift->target_dir_builder->build;
@@ -71,7 +70,7 @@ has dbic_fixture_class => (
   is => 'ro',
   default => 'DBIx::Class::Fixtures',
   isa => LoadableClass,
-  coerce=>1);
+);
 
 sub _prepare_fixture_conf_dir {
   my ($dir, $version) = @_;

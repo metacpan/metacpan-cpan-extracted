@@ -17,6 +17,8 @@ if ($joined =~ /(\d+)/) {
 
 my $fb = Graphics::Framebuffer->new('SPLASH' => 1, 'SHOW_ERRORS' => 1, 'FB_DEVICE' => "/dev/fb$device");    # ,'SIMULATED_X'=>1280,'SIMULATED_Y'=>720);
 
+$SIG{'QUIT'} = $SIG{'INT'} = $SIG{'HUP'} = $SIG{'KILL'} = sub { exec('reset'); };
+
 my $xadj = $fb->{'XRES'} / 1920;
 my $yadj = $fb->{'YRES'} / 1080;
 

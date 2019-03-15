@@ -62,6 +62,11 @@ You can now run <%= $p->{name} %>.pl in reverse proxy mode.
    cd $HOME/opt/<%= $p->{name} %>/bin
    ./<%= $p->{name} %>.pl prefork
 
+Debugging
+---------
+
+Appart from the usual Mojolicious switches you can also use the environment variable CALLBACKERY_RPC_LOG to active detailed logging of requests on level info.
+
 Packaging
 ---------
 
