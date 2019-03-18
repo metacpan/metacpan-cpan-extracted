@@ -7,7 +7,7 @@ use blib;
 use MariaDB::NonBlocking::Select;
 
 
-my $pool = [ map MariaDB::NonBlocking::Select->init, 1..5 ];
+my $pool = [ map MariaDB::NonBlocking::Select->new, 1..5 ];
 eval {
     MariaDB::NonBlocking::Select::connect(
         $pool,

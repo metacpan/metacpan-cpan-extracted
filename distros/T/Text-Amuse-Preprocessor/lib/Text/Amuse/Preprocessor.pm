@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Text::Amuse::Preprocessor::HTML;
+use Text::Amuse::Preprocessor::Parser;
 use Text::Amuse::Preprocessor::Typography qw/get_typography_filter/;
 use Text::Amuse::Preprocessor::Footnotes;
 use Text::Amuse::Functions;
@@ -18,11 +19,11 @@ Text::Amuse::Preprocessor - Helpers for Text::Amuse document formatting.
 
 =head1 VERSION
 
-Version 0.59
+Version 0.60
 
 =cut
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 
 =head1 SYNOPSIS
@@ -285,7 +286,7 @@ sub process {
     if ($self->html) {
         $self->_process_html;
     }
-    $self->_exclude_verbatim($infile);
+
     # then try to get the language
     my ($filter, $specific_filter, $nbsp_filter);
     my $fixlinks = $self->fix_links;
@@ -307,20 +308,17 @@ sub process {
     }
 
     my $outfile = $self->_outfile;
-    open (my $tmpfh, '<:encoding(UTF-8)', $infile)
-      or die "Can't open $infile $!";
-    open (my $auxfh, '>:encoding(UTF-8)', $outfile)
-      or die "Can't open $outfile $!";
-
     my $line;
-    while (my $readline = <$tmpfh>) {
-        $line = $readline;
-        #remove nulls
-        $line =~ s/\0//g;
+    my @body = Text::Amuse::Preprocessor::Parser::parse_text($self->_read_file($infile));
+    # print Dumper(\@body);
+  CHUNK:
+    foreach my $piece (@body) {
+        next CHUNK if $piece->{type} ne 'text';
+        # print "Processing $piece->{type} $piece->{string}\n";
 
-        # carriage returns and tabs
-        $line =~ s/\r//g;
-        $line =~ s/\t/    /g;
+        # do the job
+        $line = $piece->{string};
+
         # some bad things we want to filter anyway
         # $line =~ s/─/—/g; # they look the same, but they are not
         $line =~ s/\x{2500}/\x{2014}/g;
@@ -355,20 +353,17 @@ sub process {
         if ($show_nbsp) {
             $line =~ s/\x{a0}/~~/g;
         }
-        print $auxfh $line;
+        $piece->{string} = $line;
     }
-    # last line
-    if ($line !~ /\n$/s) {
-        print $auxfh "\n";
-    }
-    close $auxfh or die $!;
-    close $tmpfh or die $!;
+    # write out
+    $self->_write_file($outfile, join('', map { $_->{string} } @body));
 
     if ($self->fix_footnotes) {
         my $fn_auxfile = $self->_fn_outfile;
         my $fnfixer = Text::Amuse::Preprocessor::Footnotes
           ->new(input  => $outfile,
                 output => $fn_auxfile);
+        # print "$outfile $fn_auxfile\n";
         if ($fnfixer->process) {
             # replace the outfile
             $outfile = $fn_auxfile;
@@ -379,7 +374,7 @@ sub process {
             return;
         }
     }
-    $self->_restore_verbatim($outfile);
+
     my $output = $self->output;
     if (my $ref = ref($output)) {
         if ($ref eq 'SCALAR') {
@@ -445,69 +440,6 @@ sub _set_infile {
         $self->_infile($infile);
     }
     return $self->_infile;
-}
-
-sub _store_excluded_piece {
-    my ($self, $piece) = @_;
-    my $rand = sprintf('%u', rand(1000000000))
-      . 'XXXX8808cc3f0c1868b3b8825d0febff522237810c73c5c369d94f5db95a3dba6a005a5fe1a44103d47f36889bfXXXX'
-      . $self->_get_unique_counter;
-    $piece =~ s/\0//g;
-    # carriage returns and tabs
-    $piece =~ s/\r//g;
-    $piece =~ s/\t/    /g;
-    $self->_verbatim_pieces->{$rand} = $piece;
-    # Supplementary Private Use Area-A Unicode subset.
-    return "\x{f0003}${rand}\x{f0004}";
-}
-
-sub _restore_excluded_piece {
-    my ($self, $id) = @_;
-    my $token = delete $self->_verbatim_pieces->{$id};
-    die "Invalid $id!" . Dumper($self->_verbatim_pieces) unless defined $token;
-    return $token;
-}
-
-sub _restore_verbatim {
-    my ($self, $file) = @_;
-    my $body = $self->_read_file($file);
-    $body =~ s/(\x{f0003})([a-zA-Z0-9]+)(\x{f0004})/$self->_restore_excluded_piece($2)/gse;
-    die "Not all token were restored!" . Dumper($self->_verbatim_pieces) if %{$self->_verbatim_pieces};
-    $self->_write_file($file, $body);
-}
-
-sub _exclude_verbatim {
-    my ($self, $file) = @_;
-    open (my $fh, '<:encoding(UTF-8)', $file) or die "Couldn't open $file";
-    my $in_verbatim;
-    my @out;
-  LINE:
-    while (defined(my $line = <$fh>)) {
-        if ($in_verbatim) {
-            if ($line =~ /$in_verbatim/) {
-                $in_verbatim = 0;
-            }
-            push @out, $self->_store_excluded_piece($line);
-            next LINE;
-        }
-        else {
-            if ($line =~ m/^(\{\{\{)\s*$/) {
-                $in_verbatim = qr/^\}\}\}\s*$/;
-                push @out, $self->_store_excluded_piece($line);
-                next LINE;
-            }
-            elsif ($line =~ m/^<example>\s*$/) {
-                $in_verbatim = qr{^</example>\s*$};
-                push @out, $self->_store_excluded_piece($line);
-                next LINE;
-            }
-        }
-        push @out, $line;
-    }
-    close $fh;
-    my $body = join('', @out);
-    $body =~ s/(<verbatim>(.+?)<\/verbatim>)/$self->_store_excluded_piece($1)/gse;
-    $self->_write_file($file, $body);
 }
 
 

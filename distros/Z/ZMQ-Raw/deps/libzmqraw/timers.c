@@ -114,6 +114,9 @@ static zmq_raw_timer *zmq_raw_timer_create (void *context, int after, int interv
 		(timer->recv = zmq_socket (context, ZMQ_PAIR)) == NULL)
 		goto on_error;
 
+	/* Setting an interval of 0 will block zmq_timers_execute! Always add 10ms */
+	after += 10;
+
 	timer->after = after;
 	timer->interval = interval;
 

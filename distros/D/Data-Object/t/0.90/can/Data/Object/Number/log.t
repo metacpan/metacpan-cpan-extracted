@@ -36,8 +36,8 @@ method
 
 use_ok 'Data::Object::Number';
 
-my $data = Data::Object::Number->new(12);
+my $data = Data::Object::Number->new(12345);
 
-is_deeply $data->log(), 2.484906649788;
+like $data->log(), qr/9.42100/;
 
 ok 1 and done_testing;

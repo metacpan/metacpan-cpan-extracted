@@ -1,5 +1,3 @@
-# $Id$
-
 package CPU::Z80::Disassembler::Memory;
 
 #------------------------------------------------------------------------------
@@ -21,7 +19,7 @@ use Bit::Vector;
 
 use CPU::Z80::Disassembler::Format;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 #------------------------------------------------------------------------------
 
@@ -66,19 +64,17 @@ Creates a new empty object.
 =cut
 
 #------------------------------------------------------------------------------
-use Class::XSAccessor {
-	constructor	=> '_new',
-	accessors => [ 
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'_mem',			# string of 64 Kbytes
 		'_loaded',		# Bit::Vector, one bit per address, 1 if byte loaded
-	],
-};
+);
 
 sub new {
 	my($class) = @_;
 	my $loaded = Bit::Vector->new(0x10000);
 	my $mem = "\0" x $loaded->Size;
-	return $class->_new(_mem => $mem, _loaded => $loaded);
+	return bless { _mem => $mem, _loaded => $loaded }, $class;
 }
 
 #------------------------------------------------------------------------------

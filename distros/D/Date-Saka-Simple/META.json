@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Date-Saka-Simple",
    "no_index" : {
@@ -34,7 +34,7 @@
          "requires" : {
             "Date::Calc" : "5.7",
             "Date::Exception" : "0.03",
-            "Date::Utils" : "0.24",
+            "Date::Utils" : "0.25",
             "List::Util" : "1.41",
             "Moo" : "2.000000",
             "Time::localtime" : "1.02",
@@ -46,7 +46,7 @@
    "provides" : {
       "Date::Saka::Simple" : {
          "file" : "lib/Date/Saka/Simple.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "web" : "https://github.com/manwar/Date-Saka-Simple"
       }
    },
-   "version" : "0.21",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

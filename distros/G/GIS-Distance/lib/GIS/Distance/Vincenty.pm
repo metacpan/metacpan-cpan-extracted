@@ -1,12 +1,14 @@
 package GIS::Distance::Vincenty;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( deg2rad pi tan atan asin );
 use namespace::clean;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     return 0 if (($lon1==$lon2) and ($lat1==$lat2));
@@ -78,11 +80,14 @@ greater. In the UK, if you measure the distance from Land's End to John O'
 Groats using WGS-84, it will be 28m - 0.003% - greater than using the Airy
 ellipsoid, which provides a better fit for the UK.
 
+Take a look at the L<GIS::Distance::ALT> formula for a much quicker
+alternative with nearly the same accuracy.
+
 A faster (XS) version of this formula is available as
 L<GIS::Distance::Fast::Vincenty>.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
 =head1 FORMULA
 
@@ -119,15 +124,31 @@ is used which in turn interfaces with the various formula modules.
       bb/6*cos2sigma_m*(-3+4*sin_sigma*sin_sigma)*(-3+4*cos2sigma_m*cos2sigma_m)))
     c = b*aa*(sigma-delta_sigma)
 
-=head1 RESOURCES
+=head1 SEE ALSO
+
+=over
+
+=item *
 
 L<http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf>
 
+=item *
+
 L<http://www.movable-type.co.uk/scripts/LatLongVincenty.html>
 
-=head1 AUTHORS AND LICENSE
+=back
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+=head1 SUPPORT
+
+See L<GIS::Distance/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

@@ -10,10 +10,10 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::Git; # git description: v2.044-2-g56a4fd3
+package Dist::Zilla::Plugin::Git; # git description: v2.045-9-g75e375f
 # ABSTRACT: Update your git repository after release
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 1;
 
@@ -29,7 +29,7 @@ Dist::Zilla::Plugin::Git - Update your git repository after release
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 DESCRIPTION
 
@@ -110,15 +110,13 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
-
 =head1 AUTHOR
 
 Jerome Quelin
 
 =head1 CONTRIBUTORS
 
-=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes David Golden Mike Friedman Graham Knop Chris Weyl Stephen R. Scaffidi Randy Stauner Barr Apocalypse Doherty Nigel Metheringham Olivier Mengué Tatsuhiko Miyagawa Tuomas Jormola Alessandro Ghedini Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Brendan Byrd Alexandr Ciornii Matt Follett Michael Schout
+=for stopwords Christopher J. Madsen Jérôme Quelin Karen Etheridge Kent Fredric Yanick Champoux Ricardo Signes Graham Knop David Golden Mike Friedman Chris Weyl Stephen R. Scaffidi Randy Stauner Barr Apocalypse Doherty Nigel Metheringham Olivier Mengué Tatsuhiko Miyagawa Tuomas Jormola Alessandro Ghedini Brian Phillips Steinbrunner Geoffrey Broadwell Harley Pig Jesse Luehrs Brendan Byrd Alexandr Ciornii Matt Follett Michael Schout
 
 =over 4
 
@@ -148,15 +146,15 @@ Ricardo Signes <rjbs@cpan.org>
 
 =item *
 
+Graham Knop <haarg@haarg.org>
+
+=item *
+
 David Golden <dagolden@cpan.org>
 
 =item *
 
 Mike Friedman <friedo@friedo.com>
-
-=item *
-
-Graham Knop <haarg@haarg.org>
 
 =item *
 

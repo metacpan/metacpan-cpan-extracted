@@ -38,6 +38,6 @@ use_ok 'Data::Object::Number';
 
 my $data = Data::Object::Number->new(1);
 
-is_deeply $data->atan2(2), 0.463647609000806;
+like $data->atan2(1), qr/0.78539/;
 
 ok 1 and done_testing;

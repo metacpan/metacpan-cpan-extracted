@@ -49,7 +49,7 @@ Locale::TextDomain::OO::Util::Constants - Lexicon constants
 
 4.001
 
-$Id: Constants.pm 597 2015-06-29 18:27:08Z steffenw $
+$Id: Constants.pm 715 2018-06-04 15:08:31Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util/Constants.pm $
 

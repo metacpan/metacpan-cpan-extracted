@@ -3,6 +3,7 @@ abstract: 'Converts test events from TAP::Harness to the TeamCity format'
 author:
   - 'Alexandr Evstigneev <hurricup@gmail.com>'
 build_requires:
+  Test::Harness: '3.38'
   Test::Simple: '1.302162'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -14,21 +15,22 @@ meta-spec:
   version: '1.4'
 name: TAP-Formatter-Camelcade
 requires:
-  Test::Harness: '0'
+  Test::Harness: '3.38'
 resources:
   bugtracker: https://github.com/Camelcade/TAP-Formatter-Camelcade/issues
   homepage: https://github.com/Camelcade/TAP-Formatter-Camelcade
   repository: https://github.com/Camelcade/TAP-Formatter-Camelcade.git
-version: '0.005'
+version: '0.009'
 x_Dist_Zilla:
   perl:
-    version: '5.026001'
+    version: '5.026002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - META.json
           exclude_match:
             - .+?\.iml
           follow_symlinks: 0
@@ -172,5 +174,5 @@ x_Dist_Zilla:
     version: '6.012'
 x_contributors:
   - 'Alexandr Evstigneev <hurricup@gmail.com>'
-x_generated_by_perl: v5.26.1
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

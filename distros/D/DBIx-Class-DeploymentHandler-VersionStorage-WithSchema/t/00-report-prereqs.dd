@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
-                                      'DBIx::Class::DeploymentHandler' => '0'
+                                      'DBIx::Class::DeploymentHandler' => '0.002230'
                                     }
                     },
        'test' => {

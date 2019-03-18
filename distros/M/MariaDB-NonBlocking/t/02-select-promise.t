@@ -6,9 +6,10 @@ no warnings 'once';
 
 use Test::More;
 use AnyEvent;
-use Promises qw/collect/;
+use AnyEvent::XSPromises qw/collect/;
 use MariaDB::NonBlocking::Promises;
 use Data::Dumper;
+AnyEvent::detect();
 
 use lib 't', '.';
 require 'lib.pl';
@@ -17,24 +18,24 @@ sub wait_for_promise ($) {
     my $p = shift;
     my $cv = AnyEvent->condvar;
     $p->then(
-        sub { $cv->send; },
-        sub { $cv->send; },
+        sub { $cv->send($_[0]); },
+        sub { $cv->croak($_[0]); },
     );
     $cv->recv;
 }
 
 my $connect_args = {
-    user     => $::test_user || 'root',
+    user     => $::test_user,
     host     => '127.0.0.1',
     password => $::test_password || '',
 };
 
-my $conn = MariaDB::NonBlocking::Promises->init;
+my $conn = MariaDB::NonBlocking::Promises->new;
 my $connect_and_query = $conn->connect($connect_args)->then(sub {
     my ($conn) = @_;
     my $socket_fd = $conn->mysql_socket_fd;
     cmp_ok($socket_fd, '>=', 1, "Got a socket FD after connecting");
-    
+
     return $conn->run_query("SELECT 1")->then(sub {
         is_deeply($_[0], [[1]], "SELECT 1 worked");
     }, sub {
@@ -67,19 +68,19 @@ my $select_sleep_2 = $conn->run_query("SELECT 4, SLEEP(3)")->then(
         fail("Should never allow two queries in flight at once");
     },
     sub {
-        like($_[0], qr/Attempted to start a query when/, "query started when another is in flight failed");
+        like($_[0], qr/Attempted to /, "query started when another is in flight failed");
     },
 );
 
 wait_for_promise $select_sleep;
 wait_for_promise $select_sleep_2;
 
-my $conn2 = MariaDB::NonBlocking::Promises->init;
+my $conn2 = MariaDB::NonBlocking::Promises->new;
 my $query_without_connecting = $conn2->run_query("select 1")->then(
     sub { fail("Should never reach here"); }
 )->catch(sub {
     my $e = $_[0];
-    like($e, qr/\ACannot start query; not connected/, "->init->connect fails");
+    like($e, qr/\ACannot start query; not connected/, "->new->connect fails");
 });
 
 wait_for_promise $query_without_connecting;
@@ -87,7 +88,7 @@ wait_for_promise $query_without_connecting;
 my $connect_and_run_multiple_queries = $conn2->connect($connect_args)->then(
     sub {
         my ($conn2) = @_;
-        
+
         my $p1 = $conn->run_query("SHOW PROCESSLIST");
         my $p2 = $conn2->run_query("SELECT 1, SLEEP(1)");
 

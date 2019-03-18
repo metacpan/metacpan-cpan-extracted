@@ -57,21 +57,25 @@ pairs.
 - Does not return a [Class::Measure](https://metacpan.org/pod/Class::Measure) object.  Instead kilometers are always
 returned.
 - Does no argument checking.
-- Does not support formula ["args"](#args), which are needed by at least the
-[GIS::Distance::GeoEllipsoid](https://metacpan.org/pod/GIS::Distance::GeoEllipsoid) formula.
+- Does not support ["formula\_args"](#formula_args), which are supported by at least the
+[GIS::Distance::GeoEllipsoid](https://metacpan.org/pod/GIS::Distance::GeoEllipsoid) formula.  Read more in the ["SPEED"](#speed) section.
 
 Calling this gets you pretty close to the fastest bare metal speed you can get.
-The speed improvements of calling this is noticeable over millions of iterations
-only and you've got to decide if its worth the safety and features you are dropping.
+The speed improvements of calling this is noticeable over hundreds of thousands of
+iterations only and you've got to decide if its worth the safety and features
+you are dropping.
 
-# ATTRIBUTES
+# ARGUMENTS
 
-## formula
+```perl
+my $gis = GIS::Distance->new( $formula );
+```
 
-Returns the formula name which was passed as the first argument to `new()`.
+When you call `GIS::Distance-`new()> you may pass a partial or full formula
+class name as the first argument.  If you do not specify a formula then this
+defaults to `Haversive`.
 
-The formula can be specified as a partial or full module name for that
-formula.  For example, if the formula is set to `Haversine` as in:
+If you pass a partial name, as in:
 
 ```perl
 my $gis = GIS::Distance->new( 'Haversine' );
@@ -90,19 +94,13 @@ the `Fast::` versions of the formulas, written in C, are not available and the
 pure perl ones will be used instead.  If you would like the `Fast::` formulas
 then install [GIS::Distance::Fast](https://metacpan.org/pod/GIS::Distance::Fast) and they will be automatically used.
 
-You may disable the automatic use of the `Fast::` formulas by setting the
-`GIS_DISTANCE_PP` environment variable.
+You may globally disable the automatic use of the `Fast::` formulas by setting
+the `GIS_DISTANCE_PP` environment variable.  Although, its likely simpler to
+just provide a full class name to get the same effect:
 
-## args
-
-Returns the formula arguments, an array ref, containing the rest of the
-arguments passed to `new()` (anything passed after the ["formula"](#formula)).
-Most formulas do not take arguments.  If they do it will be described in
-their respective documentation.
-
-## module
-
-Returns the fully qualified module name that ["formula"](#formula) resolved to.
+```perl
+my $gis = GIS::Distance->new( 'GIS::Distance::Haversine' );
+```
 
 # SPEED
 
@@ -115,26 +113,32 @@ PP formulas.
 
 Use ["distance\_metal"](#distance_metal) instead of ["distance"](#distance).
 
-Call the undocumented `distance()` function that each formula module
+Call the undocumented `_distance()` function that each formula class
 has.  For example you could bypass this module entirely and just do:
 
 ```perl
 use GIS::Distance::Fast::Haversine;
-my $km = GIS::Distance::Fast::Haversine::distance( @coords );
+my $km = GIS::Distance::Fast::Haversine::_distance( @coords );
 ```
 
 The above would be the ultimate speed demon (as shown in benchmarking)
 but throws away some flexibility and adds some foot-gun support.
 
-Here's some benchmarks for these options:
+Here's a benchmarks for these options:
 
 ```
-PP Haversine - GIS::Distance->distance                   125913/s
-XS Haversine - GIS::Distance->distance                   203335/s
-PP Haversine - GIS::Distance->distance_metal             366569/s
-PP Haversine - GIS::Distance::Haversine::distance        390320/s
-XS Haversine - GIS::Distance->distance_metal            3289474/s
-XS Haversine - GIS::Distance::Fast::Haversine::distance 8064516/s
+2019-03-13T09:34:00Z
+GIS::Distance 0.15
+GIS::Distance::Fast 0.12
+GIS::Distance::Fast::Haversine 0.12
+GIS::Distance::Haversine 0.15
+                                                             Rate
+PP Haversine - GIS::Distance->distance                   123213/s
+XS Haversine - GIS::Distance->distance                   196232/s
+PP Haversine - GIS::Distance->distance_metal             356379/s
+PP Haversine - GIS::Distance::Haversine::_distance       385208/s
+XS Haversine - GIS::Distance->distance_metal             3205128/s
+XS Haversine - GIS::Distance::Fast::Haversine::_distance 8620690/s
 ```
 
 You can run your own benchmarks using the included `author/bench`
@@ -144,14 +148,15 @@ script.  The above results were produced with:
 author/bench -f Haversine
 ```
 
-Even the slowest result was `125913/s`, which is `125.913/ms`, which
-means each call took about `0.0079ms`.
+The slowest result was about `125000/s`, or about `8ms` each call.
+This could be a substantial burden in some contexts, such as live HTTP
+responses to human users and running large batch jobs, to name just two.
 
 In conclusion, if you can justify the speed gain, switching to
-["distance\_metal"](#distance_metal) and installing [GIS::Distance::Fast](https://metacpan.org/pod/GIS::Distance::Fast), seems
-the ideal setup.
+["distance\_metal"](#distance_metal) and installing [GIS::Distance::Fast](https://metacpan.org/pod/GIS::Distance::Fast) looks to be an
+ideal setup.
 
-As always, YMMV.
+As always with performance and benchmarking, YMMV.
 
 # COORDINATES
 
@@ -172,7 +177,7 @@ rad2deg function.
 
 # FORMULAS
 
-These formulas come with this distribution:
+These formulas come bundled with this distribution:
 
 - [GIS::Distance::ALT](https://metacpan.org/pod/GIS::Distance::ALT)
 - [GIS::Distance::Cosine](https://metacpan.org/pod/GIS::Distance::Cosine)
@@ -185,19 +190,19 @@ These formulas come with this distribution:
 
 These formulas are available on CPAN:
 
-- [GIS::Distance::Fast::ALT](https://metacpan.org/pod/GIS::Distance::Fast::ALT)
-- [GIS::Distance::Fast::Cosine](https://metacpan.org/pod/GIS::Distance::Fast::Cosine)
-- [GIS::Distance::Fast::GreatCircle](https://metacpan.org/pod/GIS::Distance::Fast::GreatCircle)
-- [GIS::Distance::Fast::Haversine](https://metacpan.org/pod/GIS::Distance::Fast::Haversine)
-- [GIS::Distance::Fast::Polar](https://metacpan.org/pod/GIS::Distance::Fast::Polar)
-- [GIS::Distance::Fast::Vincenty](https://metacpan.org/pod/GIS::Distance::Fast::Vincenty)
+- ["FORMULAS" in GIS::Distance::Fast](https://metacpan.org/pod/GIS::Distance::Fast#FORMULAS)
 - [GIS::Distance::GeoEllipsoid](https://metacpan.org/pod/GIS::Distance::GeoEllipsoid)
+
+# AUTHORING
+
+Take a look at [GIS::Distance::Formula](https://metacpan.org/pod/GIS::Distance::Formula) for instructions on authoring
+new formula classes.
 
 # SEE ALSO
 
 - [Geo::Distance](https://metacpan.org/pod/Geo::Distance) - Is deprecated in favor of using this module.
-- [Geo::Distance::Google](https://metacpan.org/pod/Geo::Distance::Google) - While in the Geo::Distance, namespace this isn't
-actually related to Geo::Distance at all.  Might be useful.
+- [Geo::Distance::Google](https://metacpan.org/pod/Geo::Distance::Google) - While in the Geo::Distance namespace, this isn't
+actually related to Geo::Distance at all.  Might be useful though.
 - [GIS::Distance::Lite](https://metacpan.org/pod/GIS::Distance::Lite) - An old fork of this module, not recommended.
 - [Geo::Distance::XS](https://metacpan.org/pod/Geo::Distance::XS) - Used to be used by [Geo::Distance](https://metacpan.org/pod/Geo::Distance) but no longer is.
 - [Geo::Ellipsoid](https://metacpan.org/pod/Geo::Ellipsoid) - Or use [GIS::Distance::GeoEllipsoid](https://metacpan.org/pod/GIS::Distance::GeoEllipsoid) for a uniform

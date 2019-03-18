@@ -1,6 +1,24 @@
 Changelog for Data-Object
 
-0.91 2019-03-14T21:06:09
+0.92 2019-03-17T17:22:58
+ - Added updated POD files
+ - Removed Sub::Quote dependency
+ - Fixed typos in Library POD
+ - Add ArrayLike POD to Library
+ - Add HashLike POD to Library
+ - Add StringLike POD to Library
+ - Add CodeLike POD to Library
+ - Add IntRange POD to Library
+ - Add NumRange POD to Library
+ - Remove "codify" Export
+ - Remove Codifiable Role
+ - Deprecate tests for codification
+ - Remove all uses of codify
+ - Fixed tests failing on different systems
+ - Build 0.91 (#158)
+
+0.91 2019-03-14T21:06:30
+ - Built release version 0.91
  - Updated tests and subroutine signature docs
  - Regenerated POD
  - Update bin/pod to generate with signatures

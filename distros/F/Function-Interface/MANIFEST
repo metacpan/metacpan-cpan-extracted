@@ -22,6 +22,14 @@ t/02_function_interface_info/function.t
 t/02_function_interface_info/function/param.t
 t/02_function_interface_info/function/return_param.t
 t/02_function_interface_info/info.t
+t/03_function_interface_impl/check_params.t
+t/03_function_interface_impl/check_return.t
+t/03_function_interface_impl/error.t
+t/03_function_interface_impl/impl_of.t
+t/03_function_interface_impl/info_interface.t
+t/03_function_interface_impl/info_params.t
+t/03_function_interface_impl/info_return.t
+t/03_function_interface_impl/register_check_list.t
 t/04_function_interface_types/impl_of.t
 t/lib/Bar.pm
 t/lib/Foo.pm

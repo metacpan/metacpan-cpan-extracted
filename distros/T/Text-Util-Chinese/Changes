@@ -1,3 +1,7 @@
+0.03	2019-03-16T20:40:36+0900
+	- Properly declare 'Test2::V0' as a dependency.
+        - Documentation
+
 0.02
 	- Add a new subroutine: extract_presuf
 

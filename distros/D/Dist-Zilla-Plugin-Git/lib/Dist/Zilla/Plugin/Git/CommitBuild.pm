@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::CommitBuild;
 # ABSTRACT: Check in build results on separate branch
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Git::Wrapper 0.021 ();      # need -STDIN
 use IPC::Open3;
@@ -24,9 +24,9 @@ use File::Temp;
 use Moose;
 use namespace::autoclean;
 use Path::Tiny qw();
-use MooseX::Types::Path::Tiny qw( Path );
+use Types::Path::Tiny 'Path';
 use MooseX::Has::Sugar;
-use MooseX::Types::Moose qw{ Str Bool };
+use Types::Standard qw(Str Bool);
 use Cwd qw(abs_path);
 use Try::Tiny;
 
@@ -213,7 +213,7 @@ Dist::Zilla::Plugin::Git::CommitBuild - Check in build results on separate branc
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
@@ -267,6 +267,9 @@ This option supports five formatting codes:
 
 =item * C<%v> - The release version number
 
+=item * C<%V> - The release version number, but with a leading C<v> removed
+if it exists
+
 =item * C<%t> - The string "-TRIAL" if this is a trial release
 
 =back
@@ -299,8 +302,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

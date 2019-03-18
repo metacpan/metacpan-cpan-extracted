@@ -203,6 +203,21 @@ sub test_started {
     )->print;
 }
 
+sub test_ignored {
+    my $self = shift;
+    my $name = shift;
+    my $message = shift;
+    my $node_id = shift;
+    my $parent_node_id = shift;
+    $self->new('testIgnored',
+        name         => $name,
+        message      => $message,
+        nodeId       => $node_id,
+        parentNodeId => $parent_node_id,
+        @_
+    )->print;
+}
+
 sub test_failed {
     my $self = shift;
     my $name = shift;

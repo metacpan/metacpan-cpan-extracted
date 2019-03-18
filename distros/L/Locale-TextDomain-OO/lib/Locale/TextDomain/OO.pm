@@ -3,7 +3,7 @@ package Locale::TextDomain::OO; ## no critic (TidyCode)
 use strict;
 use warnings;
 
-our $VERSION = '1.035';
+our $VERSION = '1.036';
 
 use Locale::TextDomain::OO::Translator;
 
@@ -36,13 +36,13 @@ __END__
 
 Locale::TextDomain::OO - Perl OO Interface to Uniforum Message Translation
 
-$Id: OO.pm 722 2018-12-21 12:24:14Z steffenw $
+$Id: OO.pm 724 2018-12-24 11:50:32Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO.pm $
 
 =head1 VERSION
 
-1.035
+1.036
 
 Starting with version 1.000 the interface has changed.
 
@@ -673,7 +673,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 - 2018,
+Copyright (c) 2009 - 2019,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

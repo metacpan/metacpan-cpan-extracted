@@ -5,11 +5,14 @@ use warnings;
 package MooseX::AttributeTags;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.004';
+our $VERSION   = '0.005';
 
 use Carp;
 use Data::OptList qw(mkopt);
 use Scalar::Util qw(blessed);
+
+my $subname = eval { require Sub::Name; 'Sub::Name'->can('subname') }
+	|| do { require Sub::Util; 'Sub::Util'->can('set_subname') };
 
 my $yah = 1; # avoid exported subs becoming constants
 
@@ -41,8 +44,9 @@ sub import
 			parameters => { attributes => \%attrs },
 		);
 		
+		my $coderef = $subname->($traitqname, sub () { $traitqname if $yah });
 		no strict 'refs';
-		*$traitqname = sub () { $traitqname if $yah };
+		*$traitqname = $coderef;
 	}
 }
 
@@ -151,6 +155,13 @@ Moose's C<has> keyword.
 
 =back
 
+Note that in the SYNOPSIS example, a constant C<< User::SerializationStyle >>
+is defined.
+
+   my $attr = User->meta->get_attribute('username');
+   $attr->does(User::SerializationStyle);    # true
+   $attr->hidden;                            # false
+
 =head1 BUGS
 
 Please report any bugs to
@@ -166,7 +177,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013, 2017 by Toby Inkster.
+This software is copyright (c) 2013, 2017, 2019 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

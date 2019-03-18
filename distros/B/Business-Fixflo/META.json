@@ -66,6 +66,6 @@
          "url" : "https://github.com/Humanstate/business-fixflo"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

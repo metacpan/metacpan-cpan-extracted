@@ -6,21 +6,46 @@ use warnings;
 use CPU::Z80::Disassembler;
 use Getopt::Std;
 use File::Basename;
+use Path::Tiny;
 
 our $opt_a;		# address
-our $opt_o;		# output file
+our $opt_c;		# use control file
 
-getopts('a:o:') && @ARGV == 1 
-	or die "Usage: ",basename($0)," [-a hexaddr] [-o output] binfile\n";
+getopts('a:c') && @ARGV == 1 
+	or die "Usage: ",basename($0)," [-a hexaddr] [-c] file\n";
 my $file = shift;
-
-my $dis = CPU::Z80::Disassembler->new;
-
 $opt_a = (defined $opt_a) ? hex($opt_a) : 0;
-$dis->memory->load_file($file, $opt_a);
 
-my $fh;
-if ($opt_o) {
-	open($fh, ">", $opt_o) or die "write $opt_o: $!\n";
+if ($opt_c) {	# use a control file
+	my $ctl_file = replace_ext($file, ".ctl"); 
+	my $asm_file = replace_ext($file, ".asm"); 
+	
+	if (! -f $ctl_file) {
+		print "Create new control file $ctl_file to disassemble $file\n";
+		CPU::Z80::Disassembler->create_control_file($ctl_file, $file, $opt_a);
+	}
+	else {
+		print "Read $ctl_file\n";
+		my $dis = CPU::Z80::Disassembler->new;
+		$dis->load_control_file($ctl_file);
+		print "Write $asm_file\n";
+		$dis->write_asm($asm_file);
+	}
 }
-$dis->write_dump($opt_o);
+else {
+	my $dump_file = replace_ext($file, ".dump"); 
+
+	my $dis = CPU::Z80::Disassembler->new;
+	$dis->memory->load_file($file, $opt_a);
+
+	print "Write $dump_file\n";
+	$dis->write_dump($dump_file);
+}
+
+#------------------------------------------------------------------------------
+sub replace_ext {
+	my($file, $new_ext) = @_;
+	$file =~ s/\.\w+$/$new_ext/;
+	return path($file);
+}
+

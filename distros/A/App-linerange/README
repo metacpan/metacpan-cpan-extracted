@@ -1,0 +1,107 @@
+NAME
+    App::linerange - Retrieve line ranges from a filehandle
+
+VERSION
+    This document describes version 0.001 of App::linerange (from Perl
+    distribution App-linerange), released on 2019-03-17.
+
+FUNCTIONS
+  linerange
+    Usage:
+
+     linerange(%args) -> [status, msg, payload, meta]
+
+    Retrieve line ranges from a filehandle.
+
+    Examples:
+
+    *   Get lines 1-10:
+
+         linerange(spec => "1-10");
+
+    *   Get lines 1 to 10, .. is synonym for -:
+
+         linerange(spec => "1 .. 10");
+
+    *   Get lines 1-10 as well as 21-30:
+
+         linerange(spec => "1-10, 21 - 30");
+
+    *   You can specify negative number, get the 5th line until 2nd last:
+
+         linerange(spec => "5 .. -2");
+
+    *   You can specify negative number, get the 10th last until last:
+
+         linerange(spec => "-10 .. -1");
+
+    The routine performs a single pass on the filehandle, retrieving
+    specified line ranges.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fh* => *filehandle*
+
+    *   spec* => *str*
+
+        Line range specification.
+
+        A comma-separated list of line numbers ("N") or line ranges
+        ("N1..N2" or "N1-N2"), where N, N1, and N2 are line number
+        specification. Line number begins at 1; it can also be a negative
+        integer (-1 means the last line, -2 means second last, and so on).
+        N1..N2 is the same as N2..N1.
+
+        Examples:
+
+        *   3 (third line)
+
+        *   1..5 (first to fifth line)
+
+        *   5..1 (first to fifth line)
+
+        *   -5..-1 (fifth last to last line)
+
+        *   -1..-5 (fifth last to last line)
+
+        *   5..-3 (fifth line to third last)
+
+        *   -3..5 (fifth line to third last)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-linerange>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-linerange>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-linerange>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

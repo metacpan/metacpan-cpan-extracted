@@ -1,5 +1,14 @@
 Revision history for Perl extension GIS-Distance-Fast.
 
+0.14 2019-03-17T17:03:32Z
+
+ - Depend on latest GIS::Distance.
+
+0.13 2019-03-17T04:58:20Z
+
+ - Use GIS::Distance's new interface.
+ - Lots of documentation edits.
+
 0.12 2019-03-10T06:45:47Z
 
  - Add GIS::Distance::Fast::ALT formula.

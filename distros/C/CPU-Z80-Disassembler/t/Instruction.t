@@ -114,63 +114,63 @@ t_instr	disassemble => 0x0000,	undef,
 
 # N
 t_instr	disassemble => 0x107,	undef,
-				2,	'ld a,N',	{N => 0xBD}, 		0, 0, 0, 
-					"ld a,0xBD",
-	"0107 3EBD       ld a,0xBD\n";
+				2,	'ld a, N',	{N => 0xBD}, 		0, 0, 0, 
+					"ld a, \$BD",
+	"0107 3EBD       ld a, \$BD\n";
 
 # NN
 t_instr	disassemble => 0x0002,	undef,
-				3,	'ld de,NN',	{NN => 0xFFFF}, 	0, 0, 0, 
-					"ld de,0xFFFF",
-	"0002 11FFFF     ld de,0xFFFF\n";
+				3,	'ld de, NN',	{NN => 0xFFFF}, 	0, 0, 0, 
+					"ld de, \$FFFF",
+	"0002 11FFFF     ld de, \$FFFF\n";
 
 # DIS < 0
 t_instr	disassemble => 0x0F3E,	undef,
-				3,	'ld e,(iy+DIS)', {DIS => -1}, 	0, 0, 0, 
-					"ld e,(iy-0x01)",
-	"0F3E FD5EFF     ld e,(iy-0x01)\n";
+				3,	'ld e, (iy+DIS)', {DIS => -1}, 	0, 0, 0, 
+					"ld e, (iy-\$01)",
+	"0F3E FD5EFF     ld e, (iy-\$01)\n";
 
 # DIS == 0
 t_instr	disassemble => 0x0055,	undef,
-				3,	'ld (iy+DIS),l', {DIS => 0}, 	0, 0, 0, 
-					"ld (iy),l",
-	"0055 FD7500     ld (iy),l\n";
+				3,	'ld (iy+DIS), l', {DIS => 0}, 	0, 0, 0, 
+					"ld (iy), l",
+	"0055 FD7500     ld (iy), l\n";
 
 # DIS > 0
 t_instr	disassemble => 0x0045,	undef,
 				3,	'inc (iy+DIS)', {DIS => 64}, 	0, 0, 0, 
-					"inc (iy+0x40)",
-	"0045 FD3440     inc (iy+0x40)\n";
+					"inc (iy+\$40)",
+	"0045 FD3440     inc (iy+\$40)\n";
 
 # jump relative backwards
 t_instr	disassemble => 0x062B,	undef,
 				2,	'djnz NN', {NN => 0x0629}, 		0, 1, 0, 
-					"djnz 0x0629",
-	"062B 10FC       djnz 0x0629\n";
+					"djnz \$0629",
+	"062B 10FC       djnz \$0629\n";
 
 # jump jump relative forwards
 t_instr	disassemble => 0x0043,	undef,
-				2,	'jr nz,NN', {NN => 0x0048}, 	0, 1, 0, 
-					"jr nz,0x0048",
-	"0043 2003       jr nz,0x0048\n";
+				2,	'jr nz, NN', {NN => 0x0048}, 	0, 1, 0, 
+					"jr nz, \$0048",
+	"0043 2003       jr nz, \$0048\n";
 
 # inconditional relative jump 
 t_instr	disassemble => 0x000E,	undef,
 				2,	'jr NN', {NN => 0x0053}, 		0, 1, 1, 
-					"jr 0x0053",
-	"000E 1843       jr 0x0053\n";
+					"jr \$0053",
+	"000E 1843       jr \$0053\n";
 
 # inconditional absolute jump 
 t_instr	disassemble => 0x0005,	undef,
 				3,	'jp NN', {NN => 0x11CB}, 		0, 1, 1, 
-					"jp 0x11CB",
-	"0005 C3CB11     jp 0x11CB\n";
+					"jp \$11CB",
+	"0005 C3CB11     jp \$11CB\n";
 
 # conditional absolute jump 
 t_instr	disassemble => 0x00B2,	undef,
-				3,	'jp nc,NN', {NN => 0xD441}, 	0, 1, 0, 
-					"jp nc,0xD441",
-	"00B2 D241D4     jp nc,0xD441\n";
+				3,	'jp nc, NN', {NN => 0xD441}, 	0, 1, 0, 
+					"jp nc, \$D441",
+	"00B2 D241D4     jp nc, \$D441\n";
 
 # register jump 
 t_instr	disassemble => 0x006F,	undef,
@@ -181,20 +181,20 @@ t_instr	disassemble => 0x006F,	undef,
 # rst
 t_instr	disassemble => 0x0114,	undef,
 				1,	'rst N', {N => 8, NN => 8},		1, 1, 1, 
-					"rst 0x08",
-	"0114 CF         rst 0x08\n";
+					"rst \$08",
+	"0114 CF         rst \$08\n";
 
 # inconditional call 
 t_instr	disassemble => 0x001C,	undef,
 				3,	'call NN', {NN => 0x007D}, 		1, 1, 1, 
-					"call 0x007D",
-	"001C CD7D00     call 0x007D\n";
+					"call \$007D",
+	"001C CD7D00     call \$007D\n";
 
 # conditional call 
 t_instr	disassemble => 0x0098,	undef,
-				3,	'call nz,NN', {NN => 0x4E49}, 	1, 1, 0, 
-					"call nz,0x4E49",
-	"0098 C4494E     call nz,0x4E49\n";
+				3,	'call nz, NN', {NN => 0x4E49}, 	1, 1, 0, 
+					"call nz, \$4E49",
+	"0098 C4494E     call nz, \$4E49\n";
 
 # inconditional ret 
 t_instr	disassemble => 0x0052,	undef,
@@ -227,9 +227,9 @@ for my $limit (undef, 0x702 .. 0x704) {
 	ok 1, "limit ".(defined $limit ? sprintf("%04X", $limit) : 'undef');
 	
 	t_instr	disassemble => 0x06FF,	$limit,
-					3,	'ld (ix+DIS),c', {DIS => 11}, 	0, 0, 0, 
-						"ld (ix+0x0B),c",
-		"06FF DD710B     ld (ix+0x0B),c\n";
+					3,	'ld (ix+DIS), c', {DIS => 11}, 	0, 0, 0, 
+						"ld (ix+\$0B), c",
+		"06FF DD710B     ld (ix+\$0B), c\n";
 }
 
 # composed instr with DIS+1 - decode biggest
@@ -237,9 +237,9 @@ for my $limit (-1, 0x6FF .. 0x701, 0x705) {
 	ok 1, "limit ".(defined $limit ? sprintf("%04X", $limit) : 'undef');
 	
 	t_instr	disassemble => 0x06FF,	$limit,
-					6,	'ld (ix+DIS),bc', {DIS => 11}, 	0, 0, 0, 
-						"ld (ix+0x0B),bc",
-		"06FF DD710BDD70 ld (ix+0x0B),bc\n".
+					6,	'ld (ix+DIS), bc', {DIS => 11}, 	0, 0, 0, 
+						"ld (ix+\$0B), bc",
+		"06FF DD710BDD70 ld (ix+\$0B), bc\n".
 		"     0C         \n";
 }
 	
@@ -250,24 +250,24 @@ is $instr = CPU::Z80::Disassembler::Instruction->defb($mem, 0x3FFF, 2),
 			undef;
 t_instr	defb => 0,		undef,
 				1,	'defb N', {N => 0xF3}, 			0, 0, 0, 
-					"defb 0xF3",
-	"0000 F3         defb 0xF3\n";
+					"defb \$F3",
+	"0000 F3         defb \$F3\n";
 
 t_instr	defb => 0,		1,
 				1,	'defb N', {N => 0xF3}, 			0, 0, 0, 
-					"defb 0xF3",
-	"0000 F3         defb 0xF3\n";
+					"defb \$F3",
+	"0000 F3         defb \$F3\n";
 
 t_instr	defb => 0,		2,
 				2,	'defb N', {N => [0xF3,0xAF]},	0, 0, 0, 
-					"defb 0xF3,0xAF",
-	"0000 F3AF       defb 0xF3,0xAF\n";
+					"defb \$F3, \$AF",
+	"0000 F3AF       defb \$F3, \$AF\n";
 
 t_instr	defb => 0,		8,
 				8,	'defb N', {N => [0xF3,0xAF,0x11,0xFF,0xFF,0xC3,0xCB,0x11]},
 													0, 0, 0, 
-					"defb 0xF3,0xAF,0x11,0xFF,0xFF,0xC3,0xCB,0x11",
-	"0000 F3AF11FFFF defb 0xF3,0xAF,0x11,0xFF,0xFF,0xC3,0xCB,0x11\n".
+					"defb \$F3, \$AF, \$11, \$FF, \$FF, \$C3, \$CB, \$11", 
+	"0000 F3AF11FFFF defb \$F3, \$AF, \$11, \$FF, \$FF, \$C3, \$CB, \$11\n".
 	"     C3CB11     \n";
 
 # defw
@@ -280,19 +280,19 @@ is $instr = CPU::Z80::Disassembler::Instruction->defw($mem, 0x4000-3, 2),
 
 t_instr	defw => 0x3FFE,		undef,
 				2,	'defw NN', {NN => 0x3C42},		0, 0, 0, 
-					"defw 0x3C42",
-	"3FFE 423C       defw 0x3C42\n";
+					"defw \$3C42",
+	"3FFE 423C       defw \$3C42\n";
 
 t_instr	defw => 0x3FFE,		1,
 				2,	'defw NN', {NN => 0x3C42},		0, 0, 0, 
-					"defw 0x3C42",
-	"3FFE 423C       defw 0x3C42\n";
+					"defw \$3C42",
+	"3FFE 423C       defw \$3C42\n";
 
 t_instr	defw => 0,		4,
 				8,	'defw NN', {NN => [0xAFF3,0xFF11,0xC3FF,0x11CB]},
 													0, 0, 0, 
-					"defw 0xAFF3,0xFF11,0xC3FF,0x11CB",
-	"0000 F3AF11FFFF defw 0xAFF3,0xFF11,0xC3FF,0x11CB\n".
+					"defw \$AFF3, \$FF11, \$C3FF, \$11CB",
+	"0000 F3AF11FFFF defw \$AFF3, \$FF11, \$C3FF, \$11CB\n".
 	"     C3CB11     \n";
 
 # defm
@@ -343,8 +343,8 @@ t_instr	defmz => 0x153B, 	undef,
 # org
 t_instr	org => 0x8000,		undef,
 				0,	'org NN', {NN => 0x8000}, 			0, 0, 1, 
-					"org 0x8000",
-	"8000            org 0x8000\n";
+					"org \$8000",
+	"8000            org \$8000\n";
 
 #------------------------------------------------------------------------------
 # format
@@ -353,47 +353,47 @@ t_instr	org => 0x8000,		undef,
 isa_ok	$instr = CPU::Z80::Disassembler::Instruction->disassemble(
 												$mem, 0x107), 
 			'CPU::Z80::Disassembler::Instruction';
-is		$instr->as_string,	"ld a,0xBD";
+is		$instr->as_string,	"ld a, \$BD";
 $instr->format->{N} = sub { shift };
-is		$instr->as_string,	"ld a," . 0xBD;
+is		$instr->as_string,	"ld a, " . 0xBD;
 $instr->format->{N} = sub { 'VAR' };
-is		$instr->as_string,	"ld a,VAR";
+is		$instr->as_string,	"ld a, VAR";
 
 # NN
 isa_ok	$instr = CPU::Z80::Disassembler::Instruction->disassemble(
 												$mem, 0x0002), 
 			'CPU::Z80::Disassembler::Instruction';
-is		$instr->as_string,	"ld de,0xFFFF";
+is		$instr->as_string,	"ld de, \$FFFF";
 $instr->format->{NN} = sub { shift };
-is		$instr->as_string,	"ld de," . 0xFFFF;
+is		$instr->as_string,	"ld de, " . 0xFFFF;
 $instr->format->{NN} = sub { 'VAR' };
-is		$instr->as_string,	"ld de,VAR";
+is		$instr->as_string,	"ld de, VAR";
 
 # DIS < 0
 isa_ok	$instr = CPU::Z80::Disassembler::Instruction->disassemble(
 												$mem, 0x0F3E), 
 			'CPU::Z80::Disassembler::Instruction';
-is		$instr->as_string,	"ld e,(iy-0x01)";
+is		$instr->as_string,	"ld e, (iy-\$01)";
 $instr->format->{DIS} = sub { sprintf("%+d", shift) };
-is		$instr->as_string,	"ld e,(iy-1)";
+is		$instr->as_string,	"ld e, (iy-1)";
 $instr->format->{DIS} = sub { '+VAR-BASE' };
-is		$instr->as_string,	"ld e,(iy+VAR-BASE)";
+is		$instr->as_string,	"ld e, (iy+VAR-BASE)";
 
 # DIS == 0
 isa_ok	$instr = CPU::Z80::Disassembler::Instruction->disassemble(
 												$mem, 0x0055), 
 			'CPU::Z80::Disassembler::Instruction';
-is		$instr->as_string,	"ld (iy),l";
+is		$instr->as_string,	"ld (iy), l";
 $instr->format->{DIS} = sub { sprintf("%+d", shift) };
-is		$instr->as_string,	"ld (iy+0),l";
+is		$instr->as_string,	"ld (iy+0), l";
 $instr->format->{DIS} = sub { '+VAR-BASE' };
-is		$instr->as_string,	"ld (iy+VAR-BASE),l";
+is		$instr->as_string,	"ld (iy+VAR-BASE), l";
 
 # DIS > 0
 isa_ok	$instr = CPU::Z80::Disassembler::Instruction->disassemble(
 												$mem, 0x0045), 
 			'CPU::Z80::Disassembler::Instruction';
-is		$instr->as_string,	"inc (iy+0x40)";
+is		$instr->as_string,	"inc (iy+\$40)";
 $instr->format->{DIS} = sub { sprintf("%+d", shift) };
 is		$instr->as_string,	"inc (iy+64)";
 $instr->format->{DIS} = sub { '+VAR-BASE' };

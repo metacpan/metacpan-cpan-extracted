@@ -17,6 +17,9 @@ with Image-Base-Imager.  If not, see <http://www.gnu.org/licenses/>.
 
 
 
+Version 14, March 2019
+    - tests prefer png for exercising read/write
+
 Version 13, March 2019
     - tests tighter die messages
 

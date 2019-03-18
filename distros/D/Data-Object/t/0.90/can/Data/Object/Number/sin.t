@@ -36,8 +36,8 @@ method
 
 use_ok 'Data::Object::Number';
 
-my $data = Data::Object::Number->new(12);
+my $data = Data::Object::Number->new(12345);
 
-is_deeply $data->sin(), -0.536572918000435;
+like $data->sin(), qr/-0.99377/;
 
 ok 1 and done_testing;

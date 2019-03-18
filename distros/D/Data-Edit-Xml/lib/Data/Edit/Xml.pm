@@ -13,9 +13,10 @@
 # DO NOT line number if xtrf is already taken!
 # pretty print with line numbers so we can get out of adding line numbers to existing xml which is currently not reliable
 # putFirstCut might check that the cut node is not above the target node.
+# deleteContent should putFirstCut might check that the cut node is not above the target node.
 
 package Data::Edit::Xml;
-our $VERSION = 20190315;
+our $VERSION = 20190316;
 use v5.20;
 use warnings FATAL => qw(all);
 use strict;
@@ -2420,7 +2421,7 @@ sub changeText($$@)                                                             
 
 #D2 Cut and Put                                                                 # Cut and paste nodes in the L<parse|/parse> tree.
 
-sub cut($@)                                                                     #CI Cut out the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree.
+sub cut($@)                                                                     #CI Cut out and return the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree.
  {my ($node, @context) = @_;                                                    # Node to cut out, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
   my $parent = $node->parent;                                                   # Parent node
@@ -2434,9 +2435,18 @@ sub cut($@)                                                                     
   $node                                                                         # Return node
  }
 
+sub cutIfEmpty($@)                                                              #C Cut out and return the specified B<$node> so that it can be reinserted else where in the L<parse|/parse> tree if it is empty.
+ {my ($node, @context) = @_;                                                    # Node to cut out, optional context
+  return undef if @context and !$node->at(@context);                            # Not in specified context
+  return $node->cut if $node->isAllBlankText;                                   # Cut node if it has no content or all blank content
+  undef                                                                         # Cannot cut out node
+ }
+
 sub deleteContent($@)                                                           #C Delete the content of the specified B<$node>.
  {my ($node, @context) = @_;                                                    # Node, optional context
   return undef if @context and !$node->at(@context);                            # Not in specified context
+  my @c = $node->contents;                                                      # Content
+  $_->parent = undef for @c;                                                    # Remove parent link from each child
   $node->content = [];                                                          # Delete content
   $node                                                                         # Return node
  }
@@ -4812,7 +4822,7 @@ sub ditaConvertConceptToTask($)                                                 
    {$body->putFirst($body->newTag_context);
    }
 
-  for my $i(grep {$_> 0} keys @ol)                                              # Items between ol become stepsection
+  for my $i(grep {$_ > 0} keys @ol)                                             # Items between ol become stepsection
    {my $o = $ol[$i];
     my $O = $ol[$i-1];
     if ($o != $O)
@@ -4855,18 +4865,7 @@ sub ditaConvertConceptToTask($)                                                 
        }
 
       if (my $cmd = $li->first_cmd)                                             # Ameliorate any trailing items in cmd by putting them first in context
-       {#my $m = $cmd->outputclass = $cmd->stringMd5Sum;
-        #if ($m =~ m(\A(8b690f8aa0a956b7a8c97eba747614e8)\Z)s)
-        # {say STDERR "AAAA ", $cmd->prettyStringCDATA;
-        # }
-
-#        if (my $info = $l->last_info)                                          # Context
-#         {while(my $l = $cmd->last(qr(\A(fig|image|note)\Z)))
-#           {$info->putFirstCut($l);
-#           }
-#         }
-
-        while(my $last = $cmd->last(qr(\A(fig|image|note)\Z)))
+       {while(my $last = $cmd->last(qr(\A(fig|image|note)\Z)))
          {my $info = $li->addLast_info;
              $info->putFirstCut($last);
          }
@@ -4912,16 +4911,21 @@ sub ditaConvertReferenceToConcept($)                                            
   $reference                                                                    # Return reference as a concept
  }
 
-sub ditaConvertReferenceToTask($)                                               # Convert a Dita B<reference> to a B<task> by representing B<ol> as B<steps>. Return B<undef> if the conversion is not possible because there are no B<ol> else return the specified B<$concept> as as B<task>.
+sub ditaConvertReferenceToTask($)                                               # Convert a Dita B<reference> to a B<task> in situ by representing B<ol> as B<steps>. Return B<undef> if the conversion is not possible because there are no such B<ol> else return the specified B<$concept> as as B<task>.
  {my ($reference) = @_;                                                         # Reference
   $reference->at_reference or confess "Not a reference";                        # Check we are on reference
 
   my $body = $reference->go_refbody;
      $body or confess "No refbody under reference";
 
-  $reference->by(sub                                                            # Unwrap sections
-   {$_->unwrap_section;
+  my $ol;                                                                       # Check that the necessary ol is present
+  $body->by(sub
+   {my ($o) = @_;
+    if ($o->at_ol_section_refbody)
+     {++$ol;
+     }
    });
+  return undef unless $ol;
 
   if (my $concept = $reference->ditaConvertReferenceToConcept)
    {return $concept->ditaConvertConceptToTask;
@@ -23902,7 +23906,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests=>1137;
+use Test::More tests=>1143;
 use warnings FATAL=>qw(all);
 use strict;
 use Data::Table::Text qw(:all);
@@ -30387,6 +30391,8 @@ a id="a"
 END
  }
 
+unless($windows) {
+
 if (1) {                                                                        #ThtmlTables
   my $a = Data::Edit::Xml::new(<<END);
 <task id="t1">
@@ -30406,6 +30412,8 @@ END
   ok fileMd5Sum($a->htmlTables =~ s(#\w+) ()gsr) eq q(8750fcd9e34cb1756c96602fb848e3ad);
   ok fileMd5Sum($a->jsonString)                  eq q(df448817f9d89acd4787421829402d01);
  }
+
+} else {ok 1 for 1..2}                                                          # No md5sum on windows
 
 if (1) {                                                                        #TjsonString
   my $a = Data::Edit::Xml::new(<<END);
@@ -30847,6 +30855,39 @@ if (1) {                                                                        
 END
   ok !$a->hasSingleChildText;
   ok  $a->last->hasSingleChildText;
+ }
+
+if (1) {                                                                        #TcutIfEmpty
+  my $a = Data::Edit::Xml::new(<<END);
+<a>
+  <b>bb</b>
+  <c/>
+  <d></d>
+  <e>ee</e>
+</a>
+END
+
+  my (undef, $b, $c, $d, undef, $e) = $a->byList;
+  is_deeply [q(b)..q(e)], [map {-t $_} ($b, $c, $d, $e)];
+
+  $c->cutIfEmpty;
+  ok -p $a eq <<END;
+<a>
+  <b>bb</b>
+  <d/>
+  <e>ee</e>
+</a>
+END
+
+  $d->cutIfEmpty;
+  ok -p $a eq <<END;
+<a>
+  <b>bb</b>
+  <e>ee</e>
+</a>
+END
+
+  ok !$_->cutIfEmpty for $a, $b, $e;
  }
 
 say STDERR "Took ", (time - $startTime), " seconds";

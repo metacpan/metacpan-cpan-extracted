@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=GD-Graph-radar
   repository: https://github.com/ology/GD-Graph-radar
-version: '0.1103'
+version: '0.1104'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

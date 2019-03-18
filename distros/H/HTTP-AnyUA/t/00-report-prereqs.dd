@@ -26,6 +26,9 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'HTTP::Tiny' => '0'
+                                      },
                       'requires' => {
                                       'Carp' => '0',
                                       'Exporter' => '0',
@@ -41,9 +44,6 @@ do { my $x = {
                                       'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
-                                    },
-                      'suggests' => {
-                                      'HTTP::Tiny' => '0'
                                     }
                     },
        'test' => {

@@ -1,6 +1,3 @@
-
-require 5.003;
-use lib ".";
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -33,14 +30,14 @@ my %Arg = (
 
 
 	   # where cpgplot.h should be
-	   IDIR  => $ENV{PGPLOT_DIR} || '/usr/include,/usr/local/pgplot',
+	   IDIR  => $ENV{PGPLOT_DIR} || '/usr/include,/Applications/PDL/pgplot,/usr/local/pgplot',
 
 	   # where libpgplot.a should be
 	   LDIR  => $ENV{PGPLOT_DIR} || '/usr/lib',
 
 	   # extra libraries and directories
-	   EXLIB => 'png',
-	   EXDIR => '/usr/local/lib',
+	   EXLIB => 'png12,z',
+	   EXDIR => '/Applications/PDL/pgplot,/usr/local/lib',
 	  );
 
 
@@ -194,10 +191,24 @@ if ( $is_vms ) {
 
 WriteMakefile(
     'NAME'	=> 'PGPLOT',
+    'CONFIGURE_REQUIRES' => { 'ExtUtils::F77' => 1.13 },
     'PREREQ_PM' => { 'ExtUtils::F77' => 1.13 },
     'VERSION_FROM'	=> 'PGPLOT.pm',
     'dist'      => { COMPRESS=>"gzip", SUFFIX=>"gz" },
     'depend'    => { '$(OBJECT)' => q[pgfun.c arrays.c PGPLOT.c]},
+    'META_MERGE' => {
+       "meta-spec" => { version => 2 },
+       dynamic_config => 1, # deps actually do change
+       resources => {
+          bugtracker  => 'https://github.com/PDLPorters/perl5-PGPLOT/issues',
+          repository  => {
+             url => 'git://github.com/PDLPorters/perl5-PGPLOT.git',
+             type => 'git',
+             web => 'https://github.com/PDLPorters/perl5-PGPLOT',
+          },
+       },
+       x_IRC => 'irc://irc.perl.org/#pdl',
+    },
     %items
 );
 

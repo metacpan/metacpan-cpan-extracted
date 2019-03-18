@@ -9,7 +9,6 @@ README
 README.md
 dist.ini
 eg/radar
-eg/radar.png
 lib/GD/Graph/radar.pm
 t/00-compile.t
 t/01-methods.t

@@ -3,7 +3,7 @@ package Function::Interface::Info;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub new {
     my ($class, %args) = @_;

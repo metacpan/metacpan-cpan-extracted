@@ -1,0 +1,23 @@
+teamcity[enteredTheMatrix timestamp='2019-03-10T12:56:49.973']
+teamcity[testingStarted timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteStarted locationHint='myfile://testData/tests/todo_tests.t' name='testData/tests/todo_tests.t' nodeId='myfile://testData/tests/todo_tests.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='Initial' nodeId='myfile://testData/tests/todo_tests.t-0-Initial-1' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='Initial' nodeId='myfile://testData/tests/todo_tests.t-0-Initial-1' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='TODO Failed (Here is TODO reason)' nodeId='myfile://testData/tests/todo_tests.t-0-TODO Failed (Here is TODO reason)-2' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testIgnored message='#   Failed (TODO) test |'Failed|'|n#   at testData/tests/todo_tests.t line 9.' name='TODO Failed (Here is TODO reason)' nodeId='myfile://testData/tests/todo_tests.t-0-TODO Failed (Here is TODO reason)-2' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='TODO Failed (Here is TODO reason)' nodeId='myfile://testData/tests/todo_tests.t-0-TODO Failed (Here is TODO reason)-2' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='TODO Passed (Here is TODO reason)' nodeId='myfile://testData/tests/todo_tests.t-0-TODO Passed (Here is TODO reason)-3' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testIgnored message='' name='TODO Passed (Here is TODO reason)' nodeId='myfile://testData/tests/todo_tests.t-0-TODO Passed (Here is TODO reason)-3' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='TODO Passed (Here is TODO reason)' nodeId='myfile://testData/tests/todo_tests.t-0-TODO Passed (Here is TODO reason)-3' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testStarted name='Last one' nodeId='myfile://testData/tests/todo_tests.t-0-Last one-4' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testFinished duration='42' name='Last one' nodeId='myfile://testData/tests/todo_tests.t-0-Last one-4' parentNodeId='myfile://testData/tests/todo_tests.t-0' timestamp='2019-03-10T12:56:49.973']
+teamcity[testSuiteFinished locationHint='testData/tests/todo_tests.t' name='testData/tests/todo_tests.t' nodeId='myfile://testData/tests/todo_tests.t-0' parentNodeId='0' timestamp='2019-03-10T12:56:49.973']
+All tests successful.
+
+Test Summary Report
+-------------------
+testData/tests/todo_tests.t (Wstat: 0 Tests: 4 Failed: 0)
+  TODO passed:   3
+Files=1, Tests=4, TEST_MODE_STATS;
+Result: PASS
+teamcity[testingFinished timestamp='2019-03-10T12:56:49.973']

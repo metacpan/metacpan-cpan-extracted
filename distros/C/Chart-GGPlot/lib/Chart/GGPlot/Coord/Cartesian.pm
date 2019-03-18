@@ -1,0 +1,127 @@
+package Chart::GGPlot::Coord::Cartesian;
+
+# ABSTRACT: The Cartesian coordinate system
+
+use Chart::GGPlot::Class qw(:pdl);
+use namespace::autoclean;
+
+our $VERSION = '0.0001'; # VERSION
+
+use Types::Standard qw(Bool Overload);
+
+use Chart::GGPlot::Util qw(:all);
+
+
+has xlim => ( is => 'ro' );
+has ylim => ( is => 'ro' );
+
+has limits =>
+  ( is => 'ro', lazy => 1, builder => '_build_limits', init_arg => undef );
+
+sub _build_limits {
+    my $self = shift;
+    return { x => $self->xlim, y => $self->ylim };
+}
+
+
+has expand => ( is => 'ro', default => sub { true } );
+
+
+has default => (is => 'ro', default => sub { false } );
+
+with qw(Chart::GGPlot::Coord);
+
+has '+is_linear' => ( default => sub { false } );
+
+method distance ($x, $y, $panel_params) {
+    my $max_dist = dist_euclidean( $panel_params->at('x_range'),
+        $panel_params->at('y_range') );
+    return dist_euclidean( $x, $y ) / $max_dist;
+}
+
+method transform ($data, $panel_params) {
+    my ( $rescale_x, $rescale_y ) = map {
+        fun($data) { rescale( $data, $panel_params->at($_) ) };
+    } qw(x_range y_range);
+    $data = transform_position( $data, $rescale_x, $rescale_y );
+    return transform_position( $data, squish_infinite(), squish_infiniate() );
+}
+
+method setup_panel_params ($scale_x, $scale_y, $params = {}) {
+    my $train_cartesian = fun( $scale, $limits, $xy ) {
+        my $range = $self->scale_range( $scale, $limits, $self->expand );
+        my $out = $scale->break_info($range);
+        $out->set('arrange', $scale->axis_order);
+        return $out->rename({ map { $_ => "${xy}.$_" } @{$out->names} });
+    };
+
+    return {
+        $train_cartesian->( $scale_x, $self->limits->at('x'), 'x' )->flatten,
+        $train_cartesian->( $scale_y, $self->limits->at('y'), 'y' )->flatten,
+    };
+}
+
+method scale_range ($scale, $limits=undef, $expand=true) {
+    my $expansion = $expand ? $self->expand_default($scale) : pdl([ 0, 0 ]);
+
+    if ( not defined $limits ) {
+        return $scale->dimension($expansion);
+    }
+    else {
+        my $range = range( $scale->transform($limits) );
+        return expand_range( $range, $expansion->at(0), $expansion->at(1) );
+    }
+}
+
+__PACKAGE__->meta->make_immutable;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Chart::GGPlot::Coord::Cartesian - The Cartesian coordinate system
+
+=head1 VERSION
+
+version 0.0001
+
+=head1 ATTRIBUTES
+
+=head2 xlim
+
+Limits for the x axis. 
+
+=head2 ylim
+
+Limits for the y axis. 
+
+=head2 expand
+
+If true, adds a small expansion factor to the limits to ensure
+that data and axes do not overlap. If false, limits are taken
+exactly from the data or C<xlim>/C<ylim>.
+
+Default is true.
+
+=head2 default
+
+Is this the default coordinate system?
+
+=head1 AUTHOR
+
+Stephan Loyd <sloyd@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Stephan Loyd.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

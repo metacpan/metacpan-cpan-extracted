@@ -265,7 +265,7 @@ __END__
 
 Locale::TextDomain::OO::Translator - Translator class
 
-$Id: Translator.pm 651 2017-05-31 18:10:43Z steffenw $
+$Id: Translator.pm 724 2018-12-24 11:50:32Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/module/trunk/lib/Locale/TextDomain/OO/Translator.pm $
 

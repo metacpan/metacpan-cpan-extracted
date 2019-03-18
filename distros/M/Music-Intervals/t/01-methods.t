@@ -70,4 +70,19 @@ is_deeply $obj->eq_tempered_cents,
     'eq_tempered_cents';
 is_deeply $obj->integer_notation, { "$chord integer_notation" => { 'G' => '67', 'E' => '64', 'C' => '60' } }, 'integer_notation';
 
+$chord = "C C'";
+$obj = Music::Intervals->new(
+    size => 2,
+    justin => 1,
+    interval => 1,
+    notes => [qw( C C' )],
+);
+isa_ok $obj, 'Music::Intervals';
+$obj->process;
+
+is_deeply $obj->natural_intervals,
+    { "$chord natural_intervals" => {
+        $chord => { '2/1' => 'octave' } } },
+    'octave';
+
 done_testing();

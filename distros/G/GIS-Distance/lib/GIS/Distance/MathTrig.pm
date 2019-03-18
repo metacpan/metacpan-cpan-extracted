@@ -1,13 +1,15 @@
 package GIS::Distance::MathTrig;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( great_circle_distance deg2rad );
 use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     return great_circle_distance(
@@ -30,28 +32,33 @@ GIS::Distance::MathTrig - Great cirlce distance calculations using Math::Trig.
 
 =head1 DESCRIPTION
 
-This formula uses L<Math::Trig>'s great_circle_distance function which
-at this time uses math almost exactly the same as the
-L<GIS::Distance::Cosine> formula.  If you want to use the
-L<GIS::Distance::Cosine> formula you may find that this module will
-calculate faster (untested assumption).  For some reason this and
-the Cosine formula return slight differences at very close distances.
-This formula has the same drawbacks as the Cosine formula.
+This formula uses L<Math::Trig>'s C<great_circle_distance()> which
+at this time uses math almost exactly the same formula as the
+L<GIS::Distance::Cosine> formula.  And the Cosine formula is about 5%
+faster than this formula.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
 =head1 FORMULA
-
-As stated in the L<Math::Trig> POD:
 
     lat0 = 90 degrees - phi0
     lat1 = 90 degrees - phi1
     d = R * arccos(cos(lat0) * cos(lat1) * cos(lon1 - lon01) + sin(lat0) * sin(lat1))
 
-=head1 AUTHORS AND LICENSE
+As stated in the L<Math::Trig> documentation.
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+=head1 SUPPORT
+
+See L<GIS::Distance/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

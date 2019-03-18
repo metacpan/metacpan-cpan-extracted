@@ -13,14 +13,14 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Commit;
 # ABSTRACT: Commit dirty files
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use namespace::autoclean;
 use File::Temp           qw{ tempfile };
 use Moose;
 use MooseX::Has::Sugar;
-use MooseX::Types::Moose qw{ Str };
-use MooseX::Types::Path::Tiny 0.010 qw{ Paths };
+use Types::Standard qw(Str ArrayRef);
+use Types::Path::Tiny 'Path';
 use Path::Tiny 0.048 qw(); # subsumes
 use Cwd;
 
@@ -36,8 +36,8 @@ sub _git_config_mapping { +{
 
 # -- attributes
 
-has commit_msg => ( ro, isa=>Str, default => 'v%v%n%n%c' );
-has add_files_in  => ( ro, isa=> Paths, coerce => 1, default => sub { [] });
+has commit_msg => ( ro, isa=>Str, default => 'v%V%n%n%c' );
+has add_files_in  => ( ro, isa=> ArrayRef[Path], coerce => 1, default => sub { [] });
 
 
 # -- public methods
@@ -129,7 +129,7 @@ Dist::Zilla::Plugin::Git::Commit - Commit dirty files
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Note: The files have to be generated between the phases BeforeRelease
 E<lt>-E<gt> AfterRelease, and after Git::Check + before Git::Commit.
 
 =item * commit_msg - the commit message to use. Defaults to
-C<v%v%n%n%c>, meaning the version number and the list of changes.
+C<v%V%n%n%c>, meaning the version number and the list of changes.
 The L<formatting codes|Dist::Zilla::Role::Git::StringFormatter/DESCRIPTION>
 are documented under L<Dist::Zilla::Role::Git::StringFormatter>.
 
@@ -202,8 +202,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

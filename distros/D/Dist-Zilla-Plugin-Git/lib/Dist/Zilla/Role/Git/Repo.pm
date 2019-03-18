@@ -9,10 +9,10 @@
 package Dist::Zilla::Role::Git::Repo;
 # ABSTRACT: Provide repository information for Git plugins
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Moose::Role;
-use MooseX::Types::Moose qw(Str Maybe);
+use Types::Standard qw(Str Maybe);
 use namespace::autoclean;
 
 has repo_root => (
@@ -110,7 +110,7 @@ Dist::Zilla::Role::Git::Repo - Provide repository information for Git plugins
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 DESCRIPTION
 
@@ -153,8 +153,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

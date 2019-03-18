@@ -44,8 +44,8 @@ method
 
 use_ok 'Data::Object::Number';
 
-my $data = Data::Object::Number->new(12);
+my $data = Data::Object::Number->new(1);
 
-is_deeply $data->exp(), 162754.791419004;
+like $data->exp(), qr/2.71828/;
 
 ok 1 and done_testing;

@@ -20,11 +20,11 @@ no_index:
 provides:
   Date::Saka::Simple:
     file: lib/Date/Saka/Simple.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   Date::Calc: '5.7'
   Date::Exception: '0.03'
-  Date::Utils: '0.24'
+  Date::Utils: '0.25'
   List::Util: '1.41'
   Moo: '2.000000'
   Time::localtime: '1.02'
@@ -32,5 +32,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Date-Saka-Simple.git
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

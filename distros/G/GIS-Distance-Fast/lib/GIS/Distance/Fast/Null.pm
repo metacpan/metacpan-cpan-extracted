@@ -1,12 +1,14 @@
 package GIS::Distance::Fast::Null;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.12';
+our $VERSION = '0.14';
+
+use parent 'GIS::Distance::Formula';
 
 use GIS::Distance::Fast;
 use namespace::clean;
 
-*distance = \&GIS::Distance::Fast::null_distance;
+*_distance = \&GIS::Distance::Fast::null_distance;
 
 1;
 __END__
@@ -22,11 +24,19 @@ GIS::Distance::Fast::Null - C implementation of GIS::Distance::Null.
 See L<GIS::Distance::Null> for details about this formula.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<GIS::Distance::Fast/AUTHORS> and L<GIS::Distance::Fast/LICENSE>.
+See L<GIS::Distance::Fast/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance::Fast/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance::Fast/LICENSE>.
 
 =cut
 

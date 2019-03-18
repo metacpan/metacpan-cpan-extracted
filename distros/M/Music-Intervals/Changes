@@ -1,5 +1,18 @@
 Revision history for Music-Intervals
 
+0.0507 2019-03-16 15:15:10
+    - Made the eg/ Dancer example return JSON, instead of strings.
+
+0.0506 2019-03-16 12:38:17
+    - Added logic to handle the 2/1 octave ratio correctly.
+
+0.0505 2019-03-15 11:10:17
+    - Dropped the NAME section from the eg/Dancer-App.pm example.
+    - Improved documentation.
+
+0.0504 2019-03-15 10:43:12
+    - Added webservice examples to eg/.
+
 0.0503 2019-03-14 14:27:39
     - Improved documentation.
 

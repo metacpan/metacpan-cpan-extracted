@@ -13,12 +13,12 @@ use warnings;
 package Dist::Zilla::Role::Git::DirtyFiles;
 # ABSTRACT: Provide the allow_dirty & changelog attributes
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Moose::Role;
-use MooseX::Types::Moose qw{ Any ArrayRef Str RegexpRef };
-use MooseX::Types::Path::Tiny 0.010 qw{ Paths to_Paths };
-use Moose::Util::TypeConstraints;
+use Types::Standard qw{ Any ArrayRef Str RegexpRef };
+use Type::Utils qw(coerce from as via subtype);
+use Types::Path::Tiny 'Path';
 
 use namespace::autoclean;
 use Path::Tiny 0.048 qw(); # subsumes
@@ -55,11 +55,10 @@ requires qw(log_fatal repo_root zilla);
 {
   # We specifically allow the empty string to represent the empty list.
   # Otherwise, there'd be no way to specify an empty list in an INI file.
-  my $type = subtype as Paths;
-  coerce($type,
-    from ArrayRef, via { to_Paths( [ grep { length } @$_ ] ) },
-    from Any, via { length($_) ? to_Paths($_) : [] },
-  );
+  my $type = subtype as ArrayRef[Path];
+  coerce $type,
+    from ArrayRef, via { (ArrayRef[Path])->coerce( [ grep { length } @$_ ] ) },
+    from Any, via { length($_) ? (ArrayRef[Path])->coerce($_) : [] };
 
   has allow_dirty => (
     is => 'ro', lazy => 1,
@@ -171,7 +170,7 @@ Dist::Zilla::Role::Git::DirtyFiles - Provide the allow_dirty & changelog attribu
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 DESCRIPTION
 
@@ -227,8 +226,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

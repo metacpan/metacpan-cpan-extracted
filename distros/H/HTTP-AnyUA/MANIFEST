@@ -40,7 +40,10 @@ t/23-content-coderef.t
 t/40-middleware-content-length.t
 t/40-middleware-request-headers.t
 t/40-middleware-runtime.t
+t/50-future-subclass.t
 t/app.psgi
+t/lib/AnyEvent/Future.pm
+t/lib/Future/Mojo.pm
 t/lib/MockBackend.pm
 t/lib/Server.pm
 t/lib/Util.pm

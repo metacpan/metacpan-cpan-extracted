@@ -8,12 +8,11 @@ use HTTP::AcceptLanguage;
 
 use Mojolicious::Plugin::I18NUtils::Locale;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub register {
     my ($self, $app, $config) = @_;
 
-    $config //= {};
     my $parse_format = $config->{format} // '%Y-%m-%d %H:%M:%S';
 
     my %objects;
@@ -284,7 +283,7 @@ Mojolicious::Plugin::I18NUtils - provide some helper functions for I18N
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 

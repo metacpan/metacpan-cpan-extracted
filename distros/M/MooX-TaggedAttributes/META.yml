@@ -14,11 +14,10 @@ build_requires:
   Test::CleanNamespaces: '0'
   Test::Lib: '0'
   Test::More: '0'
-  perl: '5.006'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,7 +34,7 @@ no_index:
 provides:
   MooX::TaggedAttributes:
     file: lib/MooX/TaggedAttributes.pm
-    version: '0.07'
+    version: '0.09'
 requires:
   Carp: '0'
   Class::Method::Modifiers: '2.12'
@@ -45,10 +44,12 @@ requires:
   Scalar::Util: '0'
   Sub::Name: '0'
   namespace::clean: '0'
+  perl: '5.008009'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-TaggedAttributes
   repository: git://github.com/djerius/moox-taggedattributes.git
-version: '0.07'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.09'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

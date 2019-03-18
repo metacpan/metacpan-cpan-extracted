@@ -81,7 +81,7 @@ foreach my $formula (sort @formulas) {
     my $pp_module = "GIS::Distance::$formula";
     if ($do_pp and $installed_modules_lookup{$pp_module}) {
         my $gis = GIS::Distance->new( $pp_module );
-        my $code = $pp_module->can('distance');
+        my $code = $pp_module->can('_distance');
 
         push @tests, (
             ["PP $formula - GIS::Distance->distance" => sub{
@@ -90,7 +90,7 @@ foreach my $formula (sort @formulas) {
             ["PP $formula - GIS::Distance->distance_metal" => sub{
                 return $gis->distance_metal( @coords );
             }],
-            ["PP $formula - $pp_module\::distance" => sub{
+            ["PP $formula - $pp_module\::_distance" => sub{
                 return $code->( @coords );
             }],
         );
@@ -99,7 +99,7 @@ foreach my $formula (sort @formulas) {
     my $xs_module = "GIS::Distance::Fast::$formula";
     if ($do_xs and $installed_modules_lookup{$xs_module}) {
         my $gis = GIS::Distance->new( $xs_module );
-        my $code = $xs_module->can('distance');
+        my $code = $xs_module->can('_distance');
 
         push @tests, (
             ["XS $formula - GIS::Distance->distance" => sub{
@@ -108,7 +108,7 @@ foreach my $formula (sort @formulas) {
             ["XS $formula - GIS::Distance->distance_metal" => sub{
                 return $gis->distance_metal( @coords );
             }],
-            ["XS $formula - $xs_module\::distance" => sub{
+            ["XS $formula - $xs_module\::_distance" => sub{
                 return $code->( @coords );
             }],
         );
@@ -154,6 +154,35 @@ if ($dry_run) {
 
 # Run them all once in case there are runtime errors.
 foreach my $test (@tests) { $test->[1]->() }
+
+my @time = gmtime( time() );
+my $stamp = sprintf(
+    '%04d-%02d-%02dT%02d:%02d:%02dZ',
+    $time[5] + 1900,
+    $time[4] + 1,
+    $time[3],
+    $time[2], $time[1], $time[0],
+);
+print "$stamp\n";
+
+my %versions;
+
+foreach my $module (keys %INC) {
+    next if $module !~ m{\.pm$};
+
+    $module =~ s{\.pm$}{};
+    $module =~ s{/}{::}g;
+
+    next unless $module->can('distance')
+         or $module eq 'GIS::Distance::Fast';
+
+    my $version = eval("\$$module\::VERSION");
+    $versions{$module} = $version if $version;
+}
+
+foreach my $module (sort keys %versions) {
+    print "$module $versions{ $module }\n";
+}
 
 cmpthese(
     $iters,

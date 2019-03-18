@@ -59,14 +59,18 @@ sub apply_extra_pkgconfig_paths
 {
    my %added;
 
+   my @pkg_config_path;
+
    foreach my $inc ( @INC ) {
       my $dir = "$inc/pkgconfig";
       next unless -d $dir;
       $added{$dir}++ and next;
 
-      $ENV{PKG_CONFIG_PATH} = join ":", grep { defined }
-         $dir, $ENV{PKG_CONFIG_PATH};
+      push @pkg_config_path, $dir;
    }
+   push @pkg_config_path, $ENV{PKG_CONFIG_PATH} if defined $ENV{PKG_CONFIG_PATH};
+
+   $ENV{PKG_CONFIG_PATH} = join ":", @pkg_config_path;
 }
 
 sub new
@@ -193,10 +197,10 @@ sub do_requires_alien
       ( defined $version ? "version $version" : "any version" ), 
       "\n";
 
-   $self->build_requires->{$module} = $version;
+   $self->requires->{$module} = $version;
 
    # We presume that CPAN can always find any Alien module, so we won't fail
-   # yet. At worst, CPAN will fail to satisfy the build_requires
+   # yet. At worst, CPAN will fail to satisfy the requires
    return undef;
 }
 

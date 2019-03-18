@@ -4,7 +4,7 @@
       "Slaven Rezic <srezic@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
@@ -44,5 +44,5 @@
          "url" : "git://github.com/eserte/cpan-plugin-sysdeps.git"
       }
    },
-   "version" : "0.56"
+   "version" : "0.57"
 }

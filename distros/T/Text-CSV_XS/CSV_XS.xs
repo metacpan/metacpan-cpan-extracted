@@ -1,4 +1,4 @@
-/*  Copyright (c) 2007-2018 H.Merijn Brand.  All rights reserved.
+/*  Copyright (c) 2007-2019 H.Merijn Brand.  All rights reserved.
  *  Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
  *  This program is free software; you can redistribute it and/or
  *  modify it under the same terms as Perl itself.
@@ -350,12 +350,10 @@ static SV *cx_SetDiag (pTHX_ csv_t *csv, int xse) {
 	(void)hv_store (csv->self, "_EOF",          4, &PL_sv_yes,   0);
     if (csv->pself && csv->auto_diag) {
 	ENTER;
-	SAVETMPS;
 	PUSHMARK (SP);
 	XPUSHs (csv->pself);
 	PUTBACK;
 	call_pv ("Text::CSV_XS::error_diag", G_VOID | G_DISCARD);
-	FREETMPS;
 	LEAVE;
 	}
     return (err);
@@ -1821,7 +1819,8 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
     if (csv.strict) {
 	unless (csv.strict_n) csv.strict_n = (short)csv.fld_idx;
 	if (csv.fld_idx != csv.strict_n) {
-	    ParseError (&csv, 2014, csv.used);
+	    unless (csv.useIO & useIO_EOF)
+		ParseError (&csv, 2014, csv.used);
 	    result = FALSE;
 	    }
 	}

@@ -1,13 +1,15 @@
 package GIS::Distance::GreatCircle;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( deg2rad asin );
 use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     $lon1 = deg2rad($lon1);
@@ -35,17 +37,16 @@ GIS::Distance::GreatCircle - Great circle distance calculations.
 
 =head1 DESCRIPTION
 
-A true Great Circle Distance calculation.  This was created
-because the L<GIS::Distance::MathTrig> calculation uses
-L<Math::Trig>'s great_circle_distance() which doesn't actually
-appear to use the actual Great Circle Distance formula (more like
-Cosine).
+A true Great Circle Distance calculation.  This was created because the
+L<GIS::Distance::MathTrig> formula uses L<Math::Trig>'s
+C<great_circle_distance()> which doesn't actually appear to use the
+actual Great Circle Distance formula (more likely Cosine).
 
 A faster (XS) version of this formula is available as
 L<GIS::Distance::Fast::GreatCircle>.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
 =head1 FORMULA
 
@@ -55,9 +56,17 @@ is used which in turn interfaces with the various formula modules.
         ( sin(( lon1 - lon2 )/2) )**2
     ) )
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+See L<GIS::Distance/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

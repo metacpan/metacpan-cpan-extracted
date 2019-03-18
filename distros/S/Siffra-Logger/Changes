@@ -1,0 +1,6 @@
+Revision history for Perl module Siffra::Logger
+
+0.01 Sun Mar 17 01:33:33 2019
+    - original version; created by ExtUtils::ModuleMaker 0.63
+0.02 2019-03-17 14:03:00 - Luiz Benevenuto
+    - better pod documentation

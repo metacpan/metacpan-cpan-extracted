@@ -52,6 +52,6 @@ $func = Data::Object::Func::Number::Sqrt->new(
 
 my $result = $func->execute;
 
-is_deeply $result, 111.108055513541;
+like $result, qr/111.10805/;
 
 ok 1 and done_testing;

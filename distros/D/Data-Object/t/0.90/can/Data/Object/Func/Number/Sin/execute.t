@@ -52,6 +52,6 @@ $func = Data::Object::Func::Number::Sin->new(
 
 my $result = $func->execute;
 
-is_deeply $result, -0.993771636455681;
+like $result, qr/-0.99377/;
 
 ok 1 and done_testing;

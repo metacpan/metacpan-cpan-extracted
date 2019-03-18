@@ -1,5 +1,5 @@
 package ZMQ::Raw::Loop::Timer;
-$ZMQ::Raw::Loop::Timer::VERSION = '0.29';
+$ZMQ::Raw::Loop::Timer::VERSION = '0.30';
 use strict;
 use warnings;
 use Scalar::Util qw/weaken/;
@@ -35,7 +35,7 @@ ZMQ::Raw::Loop::Timer - Timer class
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 DESCRIPTION
 

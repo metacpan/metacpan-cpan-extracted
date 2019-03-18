@@ -38,6 +38,6 @@ use_ok 'Data::Object::Number';
 
 my $data = Data::Object::Number->new(12);
 
-is_deeply $data->cos(), 0.843853958732492;
+like $data->cos(), qr/0.84385/;
 
 ok 1 and done_testing;

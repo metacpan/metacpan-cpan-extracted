@@ -14,7 +14,7 @@ has arg1 => (
 
 has arg2 => (
   is => 'ro',
-  isa => 'Undef | Str | CodeRef',
+  isa => 'Undef | CodeRef',
   opt => 1
 );
 
@@ -34,13 +34,12 @@ sub execute {
   my $hash = {};
 
   for (my $i = 0; $i < @$data; $i++) {
-    my $index = $i;
     my $value = $data->[$i];
-    my $refs = {'$index' => \$index, '$value' => \$value};
 
     if (defined($value)) {
-      my $result = $self->codify($code, $refs)->($value, @args);
-      $hash->{$value} = $result if defined($result);
+      my $result = $code->($value, @args) if $code;
+
+      $hash->{$value} = defined($result) ? $result : 1;
     }
   }
 

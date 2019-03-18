@@ -10,7 +10,7 @@ Hello [1] there [1] "hullo", 'hullo' [1] [1978]
 
 <example>
 [1] Bla "bla"
-<example>
+</example>
 
 <verbatim>"[50]"</verbatim>
 

@@ -3,9 +3,9 @@ package Function::Interface;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
-use Carp qw(croak confess);
+use Carp qw(confess);
 use Keyword::Simple;
 use PPR;
 
@@ -46,18 +46,19 @@ sub _render_src {
     my ($pkg, $keyword, $match) = @_;
 
     my $src = <<"```";
-Function::Interface::_register_info({
-    package => '$pkg',
-    keyword => '$keyword',
-    subname => '$match->{subname}',
-    params  => [ @{[ join ',', map {
-        my $named    = $_->{named} ? 1 : 0;
-        my $optional = $_->{optional} ? 1 : 0;
-
-        qq!{ type => $_->{type}, name => '$_->{name}', named => $named, optional => $optional }!
-    } @{$match->{params}} ]} ],
-    return  => [ @{[ join ',', @{$match->{return}}] } ],
-});
+BEGIN {
+    Function::Interface::_register_info({
+        package => '$pkg',
+        keyword => '$keyword',
+        subname => '$match->{subname}',
+        params  => [ @{[ join ',', map {
+            my $named    = $_->{named} ? 1 : 0;
+            my $optional = $_->{optional} ? 1 : 0;
+            qq!{ type => $_->{type}, name => '$_->{name}', named => $named, optional => $optional }!
+        } @{$match->{params}} ]} ],
+        return  => [ @{[ join ',', @{$match->{return}}] } ],
+    });
+}
 ```
     return $src;
 }
@@ -94,10 +95,10 @@ sub info {
 sub _make_function_param {
     my $param = shift;
     Function::Interface::Info::Function::Param->new(
-        type    => $param->{type},
-        name    => $param->{name},
-        named   => $param->{named},
-        optinal => $param->{optional},
+        type     => $param->{type},
+        name     => $param->{name},
+        named    => $param->{named},
+        optional => $param->{optional},
     )
 }
 
@@ -120,7 +121,7 @@ sub _assert_valid_interface {
             ;
         )
         $PPR::GRAMMAR
-    }sx or croak "Invalid interface";
+    }sx or confess "Invalid interface";
 
     my %match;
     $match{statement} = $+{statement};

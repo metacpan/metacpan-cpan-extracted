@@ -1,4 +1,5 @@
-package CheckSubCalled;
+package
+   CheckSubCalled;
 
 use strict;
 use warnings;

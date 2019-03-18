@@ -52,6 +52,6 @@ $func = Data::Object::Func::Number::Exp->new(
 
 my $result = $func->execute;
 
-is_deeply $result, 2.71828182845905;
+like $result, qr/2.71828/;
 
 ok 1 and done_testing;

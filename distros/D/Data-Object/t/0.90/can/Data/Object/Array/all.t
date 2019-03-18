@@ -41,8 +41,8 @@ use_ok 'Data::Object::Array';
 
 my $data = Data::Object::Array->new([2..5]);
 
-is_deeply $data->all('$value > 1'), 1;
+is_deeply $data->all(sub { $_[0] > 1 }), 1;
 
-is_deeply $data->all('$value > 3'), 0;
+is_deeply $data->all(sub { $_[0] > 3 }), 0;
 
 ok 1 and done_testing;

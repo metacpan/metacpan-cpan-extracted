@@ -1,6 +1,19 @@
 History file for ack.  https://beyondgrep.com/
 
 
+2.26    Sun Mar 17 22:00:00 CDT 2019
+====================================
+[ENHANCEMENTS]
+Added --help-colors and --help-rgb-colors options to display colors
+available for color options.
+
+Clarified the docs for --lines option. Thanks, Rob Hoelz.  (GH #673)
+
+[FIXES]
+Use File::Temp for temp files during tests on Win32.  Thanks, Tim Gim Yee.
+(GH #671)
+
+
 2.24    Thu Jun 21 22:41:49 CDT 2018
 ====================================
 No changes since 2.23_03.

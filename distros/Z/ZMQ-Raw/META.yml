@@ -25,49 +25,49 @@ name: ZMQ-Raw
 provides:
   ZMQ::Raw:
     file: lib/ZMQ/Raw.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Context:
     file: lib/ZMQ/Raw/Context.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Curve:
     file: lib/ZMQ/Raw/Curve.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Error:
     file: lib/ZMQ/Raw/Error.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Loop:
     file: lib/ZMQ/Raw/Loop.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Loop::Event:
     file: lib/ZMQ/Raw/Loop/Event.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Loop::Handle:
     file: lib/ZMQ/Raw/Loop/Handle.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Loop::Promise:
     file: lib/ZMQ/Raw/Loop/Promise.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Loop::Timer:
     file: lib/ZMQ/Raw/Loop/Timer.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Message:
     file: lib/ZMQ/Raw/Message.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Poller:
     file: lib/ZMQ/Raw/Poller.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Proxy:
     file: lib/ZMQ/Raw/Proxy.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Socket:
     file: lib/ZMQ/Raw/Socket.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Timer:
     file: lib/ZMQ/Raw/Timer.pm
-    version: '0.29'
+    version: '0.30'
   ZMQ::Raw::Z85:
     file: lib/ZMQ/Raw/Z85.pm
-    version: '0.29'
+    version: '0.30'
 requires:
   Carp: '0'
   Scalar::Util: '0'
@@ -80,7 +80,7 @@ requires:
 resources:
   bugtracker: https://github.com/jacquesg/p5-ZMQ-Raw/issues
   repository: git://github.com/jacquesg/p5-ZMQ-Raw.git
-version: '0.29'
+version: '0.30'
 x_Dist_Zilla:
   perl:
     version: '5.026003'
@@ -161,7 +161,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^:^v(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.21.0
           repo_root: .
       name: '@Author::ALEXBIO/Git::NextVersion'
       version: '2.045'
@@ -232,7 +232,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -245,11 +245,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.29
+          tag: v0.30
           tag_format: v%v
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -263,7 +263,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.19.1
+          git_version: 2.21.0
           repo_root: .
       name: '@Author::ALEXBIO/Git::Push'
       version: '2.045'

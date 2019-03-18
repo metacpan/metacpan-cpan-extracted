@@ -14,7 +14,7 @@ has arg1 => (
 
 has arg2 => (
   is => 'ro',
-  isa => 'Str | CodeRef',
+  isa => 'CodeRef',
   req => 1
 );
 
@@ -34,8 +34,8 @@ sub execute {
   for (my $i = 0; $i < @$data; $i++) {
     my $index = $i;
     my $value = $data->[$i];
-    my $refs = {'$index' => \$index, '$value' => \$value};
-    $self->codify($code, $refs)->($index, @args);
+
+    $code->($index, @args);
   }
 
   return $data;

@@ -20,7 +20,7 @@ has arg2 => (
 
 has arg3 => (
   is => 'ro',
-  isa => 'Str | CodeRef',
+  isa => 'CodeRef',
   req => 1
 );
 
@@ -48,13 +48,10 @@ sub execute {
       my $key   = $keys[$pos];
       my $value = defined($key) ? $data->{$key} : undef;
 
-      $refs->{"\$key${i}"}   = $key   if defined $key;
-      $refs->{"\$value${i}"} = $value if defined $value;
-
       push @values, $value;
     }
 
-    $self->codify($code, $refs)->(@values, @args);
+    $code->(@values, @args);
   }
 
   return $data;

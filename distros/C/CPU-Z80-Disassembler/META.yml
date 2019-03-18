@@ -1,36 +1,33 @@
-{---}
-{abstract: 'Disassemble the flow of a Z80 program'}
-{author:}
-{  - 'Paulo Custodio <pscust@cpan.org>'}
-{build_requires:}
-{  ExtUtils::MakeMaker: '0'}
-{configure_requires:}
-{  ExtUtils::MakeMaker: '0'}
-{dynamic_config: 1}
-{generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'}
-{license: unknown}
-{meta-spec:}
-{  url: http://module-build.sourceforge.net/META-spec-v1.4.html}
-{  version: '1.4'}
-{name: CPU-Z80-Disassembler}
-{no_index:}
-{  directory:}
-{    - t}
-{    - inc}
-{requires:}
-{  Asm::Z80::Table: '0.02'}
-{  Bit::Vector: '7.1'}
-{  CPU::Z80::Assembler: '2.13'}
-{  Carp: '0'}
-{  Class::XSAccessor: '1.08'}
-{  File::Basename: '0'}
-{  File::Slurp: '9999.12'}
-{  Getopt::Std: '0'}
-{  Test::More: '0.96'}
-{  Test::Output: '0.16'}
-{  Tie::File: '0.96'}
-{  perl: '5.01'}
-{resources:}
-{  repository: git://github.com/pauloscustodio/perl-CPU-Z80-Disassembler.git}
-{version: '0.05'}
-{x_serialization_backend: 'CPAN::Meta::YAML version 0.016'}
+---
+abstract: 'Disassemble the flow of a Z80 program'
+author:
+  - 'Paulo Custodio <pscust@cpan.org'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPU-Z80-Disassembler
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Asm::Z80::Table: '0.03'
+  Bit::Vector: '7.4'
+  CPU::Z80::Assembler: '2.16'
+  Class::Accessor: '0.51'
+  File::Slurp: '9999.26'
+  Path::Tiny: '0.108'
+  Test::More: '1.302162'
+  Test::Output: '1.031'
+  Tie::File: '1'
+  perl: '5.01'
+resources: {}
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

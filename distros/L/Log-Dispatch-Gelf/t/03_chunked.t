@@ -112,6 +112,20 @@ new_ok ( 'Log::Dispatch', [
     ]
 );
 
+new_ok ( 'Log::Dispatch', [
+        outputs => [
+            [
+                'Gelf',
+                min_level => 'debug',
+                'socket'  => {
+                    host     => 'test',
+                    protocol => 'tcp',
+                }
+            ]
+        ]
+    ]
+);
+
 my $log = Log::Dispatch->new(
     outputs => [
         [
@@ -159,4 +173,4 @@ is($msg->{level},         6,                                     'correct level 
 is($msg->{short_message}, 'Compressed - chunked',                'short_message correct');
 is($msg->{full_message},  "Compressed - chunked\nMore details.", 'full_message correct');
 
-done_testing(11);
+done_testing(12);

@@ -1,7 +1,7 @@
 /*
  * SSH2.xs - C functions for Net::SSH2
  *
- * D. Robins, 20051022
+ * Authors: D. Robins, Rafael Kitover, Salvador Fandiño
  */
 
 #include "EXTERN.h"
@@ -2204,7 +2204,7 @@ PREINIT:
     LIBSSH2_SFTP_ATTRIBUTES attrs;
 PPCODE:
     pv_path = SvPVbyte(path, len_path);
-    error = !libssh2_sftp_stat_ex(sf->sftp, (char*)pv_path, len_path,
+    error = libssh2_sftp_stat_ex(sf->sftp, (char*)pv_path, len_path,
                                   (follow ? LIBSSH2_SFTP_STAT : LIBSSH2_SFTP_LSTAT),
                                   &attrs);
     if (error < 0)

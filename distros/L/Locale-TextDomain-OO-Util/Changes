@@ -1,5 +1,10 @@
 Revision history for Perl extension Locale::TextDomain:OO::Util.
 
+4.002  Fri Mar 15 22:39:33 2019
+- added $Test::Differences::NoDeparse = 1;
+  to have equal behaviour
+  https://rt.cpan.org/Ticket/Display.html?id=128843
+
 4.001  Mon Jun  4 16:54:05 2018
 - removed module Safe (parse formula and break in case of wrong)
 - also removed related method patch_safe_module

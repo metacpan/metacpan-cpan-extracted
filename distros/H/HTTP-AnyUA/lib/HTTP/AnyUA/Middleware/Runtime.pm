@@ -5,7 +5,7 @@ package HTTP::AnyUA::Middleware::Runtime;
 use warnings;
 use strict;
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 use parent 'HTTP::AnyUA::Middleware';
 
@@ -55,7 +55,7 @@ HTTP::AnyUA::Middleware::Runtime - Middleware to determine response time
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 
@@ -91,7 +91,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2019 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

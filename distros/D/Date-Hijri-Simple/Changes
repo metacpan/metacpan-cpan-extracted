@@ -1,5 +1,8 @@
 Revision history for Date::Hijri::Simple
 
+0.21  Sat Mar 16 04:00:00 2019
+      - Updated dependency on Date::Utils v0.25.
+
 0.20  Sat Mar 17 23:25:00 2018
       - Used namespace::autoclean instead.
 

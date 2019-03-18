@@ -1,39 +1,140 @@
-Sub::Called
-===========
+NAME
 
-INSTALLATION
+    Sub::Called - get information about how the subroutine is called
 
-To install this module, run the following commands:
+VERSION
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+    version 0.04
 
+SYNOPSIS
 
-SUPPORT AND DOCUMENTATION
+        use Sub::Called;
+        
+        sub test {
+            if( Sub::Called::with_ampersand() ){
+                print "you called this subroutine this way: &test\n",
+                      "note that this disables prototypes!\n";
+            }
+        }
+    
+    
+        use Sub::Called 'already_called', 'not_called';
+        
+        sub user {
+            unless (already_called) {   # only gets called once
+                My::Fixtures::Users->load;
+            }
+            ...
+        }
+        
+        sub schema {
+            if ( not_called ) {
+                # setup schema
+            }
+            else {
+                return $schema;
+            }
+        }
 
-After installing, you can find documentation for this module with the perldoc command.
+EXPORTS
 
-    perldoc Sub::Called
+    There are no subroutines exported by default, but you can export all
+    subroutines explicitly
 
-You can also look for information at:
+      use Sub::Called qw(with_ampersand already_called not_called);
 
-    Search CPAN
-        http://search.cpan.org/dist/Sub-Called
+ already_called
 
-    CPAN Request Tracker:
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sub-Called
+    This function must be called from inside a subroutine. It will return
+    false if the subroutine has not yet been called. It will only return
+    false once.
 
-    AnnoCPAN, annotated CPAN documentation:
-        http://annocpan.org/dist/Sub-Called
+    This subroutine is only exported on demand.
 
-    CPAN Ratings:
-        http://cpanratings.perl.org/d/Sub-Called
+ not_called
 
-COPYRIGHT AND LICENCE
+    This function must be called from inside a subroutine. It returns the
+    opposite value of already_called. Aside from this, there is no
+    difference. You may find aesthetically more pleasing.
 
-Copyright (C) 2008 Renee Baecker
+    This subroutine is only exported on demand.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+ with_ampersand
+
+    This function must be called from inside a subroutine. It returns 1 if
+    the subroutine was called with an ampersand (e.g. &subroutine()).
+
+    This subroutine is only exported on demand.
+
+FUNCTIONS
+
+ with_ampersand
+
+ already_called
+
+ not_called
+
+LIMITATIONS / TODO
+
+    There are limitations and I don't know if I can solve these "problems".
+    So this section is also named "TODO". If you know a solution for any of
+    these limitations, please let me know.
+
+ Subroutine References
+
+    It seems that there are some problems with subroutine references.
+
+    This may not work:
+
+      sub test2 {
+          if( Sub::Called::with_ampersand() ){
+              die "die hard";
+          }
+      };
+        
+      my $sub2 = main->can( 'test2' );
+      &$sub2();
+
+ Inside a module
+
+    If you call subroutines in a module but outside any subroutine (so the
+    subroutine calls are executed when the module is loaded), I cannot give
+    a correct answer ;-)
+
+      package Check;
+      
+      use strict;
+      use warnings;
+      use Sub::Called qw(with_ampersand);
+      
+      &test;
+      
+      sub test {
+          if( with_ampersand() ){
+              print "yada yada yada\n";
+          }
+      }
+
+CONTRIBUTORS
+
+    Renee Baecker, <module at renee-baecker.de>
+
+    Curtis "Ovid" Poe, <ovid at cpan.org>
+
+ISSUE TRACKER & CODE REPOSITORY
+
+    An issue tracker and the code repository are available at
+    http://github.com/reneeb/Sub-Called.
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2008 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

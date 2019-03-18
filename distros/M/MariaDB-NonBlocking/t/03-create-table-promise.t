@@ -6,9 +6,10 @@ no warnings 'once';
 
 use Test::More;
 use AnyEvent;
-use Promises qw/collect/;
+use AnyEvent::XSPromises qw/collect/;
 use MariaDB::NonBlocking::Promises;
 use Data::Dumper;
+AnyEvent::detect();
 
 use lib 't', '.';
 require 'lib.pl';
@@ -42,7 +43,7 @@ my $connect_args = {
 };
 my $test_database = $::testdb || 'mariadb_perl_test';
 
-my $conn = MariaDB::NonBlocking::Promises->init;
+my $conn = MariaDB::NonBlocking::Promises->new;
 my $create_database_sql = sprintf(CREATE_DATABASE_FMT, $test_database);
 my $p = $conn->connect($connect_args)->then(sub {
     my ($conn) = @_;

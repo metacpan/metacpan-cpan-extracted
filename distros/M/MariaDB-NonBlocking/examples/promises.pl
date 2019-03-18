@@ -4,8 +4,10 @@ use strict;
 use warnings;
 
 use blib;
-use Promises qw(collect);
+use AnyEvent::XSPromises qw(collect);
 use MariaDB::NonBlocking::Promises;
+
+AnyEvent::detect();
 
 # methinks collect() has a (doc?) bug
 #perl -MPromises=collect,deferred -MAnyEvent -E 'my ($x, $y) = map deferred, 1..2; my $cv = AnyEvent->condvar; collect($x->promise, $y->promise)->then(sub { say "All finished: @_"; $cv->send; }, sub { say "Error! @_"; $cv->send; }); my @w = ( AnyEvent->timer(after => 1, cb => sub { say "Resolving X"; $x->reject("X") }), AnyEvent->timer(after => 2, cb => sub { say "Resolving Y"; $y->resolve("Y") })); $cv->recv; say "End!"'
@@ -17,7 +19,7 @@ use MariaDB::NonBlocking::Promises;
 # the handles can be safely reused
 sub collect_all_resolve_or_reject {
     my $remaining = @_;
-    my $deferred  = Promises::deferred;
+    my $deferred  = AnyEvent::XSPromises::deferred;
     my (@results, @errors);
 
     foreach my $idx ( 0..$#_ ) {
@@ -73,7 +75,7 @@ sub run_queries {
     my @promises;
     for (1..3) {
         # Create 9 connections to mysql (3 promises with 3 connections each)
-        my $connection = MariaDB::NonBlocking::Promises->init;
+        my $connection = MariaDB::NonBlocking::Promises->new;
 
         # Used during error handling to disconnect everything early
         push @all_connections, $connection;

@@ -3,7 +3,7 @@ package Locale::TextDomain::OO::Util;
 use strict;
 use warnings;
 
-our $VERSION = '4.001';
+our $VERSION = '4.002';
 
 1;
 
@@ -15,9 +15,9 @@ Locale::TextDomain::OO::Util - Lexicon utils
 
 =head1 VERSION
 
-4.001
+4.002
 
-$Id: Util.pm 673 2017-07-19 11:02:10Z steffenw $
+$Id: Util.pm 715 2018-06-04 15:08:31Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util.pm $
 
@@ -82,7 +82,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2015 - 2018,
+Copyright (c) 2015 - 2019,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

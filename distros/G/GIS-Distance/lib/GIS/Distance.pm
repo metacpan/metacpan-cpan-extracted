@@ -1,22 +1,12 @@
 package GIS::Distance;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
-
-use Class::Measure::Length qw( length );
-use Carp qw( croak );
-use Scalar::Util qw( blessed );
-use namespace::clean;
+our $VERSION = '0.17';
 
 sub new {
     my ($class, $formula, @args) = @_;
 
     $formula ||= 'Haversine';
-
-    my $self = bless {
-        formula => $formula,
-        args    => \@args,
-    }, $class;
 
     my @modules;
     push @modules, "GIS::Distance::Fast::${formula}"
@@ -25,61 +15,30 @@ sub new {
     push @modules, $formula;
 
     foreach my $module (@modules) {
-        my $code = $module->can('distance');
+        next if !_try_load_module( $module );
+        next if !$module->isa('GIS::Distance::Formula');
 
-        if (!$code) {
-            local $@;
-            my $loaded_ok = eval( "require $module; 1" );
-
-            if (!$loaded_ok) {
-                die $@ if $@ !~ m{^Can't locate};
-                next;
-            }
-
-            $code = $module->can('distance');
-            die "$module does not have a distance() function" if !$code;
-        }
-
-        $self->{module} = $module;
-        $self->{code} = $code;
-        last;
+        return $module->new( @args );
     }
 
-    die "Cannot find a GIS::Distance formula module for $formula"
-        if !$self->{code};
-
-    return $self;
+    die "Cannot find a GIS::Distance::Formula class for $formula";
 };
 
-sub formula { $_[0]->{formula} }
-sub args { $_[0]->{args} }
-sub module { $_[0]->{module} }
+my %tried_modules;
 
-sub distance {
-    my $self = shift;
+sub _try_load_module {
+    my ($module) = @_;
 
-    my @coords;
-    foreach my $coord (@_) {
-        if ((blessed($coord)||'') eq 'Geo::Point') {
-            push @coords, $coord->latlong();
-            next;
-        }
+    return $tried_modules{ $module }
+        if defined $tried_modules{ $module };
 
-        push @coords, $coord;
-    }
+    $tried_modules{ $module } = 1;
+    my $ok = eval( "require $module; 1" );
+    return 1 if $ok;
 
-    croak 'Invalid arguments passsed to distance()'
-        if @coords!=4;
-
-    return length(
-        $self->{code}->( @coords, @{$self->{args}} ),
-        'km',
-    );
-}
-
-sub distance_metal {
-    my $self = shift;
-    return $self->{code}->( @_ );
+    $tried_modules{ $module } = 0;
+    die $@ if $@ !~ m{^Can't locate};
+    return 0;
 }
 
 1;
@@ -155,23 +114,25 @@ Does no argument checking.
 
 =item *
 
-Does not support formula L</args>, which are needed by at least the
-L<GIS::Distance::GeoEllipsoid> formula.
+Does not support L</formula_args>, which are supported by at least the
+L<GIS::Distance::GeoEllipsoid> formula.  Read more in the L</SPEED> section.
 
 =back
 
 Calling this gets you pretty close to the fastest bare metal speed you can get.
-The speed improvements of calling this is noticeable over millions of iterations
-only and you've got to decide if its worth the safety and features you are dropping.
+The speed improvements of calling this is noticeable over hundreds of thousands of
+iterations only and you've got to decide if its worth the safety and features
+you are dropping.
 
-=head1 ATTRIBUTES
+=head1 ARGUMENTS
 
-=head2 formula
+    my $gis = GIS::Distance->new( $formula );
 
-Returns the formula name which was passed as the first argument to C<new()>.
+When you call C<GIS::Distance->new()> you may pass a partial or full formula
+class name as the first argument.  If you do not specify a formula then this
+defaults to C<Haversive>.
 
-The formula can be specified as a partial or full module name for that
-formula.  For example, if the formula is set to C<Haversine> as in:
+If you pass a partial name, as in:
 
     my $gis = GIS::Distance->new( 'Haversine' );
 
@@ -186,19 +147,11 @@ the C<Fast::> versions of the formulas, written in C, are not available and the
 pure perl ones will be used instead.  If you would like the C<Fast::> formulas
 then install L<GIS::Distance::Fast> and they will be automatically used.
 
-You may disable the automatic use of the C<Fast::> formulas by setting the
-C<GIS_DISTANCE_PP> environment variable.
+You may globally disable the automatic use of the C<Fast::> formulas by setting
+the C<GIS_DISTANCE_PP> environment variable.  Although, its likely simpler to
+just provide a full class name to get the same effect:
 
-=head2 args
-
-Returns the formula arguments, an array ref, containing the rest of the
-arguments passed to C<new()> (anything passed after the L</formula>).
-Most formulas do not take arguments.  If they do it will be described in
-their respective documentation.
-
-=head2 module
-
-Returns the fully qualified module name that L</formula> resolved to.
+    my $gis = GIS::Distance->new( 'GIS::Distance::Haversine' );
 
 =head1 SPEED
 
@@ -211,37 +164,44 @@ PP formulas.
 
 Use L</distance_metal> instead of L</distance>.
 
-Call the undocumented C<distance()> function that each formula module
+Call the undocumented C<_distance()> function that each formula class
 has.  For example you could bypass this module entirely and just do:
 
     use GIS::Distance::Fast::Haversine;
-    my $km = GIS::Distance::Fast::Haversine::distance( @coords );
+    my $km = GIS::Distance::Fast::Haversine::_distance( @coords );
 
 The above would be the ultimate speed demon (as shown in benchmarking)
 but throws away some flexibility and adds some foot-gun support.
 
-Here's some benchmarks for these options:
+Here's a benchmarks for these options:
 
-    PP Haversine - GIS::Distance->distance                   125913/s
-    XS Haversine - GIS::Distance->distance                   203335/s
-    PP Haversine - GIS::Distance->distance_metal             366569/s
-    PP Haversine - GIS::Distance::Haversine::distance        390320/s
-    XS Haversine - GIS::Distance->distance_metal            3289474/s
-    XS Haversine - GIS::Distance::Fast::Haversine::distance 8064516/s
+    2019-03-13T09:34:00Z
+    GIS::Distance 0.15
+    GIS::Distance::Fast 0.12
+    GIS::Distance::Fast::Haversine 0.12
+    GIS::Distance::Haversine 0.15
+                                                                 Rate
+    PP Haversine - GIS::Distance->distance                   123213/s
+    XS Haversine - GIS::Distance->distance                   196232/s
+    PP Haversine - GIS::Distance->distance_metal             356379/s
+    PP Haversine - GIS::Distance::Haversine::_distance       385208/s
+    XS Haversine - GIS::Distance->distance_metal             3205128/s
+    XS Haversine - GIS::Distance::Fast::Haversine::_distance 8620690/s
 
 You can run your own benchmarks using the included C<author/bench>
 script.  The above results were produced with:
 
     author/bench -f Haversine
 
-Even the slowest result was C<125913/s>, which is C<125.913/ms>, which
-means each call took about C<0.0079ms>.
+The slowest result was about C<125000/s>, or about C<8ms> each call.
+This could be a substantial burden in some contexts, such as live HTTP
+responses to human users and running large batch jobs, to name just two.
 
 In conclusion, if you can justify the speed gain, switching to
-L</distance_metal> and installing L<GIS::Distance::Fast>, seems
-the ideal setup.
+L</distance_metal> and installing L<GIS::Distance::Fast> looks to be an
+ideal setup.
 
-As always, YMMV.
+As always with performance and benchmarking, YMMV.
 
 =head1 COORDINATES
 
@@ -260,7 +220,7 @@ rad2deg function.
 
 =head1 FORMULAS
 
-These formulas come with this distribution:
+These formulas come bundled with this distribution:
 
 =over
 
@@ -304,33 +264,18 @@ These formulas are available on CPAN:
 
 =item *
 
-L<GIS::Distance::Fast::ALT>
-
-=item *
-
-L<GIS::Distance::Fast::Cosine>
-
-=item *
-
-L<GIS::Distance::Fast::GreatCircle>
-
-=item *
-
-L<GIS::Distance::Fast::Haversine>
-
-=item *
-
-L<GIS::Distance::Fast::Polar>
-
-=item *
-
-L<GIS::Distance::Fast::Vincenty>
+L<GIS::Distance::Fast/FORMULAS>
 
 =item *
 
 L<GIS::Distance::GeoEllipsoid>
 
 =back
+
+=head1 AUTHORING
+
+Take a look at L<GIS::Distance::Formula> for instructions on authoring
+new formula classes.
 
 =head1 SEE ALSO
 
@@ -342,8 +287,8 @@ L<Geo::Distance> - Is deprecated in favor of using this module.
 
 =item *
 
-L<Geo::Distance::Google> - While in the Geo::Distance, namespace this isn't
-actually related to Geo::Distance at all.  Might be useful.
+L<Geo::Distance::Google> - While in the Geo::Distance namespace, this isn't
+actually related to Geo::Distance at all.  Might be useful though.
 
 =item *
 

@@ -11,6 +11,7 @@ lib/GIS/Distance.pm
 lib/GIS/Distance/ALT.pm
 lib/GIS/Distance/Constants.pm
 lib/GIS/Distance/Cosine.pm
+lib/GIS/Distance/Formula.pm
 lib/GIS/Distance/GreatCircle.pm
 lib/GIS/Distance/Haversine.pm
 lib/GIS/Distance/MathTrig.pm

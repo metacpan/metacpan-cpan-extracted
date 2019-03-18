@@ -23,31 +23,31 @@ sub result {
     my $result = shift;
 
     my $type = $result->type;
-    if( $type eq 'plan'){
+    if ($type eq 'plan') {
         $self->handle_plan($result);
     }
-    elsif( $type eq 'pragma'){
+    elsif ($type eq 'pragma') {
         $self->handle_pragma($result);
     }
-    elsif( $type eq 'test'){
+    elsif ($type eq 'test') {
         $self->handle_test($result);
     }
-    elsif( $type eq 'comment'){
+    elsif ($type eq 'comment') {
         $self->handle_comment($result);
     }
-    elsif( $type eq 'bailout'){
+    elsif ($type eq 'bailout') {
         $self->handle_bailout($result);
     }
-    elsif( $type eq 'version'){
+    elsif ($type eq 'version') {
         $self->handle_version($result);
     }
-    elsif( $type eq 'unknown'){
+    elsif ($type eq 'unknown') {
         $self->handle_unknown($result);
     }
-    elsif( $type eq 'yaml'){
+    elsif ($type eq 'yaml') {
         $self->handle_yaml($result);
     }
-    else{
+    else {
         die "Unknown type: $type";
     }
 }
@@ -67,8 +67,18 @@ sub close_pending_test {
     }
     $self->set_last_time;
     my $test_output = join "\n", @{$pending_test->{output}};
-    if( $pending_test->{is_ok}){
-        if( length $test_output > 0 && $test_output ne "\n"){
+    $test_output //= "";
+    $test_output =~ s{(\A\n+|\n+\z)}{}gs;
+    if ($pending_test->{is_ok}) {
+        if ($pending_test->{is_skip}) {
+            builder->test_ignored(
+                $pending_test->{name},
+                $test_output,
+                $pending_test->{nodeId},
+                $pending_test->{parentNodeId},
+            );
+        }
+        elsif (length $test_output > 0) {
             builder->stderr(
                 $pending_test->{name},
                 $test_output,
@@ -118,6 +128,7 @@ sub start_test {
         name         => $test_name,
         duration     => $ENV{TAP_FORMATTER_CAMELCADE_DURATION} // $test_duration,
         is_ok        => $test->is_ok,
+        is_skip      => $test->has_directive,
         output       => [],
         explanation  => $test->explanation,
         nodeId       => $self->generate_test_id($test_name),
@@ -128,10 +139,10 @@ sub start_test {
 
 sub set_last_time {
     my $self = shift;
-    $self->{last_time} = time ;
+    $self->{last_time} = time;
 }
 
-sub get_last_time{
+sub get_last_time {
     my $self = shift;
     return $self->{last_time} // time;
 }
@@ -145,15 +156,26 @@ sub _compute_test_name {
     shift;
     #@type TAP::Parser::Result::Test
     my $result = shift;
-
+    my $base_name = "";
     my $description = $result->description;
-    my $test_name = $description eq q{} ? $result->explanation : $description;
-    $test_name =~ s/^-\s//;
-    $test_name = 'Unnamed test (#' . $result->number . ')' if $test_name eq q{};
-    return $test_name;
+    my $explanation = $result->explanation;
+    if( $description ){
+        $base_name = $description;
+        if( $explanation ){
+            $base_name .= " ($explanation)";
+        }
+    }
+    elsif( $explanation){
+        $base_name = $explanation;
+    }
+
+    $base_name =~ s/^-\s//;
+    $base_name ||= 'Unnamed test (#' . $result->number . ')';
+    my $directive = $result->directive // "";
+    return join" ", ($directive ? ($directive) : ()), $base_name;
 }
 
-sub handle_plan{
+sub handle_plan {
     my $self = shift;
     #@type TAP::Parser::Result::Plan
     my $result = shift;
@@ -164,7 +186,7 @@ sub handle_plan{
     }
 }
 
-sub handle_pragma{
+sub handle_pragma {
     my $self = shift;
     #@type TAP::Parser::Result::Pragma
     my $result = shift;
@@ -177,7 +199,7 @@ Invoked for every test result
 
 =cut
 
-sub handle_test{
+sub handle_test {
     my $self = shift;
     #@type TAP::Parser::Result::Test
     my $result = shift;
@@ -191,7 +213,7 @@ sub handle_test{
     }
 }
 
-sub handle_comment{
+sub handle_comment {
     my $self = shift;
     #@type TAP::Parser::Result::Comment
     my $result = shift;
@@ -212,21 +234,21 @@ sub handle_comment{
     }
 }
 
-sub handle_bailout{
+sub handle_bailout {
     my $self = shift;
     #@type TAP::Parser::Result::Bailout
     my $result = shift;
     $self->process_as_comment($result);
 }
 
-sub handle_version{
+sub handle_version {
     my $self = shift;
     #@type TAP::Parser::Result::Version
     my $result = shift;
     $self->process_as_comment($result);
 }
 
-sub handle_unknown{
+sub handle_unknown {
     my $self = shift;
     #@type TAP::Parser::Result::Unknown
     my $result = shift;
@@ -249,7 +271,7 @@ sub handle_unknown{
     elsif ($raw =~ /^\s+# Subtest: (.+)$/) {
         $self->start_subtest($1);
     }
-    elsif( $raw =~ /^\s*\d+\.\.\d+$/){
+    elsif ($raw =~ /^\s*\d+\.\.\d+$/) {
         # ignore
     }
     else {
@@ -272,7 +294,7 @@ sub process_as_comment {
     }));
 }
 
-sub handle_yaml{
+sub handle_yaml {
     my $self = shift;
     #@type TAP::Parser::Result::YAML
     my $result = shift;
@@ -300,7 +322,7 @@ sub _initialize {
     return $self;
 }
 
-sub start_suite{
+sub start_suite {
     my $self = shift;
     my $name = shift;
     my $location = shift;
@@ -318,15 +340,15 @@ sub generate_suite_id {
     my $self = shift;
     my $name = shift;
     my $location = shift;
-    my $new_id = join '-', $location || $name, $ENV{TAP_FORMATTER_CAMELCADE_DURATION} ? (): ($$, time), $self->{counter}++;
-    return $ENV{TAP_FORMATTER_CAMELCADE_DURATION} ? $new_id: md5_hex($new_id);
+    my $new_id = join '-', $location || $name, $ENV{TAP_FORMATTER_CAMELCADE_DURATION} ? () : ($$, time), $self->{counter}++;
+    return $ENV{TAP_FORMATTER_CAMELCADE_DURATION} ? $new_id : md5_hex($new_id);
 }
 
 sub generate_test_id {
     my $self = shift;
     my $name = shift;
     my $new_id = join '-', $self->get_parent_node_id, $name, $self->{counter}++;
-    return $ENV{TAP_FORMATTER_CAMELCADE_DURATION} ? $new_id: md5_hex($new_id);
+    return $ENV{TAP_FORMATTER_CAMELCADE_DURATION} ? $new_id : md5_hex($new_id);
 }
 
 sub get_current_suite {
@@ -343,7 +365,7 @@ sub get_parent_node_id {
     return defined $current_suite ? $current_suite->{nodeId} : 0;
 }
 
-sub finish_suite{
+sub finish_suite {
     my $self = shift;
     $self->close_pending_test;
 

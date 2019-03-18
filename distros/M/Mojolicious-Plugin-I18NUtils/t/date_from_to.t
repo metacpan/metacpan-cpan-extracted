@@ -47,5 +47,11 @@ for my $lang ( sort keys %tests ) {
     $t->get_ok( "/?lang=$lang&date=$date" )->status_is( 200 )->content_is( '2014-12-10', "test language $lang" );
 }
 
+{
+    my $c = $t->app->build_controller;
+    my $date = $c->date_from_to( '10.12.2014', 'de', 'us');
+    is $date, '10/12/2014';
+}
+
 done_testing();
 

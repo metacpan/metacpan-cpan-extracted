@@ -1,5 +1,3 @@
-# $Id$
-
 package CPU::Z80::Disassembler;
 
 #------------------------------------------------------------------------------
@@ -22,7 +20,9 @@ use CPU::Z80::Disassembler::Instruction;
 use CPU::Z80::Disassembler::Format;
 use CPU::Z80::Disassembler::Labels;
 
-our $VERSION = '0.05';
+use Path::Tiny;
+
+our $VERSION = '0.06';
 
 #------------------------------------------------------------------------------
 
@@ -56,6 +56,9 @@ our $VERSION = '0.05';
   $dis->relative_arg($addr, $label_name);
   $dis->ix_base($addr);
   $dis->iy_base($addr);
+  
+  $dis->create_control_file($ctl_file, $bin_file, $addr, $arch);
+  $dis->load_control_file($ctl_file);
 
 =head1 DESCRIPTION
 
@@ -127,9 +130,8 @@ Causes the disassembly to dump:
 
 #------------------------------------------------------------------------------
 # Hold a disassembly session
-use Class::XSAccessor {
-	constructor	=> '_new',
-	accessors => [ 
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'memory',		# memory to disassemble
 		'_type',		# identified type of each memory address, TYPE_xxx
 		'instr',		# array of Instruction objects at each address
@@ -148,8 +150,7 @@ use Class::XSAccessor {
 						# header and footer sections of disassembled file
 		'ix_base', 'iy_base',
 						# base addess for (IX+DIS) and (IY+DIS)
-	],
-};
+);
 
 use constant TYPE_UNKNOWN	=> '-';
 use constant TYPE_CODE		=> 'C';
@@ -166,14 +167,14 @@ sub new {
 	my $memory = CPU::Z80::Disassembler::Memory->new;
 	my $type   = CPU::Z80::Disassembler::Memory->new;
 	my $labels = CPU::Z80::Disassembler::Labels->new;
-	return $class->_new(memory 			=> $memory, 
-						_type 			=> $type, 
-						instr 			=> [],
-						labels			=> $labels,
-						_call_instr		=> {},
-						_can_call		=> {},
-						_block_comments	=> [],
-					);
+	return bless {	memory 			=> $memory, 
+					_type 			=> $type, 
+					instr 			=> [],
+					labels			=> $labels,
+					_call_instr		=> {},
+					_can_call		=> {},
+					_block_comments	=> [],
+				}, $class;
 }
 #------------------------------------------------------------------------------
 
@@ -602,7 +603,7 @@ sub get_type {
 
 =head2 set_call
 
-Declates a subroutine at the given address, either with no stack impact
+Declares a subroutine at the given address, either with no stack impact
 (if 1 is passed as argument) or with a stack impact to be computed by the
 given code reference. This function is called with $self and the address
 after the call instruction as arguments and should return the next address(es)
@@ -800,7 +801,7 @@ sub _check_call {
 
 #------------------------------------------------------------------------------
 
-=head2 defb, defw, defm, defmz, defm7
+=head2 defb, defb2, defw, defm, defmz, defm7
 
 Declares the given address as a def* instruction
 with an optional label.
@@ -825,6 +826,11 @@ sub _def {
 sub defb {
 	my($self, $addr, $count, $label) = @_;
 	$self->_def('defb', 'set_type_byte', $addr, $count, $label);
+}
+
+sub defb2 {
+	my($self, $addr, $count, $label) = @_;
+	$self->_def('defb2', 'set_type_byte', $addr, $count, $label);
 }
 
 sub defw {
@@ -859,7 +865,11 @@ Creates a block comment to insert before the given address.
 sub block_comment {
 	my($self, $addr, $block_comment) = @_;
 	
-	$self->_block_comments->[$addr] = $block_comment;
+	if (defined $block_comment) {
+		chomp($block_comment);
+		$self->_block_comments->[$addr] ||= "";
+		$self->_block_comments->[$addr] .= "$block_comment\n";
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -879,7 +889,9 @@ sub line_comments {
 		my $instr = $self->instr->[$addr];
 		croak("Cannot set comment of unknown instruction at ".format_hex4($addr))
 			unless $instr;
-		$instr->comment($_);
+		my $old_comment = $instr->comment // "";
+		$old_comment .= "\n" if $old_comment;
+		$instr->comment($old_comment . $_);
 		$addr += $instr->size;
 	}
 }
@@ -893,6 +905,328 @@ Label name can be '$' for a value relative to the instruction pointer.
 
 =cut
 
+#------------------------------------------------------------------------------
+
+=head2 create_control_file
+
+  $dis->create_control_file($ctl_file, $bin_file, $addr, $arch);
+
+Creates a new control file for the given input binary file, starting at the given address
+and for the given architecture. 
+
+The address defaults to zero, and the architecture to undefined. The architecture may be
+implemented in the future, for example to define system variable equates for the given
+architecture.
+
+It is an error to overwrite a control file.
+
+The Control File is the input file for a disassembly run in an interactive disassembly
+session, and the outout is the <bin_file>.asm. After each run, the user studies the output
+.asm file, and includes new commands in the control file to add information to the 
+.asm file on the next run.
+
+This function creates a template control file that contains just the hex dump of the 
+binary file and the decoded assembly instruction at each address, e.g.
+
+  0000                         :F <bin_file>
+  0000 D3FD       out ($FD),a
+  0002 01FF7F     ld bc,$7FFF
+  0005 C3CB03     jp $03CB
+
+The control file commands start with a ':' and refer to the hexadecimal address at the 
+start of the line. 
+
+Some commands operate on a range of addresses and accept the inclusive range limits separated
+by a single '-'.
+
+A line starting with a blank uses the same address as the previous command.
+
+A semicolon starts a comment in the control file.
+
+  0000      :;        define next address as 0x0000
+            :<cmd>  ; <cmd> at the same address 0x0000
+  0000-001F :B      ; define a range address of bytes
+
+The dump between the address and the ':' is ignored and is helpfull as a guide while adding 
+information to the control file.
+
+=head2 load_control_file
+
+  $dis->load_control_file($ctl_file);
+
+Load the control file created by <create_control_file> and subsequently edited by the user
+and create a new .asm disassembly file.
+
+=head1 Control File commands
+
+=head2 Include
+
+Include another control file at the current location.
+
+  #include vars.ctl
+
+=head2 File
+
+Load a binary file at the given address.
+
+  0000 :F zx81.rom
+
+=head2 Code
+
+Define the start of a code routine, with an optional label. The code is not known to be
+stack-safe, i.e. not to have data bytes following the call instruction. The disassembler
+stops disassembly when it cannot determine if the bytes after a call instruction are 
+data or code.
+
+  0000 :C START
+
+=head2 Procedure
+
+Define the start of a procedure with a possible list of arguments following the call
+instruction.
+
+The signature is a list of {'B','W','C'}+, identifing each of the following items
+after the call instruction (Byte, Word or Code). In the following example the call 
+istruction is followed by one byte and one word, and the procedure returns 
+to the address after the word.
+
+  0000 P proc B,W,C
+
+The signature defaults to a single 'C', meaning the procedure returns to the point after call.
+
+A signature without a 'C' means that the call never returns.
+
+=head2 Bytes and Words
+
+Define data bytes and words in the given address range.
+
+  0000-0003 :B label
+  0000-0003 :B label
+  0000-0003 :B2[1] label	; one byte per line, binary data
+  0000-0003 :W label
+
+=head2 Define a symbol
+
+Define the name of a symbol.
+
+  4000 := ERR_NO  comment\nline 2 of comment
+
+=head2 IX and IY base
+
+Define base address for IX and IY indexed mode.
+
+  4000 :IX
+  4000 :IY
+
+=head2 Header block
+
+Define a text block to be output before the given address. The block is inserted vervbatin,
+so include ';' if a comment is intended.
+
+  0000 :# ; header
+       :# ; continuation
+       :# abc EQU 23
+
+=head2 Line comment
+
+Define a line comment to show at the given address.
+
+  0000 :; comment
+
+=head2 Header and Footer
+
+Define a text block to be output at the top and the bottom of the assembly file. 
+The block is inserted vervbatin, so include ';' if a comment is intended.
+
+  0000 :< ; header
+       :< ; continuation
+       :> ; footer
+
+=cut
+
+#------------------------------------------------------------------------------
+
+sub _find_file {
+	my($self, $from_file, $include_file) = @_;
+	
+	return $include_file if -f $include_file;
+	
+	# test relative to parent
+	my $relative = path(path($from_file)->parent, path($include_file)->basename);
+	return $relative if -f $relative;
+	
+	return $from_file;
+}
+
+#------------------------------------------------------------------------------
+
+sub create_control_file {
+  my($class, $ctl_file, $bin_file, $addr, $arch) = @_;
+  
+  -f $ctl_file and die "Error: $ctl_file exists\n";
+  
+  my $dis = $class->new;
+  $dis->memory->load_file($bin_file, $addr);
+  $dis->write_dump($ctl_file);
+  my @lines = ( <<END,
+;------------------------------------------------------------------------------
+; CPU::Z80::Disassembler control file
+;------------------------------------------------------------------------------
+
+END
+		sprintf("%04X :F $bin_file\n\n", $addr),
+		path($ctl_file)->lines
+	);
+	path($ctl_file)->spew(@lines);
+}
+
+#------------------------------------------------------------------------------
+
+sub load_control_file {
+	my($self, $file) = @_;
+	
+	my $addr = 0; my $end_addr = 0;
+	open(my $fh, $file) or die "cannot open $file\n";
+	while (<$fh>) {
+		chomp;
+		s/^\s*;.*$//; 		# remove comments
+		s/\s+$//;
+		next unless /\S/;
+
+		if (/^ \#include \s+ (\S+) /ix) {
+			$self->load_control_file($self->_find_file($file, $1));
+		}
+		else {
+			# decode start address
+			if (s/^ ([0-9a-f]+) //ix) {
+				$addr = hex($1);
+			}
+
+			# decode end address
+			$end_addr = $addr;
+			if (s/^ -([0-9a-f]+) //ix) {
+				$end_addr = hex($1);
+			}
+
+			# remove all chars up to ':', ignore lines without ':'
+			/:\s*/ or next;
+			$_ = $';
+			next unless /\S/;
+			
+			# decode command
+			my($include_file, $label, $comment, $signature, $type);
+			
+			# File
+			if (($include_file) = /^ F \s+ (\S+) /ix) {
+				$self->memory->load_file($self->_find_file($file, $include_file), $addr);
+			}
+			
+			# Code
+			elsif (($label) = /^ C \s* (\w+)? /ix) {
+				$self->code($addr, $label);
+			}
+			
+			# Define label
+			elsif (($label, $comment) = /^ = \s+ (\S+) \s* ;? \s*(.*)/ix) {
+				$comment =~ s/ \\ n /\n/gx;
+				my $instr = $self->labels->add($addr, $label);
+				$instr->comment($comment) if $comment;
+			}
+			
+			# Block comment
+			elsif (($comment) = /^ \# \s? (.*)/ix) {
+				$self->block_comment($addr, $comment);
+			}
+			
+			# Header
+			elsif (($comment) = /^ \< \s? (.*)/ix) {
+				my $header = $self->header // "";
+				$header .= "\n" if $header;
+				$self->header($header.$comment);
+			}
+			
+			# Footer
+			elsif (($comment) = /^ \> \s? (.*)/ix) {
+				my $footer = $self->footer // "";
+				$footer .= "\n" if $footer;
+				$self->footer($footer.$comment);
+			}
+			
+			# Line comment
+			elsif (($comment) = /^ \; [\s;]* (.*)/ix) {
+				$self->line_comments($addr, $comment);
+			}
+			
+			# Procedure
+			elsif (($label, $signature) = /^ P \s+ (\w+) \s+ (.*)/ix) {
+				$self->code($addr, $label);
+				$signature =~ s/,/ /g;
+				my @types = split(' ', $signature);
+				@types = ('C') if !@types;
+				$self->set_call($addr, sub {
+					my($self, $addr) = @_;
+					for (@types) {
+						if ($_ eq 'B') {
+							$self->defb($addr); 
+							$addr++
+						}
+						elsif ($_ eq 'W') {
+							$self->defW($addr); 
+							$addr += 2;
+						}
+						elsif ($_ eq 'C') {
+							return $addr;
+						}
+						else {
+							die "procedure argument type $_ unknown";
+						}
+					}
+					return;
+				});
+			}
+			
+			# Byte | Word
+			elsif (my($type, $ipl, $label) = /^ (B2 | B | W) (?: \[ (\d+) \] )? \s* (\w+)?/ix) {
+				$self->labels->add($addr, $label) if defined $label;
+				$ipl = 16 unless $ipl;
+
+				my($func, $size);
+				if    ($type eq 'B') {	($func, $size) = ('defb', 1); }
+				elsif ($type eq 'B2') {	($func, $size) = ('defb2', 1); }
+				elsif ($type eq 'W') {	($func, $size) = ('defw', 2); }
+				else {					die "type $type unknown"; }
+				
+				if ($size == 2 && $addr == $end_addr) {
+					$end_addr++;		# a word uses two addresses
+				}
+				
+				for (my $a = $addr; $a <= $end_addr; ) {
+					my $items = int(($end_addr - $a + 1) / $size);
+					$items = $ipl if $items > $ipl;
+					
+					$self->$func($a, $items);
+					$a += $size * $items;
+				}
+			}
+			
+			# IX
+			elsif (/^ IX /ix) {
+				$self->ix_base($addr);
+			}
+			
+			# IY
+			elsif (/^ IY /ix) {
+				$self->iy_base($addr);
+			}
+			
+			# undefined
+			else {
+				die "Load '$file': cannot parse '$_'";
+			}
+		}
+	}
+}
+ 
 #------------------------------------------------------------------------------
 sub relative_arg {
 	my($self, $addr, $label_name) = @_;

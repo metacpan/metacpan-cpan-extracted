@@ -1,4 +1,3 @@
-
 package PGPLOT;
 
 #  Module to allow calling of PGPLOT from Perl
@@ -7,7 +6,7 @@ package PGPLOT;
 #
 #  WWW info: http://www.aao.gov.au/local/www/kgb/pgperl/
 
-$VERSION="2.21";
+$VERSION="2.23";
 
 use Exporter;
 use DynaLoader;
@@ -33,7 +32,7 @@ if($^O =~ /mswin32/i) {
 
 else {bootstrap PGPLOT $VERSION}
 
-# Exit with OK status
+# return OK status
 
 1;
 
@@ -223,7 +222,7 @@ e.g.:
 =head2 ARGUMENT MAPPING - GENERAL HANDLING OF BINARY DATA
 
 In addition to the implicit rules mentioned above PGPLOT now provides
-a scheme for explictly handling binary data in all routines.
+a scheme for explicitly handling binary data in all routines.
 
 If your scalar variable (e.g. C<$x>) holds binary data (i.e. 'packed')
 then simply pass PGPLOT a reference to it (e.g. C<\$x>). Thus one can
@@ -241,4 +240,3 @@ binary data. C<PDL> takes great advantage of these facilities.
 
 Be VERY careful binary data is of the right size or your segments
 might get violated.
-

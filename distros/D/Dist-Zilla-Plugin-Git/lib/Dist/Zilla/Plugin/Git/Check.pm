@@ -13,12 +13,11 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Check;
 # ABSTRACT: Check your git repository before releasing
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Moose;
 use namespace::autoclean 0.09;
-use Moose::Util::TypeConstraints qw(enum);
-use MooseX::Types::Moose qw(Bool);
+use Types::Standard qw(Bool Enum);;
 
 with 'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::BeforeRelease',
@@ -28,7 +27,7 @@ with 'Dist::Zilla::Role::Git::DirtyFiles',
 
 has build_warnings => ( is=>'ro', isa => Bool, default => 0 );
 
-has untracked_files => ( is=>'ro', isa => enum([qw(die warn ignore)]), default => 'die' );
+has untracked_files => ( is=>'ro', isa => Enum([qw(die warn ignore)]), default => 'die' );
 
 sub _git_config_mapping { +{
    changelog => '%{changelog}s',
@@ -140,7 +139,7 @@ Dist::Zilla::Plugin::Git::Check - Check your git repository before releasing
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
@@ -209,8 +208,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

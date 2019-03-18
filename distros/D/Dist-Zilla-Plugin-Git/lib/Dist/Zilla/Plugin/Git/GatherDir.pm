@@ -9,7 +9,7 @@
 package Dist::Zilla::Plugin::Git::GatherDir;
 # ABSTRACT: Gather all tracked files in a Git working directory
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_match
@@ -53,7 +53,7 @@ extends 'Dist::Zilla::Plugin::GatherDir' => { -version => 4.200016 }; # exclude_
 #pod =cut
 
 use List::Util 1.45 qw(uniq);
-use MooseX::Types::Moose qw(Bool);
+use Types::Standard 'Bool';
 
 use namespace::autoclean;
 
@@ -238,7 +238,7 @@ Dist::Zilla::Plugin::Git::GatherDir - Gather all tracked files in a Git working 
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
@@ -356,8 +356,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

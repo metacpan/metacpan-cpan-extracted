@@ -20,6 +20,9 @@
 
 #include <winSvc.h>
 
+#include <EXTERN.h>
+#include <perl.h>
+
 // #include <crtdbg.h>
 
 enum eConstantType { NotDefined = 0, NotPresent, String, Numeric };
@@ -80,10 +83,7 @@ enum eConstantType { NotDefined = 0, NotPresent, String, Numeric };
 //  This value is in miliseconds.
 #define DEFAULT_CALLBACK_TIMER          5000
 
-eConstantType Constant( LPTSTR pszConstant, LPVOID *ppBuffer );
-const char *GetConstantName( DWORD dwIndex );
-DWORD GetTotalConstants();
-void CountConstants();
+void ExportConstants(pTHX);
 
 typedef struct tagConstStruct
 {
@@ -173,7 +173,6 @@ extern SERVICE_STATUS_HANDLE ghService;
 extern SERVICE_STATUS gServiceStatus;
 extern HANDLE  ghLogFile;
 
-void LogToFile( LPTSTR pszMessage );
 BOOL ResetCallbackTimer( UINT uintTimeoutValue = -1 );
 BOOL KillTimer();
 int My_SetServiceBits( SERVICE_STATUS_HANDLE hService, DWORD dwServiceBits, BOOL bSetBitsOn, BOOL bUpdateImmediately );

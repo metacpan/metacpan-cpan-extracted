@@ -1,5 +1,8 @@
 Revision history for Date::Saka::Simple
 
+0.22  Fri Mar 15 20:55:00 2019
+      - Updated dependency on Date::Utils v0.25.
+
 0.21  Fri Nov 23 15:40:00 2018
       - Used namespace::autoclean instead.
 

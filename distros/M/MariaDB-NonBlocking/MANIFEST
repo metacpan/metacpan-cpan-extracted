@@ -8,17 +8,23 @@ examples/select.pl
 examples/promises.pl
 lib/MariaDB/NonBlocking/Select.pm
 lib/MariaDB/NonBlocking/Event.pm
+lib/MariaDB/NonBlocking/EV.pm
+lib/MariaDB/NonBlocking/AE.pm
 lib/MariaDB/NonBlocking/Promises.pm
+lib/MariaDB/NonBlocking/Promises/Pool.pm
 NonBlocking.xs
 ignore.txt
+t/00-load.t
 t/01-connect-event.t
 t/01-connect-promise.t
 t/02-select-event.t
 t/02-select-promise.t
+t/02-select-select.t
 t/03-create-table-promise.t
 t/04-insert-promise.t
 t/05-update-promise.t
 t/06-cyclic-refs.t
+t/07-pool.t
 Pakket.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

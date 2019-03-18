@@ -1,5 +1,9 @@
 Revision history for MariaDB-NonBlocking
 
+0.15    2019-03-18
+        * simplified the code
+        * connection pools for the promise implementation
+
 0.14    2017-11-27
         * run_query_start(undef) will no longer segfault.
 

@@ -154,7 +154,7 @@ Locale::TextDomain::OO::Util::ExtractHeader - Gettext header extractor
 
 4.001
 
-$Id: ExtractHeader.pm 600 2015-07-01 04:58:40Z steffenw $
+$Id: ExtractHeader.pm 715 2018-06-04 15:08:31Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util/ExtractHeader.pm $
 

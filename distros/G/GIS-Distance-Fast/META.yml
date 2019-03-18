@@ -3,6 +3,7 @@ abstract: 'C implementation of GIS::Distance formulas.'
 author:
   - 'Aran Clary Deltac <bluefeet@gmail.com>'
 build_requires:
+  GIS::Distance: '0.17'
   Test2::V0: '0.000094'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,39 +27,39 @@ no_index:
 provides:
   GIS::Distance::Fast:
     file: lib/GIS/Distance/Fast.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::ALT:
     file: lib/GIS/Distance/Fast/ALT.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::Cosine:
     file: lib/GIS/Distance/Fast/Cosine.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::GreatCircle:
     file: lib/GIS/Distance/Fast/GreatCircle.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::Haversine:
     file: lib/GIS/Distance/Fast/Haversine.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::Null:
     file: lib/GIS/Distance/Fast/Null.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::Polar:
     file: lib/GIS/Distance/Fast/Polar.pm
-    version: '0.12'
+    version: '0.14'
   GIS::Distance::Fast::Vincenty:
     file: lib/GIS/Distance/Fast/Vincenty.pm
-    version: '0.12'
+    version: '0.14'
 requires:
-  GIS::Distance: '0.14'
-  GIS::Distance::Constants: '0.14'
+  GIS::Distance::Formula: '0.17'
   namespace::clean: '0.24'
+  parent: '0'
   perl: '5.008001'
   strictures: '2.000000'
 resources:
   bugtracker: https://github.com/bluefeet/GIS-Distance-Fast/issues
   homepage: https://github.com/bluefeet/GIS-Distance-Fast
   repository: git://github.com/bluefeet/GIS-Distance-Fast.git
-version: '0.12'
+version: '0.14'
 x_authority: cpan:BLUEFEET
 x_contributors:
   - 'Aran Deltac <aran@ziprecruiter.com>'

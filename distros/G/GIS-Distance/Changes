@@ -1,5 +1,17 @@
 Revision history for Perl extension GIS-Distance.
 
+0.17 2019-03-17T17:01:31Z
+
+ - Finalize the new internal formula interface.
+
+0.16 2019-03-16T22:19:33Z
+
+ - Renamed the args and module attributes to formula_args
+   and formula_module to make them less generic and a bit
+   more accurate.
+ - Fix a pretty bad math typo in the SPEED section.
+ - Lots of other documentation edits.
+
 0.15 2019-03-13T06:06:09Z
 
  - Support using Geo::Point as arguments to distance().

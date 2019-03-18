@@ -309,16 +309,16 @@ sub filter {
         $l =~ s/''/"/g;
 
         # beginning of the line, long dash
-        $l =~ s/^-(?=\s)/$dash/;
+        $l =~ s/^-(?=\s)/$dash/gm;
 
         # between spaces, just replace
-        $l =~ s/(?<=\S)(\s+)-{1,3}(\s+)(?=\S)/$1$emdash$2/g;
+        $l =~ s/(?<=\S)(\x{20}+)-{1,3}(\x{20}+)(?=\S)/$1$emdash$2/g;
 
         # end of line with
-        $l =~ s/(?<=\S) +-{1,3}$/ $emdash/;
+        $l =~ s/(?<=\S) +-{1,3}$/ $emdash/gm;
 
         # -word and word-, in the middle of a line
-        $l =~ s/(?<=\S)(\s+)-(\w.+?\w)-(?=\s)/$1$emdash $2 $emdash/g;
+        $l =~ s/(?<=\S)(\x{20}+)-(\w.+?\w)-(?=\x{20})/$1$emdash $2 $emdash/g;
 
         # an opening before two digits *probably* is an apostrophe.
         # Very common case.
@@ -330,12 +330,12 @@ sub filter {
         $l =~ s/(?<=\W)'(?=\w)/$lsingle/g;
 
         # beginning of line, opening
-        $l =~ s/^"/$ldouble/;
-        $l =~ s/^'/$lsingle/;
+        $l =~ s/^"/$ldouble/gm;
+        $l =~ s/^'/$lsingle/gm;
 
         # end of line, closing
-        $l =~ s/" *$/$rdouble/;
-        $l =~ s/' *$/$rsingle/;
+        $l =~ s/" *$/$rdouble/gm;
+        $l =~ s/' *$/$rsingle/gm;
 
         # if there is a space at the left, it's opening
         $l =~ s/(?<=\s)"/$ldouble/g;
@@ -433,7 +433,7 @@ sub nbsp_filter {
                          qr/(?<=\S)
                             \s+
                             \Q$token\E
-                            (?=\W)/x,
+                            (?=\W|$)/xm,
                          "\x{a0}$token"
                         ];
     }
@@ -442,8 +442,8 @@ sub nbsp_filter {
                          qr/(?<=\d)
                             \s+
                             \Q$token\E
-                            (?=\W)
-                           /x,
+                            (?=\W|$)
+                           /xm,
                          "\x{a0}$token"
                         ];
     }
@@ -452,8 +452,8 @@ sub nbsp_filter {
                          qr/\b
                             \Q$token\E
                             \s+
-                            (?=\S)
-                           /x,
+                            (?=\S|$)
+                           /xm,
                          "$token\x{a0}"
                         ];
     }

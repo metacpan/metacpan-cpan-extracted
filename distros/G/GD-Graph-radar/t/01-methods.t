@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More;
 
 use_ok 'GD::Graph::radar';
 

@@ -55,11 +55,11 @@ is_deeply [sort by_addr $labels->search_all], [sort by_addr ($hello)];
 
 # add label with same name, other address
 eval { $labels->add(33, 'hello') };
-like $@, qr/^Label 'hello' with addresses 0x0022 and 0x0021 at t.*Labels\.t line \d+/;
+like $@, qr/^Label 'hello' with addresses \$0022 and \$0021 at t.*Labels\.t line \d+/;
 
 # add another on same address, no reference address
 eval { $labels->add(34, 'world') };
-like $@, qr/^Labels 'hello' and 'world' at the same address 0x0022 at t.*Labels\.t line \d+/;
+like $@, qr/^Labels 'hello' and 'world' at the same address \$0022 at t.*Labels\.t line \d+/;
 
 is $labels->search_name('hello'), $hello;
 is $labels->search_addr(34), $hello;

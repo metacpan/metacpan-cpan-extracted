@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.3.1';
+our $VERSION = '1.3.2';
 
 use base qw(Log::Dispatch::Output);
 use Params::Validate qw(validate SCALAR HASHREF CODEREF BOOLEAN);
@@ -73,7 +73,7 @@ sub _init {
     }
 
     if ( defined $p{socket}
-         && defined $p{chunked}
+         && $p{chunked}
          && $p{socket}{protocol} ne 'udp'
     ) {
         die 'chunked only applicable to udp';
@@ -92,7 +92,12 @@ sub _init {
             my ($msg) = @_;
 
             $msg = compress($msg) if $p{compress};
-            $socket->send($_) foreach enchunk($msg, $self->{chunked});
+            foreach my $chunk (enchunk($msg, $self->{chunked})) {
+                if ($p{socket}{protocol} ne 'udp') {
+                    $chunk .= "\x00";
+                }
+                $socket->send($chunk);
+            }
         };
     }
 

@@ -48,6 +48,13 @@ DESCRIPTION
         *   An arrayref or hashref providing options similar to those given to
             Moose's `has` keyword.
 
+    Note that in the SYNOPSIS example, a constant `User::SerializationStyle`
+    is defined.
+
+       my $attr = User->meta->get_attribute('username');
+       $attr->does(User::SerializationStyle);    # true
+       $attr->hidden;                            # false
+
 BUGS
     Please report any bugs to
     <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-AttributeTags>.
@@ -59,7 +66,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013, 2017 by Toby Inkster.
+    This software is copyright (c) 2013, 2017, 2019 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

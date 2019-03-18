@@ -1,5 +1,5 @@
 package String::Validator;
-$String::Validator::VERSION = '2.00';
+$String::Validator::VERSION = '2.01';
 use 5.008;
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ String::Validator - A Collection of Routines for validating and transforming str
 
 =head1 VERSION
 
-version 2.00
+version 2.01
 
 =head1 Description
 

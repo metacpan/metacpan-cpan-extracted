@@ -1,5 +1,3 @@
-# $Id$
-
 package CPU::Z80::Disassembler::Instruction;
 
 #------------------------------------------------------------------------------
@@ -19,7 +17,7 @@ use Asm::Z80::Table;
 use CPU::Z80::Disassembler::Memory;
 use CPU::Z80::Disassembler::Format;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 #------------------------------------------------------------------------------
 
@@ -29,6 +27,7 @@ our $VERSION = '0.05';
   $instr = CPU::Z80::Disassembler::Instruction->disassemble(
                     $memory, $addr, $limit_addr);
   $instr = CPU::Z80::Disassembler::Instruction->defb($memory, $addr, $count);
+  $instr = CPU::Z80::Disassembler::Instruction->defb2($memory, $addr, $count);
   $instr = CPU::Z80::Disassembler::Instruction->defw($memory, $addr, $count);
   $instr = CPU::Z80::Disassembler::Instruction->defm($memory, $addr, $length);
   $instr = CPU::Z80::Disassembler::Instruction->defmz($memory, $addr);
@@ -80,6 +79,10 @@ constructed and the factory returns C<undef>.
 
 Factory method to create a new object by disassembling a C<defb> instruction
 at the given address, reading one or C<$count> byte(s) from memory. 
+
+=head2 defb2
+
+Same as defb but shows binary data. 
 
 =head2 defw
 
@@ -151,13 +154,17 @@ object.
 
 =head2 opcode
 
-Cannonical assembly instruction, e.g. 'ld a,(NN)'. 
+Canonical assembly instruction, e.g. 'ld a,(NN)'. 
 The possible argument types are N, NN, DIS and STR. 
 There is one method to get/set each of the argument types.
 
 =head2 N
 
 8-bit data used by the instruction.
+
+=head2 N2
+
+8-bit data used by the instruction, to be shown in base 2.
 
 =head2 NN
 
@@ -215,14 +222,14 @@ see C<next_code> above.
 =cut
 
 #------------------------------------------------------------------------------
-use Class::XSAccessor {
-	constructor	=> '_new',
-		accessors => [ 
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 			'memory',		# point to whole memory
 			'addr',			# start address
 			'size',			# number of bytes of instruction
-			'opcode',		# cannonical opcode, e.g. 'ld a,(NN)'
+			'opcode',		# canonical opcode, e.g. 'ld a,(NN)'
 			'N',			#  8-bit data
+			'N2',			#  8-bit data in binary
 			'NN',			# 16-bit data
 			'DIS',			# offset for index
 			'STR',			# unquoted string for defm*
@@ -231,8 +238,7 @@ use Class::XSAccessor {
 							# format each type of argument
 			'is_code',		# true for a Z80 assembly instruction, 
 							# false for def*, org, ...
-		],
-};
+);
 
 #------------------------------------------------------------------------------
 sub format {
@@ -244,6 +250,7 @@ sub format {
 #------------------------------------------------------------------------------
 my %default_format = (
 		N	=> \&format_hex2,
+		N2	=> \&format_bin8,
 		NN	=> \&format_hex4,
 		DIS	=> \&format_dis,
 		STR	=> \&format_str,
@@ -284,10 +291,10 @@ sub is_break_flow	{ shift->opcode =~ /ret$|reti|retn|call NN|rst|jr NN|jp NN|jp 
 sub disassemble {
 	my($class, $memory, $addr, $limit_addr) = @_;
 
-	my $self = $class->_new(memory 	=> $memory, 
-							addr 	=> $addr, 
-							is_code	=> 1,
-						   );
+	my $self = bless { 	memory 	=> $memory, 
+						addr 	=> $addr, 
+						is_code	=> 1,
+					}, $class;
 
 	# save bytes of all decoded instructions
 	my @found;				# other instructions found
@@ -353,6 +360,7 @@ sub disassemble {
 	# collect last complete instruction found
 	my($opcode, @args) = @{$found[-1][0]};
 	$opcode .= ' '.join('', @args) if @args;
+	$opcode =~ s/,\s*/, /g;
 	
 	$self->opcode($opcode);
 	$self->size($found[-1][1] - $self->addr);
@@ -381,15 +389,17 @@ sub _def_value {
 		$values->[$i] = $value;
 	}
 	
-	return $class->_new(memory	=> $memory,
-						addr 	=> $addr, 
-						size	=> $size * $count,
-						opcode 	=> "$def $N", 
-						$N 		=> $values);
+	return bless {	memory	=> $memory,
+					addr 	=> $addr, 
+					size	=> $size * $count,
+					opcode 	=> "$def $N", 
+					$N 		=> $values,
+				}, $class;
 }
 
 #------------------------------------------------------------------------------
 sub defb	{ shift->_def_value('peek8u',  1, 'defb', 'N',  @_) }
+sub defb2	{ shift->_def_value('peek8u',  1, 'defb', 'N2',  @_) }
 sub defw	{ shift->_def_value('peek16u', 2, 'defw', 'NN', @_) }
 
 #------------------------------------------------------------------------------
@@ -400,11 +410,11 @@ sub _def_str {
 	my $str = $memory->$peek($addr, $length);
 	return undef unless defined $str;				# unloaded memory
 	
-	return $class->_new(memory	=> $memory,
+	return $class->new({memory	=> $memory,
 						addr 	=> $addr, 
 						size	=> length($str) + $eos_length,
 						opcode 	=> "$def STR", 
-						STR 	=> $str);
+						STR 	=> $str});
 }
 
 #------------------------------------------------------------------------------
@@ -416,11 +426,12 @@ sub defm7	{ shift->_def_str('peek_str7', 0, 'defm7', @_) }
 sub org { 
 	my($class, $memory, $addr) = @_;
 
-	return $class->_new(memory	=> $memory,
-						addr 	=> $addr, 
-						size	=> 0,
-						opcode 	=> "org NN", 
-						NN	 	=> $addr);
+	return bless {	memory	=> $memory,
+					addr 	=> $addr, 
+					size	=> 0,
+					opcode 	=> "org NN", 
+					NN	 	=> $addr,
+				}, $class;
 }
 
 #------------------------------------------------------------------------------
@@ -445,7 +456,7 @@ sub as_string {
 
 	# decode opcode
 	my $opcode = $self->opcode;
-	$opcode =~ s{\b ( N | NN | \+(DIS) | STR ) \b
+	$opcode =~ s{\b ( N | N2 | NN | \+(DIS) | STR ) \b
 			   }{
 					$self->_format_arg($2 || $1)
 				}gex;
@@ -473,7 +484,7 @@ sub _format_arg {
 	my $value = $self->$arg;
 	$value = [$value] unless ref($value);
 	
-	return join(",", map {$ffunc->($_)} @$value)
+	return join(", ", map {$ffunc->($_)} @$value)
 }
 
 #------------------------------------------------------------------------------

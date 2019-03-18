@@ -13,11 +13,11 @@ use warnings;
 package Dist::Zilla::Plugin::Git::Tag;
 # ABSTRACT: Tag the new version
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Moose;
 use MooseX::Has::Sugar;
-use MooseX::Types::Moose qw{ Str Bool};
+use Types::Standard qw{ Str Bool};
 use namespace::autoclean;
 
 sub _git_config_mapping { +{
@@ -26,8 +26,8 @@ sub _git_config_mapping { +{
 
 # -- attributes
 
-has tag_format  => ( ro, isa=>Str, default => 'v%v' );
-has tag_message => ( ro, isa=>Str, default => 'v%v' );
+has tag_format  => ( ro, isa=>Str, default => 'v%V' );
+has tag_message => ( ro, isa=>Str, default => 'v%V' );
 has changelog   => ( ro, isa=>Str, default => 'Changes' );
 has branch => ( ro, isa=>Str, predicate=>'has_branch' );
 has signed => ( ro, isa=>Bool, default=>0 );
@@ -115,15 +115,15 @@ Dist::Zilla::Plugin::Git::Tag - Tag the new version
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
 In your F<dist.ini>:
 
     [Git::Tag]
-    tag_format  = v%v       ; this is the default
-    tag_message = v%v       ; this is the default
+    tag_format  = v%V       ; this is the default
+    tag_message = v%V       ; this is the default
 
 =head1 DESCRIPTION
 
@@ -143,9 +143,9 @@ The plugin accepts the following options:
 
 =over 4
 
-=item * tag_format - format of the tag to apply. Defaults to C<v%v>.
+=item * tag_format - format of the tag to apply. Defaults to C<v%V>.
 
-=item * tag_message - format of the tag annotation. Defaults to C<v%v>.
+=item * tag_message - format of the tag annotation. Defaults to C<v%V>.
 Use S<C<tag_message =>> to create a lightweight tag.
 The L<formatting codes|Dist::Zilla::Role::Git::StringFormatter/DESCRIPTION>
 used in C<tag_format> and C<tag_message> are documented under
@@ -186,8 +186,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

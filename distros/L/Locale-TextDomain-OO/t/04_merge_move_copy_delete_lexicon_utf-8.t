@@ -10,6 +10,11 @@ use Test::Differences;
 use Locale::TextDomain::OO::Lexicon::Hash;
 use Locale::TextDomain::OO::Singleton::Lexicon;
 
+{
+    no warnings qw(once); ## no critic (NoWarnings)
+    $Test::Differences::NoDeparse = 1;
+}
+
 my @logs;
 my $logger_code = Locale::TextDomain::OO::Lexicon::Hash
     ->new(

@@ -1,4 +1,3 @@
-.gitignore
 bin/z80dis
 Changes
 lib/CPU/Z80/Disassembler.pm
@@ -17,7 +16,13 @@ t/data/zx48.rom
 t/data/zx48_base.asm
 t/data/zx48_benchmark.asm
 t/data/zx48_benchmark.dump
+t/data/zx81.asm
+t/data/zx81.ctl
+t/data/zx81.rom
+t/data/zx81_sysvars.ctl
+t/data/zx81_version_2_rom_source.asm
 t/dis_zx48.t
+t/dis_zx81.t
 t/Disassembler.t
 t/Format.t
 t/Instruction.t
@@ -31,3 +36,5 @@ t/tools/build_zx48_asm.pl
 t/tools/build_zx48_dz80.pl
 t/tools/Parsezx48.pm
 t/tools/TestAsm.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

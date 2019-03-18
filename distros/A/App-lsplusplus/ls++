@@ -2,24 +2,26 @@
 # vim:ft=perl:et:
 package App::lsplusplus;
 my $APP = 'ls++';
-our $VERSION = '0.58';
-$App::lsplusplus::VERSION = '0.58';
+our $VERSION = '0.68';
+$App::lsplusplus::VERSION = '0.68';
 
 use strict;
 use utf8;
 use open qw(:std :utf8);
 use Term::ExtendedColor qw(fg uncolor);
+use File::LsColor;
 use Pod::Usage;
 use Getopt::Long;
 use Time::Local;
-use Data::Dumper;
+#use Data::Dumper;
+use locale;
 
-{
-  package Data::Dumper;
-  no strict 'vars';
-  $Terse = $Indent = $Useqq = $Deparse = $Sortkeys = 1;
-  $Quotekeys = 0;
-}
+#{
+#  package Data::Dumper;
+#  no strict 'vars';
+#  $Terse = $Indent = $Useqq = $Deparse = $Sortkeys = 1;
+#  $Quotekeys = 0;
+#}
 
 
 my $ls       = '/bin/ls';
@@ -32,7 +34,7 @@ if(not isa_tty()) {
 }
 
 if(not _init_config()) {;
-  die "No configuration file found\n";
+  die "No configuration file found at $ENV{HOME}/.ls++.conf\n";
 }
 
 our(@c, @d, %ls_colors, $symlink_delim, $symlink_color, $symlink_attr);
@@ -172,7 +174,7 @@ sub ls {
     ($userpad, $grouppad) = $line =~ m/\d+\s+\S+\s(\s*)\S+(\s*)\s.{$sizelen}\s\d+\s+.*/;
     }
     elsif( ($^O eq 'darwin') or ($^O =~ /.+bsd$/) ) {
-        ($perm, $hlink, $user, $group, $size, $month, $day, $time, $year, $file) = split(/\s+/, $line, 10);
+        ($perm, $hlink, $user, $group, $size, $day, $month, $time, $year, $file) = split(/\s+/, $line, 10);
         chop($file);
         if( (!$day) ) {
           printf("%s", $line);
@@ -196,7 +198,9 @@ sub ls {
 
     if( (!$file) ) {
       if( $line =~ /(.*):/ ) {
-        printf("\n%s:\n", fg($c[9], fg('bold', $1)));
+        # for situations like ls ~/dev/*; print the directory summary
+        # with correct LS_COLORS attribute
+        printf("\n%s:\n", fg(File::LsColor::can_ls_color('di'), $1));
       }
       elsif( $line =~ /^total (.*)/ ) {
         (undef, $size) = split(/\s+/, $line);
@@ -447,10 +451,11 @@ sub owner {
 
 sub size {
   my ($size) = @_;
-  if ($size =~ /\d+,\s*\d+/){ # not size but major/minor values for special files
+  if ($size =~ /\d+,\s*\d+$/){ # not size but major/minor values for special files
     $size = sprintf("%*s", $sizelen, $size);
     return $size;
   }
+  $size =~ s/,/./;
   #FIXME
   if($colors > 16) {
     #$size =~ s/(\S+)(K)/$c[2]$1\e[0m$c[4]$2\e[0m/gi;# and print "AA\n";
@@ -605,7 +610,7 @@ sub _get_color_support {
     $colors = 88;
   }
   elsif($ENV{TERM} eq 'screen') {
-    $colors = 8;
+    $colors = $ENV{TMUX} ? 256 : 8;
   }
   else {
     chomp($colors = `tput colors`); # fail silently
@@ -623,25 +628,8 @@ sub _init_config {
     print "Using ./ls++.conf\n" unless $@;
   }
 
-  my @locations = (
-#    "./ls++.conf",
-    "$ENV{XDG_CONFIG_HOME}/ls++/ls++.conf",
-    "$ENV{HOME}/.config/ls++/ls++.conf",
-    "$ENV{HOME}/.ls++.conf",
-    "$ENV{HOME}/.ls++/ls++.conf",
-    "/home/scp1/perl5/etc/ls++.conf",
-  );
-
-  for my $conf(@locations) {
-    if(-f $conf) {
-      require $conf;
-      if($@) {
-        next;
-      }
-      return 1;
-    }
-  }
-  return 0;
+  require "$ENV{HOME}/.ls++.conf",
+  return 1;
 }
 
 
@@ -752,7 +740,7 @@ crshd added optional user:group display.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011, 2018- the B<ls++> L</AUTHOR> and L</CONTRIBUTORS> as listed
+Copyright 2010, 2011, 2019- the B<ls++> L</AUTHOR> and L</CONTRIBUTORS> as listed
 above.
 
 =head1 LICENSE

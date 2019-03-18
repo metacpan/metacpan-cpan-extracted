@@ -38,16 +38,27 @@ my $test_file_format;
 
   # exclude "raw" since it requires xsize,ysize explicitly, the size isn't
   # in the file
-  my @write_types_not_raw = grep {$_ ne 'raw'} @write_types;
+  @write_types = grep {$_ ne 'raw'} @write_types;
 
-  unless (@write_types_not_raw) {
+  unless (@write_types) {
     MyTestHelpers::diag ('skip due to no suitable write_types[]');
     foreach (1 .. $test_count) {
       skip ('skip due to no suitable write_types[]', 1, 1);
     }
     exit 0;
   }
-  $test_file_format = $write_types_not_raw[0];
+
+  # Prefer PNG if available, hoping to work best.
+  # Had cpantesters on ms-dos having trouble with tiff reading back what had
+  # just written:
+  # Cannot load: Error opening file: Cannot handle different values per sample for "BitsPerSample" at t/Imager.t ...
+  # Seemed ok for me so dunno where the blame would lie.
+  #
+  foreach my $write_type (@write_types) {
+    if ($write_type eq 'png') { unshift @write_types, $write_type; last; }
+  }
+
+  $test_file_format = $write_types[0];
   MyTestHelpers::diag ("test_file_format ", $test_file_format);
 }
 
@@ -56,7 +67,7 @@ require Image::Base::Imager;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 13;
+my $want_version = 14;
 ok ($Image::Base::Imager::VERSION,
     $want_version,
     'VERSION variable');
@@ -162,7 +173,7 @@ END {
   if (defined $temp_filename) {
     MyTestHelpers::diag ("Remove tempfile $temp_filename");
     unlink $temp_filename
-      or MyTestHelpers::diag("Oops, cannot remove $temp_filename: $!");
+      or MyTestHelpers::diag("Oh, cannot remove $temp_filename: $!");
   }
 }
 
@@ -175,10 +186,9 @@ END {
   };
   my $err = $@;
   # diag "new() err is \"",$err,"\"";
-  ok ($eval_ok, 0, 'new() error for no file - doesn\'t reach end');
+  ok ($eval_ok, 0, 'new() error for no file - doesn\'t reach end of eval');
   ok (! defined $ret, 1, 'new() error for no file - return undef');
-  ok ($err,
-      '/^Cannot/',
+  ok ($err =~ /^Cannot/, 1,
       'new() error for no file - error string "Cannot"');
 }
 {
@@ -193,8 +203,7 @@ END {
   # diag "load() err is \"",$err,"\"";
   ok ($eval_ok, 0, 'load() error for no file - doesn\'t reach end');
   ok (! defined $ret, 1, 'load() error for no file - return undef');
-  ok ($err,
-      '/^Cannot/',
+  ok ($err =~ /^Cannot/, 1,
       'load() error for no file - error string "Cannot"');
 }
 
@@ -218,7 +227,7 @@ END {
       'save() error for no dir - doesn\'t reach end');
   ok (! defined $ret, 1,
       'save() error for no dir - return undef');
-  ok ($err, '/^Cannot/',
+  ok ($err =~ /^Cannot/, 1,
       'save() error for no dir - error string "Cannot"');
 }
 {
@@ -235,7 +244,8 @@ END {
   # diag "save() err is \"",$err,"\"";
   ok ($eval_ok, 0, 'save() error for unknown ext - doesn\'t reach end');
   ok (! defined $ret, 1, 'save() error for unknown ext - return undef');
-  ok ($err, '/^Cannot/', 'save() error for no dir - error string "Cannot"');
+  ok ($err =~ /^Cannot/, 1,
+      'save() error for no dir - error string "Cannot"');
 }
 
 

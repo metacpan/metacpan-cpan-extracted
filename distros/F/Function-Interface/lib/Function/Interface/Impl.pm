@@ -3,71 +3,81 @@ package Function::Interface::Impl;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use Class::Load qw(load_class try_load_class);
 use Scalar::Util qw(blessed);
 
-use Function::Interface;
-
-my @CHECK;
-my %CHECKED;
 sub import {
     my $class = shift;
     my @interface_packages = @_;
     my ($pkg, $filename, $line) = caller;
 
-    for my $ifpkg (@interface_packages) {
-        push @CHECK => +{
-            package           => $pkg,
-            interface_package => $ifpkg,
-            filename          => $filename,
-            line              => $line,
-        }
+    for (@interface_packages) {
+        register_check_list($pkg, $_, $filename, $line);
     }
 }
 
-sub CHECK {
-    for (@CHECK) {
-        my $pkg      = $_->{package};
-        my $ifpkg    = $_->{interface_package};
-        my $filename = $_->{filename};
-        my $line     = $_->{line};
+our @CHECK_LIST;
+my %IMPL_CHECKED;
+CHECK {
+    for (@CHECK_LIST) {
+        assert_valid(@$_{qw/package interface_package filename line/});
 
-        my $croak = sub {
-            my $msg = shift;
-            die "[Interface] $msg at $filename line $line\n\tdied"
-        };
-
-        my (undef, $e) = try_load_class($ifpkg);
-        $croak->($e) if $e;
-
-        my $ifinfo = Function::Interface::info($ifpkg)
-                  or $croak->("cannot get interface info");
-
-        for my $func_info (@{$ifinfo->functions}) {
-            my $fname = $func_info->subname;
-            my $def   = $func_info->definition;
-
-            my $code = $pkg->can($fname)
-                or $croak->("function `$fname` is required. Interface: $def");
-
-            my $pinfo = info_params($code)
-                or $croak->("cannot get function `$fname` parameters info. Interface: $def");
-            my $rinfo = info_return($code)
-                or $croak->("cannot get function `$fname` return info. Interface: $def");
-
-            check_params($func_info, $pinfo)
-                or $croak->("function `$fname` is invalid parameters. Interface: $def");
-
-            check_return($func_info, $rinfo)
-                or $croak->("function `$fname` is invalid return. Interface: $def");
-        }
-
-        # for Types::Interface#ImplOf
-        # see also `impl_of`
-        $CHECKED{$pkg}{$ifpkg} = !!1;
+        # for Function::Interface::Types#ImplOf
+        $IMPL_CHECKED{$_->{package}}{$_->{interface_package}} = !!1;
     }
+}
+
+sub register_check_list {
+    my ($package, $interface_package, $filename, $line) = @_;
+
+    push @CHECK_LIST => +{
+        package           => $package,
+        interface_package => $interface_package,
+        filename          => $filename,
+        line              => $line,
+    }
+}
+
+sub assert_valid {
+    my ($package, $interface_package, $filename, $line) = @_;
+    my @fl = ($filename, $line);
+
+    my ($ok, $e) = try_load_class($interface_package);
+    error($e, @fl) if !$ok;
+
+    my $iinfo = info_interface($interface_package)
+            or error("cannot get interface info", @fl);
+
+    for my $ifunction_info (@{$iinfo->functions}) {
+        my $fname = $ifunction_info->subname;
+        my $def   = $ifunction_info->definition;
+
+        my $code = $package->can($fname)
+            or error("function `$fname` is required. Interface: $def", @fl);
+
+        my $pinfo = info_params($code)
+            or error("cannot get function `$fname` parameters info. Interface: $def", @fl);
+        my $rinfo = info_return($code)
+            or error("cannot get function `$fname` return info. Interface: $def", @fl);
+
+        check_params($pinfo, $ifunction_info)
+            or error("function `$fname` is invalid parameters. Interface: $def", @fl);
+        check_return($rinfo, $ifunction_info)
+            or error("function `$fname` is invalid return. Interface: $def", @fl);
+    }
+}
+
+sub error {
+    my ($msg, $filename, $line) = @_;
+    die sprintf "implements error: %s at %s line %s\n\tdied", $msg, $filename, $line;
+}
+
+sub info_interface {
+    my $interface_package = shift;
+    load_class('Function::Interface');
+    Function::Interface::info($interface_package)
 }
 
 sub info_params {
@@ -83,31 +93,40 @@ sub info_return {
 }
 
 sub check_params {
-    my ($func_info, $pinfo) = @_;
+    my ($pinfo, $ifunction_info) = @_;
 
-    return unless $func_info->keyword eq $pinfo->keyword;
+    return unless $ifunction_info->keyword eq $pinfo->keyword;
 
+    my $params_count = 0;
     for my $key (qw/positional_required positional_optional named_required named_optional/) {
-        for my $i (0 .. $#{$func_info->$key}) {
-            my $ifp = $func_info->$key->[$i];
-            my $p = ($pinfo->$key)[$i];
-            return unless check_param($ifp, $p);
+        my @params = $pinfo->$key;
+        $params_count += @params;
+
+        for my $i (0 .. $#{$ifunction_info->$key}) {
+            my $ifp = $ifunction_info->$key->[$i];
+            my $p = $params[$i];
+            return unless check_param($p, $ifp);
         }
     }
+
+    return unless $params_count == @{$ifunction_info->params};
     return !!1
 }
 
 sub check_param {
-    my ($interface_param, $param) = @_;
-    return $interface_param->type eq $param->type
-        && $interface_param->name eq $param->name
+    my ($param, $iparam) = @_;
+    return unless $param;
+    return $iparam->type eq $param->type
+        && $iparam->name eq $param->name
 }
 
 sub check_return {
-    my ($func_info, $rinfo) = @_;
+    my ($rinfo, $ifunction_info) = @_;
 
-    for my $i (0 .. $#{$func_info->return}) {
-        my $ifr = $func_info->return->[$i];
+    return unless @{$rinfo->types} == @{$ifunction_info->return};
+
+    for my $i (0 .. $#{$ifunction_info->return}) {
+        my $ifr = $ifunction_info->return->[$i];
         my $type = $rinfo->types->[$i];
         return unless $ifr->type eq $type;
     }
@@ -117,7 +136,7 @@ sub check_return {
 sub impl_of {
     my ($package, $interface_package) = @_;
     $package = ref $package ? blessed($package) : $package;
-    $CHECKED{$package}{$interface_package}
+    $IMPL_CHECKED{$package}{$interface_package}
 }
 
 1;

@@ -1,0 +1,160 @@
+#!perl
+
+our $DATE = '2019-03-17'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config gnu_getopt no_ignore_case);
+
+my %Opts = (
+    spec => undef,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'version|v'      => sub {
+            no warnings 'once';
+            print "linerange version ", ($main::VERSION || "dev"), "\n";
+            exit 0;
+        },
+        'help|h'           => sub {
+            print <<USAGE;
+Usage:
+  linerange [OPTIONS]... <RANGESPEC> [FILE]...
+  linerange --version (or -v)
+  linerange --help (or -h)
+Options:
+  (Currently none)
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    if (@ARGV) {
+        $Opts{spec} = shift @ARGV;
+    } else {
+        die "linerange: Please specify range specification ".
+            "(e.g. 10-15 or -5..-1)\n";
+    }
+    exit 99 if !$res;
+}
+
+sub run {
+    require App::linerange;
+
+    my $res = App::linerange::linerange(
+        spec => $Opts{spec},
+    );
+    die "linerange: $res->[0] - $res->[1]\n" unless $res->[0] == 200;
+    print for @{ $res->[2] };
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Retrieve line ranges from a filehandle
+# PODNAME: linerange
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+linerange - Retrieve line ranges from a filehandle
+
+=head1 VERSION
+
+This document describes version 0.001 of linerange (from Perl distribution App-linerange), released on 2019-03-17.
+
+=head1 SYNOPSIS
+
+ % linerange [OPTION]... <RANGESPEC> [FILE]...
+
+Examples:
+
+ # get line 25 from FILE
+ % linerange 15 < FILE
+
+ # get second to second last lines from process output
+ % some-process | linerange 2..-2
+
+=head1 DESCRIPTION
+
+Retriving line range(s) from text is one of those things that are not easy
+enough to do using standard Unix toolbox. To retrieve lines 5-12 from FILE, you
+either use B<head> and B<tail>:
+
+ % head -12 FILE | tail -8
+
+requiring you to remember what I<-n> means for B<head> and B<tail> as well as
+calculate 12-5+1. You can use B<sed> or B<awk> or B<perl>:
+
+ % sed -n '5,12p' FILE
+ % awk 'NR >= 5 && NR <= 12' FILE
+ % perl -ne'print if $. >= 5 && $. <= 12' FILE
+
+which is fine only if you are familiar with those programming languages. And
+they require you to type too many symbols.
+
+B<linerange> offers you a dead-simple alternative:
+
+ % linerange 5-12 FILE
+ % linerange 5..12 FILE
+
+as well as some features like allowing single line numbers:
+
+ % linerange 10 FILE
+
+multiple line ranges:
+
+ % linerange 5-12,20,25-32 FILE
+
+as well as negative line numbers:
+
+ % linerange 5..-1 FILE
+ % linerange -5..-1 FILE
+ % linerange 5..-3 FILE
+
+You can use C<..> or C<-> (they both work), you don't have to worry about
+getting the lower range and higher range mixed up (they both work), you don't
+have to worry about intersecting ranges (duplicates will be removed).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-linerange>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-linerange>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-linerange>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<head>, B<tail>, B<sed>, B<awk>, B<perl>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

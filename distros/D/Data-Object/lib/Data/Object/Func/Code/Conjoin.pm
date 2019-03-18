@@ -25,10 +25,6 @@ sub execute {
 
   my ($data, $code) = $self->unpack;
 
-  my $refs = {'$code' => \$code};
-
-  $code = $self->codify($code, $refs);
-
   return sub { $data->(@_) && $code->(@_) };
 }
 

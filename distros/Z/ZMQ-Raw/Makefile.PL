@@ -72,12 +72,14 @@ my @opts = (
 if ($is_osx || $is_bsd)
 {
 	push @opts,
+		'ZMQ_USE_CV_IMPL_PTHREADS',
 		'ZMQ_IOTHREAD_POLLER_USE_KQUEUE',
 		'ZMQ_USE_KQUEUE';
 }
 elsif ($is_linux)
 {
 	push @opts,
+		'ZMQ_USE_CV_IMPL_PTHREADS',
 		'ZMQ_IOTHREAD_POLLER_USE_EPOLL',
 		'ZMQ_IOTHREAD_POLLER_USE_EPOLL_CLOEXEC',
 		'ZMQ_USE_EPOLL',
@@ -89,6 +91,7 @@ elsif ($is_linux)
 elsif ($is_solaris)
 {
 	push @opts,
+		'ZMQ_USE_CV_IMPL_PTHREADS',
 		'ZMQ_IOTHREAD_POLLER_USE_DEVPOLL',
 		'ZMQ_USE_DEVPOLL';
 }
@@ -96,11 +99,13 @@ elsif ($is_windows)
 {
 	push @opts,
 		'ZMQ_IOTHREAD_POLLER_USE_SELECT',
-		'ZMQ_USE_SELECT';
+		'ZMQ_USE_SELECT',
+		'ZMQ_USE_CV_IMPL_WIN32API';
 }
 else
 {
 	push @opts,
+		'ZMQ_USE_CV_IMPL_STL11',
 		'ZMQ_IOTHREAD_POLLER_USE_POLL',
 		'ZMQ_USE_POLL 1';
 }
@@ -288,7 +293,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.29",
+  "VERSION" => "0.30",
   "test" => {
     "TESTS" => "t/*.t"
   }

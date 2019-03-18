@@ -1,5 +1,10 @@
 Revision history for Perl extension Locale::TextDomain::OO.
 
+1.036  Fri Mar 15 16:24:27 2019
+- added $Test::Differences::NoDeparse = 1;
+  to have equal behaviour
+  https://rt.cpan.org/Public/Bug/Display.html?id=128841
+
 1.035  Fri Dec 21 13:12:05 2018
 - updated dependency to Locale::MO::File
 - fixed translator in case of empty plural translations

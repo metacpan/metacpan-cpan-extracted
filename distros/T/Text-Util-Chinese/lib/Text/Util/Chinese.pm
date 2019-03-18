@@ -4,7 +4,7 @@ use warnings;
 
 use Exporter 5.57 'import';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(extract_presuf extract_words);
 
 use List::Util qw(uniq);
@@ -109,7 +109,36 @@ __END__
 
 Text::Util::Chinese - A collection of subroutines for processing Chinese Text
 
-=head1 Exportable Subroutines
+=head1 DESCRIPTIONS
+
+The subroutines provided by this module are for processing Chinese text.
+Conventionally, all input strings are assumed to be wide-characters.  No
+`decode_utf8` or `utf8::decode` were done in this module. Users of this module
+should deal with input-decoding first before passing values to these
+subroutines.
+
+Given the fact that corpus files are usually large, it may be a good idea to
+avoid slurping the entire input stream. Conventionally, subroutines in this
+modules accept "input iterator" as its way to receive a small piece of corpus
+at a time. The "input iterator" is a CodeRef that returns a string every time
+it is called, or undef if there are nothing more to be processed. Here's a
+trivial example to open a file as an input iterator:
+
+    sub open_as_iterator {
+        my ($path) = @_
+        open my $fh, '<', $path;
+        return sub {
+            my $line = <$fh>;
+            return undef unless defined($line);
+            return decode_utf8($line);
+        }
+    }
+    
+    my $input_iter = open_as_iterator("/data/corpus.txt");
+
+This C<$input_iter> can be then passed as arguments to different subroutines.
+
+=head1 EXPORTED SUBROUTINES
 
 =over 4
 

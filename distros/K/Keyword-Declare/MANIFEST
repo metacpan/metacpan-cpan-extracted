@@ -36,5 +36,7 @@ dlib/Var/Your.pm
 t/recursive.t
 t/postfix_deref.t
 t/unkeyword.t
+t/DATA.t
+t/underscore.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

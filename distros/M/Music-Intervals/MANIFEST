@@ -8,7 +8,9 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/Dancer-App.pm
 eg/intervals
+eg/mojo-intervals.pl
 lib/Music/Intervals.pm
 lib/Music/Intervals/Numeric.pm
 lib/Music/Intervals/Ratio.pm

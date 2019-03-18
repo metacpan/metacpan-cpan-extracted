@@ -1,5 +1,3 @@
-# $Id$
-
 package CPU::Z80::Disassembler::Label;
 
 #------------------------------------------------------------------------------
@@ -19,7 +17,7 @@ use Carp;
 
 use CPU::Z80::Disassembler::Format;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 #------------------------------------------------------------------------------
 
@@ -57,18 +55,13 @@ Gets the label address. The address cannot be modified.
 =cut
 
 #------------------------------------------------------------------------------
-use Class::XSAccessor {
-	constructor	=> '_new',
-	accessors => [ 
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'name',			# name
 		'comment',		# comment to add to label when defining
-		'_addr',		# address
+		'addr',			# address
 		'_refer',		# hash of reference address
-	],
-	getters => {
-		addr	=> '_addr',
-	},
-};
+);
 
 sub new {
 	my($class, $addr, $name, @from_addr) = @_;
@@ -77,8 +70,9 @@ sub new {
 	croak("invalid address".(defined($addr) ? " '$addr'" : ""))
 		unless defined($addr) && $addr =~ /^\d+$/;
 		
-	my $self = $class->_new(name => $name, _addr => $addr, 
-							_refer => {});
+	my $self = bless {	name => $name, addr => $addr, 
+						_refer => {},
+					}, $class;
 	$self->add_refer(@from_addr) if @from_addr;
 	return $self;
 }

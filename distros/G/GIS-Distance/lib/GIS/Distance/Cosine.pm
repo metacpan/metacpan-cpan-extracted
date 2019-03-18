@@ -1,13 +1,15 @@
 package GIS::Distance::Cosine;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( deg2rad acos );
 use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     $lon1 = deg2rad($lon1);
@@ -34,13 +36,13 @@ GIS::Distance::Cosine - Spherical law of cosines distance calculations.
 =head1 DESCRIPTION
 
 Although this formula is mathematically exact, it is unreliable for
-small distances because the inverse cosine is ill-conditioned.
+small distances.  See L<GIS::Distance::MathTrig> for related details.
 
 A faster (XS) version of this formula is available as
 L<GIS::Distance::Fast::Cosine>.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
 =head1 FORMULA
 
@@ -51,11 +53,25 @@ is used which in turn interfaces with the various formula modules.
 
 =head1 SEE ALSO
 
+=over
+
+=item *
+
 L<https://en.wikipedia.org/wiki/Spherical_law_of_cosines>
 
-=head1 AUTHORS AND LICENSE
+=back
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+=head1 SUPPORT
+
+See L<GIS::Distance/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

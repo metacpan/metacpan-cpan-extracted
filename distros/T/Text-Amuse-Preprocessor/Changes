@@ -1,5 +1,10 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.60 2019-03-18
+
+ - Fix crash in some corner case when =<verbatim>= is used (with a
+   closing tag somewhere else), due to incorrect parsing.
+
 0.59 2019-02-28
 
  - Preserve the <br> on import. At some point this was suppressed, but

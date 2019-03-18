@@ -8,6 +8,7 @@ use Test::More;
 use AnyEvent;
 use MariaDB::NonBlocking::Event;
 use Data::Dumper;
+AnyEvent::detect();
 
 use lib 't', '.';
 require 'lib.pl';
@@ -18,47 +19,45 @@ my $connect_args = {
     password => $::test_password || '',
 };
 
-my $conn = MariaDB::NonBlocking::Event->init;
+my $conn = MariaDB::NonBlocking::Event->new;
 my $cv   = AnyEvent->condvar;
 $conn->connect(
     $connect_args,
-    {
-        success_cb => sub {
-            my ($conn) = @_;
-            my $socket_fd = $conn->mysql_socket_fd;
-            cmp_ok($socket_fd, '>=', 1, "Got a socket FD after connecting");
-            
-            $conn->run_query("SELECT 1", undef, {
-                success_cb => sub {
-                    $cv->send;
-                    is_deeply($_[0], [[1]], "SELECT 1 worked");
-                },
-                failure_cb => sub {
-                    fail($_[0]);
-                    $cv->send;
-                },
-            });
-        },
-        failure_cb => sub {
-            fail($_[0]);
-            $cv->send;
-        },
+    sub {
+        my ($conn) = @_;
+        my $socket_fd = $conn->mysql_socket_fd;
+        cmp_ok($socket_fd, '>=', 1, "Got a socket FD after connecting");
+
+        $conn->run_query("SELECT 1", {}, undef,
+            sub {
+                $cv->send;
+                is_deeply($_[0], [[1]], "SELECT 1 worked");
+            },
+            sub {
+                fail($_[0]);
+                $cv->send;
+            },
+        );
+    },
+    sub {
+        fail($_[0]);
+        $cv->send;
     },
 );
 $cv->recv;
 
 $cv = AnyEvent->condvar;
-$conn->run_query("SELECT ?", [2], {
-    success_cb => sub {
+$conn->run_query("SELECT ?", undef, [2],
+    sub {
         $cv->send;
         my ($res) = @_;
         is_deeply($res, [[2]], "SELECT ? bind 2 worked");
     },
-    failure_cb => sub {
+    sub {
         fail("SELECT ? bind 2 failed: $_[0]");
         $cv->send;
     },
-});
+);
 $cv->recv;
 
 $cv = AnyEvent->condvar;
@@ -67,42 +66,47 @@ $cv->begin;
 $conn->run_query(
     "SELECT 3, SLEEP(1)",
     undef,
-    {
-        success_cb => sub {
-            is_deeply($_[0], [[3, 0]], "query that was in flight finished successfully");
-            $cv->end;
-        },
-        failure_cb => sub {
-            fail("Query in flight failed");
-            diag($_[0]);
-            $cv->end;
-        },
+    undef,
+    sub {
+        is_deeply($_[0], [[3, 0]], "query that was in flight finished successfully");
+        $cv->end;
+    },
+    sub {
+        fail("Query in flight failed");
+        diag($_[0]);
+        $cv->end;
     },
 );
-$conn->run_query("SELECT 4, SLEEP(3)", undef, {
-    success_cb => sub {
+$conn->run_query(
+    "SELECT 4, SLEEP(3)",
+    {},
+    undef,
+    sub {
         fail("Should never allow two queries in flight at once");
         $cv->end;
     },
-    failure_cb => sub {
-        like($_[0], qr/Attempted to start a query when/, "query started when another is in flight failed");
+    sub {
+        like($_[0], qr/Attempted to /, "query started when another is in flight failed");
         $cv->end;
     },
-});
+);
 $cv->recv;
 
-my $conn2 = MariaDB::NonBlocking::Event->init;
-$conn2->run_query("select 1", undef, {
-    success_cb => sub {},
-    failure_cb => sub {
+my $conn2 = MariaDB::NonBlocking::Event->new;
+$conn2->run_query(
+    "select 1",
+    {},
+    undef,
+    sub {},
+    sub {
         my $e = $_[0];
-        like($e, qr/\ACannot start query; not connected/, "->init->connect fails");
+        like($e, qr/\ACannot start query; not connected/, "->new->connect fails");
     },
-});
+);
 
 $cv = AnyEvent->condvar;
-$conn2->connect($connect_args, {
-    success_cb => sub {
+$conn2->connect($connect_args,
+    sub {
         my ($conn2) = @_;
 
         $cv->begin;
@@ -113,19 +117,15 @@ $conn2->connect($connect_args, {
             fail("Query failed unexpectedly: $_[0]");
             $cv->end;
         };
-        my $attr = {
-            success_cb => $success_cb,
-            failure_cb => $failure_cb,
-        };
-        $conn->run_query("SHOW PROCESSLIST", undef, $attr);
-        $conn2->run_query("SELECT 1, SLEEP(1)", undef, $attr);
+        $conn->run_query("SHOW PROCESSLIST", {}, undef, $success_cb, $failure_cb);
+        $conn2->run_query("SELECT 1, SLEEP(1)", {}, undef, $success_cb, $failure_cb);
 
         return;
     },
-    failure_cb => sub {
+    sub {
         $cv->send;
     },
-});
+);
 $cv->recv;
 
 my $start_query = sub {
@@ -135,18 +135,18 @@ my $start_query = sub {
     my $next_tuple = shift @$tuples;
     my ($re, $sql, $bind) = @$next_tuple;
 
-    $conn->run_query($sql, $bind, {
-        success_cb => sub {
+    $conn->run_query($sql, {}, $bind,
+        sub {
             $cv->send;
             fail("Broken query should never succeed");
         },
-        failure_cb => sub {
+        sub {
             my $error = $_[0];
             like($error, $re, "$sql failed as expected");
 
             $next_query_start->($conn, $tuples, $cv, $next_query_start);
         },
-    });
+    );
 };
 
 my @broken_queries = (

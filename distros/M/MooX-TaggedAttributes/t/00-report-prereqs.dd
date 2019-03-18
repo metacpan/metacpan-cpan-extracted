@@ -86,6 +86,7 @@ do { my $x = {
                                       'Scalar::Util' => '0',
                                       'Sub::Name' => '0',
                                       'namespace::clean' => '0',
+                                      'perl' => '5.008009',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -105,8 +106,7 @@ do { my $x = {
                                    'Test2::V0' => '0',
                                    'Test::CleanNamespaces' => '0',
                                    'Test::Lib' => '0',
-                                   'Test::More' => '0',
-                                   'perl' => '5.006'
+                                   'Test::More' => '0'
                                  }
                  }
      };

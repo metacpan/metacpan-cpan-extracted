@@ -1,4 +1,4 @@
-Locale-TextDomain-OO version 1.035
+Locale-TextDomain-OO version 1.036
 ==================================
 
 Perl OO Interface to Uniforum Message Translation
@@ -40,7 +40,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2009 - 2018,
+Copyright (c) 2009 - 2019,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

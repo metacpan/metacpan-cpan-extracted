@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001010';
+our $VERSION = '0.001012';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -32,6 +32,10 @@ sub import {
     if ($opt_ref->{debug}) {
         ${^H}{'Keyword::Declare debug'} = !!$opt_ref->{debug};
     }
+
+    # Install replacement __DATA__ handler...
+    # [REMOVE IF UPSTREAM MODULE (Keyword::Simple) FIXED]
+    _install_data_handler();
 
     # Install the 'keytype' (meta-)keyword...
     Keyword::Simple::define 'keytype', sub {
@@ -245,9 +249,14 @@ sub import {
 
         # Install the keyword, exporting it as well if it's in an import() or unimport() sub...
         $$src_ref = qq{ if (((caller 0)[3]//q{}) =~ /\\b(?:un)?import\\Z/) { $keyword_defn } }
+                  .  q{ Keyword::Declare::_install_data_handler(); }
                   . qq{ BEGIN{ $keyword_defn } }
                   . "\n#line $line $file\n"
                   . $$src_ref;
+
+        # Pre-empt addition of extraneous trailing newline by Keyword::Simple...
+        # [REMOVE IF UPSTREAM MODULE (Keyword::Simple) FIXED]
+        $$src_ref =~ s{\n\z}{};
     };
 
     # Install the 'unkeyword' (anti-meta-)keyword...
@@ -313,6 +322,44 @@ sub import {
     };
 }
 
+# Keyword::Simple::define() has a bug: it can't define keywords starting with _
+sub _replacement_define {
+    package Keyword::Simple;
+    use B::Hooks::EndOfScope;
+
+    my ($kw, $sub) = @_;
+    $kw =~ /^[^\W\d]\w*\z/ or croak "'$kw' doesn't look like an identifier";
+    ref($sub) eq 'CODE' or croak "'$sub' doesn't look like a coderef";
+
+    our @meta;
+    my $n = @meta;
+    push @meta, $sub;
+
+    $^H{+HINTK_KEYWORDS} .= " $kw:$n";
+    on_scope_end {
+        delete $meta[$n];
+    };
+}
+
+# Install a __DATA__ keyword to overcome bug in Keyword::Simple...
+sub _install_data_handler {
+    my $DATA_HANDLER = sub {
+        # Unpack trailing code...
+        my ($src_ref) = @_;
+
+        # Convert to data handle...
+        my $data = $$src_ref;
+        $data =~ s{ \A [^\n]* \n }{}xms;
+        open *::DATA, '<', \$data;
+
+        # Remove trailing code...
+        $$src_ref = q{};
+    };
+    _replacement_define('__DATA__', $DATA_HANDLER);
+}
+
+
+# Remove special prefix on names of internal named captures...
 sub _deprefix {
     my ($hash_ref) = @_;
 
@@ -330,10 +377,10 @@ sub _build_keyword_code {
     # Generate the keyword definition and set up its unique lexical ID...
     return qq{
         \$^H{"Keyword::Declare active:$keyword_name:\Q$keyword_sig\E"} = $keyword_ID;
-        Keyword::Simple::define '$keyword_name', Keyword::Declare::_get_dispatcher_for('$keyword_name',
+        Keyword::Declare::_replacement_define('$keyword_name', Keyword::Declare::_get_dispatcher_for('$keyword_name',
             $keyword_ID, sub
 #line $block_location
-            { $keyword_impls[$keyword_ID]{sig_vars_unpack}  do $keyword_block });
+            { $keyword_impls[$keyword_ID]{sig_vars_unpack}  do $keyword_block }));
     };
 }
 
@@ -907,6 +954,10 @@ sub _insert_replacement_code {
 
     # Install the replacement code...
     $$src_ref = "$replacement_code\n#KDCT:_:_:1 $keyword->{keyword}\n#line $line $file\n" . $$src_ref;
+
+    # Pre-empt addition of extraneous trailing newline by Keyword::Simple...
+    # [REMOVE IF UPSTREAM MODULE (Keyword::Simple) FIXED]
+    $$src_ref =~ s{\n\z}{};
 }
 
 # Compare two types...
@@ -1010,7 +1061,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001010
+This document describes Keyword::Declare version 0.001012
 
 
 =head1 STATUS

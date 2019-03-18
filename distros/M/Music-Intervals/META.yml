@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Music-Intervals
   repository: https://github.com/ology/Music-Intervals
-version: '0.0503'
+version: '0.0507'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

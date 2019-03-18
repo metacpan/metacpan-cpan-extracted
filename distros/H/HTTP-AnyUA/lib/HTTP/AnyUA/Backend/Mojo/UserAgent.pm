@@ -5,12 +5,20 @@ package HTTP::AnyUA::Backend::Mojo::UserAgent;
 use warnings;
 use strict;
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
 use Future;
 use Scalar::Util;
+
+
+my $future_class;
+BEGIN {
+    $future_class = 'Future';
+    eval 'use Future::Mojo';    ## no critic
+    $future_class = 'Future::Mojo' if !$@;
+}
 
 
 sub response_is_future { 1 }
@@ -19,7 +27,7 @@ sub request {
     my $self = shift;
     my ($method, $url, $args) = @_;
 
-    my $future = Future->new;
+    my $future = $future_class->new;
 
     my $tx = $self->_munge_request(@_);
 
@@ -150,12 +158,15 @@ HTTP::AnyUA::Backend::Mojo::UserAgent - A unified programming interface for Mojo
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 DESCRIPTION
 
 This module adds support for the HTTP client L<Mojo::UserAgent> to be used with the unified
 programming interface provided by L<HTTP::AnyUA>.
+
+If installed, requests will return L<Future::Mojo> rather than L<Future>. This allows the use of the
+C<< ->get >> method to await a result.
 
 =head1 CAVEATS
 
@@ -192,7 +203,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2019 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

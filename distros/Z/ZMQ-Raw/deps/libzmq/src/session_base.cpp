@@ -117,7 +117,7 @@ zmq::session_base_t::session_base_t (class io_thread_t *io_thread_,
 {
 }
 
-const char *zmq::session_base_t::get_endpoint () const
+const zmq::endpoint_uri_pair_t &zmq::session_base_t::get_endpoint () const
 {
     return _engine->get_endpoint ();
 }
@@ -408,6 +408,11 @@ void zmq::session_base_t::process_attach (i_engine *engine_)
         //  Remember the local end of the pipe.
         zmq_assert (!_pipe);
         _pipe = pipes[0];
+
+        //  The endpoints strings are not set on bind, set them here so that
+        //  events can use them.
+        pipes[0]->set_endpoint_pair (engine_->get_endpoint ());
+        pipes[1]->set_endpoint_pair (engine_->get_endpoint ());
 
         //  Ask socket to plug into the remote end of the pipe.
         send_bind (_socket, pipes[1]);

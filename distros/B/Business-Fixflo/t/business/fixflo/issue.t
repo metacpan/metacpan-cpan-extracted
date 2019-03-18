@@ -45,6 +45,7 @@ can_ok(
 		TenantNotes
 		Address
 		Id
+        IsCommunal
         Job
 		Firstname
 		EmailAddress

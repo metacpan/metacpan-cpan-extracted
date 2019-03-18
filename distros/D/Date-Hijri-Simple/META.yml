@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +20,10 @@ no_index:
 provides:
   Date::Hijri::Simple:
     file: lib/Date/Hijri/Simple.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   Date::Exception: '0.03'
-  Date::Utils: '0.22'
+  Date::Utils: '0.25'
   List::Util: '1.41'
   Moo: '2.000000'
   Time::localtime: '1.02'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Date-Hijri-Simple.git
-version: '0.20'
+version: '0.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

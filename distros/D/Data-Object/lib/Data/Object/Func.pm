@@ -4,7 +4,6 @@ use Data::Object::Class;
 
 extends 'Data::Object::Kind';
 
-with 'Data::Object::Role::Codifiable';
 with 'Data::Object::Role::Throwable';
 
 # BUILD

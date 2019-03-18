@@ -1,5 +1,8 @@
 Revision history for GD::Graph::radar
 
+0.1104 2019-03-16 03:13:23
+    - Attempt to quiet the cpantesters failure by tweaking the test.
+
 0.1103 2019-03-03 21:16:25
     - Ugh! Fixed crucial typo.
     - Re-worded ABSTRACT.

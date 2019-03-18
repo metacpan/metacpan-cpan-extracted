@@ -1,13 +1,15 @@
 package GIS::Distance::Polar;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( deg2rad pi );
 use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     $lon1 = deg2rad($lon1);
@@ -45,7 +47,7 @@ A faster (XS) version of this formula is available as
 L<GIS::Distance::Fast::Polar>.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
 =head1 FORMULA
 
@@ -54,9 +56,17 @@ is used which in turn interfaces with the various formula modules.
     c = sqrt( a^2 + b^2 - 2 * a * b * cos(lon2 - lon1) )
     d = R * c
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+See L<GIS::Distance/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

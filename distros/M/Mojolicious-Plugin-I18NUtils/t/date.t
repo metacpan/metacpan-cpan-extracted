@@ -59,5 +59,21 @@ for my $date ( @falses ) {
     $t->get_ok( "/error?date=" . ( $date || '' ) )->status_is( 200 )->content_is( '', "test error " . ( defined $date ? $date : '<undefined>' ) );
 }
 
+{
+    my $c = $t->app->build_controller;
+    is $c->date_loc( undef, 'de' ), '';
+}
+
+{
+    my $c = $t->app->build_controller;
+    $c->req->headers->accept_language('de');
+    is $c->date_loc( undef, undef ), '';
+}
+
+{
+    my $c = $t->app->build_controller;
+    is $c->date_loc( undef, undef ), '';
+}
+
 done_testing();
 

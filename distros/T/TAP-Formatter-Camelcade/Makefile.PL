@@ -16,12 +16,13 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "TAP::Formatter::Camelcade",
   "PREREQ_PM" => {
-    "Test::Harness" => 0
+    "Test::Harness" => "3.38"
   },
   "TEST_REQUIRES" => {
+    "Test::Harness" => "3.38",
     "Test::Simple" => "1.302162"
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Test::Harness" => 0,
+  "Test::Harness" => "3.38",
   "Test::Simple" => "1.302162"
 );
 

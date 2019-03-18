@@ -6,6 +6,7 @@ requires "Moo::Role" => "0";
 requires "Scalar::Util" => "0";
 requires "Sub::Name" => "0";
 requires "namespace::clean" => "0";
+requires "perl" => "5.008009";
 requires "strict" => "0";
 requires "warnings" => "0";
 
@@ -21,7 +22,6 @@ on 'test' => sub {
   requires "Test::CleanNamespaces" => "0";
   requires "Test::Lib" => "0";
   requires "Test::More" => "0";
-  requires "perl" => "5.006";
 };
 
 on 'test' => sub {

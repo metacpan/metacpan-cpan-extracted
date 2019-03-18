@@ -1,54 +1,37 @@
-#!perl
+#!/usr/bin/perl
 
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use 5.010;
-my $mm_ver = $ExtUtils::MakeMaker::VERSION;
-if ($mm_ver =~ /_/) {
-    # developer release
-    $mm_ver = eval $mm_ver;
-    die $@ if $@;
-}
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME                => 'CPU::Z80::Disassembler',
-    AUTHOR              => q{Paulo Custodio <pscust@cpan.org>},
+    AUTHOR              => 'Paulo Custodio <pscust@cpan.org',
     VERSION_FROM        => 'lib/CPU/Z80/Disassembler.pm',
     ABSTRACT_FROM       => 'lib/CPU/Z80/Disassembler.pm',
+    DISTNAME          	=> 'CPU-Z80-Disassembler',
     PL_FILES            => {},
     PREREQ_PM => {
-		'Asm::Z80::Table'		=> 0.02,
-		'Bit::Vector'			=> 7.1,
-		'Carp'					=> 0,
-		'Class::XSAccessor'		=> 1.08,
-		'CPU::Z80::Assembler'	=> 2.13,	# test fails if z80masm is not up-to-date
-		'File::Basename'		=> 0,
-		'File::Slurp'			=> 9999.12,
-		'Getopt::Std'			=> 0,
-		'Test::Output'			=> 0.16,
-		'Tie::File'				=> 0.96,
-        'Test::More'			=> 0.96,	# needs done_testing()
+		'Asm::Z80::Table'		=> 0.03,
+		'Bit::Vector'			=> 7.4,
+		'Class::Accessor'		=> 0.51,
+		'CPU::Z80::Assembler'	=> 2.16,	# test fails if z80masm is not up-to-date
+		'File::Slurp'			=> 9999.26,
+		'Test::Output'			=> 1.031,
+		'Tie::File'				=> 1.00,
+        'Test::More'			=> 1.302162,
+		'Path::Tiny'			=> 0.108,
     },
 	EXE_FILES => [
 		'bin/z80dis',
 	],
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'CPU-Z80-Disassembler-*' },
-
-    ($mm_ver >= 6.48
-        ? (MIN_PERL_VERSION => 5.010)
-        : ()
-    ),
-
-    ($mm_ver >= 6.31 ? (LICENSE => 'perl_5_16') : ()),
-
-    ($mm_ver <= 6.45
-        ? ()
-        : (META_MERGE => {
-            'meta-spec' => { version => 2 },
+	MIN_PERL_VERSION 	=> 5.010,
+	LICENSE 			=> 'perl_5',
+	META_MERGE => {
             resources => {
                 repository  => {
                     type => 'git',
@@ -56,8 +39,9 @@ WriteMakefile(
                     web  => 'https://github.com/pauloscustodio/perl-CPU-Z80-Disassembler',
                 },
             },
-          })
-    ),
+          },
+    clean               => { FILES => 'CPU-Z80-Disassembler-*' },
+
 );
 
 sub MY::postamble {

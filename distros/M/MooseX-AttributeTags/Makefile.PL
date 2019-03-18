@@ -6,8 +6,8 @@ my $EUMM = eval( $ExtUtils::MakeMaker::VERSION );
 my $meta = {
   "abstract"       => "tag your Moose attributes",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
-  "dynamic_config" => 0,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+  "dynamic_config" => 1,
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -27,11 +27,17 @@ my $meta = {
                                          "perl" => "5.008000",
                                        },
                                      },
-                        test      => { requires => { "Test::Fatal" => 0.007, "Test::More" => 0.96 } },
+                        test      => {
+                                       requires => {
+                                         "namespace::autoclean" => 0,
+                                         "Test::Fatal" => 0.007,
+                                         "Test::More" => 0.96,
+                                       },
+                                     },
                       },
   "provides"       => {
-                        "MooseX::AttributeTags"        => { file => "lib/MooseX/AttributeTags.pm", version => 0.004 },
-                        "MooseX::AttributeTags::PRole" => { file => "lib/MooseX/AttributeTags/PRole.pm", version => 0.004 },
+                        "MooseX::AttributeTags"        => { file => "lib/MooseX/AttributeTags.pm", version => 0.005 },
+                        "MooseX::AttributeTags::PRole" => { file => "lib/MooseX/AttributeTags/PRole.pm", version => 0.005 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -47,10 +53,15 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-AttributeTags/project",
                       },
-  "version"        => 0.004,
+  "version"        => 0.005,
 };
 
 my %dynamic_config;
+do {
+$meta->{prereqs}{runtime}{requires}{'Sub::Util'} = '0'
+	unless eval { require Sub::Name; Sub::Name->can('subname') };
+
+};
 
 my %WriteMakefileArgs = (
 	ABSTRACT   => $meta->{abstract},

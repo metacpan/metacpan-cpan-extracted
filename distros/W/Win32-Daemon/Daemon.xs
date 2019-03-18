@@ -929,7 +929,6 @@ BOOL WINAPI DllMain( HINSTANCE  hinstDLL, DWORD fdwReason, LPVOID  lpvReserved )
         case DLL_PROCESS_ATTACH:
 
             ghDLL = hinstDLL;
-            CountConstants();
 
 #ifdef ENABLE_CALLBACKS            
             gfCallbackMode = FALSE;
@@ -1061,36 +1060,13 @@ MODULE = Win32::Daemon  PACKAGE = Win32::Daemon
 
 PROTOTYPES: DISABLE
 
+BOOT:
+{
+    ExportConstants(aTHX);
+}
+
+
 # INCLUDE: \include\XS_RothMacros.xsh
-
-int
-Constant( pszName, pSvBuffer )
-    LPTSTR	pszName
-    SV*		pSvBuffer
-
-	PREINIT:
-	eConstantType eResult;
-	LPVOID	pBuffer = NULL;
-
-	CODE:
-		eResult = Constant( pszName, &pBuffer );
-		switch( eResult )
-		{
-			case String:
-				sv_setpv( pSvBuffer, (LPTSTR) pBuffer );
-				break;
-
-			case Numeric:
-				sv_setiv( pSvBuffer, (IV) pBuffer );
-				break;
-		}
-
-		//  Return the result type.
-		RETVAL = eResult;
-	
-	OUTPUT:
-		RETVAL
-		pSvBuffer
 
 int
 RegisterCallbacks( pSv )

@@ -2,7 +2,8 @@
 abstract: 'A collection of subroutines for processing Chinese Text'
 author:
   - 'Kang-min Liu <gugod@gugod.org>'
-build_requires: {}
+build_requires:
+  Test2::V0: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -15,11 +16,11 @@ name: Text-Util-Chinese
 provides:
   Text::Util::Chinese:
     file: lib/Text/Util/Chinese.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   List::Util: '1.5'
 resources:
   repository: https://github.com/gugod/Text-Util-Chinese.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: '1'

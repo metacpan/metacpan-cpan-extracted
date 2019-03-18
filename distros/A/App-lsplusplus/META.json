@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::LsColor" : "0.498",
             "Term::ExtendedColor" : "0.16",
             "Time::Local" : "0.16"
          }
@@ -51,6 +52,6 @@
          "x_bugtracker" : "https://github.com/trapd00r/ls--/issues"
       }
    },
-   "version" : "0.58",
+   "version" : "0.68",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

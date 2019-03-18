@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package DBIx::Class::DeploymentHandler::VersionStorage::WithSchema::VersionResult;
 
-our $VERSION = '0.002';
+our $VERSION = '0.004';
 
 use parent 'DBIx::Class::Core';
 

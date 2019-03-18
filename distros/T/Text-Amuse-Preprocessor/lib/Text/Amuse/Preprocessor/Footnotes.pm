@@ -5,6 +5,7 @@ use warnings;
 use File::Spec;
 use File::Temp;
 use File::Copy;
+use Text::Amuse::Preprocessor::Parser;
 use Text::Diff ();
 
 =encoding utf8
@@ -182,39 +183,14 @@ sub tmpdir {
 sub process {
     my $self = shift;
     # auxiliary files
-    my $tmpdir = $self->tmpdir;
-    print "Using $tmpdir\n" if $self->debug;
-
-    # if you're wondering, we are doing all this with file streams to
-    # avoid reading the whole document in memory
-
-    my $auxfile  = File::Spec->catfile($tmpdir, 'primary.muse');
-    my $infile = $self->input;
-    open (my $in, '<:encoding(UTF-8)', $infile)
-      or die ("can't open $infile $!");
-    open (my $out, '>:encoding(UTF-8)', $auxfile)
-      or die ("can't open $auxfile $!");
-
-
-    if ($self->rewrite(primary => $in, $out)) {
-        close $in  or die $!;
-        close $out or die $!;
-
-        my $sec_auxfile  = File::Spec->catfile($tmpdir, 'secondary.muse');
-        open (my $sec_in, '<:encoding(UTF-8)', $auxfile)
-          or die ("can't open $auxfile $!");
-        open (my $sec_out, '>:encoding(UTF-8)', $sec_auxfile)
-          or die ("can't open $sec_auxfile $!");
-
-        if ($self->rewrite(secondary => $sec_in, $sec_out)) {
-            close $sec_in  or die $!;
-            close $sec_out or die $!;
+    my @body = Text::Amuse::Preprocessor::Parser::parse_text($self->_read_file($self->input));
+    if ($self->rewrite(primary => \@body)) {
+        if ($self->rewrite(secondary => \@body)) {
             if (my $outfile = $self->output) {
-                copy $sec_auxfile, $outfile or die "Cannot copy $sec_auxfile to $outfile $!";
+                $self->_write_file($outfile, join('', map { $_->{string} } @body));
                 return $outfile;
             }
             else {
-                # dry run, just state success
                 return 1;
             }
         }
@@ -223,7 +199,7 @@ sub process {
 }
 
 sub rewrite {
-    my ($self, $type, $in, $out) = @_;
+    my ($self, $type, $body) = @_;
     # read the file.
     my $fn_counter = 0; 
     my $body_fn_counter = 0;
@@ -246,8 +222,10 @@ sub rewrite {
     my $secondary_re = qr{^ (\{ [0-9]+ \}) (?=\s) }x;
 
     my $in_footnote = 0;
-    while (my $r = <$in>) {
-
+  CHUNK:
+    foreach my $el (@$body) {
+        next CHUNK if $el->{type} ne 'text';
+        my $r = $el->{string};
         # a footnote
         if ($r =~ s/$start_re/_check_and_replace_fn($1,
                                                  \$fn_counter,
@@ -273,7 +251,7 @@ sub rewrite {
                                              \$body_fn_counter,
                                              \@references_found, $open, $close, \$in_footnote)/gxe;
         }
-        print $out $r;
+        $el->{string} = $r;
     }
     if ($body_fn_counter == $fn_counter) {
         return 1;
@@ -305,5 +283,25 @@ sub _check_and_replace_fn {
     $$in_footnote = length($number) + 3;
     return $open . $number . $close;
 }
+
+sub _write_file {
+    my ($self, $file, $body) = @_;
+    die unless $file && $body;
+    open (my $fh, '>:encoding(UTF-8)', $file) or die "opening $file $!";
+    print $fh $body;
+    close $fh or die "closing $file: $!";
+
+}
+
+sub _read_file {
+    my ($self, $file) = @_;
+    die unless $file;
+    open (my $fh, '<:encoding(UTF-8)', $file) or die "$file: $!";
+    local $/ = undef;
+    my $body = <$fh>;
+    close $fh;
+    return $body;
+}
+
 
 1;

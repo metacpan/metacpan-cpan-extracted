@@ -20,7 +20,7 @@ has arg2 => (
 
 has arg3 => (
   is => 'ro',
-  isa => 'Str | CodeRef',
+  isa => 'CodeRef',
   req => 1
 );
 
@@ -37,7 +37,6 @@ sub execute {
 
   my ($data, $number, $code, @args) = $self->unpack;
 
-  my $refs = {};
   my @list = (0 .. $#{$data});
 
   while (my @indexes = splice(@list, 0, $number)) {
@@ -48,13 +47,10 @@ sub execute {
       my $index = $indexes[$pos];
       my $value = defined($index) ? $data->[$index] : undef;
 
-      $refs->{"\$index${i}"} = $index if defined $index;
-      $refs->{"\$value${i}"} = $value if defined $value;
-
       push @values, $value;
     }
 
-    $self->codify($code, $refs)->(@values, @args);
+    $code->(@values, @args);
   }
 
   return $data;

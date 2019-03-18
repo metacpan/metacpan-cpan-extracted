@@ -29,7 +29,7 @@ is		$label->name,			'A';
 is		$label->comment,		undef;
 is		$label->addr,			23;
 is		$label->label_string,	"A:\n";
-is		$label->equ_string,		"A".(" " x 11)."equ 0x0017\n";
+is		$label->equ_string,		"A".(" " x 11)."equ \$0017\n";
 is_deeply [$label->refer_from],	[];
 
 $label->name('B');
@@ -39,48 +39,48 @@ is		$label->comment,		'this is a label';
 is		$label->addr,			23;
 is		$label->label_string,	"B:".(" " x 30).
 								"; this is a label\n";
-is		$label->equ_string,		"B".(" " x 11)."equ 0x0017".(" " x 10).
+is		$label->equ_string,		"B".(" " x 11)."equ \$0017".(" " x 11).
 								"; this is a label\n";
-is		$label->equ_string(8),	"B".(" " x 7)."equ 0x0017".(" " x 14).
+is		$label->equ_string(8),	"B".(" " x 7)."equ \$0017".(" " x 15).
 								"; this is a label\n";
 $label->name('B' x 7);
 is		$label->label_string,	"BBBBBBB:".(" " x 24).
 								"; this is a label\n";
-is		$label->equ_string,		"BBBBBBB".(" " x 5)."equ 0x0017".(" " x 10).
+is		$label->equ_string,		"BBBBBBB".(" " x 5)."equ \$0017".(" " x 11).
 								"; this is a label\n";
-is		$label->equ_string(8),	"BBBBBBB equ 0x0017".(" " x 14).
+is		$label->equ_string(8),	"BBBBBBB equ \$0017".(" " x 15).
 								"; this is a label\n";
 								
 $label->name('B' x 8);
 is		$label->label_string,	"BBBBBBBB:".(" " x 23).
 								"; this is a label\n";
-is		$label->equ_string,		"BBBBBBBB".(" " x 4)."equ 0x0017".(" " x 10).
+is		$label->equ_string,		"BBBBBBBB".(" " x 4)."equ \$0017".(" " x 11).
 								"; this is a label\n";
-is		$label->equ_string(8),	"BBBBBBBB equ 0x0017".(" " x 13).
+is		$label->equ_string(8),	"BBBBBBBB equ \$0017".(" " x 14).
 								"; this is a label\n";
 
 $label->comment("line 1\nline 2");
 is		$label->label_string,	"BBBBBBBB:".(" " x 23).
 								"; line 1\n".(" " x 32)."; line 2\n";
-is		$label->equ_string,		"BBBBBBBB".(" " x 4)."equ 0x0017".(" " x 10).
+is		$label->equ_string,		"BBBBBBBB".(" " x 4)."equ \$0017".(" " x 11).
 								"; line 1\n".(" " x 32)."; line 2\n";
-is		$label->equ_string(8),	"BBBBBBBB equ 0x0017".(" " x 13).
+is		$label->equ_string(8),	"BBBBBBBB equ \$0017".(" " x 14).
 								"; line 1\n".(" " x 32)."; line 2\n";
 
 $label->name('B' x 30);
 is		$label->label_string,	('B' x 30).": ".
 								"; line 1\n".(" " x 32)."; line 2\n";
-is		$label->equ_string,		('B' x 30)." equ 0x0017\n".
+is		$label->equ_string,		('B' x 30)." equ \$0017\n".
 								(" " x 32)."; line 1\n".(" " x 32)."; line 2\n";
-is		$label->equ_string(8),	('B' x 30)." equ 0x0017\n".
+is		$label->equ_string(8),	('B' x 30)." equ \$0017\n".
 								(" " x 32)."; line 1\n".(" " x 32)."; line 2\n";
 								
 $label->name('B' x 31);
 is		$label->label_string,	('B' x 31).":\n".
 								(" " x 32)."; line 1\n".(" " x 32)."; line 2\n";
-is		$label->equ_string,		('B' x 31)." equ 0x0017\n".
+is		$label->equ_string,		('B' x 31)." equ \$0017\n".
 								(" " x 32)."; line 1\n".(" " x 32)."; line 2\n";
-is		$label->equ_string(8),	('B' x 31)." equ 0x0017\n".
+is		$label->equ_string(8),	('B' x 31)." equ \$0017\n".
 								(" " x 32)."; line 1\n".(" " x 32)."; line 2\n";
 								
 is_deeply [$label->refer_from],	[];

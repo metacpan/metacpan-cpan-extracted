@@ -6,7 +6,7 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.1103';
+our $VERSION = '0.1104';
 
 use base qw(GD::Graph);
 use GD;
@@ -307,7 +307,7 @@ GD::Graph::radar - Attempt to make radial charts
 
 =head1 VERSION
 
-version 0.1103
+version 0.1104
 
 =head1 SYNOPSIS
 

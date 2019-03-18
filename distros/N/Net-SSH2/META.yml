@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 provides:
   Net::SSH2:
     file: lib/Net/SSH2.pm
-    version: '0.69'
+    version: '0.70'
   Net::SSH2::Channel:
     file: lib/Net/SSH2/Channel.pm
   Net::SSH2::Dir:
@@ -42,4 +42,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/rkitover/net-ssh2.git
-version: '0.69'
+version: '0.70'

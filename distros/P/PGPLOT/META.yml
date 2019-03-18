@@ -1,19 +1,26 @@
---- #YAML:1.0
-name:               PGPLOT
-version:            2.21
-abstract:           ~
-author:  []
-license:            unknown
-distribution_type:  module
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    ExtUtils::F77:  1.13
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.48
+  ExtUtils::F77: '1.13'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGPLOT
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::F77: '1.13'
+resources:
+  repository: git://github.com/PDLPorters/perl5-PGPLOT.git
+version: '2.23'
+x_IRC: irc://irc.perl.org/#pdl
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

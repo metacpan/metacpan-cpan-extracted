@@ -110,3 +110,19 @@ Revision history for Keyword-Declare
 0.001010  Fri Oct  5 07:09:40 2018
 
     * Minor doc tweaks
+
+
+0.001011  Sun Mar 17 22:08:35 2019
+
+    * Added a local replacement for Keyword::Simple::define()
+      to support keywords that start with an underscore
+
+    * Added auto-insertion of __DATA__ keyword as a workaround to support
+      __DATA__ sections when Keyword::Declare is used
+      (Thanks, Patrick!)
+
+
+0.001012  Mon Mar 18 06:40:57 2019
+
+    * Improved auto-insertion of __DATA__ keyword
+

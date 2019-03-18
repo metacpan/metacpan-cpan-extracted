@@ -36,8 +36,8 @@ method
 
 use_ok 'Data::Object::Number';
 
-my $data = Data::Object::Number->new(12);
+my $data = Data::Object::Number->new(12345);
 
-is_deeply $data->sqrt(), 3.46410161513775;
+like $data->sqrt(), qr/111.10805/;
 
 ok 1 and done_testing;

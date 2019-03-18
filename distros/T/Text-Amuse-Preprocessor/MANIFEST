@@ -7,6 +7,7 @@ Changes
 lib/Text/Amuse/Preprocessor.pm
 lib/Text/Amuse/Preprocessor/Footnotes.pm
 lib/Text/Amuse/Preprocessor/HTML.pm
+lib/Text/Amuse/Preprocessor/Parser.pm
 lib/Text/Amuse/Preprocessor/Typography.pm
 lib/Text/Amuse/Preprocessor/TypographyFilters.pm
 Makefile.PL
@@ -16,6 +17,7 @@ t/00-load.t
 t/changes.t
 t/chars.t
 t/common.t
+t/crash-on-verb.t
 t/crash_on_loop.t
 t/exclude-verbatim.t
 t/footnotes.t

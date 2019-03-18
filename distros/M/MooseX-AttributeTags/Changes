@@ -6,7 +6,16 @@ Home page:    <https://metacpan.org/release/MooseX-AttributeTags>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-AttributeTags>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
-0.004	2014-10-03
+0.005	2019-03-16
+
+ [ Documentation ]
+ - Copyright 2019.
+ - Document that constants exist.
+
+ [ Other ]
+ - Use Sub::Name/Sub::Util to name exported constants.
+
+0.004	2017-10-03
 
  [ Bug Fixes ]
  - Correct module name in SYNOPSIS.

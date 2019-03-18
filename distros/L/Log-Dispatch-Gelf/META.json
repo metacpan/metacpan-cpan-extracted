@@ -63,7 +63,7 @@
    "provides" : {
       "Log::Dispatch::Gelf" : {
          "file" : "lib/Log/Dispatch/Gelf.pm",
-         "version" : "v1.3.1"
+         "version" : "v1.3.2"
       }
    },
    "release_status" : "stable",
@@ -77,12 +77,14 @@
          "web" : "https://github.com/avast/log-dispatch-gelf"
       }
    },
-   "version" : "1.3.1",
+   "version" : "1.3.2",
    "x_contributors" : [
-      "Jan Seidl <seidl@avast.com>",
       "Adam Clarke <adam.clarke@strategicdata.com.au>",
       "tynovsky <tynovsky@seznam.cz>",
-      "Mohelníková Lucie <mohelnikova@avast.com>"
+      "Mohelníková Lucie <mohelnikova@avast.com>",
+      "Jan Seidl <seidl@avast.com>",
+      "alexrkopp <45714392+alexrkopp@users.noreply.github.com>",
+      "Jan Seidl <janseidl@volny.cz>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

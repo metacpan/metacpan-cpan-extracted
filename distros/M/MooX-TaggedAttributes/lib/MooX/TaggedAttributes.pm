@@ -2,10 +2,12 @@ package MooX::TaggedAttributes;
 
 # ABSTRACT: Add a tag with an arbitrary value to a an attribute
 
+use 5.008009;
+
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Carp;
 use MRO::Compat;
@@ -153,8 +155,6 @@ around _tag_list => sub {
 };
 
 
-use namespace::clean -except => qw( import );
-
 # _tags can't be lazy; we must resolve the tags and attributes at
 # object creation time in case a role is modified after this object
 # is created, as we scan both clsses and roles to gather the tags.
@@ -164,43 +164,47 @@ use namespace::clean -except => qw( import );
 # We also need to identify when a role has been added to an *object*
 # which adds tagged attributes.  TODO: make this work.
 
-sub _tag_list { [] }
-
 
 # Build the tag cache.  Only update it if we're an object.  if the
 # class hasn't yet been instantiated, it's still mutable, and we'd be
 # caching prematurely.
 
-sub _build_cache {
+sub _class_tags {
 
     my $class = shift;
 
-    # returned cached tags if available.  Note that as of Moo v.1.006001
-    # instantiated classes may still have attributes composed into them
-    # (i.e., they're not fully immutable, see RT#101631), but that
-    # is acknowledged as a bug, not a feature, so we don't support that.
-    return $TAGCACHE{$class} if $TAGCACHE{$class};
+    # return cached values if available.  They are stored in %TAGCACHE
+    # on the first object method call to _tags(), at which point we've
+    # decreed the class as being complete.
+    return $TAGCACHE{$class}
+      || do {
+        my %cache;
+        for my $tuple ( @{ $class->_tag_list } ) {
 
-    my %cache;
-
-    for my $tuple ( @{ $class->_tag_list } ) {
-        # my ( $tag, $attrs, $value ) = @$tuple;
-        my $cache = ( $cache{ $tuple->[0] } ||= {} );
-        $cache->{$_} = $tuple->[2] for @{ $tuple->[1] };
-    }
-
-    return \%cache;
+            # my ( $tag, $attrs, $value ) = @$tuple;
+            my $cache = ( $cache{ $tuple->[0] } ||= {} );
+            $cache->{$_} = $tuple->[2] for @{ $tuple->[1] };
+        }
+        \%cache;
+      };
 }
 
-has _tag_cache => (
-    is       => 'ro',
-    init_arg => undef,
-    default  => sub {
-        my $class = blessed( $_[0] );
-        return $TAGCACHE{$class} ||= $class->_build_cache;
-    } );
+use namespace::clean -except => qw( import  );
 
-sub _tags { blessed( $_[0] ) ? $_[0]->_tag_cache : $_[0]->_build_cache }
+# this is where all of the tags get stored while a class is being
+# built up.  eventually they are condensed into a simple hash via
+# _build_cache
+
+sub _tag_list { [] }
+
+# never create a cached value if called as a class method, as the class
+# may still be under construction.
+sub _tags {
+    my $class = blessed $_[0];
+    $class
+      ? $TAGCACHE{ $class } ||= _class_tags( $class )
+      : _class_tags( $_[0] );
+}
 
 1;
 
@@ -226,7 +230,7 @@ MooX::TaggedAttributes - Add a tag with an arbitrary value to a an attribute
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

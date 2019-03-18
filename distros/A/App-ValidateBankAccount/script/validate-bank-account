@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict; use warnings;
+
+BEGIN {
+    if (-t) {
+        require Encode::Locale;
+        Encode::Locale::decode_argv();
+        binmode(STDOUT, ":encoding(console_out)");
+        binmode(STDERR, ":encoding(console_out)");
+    }
+}
+
+use App::ValidateBankAccount;
+
+App::ValidateBankAccount->new_with_options->run;

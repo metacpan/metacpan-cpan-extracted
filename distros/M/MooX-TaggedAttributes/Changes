@@ -1,5 +1,24 @@
 Revision history for MooX-TaggedAttributes
 
+0.09      2019-03-18 10:04:27-04:00 America/New_York
+
+  [ BUG FIX ]
+
+    * specify mininum version of Perl required. ++manwar
+
+0.08      2019-03-15 15:12:24-04:00 America/New_York
+
+  [ COMPATIBILITY FIX ]
+
+    * Some MooX modules modify Moo's accessor maker, which can cause
+     problems if multiple roles with the same attributes are applied
+     (See https://rt.cpan.org/Ticket/Display.html?id=128278).
+     MooX::TaggedAttributes used an attribute, _tag_cache. When a
+     class using one of the aforementioned MooX modules consumed
+     multiple tag roles, the multiple consumptions of _tag_cache would
+     be lead to an error.  Sooooo. MooX::TaggedAttributes no longer
+     has any attributes.
+
 0.07      2018-12-08 12:52:50-05:00 America/New_York
 
     * no changes. promoted to stable.

@@ -34,8 +34,8 @@ sub execute {
   for (my $i = 0; $i < @$data; $i++) {
     my $index = $i;
     my $value = $data->[$i];
-    my $refs = {'$index' => \$index, '$value' => \$value};
-    $self->codify($code, $refs)->($index, $value, @args);
+
+    $code->($index, $value, @args);
   }
 
   return $data;

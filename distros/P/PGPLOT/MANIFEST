@@ -28,7 +28,8 @@ typemap
 pgcompatbility.p
 HINTS.irix
 HINTS.osf
-META.yml                                 Module meta-data (added by MakeMaker)
 INSTALL
 INSTALL-Win32
 INSTALL-MacOSX
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

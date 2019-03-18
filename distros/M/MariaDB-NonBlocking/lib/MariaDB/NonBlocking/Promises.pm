@@ -3,51 +3,50 @@ use parent 'MariaDB::NonBlocking::Event';
 
 use v5.18.2; # needed for __SUB__, implies strict
 use warnings;
+use Sub::StrictDecl;
 
-BEGIN {
-    my $loaded_ok;
-    local $@;
-    eval { require Sub::StrictDecl; $loaded_ok = 1; };
-    Sub::StrictDecl->import if $loaded_ok;
-}
+use AnyEvent::XSPromises (); # for deferred
 
-use Promises (); # for deferred
+sub run_query {
+    my ($conn, $sql, $bind, $extra) = @_;
 
-sub run_multiple_queries {
-    my ($conn, $remaining_sqls, $extras) = @_;
+    my $deferred = AnyEvent::XSPromises::deferred();
 
-    my $deferred = Promises::deferred();
-
-    $extras //= {};
-    local $extras->{success_cb} = sub { $deferred->resolve(@_) };
-    local $extras->{failure_cb} = sub { $deferred->reject(@_) };
-    $conn->SUPER::run_multiple_queries($remaining_sqls, $extras);
+    $conn->SUPER::run_query(
+        $sql, $extra, $bind,
+        sub { $deferred->resolve(@_) },
+        sub { $deferred->reject(@_) },
+        $extra->{perl_timeout} || 0,
+    );
 
     return $deferred->promise;
 }
 
 sub ping {
-    my ($conn, $extras) = @_;
+    my ($conn, $extra) = @_;
 
-    my $deferred = Promises::deferred();
+    my $deferred = AnyEvent::XSPromises::deferred();
 
-    $extras //= {};
-    local $extras->{success_cb} = sub { $deferred->resolve(@_) };
-    local $extras->{failure_cb} = sub { $deferred->reject(@_) };
-    $conn->SUPER::ping($extras);
+    $conn->SUPER::ping(
+        sub { $deferred->resolve(@_) },
+        sub { $deferred->reject(@_) },
+        $extra->{perl_timeout} || 0,
+    );
 
     return $deferred->promise;
 }
 
 sub connect {
-    my ($conn, $connect_args, $extras) = @_;
+    my ($conn, $connect_args, $extra) = @_;
 
-    my $deferred = Promises::deferred();
+    my $deferred = AnyEvent::XSPromises::deferred();
 
-    $extras //= {};
-    local $extras->{success_cb} = sub { $deferred->resolve(@_) };
-    local $extras->{failure_cb} = sub { $deferred->reject(@_) };
-    $conn->SUPER::connect($connect_args, $extras);
+    $conn->SUPER::connect(
+        $connect_args,
+        sub { $deferred->resolve(@_) },
+        sub { $deferred->reject(@_) },
+        $extra->{perl_timeout},
+    );
 
     return $deferred->promise;
 }

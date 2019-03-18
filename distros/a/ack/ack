@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '2.24'; # Check https://beyondgrep.com/ for updates
+our $VERSION = '2.26'; # Check https://beyondgrep.com/ for updates
 
 use 5.008008;
 use Getopt::Long 2.38 ();
@@ -1348,10 +1348,11 @@ equivalent to the default behavior found in ack 1.
 
 =item B<--lines=I<NUM>>
 
-Only print line I<NUM> of each file. Multiple lines can be given with multiple
-B<--lines> options or as a comma separated list (B<--lines=3,5,7>). B<--lines=4-7>
-also works. The lines are always output in ascending order, no matter the
-order given on the command line.
+Only print line I<NUM> of each file. Multiple lines can be given with
+multiple B<--lines> options or as a comma separated list (B<--lines=3,5,7>).
+B<--lines=4-7> also works, as well as any combination
+(B<--lines=3,15-20,43>) The lines are always output in ascending order, no
+matter the order given on the command line. No pattern is matched.
 
 =item B<-l>, B<--files-with-matches>
 
@@ -2269,6 +2270,7 @@ L<https://github.com/beyondgrep/ack2>
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
+Tim Gim Yee,
 Michele Campeotto,
 H.Merijn Brand,
 Duke Leto,
@@ -2385,7 +2387,7 @@ Rob Hoelz.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2018 Andy Lester.
+Copyright 2005-2019 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License v2.0.

@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "GIS::Distance::Fast" : "0.09"
+            "GIS::Distance::Fast" : "0.13"
          },
          "requires" : {
             "Carp" : "0",
@@ -51,6 +51,7 @@
             "Math::Trig" : "0",
             "Scalar::Util" : "0",
             "namespace::clean" : "0.24",
+            "parent" : "0",
             "perl" : "5.008001",
             "strictures" : "2.000000"
          },
@@ -67,43 +68,47 @@
    "provides" : {
       "GIS::Distance" : {
          "file" : "lib/GIS/Distance.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::ALT" : {
          "file" : "lib/GIS/Distance/ALT.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::Constants" : {
          "file" : "lib/GIS/Distance/Constants.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::Cosine" : {
          "file" : "lib/GIS/Distance/Cosine.pm",
-         "version" : "0.15"
+         "version" : "0.17"
+      },
+      "GIS::Distance::Formula" : {
+         "file" : "lib/GIS/Distance/Formula.pm",
+         "version" : "0.17"
       },
       "GIS::Distance::GreatCircle" : {
          "file" : "lib/GIS/Distance/GreatCircle.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::Haversine" : {
          "file" : "lib/GIS/Distance/Haversine.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::MathTrig" : {
          "file" : "lib/GIS/Distance/MathTrig.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::Null" : {
          "file" : "lib/GIS/Distance/Null.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::Polar" : {
          "file" : "lib/GIS/Distance/Polar.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       },
       "GIS::Distance::Vincenty" : {
          "file" : "lib/GIS/Distance/Vincenty.pm",
-         "version" : "0.15"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -117,7 +122,7 @@
          "web" : "https://github.com/bluefeet/GIS-Distance"
       }
    },
-   "version" : "0.15",
+   "version" : "0.17",
    "x_authority" : "cpan:BLUEFEET",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

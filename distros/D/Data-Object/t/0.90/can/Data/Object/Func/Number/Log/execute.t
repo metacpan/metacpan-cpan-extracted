@@ -52,6 +52,6 @@ $func = Data::Object::Func::Number::Log->new(
 
 my $result = $func->execute;
 
-is_deeply $result, 9.42100640177928;
+like $result, qr/9.42100/;
 
 ok 1 and done_testing;

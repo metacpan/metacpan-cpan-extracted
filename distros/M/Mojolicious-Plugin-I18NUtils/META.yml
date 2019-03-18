@@ -2,23 +2,42 @@
 abstract: 'provide some helper functions for I18N'
 author:
   - 'Renee Baecker <reneeb@cpan.org>'
-build_requires: {}
+build_requires:
+  File::Spec: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::LongString: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojolicious-Plugin-I18NUtils
+provides:
+  Mojolicious::Plugin::I18NUtils:
+    file: lib/Mojolicious/Plugin/I18NUtils.pm
+    version: '0.21'
+  Mojolicious::Plugin::I18NUtils::Locale:
+    file: lib/Mojolicious/Plugin/I18NUtils/Locale.pm
+    version: '0.21'
 requires:
   CLDR::Number: '0.16'
   HTTP::AcceptLanguage: '0.02'
-  Mojolicious: '4.71'
+  Mojolicious: '8'
   Time::Piece: '0'
+  perl: '5.010001'
 resources:
   bugtracker: http://github.com/reneeb/Mojolicious-Plugin-I18NUtils/issues
   homepage: http://github.com/reneeb/Mojolicious-Plugin-I18NUtils
   repository: http://github.com/reneeb/Mojolicious-Plugin-I18NUtils.git
-version: '0.20'
+version: '0.21'
+x_contributors:
+  - 'Nova Patch <patch@cpan.org>'
+  - 'reneeb <github@renee-baecker.de>'
+  - 'reneeb <info@perl-services.de>'
+  - 'Renee <reb@perl-services.de>'
+  - 'Красимир Беров <k.berov@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

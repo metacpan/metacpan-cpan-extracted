@@ -1,9 +1,9 @@
 package Dad;
 
-use Moose;
+use Moo;
 extends 'DBIx::Class::DeploymentHandler::Dad';
 
-with 'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
+use MooX::Role::Parameterized::With 'DBIx::Class::DeploymentHandler::WithApplicatorDumple' => {
     interface_role       => 'DBIx::Class::DeploymentHandler::HandlesDeploy',
     class_name           => 'DBIx::Class::DeploymentHandler::DeployMethod::SQL::Translator',
     delegate_name        => 'deploy_method',

@@ -1,5 +1,3 @@
-# $Id$
-
 package CPU::Z80::Disassembler::Labels;
 
 #------------------------------------------------------------------------------
@@ -21,7 +19,7 @@ use Bit::Vector;
 use CPU::Z80::Disassembler::Label;
 use CPU::Z80::Disassembler::Format;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 #------------------------------------------------------------------------------
 
@@ -56,24 +54,23 @@ Creates a new empty object.
 =cut
 
 #------------------------------------------------------------------------------
-use Class::XSAccessor {
-	constructor	=> '_new',
-	accessors => [ 
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'_by_addr',			# array of labels by address
 		'_by_name',			# hash of labels by name
 		'max_length',		# max length of all defined labels
 		'_has_label',		# Bit::Vector, one bit per address, 1 if label
 							# exists at that address
-	],
-};
+);
 
 sub new {
 	my($class) = @_;
 	my $has_label = Bit::Vector->new(0x10000);
-	return $class->_new(_by_addr 	=> [], 
-						_by_name 	=> {}, 
-						max_length 	=> 0,
-						_has_label	=> $has_label);
+	return bless {	_by_addr 	=> [], 
+					_by_name 	=> {}, 
+					max_length 	=> 0,
+					_has_label	=> $has_label,
+				}, $class;
 }
 #------------------------------------------------------------------------------
 

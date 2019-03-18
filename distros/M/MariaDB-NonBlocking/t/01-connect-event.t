@@ -9,10 +9,12 @@ use AnyEvent;
 use MariaDB::NonBlocking::Event;
 use Data::Dumper;
 
+AnyEvent::detect();
+
 use lib 't', '.';
 require 'lib.pl';
 
-my $conn1 = MariaDB::NonBlocking::Event->init;
+my $conn1 = MariaDB::NonBlocking::Event->new;
 
 my $connect_args = {
     user     => $::test_user,
@@ -27,16 +29,14 @@ is($initial_socket_fd, -1, "Pre-connect socket FD is -1");
 my $cv = AnyEvent->condvar;
 $conn1->connect(
     $connect_args,
-    {
-        success_cb => sub {
-            $cv->send('Success!');
+    sub {
+        $cv->send('Success!');
 
-            my ($conn) = @_;
-            my $socket_fd = $conn->mysql_socket_fd;
-            cmp_ok($socket_fd, '>=', 1, "Got a socket FD after connecting");
-        },
-        failure_cb => sub { $cv->croak($_[0]) },
+        my ($conn) = @_;
+        my $socket_fd = $conn->mysql_socket_fd;
+        cmp_ok($socket_fd, '>=', 1, "Got a socket FD after connecting");
     },
+    sub { $cv->croak($_[0]) },
 );
 
 my $output;
@@ -54,29 +54,24 @@ my $connect_args_copy = { %$connect_args };
 $connect_args_copy->{password} = $connect_args->{password} . '_xyzzy';
 
 $cv = AnyEvent->condvar;
-my $conn2 = MariaDB::NonBlocking::Event->init;
+my $conn2 = MariaDB::NonBlocking::Event->new;
 $conn2->connect(
     $connect_args_copy,
-    {
-        success_cb => sub { $cv->send('Success!') },
-        failure_cb => sub { $cv->send('Failure! ' . $_[0]) },
-    },
+    sub { $cv->send('Success!') },
+    sub { $cv->send('Failure! ' . $_[0]) },
 );
 $output = $cv->recv;
 like($output, qr/\AFailure!/, "Failed to connect when using the wrong password");
 
 $cv = AnyEvent->condvar;
 delete $connect_args_copy->{password};
-my $conn3 = MariaDB::NonBlocking::Event->init;
+my $conn3 = MariaDB::NonBlocking::Event->new;
 $conn3->connect(
     $connect_args_copy,
-    {
-        success_cb => sub { $cv->send('Success!') },
-        failure_cb => sub { $cv->send('Failure! ' . $_[0]) },
-    },
+    sub { $cv->send('Success!') },
+    sub { $cv->send('Failure! ' . $_[0]) },
 );
 $output = $cv->recv;
 like($output, qr/\AFailure! No password/, "Failed to connect when missing a password");
-
 
 done_testing;

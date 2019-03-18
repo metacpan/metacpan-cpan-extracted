@@ -6,9 +6,9 @@ use Alien::make::Module::Build;
 
 my $build = Alien::make::Module::Build->new(
    module_name => 'Alien::libtickit',
-   tarball => 'libtickit-0.2a.tar.gz',
+   tarball => 'libtickit-0.3.tar.gz',
    pkgconfig_module => "tickit",
-   pkgconfig_version => "0.2",
+   pkgconfig_version => "0.3",
    use_bundled => ( scalar grep { $_ eq "--use-bundled" } @ARGV ),
 
    alien_requires => [
@@ -17,8 +17,8 @@ my $build = Alien::make::Module::Build->new(
          [ alien => "Alien::unibilium" => '0.15' ],
       ],
       [ any =>
-         [ pkgconfig => "termkey", atleast_version => "0.20" ],
-         [ alien => "Alien::libtermkey" => "0.21" ],
+         [ pkgconfig => "termkey", atleast_version => "0.22" ],
+         [ alien => "Alien::libtermkey" => "0.22" ],
       ],
    ],
    build_requires => {

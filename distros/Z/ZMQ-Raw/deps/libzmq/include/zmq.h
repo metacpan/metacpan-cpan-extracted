@@ -98,6 +98,9 @@ extern "C" {
 #if defined ZMQ_HAVE_SOLARIS || defined ZMQ_HAVE_OPENVMS
 #include <inttypes.h>
 #elif defined _MSC_VER && _MSC_VER < 1600
+#ifndef uint64_t
+typedef unsigned __int64 uint64_t;
+#endif
 #ifndef int32_t
 typedef __int32 int32_t;
 #endif
@@ -722,6 +725,21 @@ ZMQ_EXPORT int zmq_poller_remove_fd (void *poller, int fd);
 ZMQ_EXPORT int zmq_socket_get_peer_state (void *socket,
                                           const void *routing_id,
                                           size_t routing_id_size);
+
+/*  DRAFT Socket monitoring events                                            */
+#define ZMQ_EVENT_PIPES_STATS 0x10000
+
+#define ZMQ_CURRENT_EVENT_VERSION 1
+#define ZMQ_CURRENT_EVENT_VERSION_DRAFT 2
+
+#define ZMQ_EVENT_ALL_V1 ZMQ_EVENT_ALL
+#define ZMQ_EVENT_ALL_V2 ZMQ_EVENT_ALL_V1 | ZMQ_EVENT_PIPES_STATS
+
+ZMQ_EXPORT int zmq_socket_monitor_versioned (void *s_,
+                                             const char *addr_,
+                                             uint64_t events_,
+                                             int event_version_);
+ZMQ_EXPORT int zmq_socket_monitor_pipes_stats (void *s);
 
 #endif // ZMQ_BUILD_DRAFT_API
 

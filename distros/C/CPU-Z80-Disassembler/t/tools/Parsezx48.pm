@@ -13,22 +13,21 @@ use Asm::Z80::Table;
 
 #------------------------------------------------------------------------------
 # collect info from disassembly file
-use Class::XSAccessor {
-	constructor	=> '_new',
-	accessors	=> [
+use base 'Class::Accessor';
+__PACKAGE__->mk_accessors(
 		'label_by_addr',	# hash of addr => label name
 		'label_by_name',	# hash of label name => addr
 		'label_by_line',	# hash of line number => label name
 		'header',			# file header
 		'footer',			# file footer
 		'instr',			# array of instr by addr
-	],
-};
+);
 
-use Class::XSAccessor {
-	class		=> 'My::Instr',
-	constructor	=> 'new',
-	accessors	=> [
+{
+	package # hide from indexer
+		My::Instr;
+	use base 'Class::Accessor';
+	__PACKAGE__->mk_accessors(
 		'addr',				# address
 		'size',				# size
 		'label',			# label, if any
@@ -36,17 +35,18 @@ use Class::XSAccessor {
 		'line_comment',		# line comment after instruction
 		'opcode',			# assembly instruction
 		'is_data',			# true if it is a def* opcode
-	],
-};
+	);
+}
 
 #------------------------------------------------------------------------------
 # parse the given file
 sub new { 
 	my($class, $rom_asm_file) = @_;
-	my $self = $class->_new( label_by_addr 	=> {}, 
-							 label_by_name 	=> {},
-							 label_by_line 	=> {},
-							 instr 			=> []);
+	my $self = bless {	label_by_addr 	=> {}, 
+						label_by_name 	=> {},
+						label_by_line 	=> {},
+						instr 			=> [],
+					}, $class;
 	$self->read_asm($rom_asm_file);
 	
 	return $self;
@@ -169,7 +169,7 @@ sub read_labels {
 sub read_instr {
 	my($self, $addr, $file, $p, $p_max) = @_;
 	
-	my $instr = My::Instr->new(addr => $addr);
+	my $instr = My::Instr->new({addr => $addr});
 	
 	# block comment
 	my $block_comment = '';

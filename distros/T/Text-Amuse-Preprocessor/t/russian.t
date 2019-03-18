@@ -6,7 +6,7 @@ use utf8;
 binmode STDOUT, ":encoding(utf-8)";
 binmode STDIN, ":encoding(utf-8)";
 
-use Test::More tests => 39;
+use Test::More tests => 40;
 use Data::Dumper;
 
 my $builder = Test::More->builder;
@@ -14,8 +14,17 @@ binmode $builder->output,         ":utf8";
 binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
 
+use Text::Amuse::Preprocessor::Parser;
 use Text::Amuse::Preprocessor::Typography qw/typography_filter/;
 use Text::Amuse::Preprocessor;
+
+BEGIN {
+    if (!eval q{ use Test::Differences; unified_diff; 1 }) {
+        *eq_or_diff = \&is_deeply;
+    }
+}
+
+
 
 my $test =<< 'EOF';
 Я еду домой по~дороге в~школу. Если~бы всё зависело от~меня, но~это
@@ -23,7 +32,7 @@ my $test =<< 'EOF';
 и~грабители. Я~— человек хороший, а~они~— плохие. К~моему сожалению,
 с~умом о~ней говорить не~получилось. Еду я значит к~другу, у~которого
 ни~кола, ни~двора. О~нём я тебе рассказывал. Ну~я ему и~говорю:
-ну,~отвечай. От~него, от~неё и~пошло всё. Об~этом~же я писал 12~см
+ну,~отвечай. От~него, от~неё и~пошло всё. Об~этом~же я писал 99~см
 назад. И~25~м и~65~л и~даже 809~В. Всё что душе пожелаешь. То~самое
 89~кг превращаются в~90~г, при желании. Если~бы ты пошёл, да~вот
 не~вылез. Да,~красиво тут. Но~могло быть и~лучше. По~сему заключаю
@@ -85,8 +94,8 @@ my $pp = Text::Amuse::Preprocessor->new(input => \$in,
                                         fix_nbsp => 1,
                                         fix_typography => 1);
 $pp->process;
-is_deeply ([ split /\n/, $out],
-           [ split /\n/, $exp]);
+eq_or_diff ([ split /\n/, $out],
+            [ split /\n/, $exp]);
 
 my $stripped = '';
 
@@ -110,7 +119,23 @@ $pp = Text::Amuse::Preprocessor->new(input => \$in,
                                      remove_nbsp => 1,
                                      fix_nbsp => 1,
                                      show_nbsp => 1,
-                                     fix_typography => 0);
+                                     fix_typography => 1);
+{
+    my @parsed = Text::Amuse::Preprocessor::Parser::parse_text($in);
+    diag Dumper(\@parsed);
+}
+
 $pp->process;
-is_deeply ([ split /\n/, $out2],
+eq_or_diff ([ split /\n/, $out2],
            [ split /\n/, $exp2]);
+
+
+{
+    my $filter = Text::Amuse::Preprocessor::TypographyFilters::filter('ru');
+    my $nbsp =  Text::Amuse::Preprocessor::TypographyFilters::nbsp_filter('ru');
+    my $in = "\x{43b} 99 \x{441}\x{43c} \x{43b} 99 \x{441}\x{43c}";
+    my $exp = "\x{43b} 99\x{a0}\x{441}\x{43c} \x{43b} 99\x{a0}\x{441}\x{43c}";
+    eq_or_diff($nbsp->($filter->($in)), $exp);
+}
+
+

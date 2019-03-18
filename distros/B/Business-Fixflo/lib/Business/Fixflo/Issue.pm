@@ -47,6 +47,7 @@ use Business::Fixflo::Property;
     FaultTree
     Firstname
     Id
+    IsCommunal
     Media
     Property
     PropertyId
@@ -95,6 +96,7 @@ has [ qw/
     FaultTree
     Firstname
     Id
+    IsCommunal
     Job
     Media
     Property

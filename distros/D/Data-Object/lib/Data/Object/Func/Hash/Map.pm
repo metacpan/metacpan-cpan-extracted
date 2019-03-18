@@ -14,7 +14,7 @@ has arg1 => (
 
 has arg2 => (
   is => 'ro',
-  isa => 'Str | CodeRef',
+  isa => 'CodeRef',
   req => 1
 );
 
@@ -35,8 +35,7 @@ sub execute {
 
   for my $key (keys %$data) {
     my $value = $data->{$key};
-    my $refs = {'$key' => \$key, '$value' => \$value};
-    push @caught, ($self->codify($code, $refs)->($key, @args));
+    push @caught, ($code->($key, @args));
   }
 
   return [@caught];

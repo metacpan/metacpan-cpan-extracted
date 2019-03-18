@@ -1,5 +1,14 @@
+0.007
+    Fixed module testing problems
+
+0.007
+    Added support for TODO and todo_skip
+
+0.006
+    Added support for skipping test
+
 0.005
-    Test reuirements, proper version of Test::Simple
+    Test requirements, proper version of Test::Simple
 
 0.004
     Fixed testing issues on Windows

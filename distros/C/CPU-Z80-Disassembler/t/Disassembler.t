@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-BEGIN { use lib 't/tools' }
+BEGIN { 
+	use Path::Tiny;
+	use lib path(path($0)->parent, 'tools')->stringify; 
+}
 use TestAsm;
 
 use Test::More;
@@ -25,6 +28,7 @@ my $dump_benchmark = 't/data/zx48_benchmark.dump';
 my $asm_output = 'zx48.asm';
 my $asm_benchmark = 't/data/zx48_benchmark.asm';
 
+my $ctl_output = 'zx48.ctl';
 
 #------------------------------------------------------------------------------
 # set_type_*
@@ -32,7 +36,7 @@ isa_ok $dis = CPU::Z80::Disassembler->new, 'CPU::Z80::Disassembler';
 $dis->memory->load_file($rom_input);
 
 eval	{ $dis->set_type_code(0x4000) };
-like	$@, qr/^Getting type of unloaded memory at 0x4000 at t.*Disassembler.t line \d+/;
+like	$@, qr/^Getting type of unloaded memory at \$4000 at t.*Disassembler.t line \d+/;
 
 is		$dis->get_type(0),		TYPE_UNKNOWN;
 
@@ -47,7 +51,7 @@ is		$dis->get_type(1),		TYPE_CODE;
 is		$dis->get_type(3),		TYPE_UNKNOWN;
 
 eval	{ $dis->set_type_byte(0) };
-like	$@, qr/^Changing type of address 0x0000 from C to B at t.*Disassembler.t line \d+/;
+like	$@, qr/^Changing type of address \$0000 from C to B at t.*Disassembler.t line \d+/;
 
 #------------------------------------------------------------------------------
 # line_comments
@@ -55,7 +59,7 @@ isa_ok $dis = CPU::Z80::Disassembler->new, 'CPU::Z80::Disassembler';
 $dis->memory->load_file($rom_input);
 
 eval 	{ $dis->line_comments(0x1000, 'hello') };
-like	$@, qr/^Cannot set comment of unknown instruction at 0x1000 at t.*Disassembler.t line \d+/;
+like	$@, qr/^Cannot set comment of unknown instruction at \$1000 at t.*Disassembler.t line \d+/;
 
 #------------------------------------------------------------------------------
 # relative_arg
@@ -68,50 +72,50 @@ like	$@, qr/^Label 'START' not found at t.*Disassembler.t line \d+/;
 $dis->labels->add(0xFF00, 'START');
 
 eval 	{ $dis->relative_arg(0x0000, 'START') };
-like	$@, qr/^Instruction at address 0x0000 has no arguments at t.*Disassembler.t line \d+/;
+like	$@, qr/^Instruction at address \$0000 has no arguments at t.*Disassembler.t line \d+/;
 
-is $dis->instr->[0x0002]->as_string, 'ld de,0xFFFF';
+is $dis->instr->[0x0002]->as_string, 'ld de, $FFFF';
 
 $dis->relative_arg(0x0002, 'START');
-is $dis->instr->[0x0002]->as_string, 'ld de,START+0xFF';
+is $dis->instr->[0x0002]->as_string, 'ld de, START+$FF';
 
 $dis->instr->[0x0002]->NN(0xFF00);
 $dis->relative_arg(0x0002, 'START');
-is $dis->instr->[0x0002]->as_string, 'ld de,START';
+is $dis->instr->[0x0002]->as_string, 'ld de, START';
 
 $dis->instr->[0x0002]->NN(0xF000);
 $dis->relative_arg(0x0002, 'START');
-is $dis->instr->[0x0002]->as_string, 'ld de,START-0xF00';
+is $dis->instr->[0x0002]->as_string, 'ld de, START-$F00';
 
 $dis->instr->[0x0002]->NN(0x0000);
 $dis->relative_arg(0x0002, '$');
-is $dis->instr->[0x0002]->as_string, 'ld de,$-0x02';
+is $dis->instr->[0x0002]->as_string, 'ld de, $-$02';
 
 $dis->instr->[0x0002]->NN(0x0002);
 $dis->relative_arg(0x0002, '$');
-is $dis->instr->[0x0002]->as_string, 'ld de,$';
+is $dis->instr->[0x0002]->as_string, 'ld de, $';
 
 $dis->instr->[0x0002]->NN(0x0004);
 $dis->relative_arg(0x0002, '$');
-is $dis->instr->[0x0002]->as_string, 'ld de,$+0x02';
+is $dis->instr->[0x0002]->as_string, 'ld de, $+$02';
 
 $dis->code(0x028E);
-is $dis->instr->[0x028E]->as_string, 'ld l,0x2F';
+is $dis->instr->[0x028E]->as_string, 'ld l, $2F';
 
 $dis->relative_arg(0x028E, 'START');
-is $dis->instr->[0x028E]->as_string, 'ld l,START-0xFED1';
+is $dis->instr->[0x028E]->as_string, 'ld l, START-$FED1';
 
 $dis->labels->add(0x002F, 'L1');
 $dis->relative_arg(0x028E, 'L1');
-is $dis->instr->[0x028E]->as_string, 'ld l,L1';
+is $dis->instr->[0x028E]->as_string, 'ld l, L1';
 
 $dis->labels->add(0x0030, 'L2');
 $dis->relative_arg(0x028E, 'L2');
-is $dis->instr->[0x028E]->as_string, 'ld l,L2-0x01';
+is $dis->instr->[0x028E]->as_string, 'ld l, L2-$01';
 
 $dis->labels->add(0x002E, 'L3');
 $dis->relative_arg(0x028E, 'L3');
-is $dis->instr->[0x028E]->as_string, 'ld l,L3+0x01';
+is $dis->instr->[0x028E]->as_string, 'ld l, L3+$01';
 
 #------------------------------------------------------------------------------
 # write_dump - empty
@@ -160,6 +164,20 @@ $dis->code(0, 'START');
 $dis->write_asm($asm_output);
 test_assembly($asm_output, $rom_input);
 unlink $asm_output if ($ok && ! $ENV{DEBUG});
+
+#------------------------------------------------------------------------------
+# disassemble with a control file
+unlink $ctl_output;
+CPU::Z80::Disassembler->create_control_file($ctl_output, $rom_input, 0);
+eval { CPU::Z80::Disassembler->create_control_file($ctl_output, $rom_input, 0) };
+like $@, qr/zx48.ctl exists/;
+
+isa_ok $dis = CPU::Z80::Disassembler->new, 'CPU::Z80::Disassembler';
+$dis->load_control_file($ctl_output);
+$dis->code(0, 'START');
+$dis->write_asm($asm_output);
+test_assembly($asm_output, $rom_input);
+unlink($asm_output, $ctl_output) if ($ok && ! $ENV{DEBUG});
 
 done_testing();
 

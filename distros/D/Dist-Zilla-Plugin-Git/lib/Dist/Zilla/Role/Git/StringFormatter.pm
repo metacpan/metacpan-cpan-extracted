@@ -9,7 +9,7 @@
 package Dist::Zilla::Role::Git::StringFormatter;
 # ABSTRACT: Provide a String::Formatter for commit messages
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use 5.008;
 use strict;
@@ -20,7 +20,7 @@ use List::Util qw{ first };
 
 use Moose::Role;
 use MooseX::Has::Sugar;
-use MooseX::Types::Moose qw{ Str };
+use Types::Standard qw{ Str };
 
 requires qw(changelog log zilla);
 
@@ -36,6 +36,7 @@ use String::Formatter method_stringf => {
     t => sub { $_[0]->zilla->is_trial
                    ? (defined $_[1] ? $_[1] : '-TRIAL') : '' },
     v => sub { $_[0]->zilla->version },
+    V => sub { my $v = $_[0]->zilla->version; $v =~ s/\Av//; $v },
   },
 };
 
@@ -121,7 +122,7 @@ Dist::Zilla::Role::Git::StringFormatter - Provide a String::Formatter for commit
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 DESCRIPTION
 
@@ -161,6 +162,10 @@ release, or the empty string if not.  A bare C<%t> means C<%{-TRIAL}t>.
 
 the distribution version
 
+=item C<%V>
+
+The distribution version, but with a leading C<v> removed if it exists.
+
 =back
 
 =head1 ATTRIBUTES
@@ -184,8 +189,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

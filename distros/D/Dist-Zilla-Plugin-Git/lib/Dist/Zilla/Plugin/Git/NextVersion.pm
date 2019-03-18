@@ -12,7 +12,7 @@ use warnings;
 package Dist::Zilla::Plugin::Git::NextVersion;
 # ABSTRACT: Provide a version number by bumping the last git release tag
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Dist::Zilla 4 ();
 use version 0.80 ();
@@ -21,8 +21,8 @@ use Moose;
 use namespace::autoclean 0.09;
 use Path::Tiny;
 use Try::Tiny;
-use Moose::Util::TypeConstraints;
-use MooseX::Types::Moose qw(Str RegexpRef Bool ArrayRef);
+use Types::Standard qw(Str RegexpRef Bool ArrayRef);
+use Type::Utils qw(coerce from as via subtype);
 
 use constant _cache_fn => '.gitnxtver_cache';
 
@@ -208,7 +208,7 @@ Dist::Zilla::Plugin::Git::NextVersion - Provide a version number by bumping the 
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
@@ -290,8 +290,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

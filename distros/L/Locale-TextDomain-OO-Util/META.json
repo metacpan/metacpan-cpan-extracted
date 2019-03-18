@@ -40,7 +40,7 @@
    "provides" : {
       "Locale::TextDomain::OO::Util" : {
          "file" : "lib/Locale/TextDomain/OO/Util.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Locale::TextDomain::OO::Util::Constants" : {
          "file" : "lib/Locale/TextDomain/OO/Util/Constants.pm",
@@ -65,6 +65,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "4.001",
+   "version" : "4.002",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

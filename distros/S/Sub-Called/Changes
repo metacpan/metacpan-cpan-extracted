@@ -1,4 +1,10 @@
 Revision history for Sub::Called
+================================
+
+0.04    2019-03-18 08:49:00
+
+  * updated tests
+  * dzilify dist
 
 0.03    2008-07-23
         + already_called and not_called provided by Curtis "Ovid" Poe

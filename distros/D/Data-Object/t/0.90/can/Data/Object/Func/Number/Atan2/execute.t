@@ -54,6 +54,6 @@ $func = Data::Object::Func::Number::Atan2->new(
 
 my $result = $func->execute;
 
-is_deeply $result, 0.785398163397448;
+like $result, qr/0.78539/;
 
 ok 1 and done_testing;

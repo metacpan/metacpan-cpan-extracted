@@ -6,7 +6,7 @@ Devel::CheckLib;
 use 5.00405; #postfix foreach
 use strict;
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.07';
+$VERSION = '1.13';
 use Config qw(%Config);
 use Text::ParseWords 'quotewords';
 
@@ -160,6 +160,10 @@ library name and the path to the binary just compiled.
 It is possible to use this callback, for instance, to inspect the
 binary for further dependencies.
 
+=item not_execute
+
+Do not try to execute generated binary. Only check that compilation has not failed.
+
 =back
 
 =head2 check_lib_or_exit
@@ -271,6 +275,7 @@ sub assert_lib {
     @incpaths = (ref($args{incpath}) ? @{$args{incpath}} : $args{incpath}) 
         if $args{incpath};
     my $analyze_binary = $args{analyze_binary};
+    my $not_execute = $args{not_execute};
 
     my @argv = @ARGV;
     push @argv, _parse_line('\s+', 0, $ENV{PERL_MM_OPT}||'');
@@ -344,18 +349,18 @@ sub assert_lib {
         } else { # Unix-ish: gcc, Sun, AIX (gcc, cc), ...
             @sys_cmd = (
                 @$cc,
-                @$ld,
-                $cfile,
                 (map { "-I$_" } @incpaths),
+                $cfile,
+                @$ld,
                 "-o", "$exefile"
             );
         }
         warn "# @sys_cmd\n" if $args{debug};
         my $rv = $args{debug} ? system(@sys_cmd) : _quiet_system(@sys_cmd);
-        push @missing, $header if $rv != 0 || ! -x $exefile;
+        push @missing, $header if $rv != 0 || ! -f $exefile;
         _cleanup_exe($exefile);
         unlink $cfile;
-    } 
+    }
 
     # now do each library in turn with headers
     my($ch, $cfile) = File::Temp::tempfile(
@@ -400,23 +405,26 @@ sub assert_lib {
                                                      # gcc, Sun, AIX (gcc, cc)
             @sys_cmd = (
                 @$cc,
-                @$ld,
-                $cfile,
-                "-o", "$exefile",
                 (map { "-I$_" } @incpaths),
+                $cfile,
                 (map { "-L$_" } @libpaths),
                 "-l$lib",
+                @$ld,
+                "-o", "$exefile",
             );
         }
         warn "# @sys_cmd\n" if $args{debug};
+        local $ENV{LD_RUN_PATH} = join(":", grep $_, @libpaths, $ENV{LD_RUN_PATH}) unless $^O eq 'MSWin32';
+        local $ENV{PATH} = join(";", @libpaths).";".$ENV{PATH} if $^O eq 'MSWin32';
         my $rv = $args{debug} ? system(@sys_cmd) : _quiet_system(@sys_cmd);
-        if ($rv != 0 || ! -x $exefile) {
+        if ($rv != 0 || ! -f $exefile) {
             push @missing, $lib;
         }
         else {
+            chmod 0755, $exefile;
             my $absexefile = File::Spec->rel2abs($exefile);
             $absexefile = '"'.$absexefile.'"' if $absexefile =~ m/\s/;
-            if (system($absexefile) != 0) {
+            if (!$not_execute && system($absexefile) != 0) {
                 push @wrongresult, $lib;
             }
             else {
@@ -472,7 +480,7 @@ sub _findcc {
         push @Config_ldflags, $config_val if ( $config_val =~ /\S/ );
     }
     my @ccflags = grep { length } quotewords('\s+', 1, $Config_ccflags||'', $user_ccflags||'');
-    my @ldflags = grep { length } quotewords('\s+', 1, @Config_ldflags, $user_ldflags||'');
+    my @ldflags = grep { length && $_ !~ m/^-Wl/ } quotewords('\s+', 1, @Config_ldflags, $user_ldflags||'');
     my @paths = split(/$Config{path_sep}/, $ENV{PATH});
     my @cc = split(/\s+/, $Config{cc});
     if (check_compiler ($cc[0], $debug)) {

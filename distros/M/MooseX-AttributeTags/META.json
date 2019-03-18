@@ -3,8 +3,8 @@
    "author" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
@@ -46,18 +46,19 @@
       "test" : {
          "requires" : {
             "Test::Fatal" : "0.007",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "namespace::autoclean" : "0"
          }
       }
    },
    "provides" : {
       "MooseX::AttributeTags" : {
          "file" : "lib/MooseX/AttributeTags.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "MooseX::AttributeTags::PRole" : {
          "file" : "lib/MooseX/AttributeTags/PRole.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -76,6 +77,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-AttributeTags/project"
    },
-   "version" : "0.004",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

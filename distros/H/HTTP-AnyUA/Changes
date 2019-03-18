@@ -1,5 +1,11 @@
 Revision history for HTTP-AnyUA.
 
+0.904     2019-03-17 00:45:41-06:00 MST7MDT
+
+  * When AnyEvent::HTTP and Mojo::UserAgent are used as backends, we now try
+    to respond with AnyEvent::HTTP and Future::Mojo respectively.
+  * HTTP::Tiny is now a recommended (instead of suggested) runtime dependency.
+
 0.903     2019-03-09 12:33:20-07:00 MST7MDT
 
   * Fix bug in Runtime middleware calling ->transform in void context for

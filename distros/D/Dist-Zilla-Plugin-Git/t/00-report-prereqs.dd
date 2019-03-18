@@ -9,7 +9,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.141',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.147',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -55,13 +55,13 @@ do { my $x = {
                                       'Module::Runtime' => '0',
                                       'Moose' => '0',
                                       'Moose::Role' => '0',
-                                      'Moose::Util::TypeConstraints' => '0',
                                       'MooseX::Has::Sugar' => '0',
-                                      'MooseX::Types::Moose' => '0',
-                                      'MooseX::Types::Path::Tiny' => '0.010',
                                       'Path::Tiny' => '0.048',
                                       'String::Formatter' => '0',
                                       'Try::Tiny' => '0',
+                                      'Type::Utils' => '0',
+                                      'Types::Path::Tiny' => '0',
+                                      'Types::Standard' => '0',
                                       'Version::Next' => '0',
                                       'constant' => '0',
                                       'namespace::autoclean' => '0.09',
@@ -175,9 +175,11 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::TestRelease' => '0',
                                            'Dist::Zilla::Plugin::UploadToCPAN' => '0',
                                            'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
-                                           'Dist::Zilla::PluginBundle::Author::ETHER' => '0.097',
+                                           'Dist::Zilla::PluginBundle::Author::ETHER' => '0.119',
                                            'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
-                                           'Software::License::Perl_5' => '0'
+                                           'Software::License::Perl_5' => '0',
+                                           'Types::Path::Tiny' => '0',
+                                           'Types::Standard' => '0'
                                          }
                          }
      };

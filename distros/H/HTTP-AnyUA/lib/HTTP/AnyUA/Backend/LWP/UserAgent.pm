@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend::LWP::UserAgent;
 use warnings;
 use strict;
 
-our $VERSION = '0.903'; # VERSION
+our $VERSION = '0.904'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
@@ -75,7 +75,7 @@ HTTP::AnyUA::Backend::LWP::UserAgent - A unified programming interface for LWP::
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ Charles McGarvey <chazmcgarvey@brokenzipper.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Charles McGarvey.
+This software is copyright (c) 2019 by Charles McGarvey.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

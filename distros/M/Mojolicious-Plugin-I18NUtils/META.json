@@ -1,0 +1,82 @@
+{
+   "abstract" : "provide some helper functions for I18N",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-I18NUtils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CLDR::Number" : "0.16",
+            "HTTP::AcceptLanguage" : "0.02",
+            "Mojolicious" : "8",
+            "Time::Piece" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::LongString" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::I18NUtils" : {
+         "file" : "lib/Mojolicious/Plugin/I18NUtils.pm",
+         "version" : "0.21"
+      },
+      "Mojolicious::Plugin::I18NUtils::Locale" : {
+         "file" : "lib/Mojolicious/Plugin/I18NUtils/Locale.pm",
+         "version" : "0.21"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-I18NUtils/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-I18NUtils",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-I18NUtils.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-I18NUtils"
+      }
+   },
+   "version" : "0.21",
+   "x_contributors" : [
+      "Nova Patch <patch@cpan.org>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>",
+      "\u041a\u0440\u0430\u0441\u0438\u043c\u0438\u0440 \u0411\u0435\u0440\u043e\u0432 <k.berov@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

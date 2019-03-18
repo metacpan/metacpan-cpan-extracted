@@ -2,6 +2,7 @@
 use utf8;
 use strict;
 use warnings;
+use Data::Dumper;
 use Test::More tests => 2;
 use Text::Amuse::Preprocessor;
 
@@ -14,4 +15,5 @@ for (1,2) {
                                             fix_typography => 1,
                                             fix_nbsp => 1,)->process;
     is $output, "#title Test\n#lang en\n\n0\n\n“0”\n\n0\n";
+    diag Dumper($output);
 }

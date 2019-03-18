@@ -52,6 +52,6 @@ $func = Data::Object::Func::Number::Cos->new(
 
 my $result = $func->execute;
 
-is_deeply $result, 0.843853958732492;
+like $result, qr/0.84385/;
 
 ok 1 and done_testing;

@@ -1,7 +1,9 @@
 package GIS::Distance::ALT;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( deg2rad acos pi );
 use GIS::Distance::Constants qw( :all );
@@ -17,7 +19,7 @@ my $A = 6378137;
 my $B = 6356752.314245;
 my $F = 1 / 298.257223563;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     my $f = 0.5 * ($lat2 + $lat1) * $DEG_RADS;
@@ -64,20 +66,30 @@ GIS::Distance::ALT - Andoyer-Lambert-Thomas distance calculations.
 
 =head1 DESCRIPTION
 
-This is faster than the L<GIS::Distance::Vincenty> formula, but
-looses a bit of accuracy.
+The ALT formula is intended as a much faster, but slightly less accurate,
+alternative of the L<GIS::Distance::Vincenty> formula. This formulas is
+about 5x faster than Vincenty.
+
+The code for this formula was taken from L<GIS::Distance::XS> and
+modified to fit.
 
 A faster (XS) version of this formula is available as
 L<GIS::Distance::Fast::ALT>.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-This formula was taken from L<GIS::Distance::XS> and modified to fit.
+See L<GIS::Distance/SUPPORT>.
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

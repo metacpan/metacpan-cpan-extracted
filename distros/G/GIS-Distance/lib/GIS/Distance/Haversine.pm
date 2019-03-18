@@ -1,13 +1,15 @@
 package GIS::Distance::Haversine;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.15';
+our $VERSION = '0.17';
+
+use parent 'GIS::Distance::Formula';
 
 use Math::Trig qw( deg2rad );
 use GIS::Distance::Constants qw( :all );
 use namespace::clean;
 
-sub distance {
+sub _distance {
     my ($lat1, $lon1, $lat2, $lon2) = @_;
 
     $lon1 = deg2rad($lon1);
@@ -54,7 +56,7 @@ A faster (XS) version of this formula is available as
 L<GIS::Distance::Fast::Haversine>.
 
 Normally this module is not used directly.  Instead L<GIS::Distance>
-is used which in turn interfaces with the various formula modules.
+is used which in turn interfaces with the various formula classes.
 
 =head1 FORMULA
 
@@ -64,15 +66,31 @@ is used which in turn interfaces with the various formula modules.
     c = 2 * atan2( sqrt(a), sqrt(1-a) )
     d = R * c
 
-=head1 RESOURCES
+=head1 SEE ALSO
+
+=over
+
+=item *
 
 L<http://mathforum.org/library/drmath/view/51879.html>
 
+=item *
+
 L<http://www.faqs.org/faqs/geography/infosystems-faq/>
 
-=head1 AUTHORS AND LICENSE
+=back
 
-See L<GIS::Distance/AUTHORS> and L<GIS::Distance/LICENSE>.
+=head1 SUPPORT
+
+See L<GIS::Distance/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<GIS::Distance/AUTHORS>.
+
+=head1 LICENSE
+
+See L<GIS::Distance/LICENSE>.
 
 =cut
 

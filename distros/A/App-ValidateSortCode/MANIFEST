@@ -1,0 +1,15 @@
+Changes
+lib/App/ValidateSortCode.pm
+lib/App/ValidateSortCode/Option.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/validate-sort-code.t
+script/validate-sort-code
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

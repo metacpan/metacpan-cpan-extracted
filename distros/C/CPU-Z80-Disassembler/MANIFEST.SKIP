@@ -1,3 +1,7 @@
+# git, travis
+^\.git
+^\.travis
+
 # Komodo project file
 \.kpf$
 
@@ -8,9 +12,6 @@
 \.tmp$
 
 \bMYMETA\.\w+$
-
-# .git
-\B\.git\b
 
 #!start included C:\Perl\lib\ExtUtils\MANIFEST.SKIP
 # Avoid version control files.

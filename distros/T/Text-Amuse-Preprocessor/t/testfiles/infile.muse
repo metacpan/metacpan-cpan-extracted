@@ -60,7 +60,7 @@ This is not-
 
 <example>
 [1] Bla "bla"
-<example>
+</example>
 
 <verbatim>"[50]"</verbatim>
 

@@ -8,6 +8,11 @@ use Test::Exception;
 use Test::NoWarnings;
 use Test::Differences;
 
+{
+    no warnings qw(once); ## no critic (NoWarnings)
+    $Test::Differences::NoDeparse = 1;
+}
+
 BEGIN {
     use_ok 'Locale::TextDomain::OO::Util::ExtractHeader';
 }

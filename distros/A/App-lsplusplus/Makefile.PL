@@ -25,6 +25,7 @@ WriteMakefile1(
     PREREQ_PM               => {
       'Term::ExtendedColor' => 0.16,
       'Time::Local'         => 0.16,
+      'File::LsColor'       => 0.498,
     },
     MAN1PODS                => {
       'ls++'                => 'blib/man1/ls++.1',
@@ -71,9 +72,9 @@ sub WriteMakefile1 {
     WriteMakefile(%params);
 }
 
-sub MY::postamble {
-  return qq{
-    install :: ls++.conf
-	[ ! -f $ENV{HOME}/.ls++.conf ] && cp -v ls++.conf $ENV{HOME}/.ls++.conf
-  };
-}
+#sub MY::postamble {
+#  return qq{
+#    install :: ls++.conf
+#	[ ! -f $ENV{HOME}/.ls++.conf ] && cp -v ls++.conf $ENV{HOME}/.ls++.conf
+#  };
+#}

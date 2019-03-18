@@ -92,7 +92,6 @@ can_ok 'Data::Object::Export', 'cast';
 can_ok 'Data::Object::Export', 'class_file';
 can_ok 'Data::Object::Export', 'class_name';
 can_ok 'Data::Object::Export', 'class_path';
-can_ok 'Data::Object::Export', 'codify';
 can_ok 'Data::Object::Export', 'const';
 can_ok 'Data::Object::Export', 'data_any';
 can_ok 'Data::Object::Export', 'data_array';

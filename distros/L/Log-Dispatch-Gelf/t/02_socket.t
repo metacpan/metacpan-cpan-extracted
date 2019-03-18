@@ -99,12 +99,15 @@ throws_ok {
 qr/socket protocol must be tcp or udp/, 'invalid protocol 2';
 
 my $LAST_LOG_MSG;
+my $validate_constructor_options;
 my $class_inet = qclass(
     -implement => 'IO::Socket::INET',
     new        => sub {
         my ($obj, %options) = @_;
 
-        is_deeply(\%options, { PeerAddr => 'test', PeerPort => 12201, Proto => 'udp' }, 'connect opts');
+        if ($validate_constructor_options) {
+            is_deeply(\%options, $validate_constructor_options, 'connect opts');
+        }
 
         return bless {}, $obj;
     },
@@ -115,6 +118,7 @@ my $class_inet = qclass(
     }
 );
 
+$validate_constructor_options = { PeerAddr => 'test', PeerPort => 12201, Proto => 'udp' };
 my $log = Log::Dispatch->new(
     outputs => [
         [
@@ -162,4 +166,28 @@ is($msg->{level},         6,                           'correct level info');
 is($msg->{short_message}, 'Compressed',                'short_message correct');
 is($msg->{full_message},  "Compressed\nMore details.", 'full_message correct');
 
-done_testing(14);
+$validate_constructor_options = undef;
+
+$log = Log::Dispatch->new(
+    outputs => [ [
+        'Gelf',
+        min_level         => 'debug',
+        socket            => {
+            host     => 'graylog.server',
+            port     => 21234,
+            protocol => 'tcp',
+        }
+    ] ],
+);
+$log->log(
+    level   => 'info',
+    message => "It works\nMore details.",
+);
+ok(substr($LAST_LOG_MSG, -1) eq "\x00", 'TCP transport ends with a null byte');
+note("formatted message: $LAST_LOG_MSG");
+$msg = decode_json($LAST_LOG_MSG);
+is($msg->{level},         6,                         'correct level info');
+is($msg->{short_message}, 'It works',                'short_message correct');
+is($msg->{full_message},  "It works\nMore details.", 'full_message correct');
+
+done_testing(18);

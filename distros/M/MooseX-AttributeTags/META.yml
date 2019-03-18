@@ -5,10 +5,11 @@ author:
 build_requires:
   Test::Fatal: '0.007'
   Test::More: '0.96'
+  namespace::autoclean: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005'
+dynamic_config: 1
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
@@ -26,10 +27,10 @@ optional_features: {}
 provides:
   MooseX::AttributeTags:
     file: lib/MooseX/AttributeTags.pm
-    version: '0.004'
+    version: '0.005'
   MooseX::AttributeTags::PRole:
     file: lib/MooseX/AttributeTags/PRole.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Data::OptList: '0'
   Moose: '2.0600'
@@ -41,5 +42,5 @@ resources:
   homepage: https://metacpan.org/release/MooseX-AttributeTags
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moosex-attributetags.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

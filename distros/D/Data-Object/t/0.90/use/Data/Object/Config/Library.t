@@ -42,7 +42,6 @@ validated.
 
 =cut
 
-
 =type AnyObj
 
   has data => (
@@ -57,7 +56,6 @@ not be validated. The C<is_AnyObj> function can be used to return true or false 
 the argument can not be validated.
 
 =cut
-
 
 =type AnyObject
 
@@ -74,6 +72,20 @@ if the argument can not be validated.
 
 =cut
 
+=type ArrayLike
+
+  has data => (
+    is  => 'ro',
+    isa => 'ArrayLike',
+  );
+
+The ArrayLike type constraint is provided by the L<Types::TypeTiny> library.
+Please see that documentation for more information. The C<assert_ArrayLike>
+function can be used to throw an exception if the argument can not be
+validated. The C<is_ArrayLike> function can be used to return true or false if
+the argument can not be validated.
+
+=cut
 
 =type ArrayObj
 
@@ -90,7 +102,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type ArrayObject
 
   has data => (
@@ -106,7 +117,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type ArrayRef
 
   has data => (
@@ -115,13 +125,12 @@ false if the argument can not be validated.
   );
 
 The ArrayRef type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_ArrayRef
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_ArrayRef>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_ArrayRef> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type Bool
 
@@ -138,7 +147,6 @@ validated.
 
 =cut
 
-
 =type ClassName
 
   has data => (
@@ -147,13 +155,27 @@ validated.
   );
 
 The ClassName type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_ClassName
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_ClassName>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_ClassName> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
 
+=type CodeLike
+
+  has data => (
+    is  => 'ro',
+    isa => 'CodeLike',
+  );
+
+The CodeLike type constraint is provided by the L<Types::TypeTiny> library. Please
+see that documentation for more information. The C<assert_CodeLike> function can be
+used to throw an exception if the argument can not be validated. The C<is_CodeLike>
+function can be used to return true or false if the argument can not be
+validated.
+
+=cut
 
 =type CodeObj
 
@@ -163,13 +185,12 @@ argument can not be validated.
   );
 
 The CodeObj type constraint is provided by this library and accepts any object
-that is, or is derived from, a L<Data::Object::Code> object. The C<assert_CodeObj
-function> can be used to throw an exception if the argument can not be
+that is, or is derived from, a L<Data::Object::Code> object. The C<assert_CodeObj>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_CodeObj> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type CodeObject
 
@@ -186,7 +207,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type CodeRef
 
   has data => (
@@ -202,7 +222,6 @@ be validated.
 
 =cut
 
-
 =type ConsumerOf
 
   has data => (
@@ -211,13 +230,12 @@ be validated.
   );
 
 The ConsumerOf type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_ConsumerOf
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_ConsumerOf>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_ConsumerOf> function can be used to return true or false if
 the argument can not be validated.
 
 =cut
-
 
 =type DataObj
 
@@ -234,7 +252,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type DataObject
 
   has data => (
@@ -249,7 +266,6 @@ can not be validated. The C<is_DataObject> function can be used to return true
 or false if the argument can not be validated.
 
 =cut
-
 
 =type Defined
 
@@ -266,7 +282,6 @@ be validated.
 
 =cut
 
-
 =type Dict
 
   has data => (
@@ -281,7 +296,6 @@ function can be used to return true or false if the argument can not be
 validated.
 
 =cut
-
 
 =type DispatchObj
 
@@ -298,7 +312,6 @@ return true or false if the argument can not be validated.
 
 =cut
 
-
 =type DispatchObject
 
   has data => (
@@ -313,7 +326,6 @@ argument can not be validated. The C<is_DispatchObject> function can be used to
 return true or false if the argument can not be validated.
 
 =cut
-
 
 =type Enum
 
@@ -330,7 +342,6 @@ validated.
 
 =cut
 
-
 =type ExceptionObj
 
   has data => (
@@ -345,7 +356,6 @@ argument can not be validated. The C<is_ExceptionObj> function can be used to
 return true or false if the argument can not be validated.
 
 =cut
-
 
 =type ExceptionObject
 
@@ -362,7 +372,6 @@ to return true or false if the argument can not be validated.
 
 =cut
 
-
 =type FileHandle
 
   has data => (
@@ -371,13 +380,12 @@ to return true or false if the argument can not be validated.
   );
 
 The FileHandle type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_FileHandle
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_FileHandle>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_FileHandle> function can be used to return true or false if
 the argument can not be validated.
 
 =cut
-
 
 =type FloatObj
 
@@ -394,7 +402,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type FloatObject
 
   has data => (
@@ -409,7 +416,6 @@ can not be validated. The C<is_FloatObject> function can be used to return true 
 false if the argument can not be validated.
 
 =cut
-
 
 =type FuncObj
 
@@ -426,7 +432,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type FuncObject
 
   has data => (
@@ -441,7 +446,6 @@ can not be validated. The C<is_FuncObject> function can be used to return true
 or false if the argument can not be validated.
 
 =cut
-
 
 =type GlobRef
 
@@ -458,7 +462,6 @@ be validated.
 
 =cut
 
-
 =type HasMethods
 
   has data => (
@@ -467,13 +470,27 @@ be validated.
   );
 
 The HasMethods type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_HasMethods
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_HasMethods>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_HasMethods> function can be used to return true or false if
 the argument can not be validated.
 
 =cut
 
+=type HashLike
+
+  has data => (
+    is  => 'ro',
+    isa => 'HashLike',
+  );
+
+The HashLike type constraint is provided by the L<Types::TypeTiny> library. Please
+see that documentation for more information. The C<assert_HashLike> function can be
+used to throw an exception if the argument can not be validated. The C<is_HashLike>
+function can be used to return true or false if the argument can not be
+validated.
+
+=cut
 
 =type HashObj
 
@@ -483,13 +500,12 @@ the argument can not be validated.
   );
 
 The HashObj type constraint is provided by this library and accepts any object
-that is, or is derived from, a L<Data::Object::Hash> object. The C<assert_HashObj
-function> can be used to throw an exception if the argument can not be
+that is, or is derived from, a L<Data::Object::Hash> object. The C<assert_HashObj>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_HashObj> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type HashObject
 
@@ -506,7 +522,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type HashRef
 
   has data => (
@@ -522,7 +537,6 @@ be validated.
 
 =cut
 
-
 =type InstanceOf
 
   has data => (
@@ -531,13 +545,12 @@ be validated.
   );
 
 The InstanceOf type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_InstanceOf
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_InstanceOf>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_InstanceOf> function can be used to return true or false if
 the argument can not be validated.
 
 =cut
-
 
 =type Int
 
@@ -554,7 +567,6 @@ validated.
 
 =cut
 
-
 =type IntObj
 
   has data => (
@@ -569,7 +581,6 @@ not be validated. The C<is_IntObj> function can be used to return true or false 
 the argument can not be validated.
 
 =cut
-
 
 =type IntObject
 
@@ -586,6 +597,20 @@ if the argument can not be validated.
 
 =cut
 
+=type IntRange
+
+  has data => (
+    is  => 'ro',
+    isa => 'IntRange[0, 25]',
+  );
+
+The IntRange type constraint is provided by the L<Types::TypeTiny> library. Please
+see that documentation for more information. The C<assert_IntRange> function can be
+used to throw an exception if the argument can not be validated. The C<is_IntRange>
+function can be used to return true or false if the argument can not be
+validated.
+
+=cut
 
 =type IntegerObj
 
@@ -602,7 +627,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type IntegerObject
 
   has data => (
@@ -617,7 +641,6 @@ can not be validated. The C<is_IntegerObject> function can be used to return tru
 or false if the argument can not be validated.
 
 =cut
-
 
 =type Item
 
@@ -634,7 +657,6 @@ validated.
 
 =cut
 
-
 =type JsonObj
 
   has data => (
@@ -649,7 +671,6 @@ can not be validated. The C<is_JsonObj> function can be used to return true or
 false if the argument can not be validated.
 
 =cut
-
 
 =type JsonObject
 
@@ -666,7 +687,6 @@ or false if the argument can not be validated.
 
 =cut
 
-
 =type LaxNum
 
   has data => (
@@ -681,7 +701,6 @@ C<is_LaxNum> function can be used to return true or false if the argument can no
 be validated.
 
 =cut
-
 
 =type LowerCaseSimpleStr
 
@@ -699,7 +718,6 @@ information.
 
 =cut
 
-
 =type LowerCaseStr
 
   has data => (
@@ -708,19 +726,18 @@ information.
   );
 
 The LowerCaseStr type constraint is provided by the L<Types::Common::String>
-library. Please see that documentation for more information. The C<assert_type
-function> can be used to throw an exception if the argument can not be
+library. Please see that documentation for more information. The C<assert_type>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_type> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
 
-
 =type Map
 
   has data => (
     is  => 'ro',
-    isa => 'Map[Int', HashRef],
+    isa => 'Map[Int, HashRef]',
   );
 
 The Map type constraint is provided by the L<Types::Standard> library. Please
@@ -730,7 +747,6 @@ function can be used to return true or false if the argument can not be
 validated.
 
 =cut
-
 
 =type Maybe
 
@@ -747,7 +763,6 @@ validated.
 
 =cut
 
-
 =type NegativeInt
 
   has data => (
@@ -763,7 +778,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type NegativeNum
 
   has data => (
@@ -778,7 +792,6 @@ can not be validated. The C<is_NegativeNum> function can be used to return true 
 false if the argument can not be validated.
 
 =cut
-
 
 =type NegativeOrZeroInt
 
@@ -796,7 +809,6 @@ information.
 
 =cut
 
-
 =type NegativeOrZeroNum
 
   has data => (
@@ -812,7 +824,6 @@ argument can not be validated.
 information.
 
 =cut
-
 
 =type NonEmptySimpleStr
 
@@ -830,7 +841,6 @@ information.
 
 =cut
 
-
 =type NonEmptyStr
 
   has data => (
@@ -845,7 +855,6 @@ C<is_type> function can be used to return true or false if the argument can not 
 validated.
 
 =cut
-
 
 =type Num
 
@@ -862,7 +871,6 @@ validated.
 
 =cut
 
-
 =type NumObj
 
   has data => (
@@ -877,7 +885,6 @@ not be validated. The C<is_NumObj> function can be used to return true or false 
 the argument can not be validated.
 
 =cut
-
 
 =type NumObject
 
@@ -894,22 +901,20 @@ if the argument can not be validated.
 
 =cut
 
-
-=type NumberObj
+=type NumRange
 
   has data => (
     is  => 'ro',
-    isa => 'NumberObj',
+    isa => 'NumRange[0, 25]',
   );
 
-The NumberObj type constraint is provided by this library and accepts any
-object that is, or is derived from, a L<Data::Object::Number> object. The
-C<assert_NumberObj> function can be used to throw an exception if the argument can
-not be validated. The C<is_NumberObj> function can be used to return true or false
-if the argument can not be validated.
+The NumRange type constraint is provided by the L<Types::TypeTiny> library. Please
+see that documentation for more information. The C<assert_NumRange> function can be
+used to throw an exception if the argument can not be validated. The C<is_NumRange>
+function can be used to return true or false if the argument can not be
+validated.
 
 =cut
-
 
 =type NumberObject
 
@@ -926,7 +931,6 @@ or false if the argument can not be validated.
 
 =cut
 
-
 =type NumericCode
 
   has data => (
@@ -941,7 +945,6 @@ can not be validated. The C<is_NumericCode> function can be used to return true 
 false if the argument can not be validated.
 
 =cut
-
 
 =type Object
 
@@ -958,7 +961,6 @@ be validated.
 
 =cut
 
-
 =type OptList
 
   has data => (
@@ -974,7 +976,6 @@ be validated.
 
 =cut
 
-
 =type Optional
 
   has data => (
@@ -983,13 +984,12 @@ be validated.
   );
 
 The Optional type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_Optional
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_Optional>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_Optional> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type Overload
 
@@ -999,13 +999,12 @@ argument can not be validated.
   );
 
 The Overload type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_Overload
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_Overload>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_Overload> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type Password
 
@@ -1015,13 +1014,12 @@ argument can not be validated.
   );
 
 The Password type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_Password
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_Password>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_Password> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type PathObj
 
@@ -1038,7 +1036,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type PathObject
 
   has data => (
@@ -1053,7 +1050,6 @@ can not be validated. The C<is_PathObject> function can be used to return true
 or false if the argument can not be validated.
 
 =cut
-
 
 =type PositiveInt
 
@@ -1070,7 +1066,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type PositiveNum
 
   has data => (
@@ -1085,7 +1080,6 @@ can not be validated. The C<is_PositiveNum> function can be used to return true 
 false if the argument can not be validated.
 
 =cut
-
 
 =type PositiveOrZeroInt
 
@@ -1103,7 +1097,6 @@ information.
 
 =cut
 
-
 =type PositiveOrZeroNum
 
   has data => (
@@ -1120,7 +1113,6 @@ information.
 
 =cut
 
-
 =type Ref
 
   has data => (
@@ -1135,7 +1127,6 @@ function can be used to return true or false if the argument can not be
 validated.
 
 =cut
-
 
 =type RegexpObj
 
@@ -1152,7 +1143,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type RegexpObject
 
   has data => (
@@ -1168,7 +1158,6 @@ or false if the argument can not be validated.
 
 =cut
 
-
 =type RegexpRef
 
   has data => (
@@ -1177,13 +1166,12 @@ or false if the argument can not be validated.
   );
 
 The RegexpRef type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_RegexpRef
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_RegexpRef>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_RegexpRef> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type ReplaceObj
 
@@ -1200,7 +1188,6 @@ or false if the argument can not be validated.
 
 =cut
 
-
 =type ReplaceObject
 
   has data => (
@@ -1216,7 +1203,6 @@ return true or false if the argument can not be validated.
 
 =cut
 
-
 =type RoleName
 
   has data => (
@@ -1225,13 +1211,12 @@ return true or false if the argument can not be validated.
   );
 
 The RoleName type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_RoleName
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_RoleName>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_RoleName> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type ScalarObj
 
@@ -1248,7 +1233,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type ScalarObject
 
   has data => (
@@ -1264,7 +1248,6 @@ or false if the argument can not be validated.
 
 =cut
 
-
 =type ScalarRef
 
   has data => (
@@ -1273,13 +1256,12 @@ or false if the argument can not be validated.
   );
 
 The ScalarRef type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_ScalarRef
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_ScalarRef>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_ScalarRef> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type SearchObj
 
@@ -1296,7 +1278,6 @@ or false if the argument can not be validated.
 
 =cut
 
-
 =type SearchObject
 
   has data => (
@@ -1311,7 +1292,6 @@ argument can not be validated. The C<is_SearchObject> function can be used to
 return true or false if the argument can not be validated.
 
 =cut
-
 
 =type SimpleStr
 
@@ -1328,7 +1308,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type SingleDigit
 
   has data => (
@@ -1343,7 +1322,6 @@ can not be validated. The C<is_SingleDigit> function can be used to return true 
 false if the argument can not be validated.
 
 =cut
-
 
 =type SpaceObj
 
@@ -1360,7 +1338,6 @@ false if the argument can not be validated.
 
 =cut
 
-
 =type SpaceObject
 
   has data => (
@@ -1375,7 +1352,6 @@ argument can not be validated. The C<is_SpaceObject> function can be used to
 return true or false if the argument can not be validated.
 
 =cut
-
 
 =type Str
 
@@ -1392,7 +1368,6 @@ validated.
 
 =cut
 
-
 =type StrMatch
 
   has data => (
@@ -1401,13 +1376,12 @@ validated.
   );
 
 The StrMatch type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_StrMatch
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_StrMatch>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_StrMatch> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
-
 
 =type StrObj
 
@@ -1424,7 +1398,6 @@ the argument can not be validated.
 
 =cut
 
-
 =type StrObject
 
   has data => (
@@ -1440,7 +1413,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type StrictNum
 
   has data => (
@@ -1449,13 +1421,27 @@ if the argument can not be validated.
   );
 
 The StrictNum type constraint is provided by the L<Types::Standard> library.
-Please see that documentation for more information. The C<assert_StrictNum
-function> can be used to throw an exception if the argument can not be
+Please see that documentation for more information. The C<assert_StrictNum>
+function can be used to throw an exception if the argument can not be
 validated. The C<is_StrictNum> function can be used to return true or false if the
 argument can not be validated.
 
 =cut
 
+=type StringLike
+
+  has data => (
+    is  => 'ro',
+    isa => 'StringLike',
+  );
+
+The StringLike type constraint is provided by the L<Types::TypeTiny> library.
+Please see that documentation for more information. The C<assert_StringLike>
+function can be used to throw an exception if the argument can not be
+validated. The C<is_StringLike> function can be used to return true or false if
+the argument can not be validated.
+
+=cut
 
 =type StringObj
 
@@ -1472,7 +1458,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type StringObject
 
   has data => (
@@ -1487,7 +1472,6 @@ can not be validated. The C<is_StringObject> function can be used to return true
 or false if the argument can not be validated.
 
 =cut
-
 
 =type StrongPassword
 
@@ -1504,7 +1488,6 @@ return true or false if the argument can not be validated.
 
 =cut
 
-
 =type TemplateObj
 
   has data => (
@@ -1519,7 +1502,6 @@ argument can not be validated. The C<is_TemplateObj> function can be used to
 return true or false if the argument can not be validated.
 
 =cut
-
 
 =type TemplateObject
 
@@ -1536,7 +1518,6 @@ return true or false if the argument can not be validated.
 
 =cut
 
-
 =type Tied
 
   has data => (
@@ -1552,12 +1533,11 @@ validated.
 
 =cut
 
-
 =type Tuple
 
   has data => (
     is  => 'ro',
-    isa => 'Tuple[Int, Str, Str],
+    isa => 'Tuple[Int, Str, Str]',
   );
 
 The Tuple type constraint is provided by the L<Types::Standard> library. Please
@@ -1568,6 +1548,20 @@ validated.
 
 =cut
 
+=type TypeTiny
+
+  has data => (
+    is  => 'ro',
+    isa => 'TypeTiny',
+  );
+
+The TypeTiny type constraint is provided by the L<Types::TypeTiny> library. Please
+see that documentation for more information. The C<assert_TypeTiny> function can be
+used to throw an exception if the argument can not be validated. The C<is_TypeTiny>
+function can be used to return true or false if the argument can not be
+validated.
+
+=cut
 
 =type Undef
 
@@ -1584,7 +1578,6 @@ validated.
 
 =cut
 
-
 =type UndefObj
 
   has data => (
@@ -1600,7 +1593,6 @@ if the argument can not be validated.
 
 =cut
 
-
 =type UndefObject
 
   has data => (
@@ -1615,7 +1607,6 @@ can not be validated. The C<is_UndefObject> function can be used to return true 
 false if the argument can not be validated.
 
 =cut
-
 
 =type UpperCaseSimpleStr
 
@@ -1633,7 +1624,6 @@ information.
 
 =cut
 
-
 =type UpperCaseStr
 
   has data => (
@@ -1642,13 +1632,12 @@ information.
   );
 
 The UpperCaseStr type constraint is provided by the L<Types::Common::String>
-library. Please see that documentation for more information. The C<assert_type
-function> can be used to throw an exception if the argument can not be
-validated. The C<is_type> function can be used to return true or false if the
-argument can not be validated.
+library. Please see that documentation for more information. The
+C<assert_UpperCaseStr> function can be used to throw an exception if the
+argument can not be validated. The C<is_UpperCaseStr> function can be used to
+return true or false if the argument can not be validated.
 
 =cut
-
 
 =type Value
 
@@ -1665,7 +1654,6 @@ validated.
 
 =cut
 
-
 =type YamlObj
 
   has data => (
@@ -1680,7 +1668,6 @@ can not be validated. The C<is_YamlObj> function can be used to return true or
 false if the argument can not be validated.
 
 =cut
-
 
 =type YamlObject
 

@@ -1,9 +1,12 @@
 package Music::Intervals;
 our $AUTHORITY = 'cpan:GENE';
+
 # ABSTRACT: Mathematical breakdown of musical intervals
+
 use strict;
 use warnings;
-our $VERSION = '0.0503';
+
+our $VERSION = '0.0507';
 
 use Moo;
 use Algorithm::Combinatorics qw( combinations );
@@ -222,9 +225,13 @@ sub dyads
         my $denominator = Number::Fraction->new( $self->_ratio_index->{ $i->[0] } );
         my $fraction = $numerator / $denominator;
 
+        my $str = $fraction->to_string();
+        # Handle the octave.
+        $str .= '/1' if $fraction->to_string() eq 2;
+
         # Calculate both natural and equal temperament values for our ratio.
         $dyads{"@$i"} = {
-            natural => $fraction->to_string(),
+            natural => $str,
             # The value is either the known pitch ratio or ...
             eq_tempered =>
               ( name2freq( $i->[1] . $self->octave ) || ( $self->concert * $self->_note_index->{ $i->[1] } ) )
@@ -278,7 +285,7 @@ Music::Intervals - Mathematical breakdown of musical intervals
 
 =head1 VERSION
 
-version 0.0503
+version 0.0507
 
 =head1 SYNOPSIS
 
@@ -321,21 +328,13 @@ version 0.0503
 
 =head1 DESCRIPTION
 
-A C<Music::Intervals> object shows the mathematical break-down of musical
+A C<Music::Intervals> object shows the mathematical break-down of musical notes,
 intervals and chords.
 
-This module reveals the "guts" of chords within a given tonality.  By guts I
-mean, the measurements of the notes and the intervals between them.
-
-* This module only handles equal temperament for the 12-tone scale only. *
+This module reveals the "guts" within a given tonality.  And by guts I mean, the
+measurements of the notes and the intervals between them.
 
 =head1 ATTRIBUTES
-
-=head2 cents
-
-Show divisions of the octave.
-
-Default: 0
 
 =head2 chords
 
@@ -364,6 +363,12 @@ Default: 0
 =head2 integer
 
 Show integer notation.
+
+Default: 0
+
+=head2 cents
+
+Show the logarithmic units of measure.
 
 Default: 0
 

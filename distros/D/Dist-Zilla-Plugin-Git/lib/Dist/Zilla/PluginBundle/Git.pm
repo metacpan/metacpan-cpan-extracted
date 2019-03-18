@@ -13,7 +13,7 @@ use warnings;
 package Dist::Zilla::PluginBundle::Git;
 # ABSTRACT: All git plugins in one bundle
 
-our $VERSION = '2.045';
+our $VERSION = '2.046';
 
 use Moose;
 use Module::Runtime 'use_module';
@@ -69,7 +69,7 @@ Dist::Zilla::PluginBundle::Git - All git plugins in one bundle
 
 =head1 VERSION
 
-version 2.045
+version 2.046
 
 =head1 SYNOPSIS
 
@@ -79,9 +79,9 @@ In your F<dist.ini>:
     changelog   = Changes             ; this is the default
     allow_dirty = dist.ini            ; see Git::Check...
     allow_dirty = Changes             ; ... and Git::Commit
-    commit_msg  = v%v%n%n%c           ; see Git::Commit
-    tag_format  = %v                  ; see Git::Tag
-    tag_message = %v                  ; see Git::Tag
+    commit_msg  = v%V%n%n%c           ; see Git::Commit
+    tag_format  = v%V                 ; see Git::Tag
+    tag_message = v%V                 ; see Git::Tag
     push_to     = origin              ; see Git::Push
 
 =head1 DESCRIPTION
@@ -137,8 +137,6 @@ L<http://dzil.org/#mailing-list>.
 
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
-
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
 
 =head1 AUTHOR
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension GIS-Distance-GeoEllipsoid.
 
+0.12 2019-03-17T17:06:57Z
+
+ - Use GIS::Distance's new interface.
+
 0.11 2019-03-07T23:17:39Z
 
  - Depend on latest Geo::Ellipsoid, 1.14+.

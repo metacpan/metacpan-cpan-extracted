@@ -27,7 +27,8 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'Win32::Daemon' => [
-                                  qr/^Constant|DebugOutputPath|GetLastError|GetServiceHandle|GetVersion|HideService|IsDebugBuild|QueryServiceConfig|RestoreService|SetServiceBits|ShowService$/
+                                  qr/^Constant|DebugOutputPath|GetLastError|GetServiceHandle|GetVersion|HideService|IsDebugBuild|QueryServiceConfig|RestoreService|SetServiceBits|ShowService$/,
+                                  qr/^[A-Z_0-9]+$/
                                 ]
            );
 

@@ -42,15 +42,17 @@
       },
       "runtime" : {
          "requires" : {
-            "GIS::Distance" : "0.11",
+            "GIS::Distance::Formula" : "0.17",
             "Geo::Ellipsoid" : "1.14",
             "namespace::clean" : "0.24",
+            "parent" : "0",
             "perl" : "5.008001",
             "strictures" : "2.000000"
          }
       },
       "test" : {
          "requires" : {
+            "GIS::Distance" : "0.17",
             "Test2::V0" : "0.000094"
          }
       }
@@ -58,7 +60,7 @@
    "provides" : {
       "GIS::Distance::GeoEllipsoid" : {
          "file" : "lib/GIS/Distance/GeoEllipsoid.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -72,7 +74,7 @@
          "web" : "https://github.com/bluefeet/GIS-Distance-GeoEllipsoid"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_authority" : "cpan:BLUEFEET",
    "x_contributors" : [
       "Aran Clary Deltac <bluefeet@gmail.com>"

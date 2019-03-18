@@ -3,21 +3,21 @@ require 5.010;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'NAME' => 'Locale::TextDomain::OO::Util',
-  'PL_FILES' => {},
   'VERSION_FROM' => 'lib/Locale/TextDomain/OO/Util.pm',
-  'EXE_FILES' => [],
   'PREREQ_PM' => {
-                   'namespace::autoclean' => 0,
                    'Test::Differences' => '0.60',
+                   'Cwd' => 0,
+                   'namespace::autoclean' => 0,
                    'Test::Exception' => 0,
-                   'Carp' => 0,
-                   'Test::More' => 0,
-                   'English' => 0,
-                   'Test::NoWarnings' => 0,
                    'charnames' => 0,
-                   'Cwd' => 0
+                   'Test::More' => 0,
+                   'Test::NoWarnings' => 0,
+                   'English' => 0,
+                   'Carp' => 0
                  },
-  'INSTALLDIRS' => 'site'
+  'EXE_FILES' => [],
+  'PL_FILES' => {},
+  'INSTALLDIRS' => 'site',
+  'NAME' => 'Locale::TextDomain::OO::Util'
 )
 ;

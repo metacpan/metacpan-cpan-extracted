@@ -5,7 +5,7 @@ use Test2::V0;
 
 use GIS::Distance;
 
-my $gis = GIS::Distance->new( 'Null' );
+my $gis = GIS::Distance->new( 'GIS::Distance::Null' );
 
 is(
     # Canoga Park to San Francisco.

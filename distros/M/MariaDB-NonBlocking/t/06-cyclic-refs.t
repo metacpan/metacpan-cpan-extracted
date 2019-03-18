@@ -7,9 +7,10 @@ no warnings 'once';
 use Test::More;
 use AnyEvent;
 use Scalar::Util qw/weaken/;
-use Promises qw/collect/;
+use AnyEvent::XSPromises qw/collect/;
 use MariaDB::NonBlocking::Promises;
 use Data::Dumper;
+AnyEvent::detect();
 
 use lib 't', '.';
 require 'lib.pl';
@@ -32,8 +33,8 @@ my $connect_args = {
     host     => '127.0.0.1',
 };
 
-my $conn1 = MariaDB::NonBlocking::Promises->init;
-my $conn2 = MariaDB::NonBlocking::Promises->init;
+my $conn1 = MariaDB::NonBlocking::Promises->new;
+my $conn2 = MariaDB::NonBlocking::Promises->new;
 my @connect_promises = map $_->connect($connect_args), $conn1, $conn2;
 
 wait_for_promise collect(@connect_promises);
@@ -54,7 +55,7 @@ wait_for_promise collect(@connect_promises);
 }
 
 my $conn_3_holder = {};
-$conn_3_holder->{conn_3} = MariaDB::NonBlocking::Promises->init;
+$conn_3_holder->{conn_3} = MariaDB::NonBlocking::Promises->new;
 wait_for_promise $conn_3_holder->{conn_3}->connect($connect_args);
 
 {

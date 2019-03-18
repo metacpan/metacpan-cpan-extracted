@@ -1,2 +1,3 @@
 name = "GIS-Distance-GeoEllipsoid"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"

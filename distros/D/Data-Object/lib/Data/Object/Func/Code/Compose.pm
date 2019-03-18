@@ -31,10 +31,6 @@ sub execute {
 
   my ($data, $code, @args) = $self->unpack;
 
-  my $refs = {'$code' => \$code};
-
-  $code = $self->codify($code, $refs);
-
   return sub { (sub { $code->($data->(@_)) })->(@args, @_) };
 }
 

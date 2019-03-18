@@ -41,8 +41,8 @@ use_ok 'Data::Object::Array';
 
 my $data = Data::Object::Array->new([2..5]);
 
-is_deeply $data->one('$value == 5'), 1;
+is_deeply $data->one(sub { $_[0] == 5 }), 1;
 
-is_deeply $data->one('$value == 6'), 0;
+is_deeply $data->one(sub { $_[0] == 6 }), 0;
 
 ok 1 and done_testing;
