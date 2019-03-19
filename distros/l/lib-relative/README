@@ -15,9 +15,10 @@ SYNOPSIS
       use lib::relative 'foo/baz', '/path/to/lib';
       
       # Equivalent code using core modules
+      use Cwd ();
       use File::Basename ();
       use File::Spec ();
-      use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'path/to/lib');
+      use lib File::Spec->catdir(File::Basename::dirname(Cwd::abs_path __FILE__), 'path/to/lib');
 
 DESCRIPTION
 

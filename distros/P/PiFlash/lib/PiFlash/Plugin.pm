@@ -6,7 +6,7 @@ use warnings;
 use v5.14.0; # require 2011 or newer version of Perl
 
 package PiFlash::Plugin;
-$PiFlash::Plugin::VERSION = '0.3.1';
+$PiFlash::Plugin::VERSION = '0.4.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use parent 'PiFlash::Object';
 use PiFlash::State;
@@ -112,7 +112,7 @@ PiFlash::Plugin - plugin extension interface for PiFlash
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -137,18 +137,18 @@ version 0.3.1
 
 =head1 DESCRIPTION
 
- The PiFlash::Plugin module has class methods which manage all the plugins and
- instance methods which are the base class inherited by each plugin.  L<PiFlash::Hook>
- can be used to receive callback events at various stages of the PiFlash run.
+The PiFlash::Plugin module has class methods which manage all the plugins and
+instance methods which are the base class inherited by each plugin.  L<PiFlash::Hook>
+can be used to receive callback events at various stages of the PiFlash run.
 
- To create a plugin for PiFlash, write a new class under the namespace of PiFlash::Plugin,
- such as PiFlash::Plugin::Example.  All PiFlash plugins must be named under and inherit
- from PiFlash::Plugin. Otherwise they will not be enabled or accessible.
+To create a plugin for PiFlash, write a new class under the namespace of PiFlash::Plugin,
+such as PiFlash::Plugin::Example.  All PiFlash plugins must be named under and inherit
+from PiFlash::Plugin. Otherwise they will not be enabled or accessible.
 
- If the plugin class contains or inherits an init() method, it will be called when the
- plugin object is created. You don't need to write a new() routine, and shouldn't, because
- PiFlash::Plugin provides one which must be used by all plugins. That will be called by
- PiFlash during plugin initialization.
+If the plugin class contains or inherits an init() method, it will be called when the
+plugin object is created. You don't need to write a new() routine, and shouldn't, because
+PiFlash::Plugin provides one which must be used by all plugins. That will be called by
+PiFlash during plugin initialization.
 
 =head1 SEE ALSO
 

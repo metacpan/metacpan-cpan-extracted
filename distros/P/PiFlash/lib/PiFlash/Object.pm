@@ -6,7 +6,7 @@ use warnings;
 use v5.14.0; # require 2011 or newer version of Perl
 
 package PiFlash::Object;
-$PiFlash::Object::VERSION = '0.3.1';
+$PiFlash::Object::VERSION = '0.4.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Carp qw(confess);
 
@@ -60,7 +60,7 @@ PiFlash::Object - object functions for PiFlash classes
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -76,9 +76,9 @@ version 0.3.1
 
 =head1 DESCRIPTION
 
- PiFlash::Object was written so that L<PiFlash::Hook> and L<PiFlash::Plugin> could inherit and share the same new() class method, rather than have similar and separate implementations. It isn't of interest to most PiFlash users.
+PiFlash::Object was written so that L<PiFlash::Hook> and L<PiFlash::Plugin> could inherit and share the same new() class method, rather than have similar and separate implementations. It isn't of interest to most PiFlash users.
 
- In order to use it, the class must define a class method called object_params() which returns a list of the required parameter names for each object of the class.
+In order to use it, the class must define a class method called object_params() which returns a list of the required parameter names for each object of the class.
 
 =head1 SEE ALSO
 

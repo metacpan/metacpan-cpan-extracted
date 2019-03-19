@@ -1,7 +1,7 @@
 package Dancer::SharedData;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Shared-data singleton for Dancer
-$Dancer::SharedData::VERSION = '1.3500';
+$Dancer::SharedData::VERSION = '1.3510';
 use strict;
 use warnings;
 use Dancer::Timer;
@@ -77,7 +77,7 @@ Dancer::SharedData - Shared-data singleton for Dancer
 
 =head1 VERSION
 
-version 1.3500
+version 1.3510
 
 =head1 AUTHOR
 

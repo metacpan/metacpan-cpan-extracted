@@ -3,7 +3,7 @@ package Class::Mock::Method::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.3000';
 
 # all this pre-amble is damned near identical to C::M::G::IT. Re-factor.
 use Test::More ();
@@ -76,7 +76,16 @@ sub new {
             }
         }
 
-        return $this_test->{output};
+        my $output = $this_test->{output};
+        # FIXME identical code to that in C::M::Generic::InterfaceTester
+        if(
+               ref($output)    eq 'REF'  # ref to a ref
+            && ref(${$output}) eq 'CODE' # ... which is a ref to a sub
+        ) {
+            return ${$output}->()
+        } else {
+            return $output
+        }
     }, $class);
 }
 
@@ -145,12 +154,25 @@ or when it is redefined, eg with _reset_... (see Class::Mockable).
 
 C<new()> takes an arrayref of hashrefs as its argument.  Those hashes
 must have keys 'input' and 'output' whose values define the ins and
-outs of each method call in turn.  'input' is always an arrayref which
-will get compared to all the method's arguments (excluding the first
-one, the object or class itself) but for validating very complex inputs
-you may specify a subroutine reference for the input, which will get
-executed with the actual input as its argument, and emit a failure if
-the call returns false.
+outs of each method call in turn.
+
+=over
+
+=item input
+
+This is normally an arrayref which will get compared to all the method's
+arguments (excluding the first one, the object or class itself) but for
+validating very complex inputs you may specify a subroutine reference for the
+input, which will get executed with the actual input as its argument, and emit
+a failure if the call returns false.
+
+=item output
+
+This is normally just whatever you want to return, but as a special case
+you can specify a B<reference> to a code-ref. If you do that then the code-ref
+will be executed and whatever *it* returns will be returned.
+
+=back
 
 If you want to check
 that the method is being invoked on the right object or class (if you

@@ -10,6 +10,10 @@ use MsgPack::Decoder;
 use MsgPack::Type::Boolean;
 use MsgPack::Type::Ext;
 
+use Config;
+
+my $is_32bits = !$Config{use64bitint};
+
 my $decoder = MsgPack::Decoder->new( log_to_stderr => 0, debug => 0 );
 
 subtest simple_encoding => sub {
@@ -35,6 +39,9 @@ subtest simple_encoding => sub {
     for ( sort keys %structs ) {
         my( $name, $struct ) = ( $_, $structs{$_} );
         subtest $name => sub {
+            plan skip_all => '32bits architecture'
+                if $name =~ /64/ and $is_32bits;
+
             $decoder->read( MsgPack::Encoder->new(  struct => $struct )->encoded );
             if ( $name eq 'float32' ) {
                 is_approx( $decoder->next, $struct, $name );
@@ -131,6 +138,8 @@ subtest int => sub {
         is $decoder->read_next($e) => $value;
     };
     subtest uint64 => sub {
+        plan skip_all => '32bits architecture' if $is_32bits;
+
         my $value = 2**32;
         my $e = encode( 0xcf, 0, 0, 0, 1, 0, 0, 0, 0);
         my $x = msgpack_uint64($value);
@@ -166,6 +175,8 @@ subtest int => sub {
         is $decoder->read_next($e) => $value;
     };
     subtest int64 => sub {
+        plan skip_all => '32bits architecture' if $is_32bits;
+
         my $value = -72057594037927935;
         my $e = encode( 0xd3, 1,0,0,0,0,0,0,255 );
 
@@ -178,10 +189,13 @@ subtest int => sub {
 
 subtest float => sub {
     for ( 32, 64 ) {
-        my $e = eval qq{ msgpack_float$_ 1/3 };
-        is length $e => 1 + ($_ / 8), "right number of characters";
-        my $val = $decoder->read_next($e);
-        cmp_deeply [ $val ] => [ num(1/3,3) ], "float$_";
+        subtest "float$_", sub {
+            plan skip_all => '32bits architecture' if $_ == 64 and $is_32bits;
+            my $e = eval qq{ msgpack_float$_ 1/3 };
+            is length $e => 1 + ($_ / 8), "right number of characters";
+            my $val = $decoder->read_next($e);
+            cmp_deeply [ $val ] => [ num(1/3,3) ], "float$_";
+        }
     }
     cmp_deeply [ msgpack 1/3 ] => [ num(1/3,3) ], 'msgpack';
 };
@@ -193,7 +207,7 @@ subtest 'str' => sub {
         my $function = 'msgpack_' . ( $size == 0 ? 'fixstr' : 'str' . (2**($size+2) ) );
         subtest $function => sub {
             my $l = length $str;
-            my $e = pack 'C*', ( $size == 0 
+            my $e = pack 'C*', ( $size == 0
                             ? ( 0xa0 + $l )
                             : ( 0xd8 + $size, (0)x((2**($size-1)) - 1), $l) ), map { ord } split '', $str;
             is eval qq{ $function '$str' } => $e;
@@ -211,7 +225,7 @@ subtest 'bin' => sub {
         my $function = 'msgpack_' . 'bin' . (2**($size+2) );
         subtest $function => sub {
             my $l = length $str;
-            my $e = pack 'C*', 
+            my $e = pack 'C*',
                             ( 0xc3 + $size, (0)x((2**($size-1)) - 1), $l), map { ord } split '', $str;
             is eval qq{ $function '$str' } => $e;
             is $decoder->read_next($e) => $str;
@@ -238,7 +252,7 @@ subtest array => sub {
     for my $size ( 16, 32 ) {
         my $function = "msgpack_array$size";
         subtest $function => sub {
-            my $e = pack 'C*', ( 0xdb + $size/16, 
+            my $e = pack 'C*', ( 0xdb + $size/16,
                 ( 0 ) x ( (2**($size/16)) - 1 ), 1,
                 1
             );
@@ -266,7 +280,7 @@ subtest map => sub {
     for my $size ( 16, 32 ) {
         my $function = "msgpack_map$size";
         subtest $function => sub {
-            my $e = pack 'C*', ( 0xdd + $size/16, 
+            my $e = pack 'C*', ( 0xdd + $size/16,
                 ( 0 ) x ( (2**($size/16)) - 1 ), 1,
                 1,2
             );

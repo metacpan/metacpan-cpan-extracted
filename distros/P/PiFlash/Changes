@@ -1,5 +1,20 @@
 Change log for PiFlash
 
+0.4.0 2019-03-18T20:40:50-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - when displaying program usage, display the reason the program can't run
+
+ [DOCS]
+ - POD formatting fixes - text in PiFlash::Object and PiFlash::Plugin
+   should not have been a block (indented)
+
+ [MINOR]
+ - reorg PiFlash::State accessor functions to use top-level parameter
+   containers from a class method instead of what was running in the
+   closure at init time
+ - add t/022_cmdline.t with 32 test cases for command line option
+   processing
+
 0.3.1 2019-03-13T01:19:06-07:00 America/Los_Angeles
  [BUG FIXES]
  - remove README from RPM spec file, which blocked Dist::Zilla from 0.3.0

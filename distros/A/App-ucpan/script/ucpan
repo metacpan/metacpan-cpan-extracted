@@ -25,10 +25,12 @@ my $CONFIG = {
     updater_options  => [],
 };
 
-my $APPNAME = file( $0 )->basename;
+my $APPNAME = file($0)->basename;
+
 BEGIN {
-    $APPNAME = file( $0 )->basename;    
+    $APPNAME = file($0)->basename;
 }
+
 sub usage {
     return << "EO_USAGE";
 Usage: $APPNAME [command | options...]
@@ -57,8 +59,8 @@ EO_USAGE
 
 # Process OPTIONS
 {
-    my $CPANM_OPT = [];
-    my $CUD_OPT   = [];
+    my $CPANM_OPT     = [];
+    my $CUD_OPT       = [];
     my $set_cpanm_opt = sub {
         push @$CPANM_OPT, "--$_[0]=$_[1]";
     };
@@ -79,7 +81,7 @@ EO_USAGE
     my $set_debugging = sub {
         shift;    # skip option-str
         $DEBUG{verbose} = 0;
-        $DEBUG{head} = 1;
+        $DEBUG{head}    = 1;
         my $value = shift;
         if ($value) {
             my @item = split ',', $value;
@@ -125,7 +127,7 @@ EO_USAGE
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.03');
+            our $VERSION = version->declare('1.04');
             print __PACKAGE__->VERSION, $/;
             exit;
         },
@@ -144,17 +146,18 @@ EO_USAGE
         'exclude-core'            => $set_both_opt,
         'S|sudo=s'                => $set_cpanm_opt,
         'no-sudo=s'               => $set_cpanm_opt,
+        'j|test-jobs=i'           => sub { $DEBUG{jobs} = $_[1]; },
         'D|debug:s'               => $set_debugging,
         'dump-to|dump=s'          => \$DUMP,
         'load-from|load=s'        => \$LOAD,
         );
-        push @{ $CONFIG->{updater_options} }, @$CPANM_OPT;
-        push @{ $CONFIG->{checker_options} }, @$CUD_OPT;
+    push @{ $CONFIG->{updater_options} }, @$CPANM_OPT;
+    push @{ $CONFIG->{checker_options} }, @$CUD_OPT;
 }
 
 #== Console Configuration ~~ ADDED: 2013/08/29
 BEGIN {
-    if ( WIN32 ) {
+    if (WIN32) {
         eval         { require Win32::Console::ANSI }
             and eval { Win32::Console::ANSI->import() };
     }
@@ -185,7 +188,7 @@ my $RECFILEBASE = '.ucpandb';
 {    # set config file path
     my $dir;
     my $file;
-    if ( $dir = ( grep { /^--[lL]=/ } @{ $CONFIG->{updater_options} } )[-1] ) {
+    if ( $dir = ( grep {/^--[lL]=/} @{ $CONFIG->{updater_options} } )[-1] ) {
         $dir =~ s/^--(?:l|L)=//;
         $dir = file( $dir, "lib", @Config{qw/package archname/} );
     }
@@ -203,7 +206,7 @@ if ( $DEBUG{fakelib} ) {
     $ENV{PERL_MB_OPT}         = "--install_base=$FAKELIB";
     $ENV{PERL_MM_OPT}         = "INSTALL_BASE=$FAKELIB";
     $ENV{PERL_CPANM_HOME}     = $FAKELIB;
-    $CONFIG->{cfg_file} = file($FAKELIB,$RECFILEBASE);
+    $CONFIG->{cfg_file} = file( $FAKELIB, $RECFILEBASE );
 }
 if ( $DEBUG{head} ) {
     warn "=" x 20 . " DEBUGGING MODE " . "=" x 20 . $/;
@@ -212,8 +215,10 @@ if ( $DEBUG{head} ) {
         join( ' ',
         map {"$_=$DEBUG{$_}"}
         grep { $_ !~ /^(?:enable|verbose|head)/ } keys %DEBUG );
-    warn sprintf "%25s: %s$/", 'Checker Option', join( ' ', @{ $CONFIG->{checker_options} } );
-    warn sprintf "%25s: %s$/", 'Updater Option', join( ' ', @{ $CONFIG->{updater_options} } );
+    warn sprintf "%25s: %s$/", 'Checker Option',
+        join( ' ', @{ $CONFIG->{checker_options} } );
+    warn sprintf "%25s: %s$/", 'Updater Option',
+        join( ' ', @{ $CONFIG->{updater_options} } );
     warn sprintf "%25s: %s$/", 'Config File', $CONFIG->{cfg_file};
 }
 
@@ -306,7 +311,7 @@ my $mod_fold = sub {
 my $skip_entries;
 my ( $fn, $fc, $fl, $fs );
 ( $fn, $fc, $fl ) = qw/32 10 10/;
-$fs            = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
+$fs = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
 my $output_format_3 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds$/},
     ($fn) x 2, ($fc) x 2, ($fl) x 2;
 my $output_format_4 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
@@ -337,19 +342,21 @@ sub make_table_row {
 }
 
 ## Show Skips
-if ( $SHOW_SKIPS ) {
+if ($SHOW_SKIPS) {
     pr_black qq|>>> Show FAILED Modules...$/|;
     $skip_entries = $CONFIG->{user_setting}->{SKIP};
 
     my @mods;
     @mods = sort { $a->{module} cmp $b->{module} }
-    map {
-    my @a = @{ $skip_entries->{$_}->{modules} };
-    my $f = $skip_entries->{$_}->{fail_at};
-    $_->{fail_at} = $f for @a;
-    @a
-    } keys %$skip_entries;
-    pr_cyan sprintf( $output_format_4, 'Name', 'Current', 'Latest', 'Fail at...' );
+        map {
+        my @a = @{ $skip_entries->{$_}->{modules} };
+        my $f = $skip_entries->{$_}->{fail_at};
+        $_->{fail_at} = $f for @a;
+        @a
+        } keys %$skip_entries;
+    pr_cyan
+        sprintf( $output_format_4, 'Name', 'Current', 'Latest',
+        'Fail at...' );
     print make_table_row($_) for @mods;
     exit;
 }
@@ -359,13 +366,13 @@ if ( $SHOW_SKIPS ) {
 # hack: kill -SIG,$pid[perlport#kill@win32] does not work on Win32. taskkill instead.
 sub _kill_group {
     my ($pid) = @_;
-    if ( !WIN32 )
-    {
+    if ( !WIN32 ) {
         CORE::kill -TERM => $pid;
     }
     else {
         return if $pid == 0;    # guard
         system qq:taskkill /F /T /PID $pid >NUL 2>&1:;
+        waitpid $pid, 0;
     }
 }
 
@@ -405,7 +412,6 @@ $skip_entries = $CONFIG->{user_setting}->{SKIP};
 $fs = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
 
 my $reader = sub {
-    return if $DEBUG{maxitem} && keys(%outdated) >= $DEBUG{maxitem};
     my ($line) = @_;
     chomp $line;
     my ( $mod, $current, $new, $file ) = split /\s+/, $line;
@@ -416,7 +422,7 @@ my $reader = sub {
     $dist_version = version->parse($dist_version);
     $current      = version->parse($current);
     $new          = version->parse($new);
-    my $info = +{ module=>$mod, current=>$current, new=>$new };
+    my $info = +{ module => $mod, current => $current, new => $new };
 # Checking SKIP ENTRIES
     if ( my $old = $skip_entries->{$dist_name} ) {
 
@@ -425,7 +431,7 @@ my $reader = sub {
             delete $skip_entries->{$dist_name};
         }
         unless ($IGNORE_SKIP) {
-            print make_table_row( $info );
+            print make_table_row($info);
             return;
         }
     }
@@ -445,24 +451,36 @@ my $reader = sub {
     return;
 };
 
-pr_cyan sprintf( $output_format_4, 'Name', 'Current', 'Latest', 'Fail at...' );
+pr_cyan
+    sprintf( $output_format_4, 'Name', 'Current', 'Latest', 'Fail at...' );
 
 ## run cpan-outdated
 {
     my $start_time = time;
+    my $checker_abort_ok;
     if ( my $pid = open my $pipe, '-|',
         join( ' ', map( qq{"$_"}, @{ $CONFIG->{checker} }, '2>&1' ) ) )
     {
         ## trap for cleanup children
         local $SIG{INT} = sub { _kill_group($pid); exit 3; };
-        $reader->($_) while <$pipe>;
-        close $pipe;
-        my $child_status = $? >> 8;
-        if($child_status) {
-            warn "checker returned status $child_status: abort!!";
-            exit $child_status;
+        while (<$pipe>) {
+            $reader->($_);
+            if ( $DEBUG{maxitem} && keys(%outdated) >= $DEBUG{maxitem} ) {
+                kill TERM => $pid;
+                waitpid $pid, 0;
+                $checker_abort_ok = 1;
+                last;
+            }
         }
-        waitpid $pid, 0;
+        close $pipe;
+        if ( !$checker_abort_ok ) {
+            my $child_status = $? >> 8;
+            if ($child_status) {
+                warn "checker returned status $child_status: abort!!";
+                exit $child_status;
+            }
+            waitpid $pid, 0;
+        }
         my $elapsed = time - $start_time;
         pr_spent_time($elapsed);
     }
@@ -515,7 +533,7 @@ my $cpanm_file = File::Which::which('cpanm');
 $cpanm_file =~ s/\\/\//g;
 
 # override system & symlink in App::cpanminus::script
-if (WIN32){
+if (WIN32) {
     no warnings 'once';
     *App::cpanminus::script::system = sub {
         my $cmd = shift;
@@ -549,8 +567,8 @@ pr_black qq|>>> Upgrading outdated modules$/|;
 my @outdated = sort keys %outdated;
 {
     my $ORG_STDERR = \*STDERR;
-    my $state  = +{};
-    my $ispace = ' ' x 2;    # indent witdh
+    my $state      = +{};
+    my $ispace     = ' ' x 2;    # indent witdh
     my $org_m;
     {
         no strict 'refs';
@@ -561,7 +579,7 @@ my @outdated = sort keys %outdated;
     }
     my $pid;
     no warnings 'once';
-    if ( WIN32 ) {
+    if (WIN32) {
         *App::cpanminus::script::run_timeout = sub {
             my ( $self, $cmd, $timeout ) = @_;
             $cmd = $self->shell_quote(@$cmd) if ref $cmd eq 'ARRAY';
@@ -702,7 +720,7 @@ my @outdated = sort keys %outdated;
                 pr_progress($state);
             }
             pr( FAIL => "Timeout!!.." ) if $state->{fail} =~ /timeout/i;
-            pr( FAIL    => "FAIL" );
+            pr( FAIL => "FAIL" );
             pr( DEFAULT => "($elapse_one sec)" . $/ );
         }
         $state = $state->{prev};
@@ -762,9 +780,10 @@ my @outdated = sort keys %outdated;
     }
 ## run cpanm
     local $SIG{INT} = sub { _kill_group($$); exit 3; };
+    local $ENV{HARNESS_OPTIONS} = "j$DEBUG{jobs}" if $DEBUG{jobs};
     my $start_time = time;
     for my $key (@outdated) {
-        my $file         = $outdated{$key}->{file};
+        my $file = $outdated{$key}->{file};
         $state = +{ curr => $file, depth => 0 };
         push @{ $app->{argv} }, $file;
         $app->doit;
@@ -793,29 +812,27 @@ else {
         for my $data (@success) {
             my ( $mod, $cur, $new ) = @{$data}{qw/module current new/};
             $cur ||= '~';
-            pr_green
-                make_table_row( +{ module=>$mod, current=>$cur, new=>$new } );
+            pr_green make_table_row(
+                +{ module => $mod, current => $cur, new => $new } );
         }
         $CONFIG->{user_setting}->{INSTALLED} = \@success;
     }
     my $total_fail;
     if ( %outdated = ( %outdated, %added ) ) {
         pr_red qq|Fail to upgrade| . q|-| x 50 . $/;
-        printf $output_format_4,
-            "Name",
-            "Current",
-            "Latest", "Fail at...";
+        printf $output_format_4, "Name", "Current", "Latest", "Fail at...";
         for my $fail_mod ( keys %outdated ) {
 ### require: $outdated{$fail_mod}->{modules}
             $outdated{$fail_mod}->{fail_at} //= 'UNKNOWN';
 ### failed:  $outdated{$fail_mod}->{modules}
-            my @od    = @{ $outdated{$fail_mod}->{modules} || [] };
+            my @od   = @{ $outdated{$fail_mod}->{modules} || [] };
             my $info = {};
             $info->{fail_at} = $outdated{$fail_mod}->{fail_at};
             $total_fail += @od;
             for my $mod (@od) {
-            @{$info}{qw/module current new/}= @{$mod}{qw/module current new/};
-            $info->{current} //= '~';
+                @{$info}{qw/module current new/}
+                    = @{$mod}{qw/module current new/};
+                $info->{current} //= '~';
                 pr_red make_table_row($info);
             }
             $CONFIG->{user_setting}->{SKIP}->{$fail_mod}
@@ -844,8 +861,7 @@ sub pr_spent_time {
     return unless @_;
     my ($elapsed) = @_;
     my $str = '  ' . ( $elapsed + 0 ) . 'sec.';
-    printf
-        sprintf( '%%%d.%ds', ( $screenX - length($str) - 2 ) x 2 ), ' ';
+    printf sprintf( '%%%d.%ds', ( $screenX - length($str) - 2 ) x 2 ), ' ';
     pr_black $str. $/;
 }
 
@@ -1185,6 +1201,10 @@ Current default value is 3600
 
 Specify the timeout length (in seconds) to wait for the build.
 Current default value is 1800
+
+=item -j, --test-jobs
+
+Control the parallel job habits of the test. Please do not give zero, the program ends with a warning. Note that this option internally replaces the environment variable HARNESS_OPTIONS.
 
 =item -S, --sudo
 

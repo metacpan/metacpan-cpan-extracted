@@ -4,7 +4,7 @@ DBIx::Class::Helper::Row::Enumeration - Add methods for emum values
 
 # VERSION
 
-version v0.1.5
+version v0.1.6
 
 # SYNOPSIS
 
@@ -139,7 +139,7 @@ __PACKAGE__->add_columns(
 );
 ```
 
-Note that this is by design, since the intention column modifiers is
+Note that this is by design, since the intention of column modifiers is
 to override existing values.
 
 # SEE ALSO
@@ -175,7 +175,7 @@ Aaron Crane <arc@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -10,7 +10,7 @@ use PiFlash::Inspector;
 use PiFlash::Hook;
 
 package PiFlash::MediaWriter;
-$PiFlash::MediaWriter::VERSION = '0.3.1';
+$PiFlash::MediaWriter::VERSION = '0.4.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Try::Tiny;
 use File::Basename;
@@ -246,8 +246,6 @@ sub flash_device
 			} else {
 				warn "unrecognized filesystem type ".($fstype_root // "")." - resize not attempted";
 			}
-		} else {
-			say "* partition resize skipped due to lack of partition table";
 		}
 
 		# check if any hooks are registered for filesystem access
@@ -299,7 +297,7 @@ PiFlash::MediaWriter - write to Raspberry Pi SD card installation with scriptabl
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

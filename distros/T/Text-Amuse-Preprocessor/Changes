@@ -1,5 +1,9 @@
 Revision history for perl module Text-Amuse-Preprocessor
 
+0.61 2019-03-19
+
+ - Fix space-eating bug introduced by the new parsing
+
 0.60 2019-03-18
 
  - Fix crash in some corner case when =<verbatim>= is used (with a

@@ -29,6 +29,7 @@ t/010_PiFlash_State.t
 t/011_PiFlash_Command.t
 t/020_config_yaml.t
 t/021_plugin.t
+t/022_cmdline.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/test-inputs/020_config_yaml/000-test-metadata.yml
@@ -41,3 +42,4 @@ t/test-inputs/020_config_yaml/006-toc.yml
 t/test-inputs/020_config_yaml/007-toc.yml
 t/test-inputs/021_plugin/000-no-docs.yml
 t/test-inputs/021_plugin/001-multi-doc.yml
+t/test-inputs/022_cmdline/a_file_that_exists

@@ -1,6 +1,6 @@
 package Catmandu::Breaker;
 
-our $VERSION = '0.14';
+our $VERSION = '0.141';
 
 use Moo;
 use Carp;
@@ -22,6 +22,8 @@ sub counter {
 
 sub to_breaker {
     my ( $self, $identifier, $tag, $value ) = @_;
+
+    $value //= '';
 
     croak "usage: to_breaker(idenifier,tag,value)"
         unless defined($identifier) && defined($tag) && defined($value);

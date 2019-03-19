@@ -1,0 +1,35 @@
+---
+abstract: 'ActionRole for content negotiation'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: '1.302125'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: CatalystX-Action-Negotiate
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Catalyst: '5.90117'
+  HTTP::Negotiate: '6.00'
+  Path::Class: '0.36'
+  Role::MimeInfo: '0.02'
+  perl: 5.10.0
+resources:
+  bugtracker: https://github.com/doirantaylor/p5-catalystx-action-negotiate/issues
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  repository: git://github.com/doriantaylor/p5-catalystx-action-negotiate.git
+version: '0.02'

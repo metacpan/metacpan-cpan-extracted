@@ -1,7 +1,7 @@
 package Term::Caca::Sprite;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: an OO-interface to caca_sprite
-$Term::Caca::Sprite::VERSION = '3.0.0';
+$Term::Caca::Sprite::VERSION = '3.0.1';
 use strict;
 use warnings;
 use Term::Caca;
@@ -61,7 +61,7 @@ Term::Caca::Sprite - an OO-interface to caca_sprite
 
 =head1 VERSION
 
-version 3.0.0
+version 3.0.1
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 

@@ -1,0 +1,84 @@
+NAME
+    preloadable - Require a module during run-time (or compile-time)
+
+VERSION
+    This document describes version 0.001 of preloadable (from Perl
+    distribution preloadable), released on 2019-03-19.
+
+SYNOPSIS
+    In your script:
+
+     use preloadable 'Foo';
+
+     sub baz {
+         use preloadable 'Bar';
+         Bar::blah(1, 2);
+     }
+     baz;
+
+    If the environment PERL_PRELOAD_MODULES is false or not defined, the
+    above script is equivalent to:
+
+     require Foo;
+     sub baz {
+         require Bar;
+         Bar::blah(1, 2);
+     }
+     baz;
+
+    But if PERL_PRELOAD_MODULES is true, the above script is equivalent to:
+
+     BEGIN { require Foo }
+     sub baz {
+         BEGIN { require Bar }
+         Bar::blah(1, 2);
+     }
+     baz;
+
+    which means "Foo" and "Bar" are loaded during compile-time.
+
+DESCRIPTION
+    With PERL_PRELOAD_MODULES unset or false, this statement:
+
+     use preloadable 'Foo';
+
+    is basically equivalent to run-time "require()":
+
+     require Foo;
+
+    preloadable uses B::Hooks::AtRuntime to perform the "require()" on
+    runtime. During runtime, you do take a hit of an extra subroutine call.
+
+    With PERL_PRELOAD_MODULES set to true, this statement:
+
+     use preloadable 'Foo';
+
+    will simply instruct preloadable to "require" "Foo" at compile-time.
+
+NOTES
+    B::Hooks::AtRuntime's startup overhead is a bit heavier than I'd like.
+    Will probably fork to create a lite alternative.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/preloadable>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-preloadable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=preloadable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

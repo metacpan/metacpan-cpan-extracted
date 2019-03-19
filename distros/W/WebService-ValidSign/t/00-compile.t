@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'WebService/ValidSign.pm',
@@ -27,7 +27,8 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/vs-poc.pl'
+    'bin/vs-download.pl',
+    'bin/vs-upload.pl'
 );
 
 # no fake home requested

@@ -20,3 +20,9 @@ Revision history for Perl module REST::Client::CrossRef
       spit_raw_data is set to 0
     - keys_to_keep and json_path received the same data: 
       an array of items if a list is return, a one row array below message for a single item
+0.008
+    - articles_from_funder can received any {key => value, key2 => ...} to build a filter string
+    - corrected bug in get_next
+    - json_path_callback: function not called if the extracted array is empty
+    - added test to chek get_next
+

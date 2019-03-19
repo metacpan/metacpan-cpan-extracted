@@ -1,0 +1,91 @@
+{
+   "abstract" : "Generate Class::Tiny accessors that apply type constraints",
+   "author" : [
+      "Christopher White <cxwembedded@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Class-Tiny-ConstrainedAccessor",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Getopt::Long" : "2.50",
+            "Path::Class" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::RewriteVersion" : "0",
+            "Module::Metadata" : "1.000016"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Tiny" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "MooX::Types::MooseLike" : "0",
+            "MouseX::Types" : "0",
+            "Specio" : "0"
+         },
+         "requires" : {
+            "Import::Into" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Test::Builder" : "0",
+            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Type::Tiny" : "0",
+            "lib::relative" : "0.002"
+         }
+      }
+   },
+   "provides" : {
+      "Class::Tiny::ConstrainedAccessor" : {
+         "file" : "lib/Class/Tiny/ConstrainedAccessor.pm",
+         "version" : "0.000003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/cxw42/Class-Tiny-ConstrainedAccessor"
+      }
+   },
+   "version" : "0.000003",
+   "x_contributors" : [
+      "Christopher White <cxw@cpan.org>",
+      "Toby Inkster <tobyink@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

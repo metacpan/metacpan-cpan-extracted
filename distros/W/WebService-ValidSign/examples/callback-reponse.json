@@ -1,6 +1,9 @@
 {
+   "@class" : "com.silanis.esl.packages.event.ESLProcessEvent",
+   "createdDate" : "2019-03-14T12:22:17.209Z",
+   "documentId" : null,
+   "message" : null,
    "name" : "PACKAGE_COMPLETE",
-   "packageId" : "......",
-   "sessionUser" : "...",
-   "createdDate" : "2017-05-02T20:17:58.408Z"
+   "packageId" : "pFD3g1SxbrtSkiXE3pIxPho7Wnk=",
+   "sessionUser" : "sH0j5yB1RfwT"
 }

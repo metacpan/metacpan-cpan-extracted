@@ -22,7 +22,7 @@ my %module_build_args = (
     "Ian Kluft <cpan-dev\@iankluft.com>"
   ],
   "dist_name" => "PiFlash",
-  "dist_version" => "0.3.1",
+  "dist_version" => "0.4.0",
   "license" => "apache",
   "module_name" => "PiFlash",
   "recursive_test_files" => 1,

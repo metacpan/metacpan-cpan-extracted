@@ -84,6 +84,11 @@ attributes.
 
     An [WebService::ValidSign::API::Account](https://metacpan.org/pod/WebService::ValidSign::API::Account) object. Build for you.
 
+# BUGS
+
+[JSON::XS](https://metacpan.org/pod/JSON::XS) 4.01 has a bug that causes JSON serialization errors. Please
+upgrade or downgrade JSON::XS where needed.
+
 # ACKNOWLEDGEMENTS
 
 This module has been made possible by my employer [Mintlab

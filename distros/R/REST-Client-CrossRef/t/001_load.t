@@ -3,7 +3,8 @@
 # t/001_load.t - check module loading and create testing directory
 use strict;
 use warnings;
-
+use open ':std', ':encoding(UTF-8)';
+# use lib "../lib";
 my $jdata_works = <<'END';
 {"status":"ok","message-type":"work","message-version":"1.0.0","message":{"indexed":{"date-parts":[[2018,9,1]],"date-time":"2018-09-01T21:10:25Z","timestamp":1535836225666},"reference-count":38,"publisher":"Elsevier BV","license":[{"URL":"https:\/\/www.elsevier.com\/tdm\/userlicense\/1.0\/","start":{"date-parts":[[2017,6,1]],"date-time":"2017-06-01T00:00:00Z","timestamp":1496275200000},"delay-in-days":0,"content-version":"tdm"},{"URL":"https:\/\/www.elsevier.com\/open-access\/userlicense\/1.0\/","start":{"date-parts":[[2018,5,16]],"date-time":"2018-05-16T00:00:00Z","timestamp":1526428800000},"delay-in-days":349,"content-version":"am"}],"funder":[{"DOI":"10.13039\/501100001711","name":"Schweizerischer Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung","doi-asserted-by":"publisher","award":["PP00P2_150552\/1"]},{"name":"CIRM-FBK","award":[]}],"content-domain":{"domain":["elsevier.com","sciencedirect.com"],"crossmark-restriction":true},"short-container-title":["Advances in Mathematics"],"published-print":{"date-parts":[[2017,6]]},"DOI":"10.1016\/j.aim.2017.04.017","type":"journal-article","created":{"date-parts":[[2017,5,16]],"date-time":"2017-05-16T06:15:34Z","timestamp":1494915334000},"page":"746-802","update-policy":"http:\/\/dx.doi.org\/10.1016\/elsevier_cm_policy","source":"Crossref","is-referenced-by-count":2,"title":["The integer cohomology algebra of toric arrangements"],"prefix":"10.1016","volume":"313","author":[{"ORCID":"http:\/\/orcid.org\/0000-0002-2658-3721","authenticated-orcid":false,"given":"Filippo","family":"Callegaro","sequence":"first","affiliation":[]},{"given":"Emanuele","family":"Delucchi","sequence":"additional","affiliation":[]}],"member":"78","container-title":["Advances in Mathematics"],"original-title":[],"language":"en","link":[{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0001870815301614?httpAccept=text\/xml","content-type":"text\/xml","content-version":"vor","intended-application":"text-mining"},{"URL":"https:\/\/api.elsevier.com\/content\/article\/PII:S0001870815301614?httpAccept=text\/plain","content-type":"text\/plain","content-version":"vor","intended-application":"text-mining"}],"deposited":{"date-parts":[[2018,9,1]],"date-time":"2018-09-01T20:52:45Z","timestamp":1535835165000},"score":1.0,"subtitle":[],"short-title":[],"issued":{"date-parts":[[2017,6]]},"references-count":38,"alternative-id":["S0001870815301614"],"URL":"http:\/\/dx.doi.org\/10.1016\/j.aim.2017.04.017","relation":{},"ISSN":["0001-8708"],"issn-type":[{"value":"0001-8708","type":"print"}],"subject":["General Mathematics"],"assertion":[{"value":"Elsevier","name":"publisher","label":"This article is maintained by"},{"value":"The integer cohomology algebra of toric arrangements","name":"articletitle","label":"Article Title"},{"value":"Advances in Mathematics","name":"journaltitle","label":"Journal Title"},{"value":"https:\/\/doi.org\/10.1016\/j.aim.2017.04.017","name":"articlelink","label":"CrossRef DOI link to publisher maintained version"},{"value":"article","name":"content_type","label":"Content Type"},{"value":"\u00a9 2017 Elsevier Inc. All rights reserved.","name":"copyright","label":"Copyright"}]}}
 END
@@ -53,16 +54,45 @@ $client = REST::Client::CrossRef->new( spit_raw_data => 1 );
 $data = $client->get_types();
 
 # print Dumper($data), "\n";
-my $tests_run;
+my $tests_run=5;
 my $items_ar = $data->{message}->{items};
-if (! defined $items_ar) {
-    $tests_run=5;
-}
-else {
+if ( $items_ar) {      
     my $total    = @$items_ar;
     cmp_ok( $total, '>=', 20, "got number of types from CrossRef" );
-    $tests_run=6;
+    $tests_run++;
 }
+$client = REST::Client::CrossRef->new(
+    spit_raw_data => 0,
+    add_end_flag   => 1,
+    json_path_safe => 0,
+    json_path      => [
+        ['$.publisher'],
+        ['$.title'],
+        ['$.author[?($_->{sequence}=~/first/)].family'],
+    ]
+
+);
+$client->rows(5);
+my $select =  "title,publisher,author";
+my $data_ar = $client->articles_from_funder("501100001711", {'has-orcid'=> 'true', 'has-affiliation'=>'true'}, $select);
+if ($data_ar) {
+    my $count;
+    while () {
+        last unless $data_ar;
+        my $line;
+        for my $row (@$data_ar) {
+            $line .= "\n" unless ($row);
+            for my $k ( keys %$row ) {
+                $line .= "$k : $row->{$k}\n";
+            }
+        }
+        print $line, "****\n" if ($line);
+        $data_ar = $client->get_next();
+        last if $count ++ > 3
+      }
+  ok($count == 5 && defined $data_ar, "get_next returned something");
+  $tests_run++;  
+  }
 done_testing($tests_run);
 
 

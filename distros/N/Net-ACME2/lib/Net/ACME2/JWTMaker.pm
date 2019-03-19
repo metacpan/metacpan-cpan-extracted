@@ -72,7 +72,7 @@ sub _create_jwt {
     my $json_header = $self->_encode_json($header);
     my $b64u_header = _encode_b64u($json_header);
 
-    my $b64u_signature = _encode_b64u( $signer_cr->("$b64u_header.$b64u_payload", $key) );
+    my $b64u_signature = _encode_b64u( $signer_cr->("$b64u_header.$b64u_payload") );
 
     return $self->_encode_json(
         {

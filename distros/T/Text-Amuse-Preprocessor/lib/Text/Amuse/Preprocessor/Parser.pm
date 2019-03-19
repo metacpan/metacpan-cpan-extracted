@@ -37,6 +37,8 @@ sub parse_text {
     if ($string !~ m/\n\z/s) {
         $string .= "\n";
     }
+    # remove trailing space
+    $string =~ s/ +$//gm;
     my @list;
     my $last_position = 0;
     pos($string) = $last_position;

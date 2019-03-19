@@ -4,7 +4,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 # VERSION
 
-version 3.0.0
+version 3.0.1
 
 # SYNOPSIS
 
@@ -271,7 +271,7 @@ libcaca - [https://github.com/cacalabs/libcaca](https://github.com/cacalabs/libc
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 

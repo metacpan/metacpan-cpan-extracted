@@ -28,10 +28,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Module::Metadata" => 0,
     "SQL::Translator" => "0.11018",
+    "Sub::Name" => 0,
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.1.5",
+  "VERSION" => "v0.1.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Ref::Util" => 0,
   "SQL::Translator" => "0.11018",
+  "Sub::Name" => 0,
   "Sub::Quote" => 0,
   "Test::More" => 0,
   "Test::Most" => 0

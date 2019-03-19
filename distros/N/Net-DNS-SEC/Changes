@@ -1,6 +1,14 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.12 Mar 19, 2019
+
+	Avoid use of EC_POINT_set_affine_coordinates_GFp which is
+	deprecated in OpenSSL 3.0.0
+
+	Reduce level of support for OpenSSL non-LTS releases.
+
+
 **** 1.11 Dec 11, 2018
 
 	Explain why compilation aborted in Net::DNS::SEC::DSA et al.
@@ -604,4 +612,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1725 2018-12-11 11:09:40Z willem $
+$Id: Changes 1735 2019-03-19 10:56:00Z willem $

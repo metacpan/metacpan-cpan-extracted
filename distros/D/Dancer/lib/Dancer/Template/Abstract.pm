@@ -1,7 +1,7 @@
 package Dancer::Template::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: abstract class for Dancer's template engines
-$Dancer::Template::Abstract::VERSION = '1.3500';
+$Dancer::Template::Abstract::VERSION = '1.3510';
 use strict;
 use warnings;
 use Carp;
@@ -220,7 +220,7 @@ Dancer::Template::Abstract - abstract class for Dancer's template engines
 
 =head1 VERSION
 
-version 1.3500
+version 1.3510
 
 =head1 DESCRIPTION
 

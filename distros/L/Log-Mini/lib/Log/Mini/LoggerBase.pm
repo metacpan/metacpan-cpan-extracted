@@ -7,6 +7,7 @@ use Carp qw(croak);
 use List::Util qw(first);
 use Time::Moment;
 
+
 my $LEVELS = {
     error => 1,
     warn  => 2,
@@ -46,6 +47,7 @@ sub level {
     return $self->{level} || 'error';
 }
 
+sub log   { return shift->_log( shift, @_) }
 sub info  { return shift->_log( 'info',  @_ ) }
 sub error { return shift->_log( 'error', @_ ) }
 sub warn  { return shift->_log( 'warn',  @_ ) }
@@ -54,13 +56,15 @@ sub trace { return shift->_log( 'trace', @_ ) }
 
 sub _log {
     my $self = shift;
-    my ( $level, $message ) = @_;
+    my $level = shift;
+    my $message = shift;
 
     return if $LEVELS->{$level} > $LEVELS->{ $self->{'level'} };
 
     my $time = Time::Moment->now->strftime('%Y-%m-%d %T%3f');
 
     my $text = sprintf("%s [%s] %s\n", $time, $level, $message);
+    $text = sprintf($text, @_) if (@_);
 
     $self->_print($text);
 

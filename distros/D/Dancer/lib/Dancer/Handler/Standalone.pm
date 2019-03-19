@@ -1,7 +1,7 @@
 package Dancer::Handler::Standalone;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Web server wrapper for Dancer
-$Dancer::Handler::Standalone::VERSION = '1.3500';
+$Dancer::Handler::Standalone::VERSION = '1.3510';
 use strict;
 use warnings;
 
@@ -84,7 +84,7 @@ Dancer::Handler::Standalone - Web server wrapper for Dancer
 
 =head1 VERSION
 
-version 1.3500
+version 1.3510
 
 =head1 AUTHOR
 

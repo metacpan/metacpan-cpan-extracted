@@ -46,7 +46,7 @@ test_strings(missing_nl => "hello\nthere", "hello\nthere\n");
 
 test_strings('garbage',
              "hello ─ there hello ─ there\r\n\t",
-             "hello — there hello — there\n    \n");
+             "hello — there hello — there\n\n");
 
 test_strings('ellipsis_no_fix',
              ". . . test... . . . but here .  .  .  .",

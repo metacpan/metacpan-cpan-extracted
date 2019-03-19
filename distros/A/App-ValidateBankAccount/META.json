@@ -34,8 +34,10 @@
       "runtime" : {
          "requires" : {
             "BankAccount::Validator::UK" : "0.46",
+            "Encode::Locale" : "1.05",
             "Moo" : "2.000000",
             "MooX::Options" : "4.023",
+            "Types::Standard" : "1.000005",
             "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
@@ -49,6 +51,6 @@
          "web" : "https://github.com/manwar/App-ValidateBankAccount"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

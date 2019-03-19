@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECCGOST;
 
 #
-# $Id: ECCGOST.pm 1723 2018-12-03 09:17:48Z willem $
+# $Id: ECCGOST.pm 1733 2019-03-12 09:49:50Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1723 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1733 $)[1];
 
 
 =head1 NAME
@@ -41,12 +41,10 @@ use strict;
 use integer;
 use warnings;
 
-use constant ECCGOST_configured => Net::DNS::SEC::libcrypto->can('ECCGOST_verify');
+use constant Digest_GOST => defined( eval 'require Digest::GOST::CryptoPro' );
+use constant ECCGOST_configured => Digest_GOST && Net::DNS::SEC::libcrypto->can('ECCGOST_verify');
 
-BEGIN { die 'No "use Net::DNS::SEC" or no ECCGOST' unless ECCGOST_configured }
-
-BEGIN { require Digest::GOST::CryptoPro }
-
+BEGIN { die 'ECCGOST disabled or application has no "use Net::DNS::SEC"' unless ECCGOST_configured }
 
 my %parameters = ( 12 => [840, 'Digest::GOST::CryptoPro'] );
 

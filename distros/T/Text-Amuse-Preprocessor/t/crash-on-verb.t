@@ -6,12 +6,7 @@ use Data::Dumper;
 use Test::More tests => 4;
 use Text::Amuse::Preprocessor;
 use Text::Amuse::Preprocessor::Parser;
-
-BEGIN {
-    if (!eval q{ use Test::Differences; unified_diff; 1 }) {
-        *eq_or_diff = \&is_deeply;
-    }
-}
+use Text::Diff;
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":encoding(UTF-8)";
@@ -45,6 +40,8 @@ If you need <verbatim>[10]</verbatim> to =here we 'go' test= start a line with a
 [1] 'test' "test" l'albero
 </example>
 
+"hello" <verbatim>[20]</verbatim> l'albero l'"adesso" <verbatim>"'</verbatim> 'adesso'
+
 [4] Real "footnote" {5}
 
 {6} "Hellow"
@@ -75,6 +72,8 @@ If you need <verbatim>[10]</verbatim> to =here we 'go' test= start a line with a
 [1] 'test' "test" l'albero
 </example>
 
+“hello” <verbatim>[20]</verbatim> l’albero l’“adesso” <verbatim>"'</verbatim> ‘adesso’
+
 [1] Real “footnote” {1}
 
 {1} “Hellow”
@@ -95,6 +94,7 @@ MUSE
     eq_or_diff($output, $expected);
 }
 
-{
-    my @parsed = Text::Amuse::Preprocessor::Parser::parse_text(Text::Amuse::Preprocessor->_read_file('t/footnotes/verbatim-in.muse'));
+sub eq_or_diff {
+    my ($got, $exp) = @_;
+    is ($got, $exp) or diag diff(\$got, \$exp);
 }

@@ -1,7 +1,7 @@
 package MsgPack::RPC::Message::Request;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: a MessagePack-RPC request
-$MsgPack::RPC::Message::Request::VERSION = '2.0.1';
+$MsgPack::RPC::Message::Request::VERSION = '2.0.2';
 
 use strict;
 use warnings;
@@ -65,7 +65,7 @@ MsgPack::RPC::Message::Request - a MessagePack-RPC request
 
 =head1 VERSION
 
-version 2.0.1
+version 2.0.2
 
 =head1 SYNOPSIS
 
@@ -113,7 +113,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
+This software is copyright (c) 2019, 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

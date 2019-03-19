@@ -1,5 +1,15 @@
 Revision history for DBIx-Class-Helper-Row-Enumeration:
 
+v0.1.6    2019-03-19 09:46:32+00:00 Europe/London
+  [Bug Fixes]
+  - Added Sub::Name as an explicit prereq, needed for some (buggy?)
+    installations.
+
+  [Documentation]
+  - Fixed typo.
+
+  - Bump copyright year.
+
 v0.1.5    2018-11-18 16:48:14+00:00 Europe/London
   [Enhancements]
   - Removed explicit inheritance from DBIx::Class::Core.

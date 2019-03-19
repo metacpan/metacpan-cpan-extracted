@@ -3,7 +3,7 @@ package Log::Mini;
 use strict;
 use warnings;
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.1.0";
 
 use Log::Mini::LoggerFILE;
 use Log::Mini::LoggerSTDERR;
@@ -49,6 +49,12 @@ Log::Mini - It's a very simple logger which can log your messages to a file or S
 
     #prevent buffered output. May slow down your application!
     my $synced_file_logger = Log::Mini->get_logger(file => 'log_file.log', synced => 1);
+
+    #format message with sprintf
+    $logger->info('Message with %s %s', 'some', 'additional info');
+
+    #log method for better compatibility
+    $logger->log('info', 'information message');
 
 
 =head1 DESCRIPTION

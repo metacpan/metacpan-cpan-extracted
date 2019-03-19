@@ -1,9 +1,9 @@
 package Net::DNS::SEC::ECDSA;
 
 #
-# $Id: ECDSA.pm 1723 2018-12-03 09:17:48Z willem $
+# $Id: ECDSA.pm 1732 2019-02-15 13:31:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1723 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1732 $)[1];
 
 
 =head1 NAME
@@ -48,7 +48,7 @@ use MIME::Base64;
 
 use constant ECDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_EC_KEY');
 
-BEGIN { die 'No "use Net::DNS::SEC" or no ECDSA' unless ECDSA_configured }
+BEGIN { die 'ECDSA disabled or application has no "use Net::DNS::SEC"' unless ECDSA_configured }
 
 
 my %parameters = (

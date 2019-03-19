@@ -8,7 +8,7 @@ use PiFlash::State;
 use PiFlash::Command;
 
 package PiFlash::Inspector;
-$PiFlash::Inspector::VERSION = '0.3.1';
+$PiFlash::Inspector::VERSION = '0.4.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Try::Tiny;
 use File::Basename;
@@ -436,7 +436,7 @@ PiFlash::Inspector - PiFlash functions to inspect Linux system devices to flash 
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

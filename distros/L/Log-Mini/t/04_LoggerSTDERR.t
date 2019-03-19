@@ -35,6 +35,20 @@ subtest 'prints to stderr with \n' => sub {
     }
 };
 
+subtest 'prints sprintf formatted line' => sub {
+    my $output = [];
+    my $log = _build_logger(output => $output);
+
+    for my $level (qw/error warn debug/) {
+        my $stderr = capture_stderr {
+            $log->$level('message %s', 'formatted');
+
+        };
+        like $stderr,
+            qr/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[$level\] message formatted$/;
+    }
+};
+
 sub _build_logger {
     my $logger = Log::Mini::LoggerSTDERR->new;
     $logger->set_level('debug');

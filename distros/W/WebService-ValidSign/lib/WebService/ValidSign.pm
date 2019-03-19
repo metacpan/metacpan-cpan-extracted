@@ -1,5 +1,5 @@
 package WebService::ValidSign;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 use namespace::autoclean;
 
@@ -85,7 +85,7 @@ WebService::ValidSign - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -176,6 +176,11 @@ An L<WebService::ValidSign::API::DocumentPackage> object. Build for you.
 An L<WebService::ValidSign::API::Account> object. Build for you.
 
 =back
+
+=head1 BUGS
+
+L<JSON::XS> 4.01 has a bug that causes JSON serialization errors. Please
+upgrade or downgrade JSON::XS where needed.
 
 =head1 ACKNOWLEDGEMENTS
 

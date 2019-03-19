@@ -35,6 +35,8 @@ requires:
   Digest::MD5: '0'
   Digest::SHA: '0'
   Expect: '0'
+  Exporter: '0'
+  Exporter::Heavy: '0'
   ExtUtils::CBuilder: '0'
   File::Copy: '0'
   File::HomeDir: '0'
@@ -67,5 +69,5 @@ requires:
   perl: '5.006002'
 resources:
   repository: https://github.com/andk/cpanpm
-version: '2.25'
+version: '2.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1723 2018-12-03 09:17:48Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1733 2019-03-12 09:49:50Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -41,7 +41,6 @@ my %optional;
 my @debris = qw(*.gcov *.gcda *.gcno);
 
 
-my $def = eval 'require Digest::GOST' ? '' : '-DNO_ECCGOST';
 my $inc = '';
 my $lib = '-lcrypto';
 my $nul = $^O eq 'MSWin32' ? 'nul' : '/dev/null';
@@ -66,7 +65,6 @@ $lib = $ENV{OPENSSL_LIB}     if $ENV{OPENSSL_LIB};
 WriteMakefile(
 	%metadata,
 	PREREQ_PM  => {%prerequisite},
-	DEFINE	   => $def,
 	INC	   => $inc,
 	LIBS	   => [$lib],
 	META_MERGE => {recommends => {%optional}},
@@ -162,8 +160,8 @@ test_cover :
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test
 	cover -summary
 PlanB
-	my $ccflags = join ' ', qw(-O0 -fprofile-arcs -ftest-coverage);
-	my $ldflags = join ' ', qw(-fprofile-arcs -ftest-coverage);
+	my $ldflags = "-fprofile-arcs -ftest-coverage";
+	my $ccflags = "-O0 -DNO_ECCGOST $ldflags";
 	return <<"PlanA";
 test_cover :
 	cover -delete

@@ -9,6 +9,26 @@ use namespace::autoclean ();
 use Test::Most ();
 use Import::Into;
 
+if (__has_module('JSON::XS', '4.01')) {
+    Test::More::BAIL_OUT(
+        "You have JSON::XS 4.01, please upgrade to JSON::XS 4.0 or lower OR 4.02 or higher."
+    );
+}
+
+sub __has_module {
+  my ($module, $version_or_range) = @_;
+  require Module::Metadata;
+  my $mmd = Module::Metadata->new_from_module($module);
+  return undef if not $mmd;
+  return $mmd->version($module) if not defined $version_or_range;
+
+  require CPAN::Meta::Requirements;
+  my $req = CPAN::Meta::Requirements->new;
+  $req->exact_version($module => $version_or_range);
+  return 1 if $req->accepts_module($module => $mmd->version($module));
+  return 0;
+}
+
 sub import {
 
     my $caller_level = 1;
@@ -24,6 +44,7 @@ sub import {
         warnings
         namespace::autoclean
         Sub::Override
+        WebService::ValidSign
     );
 
     $_->import::into($caller_level) for @imports;

@@ -38,7 +38,7 @@
             "Encode" : "2.21",
             "Exporter" : "0",
             "File::Basename" : "0",
-            "JSON" : "2.93",
+            "JSON" : "2.9",
             "List::Util" : "0",
             "Thread::Queue" : "0",
             "perl" : "5.012000",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/lskatz/perl-mash"
       }
    },
-   "version" : "0.8",
+   "version" : "0.9",
    "x_serialization_backend" : "JSON::PP version 2.27203"
 }

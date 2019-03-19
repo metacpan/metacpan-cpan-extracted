@@ -1,9 +1,9 @@
 package Net::DNS::SEC::EdDSA;
 
 #
-# $Id: EdDSA.pm 1723 2018-12-03 09:17:48Z willem $
+# $Id: EdDSA.pm 1732 2019-02-15 13:31:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1723 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1732 $)[1];
 
 
 =head1 NAME
@@ -48,7 +48,7 @@ use MIME::Base64;
 
 use constant EdDSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_new_raw_public_key');
 
-BEGIN { die 'No "use Net::DNS::SEC" or no EdDSA' unless EdDSA_configured }
+BEGIN { die 'EdDSA disabled or application has no "use Net::DNS::SEC"' unless EdDSA_configured }
 
 
 my %parameters = (

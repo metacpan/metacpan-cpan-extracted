@@ -4,7 +4,7 @@ MsgPack::RPC - MessagePack RPC client
 
 # VERSION
 
-version 2.0.1
+version 2.0.2
 
 # SYNOPSIS
 
@@ -15,8 +15,8 @@ my $rpc = MsgPack::RPC->new( io => '127.0.0.1:6666' );
 
 $rpc->notify( 'something' => [ 'with', 'args' ] );
 
-$rpc->request( 
-    request_method => [ 'some', 'args' ] 
+$rpc->request(
+    request_method => [ 'some', 'args' ]
 )->on_done(sub{
     print "replied with: ", @_;
 });
@@ -50,7 +50,7 @@ Returns the IO descriptor(s) used by the object.
 Sends the request. The `$id` is optional, and will be automatically
 assigned from an internal self-incrementing list if not given.
 
-Returns a promise that will be fulfilled once a response is received. The response can be either a success 
+Returns a promise that will be fulfilled once a response is received. The response can be either a success
 or a failure, and in both case the fulfilled promise will be given whatever values are passed in the response.
 
 ```perl
@@ -61,9 +61,9 @@ $rpc->request( 'ls', [ '/home', '/tmp' ] )
 
 ## notify( $method, $args )
 
-Sends a notification. 
+Sends a notification.
 
-## subscribe( $event\_name, \\&callback ) 
+## subscribe( $event\_name, \\&callback )
 
 ```perl
 # 'ping' is a request
@@ -83,14 +83,14 @@ is received, the callback will be called. The callback will be passed either a [
 a notification) or
 [MsgPack::RPC::Message::Request](https://metacpan.org/pod/MsgPack::RPC::Message::Request) object.
 
-Events can have any number of callbacks assigned to them. 
+Events can have any number of callbacks assigned to them.
 
 The subscription system is implemented using the [Beam::Emitter](https://metacpan.org/pod/Beam::Emitter) role.
 
 ## loop( $end\_condition )
 
 Reads and process messages from the incoming stream, endlessly if not be given an optional `$end_condition`.
-The end condition can be given a number of messages to read, or a promise that will end the loop once 
+The end condition can be given a number of messages to read, or a promise that will end the loop once
 fulfilled.
 
 ```perl
@@ -111,6 +111,9 @@ $rpc->loop(100);
 
 - [MsgPack::RPC::Message](https://metacpan.org/pod/MsgPack::RPC::Message)
 - [MsgPack::RPC::Message::Request](https://metacpan.org/pod/MsgPack::RPC::Message::Request)
+- [MsgPack::Encoder](https://metacpan.org/pod/MsgPack::Encoder)
+- [MsgPack::Decoder](https://metacpan.org/pod/MsgPack::Decoder)
+- [Data::MessagePack](https://metacpan.org/pod/Data::MessagePack) (alternative to `MsgPack::Encoder` and `MsgPack::Decoder`.
 
 # AUTHOR
 
@@ -118,7 +121,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
+This software is copyright (c) 2019, 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

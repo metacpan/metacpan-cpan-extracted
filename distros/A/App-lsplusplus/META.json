@@ -52,6 +52,6 @@
          "x_bugtracker" : "https://github.com/trapd00r/ls--/issues"
       }
    },
-   "version" : "0.68",
+   "version" : "0.69",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+
+package App::term::hr;
+use vars qw($VERSION);
+
+$VERSION = '0.05';
+
+use strict;
+use warnings;
+
+use utf8;
+
+use Pod::Usage;
+
+use Getopt::Long        qw(GetOptions);
+use Term::ExtendedColor qw(fg bg bold);
+
+
+#< options
+my %opt  = (
+  char  => '=',
+  size  => undef,
+);
+
+my $attributes = '';
+GetOptions(
+  'c|char:s'    => \$opt{char},
+  's|size:i'    => \$opt{size},
+
+  'fg:i'        => sub {
+    $attributes .= ($attributes !~ m/^$/)
+      ? ";38;5;$_[1]"
+      : "38;5;$_[1]"
+  },
+
+  'bg:i'        => sub {
+    $attributes .= ($attributes !~ m/^$/)
+      ? ";48;5;$_[1]"
+      : "48;5;$_[1]"
+  },
+
+  'b|bold'      => sub {
+    $attributes .= ($attributes !~ m/^$/)
+      ? ";1"
+      : "38;5;1"
+  },
+
+  'i|italic'    => sub {
+    $attributes .= ($attributes !~ m/^$/)
+      ? ";3"
+      : "3"
+  },
+
+  'u|underline' => sub {
+    $attributes .= ($attributes !~ m/^$/)
+      ? ";4"
+      : "4"
+  },
+  'r|reverse'   => sub {
+    $attributes .= ($attributes !~ m/^$/)
+      ? ";7"
+      : "7"
+  },
+
+  'h|help'   => sub { pod2usage(verbose => 1); },
+  'm|man'    => sub { pod2usage(verbose => 3); },
+);
+#>
+
+
+hr();
+
+
+sub hr {
+  my $char = shift // $opt{char};
+
+  my $hr = ($char x columns());
+
+  if($attributes !~ m/^$/) {
+    $hr = color($hr, $attributes);
+    print $hr;
+  }
+
+  else {
+    print $char x columns();
+  }
+  print "\n";
+}
+
+sub columns {
+  return $opt{size} if defined($opt{size});
+  my $width = 80; # sane default
+
+
+  if(defined $ENV{COLUMNS}) {
+    $width = $ENV{COLUMNS};
+  }
+  elsif(eval { require Term::Size; 1 }) {
+    ($width, undef) = Term::Size::chars();
+  }
+
+  return $width;
+}
+
+sub color {
+  my $str    = shift;
+  my $colors = shift;
+  return fg($colors, $str);
+}
+
+
+=head1 NAME
+
+hr - define a thematic change in the content of a terminal session
+
+=head1 SYNOPSIS
+
+  hr [OPTIONS]
+
+=head1 DESCRIPTION
+
+hr prints a horisontal bar in your terminal. Useful when you run a
+chain of commands that might produce a lot of output and you need to
+differentiate where a given output is coming from.
+
+
+=head1 OPTIONS
+
+  -c,  --char       Character to use
+  -s,  --size       Number of columns
+  -fg, --fg         Foreground color to use. See Term::ExtendedColor
+  -bg, --bg         Background color to use. See Term::ExtendedColor
+  -b,  --bold       Use bold
+  -i,  --italic     Use italics
+  -u,  --underline  Use underline
+  -r,  --reverse    Use reverse video
+
+  -h,  --help     display this help and exit
+  -v,  --version  display version info and exit
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  m@japh.se
+  http://japh.se
+  http://github.com/trapd00r
+
+=head1 COPYRIGHT
+
+Copyright 2019 B<THIS APPLICATION>s L</AUTHOR> and L</CONTRIBUTORS> as listed
+above.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

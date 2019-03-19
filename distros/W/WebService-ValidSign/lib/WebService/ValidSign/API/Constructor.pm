@@ -1,6 +1,6 @@
 package WebService::ValidSign::API::Constructor;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo::Role;
 use namespace::autoclean;
 
@@ -17,8 +17,8 @@ use WebService::ValidSign::Types qw(
 
 has lwp => (
     is      => 'ro',
-    builder => 1,
     lazy    => 1,
+    builder => 1,
 );
 
 has endpoint => (
@@ -42,12 +42,21 @@ sub args_builder {
 sub _build_lwp {
     require LWP::UserAgent;
     return LWP::UserAgent->new(
-        agent                 => join('/', "WebService::ValidSign", "$VERSION"),
+        agent                 => "WebService::ValidSign/$VERSION",
         protocols_allowed     => [qw(https)],
         ssl_opts              => { verify_hostname => 1 },
         requests_redirectable => [qw(HEAD GET)],
     );
 }
+
+around '_build_lwp' => sub {
+    my ($orig, $self, @args) = @_;
+
+    my $lwp = $orig->($self, @args);
+
+    $lwp->default_header("Authorization", join(" ", "Basic", $self->secret));
+    return $lwp;
+};
 
 
 1;
@@ -64,7 +73,7 @@ WebService::ValidSign::API::Constructor - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

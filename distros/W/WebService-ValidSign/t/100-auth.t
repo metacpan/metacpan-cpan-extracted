@@ -1,10 +1,6 @@
-use strict;
-use warnings;
-use Test::More 0.96;
-use Test::Exception;
-use Sub::Override;
+use Test::Lib;
+use Test::WebService::ValidSign;
 
-use WebService::ValidSign;
 use HTTP::Response;
 use LWP::UserAgent;
 

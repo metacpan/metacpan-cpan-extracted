@@ -7,7 +7,8 @@ use Test::More 0.88;
 use Test::EOL;
 
 my @files = (
-    'bin/vs-poc.pl',
+    'bin/vs-download.pl',
+    'bin/vs-upload.pl',
     'lib/WebService/ValidSign.pm',
     'lib/WebService/ValidSign/API.pm',
     'lib/WebService/ValidSign/API/Account.pm',
@@ -26,10 +27,10 @@ my @files = (
     't/00-compile.t',
     't/01-basic.t',
     't/02-types.t',
-    't/03-document-package-creation.t.disabled',
     't/100-auth.t',
     't/110-account.t',
     't/200-document-package.t',
+    't/210-document-package-api.t',
     't/lib/Test/WebService/ValidSign.pm'
 );
 

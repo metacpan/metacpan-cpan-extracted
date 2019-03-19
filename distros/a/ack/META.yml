@@ -3,39 +3,40 @@ abstract: 'A grep-like program for searching source code'
 author:
   - 'Andy Lester <andy@petdance.com>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: ack
 no_index:
   directory:
     - t
     - inc
 requires:
-  Carp: 1.04
-  Cwd: 3.00
-  Errno: 0
-  File::Basename: 1.00015
-  File::Next: 1.16
-  File::Spec: 3.00
-  File::Temp: 0.19
-  Getopt::Long: 2.38
-  Pod::Usage: 1.26
-  Term::ANSIColor: 1.10
-  Test::Harness: 2.50
-  Test::More: 0.98
-  Text::ParseWords: 3.1
-  perl: 5.008008
+  Carp: '1.04'
+  Cwd: '3.00'
+  Errno: '0'
+  File::Basename: '1.00015'
+  File::Next: '1.16'
+  File::Spec: '3.00'
+  File::Temp: '0.19'
+  Getopt::Long: '2.38'
+  Pod::Usage: '1.26'
+  Term::ANSIColor: '1.10'
+  Test::Harness: '2.50'
+  Test::More: '0.98'
+  Text::ParseWords: '3.1'
+  perl: '5.008008'
 resources:
   MailingList: https://groups.google.com/group/ack-users
   bugtracker: https://github.com/beyondgrep/ack2
   homepage: https://beyondgrep.com/
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/beyondgrep/ack2.git
-version: 2.26
+version: '2.28'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

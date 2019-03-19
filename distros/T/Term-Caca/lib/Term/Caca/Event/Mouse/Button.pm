@@ -1,6 +1,6 @@
 package Term::Caca::Event::Mouse::Button;
 our $AUTHORITY = 'cpan:YANICK';
-$Term::Caca::Event::Mouse::Button::VERSION = '3.0.0';
+$Term::Caca::Event::Mouse::Button::VERSION = '3.0.1';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Term::Caca::Event::Mouse::Button
 
 =head1 VERSION
 
-version 3.0.0
+version 3.0.1
 
 =head1 AUTHORS
 
@@ -50,7 +50,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 

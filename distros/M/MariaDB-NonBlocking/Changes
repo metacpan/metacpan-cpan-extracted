@@ -1,5 +1,24 @@
 Revision history for MariaDB-NonBlocking
 
+0.19    2019-03-19
+        * SSL was broken older (pre-2018) versions of mariadb-connector-c.
+          Again x2.
+
+0.18    2019-03-19
+        * SSL was broken older (pre-2018) versions of mariadb-connector-c.
+          Again.
+
+0.17    2019-03-19
+        * SSL was broken older (pre-2018) versions of mariadb-connector-c
+
+0.16    2019-03-19
+        * Barebones SSL support (including facsimile of mysql_ssl_optional=1)
+        * Global timers were broken
+        * Implicit want_hashrefs for connection pools was broken
+        * Performance & memory improvements for all queries
+        * Connection pools now have a method to invalidate too old queries
+        * Bugfixes (in some edge cases connections were returned to the pool too early)
+
 0.15    2019-03-18
         * simplified the code
         * connection pools for the promise implementation

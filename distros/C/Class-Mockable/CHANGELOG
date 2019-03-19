@@ -1,3 +1,7 @@
+2019-03-19      1.3000  'output' can be a ref to a code-ref, so output
+                          from mocked methods can be dynamic or raise
+                          exceptions
+
 2017-08-24      1.2001  Add the set_name method
 
 2017-06-28      1.2000  Let people add fixtures to an existing

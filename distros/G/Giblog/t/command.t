@@ -3,7 +3,9 @@ use warnings;
 use Test::More 'no_plan';
 
 use File::Path 'mkpath', 'rmtree';
+use Cwd 'getcwd';
 
+my $giblog_dir = '../../../..';
 my $test_dir = 't/tmp/command';
 
 rmtree $test_dir;
@@ -24,123 +26,234 @@ sub slurp {
 {
   # new command
   {
-    my $website_dir = "$test_dir/mysite_new";
-    my $cmd = "$^X -Mblib blib/script/giblog new $website_dir";
+    my $home_dir = "$test_dir/mysite_new";
+    my $cmd = "$^X -Mblib blib/script/giblog new $home_dir";
     system($cmd) == 0
       or die "Can't execute command $cmd:$!";
     
-    my @files = sort glob "$website_dir/*";
+    my @files = sort glob "$home_dir/*";
     
     is_deeply(
       \@files, 
       [
-        "$website_dir/README",
-        "$website_dir/giblog.conf",
-        "$website_dir/lib",
-        "$website_dir/public",
-        "$website_dir/serve.pl",
-        "$website_dir/templates",
+        "$home_dir/README",
+        "$home_dir/giblog.conf",
+        "$home_dir/lib",
+        "$home_dir/public",
+        "$home_dir/serve.pl",
+        "$home_dir/templates",
       ]
     );
     
-    my $readme_content = slurp "$website_dir/README";
+    my $readme_content = slurp "$home_dir/README";
     like($readme_content, qr|Giblog/Command/new/proto|);
   }
 
   # new_hp command
   {
-    my $website_dir = "$test_dir/mysite_new_hp";
-    my $cmd = "$^X -Mblib blib/script/giblog new_hp $website_dir";
+    my $home_dir = "$test_dir/mysite_new_hp";
+    my $cmd = "$^X -Mblib blib/script/giblog new_hp $home_dir";
     system($cmd) == 0
       or die "Can't execute command $cmd:$!";
     
-    my @files = sort glob "$website_dir/*";
+    my @files = sort glob "$home_dir/*";
     
     is_deeply(
       \@files, 
       [
-        "$website_dir/README",
-        "$website_dir/giblog.conf",
-        "$website_dir/lib",
-        "$website_dir/public",
-        "$website_dir/serve.pl",
-        "$website_dir/templates",
+        "$home_dir/README",
+        "$home_dir/giblog.conf",
+        "$home_dir/lib",
+        "$home_dir/public",
+        "$home_dir/serve.pl",
+        "$home_dir/templates",
       ]
     );
     
-    my $readme_content = slurp "$website_dir/README";
+    my $readme_content = slurp "$home_dir/README";
     like($readme_content, qr|Giblog/Command/new_hp/proto|);
   }
 
   # new_blog command
   {
-    my $website_dir = "$test_dir/mysite_new_blog";
-    my $cmd = "$^X -Mblib blib/script/giblog new_blog $website_dir";
+    my $home_dir = "$test_dir/mysite_new_blog";
+    my $cmd = "$^X -Mblib blib/script/giblog new_blog $home_dir";
     system($cmd) == 0
       or die "Can't execute command $cmd:$!";
     
-    my @files = sort glob "$website_dir/*";
+    my @files = sort glob "$home_dir/*";
     
     is_deeply(
       \@files, 
       [
-        "$website_dir/README",
-        "$website_dir/giblog.conf",
-        "$website_dir/lib",
-        "$website_dir/public",
-        "$website_dir/serve.pl",
-        "$website_dir/templates",
+        "$home_dir/README",
+        "$home_dir/giblog.conf",
+        "$home_dir/lib",
+        "$home_dir/public",
+        "$home_dir/serve.pl",
+        "$home_dir/templates",
       ]
     );
     
-    my $readme_content = slurp "$website_dir/README";
+    my $readme_content = slurp "$home_dir/README";
     like($readme_content, qr|Giblog/Command/new_blog/proto|);
-  }
-
-  # new_zemi command
-  {
-    my $website_dir = "$test_dir/mysite_new_zemi";
-    my $cmd = "$^X -Mblib blib/script/giblog new_zemi $website_dir";
-    system($cmd) == 0
-      or die "Can't execute command $cmd:$!";
-    
-    my @files = sort glob "$website_dir/*";
-    
-    is_deeply(
-      \@files, 
-      [
-        "$website_dir/README",
-        "$website_dir/giblog.conf",
-        "$website_dir/lib",
-        "$website_dir/public",
-        "$website_dir/serve.pl",
-        "$website_dir/templates",
-      ]
-    );
-    
-    my $readme_content = slurp "$website_dir/README";
-    like($readme_content, qr|Giblog/Command/new_zemi/proto|);
   }
 }
 
 # add
 {
-  my $website_dir = "$test_dir/mysite_new";
+  # add - change directory
   {
-    my $cmd = "$^X -Mblib blib/script/giblog add --giblog-dir=$website_dir";
-    system($cmd) == 0
-      or die "Can't execute command $cmd:$!";
+    my $home_dir = "$test_dir/mysite_new";
+    rmtree $home_dir;
+    my $new_cmd = "$^X -Mblib blib/script/giblog new $home_dir";
+    system($new_cmd) == 0
+      or die "Can't execute command $new_cmd:$!";
+    my $save_cur_dir = getcwd;
+    chdir $home_dir
+      or die "Can't change directory";
+    {
+      my $add_cmd = "$^X -Mblib $giblog_dir/blib/script/giblog add";
+      system($add_cmd) == 0
+        or die "Can't execute command $add_cmd:$!";
+    }
+    sleep 2;
+    {
+      my $add_cmd = "$^X -Mblib $giblog_dir/blib/script/giblog add";
+      system($add_cmd) == 0
+        or die "Can't execute command $add_cmd:$!";
+    }
+    chdir $save_cur_dir
+      or die "Can't back to saved current directory";
+    
+    my @files = glob "$home_dir/templates/blog/*";
+    
+    is(scalar @files, 2);
+    like($files[0], qr/\d{14}\.html/);
+    like($files[1], qr/\d{14}\.html/);
   }
-  sleep 2;
+
+  # add - --home option
   {
-    my $cmd = "$^X -Mblib blib/script/giblog add --giblog-dir=$website_dir";
-    system($cmd) == 0
-      or die "Can't execute command $cmd:$!";
+    my $home_dir = "$test_dir/mysite_new";
+    rmtree $home_dir;
+    my $new_cmd = "$^X -Mblib blib/script/giblog new $home_dir";
+    system($new_cmd) == 0
+      or die "Can't execute command $new_cmd:$!";
+    
+    {
+      my $add_cmd = "$^X -Mblib blib/script/giblog add --home=$home_dir";
+      system($add_cmd) == 0
+        or die "Can't execute command $add_cmd:$!";
+    }
+    my @files = glob "$home_dir/templates/blog/*";
+    
+    is(scalar @files, 1);
+    like($files[0], qr/\d{14}\.html/);
   }
-  
-  my @files = glob "$website_dir/templates/blog/*";
-  
-  is(scalar @files, 2);
-  like($files[0], qr/\d{14}\.html/);
-  like($files[1], qr/\d{14}\.html/);
 }
+
+# build
+{
+  # build - change directory
+  {
+    my $home_dir = "$test_dir/mysite_new";
+    rmtree $home_dir;
+    my $new_cmd = "$^X -Mblib blib/script/giblog new $home_dir";
+    system($new_cmd) == 0
+      or die "Can't execute command $new_cmd:$!";
+    my $save_cur_dir = getcwd;
+    chdir $home_dir
+      or die "Can't change directory";
+    {
+      my $add_cmd = "$^X -Mblib $giblog_dir/blib/script/giblog add";
+      system($add_cmd) == 0
+        or die "Can't execute command $add_cmd:$!";
+    }
+    {
+      my $build_cmd = "$^X -Mblib $giblog_dir/blib/script/giblog build";
+      system($build_cmd) == 0
+        or die "Can't execute command $build_cmd:$!";
+    }
+
+    chdir $save_cur_dir
+      or die "Can't back to saved current directory";
+    
+    my $index_file = "$home_dir/public/index.html";
+    my @blog_files = glob "$home_dir/public/blog/*";
+    is(scalar @blog_files, 1);
+    
+    my $index_content = slurp $index_file;
+    my $blog_content = slurp $blog_files[0];
+    
+    like($index_content, qr/header/);
+    like($index_content, qr/footer/);
+    like($index_content, qr/top/);
+    like($index_content, qr/bottom/);
+    like($index_content, qr/meta/);
+    like($index_content, qr/<p>/);
+    like($index_content, qr|</p>|);
+    like($index_content, qr/Content1/);
+    like($index_content, qr/Content2/);
+    like($index_content, qr/&gt;/);
+    like($index_content, qr/&lt;/);
+    like($index_content, qr/&lt;/);
+    like($index_content, qr|<title>Title</title>|);
+    like($index_content, qr|<h2><a href="/">Title</a></h2>|);
+
+    like($blog_content, qr/header/);
+    like($blog_content, qr/footer/);
+    like($blog_content, qr/top/);
+    like($blog_content, qr/bottom/);
+    like($blog_content, qr/meta/);
+  }
+
+  # build - --home -h
+  {
+    my $home_dir = "$test_dir/mysite_new";
+    rmtree $home_dir;
+    my $new_cmd = "$^X -Mblib blib/script/giblog new $home_dir";
+    system($new_cmd) == 0
+      or die "Can't execute command $new_cmd:$!";
+    my $save_cur_dir = getcwd;
+    {
+      my $add_cmd = "$^X -Mblib blib/script/giblog add --home $home_dir";
+      system($add_cmd) == 0
+        or die "Can't execute command $add_cmd:$!";
+    }
+    {
+      my $build_cmd = "$^X -Mblib blib/script/giblog build -h $home_dir";
+      system($build_cmd) == 0
+        or die "Can't execute command $build_cmd:$!";
+    }
+    
+    my $index_file = "$home_dir/public/index.html";
+    my @blog_files = glob "$home_dir/public/blog/*";
+    is(scalar @blog_files, 1);
+    
+    my $index_content = slurp $index_file;
+    my $blog_content = slurp $blog_files[0];
+    
+    like($index_content, qr/header/);
+    like($index_content, qr/footer/);
+    like($index_content, qr/top/);
+    like($index_content, qr/bottom/);
+    like($index_content, qr/meta/);
+    like($index_content, qr/<p>/);
+    like($index_content, qr|</p>|);
+    like($index_content, qr/Content1/);
+    like($index_content, qr/Content2/);
+    like($index_content, qr/&gt;/);
+    like($index_content, qr/&lt;/);
+    like($index_content, qr/&lt;/);
+    like($index_content, qr|<title>Title</title>|);
+    like($index_content, qr|<h2><a href="/">Title</a></h2>|);
+
+    like($blog_content, qr/header/);
+    like($blog_content, qr/footer/);
+    like($blog_content, qr/top/);
+    like($blog_content, qr/bottom/);
+    like($blog_content, qr/meta/);
+  }
+}
+

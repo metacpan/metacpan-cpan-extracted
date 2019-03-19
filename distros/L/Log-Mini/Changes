@@ -1,5 +1,9 @@
 Revision history for Perl extension Log-Mini
 
+0.1.0 2019-03-19T12:08:23Z
+    - Supports formatted with sprintf messages
+    - log method was added
+
 0.0.3 2019-03-05T15:48:33Z
     - Unused say feature was removed
 

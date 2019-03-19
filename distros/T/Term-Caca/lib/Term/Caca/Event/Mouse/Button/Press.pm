@@ -1,7 +1,7 @@
 package Term::Caca::Event::Mouse::Button::Press;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: event triggered by a button press 
-$Term::Caca::Event::Mouse::Button::Press::VERSION = '3.0.0';
+$Term::Caca::Event::Mouse::Button::Press::VERSION = '3.0.1';
 
 use strict;
 use warnings;
@@ -23,7 +23,7 @@ Term::Caca::Event::Mouse::Button::Press - event triggered by a button press
 
 =head1 VERSION
 
-version 3.0.0
+version 3.0.1
 
 =head1 DESCRIPTION 
 
@@ -45,7 +45,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 

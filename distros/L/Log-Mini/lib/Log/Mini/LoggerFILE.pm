@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use IO::Handle;
 
+
 use base 'Log::Mini::LoggerBase';
 
 sub new {
@@ -15,7 +16,7 @@ sub new {
 
     open my $fh, '>>', $params{file} or die $!;
     if (defined $params{'synced'}) {
-        $fh->autoflush;
+        $fh->autoflush(1);
     }
 
     $self->{fh} = $fh;
@@ -25,10 +26,9 @@ sub new {
 
 sub _print {
     my $self = shift;
-    my ($message) = @_;
 
     my $fh = $self->{fh};
-    print $fh $message;
+    print $fh @_;
 }
 
 

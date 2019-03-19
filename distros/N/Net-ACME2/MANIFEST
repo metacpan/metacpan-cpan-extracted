@@ -14,6 +14,7 @@ examples/tls_alpn_01_client.pl
 examples/tls_alpn_01_server.pl
 lib/Net/ACME2.pm
 lib/Net/ACME2/AccessorBase.pm
+lib/Net/ACME2/AccountKey.pm
 lib/Net/ACME2/Authorization.pm
 lib/Net/ACME2/Challenge.pm
 lib/Net/ACME2/Challenge/dns_01.pm

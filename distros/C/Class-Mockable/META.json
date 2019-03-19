@@ -4,10 +4,9 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
-      "unknown",
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -53,6 +52,5 @@
          "url" : "https://github.com/DrHyde/perl-modules-Class-Mockable"
       }
    },
-   "version" : "1.2001",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.3000"
 }

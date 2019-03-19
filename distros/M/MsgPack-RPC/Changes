@@ -1,5 +1,12 @@
 Revision history for MessagePack
 
+2.0.2 2019-03-18
+  [ MISC ]
+    - change tests to skip 64bits structures on 32bits archs.
+
+  [ STATISTICS ]
+    - code churn: 6 files changed, 82 insertions(+), 52 deletions(-)
+
 2.0.1 2017-11-27
   [ BUG FIXES ]
     - Up dependency versions for Log::Any and Promises. (GH#9, GH#10,

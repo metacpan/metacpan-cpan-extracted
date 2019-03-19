@@ -1,5 +1,12 @@
 Revision history for Term::Caca
 
+3.0.1 2019-03-18
+  [ MISC ]
+    - remove dependency to Test::Approx [GH#4]
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 56 insertions(+), 41 deletions(-)
+
 3.0.0 2018-08-01
   [ API CHANGES ]
     - Massive update moving the package to Moose and using Alien::caca for

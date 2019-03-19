@@ -9,3 +9,5 @@ on 'test', sub {
 requires 'Catmandu', '>=0.9';
 requires 'Catmandu::Stat', '0.10';
 requires 'Path::Tiny', '0';
+requires 'Moo', '0';
+requires 'namespace::clean', '0';

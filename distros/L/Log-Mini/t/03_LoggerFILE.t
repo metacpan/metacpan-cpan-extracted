@@ -7,6 +7,7 @@ use Test::Fatal;
 use File::Temp;
 use Log::Mini::LoggerFILE;
 
+
 subtest 'creates correct object' => sub {
     isa_ok(Log::Mini::LoggerFILE->new, 'Log::Mini::LoggerFILE');
 };
@@ -52,6 +53,22 @@ subtest 'prints to stderr with \n' => sub {
         my $content = _slurp($file);
 
         like $content, qr/\n$/;
+    }
+};
+
+subtest 'prints sprintf formatted line' => sub {
+    for my $level (qw/error warn debug/) {
+        my $file = File::Temp->new;
+        my $log = _build_logger(file => $file);
+
+        $log->$level('message %s', 'formatted');
+
+        undef $log;
+
+        my $content = _slurp($file);
+
+        like $content,
+            qr/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.\d{3} \[$level\] message formatted$/;
     }
 };
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0500';
+our $VERSION = '0.0600';
 
 use Moo;
 use strictures 2;
@@ -121,7 +121,8 @@ sub BUILD {
         my @item = split /\s+/, $item, 2;
         next unless defined $item[1];
         next if $item[0] eq 'PPI::Token::Comment'
-            or $item[0] eq 'PPI::Token::Pod';
+            or $item[0] eq 'PPI::Token::Pod'
+            or $item[0] eq 'PPI::Token::End';
         push @{ $halstead{ $item[0] } }, $item[1];
     }
 #use Data::Dumper;warn(__PACKAGE__,' ',__LINE__,' ',Dumper\%halstead);
@@ -159,18 +160,19 @@ sub BUILD {
 
 sub report {
     my ($self) = @_;
-    printf "Total operators = %d, Total operands = %d\n", $self->n_operators, $self->n_operands;
-    printf "Distinct operators = %d, Distinct operands = %d\n", $self->n_distinct_operators, $self->n_distinct_operands;
-    printf "Program vocabulary = %d, Program length = %d\n", $self->prog_vocab, $self->prog_length;
-    printf "Estimated program length = %.3f\n", $self->est_prog_length;
-    printf "Program volume = %.3f\n", $self->volume;
-    printf "Program difficulty = %.3f\n", $self->difficulty;
-    printf "Program level = %.3f\n", $self->level;
-    printf "Program language level = %.3f\n", $self->lang_level;
-    printf "Program intelligence content = %.3f\n", $self->intel_content;
-    printf "Program effort = %.3f\n", $self->effort;
-    printf "Time to program = %.3f\n", $self->time_to_program;
-    printf "Delivered bugs = %.3f\n", $self->delivered_bugs;
+    printf "Total operators: %d + Total operands: %d = Program length: %d\n",
+        $self->n_operators, $self->n_operands, $self->prog_length;
+    printf "Distinct operators: %d + Distinct operands: %d = Program vocabulary: %d\n",
+        $self->n_distinct_operators, $self->n_distinct_operands, $self->prog_vocab;
+    printf "Estimated program length: %.3f\n", $self->est_prog_length;
+    printf "Program volume: %.3f\n", $self->volume;
+    printf "Program difficulty: %.3f\n", $self->difficulty;
+    printf "Program level: %.3f\n", $self->level;
+    printf "Program language level: %.3f\n", $self->lang_level;
+    printf "Program intelligence content: %.3f\n", $self->intel_content;
+    printf "Program effort: %.3f\n", $self->effort;
+    printf "Time to program: %.3f\n", $self->time_to_program;
+    printf "Delivered bugs: %.3f\n", $self->delivered_bugs;
 }
 
 
@@ -197,10 +199,10 @@ sub dump {
 
 sub _is_operand {
     my $key = shift;
-    return $key eq 'PPI::Token::Number'
+    return $key =~ /Number/
         || $key eq 'PPI::Token::Symbol'
-        || $key eq 'PPI::Token::Pod'
         || $key eq 'PPI::Token::HereDoc'
+        || $key eq 'PPI::Token::Data'
         || $key =~ /Quote/;
 }
 
@@ -223,7 +225,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0500
+version 0.0600
 
 =head1 SYNOPSIS
 
@@ -244,101 +246,104 @@ of what these attributes mean and how they are computed.
 
 =head1 ATTRIBUTES
 
+All attributes are calculated except for B<file>, which is required to be given
+in the constructor.
+
 =head2 file
 
   $file = $pmh->file;
 
-The file to analyze.  This is a required attribute.
+The file to analyze.
 
 =head2 n_operators
 
   $n_operators = $pmh->n_operators;
 
-The total number of operators.  This is a computed attribute.
+The total number of operators.
 
 =head2 n_operands
 
   $n_operands = $pmh->n_operands;
 
-The total number of operands.  This is a computed attribute.
+The total number of operands.
 
 =head2 n_distinct_operators
 
   $n_distinct_operators = $pmh->n_distinct_operators;
 
-The number of distinct operators.  This is a computed attribute.
+The number of distinct operators.
 
 =head2 n_distinct_operands
 
   $n_distinct_operands = $pmh->n_distinct_operands;
 
-The number of distinct operands.  This is a computed attribute.
+The number of distinct operands.
 
 =head2 prog_vocab
 
   $prog_vocab = $pmh->prog_vocab;
 
-The program vocabulary.  This is a computed attribute.
+The program vocabulary.
 
 =head2 prog_length
 
   $prog_length = $pmh->prog_length;
 
-The program length.  This is a computed attribute.
+The program length.
 
 =head2 est_prog_length
 
   $est_prog_length = $pmh->est_prog_length;
 
-The estimated program length.  This is a computed attribute.
+The estimated program length.
 
 =head2 volume
 
   $volume = $pmh->volume;
 
-The program volume.  This is a computed attribute.
+The program volume.
 
 =head2 difficulty
 
   $difficulty = $pmh->difficulty;
 
-The program difficulty.  This is a computed attribute.
+The program difficulty.
 
 =head2 level
 
   $level = $pmh->level;
 
-The program level.  This is a computed attribute.
+The program level.
 
 =head2 lang_level
 
   $lang_level = $pmh->lang_level;
 
-The programming language level.  This is a computed attribute.
+The programming language level.
 
 =head2 intel_content
 
   $intel_content = $pmh->intel_content;
 
-Amount of intelligence presented in the program.  This is a computed attribute.
+Measure of the information content of a program.
 
 =head2 effort
 
   $effort = $pmh->effort;
 
-The program effort.  This is a computed attribute.
+The program effort.
 
 =head2 time_to_program
 
   $time_to_program = $pmh->time_to_program;
 
-The time to program.  This is a computed attribute.
+The time to program (in seconds).
 
 =head2 delivered_bugs
 
   $delivered_bugs = $pmh->delivered_bugs;
 
-Delivered bugs.  This is a computed attribute.
+Delivered bugs.
 
 =head1 METHODS
 
@@ -379,6 +384,8 @@ L<https://en.wikipedia.org/wiki/Halstead_complexity_measures>
 L<https://www.verifysoft.com/en_halstead_metrics.html>
 
 L<https://www.geeksforgeeks.org/software-engineering-halsteads-software-metrics/>
+
+L<https://www.compuware.com/hard-can-find-halstead-maintenance-effort-metric/>
 
 =head1 AUTHOR
 

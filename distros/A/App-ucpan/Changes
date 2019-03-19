@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ucpan
 
+1.04 2019-03-19T04:42:16Z
+    - Add option "-j" to control parallel test job habits.
+    - Fix timeout processing ( on Win32 )
+
 1.03 2019-03-14T11:55:16Z
     - Tweak UI
     - Report a failure due to timeout

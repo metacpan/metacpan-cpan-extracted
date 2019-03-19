@@ -24,11 +24,11 @@ REST::Client::CrossRef - Read data from CrossRef using its REST API
 
 =cut
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 =head1 VERSION
 
-Version 0.007
+Version 0.008
 
 =cut
 
@@ -510,7 +510,7 @@ sub _crossref_get_request {
         return;
     }
 
-    $self->log->notice( "> Content: " . $response->responseContent );
+    $self->log->notice( "> Content: " . substr($response->responseContent, 0, 50) );
 
     $self->code($code);
 
@@ -519,6 +519,8 @@ sub _crossref_get_request {
     $response;
 }
 
+#pagination using cursor
+#page_start_set to 0 to insure that get_next called this function again
 sub _get_metadata {
     my ( $self, $path, $query_ar, $filter, $select ) = @_;
     $self->log->notice( "test_data: ",
@@ -554,6 +556,8 @@ sub _get_metadata {
     return $self->_display_data($hr);
 }
 
+#pagination using page_start_at + offset
+#curosr set to undef to insure that get_next called this function again
 sub _get_page_metadata {
     my ( $self, $path, $param_ar ) = @_;
 
@@ -642,8 +646,8 @@ sub _display_data {
                 {
                     my @data;
                     my $cb = $self->{json_path_callback}->{$path};
-                    eval { @data = @{ $cb->( \@val ) }; };
-                    croak "Json callback failed : $@\n" if ($@);
+                    eval { @data = @{ $cb->( \@val ) } if(@val); };
+                     carp "Json callback failed : $@\n" if ($@);
                     $result{$path} = join( "\n", @data );
 
                 }
@@ -823,7 +827,8 @@ sub article_from_doi {
 
 =head2 C<$cr-E<gt>article_from_funder( $funder_id, {name=E<gt>'smith'}, $select )>
 
-Retrive the metadata from the works road for a given funder, searched with an author's name or orcid.
+Retrive the metadata from the works road for a given funder, searched with an author's name or filtered by any valid filter name.
+For example C<{'has-orcid'=E<gt> 'true', 'has-affiliation'=E<gt>'true'}>.
 C<$select> default to  "title,container-title,page,issued,volume,issue,published-print,DOI". Use * to retrieve all fields.
 
 =cut
@@ -840,28 +845,32 @@ sub articles_from_funder {
     $self->{select} = $select eq "*" ? undef : $select;
     $self->{path} = "/funders/$id/works";
     $self->cursor("*");
+    my @filters;
+    my $query;
     for my $k ( keys %$href ) {
         if ( $k eq "name" ) {
-            my $query = [ "query.author=" . uri_escape( $href->{$k} ) ];
+            $query = [ "query.author=" . uri_escape( $href->{$k} ) ];
             $self->{param} = $query;
-
-            return $self->_get_metadata( "/funders/$id/works", $query,
-                undef, $self->{select} );
+            #return $self->_get_metadata( "/funders/$id/works", $query, undef, $self->{select} );
         }
         elsif ( $k eq "orcid" ) {
             my $url =
                   $href->{$k} =~ /^https*:\/\/orcid.org\//
                 ? $href->{$k}
                 : "http://orcid.org/" . $href->{$k};
-
-            # $self->{param} = "orcid:" . uri_escape($url);
-            $self->{filter} = "orcid:" . uri_escape($url);
-            return $self->_get_metadata( "/funders/$id/works", undef,
-                $self->{filter}, $self->{select} );
+            push @filters, "orcid:" . uri_escape($url);
+            #$self->{filter} = "orcid:" . uri_escape($url);
+            #return $self->_get_metadata( "/funders/$id/works", undef,$self->{filter}, $self->{select} );
         }
-        else { croak "articles_from_funder : unknown key : $k"; }
+        else { #croak "articles_from_funder : unknown key : $k"; 
+            #$self->{filter} = $k . ":" . uri_escape( $href->{$k});
+            #return $self->_get_metadata( "/funders/$id/works", undef,$self->{filter}, $self->{select} );
+            push @filters,  $k . ":" . uri_escape( $href->{$k});
+        }
     }
-    return $self->_get_metadata( "/funders/$id/works", undef, undef,
+    $self->{filter} = join(",", @filters);
+    
+    return $self->_get_metadata( "/funders/$id/works", $query, $self->{filter},
         $self->{select} );
 
 }
@@ -1006,9 +1015,9 @@ sub get_next {
     $self->log->debug( "get_next cursor: ",
         ( defined $self->cursor ? " defined " : " undef" ) );
     $self->log->debug( "get_next page_start_at: ", $self->page_start_at );
-
+    my $res;
     if ( $self->cursor ) {
-        $self->_get_metadata(
+        $res = $self->_get_metadata(
             $self->{path},   $self->{param},
             $self->{filter}, $self->{select}
         );
@@ -1019,9 +1028,9 @@ sub get_next {
 #there should be a next page to ask for: increment page_start_at to page_start_at + row
     if ( $last_start && $self->{last_page_items_count} >= $self->rows ) {
         $self->page_start_at( $last_start + $self->rows );
-        $self->_get_page_metadata( $self->{path}, $self->{param} );
+        $res = $self->_get_page_metadata( $self->{path}, $self->{param} );
     }
-
+  return $res;
 }
 
 =head2 C<$cr-E<gt>agencies_from_dois( $dois_array_ref )>

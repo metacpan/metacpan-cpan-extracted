@@ -66,6 +66,7 @@
             "File::Spec" : "0",
             "Module::Metadata" : "0",
             "SQL::Translator" : "0.11018",
+            "Sub::Name" : "0",
             "Test::More" : "0",
             "Test::Most" : "0"
          }
@@ -74,7 +75,7 @@
    "provides" : {
       "DBIx::Class::Helper::Row::Enumeration" : {
          "file" : "lib/DBIx/Class/Helper/Row/Enumeration.pm",
-         "version" : "v0.1.5"
+         "version" : "v0.1.6"
       }
    },
    "release_status" : "stable",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-Row-Enumeration"
       }
    },
-   "version" : "v0.1.5",
+   "version" : "v0.1.6",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>"

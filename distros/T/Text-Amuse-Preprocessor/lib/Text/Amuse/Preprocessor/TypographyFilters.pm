@@ -333,9 +333,9 @@ sub filter {
         $l =~ s/^"/$ldouble/gm;
         $l =~ s/^'/$lsingle/gm;
 
-        # end of line, closing
-        $l =~ s/" *$/$rdouble/gm;
-        $l =~ s/' *$/$rsingle/gm;
+        # end of line/chunk, closing
+        $l =~ s/"( *)$/$rdouble$1/gm;
+        $l =~ s/'( *)$/$rsingle$1/gm;
 
         # if there is a space at the left, it's opening
         $l =~ s/(?<=\s)"/$ldouble/g;

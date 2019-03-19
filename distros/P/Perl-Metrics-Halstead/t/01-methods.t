@@ -35,7 +35,9 @@ is sprintf('%.3f', $pmh->effort), 58.162, 'effort';
 is sprintf('%.3f', $pmh->time_to_program), 3.231, 'time_to_program';
 is sprintf('%.3f', $pmh->delivered_bugs), 0.005, 'delivered_bugs';
 
-is keys %{ $pmh->dump }, 15, 'dump';
+my $y = $pmh->dump;
+isa_ok $y, 'HASH';
+is keys %$y, 15, 'dump';
 
 can_ok $pmh, 'report';
 

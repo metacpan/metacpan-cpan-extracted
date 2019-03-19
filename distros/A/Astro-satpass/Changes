@@ -1,3 +1,8 @@
+0.105		2019-03-19	T. R. Wyant
+    Require at least Scalar::Util 1.22. With profound thanks to Nigel
+    Horne for testing on versions of Perl old enough to expose the need
+    for this.
+
 0.104		2019-03-09	T. R. Wyant
     Correct error message definition in sgp4r().
 

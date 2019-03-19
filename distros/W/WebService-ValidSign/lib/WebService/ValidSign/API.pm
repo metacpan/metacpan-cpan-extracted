@@ -1,6 +1,6 @@
 package WebService::ValidSign::API;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo::Role;
 use namespace::autoclean;
 with 'WebService::ValidSign::API::Constructor';
@@ -18,6 +18,17 @@ use WebService::ValidSign::Types qw(
 
 requires qw(action_endpoint);
 
+has json => (
+    is      => 'ro',
+    builder => 1,
+    lazy    => 1,
+);
+
+sub _build_json {
+    require JSON::XS;
+    return JSON::XS->new->convert_blessed;
+}
+
 has auth => (
     is       => 'ro',
     required => 1,
@@ -33,14 +44,59 @@ sub get_endpoint {
     return $uri;
 }
 
+sub download_file {
+    my ($self, $uri) = @_;
+
+    my $fh = File::Temp->new();
+    my $request = HTTP::Request->new(
+        GET => $uri,
+        [
+            'Content-Type' => 'application/json',
+        ]
+    );
+
+    $self->call_api_download(
+        $request,
+        sub {
+            my ($chunk, $res, $proto) = @_;
+            print $fh $chunk;
+        }
+    );
+    $fh->seek(0,0);
+    return $fh;
+}
+
+sub call_api_download {
+    my ($self, $req, @opts) = @_;
+
+    my $res = $self->lwp->request($req, @opts);
+    if (!$res->is_success) {
+        my $msg = join("$/", "", $req->as_string, $res->as_string);
+        my $apikey = $self->secret;
+        $msg =~ s/$apikey/APIKEYHIDDEN/g;
+        croak("ValidSign error: $msg");
+    }
+
+    my $headers = $res->headers;
+
+    foreach (qw(x-died client-aborted)) {
+        if (my $header = $headers->header($_)) {
+            my $msg = join("$/", "", $req->as_string, $res->as_string);
+            my $apikey = $self->secret;
+            $msg =~ s/$apikey/APIKEYHIDDEN/g;
+            die sprintf("%s: Unable to complete file download", $_);
+        }
+    }
+
+    return 1;
+}
+
 sub call_api {
     my ($self, $req, %options) = @_;
 
     if ($options{with_token} && $self->can('auth')) {
         $req->header("Authentication", $self->auth->token);
     }
-
-    $req->header("Authorization", join(" ", "Basic", $self->secret));
 
     my $res = $self->lwp->request($req);
 
@@ -50,16 +106,6 @@ sub call_api {
     my $apikey = $self->secret;
     $msg =~ s/$apikey/APIKEYHIDDEN/g;
     croak("ValidSign error: $msg");
-}
-
-sub _build_lwp {
-    require LWP::UserAgent;
-    return LWP::UserAgent->new(
-        agent                 => join('/', __PACKAGE__, "$VERSION"),
-        protocols_allowed     => [qw(https)],
-        ssl_opts              => { verify_hostname => 1 },
-        requests_redirectable => [qw(HEAD GET)],
-    );
 }
 
 
@@ -77,7 +123,7 @@ WebService::ValidSign::API - A REST API client for ValidSign
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

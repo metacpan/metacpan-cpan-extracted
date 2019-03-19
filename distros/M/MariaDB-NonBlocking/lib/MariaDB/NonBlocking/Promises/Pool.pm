@@ -5,78 +5,6 @@ sub TELL (@) {
     say STDERR __PACKAGE__, ': ', join " ", @_;
 }
 
-package MariaDB::NonBlocking::Promises::Stolen {
-    BEGIN { $INC{__PACKAGE__ =~ s<::></>gr . '.pm'} = __FILE__ }
-    use Exporter 'import';
-    use Carp qw/croak/;
-    use Ref::Util qw/is_arrayref is_coderef/;
-    use AnyEvent::XSPromises qw/resolved rejected deferred/;
-    use v5.18.2;
-    use warnings;
-    use Sub::StrictDecl;
-    BEGIN { our @EXPORT_OK = 'p_foreach' }
-    sub p_foreach {
-        my ($input_ref, $sub, $concurrency)= @_;
-        $concurrency ||= 1;
-
-        if (!is_arrayref($input_ref) && !is_coderef($input_ref)) {
-            croak('input needs to be an arrayref or coderef');
-        }
-
-        my $deferred= deferred;
-        my $active= 0;       # Number of currently running concurrent "workers"
-        my $continue= 1;     # Has more items
-        my $fail_with_error; # Whether to just bail out and throw an error
-
-        my $next= sub {
-            my $item;
-            if ($continue) {
-                if (is_arrayref($input_ref)) {
-                    $continue= 0+@$input_ref;
-                    $item= shift @$input_ref;
-                } else {
-                    eval {
-                        $item= $input_ref->();
-                        $continue= defined($item);
-                        1;
-                    } or do {
-                        my $error= $@ || "zombie";
-                        $fail_with_error ||= "Input code died: $error";
-                        $continue= 0;
-                    };
-                }
-            }
-            if (!$continue) {
-                $active--;
-                if ($active == 0) {
-                    if ($fail_with_error) {
-                        $deferred->reject($fail_with_error);
-                    } else {
-                        $deferred->resolve;
-                    }
-                }
-                return;
-            }
-            resolved->then(sub {
-                $sub->($item);
-            })->catch(sub {
-                my $error= shift || "zombie promise";
-                $continue= 0;
-                $fail_with_error ||= $error;
-            })->then(__SUB__, __SUB__);
-            return;
-        };
-
-        $active= $concurrency;
-        for (1..$concurrency) {
-            $next->();
-        }
-
-        return $deferred->promise;
-    }
-}
-use MariaDB::NonBlocking::Promises::Stolen 'p_foreach';
-
 use v5.18.2;
 use warnings;
 use Sub::StrictDecl;
@@ -201,7 +129,11 @@ sub DESTROY {
 }
 
 # Public interface.
-our $STACKTRACE_IGNORE = {};
+our $STACKTRACE_IGNORE = { map +($_=>1),
+    'AnyEvent::XSPromises::Loader',
+    'AnyEvent::Impl::EV',
+    'AnyEvent::CondVar::Base',
+};
 for ( my @parts = split /::/, __PACKAGE__; @parts; pop @parts ) {
     $STACKTRACE_IGNORE->{join '::', @parts} = 1;
 }
@@ -292,6 +224,7 @@ sub new {
 
 sub reset_pool {
     my ($pool) = @_;
+    $pool->fail_pending('Pool reset');
     $pool->{pool_size}   = 0;
     $pool->{in_use_connections} = {};
     $pool->{free_connections}   = {};
@@ -383,14 +316,10 @@ sub _check_and_maybe_extend_pool_size {
 
     my $pool = $outside_pool;
 
-    # Return if pool already at max size:
-    return if $pool->{pool_size} >= $pool->{high_water_mark};
-
     # Return if pool has more than the low water mark
     return if $pool->{pool_size} >= $pool->{low_water_mark};
 
-    my $needed_connections
-        = $pool->{high_water_mark} - $pool->{pool_size};
+    my $needed_connections = $pool->{high_water_mark} - $pool->{pool_size};
 
     $needed_connections -= $pool->{_counters}{connections_currently_connecting} || 0;
     DEBUG && TELL "Going to extend the pool by $needed_connections";
@@ -407,8 +336,12 @@ sub _check_and_maybe_extend_pool_size {
 
     my $connecting_here = $needed_connections;
     weaken($pool);
-    return p_foreach([1..$needed_connections], sub {
+    return AnyEvent::XSPromises::collect(
+        map AnyEvent::XSPromises::resolved(1)->then(sub {
         return unless $pool;
+        return unless $needed_connections-- > 0;
+
+        my $start_new_connection = __SUB__;
 
         my $splay = $pool->_get_connect_splay();
         $pool->{_counters}{connections_currently_connecting}++;
@@ -428,16 +361,19 @@ sub _check_and_maybe_extend_pool_size {
             my $t0 = time;
             return $initial_connection->connect($connection_args)->then(sub {
                 # Success
+                return unless $pool;
                 my ($connection) = @_; # $connection is a hard reference to the connection.
                 $pool->_log_time_to_connect($connection_args, $t0);
 
                 return $pool->_fetch_some_wait_timeout($connection)->then(sub {
-                    return $pool->_initialize_new_connection($connection, $connection_args);
+                    return $pool->_initialize_new_connection($connection, $connection_args) if $pool;
+                })->catch(sub {
+                    warn "Failed to initialize the connection in some way. Will ignore. Error:\n$_[0]";
                 })->then(sub {
-                    $pool->_add_connection_to_pool($connection, $refaddr);
+                    DEBUG && TELL "Successfully added new connection to pool";
+                    $pool->_add_connection_to_pool($connection, $refaddr) if $pool;
                 });
-            },
-            sub {
+            })->catch(sub {
                 # Error
                 my ($error) = @_;
 
@@ -468,10 +404,8 @@ sub _check_and_maybe_extend_pool_size {
                 # pending queries.  Fail the queries now.
                 my $pool_name    = $pool->{pool_name};
                 my $error_string = "Connection pool for $pool_name is empty and we failed to extend it.  All pending queries will be marked as failed. Error: $confession";
-                $pool->fail_pending(
-                    # $error_string has the confession AND the stacktrace
-                    $error_string,
-                );
+                # $error_string has the confession AND the stacktrace
+                $pool->fail_pending($error_string);
                 # Don't rethrow, let the actual promises deal with the fallout
                 return;
             })->finally(sub {
@@ -480,12 +414,12 @@ sub _check_and_maybe_extend_pool_size {
         })->finally(sub {
             $connecting_here--;
             $pool->{_counters}{connections_currently_connecting}--;
-        });
-    }, $max_extend)->then(sub {
+        })->then($start_new_connection);
+    }), 1..$max_extend )->then(sub {
         $pool->_start_running_queries_if_needed if $pool;
         return;
     })->catch(sub {
-        # We get here if, somehow, p_foreach or _start_running_queries_if_needed died.
+        # We get here if, somehow, _start_running_queries_if_needed died.
         my $error = $_[0];
         $pool->fail_pending($error) if $pool;
         die $error;
@@ -546,6 +480,48 @@ sub fail_pending {
         my $deferred       = $pending->[PENDING_DEFERRED];
         my $stacktrace_ref = $pending->[PENDING_STACKTRACE];
         $deferred->reject($error_string . $$stacktrace_ref)
+            if $deferred->is_in_progress;
+    }
+}
+
+sub fail_queries_left_scheduled_for_too_long {
+    my ($pool) = @_;
+    my $pending_queries = $pool->{pending_queries} // [];
+    return unless @$pending_queries;
+
+    my $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run = $pool->{max_execution_time};
+    $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run *= 1.5;
+
+    my $time      = time;
+    my $found_idx = -1;
+    foreach my $idx ( 0..$#$pending_queries ) {
+        my $pending = $pending_queries->[$idx];
+        next unless $pending;
+        my $pending_scheduled_at = $pending->[PENDING_SCHEDULED_TIME];
+        my $pending_max_time_in_pool = $pending_scheduled_at + $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run;
+        if ( $pending_max_time_in_pool > $time ) {
+            last;
+        }
+        $found_idx = $idx;
+    }
+    return unless $found_idx >= 0;
+
+    my @removed = splice(@$pending_queries, 0, $found_idx);
+    my $scheduling_timeout = $time_in_seconds_a_query_can_remain_in_the_pool_without_being_run;
+    foreach my $pending (@removed) {
+        my $query_id       = refaddr $pending;
+        my $deferred       = $pending->[PENDING_DEFERRED];
+        my $stacktrace_ref = $pending->[PENDING_STACKTRACE];
+        my $timeout_message = sprintf(<<"EOERROR", $scheduling_timeout, $query_id, $$stacktrace_ref);
+MySQL query (nonblocking) could not be started after %d seconds, so we are marking it as failed.
+Query ID: %d
+See http://go/:Nt for details on how to deal with this.
+
+Stacktrace:
+%s
+EOERROR
+
+        $deferred->reject($timeout_message)
             if $deferred->is_in_progress;
     }
 }
@@ -629,10 +605,10 @@ sub _run_query {
     my $time0 = time();
     my $cpu0  = times;
     $attr //= {};
-    local $attr->{want_hashrefs} = 1 unless exists $attr->{want_hashrefs};
+    $attr->{want_hashrefs} = 1 unless exists $attr->{want_hashrefs};
 
     # Force all queries to have timeouts.
-    local $attr->{perl_timeout}
+    $attr->{perl_timeout}
         = ($attr->{timeout}//0) <= 0
             # Default to slightly higher than the MySQL timeout:
             ? $outside_pool->{max_execution_time} * 1.2
@@ -789,7 +765,6 @@ sub _start_running_queries_if_needed {
             if ( !$deferred->is_in_progress ) {
                 # Probably timed out
                 DEBUG && TELL "Found already finished query in the deferred queue";
-                $pool->_add_connection_to_pool($conn);
                 next PENDING;
             }
 

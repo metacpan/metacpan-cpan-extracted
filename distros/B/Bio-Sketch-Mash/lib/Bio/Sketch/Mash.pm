@@ -12,7 +12,7 @@ use Encode qw/encode decode/;
 
 &implements( 'Bio::Sketch' );
 
-our $VERSION = 0.8;
+our $VERSION = 0.9;
 
 our @EXPORT_OK = qw(raw_mash_distance);
 
@@ -150,7 +150,7 @@ sub loadMsh{
 
   # Need to check for valid utf8 or not
   eval{ my $strCopy=$jsonStr; decode('utf8', $strCopy, Encode::FB_CROAK) }
-    or die "ERROR: mash info -d yielded non-utf8 characters for this file: $msh";
+    or die "ERROR: mash info -d yielded non-utf8 characters for this file: $msh\nContents shown below:\n$jsonStr\n";
 
   my $mashInfo = $json->decode($jsonStr);
 

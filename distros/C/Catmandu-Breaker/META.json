@@ -39,7 +39,9 @@
          "requires" : {
             "Catmandu" : "0.9",
             "Catmandu::Stat" : "0.10",
+            "Moo" : "0",
             "Path::Tiny" : "0",
+            "namespace::clean" : "0",
             "perl" : "v5.10.1"
          }
       },
@@ -63,10 +65,11 @@
          "web" : "https://github.com/LibreCat/Catmandu-Breaker"
       }
    },
-   "version" : "0.14",
+   "version" : "0.141",
    "x_contributors" : [
       "Jakob Voss <voss@gbv.de>",
       "Johann Rolschewski <jorol@cpan.org>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.01"

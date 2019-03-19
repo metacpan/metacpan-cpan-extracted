@@ -1,4 +1,10 @@
 Revision history for App::ValidateBankAccount
 
+0.03  Tue Mar 19 11:10:00 2019
+      - Added prereq Types::Standard as reported by @SREZIC.
+
+0.02  Mon Mar 18 18:10:00 2019
+      - Added prereq Encode::Locale.
+
 0.01  Sun Mar 17 05:00:00 2019
       - Module Created.

@@ -1,5 +1,5 @@
 package WebService::ValidSign::Types;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use warnings;
 use strict;
 
@@ -34,7 +34,7 @@ WebService::ValidSign::Types - Moo(se) like types defined for WebService::ValidS
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

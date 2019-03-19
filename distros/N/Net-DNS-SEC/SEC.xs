@@ -1,5 +1,5 @@
 
-#define XS_Id "$Id: SEC.xs 1716 2018-09-24 09:51:04Z willem $"
+#define XS_Id "$Id: SEC.xs 1734 2019-03-19 10:54:14Z willem $"
 
 
 =head1 NAME
@@ -13,7 +13,7 @@ upon which the Net::DNS::SEC cryptographic components are built.
 
 =head1 COPYRIGHT
 
-Copyright (c)2018 Dick Franks
+Copyright (c)2018,2019 Dick Franks
 
 All Rights Reserved
 
@@ -48,15 +48,16 @@ extern "C" {
 #include "XSUB.h"
 
 #include <openssl/opensslv.h>
+#include <openssl/evp.h>
+#include <openssl/dsa.h>
+#include <openssl/ec.h>
+#include <openssl/ecdsa.h>
+#include <openssl/rsa.h>
 
-#if (OPENSSL_VERSION_NUMBER < 0x10000000L)
-#error	### This OpenSSL version now out of support ###
+#ifdef __cplusplus
+}
 #endif
 
-#include <openssl/bn.h>
-#include <openssl/evp.h>
-#include <openssl/objects.h>
-#include <openssl/opensslconf.h>
 
 #ifdef OPENSSL_NO_DSA
 #define NO_DSA
@@ -68,39 +69,33 @@ extern "C" {
 #define NO_EdDSA
 #endif
 
-#ifndef NO_DSA
-#include <openssl/dsa.h>
-#endif
 
-#ifndef NO_ECDSA
-#include <openssl/ec.h>
-#include <openssl/ecdsa.h>
-#endif
-
-#include <openssl/rsa.h>
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#ifdef LIBRESSL_VERSION_NUMBER
-#undef  OPENSSL_VERSION_NUMBER
-#if (LIBRESSL_VERSION_NUMBER < 0x20700000L)
-#define OPENSSL_VERSION_NUMBER 0x10001000L
-#endif
 #ifndef OPENSSL_VERSION_NUMBER
-#define OPENSSL_VERSION_NUMBER 0x10100000L
-#endif
-#define LIB_VERSION LIBRESSL_VERSION_NUMBER
+#define OPENSSL_VERSION_NUMBER 0x40000000L	/* avert disaster */
 #endif
 
-#ifndef LIB_VERSION
-#define LIB_VERSION OPENSSL_VERSION_NUMBER
+
+#define LIBCRYPTO_VERSION OPENSSL_VERSION_NUMBER
+#ifdef LIBRESSL_VERSION_NUMBER
+#undef  LIBCRYPTO_VERSION
+#define LIBCRYPTO_VERSION LIBRESSL_VERSION_NUMBER
+#undef  OPENSSL_VERSION_NUMBER
+#define OPENSSL_VERSION_NUMBER 0x10100000L
+#if (LIBRESSL_VERSION_NUMBER < 0x20700000L)
+#undef  OPENSSL_VERSION_NUMBER
+#define OPENSSL_VERSION_NUMBER 0x10002000L
+#endif
+#define BN_bn2binpad(a, to, tolen) BN_bn2bin(a, to)
+#endif
+
+
+#if (OPENSSL_VERSION_NUMBER < 0x30000000L)
+#define EC_POINT_set_affine_coordinates	EC_POINT_set_affine_coordinates_GFp
 #endif
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10101000L)
+#undef NO_EdDSA
 #define NO_EdDSA
 
 int EVP_DigestSign(EVP_MD_CTX *ctx,
@@ -122,6 +117,9 @@ int EVP_DigestVerify(EVP_MD_CTX *ctx,
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10100000L)
+#undef NO_ECCGOST
+#define NO_ECCGOST
+
 #define EVP_MD_CTX_new()	EVP_MD_CTX_create()
 #define EVP_MD_CTX_free(ctx)	EVP_MD_CTX_destroy((ctx))
 #define EVP_MD_CTX_reset(ctx)	EVP_MD_CTX_init((ctx))
@@ -169,50 +167,18 @@ int RSA_set0_factors(RSA *r, BIGNUM *p, BIGNUM *q)
 
 
 #if (OPENSSL_VERSION_NUMBER < 0x10001000L)
-#ifndef NO_ECCGOST
-#define NO_ECCGOST
-#endif
 #define NO_ECDSA
+#error	unsupported libcrypto version
+void malfunction() { return LIBCRYPTO_VERSION; }
 #endif
 
 
 #ifndef NO_ECCGOST
-
-#if (OPENSSL_VERSION_NUMBER < 0x10100000L)
-int ECDSA_SIG_set0(ECDSA_SIG *ecsig, BIGNUM *r, BIGNUM *s)
-{
-	ecsig->r = r;
-	ecsig->s = s;
-	return 1;
-}
-#endif
-
 BIGNUM *bn_new_hex(const char *hex)
 {
 	BIGNUM *bn = BN_new();
 	BN_hex2bn( &bn, hex );
 	return bn;
-}
-
-void bn_bn2binpad(const BIGNUM *a, unsigned char *to, int tolen)
-{
-	unsigned char *p = to;
-	int i = BN_bn2bin(a, p);
-
-	if (i < tolen) {
-		memset(to, 0, tolen - i);
-		p += tolen - i;
-		BN_bn2bin(a, p);
-	}
-	return;
-}
-#endif
-
-
-#ifndef croak_memory_wrap
-void croak_memory_wrap(void)
-{
-	return;
 }
 #endif
 
@@ -230,9 +196,6 @@ MODULE = Net::DNS::SEC	PACKAGE = Net::DNS::SEC::libcrypto
 
 PROTOTYPES: DISABLE
 
-void
-croak_memory_wrap()
-
 SV*
 VERSION(void)
     PREINIT:
@@ -241,7 +204,7 @@ VERSION(void)
     CODE:
 	v = (char*) SvEND(v_SV);
 	v = v - 4;
-	RETVAL = newSVpvf( "%s %8.8lx", v, LIB_VERSION );
+	RETVAL = newSVpvf( "%s %8.8lx", v, LIBCRYPTO_VERSION );
     OUTPUT:
 	RETVAL
 
@@ -473,7 +436,7 @@ EC_KEY_new_ECCGOST()
 	EC_GROUP *group = EC_GROUP_new_curve_GFp(p, a, b, ctx);
 	EC_POINT *G = EC_POINT_new(group);
     CODE:
-	checkerr( EC_POINT_set_affine_coordinates_GFp(group, G, x, y, ctx) );
+	checkerr( EC_POINT_set_affine_coordinates(group, G, x, y, ctx) );
 	checkerr( EC_GROUP_set_generator(group, G, q, h) );
 	EC_POINT_free(G);
 	BN_free(a);
@@ -528,13 +491,21 @@ ECCGOST_verify(SV *H, SV *r_SV, SV *s_SV, EC_KEY *eckey)
 	ecsig = ECDSA_SIG_new();
 	checkerr( ECDSA_SIG_set0(ecsig, r, s) );
 
-	bn_bn2binpad(m, bin, len);
+	BN_bn2binpad(m, bin, len);
 	BN_free(m);
 	RETVAL = ECDSA_do_verify( bin, len, ecsig, eckey );
 	EC_KEY_free(eckey);
 	ECDSA_SIG_free(ecsig);
     OUTPUT:
 	RETVAL
+
+#endif
+
+####################
+
+#ifdef croak_memory_wrap
+void
+croak_memory_wrap()
 
 #endif
 

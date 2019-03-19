@@ -1,7 +1,7 @@
 package Dancer::Serializer::YAML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: serializer for handling YAML data
-$Dancer::Serializer::YAML::VERSION = '1.3500';
+$Dancer::Serializer::YAML::VERSION = '1.3510';
 use strict;
 use warnings;
 use Carp;
@@ -77,7 +77,7 @@ Dancer::Serializer::YAML - serializer for handling YAML data
 
 =head1 VERSION
 
-version 1.3500
+version 1.3510
 
 =head1 SYNOPSIS
 

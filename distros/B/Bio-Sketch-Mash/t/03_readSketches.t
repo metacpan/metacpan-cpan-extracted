@@ -7,6 +7,9 @@ use Data::Dumper;
 use FindBin qw/$RealBin/;
 use lib "$RealBin/../lib";
 
+# In case the mash executable is here
+$ENV{PATH}="$ENV{PATH}:$RealBin/../bin/Mash-2.1.1";
+
 use Test::More tests=>3;
 use Bio::Sketch::Mash;
 my %expected = (

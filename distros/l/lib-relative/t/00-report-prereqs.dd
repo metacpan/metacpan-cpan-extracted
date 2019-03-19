@@ -11,6 +11,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Cwd' => '0',
                                       'File::Basename' => '0',
                                       'File::Spec' => '0',
                                       'lib' => '0',
@@ -24,6 +25,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::Temp' => '0.19',
                                    'Test::More' => '0.88'
                                  }
                  }

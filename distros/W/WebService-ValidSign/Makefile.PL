@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -16,16 +16,19 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-ValidSign",
   "EXE_FILES" => [
-    "bin/vs-poc.pl"
+    "bin/vs-download.pl",
+    "bin/vs-upload.pl"
   ],
   "LICENSE" => "bsd",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "WebService::ValidSign",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Config::Any" => 0,
+    "Config::General" => "2.47",
     "Data::Dumper" => 0,
     "File::Spec::Functions" => 0,
+    "File::Temp" => 0,
     "Getopt::Long" => 0,
     "HTTP::Request" => 0,
     "HTTP::Request::Common" => 0,
@@ -46,18 +49,20 @@ my %WriteMakefileArgs = (
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "CPAN::Meta::Requirements" => 0,
     "File::Spec" => 0,
     "HTTP::Response" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Import::Into" => 0,
+    "Module::Metadata" => 0,
     "Sub::Override" => 0,
     "Test::Exception" => 0,
     "Test::Lib" => 0,
     "Test::More" => "0.96",
     "Test::Most" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,11 +70,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "CPAN::Meta::Requirements" => 0,
   "Carp" => 0,
   "Config::Any" => 0,
+  "Config::General" => "2.47",
   "Data::Dumper" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
+  "File::Temp" => 0,
   "Getopt::Long" => 0,
   "HTTP::Request" => 0,
   "HTTP::Request::Common" => 0,
@@ -81,6 +89,7 @@ my %FallbackPrereqs = (
   "JSON::XS" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => 0,
+  "Module::Metadata" => 0,
   "Module::Pluggable::Object" => 0,
   "Moo" => "1.006000",
   "Moo::Role" => 0,
@@ -100,7 +109,7 @@ my %FallbackPrereqs = (
 );
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
-requires('JSON::XS', '4.02') if $] > 5.026 && has_module('JSON::XS', '4.01');
+requires('JSON::XS', '4.02') if has_module('JSON::XS', '4.01') or !defined has_module('JSON::XS', '4.01');
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

@@ -1,7 +1,7 @@
 package Term::Caca;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: perl interface for libcaca (Colour AsCii Art library)
-$Term::Caca::VERSION = '3.0.0';
+$Term::Caca::VERSION = '3.0.1';
 use 5.20.0;
 use strict;
 use warnings;
@@ -300,7 +300,7 @@ Term::Caca - perl interface for libcaca (Colour AsCii Art library)
 
 =head1 VERSION
 
-version 3.0.0
+version 3.0.1
 
 =head1 SYNOPSIS
 
@@ -578,7 +578,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 

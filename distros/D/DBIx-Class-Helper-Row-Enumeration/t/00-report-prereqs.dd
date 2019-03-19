@@ -44,6 +44,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
                                    'SQL::Translator' => '0.11018',
+                                   'Sub::Name' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0'
                                  }

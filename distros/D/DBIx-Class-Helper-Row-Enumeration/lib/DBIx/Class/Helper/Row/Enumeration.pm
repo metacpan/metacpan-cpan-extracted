@@ -12,7 +12,7 @@ use Sub::Quote ();
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.1.5';
+our $VERSION = 'v0.1.6';
 
 # The names of all methods installed by this module.
 my %MINE;
@@ -105,7 +105,7 @@ DBIx::Class::Helper::Row::Enumeration - Add methods for emum values
 
 =head1 VERSION
 
-version v0.1.5
+version v0.1.6
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,7 @@ if you want to specify custom handlers, e.g.
 
   );
 
-Note that this is by design, since the intention column modifiers is
+Note that this is by design, since the intention of column modifiers is
 to override existing values.
 
 =head1 SEE ALSO
@@ -264,7 +264,7 @@ Aaron Crane <arc@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

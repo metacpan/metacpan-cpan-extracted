@@ -84,7 +84,7 @@ sub wrong_args_subref :Tests(2) {
     );
 }
 
-sub correct_method_call_gets_correct_results :Tests(2) {
+sub correct_method_call_gets_correct_results :Tests(5) {
     CMMITTestClass->_reset_test_method();
     ok(CMMITTestClass->_test_method('foo') eq "called test_method on CMMITTestClass with [foo]\n",
         "calling a method after _reset()ing works"
@@ -93,10 +93,29 @@ sub correct_method_call_gets_correct_results :Tests(2) {
     CMMITTestClass->_set_test_method(
         Class::Mock::Method::InterfaceTester->new([
             { input => ['foo'], output => 'foo' },
-        ])
+            { input => ['foo'], output => \sub { 'foo' } },
+            { input => ['foo'], output => sub { 'foo' } },
+            { input => ['foo'], output => \{ eleven => 11 } },
+        ]),
     );
 
-    ok(CMMITTestClass->_test_method('foo') eq 'foo', "correct method call gets right result back");
+    ok(
+        CMMITTestClass->_test_method('foo') eq 'foo',
+        "correct method call gets right result back"
+    );
+    ok(
+        CMMITTestClass->_test_method('foo') eq 'foo',
+        "correct method call gets right result back by executing a code-ref"
+    );
+    ok(
+        CMMITTestClass->_test_method('foo')->() eq 'foo',
+        "can return a code-ref"
+    );
+    is_deeply(
+        CMMITTestClass->_test_method('foo'),
+        \{ eleven => 11 },
+        "can return random other refs"
+    );
 }
 
 sub run_out_of_tests :Tests(1) {

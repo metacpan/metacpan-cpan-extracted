@@ -1,5 +1,5 @@
 package WebService::ValidSign::API::Auth;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 
 # ABSTRACT: Implementation of the Authentication tokens for ValidSign
@@ -65,7 +65,7 @@ WebService::ValidSign::API::Auth - Implementation of the Authentication tokens f
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

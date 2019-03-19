@@ -67,6 +67,7 @@ my @opts = (
 	'ZMQ_HAVE_SO_KEEPALIVE',
 	'ZMQ_HAVE_CURVE',
 	'ZMQ_USE_TWEETNACL',
+	'ZMQ_POLL_BASED_ON_POLL',
 );
 
 if ($is_osx || $is_bsd)
@@ -98,8 +99,8 @@ elsif ($is_solaris)
 elsif ($is_windows)
 {
 	push @opts,
-		'ZMQ_IOTHREAD_POLLER_USE_SELECT',
-		'ZMQ_USE_SELECT',
+		'ZMQ_IOTHREAD_POLLER_USE_EPOLL',
+		'ZMQ_USE_EPOLL',
 		'ZMQ_USE_CV_IMPL_WIN32API';
 }
 else
@@ -108,17 +109,6 @@ else
 		'ZMQ_USE_CV_IMPL_STL11',
 		'ZMQ_IOTHREAD_POLLER_USE_POLL',
 		'ZMQ_USE_POLL 1';
-}
-
-if ($is_windows)
-{
-	push @opts,
-		'ZMQ_POLL_BASED_ON_SELECT';
-}
-else
-{
-	push @opts,
-		'ZMQ_POLL_BASED_ON_POLL';
 }
 
 if (($is_linux || $is_osx || $is_bsd) && !$is_gkfreebsd)
@@ -147,6 +137,13 @@ else
 {
 	push @opts,
 		'ZMQ_HAVE_WINDOWS',
+}
+
+if (!$is_solaris || $Config{osvers} eq '2.10')
+{
+	# Solaris 10 doesn't have strnlen
+	push @opts,
+		'HAVE_STRNLEN';
 }
 
 if ($is_solaris)
@@ -227,6 +224,11 @@ my @cpp_srcs = (glob ('deps/libzmq/src/*.cpp'));
 my @cpp_objs = map { substr ($_, 0, -3) . 'o' } (@cpp_srcs);
 
 my @c_srcs = (glob ('deps/libzmq/src/*.c'), glob ('deps/libzmqraw/*.c'));
+if ($is_windows)
+{
+	push @c_srcs, glob ('deps/libzmq/external/wepoll/*.c');
+}
+
 my @c_objs = map { substr ($_, 0, -1) . 'o' } (@c_srcs);
 
 sub MY::c_o {
@@ -293,7 +295,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.30",
+  "VERSION" => "0.31",
   "test" => {
     "TESTS" => "t/*.t"
   }

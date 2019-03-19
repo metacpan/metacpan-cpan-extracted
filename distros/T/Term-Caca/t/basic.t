@@ -5,7 +5,6 @@ use warnings;
 # testing
 
 use Test::More;
-use Test::Approx;
 
 use Term::Caca::Constants qw/ :colors /;
 use Term::Caca;
@@ -68,8 +67,7 @@ cmp_ok $t->canvas_height, '>=', 0, "get_height()";
 my $render_time = $t->rendering_time;
 
 # render time should be ~ 1 second
-
-is_approx $render_time, 1, 'render time around 1s', '0.5';
+cmp_ok abs( $render_time - 1 ), '<=', 0.5, 'render time around 1s';
 
 pass 'reached the end';
 

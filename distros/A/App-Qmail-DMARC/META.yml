@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'Martin H. Sluka <fany@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Qmail-DMARC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mail::Address: '0'
+  Mail::DKIM::Verifier: '0'
+  Mail::DMARC::PurePerl: '0'
+  Mail::Header: '0'
+  Mail::Qmail::Queue::Message: '0'
+  Mail::SPF::Query: '0'
+  perl: '5.014'
+resources:
+  homepage: https://github.com/fany/App-Qmail-DMARC
+version: '0.42'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

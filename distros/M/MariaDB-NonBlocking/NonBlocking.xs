@@ -15,6 +15,25 @@
     maria->query_results = MUTABLE_SV(newAV()); \
 } STMT_END
 
+/* newer connector-c releases just have MARIADB_PACKAGE_VERSION_ID which we can use. Yay
+ * Otherwise we need to define it. Anti-yay.
+ * */
+#ifndef MARIADB_PACKAGE_VERSION_ID
+#  if defined SERVER_STATUS_IN_TRANS_READONLY
+#    define MARIADB_PACKAGE_VERSION_ID 30004
+#  elif defined MARIADB_BASE_VERSION
+#    define MARIADB_PACKAGE_VERSION_ID 30003
+#  elif defined TLS_LIBRARY_VERSION
+#    define MARIADB_PACKAGE_VERSION_ID 30002
+#  elif defined MYSQL_CLIENT_reserved22
+#    define MARIADB_PACKAGE_VERSION_ID 30000
+# endif
+#endif
+
+#ifdef MARIADB_PACKAGE_VERSION_ID
+#  define HAVE_SSL_ENFORCE ( MARIADB_PACKAGE_VERSION_ID >= 30002 )
+#endif
+
 typedef struct sql_config {
     /* passed to mysql_real_connect(_start) */
     const char* username;
@@ -64,6 +83,7 @@ typedef struct MariaDB_client {
 
     /* For the state machine */
     bool is_cont;   /* next operation must be a _cont */
+    bool run_query;
     int current_state;
     int last_status;
 
@@ -123,9 +143,10 @@ void
 THX_disconnect_generic(pTHX_ MariaDB_client* maria)
 #define disconnect_generic(maria) THX_disconnect_generic(aTHX_ maria)
 {
-    if ( maria->query_sv ) {
+    if ( maria->run_query ) {
         SvREFCNT_dec(maria->query_sv);
-        maria->query_sv = NULL;
+        maria->query_sv  = NULL;
+        maria->run_query = FALSE;
     }
 
     if ( maria->res ) {
@@ -440,7 +461,7 @@ THX_do_work(pTHX_ SV* self, IV event)
         if ( status )
             break;
 
-        if ( state == STATE_STANDBY && !maria->query_sv )
+        if ( state == STATE_STANDBY && !maria->run_query )
             break;
 
         if ( state == STATE_DISCONNECTED && !have_password_in_memory(maria) ) {
@@ -450,7 +471,7 @@ THX_do_work(pTHX_ SV* self, IV event)
         /*warn("<%d><%s><%d>\n", maria->socket_fd, state_to_name[maria->current_state], maria->is_cont);*/
         switch ( state ) {
             case STATE_STANDBY:
-                if ( maria->query_sv ) {
+                if ( maria->run_query ) {
                     /* we have a query sv saved, so go ahead and run it! */
                     state = STATE_QUERY;
                 }
@@ -464,7 +485,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                     state = STATE_CONNECT;
                 }
                 else {
-                    if ( maria->query_sv ) {
+                    if ( maria->run_query ) {
                         err       = 1;
                         errstring = "Disconnected and no password in memory to reconnect, nothing to do!";
                     }
@@ -560,8 +581,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                     state          = STATE_STANDBY;
 
                     /* Release this */
-                    SvREFCNT_dec(maria->query_sv);
-                    maria->query_sv = NULL;
+                    maria->run_query = NULL;
 
                     errstring = mysql_error(maria->mysql);
                 }
@@ -573,8 +593,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                     maria->is_cont = FALSE; /* hooray! */
 
                     /* finally, release the query string */
-                    SvREFCNT_dec(maria->query_sv);
-                    maria->query_sv = NULL;
+                    maria->run_query = NULL;
 
                     if ( maria->store_query_result ) {
                         state = STATE_STORE_RESULT;
@@ -630,7 +649,7 @@ THX_do_work(pTHX_ SV* self, IV event)
                         if ( !maria->res ) {
                             /* query was successful but returned nothing */
                             /* if mysql_affected_rows(maria->mysql) returns
-                               something interesting, that's our output 
+                               something interesting, that's our output
                              */
                             UV affected_rows = mysql_affected_rows(maria->mysql);
                             if ( affected_rows ) {
@@ -797,9 +816,8 @@ THX_do_work(pTHX_ SV* self, IV event)
         maria->current_state = state_for_error;
         maria->last_status   = 0;
 
-        if ( maria->query_sv ) {
-            SvREFCNT_dec(maria->query_sv);
-            maria->query_sv = NULL;
+        if ( maria->run_query ) {
+            maria->run_query = NULL;
         }
 
         if (!errstring)
@@ -833,7 +851,7 @@ THX_quote_sv(pTHX_ MariaDB_client* maria, SV* to_be_quoted)
     if ( to_be_quoted_len == 0 ) {
         return newSVpvs("\"\""); /* "", not '', not sure why */
     }
-    
+
     if ( (to_be_quoted_len+3) > (MEM_SIZE_MAX/2) ) {
         croak("Cannot quote absurdly long string, would cause an overflow");
     }
@@ -988,7 +1006,8 @@ THX_unpack_config_from_hashref(pTHX_ SV* self, HV* args)
 #undef my_mysql_opt_integer
 
     if ( FETCH_FROM_HV("ssl") ) {
-        my_bool reject_unauthorized = 0;
+        my_bool ssl_verify  = 0;
+        my_bool ssl_enforce = 1;
         bool use_default_ciphers    = TRUE;
         HV *ssl;
 
@@ -1001,8 +1020,8 @@ THX_unpack_config_from_hashref(pTHX_ SV* self, HV* args)
         }
 
 #define ssl_config_set(s) STMT_START {                           \
-    config->ssl_##s = savepv(easy_arg_fetch(ssl, #s, FALSE));    \
-    if ( !config->ssl_##s ) config->ssl_##s = "";                \
+    const char *tmp = easy_arg_fetch(ssl, #s, FALSE);            \
+    config->ssl_##s = tmp ? savepv(tmp) : NULL;    \
 } STMT_END
 
         ssl_config_set(key);
@@ -1015,33 +1034,25 @@ THX_unpack_config_from_hashref(pTHX_ SV* self, HV* args)
             use_default_ciphers = FALSE;
         }
 
-        if ( (svp = hv_fetchs(ssl, "reject_unauthorized", FALSE)) && *svp )
-            reject_unauthorized = cBOOL(SvTRUE(*svp)) ? 1 : 0;
+        if ( (svp = hv_fetchs(ssl, "optional", FALSE)) && *svp )
+            ssl_enforce = !SvTRUE(*svp);
 
-/*
-        mysql_options(
-            maria->mysql,
-            MYSQL_OPT_SSL_MODE,
-            reject_unauthorized
-                ? &SSL_MODE_REQUIRED
-                : &SSL_MODE_PREFERRED
-        );
-*/
+        if ((svp = hv_fetchs(ssl, "verify_server_cert", FALSE)) && *svp) {
+            ssl_verify = SvTRUE(*svp);
+        }
 
-        /* What a fucking mess.  This is deprecated and will be
-         * removed in MySQL 8.  But the ssl modes enum isn't available
-         * everywhere, so you can't use Oracle's recommended way. Bah.
-         * TODO fix all of this ffs
-         */
+#if HAVE_SSL_ENFORCE
+        if (mysql_options(maria->mysql, MYSQL_OPT_SSL_ENFORCE, &ssl_enforce) != 0) {
+            croak("Enforcing SSL encryption is not supported");
+        }
+#else
+        /* Try this instead... */
+        ssl_verify = 1;
+#endif
 
-        mysql_options(
-            maria->mysql,
-            MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
-            &reject_unauthorized
-        );
-
-/* aka somewhat modern shit */
-#define DEFAULT_CIPHERS "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256"
+        if ( ssl_verify && mysql_options(maria->mysql, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &ssl_verify) != 0 ) {
+            croak("verify_server_cert=1 (or optional=0 in a version without MYSQL_OPT_SSL_ENFORCE) is not supported");
+        }
 
         mysql_ssl_set(
             maria->mysql,
@@ -1049,9 +1060,7 @@ THX_unpack_config_from_hashref(pTHX_ SV* self, HV* args)
             config->ssl_cert,
             config->ssl_ca,
             config->ssl_capath,
-            use_default_ciphers
-                ? DEFAULT_CIPHERS
-                : config->ssl_cipher
+            use_default_ciphers ? NULL : config->ssl_cipher
         );
     }
 
@@ -1101,6 +1110,7 @@ CODE:
     maria->socket_fd     = -1;
     maria->thread_id     = -1;
     maria->store_query_result = TRUE;
+    maria->query_sv      = newSVpvs("");
 
     maybe_init_mysql_connection(maria->mysql);
 
@@ -1181,7 +1191,7 @@ CODE:
     else if ( maria->current_state != STATE_STANDBY || maria->is_cont ) {
         croak("Cannot ping an active connection!!"); /* TODO moar info */
     }
-    else if ( maria->query_sv ) {
+    else if ( maria->run_query ) {
         croak("Cannot ping when we have a query queued to be run");
     }
     else {
@@ -1211,7 +1221,7 @@ CODE:
     dMARIA;
 
     /* TODO would be pretty simple to implement a pipeline here... */
-    if ( maria->query_sv )
+    if ( maria->run_query )
         croak("Attempted to start a query when this connection already has a query in flight");
 
     if ( !SvOK(query) )
@@ -1258,7 +1268,7 @@ CODE:
         SV* bind = ST(3);
         AV* bind_av;
         bool escaped;
-        SV* query_with_params;
+        SV* query_with_params = maria->query_sv;
         bool need_utf8_on               = cBOOL(SvUTF8(query));
         STRLEN max_size_of_query_string;
         const char* query_pv            = SvPV(query, max_size_of_query_string);
@@ -1294,10 +1304,13 @@ CODE:
             max_size_of_query_string += sv_len(query_param)*2+1; /* should be +2, but we are replacing a question mark so */
         }
 
-        query_with_params = newSV(max_size_of_query_string);
-        SvPOK_on(query_with_params);
-        if ( need_utf8_on )
+        SvGROW(query_with_params, max_size_of_query_string);
+        if ( need_utf8_on ) {
             SvUTF8_on(query_with_params);
+        }
+        else {
+            SvUTF8_off(query_with_params);
+        }
 
         d = SvPVX(query_with_params);
         i = 0; /* back to the start */
@@ -1370,19 +1383,16 @@ CODE:
         *d++ = '\0'; /* never hurts to have a NUL terminated string */
 
         if ( i != num_bind_params ) {
-            sv_free(query_with_params);
             croak("Too many bind params given for query! Got %"IVdf", query needed %"IVdf, num_bind_params, i);
         }
-
-        maria->query_sv = query_with_params;
-
     }
     else {
         /* we MUST copy this, because mysql_real_query will not -- it will
          * hold on to the pointer until it is done sending the query
          * */
-        maria->query_sv = newSVsv(query);
+        sv_setsv(maria->query_sv, query);
     }
+    maria->run_query = TRUE;
 
     if ( maria->is_cont ) {
         /*

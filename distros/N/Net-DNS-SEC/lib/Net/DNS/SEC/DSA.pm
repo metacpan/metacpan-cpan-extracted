@@ -1,9 +1,9 @@
 package Net::DNS::SEC::DSA;
 
 #
-# $Id: DSA.pm 1723 2018-12-03 09:17:48Z willem $
+# $Id: DSA.pm 1732 2019-02-15 13:31:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1723 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1732 $)[1];
 
 
 =head1 NAME
@@ -48,7 +48,7 @@ use MIME::Base64;
 
 use constant DSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_DSA');
 
-BEGIN { die 'No "use Net::DNS::SEC" or no DSA' unless DSA_configured }
+BEGIN { die 'DSA disabled or application has no "use Net::DNS::SEC"' unless DSA_configured }
 
 
 my %parameters = (

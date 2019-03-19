@@ -1,7 +1,7 @@
 package Dancer::Session::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: abstract class for session engine
-$Dancer::Session::Abstract::VERSION = '1.3500';
+$Dancer::Session::Abstract::VERSION = '1.3510';
 use strict;
 use warnings;
 use Carp;
@@ -127,6 +127,13 @@ sub write_session_id {
     my ($class, $id) = @_;
 
     my $name = $class->session_name();
+
+    # If we've already pushed the appropriate cookie to the response, then we
+    # don't need to do any more
+    if (Dancer::Cookies->cookie($name)) {
+        return;
+    }
+
     my %cookie = (
         name   => $name,
         value  => $id,
@@ -160,7 +167,7 @@ Dancer::Session::Abstract - abstract class for session engine
 
 =head1 VERSION
 
-version 1.3500
+version 1.3510
 
 =head1 DESCRIPTION
 

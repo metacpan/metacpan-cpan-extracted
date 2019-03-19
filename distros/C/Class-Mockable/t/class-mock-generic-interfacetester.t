@@ -4,7 +4,7 @@ use warnings;
 package CMGITtests;
 
 use Config;
-use Test::More tests => 27;
+use Test::More tests => 30;
 use Capture::Tiny qw(capture);
 use Class::Mock::Generic::InterfaceTester;
 
@@ -196,19 +196,51 @@ sub add_fixtures_arrayref {
             {
                 method => 'frolic',
                 input  => ['joyously'],
-                output => 'yay!',
+                output => \sub { 'yay!' }
             },
             {
                 method => 'celebrate',
                 input  => sub { 1 },
                 output => q{It's your birthday!},
-            }
+            },
+            {
+                method => 'pass_away',
+                output => \sub { die("Argh\n") }
+            },
+            {
+                method => 'caper',
+                output => sub { 'the verb, not the noun' }
+            },
+            {
+                method => 'carouse',
+                output => \[qw(on a carousel)]
+            },
         ]
     );
-    is($interface_tester->frolic('joyously'), 'yay!',
-        'You can add a method fixture as an arrayref');
-    is($interface_tester->celebrate, q{It's your birthday!},
-        'More than one');
+    is(
+        $interface_tester->frolic('joyously'), 'yay!',
+        'You can add method fixtures as an arrayref (and the output can be a ref to a code-ref)'
+    );
+    is(
+        $interface_tester->celebrate('raucously'), q{It's your birthday!},
+        'The input validator can be a sub-ref'
+    );
+    eval { $interface_tester->pass_away };
+    is(
+        $@,
+        "Argh\n",
+        'a magic code-ref can die()'
+    );
+    is_deeply(
+        $interface_tester->caper->(),
+        'the verb, not the noun',
+        'can return an ordinery code-ref'
+    );
+    is_deeply(
+        $interface_tester->carouse,
+        \[qw(on a carousel)],
+        'can return some random other type of ref'
+    );
 }
 
 sub add_fixtures_list {

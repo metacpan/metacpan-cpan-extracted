@@ -42,7 +42,7 @@ sleep(1);
 my $s5_res = $ws->search(area => { iso => 'US-CA', fmt => 'xml' });
 exit_if_mb_busy($s5_res);
 ok($s5_res->find('name')->first->text eq 'California');
-ok($s5_res->at('area')->attr('ext:score') == 100);
+ok($s5_res->at('area')->attr('ns2:score') == 100);
 sleep(1);
 
 done_testing();

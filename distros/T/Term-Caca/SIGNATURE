@@ -14,50 +14,50 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 7d4c9a9a64482acf749fde8d6dee442cda824de4 .travis.yml
+SHA1 c99273a1b005b2825244ea699f60ce6aa15e7477 .travis.yml
 SHA1 ed916a1799e7527ebdfa134d699b45c7239c7b25 CODE_OF_CONDUCT.md
-SHA1 03e5594dcd63f5717cdea9fccda4e204b08aae9a CONTRIBUTORS
-SHA1 e96614b71f0a3a741693db9ec5f064dbc000c138 Changes
+SHA1 83c1095dcac95859a80bffc47e4653bbedecfea2 CONTRIBUTORS
+SHA1 f7dd37c1ce16dc9781716f358b370e21b0079568 Changes
 SHA1 36fdf7dbe53290f20718ade726dfd5249c6a06ae INSTALL
-SHA1 39f01244390ebde761fa5a05e6c4d14a23dc1497 LICENSE
+SHA1 df90f6711d03952fac567f4a0270af7eecbc17c9 LICENSE
 SHA1 8cd433596fbce194d73f4ad09a41a083091adb3b MANIFEST
-SHA1 a0ec03d2d7102c2070250ebb8a6070a9d4254edc META.json
-SHA1 122e545f81988cb83fe02852fb5da83fc6cdfbe6 META.yml
-SHA1 977105616ecf3d74cfd1f9c6c4506b3ffc086a47 Makefile.PL
-SHA1 e5c36570182538f5ad24abae493eca76d1e2b324 README.mkdn
+SHA1 6163aad7e3e4c463195e3e6bdfdb11dee708db0a META.json
+SHA1 7af396e4022d4d05c2b13587b504fd313a992e69 META.yml
+SHA1 e0fed7eb6f860eabafef2d3852b521da4d0972c2 Makefile.PL
+SHA1 d602ed74960452b3b7fea1b0050b69292388200c README.mkdn
 SHA1 39597e36fe54bcfbd1015ef546f0940bd30ce6b4 TODO
-SHA1 3f37ce24bb15d53bb0d831aa75baa1693c41a16c cpanfile
-SHA1 c0613d8a3cb562876aacaa94ccf24f7b787fdc0a doap.xml
+SHA1 feda2fa5a444cfab0acc84e6ab7109f40007a001 cpanfile
+SHA1 f3b12d02bc48ac21c6fe37e2743ac92331a2d342 doap.xml
 SHA1 58d2fc4703f527c8437aba6bf41a6103f8af25f6 example/cave.pl
 SHA1 933b93eaa0c45df20e1edf1aa33d7ce2e4ba1689 examples/cave.pl
 SHA1 5e78f92b52d596e16c590abfd0d713e01892979f examples/events.pl
 SHA1 e52fe50748fb1d05826b0465a16d3e9fc9c4747b examples/maze.pl
-SHA1 c2c846170211b0697223c3ed4d6453ff2809c153 lib/Term/Caca.pm
-SHA1 f1eadb5249fc726e7582e97274065f34a41fb16f lib/Term/Caca/Bitmap.pm
-SHA1 cf1624028e48be3a60fb4807e287546e46761597 lib/Term/Caca/Constants.pm
-SHA1 42f56f5cff7ed787e1e6a795043a57b830dc6e8b lib/Term/Caca/Event.pm
-SHA1 8ca2735b7e4e35c0947bfccb3a3231cbb86291a9 lib/Term/Caca/Event/Key.pm
-SHA1 6d6a684dffb732696406b560a79b2f879f900992 lib/Term/Caca/Event/Key/Press.pm
-SHA1 95494ab1492791bd1b8db4be89ea66747508995c lib/Term/Caca/Event/Key/Release.pm
-SHA1 883d1c347948729155d2d10b39a6cf3bc1bd1f69 lib/Term/Caca/Event/Mouse/Button.pm
-SHA1 6f30ac3c693afdb7286be8f20e11bb56225b44d3 lib/Term/Caca/Event/Mouse/Button/Press.pm
-SHA1 124c43dd467d1c238150e5bd769abfd51f71483e lib/Term/Caca/Event/Mouse/Button/Release.pm
-SHA1 932f4e3052edf2d7b1195b5a71d328141c32d4ea lib/Term/Caca/Event/Mouse/Motion.pm
-SHA1 731b283ba0df7af4d86b0aa2ca2e71e3af585f43 lib/Term/Caca/Event/Quit.pm
-SHA1 a3ef6b306bc240d4ab92f2c0e1ad515efb8a1b2d lib/Term/Caca/Event/Resize.pm
-SHA1 dc7a6e841f1fd0419eeb886910fe4a507f3c8e02 lib/Term/Caca/FFI.pm
-SHA1 18ee75d11747f218b8becbee89f0776546987543 lib/Term/Caca/Sprite.pm
+SHA1 fc3b885f680646dfed01d1f2c65a959e79833594 lib/Term/Caca.pm
+SHA1 b829d6deeadd68240b4d205a913c8d0c1bf56228 lib/Term/Caca/Bitmap.pm
+SHA1 7643b56e0afcb440b3c7cd1bf528003e9ccdbb59 lib/Term/Caca/Constants.pm
+SHA1 733b8d0be404ea57e2b6956a35842f5772b512cc lib/Term/Caca/Event.pm
+SHA1 eaa1b233c72e5f6e28767ab11daa273d1f1bc843 lib/Term/Caca/Event/Key.pm
+SHA1 0043f28eaba89ce393d57f7f02fe5e4a807fcc2a lib/Term/Caca/Event/Key/Press.pm
+SHA1 e72b04a43d7e31ee73c15938f7c963590ad4510c lib/Term/Caca/Event/Key/Release.pm
+SHA1 ead877ace0d58c80c44695e42d611642460fbb9b lib/Term/Caca/Event/Mouse/Button.pm
+SHA1 4053f65b263049c23d0410cabe057eb884eda7cf lib/Term/Caca/Event/Mouse/Button/Press.pm
+SHA1 fe845c49885f54518e37e1d63d13b690b6478e35 lib/Term/Caca/Event/Mouse/Button/Release.pm
+SHA1 06cc0f3640f5beb05289657a3ab27ea5dfe7923a lib/Term/Caca/Event/Mouse/Motion.pm
+SHA1 6f809a551f8049c32e2e7ab23507e2a042c1ec0e lib/Term/Caca/Event/Quit.pm
+SHA1 ecdaf2526df1b7fb76c4986c2504ffcf3f1d2c3b lib/Term/Caca/Event/Resize.pm
+SHA1 d2016963e361fcf8ccbbf8a266738a7d862913a2 lib/Term/Caca/FFI.pm
+SHA1 e6f6f8016ec9239b6a59ec3c6dc945d84590316c lib/Term/Caca/Sprite.pm
 SHA1 0b90b0e3a0f5f275915b177c58616583c57321c2 t/00-compile.t
-SHA1 231b81820173204c6fbd41c7ea13495fbb860021 t/00-report-prereqs.dd
-SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
-SHA1 1729b81af9fa90721ba7c362fb87c6f05c293017 t/basic.t
+SHA1 8b56b093f8f3ecf33473c0c083a33a5647eae08e t/00-report-prereqs.dd
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
+SHA1 a95f4cb27296fa12895de5333d76d557024da0f6 t/basic.t
 SHA1 2cbd3172d8a75e0344f524f0d94e754703ba5b2e t/data/caca.txt
 SHA1 25ffd00b2c65f6a6bdc9ffc4963169b4e3e626cc t/driver.t
 SHA1 0fcf8acef00468794782f3621d02cc0f6fe19113 t/export.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAltiNCcACgkQ34Hwf+GwC4zCxwCfc6p9FhSdwwDloC/a6f5TdKpR
-XnIAoNEPM4bnTIkIPWAiMvQ6JXvTMY1c
-=/Cv6
+iEYEARECAAYFAlyQMrAACgkQ34Hwf+GwC4xaIACgjVTTa1zKXD+GVe/NrPtf9DXL
+5UgAni5bCHDhIoXfU8ORhZmRlA83Qt6i
+=I2uT
 -----END PGP SIGNATURE-----

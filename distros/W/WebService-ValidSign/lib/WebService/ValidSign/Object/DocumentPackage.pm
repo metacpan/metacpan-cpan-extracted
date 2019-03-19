@@ -1,12 +1,19 @@
 ## Please see file perltidy.ERR
 package WebService::ValidSign::Object::DocumentPackage;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use Moo;
 
 extends 'WebService::ValidSign::Object';
 
 use Types::Standard qw(Str Bool ArrayRef HashRef);
 use WebService::ValidSign::Object::Ceremony;
+
+# TODO:
+# Add coerce sender
+# Add coerce settings
+# Add coerce roles
+#
+use WebService::ValidSign::Types qw();
 
 # ABSTRACT: A ValidSign DocumentPackage object
 
@@ -42,6 +49,7 @@ has description => (
 has sender => (
     is        => 'rw',
     predicate => 'has_sender',
+    # coerce => 1
 );
 
 has settings => (
@@ -57,9 +65,9 @@ has visibility => (
 
 has roles => (
     is        => 'rw',
-    default   => sub { {} },
-    isa       => HashRef,
-    traits    => ["Hash"],
+    default   => sub { [] },
+    isa       => ArrayRef,
+    traits    => ["Array"],
     predicate => 'has_roles',
 
     #handles   => {
@@ -118,7 +126,7 @@ sub add_role {
 sub count_roles {
     my $self = shift;
     return 0 unless $self->has_roles;
-    return scalar keys %{$self->roles};
+    return scalar @{$self->roles};
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -135,7 +143,7 @@ WebService::ValidSign::Object::DocumentPackage - A ValidSign DocumentPackage obj
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

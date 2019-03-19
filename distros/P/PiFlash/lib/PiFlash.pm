@@ -11,9 +11,9 @@ use PiFlash::Inspector;
 use PiFlash::MediaWriter;
 
 package PiFlash;
-$PiFlash::VERSION = '0.3.1';
+$PiFlash::VERSION = '0.4.0';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
-use Getopt::Long; # included with perl
+use Getopt::Long qw(GetOptionsFromArray); # included with perl
 use File::Basename; # included with perl
 use File::Path qw(make_path); # RPM: perl-File-Path, DEB: included with perl
 
@@ -38,10 +38,17 @@ sub state_categories {
 # print program usage message
 sub usage
 {
-	say STDERR "usage: ".basename($0)." [--verbose | --logging] [--resize] [--config conf-file] input-file output-device";
-	say STDERR "       ".basename($0)." [--verbose | --logging] [--config conf-file] --SDsearch";
-	say STDERR "       ".basename($0)." --version";
-	exit 1;
+	my @msg;
+	if (@_) {
+		push @msg, shift;
+		foreach (@_) {
+			push @msg, "   $_";
+		}
+	}
+	push @msg, "usage: ".basename($0)." [--verbose | --logging] [--resize] [--config conf-file] input-file output-device";
+	push @msg, "       ".basename($0)." [--verbose | --logging] [--config conf-file] --SDsearch";
+	push @msg, "       ".basename($0)." --version";
+	PiFlash::State->error(join("\n", @msg)."\n");
 }
 
 # print numbers with readable suffixes for megabytes, gigabytes, terabytes, etc
@@ -58,25 +65,89 @@ sub num_readable
 	return sprintf "%4.2f%s", $num_base, $suffixes[$magnitude];
 }
 
+# command-line argument processing
+# this is used by PiFlash mainline and unit tests
+sub process_cli
+{
+	my $cmdline = shift // \@ARGV;
+
+	# collect and validate command-line arguments
+	{
+		my @warn;
+		local $SIG{__WARN__} = sub {
+			if (length $_[0] > 0) {
+				push @warn, $_[0];
+			}
+		};
+		my $getopt_result = eval { GetOptionsFromArray ($cmdline, PiFlash::State::cli_opt(),
+			"config:s",
+			"logging",
+			"plugin:s",
+			"resize",
+			"sdsearch",
+			"test:s%",
+			"verbose",
+			"version",
+			)
+		};
+		if ($@) {
+			# in case of failure, add state info if verbose or logging mode is set
+			usage("command option error: ", $@);
+		} elsif (@warn) {
+			chomp @warn;
+			my $line1 = shift @warn;
+			usage("command option error: $line1", @warn);
+		} elsif (!$getopt_result) {
+			usage("command option error");
+		}
+	}
+
+	# check for errors such as insufficient parameters or missing files
+	my @errors;
+	my $cli_query_mode = 0;
+	foreach my $opt ( qw(sdsearch version) ) {
+		if (PiFlash::State::has_cli_opt($opt)) {
+			$cli_query_mode = 1;
+			last;
+		}
+	}
+	my $test_flags = PiFlash::State::cli_opt("test");
+	if (scalar @$cmdline < 2) {
+		if (not $cli_query_mode) {
+			push @errors, "missing argument - need an existing source file and destination device";
+		}
+	} else {
+		if (not -e $cmdline->[0]) {
+			push @errors, "source file parameter $cmdline->[0] does not exist";
+		} elsif (not -f $cmdline->[0]) {
+			push @errors, "source file parameter $cmdline->[0] is not a regular file";
+		}
+		if (not exists $test_flags->{skip_block_check}) {
+			# test that the block device exists and is really a block device
+			# note: this may be skipped by "--test skip_block_check=1" for testing CLI options
+			if (not -e $cmdline->[1]) {
+				push @errors, "destination device parameter $cmdline->[1] does not exist";
+			} elsif (not -b $cmdline->[1]) {
+				push @errors, "destination device parameter $cmdline->[1] is not a block device";
+			}
+		}
+	}
+	# TODO insert subcommand processing here
+
+	# if there were errors, print them with program usage info and exit
+	if (@errors) {
+		usage(@errors);
+	}
+}
+
+# PiFlash main routine
 sub piflash
 {
 	# initialize program state storage
 	PiFlash::State->init(state_categories());
 
-	# collect and validate command-line arguments
-	do { GetOptions (PiFlash::State::cli_opt(),
-		"config:s",
-		"logging",
-		"plugin:s",
-		"resize",
-		"sdsearch",
-		"verbose",
-		"version",
-		); };
-	if ($@) {
-		# in case of failure, add state info if verbose or logging mode is set
-		PiFlash::State->error($@);
-	}
+	# process command line
+	process_cli();
 
 	# if --version option was selected, print the version number and exit
 	if (PiFlash::State::has_cli_opt("version")) {
@@ -95,19 +166,6 @@ sub piflash
 	}
 	if ( -f $config_file ) {
 		PiFlash::State::read_config($config_file);
-	}
-
-	# print usage info if there aren't sufficient parameters to do anything
-	my $param_ok = 0;
-	if (PiFlash::State::has_cli_opt("sdsearch")) {
-		$param_ok = 1;
-	}
-	if ($#ARGV == 1 and -f $ARGV[0] and -b $ARGV[1]) {
-		$param_ok = 1;
-	}
-	# TODO insert subcommand processing here
-	if (!$param_ok) {
-		usage();
 	}
 
 	# initialize enabled plugins
@@ -215,7 +273,7 @@ PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 

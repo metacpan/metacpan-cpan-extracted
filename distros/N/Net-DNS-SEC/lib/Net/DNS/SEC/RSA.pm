@@ -1,9 +1,9 @@
 package Net::DNS::SEC::RSA;
 
 #
-# $Id: RSA.pm 1677 2018-05-22 11:59:10Z willem $
+# $Id: RSA.pm 1732 2019-02-15 13:31:34Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1677 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1732 $)[1];
 
 
 =head1 NAME
@@ -45,6 +45,11 @@ use strict;
 use integer;
 use warnings;
 use MIME::Base64;
+
+use constant RSA_configured => Net::DNS::SEC::libcrypto->can('EVP_PKEY_assign_RSA');
+
+BEGIN { die 'RSA disabled or application has no "use Net::DNS::SEC"' unless RSA_configured }
+
 
 my %parameters = (
 	1  => [sub { Net::DNS::SEC::libcrypto::EVP_md5() }],

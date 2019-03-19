@@ -3,7 +3,7 @@ package Class::Mock::Generic::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.2001';
+our $VERSION = '1.3000';
 
 use vars qw($AUTOLOAD);
 
@@ -111,6 +111,22 @@ In this case, the actual parameters passed to the method will be passed to
 that code-ref for validation.  It should return true if the params are OK
 and false otherwise.  In the example, it will return true if the hash of
 args contains a 'fruit' key with value 'apple'.
+
+If you want to do something more complicated than just return a fixed value
+then specify a B<reference> to a code-ref for the output thus:
+
+    {
+        method => 'next_value',
+        input  => 94,
+        output => \sub { ... }
+    }
+
+Note that it must be a reference to a code-ref, to distinguish from the case where
+you really do want to return a code-ref. The code-ref supplied will be executed and
+whatever it returns will be returned. If you want to return a reference to a code-ref
+then you can perpetrate a mess like this:
+
+    output => sub { \sub { ... } }
 
 =head2 add_fixtures
 
@@ -413,7 +429,15 @@ sub AUTOLOAD {
         );
         return;
     }
-    return $next_test->{output};
+    my $output = $next_test->{output};
+    if(
+           ref($output)    eq 'REF'  # ref to a ref
+        && ref(${$output}) eq 'CODE' # ... which is a ref to a sub
+    ) {
+        return ${$output}->()
+    } else {
+        return $output
+    }
 }
 
 sub DESTROY {

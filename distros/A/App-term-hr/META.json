@@ -1,0 +1,60 @@
+{
+   "abstract" : "define a thematic change in the content of a terminal session",
+   "author" : [
+      "Magnus Woldrich <m@japh.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-term-hr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ExtendedColor" : "0.500",
+            "perl" : "5.004"
+         }
+      }
+   },
+   "provides" : {
+      "App::term::hr" : {
+         "file" : "bin/hr"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "m@japh.se",
+         "web" : "https://github.com/trapd00r/hr/issues"
+      },
+      "homepage" : "http://japh.se",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/hr.git",
+         "web" : "https://github.com/trapd00r/hr"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

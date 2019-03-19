@@ -2,15 +2,17 @@ package lib::relative;
 
 use strict;
 use warnings;
+use Cwd ();
 use File::Basename ();
 use File::Spec ();
 use lib ();
 
-our $VERSION = '0.002';
+our $VERSION = '1.000';
 
 sub import {
   my ($class, @paths) = @_;
-  my $dir = File::Spec->rel2abs(File::Basename::dirname((caller)[1]));
+  my $file = (caller)[1];
+  my $dir = -e $file ? File::Basename::dirname(Cwd::abs_path $file) : Cwd::getcwd;
   lib->import(map { File::Spec->file_name_is_absolute($_) ? $_ : File::Spec->catdir($dir, $_) } @paths);
 }
 
@@ -33,9 +35,10 @@ lib::relative - Add paths relative to the current file to @INC
   use lib::relative 'foo/baz', '/path/to/lib';
   
   # Equivalent code using core modules
+  use Cwd ();
   use File::Basename ();
   use File::Spec ();
-  use lib File::Spec->catdir(File::Spec->rel2abs(File::Basename::dirname(__FILE__)), 'path/to/lib');
+  use lib File::Spec->catdir(File::Basename::dirname(Cwd::abs_path __FILE__), 'path/to/lib');
 
 =head1 DESCRIPTION
 

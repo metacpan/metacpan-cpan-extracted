@@ -1,7 +1,7 @@
 package Term::Caca::FFI;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: ffi bindings to libcaca 
-$Term::Caca::FFI::VERSION = '3.0.0';
+$Term::Caca::FFI::VERSION = '3.0.1';
 
 use 5.20.0;
 
@@ -131,7 +131,7 @@ Term::Caca::FFI - ffi bindings to libcaca
 
 =head1 VERSION
 
-version 3.0.0
+version 3.0.1
 
 =head1 DESCRIPTION 
 
@@ -154,7 +154,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018, 2013, 2011 by John Beppu.
+This software is Copyright (c) 2019, 2018, 2013, 2011 by John Beppu.
 
 This is free software, licensed under:
 

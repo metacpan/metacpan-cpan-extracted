@@ -120,11 +120,6 @@ $pp = Text::Amuse::Preprocessor->new(input => \$in,
                                      fix_nbsp => 1,
                                      show_nbsp => 1,
                                      fix_typography => 1);
-{
-    my @parsed = Text::Amuse::Preprocessor::Parser::parse_text($in);
-    diag Dumper(\@parsed);
-}
-
 $pp->process;
 eq_or_diff ([ split /\n/, $out2],
            [ split /\n/, $exp2]);

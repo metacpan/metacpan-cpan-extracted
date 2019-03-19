@@ -30,7 +30,7 @@ WriteMakefile1(
     'threads'        => 0,
     'threads::shared'=> 0,
     'Thread::Queue'  => 0,
-    'JSON'           => 2.93,
+    'JSON'           => 2.90,
     'Encode'         => 2.21,
     #'Bio::Kmer'      => 0.19,
   },
