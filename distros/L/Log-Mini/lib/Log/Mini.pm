@@ -3,19 +3,23 @@ package Log::Mini;
 use strict;
 use warnings;
 
-our $VERSION = "0.1.0";
+our $VERSION = "0.1.1";
 
 use Log::Mini::LoggerFILE;
 use Log::Mini::LoggerSTDERR;
 
+use Data::Dumper;
+use feature qw/say/;
+
+
 sub new {
-    my $class = shift;
+    shift;
     my ( $type, @args ) = @_;
 
     $type = 'stderr' unless defined $type;
 
     if ( $type eq 'file' ) {
-        return Log::Mini::LoggerFILE->new(@args);
+        return Log::Mini::LoggerFILE->new(@_);
     }
     else {
         return Log::Mini::LoggerSTDERR->new(@args);

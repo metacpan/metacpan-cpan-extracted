@@ -1,5 +1,5 @@
 package App::CPANtoRPM;
-# Copyright (c) 2012-2016 Sullivan Beck. All rights reserved.
+# Copyright (c) 2012-2019 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -11,7 +11,7 @@ use POSIX;
 use IO::File;
 
 our($VERSION);
-$VERSION = "1.08";
+$VERSION = "1.09";
 
 $| = 1;
 
@@ -233,11 +233,13 @@ sub _args {
 #   bin_dir    => /usr/bin               The directories we're installing too
 #   lib_dir    => /usr/lib/perl5/5.14.2
 #   arch_dir   => /usr/lib/perl5/5.14.2/x86_64-linux-thread-multi
-#   man_dir    => /usr/share/man
+#   man1_dir   => /usr/share/man/man1
+#   man3_dir   => /usr/share/man/man3
 #   config_cmd => perl Makefile.PL       The commands used for each step
 #   build_cmd  => make
 #   test_cmd   => make test
 #   install_cmd=> make install
+#   build_tiny => 0/1                    1 if it uses Module::Build::Tiny
 #
 #   # From the SPEC creation step
 #   # -------------------------
@@ -444,7 +446,9 @@ sub _parse_args {
    my @a     = @ARGV;
 
    # We have to get the package first or else --optfile will not work.
-   $$self{'package'} = pop(@a);
+   if ($a[$#a] !~ /^-/) {
+      $$self{'package'} = pop(@a);
+   }
 
    while ($_ = shift(@a)) {
 
@@ -454,7 +458,7 @@ sub _parse_args {
                                                          $_ eq '--version');
       $TMPDIR = shift(@a),                     next  if ($_ eq '-t'  ||
                                                          $_ eq '--tmpdir');
-      $$self{'debug'} = 1,                     next  if ($_ eq '-d'  ||
+      $$self{'debug'} = 1,                     next  if ($_ eq '-D'  ||
                                                          $_ eq '--debug');
       unshift(@a,$self->_opt_file(shift(@a))), next  if ($_ eq '-f'  ||
                                                          $_ eq '--optfile');
@@ -534,19 +538,11 @@ sub _parse_args {
          next;
       }
 
-      die "ERROR: unknown arguments: $_ @a\n"  if (@a);
-   }
-
-   if (! -d $TMPDIR) {
-      warn "WARN: temporary directory ($TMPDIR) does not exist; creating...\n";
-      system("mkdir -p '$TMPDIR'");
-      if (! -d $TMPDIR) {
-         die "ERROR: temporary directory not created\n";
-      }
+      $self->_log_message('ERR',"Unknown arguments: $_ @a")  if (@a);
    }
 
    if (! $$self{'package'}) {
-      die "ERROR: no package given.\n";
+      $self->_log_message('ERR','No package given.');
    }
 
    if ($$self{'build_type'}  &&
@@ -560,7 +556,8 @@ sub _parse_args {
        $$self{'inst_type'} ne 'perl'  &&
        $$self{'inst_type'} ne 'site'  &&
        $$self{'inst_type'} ne 'vendor') {
-      $self->_log_message('ERR',"Invalid --install-type option: $$self{inst_type}");
+      $self->_log_message('ERR',
+                          "Invalid --install-type option: $$self{inst_type}");
    }
 
    # To determine whether man pages go in PREFIX/man or PREFIX/share/man,
@@ -599,6 +596,12 @@ sub _parse_args {
    foreach my $var (keys %{ $$self{'env'} }) {
       my $val = $$self{'env'}{$var};
       $ENV{$var} = $val;
+   }
+
+   if ($$self{'rpmbuild'}  &&  $$self{'rpmbuild'} !~ m,^/,) {
+         $self->_log_message
+           ('ERR',
+            "The --rpmbuild option requires a fully specified path.");
    }
 }
 
@@ -818,7 +821,7 @@ sub _multiple_methods {
          if ($type eq 'system-null') {
             $cmd = '(' . join(' ',$command,@args) . ") > /dev/null";
          } else {
-            $cmd = '(' . join(' ',$command,@args) . ") > $TMPDIR/cmd.out";
+            $cmd = '(' . join(' ',$command,@args) . ") > '$TMPDIR/cmd.out'";
          }
          $cmd =~ s/\{$bin\}/$exe/g;
 
@@ -875,7 +878,7 @@ sub _opt_file {
    my($self,$file) = @_;
 
    if (! -r $file) {
-      die "ERROR: Options file not readable: $file\n";
+      $self->_log_message('ERR',"Options file not readable: $file");
    }
 
    my $succ;
@@ -924,7 +927,7 @@ sub _opt_file {
         );
 
    } else {
-      die "ERROR: Options file must be YAML or JSON: $file\n";
+      $self->_log_message('ERR',"Options file must be YAML or JSON: $file");
    }
 
    if (! $succ) {
@@ -1245,7 +1248,9 @@ EOF
    $out->close();
    chmod 0755,$file;
 
-   my @out = `$file`;
+   open(IN,"'$file' |");
+   my @out = <IN>;
+   close(IN);
    unlink $file;
    if ( grep /Failed/,@out ) {
       return 1;
@@ -1340,6 +1345,22 @@ sub _build_rpm {
    my($self) = @_;
    $self->_log_message('HEAD',"Creating RPM: $package{name}");
 
+   #
+   # Move the source into the SOURCES directory (as a .tar.gz file)
+   #
+
+   my $arch = "$package{topdir}/SOURCES/$package{dir}.tar.gz";
+   my $succ = $self->_multiple_methods
+     ( [ sub { -f $arch } ],
+       ['system','tar',"cd $TMPDIR; {tar} czf $arch $package{dir}"],
+       ['module','Archive::Tar', [],
+        "my \$tar = new Archive::Tar; \$tar->setcwd($TMPDIR); \$tar->add_files($package{dir}; \$tar->write($arch,COMPRESS_GZIP;"],
+     );
+
+   #
+   # Figure out how to build RPMs
+   #
+
    my $rpmbuild = $self->_find_exe("rpmbuild");
    if (! $rpmbuild) {
 
@@ -1364,9 +1385,7 @@ sub _build_rpm {
    }
 
    my @cmd = ($rpmbuild,"-ba",
-              "--define","_builddir $TMPDIR",
-              "--define","_sourcedir $TMPDIR",
-              ($$self{'no_clean'}  ? ()
+              ($$self{'no_clean'}  ? ("--noclean")
                                    : ("--clean")),
               ($$self{'no_deps'}   ? ("--nodeps")
                                    : ()),
@@ -1376,6 +1395,10 @@ sub _build_rpm {
 
    my $cmd = join(' ',@cmd);
    $self->_log_message('INFO',"Attempting system command: $cmd");
+
+   #
+   # Build the RPM
+   #
 
    if (system(@cmd) != 0) {
       $self->_log_message('ERR',"Unable to execute $rpmbuild: $!");
@@ -1664,7 +1687,7 @@ sub _check_rpm_build {
    if (-f $macros) {
       my $in = new IO::File;
       $in->open($macros)  ||
-        $self->_log_message('ERR',"Unabble to open .rpmmacros file: $!");
+        $self->_log_message('ERR',"Unable to open .rpmmacros file: $!");
       my @in = <$in>;
       $in->close();
 
@@ -1695,15 +1718,20 @@ sub _check_rpm_build {
    #
 
    if ($$self{'rpmbuild'}  &&  ! $macroval) {
-      $$self->_add_macro($macros,'%_topdir',$$self{'rpmbuild'});
+      $self->_add_macro($macros,'%_topdir',$$self{'rpmbuild'});
    }
 
    #
    # Now make sure that the RPM build tree exists, and is writable.
    #
 
-   my $topdir = `rpm --eval '%_topdir'`;
-   chomp($topdir);
+   my $topdir;
+   if ($$self{'rpmbuild'}) {
+      $topdir = $$self{'rpmbuild'};
+   } else {
+      $topdir = `rpm --eval '%_topdir'`;
+      chomp($topdir);
+   }
    my $arch   = `rpm --eval '%_arch'`;
    chomp($arch);
 
@@ -1713,8 +1741,10 @@ sub _check_rpm_build {
    $self->_log_message('INFO',"RPM build dir:  $topdir");
    $self->_log_message('INFO',"RPM build arch: $arch");
 
-   $self->_log_message('INFO',"Creating directory: $topdir");
-   $self->_make_dir($topdir)  if (! -d $topdir);
+   if (! -d $topdir) {
+      $self->_log_message('INFO',"Creating directory: $topdir");
+      $self->_make_dir($topdir);
+   }
    if (! -w $topdir) {
       $self->_log_message('ERR',
                           "Unable to write to directory: $topdir",
@@ -1926,14 +1956,7 @@ sub _get_meta {
    # Now clean up the directory.
    #
 
-   my $cmd;
-   if ($package{'build_type'} eq 'build') {
-      $cmd = './Build distclean';
-   } else {
-      $cmd = 'make distclean';
-   }
-
-   system($cmd);
+   system("cd $package{DIR}; $package{clean_cmd}");
 }
 
 # Get a list of all of the files in the package.  We'll ignore directories.
@@ -3018,7 +3041,7 @@ sub __requires {
 # With Build.PL, it is especially complicated because we want to be able
 # to override the install directories, but to do so, we want to use 'installdirs'
 # from the Build.PL script.  In order to not parse the file, we'll actually
-# do a 'perl Build.PL' without directory arguements.  This will create a
+# do a 'perl Build.PL' without directory arguments.  This will create a
 # _build/build_params file which contains the information.
 
 sub _build {
@@ -3042,12 +3065,12 @@ sub _build {
 
    $self->_log_message('INFO',"Generating commands to build the module");
 
-   my($config_cmd,$build_cmd,$test_cmd,$install_cmd) =
-     $self->_commands($type,$$self{'inst_type'},'',0);
+   $self->_commands('',0);
 
-   my $status = $self->_run_command("$TMPDIR/config",@$config_cmd);
+   my $status = $self->_run_command("$TMPDIR/config",
+                                    @{ $package{'config_cmd_l'} });
    if ($status eq 'WAITING') {
-      my @err = `cat $TMPDIR/config.out`;
+      my @err = `cat "$TMPDIR/config.out"`;
       chomp(@err);
       $self->_log_message('ERR',
                           'Config command failed waiting on input.',
@@ -3055,7 +3078,7 @@ sub _build {
                           '#'x70,
                           @err);
    } elsif ($status eq 'ERROR') {
-      my @err = `cat $TMPDIR/config.err`;
+      my @err = `cat "$TMPDIR/config.err"`;
       chomp(@err);
       $self->_log_message('ERR',
                           'Config command failed with an exit code.',
@@ -3064,9 +3087,10 @@ sub _build {
                           @err);
    }
 
-   $status = $self->_run_command("$TMPDIR/config",@$build_cmd);
+   $status = $self->_run_command("$TMPDIR/config",
+                                 @{ $package{'build_cmd_l'} });
    if ($status eq 'WAITING') {
-      my @err = `cat $TMPDIR/config.out`;
+      my @err = `cat "$TMPDIR/config.out"`;
       chomp(@err);
       $self->_log_message('ERR',
                           'Build command failed waiting on input.',
@@ -3074,7 +3098,7 @@ sub _build {
                           '#'x70,
                           @err);
    } elsif ($status eq 'ERROR') {
-      my @err = `cat $TMPDIR/config.err`;
+      my @err = `cat "$TMPDIR/config.err"`;
       chomp(@err);
       $self->_log_message('ERR',
                           'Build command failed with an exit code.',
@@ -3094,21 +3118,56 @@ sub _build {
    # alternate directory, but it doesn't hurt even if we're not.
    #
 
+   $package{'build_tiny'} = 0;
    if (! $$self{'inst_type'}) {
       if ($type eq 'build') {
-         # _build/build_params contains:
-         #    'installdirs' => 'core',
 
-         my @tmp = `cat _build/build_params | grep "'installdirs' =>"`;
-         chomp(@tmp);
-         if (@tmp != 1) {
+         if (-f "_build_params") {
+            # Module::Build::Tiny
+            #    _build_params includes: "installdirs=core"
+
+            $self->_log_message('INFO','Using Module::Build::Tiny');
+            $package{'build_tiny'} = 1;
+            my @tmp = `cat _build_params | grep "installdirs"`;
+            chomp(@tmp);
+            if (@tmp) {
+               if (@tmp != 1) {
+                  $self->_log_message
+                    ('ERR',
+                     'perl Build.PL did not produce a _build_params',
+                     'file of the expected format.');
+               }
+               $tmp[0] =~ /"installdirs=(.*?)"/;
+               $$self{'inst_type'} = $1;
+            } else {
+               $$self{'inst_type'} = 'site';
+            }
+
+         } elsif (-f "_build/build_params") {
+
+            # Module::Build
+            #    _build/build_params contains:
+            #       'installdirs' => 'core',
+
+            $self->_log_message('INFO','Using Module::Build');
+            my @tmp = `cat _build/build_params | grep "'installdirs' =>"`;
+            chomp(@tmp);
+            if (@tmp != 1) {
+               $self->_log_message
+                 ('ERR',
+                  'perl Build.PL did not produce a _build/build_params',
+                  'file of the expected format.');
+            }
+            $tmp[0] =~ /=> '(.*?)'/;
+            $$self{'inst_type'} = $1;
+
+         } else {
             $self->_log_message
               ('ERR',
-               'perl Build.PL did not produce a _build/build_params',
-               'file of the expected format.');
+               'perl Build.PL did not produce a build_params file',
+               'using any known Build.PL method');
          }
-         $tmp[0] =~ /=> '(.*?)'/;
-         $$self{'inst_type'} = $1;
+
          $$self{'inst_type'} = 'perl'  if ($$self{'inst_type'} eq 'core');
 
       } else {
@@ -3134,8 +3193,7 @@ sub _build {
    $self->_log_message('INFO',
                        "Generating commands to build the module to that location");
 
-   ($config_cmd,$build_cmd,$test_cmd,$install_cmd) =
-     $self->_commands($type,$$self{'inst_type'},$$self{'inst_base'},1);
+   $self->_commands($$self{'inst_base'},1);
 
    #
    # Now, update the file list based on the files that will actually
@@ -3155,9 +3213,12 @@ sub _build {
 # running to make sure it can build.
 #
 sub _commands {
-   my($self,$type,$insttype,$dir,$for_spec) = @_;
+   my($self,$dir,$for_spec) = @_;
 
-   my(@config_cmd,@build_cmd,@test_cmd,@install_cmd);
+   my $type = $package{'build_type'};
+   my $insttype = $$self{'inst_type'};
+
+   my(@config_cmd,@build_cmd,@test_cmd,@install_cmd,@clean_cmd);
 
    #
    # Configure the module.
@@ -3169,10 +3230,17 @@ sub _commands {
       } else {
          @config_cmd  = ('perl',$package{build});
       }
-      @build_cmd   = (qw(./Build));
-      @test_cmd    = (qw(./Build test));
-      @install_cmd = (qw(./Build pure_install destdir=<_buildroot>
-                         create_packlist=0));
+      @build_cmd      = (qw(./Build));
+      @test_cmd       = (qw(./Build test));
+      if ($package{'build_tiny'}) {
+         @install_cmd = (qw(./Build install --destdir=<_buildroot>
+                            --create_packlist=0));
+         @clean_cmd   = (qw(./Build realclean));
+      } else {
+         @install_cmd = (qw(./Build pure_install destdir=<_buildroot>
+                            create_packlist=0));
+         @clean_cmd   = (qw(./Build distclean));
+      }
    } else {
       if ($for_spec) {
          @config_cmd  = (qw(%{__perl} <make> OPTIMIZE="<_optimize>"));
@@ -3181,13 +3249,17 @@ sub _commands {
          @config_cmd  = ('perl',$package{make});
          @build_cmd   = ('make');
       }
-      @test_cmd    = (qw(make test));
-      @install_cmd = (qw(make pure_install PERL_INSTALL_ROOT=<_buildroot>));
+      @test_cmd       = (qw(make test));
+      @install_cmd    = (qw(make pure_install PERL_INSTALL_ROOT=<_buildroot>));
+      @clean_cmd      = (qw(make distclean));
    }
 
    # Handle directory arguments
    #
    # We have to record which directories things can get installed into.
+
+   my $t = $insttype;
+   my $T = uc($t);
 
    DIR_ARGS:
    {
@@ -3207,18 +3279,6 @@ sub _commands {
 
       if (! $dir  &&  $insttype) {
 
-         if ($type eq 'build') {
-            if ($insttype eq 'perl') {
-               push(@config_cmd,"installdirs=core");
-            } else {
-               push(@config_cmd,"installdirs=$insttype");
-            }
-         } else {
-            push(@config_cmd,"INSTALLDIRS=$insttype");
-         }
-
-         $package{'bin_dir'}  = '%{_bindir}';
-         $package{'man_dir'}  = '%{_mandir}';
          if      ($insttype eq 'perl') {
             $package{'lib_dir'}  = '%{perl_privlib}';
             $package{'arch_dir'} = '%{perl_archlib}';
@@ -3229,6 +3289,48 @@ sub _commands {
             $package{'lib_dir'}  = '%{perl_vendorlib}';
             $package{'arch_dir'} = '%{perl_vendorarch}';
          }
+         $package{'bin_dir'}  = '%{_bindir}';
+         $package{'man1_dir'} = '%{_mandir}/man1';
+         $package{'man3_dir'} = '%{_mandir}/man3';
+
+         if ($type eq 'build') {
+
+            if ($t eq 'perl') {
+               push(@config_cmd,
+                    "--installdirs core");
+            } else {
+               push(@config_cmd,
+                    "--installdirs $t");
+            }
+
+            push(@config_cmd,
+                 "--install_path script=%{_bindir}",
+                 "--install_path bin=%{_bindir}",
+                 "--install_path libdoc=%{_mandir}/man3",
+                 "--install_path bindoc=%{_mandir}/man1",
+                );
+
+         } else {
+
+            if ($t eq 'perl') {
+               push(@config_cmd,
+                    "INSTALLDIRS=perl",
+                    "INSTALLBIN=%{_bindir}",
+                    "INSTALLSCRIPT=%{_bindir}",
+                    "INSTALLMAN1DIR=%{_mandir}/man1",
+                    "INSTALLMAN3DIR=%{_mandir}/man3",
+                   );
+            } else {
+               push(@config_cmd,
+                    "INSTALLDIRS=$t",
+                    "INSTALL${T}BIN=%{_bindir}",
+                    "INSTALL${T}SCRIPT=%{_bindir}",
+                    "INSTALL${T}MAN1DIR=%{_mandir}/man1",
+                    "INSTALL${T}MAN3DIR=%{_mandir}/man3",
+                    "INSTALLSCRIPT=%{_bindir}",       # necessary due to a bug
+                   );
+            }
+         }
 
          last DIR_ARGS;
       }
@@ -3238,8 +3340,6 @@ sub _commands {
 
       if ($dir) {
          my $d = $dir;
-         my $t = $insttype;
-         my $T = uc($t);
 
          if ($type eq 'build') {
             if ($t eq 'perl') {
@@ -3293,7 +3393,8 @@ sub _commands {
          }
 
          $package{'bin_dir'}  = "$d/bin";
-         $package{'man_dir'}  = "$d/$MAN";
+         $package{'man1_dir'} = "$d/$MAN/man1";
+         $package{'man3_dir'} = "$d/$MAN/man3";
          if      ($insttype eq 'perl') {
             $package{'lib_dir'}  = "$d/lib/perl5/$VERS";
          } else {
@@ -3314,8 +3415,13 @@ sub _commands {
    $package{'build_cmd'}   = join(' ',@build_cmd);
    $package{'test_cmd'}    = join(' ',@test_cmd);
    $package{'install_cmd'} = join(' ',@install_cmd);
+   $package{'clean_cmd'}   = join(' ',@clean_cmd);
 
-   return (\@config_cmd,\@build_cmd,\@test_cmd,\@install_cmd);
+   $package{'config_cmd_l'}  = [@config_cmd];
+   $package{'build_cmd_l'}   = [@build_cmd];
+   $package{'test_cmd_l'}    = [@test_cmd];
+   $package{'install_cmd_l'} = [@install_cmd];
+   $package{'clean_cmd_l'}   = [@clean_cmd];
 }
 
 # Some Makefile.PL and Build.PL scripts are interactive!  That really sucks.
@@ -3833,7 +3939,7 @@ sub _get_package_url {
        ['module','HTTP::Lite',[],
         qq{ my \$x = HTTP::Lite->new();
            \$x->request('$package');
-           open OUT,"> $TMPDIR/$package{archive}";
+           open OUT,"> '$TMPDIR/$package{archive}'";
            print OUT \$x->body();
            close OUT; }
        ],
@@ -4061,7 +4167,7 @@ sub _extract_archive {
               \$zip->extractTree(); }
           ],
           ['system','unzip',
-           "cd $TMPDIR; {unzip} -qq $package{archive}" ]
+           "cd '$TMPDIR'; {unzip} -qq $package{archive}" ]
         );
 
    } else {
@@ -4083,7 +4189,7 @@ sub _extract_archive {
               Archive::Tar->extract_archive('$TMPDIR/$package{archive}',$comp); }
           ],
           ['system','tar',
-           "cd $TMPDIR; {tar} xf$opt $package{archive}" ]
+           "cd '$TMPDIR'; {tar} xf$opt $package{archive}" ]
         );
    }
 
@@ -4108,10 +4214,11 @@ sub _init {
    my($self) = @_;
 
    #
-   # Make sure that the scratch directory exists and is empty.
+   # Make sure that the scratch directory exists, is new, and is empty.
    #
 
    $self->_log_message('HEAD',"Initializing cpantorpm ($VERSION)");
+   $self->_log_message('INFO',"Creating modules for: $VERS [ $ARCH ]...");
 
    $self->_log_message('INFO',"Checking cpantorpm dir: $TMPDIR");
    $self->_log_indent(+1);
@@ -4227,9 +4334,8 @@ Summary:        <summary>
 License:        <license>
 Group:          <group>
 URL:            <url>
-BuildRoot:      <DIR>-inst
 BuildArch:      <arch>
-Source0:        <skip:source>
+Source0:        <name>-%{version}.tar.gz
 
 #
 # Unfortunately, the automatic provides and requires do NOT always work (it
@@ -4257,7 +4363,8 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $versi
 
 %prep
 
-%setup -T -D -n <name>-<version>
+rm -rf %{_builddir}/<name>-%{version}
+%setup -D -n <name>-<version>
 chmod -R u+w %{_builddir}/<name>-%{version}
 
 if [ -f pm_to_blib ]; then rm -f pm_to_blib; fi
@@ -4306,10 +4413,10 @@ rm -rf <_buildroot>
 <arch_dir>/*
 <endif:arch_inst>
 <if:man1_inst>
-<man_dir>/man1/*
+<man1_dir>/*
 <endif:man1_inst>
 <if:man3_inst>
-<man_dir>/man3/*
+<man3_dir>/*
 <endif:man3_inst>
 
 %changelog

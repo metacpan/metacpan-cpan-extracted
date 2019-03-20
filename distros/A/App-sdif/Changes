@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.6 2019-03-20T08:20:46Z
+
+    - Fix bug of 'sdif --cdif' does not work.
+
 4.10.5 2019-03-01T03:58:30Z
 
     - Improve --view behaviour.

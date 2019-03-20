@@ -14,6 +14,8 @@ lib/Function/Interface/Info/Function/Param.pm
 lib/Function/Interface/Info/Function/ReturnParam.pm
 lib/Function/Interface/Types.pm
 minil.toml
+t/01_function_interface/assert_valid_interface_params.t
+t/01_function_interface/assert_valid_interface_return.t
 t/01_function_interface/import.t
 t/01_function_interface/import_options.t
 t/01_function_interface/info.t
@@ -22,10 +24,12 @@ t/02_function_interface_info/function.t
 t/02_function_interface_info/function/param.t
 t/02_function_interface_info/function/return_param.t
 t/02_function_interface_info/info.t
+t/03_function_interface_impl/assert_valid.t
 t/03_function_interface_impl/check_params.t
 t/03_function_interface_impl/check_return.t
 t/03_function_interface_impl/error.t
 t/03_function_interface_impl/impl_of.t
+t/03_function_interface_impl/import.t
 t/03_function_interface_impl/info_interface.t
 t/03_function_interface_impl/info_params.t
 t/03_function_interface_impl/info_return.t
@@ -35,6 +39,11 @@ t/lib/Bar.pm
 t/lib/Foo.pm
 t/lib/FooBar.pm
 t/lib/FooClone.pm
+t/lib/FooInvalidParams.pm
+t/lib/FooInvalidReturn.pm
+t/lib/FooNoFoo.pm
+t/lib/FooNoParamsInfo.pm
+t/lib/FooNoReturnInfo.pm
 t/lib/FooNotImpl.pm
 t/lib/FooObject.pm
 t/lib/IBar.pm

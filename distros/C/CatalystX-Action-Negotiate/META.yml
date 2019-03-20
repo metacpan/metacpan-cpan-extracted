@@ -29,7 +29,7 @@ requires:
   Role::MimeInfo: '0.02'
   perl: 5.10.0
 resources:
-  bugtracker: https://github.com/doirantaylor/p5-catalystx-action-negotiate/issues
+  bugtracker: https://github.com/doriantaylor/p5-catalystx-action-negotiate/issues
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-catalystx-action-negotiate.git
-version: '0.02'
+version: '0.04'

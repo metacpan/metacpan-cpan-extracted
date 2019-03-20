@@ -16,7 +16,7 @@ name: OPC
 provides:
   OPC:
     file: lib/OPC.pm
-    version: '0.04'
+    version: '0.05'
   OPC::Node:
     file: lib/OPC/Node.pm
   OPC::Part:
@@ -29,4 +29,4 @@ requires:
   perl: '5.014'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
-version: '0.04'
+version: '0.05'

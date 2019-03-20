@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,11 +27,13 @@ no_index:
 provides:
   Net::APNs::Extended:
     file: lib/Net/APNs/Extended.pm
-    version: '0.12'
+    version: '0.14'
   Net::APNs::Extended::Base:
     file: lib/Net/APNs/Extended/Base.pm
+    version: '0.14'
   Net::APNs::Extended::Feedback:
     file: lib/Net/APNs/Extended/Feedback.pm
+    version: '0.14'
 requires:
   Class::Accessor::Lite: '0'
   JSON::XS: '0'
@@ -42,9 +44,11 @@ resources:
   bugtracker: https://github.com/xaicron/p5-Net-APNs-Extended/issues
   homepage: https://github.com/xaicron/p5-Net-APNs-Extended
   repository: git://github.com/xaicron/p5-Net-APNs-Extended.git
-version: '0.12'
+version: '0.14'
 x_contributors:
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Colin Kuskie <colink@perldreamer.com>'
-  - 'xaicron <xaicron@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Yuji Shimada <xaicron@gmail.com>'
+  - 'omohayui <omohayui@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+x_static_install: 1

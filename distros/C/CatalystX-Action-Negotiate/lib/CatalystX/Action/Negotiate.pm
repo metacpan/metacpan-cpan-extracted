@@ -18,11 +18,11 @@ CatalystX::Action::Negotiate - ActionRole for content negotiation
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -134,9 +134,17 @@ Otherwise, consult L<HTTP::Negotiate> for how to construct the
 records. This modification enables you to mix static variants in with
 dynamic ones, or overwrite the list with purely dynamic variants.
 
+=head CAVEATS
+
+Note that this module may conflict with L<Catalyst::Plugin::Static::Simple>.
+In future releases I will attempt to bring this module up to par so
+that it can be a viable replacement, or at the very least be a better
+cohabitant.
+
 =cut
 
 before execute => sub {
+
     my $self = shift;
     my ($ctl, $c) = @_;
 
@@ -197,11 +205,27 @@ before execute => sub {
     my $fpath = $root->file(@ps);
 
     my @indices = grep { $_ and my $x = $_->stat; $x and -f $x }
-        map { Path::Class::File->new($_) } glob(quotemeta($dpath) . ".*");
+        map { Path::Class::File->new($_) } glob(quotemeta($dpath) . "{,.*}");
 
     my @files = grep { $_ and my $x = $_->stat; $x and -f $x }
         ($fpath, map { Path::Class::File->new($_) }
-             glob(quotemeta($fpath) . ".*")) if @ps > 0;
+             glob(quotemeta($fpath) . "{,.*}")) if @ps > 0;
+
+    # XXX we needed to switch the order of operations around a bit,
+    # otherwise this stashed stuff will never get assigned
+
+    # gin up some maps so we can figure out where the chosen variant
+    # came from
+    my %i = map { $_->stringify => $_ } @indices;
+    my %f = map { $_->stringify => $_ } @files;
+
+    # stash goodies
+    my $pkg         = __PACKAGE__;
+    $pkg            = $c->stash->{$pkg} ||= {};
+    $pkg->{ps}      = \@ps;
+    $pkg->{slash}   = $slash;
+    $pkg->{files}   = \%f;
+    $pkg->{indices} = \%i;
 
     # if these arrays are both empty then this is a 404
     unless (@indices + @files > 0) {
@@ -209,11 +233,6 @@ before execute => sub {
         $resp->body("Not found (not for a lack of looking).");
         return;
     }
-
-    # gin up some maps so we can figure out where the chosen variant
-    # came from
-    my %i = map { $_->stringify => $_ } @indices;
-    my %f = map { $_->stringify => $_ } @files;
 
     # now construct variant list
     my @variants;
@@ -258,14 +277,6 @@ before execute => sub {
                          undef, undef, undef, $st->size, $st->mtime ];
     }
 
-    # stash goodies
-    my $pkg         = __PACKAGE__;
-    $pkg            = $c->stash->{$pkg} ||= {};
-    $pkg->{ps}      = \@ps;
-    $pkg->{slash}   = $slash;
-    $pkg->{files}   = \%f;
-    $pkg->{indices} = \%i;
-
     # assign variants to stash
 
     $c->stash->{variants} = \@variants;
@@ -295,13 +306,18 @@ after execute => sub {
               [$k, @{$_}[1..$#{$_}]] } @{$c->stash->{variants} || []};
     };
 
-    # okay now we
+    # now we check again
+    unless (@variants > 0) {
+        $resp->status(404);
+        $resp->body('Not found (no variant)');
+        return;
+    }
 
     # add */* because for some reason the content negotiator won't
     # select if not in there (hi chrome)
     my $hdr = $req->headers;
-    my $acc = $hdr->header('Accept');
-    # $c->log->debug('Accept: ' . $acc);
+    my $acc = $hdr->header('Accept') || '';
+    $c->log->debug('Testing variants against Accept: ' . $acc);
     $hdr->push_header(Accept => '*/*;q=0.5') unless $acc and $acc =~ m!\*/\*!;
     # perform the negotiation
 
@@ -372,16 +388,19 @@ after execute => sub {
 
     $rhdr->header('Content-Encoding' => $encoding) if $encoding;
     $rhdr->header('Content-Language' => $lang)     if $lang;
-    $rhdr->content_length($size) if defined $size;
 
     if ($mtime) {
         $rhdr->last_modified($mtime);
         my $ims = $req->headers->if_modified_since;
         if ($ims and $mtime and $ims >= $mtime) {
+            $c->log->debug($req->uri . ' not modified');
             $resp->status(304);
             return;
         }
     }
+
+    # set this *after* we test for 304
+    $rhdr->content_length($size) if defined $size;
 
     # assume something downstream knows what to do with this
     $resp->status(200);

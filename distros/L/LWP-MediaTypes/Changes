@@ -1,25 +1,24 @@
-_______________________________________________________________________________
-2012-02-16 LWP-MediaTypes 6.02
+Change history for LWP-MediaTypes
 
-Update the media.types database
+6.04      2019-03-20 13:01:15Z
+    - Full release of changes in 6.03
 
-Restore perl-5.6 compatiblity.
+6.03      2019-03-19 16:44:17Z (TRIAL RELEASE)
+    - Convert release process to Dist::Zilla
+    - Allow File::Temp handles to be guessed correctly (GH#1) (Wesley
+      Schwengle)
 
+6.02      2012-02-16
+    - Update the media.types database
+    - Restore perl-5.6 compatiblity.
 
+6.01      2011-02-27
+    - Use mockup object to avoid test dependency on URI::URL and HTTP::Request.
+    - Drop MacOS (classic) support
 
-_______________________________________________________________________________
-2011-02-27 LWP-MediaTypes 6.01
-
-Use mockup object to avoid test dependency on URI::URL and HTTP::Request.
-
-Drop MacOS (classic) support
-
-
-
-_______________________________________________________________________________
-2011-02-25 LWP-MediaTypes 6.00
-
-Initial release of LWP-MediaTypes as a separate distribution. There are no code
-changes besides incrementing the version number since libwww-perl-5.837.
-
-The LWP::MediaTypes module used to be bundled with the libwww-perl distribution.
+6.00      2011-02-25
+    - Initial release of LWP-MediaTypes as a separate distribution. There are
+      no code changes besides incrementing the version number since
+      libwww-perl-5.837.
+    - The LWP::MediaTypes module used to be bundled with the libwww-perl
+      distribution.

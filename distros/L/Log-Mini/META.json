@@ -59,7 +59,7 @@
    "provides" : {
       "Log::Mini" : {
          "file" : "lib/Log/Mini.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       },
       "Log::Mini::LoggerBase" : {
          "file" : "lib/Log/Mini/LoggerBase.pm"
@@ -82,7 +82,7 @@
          "web" : "https://github.com/alpha6/Log-Mini"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_serialization_backend" : "JSON::PP version 2.93",
    "x_static_install" : 1
 }

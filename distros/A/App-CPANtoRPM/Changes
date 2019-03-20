@@ -2,7 +2,16 @@ Written by:
    Sullivan Beck (sbeck@cpan.org)
 Any suggestions, bug reports, or donations :-) should be sent to me.
 
-1.08
+1.09  2019-03-20
+  - Fixed bug where -h wasn't working.
+  - Now supports Module::Build::Tiny modules.  Iyad Kandalaft and F. Li
+  - The -D option for --debug was incorrectly specifed as -d.
+  - All of the rpmbuild files go in the --rpmbuild directory instead of
+    partially in the --tmpdir directory.
+  - Fixed a number of issues that prevented it working in a perlbrew
+    environment (or other heavily customized environments).  F. Li
+
+1.08  2018-04-25
   - Added %changelog section to SPEC file.  Ji-Hyeon Gim
   - Fixed date format to match the standard.  Ji-Hyeon Gim
   - Fixed a problem where emails of the form 'Name <Email>'

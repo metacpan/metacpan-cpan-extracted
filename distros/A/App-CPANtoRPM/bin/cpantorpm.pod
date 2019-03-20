@@ -234,6 +234,9 @@ file.  If it is not there, this option must be included.
 RPMs are built in the RPM build hierarchy.  This defaults to the value
 of the '%_topdir' macro, or it can be specified using this option.
 
+If this option is used, the path must be fully specified.  A relative path
+will not work.
+
 The directory will have the following subdirectories:
 
    BUILD
@@ -963,13 +966,14 @@ following modules:
    Pod::Select
    Pod::Simple::TextContent
 
-You'll should have both:
+You'll should have:
 
    Module::Build
+   Module::Build::Tiny
    ExtUtils::MakeMaker
 
 installed in order to build modules that use the Build.PL and Makefile.PL
-scripts.
+scripts (both Module::Build and Module::Build::Tiny are supported).
 
 In order to build the rpm, you need the B<rpmbuild> program.
 

@@ -14,7 +14,7 @@ use XML::LibXML;
 use OPC::Root;
 use OPC::Part;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -160,7 +160,7 @@ sub GetPhysicalContents {
   my $IsBinary = exists $Param{binary} ? $Param{binary} : 0;
   
 	if( $self->{_is_zip} ) {
-		return $self->{_physical}->contents( $PhysicalName );
+		return scalar $self->{_physical}->contents( $PhysicalName );
 	} else {
 		return do {
       my $Layer = $IsBinary ? 'raw' : 'encoding(UTF-8)';

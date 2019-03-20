@@ -126,3 +126,13 @@ Revision history for Keyword-Declare
 
     * Improved auto-insertion of __DATA__ keyword
 
+
+
+0.001013  Wed Mar 20 21:42:21 2019
+
+    * Improved compatibility with later versions of Keyword::Simple (>0.03)
+      under earlier versions of Perl (<5.18). Module will now install
+      under these combinations, but docs now warn that it the
+      combination is not reliable.
+
+    * Improved line number reporting for errors within keywords

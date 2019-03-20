@@ -8,6 +8,20 @@ BEGIN {
     use_ok('WebService::HIBP') || print "Bail out!\n";
 }
 
+package Acme::LWP::Teapot;
+
+sub new { 
+	my ($class) = @_;
+	return bless {}, $class;
+}
+
+sub get {
+	return HTTP::Response->new(418, "I'm a teapot");
+}
+
+package main;
+
+my $bad_password = 'password1';
 my $hibp = WebService::HIBP->new();
 SKIP: {
     my @classes;
@@ -343,7 +357,6 @@ SKIP: {
         ok( $paste->email_count(),
             "Email Count of paste is '" . $paste->email_count() . "'" );
     }
-    my $bad_password = 'password1';
     $count = $hibp->password($bad_password);
     ok( $count, "Bad password '$bad_password' returns a count of $count" );
     my $good_password = 'swYBygTEymkmYiwrgYj4yWwemeiQkTRQBuhWVh3JfxzRpxSTKj';
@@ -384,5 +397,37 @@ SKIP: {
 	ok($@, "account threw an error when supplied a bad proxy:$@");
 
 }
+ok(WebService::HIBP->new(user_agent => LWP::UserAgent->new()), "Successfully created a HIBP object with a custom LWP::UserAgent object");
+my $teapot = WebService::HIBP->new(user_agent => Acme::LWP::Teapot->new());
+ok($teapot, "Successfully created a HIBP object with a custom Acme::LWP::Teapot object");
+ok(!defined $teapot->last_request(), "last_request is undefined as no request has been made yet");
+ok(!defined $teapot->last_response(), "last_request is undefined as no request has been made yet");
+eval {
+	$teapot->password($bad_password);
+};
+ok($@ =~ /^Failed[ ]to[ ]retrieve.*:418.*teapot/, "Threw an exception when the user_agent returns a non-success code for password");
+ok(defined $teapot->last_request(), "last_request is defined as a request has been made yet");
+ok(defined $teapot->last_response(), "last_request is defined as a request has been made yet");
+eval {
+	$teapot->account( 'test@example.com' );
+};
+ok($@ =~ /^Failed[ ]to[ ]retrieve.*:418.*teapot/, "Threw an exception when the user_agent returns a non-success code for account");
+eval {
+	$teapot->data_classes();
+};
+ok($@ =~ /^Failed[ ]to[ ]retrieve.*:418.*teapot/, "Threw an exception when the user_agent returns a non-success code for data_classes");
+eval {
+	$teapot->breach( 'Adobe' );
+};
+ok($@ =~ /^Failed[ ]to[ ]retrieve.*:418.*teapot/, "Threw an exception when the user_agent returns a non-success code for breach");
+eval {
+	$teapot->pastes( 'test@example.com' );
+};
+ok($@ =~ /^Failed[ ]to[ ]retrieve.*:418.*teapot/, "Threw an exception when the user_agent returns a non-success code for pastes");
+eval {
+	$teapot->breaches();
+};
+ok($@ =~ /^Failed[ ]to[ ]retrieve.*:418.*teapot/, "Threw an exception when the user_agent returns a non-success code for breaches");
+
 done_testing();
 

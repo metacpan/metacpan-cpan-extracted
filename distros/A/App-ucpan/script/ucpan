@@ -66,15 +66,16 @@ EO_USAGE
     };
     my $set_both_opt = sub {
         if ( $_[0] eq 'M' ) {
-            push @$CPANM_OPT, "--$_[0]=$_[1]";
-            push @$CUD_OPT,   "--mirror=$_[1]";
+            push @$CPANM_OPT, "--from"   => $_[1];
+            push @$CUD_OPT,   "--mirror" => $_[1];
         }
         elsif ( $_[0] eq 'exclude-core' ) {
             push @$CUD_OPT, "--exclude-core";
         }
         else {
-            push @$CPANM_OPT, "--$_[0]=$_[1]";
-            push @$CUD_OPT,   "--$_[0]=$_[1]";
+            my $l = length( $_[0] ) > 1 ? '--' : '-';
+            push @$CPANM_OPT, "$l$_[0]" => $_[1];
+            push @$CUD_OPT,   "$l$_[0]" => $_[1];
         }
     };
 
@@ -127,7 +128,7 @@ EO_USAGE
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.04');
+            our $VERSION = version->declare('1.05');
             print __PACKAGE__->VERSION, $/;
             exit;
         },
@@ -317,7 +318,7 @@ my $output_format_3 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds$/},
 my $output_format_4 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
     ($fn) x 2, ($fc) x 2, ($fl) x 2, ($fs) x 2;
 
-my $output_format_fold_head = sprintf qq{%%-%d.%ds}, ($fn) x 2;
+my $output_format_fold_head = "%s$/";
 
 ## set foldize
 my $fold_mod = Foldize->new( width => $fn, delimiter => "::" );
@@ -330,8 +331,9 @@ sub make_table_row {
     $current = $e->{current};
     $new     = $e->{new};
     $phase   = $e->{fail_at};
-    $r .= sprintf( $output_format_fold_head, $mod->get )
-        while $mod->length > 2;
+    while ( $mod->length > 1 ) {
+        $r .= sprintf( $output_format_fold_head, $mod->get );
+    }
     my $format = $phase ? $output_format_4 : $output_format_3;
     $r .= sprintf(
         $format, $mod->get,
@@ -425,7 +427,6 @@ my $reader = sub {
     my $info = +{ module => $mod, current => $current, new => $new };
 # Checking SKIP ENTRIES
     if ( my $old = $skip_entries->{$dist_name} ) {
-
         $info->{fail_at} = $skip_entries->{$dist_name}->{fail_at} || '?';
         if ( $IGNORE_SKIP or $old->{version} < $dist_version ) {
             delete $skip_entries->{$dist_name};
@@ -564,7 +565,7 @@ pop @{ $app->{argv} };
 
 pr_black qq|>>> Upgrading outdated modules$/|;
 
-my @outdated = sort keys %outdated;
+my @outdated = sort { lc($a) cmp lc($b) } keys %outdated;
 {
     my $ORG_STDERR = \*STDERR;
     my $state      = +{};
@@ -928,20 +929,21 @@ sub _build_pipecmd {
                     $line = substr( $line, $width - 1 );
                 }
                 if ( length($line) ) {
-                    if (length($line) + length($chunk) + $delim_width
+                    if (length($line) + length($chunk) + $delim_width * 2
                         > $width )
                     {
                         push @pool, $line;
-                        $line = $delim . $chunk;
+                        $line = $chunk . $delim;
                     }
                     else {
-                        $line .= $delim . $chunk;
+                        $line .= $chunk . $delim;
                     }
                 }
                 else {
                     $line = $chunk;
                 }
             }
+            $line =~ s/::$//;
             while ( length($line) > $width ) {
                 push @pool, substr( $line, 0, $width - 1 ) . '-';
                 $line = substr( $line, $width - 1 );

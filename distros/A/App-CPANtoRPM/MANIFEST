@@ -1,4 +1,3 @@
-.travis.yml
 bin/cpantorpm
 bin/cpantorpm-depreq
 bin/cpantorpm.pod
@@ -9,7 +8,6 @@ examples/test_prov.pl
 examples/test_vers.exp
 examples/test_vers.pl
 INSTALL
-internal/_no_tests
 internal/build.yaml
 internal/perl.prov
 internal/perl.req
@@ -20,9 +18,11 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
-t/pod.dirs
-t/pod.t
-t/pod_coverage.t
+t/_pod.dirs
+t/_pod.t
+t/_pod_coverage.t
+t/_version.t
 t/runtests
+t/runtests.bat
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

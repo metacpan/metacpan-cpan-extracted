@@ -9,18 +9,23 @@ use Digest::SHA();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
 sub new {
-    my ($class) = @_;
+    my ( $class, %params ) = @_;
     my $self = {};
     bless $self, $class;
     $self->{url}          = 'https://haveibeenpwned.com/api/v2/';
     $self->{password_url} = 'https://api.pwnedpasswords.com/range/';
-    $self->{ua}           = LWP::UserAgent->new( agent => 'WebService-HIBP' );
-    $self->{ua}->env_proxy();
+    if ( $params{user_agent} ) {
+        $self->{ua} = $params{user_agent};
+    }
+    else {
+        $self->{ua} = LWP::UserAgent->new( agent => 'WebService-HIBP ' );
+        $self->{ua}->env_proxy();
+    }
     return $self;
 }
 
@@ -204,7 +209,13 @@ This is a client module for the L<https://haveibeenpwned.com/api/v2/> API, which
 
 =head2 new
 
-a new C<WebService::HIBP> object, ready to check how bad the pwnage is.
+a new C<WebService::HIBP> object, ready to check how bad the pwnage is.  It accepts an optional hash as a parameter.  Allowed keys are below;
+
+=over 4
+
+=item * user_agent - A pre-configured instance of L<LWP::UserAgent|LWP::UserAgent> that will be used instead of the automatically created one.  This allows full control of the user agent properties if desired
+
+=back
 
 =head2 password
 

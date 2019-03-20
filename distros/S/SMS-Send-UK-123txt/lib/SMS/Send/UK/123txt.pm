@@ -10,11 +10,11 @@ SMS::Send::UK::123txt
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -49,6 +49,7 @@ use base 'SMS::Send::Driver';
 use LWP::UserAgent();
 use JSON qw(encode_json);
 use URI::Escape qw(uri_escape);
+use Scalar::Util qw( looks_like_number );
 
 =head2 new
 
@@ -103,7 +104,8 @@ sub new {
     my $self = bless {
         user     => $params{'_login'},
         pass     => $params{'_password'},
-        from     => clean_number($params{'_from'}),
+        from     => looks_like_number($params{'_from'}) ?
+            scalar clean_number($params{'_from'}) : $params{'_from'},
         base_url => 'http://api.123-txt.com/Api123WCF.svc/rest/SendSms'
     }, $class;
 

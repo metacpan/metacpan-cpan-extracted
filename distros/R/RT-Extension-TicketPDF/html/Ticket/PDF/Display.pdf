@@ -15,9 +15,11 @@
 
     my $html = $m->scomp( "/Ticket/PDF/$tpl.html", id => $id );
 
-    # Use installed converter to do the work.
+    # Default to installed converter to do the work.
+    my $converter = RT->Config->Get('TicketPDFConverter') ||
+        "$RT::LocalPath/plugins/RT-Extension-TicketPDF/bin/wkhtmltopdf";
     my ($out, $err);
-    my @cmd = ("$RT::LocalPath/bin/wkhtmltopdf",
+    my @cmd = ("$converter",
         qw{ --grayscale  --print-media-type  --disable-external-links  - - });
 
     IPC::Run::run \@cmd, \$html, \$out, \$err

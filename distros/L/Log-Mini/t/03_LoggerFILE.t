@@ -44,7 +44,7 @@ subtest 'prints to stderr with \n' => sub {
     for my $level (qw/error warn debug/) {
     
         my $file = File::Temp->new;
-        my $log = _build_logger(file => $file);
+        my $log = _build_logger(file => $file->filename);
 
         $log->$level('message');
 
@@ -59,7 +59,7 @@ subtest 'prints to stderr with \n' => sub {
 subtest 'prints sprintf formatted line' => sub {
     for my $level (qw/error warn debug/) {
         my $file = File::Temp->new;
-        my $log = _build_logger(file => $file);
+        my $log = _build_logger(file => $file->filename);
 
         $log->$level('message %s', 'formatted');
 

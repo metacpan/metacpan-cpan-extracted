@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001012';
+our $VERSION = '0.001013';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -78,7 +78,7 @@ sub import {
                      substr($$src_ref, $failed_at) =~ /(\S+)/;
 
         # Save the information from the keyword definition...
-        my %keytype_info = ( %+, location => "$file line $line" );
+        my %keytype_info = ( %+, location => "$file line $line", hashline => "$line $file" );
 
         # Set up the sigil...
         my $sigil_decl = q{};
@@ -206,6 +206,7 @@ sub import {
                              desc            => $keyword_info{____K_D___keyword},
                              param_list      => [ @Keyword::Declare::params],
                              location        => "$file line $line",
+                             hashline        => "$line $file",
                            );
 
         # Check for excessive meta-ness...
@@ -255,7 +256,7 @@ sub import {
                   . $$src_ref;
 
         # Pre-empt addition of extraneous trailing newline by Keyword::Simple...
-        # [REMOVE IF UPSTREAM MODULE (Keyword::Simple) FIXED]
+        # [REMOVE IF UPSTREAM MODULE (Keyword::Simple) IS FIXED]
         $$src_ref =~ s{\n\z}{};
     };
 
@@ -323,25 +324,34 @@ sub import {
 }
 
 # Keyword::Simple::define() has a bug: it can't define keywords starting with _
+# [REMOVE WHEN UPSTREAM MODULE (Keyword::Simple) IS FIXED]
 sub _replacement_define {
     package Keyword::Simple;
-    use B::Hooks::EndOfScope;
 
     my ($kw, $sub) = @_;
     $kw =~ /^[^\W\d]\w*\z/ or croak "'$kw' doesn't look like an identifier";
     ref($sub) eq 'CODE' or croak "'$sub' doesn't look like a coderef";
 
-    our @meta;
-    my $n = @meta;
-    push @meta, $sub;
+    if ($Keyword::Simple::VERSION < 0.04) {
+        our @meta;
+        my $n = @meta;
+        push @meta, $sub;
 
-    $^H{+HINTK_KEYWORDS} .= " $kw:$n";
-    on_scope_end {
-        delete $meta[$n];
-    };
+        $^H{+HINTK_KEYWORDS} .= " $kw:$n";
+        use B::Hooks::EndOfScope;
+        on_scope_end {
+            delete $meta[$n];
+        };
+    }
+    else {
+        my %keywords = %{$^H{+HINTK_KEYWORDS} // {}};
+        $keywords{$kw} = $sub;
+        $^H{+HINTK_KEYWORDS} = \%keywords;
+    }
 }
 
 # Install a __DATA__ keyword to overcome bug in Keyword::Simple...
+# [REMOVE WHEN UPSTREAM MODULE (Keyword::Simple) IS FIXED]
 sub _install_data_handler {
     my $DATA_HANDLER = sub {
         # Unpack trailing code...
@@ -371,15 +381,15 @@ sub _deprefix {
 
 # Generate the source code that actually installs a keyword...
 sub _build_keyword_code {
-    my ($keyword_name, $keyword_sig, $keyword_ID, $keyword_block, $block_location, $prefix_var)
-        = @{shift()}{qw< keyword sig_desc ID block location prefix >};
+    my ($keyword_name, $keyword_sig, $keyword_ID, $keyword_block, $block_location, $block_hashline,  $prefix_var)
+        = @{shift()}{qw< keyword sig_desc ID block location hashline prefix >};
 
     # Generate the keyword definition and set up its unique lexical ID...
     return qq{
         \$^H{"Keyword::Declare active:$keyword_name:\Q$keyword_sig\E"} = $keyword_ID;
         Keyword::Declare::_replacement_define('$keyword_name', Keyword::Declare::_get_dispatcher_for('$keyword_name',
             $keyword_ID, sub
-#line $block_location
+#line $block_hashline
             { $keyword_impls[$keyword_ID]{sig_vars_unpack}  do $keyword_block }));
     };
 }
@@ -956,7 +966,7 @@ sub _insert_replacement_code {
     $$src_ref = "$replacement_code\n#KDCT:_:_:1 $keyword->{keyword}\n#line $line $file\n" . $$src_ref;
 
     # Pre-empt addition of extraneous trailing newline by Keyword::Simple...
-    # [REMOVE IF UPSTREAM MODULE (Keyword::Simple) FIXED]
+    # [REMOVE WHEN UPSTREAM MODULE (Keyword::Simple) IS FIXED]
     $$src_ref =~ s{\n\z}{};
 }
 
@@ -1061,7 +1071,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001012
+This document describes Keyword::Declare version 0.001013
 
 
 =head1 STATUS
@@ -2242,13 +2252,12 @@ keywords that appear at the beginning of a statement (though you can
 almost always code around that limitation by wrapping the keyword in
 a C<do{...}> block.
 
-Moreover, there is a bug in Keyword::Simple 0.04 which causes that
-module to fail under Perl 5.14 and 5.16 (and possibly under later
-versions of Perl as well, through the Keyword::Declare test suite does
-not detect those potential failures). Consequently, Keyword::Declare
-will not install under Perls before 5.18 if Keyword::Simple 0.04 is
-installed. The current workaround is to downgrade to Keyword::Simple 0.03
-under those Perl versions.
+Moreover, there is a issue with Keyword::Simple v0.04 which sometimes
+causes that module to fail when used by Keyword::Declare under Perl 5.14
+and 5.16. Consequently, Keyword::Declare may be unreliable under Perls
+before 5.18 if Keyword::Simple v0.04 or later is installed. The current
+workaround is to downgrade to Keyword::Simple v0.03 under those early
+Perl versions.
 
 Even with the PPR module, parsing Perl code is tricky, and parsing Perl
 code to build Perl code that parses other Perl code is even more so.

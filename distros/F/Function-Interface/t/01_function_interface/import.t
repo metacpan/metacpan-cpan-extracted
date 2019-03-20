@@ -76,4 +76,27 @@ subtest 'empty params & return' => sub {
     test baz2 => ['fun', 'baz2', [], ['Str', 'Int']];
 };
 
+subtest 'syntax error' => sub {
+    my @data = (
+        'fun a() :Return()'          => 'invalid interface', 'no semicolon',
+        'fun a :Return();'           => 'invalid interface', 'params / no bracket',
+        'fun a( :Return();'          => 'invalid interface', 'params / no right bracket',
+        'fun a) :Return();'          => 'invalid interface', 'params / no left bracket',
+        'fun a($i) :Return();'       => 'invalid interface params', 'params / no type',
+        'fun a(Int) :Return();'      => 'invalid interface params', 'params / no var',
+        'fun a(Int i) :Return();'    => 'invalid interface params', 'params / invalid var',
+        'fun a($Int $i) :Return();'  => 'invalid interface params', 'params / invalid type',
+        'fun a();'                   => 'invalid interface', 'no return',
+        'fun a() :return();'         => 'invalid interface', 'invalid return attribute',
+        'fun a() A :return();'       => 'invalid interface', 'invalid',
+        'fun a() :Return($a);'       => 'invalid interface return', 'invalid return type',
+        'fun a() :Return(Str, $a);'  => 'invalid interface return', 'invalid second return type',
+    );
+
+    while (my ($src, $error_message, $comment) = splice @data, 0,3) {
+        eval $src;
+        like $@, qr/$error_message/, $comment;
+    }
+};
+
 done_testing;

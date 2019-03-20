@@ -90,7 +90,8 @@ my $opt_d;
 my $opt_command = 1;
 my $opt_truncate = 0;
 my $opt_onword = 1;
-my $opt_cdif = 'cdif';
+my $default_opt_cdif = 'cdif';
+my $opt_cdif = '';
 my @default_opt_cdifopts = qw(--no-cc --no-mc --no-tc --no-uc);
 my @opt_cdifopts;
 my $opt_env = 1;
@@ -237,8 +238,11 @@ my $painter = do {
 };
 
 ##
-## setup cdifopts
+## setup cdif command and option
 ##
+if (defined $opt_cdif and $opt_cdif eq '') {
+    $opt_cdif = $default_opt_cdif;
+}
 unshift @opt_cdifopts,
     $opt_256   ? qw(--256)   : qw(--no-256)  ,
     $opt_graph ? qw(--graph) : qw(--no-graph),
@@ -519,38 +523,37 @@ exit($exit == 2);
 
 ######################################################################
 
+##
+## Convert diff -c output to -u compatible format.
+##
 sub merge_diffc {
     my @o = @{+shift};
     my @n = @{+shift};
+    for (@o, @n) {
+	s/(?<= ^[ \-\+\!] ) [\t ]//x or die "Format error (-c).\n";
+    }
+
     my @buf;
-
-    die if grep { not s/(?<= ^[ \-\+\!] ) [\t ]//x } @o, @n;
-
     while (@o or @n) {
-	my @slot = ([], [], []);
-	push @buf, @slot;
+	
+	push @buf, \( my( @common, @old, @new ) );
 
-	if (@o and @n) {
-	    while (@o and @n and $o[0] =~ /^ / and $n[0] =~ /^ /) {
-		push @{$slot[0]}, shift @o;
-		shift @n;
-	    }
+	while (@o and $o[0] =~ /^ /) {
+	    push @common, shift @o;
+	    shift @n if @n;
 	}
-	elsif (@o) {
-	    push(@{$slot[0]}, shift @o) while @o and $o[0] =~ /^ /;
-	}
-	elsif (@n) {
-	    push(@{$slot[0]}, shift @n) while @n and $n[0] =~ /^ /;
+	while (@n and $n[0] =~ /^ /) {
+	    push @common, shift @n;
 	}
 
-	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ /^\-/;
-	next if @{$slot[1]};
+	push @old, shift @o while @o and $o[0] =~ /^\-/;
+	next if @old;
 
-	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ /^\+/;
-	next if @{$slot[2]};
+	push @new, shift @n while @n and $n[0] =~ /^\+/;
+	next if @new;
 
-	push(@{$slot[1]}, shift @o) while @o and $o[0] =~ s/^!/-/;
-	push(@{$slot[2]}, shift @n) while @n and $n[0] =~ s/^!/+/;
+	push @old, shift @o while @o and $o[0] =~ s/^!/-/;
+	push @new, shift @n while @n and $n[0] =~ s/^!/+/;
     }
 
     @buf;

@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::Most;
+use Test::More;
 
 # use Log::Any::Adapter ('Stderr'); # Activate to get all log messages.
 

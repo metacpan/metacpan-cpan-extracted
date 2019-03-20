@@ -2,6 +2,14 @@ use 5.012;
 use warnings;
 use strict;
 
+BEGIN {
+    use Keyword::Simple;
+    if ($Keyword::Simple::VERSION >= 0.04 && %] < 5.018) {
+        say "1..0 # Skipped: Keyword::Declare not compatible with Keyword::Simple v$Keyword::Simple::VERSION under Perl $]";
+        exit;
+    }
+}
+
 use Keyword::Declare;
 
 keyword  okay (Int $n = '$default') {{{ print "ok «$n»\n" }}}

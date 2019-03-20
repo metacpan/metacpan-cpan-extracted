@@ -1,3 +1,7 @@
+2.24 2019-03-19
+ - doc updates - thanks @djerius
+ - patches to use pkg-config if available - thanks @djerius
+
 2.23 2019-03-17
  - typo fix from gregor herrmann <gregoa@debian.org>
  - add CONFIGURE_REQUIRES dep - thanks CHORNY for report

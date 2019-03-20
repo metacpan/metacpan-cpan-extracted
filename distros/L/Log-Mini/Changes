@@ -1,5 +1,8 @@
 Revision history for Perl extension Log-Mini
 
+0.1.1 2019-03-19T20:44:04Z
+    - Error in the constructor was fixed. 0.1.0 removed from CPAN.
+
 0.1.0 2019-03-19T12:08:23Z
     - Supports formatted with sprintf messages
     - log method was added

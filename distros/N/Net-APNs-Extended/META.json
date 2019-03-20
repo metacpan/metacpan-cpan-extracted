@@ -4,7 +4,7 @@
       "xaicron <xaicron {@} cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -59,13 +59,15 @@
    "provides" : {
       "Net::APNs::Extended" : {
          "file" : "lib/Net/APNs/Extended.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Net::APNs::Extended::Base" : {
-         "file" : "lib/Net/APNs/Extended/Base.pm"
+         "file" : "lib/Net/APNs/Extended/Base.pm",
+         "version" : "0.14"
       },
       "Net::APNs::Extended::Feedback" : {
-         "file" : "lib/Net/APNs/Extended/Feedback.pm"
+         "file" : "lib/Net/APNs/Extended/Feedback.pm",
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -79,11 +81,13 @@
          "web" : "https://github.com/xaicron/p5-Net-APNs-Extended"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_contributors" : [
-      "Syohei YOSHIDA <syohex@gmail.com>",
       "Colin Kuskie <colink@perldreamer.com>",
-      "xaicron <xaicron@gmail.com>"
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Yuji Shimada <xaicron@gmail.com>",
+      "omohayui <omohayui@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 4.00",
+   "x_static_install" : 1
 }

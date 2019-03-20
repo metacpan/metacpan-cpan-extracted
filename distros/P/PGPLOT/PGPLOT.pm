@@ -1,12 +1,6 @@
 package PGPLOT;
 
-#  Module to allow calling of PGPLOT from Perl
-#
-#  Karl Glazebrook [email: kgb@aaoepp.aao.gov.au]
-#
-#  WWW info: http://www.aao.gov.au/local/www/kgb/pgperl/
-
-$VERSION="2.23";
+$VERSION="2.24";
 
 use Exporter;
 use DynaLoader;
@@ -57,31 +51,23 @@ PGPLOT - allow subroutines in the PGPLOT graphics library to be called from Perl
 
 =head1 DESCRIPTION
 
-Originally developed in the olden days of Perl4 (when it was known
-as 'pgperl' due to the necessity of making a special perl executable)
-PGPLOT is now a dynamically loadable perl module which interfaces
-to the FORTRAN graphics library of the same name.
+This module provides an inteface to the PGPLOT graphics library. To
+obtain the library and its manual, see L</OBTAINING PGPLOT>.
 
-PGPLOT, originally developed as a FORTRAN library, is now available with
-C bindings (which the Perl module uses), though a FORTRAN compiler is
-still required to build it.
-
-For every PGPLOT C/FORTRAN function the module provides an equivalent
-Perl function with the same arguments. Thus the user of the module should
-refer to the PGPLOT manual to learn all about how to use PGPLOT and for
-the complete list of available functions.  This manual comes with the
-PGPLOT distribution and is also available at the WWW address:
-
-http://astro.caltech.edu/~tjp/pgplot/
+For every PGPLOT function the module provides an equivalent Perl
+function with the same arguments. Thus the user of the module should
+refer to the PGPLOT manual to learn all about how to use PGPLOT and
+for the complete list of available functions.  Note that PGPLOT is at
+its heart a Fortran library, so the documentation describes the
+Fortran interface.
 
 Also refer to the extensive set of test scripts (C<test*.p>) included
 in the module distribution for examples of usage of all kinds of
 PGPLOT routines.
 
-How the FORTRAN/C function calls map on to Perl calls is detailed below.
+How the function calls map on to Perl calls is detailed below.
 
-
-=head2 ARGUMENT MAPPING - SIMPLE NUMBERS AND ARRAYS
+=head2 Argument Mapping - Simple Numbers And Arrays
 
 This is more or less as you might expect - use Perl scalars 
 and Perl arrays in place of FORTRAN/C variables and arrays.
@@ -117,7 +103,7 @@ a array argument:
   pgpoint(1, $x, $y, 17);
 
 
-=head2 ARGUMENT MAPPING - IMAGES AND 2D ARRAYS
+=head2 Argument Mapping - Images And 2d Arrays
 
 Many of the PGPLOT commands (e.g. C<pggray>) take 2D arrays as
 arguments. Several schemes are provided to allow efficient use
@@ -175,7 +161,7 @@ the C<PDL> module which provides a wealth of functions for manipulating
 binary data.
 
 
-PLEASE NOTE: As PGPLOT is a Fortran library it expects it's images to be
+I<Please Note>: As PGPLOT is a Fortran library it expects its images to be
 be stored in row order. Thus a 1D list is interpreted as a sequence of
 rows end to end. Perl is similar to C in that 2D arrays are arrays of
 pointers thus images end up stored in column order. 
@@ -195,7 +181,7 @@ natural as the subroutine library was written by an astronomer!).
 
 =back
 
-=head2 ARGUMENT MAPPING - FUNCTION NAMES
+=head2 Argument Mapping - Function Names
 
 Some PGPLOT functions (e.g. C<pgfunx>) take functions as callback
 arguments. In Perl simply pass a subroutine reference or a name,
@@ -219,7 +205,7 @@ e.g.:
  pgfuny("foo", 360, 0, 2*$pi, 0);
 
 
-=head2 ARGUMENT MAPPING - GENERAL HANDLING OF BINARY DATA
+=head2 Argument Mapping - General Handling Of Binary Data
 
 In addition to the implicit rules mentioned above PGPLOT now provides
 a scheme for explicitly handling binary data in all routines.
@@ -235,8 +221,48 @@ say:
 This is very efficient as we can be sure the data never gets copied
 and will always be interpreted as binary.
 
-Again see the C<PDL> module for sophisticated manipulation of
-binary data. C<PDL> takes great advantage of these facilities.
+Again see the L<PDL> module for sophisticated manipulation of
+binary data, since it takes great advantage of these facilities.
+See in particular L<PDL::Graphics::PGPLOT>.
 
 Be VERY careful binary data is of the right size or your segments
 might get violated.
+
+=head1 HISTORY
+
+Originally developed in the olden days of Perl4 (when it was known
+as 'pgperl' due to the necessity of making a special perl executable)
+PGPLOT is now a dynamically loadable perl module which interfaces
+to the FORTRAN graphics library of the same name.
+
+=head1 OBTAINING PGPLOT
+
+PGPLOT is a FORTRAN library with C bindings, While the Perl module
+uses the latter, a FORTRAN compiler is still required to build the library.
+
+The official library and the manual are available from
+L<http://astro.caltech.edu/~tjp/pgplot/>
+
+Building the library using the official distribution is arcane, tedious,
+and error-prone. Additionally, the official distribution lacks a number
+of bug fixes and additions provided by the community over the years.
+
+A modern packaging (using the GNU autotools) of the more up-to-date
+code base is available from L<https://bitbucket.org/djerius/pgplot-autotool/downloads>
+
+The packaging has been tested on Linux and Mac OS X.
+
+Source code is available at either of these sites
+
+=over
+
+=item L<https://github.com/djerius/pgplot-autotool>
+
+=item L<https://bitbucket.org/djerius/pgplot-autotool/src>
+
+=back
+
+
+=head1 AUTHORS
+
+Karl Glazebrook E<lt>kgb@aaoepp.aao.gov.auE<gt>

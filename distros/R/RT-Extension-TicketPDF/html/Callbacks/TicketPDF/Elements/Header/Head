@@ -1,0 +1,38 @@
+<style>
+/* forcing print.css if wkhtmltopdf option --print-media-type fails. */
+
+% # For RT 4.0
+% if ($m->comp_exists('/NoAuth/css/print.css') ) {
+#quickbar, #main-navigation, #page-navigation, #topactions { display: none }
+#.message-stanza-folder.closed { display: none }
+#.message-stanza.closed { display: block }
+    <& /NoAuth/css/print.css &>
+% }
+% # RT 4.4
+% if ( $print_css ) {
+    <% $print_css %>
+% }
+</style>
+<%INIT>
+# Get args from call to /Ticket/Display.html
+my %request_args = $m->caller_args(2);
+return unless $request_args{'TicketPDF'};
+
+my $print_css_path = $RT::StaticPath . '/css/base/print.css';
+my $print_css;
+
+if ( open( my $fh, '<', $print_css_path ) ){
+    RT->Logger->debug("Loading print css...");
+    $print_css = do { local $/; <$fh> };
+    close $fh;
+}
+else {
+    RT->Logger->error("Unable to read print css file from $print_css_path");
+}
+
+</%INIT>
+<%ARGS>
+    # vim: syn=mason
+$id => undef
+$ARGSRef => undef
+</%ARGS>

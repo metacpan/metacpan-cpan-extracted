@@ -1,7 +1,7 @@
 package App::linerange;
 
-our $DATE = '2019-03-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-03-20'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,14 +34,18 @@ _
             description => <<'_',
 
 A comma-separated list of line numbers ("N") or line ranges ("N1..N2" or
-"N1-N2"), where N, N1, and N2 are line number specification. Line number begins
-at 1; it can also be a negative integer (-1 means the last line, -2 means second
-last, and so on). N1..N2 is the same as N2..N1.
+"N1-N2", or "N1+M" which means N2 is set to N1+M-1), where N, N1, and N2 are
+line number specification. Line number begins at 1; it can also be a negative
+integer (-1 means the last line, -2 means second last, and so on). N1..N2 is the
+same as N2..N1.
 
 Examples:
 
 * 3 (third line)
 * 1..5 (first to fifth line)
+* 3+0 (third line)
+* 3+1 (third to fourth line)
+* -3+1 (third last to fourth last)
 * 5..1 (first to fifth line)
 * -5..-1 (fifth last to last line)
 * -1..-5 (fifth last to last line)
@@ -96,21 +100,38 @@ sub linerange {
     my @ranges;
     my @buffer;
     my $bufsize = 0;
+    my $exit_after_line = 0;
     for my $spec2 (split /\s*,\s*/, $args{spec}) {
-        $spec2 =~ /\A\s*([+-]?[0-9]+)\s*(?:(?:\.\.|-)\s*([+-]?[0-9]+)\s*)?\z/
+        $spec2 =~ /\A\s*([+-]?[0-9]+)\s*(?:(\.\.|-|\+)\s*([+-]?[0-9]+)\s*)?\z/
             or return [400, "Invalid line number/range specification '$spec2'"];
+
         my $ln1 = $1;
-        my $ln2 = $2 // $1;
+        my $ln2 = $3 // $1;
+        if (defined $2 && $2 eq '+') {
+            $ln2 = $ln1 + $ln2;
+            if ($ln1 > 0) {
+                $ln2 = 1 if $ln2 < 1;
+            } else {
+                $ln2 = -1 if $ln2 > -1;
+            }
+        }
+
         if ($ln1 == 0 || $ln2 == 0) {
             return [400, "Invalid line number 0 in ".
                         "range specification '$spec2'"];
         } elsif ($ln1 > 0 && $ln2 > 0) {
             push @ranges, $ln1 > $ln2 ? [$ln2, $ln1] : [$ln1, $ln2];
+            unless ($exit_after_line < 0) {
+                $exit_after_line = $ln1 if $exit_after_line < $ln1;
+                $exit_after_line = $ln2 if $exit_after_line < $ln2;
+            }
         } elsif ($ln1 < 0 && $ln2 < 0) {
             $bufsize = -$ln1 if $bufsize < -$ln1;
             $bufsize = -$ln2 if $bufsize < -$ln2;
             push @ranges, $ln1 > $ln2 ? [$ln1, $ln2] : [$ln2, $ln1];
+            $exit_after_line = -1;
         } else {
+            $exit_after_line = -1;
             if ($ln1 > 0) {
                 $bufsize = -$ln2 if $bufsize < -$ln2;
                 push @ranges, [$ln1, $ln2];
@@ -125,6 +146,7 @@ sub linerange {
     my $linenum = 0;
     while (defined(my $line = <$fh>)) {
         $linenum++;
+        last if $exit_after_line >= 0 && $linenum > $exit_after_line;
         if ($bufsize) {
             push @buffer, $line;
             if (@buffer > $bufsize) { shift @buffer }
@@ -181,7 +203,7 @@ App::linerange - Retrieve line ranges from a filehandle
 
 =head1 VERSION
 
-This document describes version 0.001 of App::linerange (from Perl distribution App-linerange), released on 2019-03-17.
+This document describes version 0.002 of App::linerange (from Perl distribution App-linerange), released on 2019-03-20.
 
 =head1 FUNCTIONS
 
@@ -236,9 +258,10 @@ Arguments ('*' denotes required arguments):
 Line range specification.
 
 A comma-separated list of line numbers ("N") or line ranges ("N1..N2" or
-"N1-N2"), where N, N1, and N2 are line number specification. Line number begins
-at 1; it can also be a negative integer (-1 means the last line, -2 means second
-last, and so on). N1..N2 is the same as N2..N1.
+"N1-N2", or "N1+M" which means N2 is set to N1+M-1), where N, N1, and N2 are
+line number specification. Line number begins at 1; it can also be a negative
+integer (-1 means the last line, -2 means second last, and so on). N1..N2 is the
+same as N2..N1.
 
 Examples:
 
@@ -247,6 +270,12 @@ Examples:
 =item * 3 (third line)
 
 =item * 1..5 (first to fifth line)
+
+=item * 3+0 (third line)
+
+=item * 3+1 (third to fourth line)
+
+=item * -3+1 (third last to fourth last)
 
 =item * 5..1 (first to fifth line)
 

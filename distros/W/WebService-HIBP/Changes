@@ -1,5 +1,8 @@
 Revision history for WebService-HIBP
 
+0.09   Wed Mar 20 20:44:00 2019
+        Added custom LWP::UserAgent capability from a suggestion from PCRONIN recorded at RT #128876.  Changed user-agent to finish with a space.
+
 0.08   Sun Feb 17 20:55:00 2018
         Added extra code to cope with 403 Forbidden errors
 

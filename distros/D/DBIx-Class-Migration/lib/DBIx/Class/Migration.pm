@@ -1,6 +1,6 @@
 package DBIx::Class::Migration;
 
-our $VERSION = "0.068";
+our $VERSION = "0.071";
 $VERSION = eval $VERSION;
 
 use Moo;

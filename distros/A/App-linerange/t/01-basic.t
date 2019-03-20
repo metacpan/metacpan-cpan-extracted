@@ -33,6 +33,10 @@ test_linerange(spec=>"1 .. 3" , res=>[1..3]);
 
 test_linerange(spec=>"3..1", res=>[1..3]);
 
+test_linerange(spec=>"1+0" , res=>[1]);
+test_linerange(spec=>"1+1" , res=>[1..2]);
+test_linerange(spec=>"1+2" , res=>[1..3]);
+
 test_linerange(spec=>"1, 3" , res=>[1, 3]);
 test_linerange(spec=>"1, 3, -1" , res=>[1, 3, 16]);
 
@@ -44,5 +48,9 @@ test_linerange(spec=>"-3..5" , res=>[5..14]);
 test_linerange(spec=>"5..-3, -1" , res=>[5..14, 16]);
 test_linerange(spec=>"5..-3, 10..-1", res=>[5..16]);
 test_linerange(spec=>"5..-5, -3..-1", res=>[5..12, 14..16]);
+
+test_linerange(spec=>"-5+0"  , res=>[12]);
+test_linerange(spec=>"-5+1"  , res=>[12..13]);
+test_linerange(spec=>"-5+-1" , res=>[11..12]);
 
 done_testing;

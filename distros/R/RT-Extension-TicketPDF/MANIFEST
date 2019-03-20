@@ -1,4 +1,5 @@
 bin/wkhtmltopdf
+html/Callbacks/TicketPDF/Elements/Header/Head
 html/Callbacks/TicketPDF/Elements/Tabs/Privileged
 html/Ticket/PDF/Display.html
 html/Ticket/PDF/Display.pdf
@@ -18,6 +19,7 @@ lib/RT/Extension/TicketPDF.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/show-history.patch
 README
 t/00-load.t
 t/99-pod.t

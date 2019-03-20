@@ -37,18 +37,18 @@ requires:
   Log::Any: '1.707'
   Module::Find: '0.13'
   Moo: '2'
-  MooX::Attribute::ENV: '0'
+  MooX::Attribute::ENV: '0.02'
   MooX::Options: '4.103'
   MooX::Traits: '0.005'
   Pod::Parser: '1.63'
   SQL::Translator: '0.11021'
   Text::Brew: '0.02'
   Type::Tiny: '1.004004'
-  version: '0.9912'
+  version: '0.9924'
 resources:
   bugtracker: https://github.com/jjn1056/DBIx-Class-Migration/issues
   homepage: https://github.com/jjn1056/DBIx-Class-Migration
   repository: https://github.com/jjn1056/DBIx-Class-Migration.git
-version: '0.068'
+version: '0.071'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

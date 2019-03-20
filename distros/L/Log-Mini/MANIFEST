@@ -14,5 +14,6 @@ t/01_logger_builder.t
 t/02_Logger.t
 t/03_LoggerFILE.t
 t/04_LoggerSTDERR.t
+t/05_Integration.t
 META.yml
 MANIFEST

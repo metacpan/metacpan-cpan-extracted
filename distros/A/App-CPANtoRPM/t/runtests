@@ -5,11 +5,15 @@
 #
 # Runs all tests (or those starting with prefix),optionally in taint mode
 
-TI_MODE='inter'
-export TI_MODE
+if [ -z "$TI_MODE" ]; then
+   TI_MODE='inter'
+   export TI_MODE
+fi
 
-TI_QUIET=2
-export TI_QUIET
+if [ -z "$TI_QUIET" ]; then
+   TI_QUIET=2
+   export TI_QUIET
+fi
 
 if [ "$RELEASE_TESTING" != "0" ]; then
    RELEASE_TESTING=1

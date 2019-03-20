@@ -20,15 +20,13 @@ BEGIN {
     $Carp::CarpInternal{+__PACKAGE__} = 1;
 }
 
-use Socket ();
-use Time::HiRes;  # for high-res time
-
-use Ref::Util qw(is_arrayref is_hashref);
-
+use Ref::Util    qw(is_arrayref is_hashref);
+use Time::HiRes  qw(time);  # for high-res time
 use List::Util   qw(shuffle sum);
 use Scalar::Util qw(weaken refaddr);
-use MariaDB::NonBlocking ();
-use MariaDB::NonBlocking::Promises qw();
+
+use MariaDB::NonBlocking           qw(); # currently needed for get_simple_stacktrace()
+use MariaDB::NonBlocking::Promises qw(); # our default connector class
 
 use if DEBUG, 'Digest::MD5' => qw(md5_hex); # dumb fingerprinting when DEBUG is true
 BEGIN { *md5_hex = sub {} unless DEBUG };
@@ -310,6 +308,8 @@ sub _fetch_some_wait_timeout {
     });
 }
 
+sub _connector_class { 'MariaDB::NonBlocking::Promises' } # override if desired
+
 # Removes ghost connections, and extends the pool if needed
 sub _check_and_maybe_extend_pool_size {
     my ($outside_pool) = @_;
@@ -350,14 +350,14 @@ sub _check_and_maybe_extend_pool_size {
 
             my $connection_args = $pool->_get_connection_args();
 
-            # This is the one and only reference to this connection.  If we don't keep
+            my $initial_connection = $pool->_connector_class->new();
+            # $initial_connection is the one and only reference to this connection.  If we don't keep
             # a reference around, it will be freed in the following return, because ->connect
             # tries very very hard not to keep a hard reference around.  So we will keep
             # it in $pool->{currently_connecting}
-            my $initial_connection = MariaDB::NonBlocking::Promises::->new();
             my $refaddr = refaddr $initial_connection;
-
             $pool->{currently_connecting}{$refaddr} = $initial_connection;
+
             my $t0 = time;
             return $initial_connection->connect($connection_args)->then(sub {
                 # Success

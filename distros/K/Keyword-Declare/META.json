@@ -34,7 +34,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Keyword::Simple" : ">= 0.03, != 0.04",
+            "B::Hooks::EndOfScope" : "0",
+            "Keyword::Simple" : "0",
             "List::Util" : "1.45",
             "PPR" : "0.000015",
             "perl" : "5.012"
@@ -47,5 +48,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.001012"
+   "version" : "0.001013"
 }

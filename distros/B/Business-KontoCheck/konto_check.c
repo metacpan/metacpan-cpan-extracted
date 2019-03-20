@@ -13,7 +13,7 @@
  * #  wurden aus der aktuellen BLZ-Datei der Deutschen Bundesbank           #
  * #  übernommen.                                                           #
  * #                                                                        #
- * #  Copyright (C) 2002-2018 Michael Plugge <m.plugge@hs-mannheim.de>      #
+ * #  Copyright (C) 2002-2019 Michael Plugge <m.plugge@hs-mannheim.de>      #
  * #                                                                        #
  * #  Dieses Programm ist freie Software; Sie dürfen es unter den           #
  * #  Bedingungen der GNU Lesser General Public License, wie von der Free   #
@@ -48,11 +48,11 @@
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.07 (final)"
+#define VERSION "6.08 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 07
+#define VERSION_MINOR 08
 #endif
-#define VERSION_DATE "2018-12-04"
+#define VERSION_DATE "2019-03-19"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -8241,37 +8241,6 @@ static int iban_regel_cvt(char *blz,char *kto,const char **bicp,int regel_versio
          /* SEB AG */
       case 56:
             /* ab Dezember 2018 entfällt die Regel 56, bleibt jedoch frei */
-         if(pz_aenderungen_aktivieren_2018_12)return OK;
-
-            /* für die folgenden BLZs sind nur zehnstelllige Kontonummern erlaubt: */
-            /* die Liste wurde zum September 2018 kräftig gekürzt */
-         switch(b){
-            case 10010111:
-            case 13010111:
-            case 20010111:
-            case 21010111:
-            case 23010111:
-            case 25010111:
-            case 27010111:
-            case 30010111:
-            case 36010111:
-            case 37010111:
-            case 38010111:
-            case 39010111:
-            case 44010111:
-            case 50010111:
-            case 50510111:
-            case 51010111:
-            case 51310111:
-            case 55010111:
-            case 60010111:
-            case 70010111:
-            case 76010111:
-            case 86010111:
-               if(k1<10)return INVALID_KTO;
-            default:
-               break;
-         }
          RETURN_OK;
 
          /* Iban-Regel 0057.00 +§§§3 */
@@ -17767,7 +17736,6 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
                if(pz==10)break;
             }
             pz=i;
-            INVALID_PZ10;
             if(*(kto_alt+5)-'0'==pz)return ok;
 #if DEBUG>0
             if(untermethode)return FALSE;
@@ -20017,7 +19985,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # Die 10. Stelle der Kontonummer ist die Prüfziffer.                 #
  * #                                                                    #
  * # Variante 1:                                                        #
- * # Modulus 11, Gewichtung 2, 3, 4, 5, 6, 7, 8, 9, 2	                  #
+ * # Modulus 11, Gewichtung 2, 3, 4, 5, 6, 7, 8, 9, 2                   #
  * # Die Berechnung erfolgt nach der Methode 02.                        #
  * #                                                                    #
  * # Führt die Berechnung nach Variante 1 zu einem                      #
@@ -20057,7 +20025,6 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 
             MOD_11_352;   /* pz%=11 */
             if(pz)pz=11-pz;
-            INVALID_PZ10;
             CHECK_PZX10;
 
    /* Variante 2: Berechnung nach der Methode 00 */
@@ -20774,17 +20741,17 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
          if(pz_aenderungen_aktivieren_2018_12)
             return "03.12.2018";
          else
-            return "02.09.2018 (Aenderungen vom 03.12.2018 enthalten aber noch nicht aktiviert)";
+            return "03.12.2018 (Aenderungen vom 03.12.2018 enthalten aber noch nicht aktiviert)";
       case 5:
-        return "03.12.2018";
+        return "04.03.2019";
       case 6:
-        return "4. Dezember 2018";            /* Klartext-Datum der Bibliotheksversion */
+        return "4. März 2019";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "07";             /* Unterversionszahl */
+        return "08";             /* Unterversionszahl */
    }
 }
 
@@ -23977,7 +23944,7 @@ DLL_EXPORT int lut_suche_blz(int such1,int such2,int *anzahl,int **start_idx,int
    return suche_int1(such1,such2,anzahl,start_idx,zweigstellen_base,blz_base,&blz_f,&sort_blz,qcmp_blz,cnt,0);
 }
 
-#line 22550 "konto_check.lxx"
+#line 22517 "konto_check.lxx"
 /* Funktion lut_suche_bic() +§§§2 */
 DLL_EXPORT int lut_suche_bic(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
       char ***base_name,int **blz_base)
@@ -26307,13 +26274,13 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    stat(inputfile,&stat_buffer);
    cnt=stat_buffer.st_size/163+100;    /* etwas großzügig die Anzahl rechnen */
 
-   scl_bic_array=calloc(sizeof(char*),cnt);
-   scl_name_array=calloc(sizeof(char*),cnt);
-   scl_flags_array=calloc(sizeof(char*),cnt);
+   scl_bic_array=(char **)calloc(sizeof(char*),cnt);
+   scl_name_array=(char **)calloc(sizeof(char*),cnt);
+   scl_flags_array=(char **)calloc(sizeof(char*),cnt);
 
-   scl_bic_block=ptr1=calloc(12,cnt);
-   scl_name_block=ptr2=calloc(150,cnt);
-   scl_flags_block=ptr3=calloc(6,cnt);
+   scl_bic_block=ptr1=(char *)calloc(12,cnt);
+   scl_name_block=ptr2=(char *)calloc(150,cnt);
+   scl_flags_block=ptr3=(char *)calloc(6,cnt);
 
    /* SCL-Datei einlesen */
    for(cnt=0;fgets(buffer,512,in);){
@@ -26344,15 +26311,15 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    fclose(in);
 
    /* Sortierarray aufbauen */
-   iptr=calloc(sizeof(int),cnt);
+   iptr=(int* )calloc(sizeof(int),cnt);
    for(i=0;i<cnt;i++)iptr[i]=i;
 
    /* vor dem Abspeichern der Blocks nach BICs sortieren */
    qsort(iptr,cnt,sizeof(int),cmp_bic);
 
-   ptr1=scl_bic_block_s=calloc(1,ptr1-scl_bic_block+16);
-   ptr2=scl_name_block_s=calloc(1,ptr2-scl_name_block+16);
-   ptr3=scl_flags_block_s=calloc(1,ptr3-scl_flags_block+16);
+   ptr1=scl_bic_block_s=(char *)calloc(1,ptr1-scl_bic_block+16);
+   ptr2=scl_name_block_s=(char *)calloc(1,ptr2-scl_name_block+16);
+   ptr3=scl_flags_block_s=(char *)calloc(1,ptr3-scl_flags_block+16);
    for(i=0;i<cnt;i++){
       j=iptr[i];
       for(ptr=scl_bic_array[j];(*ptr1++=*ptr++););
@@ -26459,9 +26426,9 @@ DLL_EXPORT int lut_scl_init(char *lut_name)
    if((i=sscanf(scl_info_block,"cnt: %d, TS: %ld, Gueltigkeit: %15s %15s",
                &cnt,&scl_ts,(char *)&scl_gueltigkeit,(char *)&scl_gueltigkeit_iso))!=4)RETURN(INVALID_SCL_INFO_BLOCK);
 
-   scl_bic_array=calloc(sizeof(char*),cnt);
-   scl_name_array=calloc(sizeof(char*),cnt);
-   scl_flags_array=calloc(sizeof(char*),cnt);
+   scl_bic_array=(char **)calloc(sizeof(char*),cnt);
+   scl_name_array=(char **)calloc(sizeof(char*),cnt);
+   scl_flags_array=(char **)calloc(sizeof(char*),cnt);
 
    for(i=0,ptr=scl_bic_block,end=scl_bic_block+block_size_1;i<cnt && ptr<end;i++){
       scl_bic_array[i]=ptr;

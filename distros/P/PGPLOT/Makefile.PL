@@ -21,26 +21,25 @@ use strict;
 # use command line KEY=VALUE to override defaults.  VALUES are comma
 # separated lists
 
-my %Arg = ( 
+my %Arg = (
 	   # X11 library directories
 	   XDIR => '/usr/openwin/lib,/usr/X11/lib,/usr/X11R6/lib',
 
 	   # X11 libraries
 	   XLIB => 'X11',
 
-
 	   # where cpgplot.h should be
-	   IDIR  => $ENV{PGPLOT_DIR} || '/usr/include,/Applications/PDL/pgplot,/usr/local/pgplot',
+	   IDIR  => undef,
 
 	   # where libpgplot.a should be
-	   LDIR  => $ENV{PGPLOT_DIR} || '/usr/lib',
+	   LDIR => undef,
 
 	   # extra libraries and directories
 	   EXLIB => 'png12,z',
 	   EXDIR => '/Applications/PDL/pgplot,/usr/local/lib',
 	  );
 
-
+# Get user preferences
 my @NARGV;
 while( $_ = shift @ARGV )
 {
@@ -54,6 +53,66 @@ while( $_ = shift @ARGV )
   }
 }
 @ARGV = @NARGV;
+
+# look for libraries and includes if not specified on the command line
+if ( !defined $Arg{IDIR} || !defined $Arg{LDIR} ) {
+
+    my $IDIR;
+    my $LDIR;
+
+    # Specification of PGPLOT location via environment variable
+    if ( defined $ENV{PGPLOT_DIR} ) {
+
+        $IDIR = $ENV{PGPLOT_DIR};
+        $LDIR = $ENV{PGPLOT_DIR};
+    }
+
+    # if using the autotool'd version of PGPLOT (see the "OBTAINING PGPLOT"
+    # section in PGPLOT.pm for more details) pkg-config may be able to
+    # find everything needed.
+
+    #  First try pure-perl vesion
+    elsif ( eval { require PkgConfig; 1 } ) {
+
+        my $pkg = PkgConfig->find( 'cpgplot' );
+        if ( $pkg->pkg_exists ) {
+
+            my @libdirs = map { s/-L//; $_ } grep { /^-L/ } $pkg->get_ldflags;
+            $LDIR = join( ',', @libdirs );
+
+            my @incdirs = map { s/-I//; $_ } grep { /^-I/ } $pkg->get_cflags;
+            $IDIR = join( ',', @incdirs );
+
+        }
+
+    }
+
+    # now try the wrapper around the pkg-config executable
+    elsif ( eval { require ExtUtils::PkgConfig; 1; } ) {
+
+        my %pkg = eval { ExtUtils::PkgConfig->find( 'cpgplot' ); };
+
+        if ( !$@ ) {
+            my @libdirs = map { s/^-L//; $_ } grep { /^-L/ }
+              split( ' ', ExtUtils::PkgConfig->libs_only_L( 'cpgplot' ) );
+
+            $LDIR = join( ',', @libdirs );
+
+
+            my @incdirs = map { s/^-I//; $_ } grep { /^-I/ }
+              split( ' ', ExtUtils::PkgConfig->cflags( 'cpgplot' ) );
+
+            $IDIR = join( ',', @incdirs );
+
+        }
+    }
+
+    # and if nothing worked, use some defaults
+
+    $Arg{IDIR} ||= $IDIR || '/usr/include,/Applications/PDL/pgplot,/usr/local/pgplot';
+    $Arg{LDIR} ||= $LDIR || '/usr/lib,/usr/lib64';
+
+}
 
 my $LIBDIRS = join(' ', map {  "-L$_" }
 		   map { split( ',', $_ ) }

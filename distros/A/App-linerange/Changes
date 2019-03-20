@@ -1,3 +1,11 @@
+0.002    2019-03-20 (PERLANCAR)
+
+        - [opt] Exit early if we can (e.g. user requests lines 3-5 of a
+          1mil-line file).
+
+        - Introduce N1+M syntax which is equivalent to N1..(N1+M-1) syntax.
+
+
 0.001    2019-03-17 (PERLANCAR)
 
         - First release.

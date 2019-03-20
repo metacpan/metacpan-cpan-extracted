@@ -3,9 +3,9 @@ package Function::Interface;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
-use Carp qw(confess);
+use Carp qw(croak);
 use Keyword::Simple;
 use PPR;
 
@@ -121,7 +121,7 @@ sub _assert_valid_interface {
             ;
         )
         $PPR::GRAMMAR
-    }sx or confess "Invalid interface";
+    }sx or croak "invalid interface";
 
     my %match;
     $match{statement} = $+{statement};
@@ -132,36 +132,58 @@ sub _assert_valid_interface {
     return \%match;
 }
 
+$Function::Interface::GRAMMAR = qr{
+    (?(DEFINE)
+        (?<PerlType>
+            (?&PerlIdentifier)
+            (?: \s* \[
+                \s* (?&PerlTypeParameter) \s*
+                (?: , \s* (?&PerlTypeParameter) \s* )*+
+            \] )?
+        )
+
+        (?<PerlTypeParameter>
+            (?&PerlString)|(?&PerlVariable)|(?&PerlType)
+        )
+    )
+
+    $PPR::GRAMMAR
+}x;
+
 sub _assert_valid_interface_params {
     my $src = shift;
 
     my @list = grep { defined } $src =~ m{
-        ((?&type))         (?&PerlOWS)
-        ((?&named))        (?&PerlOWS)
-        ((?&PerlVariable)) (?&PerlOWS)
-        ((?&optional))
+        ((?&PerlType))     \s*
+        (:?) # named       \s*
+        ((?&PerlVariable)) \s*
+        (=?) # optional
 
-        (?(DEFINE)
-            (?<type> (?&PerlIdentifier) | (?&PerlCall) )
-            (?<named> :? )
-            (?<optional> =? )
-        )
-
-        $PPR::GRAMMAR
-    }sxg;
+        $Function::Interface::GRAMMAR
+    }xg;
 
     my @params;
-    while (my @items = splice @list, 0, 4) {
-        confess "invalid param: @items. It should be TYPE VAR."
-            unless (@items == 4);
-
+    while (my ($type, $named, $name, $optional) = splice @list, 0, 4) {
         push @params => {
-            type     => $items[0],
-            named    => !!$items[1],
-            name     => $items[2],
-            optional => !!$items[3],
+            type     => $type,
+            named    => !!$named,
+            name     => $name,
+            optional => !!$optional,
         }
     }
+
+    my $regex = join '\s*,\s*', map {
+        quotemeta sprintf('%s %s%s%s',
+            $_->{type},
+            $_->{named} ? ':' : '',
+            $_->{name},
+            $_->{optional} ? '=' : '',
+        )
+    } @params;
+
+    croak "invalid interface params: $src"
+        unless $src =~ m{ \A \s* $regex \s* \z }x;
+
     return \@params;
 }
 
@@ -169,17 +191,14 @@ sub _assert_valid_interface_return {
     my $src = shift;
 
     my @list = grep { defined } $src =~ m{
-        ((?&type))
+        ((?&PerlType))
+        $Function::Interface::GRAMMAR
+    }xg;
 
-        (?(DEFINE)
-            (?<type> (?&PerlIdentifier) | (?&PerlCall) )
-        )
-
-        $PPR::GRAMMAR
-    }sxg;
-
-    confess "invalid return type: $src. It should be TYPELIST."
-        if $src && !@list;
+    croak "invalid interface return: $src. It should be TYPELIST."
+        unless $src =~ m{
+            \A \s* @{[join '\s*,\s*', map { quotemeta $_ } @list]} \s* \z
+        }x;
 
     return \@list;
 }
@@ -191,35 +210,133 @@ __END__
 
 =head1 NAME
 
-Function::Interface - specify type constraints of subroutines
+Function::Interface - declare typed interface package
 
 =head1 SYNOPSIS
+
+Declare typed interface package C<IFoo>:
 
     package IFoo {
         use Function::Interface;
         use Types::Standard -types;
 
         fun hello(Str $msg) :Return(Str);
+
+        fun add(Int $a, Int $b) :Return(Int);
     }
 
-and implements interface class:
+Implements the interface package C<IFoo>:
 
     package Foo {
         use Function::Interface::Impl qw(IFoo);
-
-        use Function::Parameters;
-        use Function::Return;
         use Types::Standard -types;
 
         fun hello(Str $msg) :Return(Str) {
             return "HELLO $msg";
         }
+
+        fun add(Int $a, Int $b) :Return(Int) {
+            return $a + $b;
+        }
     }
 
+Use the type C<ImplOf>:
+
+    package FooService {
+        use Function::Interface::Types qw(ImplOf);
+        use Function::Parameters;
+        use Function::Return;
+        use Mouse;
+
+        use aliased 'IFoo';
+
+        fun greet(ImplOf[IFoo] $foo) :Return() {
+            print $foo->hello;
+            return;
+        }
+    }
+
+    my $foo_service = FooService->new;
+    my $foo = Foo->new; # implements of IFoo
+
+    $foo_service->greet($foo);
 
 =head1 DESCRIPTION
 
-Function::Interface provides Interface like Java and checks the arguments and return type of the function at compile time.
+This module provides a typed interface.
+C<Function::Interface> declares abstract functions without implementation and defines an interface package.
+C<Function::Interface::Impl> checks if the abstract functions are implemented at B<compile time>.
+
+=head2 SUPPORT
+
+This module supports all perl versions starting from v5.14.
+
+=head2 Declare function
+
+C<Function::Interface> provides two new keywords, C<fun> and C<method>, for declaring abstract functions and methods with types:
+
+    fun hello(Str $msg) :Return(Str);
+
+    method new(Num :$x, Num :$y) :Return(Point);
+
+The method of declaring abstract functions is the same as L<Function::Parameters> and L<Function::Return>.
+
+=head3 declare parameters
+
+Function arguments must always specify a variable name and type constraint, and named arguments and optional arguments can optionally be specified:
+
+    # positional parameters
+    # e.g. called `foo(1,2,3)`
+    fun foo1(Int $a, Int $b, Int $c) :Return();
+
+    # named parameters
+    # e.g. called `bar(x => 123, y => 456)`
+    fun foo2(Num :$x, Num :$y) :Return();
+
+    # optional
+    # e.g. called `baz()` or `baz('some')`
+    fun foo3(Str $msg=) :Return();
+
+=head3 declare return types
+
+Specify zero or more type constraints for the function's return value:
+
+    # zero(empty)
+    fun bar1() :Return();
+
+    # one
+    fun bar2() :Return(Str);
+
+    # two
+    fun bar3() :Return(Str, Num);
+
+=head2 requirements of type constraint
+
+The requirements of type constraint of C<Function::Interface> is the same as for L<Function::Parameters> and L<Function::Return>.
+
+=head1 METHODS
+
+=head2 Function::Interface::info($interface_package)
+
+The function C<Function::Interface::info> lets you introspect interface functions:
+
+    # declare interface package
+    package IBar {
+        use Function::Interface;
+        fun hello() :Return();
+        fun world() :Return();
+    }
+
+    # introspect
+    my $info = Function::Interface::info 'IBar';
+    $info->package; # => IBar
+    $info->functions; # => list of Function::Interface::Info::Function
+
+It returns either C<undef> if it knows nothing about the interface or an object of L<Function::Interface::Info>.
+
+=head1 SEE ALSO
+
+L<Function::Interface::Impl>
 
 =head1 LICENSE
 

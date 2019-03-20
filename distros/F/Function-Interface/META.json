@@ -1,5 +1,5 @@
 {
-   "abstract" : "specify type constraints of subroutines",
+   "abstract" : "declare typed interface package",
    "author" : [
       "kfly8 <kfly@cpan.org>"
    ],
@@ -46,9 +46,10 @@
             "Class::Load" : "0",
             "Function::Parameters" : "2.000003",
             "Function::Return" : "0.05",
+            "Import::Into" : "0",
             "Keyword::Simple" : "0.04",
             "PPR" : "0",
-            "Type::Tiny" : "0",
+            "Type::Tiny" : "1.000000",
             "perl" : "5.014004"
          }
       },
@@ -61,31 +62,31 @@
    "provides" : {
       "Function::Interface" : {
          "file" : "lib/Function/Interface.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Function::Interface::Impl" : {
          "file" : "lib/Function/Interface/Impl.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Function::Interface::Info" : {
          "file" : "lib/Function/Interface/Info.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Function::Interface::Info::Function" : {
          "file" : "lib/Function/Interface/Info/Function.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Function::Interface::Info::Function::Param" : {
          "file" : "lib/Function/Interface/Info/Function/Param.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Function::Interface::Info::Function::ReturnParam" : {
          "file" : "lib/Function/Interface/Info/Function/ReturnParam.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Function::Interface::Types" : {
          "file" : "lib/Function/Interface/Types.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -99,7 +100,7 @@
          "web" : "https://github.com/kfly8/p5-Function-Interface"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_authority" : "cpan:KFLY",
    "x_contributors" : [
       "Kenta Kobayashi <kentafly88@gmail.com>"

@@ -1,5 +1,10 @@
 Revision history for Perl extension Function-Interface
 
+0.04 2019-03-20T14:49:19Z
+    - [feature] automatically import Function::Parameters and Function::Return
+    - add docs and tests 
+    - refactor
+
 0.03 2019-03-15T15:08:52Z
     - add tests
 

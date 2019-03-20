@@ -2,7 +2,7 @@ NAME
     CatalystX::Action::Negotiate - ActionRole for content negotiation
 
 VERSION
-    Version 0.02
+    Version 0.04
 
 SYNOPSIS
         sub default :Path :Does('+CatalystX::Action::Negotiate') {
@@ -87,6 +87,11 @@ DESCRIPTION
     This modification enables you to mix static variants in with dynamic
     ones, or overwrite the list with purely dynamic variants.
 
+    Note that this module may conflict with
+    Catalyst::Plugin::Static::Simple. In future releases I will attempt to
+    bring this module up to par so that it can be a viable replacement, or
+    at the very least be a better cohabitant.
+
 SEE ALSO
     *   Catalyst::Action
 
@@ -128,4 +133,11 @@ LICENSE AND COPYRIGHT
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 137:
+        Unknown directive: =head
 

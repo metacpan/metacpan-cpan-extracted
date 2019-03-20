@@ -2,8 +2,8 @@ NAME
     App::linerange - Retrieve line ranges from a filehandle
 
 VERSION
-    This document describes version 0.001 of App::linerange (from Perl
-    distribution App-linerange), released on 2019-03-17.
+    This document describes version 0.002 of App::linerange (from Perl
+    distribution App-linerange), released on 2019-03-20.
 
 FUNCTIONS
   linerange
@@ -49,16 +49,23 @@ FUNCTIONS
         Line range specification.
 
         A comma-separated list of line numbers ("N") or line ranges
-        ("N1..N2" or "N1-N2"), where N, N1, and N2 are line number
-        specification. Line number begins at 1; it can also be a negative
-        integer (-1 means the last line, -2 means second last, and so on).
-        N1..N2 is the same as N2..N1.
+        ("N1..N2" or "N1-N2", or "N1+M" which means N2 is set to N1+M-1),
+        where N, N1, and N2 are line number specification. Line number
+        begins at 1; it can also be a negative integer (-1 means the last
+        line, -2 means second last, and so on). N1..N2 is the same as
+        N2..N1.
 
         Examples:
 
         *   3 (third line)
 
         *   1..5 (first to fifth line)
+
+        *   3+0 (third line)
+
+        *   3+1 (third to fourth line)
+
+        *   -3+1 (third last to fourth last)
 
         *   5..1 (first to fifth line)
 

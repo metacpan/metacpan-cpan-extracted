@@ -9,6 +9,23 @@
 ##################################################################################
 
 ##################################################################################
+###                      19.03.19 Version 6.08                                 ###
+##################################################################################
+
+   - Update für blz.lut2f: SCL-Daten vom 18.3.19
+   - Korrektur in den Prüfziffermethoden C0 und E1: falls beim ersten Test die
+     Prüfziffer 10 ist, wurde "ungültiges Konto" zurückgegeben, statt den Test mit
+     C0b bzw. E1b weiterzuführen.
+   - IBAN-Regel 56: Code etwas aufgeräumt
+   - einige Typecasts in den scl_*() Funktionen hinzugefügt
+
+##################################################################################
+###                      04.12.18 Version 6.07                                 ###
+##################################################################################
+
+   - Korrektur in den Testdateien für Perl; alles andere ist unverändert
+
+##################################################################################
 ###                      29.11.18 Version 6.06                                 ###
 ##################################################################################
 

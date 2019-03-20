@@ -36,14 +36,14 @@ my %WriteMakefileArgs = (
     "Log::Any" => "1.707",
     "Module::Find" => "0.13",
     "Moo" => 2,
-    "MooX::Attribute::ENV" => 0,
+    "MooX::Attribute::ENV" => "0.02",
     "MooX::Options" => "4.103",
     "MooX::Traits" => "0.005",
     "Pod::Parser" => "1.63",
     "SQL::Translator" => "0.11021",
     "Text::Brew" => "0.02",
     "Type::Tiny" => "1.004004",
-    "version" => "0.9912"
+    "version" => "0.9924"
   },
   "TEST_REQUIRES" => {
     "File::Path" => 0,
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => "0.34",
     "Test::Requires" => "0.10"
   },
-  "VERSION" => "0.068",
+  "VERSION" => "0.071",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,7 +77,7 @@ my %FallbackPrereqs = (
   "Log::Any" => "1.707",
   "Module::Find" => "0.13",
   "Moo" => 2,
-  "MooX::Attribute::ENV" => 0,
+  "MooX::Attribute::ENV" => "0.02",
   "MooX::Options" => "4.103",
   "MooX::Traits" => "0.005",
   "Pod::Parser" => "1.63",
@@ -86,7 +86,7 @@ my %FallbackPrereqs = (
   "Test::Requires" => "0.10",
   "Text::Brew" => "0.02",
   "Type::Tiny" => "1.004004",
-  "version" => "0.9912"
+  "version" => "0.9924"
 );
 
 

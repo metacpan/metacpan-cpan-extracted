@@ -1,6 +1,6 @@
 vim:tw=80:ft=text:ai
 
-Business::KontoCheck version 6.04
+Business::KontoCheck version 6.08
 =================================
 
 This module checks the validity of German Bank Account Numbers. All currently

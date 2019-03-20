@@ -10,7 +10,7 @@ RT::Extension::TicketPDF - make pdfs from tickets.
 
 =cut
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 =head1 SYNOPSIS
 
@@ -20,15 +20,21 @@ Use wkhtmltopdf to display a Ticket as a pdf.
 
 =head1 INSTALL
 
-    Requires: $RT::BinPath/wkhtmltopdf, IPC::Cmd
+    Requires: included wkhtmltopdf, IPC::Cmd
 
     perl Makefile.PL
     make
     make install
 
     # Enable this plugin in your RT_SiteConfig.pm:
-    Set(@Plugins, (qw/RT::Extension::TicketPDF/) );
+    Plugin('RT::Extension::TicketPDF');
 
+    # For pre-RT 4.4.5, patch RT
+    patch -p1 -d /opt/rt4 < patches/show-history.patch
+
+This extension provides a legacy version of C<wkhtmltopdf> which works
+on Linux systems. Newer versions of the utility have issues importing
+local CSS and JS resources and currently do not work with this extension.
 
 =head1 SUPPORT
 
@@ -55,6 +61,10 @@ See http://dev.perl.org/licenses/ for more information.
 
 
 =head1 CHANGES
+
+0.1.3  2019-02-27
+    - Updates for RT 4.4
+    - Update converter path to find the default install location
 
 0.1.2  2012-12-20
     - Use binary in local $RT::LocalPath/bin/wkhtmltopdf instead of /usr/bin/..

@@ -4,7 +4,11 @@
       "'Mikko Koivunalho <mikko.koivunalho@iki.fi>'"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001",
+   "keywords" : [
+      "git",
+      "git-hooks"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -23,15 +27,19 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
             "Test::Version" : "1"
          },
          "suggests" : {
@@ -55,7 +63,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::Most" : "0",
+            "Test::More" : "0",
             "perl" : "5.010000"
          }
       }
@@ -63,7 +71,7 @@
    "provides" : {
       "Git::Mailmap" : {
          "file" : "lib/Git/Mailmap.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -78,6 +86,11 @@
          "web" : "https://github.com/mikkoi/git-mailmap.git"
       }
    },
-   "version" : "0.004"
+   "version" : "0.005",
+   "x_contributors" : [
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.22.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

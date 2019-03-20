@@ -4,6 +4,7 @@ use warnings;
 
 use Test::More;
 use Test::Fatal;
+use File::Temp;
 use Log::Mini;
 
 subtest 'creates stderr logger' => sub {
@@ -13,7 +14,8 @@ subtest 'creates stderr logger' => sub {
 };
 
 subtest 'creates file logger' => sub {
-    my $logger = Log::Mini->new('file');
+    my $file = File::Temp->new;
+    my $logger = Log::Mini->new('file' => $file->filename);
 
     isa_ok $logger, 'Log::Mini::LoggerFILE';
 };

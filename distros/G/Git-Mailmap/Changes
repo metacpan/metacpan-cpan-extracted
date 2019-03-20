@@ -1,5 +1,7 @@
 Revision history for Git-Mailmap
 
+0.005     2019-03-19 21:24:06+01:00 Europe/Stockholm
+
 0.004     2015-05-26 01:22:53+03:00 Europe/Helsinki Changed aliases: one email, one name -> one email, many names. Added to test.
           Fixed minor bugs.
 

@@ -20,9 +20,10 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 7,
     },
     PREREQ_PM => {
-        'PPR'                 => '0.000015',
-        'List::Util'          => 1.45,
-        'Keyword::Simple'     => '>= 0.03' . ($] < 5.018 ? ', != 0.04' : ''),
+        'PPR'                  => '0.000015',
+        'List::Util'           => 1.45,
+        'Keyword::Simple'      => 0,
+        'B::Hooks::EndOfScope' => 0,
     },
     META_MERGE   => {
         no_index => {

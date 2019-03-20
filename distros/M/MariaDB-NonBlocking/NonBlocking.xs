@@ -31,7 +31,9 @@
 #endif
 
 #ifdef MARIADB_PACKAGE_VERSION_ID
-#  define HAVE_SSL_ENFORCE ( MARIADB_PACKAGE_VERSION_ID >= 30002 )
+#  if MARIADB_PACKAGE_VERSION_ID >= 30002
+#    define HAVE_SSL_ENFORCE
+#  endif
 #endif
 
 typedef struct sql_config {
@@ -1041,7 +1043,7 @@ THX_unpack_config_from_hashref(pTHX_ SV* self, HV* args)
             ssl_verify = SvTRUE(*svp);
         }
 
-#if HAVE_SSL_ENFORCE
+#ifdef HAVE_SSL_ENFORCE
         if (mysql_options(maria->mysql, MYSQL_OPT_SSL_ENFORCE, &ssl_enforce) != 0) {
             croak("Enforcing SSL encryption is not supported");
         }

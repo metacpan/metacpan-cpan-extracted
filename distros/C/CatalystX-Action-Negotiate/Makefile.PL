@@ -16,7 +16,7 @@ tests_recursive('t');
 resources (
     license    => 'http://www.apache.org/licenses/LICENSE-2.0',
     repository => 'git://github.com/doriantaylor/p5-catalystx-action-negotiate.git',
-    bugtracker => 'https://github.com/doirantaylor/p5-catalystx-action-negotiate/issues',
+    bugtracker => 'https://github.com/doriantaylor/p5-catalystx-action-negotiate/issues',
 );
 
 configure_requires (

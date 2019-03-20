@@ -10,7 +10,7 @@
  * #  Verwendung in anderen Programmen bzw. Programmiersprachen benutzt     #
  * #  werden.                                                               #
  * #                                                                        #
- * #  Copyright (C) 2002-2018 Michael Plugge <m.plugge@hs-mannheim.de>      #
+ * #  Copyright (C) 2002-2019 Michael Plugge <m.plugge@hs-mannheim.de>      #
  * #                                                                        #
  * #  Dieses Programm ist freie Software; Sie dürfen es unter den           #
  * #  Bedingungen der GNU Lesser General Public License, wie von der Free   #

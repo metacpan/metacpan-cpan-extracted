@@ -3,7 +3,7 @@ package Function::Interface::Types;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Type::Library -base,
     -declare => qw( ImplOf );
@@ -50,30 +50,27 @@ __END__
 
 =head1 NAME
 
-Function::Interface::Types - Interface types
+Function::Interface::Types - interface types for Type::Tiny
 
 =head1 SYNOPSIS
 
     use Function::Interface::Types -types;
     my $type = ImplOf['IFoo'];
 
-    $type->check('Foo');
-    $type->check($foo);
+    my $foo = Foo->new; # implements of 'IFoo'
+    $type->check($foo); # ok
 
 =head1 DESCRIPTION
 
-Function::Interface::Types provides type constraints of Interface.
+Function::Interface::Types provides type constraints of interface package.
+The following types are available.
 
-=head1 LICENSE
+=head2 ImplOf[`a]
 
-Copyright (C) kfly8.
+C<ImplOf['IFoo', 'IBar']> allows objects or packages where implements of interface package 'IFoo' and 'IBar' both return true.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Given no parameters, just equivalent to Object or ClassName.
 
-=head1 AUTHOR
+=head1 SEE ALSO
 
-kfly8 E<lt>kfly@cpan.orgE<gt>
-
-=cut
-
+L<Function::Interface>

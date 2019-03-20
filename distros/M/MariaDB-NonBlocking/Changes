@@ -1,5 +1,12 @@
 Revision history for MariaDB-NonBlocking
 
+0.20    2019-03-20
+        * SSL was broken older (pre-2018) versions of mariadb-connector-c.
+          Again x3.
+        * Times in the connection pool did not use highres time, which
+          meant that users using hires time could see queries taking
+          negative time.
+
 0.19    2019-03-19
         * SSL was broken older (pre-2018) versions of mariadb-connector-c.
           Again x2.

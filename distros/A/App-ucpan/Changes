@@ -1,5 +1,9 @@
 Revision history for Perl extension App-ucpan
 
+1.05 2019-03-20T13:53:50Z
+    - Improve the folding of long module names
+    - Make installation execution order case insensitive
+
 1.04 2019-03-19T04:42:16Z
     - Add option "-j" to control parallel test job habits.
     - Fix timeout processing ( on Win32 )

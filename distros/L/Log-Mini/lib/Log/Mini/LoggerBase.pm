@@ -7,6 +7,8 @@ use Carp qw(croak);
 use List::Util qw(first);
 use Time::Moment;
 
+use Data::Dumper;
+use feature qw/say/;
 
 my $LEVELS = {
     error => 1,
@@ -17,13 +19,14 @@ my $LEVELS = {
 };
 
 sub new {
+
+    # say STDERR Dumper(\@_);
     my $class = shift;
     my (%params) = @_;
 
     my $self = {};
     bless $self, $class;
 
-    $self->{'file'} = $params{'file'};
     $self->{'level'} = $params{'level'} || 'error';
 
     return $self;

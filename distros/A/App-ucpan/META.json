@@ -61,11 +61,11 @@
    "provides" : {
       "App::ucpan" : {
          "file" : "lib/App/ucpan.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
-   "version" : "1.04",
+   "version" : "1.05",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpanx@gmail.com>"

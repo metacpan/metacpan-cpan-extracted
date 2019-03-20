@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::Most;
+use Test::More;
 
 # use Log::Any::Adapter ('Stderr');    # Activate to get all log messages.
 
@@ -135,7 +135,6 @@ is_deeply(
 is_deeply( \@proper, [ undef, undef ], 'Not mapped <not_mapped_address@address>.' );
 @proper = $mailmap->map( 'email' => 'faulty_email_address>' );
 is_deeply( \@proper, [ undef, undef ], 'Not mapped "faulty_email_address>".' );
-dies_ok { @proper = $mailmap->map( 'email' => '' ) } 'Failed when empty email address string.';
 
 done_testing();
 __END__
