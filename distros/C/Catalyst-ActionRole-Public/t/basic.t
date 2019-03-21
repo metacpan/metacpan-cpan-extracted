@@ -70,4 +70,28 @@ use Catalyst::Test 'MyApp';
   is $res->header('Cache-Control'), 'private, max-age=600';
 }
 
+{
+  ok my $res = request '/static/test.txt';
+  is $res->code, 200;
+  is $res->content, "static not found for test.txt";
+}
+
+{
+  ok my $res = request '/static/example.txt';
+  is $res->code, 200;
+  is $res->content, "example\n";
+}
+
+{
+  ok my $res = request '/welcome.txt';
+  is $res->code, 200;
+  is $res->content, "example\n";
+}
+
+{
+  ok my $res = request '/one.txt';
+  is $res->code, 200;
+  is $res->content, "example\n";
+}
+
 done_testing;

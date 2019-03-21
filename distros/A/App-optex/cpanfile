@@ -1,6 +1,6 @@
 requires 'perl', '5.014';
 
-requires 'Getopt::EX', 'v1.13.1';
+requires 'Getopt::EX', 'v1.14.0';
 requires 'List::Util', '1.45';
 requires 'TOML', '0.95';
 requires 'Text::VisualWidth::PP', '0.05';

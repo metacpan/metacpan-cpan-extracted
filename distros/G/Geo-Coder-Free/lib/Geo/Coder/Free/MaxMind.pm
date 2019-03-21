@@ -6,6 +6,7 @@ use warnings;
 use Geo::Coder::Free::DB::MaxMind::admin1;
 use Geo::Coder::Free::DB::MaxMind::admin2;
 use Geo::Coder::Free::DB::MaxMind::cities;
+use Geo::Location::Point;
 use Module::Info;
 use Carp;
 use File::Spec;
@@ -32,11 +33,11 @@ Geo::Coder::Free::Maxmind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -95,8 +96,8 @@ sub new {
 
     $location = $geocoder->geocode(location => $location);
 
-    print 'Latitude: ', $location->{'latitude'}, "\n";
-    print 'Longitude: ', $location->{'longitude'}, "\n";
+    print 'Latitude: ', $location->lat(), "\n";
+    print 'Longitude: ', $location->long(), "\n";
 
     # TODO:
     # @locations = $geocoder->geocode('Portland, USA');
@@ -125,8 +126,13 @@ sub geocode {
 		$location = "$1, Washington, DC, $2";
 	}
 
-	if($known_locations{$location}) {
-		return $known_locations{$location};
+	if(my $rc = $known_locations{$location}) {
+		# return $known_locations{$location};
+		return Geo::Location::Point->new({
+			'lat' => $rc->{'latitude'},
+			'long' => $rc->{'longitude'},
+			'location' => $location
+		});
 	}
 
 	# ::diag(__LINE__, ": $location");
@@ -192,7 +198,7 @@ sub geocode {
 			$concatenated_codes = 'GB';
 		}
 		my $countrycode = country2code($country);
-		# ::diag(__LINE__, ": country $countrycode, county $county, state $state, location $location");
+	# 	::diag(__LINE__, ": country $countrycode, county $county, state $state, location $location");
 
 		if($state && $admin1cache{$state}) {
 			$concatenated_codes = $admin1cache{$state};
@@ -228,6 +234,7 @@ sub geocode {
 			}
 		}
 	}
+	# ::diag(__LINE__, ": $concatenated_codes");
 	return unless(defined($concatenated_codes));
 
 	$self->{'admin2'} //= Geo::Coder::Free::DB::MaxMind::admin2->new() or die "Can't open the admin2 database";
@@ -300,7 +307,7 @@ sub geocode {
 	if((scalar(@regions) == 0) && !defined($region)) {
 		# e.g. Unitary authorities in the UK
 		# admin[12].db columns are labelled ['concatenated_codes', 'name', 'asciiname', 'geonameId']
-		# ::diag(__LINE__, ": $location");
+	# 	::diag(__LINE__, ": $location");
 		@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		if(scalar(@admin2s) && defined($admin2s[0]->{'concatenated_codes'})) {
 			foreach my $admin2(@admin2s) {
@@ -367,11 +374,11 @@ sub geocode {
 		if(scalar(@rc) == 0) {
 			@rc = $self->{'cities'}->selectall_hash('Region' => $options->{'Region'});
 			if(scalar(@rc) == 0) {
-				# ::diag(__LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
+	 			# ::diag(__LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
 				return;
 			}
 		}
-		# ::diag(__LINE__, Data::Dumper->new([\@rc])->Dump());
+	 	# ::diag(__LINE__, Data::Dumper->new([\@rc])->Dump());
 		foreach my $city(@rc) {
 			if($city->{'Latitude'}) {
 				$city->{'latitude'} = delete $city->{'Latitude'};
@@ -404,7 +411,18 @@ sub geocode {
 			}
 			$city->{'location'} = $l;
 		}
-		return @rc;
+		# return @rc;
+		my @locations;
+
+		foreach my $l(@rc) {
+			push @locations, Geo::Location::Point->new({
+				'lat' => $l->{'latitude'},
+				'long' => $l->{'longitude'},
+				'location' => $location
+			});
+		}
+
+		return @locations;
 	}
 	my $city = $self->{'cities'}->fetchrow_hashref($options);
 	if(!defined($city)) {
@@ -421,12 +439,19 @@ sub geocode {
 		}
 	}
 
+	# ::diag(__LINE__, Data::Dumper->new([$city])->Dump());
 	if(defined($city) && defined($city->{'Latitude'})) {
 		$city->{'latitude'} = delete $city->{'Latitude'};
 		$city->{'longitude'} = delete $city->{'Longitude'};
 		$city->{'confidence'} = $confidence;
+		return Geo::Location::Point->new({
+			'lat' => $city->{'latitude'},
+			'long' => $city->{'longitude'},
+			'location' => $location
+		});
 	}
-	return $city;
+	# return $city;
+	undef;
 }
 
 =head2 reverse_geocode

@@ -17,11 +17,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 our $alternatives;
 
@@ -32,9 +32,15 @@ our $alternatives;
     my $geo_coder = Geo::Coder::Free->new();
     my $location = $geo_coder->geocode(location => 'Ramsgate, Kent, UK');
 
+    print 'Latitude: ', $location->lat(), "\n";
+    print 'Longitude: ', $location->long(), "\n";
+
     # Use a local download of http://results.openaddresses.io/
     my $openaddr_geo_coder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
     $location = $openaddr_geo_coder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
+
+    print 'Latitude: ', $location->lat(), "\n";
+    print 'Longitude: ', $location->long(), "\n";
 
 =head1 DESCRIPTION
 
@@ -288,6 +294,9 @@ There is a sample website at L<https://geocode.nigelhorne.com/>.  The source cod
 
 Some lookups fail at the moments, if you find one please file a bug report.
 
+Doesn't include results from
+L<Geo::Coder::Free::Local>.
+
 The MaxMind data only contains cities.
 The OpenAddresses data doesn't cover the globe.
 
@@ -320,6 +329,7 @@ See L<https://github.com/whosonfirst-data/whosonfirst-data/blob/master/LICENSE.m
 
 # Common mappings allowing looser lookups
 # Would be nice to read this from somewhere on-line
+# See also lib/Geo/Coder/Free/Local.pm
 __DATA__
 St Lawrence, Thanet, Kent = Ramsgate, Kent
 St Peters, Thanet, Kent = St Peters, Kent

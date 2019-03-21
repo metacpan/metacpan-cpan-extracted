@@ -1,5 +1,9 @@
 Revision history for `optex' command.
 
+v0.3 2019-03-21T07:44:57Z
+
+    - Use given name rather than aliased name for rc and module.
+
 v0.2.3 2018-12-27T08:08:49Z
 
     - requires 'Getopt::EX', 'v1.13.1';

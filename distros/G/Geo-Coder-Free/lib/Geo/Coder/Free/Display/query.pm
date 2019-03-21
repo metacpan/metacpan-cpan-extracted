@@ -43,30 +43,43 @@ sub html {
 			return '{}' if(!defined($rc));
 		}
 
-		delete $rc->{'md5'};
-		delete $rc->{'sequence'};
-		foreach my $key(keys %{$rc}) {
-			if(!defined($rc->{$key})) {
-				delete $rc->{$key};
-			}
-		}
+		# delete $rc->{'md5'};
+		# delete $rc->{'sequence'};
+		# foreach my $key(keys %{$rc}) {
+			# if(!defined($rc->{$key})) {
+				# delete $rc->{$key};
+			# }
+		# }
 
-		return encode_json $rc;
+		# return encode_json $rc;
+		return encode_json {
+			'latitude' => $rc->lat(),
+			'longitude' => $rc->long()
+		};
 	} elsif(my $scantext = $params{'scantext'}) {
 		my @rc = $geocoder->geocode(scantext => $scantext);
 
 		return '{}' if(scalar(@rc) == 0);
 
+		# foreach my $l(@rc) {
+			# delete $l->{'md5'};
+			# delete $l->{'sequence'};
+			# foreach my $key(keys %{$l}) {
+				# if(!defined($l->{$key})) {
+					# delete $l->{$key};
+				# }
+			# }
+		# }
+		# return encode_json \@rc;
+
+		my @locations;
 		foreach my $l(@rc) {
-			delete $l->{'md5'};
-			delete $l->{'sequence'};
-			foreach my $key(keys %{$l}) {
-				if(!defined($l->{$key})) {
-					delete $l->{$key};
-				}
-			}
-		}
-		return encode_json \@rc;
+			push @locations, {
+				'latitude' => $l->lat(),
+				'longitude' => $l->long()
+			};
+		};
+		return encode_json \@locations;
 	}
 
 	return '{}';

@@ -83,6 +83,10 @@ Command aliases can be set in the configuration file like this:
     [alias]
         pgrep = [ "greple", "-Mperl", "--code" ]
 
+Alias name is used to find rc file and module directory.  In above
+example, `~/.optex.d/pgrep.rc` and `~/.optex.d/pgrep/` will be
+reffered.
+
 Read CONFIGURATION FILE section.
 
 ## MACROS
@@ -397,4 +401,4 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2018 Kazumasa Utashiro
+Copyright 2017-2019 Kazumasa Utashiro

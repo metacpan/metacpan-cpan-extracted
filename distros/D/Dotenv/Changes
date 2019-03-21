@@ -1,4 +1,10 @@
 Revision history for Dotenv
 
+0.002 2019-03-20 BOOK
+    - parse and load now always return a hash reference
+      (this is a breaking change from v0.001)
+    - add support for `use Dotenv -load`, to load the module
+      and the .env file at once at compile time
+
 0.001 2019-03-20 BOOK
     - first release

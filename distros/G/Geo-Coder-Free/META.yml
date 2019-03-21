@@ -13,11 +13,13 @@ build_requires:
   File::Basename: '0'
   File::Copy: '0'
   File::Spec: '0'
+  Geo::Location::Point: '0'
   IO::AIO: '0'
   IPC::System::Simple: '0'
   JSON: '0'
   LWP::UserAgent::Throttled: '0'
   Test::Carp: '0'
+  Test::Deep: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
   Test::Number::Delta: '0'
@@ -58,9 +60,10 @@ requires:
   Module::Info: '0'
   Storable: '0'
   Text::CSV: '0'
+  Text::xSV::Slurp: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Coder-Free/issues
   repository: git://github.com/nigelhorne/Geo-Coder-Free.git
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

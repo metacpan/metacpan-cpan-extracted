@@ -1,10 +1,23 @@
 package Dotenv;
-$Dotenv::VERSION = '0.001';
+$Dotenv::VERSION = '0.002';
 use strict;
 use warnings;
 
 use Carp       ();
 use Path::Tiny ();
+
+sub import {
+    my ( $package, @args ) = @_;
+    if (@args) {
+        my $action = shift @args;
+        if ( $action eq '-load' ) {
+            $package->load(@args);
+        }
+        else {
+            Carp::croak "Unknown action $action";
+        }
+    }
+}
 
 my $parse = sub {
     my ( $string, $env ) = @_;
@@ -93,13 +106,14 @@ sub parse {
         %env = ( %kv, %env );
     }
 
-    return %env;
+    return \%env;
 }
 
 sub load {
     my ( $package, @sources ) = @_;
     @sources = ('.env') if !@sources;
-    %ENV = $package->parse( \%ENV, @sources );
+    %ENV = %{ $package->parse( \%ENV, @sources ) };
+    return \%ENV;
 }
 
 '.env';
@@ -114,7 +128,7 @@ Dotenv - Support for C<dotenv> in Perl
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -122,25 +136,31 @@ version 0.001
     use Dotenv;      # exports nothing
     Dotenv->load;    # merge the content of .env in %ENV
 
+    # do it all in one line
+    use Dotenv -load;
+
     # the source for environment variables can be a file, a filehandle,
     # a hash reference, an array reference and several other things
     # the sources are loaded in %ENV without modifying existing values
     Dotenv->load(@sources);
 
+    # sources can also be loaded via import
+    use Dotenv -load => 'local.env';
+
     # add some local stuff to %ENV (from a non-file source)
     # (.env is the default only if there are no arguments)
     Dotenv->load( \%my_env );
 
-    # return the key/value pairs read in the file,
-    # but do not set %ENV
-    my %env = Dotenv->parse('app.env');
+    # return a reference to a hash populated with the key/value pairs
+    # read in the file, but do not set %ENV
+    my $env = Dotenv->parse('app.env');
 
     # dynamically add to %ENV
-    local %ENV = Dotenv->parse( \%ENV, 'test.env' );
+    local %ENV = %{ Dotenv->parse( \%ENV, 'test.env' ) };
 
     # order of arguments matters, so this might yield different results
     # (here, values in 'test.env' take precedence over those in %ENV)
-    local %ENV = Dotenv->parse( 'test.env', \%ENV );
+    local %ENV = %{ Dotenv->parse( 'test.env', \%ENV ) };
 
 =head1 DESCRIPTION
 
@@ -157,12 +177,12 @@ C<Dotenv> has only two methods, and exports nothing.
 
 =head2 parse
 
-    %env = Dotenv->parse(@sources);
+    $env = Dotenv->parse(@sources);
 
 Parse the content of the provided sources.
 
-In list context, return the list of key/value pairs read from the sources,
-In scalar context, return the number of pairs read from the sources.
+Return a reference to a hash populated with the list of key/value pairs
+read from the sources,
 
 If no sources are provided, use the F<.env> file in the current working
 directory as the default source.
@@ -171,14 +191,18 @@ directory as the default source.
 
     Dotenv->load(@sources);
 
-Parses the content of the provided sources and update L<perlvar/%ENV>
-with the key/value pairs obtained.
-
-In list context, return the list of key/value pairs read from the sources,
-In scalar context, return the number of pairs read from the sources.
+Behaves exactly like L<parse>, and also update L<perlvar/%ENV> with the
+key/value pairs obtained for the sources.
 
 If no sources are provided, use the F<.env> file in the current working
 directory as the default source.
+
+C<load> can also be called while loading the module, with the sources
+provided as a LIST (an empty list still means to use the default source):
+
+    use Dotenv -load;
+
+    use Dotenv -load => LIST;
 
 =head1 THE "ENV" FORMAT
 

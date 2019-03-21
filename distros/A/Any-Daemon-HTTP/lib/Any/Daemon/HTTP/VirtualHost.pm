@@ -1,4 +1,4 @@
-# Copyrights 2013-2018 by [Mark Overmeer].
+# Copyrights 2013-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP::VirtualHost;
 use vars '$VERSION';
-$VERSION = '0.27';
+$VERSION = '0.28';
 
 
 use warnings;
@@ -41,11 +41,12 @@ sub init($)
     defined $name
         or error __x"virtual host {pkg} has no name", pkg => ref $self;
 
-    my $aliases = $args->{aliases} || [];
+    my $aliases = $args->{aliases} || 'AUTO';
     $self->{ADHV_aliases}
       = ref $aliases eq 'ARRAY' ? $aliases
       : $aliases eq 'AUTO'      ? [ $self->generateAliases($name) ]
-      :                           [ $aliases ];
+      : defined $aliases        ? [ $aliases ]
+	  : [];
 
     $self->addHandler($args->{handlers} || $args->{handler});
 
@@ -55,11 +56,11 @@ sub init($)
 
     $self->{ADHV_sources}     = {};
     $self->_auto_docs($args->{documents});
-    my $dirs = $args->{directories} || [];
+    my $dirs = $args->{directories} || $args->{directory} || [];
     $self->addDirectory($_) for ref $dirs eq 'ARRAY' ? @$dirs : $dirs;
 
     $self->{ADHV_proxies}  = {};
-    my $proxies = $args->{proxies}  || [];
+    my $proxies = $args->{proxies}  || $args->{proxy} || [];
     $self->addProxy($_) for ref $proxies eq 'ARRAY' ? @$proxies : $proxies;
 
     $self;
@@ -115,6 +116,8 @@ sub generateAliases($)
 
 sub addHandler(@)
 {   my $self = shift;
+	return if @_==1 && !defined $_[0];
+
     my @pairs
        = @_ > 1              ? @_
        : ref $_[0] eq 'HASH' ? %{$_[0]}
@@ -155,7 +158,11 @@ sub findHandler(@)
         return $handler if $handler;
         pop @path;
     }
-    
+
+    if(my $handler = $h->{'/'})
+    {   return $handler;
+    }
+
     sub { HTTP::Response->new(HTTP_NOT_FOUND) };
 }
 
@@ -189,6 +196,10 @@ sub handleRequest($$$;$)
     # dynamic content
     $resp = $self->findHandler(@path)->($self, $session, $req, $uri, $source);
     $resp or return HTTP::Response->new(HTTP_NO_CONTENT);
+
+    blessed $resp && $resp->isa('HTTP::Response')
+        or error __x"Handler for {uri} does not return an HTTP::Response",
+            uri => $uri->as_string;
 
     $resp->code eq HTTP_OK
         or return $resp;

@@ -24,5 +24,8 @@ Revision history for Perl module REST::Client::CrossRef
     - articles_from_funder can received any {key => value, key2 => ...} to build a filter string
     - corrected bug in get_next
     - json_path_callback: function not called if the extracted array is empty
-    - added test to chek get_next
-
+    - added test to check get_next
+0.009
+    - works_from_doi can received a filter hash ref and a select string.
+    - works_from_orcid($i, $filter, $select) to retrieve the works road
+    - return undef if {message}-{total-results} is 0

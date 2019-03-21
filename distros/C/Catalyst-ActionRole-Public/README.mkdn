@@ -9,14 +9,38 @@ Catalyst::ActionRole::Public - Mount a public url to files in your project direc
     use Moose;
     use MooseX::MethodAttributes;
 
-    sub static :Local Does(Public) At(/:actionname/*) { ... }
+    sub static :Local Does(Public) {  }
 
     __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
 
-Will create an action that from URL 'localhost/static/a/b/c/d.js' will serve
+Will create an action that from URL 'https://myhost.com/static/a/b/c/d.js' will serve
 file $c->config->{root} . '/static' . '/a/b/c/d.js'.  Will also set content type, length
 and Last-Modified HTTP headers as needed.  If the file does not exist, will not
-match (allowing possibly other actions to match).
+match (allowing possibly other actions to match such as a 'Not Found' catchall.
+
+It also builds in support for [Plack::Middleware::XSendfile](https://metacpan.org/pod/Plack::Middleware::XSendfile) by using ["set\_io\_path" in Plack::Util](https://metacpan.org/pod/Plack::Util#set_io_path)
+on the filehandle object.  This way can can take advantage of static file serving via a
+fast webserver even if you need to serve such files from behind a password protected route.
+
+If you prefer to use Chaining, here's the same type of match:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends  'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { }
+
+    sub static :Chained(root) Args Does(Public) { }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+This would have the effect of making the directory at "$c->config->root . '/static'" served
+as a public directory.
 
 # DESCRIPTION
 
@@ -37,7 +61,7 @@ use case for that...)
 The body of your action will be executed after we've created a filehandle to
 the found file and setup the response.  You may leave it empty, or if you want
 to do additional logging or work, you can. Also, you will find a stash key 
-`public_file_path` has been populated with a [Path::Class](https://metacpan.org/pod/Path::Class) object which is
+`public_file` has been populated with a [Path::Class](https://metacpan.org/pod/Path::Class) object which is
 pointing to the found file.  The action method body will not be executed if
 the file associated with the action does not exist.
 
@@ -45,19 +69,57 @@ the file associated with the action does not exist.
 
 Actions the consume this role provide the following subroutine attributes.
 
-## ShowDebugging
-
-Enabled developer debugging output.  Example:
-
-    sub myaction :Local Does(Public) ShowDebugging { ... }
-
-If present do not surpress the extra developer mode debugging information.  Useful
-if you have trouble serving files and you can't figure out why.
-
 ## At 
 
-Used to set the action class template used to match files on the filesystem to
-incoming requests.  Examples:
+## Serves
+
+Used to set the action role template used to match files on the filesystem to
+incoming requests.  Either 'At' or 'Serves' can be used to avoid namespace collision
+with other actions roles.  'Serves' will be looked at first in the case where more than
+one exists.  Useful if you have complex needs or to match a single file:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends  'Catalyst::Controller';
+
+    welcome :Path('welcome.txt') Args(0) Does(Public) Serves('/welcome.txt')  { }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+Will just match 'https://localhost/welcome.txt'.  Although it seems verbose we are cleanly
+distinguishing between the URL that is matched, the private name of the matched action, and
+the actual file path served. You might do something like this if you have a static file you
+want to serve behind a password.  Here's a similar type of pattern if you are using Chaining:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends  'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { }
+
+    sub one_file :Chained(root) 
+      PathPart('one.txt') Args(0)
+      Does(Public) Serves('/one.txt') { }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+Please note the '/' in "Serves('/one.txt')".  This would math the URL 'https://hostname/one.txt'
+and serve the file:
+
+    $c->config->{root} . '/one.txt'
+
+If you left off the '/' the file path would be relative to the action private name (in this case
+$c->config->{root} . 'one\_file' . '/one.txt').
+
+More Examples:
 
     package MyApp::Controller::Basic;
 
@@ -65,6 +127,9 @@ incoming requests.  Examples:
     use MooseX::MethodAttributes;
 
     extends  'Catalyst::Controller';
+
+    #localhost/basic/welcome
+    sub welcome :Path('welcome.txt') Args(0) Does(Public) { }
 
     #localhost/basic/css => $c->config->{root} .'/basic/*'
     sub css :Local Does(Public) At(/:namespace/*) { }
@@ -167,6 +232,34 @@ match the declared type.
 
 You may declare more than one ContentType, in which case all allowed types are
 permitted in the match.
+
+## CacheControl
+
+Used to set the Cache-Control HTTP header (useful for caching your static assets).
+Example:
+
+    sub myaction :Local Does(Public) CacheControl(public, max-age=600) { ...}
+
+## ShowDebugging
+
+Enabled developer debugging output.  Example:
+
+    sub myaction :Local Does(Public) ShowDebugging { ... }
+
+If present do not surpress the extra developer mode debugging information.  Useful
+if you have trouble serving files and you can't figure out why.
+
+**NOTE** Although you can set this on the action controller code, it is likely you will
+prefer to set it via configuration (for example turn it on only in development).  For
+example:
+
+    __PACKAGE__->config(
+      'Controller::Root' => {
+        actions => {
+          myaction => { ShowDebugging => },
+        },
+      },
+    );
 
 # RESPONSE INFO
 

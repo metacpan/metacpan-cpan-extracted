@@ -128,7 +128,7 @@ EO_USAGE
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.05');
+            our $VERSION = version->declare('1.06');
             print __PACKAGE__->VERSION, $/;
             exit;
         },

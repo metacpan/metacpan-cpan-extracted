@@ -4,7 +4,7 @@
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.3",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.13.1",
+            "Getopt::EX" : "v1.14.0",
             "List::Util" : "1.45",
             "TOML" : "0.95",
             "Text::VisualWidth::PP" : "0.05",
@@ -61,7 +61,7 @@
    "provides" : {
       "App::optex" : {
          "file" : "lib/App/optex.pm",
-         "version" : "v0.2.3"
+         "version" : "v0.3.0"
       },
       "App::optex::Tmpfile" : {
          "file" : "lib/App/optex/Tmpfile.pm"
@@ -93,11 +93,10 @@
          "web" : "https://github.com/kaz-utashiro/optex"
       }
    },
-   "version" : "v0.2.3",
+   "version" : "v0.3",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 0
 }

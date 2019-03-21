@@ -5,11 +5,11 @@ use Dotenv;
 
 chdir 't/env' or diag "Can't chdir to t/env: $!";
 
-my %env = Dotenv->parse;
-is_deeply( \%env, { DOTENV => 'true' }, 'parse read .env by default' );
+my $env = Dotenv->parse;
+is_deeply( $env, { DOTENV => 'true' }, 'parse read .env by default' );
 
-%env = ( DOTENV => 'true', local %ENV = %ENV );
+$env = { DOTENV => 'true', local %ENV = %ENV };
 Dotenv->load;
-is_deeply( \%ENV, \%env, 'load read .env by default' );
+is_deeply( \%ENV, $env, 'load read .env by default' );
 
 done_testing;

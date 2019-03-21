@@ -4,6 +4,7 @@ bin/geodecode
 bin/testcgibin
 cgi-bin/page.fcgi
 Changes
+conf/microcenter
 conf/ncbimac2024
 conf/njh
 conf/page.l4pconf
@@ -24,6 +25,7 @@ lib/Geo/Coder/Free/DB/openaddresses.pm
 lib/Geo/Coder/Free/Display.pm
 lib/Geo/Coder/Free/Display/index.pm
 lib/Geo/Coder/Free/Display/query.pm
+lib/Geo/Coder/Free/Local.pm
 lib/Geo/Coder/Free/MaxMind.pm
 lib/Geo/Coder/Free/MaxMind/databases/MAXMIND.LICENCE
 lib/Geo/Coder/Free/OpenAddresses.pm
@@ -44,6 +46,7 @@ t/cities.t
 t/coverage.t
 t/lib/MyLogger.pm
 t/links.t
+t/local.t
 t/manifest.t
 t/maxmind.t
 t/no404s.t

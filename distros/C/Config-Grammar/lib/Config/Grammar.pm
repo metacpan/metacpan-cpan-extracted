@@ -1,7 +1,7 @@
 package Config::Grammar;
 use strict;
 
-$Config::Grammar::VERSION = '1.12';
+$Config::Grammar::VERSION = '1.13';
 
 sub new($$)
 {
@@ -650,11 +650,11 @@ sub makemintmpl ($@) {
 
 sub parse($$$)
 {
-    my $self        = shift;
-    my $file        = shift;
-    my $args        = shift;
+    my $self = shift;
+    my $file = shift;
+    my $args = shift;
 
-    $self->{encoding} = $args->{encoding};
+    $self->{encoding} = $args->{encoding} if ref $args eq 'HASH';
 
     $self->{cfg}           = {};
     $self->{level}         = 0;
@@ -937,7 +937,7 @@ syntax is as follows:
 
 =head3 Assignments
 
-Assignements take the form: 'variable = value', where value can be any string
+Assignments take the form: 'variable = value', where value can be any string
 (can contain whitespaces and special characters). The spaces before and after
 the equal sign are optional.
 

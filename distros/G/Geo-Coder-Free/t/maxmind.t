@@ -2,9 +2,10 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 79;
-use Test::Number::Delta;
+use Test::Most tests => 38;
 use Test::Carp;
+use Test::Deep;
+use Test::Number::Delta;
 use lib 't/lib';
 use MyLogger;
 
@@ -12,182 +13,156 @@ BEGIN {
 	use_ok('Geo::Coder::Free');
 }
 
-LOOKUP: {
+MAXMIND: {
 	SKIP: {
 		if($ENV{AUTHOR_TESTING}) {
 			diag('This may take some time and consume a lot of memory if the database is not SQLite');
 
 			Geo::Coder::Free::DB::init(logger => new_ok('MyLogger'));
 
-			my $geocoder = new_ok('Geo::Coder::Free::MaxMind');
+			my $geo_coder = new_ok('Geo::Coder::Free::MaxMind');
 
-			my $location = $geocoder->geocode('Woolwich, London, England');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.47, 1e-2);
-			delta_within($location->{longitude}, 0.20, 1e-2);
+			# my $location = $geo_coder->geocode('Woolwich, London, England');
+			# ok(defined($location));
+			# delta_within($location->{latitude}, 51.47, 1e-2);
+			# delta_within($location->{longitude}, 0.20, 1e-2);
+			cmp_deeply($geo_coder->geocode('Woolwich, London, England'),
+				methods('lat' => num(51.47, 1e-2), 'long' => num(0.20, 1e-2)));
 
 			TODO: {
 				local $TODO = "Don't know how to parse 'London, England'";
 
 				eval {
-					$location = $geocoder->geocode('London, England');
+					my $location = $geo_coder->geocode('London, England');
 					ok(defined($location));
 				};
 			}
 
-			$location = $geocoder->geocode('Indianapolis, Indiana, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.77, 1e-2);
-			delta_within($location->{longitude}, -86.15, 1e-2);
+			my $l = $geo_coder->geocode('Indianapolis, Indiana, USA');
+			cmp_deeply($l,
+				methods('lat' => num(39.77, 1e-2), 'long' => num(-86.15, 1e-2)));
+			cmp_deeply($geo_coder->geocode('Ramsgate, Kent, England'),
+				methods('lat' => num(51.33, 1e-2), 'long' => num(1.43, 1e-2)));
 
-			$location = $geocoder->geocode('Ramsgate, Kent, England');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.33, 1e-2);
-			delta_within($location->{longitude}, 1.43, 1e-2);
+			cmp_deeply($geo_coder->geocode('Wokingham, Berkshire, United Kingdom'),
+				methods('lat' => num(51.42, 1e-2), 'long' => num(-0.83, 1e-2)));
 
-			$location = $geocoder->geocode('Wokingham, Berkshire, United Kingdom');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.83, 1e-2);
+			cmp_deeply($geo_coder->geocode('Wokingham, Berkshire, UK'),
+				methods('lat' => num(51.42, 1e-2), 'long' => num(-0.83, 1e-2)));
 
-			$location = $geocoder->geocode('Wokingham, Berkshire, UK');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.83, 1e-2);
+			cmp_deeply($geo_coder->geocode('Wokingham, Berkshire, GB'),
+				methods('lat' => num(51.42, 1e-2), 'long' => num(-0.83, 1e-2)));
 
-			$location = $geocoder->geocode('Wokingham, Berkshire, GB');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.83, 1e-2);
+			cmp_deeply($geo_coder->geocode('Wokingham, Berkshire, England'),
+				methods('lat' => num(51.42, 1e-2), 'long' => num(-0.83, 1e-2)));
 
-			$location = $geocoder->geocode('Wokingham, Berkshire, England');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.42, 1e-2);
-			delta_within($location->{longitude}, -0.83, 1e-2);
 
 			# FIXME: This finds the Wokingham in England because of a problem in the unitary city handling
 			# which actually looks for Wokingham, GB.
 
-			# $location = $geocoder->geocode('Wokingham, Berkshire, Scotland');
+			# $location = $geo_coder->geocode('Wokingham, Berkshire, Scotland');
 			# ok(!defined($location));
 
-			$location = $geocoder->geocode('Minster, Thanet, Kent, England');
 			TODO: {
 				local $TODO = 'Minster, Thanet not yet supported';
 
+				my $location = $geo_coder->geocode('Minster, Thanet, Kent, England');
 				ok(!defined($location));
 			}
 
-			$location = $geocoder->geocode('Silver Spring, Maryland, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.00, 1e-2);
-			delta_within($location->{longitude}, -77.03, 1e-2);
+			$l = $geo_coder->geocode('Silver Spring, Maryland, USA');
+			cmp_deeply($l,
+				methods('lat' => num(39.00, 1e-2), 'long' => num(-77.03, 1e-2)));
 
-			$location = $geocoder->geocode('Silver Spring, MD, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.00, 1e-2);
-			delta_within($location->{longitude}, -77.03, 1e-2);
+			cmp_deeply($geo_coder->geocode('Silver Spring, MD, USA'),
+				methods('lat' => num(39.00, 1e-2), 'long' => num(-77.03, 1e-2)));
 
-			$location = $geocoder->geocode('Silver Spring, Montgomery, MD, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.00, 1e-2);
-			delta_within($location->{longitude}, -77.03, 1e-2);
+			cmp_deeply($geo_coder->geocode('Silver Spring, Montgomery, MD, USA'),
+				methods('lat' => num(39.00, 1e-2), 'long' => num(-77.03, 1e-2)));
 
-			$location = $geocoder->geocode('Silver Spring, Maryland, United States');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.00, 1e-2);
-			delta_within($location->{longitude}, -77.03, 1e-2);
+			cmp_deeply($geo_coder->geocode('Silver Spring, Montgomery, MD, United States'),
+				methods('lat' => num(39.00, 1e-2), 'long' => num(-77.03, 1e-2)));
 
-			$location = $geocoder->geocode('Silver Spring, Montgomery County, Maryland, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.00, 1e-2);
-			delta_within($location->{longitude}, -77.03, 1e-2);
+			$l = $geo_coder->geocode('Silver Spring, Montgomery County, Maryland, United States');
+			cmp_deeply($l,
+				methods('lat' => num(39.00, 1e-2), 'long' => num(-77.03, 1e-2)));
 
-			$location = $geocoder->geocode('Montgomery County, Maryland, USA');
-			ok(!defined($location));
+			$l = $geo_coder->geocode('Montgomery County, Maryland, USA');
+			ok(!defined($l));
 
-			$location = $geocoder->geocode('St Nicholas-at-Wade, Kent, UK');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.35, 1e-2);
-			delta_within($location->{longitude}, 1.25, 1e-2);
+			cmp_deeply($geo_coder->geocode('St Nicholas-at-Wade, Kent, UK'),
+				methods('lat' => num(51.35, 1e-2), 'long' => num(1.25, 1e-2)));
 
-			$location = $geocoder->geocode('Rockville Pike, Rockville, Montgomery County, MD, USA');
 			TODO: {
 				local $TODO = "Don't know how to parse counties in the USA";
+				my $location = $geo_coder->geocode('Rockville Pike, Rockville, Montgomery County, MD, USA');
 				ok(!defined($location));
 			}
 
 			# FIXME:  this actually does a look up that fails
-			$location = $geocoder->geocode('Rockville Pike, Rockville, MD, USA');
+			my $location = $geo_coder->geocode('Rockville Pike, Rockville, MD, USA');
 			ok(!defined($location));
 
-			$location = $geocoder->geocode({ location => 'Rockville, Montgomery County, MD, USA' });
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.08, 1e-2);
-			delta_within($location->{longitude}, -77.15, 1e-2);
+			cmp_deeply($geo_coder->geocode('Rockville, Montgomery County, MD, USA'),
+				methods('lat' => num(39.08, 1e-2), 'long' => num(-77.15, 1e-2)));
 
-			$location = $geocoder->geocode(location => 'Rockville, Montgomery County, Maryland, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.08, 1e-2);
-			delta_within($location->{longitude}, -77.15, 1e-2);
+			$l = $geo_coder->geocode('Rockville, Montgomery County, Maryland, USA');
+			cmp_deeply($l,
+				methods('lat' => num(39.08, 1e-2), 'long' => num(-77.15, 1e-2)));
 
-			$location = $geocoder->geocode(location => 'Temple Ewell, Kent, England');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.15, 1e-2);
-			delta_within($location->{longitude}, 1.27, 1e-2);
+			cmp_deeply($geo_coder->geocode('Temple Ewell, Kent, England'),
+				methods('lat' => num(51.15, 1e-2), 'long' => num(1.27, 1e-2)));
 
-			$location = $geocoder->geocode(location => 'Edmonton, Alberta, Canada');
-			ok(defined($location));
-			delta_within($location->{latitude}, 53.55, 1e-2);
-			delta_within($location->{longitude}, -113.50, 1e-2);
+			cmp_deeply($geo_coder->geocode('Temple Ewell, Kent, England'),
+				methods('lat' => num(51.15, 1e-2), 'long' => num(1.27, 1e-2)));
 
-			my @locations = $geocoder->geocode(location => 'Temple Ewell, Kent, England');
+			cmp_deeply($geo_coder->geocode('Edmonton, Alberta, Canada'),
+				methods('lat' => num(53.55, 1e-2), 'long' => num(-113.50, 1e-2)));
+
+
+			my @locations = $geo_coder->geocode(location => 'Temple Ewell, Kent, England');
 			ok(defined($locations[0]));
-			delta_within($locations[0]->{latitude}, 51.15, 1e-2);
-			delta_within($locations[0]->{longitude}, 1.27, 1e-2);
+			cmp_deeply($locations[0],
+				methods('lat' => num(51.15, 1e-2), 'long' => num(1.27, 1e-2)));
 
-			$location = $geocoder->geocode(location => 'Newport Pagnell, Buckinghamshire, England');
-			ok(defined($location));
-			delta_within($location->{latitude}, 52.08, 1e-2);
-			delta_within($location->{longitude}, -0.72, 1e-2);
+			$l = $geo_coder->geocode('Newport Pagnell, Buckinghamshire, England');
+			ok(defined($l));
+			cmp_deeply($l,
+				methods('lat' => num(52.08, 1e-2), 'long' => num(-0.72, 1e-2)));
 
-			$location = $geocoder->geocode('Thanet, Kent, England');
-			ok(defined($location));
-
-			$location = $geocoder->geocode('Kent, England');
-			ok(defined($location));
-			delta_within($location->{latitude}, 51.25, 1e-2);
-			delta_within($location->{longitude}, 0.75, 1e-2);
-
-			$location = $geocoder->geocode('Maryland, USA');
-			ok(defined($location));
-			delta_within($location->{latitude}, 38.25, 1e-2);
-			delta_within($location->{longitude}, -76.74, 1e-2);
-
-			$location = $geocoder->geocode('Nebraska, USA');
+			$location = $geo_coder->geocode('Thanet, Kent, England');
 			ok(defined($location));
 
-			$location = $geocoder->geocode('New Brunswick, Canada');
-			ok(defined($location));
-			delta_within($location->{latitude}, 39.95, 1e-2);
-			delta_within($location->{longitude}, -86.52, 1e-2);
+			cmp_deeply($geo_coder->geocode('Kent, England'),
+				methods('lat' => num(51.25, 1e-2), 'long' => num(0.75, 1e-2)));
 
-			$location = $geocoder->geocode('Vessels, Misc Ships At sea or abroad, England');
+			$l = $geo_coder->geocode('Maryland, USA');
+			cmp_deeply($l,
+				methods('lat' => num(38.25, 1e-2), 'long' => num(-76.74, 1e-2)));
+
+			$location = $geo_coder->geocode('Nebraska, USA');
+			ok(defined($location));
+
+			$l = $geo_coder->geocode('New Brunswick, Canada');
+			cmp_deeply($l,
+				methods('lat' => num(39.95, 1e-2), 'long' => num(-86.52, 1e-2)));
+
+			$location = $geo_coder->geocode('Vessels, Misc Ships At sea or abroad, England');
 			ok(!defined($location));
 
-			# my $address = $geocoder->reverse_geocode(latlng => '51.50,-0.13');
+			# my $address = $geo_coder->reverse_geocode(latlng => '51.50,-0.13');
 			# like($address->{'city'}, qr/^London$/i, 'test reverse');
 
 			does_croak(sub {
-				$location = $geocoder->geocode();
+				$location = $geo_coder->geocode();
 			});
 
 			does_croak(sub {
-				$location = $geocoder->reverse_geocode();
+				$location = $geo_coder->reverse_geocode();
 			});
 		} else {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 78);
+			skip('Author tests not required for installation', 37);
 		}
 	}
 }

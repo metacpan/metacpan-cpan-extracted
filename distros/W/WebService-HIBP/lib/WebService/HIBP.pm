@@ -9,7 +9,7 @@ use Digest::SHA();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
@@ -182,7 +182,7 @@ WebService::HIBP - An interface to the Have I Been Pwned webservice at haveibeen
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -225,7 +225,7 @@ In order to protect the value of the source password being searched for, this me
 
 The L<Pwned Passwords API|https://haveibeenpwned.com/API/v2#PwnedPasswords> responds with a list of the suffix of every hash beginning with the specified prefix, followed by a count of how many times it appears in the data set. This method searches the results of the response for a matching hash suffix.
 
-This method then returns the count of how many times it appears in the data set or "0" if it dosen't appear.
+This method then returns the count of how many times it appears in the data set or "0" if it doesn't appear.
 
     use WebService::HIBP();
     use IO::Prompt();
@@ -403,7 +403,7 @@ POD was extracted from the API help at L<https://haveibeenpwned.com/API/v2>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 David Dick.
+Copyright 2019 David Dick.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -4,5 +4,6 @@ return unless RT->Config->Get('EnableOAuth2');
 <div class="button-row">
 % my $next_state = $session{NextPage}->{$ARGS{next} || ''};
 % $next_state = $next_state->{url} if ref $next_state;
-<span class="input"><a href="<%RT->Config->Get('WebPath')%>/NoAuth/OAuth<% $next_state ? "?next=$next_state" : "" %>"><img src="<% RT::Authen::OAuth2::IDPLoginButtonImage() %>" alt="<% loc('Log in using OAuth 2') %>" /></a></span>
+<span class="input"><a
+href="<%RT->Config->Get('WebPath')%>/NoAuth/OAuth<% $next_state ?  "?next=$next_state" : "" %>"><img src="<% RT->Config->Get('WebPath') . RT::Authen::OAuth2::IDPLoginButtonImage() %>" alt="<% loc('Log in using OAuth 2') %>" /></a></span>
 </div>

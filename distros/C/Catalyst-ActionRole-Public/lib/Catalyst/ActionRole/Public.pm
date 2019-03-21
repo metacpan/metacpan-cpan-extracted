@@ -6,7 +6,7 @@ use Cwd ();
 use Plack::MIME ();
 use HTTP::Date ();
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 requires 'attributes','execute', 'match', 'match_captures',
   'namespace', 'private_path', 'name';
@@ -19,7 +19,11 @@ has at => (
 
   sub _build_at {
     my ($self) = @_;
-    my ($at) =  @{$self->attributes->{At}||['/:privatepath/:args']};
+    my ($at) =  @{
+      $self->attributes->{Serves} ||
+      $self->attributes->{At} ||
+      ['/:privatepath/:args']
+    };
     return $at;
   }
 
@@ -125,7 +129,7 @@ around ['match', 'match_captures'] => sub {
   my @path_parts = $self->expand_if_relative_path( 
     $self->expand_at_template($self->at, %template_args));
 
-  $ctx->stash(public_file_path => 
+  $ctx->stash(public_file => 
     (my $full_path = $ctx->config->{root}->file(@path_parts)));
 
   unless($self->path_is_allowed_content_type($full_path)) {
@@ -134,10 +138,10 @@ around ['match', 'match_captures'] => sub {
   }
   
   if($self->is_real_file($full_path)) {
-    $ctx->log->debug("Serving File: $full_path") if $ctx->debug;
+    $ctx->log->debug("Serving File: $full_path for action $self") if $ctx->debug;
     return $self->$orig($ctx, $captures);
   } else {
-    $ctx->log->debug("File Not Found: $full_path") if $ctx->debug;
+    $ctx->log->debug("File '$full_path' not found for action $self") if $ctx->debug;
     return 0;
   }
 };
@@ -145,22 +149,20 @@ around ['match', 'match_captures'] => sub {
 around 'execute', sub {
   my ($orig, $self, $controller, $ctx, @args) = @_;
   $ctx->log->abort(1) unless $self->show_debugging;
-  my $fh = $ctx->stash->{public_file_path}->openr;
-  Plack::Util::set_io_path($fh, Cwd::realpath($ctx->stash->{public_file_path}));
+  my $fh = $ctx->stash->{public_file}->openr;
+  Plack::Util::set_io_path($fh, Cwd::realpath($ctx->stash->{public_file}));
 
-  my $stat = $ctx->stash->{public_file_path}->stat;
-  my $content_type = Plack::MIME->mime_type($ctx->stash->{public_file_path})
+  my $stat = $ctx->stash->{public_file}->stat;
+  my $content_type = Plack::MIME->mime_type($ctx->stash->{public_file})
     || 'application/octet';
 
-  $ctx->res->from_psgi_response([
-    200,
-    [
-      'Content-Type'   => $content_type,
-      'Content-Length' => $stat->[7],
-      'Last-Modified'  => HTTP::Date::time2str( $stat->[9] ),
-      ($self->has_cache_control ? ('Cache-Control' => $self->cache_control):()),
-    ],
-    $fh]);
+  $ctx->res->status(200);
+  $ctx->res->content_type($content_type);
+  $ctx->res->content_length($stat->[7]);
+  $ctx->res->body($fh);
+  $ctx->res->headers->last_modified(HTTP::Date::time2str( $stat->[9] ));
+  $ctx->res->header(cache_control => $self->cache_control)
+    if $self->has_cache_control;
 
   return $self->$orig($controller, $ctx, @args);
 };
@@ -178,14 +180,38 @@ Catalyst::ActionRole::Public - Mount a public url to files in your project direc
     use Moose;
     use MooseX::MethodAttributes;
 
-    sub static :Local Does(Public) At(/:actionname/*) { ... }
+    sub static :Local Does(Public) {  }
 
     __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
 
-Will create an action that from URL 'localhost/static/a/b/c/d.js' will serve
+Will create an action that from URL 'https://myhost.com/static/a/b/c/d.js' will serve
 file $c->config->{root} . '/static' . '/a/b/c/d.js'.  Will also set content type, length
 and Last-Modified HTTP headers as needed.  If the file does not exist, will not
-match (allowing possibly other actions to match).
+match (allowing possibly other actions to match such as a 'Not Found' catchall.
+
+It also builds in support for L<Plack::Middleware::XSendfile> by using L<Plack::Util/set_io_path>
+on the filehandle object.  This way can can take advantage of static file serving via a
+fast webserver even if you need to serve such files from behind a password protected route.
+
+If you prefer to use Chaining, here's the same type of match:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends  'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { }
+
+    sub static :Chained(root) Args Does(Public) { }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+This would have the effect of making the directory at "$c->config->root . '/static'" served
+as a public directory.
 
 =head1 DESCRIPTION
 
@@ -201,12 +227,26 @@ request maps to a file on the filesystem.  You can even use this action role
 in the middle of a chained style action (although its hard to imagine the
 use case for that...)
 
-=head2 ACTION METHOD BODY
+=head2 Why not use Catalyst::Plugin::Static::Simple?
+
+The only upsides to this action role is 1) it supports L<Plack::Middleware::XSendfile>,
+2) it gives you an action to target for static files, using C<uri_for> and 3) its a more
+targeted level of composition rather than a plugin which you mighty just happen to like
+more.
+
+The plugin can do somethings this can't (yet) such as define multiple root paths for finding
+your static files (or even have a function provide the path dynamically).
+
+If the classic plugin works for you and you are happy there's little reason to use this.
+
+Also this is not a bad example code for creating actions roles.
+
+=head2 Action Method Body
 
 The body of your action will be executed after we've created a filehandle to
 the found file and setup the response.  You may leave it empty, or if you want
 to do additional logging or work, you can. Also, you will find a stash key 
-C<public_file_path> has been populated with a L<Path::Class> object which is
+C<public_file> has been populated with a L<Path::Class> object which is
 pointing to the found file.  The action method body will not be executed if
 the file associated with the action does not exist.
 
@@ -214,19 +254,57 @@ the file associated with the action does not exist.
 
 Actions the consume this role provide the following subroutine attributes.
 
-=head2 ShowDebugging
-
-Enabled developer debugging output.  Example:
-
-    sub myaction :Local Does(Public) ShowDebugging { ... }
-
-If present do not surpress the extra developer mode debugging information.  Useful
-if you have trouble serving files and you can't figure out why.
-
 =head2 At 
 
-Used to set the action class template used to match files on the filesystem to
-incoming requests.  Examples:
+=head2 Serves
+
+Used to set the action role template used to match files on the filesystem to
+incoming requests.  Either 'At' or 'Serves' can be used to avoid namespace collision
+with other actions roles.  'Serves' will be looked at first in the case where more than
+one exists.  Useful if you have complex needs or to match a single file:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends  'Catalyst::Controller';
+
+    welcome :Path('welcome.txt') Args(0) Does(Public) Serves('/welcome.txt')  { }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+Will just match 'https://localhost/welcome.txt'.  Although it seems verbose we are cleanly
+distinguishing between the URL that is matched, the private name of the matched action, and
+the actual file path served. You might do something like this if you have a static file you
+want to serve behind a password.  Here's a similar type of pattern if you are using Chaining:
+
+    package MyApp::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends  'Catalyst::Controller';
+
+    sub root :Chained(/) PathPart('') CaptureArgs(0) { }
+
+    sub one_file :Chained(root) 
+      PathPart('one.txt') Args(0)
+      Does(Public) Serves('/one.txt') { }
+
+    __PACKAGE__->config(namespace=>'');
+    __PACKAGE__->meta->make_immutable;
+
+Please note the '/' in "Serves('/one.txt')".  This would math the URL 'https://hostname/one.txt'
+and serve the file:
+
+    $c->config->{root} . '/one.txt'
+
+If you left off the '/' the file path would be relative to the action private name (in this case
+$c->config->{root} . 'one_file' . '/one.txt').
+
+More Examples:
 
     package MyApp::Controller::Basic;
 
@@ -234,6 +312,9 @@ incoming requests.  Examples:
     use MooseX::MethodAttributes;
 
     extends  'Catalyst::Controller';
+
+    #localhost/basic/welcome
+    sub welcome :Path('welcome.txt') Args(0) Does(Public) { }
 
     #localhost/basic/css => $c->config->{root} .'/basic/*'
     sub css :Local Does(Public) At(/:namespace/*) { }
@@ -350,6 +431,27 @@ Used to set the Cache-Control HTTP header (useful for caching your static assets
 Example:
 
     sub myaction :Local Does(Public) CacheControl(public, max-age=600) { ...}
+
+=head2 ShowDebugging
+
+Enabled developer debugging output.  Example:
+
+    sub myaction :Local Does(Public) ShowDebugging { ... }
+
+If present do not surpress the extra developer mode debugging information.  Useful
+if you have trouble serving files and you can't figure out why.
+
+B<NOTE> Although you can set this on the action controller code, it is likely you will
+prefer to set it via configuration (for example turn it on only in development).  For
+example:
+
+    __PACKAGE__->config(
+      'Controller::Root' => {
+        actions => {
+          myaction => { ShowDebugging => },
+        },
+      },
+    );
 
 =head1 RESPONSE INFO
 

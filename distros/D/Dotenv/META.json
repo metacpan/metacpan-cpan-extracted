@@ -53,6 +53,7 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "IO::File" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::More" : "0",
@@ -63,7 +64,7 @@
    "provides" : {
       "Dotenv" : {
          "file" : "lib/Dotenv.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -78,7 +79,7 @@
          "web" : "http://github.com/book/Dotenv"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_contributors" : [
       "Andr\u00e9 Walker <andre@cpan.org>",
       "Brian Fraser <hugmeir@cpan.org>"

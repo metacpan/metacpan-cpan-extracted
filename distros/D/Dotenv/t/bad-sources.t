@@ -18,9 +18,9 @@ my @bad = (
 );
 
 for my $source (@bad) {
-    my %kv;
+    my $kv;
     ok(
-        !eval { %kv = Dotenv->parse($source); 1; },
+        !eval { $kv = Dotenv->parse($source); 1; },
         ( $source // 'undef' ) . ' is not a valid source'
     );
     like(
@@ -30,7 +30,7 @@ for my $source (@bad) {
         : qr/^Can't handle an unitialized value /,
         '... got expected error message'
     );
-    is_deeply( \%kv, {}, '... and no data' );
+    is( $kv, undef, '... and no data' );
 }
 
 done_testing;

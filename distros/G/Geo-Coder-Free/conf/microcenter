@@ -1,0 +1,13 @@
+SiteTitle: Free Geocoder
+Contents: Geocoder based on openaddresses and maxmind
+Host: geocoder.nigelhorne.com
+Files: a=b
+Files: c=d
+UserName: njh
+ClamAVHost: 192.168.1.2
+twitter: nigelhorne
+# Where to find the templates
+rootdir: /home/njh/src/njh/Geo-Coder-Free
+disc_cache: driver=Redis server=192.168.1.16 port=6379
+memory_cache: driver=Memcached server=192.168.1.15 port=11211
+OPENADDR_HOME: /home/njh/misc/openaddr

@@ -11,6 +11,7 @@ Any::Daemon::HTTP::VirtualHost - webserver virtual hosts
   , rewrite     => ...
   , handlers    => ...
   );
+
  my $daemon = Any::Daemon::HTTP->new
    ( @other_options
    , vhosts  => $vhost  # or \@vhosts
@@ -47,13 +48,15 @@ by using these options.
 =item Any::Daemon::HTTP::VirtualHost-E<gt>B<new>(%options|\%options)
 
  -Option     --Default
-  aliases      []
+  aliases      'AUTO'
   directories  <see text>
+  directory    undef
   documents    <undef>
   handler      undef
   handlers     {}
   name         <required>
   proxies      undef
+  proxy        undef
   redirect     <undef>
   rewrite      <undef>
   user_dirs    undef
@@ -63,13 +66,17 @@ by using these options.
 =item aliases => HOSTNAME|'AUTO'|ARRAY
 
 [0.26] Alternative host components which indicate the same virtual host.  When
-'AUTO' is given, then L<generateAliases()|Any::Daemon::HTTP::VirtualHost/"Attributes"> is used to produce a convenient
-list.
+'AUTO' is given (the default since [0.28]), then L<generateAliases()|Any::Daemon::HTTP::VirtualHost/"Attributes"> is used
+to produce a convenient list.
 
 =item directories => OBJECT|HASH|ARRAY
 
 Pass one or more L<Any::Daemon::HTTP::Directory|Any::Daemon::HTTP::Directory> OBJECTS, or HASHes which will
 be used to initialize them.
+
+=item directory => OBJECT|HASH|ARRAY
+
+[0.28] Alias for C<directories>.
 
 =item documents => DIRECTORY
 
@@ -95,6 +102,10 @@ Read L</DETAILS> for the details.
 
 Pass one or more L<Any::Daemon::HTTP::Proxy|Any::Daemon::HTTP::Proxy> OBJECTS, or HASHes which
 will be used to initialize them.
+
+=item proxy => OBJECT|HASH|ARRAY
+
+[0.28] Alias for C<proxies>.
 
 =item redirect => CODE|METHOD|HASH
 
@@ -252,7 +263,7 @@ a static file can fulfil the request.  If not, a search is started
 for the handler with the longest path.
 
   # /upload($|/*) goes to the upload_handler
-  $vhost->addHandler
+  $vhost->addHandlers
     ( '/'       => \&default_handler
     , '/upload' => \&upload_handler
     );
@@ -404,12 +415,12 @@ See Log::Report::Template if you need translations as well.
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.27,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.28,
+built on March 20, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 
-Copyrights 2013-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

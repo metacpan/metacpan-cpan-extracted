@@ -139,6 +139,7 @@ my $target_name = do {
 ##
 ## alias
 ##
+my $aliased_name;
 if (my $alias = $alias->{$target_name}) {
     my($name, @opts) = do {
 	if (ref $alias eq 'ARRAY') {
@@ -148,7 +149,7 @@ if (my $alias = $alias->{$target_name}) {
 	}
     };
     if ($name ne '') {
-	$target_name = $name;
+	$aliased_name = $name;
 	unshift @ARGV, @opts;
     }
 }
@@ -186,12 +187,14 @@ $ENV{PATH} = join(':',
 		  grep { not remove_path($_) }
 		  split /:+/, $ENV{PATH});
 
-warn "$abs_name: exec $target_name @ARGV\n" if $debug;
+my $exec_name = $aliased_name || $target_name;
+
+warn "$abs_name: exec $exec_name @ARGV\n" if $debug;
 
 ##
 ## execute target command
 ##
-my $status = system $target_name, @ARGV;
+my $status = system $exec_name, @ARGV;
 
 exit($exit_code // ( $status >> 8 ));
 
@@ -497,6 +500,10 @@ Command aliases can be set in the configuration file like this:
 
     [alias]
         pgrep = [ "greple", "-Mperl", "--code" ]
+
+Alias name is used to find rc file and module directory.  In above
+example, F<~/.optex.d/pgrep.rc> and F<~/.optex.d/pgrep/> will be
+reffered.
 
 Read CONFIGURATION FILE section.
 
@@ -858,7 +865,7 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2017-2018 Kazumasa Utashiro
+Copyright 2017-2019 Kazumasa Utashiro
 
 
 =cut

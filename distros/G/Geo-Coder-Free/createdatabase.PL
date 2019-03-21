@@ -118,6 +118,7 @@ my %max_state_lengths = (
 	'US' => 2
 );
 
+# TODO: Use Geo::Coder::Free::Local, until then keep the data in sync
 my %known_places = (	# Places I've checked with my GPS
 	'us/md/statewide.csv' => [
 		{

@@ -26,6 +26,8 @@ t/env/plain.env
 t/env/plain.pl
 t/env/quoted.env
 t/env/quoted.pl
+t/import-fail.t
+t/import.t
 t/parse.t
 t/release-distmeta.t
 t/sources.t

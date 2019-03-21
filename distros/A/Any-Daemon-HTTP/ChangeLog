@@ -1,5 +1,22 @@
 == history for distribution Any-Daemon-HTTP
 
+version 0.28: Wed 20 Mar 17:18:25 CET 2019
+
+	Fixes:
+	- call ::VirtualHost::new() without handlers
+	- missing dependency on LWP::UserAgent
+
+	Changes:
+	- ::VirtualHost::new(aliases) defaults to 'AUTO'
+
+	Improvements:
+	- find virtual-host handler for '/'.
+	- run(new_connection) with method name.
+	- new option run(new_child)
+	- add ::VirtualHost->new aliases proxy and directory.
+	- for vhost, fallback to lookup name/aliases without portnumber.
+	- error when produced response isn't a HTTP::Response.
+
 version 0.27: Sun  4 Mar 12:26:01 CET 2018
 
 	Fixes:

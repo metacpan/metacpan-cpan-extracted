@@ -1,7 +1,14 @@
 Revision history for Perl extension Config::Grammar.
 
-UNRELEASED
+2019-03-20
+
+     * Released 1.13
+     * Fix spelling error in manpage (fixes #3, patch by Salvatore Bonaccorso)
+     * Use encoding in Dynamic.pm as well (Fritz Zaucker)
+
+2016-09-09
     
+     * Released 1.12
      * Fixes 'Name "Config::Grammar::File" used only once' (patch by Salvatore Bonaccorso)
      * Fix spelling error in manpage (patch by Salvatore Bonaccorso)
      * Use Dist::Zilla to prepare the Perl distribution for CPAN

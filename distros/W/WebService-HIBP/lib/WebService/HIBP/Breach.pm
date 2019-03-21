@@ -3,7 +3,7 @@ package WebService::HIBP::Breach;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 sub new {
     my ( $class, %parameters ) = @_;
@@ -108,7 +108,7 @@ WebService::HIBP::Breach - An instance of a breach from the Have I Been Pwned we
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ POD was extracted from the API help at L<https://haveibeenpwned.com/API/v2>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 David Dick.
+Copyright 2019 David Dick.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

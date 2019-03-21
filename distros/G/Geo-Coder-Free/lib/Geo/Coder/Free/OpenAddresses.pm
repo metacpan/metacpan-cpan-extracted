@@ -5,6 +5,7 @@ use warnings;
 
 use Geo::Coder::Free::DB::OpenAddr;	# SQLite database
 use Geo::Coder::Free::DB::openaddresses;	# The original CSV files
+use Geo::Location::Point;
 use Module::Info;
 use Carp;
 use File::Spec;
@@ -40,15 +41,15 @@ Geo::Coder::Free::OpenAddresses - Provides a geocoding functionality to the data
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
-    use Geo::Coder::Free::OpenAddresses
+    use Geo::Coder::Free::OpenAddresses;
 
     # Use a local download of http://results.openaddresses.io/
     my $geocoder = Geo::Coder::Free::OpenAddresses->new(openaddr => $ENV{'OPENADDR_HOME'});
@@ -101,8 +102,8 @@ sub new {
 
     $location = $geocoder->geocode(location => $location);
 
-    print 'Latitude: ', $location->{'latitude'}, "\n";
-    print 'Longitude: ', $location->{'longitude'}, "\n";
+    print 'Latitude: ', $location->lat(), "\n";
+    print 'Longitude: ', $location->long(), "\n";
 
     # TODO:
     # @locations = $geocoder->geocode('Portland, USA');
@@ -156,47 +157,47 @@ sub geocode {
 				# TODO: Support longer addresses
 				if($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
 					if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
-						$l->{'confidence'} = 0.8;
-						$l->{'location'} = "$addr, USA";
-						$l->{'country'} = 'US';
+						$l->confidence(0.8);
+						$l->location("$addr, USA");
+						$l->country('US');
 						push @rc, $l;
 					}
 				} elsif($addr =~ /\s+(\d{2,5}\s+)(?![a|p]m\b)(([a-zA-Z|\s+]{1,5}){1,2})?([\s|\,|.]+)?(([a-zA-Z|\s+]{1,30}){1,4})(court|ct|street|st|drive|dr|lane|ln|road|rd|blvd)([\s|\,|.|\;]+)?(([a-zA-Z|\s+]{1,30}){1,2})([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)([\s|\,|.]+)?(\s+\d{5})?([\s|\,|.]+)/i) {
 					if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
-						$l->{'confidence'} = 0.8;
-						$l->{'location'} = "$addr, Canada";
-						$l->{'country'} = 'CA';
+						$l->confidence(0.8);
+						$l->location("$addr, Canada");
+						$l->country('CA');
 						push @rc, $l;
 					}
 				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AK|AL|AR|AZ|CA|CO|CT|DC|DE|FL|GA|GU|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VI|VT|WA|WI|WV|WY)/i) {
 					if(($l = $self->geocode(location => "$addr, US")) && ref($l)) {
-						$l->{'confidence'} = 0.6;
-						$l->{'location'} = "$addr, USA";
-						$l->{'city'} = uc($1);
-						$l->{'state'} = uc($3);
-						$l->{'country'} = 'US';
+						$l->confidence(0.6);
+						$l->location("$addr, USA");
+						$l->city(uc($1));
+						$l->state(uc($3));
+						$l->country('US');
 						push @rc, $l;
 					}
 				} elsif($addr =~ /([a-zA-Z|\s+]{1,30}){1,2}([\s|\,|.]+)?\b(AB|BC|MB|NB|NL|NT|NS|ON|PE|QC|SK|YT)/i) {
 					if(($l = $self->geocode(location => "$addr, Canada")) && ref($l)) {
-						$l->{'confidence'} = 0.6;
-						$l->{'location'} = "$addr, Canada";
-						$l->{'city'} = uc($1);
-						$l->{'state'} = uc($3);
-						$l->{'country'} = 'CA';
+						$l->confidence(0.6);
+						$l->location("$addr, Canada");
+						$l->city(uc($1));
+						$l->state(uc($3));
+						$l->country('US');
 						push @rc, $l;
 					}
 				}
 				if(($l = $self->geocode(location => $addr)) && ref($l)) {
-					$l->{'confidence'} = 0.1;
-					$l->{'location'} = $addr;
+					$l->confidence(0.1);
+					$l->location($addr);
 					push @rc, $l;
 				}
 				if($offset < $count - 2) {
 					$addr = join(', ', $words[$offset], $words[$offset + 1], $words[$offset + 2]);
 					if(($l = $self->geocode(location => $addr)) && ref($l)) {
-						$l->{'confidence'} = 1.0;
-						$l->{'location'} = $addr;
+						$l->confidence(1.0);
+						$l->location($addr);
 						push @rc, $l;
 					}
 				}
@@ -204,6 +205,14 @@ sub geocode {
 			$offset++;
 		}
 		return @rc;
+		# my @locations;
+
+		# foreach my $l(@rc) {
+			# ::diag(__LINE__, ': ', Data::Dumper->new([$l])->Dump());
+			# push @locations, Location::GeoTool->create_coord($l->{'latitude'}, $l->{'longitude'}, $l->{'location'}, 'Degree');
+		# }
+
+		# return @locations;
 	}
 
 	my $location = $param{location}
@@ -217,12 +226,17 @@ sub geocode {
 		$location = $1;
 	}
 
-	if($location =~ /^(.+),\s*Washington\s*DC,(.+)$/) {
-		$location = "$1, Washington, DC, $2";
+	if($location =~ /^(.+),?\s*Washington\s*DC/i) {
+		$location = "$1, Washington, DC, USA";
 	}
 
-	if($known_locations{$location}) {
-		return $known_locations{$location};
+	if(my $rc = $known_locations{$location}) {
+		# return $known_locations{$location};
+		return Geo::Location::Point->new({
+			'lat' => $rc->{'latitude'},
+			'long' => $rc->{'longitude'},
+			'location' => $location
+		});
 	}
 
 	$self->{'location'} = $location;
@@ -273,7 +287,11 @@ sub geocode {
 		$self->{'ap'}->{'au'} = $ap;
 	}
 	if($ap) {
-		if(my $error = $ap->parse($location)) {
+		my $l = $location;
+		if($l =~ /(.+), (England|UK)$/) {
+			$l = "$1, GB";
+		}
+		if(my $error = $ap->parse($l)) {
 			# Carp::croak($ap->report());
 			# ::diag('Address parse failed: ', $ap->report());
 		} else {
@@ -289,6 +307,8 @@ sub geocode {
 					$street = "$street RD";
 				} elsif($type eq 'AVENUE') {
 					$street = "$street AVE";
+				} else {
+					$street .= " $type";
 				}
 				if(my $suffix = $c{'street_direction_suffix'}) {
 					$street .= " $suffix";
@@ -308,6 +328,11 @@ sub geocode {
 					$addr{'country'} = 'US';
 					if(my $twoletterstate = Locale::US->new()->{state2code}{uc($c{'subcountry'})}) {
 						$addr{'state'} = $twoletterstate;
+					}
+				} elsif($c{'country'}) {
+					$addr{'country'} = $c{'country'};
+					if($c{'subcountry'}) {
+						$addr{'state'} = $c{'subcountry'};
 					}
 				}
 			}
@@ -715,14 +740,15 @@ sub geocode {
 					}
 				}
 				if(my $rc = $self->_get("$city$state$c")) {
-					return {
-						'number' => undef,
-						'street' => undef,
-						'city' => $city,
-						'state' => $state,
-						'country' => $country,
-						%{$rc}
-					};
+					# return {
+						# 'number' => undef,
+						# 'street' => undef,
+						# 'city' => $city,
+						# 'state' => $state,
+						# 'country' => $country,
+						# %{$rc}
+					# };
+					return $rc;
 				}
 			}
 		}
@@ -860,6 +886,7 @@ sub _get {
 	# ::diag("$location: $digest");
 	if(my $cache = $self->{'cache'}) {
 		if(my $rc = $cache->get_object($digest)) {
+			# ::diag(__LINE__, ': retrieved from cache');
 			return Storable::thaw($rc->value());
 		}
 	}
@@ -881,6 +908,11 @@ sub _get {
 			# }
 		# }
 		# ::diag(Data::Dumper->new([\$rc])->Dump());
+		$rc = Geo::Location::Point->new({
+			'lat' => $rc->{'latitude'},
+			'long' => $rc->{'longitude'},
+			'location' => $location
+		});
 		if(my $cache = $self->{'cache'}) {
 			$cache->set($digest, Storable::freeze($rc), '1 week');
 		}
@@ -981,6 +1013,18 @@ The openaddresses data doesn't cover the globe.
 Can't parse and handle "London, England".
 
 Currently only searches US and Canadian data.
+
+If you do search in the UK, only look up towns, full addresses aren't
+included.  So these will print the same.
+
+    use Geo::Coder::Free::OpenAddresses;
+
+    $location = $geo_coder->geocode(location => '22 Central Road, Ramsgate, Kent, England');
+    print $location->{latitude}, "\n";
+    print $location->{longitude}, "\n";
+    $location = $geo_coder->geocode(location => '7 Hillbrow Road, St Lawrence, Thanet, Kent, England');
+    print $location->{latitude}, "\n";
+    print $location->{longitude}, "\n";
 
 =head1 SEE ALSO
 

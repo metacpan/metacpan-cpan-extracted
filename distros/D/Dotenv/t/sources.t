@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Path::Tiny;
+use IO::File;
 use Dotenv;
 
 my %expected = (
@@ -27,8 +28,8 @@ EOT
 );
 
 for my $source (@sources) {
-    my %got = Dotenv->parse($source);
-    is_deeply( \%got, \%expected, ref $source );
+    my $got = Dotenv->parse($source);
+    is_deeply( $got, \%expected, ref $source );
 }
 
 done_testing;

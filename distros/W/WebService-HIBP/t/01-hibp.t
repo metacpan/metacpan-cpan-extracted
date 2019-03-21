@@ -16,7 +16,10 @@ sub new {
 }
 
 sub get {
-	return HTTP::Response->new(418, "I'm a teapot");
+	my ($self, $url);
+	my $response = HTTP::Response->new(418, "I'm a teapot");
+	$response->request(HTTP::Request->new('GET', $url));
+	return $response;
 }
 
 package main;

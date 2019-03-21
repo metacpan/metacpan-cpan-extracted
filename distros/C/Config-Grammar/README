@@ -10,3 +10,5 @@ for example you are setting a variable which isn't defined.
 Config::Grammar supports many advanced features, that you can read
 about in its documentation (type 'man Config::Grammar' or 'perldoc
 lib/Config/Grammar.pm' in this directory)
+
+See also: https://metacpan.org/release/Config-Grammar

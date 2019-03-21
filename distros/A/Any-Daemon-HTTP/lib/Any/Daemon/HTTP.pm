@@ -1,4 +1,4 @@
-# Copyrights 2013-2018 by [Mark Overmeer].
+# Copyrights 2013-2019 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Any::Daemon::HTTP;
 use vars '$VERSION';
-$VERSION = '0.27';
+$VERSION = '0.28';
 
 use base 'Any::Daemon';
 
@@ -229,6 +229,7 @@ sub findProxy($$$)
 
 sub _connection($$)
 {   my ($self, $client, $args) = @_;
+
     my $nr_req   = 0;
     my $max_req  = $args->{max_req_per_conn} || 100;
     my $start    = time;
@@ -246,28 +247,33 @@ sub _connection($$)
     my $peer    = $session->get('peer');
     my $host    = $peer->{host};
     my $ip      = $peer->{ip};
-    info __x"new client from {host} on {ip}", host => $host, ip => $ip;
+    info __x"new client from {host} on {ip}", host => $host // '(unnamed)',
+		ip => $ip;
+
+    my $init_conn = $args->{new_connection};
+    $self->$init_conn($session);
 
     # Change title in ps-table
-    my $title = $0;
-    $title    =~ s/ .*//;
-    $title   .= ' http from '. ($host||$ip);
-    $0        = $title;
-
-    $args->{new_connection}->($self, $session);
+    my $title = $0 =~ /^(\S+)/ ? basename($1) : $0;
+    $0        = $title . ' http from '. ($host||$ip);
 
     $SIG{ALRM} = sub {
         notice __x"connection from {host} lasted too long, killed after {time%d} seconds"
-          , host => $host, time => $deadline - $start;
+          , host => ($host || $ip), time => $deadline - $start;
         exit 0;
     };
 
     alarm $deadline - time;
     while(my $req  = $client->get_request)
     {   my $vhostn = $req->header('Host') || 'default';
-        my $resp;
+		my $vhost  = $self->virtualHost($vhostn);
 
-        if(my $vhost  = $self->virtualHost($vhostn))
+        # Fallback to vhost without specific port number
+        $vhost ||= $self->virtualHost($1)
+            if $vhostn =~ /(.*)\:[0-9]+$/;
+
+        my $resp;
+        if($vhost)
         {   $self->{ADH_host_base}
               = (ref($client) =~ /SSL/ ? 'https' : 'http').'://'.$vhost->name;
             $resp = $vhost->handleRequest($self, $session, $req);
@@ -315,7 +321,8 @@ sub _connection($$)
 sub run(%)
 {   my ($self, %args) = @_;
 
-    $args{new_connection} ||= sub {};
+    my $new_child = $args{new_child} || 'newChild';
+    $args{new_connection} ||= 'newConnection';
 
     my $vhosts = $self->{ADH_vhosts};
     unless(keys %$vhosts)
@@ -329,8 +336,8 @@ sub run(%)
         $first->addHandler('/' => $handler);
     }
 
-    my $title      = $0;
-    $title         =~ s/ .*//;
+    my $title      = $0 =~ /^(\S+)/ ? basename($1) : $0;
+
     my ($req_count, $conn_count) = (0, 0);
     my $max_conn   = $args{max_conn_per_child} || 10_000;
     $max_conn      = int(0.9 * $max_conn + rand(0.2 * $max_conn))
@@ -339,11 +346,13 @@ sub run(%)
     my $max_req    = $args{max_req_per_child}  || 100_000;
     my $linger     = $args{linger};
 
-    $0 = "$title, manager";  # $0 visible with 'ps' command
+    $0 = "$title manager";  # $0 visible with 'ps' command
     $args{child_task} ||= sub {
-        $0 = "$title, not used yet";
+        $0 = "$title not used yet";
         # even with one port, we still select...
         my $select = IO::Select->new($self->sockets);
+
+        $self->$new_child($select);
 
       CONNECTION:
         while(my @ready = $select->can_read)
@@ -353,7 +362,7 @@ sub run(%)
                 $client->sockopt(SO_LINGER, (pack "II", 1, $linger))
                     if defined $linger;
 
-                $0 = "$title, handling "
+                $0 = "$title handling "
                    . $client->peerhost.":".$client->peerport . " at "
                    . $client->sockhost.':'.$client->sockport;
 
@@ -364,12 +373,25 @@ sub run(%)
                     if $conn_count++ >= $max_conn
                     || $req_count    >= $max_req;
             }
-            $0 = "$title, idle after $conn_count";
+            $0 = "$title idle after $conn_count";
         }
         0;
     };
 
+    info __x"start running the webserver";
     $self->SUPER::run(%args);
+}
+
+
+sub newConnection($)
+{   my ($self, $session) = @_;
+    return $self;
+}
+
+
+sub newChild($)
+{   my ($self, $select) = @_;
+    return $self;
 }
 
 # HTTP::Daemon methods used by ::ClientConn.  We steal that parent role,

@@ -75,10 +75,11 @@ my $test_requires = {
 	'CGI::IDS' => 0,
 	'CGI::Lingua' => 0,
 	'Data::Throttler' => 0,
+	'Test::Carp' => 0,
+	'Test::Deep' => 0,
 	'Test::Most' => 0,
 	'Test::NoWarnings' => 0,
-	'Test::Number::Delta' => 0,
-	'Test::Carp' => 0
+	'Test::Number::Delta' => 0
 };
 
 if($ENV{'AUTHOR_TESTING'}) {
@@ -105,6 +106,7 @@ WriteMakefile(
 		'File::Copy' => 0,
 		'File::Spec' => 0,
 		'autodie' => 0,
+		'Geo::Location::Point' => 0,
 		'IO::AIO' => 0,
 		'IPC::System::Simple' => 0,
 		'JSON' => 0,
@@ -125,7 +127,6 @@ WriteMakefile(
 		'Locale::CA' => 0,
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
-		# 'Text::xSV::Slurp' => 0,
 		'Lingua::EN::AddressParse' => 0,
 		'Geo::StreetAddress::US' => 0,
 		'Gzip::Faster' => 0,
@@ -135,6 +136,7 @@ WriteMakefile(
 		'CHI' => 0,
 		'Storable' => 0,
 		'Text::CSV' => 0,
+		'Text::xSV::Slurp' => 0,
 	},
 	dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz' },
 	clean		=> { FILES => 'Geo-Coder-Free-*' },

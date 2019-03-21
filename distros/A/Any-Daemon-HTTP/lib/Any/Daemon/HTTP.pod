@@ -20,6 +20,7 @@ Any::Daemon::HTTP - preforking Apache/Plack-like webserver
   my $http = Any::Daemon::HTTP->new
     ( handler   => \&handler
     , listen    => 'server.example.com:80'
+    , new_child => sub { dispatcher SYSLOG, 'default' }
     , %daemon_opts
     );
 
@@ -190,6 +191,10 @@ Extends L<"Accessors" in Any::Daemon|Any::Daemon/"Accessors">.
  
 =over 4
 
+=item $obj-E<gt>B<pidFilename>()
+
+Inherited, see L<Any::Daemon/"Accessors">
+
 =item $obj-E<gt>B<sockets>()
 
 Returns all the sockets we listen on.  This list is the result of
@@ -291,6 +296,21 @@ Extends L<"Action" in Any::Daemon|Any::Daemon/"Action">.
  
 =over 4
 
+=item $obj-E<gt>B<newChild>($select)
+
+[0.28] Called by default when a new task process has been generated.  It
+gets the IO::Select object as only parameter (for now), which is the
+only thing created before this call.  After this call, the process starts
+waiting for connections.
+
+This parameter/method is typically used to (re)connect to the database,
+or setup logging.
+
+=item $obj-E<gt>B<newConnection>($session)
+
+[0.28] Called by default when a new client has been accepted.
+See L<run(new_connection)|Any::Daemon::HTTP/"Action">.
+
 =item $obj-E<gt>B<run>(%options)
 
 When there is no vhost yet, one will be created.  When only one vhost
@@ -298,28 +318,30 @@ is active, you may pass C<handle_request> (see the vhost docs).
 
  -Option            --Defined in     --Default
   background          Any::Daemon      <true>
-  child_died          Any::Daemon      spawn new childs
+  child_died          Any::Daemon      'childDied'
   child_task          Any::Daemon      <accept http connections>
-  kill_childs         Any::Daemon      send sigterm
+  kill_childs         Any::Daemon      'killChilds'
   linger                               undef
   max_childs          Any::Daemon      10
   max_conn_per_child                   10_000
   max_req_per_child                    100_000
   max_req_per_conn                     100
   max_time_per_conn                    120
-  new_connection                       <undef>
-  reconfigure         Any::Daemon      ignore
+  new_child                            'newChild'
+  new_connection                       'newConnection'
+  reconfigure         Any::Daemon      'reconfigDaemon'
   req_time_bonus                       5
+  run_task            Any::Daemon      undef
 
 =over 2
 
 =item background => BOOLEAN
 
-=item child_died => CODE
+=item child_died => CODE|METHOD
 
-=item child_task => CODE
+=item child_task => CODE|METHOD
 
-=item kill_childs => CODE
+=item kill_childs => CODE|METHOD
 
 =item linger => SECONDS
 
@@ -361,15 +383,24 @@ Maximum time a connection will stay alive.  When the time expires, the
 process will forcefully killed.  For each request, C<req_time_bonus>
 seconds are added.  This may be a bit short when your files are large.
 
-=item new_connection => CODE
+=item new_child => CODE|METHOD
+
+[0.28] run code when a new child process is started.  This will run
+before the task starts waiting for connections.  See L<newChild()|Any::Daemon::HTTP/"Action">
+
+=item new_connection => CODE|METHOD
 
 The CODE is called on each new connection made.  It gets as parameters
 the server (this object) and the connection (an
-L<Any::Daemon::HTTP::Session|Any::Daemon::HTTP::Session> extension)
+L<Any::Daemon::HTTP::Session|Any::Daemon::HTTP::Session> extension).
 
-=item reconfigure => CODE
+[0.28] Also a METHOD name.  See L<newConnection()|Any::Daemon::HTTP/"Action">
+
+=item reconfigure => CODE|METHOD
 
 =item req_time_bonus => SECONDS
+
+=item run_task => CODE|METHOD
 
 =back
 
@@ -445,12 +476,12 @@ Ehhh...
 
 =head1 SEE ALSO
 
-This module is part of Any-Daemon-HTTP distribution version 0.27,
-built on March 04, 2018. Website: F<http://perl.overmeer.net/any-daemon/>
+This module is part of Any-Daemon-HTTP distribution version 0.28,
+built on March 20, 2019. Website: F<http://perl.overmeer.net/any-daemon/>
 
 =head1 LICENSE
 
-Copyrights 2013-2018 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

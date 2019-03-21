@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.08
+    Version 0.10
 
 SYNOPSIS
 
@@ -34,7 +34,12 @@ SUBROUTINES/METHODS
 
  new
 
-    a new WebService::HIBP object, ready to check how bad the pwnage is.
+    a new WebService::HIBP object, ready to check how bad the pwnage is. It
+    accepts an optional hash as a parameter. Allowed keys are below;
+
+      * user_agent - A pre-configured instance of LWP::UserAgent that will
+      be used instead of the automatically created one. This allows full
+      control of the user agent properties if desired
 
  password
 
@@ -255,7 +260,7 @@ ACKNOWLEDGEMENTS
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2018 David Dick.
+    Copyright 2019 David Dick.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

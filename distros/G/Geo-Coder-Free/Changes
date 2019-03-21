@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-Free
 
+0.18	Wed 20 Mar 17:00:52 EDT 2019
+	Added Geo::Coder::Free::Local
+	Now return Geo::Location::Point object
+
 0.17	Sat 23 Feb 17:21:41 EST 2019
 	Maxmind download of worldcitiespop.txt has been removed
 

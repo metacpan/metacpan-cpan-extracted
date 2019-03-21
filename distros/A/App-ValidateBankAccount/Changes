@@ -1,5 +1,8 @@
 Revision history for App::ValidateBankAccount
 
+0.04  Thu Mar 21 14:55:00 2019
+      - Added key 'provides' as suggested by CPANTS.
+
 0.03  Tue Mar 19 11:10:00 2019
       - Added prereq Types::Standard as reported by @SREZIC.
 

@@ -2,8 +2,8 @@ NAME
     App::linerange - Retrieve line ranges from a filehandle
 
 VERSION
-    This document describes version 0.002 of App::linerange (from Perl
-    distribution App-linerange), released on 2019-03-20.
+    This document describes version 0.003 of App::linerange (from Perl
+    distribution App-linerange), released on 2019-03-21.
 
 FUNCTIONS
   linerange

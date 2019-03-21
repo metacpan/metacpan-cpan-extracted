@@ -3,7 +3,7 @@ package Function::Interface::Info::Function;
 use v5.14.0;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub new {
     my ($class, %args) = @_;
@@ -76,7 +76,7 @@ Returns an abstract function name
 
 =head2 keyword
 
-Returns the keyword used to define the abstract function, i.e. C<fun> or C<method
+Returns the keyword used to define the abstract function, i.e. C<fun> or C<method>
 
 =head2 params
 

@@ -32,6 +32,10 @@ WriteMakefile(
     clean => { FILES => 'App-ValidateBankAccount-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'App::ValidateBankAccount'         => { file => 'lib/App/ValidateBankAccount.pm'       , version => '0.04' },
+            'App::ValidateBankAccount::Option' => { file => 'lib/App/ValidateBankAccount/Option.pm', version => '0.04' },
+        },
         resources => {
             repository => {
                 type => 'git',

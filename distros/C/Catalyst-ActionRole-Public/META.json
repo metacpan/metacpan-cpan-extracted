@@ -1,0 +1,56 @@
+{
+   "abstract" : "Controller that serves files from a directory",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Catalyst-ActionRole-Public",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst" : "5.90082",
+            "Cwd" : "0",
+            "HTTP::Date" : "0",
+            "Moose" : "2.1403",
+            "MooseX::MethodAttributes" : "0.29",
+            "Plack" : "1.0033",
+            "Plack::MIME" : "0",
+            "Plack::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/Catalyst-ActionRole-Public/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/Catalyst-ActionRole-Public",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/Catalyst-ActionRole-Public.git",
+         "web" : "https://github.com/jjn1056/Catalyst-ActionRole-Public"
+      }
+   },
+   "version" : "0.010",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

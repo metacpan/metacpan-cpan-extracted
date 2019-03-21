@@ -1,4 +1,7 @@
 Revision history for RT-Authen-OAuth
 
+0.11 2019-03-21
+ - Fix image src for non-empty web path
+
 0.10 2018-03-28
  - Initial version

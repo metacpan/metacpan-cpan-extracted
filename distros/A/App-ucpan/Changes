@@ -1,5 +1,8 @@
 Revision history for Perl extension App-ucpan
 
+1.06 2019-03-21T07:16:47Z
+    - Add Term::ReadKey to prereq.(issue #128900)
+
 1.05 2019-03-20T13:53:50Z
     - Improve the folding of long module names
     - Make installation execution order case insensitive

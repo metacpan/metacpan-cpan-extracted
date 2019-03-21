@@ -26,17 +26,18 @@ no_index:
 provides:
   App::ucpan:
     file: lib/App/ucpan.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   App::cpanminus: '0'
   App::cpanoutdated: '0'
   Config: '0'
   File::Which: '0'
   Path::Class: '0'
+  Term::ReadKey: '0'
   YAML: '0'
   perl: '5.008001'
   version: '0'
-version: '1.05'
+version: '1.06'
 x_authority: cpan:KPEE
 x_contributors:
   - 'KPEE <kpee.cpanx@gmail.com>'

@@ -1,5 +1,11 @@
 # This file documents the revision history for Perl extension Catalyst::ActionRole::Public.
 
+0.010 - TBA
+  - No longer use 'from_psgi_response' to build response.  Using Catalyst native
+    methods is more compatible with some web services and middleware.
+  - Documentation and test improvements
+  - Minor changes to the dist.ini to support modern toolchain
+
 0.009 - 2015-05-05
   - Fixed a bug that caused us to not play nice with other actionroles.
 

@@ -24,11 +24,11 @@ REST::Client::CrossRef - Read data from CrossRef using its REST API
 
 =cut
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 =head1 VERSION
 
-Version 0.008
+Version 0.009
 
 =cut
 
@@ -510,7 +510,8 @@ sub _crossref_get_request {
         return;
     }
 
-    $self->log->notice( "> Content: " . substr($response->responseContent, 0, 50) );
+    #$self->log->notice( "> Content: " . substr($response->responseContent, 0, 50) );
+    $self->log->notice( "> Content: " . $response->responseContent );
 
     $self->code($code);
 
@@ -612,7 +613,7 @@ sub _display_data {
 
     return $hr if ( $self->spit_raw_data );
     my $formatter = REST::Client::CrossRef::Unfolder->new();
-
+    return if ($hr->{message}->{'total-results'} && $hr->{message}->{'total-results'}==0);
     my $data_ar;
     if ( $hr->{message}->{items} ) {
         $data_ar = $hr->{message}->{items};
@@ -775,11 +776,13 @@ Set the rows parameter that determines how many items are returned in one page
 
 =cut
 
-=head2 C<$cr-E<gt>works_from_doi( $doi )>
+=head2 C<$cr-E<gt>works_from_doi( $doi, $filter,  $select )>
 
 Retrive the metadata from the work road (url ending with works) using the article's doi.
 Return undef if the doi is not found.
-You may pass a select string with the format "field1,field2,..." to return only these fields.
+You may pass a C<$filter> hash ref C<{filter1 =E<gt> value1, ...}> 
+L<see|https://github.com/CrossRef/rest-api-doc#filter-names> for a list of filters.
+You may pass a C<$select> string with the format C<"field1,field2,..."> to return only these fields.
 Fields that may be use for selection are (October 2018):
 abstract, URL, member, posted, score, created, degree, update-policy, short-title, license, ISSN, 
 container-title, issued, update-to, issue, prefix, approved, indexed, article-number, clinical-trial-number, 
@@ -792,14 +795,42 @@ Use keys_to_keep or json_path to define an ordering in the ouptut. Use select to
 =cut
 
 sub works_from_doi {
-    my ( $self, $doi, $select ) = @_;
+    my ( $self, $doi, $filter, $select ) = @_;
     croak "works_from_doi: need doi" unless defined $doi;
-    $self->_get_metadata( "/works", undef, "doi:$doi", $select );
+    my @filters;
+    for my $fname (keys %$filter) {
+         push @filters,  $fname . ":" . uri_escape( $filter->{$fname});    
+    }
+    push @filters, "doi:" . uri_escape($doi);
+    my $filter_str = join(",", @filters);
+    $self->_get_metadata( "/works", undef, $filter_str , $select );
+}
+
+=head2 C<$cr-E<gt>works_from_orcid( $orcid, $filter, $select )>
+
+Retrive the metadata or undef from the work road using author's orcid.
+C<$filter> and C<$select> as above.
+
+=cut
+
+sub works_from_orcid {
+   my ( $self, $id, $filter, $select ) = @_;
+    croak "works_from_doi: need orcid" unless defined $id;
+    my @filters;
+    for my $fname (keys %$filter) {
+         push @filters,  $fname . ":" . uri_escape( $filter->{$fname});
+    }
+      my $url =
+                  $id =~ /^https*:\/\/orcid.org\//     ? $id
+                : "http://orcid.org/" . $id;
+    push @filters, "orcid:" . uri_escape($url);
+    my $filter_str = join(",", @filters);
+    $self->_get_metadata( "/works", undef, $filter_str , $select );
 }
 
 =head2 C<$cr-E<gt>journal_from_doi( $doi )>
 
-A shortcut for C<works_from_doi( $doi,  "container-title,page,issued,volume,issue")>
+A shortcut for C<works_from_doi( $doi,  undef, "container-title,page,issued,volume,issue")>
 
 =cut
 
@@ -813,7 +844,7 @@ sub journal_from_doi {
 
 =head2 C<$cr-E<gt>article_from_doi( $doi )>
 
-A shortcut for C<works_from_doi( $doi,  "title,container-title,page,issued,volume,issue,author,published-print,published-online")>
+A shortcut for C<works_from_doi( $doi,  undef, "title,container-title,page,issued,volume,issue,author,published-print,published-online")>
 
 =cut
 
