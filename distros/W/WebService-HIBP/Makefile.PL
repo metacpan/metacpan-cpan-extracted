@@ -20,6 +20,7 @@ WriteMakefile(
     PREREQ_PM => {
         'strict'                => 0,
         'warnings'              => 0,
+        'Digest::SHA'           => 0,
         'URI::Escape'           => 3.30,
         'URI'                   => 1.53,
         'JSON'                  => 0,

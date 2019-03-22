@@ -1,0 +1,20 @@
+bin/photodb
+Build.PL
+Dockerfile
+docs/CONTRIBUTING.pod
+docs/SCHEMA.pod
+dump-schema.pl
+lib/App/PhotoDB.pm
+lib/App/PhotoDB/commands.pm
+lib/App/PhotoDB/funcs.pm
+lib/App/PhotoDB/handlers.pm
+lib/App/PhotoDB/queries.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/00-compile.t
+t/01-perlcritic.t
+t/perlcriticrc
+t/test.t

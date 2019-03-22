@@ -38,15 +38,16 @@
       "runtime" : {
          "requires" : {
             "AnyEvent::HTTP" : "0",
-            "Dancer" : "0",
+            "Net::SSLeay" : "1.85",
             "Plack" : "0",
-            "Plack::Handler::Twiggy" : "0",
+            "Starman" : "0",
             "URI" : "0",
             "perl" : "v5.10.1"
          }
       },
       "test" : {
          "requires" : {
+            "HTTP::Request::Common" : "0",
             "Test::More" : "0.96"
          }
       }
@@ -63,8 +64,9 @@
          "web" : "https://github.com/vpeil/Plack-Middleware-Matomo"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Vitali Peil <vitali.peil@uni-bielefeld.de>"
    ],
    "x_generated_by_perl" : "v5.28.0",

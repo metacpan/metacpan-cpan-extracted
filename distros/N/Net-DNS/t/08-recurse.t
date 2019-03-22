@@ -1,4 +1,4 @@
-# $Id: 08-recurse.t 1719 2018-11-04 05:01:43Z willem $ -*-perl-*-
+# $Id: 08-recurse.t 1736 2019-03-20 10:03:12Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -12,8 +12,6 @@ use Net::DNS;
 use Net::DNS::Resolver::Recurse;
 
 my @hints = new Net::DNS::Resolver()->_hints;
-
-my @NOIP = qw(:: 0.0.0.0);
 
 
 exit( plan skip_all => 'Online tests disabled.' ) if -e 't/online.disabled';
@@ -49,7 +47,7 @@ eval {
 } || exit( plan skip_all => 'Unable to reach global root nameservers' );
 
 
-plan tests => 13;
+plan tests => 10;
 
 NonFatalBegin();
 
@@ -61,8 +59,6 @@ NonFatalBegin();
 
 	my $reply = $res->query_dorecursion( 'www.net-dns.org', 'A' );
 	is( ref($reply), 'Net::DNS::Packet', 'query returned a packet' );
-	skip( 'no response to query', 1 ) unless $reply;
-	ok( scalar( $reply->answer ), 'answer section has RRs' );
 }
 
 
@@ -72,11 +68,11 @@ NonFatalBegin();
 
 	my $count = 0;
 
-	$res->recursion_callback( sub { $count++ if ref(shift) } );
+	$res->recursion_callback( sub { $count++ } );
 
-	$res->query_dorecursion( 'a.t.net-dns.org', 'A' );
+	$res->send( 'a.t.net-dns.org', 'A' );
 
-	ok( $count >= 3, "Lookup took $count queries which is at least 3" );
+	ok( $count >= 3, "Lookup took $count queries" );
 }
 
 
@@ -85,16 +81,16 @@ NonFatalBegin();
 
 	my $count = 0;
 
-	$res->recursion_callback( sub { $count++ if ref(shift) } );
+	$res->recursion_callback( sub { $count++ } );
 
-	$res->query_dorecursion( '2a04:b900:0:0:8:0:0:60', 'PTR' );
+	$res->send( '2a04:b900:0:0:8:0:0:60', 'PTR' );
 
 	ok( $count >= 3, "Reverse lookup took $count queries" );
 }
 
 
 SKIP: {
-	my $res	  = Net::DNS::Resolver::Recurse->new();
+	my $res = Net::DNS::Resolver::Recurse->new();
 	is( scalar( $res->hints() ), 0, 'hints() initially empty' );
 	$res->hints(@hints);
 	is( scalar( $res->hints ), scalar(@hints), 'hints() set' );
@@ -111,22 +107,6 @@ SKIP: {
 
 	my @ar = grep $_->can('address'), $reply->additional;
 	ok( scalar(@ar), "address RRs in response from $from" );
-}
-
-
-{
-	my $res = Net::DNS::Resolver::Recurse->new( nameserver => [@NOIP], srcport => -1 );
-
-	ok( !$res->send( 'www.net-dns.org', 'A' ), 'fail if no reachable server' );
-}
-
-
-{
-	Net::DNS::Resolver::Recurse->retry(0);
-	my $res = Net::DNS::Resolver::Recurse->new();
-	$res->hints(@NOIP);
-
-	ok( !$res->send( 'www.net-dns.org', 'A' ), 'fail if no usable hint' );
 }
 
 

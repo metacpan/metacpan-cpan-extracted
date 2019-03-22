@@ -30,11 +30,11 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
-C<spread-revolutionary-date> is a L<Free Software|https://www.gnu.org/philosophy/free-sw.htmlhttps://www.gnu.org/philosophy/free-sw.html> that spreads the current date, expressed in L<French Revolutionary calendar|https://en.wikipedia.org/wiki/French_Republican_calendar>, to various social networks: L<Twitter|https://twitter.com/>, L<Mastodon|https://mastodon.social/>, and the L<Freenode|https://freenode.net/> Internet Relay Chat network.
+C<spread-revolutionary-date> is a L<Free Software|https://www.gnu.org/philosophy/free-sw.htmlhttps://www.gnu.org/philosophy/free-sw.html> that spreads the current date, expressed in L<French Revolutionary calendar|https://en.wikipedia.org/wiki/French_Republican_calendar>, to various social networks: L<Twitter|https://twitter.com/>, L<Mastodon|https://mastodon.social/>, and the L<Freenode|https://freenode.net/> Internet Relay Chat network. And you can easily extend these defaults targets with any desired one, see L</"EXTENDING TO NEW TARGETS">.
 
 The French Revolutionary calendar, also called Republican calendar, was introduced during the L<French Revolution|https://en.wikipedia.org/wiki/French_Revolution>, and used from late 1793 to 1805, and also during the L<Paris Commune|https://en.wikipedia.org/wiki/Paris_Commune> in 1871. This was an attempt to get rid of religious and royalist references found in Gregorian calendar when naming measures of Time. Months were given new names based on nature, each day of the year, instead of being named after an associated saint, had a unique name associated with the rural economy: agricultural tools, common animals, grains, pastures, trees, roots, flowers, fruits, plants, and minerals. But this was also an attempt to give more rational in measuring Time, basing measures on decimal system. Instead of weeks, each month was divided into exactly 3 I<décades>, that is ten days; days were divided into ten hours; hours into 100 minutes; and minutes into 100 seconds.
 
@@ -72,19 +72,11 @@ The configuration file should lie on C<~/.config/spread-revolutionary-date/sprea
 
 =head2 General options
 
-These options should appear outside of any section of the cofiguration file.
+These options should appear outside of any section of the configuration file.
 
-=head3 twitter
+=head3 targets
 
-Spread on Twitter explicitly. If none of the C<twitter>, C<mastodon>, C<freenode> option is set, the revolutionary date is spread on all of these three targets.
-
-=head3 mastodon
-
-Spread on Mastodon explicitly. If none of the C<twitter>, C<mastodon>, C<freenode> option is set, the revolutionary date is spread on all of these three targets.
-
-=head3 freenode
-
-Spread on Freenode explicitly. If none of the C<twitter>, C<mastodon>, C<freenode> option is set, the revolutionary date is spread on all of these three targets.
+This option can be specified multiple time. It explicitly defines targets where the revolutionary date should be spread to. Any value set for this option should be a valid target: any of the three default targets (C<twitter>, C<mastodon>, or C<freenode>) or some new target if you have extended this application (see L</"EXTENDING TO NEW TARGETS">). If this option is not defined, the revolutionary date is spread on all of three default targets: C<twitter>, C<mastodon>, and C<freenode>.
 
 =head3 locale
 
@@ -92,11 +84,23 @@ Spread with chosen language. As of L<DateTime::Calendar::FrenchRevolutionary> 0.
 
 =head3 test
 
-Do no not actually spread the revolutionary date, just print it on standard output for Twitter and Mastodon, and send it on configured test channels for Freenode (see <L/"test_channels"> below).
+Do no not actually spread the revolutionary date, just print it on standard output for Twitter and Mastodon, and send it on configured test channels for Freenode (see L</"test_channels"> below).
 
 =head3 acab
 
-Instead of spreading the current date and time, pretend that decimal time is 1:31:20 (which corresponds to 03:08:56 Paris winter time, in sexagesimal scale used by common Anglo-Babylonian Time).
+Instead of spreading the current date and time, pretend that decimal time is 1:31:20 (which corresponds to 03:08:56 Paris time, in sexagesimal scale used by common Anglo-Babylonian Time).
+
+=head3 twitter I<DEPRECATED>
+
+This option is I<deprecated> since version 0.07 of this distribution and may be removed in future release. Please use L</targets> option below. Spread on Twitter explicitly. If none of the C<twitter>, C<mastodon>, C<freenode> option is set, the revolutionary date is spread on all of these three targets.
+
+=head3 mastodon I<DEPRECATED>
+
+This option is I<deprecated> since version 0.07 of this distribution and may be removed in future release. Please use L</targets> option below. Spread on Mastodon explicitly. If none of the C<twitter>, C<mastodon>, C<freenode> option is set, the revolutionary date is spread on all of these three targets.
+
+=head3 freenode I<DEPRECATED>
+
+This option is I<deprecated> since version 0.07 of this distribution and may be removed in future release. Please use L</targets> option below. Spread on Freenode explicitly. If none of the C<twitter>, C<mastodon>, C<freenode> option is set, the revolutionary date is spread on all of these three targets.
 
 =head2 Twitter options
 
@@ -164,17 +168,9 @@ Any command line parameter takes precedence on the corresponding option specifie
 
 =head2 General parameters
 
-=head3 --twitter | -t
+=head3 --targets | -tg
 
-Same as L</twitter> configuration option below.
-
-=head3 --mastodon | -m
-
-Same as L</mastodon> configuration option below.
-
-=head3 --freenode | -f
-
-Same as L</freenode> configuration option below.
+Same as L</targets> configuration option below.
 
 =head3 --locale | -l
 
@@ -187,6 +183,18 @@ Same as L</test> configuration option below.
 =head3 --acab | -a
 
 Same as L</acab> configuration option below.
+
+=head3 --twitter | -t I<DEPRECATED>
+
+Same as L</twitter> configuration option below.
+
+=head3 --mastodon | -m I<DEPRECATED>
+
+Same as L</mastodon> configuration option below.
+
+=head3 --freenode | -f I<DEPRECATED>
+
+Same as L</freenode> configuration option below.
 
 =head2 Twitter parameters
 
@@ -247,6 +255,18 @@ Same as L</channels> configuration option below.
 =head3 --freenode-test_channels | -tc
 
 Same as L</test_channels> configuration option below.
+
+=head1 EXTENDING TO NEW TARGETS
+
+Version 0.07 of this distribution is a complete redesign of the API, taking advantage of L<Moose>, the postmodern object system for Perl 5, allowing to easily extend C<spread-revolutionary-date> to other targets than the default ones (C<Twitter>, C<Mastondon> and C<Freenode>.
+
+To add a new target, you should write a new class in the C<App::SpreadRevolutionaryDate::Target::> namespace (that is: the class should be C<App::SpreadRevolutionaryDate::Target::Mytarget> for a new C<Mytarget> target), that consumes the L<App::SpreadRevolutionaryDate::Target> role. See L<App::SpreadRevolutionaryDate::Target/DESCRIPTION> for a comprehensive description of this role.
+
+Such a target class is actually just a wrapper. Usually a target has to use an existing specific module (which can be a C<Moose> class or not) to perform the actual work of posting a message according the specific target protocol, after having complied with any potential required authentication. Such authentication and posting should be carried on by the constructor or the required C<spread> method of the target class.
+
+To perform authentication and to post a message, there is a strong likelihood that the new target requires specific parameters (for eg. tokens, keys, account name, password, channels, etc.). These parameters should be defined as required attributes of the target class. Values for such attributes should be set in the L<configuration file|/CONFIGURATION>, inside a section named after the target (C<[mytarget]>), or as L<command line parameters|/"COMMAND LINE PARAMETERS"> prefixed with the name of the target followed by a dash (C<--mytarget-myparam>).
+
+Should you extend C<spread-revolutionary-date> to a new target, we advise you to have a look on how of default targets are implemented: L<App::SpreadRevolutionaryDate::Target::Twitter> with L<Net::Twitter::Lite::WithAPIv1_1> C<worker>, L<App::SpreadRevolutionaryDate::Target::Mastodon> with L<Mastodon::Client> C<worker>. Both are using L<OAuth2 protocol|https://oauth.net/2/> to perform authentication. The third default target, C<App::SpreadRevolutionaryDate::Target::Freenode>, uses a L<chatbot|https://en.wikipedia.org/wiki/Chatbot>: L<App::SpreadRevolutionaryDate::Target::Freenode::Bot> subclassing L<Bot::BasicBot>. You can also see a very simple example with a test file provided in this distribution at C<t/new_target.t>, which just prints out the revolutionary date on the standard input using core module L<IO::Handle>.
 
 =head1 SEE ALSO
 

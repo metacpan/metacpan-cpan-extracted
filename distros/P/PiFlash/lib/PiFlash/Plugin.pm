@@ -6,7 +6,7 @@ use warnings;
 use v5.14.0; # require 2011 or newer version of Perl
 
 package PiFlash::Plugin;
-$PiFlash::Plugin::VERSION = '0.4.0';
+$PiFlash::Plugin::VERSION = '0.4.1';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use parent 'PiFlash::Object';
 use PiFlash::State;
@@ -112,7 +112,7 @@ PiFlash::Plugin - plugin extension interface for PiFlash
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 

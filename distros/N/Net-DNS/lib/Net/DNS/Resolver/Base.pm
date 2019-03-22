@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1719 2018-11-04 05:01:43Z willem $
+# $Id: Base.pm 1727 2018-12-31 12:04:48Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1719 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1727 $)[1];
 
 
 #
@@ -480,8 +480,8 @@ NAMESERVER: foreach my $ns (@ns) {
 
 			# state vector replaces corresponding element of @ns array
 			unless ( ref $ns ) {
-				my $socket = $self->_create_udp_socket($ns) || next;
 				my $dst_sockaddr = $self->_create_dst_sockaddr( $ns, $port );
+				my $socket = $self->_create_udp_socket($ns) || next;
 				$ns = [$socket, $ns, $dst_sockaddr];
 			}
 
@@ -581,8 +581,8 @@ sub _bgsend_udp {
 	my $port = $self->{port};
 
 	foreach my $ip ( $self->nameservers ) {
-		my $socket = $self->_create_udp_socket($ip) || next;
 		my $dst_sockaddr = $self->_create_dst_sockaddr( $ip, $port );
+		my $socket = $self->_create_udp_socket($ip) || next;
 
 		$self->_diag( 'bgsend', "[$ip]:$port" );
 
@@ -876,7 +876,6 @@ sub _create_tcp_socket {
 				unless $ip6_addr;
 	}
 
-	$self->errorstring("no socket $sock_key $!") unless $socket;
 	$self->{persistent}{$sock_key} = $self->{persistent_tcp} ? $socket : undef;
 	return $socket;
 }
@@ -909,7 +908,6 @@ sub _create_udp_socket {
 				unless $ip6_addr;
 	}
 
-	$self->errorstring("no socket $sock_key $!") unless $socket;
 	$self->{persistent}{$sock_key} = $self->{persistent_udp} ? $socket : undef;
 	return $socket;
 }

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Class::Tiny;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 # Docs {{{1
 
@@ -52,7 +52,41 @@ Example of a class using this package:
 
 =head2 import
 
-Creates the accessors you have requested.
+Creates the accessors you have requested.  Usage:
+
+    use Class::Tiny::ConstrainedAccessor
+        [optional arrayref of option=>value],
+        name => constraint
+        [, name => constraint]...  ;
+
+The options use an arrayref to make them stand out against the
+C<< name=>constraint >> pairs that come after.
+
+This also creates a L<Class::Tiny/BUILD> to check the constructor parameters if
+one doesn't exist.  If one does exist, it creates the same function as
+C<_check_all_constraints> so that you can call it from your own BUILD.  It
+takes the same parameters as C<BUILD>.
+
+=head1 OPTIONS
+
+Remember, options are carried in an B<arrayref>.  This is to leave room
+for someday carrying attributes and constraints in a hashref.
+
+=over
+
+=item NOBUILD
+
+If C<< NOBUILD => 1 >> is given, the constructor-parameter-checker
+is created as C<_check_all_constraints> regardless of whether C<BUILD()>
+exists or not.  Example:
+
+    package MyClass;
+    use Class::Tiny::ConstrainedAccessor
+        [NOBUILD => 1],
+        foo => SomeConstraint;
+
+
+=back
 
 =cut
 
@@ -61,48 +95,42 @@ Creates the accessors you have requested.
 sub import {
     my $target = caller;
     my $package = shift;
+
+    my %opts = ();
+    %opts = @{+shift} if ref $_[0] eq 'ARRAY';
+
     die "Need 'name => \$Constraint' pairs" if @_%2;
 
     my %constraints = @_;
 
+    # --- Make the accessors ---
+    my %accessors;  # constraint => [checker, get_message]
     foreach my $k (keys(%constraints)) {
         my $constraint = $constraints{$k};
 
         my ($checker, $get_message) =
                 _get_constraint_sub($constraint); # dies on failure
 
-        # The accessor --- modified from the Class::Tiny docs based on
-        # the source for C::T::__gen_accessor() and C::T::__gen_sub_body().
-        #   Future TODO? use an accessor that is specific to the type of
-        #   constraint object we have?
-        my $accessor = sub {
-            my $self_ = shift;
-            if (@_) {                               # Set
-                $checker->($_[0]) or die $get_message->($_[0]);
-                return $self_->{$k} = $_[0];
-
-            } elsif ( exists $self_->{$k} ) {       # Get
-                return $self_->{$k};
-
-            } else {                                # Get default
-                my $defaults_ =
-                    Class::Tiny->get_all_attribute_defaults_for( ref $self_ );
-
-                my $def_ = $defaults_->{$k};
-                $def_ = $def_->() if ref $def_ eq 'CODE';
-
-                $checker->($def_) or die $get_message->($def_);
-                return $self_->{$k} = $def_;
-            }
-        }; #accessor()
+        my $accessor = _make_accessor($k, $checker, $get_message);
+        $accessors{$k} = [$checker, $get_message];
 
         { # Install the accessor
             no strict 'refs';
-            my $dest = $target . '::' . $k;
-            *{ $dest } = $accessor;
+            *{ "$target\::$k" } = $accessor;
         }
-
     } #foreach constraint
+
+    # --- Make BUILD ---
+    my $has_build =
+        do { no warnings 'once'; no strict 'refs'; *{"$target\::BUILD"}{CODE} }
+        || $opts{NOBUILD};  # NOBUILD => pretend BUILD() already exists.
+    my $build = _make_build(%accessors);
+    {
+        no strict 'refs';
+        *{ $has_build ? "$target\::_check_all_constraints" :
+                        "$target\::BUILD" } = $build;
+    }
+
 } #import()
 
 # _get_constraint_sub: Get the subroutine for a constraint.
@@ -151,6 +179,50 @@ sub _get_constraint_sub {
 
     return ($checker, $get_message);
 } #_get_constraint_sub()
+
+# _make_accessor($name, \&checker, \&get_message): Make an accessor.
+sub _make_accessor {
+    my ($k, $checker, $get_message) = @_;
+
+    # The accessor --- modified from the Class::Tiny docs based on
+    # the source for C::T::__gen_accessor() and C::T::__gen_sub_body().
+    return sub {
+        my $self_ = shift;
+        if (@_) {                               # Set
+            $checker->($_[0]) or die $get_message->($_[0]);
+            return $self_->{$k} = $_[0];
+
+        } elsif ( exists $self_->{$k} ) {       # Get
+            return $self_->{$k};
+
+        } else {                                # Get default
+            my $defaults_ =
+                Class::Tiny->get_all_attribute_defaults_for( ref $self_ );
+
+            my $def_ = $defaults_->{$k};
+            $def_ = $def_->() if ref $def_ eq 'CODE';
+
+            $checker->($def_) or die $get_message->($def_);
+            return $self_->{$k} = $def_;
+        }
+    }; #accessor()
+} #_make_accessor()
+
+# _make_build(%accessors): Make a BUILD subroutine that will check
+# the constraints from the constructor arguments.
+# The resulting subroutine takes ($self, {args}).
+sub _make_build {
+    my %accessors = @_;
+
+    return sub {
+        my ($self, $args) = @_;
+        foreach my $k (keys %$args) {
+            next unless exists $accessors{$k};
+            my ($checker, $get_message) = @{$accessors{$k}};
+            $checker->($args->{$k}) or die $get_message->($args->{$k});
+        }
+    } #BUILD()
+} #_make_build()
 
 1; # End of Class::Tiny::ConstrainedAccessor
 # Rest of the docs {{{1

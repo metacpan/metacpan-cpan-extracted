@@ -9,7 +9,7 @@ use Data::Printer alias => 'pdump';
 use SQL::Abstract::Complete;
 use MySQL::Util::Lite;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 =head1 SYNOPSIS
 

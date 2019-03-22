@@ -11,6 +11,7 @@ use File::Path 'make_path';
 use File::Basename;
 use Text::Trim 'trim';
 use Perl::Tidy::Sweetened;
+use Capture::Tiny 'capture';
 
 extends 'MySQL::ORM::Generate::Common';
 
@@ -18,18 +19,13 @@ extends 'MySQL::ORM::Generate::Common';
 ## required attributes
 ##############################################################################
 
-
-
 ##############################################################################
 ## optional attributes
 ##############################################################################
 
-
 ##############################################################################
 ## private attributes
 ##############################################################################
-
-
 
 ##############################################################################
 ## methods
@@ -47,14 +43,14 @@ method write_class (
   ) {
 
 	$self->trace;
-	
-	if (!$overwrite) {
-		if (-f $file_name) {
-			say "skipping pre-existing $file_name";			
+
+	if ( !$overwrite ) {
+		if ( -f $file_name ) {
+			say "skipping pre-existing $file_name";
 			return;
 		}
 	}
-	
+
 	say "writing $file_name";
 
 	make_path dirname($file_name);
@@ -67,7 +63,7 @@ method write_class (
 
 	#
 	# use module section
-	#	
+	#
 	foreach my $mod (@$use) {
 		$self->_write( fh => $fh, text => "use $mod;" );
 	}
@@ -76,7 +72,7 @@ method write_class (
 
 	#
 	# moose extends section
-	#	
+	#
 	if ( $extends and @$extends > 0 ) {
 
 		my @tmp;
@@ -124,7 +120,7 @@ method write_class (
 			push @public, $attr;
 		}
 	}
-	
+
 	@public = sort @public;
 	$self->_write( fh => $fh, text => join( "\n\n", @public ) );
 	$self->_write( fh => $fh );
@@ -158,8 +154,8 @@ method write_class (
 	$self->_write( fh => $fh );
 	$self->_write( fh => $fh, text => '1;' );
 	close($fh);
-	
-	$self->_tidy($file_name);	
+
+	$self->_tidy($file_name);
 	$self->trace('exit');
 }
 
@@ -168,12 +164,20 @@ method write_class (
 ##############################################################################
 
 method _tidy (Str $file_name) {
-	
-	my $cmd = "perltidier -b -bext='/' $file_name 2>&1 | grep -v Subroutine";
-	pdump $cmd;
-	system($cmd);
+
+	my $cmd = "perltidier -b -bext='/' $file_name";
+#	pdump $cmd;
+
+	my ( $stdout, $stderr, $exit ) = capture {
+		system($cmd);
+	};
+
+	if ($exit) {
+		confess "$stdout\n$stderr";
+	}
+
 	return;
-		
+
 	#local @ARGV = ('-b', "-bext='/'", $file_name);
 	#Perl::Tidy::Sweetened::perltidy();
 }
@@ -190,6 +194,5 @@ method _write ( Ref :$fh, Str :$text ) {
 	print $fh $text if $text;
 	print $fh "\n";
 }
-
 
 1;

@@ -1,9 +1,9 @@
 package Net::DNS::RR::CERT;
 
 #
-# $Id: CERT.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: CERT.pm 1729 2019-01-28 09:45:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
 
 
 use strict;
@@ -77,7 +77,7 @@ my %certtype = (
 		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $algbyname{$key};
 		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak "unknown algorithm $arg";
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
 	}
 
 	sub _algbyval {
@@ -130,7 +130,7 @@ sub certtype {
 	return $self->{certtype} = $certtype unless $certtype =~ /\D/;
 
 	my $typenum = $certtype{$certtype};
-	$typenum || croak "unknown certtype $certtype";
+	$typenum || croak qq[unknown certtype "$certtype"];
 	$self->{certtype} = $typenum;
 }
 

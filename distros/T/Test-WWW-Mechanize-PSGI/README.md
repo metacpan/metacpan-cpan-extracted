@@ -4,7 +4,7 @@ Test::WWW::Mechanize::PSGI - Test PSGI programs using WWW::Mechanize
 
 # VERSION
 
-version 0.38
+version 0.39
 
 # SYNOPSIS
 
@@ -70,6 +70,7 @@ in your application:
             my $env = shift;
             return [ 200, [ 'Content-Type' => 'text/plain' ], ['Hello World'] ],;
         },
+        env => { REMOTE_USER => 'Foo Bar' },
     );
 
 # METHODS: HTTP VERBS

@@ -1,9 +1,9 @@
 package Net::DNS::RR::DS;
 
 #
-# $Id: DS.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: DS.pm 1729 2019-01-28 09:45:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
 
 
 use strict;
@@ -74,7 +74,7 @@ my %digest = (
 		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $algbyname{$key};
 		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak "unknown algorithm $arg";
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
 	}
 
 	sub _algbyval {
@@ -88,10 +88,10 @@ my %digest = (
 #
 {
 	my @digestbyname = (
-		'SHA-1'		  => 1,				# RFC3658
-		'SHA-256'	  => 2,				# RFC4509
-		'GOST-R-34.11-94' => 3,				# RFC5933
-		'SHA-384'	  => 4,				# RFC6605
+		'SHA-1'		  => 1,				# [RFC3658]
+		'SHA-256'	  => 2,				# [RFC4509]
+		'GOST-R-34.11-94' => 3,				# [RFC5933]
+		'SHA-384'	  => 4,				# [RFC6605]
 		);
 
 	my @digestalias = (
@@ -110,7 +110,7 @@ my %digest = (
 		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $digestbyname{$key};
 		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak "unknown digest type $arg";
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
 	}
 
 	sub _digestbyval {
@@ -125,8 +125,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my $rdata = substr $$data, $offset, $self->{rdlength};
-	$self->{digestbin} = unpack '@4 a*', $rdata;
-	@{$self}{qw(keytag algorithm digtype)} = unpack 'n C*', $rdata;
+	@{$self}{qw(keytag algorithm digtype digestbin)} = unpack 'n C2 a*', $rdata;
 }
 
 

@@ -37,6 +37,41 @@ Example of a class using this package:
         med_with_default => 12,
     };
 
+# SUBROUTINES
+
+## import
+
+Creates the accessors you have requested.  Usage:
+
+    use Class::Tiny::ConstrainedAccessor
+        [optional arrayref of option=>value],
+        name => constraint
+        [, name => constraint]...  ;
+
+The options use an arrayref to make them stand out against the
+`name=>constraint` pairs that come after.
+
+This also creates a ["BUILD" in Class::Tiny](https://metacpan.org/pod/Class::Tiny#BUILD) to check the constructor parameters if
+one doesn't exist.  If one does exist, it creates the same function as
+`_check_all_constraints` so that you can call it from your own BUILD.  It
+takes the same parameters as `BUILD`.
+
+# OPTIONS
+
+Remember, options are carried in an **arrayref**.  This is to leave room
+for someday carrying attributes and constraints in a hashref.
+
+- NOBUILD
+
+    If `NOBUILD => 1` is given, the constructor-parameter-checker
+    is created as `_check_all_constraints` regardless of whether `BUILD()`
+    exists or not.  Example:
+
+        package MyClass;
+        use Class::Tiny::ConstrainedAccessor
+            [NOBUILD => 1],
+            foo => SomeConstraint;
+
 # AUTHOR
 
 Christopher White, `<cxwembedded at gmail.com>`.  Thanks to

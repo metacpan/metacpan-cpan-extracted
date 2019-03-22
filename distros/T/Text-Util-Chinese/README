@@ -87,6 +87,11 @@ EXPORTED SUBROUTINES
       algorithm. So far threshold is the only one with default value being
       9.
 
+    phrase_iterator( $input_iter ) #=> CodeRef
+
+      This subroutine split input into smallelr phrases. It takes an text
+      iterator, and returns another one.
+
 AUTHORS
 
     Kang-min Liu <gugod@gugod.org>

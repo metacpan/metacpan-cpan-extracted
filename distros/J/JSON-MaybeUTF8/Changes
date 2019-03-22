@@ -1,5 +1,10 @@
 Revision history for JSON-MaybeUTF8
 
+1.002     2019-03-22 13:47:33+08:00 Asia/Kuala_Lumpur
+    Strip BOM characters by default in `decode_json_text` and `decode_json_utf8`.
+    This is a workaround for https://github.com/rurban/Cpanel-JSON-XS/issues/125
+    and addresses the issue mentioned in 1.001 release notes.
+
 1.001     2019-03-13 13:14:37+08:00 Asia/Kuala_Lumpur
     Retains a separate JSON instance for each function.
 

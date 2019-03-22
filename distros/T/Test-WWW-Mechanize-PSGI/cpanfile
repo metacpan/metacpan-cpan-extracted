@@ -29,21 +29,25 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Code::TidyAll" => "0.71";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
+  requires "Code::TidyAll::Plugin::Test::Vars" => "0.04";
+  requires "Code::TidyAll::Plugin::UniqueLines" => "0.000003";
+  requires "Parallel::ForkManager" => "1.19";
+  requires "Perl::Critic" => "1.132";
+  requires "Perl::Tidy" => "20180220";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Pod::Wordlist" => "0";
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::Code::TidyAll" => "0.50";
   requires "Test::More" => "0.96";
+  requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Spelling" => "0.12";
   requires "Test::Synopsis" => "0";
+  requires "Test::Vars" => "0.014";
 };
 
 on 'develop' => sub {
-  suggests "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004";
-  suggests "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
-  suggests "Dist::Zilla::Plugin::Git::Commit" => "2.020";
-  suggests "Dist::Zilla::Plugin::Git::Tag" => "0";
-  suggests "Dist::Zilla::Plugin::NextRelease" => "5.033";
-  suggests "Dist::Zilla::Plugin::RewriteVersion::Transitional" => "0.004";
+  recommends "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007";
 };

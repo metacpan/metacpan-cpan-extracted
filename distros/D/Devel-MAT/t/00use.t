@@ -15,7 +15,7 @@ use_ok( 'Devel::MAT' );
 
 use_ok( 'Devel::MAT::InternalTools' );
 
-use_ok( 'Devel::MAT::Tool::Callstack' );
+use_ok( 'Devel::MAT::Tool::Callers' );
 use_ok( 'Devel::MAT::Tool::Count' );
 use_ok( 'Devel::MAT::Tool::Find' );
 use_ok( 'Devel::MAT::Tool::Identify' );

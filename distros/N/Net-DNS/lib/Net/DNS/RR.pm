@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1718 2018-10-22 14:39:29Z willem $
+# $Id: RR.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1718 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 
 =head1 NAME
@@ -14,12 +14,12 @@ Net::DNS::RR - DNS resource record base class
 
     use Net::DNS;
 
-    $rr = new Net::DNS::RR('example.com IN A 192.0.2.99');
+    $rr = new Net::DNS::RR('example.com IN AAAA 2001:DB8::1');
 
     $rr = new Net::DNS::RR(
 	    owner   => 'example.com',
-	    type    => 'A',
-	    address => '192.0.2.99'
+	    type    => 'AAAA',
+	    address => '2001:DB8::1'
 	    );
 
 
@@ -39,7 +39,6 @@ use Carp;
 use constant LIB => grep $_ ne '.', grep !ref($_), @INC;
 
 use Net::DNS::Parameters;
-use Net::DNS::Domain;
 use Net::DNS::DomainName;
 
 
@@ -67,7 +66,7 @@ sub new {
 
 =head2 new (from string)
 
-    $a	   = new Net::DNS::RR('host.example.com. 86400 A 192.0.2.1');
+    $aaaa  = new Net::DNS::RR('host.example.com. 86400 AAAA 2001:DB8::1');
     $mx	   = new Net::DNS::RR('example.com. 7200 MX 10 mailhost.example.com.');
     $cname = new Net::DNS::RR('www.example.com 300 IN CNAME host.example.com');
     $txt   = new Net::DNS::RR('txt.example.com 3600 HS TXT "text data"');
@@ -107,17 +106,17 @@ sub _new_string {
 
 	croak 'unable to parse RR string' unless scalar @token;
 	my $t1 = uc $token[0];
-	my $t2 = uc $token[1] if $#token;
+	my $t2 = $token[1];
 
 	my ( $ttl, $class );
 	if ( not defined $t2 ) {				# <owner> <type>
 		@token = ('ANY') if $classbyname{$t1};		# <owner> <class>
+	} elsif ( $t1 =~ /^\d/ ) {
+		$ttl = shift @token;				# <owner> <ttl> [<class>] <type>
+		$class = shift @token if $classbyname{uc $t2} || $t2 =~ /^CLASS\d/i;
 	} elsif ( $classbyname{$t1} || $t1 =~ /^CLASS\d/ ) {
 		$class = shift @token;				# <owner> <class> [<ttl>] <type>
 		$ttl = shift @token if $t2 =~ /^\d/;
-	} elsif ( $t1 =~ /^\d/ ) {
-		$ttl = shift @token;				# <owner> <ttl> [<class>] <type>
-		$class = shift @token if $classbyname{$t2} || $t2 =~ /^CLASS\d/;
 	}
 
 	my $type      = shift(@token);
@@ -152,8 +151,8 @@ sub _new_string {
 	    owner   => 'host.example.com',
 	    ttl	    => 86400,
 	    class   => 'IN',
-	    type    => 'A',
-	    address => '192.0.2.1'
+	    type    => 'AAAA',
+	    address => '2001:DB8::1'
 	    );
  
     $rr = new Net::DNS::RR(

@@ -1,9 +1,9 @@
 package Net::DNS::RR::DNSKEY;
 
 #
-# $Id: DNSKEY.pm 1597 2017-09-22 08:04:02Z willem $
+# $Id: DNSKEY.pm 1729 2019-01-28 09:45:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
 
 
 use strict;
@@ -63,7 +63,7 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $algbyname{$key};
 		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak "unknown algorithm $arg";
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
 	}
 
 	sub _algbyval {

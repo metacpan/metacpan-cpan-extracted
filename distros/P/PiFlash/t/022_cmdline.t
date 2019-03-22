@@ -41,7 +41,7 @@ sub state_expr
 	}
 	my $path = $expr_desc->{path};
 	my $op = $expr_desc->{op};
-	my $expect = $expr_desc->{expect};
+	my $expect = $expr_desc->{expect} // "";
 
 	# find the state data by path
 	my $description = join("/", @$path)." $op $expect";
@@ -80,6 +80,8 @@ sub state_expr
 		$result = $pos <= $expect;
 	} elsif ($op eq ">=") {
 		$result = $pos >= $expect;
+	} elsif ($op eq "empty") {
+		$result = (ref $pos eq "HASH" and scalar (keys %$pos) == 0);
 	} else {
 		BAIL_OUT("invalid test: unrecognized expression operation $op");
 	}
@@ -106,7 +108,7 @@ sub cmdline_tests
 		if (not $values{result}) {
 			print STDERR "debug cmdline_tests $test_set_str values ".Dumper(\%values);
 		}
-		print STDERR "debug cmdline_tests: cmdline = ".join(" ", @$cmdline)."\n";
+		print STDERR "debug cmdline_tests $test_set_str: cmdline = ".join(" ", @$cmdline)."\n";
 		print STDERR "debug cmdline_tests $test_set_str: ".Dumper($PiFlash::State::state);
 	}
 
@@ -142,7 +144,15 @@ my @test_cases = (
 		[ ],
 		{
 			result => 0,
-			exception => 'missing argument'
+			exception => 'missing argument',
+			data00 => { path => [qw(cli_opt)], op => "empty" },
+			data01 => { path => [qw(config)], op => "empty" },
+			data02 => { path => [qw(hook)], op => "empty" },
+			data03 => { path => [qw(input)], op => "empty" },
+			data04 => { path => [qw(log)], op => "empty" },
+			data05 => { path => [qw(output)], op => "empty" },
+			data06 => { path => [qw(plugin)], op => "empty" },
+			data07 => { path => [qw(system)], op => "empty" },
 		}
 	],
 	[
@@ -159,6 +169,14 @@ my @test_cases = (
 			result => 1,
 			data00 => { path => [qw(cli_opt)], op => "has", expect => "sdsearch" },
 			data01 => { path => [qw(cli_opt sdsearch)], op => "==", expect => 1 },
+		}
+	],
+	[
+		[ "--help" ],
+		{
+			result => 1,
+			data00 => { path => [qw(cli_opt)], op => "has", expect => "help" },
+			data01 => { path => [qw(cli_opt help)], op => "==", expect => 1 },
 		}
 	],
 	[
@@ -202,6 +220,7 @@ my @test_cases = (
 		{
 			result => 0,
 			exception => 'destination device.*does not exist',
+			data00 => { path => [qw(cli_opt)], op => "empty" },
 		}
 	],
 	[

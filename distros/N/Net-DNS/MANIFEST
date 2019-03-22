@@ -103,6 +103,7 @@ README
 t/00-install.t
 t/00-load.t
 t/00-pod.t
+t/01-resolver-config.t
 t/01-resolver-env.t
 t/01-resolver-file.t
 t/01-resolver-flags.t
@@ -114,6 +115,7 @@ t/02-IDN.t
 t/02-mailbox.t
 t/02-text.t
 t/03-header.t
+t/03-parameters.t
 t/03-question.t
 t/03-rr.t
 t/04-packet.t

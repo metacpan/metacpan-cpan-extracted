@@ -1,3 +1,6 @@
+0.04	2019-03-22T23:58:44+0900
+        - Add a new subroutine: phrase_iterator
+
 0.03	2019-03-16T20:40:36+0900
 	- Properly declare 'Test2::V0' as a dependency.
         - Documentation

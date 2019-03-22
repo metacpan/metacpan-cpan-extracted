@@ -1,4 +1,25 @@
-$Id: Changes 1722 2018-11-14 15:45:37Z willem $                       -*-text-*-
+$Id: Changes 1738 2019-03-22 09:17:51Z willem $                       -*-text-*-
+
+
+**** 1.20 Mar 22, 2019
+
+	Revise documentation examples to use AAAA instead of A records.
+
+	TSIG MAC representation changed to Base64 (align with BIND).
+
+	Update Parameters.pm to resync with IANA registry.
+
+	Refactor resolver test scripts.
+
+Fix rt.cpan.org #128081
+
+	Recurse.pm fails to resolve domain “kickboxingireland.ie”
+
+Fix rt.cpan.org #127307
+
+	Provide a more informative exception report if application code
+	has no "use Net::DNS::SEC" declaration but nevertheless attempts
+	to invoke the DNSSEC sign or verify features.
 
 
 **** 1.19 Nov 14, 2018

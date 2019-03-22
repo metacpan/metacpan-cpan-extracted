@@ -1,5 +1,8 @@
 Revision history for WebService-HIBP
 
+0.11   Fri Mar 22 18:50:00 2019
+        Added Digest::SHA as an explicit dependency. Added module version to user-agent
+
 0.10   Thu Mar 21 05:55:00 2019
         Fixed test suite bug.
 

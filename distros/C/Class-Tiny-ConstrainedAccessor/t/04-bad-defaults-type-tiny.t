@@ -20,8 +20,8 @@ foreach my $test (keys %tests) {
     shift @{$tests{$test}};
     my $action = sub {
         my $x = MY::Class::TypeTinyBadDefaults->new(@{$tests{$test}});
-        diag $x->med_with_default;  # Make sure the accessors run
-        diag $x->lazy_default;
+        $x->med_with_default;  # Run the accessors.
+        $x->lazy_default;
     };
 
     if($should_die) {

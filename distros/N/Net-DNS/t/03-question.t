@@ -1,4 +1,4 @@
-# $Id: 03-question.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
+# $Id: 03-question.t 1727 2018-12-31 12:04:48Z willem $	-*-perl-*-
 
 use strict;
 
@@ -6,61 +6,7 @@ use Net::DNS::Question;
 use Net::DNS::Parameters;
 local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
-use Test::More tests => 121 + keys(%classbyname) + keys(%typebyname);
-
-
-{					## check type conversion functions
-	my ($anon) = 65500;
-	is( typebyval(1),	      'A',	   "typebyval(1)" );
-	is( typebyval($anon),	      "TYPE$anon", "typebyval($anon)" );
-	is( typebyname("TYPE$anon"),  $anon,	   "typebyname('TYPE$anon')" );
-	is( typebyname("TYPE0$anon"), $anon,	   "typebyname('TYPE0$anon')" );
-
-	my $large = 1 << 16;
-	foreach my $testcase ( "BOGUS", "Bogus", "TYPE$large" ) {
-		eval { typebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "typebyname($testcase)\t[$exception]" );
-	}
-
-	eval { typebyval($large); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "typebyval($large)\t[$exception]" );
-
-	foreach ( sort keys %Net::DNS::Parameters::typebyname ) {
-		my $expect = /[*]/ ? 'ANY' : uc($_);
-		my $name = eval { typebyval( typebyname($_) ) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
-		is( $name, $expect, "typebyname('$_')\t$exception" );
-	}
-}
-
-
-{					## check class conversion functions
-	my ($anon) = 65500;
-	is( classbyval(1),		'IN',	      "classbyval(1)" );
-	is( classbyval($anon),		"CLASS$anon", "classbyval($anon)" );
-	is( classbyname("CLASS$anon"),	$anon,	      "classbyname('CLASS$anon')" );
-	is( classbyname("CLASS0$anon"), $anon,	      "classbyname('CLASS0$anon')" );
-
-	my $large = 1 << 16;
-	foreach my $testcase ( "BOGUS", "Bogus", "CLASS$large" ) {
-		eval { classbyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "classbyname($testcase)\t[$exception]" );
-	}
-
-	eval { classbyval($large); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "classbyval($large)\t[$exception]" );
-
-	foreach ( sort keys %Net::DNS::Parameters::classbyname ) {
-		my $expect = /[*]/ ? 'ANY' : uc($_);
-		my $name = eval { classbyval( classbyname($_) ) };
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
-		is( $name, $expect, "classbyname('$_')\t$exception" );
-	}
-}
+use Test::More tests => 105;
 
 
 {
@@ -261,14 +207,6 @@ eval {					## exercise but do not test print
 	close(TEMP);
 	unlink($filename);
 };
-
-
-					## exercise but do not test ad hoc RRtype registration
-Net::DNS::Parameters::register( 'TOY', 65280 );			# RR type name and number
-Net::DNS::Parameters::register( 'TOY', 65280 );			# ignore duplicate entry
-eval { Net::DNS::Parameters::register('ANY') };			# reject CLASS identifier
-eval { Net::DNS::Parameters::register('A') };			# reject conflicting type name
-eval { Net::DNS::Parameters::register( 'Z', 1 ) };		# reject conflicting type number
 
 
 exit;

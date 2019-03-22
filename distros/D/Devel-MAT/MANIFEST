@@ -19,7 +19,7 @@ lib/Devel/MAT/InternalTools.pm
 lib/Devel/MAT/SV.pm
 lib/Devel/MAT/Tool.pm
 lib/Devel/MAT/Tool.pod
-lib/Devel/MAT/Tool/Callstack.pm
+lib/Devel/MAT/Tool/Callers.pm
 lib/Devel/MAT/Tool/Count.pm
 lib/Devel/MAT/Tool/Find.pm
 lib/Devel/MAT/Tool/Identify.pm

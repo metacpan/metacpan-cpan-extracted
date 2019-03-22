@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use constant CMD => "find";
 use constant CMD_DESC => "List SVs matching given criteria";
@@ -96,13 +96,9 @@ sub run_cmd
       SV: while( $sv = shift @svs ) {
          @output = ();
 
-         # false => omit
-         # 1     => include
-         # else  => include with output value
-
          foreach my $filter ( @filters ) {
             my $o = $filter->( $sv ) or next SV;
-            push @output, $o unless $o eq "1";
+            push @output, $o;
          }
 
          my $fmt = "%s";
@@ -180,6 +176,76 @@ use constant CMD_ARGS_SV => 0;
 
 use constant FILTER_ARGS => ();
 sub CMD_ARGS { shift->FILTER_ARGS }
+
+package # hide
+   Devel::MAT::Tool::Find::filter::num;
+use base qw( Devel::MAT::Tool::Find::filter );
+
+use constant FILTER_DESC => "Numerical (IV, UV or NV) SVs";
+
+use constant FILTER_OPTS => (
+   iv => { help => "Include IVs" },
+   uv => { help => "Include UVs" },
+   nv => { help => "Include NVs" },
+);
+
+use constant FILTER_ARGS => (
+   { name => "value", help => "match value" },
+);
+
+=head2 num
+
+   pmat> find num
+   SCALAR(UV) at 0x555555a1e9c0: 5
+   SCALAR(UV) at 0x555555c4f1b0: 2
+   SCALAR(UV) at 0x555555aa0dc0: 18446744073709551615
+
+Prints a list of all the scalar SVs that have a numerical value, optionally
+filtering for only an exact value.
+
+Takes the following named options:
+
+=over 4
+
+=item --nv, --iv, --uv
+
+Find only numerical SVs of the given types. If no options present, any
+numerical SV will be found.
+
+=back
+
+=cut
+
+sub build
+{
+   my $self = shift;
+   shift; # inv
+   my %opts = %{ +shift };
+   my ( $value ) = @_;
+
+   $opts{iv} or $opts{uv} or $opts{nv} or
+      $opts{iv} = $opts{uv} = $opts{nv} = 1;
+
+   return sub {
+      my ( $sv ) = @_;
+      return unless $sv->type eq "SCALAR";
+
+      if( $opts{nv} and defined( my $nv = $sv->nv ) ) {
+         defined $value and $nv != $value and return;
+         return Devel::MAT::Cmd->format_value( $nv, nv => 1 );
+      }
+
+      if( $opts{iv} and defined( my $iv = $sv->iv ) ) {
+         defined $value and $iv != $value and return;
+         return Devel::MAT::Cmd->format_value( $iv, iv => 1 );
+      }
+
+      if( $opts{uv} and defined( my $uv = $sv->uv ) ) {
+         defined $value and $uv != $value and return;
+         return Devel::MAT::Cmd->format_value( $uv, uv => 1 );
+      }
+   };
+}
 
 package # hide
    Devel::MAT::Tool::Find::filter::pv;
@@ -363,7 +429,8 @@ sub build
    return sub {
       my ( $sv ) = @_;
       return unless my $stash = $sv->blessed;
-      return $stash->stashname eq $package;
+      return unless $stash->stashname eq $package;
+      return Devel::MAT::Cmd->format_value( $stash->stashame );
    };
 }
 

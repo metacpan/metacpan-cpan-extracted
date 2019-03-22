@@ -16,8 +16,9 @@ require_ok $pkg;
 
 my $app = builder {
     enable "Plack::Middleware::Matomo",
-        id_site => "my-repo",
-        base_url => "http://localhost/matomo",
+        idsite                => "1",
+        base_url              => "https://analytics.openaire.eu/piwik.php",
+        token_auth            => "32846584f571be9b57488bf4088f30ea",
         view_paths            => ['record/(\w+)/*'],
         download_paths        => ['download/(\w+)/*'],
         oai_identifier_format => 'oai:test.server.org:%s',
@@ -29,7 +30,9 @@ my $app = builder {
         sub {[200, ['Content-Type' => 'text/plain'], ["Hello World"]]};
     mount '/somethingelse' =>
         sub {[200, ['Content-Type' => 'text/plain'], ["Hello World"]]};
-    mount '/matomo' => sub {[200, ['Content-Type' => 'text/plain'], ["Successfully tracked."]]};
+    mount '/matomo' => sub {
+        [200, ['Content-Type' => 'text/plain'], ["Successfully tracked."]]
+    };
 };
 
 test_psgi

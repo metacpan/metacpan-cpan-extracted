@@ -7,89 +7,96 @@
 #
 #   The GNU General Public License, Version 3, June 2007
 #
-use strict;
-use warnings;
+use 5.014;
 use utf8;
-use open qw(:std :utf8);
 package App::SpreadRevolutionaryDate;
-$App::SpreadRevolutionaryDate::VERSION = '0.06';
+$App::SpreadRevolutionaryDate::VERSION = '0.07';
 # ABSTRACT: Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.
 
+use Moose;
+use namespace::autoclean;
 use App::SpreadRevolutionaryDate::Config;
-use App::SpreadRevolutionaryDate::Twitter;
-use App::SpreadRevolutionaryDate::Mastodon;
-use App::SpreadRevolutionaryDate::Freenode;
 use DateTime::Calendar::FrenchRevolutionary;
+use URI::Escape;
+use Class::Load ':all';
+
+has 'config' => (
+    is  => 'ro',
+    isa => 'App::SpreadRevolutionaryDate::Config',
+    required => 1,
+);
+
+has 'targets' => (
+    is  => 'rw',
+    isa => 'HashRef[Object]',
+);
 
 
-sub new {
+around BUILDARGS => sub {
+  my $orig = shift;
   my $class = shift;
   my $filename = shift;
-  my $config = App::SpreadRevolutionaryDate::Config->new;
+  my $config = App::SpreadRevolutionaryDate::Config->new($filename);
 
-  $config->parse_file($filename);
-  $config->parse_command_line;
+  return $class->$orig(config => $config, targets => {});
+};
 
-  my $self = {config => $config};
 
-  if (!$self->{config}->twitter && !$self->{config}->mastodon && !$self->{config}->freenode) {
-    $self->{config}->twitter(1);
-    $self->{config}->mastodon(1);
-    $self->{config}->freenode(1);
+sub BUILD {
+  my $self = shift;
+
+  foreach my $target (@{$self->config->targets}) {
+    my $target_class = 'App::SpreadRevolutionaryDate::Target::' . ucfirst(lc($target));
+    try_load_class($target_class)
+      or die "Cannot import target class $target_class for target $target\n";
+    load_class($target_class);
+    my %target_args = $self->config->get_target_arguments($target);
+    $self->targets->{$target} = $target_class->new(%target_args);
   }
-
-  if ($self->{config}->twitter) {
-    if ($self->{config}->check_twitter) {
-      $self->{twitter} = App::SpreadRevolutionaryDate::Twitter->new($self->{config});
-    } else {
-      die "Cannot spread on Twitter, configuraton parameters missing\n";
-    }
-  }
-
-  if ($self->{config}->mastodon) {
-    if ($self->{config}->check_mastodon) {
-      $self->{mastodon} = App::SpreadRevolutionaryDate::Mastodon->new($self->{config});
-    } else {
-      die "Cannot spread on Mastodon, configuraton parameters missing\n";
-    }
-  }
-
-  if ($self->{config}->freenode) {
-    if ($self->{config}->check_freenode) {
-      $self->{freenode} = App::SpreadRevolutionaryDate::Freenode->new($self->{config});
-    } else {
-      die "Cannot spread on Freenode, configuraton parameters missing\n";
-    }
-  }
-
-  bless $self, $class;
-  return $self;
 }
 
 
 sub spread {
   my $self = shift;
-  my $no_run = shift || 1;
-  $no_run = !$no_run;
 
-  # As of DateTime::Calendar::FrenchRevolutionary 0.14
-  # locale is limited to 'en' or 'fr', defaults to 'fr'
-  my $locale = $self->{config}->locale || 'fr';
-  $locale = 'fr' unless $locale eq 'en';
-
-  my $now = $self->{config}->acab ?
-      DateTime->today->set(hour => 3, minute => 8, second => 56)
-    : DateTime->now;
-  my $revolutionary = DateTime::Calendar::FrenchRevolutionary->from_object(object => $now, locale => $locale);
-  my $msg = $locale eq 'fr' ? $revolutionary->strftime("Nous sommes le %A, %d %B de l'An %EY (%Y) de la Révolution, %Ej, il est %T!") : $revolutionary->strftime("We are %A, %d %B of Revolution Year %EY (%Y), %Ej, it is %T!");
-
-  $self->{twitter}->spread($msg) if $self->{config}->twitter;
-  $self->{mastodon}->spread($msg) if $self->{config}->mastodon;
-  $self->{freenode}->spread($msg, $no_run) if $self->{config}->freenode;
+  my $msg = $self->compute();
+  foreach my $target (@{$self->config->targets}) {
+    $self->targets->{$target}->spread($msg, $self->config->test);
+  }
 }
 
 
-1;
+sub compute {
+  my $self = shift;
+
+  # As of DateTime::Calendar::FrenchRevolutionary 0.14
+  # locale is limited to 'en' or 'fr', defaults to 'fr'
+  my $locale = $self->config->locale || 'fr';
+  $locale = 'fr' unless $locale eq 'en';
+
+  my $revolutionary = $self->config->acab ?
+      DateTime::Calendar::FrenchRevolutionary->now->set(hour => 1, minute => 31, second => 20, locale => $locale)
+    : DateTime::Calendar::FrenchRevolutionary->now->set(locale => $locale);
+
+  my $msg = $locale eq 'fr' ?
+      $revolutionary->strftime("Nous sommes le %A, %d %B de l'An %EY (%Y) de la Révolution, %Ej, il est %T! https://$locale.wikipedia.org/wiki/!!%Oj!!")
+    : $revolutionary->strftime("We are %A, %d %B of Revolution Year %EY (%Y), %Ej, it is %T! https://$locale.wikipedia.org/wiki/!!%Oj!!");
+
+  $msg =~ s/!!([^!]+)!!/uri_escape($1)/e;
+
+  return $msg
+}
+
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
+# A module must return a true value. Traditionally, a module returns 1.
+# But this module is a revolutionary one, so it discards all old traditions.
+# Idea borrowed from Jean Forget's DateTime::Calendar::FrenchRevolutionary.
+"Quand le gouvernement viole les droits du peuple,
+l'insurrection est pour le peuple le plus sacré
+et le plus indispensable des devoirs";
 
 __END__
 
@@ -103,7 +110,7 @@ App::SpreadRevolutionaryDate - Spread date and time from Revolutionary (Republic
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 METHODS
 
@@ -111,9 +118,17 @@ version 0.06
 
 Constructor class method. Takes one optional argument: C<$filename> which should be the file path of, or an opened file handle on your configuration file, defaults to C<~/.config/spread-revolutionary-date/spread-revolutionary-date.conf> or C<~/.spread-revolutionary-date.conf>. This is only used for testing, when custom configuration file is needed. You can safely leave this optional argument unset. Returns an C<App::SpreadRevolutionaryDate> object.
 
+=head2 BUILD
+
+Initialises the internal C<App::SpreadRevolutionaryDate> object. This is where all targets objets are built, and authentication is attempted on each of them.
+
 =head2 spread
 
-Spreads calendar date to configured targets. Takes one optional boolean argument, if true (default) authentication and spreading to Freenode is performed, otherwise, you've got to run C<use POE; POE::Kernel-E<gt>run();> to do so. This is only used for testing, when multiple bots are needed. You can safely leave this optional argument unset.
+Spreads calendar date to configured targets. Takes no argument.
+
+=head2 compute
+
+Computes revolutionary date. Takes no argument. Returns message as string, ready to be spread.
 
 =head1 SEE ALSO
 
@@ -123,13 +138,15 @@ Spreads calendar date to configured targets. Takes one optional boolean argument
 
 =item L<App::SpreadRevolutionaryDate::Config>
 
-=item L<App::SpreadRevolutionaryDate::Twitter>
+=item L<App::SpreadRevolutionaryDate::Target>
 
-=item L<App::SpreadRevolutionaryDate::Mastodon>
+=item L<App::SpreadRevolutionaryDate::Target::Twitter>
 
-=item L<App::SpreadRevolutionaryDate::Freenode>
+=item L<App::SpreadRevolutionaryDate::Target::Mastodon>
 
-=item L<App::SpreadRevolutionaryDate::Freenode::Bot>
+=item L<App::SpreadRevolutionaryDate::Target::Freenode>
+
+=item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
 
 =back
 

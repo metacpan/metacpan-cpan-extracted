@@ -1,5 +1,13 @@
 Revision history for Devel-MAT
 
+0.42    2019-03-21 22:36:09
+        [CHANGES]
+         * Rename `callstack` to `callers`
+         * Optionally show pad in `callers` output
+         * Check symbol table before using ->symname in `identify`
+         * Added `find num` filter
+         * Load the -DDEBUG_LEAKING_SCALARS dumper extension
+
 0.41    2019-01-14 18:19:44
         [CHANGES]
          * Nicer table output in command tools

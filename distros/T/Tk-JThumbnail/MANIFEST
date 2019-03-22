@@ -1,0 +1,12 @@
+Changes
+JThumbnail.htm
+Makefile.PL
+MANIFEST
+README
+t/90_Tk-JThumbnail.t
+t/99_Tk-JThumbnail_demo.t
+lib/Tk/JThumbnail.pm
+lib/Tk/JThumbnail/images/failimg.png
+lib/Tk/JThumbnail/images/info3.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

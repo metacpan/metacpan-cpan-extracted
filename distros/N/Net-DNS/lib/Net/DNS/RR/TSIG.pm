@@ -1,9 +1,9 @@
 package Net::DNS::RR::TSIG;
 
 #
-# $Id: TSIG.pm 1718 2018-10-22 14:39:29Z willem $
+# $Id: TSIG.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1718 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 
 use strict;
@@ -178,9 +178,8 @@ sub algorithm { &_algorithm; }
 
 sub key {
 	my $self = shift;
-
-	$self->keybin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->keybin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
+	$self->keybin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -205,9 +204,8 @@ sub fudge {
 
 sub mac {
 	my $self = shift;
-
-	$self->macbin( pack "H*", map { die "!hex!" if m/[^0-9A-Fa-f]/; $_ } join "", @_ ) if scalar @_;
-	unpack "H*", $self->macbin() if defined wantarray;
+	return MIME::Base64::encode( $self->macbin(), "" ) unless scalar @_;
+	$self->macbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -221,8 +219,8 @@ sub macbin {
 
 sub prior_mac {
 	my $self = shift;
-	return unpack "H*", $self->prior_macbin() unless scalar @_;
-	$self->prior_macbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	return MIME::Base64::encode( $self->prior_macbin(), "" ) unless scalar @_;
+	$self->prior_macbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -236,8 +234,8 @@ sub prior_macbin {
 
 sub request_mac {
 	my $self = shift;
-	return unpack "H*", $self->request_macbin() unless scalar @_;
-	$self->request_macbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
+	return MIME::Base64::encode( $self->request_macbin(), "" ) unless scalar @_;
+	$self->request_macbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -417,16 +415,11 @@ sub verify {
 	my $self = shift;
 	my $data = shift;
 
-	unless ( abs( time() - $self->time_signed ) < $self->fudge ) {
-		$self->error(18);				# bad time
-		return;
-	}
-
 	if ( scalar @_ ) {
 		my $arg = shift;
 
 		unless ( ref($arg) ) {
-			$self->error(16);			# bad sig (multi-packet)
+			$self->error(16);			# BADSIG (multi-packet)
 			return;
 		}
 
@@ -434,12 +427,12 @@ sub verify {
 		if ( $arg->isa('Net::DNS::Packet') ) {
 			my $request = $arg->sigrr;		# request TSIG
 			my $rqstkey = lc( join '+', $request->name, $request->algorithm );
-			$self->error(17) unless $signerkey eq $rqstkey;
+			$self->error(17) unless $signerkey eq $rqstkey;			     # BADKEY
 			$self->request_macbin( $request->macbin );
 
 		} elsif ( $arg->isa(__PACKAGE__) ) {
 			my $priorkey = lc( join '+', $arg->name, $arg->algorithm );
-			$self->error(17) unless $signerkey eq $priorkey;
+			$self->error(17) unless $signerkey eq $priorkey;		     # BADKEY
 			$self->prior_macbin( $arg->macbin );
 
 		} else {
@@ -455,8 +448,9 @@ sub verify {
 	my $macbin = $self->macbin;
 	my $maclen = length $macbin;
 	my $minlen = length($tsigmac) >> 1;			# per RFC4635, 3.1
-	$self->error(16) unless $macbin eq substr $tsigmac, 0, $maclen;
-	$self->error(1) if $maclen < $minlen or $maclen < 10 or $maclen > length $tsigmac;
+	$self->error(16) if $macbin ne substr $tsigmac, 0, $maclen;			     # BADSIG
+	$self->error(18) if abs( time() - $self->time_signed ) > $self->fudge;		     # BADTIME
+	$self->error(22) if $maclen < $minlen or $maclen < 10 or $maclen > length $tsigmac;  # BADTRUNC
 
 	return $self->{error} ? undef : $tsig;
 }
@@ -614,14 +608,11 @@ The default fudge is 300 seconds.
 
 =head2 mac
 
-    $mac = $rr->mac;
+    $rr->mac( $mac );
 
-Returns the message authentication code (MAC) as a string of hex
-characters.  The programmer must call the Net::DNS::Packet data()
+Message authentication code (MAC).
+The programmer must call the Net::DNS::Packet data()
 object method before this will return anything meaningful.
-
-=cut
-
 
 =head2 macbin
 

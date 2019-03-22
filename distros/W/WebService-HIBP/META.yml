@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  Digest::SHA: '0'
   JSON: '0'
   LWP::Protocol::https: '6.06'
   LWP::UserAgent: '0'
@@ -26,5 +27,5 @@ requires:
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

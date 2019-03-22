@@ -1,9 +1,9 @@
 package Net::DNS::RR::RRSIG;
 
 #
-# $Id: RRSIG.pm 1709 2018-09-07 08:03:09Z willem $
+# $Id: RRSIG.pm 1729 2019-01-28 09:45:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
 
 
 use strict;
@@ -29,24 +29,17 @@ use constant DEBUG => 0;
 
 use constant UTIL => defined eval 'use Scalar::Util 1.25; 1;';
 
-# IMPORTANT: Distros MUST NOT create dependencies on Net::DNS::SEC	(Prohibited in many territories)
-use constant PRIVATE => 'Net::DNS::SEC::Private';
-use constant DSA     => 'Net::DNS::SEC::DSA';
-use constant RSA     => 'Net::DNS::SEC::RSA';
-use constant ECDSA   => 'Net::DNS::SEC::ECDSA';
-use constant EdDSA   => 'Net::DNS::SEC::EdDSA';
-use constant ECCGOST => 'Net::DNS::SEC::ECCGOST';
-
+# IMPORTANT: Distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
 use constant EXISTS => join '', qw(r e q u i r e);		# Defeat static analysers and grep
-use constant DNSSEC => defined( eval join ' ', EXISTS, PRIVATE );
+use constant DNSSEC => defined( eval join ' ', EXISTS, 'Net::DNS::SEC::Private' );
+use constant ACTIVE => DNSSEC && $INC{'Net/DNS/SEC.pm'};	# Discover how we got here, without loading libcrypto
 
-my ($DSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } DSA;
-my ($RSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } RSA;
+my ($RSA) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::RSA';
+my ($DSA) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::DSA';
 
-my ($ECDSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } ECDSA;
-my ($EdDSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } EdDSA;
-use constant GOST => defined( eval join ' ', EXISTS, 'Digest::GOST' );
-my ($ECCGOST) = grep { DNSSEC && GOST && defined( eval join ' ', EXISTS, $_ ) } ECCGOST;
+my ($ECDSA)   = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::ECDSA';
+my ($EdDSA)   = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::EdDSA';
+my ($ECCGOST) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::ECCGOST';
 
 my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 
@@ -134,7 +127,7 @@ sub _defaults {				## specify RR attribute default values
 		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $algbyname{$key};
 		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak "unknown algorithm $arg";
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
 	}
 
 	sub _algbyval {
@@ -323,7 +316,9 @@ sub verify {
 	# $keyref is either a key object or a reference to an array
 	# of key objects.
 
-	if (DNSSEC) {
+	unless (DNSSEC) {
+		croak 'Net::DNS::SEC support not available';
+	} else {
 		my ( $self, $rrsetref, $keyref ) = @_;
 
 		croak '$keyref argument is scalar or undefined' unless ref($keyref);
@@ -331,22 +326,19 @@ sub verify {
 		print '$keyref argument is ', ref($keyref), "\n" if DEBUG;
 		if ( ref($keyref) eq "ARRAY" ) {
 
-			#  We will recurse for each key that matches algorithm and key-id
-			#  and return when there is a successful verification.
-			#  If not, we will continue so that we can survive key-id collision.
-			#  The downside of this is that the error string only matches the
-			#  last error.
+			#  We will iterate over the supplied key list and
+			#  return when there is a successful verification.
+			#  If not, continue so that we survive key-id collision.
 
 			print "Iterating over ", scalar(@$keyref), " keys\n" if DEBUG;
 			my @error;
-			my $i;
 			foreach my $keyrr (@$keyref) {
 				my $result = $self->verify( $rrsetref, $keyrr );
 				return $result if $result;
 				my $error = $self->{vrfyerrstr};
-				$i++;
-				push @error, "key $i: $error";
-				print "key $i: $error\n" if DEBUG;
+				my $keyid = $keyrr->keytag;
+				push @error, "key $keyid: $error";
+				print "key $keyid: $error\n" if DEBUG;
 				next;
 			}
 
@@ -562,8 +554,9 @@ sub _CreateSig {
 		my $class     = $DNSSEC_sign{$algorithm};
 
 		eval {
-			die "algorithm $algorithm not supported" unless $class;
-			$self->sigbin( $class->sign(@_) );
+			return $self->sigbin( $class->sign(@_) ) if $class;
+			die qq[algorithm $algorithm not supported\n] if ACTIVE;
+			die qq[No "use Net::DNS::SEC" declaration in application code\n];
 		} || croak "${@}signature generation failed";
 	}
 }
@@ -577,8 +570,9 @@ sub _VerifySig {
 		my $class     = $DNSSEC_verify{$algorithm};
 
 		my $retval = eval {
-			die "algorithm $algorithm not supported" unless $class;
-			$class->verify( @_, $self->sigbin );
+			return $class->verify( @_, $self->sigbin ) if $class;
+			die qq[algorithm $algorithm not supported\n] if ACTIVE;
+			die qq[No "use Net::DNS::SEC" declaration in application code\n];
 		};
 
 		unless ($retval) {
@@ -588,7 +582,7 @@ sub _VerifySig {
 		}
 
 		# uncoverable branch true	# bug in Net::DNS::SEC or dependencies
-		croak "unknown error in $class->verify" unless $retval == 1;
+		croak 'unknown error in $class->verify' unless $retval == 1;
 		print "\nalgorithm $algorithm verification successful\n" if DEBUG;
 		return 1;
 	}
@@ -608,8 +602,8 @@ __END__
 
     use Net::DNS::SEC;
     $sigrr = create Net::DNS::RR::RRSIG( \@rrset, $keypath,
-					sigex => 20181231010101
-					sigin => 20181201010101
+					sigex => 20191231010101
+					sigin => 20191201010101
 					);
 
     $sigrr->verify( \@rrset, $keyrr ) || die $sigrr->vrfyerrstr;
@@ -733,8 +727,8 @@ Create a signature over a RR set.
     $sigrr = create Net::DNS::RR::RRSIG( \@rrsetref, $keypath );
 
     $sigrr = create Net::DNS::RR::RRSIG( \@rrsetref, $keypath,
-					sigex => 20181231010101
-					sigin => 20181201010101
+					sigex => 20191231010101
+					sigin => 20191201010101
 					);
     $sigrr->print;
 
@@ -760,8 +754,8 @@ containing the private key as generated by dnssec-keygen.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigex  => 20181231010101,	# signature expiration
-	sigin  => 20181201010101,	# signature inception
+	sigex  => 20191231010101,	# signature expiration
+	sigin  => 20191201010101,	# signature inception
 	sigval => 30,			# validity window (days)
 	ttl    => 3600			# TTL
 

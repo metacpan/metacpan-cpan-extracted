@@ -1,5 +1,13 @@
 Revision history for Group-Git
 
+0.7.1   2019-03-22
+        Updating for release of version 0.7.1
+        Making it possible to exclude tags (via config) (Ivan Wills)
+        Adding caching to mechanize (Ivan Wills)
+        Fixing up runtime short name to not conflict with remote (Ivan Wills)
+        Moving to next Getopt::Alt version (Ivan Wills)
+        Adding the ability to use different default values form the config file (Ivan Wills)
+
 0.7.0   2019-01-23
         Updating for release of version 0.7.0
         Updated date (Ivan Wills)

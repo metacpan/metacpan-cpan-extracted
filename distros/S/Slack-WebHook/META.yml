@@ -9,7 +9,7 @@ build_requires:
   Test2::Bundle::Extended: '0'
   Test2::Plugin::NoWarnings: '0'
   Test2::Tools::Explain: '0'
-  Test::MockModule: '0'
+  Test::MockModule: '0.13'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -23,7 +23,7 @@ name: Slack-WebHook
 provides:
   Slack::WebHook:
     file: lib/Slack/WebHook.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   HTTP::Tiny: '0.076'
   JSON::MaybeXS: '0'
@@ -32,7 +32,7 @@ requires:
 resources:
   bugtracker: https://github.com/atoomic/Slack-WebHook/issues
   repository: https://github.com/atoomic/Slack-WebHook.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026002'
@@ -287,7 +287,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
+          tag: v0.002
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

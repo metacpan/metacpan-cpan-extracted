@@ -5,6 +5,12 @@ Created:      2014-09-27
 Home page:    <http://search.cpan.org/dist/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 
+0.022  2019-03-21
+
+ - (Addition) Add Attean::API::TermOrVariable->is_bound method (#129 from
+   @kjetilk).
+ - (Addition) Added statement matching functionality for iterators.
+
 0.021  2019-02-12
 
  - (Addition) Added Attean::API::Model->algebra_holds method.

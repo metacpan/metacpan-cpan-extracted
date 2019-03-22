@@ -1,6 +1,63 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.06 2019-03-07T20:10:40
+0.07 2019-03-22T15:03:21
+ - Add documentation for extending pre-defined targets
+ - Rename parameter of App::SpreadRevolutionaryDate::Target parameterized
+   role to 'worker'
+ - Add App::SpreadRevolutionaryDate::Target in SEE ALSO doc section
+ - Fix encodings and use 5.014 instead of use strict; use warnings
+ - Unify test for new target
+ - Add xtest for spreading to a new target
+ - Add a Moose::Role as interface for defining new targets
+ - Use good old shebang
+ - Fix locale set when computing date without acab option
+ - Be modern: replace eval require by Class::Load
+ - Update TODO
+ - Add test for a new target (without spread)
+ - Allow pre-defined targets to be easily extended
+ - Revert "Rename App::SpreadRevolutionaryDate::Config constructor"
+ - Use revolutionary quote for modules' return value
+ - Rename App::SpreadRevolutionaryDate::Config constructor
+ - Require targets classes only when needed
+ - Revert "Build SIGNATURE only on release stage"
+ - Replace targets attributes by an hashref of objects
+ - Move target classes in App::SpreadRevolutionaryDate::Target namespace
+ - Build SIGNATURE only on release stage
+ - Remove Module::Build, one module builder is enough
+ - Make it clear in docs that App:SpreadRevolutionaryDate::* are not
+   subclasses
+ - Revert "Explicit methods calls with parenthesis"
+ - Explicit methods calls with parenthesis
+ - Add method to compute message to spread
+ - Factorize get_target_arguments
+ - Update travis config file to run perl >= 5.14
+ - Update meta files
+ - Simplify Freenode tests by removing no_run argument
+ - Add test for App::SpreadRevolutionaryDate::Freenode->obj (like other
+   targets)
+ - Replace config attribute by explicit attributes in targets subclasses
+ - Add wikipedia link for en locale
+ - Delete linefeed before wikipedia link
+ - Add wikipedia link
+ - Fix computation of acab time independently of winter/summer time
+ - Fix link in doc
+ - Fix typo in doc
+ - Upgrade to Module::Signature 0.83
+ - Add CODE_OF_CONDUCT file
+ - Add CONTRIBUTING file
+ - Update TODO with nothing else than extending to other targets
+ - Use accessors in tests
+ - Moosify classes
+ - Use defined-or operator for $no_run arg to
+   App::SpreadRevolutionaryDate::Freenode->spread
+ - Configure travis on all perl stable releases
+ - Add travis CI
+ - Add SIGNATURE from build dir
+ - Upgrade to Dist::Zilla::Plugin::ModuleBuild v6.012
+ - Upgrade to Dist::Zilla::Plugin::InstallGuide 1.200012
+ - Use defined-or operator instead of or to setting default value
+
+0.06 2019-03-07T20:10:40Z
  - Add Net::Async::HTTP 0.43 requirement since previous versions fail
  - Sync README.md with commit #2568084
  - Tidied up pod.

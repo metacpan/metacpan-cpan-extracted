@@ -2,12 +2,12 @@ package Net::DNS::DynDNS;
 
 use warnings;
 use strict;
-use LWP();
+use LWP::UserAgent();
 use HTTP::Cookies();
 use HTTP::Headers();
 use Carp();
 use English qw(-no_match_vars);
-our $VERSION = '0.9993';
+our $VERSION = '0.9994';
 
 our @CARP_NOT = ('Net::DNS::DynDNS');
 sub DEFAULT_TIMEOUT                      { return 60 }
@@ -43,7 +43,7 @@ sub new {
             Carp::croak(q[The 'timeout' parameter must be a number]);
         }
     }
-    my $name = "Net::DNS::DynDNS $VERSION "
+    my $name = "Net-DNS-DynDNS/$VERSION "
       ;    # a space causes the default LWP User Agent to be appended.
     if ( exists $params->{user_agent} ) {
         if ( ( $params->{user_agent} ) && ( $params->{user_agent} =~ /\S/xsm ) )
@@ -149,11 +149,6 @@ sub _check_ip_address_uri {
                 q[The 'protocol' parameter must be one of 'http' or 'https']);
         }
         $protocol = $params->{protocol};
-    }
-    if ( $protocol eq 'https' ) {
-        eval { require Net::HTTPS; } or do {
-            Carp::croak(q[Cannot load Net::HTTPS]);
-        };
     }
     return $protocol . '://' . $self->{check_ip};
 }
@@ -416,11 +411,6 @@ sub update {
     if ( $params->{protocol} ) {
         $protocol = $params->{protocol};
     }
-    if ( $protocol eq 'https' ) {
-        eval { require Net::HTTPS; } or do {
-            Carp::croak(q[Cannot load Net::HTTPS]);
-        };
-    }
     my $update_uri =
       $protocol . "://$self->{dns_server}/nic/update?hostname=" . $hostnames;
     if ( defined $ip_address ) {
@@ -578,7 +568,7 @@ Net::DNS::DynDNS requires the following non-core Perl modules
 L<LWP|LWP>
  
 =item *
-L<Net::HTTPS|Net::HTTPS>
+L<LWP::Protocol::https|LWP::Protocol::https>
  
 =item *
 L<HTTP::Cookies|HTTP::Cookies>

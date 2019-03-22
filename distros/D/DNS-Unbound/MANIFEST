@@ -1,0 +1,18 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+lib/DNS/Unbound.pm
+lib/DNS/Unbound.xs
+lib/DNS/Unbound/X.pm
+lib/DNS/Unbound/X/Base.pm
+lib/DNS/Unbound/X/ResolveError.pm
+t/convenience.t
+t/load.t
+t/option.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

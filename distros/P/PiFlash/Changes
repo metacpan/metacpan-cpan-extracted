@@ -1,5 +1,21 @@
 Change log for PiFlash
 
+0.4.1 2019-03-21T16:46:28-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - the --help option is the only case of printing usage info which
+   shouldn't have an error message
+
+ [DOCS]
+ - add /doc directory starting with new file of online resource list
+ - add links in POD docs to the online resources on GitHub
+ - change README.md to be a top-level intro instead of a markdown copy of
+   the pod docs in bin/piflash
+
+ [REVISION]
+ - added more command-line tests in t/022_cmdline.t
+ - added more YAML test files for cases of 1 or 2 attachments for the 3
+   test plugins
+
 0.4.0 2019-03-18T20:40:50-07:00 America/Los_Angeles
  [BUG FIXES]
  - when displaying program usage, display the reason the program can't run

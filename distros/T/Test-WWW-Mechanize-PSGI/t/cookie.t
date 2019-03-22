@@ -10,7 +10,7 @@ my $hello = Test::WWW::Mechanize::PSGI->new(
         my $cookie_store = {};
         my $sid          = 123456;
         sub {
-            my $env = shift;
+            my $env     = shift;
             my %cookies = CGI::Cookie->parse( $env->{HTTP_COOKIE} || '' );
             if ( my $cookie = $cookies{sid} ) {
                 my $content = $cookie_store->{ $cookies{sid}->value };
@@ -28,7 +28,7 @@ my $hello = Test::WWW::Mechanize::PSGI->new(
                     ],
                     ;
             }
-            }
+        }
     },
 );
 $hello->get_ok('/');

@@ -1,19 +1,20 @@
-# $Id: 72-TSIG-verify.t 1678 2018-05-22 12:01:30Z willem $	-*-perl-*-
+# $Id: 72-TSIG-verify.t 1726 2018-12-15 12:59:56Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
 use Net::DNS;
 
-my @prerequisite = qw(
-		Digest::HMAC
-		Digest::MD5
-		Digest::SHA
-		MIME::Base64
-		);
+my %prerequisite = (
+	'Digest::HMAC' => 1.03,
+	'Digest::MD5'  => 2.13,
+	'Digest::SHA'  => 5.23,
+	'MIME::Base64' => 2.13,
+	);
 
-foreach my $package (@prerequisite) {
-	next if eval "require $package";
-	plan skip_all => "$package not installed";
+foreach my $package ( sort keys %prerequisite ) {
+	my @revision = grep $_, $prerequisite{$package};
+	next if eval "use $package @revision; 1;";
+	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
 
@@ -120,7 +121,7 @@ close KEY;
 	sleep 1;
 
 	my $query = new Net::DNS::Packet( \$encoded );
-	my $verified = $query->verify();
+	$query->verify();
 	is( $query->verifyerr, 'BADTIME', 'unverifiable query packet: BADTIME' );
 }
 
@@ -173,7 +174,7 @@ close KEY;
 	$packet->sigrr->macbin( substr $packet->sigrr->macbin, 0, 9 );
 
 	$packet->verify();
-	is( $packet->verifyerr, 'FORMERR', 'signature too short: FORMERR' );
+	is( $packet->verifyerr, 'BADTRUNC', 'signature too short: BADTRUNC' );
 }
 
 
@@ -185,7 +186,7 @@ close KEY;
 	$packet->sigrr->macbin( join '', $packet->sigrr->macbin, 'x' );
 
 	$packet->verify();
-	is( $packet->verifyerr, 'FORMERR', 'signature too long: FORMERR' );
+	is( $packet->verifyerr, 'BADTRUNC', 'signature too long: BADTRUNC' );
 }
 
 

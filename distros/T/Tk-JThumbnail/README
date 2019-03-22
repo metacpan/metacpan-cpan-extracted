@@ -1,0 +1,472 @@
+Tk-JThumbnail version 0.01
+==========================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk, Tk::LabEntry, Tk::JPEG, Tk::PNG, File::Basename
+  Optional:  Tk::Animation
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2019 by Jim Turner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+NAME
+    Tk::JThumbnail - Present a list of files in a directory as a grid of
+    icons with or without text.
+
+AUTHOR
+    Jim Turner
+
+    (c) 2019, Jim Turner under the same license that Perl 5 itself is. All
+    rights reserved.
+
+    Derived from Tk::Thumbnail, AUTHOR: Stephen O. Lidie (Copyright (C) 2001
+    - 2005, Steve Lidie. All rights reserved.)
+
+SYNOPSIS
+            my $thumb = $parent->JThumbnail(-option => value, ... );
+
+EXAMPLE
+            #!/usr/bin/perl -w
+
+            use strict;
+            use Tk;
+            use Tk::JThumbnail;
+
+            my $mw = MainWindow->new;
+            my @list = directory($ARGV[0] || '.');  #Fetch files from the current directory.
+
+            my $thumb = $mw->Scrolled('JThumbnail',
+                            -images => \@list,
+                            -width => 500,
+                            -scrollbars => 'osoe',
+                            -highlightthickness => 1,
+                            -focus => 2,
+                            -nodirs => 1,
+            )->pack(-side => 'top', -expand => 1, -fill => 'both');
+
+            $thumb->Subwidget('yscrollbar')->configure(-takefocus => 0);
+            $thumb->Subwidget('xscrollbar')->configure(-takefocus => 0);
+            $thumb->Subwidget('corner')->Button(
+                            -bitmap => $Tk::JThumbnail::CORNER,
+                            -borderwidth => 1,
+                            -takefocus => 0,
+                            -command => [\&cornerjump, $thumb],
+            )->pack;
+
+            my $b2 = $mw->Button(
+                            -text=>'E~xit',
+                            -command => sub{
+                                            print "ok, bye.\n";
+                                            exit(0)
+                            }
+            )->pack(qw/-side top/);
+
+            $thumb->bindImages('<ButtonRelease-3>' => [\&RighClickFunction]);
+
+            $thumb->focus();
+
+            MainLoop;
+
+            exit(0);
+
+            sub RighClickFunction
+            {
+                    my $self = pop;
+
+                    my $indx = $self->index('mouse');
+                    my $fn = $self->get($indx);
+                    print "---You right-clicked on file ($fn) at position: $indx!\n";
+            }
+
+            sub cornerjump
+            {
+                    my $self = shift;
+
+                    $self->activate($self->index('active') ? 0 : 'end');
+            }
+
+            sub directory
+            {
+                    my ($dir) = @_;
+                    chdir($dir);
+                    $dir .= '/'  unless ($dir =~ m#\/#);
+                    my $pwd = `pwd`; chomp $pwd;
+                    $mw->title ("Directory: $pwd");
+                    opendir (DIR, ".") or die "Cannot open '.': $!\n";
+                    my @files = ();
+                    foreach my $name (readdir(DIR)) {       
+                            my $st = stat($name);
+                            next  unless ($st);
+                            push @files, $name;
+                    }
+                    return sort @files;
+            }
+
+DESCRIPTION
+    Tk::JThumbnail is derived from the old Tk::Thumbnail widget. The reason
+    for this fork is to:
+
+    1) Fix some issues including an FTBFS.
+
+    2) Add some features needed to use in my JFM5 Filemanager to provide it
+    with a "graphical" option of displaying files in a directory with
+    thumbnail images, along with the other ("text") option uses my
+    Tk::HMListbox widget, similarly derived from the older Tk::MListbox.
+
+    The main new features are:
+
+    1) Ability to display an alternate icon for non-image files, based on
+    their file-extension.
+
+    2) Ability to "select" images (files) for further processing (as is done
+    in a file-manager).
+
+    3) Ability to bind both mouse and keyboard operatons to the individual
+    images allowing for right-clicking, shift-clicking, dragging to select /
+    unselect images, keyboard-traversal via arrow-keys, etc.
+
+    4) Added method compatability with Tk::HMListbox methods needed by a
+    filemanager (JFM5 in particular) to allow for both to be swapped in and
+    out with very similar code minimizing changes needed to code needed for
+    giving the file-manager user the ability to display files either in
+    line-detail mode (Tk::HMListbox) or icon-mode (Tk::JThumbnail) and
+    interact on them in a similar fashon.
+
+    5) A "default" (fail-through) image added for display when a non-image
+    file is encountered or an image file that can not be properly rendered.
+    This file is in images/ and is called "failimg.png", and can be replaced
+    with whatever default image you wish to use (must be named
+    "failimg.png").
+
+    6) Perl can CRASH (segfault) if a .xpm image containing the C comment
+    string "/*" is processed - OUCH! We work around this now by reading in
+    .xpm images and converting this string to something harmless.
+
+    The original relevant Tk::Thumbnail documentation follows below:
+
+    Create a table of thumbnail images, having a default size of 32 x 32
+    pixels. Once we have a Photo of an image, shrink it by copying a
+    subsample of the original to a blank Photo. Images smaller than the
+    thumbnail dimensions are enlarged by zooiming.
+
+    Clicking on an image displays it full-size in a separate window with a
+    "Get Info" button. The info window shows the image's width, height, path
+    name, size and frame count.
+
+    For multi-frame GIFs the image is shown with an extra button to play /
+    stop the animation.
+
+    -images
+        A list of file names and/or Photo widgets. JThumbnail creates
+        temporarty Photo images from all the files, and destroys them when
+        the JThumbnail is destroyed or when a new list of images is
+        specified in a subsequent configure call. Already existing Photos
+        are left untouched.
+
+    -ilabels
+        A boolean, set to *TRUE* if you want file names displayed under the
+        thumbnail images. Default *TRUE*.
+
+    -font
+        The default font is fixed.
+
+    -iwidth
+        Pixel width of the thumbnails. Default is *32*. The special value -1
+        means don't shrink images in the X direction.
+
+    -iheight
+        Pixel height of the thumbnails. Default is *32*. The special value
+        -1 means don't shrink images in the Y direction.
+
+    -command
+        A callback that's executed on a <Button-1> event over a thumbnail
+        image. It's passed six arguments: the Label widget reference
+        containing the thumbnail Photo image, the file name of the Photo, a
+        boolean indicating whether or not the the Photo is valid, the
+        Photo's pixel width and height, and a boolean indicating whether the
+        image is a single frame (Tk::Photo) or has multiple frames
+        (Tk::Animation).
+
+        A default callback is provided that simply displays the original
+        image in a new Toplevel widget, along with a Get Info Button that
+        opens another Toplevel containing information about the image. For
+        multi-frame GIFs the image is shown with an extra button to play /
+        stop the animation.
+
+        To override the default <Button-1> callback, use the *bindImages*()
+        function to set your own, or set -command => undef to have no
+        <Button-1> callback.
+
+        Example: *$thumb*->bindImages('<Button-1>' => [\&*mycallbackfn* [,
+        args] ]);
+
+    -columns
+        Number of Photos per row. The column count is computed if not
+        specified. Default: computed to mostly form a square (columns ==
+        rows).
+
+    -blank
+        For animated GIFs, a boolean specifying whether to blank the
+        animation photo between movie frames. Default is now *0* (*FALSE*).
+        This flag is passed to Tk::Animation's *set_disposal_method*().
+
+    -highlightthickness
+        Set the frame border around the images, becomes visible when widget
+        has keyboard focus. Default *0* (*none*).
+
+    -nodirs
+        Do not include directories in the list. Default *0* (*FALSE*) -
+        include them.
+
+    -extimages
+        JThumbnail-added feature: Optional reference to a hash of icon
+        images to be displayed for non-image files. The hash keys are file
+        extensions and the values image files for the icons. Default: {}
+        (*none*).
+
+        Example: {'txt' => '/usr/local/pixmaps/texticon.png', 'pdf' =>
+        '/usr/local/pixmaps/adobe.jpg' [, ...]}
+
+        Special keys are: '' for files with no or unrecognized extension,
+        and 'dir' for directories.
+
+    -selected
+        JThumbnail-added feature: Optional reference to a list of boolean
+        values corresponding to the indicies of images to be marked as
+        currently "selected". Default: [] (*none*).
+
+        Example: To select the first and fifth images: -selected =>
+        [1,0,0,0,1]
+
+        All images beyond the fifth will not be selected.
+
+    -takefocus
+        NOTE: DO NOT USE (it doesn't work properly)! Instead use the -focus
+        option, see below:
+
+    -focus
+        JThumbnail-added feature: Specify the focusing model. Valid values
+        are:
+
+        0: Never take keyboard focus (and skip in the main window's
+        tab-focusing order).
+
+        1: Take focus when tabbed to from the main window (normal
+        "-takefocus => 1" action for Tk widgets).
+
+        2: Also take keyboard focus whenever an icon in the widget or the
+        widget itself is clicked on.
+
+        Default: *1*.
+
+    -selectbackground
+        JThumbnail-added feature: Set a different background color for
+        images that are "selected". Default: the palette's
+        "*readonlyBackground*" or "*highlightBackground*", or, if those are
+        the same as the current background, a different shade of gray will
+        be used.
+
+METHODS
+    $thumb->activate(*index*);
+        Sets the active element to the one indicated by *index*. If *index*
+        is outside the range of elements in the list then *undef* is
+        returned. The active element is drawn with a ridge around it, and
+        its index may be retrieved with the index 'active'.
+
+    $thumb->bindImages(*sequence*, *callback*);
+        Adds the binding to all images in the widget. This is needed because
+        normal events to the main widget itself are NOT passed down to the
+        image subwidgets themselves.
+
+    $thumb->bindRows(*sequence*, *callback*);
+        Synonym for bindImages for compatability in file-managers, etc. that
+        use both this and Tk::HMListbox interchangability for displaying
+        directory contents. Other that that, it really has nothing to do
+        with "rows".
+
+    $thumb->clear();
+        Destroys all Frames and Labels, and deletes all the temporary Photo
+        images, in preparation for re-populating the JThumbnail with new
+        data.
+
+    $thumb->curselection();
+        Returns a list containing the numerical indices of all of the
+        elements in the HListbox that are currently selected. If there are
+        no elements selected in the listbox then an empty list is returned.
+
+    $thumb->get(*index*);
+        Returns the file-name of the image specified by *index*. *index* can
+        be either a number, 'active', or 'end'.
+
+    $thumb->getRow(*index*)
+        In scalar context, returns the file-name of the image specified by
+        *index*. In list context, returns an array with the following
+        elements:
+
+            [0]: Hash-reference to the detailed data-elements saved for each
+            image.
+
+            [1]: The file-name of the image.
+
+            [2]: Directory indicator: either 'd' if image file is a
+            directory, or '-' if not. This is from the first character of an
+            "ls -l" list and is this way for compatability with
+            Tk::HMListbox, as used by the JFM5 file-manager for determining
+            whether an entry is a directory or not.
+
+        This method is provided for convenience for creating file-managers,
+        such as JFM5.
+
+        The keys of the hash-reference (first argument) are:
+
+            -index:  Index number of the image file returned.
+
+            -label:  Widget containing the image.
+
+            -filename:  File-name of the image.
+
+            -bad:  True if not an image file or the image could not be rendered.
+
+            -width:  The pixel width of the image file.
+
+            -height:  The pixel height of the image file.
+
+            -animated:  True if the image is an animation (animated GIF).
+
+            -blankit:  The value of the boolean I<-blank> option.
+
+            -row:  Row index# where the image is displayed in the widget.
+
+            -col:  Column index# where the image is displayed in the widget.
+
+            -photo:  The photo object of the image file.
+
+    $thumb->index(*index-expression*);
+        Returns a valid index number based in the *index-expression*, or -1
+        if invalid or out of range. *index-expression* can be any of the
+        following: *number*, *'active'*, *'end'*, *'mouse'*, or *'@x,y'*
+        (where x & y are the pointer[x|y] pixel coordinates of the mouse
+        cursor in the widget). *'mouse'* can be used to get the index of the
+        widget under the mouse pointer (or just clicked on). NOTE:
+        $thumb->index('end') returns the index of the last image in the
+        list, so adding 1 to this gets the total count of images in the
+        list!
+
+    $thumb->indexOf(*image-filename*);
+        Returns the index# of the image file-name, or -1 if not a valid
+        file-name in the list.
+
+    $thumb->isFocused();
+        Returns *TRUE* if $thumb has the keyboard focus, *FALSE* otherwise.
+        Returns *undef* if *index* is invalid or out of range. NOTE: *index*
+        must be a valid *number*, use $thumb->index() to get a valid *index*
+        number.
+
+    $thumb->isSelected(*index*);
+        Returns *TRUE* if the image is currently selected or *FALSE*
+        otherwise.
+
+    $thumb->selectionSet(*index* [ , *index* ...]);
+        If a single *index* is given, that image is "selected". If two
+        indices are given, all images between the two, inclusive are
+        selected. If three or more are given, each image in the list is
+        selected. *index* can be either a *number* or *end*.
+
+    $thumb->selectionToggle(*index*);
+        Toggles the selection state of the image given by *index*, then
+        returns the selection state of the image AFTER the toggle.
+
+    $thumb->selectionClear(*index* [ , *index* ...]);
+        If a single *index* is given, that image is "selected". If two
+        indices are given, all images between the two, inclusive are
+        de-selected, if selected. If three or more are given, each image in
+        the list is de-selected. *index* can be either a *number* or *end*.
+
+NOTES
+    1) There are no insert, delete, or sort methods. One must "reconfigure"
+    the widget with a new list of images in order to change the list,
+    example:
+
+    $thumb->configure(*-images* => \@filelist);
+
+    which will replace all the images with the new list.
+
+    2) -takefocus does not work, use -focus instead.
+
+    3) The default for scrollbars seems to be "osow" even though I've
+    specified "osoe" in this code. Not sure why, but to set "osoe"
+    (SouthEast / Lower and Right), you should specify "-scrollbars =>
+    'osoe'! "osoe" is best, if you are using the "corner button" option (see
+    the Example in this documentation).
+
+    4) I've replaced Tk::Thumbnail's "multimedia" buttons for animated gifs
+    in the default callback which displays the image you clicked on
+    full-sized in it's own window since the Tk::MultiMediaControls produces
+    floods of errors about "Tk::MasterMenu" being missing, but no such
+    widget seems to exist anymore?! Instead, now there's a simple Play /
+    Stop button to play the animation.
+
+    5) The default callback to display full-sized images and info. in a
+    separate popup window is invoked whenever one clicks on an image OR now,
+    when one presses the Return key, the active image is displayed as such.
+    To NOT do this, specify:
+
+    -command => *undef*.
+
+    OR specify your own callback function for -command, OR override both
+    *<lt*ButtonRelease-1<gt>> and *<lt*Return<gt>> key using the
+    bindImages() function.
+
+    6) There are now TWO built-in icon images included with this package:
+    failimg.png and info3.png in the images/ subdirectory. You can replace
+    them with whatever you wish. *failimg.png* is displayed for any
+    non-image file or image file that could not be converted properly, or
+    for which no -extimg image exists for it's extension. *info3.png* is
+    displayed for the "info" button in the popup window image by the default
+    -command callback.
+
+    7) Tk::Animation is now an optional module (not required). Needed only
+    if you wish to be able to "play" animated GIF images. NOTE: They are not
+    playable from the image display screen, but only via a bound callback
+    function, such as the default *-command* callback.
+
+KEYWORDS
+    jthumbnail, thumbnail, icons
+
+DEPENDS
+    Tk Tk::LabEntry Tk::JPEG Tk::PNG File::Basename
+
+    Optional: Tk::Animation
+
+SEE ALSO
+    Tk::Thumbnail

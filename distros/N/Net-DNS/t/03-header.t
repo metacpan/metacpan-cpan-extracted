@@ -1,4 +1,4 @@
-# $Id: 03-header.t 1527 2017-01-18 21:42:48Z willem $
+# $Id: 03-header.t 1727 2018-12-31 12:04:48Z willem $
 
 use strict;
 use Test::More;
@@ -6,10 +6,7 @@ use Test::More;
 use Net::DNS::Packet;
 use Net::DNS::Parameters;
 
-my @op = keys %Net::DNS::Parameters::opcodebyname;
-my @rc = keys %Net::DNS::Parameters::rcodebyname;
-
-plan tests => 76 + scalar(@op) + scalar(@rc);
+plan tests => 72;
 
 
 my $packet = new Net::DNS::Packet(qw(. NS IN));
@@ -25,43 +22,6 @@ sub waggle {
 		my $change = $object->$attribute($value);
 		my $stored = $object->$attribute();
 		is( $stored, $value, "expected value after header->$attribute($value)" );
-	}
-}
-
-
-{					## check conversion functions
-	foreach ( sort( keys %Net::DNS::Parameters::opcodebyname ), 15 ) {
-		my $expect = /NS_NOTIFY/i ? 'NOTIFY' : uc($_);
-		my $name = eval {
-			my $val = opcodebyname($_);
-			opcodebyval( opcodebyname($val) );
-		};
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
-		is( $name, $expect, "opcodebyname('$_')\t$exception" );
-	}
-
-	foreach my $testcase ('BOGUS') {
-		eval { opcodebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "opcodebyname($testcase)\t[$exception]" );
-	}
-}
-
-{
-	foreach ( sort( keys %Net::DNS::Parameters::rcodebyname ), 4000 ) {
-		my $expect = /BADVERS/i ? 'BADSIG' : uc($_);
-		my $name = eval {
-			my $val = rcodebyname($_);
-			rcodebyval( rcodebyname($val) );
-		};
-		my $exception = $@ =~ /^(.+)\n/ ? $1 : '';
-		is( $name, $expect, "rcodebyname('$_')\t$exception" );
-	}
-
-	foreach my $testcase ('BOGUS') {
-		eval { rcodebyname($testcase); };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "rcodebyname($testcase)\t[$exception]" );
 	}
 }
 

@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - 'Mirko Westermeier <mirko@westermeier.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Mojo-CommandOutputRole
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0.48'
+  Mojolicious: '8.06'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/memowe/Test-Mojo-CommandOutputRole/issues
+  repository: https://github.com/memowe/Test-Mojo-CommandOutputRole
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

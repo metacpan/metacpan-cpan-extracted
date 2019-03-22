@@ -18,6 +18,7 @@ no_index:
     - t
     - inc
 requires:
+  Capture::Tiny: '0'
   Data::Printer: '0'
   Method::Signatures: '0'
   Module::Refresh: '0'
@@ -26,5 +27,5 @@ requires:
   SQL::Abstract::Complete: '0'
   Text::Trim: '0'
   perl: '5.006'
-version: '0.06'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

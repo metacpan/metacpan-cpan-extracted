@@ -1,4 +1,7 @@
 Revision history for Plack-Middleware-OpenAireMetrics
 
+0.02  2019-03-22 13:40:37 CET
+    - use correct tracking paramters
+
 0.01  2019-02-20 17:45:28 CET
-        - Initial release
+    - Initial release

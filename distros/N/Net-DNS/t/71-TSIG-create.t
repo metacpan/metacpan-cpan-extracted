@@ -1,38 +1,35 @@
-# $Id: 71-TSIG-create.t 1678 2018-05-22 12:01:30Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1726 2018-12-15 12:59:56Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
 use Net::DNS;
 
-my @prerequisite = qw(
-		Digest::HMAC
-		Digest::MD5
-		Digest::SHA
-		MIME::Base64
-		);
+my %prerequisite = (
+	'Digest::HMAC' => 1.03,
+	'Digest::MD5'  => 2.13,
+	'Digest::SHA'  => 5.23,
+	'MIME::Base64' => 2.13,
+	);
 
-foreach my $package (@prerequisite) {
-	next if eval "require $package";
-	plan skip_all => "$package not installed";
+foreach my $package ( sort keys %prerequisite ) {
+	my @revision = grep $_, $prerequisite{$package};
+	next if eval "use $package @revision; 1;";
+	plan skip_all => "missing prerequisite $package @revision";
 	exit;
 }
 
-plan tests => 11;
+plan tests => 12;
 
 
 my $tsig = new Net::DNS::RR( type => 'TSIG' );
 my $class = ref($tsig);
 
 
-{
-	my $keyname = 'keyname.example';
-	my $keytext = 'xdX9m8UtQNbJUzUgQ4xDtUNZAmU=';
-	my $tsig    = create $class( $keyname, $keytext );
-	is( ref($tsig), $class, 'create TSIG from argument list' );
-}
+my $keyrr = new Net::DNS::RR <<'END';
+hmac-md5.example. IN KEY 512 3 157 ARDJZgtuTDzAWeSGYPAu9uJUkX0=
+END
 
-
-my $privatekey = 'Khmac-md5.example.+157+53335.private';
+my $privatekey = $keyrr->privatekeyname;
 END { unlink($privatekey) if defined $privatekey; }
 
 open( KEY, ">$privatekey" ) or die "$privatekey $!";
@@ -46,6 +43,18 @@ close KEY;
 {
 	my $tsig = create $class($privatekey);
 	is( ref($tsig), $class, 'create TSIG from private key' );
+}
+
+
+{
+	my $tsig = create $class($keyrr);
+	is( ref($tsig), $class, 'create TSIG from KEY RR' );
+}
+
+
+{
+	my $tsig = create $class( $keyrr->owner, $keyrr->key );
+	is( ref($tsig), $class, 'create TSIG from argument list' );
 }
 
 

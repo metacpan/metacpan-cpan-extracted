@@ -4,10 +4,33 @@ use warnings;
 
 use Exporter 5.57 'import';
 
-our $VERSION = '0.03';
-our @EXPORT_OK = qw(extract_presuf extract_words);
+our $VERSION = '0.04';
+our @EXPORT_OK = qw(phrase_iterator extract_presuf extract_words);
 
 use List::Util qw(uniq);
+
+sub grep_iterator(&$) {
+    my ($cb, $iter) = @_;
+    return sub {
+        local $_ = $iter->();
+        return undef unless defined($_);
+        $cb->();
+        return $_;
+    }
+}
+
+sub phrase_iterator {
+    my ($input_iter, $opts) = @_;
+    my @phrases;
+    return sub {
+        while(! @phrases && defined(my $text = $input_iter->())) {
+            @phrases = grep {
+                (! /\A\s+\z/) && (! /\p{General_Category=Punctuation}/) && /\p{Han}/
+            } split / ( \r?\n | \p{General_Category: Other_Punctuation} )+ /x, $text;
+        }
+        return shift @phrases;
+    }
+}
 
 sub extract_presuf {
     my ($input_iter, $output_cb, $opts) = @_;
@@ -17,34 +40,32 @@ sub extract_presuf {
     my $threshold = $opts->{threshold} || 9; # an arbitrary choice.
     my $text;
 
-    while (defined($text = $input_iter->())) {
-        for my $phrase (split /\p{General_Category: Other_Punctuation}+/, $text) {
-            next unless length($phrase) >= 2 && $phrase =~ /\A\p{Han}+\z/x;
+    my $phrase_iter = grep_iterator sub { /\A\p{Han}+\z/ }, phrase_iterator( $input_iter );
+    while (my $phrase = $phrase_iter->()) {
+        for my $len (2..5) {
+            my $re = '\p{Han}{' . $len . '}';
+            next unless length($phrase) >= $len * 2 && $phrase =~ /\A($re) .* ($re)\z/x;
+            my ($prefix, $suffix) = ($1, $2);
+            $stats{prefix}{$prefix}++ unless $extracted{$prefix};
+            $stats{suffix}{$suffix}++ unless $extracted{$suffix};
 
-            for my $len (2..5) {
-                my $re = '\p{Han}{' . $len . '}';
-                next unless length($phrase) >= $len * 2 && $phrase =~ /\A($re) .* ($re)\z/x;
-                my ($prefix, $suffix) = ($1, $2);
-                $stats{prefix}{$prefix}++ unless $extracted{$prefix};
-                $stats{suffix}{$suffix}++ unless $extracted{$suffix};
+            for my $x ($prefix, $suffix) {
+                if (! $extracted{$x}
+                    && $stats{prefix}{$x}
+                    && $stats{suffix}{$x}
+                    && $stats{prefix}{$x} > $threshold
+                    && $stats{suffix}{$x} > $threshold
+                ) {
+                    $extracted{$x} = 1;
+                    delete $stats{prefix}{$x};
+                    delete $stats{suffix}{$x};
 
-                for my $x ($prefix, $suffix) {
-                    if (! $extracted{$x}
-                        && $stats{prefix}{$x}
-                        && $stats{suffix}{$x}
-                        && $stats{prefix}{$x} > $threshold
-                        && $stats{suffix}{$x} > $threshold
-                    ) {
-                        $extracted{$x} = 1;
-                        delete $stats{prefix}{$x};
-                        delete $stats{suffix}{$x};
-
-                        $output_cb->($x, \%extracted);
-                    }
+                    $output_cb->($x, \%extracted);
                 }
             }
         }
     }
+
 
     return \%extracted;
 }
@@ -191,6 +212,11 @@ of this subroutine.
 
 The 3rd argument is a HashRef with parameters to the internal algorithm. So
 far C<threshold> is the only one with default value being 9.
+
+=item phrase_iterator( $input_iter ) #=> CodeRef
+
+This subroutine split input into smallelr phrases. It takes an text iterator,
+and returns another one.
 
 =back
 

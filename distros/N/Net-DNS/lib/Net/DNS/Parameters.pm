@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1714 2018-09-21 14:14:55Z willem $
+# $Id: Parameters.pm 1729 2019-01-28 09:45:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2018-01-08)
+##	(last updated 2019-01-17)
 ##
 ################################################
 
@@ -26,6 +26,7 @@ our @EXPORT = qw(
 		opcodebyname opcodebyval
 		rcodebyname rcodebyval
 		ednsoptionbyname ednsoptionbyval
+		dsotypebyname dsotypebyval
 		);
 
 
@@ -105,6 +106,7 @@ my @typebyname = (
 	CDNSKEY	   => 60,					# RFC7344
 	OPENPGPKEY => 61,					# RFC7929
 	CSYNC	   => 62,					# RFC7477
+	ZONEMD	   => 63,					# draft-wessels-dns-zone-digest
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -122,7 +124,7 @@ my @typebyname = (
 	AXFR	   => 252,					# RFC1035 RFC5936
 	MAILB	   => 253,					# RFC1035
 	MAILA	   => 254,					# RFC1035
-	ANY	   => 255,					# RFC1035 RFC6895
+	ANY	   => 255,					# RFC1035 RFC6895 RFC8482
 	URI	   => 256,					# RFC7553
 	CAA	   => 257,					# RFC6844
 	AVC	   => 258,					#
@@ -142,6 +144,7 @@ my @opcodebyname = (
 	STATUS => 2,						# RFC1035
 	NOTIFY => 4,						# RFC1996
 	UPDATE => 5,						# RFC2136
+	DSO    => 6,						# RFC-ietf-dnsop-session-signal-20
 	);
 our %opcodebyval = reverse @opcodebyname;
 push @opcodebyname, map /^\d/ ? $_ : lc($_), @opcodebyname;
@@ -162,6 +165,7 @@ my @rcodebyname = (
 	NOTAUTH	  => 9,						# RFC2136
 	NOTAUTH	  => 9,						# RFC2845
 	NOTZONE	  => 10,					# RFC2136
+	DSOTYPENI => 11,					# RFC-ietf-dnsop-session-signal-20
 	BADVERS	  => 16,					# RFC6891
 	BADSIG	  => 16,					# RFC2845
 	BADKEY	  => 17,					# RFC2845
@@ -220,6 +224,17 @@ push @ednsflagbyname, map /^\d/ ? $_ : lc($_), @ednsflagbyname;
 our %ednsflagbyname = @ednsflagbyname;
 
 
+# Registry: DSO Type Codes
+my @dsotypebyname = (
+	KEEPALIVE	  => 0x0001,				# RFC-ietf-dnsop-session-signal-20
+	RETRYDELAY	  => 0x0002,				# RFC-ietf-dnsop-session-signal-20
+	ENCRYPTIONPADDING => 0x0003,				# RFC-ietf-dnsop-session-signal-20
+	);
+our %dsotypebyval = reverse @dsotypebyname;
+push @dsotypebyname, map /^\d/ ? $_ : lc($_), @dsotypebyname;
+our %dsotypebyname = @dsotypebyname;
+
+
 ########
 
 # The following functions are wrappers around similarly named hashes.
@@ -228,9 +243,9 @@ sub classbyname {
 	my $name = shift;
 
 	$classbyname{$name} || $classbyname{uc $name} || do {
-		croak "unknown class $name" unless $name =~ m/^(CLASS)?(\d+)/i;
+		croak qq[unknown class "$name"] unless $name =~ m/^(CLASS)?(\d+)/i;
 		my $val = 0 + $2;
-		croak "classbyname( $name ) out of range" if $val > 0xffff;
+		croak qq[classbyname("$name") out of range] if $val > 0xffff;
 		return $val;
 			}
 }
@@ -240,7 +255,7 @@ sub classbyval {
 
 	$classbyval{$val} || do {
 		$val += 0;
-		croak "classbyval( $val ) out of range" if $val > 0xffff;
+		croak qq[classbyval($val) out of range] if $val > 0xffff;
 		return "CLASS$val";
 			}
 }
@@ -252,11 +267,11 @@ sub typebyname {
 	$typebyname{$name} || do {
 		if ( $name =~ m/^(TYPE)?(\d+)/i ) {
 			my $val = 0 + $2;
-			croak "typebyname( $name ) out of range" if $val > 0xffff;
+			croak qq[typebyname("$name") out of range] if $val > 0xffff;
 			return $val;
 		}
 		_typespec("$name.RRNAME") unless $typebyname{uc $name};
-		return $typebyname{uc $name} || croak "unknown type $name";
+		return $typebyname{uc $name} || croak qq[unknown type "$name"];
 			}
 }
 
@@ -265,7 +280,7 @@ sub typebyval {
 
 	$typebyval{$val} || do {
 		$val += 0;
-		croak "typebyval( $val ) out of range" if $val > 0xffff;
+		croak qq[typebyval($val) out of range] if $val > 0xffff;
 		$typebyval{$val} = "TYPE$val";
 		_typespec("$val.RRTYPE");
 		return $typebyval{$val};
@@ -277,7 +292,7 @@ sub opcodebyname {
 	my $arg = shift;
 	return $opcodebyname{$arg} if defined $opcodebyname{$arg};
 	return 0 + $arg if $arg =~ /^\d/;
-	croak "unknown opcode $arg";
+	croak qq[unknown opcode "$arg"];
 }
 
 sub opcodebyval {
@@ -290,7 +305,7 @@ sub rcodebyname {
 	my $arg = shift;
 	return $rcodebyname{$arg} if defined $rcodebyname{$arg};
 	return 0 + $arg if $arg =~ /^\d/;
-	croak "unknown rcode $arg";
+	croak qq[unknown rcode "$arg"];
 }
 
 sub rcodebyval {
@@ -303,7 +318,7 @@ sub ednsoptionbyname {
 	my $arg = shift;
 	return $ednsoptionbyname{$arg} if defined $ednsoptionbyname{$arg};
 	return 0 + $arg if $arg =~ /^\d/;
-	croak "unknown option $arg";
+	croak qq[unknown option "$arg"];
 }
 
 sub ednsoptionbyval {
@@ -312,15 +327,28 @@ sub ednsoptionbyval {
 }
 
 
+sub dsotypebyname {
+	my $arg = shift;
+	return $dsotypebyname{$arg} if defined $dsotypebyname{$arg};
+	return 0 + $arg if $arg =~ /^\d/;
+	croak qq[unknown DSO type "$arg"];
+}
+
+sub dsotypebyval {
+	my $val = shift;
+	$dsotypebyval{$val} || return $val;
+}
+
+
 sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
 	my ( $mnemonic, $rrtype ) = map uc($_), @_;		# uncoverable pod
 	$rrtype = rand(255) + 65280 unless $rrtype;
-	for ( typebyval $rrtype = int($rrtype) ) {
-		croak "'$mnemonic' is a CLASS identifier" if $classbyname{$mnemonic};
+	for ( typebyval( $rrtype = int $rrtype ) ) {
+		croak qq["$mnemonic" is a CLASS identifier] if $classbyname{$mnemonic};
 		return $rrtype if /^$mnemonic$/;    # duplicate registration
-		croak "'$mnemonic' conflicts with TYPE$rrtype ($_)" unless /^TYPE\d+$/;
+		croak qq["$mnemonic" conflicts with TYPE$rrtype ($_)] unless /^TYPE\d+$/;
 		my $known = $typebyname{$mnemonic};
-		croak "'$mnemonic' conflicts with TYPE$known" if $known;
+		croak qq["$mnemonic" conflicts with TYPE$known] if $known;
 	}
 	$typebyval{$rrtype} = $mnemonic;
 	return $typebyname{$mnemonic} = $rrtype;
@@ -379,12 +407,12 @@ maintained and published by IANA.
 
 =head1 FUNCTIONS
 
-=head2 classbyname, typebyname, opcodebyname, rcodebyname, ednsoptionbyname
+=head2 classbyname, typebyname, opcodebyname, rcodebyname, ednsoptionbyname, dsotypebyname
 
 Access functions which return the numerical code corresponding to
 the given mnemonic.
 
-=head2 classbyval, typebyval, opcodebyval, rcodebyval, ednsoptionbyval
+=head2 classbyval, typebyval, opcodebyval, rcodebyval, ednsoptionbyval, dsotypebyval
 
 Access functions which return the canonical mnemonic corresponding to
 the given numerical code.

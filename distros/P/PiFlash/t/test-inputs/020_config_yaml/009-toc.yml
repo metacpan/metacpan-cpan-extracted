@@ -1,0 +1,15 @@
+# test with TOC and only two of three plugins have an attachment
+foo: bar
+---
+- type: Test1
+- type: Test2
+---
+data: Test1
+foo: bar
+ping: pong
+---
+data: Test2
+blarg: 
+  - one
+  - two
+  - three

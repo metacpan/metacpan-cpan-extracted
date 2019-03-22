@@ -1,0 +1,106 @@
+=head1 Contributing to PhotoDB
+
+=head2 Background
+
+PhotoDB is designed to be a normalised relational database to track different aspects of photography.
+The application is designed to shield the user from the sharp edges that exist when updating
+multiple database tables at once.
+
+=over
+
+=item * Commits should be atomic, i.e. complete within themselves. If you make a change to the schema that requires a change to the application and/or documentation, they should be in the same commit.
+
+=item * Documentation should be kept up to date with the project. Database schema docs are generated automatically but application usage documentation needs to be written by hand.
+
+=item * CI tests need to be passing before a pull request will be accepted. At the moment this is just a syntax check but I hope to expand the tests in the future.
+
+=back
+
+=head2 The application
+
+For development, you will have to add your checked-out copy of the application directory to C<PERL5LIB>.
+Execute the following and preferably add it to your C<.bashrc> for persistence.
+
+    export PERL5LIB=/path/to/photodb:$PERL5LIB
+
+=head2 Database conventions
+
+=over
+
+=item * Tables should be given names in UPPERCASE
+
+=item * Views should be given names in LOWERCASE
+
+=item * Views whose name starts C<choose_> are specifically for use with the C<listchoices()> function and only return columns C<id>, C<opt>
+
+=item * Views whose name starts C<info_> are for displaying datasets about single items to the user and should have human-readable column names
+
+=item * Views whose name starts C<report_> are for displaying datasets about multiple items to the user and should have human-readable column names
+
+=back
+
+=head3 Altering the schema
+
+This section describes how to alter the schema, and document the changes.
+
+Draft your edits to the schema using any tool you prefer (I like MySQL Workbench).
+Don't actually apply the edits, but copy the script and save it in the `migrations`
+directory with the next incremented number, e.g. `025-add-table.sql`.
+
+Then PhotoDB can upgrade its own database schema to match the application version by
+running `photodb db upgrade`. This system of migrations means it is easy for users
+to keep their schema up to date.
+
+Then use the included Perl script C<dump-schema.pl> to export the dump files in the
+right format. You'll need the following CPAN modules on your system:
+
+=over
+
+=item * C<Getopt::Long>
+
+=item * C<Term::ReadKey>
+
+=item * C<DBI>
+
+=item * C<DBD::MySQL>
+
+=back
+
+C<Getopt::Long> seems to be standard in the Red Hat distribution of Perl but you'll need
+to install the others by doing:
+
+    yum install perl-TermReadKey perl-DBI perl-DBD-MySQL
+
+Change into the working directory of the script and do the following:
+
+    ./dump-schema.pl --hostname 192.168.0.1 --database photography --username joebloggs
+
+    # Default values:
+    # hostname = localhost
+    # database = photography
+    # username = whoever is currently logged in
+
+The script B<will delete all existing SQL dump files and write them out again>. Do not run
+this in random paths on your system!
+
+After running the script, check which files have been added, removed or changed, and then commit
+the diffs with a meaningful commit message.
+
+=head2 Application conventions
+
+The application frontend, C<photodb>, is the smallest possible script to determine which command
+the user wants to run, map the command to a handler using C<commands.pm> and then execute the
+handler from C<handlers.pm> to complete the user interaction.
+
+Handlers are pieces of code which carry out user interaction, and encode logic about what information
+to collect. They tend to be simple but extensive. Most handlers simply run through a list of prompts to
+build a hash of data, which is then inserted/updated/etc into the database backend. Some handlers
+contain simple logic to make decisions or loops to simplify bulk operations.
+
+Handlers rely on functions in C<funcs.pm> which are reusable pieces of code which do not interact
+with the user, but perform common operations like selecting from a database, validating user input,
+etc.
+
+=head2 Contributing your work
+
+Pull requests are welcome.

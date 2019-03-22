@@ -16,7 +16,7 @@ use Path::Tiny 'path';
 use Text::Diff ();
 use Try::Tiny qw( try catch finally );
 
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 my $env;
 
@@ -539,7 +539,7 @@ sub _execute {
             }
 
             run(
-                [ grep { defined } ( ($wrap) ? $wrap : undef ), $file ],
+                [ grep { defined } ( ($wrap) ? $wrap : undef ), $file, $type ],
                 \undef, \$out, \$err,
             ) or $died = 1;
         }
@@ -617,7 +617,7 @@ App::Dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/dest.svg)](https://travis-ci.org/gryphonshafer/dest)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/dest/badge.png)](https://coveralls.io/r/gryphonshafer/dest)
@@ -950,6 +950,9 @@ a revert file for some action and you checkout your working directory to a
 point in time prior to the revert file existing, C<dest> maintains a copy of the
 original revert file so it can revert the action. However, it will always rely
 on whatever wrapper is in the current working directory.
+
+The C<dest.wrap> is called with two parameters: first, the name of the change
+program, and second, the action type ("deploy", "revert", "verify").
 
 =head1 WATCH FILE
 

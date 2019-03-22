@@ -5,8 +5,8 @@ use Test::More(tests => 10);
 use strict;
 use warnings;
 
-eval { require Net::HTTPS; };
-ok($@ eq '', "Loaded Net::HTTPS for secure updates");
+eval { require LWP::Protocol::https; };
+ok($@ eq '', "Loaded LWP::Protocol::https for secure updates");
 SKIP: {
 	my $ua = LWP::UserAgent->new( timeout => 10 );
 	my $internet_available;
@@ -40,6 +40,7 @@ SKIP: {
 	eval {
 		$assigned_ip = Net::DNS::DynDNS->new('test', 'test')->update('test.dyndns.org,test.homeip.net');
 	};
+	diag($@);
 	chomp($@);
 	if ($@ =~ /^The hostname specified is blocked for update abuse/) {
 		skip("Update abuse has been switched on during initial test", 7);

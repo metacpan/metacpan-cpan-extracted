@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -241,8 +241,12 @@ sub inref_graph
    }
 
    my $name;
+   my $foundsv;
    if( $elide_sym and $name = $sv->symname and
-         $name !~ m/^&.*::__ANON__$/ ) {
+         $name !~ m/^&.*::__ANON__$/ and
+         $foundsv = eval { $self->find_symbol( $sv->symname ) } and
+         $foundsv->addr == $sv->addr
+      ) {
       $graph->add_root( $sv,
          Devel::MAT::SV::Reference( "the symbol '" . Devel::MAT::Cmd->format_symbol( $name, $sv ) . "'", strong => undef ) );
       return $graph->get_sv_node( $sv );

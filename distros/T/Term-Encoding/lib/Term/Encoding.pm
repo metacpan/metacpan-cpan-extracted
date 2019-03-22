@@ -1,7 +1,7 @@
 package Term::Encoding;
 
 use strict;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(term_encoding);
@@ -81,6 +81,10 @@ terminal expects, in various ways.
 Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
 
 Audrey Tang E<lt>audreyt@audreyt.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2019 Tatsuhiko Miyagawa
 
 =head1 LICENSE
 

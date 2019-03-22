@@ -4,7 +4,7 @@ use warnings;
 
 # PODNAME: dest
 # ABSTRACT: Deployment State Manager
-our $VERSION = '1.20'; # VERSION
+our $VERSION = '1.21'; # VERSION
 
 use Pod::Usage 'pod2usage';
 use App::Dest;
@@ -53,7 +53,7 @@ dest - Deployment State Manager
 
 =head1 VERSION
 
-version 1.20
+version 1.21
 
 =head1 AUTHOR
 

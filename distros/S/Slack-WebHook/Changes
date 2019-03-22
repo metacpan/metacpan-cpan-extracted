@@ -1,5 +1,9 @@
 Revision history for Slack-WebHook
 
+0.002     2019-03-21 10:07:41-06:00 America/Denver
+
+- bump Test::MockModule requirement version to fix smokers
+
 0.001     2019-03-20 15:57:11-06:00 America/Denver
 
 - initial release

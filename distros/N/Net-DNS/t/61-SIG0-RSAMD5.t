@@ -1,18 +1,18 @@
-# $Id: 61-SIG0-RSAMD5.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
+# $Id: 61-SIG0-RSAMD5.t 1736 2019-03-20 10:03:12Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 
-my @prerequisite = qw(
-		MIME::Base64
-		Time::Local
-		Net::DNS::RR::SIG
-		Net::DNS::SEC
-		);
+my %prerequisite = (
+	'MIME::Base64'	=> 2.13,
+	'Net::DNS::SEC' => 1.01,
+	'Time::Local'	=> 1.19,
+	);
 
-foreach my $package (@prerequisite) {
-	next if eval "require $package";
+foreach my $package ( sort keys %prerequisite ) {
+	my @revision = grep $_, $prerequisite{$package};
+	next if eval "use $package @revision; 1;";
 	plan skip_all => "$package not installed";
 	exit;
 }

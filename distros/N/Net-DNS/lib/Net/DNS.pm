@@ -1,13 +1,13 @@
 package Net::DNS;
 
 #
-# $Id: DNS.pm 1722 2018-11-14 15:45:37Z willem $
+# $Id: DNS.pm 1738 2019-03-22 09:17:51Z willem $
 #
 require 5.006;
 our $VERSION;
-$VERSION = '1.19';
+$VERSION = '1.20';
 $VERSION = eval $VERSION;
-our $SVNVERSION = (qw$LastChangedRevision: 1722 $)[1];
+our $SVNVERSION = (qw$LastChangedRevision: 1738 $)[1];
 
 
 =head1 NAME
@@ -269,14 +269,14 @@ Returns the version of Net::DNS.
     # Use a default resolver -- can not get an error string this way.
     use Net::DNS;
     my @rr = rr("example.com");
-    my @rr = rr("example.com", "A");
-    my @rr = rr("example.com", "A", "IN");
+    my @rr = rr("example.com", "AAAA");
+    my @rr = rr("example.com", "AAAA", "IN");
 
     # Use your own resolver object.
     my $res = Net::DNS::Resolver->new;
     my @rr  = rr($res, "example.com" ... );
 
-    my ($ptr) = rr("192.0.2.1");
+    my ($ptr) = rr("2001:DB8::dead:beef");
 
 The C<rr()> method provides simple RR lookup for scenarios where
 the full flexibility of Net::DNS is not required.
@@ -302,7 +302,7 @@ records for the specified name.
 The list will be sorted by preference.
 Returns an empty list if the query failed or no MX record was found.
 
-This method does not look up A records; it only performs MX queries.
+This method does not look up address records; it resolves MX only.
 
 
 =head1 Dynamic DNS Update Support
@@ -318,13 +318,13 @@ update packet.	There are two forms, value-independent and
 value-dependent:
 
     # RRset exists (value-independent)
-    $update->push( pre => yxrrset("host.example.com A") );
+    $update->push( pre => yxrrset("host.example.com AAAA") );
 
 Meaning:  At least one RR with the specified name and type must
 exist.
 
     # RRset exists (value-dependent)
-    $update->push( pre => yxrrset("host.example.com A 10.1.2.3") );
+    $update->push( pre => yxrrset("host.example.com AAAA 2001:DB8::dead:beef") );
 
 Meaning:  At least one RR with the specified name and type must
 exist and must have matching data.
@@ -337,7 +337,7 @@ be created.
 Use this method to add an "RRset does not exist" prerequisite to
 a dynamic update packet.
 
-    $update->push( pre => nxrrset("host.example.com A") );
+    $update->push( pre => nxrrset("host.example.com AAAA") );
 
 Meaning:  No RRs with the specified name and type can exist.
 
@@ -372,7 +372,7 @@ be created.
 
 Use this method to add RRs to a zone.
 
-    $update->push( update => rr_add("host.example.com A 10.1.2.3") );
+    $update->push( update => rr_add("host.example.com AAAA 2001:DB8::dead:beef") );
 
 Meaning:  Add this RR to the zone.
 
@@ -394,12 +394,12 @@ delete all RRsets, delete an RRset, and delete a specific RR.
 Meaning:  Delete all RRs having the specified name.
 
     # Delete an RRset.
-    $update->push( update => rr_del("host.example.com A") );
+    $update->push( update => rr_del("host.example.com AAAA") );
 
 Meaning:  Delete all RRs having the specified name and type.
 
     # Delete a specific RR.
-    $update->push( update => rr_del("host.example.com A 10.1.2.3") );
+    $update->push( update => rr_del("host.example.com AAAA 2001:DB8::dead:beef") );
 
 Meaning:  Delete the RR which matches the specified argument.
 
@@ -494,7 +494,7 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
 
     use Net::DNS;
     my $res   = Net::DNS::Resolver->new;
-    my $reply = $res->search("www.example.com", "A");
+    my $reply = $res->search("www.example.com", "AAAA");
 
     if ($reply) {
 	foreach my $rr ($reply->answer) {
@@ -573,7 +573,7 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
     my $res    = Net::DNS::Resolver->new;
     $res->udp_timeout(10);
     $res->tcp_timeout(20);
-    my $socket = $res->bgsend("host.example.com");
+    my $socket = $res->bgsend("host.example.com", "AAAA");
 
     while ( $res->bgbusy($socket) ) {
 	# do some work here while waiting for the response

@@ -1,4 +1,18 @@
 Revision history for perl distribution Mojolicious-Plugin-Wordpress
 
+0.02 2019-03-22T10:59:10+0800
+ - Fix "Not an ARRAY reference at Wordpress.pm line 92", when fetching posts
+   with ?page=$too_high.
+ - Add support for %%variables%% from YOAST SEO.
+ - Add support for "base_assets_url"
+ - Add wp.rewrite_content helper
+ - Will not return empty keys from meta_from helper.
+ - Changed the return value from wp.meta_from helper.
+
 0.01 2019-03-20T22:48:14+0800
- - Started project
+ - Add support for post-processing responses from the API.
+ - Add wp.meta_from helper.
+ - Add wp.get_post_p helper.
+ - Add wp.get_posts_p helper.
+ - Add wp.get_page_p helper.
+ - Add wp.get_pages_p helper.

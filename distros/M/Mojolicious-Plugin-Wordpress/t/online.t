@@ -33,12 +33,12 @@ my $slug  = $page->{slug} || 'unknown';
 $t->get_ok("/page/$slug")->status_is(200)->json_is($page);
 
 my $meta = $t->app->wp->meta_from($page);
-ok $meta->{description},           'meta description'           or note Mojo::Util::dumper($meta);
-ok $meta->{title},                 'meta title'                 or note Mojo::Util::dumper($meta);
-ok $meta->{opengraph_description}, 'meta opengraph_description' or note Mojo::Util::dumper($meta);
-ok $meta->{opengraph_title},       'meta opengraph_title'       or note Mojo::Util::dumper($meta);
-ok $meta->{twitter_description},   'meta twitter_description'   or note Mojo::Util::dumper($meta);
-ok $meta->{twitter_title},         'meta twitter_title'         or note Mojo::Util::dumper($meta);
+ok $meta->{wp_description},           'meta description'           or note Mojo::Util::dumper($meta);
+ok $meta->{wp_title},                 'meta title'                 or note Mojo::Util::dumper($meta);
+ok $meta->{wp_opengraph_description}, 'meta opengraph_description' or note Mojo::Util::dumper($meta);
+ok $meta->{wp_opengraph_title},       'meta opengraph_title'       or note Mojo::Util::dumper($meta);
+ok $meta->{wp_twitter_description},   'meta twitter_description'   or note Mojo::Util::dumper($meta);
+ok $meta->{wp_twitter_title},         'meta twitter_title'         or note Mojo::Util::dumper($meta);
 
 $t->get_ok('/pages?all=1')->status_is(200)->json_has('/0/slug')->json_has('/0/title');
 my $all_pages = $t->tx->res->json;

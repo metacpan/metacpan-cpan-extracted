@@ -10,13 +10,15 @@ my @files = (
     'bin/spread-revolutionary-date',
     'lib/App/SpreadRevolutionaryDate.pm',
     'lib/App/SpreadRevolutionaryDate/Config.pm',
-    'lib/App/SpreadRevolutionaryDate/Freenode.pm',
-    'lib/App/SpreadRevolutionaryDate/Freenode/Bot.pm',
-    'lib/App/SpreadRevolutionaryDate/Mastodon.pm',
-    'lib/App/SpreadRevolutionaryDate/Twitter.pm',
+    'lib/App/SpreadRevolutionaryDate/Target.pm',
+    'lib/App/SpreadRevolutionaryDate/Target/Freenode.pm',
+    'lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm',
+    'lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm',
+    'lib/App/SpreadRevolutionaryDate/Target/Twitter.pm',
     't/00-compile.t',
     't/config.t',
     't/locale.t',
+    't/new_target.t',
     't/objects.t'
 );
 

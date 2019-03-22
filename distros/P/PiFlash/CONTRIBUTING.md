@@ -8,14 +8,21 @@ pull request.
 
 ## Code of conduct
 
-A more detailed code of conduct will be selected as more developers join the PiFlash project.
-To set inital expectations, we'll use the [Contributor Covenant v1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct).
-This expectation applies both ways, and should be used as a gentle reminder to contributors or developers as needed.
+To set expectations for how volunteers work together on this project,
+the [Contributor Covenant v1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct)
+was selected.
+This expectation applies both ways, how you should treat others and what you may expect from others.
+It should be used as a gentle reminder to contributors or developers as needed.
+
+In general, this works better when people are stricter on themselves and try to be more accepting of others.
+Each of us has different styles, which also means we can bring different strengths to the project.
+Anyone in a leadership role should try to bring out the best in the team.
 
 The point of a code of conduct in an Open Source software project is to avoid an unstructured environment where
-the last loud bully standing always wins, after they've caused others to give up and go away.
+the last loud bully standing always wins, often after they've caused others to give up and go away.
 Like it or not, that's human nature - if you allow it by having no standards of behavior, someone *will* do that.
-Even before the Internet, this trend was documented in the 1970s in "[The Tyranny of Structurelessness](https://en.wikipedia.org/wiki/The_Tyranny_of_Structurelessness)".
+Even before the Internet, this trend was documented in the 1970s in
+"[The Tyranny of Structurelessness](https://en.wikipedia.org/wiki/The_Tyranny_of_Structurelessness)".
 It is not a new problem.
 
 ## Submitting an issue

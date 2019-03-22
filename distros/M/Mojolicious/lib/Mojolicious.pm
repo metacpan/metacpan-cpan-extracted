@@ -59,7 +59,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.12';
+our $VERSION  = '8.13';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -1077,6 +1077,8 @@ Maxim Vuets
 Michael Gregorowicz
 
 Michael Harris
+
+Michael Jemmeson
 
 Mike Magowan
 

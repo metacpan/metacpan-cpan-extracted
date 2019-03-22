@@ -8,7 +8,7 @@ package Devel::MAT::Cmd::Terminal;
 use strict;
 use warnings;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use String::Tagged 0.15;  # sprintf
 use String::Tagged::Terminal 0.03;  # ->print_to_terminal

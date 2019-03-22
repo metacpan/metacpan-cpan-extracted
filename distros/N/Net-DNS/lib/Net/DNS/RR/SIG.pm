@@ -15,9 +15,9 @@ sub UNITCHECK {				## restore %SIG after compilation
 package Net::DNS::RR::SIG;
 
 #
-# $Id: SIG.pm 1709 2018-09-07 08:03:09Z willem $
+# $Id: SIG.pm 1729 2019-01-28 09:45:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1709 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1729 $)[1];
 
 
 use strict;
@@ -44,19 +44,13 @@ use constant DEBUG => 0;
 
 use constant UTIL => defined eval 'use Scalar::Util 1.25; 1;';
 
-# IMPORTANT: Distros MUST NOT create dependencies on Net::DNS::SEC	(Prohibited in many territories)
-use constant PRIVATE => 'Net::DNS::SEC::Private';
-use constant DSA     => 'Net::DNS::SEC::DSA';
-use constant RSA     => 'Net::DNS::SEC::RSA';
-use constant ECDSA   => 'Net::DNS::SEC::ECDSA';
-use constant EdDSA   => 'Net::DNS::SEC::EdDSA';
-use constant ECCGOST => 'Net::DNS::SEC::ECCGOST';
-
+# IMPORTANT: Distros MUST NOT create dependencies on Net::DNS::SEC	(strong crypto prohibited in many territories)
 use constant EXISTS => join '', qw(r e q u i r e);		# Defeat static analysers and grep
-use constant DNSSEC => defined( eval join ' ', EXISTS, PRIVATE );
+use constant DNSSEC => defined( eval join ' ', EXISTS, 'Net::DNS::SEC::Private' );
+use constant ACTIVE => DNSSEC && $INC{'Net/DNS/SEC.pm'};	# Discover how we got here, without loading libcrypto
 
-my ($DSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } DSA;
-my ($RSA) = grep { DNSSEC && defined( eval join ' ', EXISTS, $_ ) } RSA;
+my ($RSA) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::RSA';
+my ($DSA) = grep ACTIVE && defined( eval join ' ', EXISTS, $_ ), 'Net::DNS::SEC::DSA';
 
 my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 
@@ -163,7 +157,7 @@ sub _defaults {				## specify RR attribute default values
 		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $algbyname{$key};
 		return $val if defined $val;
-		return $key =~ /^\d/ ? $arg : croak "unknown algorithm $arg";
+		return $key =~ /^\d/ ? $arg : croak qq[unknown algorithm "$arg"];
 	}
 
 	sub _algbyval {
@@ -340,34 +334,33 @@ sub verify {
 	# $keyref is either a key object or a reference to an array
 	# of keys.
 
-	if (DNSSEC) {
+	unless (DNSSEC) {
+		croak 'Net::DNS::SEC support not available';
+	} else {
 		my ( $self, $dataref, $keyref ) = @_;
 
 		if ( my $isa = ref($dataref) ) {
 			print '$dataref argument is ', $isa, "\n" if DEBUG;
-			croak '$dataref can not be ', $isa unless $isa =~ /^Net::DNS::/;
-			croak '$dataref can not be ', $isa unless $dataref->isa('Net::DNS::Packet');
+			croak '$dataref must be scalar or a Net::DNS::Packet'
+					unless $isa =~ /Net::DNS/ && $dataref->isa('Net::DNS::Packet');
 		}
 
 		print '$keyref argument is of class ', ref($keyref), "\n" if DEBUG;
 		if ( ref($keyref) eq "ARRAY" ) {
 
-			#  We will recurse for each key that matches algorithm and key-id
-			#  and return when there is a successful verification.
-			#  If not, we'll continue so that we even survive key-id collision.
-			#  The downside of this is that the error string only matches the
-			#  last error.
+			#  We will iterate over the supplied key list and
+			#  return when there is a successful verification.
+			#  If not, continue so that we survive key-id collision.
 
 			print "Iterating over ", scalar(@$keyref), " keys\n" if DEBUG;
 			my @error;
-			my $i;
 			foreach my $keyrr (@$keyref) {
 				my $result = $self->verify( $dataref, $keyrr );
 				return $result if $result;
 				my $error = $self->{vrfyerrstr};
-				$i++;
-				push @error, "key $i: $error";
-				print "key $i: $error\n" if DEBUG;
+				my $keyid = $keyrr->keytag;
+				push @error, "key $keyid: $error";
+				print "key $keyid: $error\n" if DEBUG;
 				next;
 			}
 
@@ -382,6 +375,7 @@ sub verify {
 			croak join ' ', ref($keyref), 'can not be used as SIG0 key';
 		}
 
+		croak "SIG typecovered is TYPE$self->{typecovered}" if $self->{typecovered};
 
 		if (DEBUG) {
 			print "\n ---------------------- SIG DEBUG ----------------------";
@@ -389,8 +383,6 @@ sub verify {
 			print "\n  KEY:\t", $keyref->string;
 			print "\n -------------------------------------------------------\n";
 		}
-
-		croak "Trying to verify SIG0 using non-SIG0 signature" if $self->{typecovered};
 
 		$self->{vrfyerrstr} = '';
 		unless ( $self->algorithm == $keyref->algorithm ) {
@@ -536,8 +528,9 @@ sub _CreateSig {
 		my $class     = $DNSSEC_sign{$algorithm};
 
 		eval {
-			die "algorithm $algorithm not supported" unless $class;
-			$self->sigbin( $class->sign(@_) );
+			return $self->sigbin( $class->sign(@_) ) if $class;
+			die qq[algorithm $algorithm not supported\n] if ACTIVE;
+			die qq[No "use Net::DNS::SEC" declaration in application code\n];
 		} || croak "${@}signature generation failed";
 	}
 }
@@ -551,8 +544,9 @@ sub _VerifySig {
 		my $class     = $DNSSEC_verify{$algorithm};
 
 		my $retval = eval {
-			die "algorithm $algorithm not supported" unless $class;
-			$class->verify( @_, $self->sigbin );
+			return $class->verify( @_, $self->sigbin ) if $class;
+			die qq[algorithm $algorithm not supported\n] if ACTIVE;
+			die qq[No "use Net::DNS::SEC" declaration in application code\n];
 		};
 
 		unless ($retval) {
@@ -562,7 +556,7 @@ sub _VerifySig {
 		}
 
 		# uncoverable branch true	# bug in Net::DNS::SEC or dependencies
-		croak "unknown error in $class->verify" unless $retval == 1;
+		croak 'unknown error in $class->verify' unless $retval == 1;
 		print "\nalgorithm $algorithm verification successful\n" if DEBUG;
 		return 1;
 	}
@@ -708,8 +702,8 @@ that comes with the ISC BIND distribution.
 The optional remaining arguments consist of ( name => value ) pairs
 as follows:
 
-	sigin  => 20181201010101,	# signature inception
-	sigex  => 20181201011101,	# signature expiration
+	sigin  => 20191201010101,	# signature inception
+	sigex  => 20191201011101,	# signature expiration
 	sigval => 10,			# validity window (minutes)
 
 The sigin and sigex values may be specified as Perl time values or as

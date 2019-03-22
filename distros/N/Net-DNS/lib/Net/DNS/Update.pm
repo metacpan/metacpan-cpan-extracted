@@ -1,9 +1,9 @@
 package Net::DNS::Update;
 
 #
-# $Id: Update.pm 1714 2018-09-21 14:14:55Z willem $
+# $Id: Update.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1714 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 
 =head1 NAME
@@ -16,8 +16,8 @@ Net::DNS::Update - DNS dynamic update packet
 
     $update = new Net::DNS::Update( 'example.com', 'IN' );
 
-    $update->push( prereq => nxrrset('foo.example.com. A') );
-    $update->push( update => rr_add('foo.example.com. 86400 A 192.168.1.2') );
+    $update->push( prereq => nxrrset('foo.example.com. AAAA') );
+    $update->push( update => rr_add('foo.example.com. 86400 AAAA 2001::DB8::1') );
 
 =head1 DESCRIPTION
 
@@ -167,12 +167,13 @@ the corresponding ( name => value ) form may also be used.
     # Create the update packet.
     my $update = new Net::DNS::Update('example.com');
 
-    # Prerequisite is that no A records exist for the name.
+    # Prerequisite is that no address records exist for the name.
     $update->push( pre => nxrrset('foo.example.com. A') );
+    $update->push( pre => nxrrset('foo.example.com. AAAA') );
 
-    # Add two A records for the name.
-    $update->push( update => rr_add('foo.example.com. 86400 A 192.168.1.2') );
-    $update->push( update => rr_add('foo.example.com. 86400 A 172.16.3.4') );
+    # Add two address records for the name.
+    $update->push( update => rr_add('foo.example.com. 86400 A 192.0.2.1') );
+    $update->push( update => rr_add('foo.example.com. 86400 AAAA 2001:DB8::1') );
 
     # Send the update to the zone's primary master.
     my $resolver = new Net::DNS::Resolver;
@@ -219,7 +220,7 @@ the corresponding ( name => value ) form may also be used.
 =head2 Perform a DNS update signed using a BIND private key file
 
     my $update = new Net::DNS::Update('example.com');
-    $update->push( update => rr_add('foo.example.com A 10.1.2.3') );
+    $update->push( update => rr_add('foo.example.com AAAA 2001:DB8::1') );
     $update->sign_tsig( "$dir/Khmac-sha512.example.com.+165+01018.private" );
     my $reply = $resolver->send( $update );
     $reply->verify( $update ) || die $reply->verifyerr;
@@ -243,7 +244,7 @@ the corresponding ( name => value ) form may also be used.
     $tsig->fudge(60);
 
     my $update = new Net::DNS::Update('example.com');
-    $update->push( update     => rr_add('foo.example.com A 10.1.2.3') );
+    $update->push( update     => rr_add('foo.example.com AAAA 2001:DB8::1') );
     $update->push( additional => $tsig );
 
 

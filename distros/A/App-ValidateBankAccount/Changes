@@ -1,5 +1,8 @@
 Revision history for App::ValidateBankAccount
 
+0.05  Fri Mar 22 15:50:00 2019
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.04  Thu Mar 21 14:55:00 2019
       - Added key 'provides' as suggested by CPANTS.
 

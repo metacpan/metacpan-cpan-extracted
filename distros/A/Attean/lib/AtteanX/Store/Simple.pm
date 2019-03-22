@@ -4,7 +4,7 @@ AtteanX::Store::Simple - Simple, unindexed, in-memory RDF store
 
 =head1 VERSION
 
-This document describes AtteanX::Store::Simple version 0.021
+This document describes AtteanX::Store::Simple version 0.022
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ AtteanX::Store::Simple provides an in-memory quad-store.
 use v5.14;
 use warnings;
 
-package AtteanX::Store::Simple 0.021 {
+package AtteanX::Store::Simple 0.022 {
 	use Moo;
 	use Type::Tiny::Role;
 	use Types::Standard qw(Int ArrayRef HashRef ConsumerOf InstanceOf);
@@ -31,8 +31,6 @@ package AtteanX::Store::Simple 0.021 {
 	use namespace::clean;
 
 	with 'Attean::API::QuadStore';
-
-	my @pos_names	= Attean::API::Quad->variables;
 
 =head1 METHODS
 
@@ -59,31 +57,9 @@ predicate and objects. Any of the arguments may be undef to match any value.
 	sub get_quads {
 		my $self	= shift;
 		my @nodes	= @_;
-		my %bound;
-		foreach my $pos (0 .. 3) {
-			my $n	= $nodes[ $pos ];
-			if (blessed($n) and $n->does('Attean::API::Variable')) {
-				$n	= undef;
-				$nodes[$pos]	= undef;
-			}
-			if (blessed($n)) {
-				$bound{ $pos_names[$pos] }	= $n;
-			}
-		}
-		
 		my $quads	= $self->quads;
 		my $iter	= Attean::ListIterator->new( values => $quads, item_type => 'Attean::API::Quad' );
-		return $iter->grep(sub {
-			my $q	= shift;
-			foreach my $key (keys %bound) {
-				my $term	= $q->$key();
-				unless ($term->equals( $bound{$key} )) {
-					return 0;
-				}
-			}
-			return 1;
-		});
-		return $iter;
+		return $iter->matching_pattern(@nodes);
 	}
 
 }
@@ -105,7 +81,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2018 Gregory Todd Williams. This
+Copyright (c) 2014--2019 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

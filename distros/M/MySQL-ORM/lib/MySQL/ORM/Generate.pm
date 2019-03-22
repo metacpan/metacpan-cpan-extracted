@@ -40,7 +40,13 @@ has namespace => (
 has ignore_tables => (
 	is      => 'ro',
 	isa     => 'ArrayRef',
-	default => sub {[]},
+	default => sub { [] },
+);
+
+has only_tables => (
+	is      => 'ro',
+	isa     => 'ArrayRef',
+	default => sub { [] },
 );
 
 ##############################################################################
@@ -59,9 +65,9 @@ has _lite => (
 ##############################################################################
 
 method generate {
-	
+
 	$self->trace;
-	
+
 	my $schema = $self->_lite->get_schema;
 	my @tables = $schema->get_tables;
 	@tables = $self->_prune_tables( \@tables );
@@ -75,7 +81,7 @@ method generate {
 
 	my $db = MySQL::ORM::Generate::Class::Db->new(%new);
 	$db->generate;
-	
+
 	$self->trace('exit');
 }
 
@@ -94,17 +100,38 @@ method _get_ignore_tables_hash {
 	return %ignore;
 }
 
+method _get_only_tables_hash {
+
+	my %only;
+
+	foreach my $t ( @{ $self->only_tables } ) {
+		$only{$t} = 1;
+	}
+
+	return %only;
+}
+
 method _prune_tables (ArrayRef $tables) {
 
 	my @pruned;
-	my %prune = $self->_get_ignore_tables_hash;
-	
-	foreach my $t (@$tables) {
-		if ( !$prune{ $t->name } ) {
-			push @pruned, $t;
+
+	if ( @{ $self->only_tables } > 0 ) {
+		my %prune = $self->_get_only_tables_hash;
+		foreach my $t (@$tables) {
+			if ( $prune{ $t->name } ) {
+				push @pruned, $t;
+			}
 		}
 	}
-	
+	else {
+		my %prune = $self->_get_ignore_tables_hash;
+		foreach my $t (@$tables) {
+			if ( !$prune{ $t->name } ) {
+				push @pruned, $t;
+			}
+		}
+	}
+
 	return @pruned;
 }
 

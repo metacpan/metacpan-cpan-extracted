@@ -1,4 +1,4 @@
-# $Id: 01-resolver-file.t 1709 2018-09-07 08:03:09Z willem $
+# $Id: 01-resolver-file.t 1729 2019-01-28 09:45:47Z willem $
 
 use strict;
 use File::Spec;
@@ -58,8 +58,8 @@ my $config = File::Spec->catfile(qw(t custom.txt));		# .txt to run on Windows
 
 {								# file presumed not to exist
 	eval { new $class( config_file => 'nonexist.txt' ); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "new( config_file => ?\t[$exception]" );
+	my ($exception) = split /\n/, "$@\n";
+	ok( $exception, "new( config_file => ?\t[$exception]" );
 }
 
 

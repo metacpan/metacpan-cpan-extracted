@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
 #
-# $Id: Text.pm 1698 2018-07-24 15:29:05Z willem $
+# $Id: Text.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1698 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 
 =head1 NAME
@@ -231,22 +231,18 @@ sub _encode_utf8 {			## perl internal encoding to UTF-8
 
 
 %escape = eval {			## precalculated ASCII/UTF-8 escape table
-	my %table;
 	my @C0 = ( 0 .. 31 );					# control characters
 	my @NA = UTF8 ? ( 192, 193, 216 .. 223, 245 .. 255 ) : ( 128 .. 255 );
 
-	foreach ( 0 .. 255 ) {					# transparent
-		$table{pack( 'C', $_ )} = pack 'C', $_;
-	}
-
-	foreach ( 34, 40, 41, 59 ) {				# character escape	" ( ) ;
-		$table{pack( 'C', $_ )} = pack 'C2', 92, $_;
-	}
+	my %table = (						# transparent,	    \" \( \) \; \\
+		map( ( $_ => $_ ), map pack( 'C', $_ ), ( 0 .. 255 ) ),
+		map( ( pack( 'C', $_ ) => pack( 'C2', 92, $_ ) ), ( 34, 40, 41, 59, 92 ) ),
+		);
 
 	foreach my $n ( @C0, 92, 127, @NA ) {			# numerical escape
 		my $codepoint = sprintf( '%03u', $n );
 
-		# partial transliteration for non-ASCII character encodings
+		# transliteration for non-ASCII character encodings
 		$codepoint =~ tr [0-9] [\060-\071];
 
 		$table{pack( 'C', $n )} = pack 'C a3', 92, $codepoint;
@@ -262,12 +258,12 @@ sub _encode_utf8 {			## perl internal encoding to UTF-8
 	foreach my $n ( 0 .. 255 ) {
 		my $key = sprintf( '%03u', $n );
 
-		# partial transliteration for non-ASCII character encodings
+		# transliteration for non-ASCII character encodings
 		$key =~ tr [0-9] [\060-\071];
 
 		$table{$key} = pack 'C', $n;
-		$table{$key} = pack 'C2', 92, $n if $n == 92;	   # escaped escape
 	}
+	$table{"\060\071\062"} = pack 'C2', 92, 92;		# escaped escape
 
 	return %table;
 };

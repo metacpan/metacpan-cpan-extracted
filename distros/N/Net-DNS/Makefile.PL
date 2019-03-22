@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1719 2018-11-04 05:01:43Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1726 2018-12-15 12:59:56Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -42,7 +42,7 @@ my %prerequisite = (
 	'IO::File'	 => 1.08,
 	'IO::Select'	 => 1.14,
 	'IO::Socket::IP' => 0.38,
-	'MIME::Base64'	 => 2.11,
+	'MIME::Base64'	 => 2.13,
 	'PerlIO'	 => 1.05,
 	'Scalar::Util'	 => 1.25,
 	'Time::Local'	 => 1.19,

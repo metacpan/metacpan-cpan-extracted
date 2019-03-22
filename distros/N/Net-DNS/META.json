@@ -12,7 +12,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-DNS",
    "no_index" : {
@@ -45,7 +45,7 @@
             "IO::File" : "1.08",
             "IO::Select" : "1.14",
             "IO::Socket::IP" : "0.38",
-            "MIME::Base64" : "2.11",
+            "MIME::Base64" : "2.13",
             "PerlIO" : "1.05",
             "Scalar::Util" : "1.25",
             "Test::More" : "0.52",
@@ -55,6 +55,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.19",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "1.20",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

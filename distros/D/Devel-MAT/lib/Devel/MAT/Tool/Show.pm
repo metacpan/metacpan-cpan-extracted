@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Show;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use List::Util qw( max );
 
@@ -96,6 +96,14 @@ sub run
       ) if $magic->ptr;
 
       Devel::MAT::Cmd->printf( "\n" );
+   }
+
+   if( defined( my $serial = $sv->debug_serial ) ) {
+      Devel::MAT::Cmd->printf( "  debug serial %d\n", $serial );
+
+      my $file = $sv->debug_file;
+      Devel::MAT::Cmd->printf( "  created at %s:%d\n", $file, $sv->debug_line )
+         if defined $file;
    }
 
    my $type = ref $sv; $type =~ s/^Devel::MAT::SV:://;
@@ -240,12 +248,23 @@ sub show_PAD
    $padcv ? say_with_sv( "  padcv=", $padcv )
           : Devel::MAT::Cmd->printf( "  no padcv\n" );
 
+   $self->show_PAD_contents( $pad );
+}
+
+sub show_PAD_contents
+{
+   my $self = shift;
+   my ( $pad ) = @_;
+
+   my $padcv = $pad->padcv;
+
    my @elems = $pad->elems;
    my @padnames = map {
       my $padname = $padcv->padname( $_ );
       $padname ? $padname->name : undef
    } 0 .. $#elems;
-   my $maxname = max map { defined $_ ? length $_ : 0 } @padnames;
+   my $idxlen  = length $#elems;
+   my $namelen = max map { defined $_ ? length $_ : 0 } @padnames;
 
    my %padtype;
    if( my $gvix = $padcv->{gvix} ) {
@@ -255,19 +274,25 @@ sub show_PAD
       $padtype{$_} = "CONST" for @$constix;
    }
 
+   Devel::MAT::Cmd->printf( "  [%*d/%-*s]=%s\n",
+      $idxlen, 0,
+      $namelen, Devel::MAT::Cmd->format_note( '@_', 1 ),
+      Devel::MAT::Cmd->format_sv_with_value( $elems[0] ),
+   );
+
    foreach my $padix ( 1 .. $#elems ) {
       my $sv = $elems[$padix];
       if( $padnames[$padix] ) {
-         Devel::MAT::Cmd->printf( "  [%3d/%-*s]=%s\n",
-            $padix,
-            $maxname, Devel::MAT::Cmd->format_note( $padnames[$padix], 1 ),
+         Devel::MAT::Cmd->printf( "  [%*d/%-*s]=%s\n",
+            $idxlen, $padix,
+            $namelen, Devel::MAT::Cmd->format_note( $padnames[$padix], 1 ),
             ( $sv ? Devel::MAT::Cmd->format_sv_with_value( $sv ) : "NULL" ),
          );
       }
       else {
-         Devel::MAT::Cmd->printf( "  [%3d %-*s]=%s\n",
-            $padix,
-            $maxname, $padtype{$padix} // "",
+         Devel::MAT::Cmd->printf( "  [%*d %-*s]=%s\n",
+            $idxlen, $padix,
+            $namelen, $padtype{$padix} // "",
             ( $sv ? Devel::MAT::Cmd->format_sv( $sv ) : "NULL" ),
          );
       }

@@ -1,9 +1,9 @@
 package Net::DNS::Domain;
 
 #
-# $Id: Domain.pm 1698 2018-07-24 15:29:05Z willem $
+# $Id: Domain.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1698 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 
 =head1 NAME
@@ -312,21 +312,15 @@ sub _encode_utf8 {			## perl internal encoding to UTF8
 
 
 %escape = eval {			## precalculated ASCII escape table
-	my %table;
-
-	foreach ( 33 .. 126 ) {					# ASCII printable
-		$table{pack( 'C', $_ )} = pack 'C', $_;
-	}
-
-	# minimal character escapes
-	foreach ( 46, 92 ) {					# \. \\
-		$table{pack( 'C', $_ )} = pack 'C*', 92, $_;
-	}
+	my %table = (						# ASCII printable,	\. \\
+		map( ( $_ => $_ ), map pack( 'C', $_ ), ( 33 .. 126 ) ),
+		map( ( pack( 'C', $_ ) => pack( 'C2', 92, $_ ) ), ( 46, 92 ) ),
+		);
 
 	foreach my $n ( 0 .. 32, 127 .. 255 ) {			# \ddd
 		my $codepoint = sprintf( '%03u', $n );
 
-		# partial transliteration for non-ASCII character encodings
+		# transliteration for non-ASCII character encodings
 		$codepoint =~ tr [0-9] [\060-\071];
 
 		$table{pack( 'C', $n )} = pack 'C a3', 92, $codepoint;
@@ -342,12 +336,12 @@ sub _encode_utf8 {			## perl internal encoding to UTF8
 	foreach my $n ( 0 .. 255 ) {
 		my $key = sprintf( '%03u', $n );
 
-		# partial transliteration for non-ASCII character encodings
+		# transliteration for non-ASCII character encodings
 		$key =~ tr [0-9] [\060-\071];
 
 		$table{$key} = pack 'C', $n;
-		$table{$key} = pack 'C2', 92, $n if $n == 92;	   # escaped escape
 	}
+	$table{"\060\071\062"} = pack 'C2', 92, 92;		# escaped escape
 
 	return %table;
 };

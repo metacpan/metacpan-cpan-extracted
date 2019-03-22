@@ -119,12 +119,9 @@ sub test_construction {
     my $obj = $factory->(regular=>1, medint=>10);
     isa_ok($obj, $class);
 
-    TODO: {
-        local $TODO = "#4 not yet implemented";
-        dies_ok { $factory->(regular=>1, medint=>$_) }
-            "$class medint=>$_ fails constraint"
-            foreach (9, 20, 'oops', '', \*STDOUT);
-    }
+    dies_ok { $factory->(regular=>1, medint=>$_) }
+        "$class medint=>$_ fails constraint"
+        foreach (9, 20, 'oops', '', \*STDOUT);
 
 } #test_construction
 

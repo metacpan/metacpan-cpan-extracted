@@ -51,7 +51,7 @@
             "Test2::Bundle::Extended" : "0",
             "Test2::Plugin::NoWarnings" : "0",
             "Test2::Tools::Explain" : "0",
-            "Test::MockModule" : "0",
+            "Test::MockModule" : "0.13",
             "Test::More" : "0"
          }
       }
@@ -59,7 +59,7 @@
    "provides" : {
       "Slack::WebHook" : {
          "file" : "lib/Slack/WebHook.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/atoomic/Slack-WebHook.git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026002"
@@ -405,7 +405,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.001",
+                  "tag" : "v0.002",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

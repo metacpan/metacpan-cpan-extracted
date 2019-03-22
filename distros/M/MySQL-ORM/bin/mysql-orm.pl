@@ -25,6 +25,7 @@ use vars qw(
   $Namespace
   $Port
   $Ignore
+  $Only
   %Dispatch
   $Action
 );
@@ -51,15 +52,17 @@ sub generate {
 	$new{dbh} = get_dbh();				
 	$new{dir} = $Dir if $Dir;
 	$new{namespace} = $Namespace if $Namespace;
-	$new{ignore_tables} = parse_ignore_tables() if $Ignore;
+	$new{ignore_tables} = parse_csv($Ignore) if $Ignore;
+	$new{only_tables} = parse_csv($Only) if $Only;
 	
 	my $gen = MySQL::ORM::Generate->new(%new);
 	$gen->generate;
 }
 
-sub parse_ignore_tables {
+sub parse_csv {
 
-	my @list = split(/,/, $Ignore);
+	my $str = shift;
+	my @list = split(/,/, $str);
 	return \@list;	
 }
 
@@ -90,6 +93,7 @@ sub parse_cmd_line {
 		'D=s'    => \$Dir,
 		'i=s'    => \$Ignore,
 		'n=s'    => \$Namespace,
+		'o=s' => \$Only,
 		'P=s'    => \$Port,
 		"help|?" => \$help
 	);
@@ -130,10 +134,11 @@ $basename <action> -d <dbname> -u <user> [opts]
     OPTIONAL ARGS:
       [ -D <dest dir> ]      (default is .)
       [ -h <hostname> ]      (default localhost)
-      [ -n <namespace> ]  
-      [ -p <password> ]
-      [ -P <port> ]          
       [ -i <ignore tables> ] (comma sep list)
+      [ -n <namespace> ]  
+      [ -o <only tables> ]      
+      [ -p <password> ]
+      [ -P <port> ]    
       [-?] (usage)
      
 HERE

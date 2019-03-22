@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.7.0');
+our $VERSION = version->new('0.7.1');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -43,6 +43,7 @@ sub main {
             sub_command   => 1,
             auto_complete => \&auto,
             conf_prefix   => '',
+            conf_section  => 'defaults',
             default       => {
                 max      => 10,
                 runtime  => 600,
@@ -55,7 +56,7 @@ sub main {
             'skip|s=s',
             'match|m=s',
             'max|M=i',
-            'runtime|max-runtime|R=i',
+            'runtime|max-runtime|mr=i',
             'remote|R!',
             'limit|l=i',
             'recurse|r!',
@@ -64,6 +65,7 @@ sub main {
             'test|T!',
             'bw',
             'separate|S!',
+            'defaults|d=s',
             'verbose|v+',
             'quiet|q',
         ]
@@ -119,6 +121,7 @@ sub main {
             next if $exclude{$project};
             next if %include && !$include{$project};
             next if !tagged($conf, $opt->tag, $project, $group->repos->{$project});
+            next if exclude_tagged($conf, $project, $group->repos->{$project});
             last if $opt->limit && $total++ >= $opt->limit;
 
             push @threads, {
@@ -233,6 +236,20 @@ sub sorter {
     return lc $A cmp lc $B;
 }
 
+my $exclude_tagged;
+sub exclude_tagged {
+    my ($conf, $project, $object) = @_;
+
+    if ( !defined $exclude_tagged ) {
+        $exclude_tagged = { map { $_ => 1 } @{ $conf->{'exclude-tags'} || [] } };
+    }
+
+    my $Project = $exclude_tagged->{$project};
+    my $Object  = ( scalar grep { $object->tags->{$_} } keys %{$exclude_tagged} );
+    my $Dynamic = ( scalar grep { dyna_tags($_, $project) } keys %{$exclude_tagged} );
+    return $Project || $Object || $Dynamic;
+}
+
 my $tagged;
 sub tagged {
     my ($conf, $tag, $project, $object) = @_;
@@ -321,7 +338,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.7.0.
+This documentation refers to group-git version 0.7.1.
 
 =head1 SYNOPSIS
 
@@ -353,6 +370,8 @@ This documentation refers to group-git version 0.7.0.
   -S --separate Add a new line separator before each repository output (Default)
      --no-separate
                 Don't show the new repository separator
+  -d --defaults[=]section
+                Specify a different default configuration section
   -q --quiet    Don't show project names before running git on the directory
   -v --verbose  Show more details
 

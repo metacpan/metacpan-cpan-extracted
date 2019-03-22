@@ -32,7 +32,7 @@ no_index:
 provides:
   Class::Tiny::ConstrainedAccessor:
     file: lib/Class/Tiny/ConstrainedAccessor.pm
-    version: '0.000003'
+    version: '0.000004'
 requires:
   Class::Tiny: '0'
   perl: '5.006'
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues
   repository: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor
-version: '0.000003'
+version: '0.000004'
 x_contributors:
   - 'Christopher White <cxw@cpan.org>'
   - 'Toby Inkster <tobyink@cpan.org>'

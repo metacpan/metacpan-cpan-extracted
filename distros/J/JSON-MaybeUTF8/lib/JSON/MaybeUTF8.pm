@@ -4,7 +4,7 @@ package JSON::MaybeUTF8;
 use strict;
 use warnings;
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 =head1 NAME
 
@@ -39,6 +39,20 @@ use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 
 use Exporter qw(import export_to_level);
 
+=head2 BOM removal
+
+The C<< $JSON::Maybe::UTF8::REMOVE_BOM >> flag is B<set by default> due
+to L<https://github.com/rurban/Cpanel-JSON-XS/issues/125>. If you would
+prefer to disable this, add C<< $JSON::Maybe::UTF8::REMOVE_BOM = 0; >>
+in your code.
+
+Note that this only affects things when L<Cpanel::JSON::XS> is used (preferred by L<JSON::MaybeXS>
+if it can be loaded).
+
+=cut
+
+our $REMOVE_BOM = 1;
+
 our @EXPORT_OK = qw(
     decode_json_utf8
     encode_json_utf8
@@ -52,13 +66,17 @@ our %EXPORT_TAGS = (
 =head2 decode_json_utf8
 
 Given a UTF-8-encoded JSON byte string, returns a Perl data
-structure.
+structure. May optionally remove the UTF-8 L<BOM|https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8>
+if it exists.
 
 =cut
 
 sub decode_json_utf8 {
     state $json = JSON::MaybeXS->new;
-    $json->decode(decode_utf8(shift))
+    die 'bad json state' if $json->get_utf8;
+    return $json->decode_utf8($_[0]) unless $REMOVE_BOM;
+    (my $txt = decode_utf8(shift)) =~ s{^\x{feff}}{};
+    return $json->decode($txt);
 }
 
 =head2 encode_json_utf8
@@ -70,6 +88,7 @@ byte string.
 
 sub encode_json_utf8 {
     state $json = JSON::MaybeXS->new;
+    die 'bad json state' if $json->get_utf8;
     encode_utf8($json->encode(shift))
 }
 
@@ -82,7 +101,10 @@ Perl's internal encoding), returns a Perl data structure.
 
 sub decode_json_text {
     state $json = JSON::MaybeXS->new;
-    $json->decode(shift)
+    die 'bad json state' if $json->get_utf8;
+    my $txt = shift;
+    $txt =~ s{^\x{feff}}{} if $REMOVE_BOM;
+    $json->decode($txt);
 }
 
 =head2 encode_json_text
@@ -94,6 +116,7 @@ of Unicode characters (in Perl's internal encoding).
 
 sub encode_json_text {
     state $json = JSON::MaybeXS->new;
+    die 'bad json state' if $json->get_utf8;
     $json->encode(shift)
 }
 

@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use constant CMD => "stack";
 use constant CMD_DESC => "Display the value stack";
@@ -30,7 +30,7 @@ showing the SVs in place there.
 =head2 stack
 
    pmat> stack
-   [1]: SCALAR(PV) at 0x55cde0fa0830
+   [1]: SCALAR(PV) at 0x55cde0fa0830 = "tiny.pmat"
    [0]: UNDEF at 0x55cde0f71398
 
 Prints SVs on the value stack.
@@ -46,7 +46,7 @@ sub run
       my $sv = $stacksvs[$idx];
 
       Devel::MAT::Cmd->printf( "[%d]: %s\n",
-         $idx, Devel::MAT::Cmd->format_sv( $sv )
+         $idx, Devel::MAT::Cmd->format_sv_with_value( $sv )
       );
    }
 }

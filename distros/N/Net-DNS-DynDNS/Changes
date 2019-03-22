@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  0.9994 - 22 Mar 2019
+
+      * Replacing failing to build Crypt::SSLeay with LWP::Protocol::https
+
   0.9993 - 01 Nov 2015
 
       * POD fixes

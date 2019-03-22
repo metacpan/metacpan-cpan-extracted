@@ -1,0 +1,84 @@
+{
+   "abstract" : "App to manage a collection of film cameras & lenses",
+   "author" : [
+      "Jonathan Gazeley <me@jonathangazeley.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-PhotoDB",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Select" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Pod::Select" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Utils" : "0",
+            "Config::IniHash" : "0",
+            "DB::SQL::Migrations" : "0",
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
+            "Image::ExifTool" : "0",
+            "Path::Iterator::Rule" : "0",
+            "Perl::Critic" : "0",
+            "SQL::Abstract" : "0",
+            "Term::ReadKey" : "0",
+            "Text::TabularDisplay" : "0",
+            "YAML" : "0",
+            "experimental" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0.47",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::PhotoDB" : {
+         "file" : "lib/App/PhotoDB.pm"
+      },
+      "App::PhotoDB::commands" : {
+         "file" : "lib/App/PhotoDB/commands.pm"
+      },
+      "App::PhotoDB::funcs" : {
+         "file" : "lib/App/PhotoDB/funcs.pm"
+      },
+      "App::PhotoDB::handlers" : {
+         "file" : "lib/App/PhotoDB/handlers.pm"
+      },
+      "App::PhotoDB::queries" : {
+         "file" : "lib/App/PhotoDB/queries.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

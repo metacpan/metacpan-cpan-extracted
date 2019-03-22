@@ -9,7 +9,7 @@ use Digest::SHA();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
@@ -23,7 +23,8 @@ sub new {
         $self->{ua} = $params{user_agent};
     }
     else {
-        $self->{ua} = LWP::UserAgent->new( agent => 'WebService-HIBP ' );
+        $self->{ua} =
+          LWP::UserAgent->new( agent => "WebService-HIBP/$VERSION " );
         $self->{ua}->env_proxy();
     }
     return $self;
@@ -182,7 +183,7 @@ WebService::HIBP - An interface to the Have I Been Pwned webservice at haveibeen
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 

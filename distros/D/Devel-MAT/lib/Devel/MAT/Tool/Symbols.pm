@@ -10,7 +10,7 @@ use warnings;
 use 5.014; # s///r
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use constant CMD => "symbols";
 use constant CMD_DESC => "Display a list of the symbol table";

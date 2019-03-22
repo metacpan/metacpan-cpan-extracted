@@ -1,4 +1,4 @@
-# $Id: 05-OPT.t 1717 2018-10-12 13:14:42Z willem $	-*-perl-*-
+# $Id: 05-OPT.t 1727 2018-12-31 12:04:48Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -6,9 +6,8 @@ use Test::More;
 use Net::DNS;
 use Net::DNS::Parameters;
 
-my @opt = keys %Net::DNS::Parameters::ednsoptionbyval;
 
-plan tests => 42 + scalar(@opt);
+plan tests => 41 + scalar( keys %Net::DNS::Parameters::ednsoptionbyval );
 
 
 my $name = '.';
@@ -186,12 +185,6 @@ foreach my $method (qw(class ttl)) {
 	eval { $edns->option( 65001 => ( '', '' ) ) };
 	chomp $@;
 	ok( $@, "unable to compose option:\t[$@]" );
-
-
-	my $bogus = 'BOGUS-OPTION';
-	eval { ednsoptionbyname($bogus) };
-	chomp $@;
-	ok( $@, "ednsoptionbyname($bogus)\t[$@]" );
 
 
 	my $options = $edns->options;

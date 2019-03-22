@@ -26,13 +26,13 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.4.0
+version 0.4.1
 
 =head1 SYNOPSIS
 
- piflash [--verbose] [--resize] input-file output-device
+ piflash [--verbose] [--resize] [--config conf-file] input-file output-device
 
- piflash [--verbose] --sdsearch
+ piflash [--verbose] [--config conf-file] --sdsearch
 
  piflash --version
 
@@ -171,7 +171,7 @@ The prerequisites of this distribution will also have to be installed manually. 
 prerequisites are listed in one of the files: `MYMETA.yml` or `MYMETA.json` generated
 by running the manual build process described above.
 
-=head3 Configure Prerequisites
+=head3 Configure prerequisites
 
 This distribution requires other modules to be installed before this
 distribution's installer can be run.  They can be found under the
@@ -188,10 +188,14 @@ You can run `perldoc` from a shell to read the documentation:
 For more information on installing Perl modules via CPAN, please see:
 L<https://www.cpan.org/modules/INSTALL.html>
 
+=head3 Online resources
+
+A list of online resources for PiFlash is at L<https://github.com/ikluft/piflash/blob/master/doc/resources.md>
+including where to download Raspberry Pi bootable image files and articles/presentations about PiFlash.
+
 =head2 Bug reporting
 
-Report bugs via GitHub at L<https://github.com/ikluft/piflash/issues> - this location may eventually change
-if piflash becomes popular enough to warrant having its own source code repository.
+Report bugs via GitHub at L<https://github.com/ikluft/piflash/issues>
 
 When reporting a bug, please include the full output using the --verbose option. That will include all of the
 program's state information, which will help understand the bigger picture what was happening on your system.

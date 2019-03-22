@@ -12,6 +12,8 @@ t/01-type-tiny.t
 t/02-moosex-types.t
 t/03-invalid-invocation.t
 t/04-bad-defaults-type-tiny.t
+t/05-type-tiny-build.t
+t/06-type-tiny-nobuild.t
 t/10-moox-types-mooselike.t
 t/11-mousex-types.t
 t/12-specio.t
@@ -21,6 +23,8 @@ t/MY/Class/MouseXTypes.pm
 t/MY/Class/Specio.pm
 t/MY/Class/TypeTiny.pm
 t/MY/Class/TypeTinyBadDefaults.pm
+t/MY/Class/TypeTinyBUILD.pm
+t/MY/Class/TypeTinyNOBUILD.pm
 t/MY/Kit.pm
 t/MY/Tests.pm
 t/MY/TypeLib/MooXTypesMooseLike.pm

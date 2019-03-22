@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.10
+    Version 0.11
 
 SYNOPSIS
 
@@ -65,7 +65,7 @@ SUBROUTINES/METHODS
     method searches the results of the response for a matching hash suffix.
 
     This method then returns the count of how many times it appears in the
-    data set or "0" if it dosen't appear.
+    data set or "0" if it doesn't appear.
 
         use WebService::HIBP();
         use IO::Prompt();

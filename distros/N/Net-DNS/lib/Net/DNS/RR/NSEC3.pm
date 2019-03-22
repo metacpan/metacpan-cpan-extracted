@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3;
 
 #
-# $Id: NSEC3.pm 1694 2018-07-16 04:19:40Z willem $
+# $Id: NSEC3.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1694 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 
 use strict;
@@ -48,7 +48,7 @@ my %digest = (
 		my $name = shift;
 		my $key	 = uc $name;				# synthetic key
 		$key =~ s /[\W_]//g;				# strip non-alphanumerics
-		$digestbyname{$key} || croak "unknown digest type $name";
+		$digestbyname{$key} || croak qq[unknown digest type "$name"];
 	}
 
 	sub _digestbyval {
@@ -64,13 +64,14 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 	my $limit = $offset + $self->{rdlength};
 	my $ssize = unpack "\@$offset x4 C", $$data;
-	@{$self}{qw(algorithm flags iterations saltbin)} = unpack "\@$offset CCnx a$ssize", $$data;
+	my ( $algorithm, $flags, $iterations, $saltbin ) = unpack "\@$offset CCnx a$ssize", $$data;
+	@{$self}{qw(algorithm flags iterations saltbin)} = ( $algorithm, $flags, $iterations, $saltbin );
 	$offset += 5 + $ssize;
 	my $hsize = unpack "\@$offset C", $$data;
 	$self->{hnxtname} = unpack "\@$offset x a$hsize", $$data;
 	$offset += 1 + $hsize;
 	$self->{typebm} = substr $$data, $offset, ( $limit - $offset );
-	$self->{hashfn} = _hashfn( @{$self}{qw(algorithm iterations saltbin)} );
+	$self->{hashfn} = _hashfn( $algorithm, $iterations, $saltbin );
 }
 
 
@@ -99,14 +100,14 @@ sub _format_rdata {			## format rdata portion of RR string.
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
-	$self->algorithm(shift);
+	my $alg = $self->algorithm(shift);
 	$self->flags(shift);
-	$self->iterations(shift);
+	my $iter = $self->iterations(shift);
 	my $salt = shift;
 	$self->salt($salt) unless $salt eq '-';
 	$self->hnxtname(shift);
 	$self->typelist(@_);
-	$self->{hashfn} = _hashfn( @{$self}{qw(algorithm iterations saltbin)} );
+	$self->{hashfn} = _hashfn( $alg, $iter, $self->{saltbin} );
 }
 
 

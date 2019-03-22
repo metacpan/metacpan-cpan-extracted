@@ -1,123 +1,92 @@
-# $Id: 01-resolver.t 1709 2018-09-07 08:03:09Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1729 2019-01-28 09:45:47Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 27;
+use Test::More tests => 22;
 
 use Net::DNS::Resolver;
+use Net::DNS::Resolver::Recurse;
 
-local $ENV{'RES_NAMESERVERS'};
-local $ENV{'RES_SEARCHLIST'};
-local $ENV{'LOCALDOMAIN'};
-local $ENV{'RES_OPTIONS'};
+my @NOIP = qw(:: 0.0.0.0);
 
+{					## sabotage socket code
 
-BEGIN {
-	eval {
-		open( TOUCH, '>.resolv.conf' ) || die $!;	# owned by effective UID
-		close(TOUCH);
-	};
+	package IO::Socket::INET;
+	sub new { }			## stub
+
+	package IO::Socket::IP;
+	sub new { }			## stub
 }
 
 
-my $resolver = Net::DNS::Resolver->new();
-my $class    = ref($resolver);
-
-for (@Net::DNS::Resolver::ISA) {
-	diag $_ unless /[:]UNIX$/;
-}
-
-ok( $resolver->isa('Net::DNS::Resolver'), 'new() created object' );
-
-ok( $resolver->print, '$resolver->print' );
-
-ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' );
+my $resolver = Net::DNS::Resolver->new( retrans => 0, retry => 0 );
 
 
-{					## check class methods
-	$class->nameservers(qw(127.0.0.1 ::1));
-	ok( scalar( $class->nameservers ), '$class->nameservers' );
-	$class->searchlist(qw(sub1.example.com sub2.example.com));
-	ok( scalar( $class->searchlist ), '$class->searchlist' );
-	$class->domain('example.com');
-	ok( $class->domain,	   '$class->domain' );
-	ok( $class->srcport(1234), '$class->srcport' );
-	ok( $class->string(),	   '$class->string' );
-}
+$resolver->defnames(0);			## exercise query()
+ok( !$resolver->query(''), '$resolver->query() without defnames' );
+
+$resolver->defnames(1);
+ok( !$resolver->query(''), '$resolver->query() with defnames' );
 
 
-{					## check instance methods
-	ok( $resolver->domain('example.com'),	  '$resolver->domain' );
-	ok( $resolver->searchlist('example.com'), '$resolver->searchlist' );
-	$resolver->nameservers(qw(127.0.0.1 ::1));
-	ok( scalar( $resolver->nameservers() ), '$resolver->nameservers' );
-}
+$resolver->dnsrch(0);			## exercise search()
+ok( !$resolver->search('name'), '$resolver->search() without dnsrch' );
+
+$resolver->dnsrch(1);
+$resolver->ndots(1);
+ok( !$resolver->search('name'),	       '$resolver->search() simple name' );
+ok( !$resolver->search('name.domain'), '$resolver->search() dotted name' );
+
+$resolver->ndots(2);
+ok( !$resolver->search(''), '$resolver->search() with ndots > 1' );
 
 
-{
-	my $resolver = Net::DNS::Resolver->new();
-	$resolver->nameservers(qw(127.0.0.1 ::1 ::ffff:127.0.0.1 fe80::1234%1));
-	$resolver->force_v4(0);					# set by default if no IPv6
-	$resolver->prefer_v6(1);
-	my ($address) = $resolver->nameserver();
-	is( $address, '::1', '$resolver->prefer_v6(1)' );
-}
+my $query = new Net::DNS::Packet('.');	## exercise _accept_reply()
+my $reply = new Net::DNS::Packet('.');
+$reply->header->qr(1);
+
+ok( !$resolver->_accept_reply(undef), '_accept_reply()	no reply' );
+
+ok( !$resolver->_accept_reply($query), '_accept_reply()	qr not set' );
+
+ok( !$resolver->_accept_reply( $reply, $query ), '_accept_reply()	id mismatch' );
+
+ok( $resolver->_accept_reply( $reply, $reply ), '_accept_reply()	id match' );
+ok( $resolver->_accept_reply( $reply, undef ),	'_accept_reply()	query absent/undefined' );
+
+is( scalar( Net::DNS::Resolver::Base::_cname_addr( undef, undef ) ), 0, '_cname_addr()	no reply packet' );
 
 
-{
-	my $resolver = Net::DNS::Resolver->new();
-	$resolver->nameservers(qw(127.0.0.1 ::1));
-	$resolver->force_v6(0);
-	$resolver->prefer_v4(1);
-	my ($address) = $resolver->nameserver();
-	is( $address, '127.0.0.1', '$resolver->prefer_v4(1)' );
-}
+$resolver->nameservers();		## exercise UDP failure path
+ok( !$resolver->send('.'), 'no UDP nameservers' );
+
+$resolver->nameservers(@NOIP);
+ok( !$resolver->send('.'),   '$resolver->send	UDP socket error' );
+ok( !$resolver->bgsend('.'), '$resolver->bgsend UDP socket error' );
 
 
-{
-	my $resolver = Net::DNS::Resolver->new();
-	$resolver->force_v6(1);
-	ok( !$resolver->nameservers(qw(127.0.0.1)), '$resolver->force_v6(1)' );
-	like( $resolver->errorstring, '/IPv4.+disabled/', 'errorstring: IPv4 disabled' );
-}
+$resolver->usevc(1);			## exercise TCP failure path
+$resolver->nameservers();
+ok( !$resolver->send('.'), 'no TCP nameservers' );
+
+$resolver->nameservers(@NOIP);
+ok( !$resolver->send('.'),	  '$resolver->send   TCP socket error' );
+ok( !$resolver->bgsend('.'),	  '$resolver->bgsend TCP socket error' );
+ok( !scalar( $resolver->axfr() ), '$resolver->axfr   TCP socket error' );
 
 
-{
-	my $resolver = Net::DNS::Resolver->new();
-	$resolver->force_v4(1);
-	ok( !$resolver->nameservers(qw(::)), '$resolver->force_v4(1)' );
-	like( $resolver->errorstring, '/IPv6.+disabled/', 'errorstring: IPv6 disabled' );
-}
+my $res = Net::DNS::Resolver::Recurse->new();
+$res->hints(@NOIP);
+ok( !$res->send( 'www.net-dns.org', 'A' ), 'fail if no usable hint' );
+
+$res->nameservers(@NOIP);
+ok( !$res->send( 'www.net-dns.org', 'A' ), 'fail if no reachable server' );
 
 
-{
-	my $resolver = Net::DNS::Resolver->new();
-	foreach my $ip (qw(127.0.0.1 ::1)) {
-		is( $resolver->srcaddr($ip), $ip, "\$resolver->srcaddr($ip)" );
-	}
-}
+my $warning;
+local $SIG{__WARN__} = sub { ($warning) = split /\n/, "@_\n" };
 
-
-{					## exercise possibly unused socket code
-					## check for smoke and flames only
-	my $resolver = Net::DNS::Resolver->new( tcp_timeout => 1 );
-	foreach my $ip (qw(127.0.0.1 ::1)) {
-		eval { $resolver->_create_udp_socket($ip) };
-		is( $@, '', "\$resolver->_create_udp_socket($ip)" );
-		eval { $resolver->_create_dst_sockaddr( $ip, 53 ) };
-		is( $@, '', "\$resolver->_create_dst_sockaddr($ip,53)" );
-		eval { $resolver->_create_tcp_socket($ip) };
-		is( $@, '', "\$resolver->_create_tcp_socket($ip)" );
-	}
-}
-
-
-{					## check for exception on bogus AUTOLOAD method
-	eval { $resolver->bogus(); };
-	my $exception = $1 if $@ =~ /^(.+)\n/;
-	ok( $exception ||= '', "unknown method:\t[$exception]" );
-
-	is( $resolver->DESTROY, undef, 'DESTROY() exists to defeat pre-5.18 AUTOLOAD' );
-}
+$resolver->nameserver('bogus.example.com.');
+ok( $warning, "unresolved nameserver warning\t[$warning]" );
 
 
 eval {					## exercise warning for make_query_packet()

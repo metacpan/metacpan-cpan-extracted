@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2019 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Dumpfile;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -507,6 +507,17 @@ sub _read_svx_87
    my ( $sv, $bytes, $ptrs, $strs ) = @_;
 
    $sv->_more_annotations( $ptrs->[0], $strs->[0] );
+}
+
+sub _read_svx_88
+{
+   my $self = shift;
+   my ( $sv, $bytes, $ptrs, $strs ) = @_;
+
+   my ( $serial, $line ) = unpack "($self->{uint_fmt})2", $bytes;
+   my $file = $strs->[0];
+
+   $sv->_debugdata( $serial, $line, $file );
 }
 
 sub _read_ctx

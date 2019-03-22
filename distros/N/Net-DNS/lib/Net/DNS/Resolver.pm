@@ -1,9 +1,9 @@
 package Net::DNS::Resolver;
 
 #
-# $Id: Resolver.pm 1717 2018-10-12 13:14:42Z willem $
+# $Id: Resolver.pm 1726 2018-12-15 12:59:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1717 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1726 $)[1];
 
 =head1 NAME
 
@@ -65,7 +65,7 @@ recursion is desired, etc.
 
     # Set options in the constructor
     $resolver = new Net::DNS::Resolver(
-	nameservers => [ '10.1.1.128', '10.1.2.128' ],
+	nameservers => [ '2001:DB8::1', 'ns.example.com' ],
 	recurse	    => 0,
 	debug	    => 1
 	);
@@ -133,7 +133,7 @@ all other configuration files and environment variables are ignored.
 
     # Set options in the constructor
     $resolver = new Net::DNS::Resolver(
-	nameservers => [ '10.1.1.128', '10.1.2.128' ],
+	nameservers => [ '2001:DB8::1', 'ns.example.com' ],
 	recurse	    => 0
 	);
 
@@ -153,7 +153,7 @@ Prints the resolver state on the standard output.
 
     $packet = $resolver->query( 'mailhost' );
     $packet = $resolver->query( 'mailhost.example.com' );
-    $packet = $resolver->query( '192.0.2.1' );
+    $packet = $resolver->query( '2001:DB8::1' );
     $packet = $resolver->query( 'example.com', 'MX' );
     $packet = $resolver->query( 'annotation.example.com', 'TXT', 'IN' );
 
@@ -175,7 +175,7 @@ any answers or not, use the C<send()> method instead.
 
     $packet = $resolver->search( 'mailhost' );
     $packet = $resolver->search( 'mailhost.example.com' );
-    $packet = $resolver->search( '192.0.2.1' );
+    $packet = $resolver->search( '2001:DB8::1' );
     $packet = $resolver->search( 'example.com', 'MX' );
     $packet = $resolver->search( 'annotation.example.com', 'TXT', 'IN' );
 
@@ -204,7 +204,7 @@ any answers or not, use the C<send()> method instead.
     $packet = $resolver->send( $query );
 
     $packet = $resolver->send( 'mailhost.example.com' );
-    $packet = $resolver->query( '192.0.2.1' );
+    $packet = $resolver->send( '2001:DB8::1' );
     $packet = $resolver->send( 'example.com', 'MX' );
     $packet = $resolver->send( 'annotation.example.com', 'TXT', 'IN' );
 
@@ -289,7 +289,7 @@ Here is the example above, implemented using an iterator:
     $handle = $resolver->bgsend( $packet ) || die $resolver->errorstring;
 
     $handle = $resolver->bgsend( 'mailhost.example.com' );
-    $handle = $resolver->bgsend( '192.0.2.1' );
+    $handle = $resolver->bgsend( '2001:DB8::1' );
     $handle = $resolver->bgsend( 'example.com', 'MX' );
     $handle = $resolver->bgsend( 'annotation.example.com', 'TXT', 'IN' );
 
@@ -408,7 +408,7 @@ The default is false.
 =head2 nameserver, nameservers
 
     @nameservers = $resolver->nameservers();
-    $resolver->nameservers( '192.0.2.1', '192.0.2.2', '2001:DB8::3' );
+    $resolver->nameservers( '2001:DB8::1', '192.0.2.1' );
     $resolver->nameservers( 'ns.domain.example.' );
 
 Gets or sets the nameservers to be queried.
@@ -492,7 +492,7 @@ Gets or sets the resolver search list.
 
 =head2 srcaddr
 
-    $resolver->srcaddr('192.0.2.1');
+    $resolver->srcaddr('2001::DB8::1');
 
 Sets the source address from which queries are sent.
 Convenient for forcing queries from a specific interface on a
@@ -650,11 +650,11 @@ the resolver:
 =head2 RES_NAMESERVERS
 
     # Bourne Shell
-    RES_NAMESERVERS="192.0.2.1 192.0.2.2 2001:DB8::3"
+    RES_NAMESERVERS="2001:DB8::1 192.0.2.1"
     export RES_NAMESERVERS
 
     # C Shell
-    setenv RES_NAMESERVERS "192.0.2.1 192.0.2.2 2001:DB8::3"
+    setenv RES_NAMESERVERS "2001:DB8::1 192.0.2.1"
 
 A space-separated list of nameservers to query.
 
@@ -693,18 +693,14 @@ A space-separated list of resolver options to set.  Options that
 take values are specified as C<option:value>.
 
 
-=head1 IPv6 TRANSPORT
-
-The Net::DNS::Resolver library will enable IPv6 transport if the
-L<IO::Socket::IP> library package is available.
+=head1 IPv4 TRANSPORT
 
 The C<force_v4()>, C<force_v6()>, C<prefer_v4()>, and C<prefer_v6()> methods
 with non-zero argument may be used to configure transport selection.
 
 The behaviour of the C<nameserver()> method illustrates the transport
-selection mechanism.  If, for example, IPv6 is not available or IPv4
-transport has been forced, the C<nameserver()> method will only return
-IPv4 addresses:
+selection mechanism.  If, for example, IPv4 transport has been forced,
+the C<nameserver()> method will only return IPv4 addresses:
 
     $resolver->nameservers( '192.0.2.1', '192.0.2.2', '2001:DB8::3' );
     $resolver->force_v4(1);

@@ -62,4 +62,22 @@ my $base_href = Test::WWW::Mechanize::PSGI->new(
 my $res = $base_href->get('/');
 is( $base_href->base, $base );
 
+subtest 'env' => sub {
+    my $add_env = Test::WWW::Mechanize::PSGI->new(
+        app => sub {
+            my $env = shift;
+            return [
+                200, [ 'Content-Type' => 'text/html' ],
+                [
+                    qq[<html><head><title>Hi</title></head><body>$env->{REMOTE_USER}</body></html>]
+                ]
+            ];
+        },
+        env => { REMOTE_USER => 'Joe' },
+    );
+
+    my $res = $add_env->get('/');
+    $add_env->content_contains('Joe');
+};
+
 done_testing();

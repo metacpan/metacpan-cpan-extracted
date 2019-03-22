@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/perl
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
@@ -13,12 +13,13 @@ use Test::More tests => 2;
 use Test::NoWarnings;
 
 use App::SpreadRevolutionaryDate;
+use App::SpreadRevolutionaryDate::Target::Freenode::Bot;
 
 {
     no strict 'refs';
     no warnings 'redefine';
 
-    *App::SpreadRevolutionaryDate::Freenode::Bot::tick = sub {
+    *App::SpreadRevolutionaryDate::Target::Freenode::Bot::tick = sub {
       my $self = shift;
       $self->{nb_ticks} = 1 unless $self->{nb_ticks};
       if ($nb_ticks == 2) {
@@ -27,7 +28,7 @@ use App::SpreadRevolutionaryDate;
       };
       return 1;
     };
-    *App::SpreadRevolutionaryDate::Freenode::Bot::said = sub {
+    *App::SpreadRevolutionaryDate::Target::Freenode::Bot::said = sub {
         my $self = shift;
         my $message = shift;
         return if $message->{who} ne 'NickServ';
@@ -38,7 +39,7 @@ use App::SpreadRevolutionaryDate;
 
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 
-$spread_revolutionary_date->{freenode}->spread('test');
+$spread_revolutionary_date->targets->{freenode}->spread('test');
 
 __DATA__
 

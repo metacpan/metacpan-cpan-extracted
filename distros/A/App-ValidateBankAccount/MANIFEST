@@ -9,6 +9,8 @@ README
 t/00-load.t
 t/manifest.t
 t/pod.t
+t/meta-json.t
+t/meta-yml.t
 t/validate-bank-account.t
 script/validate-bank-account
 META.yml                                 Module YAML meta-data (added by MakeMaker)

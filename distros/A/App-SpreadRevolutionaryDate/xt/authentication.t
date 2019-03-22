@@ -1,4 +1,4 @@
-#!perl
+#!/usr/bin/perl
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
@@ -20,13 +20,14 @@ unless(   -f File::HomeDir->my_home . '/.config/spread-revolutionary-date/spread
 }
 
 use App::SpreadRevolutionaryDate;
+use App::SpreadRevolutionaryDate::Target::Freenode::Bot;
 
 {
     no strict 'refs';
     no warnings 'redefine';
 
-    *App::SpreadRevolutionaryDate::Freenode::Bot::tick = undef;
-    *App::SpreadRevolutionaryDate::Freenode::Bot::said = sub {
+    *App::SpreadRevolutionaryDate::Target::Freenode::Bot::tick = undef;
+    *App::SpreadRevolutionaryDate::Target::Freenode::Bot::said = sub {
         my $self = shift;
         my $message = shift;
         return if $message->{who} eq 'freenode-connect';
@@ -38,10 +39,10 @@ use App::SpreadRevolutionaryDate;
 @ARGV = ('--test');
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new;
 
-eval { $spread_revolutionary_date->{twitter}->{obj}->verify_credentials };
+eval { $spread_revolutionary_date->targets->{twitter}->obj->verify_credentials };
 ok(!$@, 'Twitter connection with actual credentials in user conf');
 
-eval { $spread_revolutionary_date->{mastodon}->{obj}->get_account };
+eval { $spread_revolutionary_date->targets->{mastodon}->obj->get_account };
 ok(!$@, 'Mastodon connection with actual credentials in user conf');
 
-$spread_revolutionary_date->{freenode}->spread('test');
+$spread_revolutionary_date->targets->{freenode}->spread('Test authentication');
