@@ -11,7 +11,7 @@ my $bench = ATWDumbbench->new(
     initial_runs         => BATCH_SIZE,
 );
 
-my $dir = tempdir( CLEANUP => 1 );
+my $dir      = tempdir( CLEANUP => 1 );
 my $template = 'foobar-XXXXXXXX';
 for ( 1 .. BATCH_SIZE ) {
     my ( $fh, $filename ) = tempfile( $template, DIR => $dir );
@@ -150,14 +150,11 @@ $bench->add_instances(
 note('This will take a while... hang on.');
 $bench->run;
 diag( $bench->report_as_text );
+my $method_name = 'with enhanced eq mark3';
 
-TODO: {
-    local $TODO = 'Too many variables to account for success';
-    my $method_name = 'with enhanced eq mark3';
-    cmp_ok(
-        $bench->measurements(),
-        '<=',
-        $bench->get_measure($method_name),
-        "'$method_name' is the fastest method."
-    );
-}
+cmp_ok(
+    $bench->measurements(),
+    '<=',
+    $bench->get_measure($method_name),
+    "'$method_name' is the fastest method."
+);

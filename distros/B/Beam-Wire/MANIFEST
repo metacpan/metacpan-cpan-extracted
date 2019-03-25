@@ -7,10 +7,12 @@ META.json
 META.yml
 Makefile.PL
 README
+bin/beam-wire
 cpanfile
 lib/Beam/Wire.pm
+lib/Beam/Wire/Event/BuildService.pm
+lib/Beam/Wire/Event/ConfigService.pm
 lib/Beam/Wire/Help/Config.pod
-script/beam-wire
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -23,6 +25,7 @@ t/dependency/config.t
 t/dependency/value.t
 t/deprecated/event_listeners.t
 t/deprecated/method_call.t
+t/events.t
 t/exception.t
 t/lib/My/ArgsListRole.pm
 t/lib/My/ArgsTest.pm

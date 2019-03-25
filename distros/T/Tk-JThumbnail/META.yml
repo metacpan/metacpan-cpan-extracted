@@ -22,5 +22,5 @@ requires:
   Tk: '0'
   Tk::JPEG: '0'
   Tk::PNG: '0'
-version: '2.0'
+version: '2.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

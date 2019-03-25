@@ -23,7 +23,7 @@ DUMMY
 
 diag 'First release';
 my $app = App::git::ship->new;
-$app = $app->start('Perl/Ship.pm', 0);
+$app         = $app->start('Perl/Ship.pm', 0);
 $upload_file = '';
 
 create_bad_main_module();
@@ -37,6 +37,8 @@ like $@, qr{Project built}, 'Project built';
 eval { $app->ship };
 is $@, '', 'no ship error';
 like $upload_file, qr{\bPerl-Ship-0\.01\.tar\.gz$}, 'CPAN::Uploader uploaded version 0.01';
+
+is eval { $app->clean }, $app, 'clean up after release' or diag $@;
 
 diag 'Second release';
 $app = App::git::ship->new;

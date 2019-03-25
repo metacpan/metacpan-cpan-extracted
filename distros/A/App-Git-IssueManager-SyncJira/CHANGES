@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2017-09-16 00:00:00 +0000 to present.
+Changes from 2018-03-23 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.1 at 2018-09-16 10:29:54 +0000
+version 0.2 at 2019-03-23 13:12:15 +0000
+----------------------------------------
+
+  Change: f23224c1ec1e9c4dc0c2d83cca3414c0cbdd16e8
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-03-23 14:12:11 +0000
+
+    ADD: ignore more files 
+
+  Change: 7ba65ac0741a3781d77ec48ade13ea1966f0b32d
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-03-23 14:09:51 +0000
+
+    FIX: fixed type/status mapping with spaces 
+
+----------------------------------------
+version 0.1 at 2018-09-16 10:29:50 +0000
 ----------------------------------------
 
   Change: 83e89cd85053340b0634303f47044028612b91f6

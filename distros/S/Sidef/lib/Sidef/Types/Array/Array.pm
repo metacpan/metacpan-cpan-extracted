@@ -942,45 +942,45 @@ package Sidef::Types::Array::Array {
         $self->reduce_operator('+', $initial);
     }
 
-    sub sum_by {
-        my ($self, $block) = @_;
-
-        my $sum = Sidef::Types::Number::Number::ZERO;
+    sub _sum_prod_by {
+        my ($self, $method, $result, $callback) = @_;
 
         my @list;
         my $count = 0;
 
-        foreach my $obj (@$self) {
-            CORE::push(@list, $block->run($obj));
+        foreach my $k (0 .. $#$self) {
+            CORE::push(@list, $callback->($k, $self->[$k]));
 
             if (++$count > 1e5) {
-                $count = 0;
-                $sum   = $sum->sum(CORE::splice(@list));
+                $count  = 0;
+                $result = $result->$method(CORE::splice(@list));
             }
         }
 
         if (@list) {
-            $sum = $sum->sum(CORE::splice(@list));
+            $result = $result->$method(CORE::splice(@list));
         }
 
-        return $sum;
+        $result;
+    }
+
+    sub sum_by {
+        my ($self, $block) = @_;
+        $self->_sum_prod_by('sum', Sidef::Types::Number::Number::ZERO, sub { $block->run($_[1]) });
+    }
+
+    sub sum_kv {
+        my ($self, $block) = @_;
+        $self->_sum_prod_by('sum',
+                            Sidef::Types::Number::Number::ZERO,
+                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub sum {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto &sum_by;
-        }
-
         if (defined($arg)) {
-            my $sum = $arg;
-
-            foreach my $obj (@$self) {
-                $sum = $sum->add($obj);
-            }
-
-            return $sum;
+            goto &sum_by;
         }
 
         Sidef::Types::Number::Number::sum(@$self);
@@ -988,43 +988,21 @@ package Sidef::Types::Array::Array {
 
     sub prod_by {
         my ($self, $block) = @_;
+        $self->_sum_prod_by('prod', Sidef::Types::Number::Number::ONE, sub { $block->run($_[1]) });
+    }
 
-        my $prod = Sidef::Types::Number::Number::ONE;
-
-        my @list;
-        my $count = 0;
-
-        foreach my $obj (@$self) {
-            CORE::push(@list, $block->run($obj));
-
-            if (++$count > 1e5) {
-                $count = 0;
-                $prod  = $prod->prod(CORE::splice(@list));
-            }
-        }
-
-        if (@list) {
-            $prod = $prod->prod(CORE::splice(@list));
-        }
-
-        return $prod;
+    sub prod_kv {
+        my ($self, $block) = @_;
+        $self->_sum_prod_by('prod',
+                            Sidef::Types::Number::Number::ONE,
+                            sub { $block->run(Sidef::Types::Number::Number->_set_uint($_[0]), $_[1]) });
     }
 
     sub prod {
         my ($self, $arg) = @_;
 
-        if (ref($arg) eq 'Sidef::Types::Block::Block') {
-            goto &prod_by;
-        }
-
         if (defined($arg)) {
-            my $prod = $arg;
-
-            foreach my $obj (@$self) {
-                $prod = $prod->mul($obj);
-            }
-
-            return $prod;
+            goto &prod_by;
         }
 
         Sidef::Types::Number::Number::prod(@$self);
@@ -1070,6 +1048,24 @@ package Sidef::Types::Array::Array {
         }
 
         Sidef::Types::Number::Number::lcm(@$self);
+    }
+
+    sub digits2num {
+        my ($self, $base) = @_;
+
+        state $ten = Sidef::Types::Number::Number->_set_uint(10);
+
+        $base //= $ten;
+
+        my $sum       = Sidef::Types::Number::Number::ZERO;
+        my $base_prod = Sidef::Types::Number::Number::ONE;
+
+        foreach my $v (@$self) {
+            $sum       = $sum->add($base_prod->mul($v));
+            $base_prod = $base_prod->mul($base);
+        }
+
+        $sum;
     }
 
     sub _min_max_by {
@@ -1169,7 +1165,7 @@ package Sidef::Types::Array::Array {
 
     sub item {
         my ($self, $index) = @_;
-        exists($self->[$index]) ? $self->[$index] : ();
+        exists($self->[$index]) ? $self->[$index] : undef;
     }
 
     sub fetch {
@@ -1591,12 +1587,16 @@ package Sidef::Types::Array::Array {
                 goto &first_by;
             }
 
-            my $max = $#$self;
-            $arg = CORE::int($arg) - 1;
-            return bless([@$self[0 .. ($arg > $max ? $max : $arg)]], ref($self));
+            my $end = $#$self;
+
+            $arg = CORE::int($arg) || return bless([], ref($self));
+            $arg += $end + 1 if $arg < 0;
+            $arg -= 1;
+
+            return bless([@$self[0 .. ($arg > $end ? $end : $arg)]], ref($self));
         }
 
-        @$self ? $self->[0] : ();
+        @$self ? $self->[0] : undef;
     }
 
     *head = \&first;
@@ -1618,11 +1618,17 @@ package Sidef::Types::Array::Array {
                 goto &last_by;
             }
 
-            my $from = @$self - CORE::int($arg);
-            return bless([@$self[($from < 0 ? 0 : $from) .. $#$self]], ref($self));
+            my $end = $#$self;
+
+            $arg = CORE::int($arg) || return bless([], ref($self));
+            $arg += $end + 1 if $arg < 0;
+
+            my $from = $end - $arg + 1;
+
+            return bless([@$self[($from < 0 ? 0 : $from) .. $end]], ref($self));
         }
 
-        @$self ? $self->[-1] : ();
+        @$self ? $self->[-1] : undef;
     }
 
     *tail = \&last;
@@ -3426,6 +3432,8 @@ package Sidef::Types::Array::Array {
         *{__PACKAGE__ . '::' . '/'}   = \&div;
         *{__PACKAGE__ . '::' . '÷'}   = \&div;
         *{__PACKAGE__ . '::' . '...'} = \&to_list;
+        *{__PACKAGE__ . '::' . '∋'}   = \&contains;
+        *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
     }
 
 };

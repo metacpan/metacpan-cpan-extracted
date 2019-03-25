@@ -23,8 +23,9 @@ SKIP: {
     $TARDIR = File::Spec->catdir( 't', $TARDIR ) unless -d $TARDIR;
     umask(0);
     my $arch = Archive::Tar::Wrapper->new();
-    ok( $arch->read("$TARDIR/foo.tar.bz2"), "opening compressed tarfile" );
-    ok( $arch->locate("001Basic.t"),        "find 001Basic.t" );
-    ok( $arch->locate("./001Basic.t"),      "find ./001Basic.t" );
-    ok( !$arch->locate("nonexist"),         "find nonexist" );
+    ok( $arch->read( File::Spec->catfile( $TARDIR, 'foo.tar.bz2' ) ),
+        "opening compressed tarfile" );
+    ok( $arch->locate('001Basic.t'),   "find 001Basic.t" );
+    ok( $arch->locate('./001Basic.t'), "find ./001Basic.t" );
+    ok( !$arch->locate('nonexist'),    "find nonexist" );
 }

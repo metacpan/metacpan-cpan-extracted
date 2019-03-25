@@ -7,7 +7,6 @@ use File::Basename 'dirname', 'basename';
 use File::Path 'mkpath';
 use Carp 'confess';
 use Encode 'encode', 'decode';
-use File::Copy 'copy';
 
 sub new {
   my $class = shift;
@@ -90,30 +89,6 @@ sub slurp_file {
   return $content;
 }
 
-sub run_command {
-  my ($self, $command_name, @argv) = @_;
-  
-  # Add "lib" in home directory to include path 
-  my $home_dir = $self->home_dir;
-  local @INC = @INC;
-  if (defined $home_dir) {
-    unshift @INC, "$home_dir/lib";
-  }
-  else {
-    unshift @INC, "lib";
-  }
-  
-  # Command is implemented in command
-  my $command_class = "Giblog::Command::$command_name";
-  eval "use $command_class;";
-  if ($@) {
-    confess "Can't load command $command_class:\n$!\n$@";
-  }
-  my $command = $command_class->new(api => $self);
-
-  $command->run(@argv);
-}
-
 sub _get_proto_dir {
   my ($self, $module_name) = @_;
   
@@ -136,7 +111,7 @@ sub create_website_from_proto {
   my $proto_dir = $self->_get_proto_dir($module_name);
   
   unless (defined $proto_dir) {
-    confess "proto diretory can't specified\n";
+    confess "proto diretory can't specific\n";
   }
 
   unless (-d $proto_dir) {
@@ -163,8 +138,13 @@ sub create_website_from_proto {
         my $user_dir = dirname $user_file;
         mkpath $user_dir;
         
-        copy $proto_file, $user_file
-          or confess "Can't copy $proto_file to $user_file: $!";
+        open my $in_fh, '<', $proto_file
+          or confess "Can't open $user_file: $!";
+        my $proto_content = do { local $/; <$in_fh> };
+        
+        open my $out_fh, '>', $user_file
+          or confess "Can't open $user_file: $!";
+        print $out_fh $proto_content;
       },
       no_chdir => 1,
     },
@@ -206,6 +186,55 @@ sub _module_rel_file {
   return $file;
 }
 
+sub copy_static_files_to_public {
+  my $self = shift;
+
+  my $static_dir = $self->rel_file('templates/static');
+
+  # Get static files
+  my @static_rel_files;
+  find(
+    {
+      wanted => sub {
+        my $static_file = $File::Find::name;
+        
+        # Skip directory
+        my $static_file_base = basename $_;
+        
+        my $static_rel_file = $static_file;
+        $static_rel_file =~ s/^$static_dir//;
+        $static_rel_file =~ s/^[\\\/]//;
+        
+        push @static_rel_files, $static_rel_file;
+      },
+      no_chdir => 1,
+    },
+    $static_dir
+  );
+  
+  # Copy static content to public
+  for my $static_rel_file (@static_rel_files) {
+    my $static_file = $self->rel_file("templates/static/$static_rel_file");
+    my $public_file = $self->rel_file("public/$static_rel_file");
+    
+    if (-d $static_file) {
+      mkpath $public_file;
+    }
+    else {
+      my $public_dir = dirname $public_file;
+      mkpath $public_dir;
+      open my $in_fh, '<', $static_file
+        or confess "Can't open file $static_file: $!";
+      local $/;
+      my $static_content = <$in_fh>;
+      open my $out_fh, '>', $public_file
+        or confess "Can't open file $public_file: $!";
+      binmode $out_fh;
+      print $out_fh $static_content;
+    }
+  }
+}
+
 sub get_templates_files {
   my $self = shift;
 
@@ -223,6 +252,9 @@ sub get_templates_files {
 
         # Skip common files
         return if $template_file =~ /^\Q$templates_dir\/common/;
+
+        # Skip static files
+        return if $template_file =~ /^\Q$templates_dir\/static/;
         
         my $template_file_base = basename $_;
         
@@ -476,7 +508,29 @@ sub parse_first_img_src {
   }
 }
 
-sub wrap {
+sub build_entry {
+  my ($self, $data) = @_;
+  
+  my $giblog = $self->giblog;
+
+  my $content = <<"EOS";
+<div class="entry">
+  <div class="top">
+    $data->{top}
+  </div>
+  <div class="middle">
+    $data->{content}
+  </div>
+  <div class="bottom">
+    $data->{bottom}
+  </div>
+</div>
+EOS
+  
+  $data->{content} = $content;
+}
+
+sub build_html {
   my ($self, $data) = @_;
   
   my $giblog = $self->giblog;
@@ -493,16 +547,8 @@ sub wrap {
         $data->{header}
       </div>
       <div class="main">
-        <div class="entry">
-          <div class="top">
-            $data->{top}
-          </div>
-          <div class="content">
-            $data->{content}
-          </div>
-          <div class="bottom">
-            $data->{bottom}
-          </div>
+        <div class="content">
+          $data->{content}
         </div>
         <div class="side">
           $data->{side}
@@ -662,7 +708,7 @@ Parse "giblog.conf" in home directory and return hash reference.
     site_url => 'http://somesite.example',
   }
 
-After calling read_config, You can also get config by C<config> method.
+After calling "read_config", You can also get config by C<config> method.
 
 =head2 clear_config
 
@@ -708,19 +754,9 @@ If file is not exists, exception occur.
 
   my $file = $api->rel_file('foo/bar');
 
-Get combined path of home directory and specified relative path.
+Get combined path of home directory and specific relative path.
 
-If home directory is not set, return specified path.
-
-=head2 run_command
-
-  $api->run_command($command_name, @args);
-
-Load command class and create object and execute "run" method.
-
-For example, if command name is "build", Coresspoing "Giblog::Command::build" module is loaded, and the object is created and, "run" method is executed.
-
-If module loading fail, exception occur.
+If home directory is not set, return specific path.
 
 =head2 create_website_from_proto
 
@@ -737,23 +773,29 @@ If module name is "Giblog::Command::new_foo" and the loading path is "lib/Giblog
 
 Module must be loaded before calling "create_website_from_proto". otherwise exception occur.
 
-If home directory is not specified, exception occur.
+If home directory is not specific, exception occur.
 
 If home directory already exists, exception occur.
 
 If creating directory fail, exception occur.
 
-If proto directory corresponding to module name is not specified, exception occur.
+If proto directory corresponding to module name is not specific, exception occur.
 
 If proto direcotry corresponding to module name is not found, exception occur.
 
+=head2 copy_static_files_to_public
+
+  $api->copy_static_files_to_public;
+
+Copy static files in "templates/static" directory to "public" directory.
+
 =head2 get_templates_files
 
-  $api->get_templates_files;
+  my $files = $api->get_templates_files;
 
 Get file names in "templates" directory in home directory.
 
-Files in "templates/common" directory and hidden files(which start with ".") is not contained.
+Files in "templates/common" directory and "templates/static" directory and hidden files(which start with ".") is not contained.
 
 Got file name is relative name from "templates" directory.
 
@@ -1188,13 +1230,45 @@ B<OUTPUT:>
 
 If value of "meta" is "foo" and "description" is "Perl is good", output value of "meta" become "foo\n<meta name="description" content="Perl is good">"
 
-=head2 wrap
+=head2 build_entry
 
-Wrap content by common templates.
+Build entry HTML by "content" and "top", "bottom".
 
 B<INPUT:>
 
   $data->{content}
+  $data->{top}
+  $data->{bottom}
+
+B<OUTPUT:>
+
+  $data->{content}
+
+Output is the following HTML.
+
+  <div class="entry">
+    <div class="top">
+      $data->{top}
+    </div>
+    <div class="middle">
+      $data->{content}
+    </div>
+    <div class="bottom">
+      $data->{bottom}
+    </div>
+  </div>
+
+=head2 build_html
+
+Build whole HTML by "content" and "header", "bottom", "side", "footer".
+
+B<INPUT:>
+
+  $data->{content}
+  $data->{header}
+  $data->{bottom}
+  $data->{side}
+  $data->{footer}
 
 B<OUTPUT:>
 
@@ -1213,16 +1287,8 @@ Output is the following HTML.
           $data->{header}
         </div>
         <div class="main">
-          <div class="entry">
-            <div class="top">
-              $data->{top}
-            </div>
-            <div class="content">
-              $data->{content}
-            </div>
-            <div class="bottom">
-              $data->{bottom}
-            </div>
+          <div class="content">
+            $data->{content}
           </div>
           <div class="side">
             $data->{side}

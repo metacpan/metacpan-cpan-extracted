@@ -97,19 +97,125 @@ package Sidef::Types::Regex::Regex {
         my ($self, $object, $pos) = @_;
 
         # Return a new Match object
-        Sidef::Types::Regex::Match->new(
-                                        string => "$object",
-                                        regex  => $self,
-                                        pos    => defined($pos) ? CORE::int($pos) : undef,
-                                       );
+        Sidef::Types::Regex::Match->new(string => "$object", regex => $self, pos => $pos);
     }
 
     *run = \&match;
 
-    sub gmatch {
+    sub global_match {
         my ($self, $obj, $pos) = @_;
         local $self->{global} = 1;
-        $self->match($obj, $pos);
+        local $self->{pos}    = CORE::int($pos) if defined($pos);
+        $self->match($obj);
+    }
+
+    *gmatch = \&global_match;
+
+    sub global_matches {
+        my ($self, $obj, $third, $fourth) = @_;
+
+        my ($pos, $block) = (0, undef);
+
+        if (UNIVERSAL::isa($third, 'Sidef::Types::Number::Number')) {
+            $pos = $third;
+        }
+        elsif (UNIVERSAL::isa($third, 'Sidef::Types::Block::Block')) {
+            $block = $third;
+        }
+
+        if (UNIVERSAL::isa($fourth, 'Sidef::Types::Number::Number')) {
+            $pos = $fourth;
+        }
+        elsif (UNIVERSAL::isa($fourth, 'Sidef::Types::Block::Block')) {
+            $block = $fourth;
+        }
+
+        my @matches;
+        local $self->{global} = 1;
+        local $self->{pos}    = CORE::int($pos);
+
+        if (defined($block)) {
+            my ($cpos, $lpos) = ($self->{pos}, $self->{pos});
+            my $i = 0;
+
+            while ((my $m = $self->match($obj))->{matched}) {
+                $lpos = $cpos;
+                last if ($lpos == ($cpos = $self->{pos}));
+                CORE::push(@matches, $block->run(Sidef::Types::Number::Number->_set_uint($i++), $m));
+            }
+        }
+        else {
+            my ($cpos, $lpos) = ($self->{pos}, $self->{pos});
+            while ((my $m = $self->match($obj))->{matched}) {
+                $lpos = $cpos;
+                last if ($lpos == ($cpos = $self->{pos}));
+                CORE::push(@matches, $m);
+            }
+        }
+
+        Sidef::Types::Array::Array->new(\@matches);
+    }
+
+    *gmatches       = \&global_matches;
+    *all_matches    = \&global_matches;
+    *map_matches    = \&global_matches;
+    *repeated_match = \&global_matches;
+
+    sub add {
+        my ($self, $other) = @_;
+
+        my $x = $self->{regex};
+        my $y = ref($other) eq __PACKAGE__ ? $other->{regex} : "\Q$other\E";
+
+        __PACKAGE__->new("$x$y");
+    }
+
+    *concat = \&add;
+
+    sub union {
+        my ($self, $other, $extra_flags) = @_;
+
+        my ($x, $x_flags, $x_global) = ($self->{raw}, $self->{flags}, $self->{global});
+        my ($y, $y_flags, $y_global) = (undef, '', 0);
+
+        my %x_flags;
+        my %y_flags;
+
+        if (ref($other) eq __PACKAGE__) {
+            $y        = $other->{raw};
+            $y_flags  = $other->{flags};
+            $y_global = $other->{global};
+        }
+        else {
+            $y = "\Q$other\E";
+        }
+
+        $x_flags{$_}++ for split(//, $x_flags);
+        $y_flags{$_}++ for split(//, $y_flags);
+
+        my %union = %x_flags;
+
+        foreach my $k (keys %y_flags) {
+            if (exists $union{$k}) {
+
+                my $c1 = $x_flags{$k};
+                my $c2 = $y_flags{$k};
+
+                if ($c2 > $c1) {
+                    $union{$k} = $c2;
+                }
+            }
+            else {
+                $union{$k} = $y_flags{$k};
+            }
+        }
+
+        my $global = ($x_global || $y_global) ? 'g' : '';
+        my $flags  = join('', map { $_ x $union{$_} } sort keys %union);
+
+        $flags .= $extra_flags if defined($extra_flags);
+
+        __PACKAGE__->new("$x$y", join('', sort split(//, $flags . $global)));
     }
 
     sub dump {
@@ -118,7 +224,8 @@ package Sidef::Types::Regex::Regex {
         my $str   = $self->{raw};
         my $flags = $self->{flags};
 
-        Sidef::Types::String::String->new('/' . $str =~ s{/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
+        Sidef::Types::String::String->new(
+                                    '/' . $str =~ s{(?<!\\)(?:\\\\)*\K/}{\\/}gr . '/' . $flags . ($self->{global} ? 'g' : ''));
     }
 
     *to_s   = \&dump;
@@ -129,14 +236,16 @@ package Sidef::Types::Regex::Regex {
         *{__PACKAGE__ . '::' . '=~'}  = \&match;
         *{__PACKAGE__ . '::' . '=='}  = \&eq;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
-        *{__PACKAGE__ . '::' . '≠'} = \&ne;
+        *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '<=>'} = \&cmp;
         *{__PACKAGE__ . '::' . '<'}   = \&lt;
         *{__PACKAGE__ . '::' . '<='}  = \&le;
-        *{__PACKAGE__ . '::' . '≤'} = \&le;
+        *{__PACKAGE__ . '::' . '≤'}   = \&le;
         *{__PACKAGE__ . '::' . '>'}   = \&gt;
-        *{__PACKAGE__ . '::' . '≥'} = \&ge;
+        *{__PACKAGE__ . '::' . '≥'}   = \&ge;
         *{__PACKAGE__ . '::' . '>='}  = \&ge;
+        *{__PACKAGE__ . '::' . '+'}   = \&concat;
+        *{__PACKAGE__ . '::' . '|'}   = \&union;
     }
 
 };

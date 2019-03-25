@@ -38,7 +38,7 @@ subtest 'manager created with store' => sub{
         qr{^starch\.store\.Memory\.new$},
         'starch.store.Memory.new',
     );
-    log_empty_ok();
+    $log->empty_ok();
 };
 
 subtest 'create state' => sub{
@@ -60,7 +60,7 @@ subtest 'create state' => sub{
         qr{^starch\.manager.state\.created\.$state_id$},
         'starch.manager.state.created.$state_id',
     );
-    log_empty_ok();
+    $log->empty_ok();
 };
 
 subtest 'retrieve state' => sub{
@@ -77,7 +77,7 @@ subtest 'retrieve state' => sub{
         qr{^starch\.manager.state\.retrieved\.$state_id$},
         'starch.manager.state.retrieved.$state_id',
     );
-    log_empty_ok();
+    $log->empty_ok();
 };
 
 subtest 'state methods' => sub{
@@ -91,7 +91,7 @@ subtest 'state methods' => sub{
         qr{^starch\.state\.save\.$state_id$},
         'starch.state.save.$state_id',
     );
-    log_empty_ok('log is empty after non-dirty save');
+    $log->empty_ok('log is empty after non-dirty save');
 
     $state->data->{foo} = 34;
     $state->save();
@@ -110,7 +110,7 @@ subtest 'state methods' => sub{
         qr{^starch\.state\.mark_clean\.$state_id$},
         'starch.state.mark_clean.$state_id',
     );
-    log_empty_ok();
+    $log->empty_ok();
 
     $state->reload();
     $state->mark_clean();
@@ -147,18 +147,7 @@ subtest 'state methods' => sub{
         qr{^starch\.store\.Memory\.remove\.starch-state:$state_id$},
         'starch.store.Memory.remove.starch-state:$state_id',
     );
-    log_empty_ok();
+    $log->empty_ok();
 };
 
 done_testing;
-
-# Workaround: https://github.com/dagolden/Log-Any/issues/30
-sub log_empty_ok {
-    my ($test_msg) = @_;
-    $test_msg = 'log is empty' if !defined $test_msg;
-    my $msgs = $log->msgs();
-    ok( (@$msgs == 0), $test_msg );
-    use Data::Dumper;
-    diag( Dumper($msgs) ) if @$msgs;
-    $log->clear();
-}

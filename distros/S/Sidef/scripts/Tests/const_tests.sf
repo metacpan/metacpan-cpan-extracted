@@ -1,0 +1,70 @@
+#!/usr/bin/ruby
+
+# Test for `const` declared in a module.
+# https://github.com/trizen/sidef/issues/77
+
+module F {
+  const VALUE = "any value"
+}
+
+# works
+assert_eq("works "+(nil || F::VALUE), "works any value")
+
+class A {
+  method f {
+    # works
+    assert_eq("works "+F::VALUE, "works any value")
+    "ok "+(nil || F::VALUE)
+  }
+}
+
+func x {
+  assert_eq("works "+F::VALUE, "works any value")
+  return ("ok "+(nil || F::VALUE))
+}
+
+var a = A()
+assert_eq(a.f, "ok any value")
+assert_eq(x(), "ok any value")
+
+
+# Make sure `const` is initialized at declaration.
+# https://github.com/trizen/sidef/issues/81
+
+do {
+    var n = 42
+
+    func bar {
+        ++n
+    }
+
+    func foo() {
+        const t = bar()
+        10.of { bar() }
+        return t
+    }
+
+    assert_eq(foo(), 43)
+}
+
+do {
+    const v = 42
+    assert_eq(v, 42)
+
+    func foo(n) {
+        const _v = n
+    }
+
+    assert_eq(foo(3), 3)
+    assert_eq(foo(4), 4)
+
+    func bar(n) {
+        const v = n
+        return v
+    }
+
+    assert_eq(bar(5), 5)
+    assert_eq(bar(6), 6)
+}
+
+say "** Test passed!"

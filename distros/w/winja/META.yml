@@ -3,9 +3,11 @@ abstract: 'dirty patch for handling pathname on MSWin32::Ja_JP.cp932'
 author:
   - 'kpee  C<< <kpee.cpanx@gmail.com> >>'
 build_requires:
-  Encode: '0'
-  File::Path: '0'
+  Exporter: '0'
+  File::Spec::Functions: '0'
   Test::More: '0'
+  lib: '0'
+  parent: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
@@ -30,16 +32,20 @@ provides:
     file: lib/winja.pm
   winja:
     file: lib/winja.pm
-    version: v1.0.2
+    version: v1.0.3
 requires:
+  Carp: '0'
   Cwd: '0'
   Encode: '0'
   File::Basename: '0'
   File::Spec: '0'
   Win32::API: '0'
   perl: '5.018000'
+  strict: '0'
+  utf8: '0'
   version: '0'
-version: 1.0.2
+  warnings: '0'
+version: 1.0.3
 x_authority: cpan:KPEE
 x_contributors:
   - 'KPEE <kpee.cpan@gmail.com>'

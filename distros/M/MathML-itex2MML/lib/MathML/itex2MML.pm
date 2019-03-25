@@ -4,7 +4,7 @@
 # All Rights Reserved.
 # Licensed under the Perl Artistic License.
 #
-# Version: 1.5.10
+# Version: 1.6.0
 
 package MathML::itex2MML;
 
@@ -13,7 +13,7 @@ use warnings;
 
 use base qw(Exporter);
 use base qw(DynaLoader);
-our $VERSION = '1.5.10';
+our $VERSION = '1.6.0';
 
 package MathML::itex2MMLc;
 bootstrap MathML::itex2MML;

@@ -31,7 +31,7 @@ BEGIN {
 
 ## no critic (RequireArgUnpacking)
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 our @EXPORT_OK = qw/ replace replace2 replace3 inplace /;
 our @CARP_NOT = qw/ File::Replace::SingleHandle File::Replace::DualHandle File::Replace::Inplace /;
@@ -377,7 +377,7 @@ B<no guarantees> as to whether it will be atomic or not.
 
 =head2 Version
 
-This documentation describes version 0.12 of this module.
+This documentation describes version 0.14 of this module.
 
 =head1 Constructors and Overview
 

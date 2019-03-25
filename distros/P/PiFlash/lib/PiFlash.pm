@@ -11,7 +11,7 @@ use PiFlash::Inspector;
 use PiFlash::MediaWriter;
 
 package PiFlash;
-$PiFlash::VERSION = '0.4.1';
+$PiFlash::VERSION = '0.4.3';
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use Getopt::Long qw(GetOptionsFromArray); # included with perl
 use File::Basename; # included with perl
@@ -285,7 +285,7 @@ PiFlash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.4.1
+version 0.4.3
 
 =head1 SYNOPSIS
 
@@ -304,7 +304,7 @@ to process the command line.
 
 L<PiFlash::Command>, L<PiFlash::Inspector>, L<PiFlash::MediaWriter>, L<PiFlash::State>
 
-PiFlash online resources L<https://github.com/ikluft/piflash/blob/master/doc/resources.md>
+L<https://metacpan.org/pod/distribution/PiFlash/doc/resources> - Online resources for PiFlash
 
 L<https://metacpan.org/release/PiFlash> - main PiFlash release page on MetaCPAN
 

@@ -38,21 +38,11 @@ our $UTC = DateTime::TimeZone::UTC->new();
 our $FLOATING = DateTime::TimeZone::Floating->new();
 our $LOCALE = DateTime::Locale->load('en_US');
 
-# Beginning and End of time as used for "all event" date ranges
-# Reducing this range may result in events disappearing from FastMail
-# calendars, as we think they have been deleted from the other end,
-# so best to avoid this.
-# However, from my tests, the events should be resurrected once this date
-# window includes them again.
-
-my $BoT = '1970-01-01T00:00:00';
-my $EoT = '2038-01-19T00:00:00';
-
 my (
   %ValidDay,
   %ValidFrequency,
   %EventKeys,
-  %ColourNames,
+  %ColorNames,
   %RecurrenceProperties,
   %UTCLinks,
   %MustBeTopLevel,
@@ -65,29 +55,30 @@ BEGIN {
   %EventKeys = (
     '' => {
       uid                  => [0, 'string',    1, undef],
-      relatedTo            => [0, 'string',    0, undef],
+      relatedTo            => [2, 'keywords',  0, undef],
+      keywords             => [0, 'keywords',  0, undef],
       prodId               => [0, 'string',    0, undef],
       created              => [0, 'utcdate',   0, undef],
       updated              => [0, 'utcdate',   1, undef],
       sequence             => [0, 'number',    0, 0],
       title                => [0, 'string',    0, ''],
       description          => [0, 'string',    0, ''],
-      links                => [0, 'object',    0, undef],
+      links                => [2, 'object',    0, undef],
       locale               => [0, 'string',    0, undef],
       localizations        => [0, 'patch',     0, undef],
-      locations            => [0, 'object',    0, undef],
+      locations            => [2, 'object',    0, undef],
       isAllDay             => [0, 'bool',      0, $JSON::false],
       start                => [0, 'localdate', 1, undef],
       timeZone             => [0, 'timezone',  0, undef],
       duration             => [0, 'duration',  0, undef],
       recurrenceRule       => [0, 'object',    0, undef],
-      recurrenceOverrides  => [0, 'patch',     0, undef],
+      recurrenceOverrides  => [2, 'patch',     0, undef],
       status               => [0, 'string',    0, undef],
       showAsFree           => [0, 'bool',      0, $JSON::false],
       replyTo              => [0, 'object',    0, undef],
-      participants         => [0, 'object',    0, undef],
+      participants         => [2, 'object',    0, undef],
       useDefaultAlerts     => [0, 'bool',      0, $JSON::false],
-      alerts               => [0, 'object',    0, undef],
+      alerts               => [2, 'object',    0, undef],
       excluded             => [0, 'bool',      0, $JSON::false],
     },
     replyTo => {
@@ -139,11 +130,12 @@ BEGIN {
       kind                 => [0, 'string',    0, 'unknown'],
       roles                => [1, 'string',    1, undef],
       locationId           => [0, 'string',    0, undef],
-      scheduleStatus       => [0, 'string',    0, 'needs-action'],
-      schedulePriority     => [0, 'string',    0, 'required'],
-      scheduleRSVP         => [0, 'bool',      0, $JSON::false],
+      participationStatus  => [0, 'string',    0, 'needs-action'],
+      attendance           => [0, 'string',    0, 'required'],
+      expectReply          => [0, 'bool',      0, $JSON::false],
+      scheduleSequence     => [0, 'number',    0, 0],
       scheduleUpdated      => [0, 'utcdate',   0, undef],
-      memberOf             => [1, 'string',    0, undef],
+      # XXX - there's a bunch more here
     },
     alerts => {
       relativeTo           => [0, 'string',    0, 'before-start'],
@@ -202,10 +194,10 @@ BEGIN {
     method
   };
 
-  # Colour names defined in CSS Color Module Level 3
+  # Color names defined in CSS Color Module Level 3
   # http://www.w3.org/TR/css3-color/
 
-  %ColourNames
+  %ColorNames
     = map { $_ => 1 }
       qw{
         aliceblue
@@ -380,11 +372,11 @@ Text::JSCalendar
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -423,10 +415,16 @@ sub tz {
   return $Self->{_tz}{$tzName};
 }
 
-sub _fixColour {
+sub color {
+  my $Self = shift;
+  my $color = shift;
+  return _fixColor($color);
+}
+
+sub _fixColor {
   my $color = lc(shift || '');
 
-  return $color if $ColourNames{$color};
+  return $color if $ColorNames{$color};
   confess("unparseable color: $color") unless $color =~ m/^\s*(\#[a-f0-9]{3,8})\s*$/;
   $color = $1;
   return uc($color) if length($color) == 7;
@@ -656,24 +654,66 @@ sub NormaliseEvent {
   }
   foreach my $key (sort keys %$Spec) {
     # remove if it's the default
-    if ($Spec->{$key}[1] eq 'object') {
+    if ($Spec->{$key}[0] == 2) {
+      # idmap of type
       my $Item = delete $Copy{$key};
-      next unless $Item; # no object
-      if ($Spec->{$key}[0]) {
-        $Copy{$key} = [map { $class->NormaliseEvent($_, $key) } @$Item];
+      next unless ref($Item) eq 'HASH';
+      next unless keys %$Item;
+      my %new;
+      foreach my $id (keys %$Item) {
+        if ($Spec->{$key}[1] eq 'object') {
+          next unless ref($Item->{$id}) eq 'HASH';
+          $new{$id} = $class->NormaliseEvent($Item->{$id}, $key);
+        }
+        elsif ($Spec->{$key}[1] eq 'patch') {
+          next unless ref($Item->{$id}) eq 'HASH';
+          # XXX - handle keys?  Tricky
+          $new{$id} = $class->NormaliseEvent($Item->{$id}, $key);
+        }
+        else {
+          $new{$id} = $Item->{$id};
+        }
       }
-      else {
-        $Copy{$key} = $class->NormaliseEvent($Item, $key);
+      $Copy{$key} = \%new;
+    }
+    elsif ($Spec->{$key}[0] == 1) {
+      my $Item = delete $Copy{$key};
+      next unless ref($Item) eq 'ARRAY';
+      next unless @$Item;
+      my @new;
+      foreach my $one (@$Item) {
+        if ($Spec->{$key}[1] eq 'object') {
+          next unless ref($one) eq 'HASH';
+          push @new, $class->NormaliseEvent($one, $key);
+        }
+        elsif ($Spec->{$key}[1] eq 'patch') {
+          next unless ref($one) eq 'HASH';
+          # XXX - handle keys?  Tricky
+          push @new, $class->NormaliseEvent($one, $key);
+        }
+        else {
+          push @new, $one;
+        }
       }
-    }
-    elsif ($Spec->{$key}[1] eq 'bool') {
-      delete $Copy{$key} if !!$Spec->{$key}[3] == !!$Copy{$key};
-    }
-    elsif ($Spec->{$key}[1] eq 'mailto') {
-      $Copy{$key} = lc $Copy{$key} if $Copy{$key};
+      $Copy{$key} = \@new;
     }
     else {
-      delete $Copy{$key} if _safeeq($Spec->{$key}[3], $Copy{$key});
+      if ($Spec->{$key}[1] eq 'object') {
+        next unless ref($Copy{$key}) eq 'HASH';
+        $Copy{$key} = $class->NormaliseEvent($Copy{$key}, $key);
+      }
+      elsif ($Spec->{$key}[1] eq 'bool') {
+        next if ref($Copy{$key});
+        delete $Copy{$key} if !!$Spec->{$key}[3] == !!$Copy{$key};
+      }
+      elsif ($Spec->{$key}[1] eq 'mailto') {
+        next if ref($Copy{$key});
+        $Copy{$key} = lc $Copy{$key} if $Copy{$key};
+      }
+      else {
+        next if ref($Copy{$key});
+        delete $Copy{$key} if _safeeq($Spec->{$key}[3], $Copy{$key});
+      }
     }
   }
 
@@ -1021,7 +1061,7 @@ sub _getEventsFromVCalendar {
         my $filename = $Attach->{params}{filename}[0];
         # XXX - mime guessing?
         my $mime = $Attach->{params}{fmttype}[0];
-        if (not defined $mime) {
+        if (not defined $mime and $filename) {
           $::MimeTypes ||= MIME::Types->new;
           my $MimeTypeObj = $::MimeTypes->mimeTypeOf($filename);
           $mime = $MimeTypeObj->type() if $MimeTypeObj;
@@ -1061,7 +1101,8 @@ sub _getEventsFromVCalendar {
       my %relations;
       foreach my $Relation (@{$VEvent->{properties}{'related-to'} || []}) {
         my $reltype = $Relation->{params}{reltype}[0] || 'parent';
-        $relations{$reltype} = $Relation->{value};
+        $reltype = lc $reltype if grep { $_ eq lc $reltype } qw(first next parent child);
+        $relations{$Relation->{value}}{relation}{$reltype} = $JSON::true;
       }
 
       # }}}
@@ -1113,7 +1154,8 @@ sub _getEventsFromVCalendar {
       # 4.2 What and where
 
       # 4.2.1 title
-      $Event{title} = $Properties{summary}{value} if $Properties{summary};
+      $Event{title} = $Properties{summary}{value}
+        if ($Properties{summary} and defined $Properties{summary}{value});
 
       # 4.2.2 description
       $Event{description} = join("\n", @description) if @description;
@@ -1150,7 +1192,7 @@ sub _getEventsFromVCalendar {
       # 4.2.9 categories is not supported
 
       # 4.2.10 color
-      $Event{color} = _fixColour($Properties{color}{value}) if $Properties{color};
+      $Event{color} = _fixColor($Properties{color}{value}) if $Properties{color};
 
       # ==============================================================
       # 4.3 Recurrence properties
@@ -1447,6 +1489,10 @@ sub _argsToVEvents {
     $VEvent->add_property($key => [$Prop, \%lang]);
   }
 
+  if ($Args->{status} and $Args->{status} ne 'confirmed') {
+    $VEvent->add_property('status', uc($Args->{status}));
+  }
+
   # dates in UTC - stored in UTC
   $VEvent->add_property(created => $Self->_makeZTime($Args->{created})) if $Args->{created};
   $VEvent->add_property(dtstamp => $Self->_makeZTime($Args->{updated} || DateTime->now->iso8601()));
@@ -1470,6 +1516,7 @@ sub _argsToVEvents {
     $EndTimeZone //= $StartTimeZone;
     my $Duration = eval { DateTime::Format::ICal->parse_duration($Args->{duration}) };
     my $End = $Start->clone()->add($Duration) if $Duration;
+    $End->set_time_zone($EndTimeZone) if $EndTimeZone;
     $VEvent->add_property(dtend => $Self->_makeVTimeObj($TimeZones, $End, $EndTimeZone, $Args->{isAllDay}));
   }
 
@@ -1507,9 +1554,10 @@ sub _argsToVEvents {
 
       my $Type          = $Alert->{action} // '';
       my $Offset        = $Alert->{offset};
-      my $Sign          = $Alert->{relativeTo} =~ m/before/ ? '-' : '';
-      my $Loc1          = $Alert->{relativeTo} =~ m/end/ ? "ends" : "starts";
-      my $Loc2          = $Alert->{relativeTo} =~ m/end/ ? "ended" : "started";
+      my $Relative      = $Alert->{relativeTo} // 'before-start';
+      my $Sign          = $Relative =~ m/before/ ? '-' : '';
+      my $Loc1          = $Relative =~ m/end/ ? "ends" : "starts";
+      my $Loc2          = $Relative =~ m/end/ ? "ended" : "started";
       my $Minutes       = DateTime::Format::ICal->parse_duration(uc $Offset)->in_units('minutes');
 
       my $VAlarm;
@@ -1537,11 +1585,12 @@ sub _argsToVEvents {
         $VAlarm = Data::ICal::Entry::Alarm::Email->new();
         $VAlarm->add_properties(
           summary     => $Summary,
+          attendee    => 'mailto:',  # XXX - name?
           description => join("\n",
             $Description,
             "",
             "Description:",
-            $Args->{description},
+            ($Args->{description} // ''),
             # XXX more
           ),
         );
@@ -1553,7 +1602,7 @@ sub _argsToVEvents {
 
       $VAlarm->add_property(uid => $id);
       $VAlarm->add_property(trigger => "${Sign}$Offset");
-      $VAlarm->add_property(related => 'end') if $Alert->{relativeTo} =~ m/end/;
+      $VAlarm->add_property(related => 'end') if $Relative =~ m/end/;
 
       if ($Alert->{acknowledged}) {
         $VAlarm->add_property(acknowledged => $Self->_makeZTime($Alert->{acknowledged}));
@@ -1565,9 +1614,9 @@ sub _argsToVEvents {
 
   my %namemap;
   if ($Args->{participants}) {
-    foreach my $Address (sort keys %{$Args->{participants}}) {
-      my $Attendee = $Args->{participants}{$Address};
-      my $Email = $Attendee->{email} || $Address;
+    foreach my $partid (sort keys %{$Args->{participants}}) {
+      my $Attendee = $Args->{participants}{$partid};
+      my $Email = $Attendee->{email};
       my $Rsvp  = $Attendee->{rsvp};
 
       my %AttendeeProps;
@@ -1579,24 +1628,24 @@ sub _argsToVEvents {
       next unless grep { $_ eq 'attendee' } @{$Attendee->{roles}};
 
       $AttendeeProps{"CUTYPE"}     = uc $Attendee->{"kind"} if defined $Attendee->{"kind"};
-      $AttendeeProps{"RSVP"}       = uc $Attendee->{"scheduleRSVP"} if defined $Attendee->{"scheduleRSVP"};
-      $AttendeeProps{"X-SEQUENCE"} = $Attendee->{"x-sequence"} if defined $Attendee->{"x-sequence"};
+      $AttendeeProps{"RSVP"}       = "TRUE" if $Attendee->{"expectReply"};
+      $AttendeeProps{"X-SEQUENCE"} = $Attendee->{"scheduleSequence"} if defined $Attendee->{"scheduleSequence"};
       $AttendeeProps{"X-DTSTAMP"}  = $Self->_makeZTime($Attendee->{"scheduleUpdated"}) if defined $Attendee->{"scheduleUpdated"};
       foreach my $prop (keys %AttendeeProps) {
         delete $AttendeeProps{$prop} if $AttendeeProps{$prop} eq '';
       }
       if (grep { $_ eq 'chair' } @{$Attendee->{roles}}) {
-        $Attendee->{ROLE} = 'CHAIR';
+        $AttendeeProps{ROLE} = 'CHAIR';
       }
-      elsif ($Attendee->{schedulePriority} and $Attendee->{schedulePriority} eq 'optional') {
-        $Attendee->{ROLE} = 'OPT-PARTICIPANT';
+      elsif ($Attendee->{attendance} and $Attendee->{attendance} eq 'optional') {
+        $AttendeeProps{ROLE} = 'OPT-PARTICIPANT';
       }
-      elsif ($Attendee->{schedulePriority} and $Attendee->{schedulePriority} eq 'non-participant') {
-        $Attendee->{ROLE} = 'NON-PARTICIPANT';
+      elsif ($Attendee->{attendance} and $Attendee->{attendance} eq 'none') {
+        $AttendeeProps{ROLE} = 'NON-PARTICIPANT';
       }
       # default is REQ-PARTICIPANT
 
-      $AttendeeProps{PARTSTAT} = uc $Attendee->{"scheduleStatus"} if $Attendee->{"scheduleStatus"};
+      $AttendeeProps{PARTSTAT} = uc $Attendee->{"participationStatus"} if $Attendee->{"participationStatus"};
 
       $VEvent->add_property(attendee => [ "MAILTO:$Email", \%AttendeeProps ]);
     }
@@ -1630,10 +1679,45 @@ sub _argsToVEvents {
     }
   }
 
+  if ($Args->{relatedTo}) {
+    foreach my $uid (keys %{$Args->{relatedTo}}) {
+      my $relation = $Args->{relatedTo}{$uid}{relation};
+      foreach my $key (keys %$relation) {
+        $key = uc($key) if grep { $_ eq $key } qw(first next parent child);
+        my %Props;
+        $Props{RELTYPE} = $key unless $key eq 'PARENT';
+        $VEvent->add_property('RELATED-TO' => [ $uid, \%Props ]);
+      }
+    }
+  }
+
+  if ($Args->{keywords}) {
+    my @items = sort keys %{$Args->{keywords}};
+    $VEvent->add_property('CATEGORIES', join(',', @items));
+  }
+
   # detect if this is a dummy top-level event and skip it
   unshift @VEvents, $VEvent unless ($Args->{replyTo} and not $Args->{participants});
 
   return @VEvents;
+}
+
+=head2 $self->eventsToVCalendar(@Events)
+
+Convert a set of events (one or multiple) into an ical file)
+
+Returns a string
+
+e.g.
+
+print $jscal->eventsToVCalendar(@Events);
+
+=cut
+
+sub eventsToVCalendar {
+  my $Self = shift;
+  my $VCalendar = $Self->_argsToVCalendar(\@_);
+  return $VCalendar->as_string();
 }
 
 sub _argsToVCalendar {
@@ -1656,8 +1740,6 @@ sub _argsToVCalendar {
       $VCalendar->add_properties('prodid' => $Args->{prodId});
       $havepid = 1;
     }
-    # initialise timestamp if not given one
-    $Args->{dtstamp} //= DateTime->now()->strftime('%Y-%m-%dT%H:%M:%S');
     push @VEvents, $Self->_argsToVEvents(\%TimeZones, $Args);
   }
 
@@ -1786,6 +1868,11 @@ sub _makeRecurrence {
       $Until->set_time_zone($UTC);
       $Recurrence{UNTIL} = $Until->strftime('%Y%m%dT%H%M%SZ');
     }
+  }
+
+  if ($Args->{rscale}) {
+    $Recurrence{RSCALE} = uc $Args->{rscale};
+    $Recurrence{SKIP} = uc $Args->{skip} if exists $Args->{skip};
   }
 
   # }}}

@@ -56,7 +56,7 @@ App::TimeTracker::Command::TextNotify - App::TimeTracker post mac desktop integr
 
 =head1 VERSION
 
-version 2.026
+version 2.027
 
 =head1 AUTHOR
 

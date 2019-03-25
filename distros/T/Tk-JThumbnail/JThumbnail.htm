@@ -14,6 +14,8 @@
 <ul id="index">
   <li><a href="#NAME">NAME</a></li>
   <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</a></li>
+  <li><a href="#LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</a></li>
   <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
   <li><a href="#EXAMPLE">EXAMPLE</a></li>
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
@@ -34,7 +36,19 @@
 
 <p>(c) 2019, Jim Turner under the same license that Perl 5 itself is. All rights reserved.</p>
 
-<p>Derived from Tk::Thumbnail, AUTHOR: Stephen O. Lidie (Copyright (C) 2001 - 2005, Steve Lidie. All rights reserved.)</p>
+<h1 id="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS</h1>
+
+<p>Derived from <a>Tk::Thumbnail</a>, by Stephen O. Lidie (Copyright (C) 2001 - 2005, Steve Lidie. All rights reserved.)</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>Copyright (c) 2019 Jim Turner.</p>
+
+<p>Tk::JThumbnail is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU Lesser General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA</p>
 
 <h1 id="SYNOPSIS">SYNOPSIS</h1>
 
@@ -49,7 +63,7 @@
         use Tk::JThumbnail;
 
         my $mw = MainWindow-&gt;new;
-        my @list = directory($ARGV[0] || &#39;.&#39;);  #Fetch files from the current directory.
+        my @list = directory($ARGV[0] || &#39;.&#39;);  #Directory to fetch files from.
 
         my $thumb = $mw-&gt;Scrolled(&#39;JThumbnail&#39;,
                         -images =&gt; \@list,
@@ -77,6 +91,7 @@
                         }
         )-&gt;pack(qw/-side top/);
 
+        #EXAMPLE CALLBACK BINDING (RIGHT MOUSE-BUTTON):
         $thumb-&gt;bindImages(&#39;&lt;ButtonRelease-3&gt;&#39; =&gt; [\&amp;RighClickFunction]);
 
         $thumb-&gt;focus();
@@ -85,7 +100,7 @@
 
         exit(0);
 
-        sub RighClickFunction
+        sub RighClickFunction  #CALLBACK BOUND TO RIGHT MOUSE-BUTTON:
         {
                 my $self = pop;
 
@@ -94,14 +109,14 @@
                 print &quot;---You right-clicked on file ($fn) at position: $indx!\n&quot;;
         }
 
-        sub cornerjump
+        sub cornerjump   #CALLBACK WHEN &quot;CORNER&quot; BUTTON PRESSED:
         {
                 my $self = shift;
 
                 $self-&gt;activate($self-&gt;index(&#39;active&#39;) ? 0 : &#39;end&#39;);
         }
 
-        sub directory
+        sub directory   #FETCH LIST OF IMAGE FILES TO BE DISPLAYED:
         {
                 my ($dir) = @_;
                 chdir($dir);
@@ -122,9 +137,9 @@
 
 <p>Tk::JThumbnail is derived from the old Tk::Thumbnail widget. The reason for this fork is to:</p>
 
-<p>1) Fix some issues including an FTBFS.</p>
+<p>1) Fix some issues including an FTBFS to run in modern Perl 5.</p>
 
-<p>2) Add some features needed to use in my JFM5 Filemanager to provide it with a &quot;graphical&quot; option of displaying files in a directory with thumbnail images, along with the other (&quot;text&quot;) option uses my <a>Tk::HMListbox</a> widget, similarly derived from the older Tk::MListbox.</p>
+<p>2) Add some features needed to use in my JFM5 Filemanager to provide it with a &quot;graphical&quot; option of displaying files in a directory with thumbnail images (including icons based on file extension), along with the other (&quot;text&quot;) option uses my <a>Tk::HMListbox</a> widget, similarly derived from the older Tk::MListbox. (JFM5 is derived from my JFM4 filemanager, but adds an icon-view using THIS module)!</p>
 
 <p>The main new features are:</p>
 
@@ -134,13 +149,13 @@
 
 <p>3) Ability to bind both mouse and keyboard operatons to the individual images allowing for right-clicking, shift-clicking, dragging to select / unselect images, keyboard-traversal via arrow-keys, etc.</p>
 
-<p>4) Added method compatability with Tk::HMListbox methods needed by a filemanager (JFM5 in particular) to allow for both to be swapped in and out with very similar code minimizing changes needed to code needed for giving the file-manager user the ability to display files either in line-detail mode (Tk::HMListbox) or icon-mode (Tk::JThumbnail) and interact on them in a similar fashon.</p>
+<p>4) Added method compatability with Tk::HMListbox methods needed by a filemanager (JFM5 in particular) to allow for both to be swapped in and out with very similar code, while minimizing changes needed for giving the file-manager user the ability to display files either in line-detail mode (Tk::HMListbox) or icon-mode (Tk::JThumbnail) and interact on them in a similar fashon.</p>
 
 <p>5) A &quot;default&quot; (fail-through) image added for display when a non-image file is encountered or an image file that can not be properly rendered. This file is in images/ and is called &quot;failimg.png&quot;, and can be replaced with whatever default image you wish to use (must be named &quot;failimg.png&quot;).</p>
 
 <p>6) Perl can CRASH (segfault) if a .xpm image containing the C comment string &quot;/*&quot; is processed - OUCH! We work around this now by reading in .xpm images and converting this string to something harmless.</p>
 
-<p>The original relevant Tk::Thumbnail documentation follows below:</p>
+<p>The original relevant Tk::Thumbnail documentation, including our additions follows below:</p>
 
 <p>Create a table of thumbnail images, having a default size of 32 x 32 pixels. Once we have a <b>Photo</b> of an image, shrink it by copying a subsample of the original to a blank <b>Photo</b>. Images smaller than the thumbnail dimensions are enlarged by zooiming.</p>
 
@@ -150,46 +165,10 @@
 
 <dl>
 
-<dt id="images"><b>-images</b></dt>
+<dt id="blank"><b>-blank</b></dt>
 <dd>
 
-<p>A list of file names and/or <b>Photo</b> widgets. <b>JThumbnail</b> creates temporarty <b>Photo</b> images from all the files, and destroys them when the <b>JThumbnail</b> is destroyed or when a new list of images is specified in a subsequent <b>configure</b> call. Already existing <b>Photo</b>s are left untouched.</p>
-
-</dd>
-<dt id="ilabels"><b>-ilabels</b></dt>
-<dd>
-
-<p>A boolean, set to <i>TRUE</i> if you want file names displayed under the thumbnail images. Default <i>TRUE</i>.</p>
-
-</dd>
-<dt id="font"><b>-font</b></dt>
-<dd>
-
-<p>The default font is <b>fixed</b>.</p>
-
-</dd>
-<dt id="iwidth"><b>-iwidth</b></dt>
-<dd>
-
-<p>Pixel width of the thumbnails. Default is <i>32</i>. The special value -1 means don&#39;t shrink images in the X direction.</p>
-
-</dd>
-<dt id="iheight"><b>-iheight</b></dt>
-<dd>
-
-<p>Pixel height of the thumbnails. Default is <i>32</i>. The special value -1 means don&#39;t shrink images in the Y direction.</p>
-
-</dd>
-<dt id="command"><b>-command</b></dt>
-<dd>
-
-<p>A callback that&#39;s executed on a &lt;Button-1&gt; event over a thumbnail image. It&#39;s passed six arguments: the Label widget reference containing the thumbnail <b>Photo</b> image, the file name of the <b>Photo</b>, a boolean indicating whether or not the the <b>Photo</b> is valid, the <b>Photo</b>&#39;s pixel width and height, and a boolean indicating whether the image is a single frame (Tk::Photo) or has multiple frames (Tk::Animation).</p>
-
-<p>A default callback is provided that simply displays the original image in a new Toplevel widget, along with a Get Info Button that opens another Toplevel containing information about the image. For multi-frame GIFs the image is shown with an extra button to play / stop the animation.</p>
-
-<p>To override the default &lt;Button-1&gt; callback, use the <i>bindImages</i>() function to set your own, or set <b>-command</b> =&gt; undef to have no &lt;Button-1&gt; callback.</p>
-
-<p>Example: <i>$thumb</i>-&gt;<b>bindImages</b>(&#39;&lt;Button-1&gt;&#39; =&gt; [\&amp;<i>mycallbackfn</i> [, args] ]);</p>
+<p>For animated GIFs, a boolean specifying whether to blank the animation photo between movie frames. Default is now <i>0</i> (<i>FALSE</i>). This flag is passed to <b>Tk::Animation</b>&#39;s <i>set_disposal_method</i>().</p>
 
 </dd>
 <dt id="columns"><b>-columns</b></dt>
@@ -198,22 +177,16 @@
 <p>Number of Photos per row. The column count is computed if not specified. Default: computed to mostly form a square (columns == rows).</p>
 
 </dd>
-<dt id="blank"><b>-blank</b></dt>
+<dt id="command"><b>-command</b></dt>
 <dd>
 
-<p>For animated GIFs, a boolean specifying whether to blank the animation photo between movie frames. Default is now <i>0</i> (<i>FALSE</i>). This flag is passed to <b>Tk::Animation</b>&#39;s <i>set_disposal_method</i>().</p>
+<p>A Legacy callback that&#39;s executed on a &lt;Button-1&gt; event over a thumbnail image. It&#39;s passed 2 arguments: the thumbnail widget itself, and the index of the image clicked on (or the active image if &lt;Return&gt; key pressed. In <a>Tk::Thumbnail</a> It was passed six arguments: the Label widget reference containing the thumbnail <b>Photo</b> image, the file name of the <b>Photo</b>, a boolean indicating whether or not the the <b>Photo</b> is valid, the <b>Photo</b>&#39;s pixel width and height, and a boolean indicating whether the image is a single frame (Tk::Photo) or has multiple frames (Tk::Animation); but now this information can be fetched form the hash referenced by $self-&gt;{&#39;data&#39;}[$index] where $self and $index represent the two arguments passed in.</p>
 
-</dd>
-<dt id="highlightthickness"><b>-highlightthickness</b></dt>
-<dd>
+<p>A default callback is provided that simply displays the original image in a new Toplevel widget, along with a Get Info Button that opens another Toplevel containing information about the image. For multi-frame GIFs the image is shown with an extra button to play / stop the animation.</p>
 
-<p>Set the frame border around the images, becomes visible when widget has keyboard focus. Default <i>0</i> (<i>none</i>).</p>
+<p>To override this default &lt;Button-1&gt; callback, use the <i>bindImages</i>() function to set your own, or set <b>-command</b> =&gt; undef to have no &lt;Button-1&gt; callback.</p>
 
-</dd>
-<dt id="nodirs"><b>-nodirs</b></dt>
-<dd>
-
-<p>Do not include directories in the list. Default <i>0</i> (<i>FALSE</i>) - include them.</p>
+<p>Example: <i>$thumb</i>-&gt;<b>bindImages</b>(&#39;&lt;Button-1&gt;&#39; =&gt; [\&amp;<i>mycallbackfn</i> [, args] ]);</p>
 
 </dd>
 <dt id="extimages"><b>-extimages</b></dt>
@@ -224,22 +197,6 @@
 <p>Example: {&#39;txt&#39; =&gt; &#39;/usr/local/pixmaps/texticon.png&#39;, &#39;pdf&#39; =&gt; &#39;/usr/local/pixmaps/adobe.jpg&#39; [, ...]}</p>
 
 <p>Special keys are: &#39;&#39; for files with no or unrecognized extension, and &#39;dir&#39; for directories.</p>
-
-</dd>
-<dt id="selected"><b>-selected</b></dt>
-<dd>
-
-<p><b>JThumbnail-added feature</b>: Optional reference to a list of boolean values corresponding to the indicies of images to be marked as currently &quot;selected&quot;. Default: [] (<i>none</i>).</p>
-
-<p>Example: To select the first and fifth images: -selected =&gt; [1,0,0,0,1]</p>
-
-<p>All images beyond the fifth will not be selected.</p>
-
-</dd>
-<dt id="takefocus"><b>-takefocus</b></dt>
-<dd>
-
-<p>NOTE: DO NOT USE (it doesn&#39;t work properly)! Instead use the <b>-focus</b> option, see below:</p>
 
 </dd>
 <dt id="focus"><b>-focus</b></dt>
@@ -256,10 +213,74 @@
 <p>Default: <i>1</i>.</p>
 
 </dd>
+<dt id="font"><b>-font</b></dt>
+<dd>
+
+<p>The default font is <b>fixed</b>.</p>
+
+</dd>
+<dt id="highlightthickness"><b>-highlightthickness</b></dt>
+<dd>
+
+<p>Set the frame border around the images, becomes visible when widget has keyboard focus. Default <i>0</i> (<i>none</i>). Recommended: <i>1</i> (pixel wide).</p>
+
+</dd>
+<dt id="ilabels"><b>-ilabels</b></dt>
+<dd>
+
+<p>A boolean, set to <i>TRUE</i> if you want file names displayed under the thumbnail images. Default <i>TRUE</i>.</p>
+
+</dd>
+<dt id="images"><b>-images</b></dt>
+<dd>
+
+<p>A list (reference) of file names and/or <b>Photo</b> widgets. <b>JThumbnail</b> creates temporarty <b>Photo</b> images from all the files, and destroys them when the <b>JThumbnail</b> is destroyed or when a new list of images is specified in a subsequent <b>configure</b> call. Already existing <b>Photo</b>s are left untouched.</p>
+
+</dd>
+<dt id="iheight"><b>-iheight</b></dt>
+<dd>
+
+<p>Pixel height of the thumbnails. Default is <i>32</i>. The special value -1 means don&#39;t shrink images in the Y direction.</p>
+
+</dd>
+<dt id="iwidth"><b>-iwidth</b></dt>
+<dd>
+
+<p>Pixel width of the thumbnails. Default is <i>32</i>. The special value -1 means don&#39;t shrink images in the X direction.</p>
+
+</dd>
+<dt id="nodirs"><b>-nodirs</b></dt>
+<dd>
+
+<p><b>JThumbnail-added feature</b>: Do not include directories in the list. Default <i>0</i> (<i>FALSE</i>) - include them.</p>
+
+</dd>
+<dt id="noexpand"><b>-noexpand</b></dt>
+<dd>
+
+<p><b>JThumbnail-added feature</b>: If set to <i>TRUE</i>, Do not zoom tiny images (smaller than <i>-iwidth</i> x <i>-iheight</i>) to fill those dimensions, but keep their original size. Default is <i>0</i> (<i>FALSE</i>) - zoom (expand) them until one dimension fills that space (aspect maintained), as <b>Tk::Thumbnail</b> does.</p>
+
+</dd>
 <dt id="selectbackground"><b>-selectbackground</b></dt>
 <dd>
 
 <p><b>JThumbnail-added feature</b>: Set a different background color for images that are &quot;selected&quot;. Default: the palette&#39;s &quot;<i>readonlyBackground</i>&quot; or &quot;<i>highlightBackground</i>&quot;, or, if those are the same as the current background, a different shade of gray will be used.</p>
+
+</dd>
+<dt id="selected"><b>-selected</b></dt>
+<dd>
+
+<p><b>JThumbnail-added feature</b>: Optional reference to a list of boolean values corresponding to the indicies of images to be marked as currently &quot;selected&quot;. Default: [] (<i>none</i>).</p>
+
+<p>Example: To select the first and fifth images: -selected =&gt; [1,0,0,0,1]</p>
+
+<p>All images beyond the fifth will not be selected.</p>
+
+</dd>
+<dt id="takefocus"><b>-takefocus</b></dt>
+<dd>
+
+<p>NOTE: DO NOT USE (it doesn&#39;t work properly)! Instead use the <b>-focus</b> option, see above:</p>
 
 </dd>
 </dl>
@@ -271,19 +292,19 @@
 <dt id="thumb-activate-index">$thumb-&gt;<b>activate</b>(<i>index</i>);</dt>
 <dd>
 
-<p>Sets the active element to the one indicated by <i>index</i>. If <i>index</i> is outside the range of elements in the list then <i>undef</i> is returned. The active element is drawn with a ridge around it, and its index may be retrieved with the index <b>&#39;active&#39;</b>.</p>
+<p><b>JThumbnail-added feature</b>: Sets the active element to the one indicated by <i>index</i>. If <i>index</i> is outside the range of elements in the list then <i>undef</i> is returned. The active element is drawn with a ridge around it, and its index may be retrieved with the index <b>&#39;active&#39;</b>.</p>
 
 </dd>
 <dt id="thumb-bindImages-sequence-callback">$thumb-&gt;<b>bindImages</b>(<i>sequence</i>, <i>callback</i>);</dt>
 <dd>
 
-<p>Adds the binding to all images in the widget. This is needed because normal events to the main widget itself are NOT passed down to the image subwidgets themselves.</p>
+<p><b>JThumbnail-added feature</b>: Adds the binding to all images in the widget. This is needed because normal events to the main widget itself are NOT passed down to the image subwidgets themselves.</p>
 
 </dd>
 <dt id="thumb-bindRows-sequence-callback">$thumb-&gt;<b>bindRows</b>(<i>sequence</i>, <i>callback</i>);</dt>
 <dd>
 
-<p>Synonym for <b>bindImages</b> for compatability in file-managers, etc. that use both this and <b>Tk::HMListbox</b> interchangability for displaying directory contents. Other that that, it really has nothing to do with &quot;rows&quot;.</p>
+<p><b>JThumbnail-added feature</b>: Synonym for <b>bindImages</b> for compatability in file-managers, etc. that use both this and <b>Tk::HMListbox</b> interchangability for displaying directory contents. Other that that, it really has nothing to do with &quot;rows&quot;.</p>
 
 </dd>
 <dt id="thumb-clear">$thumb-&gt;<b>clear</b>();</dt>
@@ -295,19 +316,19 @@
 <dt id="thumb-curselection">$thumb-&gt;<b>curselection</b>();</dt>
 <dd>
 
-<p>Returns a list containing the numerical indices of all of the elements in the HListbox that are currently selected. If there are no elements selected in the listbox then an empty list is returned.</p>
+<p><b>JThumbnail-added feature</b>: Returns a list containing the numerical indices of all of the elements in the HListbox that are currently selected. If there are no elements selected in the listbox then an empty list is returned.</p>
 
 </dd>
 <dt id="thumb-get-index">$thumb-&gt;<b>get</b>(<i>index</i>);</dt>
 <dd>
 
-<p>Returns the file-name of the image specified by <i>index</i>. <i>index</i> can be either a number, &#39;active&#39;, or &#39;end&#39;.</p>
+<p><b>JThumbnail-added feature</b>: Returns the file-name of the image specified by <i>index</i>. <i>index</i> can be either a number, &#39;active&#39;, or &#39;end&#39;.</p>
 
 </dd>
 <dt id="thumb-getRow-index">$thumb-&gt;<b>getRow</b>(<i>index</i>)</dt>
 <dd>
 
-<p>In scalar context, returns the file-name of the image specified by <i>index</i>. In list context, returns an array with the following elements:</p>
+<p><b>JThumbnail-added feature</b>: In scalar context, returns the file-name of the image specified by <i>index</i>. In list context, returns an array with the following elements:</p>
 
 <ul>
 
@@ -349,37 +370,37 @@
 <dt id="thumb-index-index-expression">$thumb-&gt;<b>index</b>(<i>index-expression</i>);</dt>
 <dd>
 
-<p>Returns a valid index number based in the <i>index-expression</i>, or -1 if invalid or out of range. <i>index-expression</i> can be any of the following: <i>number</i>, <i>&#39;active&#39;</i>, <i>&#39;end&#39;</i>, <i>&#39;mouse&#39;</i>, or <i>&#39;@x,y&#39;</i> (where x &amp; y are the pointer[x|y] pixel coordinates of the mouse cursor in the widget). <i>&#39;mouse&#39;</i> can be used to get the index of the widget under the mouse pointer (or just clicked on). NOTE: $thumb-&gt;index(&#39;end&#39;) returns the index of the last image in the list, so adding 1 to this gets the total count of images in the list!</p>
+<p><b>JThumbnail-added feature</b>: Returns a valid index number based in the <i>index-expression</i>, or -1 if invalid or out of range. <i>index-expression</i> can be any of the following: <i>number</i>, <i>&#39;active&#39;</i>, <i>&#39;end&#39;</i>, <i>&#39;mouse&#39;</i>, or <i>&#39;@x,y&#39;</i> (where x &amp; y are the pointer[x|y] pixel coordinates of the mouse cursor in the widget). <i>&#39;mouse&#39;</i> can be used to get the index of the widget under the mouse pointer (or just clicked on). NOTE: $thumb-&gt;index(&#39;end&#39;) returns the index of the last image in the list, so adding 1 to this gets the total count of images in the list!</p>
 
 </dd>
 <dt id="thumb-indexOf-image-filename">$thumb-&gt;<b>indexOf</b>(<i>image-filename</i>);</dt>
 <dd>
 
-<p>Returns the index# of the image file-name, or -1 if not a valid file-name in the list.</p>
+<p><b>JThumbnail-added feature</b>: Returns the index# of the image file-name, or -1 if not a valid file-name in the list.</p>
 
 </dd>
 <dt id="thumb-isFocused">$thumb-&gt;<b>isFocused</b>();</dt>
 <dd>
 
-<p>Returns <i>TRUE</i> if $thumb has the keyboard focus, <i>FALSE</i> otherwise. Returns <i>undef</i> if <i>index</i> is invalid or out of range. NOTE: <i>index</i> must be a valid <i>number</i>, use $thumb-&gt;<b>index</b>() to get a valid <i>index</i> number.</p>
+<p><b>JThumbnail-added feature</b>: Returns <i>TRUE</i> if $thumb has the keyboard focus, <i>FALSE</i> otherwise.</p>
 
 </dd>
 <dt id="thumb-isSelected-index">$thumb-&gt;<b>isSelected</b>(<i>index</i>);</dt>
 <dd>
 
-<p>Returns <i>TRUE</i> if the image is currently selected or <i>FALSE</i> otherwise.</p>
+<p><b>JThumbnail-added feature</b>: Returns <i>TRUE</i> if the image is currently selected or <i>FALSE</i> otherwise. Returns <i>undef</i> if <i>index</i> is invalid or out of range. NOTE: <i>index</i> must be a valid <i>number</i>, use $thumb-&gt;<b>index</b>() to get a valid <i>index</i> number.</p>
 
 </dd>
 <dt id="thumb-selectionSet-index-index">$thumb-&gt;<b>selectionSet</b>(<i>index</i> [ , <i>index</i> ...]);</dt>
 <dd>
 
-<p>If a single <i>index</i> is given, that image is &quot;selected&quot;. If two indices are given, all images between the two, inclusive are selected. If three or more are given, each image in the list is selected. <i>index</i> can be either a <i>number</i> or <i>end</i>.</p>
+<p><b>JThumbnail-added feature</b>: If a single <i>index</i> is given, that image is &quot;selected&quot;. If two indices are given, all images between the two, inclusive are selected. If three or more are given, each image in the list is selected. <i>index</i> can be either a <i>number</i> or <i>end</i>.</p>
 
 </dd>
 <dt id="thumb-selectionToggle-index">$thumb-&gt;<b>selectionToggle</b>(<i>index</i>);</dt>
 <dd>
 
-<p>Toggles the selection state of the image given by <i>index</i>, then returns the selection state of the image AFTER the toggle.</p>
+<p><b>JThumbnail-added feature</b>: Toggles the selection state of the image given by <i>index</i>, then returns the selection state of the image AFTER the toggle.</p>
 
 </dd>
 <dt id="thumb-selectionClear-index-index">$thumb-&gt;<b>selectionClear</b>(<i>index</i> [ , <i>index</i> ...]);</dt>
@@ -422,11 +443,11 @@
 
 <p><a>Tk</a> <a>Tk::LabEntry</a> <a>Tk::JPEG</a> <a>Tk::PNG</a> <a>File::Basename</a></p>
 
-<p>Optional: <a>Tk::Animation</a></p>
+<p>Optional: <a>Tk::Animation</a> (for GIF animation)</p>
 
 <h1 id="SEE-ALSO">SEE ALSO</h1>
 
-<p><a>Tk::Thumbnail</a></p>
+<p><a>Tk::Thumbnail</a> <a>Tk::Photo</a></p>
 
 
 </body>

@@ -40,5 +40,5 @@ requires:
 resources:
   homepage: https://github.com/ikluft/piflash
   repository: https://github.com/ikluft/piflash.git
-version: 0.4.1
+version: 0.4.3
 x_serialization_backend: 'YAML::Tiny version 1.73'

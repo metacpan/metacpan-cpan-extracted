@@ -1,7 +1,7 @@
 package Starch::Factory;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 
@@ -199,9 +199,17 @@ sub new_store {
 1;
 __END__
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<Starch/AUTHORS> and L<Starch/LICENSE>.
+See L<Starch/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<Starch/AUTHORS>.
+
+=head1 LICENSE
+
+See L<Starch/LICENSE>.
 
 =cut
 

@@ -30,11 +30,11 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 
-C<spread-revolutionary-date> is a L<Free Software|https://www.gnu.org/philosophy/free-sw.htmlhttps://www.gnu.org/philosophy/free-sw.html> that spreads the current date, expressed in L<French Revolutionary calendar|https://en.wikipedia.org/wiki/French_Republican_calendar>, to various social networks: L<Twitter|https://twitter.com/>, L<Mastodon|https://mastodon.social/>, and the L<Freenode|https://freenode.net/> Internet Relay Chat network. And you can easily extend these defaults targets with any desired one, see L</"EXTENDING TO NEW TARGETS">.
+C<spread-revolutionary-date> is a L<Free Software|https://www.gnu.org/philosophy/free-sw.html> that spreads the current date, expressed in L<French Revolutionary calendar|https://en.wikipedia.org/wiki/French_Republican_calendar>, to various social networks: L<Twitter|https://twitter.com/>, L<Mastodon|https://mastodon.social/>, and the L<Freenode|https://freenode.net/> Internet Relay Chat network. And you can easily extend these defaults targets with any desired one, see L</"EXTENDING TO NEW TARGETS">.
 
 The French Revolutionary calendar, also called Republican calendar, was introduced during the L<French Revolution|https://en.wikipedia.org/wiki/French_Revolution>, and used from late 1793 to 1805, and also during the L<Paris Commune|https://en.wikipedia.org/wiki/Paris_Commune> in 1871. This was an attempt to get rid of religious and royalist references found in Gregorian calendar when naming measures of Time. Months were given new names based on nature, each day of the year, instead of being named after an associated saint, had a unique name associated with the rural economy: agricultural tools, common animals, grains, pastures, trees, roots, flowers, fruits, plants, and minerals. But this was also an attempt to give more rational in measuring Time, basing measures on decimal system. Instead of weeks, each month was divided into exactly 3 I<décades>, that is ten days; days were divided into ten hours; hours into 100 minutes; and minutes into 100 seconds.
 
@@ -53,14 +53,16 @@ The revolutionary date and time is computed thanks to the L<DateTime::Calendar::
   $ perl -MApp::SpreadRevolutionaryDate -e 'App::SpreadRevolutionaryDate->new->spread;'
 
   # Test spreading to Mastodon only:
-  $ spread-revolutionary-date --mastodon --test
+  $ spread-revolutionary-date --targets=mastodon --test
 
   # Test spreading to Twitter only in English:
-  $ spread-revolutionary-date --twitter --test --locale=en
+  $ spread-revolutionary-date --targets=twitter --test --locale=en
 
   # Spread to Twitter and Freenode explicit channels
-  $ spread-revolutionary-date --twitter --freenode \
-      --freenode-channels='#revolution' --freenode-channels='#acab'
+  $ spread-revolutionary-date --targets=twitter \
+      --targets=freenode \
+      --freenode-channels='#revolution' \
+      --freenode-channels='#acab'
 
 =head1 CONFIGURATION
 

@@ -5,15 +5,15 @@ NAME
 
 VERSION
 
-    version 0.07
+    version 0.08
 
 DESCRIPTION
 
     spread-revolutionary-date is a Free Software
-    <https://www.gnu.org/philosophy/free-sw.htmlhttps://www.gnu.org/philosophy/free-sw.html>
-    that spreads the current date, expressed in French Revolutionary
-    calendar <https://en.wikipedia.org/wiki/French_Republican_calendar>, to
-    various social networks: Twitter <https://twitter.com/>, Mastodon
+    <https://www.gnu.org/philosophy/free-sw.html> that spreads the current
+    date, expressed in French Revolutionary calendar
+    <https://en.wikipedia.org/wiki/French_Republican_calendar>, to various
+    social networks: Twitter <https://twitter.com/>, Mastodon
     <https://mastodon.social/>, and the Freenode <https://freenode.net/>
     Internet Relay Chat network. And you can easily extend these defaults
     targets with any desired one, see "EXTENDING TO NEW TARGETS".
@@ -54,14 +54,16 @@ USAGE
       $ perl -MApp::SpreadRevolutionaryDate -e 'App::SpreadRevolutionaryDate->new->spread;'
     
       # Test spreading to Mastodon only:
-      $ spread-revolutionary-date --mastodon --test
+      $ spread-revolutionary-date --targets=mastodon --test
     
       # Test spreading to Twitter only in English:
-      $ spread-revolutionary-date --twitter --test --locale=en
+      $ spread-revolutionary-date --targets=twitter --test --locale=en
     
       # Spread to Twitter and Freenode explicit channels
-      $ spread-revolutionary-date --twitter --freenode \
-          --freenode-channels='#revolution' --freenode-channels='#acab'
+      $ spread-revolutionary-date --targets=twitter \
+          --targets=freenode \
+          --freenode-channels='#revolution' \
+          --freenode-channels='#acab'
 
 CONFIGURATION
 

@@ -1,5 +1,9 @@
 Revision history for ZMQ-Raw
 
+0.32      2019-03-23 19:08:55+00:00 Europe/London
+
+ - Restore OpenBSD/FreeBSD support
+
 0.31      2019-03-19 12:38:18+00:00 Europe/London
 
  - epoll implementation is now used on Windows

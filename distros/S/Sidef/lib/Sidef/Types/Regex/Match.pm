@@ -21,7 +21,8 @@ package Sidef::Types::Regex::Match {
 
         my @captures;
         if ($hash{regex}{global}) {
-            pos($hash{string}) = $hash{regex}{pos};
+
+            pos($hash{string}) = CORE::int($hash{regex}{pos});
             my $match = $hash{string} =~ /$hash{regex}{regex}/g;
 
             if ($match) {
@@ -43,13 +44,12 @@ package Sidef::Types::Regex::Match {
             }
         }
         else {
-            @captures =
-              defined($hash{pos})
-              ? (substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex})
-              : ($hash{string} =~ $hash{regex}{regex});
+            $hash{pos} = CORE::int($hash{pos} // 0);
+            $hash{pos} = 0 if ($hash{pos} < 0);
+            @captures = substr($hash{string}, $hash{pos}) =~ $hash{regex}{regex};
 
             $hash{matched}   = (@captures != 0);
-            $hash{match_pos} = $hash{matched} ? [$-[0] + ($hash{pos} // 0), $+[0] + ($hash{pos} // 0)] : [];
+            $hash{match_pos} = $hash{matched} ? [$-[0] + $hash{pos}, $+[0] + $hash{pos}] : [];
 
             foreach my $key (keys %+) {
                 $hash{named_captures}{$key} = $+{$key};
@@ -79,6 +79,8 @@ package Sidef::Types::Regex::Match {
         Sidef::Types::Array::Array->new(
                     [@{$self->{_cached_pos} //= [map { Sidef::Types::Number::Number->_set_uint($_) } @{$self->{match_pos}}]}]);
     }
+
+    *match_pos = \&pos;
 
     sub captures {
         my ($self) = @_;

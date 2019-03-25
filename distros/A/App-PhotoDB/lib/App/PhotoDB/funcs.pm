@@ -21,8 +21,10 @@ use Exporter qw(import);
 use Config::IniHash;
 use YAML;
 use Image::ExifTool;
+use Term::ReadLine;
+use Term::ReadLine::Perl;
 
-our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles);
+our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term);
 
 =head2 prompt
 
@@ -78,16 +80,17 @@ sub prompt {
 		$default = &printbool($default);
 	}
 
+	# Assemble prompt text
+	my $msg = $prompt;
+	$msg .= " ($type)" if $showtype;
+	$msg .= " [$default]" if $showdefault;
+	$msg .= "$char ";
+
+	my $term = $App::PhotoDB::term;
 	my $rv;
 	# Repeatedly prompt user until we get a response of the correct type
 	do {
-		# Assemble prompt text and print it
-		print $prompt;
-		print " ($type)" if $showtype;
-		print " [$default]" if $showdefault;
-		print "$char ";
-		my $input = <STDIN>; ## no critic
-		chomp($input);
+		my $input = $term->readline($msg);
 
 		# Use default value if user gave blank input
 		$rv = ($input eq "") ? $default:$input;
@@ -101,6 +104,32 @@ sub prompt {
 		return $rv;
 	}
 }
+
+=head2 term
+
+Set up a terminal object for use by PhotoDB
+
+=head4 Usage
+
+    my $term = &term;
+
+=head4 Arguments
+
+None
+
+=head4 Returns
+
+Terminal object
+
+=cut
+
+sub term {
+	my $term = Term::ReadLine->new('PhotoDB');
+	$term->ornaments(0);
+	$term->MinLine(7);
+	return $term;
+}
+
 
 =head2 validate
 
@@ -118,7 +147,7 @@ Validate that a value is a certain data type
 
 =head4 Returns
 
-Returns C<1>< if the value passes validation as the requested type, and C<0> if it doesn't.
+Returns C<1> if the value passes validation as the requested type, and C<0> if it doesn't.
 
 =cut
 

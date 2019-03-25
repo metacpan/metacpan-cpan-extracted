@@ -2,7 +2,14 @@ use strict;
 use warnings;
 package YAML::PP::Emitter;
 
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.011'; # VERSION
+
+use YAML::PP::Common qw/
+    YAML_PLAIN_SCALAR_STYLE YAML_SINGLE_QUOTED_SCALAR_STYLE
+    YAML_DOUBLE_QUOTED_SCALAR_STYLE YAML_QUOTED_SCALAR_STYLE
+    YAML_LITERAL_SCALAR_STYLE YAML_FOLDED_SCALAR_STYLE
+    YAML_FLOW_SEQUENCE_STYLE YAML_FLOW_MAPPING_STYLE
+/;
 
 use constant DEBUG => $ENV{YAML_PP_EMIT_DEBUG} ? 1 : 0;
 
@@ -96,7 +103,7 @@ sub mapping_start_event {
     }
     $self->writer->write($yaml);
     my $new_info = { index => 0, indent => $new_indent, info => $info, append => $new_append };
-    if (($info->{style} || '') eq 'flow') {
+    if (($info->{style} || '') eq YAML_FLOW_MAPPING_STYLE) {
 #        $new_info->{type} = 'FLOWMAP';
         $new_info->{type} = 'MAP';
     }
@@ -115,7 +122,17 @@ sub mapping_end_event {
 
     my $last = pop @{ $stack };
     if ($last->{index} == 0) {
-        $self->writer->write(" {}\n");
+        my $indent = $last->{indent};
+        my $zero_indent = $last->{zero_indent};
+        if ($last->{zero_indent}) {
+            $indent .= ' ' x $self->indent;
+        }
+        if ($last->{append}) {
+            $self->writer->write(" {}\n");
+        }
+        else {
+            $self->writer->write("$indent\{}\n");
+        }
     }
     $last = $stack->[-1];
     if ($last->{type} eq 'SEQ') {
@@ -149,6 +166,7 @@ sub sequence_start_event {
     $props = join ' ', grep defined, ($anchor, $tag);
 
     my $new_append = 0;
+    my $zero_indent = 0;
     my $append = $last->{append};
     if ($last->{type} eq 'DOC') {
         if ($append and $props) {
@@ -163,6 +181,7 @@ sub sequence_start_event {
     }
     else {
         if ($last->{type} eq 'MAPVALUE') {
+            $zero_indent = 1;
         }
         else {
             if ($append) {
@@ -196,8 +215,14 @@ sub sequence_start_event {
     $self->writer->write($yaml);
     $last->{index}++;
     $last->{append} = 0;
-    my $new_info = { index => 0, indent => $new_indent, info => $info, append => $new_append };
-    if (($info->{style} || '') eq 'flow') {
+    my $new_info = {
+        index => 0,
+        indent => $new_indent,
+        info => $info,
+        append => $new_append,
+        zero_indent => $zero_indent,
+    };
+    if (($info->{style} || '') eq YAML_FLOW_SEQUENCE_STYLE) {
         $new_info->{type} = 'FLOWSEQ';
     }
     else {
@@ -213,7 +238,17 @@ sub sequence_end_event {
 
     my $last = pop @{ $stack };
     if ($last->{index} == 0) {
-        $self->writer->write(" []\n");
+        my $indent = $last->{indent};
+        my $zero_indent = $last->{zero_indent};
+        if ($last->{zero_indent}) {
+            $indent .= ' ' x $self->indent;
+        }
+        if ($last->{append}) {
+            $self->writer->write(" []\n");
+        }
+        else {
+            $self->writer->write("$indent\[]\n");
+        }
     }
     $last = $stack->[-1];
     if ($last->{type} eq 'MAP') {
@@ -235,6 +270,9 @@ sub sequence_end_event {
 my %forbidden_first = (qw/
     ! 1 & 1 * 1 { 1 } 1 [ 1 ] 1 | 1 > 1 @ 1 ` 1 " 1 ' 1
 /, '#' => 1, ',' => 1, " " => 1);
+my %forbidden_first_plus_space = (qw/
+    ? 1 - 1 : 1
+/);
 
 my %control = (
     "\x00" => '\0',
@@ -310,62 +348,73 @@ sub scalar_event {
     DEBUG and local $Data::Dumper::Useqq = 1;
     $value = '' unless defined $value;
     if (not $style and $value eq '') {
-        $style = "'";
+        $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
     }
-    $style ||= ':';
+    $style ||= YAML_PLAIN_SCALAR_STYLE;
+    if ($style eq YAML_QUOTED_SCALAR_STYLE) {
+        $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
+    }
 
     my $first = substr($value, 0, 1);
     # no control characters anywhere
-    if ($style ne '"' and $value =~ m/[$control_re]/) {
-        $style = '"';
+    if ($style ne YAML_DOUBLE_QUOTED_SCALAR_STYLE and $value =~ m/[$control_re]/) {
+        $style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
     }
-    elsif ($style eq "'") {
+    elsif ($style eq YAML_SINGLE_QUOTED_SCALAR_STYLE) {
         if ($value =~ m/ \n/ or $value =~ m/\n / or $value =~ m/^\n/ or $value =~ m/\n$/) {
-            $style = '"';
+            $style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value eq "\n") {
-            $style = '"';
+            $style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
         }
     }
-    elsif ($style eq '|' or $style eq '>') {
+    elsif ($style eq YAML_LITERAL_SCALAR_STYLE or $style eq YAML_FOLDED_SCALAR_STYLE) {
     }
-    elsif ($style eq ':') {
+    elsif ($style eq YAML_PLAIN_SCALAR_STYLE) {
         if ($value =~ m/[$escape_re_without_lb]/) {
-            $style = '"';
+            $style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value eq "\n") {
-            $style = '"';
+            $style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value =~ m/\n/) {
-            $style = '|';
+            $style = YAML_LITERAL_SCALAR_STYLE;
         }
         elsif ($forbidden_first{ $first }) {
-            $style = "'";
+            $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         elsif (substr($value, 0, 2) =~ m/^([:?-] )/) {
-            $style = "'";
+            $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value =~ m/: /) {
-            $style = "'";
+            $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value =~ m/ #/) {
-            $style = "'";
+            $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         elsif ($value =~ m/[: \t]\z/) {
-            $style = "'";
+            $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
         }
         else {
-            $style = ':';
+            $style = YAML_PLAIN_SCALAR_STYLE;
         }
     }
 
-    if (($style eq '|' or $style eq '>') and $value eq '') {
-        $style = '"';
+    if ($style eq YAML_PLAIN_SCALAR_STYLE) {
+        if ($forbidden_first_plus_space{ $first }) {
+            if (length ($value) == 1 or substr($value, 1, 1) =~ m/^\s/) {
+                $style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
+            }
+        }
     }
-    if ($style eq ":") {
+
+    if (($style eq YAML_LITERAL_SCALAR_STYLE or $style eq YAML_FOLDED_SCALAR_STYLE) and $value eq '') {
+        $style = YAML_DOUBLE_QUOTED_SCALAR_STYLE;
+    }
+    if ($style eq YAML_PLAIN_SCALAR_STYLE) {
         $value =~ s/\n/\n\n/g;
     }
-    elsif ($style eq "'") {
+    elsif ($style eq YAML_SINGLE_QUOTED_SCALAR_STYLE) {
         my $new_indent = $last->{indent} . (' ' x $self->indent);
         $value =~ s/(\n+)/"\n" x (1 + (length $1))/eg;
         my @lines = split m/\n/, $value, -1;
@@ -379,7 +428,7 @@ sub scalar_event {
         $value =~ s/'/''/g;
         $value = "'" . $value . "'";
     }
-    elsif ($style eq '|') {
+    elsif ($style eq YAML_LITERAL_SCALAR_STYLE) {
         DEBUG and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$value], ['value']);
         my $indicators = '';
         if ($value =~ m/\A\n* +/) {
@@ -395,7 +444,7 @@ sub scalar_event {
         $value =~ s/^(?=.)/$indent  /gm;
         $value = "|$indicators\n$value";
     }
-    elsif ($style eq '>') {
+    elsif ($style eq YAML_FOLDED_SCALAR_STYLE) {
         DEBUG and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$value], ['value']);
         my @lines = split /\n/, $value, -1;
         DEBUG and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@lines], ['lines']);
@@ -436,7 +485,7 @@ sub scalar_event {
     elsif (length $value) {
         $pvalue .= $value;
     }
-    my $multiline = ($style eq '|' or $style eq '>');
+    my $multiline = ($style eq YAML_LITERAL_SCALAR_STYLE or $style eq YAML_FOLDED_SCALAR_STYLE);
     if ($last->{type} eq 'MAP') {
 
         if ($props and not length $value) {
@@ -531,13 +580,20 @@ sub alias_event {
     my $stack = $self->event_stack;
     my $last = $stack->[-1];
     $last->{index}++;
-    $last->{append} = 0;
+    my $append = $last->{append};
     my $indent = $last->{indent};
 
     my $alias = '*' . $info->{value};
 
     if ($last->{type} eq 'MAP') {
-        $self->writer->write("$indent$alias :");
+        my $yaml = '';
+        if ($append) {
+            $yaml .= " ";
+        }
+        else {
+            $yaml .= $indent;
+        }
+        $self->writer->write("$yaml$alias :");
         $last->{type} = 'MAPVALUE';
     }
     elsif ($last->{type} eq 'MAPVALUE') {
@@ -545,15 +601,25 @@ sub alias_event {
         $last->{type} = 'MAP';
     }
     elsif ($last->{type} eq 'SEQ') {
-        $self->writer->write("$indent- $alias\n");
+        my $yaml = '';
+        if (not $append) {
+            $yaml .= $indent;
+        }
+        else {
+            $yaml .= " ";
+        }
+        $yaml .= "- $alias\n";
+        $self->writer->write($yaml);
     }
     elsif ($last->{type} eq 'DOC') {
+        # TODO an alias at document level isn't actually valid
         $self->writer->write("$alias\n");
     }
     else {
         $self->writer->write("$indent: $alias\n");
         $last->{type} = 'MAP';
     }
+    $last->{append} = 0;
 }
 
 sub document_start_event {

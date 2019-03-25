@@ -10,7 +10,7 @@ use Mojo::URL;
 use Scalar::Util 'weaken';
 use SQL::Abstract::mysql;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 has abstract        => sub { SQL::Abstract::mysql->new(quote_char => chr(96), name_sep => '.') };
 has auto_migrate    => 0;
@@ -326,12 +326,6 @@ soon as the first database connection has been established.
 
 Defaults to false.
 
-=head2 close_idle_connections
-
-  $mysql = $mysql->close_idle_connections;
-
-Close all connections that are not currently active.
-
 =head2 database_class
 
   $class = $mysql->database_class;
@@ -427,6 +421,12 @@ Database username, defaults to an empty string.
 
 L<Mojo::mysql> inherits all methods from L<Mojo::EventEmitter> and implements the
 following new ones.
+
+=head2 close_idle_connections
+
+  $mysql = $mysql->close_idle_connections;
+
+Close all connections that are not currently active.
 
 =head2 db
 
@@ -538,13 +538,13 @@ Jan Henning Thorsen - C<jhthorsen@cpan.org>.
 
 Mike Magowan
 
-Tekki
+Rolf Stöckli - C<tekki@cpan.org>.
 
-This code is mostly a rip-off from Sebastian Riedel's L<Mojo::Pg>.
+This code started as a rip-off from Sebastian Riedel's L<Mojo::Pg>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2015, Jan Henning Thorsen.
+Copyright (C) 2014-2019, Jan Henning Thorsen.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

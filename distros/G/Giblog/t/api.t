@@ -243,30 +243,6 @@ mkpath $test_dir;
   }
 }
 
-# run_command
-{
-  # run_command - run command
-  {
-    my $giblog = Giblog->new;
-    my $api = Giblog::API->new(giblog => $giblog);
-    my $command = 'test';
-    my $num = 0;
-    $api->run_command($command, \$num);
-    is($num, 3);
-  }
-
-  # run_command - exeption - can't find command
-  {
-    my $giblog = Giblog->new;
-    my $api = Giblog::API->new(giblog => $giblog);
-    my $command = 'not_exists';
-    eval {
-      $api->run_command($command);
-    };
-    ok($@);
-  }
-}
-
 # create_website_from_proto
 {
   my $home_dir = 't/tmp/api/create_website';
@@ -343,6 +319,47 @@ mkpath $test_dir;
       $api->create_website_from_proto($home_dir, $module_name);
     };
     ok($@);
+  }
+}
+
+# copy_static_files_to_public
+{
+  # copy_static_files_to_public - copy static files to public directory
+  {
+    my $home_dir = 't/tmp/api/copy_static_files_to_public';
+    my $giblog = Giblog->new(home_dir => $home_dir);
+    my $api = Giblog::API->new(giblog => $giblog);
+    my $module_name = 'Giblog::Command::new';
+    $api->create_website_from_proto($home_dir, $module_name);
+    
+    # Binary
+    {
+      my $binary = pack "l4", 1, 2, 3, 4;
+      my $file = "$home_dir/templates/static/foo.png";
+      open my $out_fh, '>', $file
+        or die "Can't file $file : $!";
+      binmode $out_fh;
+      print $out_fh $binary;
+    }
+
+    my $files = $api->copy_static_files_to_public;
+    
+    ok(-f "$home_dir/public/js/.gitkeep");
+    ok(-f "$home_dir/public/images/.gitkeep");
+    ok(-f "$home_dir/public/css/common.css");
+    ok(-f "$home_dir/public/blog/.gitkeep");
+    ok(-f "$home_dir/public/foo.png");
+    
+    {
+      my $file = "$home_dir/templates/static/foo.png";
+      open my $in_fh, '<', $file
+        or die "Can't file $file : $!";
+      local $/;
+      my $binary = <$in_fh>;
+      my $binary_expected = pack "l4", 1, 2, 3, 4;
+      
+      is($binary, $binary_expected);
+    }
   }
 }
 
@@ -803,11 +820,51 @@ EOS
   }
 }
 
-# wrap
+# build_entry
 {
-  # wrap - wrap content by common templates
+  # build_entry - build_entry content by common templates
   {
-    my $home_dir = 't/tmp/api/wrap';
+    my $home_dir = 't/tmp/api/build_entry';
+    rmtree $home_dir;
+    my $giblog = Giblog->new(home_dir => $home_dir);
+    my $api = Giblog::API->new(giblog => $giblog);
+    my $module_name = 'Giblog::Command::new';
+    $api->create_website_from_proto($home_dir, $module_name);
+    
+    $api->write_to_file("$home_dir/templates/common/top.html", "お");
+    $api->write_to_file("$home_dir/templates/common/bottom.html", "か");
+
+    my $data = {};
+    $api->read_common_templates($data);
+    
+    is($data->{top}, "お");
+    is($data->{bottom}, "か");
+    
+    $data->{content} = 'コンテンツ';
+    $api->build_entry($data);
+    
+    my $expect =<<'EOS';
+<div class="entry">
+  <div class="top">
+    お
+  </div>
+  <div class="middle">
+    コンテンツ
+  </div>
+  <div class="bottom">
+    か
+  </div>
+</div>
+EOS
+    is($data->{content}, $expect);
+  }
+}
+
+# build_html
+{
+  # build_html - build_html content by common templates
+  {
+    my $home_dir = 't/tmp/api/build_html';
     rmtree $home_dir;
     my $giblog = Giblog->new(home_dir => $home_dir);
     my $api = Giblog::API->new(giblog => $giblog);
@@ -832,7 +889,9 @@ EOS
     is($data->{bottom}, "か");
     
     $data->{content} = 'コンテンツ';
-    $api->wrap($data);
+
+    $api->build_entry($data);
+    $api->build_html($data);
     
     my $expect =<<'EOS';
 <!DOCTYPE html>
@@ -846,16 +905,19 @@ EOS
         い
       </div>
       <div class="main">
-        <div class="entry">
-          <div class="top">
-            お
-          </div>
-          <div class="content">
-            コンテンツ
-          </div>
-          <div class="bottom">
-            か
-          </div>
+        <div class="content">
+          <div class="entry">
+  <div class="top">
+    お
+  </div>
+  <div class="middle">
+    コンテンツ
+  </div>
+  <div class="bottom">
+    か
+  </div>
+</div>
+
         </div>
         <div class="side">
           え

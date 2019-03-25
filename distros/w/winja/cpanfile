@@ -3,12 +3,18 @@ requires 'perl' => '5.018000';
 if( $^O eq 'MSWin32' ) {
     requires 'Win32::API';
 }
+requires 'Carp';
 requires 'Cwd';
 requires 'Encode';
 requires 'File::Basename';
 requires 'File::Spec';
+requires 'strict';
+requires 'utf8';
 requires 'version';
+requires 'warnings';
 
+test_requires 'File::Spec::Functions';
+test_requires 'lib';
 test_requires 'Test::More';
-test_requires 'File::Path';
-test_requires 'Encode';
+test_requires 'Exporter';
+test_requires 'parent';

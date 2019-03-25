@@ -13,7 +13,7 @@
         "args" => [[ "one", "two", "three" ]]
     },
     "fizz" => {
-        "class" => "My::ArgsTest",
+        "extends" => "buzz",
         "args" => [ { "one" => "two" } ]
     }
 }

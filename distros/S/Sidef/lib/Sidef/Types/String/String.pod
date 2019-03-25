@@ -304,6 +304,16 @@ Return the
 
 =cut
 
+=head2 collect
+
+String.collect() -> I<Obj>
+
+Return the
+
+Aliases: I<find_all>, I<findall>
+
+=cut
+
 =head2 contain
 
 String.contain() -> I<Obj>
@@ -486,14 +496,6 @@ Aliases: I<foldcase>
 
 =cut
 
-=head2 findall
-
-String.findall() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 first
 
 String.first() -> I<Obj>
@@ -533,6 +535,8 @@ Return the
 String.ft() -> I<Obj>
 
 Return the
+
+Aliases: I<slice>
 
 =cut
 

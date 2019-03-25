@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Twitter;
-$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.07';
+$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.08';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Twitter.
 
 use Moose;
@@ -20,6 +20,7 @@ with 'App::SpreadRevolutionaryDate::Target'
 use namespace::autoclean;
 use Net::Twitter::Lite::WithAPIv1_1;
 use Net::OAuth 0.25;
+use Encode qw(encode);
 
 has 'consumer_key' => (
     is  => 'ro',
@@ -67,7 +68,8 @@ sub spread {
   my $msg = shift;
   my $test = shift // 0;
   if ($test) {
-    print "Spread to Twitter: $msg\n";
+    my $utf8_msg = encode('UTF-8', $msg);
+    print "Spread to Twitter: $utf8_msg\n";
   } else {
     $self->obj->update($msg);
   }
@@ -96,7 +98,7 @@ App::SpreadRevolutionaryDate::Target::Twitter - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 METHODS
 

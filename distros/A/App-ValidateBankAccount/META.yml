@@ -21,10 +21,10 @@ no_index:
 provides:
   App::ValidateBankAccount:
     file: lib/App/ValidateBankAccount.pm
-    version: '0.05'
+    version: '0.06'
   App::ValidateBankAccount::Option:
     file: lib/App/ValidateBankAccount/Option.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   BankAccount::Validator::UK: '0.46'
   Encode::Locale: '1.05'
@@ -35,5 +35,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/App-ValidateBankAccount.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

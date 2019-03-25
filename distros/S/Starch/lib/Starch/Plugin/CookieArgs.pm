@@ -1,7 +1,7 @@
 package Starch::Plugin::CookieArgs;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 use namespace::clean;
@@ -103,9 +103,17 @@ This returns the same thing as L</cookie_set_args>, but overrides the
 C<expires> value to be one day in the past which will trigger the client
 to remove the cookie immediately.
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<Starch/AUTHORS> and L<Starch/LICENSE>.
+See L<Starch/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<Starch/AUTHORS>.
+
+=head1 LICENSE
+
+See L<Starch/LICENSE>.
 
 =cut
 

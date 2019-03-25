@@ -1,0 +1,69 @@
+{
+   "abstract" : "Command runner",
+   "author" : [
+      "Theo -q Willows <theo@willows.se>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-ppll",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "1.5",
+            "IPC::Run" : "20180523.0",
+            "List::Flatten" : "0.01",
+            "Readonly" : "2.05",
+            "String::ShellQuote" : "1.04",
+            "Sys::CPU" : "0",
+            "Term::ReadKey" : "2.38",
+            "Time::Duration" : "1.2",
+            "perl" : "v5.20.0",
+            "utf8::all" : "0.024"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Task::Perl::Critic" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Most" : "0",
+            "Test::Output" : "1.031",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::ppll" : {
+         "file" : "lib/App/ppll.pm",
+         "version" : "v0.0.1"
+      },
+      "App::ppll::Worker" : {
+         "file" : "lib/App/ppll/Worker.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://gitlab.com/munkei-software/ppll",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

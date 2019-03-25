@@ -1,6 +1,6 @@
 package App::ValidateBankAccount;
 
-$App::ValidateBankAccount::VERSION   = '0.05';
+$App::ValidateBankAccount::VERSION   = '0.06';
 $App::ValidateBankAccount::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::ValidateBankAccount - App to validate bank account number.
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
@@ -44,9 +44,11 @@ You can list all command line options by giving C<-h> flag.
         --help                   show a long help message
         --man                    show the manual
 
-=head1 SUPPORTED BANKS
+=head1 SUPPORTED COUNTRIES
 
 =head2 UNITED KINGDOM
+
+=head3 BANKS
 
 =over 4
 

@@ -3,4 +3,10 @@ Revision history for Perl extension Tk::JThumbnail.
 2.00  Thu Mar 21 19:48:37 2019
 	- original version; created by h2xs 1.23 with options
 		-X -n Tk::JThumbnail
+	  Started with v2.0 since we're both a fork and a continuation of 
+	  Tk::Thumbnail.
 
+2.01  Sun Mar 24, 2019
+	- Fix segfault if clear() called followed by configure(-images => \@files).
+	- Touch up the docs a bit.
+	- Include proper license files.

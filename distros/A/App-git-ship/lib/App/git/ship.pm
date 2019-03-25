@@ -11,7 +11,7 @@ use Mojo::Template;
 use constant DEBUG  => $ENV{GIT_SHIP_DEBUG}  || 0;
 use constant SILENT => $ENV{GIT_SHIP_SILENT} || 0;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 # Need to be overridden in subclass
 sub build { $_[0]->abort('build() is not available for %s', ref $_[0]) }
@@ -92,6 +92,12 @@ sub render_template {
     return $self;
   }
 
+  # Try to read template from $HOME/$name
+  if ($args->{template_from_home}) {
+    my $src = $ENV{HOME} ? path $ENV{HOME}, $name : undef $template->parse($file->slurp)
+      if $file and -r $file;
+  }
+
   $file->dirname->make_path unless -d $file->dirname;
   $file->spurt($template->process({%$args, ship => $self}));
   say "# Generated $file" unless SILENT;
@@ -162,7 +168,7 @@ sub system {
 sub _build_config {
   my $self = shift;
 
-  my $file = $ENV{GIT_SHIP_CONFIG} || '.ship.conf';
+  my $file   = $ENV{GIT_SHIP_CONFIG} || '.ship.conf';
   my $config = {};
   return $config unless open my $CFG, '<', $file;
 
@@ -184,7 +190,7 @@ sub _build_config {
 }
 
 sub _build_config_param_author {
-  my $self = shift;
+  my $self   = shift;
   my $format = shift || '%an <%ae>';
 
   open my $GIT, '-|', qw(git log), "--format=$format"
@@ -235,7 +241,7 @@ sub _get_template {
   my $str;
   no strict 'refs';
   for my $package ($class, @{"$class\::ISA"}) {
-    $str = Mojo::Loader::data_section($package, $name) or next;
+    $str  = Mojo::Loader::data_section($package, $name) or next;
     $name = "$package/$name";
     last;
   }
@@ -253,7 +259,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.31
+0.32
 
 =head1 SYNOPSIS
 
@@ -262,14 +268,14 @@ See L<App::git::ship::perl/SYNOPSIS> for how to build Perl projects.
 Below is a list of useful git aliases:
 
   # git build
-  $ git config --global alias.build = ship build
+  $ git config --global alias.build 'ship build'
 
   # git cl
-  $ git config --global alias.cl = ship clean
+  $ git config --global alias.cl 'ship clean'
 
   # git start
   # git start My/Project.pm
-  $ git config --global alias.start = ship start
+  $ git config --global alias.start 'ship start'
 
 =head1 DESCRIPTION
 

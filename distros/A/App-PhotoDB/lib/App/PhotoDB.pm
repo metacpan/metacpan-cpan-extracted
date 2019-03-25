@@ -264,7 +264,7 @@ use App::PhotoDB::handlers;
 use App::PhotoDB::commands;
 
 # Authoritative distro version
-our $VERSION = '0.00';
+our $VERSION = '0.01';
 
 sub main {
 
@@ -275,6 +275,9 @@ sub main {
 
 	# Connect to the database
 	my $db = &db;
+
+	# Set up terminal
+	our $term = &term;
 
 	# Enter interactive prompt and loop until exited by user
 	while (1) {

@@ -1,5 +1,9 @@
 Revision history for Perl-Metrics-Halstead
 
+0.0601 2019-03-23 07:17:06
+    - Add the eg/analyze example program.
+    - Add my write-up link to the documentation.
+
 0.0600 2019-03-18 16:20:19
     - Add missing tokens to skip and classify as an operand.
     - Look for matches for /Number/ instead of a single token type in the operand classification.

@@ -152,9 +152,17 @@ of retrieving the data from the outer (DynamoDB in our example) store and, if
 its not there, then retrieving from the inner (DBI) store, and setting it in
 DynamoDB.
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<Starch/AUTHORS> and L<Starch/LICENSE>.
+See L<Starch/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<Starch/AUTHORS>.
+
+=head1 LICENSE
+
+See L<Starch/LICENSE>.
 
 =cut
 

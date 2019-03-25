@@ -6,7 +6,7 @@ use Carp;
 
 # For AUTHOR, COPYRIGHT, AND LICENSE see the bottom of this file
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 require Tie::Handle::Base;
 our @ISA = qw/ Tie::Handle::Base /;  ## no critic (ProhibitExplicitISA)
@@ -322,7 +322,7 @@ and for L<Tie::Handle::Base|Tie::Handle::Base>.
 
 =back
 
-This documentation describes version 0.12 of this module.
+This documentation describes version 0.14 of this module.
 
 =head2 Warning About Perls Older Than v5.16 and Windows
 
@@ -374,7 +374,7 @@ work like C<<< <<>> >>> even on older Perls, for instance:
 
 This class contains a C<_debug> method that may be called by subclasses
 to provide debug output (when enabled). C<TIEHANDLE> takes an argument
-C<debug => $debug>, where C<$debug> is either a scalar with a true value,
+C<< debug => $debug >>, where C<$debug> is either a scalar with a true value,
 in which case debugging messages will be sent to C<STDERR>, or a reference
 to a filehandle, in which case debugging messages will be sent to that
 filehandle.

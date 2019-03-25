@@ -1,6 +1,7 @@
 package Tk::JThumbnail;
 
 use strict;
+use warnings;
 use Carp;
 use File::Basename;
 use Tk; # qw/Ev $XS_VERSION/;
@@ -9,7 +10,7 @@ use Tk::widgets qw/ JPEG LabEntry Pane PNG /;
 use base qw/ Tk::Derived Tk::Pane /;
 use vars qw/ $VERSION $err $info $CORNER $haveAnimation/;
 
-$VERSION = '2.0';
+$VERSION = '2.01';
 $haveAnimation = 0;
 eval 'use Tk::widgets qw/ Animation /; $haveAnimation = 1; 1';
 
@@ -31,7 +32,7 @@ sub ClassInit {
 	$mw->YMouseWheelBind($class);
 	$mw->bind($class,'<FocusIn>','focus');
 	$mw->bind($class,'<FocusOut>', sub { my $self = shift; $self->{'isfocused'} = 0; });
-	my $bits = pack("b15"x15,
+	my $bits = pack("b15"x15,     #OPTIONAL IMAGE TO DISPLAY IN CORNER BETWEEN SCROLLBARS:
 			"...............",
 			".#############.",
 			".############..",
@@ -89,7 +90,7 @@ sub Populate {
 			-iheight    => [ 'PASSIVE',                 'iheight',    'Iheight',         32 ],
 			-images     => [ 'PASSIVE',                 'images',     'Images',       undef ],
 			-extimages  => [ 'PASSIVE',                 'images',     'Images',       undef ],
-			-selected   => [ 'PASSIVE',                 'selected',   'Selected',       undef ],
+			-selected   => [ 'PASSIVE',                 'selected',   'Selected',     undef ],
 			-ilabels    => [ 'PASSIVE',                 'ilabels',    'Ilabels',          1 ],
 			-iwidth     => [ 'PASSIVE',                 'iwidth',     'Iwidth',          32 ],
 			-nodirs     => [ 'PASSIVE',                 'nodirs',     'NoDirs',           0 ],
@@ -111,9 +112,8 @@ sub Populate {
 
 } # end Populate
 
-sub button1 {
+sub button1 {  #LEGACY Tk::Thumbnail DEFAULT MOUSE-BUTTON 1 CALLBACK TO DISPLAY IMAGE/ANIMATION FULL-SIZED IN POPUP WINDOW:
 	my $self = shift;
-	my $focused = $self->toplevel->focusCurrent;  #NEEDED (AT LEAST IN AFTERSTEP) TO RESTORE FOCUS PROPERLY!
 	my( $label, $file, $bad_photo, $w, $h, $animated, $blank, $extphoto );
 	if (scalar(@_) > 1) {  #KEEP THE LEGACY WAY FOR LEGACY THUMBNAIL abUSERS!:
 		( $label, $file, $bad_photo, $w, $h, $animated, $blank ) = @_;
@@ -163,7 +163,6 @@ sub button1 {
 	}
 	$tl->protocol( 'WM_DELETE_WINDOW' => sub {
 		$p->delete if $can_del;
-		$focused->focus('-force'); #  if ($focused);
 		$tl->destroy;
 		} );
 
@@ -225,7 +224,6 @@ sub button1 {
 			-command => sub {
 				$p->delete if $can_del;
 				delete $self->{'_playbtn'}  if ($haveAnimation && $animated && defined $self->{'_playbtn'});
-				$focused->focus('-force'); #  if ($focused);
 				$tl->destroy;
 			}
 			)->pack(-side => 'left');
@@ -242,7 +240,7 @@ sub button1 {
 
 } # end button1
 
-sub photo_info {
+sub photo_info {  #LEGACY Tk::Thumbnail CALLBACK FUNCTION TO POPUP IMAGE INFO SUBWINDOW:
 
 	my( $tl, $file, $photo, $w, $h, $animated ) = @_;
 
@@ -273,7 +271,8 @@ sub photo_info {
 	}
 
 	my $f = $tl_info->Labelframe( qw/ -text File / )->pack( qw/ -fill x -expand 1 / );
-	$file = $photo->cget( '-file' );
+	my $filename = $file;
+	$file = $photo->cget( '-file' ) || $filename;  #DOESN'T ALWAYS SEEM TO WORK?!
 	my $size = -s $file;
 	$size = reverse $size;
 	$size =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/g; # commify
@@ -299,7 +298,7 @@ sub photo_info {
 			}
 			)->pack(-side => 'left');
 
-	$tl_info->title( basename( $file ) );
+	$tl_info->title( basename( $filename ) );
 	$closeBtn->focus();
 
 } # end photo_info
@@ -328,7 +327,6 @@ sub render {
 	my( $self ) = @_;
 
 	$self->clear;		# clear Table
-	delete $self->{'descendants'};
 
 	my $pxx = $self->cget( '-iwidth' );  # thumbnail pixel width
 	my $pxy = $self->cget( '-iheight' ); # thumbnail pixel height
@@ -387,7 +385,7 @@ sub render {
 				$ext = (-d $i) ? 'dir' : ($i =~ /.\.(\w+)$/o) ? $1 : '';
 				$ext =~ tr/A-Z/a-z/;
 				#Tk::catch { $photo = $self->Photo( -file => $i ) };
-				if ($i =~ /\.xpm$/io) {  #WORK AROUND STUPID PERL BUG THAT *SEGFAULTS* IF PIXMAP DATA CONTAINS "/*"?!:
+				if ($i =~ /\.xpm$/io) {  #WORK AROUND STUPID PERL BUG THAT *SEGFAULTS* IF XPM PIXMAP DATA CONTAINS "/*"?!:
 					if (open IN, $i) {
 						my $img = '';
 						while (<IN>) {
@@ -399,16 +397,16 @@ sub render {
 						$imgdata[1] =~ s#\/\*#\\\*#gs;
 						Tk::catch { $photo = $self->Photo(-data => ($imgdata[0].'{'.$imgdata[1]), -format => 'xpm') };
 					}
-				} else {
+				} else {  #FOR NON-XPM IMAGES, LOAD THE NORMAL WAY:
 					Tk::catch { $photo = $self->Photo( -file => $i ) };
 				}
-				unless ( $@ || !$haveAnimation ) {
+				unless ( $@ || !$haveAnimation ) {  #GOOD IMAGE, SEE IF WE'RE AN ANIMATED GIF:
 					Tk::catch { $photo = $self->Animation( -file => $i, -format => 'gif' ) };
 					$animated = 1 unless $@;
 				}
 			}
 
-			unless ($photo) {
+			unless ($photo) {  #WE'RE NOT AN IMAGE FILE, SO SEE IF WE HAVE AN IMAGE FOR THIS FILE'S EXTENSION:
 				if ($extimg && $extimg->{$ext})
 				{
 					if ( UNIVERSAL::isa( $extimg->{$ext}, 'Tk::Photo' ) ) {
@@ -418,7 +416,7 @@ sub render {
 					}
 				}
 			}
-			unless ($photo) {
+			unless ($photo) {  #WE HAVE NO IMAGE, SO USE THE DEFAULT IMAGE (failimg.png):
 				$photo = $default;
 				$bad_photo++;
 			}
@@ -462,10 +460,10 @@ sub render {
 			$b->bind('<Button-6>', sub { $self->xview(scroll => -5, 'units')});
 			$b->bind('<Button-7>', sub { $self->xview(scroll => 5, 'units')});
 			$b->bind('<B1-Motion>', sub { $self->Motion(Ev('index',Ev('@')))});
-			$b->bind('<ButtonPress-1>', sub {
+			$b->bind('<ButtonPress-1>', sub {   #NEEDED FOR "MOTION-DRAG SELECT TO WORK:
 					my $clickedon = $self->index('mouse');
 					$self->activate($clickedon);
-					if ($takefocus > 1) {
+					if ($takefocus > 1) {   #IF -focus => 2: TAKE FOCUS WHEN CLICKED ON:
 						$self->update;
 						$self->focus();
 						$self->parent->focus();
@@ -476,24 +474,26 @@ sub render {
 			$b->grid( -row => $r, -column => $c );
 			push @{$self->{'descendants'}}, $b;
 			${$self->{'selected'}}{$i} = $selected->[$indx] || 0;
-			$self->{lastbtn} = $indx;  #NEEDED FOR TAB-FOCUS!
 			push @{$self->{'data'}}, {-index => $indx, -label => $b, -filename => $i, -bad => $bad_photo,
 					-width => $w, -height => $h, -animated => $animated, -blankit => $self->cget( '-blank' ),
 					-row => $r, -col => $c, -photo => $subsample
-			};
+			};  #KEEP ALL THE DATA NEEDED BY THE LEGACY CALLBACK.
 
 			$photo->delete unless UNIVERSAL::isa( $i, 'Tk::Photo' ) or $photo == $default;
-			$b->bind('<ButtonRelease-1>' => [ $self => 'Callback', '-command', $self, $indx ])
-					if (defined $self->cget('-command'));
 
+			#BIND THE LEGACY CALLBACK (UNLESS -command => undef):
+			$b->bind('<ButtonRelease-1>' => [ $self => 'Callback', '-command', $self, $indx ])
+					if (defined $self->cget('-command'));  #WE NOW JUST PASS THE INDEX, ${$self->{'data'}}[$indx] HAS ALL THE DATA!
+
+			#BIND ALL THE bindImages SEQUENCES TO EACH IMAGE SUBWIDGET (CAN OVERRIDE LEGACY CALLBACK BINDING ABOVE!):
 			foreach my $bindkey (keys %{$binds}) {
-				if ($binds->{$bindkey} =~ /ARRAY/o) {
+				if ($binds->{$bindkey} =~ /ARRAY/o) {   #[\&callback, args...]
 					my @binds = @{$binds->{$bindkey}};
 					my $me = shift @binds;
-					unshift @binds, $self;
+					unshift @binds, $self;   #MUST PUSH OURSELF BETWEEN CALLBACK AND OTHER ARGS!
 					unshift @binds, $me;
 					$b->bind($bindkey => [@binds]);
-				} else {
+				} else {                                #sub { &callback(args...) }
 					$b->bind($bindkey => [$binds->{$bindkey}]);
 				}
 			}
@@ -501,7 +501,7 @@ sub render {
 		} # forend columns
 	} #forend rows
 	$self->{'active'} = -1;
-	if ($indx) {
+	if ($indx) {  #DEFAULT BINDINGS TO THE FRAME ITSELF (UNLESS WE'RE A COMPLETELY EMPTY LIST):
 		$self->{'frame'} = ${$self->{'descendants'}}[0]->parent;
 		$self->{'frame'}->bind('<Right>', sub { my $self = shift->parent; my $i = $self->index('active'); $self->activate($i+1); });
 		$self->{'frame'}->bind('<Left>', sub { my $self = shift->parent; my $i = $self->index('active'); $self->activate($i-1); });
@@ -516,18 +516,19 @@ sub render {
 		$self->{'frame'}->bind('<Return>' => [ $self => 'Callback', '-command', $self, 'active' ])
 				if (defined $self->cget('-command'));
 
+		#BIND ALL THE bindImages SEQUENCES TO THE FRAME ITSELF (AREAS OUTSIDE THE IMAGE SUBWIDGET - NEEDED MOSTLY FOR MOUSE BINDINGS):
 		foreach my $bindkey (keys %{$binds}) {
-			if ($binds->{$bindkey} =~ /ARRAY/o) {
+			if ($binds->{$bindkey} =~ /ARRAY/o) {   #[\&callback, args...]
 				my @binds = @{$binds->{$bindkey}};
 				my $me = shift @binds;
-				unshift @binds, $self;
+				unshift @binds, $self;   #MUST PUSH OURSELF BETWEEN CALLBACK AND OTHER ARGS!
 				unshift @binds, $me;
 				$self->{'frame'}->bind($bindkey => [@binds]);
-			} else {
+			} else {                                #sub { &callback(args...) }
 				$self->{'frame'}->bind($bindkey => [$binds->{$bindkey}]);
 			}
 		}
-		$self->activate(0);
+		$self->activate(0);  #ACTIVATE THE FIRST IMAGE TO START.
 	}
 	$self->update;
 
@@ -557,9 +558,11 @@ sub clear {
 
 	$self->free_photos;		# delete previous images
 
-	foreach my $c ( @{$self->{'descendants'}} ) {
-		$c->gridForget;
-		$c->destroy;
+	if (defined $self->{'descendants'}) {
+		foreach my $c ( @{$self->{'descendants'}} ) {
+			$c->gridForget;
+			$c->destroy;
+		}
 	}
 	%{$self->{'selected'}} = ();
 	@{$self->{'data'}} = ();
@@ -574,11 +577,12 @@ sub free_photos {
 
 	my $self = shift;
 
-	foreach my $photo ( @{$self->{photos}} ) {
-		$photo->delete;
+	if (defined $self->{photos}) {
+		foreach my $photo ( @{$self->{photos}} ) {
+			$photo->delete;
+		}
 	}
 	delete $self->{photos};
-
 } # end free_photos
 
 sub activate
@@ -787,7 +791,28 @@ Jim Turner
 
 (c) 2019, Jim Turner under the same license that Perl 5 itself is.  All rights reserved.
 
-Derived from Tk::Thumbnail, AUTHOR:  Stephen O. Lidie (Copyright (C) 2001 - 2005, Steve Lidie. All rights reserved.)
+=head1 ACKNOWLEDGEMENTS
+
+Derived from L<Tk::Thumbnail>, by Stephen O. Lidie (Copyright (C) 2001 - 2005, Steve Lidie. All rights reserved.)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2019 Jim Turner.
+
+Tk::JThumbnail is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this program; if not, write to the Free
+Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
 =head1 SYNOPSIS
 
@@ -802,7 +827,7 @@ Derived from Tk::Thumbnail, AUTHOR:  Stephen O. Lidie (Copyright (C) 2001 - 2005
 	use Tk::JThumbnail;
 
 	my $mw = MainWindow->new;
-	my @list = directory($ARGV[0] || '.');  #Fetch files from the current directory.
+	my @list = directory($ARGV[0] || '.');  #Directory to fetch files from.
 
 	my $thumb = $mw->Scrolled('JThumbnail',
 			-images => \@list,
@@ -830,6 +855,7 @@ Derived from Tk::Thumbnail, AUTHOR:  Stephen O. Lidie (Copyright (C) 2001 - 2005
 			}
 	)->pack(qw/-side top/);
 
+	#EXAMPLE CALLBACK BINDING (RIGHT MOUSE-BUTTON):
 	$thumb->bindImages('<ButtonRelease-3>' => [\&RighClickFunction]);
 
 	$thumb->focus();
@@ -838,7 +864,7 @@ Derived from Tk::Thumbnail, AUTHOR:  Stephen O. Lidie (Copyright (C) 2001 - 2005
 
 	exit(0);
 
-	sub RighClickFunction
+	sub RighClickFunction  #CALLBACK BOUND TO RIGHT MOUSE-BUTTON:
 	{
 		my $self = pop;
 
@@ -847,14 +873,14 @@ Derived from Tk::Thumbnail, AUTHOR:  Stephen O. Lidie (Copyright (C) 2001 - 2005
 		print "---You right-clicked on file ($fn) at position: $indx!\n";
 	}
 
-	sub cornerjump
+	sub cornerjump   #CALLBACK WHEN "CORNER" BUTTON PRESSED:
 	{
 		my $self = shift;
 
 		$self->activate($self->index('active') ? 0 : 'end');
 	}
 
-	sub directory
+	sub directory   #FETCH LIST OF IMAGE FILES TO BE DISPLAYED:
 	{
 		my ($dir) = @_;
 		chdir($dir);
@@ -876,12 +902,14 @@ Derived from Tk::Thumbnail, AUTHOR:  Stephen O. Lidie (Copyright (C) 2001 - 2005
 Tk::JThumbnail is derived from the old Tk::Thumbnail widget.
 The reason for this fork is to: 
 
-1)  Fix some issues including an FTBFS.
+1)  Fix some issues including an FTBFS to run in modern Perl 5.
 
 2)  Add some features needed to use in my JFM5 Filemanager to provide 
 it with a "graphical" option of displaying files in a directory with 
-thumbnail images, along with the other ("text") option uses my 
-L<Tk::HMListbox> widget, similarly derived from the older Tk::MListbox.
+thumbnail images (including icons based on file extension), along with 
+the other ("text") option uses my L<Tk::HMListbox> widget, similarly 
+derived from the older Tk::MListbox.  (JFM5 is derived from my 
+JFM4 filemanager, but adds an icon-view using THIS module)!
 
 The main new features are:
 
@@ -897,8 +925,8 @@ select / unselect images, keyboard-traversal via arrow-keys, etc.
 
 4)  Added method compatability with Tk::HMListbox methods needed by 
 a filemanager (JFM5 in particular) to allow for both to be swapped 
-in and out with very similar code minimizing changes needed to code 
-needed for giving the file-manager user the ability to display files 
+in and out with very similar code, while minimizing changes needed for 
+giving the file-manager user the ability to display files 
 either in line-detail mode (Tk::HMListbox) or icon-mode (Tk::JThumbnail) 
 and interact on them in a similar fashon.
 
@@ -908,10 +936,11 @@ This file is in images/ and is called "failimg.png", and can be replaced
 with whatever default image you wish to use (must be named "failimg.png").
 
 6)  Perl can CRASH (segfault) if a .xpm image containing the C comment 
-string "/*" is processed - OUCH!  We work around this now by reading in .xpm 
-images and converting this string to something harmless.
+string "/*" is processed - OUCH!  We work around this now by reading 
+in .xpm images and converting this string to something harmless.
 
-The original relevant Tk::Thumbnail documentation follows below:
+The original relevant Tk::Thumbnail documentation, including our additions 
+follows below:
 
 Create a table of thumbnail images, having a default size of 32 x 32
 pixels.  Once we have a B<Photo> of an image, shrink it by copying a
@@ -927,42 +956,30 @@ stop the animation.
 
 =over 4
 
-=item B<-images>
+=item B<-blank>
 
-A list of file names and/or B<Photo> widgets.  B<JThumbnail> creates
-temporarty B<Photo> images from all the files, and destroys them when
-the B<JThumbnail> is destroyed or when a new list of images is
-specified in a subsequent B<configure> call.  Already existing
-B<Photo>s are left untouched.
+For animated GIFs, a boolean specifying whether to blank the animation 
+photo between movie frames.  Default is now I<0> (I<FALSE>).  This flag 
+is passed to B<Tk::Animation>'s I<set_disposal_method>().
 
-=item B<-ilabels>
+=item B<-columns>
 
-A boolean, set to I<TRUE> if you want file names displayed under the
-thumbnail images.  Default I<TRUE>.
-
-=item B<-font>
-
-The default font is B<fixed>.
-
-=item B<-iwidth>
-
-Pixel width of the thumbnails.  Default is I<32>. The special value -1 means
-don't shrink images in the X direction.
-
-=item B<-iheight>
-
-Pixel height of the thumbnails.  Default is I<32>. The special value -1 means
-don't shrink images in the Y direction.
+Number of Photos per row. The column count is computed if not specified.  
+Default:  computed to mostly form a square (columns == rows).
 
 =item B<-command>
 
-A callback that's executed on a <Button-1> event over a thumbnail
-image.  It's passed six arguments: the Label widget reference
-containing the thumbnail B<Photo> image, the file name of the
+A Legacy callback that's executed on a <Button-1> event over a thumbnail
+image.  It's passed 2 arguments:  the thumbnail widget itself, and the index 
+of the image clicked on (or the active image if <Return> key pressed.  
+In L<Tk::Thumbnail> It was passed six arguments: the Label widget 
+reference containing the thumbnail B<Photo> image, the file name of the
 B<Photo>, a boolean indicating whether or not the the B<Photo> is
 valid, the B<Photo>'s pixel width and height, and a boolean indicating
 whether the image is a single frame (Tk::Photo) or has multiple frames
-(Tk::Animation).  
+(Tk::Animation); but now this information can be fetched form the hash 
+referenced by $self->{'data'}[$index] where $self and $index represent 
+the two arguments passed in.
 
 A default callback is provided that simply displays
 the original image in a new Toplevel widget, along with a Get Info
@@ -970,45 +987,95 @@ Button that opens another Toplevel containing information about the
 image.  For multi-frame GIFs the image is shown with an extra button 
 to play / stop the animation.
 
-To override the default <Button-1> callback, use the I<bindImages>() function 
-to set your own, or set B<-command> => undef to have no <Button-1> callback.
+To override this default <Button-1> callback, use the I<bindImages>() 
+function to set your own, or set B<-command> => undef to have 
+no <Button-1> callback.
 
 Example:  I<$thumb>->B<bindImages>('<Button-1>' => [\&I<mycallbackfn> [, args] ]);
 
-=item B<-columns>
-
-Number of Photos per row. The column count is computed if not specified.  
-Default:  computed to mostly form a square (columns == rows).
-
-=item B<-blank>
-
-For animated GIFs, a boolean specifying whether to blank the animation photo between movie
-frames.  Default is now I<0> (I<FALSE>).  This flag is passed to 
-B<Tk::Animation>'s I<set_disposal_method>().
-
-=item B<-highlightthickness>
-
-Set the frame border around the images, becomes visible when widget has keyboard focus.
-Default I<0> (I<none>).
-
-=item B<-nodirs>
-
-Do not include directories in the list.  Default I<0> (I<FALSE>) - include them.
-
 =item B<-extimages>
 
-B<JThumbnail-added feature>:  Optional reference to a hash of icon images to be displayed 
-for non-image files.  The hash keys are file extensions and the values image files for the 
-icons.  Default:  {} (I<none>).
+B<JThumbnail-added feature>:  Optional reference to a hash of icon images 
+to be displayed for non-image files.  The hash keys are file extensions 
+and the values image files for the icons.  Default:  {} (I<none>).
 
 Example:  {'txt' => '/usr/local/pixmaps/texticon.png', 'pdf' => '/usr/local/pixmaps/adobe.jpg' [, ...]}
 
-Special keys are:  '' for files with no or unrecognized extension, and 'dir' for directories.
+Special keys are:  '' for files with no or unrecognized extension, and 'dir' 
+for directories.
+
+=item B<-focus>
+
+B<JThumbnail-added feature>:  Specify the focusing model.  Valid values are:
+
+0:  Never take keyboard focus (and skip in the main window's 
+tab-focusing order).
+
+1:  Take focus when tabbed to from the main window (normal "-takefocus => 1" 
+action for Tk widgets).
+
+2:  Also take keyboard focus whenever an icon in the widget or the 
+widget itself is clicked on.
+
+Default:  I<1>.
+
+=item B<-font>
+
+The default font is B<fixed>.
+
+=item B<-highlightthickness>
+
+Set the frame border around the images, becomes visible when widget has 
+keyboard focus.  Default I<0> (I<none>).  Recommended:  I<1> (pixel wide).
+
+=item B<-ilabels>
+
+A boolean, set to I<TRUE> if you want file names displayed under the
+thumbnail images.  Default I<TRUE>.
+
+=item B<-images>
+
+A list (reference) of file names and/or B<Photo> widgets.  B<JThumbnail> 
+creates temporarty B<Photo> images from all the files, and destroys them 
+when the B<JThumbnail> is destroyed or when a new list of images is
+specified in a subsequent B<configure> call.  Already existing
+B<Photo>s are left untouched.
+
+=item B<-iheight>
+
+Pixel height of the thumbnails.  Default is I<32>. The special value -1 
+means don't shrink images in the Y direction.
+
+=item B<-iwidth>
+
+Pixel width of the thumbnails.  Default is I<32>. The special value -1 
+means don't shrink images in the X direction.
+
+=item B<-nodirs>
+
+B<JThumbnail-added feature>:  Do not include directories in the list.  
+Default I<0> (I<FALSE>) - include them.
+
+=item B<-noexpand>
+
+B<JThumbnail-added feature>:  If set to I<TRUE>, Do not zoom tiny images 
+(smaller than I<-iwidth> x I<-iheight>) to fill those dimensions, but keep 
+their original size.  Default is I<0> (I<FALSE>) - zoom (expand) them 
+until one dimension fills that space (aspect maintained), 
+as B<Tk::Thumbnail> does.
+
+=item B<-selectbackground>
+
+B<JThumbnail-added feature>:  Set a different background color for images 
+that are "selected".  Default:  the palette's "I<readonlyBackground>" or 
+"I<highlightBackground>", or, if those are the same as the current 
+background, a different shade of gray will be used.
 
 =item B<-selected>
 
-B<JThumbnail-added feature>:  Optional reference to a list of boolean values corresponding to 
-the indicies of images to be marked as currently "selected".  Default:  [] (I<none>).
+B<JThumbnail-added feature>:  Optional reference to a list of boolean 
+values corresponding to the indicies of images to be marked as currently 
+"selected".  Default:  [] (I<none>).
 
 Example:  To select the first and fifth images:  -selected => [1,0,0,0,1]
 
@@ -1016,28 +1083,8 @@ All images beyond the fifth will not be selected.
 
 =item B<-takefocus>
 
-NOTE:  DO NOT USE (it doesn't work properly)!  Instead use the B<-focus> option, see below:
-
-=item B<-focus>
-
-B<JThumbnail-added feature>:  Specify the focusing model.  Valid values are:
-
-0:  Never take keyboard focus (and skip in the main window's tab-focusing order).
-
-1:  Take focus when tabbed to from the main window (normal "-takefocus => 1" action 
-for Tk widgets).
-
-2:  Also take keyboard focus whenever an icon in the widget or the widget itself 
-is clicked on.
-
-Default:  I<1>.
-
-=item B<-selectbackground>
-
-B<JThumbnail-added feature>:  Set a different background color for images that are 
-"selected".  Default:  the palette's "I<readonlyBackground>" or "I<highlightBackground>", 
-or, if those are the same as the current background, a different shade of gray will 
-be used.
+NOTE:  DO NOT USE (it doesn't work properly)!  Instead use the B<-focus> 
+option, see above:
 
 =back
 
@@ -1047,44 +1094,46 @@ be used.
 
 =item $thumb->B<activate>(I<index>);
 
-Sets the active element to the one indicated by I<index>.
-If I<index> is outside the range of elements in the list 
-then I<undef> is returned.
-The active element is drawn with a ridge around it, and its index 
-may be retrieved with the index B<'active'>.
+B<JThumbnail-added feature>:  Sets the active element to the one indicated 
+by I<index>.  If I<index> is outside the range of elements in the list 
+then I<undef> is returned.  The active element is drawn with a ridge 
+around it, and its index may be retrieved with the index B<'active'>.
 
 =item $thumb->B<bindImages>(I<sequence>, I<callback>);
 
-Adds the binding to all images in the widget.  This is needed because normal events 
-to the main widget itself are NOT passed down to the image subwidgets themselves.
+B<JThumbnail-added feature>:  Adds the binding to all images in the widget.  
+This is needed because normal events to the main widget itself are NOT 
+passed down to the image subwidgets themselves.
 
 =item $thumb->B<bindRows>(I<sequence>, I<callback>);
 
-Synonym for B<bindImages> for compatability in file-managers, etc. that use both 
-this and B<Tk::HMListbox> interchangability for displaying directory contents.  
-Other that that, it really has nothing to do with "rows".
+B<JThumbnail-added feature>:  Synonym for B<bindImages> for compatability 
+in file-managers, etc. that use both this and B<Tk::HMListbox> 
+interchangability for displaying directory contents.  Other that that, 
+it really has nothing to do with "rows".
 
 =item $thumb->B<clear>();
 
-Destroys all Frames and Labels, and deletes all the temporary B<Photo> images, in
-preparation for re-populating the JThumbnail with new data.
+Destroys all Frames and Labels, and deletes all the temporary B<Photo> 
+images, in preparation for re-populating the JThumbnail with new data.
 
 =item $thumb->B<curselection>();
 
-Returns a list containing the numerical indices of
-all of the elements in the HListbox that are currently selected.
-If there are no elements selected in the listbox then an empty
+B<JThumbnail-added feature>:  Returns a list containing the numerical 
+indices of all of the elements in the HListbox that are currently 
+selected.  If there are no elements selected in the listbox then an empty
 list is returned.
 
 =item $thumb->B<get>(I<index>);
 
-Returns the file-name of the image specified by I<index>.  
-I<index> can be either a number, 'active', or 'end'.
+B<JThumbnail-added feature>:  Returns the file-name of the image 
+specified by I<index>.  I<index> can be either a number, 'active', or 'end'.
 
 =item $thumb->B<getRow>(I<index>)
 
-In scalar context, returns the file-name of the image specified by I<index>.  
-In list context, returns an array with the following elements:
+B<JThumbnail-added feature>:  In scalar context, returns the file-name 
+of the image specified by I<index>.  In list context, returns an array 
+with the following elements:
 
 =over 4
 
@@ -1128,9 +1177,9 @@ The keys of the hash-reference (first argument) are:
 
 =item $thumb->B<index>(I<index-expression>);
 
-Returns a valid index number based in the I<index-expression>, or 
--1 if invalid or out of range.  I<index-expression> can be any of 
-the following:  I<number>, I<'active'>, I<'end'>, I<'mouse'>, 
+B<JThumbnail-added feature>:  Returns a valid index number based in the 
+I<index-expression>, or -1 if invalid or out of range.  I<index-expression> 
+can be any of the following:  I<number>, I<'active'>, I<'end'>, I<'mouse'>, 
 or I<'@x,y'> (where x & y are the pointer[x|y] pixel coordinates of 
 the mouse cursor in the widget).  I<'mouse'> can be used to get the 
 index of the widget under the mouse pointer (or just clicked on).
@@ -1140,31 +1189,33 @@ list!
 
 =item $thumb->B<indexOf>(I<image-filename>);
 
-Returns the index# of the image file-name, or -1 if not a valid 
-file-name in the list.
+B<JThumbnail-added feature>:  Returns the index# of the image file-name, 
+or -1 if not a valid file-name in the list.
 
 =item $thumb->B<isFocused>();
 
-Returns I<TRUE> if $thumb has the keyboard focus, I<FALSE> otherwise.
-Returns I<undef> if I<index> is invalid or out of range.
-NOTE:  I<index> must be a valid I<number>, use $thumb->B<index>() to 
-get a valid I<index> number.
+B<JThumbnail-added feature>:  Returns I<TRUE> if $thumb has the keyboard 
+focus, I<FALSE> otherwise.
 
 =item $thumb->B<isSelected>(I<index>);
 
-Returns I<TRUE> if the image is currently selected or I<FALSE> otherwise.
+B<JThumbnail-added feature>:  Returns I<TRUE> if the image is currently 
+selected or I<FALSE> otherwise.  Returns I<undef> if I<index> is invalid 
+or out of range.  NOTE:  I<index> must be a valid I<number>, 
+use $thumb->B<index>() to get a valid I<index> number.
 
 =item $thumb->B<selectionSet>(I<index> [ , I<index> ...]);
 
-If a single I<index> is given, that image is "selected".
-If two indices are given, all images between the two, inclusive are 
-selected.  If three or more are given, each image in the list is 
-selected.  I<index> can be either a I<number> or I<end>.
+B<JThumbnail-added feature>:  If a single I<index> is given, that image 
+is "selected".  If two indices are given, all images between the two, 
+inclusive are selected.  If three or more are given, each image in the 
+list is selected.  I<index> can be either a I<number> or I<end>.
 
 =item $thumb->B<selectionToggle>(I<index>);
 
-Toggles the selection state of the image given by I<index>, then 
-returns the selection state of the image AFTER the toggle.
+B<JThumbnail-added feature>:  Toggles the selection state of the image 
+given by I<index>, then returns the selection state of the image AFTER 
+the toggle.
 
 =item $thumb->B<selectionClear>(I<index> [ , I<index> ...]);
 
@@ -1177,8 +1228,8 @@ the list is de-selected.  I<index> can be either a I<number> or I<end>.
 
 =head1 NOTES
 
-1)  There are no insert, delete, or sort methods.  One must "reconfigure" the 
-widget with a new list of images in order to change the list, example:
+1)  There are no insert, delete, or sort methods.  One must "reconfigure" 
+the widget with a new list of images in order to change the list, example:
 
 $thumb->B<configure>(I<-images> => \@filelist);
 
@@ -1189,38 +1240,39 @@ which will replace all the images with the new list.
 3)  The default for scrollbars seems to be "osow" even though I've 
 specified "osoe" in this code.  Not sure why, but to set "osoe" 
 (SouthEast / Lower and Right), you should specify "-scrollbars => 'osoe'!
-"osoe" is best, if you are using the "corner button" option (see the Example 
-in this documentation).
+"osoe" is best, if you are using the "corner button" option (see the 
+Example in this documentation).
 
 4)  I've replaced B<Tk::Thumbnail>'s "multimedia" buttons for animated gifs 
 in the default callback which displays the image you clicked on full-sized 
 in it's own window since the L<Tk::MultiMediaControls> produces floods of 
-errors about "Tk::MasterMenu" being missing, but no such widget seems to exist 
-anymore?!  Instead, now there's a simple Play / Stop button to play the 
-animation.
+errors about "Tk::MasterMenu" being missing, but no such widget seems to 
+exist anymore?!  Instead, now there's a simple Play / Stop button to play 
+the animation.
 
-5)  The default callback to display full-sized images and info. in a separate 
-popup window is invoked whenever one clicks on an image OR now, when one 
-presses the B<Return> key, the active image is displayed as such.  To NOT do this, 
-specify:
+5)  The default callback to display full-sized images and info. in a 
+separate popup window is invoked whenever one clicks on an image OR now, 
+when one presses the B<Return> key, the active image is displayed as such.  
+To NOT do this, specify:
 
 B<-command> => I<undef>.
 
 OR specify your own callback function for B<-command>, OR override both 
-I<<lt>ButtonRelease-1<gt>> and I<<lt>Return<gt>> key using the B<bindImages>() 
-function.  
+I<<lt>ButtonRelease-1<gt>> and I<<lt>Return<gt>> key using the 
+B<bindImages>() function.  
 
 6)  There are now TWO built-in icon images included with this package:
-failimg.png and info3.png in the images/ subdirectory.  You can replace them 
-with whatever you wish.  I<failimg.png> is displayed for any non-image file or 
-image file that could not be converted properly, or for which no B<-extimg> 
-image exists for it's extension.  I<info3.png> is displayed for the "info" 
-button in the popup window image by the default B<-command> callback.
+failimg.png and info3.png in the images/ subdirectory.  You can replace 
+them with whatever you wish.  I<failimg.png> is displayed for any 
+non-image file or image file that could not be converted properly, or for 
+which no B<-extimg> image exists for it's extension.  I<info3.png> is 
+displayed for the "info" button in the popup window image by the 
+default B<-command> callback.
 
-7)  B<Tk::Animation> is now an optional module (not required).  Needed only 
-if you wish to be able to "play" animated GIF images.  NOTE:  They are not 
-playable from the image display screen, but only via a bound callback 
-function, such as the default I<-command> callback.
+7)  B<Tk::Animation> is now an optional module (not required).  Needed 
+only if you wish to be able to "play" animated GIF images.  
+NOTE:  They are not playable from the image display screen, but only via 
+a bound callback function, such as the default I<-command> callback.
 
 =head1 KEYWORDS
 
@@ -1230,10 +1282,10 @@ jthumbnail, thumbnail, icons
 
 L<Tk> L<Tk::LabEntry> L<Tk::JPEG> L<Tk::PNG> L<File::Basename>
 
-Optional:  L<Tk::Animation>
+Optional:  L<Tk::Animation> (for GIF animation)
 
 =head1 SEE ALSO
 
-L<Tk::Thumbnail>
+L<Tk::Thumbnail> L<Tk::Photo>
 
 =cut

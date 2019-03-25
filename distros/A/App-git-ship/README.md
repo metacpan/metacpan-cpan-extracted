@@ -4,7 +4,7 @@ App::git::ship - Git command for shipping your project
 
 # VERSION
 
-0.31
+0.32
 
 # SYNOPSIS
 
@@ -13,14 +13,14 @@ See ["SYNOPSIS" in App::git::ship::perl](https://metacpan.org/pod/App::git::ship
 Below is a list of useful git aliases:
 
     # git build
-    $ git config --global alias.build = ship build
+    $ git config --global alias.build 'ship build'
 
     # git cl
-    $ git config --global alias.cl = ship clean
+    $ git config --global alias.cl 'ship clean'
 
     # git start
     # git start My/Project.pm
-    $ git config --global alias.start = ship start
+    $ git config --global alias.start 'ship start'
 
 # DESCRIPTION
 

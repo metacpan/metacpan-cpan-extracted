@@ -24,6 +24,6 @@ requires:
   warnings: '0'
 resources:
   repository: https://gitcloud.federationhq.de/git/App-Git-IssueManager-JiraSync.git
-version: '0.1'
+version: '0.2'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

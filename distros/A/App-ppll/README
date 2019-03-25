@@ -1,0 +1,74 @@
+NAME
+    App::ppll - Command runner
+
+VERSION
+    0.0.1
+
+DESCRIPTION
+    "ppll" is a tool to control the execution of commands. It can run
+    commands in parallel, construct commands from lists of parameters, and
+    more.
+
+    It handles the output of commands and can prefix lines with which
+    command produced it, print timestamps, etc.
+
+    "ppll" has functionality similar to "xargs" and "parallel".
+
+    This page documents "ppll"’s Perl API. For user documentation of the
+    "ppll" command see ppll.
+
+SYNOPSIS
+        my $ppll = App::ppll->new( %args );
+        $ppll->call();
+
+SUBROUTINES/METHODS
+  "call"
+    Runs "ppll".
+
+    Returns an integer suitable for "exit" (0 if everything went fine, non-0
+    otherwise).
+
+  "new( %args )"
+    Constucts a new "App::ppll" object that represents an invocation of
+    "ppll". Does *not* run anything, to do that use call.
+
+   NAMED ARGUMENTS
+    "argv"
+        An array ref to use instead of @ARGV.
+
+  stop
+AUTHOR
+    Theo -q Willows, "<theo@willows.se>"
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests through the web interface at
+    <https://gitlab.com/munkei-software/ppll/issues>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc ppll
+
+    Or:
+
+        ppll --help
+
+    You can also look for information at:
+
+    *   MetaCPAN
+
+        <https://metacpan.org/pod/App::ppll>
+
+    *   GitLab
+
+        <https://gitlab.com/munkei-software/ppll>
+
+LICENSE AND COPYRIGHT
+    Copyright 2019 Theo Willows.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <http://dev.perl.org/licenses/> for more information.
+

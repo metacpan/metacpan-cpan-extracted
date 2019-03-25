@@ -1,0 +1,468 @@
+#!/usr/bin/env perl
+
+=encoding utf8
+
+=head1 NAME
+
+ppll
+
+=cut
+
+use autodie;
+use strict;
+use utf8::all;
+use v5.20;
+use warnings;
+
+use FindBin;
+
+use lib "$FindBin::Bin/../lib";
+
+require App::ppll;
+
+exit App::ppll->new->call;
+
+=head1 SYNOPSIS
+
+    ppll [OPTIONS] COMMAND [ARGS]
+    ppll [OPTIONS] -c COMMAND [PARAMETERS]
+    ppll --help
+    ppll --version
+
+In the first form, all arguments after I<COMMAND> are considered arguments to
+I<COMMAND>, not options to C<ppll>, even if they begin with a hyphen.
+
+=head1 DESCRIPTION
+
+C<ppll> is a tool to control the execution of commands. It can run commands in
+parallel, construct commands from lists of parameters, and more.
+
+It handles the output of commands and can prefix lines with which command
+produced it, print timestamps, etc.
+
+C<ppll> has functionality similar to C<xargs> and C<parallel>.
+
+=head2 PARAMETERS AND JOBS
+
+‘Parameters’ is what makes C<ppll> run multiple commands. In one way or
+another C<ppll> can be given a number of parameters, and it will create and run
+one ‘job’ for each parameter.
+
+If no parameter-related option is used C<ppll> will read the parameters from
+STDIN (if it’s not a TTY). Ordinarily, each line read becomes one parameter, but
+there are options to control this.
+
+The other important input to C<ppll> is the ‘command’. The command-line
+arguments after all options make up the command and its arguments.
+
+Each job will execute the command. All occurrences of C<{}> in any part of the
+command (and its arguments) will be replaced with the job’s parameter. If there
+are no such occurrences the parameter will be appended as an additional
+argument.
+
+For example:
+
+    ppll echo {} <<EOF
+    cow
+    pig
+    sheep
+    EOF
+
+Will create jobs that execute C<echo cow>, C<echo pig> and so on. An other way
+to do the same thing would be:
+
+    ppll echo <<EOF
+    cow
+    pig
+    sheep
+    EOF
+
+C<{}> becomes useful when it’s not supposed to be the last argument, e.g:
+
+    ppll cp {} farm/ <<EOF
+    cow
+    pig
+    sheep
+    EOF
+
+Or when it’s supposed to be just a part of an argument, or show up more than
+once, e.g:
+
+    ppll curl -o photo-of-a-{}.jpg http://example.com/img/{}.jpg <<EOF
+    cow
+    pig
+    sheep
+    EOF
+
+The above would run
+C<curl -o photo-of-a-cow.jpg http://example.com/img/cow.jpg>, etc.
+
+=head3 JOB CONTROL
+
+The default is to run several such jobs in parallel. Once a job is finished
+another one is started, until there are no more jobs to run.
+
+The number of jobs run at the same time is controlled by the B<--jobs> option.
+The default is one per CPU (but not necessarily one on each CPU).
+
+If a job fails (exits with a code other than 0), no more jobs will be started.
+C<ppll> I<attempts to> stop other running jobs.
+
+The B<--force> option tells C<ppll> to not care about failed jobs and always
+keep starting new ones. Any failed jobs are still noted and will still affect
+C<ppll>’s own exit code.
+
+=head3 SERIAL LINES, PARALLEL FIELDS
+
+This feature deserves its own section.
+
+It can be used to parallelise heavy tasks, while also making sure certain tasks
+are run in a particular order.
+
+Each line of input will create a ‘group’ of parameters, that will be run before
+the next group starts. Each line is split up into individual parameters (using
+the C<IFS> environment variable), that will be run at the same time.
+
+An example:
+
+    ppll --slpf wake-up.sh <<EOF
+    rooster
+    hens chickens
+    cows pigs sheep
+    cat
+    EOF
+
+The above would run C<wake-up.sh> first for C<rooster>. I<Then> it would run it
+for C<hens> and C<chickens>, at the same time, but after the C<rooster> job has
+completed. Then C<cows>, C<pigs> and C<sheep> in parallel, and so on.
+
+=head1 OPTIONS
+
+=head2 GENERAL
+
+=over
+
+=item B<--help>
+
+=item B<-h>
+
+=item B<-?>
+
+Print (this) help and exit.
+
+=item B<--version>
+
+=item B<-V>
+
+Print B<ppll>’s version and exit.
+
+=back
+
+=head2 PARAMETERS AND JOBS
+
+=over
+
+=item B<--command> I<COMMAND>
+
+=item B<-C> I<COMMAND>
+
+Run I<COMMAND> as a shell command with each parameter passed as an argument.
+This allows for shell constructs, such as piping, redirecting, etc.
+
+If used then the rest of the command-line arguments are used as parameters,
+instead of a command.
+
+More or less the same as:
+
+    ppll $SHELL -c <COMMAND> -
+
+(C<$SHELL> defaults to C</bin/sh>.)
+
+=item B<--delimiter> I<DELIMITER>
+
+=item B<-d> I<DELIMITER>
+
+Use I<DELIMITER>, as a regex,  to split lines into fields. Implies B<--fields>.
+
+=item B<--empty>
+
+Include empty parameters. These are otherwise discarded.
+
+=item B<--fields>
+
+=item B<-f>
+
+Alias for C<--mode fields>.
+
+=item B<--force>
+
+=item B<-k>
+
+Keep starting new jobs even if a job has failed.
+
+=item B<--jobs> I<N>
+
+=item B<-j> I<N>
+
+Run (up to) this many jobs in parallel.
+
+=item B<--lines>
+
+=item B<-l>
+
+Alias for C<--mode lines>.
+
+=item B<--mode> I<MODE>
+
+How input should be turned into parameters. I<MODE> is one of:
+
+=over
+
+=item C<auto> (default)
+
+If there’s only one line of input, behave as if C<fields>, otherwise as if
+C<lines>.
+
+=item C<fields>
+
+Split lines into fields and use each field as a parameter.
+Splitting is done using a delimiter set with B<--delimiter>, or the C<IFS>
+environment variable.
+
+=item C<lines>
+
+Use each line as a parameter.
+
+=item C<slpf>
+
+Split each line into parameters. All parameters from a single line will be run
+in parallel, but lines will be run serially.
+
+=back
+
+See also: B<--fields>, B<--lines>, B<--serial-lines-parallel-fields>
+
+=item B<--random>
+
+=item B<-R>
+
+Shuffle the parameters.
+
+=item B<--replace-string> I<STRING>
+
+=item B<-replstr> I<STRING>
+
+=item B<-I=s> I<STRING>
+
+Use I<STRING> instead of C<{}> as a placeholder for the parameter.
+
+=item B<--reverse>
+
+=item B<-r>
+
+Use the parameters in reverse order.
+
+=item B<--sequence> I<SPEC>
+
+=item B<-s> I<SPEC>
+
+Use I<SPEC> as parameters.
+
+I<SPEC> is in one of the forms:
+
+=over
+
+=item C<N..M>
+
+Parameters are from I<N> to I<M>, inclusive.
+
+=item C<M>
+
+Parameters are from 1 to I<M>, inclusive.
+
+=back
+
+=item B<--serial-lines-parallel-fields>
+
+=item B<-slpf>
+
+Alias for C<--mode slpf>.
+
+=back
+
+=head2 OUTPUT
+
+=over
+
+=item B<--colour>
+
+=item B<--color>
+
+=item B<--no-colour>
+
+=item B<--no-color>
+
+Turn on or off ANSI colours in the output.
+
+The default is to enable colours if STDOUT is a TTY.
+
+=item B<--markers>
+
+=item B<--no-markers>
+
+Prefix (the default), or don’t prefix, jobs’ STDOUT and STDERR output with
+C<E<gt>> or C<≫>, respectively.
+
+=item B<--quiet>
+
+=item B<-q>
+
+Print less. Can be repeated for less and less.
+
+=item B<--summary>
+
+=item B<-S>
+
+=item B<--no-summary>
+
+Print (the default if there’s more than one parameter), or don’t print, a
+summary of how many jobs ran and which of them failed.
+
+=item B<--timestamp-format> I<FORMAT>
+
+Format timestamps using I<FORMAT>. See L<DateTime::strftime|DateTime::strftime>.
+
+The default is C<%T.%3N>.
+
+Implies B<--timestamps>.
+
+=item B<--timestamps>
+
+=item B<-t>
+
+Prefix lines from jobs’ output with a timestamp. The time printed will be the
+I<approximate> time the line was printed by the job.
+
+=item B<--verbose>
+
+=item B<-v>
+
+Print more. Can be repeated for more and more.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<ppll> uses some environment variables in some cases:
+
+=over
+
+=item C<COLUMNS>
+
+If set then used when printing things across the whole width of the terminal. If
+not set then C<ppll> will try to work out the terminal width in other ways,
+falling back to 80.
+
+=item C<IFS>
+
+Used for splitting lines into fields, e.g. with C<--fields> or
+C<--serial-lines-parallel-fields>.
+
+=item C<SHELL>
+
+Used with C<--commmand> (C<-c>).
+
+=back
+
+=head1 EXAMPLES
+
+    ppll -t make
+
+Run a long-running command, e.g. C<make>, and prefix the output with timestamps.
+
+    ppll -j 10 -s 1..1000 gobbledygook --with-rigmarole --number
+
+For each number from 1 to 1,000 (inclusive), run the C<gobbledygook> command
+with some arguments. Add the a number as the last argument, e.g. C<gobbledygook
+--with-rigmarole --number 42>.
+
+Run no more than 10 such commands at a time.
+
+    ppll curl -o photo-of-a-{}.jpg http://example.com/img/{}.jpg <<EOF
+    cow
+    pig
+    sheep
+    EOF
+
+Download three files in parallel. Note the use of C<{}> to use each parameter in
+two places in each command.
+
+=head1 SEE ALSO
+
+=over
+
+=item
+L<xargs|https://pubs.opengroup.org/onlinepubs/9699919799/utilities/xargs.html>
+
+POSIX, and thus available almost everywhere, and can run multiple commands based
+on a list of parameters, much like C<ppll>.
+
+=item L<GNU Parallel|https://www.gnu.org/software/parallel/>
+
+Also runs commands in parallel, but with an interface quite different to
+C<ppll>’s.
+
+=item L<moreutil|https://joeyh.name/code/moreutils/>’s C<parallel> and C<ts>
+
+moreutils contains a C<parallel> tool similar yet different to GNU Parallel.
+
+It also has a separate tool for adding timestamps to output.
+
+=back
+
+=head1 AUTHOR
+
+Theo -q Willows, C<< <theo@willows.se> >>
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests through the web interface at
+L<https://gitlab.com/munkei-software/ppll/issues>.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc ppll
+
+Or:
+
+    ppll --help
+
+You can also look for information at:
+
+=over
+
+=item * MetaCPAN
+
+L<https://metacpan.org/pod/App::ppll>
+
+=item * GitLab
+
+L<https://gitlab.com/munkei-software/ppll>
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2019 Theo Willows.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of either: the GNU General Public License as published by the Free
+Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

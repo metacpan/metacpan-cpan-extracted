@@ -1,7 +1,7 @@
 package winja;
 use 5.018000;
 use version;
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 use utf8;
 

@@ -1,3 +1,8 @@
+Release Name: 1.15
+====================
+
+Tag.pm:	Fix more unescaped-{ warnings (thanks to Christian Walde etc).
+
 Release Name: 1.14
 ====================
 

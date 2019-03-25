@@ -90,7 +90,6 @@ sub run {
     try {
         my $config = $self->load_config;
         my $class  = $self->setup_class($config);
-
         $class->name->new_with_options( {
                 home   => $self->home,
                 config => $config,
@@ -112,7 +111,7 @@ sub run {
 }
 
 sub setup_class {
-    my ( $self, $config ) = @_;
+    my ( $self, $config, $command ) = @_;
 
     # unique plugins
     $config->{plugins} ||= [];
@@ -135,9 +134,17 @@ sub setup_class {
     }
 
     my $load_attribs_for_command;
-    foreach (@ARGV) {
-        if ( defined $commands{$_} ) {
-            $load_attribs_for_command = '_load_attribs_' . $_;
+    foreach my $cmd ( $command ? $command : @ARGV) {
+        if ( defined $commands{$cmd} ) {
+            $load_attribs_for_command = '_load_attribs_' . $cmd;
+
+            if ($cmd eq 'start' && !$self->has_project) {
+                error_message(
+                    "Could not find project\nUse --project or chdir into the project directory"
+                );
+                exit;
+            }
+
             last;
         }
     }
@@ -187,7 +194,6 @@ WALKUP: while ( $try++ < 30 ) {
             my @path    = $config_file->parent->dir_list;
             my $project = $path[-1];
             $cfl->{$project} = $config_file->stringify;
-
             $self->project($project)
                 unless $self->has_project;
 
@@ -266,7 +272,7 @@ App::TimeTracker::Proto - App::TimeTracker Proto Class
 
 =head1 VERSION
 
-version 2.026
+version 2.027
 
 =head1 DESCRIPTION
 

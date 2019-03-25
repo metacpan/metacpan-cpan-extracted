@@ -14,10 +14,12 @@ t/005Cwd.t
 t/006DirPerms.t
 t/007bzip.t
 t/008performance.t
-t/009performance-small.t
+t/009compressed.t
+t/010openbsd.t
 t/data/bar.tar
 t/data/foo.tar.bz2
 t/data/foo.tgz
 t/lib/ATWDumbbench.pm
+xt/performance-small.t
 README.md
 META.json                                Module JSON meta-data (added by MakeMaker)

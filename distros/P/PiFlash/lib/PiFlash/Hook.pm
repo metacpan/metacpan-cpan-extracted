@@ -6,7 +6,7 @@ use warnings;
 use v5.14.0; # require 2011 or newer version of Perl
 
 package PiFlash::Hook;
-$PiFlash::Hook::VERSION = '0.4.1';
+$PiFlash::Hook::VERSION = '0.4.3';
 use Carp qw(confess);
 use autodie; # report errors instead of silently continuing ("die" actions are used as exceptions - caught & reported)
 use parent 'PiFlash::Object';
@@ -108,7 +108,7 @@ PiFlash::Hook - named dispatch/hook library for PiFlash
 
 =head1 VERSION
 
-version 0.4.1
+version 0.4.3
 
 =head1 SYNOPSIS
 

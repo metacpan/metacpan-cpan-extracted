@@ -6,33 +6,31 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0002'; # VERSION
+our $VERSION = '0.0003'; # VERSION
 
-use PDL::Core;
-use PDL::Lite;
+use PDL::Lite ();
 use PDL::Primitive qw(which);
 use PDL::Types;
+
 use Safe::Isa;
 use Scalar::Util qw(blessed);
 use Test2::API qw(context);
-use Test2::Compare qw(compare strict_convert convert);
-use Test2::Compare::Float;
-use Test2::Tools::Compare qw(number within string);
+use Test2::Compare qw(compare strict_convert);
 use Test2::Util::Table qw(table);
 use Test2::Util::Ref qw(render_ref);
 
 use parent qw/Exporter/;
 our @EXPORT = qw(pdl_ok pdl_is);
 
-use constant DEFAULT_TOLERANCE => $Test2::Compare::Float::DEFAULT_TOLERANCE;
-our $TOLERANCE = DEFAULT_TOLERANCE;
+our $TOLERANCE = $Test2::Compare::Float::DEFAULT_TOLERANCE;
+our $TOLERANCE_REL = 0;
 
 
 sub pdl_ok {
     my ( $thing, $name ) = @_;
     my $ctx = context();
 
-    unless ( $thing->$_DOES('PDL') ) {
+    unless ( $thing->$_isa('PDL') ) {
         my $thingname = render_ref($thing);
         $ctx->ok( 0, $name, ["'$thingname' is not a piddle."] );
         $ctx->release;
@@ -104,97 +102,68 @@ sub pdl_is {
     }
 
     # Compare data values.
-    # 
-    # Here we directly compare the $got and $exp's unpdl via standard
-    # Test2::Compare::Array, this way is slower but does not require the
-    # effort for diag message. Another possible approach would be checking
-    # if ($got == $exp) has all ones, but that needs further generating
-    # the diag message ourselves.
-    my $is_numeric = !( $exp->type eq 'byte' or $exp->$_DOES('PDL::SV') );
-    my $converter_scalar = !$is_numeric
-        ? \&string : ( $got->type < PDL::float and $exp->type < PDL::float )
-        ? \&number 
-        : sub { within( $_[0], $TOLERANCE ) } ;
-
-    my $delta_equal  = compare( $got->unpdl, $exp->unpdl,
-            gen_convert->($both_bad, $converter_scalar) );
-    if ($delta_equal) {
-        $ctx->ok( 0, $name,
-            [ $delta_equal->table, 'Values do not match', @diag ] );
+    my $diff;
+    my $is_numeric = !(
+        List::Util::any { $exp->$_isa($_) }
+        qw(PDL::SV PDL::Factor PDL::DateTime) or $exp->type eq 'byte'
+    );
+    eval {
+        if ( $is_numeric
+            and ( $exp->type >= PDL::float or $got->type >= PDL::float ) )
+        {
+            $diff = (($got - $exp)->abs > $TOLERANCE + $TOLERANCE_REL * $exp);
+        }
+        else {
+            $diff = ( $got != $exp );
+        }
+        if ( $exp->badflag ) {
+            $diff->where( $exp->isbad ) .= 0;
+        }
+    };
+    if ($@) {
+        my $gotname = render_ref($got);
+        $ctx->ok( 0, $name, [ "Error occurred during values comparison.", $@ ],
+            @diag );
+        $ctx->release;
+        return 0;
     }
-    else {
-        $ctx->ok( 1, $name );
-    }
-
-    $ctx->release;
-    return !$delta_equal;
-}
-
-sub gen_convert {
-    my ($both_bad, $converter_scalar) = @_;
-
-    unless (defined $both_bad) {
-        return sub {
-            my ($check) = @_;
-
-            if ( not ref($check) ) {
-                return $converter_scalar->(@_);
-            } else {
-                return strict_convert(@_);
+    my $diff_which = which($diff);
+    unless ( $diff_which->isempty ) {
+        state $at = sub {
+            my ( $p, @position ) = @_;
+            if ( $p->isa('PDL::DateTime') ) {
+                return $p->dt_at(@position);
+            }
+            else {
+                return $p->at(@position);
             }
         };
+
+        my $gotname = render_ref($got);
+        my @table   = table(
+            sanitize  => 1,
+            max_width => 80,
+            collapse  => 1,
+            header    => [qw(POSITION GOT CHECK)],
+            rows      => [
+                map {
+                    my @position = $exp->one2nd($_);
+                    [
+                        join( ',', @position ),
+                        $at->( $got, @position ),
+                        $at->( $exp, @position )
+                    ]
+                } @{ $diff_which->unpdl }
+            ]
+        );
+        $ctx->ok( 0, $name, [ "Values do not match.", @table ], @diag );
+        $ctx->release;
+        return 0;
     }
 
-    # pdl dimensions is in reversion to array
-    if ( $both_bad->ndims > 1 ) {
-        $both_bad = $both_bad->transpose;
-    }
-
-    # Have a state in the subroutine, so it knows which indices to ignore.
-    return sub {
-        my ($check) = @_;
-
-        unless ( defined $check and ref($check) eq 'ARRAY' ) {
-            return strict_convert($check);
-        }
-
-        # get number of dimensions of $check
-        my $check_ndims = 0;
-        my $tmp         = $check;
-        while ( defined $tmp and ref($tmp) eq 'ARRAY' ) {
-            $check_ndims += 1;
-            $tmp = $tmp->[0];
-        }
-
-        state $indices = [ (-1) x $both_bad->ndims ];
-
-        my $indices_idx = $both_bad->ndims - $check_ndims - 1;
-        if ( $indices_idx < $#$indices ) {
-
-            # reset indices of later dimensions
-            for ( $indices_idx + 1 .. $#$indices ) {
-                $indices->[$_] = -1;
-            }
-        }
-        $indices->[$indices_idx] += 1;
-
-        # implicit_end has be 0 as otherwise it fails in case bad is at end
-        # of piddle.
-        my $converted = convert( $check,
-            { implicit_end => 0, use_regex => 0, use_code => 0 } );
-
-        # last dimension
-        if ( $indices_idx == $both_bad->ndims - 2 ) {
-            my $order =
-                $indices_idx >= 0
-              ? $both_bad->index( @$indices[ 0 .. $indices_idx ] )
-              : $both_bad;
-            $order = which( !$order )->unpdl;
-            $converted->set_order($order);
-        }
-
-        return $converted;
-    };
+    $ctx->ok( 1, $name );
+    $ctx->release;
+    return 1;
 }
 
 1;
@@ -211,7 +180,7 @@ Test2::Tools::PDL - Test2 tools for verifying Perl Data Language piddles
 
 =head1 VERSION
 
-version 0.0002
+version 0.0003
 
 =head1 SYNOPSIS
 
@@ -247,19 +216,21 @@ This module contains tools for verifying L<PDL> piddles.
 
 This module can be configured by some module variables.
 
-=head2 TOLERANCE
+=head2 TOLERANCE, TOLERANCE_REL
 
-Defaultly it's same as C<$Test2::Compare::Float::DEFAULT_TOLERANCE>, which
-is C<1e-8>. For piddle of float types piddles the tolerance is applied for
-comparison.
+These two variables are used when comparing float piddles. For
+C<pdl_is($got, $exp, ...)>, the effective tolerance is
+C<$TOLERANCE + $TOLERANCE_REL * $exp>.
 
-    $Test2::Tools::PDL::TOLERANCE = 0.01;
+Default value of C<$TOLERANCE> is same as
+C<$Test2::Compare::Float::DEFAULT_TOLERANCE>, which is C<1e-8>.
+Default value of C<$TOLERANCE_REL> is 0.
 
-You can set this variable to 0 to force exact numeric comparison. For
-example,
+For example, to use only relative tolerance,
 
     {
         local $Test2::Tools::PDL::TOLERANCE = 0;
+        local $Test2::Tools::PDL::TOLERANCE_REL = 1e-6;
         ...
     }
 
@@ -270,6 +241,12 @@ L<PDL>, L<Test2::Suite>, L<Test::PDL>
 =head1 AUTHOR
 
 Stephan Loyd <sloyd@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mohammad S Anwar
+
+Mohammad S Anwar <manwar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.07';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.08';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -19,7 +19,6 @@ extends 'AppConfig';
 use AppConfig qw(:argcount);
 use File::HomeDir;
 use Class::Load ':all';
-use Encode;
 use namespace::clean;
 
 
@@ -230,7 +229,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 METHODS
 

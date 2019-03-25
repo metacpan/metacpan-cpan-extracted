@@ -5,6 +5,7 @@ use Config;
 # compiler detection
 my $is_gcc = length($Config{gccversion});
 my $is_msvc = $Config{cc} eq 'cl' ? 1 : 0;
+my $legacy_gcc = index ($Config{gccversion}, '4.2.1') != -1 ? 1 : 0;
 
 # os detection
 my $is_solaris = ($^O =~ /(sun|solaris)/i) ? 1 : 0;
@@ -12,6 +13,7 @@ my $is_windows = ($^O =~ /MSWin32/i) ? 1 : 0;
 my $is_linux = ($^O =~ /linux/i) ? 1 : 0;
 my $is_osx = ($^O =~ /darwin/i) ? 1 : 0;
 my $is_bsd = ($^O =~ /bsd/i) ? 1 : 0;
+my $is_openbsd = ($^O =~ /openbsd/i) ? 1 : 0;
 my $is_gkfreebsd = ($^O =~ /gnukfreebsd/i) ? 1 : 0;
 
 my $def = '-DZMQ_CUSTOM_PLATFORM_HPP -DZMQ_STATIC -DZMQ_BUILD_DRAFT_API -D_THREAD_SAFE';
@@ -111,7 +113,7 @@ else
 		'ZMQ_USE_POLL 1';
 }
 
-if (($is_linux || $is_osx || $is_bsd) && !$is_gkfreebsd)
+if ($is_linux || $is_osx || ($is_bsd && !$is_gkfreebsd && !$is_openbsd))
 {
 	push @opts,
 		'ZMQ_HAVE_TCP_KEEPCNT',
@@ -239,7 +241,7 @@ sub MY::c_o {
 	}
 
 	my $std_switch = '';
-	if ($is_gcc) {
+	if ($is_gcc && !$legacy_gcc) {
 		$std_switch = '-std=c++11'
 	}
 
@@ -295,7 +297,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.31",
+  "VERSION" => "0.32",
   "test" => {
     "TESTS" => "t/*.t"
   }

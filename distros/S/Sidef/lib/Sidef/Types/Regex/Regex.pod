@@ -22,6 +22,16 @@ Inherits methods from:
 
 =head1 METHODS
 
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>, I<concat>
+
+=cut
+
 =head2 <
 
 I<Obj> B<E<lt>> I<Obj> -> I<Obj>
@@ -86,6 +96,18 @@ Regex.gmatch() -> I<Obj>
 
 Return the
 
+Aliases: I<global_match>
+
+=cut
+
+=head2 gmatches
+
+Regex.gmatches() -> I<Obj>
+
+Return the
+
+Aliases: I<all_matches>, I<map_matches>, I<global_matches>, I<repeated_match>
+
 =cut
 
 =head2 to_re
@@ -105,6 +127,16 @@ Regex.to_s() -> I<Obj>
 Return the
 
 Aliases: I<dump>, I<to_str>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<union>
 
 =cut
 

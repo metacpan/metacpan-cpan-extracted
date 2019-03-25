@@ -1,16 +1,14 @@
 package Sidef {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
-    our $VERSION = '3.60';
+    our $VERSION = '3.70';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
 
-    our @NAMESPACES;         # will keep track of declared modules
     our %INCLUDED;           # will keep track of included modules
-
     our %EVALS;              # will contain info required for eval()
 
     use constant {
@@ -36,7 +34,6 @@ package Sidef {
         my ($self, $code) = @_;
 
         local %INCLUDED;
-        local @NAMESPACES;
 
         $self->{parser} //= Sidef::Parser->new(
                                                opt         => $self->{opt},
@@ -46,7 +43,6 @@ package Sidef {
                                               );
 
         my $ast = $self->{parser}->parse_script(code => \$code);
-        $self->{namespaces} = \@NAMESPACES;
 
         # Check for optimization
         if (defined(my $level = $self->{opt}{O})) {
@@ -235,8 +231,7 @@ package Sidef {
         if (
             $self->{opt}{s}
             ##and length($$code) > 1024
-            and (defined($self->{dbm_driver})
-                 or $self->has_dbm_driver)
+            and (defined($self->{dbm_driver}) or $self->has_dbm_driver)
           ) {
 
             my $db_dir = ($self->{$lang}{db_dir} //= File::Spec->catdir($self->get_sidef_vdir(), $lang));
@@ -298,11 +293,8 @@ package Sidef {
         my $pm     = ($module =~ s{::}{/}gr . '.pm');
 
         require $pm;
-        $self->{$lang}{deparser} = $module->new(
-                                                opt              => $self->{opt},
-                                                namespaces       => $self->{namespaces},
-                                                environment_name => $self->{environment_name} // '',
-                                               );
+        $self->{$lang}{deparser} = $module->new(opt              => $self->{opt},
+                                                environment_name => $self->{environment_name} // '',);
 
         scalar $self->{$lang}{deparser}->deparse($ast);
     }

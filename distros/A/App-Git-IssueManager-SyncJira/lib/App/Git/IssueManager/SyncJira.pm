@@ -36,6 +36,14 @@ option 'dryrun' => (
                     documentation=>"JIRA URL"
                   );
 
+  option 'nosslverify' => (
+                    is => 'rw',
+                    isa => 'Bool',
+                    required => 0,
+                    default => 0,
+                    documentation => q[If URL scheme is HTTPS do not enforce valid certificate]
+                  );
+
   option 'user' => (
                     is => 'rw',
                     isa=>"Str",
@@ -85,7 +93,7 @@ sub run
 
   for my $t (@{$self->type_mapping})
   {
-    if ($t =~ /^(\S+):(\S+)$/ )
+    if ($t =~ /^([\S\s]+):(\S+)$/ )
     {
       $typemap->{$1}=$2;
     }
@@ -93,13 +101,17 @@ sub run
 
   for my $s (@{$self->stati_mapping})
   {
-    if ($s =~ /^(\S+):(\S+)$/ )
+    if ($s =~ /^([\S\s]+):(\S+)$/ )
     {
       $statimap->{$1}=$2;
     }
   }
 
   my $jira = JIRA::Client::Automated->new($self->url, $self->user, $self->pass);
+
+  # set SSL verification requirements
+  $jira->ua()->ssl_opts("verify_hostname" => $self->nosslverify() ? 0 : 1);
+
   my $jql = "project = " . $self->project;
   my $search_results = $jira->search_issues($jql,0, 1000000000);
 
@@ -145,7 +157,7 @@ App::Git::IssueManager::SyncJira - class implementing the sync_jira issue comman
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 DESCRIPTION
 

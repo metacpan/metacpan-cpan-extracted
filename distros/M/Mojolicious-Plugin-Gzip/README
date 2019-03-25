@@ -1,0 +1,91 @@
+NAME
+
+    Mojolicious::Plugin::Gzip - Plugin to Gzip Mojolicious responses
+
+STATUS
+
+SYNOPSIS
+
+      # Mojolicious::Lite
+      plugin 'Gzip';
+    
+      # With minimum size in bytes required before gzipping. Default is 860.
+      plugin Gzip => {min_size => 1500};
+    
+      # Mojolicious
+      $app->plugin('Gzip');
+    
+      # With minimum size in bytes required before gzipping. Default is 860.
+      $app->plugin(Gzip => {min_size => 1500});
+
+DESCRIPTION
+
+    Mojolicious::Plugin::Gzip gzips all responses equal to or greater than
+    a "min_size" by using the "after_dispatch" in Mojolicious hook.
+    Mojolicious::Plugin::Gzip will only gzip a response if all of these
+    conditions are met:
+
+      * The "accept_encoding" in Mojo::Headers header contains 'gzip'.
+
+      * The "body_size" in Mojo::Content of the response is greater than or
+      equal to "min_size".
+
+      * The "code" in Mojo::Message::Response is 200.
+
+      * The "content_encoding" in Mojo::Headers for the response is not
+      set.
+
+    Mojolicious::Plugin::Gzip will do these things if those conditions are
+    met:
+
+      * Set "body" in Mojo::Message to the gzipped version of the previous
+      "body" in Mojo::Message.
+
+      * Set "body_size" in Mojo::Message to the size of the gzipped
+      content.
+
+      * Set "content_encoding" in Mojo::Headers to "gzip".
+
+      * If "etag" in Mojo::Headers was set, append "-gzip" to the existing
+      "etag" in Mojo::Headers. This is done according to RFC-7232
+      <https://tools.ietf.org/html/rfc7232#section-2.3.3>, which states
+      that ETags should be content-coding aware.
+
+      * Use "append" in Mojo::Headers to append "Accept-Encoding" to the
+      "vary" in Mojo::Headers header.
+
+OPTIONS
+
+ min_size
+
+      # Mojolicious::Lite
+      plugin 'Gzip' => {min_size => 1500};
+    
+      # Mojolicious
+      $app->plugin(Gzip => {min_size => 1500});
+
+    Sets the minimum "body_size" in Mojo::Content required before response
+    content will be gzipped. If the "body_size" in Mojo::Content is greater
+    than or equal to "min_size", then it will be gzipped. Default is 860.
+
+AUTHOR
+
+    Adam Hopkins <srchulo@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2019- Adam Hopkins
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+      * MojoX::Encode::Gzip
+
+      * Mojolicious
+
+      * https://mojolicious.org
+

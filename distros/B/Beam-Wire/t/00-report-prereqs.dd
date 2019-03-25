@@ -21,7 +21,7 @@ do { my $x = {
                                       'Throwable' => '0',
                                       'Types::Standard' => '0',
                                       'YAML' => '0',
-                                      'perl' => '5.008'
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {

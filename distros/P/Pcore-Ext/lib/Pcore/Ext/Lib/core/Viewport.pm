@@ -6,6 +6,8 @@ use Pcore::CDN::Static::FA qw[:ALL];
 # VIEWPORT CONTROLLER
 sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
     return {
+        isCordova => \0,
+
         roles => [],
 
         api => {
@@ -51,6 +53,8 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
         init => func ['view'], <<"JS",
             var me = this;
 
+            me.isCordova = !!window.cordova;
+
             // parse API methods
             for (var method in me.api) {
                 me.api[method] = Ext.direct.Manager.parseMethod(me.api[method]);
@@ -66,7 +70,21 @@ sub EXT_controller : Extend('Ext.app.ViewController') : Type('controller') {
 
             Ext.route.Router.suspend();
 
-            me.initApp();
+            // cordova
+            if (me.isCordova) {
+
+                // initApp after device ready
+                document.addEventListener('deviceready', function () {
+                    me.onCordovaDeviceReady();
+
+                    me.initApp();
+                }, false);
+            }
+
+            // browser
+            else {
+                me.initApp();
+            }
 
             me.callParent(arguments);
 JS
@@ -88,6 +106,8 @@ JS
 
                     me.setLocale(session.locale, function () {
                         Ext.route.Router.resume();
+
+                        me.onAppReady();
                     });
                 }
                 else {
@@ -105,6 +125,14 @@ JS
                     me.getView().setActiveItem(item);
                 }
             });
+JS
+
+        onCordovaDeviceReady => func <<'JS',
+            return;
+JS
+
+        onAppReady => func <<'JS',
+            return;
 JS
 
         checkSession => func ['session'], <<'JS',

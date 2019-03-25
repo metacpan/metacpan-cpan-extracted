@@ -1,9 +1,11 @@
 package Sidef::Types::Glob::File {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
-    use parent qw(Sidef::Types::String::String);
+    use parent qw(
+      Sidef::Types::String::String
+      );
 
     require File::Spec;
     use Sidef::Types::Number::Number;
@@ -460,7 +462,7 @@ package Sidef::Types::Glob::File {
               };
         }
 
-        $success ? $fh_obj : ();
+        $success ? $fh_obj : undef;
     }
 
     sub touch {

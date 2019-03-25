@@ -26,7 +26,7 @@ piflash - Raspberry Pi SD-flashing script with safety checks to avoid erasing th
 
 =head1 VERSION
 
-version 0.4.1
+version 0.4.3
 
 =head1 SYNOPSIS
 
@@ -190,7 +190,7 @@ L<https://www.cpan.org/modules/INSTALL.html>
 
 =head3 Online resources
 
-A list of online resources for PiFlash is at L<https://github.com/ikluft/piflash/blob/master/doc/resources.md>
+A list of online resources for PiFlash is at L<https://metacpan.org/pod/distribution/PiFlash/doc/resources>
 including where to download Raspberry Pi bootable image files and articles/presentations about PiFlash.
 
 =head2 Bug reporting

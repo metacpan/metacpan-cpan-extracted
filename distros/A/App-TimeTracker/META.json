@@ -90,7 +90,7 @@
          "web" : "https://github.com/domm/App-TimeTracker"
       }
    },
-   "version" : "2.026",
+   "version" : "2.027",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

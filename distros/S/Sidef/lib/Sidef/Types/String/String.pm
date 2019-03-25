@@ -223,17 +223,17 @@ package Sidef::Types::String::String {
 
     sub first {
         my ($self, $num) = @_;
-        bless \CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1);
+        bless \(my $t = CORE::substr($$self, 0, defined($num) ? CORE::int($num) : 1));
     }
 
     sub last {
         my ($self, $num) = @_;
-        bless \CORE::substr($$self, defined($num) ? -CORE::int($num) : -1);
+        bless \(my $t = CORE::substr($$self, defined($num) ? -(CORE::int($num) || return $self->new('')) : -1));
     }
 
     sub char {
         my ($self, $pos) = @_;
-        bless \CORE::substr($$self, CORE::int($pos), 1);
+        bless \(my $t = CORE::substr($$self, CORE::int($pos), 1));
     }
 
     *char_at = \&char;
@@ -346,9 +346,11 @@ package Sidef::Types::String::String {
     sub substr {
         my ($self, $offs, $len) = @_;
         bless \(
-                defined($len)
-                ? CORE::substr($$self, CORE::int($offs), CORE::int($len))
-                : CORE::substr($$self, CORE::int($offs))
+                my $t = (
+                         defined($len)
+                         ? CORE::substr($$self, CORE::int($offs), CORE::int($len))
+                         : CORE::substr($$self, CORE::int($offs))
+                        )
                );
     }
 
@@ -377,9 +379,11 @@ package Sidef::Types::String::String {
         __PACKAGE__->new($to < $from ? '' : CORE::substr($$self, $from, $to - $from + 1));
     }
 
+    *slice = \&ft;
+
     sub insert {
         my ($self, $string, $pos, $len) = @_;
-        my $copy_str = $$self;
+        my $copy_str = "$$self";
         CORE::substr($copy_str, CORE::int($pos), (defined($len) ? CORE::int($len) : 0), "$string");
         bless \$copy_str;
     }
@@ -495,7 +499,7 @@ package Sidef::Types::String::String {
 
     sub _get_captures {
         my ($string) = @_;
-        map { bless \CORE::substr($string, $-[$_], $+[$_] - $-[$_]) } 1 .. $#{-};
+        map { bless \(my $t = CORE::substr($string, $-[$_], $+[$_] - $-[$_])) } 1 .. $#{-};
     }
 
     sub esub {
@@ -543,7 +547,7 @@ package Sidef::Types::String::String {
         Sidef::Types::Array::Array->new([map { bless \$_ } $str =~ /$regex->{regex}/g]);
     }
 
-    sub findall {
+    sub collect {
         my ($self, $regex) = @_;
         my $str = $$self;
         my @matches;
@@ -552,6 +556,9 @@ package Sidef::Types::String::String {
         }
         Sidef::Types::Array::Array->new(\@matches);
     }
+
+    *findall  = \&collect;
+    *find_all = \&collect;
 
     sub split {
         my ($self, $sep, $size) = @_;
@@ -1226,6 +1233,8 @@ package Sidef::Types::String::String {
         $$self =~ /\\|#\{/ || return $self;    # return faster
 
         require Encode;
+        require List::Util;
+
         my $str = $$self;
 
         state $esc = {
@@ -1252,6 +1261,15 @@ package Sidef::Types::String::String {
                 if (exists $esc->{$char}) {
                     splice(@chars, $i--, 2, $esc->{$char});
                     next;
+                }
+                elsif ($char =~ /^[0-7]/) {
+
+                    my $max = List::Util::min($i + 3, $#chars);
+                    my $str = CORE::join('', @chars[$i + 1 .. $max]);
+
+                    if ($str =~ /^(0[0-7]{1,2}|[0-7]{1,2})/) {
+                        splice @chars, $i, 1 + $+[0], CORE::chr(CORE::oct($1));
+                    }
                 }
                 elsif (   $char eq 'L'
                        or $char eq 'U'
@@ -1281,7 +1299,10 @@ package Sidef::Types::String::String {
                 }
                 elsif ($char eq 'N') {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
-                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+
+                        my $max = List::Util::min($i + 2048, $#chars);
+                        my $str = CORE::join('', @chars[$i + 2 .. $max]);
+
                         if ($str =~ /^\{(.*?)\}/) {
                             require charnames;
                             my $char = charnames::string_vianame($1);
@@ -1301,7 +1322,10 @@ package Sidef::Types::String::String {
                 }
                 elsif ($char eq 'x') {
                     if (exists $chars[$i + 2]) {
-                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+
+                        my $max = List::Util::min($i + 64, $#chars);
+                        my $str = CORE::join('', @chars[$i + 2 .. $max]);
+
                         if ($str =~ /^\{([[:xdigit:]]+)\}/) {
                             splice(@chars, $i, 2 + $+[0], chr(CORE::hex($1)));
                             next;
@@ -1315,7 +1339,10 @@ package Sidef::Types::String::String {
                 }
                 elsif ($char eq 'o') {
                     if (exists $chars[$i + 2] and $chars[$i + 2] eq '{') {
-                        my $str = CORE::join('', @chars[$i + 2 .. $#chars]);
+
+                        my $max = List::Util::min($i + 64, $#chars);
+                        my $str = CORE::join('', @chars[$i + 2 .. $max]);
+
                         if ($str =~ /^\{(.*?)\}/) {
                             splice(@chars, $i--, 2 + $+[0], CORE::chr(CORE::oct($1)));
                             next;
@@ -1328,12 +1355,6 @@ package Sidef::Types::String::String {
                         CORE::warn("Missing braces on \\o{}, within string!\n");
                     }
                     splice(@chars, $i, 1);
-                }
-                elsif ($char =~ /^[0-7]/) {
-                    my $str = CORE::join('', @chars[$i + 1 .. $#chars]);
-                    if ($str =~ /^(0[0-7]{1,2}|[0-7]{1,2})/) {
-                        splice @chars, $i, 1 + $+[0], CORE::chr(CORE::oct($1));
-                    }
                 }
                 elsif ($char eq 'c') {
                     if (exists $chars[$i + 2]) {    # bug for: "\c\\"

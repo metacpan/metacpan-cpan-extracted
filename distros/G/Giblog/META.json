@@ -1,5 +1,5 @@
 {
-   "abstract" : "HTML Generator",
+   "abstract" : "Blog builder for git generation",
    "author" : [
       "Yuki Kimoto <kimoto.yuki@gmail.com>"
    ],
@@ -44,5 +44,5 @@
          "web" : "https://github.com/yuki-kimoto/giblog"
       }
    },
-   "version" : "0.51"
+   "version" : "0.72"
 }

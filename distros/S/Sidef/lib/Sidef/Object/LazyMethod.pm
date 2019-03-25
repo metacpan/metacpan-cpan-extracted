@@ -1,7 +1,7 @@
 package Sidef::Object::LazyMethod {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(
       Sidef::Object::Object
@@ -52,6 +52,7 @@ package Sidef::Object::LazyMethod {
         my $method = $call->{method};
 
         if ($want eq 'call') {
+
             if (ref($obj)) {
                 return $obj->$method(@{$call->{args}}, @args);
             }

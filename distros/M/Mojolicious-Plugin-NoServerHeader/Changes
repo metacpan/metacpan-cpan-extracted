@@ -1,0 +1,10 @@
+Revision history for Mojolicious-Plugin-NoServerHeader
+
+0.03  2019-03-22 21:04:19 CDT
+        - Add Mojolicious as a dependency.
+
+0.02  2019-03-22 21:01:04 CDT
+        - Add Travis build status image.
+
+0.01  2019-03-22 20:54:07 CDT
+        - Initial release

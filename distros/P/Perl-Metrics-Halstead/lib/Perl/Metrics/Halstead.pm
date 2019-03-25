@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 use Moo;
 use strictures 2;
@@ -225,7 +225,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0600
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -243,6 +243,9 @@ C<Perl::Metrics::Halstead> computes Halstead complexity metrics.
 
 Please see the explanatory links in the L</"SEE ALSO"> section for descriptions
 of what these attributes mean and how they are computed.
+
+My write-up about this technique is at
+L<http://techn.ology.net/halstead-software-complexity-of-perl-code/>
 
 =head1 ATTRIBUTES
 
@@ -371,7 +374,7 @@ Return a hashref of the metrics and their computed values.
 
 =head1 SEE ALSO
 
-The F<t/01-methods.t> file in this distribution.
+The F<eg/analyze> and F<t/01-methods.t> file in this distribution.
 
 L<Moo>
 
@@ -380,6 +383,8 @@ L<PPI::Document>
 L<PPI::Dumper>
 
 L<https://en.wikipedia.org/wiki/Halstead_complexity_measures>
+
+L<http://techn.ology.net/halstead-software-complexity-of-perl-code/>
 
 L<https://www.verifysoft.com/en_halstead_metrics.html>
 

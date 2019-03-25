@@ -1,9 +1,11 @@
 package Sidef::Types::Set::Bag {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
-    use parent qw(Sidef::Types::Set::Set);
+    use parent qw(
+      Sidef::Types::Set::Set
+      );
 
     use overload
       q{bool} => sub { scalar(CORE::keys(%{$_[0]})) },
@@ -262,6 +264,8 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *set_kv      = \&replace_pair;
+    *update_kv   = \&replace_pair;
     *update_pair = \&replace_pair;
 
     sub replace_pairs {
@@ -275,6 +279,8 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *set_kvs      = \&replace_pairs;
+    *update_kvs   = \&replace_pairs;
     *update_pairs = \&replace_pairs;
 
     sub add_pair {
@@ -296,6 +302,9 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *add_kv      = \&add_pair;
+    *push_kv     = \&add_pair;
+    *append_kv   = \&add_pair;
     *push_pair   = \&add_pair;
     *append_pair = \&add_pair;
 
@@ -310,6 +319,9 @@ package Sidef::Types::Set::Bag {
         $self;
     }
 
+    *add_kvs      = \&add_pairs;
+    *push_kvs     = \&add_pairs;
+    *append_kvs   = \&add_pairs;
     *push_pairs   = \&add_pairs;
     *append_pairs = \&add_pairs;
 
@@ -464,6 +476,8 @@ package Sidef::Types::Set::Bag {
 
         return Sidef::Types::Number::Number::ZERO;
     }
+
+    *get = \&count;
 
     sub delete_if {
         my ($self, $block) = @_;
@@ -852,6 +866,8 @@ package Sidef::Types::Set::Bag {
         *{__PACKAGE__ . '::' . '≠'}   = \&ne;
         *{__PACKAGE__ . '::' . '!='}  = \&ne;
         *{__PACKAGE__ . '::' . '<<'}  = \&append;
+        *{__PACKAGE__ . '::' . '∋'}   = \&contains;
+        *{__PACKAGE__ . '::' . '∌'}   = sub { $_[0]->contains($_[1])->not };
     }
 };
 

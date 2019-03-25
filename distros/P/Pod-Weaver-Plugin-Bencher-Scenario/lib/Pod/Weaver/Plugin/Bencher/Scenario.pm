@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Bencher::Scenario;
 
-our $DATE = '2019-02-24'; # DATE
-our $VERSION = '0.242'; # VERSION
+our $DATE = '2019-03-24'; # DATE
+our $VERSION = '0.243'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -574,7 +574,7 @@ sub weave_section {
     my $package;
     if ($filename =~ m!^lib/(?:(Acme/CPANModules/.+)|(Bencher/Scenario/.+))\.pm$!) {
         {
-            $package = $1;
+            $package = $1 // $2;
             $package =~ s!/!::!g;
             if ($self->include_module && @{ $self->include_module }) {
                 last unless grep {$_ eq $package || "Bencher::Scenario::$_" eq $package || "Acme::CPANModules::$_" eq $package} @{ $self->include_module };
@@ -613,7 +613,7 @@ Pod::Weaver::Plugin::Bencher::Scenario - Plugin to use when building Bencher::Sc
 
 =head1 VERSION
 
-This document describes version 0.242 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-02-24.
+This document describes version 0.243 of Pod::Weaver::Plugin::Bencher::Scenario (from Perl distribution Pod-Weaver-Plugin-Bencher-Scenario), released on 2019-03-24.
 
 =head1 SYNOPSIS
 

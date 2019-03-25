@@ -31,7 +31,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Metrics-Halstead
   repository: https://github.com/ology/Perl-Metrics-Halstead
-version: '0.0600'
+version: '0.0601'
 x_Dist_Zilla:
   perl:
     version: '5.027007'
@@ -339,4 +339,4 @@ x_Dist_Zilla:
     version: '6.012'
 x_authority: cpan:GENE
 x_generated_by_perl: v5.27.7
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.73'

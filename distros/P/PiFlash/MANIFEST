@@ -12,7 +12,7 @@ README.md
 bin/piflash
 dist.ini
 doc/raspberrypi_board_vector_red.png
-doc/resources.md
+doc/resources.pod
 inc/Devel/AssertOS.pm
 inc/Devel/AssertOS/Android.pm
 inc/Devel/AssertOS/Linux.pm

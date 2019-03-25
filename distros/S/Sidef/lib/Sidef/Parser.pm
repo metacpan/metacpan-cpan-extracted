@@ -1,7 +1,7 @@
 package Sidef::Parser {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use Sidef::Types::Bool::Bool;
     use List::Util qw(first);
@@ -63,7 +63,7 @@ package Sidef::Parser {
                      | File\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::File') })
                      | Arr(?:ay)?+\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Array') })
                      | Pair\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Pair') })
-                     | Vector\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Vector') })
+                     | Vec(?:tor)?\b                  (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Vector') })
                      | Matrix\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Array::Matrix') })
                      | Hash\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
                      | Set\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Set') })
@@ -80,6 +80,7 @@ package Sidef::Parser {
                      | Socket\b                       (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Socket') })
                      | Pipe\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Glob::Pipe') })
                      | Ref\b                          (?{ state $x = bless({}, 'Sidef::Variable::Ref') })
+                     | NamedParam\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Variable::NamedParam') })
                      | Lazy\b                         (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Lazy') })
                      | LazyMethod\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::LazyMethod') })
                      | Enumerator\b                   (?{ state $x = bless({}, 'Sidef::DataTypes::Object::Enumerator') })
@@ -142,7 +143,7 @@ package Sidef::Parser {
                       | print
                       | defined
                     )\b)                                     (?{ state $x = bless({}, 'Sidef::Operator::Unary') })
-                | :                                          (?{ state $x = bless({}, 'Sidef::DataTypes::Hash::Hash') })
+                | :                                          (?{ state $x = bless({}, 'Sidef::Meta::PrefixColon') })
               )
             }x,
             quote_operators_re => qr{\G
@@ -193,7 +194,7 @@ package Sidef::Parser {
                   DirHandle
                   Arr Array
                   Pair
-                  Vector
+                  Vec Vector
                   Matrix
                   Enumerator
                   Hash
@@ -223,6 +224,7 @@ package Sidef::Parser {
                   Backtick
                   Lazy
                   LazyMethod
+                  NamedParam
 
                   true false
                   nil null
@@ -283,7 +285,8 @@ package Sidef::Parser {
                   __TIME__
                   __DATE__
                   __NAMESPACE__
-
+                  __COMPILED__
+                  __OPTIMIZED__
                   )
             },
             match_flags_re  => qr{[msixpogcaludn]+},
@@ -324,7 +327,9 @@ package Sidef::Parser {
                   ...
                   != ..
                   \\\\= \\\\
-                  !! ! : « » ~
+                  !! !
+                  : ： ⫶ ¦
+                  « » ~
                   );
 
                 qr{
@@ -543,12 +548,12 @@ package Sidef::Parser {
     sub get_name_and_class {
         my ($self, $var_name) = @_;
 
-        $var_name // return ('', $self->{module} // $self->{class});
+        $var_name // return ('', $self->{class});
 
         my $rindex = rindex($var_name, '::');
         $rindex != -1
           ? (substr($var_name, $rindex + 2), substr($var_name, 0, $rindex))
-          : ($var_name, $self->{module} // $self->{class});
+          : ($var_name, $self->{class});
     }
 
     sub get_quoted_words {
@@ -593,13 +598,21 @@ package Sidef::Parser {
 
         my $string = '';
         if (defined $pair_delim) {
+
             my $end_delim = quotemeta $pair_delim;
             my $re_delim  = $beg_delim . $end_delim;
-            if (m{\G(?<main>$beg_delim((?>[^$re_delim\\]+|\\.|(?&main))*+)$end_delim)}sgc) {
+
+            # if (m{\G(?<main>$beg_delim((?>[^$re_delim\\]+|\\.|(?&main))*+)$end_delim)}sgc) {
+
+            if (m{\G(?<main>$beg_delim((?>[^\\$re_delim]*+(?>\\.[^\\$re_delim]*|(?&main)){0,}){0,})$end_delim)}sgc) {
                 $string = $2 =~ s/\\([$re_delim])/$1/gr;
             }
         }
-        elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {
+
+        # elsif (m{\G$beg_delim([^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*)*)}sgc) {    # limited to 2^15-1 escapes
+        # elsif (m{\G$beg_delim((?>(?>[^$beg_delim\\]++|\\.){0,}+){0,}+)}sgc) {
+
+        elsif (m{\G$beg_delim((?>[^\\$beg_delim]*+(?>\\.[^\\$beg_delim]*){0,}){0,})}sgc) {
             $string = $1 =~ s/\\([$beg_delim])/$1/gr;
         }
 
@@ -1141,6 +1154,8 @@ package Sidef::Parser {
                 return Sidef::Types::String::String->new($1);
             }
 
+            # Bareword followed by a colon becomes a NamedParam with the bareword
+            # on the LHS
             if (/\G([^\W\d]\w*+):(?![=:])/gc) {
                 my $name = $1;
                 my $obj  = $self->parse_obj(code => $opt{code});
@@ -1518,8 +1533,6 @@ package Sidef::Parser {
                             );
                     ($name, $class_name) = $self->get_name_and_class($name);
                 }
-
-                local $self->{class} = $class_name;
 
                 if (    $type ne 'method'
                     and $type ne 'class'
@@ -1911,8 +1924,9 @@ package Sidef::Parser {
                 $self->parse_whitespace(code => $opt{code});
 
                 if (/\G(?=\{)/) {
-                    local $self->{module} = $name;
-                    my $obj = $self->parse_block(code => $opt{code});
+                    my $prev_class = $self->{class};
+                    local $self->{class} = $name;
+                    my $obj = $self->parse_block(code => $opt{code}, is_module => 1, prev_class => $prev_class);
 
                     return
                       bless {
@@ -1933,6 +1947,8 @@ package Sidef::Parser {
 
             if (/\Gimport\b\h*/gc) {
 
+                my $import_pos = pos($_);
+
                 my $var_names =
                   $self->get_init_vars(code      => $opt{code},
                                        with_vals => 0);
@@ -1940,17 +1956,17 @@ package Sidef::Parser {
                 @{$var_names}
                   || $self->fatal_error(
                                         code  => $_,
-                                        pos   => (pos($_)),
+                                        pos   => $import_pos,
                                         error => "expected a variable-like name for importing!",
                                        );
 
                 foreach my $var_name (@{$var_names}) {
                     my ($name, $class) = $self->get_name_and_class($var_name);
 
-                    if ($class eq ($self->{module} // $self->{class})) {
+                    if ($class eq ($self->{class})) {
                         $self->fatal_error(
                                            code  => $_,
-                                           pos   => pos($_),
+                                           pos   => $import_pos,
                                            error => "can't import '${class}::${name}' into the same namespace",
                                           );
                     }
@@ -1960,14 +1976,14 @@ package Sidef::Parser {
                     if (not defined $var) {
                         $self->fatal_error(
                                            code  => $_,
-                                           pos   => pos($_),
+                                           pos   => $import_pos,
                                            error => "variable '${class}::${name}' does not exists",
                                           );
                     }
 
                     $var->{count}++;
 
-                    unshift @{$self->{vars}{$self->{module} // $self->{class}}},
+                    unshift @{$self->{vars}{$self->{class}}},
                       {
                         obj   => $var->{obj},
                         name  => $name,
@@ -1981,6 +1997,8 @@ package Sidef::Parser {
             }
 
             if (/\Ginclude\b\h*/gc) {
+
+                my $include_pos = pos($_);
 
                 state $x = do {
                     require File::Spec;
@@ -2032,7 +2050,7 @@ package Sidef::Parser {
 
                     $found_module // $self->fatal_error(
                           code  => $_,
-                          pos   => pos($_),
+                          pos   => $include_pos,
                           error => "can't find the module '${mod_path}' anywhere in ['" . join("', '", @{$self->{inc}}) . "']",
                     );
 
@@ -2077,7 +2095,7 @@ package Sidef::Parser {
                         ref($filename) ne ''
                           and $self->fatal_error(
                                   code  => $_,
-                                  pos   => pos($_),
+                                  pos   => $include_pos,
                                   error => 'include-error: invalid value of type "' . ref($filename) . '" (expected a string)',
                           );
 
@@ -2088,7 +2106,7 @@ package Sidef::Parser {
                             if (!defined($abs) or $abs eq '') {
                                 $self->fatal_error(
                                           code  => $_,
-                                          pos   => pos($_),
+                                          pos   => $include_pos,
                                           error => 'include-error: cannot resolve the absolute path to file <<' . $file . '>>',
                                 );
                             }
@@ -2100,7 +2118,7 @@ package Sidef::Parser {
                             if (exists $Sidef::INCLUDED{$file}) {
                                 $self->fatal_error(
                                                    code  => $_,
-                                                   pos   => pos($_),
+                                                   pos   => $include_pos,
                                                    error => "include-error: circular inclusion of file: $file",
                                                   );
                             }
@@ -2121,7 +2139,7 @@ package Sidef::Parser {
                     open(my $fh, '<:utf8', $full_path)
                       || $self->fatal_error(
                                             code  => $_,
-                                            pos   => pos($_),
+                                            pos   => $include_pos,
                                             error => "can't open file `$full_path`: $!"
                                            );
 
@@ -2130,7 +2148,7 @@ package Sidef::Parser {
 
                     next if $Sidef::INCLUDED{$full_path};
 
-                    local $self->{module}              = $name if defined $name;    # new namespace
+                    local $self->{class}               = $name if defined $name;    # new namespace
                     local $self->{line}                = 1;
                     local $self->{file_name}           = $full_path;
                     local $Sidef::INCLUDED{$full_path} = 1;
@@ -2222,8 +2240,9 @@ package Sidef::Parser {
                                                 [map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) } @{$strings}]);
                 }
                 elsif ($type eq 'v') {
-                    return Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
-                                                            @{$strings});
+                    return
+                      Sidef::Types::Array::Vector->new(map { Sidef::Types::Number::Number->new(s{\\(?=[\\#\s])}{}gr) }
+                                                         split(/[\s,]+/, join(' ', @$strings)));
                 }
                 elsif ($type eq 'm') {
                     my @matrix;
@@ -2399,6 +2418,14 @@ package Sidef::Parser {
 
             if (/\G__LINE__\b/gc) {
                 return Sidef::Types::Number::Number->new($self->{line});
+            }
+
+            if (/\G__COMPILED__\b/gc) {
+                return Sidef::Types::Bool::Bool->new($self->{opt}{R} eq 'Perl' or $self->{opt}{c});
+            }
+
+            if (/\G__OPTIMIZED__\b/gc) {
+                return Sidef::Types::Bool::Bool->new(($self->{opt}{O} || 0) > 0);
             }
 
             if (/\G__(?:END|DATA)__\b\h*+\R?/gc) {
@@ -2732,13 +2759,19 @@ package Sidef::Parser {
             my $p = pos($_);
             local $self->{curly_brackets} = 1;
 
-            my $ref   = $self->{vars}{$self->{class}} //= [];
-            my $count = scalar(@{$self->{vars}{$self->{class}}});
+            my $class_name = $self->{class};
 
-            unshift @{$self->{ref_vars_refs}{$self->{class}}}, @{$ref};
-            unshift @{$self->{vars}{$self->{class}}}, [];
+            if ($opt{is_module}) {
+                $class_name = $opt{prev_class};
+            }
 
-            $self->{vars}{$self->{class}} = $self->{vars}{$self->{class}}[0];
+            my $ref   = $self->{vars}{$class_name} //= [];
+            my $count = scalar(@{$self->{vars}{$class_name}});
+
+            unshift @{$self->{ref_vars_refs}{$class_name}}, @{$ref};
+            unshift @{$self->{vars}{$class_name}}, [];
+
+            $self->{vars}{$class_name} = $self->{vars}{$class_name}[0];
 
             my $block = bless({}, 'Sidef::Types::Block::BlockInit');
 
@@ -2759,20 +2792,12 @@ package Sidef::Parser {
 
             # Special '_' variable
             if ($opt{topic_var} and not $has_vars) {
-                my $var_obj = bless({name => '_', type => 'var', class => $self->{class}}, 'Sidef::Variable::Variable');
-
-                push @{$var_objs}, $var_obj;
-                unshift @{$self->{vars}{$self->{class}}},
-                  {
-                    obj   => $var_obj,
-                    name  => '_',
-                    count => 0,
-                    type  => 'var',
-                    line  => $self->{line},
-                  };
+                my $code = '_';
+                $has_vars = 1;
+                $var_objs = $self->parse_init_vars(code => \$code, type => 'var');
             }
 
-            local $self->{current_block} = $block if ($opt{topic_var} || $has_vars);
+            local $self->{current_block} = $block if $has_vars;
 
             my $obj = $self->parse_script(code => $opt{code});
 
@@ -2785,14 +2810,16 @@ package Sidef::Parser {
 
             #$block->{vars} = [
             #    map { $_->{obj} }
-            #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$self->{class}}}
+            #    grep { ref($_) eq 'HASH' and ref($_->{obj}) eq 'Sidef::Variable::Variable' } @{$self->{vars}{$class_name}}
             #];
 
-            $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
+            if ($has_vars) {
+                $block->{init_vars} = bless({vars => $var_objs}, 'Sidef::Variable::Init');
+            }
 
             $block->{code} = $obj;
-            splice @{$self->{ref_vars_refs}{$self->{class}}}, 0, $count;
-            $self->{vars}{$self->{class}} = $ref;
+            splice @{$self->{ref_vars_refs}{$class_name}}, 0, $count;
+            $self->{vars}{$class_name} = $ref;
 
             return $block;
         }

@@ -1,0 +1,8 @@
+xt
+xtest
+stuff
+dist\.ini
+weaver\.ini
+tags
+\.md$
+.DS_Store

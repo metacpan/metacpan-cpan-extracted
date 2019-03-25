@@ -35,6 +35,7 @@ lib/Starch/Store.pm
 lib/Starch/Store/Layered.pm
 lib/Starch/Store/Memory.pm
 lib/Starch/Util.pm
+lib/Test/Starch.pm
 minil.toml
 t/croak.t
 t/manager.t

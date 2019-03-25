@@ -23,7 +23,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
-        'Date::Gregorian::Simple'    => '0.12',
+        'Date::Gregorian::Simple'    => '0.13',
         'Calendar::Plugin::Renderer' => '0.12',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -31,7 +31,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Gregorian' => { file => 'lib/Calendar/Gregorian.pm', version => '0.17' },
+            'Calendar::Gregorian' => { file => 'lib/Calendar/Gregorian.pm', version => '0.18' },
         },
         resources => {
             repository => {

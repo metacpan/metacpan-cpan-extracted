@@ -3,7 +3,6 @@ use utf8;
 use strict;
 use warnings;
 eval { require Encode } && Encode->import();
-use File::Path;
 use parent qw(Exporter);
 
 our @EXPORT = qw(
@@ -13,7 +12,6 @@ our @EXPORT = qw(
     to_cp932 to_utf8
     cleanup_dir
     ls pwd touch
-    rmtree
     );
 
 my @asciis = ( "foo",       "foo bar", );
@@ -69,8 +67,12 @@ sub to_cp932 {
 
 sub cleanup_dir {
     if ( -d $_[0] ) {
-        rmtree( $_[0] );
+        my $path = to_utf8($_[0]);
+        $path =~ s:/:\\:g;
+        $path = to_cp932($path);
+        return !system(qw{cmd.exe /C rmdir /S /Q}, $path);
     }
+    return 0;
 }
 
 sub ls {

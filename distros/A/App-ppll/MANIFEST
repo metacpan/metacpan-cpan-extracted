@@ -1,0 +1,19 @@
+bin/ppll
+Build.PL
+Changes
+CONTRIBUTING.md
+lib/App/ppll.pm
+lib/App/ppll/Worker.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/App/ppll.t
+t/App/ppll/Worker.t
+t/bin/ppll.t
+t/changes.t
+t/critic.t
+t/meta.t
+t/minimumversion.t

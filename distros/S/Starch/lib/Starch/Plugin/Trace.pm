@@ -1,7 +1,7 @@
 package Starch::Plugin::Trace;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Moo;
 use namespace::clean;
@@ -153,9 +153,17 @@ log will produced of the format C<starch.store.$store_name.get.$state_key.missin
 Every call to L<Starch::Store/remove> is logged in the
 format of C<starch.store.$store_name.remove.$state_key>.
 
-=head1 AUTHORS AND LICENSE
+=head1 SUPPORT
 
-See L<Starch/AUTHORS> and L<Starch/LICENSE>.
+See L<Starch/SUPPORT>.
+
+=head1 AUTHORS
+
+See L<Starch/AUTHORS>.
+
+=head1 LICENSE
+
+See L<Starch/LICENSE>.
 
 =cut
 

@@ -116,6 +116,14 @@ Aliases: I<start>
 
 =cut
 
+=head2 first
+
+Block.first() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 fork
 
 Block.fork() -> I<Obj>
@@ -143,6 +151,14 @@ Return the
 =head2 new
 
 Block.new() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 nth
+
+Block.nth() -> I<Obj>
 
 Return the
 

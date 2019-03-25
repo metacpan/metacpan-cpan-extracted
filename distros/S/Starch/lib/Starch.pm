@@ -1,7 +1,7 @@
 package Starch;
 use 5.008001;
 use strictures 2;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Starch::Factory;
 use Moo::Object qw();
@@ -178,7 +178,7 @@ the state will expire.
 
 Setting C<expires> to C<0> generally disables expiration, but behavior
 can be store-specific.  For example, often times caching stores assume no
-expiration to mean the storage backend gets to pick when the expire the data.
+expiration to mean the storage backend gets to pick when to expire the data.
 
 =item *
 
@@ -337,7 +337,7 @@ L<meta::cpan|https://metacpan.org/search?q=Starch%3A%3AStore>.
 =head1 PLUGINS
 
 Plugins alter the behavior of the manager (L<Starch::Manager>),
-state (L<Starch:State>), and store (L<Starch::Store>)
+state (L<Starch::State>), and store (L<Starch::Store>)
 objects.  To use a plugin pass the C<plugins> argument when
 creating your Starch object:
 
@@ -466,19 +466,17 @@ L<MojoX::Session>
 
 =head1 SUPPORT
 
-Please submit bugs and feature requests to the Starch GitHub issue tracker:
+Please submit bugs and feature requests to the
+Starch GitHub issue tracker:
 
 L<https://github.com/bluefeet/Starch/issues>
 
 =head1 AUTHORS
 
-Aran Clary Deltac E<lt>bluefeet@gmail.comE<gt>
-
-Arthur Axel "fREW" Schmidt E<lt>frioux+cpan@gmail.comE<gt>
-
-Jonathan Scott Duff E<lt>duff@pobox.comE<gt>
-
-Ismail Kerim E<lt>ismail.kerim@assurant.comE<gt>
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+    Jonathan Scott Duff <duff@pobox.com>
+    Ismail Kerim <ismail.kerim@assurant.com>
 
 =head1 ACKNOWLEDGEMENTS
 

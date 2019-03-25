@@ -115,7 +115,6 @@ scripts/Applications/fdf.sf
 'scripts/Applications/Gift match/giftmatch.sf'
 'scripts/Applications/Gift match/input.txt'
 'scripts/Applications/Gift match/output.txt'
-scripts/Applications/make_filenames_safe.sf
 'scripts/Applications/Pure OO/booleans.sf'
 'scripts/Applications/Pure OO/if_statement.sf'
 'scripts/Applications/Pure OO/numbers.sf'
@@ -147,6 +146,7 @@ scripts/Expensive/calendar_all_uppercase.sf
 scripts/Expensive/closed_form_fibonacci.sf
 scripts/Expensive/coin_change.sf
 scripts/Expensive/dice_game_solver.sf
+scripts/Expensive/ekg_sequence_convergence.sf
 scripts/Expensive/factorial_approximations.sf
 scripts/Expensive/fibonacci_validation.sf
 scripts/Expensive/fibonacci_word.sf
@@ -553,6 +553,7 @@ scripts/RosettaCode/sieve_of_eratosthenes.sf
 scripts/RosettaCode/singleton.sf
 scripts/RosettaCode/singly-linked_list_element_definition.sf
 scripts/RosettaCode/singly-linked_list_element_insertion.sf
+scripts/RosettaCode/site_percolation.sf
 scripts/RosettaCode/smith_numbers.sf
 scripts/RosettaCode/sort_a_list_of_object_identifiers.sf
 scripts/RosettaCode/sort_an_integer_array.sf
@@ -684,6 +685,7 @@ scripts/Tests/cnp.sf
 scripts/Tests/code_interpolation.sf
 scripts/Tests/combs_and_perms.sf
 scripts/Tests/complex_numbers.sf
+scripts/Tests/const_tests.sf
 scripts/Tests/constant_folding.sf
 scripts/Tests/cpp_input_output.sf
 scripts/Tests/cramers_method.sf
@@ -810,9 +812,11 @@ scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
 scripts/Tests/Module/Foo.sm
+scripts/Tests/Module/Test.sm
 scripts/Tests/Module/YouTube.sm
 scripts/Tests/module_access_namespace.sf
 scripts/Tests/module_definition.sf
+scripts/Tests/module_identifiers.sf
 scripts/Tests/module_inclusion.sf
 scripts/Tests/module_inclusion_2.sf
 scripts/Tests/module_inclusion_3.sf
@@ -846,6 +850,7 @@ scripts/Tests/objects_init.sf
 scripts/Tests/one-dimensional_cellular_automata.sf
 scripts/Tests/one-dimensional_cellular_automata_2.sf
 scripts/Tests/open.sf
+scripts/Tests/pair_namedparam_force_ops.sf
 scripts/Tests/pairs_test.sf
 scripts/Tests/palindrome_recursive.sf
 scripts/Tests/pascal_matrix_generation.sf
@@ -863,6 +868,7 @@ scripts/Tests/pipeline_zip_operator.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf
 scripts/Tests/power_numbers.sf
+scripts/Tests/prefix_colon_hash.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
@@ -880,8 +886,11 @@ scripts/Tests/recursion.sf
 scripts/Tests/recursive_block_closures.sf
 scripts/Tests/regex.sf
 scripts/Tests/regex_bool.sf
+scripts/Tests/regex_concat.sf
 scripts/Tests/regex_global_matching.sf
 scripts/Tests/regex_match_as_array.sf
+scripts/Tests/regex_pos.sf
+scripts/Tests/regex_union.sf
 scripts/Tests/return.sf
 scripts/Tests/return_types.sf
 scripts/Tests/reverse_a_base10_integer.sf
@@ -946,6 +955,7 @@ scripts/Tests/triangle_path.sf
 scripts/Tests/tribonacci_closed_form.sf
 scripts/Tests/trigonometric_functions.sf
 scripts/Tests/trizen_s_pair_numbers.sf
+scripts/Tests/try_catch.sf
 scripts/Tests/two_dimensional_array.sf
 scripts/Tests/type_comparisons.sf
 scripts/Tests/typed_parameters.sf
@@ -1004,7 +1014,6 @@ t/fast_fourier_transform.t
 t/fibonacci.t
 t/levenshtein_distance.t
 t/man_or_boy.t
-t/manifest.t
 t/md5.t
 t/oo_inheritance.t
 t/pod.t

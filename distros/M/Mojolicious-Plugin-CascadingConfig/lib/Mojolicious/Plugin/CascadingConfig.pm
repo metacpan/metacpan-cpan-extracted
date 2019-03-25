@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::CascadingConfig;
 use Mojo::Base 'Mojolicious::Plugin::Config';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub register {
     my ($self, $app, $plugin_conf) = @_;

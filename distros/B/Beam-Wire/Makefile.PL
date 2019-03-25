@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -15,8 +15,11 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0
   },
   "DISTNAME" => "Beam-Wire",
+  "EXE_FILES" => [
+    "bin/beam-wire"
+  ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Beam::Wire",
   "PREREQ_PM" => {
     "Beam::Emitter" => 0,
@@ -41,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Lib" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "1.022",
+  "VERSION" => "1.023",
   "test" => {
     "TESTS" => "t/*.t t/container/*.t t/dependency/*.t t/deprecated/*.t t/method/*.t t/regression/*.t t/service/*.t"
   }

@@ -1,6 +1,11 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.07 2019-03-22T15:03:21
+0.08 2019-03-23T07:49:05
+ - Replace deprecated command line arguments in doc usage
+ - Fix link in doc
+ - Fix encoding when testing print to output for Twitter and Mastodon
+
+0.07 2019-03-22T15:03:21Z
  - Add documentation for extending pre-defined targets
  - Rename parameter of App::SpreadRevolutionaryDate::Target parameterized
    role to 'worker'

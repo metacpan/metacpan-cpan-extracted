@@ -1,5 +1,5 @@
 This archive contains the distribution App-Git-IssueManager-SyncJira,
-version 0.1:
+version 0.2:
 
   class implementing the sync_jira issue command of the GIT IssueManager
 

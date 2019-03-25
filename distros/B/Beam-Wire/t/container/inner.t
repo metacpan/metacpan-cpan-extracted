@@ -130,4 +130,23 @@ subtest 'inner get_config' => sub {
     cmp_deeply $config, { class => 'My::RefTest', args => { got_ref => { '$ref' => 'inner/bar' } } } or diag explain $config;
 };
 
+subtest 'inner container resolve extends of extends' => sub {
+    my $wire = Beam::Wire->new(
+        config => {
+            inner => {
+                class => 'Beam::Wire',
+                args => { file => $SINGLE_FILE },
+            },
+            foo => {
+                # inner/fizz extends inner/buzz
+                extends => 'inner/fizz',
+            },
+        },
+    );
+    my $obj = eval { $wire->get( 'foo' ) };
+    ok !$@, 'service created successfully' or diag "$@";
+    isa_ok $obj, 'My::ArgsTest', 'service gets class from inner/buzz';
+    is_deeply $obj->got_args, [{ one => 'two' }], 'service gets args from inner/fizz';
+};
+
 done_testing;

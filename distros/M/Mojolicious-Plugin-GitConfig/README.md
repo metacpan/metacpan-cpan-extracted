@@ -1,0 +1,1 @@
+# Mojolicous::Plugin::GitConfig

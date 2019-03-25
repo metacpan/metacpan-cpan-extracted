@@ -65,5 +65,5 @@ requires:
 resources:
   homepage: http://timetracker.plix.at
   repository: git://github.com/domm/App-TimeTracker.git
-version: '2.026'
+version: '2.027'
 x_serialization_backend: 'YAML::Tiny version 1.69'

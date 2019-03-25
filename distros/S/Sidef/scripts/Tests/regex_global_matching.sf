@@ -4,17 +4,92 @@
 ## Regular expressions -- global matching
 #
 
-3.times { |i|
-    say i;
-    while (var m = ("abcd" =~ /(..)/g)) {
-        say m.cap[0];
+3.times {
+    define r = /\G(..)/g
+    var cs = []
+    while (var m = ('abcd' =~ r)[0]) {
+       cs.append(m)
     }
-};
+    assert_eq(cs, ['ab', 'cd'])
+}
 
 
-3.times { |i|
-    say i;
-    while (var m = "abcd".gmatch(/(..)/)) {
-        say m.cap[0];
+3.times {
+    define r = /\G(..)/
+    var cs = []
+    while (var m = 'abcd'.gmatch(r)[0]) {
+        cs.append(m)
     }
-};
+    assert_eq(cs, ['ab', 'cd'])
+}
+
+do {
+    define r = /\G(.)/
+    define s = "1234567"
+    assert_eq(s, r.global_matches(s).map{ _[0] }.join)
+    assert_eq(s, r.global_matches(s, { |_, c| c[0] } ).join)
+    assert_eq([s[3..s.len-1]], r.global_matches(s, 3).map{ _[0] })
+    assert_eq([s[3..s.len-1]], r.global_matches(s, 3, { |_, c| c[0] } ))
+    assert_eq([s[3..s.len-1]], r.global_matches(s,    { |_, c| c[0] }, 3 ))
+    assert_eq([s[2..s.len-1]], r.global_matches(s, 1, 2 ).map{ _[0] })
+
+    assert_eq("", r.global_matches(s,    { |_, c| c[0] }, 7.4 ).join)
+    assert_eq(s[-1], r.global_matches(s,    { |_, c| c[0] }, -1 ).join)
+
+    # null regexes (empty or empty capture)
+    assert_eq(//.gmatches, [])
+    assert_eq(//.gmatches(:asdf), [])
+    assert_eq(//.gmatches(:asdf, 1, { }), [])
+    assert_eq(/()/.gmatches(), [])
+    assert_eq(/()/.gmatches(:asdf), [])
+    assert_eq(/()/.gmatches(:asdf, { }, 1), [])
+    assert_eq(/(?<a>)/.gmatches(), [])
+    assert_eq(/(?<a>)/.gmatches(:asdf), [])
+    assert_eq(/(?<a>)/.gmatches(:asdf, { }, 1), [])
+}
+
+2.times {
+    var captures = []
+    var str = "foo -- bar -- baz"
+
+    while (/(\w+)/.gmatch(str)) {|m|
+        captures << "#{m}"
+    }
+
+    assert_eq(captures, ['foo', 'bar', 'baz'])
+}
+
+2.times {
+    var captures = []
+    var str = "foo -- bar -- baz"
+
+    while (str.gmatch(/(\w+)/)) {|m|
+        captures << "#{m}"
+    }
+
+    assert_eq(captures, ['foo', 'bar', 'baz'])
+}
+
+2.times {
+    var captures = []
+    var str = "a cat, a dog and a fox"
+
+    while (var m = str.match(/\ba\h+(\w+)/g)) {
+        captures << m[0]
+    }
+
+    assert_eq(captures, ['cat', 'dog', 'fox'])
+}
+
+2.times {
+    var captures = []
+    var str = "a cat, a dog and a fox"
+
+    while (var m = /\ba\h+(\w+)/g.match(str)) {
+        captures << m[0]
+    }
+
+    assert_eq(captures, ['cat', 'dog', 'fox'])
+}
+
+say "** Test passed!"

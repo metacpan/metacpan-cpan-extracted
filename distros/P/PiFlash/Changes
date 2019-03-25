@@ -1,5 +1,16 @@
 Change log for PiFlash
 
+0.4.3 2019-03-23T10:35:14-07:00 America/Los_Angeles
+ [DOCS]
+ - fix RPM spec error (no files matched doc/*.md) that broke 0.4.2 before
+   GitHub release but after CPAN upload
+
+0.4.2 2019-03-23T10:25:51Z America/Los_Angeles
+ [DOCS]
+ - convert doc/resources.md back to POD so MetaCPAN will display it as
+   documentation on the release page
+ - declare doc/*.md & doc/*.pod as documentation files in the RPM spec
+
 0.4.1 2019-03-21T16:46:28-07:00 America/Los_Angeles
  [BUG FIXES]
  - the --help option is the only case of printing usage info which

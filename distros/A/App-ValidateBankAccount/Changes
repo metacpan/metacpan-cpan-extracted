@@ -1,5 +1,8 @@
 Revision history for App::ValidateBankAccount
 
+0.06  Sat Mar 23 11:30:00 2019
+      - Tidied up pod.
+
 0.05  Fri Mar 22 15:50:00 2019
       - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
 

@@ -1,5 +1,5 @@
 package Beam::Wire;
-our $VERSION = '1.022';
+our $VERSION = '1.023';
 # ABSTRACT: Lightweight Dependency Injection Container
 
 #pod =head1 SYNOPSIS
@@ -58,7 +58,10 @@ use Path::Tiny qw( path );
 use File::Basename qw( dirname );
 use Types::Standard qw( :all );
 use Data::Dumper;
+use Beam::Wire::Event::ConfigService;
+use Beam::Wire::Event::BuildService;
 use constant DEBUG => $ENV{BEAM_WIRE_DEBUG};
+with 'Beam::Emitter';
 
 #pod =attr file
 #pod
@@ -211,12 +214,36 @@ sub get {
     ; print STDERR "Get service: $name\n" if DEBUG;
 
     if ( $name =~ q{/} ) {
-        my ( $container_name, $service ) = split m{/}, $name, 2;
-        return $self->get( $container_name )->get( $service, %override );
+        my ( $container_name, $service_name ) = split m{/}, $name, 2;
+        my $container = $self->get( $container_name );
+        my $unsub_config = $container->on( configure_service => sub {
+            my ( $event ) = @_;
+            $self->emit( configure_service =>
+                class => 'Beam::Wire::Event::ConfigService',
+                service_name => join( '/', $container_name, $event->service_name ),
+                config => $event->config,
+            );
+        } );
+        my $unsub_build = $container->on( build_service => sub {
+            my ( $event ) = @_;
+            $self->emit( build_service =>
+                class => 'Beam::Wire::Event::BuildService',
+                service_name => join( '/', $container_name, $event->service_name ),
+                service => $event->service,
+            );
+        } );
+        my $service = $container->get( $service_name, %override );
+        $unsub_config->();
+        $unsub_build->();
+        return $service;
     }
 
     if ( keys %override ) {
-        return $self->create_service( "\$anonymous extends $name", %override, extends => $name );
+        return $self->create_service(
+            "\$anonymous extends $name",
+            %override,
+            extends => $name,
+        );
     }
 
     my $service = $self->services->{$name};
@@ -289,9 +316,10 @@ sub get_config {
     my ( $self, $name ) = @_;
     if ( $name =~ q{/} ) {
         my ( $container_name, $service ) = split m{/}, $name, 2;
-        my $inner_config = $self->get( $container_name )->get_config( $service );
+        my %inner_config = %{ $self->get( $container_name )->get_config( $service ) };
         # Fix relative references to prefix the container name
-        return { $self->fix_refs( $container_name, %{$inner_config} ) };
+        my ( $fixed_config ) = $self->fix_refs( $container_name, \%inner_config );
+        return $fixed_config;
     }
     return $self->config->{$name};
 }
@@ -488,6 +516,12 @@ sub create_service {
         );
     }
 
+    $self->emit( configure_service =>
+        class => 'Beam::Wire::Event::ConfigService',
+        service_name => $name,
+        config => \%service_info,
+    );
+
     use_module( $service_info{class} );
 
     if ( my $with = $service_info{with} ) {
@@ -548,6 +582,12 @@ sub create_service {
             $service->on( $event => sub { $listen_svc->$sub_name( @_ ) } );
         }
     }
+
+    $self->emit( build_service =>
+        class => 'Beam::Wire::Event::BuildService',
+        service_name => $name,
+        service => $service,
+    );
 
     return $service;
 }
@@ -891,7 +931,7 @@ sub resolve_ref {
 
 #pod =method fix_refs
 #pod
-#pod     my @fixed = $wire->fix_refs( $for_name, @args );
+#pod     my @fixed = $wire->fix_refs( $for_container_name, @args );
 #pod
 #pod Similar to L<the find_refs method|/find_refs>. This method searches
 #pod through the C<@args> and recursively fixes any reference paths to be
@@ -910,13 +950,18 @@ sub fix_refs {
     my %meta = $self->get_meta_names;
     for my $arg ( @args ) {
         if ( ref $arg eq 'HASH' ) {
-            if ( $self->is_meta( $arg ) ) {
-                my %new = ();
-                for my $key ( @meta{qw( ref extends )} ) {
-                    if ( $arg->{$key} ) {
-                        $new{ $key } = join( q{/}, $container_name, $arg->{$key} );
+            if ( $self->is_meta( $arg, 1 ) ) {
+                #; print STDERR 'Fixing refs for arg: ' . Dumper $arg;
+                my %new = %$arg;
+                for my $key ( keys %new ) {
+                    if ( $key =~ /(?:ref|extends)$/ ) {
+                        $new{ $key } = join( q{/}, $container_name, $new{$key} );
+                    }
+                    else {
+                        ( $new{ $key } ) = $self->fix_refs( $container_name, $new{ $key } );
                     }
                 }
+                #; print STDERR 'Fixed refs for arg: ' . Dumper \%new;
                 push @out, \%new;
             }
             else {
@@ -1197,6 +1242,34 @@ use overload q{""} => sub {
         ;
 };
 
+#pod =head1 EVENTS
+#pod
+#pod The container emits the following events.
+#pod
+#pod =head2 configure_service
+#pod
+#pod This event is emitted when a new service is configured, but before it is
+#pod instantiated or any classes loaded. This allows altering of the
+#pod configuration before the service is built. Already-built services will
+#pod not fire this event.
+#pod
+#pod Event handlers get a L<Beam::Wire::Event::ConfigService> object as their
+#pod only argument.
+#pod
+#pod This event will bubble up from child containers.
+#pod
+#pod =head2 build_service
+#pod
+#pod This event is emitted when a new service is built. Cached services will
+#pod not fire this event.
+#pod
+#pod Event handlers get a L<Beam::Wire::Event::BuildService> object as their
+#pod only argument.
+#pod
+#pod This event will bubble up from child containers.
+#pod
+#pod =cut
+
 1;
 
 __END__
@@ -1211,7 +1284,7 @@ Beam::Wire - Lightweight Dependency Injection Container
 
 =head1 VERSION
 
-version 1.022
+version 1.023
 
 =head1 SYNOPSIS
 
@@ -1607,7 +1680,7 @@ arguments to that method, respectively.
 
 =head2 fix_refs
 
-    my @fixed = $wire->fix_refs( $for_name, @args );
+    my @fixed = $wire->fix_refs( $for_container_name, @args );
 
 Similar to L<the find_refs method|/find_refs>. This method searches
 through the C<@args> and recursively fixes any reference paths to be
@@ -1662,6 +1735,32 @@ Both "value" and "class" or "extends" are defined. These are mutually-exclusive.
 
 =back
 
+=head1 EVENTS
+
+The container emits the following events.
+
+=head2 configure_service
+
+This event is emitted when a new service is configured, but before it is
+instantiated or any classes loaded. This allows altering of the
+configuration before the service is built. Already-built services will
+not fire this event.
+
+Event handlers get a L<Beam::Wire::Event::ConfigService> object as their
+only argument.
+
+This event will bubble up from child containers.
+
+=head2 build_service
+
+This event is emitted when a new service is built. Cached services will
+not fire this event.
+
+Event handlers get a L<Beam::Wire::Event::BuildService> object as their
+only argument.
+
+This event will bubble up from child containers.
+
 =head1 ENVIRONMENT VARIABLES
 
 =over 4
@@ -1688,7 +1787,7 @@ Al Newkirk <anewkirk@ana.io>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Moon Bruce Armstrong Kent Fredric Mohammad S Anwar mohawk2
+=for stopwords Ben Moon Bruce Armstrong Diab Jerius Kent Fredric Mohammad S Anwar mohawk2
 
 =over 4
 
@@ -1699,6 +1798,10 @@ Ben Moon <guiltydolphin@gmail.com>
 =item *
 
 Bruce Armstrong <bruce@armstronganchor.net>
+
+=item *
+
+Diab Jerius <djerius@cfa.harvard.edu>
 
 =item *
 

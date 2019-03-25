@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 
-  $VERSION = '0.499';
+  $VERSION = '0.500';
   @ISA = qw(Exporter);
 
   @EXPORT_OK = qw(
@@ -309,7 +309,7 @@ sub ls_color {
       -S $real_file and $ext = 'so'; # socket
       -p $real_file and $ext = 'pi'; # fifo, pipe
       -b $real_file and $ext = 'bd'; # block device
-      -c $real_file and $ext = 'ca'; # character special file
+      -c $real_file and $ext = 'cd'; # character special file
 
 # special case for directories that we can't stat, but we can still safely
 # assume that they are in fact dirs.

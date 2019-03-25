@@ -1,7 +1,7 @@
 package Sidef::Deparse::Perl {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use Scalar::Util qw(refaddr);
     use Sidef::Types::Number::Number;
@@ -20,7 +20,6 @@ package Sidef::Deparse::Perl {
             top_program => '',
             between     => ';',
             after       => ';',
-            namespaces  => [],
             opt         => {},
 
             environment_name => 'main',
@@ -77,6 +76,9 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Object::Lazy          Sidef::Object::Lazy
                   Sidef::DataTypes::Object::LazyMethod    Sidef::Object::LazyMethod
                   Sidef::DataTypes::Object::Enumerator    Sidef::Object::Enumerator
+                  Sidef::DataTypes::Variable::NamedParam  Sidef::Variable::NamedParam
+
+                  Sidef::Meta::PrefixColon                Sidef::Types::Hash::Hash
 
                   Sidef::Sys::Sig                         Sidef::Sys::Sig
                   Sidef::Sys::Sys                         Sidef::Sys::Sys
@@ -762,30 +764,34 @@ HEADER
             $code = $value;
         }
         elsif ($ref eq 'Sidef::Variable::Const') {
-            my $name  = $obj->{name} . $refaddr;
+            my $name  = "const_$obj->{name}" . $refaddr;
             my $value = '(' . $name . ')';
             if (not exists $obj->{inited}) {
                 $obj->{inited} = 1;
 
-                # Use dynamical constants inside blocks or classes
+                # Use dynamical constants with perl>=5.022
                 if (
                     exists($self->{class})
                     ? ($] >= 5.022 or $self->{class} != $self->{current_block})
-                    : exists($self->{current_block})
+                    : 1
                   ) {
 
                     # This is no longer needed in Perl>=5.25.2
                     $] < 5.025002 && $self->top_add(q{use feature 'lexical_subs'; no warnings 'experimental::lexical_subs';});
 
                     # XXX: this is known to cause segmentation faults in perl-5.18.* and perl-5.20.* when used in a class
-                    $code = "my sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
+                    $code =
+                        "my sub $name(){state\$_$refaddr"
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '')
+                      . "}; ($name)";
                 }
 
                 # Otherwise, use static constants
                 else {
-                    $code = "sub $name(){state\$_$refaddr"
-                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '') . '}';
+                    $code =
+                        "sub $name(){state\$_$refaddr"
+                      . (defined($obj->{expr}) ? ('=do{' . $self->deparse_script($obj->{expr}) . '}') : '')
+                      . "}; ($name)";
                 }
             }
             else {
@@ -892,6 +898,7 @@ HEADER
                                                        );
 
                             my @self_class_attr = (defined($self->{class_attributes}) ? @{$self->{class_attributes}} : ());
+
                             my @inherited_class_attr = (
                                 defined($self->{inherit})
                                 ? $self->_get_inherited_stuff(
@@ -1183,7 +1190,7 @@ HEADER
                   . ($multi ? '@{('      : '') . '$item'
                   . ($multi ? ')->to_a}' : '')
                   . "; $vars; $code }, $expr)"
-                  . (@loops ? ' // last' : '') . ';';
+                  . (@loops ? ' // last' : '');
             }
         }
         elsif ($ref eq 'Sidef::Types::Bool::Ternary') {
@@ -1193,7 +1200,7 @@ HEADER
               . $self->deparse_args($obj->{false}) . ')';
         }
         elsif ($ref eq 'Sidef::Variable::NamedParam') {
-            $code = $ref . '->new(' . $self->_dump_string($obj->[0]) . ', ' . $self->deparse_args(@{$obj->[1]}) . ')';
+            $code = $ref . '->new(' . $self->_dump_string($obj->{name}) . ', ' . $self->deparse_args(@{$obj->{value}}) . ')';
         }
         elsif ($ref eq 'Sidef::Types::Nil::Nil') {
             $code = 'undef';
@@ -1525,11 +1532,11 @@ HEADER
 
                 # Optimization for hashes
                 if (
-                        $ref eq 'Sidef::DataTypes::Hash::Hash'
-                    and $i == 0
-                    and (   $method eq 'call'
-                         or $method eq 'new'
-                         or $method eq ':')
+                    (
+                     $ref eq 'Sidef::DataTypes::Hash::Hash' and $i == 0 and (   $method eq 'call'
+                                                                             or $method eq 'new')
+                    )
+                    or ($ref eq 'Sidef::Meta::PrefixColon' and $method eq ':')
                   ) {
                     $code = 'bless({' . $self->deparse_args(@{$call->{arg}}) . "}, '$self->{data_types}{$ref}')";
                     next;
@@ -1583,7 +1590,7 @@ HEADER
                     }
 
                     if (exists($self->{lazy_ops}{$method})) {
-                        $code .= $self->{lazy_ops}{$method} . 'do' . $self->deparse_bare_block(@{$call->{arg}});
+                        $code .= $self->{lazy_ops}{$method} . $self->deparse_args(@{$call->{arg}});
                         next;
                     }
 
@@ -1749,6 +1756,12 @@ HEADER
                 }
 
                 if (exists $call->{keyword}) {
+
+                    if ($call->{keyword} eq 'if') {
+                        $code = $self->deparse_args(@{$call->{arg}}) . '&&' . $code;
+                        next;
+                    }
+
                     $code .= $call->{keyword};
                 }
 

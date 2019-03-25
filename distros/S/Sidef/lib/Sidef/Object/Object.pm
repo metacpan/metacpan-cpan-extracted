@@ -229,6 +229,20 @@ package Sidef::Object::Object {
     *is_an   = \&is_a;
     *kind_of = \&is_a;
 
+    sub is_object {
+        my ($self) = @_;
+        CORE::ref($self)
+          ? (Sidef::Types::Bool::Bool::TRUE)
+          : (Sidef::Types::Bool::Bool::FALSE);
+    }
+
+    sub is_typename {
+        my ($self) = @_;
+        CORE::ref($self)
+          ? (Sidef::Types::Bool::Bool::FALSE)
+          : (Sidef::Types::Bool::Bool::TRUE);
+    }
+
     sub parent_classes {
         my ($obj) = @_;
 
@@ -251,7 +265,8 @@ package Sidef::Object::Object {
             @parents;
         };
 
-        Sidef::Types::Array::Array->new([map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj))]);
+        Sidef::Types::Array::Array->new(
+                                  [map { Sidef::Types::String::String->new($_) } $extract_parents->(CORE::ref($obj) || $obj)]);
     }
 
     sub interpolate {
@@ -270,7 +285,7 @@ package Sidef::Object::Object {
             exists($addr{$refaddr})
               and return $addr{$refaddr};
 
-            my $type = Sidef::normalize_type(CORE::ref($obj) ? CORE::ref($obj) : $obj);
+            my $type = Sidef::normalize_type(CORE::ref($obj) || $obj);
             Scalar::Util::reftype($obj) eq 'HASH' or return $type;
             my @keys = CORE::sort(CORE::keys(%{$obj}));
 
@@ -305,7 +320,7 @@ package Sidef::Object::Object {
 
         sub def_method {
             my ($self, $name, $block) = @_;
-            *{(CORE::ref($self) ? CORE::ref($self) : $self) . '::' . $name} = sub {
+            *{(CORE::ref($self) || $self) . '::' . $name} = sub {
                 $block->call(@_);
             };
             $self;
@@ -313,15 +328,15 @@ package Sidef::Object::Object {
 
         sub undef_method {
             my ($self, $name) = @_;
-            delete ${(CORE::ref($self) ? CORE::ref($self) : $self) . '::'}{$name};
+            delete ${(CORE::ref($self) || $self) . '::'}{$name};
             $self;
         }
 
         sub alias_method {
             my ($self, $old, $new) = @_;
 
-            my $ref = (CORE::ref($self) ? CORE::ref($self) : $self);
-            my $to = \&{$ref . '::' . $old};
+            my $ref = (CORE::ref($self) || $self);
+            my $to  = \&{$ref . '::' . $old};
 
             if (not defined &$to) {
                 die "[ERROR] Can't alias the nonexistent method `$old` as `$new`!";
@@ -331,11 +346,12 @@ package Sidef::Object::Object {
         }
 
         sub methods {
-            my ($self) = @_;
+            my ($self, @args) = @_;
 
             my %alias;
             my %methods;
-            my $ref = CORE::ref($self);
+            my $ref = CORE::ref($self) || $self;
+
             foreach my $method (grep { $_ !~ /^[(_]/ and defined(&{$ref . '::' . $_}) } keys %{$ref . '::'}) {
                 $methods{$method} = (
                                      $alias{\&{$ref . '::' . $method}} //=
@@ -343,6 +359,7 @@ package Sidef::Object::Object {
                                                                       {
                                                                        obj    => $self,
                                                                        method => $method,
+                                                                       args   => \@args,
                                                                       }
                                                                      )
                                     );
@@ -367,9 +384,24 @@ package Sidef::Object::Object {
             $func->call($arg, @args);
         };
 
-        # Pair operator
+        # Deprecated pair method: ASCII colon; U+3A
         *{__PACKAGE__ . '::' . ':'} = sub {
             Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
+        # TODO: v4.0: the following 2 methods should create an Array with 2 elements
+        # Pair (2-Array) method: Fullwidth Colon; U+FF1A
+        *{__PACKAGE__ . '::' . '：'} = sub {
+            Sidef::Types::Array::Pair->new($_[0], $_[1]);
+        };
+
+        # Pair (2-Array) method: Broken bar; U+A6
+        # Easier to type than U+FF1A, but uglier
+        *{__PACKAGE__ . '::' . '¦'} = \&{__PACKAGE__ . '::' . '：'};
+
+        # NamedParam method: Triple Colon Operator; U+2AF6
+        *{__PACKAGE__ . '::' . '⫶'} = sub {
+            Sidef::Variable::NamedParam->new($_[0], $_[1]);
         };
 
         # Logical AND

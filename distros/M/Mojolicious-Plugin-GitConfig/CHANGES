@@ -1,0 +1,35 @@
+==================================================
+Changes from 2018-03-24 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.0 at 2019-03-24 15:16:58 +0000
+----------------------------------------
+
+  Change: 8bf0e6d5e3805f6b32ab816198428ebabae156cb
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-03-24 16:11:02 +0000
+
+    ADD: first version of plugin 
+
+  Change: ffdab07ba5520a92f075372c380ecb6c5c13db5a
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-03-24 15:59:21 +0000
+
+    ADD: Dist::Zilla configuration 
+
+  Change: fe01ca516b030bdca7dd7dfa696574f831df3a08
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-03-24 15:47:07 +0000
+
+    ADD: ignore some files 
+
+  Change: de66cc88ac6991c416a272285f2fcc1b5ca50078
+  Author: Dominik Meyer <dmeyer@federationhq.de>
+  Date : 2019-03-24 14:44:12 +0000
+
+    ADD: initial commit 
+
+================
+End of releases.
+================

@@ -1,6 +1,7 @@
 Revision history for Win32-JA-PathPatch
 
-1.0.2 2019-03-05T09:46:46Z
+1.0.3 2019-03-22T23:39:36Z
+    - Same as 1.0.2. Make prereqs list strictly.
 
 1.0.2 2019-03-05T09:45:12Z
     - Remove unused prereqs

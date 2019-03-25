@@ -42,20 +42,26 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Cwd" : "0",
             "Encode" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "Win32::API" : "0",
             "perl" : "5.018000",
-            "version" : "0"
+            "strict" : "0",
+            "utf8" : "0",
+            "version" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Encode" : "0",
-            "File::Path" : "0",
-            "Test::More" : "0"
+            "Exporter" : "0",
+            "File::Spec::Functions" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "parent" : "0"
          }
       }
    },
@@ -65,11 +71,11 @@
       },
       "winja" : {
          "file" : "lib/winja.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
-   "version" : "1.0.2",
+   "version" : "1.0.3",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpan@gmail.com>",

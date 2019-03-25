@@ -4,13 +4,33 @@ use strict;
 use warnings;
 
 use Giblog;
-use Giblog::API;
 
-my $opt = Giblog->parse_argv(@ARGV);
+Giblog->run_command(@ARGV);
 
-my $command_name = $opt->{command_name};
-my $argv = $opt->{argv};
+=encoding utf8
 
-my $api = Giblog->build_api(%$opt);
+=head1 NAME
 
-$api->run_command($command_name, @$argv);
+giblog - giblog command
+
+=head1 SYNOPSIS
+
+  Usage: giblog [OPTIONS] [COMMAND] [ARGS]
+
+    giblog new mysite
+    giblog new_website mysite
+    giblog new_blog mysite
+    giblog add
+    giblog build
+    giblog -H /home/kimoto/mysite add
+    giblog --home /home/kimoto/mysite build
+
+  Options:
+    -H, --home <directory>         Home directory
+    -h, --help                     Show this message
+
+=head1 DESCRIPTION
+
+Run Giblog command which is implemented as subclass of L<Giblog::Command>.
+
+=cut

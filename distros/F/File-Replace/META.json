@@ -4,13 +4,13 @@
       "Hauke D <haukex@zero-g.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "File-Replace",
    "no_index" : {
@@ -65,19 +65,19 @@
    "provides" : {
       "File::Replace" : {
          "file" : "lib/File/Replace.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "File::Replace::Inplace" : {
          "file" : "lib/File/Replace/Inplace.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Tie::Handle::Argv" : {
          "file" : "lib/Tie/Handle/Argv.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       },
       "Tie::Handle::Base" : {
          "file" : "lib/Tie/Handle/Base.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -92,6 +92,6 @@
          "web" : "https://bitbucket.org/haukex/file-replace"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

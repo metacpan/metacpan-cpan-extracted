@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.2.1.  */
+/* A Bison parser, made by GNU Bison 3.3.1.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,7 +48,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.2.1"
+#define YYBISON_VERSION "3.3.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -73,7 +74,7 @@
 #define yychar          itex2MML_yychar
 
 /* First part of user prologue.  */
-#line 7 "itex2MML.y" /* yacc.c:338  */
+#line 7 "itex2MML.y" /* yacc.c:337  */
 
 #include <stdio.h>
 #include <string.h>
@@ -348,7 +349,7 @@
    }
 
 
-#line 352 "y.tab.c" /* yacc.c:338  */
+#line 353 "y.tab.c" /* yacc.c:337  */
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -992,16 +993,16 @@ union yyalloc
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  594
 
-/* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
-   by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   429
 
+/* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
+   as returned by yylex, with out-of-bounds checking.  */
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
 
 /* YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to TOKEN-NUM
-   as returned by yylex, without out-of-bounds checking.  */
+   as returned by yylex.  */
 static const yytype_uint8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -2558,22 +2559,22 @@ static const yytype_uint8 yyr2[] =
 
 #define YYRECOVERING()  (!!yyerrstatus)
 
-#define YYBACKUP(Token, Value)                                  \
-do                                                              \
-  if (yychar == YYEMPTY)                                        \
-    {                                                           \
-      yychar = (Token);                                         \
-      yylval = (Value);                                         \
-      YYPOPSTACK (yylen);                                       \
-      yystate = *yyssp;                                         \
-      goto yybackup;                                            \
-    }                                                           \
-  else                                                          \
-    {                                                           \
-      yyerror (ret_str, YY_("syntax error: cannot back up")); \
-      YYERROR;                                                  \
-    }                                                           \
-while (0)
+#define YYBACKUP(Token, Value)                                    \
+  do                                                              \
+    if (yychar == YYEMPTY)                                        \
+      {                                                           \
+        yychar = (Token);                                         \
+        yylval = (Value);                                         \
+        YYPOPSTACK (yylen);                                       \
+        yystate = *yyssp;                                         \
+        goto yybackup;                                            \
+      }                                                           \
+    else                                                          \
+      {                                                           \
+        yyerror (ret_str, YY_("syntax error: cannot back up")); \
+        YYERROR;                                                  \
+      }                                                           \
+  while (0)
 
 /* Error token number */
 #define YYTERROR        1
@@ -2689,7 +2690,7 @@ yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule, char **ret_str
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr,
                        yystos[yyssp[yyi + 1 - yynrhs]],
-                       &(yyvsp[(yyi + 1) - (yynrhs)])
+                       &yyvsp[(yyi + 1) - (yynrhs)]
                                               , ret_str);
       YYFPRINTF (stderr, "\n");
     }
@@ -2793,7 +2794,10 @@ yytnamerr (char *yyres, const char *yystr)
           case '\\':
             if (*++yyp != '\\')
               goto do_not_strip_quotes;
-            /* Fall through.  */
+            else
+              goto append;
+
+          append:
           default:
             if (yyres)
               yyres[yyn] = *yyp;
@@ -2889,10 +2893,10 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
                 yyarg[yycount++] = yytname[yyx];
                 {
                   YYSIZE_T yysize1 = yysize + yytnamerr (YY_NULLPTR, yytname[yyx]);
-                  if (! (yysize <= yysize1
-                         && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
+                  if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
+                    yysize = yysize1;
+                  else
                     return 2;
-                  yysize = yysize1;
                 }
               }
         }
@@ -2916,9 +2920,10 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 
   {
     YYSIZE_T yysize1 = yysize + yystrlen (yyformat);
-    if (! (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM))
+    if (yysize <= yysize1 && yysize1 <= YYSTACK_ALLOC_MAXIMUM)
+      yysize = yysize1;
+    else
       return 2;
-    yysize = yysize1;
   }
 
   if (*yymsg_alloc < yysize)
@@ -3045,23 +3050,31 @@ yyparse (char **ret_str)
   yychar = YYEMPTY; /* Cause a token to be read.  */
   goto yysetstate;
 
+
 /*------------------------------------------------------------.
-| yynewstate -- Push a new state, which is found in yystate.  |
+| yynewstate -- push a new state, which is found in yystate.  |
 `------------------------------------------------------------*/
- yynewstate:
+yynewstate:
   /* In all cases, when you get here, the value and location stacks
      have just been pushed.  So pushing a state here evens the stacks.  */
   yyssp++;
 
- yysetstate:
+
+/*--------------------------------------------------------------------.
+| yynewstate -- set current state (the top of the stack) to yystate.  |
+`--------------------------------------------------------------------*/
+yysetstate:
   *yyssp = (yytype_int16) yystate;
 
   if (yyss + yystacksize - 1 <= yyssp)
+#if !defined yyoverflow && !defined YYSTACK_RELOCATE
+    goto yyexhaustedlab;
+#else
     {
       /* Get the current used size of the three stacks, in elements.  */
       YYSIZE_T yysize = (YYSIZE_T) (yyssp - yyss + 1);
 
-#ifdef yyoverflow
+# if defined yyoverflow
       {
         /* Give user a chance to reallocate the stack.  Use copies of
            these so that the &'s don't force the real ones into
@@ -3080,10 +3093,7 @@ yyparse (char **ret_str)
         yyss = yyss1;
         yyvs = yyvs1;
       }
-#else /* no yyoverflow */
-# ifndef YYSTACK_RELOCATE
-      goto yyexhaustedlab;
-# else
+# else /* defined YYSTACK_RELOCATE */
       /* Extend the stack our own way.  */
       if (YYMAXDEPTH <= yystacksize)
         goto yyexhaustedlab;
@@ -3099,12 +3109,11 @@ yyparse (char **ret_str)
           goto yyexhaustedlab;
         YYSTACK_RELOCATE (yyss_alloc, yyss);
         YYSTACK_RELOCATE (yyvs_alloc, yyvs);
-#  undef YYSTACK_RELOCATE
+# undef YYSTACK_RELOCATE
         if (yyss1 != yyssa)
           YYSTACK_FREE (yyss1);
       }
 # endif
-#endif /* no yyoverflow */
 
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
@@ -3115,6 +3124,7 @@ yyparse (char **ret_str)
       if (yyss + yystacksize - 1 <= yyssp)
         YYABORT;
     }
+#endif /* !defined yyoverflow && !defined YYSTACK_RELOCATE */
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
@@ -3123,11 +3133,11 @@ yyparse (char **ret_str)
 
   goto yybackup;
 
+
 /*-----------.
 | yybackup.  |
 `-----------*/
 yybackup:
-
   /* Do appropriate processing given the current state.  Read a
      lookahead token if we need one and don't already have one.  */
 
@@ -3200,7 +3210,7 @@ yydefault:
 
 
 /*-----------------------------.
-| yyreduce -- Do a reduction.  |
+| yyreduce -- do a reduction.  |
 `-----------------------------*/
 yyreduce:
   /* yyn is the number of a rule to reduce with.  */
@@ -3221,68 +3231,68 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 287 "itex2MML.y" /* yacc.c:1645  */
+#line 287 "itex2MML.y" /* yacc.c:1652  */
     {/* all processing done in body*/}
-#line 3227 "y.tab.c" /* yacc.c:1645  */
+#line 3237 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 3:
-#line 290 "itex2MML.y" /* yacc.c:1645  */
+#line 290 "itex2MML.y" /* yacc.c:1652  */
     {/* nothing - do nothing*/}
-#line 3233 "y.tab.c" /* yacc.c:1645  */
+#line 3243 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 4:
-#line 291 "itex2MML.y" /* yacc.c:1645  */
+#line 291 "itex2MML.y" /* yacc.c:1652  */
     {/* proc done in body*/}
-#line 3239 "y.tab.c" /* yacc.c:1645  */
+#line 3249 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 5:
-#line 292 "itex2MML.y" /* yacc.c:1645  */
+#line 292 "itex2MML.y" /* yacc.c:1652  */
     {/* all proc. in body*/}
-#line 3245 "y.tab.c" /* yacc.c:1645  */
+#line 3255 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 6:
-#line 293 "itex2MML.y" /* yacc.c:1645  */
+#line 293 "itex2MML.y" /* yacc.c:1652  */
     {/* all proc. in body*/}
-#line 3251 "y.tab.c" /* yacc.c:1645  */
+#line 3261 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 7:
-#line 294 "itex2MML.y" /* yacc.c:1645  */
+#line 294 "itex2MML.y" /* yacc.c:1652  */
     {/* all proc. in body*/}
-#line 3257 "y.tab.c" /* yacc.c:1645  */
+#line 3267 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 8:
-#line 296 "itex2MML.y" /* yacc.c:1645  */
-    {printf("%s", (yyvsp[0]));}
-#line 3263 "y.tab.c" /* yacc.c:1645  */
+#line 296 "itex2MML.y" /* yacc.c:1652  */
+    {printf("%s", yyvsp[0]);}
+#line 3273 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 9:
-#line 298 "itex2MML.y" /* yacc.c:1645  */
+#line 298 "itex2MML.y" /* yacc.c:1652  */
     {/* empty math group - ignore*/}
-#line 3269 "y.tab.c" /* yacc.c:1645  */
+#line 3279 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 10:
-#line 299 "itex2MML.y" /* yacc.c:1645  */
+#line 299 "itex2MML.y" /* yacc.c:1652  */
     {/* ditto */}
-#line 3275 "y.tab.c" /* yacc.c:1645  */
+#line 3285 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 11:
-#line 300 "itex2MML.y" /* yacc.c:1645  */
+#line 300 "itex2MML.y" /* yacc.c:1652  */
     {
   char ** r = (char **) ret_str;
-  char * p = itex2MML_copy3("<math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow>", (yyvsp[-1]), "</mrow><annotation encoding='application/x-tex'>");
-  char * s = itex2MML_copy3(p, (yyvsp[0]), "</annotation></semantics></math>");
+  char * p = itex2MML_copy3("<math xmlns='http://www.w3.org/1998/Math/MathML' display='inline'><semantics><mrow>", yyvsp[-1], "</mrow><annotation encoding='application/x-tex'>");
+  char * s = itex2MML_copy3(p, yyvsp[0], "</annotation></semantics></math>");
   itex2MML_free_string(p);
-  itex2MML_free_string((yyvsp[-1]));  
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);  
+  itex2MML_free_string(yyvsp[0]);
   if (r) {
     (*r) = (s == itex2MML_empty_string) ? 0 : s;
   }
@@ -3292,18 +3302,18 @@ yyreduce:
     itex2MML_free_string(s);
   }
 }
-#line 3296 "y.tab.c" /* yacc.c:1645  */
+#line 3306 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 12:
-#line 316 "itex2MML.y" /* yacc.c:1645  */
+#line 316 "itex2MML.y" /* yacc.c:1652  */
     {
   char ** r = (char **) ret_str;
-  char * p = itex2MML_copy3("<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'><semantics><mrow>", (yyvsp[-1]), "</mrow><annotation encoding='application/x-tex'>");
-  char * s = itex2MML_copy3(p, (yyvsp[0]), "</annotation></semantics></math>");
+  char * p = itex2MML_copy3("<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'><semantics><mrow>", yyvsp[-1], "</mrow><annotation encoding='application/x-tex'>");
+  char * s = itex2MML_copy3(p, yyvsp[0], "</annotation></semantics></math>");
   itex2MML_free_string(p);
-  itex2MML_free_string((yyvsp[-1]));  
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);  
+  itex2MML_free_string(yyvsp[0]);
   if (r) {
     (*r) = (s == itex2MML_empty_string) ? 0 : s;
   }
@@ -3313,2520 +3323,2520 @@ yyreduce:
     itex2MML_free_string(s);
   }
 }
-#line 3317 "y.tab.c" /* yacc.c:1645  */
+#line 3327 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 13:
-#line 333 "itex2MML.y" /* yacc.c:1645  */
+#line 333 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3326 "y.tab.c" /* yacc.c:1645  */
+#line 3336 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 14:
-#line 337 "itex2MML.y" /* yacc.c:1645  */
+#line 337 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2((yyvsp[-1]), (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2(yyvsp[-1], yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3336 "y.tab.c" /* yacc.c:1645  */
+#line 3346 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 15:
-#line 343 "itex2MML.y" /* yacc.c:1645  */
+#line 343 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<munderover>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-    (yyval) = itex2MML_copy3(s1, s2, "</munderover>");
+    char * s1 = itex2MML_copy3("<munderover>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+    yyval = itex2MML_copy3(s1, s2, "</munderover>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
   else {
-    char * s1 = itex2MML_copy3("<msubsup>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-    (yyval) = itex2MML_copy3(s1, s2, "</msubsup>");
+    char * s1 = itex2MML_copy3("<msubsup>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+    yyval = itex2MML_copy3(s1, s2, "</msubsup>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3360 "y.tab.c" /* yacc.c:1645  */
+#line 3370 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 16:
-#line 362 "itex2MML.y" /* yacc.c:1645  */
+#line 362 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<munder>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</munder>");
+    char * s1 = itex2MML_copy3("<munder>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</munder>");
     itex2MML_free_string(s1);
   }
   else {
-    char * s1 = itex2MML_copy3("<msub>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</msub>");
+    char * s1 = itex2MML_copy3("<msub>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</msub>");
     itex2MML_free_string(s1);
   }
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3379 "y.tab.c" /* yacc.c:1645  */
+#line 3389 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 17:
-#line 376 "itex2MML.y" /* yacc.c:1645  */
+#line 376 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<munderover>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[0]), " ", (yyvsp[-2]));
-    (yyval) = itex2MML_copy3(s1, s2, "</munderover>");
+    char * s1 = itex2MML_copy3("<munderover>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[0], " ", yyvsp[-2]);
+    yyval = itex2MML_copy3(s1, s2, "</munderover>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
   else {
-    char * s1 = itex2MML_copy3("<msubsup>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[0]), " ", (yyvsp[-2]));
-    (yyval) = itex2MML_copy3(s1, s2, "</msubsup>");
+    char * s1 = itex2MML_copy3("<msubsup>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[0], " ", yyvsp[-2]);
+    yyval = itex2MML_copy3(s1, s2, "</msubsup>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3403 "y.tab.c" /* yacc.c:1645  */
+#line 3413 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 18:
-#line 395 "itex2MML.y" /* yacc.c:1645  */
+#line 395 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<mover>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mover>");
+    char * s1 = itex2MML_copy3("<mover>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</mover>");
     itex2MML_free_string(s1);
   }
   else {
-    char * s1 = itex2MML_copy3("<msup>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</msup>");
+    char * s1 = itex2MML_copy3("<msup>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</msup>");
     itex2MML_free_string(s1);
   }
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3422 "y.tab.c" /* yacc.c:1645  */
+#line 3432 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 19:
-#line 409 "itex2MML.y" /* yacc.c:1645  */
+#line 409 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<munderover>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-    (yyval) = itex2MML_copy3(s1, s2, "</munderover>");
+    char * s1 = itex2MML_copy3("<munderover>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+    yyval = itex2MML_copy3(s1, s2, "</munderover>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
   else {
-    char * s1 = itex2MML_copy3("<msubsup>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-    (yyval) = itex2MML_copy3(s1, s2, "</msubsup>");
+    char * s1 = itex2MML_copy3("<msubsup>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+    yyval = itex2MML_copy3(s1, s2, "</msubsup>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3446 "y.tab.c" /* yacc.c:1645  */
+#line 3456 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 20:
-#line 428 "itex2MML.y" /* yacc.c:1645  */
+#line 428 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<munder>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</munder>");
+    char * s1 = itex2MML_copy3("<munder>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</munder>");
     itex2MML_free_string(s1);
   }
   else {
-    char * s1 = itex2MML_copy3("<msub>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</msub>");
+    char * s1 = itex2MML_copy3("<msub>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</msub>");
     itex2MML_free_string(s1);
   }
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3465 "y.tab.c" /* yacc.c:1645  */
+#line 3475 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 21:
-#line 442 "itex2MML.y" /* yacc.c:1645  */
+#line 442 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<munderover>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[0]), " ", (yyvsp[-2]));
-    (yyval) = itex2MML_copy3(s1, s2, "</munderover>");
+    char * s1 = itex2MML_copy3("<munderover>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[0], " ", yyvsp[-2]);
+    yyval = itex2MML_copy3(s1, s2, "</munderover>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
   else {
-    char * s1 = itex2MML_copy3("<msubsup>", (yyvsp[-4]), " ");
-    char * s2 = itex2MML_copy3((yyvsp[0]), " ", (yyvsp[-2]));
-    (yyval) = itex2MML_copy3(s1, s2, "</msubsup>");
+    char * s1 = itex2MML_copy3("<msubsup>", yyvsp[-4], " ");
+    char * s2 = itex2MML_copy3(yyvsp[0], " ", yyvsp[-2]);
+    yyval = itex2MML_copy3(s1, s2, "</msubsup>");
     itex2MML_free_string(s1);
     itex2MML_free_string(s2);
   }
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3489 "y.tab.c" /* yacc.c:1645  */
+#line 3499 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 22:
-#line 461 "itex2MML.y" /* yacc.c:1645  */
+#line 461 "itex2MML.y" /* yacc.c:1652  */
     {
   if (itex2MML_displaymode == 1) {
-    char * s1 = itex2MML_copy3("<mover>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mover>");
+    char * s1 = itex2MML_copy3("<mover>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</mover>");
     itex2MML_free_string(s1);
   }
   else {
-    char * s1 = itex2MML_copy3("<msup>", (yyvsp[-2]), " ");
-    (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</msup>");
+    char * s1 = itex2MML_copy3("<msup>", yyvsp[-2], " ");
+    yyval = itex2MML_copy3(s1, yyvsp[0], "</msup>");
     itex2MML_free_string(s1);
   }
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3508 "y.tab.c" /* yacc.c:1645  */
+#line 3518 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 23:
-#line 475 "itex2MML.y" /* yacc.c:1645  */
+#line 475 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<msubsup>", (yyvsp[-4]), " ");
-  char * s2 = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-  (yyval) = itex2MML_copy3(s1, s2, "</msubsup>");
+  char * s1 = itex2MML_copy3("<msubsup>", yyvsp[-4], " ");
+  char * s2 = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+  yyval = itex2MML_copy3(s1, s2, "</msubsup>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3523 "y.tab.c" /* yacc.c:1645  */
+#line 3533 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 24:
-#line 485 "itex2MML.y" /* yacc.c:1645  */
+#line 485 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<msubsup>", (yyvsp[-4]), " ");
-  char * s2 = itex2MML_copy3((yyvsp[0]), " ", (yyvsp[-2]));
-  (yyval) = itex2MML_copy3(s1, s2, "</msubsup>");
+  char * s1 = itex2MML_copy3("<msubsup>", yyvsp[-4], " ");
+  char * s2 = itex2MML_copy3(yyvsp[0], " ", yyvsp[-2]);
+  yyval = itex2MML_copy3(s1, s2, "</msubsup>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3538 "y.tab.c" /* yacc.c:1645  */
+#line 3548 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 25:
-#line 495 "itex2MML.y" /* yacc.c:1645  */
+#line 495 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<msub>", (yyvsp[-2]), " ");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</msub>");
+  char * s1 = itex2MML_copy3("<msub>", yyvsp[-2], " ");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</msub>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3550 "y.tab.c" /* yacc.c:1645  */
+#line 3560 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 26:
-#line 502 "itex2MML.y" /* yacc.c:1645  */
+#line 502 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<msup>", (yyvsp[-2]), " ");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</msup>");
+  char * s1 = itex2MML_copy3("<msup>", yyvsp[-2], " ");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</msup>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3562 "y.tab.c" /* yacc.c:1645  */
+#line 3572 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 27:
-#line 509 "itex2MML.y" /* yacc.c:1645  */
+#line 509 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<msub><mo/>", (yyvsp[0]), "</msub>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<msub><mo/>", yyvsp[0], "</msub>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3571 "y.tab.c" /* yacc.c:1645  */
+#line 3581 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 28:
-#line 513 "itex2MML.y" /* yacc.c:1645  */
+#line 513 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<msup><mo/>", (yyvsp[0]), "</msup>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<msup><mo/>", yyvsp[0], "</msup>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3580 "y.tab.c" /* yacc.c:1645  */
+#line 3590 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 29:
-#line 517 "itex2MML.y" /* yacc.c:1645  */
+#line 517 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3589 "y.tab.c" /* yacc.c:1645  */
+#line 3599 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 34:
-#line 526 "itex2MML.y" /* yacc.c:1645  */
+#line 526 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mi>", (yyvsp[0]), "</mi>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mi>", yyvsp[0], "</mi>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3598 "y.tab.c" /* yacc.c:1645  */
+#line 3608 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 35:
-#line 530 "itex2MML.y" /* yacc.c:1645  */
+#line 530 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mn>", (yyvsp[0]), "</mn>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mn>", yyvsp[0], "</mn>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3607 "y.tab.c" /* yacc.c:1645  */
+#line 3617 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 105:
-#line 603 "itex2MML.y" /* yacc.c:1645  */
+#line 603 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 3616 "y.tab.c" /* yacc.c:1645  */
+#line 3626 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 106:
-#line 607 "itex2MML.y" /* yacc.c:1645  */
+#line 607 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow>", (yyvsp[-1]), "</mrow>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mrow>", yyvsp[-1], "</mrow>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 3625 "y.tab.c" /* yacc.c:1645  */
+#line 3635 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 107:
-#line 611 "itex2MML.y" /* yacc.c:1645  */
+#line 611 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow>", (yyvsp[-2]), (yyvsp[-1]));
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mrow>");
+  char * s1 = itex2MML_copy3("<mrow>", yyvsp[-2], yyvsp[-1]);
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</mrow>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3638 "y.tab.c" /* yacc.c:1645  */
+#line 3648 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 112:
-#line 624 "itex2MML.y" /* yacc.c:1645  */
+#line 624 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3648 "y.tab.c" /* yacc.c:1645  */
+#line 3658 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 113:
-#line 629 "itex2MML.y" /* yacc.c:1645  */
+#line 629 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3658 "y.tab.c" /* yacc.c:1645  */
+#line 3668 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 114:
-#line 634 "itex2MML.y" /* yacc.c:1645  */
+#line 634 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy_string("");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string("");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3668 "y.tab.c" /* yacc.c:1645  */
+#line 3678 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 115:
-#line 640 "itex2MML.y" /* yacc.c:1645  */
+#line 640 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3677 "y.tab.c" /* yacc.c:1645  */
+#line 3687 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 116:
-#line 644 "itex2MML.y" /* yacc.c:1645  */
+#line 644 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3686 "y.tab.c" /* yacc.c:1645  */
+#line 3696 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 117:
-#line 648 "itex2MML.y" /* yacc.c:1645  */
+#line 648 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string("");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3695 "y.tab.c" /* yacc.c:1645  */
+#line 3705 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 118:
-#line 653 "itex2MML.y" /* yacc.c:1645  */
+#line 653 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3705 "y.tab.c" /* yacc.c:1645  */
+#line 3715 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 119:
-#line 658 "itex2MML.y" /* yacc.c:1645  */
+#line 658 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3714 "y.tab.c" /* yacc.c:1645  */
+#line 3724 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 120:
-#line 662 "itex2MML.y" /* yacc.c:1645  */
+#line 662 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3723 "y.tab.c" /* yacc.c:1645  */
+#line 3733 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 121:
-#line 666 "itex2MML.y" /* yacc.c:1645  */
+#line 666 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3733 "y.tab.c" /* yacc.c:1645  */
+#line 3743 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 122:
-#line 671 "itex2MML.y" /* yacc.c:1645  */
+#line 671 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3742 "y.tab.c" /* yacc.c:1645  */
+#line 3752 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 123:
-#line 675 "itex2MML.y" /* yacc.c:1645  */
+#line 675 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3751 "y.tab.c" /* yacc.c:1645  */
+#line 3761 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 124:
-#line 679 "itex2MML.y" /* yacc.c:1645  */
+#line 679 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3761 "y.tab.c" /* yacc.c:1645  */
+#line 3771 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 125:
-#line 684 "itex2MML.y" /* yacc.c:1645  */
+#line 684 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3770 "y.tab.c" /* yacc.c:1645  */
+#line 3780 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 126:
-#line 688 "itex2MML.y" /* yacc.c:1645  */
+#line 688 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3779 "y.tab.c" /* yacc.c:1645  */
+#line 3789 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 127:
-#line 692 "itex2MML.y" /* yacc.c:1645  */
+#line 692 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3789 "y.tab.c" /* yacc.c:1645  */
+#line 3799 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 128:
-#line 697 "itex2MML.y" /* yacc.c:1645  */
+#line 697 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3798 "y.tab.c" /* yacc.c:1645  */
+#line 3808 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 129:
-#line 701 "itex2MML.y" /* yacc.c:1645  */
+#line 701 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3807 "y.tab.c" /* yacc.c:1645  */
+#line 3817 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 130:
-#line 705 "itex2MML.y" /* yacc.c:1645  */
+#line 705 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3817 "y.tab.c" /* yacc.c:1645  */
+#line 3827 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 131:
-#line 710 "itex2MML.y" /* yacc.c:1645  */
+#line 710 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.2em\" minsize=\"1.2em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3827 "y.tab.c" /* yacc.c:1645  */
+#line 3837 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 132:
-#line 715 "itex2MML.y" /* yacc.c:1645  */
+#line 715 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3837 "y.tab.c" /* yacc.c:1645  */
+#line 3847 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 133:
-#line 720 "itex2MML.y" /* yacc.c:1645  */
+#line 720 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"1.8em\" minsize=\"1.8em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3847 "y.tab.c" /* yacc.c:1645  */
+#line 3857 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 134:
-#line 725 "itex2MML.y" /* yacc.c:1645  */
+#line 725 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3857 "y.tab.c" /* yacc.c:1645  */
+#line 3867 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 135:
-#line 730 "itex2MML.y" /* yacc.c:1645  */
+#line 730 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"2.4em\" minsize=\"2.4em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3867 "y.tab.c" /* yacc.c:1645  */
+#line 3877 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 136:
-#line 735 "itex2MML.y" /* yacc.c:1645  */
+#line 735 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3877 "y.tab.c" /* yacc.c:1645  */
+#line 3887 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 137:
-#line 740 "itex2MML.y" /* yacc.c:1645  */
+#line 740 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo maxsize=\"3em\" minsize=\"3em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3887 "y.tab.c" /* yacc.c:1645  */
+#line 3897 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 138:
-#line 746 "itex2MML.y" /* yacc.c:1645  */
+#line 746 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<merror><mtext>Unknown character</mtext></merror>");
+  yyval = itex2MML_copy_string("<merror><mtext>Unknown character</mtext></merror>");
 }
-#line 3895 "y.tab.c" /* yacc.c:1645  */
+#line 3905 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 139:
-#line 750 "itex2MML.y" /* yacc.c:1645  */
+#line 750 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mo lspace=\"verythinmathspace\" rspace=\"0em\">&minus;</mo>");
+  yyval = itex2MML_copy_string("<mo lspace=\"0.11111em\" rspace=\"0em\">&minus;</mo>");
 }
-#line 3903 "y.tab.c" /* yacc.c:1645  */
+#line 3913 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 140:
-#line 754 "itex2MML.y" /* yacc.c:1645  */
+#line 754 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mo lspace=\"verythinmathspace\" rspace=\"0em\">+</mo>");
+  yyval = itex2MML_copy_string("<mo lspace=\"0.11111em\" rspace=\"0em\">+</mo>");
 }
-#line 3911 "y.tab.c" /* yacc.c:1645  */
+#line 3921 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 142:
-#line 760 "itex2MML.y" /* yacc.c:1645  */
+#line 760 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn=2;
-  (yyval) = itex2MML_copy3("<mi>", (yyvsp[0]), "</mi>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mi>", yyvsp[0], "</mi>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3921 "y.tab.c" /* yacc.c:1645  */
+#line 3931 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 144:
-#line 767 "itex2MML.y" /* yacc.c:1645  */
+#line 767 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3931 "y.tab.c" /* yacc.c:1645  */
+#line 3941 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 145:
-#line 773 "itex2MML.y" /* yacc.c:1645  */
+#line 773 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0.16667em\" rspace=\"0.16667em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3941 "y.tab.c" /* yacc.c:1645  */
+#line 3951 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 148:
-#line 781 "itex2MML.y" /* yacc.c:1645  */
+#line 781 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3951 "y.tab.c" /* yacc.c:1645  */
+#line 3961 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 149:
-#line 786 "itex2MML.y" /* yacc.c:1645  */
+#line 786 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3961 "y.tab.c" /* yacc.c:1645  */
+#line 3971 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 150:
-#line 791 "itex2MML.y" /* yacc.c:1645  */
+#line 791 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mstyle scriptlevel=\"0\"><mo>", (yyvsp[0]), "</mo></mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle scriptlevel=\"0\"><mo>", yyvsp[0], "</mo></mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3971 "y.tab.c" /* yacc.c:1645  */
+#line 3981 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 151:
-#line 796 "itex2MML.y" /* yacc.c:1645  */
+#line 796 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo stretchy=\"false\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo stretchy=\"false\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3980 "y.tab.c" /* yacc.c:1645  */
+#line 3990 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 152:
-#line 800 "itex2MML.y" /* yacc.c:1645  */
+#line 800 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo stretchy=\"false\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo stretchy=\"false\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3990 "y.tab.c" /* yacc.c:1645  */
+#line 4000 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 153:
-#line 805 "itex2MML.y" /* yacc.c:1645  */
+#line 805 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo stretchy=\"false\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo stretchy=\"false\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 3999 "y.tab.c" /* yacc.c:1645  */
+#line 4009 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 154:
-#line 809 "itex2MML.y" /* yacc.c:1645  */
+#line 809 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo stretchy=\"false\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo stretchy=\"false\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4008 "y.tab.c" /* yacc.c:1645  */
+#line 4018 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 155:
-#line 813 "itex2MML.y" /* yacc.c:1645  */
+#line 813 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mo>", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo>", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4017 "y.tab.c" /* yacc.c:1645  */
+#line 4027 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 156:
-#line 817 "itex2MML.y" /* yacc.c:1645  */
+#line 817 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn=2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"mediummathspace\" rspace=\"mediummathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0.22222em\" rspace=\"0.22222em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4027 "y.tab.c" /* yacc.c:1645  */
+#line 4037 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 157:
-#line 822 "itex2MML.y" /* yacc.c:1645  */
+#line 822 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"0em\" rspace=\"thinmathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0em\" rspace=\"0.16667em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4037 "y.tab.c" /* yacc.c:1645  */
+#line 4047 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 158:
-#line 827 "itex2MML.y" /* yacc.c:1645  */
+#line 827 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"verythinmathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0.11111em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4047 "y.tab.c" /* yacc.c:1645  */
+#line 4057 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 159:
-#line 832 "itex2MML.y" /* yacc.c:1645  */
+#line 832 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"0em\" rspace=\"thinmathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0em\" rspace=\"0.16667em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4057 "y.tab.c" /* yacc.c:1645  */
+#line 4067 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 160:
-#line 837 "itex2MML.y" /* yacc.c:1645  */
+#line 837 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0.16667em\" rspace=\"0.16667em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4067 "y.tab.c" /* yacc.c:1645  */
+#line 4077 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 161:
-#line 842 "itex2MML.y" /* yacc.c:1645  */
+#line 842 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"mediummathspace\" rspace=\"mediummathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0.22222em\" rspace=\"0.22222em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4077 "y.tab.c" /* yacc.c:1645  */
+#line 4087 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 162:
-#line 847 "itex2MML.y" /* yacc.c:1645  */
+#line 847 "itex2MML.y" /* yacc.c:1652  */
     {
   itex2MML_rowposn = 2;
-  (yyval) = itex2MML_copy3("<mo lspace=\"thickmathspace\" rspace=\"thickmathspace\">", (yyvsp[0]), "</mo>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mo lspace=\"0.27778em\" rspace=\"0.27778em\">", yyvsp[0], "</mo>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4087 "y.tab.c" /* yacc.c:1645  */
+#line 4097 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 163:
-#line 853 "itex2MML.y" /* yacc.c:1645  */
+#line 853 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mspace height=\"", (yyvsp[-7]), "ex\" depth=\"");
-  char * s2 = itex2MML_copy3((yyvsp[-4]), "ex\" width=\"", (yyvsp[-1]));
-  (yyval) = itex2MML_copy3(s1, s2, "em\"/>");
+  char * s1 = itex2MML_copy3("<mspace height=\"", yyvsp[-7], "ex\" depth=\"");
+  char * s2 = itex2MML_copy3(yyvsp[-4], "ex\" width=\"", yyvsp[-1]);
+  yyval = itex2MML_copy3(s1, s2, "em\"/>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-7]));
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-7]);
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4102 "y.tab.c" /* yacc.c:1645  */
+#line 4112 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 164:
-#line 864 "itex2MML.y" /* yacc.c:1645  */
+#line 864 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<maction actiontype=\"statusline\">", (yyvsp[0]), "<mtext>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-1]), "</mtext></maction>");
+  char * s1 = itex2MML_copy3("<maction actiontype=\"statusline\">", yyvsp[0], "<mtext>");
+  yyval = itex2MML_copy3(s1, yyvsp[-1], "</mtext></maction>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4114 "y.tab.c" /* yacc.c:1645  */
+#line 4124 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 165:
-#line 872 "itex2MML.y" /* yacc.c:1645  */
+#line 872 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<maction actiontype=\"tooltip\">", (yyvsp[0]), "<mtext>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-1]), "</mtext></maction>");
+  char * s1 = itex2MML_copy3("<maction actiontype=\"tooltip\">", yyvsp[0], "<mtext>");
+  yyval = itex2MML_copy3(s1, yyvsp[-1], "</mtext></maction>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4126 "y.tab.c" /* yacc.c:1645  */
+#line 4136 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 166:
-#line 880 "itex2MML.y" /* yacc.c:1645  */
+#line 880 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<maction actiontype=\"toggle\" selection=\"2\">", (yyvsp[-1]), " ");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</maction>");
+  char * s1 = itex2MML_copy3("<maction actiontype=\"toggle\" selection=\"2\">", yyvsp[-1], " ");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</maction>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4138 "y.tab.c" /* yacc.c:1645  */
+#line 4148 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 167:
-#line 887 "itex2MML.y" /* yacc.c:1645  */
+#line 887 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<maction actiontype=\"toggle\">", (yyvsp[-1]), "</maction>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<maction actiontype=\"toggle\">", yyvsp[-1], "</maction>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4147 "y.tab.c" /* yacc.c:1645  */
+#line 4157 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 168:
-#line 892 "itex2MML.y" /* yacc.c:1645  */
+#line 892 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<maction actiontype=\"highlight\" other='color=", (yyvsp[-1]), "'>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</maction>");
+  char * s1 = itex2MML_copy3("<maction actiontype=\"highlight\" other='color=", yyvsp[-1], "'>");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</maction>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4159 "y.tab.c" /* yacc.c:1645  */
+#line 4169 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 169:
-#line 900 "itex2MML.y" /* yacc.c:1645  */
+#line 900 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<maction actiontype=\"highlight\" other='background=", (yyvsp[-1]), "'>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</maction>");
+  char * s1 = itex2MML_copy3("<maction actiontype=\"highlight\" other='background=", yyvsp[-1], "'>");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</maction>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4171 "y.tab.c" /* yacc.c:1645  */
+#line 4181 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 170:
-#line 908 "itex2MML.y" /* yacc.c:1645  */
+#line 908 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mstyle mathcolor=", (yyvsp[-1]), ">");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mstyle>");
+  char * s1 = itex2MML_copy3("<mstyle mathcolor=", yyvsp[-1], ">");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</mstyle>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4183 "y.tab.c" /* yacc.c:1645  */
+#line 4193 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 171:
-#line 915 "itex2MML.y" /* yacc.c:1645  */
+#line 915 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mstyle mathbackground=", (yyvsp[-1]), ">");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mstyle>");
+  char * s1 = itex2MML_copy3("<mstyle mathbackground=", yyvsp[-1], ">");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</mstyle>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4195 "y.tab.c" /* yacc.c:1645  */
+#line 4205 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 172:
-#line 923 "itex2MML.y" /* yacc.c:1645  */
+#line 923 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mpadded width=\"0\">", (yyvsp[0]), "</mpadded>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mpadded width=\"0px\">", yyvsp[0], "</mpadded>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4204 "y.tab.c" /* yacc.c:1645  */
+#line 4214 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 173:
-#line 928 "itex2MML.y" /* yacc.c:1645  */
+#line 928 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mpadded width=\"0\" lspace=\"-100%width\">", (yyvsp[0]), "</mpadded>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mpadded width=\"0px\" lspace=\"-100%width\">", yyvsp[0], "</mpadded>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4213 "y.tab.c" /* yacc.c:1645  */
+#line 4223 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 174:
-#line 933 "itex2MML.y" /* yacc.c:1645  */
+#line 933 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mpadded width=\"0\" lspace=\"-50%width\">", (yyvsp[0]), "</mpadded>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mpadded width=\"0px\" lspace=\"-50%width\">", yyvsp[0], "</mpadded>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4222 "y.tab.c" /* yacc.c:1645  */
+#line 4232 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 175:
-#line 938 "itex2MML.y" /* yacc.c:1645  */
+#line 938 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mtext>", (yyvsp[0]), "</mtext>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mtext>", yyvsp[0], "</mtext>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4231 "y.tab.c" /* yacc.c:1645  */
+#line 4241 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 176:
-#line 943 "itex2MML.y" /* yacc.c:1645  */
+#line 943 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle displaystyle=\"true\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle displaystyle=\"true\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4240 "y.tab.c" /* yacc.c:1645  */
+#line 4250 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 177:
-#line 948 "itex2MML.y" /* yacc.c:1645  */
+#line 948 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle displaystyle=\"false\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle displaystyle=\"false\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4249 "y.tab.c" /* yacc.c:1645  */
+#line 4259 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 178:
-#line 953 "itex2MML.y" /* yacc.c:1645  */
+#line 953 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle scriptlevel=\"0\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle scriptlevel=\"0\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4258 "y.tab.c" /* yacc.c:1645  */
+#line 4268 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 179:
-#line 958 "itex2MML.y" /* yacc.c:1645  */
+#line 958 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle scriptlevel=\"1\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle scriptlevel=\"1\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4267 "y.tab.c" /* yacc.c:1645  */
+#line 4277 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 180:
-#line 963 "itex2MML.y" /* yacc.c:1645  */
+#line 963 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle scriptlevel=\"2\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle scriptlevel=\"2\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4276 "y.tab.c" /* yacc.c:1645  */
+#line 4286 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 181:
-#line 968 "itex2MML.y" /* yacc.c:1645  */
+#line 968 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle mathvariant=\"italic\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle mathvariant=\"italic\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4285 "y.tab.c" /* yacc.c:1645  */
+#line 4295 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 182:
-#line 973 "itex2MML.y" /* yacc.c:1645  */
+#line 973 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle mathvariant=\"sans-serif\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle mathvariant=\"sans-serif\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4294 "y.tab.c" /* yacc.c:1645  */
+#line 4304 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 183:
-#line 978 "itex2MML.y" /* yacc.c:1645  */
+#line 978 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle mathvariant=\"monospace\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle mathvariant=\"monospace\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4303 "y.tab.c" /* yacc.c:1645  */
+#line 4313 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 184:
-#line 983 "itex2MML.y" /* yacc.c:1645  */
+#line 983 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<menclose notation=\"updiagonalstrike\">", (yyvsp[0]), "</menclose>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<menclose notation=\"updiagonalstrike\">", yyvsp[0], "</menclose>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4312 "y.tab.c" /* yacc.c:1645  */
+#line 4322 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 185:
-#line 988 "itex2MML.y" /* yacc.c:1645  */
+#line 988 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<menclose notation=\"box\">", (yyvsp[0]), "</menclose>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<menclose notation=\"box\">", yyvsp[0], "</menclose>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4321 "y.tab.c" /* yacc.c:1645  */
+#line 4331 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 186:
-#line 993 "itex2MML.y" /* yacc.c:1645  */
+#line 993 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle mathvariant=\"bold\">", (yyvsp[0]), "</mstyle>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mstyle mathvariant=\"bold\">", yyvsp[0], "</mstyle>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4330 "y.tab.c" /* yacc.c:1645  */
+#line 4340 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 187:
-#line 998 "itex2MML.y" /* yacc.c:1645  */
+#line 998 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mi mathvariant=\"normal\">", (yyvsp[-1]), "</mi>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mi mathvariant=\"normal\">", yyvsp[-1], "</mi>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4339 "y.tab.c" /* yacc.c:1645  */
+#line 4349 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 188:
-#line 1003 "itex2MML.y" /* yacc.c:1645  */
+#line 1003 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4348 "y.tab.c" /* yacc.c:1645  */
+#line 4358 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 189:
-#line 1007 "itex2MML.y" /* yacc.c:1645  */
+#line 1007 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2((yyvsp[-1]), (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2(yyvsp[-1], yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4358 "y.tab.c" /* yacc.c:1645  */
+#line 4368 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 190:
-#line 1013 "itex2MML.y" /* yacc.c:1645  */
+#line 1013 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mi>", (yyvsp[-1]), "</mi>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mi>", yyvsp[-1], "</mi>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4367 "y.tab.c" /* yacc.c:1645  */
+#line 4377 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 191:
-#line 1018 "itex2MML.y" /* yacc.c:1645  */
+#line 1018 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4376 "y.tab.c" /* yacc.c:1645  */
+#line 4386 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 192:
-#line 1022 "itex2MML.y" /* yacc.c:1645  */
+#line 1022 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2((yyvsp[-1]), (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2(yyvsp[-1], yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4386 "y.tab.c" /* yacc.c:1645  */
+#line 4396 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 193:
-#line 1028 "itex2MML.y" /* yacc.c:1645  */
+#line 1028 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("&", (yyvsp[0]), "opf;");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("&", yyvsp[0], "opf;");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4395 "y.tab.c" /* yacc.c:1645  */
+#line 4405 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 194:
-#line 1032 "itex2MML.y" /* yacc.c:1645  */
+#line 1032 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("&", (yyvsp[0]), "opf;");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("&", yyvsp[0], "opf;");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4404 "y.tab.c" /* yacc.c:1645  */
+#line 4414 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 195:
-#line 1036 "itex2MML.y" /* yacc.c:1645  */
+#line 1036 "itex2MML.y" /* yacc.c:1652  */
     {
   /* Blackboard digits 0-9 correspond to Unicode characters 0x1D7D8-0x1D7E1 */
-  char * end = (yyvsp[0]) + 1;
-  int code = 0x1D7D8 + strtoul((yyvsp[0]), &end, 10);
-  (yyval) = itex2MML_character_reference(code);
-  itex2MML_free_string((yyvsp[0]));
+  char * end = yyvsp[0] + 1;
+  int code = 0x1D7D8 + strtoul(yyvsp[0], &end, 10);
+  yyval = itex2MML_character_reference(code);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4416 "y.tab.c" /* yacc.c:1645  */
+#line 4426 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 196:
-#line 1044 "itex2MML.y" /* yacc.c:1645  */
+#line 1044 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mi>", (yyvsp[-1]), "</mi>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mi>", yyvsp[-1], "</mi>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4425 "y.tab.c" /* yacc.c:1645  */
+#line 4435 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 197:
-#line 1049 "itex2MML.y" /* yacc.c:1645  */
+#line 1049 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4434 "y.tab.c" /* yacc.c:1645  */
+#line 4444 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 198:
-#line 1053 "itex2MML.y" /* yacc.c:1645  */
+#line 1053 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2((yyvsp[-1]), (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2(yyvsp[-1], yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4444 "y.tab.c" /* yacc.c:1645  */
+#line 4454 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 199:
-#line 1059 "itex2MML.y" /* yacc.c:1645  */
+#line 1059 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("&", (yyvsp[0]), "fr;");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("&", yyvsp[0], "fr;");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4453 "y.tab.c" /* yacc.c:1645  */
+#line 4463 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 200:
-#line 1064 "itex2MML.y" /* yacc.c:1645  */
+#line 1064 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mi>", (yyvsp[-1]), "</mi>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mi>", yyvsp[-1], "</mi>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4462 "y.tab.c" /* yacc.c:1645  */
+#line 4472 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 201:
-#line 1069 "itex2MML.y" /* yacc.c:1645  */
+#line 1069 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mi class='mathscript'>", (yyvsp[-1]), "</mi>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mi class='mathscript'>", yyvsp[-1], "</mi>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4471 "y.tab.c" /* yacc.c:1645  */
+#line 4481 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 202:
-#line 1074 "itex2MML.y" /* yacc.c:1645  */
+#line 1074 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4480 "y.tab.c" /* yacc.c:1645  */
+#line 4490 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 203:
-#line 1078 "itex2MML.y" /* yacc.c:1645  */
+#line 1078 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2((yyvsp[-1]), (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2(yyvsp[-1], yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4490 "y.tab.c" /* yacc.c:1645  */
+#line 4500 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 204:
-#line 1084 "itex2MML.y" /* yacc.c:1645  */
+#line 1084 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("&", (yyvsp[0]), "scr;");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("&", yyvsp[0], "scr;");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4499 "y.tab.c" /* yacc.c:1645  */
+#line 4509 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 205:
-#line 1089 "itex2MML.y" /* yacc.c:1645  */
+#line 1089 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"thinmathspace\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"0.16667em\"/>");
 }
-#line 4507 "y.tab.c" /* yacc.c:1645  */
+#line 4517 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 206:
-#line 1093 "itex2MML.y" /* yacc.c:1645  */
+#line 1093 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"mediummathspace\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"0.22222em\"/>");
 }
-#line 4515 "y.tab.c" /* yacc.c:1645  */
+#line 4525 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 207:
-#line 1097 "itex2MML.y" /* yacc.c:1645  */
+#line 1097 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"thickmathspace\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"0.27778em\"/>");
 }
-#line 4523 "y.tab.c" /* yacc.c:1645  */
+#line 4533 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 208:
-#line 1101 "itex2MML.y" /* yacc.c:1645  */
+#line 1101 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"1em\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"1em\"/>");
 }
-#line 4531 "y.tab.c" /* yacc.c:1645  */
+#line 4541 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 209:
-#line 1105 "itex2MML.y" /* yacc.c:1645  */
+#line 1105 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"2em\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"2em\"/>");
 }
-#line 4539 "y.tab.c" /* yacc.c:1645  */
+#line 4549 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 210:
-#line 1109 "itex2MML.y" /* yacc.c:1645  */
+#line 1109 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"negativethinmathspace\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"-0.16667em\"/>");
 }
-#line 4547 "y.tab.c" /* yacc.c:1645  */
+#line 4557 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 211:
-#line 1113 "itex2MML.y" /* yacc.c:1645  */
+#line 1113 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"negativemediummathspace\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"-0.22222em\"/>");
 }
-#line 4555 "y.tab.c" /* yacc.c:1645  */
+#line 4565 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 212:
-#line 1117 "itex2MML.y" /* yacc.c:1645  */
+#line 1117 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mspace width=\"negativethickmathspace\"/>");
+  yyval = itex2MML_copy_string("<mspace width=\"-0.27778em\"/>");
 }
-#line 4563 "y.tab.c" /* yacc.c:1645  */
+#line 4573 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 213:
-#line 1121 "itex2MML.y" /* yacc.c:1645  */
+#line 1121 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mphantom>", (yyvsp[0]), "</mphantom>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mphantom>", yyvsp[0], "</mphantom>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4572 "y.tab.c" /* yacc.c:1645  */
+#line 4582 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 214:
-#line 1126 "itex2MML.y" /* yacc.c:1645  */
+#line 1126 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow href=\"", (yyvsp[-1]), "\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:type=\"simple\" xlink:href=\"");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-1]), "\">");
-  (yyval) = itex2MML_copy3(s2, (yyvsp[0]), "</mrow>");
+  char * s1 = itex2MML_copy3("<mrow href=\"", yyvsp[-1], "\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:type=\"simple\" xlink:href=\"");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-1], "\">");
+  yyval = itex2MML_copy3(s2, yyvsp[0], "</mrow>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4586 "y.tab.c" /* yacc.c:1645  */
+#line 4596 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 215:
-#line 1136 "itex2MML.y" /* yacc.c:1645  */
+#line 1136 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mmultiscripts>", (yyvsp[-3]), (yyvsp[-1]));
-  (yyval) = itex2MML_copy2(s1, "</mmultiscripts>");
+  char * s1 = itex2MML_copy3("<mmultiscripts>", yyvsp[-3], yyvsp[-1]);
+  yyval = itex2MML_copy2(s1, "</mmultiscripts>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4598 "y.tab.c" /* yacc.c:1645  */
+#line 4608 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 216:
-#line 1143 "itex2MML.y" /* yacc.c:1645  */
+#line 1143 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mmultiscripts>", (yyvsp[-1]), (yyvsp[0]));
-  (yyval) = itex2MML_copy2(s1, "</mmultiscripts>");
+  char * s1 = itex2MML_copy3("<mmultiscripts>", yyvsp[-1], yyvsp[0]);
+  yyval = itex2MML_copy2(s1, "</mmultiscripts>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4610 "y.tab.c" /* yacc.c:1645  */
+#line 4620 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 217:
-#line 1151 "itex2MML.y" /* yacc.c:1645  */
+#line 1151 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mmultiscripts>", (yyvsp[-3]), (yyvsp[-1]));
-  char * s2 = itex2MML_copy3("<mprescripts/>", (yyvsp[-5]), "</mmultiscripts>");
-  (yyval) = itex2MML_copy2(s1, s2);
+  char * s1 = itex2MML_copy3("<mmultiscripts>", yyvsp[-3], yyvsp[-1]);
+  char * s2 = itex2MML_copy3("<mprescripts/>", yyvsp[-5], "</mmultiscripts>");
+  yyval = itex2MML_copy2(s1, s2);
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-5]));
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-5]);
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4625 "y.tab.c" /* yacc.c:1645  */
+#line 4635 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 218:
-#line 1161 "itex2MML.y" /* yacc.c:1645  */
+#line 1161 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy2("<mmultiscripts>", (yyvsp[-1]));
-  char * s2 = itex2MML_copy3("<mprescripts/>", (yyvsp[-3]), "</mmultiscripts>");
-  (yyval) = itex2MML_copy2(s1, s2);
+  char * s1 = itex2MML_copy2("<mmultiscripts>", yyvsp[-1]);
+  char * s2 = itex2MML_copy3("<mprescripts/>", yyvsp[-3], "</mmultiscripts>");
+  yyval = itex2MML_copy2(s1, s2);
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4639 "y.tab.c" /* yacc.c:1645  */
+#line 4649 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 219:
-#line 1170 "itex2MML.y" /* yacc.c:1645  */
+#line 1170 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mmultiscripts>", (yyvsp[-3]), (yyvsp[-1]));
-  (yyval) = itex2MML_copy2(s1, "</mmultiscripts>");
+  char * s1 = itex2MML_copy3("<mmultiscripts>", yyvsp[-3], yyvsp[-1]);
+  yyval = itex2MML_copy2(s1, "</mmultiscripts>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1])); 
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]); 
 }
-#line 4651 "y.tab.c" /* yacc.c:1645  */
+#line 4661 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 220:
-#line 1178 "itex2MML.y" /* yacc.c:1645  */
+#line 1178 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4660 "y.tab.c" /* yacc.c:1645  */
+#line 4670 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 221:
-#line 1182 "itex2MML.y" /* yacc.c:1645  */
+#line 1182 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-1]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-1], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4670 "y.tab.c" /* yacc.c:1645  */
+#line 4680 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 222:
-#line 1188 "itex2MML.y" /* yacc.c:1645  */
+#line 1188 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4680 "y.tab.c" /* yacc.c:1645  */
+#line 4690 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 223:
-#line 1193 "itex2MML.y" /* yacc.c:1645  */
+#line 1193 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2((yyvsp[0]), " <none/>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2(yyvsp[0], " <none/>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4689 "y.tab.c" /* yacc.c:1645  */
+#line 4699 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 224:
-#line 1197 "itex2MML.y" /* yacc.c:1645  */
+#line 1197 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("<none/> ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("<none/> ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4698 "y.tab.c" /* yacc.c:1645  */
+#line 4708 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 225:
-#line 1201 "itex2MML.y" /* yacc.c:1645  */
+#line 1201 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("<none/> ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("<none/> ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4707 "y.tab.c" /* yacc.c:1645  */
+#line 4717 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 226:
-#line 1206 "itex2MML.y" /* yacc.c:1645  */
+#line 1206 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mfrac>", (yyvsp[-1]), (yyvsp[0]));
-  (yyval) = itex2MML_copy2(s1, "</mfrac>");
+  char * s1 = itex2MML_copy3("<mfrac>", yyvsp[-1], yyvsp[0]);
+  yyval = itex2MML_copy2(s1, "</mfrac>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4719 "y.tab.c" /* yacc.c:1645  */
+#line 4729 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 227:
-#line 1213 "itex2MML.y" /* yacc.c:1645  */
+#line 1213 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mstyle displaystyle=\"false\"><mfrac>", (yyvsp[-1]), (yyvsp[0]));
-  (yyval) = itex2MML_copy2(s1, "</mfrac></mstyle>");
+  char * s1 = itex2MML_copy3("<mstyle displaystyle=\"false\"><mfrac>", yyvsp[-1], yyvsp[0]);
+  yyval = itex2MML_copy2(s1, "</mfrac></mstyle>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4731 "y.tab.c" /* yacc.c:1645  */
+#line 4741 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 228:
-#line 1221 "itex2MML.y" /* yacc.c:1645  */
+#line 1221 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3( "<mrow><mo lspace=\"mediummathspace\">(</mo><mo rspace=\"thinmathspace\">mod</mo>", (yyvsp[0]), "<mo rspace=\"mediummathspace\">)</mo></mrow>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3( "<mrow><mo lspace=\"0.22222em\">(</mo><mo rspace=\"0.16667em\">mod</mo>", yyvsp[0], "<mo rspace=\"0.22222em\">)</mo></mrow>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4740 "y.tab.c" /* yacc.c:1645  */
+#line 4750 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 229:
-#line 1226 "itex2MML.y" /* yacc.c:1645  */
+#line 1226 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mfrac><mrow>", (yyvsp[-3]), "</mrow><mrow>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-1]), "</mrow></mfrac>");
+  char * s1 = itex2MML_copy3("<mfrac><mrow>", yyvsp[-3], "</mrow><mrow>");
+  yyval = itex2MML_copy3(s1, yyvsp[-1], "</mrow></mfrac>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4752 "y.tab.c" /* yacc.c:1645  */
+#line 4762 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 230:
-#line 1233 "itex2MML.y" /* yacc.c:1645  */
+#line 1233 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow>", (yyvsp[-4]), "<mfrac><mrow>");
-  char * s2 = itex2MML_copy3((yyvsp[-3]), "</mrow><mrow>", (yyvsp[-1]));
-  char * s3 = itex2MML_copy3("</mrow></mfrac>", (yyvsp[0]), "</mrow>");
-  (yyval) = itex2MML_copy3(s1, s2, s3);
+  char * s1 = itex2MML_copy3("<mrow>", yyvsp[-4], "<mfrac><mrow>");
+  char * s2 = itex2MML_copy3(yyvsp[-3], "</mrow><mrow>", yyvsp[-1]);
+  char * s3 = itex2MML_copy3("</mrow></mfrac>", yyvsp[0], "</mrow>");
+  yyval = itex2MML_copy3(s1, s2, s3);
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
   itex2MML_free_string(s3);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4770 "y.tab.c" /* yacc.c:1645  */
+#line 4780 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 231:
-#line 1247 "itex2MML.y" /* yacc.c:1645  */
+#line 1247 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mfrac linethickness=\"0\"><mrow>", (yyvsp[-3]), "</mrow><mrow>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-1]), "</mrow></mfrac>");
+  char * s1 = itex2MML_copy3("<mfrac linethickness=\"0px\"><mrow>", yyvsp[-3], "</mrow><mrow>");
+  yyval = itex2MML_copy3(s1, yyvsp[-1], "</mrow></mfrac>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 4782 "y.tab.c" /* yacc.c:1645  */
+#line 4792 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 232:
-#line 1254 "itex2MML.y" /* yacc.c:1645  */
+#line 1254 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow>", (yyvsp[-4]), "<mfrac linethickness=\"0\"><mrow>");
-  char * s2 = itex2MML_copy3((yyvsp[-3]), "</mrow><mrow>", (yyvsp[-1]));
-  char * s3 = itex2MML_copy3("</mrow></mfrac>", (yyvsp[0]), "</mrow>");
-  (yyval) = itex2MML_copy3(s1, s2, s3);
+  char * s1 = itex2MML_copy3("<mrow>", yyvsp[-4], "<mfrac linethickness=\"0px\"><mrow>");
+  char * s2 = itex2MML_copy3(yyvsp[-3], "</mrow><mrow>", yyvsp[-1]);
+  char * s3 = itex2MML_copy3("</mrow></mfrac>", yyvsp[0], "</mrow>");
+  yyval = itex2MML_copy3(s1, s2, s3);
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
   itex2MML_free_string(s3);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4800 "y.tab.c" /* yacc.c:1645  */
+#line 4810 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 233:
-#line 1268 "itex2MML.y" /* yacc.c:1645  */
+#line 1268 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow><mo>(</mo><mfrac linethickness=\"0\">", (yyvsp[-1]), (yyvsp[0]));
-  (yyval) = itex2MML_copy2(s1, "</mfrac><mo>)</mo></mrow>");
+  char * s1 = itex2MML_copy3("<mrow><mo>(</mo><mfrac linethickness=\"0px\">", yyvsp[-1], yyvsp[0]);
+  yyval = itex2MML_copy2(s1, "</mfrac><mo>)</mo></mrow>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4812 "y.tab.c" /* yacc.c:1645  */
+#line 4822 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 234:
-#line 1275 "itex2MML.y" /* yacc.c:1645  */
+#line 1275 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow><mo>(</mo><mstyle displaystyle=\"false\"><mfrac linethickness=\"0\">", (yyvsp[-1]), (yyvsp[0]));
-  (yyval) = itex2MML_copy2(s1, "</mfrac></mstyle><mo>)</mo></mrow>");
+  char * s1 = itex2MML_copy3("<mrow><mo>(</mo><mstyle displaystyle=\"false\"><mfrac linethickness=\"0px\">", yyvsp[-1], yyvsp[0]);
+  yyval = itex2MML_copy2(s1, "</mfrac></mstyle><mo>)</mo></mrow>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4824 "y.tab.c" /* yacc.c:1645  */
+#line 4834 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 235:
-#line 1283 "itex2MML.y" /* yacc.c:1645  */
+#line 1283 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<munder>", (yyvsp[0]), "<mo>&UnderBrace;</mo></munder>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<munder>", yyvsp[0], "<mo>&UnderBrace;</mo></munder>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4833 "y.tab.c" /* yacc.c:1645  */
+#line 4843 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 236:
-#line 1288 "itex2MML.y" /* yacc.c:1645  */
+#line 1288 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<munder>", (yyvsp[0]), "<mo>&#x00332;</mo></munder>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<munder>", yyvsp[0], "<mo>&#x00332;</mo></munder>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4842 "y.tab.c" /* yacc.c:1645  */
+#line 4852 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 237:
-#line 1293 "itex2MML.y" /* yacc.c:1645  */
+#line 1293 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&OverBrace;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&OverBrace;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4851 "y.tab.c" /* yacc.c:1645  */
+#line 4861 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 238:
-#line 1298 "itex2MML.y" /* yacc.c:1645  */
+#line 1298 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo stretchy=\"false\">&#x000AF;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo stretchy=\"false\">&#x000AF;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4860 "y.tab.c" /* yacc.c:1645  */
+#line 4870 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 239:
-#line 1302 "itex2MML.y" /* yacc.c:1645  */
+#line 1302 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&#x000AF;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&#x000AF;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4869 "y.tab.c" /* yacc.c:1645  */
+#line 4879 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 240:
-#line 1307 "itex2MML.y" /* yacc.c:1645  */
+#line 1307 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo stretchy=\"false\">&rightarrow;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo stretchy=\"false\">&rightarrow;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4878 "y.tab.c" /* yacc.c:1645  */
+#line 4888 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 241:
-#line 1311 "itex2MML.y" /* yacc.c:1645  */
+#line 1311 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&rightarrow;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&rightarrow;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4887 "y.tab.c" /* yacc.c:1645  */
+#line 4897 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 242:
-#line 1316 "itex2MML.y" /* yacc.c:1645  */
+#line 1316 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&leftarrow;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&leftarrow;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4896 "y.tab.c" /* yacc.c:1645  */
+#line 4906 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 243:
-#line 1320 "itex2MML.y" /* yacc.c:1645  */
+#line 1320 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&leftrightarrow;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&leftrightarrow;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4905 "y.tab.c" /* yacc.c:1645  */
+#line 4915 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 244:
-#line 1324 "itex2MML.y" /* yacc.c:1645  */
+#line 1324 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<munder>", (yyvsp[0]), "<mo>&rightarrow;</mo></munder>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<munder>", yyvsp[0], "<mo>&rightarrow;</mo></munder>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4914 "y.tab.c" /* yacc.c:1645  */
+#line 4924 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 245:
-#line 1328 "itex2MML.y" /* yacc.c:1645  */
+#line 1328 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<munder>", (yyvsp[0]), "<mo>&leftarrow;</mo></munder>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<munder>", yyvsp[0], "<mo>&leftarrow;</mo></munder>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4923 "y.tab.c" /* yacc.c:1645  */
+#line 4933 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 246:
-#line 1332 "itex2MML.y" /* yacc.c:1645  */
+#line 1332 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<munder>", (yyvsp[0]), "<mo>&leftrightarrow;</mo></munder>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<munder>", yyvsp[0], "<mo>&leftrightarrow;</mo></munder>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4932 "y.tab.c" /* yacc.c:1645  */
+#line 4942 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 247:
-#line 1337 "itex2MML.y" /* yacc.c:1645  */
+#line 1337 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&dot;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&dot;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4941 "y.tab.c" /* yacc.c:1645  */
+#line 4951 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 248:
-#line 1342 "itex2MML.y" /* yacc.c:1645  */
+#line 1342 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&Dot;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&Dot;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4950 "y.tab.c" /* yacc.c:1645  */
+#line 4960 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 249:
-#line 1347 "itex2MML.y" /* yacc.c:1645  */
+#line 1347 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&tdot;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&tdot;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4959 "y.tab.c" /* yacc.c:1645  */
+#line 4969 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 250:
-#line 1352 "itex2MML.y" /* yacc.c:1645  */
+#line 1352 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&DotDot;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&DotDot;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4968 "y.tab.c" /* yacc.c:1645  */
+#line 4978 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 251:
-#line 1357 "itex2MML.y" /* yacc.c:1645  */
+#line 1357 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo stretchy=\"false\">&tilde;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo stretchy=\"false\">&tilde;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4977 "y.tab.c" /* yacc.c:1645  */
+#line 4987 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 252:
-#line 1361 "itex2MML.y" /* yacc.c:1645  */
+#line 1361 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&tilde;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&tilde;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4986 "y.tab.c" /* yacc.c:1645  */
+#line 4996 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 253:
-#line 1366 "itex2MML.y" /* yacc.c:1645  */
+#line 1366 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo stretchy=\"false\">&#x2c7;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo stretchy=\"false\">&#x2c7;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 4995 "y.tab.c" /* yacc.c:1645  */
+#line 5005 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 254:
-#line 1370 "itex2MML.y" /* yacc.c:1645  */
+#line 1370 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&#x2c7;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&#x2c7;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5004 "y.tab.c" /* yacc.c:1645  */
+#line 5014 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 255:
-#line 1375 "itex2MML.y" /* yacc.c:1645  */
+#line 1375 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo stretchy=\"false\">&#x5E;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo stretchy=\"false\">&#x5E;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5013 "y.tab.c" /* yacc.c:1645  */
+#line 5023 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 256:
-#line 1379 "itex2MML.y" /* yacc.c:1645  */
+#line 1379 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mover>", (yyvsp[0]), "<mo>&#x5E;</mo></mover>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mover>", yyvsp[0], "<mo>&#x5E;</mo></mover>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5022 "y.tab.c" /* yacc.c:1645  */
+#line 5032 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 257:
-#line 1384 "itex2MML.y" /* yacc.c:1645  */
+#line 1384 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<msqrt>", (yyvsp[0]), "</msqrt>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<msqrt>", yyvsp[0], "</msqrt>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5031 "y.tab.c" /* yacc.c:1645  */
+#line 5041 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 258:
-#line 1389 "itex2MML.y" /* yacc.c:1645  */
+#line 1389 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mroot>", (yyvsp[0]), (yyvsp[-2]));
-  (yyval) = itex2MML_copy2(s1, "</mroot>");
+  char * s1 = itex2MML_copy3("<mroot>", yyvsp[0], yyvsp[-2]);
+  yyval = itex2MML_copy2(s1, "</mroot>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5043 "y.tab.c" /* yacc.c:1645  */
+#line 5053 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 259:
-#line 1396 "itex2MML.y" /* yacc.c:1645  */
+#line 1396 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mroot>", (yyvsp[0]), (yyvsp[-1]));
-  (yyval) = itex2MML_copy2(s1, "</mroot>");
+  char * s1 = itex2MML_copy3("<mroot>", yyvsp[0], yyvsp[-1]);
+  yyval = itex2MML_copy2(s1, "</mroot>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5055 "y.tab.c" /* yacc.c:1645  */
+#line 5065 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 260:
-#line 1404 "itex2MML.y" /* yacc.c:1645  */
+#line 1404 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mpadded voffset='", (yyvsp[-3]), "' height='");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-2]), "' depth='");
-  char * s3 = itex2MML_copy3(s2, (yyvsp[-1]), "'>");
-  (yyval) = itex2MML_copy3(s3, (yyvsp[0]), "</mpadded>");
+  char * s1 = itex2MML_copy3("<mpadded voffset='", yyvsp[-3], "' height='");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-2], "' depth='");
+  char * s3 = itex2MML_copy3(s2, yyvsp[-1], "'>");
+  yyval = itex2MML_copy3(s3, yyvsp[0], "</mpadded>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
   itex2MML_free_string(s3);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5073 "y.tab.c" /* yacc.c:1645  */
+#line 5083 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 261:
-#line 1417 "itex2MML.y" /* yacc.c:1645  */
+#line 1417 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mpadded voffset='-", (yyvsp[-3]), "' height='");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-2]), "' depth='");
-  char * s3 = itex2MML_copy3(s2, (yyvsp[-1]), "'>");
-  (yyval) = itex2MML_copy3(s3, (yyvsp[0]), "</mpadded>");
+  char * s1 = itex2MML_copy3("<mpadded voffset='-", yyvsp[-3], "' height='");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-2], "' depth='");
+  char * s3 = itex2MML_copy3(s2, yyvsp[-1], "'>");
+  yyval = itex2MML_copy3(s3, yyvsp[0], "</mpadded>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
   itex2MML_free_string(s3);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5091 "y.tab.c" /* yacc.c:1645  */
+#line 5101 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 262:
-#line 1430 "itex2MML.y" /* yacc.c:1645  */
+#line 1430 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mpadded voffset='", (yyvsp[-2]), "' height='");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-1]), "' depth='depth'>");
-  (yyval) = itex2MML_copy3(s2, (yyvsp[0]), "</mpadded>");
+  char * s1 = itex2MML_copy3("<mpadded voffset='", yyvsp[-2], "' height='");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-1], "' depth='depth'>");
+  yyval = itex2MML_copy3(s2, yyvsp[0], "</mpadded>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5106 "y.tab.c" /* yacc.c:1645  */
+#line 5116 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 263:
-#line 1440 "itex2MML.y" /* yacc.c:1645  */
+#line 1440 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mpadded voffset='-", (yyvsp[-2]), "' height='");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-1]), "' depth='+");
-  char * s3 = itex2MML_copy3(s2, (yyvsp[-2]), "'>");
-  (yyval) = itex2MML_copy3(s3, (yyvsp[0]), "</mpadded>");
+  char * s1 = itex2MML_copy3("<mpadded voffset='-", yyvsp[-2], "' height='");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-1], "' depth='+");
+  char * s3 = itex2MML_copy3(s2, yyvsp[-2], "'>");
+  yyval = itex2MML_copy3(s3, yyvsp[0], "</mpadded>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
   itex2MML_free_string(s3);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5123 "y.tab.c" /* yacc.c:1645  */
+#line 5133 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 264:
-#line 1452 "itex2MML.y" /* yacc.c:1645  */
+#line 1452 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mpadded voffset='", (yyvsp[-1]), "' height='+");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-1]), "' depth='depth'>");
-  (yyval) = itex2MML_copy3(s2, (yyvsp[0]), "</mpadded>");
+  char * s1 = itex2MML_copy3("<mpadded voffset='", yyvsp[-1], "' height='+");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-1], "' depth='depth'>");
+  yyval = itex2MML_copy3(s2, yyvsp[0], "</mpadded>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5137 "y.tab.c" /* yacc.c:1645  */
+#line 5147 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 265:
-#line 1461 "itex2MML.y" /* yacc.c:1645  */
+#line 1461 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mpadded voffset='-", (yyvsp[-1]), "' height='0pt' depth='+");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-1]), "'>");
-  (yyval) = itex2MML_copy3(s2, (yyvsp[0]), "</mpadded>");
+  char * s1 = itex2MML_copy3("<mpadded voffset='-", yyvsp[-1], "' height='0pt' depth='+");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-1], "'>");
+  yyval = itex2MML_copy3(s2, yyvsp[0], "</mpadded>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5151 "y.tab.c" /* yacc.c:1645  */
+#line 5161 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 266:
-#line 1471 "itex2MML.y" /* yacc.c:1645  */
+#line 1471 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<munder><mo>", (yyvsp[-4]), "</mo><mrow>");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-2]), "</mrow></munder>");
+  char * s1 = itex2MML_copy3("<munder><mo>", yyvsp[-4], "</mo><mrow>");
+  yyval = itex2MML_copy3(s1, yyvsp[-2], "</mrow></munder>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5163 "y.tab.c" /* yacc.c:1645  */
+#line 5173 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 267:
-#line 1478 "itex2MML.y" /* yacc.c:1645  */
+#line 1478 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<munder>", (yyvsp[0]), (yyvsp[-1]));
-  (yyval) = itex2MML_copy2(s1, "</munder>");
+  char * s1 = itex2MML_copy3("<munder>", yyvsp[0], yyvsp[-1]);
+  yyval = itex2MML_copy2(s1, "</munder>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5175 "y.tab.c" /* yacc.c:1645  */
+#line 5185 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 268:
-#line 1486 "itex2MML.y" /* yacc.c:1645  */
+#line 1486 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mover><mo>", (yyvsp[-1]), "</mo>");
-  (yyval) =  itex2MML_copy3(s1, (yyvsp[0]), "</mover>");
+  char * s1 = itex2MML_copy3("<mover><mo>", yyvsp[-1], "</mo>");
+  yyval =  itex2MML_copy3(s1, yyvsp[0], "</mover>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5187 "y.tab.c" /* yacc.c:1645  */
+#line 5197 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 269:
-#line 1493 "itex2MML.y" /* yacc.c:1645  */
+#line 1493 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mover>", (yyvsp[0]), (yyvsp[-1]));
-  (yyval) = itex2MML_copy2(s1, "</mover>");
+  char * s1 = itex2MML_copy3("<mover>", yyvsp[0], yyvsp[-1]);
+  yyval = itex2MML_copy2(s1, "</mover>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5199 "y.tab.c" /* yacc.c:1645  */
+#line 5209 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 270:
-#line 1501 "itex2MML.y" /* yacc.c:1645  */
+#line 1501 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<munderover><mo>", (yyvsp[-4]), "</mo><mrow>");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-2]), "</mrow>");
-  (yyval) = itex2MML_copy3(s2, (yyvsp[0]), "</munderover>");
+  char * s1 = itex2MML_copy3("<munderover><mo>", yyvsp[-4], "</mo><mrow>");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-2], "</mrow>");
+  yyval = itex2MML_copy3(s2, yyvsp[0], "</munderover>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5214 "y.tab.c" /* yacc.c:1645  */
+#line 5224 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 271:
-#line 1511 "itex2MML.y" /* yacc.c:1645  */
+#line 1511 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<munderover>", (yyvsp[0]), (yyvsp[-2]));
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-1]), "</munderover>");
+  char * s1 = itex2MML_copy3("<munderover>", yyvsp[0], yyvsp[-2]);
+  yyval = itex2MML_copy3(s1, yyvsp[-1], "</munderover>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5227 "y.tab.c" /* yacc.c:1645  */
+#line 5237 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 272:
-#line 1520 "itex2MML.y" /* yacc.c:1645  */
+#line 1520 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mrow/>");
+  yyval = itex2MML_copy_string("<mrow/>");
 }
-#line 5235 "y.tab.c" /* yacc.c:1645  */
+#line 5245 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 273:
-#line 1524 "itex2MML.y" /* yacc.c:1645  */
+#line 1524 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5244 "y.tab.c" /* yacc.c:1645  */
+#line 5254 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 274:
-#line 1528 "itex2MML.y" /* yacc.c:1645  */
+#line 1528 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mtable displaystyle=\"true\" rowspacing=\"1.0ex\">", (yyvsp[-2]), "</mtable></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mtable displaystyle=\"true\" rowspacing=\"1.0ex\">", yyvsp[-2], "</mtable></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5253 "y.tab.c" /* yacc.c:1645  */
+#line 5263 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 275:
-#line 1532 "itex2MML.y" /* yacc.c:1645  */
+#line 1532 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mo>(</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow><mo>)</mo></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mo>(</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow><mo>)</mo></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5262 "y.tab.c" /* yacc.c:1645  */
+#line 5272 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 276:
-#line 1536 "itex2MML.y" /* yacc.c:1645  */
+#line 1536 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mo>[</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow><mo>]</mo></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mo>[</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow><mo>]</mo></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5271 "y.tab.c" /* yacc.c:1645  */
+#line 5281 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 277:
-#line 1540 "itex2MML.y" /* yacc.c:1645  */
+#line 1540 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mo>&VerticalBar;</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow><mo>&VerticalBar;</mo></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mo>&VerticalBar;</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow><mo>&VerticalBar;</mo></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5280 "y.tab.c" /* yacc.c:1645  */
+#line 5290 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 278:
-#line 1544 "itex2MML.y" /* yacc.c:1645  */
+#line 1544 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mo>{</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow><mo>}</mo></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mo>{</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow><mo>}</mo></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5289 "y.tab.c" /* yacc.c:1645  */
+#line 5299 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 279:
-#line 1548 "itex2MML.y" /* yacc.c:1645  */
+#line 1548 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mo>&DoubleVerticalBar;</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow><mo>&DoubleVerticalBar;</mo></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mo>&DoubleVerticalBar;</mo><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow><mo>&DoubleVerticalBar;</mo></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5298 "y.tab.c" /* yacc.c:1645  */
+#line 5308 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 280:
-#line 1552 "itex2MML.y" /* yacc.c:1645  */
+#line 1552 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mstyle scriptlevel=\"2\"><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", (yyvsp[-2]), "</mtable></mrow></mstyle>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mstyle scriptlevel=\"2\"><mrow><mtable displaystyle=\"false\" rowspacing=\"0.5ex\">", yyvsp[-2], "</mtable></mrow></mstyle>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5307 "y.tab.c" /* yacc.c:1645  */
+#line 5317 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 281:
-#line 1556 "itex2MML.y" /* yacc.c:1645  */
+#line 1556 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mo>{</mo><mrow><mtable displaystyle=\"false\" columnalign=\"left left\">", (yyvsp[-2]), "</mtable></mrow></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mo>{</mo><mrow><mtable displaystyle=\"false\" columnalign=\"left left\">", yyvsp[-2], "</mtable></mrow></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5316 "y.tab.c" /* yacc.c:1645  */
+#line 5326 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 282:
-#line 1560 "itex2MML.y" /* yacc.c:1645  */
+#line 1560 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mtable displaystyle=\"true\" columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\">", (yyvsp[-2]), "</mtable></mrow>");
-  itex2MML_free_string((yyvsp[-2]));
+  yyval = itex2MML_copy3("<mrow><mtable displaystyle=\"true\" columnalign=\"right left right left right left right left right left\" columnspacing=\"0em\">", yyvsp[-2], "</mtable></mrow>");
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5325 "y.tab.c" /* yacc.c:1645  */
+#line 5335 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 283:
-#line 1564 "itex2MML.y" /* yacc.c:1645  */
+#line 1564 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mtable displaystyle=\"false\" rowspacing=\"0.5ex\" align=\"", (yyvsp[-6]), "\" columnalign=\"");
-  char * s2 = itex2MML_copy3(s1, (yyvsp[-4]), "\">");
-  (yyval) = itex2MML_copy3(s2, (yyvsp[-2]), "</mtable>");
+  char * s1 = itex2MML_copy3("<mtable displaystyle=\"false\" rowspacing=\"0.5ex\" align=\"", yyvsp[-6], "\" columnalign=\"");
+  char * s2 = itex2MML_copy3(s1, yyvsp[-4], "\">");
+  yyval = itex2MML_copy3(s2, yyvsp[-2], "</mtable>");
   itex2MML_free_string(s1);
   itex2MML_free_string(s2);
-  itex2MML_free_string((yyvsp[-6]));
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
+  itex2MML_free_string(yyvsp[-6]);
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5340 "y.tab.c" /* yacc.c:1645  */
+#line 5350 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 284:
-#line 1574 "itex2MML.y" /* yacc.c:1645  */
+#line 1574 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mtable displaystyle=\"false\" rowspacing=\"0.5ex\" columnalign=\"", (yyvsp[-4]), "\">");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-2]), "</mtable>");
+  char * s1 = itex2MML_copy3("<mtable displaystyle=\"false\" rowspacing=\"0.5ex\" columnalign=\"", yyvsp[-4], "\">");
+  yyval = itex2MML_copy3(s1, yyvsp[-2], "</mtable>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-4]));
-  itex2MML_free_string((yyvsp[-2]));
+  itex2MML_free_string(yyvsp[-4]);
+  itex2MML_free_string(yyvsp[-2]);
 }
-#line 5352 "y.tab.c" /* yacc.c:1645  */
+#line 5362 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 285:
-#line 1581 "itex2MML.y" /* yacc.c:1645  */
+#line 1581 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<semantics><annotation-xml encoding=\"SVG1.1\">", (yyvsp[-1]), "</annotation-xml></semantics>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<semantics><annotation-xml encoding=\"SVG1.1\">", yyvsp[-1], "</annotation-xml></semantics>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 5361 "y.tab.c" /* yacc.c:1645  */
+#line 5371 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 286:
-#line 1585 "itex2MML.y" /* yacc.c:1645  */
+#line 1585 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string(" ");
+  yyval = itex2MML_copy_string(" ");
 }
-#line 5369 "y.tab.c" /* yacc.c:1645  */
+#line 5379 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 287:
-#line 1589 "itex2MML.y" /* yacc.c:1645  */
+#line 1589 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-1]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-1], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5379 "y.tab.c" /* yacc.c:1645  */
+#line 5389 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 288:
-#line 1594 "itex2MML.y" /* yacc.c:1645  */
+#line 1594 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5388 "y.tab.c" /* yacc.c:1645  */
+#line 5398 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 289:
-#line 1599 "itex2MML.y" /* yacc.c:1645  */
+#line 1599 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mtable columnalign=\"center\" rowspacing=\"0.5ex\">", (yyvsp[-1]), "</mtable></mrow>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mrow><mtable columnalign=\"center\" rowspacing=\"0.5ex\">", yyvsp[-1], "</mtable></mrow>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 5397 "y.tab.c" /* yacc.c:1645  */
+#line 5407 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 290:
-#line 1604 "itex2MML.y" /* yacc.c:1645  */
+#line 1604 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mrow><mtable>", (yyvsp[-1]), "</mtable></mrow>");
-  itex2MML_free_string((yyvsp[-1]));
+  yyval = itex2MML_copy3("<mrow><mtable>", yyvsp[-1], "</mtable></mrow>");
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 5406 "y.tab.c" /* yacc.c:1645  */
+#line 5416 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 291:
-#line 1608 "itex2MML.y" /* yacc.c:1645  */
+#line 1608 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mrow><mtable ", (yyvsp[-3]), ">");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[-1]), "</mtable></mrow>");
+  char * s1 = itex2MML_copy3("<mrow><mtable ", yyvsp[-3], ">");
+  yyval = itex2MML_copy3(s1, yyvsp[-1], "</mtable></mrow>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-3]));
-  itex2MML_free_string((yyvsp[-1]));
+  itex2MML_free_string(yyvsp[-3]);
+  itex2MML_free_string(yyvsp[-1]);
 }
-#line 5418 "y.tab.c" /* yacc.c:1645  */
+#line 5428 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 292:
-#line 1616 "itex2MML.y" /* yacc.c:1645  */
+#line 1616 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5427 "y.tab.c" /* yacc.c:1645  */
+#line 5437 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 293:
-#line 1620 "itex2MML.y" /* yacc.c:1645  */
+#line 1620 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-1]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-1], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5437 "y.tab.c" /* yacc.c:1645  */
+#line 5447 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 294:
-#line 1626 "itex2MML.y" /* yacc.c:1645  */
+#line 1626 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5446 "y.tab.c" /* yacc.c:1645  */
+#line 5456 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 295:
-#line 1630 "itex2MML.y" /* yacc.c:1645  */
+#line 1630 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5455 "y.tab.c" /* yacc.c:1645  */
+#line 5465 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 296:
-#line 1634 "itex2MML.y" /* yacc.c:1645  */
+#line 1634 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5464 "y.tab.c" /* yacc.c:1645  */
+#line 5474 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 297:
-#line 1638 "itex2MML.y" /* yacc.c:1645  */
+#line 1638 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5473 "y.tab.c" /* yacc.c:1645  */
+#line 5483 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 298:
-#line 1642 "itex2MML.y" /* yacc.c:1645  */
+#line 1642 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5482 "y.tab.c" /* yacc.c:1645  */
+#line 5492 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 299:
-#line 1646 "itex2MML.y" /* yacc.c:1645  */
+#line 1646 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5491 "y.tab.c" /* yacc.c:1645  */
+#line 5501 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 300:
-#line 1650 "itex2MML.y" /* yacc.c:1645  */
+#line 1650 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5500 "y.tab.c" /* yacc.c:1645  */
+#line 5510 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 301:
-#line 1654 "itex2MML.y" /* yacc.c:1645  */
+#line 1654 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5509 "y.tab.c" /* yacc.c:1645  */
+#line 5519 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 302:
-#line 1658 "itex2MML.y" /* yacc.c:1645  */
+#line 1658 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5518 "y.tab.c" /* yacc.c:1645  */
+#line 5528 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 303:
-#line 1662 "itex2MML.y" /* yacc.c:1645  */
+#line 1662 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5527 "y.tab.c" /* yacc.c:1645  */
+#line 5537 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 304:
-#line 1667 "itex2MML.y" /* yacc.c:1645  */
+#line 1667 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("columnalign=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("columnalign=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5536 "y.tab.c" /* yacc.c:1645  */
+#line 5546 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 305:
-#line 1672 "itex2MML.y" /* yacc.c:1645  */
+#line 1672 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("columnalign=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("columnalign=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5545 "y.tab.c" /* yacc.c:1645  */
+#line 5555 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 306:
-#line 1677 "itex2MML.y" /* yacc.c:1645  */
+#line 1677 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("rowalign=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("rowalign=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5554 "y.tab.c" /* yacc.c:1645  */
+#line 5564 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 307:
-#line 1682 "itex2MML.y" /* yacc.c:1645  */
+#line 1682 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("align=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("align=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5563 "y.tab.c" /* yacc.c:1645  */
+#line 5573 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 308:
-#line 1687 "itex2MML.y" /* yacc.c:1645  */
+#line 1687 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("equalrows=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("equalrows=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5572 "y.tab.c" /* yacc.c:1645  */
+#line 5582 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 309:
-#line 1692 "itex2MML.y" /* yacc.c:1645  */
+#line 1692 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("equalcolumns=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("equalcolumns=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5581 "y.tab.c" /* yacc.c:1645  */
+#line 5591 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 310:
-#line 1697 "itex2MML.y" /* yacc.c:1645  */
+#line 1697 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("rowlines=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("rowlines=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5590 "y.tab.c" /* yacc.c:1645  */
+#line 5600 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 311:
-#line 1702 "itex2MML.y" /* yacc.c:1645  */
+#line 1702 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("columnlines=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("columnlines=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5599 "y.tab.c" /* yacc.c:1645  */
+#line 5609 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 312:
-#line 1707 "itex2MML.y" /* yacc.c:1645  */
+#line 1707 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("frame=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("frame=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5608 "y.tab.c" /* yacc.c:1645  */
+#line 5618 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 313:
-#line 1712 "itex2MML.y" /* yacc.c:1645  */
+#line 1712 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("rowspacing=", (yyvsp[0]), " columnspacing=");
-  (yyval) = itex2MML_copy2(s1, (yyvsp[0]));
+  char * s1 = itex2MML_copy3("rowspacing=", yyvsp[0], " columnspacing=");
+  yyval = itex2MML_copy2(s1, yyvsp[0]);
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5619 "y.tab.c" /* yacc.c:1645  */
+#line 5629 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 314:
-#line 1719 "itex2MML.y" /* yacc.c:1645  */
+#line 1719 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5628 "y.tab.c" /* yacc.c:1645  */
+#line 5638 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 315:
-#line 1723 "itex2MML.y" /* yacc.c:1645  */
+#line 1723 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5638 "y.tab.c" /* yacc.c:1645  */
+#line 5648 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 316:
-#line 1729 "itex2MML.y" /* yacc.c:1645  */
+#line 1729 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mtr>", (yyvsp[0]), "</mtr>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mtr>", yyvsp[0], "</mtr>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5647 "y.tab.c" /* yacc.c:1645  */
+#line 5657 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 317:
-#line 1733 "itex2MML.y" /* yacc.c:1645  */
+#line 1733 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5656 "y.tab.c" /* yacc.c:1645  */
+#line 5666 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 318:
-#line 1738 "itex2MML.y" /* yacc.c:1645  */
+#line 1738 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5665 "y.tab.c" /* yacc.c:1645  */
+#line 5675 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 319:
-#line 1742 "itex2MML.y" /* yacc.c:1645  */
+#line 1742 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-2]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-2], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5675 "y.tab.c" /* yacc.c:1645  */
+#line 5685 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 320:
-#line 1748 "itex2MML.y" /* yacc.c:1645  */
+#line 1748 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mtr ", (yyvsp[-2]), ">");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mtr>");
+  char * s1 = itex2MML_copy3("<mtr ", yyvsp[-2], ">");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</mtr>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5687 "y.tab.c" /* yacc.c:1645  */
+#line 5697 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 321:
-#line 1756 "itex2MML.y" /* yacc.c:1645  */
+#line 1756 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5696 "y.tab.c" /* yacc.c:1645  */
+#line 5706 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 322:
-#line 1760 "itex2MML.y" /* yacc.c:1645  */
+#line 1760 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-1]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-1], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5706 "y.tab.c" /* yacc.c:1645  */
+#line 5716 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 323:
-#line 1766 "itex2MML.y" /* yacc.c:1645  */
+#line 1766 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5715 "y.tab.c" /* yacc.c:1645  */
+#line 5725 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 324:
-#line 1770 "itex2MML.y" /* yacc.c:1645  */
+#line 1770 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5724 "y.tab.c" /* yacc.c:1645  */
+#line 5734 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 325:
-#line 1775 "itex2MML.y" /* yacc.c:1645  */
+#line 1775 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string("<mtd/>");
+  yyval = itex2MML_copy_string("<mtd/>");
 }
-#line 5732 "y.tab.c" /* yacc.c:1645  */
+#line 5742 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 326:
-#line 1778 "itex2MML.y" /* yacc.c:1645  */
+#line 1778 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3("<mtd>", (yyvsp[0]), "</mtd>");
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3("<mtd>", yyvsp[0], "</mtd>");
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5741 "y.tab.c" /* yacc.c:1645  */
+#line 5751 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 327:
-#line 1782 "itex2MML.y" /* yacc.c:1645  */
+#line 1782 "itex2MML.y" /* yacc.c:1652  */
     {
-  char * s1 = itex2MML_copy3("<mtd ", (yyvsp[-2]), ">");
-  (yyval) = itex2MML_copy3(s1, (yyvsp[0]), "</mtd>");
+  char * s1 = itex2MML_copy3("<mtd ", yyvsp[-2], ">");
+  yyval = itex2MML_copy3(s1, yyvsp[0], "</mtd>");
   itex2MML_free_string(s1);
-  itex2MML_free_string((yyvsp[-2]));
-  itex2MML_free_string((yyvsp[0]));
+  itex2MML_free_string(yyvsp[-2]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5753 "y.tab.c" /* yacc.c:1645  */
+#line 5763 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 328:
-#line 1790 "itex2MML.y" /* yacc.c:1645  */
+#line 1790 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5762 "y.tab.c" /* yacc.c:1645  */
+#line 5772 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 329:
-#line 1794 "itex2MML.y" /* yacc.c:1645  */
+#line 1794 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy3((yyvsp[-1]), " ", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[-1]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy3(yyvsp[-1], " ", yyvsp[0]);
+  itex2MML_free_string(yyvsp[-1]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5772 "y.tab.c" /* yacc.c:1645  */
+#line 5782 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 330:
-#line 1800 "itex2MML.y" /* yacc.c:1645  */
+#line 1800 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5781 "y.tab.c" /* yacc.c:1645  */
+#line 5791 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 331:
-#line 1804 "itex2MML.y" /* yacc.c:1645  */
+#line 1804 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5790 "y.tab.c" /* yacc.c:1645  */
+#line 5800 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 332:
-#line 1808 "itex2MML.y" /* yacc.c:1645  */
+#line 1808 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5799 "y.tab.c" /* yacc.c:1645  */
+#line 5809 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 333:
-#line 1812 "itex2MML.y" /* yacc.c:1645  */
+#line 1812 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy_string((yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy_string(yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5808 "y.tab.c" /* yacc.c:1645  */
+#line 5818 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 334:
-#line 1817 "itex2MML.y" /* yacc.c:1645  */
+#line 1817 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("rowspan=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("rowspan=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5817 "y.tab.c" /* yacc.c:1645  */
+#line 5827 "y.tab.c" /* yacc.c:1652  */
     break;
 
   case 335:
-#line 1822 "itex2MML.y" /* yacc.c:1645  */
+#line 1822 "itex2MML.y" /* yacc.c:1652  */
     {
-  (yyval) = itex2MML_copy2("columnspan=", (yyvsp[0]));
-  itex2MML_free_string((yyvsp[0]));
+  yyval = itex2MML_copy2("columnspan=", yyvsp[0]);
+  itex2MML_free_string(yyvsp[0]);
 }
-#line 5826 "y.tab.c" /* yacc.c:1645  */
+#line 5836 "y.tab.c" /* yacc.c:1652  */
     break;
 
 
-#line 5830 "y.tab.c" /* yacc.c:1645  */
+#line 5840 "y.tab.c" /* yacc.c:1652  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -5940,12 +5950,10 @@ yyerrlab:
 | yyerrorlab -- error raised explicitly by YYERROR.  |
 `---------------------------------------------------*/
 yyerrorlab:
-
-  /* Pacify compilers like GCC when the user code never invokes
-     YYERROR and the label yyerrorlab therefore never appears in user
-     code.  */
-  if (/*CONSTCOND*/ 0)
-     goto yyerrorlab;
+  /* Pacify compilers when the user code never invokes YYERROR and the
+     label yyerrorlab therefore never appears in user code.  */
+  if (0)
+    YYERROR;
 
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYERROR.  */
@@ -6007,12 +6015,14 @@ yyacceptlab:
   yyresult = 0;
   goto yyreturn;
 
+
 /*-----------------------------------.
 | yyabortlab -- YYABORT comes here.  |
 `-----------------------------------*/
 yyabortlab:
   yyresult = 1;
   goto yyreturn;
+
 
 #if !defined yyoverflow || YYERROR_VERBOSE
 /*-------------------------------------------------.
@@ -6024,6 +6034,10 @@ yyexhaustedlab:
   /* Fall through.  */
 #endif
 
+
+/*-----------------------------------------------------.
+| yyreturn -- parsing is finished, return the result.  |
+`-----------------------------------------------------*/
 yyreturn:
   if (yychar != YYEMPTY)
     {
@@ -6053,7 +6067,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1827 "itex2MML.y" /* yacc.c:1903  */
+#line 1827 "itex2MML.y" /* yacc.c:1918  */
 
 
 char * itex2MML_parse (const char * buffer, size_t length)

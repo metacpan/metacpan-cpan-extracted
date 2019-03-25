@@ -22,6 +22,23 @@ sub slurp {
   return $content;
 }
 
+# Help
+{
+  # help
+  {
+    my $stderr = `$^X -Mblib blib/script/giblog 2>&1`;
+    like($stderr, qr/Usage/);
+  }
+  {
+    my $stderr = `$^X -Mblib blib/script/giblog -h 2>&1`;
+    like($stderr, qr/Usage/);
+  }
+  {
+    my $stderr = `$^X -Mblib blib/script/giblog --help 2>&1`;
+    like($stderr, qr/Usage/);
+  }
+}
+
 # New
 {
   # new command
@@ -49,10 +66,10 @@ sub slurp {
     like($readme_content, qr|Giblog/Command/new/proto|);
   }
 
-  # new_hp command
+  # new_website command
   {
-    my $home_dir = "$test_dir/mysite_new_hp";
-    my $cmd = "$^X -Mblib blib/script/giblog new_hp $home_dir";
+    my $home_dir = "$test_dir/mysite_new_website";
+    my $cmd = "$^X -Mblib blib/script/giblog new_website $home_dir";
     system($cmd) == 0
       or die "Can't execute command $cmd:$!";
     
@@ -71,7 +88,7 @@ sub slurp {
     );
     
     my $readme_content = slurp "$home_dir/README";
-    like($readme_content, qr|Giblog/Command/new_hp/proto|);
+    like($readme_content, qr|Giblog/Command/new_website/proto|);
   }
 
   # new_blog command
@@ -208,7 +225,7 @@ sub slurp {
     like($blog_content, qr/meta/);
   }
 
-  # build - --home -h
+  # build - --home -H
   {
     my $home_dir = "$test_dir/mysite_new";
     rmtree $home_dir;
@@ -222,7 +239,7 @@ sub slurp {
         or die "Can't execute command $add_cmd:$!";
     }
     {
-      my $build_cmd = "$^X -Mblib blib/script/giblog build -h $home_dir";
+      my $build_cmd = "$^X -Mblib blib/script/giblog build -H $home_dir";
       system($build_cmd) == 0
         or die "Can't execute command $build_cmd:$!";
     }

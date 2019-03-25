@@ -1,5 +1,13 @@
 Revision history for perl distribution App-git-ship
 
+0.32 2019-03-23T18:38:58+0800
+ - Fix adding .travis.yml to the first commit
+ - Fix bug in default .gitignore
+ - Fix examples for git aliases
+   Contributor: Rolf Stöckli
+ - Fix "git ship clean" will ignore Makefile timestamp
+ - Add a default .perltidyrc when project is started
+
 0.31 2018-12-17T10:32:27+0900
  - Can generate README.md
  - Fix "Cannot find project name from lib/App/git/ship.pm" in perl-basic.t #19

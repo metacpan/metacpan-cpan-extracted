@@ -40,9 +40,18 @@ if ( $^O eq 'MSWin32' ) {
     }
 }
 
+my ( $module_path, $module_version );
+
+{
+    require ExtUtils::MY;
+    my $version_reader = MM->new();
+    $module_path    = 'lib/Archive/Tar/Wrapper.pm';
+    $module_version = $version_reader->parse_version("./$module_path");
+}
+
 my %WriteMakefileArgs = (
     'NAME'             => 'Archive::Tar::Wrapper',
-    'VERSION_FROM'     => 'lib/Archive/Tar/Wrapper.pm',
+    'VERSION'          => $module_version,
     'MIN_PERL_VERSION' => 5.008001,
     'PREREQ_PM'        => {
         'File::Temp'    => 0,
@@ -53,22 +62,29 @@ my %WriteMakefileArgs = (
     },
 );
 
-if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
+if ( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
     $WriteMakefileArgs{META_MERGE} = {
-        'meta-spec' => { version => 2 },
-        'resources' => {
-            'bugtracker' => {
-                'web' =>
-'https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues',
-            },
-            'repository' => {
-                'type' => 'git',
-                'url' =>
-                  'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
-                'web' =>
-                  'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
-            },
-        },
+        provides => {
+            'Archive::Tar::Wrapper' => {
+                file    => $module_path,
+                version => $module_version
+            }
+        }
+    };
+}
+
+if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
+    $WriteMakefileArgs{META_MERGE}->{'meta-spec'} = { version => 2 };
+    $WriteMakefileArgs{META_MERGE}->{'resources'} = {
+        'bugtracker' => {
+            'web' =>
+              'https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues',
+        }
+    };
+    $WriteMakefileArgs{META_MERGE}->{'repository'} = {
+        'type' => 'git',
+        'url'  => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
+        'web'  => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
     };
 }
 

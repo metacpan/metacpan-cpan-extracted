@@ -1,7 +1,7 @@
 package Sidef::Types::Hash::Hash {
 
     use utf8;
-    use 5.014;
+    use 5.016;
 
     use parent qw(Sidef::Object::Object);
 
@@ -70,7 +70,7 @@ package Sidef::Types::Hash::Hash {
 
     sub item {
         my ($self, $key) = @_;
-        CORE::exists($self->{$key}) ? $self->{$key} : ();
+        CORE::exists($self->{$key}) ? $self->{$key} : undef;
     }
 
     sub fetch {

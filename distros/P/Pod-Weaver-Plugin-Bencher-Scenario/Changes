@@ -1,3 +1,9 @@
+0.243   2019-03-24 (PERLANCAR)
+
+	- [bugfix] Failed to retrieve package name for
+	  Bencher::Scenario::*.
+
+
 0.242   2019-02-24 (PERLANCAR)
 
 	- Add '## no critic' to generated Scenario_R module file.

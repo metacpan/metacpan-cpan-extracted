@@ -56,63 +56,63 @@
    "provides" : {
       "ZMQ::Raw" : {
          "file" : "lib/ZMQ/Raw.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Context" : {
          "file" : "lib/ZMQ/Raw/Context.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Curve" : {
          "file" : "lib/ZMQ/Raw/Curve.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Error" : {
          "file" : "lib/ZMQ/Raw/Error.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Loop" : {
          "file" : "lib/ZMQ/Raw/Loop.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Loop::Event" : {
          "file" : "lib/ZMQ/Raw/Loop/Event.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Loop::Handle" : {
          "file" : "lib/ZMQ/Raw/Loop/Handle.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Loop::Promise" : {
          "file" : "lib/ZMQ/Raw/Loop/Promise.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Loop::Timer" : {
          "file" : "lib/ZMQ/Raw/Loop/Timer.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Message" : {
          "file" : "lib/ZMQ/Raw/Message.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Poller" : {
          "file" : "lib/ZMQ/Raw/Poller.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Proxy" : {
          "file" : "lib/ZMQ/Raw/Proxy.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Socket" : {
          "file" : "lib/ZMQ/Raw/Socket.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Timer" : {
          "file" : "lib/ZMQ/Raw/Timer.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       },
       "ZMQ::Raw::Z85" : {
          "file" : "lib/ZMQ/Raw/Z85.pm",
-         "version" : "0.31"
+         "version" : "0.32"
       }
    },
    "release_status" : "stable",
@@ -126,7 +126,7 @@
          "web" : "https://github.com/jacquesg/p5-ZMQ-Raw"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026003"
@@ -335,7 +335,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.31",
+                  "tag" : "v0.32",
                   "tag_format" : "v%v",
                   "tag_message" : "%N %v"
                },

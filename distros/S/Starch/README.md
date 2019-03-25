@@ -122,7 +122,7 @@ and behaviors that are important to understand:
 the state will expire.
 - Setting `expires` to `0` generally disables expiration, but behavior
 can be store-specific.  For example, often times caching stores assume no
-expiration to mean the storage backend gets to pick when the expire the data.
+expiration to mean the storage backend gets to pick when to expire the data.
 - The [Starch::Manager](https://metacpan.org/pod/Starch::Manager) class accepts an `expires` argument which is used
 as the default expires for new state objects and used as the expiration
 for cookies via [Starch::Plugin::CookieArgs](https://metacpan.org/pod/Starch::Plugin::CookieArgs).
@@ -243,7 +243,7 @@ More third-party stores can be found on
 # PLUGINS
 
 Plugins alter the behavior of the manager ([Starch::Manager](https://metacpan.org/pod/Starch::Manager)),
-state ([Starch:State](Starch:State)), and store ([Starch::Store](https://metacpan.org/pod/Starch::Store))
+state ([Starch::State](https://metacpan.org/pod/Starch::State)), and store ([Starch::Store](https://metacpan.org/pod/Starch::Store))
 objects.  To use a plugin pass the `plugins` argument when
 creating your Starch object:
 
@@ -300,19 +300,17 @@ for instructions on writing your own.
 
 # SUPPORT
 
-Please submit bugs and feature requests to the Starch GitHub issue tracker:
+Please submit bugs and feature requests to the
+Starch GitHub issue tracker:
 
 [https://github.com/bluefeet/Starch/issues](https://github.com/bluefeet/Starch/issues)
 
 # AUTHORS
 
-Aran Clary Deltac <bluefeet@gmail.com>
-
-Arthur Axel "fREW" Schmidt &lt;frioux+cpan@gmail.com>
-
-Jonathan Scott Duff <duff@pobox.com>
-
-Ismail Kerim <ismail.kerim@assurant.com>
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+    Jonathan Scott Duff <duff@pobox.com>
+    Ismail Kerim <ismail.kerim@assurant.com>
 
 # ACKNOWLEDGEMENTS
 

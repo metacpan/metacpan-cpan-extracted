@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/analyze
 eg/tester1.pl
 eg/tester2.pl
 eg/tester3.pl

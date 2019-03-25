@@ -8,7 +8,7 @@ requires "Path::Tiny" => "0.055";
 requires "Throwable" => "0";
 requires "Types::Standard" => "0";
 requires "YAML" => "0";
-requires "perl" => "5.008";
+requires "perl" => "5.010";
 recommends "JSON" => "0";
 
 on 'test' => sub {

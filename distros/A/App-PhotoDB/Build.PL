@@ -44,6 +44,8 @@ my $builder = $class->new(
 		'Getopt::Long' => 0,
 		'Term::ReadKey' => 0,
 		'DB::SQL::Migrations' => 0,
+		'Term::ReadLine' => 0,
+		'Term::ReadLine::Perl' => 0,
 	},
 	test_requires => {
 		'Test::More' => '0.47',
