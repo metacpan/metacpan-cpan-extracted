@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin::Config';
 use Mojo::Util qw/gzip/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register {
     my (undef, $app, $config) = @_;

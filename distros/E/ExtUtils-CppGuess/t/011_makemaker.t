@@ -1,7 +1,5 @@
-#!/usr/bin/perl -w
-
 use strict;
-use Test::More tests => 1;
+use Test::More;
 use lib 't/lib';
 use TestUtils;
 
@@ -16,3 +14,5 @@ if( !$ok ) {
     diag( "make output\n",        $separator, $build, $separator ) if $build;
     diag( "make test output\n",   $separator, $test, $separator ) if $test;
 }
+
+done_testing;

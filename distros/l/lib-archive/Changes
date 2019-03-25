@@ -1,3 +1,9 @@
+0.5 2019-03-25
+  - better support for relative paths
+
+0.4 2019-03-08
+  - fix inconsistent entries in %INC
+
 0.3 2018-08-30
   - fix manifest (thanks to manwar)
 

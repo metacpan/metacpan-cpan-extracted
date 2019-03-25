@@ -1,46 +1,48 @@
 use Arango::DB;
 use Test2::V0;
 use Test2::Tools::Exception qw/dies lives/;
-use HTTP::Tiny;
 
-SKIP: {
-    skip "No ArangoDB environment variables for testing. See README" unless defined $ENV{ARANGO_DB_HOST} 
-                                                                        and defined $ENV{ARANGO_DB_USERNAME}
-                                                                        and defined $ENV{ARANGO_DB_PASSWORD};
+do "./t/helper.pl";
 
-    my $port = $ENV{ARANGO_DB_PORT} || 8529;
-    skip "Can't reach ArangoDB Server" unless HTTP::Tiny->new->get("http://$ENV{ARANGO_DB_HOST}:$port")->{success};
+skip_all "No ArangoDB environment variables for testing. See README" unless valid_env_vars();
+skip_all "Can't reach ArangoDB Server" unless server_alive(); 
 
-    my $db = Arango::DB->new( );
+my $arango = Arango::DB->new( );
+clean_test_environment($arango);
 
-    my $version = $db->version;
-    is $version->{server} => 'arango';
+my $version = $arango->version;
+is $version->{server} => 'arango';
 
-    my $ans = $db->list_databases;
+$version = $arango->version( details => 1 );
+ok (exists($version->{details}));
 
-    is ref($ans), "ARRAY", "Databases list is an array";
-    ok grep { /^_system$/ } @$ans, "System database is present";
+$version = $arango->version( details => 0 );
+ok (!exists($version->{details}));
 
-    $ans = $db->create_database('tmp_');
+my $ans = $arango->list_databases;
 
-    isa_ok($ans => "Arango::DB::Database");
+is ref($ans), "ARRAY", "Databases list is an array";
+ok grep { /^_system$/ } @$ans, "System database is present";
 
-    $ans = $db->list_databases;
-    ok grep { /^tmp_$/ } @$ans, "tmp_ database was created";
+$ans = $arango->create_database('tmp_');
 
-    $db->delete_database('tmp_');
+isa_ok($ans => "Arango::DB::Database");
 
-    $ans = $db->list_databases;
-    ok !grep { /^tmp_$/ } @$ans, "tmp_ database was deleted";
+$ans = $arango->list_databases;
+ok grep { /^tmp_$/ } @$ans, "tmp_ database was created";
 
-    like(
-        dies { my $system_db = $db->database("system"); },
-        qr/Arango::DB.*Database not found/,
-        "Got exception"
-    );
+$arango->delete_database('tmp_');
 
-    my $system = $db->database("_system");
-    isa_ok($system => "Arango::DB::Database");
+$ans = $arango->list_databases;
+ok !grep { /^tmp_$/ } @$ans, "tmp_ database was deleted";
 
-}
+like(
+    dies { my $system_db = $arango->database("system"); },
+    qr/Arango::DB.*Database not found/,
+    "Got exception"
+);
+
+my $system = $arango->database("_system");
+isa_ok($system => "Arango::DB::Database");
+
 done_testing;

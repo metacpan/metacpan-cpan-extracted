@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,7 +46,7 @@
             "Fatal" : "0",
             "File::Spec" : "0",
             "Module::Build" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -58,5 +58,6 @@
          "web" : "https://github.com/tsee/extutils-cppguess"
       }
    },
-   "version" : "0.12"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

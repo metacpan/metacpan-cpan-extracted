@@ -1,0 +1,9 @@
+If you want to contribute to this module, please file a github issue
+about what you want to do before you start work.
+
+https://github.com/benkasminbullock/Lingua-JA-Moji/issues
+
+The build process for Lingua::JA::Moji is quite convoluted, so unless
+you only need to do a small change on a file, I don't recommend using
+the fork and pull request system directly, because building this
+module from the repository sources will be difficult.

@@ -7,5 +7,7 @@ README.md
 t/app.pl
 t/lib/TestCommand/test_command.pm
 t/test_command_output.t
+Test-Mojo-CommandOutputRole-0.02/META.json
+Test-Mojo-CommandOutputRole-0.02/META.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -39,16 +39,16 @@ $t->command_output(do_something => [] => sub ($output) {
 
     ok 1 - GET /
     ok 2 - exact match for content
-    # Subtest: Correct test_command output
+    # Subtest: Correct do_something output
         ok 1 - Command didn't die
         ok 2 - Correct output string
         1..2
-    ok 3 - Correct test_command output
-    # Subtest: Matching test_command output
+    ok 3 - Correct do_something output
+    # Subtest: Matching do_something output
         ok 1 - Command didn't die
         ok 2 - Output regex
         1..2
-    ok 4 - Matching test_command output
+    ok 4 - Matching do_something output
     # Subtest: Output test results OK
         ok 1 - Command didn't die
         # Subtest: Handle command output

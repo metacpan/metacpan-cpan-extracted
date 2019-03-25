@@ -1,13 +1,31 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::DB::Database;
-$Arango::DB::Database::VERSION = '0.002';
+$Arango::DB::Database::VERSION = '0.003';
+use Arango::DB::Cursor;
+
 use warnings;
 use strict;
 
 sub new {
     my ($class, %opts) = @_;
     return bless {%opts} => $class;
+}
+
+sub collection {
+   my ($self, $name) = @_;
+   my @match = grep { $_->{name} eq $name } @{$self->list_collections};
+   if (scalar(@match)) {
+      return Arango::DB::Collection->new(arango => $self->{arango}, database => $self->{name}, 'name' => $name);
+   }
+   else {
+      die "Arango::DB | Collection not found in database $self->{name}."
+   }
+}
+
+sub cursor {
+    my ($self, $aql, %opts) = @_;
+    return Arango::DB::Cursor->new(arango => $self->{arango}, database => $self->{name}, query => $aql, %opts);
 }
 
 sub list_collections {
@@ -17,12 +35,14 @@ sub list_collections {
 
 sub create_collection {
     my ($self, $name) = @_;
-    return $self->{arango}->_create_collection($self->{name}, $name);
+    die "Arango::DB | Cannot create collection with empty collection or database name" unless length $name;
+    return $self->{arango}->_api('create_collection', { database => $self->{name}, name => $name })
 }
 
 sub delete_collection {
     my ($self, $name) = @_;
-    return $self->{arango}->_delete_collection($self->{name}, $name);
+    die "Arango::DB | Cannot create collection with empty collection or database name" unless length $name;
+    return $self->{arango}->_api('delete_collection', { database => $self->{name}, name => $name })
 }
 
 1;
@@ -39,7 +59,7 @@ Arango::DB::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 USAGE
 
@@ -59,6 +79,12 @@ Returns an array reference to the collections available in the database.
    my $col = $database->create_collection("col_name");
 
 Creates a new collection and returns the object representing it (L<Arango::DB::Collection>).
+
+=head2 C<collection>
+
+    my $collection = $database->collection("some_collection");
+
+Opens an existing collection, and returns a reference to a L<Arango::DB::Collection> representing it.
 
 =head2 C<delete_collection>
 

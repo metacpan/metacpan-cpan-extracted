@@ -11,6 +11,7 @@ WriteMakefile(
     PREREQ_PM           => {
         'Mojolicious'       => '8.06',
         'Capture::Tiny'     => '0.48',
+        'Role::Tiny'        => '2.000006',
     },
     META_MERGE          => {resources => {
         bugtracker  => 'https://github.com/memowe/Test-Mojo-CommandOutputRole/issues',

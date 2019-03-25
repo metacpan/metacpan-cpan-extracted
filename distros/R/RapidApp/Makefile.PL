@@ -82,7 +82,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => "2.131",
     "Data::Dumper::Concise" => "2.020",
     "Data::Printer" => 0,
-    "DateTime" => "1.10",
+    "DateTime" => "1.50",
     "DateTime::Format::SQLite" => "0.11",
     "Digest::MD5" => "2.51",
     "Digest::SHA1" => "2.13",
@@ -181,7 +181,7 @@ my %WriteMakefileArgs = (
     "inc::Module::Install" => "1.08",
     "utf8" => 0
   },
-  "VERSION" => "1.3102",
+  "VERSION" => "1.3103",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t t/unit/*.t"
   }
@@ -241,7 +241,7 @@ my %FallbackPrereqs = (
   "Data::Dumper" => "2.131",
   "Data::Dumper::Concise" => "2.020",
   "Data::Printer" => 0,
-  "DateTime" => "1.10",
+  "DateTime" => "1.50",
   "DateTime::Format::SQLite" => "0.11",
   "Digest::MD5" => "2.51",
   "Digest::SHA1" => "2.13",

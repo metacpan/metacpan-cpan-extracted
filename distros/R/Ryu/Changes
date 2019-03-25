@@ -1,5 +1,12 @@
 Revision history for Ryu
 
+0.037     2019-03-25 17:42:43+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - boolean comparison on Ryu::Observable instances caused a warning
+
 0.036     2019-02-08 17:14:51+08:00 Asia/Kuala_Lumpur
     New features:
     

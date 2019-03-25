@@ -25,9 +25,10 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/Lingua-JA-Moji/issues
   repository: https://github.com/benkasminbullock/Lingua-JA-Moji
-version: '0.55'
+version: '0.56'
 x_contributors:
   - 'Naoki Tomita <tomita@cpan.org>'
   - 'David Steinbrunner'
   - 'Neil Bowers <neilb@cpan.org>'
+  - 'Karl Williamson <khw@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

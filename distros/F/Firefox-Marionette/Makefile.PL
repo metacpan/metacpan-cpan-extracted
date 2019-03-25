@@ -57,7 +57,7 @@ if ($version_string) {
         ($major) = ($1);
         if ( $major < 31 ) {
             last_desperate_search();
-            die
+            warn
 "Please install a more recent version of Mozilla Firefox.  Current version is $major\n";
         }
     }

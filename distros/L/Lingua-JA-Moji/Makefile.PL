@@ -27,6 +27,7 @@ WriteMakefile (
 	    'Naoki Tomita <tomita@cpan.org>',
 	    'David Steinbrunner',
 	    'Neil Bowers <neilb@cpan.org>',
+	    'Karl Williamson <khw@cpan.org>',
 	],
     },
     LICENSE => 'perl',

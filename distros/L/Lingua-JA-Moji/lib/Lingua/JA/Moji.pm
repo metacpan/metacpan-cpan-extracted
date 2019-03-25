@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.55';
+our $VERSION = '0.56';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -833,7 +833,11 @@ sub hira2kata
     if (!@input) {
         return;
     }
-    for (@input) {tr/ぁ-んゔ/ァ-ンヴ/}
+    for (@input) {
+	if ($_) {
+	    tr/ぁ-んゔ/ァ-ンヴ/;
+	}
+    }
     return wantarray ? @input : "@input";
 }
 
@@ -1374,7 +1378,7 @@ sub kanji2bracketed
 
 sub InKana
 {
-    return <<'END';
+    return <<"END";
 +utf8::Katakana
 +utf8::InKatakana
 +utf8::InHiragana
@@ -1542,6 +1546,8 @@ my %yayuyo = (qw/
 		    ヨ ョ
 		/);
 
+my %l2s = qw!ア ァ イ ィ ウ ゥ エ ェ オ ォ!;
+
 sub smallize_kana
 {
     my ($kana) = @_;
@@ -1549,6 +1555,7 @@ sub smallize_kana
     $kana =~ s/([キギシジチヂニヒビピミリ])([ヤユヨ])/$1$yayuyo{$2}/g;
     # Don't make "ツル" into "ッル".
     $kana =~ s/([$before_sokuon])ツ([$takes_sokuon])/$1ッ$2/g;
+    $kana =~ s/フ([アイエオ])/フ$l2s{$1}/g;
     if ($kana ne $orig) {
 	return $kana;
     }
@@ -1558,6 +1565,9 @@ sub smallize_kana
 sub cleanup_kana
 {
     my ($kana) = @_;
+    if (! $kana) {
+	return $kana;
+    }
     if ($kana =~ /[\x{ff01}-\x{ff5e}]/) {
 	$kana = wide2ascii ($kana);
 	$kana = romaji2kana ($kana);
@@ -1565,14 +1575,13 @@ sub cleanup_kana
     elsif ($kana =~ /[a-zâîûêôôāūēō]/i) {
 	$kana = romaji2kana ($kana);
     }
+    # This calls join_sound_marks, so that call is not necessary.
     $kana = kana2katakana ($kana);
-    #$kana =~ s/([$nohandaku])°/$1゜/g;
-    $kana = join_sound_marks ($kana);
     # Translate kanjis into katakana where a "naive user" has inserted
     # kanji not kana.  Because the following expression is visually
     # confusing, note that the LHS are all kanji, and the RHS are all
     # kana/chouon
-    $kana =~ tr/口八力二一/ロハカニー/;
+    $kana =~ tr/囗口八力二一/ロロハカニー/;
     return $kana;
 }
 

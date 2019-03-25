@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.56/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.56/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.55
-corresponding to git commit L<4b5650f0e39a1cfaa3e283ce7a6b0ea15ce875eb|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/4b5650f0e39a1cfaa3e283ce7a6b0ea15ce875eb> made on Wed Oct 24 11:47:18 2018 +0900.
+This document describes Lingua::JA::Moji version 0.56
+corresponding to git commit L<9d66e200b70c2626458efcecb58e721e5847b812|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/9d66e200b70c2626458efcecb58e721e5847b812> made on Mon Mar 25 13:40:46 2019 +0900.
 
 =head1 DESCRIPTION
 
@@ -1590,7 +1590,7 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.55/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.56/examples/onbiki.pl> in the distribution.)
 
 
 =item L<Lingua::JA::Jtruncate>
@@ -1819,7 +1819,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2018
+2008-2019
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

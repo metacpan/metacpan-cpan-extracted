@@ -7,10 +7,10 @@ use 5.010001;
 
 use Carp qw(croak);
 use Archive::Tar;
-use Cwd qw(abs_path);
-use File::Basename qw(fileparse);
+use File::Spec::Functions qw(file_name_is_absolute rel2abs);
+use File::Basename qw(dirname fileparse);
 
-our $VERSION = "0.3";
+our $VERSION = "0.5";
 
 =pod
 
@@ -20,8 +20,7 @@ lib::archive - load pure-Perl modules directly from TAR archives
 
 =head1 SYNOPSIS
 
-  use FindBin qw($Bin);
-  use lib::archive ("$Bin/external/*.tgz", "$Bin/extra.tar");
+  use lib::archive ("../external/*.tgz", "lib/extra.tar");
 
   use MyModule; # the given tar archives will be searched first
 
@@ -41,6 +40,11 @@ Specify TAR archives to directly load modules from. The TAR files will be
 searched like include dirs. Globs are expanded, so you can use wildcards
 (not for URLs). If modules are present in more than one TAR archive, the
 first one will be used.
+
+Relative paths will be interpreted as relative to the directory the
+calling script or module resides in. So don't do a chdir() before using
+lib::archive when you call your script with a relative path B<and> use releative
+paths for lib::archive.
 
 B<The module will not create any files, not even temporary. Everything is
 extracted on the fly>.
@@ -99,66 +103,57 @@ sub import {
     my $class = shift;
     my %cache;
 
-    for my $entry ( @_ ) {
-        my $arcs = $entry =~ /$is_url/
-                 ? _get_url($entry)
-                 : _get_files($entry);
-        for my $arc ( @$arcs ) {
+    ( my $acdir = dirname( rel2abs( (caller)[1] ) ) ) =~ s!\\!/!g;
+
+    for my $entry (@_) {
+        my $is_url = $entry =~ /$is_url/;
+        my $arcs = $is_url ? _get_url($entry) : _get_files( $entry, $acdir );
+        for my $arc (@$arcs) {
+            my $path = $is_url ? $entry : $arc->[0];
             my %tmp;
             my $mod = 0;
             my $lib = 0;
-            for my $f ( $tar->read($arc->[0]) ) {
-                next unless (my $full = $f->full_path) =~ /\.pm$/;
-                my @parts = split('/', $full);
+            for my $f ( $tar->read( $arc->[0] ) ) {
+                next unless ( my $full = $f->full_path ) =~ /\.pm$/;
+                my @parts = split( '/', $full );
                 ++$mod && shift @parts if $parts[0] eq $arc->[1];
                 ++$lib && shift @parts if $parts[0] eq 'lib';
-                my $rel = join('/', @parts);
+                my $rel = join( '/', @parts );
                 $tmp{$rel}{$full} = $f->get_content_by_ref;
             }
             for my $rel ( keys %tmp ) {
-                my @parts = (
-                    $mod ? $arc->[1] : (),
-                    $lib ? 'lib'     : (),
-                    $rel
-                );
-                my $full = join('/', @parts);
-                $cache{$rel} //= {
-                    path    => ref($arc->[0]) ? $entry : $arc->[0],
-                    content => $tmp{$rel}{$full},
-                };
+                my $full = join( '/', $mod ? $arc->[1] : (), $lib ? 'lib' : (), $rel );
+                $cache{$rel} //= { path => "$path/$full", content => $tmp{$rel}{$full} };
             }
         }
     }
     unshift @INC, sub {
-        my($cref, $rel) = @_;
-        my $rec = $cache{$rel} or $cache{"lib/$rel"} or return;
-        my $root = $rec->{path} =~ /$is_url/
-                 ? $rec->{path}
-                 : abs_path($rec->{path});
-        $root =~ s!\\!/!g;
-        $INC{$rel} =  "$root/$rel";
+        my ( $cref, $rel ) = @_;
+        return unless my $rec = $cache{$rel};
+        $INC{$rel} = $rec->{path};
         return $rec->{content};
     };
 }
 
 
 sub _get_files {
-    my($glob) = @_;
-    ( my $glob_ux = $glob) =~ s!\\!/!g;
+    my ( $glob, $cdir ) = @_;
+    ( my $glob_ux = $glob ) =~ s!\\!/!g;
+    $glob_ux = "$cdir/$glob_ux" unless file_name_is_absolute($glob_ux);
     my @files;
     for my $f ( sort glob($glob_ux) ) {
-        my($module, $dirs, $suffix) = fileparse($f, qr/\.tar\.gz/);
-        push @files, [$f, $module];
+        my ( $module, $dirs, $suffix ) = fileparse( $f, qr/\.tar\.gz/ );
+        push @files, [ $f, $module ];
     }
     return \@files;
 }
 
 
 sub _get_url {
-    my($url) = @_;
+    my ($url) = @_;
 
-    my($module) = $url =~ m!/([^/]+)\.tar\.gz$!;
-    my($top) = split(/-/, $module);
+    my ($module) = $url =~ m!/([^/]+)\.tar\.gz$!;
+    my ($top) = split( /-/, $module );
 
     $url =~ s!^CPAN://!$cpan/modules/by-module/$top/!;
 
@@ -169,9 +164,10 @@ sub _get_url {
 
     my @zips;
     if ( $rp->{success} ) {
-        my $z = IO::Uncompress::Gunzip->new(\$rp->{content});
-        push @zips, [$z, $module];
-    } else {
+        my $z = IO::Uncompress::Gunzip->new( \$rp->{content} );
+        push @zips, [ $z, $module ];
+    }
+    else {
         croak "GET '$url' failed with status:", $rp->{status};
     }
     return \@zips;

@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use Math::MPFR qw(:mpfr);
 use Config;
-
-print "1..1\n";
+use Test::More;
 
 # We'll check a list of 10000 randomly derived NV values.
 # The mantissa of each NV will be between 1 and $MAX_DIG decimal digits.
@@ -45,23 +44,20 @@ print "1..1\n";
 # them, irrespective of the value of $].
 #
 # All perls that don't fit any of the above categories are deemed unreliable, and
-# $reliable is set to false false.
+# $reliable is set to false.
 
-
-if(4 > MPFR_VERSION_MAJOR) {
-
-  eval{ nvtoa(0.5) };
-
-  if($@ =~ /^nvtoa function requires version 4\.0/) {
-    warn "nvtoa() not supported because the mpfr library is too old\n";
-    print "ok 1\n";
-  }
-  else {
-    warn "\$\@: $@\n";
-    print "not ok 1\n";
-  }
-
+if(MPFR_VERSION_MAJOR < 3 || (MPFR_VERSION_MAJOR() == 3  && MPFR_VERSION_PATCHLEVEL < 6)) {
+  plan skip_all => "nvtoa.t utilizes Math::MPFR functionality that requires mpfr-3.1.6\n";
   exit 0;
+}
+
+plan tests => 1;
+my $todo = 0;
+
+# Some systems provide sqrtl() but not powl() for their -Duselongdouble builds
+unless(sqrt(2.0) == 2 ** 0.5) {
+  warn "\nPoorly configured system\n";
+  $todo = 1;
 }
 
 my $MAX_DIG;
@@ -110,17 +106,13 @@ while(1) {
   # Skew the exponent towards the more usual values that are typically used.
   # nvtoa() calculations are quite expensive on long double and __float128
   # builds for NVs whose exponents are a long way from zero.
-  $exponent = int(rand(10)) if ($exponent > 50 && $exponent < $MAX_POW / 1.2);
+  $exponent = int(rand(10)) if ($exponent > 50 && $exponent < $MAX_POW / 1.5);
   $exponent = '-' . $exponent if ($count & 1);
 
   my $len = int(rand($MAX_DIG));
 
   while(length($mantissa) < $len) { $mantissa .= int(rand(10)) }
   $mantissa .= 1 +int(rand(9)) if $len;
-
-  #$mantissa_sign = '-';
-  #$mantissa = '71306352878608394';
-  #$exponent = -7;
 
   my $str = $mantissa_sign . $mantissa . 'e' . $exponent;
 
@@ -135,7 +127,9 @@ while(1) {
 
   my $nvtoa = nvtoa($nv);
 
-  if($reliable) {
+  # Now check that $nvtoa == $nv
+
+  if($reliable) { # perl can assign the string directly
     my $nvtoa_num = $nvtoa; # Avoid numifying $nvtoa
 
     if($nvtoa_num != $nv) {
@@ -144,7 +138,7 @@ while(1) {
       last;
     }
   }
-  else {
+  else {         # perl is unreliable so we assign the string using atonv()
     if(atonv($nvtoa) != $nv) {
       warn "$str: ", atonv($nvtoa), " != $nv\n";
       $ok = 0;
@@ -159,21 +153,17 @@ while(1) {
   my $significand = (split /e/, $nvtoa)[0];
   while($significand =~ /0$/) {
     chop $significand;
-   # if($exponent < 0) { $exponent-- }
-   # else { $exponent++ }
   }
   substr($significand, 0, 1, '') while $significand =~ /^0/;
 
   if(length $significand > length $mantissa) {
-    warn "$significand longer than $mantissa\n";
+    warn "$str: $significand longer than $mantissa\n";
+    warn sprintf("%a vs %a\n", atonv($str), atonv($nvtoa)), "\n";
     $ok = 0;
+    last;
   }
 
-  #print "SIG: $significand MAN: $mantissa\n";
-
   my $new_exponent = $exponent + length($mantissa) - length($significand);
-
-  #print "EXP: $exponent NEW: $new_exponent\n";
 
   if(length $significand > 1) {
     chop $significand;
@@ -187,8 +177,6 @@ while(1) {
   # eg 1234e-11 becomes 123e-10 - which should be less than the original $nv.
 
   my $new_str = $mantissa_sign . $significand . 'e' . $new_exponent;
-
-  #print "$str\n$new_str\n";
 
   if($reliable) {
     my $new_str_num = $new_str; # Avoid numifying $new_str
@@ -270,6 +258,16 @@ while(1) {
 
 }
 
-if($ok == 1) { print "ok 1\n" }
-else         { print "not ok 1\n" }
+    if($todo) {
+      TODO: {
+        local $TODO = "Tests don't yet accommodate this inferior -Duselongdouble implementation";
+        ok($ok == 1, 'test 1');
+      };
+    }
+    else {
+      ok($ok == 1, 'test 1');
+    }
+
+
+__END__
 

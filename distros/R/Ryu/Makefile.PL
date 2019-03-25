@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Encode" => "1.98",
     "Exporter" => 0,
-    "Future" => "0.37",
+    "Future" => "0.39",
     "JSON::MaybeXS" => 0,
     "List::Util" => 0,
     "List::UtilsBy" => "0.10",
@@ -39,6 +39,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "sort" => 0,
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -56,7 +57,7 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "Test::Warnings" => "0.024"
   },
-  "VERSION" => "0.036",
+  "VERSION" => "0.037",
   "test" => {
     "TESTS" => "t/*.t t/source/*.t"
   }
@@ -68,7 +69,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Future" => "0.37",
+  "Future" => "0.39",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
@@ -98,6 +99,7 @@ my %FallbackPrereqs = (
   "parent" => 0,
   "sort" => 0,
   "strict" => 0,
+  "utf8" => 0,
   "warnings" => 0
 );
 

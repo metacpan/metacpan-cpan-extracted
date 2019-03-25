@@ -24,14 +24,14 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'JSON::MaybeUTF8' => '1.000',
+                                        'JSON::MaybeUTF8' => '1.002',
                                         'MIME::Base64' => '0',
                                         'Text::CSV' => '0'
                                       },
                       'requires' => {
                                       'Encode' => '1.98',
                                       'Exporter' => '0',
-                                      'Future' => '0.37',
+                                      'Future' => '0.39',
                                       'JSON::MaybeXS' => '0',
                                       'List::Util' => '0',
                                       'List::UtilsBy' => '0.10',
@@ -51,6 +51,7 @@ do { my $x = {
                                       'parent' => '0',
                                       'sort' => '0',
                                       'strict' => '0',
+                                      'utf8' => '0',
                                       'warnings' => '0'
                                     },
                       'suggests' => {

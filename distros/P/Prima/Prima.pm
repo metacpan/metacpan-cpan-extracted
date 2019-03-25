@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.54';
+$VERSION = '1.55';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -445,7 +445,7 @@ L<Prima::Const> - predefined toolkit constants
 
 L<Prima::EventHook> - event filtering
 
-L<Prima::Image::AnimateGIF> - animate gif files
+L<Prima::Image::Animate> - animate gif and webp files
 
 L<Prima::IniFile> - support of Windows-like initialization files
 

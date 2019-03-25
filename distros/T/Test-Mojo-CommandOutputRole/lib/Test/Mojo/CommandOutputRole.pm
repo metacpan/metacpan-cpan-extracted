@@ -5,7 +5,7 @@ use Mojo::Base -strict, -signatures;
 use Test::More;
 use Capture::Tiny 'capture';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub command_output ($t, $command, $args, $test, $test_name = 'Output test') {
 subtest $test_name => sub {

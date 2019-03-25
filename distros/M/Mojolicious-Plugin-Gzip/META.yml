@@ -22,13 +22,14 @@ no_index:
     - t
     - xt
 requires:
-  Mojolicious: '0'
+  Mojolicious: '8.02'
+  Test::Exception: '0'
   perl: '5.008005'
 resources:
   bugtracker: https://github.com/srchulo/Mojolicious-Plugin-Gzip/issues
   homepage: https://github.com/srchulo/Mojolicious-Plugin-Gzip
   repository: https://github.com/srchulo/Mojolicious-Plugin-Gzip.git
-version: '0.01'
+version: '0.02'
 x_contributors:
   - 'Adam Hopkins <violapiratejunky@gmail.com>'
 x_generated_by_perl: v5.28.0

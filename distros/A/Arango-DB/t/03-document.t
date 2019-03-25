@@ -1,29 +1,24 @@
 use Arango::DB;
 use Test2::V0;
 use Test2::Tools::Exception qw/dies lives/;
-use HTTP::Tiny;
+do "./t/helper.pl";
 
-SKIP: {
-    skip "No ArangoDB environment variables for testing. See README" unless defined $ENV{ARANGO_DB_HOST} 
-                                                                        and defined $ENV{ARANGO_DB_USERNAME}
-                                                                        and defined $ENV{ARANGO_DB_PASSWORD};
+skip_all "No ArangoDB environment variables for testing. See README" unless valid_env_vars();
+skip_all "Can't reach ArangoDB Server" unless server_alive();
 
-    my $port = $ENV{ARANGO_DB_PORT} || 8529;
-    skip "Can't reach ArangoDB Server" unless HTTP::Tiny->new->get("http://$ENV{ARANGO_DB_HOST}:$port")->{success};
+my $arango = Arango::DB->new( );
+clean_test_environment($arango);
 
-    my $arango = Arango::DB->new( );
+my $db = $arango->create_database("tmp_");
+my $collection = $db->create_collection("collection");
 
-    my $db = $arango->create_database("tmp_");
-    my $collection = $db->create_collection("collection");
+$collection->create_document( { Hello => 'World' });
 
-    $collection->create_document( { Hello => 'World' });
+my $list = $collection->document_paths();
 
-    my $list = $collection->document_paths();
+is ref($list) => "ARRAY" => "List of paths is an array";
+like $list->[0] => qr!/_db/tmp_/_api/document/collection/\d+! => "path looks right";
 
-    is ref($list) => "ARRAY" => "List of paths is an array";
-    like $list->[0] => qr!/_db/tmp_/_api/document/collection/\d+! => "path looks right";
+$arango->delete_database("tmp_");
 
-    $arango->delete_database("tmp_");
-
-}
 done_testing;

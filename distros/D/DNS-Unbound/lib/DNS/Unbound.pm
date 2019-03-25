@@ -33,7 +33,7 @@ use DNS::Unbound::X ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.01';
+    $VERSION = '0.02';
     XSLoader::load();
 }
 
@@ -225,8 +225,13 @@ sub DESTROY {
 
 #----------------------------------------------------------------------
 
+1;
+
 =head1 REPOSITORY
 
 L<https://github.com/FGasper/p5-DNS-Unbound>
 
-1;
+=head1 THANK YOU
+
+Special thanks to L<ATOOMIC|https://metacpan.org/author/ATOOMIC> for
+making some helpful review notes.

@@ -1,5 +1,12 @@
 Revision history for Perl extension ExtUtils::CppGuess.
 
+0.13	
+    - repo tidied slightly
+    - use Travis
+    - add compiler_command, linker_flags
+    - test all known configurations
+    - inhale knowledge from Inline::CPP
+
 0.12	Sat Oct 21 18:12:51 BST 2017
     - Fix tests on 5.26 without '.' in @INC (kentfredric)
 

@@ -3,8 +3,10 @@ use strict;
 use warnings;
 use Encode ();
 use File::Spec;
+use File::Which ();
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case bundling);
 use HTTP::Tiny;
+use IO::Handle;
 use IO::Socket::SSL;
 use Pod::Usage 'pod2usage';
 use Term::ReadKey ();
@@ -13,7 +15,7 @@ use Text::Fold ();
 use constant DEBUG => $ENV{TLDR_DEBUG};
 use constant REPOSITORY => $ENV{TLDR_REPOSITORY};
 
-our $VERSION = '0.02';
+our $VERSION = '0.10';
 
 my $URL = "https://raw.githubusercontent.com/tldr-pages/tldr/master/pages/%s/%s.md";
 
@@ -31,10 +33,28 @@ sub parse_options {
         "h|help"    => sub { $self->_help },
         "o|os=s@"   => \($self->{platform}),
         "v|version" => sub { printf "%s %s\n", ref $self, $self->VERSION; exit },
+        "pager=s"   => \my $pager,
+        "no-pager"  => \my $no_pager,
     or exit(2);
     $self->{argv} = \@ARGV;
+    if (!$no_pager and -t STDOUT and my $guess = $self->_guess_pager($pager)) {
+        $self->{pager} = $guess;
+    }
     push @{$self->{platform}}, $self->_guess_platform, "common";
     $self;
+}
+
+sub _guess_pager {
+    my $self = shift;
+
+    my $cmd;
+    for my $try (grep $_, @_, $ENV{PAGER}, "less", "more") {
+        if (my $found = File::Which::which($try)) {
+            $cmd = $found, last;
+        }
+    }
+    return if !$cmd;
+    [$cmd, $cmd =~ /\bless$/ ? "-R" : ()];
 }
 
 sub _help {
@@ -95,7 +115,6 @@ sub run {
         }
     }
     die "Couldn't find tldr for '$arg'\n" unless $content;
-    binmode STDOUT, ":utf8";
     $self->_render($content, $arg);
 }
 
@@ -109,6 +128,14 @@ sub _render {
     $width -= 4;
 
     my @line = split /\n/, $content;
+
+    my $out;
+    if ($self->{pager}) {
+        open $out, "|-", @{$self->{pager}} or die "failed to exec @{$self->{pager}}: $!";
+    } else {
+        $out = \*STDOUT;
+    }
+    binmode $out, ":utf8";
 
     while (defined(my $line = shift @line)) {
         if ($line =~ /^#/) {
@@ -127,21 +154,21 @@ sub _render {
                 }
             }
             my $fold = Text::Fold::fold_text($description, $width);
-            print "\n";
-            print "  \e[32m$_\e[m\n" for split /\n/, $fold;
-            print "\n";
+            $out->print("\n");
+            $out->print("  \e[32m$_\e[m\n") for split /\n/, $fold;
+            $out->print("\n");
         } elsif ($line =~ s/^[*-]\s*//) {
             my $fold = Text::Fold::fold_text($line, $width - 2);
             my ($first, @rest) = split /\n/, $fold;
-            print "  \e[1m$CHECK \e[4m$first\e[m\n";
-            print "    \e[1m\e[4m$_\e[m\n" for @rest;
-            print "\n";
+            $out->print("  \e[1m$CHECK \e[4m$first\e[m\n");
+            $out->print("    \e[1m\e[4m$_\e[m\n") for @rest;
+            $out->print("\n");
         } elsif ($line =~ /`([^`]+)`/) {
             my $code = $1;
             $code =~ s/\b$query\b/
               "\e[32m$query\e[m"
             /eg;
-            print "    $SUSHI  $code\n\n";
+            $out->print("    $SUSHI  $code\n\n");
         }
     }
 }

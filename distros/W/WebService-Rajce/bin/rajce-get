@@ -56,7 +56,7 @@ $bot->cookie_jar(HTTP::Cookies->new());
 my $gal = $bot->get($url);
 
 my $storageurl = $gal->content();
-$storageurl =~ s/.*var storage = "([^"]*)";.*/$1/s;
+$storageurl =~ s/.*var storage = "https:([^"]*)";.*/$1/s;
 
 my @images = $bot->find_all_links(tag => "a", url_regex => qr/$storageurl/ );
 
@@ -103,7 +103,7 @@ rajce-get - Download images from rajce.net.
 
 =head1 VERSION
 
-version 1.180380
+version 1.190840
 
 =head1 SYNOPSIS
 

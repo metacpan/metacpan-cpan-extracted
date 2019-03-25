@@ -33,6 +33,7 @@ t/00-check-deps.t
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/observable.t
 t/ryu.t
 t/source/buffer.t
 t/source/chained.t
@@ -53,7 +54,6 @@ t/source/max.t
 t/source/mean.t
 t/source/merge.t
 t/source/min.t
-t/source/observable.t
 t/source/ordered_futures.t
 t/source/prefix.t
 t/source/skip.t

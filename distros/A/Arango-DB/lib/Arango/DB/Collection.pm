@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::DB::Collection;
-$Arango::DB::Collection::VERSION = '0.002';
+$Arango::DB::Collection::VERSION = '0.003';
 use warnings;
 use strict;
 
@@ -11,12 +11,13 @@ sub new {
 
 sub create_document {
     my ($self, $body) = @_;
-    $self->{arango}->_create_document($self->{database}, $self->{name}, $body);
+    die "Arango::DB | Refusing to store undefined body" unless defined($body) and ref($body) =~ /^(ARRAY|HASH)$/;
+    return $self->{arango}->_api('create_document', { database => $self->{database}, collection => $self->{name}, body => $body})
 }
 
 sub document_paths {
     my ($self) = @_;
-    $self->{arango}->_list_documents($self->{database}, $self->{name}, "path");
+    return $self->{arango}->_api('all_keys', { database => $self->{database}, collection => $self->{name}, type => "path"})
 }
 
 1;
@@ -33,7 +34,7 @@ Arango::DB::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 USAGE
 

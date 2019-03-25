@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,44 +26,51 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "Dist::Milla" : "v1.0.15",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
+            "File::Which" : "0",
             "HTTP::Tiny" : "0",
             "IO::Socket::SSL" : "0",
             "Term::ReadKey" : "0",
             "Text::Fold" : "0",
             "perl" : "5.008005"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0.98"
-         }
+      }
+   },
+   "provides" : {
+      "App::tldr" : {
+         "file" : "lib/App/tldr.pm",
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shoichikaji/perl-tldr/issues"
+         "web" : "https://github.com/skaji/perl-tldr/issues"
       },
-      "homepage" : "https://github.com/shoichikaji/perl-tldr",
+      "homepage" : "https://github.com/skaji/perl-tldr",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shoichikaji/perl-tldr.git",
-         "web" : "https://github.com/shoichikaji/perl-tldr"
+         "url" : "https://github.com/skaji/perl-tldr.git",
+         "web" : "https://github.com/skaji/perl-tldr"
       }
    },
-   "version" : "0.02",
-   "x_static_install" : "1"
+   "version" : "0.10",
+   "x_contributors" : [
+      "Shoichi Kaji <skaji@outlook.com>"
+   ],
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10",
+   "x_static_install" : 1
 }
 

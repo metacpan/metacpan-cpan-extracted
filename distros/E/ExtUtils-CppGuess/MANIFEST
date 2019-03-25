@@ -1,19 +1,22 @@
-Makefile.PL
 Changes
+lib/ExtUtils/CppGuess.pm
+Makefile.PL
 MANIFEST			This list of files
 README
-META.json
-META.yml
-lib/ExtUtils/CppGuess.pm
 t/001_load.t
+t/002_icpp.t
 t/010_module_build.t
 t/011_makemaker.t
+t/lib/Guess.pm
+t/lib/TestGuess.pm
 t/lib/TestUtils.pm
 t/module/Build.PL
 t/module/CppGuessTest.xs
-t/module/MANIFEST
-t/module/Makefile.PL
 t/module/lib/CppGuessTest.pm
+t/module/Makefile.PL
+t/module/MANIFEST
 t/module/t/001_load.t
 t/module/t/002_base.t
 t/module/typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

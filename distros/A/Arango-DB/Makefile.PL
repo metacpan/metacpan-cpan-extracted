@@ -17,9 +17,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Arango::DB",
   "PREREQ_PM" => {
+    "Data::Dumper" => 0,
     "HTTP::Tiny" => 0,
     "JSON" => 0,
     "MIME::Base64" => "3.11",
+    "URI::Encode" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -27,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Exception" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,11 +37,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Dumper" => 0,
   "HTTP::Tiny" => 0,
   "JSON" => 0,
   "MIME::Base64" => "3.11",
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,
+  "URI::Encode" => 0,
   "strict" => 0,
   "warnings" => 0
 );

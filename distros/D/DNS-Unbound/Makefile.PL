@@ -25,8 +25,11 @@ WriteMakefile(
     LICENSE        => 'perl',
     XSMULTI        => 1,
 
-    PREREQ_PM => {
+    CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 7.12,
+    },
+
+    PREREQ_PM => {
         'X::Tiny' => 0,
         'XSLoader' => 0.24,
     },

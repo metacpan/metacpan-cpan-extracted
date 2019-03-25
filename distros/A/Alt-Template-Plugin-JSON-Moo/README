@@ -1,0 +1,17 @@
+
+    README for Perl module Alt::Template::Plugin::JSON::Moo
+
+This module provides an alternate implemention of a  plugin 
+for use with the Template Toolkit using Moo instead of Moose.
+It provides a .json vmethod to all value types when loaded.
+You can also decode a json string back to a data structure.
+
+You should be able to install this using your usual method for installing
+modules from CPAN. If you don't have one, have a look at:
+
+    http://www.cpan.org/modules/INSTALL.html
+
+This module was written by Yuval Kogman <nothingmuch@woobling.org>
+
+Copyright (c) 2006, 2008 Infinity Interactive, Yuval Kogman
+

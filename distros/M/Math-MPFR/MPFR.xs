@@ -8027,36 +8027,442 @@ SV * Rmpfr_dot(pTHX_ mpfr_t * rop, SV * avref_A, SV * avref_B, SV * len, SV * ro
 #endif
 }
 
-/* _nvtoa function is adapted from p120 of  "How to Print Floating-Point Numbers Accurately" */
-/* by Guy L. Steele Jr and Jon L. White                                               */
+/********************************************************
+ * Set exponent and precision for nvtoa to utilize. *
+ *******************************************************/
 
-void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int max_dig) {
+void _get_exp_and_bits(mpfr_exp_t * exp, int * bits, NV nv_in) {
 
-#if MPFR_VERSION_MAJOR < 4
-  croak("nvtoa function requires version 4.0 or later of the mpfr library - this is only %s", MPFR_VERSION_STRING);
+  int subnormal_prec_adjustment = 0, tmp;
+  void *nvptr = &nv_in;
+
+#if defined(NV_IS_FLOAT128) || (defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 113)	/* 113 bit prec */
+
+#if defined(MPFR_HAVE_BENDIAN)
+
+  int i = 2;
+
+  *exp = ((unsigned char *)nvptr)[0];
+  *exp <<= 8;
+  tmp = ((unsigned char *)nvptr)[1];
+  *exp += tmp - 16382;
+
+  if(*exp == -16382) {
+    while(i <= 15) {
+      tmp = ((unsigned char *)nvptr)[i];
+      if(tmp) {
+        BITSEARCH_8		/* defined in math_mpfr_include.h */
+        break;
+      }
+
+      subnormal_prec_adjustment += 8;
+      i++;
+    }			/* close while loop */
+  }
+
 #else
-  dXSARGS;
-  int subnormal_prec_adjustment, exp_init;
-  int k, k_start, len;
-  int bits = b, is_subnormal = 0, shift1, shift2, inex, further_adjustment, low, high, cmp;
-  unsigned long u;
-  mpfr_prec_t e;
-  NV nv;
-  mpfr_t ws;
-  mpz_t R, S, M_minus, M_plus, LHS, TMP;
-  mpq_t Q, QT;
-#if REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
-  void *nvptr = &nv; /* The NV, not the SV */
-  int msd_exp, lsd_exp;
+
+  int i = 13;
+
+  *exp = ((unsigned char *)nvptr)[15];
+  *exp <<= 8;
+  tmp = ((unsigned char *)nvptr)[14];
+  *exp += tmp - 16382;
+
+  if(*exp == -16382) {
+    while(i >= 0) {
+      tmp = ((unsigned char *)nvptr)[i];
+      if(tmp) {
+        BITSEARCH_8		/* defined in math_mpfr_include.h */
+        break;
+      }
+
+      subnormal_prec_adjustment += 8;
+      i--;
+    }			/* close while loop */
+  }
+
 #endif
 
-  char *f, *out;
+  /* for both endians (113-bit) */
+  *exp  -= subnormal_prec_adjustment - 1;
+  *bits =  113 - subnormal_prec_adjustment;
+
+  if(!subnormal_prec_adjustment) (*exp)--;
+
+/*********************
+ * START DOUBLEDOUBLE*
+ *********************/
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098	/* double-double */
+  int msd_exp, lsd_exp, t, lsd_is_negative_reduction = 0, lsd_is_zero = 0;
+
+#if defined(MPFR_HAVE_BENDIAN)
+  int i0 = 0, i1 = 1, i2 = 8, i3 = 9;
+  int i = 1;
+
+  if( (128 == ((unsigned char *)nvptr)[8] || 0 == ((unsigned char *)nvptr)[8])  &&
+      0 == ((unsigned char *)nvptr)[9]  && 0 == ((unsigned char *)nvptr)[10]    &&
+      0 == ((unsigned char *)nvptr)[11] && 0 == ((unsigned char *)nvptr)[12]    &&
+      0 == ((unsigned char *)nvptr)[13] && 0 == ((unsigned char *)nvptr)[14]    &&
+      0 == ((unsigned char *)nvptr)[15]
+    ) {
+    lsd_is_zero = 1;
+    *bits = 53;
+  }
+
+  if(*bits == 53) {
+    *exp = ((unsigned char *)nvptr)[0];
+    *exp <<= 4;
+    tmp = ((unsigned char *)nvptr)[i];
+    *exp += (tmp >> 4) - 1022;
+
+    if(*exp == -1022) {
+      while(i <= 7) {
+        tmp = ((unsigned char *)nvptr)[i];
+        if(tmp) {
+          if(i == 1) {
+            BITSEARCH_4		/* defined in math_mpfr_include.h */
+            break;
+          }
+          else {
+            BITSEARCH_8		/* defined in math_mpfr_include.h */
+            break;
+          }
+        }
+
+        if(i == 1) subnormal_prec_adjustment += 4;
+        else subnormal_prec_adjustment += 8;
+        i++;
+      }
+    }
+
+    if(!subnormal_prec_adjustment){
+
+      (*exp)--;
+
+      if(*exp > 53 && *exp < 106) {
+        *bits = *exp;
+      }
+
+      else {
+       if(*exp < 53)
+         *bits += 1022 + *exp;
+      }
+    }
+    else {
+      *exp  -= subnormal_prec_adjustment - 1;
+      *bits =  53 - subnormal_prec_adjustment;
+    }
+
+  }
+
+#else
+  int i0 = 15, i1 = 14, i2 = 7, i3 = 6;
+  int i = 6;
+
+  if( (128 == ((unsigned char *)nvptr)[7] || 0 == ((unsigned char *)nvptr)[7])  &&
+      0 == ((unsigned char *)nvptr)[6]  && 0 == ((unsigned char *)nvptr)[5]    &&
+      0 == ((unsigned char *)nvptr)[4] && 0 == ((unsigned char *)nvptr)[3]    &&
+      0 == ((unsigned char *)nvptr)[2] && 0 == ((unsigned char *)nvptr)[1]    &&
+      0 == ((unsigned char *)nvptr)[0]
+    ) {
+    lsd_is_zero = 1;
+    *bits = 53;
+  }
+
+  if(*bits == 53) {
+    *exp = ((unsigned char *)nvptr)[7];
+    *exp <<= 4;
+    tmp = ((unsigned char *)nvptr)[i];
+    *exp += (tmp >> 4) - 1022;
+
+    if(*exp == -1022) {
+      while(i >= 0) {
+        tmp = ((unsigned char *)nvptr)[i];
+        if(tmp) {
+          if(i == 6) {
+            BITSEARCH_4		/* defined in math_mpfr_include.h */
+            break;
+          }
+          else {
+            BITSEARCH_8		/* defined in math_mpfr_include.h */
+            break;
+          }
+        }
+
+        if(i == 6) subnormal_prec_adjustment += 4;
+        else subnormal_prec_adjustment += 8;
+        i--;
+      }
+    }
+
+    if(!subnormal_prec_adjustment){
+
+      (*exp)--;
+
+      if(*exp > 53 && *exp < 106) {
+        *bits = *exp;
+      }
+
+      else {
+       if(*exp < 53)
+         *bits += 1022 + *exp;
+      }
+    }
+    else {
+      *exp  -= subnormal_prec_adjustment - 1;
+      *bits =  53 - subnormal_prec_adjustment;
+    }
+
+  }
+
+#endif
+
+  else {
+      msd_exp = ((unsigned char *)nvptr)[i0];
+      msd_exp <<= 4;
+      tmp = ((unsigned char *)nvptr)[i1];
+      msd_exp += (tmp >> 4) - 1022;
+
+      lsd_exp = ((unsigned char *)nvptr)[i2];
+
+
+      lsd_exp <<= 4;
+      tmp = ((unsigned char *)nvptr)[i3];
+      lsd_exp += tmp >> 4;
+      if(lsd_exp > 2047) {
+        lsd_exp -= 2048;
+        if(!lsd_is_zero) lsd_is_negative_reduction = 1;
+      }
+      lsd_exp -= 1022;
+
+      if(lsd_is_zero) *bits = 53;
+      else *bits = 53 + msd_exp - lsd_exp;
+
+      if(lsd_is_negative_reduction) {                   /* lsd is negative and not zero */
+        if(msd_exp - lsd_exp > 53) {  /* need to check that msd is not a power of 2 */
+
+#if defined(MPFR_HAVE_BENDIAN)
+          for(i = 2; i < 8; i++) {
+            t = ((unsigned char *)nvptr)[i];
+            if(t != 0) {   /* msd is not a power of 2 */
+              lsd_is_negative_reduction = 0;
+              break;
+            }
+          }
+
+          if(lsd_is_negative_reduction) {
+            t = ((unsigned char *)nvptr)[1];
+            if(t & 15) {   /* msd is not a power of 2 */
+              lsd_is_negative_reduction = 0;
+            }
+          }
+#else
+
+#endif
+        }
+        else lsd_is_negative_reduction = 0;
+      }
+
+      if(lsd_exp < -1022) *bits += (lsd_exp + 1022);
+      if(lsd_exp == -1022) *bits -= 1;
+      *exp = msd_exp - lsd_is_negative_reduction;
+  }
+
+/*******************
+ * END DOUBLEDOUBLE*
+ *******************/
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64	/* 64 bit prec */
+#if defined(MPFR_HAVE_BENDIAN)
+  int i = 2;
+
+  *exp = ((unsigned char *)nvptr)[0];
+  *exp <<= 8;
+  tmp = ((unsigned char *)nvptr)[1];
+  *exp += tmp - 16382;
+
+  if(*exp == -16382) {
+    while(i <= 9) {
+      tmp = ((unsigned char *)nvptr)[i];
+      if(tmp) {
+        BITSEARCH_8		/* defined in math_mpfr_include.h */
+        break;
+      }
+
+      subnormal_prec_adjustment += 8;
+      i++;
+    }			/* close while loop */
+  }
+
+#else
+
+  int i = 7;
+
+  *exp = ((unsigned char *)nvptr)[9];
+  *exp <<= 8;
+  tmp = ((unsigned char *)nvptr)[8];
+  *exp += tmp - 16382;
+
+  if(*exp == -16382) {
+    while(i >= 0) {
+      tmp = ((unsigned char *)nvptr)[i];
+      if(tmp) {
+        BITSEARCH_8		/* defined in math_mpfr_include.h */
+        break;
+      }
+
+      subnormal_prec_adjustment += 8;
+      i--;
+    }			/* close while loop */
+  }
+
+#endif
+
+  /* for both endians (64 bit) */
+  if(subnormal_prec_adjustment) subnormal_prec_adjustment--;
+
+  *exp  -= subnormal_prec_adjustment;
+  *bits =  64 - subnormal_prec_adjustment;
+
+   if(subnormal_prec_adjustment) (*exp)++;
+
+#else									/* 53 bit prec */
+
+#if defined(MPFR_HAVE_BENDIAN)
+  int i = 1;
+
+  *exp = ((unsigned char *)nvptr)[0];
+  *exp <<= 4;
+  tmp = ((unsigned char *)nvptr)[i];
+  *exp += (tmp >> 4) - 1022;
+
+  if(*exp == -1022) {
+    while(i <= 7) {
+      tmp = ((unsigned char *)nvptr)[i];
+      if(tmp) {
+        if(i == 1) {
+          BITSEARCH_4		/* defined in math_mpfr_include.h */
+          break;
+        }
+        else {
+          BITSEARCH_8		/* defined in math_mpfr_include.h */
+          break;
+        }
+      }
+
+      if(i == 1) subnormal_prec_adjustment += 4;
+      else subnormal_prec_adjustment += 8;
+      i++;
+    }
+  }
+
+#else
+  int i = 6;
+
+  *exp = ((unsigned char *)nvptr)[7];
+  *exp <<= 4;
+  tmp = ((unsigned char *)nvptr)[i];
+  *exp += (tmp >> 4) - 1022;
+
+  if(*exp == -1022) {
+    while(i >= 0) {
+      tmp = ((unsigned char *)nvptr)[i];
+      if(tmp) {
+        if(i == 6) {
+          BITSEARCH_4		/* defined in math_mpfr_include.h */
+          break;
+        }
+        else {
+          BITSEARCH_8		/* defined in math_mpfr_include.h */
+          break;
+        }
+      }
+
+      if(i == 6) subnormal_prec_adjustment += 4;
+      else subnormal_prec_adjustment += 8;
+      i--;
+    }			/* close while loop */
+  }
+
+#endif
+
+  /* for both endians (53 bit) */
+  *exp  -= subnormal_prec_adjustment - 1;
+  *bits =  53 - subnormal_prec_adjustment;
+
+  if(!subnormal_prec_adjustment) (*exp)--;
+
+#endif
+
+}
+
+
+
+/* nvtoa function is adapted from p120 of  "How to Print Floating-Point Numbers Accurately" */
+/* by Guy L. Steele Jr and Jon L. White                                                     */
+
+void nvtoa(pTHX_ SV * pnv) {
+
+  dXSARGS;
+  int subnormal_prec_adjustment, exp_init;
+  int k = 0, k_start, lsb, skip = 0, sign = 0, len, critical;
+  int bits = MATH_MPFR_BITS, is_subnormal = 0, shift1, shift2, inex, low, high, cmp;
+  unsigned long u;
+  mpfr_exp_t e;    /* Change to 'int' when mpfr dependency for doubledouble is removed */
+  NV nv;
+  void *nvptr = &nv;
+#if defined(NV_IS_53_BIT)
+  char f[] = {'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0'};
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
+  char f[] = {'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0',
+              '\0','\0','\0','\0'};
+
+#elif REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
+  char *f;
+  mpfr_t ws;
+
+#else
+  char f[] = {'\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0',
+              '\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0','\0'};
+
+#endif
+  mpz_t R, S, M_minus, M_plus, LHS, TMP;
+  char str[] = {'\0','\0','\0','\0','\0','\0','\0','\0'};
+  char * c = "0123456789abcdef";
+  char *out, *bstr;
 
   nv = SvNV(pnv);
 
-  if(nv <= 0) {
-    if(nv < 0) croak("Passing of negative values to _nvtoa XSub is not allowed");
-    ST(0) = sv_2mortal(newSVpv("0.0", 0));
+#if defined(MPFR_HAVE_BENDIAN)
+
+  if(((unsigned char *)nvptr)[0] >= 128) {
+#if defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098
+    nv = -nv;
+#else
+    ((unsigned char *)nvptr)[0] &= 127;
+#endif
+
+#elif defined(NV_IS_53_BIT)
+  if(((unsigned char *)nvptr)[7] >= 128) {
+    ((unsigned char *)nvptr)[7] &= 127;
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
+  if(((unsigned char *)nvptr)[9] >= 128) {
+    ((unsigned char *)nvptr)[9] &= 127;
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098
+  if(((unsigned char *)nvptr)[15] >= 128) {
+    nv = -nv;
+#else
+  if(((unsigned char *)nvptr)[15] >= 128) {
+    ((unsigned char *)nvptr)[15] &= 127;
+#endif
+    sign = 1;
+  }
+
+  if(nv == 0) {
+    ST(0) = sign ? sv_2mortal(newSVpv("-0.0", 0)) : sv_2mortal(newSVpv("0.0", 0));
     XSRETURN(1);
   }
 
@@ -8065,126 +8471,137 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
     XSRETURN(1);
   }
 
-  if(nv > nv_max) {
-    ST(0) = sv_2mortal(newSVpv("Inf", 0));
+  if(nv > MATH_MPFR_NV_MAX) {
+    ST(0) = sign ? sv_2mortal(newSVpv("-Inf", 0)) : sv_2mortal(newSVpv("Inf", 0));
     XSRETURN(1);
   }
 
-  mpfr_init2(ws, bits);
   mpz_init(R);
   mpz_init(S);
   mpz_init(M_plus);
   mpz_init(M_minus);
   mpz_init(LHS);
   mpz_init(TMP);
-  mpq_init(Q);
-  mpq_init(QT);
 
-  Newxz(f, bits + 8, char);
-  if(f == NULL) croak("Failed to allocate memory near start of _nvtoa XSub");
-
-  if(nv < normal_min) {
-    is_subnormal = 1;
-#if REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
-    bits = 53;
-#endif
-    mpfr_set_prec(ws, bits);
-    Rmpfr_set_NV(aTHX_ &ws, pnv, GMP_RNDN);
-
-    exp_init = mpfr_get_exp(ws);
-    subnormal_prec_adjustment = bits - (exp_init - min_pow);
-    bits -= subnormal_prec_adjustment;
-  }
+  _get_exp_and_bits( &e, &bits, nv);
 
 #if REQUIRED_LDBL_MANT_DIG == 2098 && defined(NV_IS_LONG_DOUBLE)
-#ifdef MPFR_HAVE_BENDIAN                   /* Big Endian architecture */
 
-    if(!is_subnormal) {
-      msd_exp = ((unsigned char *)nvptr)[0];
-      msd_exp <<= 4;
-      bits = ((unsigned char *)nvptr)[1];
-      bits >>= 4;
-      msd_exp += bits;
-      if(msd_exp > 2047) msd_exp -= 2048;
-      if(msd_exp == 0) msd_exp = -1022;
-      else msd_exp -= 1023;
-
-      lsd_exp = ((unsigned char *)nvptr)[8];
-      lsd_exp <<= 4;
-      bits = ((unsigned char *)nvptr)[9];
-      bits >>= 4;
-      lsd_exp += bits;
-      if(lsd_exp > 2047) lsd_exp -= 2048;
-      if(lsd_exp == 0) lsd_exp = -1022;
-      else lsd_exp -= 1023;
-
-      bits = 53 + msd_exp - lsd_exp;
-      if(lsd_exp < -1022) bits += (lsd_exp + 1022); /* reduce "bits" because lsd is subnormal */
-      if(bits < 53) croak ("Bad calculation of bitsize");
-    }
-
-#else                                     /* Little Endian architecture */
-
-    if(!is_subnormal) {
-      msd_exp = ((unsigned char *)nvptr)[15];
-      msd_exp <<= 4;
-      bits = ((unsigned char *)nvptr)[14];
-      bits >>= 4;
-      msd_exp += bits;
-      if(msd_exp > 2047) msd_exp -= 2048;
-      if(msd_exp == 0) msd_exp = -1022;
-      else msd_exp -= 1023;
-
-      lsd_exp = ((unsigned char *)nvptr)[7];
-      lsd_exp <<= 4;
-      bits = ((unsigned char *)nvptr)[6];
-      bits >>= 4;
-      lsd_exp += bits;
-      if(lsd_exp > 2047) lsd_exp -= 2048;
-      if(lsd_exp == 0) lsd_exp = -1022;
-      else lsd_exp -= 1023;
-
-      bits = 53 + msd_exp - lsd_exp;
-      if(lsd_exp < -1022) bits += (lsd_exp + 1022); /* reduce "bits" because lsd is subnormal */
-      if(bits < 53) croak ("Bad calculation of bitsize");
-    }
-
-#endif
-#endif
-
-  mpfr_set_prec(ws, bits);
-  Rmpfr_set_NV(aTHX_ &ws, pnv, GMP_RNDN);
-
-#if MPFR_VERSION < MPFR_VERSION_NUM(4,0,2) /* work around mpfr_get_str bug */
-
-  if(bits == 1) {
-    sprintf(f, "%s", "1"); /* Would have already returned if "0" */
-    e = mpfr_get_exp(ws);
-  }
-  else  mpfr_get_str(f, &e, 2, bits, ws, GMP_RNDN);
+  if(bits < 53) is_subnormal = 1;
 
 #else
 
-  mpfr_get_str(f, &e, 2, bits, ws, GMP_RNDN);
+  if(bits < MATH_MPFR_BITS) is_subnormal = 1;
 
 #endif
 
+/***************
+ * Assign to f *
+ ***************/
+
+  if(bits == 1) {
+#if defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098			/* doubledouble */
+    Newxz(f, 4, char);
+    if(f == NULL) croak("Failed to allocate memory for string buffer in nvtoa XSub");
+#endif
+    f[0] = c[1];
+  }
+  else {
+
+#if defined(NV_IS_FLOAT128) || (defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 113)	/* 113 bit prec */
+
+    f[0] = is_subnormal ? c[0] : c[1];
+    k++;
+
+#if defined(MPFR_HAVE_BENDIAN)
+    for(skip = 2; skip <= 15; skip++) {
+#else
+    for(skip = 13; skip >= 0; skip--) {
+#endif
+      low = ((unsigned char *)nvptr)[skip];
+      f[k] = c[low >> 4];
+      f[k + 1] = c[low & 15];
+      k += 2;
+    }
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098			/* doubledouble */
+
+    /*********************************************
+     * TODO: Remove the mpfr dependency entirely *
+     ********************************************/
+
+    mpfr_init2(ws, bits);
+    mpfr_set_ld(ws, nv, GMP_RNDN);
+
+    Newxz(f, bits + 8, char);
+    if(f == NULL) croak("Failed to allocate memory for string buffer in nvtoa XSub");
+
+    mpfr_get_str(f, &e, 2, bits, ws, GMP_RNDN);		/* using mpfr to set both f and e */
+    mpfr_clear(ws);
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64	/* 64 bit prec */
+
+#if defined(MPFR_HAVE_BENDIAN)
+    for(skip = 2; skip <= 9; skip++) {
+#else
+    for(skip = 7; skip >= 0; skip--) {
+#endif
+      low = ((unsigned char *)nvptr)[skip];
+      f[k] = c[low >> 4];
+      f[k + 1] = c[low & 15];
+      k += 2;
+    }
+
+#else									/* 53 bit prec */
+
+#if defined(MPFR_HAVE_BENDIAN)
+    for(skip = 1; skip <= 7; skip++) {
+#else
+    for(skip = 6; skip >= 0; skip--) {
+#endif
+      low = ((unsigned char *)nvptr)[skip];
+      if(!k) {
+        f[0] = is_subnormal ? c[0] : c[1];
+        f[1] = c[low & 15];
+      }
+      else {
+        f[k] = c[low >> 4];
+        f[k + 1] = c[low & 15];
+      }
+      k += 2;
+    }
+#endif
+
+/********************************
+ * assignment to f is completed *
+ ********************************/
+
+  }
+
+#if defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098			/* doubledouble */
+
   mpz_set_str(R, f, 2);
+  Safefree(f);
+
+#else
+
+  mpz_set_str(R, f, 16);
+
+#endif
+
+  lsb = mpz_tstbit(R, 0);
   mpz_set(TMP, R);
 
-  if(mpz_cmp_ui(R, 0) < 1) croak("Negative value in _nvtoa XSub is not allowed");
+  if(mpz_cmp_ui(R, 0) < 1) croak("Negative value in nvtoa XSub is not allowed");
   mpz_set_ui(S, 1);
 
-  shift1 = e - bits > 0 ? e - bits : 0;
-  shift2 = shift1       ? 0 : -(e - bits);
+  shift2 = e - bits;
 
+  shift1 = shift2 > 0 ? shift2 : 0;
   mpz_mul_2exp(R, R, shift1);
+
+  shift2 = shift1       ? 0 : -shift2;
   mpz_mul_2exp(S, S, shift2);
-
-  mpq_set_z(Q, R);
-  mpq_div_2exp(Q, Q, shift2);
-
-  mpfr_set_q(ws, Q, GMP_RNDN);
 
   mpz_set_ui(M_minus, 1);
   mpz_mul_2exp(M_minus, M_minus, shift1);
@@ -8202,78 +8619,79 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
     }
   }
 
-  k = 0;
+  k = 0;	/* used above, so we reset to zero */
+  skip = 0;	/* used above, so we reset to zero */
 
-  while(1) {
+  mpz_cdiv_q_ui(LHS, S, 10);
 
-    mpq_set_z(Q, S);
-    mpq_set_ui(QT, 10, 1);
-    mpq_div(Q, Q, QT);
+  if(mpz_cmp(LHS, R) > 0) {
+    k = (int)floor(mpz_sizeinbase(LHS, 2) * 0.30102999566398119); /* 0.30102999566398119 < log(2)/log(10) */
+    if(k) k--;    /* k should not become -ve here */
+    mpz_ui_pow_ui(TMP, 10, k);
+    k *= -1;
+    mpz_mul(R, R, TMP);
+    mpz_mul(M_minus, M_minus, TMP);
+    mpz_mul(M_plus, M_plus, TMP);
+  }
+  else {
+    skip = 1; /* No need to enter the following while() loop */
+  }
 
-    inex = mpfr_set_q(ws, Q, GMP_RNDN);
+  if(!skip) {
+    while(1) {
+      if(mpz_cmp(LHS, R) <= 0) break;
+      k--;
+      mpz_mul_ui(R, R, 10);
+      mpz_mul_ui(M_minus, M_minus, 10);
+      mpz_mul_ui(M_plus, M_plus, 10);
+    }                                   /* close first while loop */
+  }
 
-    further_adjustment = 0;
+  mpz_mul_2exp(LHS, R, 1);
+  mpz_add(LHS, LHS, M_plus);
+  mpz_mul_2exp(TMP, S, 1);
 
-    if(inex < 0 && mpfr_integer_p(ws)) {
-      further_adjustment++;
-    }
-    else {
-      mpfr_ceil(ws, ws);
-    }
+  if(mpz_cmp(LHS, TMP) >= 0) {
+    skip = 0;
+    mpz_div(TMP, LHS, TMP);
+    u = (int)floor(mpz_sizeinbase(TMP, 2) * 0.30102999566398119); /* 0.30102999566398119 < log(2)/log(10) */
+    if(u) u--;     /* Do not decrement if u is zero */
+    mpz_ui_pow_ui(TMP, 10, u);
+    k += u;
+    mpz_mul(S, S, TMP);
+  }
+  else {
+    skip = 1; /* No need to enter the following while() loop */
+  }
 
-    mpfr_add_ui(ws, ws, 1, GMP_RNDN);
+  if(!skip) {
+    while(1) {
+      mpz_mul_2exp(TMP, S, 1);
 
-    if(mpfr_cmp_z(ws, R) <= 0) break;
+      if(mpz_cmp(LHS, TMP) < 0) break;
 
-    k--;
-    mpz_mul_ui(R, R, 10);
-    mpz_mul_ui(M_minus, M_minus, 10);
-    mpz_mul_ui(M_plus, M_plus, 10);
-  }                                   /* close first while loop */
-
-  while(1) {
-    mpz_mul_2exp(LHS, R, 1);
-    mpz_add(LHS, LHS, M_plus);
-    mpz_mul_2exp(TMP, S, 1);
-
-    if(mpz_cmp(LHS, TMP) < 0) break;
-
-    mpz_mul_ui(S, S, 10);
-    k++;
-  }                                 /* close second while loop */
+      mpz_mul_ui(S, S, 10);
+      k++;
+    }                                 /* close second while loop */
+  }
 
   /*********************************************/
 
-  k_start = k;
+  k_start = k - 1;
 
-  Newxz(out, max_dig + 8, char);
-  if(out == NULL) croak("Failed to allocate memory for output string in _nvtoa XSub");
+  Newxz(out, (int)(12 + ceil(0.30103 * bits)), char); /* 1 + ceil(log(2) / log(10) * bits), but allow a few extra for
+                                                       exponent and sign */
+
+  if(out == NULL) croak("Failed to allocate memory for output string in nvtoa XSub");
 
   while(1) {
 
     k--;
-    mpz_mul_ui(TMP, R, 10);
-    mpq_set_z(Q, TMP);
-    mpq_set_z(QT, S);
-    mpq_div(Q, Q, QT);
-
-    inex = mpfr_set_q(ws, Q, GMP_RNDN);
-
-    further_adjustment = 0;
-
-
-    if(inex > 0 && mpfr_integer_p(ws)) {
-      further_adjustment++;
-    }
-    else {
-      mpfr_floor(ws, ws);
-    }
-
-    u = mpfr_get_ui(ws, GMP_RNDN);
-    u -= further_adjustment;
 
     mpz_mul_ui(TMP, R, 10);
-    mpz_mod(R, TMP, S);
+    mpz_fdiv_qr(LHS, R, TMP, S);
+    u = mpz_get_ui(LHS);
+
     mpz_mul_ui(M_minus, M_minus, 10);
     mpz_mul_ui(M_plus, M_plus, 10);
 
@@ -8281,9 +8699,7 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
 
     cmp = mpz_cmp(LHS, M_minus);
 
-    len = strlen(f);
-
-    if(!cmp && f[len - 1] == '0' && !is_subnormal) {
+    if(!cmp && !lsb && !is_subnormal) { /* !lsb implies that f is even */
       low = 1;
     }
     else {
@@ -8295,7 +8711,7 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
 
     cmp = mpz_cmp(LHS, TMP);
 
-    if(!cmp && f[len - 1] == '0' && !is_subnormal) {
+    if(!cmp && !lsb && !is_subnormal) { /* !lsb implies that f is even */
       high = 1;
     }
     else {
@@ -8304,43 +8720,142 @@ void _nvtoa(pTHX_ SV * pnv, NV nv_max, NV normal_min, int min_pow, int b, int ma
 
     if(!(!low && !high)) break;
 
-    out[k_start - k - 1] = 48 + u;
+    out[k_start - k] = 48 + u;
 
   }                                   /* close while loop */
 
-  Safefree(f);
+  /* Next we set the final digit, rounding up where appropriate */
 
-  if(low && !high) out[k_start - k - 1] = 48 + u;
-  if(!low && high) out[k_start - k - 1] = 49 + u;
+  if(low && !high) out[k_start - k] = 48 + u;
+  if(!low && high) out[k_start - k] = 49 + u;
   if(low && high) {
     mpz_mul_2exp(LHS, R, 1);
     cmp = mpz_cmp(LHS, S);
-    if(cmp < 0)    out[k_start - k - 1] = 48 + u;
-    if(cmp > 0)    out[k_start - k - 1] = 49 + u;
+    if(cmp < 0)    out[k_start - k] = 48 + u;
+    if(cmp > 0)    out[k_start - k] = 49 + u;
     if(cmp == 0) {
-      if(u & 1)    out[k_start - k - 1] = 49 + u;
-      else         out[k_start - k - 1] = 48 + u;
+      if(u & 1)    out[k_start - k] = 49 + u;
+      else         out[k_start - k] = 48 + u;
     }
   }
 
-  mpfr_clear(ws);
   mpz_clear(R);
   mpz_clear(S);
   mpz_clear(M_plus);
   mpz_clear(M_minus);
   mpz_clear(LHS);
   mpz_clear(TMP);
-  mpq_clear(Q);
-  mpq_clear(QT);
+
+  /*********************
+   * Format the result *
+   *********************/
+
+  len = strlen(out);
+  critical = k + len; /* "critical" is critical only wrt the formatting of the output string */
+
+  /* printf("sign: %d critical: %d len %d k %d\n", sign, critical, len, k); */
+
+  if(critical < -3) {
+
+    sprintf(str, "e%03d", critical - 1);
+    if(sign || len > 1) {
+      /* insert decimal point */
+      for(skip = len + sign; skip > 1 + sign; skip--) {
+        out[skip] = out[skip - 1 - sign];
+      }
+
+      out[1 + sign] = '.';
+      out[len + 1 + sign] = 0;
+
+      if(sign) {
+        out[1] = out[0];
+        out[0] = '-';
+      }
+    }
+    strcat(out, str);
+    ST(0) = sv_2mortal(newSVpv(out, 0));
+    Safefree(out);
+    XSRETURN(1);
+  }
+
+  if(critical <= 0 ) {
+    /* bstr = concatenate "0." . ("0" x -critical) . out; */
+    Newxz(bstr, (int)(16 + ceil(0.30103 * bits)), char); /* 1 + ceil(log(2) / log(10) * bits),
+                                                        but allow a few extra for exponent and sign */
+
+    if(bstr == NULL) croak("Failed to allocate memory for 2nd output string in nvtoa XSub");
+
+    if(sign) bstr[0] = '-';
+
+    bstr[0 + sign] = '0';
+    bstr[1 + sign] = '.';
+
+    sign += 2;
+
+    for(skip = critical; skip < 0; skip++) {
+      bstr[sign] = '0';
+      sign++;
+    }
+
+    bstr[sign] = 0;
+    strcat(bstr, out);
+
+    ST(0) = sv_2mortal(newSVpv(bstr, 0));
+    Safefree(out);
+    Safefree(bstr);
+    XSRETURN(1);
+  }
+
+  if(critical < MATH_MPFR_MAX_DIG) {
+    if(sign) {
+      for(skip = len; skip > 0; skip--) out[skip] = out[skip - 1];
+      out[0] = '-';
+      out[len + 1] = 0;
+    }
+
+   if(k >= 0) {
+      /* out = concatenate out . ('0' x k); */
+      for(skip = 0; skip < k; skip++) out[len + skip + sign] = '0';
+      out[len + k + sign] = '.';
+      out[len + k + sign + 1] = '0';
+      out[len + k + sign + 2] = 0;
+      ST(0) = sv_2mortal(newSVpv(out, 0));
+      Safefree(out);
+      XSRETURN(1);
+    }
+
+    /* insert decimal point; */
+    for(skip = len + sign; skip > len + k + sign; skip--) out[skip] = out[skip - 1];
+    out[len + k + sign] = '.';
+    out[len + sign + 1] = 0;
+    ST(0) = sv_2mortal(newSVpv(out, 0));
+    Safefree(out);
+    XSRETURN(1);
+  }
+
+  if( len > 1) {
+    /* insert decimal point */
+    for(skip = len + sign; skip > 1 + sign; skip--) {
+      out[skip] = out[skip - 1 - sign];
+    }
+
+    out[1 + sign] = '.';
+    out[len + 1 + sign] = 0;
+  }
+
+  if(sign) {
+    out[1] = out[0];
+    out[0] = '-';
+  }
+
+  sprintf(str, "e+%d", critical - 1);
+  strcat(out, str);
 
   ST(0) = sv_2mortal(newSVpv(out, 0));
   Safefree(out);
-  ST(1) = sv_2mortal(newSViv(k));
-  XSRETURN(2);
-#endif
+  XSRETURN(1);
+
 }
-
-
 
 
 
@@ -12748,18 +13263,13 @@ CODE:
 OUTPUT:  RETVAL
 
 void
-_nvtoa (pnv, nv_max, normal_min, min_pow, b, max_dig)
+nvtoa (pnv)
 	SV *	pnv
-	NV	nv_max
-	NV	normal_min
-	int	min_pow
-	int	b
-	int	max_dig
         PREINIT:
         I32* temp;
         PPCODE:
         temp = PL_markstack_ptr++;
-        _nvtoa(aTHX_ pnv, nv_max, normal_min, min_pow, b, max_dig);
+        nvtoa(aTHX_ pnv);
         if (PL_markstack_ptr != temp) {
           /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;

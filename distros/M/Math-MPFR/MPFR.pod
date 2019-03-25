@@ -1691,13 +1691,19 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     the string $str.
     If $Config{nvtype} is double, it therefore returns the same
     value as atonv.
+    See atonv(), immediately below.
 
    $nv = atonv($str); # Needs mpfr-3.1.6 or later
     Sets $nv to the NV value represented by the string $str.
+    If $str expresses a base 2 value, begin it with '0b' or '0B'.
+    If $str expresses a base 16 value, begin it with '0x' or '0X.
+    For example:
+      atonv('0x0.89p5'), atonv('0x0.112@2'), atonv('17.125') and
+      atonv('0b0.10001001e5') all return 17.125.
     NOTE: ORIGINALLY TOOK 2 ARGUMENTS - NOW TAKES ONLY 1, as of
           Math-MPFR-4.07.
 
-   $str = nvtoa($nv); # Needs mpfr-4.0.0 or later
+   $str = nvtoa($nv);
     Sets $str to the value of $nv.
     $str will appear in standard decimal format, containing the
     *minimum* number of digits such that the condition ($str == $nv)
@@ -1709,11 +1715,14 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
             of values to the NV. The nvtoa() function looks only at
             the value that was passed to it - which, with such buggy
             perls, may differ from the intended value by a few ULPs.
-            When it matters, assign with atonv().
+            When it matters, assign with atonv() - which requires
+            mpfr-3.1.6.
     NOTE 2: Be wary of values assigned by perl to double-double NVs.
-            Such assignments may also be incorrect by up to a few
-            ULPs, irrespective of the perl version.
-            When it matters, assign with atonv().
+            Such assignments may be incorrect by up to a few ULPS,
+            irrespective of the perl version.
+            When it matters, assign with atonv() - which requires
+            mpfr-3.1.6.
+            With these NVs, nvtoa() currently requires mpfr-4.0.0.
 
    $MPFR_version = Rmpfr_get_version();
     Returns the version of the MPFR library (eg 2.1.0) being used by

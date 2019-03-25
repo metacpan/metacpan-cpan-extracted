@@ -19,6 +19,8 @@ tldr - a perl tldr client
    -o, --os=OS     os (osx, sunos or linux)
    -h, --help      show this help
    -v, --version   show version
+       --pager     specify pager command
+       --no-pager  turn off paging
 
   Environment variables:
    * TLDR_REPOSITORY=/path/to/tldr-pages/tldr

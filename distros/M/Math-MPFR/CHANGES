@@ -1,3 +1,6 @@
+4.11
+ - Optimizations to nvtoa()
+
 4.09
  - Hopefully fix bugs in t/nvtoa.t reported by (eg):
    http://www.cpantesters.org/cpan/report/844b433e-2463-11e9-b3bd-8a932d9bfb17

@@ -55,6 +55,6 @@
          "web" : "https://github.com/trapd00r/hr"
       }
    },
-   "version" : "0.05",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

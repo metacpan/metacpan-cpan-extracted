@@ -16,7 +16,7 @@ WriteMakefile(
         'Capture::Tiny' => '0',
         'Module::Build' => '0',
         'ExtUtils::MakeMaker' => '0',
-        'Test::More' => '0',
+        'Test::More' => '0.88',
         'File::Spec' => '0',
         'ExtUtils::Manifest' => '0',
         'Fatal' => '0',

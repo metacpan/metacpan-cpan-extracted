@@ -37,7 +37,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Mojolicious" : "0",
+            "Mojolicious" : "8.02",
+            "Test::Exception" : "0",
             "perl" : "5.008005"
          }
       },
@@ -59,7 +60,7 @@
          "web" : "https://github.com/srchulo/Mojolicious-Plugin-Gzip"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Adam Hopkins <violapiratejunky@gmail.com>"
    ],

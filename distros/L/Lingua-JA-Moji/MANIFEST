@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING
 examples/onbiki.pl
 examples/syn-kana.pl
 examples/synopsis.pl
@@ -43,6 +44,7 @@ t/Lingua-JA-Moji.t
 t/lingua-ja-regular-unicode.t
 t/new-old-kanji.t
 t/romaji2kana.t
+t/smallize.t
 t/sound-marks.t
 t/square.t
 t/wanakana.t

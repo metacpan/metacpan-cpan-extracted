@@ -1,12 +1,12 @@
 =head1 NAME
 
-examples/animate.pl - Animate using L<Prima::Image::AnimateGIF>
+examples/animate.pl - Animate using L<Prima::Image::Animate>
 
 =cut
 
 use strict;
 use warnings;
-use Prima qw(Application Image::AnimateGIF);
+use Prima qw(Application Image::Animate);
 
 my $clip_debug = 0;
 
@@ -25,7 +25,7 @@ unless ( @ARGV) {
 	}
 }
 
-my $x = Prima::Image::AnimateGIF->load($ARGV[0]);
+my $x = Prima::Image::Animate->load($ARGV[0]);
 die "Can't load $ARGV[0]:$@\n" unless $x;
 
 my ( $X, $Y) = ( 100, 100);
@@ -34,11 +34,13 @@ my $g = $::application-> get_image( $X, $Y, $x-> size);
 $::application-> begin_paint;
 
 my $break;
+my $with_background = ($ARGV[1] // '') eq '-bg';
 
 $SIG{INT} = sub { $break++ };
 while ( my $info = $x-> next) {
 	my $c = $g-> dup;
 	$c-> begin_paint;
+	$x-> draw_background( $c, 0, 0) if $with_background;
 	$x-> draw( $c, 0, 0);
 
 	$::application-> clipRect(

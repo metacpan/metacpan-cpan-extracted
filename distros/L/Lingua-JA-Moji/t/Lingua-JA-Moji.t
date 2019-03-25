@@ -17,7 +17,6 @@ use Lingua::JA::Moji qw/romaji2kana
                         romaji_styles
                         kana_to_large
 			nigori_first
-			smallize_kana
 			cleanup_kana
 			bad_kanji
 			yurei_moji/;
@@ -133,18 +132,6 @@ my @list = (qw/カン スウ ハツ オオ/);
 nigori_first (\@list);
 is_deeply (\@list, [qw/カン スウ ハツ オオ ガン ズウ バツ パツ/],
 	   "Operation of nigori_first");
-
-is (smallize_kana ('シヤツター'), 'シャッター',
-    "Basic operation of smallize_kana");
-
-is (smallize_kana ('ケンブリツジ'), 'ケンブリッジ');
-
-is (smallize_kana ('ツプ'), undef, "Cannot smallize tsu kana at start");
-is (smallize_kana ('感ツプ'), undef, "Cannot smallize tsu kana after non-kana");
-is (smallize_kana ('サンゼンツプ'), undef, "Cannot smallize tsu kana after n");
-is (smallize_kana ('サツプ'), 'サップ', "Can smallize kana after 'sa'");
-is (smallize_kana ('シヨツチユウ'), 'ショッチュウ', "Test of smallize shotchuu");
-is (smallize_kana ('チヨダ'), 'チョダ', "Test of smallize chiyoda");
 
 # Test the cleanup of badly-input kana
 

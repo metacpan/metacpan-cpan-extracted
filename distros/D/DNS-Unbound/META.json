@@ -27,12 +27,11 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.12"
          }
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.12",
             "X::Tiny" : "0",
             "XSLoader" : "0.24"
          }
@@ -51,6 +50,6 @@
          "web" : "https://github.com/FGasper/p5-DNS-Unbound"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

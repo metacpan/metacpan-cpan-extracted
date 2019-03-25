@@ -1,7 +1,7 @@
 requires 'parent', 0;
 requires 'curry', '>= 1.001';
 requires 'indirect', 0;
-requires 'Future', '>= 0.37';
+requires 'Future', '>= 0.39';
 requires 'Scalar::Util', '>= 1.47';
 requires 'Ref::Util', '>= 0.111';
 requires 'List::UtilsBy', '>= 0.10';
@@ -14,7 +14,7 @@ requires 'Encode', '>= 1.98';
 
 # Used for transcoding - not essential, but commonly used
 recommends 'MIME::Base64', 0;
-recommends 'JSON::MaybeUTF8', '>= 1.000';
+recommends 'JSON::MaybeUTF8', '>= 1.002';
 recommends 'Text::CSV', 0;
 
 # Not so common

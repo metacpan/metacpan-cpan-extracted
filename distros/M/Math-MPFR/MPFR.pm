@@ -180,7 +180,7 @@ Rmpfr_round_nearest_away rndna
 atonv nvtoa atodouble Rmpfr_dot Rmpfr_get_str_ndigits
 );
 
-    our $VERSION = '4.09';
+    our $VERSION = '4.11';
     #$VERSION = eval $VERSION;
 
     DynaLoader::bootstrap Math::MPFR $VERSION;
@@ -794,82 +794,6 @@ sub _get_NV_properties {
   return %properties;
 }
 
-
-sub nvtoa {
-
-   if(defined $Math::MPFR::NV_properties{type}) { die "$Math::MPFR::NV_properties{type}" }
-   my $nv = shift;
-   my $significand_sign = '';
-   if($nv <= 0) {
-     if($nv == 0) {
-       if($] >= 5.010 && scalar(reverse(unpack('h*', pack('F<', $nv)))) =~ /8/   ) {
-         $significand_sign = '-';
-       }
-     }
-     else {
-       $significand_sign = '-';
-       $nv *= -1;
-     }
-   }
-
-   my @s = _nvtoa($nv, $Math::MPFR::NV_properties{NV_MAX}, $Math::MPFR::NV_properties{normal_min},
-                $Math::MPFR::NV_properties{min_pow},$Math::MPFR::NV_properties{bits},
-                $Math::MPFR::NV_properties{max_dig});
-
-   return "$significand_sign$s[0]" if @s == 1;
-
-
-   my $leading_zero_count = 0;
-   my $exp_sign = '';
-   my $output = $s[0];
-   my $k = $s[1];
-
-   for(0 .. length($output)) {
-     if(substr($output, $_, 1) eq '0') {
-       $leading_zero_count++;
-       $k--;
-     }
-     else { last }
-   }
-
-   return $significand_sign . _std($output, $k);
-}
-
-# standardize the string returned by the _nvtoa() XSub.
-sub _std {
-  my $output = shift;
-  my $k = shift;
-
-  my $len  = length($output);
-
-  my $critical = $k + $len;
-
-  if($critical < -3) {
-
-    $critical--;
-    $critical = sprintf "%03d", $critical;
-    if($len > 1) { substr($output, 1, 0, '.') }
-    return "${output}e${critical}";
-  }
-
-  if($critical <= 0 && $critical >= -3) { return $output = "0." . ('0' x -$critical) . $output }
-  if($critical > 0 && $critical < $Math::MPFR::NV_properties{max_dig}) {
-
-    if($k >= 0) {
-      $output .= '0' x $k;
-      return $output . ".0";
-    }
-
-    substr($output, $k, 0, '.');
-    return $output;
-  }
-
-    # $critical >= $max_dig
-
-    $critical--;
-    if($len > 1) { substr($output, 1, 0, '.') }
-    return "${output}e+${critical}";
-}
 
 *Rmpfr_get_z_exp             = \&Rmpfr_get_z_2exp;
 *prec_cast                   = \&Math::MPFR::Prec::prec_cast;

@@ -1,3 +1,11 @@
+0.003  2019-03-25
+   - Added 'collection' method.
+   - Reworked tests to delete the testing database if it exists.
+     (dangerous, but will keep for now)
+   - Testing mechanism for uri parameters under work.
+   - Complete support for: _api/version
+   - First cursor implementation
+
 0.0002  2019-03-23
    - Require specific version of MIME::Base64 for encode_base64url method. 
 

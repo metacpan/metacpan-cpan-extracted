@@ -1,7 +1,8 @@
-#!/usr/bin/perl -w
-
 use strict;
-use Test::More tests => 1;
+use Test::More;
+BEGIN {
+  plan skip_all => 'no Module::Build' if !eval { require Module::Build; 1 };
+}
 use lib 't/lib';
 use TestUtils;
 
@@ -16,3 +17,5 @@ if( !$ok ) {
     diag( "Build output\n",      $separator, $build, $separator ) if $build;
     diag( "Build test output\n", $separator, $test, $separator ) if $test;
 }
+
+done_testing;

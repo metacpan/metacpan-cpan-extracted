@@ -1,6 +1,6 @@
 package WebService::Rajce;
 # ABSTRACT: Perl module for rajce.net web API.
-$WebService::Rajce::VERSION = '1.180380';
+$WebService::Rajce::VERSION = '1.190840';
 use 5.006;
 use strict;
 use warnings;
@@ -460,7 +460,7 @@ WebService::Rajce - Perl module for rajce.net web API.
 
 =head1 VERSION
 
-version 1.180380
+version 1.190840
 
 =head1 SYNOPSIS
 

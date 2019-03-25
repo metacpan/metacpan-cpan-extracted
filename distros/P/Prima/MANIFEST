@@ -122,6 +122,7 @@ img/codec_tiff.c
 img/codec_gif.c
 img/codec_X11.c
 img/codec_Xpm.c
+img/codec_webp.c
 img/conv.c
 img/ic_conv.c
 img/img.c
@@ -237,12 +238,13 @@ Prima/Grids.pm
 Prima/Header.pm
 Prima/HelpViewer.fm
 Prima/HelpViewer.pm
-Prima/Image/AnimateGIF.pm
+Prima/Image/Animate.pm
 Prima/Image/gif.pm
 Prima/Image/jpeg.pm
 Prima/Image/tiff.fm
 Prima/Image/tiff.pm
 Prima/Image/TransparencyControl.pm
+Prima/Image/webp.pm
 Prima/ImageDialog.pm
 Prima/ImageViewer.pm
 Prima/IniFile.pm
@@ -393,6 +395,7 @@ t/Widget/Window.t
 t/Widget/ZOrder.t
 t/misc/pod.t
 t/misc/syntax.t
+t/misc/cpan.t
 unix/apc_app.c
 unix/apc_clipboard.c
 unix/apc_event.c

@@ -4,8 +4,14 @@
 /*                               */
 /*********************************/
 
+#include <sys/param.h>
 #include "unix/guts.h"
 #include "img.h"
+
+#if !(defined(__FreeBSD__ ) && PERL_REVISION == 5 && PERL_VERSION < 22)
+/* Observed hangs on 2 processors with DBUS session running */
+#define SAFE_DBUS
+#endif
 
 #ifdef WITH_GTK
 
@@ -93,8 +99,10 @@ my_gdk_display_open_default (void)
 }
 #endif
 
+#ifdef SAFE_DBUS
 /* GIO wants that callback, even empty */
 static void gtk_application_activate (GApplication *app) {}
+#endif
 
 Display*
 prima_gtk_init(void)
@@ -152,13 +160,19 @@ prima_gtk_init(void)
 		ret = gdk_x11_display_get_xdisplay(display);
 #endif
 	}
-  
+#if PERL_REVISION == 5 && PERL_VERSION >= 22
+/* https://rt.perl.org/Ticket/Display.html?id=133945 */
+	sync_locale();
+#endif
+
+#if defined(SAFE_DBUS) && (GLIB_MAJOR_VERSION > 2 || (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION >= 34))
 	gtk_app = g_application_new ("org.prima", G_APPLICATION_NON_UNIQUE);
 	g_signal_connect (gtk_app, "activate", G_CALLBACK (gtk_application_activate), NULL);
 	if ( !g_application_register (gtk_app, NULL, NULL)) {
   		g_object_unref (gtk_app);
 		gtk_app = NULL;
 	}
+#endif
 
 	settings  = gtk_settings_get_default();
 	stdcolors = prima_standard_colors();
@@ -260,7 +274,7 @@ set_transient_for(void)
 	if ( toplevel ) {
 		GdkWindow * g = NULL;
 
-#if GTK_MAJOR_VERSION == 3 || (GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 14)
+#if GTK_MAJOR_VERSION > 2 || (GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 14)
 		g = gtk_widget_get_window(GTK_WIDGET(gtk_dialog));
 #else
 		g = gtk_dialog->window;
@@ -331,7 +345,7 @@ gtk_openfile( Bool open)
 	if (open)
 		gtk_file_chooser_set_select_multiple( GTK_FILE_CHOOSER (gtk_dialog), gtk_select_multiple);
 
-#if GTK_MAJOR_VERSION == 3 || (GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 8)
+#if GTK_MAJOR_VERSION > 2 || (GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION >= 8)
 	gtk_file_chooser_set_do_overwrite_confirmation( GTK_FILE_CHOOSER (gtk_dialog), gtk_overwrite_prompt);
 	gtk_file_chooser_set_show_hidden( GTK_FILE_CHOOSER (gtk_dialog), gtk_show_hidden_files);
 #endif
@@ -564,6 +578,7 @@ prima_gtk_openfile( char * params)
 Bool
 prima_gtk_application_get_bitmap( Handle self, Handle image, int x, int y, int xLen, int yLen)
 {
+#if defined(SAFE_DBUS) && (GLIB_MAJOR_VERSION > 2 || (GLIB_MAJOR_VERSION == 2 && GLIB_MINOR_VERSION >= 34))
 	DEFXX;
 	int              i, found_png;
 	PList            codecs;
@@ -630,6 +645,9 @@ prima_gtk_application_get_bitmap( Handle self, Handle image, int x, int y, int x
 	plist_destroy(codecs);
 
 	return true;
+#else
+	return false;
+#endif
 }
 
 #endif

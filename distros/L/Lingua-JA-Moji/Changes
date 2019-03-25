@@ -1,5 +1,10 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.56 2019-03-25
+
+* smallize_kana now handles fa, fi, fe, fo.
+* Bug fix for "InKana" (KHWilliamson)
+
 0.55 2018-10-24
 
 * Only documentation has changed, all functionality is as 0.54

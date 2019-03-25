@@ -76,7 +76,7 @@ requires:
   Data::Dumper: 2.131
   Data::Dumper::Concise: 2.020
   Data::Printer: 0
-  DateTime: 1.10
+  DateTime: 1.50
   DateTime::Format::SQLite: 0.11
   Digest::MD5: 2.51
   Digest::SHA1: 2.13
@@ -167,7 +167,7 @@ resources:
   bugtracker: https://github.com/vanstyn/RapidApp/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/RapidApp.git
-version: 1.3102
+version: 1.3103
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
   - 'Torsten Raudssus <torsten@raudss.us>'

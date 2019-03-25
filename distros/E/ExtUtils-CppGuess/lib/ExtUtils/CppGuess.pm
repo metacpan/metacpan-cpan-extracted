@@ -90,6 +90,20 @@ flags.
 Takes a string as argument that is added to the string of extra linker
 flags.
 
+=head2 compiler_command
+
+Returns the string that can be passed to C<system> to execute the compiler.
+Will include the flags returned as the Module::Build
+C<extra_compiler_flags>.
+
+Added in 0.13.
+
+=head2 linker_flags
+
+The same as returned as the Module::Build C<extra_linker_flags>.
+
+Added in 0.13.
+
 =head1 AUTHOR
 
 Mattia Barbon <mbarbon@cpan.org>
@@ -111,7 +125,7 @@ use Config ();
 use File::Basename qw();
 use Capture::Tiny 'capture_merged';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 sub new {
     my( $class, %args ) = @_;
@@ -119,7 +133,12 @@ sub new {
 
     # Allow override of default %Config::Config; useful in testing.
     if( ! exists $self->{config} || ! defined $self->{config} ) {
-      $self->{config} = \%Config::Config;
+      if ($ExtUtils::MakeMaker::Config::VERSION) {
+        # tricksy hobbitses are overriding Config, go with it
+        $self->{config} = \%ExtUtils::MakeMaker::Config::Config;
+      } else {
+        $self->{config} = \%Config::Config;
+      }
     }
 
     # Allow a 'cc' %args.  If not supplied, pull from {config}, or $Config{cc}.
@@ -138,6 +157,14 @@ sub new {
         : $^O;
     }
 
+    # Set up osvers.
+    if( ! exists $self->{osvers} || ! defined $self->{osvers} ) {
+      $self->{osvers}
+        = exists $self->{config}{osvers} && defined $self->{config}{osvers}
+        ? $self->{config}{osvers}
+        : '';
+    }
+
     return $self;
 }
 
@@ -149,48 +176,34 @@ sub new {
 sub _config { shift->{config} }
 sub _cc     { shift->{cc}     }
 sub _os     { shift->{os}     }
-
+sub _osvers { shift->{osvers} }
 
 sub guess_compiler {
     my $self = shift;
-
-    return $self->{guess} if $self->{guess};
-
-    if( $self->_os =~ /^mswin/i ) {
-        $self->_guess_win32() or return;
-    } else {
-        $self->_guess_unix()  or return;
-    }
-    return $self->{guess};
+    return $self->{guess} ||= $self->_os =~ /^mswin/i
+      ? $self->_guess_win32
+      : $self->_guess_unix;
 }
-
 
 sub _get_cflags {
-    my $self = shift;
-
-    $self->guess_compiler or die;
-
-    my $cflags =  ' ' . $self->_config->{ccflags};
-    $cflags    .= ' ' . $self->{guess}{extra_cflags};
-    $cflags    .= ' ' . $self->{extra_compiler_flags}
-      if defined $self->{extra_compiler_flags};
-
-    return $cflags;
+  my $self = shift;
+  $self->guess_compiler or die;
+  join ' ', '', map _trim_whitespace($_), grep defined && length,
+    $self->_config->{ccflags},
+    $self->{guess}{extra_cflags},
+    $self->{extra_compiler_flags},
+    (($self->_config->{gccversion} || '') =~ /Clang/ ? '-Wno-reserved-user-defined-literal' : ()),
+    ;
 }
-
 
 sub _get_lflags {
-    my $self = shift;
-
-    $self->guess_compiler || die;
-
-    my $lflags = $self->{guess}{extra_lflags};
-    $lflags .= ' ' . $self->{extra_linker_flags}
-      if defined $self->{extra_linker_flags};
-
-    return $lflags;
+  my $self = shift;
+  $self->guess_compiler || die;
+  join ' ', '', map _trim_whitespace($_), grep defined && length,
+    $self->{guess}{extra_lflags},
+    $self->{extra_linker_flags},
+    ;
 }
-
 
 sub makemaker_options {
     my $self = shift;
@@ -222,42 +235,46 @@ sub _guess_win32 {
     my $self = shift;
     my $c_compiler = $self->_cc;
 #    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
-
     if( $self->_cc_is_gcc( $c_compiler ) ) {
-        $self->{guess} = {
-          extra_cflags => ' -xc++ ',
-          extra_lflags => ' -lstdc++ ',
+        return {
+          compiler_command => ($c_compiler eq 'clang' ? 'clang++' : 'g++'),
+          extra_cflags => '-xc++',
+          extra_lflags => '-lstdc++',
         };
     } elsif( $self->_cc_is_msvc( $c_compiler ) ) {
-        $self->{guess} = {
-          extra_cflags => ' -TP -EHsc ',
-          extra_lflags => ' msvcprt.lib ',
+        return {
+          compiler_command => 'cl',
+          extra_cflags => '-TP -EHsc',
+          extra_lflags => 'msvcprt.lib',
         };
     } else {
         die "Unable to determine a C++ compiler for '$c_compiler'";
     }
-
-    return 1;
 }
-
 
 sub _guess_unix {
     my $self = shift;
     my $c_compiler = $self->_cc;
 #    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
-
     if( !$self->_cc_is_gcc( $c_compiler ) ) {
         die "Unable to determine a C++ compiler for '$c_compiler'";
     }
-
-    $self->{guess} = {
-      extra_cflags => ' -xc++ ',
-      extra_lflags => ' -lstdc++ ',
-    };
-    $self->{guess}{extra_lflags} .= ' -lgcc_s'
-      if $self->_os eq 'netbsd' && $self->{guess}{extra_lflags} !~ /-lgcc_s/;
-
-    return 1;
+    my %guess;
+    if ($self->{os} eq 'freebsd' && $self->{osvers} =~ /^(\d+)/ && $1 >= 10) {
+      %guess = (
+        compiler_command => 'clang++',
+        extra_lflags => '-lc++',
+      );
+    } else {
+      %guess = (
+        compiler_command => ($c_compiler eq 'clang' ? 'clang++' : 'g++'),
+        extra_cflags => '-xc++',
+        extra_lflags => '-lstdc++',
+      );
+    }
+    $guess{extra_lflags} .= ' -lgcc_s'
+      if $self->_os eq 'netbsd' && $guess{extra_lflags} !~ /-lgcc_s/;
+    \%guess;
 }
 
 # originally from Alien::wxWidgets::Utility
@@ -333,19 +350,34 @@ sub add_extra_compiler_flags {
     my( $self, $string ) = @_;
 
     $self->{extra_compiler_flags}
-      = defined($self->{extra_compiler_flags})
-        ? $self->{extra_compiler_flags} . ' ' . $string
-        : $string;
+      = join ' ', map _trim_whitespace($_), grep defined && length,
+        $self->{extra_compiler_flags}, $string;
 }
-
 
 sub add_extra_linker_flags {
     my( $self, $string ) = @_;
     $self->{extra_linker_flags}
-      = defined($self->{extra_linker_flags})
-        ? $self->{extra_linker_flags} . ' ' . $string
-        : $string;
+      = join ' ', map _trim_whitespace($_), grep defined && length,
+        $self->{extra_linker_flags}, $string;
 }
 
+sub compiler_command {
+    my( $self ) = @_;
+    $self->guess_compiler || die;
+    my $cc = $self->{guess}{compiler_command};
+    my $cflags = $self->_get_cflags;
+    join ' ', map _trim_whitespace($_), grep defined && length, $cc, $cflags;
+}
+
+sub _trim_whitespace {
+  my $string = shift;
+  $string =~ s/^\s+|\s+$//g;
+  return $string;
+}
+
+sub linker_flags {
+    my( $self ) = @_;
+    _trim_whitespace($self->_get_lflags);
+}
 
 1;

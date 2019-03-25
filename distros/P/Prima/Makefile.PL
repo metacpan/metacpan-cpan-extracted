@@ -1,4 +1,3 @@
-#!env perl
 use strict;
 use warnings;
 use 5.010;
@@ -40,6 +39,7 @@ use vars qw(
 	$LIB_EXT
 	$LIB_PREFIX
 	$LDFLAGS
+	$LDDLFLAGS
 	@LIBS
 	@INCPATH
 	@LIBPATH
@@ -56,6 +56,7 @@ use vars qw(
 	$OPENMP
 	%ALL_PM_INSTALL
 	%ALL_MAN_INSTALL
+	%MODVERSIONS
 );
 
 use vars qw(
@@ -372,6 +373,7 @@ sub setup_environment
 		$OPTIMIZE     = '-g' if $cmd_options{DEBUG};
 		$OPENMP       = '-fopenmp';
 		$OPTIMIZE    .= ' -Wall' if $compiler_type eq 'gcc';
+		$passthru_options{LDDLFLAGS} .= ' -g' if $cmd_options{DEBUG};
 	}
 
 	$DEFFILE    = 'Prima.def';
@@ -660,6 +662,7 @@ sub compile_and_run
 
 	null_output;
 	my $cc = cc_command_line( $tmpsrc, $tmpo, $tmpexe, 0);
+	$cc =~ s/\s\-(s(hared)?|mdll)\b//g if $compiler_type eq 'gcc';
 	print STDERR "$cc\n";
 	my $rc = system($cc);
 	restore_output;
@@ -1225,6 +1228,7 @@ sub pkgconfig
 
 	my $modversion  = `pkg-config --modversion $package`;
 	chomp $modversion;
+	$MODVERSIONS{$package} = $modversion;
 	printlog "$modversion\n";
 
 	my %h;
@@ -1703,6 +1707,7 @@ sub setup_codecs
 
 	my @codec_libpath = $Config{installsitearch};
 	my @warn_codecs;
+	my $webp_version;
 	for my $cx ( @codecs) {
 		my @inc;
 		my $foundlib;
@@ -1716,6 +1721,12 @@ sub setup_codecs
 			if ( $codec eq 'X11') {
 				$DEFINES{EMULATE_X11_CODEC} = 1 unless pkgconfig('x11');
 				$found = 1;
+			} elsif ( $codec eq 'webp') {
+				if (pkgconfig('libwebp') && pkgconfig('libwebpdemux') && pkgconfig('libwebpmux')) {
+					$found = 1;
+					$webp_version = $1 * 0x10000 + $2 * 0x100 + $3
+						if $MODVERSIONS{libwebp} =~ /^(\d+).(\d+).(\d+)/;
+				}
 			} elsif ( $codec eq 'png') {
 				$found = 1 if pkgconfig('libpng');
 			} elsif ( $codec eq 'tiff') {
@@ -1758,10 +1769,21 @@ sub setup_codecs
 				@codec_libpath = ();
 			}
 			push( @ACTIVE_CODECS, $codec);
+
+			printlog "yes";
+			if ($codec eq 'webp') {
+				for my $lib2 ('webpdemux', 'webmux') {
+					if ( defined find_lib($lib2,join('', @inc), '', @codec_libpath)) {
+						unshift( @LIBS, $lib2) unless $libs{$lib2};
+					} else {
+						printlog ", but $lib2 not found, skipping\n";
+						next;
+					}
+				}
+			}
 			# In gcc, order of libs matters. libXpm requires libgdi32, and
 			# has to be mentioned _after_ it to work.
 			unshift( @LIBS, $lib) unless $libs{$lib};
-			printlog "yes";
 			printlog ", in $foundlib" if defined($foundlib) and length($foundlib);
 			printlog "\n";
 		} elsif ( $codec eq 'X11') {
@@ -1777,6 +1799,28 @@ sub setup_codecs
 			$PASSIVE_CODECS{$fn} = 1;
 			push @warn_codecs, $codec;
 			printlog "no\n";
+		}
+	}
+
+
+	# check supported versions
+	if ( grep {/webp/} @ACTIVE_CODECS) {
+		$webp_version //= compile_and_run(<<'VER');
+#include <stdio.h>
+#include <webp/decode.h>
+int main() {
+	printf("%d\n", WebPGetDecoderVersion());
+	return 0;
+}
+VER
+		if (( $webp_version // 0) < 1537 ) { # 0.6.1
+			printlog "** Warning: webp version ".
+				((defined($webp_version) ?
+					"is too low, 0.6.1 at least is needed" :
+					"cannot be determined")).
+				", skipping\n";
+			@ACTIVE_CODECS = grep { !/webp/ } @ACTIVE_CODECS;
+			$PASSIVE_CODECS{'img/codec_webp.c'} = 1;
 		}
 	}
 
@@ -2453,6 +2497,7 @@ WriteMakefile(
 	AUTHOR            => 'Dmitry Karasik <dmitry@karasik.eu.org>',
 	PM                => MY::orderedhash->tie(\%ALL_PM_INSTALL),
 	OPTIMIZE          => $OPTIMIZE,
+	LDDLFLAGS         => $passthru_options{LDDLFLAGS},
 	PREREQ_PM         => \%PREREQ,
 	OBJECT            => "@o_files",
 	INC               =>

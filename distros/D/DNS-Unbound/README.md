@@ -73,4 +73,7 @@ returned as an array reference. Useful for `TXT` query results.
 
 [https://github.com/FGasper/p5-DNS-Unbound](https://github.com/FGasper/p5-DNS-Unbound)
 
-1;
+# THANK YOU
+
+Special thanks to [ATOOMIC](https://metacpan.org/author/ATOOMIC) for
+making some helpful review notes.

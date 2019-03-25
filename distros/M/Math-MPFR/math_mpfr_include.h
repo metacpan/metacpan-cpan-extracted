@@ -9,6 +9,10 @@ NV_IS_FLOAT128           : Automatically defined by Makefile.PL if
                            If NV_IS_FLOAT128 is defined we include the
                            quadmath.h header.
 
+NV_IS_53_BIT             : Defined only when $Config{nvtype} is 'double' or
+                           when $Config{nvtype} is a 'long double' that's
+                           identical to the double.
+
 MPFR_WANT_FLOAT128       : Defined by Makefile.PL if $have_float128 is
                            set to a true value. $have_float128 can be set
                            to a true value by either editing the Makefile.PL
@@ -35,13 +39,9 @@ CAN_PASS_FLOAT128        : Defined only when both MPFR_WANT_FLOAT128 and
                            4.0.0.)
                            DANGER: The assumption is that if MPFR_WANT_FLOAT128
                            is defined then the mpfr library has been built
-                           with __float128 support, which won't be the case if
-                           the mpfr library wasn't configured with
-                           '--enable-float128'.
-                           I haven't yet found a way of managing this - it's
-                           instead left up to the person building Math::MPFR to
-                           NOT define MATH_MPFR_WANT_FLOAT128 unless mpfr WAS
-                           configured with --enable-float128.
+                           with __float128 support, which may not be the case.
+                           Hopefully the configure probing done by the
+                           Makefile.PL will get it right.
 
 MPFR_WANT_DECIMAL_FLOATS : The symbol needs to be defined (before mpfr.h is
                            included) in order to enable _Decimal64 and/or
@@ -209,6 +209,10 @@ typedef _Decimal128 D128;
 #define REQUIRED_LDBL_MANT_DIG LDBL_MANT_DIG
 #endif
 
+#if (!defined(NV_IS_FLOAT128) && !defined(NV_IS_LONG_DOUBLE)) || (defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 53)
+#define NV_IS_53_BIT 1
+#endif
+
 #define MAXIMUM_ALLOWABLE_BASE 62
 
 /* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV      *
@@ -238,6 +242,52 @@ typedef _Decimal128 D128;
          if(SvIV(get_sv("Math::MPFR::NNW", 0))) \
            warn("string used in %s contains non-numeric characters"
 
+#define BITSEARCH_4 \
+          if(tmp & 8) {				\
+            subnormal_prec_adjustment += 1;	\
+            break;				\
+          }					\
+          if(tmp & 4) {				\
+            subnormal_prec_adjustment += 2;	\
+            break;				\
+          }					\
+          if(tmp & 2) {				\
+            subnormal_prec_adjustment += 3;	\
+            break;				\
+          }					\
+          subnormal_prec_adjustment += 4;
+
+
+#define BITSEARCH_8 \
+          if(tmp & 128) {			\
+            subnormal_prec_adjustment += 1;	\
+            break;				\
+          }					\
+          if(tmp & 64) {			\
+            subnormal_prec_adjustment += 2;	\
+            break;				\
+          }					\
+          if(tmp & 32) {			\
+            subnormal_prec_adjustment += 3;	\
+            break;				\
+          }					\
+          if(tmp & 16) {			\
+            subnormal_prec_adjustment += 4;	\
+            break;				\
+          }					\
+          if(tmp & 8) {				\
+            subnormal_prec_adjustment += 5;	\
+            break;				\
+          }					\
+          if(tmp & 4) {				\
+            subnormal_prec_adjustment += 6;	\
+            break;				\
+          }					\
+          if(tmp & 2) {				\
+            subnormal_prec_adjustment += 7;	\
+            break;				\
+          }					\
+          subnormal_prec_adjustment += 8;
 
 
 #define NEG_ZERO_BUG 196866 /* A bug affecting mpfr_fits_u*_p functions         */
@@ -303,4 +353,33 @@ typedef _Decimal128 D128;
 #if !defined(__GNU_MP_VERSION) || __GNU_MP_VERSION < 5
 #define mp_bitcnt_t unsigned long int
 #endif
+
+/* For nvtoa() */
+#if defined(NV_IS_53_BIT)
+#define MATH_MPFR_MAX_DIG 17
+#define MATH_MPFR_BITS 53
+#define MATH_MPFR_NV_MAX 1.7976931348623157e+308
+#define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 64
+#define MATH_MPFR_MAX_DIG 21
+#define MATH_MPFR_BITS 64
+#define MATH_MPFR_NV_MAX 1.18973149535723176502e4932L
+
+#define MATH_MPFR_NORMAL_MIN 3.36210314311209350626e-4932L
+
+#elif defined(NV_IS_LONG_DOUBLE) && REQUIRED_LDBL_MANT_DIG == 2098
+#define MATH_MPFR_MAX_DIG 33
+#define MATH_MPFR_BITS 2098
+#define MATH_MPFR_NV_MAX 1.797693134862315807937289714053e+308L
+#define MATH_MPFR_NORMAL_MIN 2.2250738585072014e-308
+
+#else
+#define MATH_MPFR_MAX_DIG 36
+#define MATH_MPFR_BITS 113
+#define MATH_MPFR_NV_MAX 1.18973149535723176508575932662800702e+4932Q
+#define MATH_MPFR_NORMAL_MIN 3.3621031431120935062626778173217526e-4932Q
+#endif
+
+
 
