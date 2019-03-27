@@ -1,3 +1,8 @@
+0.130   2019-03-26 (PERLANCAR)
+
+	- [build] Remove use of DZP:Rinci::Validate [ref: RT#128914].
+
+
 0.12    2017-03-21 (PERLANCAR)
 
         - No functional changes.

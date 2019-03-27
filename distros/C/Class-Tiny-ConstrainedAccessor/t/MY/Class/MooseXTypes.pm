@@ -3,6 +3,8 @@ package MY::Class::MooseXTypes;
 use 5.006;
 use strict;
 use warnings;
+use MY::Helpers;
+
 our @ISA;
 use Scalar::Util qw(looks_like_number);
 
@@ -18,7 +20,7 @@ BEGIN {
     subtype MediumInteger,
         as Int,
         where { $_ >= 10 and $_ < 20 },
-        message { ($_ // 'undef') . ' is not an integer on [10,19]' };
+        message { _dor . ' is not an integer on [10,19]' };
 
     # Sanity check
     my $av = eval { MediumInteger->can('assert_valid') };

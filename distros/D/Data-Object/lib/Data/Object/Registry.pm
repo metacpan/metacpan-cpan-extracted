@@ -12,7 +12,7 @@ use parent 'Data::Object::Kind';
 # METHODS
 
 sub def {
-  'Data::Object::Config::Library';
+  'Data::Object::Library';
 }
 
 sub get {

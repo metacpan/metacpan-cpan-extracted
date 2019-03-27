@@ -2,8 +2,8 @@ NAME
     App::calx - Display a calendar
 
 VERSION
-    This document describes version 0.004 of App::calx (from Perl
-    distribution App-calx), released on 2019-02-13.
+    This document describes version 0.005 of App::calx (from Perl
+    distribution App-calx), released on 2019-03-26.
 
 SYNOPSIS
      # See calx script provided in this distribution

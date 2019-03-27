@@ -1,6 +1,5 @@
 bin/photodb
 Build.PL
-Dockerfile
 docs/CONTRIBUTING.pod
 docs/SCHEMA.pod
 dump-schema.pl
@@ -13,6 +12,10 @@ LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
+migrations/000-base-schema.sql
+migrations/001-sample-data.sql
+migrations/002-functions.sql
+migrations/003-views.sql
 README.pod
 t/00-compile.t
 t/01-perlcritic.t

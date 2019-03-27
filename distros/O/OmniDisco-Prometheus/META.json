@@ -35,10 +35,13 @@
       "runtime" : {
          "requires" : {
             "Data::Printer" : "0",
+            "JSON" : "0",
             "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "Moose" : "0",
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
+            "URI" : "0",
             "overload" : "0",
             "perl" : "v5.24.0",
             "strict" : "0",
@@ -48,6 +51,7 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
+            "Test::LWP::UserAgent" : "0",
             "perl" : "v5.24.0"
          }
       }
@@ -55,19 +59,23 @@
    "provides" : {
       "OD::Prometheus::Client" : {
          "file" : "lib/OD/Prometheus/Client.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "OD::Prometheus::Metric" : {
          "file" : "lib/OD/Prometheus/Metric.pm",
-         "version" : "0.005"
+         "version" : "0.006"
+      },
+      "OD::Prometheus::Query" : {
+         "file" : "lib/OD/Prometheus/Query.pm",
+         "version" : "0.006"
       },
       "OD::Prometheus::Set" : {
          "file" : "lib/OD/Prometheus/Set.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "OmniDisco::Prometheus" : {
          "file" : "lib/OmniDisco/Prometheus.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -79,7 +87,7 @@
          "web" : "https://github.com/aduitsis/omnidisco-prometheus"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }

@@ -1,9 +1,9 @@
 package Mojolicious::Plugin::Gzip;
-use Mojo::Base 'Mojolicious::Plugin::Config';
+use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::Util qw/gzip/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub register {
     my (undef, $app, $config) = @_;
@@ -48,7 +48,6 @@ sub register {
 
         my $zipped_body = gzip $body;
         $res->body($zipped_body);
-        $res->fix_headers;
         $res->headers->content_length(length $zipped_body);
         $res->headers->append(Vary => 'Accept-Encoding');
         $res->headers->content_encoding('gzip');
@@ -81,6 +80,14 @@ Mojolicious::Plugin::Gzip - Plugin to Gzip Mojolicious responses
 
   # With minimum size in bytes required before gzipping. Default is 860.
   $app->plugin(Gzip => {min_size => 1500});
+
+=head1 WARNING
+
+This module can be inefficient for large static files. It loads the entire file into memory and then gzips it, resulting in both the original file and
+the gzipped one in memory at once. By default, L<Mojolicious> serves static files from disk, which is much more memory efficient. For static files, you may want
+to compress them ahead of time or use something like a reverse proxy with L<Nginx|https://www.nginx.com/> to serve your static files or a service like
+L<Cloudlfare|https://www.cloudflare.com/>, which will compress files for you. For gzipping dynamic content, you should consider using L<Mojolicious::Renderer/compress>
+instead.
 
 =head1 DESCRIPTION
 

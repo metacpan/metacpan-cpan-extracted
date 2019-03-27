@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -168,42 +168,74 @@ sub _verify_claims {
   }
 
   ### iss
-  if(exists $payload->{iss}) {
-    if (ref $args{verify_iss} eq 'Regexp') {
-      croak "JWT: iss claim re check failed" unless $payload->{iss} =~ $args{verify_iss};
+  if (exists $args{verify_iss}) {
+    if (exists $payload->{iss}) {
+      if (ref $args{verify_iss} eq 'Regexp') {
+        croak "JWT: iss claim re check failed" unless $payload->{iss} =~ $args{verify_iss};
+      }
+      elsif (ref $args{verify_iss} eq 'CODE') {
+        croak "JWT: iss claim check failed" unless $args{verify_iss}->($payload->{iss});
+      }
+      else {
+        croak "JWT: verify_iss must be Regexp or CODE";
+      }
     }
-    elsif (ref $args{verify_iss} eq 'CODE') {
-      croak "JWT: iss claim check failed" unless $args{verify_iss}->($payload->{iss});
+    elsif ($args{verify_iss}) {
+      croak "JWT: iss claim required but missing"
     }
   }
 
   ### sub
-  if(exists $payload->{sub}) {
-    if (ref $args{verify_sub} eq 'Regexp') {
-      croak "JWT: sub claim re check failed" unless $payload->{sub} =~ $args{verify_sub};
+  if (exists $args{verify_sub}) {
+    if (exists $payload->{sub}) {
+      if (ref $args{verify_sub} eq 'Regexp') {
+        croak "JWT: sub claim re check failed" unless $payload->{sub} =~ $args{verify_sub};
+      }
+      elsif (ref $args{verify_sub} eq 'CODE') {
+        croak "JWT: sub claim check failed" unless $args{verify_sub}->($payload->{sub});
+      }
+      else {
+        croak "JWT: verify_sub must be Regexp or CODE";
+      }
     }
-    elsif (ref $args{verify_sub} eq 'CODE') {
-      croak "JWT: sub claim check failed" unless $args{verify_sub}->($payload->{sub});
+    elsif ($args{verify_sub}) {
+      croak "JWT: sub claim required but missing"
     }
   }
 
   ### aud
-  if(exists $payload->{aud}) {
-    if (ref $args{verify_aud} eq 'Regexp') {
-      croak "JWT: aud claim re check failed" unless $payload->{aud} =~ $args{verify_aud};
+  if (exists $args{verify_aud}) {
+    if (exists $payload->{aud}) {
+      if (ref $args{verify_aud} eq 'Regexp') {
+        croak "JWT: aud claim re check failed" unless $payload->{aud} =~ $args{verify_aud};
+      }
+      elsif (ref $args{verify_aud} eq 'CODE') {
+        croak "JWT: aud claim check failed" unless $args{verify_aud}->($payload->{aud});
+      }
+      else {
+        croak "JWT: verify_aud must be Regexp or CODE";
+      }
     }
-    elsif (ref $args{verify_aud} eq 'CODE') {
-      croak "JWT: aud claim check failed" unless $args{verify_aud}->($payload->{aud});
+    elsif ($args{verify_aud}) {
+      croak "JWT: aud claim required but missing"
     }
   }
 
   ### jti
-  if(exists $payload->{jti}) {
-    if (ref $args{verify_jti} eq 'Regexp') {
-      croak "JWT: jti claim re check failed" unless $payload->{jti} =~ $args{verify_jti};
+  if (exists $args{verify_jti}) {
+    if (exists $payload->{jti}) {
+      if (ref $args{verify_jti} eq 'Regexp') {
+        croak "JWT: jti claim re check failed" unless $payload->{jti} =~ $args{verify_jti};
+      }
+      elsif (ref $args{verify_jti} eq 'CODE') {
+        croak "JWT: jti claim check failed" unless $args{verify_jti}->($payload->{jti});
+      }
+      else {
+        croak "JWT: verify_jti must be Regexp or CODE";
+      }
     }
-    elsif (ref $args{verify_jti} eq 'CODE') {
-      croak "JWT: jti claim check failed" unless $args{verify_jti}->($payload->{jti});
+    elsif ($args{verify_jti}) {
+      croak "JWT: jti claim required but missing"
     }
   }
 }
@@ -469,7 +501,7 @@ sub _decode_jwe {
     $key = defined $args{keypass} ? [$args{key}, $args{keypass}] : $args{key};
   }
   elsif (exists $args{kid_keys}) {
-    # BEWARE: stricter approach since 0.23
+    # BEWARE: stricter approach since 0.023
     # when 'kid_keys' specified it croaks if header doesn't contain 'kid' value or if 'kid' wasn't found in 'kid_keys'
     my $k = _kid_lookup($header->{kid}, $args{kid_keys}, $header->{alg});
     croak "JWE: kid_keys lookup failed" if !defined $k;
@@ -620,7 +652,7 @@ sub _decode_jws {
         $key = defined $args{keypass} ? [$args{key}, $args{keypass}] : $args{key};
       }
       elsif (exists $args{kid_keys}) {
-        # BEWARE: stricter approach since 0.23
+        # BEWARE: stricter approach since 0.023
         # when 'kid_keys' specified it croaks if header doesn't contain 'kid' value or if 'kid' wasn't found in 'kid_keys'
         my $kid = exists $header->{kid} ? $header->{kid} : $unprotected_header->{kid};
         my $k = _kid_lookup($kid, $args{kid_keys}, $alg);
@@ -628,7 +660,7 @@ sub _decode_jws {
         $key = $k;
       }
       elsif ($args{key_from_jwk_header}) {
-        # BEWARE: stricter approach since 0.23
+        # BEWARE: stricter approach since 0.023
         # - header 'jwk' is by default ignored (unless given: key_from_jwk_header => 1)
         # - only RSA/ECDSA public keys are accepted
         my $k = $header->{jwk};
@@ -815,7 +847,6 @@ Mandatory argument, a string with either JWS or JWE JSON Web Token.
 =item key
 
 A key used for token decryption (JWE) or token signature validation (JWS).
-If not given, and the token header contains a C<jwk> header value, that value will be used.
 The value depends on the C<alg> token header value.
 
  JWS alg header      key value
@@ -862,10 +893,10 @@ The value depends on the C<alg> token header value.
  ECDH-ES+A192KW      private ECC key, see ECDH-ES
  ECDH-ES+A256KW      private ECC key, see ECDH-ES
 
-Example with key from C<jwk> token header:
+Example using the key from C<jwk> token header:
 
- my $data = decode_jwt(token=>$t);
- my ($header, $data) = decode_jwt(token=>$t, decode_header=>1);
+ my $data = decode_jwt(token=>$t, key_from_jwk_header=>1);
+ my ($header, $data) = decode_jwt(token=>$t, decode_header=>1, key_from_jwk_header=>1);
 
 Examples with raw octet keys:
 
@@ -970,7 +1001,14 @@ This parametes can be either a JWK Set JSON string (see RFC7517) or a perl HASH 
   };
   my $payload = decode_jwt(token=>$t, kid_keys=>$keylist);
 
-Since 0.19 we also support:
+The structure described above is used e.g. by L<https://www.googleapis.com/oauth2/v2/certs>
+
+  use Mojo::UserAgent;
+  my $ua = Mojo::UserAgent->new;
+  my $google_keys => $ua->get('https://www.googleapis.com/oauth2/v2/certs')->result->json;
+  my $payload = decode_jwt(token => $t, kid_keys => $google_keys);
+
+B<SINCE 0.019> we also support alternative structure used e.g. by L<https://www.googleapis.com/oauth2/v1/certs>:
 
   use LWP::Simple;
   my $google_certs = get('https://www.googleapis.com/oauth2/v1/certs');
@@ -979,12 +1017,12 @@ Since 0.19 we also support:
 When the token header contains C<kid> item the corresponding key is looked up in C<kid_keys> list and used for token
 decoding (you do not need to pass the explicit key via C<key> parameter).
 
-B<CHANGED in 0.23:> When C<kid_keys> is specified it croaks if token header does not contain C<kid> value or
+B<INCOMPATIBLE CHANGE in 0.023:> When C<kid_keys> is specified it croaks if token header does not contain C<kid> value or
 if C<kid> was not found in C<kid_keys>.
 
 =item key_from_jwk_header
 
-B<ADDED in 0.23>
+B<SINCE 0.023>
 
 C<1> - use C<jwk> header value for validating JWS signature if neither C<key> nor C<kid_keys> specified, B<BEWARE: DANGEROUS, UNSECURE!!!>
 
@@ -1056,6 +1094,9 @@ C<1> - return decoded header as a return value of decode_jwt()
 
 =item verify_iss
 
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+claim C<iss> (Issuer) is completely missing it is a failure since 0.024
+
 C<CODE ref> - subroutine (with 'iss' claim value passed as argument) should return C<true> otherwise verification fails
 
 C<Regexp ref> - 'iss' claim value has to match given regexp otherwise verification fails
@@ -1063,6 +1104,9 @@ C<Regexp ref> - 'iss' claim value has to match given regexp otherwise verificati
 C<undef> (default) - do not verify 'iss' claim
 
 =item verify_aud
+
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+claim C<aud> (Audience) is completely missing it is a failure since 0.024
 
 C<CODE ref> - subroutine (with 'aud' claim value passed as argument) should return C<true> otherwise verification fails
 
@@ -1072,6 +1116,9 @@ C<undef> (default) - do not verify 'aud' claim
 
 =item verify_sub
 
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+claim C<sub> (Subject) is completely missing it is a failure since 0.024
+
 C<CODE ref> - subroutine (with 'sub' claim value passed as argument) should return C<true> otherwise verification fails
 
 C<Regexp ref> - 'sub' claim value has to match given regexp otherwise verification fails
@@ -1079,6 +1126,9 @@ C<Regexp ref> - 'sub' claim value has to match given regexp otherwise verificati
 C<undef> (default) - do not verify 'sub' claim
 
 =item verify_jti
+
+B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
+claim C<jti> (JWT ID) is completely missing it is a failure since 0.024
 
 C<CODE ref> - subroutine (with 'jti' claim value passed as argument) should return C<true> otherwise verification fails
 

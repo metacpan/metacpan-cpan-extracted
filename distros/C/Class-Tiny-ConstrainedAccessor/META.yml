@@ -3,6 +3,7 @@ abstract: 'Generate Class::Tiny accessors that apply type constraints'
 author:
   - 'Christopher White <cxwembedded@gmail.com>'
 build_requires:
+  Exporter: '0'
   Getopt::Long: '2.50'
   Import::Into: '0'
   MooseX::Types: '0'
@@ -14,6 +15,7 @@ build_requires:
   Test::More: '0'
   Type::Tiny: '0'
   lib::relative: '0.002'
+  parent: '0'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
@@ -32,7 +34,7 @@ no_index:
 provides:
   Class::Tiny::ConstrainedAccessor:
     file: lib/Class/Tiny/ConstrainedAccessor.pm
-    version: '0.000004'
+    version: '0.000006'
 requires:
   Class::Tiny: '0'
   perl: '5.006'
@@ -41,7 +43,7 @@ requires:
 resources:
   bugtracker: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues
   repository: https://github.com/cxw42/Class-Tiny-ConstrainedAccessor
-version: '0.000004'
+version: '0.000006'
 x_contributors:
   - 'Christopher White <cxw@cpan.org>'
   - 'Toby Inkster <tobyink@cpan.org>'

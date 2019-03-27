@@ -2,11 +2,12 @@ use strict;
 use warnings;
 
 package OD::Prometheus::Metric;
-$OD::Prometheus::Metric::VERSION = '0.005';
+$OD::Prometheus::Metric::VERSION = '0.006';
 use v5.24;
 use Moose;
 use Data::Printer;
 use Regexp::Common qw(number delimited);
+use Scalar::Util qw(reftype);
 
 =head1 NAME
 
@@ -14,7 +15,7 @@ OD::Prometheus::Metric - Class representing a Prometheus metric
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =cut
 
@@ -25,17 +26,10 @@ has metric_name	=> (
 	required=> 1,
 );
 
-has value	=> (
+has values	=> (
 	is	=> 'ro',
-	isa	=> 'Str',
+	isa	=> 'ArrayRef[ArrayRef]',
 	required=> 1,
-);
-
-has timestamp	=> (
-	is	=> 'ro',
-	isa	=> 'Num',
-	required=> 1,
-	default	=> sub { time },
 );
 
 has labels	=> (
@@ -65,26 +59,83 @@ sub BUILDARGS {
 	else {
 		my %temphash = @_;
 		if( @_ == 4 && exists $temphash{ line }  && exists $temphash{ comments }  ) {
-			return $class->parse( $temphash{ line } , @{ $temphash{ comments } } );	
+			%temphash = $class->parse( $temphash{ line } , @{ $temphash{ comments } } )->%*;
 		}
-		else {
-			return $class->SUPER::BUILDARGS(@_);
+		# case where value is supplied instead of values
+		if( exists $temphash{ value } ) {
+			exists( $temphash{ values } ) && die 'Please do not set value and values at the same time';
+			$temphash{ values } = [ [ $temphash{ timestamp } // time, $temphash{ value } ] ];
+			delete $temphash{ value }
 		}
+		# case where line and comments are supplied to new
+		return \%temphash
 	}
 }
 
+sub value {
+	die 'Please do not call value when object contains multiple values. Use the is_multi method to test and call values if true' if $_[0]->is_multi;
+	$_[0]->first->[1]
+};
+
+sub timestamp {
+	die 'Please do not call timestamp when object contains multiple values. Use the is_multi method to test and, if true, get the timestamps from the values method directly' if $_[0]->is_multi;
+	$_[0]->first->[0];
+}
+
+sub first {
+	$_[0]->values->[0]
+}
+
+sub size {
+	scalar $_[0]->values->@*
+}
+
+sub is_multi {
+	$_[0]->size > 1
+}
+
+sub valuehash {
+	my @a = map { $_->[0] => $_->[1] } $_[0]->values->@* ;
+	return { @a }
+}
+
+sub ordered {
+	[ sort { $a->[0] <=> $b->[0] } $_[0]->values->@* ]
+}
+
+sub latest_elem {
+	$_[0]->ordered->[-1]
+}
+
+sub latest {
+	$_[0]->latest_elem->[1]
+}
+
+sub latest_timestamp {
+	$_[0]->latest_elem->[0]
+}
+
+sub earliest_elem {
+	$_[0]->ordered->[0]
+}
+
+sub earliest {
+	$_[0]->earliest_elem->[1]
+}
+
+sub earliest_timestamp {
+	$_[0]->earliest_elem->[0]
+}
+
 sub to_string {
-	join("\n",
-		(
-		( defined( $_[0]->docstring )? '# HELP '.encode_str( $_[0]->docstring ) : () ),
-		'# TYPE '.$_[0]->type,
-		join(' ',
-			$_[0]->metric_name.( ($_[0]->labels->%*)? '{'.join(',',map { $_.'='.$_[0]->get_label( $_ ) } (sort keys $_[0]->labels->%*)).'}' : '' ),
-			$_[0]->value,
-			$_[0]->timestamp
-		)
-		)
-	)
+	(defined( $_[0]->docstring )? '# HELP '.encode_str( $_[0]->docstring )."\n" : '' ).'# TYPE '.$_[0]->type."\n".
+	join("\n", map { 
+			$_[0]->metric_name.
+			( ($_[0]->labels->%*)? '{'.join(',',map { $_.'='.$_[0]->get_label( $_ ) } (sort keys $_[0]->labels->%*)).'}' : '' ).' '.
+			$_->[1].' '.$_->[0]
+		}
+		sort { $a->[0] <=> $b->[0] } ( $_[0]->values->@* )
+	) 
 }
 
 sub get_label {

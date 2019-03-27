@@ -1461,10 +1461,14 @@ Registered as:
 
 =item L<DTA::CAB::Format::Raw|DTA::CAB::Format::Raw>
 
-Abstract input-only format for reading raw untokenized text,
-wraps L<DTA::CAB::Format::Raw:HTTP|DTA::CAB::Format::Raw:HTTP> by default.
+Abstract only format for reading raw untokenized text and
+writing simple flat list of canonical forms;
+wraps L<DTA::CAB::Format::Raw::Waste|DTA::CAB::Format::Raw::Waste> by default.
+Registered as:
 
-=item L<DTA::CAB::Format::Raw::HTTP|DTA::CAB::Format::Raw:HTTP>
+ name=>__PACKAGE__, filenameRegex=>qr/\.(?i:raw)$/
+
+=item L<DTA::CAB::Format::Raw::HTTP|DTA::CAB::Format::Raw::HTTP>
 
 Input-only format for reading raw untokenized text and analyzing it
 over HTTP using a remote WASTE FastCGI interface, registered as:
@@ -1483,7 +1487,7 @@ using simple pure-perl heuristics. Registered as:
 Input-only format for reading raw untokenized text and analyzing it
 using the L<Moot::Waste|Moot::Waste> module, registered as:
 
- name=>__PACKAGE__, short=>'raw-waste', filenameRegex=>qr/\.(?i:raw-waste|txt-waste)$/);
+ name=>__PACKAGE__, short=>'raw-waste', filenameRegex=>qr/\.(?i:raw-waste|txt-waste)$/
 
 
 =begin comment text

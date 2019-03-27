@@ -1,6 +1,6 @@
 use Test::More;
 
-use Data::Object::Config::Signatures qw(:strict);
+use Data::Object::Signatures qw(:strict);
 use Data::Object::Export qw(deduce);
 
 fun greeting (StrObj $name) {

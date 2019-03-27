@@ -1,30 +1,22 @@
-_______________________________________________________________________________
-2012-03-30 HTML-Form 6.03
+Change history for HTML-Form
 
-Support the new HTML5 input types without warning
+6.04      2019-03-25 18:22:51Z
+    - Convert to Dist::Zilla
+    - Add an autocomplete method (GH #13) (Olaf Alders)
 
+6.03      2012-03-30
+    - Support the new HTML5 input types without warning
 
+6.02      2012-02-20 HTML-Form
+    - Fix test failure when HTTP-Message 6.03 (or better) was installed [RT#75155]
 
-_______________________________________________________________________________
-2012-02-20 HTML-Form 6.02
+6.01      2012-02-18
+    - Don't pick up label text from textarea [RT#72925]
+    - Restore perl-5.8.1 compatibility.
 
-Fix test failure when HTTP-Message 6.03 (or better) was installed [RT#75155]
-
-
-
-_______________________________________________________________________________
-2012-02-18 HTML-Form 6.01
-
-Don't pick up label text from textarea [RT#72925]
-
-Restore perl-5.8.1 compatibility.
-
-
-
-_______________________________________________________________________________
-2011-02-27 HTML-Form 6.00
-
-Initial release of HTML-Form as a separate distribution. There are no code
-changes besides incrementing the version number since libwww-perl-5.837.
-
-The HTML::Form module used to be bundled with the libwww-perl distribution.
+6.00      2011-02-27
+    - Initial release of HTML-Form as a separate distribution. There are no
+      code changes besides incrementing the version number since
+      libwww-perl-5.837.
+    - The HTML::Form module used to be bundled with the libwww-perl
+      distribution.

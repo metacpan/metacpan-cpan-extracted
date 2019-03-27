@@ -1,5 +1,11 @@
 Revision history for Mojolicious-Plugin-Gzip
 
+0.03  2019-03-25 22:07:04 CDT
+        - Inherit from Mojolicious::Plugin instead of Mojolicious::Plugin::Config.
+        - Remove call to fix_headers.
+        - Fixed flakey tests by comparing the gunzipped text with the original text instead of comparing the gzipped text.
+        - Adding warning about how module is inefficient with large files.
+
 0.02  2019-03-24 22:33:20 CDT
         - Require Mojolicious 8.02.
         - Add Test::Exception to required dependencies.

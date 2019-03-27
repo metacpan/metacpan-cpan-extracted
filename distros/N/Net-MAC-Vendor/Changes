@@ -1,5 +1,12 @@
 Revision history for Perl module Net::MAC::Vendor
 
+1.263     2019-03-26 22:26:49Z
+	* Compress::Bzip2 and Compress::Zlib are now optional prerequisites if
+	PUREPERL_ONLY=1 is specified as a Makefile.PL argument (or e.g. via `cpanm --pureperl`,
+	or PERL_MM_OPT=PUREPERL_ONLY=1 in the environment).
+	* fix warning from use of deprecated Mojo interface
+	* convert packaging to Dist::Zilla, now released by ether
+
 1.262 2017-08-10T06:45:18Z
 	* Fix docs for load_cache (GitHub #23, Matt W.). Mojo::UserAgent
 	doesn't handle file://
@@ -36,7 +43,7 @@ Revision history for Perl module Net::MAC::Vendor
 1.24_02 2015-08-08T07:51:40Z
 	* Update for new IEEE URLs. Again.
 
-1.24_01 - Sun Jan 11 07:03:57 2015
+1.24_01   2015-01-11 07:03:57Z
 	* Fix RT #101011: Line endings are now CRLF
 
 1.23 - 2014-11-13

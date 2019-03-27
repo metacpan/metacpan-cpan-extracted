@@ -1,6 +1,6 @@
 package Data::Object::Func::Regexp::Replace;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 use Data::Object::Replace;
 

@@ -103,7 +103,7 @@ sub html_handler_presets {
           }
         }
       );
-      
+
       return [
         $dom->{action} || '',
         uc($dom->{method} || 'GET'),
@@ -138,7 +138,7 @@ sub reduce_html_handlers {
       $ret->{($cont ? $cont . ' ' : '') . $sel} = sub {
         return if ($_[0]->xml && _wrong_dom_detection($_[0]));
         return $cb->($_[0]);
-        }
+      }
     }
   }
   return $ret;

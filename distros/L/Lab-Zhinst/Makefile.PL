@@ -39,8 +39,6 @@ else {
     die "Unknown os $os";
 }
 
-my $ccflags = 
-
 WriteMakefile(
     ABSTRACT_FROM => 'lib/Lab/Zhinst.pm',
     AUTHOR => "Simon Reinhardt <simon.reinhardt\@stud.uni-regensburg.de>",
@@ -65,7 +63,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/Lab/Zhinst.pm',
     LIBS => [$libs],
     INC => $inc,
-    CCFLAGS => '-Wall -Wno-deprecated-declarations',
+    CCFLAGS => "$Config{ccflags} -Wall -Wno-deprecated-declarations",
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {

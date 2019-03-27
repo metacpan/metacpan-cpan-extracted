@@ -1,6 +1,6 @@
 package Data::Object::Func::Array::Shift;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 extends 'Data::Object::Func::Array';
 

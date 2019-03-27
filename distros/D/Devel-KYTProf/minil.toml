@@ -1,0 +1,5 @@
+name = "Devel-KYTProf"
+authority = "cpan:ONISHI"
+badges = ["travis", "coveralls"]
+
+markdown_maker = "Pod::Markdown::Github"

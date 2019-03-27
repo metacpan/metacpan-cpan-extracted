@@ -28,7 +28,7 @@ Data-Object Class Declaration
 
   package Person;
 
-  use Data::Object Class;
+  use Data::Object 'Class';
 
   extends 'Identity';
 

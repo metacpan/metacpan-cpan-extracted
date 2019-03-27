@@ -29,10 +29,17 @@ BEGIN {
   DTA::CAB::Format->registerFormat(name=>__PACKAGE__, short=>$_)
       foreach (qw(tei-ws tei+ws tei+w tei-w teiw wst-xml wstxml teiws-xml));
 
+  DTA::CAB::Format->registerFormat(name=>__PACKAGE__, short=>$_, opts=>{'teinames'=>1})
+      foreach (qw(teiws-names teiws+names));
+
+  my @lingnames = (qw(teiws-ling teiws-ling-xml),
+		   qw(tei-ling-ws tei+ling+ws lteiws teilws teiwsl ltei-ws ltei+ws ltei+w ltei-w lteiw lwst-xml lwstxml lteiws-xml),
+		   qw(tei-ws-ling tei+ws+ling teiws-ling-xml ling-tei-ws));
   DTA::CAB::Format->registerFormat(name=>__PACKAGE__, short=>$_, opts=>{'att.linguistic'=>1})
-      foreach (qw(teiws-ling teiws-ling-xml),
-	       qw(tei-ling-ws tei+ling+ws lteiws teilws teiwsl ltei-ws ltei+ws ltei+w ltei-w lteiw lwst-xml lwstxml lteiws-xml),
-	       qw(tei-ws-ling tei+ws+ling teiws-ling-xml ling-tei-ws));
+      foreach (@lingnames);
+
+  DTA::CAB::Format->registerFormat(name=>__PACKAGE__, short=>$_, opts=>{'att.linguistic'=>1, teinames=>1})
+      foreach (map {("${_}+names","${_}-names")} @lingnames);
 }
 
 BEGIN {

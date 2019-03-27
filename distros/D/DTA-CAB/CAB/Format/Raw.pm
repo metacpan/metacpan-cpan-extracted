@@ -50,7 +50,7 @@ sub new {
 
 ##==============================================================================
 ## Methods: Output
-##  + output not supported
+## (output not supported)
 ##==============================================================================
 
 ##--------------------------------------------------------------
@@ -79,7 +79,7 @@ __END__
 
 =head1 NAME
 
-DTA::CAB::Format::Raw - Document parser: raw untokenized text (dispatch)
+DTA::CAB::Format::Raw - Document parser/formatter: raw untokenized text (dispatch)
 
 =cut
 
@@ -108,9 +108,15 @@ DTA::CAB::Format::Raw - Document parser: raw untokenized text (dispatch)
 
 DTA::CAB::Format::Raw
 is an input-only L<DTA::CAB::Format|DTA::CAB::Format> subclass
-for untokenized raw string intput.
+for untokenized raw string input.
 This class really justs acts as a wrapper for the actual
 default tokenizing class, C<$DTA::CAB::Format::Raw::DEFAULT_SUBCLASS>.
+
+As an output format,
+DTA::CAB::Format::Raw writes canonical surface forms to the output stream
+using L<DTA::CAB::Format::Raw::Base>.
+Each output sentence is terminated by a single newline (C<"\n">), and output
+tokens are separated by a single space character.
 
 
 =cut

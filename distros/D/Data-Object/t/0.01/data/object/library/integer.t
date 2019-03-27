@@ -5,7 +5,7 @@ use Test::More;
 use Test::TypeTiny;
 
 use Data::Object::Export qw(deduce);
-use Data::Object::Config::Library qw(
+use Data::Object::Library qw(
   IntObj
   IntObject
   IntegerObj

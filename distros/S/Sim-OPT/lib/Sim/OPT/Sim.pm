@@ -169,9 +169,9 @@ sub sim    # This function launch the simulations in ESP-r
     my $countstep = $dt{countstep}; #say $tee "IN SIM \$countstep : " . dump( $countstep );
     my $c = $dt{c}; #say $tee "IN SIM1 \$c : " . dump( $c );
 
-		my %to = %{ $dt{to} }; say $tee " IN SIM \%to " . dump( \%to );
+		my %to = %{ $dt{to} }; #say $tee " IN SIM \%to " . dump( \%to );
 		my %inst = %{ $dt{inst} };
-    my $instn = $dt{instn}; say $tee " IN SIM \$instn " . dump( $instn );
+    my $instn = $dt{instn}; #say $tee " IN SIM \$instn " . dump( $instn );
 
 		my $from = $dt{from}; #say $tee " IN SIM \$from $from ";
 		my $toitem = $dt{toitem}; #say $tee " IN SIM \$toitem $toitem ";
@@ -195,7 +195,7 @@ sub sim    # This function launch the simulations in ESP-r
     my $countdir = 0;
 
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } );
-    my $simelt = $to{crypto}; #say $tee "IN SIM \$simelt $simelt";
+    my $simelt = $to{crypto}; say $tee "IN SIM \$simelt $simelt";
 
 
     if ( $dowhat{simulate} eq "y")
@@ -223,8 +223,11 @@ sub sim    # This function launch the simulations in ESP-r
               my $before = $simtitle_ref->[3];
               my $step = $simtitle_ref->[4];
 
-              $resfile = "$simelt-$date_to_sim-$tooltype.res"; #say $tee "IN SIM \$resfile $resfile";
-              $flfile = "$simelt-$date_to_sim-$tooltype.fl"; #say $tee "IN SIM \$flfile $flfile";
+              if ( ( $simelt ne "") and ( $date_to_sim ne "" ) )
+              {
+                $resfile = "$simelt-$date_to_sim-$tooltype.res"; say $tee "IN SIM \$resfile $resfile";
+                $flfile = "$simelt-$date_to_sim-$tooltype.fl"; #say $tee "IN SIM \$flfile $flfile";
+              }
 
               #if ( fileno (SIMLIST) )
               #if (not (-e $simlist ) )

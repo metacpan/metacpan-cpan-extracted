@@ -2,21 +2,30 @@ use Test::More 0.98;
 
 my $class = 'Net::MAC::Vendor';
 
-use_ok( $class );
-ok( defined &{"${class}::run"}, "run() method is defined" );
-can_ok( $class, qw(run) );
+subtest setup => sub{
+	use_ok( $class );
+	ok( defined &{"${class}::run"}, "run() method is defined" );
+	can_ok( $class, qw(run) );
+	};
 
-{
-local *STDOUT;
+subtest run => sub {
+	SKIP: {
+		my $ssl_version =  Net::SSLeay::SSLeay();
+		my $ssl_version_string = Net::SSLeay::SSLeay_version();
+		my $minimum_ssl = 0x10_00_00_00;
 
-open STDOUT, ">", \ my $output;
+		skip "You need OpenSSL 1.x to fetch from IEEE", 2, if $ssl_version < $minimum_ssl;
 
-my $rc = $class->run( '00:0d:93:84:49:ee' );
+		local *STDOUT;
+		open STDOUT, ">", \ my $output;
 
-SKIP: {
-	skip 'Problem looking up data', 1 unless defined $rc;
-	like( $output, qr/Apple/, 'OUI belongs to Apple');
-	}
-}
+		my $rc = $class->run( '00:0d:93:84:49:ee' );
+		SKIP: {
+		skip 'Problem looking up data', 1 unless defined $rc;
+			ok $rc, 'run returns a true value';
+			like( $output, qr/Apple/, 'OUI belongs to Apple');
+			}
+		}
+	};
 
 done_testing();

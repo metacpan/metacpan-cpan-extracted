@@ -36,6 +36,7 @@ use DTA::CAB::Format::SQLite;
 use DTA::CAB::Format::SynCoPe::CSV;
 use DTA::CAB::Format::TCF;
 #use DTA::CAB::Format::XmlVz;
+use DTA::CAB::Format::CorpusExplorerPlugin;
 
 #use DTA::CAB::Format::TEI;   ##-- debug
 eval "use DTA::CAB::Format::TEI";   ##-- only available if DTA::TokWrap is installed

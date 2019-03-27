@@ -4,6 +4,11 @@ TODO: better exit conditions in Async, see Art Sackett mail
 TODO: allow overtaking existing $fh
 TODO: compatible $0 method, somehow
 
+1.24  Tue Mar 26 05:18:55 CET 2019
+	- check if connection has succeeded, rather than crashing
+          (based on patch by Johan Finnved).
+        - add t/03_connfail.t testcase by Johan Finnved.
+
 1.23  Thu Nov 10 17:31:14 CET 2016
         - async backend had an optimization for EV that failed to
           actually trigger when EV was used (analyzed by sten).

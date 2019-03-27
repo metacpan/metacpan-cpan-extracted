@@ -38,7 +38,7 @@ use warnings::unused;
 
 our @EXPORT = qw( retrieve report newretrieve newreport get_files );
 
-$VERSION = '0.069'; # our $VERSION = '';
+$VERSION = '0.071'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Report is the module used by Sim::OPT to retrieve simulation results.';
 
 #########################################################################################
@@ -155,10 +155,10 @@ sub newretrieve
   my $countvar = $d{countvar}; #say $tee "IN RETRIEVE(\$countvar): " . dump($countvar );
   my $countstep = $d{countstep}; #say $tee "IN RETRIEVE(\$countstep): " . dump($countstep);
 
-  my %to = %{ $d{to} }; say $tee  "IN RETRIEVE( \%to) " . dump( %to );
-  my $thisto = $to{to}; say $tee  "IN RETRIEVE( \$thisto) " . dump( $thisto );
+  my %to = %{ $d{to} }; #say $tee  "IN RETRIEVE( \%to) " . dump( %to );
+  my $thisto = $to{to}; #say $tee  "IN RETRIEVE( \$thisto) " . dump( $thisto );
   my %inst = %{ $d{inst} };
-  my $cleanto = $inst{$thisto}; say $tee  "IN RETRIEVE( \$cleanto) " . dump( $cleanto );
+  my $cleanto = $inst{$thisto}; #say $tee  "IN RETRIEVE( \$cleanto) " . dump( $cleanto );
 
 
   my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
@@ -172,7 +172,7 @@ sub newretrieve
 
   my ( @repdata, @retrdata );
 
-  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
+  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); #say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
 
   my $counttool = 1;
   while ( $counttool <= $numberof_simtools )
@@ -591,14 +591,16 @@ $printthis
           my $retfile = $datarep{retfile}; #say $tee "IN NEWRETRIEVE \$retfile $retfile";
           my $reporttitle = $datarep{reporttitle}; #say $tee "IN NEWRETRIEVE \$reporttitle $reporttitle";
           my $themereport = $datarep{themereport}; #say $tee "IN NEWRETRIEVE \$themereport $themereport";
+          my $semaphorego = $datarep{semaphorego}; #say $tee "IN NEWRETRIEVE \$semaphorego1 $semaphorego1";
           my $semaphorego1 = $datarep{semaphorego1}; #say $tee "IN NEWRETRIEVE \$semaphorego1 $semaphorego1";
           my $semaphorego2 = $datarep{semaphorego2}; #say $tee "IN NEWRETRIEVE \$semaphorego2 $semaphorego2";
+          my $semaphorestop = $datarep{semaphorestop}; #say $tee "IN NEWRETRIEVE \$semaphorestop1 $semaphorestop1";
           my $semaphorestop1 = $datarep{semaphorestop1}; #say $tee "IN NEWRETRIEVE \$semaphorestop1 $semaphorestop1";
           my $semaphorestop2 = $datarep{semaphorestop2}; #say $tee "IN NEWRETRIEVE \$semaphorestop2 $semaphorestop2";
           my $textpattern = $datarep{textpattern}; #say $tee "IN NEWRETRIEVE \$textpattern $textpattern";
           my $afterlines = $datarep{afterlines}; #say $tee "IN NEWRETRIEVE \$afterlines $afterlines";
-
-
+          my $column = $datarep{column}; #say $tee "IN NEWRETRIEVE \$column $column";
+          my $reportstrategy = $datarep{reportstrategy}; #say $tee "IN NEWRETRIEVE \$column $column";
 
 
 
@@ -667,14 +669,18 @@ $printthis
                   my %datarep = %$item;  #say $tee "IN FOREACH 3 \%datarep : ". dump( %datarep);
                   my $reporttitle = $datarep{reporttitle};
                   my $themereport = $datarep{themereport};
+                  my $semaphorego = $datarep{semaphorego};
                   my $semaphorego1 = $datarep{semaphorego1};
                   my $semaphorego2 = $datarep{semaphorego2};
+                  my $semaphorestop = $datarep{semaphorestop};
                   my $semaphorestop1 = $datarep{semaphorestop1};
                   my $semaphorestop2 = $datarep{semaphorestop2};
                   my $textpattern = $datarep{textpattern};
                   my $afterlines = $datarep{afterlines};
+                  my $reportstrategy = $datarep{reportstrategy};
                   #my $adhoclines = $datarep{adhoclines}; say $tee "\$adhoclines " . dump($adhoclines);
                   my $retfile = "$resfile-$reporttitle-$themereport.grt";
+                  my $column = $datarep{column}; #say $tee "IN NEWRETRIEVE \$column $column";
 
                   #say $tee "IN NEWRETRIEVE \@repdata : ". dump( @repdata );
                   #say $tee "IN NEWRETRIEVE \$retfile $retfile";
@@ -722,12 +728,16 @@ $printthis
                         retfile => $retfile,
                         reporttitle => $reporttitle,
                         themereport => $themereport,
+                        semaphorego => $semaphorego,
                         semaphorego1 => $semaphorego1,
                         semaphorego2 => $semaphorego2,
+                        semaphorestop => $semaphorestop,
                         semaphorestop1 => $semaphorestop1,
                         semaphorestop2 => $semaphorestop2,
                         textpattern => $textpattern,
                         afterlines => $afterlines,
+                        column => $column,
+                        reportstrategy => $reportstrategy,
                         #adhoclines => $adhoclines,
                       } );
                   }
@@ -832,12 +842,16 @@ $printthis
                   my %datarep = %$item;
                   my $reporttitle = $datarep{reporttitle}; #say $tee "IN NEWRETRIEVE \$reporttitle $reporttitle";
                   my $themereport = $datarep{themereport}; #say $tee "IN NEWRETRIEVE \$themereport $themereport";
+                  my $semaphorego = $datarep{semaphorego}; #say $tee "IN NEWRETRIEVE \$semaphorego1 $semaphorego1";
                   my $semaphorego1 = $datarep{semaphorego1}; #say $tee "IN NEWRETRIEVE \$semaphorego1 $semaphorego1";
                   my $semaphorego2 = $datarep{semaphorego2}; #say $tee "IN NEWRETRIEVE \$semaphorego2 $semaphorego2";
+                  my $semaphorestop = $datarep{semaphorestop}; #say $tee "IN NEWRETRIEVE \$semaphorestop1 $semaphorestop1";
                   my $semaphorestop1 = $datarep{semaphorestop1}; #say $tee "IN NEWRETRIEVE \$semaphorestop1 $semaphorestop1";
                   my $semaphorestop2 = $datarep{semaphorestop2}; #say $tee "IN NEWRETRIEVE \$semaphorestop2 $semaphorestop2";
                   my $textpattern = $datarep{textpattern}; #say $tee "IN NEWRETRIEVE \$textpattern $textpattern";
                   my $afterlines = $datarep{afterlines}; #say $tee "IN NEWRETRIEVE \$afterlines $afterlines";
+                  my $column = $datarep{column}; #say $tee "IN NEWRETRIEVE \$afterlines $afterlines";
+                  my $reportstrategy = $datarep{reportstrategy};
 
                   print RETBLOCK "$retfile\n";
 
@@ -845,15 +859,17 @@ $printthis
                                     {
                                       retfile => $retfile,
                                       reporttitle => $reporttitle,
-
-
-                                    themereport => $themereport,
+                                      themereport => $themereport,
+                                      semaphorego => $semaphorego,
                                       semaphorego1 => $semaphorego1,
                                       semaphorego2 => $semaphorego2,
+                                      semaphorestop => $semaphorestop,
                                       semaphorestop1 => $semaphorestop1,
                                       semaphorestop2 => $semaphorestop2,
                                       textpattern => $textpattern,
-                                      afterlines => $afterlines
+                                      afterlines => $afterlines,
+                                      column => $column,
+                                      reportstrategy => $reportstrategy,
                                     } );
 
                   $countitem++;
@@ -954,7 +970,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   my @descendcases = @{ $dirfiles{descendcases} };
   my @descendstruct = @{ $dirfiles{descendstruct} };
   my @notecases = @{ $dirfiles{notecases} };
-  my $repfile = $dirfiles{repfile}; say $tee "IN REPORT REPFILE: $repfile";
+  my $repfile = $dirfiles{repfile}; #say $tee "IN REPORT REPFILE: $repfile";
 
   my $morphlist = $dirfiles{morphlist};
   my $morphblock = $dirfiles{morphblock};
@@ -988,10 +1004,10 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $countvar = $d{countvar}; #say $tee "IN REPORT \$countvar " . dump( $countvar );
   my $countstep = $d{countstep}; #say $tee "IN REPORT \$countstep " . dump( $countstep );
 
-  my %to = %{ $d{to} }; say $tee  "IN REPORT( \%to) " . dump( %to );
-  my $thisto = $to{to}; say $tee  "IN REPORT( \$thisto) " . dump( $thisto );
+  my %to = %{ $d{to} }; #say $tee  "IN REPORT( \%to) " . dump( %to );
+  my $thisto = $to{to}; #say $tee  "IN REPORT( \$thisto) " . dump( $thisto );
   my %inst = %{ $d{inst} };
-  my $cleanto = $inst{$thisto}; say $tee  "IN REPORT( \$cleanto) " . dump( $cleanto );
+  my $cleanto = $inst{$thisto}; #say $tee  "IN REPORT( \$cleanto) " . dump( $cleanto );
 
   my $from = $d{from}; #say $tee " IN MORPH \$from $from ";
   my $toitem = $d{toitem}; #say $tee " IN MORPH \$toitem $toitem ";
@@ -1022,10 +1038,11 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   say $tee "#Processing reports for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1);
 
+
   open( REPLIST, ">>$replist" ) or die( "$!" );
   open( REPBLOCK, ">>$repblock" ) or die( "$!" );
 
-  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; say $tee "IN NEWREPORT \$repfile $repfile";
+  open( REPFILE, ">>$repfile") or die "Can't open $repfile $!"; #say $tee "IN NEWREPORT \$repfile $repfile";
   @repcases = uniq( @repcases );
 
   say REPBLOCK "$repfile";
@@ -1062,12 +1079,16 @@ sub newreport # This function retrieves the results of interest from the texts f
           my $retfile = $retitem{retfile};
           my $reporttitle = $retitem{reporttitle};
           my $themereport = $retitem{themereport};
+          my $semaphorego = $retitem{semaphorego};
           my $semaphorego1 = $retitem{semaphorego1};
           my $semaphorego2 = $retitem{semaphorego2};
+          my $semaphorestop = $retitem{semaphorestop};
           my $semaphorestop1 = $retitem{semaphorestop1};
           my $semaphorestop2 = $retitem{semaphorestop2};
           my $textpattern = $retitem{textpattern};
           my $afterlines = $retitem{afterlines};
+          my $column = $retitem{column}; #say $tee "HERE \$column $column";
+          my $reportstrategy = $retitem{reportstrategy};
           #my $adhoclines = $retitem{adhoclines};
 
           if ( $signalnewinstance == 1 )
@@ -1076,11 +1097,11 @@ sub newreport # This function retrieves the results of interest from the texts f
             $signalnewinstance--;
           }
 
-          my ( $semaphore1, $semaphore2 );     											$line =~ s/^\s+// ;
-
+          my ( $semaphore1, $semaphore2 );
 
           if ( -e $retfile ) #if ( not ( eval ( $skipreport ) ) )
-          {  say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
+          { say $tee "#Inspecting results for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", instance " . ($countinstance + 1) . ", file $retfile, to report $themereport." ;
+
             open( RETFILE, "$retfile" ) or die( "$!" );
             my @lines = <RETFILE>;
             close RETFILE;
@@ -1094,12 +1115,25 @@ sub newreport # This function retrieves the results of interest from the texts f
             #my $thiscrypto = $to{crypto};
             foreach my $line ( @lines )
             {
-
-              $line =~ s/^\s+//;
+              $line =~ s/^\s//;
+              $line =~ s/^\s//;
+              $line =~ s/^\s//;
+              $line =~ s/://;
+              #$line =~ s/(\s+)/\s/;
+              $line =~ s/(\s+)/,/;
+              my @elts = split( ",", $line );
+              my $elt = $elts[$column];
               #$line =~ s/$thiscrypto/$thisto/ ;
+              #say $tee "LINE: $line";
+              #say $tee "ELT: $elt";
 
               #chomp( $line );
               #$line = $line . " ";
+
+              if ( ( not ( defined( $semaphorego ) ) ) or ( $semaphorego eq "" ) or ( $line =~ m/$semaphorego/ ) )
+              {
+                $semaphore = "on";
+              }
 
 
               if ( ( not ( defined( $semaphorego1 ) ) ) or ( $semaphorego1 eq "" ) or ( $line =~ m/$semaphorego1/ ) )
@@ -1113,6 +1147,11 @@ sub newreport # This function retrieves the results of interest from the texts f
                 {
                   $semaphore2 = "on";
                 }
+              }
+
+              if ( ( $line =~ m/$semaphorestop/ ) and ( defined( $semaphorestop ) ) and ( $semaphorestop ne "" ) )
+              {
+                $semaphore = "off";
               }
 
               if ( ( $line =~ m/$semaphorestop1/ ) and ( defined( $semaphorestop1 ) ) and ( $semaphorestop1 ne "" ) )
@@ -1132,24 +1171,36 @@ sub newreport # This function retrieves the results of interest from the texts f
 
               if ( ( not ( defined ( $afterlines ) ) ) or ( $afterlines eq "" ) )
               {
-
                 if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   #chomp( $line )
                   if ( $foundhit == 0 )
                   {
-                    push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$this$themereport,$line" );
+                    unless ( $reportstrategy eq "new" )
+                    {
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$line" );
+                    }
+                    else
+                    { #say $tee "NEWSTRATEGY";
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$elt" );
+                    }
                   }
                   else
                   {
-                    push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                    unless ( $reportstrategy eq "new" )
+                    {
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                    }
+                    else
+                    { #say $tee "NEWSTRATEGY";
+                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $elt );
+                    }
                   }
                   $foundhit++;
                 }
               }
               else
               {
-
                 if ( ( $textpattern ne "" ) and ( $line =~ m/^$textpattern/ ) and ( $semaphore1 eq "on" ) and ( $semaphore2 eq "on" ) )
                 {
                   $signalhit++;
@@ -1160,10 +1211,17 @@ sub newreport # This function retrieves the results of interest from the texts f
 
                   if ( not ( ref( $afterlines ) ) )
                   {
-                    if ( ( $afterlines ne "" ) and ( $countline == ( $afterlines - 1) ) )
+                    if ( ( $afterlines ne "" ) and ( $countline == ( $afterlines - 1 ) ) )
                     {
                       #chomp( $line );
-                      push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
+                      unless ( $reportstrategy eq "new" )
+                      {
+                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$line" );
+                      }
+                      else
+                      { #say $tee "NEWSTRATEGY";
+                        push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$elt" );
+                      }
                       $countli++;
                     }
                   }
@@ -1195,17 +1253,30 @@ sub newreport # This function retrieves the results of interest from the texts f
                       my $countlocal = 0;
                       foreach my $afterl ( @bringer )
                       {
-
                         if ( $countline == ( $afterl - 1 ) )
                         {
                           #chomp( $line );
                           if ( $countlocal == 0 )
                           {
-                            push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$line" );
+                            unless ( $reportstrategy eq "new" )
+                            {
+                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$line" );
+                            }
+                            else
+                            {
+                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, "$themereport,$reporttitle,$elt" );
+                            }
                           }
                           else
                           {
-                            push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                            unless ( $reportstrategy eq "new" )
+                            {
+                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $line );
+                            }
+                            else
+                            {
+                              push ( @{ $mergestruct[$countcase][$countblock][ $countinstance ] }, $elt );
+                            }
                           }
                         }
                         $counlin++;

@@ -1,3 +1,8 @@
+0.005   2019-03-26 (PERLANCAR)
+
+	- [build] Remove usage of DZP-Rinci-Validate to resolve RT#128914.
+
+
 0.004   2019-02-13 (PERLANCAR)
 
 	- [ux] Show tags.

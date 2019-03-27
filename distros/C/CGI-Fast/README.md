@@ -38,6 +38,10 @@ Scripts that perform time-consuming initialization processes, such as
 loading large modules or opening persistent database connections, will
 see large performance improvements.
 
+Note that as CGI::Fast is based on CGI.pm it is no longer advised as
+a way to write Perl web apps. See [https://metacpan.org/pod/CGI#CGI.pm-HAS-BEEN-REMOVED-FROM-THE-PERL-CORE](https://metacpan.org/pod/CGI#CGI.pm-HAS-BEEN-REMOVED-FROM-THE-PERL-CORE)
+for more information about this
+
 # OTHER PIECES OF THE PUZZLE
 
 In order to use CGI::Fast you'll need the FCGI module.  See

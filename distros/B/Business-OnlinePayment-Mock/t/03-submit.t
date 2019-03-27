@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Test::Deep;
 use Module::Runtime qw( use_module );
 
@@ -60,4 +60,30 @@ subtest 'submit returns expected result when mock_response is defined' => sub {
     };
 
     cmp_deeply($result, $expected) or diag explain $result;
-}
+};
+
+subtest 'submit returns expected result for PreAuth' => sub {
+    my $mock_client = new_ok( use_module('Business::OnlinePayment'), ['Mock'] );
+
+    $mock_client->set_mock_response({
+        action        => 'PreAuth',
+        card_number   => '4111111111111111',
+        error_message => 'Approved',
+        is_success    => 1,
+        error_code    => 0,
+        order_number  => sub { time },
+    });
+
+    $mock_client->content(action => 'PreAuth', card_number => '4111111111111111');
+
+    my $result = $mock_client->submit;
+
+    my $expected = {
+        error_message => 'Approved',
+        is_success    => 1,
+        error_code    => 0,
+        order_number  => ignore(),
+    };
+
+    cmp_deeply($result, $expected) or diag explain $result;
+};

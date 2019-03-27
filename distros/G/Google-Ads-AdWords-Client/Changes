@@ -1,3 +1,8 @@
+5.8.0
+- Removed examples and support for v201806.
+For future sunset dates, see
+https://developers.google.com/adwords/api/docs/sunset-dates
+
 5.7.0
 - Removed examples and support for v201802.
 For future sunset dates, see

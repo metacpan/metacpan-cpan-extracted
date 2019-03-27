@@ -54,6 +54,7 @@
             "Specio" : "0"
          },
          "requires" : {
+            "Exporter" : "0",
             "Import::Into" : "0",
             "MooseX::Types" : "0",
             "MooseX::Types::Moose" : "0",
@@ -62,14 +63,15 @@
             "Test::Fatal" : "0",
             "Test::More" : "0",
             "Type::Tiny" : "0",
-            "lib::relative" : "0.002"
+            "lib::relative" : "0.002",
+            "parent" : "0"
          }
       }
    },
    "provides" : {
       "Class::Tiny::ConstrainedAccessor" : {
          "file" : "lib/Class/Tiny/ConstrainedAccessor.pm",
-         "version" : "0.000004"
+         "version" : "0.000006"
       }
    },
    "release_status" : "stable",
@@ -82,7 +84,7 @@
          "web" : "https://github.com/cxw42/Class-Tiny-ConstrainedAccessor"
       }
    },
-   "version" : "0.000004",
+   "version" : "0.000006",
    "x_contributors" : [
       "Christopher White <cxw@cpan.org>",
       "Toby Inkster <tobyink@cpan.org>"

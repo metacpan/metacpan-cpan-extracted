@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '0.92'; # VERSION
+our $VERSION = '0.93'; # VERSION
 
 # BUILD
 # METHODS
@@ -29,11 +29,18 @@ Modern Perl Development Framework and Standard Library
 
 =head1 SYNOPSIS
 
-  use Data::Object;
+  package Person;
 
-  fun hello_world($name) {
-    say "Hello, $name.";
-  }
+  use Data::Object 'Class';
+
+  extends 'Identity';
+
+  has fullname => (
+    is => 'ro',
+    isa => 'Str'
+  );
+
+  1;
 
 =cut
 
@@ -88,13 +95,34 @@ completely isolated perl installations.
 
 =cut
 
-=head1 GETTING STARTED
+=head1 OVERVIEW
+
+  use Data::Object;
+
+This is what's enabled whenever you import the L<Data::Object> framework.
+
+  # basics
+  # use strict;
+  # use warnings;
+
+  # say, state, switch, unicode_strings, array_base
+  # use feature ':5.14';
+
+  # types and signatures
+  # use Data::Object::Library;
+  # use Data::Object::Signatures;
+
+  # super "do" function, tools and functions
+  # use Data::Object::Export;
+
+  # overload core "do" function
+  # use subs 'do';
 
 This creates a class representing a person which greets another person.
 
   package Person;
 
-  use Data::Object Class, App;
+  use Data::Object 'Class', 'App';
 
   has name => (
     is => 'ro',
@@ -113,7 +141,7 @@ This creates a function that returns how one person greet another person.
 
   use Person;
 
-  use Data::Object Core, App;
+  use Data::Object 'Core', 'App';
 
   fun greetings(Person $p1, Person $p2) {
     return $p1->hello($p2);
@@ -159,7 +187,175 @@ cooperative and cohesive way that feels like it's native to the language.
 
 =cut
 
-=head1 PACKAGE CLASS
+=head1 OVERVIEW: CONFIGURATION
+
+  package Authenticatable;
+
+  use Data::Object 'Rule';
+
+  package Authentication;
+
+  use Data::Object 'Role';
+
+  package User;
+
+  use Data::Object 'Class';
+
+  with 'Authentication';
+  with 'Authenticatable';
+
+It's an important and intentional design decision to make this framework highly
+configurable. It's really Perlish that way. Using the L<do> and L<Data::Object>
+modules is the entry point into this framework and is where the configuration
+of the various features begins. The import process has been designed to be
+idempotent, and declaring the use of the same module multiple times with
+different parameters is encouraged.
+
+=cut
+
+=head1 OVERVIEW: CONSTRUCTORS
+
+  use Data::Object;
+
+  my $file = do('path', 'dump.json');
+  my $json = do('json' $file->slurp);
+
+  say(do('dump', $json));
+
+The constructor functions offered through L<Data::Object::Export>, when called,
+return instances of the classes they're associated with. They are merely a
+convenience and provide a way to quickly load a class and construct an object
+at runtime. These functions can be proxied to by the special (albeit slightly
+evil) C<do> function, which overloads the core “do” function. This
+super-function is made available to every namespace where the Data-Object
+framework is configured.
+
+=cut
+
+=head1 OVERVIEW: DATA OBJECTS
+
+  use Data::Object;
+  use Data::Object::Code;
+
+  # returns a code object
+  my $code = Data::Object::Code->new(fun{ join ' ', @_ });
+
+  # returns truthy
+  $code->isa('Data::Object::Code');
+
+  # returns a string object representing 'Hello World'
+  my $string = $code->call('Hello', 'World');
+
+  # returns a new string object
+  $string = $string->split('')->reverse->join('')->uppercase;
+
+  # returns a number object (returns truthy) and outputs "DLROW OLLEH"
+  my $result = $string->say;
+
+  # returns truthy
+  $result->isa('Data::Object::Number');
+
+This framework also provides classes which wrap Perl 5 native data types and
+provides methods for operating on that data, e.g. L<Data::Object::Array>,
+L<Data::Object::Code>, L<Data::Object::Hash>, and L<Data::Object::String>, to
+name a few. These are referred to as the data type classes which construct data
+objects.
+
+=cut
+
+=head1 OVERVIEW: DISPATCHERS
+
+  use Data::Object::Dispatch;
+
+  my $package = 'Logger';
+
+  my $dispatch1 = Data::Object::Dispatch->new($package);
+
+  $dispatch1->call(@args);
+
+  my $dispatch2 = Data::Object::Dispatch->new($package, 'log', time);
+
+  $dispatch2->call('Something went wrong');
+
+  # i.e. Logger::log(time, 'Something went wrong')
+
+Dispatchers are basically closures which when called execute subroutines in a
+package, and can be curried. This concept is often found in functional
+programming and is extremely powerful in that it creates an inversion of
+control by allowing the closure creator to decide how the call will be
+executed. The L<Data::Object::Dispatch> class can be used directly or
+subclassed to create sophisticated applications.
+
+=cut
+
+=head1 OVERVIEW: FUNCTION CLASSES
+
+  my $data = Data::Object::Array->new([1..4]);
+
+  my $sets = [];
+
+  my $func = Data::Object::Func::Array::EachNValues->new(
+    arg1 => $data,
+    arg2 => 2,
+    arg3 => fun ($v1, $v2) { push $@sets, [$v1, $v2]; }
+  );
+
+  my $result = $func->execute;
+
+Each data type class' methods correspond to a function class which encapsulates
+the subroutine logic, enforces its signature, provides execution automation,
+and establishes an architecture that's easy to evolve and maintain. These
+classes provide the logic that gets executed whenever a method call is made on
+a data object.
+
+=cut
+
+=head1 OVERVIEW: FUNCTION SIGNATURES
+
+  use Data::Object;
+
+  fun output($string) {
+    say $string;
+  }
+
+  fun collect(Any @args) {
+    return (map do('dump', $_), @args);
+  }
+
+  output(collect(@data));
+
+Everything offered by this framework is optional and one of its best features
+is the type-constrainable method and function signatures which leverages the
+core type library and can easily interoperate with a user-defined type library
+(or libraries).
+
+=cut
+
+=head1 OVERVIEW: OBJECT SYSTEM
+
+  package App::Person;
+
+  use Data::Object 'Class', 'App';
+
+  has 'fname';
+  has 'lname';
+
+  has 'parents' => (
+    is  => 'ro',
+    isa => 'Tuple[AppPerson, AppPerson]',
+    lzy => 1
+  );
+
+
+The underlying object system uses L<Moo> which is a light-weight L<Moose>
+compatible framework for declaring classes, attributes, and method-modifiers,
+as well as constructing objects, with clear and concise syntax. Data-Object
+takes this functionality further by providing an integrated type system and
+syntactic sugar around the class attribute declaration.
+
+=cut
+
+=head1 OVERVIEW: PACKAGE CLASS
 
   use Data::Object::Space;
 
@@ -182,66 +378,118 @@ blessing, inspecting, and otherwise operating on packages.
 
 =cut
 
-=head1 TYPE SYSTEM
+=head1 OVERVIEW: PODISH PARSER
 
-  package Config;
+  package App::Command;
 
-  use Data::Object Class;
+  use Data::Object 'Data';
 
-  has 'data' => (
-    is  => 'ro',
-    isa => 'HashRef',
-    req => 1
-  );
+  =help
 
-  method json() {
-    return new_json;
+  fetches results from the api
+
+  =cut
+
+  my $data = Data::Object::Data->new;
+
+  my $help = $data->content('help');
+
+  1;
+
+The pod-ish parser, offered in L<Data::Object::Data>, allows you to parse files
+and packages and extract pod-like sections of information. This is a powerful
+ability that rethinks what, why and how we use POD (plain old documentation)
+data, and opens up your application to make use of this data in cool new ways.
+
+=cut
+
+=head1 OVERVIEW: ROLES AND RULES
+
+  package Persona;
+
+  use Data::Object 'Rule';
+
+  requires 'id';
+  requires 'fname';
+  requires 'lname';
+  requires 'created';
+  requires 'updated';
+
+  around created() {
+    # do something ...
+    return $self->$orig;
   }
 
-  method save(PathObj $path) {
-    return $path->write($self->data->dump);
+  around updated() {
+    # do something ...
+    return $self->$orig;
   }
 
   1;
 
-The type system and core type library offered in
-L<Data::Object::Config::Library> provide type constraints for the most common
-types of objects and values. These type constraints can be declared in class
-attribute declarations as well as in method and function signatures.
-
-The type-constrainable aspects of the Data-Object framework are context-aware,
-i.e. the framework provides mechanisms for mapping user-defined type libraries
-to namespaces so that user-defined types can be used in type validation
-alongside core types. This prevents any need to extend the core type library
-and prevents type constraint naming collisions across applications.
+Roles offer us a way to reuse behavior without relying on inheritance. Rules
+are roles but meant to establish by convention the separation of interface
+declaration and behavior abstraction, i.e. rules are where we put the
+“interface” rules, and roles are where we put the behavior.
 
 =cut
 
-=head1 OBJECT SYSTEM
+=head1 OVERVIEW: SINGLETONS
 
-  package App::Person;
+  package App::Config;
 
-  use Data::Object Class, App;
+  use Data::Object 'State';
 
-  has 'fname';
-  has 'lname';
+  extends 'Config';
 
-  has 'parents' => (
-    is  => 'ro',
-    isa => 'Tuple[AppPerson, AppPerson]',
-    lzy => 1
-  );
+  has 'datastore';
+  has 'environment';
+  has 'servers';
 
+  1;
 
-The underlying object system uses L<Moo> which is a light-weight L<Moose>
-compatible framework for declaring classes, attributes, and method-modifiers,
-as well as constructing objects, with clear and concise syntax. Data-Object
-takes this functionality further by providing an integrated type system and
-syntactic sugar around the class attribute declaration.
+Occasionally it makes sense to declare some persistent state and the
+L<Data::Object::State> class allows you to do that with all of the features and
+benefits of a L<Moo> or L<Moose> derived object.
 
 =cut
 
-=head1 TYPE BUILDER
+=head1 OVERVIEW: STANDARD LIBRARY
+
+  # Data::Object::Any
+  # Data::Object::Array
+  # Data::Object::Class
+  # Data::Object::Cli
+  # Data::Object::Code
+  # Data::Object::Config
+  # Data::Object::Data
+  # Data::Object::Dispatch
+  # Data::Object::Exception
+  # Data::Object::Float
+  # Data::Object::Hash
+  # Data::Object::Integer
+  # Data::Object::Kind
+  # Data::Object::Number
+  # Data::Object::Regexp
+  # Data::Object::Replace
+  # Data::Object::Role
+  # Data::Object::Rule
+  # Data::Object::Scalar
+  # Data::Object::Search
+  # Data::Object::Space
+  # Data::Object::State
+  # Data::Object::String
+  # Data::Object::Template
+  # Data::Object::Type
+  # Data::Object::Undef
+
+The framework is meant to offer a kind-of standard library of functionality,
+concepts, and patterns for developing modern Perl applications. Again,
+everything provided is optional and has been designed to be configurable.
+
+=cut
+
+=head1 OVERVIEW: TYPE BUILDER
 
   package App::Type::Label;
 
@@ -275,7 +523,7 @@ syntactic sugar around the class attribute declaration.
 
 The type system provided is based on the L<Type::Tiny> system and takes
 advantage of many of the features and functions available, such as coercion and
-parameterization. The L<Data::Object::Config::Library> library is itself a
+parameterization. The L<Data::Object::Library> library is itself a
 L<Type::Library>, and extends the L<Types::Standard>, L<Types::TypeTiny>,
 L<Types::Common::Numeric> and L<Types::Common::String> libraries, and provides
 additional types based on the classes, roles and rules offered as part of this
@@ -290,260 +538,71 @@ library.
 
 =cut
 
-=head1 ROLES AND RULES
+=head1 OVERVIEW: TYPE SYSTEM
 
-  package Persona;
+  package DSN;
 
-  use Data::Object Rule;
+  use Data::Object 'Class';
 
-  requires 'id';
-  requires 'fname';
-  requires 'lname';
-  requires 'created';
-  requires 'updated';
-
-  around created() {
-    # do something ...
-    return $self->$orig;
-  }
-
-  around updated() {
-    # do something ...
-    return $self->$orig;
-  }
-
-  1;
-
-Roles offer us a way to reuse behavior without relying on inheritance. Rules
-are roles but meant to establish by convention the separation of interface
-declaration and behavior abstraction, i.e. rules are where we put the
-“interface” rules, and roles are where we put the behavior.
-
-=cut
-
-=head1 SINGLETON SUPPORT
-
-  package App::Config;
-
-  use Data::Object State;
-
-  extends 'Config';
-
-  has 'datastore';
-  has 'environment';
-  has 'servers';
-
-  1;
-
-Occasionally it makes sense to declare some persistent state and the
-L<Data::Object::State> class allows you to do that with all of the features and
-benefits of a L<Moo> or L<Moose> derived object.
-
-=cut
-
-=head1 PODISH PARSER
-
-  package App::Command;
-
-  use Data::Object Data;
-
-  =help
-
-  fetches results from the api
-
-  =cut
-
-  my $data = Data::Object::Data->new;
-
-  my $help = $data->content('help');
-
-  1;
-
-The pod-ish parser, offered in L<Data::Object::Data>, allows you to parse files
-and packages and extract pod-like sections of information. This is a powerful
-ability that rethinks what, why and how we use POD (plain old documentation)
-data, and opens up your application to make use of this data in cool new ways.
-
-=cut
-
-=head1 DISPATCHERS
-
-  use Data::Object::Dispatch;
-
-  my $package = 'Logger';
-
-  my $dispatch1 = Data::Object::Dispatch->new($package);
-
-  $dispatch1->call(@args);
-
-  my $dispatch2 = Data::Object::Dispatch->new($package, 'log', time);
-
-  $dispatch2->call('Something went wrong');
-
-  # i.e. Logger::log(time, 'Something went wrong')
-
-Dispatchers are basically closures which when called execute subroutines in a
-package, and can be curried. This concept is often found in functional
-programming and is extremely powerful in that it creates an inversion of
-control by allowing the closure creator to decide how the call will be
-executed. The L<Data::Object::Dispatch> class can be used directly or
-subclassed to create sophisticated applications.
-
-=cut
-
-=head1 FUNCTION SIGNATURES
-
-  use Data::Object;
-
-  fun output($string) {
-    say $string;
-  }
-
-  fun collect(Any @args) {
-    return (map do('dump', $_), @args);
-  }
-
-  output(collect(@data));
-
-Everything offered by this framework is optional and one of its best features
-is the type-constrainable method and function signatures which leverages the
-core type library and can easily interoperate with a user-defined type library
-(or libraries).
-
-=cut
-
-=head1 CALLER CONFIGURATION
-
-  package Authenticatable;
-
-  use Data::Object Rule;
-
-  package Authentication;
-
-  use Data::Object Role;
-
-  package User;
-
-  use Data::Object Class;
-
-  with 'Authentication';
-  with 'Authenticatable';
-
-It's an important and intentional design decision to make this framework highly
-configurable. It's really Perlish that way. Using the L<do> and L<Data::Object>
-modules is the entry point into this framework and is where the configuration
-of the various features begins. The import process has been designed to be
-idempotent, and declaring the use of the same module multiple times with
-different parameters is encouraged.
-
-=cut
-
-=head1 CONSTRUCTOR FUNCTIONS
-
-  use Data::Object;
-
-  my $file = do('path', 'dump.json');
-  my $json = do('json' $file->slurp);
-
-  say(do('dump', $json));
-
-The constructor functions offered through L<Data::Object::Export>, when called,
-return instances of the classes they're associated with. They are merely a
-convenience and provide a way to quickly load a class and construct an object
-at runtime. These functions can be proxied to by the special (albeit slightly
-evil) C<do> function, which overloads the core “do” function. This
-super-function is made available to every namespace where the Data-Object
-framework is configured.
-
-=cut
-
-=head1 DATA TYPE OBJECTS
-
-  use Data::Object::Code;
-
-  # returns a code object
-  my $code = Data::Object::Code->new(sub{ join ' ', @_ });
-
-  # returns truthy
-  $code->isa('Data::Object::Code');
-
-  # returns a string object representing 'Hello World'
-  my $string = $code->call('Hello', 'World');
-
-  # returns a new string object
-  $string = $string->split('')->reverse->join('')->uppercase;
-
-  # returns a number object (returns truthy) and outputs "DLROW OLLEH"
-  my $result = $string->say;
-
-  # returns truthy
-  $result->isa('Data::Object::Number');
-
-This framework also provides classes which wrap Perl 5 native data types and
-provides methods for operating on that data, e.g. L<Data::Object::Array>,
-L<Data::Object::Code>, L<Data::Object::Hash>, and L<Data::Object::String>, to
-name a few. These are referred to as the data type classes which construct data
-objects.
-
-=cut
-
-=head1 FUNCTION CLASSES
-
-  my $data = Data::Object::Array->new([1..4]);
-
-  my $sets = [];
-
-  my $func = Data::Object::Func::Array::EachNValues->new(
-    arg1 => $data,
-    arg2 => 2,
-    arg3 => fun ($v1, $v2) { push $@sets, [$v1, $v2]; }
+  has scheme => (
+    is  => 'ro',
+    isa => 'Str',
+    req => 1
   );
 
-  my $result = $func->execute;
+  has driver => (
+    is  => 'ro',
+    isa => 'Str',
+    req => 1
+  );
 
-Each data type class' methods correspond to a function class which encapsulates
-the subroutine logic, enforces its signature, provides execution automation,
-and establishes an architecture that's easy to evolve and maintain. These
-classes provide the logic that gets executed whenever a method call is made on
-a data object.
+  has database => (
+    is  => 'ro',
+    isa => 'Str',
+    req => 1
+  );
 
-=cut
+  has options => (
+    is  => 'ro',
+    isa => 'HashRef',
+    req => 1
+  );
 
-=head1 STANDARD LIBRARY
+  has host => (
+    is  => 'ro',
+    isa => 'Str',
+    opt => 1
+  );
 
-  # Data::Object::Any
-  # Data::Object::Array
-  # Data::Object::Class
-  # Data::Object::Cli
-  # Data::Object::Code
-  # Data::Object::Config
-  # Data::Object::Data
-  # Data::Object::Dispatch
-  # Data::Object::Exception
-  # Data::Object::Float
-  # Data::Object::Hash
-  # Data::Object::Integer
-  # Data::Object::Json
-  # Data::Object::Kind
-  # Data::Object::Number
-  # Data::Object::Path
-  # Data::Object::Regexp
-  # Data::Object::Replace
-  # Data::Object::Role
-  # Data::Object::Rule
-  # Data::Object::Scalar
-  # Data::Object::Search
-  # Data::Object::Space
-  # Data::Object::State
-  # Data::Object::String
-  # Data::Object::Template
-  # Data::Object::Type
-  # Data::Object::Undef
-  # Data::Object::Yaml
-  # etc
+  has port => (
+    is  => 'ro',
+    isa => 'Number',
+    opt => 1
+  );
 
-The framework is meant to offer a kind-of standard library of functionality,
-concepts, and patterns for developing modern Perl applications. Again,
-everything provided is optional and has been designed to be configurable.
+  has username => (
+    is  => 'ro',
+    isa => 'Str',
+    opt => 1
+  );
+
+  has password => (
+    is  => 'ro',
+    isa => 'Str',
+    opt => 1
+  );
+
+  1;
+
+The type system and core type library offered in
+L<Data::Object::Library> provide type constraints for the most common
+types of objects and values. These type constraints can be declared in class
+attribute declarations as well as in method and function signatures.
+
+The type-constrainable aspects of the Data-Object framework are context-aware,
+i.e. the framework provides mechanisms for mapping user-defined type libraries
+to namespaces so that user-defined types can be used in type validation
+alongside core types. This prevents any need to extend the core type library
+and prevents type constraint naming collisions across applications.
 
 =cut

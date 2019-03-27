@@ -1,0 +1,40 @@
+NAME
+    Log::ger::Layout::Pattern::Multiline - Pattern layout (with multiline
+    message split)
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     use Log::ger::Layout 'Pattern::Multiline', format => '%d (%F:%L)> %m';
+     use Log::ger;
+
+DESCRIPTION
+    This is just like Log::ger::Layout::Pattern except that multiline log
+    message is split per-line so that a message like "line1\nline2\nline3"
+    (with "[%r] %m" format) is not laid out not as:
+
+     [0.003] line1
+     line2
+     line3
+
+    but as:
+
+     [0.003] line1
+     [0.003] line2
+     [0.003] line3
+
+SEE ALSO
+    Log::ger::Layout::Pattern
+
+    Modelled after Log::Log4perl::Layout::PatternLayout::Multiline.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

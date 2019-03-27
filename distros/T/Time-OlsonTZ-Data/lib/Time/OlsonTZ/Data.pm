@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.201809";
+our $VERSION = "0.201901";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2018i";
+use constant olson_version => "2019a";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2018i";
+use constant olson_code_version => "2019a";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2018i";
+use constant olson_data_version => "2019a";
 
 =back
 
@@ -193,29 +193,28 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	Etc/GMT+3 Etc/GMT+4 Etc/GMT+5 Etc/GMT+6 Etc/GMT+7 Etc/GMT+8 Etc/GMT+9
 	Etc/GMT-1 Etc/GMT-10 Etc/GMT-11 Etc/GMT-12 Etc/GMT-13 Etc/GMT-14
 	Etc/GMT-2 Etc/GMT-3 Etc/GMT-4 Etc/GMT-5 Etc/GMT-6 Etc/GMT-7 Etc/GMT-8
-	Etc/GMT-9 Etc/UCT Etc/UTC Europe/Amsterdam Europe/Andorra
-	Europe/Astrakhan Europe/Athens Europe/Belgrade Europe/Berlin
-	Europe/Brussels Europe/Bucharest Europe/Budapest Europe/Chisinau
-	Europe/Copenhagen Europe/Dublin Europe/Gibraltar Europe/Helsinki
-	Europe/Istanbul Europe/Kaliningrad Europe/Kiev Europe/Kirov
-	Europe/Lisbon Europe/London Europe/Luxembourg Europe/Madrid Europe/Malta
-	Europe/Minsk Europe/Monaco Europe/Moscow Europe/Oslo Europe/Paris
-	Europe/Prague Europe/Riga Europe/Rome Europe/Samara Europe/Saratov
-	Europe/Simferopol Europe/Sofia Europe/Stockholm Europe/Tallinn
-	Europe/Tirane Europe/Ulyanovsk Europe/Uzhgorod Europe/Vienna
-	Europe/Vilnius Europe/Volgograd Europe/Warsaw Europe/Zaporozhye
-	Europe/Zurich Factory HST Indian/Chagos Indian/Christmas Indian/Cocos
-	Indian/Kerguelen Indian/Mahe Indian/Maldives Indian/Mauritius
-	Indian/Reunion MET MST MST7MDT PST8PDT Pacific/Apia Pacific/Auckland
-	Pacific/Bougainville Pacific/Chatham Pacific/Chuuk Pacific/Easter
-	Pacific/Efate Pacific/Enderbury Pacific/Fakaofo Pacific/Fiji
-	Pacific/Funafuti Pacific/Galapagos Pacific/Gambier Pacific/Guadalcanal
-	Pacific/Guam Pacific/Honolulu Pacific/Kiritimati Pacific/Kosrae
-	Pacific/Kwajalein Pacific/Majuro Pacific/Marquesas Pacific/Nauru
-	Pacific/Niue Pacific/Norfolk Pacific/Noumea Pacific/Pago_Pago
-	Pacific/Palau Pacific/Pitcairn Pacific/Pohnpei Pacific/Port_Moresby
-	Pacific/Rarotonga Pacific/Tahiti Pacific/Tarawa Pacific/Tongatapu
-	Pacific/Wake Pacific/Wallis WET
+	Etc/GMT-9 Etc/UTC Europe/Amsterdam Europe/Andorra Europe/Astrakhan
+	Europe/Athens Europe/Belgrade Europe/Berlin Europe/Brussels
+	Europe/Bucharest Europe/Budapest Europe/Chisinau Europe/Copenhagen
+	Europe/Dublin Europe/Gibraltar Europe/Helsinki Europe/Istanbul
+	Europe/Kaliningrad Europe/Kiev Europe/Kirov Europe/Lisbon Europe/London
+	Europe/Luxembourg Europe/Madrid Europe/Malta Europe/Minsk Europe/Monaco
+	Europe/Moscow Europe/Oslo Europe/Paris Europe/Prague Europe/Riga
+	Europe/Rome Europe/Samara Europe/Saratov Europe/Simferopol Europe/Sofia
+	Europe/Stockholm Europe/Tallinn Europe/Tirane Europe/Ulyanovsk
+	Europe/Uzhgorod Europe/Vienna Europe/Vilnius Europe/Volgograd
+	Europe/Warsaw Europe/Zaporozhye Europe/Zurich Factory HST Indian/Chagos
+	Indian/Christmas Indian/Cocos Indian/Kerguelen Indian/Mahe
+	Indian/Maldives Indian/Mauritius Indian/Reunion MET MST MST7MDT PST8PDT
+	Pacific/Apia Pacific/Auckland Pacific/Bougainville Pacific/Chatham
+	Pacific/Chuuk Pacific/Easter Pacific/Efate Pacific/Enderbury
+	Pacific/Fakaofo Pacific/Fiji Pacific/Funafuti Pacific/Galapagos
+	Pacific/Gambier Pacific/Guadalcanal Pacific/Guam Pacific/Honolulu
+	Pacific/Kiritimati Pacific/Kosrae Pacific/Kwajalein Pacific/Majuro
+	Pacific/Marquesas Pacific/Nauru Pacific/Niue Pacific/Norfolk
+	Pacific/Noumea Pacific/Pago_Pago Pacific/Palau Pacific/Pitcairn
+	Pacific/Pohnpei Pacific/Port_Moresby Pacific/Rarotonga Pacific/Tahiti
+	Pacific/Tarawa Pacific/Tongatapu Pacific/Wake Pacific/Wallis WET
 ) });
 sub olson_canonical_names() {
 	$cn = eval($cn) || die $@ if ref($cn) eq "";
@@ -397,6 +396,7 @@ my $li = q(+{
 	"Etc/GMT-0" => "Etc/GMT",
 	"Etc/GMT0" => "Etc/GMT",
 	"Etc/Greenwich" => "Etc/GMT",
+	"Etc/UCT" => "Etc/UTC",
 	"Etc/Universal" => "Etc/UTC",
 	"Etc/Zulu" => "Etc/UTC",
 	"Europe/Belfast" => "Europe/London",
@@ -454,7 +454,7 @@ my $li = q(+{
 	ROK => "Asia/Seoul",
 	Singapore => "Asia/Singapore",
 	Turkey => "Europe/Istanbul",
-	UCT => "Etc/UCT",
+	UCT => "Etc/UTC",
 	"US/Alaska" => "America/Anchorage",
 	"US/Aleutian" => "America/Adak",
 	"US/Arizona" => "America/Phoenix",
@@ -643,7 +643,7 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017, 2018, 2019
 Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE

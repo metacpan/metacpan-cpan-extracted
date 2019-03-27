@@ -2,7 +2,7 @@ use strict;
 use Test::More;
 use Test::Mojo;
 use Mojolicious::Lite;
-use Mojo::Util qw/gzip/;
+use Mojo::Util qw/gunzip gzip/;
 
 get '/' => sub {
     my ($c) = @_;
@@ -25,21 +25,19 @@ $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => $text)
 
 # At min_size gzips
 $text = 'a' x 860;
-my $gzipped_text = gzip $text;
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => $text)
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # One above min_size gzips
 $text = 'a' x 861;
-$gzipped_text = gzip $text;
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => $text)
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test setting min_size
 plugin 'Gzip' => {min_size => 500};
@@ -54,19 +52,17 @@ $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => $text)
 
 # At min_size gzips
 $text = 'a' x 500;
-$gzipped_text = gzip $text;
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => $text)
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # One above min_size gzips
 $text = 'a' x 501;
-$gzipped_text = gzip $text;
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => $text)
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip');
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 done_testing;

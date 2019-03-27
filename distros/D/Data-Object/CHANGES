@@ -1,6 +1,26 @@
 Changelog for Data-Object
 
-0.92 2019-03-17T17:22:58
+0.93 2019-03-26T16:39:13
+ - Reorganized main module POD
+ - Dynamically generating main module overview POD
+ - Autoloading feature bundle :5.14
+ - Replace "use" Lines with Barewords Syntax
+ - Flattened test files structure for sane Makefile
+ - Renamed Config::Library to Library
+ - Renamed Config::Signatures to Signatures
+ - Renamed Config::{Class,Role} to {Class,Role}Has
+ - Removed unnecessary tests
+ - Reordered config functions and updated class and role config
+ - Removed recommended prereqs
+ - Removed lib/Data/Object/Json.pod
+ - Removed JSON, YAML, Template and Path
+ - JSON, YAML, Role, Template and Path no longer required
+ - Removed Exporter::Tiny dep and usage
+ - Build 0.92 (#167)
+ - Build 0.92 (#166)
+
+0.92 2019-03-17T17:23:18
+ - Built release version 0.92
  - Added updated POD files
  - Removed Sub::Quote dependency
  - Fixed typos in Library POD

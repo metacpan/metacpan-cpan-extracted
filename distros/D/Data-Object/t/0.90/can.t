@@ -82,7 +82,9 @@ sub test {
 sub test_exists {
   my ($path, $subs) = @_;
 
-  ok -f "t/0.90/can/$path/$_.t", "t/0.90/can/$path/$_.t exists" for @$subs;
+  my $name = $path =~ s/\//_/gr;
+
+  ok -f "t/0.90/can/${name}_$_.t", "t/0.90/can/${name}_$_.t exists" for @$subs;
 
   return;
 }
@@ -90,7 +92,9 @@ sub test_exists {
 sub test_sections {
   my ($path, $subs) = @_;
 
-  for my $file (grep -f, map "t/0.90/can/$path/$_.t", @$subs) {
+  my $name = $path =~ s/\//_/gr;
+
+  for my $file (grep -f, map "t/0.90/can/${name}_$_.t", @$subs) {
     my $headings = { map +($_, $_), headings($file) };
 
     ok exists $headings->{name}, "$file has pod name-section";

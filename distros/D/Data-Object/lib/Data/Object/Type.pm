@@ -38,7 +38,7 @@ sub library {
 }
 
 sub namespace {
-  return 'Data::Object::Config::Library';
+  return 'Data::Object::Library';
 }
 
 sub register {

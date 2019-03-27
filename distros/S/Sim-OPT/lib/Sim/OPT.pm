@@ -67,7 +67,7 @@ $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularrat
 toil genstar solvestar integratebox filterbox__ clean
 );
 
-$VERSION = '0.329';
+$VERSION = '0.335';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program encouraging problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -484,8 +484,9 @@ sub clean
 
 sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 {
-	my ( $tempc_r, $mypath, $file, $instn ) = @_;
+	my ( $tempc_r, $mypath, $file, $instn, $dowhat_ref ) = @_;
 	my %tempc = %{ $tempc_r }; #say $tee "IN MAKEFILENAME \$tempc $tempc";
+	%dowhat = %{ $dowhat_ref };
 	my $cleanto;
 	foreach my $key (sort {$a <=> $b} (keys %tempc) )
 	{
@@ -498,10 +499,20 @@ sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 	#my $cleancrypto = $instn . "-";
 	my $crypto = "$mypath/$file" . "_" . "$cleancrypto"; #say $tee "IN MAKEFILENAME \$crypto $crypto";
 	my $it;
-	$it{to} = $to;
-	$it{cleanto} = $cleanto;
-	$it{crypto} = $crypto;
-	$it{cleancrypto} = $cleancrypto;
+	if ( $dowhat{names} eq "short" )
+	{
+		$it{to} = $to;
+		$it{cleanto} = $cleanto;
+		$it{crypto} = $crypto;
+		$it{cleancrypto} = $cleancrypto;
+	}
+	elsif ( ( $dowhat{names} eq "long" ) or ( $dowhat{names} eq "" ) )
+	{
+		$it{to} = $to;
+		$it{cleanto} = $cleanto;
+		$it{crypto} = $to;
+		$it{cleancrypto} = $cleanto;
+	}
 	return ( \%it );
 }
 
@@ -539,12 +550,13 @@ sub getrootname
 
 sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 {
-	my ( $transfile, $carrier_r, $file, $blockelts_r, $mypath, $instn ) = @_;
+	my ( $dowhat_ref, $transfile, $carrier_r, $file, $blockelts_r, $mypath, $instn ) = @_;
 	#say $tee "In extractcase; \$transfile: " . dump( $transfile) ;
 	#say $tee "In extractcase; \$file: " . dump( $file) ;
 	my %carrier = %{ $carrier_r }; #say $tee "In extractcase; \%carrier: " . dump( \%carrier) ;
 	my @blockelts = @{ $blockelts_r }; #say $tee "In extractcase; \@blockelts: " . dump( @blockelts ) ;
 	my $num = scalar( @blockelts ); #say $tee "In extractcase; \$num: " . dump( $num ) ;
+	my %dowhat = %{ $dowhat_ref };
 	#say $tee "In extractcase; \$mypath: " . dump( $mypath ) ;
 	#say $tee "In extractcase; \$instn: " . dump( $instn ) ;
 
@@ -586,7 +598,7 @@ sub extractcase #  UPDATES THE FILE NAME ON THE BASIS OF A %carrier
 	}
 
 	#say $tee "In extractcase, OBTAINED \%carrier: " . dump( \%carrier ) ;
-	my %to = %{ makefilename( \%tempc, $mypath, $file, $instn, \%inst ) }; #say $tee "In extractcase!, RESULT1:; \%to: " . dump( \%to ) ;
+	my %to = %{ makefilename( \%tempc, $mypath, $file, $instn, \%inst, \%dowhat ) }; #say $tee "In extractcase!, RESULT1:; \%to: " . dump( \%to ) ;
 	return( \%to );
 }
 
@@ -793,6 +805,7 @@ sub integratebox
 	my $file = $_[2]; #say $tee "IN INTEGRATEBOX \$file $file" ;
 	my @blockelts = @{ $_[3] }; #say $tee "IN INTEGRATEBOX \@blockelts @blockelts" ;
 	my $mypath = $_[4]; #say $tee "IN INTEGRATEBOX \$mypath $mypath" ;
+	my %dowhat = %{ $_[5] };
 	my @newbox;
 	if ( ref( $arrelts[0] ) )
 	{
@@ -801,11 +814,11 @@ sub integratebox
 			my @elts = @{ $eltref }; #say $tee "IN INTEGRATEBOX \@elts @elts" ;
 			my $target = $elts[0]; #say $tee "IN INTEGRATEBOX Target $target" ;
 			#say $tee "PRE EXTRACTCASE IN INTEGRATEBOX \$target $target" ;
-			my %righttarg = %{ extractcase( $target, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%righttarg " . dump(  \%righttarg ) ;
+			my %righttarg = %{ extractcase( \%dowhat, $target, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%righttarg " . dump(  \%righttarg ) ;
 			my $righttarget = $righttarg{cleanto}; #say $tee "IN INTEGRATEBOX \$righttarget $righttarget" ;
 			my $origin = $elts[3]; #say $tee "IN INTEGRATEBOX \$origin $origin" ;
 			#say $tee "PRE EXTRACTCASE IN INTEGRATEBOX \$origin $origin";
-			my %rightorig = %{ extractcase( $origin, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%rightorig " . dump(  \%rightorig ) ;
+			my %rightorig = %{ extractcase( \%dowhat, $origin, \%carrier, $file, \@blockelts, $mypath ) }; #say $tee "IN INTEGRATEBOX \%rightorig " . dump(  \%rightorig ) ;
 			my $rightorigin = $rightorig{cleanto}; #say $tee "IN INTEGRATEBOX \$rightorigin " . dump(  \$rightorigin ) ;
 			push ( @newbox, [ $righttarget, $elts[1], $elts[2], $rightorigin, $elts[4] ] );
 		} #say $tee "IN INTEGRATEBOX \@newbox " . dump( @newbox ) ;
@@ -1763,7 +1776,9 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 
 	sub cleanduplicates
 	{
-		my @elts = @_; #say $tee "In cleanduplicates \@elts!: " . dump ( @elts );
+		my ( $elts_ref, $dowhat_ref ) = @_; #say $tee "In cleanduplicates \@elts!: " . dump ( @elts );
+		my @elts = @{ $elts_ref };
+		my %dowhat = %{ $dowhat_ref };
 
 		#my @sack;
 		#foreach my $el ( @elts )
@@ -1804,16 +1819,16 @@ sub deffiles # IT DEFINED THE FILES TO BE PROCESSED
 		{
 			#say $tee "MIDITERS FOR MIDSURRS!: " . dump ( @miditers );
 			my %midsurrs = %{ $midsurrs_r }; #say $tee "IN DEFFILES \%midsurrs" . dump( \%midsurrs );
-	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts, $mypath, \%inst ) } );
+	 		@bag = uniq( @{ integratebox( \@bux, \%midsurrs, $file, \@blockelts, $mypath, \%inst, \%dowhat ) } );
 			push( @finalbox, @bag );
 		} #say $tee "IN DEFFILES BEFORE WASH \@finalbox" . dump( @finalbox );
-		my @finalbox = cleanduplicates( @finalbox ); #say $tee "IN DEFFILES AFTER WASH \@finalbox" . dump( @finalbox );
+		my @finalbox = cleanduplicates( \@finalbox, \%dowhat ); #say $tee "IN DEFFILES AFTER WASH \@finalbox" . dump( @finalbox );
 	}
 	else
 	{
 		#say $tee "IN DEFFILES RIGHT AFTER " ;
 		my @bark = @{ flattenbox( \@bux ) }; #say $tee "In DEFFILES5-DESCENT \@bark!: " . dump ( @bark );
-		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst ) } );
+		@finalbox = uniq( @{ integratebox( \@bark, \%carrier, $file, \@blockelts, $mypath, \%inst, \%dowhat ) } );
 		#say $tee "In DEFFILES5-DESCENT \@finalbox!: " . dump ( @finalbox );
 	}
 
@@ -1892,7 +1907,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 
 	my ( @instances );
 	#say $tee "PRE EXTRACTCASE IN SETLAUNCH - NOTHING" . dump(  );
-	my %starters = %{ extractcase( "", \%carrier, $file, \@blockelts, $mypath, "" ) };
+	my %starters = %{ extractcase( \%dowhat, "", \%carrier, $file, \@blockelts, $mypath, "" ) };
 
 	$dirfiles{starter} = $starters{cleanto}; #say $tee "IN SETLAUNCH \$dirfiles{starter}" . dump( $dirfiles{starter} );
 
@@ -1905,7 +1920,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 		my $countstep = $$elt[2]; #say $tee "IN SETLAUNCH \$countstep! " . dump( $countstep );
 		my $oldpars = $$elt[3]; #say $tee "IN SETLAUNCH \$oldpars " . dump( $oldpars );
 		#say $tee "PRE EXTRACTCASE IN SETLAUNCH \$newpars" . dump( \$newpars );
-		my %to = %{ extractcase( $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
+		my %to = %{ extractcase( \%dowhat, $newpars, \%carrier, $file, \@blockelts, $mypath, $instn ) };
 		#say $tee "IN SETLAUNCH FROM EXTRATCASE \%to" . dump( \%to );
 		#say $tee "IN SETLAUNCH FROM EXTRATCASE \$to{cleanto}" . dump( $to{cleanto} );
 		#say $tee "IN SETLAUNCH \$inst{\$to{cleanto}}" . dump( $inst{$to{cleanto}} );
@@ -1920,7 +1935,7 @@ sub setlaunch # IT SETS THE DATA FOR THE SEARCH ON THE ACTIVE BLOCK.
 			$inst{$to{to}} = $to{cleanto};
 
 			#say $tee "PRE EXTRACTCASE IN SETLAUNCH \$oldpars" . dump( \$oldpars );
-			my %orig = %{ extractcase( $oldpars, \%carrier, $file, \@blockelts, $mypath ) };
+			my %orig = %{ extractcase( \%dowhat, $oldpars, \%carrier, $file, \@blockelts, $mypath ) };
 			my $origin = $orig{cleanto};
 			#say $tee "IN SETLAUNCH! \$origin" . dump( \$origin ) . "\n\n";
 			my $c = $$elt[4];

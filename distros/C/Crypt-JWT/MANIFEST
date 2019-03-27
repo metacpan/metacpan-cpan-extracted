@@ -4,7 +4,7 @@ lib/Crypt/KeyWrap.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 t/compile.t
 t/flattened.t
 t/jws_no_key.t

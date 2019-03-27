@@ -8,7 +8,7 @@ my @DATA = (
   [
     { os => 'MSWin32', cc => 'cl', config => {ccflags => ''} },
     {
-      is_msvc => 1, is_gcc => 0,
+      is_msvc => 1, is_gcc => 0, is_clang => 0,
       compiler_command => 'cl -TP -EHsc',
       linker_flags => 'msvcprt.lib',
     },
@@ -16,7 +16,7 @@ my @DATA = (
   [
     { os => 'MSWin32', cc => 'gcc', config => {ccflags => ''} },
     {
-      is_msvc => undef, is_gcc => 1,
+      is_msvc => undef, is_gcc => 1, is_clang => 0,
       compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++',
     },
@@ -24,7 +24,7 @@ my @DATA = (
   [
     { os => 'freebsd', cc => 'gcc', config => {ccflags => ''}, osvers => 9 },
     {
-      is_msvc => undef, is_gcc => 1,
+      is_msvc => undef, is_gcc => 1, is_clang => 0,
       compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++',
     },
@@ -32,7 +32,7 @@ my @DATA = (
   [
     { os => 'freebsd', cc => 'gcc', config => {gccversion => 'Clang', ccflags => ''}, osvers => 10 },
     {
-      is_msvc => undef, is_gcc => 1,
+      is_msvc => undef, is_gcc => undef, is_clang => 1,
       compiler_command => 'clang++ -Wno-reserved-user-defined-literal',
       linker_flags => '-lc++',
     },
@@ -40,7 +40,7 @@ my @DATA = (
   [
     { os => 'netbsd', cc => 'gcc', config => {ccflags => ''} },
     {
-      is_msvc => undef, is_gcc => 1,
+      is_msvc => undef, is_gcc => 1, is_clang => 0,
       compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++ -lgcc_s',
     },
@@ -48,7 +48,7 @@ my @DATA = (
   [
     { os => 'linux', cc => 'clang', config => {gccversion => 'Clang', ccflags => ''} },
     {
-      is_msvc => undef, is_gcc => 1,
+      is_msvc => undef, is_gcc => undef, is_clang => 1,
       compiler_command => 'clang++ -xc++ -Wno-reserved-user-defined-literal',
       linker_flags => '-lstdc++',
     },
@@ -56,13 +56,13 @@ my @DATA = (
   [
     { os => 'linux', cc => 'gcc', config => {ccflags => ''} },
     {
-      is_msvc => undef, is_gcc => 1,
+      is_msvc => undef, is_gcc => 1, is_clang => 0,
       compiler_command => 'g++ -xc++',
       linker_flags => '-lstdc++',
     },
   ],
 );
-my @METHODS = qw(is_msvc is_gcc compiler_command linker_flags);
+my @METHODS = qw(is_msvc is_gcc is_clang compiler_command linker_flags);
 $Data::Dumper::Indent = $Data::Dumper::Sortkeys = $Data::Dumper::Terse = 1;
 
 run_test(@$_) for @DATA;

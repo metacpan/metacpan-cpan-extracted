@@ -1,5 +1,9 @@
 Revision history for CGI::Fast
 
+2.14 2019-03-26
+    [DOCUMENTATION]
+    - Add a link to the "you probably shouldn't use CGI.pm" docs
+
 2.13 2017-11-17
     [TESTING]
     remove use of Test::Deep completely (GH #17)

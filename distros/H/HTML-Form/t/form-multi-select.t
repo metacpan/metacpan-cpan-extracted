@@ -1,19 +1,19 @@
 #!/usr/bin/perl
 
-# Test for case when multiple forms are on a page with same-named <select> fields. 
+# Test for case when multiple forms are on a page with same-named <select> fields.
 
 use strict;
 use Test::More tests => 2;
 use HTML::Form;
 
-{ 
+{
     my $test = "the settings of a previous form should not interfere with a latter form (control test with one form)";
     my @forms = HTML::Form->parse( FakeResponse::One->new );
     my $cat_form = $forms[0];
     my @vals = $cat_form->param('age');
     is_deeply(\@vals,[''], $test);
 }
-{ 
+{
     my $test = "the settings of a previous form should not interfere with a latter form (test with two forms)";
     my @forms = HTML::Form->parse( FakeResponse::TwoForms->new );
     my $cat_form = $forms[1];

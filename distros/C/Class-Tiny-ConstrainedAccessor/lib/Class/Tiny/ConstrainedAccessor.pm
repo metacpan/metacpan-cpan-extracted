@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Class::Tiny;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000006';
 
 # Docs {{{1
 
@@ -52,25 +52,30 @@ Example of a class using this package:
 
 =head2 import
 
-Creates the accessors you have requested.  Usage:
+Creates the accessors you have requested.  Basic usage:
 
     use Class::Tiny::ConstrainedAccessor
-        [optional arrayref of option=>value],
         name => constraint
-        [, name => constraint]...  ;
+        [, name => constraint ...]; # ... any number of name=>constraint pairs
 
-The options use an arrayref to make them stand out against the
-C<< name=>constraint >> pairs that come after.
+This also creates a L<BUILD()|Class::Tiny/BUILD> subroutine to check the
+constructor parameters, if a C<BUILD()> doesn't already exist.
 
-This also creates a L<Class::Tiny/BUILD> to check the constructor parameters if
-one doesn't exist.  If one does exist, it creates the same function as
-C<_check_all_constraints> so that you can call it from your own BUILD.  It
-takes the same parameters as C<BUILD>.
+If a C<BUILD()> does exist (e.g., you said C<use subs 'BUILD';>), this package
+will create the same function, taking the same parameters as C<BUILD()> would,
+but call it C<_check_all_constraints()>.   You can call this checker from your
+own C<BUILD()> if you want to.
 
 =head1 OPTIONS
 
-Remember, options are carried in an B<arrayref>.  This is to leave room
-for someday carrying attributes and constraints in a hashref.
+To specify options, pass an B<arrayref> as the first argument on the `use`
+line.  This is to leave room for someday carrying attributes and constraints in
+a hashref.  For example:
+
+    use Class::Tiny::ConstrainedAccessor [ OPTION=>value ],
+        name => constraint ...;
+
+Valid options are:
 
 =over
 
@@ -84,7 +89,7 @@ exists or not.  Example:
     use Class::Tiny::ConstrainedAccessor
         [NOBUILD => 1],
         foo => SomeConstraint;
-
+    # Now $object->_check_all_constraints($args) exists, but not BUILD().
 
 =back
 
@@ -112,7 +117,7 @@ sub import {
                 _get_constraint_sub($constraint); # dies on failure
 
         my $accessor = _make_accessor($k, $checker, $get_message);
-        $accessors{$k} = [$checker, $get_message];
+        $accessors{$k} = [$checker, $get_message];      # Save for BUILD()
 
         { # Install the accessor
             no strict 'refs';
@@ -228,15 +233,15 @@ sub _make_build {
 # Rest of the docs {{{1
 __END__
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Christopher White, C<< <cxwembedded at gmail.com> >>.  Thanks to
+Created by Christopher White, C<< <cxwembedded at gmail.com> >>.  Thanks to
 Toby Inkster for code contributions.
 
 =head1 BUGS
 
 Please report any bugs or feature requests through the GitHub Issues interface
-at L<https://github.com/cxw42/Class-Tiny-ConstrainedAccessor>.  I will be
+at L<https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues>.  I will be
 notified, and then you'll automatically be notified of progress on your bug as
 I make changes.
 
@@ -253,10 +258,6 @@ You can also look for information at:
 =item * GitHub (report bugs here)
 
 L<https://github.com/cxw42/Class-Tiny-ConstrainedAccessor>
-
-=item * RT: CPAN's request tracker
-
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Tiny-ConstrainedAccessor>
 
 =item * Search CPAN
 

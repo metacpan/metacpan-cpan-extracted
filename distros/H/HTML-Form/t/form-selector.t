@@ -11,7 +11,7 @@ my $form = HTML::Form->parse(<<"EOT", base => "http://example.com", strict => 1)
 <form>
 <input name="n1" id="id1" class="A" value="1">
 <input id="id2" class="A" value="2">
-<input id="id3" class="B" value="3"> 
+<input id="id3" class="B" value="3">
 <select id="id4">
    <option>1
    <option>2

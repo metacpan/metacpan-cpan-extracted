@@ -41,6 +41,7 @@ BEGIN {
 ##     raw => $bool,                   ##-- attempt to load/save raw data
 ##     fh  => $fh,                     ##-- IO::Handle for read/write
 ##     utf8 => $bool,                  ##-- read/write utf8?
+##     tloc => $attr,                  ##-- if non-empty, parseTokenizerString() sets $w->{$attr}="$off $len"; default=0
 ##     defaultFieldName => $name,      ##-- default name for unnamed fields; parsed into @{$tok->{other}{$name}}; default=''
 ##    }
 
@@ -53,6 +54,7 @@ sub new {
 		   ##-- common
 		   utf8 => 1,
 		   defaultFieldName => '',
+		   #tloc => undef,
 
 		   ##-- user args
 		   @_
@@ -345,12 +347,15 @@ sub parseTTString {
   return $fmt;
 }
 
-## $doc = $CLASS_OR_OBJECT->parseTokenizerString(\$string)
+## $doc = $CLASS_OR_OBJECT->parseTokenizerString(\$string,\%opts)
 ##  + scaled-down version of parseTTString() suitable for use with dwds_tomastotath or moot/waste tokenizer output
 sub parseTokenizerString {
-  my ($that,$tstr) = @_;
+  my ($that,$tstr,$opts) = @_;
   utf8::decode($$tstr) if (!utf8::is_utf8($$tstr));
 
+  my $tloc = ($opts && exists($opts->{tloc}) ? $opts->{tloc}
+	      : (ref($that) ? $that->{tloc}
+		 : undef));
   my ($toks,%sa);
   my $sents =
     [
@@ -370,7 +375,8 @@ sub parseTokenizerString {
 	      ##-- token
 	      {text=>$1,
 		 #loc=>{off=>$2,len=>$3},
-		 ($4 ? (toka=>[map {/^\[(.*)\]$/ ? $1 : $_} split(/\t/,$4)]) : qw())
+		 ($tloc ? ($tloc=>"$2 $3") : qw()),
+		 ($4    ? (toka=>[map {/^\[(.*)\]$/ ? $1 : $_} split(/\t/,$4)]) : qw())
 	       }
 	    }
 	  }
@@ -407,15 +413,15 @@ sub mimeType { return 'text/plain'; }
 sub defaultExtension { return '.tt'; }
 
 ## $str = $fmt->toString()
-## $str = $fmt->toString($formatLevel)
+##  + select output to byte-string
 ##  + flush buffered output document to byte-string
 
 ## $fmt_or_undef = $fmt->toFile($filename_or_handle, $formatLevel)
-##  + flush buffered output document to $filename_or_handle
+##  + select output to named file $filename.
 ##  + default implementation calls $fmt->toFh()
 
 ## $fmt_or_undef = $fmt->toFh($fh,$formatLevel)
-##  + flush buffered output document to filehandle $fh
+##  + select output to an open filehandle $fh.
 ##  + default implementation calls to $fmt->formatString($formatLevel)
 sub toFh {
   $_[0]->DTA::CAB::Format::toFh(@_[1..$#_]);
@@ -441,7 +447,8 @@ sub token2buf {
   $$bufr .= $tok->{text};
 
   ##-- Location ('loc'), moot compatibile
-  $$bufr .= "\t$tok->{loc}{off} $tok->{loc}{len}" if (defined($tok->{loc}));
+  $$bufr .= "\t" . (UNIVERSAL::isa($tok->{loc},'HASH') ? "$tok->{loc}{off} $tok->{loc}{len}" : $tok->{loc}) if ($tok->{loc});
+
 
   ##-- SynCoPe location (for syncope-tab format)
   $$bufr .= "\t[syncope_tag] $tok->{syncope_tag}"   if (defined($tok->{syncope_tag}));

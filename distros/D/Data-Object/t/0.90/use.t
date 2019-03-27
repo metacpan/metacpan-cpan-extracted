@@ -66,7 +66,9 @@ sub test {
 sub test_exists {
   my ($path) = @_;
 
-  ok -f "t/0.90/use/$path.t", "t/0.90/use/$path.t exists";
+  my $name = $path =~ s/\//_/gr;
+
+  ok -f "t/0.90/use/$name.t", "t/0.90/use/$name.t exists";
 
   return;
 }
@@ -83,7 +85,8 @@ sub test_modules {
 sub test_sections {
   my ($path) = @_;
 
-  my $file = "t/0.90/use/$path.t";
+  my $name = $path =~ s/\//_/gr;
+  my $file = "t/0.90/use/$name.t";
 
   return unless -f $file;
 

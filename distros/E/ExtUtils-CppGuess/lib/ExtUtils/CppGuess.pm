@@ -80,6 +80,10 @@ Returns true if the detected compiler is in the gcc family.
 
 Returns true if the detected compiler is in the MS VC family.
 
+=head2 is_clang
+
+Returns true if the detected compiler is in the Clang family.
+
 =head2 add_extra_compiler_flags
 
 Takes a string as argument that is added to the string of extra compiler
@@ -125,7 +129,7 @@ use Config ();
 use File::Basename qw();
 use Capture::Tiny 'capture_merged';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub new {
     my( $class, %args ) = @_;
@@ -179,10 +183,43 @@ sub _os     { shift->{os}     }
 sub _osvers { shift->{osvers} }
 
 sub guess_compiler {
-    my $self = shift;
-    return $self->{guess} ||= $self->_os =~ /^mswin/i
-      ? $self->_guess_win32
-      : $self->_guess_unix;
+  my $self = shift;
+  return $self->{guess} if $self->{guess};
+  my $c_compiler = $self->_cc;
+#  $c_compiler = $Config::Config{cc} if not defined $c_compiler;
+  my %guess;
+  if ($self->{os} eq 'freebsd' && $self->{osvers} =~ /^(\d+)/ && $1 >= 10) {
+    $self->{is_clang} = 1; # special-case override
+    %guess = (
+      compiler_command => 'clang++',
+      extra_lflags => '-lc++',
+    );
+  } elsif( $self->_cc_is_clang( $c_compiler ) ) {
+    %guess = (
+      compiler_command => 'clang++',
+      extra_cflags => '-xc++',
+      extra_lflags => '-lstdc++',
+    );
+  } elsif( $self->_cc_is_gcc( $c_compiler ) ) {
+    %guess = (
+      compiler_command => 'g++',
+      extra_cflags => '-xc++',
+      extra_lflags => '-lstdc++',
+    );
+  } elsif ( $self->_cc_is_msvc( $c_compiler ) ) {
+    %guess = (
+      compiler_command => 'cl',
+      extra_cflags => '-TP -EHsc',
+      extra_lflags => 'msvcprt.lib',
+    );
+  } else {
+    die "Unable to determine a C++ compiler for '$c_compiler' on ".$self->_os;
+  }
+  $guess{extra_lflags} .= ' -lgcc_s'
+    if $self->_os eq 'netbsd' and
+    $guess{compiler_command} =~ /g\+\+/i and
+    $guess{extra_lflags} !~ /-lgcc_s/;
+  $self->{guess} = \%guess;
 }
 
 sub _get_cflags {
@@ -230,53 +267,6 @@ sub module_build_options {
     );
 }
 
-
-sub _guess_win32 {
-    my $self = shift;
-    my $c_compiler = $self->_cc;
-#    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
-    if( $self->_cc_is_gcc( $c_compiler ) ) {
-        return {
-          compiler_command => ($c_compiler eq 'clang' ? 'clang++' : 'g++'),
-          extra_cflags => '-xc++',
-          extra_lflags => '-lstdc++',
-        };
-    } elsif( $self->_cc_is_msvc( $c_compiler ) ) {
-        return {
-          compiler_command => 'cl',
-          extra_cflags => '-TP -EHsc',
-          extra_lflags => 'msvcprt.lib',
-        };
-    } else {
-        die "Unable to determine a C++ compiler for '$c_compiler'";
-    }
-}
-
-sub _guess_unix {
-    my $self = shift;
-    my $c_compiler = $self->_cc;
-#    $c_compiler = $Config::Config{cc} if not defined $c_compiler;
-    if( !$self->_cc_is_gcc( $c_compiler ) ) {
-        die "Unable to determine a C++ compiler for '$c_compiler'";
-    }
-    my %guess;
-    if ($self->{os} eq 'freebsd' && $self->{osvers} =~ /^(\d+)/ && $1 >= 10) {
-      %guess = (
-        compiler_command => 'clang++',
-        extra_lflags => '-lc++',
-      );
-    } else {
-      %guess = (
-        compiler_command => ($c_compiler eq 'clang' ? 'clang++' : 'g++'),
-        extra_cflags => '-xc++',
-        extra_lflags => '-lstdc++',
-      );
-    }
-    $guess{extra_lflags} .= ' -lgcc_s'
-      if $self->_os eq 'netbsd' && $guess{extra_lflags} !~ /-lgcc_s/;
-    \%guess;
-}
-
 # originally from Alien::wxWidgets::Utility
 # Why was this hanging around outside of all functions, and without any other
 # use of $quotes?
@@ -284,10 +274,8 @@ sub _guess_unix {
 
 sub _capture {
     my @cmd = @_;
-
     my $out = capture_merged { system(@cmd) };
     $out = '' if not defined $out;
-
     return $out;
 }
 
@@ -301,7 +289,6 @@ sub _capture_empty_stdin {
         }
     };
     $out = '' if not defined $out;
-
     return $out;
 }
 
@@ -313,10 +300,8 @@ sub _cc_is_msvc {
     return $self->{is_msvc};
 }
 
-
 sub _cc_is_gcc {
     my( $self, $cc ) = @_;
-
     $self->{is_gcc} = 0;
     my $cc_version = _capture( "$cc --version" );
     if (
@@ -324,13 +309,25 @@ sub _cc_is_gcc {
       || scalar( _capture( "$cc" ) =~ m/\bgcc\b/i ) # 2.95
       || scalar(_capture_empty_stdin("$cc -dM -E -") =~ /__GNUC__/) # more or less universal?
       || scalar($cc_version =~ m/\bcc\b.*Free Software Foundation/si) # some 4.x?
+      || $cc eq 'gcc' # because why would they lie?
     ) {
       $self->{is_gcc} = 1;
     }
-
     return $self->{is_gcc};
 }
 
+sub _cc_is_clang {
+    my( $self, $cc ) = @_;
+    $self->{is_clang} = 0;
+    my $cc_version = _capture( "$cc --version" );
+    if (
+         $cc_version =~ m/\Aclang/i
+      || $cc eq 'clang' # because why would they lie?
+    ) {
+      $self->{is_clang} = 1;
+    }
+    return $self->{is_clang};
+}
 
 sub is_gcc {
     my $self = shift;
@@ -340,10 +337,14 @@ sub is_gcc {
 
 sub is_msvc {
     my $self = shift;
-
     $self->guess_compiler || die;
-
     return $self->{is_msvc};
+}
+
+sub is_clang {
+    my $self = shift;
+    $self->guess_compiler || die;
+    return $self->{is_clang};
 }
 
 sub add_extra_compiler_flags {

@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Color::ANSI::Util" => "0.161",
     "Color::RGB::Util" => "0.595",
     "DateTime" => 0,
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.50",
     "List::Util" => "1.45",
     "PERLANCAR::Module::List" => 0,
     "Text::ANSI::Util" => "0.22",
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Color::RGB::Util" => "0.595",
   "DateTime" => 0,
   "File::Spec" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.45",

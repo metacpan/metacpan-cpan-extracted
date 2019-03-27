@@ -1,7 +1,7 @@
 package App::CalId;
 
-our $DATE = '2017-03-21'; # DATE
-our $VERSION = '0.12'; # VERSION
+our $DATE = '2019-03-26'; # DATE
+our $VERSION = '0.130'; # VERSION
 
 use 5.010001;
 use strict;
@@ -82,7 +82,7 @@ _
     result_naked => 1,
 };
 sub gen_monthly_calendar {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::bool;my $arg_err; if (exists($args{'highlight_today'})) { (($args{'highlight_today'} //= 1), 1) && (!defined($args{'highlight_today'}) ? 1 :  ((!ref($args{'highlight_today'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for highlight_today: $arg_err" } } else { $args{'highlight_today'} = 1;}no warnings ('void');require Data::Sah::Compiler::perl::TH::int;require Scalar::Util::Numeric;if (exists($args{'month'})) { ((defined($args{'month'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'month'})) ? 1 : (($arg_err //= "Not of type integer"),0)) && (($args{'month'} >= 1 && $args{'month'} <= 12) ? 1 : (($arg_err //= "Must be between 1 and 12"),0)); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for month: $arg_err" } }if (!exists($args{'month'})) { die "gen_monthly_calendar(): " . "Missing argument: month" } no warnings ('void');if (exists($args{'show_holiday_list'})) { (($args{'show_holiday_list'} //= 1), 1) && (!defined($args{'show_holiday_list'}) ? 1 :  ((!ref($args{'show_holiday_list'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for show_holiday_list: $arg_err" } } else { $args{'show_holiday_list'} = 1;}no warnings ('void');if (exists($args{'show_joint_leave'})) { (($args{'show_joint_leave'} //= 0), 1) && (!defined($args{'show_joint_leave'}) ? 1 :  ((!ref($args{'show_joint_leave'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for show_joint_leave: $arg_err" } } else { $args{'show_joint_leave'} = 0;}no warnings ('void');if (exists($args{'show_next_month_days'})) { (($args{'show_next_month_days'} //= 1), 1) && (!defined($args{'show_next_month_days'}) ? 1 :  ((!ref($args{'show_next_month_days'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for show_next_month_days: $arg_err" } } else { $args{'show_next_month_days'} = 1;}no warnings ('void');if (exists($args{'show_prev_month_days'})) { (($args{'show_prev_month_days'} //= 1), 1) && (!defined($args{'show_prev_month_days'}) ? 1 :  ((!ref($args{'show_prev_month_days'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for show_prev_month_days: $arg_err" } } else { $args{'show_prev_month_days'} = 1;}no warnings ('void');if (exists($args{'show_year_in_title'})) { (($args{'show_year_in_title'} //= 1), 1) && (!defined($args{'show_year_in_title'}) ? 1 :  ((!ref($args{'show_year_in_title'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for show_year_in_title: $arg_err" } } else { $args{'show_year_in_title'} = 1;}no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'time_zone'})) { ((defined($args{'time_zone'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'time_zone'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for time_zone: $arg_err" } }no warnings ('void');if (exists($args{'year'})) { ((defined($args{'year'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'year'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { die "gen_monthly_calendar(): " . "Invalid argument value for year: $arg_err" } }if (!exists($args{'year'})) { die "gen_monthly_calendar(): " . "Missing argument: year" } # VALIDATE_ARGS
+    my %args = @_;
     my $m = $args{month};
     my $y = $args{year};
 
@@ -180,7 +180,7 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub gen_calendar {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::bool;my $arg_err; if (exists($args{'highlight_today'})) { (($args{'highlight_today'} //= 1), 1) && (!defined($args{'highlight_today'}) ? 1 :  ((!ref($args{'highlight_today'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { return [400, "Invalid argument value for highlight_today: $arg_err"] } } else { $args{'highlight_today'} = 1;}no warnings ('void');require Data::Sah::Compiler::perl::TH::int;require Scalar::Util::Numeric;if (exists($args{'month'})) { ((defined($args{'month'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'month'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for month: $arg_err"] } }no warnings ('void');if (exists($args{'months'})) { (($args{'months'} //= 1), 1) && ((defined($args{'months'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'months'})) ? 1 : (($arg_err //= "Not of type integer"),0)) && (($args{'months'} >= 1) ? 1 : (($arg_err //= "Must be at least 1"),0)) && (($args{'months'} <= 12) ? 1 : (($arg_err //= "Must be at most 12"),0)); if ($arg_err) { return [400, "Invalid argument value for months: $arg_err"] } } else { $args{'months'} = 1;}no warnings ('void');if (exists($args{'show_holiday_list'})) { (($args{'show_holiday_list'} //= 1), 1) && (!defined($args{'show_holiday_list'}) ? 1 :  ((!ref($args{'show_holiday_list'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { return [400, "Invalid argument value for show_holiday_list: $arg_err"] } } else { $args{'show_holiday_list'} = 1;}no warnings ('void');if (exists($args{'show_joint_leave'})) { (($args{'show_joint_leave'} //= 0), 1) && (!defined($args{'show_joint_leave'}) ? 1 :  ((!ref($args{'show_joint_leave'})) ? 1 : (($arg_err //= "Not of type boolean value"),0))); if ($arg_err) { return [400, "Invalid argument value for show_joint_leave: $arg_err"] } } else { $args{'show_joint_leave'} = 0;}no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'time_zone'})) { ((defined($args{'time_zone'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'time_zone'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for time_zone: $arg_err"] } }no warnings ('void');if (exists($args{'year'})) { ((defined($args{'year'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'year'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for year: $arg_err"] } }if (!exists($args{'year'})) { return [400, "Missing argument: year"] } # VALIDATE_ARGS
+    my %args = @_;
     my $y  = $args{year};
     my $m  = $args{month};
     my $mm = $args{months} // 1;
@@ -253,7 +253,7 @@ App::CalId - Display Indonesian calendar on the command-line
 
 =head1 VERSION
 
-This document describes version 0.12 of App::CalId (from Perl distribution App-CalId), released on 2017-03-21.
+This document describes version 0.130 of App::CalId (from Perl distribution App-CalId), released on 2019-03-26.
 
 =head1 SYNOPSIS
 
@@ -271,7 +271,7 @@ command-line.
 
 Usage:
 
- gen_calendar(%args) -> [status, msg, result, meta]
+ gen_calendar(%args) -> [status, msg, payload, meta]
 
 Generate one or more monthly calendars in 3-column format.
 
@@ -306,7 +306,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -373,7 +373,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

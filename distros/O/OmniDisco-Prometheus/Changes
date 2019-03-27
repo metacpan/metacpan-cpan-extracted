@@ -11,3 +11,7 @@ Revision history for Perl module OD::Prometheus
 0.005 2019-03-06
 
   * Add more methods to OD::Prometheus::Set class
+
+0.006 2019-03-27
+
+  * Add OD::Prometheus::Query

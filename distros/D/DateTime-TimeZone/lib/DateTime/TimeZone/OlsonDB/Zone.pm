@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.23';
+our $VERSION = '2.34';
 
 use DateTime::TimeZone;
 use DateTime::TimeZone::OlsonDB;

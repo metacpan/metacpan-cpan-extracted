@@ -67,7 +67,7 @@ my %WriteMakefileArgs = (
     "LWP::MediaTypes" => 6,
     "MIME::Base64" => "2.1",
     "Net::FTP" => "2.58",
-    "Net::HTTP" => "6.07",
+    "Net::HTTP" => "6.18",
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "URI" => "1.10",
@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.37",
+  "VERSION" => "6.38",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -120,7 +120,7 @@ my %FallbackPrereqs = (
   "LWP::MediaTypes" => 6,
   "MIME::Base64" => "2.1",
   "Net::FTP" => "2.58",
-  "Net::HTTP" => "6.07",
+  "Net::HTTP" => "6.18",
   "Scalar::Util" => 0,
   "Test::Fatal" => 0,
   "Test::More" => 0,

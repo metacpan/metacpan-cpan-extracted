@@ -2,12 +2,13 @@ use strict;
 use warnings;
 
 package OD::Prometheus::Set;
-$OD::Prometheus::Set::VERSION = '0.005';
+$OD::Prometheus::Set::VERSION = '0.006';
 use v5.24;
 use Moose;
 use LWP::UserAgent;
 use Data::Printer;
 use Scalar::Util qw(looks_like_number reftype);
+use List::Util qw( sum );
 use OD::Prometheus::Metric;
 
 =head1 NAME
@@ -16,7 +17,7 @@ OD::Prometheus::Set - A set of Prometheus metrics
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =cut
 
@@ -36,7 +37,7 @@ sub push {
 }
 
 sub size {
-	scalar $_[0]->metrics->@*
+	sum( map { $_->size } $_[0]->metrics->@* ) // 0 # we do this to make sure we always get a number
 }
 
 sub is_empty {
@@ -49,6 +50,10 @@ sub pop {
 
 sub item {
 	$_[0]->metrics->[ $_[1] ]
+}
+
+sub to_string {
+	join("\n",map { $_->to_string } $_[0]->metrics->@*)
 }
 
 sub find {

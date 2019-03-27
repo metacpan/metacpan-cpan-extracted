@@ -25,7 +25,7 @@ subtest oui_url => sub {
 subtest fetch_url => sub {
 	my $connected = do {
 		my $tx = $class->ua->head( Net::MAC::Vendor::oui_url() );
-		$tx->success && $tx->res->code;
+		!$tx->error && $tx->res->code;
 		};
 	diag 'Did', ( $connected ? '' : ' not' ),
 		' connect to ' . Net::MAC::Vendor::oui_url();
@@ -34,7 +34,7 @@ subtest fetch_url => sub {
 		skip "Skipping network tests when not connected", 1 unless $connected;
 
 		my $tx = $class->ua->head( $class->oui_url );
-		ok( $tx->success, "Fetching URL was a success" );
+		ok( !$tx->error, "Fetching URL was a success" );
 		}
 	};
 

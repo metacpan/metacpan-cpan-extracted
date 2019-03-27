@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-dist.ini
 lib/Business/OnlinePayment/Mock.pm
 perlcritic.rc
 perltidy.rc
@@ -17,4 +16,5 @@ t/01-set-default-mock.t
 t/02-set-mock-response.t
 t/03-submit.t
 t/author-critic.t
+t/author-pod-coverage.t
 t/release-kwalitee.t

@@ -1,6 +1,6 @@
 package Data::Object::Func::Regexp::Gt;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 extends 'Data::Object::Func::Regexp';
 

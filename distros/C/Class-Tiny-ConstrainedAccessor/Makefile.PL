@@ -170,8 +170,10 @@ my %opts = (
         'Path::Class' => '0',
     },
     TEST_REQUIRES => {
+        'Exporter' => '0',
         'Import::Into' => '0',
         'lib::relative' => '0.002',
+        'parent' => '0',
         'Test::Builder' => '0',
         'Test::Exception' => '0',
         'Test::Fatal' => '0',       # TODO replace uses of this with T~::Ex~

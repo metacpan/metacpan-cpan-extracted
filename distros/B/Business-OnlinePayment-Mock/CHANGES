@@ -1,9 +1,62 @@
 ==================================================
-Changes from 2017-05-17 00:00:00 +0000 to present.
+Changes from 2018-03-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.006 at 2018-05-17 17:53:04 +0000
+version 0.007 at 2019-03-25 21:37:41 +0000
+------------------------------------------
+
+  Change: 3ea6f316cb0842d63f8ddb039796e2196f2d53e2
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-03-25 15:37:31 +0000
+
+    add PreAuth support 
+
+  Change: 75caa398b97226014ab3eb4347e221c65a324450
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2019-03-25 15:34:17 +0000
+
+    version bump 
+
+  Change: 887e5a7aed7dd703cc127b146965043c55669ea3
+  Author: Jason Terry <oaxlin@gmail.com>
+  Date : 2018-05-18 15:56:14 +0000
+
+    Merge pull request #4 from csjewell/master
+
+    Some dist.ini cleanups. 
+
+  Change: 2ec1024c8803d0dd1cbe772aaa0a152c0eb3d7e5
+  Author: Curtis Jewell <swordsman@curtisjewell.name>
+  Date : 2018-05-18 15:46:23 +0000
+
+    Move Git::Contributors with the other git stuff
+
+    Also add comments. 
+
+  Change: 5d9b7502d6a7c0f7f1a1a795bd53161b0d281d18
+  Author: Curtis Jewell <swordsman@curtisjewell.name>
+  Date : 2018-05-18 15:43:34 +0000
+
+    Add POD coverage, move perlcritic tests with the other tests. 
+
+  Change: cbf90c8b59d89189d4015007656b274ab04aa200
+  Author: Curtis Jewell <swordsman@curtisjewell.name>
+  Date : 2018-05-18 15:42:32 +0000
+
+    Move things that deal with the source code together. 
+
+  Change: fd2a3ba68808bc337c89ffdf84ecc183d38be3f4
+  Author: Curtis Jewell <swordsman@curtisjewell.name>
+  Date : 2018-05-18 15:35:31 +0000
+
+    Add Git::GatherDir, remove GatherDir
+
+    This removes dist.ini from the tarball (it is not needed there), and
+    anything that is gitignored. 
+
+------------------------------------------
+version 0.006 at 2018-05-17 17:53:00 +0000
 ------------------------------------------
 
   Change: 717f34a6ccb1f3a808349aaabee07cf1e34d1aa0

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package OD::Prometheus::Client;
-$OD::Prometheus::Client::VERSION = '0.005';
+$OD::Prometheus::Client::VERSION = '0.006';
 use v5.24;
 use Moose;
 use LWP::UserAgent;
@@ -16,7 +16,7 @@ OD::Prometheus::Client - Client library to talk to Prometheus nodes
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =cut
 

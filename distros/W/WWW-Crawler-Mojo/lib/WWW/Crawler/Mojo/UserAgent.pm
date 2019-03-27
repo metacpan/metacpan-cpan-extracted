@@ -5,7 +5,7 @@ use Mojo::Base 'Mojo::UserAgent';
 use Mojo::URL;
 use 5.010;
 
-has active_conn => 0;
+has active_conn          => 0;
 has active_conn_per_host => sub { {} };
 has '_creds';
 has keep_credentials => 1;
@@ -19,7 +19,7 @@ sub new {
     $self->on(
       start => sub {
         my ($self, $tx) = @_;
-        my $url = $tx->req->url;
+        my $url      = $tx->req->url;
         my $host_key = _host_key($url) or return;
         if ($url->userinfo) {
           $self->{_creds}->{$host_key} = $url->userinfo;

@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/jamadam/WWW-Crawler-Mojo/issues
   repository: https://github.com/jamadam/WWW-Crawler-Mojo
-version: '0.21'
+version: '0.22'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

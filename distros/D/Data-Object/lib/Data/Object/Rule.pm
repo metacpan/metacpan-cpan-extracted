@@ -30,7 +30,7 @@ Data-Object Class Requirements
 
   package Persona;
 
-  use Data::Object Rule;
+  use Data::Object 'Rule';
 
   requires 'id';
   requires 'fname';

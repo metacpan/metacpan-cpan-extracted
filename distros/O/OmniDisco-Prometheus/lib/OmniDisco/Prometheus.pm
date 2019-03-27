@@ -1,20 +1,21 @@
 use strict;
 
 package OmniDisco::Prometheus;
-$OmniDisco::Prometheus::VERSION = '0.005';
+$OmniDisco::Prometheus::VERSION = '0.006';
 =head1 NAME
 
 OmniDisco::Prometheus - Client library to talk to Prometheus nodes
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =cut
 
 
 use OD::Prometheus::Metric;
 use OD::Prometheus::Client;
+use OD::Prometheus::Query;
 
 =head1 COPYRIGHT & LICENSE
  

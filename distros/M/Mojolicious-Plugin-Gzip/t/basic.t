@@ -2,7 +2,7 @@ use strict;
 use Test::More;
 use Test::Mojo;
 use Mojolicious::Lite;
-use Mojo::Util qw/gzip/;
+use Mojo::Util qw/gunzip gzip/;
 
 get '/' => sub {
     my ($c) = @_;
@@ -72,30 +72,29 @@ $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, co
   ->header_unlike(Vary => qr/Accept-Encoding/);
 
 # gzip content encoding means no gzip by this plugin
-my $gzipped_text = gzip $text;
-$t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { data => $gzipped_text, content_encoding => 'gzip' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+$t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { data => gzip $text, content_encoding => 'gzip' })
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_unlike(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # gzip in Accept-Encoding, 200 status, length >= 860, no content_encoding means gzip
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # case doesn't matter for accept encoding
 $t->get_ok('/' => { 'Accept-Encoding' => 'Gzip' } => json => { body => $text })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 $t->get_ok('/' => { 'Accept-Encoding' => 'GzIp' } => json => { body => $text })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 done_testing;

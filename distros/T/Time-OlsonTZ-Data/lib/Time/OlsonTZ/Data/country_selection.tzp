@@ -2056,7 +2056,7 @@ use strict;
 	},
 	MK => {
 		alpha2_code => "MK",
-		olson_name => "Macedonia",
+		olson_name => "North Macedonia",
 		regions => {
 			"" => {
 				location_coords => "+4159+02126",
@@ -3045,7 +3045,7 @@ use strict;
 	},
 	SZ => {
 		alpha2_code => "SZ",
-		olson_name => "Swaziland",
+		olson_name => "Eswatini (Swaziland)",
 		regions => {
 			"" => {
 				location_coords => "-2618+03106",

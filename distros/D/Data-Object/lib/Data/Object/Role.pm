@@ -30,7 +30,7 @@ Data-Object Role Declaration
 
   package Persona;
 
-  use Data::Object Role;
+  use Data::Object 'Role';
 
   with 'Relatable';
 

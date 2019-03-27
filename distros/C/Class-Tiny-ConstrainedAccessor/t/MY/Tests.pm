@@ -24,6 +24,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Test::Fatal;
+use MY::Helpers;
 
 =head1 FUNCTIONS
 
@@ -55,46 +56,46 @@ sub test_accessors {
     is(
         exception { $dut->regular($_) },
         undef,
-        'Regular accepts ' . ($_ // 'undef')
+        'Regular accepts ' . _dor
     ) foreach (0, 9, 10, 19, 20, 'some string', undef, \*STDOUT);
 
     # The constrained accessors accept 10..19
     is(
         exception { $dut->medint($_) },
         undef,
-        'medint accepts ' . ($_ // 'undef')
+        'medint accepts ' . _dor
     ) foreach (10..19, "10".."19");
 
     is(
         exception { $dut->med_with_default($_) },
         undef,
-        'med_with_default accepts ' . ($_ // 'undef')
+        'med_with_default accepts ' . _dor
     ) foreach (10..19, "10".."19");
 
     # The constrained accessors reject numbers outside that range
     like(
         exception { $dut->medint($_) },
         qr/./,
-        'medint rejects ' . ($_ // 'undef')
+        'medint rejects ' . _dor
     ) foreach (0..9, "0".."9", 20..29, "20".."29");
 
     like(
         exception { $dut->med_with_default($_) },
         qr/./,
-        'med_with_default rejects ' . ($_ // 'undef')
+        'med_with_default rejects ' . _dor
     ) foreach (0..9, "0".."9", 20..29, "20".."29");
 
     # The constrained accessors reject random stuff
     like(
         exception { $dut->medint($_) },
         qr/./,
-        'medint rejects ' . ($_ // 'undef')
+        'medint rejects ' . _dor
     ) foreach ('some string', undef, \*STDOUT);
 
     like(
         exception { $dut->med_with_default($_) },
         qr/./,
-        'med_with_default rejects ' . ($_ // 'undef')
+        'med_with_default rejects ' . _dor
     ) foreach ('some string', undef, \*STDOUT);
 } #test_accessors()
 
@@ -113,7 +114,7 @@ in the specified class).  The coderef is for flexibility.
 sub test_construction {
     my $class = shift;
     die "Need a class name" unless $class;
-    my $factory = shift // sub { $class->new(@_) };
+    my $factory = shift || sub { $class->new(@_) };
 
     # Sanity check: parameters OK
     my $obj = $factory->(regular=>1, medint=>10);

@@ -1,6 +1,6 @@
 package Data::Object::Func::Float::Eq;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 extends 'Data::Object::Func::Float';
 

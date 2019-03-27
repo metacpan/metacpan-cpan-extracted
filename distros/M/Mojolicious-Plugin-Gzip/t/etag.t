@@ -2,7 +2,7 @@ use strict;
 use Test::More;
 use Test::Mojo;
 use Mojolicious::Lite;
-use Mojo::Util qw/gzip/;
+use Mojo::Util qw/gunzip gzip/;
 
 get '/' => sub {
     my ($c) = @_;
@@ -28,100 +28,99 @@ $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text_bel
   ->header_unlike(Vary => qr/Accept-Encoding/);
 
 my $text = 'a' x 860;
-my $gzipped_text = gzip $text;
 
 # Test that etag is not set with undef etag provided
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_like(ETag => qr/^$/)
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test that etag is not set with empty etag provided
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_like(ETag => qr/^$/)
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test quote of length 1
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '"' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '""-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test quote of length 2
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '""' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"""-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test quote of length 3
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '"""' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '""-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test a of length 1
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => 'a' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"a-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test a of length 2
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => 'aa' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"aa-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test a of length 3
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => 'aaa' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"aaa-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 # Test etags surrounded by quotes, the way that they should be
 
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '"a"' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"a-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '"ab"' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"ab-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '"abc"' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"abc-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 $t->get_ok('/' => { 'Accept-Encoding' => 'gzip' } => json => { body => $text, etag => '"abcd"' })
-  ->content_is($gzipped_text)
-  ->header_is('Content-Length' => length($gzipped_text))
+  ->header_is('Content-Length' => length($t->tx->res->body))
   ->header_is(ETag => '"abcd-gzip"')
   ->header_is('Content-Encoding' => 'gzip')
   ->header_like(Vary => qr/Accept-Encoding/);
+is gunzip($t->tx->res->body), $text, 'gunzipped text is equal to original text';
 
 done_testing;

@@ -158,11 +158,8 @@ is resolve_href($base, '//www.eclipse.org/forums/'),
 
 # Additional real world use case
 $base = 'https://example.com/';
-is resolve_href($base, ' foo'),
-  'https://example.com/foo', 'right url';
-is resolve_href($base, 'foo '),
-  'https://example.com/foo', 'right url';
-is resolve_href($base, 'foo bar'),
-  'https://example.com/foo%20bar', 'right url';
-is resolve_href($base, "foo\nbar"),
-  'https://example.com/foobar', 'right url';
+is resolve_href($base, ' foo'), 'https://example.com/foo', 'right url';
+is resolve_href($base, 'foo '), 'https://example.com/foo', 'right url';
+is resolve_href($base, 'foo bar'), 'https://example.com/foo%20bar',
+  'right url';
+is resolve_href($base, "foo\nbar"), 'https://example.com/foobar', 'right url';

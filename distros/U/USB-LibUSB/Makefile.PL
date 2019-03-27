@@ -1,10 +1,15 @@
+use strict;
+use warnings;
+
+use 5.008003;
 use ExtUtils::MakeMaker;
+use Config;
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
 my $libs = $ENV{USB_LIBUSB_LIB};
 my $inc = $ENV{USB_LIBUSB_INCLUDE};
-
 
 if (not defined $libs or not defined $inc) {
     `pkg-config --exists libusb-1.0`;
@@ -29,6 +34,7 @@ See section INSTALLATION in the module documentation.
 EOF
         
 }
+print "CCFLAGS: $Config{ccflags}\n";
 
 WriteMakefile(
     NAME              => 'USB::LibUSB',
@@ -53,7 +59,7 @@ WriteMakefile(
     LIBS              => [$libs], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => $inc, # e.g., '-I. -I/usr/include/other'
-    CCFLAGS           => '-Wall -std=gnu99',
+    CCFLAGS           => "$Config{ccflags} -Wall -std=gnu99",
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {

@@ -2,202 +2,88 @@ package Devel::KYTProf;
 use strict;
 use warnings;
 
-use base qw/Class::Data::Inheritable/;
+our $VERSION = '0.9991';
 
-our $VERSION = '0.05';
+use Class::Data::Lite (
+    rw => {
+        namespace_regex         => undef,
+        ignore_class_regex      => undef,
+        context_classes_regex   => undef,
+        logger                  => undef,
+        threshold               => undef,
+        remove_linefeed         => undef,
+        remove_escape_sequences => undef,
 
-__PACKAGE__->mk_classdata( namespace_regex       => undef );
-__PACKAGE__->mk_classdata( ignore_class_regex    => undef );
-__PACKAGE__->mk_classdata( context_classes_regex => undef );
-__PACKAGE__->mk_classdata( logger => undef );
-__PACKAGE__->mk_classdata( threshold => undef );
-__PACKAGE__->mk_classdata( remove_linefeed => undef );
-__PACKAGE__->mk_classdata( remove_escape_sequences => undef );
+        color_time   => 'red',
+        color_module => 'cyan',
+        color_info   => 'blue',
+        color_call   => 'green',
 
-__PACKAGE__->mk_classdata( color_time   => 'red' );
-__PACKAGE__->mk_classdata( color_module => 'cyan' );
-__PACKAGE__->mk_classdata( color_info   => 'blue' );
-__PACKAGE__->mk_classdata( color_call   => 'green' );
+        _orig_code => {},
+        _prof_code => {},
+    },
+);
 
-__PACKAGE__->mk_classdata( _orig_code   => {} );
-__PACKAGE__->mk_classdata( _prof_code   => {} );
-
-use UNIVERSAL::require;
+use Module::Load ();
 use Time::HiRes;
 use Term::ANSIColor;
 
-'DBI'->require and do {
-    no warnings 'redefine';
-    __PACKAGE__->add_prof(
-        'DBI',
-        'connect',
-        sub {
-            my ($orig, $class, $dsn, $user, $pass, $attr) = @_;
-            return [
-                '%s %s',
-                ['dbi_connect_method', 'dsn'],
-                {
-                    dbi_connect_method => $attr->{dbi_connect_method} || 'connect',
-                    dsn => $dsn,
-                },
-            ];
-        }
-    );
-    __PACKAGE__->add_prof(
-        'DBI::st',
-        'execute',
-        sub {
-            my ($orig, $sth, @binds) = @_;
-            my $sql = $sth->{Database}->{Statement};
-            my $bind_info = scalar(@binds) ? '(bind: '.join(', ', map { defined $_ ? $_ : 'undef' } @binds).')' : '';
-            return [
-                '%s %s (%d rows)',
-                ['sql', 'sql_binds', 'rows'],
-                {
-                    sql => $sql,
-                    sql_binds => $bind_info,
-                    rows => $sth->rows,
-                },
-            ];
-        }
-    );
-};
+sub import {
+    __PACKAGE__->apply_prof('DBI');
+    __PACKAGE__->apply_prof('LWP::UserAgent');
+    __PACKAGE__->apply_prof('Cache::Memcached::Fast');
+    __PACKAGE__->apply_prof('MogileFS::Client');
+    __PACKAGE__->apply_prof('Furl::HTTP');
+    1;
+}
 
-'LWP::UserAgent'->require and do {
-    __PACKAGE__->add_prof(
-        'LWP::UserAgent',
-        'request',
-        sub {
-            my($orig, $self, $request, $arg, $size, $previous) = @_;
-            return [
-                '%s %s',
-                ['http_method', 'http_url'],
-                {
-                    http_method => $request->method,
-                    http_url => ''.$request->uri,
-                },
-            ];
-        },
-    );
-};
+sub apply_prof {
+    my ($class, $pkg, $prof_pkg, @args) = @_;
+    eval { Module::Load::load($pkg) };
+    return if $@;
 
-'Cache::Memcached::Fast'->require and do {
-    for my $method (qw/add append set get gets delete prepend replace cas incr decr/) {
-        __PACKAGE__->add_prof(
-            'Cache::Memcached::Fast',
-            $method,
-            sub {
-                my ($orig, $self, $key) = @_;
-                return [
-                    '%s %s',
-                    ['memcached_method', 'memcached_key'],
-                    {
-                        memcached_method => $method,
-                        memcached_key => $key,
-                    },
-                ];
-            }
-        );
-        my $method_multi = $method.'_multi';
-        __PACKAGE__->add_prof(
-            'Cache::Memcached::Fast',
-            $method_multi,
-            sub {
-                my ($orig, $self, @args) = @_;
-                if (ref $args[0] eq 'ARRAY') {
-                    return [
-                        '%s %s',
-                        ['memcached_method', 'memcached_key'],
-                        {
-                            memcached_method => $method_multi,
-                            memcached_key => join( ', ', map { $_->[0] } @args),
-                        },
-                    ];
-                } else {
-                    return [
-                        '%s %s',
-                        ['memcached_method', 'memcached_key'],
-                        {
-                            memcached_method => $method_multi,
-                            memcached_key => join( ', ', map {ref($_) eq 'ARRAY' ? join(', ',@$_) : $_} @args),
-                        },
-                    ];
-                }
-            }
-        );
+    $prof_pkg ||= "Devel::KYTProf::Profiler::$pkg";
+    eval {Module::Load::load($prof_pkg)};
+    if ($@) {
+        die qq{failed to load profiler package "$prof_pkg" for "$pkg": $@\n};
     }
-
-    __PACKAGE__->add_prof(
-        'Cache::Memcached::Fast',
-        'remove',
-        sub {
-            my ($orig, $self, $key,) = @_;
-            return [
-                '%s %s',
-                ['memcached_method', 'memcached_key'],
-                {
-                    memcached_method => 'remove',
-                    memcached_key => $key,
-                },
-            ];
-        }
-    );
-};
-
-'MogileFS::Client'->require and do {
-    __PACKAGE__->add_profs(
-        'MogileFS::Client',
-        [qw{
-            edit_file
-            read_file
-            store_file
-            store_content
-            get_paths
-            get_file_data
-            delete
-            rename
-        }],
-    );
-};
-
-'Furl::HTTP'->require and do {
-    __PACKAGE__->add_prof(
-        'Furl::HTTP',
-        'request',
-        sub {
-            my($orig, $self, %args) = @_;
-            return [
-                '%s %s',
-                ['http_method', 'http_url'],
-                {
-                    http_method => $args{method},
-                    http_url => $args{url},
-                },
-            ];
-        },
-    );
-};
+    unless ($prof_pkg->can('apply')) {
+        die qq{"$prof_pkg" has no `apply` method. A profiler package should implement it.\n};
+    }
+    $prof_pkg->apply(@args);
+}
 
 sub add_profs {
-    my ($class, $module, $methods, $callback) = @_;
-    $module->require; # or warn $@ and return;
+    my ($class, $module, $methods, $callback, $sampler) = @_;
+    eval {Module::Load::load($module)};
     if ($methods eq ':all') {
-        Class::Inspector->require or return;
+        eval { Module::Load::load('Class/Inspector.pm') };
+        return if $@;
         $methods = [];
         @$methods = @{Class::Inspector->methods($module, 'public')};
     }
     for my $method (@$methods) {
-        $class->add_prof($module, $method, $callback);
+        $class->add_prof($module, $method, $callback, $sampler);
     }
 }
 
 sub add_prof {
-    my ($class, $module, $method, $callback) = @_;
-    $module->require; # or warn $@ and return;
-    my $orig  = $module->can($method) or return;
-    $class->_orig_code->{$module}->{$method} = $orig;
+    my ($class, $module, $method, $callback, $sampler) = @_;
+    eval {Module::Load::load($module)};
+    my $orig = $class->_orig_code->{$module}{$method};
+    unless ($orig) {
+        $orig = $module->can($method) or return;
+        $class->_orig_code->{$module}->{$method} = $orig;
+    }
 
-    my $code  = sub {
+    my $code = sub {
+        if ($sampler) {
+            my $is_sample = $sampler->($orig, @_);
+            unless ($is_sample) {
+                return $orig->(@_);
+            }
+        }
+
         my ($package, $file, $line, $level);
         my $namespace_regex       = $class->namespace_regex;
         my $ignore_class_regex    = $class->ignore_class_regex;
@@ -355,14 +241,15 @@ Output as follows.
 
 You can add profiler to any method.
 
-  Devel::KYTProf->add_prof($module, $method);
-  Devel::KYTProf->add_prof($module, $method, $callback);
+  Devel::KYTProf->add_prof($module, $method, [$callback, $sampler]);
+  Devel::KYTProf->add_profs($module, $methods, [$callback, $sampler]);
+  Devel::KYTProf->add_profs($module, ':all', [$callback, $sampler]);
 
-  Devel::KYTProf->add_profs($module, $methods);
-  Devel::KYTProf->add_profs($module, $methods, $callback);
+The C<< $sampler >> is still an experimental feature.
 
-  Devel::KYTProf->add_profs($module, ':all');
-  Devel::KYTProf->add_profs($module, ':all', $callback);
+You can specify profiler packages.
+
+  Devel::KYTProf->apply_prof($pkg, [$prof_pkg, @args]);
 
 You can change settings.
 

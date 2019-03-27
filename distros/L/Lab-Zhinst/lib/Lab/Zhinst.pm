@@ -73,8 +73,8 @@ for the exact list of needed commands.
 
 =item *
 
-Make sure that you have a 32-bit version of StrawberryPerl 5.20 or 5.18.
-It is currently not possible to use other versions (see L<https://rt.cpan.org/Public/Bug/Display.html?id=121219>).
+For StrawberryPerl, version 5.26 or newer is required.
+Especially with 64-bit StrawberryPerl it is currently not possible to use earlier versions (see L<https://rt.cpan.org/Public/Bug/Display.html?id=121219>).
 
 =item *
 
@@ -345,7 +345,7 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(

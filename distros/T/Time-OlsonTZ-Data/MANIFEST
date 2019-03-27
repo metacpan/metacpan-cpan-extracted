@@ -298,7 +298,6 @@ lib/Time/OlsonTZ/Data/Etc/GMT-7.tz
 lib/Time/OlsonTZ/Data/Etc/GMT-8.tz
 lib/Time/OlsonTZ/Data/Etc/GMT-9.tz
 lib/Time/OlsonTZ/Data/Etc/GMT.tz
-lib/Time/OlsonTZ/Data/Etc/UCT.tz
 lib/Time/OlsonTZ/Data/Etc/UTC.tz
 lib/Time/OlsonTZ/Data/Europe/Amsterdam.tz
 lib/Time/OlsonTZ/Data/Europe/Andorra.tz

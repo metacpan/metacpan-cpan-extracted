@@ -8,12 +8,12 @@ use Storable qw(freeze thaw );
 
 has table_name => 'jobs';
 has 'jobs';
-has blob => 0;
+has blob               => 0;
 has redundancy_storage => sub { {} };
 
 sub new {
   my ($class, $conn, %opts) = @_;
-  my $self = $class->SUPER::new(jobs => Mojo::mysql->new($conn)->db, %opts);
+  my $self  = $class->SUPER::new(jobs => Mojo::mysql->new($conn)->db, %opts);
   my $table = $self->table_name;
 
   unless ($self->jobs->query("show tables LIKE '$table'")->rows) {

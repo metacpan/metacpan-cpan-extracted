@@ -416,7 +416,6 @@ tools/parse_olson
 tools/tests_from_zdump
 tools/tz-num-to-date
 tools/update-from-latest-olson
-weaver.ini
 xt/author/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/eol.t

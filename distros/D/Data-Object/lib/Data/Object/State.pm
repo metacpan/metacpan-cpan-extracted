@@ -70,7 +70,7 @@ Data-Object Singleton Declaration
 
   package Registry;
 
-  use Data::Object State;
+  use Data::Object 'State';
 
   extends 'Environment';
 

@@ -159,7 +159,7 @@ our @EXPORT = qw(
 	LIBUSB_TRANSFER_TYPE_MASK
 );
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

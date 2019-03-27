@@ -36,6 +36,8 @@
             "CryptX" : "0.034",
             "Exporter" : "5.57",
             "JSON::MaybeXS" : "1.003005",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
@@ -49,6 +51,6 @@
          "url" : "https://github.com/DCIT/perl-Crypt-JWT"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

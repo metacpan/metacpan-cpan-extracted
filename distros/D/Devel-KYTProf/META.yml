@@ -3,28 +3,67 @@ abstract: 'Simple profiler'
 author:
   - 'Yasuhiro Onishi <yasuhiro.onishi@gmail.com>'
 build_requires:
-  ExtUtils::MakeMaker: 6.36
+  Test::More: '0.98'
+  Test::Requires: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.36
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Devel-KYTProf
 no_index:
   directory:
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::KYTProf:
+    file: lib/Devel/KYTProf.pm
+    version: '0.9991'
+  Devel::KYTProf::Logger::LTSV:
+    file: lib/Devel/KYTProf/Logger/LTSV.pm
+  Devel::KYTProf::Profiler::Cache::Memcached::Fast:
+    file: lib/Devel/KYTProf/Profiler/Cache/Memcached/Fast.pm
+  Devel::KYTProf::Profiler::DBI:
+    file: lib/Devel/KYTProf/Profiler/DBI.pm
+  Devel::KYTProf::Profiler::Furl::HTTP:
+    file: lib/Devel/KYTProf/Profiler/Furl/HTTP.pm
+  Devel::KYTProf::Profiler::LWP::UserAgent:
+    file: lib/Devel/KYTProf/Profiler/LWP/UserAgent.pm
+  Devel::KYTProf::Profiler::MogileFS::Client:
+    file: lib/Devel/KYTProf/Profiler/MogileFS/Client.pm
 requires:
-  Class::Data::Inheritable: 0
-  Term::ANSIColor: 0
-  Time::HiRes: 0
-  UNIVERSAL::require: 0
+  Class::Data::Lite: '0'
+  Class::Inspector: '0'
+  DBIx::Tracer: '0'
+  Module::Load: '0'
+  Term::ANSIColor: '0'
 resources:
-  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/onishi/perl5-devel-kytprof/issues
+  homepage: https://github.com/onishi/perl5-devel-kytprof
   repository: git://github.com/onishi/perl5-devel-kytprof.git
-version: 0.05
+version: '0.9991'
+x_authority: cpan:ONISHI
+x_contributors:
+  - 'Atsushi Kobayashi <nekokak@gmail.com>'
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'Kentaro Kuribayashi <kentarok@gmail.com>'
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+  - 'Wakaba <wakabatan@hatena.ne.jp>'
+  - 'Yasuhiro Onishi <onishi@hatena.ne.jp>'
+  - 'cho45 <cho45@lowreal.net>'
+  - 'hitode909 <hitode909@gmail.com>'
+  - 'motemen <motemen@gmail.com>'
+  - 'shiba_yu36 <shibayu36@gmail.com>'
+  - 'soh335 <sugarbabe335@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

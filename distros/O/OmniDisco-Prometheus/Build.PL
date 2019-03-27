@@ -19,16 +19,19 @@ my %module_build_args = (
     "Athanasios Douitsis <aduitsis\@cpan.org>"
   ],
   "dist_name" => "OmniDisco-Prometheus",
-  "dist_version" => "0.005",
+  "dist_version" => "0.006",
   "license" => "artistic_2",
   "module_name" => "OmniDisco::Prometheus",
   "recursive_test_files" => 1,
   "requires" => {
     "Data::Printer" => 0,
+    "JSON" => 0,
     "LWP::UserAgent" => 0,
+    "List::Util" => 0,
     "Moose" => 0,
     "Regexp::Common" => 0,
     "Scalar::Util" => 0,
+    "URI" => 0,
     "overload" => 0,
     "perl" => "v5.24.0",
     "strict" => 0,
@@ -36,6 +39,7 @@ my %module_build_args = (
   },
   "test_requires" => {
     "Test2::V0" => 0,
+    "Test::LWP::UserAgent" => 0,
     "perl" => "v5.24.0"
   }
 );
@@ -44,6 +48,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "Module::Build" => "0.28",
   "Test2::V0" => 0,
+  "Test::LWP::UserAgent" => 0,
   "perl" => "v5.24.0"
 );
 

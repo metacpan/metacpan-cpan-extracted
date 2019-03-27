@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.23';
+our $VERSION = '2.34';
 
 our @ALL =
 qw(
@@ -1900,7 +1900,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2018i' }
+sub OlsonVersion { '2019a' }
 
 
 1;
@@ -2249,10 +2249,10 @@ so that applications can easily present a list of timezones.
 
 =head3 Indian
 
-  Indian/Kerguelen
   Indian/Mahe
   Indian/Mauritius
   Indian/Reunion
+  Indian/Kerguelen
   Indian/Christmas
   Indian/Cocos
   Indian/Chagos

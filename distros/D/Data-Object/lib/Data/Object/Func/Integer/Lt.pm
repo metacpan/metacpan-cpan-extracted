@@ -1,6 +1,6 @@
 package Data::Object::Func::Integer::Lt;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 extends 'Data::Object::Func::Integer';
 

@@ -1,6 +1,10 @@
 Revision history for WWW-Crawler-Mojo
 
-0.21 2017/01/17
+0.22 2019/03/27
+  - Fixed default error callback
+
+0.21 2019/03/06
+  - Adjusted to latest Mojolicious release.
   - Fix a bug where url including white spaces haven't been treated propery.
   - Form submition now includes passwords and dates.
   - Started Appveyor to test against windows.

@@ -36,16 +36,12 @@ our @DATA = (
   'data_float',
   'data_hash',
   'data_integer',
-  'data_json',
   'data_number',
-  'data_path',
   'data_regexp',
   'data_scalar',
   'data_space',
   'data_string',
-  'data_tmpl',
-  'data_undef',
-  'data_yaml'
+  'data_undef'
 );
 
 our @TYPE = (
@@ -120,36 +116,6 @@ sub do {
   }
 
   goto $point;
-}
-
-# TINIES
-
-sub data_json {
-  my $class = 'Data::Object::Json';
-  my $point = load($class)->can('from');
-
-  unshift @_, $class and goto $point;
-}
-
-sub data_path {
-  my $class = 'Data::Object::Path';
-  my $point = load($class)->can('new');
-
-  unshift @_, $class and goto $point;
-}
-
-sub data_tmpl {
-  my $class = 'Data::Object::Template';
-  my $point = load($class)->can('new');
-
-  unshift @_, $class and goto $point;
-}
-
-sub data_yaml {
-  my $class = 'Data::Object::Yaml';
-  my $point = load($class)->can('from');
-
-  unshift @_, $class and goto $point;
 }
 
 # JUMPERS
@@ -267,7 +233,7 @@ sub immutable {
 }
 
 sub library {
-  my $class = 'Data::Object::Config::Library';
+  my $class = 'Data::Object::Library';
   my $point = load($class)->can('meta');
 
   unshift @_, $class and goto $point;
@@ -622,16 +588,12 @@ sub path_name {
   *float = *data_float;
   *hash = *data_hash;
   *integer = *data_integer;
-  *json = *data_json;
   *number = *data_number;
-  *path = *data_path;
   *regexp = *data_regexp;
   *scalar = *data_scalar;
   *space = *data_space;
   *string = *data_string;
-  *tmpl = *data_tmpl;
   *undef = *data_undef;
-  *yaml = *data_yaml;
 
   # aliases (backwards compatibility)
   *type_any = *data_any;
@@ -1033,29 +995,6 @@ C<type_integer> function is an alias to this function.
 
 =cut
 
-=head2 data_json
-
-  data_json(Any @args) : Any
-
-The data_json function encodes Perl data to JSON or decodes JSON strings to
-Perl.
-
-=over 4
-
-=item data_json example
-
-  # given $string
-
-  my $data = data_json($string);
-
-  # given $data
-
-  my $string = data_json($data);
-
-=back
-
-=cut
-
 =head2 data_number
 
   data_number(Num $arg1) : NumObject
@@ -1072,25 +1011,6 @@ C<type_number> function is an alias to this function.
 
   $object = data_number 100;
   $object->isa('Data::Object::Number');
-
-=back
-
-=cut
-
-=head2 data_path
-
-  data_path(Any @args) : Any
-
-The data_path function returns a L<Data::Object::Path> object for the given
-path.
-
-=over 4
-
-=item data_path example
-
-  # given $filepath
-
-  my $path = data_path($filepath);
 
 =back
 
@@ -1179,26 +1099,6 @@ C<type_string> function is an alias to this function.
 
 =cut
 
-=head2 data_tmpl
-
-  data_tmpl(Any @args) : Any
-
-The data_tmpl function returns a L<Data::Object::Template> object.
-
-=over 4
-
-=item data_tmpl example
-
-  # given ($content, $variables)
-
-  my $tmpl = data_tmpl;
-
-  my $data = $tmpl->render($content, $variables);
-
-=back
-
-=cut
-
 =head2 data_undef
 
   data_undef(Undef $arg1) : UndefObject
@@ -1215,29 +1115,6 @@ C<type_undef> function is an alias to this function.
 
   $object = data_undef undef;
   $object->isa('Data::Object::Undef');
-
-=back
-
-=cut
-
-=head2 data_yaml
-
-  data_yaml(Any @args) : Any
-
-The data_yaml function encodes Perl data to YAML or decodes YAML strings to
-Perl.
-
-=over 4
-
-=item data_yaml example
-
-  # given $string
-
-  my $data = data_yaml($string);
-
-  # given $data
-
-  my $string = data_yaml($data);
 
 =back
 

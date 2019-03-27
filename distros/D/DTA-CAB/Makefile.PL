@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 ##----------------------------------------------------------------------
 ## Constants
-my $VERSION = '1.107';
+my $VERSION = '1.109';
 
 ##----------------------------------------------------------------------
 ## Hacks
@@ -232,7 +232,10 @@ HTML_EXTRA ?= \
   doc-extra/spliced2cab.xsl \
   doc-extra/spliced2ling.xsl \
   doc-extra/tcf-orthswap.xsl \
-  doc-extra/cab-screenshot-annotated.png
+  doc-extra/ling2norm.xsl \
+  doc-extra/ling2plain.xsl \
+  doc-extra/cab-screenshot-annotated.png \
+  doc-extra/sysarch.png
 
 ##-- lifted from MakeMaker blibdir section
 $(INST_HTMLDIR)$(DFSEP).exists :: Makefile.PL

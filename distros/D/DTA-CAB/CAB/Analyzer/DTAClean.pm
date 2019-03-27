@@ -24,7 +24,8 @@ sub new {
   return $that->SUPER::new(
 			   ##-- security
 			   label => 'clean',
-			   forceClean => 1,  ##-- always run analyzeClean() regardless of options; also checked in analyzeClean() itself
+			   forceClean => 1,   ##-- always run analyzeClean() regardless of options; also checked in analyzeClean() itself
+			   cleanPublic => 1,  ##-- cleanup level: 0=verbose, 1=terse (for public wrapper "clean" parameter)
 
 			   ##-- user args
 			   @_,
@@ -90,29 +91,30 @@ sub doAnalyze {
 sub analyzeClean {
   my ($ach,$doc,$opts) = @_;
 
-  ##-- prune output
-  if (1) {
-    ##-- black-list
-    my @prune_keys = qw(tokpp toka lts morph rw eqphox dmoot);
-    foreach (map {@{$_->{tokens}}} @{$doc->{body}}) {
+  ##-- prune output (black-list)
+  my $cleanPublic = (exists($opts->{cleanPublic}) ? $opts->{cleanPublic} : $ach->{cleanPublic}) || 0;
+  $ach->debug("analyzeClean(): cleanPublic=$cleanPublic");
+
+  ##-- black-list
+  my @prune_keys = (qw(morph),
+		    ($cleanPublic ? qw(tokpp toka lts rw eqphox dmoot) : qw()),
+		   );
+  my ($s,$w);
+  foreach $s (@{$doc->{body}}) {
+    foreach $w (@{$s->{tokens}}) {
       ##-- map 'morph' to 'hasmorph'
-      $_->{hasmorph} = 1 if ($_->{morph} && @{$_->{morph}});
+      $w->{hasmorph} = 1 if ($w->{morph} && @{$w->{morph}});
 
       ##-- delete all unsafe keys
-      delete @$_{@prune_keys};
-      delete @{$_->{moot}}{qw(analyses details)} if ($_->{moot}); ##-- moot/analyses, moot/details: also unsafe
+      delete @$w{@prune_keys};
+      delete @{$w->{moot}}{qw(analyses details)} if ($w->{moot}); ##-- moot/analyses, moot/details: also unsafe
 
-      ##-- delete any remaining keys with undef values
-      #delete @$tok{grep {!defined($_->{$_})} keys %$tok};
-    }
-  }
-  elsif (0) {
-    ##-- white-list
-    my %keep_keys = map {($_=>undef)} qw(text id xlit mlatin eqpho eqrw eqlemma moot);
-    foreach (map {@{$_->{tokens}}} @{$doc->{body}}) {
-      ##-- delete all unsafe keys
-      delete @$_{grep {!exists($keep_keys{$_})} keys %$_};
-      delete $_->{moot}{analyses} if ($_->{moot});
+      ##-- deep cleaning of embedded 'morph' keys (for {cleanPublic=>0} and rwsub, dmootsub)
+      if (!$cleanPublic) {
+	delete @$_{@prune_keys} foreach (grep {UNIVERSAL::isa($_,'HASH')}
+					 map  {UNIVERSAL::isa($_,'ARRAY') ? @$_ : $_}
+					 values %$w);
+      }
     }
   }
 

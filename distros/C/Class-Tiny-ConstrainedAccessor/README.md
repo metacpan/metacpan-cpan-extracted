@@ -41,25 +41,30 @@ Example of a class using this package:
 
 ## import
 
-Creates the accessors you have requested.  Usage:
+Creates the accessors you have requested.  Basic usage:
 
     use Class::Tiny::ConstrainedAccessor
-        [optional arrayref of option=>value],
         name => constraint
-        [, name => constraint]...  ;
+        [, name => constraint ...]; # ... any number of name=>constraint pairs
 
-The options use an arrayref to make them stand out against the
-`name=>constraint` pairs that come after.
+This also creates a [BUILD()](https://metacpan.org/pod/Class::Tiny#BUILD) subroutine to check the
+constructor parameters, if a `BUILD()` doesn't already exist.
 
-This also creates a ["BUILD" in Class::Tiny](https://metacpan.org/pod/Class::Tiny#BUILD) to check the constructor parameters if
-one doesn't exist.  If one does exist, it creates the same function as
-`_check_all_constraints` so that you can call it from your own BUILD.  It
-takes the same parameters as `BUILD`.
+If a `BUILD()` does exist (e.g., you said `use subs 'BUILD';`), this package
+will create the same function, taking the same parameters as `BUILD()` would,
+but call it `_check_all_constraints()`.   You can call this checker from your
+own `BUILD()` if you want to.
 
 # OPTIONS
 
-Remember, options are carried in an **arrayref**.  This is to leave room
-for someday carrying attributes and constraints in a hashref.
+To specify options, pass an **arrayref** as the first argument on the \`use\`
+line.  This is to leave room for someday carrying attributes and constraints in
+a hashref.  For example:
+
+    use Class::Tiny::ConstrainedAccessor [ OPTION=>value ],
+        name => constraint ...;
+
+Valid options are:
 
 - NOBUILD
 
@@ -71,16 +76,17 @@ for someday carrying attributes and constraints in a hashref.
         use Class::Tiny::ConstrainedAccessor
             [NOBUILD => 1],
             foo => SomeConstraint;
+        # Now $object->_check_all_constraints($args) exists, but not BUILD().
 
-# AUTHOR
+# AUTHORS
 
-Christopher White, `<cxwembedded at gmail.com>`.  Thanks to
+Created by Christopher White, `<cxwembedded at gmail.com>`.  Thanks to
 Toby Inkster for code contributions.
 
 # BUGS
 
 Please report any bugs or feature requests through the GitHub Issues interface
-at [https://github.com/cxw42/Class-Tiny-ConstrainedAccessor](https://github.com/cxw42/Class-Tiny-ConstrainedAccessor).  I will be
+at [https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues](https://github.com/cxw42/Class-Tiny-ConstrainedAccessor/issues).  I will be
 notified, and then you'll automatically be notified of progress on your bug as
 I make changes.
 
@@ -95,10 +101,6 @@ You can also look for information at:
 - GitHub (report bugs here)
 
     [https://github.com/cxw42/Class-Tiny-ConstrainedAccessor](https://github.com/cxw42/Class-Tiny-ConstrainedAccessor)
-
-- RT: CPAN's request tracker
-
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Tiny-ConstrainedAccessor](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Tiny-ConstrainedAccessor)
 
 - Search CPAN
 

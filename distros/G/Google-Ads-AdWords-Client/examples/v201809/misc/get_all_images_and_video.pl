@@ -14,9 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# This example gets all images and videos associated to the account.
-# To upload video, see
-# http://adwords.google.com/support/aw/bin/answer.py?hl=en&amp;answer=39454.
+# This code example gets all videos and images.
+# Use the Google Ads website to upload new videos.
 # To upload an image, run misc/upload_image.pl.
 
 use strict;

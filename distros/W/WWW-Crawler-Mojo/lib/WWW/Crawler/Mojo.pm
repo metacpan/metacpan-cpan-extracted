@@ -8,7 +8,7 @@ use WWW::Crawler::Mojo::UserAgent;
 use WWW::Crawler::Mojo::ScraperUtil qw{
   collect_urls_css html_handler_presets reduce_html_handlers resolve_href decoded_body};
 use Mojo::Message::Request;
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 has clock_speed       => 0.25;
 has html_handlers     => sub { html_handler_presets() };
@@ -37,9 +37,12 @@ sub init {
 
   $self->on('empty', sub { say "Queue is drained out."; $self->stop })
     unless $self->has_subscribers('empty');
-  $self->on('error',
-    sub { say "An error occured during crawling $_[0]: $_[1]" })
-    unless $self->has_subscribers('error');
+  $self->on(
+    'error',
+    sub {
+      say sprintf("An error occured during crawling %s: %s", $_[2]->url, $_[1]);
+    }
+  ) unless $self->has_subscribers('error');
   $self->on('res', sub { $_[1]->() }) unless $self->has_subscribers('res');
 
   $self->ua->transactor->name($self->ua_name);
@@ -131,7 +134,7 @@ sub scrape {
     if ((my $base_tag = $res->dom->at('base[href]'))) {
       $base = resolve_href($base, $base_tag->attr('href'));
     }
-    my $dom = Mojo::DOM->new(decoded_body($res));
+    my $dom      = Mojo::DOM->new(decoded_body($res));
     my $handlers = reduce_html_handlers($self->html_handlers, $contexts);
     for my $selector (sort keys %{$handlers}) {
       $dom->find($selector)->each(
@@ -374,7 +377,7 @@ network errors or un-responsible servers.
 
     $bot->on(error => sub {
         my ($bot, $error, $job) = @_;
-        say "error: $_[1]";
+        say "error: $error";
         if (...) { # until failur occures 3 times
             $bot->requeue($job);
         }
@@ -465,14 +468,6 @@ enqueue method.
         if (...) { # until failur occures 3 times
             $bot->requeue($job);
         }
-    });
-
-=head2 collect_urls_html
-
-Collects URLs out of HTML.
-
-    $bot->collect_urls_html($dom, sub {
-        my ($uri, $dom) = @_;
     });
 
 =head1 EXAMPLE

@@ -1,5 +1,8 @@
 Revision history for Calendar::Hebrew
 
+0.08  Mon Mar 25 15:20:00 2019
+      - Updated dependency on Date::Hebrew::Simple v0.11.
+
 0.07  Tue Nov 18 18:30:00 2018
       - Updated dependency on Date::Hebrew::Simple v0.10.
 

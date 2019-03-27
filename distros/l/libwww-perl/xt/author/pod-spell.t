@@ -99,6 +99,7 @@ Harald
 Hay
 Hedlund
 Hoblitt
+Hoesel
 Horsfall
 Hukins
 Hwa
@@ -237,6 +238,8 @@ Subbarao
 TCP
 Takanori
 Takumi
+Th
+Theo
 Theodore
 Thoennes
 Thompson
@@ -380,6 +383,7 @@ tom
 trcjr
 turugina
 uid39246
+van
 ville
 waif
 wfmann

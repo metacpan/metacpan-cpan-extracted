@@ -1,6 +1,6 @@
 package Data::Object::Func::String::Lowercase;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 extends 'Data::Object::Func::String';
 

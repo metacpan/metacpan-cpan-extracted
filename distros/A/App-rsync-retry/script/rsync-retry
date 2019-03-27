@@ -1,0 +1,157 @@
+#!perl
+
+our $DATE = '2019-03-27'; # DATE
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+
+use File::Which;
+use Getopt::Long;
+
+my %Opts = (
+    retry_times => -1,
+    retry_delay => 30,
+);
+
+Getopt::Long::Configure(
+    'bundling', 'pass_through', 'no_auto_abbrev', 'permute');
+GetOptions(
+    'help|h|?' => sub {
+        print <<'_';
+Usage: rsync-retry [options] <source> <target>
+
+Options:
+  --help, -h, -?   Show this message and exit.
+  --version        Show program version and exit.
+  --retry-times=i  Number of times to retry (0=no retry, -1=unlimited).
+                   Default: -1.
+  --retry-delay=i  Number of seconds to wait before retrying. Default: 30.
+
+All the other options will be passed to rsync.
+
+See manpage for more detailed documentation.
+_
+        exit 0;
+    },
+    'version' => sub {
+        no warnings 'once';
+        print "rsync-retry version ", ($main::VERSION || "dev"),
+            ($main::DATE ? " ($main::DATE)" : ""), "\n";
+        exit 0;
+    },
+    'retry-times=i' => \$Opts{retry_times},
+    'retry-delay=i' => \$Opts{retry_delay},
+);
+
+my $rsync_cmd = $ENV{RSYNC_RETRY_RSYNC_CMD} ||
+    which("rsynccolor") ? "rsynccolor" : "rsync";
+
+my $retries = 0;
+while (1) {
+    system {$rsync_cmd} $rsync_cmd, @ARGV;
+    last unless $?;
+    my $exit_code = $? >> 8;
+    if ($exit_code =~ /\A(10|11|12|22|23|24|30|35)\z/) {
+        $retries++;
+        if ($Opts{retry_times} == -1 || $retries <= $Opts{retry_times}) {
+            warn "rsync-retry: $rsync_cmd exit-code is $exit_code, retrying ($retries) after $Opts{retry_delay} second(s) ...\n";
+            sleep $Opts{retry_delay};
+            next;
+        } else {
+            warn "rsync-retry: $rsync_cmd exit-code is $exit_code, won't retry anymore, exiting\n";
+            exit $exit_code;
+        }
+    } else {
+        exit $exit_code;
+    }
+}
+
+# ABSTRACT: Rsync wrapper to retry on transfer errors
+# PODNAME: rsync-retry
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rsync-retry - Rsync wrapper to retry on transfer errors
+
+=head1 VERSION
+
+This document describes version 0.002 of rsync-retry (from Perl distribution App-rsync-retry), released on 2019-03-27.
+
+=head1 SYNOPSIS
+
+Use like you would use B<rsync>:
+
+ % rsync-retry -Pavz [other options...] <source> <target>
+
+=head1 DESCRIPTION
+
+This wrapper runs B<rsync> then check its exit code. If exit code indicates
+transfer errors (e.g. I/O error, socket error, partial transfers, timeout) it
+will re-run the rsync. The number of retries to perform is set by the
+L</"--retry-times"> option, while the number of seconds to wait before each
+retry is set by the L</"--retry-delay"> option.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Shortcuts: -h, -?.
+
+=head2 --version
+
+=head2 --retry-times
+
+Default: -1 (unlimited).
+
+=head2 --retry-delay
+
+In seconds. Default: 30.
+
+=head1 ENVIRONMENT
+
+=head2 RSYNC_RETRY_RSYNC_CMD
+
+String. Rsync command to use. Defaults to C<rsynccolor> (if available) or
+C<rsync> otherwise. Can be used to chain several wrappers together.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-rsync-retry>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-rsync-retry>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-rsync-retry>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<rsync>.
+
+Some other wrappers for rsync: L<rsync-new2old>, L<rsynccolor>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

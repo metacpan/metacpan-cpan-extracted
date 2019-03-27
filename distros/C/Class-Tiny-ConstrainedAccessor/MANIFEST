@@ -25,6 +25,7 @@ t/MY/Class/TypeTiny.pm
 t/MY/Class/TypeTinyBadDefaults.pm
 t/MY/Class/TypeTinyBUILD.pm
 t/MY/Class/TypeTinyNOBUILD.pm
+t/MY/Helpers.pm
 t/MY/Kit.pm
 t/MY/Tests.pm
 t/MY/TypeLib/MooXTypesMooseLike.pm

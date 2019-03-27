@@ -60,7 +60,7 @@
          "web" : "https://github.com/srchulo/Mojolicious-Plugin-Gzip"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Adam Hopkins <violapiratejunky@gmail.com>"
    ],

@@ -13,7 +13,7 @@ use Carp;
 use Exporter 'import';
 our @EXPORT = @USB::LibUSB::XS::EXPORT;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 has 'ctx' => (
     is => 'ro',
@@ -263,8 +263,8 @@ You will also need to add
 
 to the B<Path> environment variable.
 
-The latest supported version of Strawberry Perl is 5.20. In our tests the build
-fails for newer versions.
+For StrawberryPerl, version 5.26 or newer is required
+(see L<https://rt.cpan.org/Public/Bug/Display.html?id=121219>).
 
 =head4 Driver Installation
 

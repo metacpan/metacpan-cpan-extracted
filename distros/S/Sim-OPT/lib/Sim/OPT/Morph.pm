@@ -58,7 +58,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.103'; # our $VERSION = '';
+$VERSION = '0.105'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH
@@ -486,7 +486,7 @@ sub morph
 									{
 										change_groundreflectance
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus   );
+											\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "genchange" )#
 									{
@@ -505,113 +505,113 @@ sub morph
 									{
 										make_generic_change
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
+											\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
 									} #
 									elsif ( $modtype eq "translate_surface" )
 									{
 										translate_surfaces
 										($to, $stepsvar, $countop, $countstep,
-											\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "rotate_surface" )              #
 									{
 										rotate_surface
 										($to, $stepsvar, $countop, $countstep,
-											\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "shift_vertices" )
 									{
 										shift_vertices
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "translate_vertices" )
 									{
 										#say $tee "HITTING \$countinstance $countinstance";
 										translate_vertices
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "construction_reassign" )
 									{
 										reassign_construction
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "rotate" )
 									{
 										rotate
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "translate" )
 									{
 
 										translate
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "apply_constraints" )
 									{
 
 										apply_constraints
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "change_thickness" )
 									{
 										change_thickness
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "rotatez" )
 									{
 										rotatez
 										($to, $stepsvar, $countop, $countstep,
-											\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "change_config" )
 									{
 										change_config
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "reshape_windows" )
 									{
 										reshape_windows
 										($to, $stepsvar, $countop, $countstep,
-											\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "obs_modify" )
 									{
 										obs_modify
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 
 									}
 									elsif ( $modtype eq "warping" )
 									{
 										warp
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "vary_controls" )
 									{
 										vary_controls
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "vary_net" )
 									{
 										vary_net
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+											\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									elsif ( $modtype eq "change_climate" )
 									{
 										change_climate
 										( $to, $stepsvar, $countop, $countstep,
-											\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus );
+											\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus, $countinstance );
 									}
 									else
 									{
@@ -643,7 +643,7 @@ sub morph
 
 												my ( $v_ref ) = constrain_geometry
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus );
+													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus, $countinstance );
 												@v = @$v_ref;
 												@v_ = @$v__ref;
 											}
@@ -654,7 +654,7 @@ sub morph
 													genprop ( $to, $stepsvar, $countop, $countstep,
 														\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $action,
 														$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
-														$newfilecontents_ref, $launchline );
+														$newfilecontents_ref, $launchline, \@menus, $countinstance );
 														%nums = %$nums_ref;
 														%names = %$names_ref;
 														%newcontents = %$newcontents_ref;
@@ -666,7 +666,7 @@ sub morph
 											{
 												my ( $obs_ref, $obs__ref ) = constrain_obstructions
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus );
+													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus, $countinstance );
 													@obs = @$obs_ref;
 													@obs_ = @$obs__ref;
 											}
@@ -675,7 +675,7 @@ sub morph
 											{
 												my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
 													$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus );
+													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus, $countinstance );
 													@node = @$node_ref;
 													@component = @$component_ref;
 													@donode = @$donode_ref;
@@ -687,7 +687,7 @@ sub morph
 												my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
 												( $to, $stepsvar, $countop,
 													$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus );
+													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus, $countinstance );
 													@loopcontrol = @$loopcontrol_ref;
 													@flowcontrol = @$flowcontrol_ref;
 													@new_loopcontrol = @$new_loopcontrol_ref;
@@ -698,47 +698,47 @@ sub morph
 											{
 												apply_constraints
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 
 											if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
 											{
 												pin_obstructions
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 
 											if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
 											{
 												recalculatenet
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 
 											if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
 											{
 												recalculateish
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 
 											if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
 											{
 												daylightcalc
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 											if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) )
 											{
 												use_modish
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 											if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
 											{
 												export_toenergyplus
 												( $to, $stepsvar, $countop,
-													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
+													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus, $countinstance );
 											}
 										}
 									}
@@ -817,7 +817,7 @@ sub morph
 											my $countvar = $d{countvar};
 											my $countstep = $d{countstep};
 											my $to = $d{to}{crypto};
-											my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers);
+											my $stepsvar = Sim::OPT::getstepsvar( $countvar, $countcase, \@varinumbers );
 
 											foreach my $todo ( @todolist )
 											{
@@ -837,12 +837,12 @@ sub morph
 														}
 
 
-														if ( ( defined( $constrain_geometry[$countop] ) ) and ( ( $action eq "read_geo" ) or ( $action_ eq "write_geo" ) ) )
+														if ( ( defined( $constrain_geometry[ $countop ] ) ) and ( ( $action eq "read_geo" ) or ( $action_ eq "write_geo" ) ) )
 														{
 
 															my ( $v_ref ) = constrain_geometry
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus );
+																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus, $countinstance );
 															@v = @$v_ref;
 															@v_ = @$v__ref;
 														}
@@ -855,7 +855,7 @@ sub morph
 																genprop ( $to_, $stepsvar_, $countop, $countstep_,
 																	\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,
 																	$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref,
-																	$newfilecontents_ref, $newlaunchline, \@menus );
+																	$newfilecontents_ref, $newlaunchline, \@menus, $countinstance );
 																	%nums = %$nums_ref;
 																	%names = %$names_ref;
 																	%newcontents = %$newcontents_ref;
@@ -867,7 +867,7 @@ sub morph
 														{
 															my ( $obs_ref, $obs__ref ) = constrain_obstructions
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus );
+																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus, $countinstance );
 																@obs = @$obs_ref;
 																@obs_ = @$obs__ref;
 														}
@@ -876,7 +876,7 @@ sub morph
 														{
 															my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop,
 																$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus );
+																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus, $countinstance );
 																@node = @$node_ref;
 																@component = @$component_ref;
 																@donode = @$donode_ref;
@@ -888,7 +888,7 @@ sub morph
 															my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
 															( $to, $stepsvar, $countop,
 																$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus  );
+																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus, $countinstance  );
 																@loopcontrol = @$loopcontrol_ref;
 																@flowcontrol = @$flowcontrol_ref;
 																@new_loopcontrol = @$new_loopcontrol_ref;
@@ -899,35 +899,35 @@ sub morph
 														{
 															apply_constraints
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 
 														if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
 														{
 															pin_obstructions
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 
 														if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) )
 														{
 															recalculatenet
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 
 														if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) )
 														{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
 															recalculateish
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 
 														if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) )
 														{
 															daylightcalc
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 
 
@@ -935,13 +935,13 @@ sub morph
 														{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
 															use_modish
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 														if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) )
 														{
 															export_toenergyplus
 															( $to, $stepsvar, $countop,
-																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus );
+																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus, $countinstance );
 														}
 
 													}
@@ -1241,7 +1241,7 @@ sub gatherseparators
 
 sub translate
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 
@@ -1411,7 +1411,7 @@ $printthis
 
 sub translate_surfaces
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 
 	my @applytype = @$swap;
@@ -1595,7 +1595,7 @@ $printthis";
 
 sub rotate_surface
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytyperef, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytyperef, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytyperef;
 	my $zone_letter = $applytype[$countop][3];
@@ -1688,7 +1688,7 @@ $printthis";
 sub translate_vertices
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref,
-		$countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+		$countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my @translate_vertices = @$translate_vertices_ref; #say $tee "IN MORPH \@translate_vertices: " . dump( @translate_vertices );
@@ -1843,7 +1843,7 @@ $printthis";
 
 sub shift_vertices
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
@@ -1980,7 +1980,7 @@ $printthis";
 
 sub rotate    # generic zone rotation
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
@@ -2124,7 +2124,7 @@ $printthis
 
 sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE FUNCTION GENERIC ENOUGH.
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $rotatez, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $rotatez, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
@@ -2289,7 +2289,7 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 
 sub reassign_construction
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
@@ -2359,7 +2359,7 @@ $printthis";
 
 sub change_thickness
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 	my @applytype = @$applytype_ref;
 
 	my @menus = @$menus_ref;
@@ -2441,15 +2441,12 @@ sub readobsfile
 {    # THIS READS A GEO FILE TO GET THE DATA OF THE REQUESTED OBSTRUCTIONS
 	my ( $fullgeopath ) = @_;
 
-	#my @lines = `cat $fullgeopath`;
-	open( GEOF, "<$fullgeopath" );
+	open( GEOF, "$fullgeopath" ) or die;
 	my @lines = <GEOF>;
 	close GEOF;
 
-
 	my $countelt = 0;
-	my %obs_letter = (
-				1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 8 => "l", 9 => "m", 10 => "n", 11 => "o" ); # RE-CHECK
+	my %obs_letter = ( 1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 8 => "l", 9 => "m", 10 => "n", 11 => "o" ); # RE-CHECK
 
 	my %obsts;
 
@@ -2457,7 +2454,7 @@ sub readobsfile
 	{
 		if ( $line =~ m/^\*obs/ )
 		{
-			my @elts = split(/\s+|,/, $line);
+			my @elts = split( /\s+|,/, $line );
 			my $obsnum = $elts[13];
 			my $obsletter = $obs_letter{$obsnum};
 			$obsts{$obsletter}{obsnum} = $obsnum;
@@ -2475,7 +2472,7 @@ sub readobsfile
 
 sub obs_modify
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $obs_modify_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $obs_modify_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 	my @applytype = @$applytype_ref; #say $tee "\@applytype : " . dump( @applytype );
 	my $geofile = $applytype[$countop][2]; #say $tee "\$geofile : " . dump( $geofile );
 	my $zone_letter = $applytype[$countop][3]; #say $tee "\$zone_letter : " . dump( $zone_letter );
@@ -2491,6 +2488,7 @@ sub obs_modify
 	my $fullgeopath = "$to/zones/$geofile"; #say $tee "\$fullgeopath : $fullgeopath" ;
 	my @obsrefs = @{ $case_cycle_ref }; #say $tee "\@obsrefs : " . dump( @obsrefs );
 
+	#say $tee "\$fullgeopath : " . dump( $fullgeopath );
 	my %obsts = readobsfile( $fullgeopath ); #say $tee "\%obsts : " . dump( %obsts );
 
 
@@ -2514,7 +2512,7 @@ sub obs_modify
 
 			if ( $modification_type eq "a" )
 			{
-				@base = @{ $obsts{$obsletter}{origin} }; #say $tee "\@base : " . dump( @base );
+				@base = @{ $obsts{$obsletter}{origin} }; #say $tee "MOD TYPE A \@base : " . dump( @base );
 			}
 			elsif ( $modification_type eq "b" )
 			{
@@ -2628,8 +2626,8 @@ YYY
 					print `$printthis`;
 				}
 				print $tee "
-	#Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
-	$printthis"; say  "\$printthis : " . dump( $printthis );
+#Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.
+$printthis"; say  "\$printthis : " . dump( $printthis );
 			}
 
 
@@ -2899,7 +2897,7 @@ YYY
 
 sub recalculateish
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
@@ -2997,7 +2995,7 @@ sub ifempty
 
 sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $filedf, $swap2, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $filedf, $swap2, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
@@ -3224,7 +3222,7 @@ $printthis";
 
 sub change_config
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_config_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_config_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
@@ -3303,7 +3301,7 @@ sub checkfile # THIS CHECKS IF A SOURCE FILE MUST BE SUBSTITUTED BY ANOTHER ONE.
 
 sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK ITSELF IF PRINTED TO THE SHELL?
 {  # THIS FUNCTION CHANGES THE CLIMATE FILES.
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_climate_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_climate_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 
 
@@ -3384,7 +3382,7 @@ $printthis";
 
 sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING THE NETS, BELOW, BUT WORKS AND IS SIMPLER
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculatenet_ref, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculatenet_ref, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
@@ -3685,7 +3683,7 @@ $printthis";
 		}
 		elsif ( ($mode eq "componentmode") and ( $line =~ "crack "))
 		{
-			MY $printthis =
+			my $printthis =
 "prj $launchline<<YYY
 b
 m
@@ -3733,7 +3731,7 @@ YYY
 sub pin_obstructions
 {
 	#use strict; use warnings;
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $pin_obstructions_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $pin_obstructions_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 
@@ -3801,7 +3799,7 @@ sub pin_obstructions
 sub apply_constraints
 {
 
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my @apply_constraints = @$apply_constraints_ref;
@@ -4416,7 +4414,7 @@ $printthis";
 
 sub reshape_windows # IT APPLIES CONSTRAINTS
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
@@ -4585,7 +4583,7 @@ $printthis";
 
 sub warp #
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
@@ -4777,7 +4775,7 @@ $printthis";
 
 sub export_toenergyplus
 {
-				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $export_toenergyplus_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $export_toenergyplus_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 
 
@@ -4901,7 +4899,7 @@ sub use_modish
 	#use strict;
 	#use warnings;
 
-				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $dowhat_ref ) = @_;
+				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 
 				my @applytype = @$applytype_ref;
@@ -5003,7 +5001,7 @@ sub genchange
 
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file,
 	$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref,
-	$filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref ) = @_;
+	$filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref, $countinstance ) = @_;
 
 
 
@@ -5590,11 +5588,12 @@ sub genprop
 	#use warnings;
 
 	my ($to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo,
-		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref ) = @_;
+		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref, $countinstance ) = @_;
+
 	( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange ($to, $stepsvar, $countop, $countstep,
 												$applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $to_do,
 												$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref,
-												$launchline );
+												$launchline, $countinstance );
 	%names = %$names_ref;
 	%newcontents = %$newcontents_ref;
 	@filecontents = @$filecontents_ref;
@@ -5611,7 +5610,7 @@ sub change_groundreflectance
 {
 	#use strict;
 	#use warnings;
-	( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 	my @applytype = @$applytype_ref;
 
 	my @menus = @$menus_ref;
@@ -5668,7 +5667,7 @@ $printthis
 
 sub vary_controls
 {    # IT IS CALLED FROM THE MAIN FILE
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $vary_controls_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $vary_controls_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
@@ -5915,7 +5914,7 @@ sub vary_controls
 sub constrain_controls
 {  # IT READS CONTROL USER-IMPOSED CONSTRAINTS
 	my ( $to, $filecon, $countop, $countstep, $applytype_ref, $constrain_controls_ref, $countvar, $fileconfig, $countmorphing, $todo,
-		$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, $menus_ref ) = @_;
+		$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, $menus_ref, $countinstance ) = @_;
 
 	my @menus = @$menus_ref;
 	my %numvertmenu = %{ $menus[0] };
@@ -6002,8 +6001,8 @@ sub constrain_controls
 	if ($todo eq "write_ctl")
 	{
 		print $_outfile_ "THAT\n";
-		apply_loopcontrol_changes( \@new_loopcontrol, \@temploopcontrol);
-		apply_flowcontrol_changes(\@new_flowcontrol, \@tempflowcontrol);
+		apply_loopcontrol_changes( \@new_loopcontrol, \@temploopcontrol );
+		apply_flowcontrol_changes( \@new_flowcontrol, \@tempflowcontrol );
 	}
 	# return ( \@loopcontrol, \@flowcontrol, \@new_loopcontrol, \@new_flowcontrol );
 	return ( \@loopcontrol, \@flowcontrol, \@new_loopcontrol, \@new_flowcontrol );

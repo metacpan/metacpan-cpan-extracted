@@ -43,7 +43,7 @@ sub child {
 }
 
 sub digest {
-  my $self = shift;
+  my $self     = shift;
   my $md5_seed = $self->url->to_string . ($self->method || '');
   $md5_seed .= $self->tx_params->to_string if ($self->tx_params);
   return md5_sum($md5_seed);

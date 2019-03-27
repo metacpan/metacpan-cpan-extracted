@@ -21,33 +21,21 @@
       },
       "runtime" : {
          "requires" : {
-            "Exporter::Tiny" : "1.002001",
             "Function::Parameters" : "2.001003",
             "Import::Into" : "1.002005",
-            "JSON::Tiny" : "0.58",
             "Moo" : "2.000001",
-            "Path::Tiny" : "0.108",
-            "Role::Tiny" : "2.000006",
-            "Template::Tiny" : "1.12",
             "Try::Tiny" : "0.30",
             "Type::Tiny" : "1.000005",
-            "YAML::Tiny" : "1.73",
             "perl" : "v5.14.0"
          }
       },
       "test" : {
          "requires" : {
-            "Exporter::Tiny" : "1.002001",
             "Function::Parameters" : "2.001003",
             "Import::Into" : "1.002005",
-            "JSON::Tiny" : "0.58",
             "Moo" : "2.000001",
-            "Path::Tiny" : "0.108",
-            "Role::Tiny" : "2.000006",
-            "Template::Tiny" : "1.12",
             "Try::Tiny" : "0.30",
             "Type::Tiny" : "1.000005",
-            "YAML::Tiny" : "1.73",
             "perl" : "v5.14.0"
          }
       }
@@ -64,7 +52,7 @@
          "web" : "https://github.com/iamalnewkirk/data-object"
       }
    },
-   "version" : "0.92",
+   "version" : "0.93",
    "x_authority" : "cpan:AWNCORP",
    "x_contributors" : [
       "Anthony Brummett <abrummet@genome.wustl.edu>"

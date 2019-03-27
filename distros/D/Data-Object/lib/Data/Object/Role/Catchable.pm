@@ -34,7 +34,7 @@ Data-Object Catchable Role
 
 =head1 SYNOPSIS
 
-  use Data::Object Class;
+  use Data::Object 'Class';
 
   with Data::Object::Role::Catchable;
 

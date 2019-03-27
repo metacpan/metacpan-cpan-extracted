@@ -197,7 +197,7 @@ sub run {
   my ($rstr);
   $ofmt->flush->toString(\$rstr)->putDocument($qdoc)->flush;
   utf8::encode($rstr) if (utf8::is_utf8($rstr));
-  return $h->cerror($c, undef, "could format output document using format '$ofc': $@") if (!defined($rstr));
+  return $h->cerror($c, undef, "could not format output document using format '$ofc': $@") if (!defined($rstr));
 
   ##-- dump to client
   my ($filename);

@@ -1,6 +1,6 @@
 package Data::Object::Func::Number::Gt;
 
-use Data::Object Class;
+use Data::Object 'Class';
 
 extends 'Data::Object::Func::Number';
 

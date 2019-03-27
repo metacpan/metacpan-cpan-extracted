@@ -2,7 +2,7 @@ use Test::More 0.98;
 
 use_ok( 'Net::MAC::Vendor' );
 
-my @oui = (  
+my @oui = (
 
 # # # # # # # # # # # # # # # # # # #
 ["00-0D-07   (hex)             Calrec Audio Ltd
@@ -10,19 +10,18 @@ my @oui = (
                                 Nutclough Mill
                                 Hebden Bridge West Yorkshire HX7 8EZ
                                 UNITED KINGDOM",
-                                
+
                [
 	'Calrec Audio Ltd',
 	'Nutclough Mill',
 	'Hebden Bridge West Yorkshire HX7 8EZ',
 	'UNITED KINGDOM',
 	]
-],                 
+],
 # # # # # # # # # # # # # # # # # # #
           );
-          
-foreach my $elem ( @oui )
-	{
+
+foreach my $elem ( @oui ) {
 	my $parsed = Net::MAC::Vendor::parse_oui( $elem->[0] );
 
 	foreach my $i ( 0 .. $#$parsed )

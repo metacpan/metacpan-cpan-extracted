@@ -393,7 +393,7 @@ use Guard ();
 
 use AnyEvent;
 
-our $VERSION = 1.23;
+our $VERSION = 1.24;
 
 =item my $rpc = AnyEvent::Fork::RPC::run $fork, $function, [key => value...]
 
@@ -663,7 +663,8 @@ sub run {
    $self->require ($module)
         ->send_arg ($function, $arg{init}, $serialiser, $arg{done} || "$module\::do_exit")
         ->run ("$module\::run", sub {
-      $fh = shift;
+      $fh = shift
+         or return $on_error->("connection failed");
 
       my ($id, $len);
       $rw = AE::io $fh, 0, sub {

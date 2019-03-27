@@ -108,6 +108,7 @@ CAB/Document.pm
 CAB/Fork/Pool.pm
 CAB/Format.pm
 CAB/Format/Builtin.pm
+CAB/Format/CorpusExplorerPlugin.pm
 CAB/Format/CSV.pm
 CAB/Format/CSV1g.pm
 CAB/Format/ExpandList.pm
@@ -116,6 +117,7 @@ CAB/Format/JSON.pm
 CAB/Format/Null.pm
 CAB/Format/Perl.pm
 CAB/Format/Raw.pm
+CAB/Format/Raw/Base.pm
 CAB/Format/Raw/HTTP.pm
 CAB/Format/Raw/Perl.pm
 CAB/Format/Raw/Waste.pm
@@ -186,8 +188,11 @@ doc-extra/spliced2cleaner.xsl
 doc-extra/spliced2clean+cabns.xsl
 doc-extra/spliced2cab.xsl
 doc-extra/spliced2ling.xsl
+doc-extra/ling2norm.xsl
+doc-extra/ling2plain.xsl
 doc-extra/tcf-orthswap.xsl
 doc-extra/cab-screenshot-annotated.png
+doc-extra/sysarch.png
 
 dta-cab-analyze.perl
 dta-cab-blockscan.perl

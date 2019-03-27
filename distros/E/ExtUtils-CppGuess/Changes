@@ -1,6 +1,9 @@
 Revision history for Perl extension ExtUtils::CppGuess.
 
-0.13	
+0.14	Mon 25 Mar 21:13:36 GMT 2019
+    - add is_clang, unify OS-based detection
+
+0.13	Mon Mar 25 02:57:02 2019 +0000
     - repo tidied slightly
     - use Travis
     - add compiler_command, linker_flags
