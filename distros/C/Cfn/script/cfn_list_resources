@@ -1,0 +1,19 @@
+#!perl
+
+use strict;
+use warnings;
+use v5.10;
+use Cfn::ResourceModules;
+
+my $pattern = $ARGV[0];
+
+my @list = Cfn::ResourceModules::list();
+
+if (defined $pattern) {
+  @list = grep { $_ =~ m/$pattern/ } @list;
+}
+
+say "Supported resources:\n";
+say $_ for @list;
+
+exit 0;

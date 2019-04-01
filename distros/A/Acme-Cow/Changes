@@ -1,0 +1,9 @@
+Revision history for Perl extension Acme::Cow.
+
+0.1  Fri Mar 22 17:39:06 PST 2002
+	- Object-oriented cows.
+
+0.1  Fri Sep  7 10:51:21 2001
+	- original version; created by h2xs 1.21 with options
+		-O -X -f -v 0.1 Acme::Cow
+

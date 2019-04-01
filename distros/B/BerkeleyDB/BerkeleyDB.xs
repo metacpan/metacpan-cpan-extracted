@@ -6,7 +6,7 @@
 
  All comments/suggestions/problems are welcome
 
-     Copyright (c) 1997-2015 Paul Marquess. All rights reserved.
+     Copyright (c) 1997-2016 Paul Marquess. All rights reserved.
      This program is free software; you can redistribute it and/or
      modify it under the same terms as Perl itself.
 
@@ -171,6 +171,10 @@ extern "C" {
 
 #if DB_VERSION_MAJOR >= 6 
 #  define AT_LEAST_DB_6_0
+#endif
+
+#if DB_VERSION_MAJOR > 6 || (DB_VERSION_MAJOR == 6 && DB_VERSION_MINOR >= 2)
+#  define AT_LEAST_DB_6_2
 #endif
 
 #ifdef __cplusplus
@@ -2615,6 +2619,7 @@ _db_appinit(self, ref, errfile=NULL)
 	    int		lk_detect = 0 ;
             int		tx_max = 0 ;
             int		log_config = 0 ;
+            int		log_filemode = 0 ;
             int		max_lockers = 0 ;
             int		max_locks = 0 ;
             int		max_objects = 0 ;
@@ -2644,6 +2649,7 @@ _db_appinit(self, ref, errfile=NULL)
 	    SetValue_iv(lk_detect, "LockDetect") ;
 	    SetValue_iv(tx_max,    "TxMax") ;
 	    SetValue_iv(log_config,"LogConfig") ;
+	    SetValue_iv(log_filemode,"LogFileMode") ;
 	    SetValue_iv(max_lockers,"MaxLockers") ;
 	    SetValue_iv(max_locks, "MaxLocks") ;
 	    SetValue_iv(max_objects,"MaxObjects") ;
@@ -2690,6 +2696,8 @@ _db_appinit(self, ref, errfile=NULL)
 #ifndef AT_LEAST_DB_4_4
 		if (thread_count)
 			softCrash("-ThreadCount needs Berkeley DB 4.4 or better") ;
+		if (log_filemode)
+			softCrash("-LogFileMode needs Berkeley DB 4.4 or better") ;
 #endif /* ! AT_LEAST_DB_4_4 */
 #ifndef AT_LEAST_DB_4_7
 		if (log_config)
@@ -2804,6 +2812,13 @@ _db_appinit(self, ref, errfile=NULL)
 			my_db_strerror(status)));
 	  }
 #endif	  
+#ifdef AT_LEAST_DB_4_4
+	  if (status == 0 && log_filemode) {
+	      status = env->set_lg_filemode(env, log_filemode) ;
+	      Trace(("set_lg_filemode [%04o] returned %s\n", log_filemode,
+			my_db_strerror(status)));
+	  }
+#endif
 	  if (status == 0 && cachesize) {
 	      status = env->set_cachesize(env, 0, cachesize, 0) ;
 	      Trace(("set_cachesize [%d] returned %s\n",
@@ -3373,6 +3388,23 @@ set_lg_bsize(env, bsize)
 	    RETVAL
 
 int
+set_lg_filemode(env, filemode)
+        BerkeleyDB::Env  env
+	u_int32_t	filemode 
+	PREINIT:
+	  dMY_CXT;
+	INIT:
+	  ckActive_Database(env->active) ;
+	CODE:
+#ifndef AT_LEAST_DB_4_4
+	    softCrash("$env->set_lg_filemode needs Berkeley DB 4.4 or better") ;
+#else
+	    RETVAL = env->Status = env->Env->set_lg_filemode(env->Env, filemode);
+#endif
+	OUTPUT:
+	    RETVAL
+
+int
 set_lg_max(env, lg_max)
         BerkeleyDB::Env  env
 	u_int32_t	 lg_max
@@ -3692,7 +3724,53 @@ get_blob_dir(env, dir)
         RETVAL
         dir
 
-        
+DualType
+set_region_dir(env, dir)
+	BerkeleyDB::Env	env
+	const char* dir 
+	PREINIT:
+	  dMY_CXT;
+    CODE:
+#ifndef AT_LEAST_DB_6_2
+	    softCrash("$env->set_region_dir needs Berkeley DB 6.2 or better") ;
+#else
+        RETVAL = env->Env->set_region_dir(env->Env, dir);
+#endif
+    OUTPUT:
+        RETVAL
+
+DualType
+get_region_dir(env, dir)
+	BerkeleyDB::Env	env
+	char* dir = NO_INIT
+	PREINIT:
+	  dMY_CXT;
+    CODE:
+#ifndef AT_LEAST_DB_6_2
+	    softCrash("$env->get_region_dir needs Berkeley DB 6.2 or better") ;
+#else
+        RETVAL = env->Env->get_region_dir(env->Env, (const char**)&dir);
+#endif
+    OUTPUT:
+        RETVAL
+        dir
+
+DualType
+get_slice_count(env, count)
+	BerkeleyDB::Env	env
+	u_int32_t count = NO_INIT
+	PREINIT:
+	  dMY_CXT;
+    CODE:
+#ifndef AT_LEAST_DB_6_2
+	    softCrash("$env->get_slice_count needs Berkeley DB 6.2 or better") ;
+#else
+        RETVAL = env->Env->get_slice_count(env->Env, &count);
+#endif
+    OUTPUT:
+        RETVAL
+        count
+
 
 MODULE = BerkeleyDB::Term		PACKAGE = BerkeleyDB::Term
 

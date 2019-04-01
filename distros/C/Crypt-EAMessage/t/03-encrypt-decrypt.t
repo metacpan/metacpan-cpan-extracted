@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016-2018 Joelle Maslak
+# Copyright (C) 2016-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -15,18 +15,22 @@ my (@MSG) = (
     {
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => 'Plain Text Message',
+        type => 'text',
     },
     {
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => '',
+        type => 'text',
     },
     {
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => undef,
+        type => 'undef',
     },
     {
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => { a => [ 'b', 'c' ], c => 3 },
+        type => 'hash',
     },
 );
 
@@ -44,6 +48,7 @@ foreach my $msg (@MSG) {
     my $ascii_crlf = $eamsg->encrypt_auth_ascii($txt, "\r\n");
     my $ascii_nolf = $eamsg->encrypt_auth_ascii($txt, "");
     my $urlsafe    = $eamsg->encrypt_auth_urlsafe($txt);
+    my $portable   = $eamsg->encrypt_auth_portable($txt) if $msg->{type} eq 'text';
 
     ok(length($encrypted) < length($ascii), "ASCII encrypted message is longer for msg $cnt");
     ok(length($encrypted) < length($ascii_crlf), "ASCII CRLF encrypted message is longer for msg $cnt");
@@ -52,8 +57,9 @@ foreach my $msg (@MSG) {
     ok(length($ascii_nolf) <= length($ascii), "ASCII no-LF encrypted message is longer than or same length as ascii encrypted for msg $cnt");
     ok(length($ascii_nolf) < length($ascii_crlf), "ASCII CRLF encrypted message is longer than CRLF encrypted for msg $cnt");
     ok(length($urlsafe) == length($ascii_nolf), "URL-Safe encrypted message is same length as ASCII no-LF encrypted message for msg $cnt");
+    ok(length($portable) < length($urlsafe), "Portable encrypted message is shorter than URL-Safe encrypted message for msg $cnt") if $msg->{type} eq 'text';
 
-    my ($plain, $plain2, $plain3, $plain4, $plain5);
+    my ($plain, $plain2, $plain3, $plain4, $plain5, $plain6);
 
     ok(lives( sub { $plain = $eamsg->decrypt_auth($encrypted) } ), "Decrypted raw msg $cnt");
     is( $plain, $txt, "Decrypted raw msg $cnt correctly" );
@@ -68,14 +74,20 @@ foreach my $msg (@MSG) {
     is( $plain4, $txt, "Decrypted B64 msg $cnt correctly" );
 
     ok(lives( sub { $plain5 = $eamsg->decrypt_auth($urlsafe) } ), "Decrypted URL Safe msg $cnt");
-    is( $plain5, $txt, "Decrypted B64 msg $cnt correctly" );
+    is( $plain5, $txt, "Decrypted Url-safe msg $cnt correctly" );
+
+    ok(lives( sub { $plain6 = $eamsg->decrypt_auth($portable) } ), "Decrypted URL Portable msg $cnt") if $msg->{type} eq 'text';
+    is( $plain6, $txt, "Decrypted Portable msg $cnt correctly" ) if $msg->{type} eq 'text';
 
     my $badkey = '11112222333344445555666677778888';
     $eamsg = Crypt::EAMessage->new( hex_key => $badkey );
     ok(dies( sub { $eamsg->decrypt_auth($encrypted) } ), "Can't decrypt msg $cnt with bad key");;
 
     $encrypted =~ s/.$//;
-    ok(dies( sub { $eamsg->decrypt_auth($encrypted) } ), "Can't decrypt msg $cnt with tampered-with message");
+    ok(dies( sub { $eamsg->decrypt_auth($encrypted) } ), "Can't decrypt msg $cnt with tampered-with (shortened) message");
+
+    $encrypted .= chr(0);
+    ok(dies( sub { $eamsg->decrypt_auth($encrypted) } ), "Can't decrypt msg $cnt with tampered-with (appended) message");
 
     my $encrypted2 = $eamsg->encrypt_auth($txt);
     isnt($encrypted2, $encrypted, "Two encrypts of msg $cnt return different values");

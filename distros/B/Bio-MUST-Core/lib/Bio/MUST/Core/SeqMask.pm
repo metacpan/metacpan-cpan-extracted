@@ -2,7 +2,7 @@ package Bio::MUST::Core::SeqMask;
 # ABSTRACT: Sequence mask for selecting specific sites
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
-$Bio::MUST::Core::SeqMask::VERSION = '0.190690';
+$Bio::MUST::Core::SeqMask::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -357,7 +357,7 @@ sub gblocks_mask {
 
     # check Gblocks settings
     if ( !defined $gb_parms_for{$mode} ) {
-        carp "Warning: invalid Gblocks settings: $mode; using strict!";
+        carp "[BMC] Warning: invalid Gblocks settings: $mode; using strict!";
         $mode = 'strict';
     }
 
@@ -382,7 +382,8 @@ sub gblocks_mask {
     # try to robustly execute Gblocks
     my $ret_code = system( [ 1, 127 ], $cmd);   # Gblocks always returns 1?!?
     if ($ret_code == 127) {
-        carp 'Warning: cannot execute Gblocks command; returning neutral mask!';
+        carp '[BMC] Warning: cannot execute Gblocks command;'
+            . ' returning neutral mask!';
         return $class->neutral_mask($ali);
     }
     # TODO: try to bypass shell (need for absolute path to executable then)
@@ -415,7 +416,7 @@ sub gblocks_mask {
         # which would left-shift all blocks bounds!
         my ($width) = $line =~ m/original\s+(\d+)\s+positions/xms;
         if (defined $width && $width != $ali->width) {
-            carp 'Warning: shared gaps detected; returning neutral mask!';
+            carp '[BMC] Warning: shared gaps detected; returning neutral mask!';
             return $class->neutral_mask($ali);
         }
     }
@@ -442,7 +443,7 @@ sub bmge_mask {
 
     # check BMGE settings
     if ( !defined $bmge_parms_for{$mode} ) {
-        carp "Warning: invalid BMGE settings: $mode; using strict!";
+        carp "[BMC] Warning: invalid BMGE settings: $mode; using strict!";
         $mode = 'strict';
     }
 
@@ -461,7 +462,8 @@ sub bmge_mask {
     # try to robustly execute BMGE
     my $ret_code = system( [ 0, 127 ], $cmd);
     if ($ret_code == 127) {
-        carp 'Warning: cannot execute BMGE command; returning neutral mask!';
+        carp '[BMC] Warning: cannot execute BMGE command;'
+            . ' returning neutral mask!';
         return $class->neutral_mask($ali);
     }
     # TODO: try to bypass shell (need for absolute path to executable then)
@@ -743,7 +745,7 @@ Bio::MUST::Core::SeqMask - Sequence mask for selecting specific sites
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

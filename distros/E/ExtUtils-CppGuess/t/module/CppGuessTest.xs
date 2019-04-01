@@ -6,14 +6,33 @@
 #include <sys/vnode.h>
 #endif
 
+#if INCLUDE_DOT
+#include <string.h>
+#else
 #include <string>
+#endif
 
 typedef std::string std__string;
 
+extern "C" {
 #include <config.h>
+#ifdef __clang__
+#  ifdef CLANG_WORKAROUND_514
+     /* perl.h before 5.18 or so blow up on clang with dVAR on EU::PXS >= 3.04_01 - this works around */
+#    undef HASATTRIBUTE_UNUSED
+#  endif
+#endif
 #include <EXTERN.h>
 #include <perl.h>
+#ifdef __clang__
+#  ifdef CLANG_WORKAROUND_516
+     /* perl.h before 5.18 or so blow up on clang with dVAR on EU::PXS >= 3.04_01 - this works around */
+#    undef dNOOP
+#    define dNOOP /*EMPTY*/(void)0
+#  endif
+#endif
 #include <XSUB.h>
+}
 
 // Perl likes to pollute your namespace
 #undef bool

@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::sq_MK - Locale data examples for the Albanian Macedonia (sq-MK) locale
+DateTime::Locale::sq_MK - Locale data examples for the Albanian North Macedonia (sq-MK) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Albanian Macedonia locale.
+Albanian North Macedonia locale.
 
 =head2 Days
 
@@ -477,17 +477,17 @@ Albanian Macedonia locale.
    1995-12-22T09:05:02 = Pre, 22 dhjetor
   -0010-09-15T04:44:23 = Sht, 15 shtator
 
-=head3 MMMMW-count-one ('java' W 'e' MMM)
+=head3 MMMMW-count-one ('java' W 'e' MMMM)
 
-   2008-02-05T18:30:30 = java 1 e shk
-   1995-12-22T09:05:02 = java 3 e dhj
-  -0010-09-15T04:44:23 = java 2 e sht
+   2008-02-05T18:30:30 = java 1 e shkurt
+   1995-12-22T09:05:02 = java 3 e dhjetor
+  -0010-09-15T04:44:23 = java 2 e shtator
 
-=head3 MMMMW-count-other ('java' W 'e' MMM)
+=head3 MMMMW-count-other ('java' W 'e' MMMM)
 
-   2008-02-05T18:30:30 = java 1 e shk
-   1995-12-22T09:05:02 = java 3 e dhj
-  -0010-09-15T04:44:23 = java 2 e sht
+   2008-02-05T18:30:30 = java 1 e shkurt
+   1995-12-22T09:05:02 = java 3 e dhjetor
+  -0010-09-15T04:44:23 = java 2 e shtator
 
 =head3 MMMMd (d MMMM)
 

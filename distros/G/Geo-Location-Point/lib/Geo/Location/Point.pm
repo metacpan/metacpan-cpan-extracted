@@ -1,8 +1,10 @@
 package Geo::Location::Point;
 
+use 5.10.0;
 use strict;
 use warnings;
 
+use Carp;
 use GIS::Distance;
 
 =head1 NAME
@@ -12,11 +14,11 @@ Location information
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -47,8 +49,16 @@ sub new {
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	die unless($args{'lat'});
-	die unless($args{'long'});
+	$args{'lat'} //= $args{'latitude'} // $args{'Latitude'};
+	if(!defined($args{'lat'})) {
+		Carp::carp(__PACKAGE__, ': latitude not given');
+		return;
+	}
+	$args{'long'} //= $args{'longitude'} // $args{'Longitude'};
+	if(!defined($args{'long'})) {
+		Carp::carp(__PACKAGE__, ': longitude not given');
+		return;
+	}
 
 	return bless \%args, $class;
 }
@@ -96,6 +106,85 @@ sub distance {
 	return $self->{'gis'}->distance($self->{'lat'}, $self->{'long'}, $location->lat(), $location->long());
 }
 
+=head2	as_string
+
+Prints the object in human-readable format.
+
+=cut
+
+sub as_string {
+	my $self = shift;
+
+	if($self->{'location'}) {
+		return $self->{'location'};
+	}
+
+	my $rc = $self->{'name'};
+	if($rc) {
+		$rc = ucfirst(lc($rc));
+	}
+
+	foreach my $field('house_number', 'number', 'road', 'street', 'AccentCity', 'city', 'county', 'Region', 'state_district', 'state', 'country', 'Country') {
+		if(my $value = $self->{$field}) {
+			if($rc) {
+				if(($field eq 'street') || ($field eq 'road')) {
+					if($self->{'number'} || $self->{'house_number'}) {
+						$rc .= ' ';
+					} else {
+						$rc .= ', '
+					}
+				} else {
+					$rc .= ', ';
+				}
+			} elsif($rc) {
+				$rc .= ', ';
+			}
+			my $leave_case = 0;
+			if(my $country = $self->{'country'} // $self->{'Country'}) {
+				if(uc($country) eq 'US') {
+					if(($field eq 'state') || ($field eq 'Region') || (lc($field) eq 'country')) {
+						$leave_case = 1;
+						if(lc($field) eq 'country') {
+							$value = 'US';
+						}
+					}
+				} elsif(($country eq 'Canada') || ($country eq 'Australia')) {
+					if($field eq 'state') {
+						$leave_case = 1;
+					}
+				}
+			}
+			if($leave_case) {
+				$rc .= $value;
+			} else {
+				$rc .= $self->_sortoutcase($value);
+				if((($field eq 'street') || ($field eq 'road')) &&
+				   ($rc =~ /(.+)\s([NS][ew])$/)) {
+					# e.g South Street NW
+					$rc = "$1 " . uc($2);
+				}
+			}
+		}
+	}
+
+	return $self->{'location'} = $rc;
+}
+
+sub _sortoutcase {
+	my $self = shift;
+	my $field = lc(shift);
+	my $ret;
+
+	foreach (split(/ /, $field)) {
+		if($ret) {
+			$ret .= ' ';
+		}
+		$ret .= ucfirst($_);
+	}
+
+	$ret;
+}
+
 =head2	attr
 
 Get/set location attributes, e.g. city
@@ -121,31 +210,6 @@ sub AUTOLOAD {
 	}
 
 	return $self->{$key};
-}
-
-=head2	as_string
-
-Prints the object in human-readable format.
-
-=cut
-
-sub as_string {
-	my $self = shift;
-
-	my $rc;
-
-	foreach my $field('number', 'street', 'city', 'county', 'state', 'country') {
-		if(my $value = $self->{$field}) {
-			$rc .= ', ' if($rc);
-			$rc .= $value;
-		}
-	}
-
-	if($self->{'number'}) {
-		$rc =~ s/,//;
-	}
-
-	return $rc;
 }
 
 =head1 AUTHOR

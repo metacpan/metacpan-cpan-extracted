@@ -1,6 +1,6 @@
 package App::calendr;
 
-$App::calendr::VERSION   = '0.23';
+$App::calendr::VERSION   = '0.24';
 $App::calendr::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ App::calendr - Application to display supported Calendar.
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
@@ -23,7 +23,7 @@ use Module::Pluggable
     max_depth   => 2;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 our $DEFAULT_CALENDAR = 'Gregorian';
 our $FAILED_CALENDARS = {};

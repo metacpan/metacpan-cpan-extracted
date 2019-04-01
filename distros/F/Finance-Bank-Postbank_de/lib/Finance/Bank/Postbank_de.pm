@@ -16,7 +16,7 @@ use Mozilla::CA;
 
 #use IO::Socket::SSL qw(SSL_VERIFY_PEER SSL_VERIFY_NONE);
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 has 'login' => (
     is => 'ro',
@@ -222,7 +222,7 @@ sub _build_account_numbers {
   my %numbers;
   # this currently includes the credit card numbers ...
   for my $acc ( $bp->get_accounts() ) {
-      $numbers{ $acc->iban } = $acc if ($acc->productType ne 'DEPOT' and $acc->productType ne 'BAUFINANZIERUNG');
+      $numbers{ $acc->iban } = $acc if (!$acc->is_depot and !$acc->is_mortgage);
   };
 
   return $self->_account_numbers( \%numbers );
@@ -492,7 +492,7 @@ or via mail to L<finance-bank-postbank_de-Bugs@rt.cpan.org>.
 
 =head1 COPYRIGHT (c)
 
-Copyright 2003-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2003-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Reference;
 use Quiq::Http::Cookie;
@@ -77,7 +77,7 @@ generiert auf STDOUT
 
 Die Setzung received=>1 bewirkt, dass wir bei der Auswertung der
 Headerzeilen nicht strikt sind, d.h. bei unbekannten Headern wird
-keine Exception geworfen, und die Methode $msg->L</asString>()
+keine Exception geworfen, und die Methode $msg->L<asString|"asString() - Liefere HTTP-Nachricht als Zeichenkette">()
 liefert die Headerinformation exakt so wie sie empfangen wurde, d.h.
 sie wird nicht aus den Attributen gewonnen.
 
@@ -166,8 +166,8 @@ body => $data
 
 =back
 
-Zum Setzen von Eigenschaften siehe auch die Methoden $msg->L</set>()
-und $msg->L</fromString>().
+Zum Setzen von Eigenschaften siehe auch die Methoden $msg->L<set|"set() - Setze Objekteigenschaften">()
+und $msg->L<fromString|"fromString() - Setze Objektattribute aus Zeichenkette">().
 
 Ist eine ungerade Anzahl an Parametern angegeben, wird zunächst
 die (ggf. leere) Liste von Attribut/Wert-Paaren @keyVal zugewiesen.
@@ -235,7 +235,7 @@ Die Methode liefert keinen Wert zurück.
 =head4 Description
 
 Setze die Objekteigenschaften @keyVal. Für die Liste der
-Eigenschaften siehe L</new>().
+Eigenschaften siehe L<new|"new() - Instantiiere ein HTTP Nachrichten-Objekt">().
 
 =head4 Examples
 
@@ -307,8 +307,8 @@ Methode contentType() verwaltet.
 Der Wert einer Kopfzeilen-Methode ist nicht immer eine Zeichenkette.
 Er kann auch eine Datenstruktur sein. Dies hängt von der jeweiligen
 Kopfzeile ab. Im Skalarkontext wird eine Referenz auf die Datenstruktur
-geliefert, im Array-Kontext die Liste der Elemente (siehe L</contentType>()
-oder L</setCookie>()).
+geliefert, im Array-Kontext die Liste der Elemente (siehe L<contentType|"contentType() - Setze/Liefere Content-Type Header">()
+oder L<setCookie|"setCookie() - Setze/Liefere Set-Cookie Header">()).
 
 =head3 received() - Setze/Liefere received-Eigenschaft
 
@@ -978,7 +978,7 @@ sub asString {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

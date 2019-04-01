@@ -2,7 +2,7 @@
 #
 # 0005_ghost_test.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -14,6 +14,8 @@ BEGIN {
     @test = (
         ["\x9C\x5A\x9C\x5A",'cp932x',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\x9C\x5A\x9C\x5A"],
         ["\x9C\x5A\x9C\x5A",'cp932',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\x9C\x5A"        ],
+        ["\x9C\x5A\x9C\x5A",'cp932ibm','cp932x',{'INPUT_LAYOUT'=>'D'},"\x9C\x5A"        ],
+        ["\x9C\x5A\x9C\x5A",'cp932nec','cp932x',{'INPUT_LAYOUT'=>'D'},"\x9C\x5A"        ],
         ["\x9C\x5A\x9C\x5A",'sjis2004','cp932x',{'INPUT_LAYOUT'=>'D'},"\x9C\x5A"        ],
         ["\x9C\x5A\x9C\x5A",'cp00930', 'cp932x',{'INPUT_LAYOUT'=>'D'},"\x59\xCD"        ],
         ["\x9C\x5A\x9C\x5A",'keis78',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xD7\xBB"        ],
@@ -25,6 +27,7 @@ BEGIN {
         ["\x9C\x5A\x9C\x5A",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE6\x5E"        ],
         ["\x9C\x5A\x9C\x5A",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xD7\xBB"        ],
         ["\x9C\x5A\x9C\x5A",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE5\xBD\x81"    ],
+        ["\x9C\x5A\x9C\x5A",'utf8.1',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE5\xBD\x81"    ],
         ["\x9C\x5A\x9C\x5A",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xF3\xB4\x83\xBE"],
     );
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }

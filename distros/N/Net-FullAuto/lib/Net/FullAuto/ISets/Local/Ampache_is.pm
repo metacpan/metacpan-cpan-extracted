@@ -1137,7 +1137,7 @@ END
          '__display__');
       #($stdout,$stderr)=$handle->cmd($sudo.
       #   'rm -rvf /opt/source/tokudb.cnf','__display__');
-      # https://github.com/arslancb/ampache/issues/429
+      # https://github.com/ampache/ampache/issues/429
       my $sql_mode_cnf=<<END;
 [mysqld]
 sql_mode=IGNORE_SPACE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
@@ -1192,13 +1192,6 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://github.com/ampache/ampache.git','__display__');
    ($stdout,$stderr)=$handle->cwd("ampache");
-   ($stdout,$stderr)=$handle->cmd(
-      'git tag | sort -n | tail -1','__display__');
-   chomp($stdout);
-   # git ls-remote --tags git://github.com/ampache/ampache.git
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "git checkout $stdout",'__display__');
-   ($stdout,$stderr)=$handle->cwd("upload");
    ($stdout,$stderr)=$handle->cmd($sudo.'mkdir -vp /var/www/html',
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.'chmod 777 /var','__display__');
@@ -1209,74 +1202,16 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'chown -Rv www-data:www-data /var/www','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -Rv 777 /var/www/html/ampache/cache','__display__');
+      'wget --random-wait --progress=dot '.
+      'https://getcomposer.org/composer.phar','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -Rv 777 /var/www/html/ampache/files','__display__');
+      'mv -v composer.phar /usr/local/bin/composer','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -Rv 777 /var/www/html/ampache/images','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -Rv 777 /var/www/html/ampache/includes','__display__');
+      '/usr/local/bin/composer '.
+      'install --prefer-source --no-interaction','__display__');
    my $fa_builddir=fullauto_builddir($local,$sudo);
    my $ignore='';
-   ($ignore,$stdout)=$local->cmd("${sudo}cp -v $fa_builddir/installer/".
-      'fullauto_clickable_image.png /opt/source','__display__');
-   ($ignore,$stdout)=$local->cmd($sudo.
-      'chmod -v 777 fullauto_clickable_image.png','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   #($stdout,$stderr)=$handle->put('fullauto_clickable_image.png');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -v 777 fullauto_clickable_image.png','__display__');
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   my $sd='/var/www/html/ampache/styles/cb_28/theme/images';
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "mv -vf fullauto_clickable_image.png $sd",'__display__');
-   ($stdout,$stderr)=$local->cmd($sudo.
-      "rm -rvf fullauto_clickable_image.png",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      $sudo.'chmod -Rv 777 /var/www/html/ampache/styles','__display__');
-   my $fullstyle=
-      '                                <div class="fullauto">%NL%'.
-      '                                        <a href="http://www.fullauto.com">%NL%'.
-      '                                                <img src="{$theme}/images/fullauto_clickable_image.png" class="fullauto-image">%NL%'.
-      '                                        </a>%NL%'.
-      '                                </div>%NL%';
-   $ad=<<END;
-sed -i '/Collect/i$fullstyle' /var/www/html/ampache/styles/cb_28/layout/header.html
-END
-   $handle->cmd_raw("${sudo}$ad");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       "/var/www/html/ampache/styles/cb_28/layout/header.html");
-   $handle->cmd_raw(
-       "${sudo}sed -i 's/\\(^[<]div.*\\\)/                                \\1/' ".
-       "/var/www/html/ampache/styles/cb_28/layout/header.html");
-   $fullstyle=
-      '<style>%NL%'.
-      '.fullauto{%NL%'.
-      '    padding: 10px 10px;%NL%'.
-      '    float: none;%NL%'.
-      '    display: table-cell;%NL%'.
-      '    vertical-align: middle;%NL%'.
-      '    width: 40px;%NL%'.
-      '}%NL%'.
-      '.fullauto-image {%NL%'.
-      '        display: block;%NL%'.
-      '        position: relative;%NL%'.
-      '        width: 83px;%NL%'.
-      '        height: 40px;%NL%'.
-      '}%NL%'.
-      '</style>%NL%';
-   $ad=<<END;
-sed -i '/^[<]script[>]/i$fullstyle' /var/www/html/ampache/styles/cb_28/layout/header.html
-END
-   $handle->cmd_raw("${sudo}$ad");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       "/var/www/html/ampache/styles/cb_28/layout/header.html");
-   $handle->cmd_raw(
-       "${sudo}sed -i 's/\\(^[<]div.*\\\)/                                \\1/' ".
-       "/var/www/html/ampache/styles/cb_28/layout/header.html");
-   ($stdout,$stderr)=$handle->cwd('/opt/source/');
    ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- http://icanhazip.com');
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
@@ -1407,213 +1342,9 @@ END
    ($stdout,$stderr)=$handle->cmd(
       "${sudo}sed -i 's/-Werror //' ./objs/Makefile");
    ($stdout,$stderr)=$handle->cmd("${sudo}make install",'__display__');
+
    # https://www.liberiangeek.net/2015/10/
    # how-to-install-self-signed-certificates-on-nginx-webserver/
-   ($stdout,$stderr)=$handle->cmd("${sudo}sed -i 's/1024/64/' ".
-       "/usr/local/nginx/nginx.conf");
-   $ad='          fastcgi_split_path_info ^(.+\\\\.php)(/.+)\$;%NL%'.
-       '          fastcgi_param SCRIPT_FILENAME '.
-       '/var/www/html/ampache\$fastcgi_script_name;%NL%'.
-       "          include fastcgi_params;%NL%".
-       "          fastcgi_pass unix:/var/run/php-fpm/php7.0-fpm.sock;%NL%".
-       "          fastcgi_index index.php;%NL%".
-       "          ##Add below line to fix the blank screen error%NL%".
-       "          include fastcgi.conf;";
-   $ad=<<END;
-sed -i '1,/location/ {/location/a\\\
-$ad
-}' /usr/local/nginx/nginx.conf
-END
-   $handle->cmd_raw("${sudo}$ad");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i '/default_type/".
-       "iclient_max_body_size 1000M;%NL%' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i '/fastcgi.conf/{n;N;d}' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i 's#^[ ]*location / {#        location ~ \\.php {#' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i '/ location ~/iroot /var/www/html/ampache;' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i '/ location ~/".
-       "iindex index.php index.html index.htm;%NL%' ".
-       '/usr/local/nginx/nginx.conf');
-   $handle->cmd_raw("${sudo}sed -i ".
-       "'s#\\(^client_max_body_size 1000M;$\\\)#    \\1#' ".
-       '/usr/local/nginx/nginx.conf');
-   $handle->cmd_raw(
-       "${sudo}sed -i 's#\\(^root /var/www/html/ampache;$\\\)#        \\1#' ".
-       '/usr/local/nginx/nginx.conf');
-   $handle->cmd_raw("${sudo}sed -i ".
-       "'s#\\(^index index.php index.html index.htm;$\\\)#        \\1#' ".
-       '/usr/local/nginx/nginx.conf');
-   $ad='%NL%        location /videos {'.
-       '%NL%            rewrite ^/videos/(.*)/(.*)/(.*)/(.*)/(.*) /videos.php?cat=$1&sort=$3&time=$4&page=$5&seo_cat_name=$2;'.
-       '%NL%            rewrite ^/videos/([0-9]+) /videos.php?page=$1;'.
-       '%NL%            rewrite ^/videos/?$ /videos.php?$query_string;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /video {'.
-       '%NL%            rewrite ^/video/(.*)/(.*) /watch_video.php\?v=$1&$query_string;'.
-       '%NL%            rewrite ^/video/([0-9]+)_(.*) /watch_video.php?v=$1&$query_string;'.
-       '%NL%        }%NL%'.
-       '%NL%        location / {'.
-       '%NL%            rewrite ^/(.*)_v([0-9]+) /watch_video.phpi\?v=$2&$query_string;'.
-       '%NL%            rewrite ^/([a-zA-Z0-9-]+)/?$ /view_channel.php?uid=$1&seo_diret=yes;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /channels {'.
-       '%NL%            rewrite ^/channels/(.*)/(.*)/(.*)/(.*)/(.*) /channels.php\?cat=$1&sort=$3&time=$4&page=$5&seo_cat_name=$2;'.
-       '%NL%            rewrite ^/channels/([0-9]+) /channels.php?page=$1;'.
-       '%NL%            rewrite ^/channels/?$ /channels.php?$query_string;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /members {'.
-       '%NL%            rewrite ^/members/?$ /channels.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /users {'.
-       '%NL%            rewrite ^/users/?$ /channels.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /user {'.
-       '%NL%            rewrite ^/user/?$ /channels.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /channel {'.
-       '%NL%            rewrite ^/channel/(.*) /view_channel.php?user=$1;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /my_account {'.
-       '%NL%            rewrite ^/my_account /myaccount.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /page {'.
-       '%NL%            rewrite ^/page/([0-9]+)/(.*) /view_page.php?pid=$1;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /search {'.
-       '%NL%            rewrite ^/search/result/?$ /search_result.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /upload {'.
-       '%NL%            rewrite ^/upload/?$ /upload.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /contact {'.
-       '%NL%            rewrite ^/contact/?$ /contact.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /categories {'.
-       '%NL%            rewrite ^/categories/?$ /categories.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /group {'.
-       '%NL%            rewrite ^/group/([a-zA-Z0-9].+) /view_group.php?url=$1&$query_string;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /view_topic {'.
-       '%NL%            rewrite ^/view_topic/([a-zA-Z0-9].+)_tid_([0-9]+) /view_topic.php?tid=$2&$query_string;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /groups {'.
-       '%NL%            rewrite ^/groups/(.*)/(.*)/(.*)/(.*)/(.*) /groups.php?cat=$1&sort=$3&time=$4&page=$5&seo_cat_name=$2;'.
-       '%NL%            rewrite ^/groups/([0-9]+) /groups.php?page=$1;'.
-       '%NL%            rewrite ^/groups/?$ /groups.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /create_group {'.
-       '%NL%            rewrite ^/create_group /create_group.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /collections {'.
-       '%NL%            rewrite ^/collections/(.*)/(.*)/(.*)/(.*)/(.*) /collections.php?cat=$1&sort=$3&time=$4&page=$5&seo_cat_name=$2;'.
-       '%NL%            rewrite ^/collections/([0-9]+) /collections.php?page=$1;'.
-       '%NL%            rewrite ^/collections/?$ /collections.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /photos {'.
-       '%NL%            rewrite ^/photos/(.*)/(.*)/(.*)/(.*)/(.*) /photos.php?cat=$1&sort=$3&time=$4&page=$5&seo_cat_name=$2;'.
-       '%NL%            rewrite ^/photos/([0-9]+) /photos.php?page=$1;'.
-       '%NL%            rewrite ^/photos/?$ /photos.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /collection {'.
-       '%NL%            rewrite ^/collection/(.*)/(.*)/(.*) /view_collection.php?cid=$1&type=$2&$query_string;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /item {'.
-       '%NL%            rewrite ^/item/(.*)/(.*)/(.*)/(.*) /view_item.php?item=$3&type=$1&collection=$2;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /photo_upload {'.
-       '%NL%            rewrite ^/photo_upload/(.*) /photo_upload.php?collection=$1;'.
-       '%NL%            rewrite ^/photo_upload/?$ /photo_upload.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location = /sitemap.xml {'.
-       '%NL%            rewrite ^(.*)$ /sitemap.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location /signup {'.
-       '%NL%            rewrite ^/signup/?$ /signup.php;'.
-       '%NL%        }%NL%'.
-       '%NL%        location = /rss {'.
-       '%NL%            rewrite ^/rss/([a-zA-Z0-9].+)$ /rss.php?mode=$1&$query_string;'.
-       '%NL%        }';
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'/#error_page/a$ad\' /usr/local/nginx/nginx.conf");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       "/usr/local/nginx/nginx.conf");
-   # https://www.linode.com/docs/websites/nginx/nginx-and-phpfastcgi-on-centos-5
-   $ad='%NL%        location /static {'.
-       "%NL%            root /var/www/html/ampache/root;".
-       '%NL%        }%NL%'.
-       '%NL%        ssl off;';
-   #    "%NL%        ssl_certificate /etc/nginx/ssl.crt/$public_ip.crt;".
-   #    "%NL%        ssl_certificate_key /etc/nginx/ssl.key/$public_ip.key;".
-   #    '%NL%        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;'.
-   #    '%NL%        ssl_ciphers '.
-   #    '"HIGH:!aNULL:!MD5 or HIGH:!aNULL:!MD5:!3DES";';
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}sed -i \'/404/a$ad\' /usr/local/nginx/nginx.conf");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       "/usr/local/nginx/nginx.conf");
-   $ad='%NL%'.
-       '    #server {%NL%'.
-       '       #listen 80;%NL%'.
-       '       #listen [::]:80;%NL%'.
-       '%NL%'.
-       "       #server_name  $public_ip;%NL%".
-       '%NL%'.
-       '       # FIXME: change domain name here (and also make sure '.
-       'you do the same in the next %SQ%server%SQ% section)%NL%'.
-       '%NL%'.
-       '       # redirect all traffic to HTTPS%NL%'.
-       '       #rewrite ^ https://\$server_name\$request_uri? permanent;%NL%'.
-       '    #}';
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}sed -i \'/#gzip/a$ad\' /usr/local/nginx/nginx.conf");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
-       '/usr/local/nginx/nginx.conf');
-   #($stdout,$stderr)=$handle->cmd(
-   #    "${sudo}sed -i \'s/^        listen       80/        listen       ".
-   #    "\*:443 ssl default_server/\' /usr/local/nginx/nginx.conf");
-   my $ngx='/usr/local/nginx/nginx.conf';
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'/split_path/a        try_files \$uri =404;\' $ngx");
-   $handle->cmd_raw(
-       "${sudo}sed -i 's/\\(^try_files.*\\\)/          \\1/' $ngx");
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/localhost/$public_ip/\' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/nobody/www-data/\' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i \'s/#user/user/\' ".
-       '/usr/local/nginx/nginx.conf');
-   ($stdout,$stderr)=$handle->cmd(
-       "${sudo}sed -i '/^          fastcgi_index/{n;N;d}' ".
-       '/usr/local/nginx/nginx.conf');
-   #$handle->{_cmd_handle}->print($sudo.'/usr/local/nginx/nginx');
-   #$prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-   #while (1) {
-   #   my $output.=Net::FullAuto::FA_Core::fetch($handle);
-   #   last if $output=~/$prompt/;
-   #   print $output;
-   #   if (-1<index $output,'PEM pass phrase') {
-   #      $handle->{_cmd_handle}->print($service_and_cert_password);
-   #      $output='';
-   #      next;
-   #   }
-   #}
 
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -1627,7 +1358,213 @@ END
    #          $  -   \\x24     %  -  \\x25
    #
    # https://www.lisenet.com/2014/ - bash approach to conversion
-   my $nginxconf=<<END;
+
+   my $nginx_conf=<<END;
+user www-data;
+worker_processes auto;
+pid /var/run/nginx.pid;
+include /etc/nginx/modules-enabled/\\x2A.conf;
+
+events {
+        worker_connections 1024;
+        # multi_accept on;
+}
+
+http {
+
+        ##
+        # Basic Settings
+        ##
+
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        keepalive_timeout 65;
+        types_hash_max_size 2048;
+        # server_tokens off;
+
+        # server_names_hash_bucket_size 64;
+        # server_name_in_redirect off;
+
+        include /usr/local/nginx/mime.types;
+        default_type application/octet-stream;
+
+        ##
+        # SSL Settings
+        ##
+
+        #ssl_protocols TLSv1 TLSv1.1 TLSv1.2; # Dropping SSLv3, ref: POODLE
+        #ssl_prefer_server_ciphers on;
+
+        ##
+        # Logging Settings
+        ##
+
+        #access_log /var/log/nginx/access.log;
+        #error_log /var/log/nginx/error.log;
+
+        ##
+        # Gzip Settings
+        ##
+
+        gzip on;
+        gzip_disable \\x22msie6\\x22;
+
+        # gzip_vary on;
+        # gzip_proxied any;
+        # gzip_comp_level 6;
+        # gzip_buffers 16 8k;
+        # gzip_http_version 1.1;
+        # gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+
+
+        server {
+
+            # listen to
+            # listen  [::]:used_port; #ssl; ipv6 optional with ssl enabled
+            listen       80; #ssl; ipv4 optional with ssl enabled
+
+            server_name $public_ip;
+            charset utf-8;
+
+            # Logging, error_log mode [notice] is necessary for rewrite_log on,
+            # (very usefull if rewrite rules do not work as expected)
+
+                error_log       /var/log/ampache/error.log; # notice;
+              # access_log      /var/log/ampache/access.log;
+              # rewrite_log     on;
+
+            # Use secure SSL/TLS settings, see https://mozilla.github.io/server-side-tls/ssl-config-generator/
+            # ssl_protocols TLSv1.2;
+            # ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-E    CDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+            # ssl_prefer_server_ciphers on;
+            # add_header Strict-Transport-Security max-age=15768000;
+            # etc.
+
+            # Use secure headers to avoid XSS and many other things
+            add_header X-Content-Type-Options nosniff;
+            add_header X-XSS-Protection \\x221; mode=block\\x22;
+            add_header X-Robots-Tag none;
+            add_header X-Download-Options noopen;
+            add_header X-Permitted-Cross-Domain-Policies none;
+            add_header X-Frame-Options \\x22SAMEORIGIN\\x22 always;
+            add_header Referrer-Policy \\x22no-referrer\\x22;
+            add_header Content-Security-Policy \\x22script-src 'self' 'unsafe-inline' 'unsafe-eval'; frame-src 'self'; object-src 'self'\\x22;
+
+            # Avoid information leak
+            server_tokens off;
+            fastcgi_hide_header X-Powered-By;
+
+            root /var/www/html/ampache;
+            index index.php;
+
+            # Somebody said this helps, in my setup it doesn't prevent temporary saving in files
+            proxy_max_temp_file_size 0;
+
+            # Rewrite rule for Subsonic backend
+            if ( \\x21-d \\x24request_filename ) {
+               rewrite ^/rest/(.\\x2A).view\\x24 /rest/index.php?action=\\x241 last;
+               rewrite ^/rest/fake/(.+)\\x24 /play/\\x241 last;
+            }
+
+            # Rewrite rule for Channels
+            if (\\x21-d \\x24request_filename){
+               rewrite ^/channel/([0-9]+)/(.\\x2A)\\x24 /channel/index.php?channel=\\x241&target=\\x242 last;
+            }
+
+            # Beautiful URL Rewriting
+               rewrite ^/play/ssid/(\w+)/type/(\w+)/oid/([0-9]+)/uid/([0-9]+)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&name=\\x245 last;
+               rewrite ^/play/ssid/(\w+)/type/(\w+)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&name=\\x247 last;
+               rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/player/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&player=\\x247&name=\\x248 last;
+               rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/bitrate/([0-9]+)/player/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&bitrate=\\x247player=\\x248&name=\\x249 last;
+               rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/client/(.\\x2A)/noscrobble/([0-1])/transcode_to/(w+)/bitrate/([0-9]+)/player/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244&client=\\x245&noscrobble=\\x246&transcode_to=\\x247&bitrate=\\x248&player=\\x249&name=\\x2410 last;
+
+            # the following line was needed for me to get downloads of single songs to work
+               rewrite ^/play/ssid/(.\\x2A)/type/(.\\x2A)/oid/([0-9]+)/uid/([0-9]+)/action/(.\\x2A)/name/(.\\x2A)\\x24 /play/index.php?ssid=\\x241&type=\\x242&oid=\\x243&uid=\\x244action=\\x245&name=\\x246 last;
+            location /play {
+                if (\\x21-e \\x24request_filename) {
+                   rewrite ^/play/art/([^/]+)/([^/]+)/([0-9]+)/thumb([0-9]\\x2A)\.([a-z]+)\\x24 /image.php?object_type=\\x242&object_id=\\x243&auth=\\x241 last;
+                }
+
+                rewrite ^/([^/]+)/([^/]+)(/.\\x2A)?\\x24 /play/\\x243?\\x241=\\x242;
+                rewrite ^/(/[^/]+|[^/]+/|/?)\\x24 /play/index.php last;
+                break;
+            }
+
+            location /rest {
+                limit_except GET POST {
+                   deny all;
+                }
+            }
+
+            location ^~ /bin/ {
+                deny all;
+                return 403;
+            }
+
+            location ^~ /config/ {
+                deny all;
+                return 403;
+            }
+
+            location / {
+                limit_except GET POST HEAD{
+                   deny all;
+                }
+            }
+
+            location ~ ^/.\\x2A.php {
+                fastcgi_index index.php;
+
+                # sets the timeout for requests in [s] , 60s are normally enough
+                   fastcgi_read_timeout 600s;
+
+                include fastcgi_params;
+                fastcgi_param SCRIPT_FILENAME \\x24document_root\\x24fastcgi_script_name;
+
+                # Mitigate HTTPOXY https://httpoxy.org/
+                   fastcgi_param HTTP_PROXY \\x22\\x22;
+
+                # has to be set to on if encryption (https) is used:
+                   # fastcgi_param HTTPS on;
+
+                fastcgi_split_path_info ^(.+?\\x5C.php)(/.\\x2A)\\x24;
+
+                # chose as your php-fpm is configured to listen on
+                   fastcgi_pass unix:/var/run/php-fpm/php7.0-fpm.sock;
+                   # fastcgi_pass 127.0.0.1:8000/;
+            }
+
+            # Rewrite rule for WebSocket
+            location /ws {
+                rewrite ^/ws/(.\\x2A) /\\x241 break;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade \\x24http_upgrade;
+                proxy_set_header Connection \\x22upgrade\\x22;
+                proxy_set_header Host \\x24host;
+                proxy_pass http://127.0.0.1:8100/;
+            }
+        }
+
+}
+END
+
+   ($stdout,$stderr)=$handle->cmd(
+      "echo -e \"$nginx_conf\" > /usr/local/nginx/nginx.conf");
+
+   #
+   # echo-ing/streaming files over ssh can be tricky. Use echo -e
+   #          and replace these characters with thier HEX
+   #          equivalents (use an external editor for quick
+   #          search and replace - and paste back results.
+   #          use copy/paste or cat file and copy/paste results.):
+   #
+   #          !  -   \\x21     `  -  \\x60   * - \\x2A
+   #          "  -   \\x22     \  -  \\x5C
+   #          $  -   \\x24     %  -  \\x25
+   #
+   # https://www.lisenet.com/2014/ - bash approach to conversion
+   my $nginx_start_stop=<<END;
 #\\x21/bin/sh
 #
 # nginx - this script starts and stops the nginx daemin
@@ -1636,7 +1573,7 @@ END
 # description:  Nginx is an HTTP(S) server, HTTP(S) reverse #               proxy and IMAP/POP3 proxy server
 # processname: nginx
 # config:      /usr/local/nginx/nginx.conf
-# pidfile:     /usr/local/nginx/nginx.pid
+# pidfile:     /var/run/nginx.pid
 # user:        www-data
 
 # Source function library.
@@ -1736,7 +1673,7 @@ case \\x22\\x241\\x22 in
 esac
 END
    ($stdout,$stderr)=$handle->cmd(
-      "echo -e \"$nginxconf\" > /opt/source/nginx");
+      "echo -e \"$nginx_start_stop\" > /opt/source/nginx");
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v /opt/source/nginx /etc/init.d','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -1766,6 +1703,12 @@ END
       } elsif (-1<index $output,'Set root password? [Y/n]') {
          $handle->{_cmd_handle}->print('n');
          next;
+      } elsif (-1<index $output,'Switch to unix_socket authentication [Y/n]') {
+         $handle->{_cmd_handle}->print('n');
+         next;
+      } elsif (-1<index $output,'Change the root password? [Y/n]') {
+         $handle->{_cmd_handle}->print('n');
+         next;
       } elsif (-1<index $output,'Remove anonymous users? [Y/n]') {
          $handle->{_cmd_handle}->print('Y');
          next;
@@ -1782,34 +1725,37 @@ END
       }
    }
    $handle->cmd("echo");
-   $handle->{_cmd_handle}->print($sudo.'mysql -u root -p 2>&1');
+   $handle->{_cmd_handle}->print($sudo.'mysql 2>&1');
    my $first_pass=0;
    my $second_pass=0;
    my $third_pass=0;
    my $fourth_pass=0;
+   my $fifth_pass=0;
    while (1) {
       my $output=Net::FullAuto::FA_Core::fetch($handle);
       last if $output=~/$prompt/ && $first_pass;
       print $output;
-      if (-1<index $output,'Enter password:') {
-         $handle->{_cmd_handle}->print();
-         next;
-      } elsif (-1<index $output,'none') {
+      if (-1<index $output,'[(none)]>') {
          if (!$first_pass) {
-            $handle->{_cmd_handle}->print('CREATE DATABASE ampache;');
+            $handle->{_cmd_handle}->print(
+               "ALTER USER \'root\'@\'localhost\' ".
+               "IDENTIFIED BY \'$service_and_cert_password\';");
             $first_pass=1;
          } elsif (!$second_pass) {
-            $handle->{_cmd_handle}->print(
-               'GRANT USAGE ON ampache.* TO ampache@localhost'.
-               " IDENTIFIED BY \'$service_and_cert_password\';");
+            $handle->{_cmd_handle}->print('CREATE DATABASE ampache;');
             $second_pass=1;
          } elsif (!$third_pass) {
             $handle->{_cmd_handle}->print(
-               'GRANT ALL PRIVILEGES ON ampache.* TO ampache@localhost;');
+               'GRANT USAGE ON ampache.* TO ampache@localhost'.
+               " IDENTIFIED BY \'$service_and_cert_password\';");
             $third_pass=1;
          } elsif (!$fourth_pass) {
-            $handle->{_cmd_handle}->print('flush privileges;');
+            $handle->{_cmd_handle}->print(
+               'GRANT ALL PRIVILEGES ON ampache.* TO ampache@localhost;');
             $fourth_pass=1;
+         } elsif (!$fifth_pass) {
+            $handle->{_cmd_handle}->print('flush privileges;');
+            $fifth_pass=1;
          } else {
             $handle->{_cmd_handle}->print('exit;');
          }
@@ -2027,11 +1973,11 @@ END
       my $output.=Net::FullAuto::FA_Core::fetch($handle);
       last if $output=~/$prompt/;
       print $output;
-      if (-1<index $output,'choose a different') {
+      if (-1<index $output,'choose a different)') {
          $handle->{_cmd_handle}->print('y');
          $output='';
          next;
-      } elsif (-1<index $output,'Set that up') {
+      } elsif (-1<index $output,' Set that up? [y/N]') {
          $handle->{_cmd_handle}->print('y');
          $output='';
          next;
@@ -2096,122 +2042,7 @@ END
 '####################################################%NL%'.
 '# Commented Out by FullAuto so above sends all email%NL%'.
 '####################################################%NL%';
-   ($stdout,$stderr)=$handle->cwd("/var/www/html/ampache/includes");
-   ($stdout,$stderr)=$handle->cmd("${sudo}sed -i ".
-      "\'/MsgHTML/i$substitute_email_module\' functions.php");
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
-      'functions.php');
-   ($stdout,$stderr)=$handle->cmd("${sudo}sed -i \"s/%SQ%/\'/g\" ".
-      'functions.php');
-   ($stdout,$stderr)=$handle->cmd("${sudo}sed -i ".
-      "'/MsgHTML/,+8 s/^/#/' ".
-      'functions.php');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/webmaster\@website/".$verified_email."/' ".
-      'functions.php');
-   ($stdout,$stderr)=$handle->cmd_raw('cat functions.php | sudo '.
-      'bash -ic "awk \'{ sub(/\r$/,\"\"); print }\' > temp.php"');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv -fv temp.php functions.php','__display__');
-   ($stdout,$stderr)=$handle->cwd("/var/www/html/ampache/cb_install/sql");
-   my %smtp_host=('us-east-1' => 'email-smtp.us-east-1.amazonaws.com',
-                  'us-west-2' => 'email-smtp.us-west-2.amazonaws.com',
-                  'eu-west-1' => 'email-smtp.eu-west-1.amazonaws.com');
-   my $smtp_host='email-smtp.us-east-1.amazonaws.com';
-   $region=~s/^.*['](.*)[']$/$1/;
-   if (exists $smtp_host{$region}) {
-      $smtp_host=$smtp_host{$region};
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/webmaster\@website/".$verified_email."/' ".
-      'add_admin.sql');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/2, '777750fea4d3bd585bf47dc1873619fc'/".
-      "2, '38d8e594a1ddbd29fdba0de385d4fefa'/\" ".
-      'add_admin.sql');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/webmaster\@localhost/".$verified_email."/' ".
-      'configs.sql');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/'mail'/'smtp'/\" ".
-      'configs.sql');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/'smtp_host', ''/'smtp_host', '".$smtp_host.
-      "'/\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s#'baseurl', ''#'baseurl', 'https://".$public_ip.
-      "'#\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s#'basedir', ''#'basedir', '/var/www/html/ampache".
-      "'#\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/'smtp_user', ''/'smtp_user', '".$access_id.
-      "'/\" configs.sql");
-   $smtppass=~s/\//\\\//g;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/'smtp_pass', ''/'smtp_pass', '".$smtppass.
-      "'/\" configs.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/'smtp_auth', 'no'/'smtp_auth', 'yes'/\"".
-      " configs.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/'smtp_port', ''/'smtp_port', '25'/\"".
-      " configs.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/{tbl_prefix}_video/{tbl_prefix}video/\"".
-      " structure.sql");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/{tbl_prefix}_groups/{tbl_prefix}groups/\"".
-      " structure.sql");
-   my $datestring = strftime "%Y-%d-%e %H:%M:%S", localtime;
-   $datestring=sprintf($datestring);
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/now()/'".$datestring."'/\"".
-      " categories.sql");
-   my @sql=('structure','configs','ads_placements',
-            'countries','email_templates','pages','user_levels',
-            'categories','add_admin','import_categories');
-   foreach my $file (@sql) {
-      print "\nRUNNING $file.sql SQL FILE\n";
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         "sed -i \"s/{tbl_prefix}/cb_/\" $file.sql");
-      ($stdout,$stderr)=$handle->cmd($sudo.
-         'mysql --verbose --force -u ampache -p'.
-         "'".$service_and_cert_password."' ampache < $file.sql",
-         '__display__');
-   }
-   ($stdout,$stderr)=$handle->cwd("/var/www/html/ampache/includes");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v /var/www/html/ampache/cb_install/ampache.php ".
-      "/var/www/html/ampache/includes",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v dbconnect.sample.php dbconnect.php",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/ampache_svn/ampache/' dbconnect.php");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i 's/root/ampache/' dbconnect.php");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "sed -i \"s/''/'".$service_and_cert_password."'/\" dbconnect.php");
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #   'rm -rvf /var/www/html/ampache/cb_install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'chmod -Rv 755 /var/www/html/ampache/includes/','__display__');
-   $ad=<<'END';
-\\x2A \\x2A \\x2A \\x2A \\x2A php -q /var/www/html/ampache/actions/video_convert.php
-\\x2A \\x2A \\x2A \\x2A \\x2A php -q /var/www/html/ampache/actions/verify_converted_videos.php
-0 0,12,13 \\x2A \\x2A \\x2A php -q /var/www/html/ampache/actions/update_cb_stats.php
-END
-   ($stdout,$stderr)=$handle->cmd("echo -e \"$ad\" > root");
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'cp root /var/spool/cron/','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'rm -rvf root','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'service crond restart','__display__');
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #   'rm -rvf /var/www/html/ampache/files/temp/install.me','__display__');
    use LWP::UserAgent;
    use HTTP::Request::Common;
    use IO::Socket::SSL qw();
@@ -3085,7 +2916,7 @@ our $ampache_choose_build=sub {
 
    package ampache_choose_build;
    use JSON::XS;
-   my $c='wget -qO- https://api.github.com/users/arslancb/repos';
+   my $c='wget -qO- https://api.github.com/users/ampache/repos';
    my $local=Net::FullAuto::FA_Core::connect_shell();
    my ($stdout,$stderr)=('','');
    ($stdout,$stderr)=$local->cmd($c);
@@ -3094,8 +2925,8 @@ our $ampache_choose_build=sub {
    my $default_branch=$repos[0]->[1]->{'default_branch'};
    my $updated=$repos[0]->[1]->{'updated_at'};
    my @branches=();
-   # git ls-remote --tags git://github.com/arslancb/ampache
-   $c='wget -qO- https://api.github.com/repos/arslancb/ampache/branches';
+   # git ls-remote --tags git://github.com/ampache/ampache
+   $c='wget -qO- https://api.github.com/repos/ampache/ampache/branches';
    ($stdout,$stderr)=$local->cmd($c);
    @branches=decode_json($stdout);
    my @builds=();
@@ -3120,7 +2951,7 @@ END
    developer, it is highly recommended that you choose the \"$default_branch\"
    branch. It is set as the default (with the arrow >).
 
-   For more information:  https://github.com/arslanh/ampache/branches
+   For more information:  https://github.com/ampache/ampache/branches
 
    The AMPACHE project was last updated:  $updated
 
@@ -3532,12 +3363,12 @@ our $select_ampache_setup=sub {
 
                            http://ampache.com/
 
-        _____ _      _______  ____  _    _  _____ _   __ ______ _______
-       / ____| |    | |  __ \|  _ \| |  | |/ ____| | / /|  ____|__   __|
-      / /    | |    | | |__) | |_) | |  | | |    | |/ / | |__     | |
-      | |    | |    | |  ___/|  _ <| |  | | |    |    \ |  __|    | |
-      | \____| |____| | |    | |_) | |__| | |____| |\  \| |____   | |
-       \_____|______|_|_|    |____/ \____/ \_____|_| \__|______|  |_|
+                       __  __ _____        _____ _    _ ______
+                 /\   |  \/  |  __ \ /\   / ____| |  | |  ____|
+                /  \  | \  / | |__) /  \ | |    | |__| | |__
+               / /\ \ | |\/| |  ___/ /\ \| |    |  __  |  __|
+              / ____ \| |  | | |  / ____ \ |____| |  | | |____
+             /_/    \_\_|  |_|_| /_/    \_\_____|_|  |_|______|
 
 
    Choose the AMPACHE setup you wish to set up. Note that more or larger

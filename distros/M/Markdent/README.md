@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.33
+version 0.34
 
 # SYNOPSIS
 
@@ -75,7 +75,7 @@ dialect is implemented is to look at one of the existing dialect classes:
 - [Markdent::Dialect::Theory::SpanParser](https://metacpan.org/pod/Markdent::Dialect::Theory::SpanParser)
 
 You'll also need to dig into the core [Markdent::Parser::BlockParser](https://metacpan.org/pod/Markdent::Parser::BlockParser) and
-[Markdent::Parser::SpanParser](https://metacpan.org/pod/Markdent::Parser::SpanParser) classes in order to see h ow these dialects
+[Markdent::Parser::SpanParser](https://metacpan.org/pod/Markdent::Parser::SpanParser) classes in order to see how these dialects
 interact with the core parser.
 
 # DONATIONS
@@ -142,6 +142,7 @@ Dave Rolsky <autarch@urth.org>
 - Jason McIntosh <jmac@appleseed-sc.com>
 - Polina Shubina <925043@mai.com>
 - Shlomi Fish <shlomif@shlomifish.org>
+- Stefan Hornburg (Racke) <racke@linuxia.de>
 - Tom Hukins <tom@eborcom.com>
 
 # COPYRIGHT AND LICENSE

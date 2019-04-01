@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::String;
 use Quiq::Option;
@@ -169,7 +169,7 @@ Character Encoding, z.B. 'UTF-8'.
 
 =head4 Description
 
-Wie L</fromString>, nur dass der Record aus Datei $file gelesen wird.
+Wie L<fromString|"fromString() - Lies Schlüssel/Wert-Paare aus String">, nur dass der Record aus Datei $file gelesen wird.
 
 =cut
 
@@ -308,11 +308,11 @@ sub toString {
 
 =head4 Options
 
-Siehe L</toString>
+Siehe L<toString|"toString() - Schreibe Schlüssel/Wert-Paare auf String">
 
 =head4 Description
 
-Wie L</toString>, nur dass der Record auf eine Datei geschrieben wird.
+Wie L<toString|"toString() - Schreibe Schlüssel/Wert-Paare auf String">, nur dass der Record auf eine Datei geschrieben wird.
 Die Methode liefert keinen Wert zurück.
 
 =cut
@@ -332,7 +332,7 @@ sub toFile {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

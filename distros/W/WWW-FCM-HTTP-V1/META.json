@@ -1,0 +1,88 @@
+{
+   "abstract" : "Client for Firebase Cloud Messaging HTTP v1 API",
+   "author" : [
+      "omohayui <omohayui@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-FCM-HTTP-V1",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Lite" : "0",
+            "Crypt::OpenSSL::RSA" : "0",
+            "Furl" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "0",
+            "JSON::WebToken" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::Fake::HTTPD" : "0.08",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "WWW::FCM::HTTP::V1" : {
+         "file" : "lib/WWW/FCM/HTTP/V1.pm",
+         "version" : "0.01"
+      },
+      "WWW::FCM::HTTP::V1::OAuth" : {
+         "file" : "lib/WWW/FCM/HTTP/V1/OAuth.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/omohayui/WWW-FCM-HTTP-V1/issues"
+      },
+      "homepage" : "https://github.com/omohayui/WWW-FCM-HTTP-V1",
+      "repository" : {
+         "url" : "git://github.com/omohayui/WWW-FCM-HTTP-V1.git",
+         "web" : "https://github.com/omohayui/WWW-FCM-HTTP-V1"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:OMOHAYUI",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_static_install" : 1
+}

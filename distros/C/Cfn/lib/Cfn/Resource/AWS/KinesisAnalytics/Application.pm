@@ -1,4 +1,4 @@
-# AWS::KinesisAnalytics::Application generated from spec 1.11.0
+# AWS::KinesisAnalytics::Application generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::KinesisAnalytics::Application {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

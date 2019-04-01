@@ -7,7 +7,7 @@ with qw[Pcore::Util::Src::Filter];
 sub decompress ($self) {
     my $json = P->data->from_json( $self->{data} );
 
-    $self->{data}->$* = P->data->to_json $json, readable => 1;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = P->data->to_json( $json, readable => 1 );    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     return res 200;
 }
@@ -15,7 +15,7 @@ sub decompress ($self) {
 sub compress ($self) {
     my $json = P->data->from_json( $self->{data} );
 
-    $self->{data}->$* = P->data->to_json $json, readable => 0;    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
+    $self->{data}->$* = P->data->to_json( $json, readable => 0 );    ## no critic qw[Variables::RequireLocalizedPunctuationVars]
 
     return res 200;
 }

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Option;
 
@@ -89,7 +89,7 @@ getText-Callback-Methode genutzt werden, um den betreffenden Knoten
 besonders darzustellen. Der Knoten $node kann ein Objekt oder ein Text
 sein. Die Ebene $level ist eine natürliche Zahl im Wertebereich von
 0 (Wurzelknoten) bis n. Die Paar-Liste kann aus irgendeiner Baumstruktur
-mit einer rekursiven Funktion erzeugt werden (siehe Abschnitt L</EXAMPLE>).
+mit einer rekursiven Funktion erzeugt werden (siehe Abschnitt L<EXAMPLE|"EXAMPLE">).
 
 =head1 EXAMPLE
 
@@ -149,7 +149,7 @@ Die Subroutine wird mittels der Option C<-getText> an $t->asText()
     my $arrA = $cls->classHierarchy;
     print Quiq::TreeFormatter->new($arrA)->asText(
         -getText => sub {
-            my ($cls,$stop) = @_;
+            my ($cls,$level,$stop) = @_;
     
             my $str = $cls->name."\n";
             for my $grp ($cls->groups) {
@@ -331,18 +331,18 @@ B<debug>
 
     0 0 A
     1 1   B
-    2 1     C
-    3 0       D
-    2 1     E
-    2 0     F
-    3 0       G
-    4 0         H
+    1 2     C
+    0 3       D
+    1 2     E
+    0 2     F
+    0 3       G
+    0 4         H
     1 1   I
     1 1   J
-    2 1     K
-    2 0     L
-    1 0   M
-    2 0     N
+    1 2     K
+    0 2     L
+    0 1   M
+    0 2     N
 
 B<compact>
 
@@ -363,33 +363,33 @@ B<compact>
 
 B<tree>
 
-    +--A
+    A
+    |
+    +--B
+    |  |
+    |  +--C
+    |  |  |
+    |  |  +--D
+    |  |
+    |  +--E
+    |  |
+    |  +--F
+    |     |
+    |     +--G
+    |        |
+    |        +--H
+    |
+    +--I
+    |
+    +--J
+    |  |
+    |  +--K
+    |  |
+    |  +--L
+    |
+    +--M
        |
-       +--B
-       |  |
-       |  +--C
-       |  |  |
-       |  |  +--D
-       |  |
-       |  +--E
-       |  |
-       |  +--F
-       |     |
-       |     +--G
-       |        |
-       |        +--H
-       |
-       +--I
-       |
-       +--J
-       |  |
-       |  +--K
-       |  |
-       |  +--L
-       |
-       +--M
-          |
-          +--N
+       +--N
 
 =cut
 
@@ -446,7 +446,7 @@ sub asText {
             # konstant ein |. Bei Direction 'down' wird X oberhalb,
             # bei 'up' unterhalb des Blocks hinzugefügt.
 
-            my ($line1,$rest) = split /\n/,$getText->($node,@args),2;
+            my ($line1,$rest) = split /\n/,$getText->($node,$level,@args),2;
 
             my $block = sprintf "+--%s\n",$line1;
 
@@ -479,7 +479,7 @@ sub asText {
             }
         }
 
-        # $str =~ s/^...//mg;
+        $str =~ s/^(\+--|   )//mg;
     }
     elsif ($format eq 'debug') {
         for (@$lineA) {
@@ -488,14 +488,14 @@ sub asText {
                 $follow,
                 $level,
                 '  ' x $level,
-                $getText->($node,@args), # $node,
+                $getText->($node,$level,@args), # $node,
                 @args? ' '.join('|',map {$_ // 'undef'} @args): '';
         }
     }
     elsif ($format eq 'compact') {
         for (@$lineA) {
             my ($follow,$level,$node,@args) = @$_;
-            my ($line1,$rest) = split /\n/,$getText->($node,@args),2;
+            my ($line1,$rest) = split /\n/,$getText->($node,$level,@args),2;
             my $block = sprintf "%s%s\n",'  ' x $level,$line1;
             if ($direction eq 'down') {
                 $str .= $block;
@@ -519,7 +519,7 @@ sub asText {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

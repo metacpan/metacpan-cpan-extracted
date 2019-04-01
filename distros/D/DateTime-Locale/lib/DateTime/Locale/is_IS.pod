@@ -477,17 +477,17 @@ Icelandic Iceland locale.
    1995-12-22T09:05:02 = fös., 22. desember
   -0010-09-15T04:44:23 = lau., 15. september
 
-=head3 MMMMW-count-one ('viku' W 'í' MMM)
+=head3 MMMMW-count-one ('viku' W 'í' MMMM)
 
-   2008-02-05T18:30:30 = viku 1 í feb.
-   1995-12-22T09:05:02 = viku 3 í des.
-  -0010-09-15T04:44:23 = viku 2 í sep.
+   2008-02-05T18:30:30 = viku 1 í febrúar
+   1995-12-22T09:05:02 = viku 3 í desember
+  -0010-09-15T04:44:23 = viku 2 í september
 
-=head3 MMMMW-count-other ('viku' W 'í' MMM)
+=head3 MMMMW-count-other ('viku' W 'í' MMMM)
 
-   2008-02-05T18:30:30 = viku 1 í feb.
-   1995-12-22T09:05:02 = viku 3 í des.
-  -0010-09-15T04:44:23 = viku 2 í sep.
+   2008-02-05T18:30:30 = viku 1 í febrúar
+   1995-12-22T09:05:02 = viku 3 í desember
+  -0010-09-15T04:44:23 = viku 2 í september
 
 =head3 MMMMd (d. MMMM)
 

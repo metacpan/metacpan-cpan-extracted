@@ -275,54 +275,54 @@ Afrikaans Namibia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 6:30:30 nm. UTC
+   1995-12-22T09:05:02 = 9:05:02 vm. UTC
+  -0010-09-15T04:44:23 = 4:44:23 vm. UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 6:30:30 nm. UTC
+   1995-12-22T09:05:02 = 9:05:02 vm. UTC
+  -0010-09-15T04:44:23 = 4:44:23 vm. UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 18:30:30
-   1995-12-22T09:05:02 = 09:05:02
-  -0010-09-15T04:44:23 = 04:44:23
+   2008-02-05T18:30:30 = 6:30:30 nm.
+   1995-12-22T09:05:02 = 9:05:02 vm.
+  -0010-09-15T04:44:23 = 4:44:23 vm.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 18:30
-   1995-12-22T09:05:02 = 09:05
-  -0010-09-15T04:44:23 = 04:44
+   2008-02-05T18:30:30 = 6:30 nm.
+   1995-12-22T09:05:02 = 9:05 vm.
+  -0010-09-15T04:44:23 = 4:44 vm.
 
 
 =head2 Datetime Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Dinsdag 05 Februarie 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = Vrydag 22 Desember 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = Saterdag 15 September -10 04:44:23 UTC
+   2008-02-05T18:30:30 = Dinsdag 05 Februarie 2008 6:30:30 nm. UTC
+   1995-12-22T09:05:02 = Vrydag 22 Desember 1995 9:05:02 vm. UTC
+  -0010-09-15T04:44:23 = Saterdag 15 September -10 4:44:23 vm. UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 05 Februarie 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 Desember 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 September -10 04:44:23 UTC
+   2008-02-05T18:30:30 = 05 Februarie 2008 6:30:30 nm. UTC
+   1995-12-22T09:05:02 = 22 Desember 1995 9:05:02 vm. UTC
+  -0010-09-15T04:44:23 = 15 September -10 4:44:23 vm. UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 05 Feb. 2008 18:30:30
-   1995-12-22T09:05:02 = 22 Des. 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 Sep. -10 04:44:23
+   2008-02-05T18:30:30 = 05 Feb. 2008 6:30:30 nm.
+   1995-12-22T09:05:02 = 22 Des. 1995 9:05:02 vm.
+  -0010-09-15T04:44:23 = 15 Sep. -10 4:44:23 vm.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05 18:30
-   1995-12-22T09:05:02 = 1995-12-22 09:05
-  -0010-09-15T04:44:23 = -10-09-15 04:44
+   2008-02-05T18:30:30 = 2008-02-05 6:30 nm.
+   1995-12-22T09:05:02 = 1995-12-22 9:05 vm.
+  -0010-09-15T04:44:23 = -10-09-15 4:44 vm.
 
 
 =head2 Available Formats
@@ -477,23 +477,23 @@ Afrikaans Namibia locale.
    1995-12-22T09:05:02 = Vr. 22 Desember
   -0010-09-15T04:44:23 = Sa. 15 September
 
-=head3 MMMMW-count-one ('week' W 'van' MMM)
+=head3 MMMMW-count-one ('week' W 'van' MMMM)
 
-   2008-02-05T18:30:30 = week 1 van Feb.
-   1995-12-22T09:05:02 = week 3 van Des.
-  -0010-09-15T04:44:23 = week 2 van Sep.
+   2008-02-05T18:30:30 = week 1 van Februarie
+   1995-12-22T09:05:02 = week 3 van Desember
+  -0010-09-15T04:44:23 = week 2 van September
 
-=head3 MMMMW-count-other ('week' W 'van' MMM)
+=head3 MMMMW-count-other ('week' W 'van' MMMM)
 
-   2008-02-05T18:30:30 = week 1 van Feb.
-   1995-12-22T09:05:02 = week 3 van Des.
-  -0010-09-15T04:44:23 = week 2 van Sep.
+   2008-02-05T18:30:30 = week 1 van Februarie
+   1995-12-22T09:05:02 = week 3 van Desember
+  -0010-09-15T04:44:23 = week 2 van September
 
-=head3 MMMMd (d MMM)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = 5 Feb.
-   1995-12-22T09:05:02 = 22 Des.
-  -0010-09-15T04:44:23 = 15 Sep.
+   2008-02-05T18:30:30 = 5 Februarie
+   1995-12-22T09:05:02 = 22 Desember
+  -0010-09-15T04:44:23 = 15 September
 
 =head3 MMMd (d MMM)
 
@@ -626,7 +626,7 @@ Afrikaans Namibia locale.
 
 =head3 Prefers 24 hour time?
 
-Yes
+No
 
 =head3 Local first day of the week
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Markdent::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -611,7 +611,7 @@ Markdent::Handler::MinimalTree - A Markdent handler which builds a tree
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 DESCRIPTION
 

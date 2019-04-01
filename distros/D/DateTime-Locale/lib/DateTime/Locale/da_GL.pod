@@ -477,17 +477,17 @@ Danish Greenland locale.
    1995-12-22T09:05:02 = fre. 22. december
   -0010-09-15T04:44:23 = lør. 15. september
 
-=head3 MMMMW-count-one ('uge' W 'i' MMM)
+=head3 MMMMW-count-one ('uge' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = uge 1 i feb.
-   1995-12-22T09:05:02 = uge 3 i dec.
-  -0010-09-15T04:44:23 = uge 2 i sep.
+   2008-02-05T18:30:30 = uge 1 i februar
+   1995-12-22T09:05:02 = uge 3 i december
+  -0010-09-15T04:44:23 = uge 2 i september
 
-=head3 MMMMW-count-other ('uge' W 'i' MMM)
+=head3 MMMMW-count-other ('uge' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = uge 1 i feb.
-   1995-12-22T09:05:02 = uge 3 i dec.
-  -0010-09-15T04:44:23 = uge 2 i sep.
+   2008-02-05T18:30:30 = uge 1 i februar
+   1995-12-22T09:05:02 = uge 3 i december
+  -0010-09-15T04:44:23 = uge 2 i september
 
 =head3 MMMMd (d. MMMM)
 

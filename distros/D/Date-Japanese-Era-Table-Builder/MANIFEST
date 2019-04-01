@@ -1,9 +1,11 @@
 Changes
 lib/Date/Japanese/Era/Table/Builder.pm
 Makefile.PL
-MANIFEST			This list of files
-README
+MANIFEST			    This list of files
+README            Documentation
 t/00-load.t
+t/01-reality.t    Tests based in factuals
+t/02-falsehoods.t Tests based in counterfactuals
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2018-12-02'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-03-28'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,7 +20,8 @@ sub parse_cmdline {
 sub run {
     require ShellQuote::Any::Tiny;
 
-    my $cmd = "rsync" . (@ARGV ? " " : "") .
+    my $rsync_cmd = $ENV{RSYNCCOLOR_RSYNC_CMD} // "rsync";
+    my $cmd = $rsync_cmd . (@ARGV ? " " : "") .
         join(" ", map { ShellQuote::Any::Tiny::shell_quote($_) } @ARGV);
     open my $rsync, "$cmd |" or die "rsynccolor: Can't run rsync: $!\n";
 
@@ -73,7 +74,7 @@ rsynccolor - Add some color to rsync output
 
 =head1 VERSION
 
-This document describes version 0.004 of rsynccolor (from Perl distribution App-rsynccolor), released on 2018-12-02.
+This document describes version 0.005 of rsynccolor (from Perl distribution App-rsynccolor), released on 2019-03-28.
 
 =head1 SYNOPSIS
 
@@ -95,6 +96,11 @@ to rsync output, currently:
 will be highlighted in red to be more visually striking.
 
 =head1 ENVIRONMENT
+
+=head2 RSYNCCOLOR_RSYNC_CMD
+
+String. Rsync command to use. Defaults to C<rsync>. Can be used to chain several
+wrappers together.
 
 =head2 NO_COLOR
 
@@ -129,7 +135,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

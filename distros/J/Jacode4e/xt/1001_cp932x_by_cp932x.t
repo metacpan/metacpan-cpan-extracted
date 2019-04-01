@@ -2,7 +2,7 @@
 #
 # 1001_cp932x_by_cp932x.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;

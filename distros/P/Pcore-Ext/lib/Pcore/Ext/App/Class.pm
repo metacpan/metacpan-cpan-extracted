@@ -146,7 +146,7 @@ sub build ( $self ) {
         return Pcore::Ext::App::Class::Ctx::L10N->new( class => $self, buf => [ [$msgid] ] );
     };
 
-    local ${"$self->{package}\::l10n"} = $l10n_hash;
+    local *{"$self->{package}\::l10n"} = $l10n_hash;
 
     # build class
     ( $self->{build}, $self->{build_on_create_func} ) = $self->{package}->can( $self->{method} )->();

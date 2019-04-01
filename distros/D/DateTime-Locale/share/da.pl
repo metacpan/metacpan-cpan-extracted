@@ -29,8 +29,8 @@
     MMM => "MMM",
     MMMEd => "E d. MMM",
     MMMMEd => "E d. MMMM",
-    "MMMMW-count-one" => "'uge' W 'i' MMM",
-    "MMMMW-count-other" => "'uge' W 'i' MMM",
+    "MMMMW-count-one" => "'uge' W 'i' MMMM",
+    "MMMMW-count-other" => "'uge' W 'i' MMMM",
     MMMMd => "d. MMMM",
     MMMd => "d. MMM",
     MMdd => "dd.MM",
@@ -271,5 +271,5 @@
   time_format_medium => "HH.mm.ss",
   time_format_short => "HH.mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

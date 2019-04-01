@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.29 2019-03-31
+
+ - Fix tests for Win32 (again)
+
+1.28 2019-03-28
+
+ - Extend the magic comments (still experimental)
+
 1.27 2018-01-08
 
  - Fix crash on conflicting options continuefootnotes and nocoverpage

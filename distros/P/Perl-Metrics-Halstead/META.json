@@ -44,6 +44,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -66,7 +67,7 @@
          "web" : "https://github.com/ology/Perl-Metrics-Halstead"
       }
    },
-   "version" : "0.0601",
+   "version" : "0.0602",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

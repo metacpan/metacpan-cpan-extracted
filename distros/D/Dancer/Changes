@@ -1,5 +1,17 @@
 Revision history for Dancer
 
+1.3512    2019-03-31 20:10:08+01:00 Europe/London
+Promoting previous trial release 1.3511 to stable.
+
+1.3511    2019-03-29 11:16:08+00:00 Europe/London (TRIAL RELEASE)
+[BUG FIXES]
+ - More session cookie handling fun - avoid causing test failures in dependencies
+   in some cases (e.g. RT #128911 and others)
+
+[ENHANCEMENTS]
+ - hold session in SharedData, to avoid reading the session contents every time
+   anything is requested, could be a performance win
+
 1.3510    2019-03-19 14:42:26+00:00 Europe/London
 Promoting previous trial release 1.3501  to stable.
 Fix #1204 - more proxy-related test failure fun

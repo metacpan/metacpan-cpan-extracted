@@ -4,7 +4,7 @@ use warnings;
 use base 'Exporter';
 
 our @EXPORT_OK = qw(match_gitignore build_gitignore_matcher);
-our $VERSION   = "0.01";
+our $VERSION   = "0.02";
 
 sub match_gitignore {
     my ( $patterns, @paths ) = @_;
@@ -58,8 +58,7 @@ sub build_gitignore_matcher {
     my @patterns_re;
     foreach my $pattern (@$patterns) {
         if ( $pattern =~ m/^!/ ) {
-            my $re = $build_pattern->($pattern);
-            $re =~ s{^\\!}{};
+            my $re = $build_pattern->(substr $pattern, 1);
 
             push @patterns_re,
               {
@@ -163,6 +162,10 @@ Copyright (C) Viacheslav Tykhanovskyi.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 CREDITS
+
+Flavio Poletti
 
 =head1 AUTHOR
 

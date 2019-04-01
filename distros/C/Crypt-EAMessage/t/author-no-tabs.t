@@ -24,6 +24,7 @@ my @files = (
     't/03-encrypt-decrypt.t',
     't/04-backwards-compatability.t',
     't/05-calling.t',
+    't/06-invalid-encodings.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-no-tabs.t',

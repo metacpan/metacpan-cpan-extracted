@@ -8,6 +8,7 @@ package App::Git::Workflow::Repository;
 
 use strict;
 use warnings;
+use version;
 use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
@@ -15,7 +16,7 @@ use Git;
 use File::Spec;
 use base qw/Exporter/;
 
-our $VERSION     = 1.1.1;
+our $VERSION     = version->new(1.1.2);
 our @EXPORT      = qw/git/;
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
@@ -90,7 +91,7 @@ App::Git::Workflow::Repository - A basic wrapper around GIT
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Repository version 1.1.1
+This documentation refers to App::Git::Workflow::Repository version 1.1.2
 
 =head1 SYNOPSIS
 

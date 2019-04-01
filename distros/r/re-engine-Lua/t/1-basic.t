@@ -10,7 +10,7 @@ ok("Hello, world" =~ /Hello, (world)/);
 is($1, 'world');
 
 no re::engine::Lua;
-is(eval '"Hello, world" =~ /(?<=Moose|Mo), (world)/', undef);
+ok(!eval '"Hello, world" =~ /(?=Moose|Mo), (world)/');
 
 SKIP:
 {

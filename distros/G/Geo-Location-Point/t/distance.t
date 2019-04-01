@@ -12,14 +12,14 @@ BEGIN {
 
 DISTANCE: {
 	my $loc1 = new_ok('Geo::Location::Point' => [
-		lat => 51.34203083,
+		Latitude => 51.34203083,
 		long => 1.31609075,
 		county => 'Kent',
 		country => 'GB'
 	]);
 	my $loc2 = new_ok('Geo::Location::Point' => [
 		lat => 51.34015944,
-		long => 1.31580976,
+		Longitude => 1.31580976,
 		county => 'Kent',
 		country => 'GB'
 	]);

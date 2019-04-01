@@ -1,0 +1,10 @@
+# TAP::Harness test rules
+# "t\00init.t" should *not* be run in parallel
+# ... parallel execution causes file system race conditions and multiple failures
+seq:
+  - seq:
+    # serialize all tests in files matching "t/0*.t"
+    - t{\\,/}00init.t
+  - par:
+    # run all other tests in parallel
+    - **

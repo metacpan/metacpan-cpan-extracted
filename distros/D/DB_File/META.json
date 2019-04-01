@@ -32,6 +32,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.843",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pmqs/DB_File/issues"
+      },
+      "homepage" : "https://github.com/pmqs/DB_File",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pmqs/DB_File.git",
+         "web" : "https://github.com/pmqs/DB_File"
+      }
+   },
+   "version" : "1.850",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

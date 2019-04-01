@@ -1,4 +1,4 @@
-# AWS::DocDB::DBCluster generated from spec 2.22.0
+# AWS::DocDB::DBCluster generated from spec 2.28.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DocDB::DBCluster',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::DocDB::DBCluster {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::DocDB::DBCluster', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'ClusterResourceId','Endpoint','Port','ReadEndpoint' ]
+  }
+  sub supported_regions {
+    [ 'eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

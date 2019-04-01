@@ -40,7 +40,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.69';
+our $VERSION = '0.71';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -339,7 +339,10 @@ sub _check_visible {
         {
         }
         else {
-            if ( $self->_is_xvfb_okay() && $self->_xvfb_exists() && $self->_launch_xvfb() ) {
+            if (   $self->_is_xvfb_okay()
+                && $self->_xvfb_exists()
+                && $self->_launch_xvfb() )
+            {
                 $self->{_launched_xvfb_anyway} = 1;
                 $self->{visible}               = 0;
             }
@@ -448,11 +451,8 @@ _RDF_
 sub _is_xvfb_okay {
     my ($self) = @_;
     $self->_initialise_version();
-    if (
-        ( $self->{_initial_version}->{major} )
-        && ( $self->{_initial_version}->{major} <
-            _MIN_VERSION_FOR_XVFB() )
-      )
+    if (   ( $self->{_initial_version}->{major} )
+        && ( $self->{_initial_version}->{major} < _MIN_VERSION_FOR_XVFB() ) )
     {
         return 0;
     }
@@ -1752,8 +1752,6 @@ sub type {
         [
             _COMMAND(),                                   $message_id,
             $self->_command('WebDriver:ElementSendKeys'), $parameters
-
-# >> 159:{"name":"sendKeysToElement","parameters":{"text":"Test::More","value":["T","e","s","t",":",":","M","o","r","e"],"id":"{a754587f-c511-48f5-8c9c-b31c6bac3832}"}} works
         ]
     );
     my $response = $self->_get_response($message_id);
@@ -1812,6 +1810,7 @@ my %_deprecated_commands = (
     'Marionette:SetScreenOrientation' => 'setScreenOrientation',
     'Addon:Install'                   => 'addon:install',
     'Addon:Uninstall'                 => 'addon:uninstall',
+    'WebDriver:AcceptAlert'           => 'acceptDialog',
     'WebDriver:AcceptDialog'          => 'acceptDialog',
     'WebDriver:AddCookie'             => 'addCookie',
     'WebDriver:Back'                  => 'goBack',
@@ -1823,11 +1822,16 @@ my %_deprecated_commands = (
         },
         { command => 'close', before_major => _MAX_VERSION_FOR_NEW_CMDS() }
     ],
-    'WebDriver:DeleteAllCookies'       => 'deleteAllCookies',
-    'WebDriver:DeleteCookie'           => 'deleteCookie',
-    'WebDriver:DeleteSession'          => 'deleteSession',
-    'WebDriver:DismissAlert'           => 'dismissDialog',
-    'WebDriver:GetWindowType'          => 'getWindowType',
+    'WebDriver:DeleteAllCookies' => 'deleteAllCookies',
+    'WebDriver:DeleteCookie'     => 'deleteCookie',
+    'WebDriver:DeleteSession'    => 'deleteSession',
+    'WebDriver:DismissAlert'     => 'dismissDialog',
+    'Marionette:GetWindowType'   => [
+        {
+            command      => 'getWindowType',
+            before_major => _MAX_VERSION_FOR_NEW_CMDS(),
+        },
+    ],
     'WebDriver:DismissAlert'           => 'dismissDialog',
     'WebDriver:ElementClear'           => 'clearElement',
     'WebDriver:ElementClick'           => 'clickElement',
@@ -1901,6 +1905,7 @@ my %_deprecated_commands = (
     'WebDriver:IsElementEnabled'   => 'isElementEnabled',
     'WebDriver:IsElementSelected'  => 'isElementSelected',
     'WebDriver:MaximizeWindow'     => 'maximizeWindow',
+    'WebDriver:MinimizeWindow'     => 'minimizeWindow',
     'WebDriver:Navigate'           => [
         { command => 'goUrl', before_major => _MAX_VERSION_FOR_ANCIENT_CMDS() },
         { command => 'get',   before_major => _MAX_VERSION_FOR_NEW_CMDS() }
@@ -2349,8 +2354,20 @@ sub send_alert_text {
     return $self;
 }
 
+sub accept_alert {
+    my ($self) = @_;
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [ _COMMAND(), $message_id, $self->_command('WebDriver:AcceptAlert') ] );
+    my $response = $self->_get_response($message_id);
+    return $self;
+}
+
 sub accept_dialog {
     my ($self) = @_;
+    Carp::carp(
+'**** DEPRECATED METHOD - using accept_dialog() HAS BEEN REPLACED BY accept_alert ****'
+    );
     my $message_id = $self->_new_message_id();
     $self->_send_request(
         [ _COMMAND(), $message_id, $self->_command('WebDriver:AcceptDialog') ]
@@ -2506,6 +2523,26 @@ sub window_handles {
     else {
         return @{ $response->result()->{value} };
     }
+}
+
+sub new_window {
+    my ( $self, %parameters ) = @_;
+
+    foreach my $key (qw(focus)) {
+        if ( defined $parameters{$key} ) {
+            $parameters{$key} =
+              $parameters{$key} ? JSON::true() : JSON::false();
+        }
+    }
+    my $message_id = $self->_new_message_id();
+    $self->_send_request(
+        [
+            _COMMAND(), $message_id,
+            $self->_command('WebDriver:NewWindow'), {%parameters}
+        ]
+    );
+    my $response = $self->_get_response($message_id);
+    return $response->result()->{handle};
 }
 
 sub close_current_chrome_window_handle {
@@ -3097,7 +3134,9 @@ sub window_type {
     my ($self) = @_;
     my $message_id = $self->_new_message_id();
     $self->_send_request(
-        [ _COMMAND(), $message_id, $self->_command('WebDriver:GetWindowType') ]
+        [
+            _COMMAND(), $message_id, $self->_command('Marionette:GetWindowType')
+        ]
     );
     my $response = $self->_get_response($message_id);
     return $self->_response_result_value($response);
@@ -3485,7 +3524,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.69
+Version 0.71
 
 =head1 SYNOPSIS
 
@@ -3994,6 +4033,28 @@ accepts a L<frame|Firefox::Marionette::Element> as a parameter and switches to i
 
 set the current browsing context for future commands to the parent of the current browsing context
 
+=head2 new_window
+
+accepts an optional hash as the parameter.  Allowed keys are below;
+
+=over 4
+
+=item * focus - a boolean field representing if the new window be opened in the foreground (focused) or background (not focused). Defaults to false.
+
+=item * type - the type of the new window. Can be one of 'tab' or 'window'. Defaults to 'tab'.
+
+=back
+
+Returns the window handle for the new window.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+
+    my $window_handle = $firefox->new_window(type => 'tab');
+
+    $firefox->switch_to_window($window_handle);
+
 =head2 close_current_chrome_window_handle
 
 closes the current chrome window (that is the entire window, not just the tabs).  It returns a list of still available chrome window handles. You will need to L<switch_to_window|Firefox::Marionette#switch_to_window> to use another window.
@@ -4026,7 +4087,7 @@ Returns the message shown in a currently displayed modal message box
 
 dismisses a currently displayed modal message box
 
-=head2 accept_dialog
+=head2 accept_alert
 
 accepts a currently displayed modal message box
 

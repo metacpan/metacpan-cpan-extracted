@@ -1,5 +1,10 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.53      2019-04-01 08:42:05 -0400
+  - Add missing timeout from test that could otherwise hang with a
+    broken combination of Debian Buster / Net::SSLeay / AnyEvent.
+    (gh#46. gh#47)
+
 0.52      2019-02-08 14:22:11 -0500
   - Production version functionally identical to the 0.51_01 release.
 

@@ -1,12 +1,12 @@
 package Date::Japanese::Era;
 
 use strict;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 use constant END_OF_LUNAR => 1872;
 
-use vars qw(@ISA @EXPORT %ERA_TABLE %ERA_JA2ASCII %ERA_ASCII2JA);
+our(%ERA_TABLE, %ERA_JA2ASCII, %ERA_ASCII2JA);
 
 sub import {
     my $self = shift;
@@ -52,14 +52,13 @@ sub _from_ymd {
 	Carp::carp("In $ymd[0] they didn't use gregorious date.");
     }
 
-    require Date::Calc;		# not 'use'
-    *Delta_Days = \&Date::Calc::Delta_Days;
+    require Date::Calc;
 
     # XXX can be more efficient
     for my $era (keys %ERA_TABLE) {
 	my $data = $ERA_TABLE{$era};
-	if (Delta_Days(@{$data}[1..3], @ymd) >= 0 &&
-            Delta_Days(@ymd, @{$data}[4..6]) >= 0) {
+	if (Date::Calc::Delta_Days(@{$data}[1..3], @ymd) >= 0 &&
+            Date::Calc::Delta_Days(@ymd, @{$data}[4..6]) >= 0) {
 	    $self->{name} = $era;
 	    $self->{year} = $ymd[0] - $data->[1] + 1;
 	    $self->{gregorian_year} = $ymd[0];
@@ -97,7 +96,7 @@ sub _dwim {
     my($self, $str) = @_;
 
     unless (utf8::is_utf8($str)) {
-        croak "Era should be Unicode flagged";
+        croak "Era should be in Unicode";
     }
 
     my $gengou_re = join "|", keys %ERA_JA2ASCII;
@@ -177,15 +176,16 @@ Date::Japanese::Era - Conversion between Japanese Era / Gregorian calendar
 
 =head1 SYNOPSIS
 
+  use utf8;
   use Date::Japanese::Era;
 
   # from Gregorian (month + day required)
   $era = Date::Japanese::Era->new(1970, 1, 1);
 
   # from Japanese Era
-  $era = Date::Japanese::Era->new("\x{662D}\x{548C}", 52); # SHOWA
+  $era = Date::Japanese::Era->new("昭和", 52); # SHOWA
 
-  $name      = $era->name;         # \x{662D}\x{548C} (Unicode flagged)
+  $name      = $era->name;         # 昭和 (in Unicode)
   $gengou    = $era->gengou;       # Ditto
 
   $year      = $era->year;	   # 52
@@ -195,7 +195,6 @@ Date::Japanese::Era - Conversion between Japanese Era / Gregorian calendar
   use Date::Japanese::Era 'JIS_X0301';
 
   # more DWIMmy
-  use encoding 'utf-8';
   $era = Date::Japanese::Era->new("昭和五十二年");
   $era = Date::Japanese::Era->new("昭和52年");
 
@@ -218,11 +217,15 @@ Constructs new Date::Japanese::Era instance. When constructed from
 Gregorian date, month and day is required. You need Date::Calc to
 construct from Gregorian.
 
-Name of era can be either of Japanese / ASCII. If you pass Japanese,
-the variable should be properly UTF-8 flaged.
+Name of era can be either of Japanese / ASCII. If you pass Japanese
+text, they should be in Unicode.
 
-Exceptions are thrown when inputs are invalid (e.g: non-existent
-era name and year combination, unknwon era-name, etc.).
+Errors will be thrown if you pass byte strings such as UTF-8 or
+EUC-JP, since Perl doesn't understand what encoding they're in. Use
+the L<utf8> pragma if you want to write them in literals.
+
+Exceptions are thrown when inputs are invalid, such as non-existent
+era name and year combination, unknwon era-name, etc.
 
 =item name
 
@@ -256,6 +259,7 @@ returns year as Gregorian.
 
 =head1 EXAMPLES
 
+  use utf8;
   use Date::Japanese::Era;
 
   # 2001 is H-13
@@ -263,7 +267,7 @@ returns year as Gregorian.
   printf "%s-%s", uc(substr($era->name_ascii, 0, 1)), $era->year;
 
   # to Gregorian
-  my $era = Date::Japanese::Era->new("\x{5E73}\x{6210}", 13); # HEISEI 13
+  my $era = Date::Japanese::Era->new("平成", 13); # HEISEI 13
   print $era->gregorian_year;	# 2001
 
 =head1 CAVEATS
@@ -297,7 +301,7 @@ For example, 1912-07-30 is handled as:
 
 =item *
 
-If someday current era (heisei) is changed, Date::Japanese::Era::Table
+If someday current era (reiwa) is changed, Date::Japanese::Era::Table
 should be upgraded.
 
 =back
@@ -305,6 +309,12 @@ should be upgraded.
 =head1 AUTHOR
 
 Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
+
+=head1 COPYRIGHT
+
+Tatsuhiko Miyagawa, 2001-
+
+=head1 LICENSE
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

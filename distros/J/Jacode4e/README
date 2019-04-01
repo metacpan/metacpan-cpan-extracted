@@ -39,6 +39,8 @@ RAISON D'ETRE
       -----------------------------------------------------------------------
       cp932x        CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
       cp932         Microsoft CP932, IANA Windows-31J
+      cp932ibm      IBM CP932
+      cp932nec      NEC CP932
       sjis2004      JISC Shift_JIS-2004
       cp00930       IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
       keis78        HITACHI KEIS78
@@ -49,7 +51,8 @@ RAISON D'ETRE
       jipsj         NEC JIPS(J)
       jipse         NEC JIPS(E)
       letsj         UNISYS LetsJ
-      utf8          UTF-8
+      utf8          UTF-8.0 (aka UTF-8)
+      utf8.1        UTF-8.1
       utf8jp        UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
     -----------------------------------------------------------------------
 
@@ -77,7 +80,7 @@ INSTALLATION
 
    make test
 
-   To install this software, copy 'jacode4e.pl' to any directory of @INC.
+   To install this software, copy 'Jacode4e.pm' to any directory of @INC.
 
 DEPENDENCIES
 

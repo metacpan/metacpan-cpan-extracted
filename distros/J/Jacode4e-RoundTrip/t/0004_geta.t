@@ -2,7 +2,7 @@
 #
 # 0004_geta_test.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -14,6 +14,8 @@ BEGIN {
     @test = (
         ["\xFC\xFC",'cp932x',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\x81\xAC"        ],
         ["\xFC\xFC",'cp932',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\x81\xAC"        ],
+        ["\xFC\xFC",'cp932ibm','cp932x',{'INPUT_LAYOUT'=>'D'},"\x81\xAC"        ],
+        ["\xFC\xFC",'cp932nec','cp932x',{'INPUT_LAYOUT'=>'D'},"\x81\xAC"        ],
         ["\xFC\xFC",'sjis2004','cp932x',{'INPUT_LAYOUT'=>'D'},"\x81\xAC"        ],
         ["\xFC\xFC",'cp00930', 'cp932x',{'INPUT_LAYOUT'=>'D'},"\x44\x7D"        ],
         ["\xFC\xFC",'keis78',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xA2\xAE"        ],
@@ -25,6 +27,7 @@ BEGIN {
         ["\xFC\xFC",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\x7F\x4B"        ],
         ["\xFC\xFC",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D'},"\xA2\xAE"        ],
         ["\xFC\xFC",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE3\x80\x93"    ],
+        ["\xFC\xFC",'utf8.1',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xE3\x80\x93"    ],
         ["\xFC\xFC",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D'},"\xF3\xB0\x85\xAB"],
     );
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }

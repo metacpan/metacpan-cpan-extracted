@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Mojolicious-Plugin-FormFieldsFromJSON",
   "LICENSE" => "artistic_2",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Mojolicious::Plugin::FormFieldsFromJSON",
   "PREREQ_PM" => {
     "Mojolicious" => "5.67"
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.01",
   "test" => {
     "TESTS" => "t/*.t t/fields/*.t t/validation/*.t"
   }

@@ -477,11 +477,11 @@ Indonesian Indonesia locale.
    1995-12-22T09:05:02 = Jum, 22 Desember
   -0010-09-15T04:44:23 = Sab, 15 September
 
-=head3 MMMMW-count-other ('minggu' 'ke'-W MMM)
+=head3 MMMMW-count-other ('minggu' 'ke'-W MMMM)
 
-   2008-02-05T18:30:30 = minggu ke-1 Feb
-   1995-12-22T09:05:02 = minggu ke-3 Des
-  -0010-09-15T04:44:23 = minggu ke-2 Sep
+   2008-02-05T18:30:30 = minggu ke-1 Februari
+   1995-12-22T09:05:02 = minggu ke-3 Desember
+  -0010-09-15T04:44:23 = minggu ke-2 September
 
 =head3 MMMMd (d MMMM)
 

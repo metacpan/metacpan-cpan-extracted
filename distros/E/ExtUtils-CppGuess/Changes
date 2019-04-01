@@ -1,5 +1,22 @@
 Revision history for Perl extension ExtUtils::CppGuess.
 
+0.19    Mon  1 Apr 07:08:46 BST 2019
+    - support clang on Perl 5.14-16 with ExtUtils::ParseXS >= 3.04_01 (yes, really)
+
+0.18    Sun 31 Mar 17:49:21 BST 2019
+    - improve clang detection
+
+0.17    Sat 30 Mar 16:03:52 GMT 2019
+    - support Sun Studio compiler family
+
+0.16    Sat 30 Mar 00:09:42 GMT 2019
+    - test output more if no clue about compiler
+
+0.15    Fri 29 Mar 22:42:00 GMT 2019
+    - iostream_fname, cpp_flavor_defs methods
+    - add which actual compiler to use to generated MB and EUMM flags
+    - make the test sensitive to whether to #include with a ".h"
+
 0.14	Mon 25 Mar 21:13:36 GMT 2019
     - add is_clang, unify OS-based detection
 

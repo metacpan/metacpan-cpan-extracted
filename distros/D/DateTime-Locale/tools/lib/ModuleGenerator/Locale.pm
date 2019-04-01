@@ -362,7 +362,7 @@ sub _build_parsed_code ($self) {
 }
 
 {
-    my $i = 1;
+    my $i    = 1;
     my %days = map { $_ => $i++ } qw( mon tue wed thu fri sat sun );
 
     sub _build_first_day_of_week {

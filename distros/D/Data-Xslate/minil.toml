@@ -1,2 +1,3 @@
 name = "Data-Xslate"
 authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"

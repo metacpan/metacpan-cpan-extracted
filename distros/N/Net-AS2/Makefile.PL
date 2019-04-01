@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,21 +14,25 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-AS2",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Net::AS2",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Crypt::SMIME" => 0,
     "Digest::SHA" => 0,
+    "Email::Address" => 0,
     "HTTP::Message" => 0,
     "LWP::UserAgent" => 0,
     "MIME::Base64" => 0,
-    "MIME::Tools" => 0
+    "MIME::Tools" => 0,
+    "autodie" => 0,
+    "parent" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.0",
+  "VERSION" => "1.0101",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,12 +43,15 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Crypt::SMIME" => 0,
   "Digest::SHA" => 0,
+  "Email::Address" => 0,
   "HTTP::Message" => 0,
   "LWP::UserAgent" => 0,
   "MIME::Base64" => 0,
   "MIME::Tools" => 0,
   "Test::Exception" => 0,
-  "Test::More" => 0
+  "Test::More" => 0,
+  "autodie" => 0,
+  "parent" => 0
 );
 
 

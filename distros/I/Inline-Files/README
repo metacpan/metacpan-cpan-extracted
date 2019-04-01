@@ -1,5 +1,5 @@
 ==============================================================================
-                   Release of version 0.62 of Inline::Files
+                         Release of Inline::Files
 ==============================================================================
 
 
@@ -44,36 +44,5 @@ DESCRIPTION
 AUTHOR
     Damian Conway (damian@conway.org)
 
-
-==============================================================================
-
-CHANGES IN VERSION 0.52
-
-(No changes have been documented for this version)
-
-==============================================================================
-
-AVAILABILITY
-
-Inline::Files has been uploaded to the CPAN
-and is also available from:
-
-	http://www.csse.monash.edu.au/~damian/CPAN/Inline-Files.tar.gz
-
-==============================================================================
-
-
-==============================================================================
-
-CHANGES IN VERSION 0.62
-
-
-
-
-==============================================================================
-
-AVAILABILITY
-
-Inline::Files has been uploaded to the CPAN
 
 ==============================================================================

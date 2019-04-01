@@ -32,10 +32,14 @@
             "Carp" : "0",
             "Crypt::SMIME" : "0",
             "Digest::SHA" : "0",
+            "Email::Address" : "0",
             "HTTP::Message" : "0",
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
-            "MIME::Tools" : "0"
+            "MIME::Tools" : "0",
+            "autodie" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
@@ -54,7 +58,7 @@
          "web" : "https://github.com/andrewjmaguire/Net-AS2"
       }
    },
-   "version" : "1.0",
+   "version" : "1.0101",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

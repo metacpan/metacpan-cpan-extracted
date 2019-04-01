@@ -5,7 +5,7 @@ use warnings;
 use Exporter qw(import);
 use Test::AutoMock::Mock::Functions qw(new_mock get_manager);
 
-our $VERSION = "0.01";
+our $VERSION = "0.04";
 
 our @EXPORT_OK = qw(mock mock_overloaded manager);
 

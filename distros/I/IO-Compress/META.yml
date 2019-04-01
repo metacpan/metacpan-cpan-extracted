@@ -20,8 +20,12 @@ no_index:
     - t
     - private
 requires:
-  Compress::Raw::Bzip2: '2.084'
-  Compress::Raw::Zlib: '2.084'
+  Compress::Raw::Bzip2: '2.086'
+  Compress::Raw::Zlib: '2.086'
   Scalar::Util: '0'
-version: '2.084'
+resources:
+  bugtracker: https://github.com/pmqs/IO-Compress/issues
+  homepage: https://github.com/pmqs/IO-Compress
+  repository: git://github.com/pmqs/IO-Compress.git
+version: '2.086'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

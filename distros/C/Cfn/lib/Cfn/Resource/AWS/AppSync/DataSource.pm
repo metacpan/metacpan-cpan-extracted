@@ -1,4 +1,4 @@
-# AWS::AppSync::DataSource generated from spec 2.15.0
+# AWS::AppSync::DataSource generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::DataSource',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::AppSync::DataSource {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AppSync::DataSource', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'DataSourceArn','Name' ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

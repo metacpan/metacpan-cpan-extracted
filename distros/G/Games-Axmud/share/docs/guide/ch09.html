@@ -20,7 +20,7 @@
 </ul>
 <hr>
 <p>A missions is an extremely simple script that requires no knowledge of programming at all. (See <a href="ch08.html">Section 8</a> for a summary of the types of script available in Axmud.)</p>
-<p>Missions are created by <em>recording</em> them. That is to say, you start by pressing a 'record' button. Then, you send your character around the world, slaying enemies, looting treasures, and so on. Axmud records every world command that is sent.</p>
+<p>Missions are created by <em>recording</em> them. That is to say, you tell Axmud to start recording, then send your character around the world, slaying enemies, looting treasures and so on, then you tell Axmud to stop recording.</p>
 <p>When you've finished, you can convert the recording into a mission. (There are other uses for recordings, too.)</p>
 <h2><a name="9.1">9.1 Starting a recording</a></h2>
 <p>Recordings can be also be started/stopped/paused/resumed from the main window menu. In addition, you can use the following client command to start/stop a recording:</p>
@@ -43,6 +43,7 @@
 <pre><code>    ;addmission myquest
     ;amn myquest
 </code></pre>
+<p>It's possible to create an empty mission, if you prefer, in which case you'll have to write the whole mission yourself (see <a href="ch09.html#9.5">Section 9.5</a>).</p>
 <h2><a name="9.3">9.3 Starting the mission</a></h2>
 <p>Starting a mission <em>plays back</em> the recording, re-sending all the world commands that were sent the first time.</p>
 <p>Missions can be done all at once or one step at a time. Use the following command to do the mission all at once:</p>

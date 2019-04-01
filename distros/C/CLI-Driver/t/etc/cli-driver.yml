@@ -1,0 +1,139 @@
+---
+
+test1:
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test1_method
+
+test2:
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test2_method
+    args:
+      required: 
+        hard: 
+          m: myarg
+
+test3:
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test3_method
+    args:
+      required: 
+        hard: 
+          m: myarg
+        soft:
+          s: softargX
+
+test4:
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test4_method
+    args:
+      required: 
+        hard: 
+          m: myarg
+        soft:
+          s: softargX            
+      optional:
+        o: optionalargZ
+
+test5:
+  class:
+    name: CLI::Driver::Test
+  method:
+    name: test5_method
+    args:
+      required: 
+        hard: 
+          m: myarg
+        soft:
+          s: softargX            
+      optional:
+        o: optionalargZ        
+      flags:
+        dry-run: dry_run
+        
+        
+test6:
+  class:
+    name: CLI::Driver::Test2
+    attr:
+      required:
+        hard:
+          h: hard_attr
+        soft:
+      optional:
+      flags: 
+  method:
+    name: test6_method
+    args:
+      required: 
+        hard: 
+        soft:
+      optional:
+      flags:
+
+test7:
+  class:
+    name: CLI::Driver::Test2
+    attr:
+      required:
+        hard:
+          h: hard_attr
+        soft:
+          s: soft_attr
+      optional:
+      flags: 
+  method:
+    name: test7_method
+    args:
+      required: 
+        hard: 
+        soft:
+      optional:
+      flags:
+
+test8:
+  class:
+    name: CLI::Driver::Test2
+    attr:
+      required:
+        hard:
+          h: hard_attr
+        soft:
+      optional:
+        o: optional_attr
+      flags: 
+  method:
+    name: test8_method
+    args:
+      required: 
+        hard: 
+        soft:
+      optional:
+      flags:   
+      
+test9:
+  class:
+    name: CLI::Driver::Test2
+    attr:
+      required:
+        hard:
+          h: hard_attr
+        soft:
+      optional:
+      flags: 
+        dry-run: dry_run
+  method:
+    name: test9_method
+    args:
+      required: 
+        hard: 
+        soft:
+      optional:
+      flags:                        

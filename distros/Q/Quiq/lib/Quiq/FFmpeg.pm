@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::File::Video;
 use POSIX ();
@@ -37,7 +37,7 @@ Ausgabe-Dateien, Optionen, Filtern usw. zu konstruieren und
 andererseits I<höhere> (Klassen-)Methoden, die eine vollständige
 Kommandozeile zur Erfüllung eines bestimmten Zwecks unter
 Rückgriff auf die elementaren Methoden erstellen. Die höheren
-Methoden Methoden befinden sich im Abschnitt L</"Klassenmethoden (vollständige Kommandozeilen)">.
+Methoden Methoden befinden sich im Abschnitt L<Klassenmethoden (vollständige Kommandozeilen)|"Klassenmethoden (vollständige Kommandozeilen)">.
 
 =head1 METHODS
 
@@ -1533,7 +1533,7 @@ sub execute {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

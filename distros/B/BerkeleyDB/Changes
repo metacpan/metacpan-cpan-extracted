@@ -1,9 +1,36 @@
 Revision history for Perl extension BerkeleyDB.
 
+0.61  30 March 2019
+
+        * Fix a couple of typos  
+          One's a copyright date out by 20 years.
+          The other one breaks builds with 5.2 ≤ BDB < 6.2.
+          Merge pull request #1 https://github.com/pmqs/BerkeleyDB/pull/1
+
+0.60  30 March 2019
+        * Moved source to github https://github.com/pmqs/BerkeleyDB
+
+        * Add META_MERGE to Makefile.PL
+
+        * Added meta-json.t & meta-yaml.t
+
+0.58  23 January 2018
+
+        * please expose set_lg_filemode
+          [RT #124979]
+
+0.57  23 January 2018
+
+        * Updates for BDB 6.3
+
+0.56  5 January 2016
+
+        * Updates for BDB 6.2
+
 0.55  30 March 2014
 
         * Error opening ErrFile with PerlIO_findFILE
-          [RT =#101883]
+          [RT #101883]
 
         * Minor updates for BDB 6.1 
 

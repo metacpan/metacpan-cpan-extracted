@@ -471,23 +471,23 @@ Inari Sami locale.
    1995-12-22T09:05:02 = vás, juovlâ 22.
   -0010-09-15T04:44:23 = láv, čohčâ 15.
 
-=head3 MMMMW-count-one ('okko' W, MMM)
+=head3 MMMMW-count-one ('okko' W, MMMM)
 
-   2008-02-05T18:30:30 = okko 1, kuovâ
-   1995-12-22T09:05:02 = okko 3, juovlâ
-  -0010-09-15T04:44:23 = okko 2, čohčâ
+   2008-02-05T18:30:30 = okko 1, kuovâmáánu
+   1995-12-22T09:05:02 = okko 3, juovlâmáánu
+  -0010-09-15T04:44:23 = okko 2, čohčâmáánu
 
-=head3 MMMMW-count-other ('okko' W, MMM)
+=head3 MMMMW-count-other ('okko' W, MMMM)
 
-   2008-02-05T18:30:30 = okko 1, kuovâ
-   1995-12-22T09:05:02 = okko 3, juovlâ
-  -0010-09-15T04:44:23 = okko 2, čohčâ
+   2008-02-05T18:30:30 = okko 1, kuovâmáánu
+   1995-12-22T09:05:02 = okko 3, juovlâmáánu
+  -0010-09-15T04:44:23 = okko 2, čohčâmáánu
 
-=head3 MMMMW-count-two ('okko' W, MMM)
+=head3 MMMMW-count-two ('okko' W, MMMM)
 
-   2008-02-05T18:30:30 = okko 1, kuovâ
-   1995-12-22T09:05:02 = okko 3, juovlâ
-  -0010-09-15T04:44:23 = okko 2, čohčâ
+   2008-02-05T18:30:30 = okko 1, kuovâmáánu
+   1995-12-22T09:05:02 = okko 3, juovlâmáánu
+  -0010-09-15T04:44:23 = okko 2, čohčâmáánu
 
 =head3 MMMMd (MMMM d.)
 

@@ -32,9 +32,9 @@ use Linux::GetPidstat::Collector::Parser;
         'cswch_per_sec'      => '19.87',
         'disk_read_per_sec'  => '0',
         'disk_write_per_sec' => '-250',
-        'memory_percent'     => '34.63',
+        'memory_percent'     => '34.64',
         'memory_rss'         => '10881534000',
-        'nvcswch_per_sec'    => '30.45',
+        'nvcswch_per_sec'    => '30.44',
         'stk_ref'            => '25500',
         'stk_size'           => '128500'
     } or diag explain $parsed;
@@ -49,9 +49,9 @@ use Linux::GetPidstat::Collector::Parser;
         'cswch_per_sec'      => '33.54',
         'disk_read_per_sec'  => '500',
         'disk_write_per_sec' => '-500',
-        'memory_percent'     => '42.15',
+        'memory_percent'     => '42.16',
         'memory_rss'         => '13532901250',
-        'nvcswch_per_sec'    => '44.04',
+        'nvcswch_per_sec'    => '44.02',
         'stk_ref'            => '39500',
         'stk_size'           => '190000'
     } or diag explain $parsed;

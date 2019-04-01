@@ -1,6 +1,8 @@
-package Net::AS2::MDN 1.0;
+package Net::AS2::MDN;
+
 use strict;
 use warnings;
+our $VERSION = '1.0101'; # VERSION
 
 =head1 NAME
 
@@ -15,11 +17,19 @@ Net::AS2::MDN - AS2 Message Deposition Notification
         print STDERR $mdn->description;
     }
 
+
+=head1 DESCRIPTION
+
+This is a class for creating Message Deposition Notifications (MDN)
+for use in handling AS2 (RFC 4130) communication. This described in
+RFC 3798.
+
 =head1 PUBLIC INTERFACE
 
 =cut
 
 use Carp;
+use Email::Address;
 use MIME::Parser;
 use MIME::Entity;
 use Scalar::Util qw(blessed);
@@ -127,7 +137,7 @@ sub create_from_unsuccessful_message
     croak "error_message is not an Net::AS2::Message"
         unless blessed($error_message) && $error_message->isa('Net::AS2::Message');
     croak "message is not error"
-        unless !$error_message->is_success;
+        if $error_message->is_success;
 
     my $self = $class->_create_from_message(
         $error_message,
@@ -139,7 +149,7 @@ sub create_from_unsuccessful_message
     } else {
         $self->{failure} = 1;
     }
-    return $self
+    return $self;
 }
 
 sub _create_from_message
@@ -220,12 +230,12 @@ sub _parse_mdn
 {
     my ($self, $content) = @_;
 
-    my $parser = new MIME::Parser;
+    my $parser = MIME::Parser->new();
     $parser->output_to_core(1);
     $parser->tmp_to_core(1);
     my $entity = $parser->parse_data($content);
 
-    unless ($entity->mime_type =~ m{^multipart/report}) {
+    if ($entity->mime_type !~ m{^multipart/report}) {
         $self->{status_text} = 'unexpected content type';
         $self->{unparsable} = 1;
         return;
@@ -240,7 +250,7 @@ sub _parse_mdn
         next unless $bh;
         if ($p->effective_type =~ m{^text/}i) {
             $self->{plain_text} = $bh->as_string;
-        } elsif ($p->effective_type =~ m{^message/disposition-notification$}i) {
+        } elsif (lc($p->effective_type) eq 'message/disposition-notification') {
             $disposition_text = $bh->as_string;
         }
     }
@@ -255,12 +265,19 @@ sub _parse_mdn
     {
         my $recipient = $disposition{'final-recipient'};
         if ($recipient =~ /^.*? *; *(.+)$/) {
-            $self->{recipient} = Net::AS2::_parse_as2_id($1);
+            $self->{recipient} = Net::AS2->parse_as2_id($1);
         }
     }
 
-    $self->{original_message_id} = $disposition{'original-message-id'}
-        if defined $disposition{'original-message-id'};
+    if (my $id = $disposition{'original-message-id'}) {
+        if ($id =~ /<?($Email::Address::addr_spec)>?/) {
+            $self->{original_message_id} = $1;
+        }
+        else {
+            $self->{status_text} = "Original-Message-Id does not conform to RFC 2822: '$id'";
+            $self->{error} = 1;
+        }
+    }
 
     if (defined $disposition{'received-content-mic'})
     {
@@ -279,7 +296,7 @@ sub _parse_mdn
             if ($op =~ /: *(.*?) *$/) {
                 $status_text = $1;
             }
-            if ($op =~ /^processed$/i) {
+            if (lc($op) eq 'processed') {
                 # All success
                 $self->{success} = 1;
             } elsif ($op =~ m{^processed/warning}i) {
@@ -300,9 +317,11 @@ sub _parse_mdn
         }
     } else {
         $status_text = "disposition not found";
-            $self->{unparsable} = 1;
+        $self->{unparsable} = 1;
     }
     $self->{status_text} = $status_text;
+
+    return;
 }
 
 =back
@@ -322,24 +341,35 @@ The MDN will be marked C<is_error> if the MICs do not match.
         # still success after comparing mic
     }
 
+Returns 1 if MICs do match, 0 otherwise.
+
 =cut
 
 sub match_mic
 {
     my ($self, $hash, $alg) = @_;
-    return if !$self->is_success;
-    unless (
-        defined $self->{mic_hash} &&
-        defined $hash && defined $alg &&
-        $self->{mic_hash} eq $hash &&
-        $self->{mic_alg} eq $alg)
-    {
-        $self->{success} = $self->{warning} = $self->{failure} = 0;
-        $self->{error} = 1;
-        $self->{status_text} .= "; MDN MIC validation failure $self->{mic_alg} ne $alg";
-        return 0;
+
+    return 0 unless $self->is_success;
+
+    if (! $self->{mic_alg} && ! $alg) {
+        return 1;
     }
-    return 1;
+
+    if (
+        defined $hash && defined $alg &&
+        defined $self->{mic_hash} &&
+        defined $self->{mic_alg} &&
+        $self->{mic_hash} eq $hash &&
+        $self->{mic_alg} eq $alg
+    ) {
+        return 1;
+    }
+
+    $self->{success} = $self->{warning} = $self->{failure} = 0;
+    $self->{error} = 1;
+    $self->{status_text} .= "; MDN MIC validation failure $self->{mic_alg} ne $alg";
+
+    return 0;
 }
 
 =item $mdn->is_success
@@ -454,7 +484,7 @@ sub as_mime
 {
     my $self = shift;
 
-    my $quoted_recipient = Net::AS2::_encode_as2_id($self->{recipient});
+    my $quoted_recipient = Net::AS2->encode_as2_id($self->{recipient});
 
     my $machine_report =
     join($crlf, (
@@ -475,7 +505,7 @@ sub as_mime
             ())
     ));
 
-    my $human_report_mime = new MIME::Entity->build(
+    my $human_report_mime = MIME::Entity->build(
         Type => 'text/plain',
         Data => $self->{plain_text} // $self->{status_text} // (
             $self->{success} ?
@@ -483,12 +513,12 @@ sub as_mime
                 'Message could not be processed.'),
         Top => 0);
     $human_report_mime->head->delete('Content-disposition');
-    my $machine_report_mime = new MIME::Entity->build(
+    my $machine_report_mime = MIME::Entity->build(
         Type => 'message/disposition-notification',
         Data => $machine_report,
         Top => 0);
     $machine_report_mime->head->delete('Content-disposition');
-    my $report_mime = new MIME::Entity->build(
+    my $report_mime = MIME::Entity->build(
         Type => 'multipart/report; report-type="disposition-notification"',
         'X-Mailer' => undef);
     $report_mime->add_part($human_report_mime);
@@ -504,4 +534,12 @@ sub as_mime
 =head1 SEE ALSO
 
 L<Net::AS2>, L<MIME::Entity>
+
+L<RFC 3798|https://www.ietf.org/rfc/rfc3798.txt>
+
+=head1 BUGS AND LIMITATIONS
+
+The Message Deposition Notification RFC 3798 is now obsolete.  It has
+been superceeded by L<RFC 8098|https://www.ietf.org/rfc/rfc8098.txt>.
+These changes have not been implemented.
 

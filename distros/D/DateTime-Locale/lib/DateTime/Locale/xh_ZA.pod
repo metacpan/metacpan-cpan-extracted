@@ -471,17 +471,17 @@ Xhosa South Africa locale.
    1995-12-22T09:05:02 = Dis 22, Hla
   -0010-09-15T04:44:23 = Sep 15, Mgq
 
-=head3 MMMMW-count-one ('week' W 'of' MMM)
+=head3 MMMMW-count-one ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Feb
-   1995-12-22T09:05:02 = week 3 of Dis
-  -0010-09-15T04:44:23 = week 2 of Sep
+   2008-02-05T18:30:30 = week 1 of Februwari
+   1995-12-22T09:05:02 = week 3 of Disemba
+  -0010-09-15T04:44:23 = week 2 of Septemba
 
-=head3 MMMMW-count-other ('week' W 'of' MMM)
+=head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Feb
-   1995-12-22T09:05:02 = week 3 of Dis
-  -0010-09-15T04:44:23 = week 2 of Sep
+   2008-02-05T18:30:30 = week 1 of Februwari
+   1995-12-22T09:05:02 = week 3 of Disemba
+  -0010-09-15T04:44:23 = week 2 of Septemba
 
 =head3 MMMMd (MMMM d)
 

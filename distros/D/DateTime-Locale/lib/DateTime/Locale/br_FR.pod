@@ -471,35 +471,35 @@ Breton France locale.
    1995-12-22T09:05:02 = Gwe. 22 Kzu.
   -0010-09-15T04:44:23 = Sad. 15 Gwen.
 
-=head3 MMMMW-count-few ('sizhun' W MMM)
+=head3 MMMMW-count-few ('sizhun' W MMMM)
 
-   2008-02-05T18:30:30 = sizhun 1 Cʼhwe.
-   1995-12-22T09:05:02 = sizhun 3 Kzu.
-  -0010-09-15T04:44:23 = sizhun 2 Gwen.
+   2008-02-05T18:30:30 = sizhun 1 Cʼhwevrer
+   1995-12-22T09:05:02 = sizhun 3 Kerzu
+  -0010-09-15T04:44:23 = sizhun 2 Gwengolo
 
-=head3 MMMMW-count-many ('sizhun' W MMM)
+=head3 MMMMW-count-many ('sizhun' W MMMM)
 
-   2008-02-05T18:30:30 = sizhun 1 Cʼhwe.
-   1995-12-22T09:05:02 = sizhun 3 Kzu.
-  -0010-09-15T04:44:23 = sizhun 2 Gwen.
+   2008-02-05T18:30:30 = sizhun 1 Cʼhwevrer
+   1995-12-22T09:05:02 = sizhun 3 Kerzu
+  -0010-09-15T04:44:23 = sizhun 2 Gwengolo
 
-=head3 MMMMW-count-one ('sizhun' W MMM)
+=head3 MMMMW-count-one ('sizhun' W MMMM)
 
-   2008-02-05T18:30:30 = sizhun 1 Cʼhwe.
-   1995-12-22T09:05:02 = sizhun 3 Kzu.
-  -0010-09-15T04:44:23 = sizhun 2 Gwen.
+   2008-02-05T18:30:30 = sizhun 1 Cʼhwevrer
+   1995-12-22T09:05:02 = sizhun 3 Kerzu
+  -0010-09-15T04:44:23 = sizhun 2 Gwengolo
 
-=head3 MMMMW-count-other ('sizhun' W MMM)
+=head3 MMMMW-count-other ('sizhun' W MMMM)
 
-   2008-02-05T18:30:30 = sizhun 1 Cʼhwe.
-   1995-12-22T09:05:02 = sizhun 3 Kzu.
-  -0010-09-15T04:44:23 = sizhun 2 Gwen.
+   2008-02-05T18:30:30 = sizhun 1 Cʼhwevrer
+   1995-12-22T09:05:02 = sizhun 3 Kerzu
+  -0010-09-15T04:44:23 = sizhun 2 Gwengolo
 
-=head3 MMMMW-count-two ('sizhun' W MMM)
+=head3 MMMMW-count-two ('sizhun' W MMMM)
 
-   2008-02-05T18:30:30 = sizhun 1 Cʼhwe.
-   1995-12-22T09:05:02 = sizhun 3 Kzu.
-  -0010-09-15T04:44:23 = sizhun 2 Gwen.
+   2008-02-05T18:30:30 = sizhun 1 Cʼhwevrer
+   1995-12-22T09:05:02 = sizhun 3 Kerzu
+  -0010-09-15T04:44:23 = sizhun 2 Gwengolo
 
 =head3 MMMMd (d MMMM)
 

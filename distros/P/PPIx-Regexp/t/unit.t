@@ -1721,9 +1721,9 @@ klass   ( 'PPIx::Regexp::Token::Modifier' );
 content ( '' );
 
 # Make sure we do not prematurely end an extended bracketed character
-# klass if we encounter a bracketed character klass followed immediately
+# class if we encounter a bracketed character class followed immediately
 # by the end of a parenthesized group (e.g. in '(?[([x])])' the extended
-# klass should end at the end of the string).
+# class should end at the end of the string).
 
 parse   ( '/(?[(\\w-[[:lower:]])|\\p{Greek}])|[^a-z]/' );
 value   ( failures => [], 0 );
@@ -1889,6 +1889,75 @@ count   ( 7 );
 choose  ( 4 );
 klass   ( 'PPIx::Regexp::Token::Code' );
 content ( '$x->%{foo,bar}' );
+
+# \x{}
+note	'/\\x{}/ generates a NUL by default';
+parse   ( '/\\x{}/' );
+value   ( failures => [], 0 );
+klass   ( 'PPIx::Regexp' );
+count   ( 3 );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( '\\x{}' );
+value   ( ordinal => [], 0 );
+
+note	q</\x{}/ is an error if "use re 'strict'" is in effect>;
+parse   ( '/\\x{}/', strict => 1 );
+value   ( failures => [], 1 );
+klass   ( 'PPIx::Regexp' );
+count   ( 3 );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Unknown' );
+content ( '\\x{}' );
+error   ( 'Empty \\x{} is an error under "use re \'strict\'"' );
+
+
+# \o{}
+note	'/\\o{}/ is an error';
+parse   ( '/\\o{}/' );
+value   ( failures => [], 1 );
+klass   ( 'PPIx::Regexp' );
+count   ( 3 );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Unknown' );
+content ( '\\o{}' );
+error   ( 'Empty \\o{} is an error' );
+
+note	'/\\o{ }/ is not normally an error';
+parse   ( '/\\o{ }/' );
+value   ( failures => [], 0 );
+klass   ( 'PPIx::Regexp' );
+count   ( 3 );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Literal' );
+content ( '\\o{ }' );
+value   ( ordinal => [], 0 );
+
+note	q</\\o{ }/ is an error if "use re 'strict'" is in effect>;
+parse   ( '/\\o{ }/', strict => 1 );
+value   ( failures => [], 1 );
+klass   ( 'PPIx::Regexp' );
+count   ( 3 );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Unknown' );
+content ( '\\o{ }' );
+error   ( 'Non-octal character in \\o{...}' );
+
+
+
+# \p{}
+
+note	q</\\p{ }/ is an error>;
+parse   ( '/\\p{ }/' );
+value   ( failures => [], 1 );
+klass   ( 'PPIx::Regexp' );
+count   ( 3 );
+choose  ( child => 1, child => 0 );
+klass   ( 'PPIx::Regexp::Token::Unknown' );
+content ( '\\p{ }' );
+error   ( 'Empty \\p{} is an error' );
+
+
 
 note	'Make sure \Q stacks with \U, \L and \F';
 tokenize( '/\\Qx\\Uy\\E\\w\\E/' );

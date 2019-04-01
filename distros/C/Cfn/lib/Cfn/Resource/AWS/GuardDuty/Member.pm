@@ -1,4 +1,4 @@
-# AWS::GuardDuty::Member generated from spec 2.2.0
+# AWS::GuardDuty::Member generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::GuardDuty::Member',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::GuardDuty::Member {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::GuardDuty::Member', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 

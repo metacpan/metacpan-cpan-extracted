@@ -8,6 +8,7 @@ package App::Git::Workflow;
 
 use strict;
 use warnings;
+use version;
 use autodie;
 use Carp qw/carp croak cluck confess longmess/;
 use Data::Dumper qw/Dumper/;
@@ -15,7 +16,7 @@ use English qw/ -no_match_vars /;
 use App::Git::Workflow::Repository qw//;
 use base qw/Exporter/;
 
-our $VERSION   = 1.1.1;
+our $VERSION   = version->new(1.1.2);
 
 sub _alphanum_sort {
     no warnings qw/once/;
@@ -39,7 +40,6 @@ sub new {
     $self->{GIT_DIR}  = '.git';
     $self->{branches} = undef;
     $self->{tags}     = undef;
-    $self->{settings} = {};
     $self->{settings_dir} = ($ENV{HOME} || "/tmp/") . '/.git-workflow';
     mkdir $self->{settings_dir} if !-d $self->{settings_dir};
 
@@ -225,7 +225,7 @@ sub settings {
     return $self->{settings} if $self->{settings};
 
     my $key = $self->git->config('remote.origin.url');
-    chomp $key;
+    chomp $key if $key;
     if ( !$key ) {
         $key = $self->git->rev_parse("--show-toplevel");
         chomp $key;
@@ -239,7 +239,7 @@ sub settings {
         ? do $self->{settings_file}
         : {};
 
-    if ( $self->{settings}->{version} && $self->{settings}->{version} > $App::Git::Workflow::VERSION ) {
+    if ( $self->{settings}->{version} && version->new($self->{settings}->{version}) > $App::Git::Workflow::VERSION ) {
         die "Current settings created with newer version than this program!\n";
     }
 
@@ -251,7 +251,8 @@ sub save_settings {
     return if !$self->{settings_file};
     local $Data::Dumper::Indent   = 1;
     local $Data::Dumper::Sortkeys = 1;
-    $self->{settings}->{version} =$App::Git::Workflow::VERSION;
+    $self->{settings}->{version} = $App::Git::Workflow::VERSION;
+    $self->{settings}->{date} = time;
     $self->spew($self->{settings_file}, 'my ' . Dumper $self->{settings});
 }
 
@@ -276,7 +277,7 @@ App::Git::Workflow - Git workflow tools
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow version 1.1.1
+This documentation refers to App::Git::Workflow version 1.1.2
 
 =head1 SYNOPSIS
 

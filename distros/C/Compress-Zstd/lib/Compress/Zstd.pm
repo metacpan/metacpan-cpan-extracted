@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 
 our @EXPORT = qw(
     compress

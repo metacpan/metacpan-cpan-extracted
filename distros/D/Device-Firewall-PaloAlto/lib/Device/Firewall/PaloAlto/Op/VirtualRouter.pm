@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::VirtualRouter;
-$Device::Firewall::PaloAlto::Op::VirtualRouter::VERSION = '0.1.2';
+$Device::Firewall::PaloAlto::Op::VirtualRouter::VERSION = '0.1.3';
 use strict;
 use warnings;
 use 5.010;
@@ -74,7 +74,7 @@ Device::Firewall::PaloAlto::Op::VirtualRouter - new module
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,6 @@
 If you are looking for ways to help:
 
 * Add tests!
-  * Do we do the right thing with unexpected encodings?  We create type
-    1, 2, and 3 messages today - what happens with a type 4? Type x?
-    Type chr(0)?
   * Check error messages when bad keys are provided
   * Check that system throws exceptions when methods are called with the
     wrong number/type of parameters (extend tests in 05-calling.t)

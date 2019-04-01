@@ -11,7 +11,7 @@ use List::MoreUtils qw(all);
 use LUGS::Events::Parser::Event ();
 use Params::Validate ':all';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 validation_options(
     on_fail => sub
@@ -39,10 +39,11 @@ sub new
 sub _init
 {
     my $self = shift;
-    validate_pos(@_, { type => SCALAR }, { type => HASHREF, optional => true });
+    validate_pos(@_, { type => SCALAR, callbacks => { 'is a file' => sub { -f shift } } },
+                     { type => HASHREF, optional => true });
+
     my ($file, $opts) = @_;
 
-    croak 'new(): not a file provided' unless -f $file;
     $self->{Input} = $file;
 
     if (ref $opts eq 'HASH') {

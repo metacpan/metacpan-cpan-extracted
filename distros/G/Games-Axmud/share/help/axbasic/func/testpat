@@ -1,14 +1,14 @@
-TESTPAT (regex)
+Testpat (regex)
 
    Synopsis:
-      TESTPAT checks the validity of a pattern.
+      Checks the validity of a pattern (regular expression)
          
    Notes:
       'regex' is a Perl regular expression like "orc", "^orc" or "^orc (.*)$".
-         If it's a valid pattern, TESTPAT returns 1; if it's an invalid pattern
-         (or if 'regex' is an empty string), returns 0.
-      See also the help for TESTPAT$ which, for an invalid patterns, returns a
-         string value containing the Perl error message. 
+         If it's a valid pattern, Testpat () returns 1; if it's an invalid
+         pattern (or if 'regex' is an empty string), returns 0.
+      See also the help for Testpat$ () which, for an invalid patterns, returns
+         a string value containing the Perl error message. 
 
    Compatibility:
       Since Axbasic v1.001

@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Database::Row::Array;
 use Quiq::Shell;
 use Quiq::Path;
 use Quiq::CommandLine;
+use Quiq::Array;
 use Quiq::Stopwatch;
 use Quiq::TempFile;
 use Quiq::Unindent;
@@ -992,19 +993,23 @@ sub demote {
 
 # -----------------------------------------------------------------------------
 
-=head3 demoteToBase() - Demote Packages auf die unterste Stufe
+=head3 movePackage() - Bringe Package auf Zielstufe
 
 =head4 Synopsis
 
-    $scm->demoteToBase(@packages);
+    $scm->movePackage($state,$package);
 
 =head4 Arguments
 
 =over 4
 
-=item @packages
+=item $state
 
-Packages, die demotet werden sollen.
+Stufe, auf die das Package gebracht werden soll.
+
+=item $packge
+
+Package, das bewegt werden soll.
 
 =back
 
@@ -1014,81 +1019,42 @@ Ausgabe des Kommandos (String)
 
 =head4 Description
 
-Demote die Packages @packages auf die unterste Stufe und liefere die
-Ausgabe des Kommandos zurück. Die Packages müssen sich alle auf der
-gleichen Ausgangsstufe befinden, sonst wirft die Methode eine Exception.
+Bringe das Package $package von der aktuellen Stufe auf die Zielstufe
+$state und liefere die Ausgabe des Kommandos zurück. Liegt die Zielstufe
+über der aktuellen Stufe, wird das Package promotet, andernfalls demotet.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub demoteToBase {
-    my ($self,@packages) = @_;
+sub movePackage {
+    my ($self,$state,$package) = @_;
 
-    my $projectContext = $self->projectContext;
-    my $packageNames = join ', ',map {"'$_'"} @packages;
-
-    my $tab = $self->runSql("
-        SELECT
-            pkg.packagename
-            , sta.statename
-        FROM
-            harPackage pkg
-            JOIN harEnvironment env
-                ON env.envobjid = pkg.envobjid
-            JOIN harState sta
-                ON sta.stateobjid = pkg.stateobjid
-        WHERE
-            env.environmentname = '$projectContext'
-            AND pkg.packagename IN ($packageNames)
-    ");
-
-    if (@packages != $tab->count) {
-        # Fehler: nicht alle Packages wurden gefunden
-
-        my %package;
-        @package{@packages} = (1) x @packages;
-        for my $row ($tab->rows) {
-            delete $package{$row->[0]};
-        }
+    my @states = $self->states;
+    my $i = Quiq::Array->index(\@states,$state);
+    if ($i < 0) {
         $self->throw(
-            q~CASCM-00099: Package not found~,
-            Packages => join(', ',sort keys %package),
+            q~CASCM-00099: State does not exist~,
+            State => $state,
         );
     }
 
-    my %state;
-    for my $row ($tab->rows) {
-        $state{$row->[1]}++;
-    }
-    if (keys(%state) > 1) {
-        # Fehler: die Packages sind nicht auf einer Stufe
+    my $currState = $self->packageState($package);
+    my $j = Quiq::Array->index(\@states,$currState);    
 
-        $self->throw(
-            q~CASCM-00099: More than one state~,
-            States => join(', ',sort keys %state),
-        );
-    }
-    my $state = (keys %state)[0]; # Wir haben nur einen State
-
-    # Stufen, die die Packages durchlaufen
-
-    my @states = reverse $self->states;
-    while (@states) {
-        if ($states[0] eq $state) {
-            last;
+    my $output = '';
+    if ($i > $j) {
+        for (my $k = $j; $k < $i; $k++) {
+            $self->promote($states[$k],$package);
         }
-        shift @states;
-    }
-    pop @states; # Niedrigste Stufe entfernen
+    } 
+    elsif ($i < $j) {
+        for (my $k = $j; $k > $i; $k--) {
+            $self->demote($states[$k],$package);
+        }
+    } 
 
-    # Packages demoten
-
-    for my $state (@states) {
-        $self->demote($state,@packages);
-    }
-
-    return;
+    return $output;
 }
 
 # -----------------------------------------------------------------------------
@@ -1548,7 +1514,7 @@ sub runSql {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

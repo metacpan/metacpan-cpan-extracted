@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 DESCRIPTION
 
@@ -136,6 +136,8 @@ The available locales are:
  ccp-IN           Chakma India                                𑄌𑄋𑄴𑄟𑄳𑄦 𑄞𑄢𑄧𑄖𑄴
  ce               Chechen                                     нохчийн
  ce-RU            Chechen Russia                              нохчийн Росси
+ ceb              Cebuano                                     Cebuano
+ ceb-PH           Cebuano Philippines                         Cebuano Pilipinas
  cgg              Chiga                                       Rukiga
  cgg-UG           Chiga Uganda                                Rukiga Uganda
  chr              Cherokee                                    ᏣᎳᎩ
@@ -183,6 +185,7 @@ The available locales are:
  en               English                                     English
  en-001           English World                               English World
  en-150           English Europe                              English Europe
+ en-AE            English United Arab Emirates                English United Arab Emirates
  en-AG            English Antigua & Barbuda                   English Antigua & Barbuda
  en-AI            English Anguilla                            English Anguilla
  en-AS            English American Samoa                      English American Samoa
@@ -236,7 +239,7 @@ The available locales are:
  en-LS            English Lesotho                             English Lesotho
  en-MG            English Madagascar                          English Madagascar
  en-MH            English Marshall Islands                    English Marshall Islands
- en-MO            English Macau SAR China                     English Macau SAR China
+ en-MO            English Macao SAR China                     English Macao SAR China
  en-MP            English Northern Mariana Islands            English Northern Mariana Islands
  en-MS            English Montserrat                          English Montserrat
  en-MT            English Malta                               English Malta
@@ -267,7 +270,7 @@ The available locales are:
  en-SL            English Sierra Leone                        English Sierra Leone
  en-SS            English South Sudan                         English South Sudan
  en-SX            English Sint Maarten                        English Sint Maarten
- en-SZ            English Swaziland                           English Swaziland
+ en-SZ            English Eswatini                            English Eswatini
  en-TC            English Turks & Caicos Islands              English Turks & Caicos Islands
  en-TK            English Tokelau                             English Tokelau
  en-TO            English Tonga                               English Tonga
@@ -287,7 +290,7 @@ The available locales are:
  en-ZM            English Zambia                              English Zambia
  en-ZW            English Zimbabwe                            English Zimbabwe
  eo               Esperanto                                   esperanto
- eo-001           Esperanto World                             esperanto 001
+ eo-001           Esperanto World                             esperanto Mondo
  es               Spanish                                     español
  es-419           Spanish Latin America                       español Latinoamérica
  es-AR            Spanish Argentina                           español Argentina
@@ -437,8 +440,8 @@ The available locales are:
  ia-001           Interlingua World                           interlingua Mundo
  id               Indonesian                                  Indonesia
  id-ID            Indonesian Indonesia                        Indonesia Indonesia
- ig               Igbo                                        Igbo
- ig-NG            Igbo Nigeria                                Igbo Naịjịrịa
+ ig               Igbo                                        Asụsụ Igbo
+ ig-NG            Igbo Nigeria                                Asụsụ Igbo Naịjịrịa
  ii               Sichuan Yi                                  ꆈꌠꉙ
  ii-CN            Sichuan Yi China                            ꆈꌠꉙ ꍏꇩ
  is               Icelandic                                   íslenska
@@ -488,7 +491,7 @@ The available locales are:
  kok              Konkani                                     कोंकणी
  kok-IN           Konkani India                               कोंकणी भारत
  ks               Kashmiri                                    کٲشُر
- ks-IN            Kashmiri India                              کٲشُر ہِنٛدوستان
+ ks-IN            Kashmiri India                              کٲشُر ہِندوستان
  ksb              Shambala                                    Kishambaa
  ksb-TZ           Shambala Tanzania                           Kishambaa Tanzania
  ksf              Bafia                                       rikpa
@@ -545,7 +548,7 @@ The available locales are:
  mi               Maori                                       Māori
  mi-NZ            Maori New Zealand                           Māori Aotearoa
  mk               Macedonian                                  македонски
- mk-MK            Macedonian Macedonia                        македонски Македонија
+ mk-MK            Macedonian North Macedonia                  македонски Северна Македонија
  ml               Malayalam                                   മലയാളം
  ml-IN            Malayalam India                             മലയാളം ഇന്ത്യ
  mn               Mongolian                                   монгол
@@ -614,6 +617,7 @@ The available locales are:
  prg-001          Prussian World                              prūsiskan 001
  ps               Pashto                                      پښتو
  ps-AF            Pashto Afghanistan                          پښتو افغانستان
+ ps-PK            Pashto Pakistan                             پښتو پاکستان
  pt               Portuguese                                  português
  pt-AO            Portuguese Angola                           português Angola
  pt-BR            Portuguese Brazil                           português Brasil
@@ -622,7 +626,7 @@ The available locales are:
  pt-GQ            Portuguese Equatorial Guinea                português Guiné Equatorial
  pt-GW            Portuguese Guinea-Bissau                    português Guiné-Bissau
  pt-LU            Portuguese Luxembourg                       português Luxemburgo
- pt-MO            Portuguese Macau SAR China                  português Macau, RAE da China
+ pt-MO            Portuguese Macao SAR China                  português Macau, RAE da China
  pt-MZ            Portuguese Mozambique                       português Moçambique
  pt-PT            Portuguese Portugal                         português Portugal
  pt-ST            Portuguese São Tomé & Príncipe              português São Tomé e Príncipe
@@ -692,7 +696,7 @@ The available locales are:
  so-SO            Somali Somalia                              Soomaali Soomaaliya
  sq               Albanian                                    shqip
  sq-AL            Albanian Albania                            shqip Shqipëri
- sq-MK            Albanian Macedonia                          shqip Maqedoni
+ sq-MK            Albanian North Macedonia                    shqip Maqedonia e Veriut
  sq-XK            Albanian Kosovo                             shqip Kosovë
  sr               Serbian                                     српски
  sr-Cyrl          Serbian Cyrillic                            српски ћирилица
@@ -783,7 +787,7 @@ The available locales are:
  yi-001           Yiddish World                               ייִדיש וועלט
  yo               Yoruba                                      Èdè Yorùbá
  yo-BJ            Yoruba Benin                                Èdè Yorùbá Orílɛ́ède Bɛ̀nɛ̀
- yo-NG            Yoruba Nigeria                              Èdè Yorùbá Orílẹ́ède Nàìjíríà
+ yo-NG            Yoruba Nigeria                              Èdè Yorùbá Orilẹ̀-èdè Nàìjíríà
  yue              Cantonese                                   粵語
  yue-Hans         Cantonese Simplified                        粤语 简体
  yue-Hans-CN      Cantonese China Simplified                  粤语 中华人民共和国 简体
@@ -795,11 +799,11 @@ The available locales are:
  zh-Hans          Chinese Simplified                          中文 简体
  zh-Hans-CN       Chinese China Simplified                    中文 中国 简体
  zh-Hans-HK       Chinese Hong Kong SAR China Simplified      中文 中国香港特别行政区 简体
- zh-Hans-MO       Chinese Macau SAR China Simplified          中文 中国澳门特别行政区 简体
+ zh-Hans-MO       Chinese Macao SAR China Simplified          中文 中国澳门特别行政区 简体
  zh-Hans-SG       Chinese Singapore Simplified                中文 新加坡 简体
  zh-Hant          Chinese Traditional                         中文 繁體
  zh-Hant-HK       Chinese Hong Kong SAR China Traditional     中文 中國香港特別行政區 繁體字
- zh-Hant-MO       Chinese Macau SAR China Traditional         中文 中國澳門特別行政區 繁體字
+ zh-Hant-MO       Chinese Macao SAR China Traditional         中文 中國澳門特別行政區 繁體字
  zh-Hant-TW       Chinese Taiwan Traditional                  中文 台灣 繁體
  zu               Zulu                                        isiZulu
  zu-ZA            Zulu South Africa                           isiZulu iNingizimu Afrika
@@ -823,7 +827,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2018 by Dave Rolsky.
+This software is copyright (c) 2003 - 2019 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

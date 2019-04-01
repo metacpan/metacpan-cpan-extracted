@@ -1,0 +1,43 @@
+---
+abstract: "Don't write code after an unconditional Catalyst detach."
+author:
+  - 'Aran Clary Deltac <bluefeet@gmail.com>'
+build_requires:
+  Perl::Critic: '1.123'
+  Test2::V0: '0.000094'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::Critic::Policy::Catalyst::ProhibitUnreachableCode:
+    file: lib/Perl/Critic/Policy/Catalyst/ProhibitUnreachableCode.pm
+    version: '0.01'
+requires:
+  Perl::Critic::Policy: '1.123'
+  Perl::Critic::Utils: '1.123'
+  Readonly: '2.00'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/bluefeet/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode/issues
+  homepage: https://github.com/bluefeet/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode
+  repository: git://github.com/bluefeet/Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode.git
+version: '0.01'
+x_authority: cpan:BLUEFEET
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

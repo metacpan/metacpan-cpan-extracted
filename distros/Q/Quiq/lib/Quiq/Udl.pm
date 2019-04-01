@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -602,6 +602,9 @@ sub dsn {
     elsif ($dbms eq 'access') {
         $dsn = "DBI:ODBC:$db";
     }
+    elsif ($dbms eq 'mssql') {
+        $dsn = "DBI:ODBC:$db";
+    }
     else {
         $self->throw(
             q~UDL-00002: Nicht-unterstütztes DBMS~,
@@ -678,8 +681,8 @@ sub udl {
             }
         }
 
-        # Alte Implementierung. Wegen neuer Möglichkeit zur Maskierung der Metazeichen
-        # durch \, durch obige Implementierung ersetzt.
+        # Alte Implementierung. Wegen neuer Möglichkeit zur Maskierung
+        # der Metazeichen durch \, durch obige Implementierung ersetzt.
 
         #if ($udl =~ s|^([a-z]+)#||) {
         #    $self->api($1);
@@ -703,7 +706,8 @@ sub udl {
 
         # Rückwärtskompatibilität
 
-        if (!grep { $dbms eq $_ } qw/oracle postgresql sqlite mysql access/) {
+        if (!grep { $dbms eq $_ } qw/oracle postgresql sqlite mysql
+                access mssql/) {
             ($dbms,$db,$user,$password) = ($user,$password,$dbms,$db);
         }
 
@@ -729,7 +733,7 @@ sub udl {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package Dancer::Serializer::JSONP;
 our $AUTHORITY = 'cpan:SUKRIA';
-$Dancer::Serializer::JSONP::VERSION = '1.3510';
+$Dancer::Serializer::JSONP::VERSION = '1.3512';
 # ABSTRACT: serializer for handling JSONP data
 
 use strict;
@@ -34,7 +34,7 @@ Dancer::Serializer::JSONP - serializer for handling JSONP data
 
 =head1 VERSION
 
-version 1.3510
+version 1.3512
 
 =head1 SYNOPSIS
 

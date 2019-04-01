@@ -2,7 +2,7 @@ package Bio::MUST::Core::Seq;
 # ABSTRACT: Nucleotide or protein sequence
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Seq::VERSION = '0.190690';
+$Bio::MUST::Core::Seq::VERSION = '0.190900';
 use Moose;
 use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -252,7 +252,7 @@ around qw(reverse_complemented_seq codons) => sub {
 
     # Note: we return an explicit undef to emulate other accessor behavior
     if ($self->is_protein) {
-        carp 'Warning: sequence looks like a protein; returning undef!';
+        carp '[BMC] Warning: sequence looks like a protein; returning undef!';
         return undef;           ## no critic (ProhibitExplicitReturnUndef)
     }
 
@@ -348,7 +348,7 @@ Bio::MUST::Core::Seq - Nucleotide or protein sequence
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

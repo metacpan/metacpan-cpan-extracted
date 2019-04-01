@@ -1,7 +1,7 @@
 package Dancer::Session::Abstract;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: abstract class for session engine
-$Dancer::Session::Abstract::VERSION = '1.3510';
+$Dancer::Session::Abstract::VERSION = '1.3512';
 use strict;
 use warnings;
 use Carp;
@@ -55,7 +55,9 @@ sub is_lazy { 0 };
 # that the session ID is still generated.
 sub init {
     my ($self) = @_;
-    $self->id(build_id());
+    if (!$self->id) {
+        $self->id(build_id());
+    }
 }
 
 # this method can be overwritten in any Dancer::Session::* module
@@ -130,8 +132,10 @@ sub write_session_id {
 
     # If we've already pushed the appropriate cookie to the response, then we
     # don't need to do any more
-    if (Dancer::Cookies->cookie($name)) {
-        return;
+    if (my $cookie = Dancer::Cookies->cookie($name)) {
+        if ($cookie eq $id) {
+            return;
+        }
     }
 
     my %cookie = (
@@ -167,7 +171,7 @@ Dancer::Session::Abstract - abstract class for session engine
 
 =head1 VERSION
 
-version 1.3510
+version 1.3512
 
 =head1 DESCRIPTION
 

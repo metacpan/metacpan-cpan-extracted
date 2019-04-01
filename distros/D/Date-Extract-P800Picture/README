@@ -1,7 +1,7 @@
-Date::Extract::P800Picture is Copyright (C) 2008-2017, Roland van Ipenburg
+Date::Extract::P800Picture is Copyright (C) 2008-2019, Roland van Ipenburg
 
-Date::Extract::P800Picture version 0.108
-========================================
+Date::Extract::P800Picture version v1.1.1
+=========================================
 
 This module can be used to extract the date and hour found in the filenames
 of pictures taken with the Sony Ericsson P800 camera phone.  The format used

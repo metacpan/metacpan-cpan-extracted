@@ -1,6 +1,6 @@
 package Bio::MUST::Core::GeneticCode::Factory;
 # ABSTRACT: Genetic code factory based on NCBI gc.prt file
-$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.190690';
+$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -51,7 +51,7 @@ sub _build_code_for {
 
     # split file content into code blocks
     my @codes = $self->_get_gcprt_content =~ m/ \{ ( [^{}]+ ) \} /xmsgc;
-    croak "Error: cannot parse 'gc.prt' file; aborting!" unless @codes;
+    croak "[BMC] Error: cannot parse 'gc.prt' file; aborting!" unless @codes;
 
 # Genetic-code-table ::= {
 # ...
@@ -197,6 +197,13 @@ sub _get_gcprt_content {
 --    readability at the suggestion of Peter Rice, EMBL
 --  Later additions by Taxonomy Group staff at NCBI
 --
+--  Version 4.4
+--     Added GTG as start codon for genetic code 3
+--     Added Balanophoraceae plastid genetic code 32
+--
+--  Version 4.3
+--     Change to CTG -> Leu in genetic codes 27, 28, 29, 30
+--
 --  Version 4.2
 --     Added Karyorelict nuclear genetic code 27
 --     Added Condylostoma nuclear genetic code 28
@@ -305,7 +312,7 @@ Genetic-code-table ::= {
   name "SGC2" ,
   id 3 ,
   ncbieaa  "FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
-  sncbieaa "----------**----------------------MM----------------------------"
+  sncbieaa "----------**----------------------MM---------------M------------"
   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
@@ -513,6 +520,15 @@ Genetic-code-table ::= {
   -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
   -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
+ } ,
+ {
+  name "Balanophoraceae Plastid" ,
+  id 32 ,
+  ncbieaa  "FFLLSSSSYY*WCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
+  sncbieaa "---M------*---*----M------------MMMM---------------M------------"
+  -- Base1  TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG
+  -- Base2  TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG
+  -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
  }
 }
 
@@ -532,7 +548,7 @@ Bio::MUST::Core::GeneticCode::Factory - Genetic code factory based on NCBI gc.pr
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

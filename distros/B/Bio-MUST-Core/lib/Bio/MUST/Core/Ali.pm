@@ -2,7 +2,7 @@ package Bio::MUST::Core::Ali;
 # ABSTRACT: Multiple sequence alignment
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
-$Bio::MUST::Core::Ali::VERSION = '0.190690';
+$Bio::MUST::Core::Ali::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -99,7 +99,7 @@ sub get_seq_with_id {
     my $id   = shift;
 
     my $seq = $self->first_seq( sub { $_->full_id eq $id } );
-    carp "Warning: cannot find seq with id: $id; returning undef!"
+    carp "[BMC] Warning: cannot find seq with id: $id; returning undef!"
         unless $seq;
 
     return $seq;
@@ -296,20 +296,20 @@ sub _premask_check {
     my $mask = shift;
 
     # warn of unaligned Ali
-    carp 'Warning: Ali does not look aligned!'
+    carp '[BMC] Note: Ali does not look aligned!'
         . ' This might not be an issue if seqs are ultra-conserved!'
         unless $self->is_aligned;
     $self->uniformize;
 
     # warn of empty SeqMask
-    carp 'Warning: applying this mask will result in a zero-width Ali!'
+    carp '[BMC] Note: applying this mask will result in a zero-width Ali!'
         unless List::AllUtils::any { $_ } $mask->all_states;
 
     # check that SeqMask is compatible with Ali
     # potential bugs could come from constant sites etc
     my $a_width = $self->width;
     my $m_width = $mask->mask_len;
-    carp "Warning: Ali width does not match mask len: $a_width vs. $m_width!"
+    carp "[BMC] Note: Ali width does not match mask len: $a_width vs. $m_width!"
         . ' This might not be an issue if the mask results from blocks.'
         unless $a_width == $m_width;
 
@@ -425,7 +425,7 @@ before qr{\Astore}xms => sub {
     my $self = shift;
 
     # perform pre-storage duties
-    carp 'Warning: non unique seq ids!' unless $self->has_uniq_ids;
+    carp '[BMC] Warning: non unique seq ids!' unless $self->has_uniq_ids;
     $self->uniformize if $self->is_aligned;
 
     return;
@@ -539,7 +539,7 @@ sub load_phylip {
         my ($seq_id, $seq) = $line =~ $PHY_LINE;
 
         # should never happen...
-        croak "Error: unable to parse PHYLIP file at line $.; aborting!"
+        croak "[BMC] Error: unable to parse PHYLIP file at line $.; aborting!"
             unless $seq;
 
         # delete optional spaces
@@ -549,7 +549,7 @@ sub load_phylip {
         if ($ali->count_seqs < $seq_n) {
 
             # seq_id are mandatory in first block
-            croak "Error: missing id in PHILIP file at line $.; aborting!"
+            croak "[BMC] Error: missing id in PHILIP file at line $.; aborting!"
                 unless $seq_id;
 
             # store first seq chunk along with seq_id
@@ -575,8 +575,8 @@ sub load_phylip {
     }
 
     my $width = $ali->width;
-    croak "Error: unexpected site number in PHYLIP file: $width; aborting!"
-        if $width != $site_n;
+    croak "[BMC] Error: unexpected site number in PHYLIP file: $width;"
+        . ' aborting!' if $width != $site_n;
 
     return $ali;
 }
@@ -738,11 +738,11 @@ sub instant_store {
     my $args    = shift // {};          # HashRef (should not be empty...)
 
     my $infile  = $args->{infile};
-    croak 'Error: no infile specified for instant_store; aborting!'
+    croak '[BMC] Error: no infile specified for instant_store; aborting!'
         unless $infile;
 
     my $coderef = $args->{coderef};
-    croak 'Error: no coderef specified for instant_store; aborting!'
+    croak '[BMC] Error: no coderef specified for instant_store; aborting!'
         unless $coderef;
 
     open my $in,  '<', $infile;
@@ -800,7 +800,7 @@ Bio::MUST::Core::Ali - Multiple sequence alignment
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

@@ -121,7 +121,7 @@
 <p>If you're using a pre-configured world, you're good to go: you can start drawing maps immediately. If not, the current world profile needs to be configured first.</p>
 <p><img alt="Wizard hat icon" src="img/ch15/icon_wizard.png"> Axmud provides a <em>Locator wizard</em> which can handle most of the configuration process (with just a little assistance from you). Simply click this button in the main window and follow the  instructions.</p>
 <p><strong>Hint 1</strong>
-The wizard has a 100% accuracy rate with some worlds, but struggles to cope with other worlds. If you have problems configuring your favourite MUD, visit us at the <a href="https://axmud.sourceforge.net/">Axmud website</a> and we'll try to help.</p>
+The wizard has a 100% accuracy rate with some worlds, but struggles to cope with other worlds. If you have problems configuring your favourite MUD, visit us at the <a href="https://axmud.sourceforge.io/">Axmud website</a> and we'll try to help.</p>
 <p><strong>Hint 2</strong>
 The wizard can learn to recognise all the components of a room statement: the room title, the verbose description, the exit list and the contents list. In most cases, the only component you really need is the exit list. If you're having problems, run the wizard again, ignoring everything except the line with the list of exits.</p>
 <p><strong>Hint 3</strong>
@@ -281,7 +281,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>When you move rooms around, exits are automatically re-drawn. If necessary, they are re-drawn as region exits.</li>
 </ul>
 <p>Some keyboards don't have an <strong>ALT-GR</strong> key, in which case you can use the blue <em>Drag mode</em> button.</p>
-<p><img alt="Drag mode button" src="img/ch15/drag_mode_button.png"> </p>
+<p><img alt="Drag mode button" src="img/ch15/drag_mode_button.png"></p>
 <ul>
 <li>Click the button to turn on <strong>Drag mode</strong></li>
 <li>Drag the room(s) to their new position</li>
@@ -289,7 +289,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 </ul>
 <p>Another method, which is especially useful if you want to move rooms to a new region, is to use <strong>CTRL+C</strong>.</p>
 <ul>
-<li>Select a group of rooms <ul>
+<li>Select a group of rooms<ul>
 <li>Any selected labels are moved with them</li>
 </ul>
 </li>
@@ -315,7 +315,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Other regions you've recently viewed are also listed here, for your convenience</li>
 </ul>
 </li>
-<li>Select a destination region </li>
+<li>Select a destination region</li>
 </ul>
 <h3><a name="15.11.1">15.11.1 Dragging exits</a></h3>
 <p>You can connect rooms together by dragging the exit onto its destination room.</p>
@@ -509,7 +509,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>But, in fact, when you turn on complex exits, you'll find that a path only exists from east to west:</p>
 <p><img alt="Pathfinding problem 2" src="img/ch15/path_problem2.png"></p>
 <p>Reason 2: <em>Axmud's pathfinding optimisation has failed</em></p>
-<p>Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a <em>very</em> long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region. </p>
+<p>Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a <em>very</em> long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region.</p>
 <p>This approach works well when each pair of regions are connected to each other by a single exit. Sometimes it doesn't work so well when there are many exits connecting a single pair of regions.</p>
 <h3><a name="15.18.2">15.18.2 Avoiding path optimisation</a></h3>
 <p>Axmud's pathfinding optimisation is not needed at all when the path between two rooms is in a single region, or if they are in neighbouring regions.</p>
@@ -528,12 +528,12 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>Experience shows that <em>the best settings for most users are the default settings</em>.</p>
 <h3><a name="15.18.3">15.18.3 Using path optimisation</a></h3>
 <p>In a map with many thousands of rooms spread across dozens of regions, finding a path between two rooms might take a long time.</p>
-<p>Axmud's pathfinding optimisation works by calculating the paths through regions in advance. In other words, if three regions are linked like this:  </p>
+<p>Axmud's pathfinding optimisation works by calculating the paths through regions in advance. In other words, if three regions are linked like this:</p>
 <pre><code>    A --- B --- C
 </code></pre>
 <p>...then Axmud calculates a path across region B in advance, from one region exit to the other. These pre-calculated paths are linked together in a network. Axmud uses this network of pre-calculated paths to find the shortest path between two rooms separated by a great distance.</p>
 <p>This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take <em>much</em> longer than actually moving between two rooms!)</p>
-<p>As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. </p>
+<p>As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them.</p>
 <pre><code>    A --- B --- C
 </code></pre>
 <p>Region B might have many exits which lead to Region A, but only one of them is marked as a <em>super-region exit</em>. That's the one Axmud uses when it does pathfinding between a room in Region A and a room in Region C.</p>
@@ -832,7 +832,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>In crafty moves mode, if you character moves north from a room that doesn't contain a north exit, the automapper will create a hidden exit in that direction for you.  (This mode overrides protected moves mode, described in <a href="#15.17.1">Section 15.17.1</a>.)</p>
 <h3><a name="15.27.4">15.27.4 Transient exits</a></h3>
 <p>A transient exit is one which moves from room to room.</p>
-<p>Transient exits usually lead to a room that represents a moving vehicle. As the vehicle moves around the world, a transient exit like <em>board wagon</em> moves with it. </p>
+<p>Transient exits usually lead to a room that represents a moving vehicle. As the vehicle moves around the world, a transient exit like <em>board wagon</em> moves with it.</p>
 <p>This causes a problem for the automapper, which usually checks the exits in a new room to make sure they're the exits it was expecting. If the <em>board wagon</em> exit has moved somewhere else, the automapper will assume it has lost track of the current location.</p>
 <p>For worlds like <em>Discworld</em> that use a lot of moving vehicles, you can specify a list of transient exits.  The automapper ignores any transient exits you specify.</p>
 <ul>
@@ -875,8 +875,8 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <p>There are a number of reasons why the automapper might get lost. In some cases - for example, when you've clicked the brown <strong>Reset Locator</strong> button - the automapper really is lost, and it's up to you to find your place again.</p>
 <p>In most cases, though, you can set the automapper to start drawing rooms in a different location. The automapper provides some tools to help you work out when you're drawing a duplicate room, and to merge that duplicate room with the original, if you want.</p>
 <h3><a name="15.29.1">15.29.1 Auto-compare mode</a></h3>
-<p>Some worlds arrange their rooms on a regular grid that's very easy to map. </p>
-<p>Many other worlds, however, arrange their rooms in a most irregular way. This can be very tricky to map, especially if you're not familiar with the area. </p>
+<p>Some worlds arrange their rooms on a regular grid that's very easy to map.</p>
+<p>Many other worlds, however, arrange their rooms in a most irregular way. This can be very tricky to map, especially if you're not familiar with the area.</p>
 <p>In this situation, you might like to make use of <strong>Auto-compare mode</strong>. Auto-compare mode is available whenever the automapper window is open and in <strong>Update mode</strong>.</p>
 <ul>
 <li>From the automapper menu, select <strong>Mode &gt; Auto-compare &gt; Auto-compare new rooms</strong></li>
@@ -902,7 +902,7 @@ A few worlds (such as <em>LambdaMoo</em> and <em>MUD1</em>) don't use exit lists
 <li>Double-click on the current room</li>
 <li>Left-click on one of the matching selected rooms</li>
 </ul>
-<p>You don't need to merge one room at a time; you can merge a whole group of rooms, if that's more convenient. </p>
+<p>You don't need to merge one room at a time; you can merge a whole group of rooms, if that's more convenient.</p>
 <p>The automapper is fairly intelligent in the way it decides which pairs of rooms should be merged. It carefully compares how rooms are connected to each other; as a result, it makes little difference to the result if you've been dragging rooms all around your map.</p>
 <ul>
 <li>Select a group of rooms<ul>

@@ -90,9 +90,6 @@ lib/Cfn/Resource/AWS/CodeDeploy/DeploymentGroup.pm
 lib/Cfn/Resource/AWS/CodePipeline/CustomActionType.pm
 lib/Cfn/Resource/AWS/CodePipeline/Pipeline.pm
 lib/Cfn/Resource/AWS/CodePipeline/Webhook.pm
-lib/Cfn/Resource/AWS/CodeStar/Project.pm
-lib/Cfn/Resource/AWS/CodeStar/SeedRepository.pm
-lib/Cfn/Resource/AWS/CodeStar/SyncResources.pm
 lib/Cfn/Resource/AWS/Cognito/IdentityPool.pm
 lib/Cfn/Resource/AWS/Cognito/IdentityPoolRoleAttachment.pm
 lib/Cfn/Resource/AWS/Cognito/UserPool.pm
@@ -216,6 +213,21 @@ lib/Cfn/Resource/AWS/Glue/Job.pm
 lib/Cfn/Resource/AWS/Glue/Partition.pm
 lib/Cfn/Resource/AWS/Glue/Table.pm
 lib/Cfn/Resource/AWS/Glue/Trigger.pm
+lib/Cfn/Resource/AWS/Greengrass/ConnectorDefinition.pm
+lib/Cfn/Resource/AWS/Greengrass/ConnectorDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/CoreDefinition.pm
+lib/Cfn/Resource/AWS/Greengrass/CoreDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/DeviceDefinition.pm
+lib/Cfn/Resource/AWS/Greengrass/DeviceDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/FunctionDefinition.pm
+lib/Cfn/Resource/AWS/Greengrass/FunctionDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/Group.pm
+lib/Cfn/Resource/AWS/Greengrass/GroupVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/LoggerDefinition.pm
+lib/Cfn/Resource/AWS/Greengrass/LoggerDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/ResourceDefinitionVersion.pm
+lib/Cfn/Resource/AWS/Greengrass/SubscriptionDefinition.pm
+lib/Cfn/Resource/AWS/Greengrass/SubscriptionDefinitionVersion.pm
 lib/Cfn/Resource/AWS/GuardDuty/Detector.pm
 lib/Cfn/Resource/AWS/GuardDuty/Filter.pm
 lib/Cfn/Resource/AWS/GuardDuty/IPSet.pm
@@ -223,7 +235,6 @@ lib/Cfn/Resource/AWS/GuardDuty/Master.pm
 lib/Cfn/Resource/AWS/GuardDuty/Member.pm
 lib/Cfn/Resource/AWS/GuardDuty/ThreatIntelSet.pm
 lib/Cfn/Resource/AWS/IAM/AccessKey.pm
-lib/Cfn/Resource/AWS/IAM/ExportablePolicy.pm
 lib/Cfn/Resource/AWS/IAM/Group.pm
 lib/Cfn/Resource/AWS/IAM/InstanceProfile.pm
 lib/Cfn/Resource/AWS/IAM/ManagedPolicy.pm
@@ -381,6 +392,8 @@ lib/Cfn/Resource/AWS/WAFRegional/WebACLAssociation.pm
 lib/Cfn/Resource/AWS/WAFRegional/XssMatchSet.pm
 lib/Cfn/Resource/AWS/WorkSpaces/Workspace.pm
 lib/Cfn/Resource/Alexa/ASK/Skill.pm
+lib/Cfn/ResourceModules.pm
+script/cfn_list_resources
 t/001_parse.t
 t/001_parse/apigateway_account.res
 t/001_parse/apigateway_authorizer.res
@@ -580,6 +593,7 @@ t/001_parse/route53-weighted.res
 t/001_parse/s3_bucket_policy.res
 t/001_parse/s3_bucket_replication.res
 t/001_parse/scaling_policy.res
+t/001_parse/servicediscovery_instance.res
 t/001_parse/sns_subscription.res
 t/001_parse/sns_topic.res
 t/001_parse/sns_topicpolicy.res
@@ -610,6 +624,7 @@ t/009_from_hashref.t
 t/010_transform.t
 t/011_stack_metadata.t
 t/012_pseudoparams.t
+t/100_resource_modules.t
 t/102_outputs.t
 t/105_dependson.t
 t/108_policy_addstatement.t

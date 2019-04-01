@@ -1,0 +1,16 @@
+Revision history for perl module Net::AS2::PSGI
+
+1.0 2019-03-04
+
+ - Make Content-Disposition filename available for send and receive
+ - Document Net::AS2::PSGI::FileHandler and related classes
+ - Document some limitations discovered during integration testing
+
+0.95 2019-02-21
+
+ - Create PSGI application for AS2 server
+ - Include tests and examples
+
+0.001 2019-01-30
+
+ - Initial version

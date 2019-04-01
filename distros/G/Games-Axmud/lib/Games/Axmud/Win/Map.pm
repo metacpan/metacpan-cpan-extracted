@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2018 A S Lewis
+# Copyright (C) 2011-2019 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -128,22 +128,20 @@
             #   displayed in a 'dialogue' window)
             pseudoCmdMode               => 'win_only',
 
-            # The window widget. For most window objects, the Gtk2::Window. For pseudo-windows, the
-            #   parent 'main' window's Gtk2::Window
+            # The window widget. For most window objects, the Gtk3::Window. For pseudo-windows, the
+            #   parent 'main' window's Gtk3::Window
             # The code should use this IV when it wants to do something to the window itself
             #   (minimise it, make it active, etc)
             winWidget                   => undef,
-            # The window container. For most window objects, the Gtk2::Window. For pseudo-windows,
+            # The window container. For most window objects, the Gtk3::Window. For pseudo-windows,
             #   the parent GA::Table::PseudoWin table object
             # The code should use this IV when it wants to add, modify or remove widgets inside the
             #   window itself
             winBox                      => undef,
-            # The Gnome2::Wnck::Window, if known
-            wnckWin                     => undef,
             # Flag set to TRUE if the window actually exists (after a call to $self->winEnable),
             #   FALSE if not
             enabledFlag                 => FALSE,
-            # Flag set to TRUE if the Gtk2 window itself is visible (after a call to
+            # Flag set to TRUE if the Gtk3 window itself is visible (after a call to
             #   $self->setVisible), FALSE if it is not visible (after a call to $self->setInvisible)
             visibleFlag                 => TRUE,
             # Registry hash of 'free' windows (excluding 'dialogue' windows) for which this window
@@ -161,8 +159,8 @@
             #       (sub_name, argument_list_ref, sub_name, argument_list_ref...)
             childDestroyHash            => {},
 
-            # The container widget into which all other widgets are packed (usually a Gtk2::VBox or
-            #   Gtk2::HBox, but any container widget can be used; takes up the whole window client
+            # The container widget into which all other widgets are packed (usually a Gtk3::VBox or
+            #   Gtk3::HBox, but any container widget can be used; takes up the whole window client
             #   area)
             packingBox                  => undef,
 
@@ -278,11 +276,11 @@
 
             # Menu bar/toolbar items which will be sensitised or desensitised, depending on the
             #   context. Hash in the form
-            #       $menuToolItemHash{'item_name'} = gtk2_widget
+            #       $menuToolItemHash{'item_name'} = Gtk3_widget
             # ...where:
             #   'item_name' is a descriptive scalar, e.g. 'move_up_level'
-            #   'gtk2_widget' is the Gtk2::MenuItem or toolbar widget, typically Gtk2::ToolButton or
-            #       Gtk2::RadioToolButton
+            #   'Gtk3_widget' is the Gtk3::MenuItem or toolbar widget, typically Gtk3::ToolButton or
+            #       Gtk3::RadioToolButton
             # NB Entries in this hash continue to exist, after the widgets are no longer visible.
             #   Doesn't matter, because there are a limited number of 'item_name' scalars, and so
             #   a limited size to the hash (and referencing no-longer visible widgets, for example
@@ -318,6 +316,12 @@
             canvasHAdjustment           => undef,
             canvasVAdjustment           => undef,
 
+            # The size of the available area inside the scrolled window, set whenever the
+            #   scrolled window's size-allocate signal is emitted (this is the only way to guarantee
+            #   that the correct size is available to $self->setMapPosn)
+            canvasScrollerWidth         => 1,
+            canvasScrollerHeight        => 1,
+
             # Blessed reference of the currently displayed GA::Obj::Regionmap ('undef' if no region
             #   is displayed; not necessarily the same region as the character's current location)
             currentRegionmap            => undef,
@@ -329,20 +333,6 @@
             #   most recent current region is the first one in the list. The list is modified
             #   whenever $self->setCurrentRegion is called
             recentRegionList            => [],
-            # Because of performance issues for very big maps (with thousands of rooms), when a
-            #   region is completely redrawn (by a call to $self->redrawRegions), we can't simply
-            #   call ->destroy on all of its drawn canvas objects. Current solution is to add them
-            #   all to a destruction queue, and allow $self->winUpdate to destroy them a few at a
-            #   time
-            destroyQueueList            => [],
-            # The maximum number of canvas widgets/objects to destroy in every call to
-            #   $self->winUpdate
-            constDestroyQueueMax        => 100,
-            # If the user changes GA::Obj::WorldModel->queueDrawMaxObjs to 0, no more objects are
-            #   queued to be drawn, but we still continue drawing anything that's already queued.
-            #   This IV sets the number of queued objects to draw in every call to $self->winUpdate
-            #   (represents the same value, if other IVs have their default value
-            drawQueueDefault            => 50,
 
             # Flag set to TRUE if the visible map is the empty background map (created by a call to
             #   $self->resetMap). Set to FALSE if the visible map is a region (created by a call to
@@ -377,15 +367,6 @@
             #   ->parchmentReadyHash; then they start drawing the next parchment object in the list
             #   until the list is empty
             parchmentQueueList          => [],
-            # Depending on the values specified in the world model, when a new current region is
-            #   set, the old region's drawn map is either retained in memory (for larger maps) or
-            #   removed from memory (for smaller maps). This prevents Axmud swallowing huge amounts
-            #   of memory for canvas widgets that might not be made visible again
-            # When a drawn map (stored in a parchment object) is removed from memory, the parchment
-            #   object is recycled (all of its IVs are reset, but the canvas widgets are retained,
-            #   ready for re-use)
-            # A recycled parchment object, which is ready for use, is stored here until required
-            spareParchmentObj           => undef,
 
             # Tooltips
             # The current canvas object for which a tooltip is displayed ('undef' if no canvas
@@ -461,38 +442,46 @@
             # Flag that can be set to TRUE by any code that wants to prevent a drawing operation
             #   from starting (temporarily); the operation will be able to start when the flag is
             #   set back to FALSE
-            # Is set to TRUE by ->doDraw itself, so that a second call to that function can't be
-            #   processed while an earlier one is still in progress
+            # Is set to TRUE at the beginning of calls to ->doDraw and ->doQuickDraw, so that a
+            #   second call to either function can't be processed while an earlier one is still in
+            #   progress
             delayDrawFlag               => FALSE,
+            # When pre-drawing, objects are drawn in stack order, from bottom to top; in very large
+            #   maps (thousands of rooms), GooCanvas2 can complete the drawing much more quickly
+            #   when everything can be raised to the top of the stack, rather than being
+            #   arbitrarily inserted somewhere in the middle
+            # Flag set to TRUE at the beginning of calls to ->doQuickDraw, so that individual
+            #   drawing functions like $self->drawRoomBox, ->drawIncompleteExit (etc) can raise the
+            #   canvas object to the top of the drawing stack every time
+            quickDrawFlag               => FALSE,
 
-            # Drawing cycle IVs, set during each call to $self->drawObjs
+            # Drawing cycle IVs (each call to $self->doDraw is a single drawing cycle). Some of
+            #   these IVs are also set in a call to ->doQuickDraw
             #
-            # During the draw cycle, regions are drawn one at a time. For each region, these IVs is
-            #   set so individual drawing functions can quickly look up the regionmap and parchment
-            #   object being drawn
+            # During the drawing cycle, regions are drawn one at a time. For each region, these IVs
+            #   is set so individual drawing functions can quickly look up the regionmap and
+            #   parchment object being drawn
             drawRegionmap               => undef,
             drawParchment               => undef,
-            # $self->drawCycleExitHash contains a list of exits that have been drawn during the
-            #   current drawing cycle. Before drawing an exit, we can check whether it has a twin
-            #   exit (which occupies the same space) and, if so, we don't need to draw it a second
-            #   time - thus each exit-twin exit pair is only drawn once for each call to
-            #   $self->drawObjs. Hash in the form
-            #       $drawCycleExitHash{exit_model_number} = blessed_reference_to_exit_object
+            # $self->drawCycleExitHash contains a list of exits drawn during a single drawing cycle.
+            #   Before drawing an exit, we can check whether it has a twin exit (which occupies the
+            #   same space) and, if so, we don't need to draw it a second time - thus each exit-twin
+            #   exit pair is only drawn once for each call to $self->doDraw
+            # Hash in the form
+            #       $drawCycleExitHash{exit_model_number} = undef
             drawCycleExitHash           => {},
-            # The (pango) size of room interior text. This value is set by $self->prepareDraw, at
-            #   the start of every drawing cycle, to be a little bit smaller than half the width of
-            #   the room (which depends on the draw exit mode in effect)
+            # The size of room interior text. This value is set by $self->prepareDraw, at the start
+            #   of every drawing cycle, to be a little bit smaller than half the width of the room
+            #   (which depends on the draw exit mode in effect)
             drawRoomTextSize            => undef,
             # For room interior text, the size of the usable area (which depends on the draw exit
             #   mode in effect). The values are also set by $self->doDraw, once per drawing cycle
             drawRoomTextWidth           => undef,
             drawRoomTextHeight          => undef,
-            # The (pango) size of other text drawn on the map, besides room interior text (includes
-            #   room tags, room guilds, exit tags and labels). Also set by $self->prepareDraw, based
-            #   on the size of a room when exits are being drawn
+            # The size of other text drawn on the map, besides room interior text (includes room
+            #   tags, room guilds, exit tags and labels). Also set by $self->prepareDraw, based on
+            #   the size of a room when exits are being drawn
             drawOtherTextSize           => undef,
-            # The (pango) size of that text, without magnification applied
-            drawDefaultTextSize         => undef,
             # Hashes set by $self->preDrawPositions and $self->preDrawExits (see the comments in
             #   those functions for a longer explanation)
             # Calculates the position of each type of exit, and of a few room components, relative
@@ -560,14 +549,22 @@
             #   drawn exit's gradient (relative to the x-axis) must match the gradient of a line
             #   from the exit's origin point, to the point on the map the user clicked (in degrees)
             exitSensitivity             => 30,
-            # A value used to draw bends on bending exits. The actual size of the drawn bend (a
-            #   square) is twice this value, plus 1
-            exitBendSize                => 2,
+            # A value used to draw bends on bending exits
+            exitBendSize                => 4,
             # When the user right-clicks on an exit, we need to record the position of the click, in
             #   case the user wants to add an exit bend at that point. These IVs are reset by a
             #   click on any other part of the canvas
             exitClickXPosn              => undef,
             exitClickYPosn              => undef,
+
+            # GooCanvas2 signals don't recognise double clicks on canvas objects such as rooms,
+            #   therefore we have to implement our own double-click detection code
+            # These IVs are set when the user left-clicks on a room, and reset when a double-click
+            #   is detected on the same room
+            leftClickTime               => undef,
+            leftClickObj                => undef,
+            # The maximumd time (in seconds) between the two clicks
+            leftClickWaitTime           => 0.3,
 
             # The operating mode:
             #   'wait'      - The automapper isn't doing anything
@@ -628,22 +625,22 @@
             # NB 'up' and 'down' are never drawn with double lines, so their values are both
             #   [0, 0, 0, 0]
             constDoubleVectorHash       => {
-                north                   => [-1, 0, 1, 0],
-                northnortheast          => [-1, 0, 1, 0],   # Also on top of room box, so same as N
-                northeast               => [-1, 0, 0, 1],
-                eastnortheast           => [0, -1, 0, 1],   # Same as E
-                east                    => [0, -1, 0, 1],
-                eastsoutheast           => [0, -1, 0, 1],   # Same as E
-                southeast               => [-1, 0, 0, -1],
-                southsoutheast          => [-1, 0, 1, 0],   # Same as S
-                south                   => [-1, 0, 1, 0],
-                southsouthwest          => [-1, 0, 1, 0],   # Same as S
-                southwest               => [0, -1, 1, 0],
-                westsouthwest           => [0, -1, 0, 1],   # Same as W
-                west                    => [0, -1, 0, 1],
-                westnorthwest           => [0, -1, 0, 1],   # Same as W
-                northwest               => [1, 0, 0, 1],
-                northnorthwest          => [-1, 0, 1, 0],   # Same as N
+                north                   => [-2, 0, 2, 0],
+                northnortheast          => [-2, 0, 2, 0],   # Also on top of room box, so same as N
+                northeast               => [-2, 0, 0, 2],
+                eastnortheast           => [0, -2, 0, 2],   # Same as E
+                east                    => [0, -2, 0, 2],
+                eastsoutheast           => [0, -2, 0, 2],   # Same as E
+                southeast               => [-2, 0, 0, -2],
+                southsoutheast          => [-2, 0, 2, 0],   # Same as S
+                south                   => [-2, 0, 2, 0],
+                southsouthwest          => [-2, 0, 2, 0],   # Same as S
+                southwest               => [0, -2, 2, 0],
+                westsouthwest           => [0, -2, 0, 2],   # Same as W
+                west                    => [0, -2, 0, 2],
+                westnorthwest           => [0, -2, 0, 2],   # Same as W
+                northwest               => [2, 0, 0, 2],
+                northnorthwest          => [-2, 0, 2, 0],   # Same as N
                 up                      => [0, 0, 0, 0],
                 down                    => [0, 0, 0, 0],
             },
@@ -758,25 +755,26 @@
                 up                      => [0, 0],
                 down                    => [0, 0],
             },
-            # Anchor hashes - converts a standard primary direction into a Gtk2 anchor constant, so
+            # Anchor hashes - converts a standard primary direction into a Gtk3 anchor constant, so
             #   that exit tags can be drawn in the right position
             constGtkAnchorHash          => {
-                north                   => 'GTK_ANCHOR_S',
-                northnortheast          => 'GTK_ANCHOR_S',  # Same as N/no GTK constant for NNE, etc
-                northeast               => 'GTK_ANCHOR_SW',
-                eastnortheast           => 'GTK_ANCHOR_W',  # Same as E
-                east                    => 'GTK_ANCHOR_W',
-                eastsoutheast           => 'GTK_ANCHOR_W',  # Same as E
-                southeast               => 'GTK_ANCHOR_NW',
-                southsoutheast          => 'GTK_ANCHOR_N',  # Same as S
-                south                   => 'GTK_ANCHOR_N',
-                southsouthwest          => 'GTK_ANCHOR_N',  # Same as S
-                southwest               => 'GTK_ANCHOR_NE',
-                westsouthwest           => 'GTK_ANCHOR_E',  # Same as W
-                west                    => 'GTK_ANCHOR_E',
-                westnorthwest           => 'GTK_ANCHOR_E',  # Same as w
-                northwest               => 'GTK_ANCHOR_SE',
-                northnorthwest          => 'GTK_ANCHOR_S',  # Same as N
+                north                   => 'GOO_CANVAS_ANCHOR_S',
+                # No GooCanvas2 constant for NNE, etc, so use the same as N
+                northnortheast          => 'GOO_CANVAS_ANCHOR_S',  # Same as N
+                northeast               => 'GOO_CANVAS_ANCHOR_SW',
+                eastnortheast           => 'GOO_CANVAS_ANCHOR_W',  # Same as E
+                east                    => 'GOO_CANVAS_ANCHOR_W',
+                eastsoutheast           => 'GOO_CANVAS_ANCHOR_W',  # Same as E
+                southeast               => 'GOO_CANVAS_ANCHOR_NW',
+                southsoutheast          => 'GOO_CANVAS_ANCHOR_N',  # Same as S
+                south                   => 'GOO_CANVAS_ANCHOR_N',
+                southsouthwest          => 'GOO_CANVAS_ANCHOR_N',  # Same as S
+                southwest               => 'GOO_CANVAS_ANCHOR_NE',
+                westsouthwest           => 'GOO_CANVAS_ANCHOR_E',  # Same as W
+                west                    => 'GOO_CANVAS_ANCHOR_E',
+                westnorthwest           => 'GOO_CANVAS_ANCHOR_E',  # Same as w
+                northwest               => 'GOO_CANVAS_ANCHOR_SE',
+                northnorthwest          => 'GOO_CANVAS_ANCHOR_S',  # Same as N
             },
 
             # Magnfication list. A list of standard magnification factors used for zooming in or out
@@ -885,7 +883,7 @@
     sub winSetup {
 
         # Called by GA::Obj::Workspace->createGridWin or ->createSimpleGridWin
-        # Creates the Gtk2::Window itself
+        # Creates the Gtk3::Window itself
         #
         # Expected arguments
         #   (none besides $self)
@@ -893,7 +891,7 @@
         # Optional arguments
         #   $title      - The window title; ignored if specified ($self->setWinTitle sets the
         #                   window title)
-        #   $listRef    - Reference to a list of functions to call, just after the Gtk2::Window is
+        #   $listRef    - Reference to a list of functions to call, just after the Gtk3::Window is
         #                   created (can be used to set up further ->signal_connects, if this
         #                   window needs them)
         #
@@ -918,8 +916,8 @@
             return undef;
         }
 
-        # Create the Gtk2::Window
-        my $winWidget = Gtk2::Window->new('toplevel');
+        # Create the Gtk3::Window
+        my $winWidget = Gtk3::Window->new('toplevel');
         if (! $winWidget) {
 
             return undef;
@@ -960,7 +958,7 @@
 
         # Set the icon list for this window
         $iv = $self->winType . 'WinIconList';
-        $winWidget->set_icon_list($axmud::CLIENT->desktopObj->$iv);
+        $winWidget->set_icon_list($axmud::CLIENT->desktopObj->{$iv});
 
         # Draw the widgets used by this window
         if (! $self->drawWidgets()) {
@@ -976,14 +974,14 @@
     sub winEnable {
 
         # Called by GA::Obj::Workspace->createGridWin or ->createSimpleGridWin
-        # After the Gtk2::Window has been setup and moved into position, makes it visible and calls
+        # After the Gtk3::Window has been setup and moved into position, makes it visible and calls
         #   any further ->signal_connects that must be not be setup until the window is visible
         #
         # Expected arguments
         #   (none besides $self)
         #
         # Optional arguments
-        #   $listRef    - Reference to a list of functions to call, just after the Gtk2::Window is
+        #   $listRef    - Reference to a list of functions to call, just after the Gtk3::Window is
         #                   created (can be used to set up further ->signal_connects, if this
         #                   window needs them)
         #
@@ -1006,10 +1004,10 @@
         # For windows about to be placed on a grid, briefly minimise the window so it doesn't
         #   appear in the centre of the desktop before being moved to its correct workspace, size
         #   and position
-        if ($self->workspaceGridObj && $self->winWidget eq $self->winBox) {
-
-            $self->winWidget->iconify();
-        }
+#        if ($self->workspaceGridObj && $self->winWidget eq $self->winBox) {
+#
+#            $self->minimise();
+#        }
 
         # This type of window is unique to its GA::Session (only one can be open at any time, per
         #   session); inform the session it has opened
@@ -1061,7 +1059,7 @@
         # Called by GA::Obj::WorkspaceGrid->stop or by any other function
         # Updates the automapper object (GA::Obj::Map), informs the parent workspace grid (if this
         #   'grid' window is on a workspace grid) and the desktop object, and then destroys the
-        #   Gtk2::Window (if it is open)
+        #   Gtk3::Window (if it is open)
         #
         # Expected arguments
         #   (none besides $self)
@@ -1124,7 +1122,7 @@
         # Inform the desktop object
         $axmud::CLIENT->desktopObj->del_gridWin($self);
 
-        # Destroy the Gtk2::Window
+        # Destroy the Gtk3::Window
         eval { $self->winBox->destroy(); };
         if ($@) {
 
@@ -1155,7 +1153,7 @@
     sub drawWidgets {
 
         # Called by $self->winSetup
-        # Sets up the Gtk2::Window by drawing its widgets
+        # Sets up the Gtk3::Window by drawing its widgets
         #
         # Expected arguments
         #   (none besides $self)
@@ -1176,7 +1174,7 @@
         }
 
         # Create a packing box
-        my $packingBox = Gtk2::VBox->new(FALSE, 0);
+        my $packingBox = Gtk3::VBox->new(FALSE, 0);
         $self->winBox->add($packingBox);
         $packingBox->set_border_width(0);
         # Update IVs immediately
@@ -1213,7 +1211,7 @@
         #   are shown)
         if ($self->worldModelObj->showTreeViewFlag && $self->worldModelObj->showCanvasFlag) {
 
-            $hPaned = Gtk2::HPaned->new();
+            $hPaned = Gtk3::HPaned->new();
             if ($hPaned) {
 
                 # Set the width of the space about to be filled with the treeview
@@ -1242,7 +1240,6 @@
                     # Pack the treeview directly into the packing box
                     $packingBox->pack_start($treeViewScroller, TRUE, TRUE, 0);
                 }
-
             }
         }
 
@@ -1434,7 +1431,7 @@
         # Create a new horizontal pane (only if both the treeview and the canvas are allowed)
         if ($self->worldModelObj->showTreeViewFlag && $self->worldModelObj->showCanvasFlag) {
 
-            $hPaned = Gtk2::HPaned->new();
+            $hPaned = Gtk3::HPaned->new();
             if ($hPaned) {
 
                 # Set the width of the space about to be filled with the treeview
@@ -1660,22 +1657,13 @@
         my ($self, $check) = @_;
 
         # Local variables
-        my ($forceFlag, $wmObj, $count, $max, $parchmentObj);
+        my ($parchmentObj);
 
         # Check for improper arguments
         if (defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->winUpdate', @_);
         }
-
-        # In response to user input (e.g. a click on the map), $self->doDraw can be called at any
-        #   time. If a drawing cycle (another call to ->doDraw) is already in progress,
-        #   $self->winUpdateForceFlag is set to TRUE
-        # Remember the value of the flag, as it is now. If it's TRUE, we can set it back to FALSE
-        #   at the end of this function. However, if $self->winUpdateForceFlag is FALSE but becomes
-        #   TRUE during this function, we don't want to reset it until the next call to this
-        #   function
-        $forceFlag = $self->winUpdateForceFlag;
 
         # If a drawing cycle (i.e. a call to $self->doDraw) is already in progress, don't do
         #   anything this time; wait for the next spin of the session's maintain loop
@@ -1692,198 +1680,37 @@
             $self->preparePreDraw();
         }
 
-        # Import the world model (for speed)
-        $wmObj = $self->worldModelObj;
-
-        # Set the number of objects that can be drawn during the current call to this function
-        #   (e.g. if GA::Obj::WorldModel->queueDrawMaxObjs is 500 and the session's maintain loop is
-        #   spinning ten times a second, then draw 500/10 = 50 objects per call)
-        $max = $wmObj->queueDrawMaxObjs * $self->session->maintainLoopDelay;
-        # If the user changes GA::Obj::WorldModel->queueDrawMaxObjs to 0, code in this automapper
-        #   window no longer adds objects to GA::Obj::Parchment->queueRoomHash, ->queueExitHash etc
-        # However, there might be some objects that were already queued to be drawn; perhaps a lot
-        #   of objects
-        # In this situation, continue drawing objects, a few at a time, until the existing queues
-        #   are emptied
-        if (! $max) {
-
-            $max = $self->drawQueueDefault;
-        }
-
         # We only draw things from the first parchment object in the list (if any)
         $parchmentObj = $self->ivFirst('parchmentQueueList');
-        # Stop marking objects as soon as $count reaches $max
-        $count = 0;
+        if ($parchmentObj) {
 
-        # (If ->queueDrawMaxObjs is 0, no queued drawing takes place)
-        if ($parchmentObj && $max) {
+            # We call ->doQuickDraw, rather than calling the standard ->doDraw function, as the
+            #   former is optimised for drawing a whole region
+            # The TRUE flag tells ->doQuickDraw to apply a limit to the number of rooms, exits
+            #   and/or labels drawn
+            $self->doQuickDraw($parchmentObj, TRUE);
 
-            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomHash')) {
-
-                # (Check the room still exists. This check, and the similar checks below, check for
-                #   momentary inconsistencies while some other process takes place; code in the
-                #   world model GA::Obj::WorldModel should update parchment objects automatically)
-                $parchmentObj->ivDelete('queueRoomHash', $roomObj->number);
-                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
-
-                    next OUTER;
-                }
-
-                $parchmentObj->ivAdd('markedRoomHash', $roomObj->number, $roomObj);
-                # Drawing a room also draws its room tags, room guilds, exits and exit tags, so we
-                #   can remove them from the queue
-                $parchmentObj->ivDelete('markedRoomTagHash', $roomObj->number);
-                $parchmentObj->ivDelete('markedRoomGuildHash', $roomObj->number);
-
-                foreach my $exitNum ($roomObj->ivValues('exitNumHash')) {
-
-                    $parchmentObj->ivDelete('markedExitHash', $exitNum);
-                    $parchmentObj->ivDelete('markedExitTagHash', $exitNum);
-                }
-
-                $count++;
-                if ($count >= $max) {
-
-                    last OUTER;
-                }
-            }
-
-            if ($count < $max) {
-
-                OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomTagHash')) {
-
-                    # (Check the room still exists and still has a room tag)
-                    $parchmentObj->ivDelete('queueRoomTagHash', $roomObj->number);
-                    if (
-                        ! $wmObj->ivExists('modelHash', $roomObj->number)
-                        || ! defined $roomObj->roomTag
-                    ) {
-                        next OUTER;
-                    }
-
-                    $parchmentObj->ivAdd('markedRoomTagHash', $roomObj->number, $roomObj);
-
-                    $count++;
-                    if ($count >= $max) {
-
-                        last OUTER;
-                    }
-                }
-            }
-
-            if ($count < $max) {
-
-                OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomGuildHash')) {
-
-                    # (Check the room still exists and still has a room tag)
-                    $parchmentObj->ivDelete('queueRoomGuildHash', $roomObj->number);
-                    if (
-                        ! $wmObj->ivExists('modelHash', $roomObj->number)
-                        || ! defined $roomObj->roomGuild
-                    ) {
-                        next OUTER;
-                    }
-
-                    $parchmentObj->ivAdd('markedRoomGuildHash', $roomObj->number, $roomObj);
-
-                    $count++;
-                    if ($count >= $max) {
-
-                        last OUTER;
-                    }
-                }
-            }
-
-            if ($count < $max) {
-
-                OUTER: foreach my $exitObj ($parchmentObj->ivValues('queueExitHash')) {
-
-                    # (Check the exit still exists)
-                    $parchmentObj->ivDelete('queueExitHash', $exitObj->number);
-                    if (! $wmObj->ivExists('exitModelHash', $exitObj->number)) {
-
-                        next OUTER;
-                    }
-
-                    $parchmentObj->ivAdd('markedExitHash', $exitObj->number, $exitObj);
-
-                    $count++;
-                    if ($count >= $max) {
-
-                        last OUTER;
-                    }
-                }
-            }
-
-            if ($count < $max) {
-
-                OUTER: foreach my $exitObj ($parchmentObj->ivValues('queueExitTagHash')) {
-
-                    # (Check the exit still exists and has an exit tag)
-                    $parchmentObj->ivDelete('queueExitTagHash', $exitObj->number);
-                    if (
-                        ! $wmObj->ivExists('exitModelHash', $exitObj->number)
-                        || ! defined $exitObj->exitTag
-                    ) {
-                        next OUTER;
-                    }
-
-                    $parchmentObj->ivAdd('markedExitTagHash', $exitObj->number, $exitObj);
-
-                    $count++;
-                    if ($count >= $max) {
-
-                        last OUTER;
-                    }
-                }
-            }
-
-            if ($count < $max) {
-
-                OUTER: foreach my $labelObj ($parchmentObj->ivValues('queueLabelHash')) {
-
-                    my $regionmapObj;
-
-                    # (Check the label still exists)
-                    $parchmentObj->ivDelete('queueLabelHash', $labelObj->number);
-                    $regionmapObj = $wmObj->ivShow('regionmapHash', $labelObj->region);
-                    if (
-                        ! $regionmapObj
-                        || ! $regionmapObj->ivExists('gridLabelHash', $labelObj->number)
-                    ) {
-                        next OUTER;
-                    }
-
-                    $parchmentObj->ivAdd('markedLabelHash', $labelObj->number, $labelObj);
-
-                    $count++;
-                    if ($count >= $max) {
-
-                        last OUTER;
-                    }
-                }
-            }
-
-            # If the parchment has no more queued objects, we can remove it from the queue
+            # If the parchment has no more queued drawing operations, we can remove it from the
+            #   queue
             if (
-                ! $parchmentObj->queueRoomHash && ! $parchmentObj->queueRoomTagHash
-                && ! $parchmentObj->queueRoomGuildHash && ! $parchmentObj->queueExitHash
-                && ! $parchmentObj->queueExitTagHash && ! $parchmentObj->queueLabelHash
+                ! $parchmentObj->queueRoomEchoHash && ! $parchmentObj->queueRoomBoxHash
+                && ! $parchmentObj->queueRoomTextHash && ! $parchmentObj->queueRoomExitHash
+                && ! $parchmentObj->queueRoomInfoHash && ! $parchmentObj->queueLabelHash
             ) {
                 $self->ivShift('parchmentQueueList');
                 $self->ivAdd('parchmentReadyHash', $parchmentObj->name, $parchmentObj);
+
+                # Show the next region to be pre-drawn (if any) in the window's title bar
+                $self->setWinTitle();
             }
         }
 
-        # If any objects have been marked to be drawn (by this function), call ->doDraw to draw them
         # If a recent call to $self->doDraw failed because a drawing cycle was already in progress,
-        #   call ->doDraw again to complete that operation
-        if ($count || $forceFlag) {
+        #   call ->doDraw now to complete that operation
+        if ($self->winUpdateForceFlag) {
 
-            if ($self->doDraw() && $forceFlag) {
+            if ($self->doDraw()) {
 
-                # Only call ->doDraw on the next call to this function if there are additional
-                #   objects marked to be drawn
                 $self->ivPoke('winUpdateForceFlag', FALSE);
 
                 # If the failed call to ->doDraw came from ->setCurrentRegion, then we can make the
@@ -1895,13 +1722,6 @@
                 }
             }
         }
-
-        # Also destroy some canvas widgets/canvas objects that have been added to the destruction
-        #   queue by $self->refreshMap
-        # In testing, simply emptying the list (and relying on Perl's garbage collection) is
-        #   consistently 10-15% faster than calling ->destroy on thousands of objects, so we'll do
-        #   that
-        $self->ivSplice('destroyQueueList', 0, $self->constDestroyQueueMax);
 
         return 1;
     }
@@ -1930,7 +1750,7 @@
 
         $self->winBox->signal_connect('delete-event' => sub {
 
-            # Prevent Gtk2 from taking action directly. Instead redirect the request to
+            # Prevent Gtk3 from taking action directly. Instead redirect the request to
             #   $self->winDestroy, which does things like resetting a portion of the workspace
             #   grid, as well as actually destroying the window
             return $self->winDestroy();
@@ -1969,7 +1789,7 @@
             my ($keycode, $standard);
 
             # Get the system keycode for this keypress
-            $keycode = Gtk2::Gdk->keyval_name($event->keyval);
+            $keycode = Gtk3::Gdk::keyval_name($event->keyval);
             # Translate it into a standard Axmud keycode
             $standard = $axmud::CLIENT->reverseKeycode($keycode);
 
@@ -2030,7 +1850,7 @@
             my ($keycode, $standard);
 
             # Get the system keycode for this keypress
-            $keycode = Gtk2::Gdk->keyval_name($event->keyval);
+            $keycode = Gtk3::Gdk::keyval_name($event->keyval);
             # Translate it into a standard Axmud keycode
             $standard = $axmud::CLIENT->reverseKeycode($keycode);
 
@@ -2238,7 +2058,7 @@
 
         $self->ivUndef('canvas');
         $self->ivUndef('canvasBackground');
-        # (For some reason, commenting out these lines increases the draw time, during a call to
+        # (For some reason, commenting out these lines decreases the draw time, during a call to
         #   $self->redrawWidgets, by about 40%. The IVs receive their correct values anyway when
         #   ->enableCanvas is called)
 #        $self->ivUndef('canvasFrame');
@@ -2258,14 +2078,14 @@
     sub enableMenu {
 
         # Called by $self->drawWidgets
-        # Sets up the Automapper window's Gtk2::MenuBar widget
+        # Sets up the Automapper window's Gtk3::MenuBar widget
         #
         # Expected arguments
         #   (none besides $self)
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::MenuBar created
+        #   Otherwise returns the Gtk3::MenuBar created
 
         my ($self, $check) = @_;
 
@@ -2276,7 +2096,7 @@
         }
 
         # Create the menu bar
-        my $menuBar = Gtk2::MenuBar->new();
+        my $menuBar = Gtk3::MenuBar->new();
         if (! $menuBar) {
 
             return undef;
@@ -2284,49 +2104,49 @@
 
         # 'File' column
         my $column_file = $self->enableFileColumn();
-        my $item_file = Gtk2::MenuItem->new('_File');
+        my $item_file = Gtk3::MenuItem->new('_File');
         $item_file->set_submenu($column_file);
         $menuBar->append($item_file);
 
         # 'Edit' column
         my $column_edit = $self->enableEditColumn();
-        my $item_edit = Gtk2::MenuItem->new('_Edit');
+        my $item_edit = Gtk3::MenuItem->new('_Edit');
         $item_edit->set_submenu($column_edit);
         $menuBar->append($item_edit);
 
         # 'View' column
         my $column_view = $self->enableViewColumn();
-        my $item_view = Gtk2::MenuItem->new('_View');
+        my $item_view = Gtk3::MenuItem->new('_View');
         $item_view->set_submenu($column_view);
         $menuBar->append($item_view);
 
         # 'Mode' column
         my $column_mode = $self->enableModeColumn();
-        my $item_mode = Gtk2::MenuItem->new('_Mode');
+        my $item_mode = Gtk3::MenuItem->new('_Mode');
         $item_mode->set_submenu($column_mode);
         $menuBar->append($item_mode);
 
         # 'Regions' column
         my $column_regions = $self->enableRegionsColumn();
-        my $item_regions = Gtk2::MenuItem->new('_Regions');
+        my $item_regions = Gtk3::MenuItem->new('_Regions');
         $item_regions->set_submenu($column_regions);
         $menuBar->append($item_regions);
 
         # 'Rooms' column
         my $column_rooms = $self->enableRoomsColumn();
-        my $item_rooms = Gtk2::MenuItem->new('R_ooms');
+        my $item_rooms = Gtk3::MenuItem->new('R_ooms');
         $item_rooms->set_submenu($column_rooms);
         $menuBar->append($item_rooms);
 
         # 'Exits' column
         my $column_exits = $self->enableExitsColumn();
-        my $item_exits = Gtk2::MenuItem->new('E_xits');
+        my $item_exits = Gtk3::MenuItem->new('E_xits');
         $item_exits->set_submenu($column_exits);
         $menuBar->append($item_exits);
 
         # 'Labels' column
         my $column_labels = $self->enableLabelsColumn();
-        my $item_labels = Gtk2::MenuItem->new('_Labels');
+        my $item_labels = Gtk3::MenuItem->new('_Labels');
         $item_labels->set_submenu($column_labels);
         $menuBar->append($item_labels);
 
@@ -2350,7 +2170,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -2361,13 +2181,13 @@
         }
 
         # Set up column
-        my $column_file = Gtk2::Menu->new();
+        my $column_file = Gtk3::Menu->new();
         if (! $column_file) {
 
             return undef;
         }
 
-        my $item_loadModel = Gtk2::MenuItem->new('_Load world model');
+        my $item_loadModel = Gtk3::MenuItem->new('_Load world model');
         $item_loadModel->signal_connect('activate' => sub {
 
             # $self->winReset will be called by $self->set_worldModelObj when the ';load' command
@@ -2379,20 +2199,20 @@
         });
         $column_file->append($item_loadModel);
 
-        my $item_loadAll = Gtk2::ImageMenuItem->new('L_oad all files');
+        my $item_loadAll = Gtk3::ImageMenuItem->new('L_oad all files');
         $item_loadAll->signal_connect('activate' => sub {
 
             # The ';load' command will  $self->winReset when finished
 
             $self->session->pseudoCmd('load', 'win_error');
         });
-        my $img_loadAll = Gtk2::Image->new_from_stock('gtk-open', 'menu');
+        my $img_loadAll = Gtk3::Image->new_from_stock('gtk-open', 'menu');
         $item_loadAll->set_image($img_loadAll);
         $column_file->append($item_loadAll);
 
-        $column_file->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_file->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_saveModel = Gtk2::MenuItem->new('_Save world model');
+        my $item_saveModel = Gtk3::MenuItem->new('_Save world model');
         $item_saveModel->signal_connect('activate' => sub {
 
             # Do a forced save. The ';save' command sets $self->freeClickMode back to 'default'
@@ -2400,49 +2220,49 @@
         });
         $column_file->append($item_saveModel);
 
-        my $item_saveAll = Gtk2::ImageMenuItem->new('S_ave all files');
+        my $item_saveAll = Gtk3::ImageMenuItem->new('S_ave all files');
         $item_saveAll->signal_connect('activate' => sub {
 
             # Do a forced save. The ';save' command sets $self->freeClickMode back to 'default'
             $self->session->pseudoCmd('save -f', 'win_error');
         });
-        my $img_saveAll = Gtk2::Image->new_from_stock('gtk-save', 'menu');
+        my $img_saveAll = Gtk3::Image->new_from_stock('gtk-save', 'menu');
         $item_saveAll->set_image($img_saveAll);
         $column_file->append($item_saveAll);
 
-        $column_file->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_file->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_importModel = Gtk2::MenuItem->new('_Import/load world model...');
+        my $item_importModel = Gtk3::MenuItem->new('_Import/load world model...');
         $item_importModel->signal_connect('activate' => sub {
 
             $self->importModelCallback();
         });
         $column_file->append($item_importModel);
 
-        my $item_exportModel = Gtk2::MenuItem->new('Save/_export world model...');
+        my $item_exportModel = Gtk3::MenuItem->new('Save/_export world model...');
         $item_exportModel->signal_connect('activate' => sub {
 
             $self->exportModelCallback();
         });
         $column_file->append($item_exportModel);
 
-        $column_file->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_file->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_mergeModel = Gtk2::MenuItem->new('_Merge world models...');
+        my $item_mergeModel = Gtk3::MenuItem->new('_Merge world models...');
         $item_mergeModel->signal_connect('activate' => sub {
 
             $self->session->pseudoCmd('mergemodel')
         });
         $column_file->append($item_mergeModel);
 
-        $column_file->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_file->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_closeWindow = Gtk2::ImageMenuItem->new('_Close window');
+        my $item_closeWindow = Gtk3::ImageMenuItem->new('_Close window');
         $item_closeWindow->signal_connect('activate' => sub {
 
             $self->winDestroy();
         });
-        my $img_closeWindow = Gtk2::Image->new_from_stock('gtk-quit', 'menu');
+        my $img_closeWindow = Gtk3::Image->new_from_stock('gtk-quit', 'menu');
         $item_closeWindow->set_image($img_closeWindow);
         $column_file->append($item_closeWindow);
 
@@ -2460,7 +2280,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -2474,286 +2294,286 @@
         }
 
         # Set up column
-        my $column_edit = Gtk2::Menu->new();
+        my $column_edit = Gtk3::Menu->new();
         if (! $column_edit) {
 
             return undef;
         }
 
             # 'Select' submenu
-            my $subMenu_select = Gtk2::Menu->new();
+            my $subMenu_select = Gtk3::Menu->new();
 
                 # 'Select rooms' sub-submenu
-                my $subSubMenu_selectRooms = Gtk2::Menu->new();
+                my $subSubMenu_selectRooms = Gtk3::Menu->new();
 
-                my $item_selectNoTitle = Gtk2::MenuItem->new('Rooms with no _titles');
+                my $item_selectNoTitle = Gtk3::MenuItem->new('Rooms with no _titles');
                 $item_selectNoTitle->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('no_title');
                 });
                 $subSubMenu_selectRooms->append($item_selectNoTitle);
 
-                my $item_selectNoDescrip = Gtk2::MenuItem->new('Rooms with no _descriptions');
+                my $item_selectNoDescrip = Gtk3::MenuItem->new('Rooms with no _descriptions');
                 $item_selectNoDescrip->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('no_descrip');
                 });
                 $subSubMenu_selectRooms->append($item_selectNoDescrip);
 
-                my $item_selectNoTitleDescrip = Gtk2::MenuItem->new('Rooms with neither');
+                my $item_selectNoTitleDescrip = Gtk3::MenuItem->new('Rooms with _neither');
                 $item_selectNoTitleDescrip->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('no_title_descrip');
                 });
                 $subSubMenu_selectRooms->append($item_selectNoTitleDescrip);
 
-                my $item_selectTitleDescrip = Gtk2::MenuItem->new('Rooms with both');
+                my $item_selectTitleDescrip = Gtk3::MenuItem->new('Rooms with _both');
                 $item_selectTitleDescrip->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('title_descrip');
                 });
                 $subSubMenu_selectRooms->append($item_selectTitleDescrip);
 
-                $subSubMenu_selectRooms->append(Gtk2::SeparatorMenuItem->new());   # Separator
+                $subSubMenu_selectRooms->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-                my $item_selectNoVisitChar = Gtk2::MenuItem->new('Rooms not visited by character');
+                my $item_selectNoVisitChar = Gtk3::MenuItem->new('Rooms not visited by _character');
                 $item_selectNoVisitChar->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('no_visit_char');
                 });
                 $subSubMenu_selectRooms->append($item_selectNoVisitChar);
 
-                my $item_selectNoVisitAllChar = Gtk2::MenuItem->new('Rooms not visited by anyone');
+                my $item_selectNoVisitAllChar = Gtk3::MenuItem->new('Rooms not visited by _anyone');
                 $item_selectNoVisitAllChar->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('no_visit_all');
                 });
                 $subSubMenu_selectRooms->append($item_selectNoVisitAllChar);
 
-                my $item_selectVisitChar = Gtk2::MenuItem->new('Rooms visited by character');
+                my $item_selectVisitChar = Gtk3::MenuItem->new('Rooms visited by c_haracter');
                 $item_selectVisitChar->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('visit_char');
                 });
                 $subSubMenu_selectRooms->append($item_selectVisitChar);
 
-                my $item_selectVisitAllChar = Gtk2::MenuItem->new('Rooms visited by anyone');
+                my $item_selectVisitAllChar = Gtk3::MenuItem->new('Rooms visited by an_yone');
                 $item_selectVisitAllChar->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('visit_all');
                 });
                 $subSubMenu_selectRooms->append($item_selectVisitAllChar);
 
-                $subSubMenu_selectRooms->append(Gtk2::SeparatorMenuItem->new());   # Separator
+                $subSubMenu_selectRooms->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-                my $item_selectCheckable = Gtk2::MenuItem->new('Rooms with checkable directions');
+                my $item_selectCheckable = Gtk3::MenuItem->new('Rooms with checkable d_irections');
                 $item_selectCheckable->signal_connect('activate' => sub {
 
                     $self->selectRoomCallback('checkable');
                 });
                 $subSubMenu_selectRooms->append($item_selectCheckable);
 
-            my $item_selectRooms = Gtk2::MenuItem->new('Select r_ooms');
+            my $item_selectRooms = Gtk3::MenuItem->new('Select _rooms');
             $item_selectRooms->set_submenu($subSubMenu_selectRooms);
             $subMenu_select->append($item_selectRooms);
 
                 # 'Select exits' sub-submenu
-                my $subSubMenu_selectExits = Gtk2::Menu->new();
+                my $subSubMenu_selectExits = Gtk3::Menu->new();
 
-                my $item_selectInRooms = Gtk2::MenuItem->new('Exits in selected _rooms');
+                my $item_selectInRooms = Gtk3::MenuItem->new('Exits in selected _rooms');
                 $item_selectInRooms->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('in_rooms');
                 });
                 $subSubMenu_selectExits->append($item_selectInRooms);
 
-                $subSubMenu_selectExits->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_selectExits->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_selectUnallocated = Gtk2::MenuItem->new('_Unallocated exits');
+                my $item_selectUnallocated = Gtk3::MenuItem->new('_Unallocated exits');
                 $item_selectUnallocated->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('unallocated');
                 });
                 $subSubMenu_selectExits->append($item_selectUnallocated);
 
-                my $item_selectUnallocatable = Gtk2::MenuItem->new('Una_llocatable exits');
+                my $item_selectUnallocatable = Gtk3::MenuItem->new('U_nallocatable exits');
                 $item_selectUnallocatable->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('unallocatable');
                 });
                 $subSubMenu_selectExits->append($item_selectUnallocatable);
 
-                my $item_selectUncertain = Gtk2::MenuItem->new('Un_certain exits');
+                my $item_selectUncertain = Gtk3::MenuItem->new('Un_certain exits');
                 $item_selectUncertain->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('uncertain');
                 });
                 $subSubMenu_selectExits->append($item_selectUncertain);
 
-                my $item_selectIncomplete = Gtk2::MenuItem->new('I_ncomplete exits');
+                my $item_selectIncomplete = Gtk3::MenuItem->new('_Incomplete exits');
                 $item_selectIncomplete->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('incomplete');
                 });
                 $subSubMenu_selectExits->append($item_selectIncomplete);
 
-                my $item_selectAllAbove = Gtk2::MenuItem->new('_All of the above');
+                my $item_selectAllAbove = Gtk3::MenuItem->new('_All of the above');
                 $item_selectAllAbove->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('all_above');
                 });
                 $subSubMenu_selectExits->append($item_selectAllAbove);
 
-                $subSubMenu_selectExits->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_selectExits->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_selectImpassable = Gtk2::MenuItem->new('_Impassable exits');
+                my $item_selectImpassable = Gtk3::MenuItem->new('I_mpassable exits');
                 $item_selectImpassable->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('impass');
                 });
                 $subSubMenu_selectExits->append($item_selectImpassable);
 
-                my $item_selectMystery = Gtk2::MenuItem->new('_Mystery exits');
+                my $item_selectMystery = Gtk3::MenuItem->new('M_ystery exits');
                 $item_selectMystery->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('mystery');
                 });
                 $subSubMenu_selectExits->append($item_selectMystery);
 
-                $subSubMenu_selectExits->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_selectExits->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_selectNonSuper = Gtk2::MenuItem->new('_Region exits');
+                my $item_selectNonSuper = Gtk3::MenuItem->new('R_egion exits');
                 $item_selectNonSuper->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('region');
                 });
                 $subSubMenu_selectExits->append($item_selectNonSuper);
 
-                my $item_selectSuper = Gtk2::MenuItem->new('_Super-region exits');
+                my $item_selectSuper = Gtk3::MenuItem->new('_Super-region exits');
                 $item_selectSuper->signal_connect('activate' => sub {
 
                     $self->selectExitTypeCallback('super');
                 });
                 $subSubMenu_selectExits->append($item_selectSuper);
 
-            my $item_selectExits = Gtk2::MenuItem->new('Select e_xits');
+            my $item_selectExits = Gtk3::MenuItem->new('Select _exits');
             $item_selectExits->set_submenu($subSubMenu_selectExits);
             $subMenu_select->append($item_selectExits);
 
-            $subMenu_select->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_select->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
                 # 'Select in region' sub-submenu
-                my $subSubMenu_selectRegion = Gtk2::Menu->new();
+                my $subSubMenu_selectRegion = Gtk3::Menu->new();
 
-                my $item_selectRegionRoom = Gtk2::MenuItem->new('Every _room');
+                my $item_selectRegionRoom = Gtk3::MenuItem->new('Every _room');
                 $item_selectRegionRoom->signal_connect('activate' => sub {
 
                     $self->selectInRegionCallback('room');
                 });
                 $subSubMenu_selectRegion->append($item_selectRegionRoom);
 
-                my $item_selectRegionExit = Gtk2::MenuItem->new('Every _exit');
+                my $item_selectRegionExit = Gtk3::MenuItem->new('Every _exit');
                 $item_selectRegionExit->signal_connect('activate' => sub {
 
                     $self->selectInRegionCallback('exit');
                 });
                 $subSubMenu_selectRegion->append($item_selectRegionExit);
 
-                my $item_selectRegionRoomTag = Gtk2::MenuItem->new('Every room _tag');
+                my $item_selectRegionRoomTag = Gtk3::MenuItem->new('Every room _tag');
                 $item_selectRegionRoomTag->signal_connect('activate' => sub {
 
                     $self->selectInRegionCallback('room_tag');
                 });
                 $subSubMenu_selectRegion->append($item_selectRegionRoomTag);
 
-                my $item_selectRegionRoomGuild = Gtk2::MenuItem->new('Every room g_uild');
+                my $item_selectRegionRoomGuild = Gtk3::MenuItem->new('Every room _guild');
                 $item_selectRegionRoomGuild->signal_connect('activate' => sub {
 
                     $self->selectInRegionCallback('room_guild');
                 });
                 $subSubMenu_selectRegion->append($item_selectRegionRoomGuild);
 
-                my $item_selectRegionLabel = Gtk2::MenuItem->new('Every _label');
+                my $item_selectRegionLabel = Gtk3::MenuItem->new('Every _label');
                 $item_selectRegionLabel->signal_connect('activate' => sub {
 
                     $self->selectInRegionCallback('label');
                 });
                 $subSubMenu_selectRegion->append($item_selectRegionLabel);
 
-                $subSubMenu_selectRegion->append(Gtk2::SeparatorMenuItem->new());   # Separator
+                $subSubMenu_selectRegion->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-                my $item_selectRegionAbove = Gtk2::MenuItem->new('_All of the above');
+                my $item_selectRegionAbove = Gtk3::MenuItem->new('_All of the above');
                 $item_selectRegionAbove->signal_connect('activate' => sub {
 
                     $self->selectInRegionCallback();
                 });
                 $subSubMenu_selectRegion->append($item_selectRegionAbove);
 
-            my $item_selectRegion = Gtk2::MenuItem->new('Select in _region');
+            my $item_selectRegion = Gtk3::MenuItem->new('Select in re_gion');
             $item_selectRegion->set_submenu($subSubMenu_selectRegion);
             $subMenu_select->append($item_selectRegion);
 
                 # 'Select in map' sub-submenu
-                my $subSubMenu_selectMap = Gtk2::Menu->new();
+                my $subSubMenu_selectMap = Gtk3::Menu->new();
 
-                my $item_selectMapRoom = Gtk2::MenuItem->new('Every _room');
+                my $item_selectMapRoom = Gtk3::MenuItem->new('Every _room');
                 $item_selectMapRoom->signal_connect('activate' => sub {
 
                     $self->selectInMapCallback('room');
                 });
                 $subSubMenu_selectMap->append($item_selectMapRoom);
 
-                my $item_selectMapExit = Gtk2::MenuItem->new('Every _exit');
+                my $item_selectMapExit = Gtk3::MenuItem->new('Every _exit');
                 $item_selectMapExit->signal_connect('activate' => sub {
 
                     $self->selectInMapCallback('exit');
                 });
                 $subSubMenu_selectMap->append($item_selectMapExit);
 
-                my $item_selectMapRoomTag = Gtk2::MenuItem->new('Every room _tag');
+                my $item_selectMapRoomTag = Gtk3::MenuItem->new('Every room _tag');
                 $item_selectMapRoomTag->signal_connect('activate' => sub {
 
                     $self->selectInMapCallback('room_tag');
                 });
                 $subSubMenu_selectMap->append($item_selectMapRoomTag);
 
-                my $item_selectMapRoomGuild = Gtk2::MenuItem->new('Every room g_uild');
+                my $item_selectMapRoomGuild = Gtk3::MenuItem->new('Every room _guild');
                 $item_selectMapRoomGuild->signal_connect('activate' => sub {
 
                     $self->selectInMapCallback('room_guild');
                 });
                 $subSubMenu_selectMap->append($item_selectMapRoomGuild);
 
-                my $item_selectMapLabel = Gtk2::MenuItem->new('Every _label');
+                my $item_selectMapLabel = Gtk3::MenuItem->new('Every _label');
                 $item_selectMapLabel->signal_connect('activate' => sub {
 
                     $self->selectInMapCallback('label');
                 });
                 $subSubMenu_selectMap->append($item_selectMapLabel);
 
-                $subSubMenu_selectMap->append(Gtk2::SeparatorMenuItem->new());   # Separator
+                $subSubMenu_selectMap->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-                my $item_selectMapAbove = Gtk2::MenuItem->new('_All of the above');
+                my $item_selectMapAbove = Gtk3::MenuItem->new('_All of the above');
                 $item_selectMapAbove->signal_connect('activate' => sub {
 
                     $self->selectInMapCallback();
                 });
                 $subSubMenu_selectMap->append($item_selectMapAbove);
 
-            my $item_selectMap = Gtk2::MenuItem->new('Select in _map');
+            my $item_selectMap = Gtk3::MenuItem->new('Select in _map');
             $item_selectMap->set_submenu($subSubMenu_selectMap);
             $subMenu_select->append($item_selectMap);
 
-        my $item_select = Gtk2::MenuItem->new('S_elect');
+        my $item_select = Gtk3::MenuItem->new('_Select');
         $item_select->set_submenu($subMenu_select);
         $column_edit->append($item_select);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'select', $item_select);
 
             # 'Selected items' submenu
-            my $subMenu_selectedObjs = Gtk2::Menu->new();
+            my $subMenu_selectedObjs = Gtk3::Menu->new();
 
-            my $item_identifyRoom = Gtk2::MenuItem->new('_Identify room(s)');
+            my $item_identifyRoom = Gtk3::MenuItem->new('Identify _room(s)');
             $item_identifyRoom->signal_connect('activate' => sub {
 
                 $self->identifyRoomsCallback();
@@ -2763,7 +2583,7 @@
             #   $self->selectedRoomHash or $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'identify_room', $item_identifyRoom);
 
-            my $item_identifyExit = Gtk2::MenuItem->new('I_dentify exit(s)');
+            my $item_identifyExit = Gtk3::MenuItem->new('Identify _exit(s)');
             $item_identifyExit->signal_connect('activate' => sub {
 
                 $self->identifyExitsCallback();
@@ -2773,13 +2593,13 @@
             #   $self->selectedExitHash)
             $self->ivAdd('menuToolItemHash', 'identify_exit', $item_identifyExit);
 
-        my $item_selectedObjs = Gtk2::MenuItem->new('Identify s_elected items');
+        my $item_selectedObjs = Gtk3::MenuItem->new('_Identify selected items');
         $item_selectedObjs->set_submenu($subMenu_selectedObjs);
         $column_edit->append($item_selectedObjs);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'selected_objs', $item_selectedObjs);
 
-        my $item_unselectAll = Gtk2::MenuItem->new('_Unselect all');
+        my $item_unselectAll = Gtk3::MenuItem->new('_Unselect all');
         $item_unselectAll->signal_connect('activate' => sub {
 
             $self->setSelectedObj();
@@ -2788,12 +2608,12 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'unselect_all', $item_unselectAll);
 
-        $column_edit->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_edit->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Search' submenu
-            my $subMenu_search = Gtk2::Menu->new();
+            my $subMenu_search = Gtk3::Menu->new();
 
-            my $item_searchModel = Gtk2::MenuItem->new('Search _world model...');
+            my $item_searchModel = Gtk3::MenuItem->new('Search world _model...');
             $item_searchModel->signal_connect('activate' => sub {
 
                 # Open a 'pref' window to conduct the search
@@ -2806,32 +2626,32 @@
             });
             $subMenu_search->append($item_searchModel);
 
-            $subMenu_search->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_search->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_findRoom = Gtk2::MenuItem->new('Find _room...');
+            my $item_findRoom = Gtk3::MenuItem->new('Find _room...');
             $item_findRoom->signal_connect('activate' => sub {
 
                 $self->findRoomCallback();
             });
             $subMenu_search->append($item_findRoom);
 
-            my $item_findExit = Gtk2::MenuItem->new('Find _exit...');
+            my $item_findExit = Gtk3::MenuItem->new('Find _exit...');
             $item_findExit->signal_connect('activate' => sub {
 
                 $self->findExitCallback();
             });
             $subMenu_search->append($item_findExit);
 
-        my $item_search = Gtk2::ImageMenuItem->new('Se_arch');
-        my $img_search = Gtk2::Image->new_from_stock('gtk-find', 'menu');
+        my $item_search = Gtk3::ImageMenuItem->new('S_earch');
+        my $img_search = Gtk3::Image->new_from_stock('gtk-find', 'menu');
         $item_search->set_image($img_search);
         $item_search->set_submenu($subMenu_search);
         $column_edit->append($item_search);
 
             # 'Generate reports' submenu
-            my $subMenu_reports = Gtk2::Menu->new();
+            my $subMenu_reports = Gtk3::Menu->new();
 
-            my $item_showSummary = Gtk2::MenuItem->new('_Show general report');
+            my $item_showSummary = Gtk3::MenuItem->new('_Show general report');
             $item_showSummary->signal_connect('activate' => sub {
 
                 # (Don't use $self->pseudoCmdMode - we want to see the footer messages)
@@ -2839,7 +2659,7 @@
             });
             $subMenu_reports->append($item_showSummary);
 
-            my $item_showCurrentRegion = Gtk2::MenuItem->new('S_how current region');
+            my $item_showCurrentRegion = Gtk3::MenuItem->new('S_how current region');
             $item_showCurrentRegion->signal_connect('activate' => sub {
 
                 $self->session->pseudoCmd(
@@ -2851,19 +2671,19 @@
             # (Requires $self->currentRegionmap)
             $self->ivAdd('menuToolItemHash', 'report_region', $item_showCurrentRegion);
 
-            $subMenu_reports->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_reports->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
                 # 'Character visits' sub-submenu
-                my $subSubMenu_visits = Gtk2::Menu->new();
+                my $subSubMenu_visits = Gtk3::Menu->new();
 
-                my $item_visits1 = Gtk2::MenuItem->new('_All regions/characters');
+                my $item_visits1 = Gtk3::MenuItem->new('_All regions/characters');
                 $item_visits1->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd('modelreport -v', 'show_all');
                 });
                 $subSubMenu_visits->append($item_visits1);
 
-                my $item_visits2 = Gtk2::MenuItem->new('Current _region');
+                my $item_visits2 = Gtk3::MenuItem->new('Current _region');
                 $item_visits2->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2875,7 +2695,7 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_visits_2', $item_visits2);
 
-                my $item_visits3 = Gtk2::MenuItem->new('Current c_haracter');
+                my $item_visits3 = Gtk3::MenuItem->new('Current _character');
                 $item_visits3->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2887,7 +2707,7 @@
                 # (Requires current character profile)
                 $self->ivAdd('menuToolItemHash', 'report_visits_3', $item_visits3);
 
-                my $item_visits4 = Gtk2::MenuItem->new('_Current region/character');
+                my $item_visits4 = Gtk3::MenuItem->new('C_urrent region/character');
                 $item_visits4->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2900,21 +2720,21 @@
                 # (Requires $self->currentRegionmap and current character profile)
                 $self->ivAdd('menuToolItemHash', 'report_visits_4', $item_visits4);
 
-            my $item_visits = Gtk2::MenuItem->new('_Character visits');
+            my $item_visits = Gtk3::MenuItem->new('_Character visits');
             $item_visits->set_submenu($subSubMenu_visits);
             $subMenu_reports->append($item_visits);
 
                 # 'Room guilds' sub-submenu
-                my $subSubMenu_guilds = Gtk2::Menu->new();
+                my $subSubMenu_guilds = Gtk3::Menu->new();
 
-                my $item_guilds1 = Gtk2::MenuItem->new('_All regions/guilds');
+                my $item_guilds1 = Gtk3::MenuItem->new('_All regions/guilds');
                 $item_guilds1->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd('modelreport -g', 'show_all');
                 });
                 $subSubMenu_guilds->append($item_guilds1);
 
-                my $item_guilds2 = Gtk2::MenuItem->new('Current _region');
+                my $item_guilds2 = Gtk3::MenuItem->new('Current _region');
                 $item_guilds2->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2926,7 +2746,7 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_guilds_2', $item_guilds2);
 
-                my $item_guilds3 = Gtk2::MenuItem->new('C_urrent guild');
+                my $item_guilds3 = Gtk3::MenuItem->new('Current _guild');
                 $item_guilds3->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2938,7 +2758,7 @@
                 # (Requires current guild profile)
                 $self->ivAdd('menuToolItemHash', 'report_guilds_3', $item_guilds3);
 
-                my $item_guilds4 = Gtk2::MenuItem->new('_Current region/guild');
+                my $item_guilds4 = Gtk3::MenuItem->new('C_urrent region/guild');
                 $item_guilds4->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2951,21 +2771,21 @@
                 # (Requires $self->currentRegionmap and current guild profile)
                 $self->ivAdd('menuToolItemHash', 'report_guilds_4', $item_guilds4);
 
-            my $item_guilds = Gtk2::MenuItem->new('_Room guilds');
+            my $item_guilds = Gtk3::MenuItem->new('Room _guilds');
             $item_guilds->set_submenu($subSubMenu_guilds);
             $subMenu_reports->append($item_guilds);
 
                 # 'Room flags' sub-submenu
-                my $subSubMenu_roomFlags = Gtk2::Menu->new();
+                my $subSubMenu_roomFlags = Gtk3::Menu->new();
 
-                my $item_roomFlags1 = Gtk2::MenuItem->new('_All regions/flags');
+                my $item_roomFlags1 = Gtk3::MenuItem->new('_All regions/flags');
                 $item_roomFlags1->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd('modelreport -f', 'show_all');
                 });
                 $subSubMenu_roomFlags->append($item_roomFlags1);
 
-                my $item_roomFlags2 = Gtk2::MenuItem->new('Current _region');
+                my $item_roomFlags2 = Gtk3::MenuItem->new('Current _region');
                 $item_roomFlags2->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -2977,7 +2797,7 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_flags_2', $item_roomFlags2);
 
-                my $item_roomFlags3 = Gtk2::MenuItem->new('_Specify flag...');
+                my $item_roomFlags3 = Gtk3::MenuItem->new('_Specify flag...');
                 $item_roomFlags3->signal_connect('activate' => sub {
 
                     my (
@@ -2990,7 +2810,6 @@
                     $choice = $self->showComboDialogue(
                         'Select room flag',
                         'Select one of the world model\'s room flags',
-                        FALSE,
                         \@list,
                     );
 
@@ -3004,7 +2823,7 @@
                 });
                 $subSubMenu_roomFlags->append($item_roomFlags3);
 
-                my $item_roomFlags4 = Gtk2::MenuItem->new('_Current region/specify flag...');
+                my $item_roomFlags4 = Gtk3::MenuItem->new('C_urrent region/specify flag...');
                 $item_roomFlags4->signal_connect('activate' => sub {
 
                     my (
@@ -3017,7 +2836,6 @@
                     $choice = $self->showComboDialogue(
                         'Select room flag',
                         'Select one of the world model\'s room flags',
-                        FALSE,
                         \@list,
                     );
 
@@ -3034,21 +2852,21 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_flags_4', $item_roomFlags4);
 
-            my $item_roomFlags = Gtk2::MenuItem->new('Room _flags');
+            my $item_roomFlags = Gtk3::MenuItem->new('Room _flags');
             $item_roomFlags->set_submenu($subSubMenu_roomFlags);
             $subMenu_reports->append($item_roomFlags);
 
                  # 'Rooms' sub-submenu
-                my $subSubMenu_rooms = Gtk2::Menu->new();
+                my $subSubMenu_rooms = Gtk3::Menu->new();
 
-                my $item_rooms1 = Gtk2::MenuItem->new('_All regions');
+                my $item_rooms1 = Gtk3::MenuItem->new('_All regions');
                 $item_rooms1->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd('modelreport -m', 'show_all');
                 });
                 $subSubMenu_rooms->append($item_rooms1);
 
-                my $item_rooms2 = Gtk2::MenuItem->new('_Current region');
+                my $item_rooms2 = Gtk3::MenuItem->new('_Current region');
                 $item_rooms2->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -3060,21 +2878,21 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_rooms_2', $item_rooms2);
 
-            my $item_rooms = Gtk2::MenuItem->new('_Rooms');
+            my $item_rooms = Gtk3::MenuItem->new('_Rooms');
             $item_rooms->set_submenu($subSubMenu_rooms);
             $subMenu_reports->append($item_rooms);
 
                  # 'Exits' sub-submenu
-                my $subSubMenu_exits = Gtk2::Menu->new();
+                my $subSubMenu_exits = Gtk3::Menu->new();
 
-                my $item_exits1 = Gtk2::MenuItem->new('_All regions');
+                my $item_exits1 = Gtk3::MenuItem->new('_All regions');
                 $item_exits1->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd('modelreport -x', 'show_all');
                 });
                 $subSubMenu_exits->append($item_exits1);
 
-                my $item_exits2 = Gtk2::MenuItem->new('_Current region');
+                my $item_exits2 = Gtk3::MenuItem->new('_Current region');
                 $item_exits2->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -3086,21 +2904,21 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_exits_2', $item_exits2);
 
-            my $item_exits = Gtk2::MenuItem->new('_Exits');
+            my $item_exits = Gtk3::MenuItem->new('_Exits');
             $item_exits->set_submenu($subSubMenu_exits);
             $subMenu_reports->append($item_exits);
 
                 # 'Checked directions' sub-submenu
-                my $subSubMenu_checked = Gtk2::Menu->new();
+                my $subSubMenu_checked = Gtk3::Menu->new();
 
-                my $item_checked1 = Gtk2::MenuItem->new('_All regions');
+                my $item_checked1 = Gtk3::MenuItem->new('_All regions');
                 $item_checked1->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd('modelreport -h', 'show_all');
                 });
                 $subSubMenu_checked->append($item_checked1);
 
-                my $item_checked2 = Gtk2::MenuItem->new('_Current region');
+                my $item_checked2 = Gtk3::MenuItem->new('_Current region');
                 $item_checked2->signal_connect('activate' => sub {
 
                     $self->session->pseudoCmd(
@@ -3112,41 +2930,41 @@
                 # (Requires $self->currentRegionmap)
                 $self->ivAdd('menuToolItemHash', 'report_checked_2', $item_checked2);
 
-            my $item_checked = Gtk2::MenuItem->new('_Checked directions');
+            my $item_checked = Gtk3::MenuItem->new('Checked _directions');
             $item_checked->set_submenu($subSubMenu_checked);
             $subMenu_reports->append($item_checked);
 
-        my $item_reports = Gtk2::MenuItem->new('_Generate reports');
+        my $item_reports = Gtk3::MenuItem->new('_Generate reports');
         $item_reports->set_submenu($subMenu_reports);
         $column_edit->append($item_reports);
 
-        $column_edit->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_edit->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Reset' sub-submenu
-            my $subMenu_reset = Gtk2::Menu->new();
+            my $subMenu_reset = Gtk3::Menu->new();
 
-            my $item_resetRoomData = Gtk2::MenuItem->new('_Reset room data...');
+            my $item_resetRoomData = Gtk3::MenuItem->new('Reset _room data...');
             $item_resetRoomData->signal_connect('activate' => sub {
 
                 $self->resetRoomDataCallback();
             });
             $subMenu_reset->append($item_resetRoomData);
 
-            my $item_resetCharVisits = Gtk2::MenuItem->new('Reset visits by c_haracter...');
+            my $item_resetCharVisits = Gtk3::MenuItem->new('Reset _visits by character...');
             $item_resetCharVisits->signal_connect('activate' => sub {
 
                 $self->resetVisitsCallback();
             });
             $subMenu_reset->append($item_resetCharVisits);
 
-        my $item_reset = Gtk2::MenuItem->new('_Reset');
+        my $item_reset = Gtk3::MenuItem->new('_Reset');
         $item_reset->set_submenu($subMenu_reset);
         $column_edit->append($item_reset);
 
-        $column_edit->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_edit->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_editDict = Gtk2::ImageMenuItem->new('Edit current _dictionary...');
-        my $img_editDict = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editDict = Gtk3::ImageMenuItem->new('Edit current _dictionary...');
+        my $img_editDict = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editDict->set_image($img_editDict);
         $item_editDict->signal_connect('activate' => sub {
 
@@ -3162,7 +2980,7 @@
         });
         $column_edit->append($item_editDict);
 
-        my $item_addWords = Gtk2::MenuItem->new('Add dictionary _words...');
+        my $item_addWords = Gtk3::MenuItem->new('Add dictionary _words...');
         $item_addWords->signal_connect('activate' => sub {
 
             $self->createFreeWin(
@@ -3174,7 +2992,7 @@
         });
         $column_edit->append($item_addWords);
 
-        my $item_updateModel = Gtk2::MenuItem->new('Update mode_l words');
+        my $item_updateModel = Gtk3::MenuItem->new('U_pdate model words');
         $item_updateModel->signal_connect('activate' => sub {
 
             # Use pseudo-command mode 'win_error' - show success messages in the 'main' window,
@@ -3183,10 +3001,10 @@
         });
         $column_edit->append($item_updateModel);
 
-        $column_edit->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_edit->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_setupWizard = Gtk2::ImageMenuItem->new('Run Locator wi_zard...');
-        my $img_setupWizard = Gtk2::Image->new_from_stock('gtk-page-setup', 'menu');
+        my $item_setupWizard = Gtk3::ImageMenuItem->new('Run _Locator wizard...');
+        my $img_setupWizard = Gtk3::Image->new_from_stock('gtk-page-setup', 'menu');
         $item_setupWizard->set_image($img_setupWizard);
         $item_setupWizard->signal_connect('activate' => sub {
 
@@ -3203,8 +3021,8 @@
         });
         $column_edit->append($item_setupWizard);
 
-        my $item_editModel = Gtk2::ImageMenuItem->new('Edit w_orld model...');
-        my $img_editModel = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editModel = Gtk3::ImageMenuItem->new('Edit world _model...');
+        my $img_editModel = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editModel->set_image($img_editModel);
         $item_editModel->signal_connect('activate' => sub {
 
@@ -3233,7 +3051,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -3251,16 +3069,16 @@
         }
 
         # Set up column
-        my $column_view = Gtk2::Menu->new();
+        my $column_view = Gtk3::Menu->new();
         if (! $column_view) {
 
             return undef;
         }
 
             # 'Window components' submenu
-            my $subMenu_winComponents = Gtk2::Menu->new();
+            my $subMenu_winComponents = Gtk3::Menu->new();
 
-            my $item_showMenuBar = Gtk2::CheckMenuItem->new('Show menu_bar');
+            my $item_showMenuBar = Gtk3::CheckMenuItem->new('Show menu_bar');
             $item_showMenuBar->set_active($self->worldModelObj->showMenuBarFlag);
             $item_showMenuBar->signal_connect('toggled' => sub {
 
@@ -3273,7 +3091,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_menu_bar', $item_showMenuBar);
 
-            my $item_showToolbar = Gtk2::CheckMenuItem->new('Show _toolbar');
+            my $item_showToolbar = Gtk3::CheckMenuItem->new('Show _toolbar');
             $item_showToolbar->set_active($self->worldModelObj->showToolbarFlag);
             $item_showToolbar->signal_connect('toggled' => sub {
 
@@ -3286,7 +3104,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_toolbar', $item_showToolbar);
 
-            my $item_showTreeView = Gtk2::CheckMenuItem->new('Show _regions');
+            my $item_showTreeView = Gtk3::CheckMenuItem->new('Show _regions');
             $item_showTreeView->set_active($self->worldModelObj->showTreeViewFlag);
             $item_showTreeView->signal_connect('toggled' => sub {
 
@@ -3299,7 +3117,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_treeview', $item_showTreeView);
 
-            my $item_showCanvas = Gtk2::CheckMenuItem->new('Show _map');
+            my $item_showCanvas = Gtk3::CheckMenuItem->new('Show _map');
             $item_showCanvas->set_active($self->worldModelObj->showCanvasFlag);
             $item_showCanvas->signal_connect('toggled' => sub {
 
@@ -3312,23 +3130,23 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_canvas', $item_showCanvas);
 
-            $subMenu_winComponents->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_winComponents->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_redrawWindow = Gtk2::MenuItem->new('Re_draw window');
+            my $item_redrawWindow = Gtk3::MenuItem->new('Re_draw window');
             $item_redrawWindow->signal_connect('activate' => sub {
 
                 $self->redrawWidgets('menu_bar', 'toolbar', 'treeview', 'canvas');
             });
             $subMenu_winComponents->append($item_redrawWindow);
 
-        my $item_windowComponents = Gtk2::MenuItem->new('_Window components');
+        my $item_windowComponents = Gtk3::MenuItem->new('_Window components');
         $item_windowComponents->set_submenu($subMenu_winComponents);
         $column_view->append($item_windowComponents);
 
             # 'Current room' submenu
-            my $subMenu_currentRoom = Gtk2::Menu->new();
+            my $subMenu_currentRoom = Gtk3::Menu->new();
 
-            my $item_radio1 = Gtk2::RadioMenuItem->new(undef, 'Draw _normal room');
+            my $item_radio1 = Gtk3::RadioMenuItem->new_with_mnemonic(undef, 'Draw _normal room');
             $item_radio1->signal_connect('toggled' => sub {
 
                 if (! $self->ignoreMenuUpdateFlag && $item_radio1->get_active()) {
@@ -3346,7 +3164,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'normal_current_mode', $item_radio1);
 
-            my $item_radio2 = Gtk2::RadioMenuItem->new($item_group0, 'Draw _emphasised room');
+            my $item_radio2 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group0,
+                'Draw _emphasised room',
+            );
             if ($self->worldModelObj->currentRoomMode eq 'double') {
 
                 $item_radio2->set_active(TRUE);
@@ -3367,7 +3188,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'empahsise_current_room', $item_radio2);
 
-            my $item_radio3 = Gtk2::RadioMenuItem->new($item_group0, 'Draw _filled-in room');
+            my $item_radio3 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group0,
+                'Draw _filled-in room',
+            );
             if ($self->worldModelObj->currentRoomMode eq 'interior') {
 
                 $item_radio3->set_active(TRUE);
@@ -3388,14 +3212,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'fill_in_current_room', $item_radio3);
 
-        my $item_currentRoom = Gtk2::MenuItem->new('_Draw current room');
+        my $item_currentRoom = Gtk3::MenuItem->new('_Draw current room');
         $item_currentRoom->set_submenu($subMenu_currentRoom);
         $column_view->append($item_currentRoom);
 
             # 'Room filters' submenu
-            my $subMenu_roomFilters = Gtk2::Menu->new();
+            my $subMenu_roomFilters = Gtk3::Menu->new();
 
-            my $item_releaseAllFilters = Gtk2::CheckMenuItem->new('Release _all filters');
+            my $item_releaseAllFilters = Gtk3::CheckMenuItem->new('_Release all filters');
             $item_releaseAllFilters->set_active($self->worldModelObj->allRoomFiltersFlag);
             $item_releaseAllFilters->signal_connect('toggled' => sub {
 
@@ -3414,11 +3238,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'release_all_filters', $item_releaseAllFilters);
 
-            $subMenu_roomFilters->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_roomFilters->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
+            my @shortcutList = $axmud::CLIENT->constRoomFilterKeyList;
             foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
 
-                my $menuItem = Gtk2::CheckMenuItem->new('Release _' . $filter . ' filter');
+                my $shortcut = shift @shortcutList;
+
+                my $menuItem = Gtk3::CheckMenuItem->new('Release ' . $shortcut . ' filter');
                 $menuItem->set_active($self->worldModelObj->ivShow('roomFilterApplyHash', $filter));
                 $menuItem->signal_connect('toggled' => sub {
 
@@ -3435,30 +3262,30 @@
                 $self->ivAdd('menuToolItemHash', $filter . '_filter', $menuItem);
             }
 
-        my $item_roomFilters = Gtk2::MenuItem->new('Room _filters');
+        my $item_roomFilters = Gtk3::MenuItem->new('Room _filters');
         $item_roomFilters->set_submenu($subMenu_roomFilters);
         $column_view->append($item_roomFilters);
 
             # 'Room interiors' submenu
-            my $subMenu_roomInteriors = Gtk2::Menu->new();
+            my $subMenu_roomInteriors = Gtk3::Menu->new();
 
             @initList = (
                 'none' => '_Don\'t draw counts',
                 'shadow_count' => 'Draw _unallocated/shadow exits',
-                'region_count' => 'Draw reg_ion/super region exits',
-                'checked_count' => 'Draw checked/checkable directions',
+                'region_count' => 'Draw re_gion/super region exits',
+                'checked_count' => 'Draw _checked/checkable directions',
                 'room_content' => 'Draw _room contents',
                 'hidden_count' => 'Draw _hidden contents',
                 'temp_count' => 'Draw _temporary contents',
                 'word_count' => 'Draw r_ecognised words',
                 'room_flag' => 'Draw r_oom flag text',
-                'visit_count' => 'Draw _character visits',
+                'visit_count' => 'Draw character _visits',
                 'compare_count' => 'Draw _matching rooms',
                 'profile_count' => 'Draw e_xclusive profiles',
-                'title_descrip' => 'Draw titles/descriptions',
-                'exit_pattern' => 'Draw exit patterns',
+                'title_descrip' => 'Draw t_itles/descriptions',
+                'exit_pattern' => 'Draw exit _patterns',
                 'source_code' => 'Draw room _source code',
-                'vnum' => 'Draw world\'s room _vnum',
+                'vnum' => 'Draw world\'s room v_num',
             );
 
             do {
@@ -3480,8 +3307,10 @@
                 $mode = $interiorList[$count];
 
                 # (For $count = 0, $item_group is 'undef')
-                my $item_radio = Gtk2::RadioMenuItem->new($item_group, $interiorHash{$mode});
-
+                my $item_radio = Gtk3::RadioMenuItem->new_with_mnemonic(
+                    $item_group,
+                    $interiorHash{$mode},
+                );
                 if ($self->worldModelObj->roomInteriorMode eq $mode) {
 
                     $item_radio->set_active(TRUE);
@@ -3500,9 +3329,9 @@
                 $self->ivAdd('menuToolItemHash', 'interior_mode_' . $mode, $item_radio);
             }
 
-            $subMenu_roomInteriors->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_roomInteriors->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_changeCharDrawn = Gtk2::MenuItem->new('Ch_ange character drawn...');
+            my $item_changeCharDrawn = Gtk3::MenuItem->new('Ch_ange character drawn...');
             $item_changeCharDrawn->signal_connect('activate' => sub {
 
                 # (Callback func has no dependencies)
@@ -3510,14 +3339,17 @@
             });
             $subMenu_roomInteriors->append($item_changeCharDrawn);
 
-        my $item_roomInteriors = Gtk2::MenuItem->new('Room _interiors');
+        my $item_roomInteriors = Gtk3::MenuItem->new('R_oom interiors');
         $item_roomInteriors->set_submenu($subMenu_roomInteriors);
         $column_view->append($item_roomInteriors);
 
             # 'All exits' submenu
-            my $subMenu_allExits = Gtk2::Menu->new();
+            my $subMenu_allExits = Gtk3::Menu->new();
 
-            my $item_radio11 = Gtk2::RadioMenuItem->new(undef, '_Use region exit settings');
+            my $item_radio11 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                undef,
+                '_Use region exit settings',
+            );
             $item_radio11->signal_connect('toggled' => sub {
 
                 if (! $self->ignoreMenuUpdateFlag && $item_radio11->get_active()) {
@@ -3536,7 +3368,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_defer_exits', $item_radio11);
 
-            my $item_radio12 = Gtk2::RadioMenuItem->new($item_group1, 'Draw _no exits');
+            my $item_radio12 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group1,
+                'Draw _no exits',
+            );
             if ($self->worldModelObj->drawExitMode eq 'no_exit') {
 
                 $item_radio12->set_active(TRUE);
@@ -3558,7 +3393,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_no_exits', $item_radio12);
 
-            my $item_radio13 = Gtk2::RadioMenuItem->new($item_group1, 'Draw _simple exits');
+            my $item_radio13 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group1,
+                'Draw _simple exits',
+            );
             if ($self->worldModelObj->drawExitMode eq 'simple_exit') {
 
                 $item_radio13->set_active(TRUE);
@@ -3580,7 +3418,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_simple_exits', $item_radio13);
 
-            my $item_radio14 = Gtk2::RadioMenuItem->new(
+            my $item_radio14 = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_group1,
                 'Draw _complex exits',
             );
@@ -3605,9 +3443,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_complex_exits', $item_radio14);
 
-            $subMenu_allExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_allExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_drawOrnaments = Gtk2::CheckMenuItem->new('Draw exit _ornaments');
+            my $item_drawOrnaments = Gtk3::CheckMenuItem->new('Draw exit _ornaments');
             $item_drawOrnaments->set_active($self->worldModelObj->drawOrnamentsFlag);
             $item_drawOrnaments->signal_connect('toggled' => sub {
 
@@ -3626,14 +3464,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_ornaments', $item_drawOrnaments);
 
-        my $item_allExits = Gtk2::MenuItem->new('Exits (_all regions)');
+        my $item_allExits = Gtk3::MenuItem->new('Exits (_all regions)');
         $item_allExits->set_submenu($subMenu_allExits);
         $column_view->append($item_allExits);
 
             # 'Region exits' submenu
-            my $subMenu_regionExits = Gtk2::Menu->new();
+            my $subMenu_regionExits = Gtk3::Menu->new();
 
-            my $item_radio21 = Gtk2::RadioMenuItem->new(undef, 'Draw _no exits');
+            my $item_radio21 = Gtk3::RadioMenuItem->new_with_mnemonic(undef, 'Draw _no exits');
             $item_radio21->signal_connect('toggled' => sub {
 
                 if (! $self->ignoreMenuUpdateFlag && $item_radio21->get_active()) {
@@ -3649,7 +3487,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'region_draw_no_exits', $item_radio21);
 
-            my $item_radio22 = Gtk2::RadioMenuItem->new($item_group2, 'Draw _simple exits');
+            my $item_radio22 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group2,
+                'Draw _simple exits',
+            );
             if ($self->currentRegionmap && $self->currentRegionmap->drawExitMode eq 'simple_exit') {
 
                 $item_radio22->set_active(TRUE);
@@ -3668,7 +3509,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'region_draw_simple_exits', $item_radio22);
 
-            my $item_radio23 = Gtk2::RadioMenuItem->new($item_group2, 'Draw _complex exits');
+            my $item_radio23 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group2,
+                'Draw _complex exits',
+            );
             if (
                 $self->currentRegionmap
                 && $self->currentRegionmap->drawExitMode eq 'complex_exit'
@@ -3689,17 +3533,17 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'region_draw_complex_exits', $item_radio23);
 
-        my $item_regionExits = Gtk2::MenuItem->new('Exits (_current region)');
+        my $item_regionExits = Gtk3::MenuItem->new('Exits (_current region)');
         $item_regionExits->set_submenu($subMenu_regionExits);
         $column_view->append($item_regionExits);
         # (Requires $self->currentRegionmap and $self->worldModelObj->drawExitMode is
         #   'ask_regionmap')
         $self->ivAdd('menuToolItemHash', 'draw_region_exits', $item_regionExits);
 
-        $column_view->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_view->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_zoomIn = Gtk2::ImageMenuItem->new('Zoom i_n');
-        my $img_zoomIn = Gtk2::Image->new_from_stock('gtk-zoom-in', 'menu');
+        my $item_zoomIn = Gtk3::ImageMenuItem->new('Zoom i_n');
+        my $img_zoomIn = Gtk3::Image->new_from_stock('gtk-zoom-in', 'menu');
         $item_zoomIn->set_image($img_zoomIn);
         $item_zoomIn->signal_connect('activate' => sub {
 
@@ -3709,8 +3553,8 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'zoom_in', $item_zoomIn);
 
-        my $item_zoomOut = Gtk2::ImageMenuItem->new('Zoom _out');
-        my $img_zoomOut = Gtk2::Image->new_from_stock('gtk-zoom-out', 'menu');
+        my $item_zoomOut = Gtk3::ImageMenuItem->new('Zoom _out');
+        my $img_zoomOut = Gtk3::Image->new_from_stock('gtk-zoom-out', 'menu');
         $item_zoomOut->set_image($img_zoomOut);
         $item_zoomOut->signal_connect('activate' => sub {
 
@@ -3721,7 +3565,7 @@
         $self->ivAdd('menuToolItemHash', 'zoom_out', $item_zoomOut);
 
             # 'Zoom' submenu
-            my $subMenu_zoom = Gtk2::Menu->new();
+            my $subMenu_zoom = Gtk3::Menu->new();
 
             # Import the list of magnifications
             @magList = $self->constMagnifyList;
@@ -3731,7 +3575,7 @@
 
             foreach my $mag (@shortMagList) {
 
-                my $menuItem = Gtk2::MenuItem->new('Zoom ' . $mag * 100 . '%');
+                my $menuItem = Gtk3::MenuItem->new('Zoom ' . $mag * 100 . '%');
                 $menuItem->signal_connect('activate' => sub {
 
                     # No argument causes the called function to prompt the user
@@ -3740,25 +3584,25 @@
                 $subMenu_zoom->append($menuItem);
             }
 
-            $subMenu_zoom->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_zoom->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_zoomMax = Gtk2::MenuItem->new('Zoom _in max');
+            my $item_zoomMax = Gtk3::MenuItem->new('Zoom _in max');
             $item_zoomMax->signal_connect('activate' => sub {
 
                 $self->zoomCallback($magList[-1]);
             });
             $subMenu_zoom->append($item_zoomMax);
 
-            my $item_zoomMin = Gtk2::MenuItem->new('Zoom _out max');
+            my $item_zoomMin = Gtk3::MenuItem->new('Zoom _out max');
             $item_zoomMin->signal_connect('activate' => sub {
 
                 $self->zoomCallback($magList[0]);
             });
             $subMenu_zoom->append($item_zoomMin);
 
-            $subMenu_zoom->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_zoom->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_zoomPrompt = Gtk2::MenuItem->new('O_ther...');
+            my $item_zoomPrompt = Gtk3::MenuItem->new('O_ther...');
             $item_zoomPrompt->signal_connect('activate' => sub {
 
                 # No argument causes the called function to prompt the user
@@ -3766,20 +3610,20 @@
             });
             $subMenu_zoom->append($item_zoomPrompt);
 
-        my $item_zoom = Gtk2::ImageMenuItem->new('_Zoom');
-        my $img_zoom = Gtk2::Image->new_from_stock('gtk-zoom-fit', 'menu');
+        my $item_zoom = Gtk3::ImageMenuItem->new('_Zoom');
+        my $img_zoom = Gtk3::Image->new_from_stock('gtk-zoom-fit', 'menu');
         $item_zoom->set_image($img_zoom);
         $item_zoom->set_submenu($subMenu_zoom);
         $column_view->append($item_zoom);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'zoom_sub', $item_zoom);
 
-        $column_view->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_view->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Level' submenu
-            my $subMenu_level = Gtk2::Menu->new();
+            my $subMenu_level = Gtk3::Menu->new();
 
-            my $item_moveUpLevel = Gtk2::MenuItem->new('Move _up level');
+            my $item_moveUpLevel = Gtk3::MenuItem->new('Move _up level');
             $item_moveUpLevel->signal_connect('activate' => sub {
 
                 $self->setCurrentLevel($self->currentRegionmap->currentLevel + 1);
@@ -3791,7 +3635,7 @@
             # (Requires $self->currentRegionmap)
             $self->ivAdd('menuToolItemHash', 'move_up_level', $item_moveUpLevel);
 
-            my $item_moveDownLevel = Gtk2::MenuItem->new('Move _down level');
+            my $item_moveDownLevel = Gtk3::MenuItem->new('Move _down level');
             $item_moveDownLevel->signal_connect('activate' => sub {
 
                 $self->setCurrentLevel($self->currentRegionmap->currentLevel - 1);
@@ -3803,27 +3647,27 @@
             # (Requires $self->currentRegionmap)
             $self->ivAdd('menuToolItemHash', 'move_down_level', $item_moveDownLevel);
 
-            $subMenu_level->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_level->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_changeLevel = Gtk2::MenuItem->new('_Change level...');
+            my $item_changeLevel = Gtk3::MenuItem->new('_Change level...');
             $item_changeLevel->signal_connect('activate' => sub {
 
                 $self->changeLevelCallback();
             });
             $subMenu_level->append($item_changeLevel);
 
-        my $item_level = Gtk2::MenuItem->new('_Level');
+        my $item_level = Gtk3::MenuItem->new('_Level');
         $item_level->set_submenu($subMenu_level);
         $column_view->append($item_level);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'level_sub', $item_level);
 
-        $column_view->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_view->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Centre map' submenu
-            my $subMenu_centreMap = Gtk2::Menu->new();
+            my $subMenu_centreMap = Gtk3::Menu->new();
 
-            my $item_centreMap_currentRoom = Gtk2::MenuItem->new('_Current room');
+            my $item_centreMap_currentRoom = Gtk3::MenuItem->new('_Current room');
             $item_centreMap_currentRoom->signal_connect('activate' => sub {
 
                 $self->centreMapOverRoom($self->mapObj->currentRoom);
@@ -3836,7 +3680,7 @@
                 $item_centreMap_currentRoom,
             );
 
-            my $item_centreMap_selectRoom = Gtk2::MenuItem->new('_Selected room');
+            my $item_centreMap_selectRoom = Gtk3::MenuItem->new('_Selected room');
             $item_centreMap_selectRoom->signal_connect('activate' => sub {
 
                 $self->centreMapOverRoom($self->selectedRoom);
@@ -3849,7 +3693,7 @@
                 $item_centreMap_selectRoom,
             );
 
-            my $item_centreMap_lastKnownRoom = Gtk2::MenuItem->new('_Last known room');
+            my $item_centreMap_lastKnownRoom = Gtk3::MenuItem->new('_Last known room');
             $item_centreMap_lastKnownRoom->signal_connect('activate' => sub {
 
                 $self->centreMapOverRoom($self->mapObj->lastKnownRoom);
@@ -3862,9 +3706,9 @@
                 $item_centreMap_lastKnownRoom,
             );
 
-            $subMenu_centreMap->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_centreMap->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_centreMap_middleGrid = Gtk2::MenuItem->new('_Middle of grid');
+            my $item_centreMap_middleGrid = Gtk3::MenuItem->new('_Middle of grid');
             $item_centreMap_middleGrid->signal_connect('activate' => sub {
 
                 $self->setMapPosn(0.5, 0.5);
@@ -3873,13 +3717,13 @@
             # (Requires $self->currentRegionmap)
             $self->ivAdd('menuToolItemHash', 'centre_map_middle_grid', $item_centreMap_middleGrid);
 
-        my $item_centreMap = Gtk2::MenuItem->new('Centre _map');
+        my $item_centreMap = Gtk3::MenuItem->new('Centre _map');
         $item_centreMap->set_submenu($subMenu_centreMap);
         $column_view->append($item_centreMap);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'centre_map_sub', $item_centreMap);
 
-        my $item_repositionAllMaps = Gtk2::MenuItem->new('R_eposition all maps');
+        my $item_repositionAllMaps = Gtk3::MenuItem->new('_Reposition all maps');
         $item_repositionAllMaps->signal_connect('activate' => sub {
 
             $self->worldModelObj->repositionMaps();
@@ -3887,9 +3731,9 @@
         $column_view->append($item_repositionAllMaps);
 
             # 'Tracking' submenu
-            my $subMenu_tracking = Gtk2::Menu->new();
+            my $subMenu_tracking = Gtk3::Menu->new();
 
-            my $item_trackCurrentRoom = Gtk2::CheckMenuItem->new('_Track current room');
+            my $item_trackCurrentRoom = Gtk3::CheckMenuItem->new('_Track current room');
             $item_trackCurrentRoom->set_active($self->worldModelObj->trackPosnFlag);
             $item_trackCurrentRoom->signal_connect('toggled' => sub {
 
@@ -3908,9 +3752,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'track_current_room', $item_trackCurrentRoom);
 
-            $subMenu_tracking->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_tracking->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_radio31 = Gtk2::RadioMenuItem->new(undef, '_Always track');
+            my $item_radio31 = Gtk3::RadioMenuItem->new_with_mnemonic(undef, '_Always track');
             if (
                 $self->worldModelObj->trackingSensitivity != 0.33
                 && $self->worldModelObj->trackingSensitivity != 0.66
@@ -3932,7 +3776,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'track_always', $item_radio31);
 
-            my $item_radio32 = Gtk2::RadioMenuItem->new($item_group3, 'Track near _centre');
+            my $item_radio32 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group3,
+                'Track near _centre',
+            );
             if ($self->worldModelObj->trackingSensitivity == 0.33) {
 
                 $item_radio32->set_active(TRUE);
@@ -3948,7 +3795,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'track_near_centre', $item_radio32);
 
-            my $item_radio33 = Gtk2::RadioMenuItem->new($item_group3, 'Track near _edge');
+            my $item_radio33 = Gtk3::RadioMenuItem->new_with_mnemonic(
+                $item_group3,
+                'Track near _edge',
+            );
             if ($self->worldModelObj->trackingSensitivity == 0.66) {
 
                 $item_radio33->set_active(TRUE);
@@ -3964,7 +3814,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'track_near_edge', $item_radio33);
 
-            my $item_radio34 = Gtk2::RadioMenuItem->new(
+            my $item_radio34 = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_group3,
                 'Track if not _visible',
             );
@@ -3983,7 +3833,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'track_not_visible', $item_radio34);
 
-        my $item_tracking = Gtk2::MenuItem->new('_Tracking');
+        my $item_tracking = Gtk3::MenuItem->new('_Tracking');
         $item_tracking->set_submenu($subMenu_tracking);
         $column_view->append($item_tracking);
 
@@ -4001,7 +3851,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -4012,7 +3862,7 @@
         }
 
         # Set up column
-        my $column_mode = Gtk2::Menu->new();
+        my $column_mode = Gtk3::Menu->new();
         if (! $column_mode) {
 
             return undef;
@@ -4020,7 +3870,7 @@
 
         # (Save each radio menu item in a hash IV, so that when $self->setMode is called, the radio
         #   group can be toggled)
-        my $item_radio1 = Gtk2::RadioMenuItem->new(undef, '_Wait mode');
+        my $item_radio1 = Gtk3::RadioMenuItem->new_with_mnemonic(undef, '_Wait mode');
         $item_radio1->signal_connect('toggled' => sub {
 
             # (To stop the equivalent toolbar icon from being toggled by the call to ->setMode,
@@ -4035,7 +3885,7 @@
         # (Never desensitised)
         $self->ivAdd('menuToolItemHash', 'set_wait_mode', $item_radio1);
 
-        my $item_radio2 = Gtk2::RadioMenuItem->new($item_group, '_Follow mode');
+        my $item_radio2 = Gtk3::RadioMenuItem->new_with_mnemonic($item_group, '_Follow mode');
         $item_radio2->signal_connect('toggled' => sub {
 
             if ($item_radio2->get_active && ! $self->ignoreMenuUpdateFlag) {
@@ -4047,7 +3897,7 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'set_follow_mode', $item_radio2);
 
-        my $item_radio3 = Gtk2::RadioMenuItem->new($item_group, '_Update mode');
+        my $item_radio3 = Gtk3::RadioMenuItem->new_with_mnemonic($item_group, '_Update mode');
         $item_radio3->signal_connect('toggled' => sub {
 
             if ($item_radio3->get_active && ! $self->ignoreMenuUpdateFlag) {
@@ -4060,9 +3910,9 @@
         #   FALSE and a session not in 'connect offline' mode
         $self->ivAdd('menuToolItemHash', 'set_update_mode', $item_radio3);
 
-        $column_mode->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_mode->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-        my $item_dragMode = Gtk2::CheckMenuItem->new('_Drag mode');
+        my $item_dragMode = Gtk3::CheckMenuItem->new('_Drag mode');
         $item_dragMode->set_active($self->dragModeFlag);
         $item_dragMode->signal_connect('toggled' => sub {
 
@@ -4083,7 +3933,7 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'drag_mode', $item_dragMode);
 
-        my $item_graffitMode = Gtk2::CheckMenuItem->new('_Graffiti mode');
+        my $item_graffitMode = Gtk3::CheckMenuItem->new('_Graffiti mode');
         $item_graffitMode->set_active($self->graffitiModeFlag);
         $item_graffitMode->signal_connect('toggled' => sub {
 
@@ -4146,12 +3996,12 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'graffiti_mode', $item_graffitMode);
 
-        $column_mode->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_mode->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Match rooms' submenu
-            my $subMenu_matchRooms = Gtk2::Menu->new();
+            my $subMenu_matchRooms = Gtk3::Menu->new();
 
-            my $item_matchTitle = Gtk2::CheckMenuItem->new('Match room _titles');
+            my $item_matchTitle = Gtk3::CheckMenuItem->new('Match room _titles');
             $item_matchTitle->set_active($self->worldModelObj->matchTitleFlag);
             $item_matchTitle->signal_connect('toggled' => sub {
 
@@ -4169,7 +4019,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'match_title', $item_matchTitle);
 
-            my $item_matchDescrip = Gtk2::CheckMenuItem->new('_Match room descriptions');
+            my $item_matchDescrip = Gtk3::CheckMenuItem->new('Match room _descriptions');
             $item_matchDescrip->set_active($self->worldModelObj->matchDescripFlag);
             $item_matchDescrip->signal_connect('toggled' => sub {
 
@@ -4187,7 +4037,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'match_descrip', $item_matchDescrip);
 
-            my $item_matchExit = Gtk2::CheckMenuItem->new('Match _exits');
+            my $item_matchExit = Gtk3::CheckMenuItem->new('Match _exits');
             $item_matchExit->set_active($self->worldModelObj->matchExitFlag);
             $item_matchExit->signal_connect('toggled' => sub {
 
@@ -4205,7 +4055,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'match_exit', $item_matchExit);
 
-            my $item_matchSource = Gtk2::CheckMenuItem->new('Match _source code');
+            my $item_matchSource = Gtk3::CheckMenuItem->new('Match _source code');
             $item_matchSource->set_active($self->worldModelObj->matchSourceFlag);
             $item_matchSource->signal_connect('toggled' => sub {
 
@@ -4223,7 +4073,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'match_source', $item_matchSource);
 
-            my $item_matchVNum = Gtk2::CheckMenuItem->new('Match room _vnum');
+            my $item_matchVNum = Gtk3::CheckMenuItem->new('Match room _vnum');
             $item_matchVNum->set_active($self->worldModelObj->matchVNumFlag);
             $item_matchVNum->signal_connect('toggled' => sub {
 
@@ -4241,23 +4091,23 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'match_vnum', $item_matchVNum);
 
-            $subMenu_matchRooms->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_matchRooms->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_verboseChars = Gtk2::MenuItem->new('Set description _length...');
+            my $item_verboseChars = Gtk3::MenuItem->new('Set description _length...');
             $item_verboseChars->signal_connect('activate' => sub {
 
                 $self->verboseCharsCallback();
             });
             $subMenu_matchRooms->append($item_verboseChars);
 
-        my $item_matchRooms = Gtk2::MenuItem->new('_Match rooms');
+        my $item_matchRooms = Gtk3::MenuItem->new('_Match rooms');
         $item_matchRooms->set_submenu($subMenu_matchRooms);
         $column_mode->append($item_matchRooms);
 
             # 'Update rooms' submenu
-            my $subMenu_updateRooms = Gtk2::Menu->new();
+            my $subMenu_updateRooms = Gtk3::Menu->new();
 
-            my $item_updateTitle = Gtk2::CheckMenuItem->new('Update room _titles');
+            my $item_updateTitle = Gtk3::CheckMenuItem->new('Update room _titles');
             $item_updateTitle->set_active($self->worldModelObj->updateTitleFlag);
             $item_updateTitle->signal_connect('toggled' => sub {
 
@@ -4275,7 +4125,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'update_title', $item_updateTitle);
 
-            my $item_updateDescrip = Gtk2::CheckMenuItem->new('Update room _descriptions');
+            my $item_updateDescrip = Gtk3::CheckMenuItem->new('Update room _descriptions');
             $item_updateDescrip->set_active($self->worldModelObj->updateDescripFlag);
             $item_updateDescrip->signal_connect('toggled' => sub {
 
@@ -4293,7 +4143,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'update_descrip', $item_updateDescrip);
 
-            my $item_updateExit = Gtk2::CheckMenuItem->new('Update _exits');
+            my $item_updateExit = Gtk3::CheckMenuItem->new('Update _exits');
             $item_updateExit->set_active($self->worldModelObj->updateExitFlag);
             $item_updateExit->signal_connect('toggled' => sub {
 
@@ -4312,7 +4162,7 @@
             $self->ivAdd('menuToolItemHash', 'update_exit', $item_updateExit);
 
             my $item_updateOrnament
-                = Gtk2::CheckMenuItem->new('Update _ornaments from exit state');
+                = Gtk3::CheckMenuItem->new('Update _ornaments from exit state');
             $item_updateOrnament->set_active($self->worldModelObj->updateOrnamentFlag);
             $item_updateOrnament->signal_connect('toggled' => sub {
 
@@ -4330,7 +4180,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'update_ornament', $item_updateOrnament);
 
-            my $item_updateSource = Gtk2::CheckMenuItem->new('Update _source code');
+            my $item_updateSource = Gtk3::CheckMenuItem->new('Update _source code');
             $item_updateSource->set_active($self->worldModelObj->updateSourceFlag);
             $item_updateSource->signal_connect('toggled' => sub {
 
@@ -4348,7 +4198,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'update_source', $item_updateSource);
 
-            my $item_updateVNum = Gtk2::CheckMenuItem->new('Update room _vnum, etc');
+            my $item_updateVNum = Gtk3::CheckMenuItem->new('Update room _vnum, etc');
             $item_updateVNum->set_active($self->worldModelObj->updateVNumFlag);
             $item_updateVNum->signal_connect('toggled' => sub {
 
@@ -4366,7 +4216,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'update_vnum', $item_updateVNum);
 
-            my $item_updateRoomCmd = Gtk2::CheckMenuItem->new('Update room _commands');
+            my $item_updateRoomCmd = Gtk3::CheckMenuItem->new('Update room _commands');
             $item_updateRoomCmd->set_active($self->worldModelObj->updateRoomCmdFlag);
             $item_updateRoomCmd->signal_connect('toggled' => sub {
 
@@ -4384,9 +4234,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'update_room_cmd', $item_updateRoomCmd);
 
-            $subMenu_updateRooms->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_updateRooms->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_analyseDescrip = Gtk2::CheckMenuItem->new('A_nalyse room descrips');
+            my $item_analyseDescrip = Gtk3::CheckMenuItem->new('_Analyse room descrips');
             $item_analyseDescrip->set_active($self->worldModelObj->analyseDescripFlag);
             $item_analyseDescrip->signal_connect('toggled' => sub {
 
@@ -4404,16 +4254,16 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'analyse_descrip', $item_analyseDescrip);
 
-        my $item_updateRooms = Gtk2::MenuItem->new('Update _rooms');
+        my $item_updateRooms = Gtk3::MenuItem->new('Update _rooms');
         $item_updateRooms->set_submenu($subMenu_updateRooms);
         $column_mode->append($item_updateRooms);
 
-        $column_mode->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_mode->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Painter' submenu
-            my $subMenu_painter = Gtk2::Menu->new();
+            my $subMenu_painter = Gtk3::Menu->new();
 
-            my $item_painterEnabled = Gtk2::CheckMenuItem->new('_Painter enabled');
+            my $item_painterEnabled = Gtk3::CheckMenuItem->new('_Painter enabled');
             $item_painterEnabled->set_active($self->painterFlag);
             $item_painterEnabled->signal_connect('toggled' => sub {
 
@@ -4437,9 +4287,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'enable_painter', $item_painterEnabled);
 
-            $subMenu_painter->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_painter->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_paintAll = Gtk2::RadioMenuItem->new(undef, 'Paint _all rooms');
+            my $item_paintAll = Gtk3::RadioMenuItem->new_with_mnemonic(undef, 'Paint _all rooms');
             $item_paintAll->signal_connect('toggled' => sub {
 
                 if ($item_paintAll->get_active) {
@@ -4458,9 +4308,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'paint_all', $item_paintAll);
 
-            my $item_paintNew = Gtk2::RadioMenuItem->new(
+            my $item_paintNew = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_paintGroup,
-                'Paint only _new rooms',
+                'Paint _only new rooms',
             );
             if (! $self->worldModelObj->paintAllRoomsFlag) {
 
@@ -4483,9 +4333,12 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'paint_new', $item_paintNew);
 
-            $subMenu_painter->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_painter->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_paintNormal = Gtk2::RadioMenuItem->new(undef, 'Paint _normal rooms');
+            my $item_paintNormal = Gtk3::RadioMenuItem->new_with_mnemonic(
+                undef,
+                'Paint _normal rooms',
+            );
             $item_paintNormal->signal_connect('toggled' => sub {
 
                 if ($item_paintNormal->get_active) {
@@ -4504,7 +4357,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'paint_normal', $item_paintNormal);
 
-            my $item_paintWild = Gtk2::RadioMenuItem->new(
+            my $item_paintWild = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_paintGroup2,
                 'Paint _wilderness rooms',
             );
@@ -4529,7 +4382,7 @@
             # (Requires $self->session->currentWorld->basicMappingFlag to be FALSE)
             $self->ivAdd('menuToolItemHash', 'paint_wild', $item_paintWild);
 
-            my $item_paintBorder = Gtk2::RadioMenuItem->new(
+            my $item_paintBorder = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_paintGroup2,
                 'Paint wilderness _border rooms',
             );
@@ -4554,9 +4407,9 @@
             # (Requires $self->session->currentWorld->basicMappingFlag to be FALSE)
             $self->ivAdd('menuToolItemHash', 'paint_border', $item_paintBorder);
 
-            $subMenu_painter->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_painter->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_repaintCurrentRoom = Gtk2::MenuItem->new('Repaint _current room');
+            my $item_repaintCurrentRoom = Gtk3::MenuItem->new('Repaint _current room');
             $item_repaintCurrentRoom->signal_connect('activate' => sub {
 
                 if ($self->mapObj->currentRoom) {
@@ -4570,7 +4423,7 @@
             # (Requires $self->currentRegionmap and $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'repaint_current', $item_repaintCurrentRoom);
 
-            my $item_repaintSelectedRooms = Gtk2::MenuItem->new('Repaint _selected rooms');
+            my $item_repaintSelectedRooms = Gtk3::MenuItem->new('Repaint _selected rooms');
             $item_repaintSelectedRooms->signal_connect('activate' => sub {
 
                 $self->repaintSelectedRoomsCallback();
@@ -4580,10 +4433,10 @@
             #   $self->selectedRoomHash)
             $self->ivAdd('menuToolItemHash', 'repaint_selected', $item_repaintSelectedRooms);
 
-            $subMenu_painter->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_painter->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_editPainter = Gtk2::ImageMenuItem->new('_Edit painter');
-            my $img_editPainter = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+            my $item_editPainter = Gtk3::ImageMenuItem->new('_Edit painter...');
+            my $img_editPainter = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
             $item_editPainter->set_image($img_editPainter);
             $item_editPainter->signal_connect('activate' => sub {
 
@@ -4599,9 +4452,9 @@
             });
             $subMenu_painter->append($item_editPainter);
 
-            $subMenu_painter->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_painter->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_resetPainter = Gtk2::MenuItem->new('_Reset painter');
+            my $item_resetPainter = Gtk3::MenuItem->new('_Reset painter');
             $item_resetPainter->signal_connect('activate' => sub {
 
                 $self->worldModelObj->resetPainter($self->session);
@@ -4615,18 +4468,18 @@
             });
             $subMenu_painter->append($item_resetPainter);
 
-        my $item_painter = Gtk2::ImageMenuItem->new('_Painter');
-        my $img_painter = Gtk2::Image->new_from_stock('gtk-select-color', 'menu');
+        my $item_painter = Gtk3::ImageMenuItem->new('_Painter');
+        my $img_painter = Gtk3::Image->new_from_stock('gtk-select-color', 'menu');
         $item_painter->set_image($img_painter);
         $item_painter->set_submenu($subMenu_painter);
         $column_mode->append($item_painter);
 
-        $column_mode->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_mode->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Auto-compare' submenu
-            my $subMenu_autoCompare = Gtk2::Menu->new();
+            my $subMenu_autoCompare = Gtk3::Menu->new();
 
-            my $item_compareDefault = Gtk2::RadioMenuItem->new(
+            my $item_compareDefault = Gtk3::RadioMenuItem->new_with_mnemonic(
                 undef,
                 '_Don\'t auto-compare current room',
             );
@@ -4642,7 +4495,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_compare_default', $item_compareDefault);
 
-            my $item_compareNew = Gtk2::RadioMenuItem->new(
+            my $item_compareNew = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_compareGroup,
                 'Auto-compare _new rooms',
             );
@@ -4661,7 +4514,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_compare_new', $item_compareNew);
 
-            my $item_compareCurrent = Gtk2::RadioMenuItem->new(
+            my $item_compareCurrent = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_compareGroup,
                 'Auto-compare the _current room',
             );
@@ -4680,9 +4533,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_compare_current', $item_compareCurrent);
 
-            $subMenu_autoCompare->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_autoCompare->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_compareRegion = Gtk2::RadioMenuItem->new(
+            my $item_compareRegion = Gtk3::RadioMenuItem->new_with_mnemonic(
                 undef,
                 'Compare with rooms in _same region',
             );
@@ -4698,7 +4551,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_compare_region', $item_compareRegion);
 
-            my $item_compareWhole = Gtk2::RadioMenuItem->new(
+            my $item_compareWhole = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_compareRegionGroup,
                 'Compare with rooms in _whole world',
             );
@@ -4717,9 +4570,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_compare_model', $item_compareWhole);
 
-            $subMenu_autoCompare->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_autoCompare->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_compareMax = Gtk2::MenuItem->new('Set limit on room comparisons...');
+            my $item_compareMax = Gtk3::MenuItem->new('Set _limit on room comparisons...');
             $item_compareMax->signal_connect('activate' => sub {
 
                 $self->autoCompareMaxCallback();
@@ -4728,14 +4581,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_compare_max', $item_compareMax);
 
-        my $item_autoCompare = Gtk2::MenuItem->new('_Auto-compare');
+        my $item_autoCompare = Gtk3::MenuItem->new('_Auto-compare');
         $item_autoCompare->set_submenu($subMenu_autoCompare);
         $column_mode->append($item_autoCompare);
 
             # 'Auto-rescue mode' submenu
-            my $subMenu_autoRescue = Gtk2::Menu->new();
+            my $subMenu_autoRescue = Gtk3::Menu->new();
 
-            my $item_autoRescueEnable = Gtk2::CheckMenuItem->new('Enable _auto-rescue mode');
+            my $item_autoRescueEnable = Gtk3::CheckMenuItem->new('_Enable auto-rescue mode');
             $item_autoRescueEnable->set_active($self->worldModelObj->autoRescueFlag);
             $item_autoRescueEnable->signal_connect('toggled' => sub {
 
@@ -4753,10 +4606,10 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_rescue', $item_autoRescueEnable);
 
-            $subMenu_autoRescue->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_autoRescue->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_autoRescueFirst = Gtk2::CheckMenuItem->new(
-                'Merge at first matching room',
+            my $item_autoRescueFirst = Gtk3::CheckMenuItem->new(
+                '_Merge at first matching room',
             );
             $item_autoRescueFirst->set_active($self->worldModelObj->autoRescueFirstFlag);
             $item_autoRescueFirst->signal_connect('toggled' => sub {
@@ -4775,7 +4628,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_rescue_first', $item_autoRescueFirst);
 
-            my $item_autoRescuePrompt = Gtk2::CheckMenuItem->new('_Prompt before merging');
+            my $item_autoRescuePrompt = Gtk3::CheckMenuItem->new('_Prompt before merging');
             $item_autoRescuePrompt->set_active($self->worldModelObj->autoRescuePromptFlag);
             $item_autoRescuePrompt->signal_connect('toggled' => sub {
 
@@ -4793,9 +4646,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_rescue_prompt', $item_autoRescuePrompt);
 
-            $subMenu_autoRescue->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_autoRescue->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_autoRescueNoMove = Gtk2::CheckMenuItem->new('Don\'t move non-matching rooms');
+            my $item_autoRescueNoMove = Gtk3::CheckMenuItem->new('_Don\'t move non-matching rooms');
             $item_autoRescueNoMove->set_active($self->worldModelObj->autoRescueNoMoveFlag);
             $item_autoRescueNoMove->signal_connect('toggled' => sub {
 
@@ -4813,8 +4666,8 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_rescue_no_move', $item_autoRescueNoMove);
 
-            my $item_autoRescueVisits = Gtk2::CheckMenuItem->new(
-                'Only update visits in merged rooms',
+            my $item_autoRescueVisits = Gtk3::CheckMenuItem->new(
+                '_Only update visits in merged rooms',
             );
             $item_autoRescueVisits->set_active($self->worldModelObj->autoRescueVisitsFlag);
             $item_autoRescueVisits->signal_connect('toggled' => sub {
@@ -4833,7 +4686,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_rescue_visits', $item_autoRescueVisits);
 
-            my $item_autoRescueForce = Gtk2::CheckMenuItem->new(
+            my $item_autoRescueForce = Gtk3::CheckMenuItem->new(
                 '_Temporarily switch to \'update\' mode',
             );
             $item_autoRescueForce->set_active($self->worldModelObj->autoRescueForceFlag);
@@ -4853,14 +4706,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_rescue_force', $item_autoRescueForce);
 
-        my $item_autoRescue = Gtk2::MenuItem->new('Auto-_rescue mode');
+        my $item_autoRescue = Gtk3::MenuItem->new('Auto-r_escue mode');
         $item_autoRescue->set_submenu($subMenu_autoRescue);
         $column_mode->append($item_autoRescue);
 
             # 'Auto-slide mode' submenu
-            my $subMenu_autoSlide = Gtk2::Menu->new();
+            my $subMenu_autoSlide = Gtk3::Menu->new();
 
-            my $item_slideMode = Gtk2::RadioMenuItem->new(
+            my $item_slideMode = Gtk3::RadioMenuItem->new_with_mnemonic(
                 undef,
                 '_Don\'t auto-slide new rooms',
             );
@@ -4876,9 +4729,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_default', $item_slideMode);
 
-            my $item_slideOrigPull = Gtk2::RadioMenuItem->new(
+            my $item_slideOrigPull = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_slideGroup,
-                'Slide original room backwards',
+                'Slide original room _backwards',
             );
             if ($self->worldModelObj->autoSlideMode eq 'orig_pull') {
 
@@ -4895,9 +4748,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_orig_pull', $item_slideOrigPull);
 
-            my $item_slideOrigPush = Gtk2::RadioMenuItem->new(
+            my $item_slideOrigPush = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_slideGroup,
-                'Slide original room forwards',
+                'Slide original room _forwards',
             );
             if ($self->worldModelObj->autoSlideMode eq 'orig_push') {
 
@@ -4914,9 +4767,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_orig_pull', $item_slideOrigPush);
 
-            my $item_slideOtherPull = Gtk2::RadioMenuItem->new(
+            my $item_slideOtherPull = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_slideGroup,
-                'Slide blocking room backwards',
+                'Slide blocking room b_ackwards',
             );
             if ($self->worldModelObj->autoSlideMode eq 'other_pull') {
 
@@ -4933,9 +4786,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_orig_pull', $item_slideOtherPull);
 
-            my $item_slideOtherPush = Gtk2::RadioMenuItem->new(
+            my $item_slideOtherPush = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_slideGroup,
-                'Slide blocking room forwards',
+                'Slide blocking room f_orwards',
             );
             if ($self->worldModelObj->autoSlideMode eq 'other_push') {
 
@@ -4952,9 +4805,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_orig_pull', $item_slideOtherPush);
 
-            my $item_slideDestPull = Gtk2::RadioMenuItem->new(
+            my $item_slideDestPull = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_slideGroup,
-                'Slide new room backwards',
+                'Slide new room ba_ckwards',
             );
             if ($self->worldModelObj->autoSlideMode eq 'dest_pull') {
 
@@ -4971,9 +4824,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_orig_pull', $item_slideDestPull);
 
-            my $item_slideDestPush = Gtk2::RadioMenuItem->new(
+            my $item_slideDestPush = Gtk3::RadioMenuItem->new_with_mnemonic(
                 $item_slideGroup,
-                'Slide new room forwards',
+                'Slide new room fo_rwards',
             );
             if ($self->worldModelObj->autoSlideMode eq 'dest_push') {
 
@@ -4990,9 +4843,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_orig_pull', $item_slideDestPush);
 
-            $subMenu_autoSlide->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_autoSlide->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_slideMax = Gtk2::MenuItem->new('Set limit on slide distance...');
+            my $item_slideMax = Gtk3::MenuItem->new('Set _limit on slide distance...');
             $item_slideMax->signal_connect('activate' => sub {
 
                 $self->autoSlideMaxCallback();
@@ -5001,16 +4854,16 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'slide_max', $item_slideMax);
 
-        my $item_autoSlide = Gtk2::MenuItem->new('Auto-_slide mode');
+        my $item_autoSlide = Gtk3::MenuItem->new('Auto-s_lide mode');
         $item_autoSlide->set_submenu($subMenu_autoSlide);
         $column_mode->append($item_autoSlide);
 
-        $column_mode->append(Gtk2::SeparatorMenuItem->new());   # Separator
+        $column_mode->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
             # 'Start-up flags' submenu
-            my $subMenu_startUpFlags = Gtk2::Menu->new();
+            my $subMenu_startUpFlags = Gtk3::Menu->new();
 
-            my $item_autoOpenWindow = Gtk2::CheckMenuItem->new('_Open automapper on startup');
+            my $item_autoOpenWindow = Gtk3::CheckMenuItem->new('Open _automapper on startup');
             $item_autoOpenWindow->set_active($self->worldModelObj->autoOpenWinFlag);
             $item_autoOpenWindow->signal_connect('toggled' => sub {
 
@@ -5028,7 +4881,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'auto_open_win', $item_autoOpenWindow);
 
-            my $item_pseudoWin = Gtk2::CheckMenuItem->new('Open as _pseudo-window');
+            my $item_pseudoWin = Gtk3::CheckMenuItem->new('Open as _pseudo-window');
             $item_pseudoWin->set_active($self->worldModelObj->pseudoWinFlag);
             $item_pseudoWin->signal_connect('toggled' => sub {
 
@@ -5046,7 +4899,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'pseudo_win', $item_pseudoWin);
 
-            my $item_allowTrackAlone = Gtk2::CheckMenuItem->new('_Follow character after closing');
+            my $item_allowTrackAlone = Gtk3::CheckMenuItem->new('_Follow character after closing');
             $item_allowTrackAlone->set_active($self->worldModelObj->allowTrackAloneFlag);
             $item_allowTrackAlone->signal_connect('toggled' => sub {
 
@@ -5064,14 +4917,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'keep_following', $item_allowTrackAlone);
 
-        my $item_startUpFlags = Gtk2::MenuItem->new('_Start-up flags');
+        my $item_startUpFlags = Gtk3::MenuItem->new('S_tart-up flags');
         $item_startUpFlags->set_submenu($subMenu_startUpFlags);
         $column_mode->append($item_startUpFlags);
 
             # 'Drawing flags' submenu
-            my $subMenu_drawingFlags = Gtk2::Menu->new();
+            my $subMenu_drawingFlags = Gtk3::Menu->new();
 
-            my $item_roomTagsInCaps = Gtk2::CheckMenuItem->new('Capitalise room _tags');
+            my $item_roomTagsInCaps = Gtk3::CheckMenuItem->new('_Capitalise room tags');
             $item_roomTagsInCaps->set_active($self->worldModelObj->capitalisedRoomTagFlag);
             $item_roomTagsInCaps->signal_connect('toggled' => sub {
 
@@ -5089,7 +4942,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'room_tags_capitalised', $item_roomTagsInCaps);
 
-            my $item_drawBentExits = Gtk2::CheckMenuItem->new('Draw _bent broken exits');
+            my $item_drawBentExits = Gtk3::CheckMenuItem->new('Draw _bent broken exits');
             $item_drawBentExits->set_active($self->worldModelObj->drawBentExitsFlag);
             $item_drawBentExits->signal_connect('toggled' => sub {
 
@@ -5107,7 +4960,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_bent_exits', $item_drawBentExits);
 
-            my $item_drawRoomEcho = Gtk2::CheckMenuItem->new('Draw _room echos');
+            my $item_drawRoomEcho = Gtk3::CheckMenuItem->new('Draw _room echos');
             $item_drawRoomEcho->set_active($self->worldModelObj->drawRoomEchoFlag);
             $item_drawRoomEcho->signal_connect('toggled' => sub {
 
@@ -5125,7 +4978,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_room_echo', $item_drawRoomEcho);
 
-            my $item_showTooltips = Gtk2::CheckMenuItem->new('_Show tooltips');
+            my $item_showTooltips = Gtk3::CheckMenuItem->new('Show _tooltips');
             $item_showTooltips->set_active($self->worldModelObj->showTooltipsFlag);
             $item_showTooltips->signal_connect('toggled' => sub {
 
@@ -5137,7 +4990,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_tooltips', $item_showTooltips);
 
-            my $item_showNotes = Gtk2::CheckMenuItem->new('Show _room notes in tooltips');
+            my $item_showNotes = Gtk3::CheckMenuItem->new('Show room _notes in tooltips');
             $item_showNotes->set_active($self->worldModelObj->showNotesFlag);
             $item_showNotes->signal_connect('toggled' => sub {
 
@@ -5155,95 +5008,14 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_notes', $item_showNotes);
 
-            $subMenu_drawingFlags->append(Gtk2::SeparatorMenuItem->new()); # Separator
-
-                # 'Preserve size during zoom' sub-submenu
-                my $subSubMenu_duringZoom = Gtk2::Menu->new();
-
-                my $item_zoomRoomTag = Gtk2::CheckMenuItem->new('Room _tags');
-                $item_zoomRoomTag->set_active($self->worldModelObj->fixedRoomTagFlag);
-                $item_zoomRoomTag->signal_connect('toggled' => sub {
-
-                    if (! $self->ignoreMenuUpdateFlag) {
-
-                        $self->worldModelObj->toggleFlag(
-                            'fixedRoomTagFlag',
-                            $item_zoomRoomTag->get_active(),
-                            TRUE,      # Do call $self->redrawRegions
-                            'fixed_room_tag',
-                        );
-                    }
-                });
-                $subSubMenu_duringZoom->append($item_zoomRoomTag);
-                # (Never desensitised)
-                $self->ivAdd('menuToolItemHash', 'fixed_room_tag', $item_zoomRoomTag);
-
-                my $item_zoomRoomGuild = Gtk2::CheckMenuItem->new('Room _guilds');
-                $item_zoomRoomGuild->set_active($self->worldModelObj->fixedRoomGuildFlag);
-                $item_zoomRoomGuild->signal_connect('toggled' => sub {
-
-                    if (! $self->ignoreMenuUpdateFlag) {
-
-                        $self->worldModelObj->toggleFlag(
-                            'fixedRoomGuildFlag',
-                            $item_zoomRoomGuild->get_active(),
-                            TRUE,      # Do call $self->redrawRegions
-                            'fixed_room_guild',
-                        );
-                    }
-                });
-                $subSubMenu_duringZoom->append($item_zoomRoomGuild);
-                # (Never desensitised)
-                $self->ivAdd('menuToolItemHash', 'fixed_room_guild', $item_zoomRoomGuild);
-
-                my $item_zoomExitTag = Gtk2::CheckMenuItem->new('_Exit tags');
-                $item_zoomExitTag->set_active($self->worldModelObj->fixedExitTagFlag);
-                $item_zoomExitTag->signal_connect('toggled' => sub {
-
-                    if (! $self->ignoreMenuUpdateFlag) {
-
-                        $self->worldModelObj->toggleFlag(
-                            'fixedExitTagFlag',
-                            $item_zoomExitTag->get_active(),
-                            TRUE,      # Do call $self->redrawRegions
-                            'fixed_exit_tag',
-                        );
-                    }
-                });
-                $subSubMenu_duringZoom->append($item_zoomExitTag);
-                # (Never desensitised)
-                $self->ivAdd('menuToolItemHash', 'fixed_exit_tag', $item_zoomExitTag);
-
-                my $item_zoomLabel = Gtk2::CheckMenuItem->new('_Labels');
-                $item_zoomLabel->set_active($self->worldModelObj->fixedLabelFlag);
-                $item_zoomLabel->signal_connect('toggled' => sub {
-
-                    if (! $self->ignoreMenuUpdateFlag) {
-
-                        $self->worldModelObj->toggleFlag(
-                            'fixedLabelFlag',
-                            $item_zoomLabel->get_active(),
-                            TRUE,      # Do call $self->redrawRegions
-                            'fixed_label',
-                        );
-                    }
-                });
-                $subSubMenu_duringZoom->append($item_zoomLabel);
-                # (Never desensitised)
-                $self->ivAdd('menuToolItemHash', 'fixed_label', $item_zoomLabel);
-
-            my $item_duringZoom = Gtk2::MenuItem->new('_Preserve size during zoom');
-            $item_duringZoom->set_submenu($subSubMenu_duringZoom);
-            $subMenu_drawingFlags->append($item_duringZoom);
-
-        my $item_drawingFlags = Gtk2::MenuItem->new('_Drawing flags');
+        my $item_drawingFlags = Gtk3::MenuItem->new('Draw_ing flags');
         $item_drawingFlags->set_submenu($subMenu_drawingFlags);
         $column_mode->append($item_drawingFlags);
 
             # 'Movement flags' submenu
-            my $subMenu_moves = Gtk2::Menu->new();
+            my $subMenu_moves = Gtk3::Menu->new();
 
-            my $item_allowAssisted = Gtk2::CheckMenuItem->new('_Allow assisted moves');
+            my $item_allowAssisted = Gtk3::CheckMenuItem->new('_Allow assisted moves');
             $item_allowAssisted->set_active($self->worldModelObj->assistedMovesFlag);
             $item_allowAssisted->signal_connect('toggled' => sub {
 
@@ -5266,9 +5038,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_assisted_moves', $item_allowAssisted);
 
-            $subMenu_moves->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_moves->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_assistedBreak = Gtk2::CheckMenuItem->new('_Break doors before move');
+            my $item_assistedBreak = Gtk3::CheckMenuItem->new('_Break doors before move');
             $item_assistedBreak->set_active($self->worldModelObj->assistedBreakFlag);
             $item_assistedBreak->signal_connect('toggled' => sub {
 
@@ -5286,7 +5058,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'break_before_move', $item_assistedBreak);
 
-            my $item_assistedPick = Gtk2::CheckMenuItem->new('_Pick doors before move');
+            my $item_assistedPick = Gtk3::CheckMenuItem->new('_Pick doors before move');
             $item_assistedPick->set_active($self->worldModelObj->assistedPickFlag);
             $item_assistedPick->signal_connect('toggled' => sub {
 
@@ -5304,7 +5076,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'pick_before_move', $item_assistedPick);
 
-            my $item_assistedUnlock = Gtk2::CheckMenuItem->new('_Unlock doors before move');
+            my $item_assistedUnlock = Gtk3::CheckMenuItem->new('_Unlock doors before move');
             $item_assistedUnlock->set_active($self->worldModelObj->assistedUnlockFlag);
             $item_assistedUnlock->signal_connect('toggled' => sub {
 
@@ -5322,7 +5094,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'unlock_before_move', $item_assistedUnlock);
 
-            my $item_assistedOpen = Gtk2::CheckMenuItem->new('_Open doors before move');
+            my $item_assistedOpen = Gtk3::CheckMenuItem->new('_Open doors before move');
             $item_assistedOpen->set_active($self->worldModelObj->assistedOpenFlag);
             $item_assistedOpen->signal_connect('toggled' => sub {
 
@@ -5340,7 +5112,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'open_before_move', $item_assistedOpen);
 
-            my $item_assistedClose = Gtk2::CheckMenuItem->new('_Close doors after move');
+            my $item_assistedClose = Gtk3::CheckMenuItem->new('_Close doors after move');
             $item_assistedClose->set_active($self->worldModelObj->assistedCloseFlag);
             $item_assistedClose->signal_connect('toggled' => sub {
 
@@ -5358,7 +5130,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'close_after_move', $item_assistedClose);
 
-            my $item_assistedLock = Gtk2::CheckMenuItem->new('_Lock doors after move');
+            my $item_assistedLock = Gtk3::CheckMenuItem->new('_Lock doors after move');
             $item_assistedLock->set_active($self->worldModelObj->assistedLockFlag);
             $item_assistedLock->signal_connect('toggled' => sub {
 
@@ -5376,9 +5148,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'lock_after_move', $item_assistedLock);
 
-            $subMenu_moves->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_moves->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_allowProtected = Gtk2::CheckMenuItem->new('Allow p_rotected moves');
+            my $item_allowProtected = Gtk3::CheckMenuItem->new('Allow p_rotected moves');
             $item_allowProtected->set_active($self->worldModelObj->protectedMovesFlag);
             $item_allowProtected->signal_connect('toggled' => sub {
 
@@ -5401,7 +5173,7 @@
             # (Requires $self->worldModelObj->assistedMovesFlag)
             $self->ivAdd('menuToolItemHash', 'allow_protected_moves', $item_allowProtected);
 
-            my $item_allowSuper = Gtk2::CheckMenuItem->new('Ca_ncel commands when overruled');
+            my $item_allowSuper = Gtk3::CheckMenuItem->new('Ca_ncel commands when overruled');
             $item_allowSuper->set_active($self->worldModelObj->superProtectedMovesFlag);
             $item_allowSuper->signal_connect('toggled' => sub {
 
@@ -5419,9 +5191,9 @@
             # (Requires $self->worldModelObj->assistedMovesFlag)
             $self->ivAdd('menuToolItemHash', 'allow_super_protected_moves', $item_allowSuper);
 
-            $subMenu_moves->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_moves->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_allowCrafty = Gtk2::CheckMenuItem->new('Allow _crafty moves');
+            my $item_allowCrafty = Gtk3::CheckMenuItem->new('Allow crafty _moves');
             $item_allowCrafty->set_active($self->worldModelObj->craftyMovesFlag);
             $item_allowCrafty->signal_connect('toggled' => sub {
 
@@ -5439,14 +5211,14 @@
             # (Requires $self->worldModelObj->protectedMovesFlag set to be FALSE)
             $self->ivAdd('menuToolItemHash', 'allow_crafty_moves', $item_allowCrafty);
 
-        my $item_moves = Gtk2::MenuItem->new('_Movement flags');
+        my $item_moves = Gtk3::MenuItem->new('Mo_vement flags');
         $item_moves->set_submenu($subMenu_moves);
         $column_mode->append($item_moves);
 
             # 'Other flags' submenu
-            my $subMenu_otherFlags = Gtk2::Menu->new();
+            my $subMenu_otherFlags = Gtk3::Menu->new();
 
-            my $item_allowModelScripts = Gtk2::CheckMenuItem->new('_Allow model-wide scripts');
+            my $item_allowModelScripts = Gtk3::CheckMenuItem->new('_Allow model-wide scripts');
             $item_allowModelScripts->set_active($self->worldModelObj->allowModelScriptFlag);
             $item_allowModelScripts->signal_connect('toggled' => sub {
 
@@ -5464,7 +5236,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_model_scripts', $item_allowModelScripts);
 
-            my $item_allowRoomScripts = Gtk2::CheckMenuItem->new(
+            my $item_allowRoomScripts = Gtk3::CheckMenuItem->new(
                 'Allow ' . $axmud::BASIC_NAME . ' _scripts',
             );
             $item_allowRoomScripts->set_active($self->worldModelObj->allowRoomScriptFlag);
@@ -5484,7 +5256,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_room_scripts', $item_allowRoomScripts);
 
-            my $item_countVisits = Gtk2::CheckMenuItem->new('_Count character visits');
+            my $item_countVisits = Gtk3::CheckMenuItem->new('_Count character visits');
             $item_countVisits->set_active($self->worldModelObj->countVisitsFlag);
             $item_countVisits->signal_connect('toggled' => sub {
 
@@ -5502,7 +5274,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'count_char_visits', $item_countVisits);
 
-            my $item_disableUpdate = Gtk2::CheckMenuItem->new('_Disable update mode');
+            my $item_disableUpdate = Gtk3::CheckMenuItem->new('_Disable update mode');
             $item_disableUpdate->set_active($self->worldModelObj->disableUpdateModeFlag);
             $item_disableUpdate->signal_connect('toggled' => sub {
 
@@ -5517,7 +5289,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'disable_update_mode', $item_disableUpdate);
 
-            my $item_explainGetLost = Gtk2::CheckMenuItem->new('_Explain when getting lost');
+            my $item_explainGetLost = Gtk3::CheckMenuItem->new('_Explain when getting lost');
             $item_explainGetLost->set_active($self->worldModelObj->explainGetLostFlag);
             $item_explainGetLost->signal_connect('toggled' => sub {
 
@@ -5535,7 +5307,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'explain_get_lost', $item_explainGetLost);
 
-            my $item_followAnchor = Gtk2::CheckMenuItem->new('New exits for _follow anchors');
+            my $item_followAnchor = Gtk3::CheckMenuItem->new('New exits for _follow anchors');
             $item_followAnchor->set_active($self->worldModelObj->followAnchorFlag);
             $item_followAnchor->signal_connect('toggled' => sub {
 
@@ -5553,7 +5325,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'follow_anchor', $item_followAnchor);
 
-            my $item_allowCtrlCopy = Gtk2::CheckMenuItem->new('Move rooms to click with CTRL+C');
+            my $item_allowCtrlCopy = Gtk3::CheckMenuItem->new('_Move rooms to click with CTRL+C');
             $item_allowCtrlCopy->set_active($self->worldModelObj->allowCtrlCopyFlag);
             $item_allowCtrlCopy->signal_connect('toggled' => sub {
 
@@ -5571,7 +5343,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_ctrl_copy', $item_allowCtrlCopy);
 
-            my $item_showAllPrimary = Gtk2::CheckMenuItem->new('_Show all directions in dialogues');
+            my $item_showAllPrimary = Gtk3::CheckMenuItem->new('S_how all directions in dialogues');
             $item_showAllPrimary->set_active($self->worldModelObj->showAllPrimaryFlag);
             $item_showAllPrimary->signal_connect('toggled' => sub {
 
@@ -5589,7 +5361,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'show_all_primary', $item_showAllPrimary);
 
-        my $item_otherFlags = Gtk2::MenuItem->new('_Other flags');
+        my $item_otherFlags = Gtk3::MenuItem->new('_Other flags');
         $item_otherFlags->set_submenu($subMenu_otherFlags);
         $column_mode->append($item_otherFlags);
 
@@ -5607,7 +5379,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -5618,14 +5390,14 @@
         }
 
         # Set up column
-        my $column_regions = Gtk2::Menu->new();
+        my $column_regions = Gtk3::Menu->new();
         if (! $column_regions) {
 
             return undef;
         }
 
-        my $item_newRegion = Gtk2::ImageMenuItem->new('_New region...');
-        my $img_newRegion = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_newRegion = Gtk3::ImageMenuItem->new('_New region...');
+        my $img_newRegion = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_newRegion->set_image($img_newRegion);
         $item_newRegion->signal_connect('activate' => sub {
 
@@ -5633,8 +5405,8 @@
         });
         $column_regions->append($item_newRegion);
 
-        my $item_newTempRegion = Gtk2::ImageMenuItem->new('New _temporary region...');
-        my $img_newTempRegion = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_newTempRegion = Gtk3::ImageMenuItem->new('New _temporary region...');
+        my $img_newTempRegion = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_newTempRegion->set_image($img_newTempRegion);
         $item_newTempRegion->signal_connect('activate' => sub {
 
@@ -5642,10 +5414,10 @@
         });
         $column_regions->append($item_newTempRegion);
 
-        $column_regions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-        my $item_editRegion = Gtk2::ImageMenuItem->new('_Edit region...');
-        my $img_editRegion = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editRegion = Gtk3::ImageMenuItem->new('_Edit region...');
+        my $img_editRegion = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editRegion->set_image($img_editRegion);
         $item_editRegion->signal_connect('activate' => sub {
 
@@ -5655,8 +5427,8 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'edit_region', $item_editRegion);
 
-        my $item_editRegionmap = Gtk2::ImageMenuItem->new('E_dit regionmap...');
-        my $img_editRegionmap = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editRegionmap = Gtk3::ImageMenuItem->new('Edit _regionmap...');
+        my $img_editRegionmap = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editRegionmap->set_image($img_editRegionmap);
         $item_editRegionmap->signal_connect('activate' => sub {
 
@@ -5675,9 +5447,9 @@
         $self->ivAdd('menuToolItemHash', 'edit_regionmap', $item_editRegionmap);
 
             # 'Recalculate paths' submenu
-            my $subMenu_recalculatePaths = Gtk2::Menu->new();
+            my $subMenu_recalculatePaths = Gtk3::Menu->new();
 
-            my $item_recalculateInCurrentRegion = Gtk2::MenuItem->new('In _current region');
+            my $item_recalculateInCurrentRegion = Gtk3::MenuItem->new('In _current region');
             $item_recalculateInCurrentRegion->signal_connect('activate' => sub {
 
                 $self->recalculatePathsCallback('current');
@@ -5691,23 +5463,23 @@
                 $item_recalculateInCurrentRegion,
             );
 
-            my $item_recalculateSelectRegion = Gtk2::MenuItem->new('In _region...');
+            my $item_recalculateSelectRegion = Gtk3::MenuItem->new('In _region...');
             $item_recalculateSelectRegion->signal_connect('activate' => sub {
 
                 $self->recalculatePathsCallback('select');
             });
             $subMenu_recalculatePaths->append($item_recalculateSelectRegion);
 
-            my $item_recalculateAllRegions = Gtk2::MenuItem->new('In _all regions');
+            my $item_recalculateAllRegions = Gtk3::MenuItem->new('In _all regions');
             $item_recalculateAllRegions->signal_connect('activate' => sub {
 
                 $self->recalculatePathsCallback('all');
             });
             $subMenu_recalculatePaths->append($item_recalculateAllRegions);
 
-            $subMenu_recalculatePaths->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_recalculatePaths->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_recalculateFromExit = Gtk2::MenuItem->new('For selected _exit');
+            my $item_recalculateFromExit = Gtk3::MenuItem->new('For selected _exit');
             $item_recalculateFromExit->signal_connect('activate' => sub {
 
                 $self->recalculatePathsCallback('exit');
@@ -5717,34 +5489,34 @@
             #   exit)
             $self->ivAdd('menuToolItemHash', 'recalculate_from_exit', $item_recalculateFromExit);
 
-        my $item_recalculatePaths = Gtk2::MenuItem->new('Rec_alculate region paths');
+        my $item_recalculatePaths = Gtk3::MenuItem->new('Re_calculate region paths');
         $item_recalculatePaths->set_submenu($subMenu_recalculatePaths);
         $column_regions->append($item_recalculatePaths);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'recalculate_paths', $item_recalculatePaths);
 
-        $column_regions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
             # 'Region list' submenu
-            my $subMenu_regionsTree = Gtk2::Menu->new();
+            my $subMenu_regionsTree = Gtk3::Menu->new();
 
-            my $item_resetList = Gtk2::MenuItem->new('_Reset region list');
+            my $item_resetList = Gtk3::MenuItem->new('_Reset region list');
             $item_resetList->signal_connect('activate' => sub {
 
                 $self->worldModelObj->resetRegionList();
             });
             $subMenu_regionsTree->append($item_resetList);
 
-            my $item_reverseList = Gtk2::MenuItem->new('Re_verse region list');
+            my $item_reverseList = Gtk3::MenuItem->new('Re_verse region list');
             $item_reverseList->signal_connect('activate' => sub {
 
                 $self->worldModelObj->reverseRegionList();
             });
             $subMenu_regionsTree->append($item_reverseList);
 
-            $subMenu_regionsTree->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_regionsTree->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_moveCurrentRegion = Gtk2::MenuItem->new('Move _current region to top');
+            my $item_moveCurrentRegion = Gtk3::MenuItem->new('_Move current region to top');
             $item_moveCurrentRegion->signal_connect('activate' => sub {
 
                 $self->worldModelObj->moveRegionToTop($self->currentRegionmap);
@@ -5753,9 +5525,9 @@
             # (Requires $self->currentRegionmap for a region that doesn't have a parent region)
             $self->ivAdd('menuToolItemHash', 'move_region_top', $item_moveCurrentRegion);
 
-            $subMenu_regionsTree->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_regionsTree->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_identifyRegion = Gtk2::MenuItem->new('_Identify highlighted region');
+            my $item_identifyRegion = Gtk3::MenuItem->new('_Identify highlighted region');
             $item_identifyRegion->signal_connect('activate' => sub {
 
                 $self->identifyRegionCallback();
@@ -5764,37 +5536,37 @@
             # (Requires $self->treeViewSelectedLine)
             $self->ivAdd('menuToolItemHash', 'identify_region', $item_identifyRegion);
 
-        my $item_regionsTree = Gtk2::MenuItem->new('Region _list');
+        my $item_regionsTree = Gtk3::MenuItem->new('Region _list');
         $item_regionsTree->set_submenu($subMenu_regionsTree);
         $column_regions->append($item_regionsTree);
 
             # 'Current region' submenu
-            my $subMenu_currentRegion = Gtk2::Menu->new();
+            my $subMenu_currentRegion = Gtk3::Menu->new();
 
-            my $item_renameRegion = Gtk2::MenuItem->new('_Rename region...');
+            my $item_renameRegion = Gtk3::MenuItem->new('_Rename region...');
             $item_renameRegion->signal_connect('activate' => sub {
 
                 $self->renameRegionCallback();
             });
             $subMenu_currentRegion->append($item_renameRegion);
 
-            my $item_changeParent = Gtk2::MenuItem->new('_Set parent region...');
+            my $item_changeParent = Gtk3::MenuItem->new('_Set parent region...');
             $item_changeParent->signal_connect('activate' => sub {
 
                 $self->changeRegionParentCallback();
             });
             $subMenu_currentRegion->append($item_changeParent);
 
-            $subMenu_currentRegion->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_currentRegion->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_convertRegionExit = Gtk2::MenuItem->new('_Convert all region exits');
+            my $item_convertRegionExit = Gtk3::MenuItem->new('_Convert all region exits');
             $item_convertRegionExit->signal_connect('activate' => sub {
 
                 $self->convertRegionExitCallback(TRUE);
             });
             $subMenu_currentRegion->append($item_convertRegionExit);
 
-            my $item_deconvertRegionExit = Gtk2::MenuItem->new(
+            my $item_deconvertRegionExit = Gtk3::MenuItem->new(
                 '_Deconvert all super-region exits',
             );
             $item_deconvertRegionExit->signal_connect('activate' => sub {
@@ -5803,9 +5575,9 @@
             });
             $subMenu_currentRegion->append($item_deconvertRegionExit);
 
-            $subMenu_currentRegion->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_currentRegion->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_resetObjectCounts = Gtk2::MenuItem->new('Reset _object counts');
+            my $item_resetObjectCounts = Gtk3::MenuItem->new('Reset _object counts');
             $item_resetObjectCounts->signal_connect('activate' => sub {
 
                  # Empty the hashes which store temporary object counts and redraw the region
@@ -5813,46 +5585,61 @@
             });
             $subMenu_currentRegion->append($item_resetObjectCounts);
 
-            my $item_removeRoomFlags = Gtk2::MenuItem->new('Remove room _flags...');
+            my $item_removeRoomFlags = Gtk3::MenuItem->new('Remove room _flags...');
             $item_removeRoomFlags->signal_connect('activate' => sub {
 
                 $self->removeRoomFlagsCallback();
             });
             $subMenu_currentRegion->append($item_removeRoomFlags);
 
-        my $item_currentRegion = Gtk2::MenuItem->new('_Current region');
+        my $item_currentRegion = Gtk3::MenuItem->new('C_urrent region');
         $item_currentRegion->set_submenu($subMenu_currentRegion);
         $column_regions->append($item_currentRegion);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'current_region', $item_currentRegion);
 
             # 'Pre-drawn regions' submenu
-            my $subMenu_preDrawRegion = Gtk2::Menu->new();
+            my $subMenu_preDrawRegion = Gtk3::Menu->new();
 
-            my $item_setPreDrawSize = Gtk2::MenuItem->new('Set pre-draw minimum size');
+            my $item_allowPreDraw = Gtk3::CheckMenuItem->new('_Allow pre-drawing of maps');
+            $item_allowPreDraw->set_active($self->worldModelObj->preDrawAllowFlag);
+            $item_allowPreDraw->signal_connect('toggled' => sub {
+
+                $self->worldModelObj->toggleFlag(
+                    'preDrawAllowFlag',
+                    $item_allowPreDraw->get_active(),
+                    FALSE,      # Don't call $self->redrawRegions
+                    'allow_pre_draw',
+                );
+            });
+            $subMenu_preDrawRegion->append($item_allowPreDraw);
+            # (Never desensitised)
+            $self->ivAdd('menuToolItemHash', 'allow_pre_draw', $item_allowPreDraw);
+
+            my $item_setPreDrawSize = Gtk3::MenuItem->new('_Set minimum region size');
             $item_setPreDrawSize->signal_connect('activate' => sub {
 
                 $self->preDrawSizeCallback();
             });
             $subMenu_preDrawRegion->append($item_setPreDrawSize);
 
-            my $item_setRetainSize = Gtk2::MenuItem->new('Set retain minimum size');
+            my $item_setRetainSize = Gtk3::MenuItem->new('Set minimum retention size');
             $item_setRetainSize->signal_connect('activate' => sub {
 
-                $self->retainDrawSizeCallback();
+                $self->preDrawRetainCallback();
             });
             $subMenu_preDrawRegion->append($item_setRetainSize);
 
-            my $item_setPreDrawSpeed = Gtk2::MenuItem->new('Set pre-draw speed');
+            my $item_setPreDrawSpeed = Gtk3::MenuItem->new('Set pre-draw speed');
             $item_setPreDrawSpeed->signal_connect('activate' => sub {
 
                 $self->preDrawSpeedCallback();
             });
             $subMenu_preDrawRegion->append($item_setPreDrawSpeed);
 
-            $subMenu_preDrawRegion->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_preDrawRegion->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_redrawRegion = Gtk2::MenuItem->new('Redraw this region');
+            my $item_redrawRegion = Gtk3::MenuItem->new('Re_draw this region');
             $item_redrawRegion->signal_connect('activate' => sub {
 
                 $self->redrawRegions($self->currentRegionmap, TRUE);
@@ -5861,51 +5648,51 @@
             # (Requires $self->currentRegionmap)
             $self->ivAdd('menuToolItemHash', 'redraw_region', $item_redrawRegion);
 
-            my $item_redrawAllRegions = Gtk2::MenuItem->new('Redraw all drawn regions');
+            my $item_redrawAllRegions = Gtk3::MenuItem->new('Redraw _all drawn regions');
             $item_redrawAllRegions->signal_connect('activate' => sub {
 
                 $self->redrawRegionsCallback();
             });
             $subMenu_preDrawRegion->append($item_redrawAllRegions);
 
-        my $item_preDrawRegion = Gtk2::MenuItem->new('_Pre-drawn regions');
+        my $item_preDrawRegion = Gtk3::MenuItem->new('_Pre-drawn regions');
         $item_preDrawRegion->set_submenu($subMenu_preDrawRegion);
         $column_regions->append($item_preDrawRegion);
 
             # 'Screenshots' submenu
-            my $subMenu_screenshots = Gtk2::Menu->new();
+            my $subMenu_screenshots = Gtk3::Menu->new();
 
-            my $item_visibleScreenshot = Gtk2::MenuItem->new('_Visible map');
+            my $item_visibleScreenshot = Gtk3::MenuItem->new('_Visible map');
             $item_visibleScreenshot->signal_connect('activate' => sub {
 
-                $self->visibleScreenshotCallback();
+                $self->regionScreenshotCallback('visible');
             });
             $subMenu_screenshots->append($item_visibleScreenshot);
 
-            my $item_occupiedScreenshot = Gtk2::MenuItem->new('_Occupied portion');
+            my $item_occupiedScreenshot = Gtk3::MenuItem->new('_Occupied portion');
             $item_occupiedScreenshot->signal_connect('activate' => sub {
 
-                $self->regionScreenshotCallback(FALSE);
+                $self->regionScreenshotCallback('occupied');
             });
             $subMenu_screenshots->append($item_occupiedScreenshot);
 
-            my $item_regionScreenshot = Gtk2::MenuItem->new('_Whole region');
-            $item_regionScreenshot->signal_connect('activate' => sub {
+            my $item_wholeScreenshot = Gtk3::MenuItem->new('_Whole region');
+            $item_wholeScreenshot->signal_connect('activate' => sub {
 
-                $self->regionScreenshotCallback(TRUE);
+                $self->regionScreenshotCallback('whole');
             });
-            $subMenu_screenshots->append($item_regionScreenshot);
+            $subMenu_screenshots->append($item_wholeScreenshot);
 
-        my $item_screenshots = Gtk2::MenuItem->new('Take _screenshot');
+        my $item_screenshots = Gtk3::MenuItem->new('Take _screenshot');
         $item_screenshots->set_submenu($subMenu_screenshots);
         $column_regions->append($item_screenshots);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'screenshots', $item_screenshots);
 
             # 'Locate current room' submenu
-            my $subMenu_locateCurrentRoom = Gtk2::Menu->new();
+            my $subMenu_locateCurrentRoom = Gtk3::Menu->new();
 
-            my $item_locateInCurrentRegion = Gtk2::MenuItem->new('In _current region');
+            my $item_locateInCurrentRegion = Gtk3::MenuItem->new('In _current region');
             $item_locateInCurrentRegion->signal_connect('activate' => sub {
 
                 $self->locateCurrentRoomCallback('current');
@@ -5914,53 +5701,53 @@
             # (Requires $self->currentRegionmap and a non-empty GA::Obj::Regionmap->gridRoomHash)
             $self->ivAdd('menuToolItemHash', 'locate_room_in_current', $item_locateInCurrentRegion);
 
-            my $item_locateInSelectRegion = Gtk2::MenuItem->new('In _region...');
+            my $item_locateInSelectRegion = Gtk3::MenuItem->new('In _region...');
             $item_locateInSelectRegion->signal_connect('activate' => sub {
 
                 $self->locateCurrentRoomCallback('select');
             });
             $subMenu_locateCurrentRoom->append($item_locateInSelectRegion);
 
-            my $item_locateInAllRegions = Gtk2::MenuItem->new('In _all regions');
+            my $item_locateInAllRegions = Gtk3::MenuItem->new('In _all regions');
             $item_locateInAllRegions->signal_connect('activate' => sub {
 
                 $self->locateCurrentRoomCallback('all');
             });
             $subMenu_locateCurrentRoom->append($item_locateInAllRegions);
 
-        my $item_locateCurrentRoom = Gtk2::ImageMenuItem->new('Locate c_urrent room');
-        my $img_locateCurrentRoom = Gtk2::Image->new_from_stock('gtk-find', 'menu');
+        my $item_locateCurrentRoom = Gtk3::ImageMenuItem->new('L_ocate current room');
+        my $img_locateCurrentRoom = Gtk3::Image->new_from_stock('gtk-find', 'menu');
         $item_locateCurrentRoom->set_image($img_locateCurrentRoom);
         $item_locateCurrentRoom->set_submenu($subMenu_locateCurrentRoom);
         $column_regions->append($item_locateCurrentRoom);
 
-        $column_regions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
             # 'Background colours' submenu
-            my $subMenu_bgColours = Gtk2::Menu->new();
+            my $subMenu_bgColours = Gtk3::Menu->new();
 
-            my $item_removeBGAll = Gtk2::MenuItem->new('Remove colour...');
+            my $item_removeBGAll = Gtk3::MenuItem->new('_Remove colour...');
             $item_removeBGAll->signal_connect('activate' => sub {
 
                 $self->removeBGColourCallback();
             });
             $subMenu_bgColours->append($item_removeBGAll);
 
-            my $item_removeBGColour = Gtk2::MenuItem->new('Remove all colours');
+            my $item_removeBGColour = Gtk3::MenuItem->new('Remove _all colours');
             $item_removeBGColour->signal_connect('activate' => sub {
 
                 $self->removeBGAllCallback();
             });
             $subMenu_bgColours->append($item_removeBGColour);
 
-        my $item_bgColours = Gtk2::MenuItem->new('Background colours');
+        my $item_bgColours = Gtk3::MenuItem->new('_Background colours');
         $item_bgColours->set_submenu($subMenu_bgColours);
         $column_regions->append($item_bgColours);
         # (Requires $self->currentRegionmap whose ->gridColourBlockHash and/or ->gridColourObjHash
         #   is not empty)
         $self->ivAdd('menuToolItemHash', 'empty_bg_colours', $item_bgColours);
 
-        my $item_emptyRegion = Gtk2::MenuItem->new('Empt_y region');
+        my $item_emptyRegion = Gtk3::MenuItem->new('E_mpty region');
         $item_emptyRegion->signal_connect('activate' => sub {
 
             $self->emptyRegionCallback();
@@ -5969,10 +5756,10 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'empty_region', $item_emptyRegion);
 
-        $column_regions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+        $column_regions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-        my $item_deleteRegion = Gtk2::ImageMenuItem->new('De_lete region');
-        my $img_deleteRegion = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteRegion = Gtk3::ImageMenuItem->new('_Delete region');
+        my $img_deleteRegion = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteRegion->set_image($img_deleteRegion);
         $item_deleteRegion->signal_connect('activate' => sub {
 
@@ -5982,8 +5769,8 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'delete_region', $item_deleteRegion);
 
-        my $item_deleteTempRegion = Gtk2::ImageMenuItem->new('Delete te_mporary regions');
-        my $img_deleteTempRegion = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteTempRegion = Gtk3::ImageMenuItem->new('Delete temporar_y regions');
+        my $img_deleteTempRegion = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteTempRegion->set_image($img_deleteTempRegion);
         $item_deleteTempRegion->signal_connect('activate' => sub {
 
@@ -6005,7 +5792,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -6016,13 +5803,13 @@
         }
 
         # Set up column
-        my $column_rooms = Gtk2::Menu->new();
+        my $column_rooms = Gtk3::Menu->new();
         if (! $column_rooms) {
 
             return undef;
         }
 
-        my $item_setCurrentRoom = Gtk2::MenuItem->new('_Set current room');
+        my $item_setCurrentRoom = Gtk3::MenuItem->new('_Set current room');
         $item_setCurrentRoom->signal_connect('activate' => sub {
 
             $self->mapObj->setCurrentRoom($self->selectedRoom);
@@ -6031,7 +5818,7 @@
         # (Requires $self->currentRegionmap & $self->selectedRoom)
         $self->ivAdd('menuToolItemHash', 'set_current_room', $item_setCurrentRoom);
 
-        my $item_unsetCurrentRoom = Gtk2::MenuItem->new('_Unset current room');
+        my $item_unsetCurrentRoom = Gtk3::MenuItem->new('_Unset current room');
         $item_unsetCurrentRoom->signal_connect('activate' => sub {
 
             # This function automatically redraws the room
@@ -6041,12 +5828,12 @@
         # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
         $self->ivAdd('menuToolItemHash', 'unset_current_room', $item_unsetCurrentRoom);
 
-        $column_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Locator task' submenu
-            my $subMenu_locatorTask = Gtk2::Menu->new();
+            my $subMenu_locatorTask = Gtk3::Menu->new();
 
-            my $item_resetLocator = Gtk2::MenuItem->new('_Reset Locator');
+            my $item_resetLocator = Gtk3::MenuItem->new('_Reset Locator');
             $item_resetLocator->signal_connect('activate' => sub {
 
                 $self->resetLocatorCallback();
@@ -6055,7 +5842,7 @@
             # (Requires $self->currentRegionmap)
             $self->ivAdd('menuToolItemHash', 'reset_locator', $item_resetLocator);
 
-            my $item_updateLocator = Gtk2::MenuItem->new('_Update Locator');
+            my $item_updateLocator = Gtk3::MenuItem->new('_Update Locator');
             $item_updateLocator->signal_connect('activate' => sub {
 
                 # Update the Locator task
@@ -6065,39 +5852,39 @@
             # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'update_locator', $item_updateLocator);
 
-            $subMenu_locatorTask->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_locatorTask->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_setFacing = Gtk2::MenuItem->new('Set _facing direction...');
+            my $item_setFacing = Gtk3::MenuItem->new('_Set facing direction...');
             $item_setFacing->signal_connect('activate' => sub {
 
                 $self->setFacingCallback();
             });
             $subMenu_locatorTask->append($item_setFacing);
 
-            my $item_resetFacing = Gtk2::MenuItem->new('Reset f_acing direction...');
+            my $item_resetFacing = Gtk3::MenuItem->new('R_eset facing direction...');
             $item_resetFacing->signal_connect('activate' => sub {
 
                 $self->resetFacingCallback();
             });
             $subMenu_locatorTask->append($item_resetFacing);
 
-            $subMenu_locatorTask->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_locatorTask->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_viewLocatorRoom = Gtk2::MenuItem->new('_View Locator room...');
+            my $item_viewLocatorRoom = Gtk3::MenuItem->new('_View Locator room...');
             $item_viewLocatorRoom->signal_connect('activate' => sub {
 
                 $self->editLocatorRoomCallback();
             });
             $subMenu_locatorTask->append($item_viewLocatorRoom);
 
-        my $item_locatorTask = Gtk2::MenuItem->new('_Locator task');
+        my $item_locatorTask = Gtk3::MenuItem->new('_Locator task');
         $item_locatorTask->set_submenu($subMenu_locatorTask);
         $column_rooms->append($item_locatorTask);
 
             # 'Pathfinding' submenu
-            my $subMenu_pathFinding = Gtk2::Menu->new();
+            my $subMenu_pathFinding = Gtk3::Menu->new();
 
-            my $item_highlightPath = Gtk2::MenuItem->new('_Highlight path');
+            my $item_highlightPath = Gtk3::MenuItem->new('_Highlight path');
             $item_highlightPath->signal_connect('activate' => sub {
 
                 $self->processPathCallback('select_room');
@@ -6106,7 +5893,7 @@
             # (Requires $self->currentRegionmap, $self->mapObj->currentRoom and $self->selectedRoom)
             $self->ivAdd('menuToolItemHash', 'path_finding_highlight', $item_highlightPath);
 
-            my $item_displayPath = Gtk2::MenuItem->new('_Edit path');
+            my $item_displayPath = Gtk3::MenuItem->new('_Edit path...');
             $item_displayPath->signal_connect('activate' => sub {
 
                 $self->processPathCallback('pref_win');
@@ -6115,7 +5902,7 @@
             # (Requires $self->currentRegionmap, $self->mapObj->currentRoom and $self->selectedRoom)
             $self->ivAdd('menuToolItemHash', 'path_finding_edit', $item_displayPath);
 
-            my $item_goToRoom = Gtk2::MenuItem->new('_Go to room');
+            my $item_goToRoom = Gtk3::MenuItem->new('_Go to room');
             $item_goToRoom->signal_connect('activate' => sub {
 
                 $self->processPathCallback('send_char');
@@ -6124,9 +5911,9 @@
             # (Requires $self->currentRegionmap, $self->mapObj->currentRoom and $self->selectedRoom)
             $self->ivAdd('menuToolItemHash', 'path_finding_go', $item_goToRoom);
 
-            $subMenu_pathFinding->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_pathFinding->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_allowPostProcessing = Gtk2::CheckMenuItem->new('_Allow post-processing');
+            my $item_allowPostProcessing = Gtk3::CheckMenuItem->new('_Allow post-processing');
             $item_allowPostProcessing->set_active($self->worldModelObj->postProcessingFlag);
             $item_allowPostProcessing->signal_connect('toggled' => sub {
 
@@ -6141,7 +5928,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_post_process', $item_allowPostProcessing);
 
-            my $item_avoidHazardousRooms = Gtk2::CheckMenuItem->new('Avoid ha_zardous rooms');
+            my $item_avoidHazardousRooms = Gtk3::CheckMenuItem->new('A_void hazardous rooms');
             $item_avoidHazardousRooms->set_active($self->worldModelObj->avoidHazardsFlag);
             $item_avoidHazardousRooms->signal_connect('toggled' => sub {
 
@@ -6156,7 +5943,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_hazard_rooms', $item_avoidHazardousRooms);
 
-            my $item_doubleClickPathFind = Gtk2::CheckMenuItem->new(
+            my $item_doubleClickPathFind = Gtk3::CheckMenuItem->new(
                 'Allow _double-click moves',
             );
             $item_doubleClickPathFind->set_active($self->worldModelObj->quickPathFindFlag);
@@ -6173,23 +5960,23 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'allow_quick_path_find', $item_doubleClickPathFind);
 
-            $subMenu_pathFinding->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_pathFinding->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_adjacentMode = Gtk2::MenuItem->new('_Set adjacent regions mode...');
+            my $item_adjacentMode = Gtk3::MenuItem->new('_Set adjacent regions mode...');
             $item_adjacentMode->signal_connect('activate' => sub {
 
                 $self->adjacentModeCallback();
             });
             $subMenu_pathFinding->append($item_adjacentMode);
 
-        my $item_pathFinding = Gtk2::MenuItem->new('_Pathfinding');
+        my $item_pathFinding = Gtk3::MenuItem->new('_Pathfinding');
         $item_pathFinding->set_submenu($subMenu_pathFinding);
         $column_rooms->append($item_pathFinding);
 
             # 'Move rooms/labels' submenu
-            my $subMenu_moveRooms = Gtk2::Menu->new();
+            my $subMenu_moveRooms = Gtk3::Menu->new();
 
-            my $item_moveSelected = Gtk2::MenuItem->new('Move in _direction...');
+            my $item_moveSelected = Gtk3::MenuItem->new('Move in _direction...');
             $item_moveSelected->signal_connect('activate' => sub {
 
                 $self->moveSelectedRoomsCallback();
@@ -6198,7 +5985,7 @@
             # (Requires $self->currentRegionmap and one or more selected rooms)
             $self->ivAdd('menuToolItemHash', 'move_rooms_dir', $item_moveSelected);
 
-            my $item_moveSelectedToClick = Gtk2::MenuItem->new('Move to _click');
+            my $item_moveSelectedToClick = Gtk3::MenuItem->new('Move to _click');
             $item_moveSelectedToClick->signal_connect('activate' => sub {
 
                 # Set the free clicking mode: $self->mouseClickEvent will move the objects when the
@@ -6209,16 +5996,16 @@
             # (Requires $self->currentRegionmap and one or more selected rooms)
             $self->ivAdd('menuToolItemHash', 'move_rooms_click', $item_moveSelectedToClick);
 
-            $subMenu_moveRooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_moveRooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
                 # 'Transfer to region' sub-submenu
-                my $subSubMenu_transferRegion = Gtk2::Menu->new();
+                my $subSubMenu_transferRegion = Gtk3::Menu->new();
 
                 if ($self->recentRegionList) {
 
                     foreach my $name ($self->recentRegionList) {
 
-                        my $item_regionName = Gtk2::MenuItem->new($name);
+                        my $item_regionName = Gtk3::MenuItem->new($name);
                         $item_regionName->signal_connect('activate' => sub {
 
                             $self->transferSelectedRoomsCallback($name);
@@ -6228,30 +6015,30 @@
 
                 } else {
 
-                    my $item_regionNone = Gtk2::MenuItem->new('(No recent regions)');
+                    my $item_regionNone = Gtk3::MenuItem->new('(No recent regions)');
                     $item_regionNone->set_sensitive(FALSE);
                     $subSubMenu_transferRegion->append($item_regionNone);
                 }
 
-                $subSubMenu_transferRegion->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_transferRegion->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_transferSelect = Gtk2::MenuItem->new('Select region...');
+                my $item_transferSelect = Gtk3::MenuItem->new('Select region...');
                 $item_transferSelect->signal_connect('activate' => sub {
 
                     $self->transferSelectedRoomsCallback();
                 });
                 $subSubMenu_transferRegion->append($item_transferSelect);
 
-            my $item_transferRegion = Gtk2::MenuItem->new('_Transfer to region');
+            my $item_transferRegion = Gtk3::MenuItem->new('_Transfer to region');
             $item_transferRegion->set_submenu($subSubMenu_transferRegion);
             $subMenu_moveRooms->append($item_transferRegion);
             # (Requires $self->currentRegionmap, one or more selected rooms and at least two regions
             #   in the world model)
             $self->ivAdd('menuToolItemHash', 'transfer_to_region', $item_transferRegion);
 
-            $subMenu_moveRooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_moveRooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_mergeMoveRooms = Gtk2::MenuItem->new('_Merge/move rooms');
+            my $item_mergeMoveRooms = Gtk3::MenuItem->new('_Merge/move rooms');
             $item_mergeMoveRooms->signal_connect('activate' => sub {
 
                 $self->doMerge($self->mapObj->currentRoom);
@@ -6261,19 +6048,19 @@
             #   up to perform a merge)
             $self->ivAdd('menuToolItemHash', 'move_merge_rooms', $item_mergeMoveRooms);
 
-        my $item_moveRooms = Gtk2::MenuItem->new('_Move rooms/labels');
+        my $item_moveRooms = Gtk3::MenuItem->new('_Move rooms/labels');
         $item_moveRooms->set_submenu($subMenu_moveRooms);
         $column_rooms->append($item_moveRooms);
         # (Requires $self->currentRegionmap and EITHER one or more selected rooms OR a current room
         #   and the automapper being set up to perform a merge)
         $self->ivAdd('menuToolItemHash', 'move_rooms_labels', $item_moveRooms);
 
-        $column_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Add room' submenu
-            my $subMenu_addRoom = Gtk2::Menu->new();
+            my $subMenu_addRoom = Gtk3::Menu->new();
 
-            my $item_addFirstRoom = Gtk2::MenuItem->new('Add _first room');
+            my $item_addFirstRoom = Gtk3::MenuItem->new('Add _first room');
             $item_addFirstRoom->signal_connect('activate' => sub {
 
                 $self->addFirstRoomCallback();
@@ -6282,7 +6069,7 @@
             # (Requires $self->currentRegionmap & an empty $self->currentRegionmap->gridRoomHash)
             $self->ivAdd('menuToolItemHash', 'add_first_room', $item_addFirstRoom);
 
-            my $item_addRoomAtClick = Gtk2::MenuItem->new('Add room at _click');
+            my $item_addRoomAtClick = Gtk3::MenuItem->new('Add room at _click');
             $item_addRoomAtClick->signal_connect('activate' => sub {
 
                 # Set the free clicking mode: $self->mouseClickEvent will create the new room when
@@ -6294,15 +6081,15 @@
             });
             $subMenu_addRoom->append($item_addRoomAtClick);
 
-            my $item_addRoomAtBlock = Gtk2::MenuItem->new('Add room at _block...');
+            my $item_addRoomAtBlock = Gtk3::MenuItem->new('Add room at _block...');
             $item_addRoomAtBlock->signal_connect('activate' => sub {
 
                 $self->addRoomAtBlockCallback();
             });
             $subMenu_addRoom->append($item_addRoomAtBlock);
 
-        my $item_addRoom = Gtk2::ImageMenuItem->new('Add _room');
-        my $img_addRoom = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addRoom = Gtk3::ImageMenuItem->new('Add _room');
+        my $img_addRoom = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addRoom->set_image($img_addRoom);
         $item_addRoom->set_submenu($subMenu_addRoom);
         $column_rooms->append($item_addRoom);
@@ -6310,16 +6097,16 @@
         $self->ivAdd('menuToolItemHash', 'add_room', $item_addRoom);
 
             # 'Add pattern' submenu
-            my $subMenu_exitPatterns = Gtk2::Menu->new();
+            my $subMenu_exitPatterns = Gtk3::Menu->new();
 
-            my $item_addFailedExitWorld = Gtk2::MenuItem->new('Add failed exit to _world...');
+            my $item_addFailedExitWorld = Gtk3::MenuItem->new('Add failed exit to _world...');
             $item_addFailedExitWorld->signal_connect('activate' => sub {
 
                 $self->addFailedExitCallback(TRUE);
             });
             $subMenu_exitPatterns->append($item_addFailedExitWorld);
 
-            my $item_addFailedExitRoom = Gtk2::MenuItem->new('Add failed exit to current _room...');
+            my $item_addFailedExitRoom = Gtk3::MenuItem->new('Add failed exit to current _room...');
             $item_addFailedExitRoom->signal_connect('activate' => sub {
 
                 $self->addFailedExitCallback(FALSE, $self->mapObj->currentRoom);
@@ -6328,9 +6115,9 @@
             # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'add_failed_room', $item_addFailedExitRoom);
 
-            $subMenu_exitPatterns->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_exitPatterns->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addInvoluntaryExitRoom = Gtk2::MenuItem->new(
+            my $item_addInvoluntaryExitRoom = Gtk3::MenuItem->new(
                 'Add _involuntary exit to current room...',
             );
             $item_addInvoluntaryExitRoom->signal_connect('activate' => sub {
@@ -6341,7 +6128,7 @@
             # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'add_involuntary_exit', $item_addInvoluntaryExitRoom);
 
-            my $item_addRepulseExitRoom = Gtk2::MenuItem->new(
+            my $item_addRepulseExitRoom = Gtk3::MenuItem->new(
                 'Add r_epulse exit to current room...',
             );
             $item_addRepulseExitRoom->signal_connect('activate' => sub {
@@ -6352,9 +6139,9 @@
             # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'add_repulse_exit', $item_addRepulseExitRoom);
 
-            $subMenu_exitPatterns->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_exitPatterns->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addSpecialDepartRoom = Gtk2::MenuItem->new(
+            my $item_addSpecialDepartRoom = Gtk3::MenuItem->new(
                 'Add _special departure to current room...',
             );
             $item_addSpecialDepartRoom->signal_connect('activate' => sub {
@@ -6365,7 +6152,7 @@
             # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'add_special_depart', $item_addSpecialDepartRoom);
 
-            my $item_addUnspecifiedRoom = Gtk2::MenuItem->new(
+            my $item_addUnspecifiedRoom = Gtk3::MenuItem->new(
                 'Add _unspecified room pattern...',
             );
             $item_addUnspecifiedRoom->signal_connect('activate' => sub {
@@ -6376,14 +6163,14 @@
             # (Requires $self->currentRegionmap & $self->mapObj->currentRoom)
             $self->ivAdd('menuToolItemHash', 'add_unspecified_pattern', $item_addUnspecifiedRoom);
 
-        my $item_exitPatterns = Gtk2::MenuItem->new('Add patter_n');
+        my $item_exitPatterns = Gtk3::MenuItem->new('Add p_attern');
         $item_exitPatterns->set_submenu($subMenu_exitPatterns);
         $column_rooms->append($item_exitPatterns);
 
             # 'Add to model' submenu
-            my $subMenu_addToModel = Gtk2::Menu->new();
+            my $subMenu_addToModel = Gtk3::Menu->new();
 
-            my $item_addRoomContents = Gtk2::MenuItem->new('Add _contents...');
+            my $item_addRoomContents = Gtk3::MenuItem->new('Add _contents...');
             $item_addRoomContents->signal_connect('activate' => sub {
 
                 $self->addContentsCallback(FALSE);
@@ -6392,7 +6179,7 @@
             # Requires $self->currentRegionmap, $self->mapObj->currentRoom
             $self->ivAdd('menuToolItemHash', 'add_room_contents', $item_addRoomContents);
 
-            my $item_addContentsString = Gtk2::MenuItem->new('Add contents from _string...');
+            my $item_addContentsString = Gtk3::MenuItem->new('Add c_ontents from string...');
             $item_addContentsString->signal_connect('activate' => sub {
 
                 $self->addContentsCallback(TRUE);
@@ -6401,9 +6188,9 @@
             # Requires $self->currentRegionmap, $self->selectedRoom
             $self->ivAdd('menuToolItemHash', 'add_contents_string', $item_addContentsString);
 
-            $subMenu_addToModel->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_addToModel->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addHiddenObj = Gtk2::MenuItem->new('Add _hidden object...');
+            my $item_addHiddenObj = Gtk3::MenuItem->new('Add _hidden object...');
             $item_addHiddenObj->signal_connect('activate' => sub {
 
                 $self->addHiddenObjCallback(FALSE);
@@ -6412,7 +6199,7 @@
             # Requires $self->currentRegionmap, $self->mapObj->currentRoom
             $self->ivAdd('menuToolItemHash', 'add_hidden_object', $item_addHiddenObj);
 
-            my $item_addHiddenString = Gtk2::MenuItem->new('Add hidden object _from string...');
+            my $item_addHiddenString = Gtk3::MenuItem->new('Add h_idden object from string...');
             $item_addHiddenString->signal_connect('activate' => sub {
 
                 $self->addHiddenObjCallback(TRUE);
@@ -6421,9 +6208,9 @@
             # Requires $self->currentRegionmap, $self->selectedRoom
             $self->ivAdd('menuToolItemHash', 'add_hidden_string', $item_addHiddenString);
 
-            $subMenu_addToModel->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_addToModel->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addSearchResult = Gtk2::MenuItem->new('Add search _result...');
+            my $item_addSearchResult = Gtk3::MenuItem->new('Add _search result...');
             $item_addSearchResult->signal_connect('activate' => sub {
 
                 $self->addSearchResultCallback();
@@ -6432,19 +6219,19 @@
             # Requires $self->currentRegionmap and $self->mapObj->currentRoom
             $self->ivAdd('menuToolItemHash', 'add_search_result', $item_addSearchResult);
 
-        my $item_addToModel = Gtk2::MenuItem->new('Add to _model');
+        my $item_addToModel = Gtk3::MenuItem->new('Add to m_odel');
         $item_addToModel->set_submenu($subMenu_addToModel);
         $column_rooms->append($item_addToModel);
         # Requires $self->currentRegionmap and either $self->mapObj->currentRoom or
         #   $self->selectedRoom
         $self->ivAdd('menuToolItemHash', 'add_to_model', $item_addToModel);
 
-        $column_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Add/set exits' submenu
-            my $subMenu_setExits = Gtk2::Menu->new();
+            my $subMenu_setExits = Gtk3::Menu->new();
 
-            my $item_addNormal = Gtk2::MenuItem->new('Add _normal exit...');
+            my $item_addNormal = Gtk3::MenuItem->new('Add _normal exit...');
             $item_addNormal->signal_connect('activate' => sub {
 
                 $self->addExitCallback(FALSE);  # FALSE - not a hidden exit
@@ -6454,7 +6241,7 @@
             #   'wild' - the value 'border' is ok, though)
             $self->ivAdd('menuToolItemHash', 'add_normal_exit', $item_addNormal);
 
-            my $item_addHiddenExit = Gtk2::MenuItem->new('Add _hidden exit...');
+            my $item_addHiddenExit = Gtk3::MenuItem->new('Add _hidden exit...');
             $item_addHiddenExit->signal_connect('activate' => sub {
 
                 $self->addExitCallback(TRUE);   # TRUE - a hidden exit
@@ -6464,9 +6251,9 @@
             #   'wild' - the value 'border' is ok, though)
             $self->ivAdd('menuToolItemHash', 'add_hidden_exit', $item_addHiddenExit);
 
-            $subMenu_setExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_setExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addMultiple = Gtk2::MenuItem->new('Add _multiple exits...');
+            my $item_addMultiple = Gtk3::MenuItem->new('Add _multiple exits...');
             $item_addMultiple->signal_connect('activate' => sub {
 
                 $self->addMultipleExitsCallback();
@@ -6475,9 +6262,9 @@
             # (Requires $self->currentRegionmap and one or more selected rooms)
             $self->ivAdd('menuToolItemHash', 'add_multiple_exits', $item_addMultiple);
 
-            $subMenu_setExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_setExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_removeChecked = Gtk2::MenuItem->new('Remove checked direction...');
+            my $item_removeChecked = Gtk3::MenuItem->new('Remove _checked direction...');
             $item_removeChecked->signal_connect('activate' => sub {
 
                 $self->removeCheckedDirCallback(FALSE);
@@ -6487,7 +6274,7 @@
             #   directions)
             $self->ivAdd('menuToolItemHash', 'remove_checked', $item_removeChecked);
 
-            my $item_removeCheckedAll = Gtk2::MenuItem->new('Remove all checked directions');
+            my $item_removeCheckedAll = Gtk3::MenuItem->new('Remove _all checked directions');
             $item_removeCheckedAll->signal_connect('activate' => sub {
 
                 $self->removeCheckedDirCallback(TRUE);
@@ -6497,9 +6284,9 @@
             #   directions)
             $self->ivAdd('menuToolItemHash', 'remove_checked_all', $item_removeCheckedAll);
 
-            $subMenu_setExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_setExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_markNormal = Gtk2::MenuItem->new('Mark room(s) as normal');
+            my $item_markNormal = Gtk3::MenuItem->new('Mark room(s) as n_ormal');
             $item_markNormal->signal_connect('activate' => sub {
 
                 $self->setWildCallback('normal');
@@ -6508,7 +6295,7 @@
             # (Require a current regionmap and one or more selected rooms)
             $self->ivAdd('menuToolItemHash', 'wilderness_normal', $item_markNormal);
 
-            my $item_markWild = Gtk2::MenuItem->new('Mark room(s) as wilderness');
+            my $item_markWild = Gtk3::MenuItem->new('Mark room(s) as _wilderness');
             $item_markWild->signal_connect('activate' => sub {
 
                 $self->setWildCallback('wild');
@@ -6518,7 +6305,7 @@
             #   $self->session->currentWorld->basicMappingFlag to be FALSE)
             $self->ivAdd('menuToolItemHash', 'wilderness_wild', $item_markWild);
 
-            my $item_markBorder = Gtk2::MenuItem->new('Mark room(s) as wilderness border');
+            my $item_markBorder = Gtk3::MenuItem->new('Mark room(s) as wilderness _border');
             $item_markBorder->signal_connect('activate' => sub {
 
                 $self->setWildCallback('border');
@@ -6528,15 +6315,15 @@
             #   $self->session->currentWorld->basicMappingFlag to be FALSE)
             $self->ivAdd('menuToolItemHash', 'wilderness_border', $item_markBorder);
 
-        my $item_setExits = Gtk2::ImageMenuItem->new('Add/set e_xits');
-        my $img_setExits = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_setExits = Gtk3::ImageMenuItem->new('Add/set _exits');
+        my $img_setExits = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_setExits->set_image($img_setExits);
         $item_setExits->set_submenu($subMenu_setExits);
         $column_rooms->append($item_setExits);
         # (Require a current regionmap and one or more selected rooms)
         $self->ivAdd('menuToolItemHash', 'set_exits', $item_setExits);
 
-        my $item_selectExit = Gtk2::MenuItem->new('Select e_xit in room...');
+        my $item_selectExit = Gtk3::MenuItem->new('Select e_xit in room...');
         $item_selectExit->signal_connect('activate' => sub {
 
             $self->selectExitCallback();
@@ -6545,10 +6332,10 @@
         # (Requires $self->currentRegionmap & $self->selectedRoom)
         $self->ivAdd('menuToolItemHash', 'select_exit', $item_selectExit);
 
-        $column_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_editRoom = Gtk2::ImageMenuItem->new('_Edit room...');
-        my $img_editRoom = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editRoom = Gtk3::ImageMenuItem->new('Ed_it room...');
+        my $img_editRoom = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editRoom->set_image($img_editRoom);
         $item_editRoom->signal_connect('activate' => sub {
 
@@ -6567,9 +6354,9 @@
         $self->ivAdd('menuToolItemHash', 'edit_room', $item_editRoom);
 
             # 'Room text' submenu
-            my $subMenu_roomText = Gtk2::Menu->new();
+            my $subMenu_roomText = Gtk3::Menu->new();
 
-            my $item_setRoomTag = Gtk2::MenuItem->new('Set room _tag...');
+            my $item_setRoomTag = Gtk3::MenuItem->new('Set room _tag...');
             $item_setRoomTag->signal_connect('activate' => sub {
 
                 $self->setRoomTagCallback();
@@ -6579,7 +6366,7 @@
             #   $self->selectedRoomTag)
             $self->ivAdd('menuToolItemHash', 'set_room_tag', $item_setRoomTag);
 
-            my $item_setGuild = Gtk2::MenuItem->new('Set room _guild...');
+            my $item_setGuild = Gtk3::MenuItem->new('Set room _guild...');
             $item_setGuild->signal_connect('activate' => sub {
 
                 $self->setRoomGuildCallback();
@@ -6589,9 +6376,9 @@
             #   $self->selectedRoomHash, $self->selectedRoomGuild, $self->selectedRoomGuildHash)
             $self->ivAdd('menuToolItemHash', 'set_room_guild', $item_setGuild);
 
-            $subMenu_roomText->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_roomText->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_resetPositions = Gtk2::MenuItem->new('_Reset text positions');
+            my $item_resetPositions = Gtk3::MenuItem->new('_Reset text positions');
             $item_resetPositions->signal_connect('activate' => sub {
 
                 $self->resetRoomOffsetsCallback();
@@ -6600,32 +6387,74 @@
             # (Requires $self->currentRegionmap & $self->selectedRoom)
             $self->ivAdd('menuToolItemHash', 'reset_positions', $item_resetPositions);
 
-        my $item_roomText = Gtk2::MenuItem->new('Set r_oom text');
+        my $item_roomText = Gtk3::MenuItem->new('Set room _text');
         $item_roomText->set_submenu($subMenu_roomText);
         $column_rooms->append($item_roomText);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'room_text', $item_roomText);
 
             # 'Toggle room flag' submenu
-            my $subMenu_toggleRoomFlag = Gtk2::Menu->new();
+            my $subMenu_toggleRoomFlag = Gtk3::Menu->new();
 
-            foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
+            if ($self->worldModelObj->roomFlagShowMode eq 'default') {
 
-                # A sub-sub menu for $filter
-                my $subSubMenu_filter = Gtk2::Menu->new();
+                # Show all room flags, sorted by filter
+                foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
 
-                my @nameList = $self->worldModelObj->getRoomFlagsInFilter($filter);
-                foreach my $name (@nameList) {
+                    # A sub-sub menu for $filter
+                    my $subSubMenu_filter = Gtk3::Menu->new();
 
-                    my $obj = $self->worldModelObj->ivShow('roomFlagHash', $name);
-                    if ($obj) {
+                    my @nameList = $self->worldModelObj->getRoomFlagsInFilter($filter);
+                    foreach my $name (@nameList) {
 
-                        my $menuItem = Gtk2::MenuItem->new($obj->descrip);
+                        my $obj = $self->worldModelObj->ivShow('roomFlagHash', $name);
+                        if ($obj) {
+
+                            my $menuItem = Gtk3::MenuItem->new($obj->descrip);
+                            $menuItem->signal_connect('activate' => sub {
+
+                                # Toggle the flags for all selected rooms, redraw them and (if the
+                                #   flag is one of the hazardous room flags) recalculate the
+                                #   regionmap's paths. The TRUE argument tells the world model to
+                                #   redraw the rooms
+                                $self->worldModelObj->toggleRoomFlags(
+                                    $self->session,
+                                    TRUE,
+                                    $obj->name,
+                                    $self->compileSelectedRooms(),
+                                );
+                            });
+                            $subSubMenu_filter->append($menuItem);
+                        }
+                    }
+
+                    if (! @nameList) {
+
+                        my $menuItem = Gtk3::MenuItem->new('(No flags in this filter)');
+                        $menuItem->set_sensitive(FALSE);
+                        $subSubMenu_filter->append($menuItem);
+                    }
+
+                    my $menuItem = Gtk3::MenuItem->new(ucfirst($filter));
+                    $menuItem->set_submenu($subSubMenu_filter);
+                    $subMenu_toggleRoomFlag->append($menuItem);
+                }
+
+            } else {
+
+                # Show selected room flags, sorted only by priority
+                my %showHash = $self->worldModelObj->getVisibleRoomFlags();
+                if (%showHash) {
+
+                    foreach my $obj (sort {$a->priority <=> $b->priority} (values %showHash)) {
+
+                        my $menuItem = Gtk3::MenuItem->new($obj->descrip);
                         $menuItem->signal_connect('activate' => sub {
 
-                            # Toggle the flags for all selected rooms, redraw them and (if the flag
-                            #   is one of the hazardous room flags) recalculate the regionmap's
-                            #   paths. The TRUE argument tells the world model to redraw the rooms
+                            # Toggle the flags for all selected rooms, redraw them and (if the
+                            #   flag is one of the hazardous room flags) recalculate the
+                            #   regionmap's paths. The TRUE argument tells the world model to
+                            #   redraw the rooms
                             $self->worldModelObj->toggleRoomFlags(
                                 $self->session,
                                 TRUE,
@@ -6633,23 +6462,18 @@
                                 $self->compileSelectedRooms(),
                             );
                         });
-                        $subSubMenu_filter->append($menuItem);
+                        $subMenu_toggleRoomFlag->append($menuItem);
                     }
-                }
 
-                if (! @nameList) {
+                } else {
 
-                    my $menuItem = Gtk2::MenuItem->new('(No flags in this filter)');
+                    my $menuItem = Gtk3::MenuItem->new('(None are marked visible)');
                     $menuItem->set_sensitive(FALSE);
-                    $subSubMenu_filter->append($menuItem);
+                    $subMenu_toggleRoomFlag->append($menuItem);
                 }
-
-                my $menuItem = Gtk2::MenuItem->new(ucfirst($filter));
-                $menuItem->set_submenu($subSubMenu_filter);
-                $subMenu_toggleRoomFlag->append($menuItem);
             }
 
-        my $item_toggleRoomFlag = Gtk2::MenuItem->new('_Toggle room flags');
+        my $item_toggleRoomFlag = Gtk3::MenuItem->new('Toggle room _flags');
         $item_toggleRoomFlag->set_submenu($subMenu_toggleRoomFlag);
         $column_rooms->append($item_toggleRoomFlag);
         # (Requires $self->currentRegionmap & either $self->selectedRoom or
@@ -6657,12 +6481,12 @@
         $self->ivAdd('menuToolItemHash', 'toggle_room_flag_sub', $item_toggleRoomFlag);
 
             # 'Other room features' submenu
-            my $subMenu_roomFeatures = Gtk2::Menu->new();
+            my $subMenu_roomFeatures = Gtk3::Menu->new();
 
                 # 'Update character visits' sub-submenu
-                my $subSubMenu_updateVisits = Gtk2::Menu->new();
+                my $subSubMenu_updateVisits = Gtk3::Menu->new();
 
-                my $item_increaseSetCurrent = Gtk2::MenuItem->new('Increase & set _current');
+                my $item_increaseSetCurrent = Gtk3::MenuItem->new('Increase & set _current');
                 $item_increaseSetCurrent->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('increase');
@@ -6672,39 +6496,39 @@
                 # (Requires $self->currentRegionmap and $self->selectedRoom)
                 $self->ivAdd('menuToolItemHash', 'increase_set_current', $item_increaseSetCurrent);
 
-                $subSubMenu_updateVisits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+                $subSubMenu_updateVisits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-                my $item_increaseVisits = Gtk2::MenuItem->new('_Increase by one');
+                my $item_increaseVisits = Gtk3::MenuItem->new('_Increase by one');
                 $item_increaseVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('increase');
                 });
                 $subSubMenu_updateVisits->append($item_increaseVisits);
 
-                my $item_decreaseVisits = Gtk2::MenuItem->new('_Decrease by one');
+                my $item_decreaseVisits = Gtk3::MenuItem->new('_Decrease by one');
                 $item_decreaseVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('decrease');
                 });
                 $subSubMenu_updateVisits->append($item_decreaseVisits);
 
-                my $item_manualVisits = Gtk2::MenuItem->new('Set _manually');
+                my $item_manualVisits = Gtk3::MenuItem->new('Set _manually');
                 $item_manualVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('manual');
                 });
                 $subSubMenu_updateVisits->append($item_manualVisits);
 
-                my $item_resetVisits = Gtk2::MenuItem->new('_Reset to zero');
+                my $item_resetVisits = Gtk3::MenuItem->new('_Reset to zero');
                 $item_resetVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('reset');
                 });
                 $subSubMenu_updateVisits->append($item_resetVisits);
 
-                $subSubMenu_updateVisits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+                $subSubMenu_updateVisits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-                my $item_toggleGraffiti = Gtk2::MenuItem->new('Toggle _graffiti');
+                my $item_toggleGraffiti = Gtk3::MenuItem->new('Toggle _graffiti');
                 $item_toggleGraffiti->signal_connect('activate' => sub {
 
                     $self->toggleGraffitiCallback();
@@ -6714,7 +6538,7 @@
                 #   rooms)
                 $self->ivAdd('menuToolItemHash', 'toggle_graffiti', $item_toggleGraffiti);
 
-            my $item_updateVisits = Gtk2::MenuItem->new('Update character _visits');
+            my $item_updateVisits = Gtk3::MenuItem->new('Update character _visits');
             $item_updateVisits->set_submenu($subSubMenu_updateVisits);
             $subMenu_roomFeatures->append($item_updateVisits);
             # (Requires $self->currentRegionmap & either $self->selectedRoom or
@@ -6722,9 +6546,9 @@
             $self->ivAdd('menuToolItemHash', 'update_visits', $item_updateVisits);
 
                 # 'Room exclusivity' sub-submenu
-                my $subSubMenu_exclusivity = Gtk2::Menu->new();
+                my $subSubMenu_exclusivity = Gtk3::Menu->new();
 
-                my $item_toggleExclusivity = Gtk2::MenuItem->new('_Toggle exclusivity');
+                my $item_toggleExclusivity = Gtk3::MenuItem->new('_Toggle exclusivity');
                 $item_toggleExclusivity->signal_connect('activate' => sub {
 
                     $self->toggleExclusiveProfileCallback();
@@ -6734,9 +6558,9 @@
                 #   $self->selectedRoomHash)
                 $self->ivAdd('menuToolItemHash', 'toggle_exclusivity', $item_toggleExclusivity);
 
-                $subSubMenu_exclusivity->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_exclusivity->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_addExclusiveProf = Gtk2::MenuItem->new('_Add exclusive profile...');
+                my $item_addExclusiveProf = Gtk3::MenuItem->new('_Add exclusive profile...');
                 $item_addExclusiveProf->signal_connect('activate' => sub {
 
                     $self->addExclusiveProfileCallback();
@@ -6745,7 +6569,7 @@
                 # (Requires $self->currentRegionmap & $self->selectedRoom)
                 $self->ivAdd('menuToolItemHash', 'add_exclusive_prof', $item_addExclusiveProf);
 
-                my $item_clearExclusiveProf = Gtk2::MenuItem->new('_Clear exclusive profiles');
+                my $item_clearExclusiveProf = Gtk3::MenuItem->new('_Clear exclusive profiles');
                 $item_clearExclusiveProf->signal_connect('activate' => sub {
 
                     $self->resetExclusiveProfileCallback();
@@ -6755,7 +6579,7 @@
                 #   $self->selectedRoomHash)
                 $self->ivAdd('menuToolItemHash', 'clear_exclusive_profs', $item_clearExclusiveProf);
 
-            my $item_exclusivity = Gtk2::MenuItem->new('Room exclusi_vity');
+            my $item_exclusivity = Gtk3::MenuItem->new('Room _exclusivity');
             $item_exclusivity->set_submenu($subSubMenu_exclusivity);
             $subMenu_roomFeatures->append($item_exclusivity);
             # (Requires $self->currentRegionmap & either $self->selectedRoom or
@@ -6763,9 +6587,9 @@
             $self->ivAdd('menuToolItemHash', 'room_exclusivity', $item_exclusivity);
 
                 # 'Source code' sub-submenu
-                my $subSubMenu_sourceCode = Gtk2::Menu->new();
+                my $subSubMenu_sourceCode = Gtk3::Menu->new();
 
-                my $item_setFilePath = Gtk2::MenuItem->new('_Set file path...');
+                my $item_setFilePath = Gtk3::MenuItem->new('_Set file path...');
                 $item_setFilePath->signal_connect('activate' => sub {
 
                     $self->setFilePathCallback();
@@ -6774,7 +6598,7 @@
                 # (Requires $self->currentRegionmap and $self->selectedRoom)
                 $self->ivAdd('menuToolItemHash', 'set_file_path', $item_setFilePath);
 
-                my $item_setVirtualArea = Gtk2::MenuItem->new('Set virtual _area...');
+                my $item_setVirtualArea = Gtk3::MenuItem->new('Set virtual _area...');
                 $item_setVirtualArea->signal_connect('activate' => sub {
 
                     $self->setVirtualAreaCallback(TRUE);
@@ -6784,7 +6608,7 @@
                 #   $self->selectedRoomHash)
                 $self->ivAdd('menuToolItemHash', 'set_virtual_area', $item_setVirtualArea);
 
-                my $item_resetVirtualArea = Gtk2::MenuItem->new('_Reset virtual area...');
+                my $item_resetVirtualArea = Gtk3::MenuItem->new('_Reset virtual area...');
                 $item_resetVirtualArea->signal_connect('activate' => sub {
 
                     $self->setVirtualAreaCallback(FALSE);
@@ -6794,7 +6618,7 @@
                 #   $self->selectedRoomHash)
                 $self->ivAdd('menuToolItemHash', 'reset_virtual_area', $item_resetVirtualArea);
 
-                my $item_showSourceCode = Gtk2::MenuItem->new('S_how file paths');
+                my $item_showSourceCode = Gtk3::MenuItem->new('S_how file paths');
                 $item_showSourceCode->signal_connect('activate' => sub {
 
                     # (Don't use $self->pseudoCmdMode - we want to see the footer messages)
@@ -6802,9 +6626,9 @@
                 });
                 $subSubMenu_sourceCode->append($item_showSourceCode);
 
-                $subSubMenu_sourceCode->append(Gtk2::SeparatorMenuItem->new()); # Separator
+                $subSubMenu_sourceCode->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-                my $item_viewSourceCode = Gtk2::MenuItem->new('_View file...');
+                my $item_viewSourceCode = Gtk3::MenuItem->new('_View file...');
                 $item_viewSourceCode->signal_connect('activate' => sub {
 
                     $self->quickFreeWin(
@@ -6820,7 +6644,7 @@
                 #   $self->selectedRoom->virtualAreaPath)
                 $self->ivAdd('menuToolItemHash', 'view_source_code', $item_viewSourceCode);
 
-                my $item_editSourceCode = Gtk2::MenuItem->new('_Edit file...');
+                my $item_editSourceCode = Gtk3::MenuItem->new('_Edit file...');
                 $item_editSourceCode->signal_connect('activate' => sub {
 
                     $self->editFileCallback();
@@ -6831,9 +6655,9 @@
                 #   $self->selectedRoom->virtualAreaPath)
                 $self->ivAdd('menuToolItemHash', 'edit_source_code', $item_editSourceCode);
 
-                $subSubMenu_sourceCode->append(Gtk2::SeparatorMenuItem->new()); # Separator
+                $subSubMenu_sourceCode->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-                my $item_viewVirtualArea = Gtk2::MenuItem->new('View virtual area _file...');
+                my $item_viewVirtualArea = Gtk3::MenuItem->new('View virtual area _file...');
                 $item_viewVirtualArea->signal_connect('activate' => sub {
 
                     $self->quickFreeWin(
@@ -6849,7 +6673,7 @@
                 #   $self->selectedRoom->virtualAreaPath
                 $self->ivAdd('menuToolItemHash', 'view_virtual_area', $item_viewVirtualArea);
 
-                my $item_editVirtualArea = Gtk2::MenuItem->new('E_dit virtual area file...');
+                my $item_editVirtualArea = Gtk3::MenuItem->new('E_dit virtual area file...');
                 $item_editVirtualArea->signal_connect('activate' => sub {
 
                     # Use TRUE to specify that the virtual area file should be opened
@@ -6860,20 +6684,20 @@
                 #   $self->selectedRoom->virtualAreaPath
                 $self->ivAdd('menuToolItemHash', 'edit_virtual_area', $item_editVirtualArea);
 
-            my $item_sourceCode = Gtk2::MenuItem->new('Source _code');
+            my $item_sourceCode = Gtk3::MenuItem->new('Source _code');
             $item_sourceCode->set_submenu($subSubMenu_sourceCode);
             $subMenu_roomFeatures->append($item_sourceCode);
 
-        my $item_roomFeatures = Gtk2::MenuItem->new('Other room _features');
+        my $item_roomFeatures = Gtk3::MenuItem->new('Ot_her room features');
         $item_roomFeatures->set_submenu($subMenu_roomFeatures);
         $column_rooms->append($item_roomFeatures);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'other_room_features', $item_roomFeatures);
 
-        $column_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_deleteRoom = Gtk2::ImageMenuItem->new('_Delete rooms');
-        my $img_deleteRoom = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteRoom = Gtk3::ImageMenuItem->new('_Delete rooms');
+        my $img_deleteRoom = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteRoom->set_image($img_deleteRoom);
         $item_deleteRoom->signal_connect('activate' => sub {
 
@@ -6898,7 +6722,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -6912,16 +6736,16 @@
         }
 
         # Set up column
-        my $column_exits = Gtk2::Menu->new();
+        my $column_exits = Gtk3::Menu->new();
         if (! $column_exits) {
 
             return undef;
         }
 
             # 'Set direction' submenu
-            my $subMenu_setDir = Gtk2::Menu->new();
+            my $subMenu_setDir = Gtk3::Menu->new();
 
-            my $item_changeDir = Gtk2::MenuItem->new('_Change direction...');
+            my $item_changeDir = Gtk3::MenuItem->new('_Change direction...');
             $item_changeDir->signal_connect('activate' => sub {
 
                 $self->changeDirCallback();
@@ -6931,20 +6755,20 @@
             #   $self->selectedExit->drawMode is 'primary' or 'perm_alloc')
             $self->ivAdd('menuToolItemHash', 'change_direction', $item_changeDir);
 
-            my $item_altDir = Gtk2::MenuItem->new('Set _alternative direction(s)...');
+            my $item_altDir = Gtk3::MenuItem->new('Set _alternative direction(s)...');
             $item_altDir->signal_connect('activate' => sub {
 
                 $self->setAltDirCallback();
             });
             $subMenu_setDir->append($item_altDir);
 
-        my $item_setDir = Gtk2::MenuItem->new('Set _direction');
+        my $item_setDir = Gtk3::MenuItem->new('Set di_rection');
         $item_setDir->set_submenu($subMenu_setDir);
         $column_exits->append($item_setDir);
         # (Requires $self->currentRegionmap and $self->selectedExit)
         $self->ivAdd('menuToolItemHash', 'set_exit_dir', $item_setDir);
 
-        my $item_setAssisted = Gtk2::MenuItem->new('Set assisted _move...');
+        my $item_setAssisted = Gtk3::MenuItem->new('Set assisted _move...');
         $item_setAssisted->signal_connect('activate' => sub {
 
             $self->setAssistedMoveCallback();
@@ -6955,30 +6779,30 @@
         $self->ivAdd('menuToolItemHash', 'set_assisted_move', $item_setAssisted);
 
             # 'Allocate map direction' submenu
-            my $subMenu_allocateMapDir = Gtk2::Menu->new();
+            my $subMenu_allocateMapDir = Gtk3::Menu->new();
 
-            my $item_allocatePrimary = Gtk2::MenuItem->new('Choose _direction...');
+            my $item_allocatePrimary = Gtk3::MenuItem->new('Choose _direction...');
             $item_allocatePrimary->signal_connect('activate' => sub {
 
                 $self->allocateMapDirCallback();
             });
             $subMenu_allocateMapDir->append($item_allocatePrimary);
 
-            my $item_confirmTwoWay = Gtk2::MenuItem->new('Confirm _two-way exit...');
+            my $item_confirmTwoWay = Gtk3::MenuItem->new('Confirm _two-way exit...');
             $item_confirmTwoWay->signal_connect('activate' => sub {
 
                 $self->confirmTwoWayCallback();
             });
             $subMenu_allocateMapDir->append($item_confirmTwoWay);
 
-        my $item_allocateMapDir = Gtk2::MenuItem->new('_Allocate map direction');
+        my $item_allocateMapDir = Gtk3::MenuItem->new('_Allocate map direction');
         $item_allocateMapDir->set_submenu($subMenu_allocateMapDir);
         $column_exits->append($item_allocateMapDir);
         # (Requires $self->currentRegionmap and $self->selectedExit and
         #   $self->selectedExit->drawMode is 'temp_alloc' or 'temp_unalloc')
         $self->ivAdd('menuToolItemHash', 'allocate_map_dir', $item_allocateMapDir);
 
-        my $item_allocateShadow = Gtk2::MenuItem->new('Allocate _shadow...');
+        my $item_allocateShadow = Gtk3::MenuItem->new('Allocate _shadow...');
         $item_allocateShadow->signal_connect('activate' => sub {
 
             $self->allocateShadowCallback();
@@ -6988,9 +6812,9 @@
         #   $self->selectedExit->drawMode is 'temp_alloc' or 'temp_unalloc')
         $self->ivAdd('menuToolItemHash', 'allocate_shadow', $item_allocateShadow);
 
-        $column_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_connectExitToClick = Gtk2::MenuItem->new('_Connect to click');
+        my $item_connectExitToClick = Gtk3::MenuItem->new('_Connect to click');
         $item_connectExitToClick->signal_connect('activate' => sub {
 
             $self->connectToClickCallback();
@@ -7000,7 +6824,7 @@
         #   $self->selectedExit->drawMode 'primary', 'temp_unalloc' or 'perm_alloc')
         $self->ivAdd('menuToolItemHash', 'connect_to_click', $item_connectExitToClick);
 
-        my $item_disconnectExit = Gtk2::MenuItem->new('D_isconnect exit');
+        my $item_disconnectExit = Gtk3::MenuItem->new('D_isconnect exit');
         $item_disconnectExit->signal_connect('activate' => sub {
 
             $self->disconnectExitCallback();
@@ -7009,10 +6833,10 @@
         # (Requires $self->currentRegionmap and $self->selectedExit)
         $self->ivAdd('menuToolItemHash', 'disconnect_exit', $item_disconnectExit);
 
-        $column_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Set ornaments' submenu
-            my $subMenu_setOrnament = Gtk2::Menu->new();
+            my $subMenu_setOrnament = Gtk3::Menu->new();
 
             # Create a list of exit ornament types, in groups of two, in the form
             #   (menu_item_title, exit_ornament_type)
@@ -7033,7 +6857,7 @@
                 $title = shift @titleList;
                 $type = shift @titleList;
 
-                my $menuItem = Gtk2::MenuItem->new($title);
+                my $menuItem = Gtk3::MenuItem->new($title);
                 $menuItem->signal_connect('activate' => sub {
 
                     $self->exitOrnamentCallback($type);
@@ -7042,9 +6866,9 @@
 
             } until (! @titleList);
 
-            $subMenu_setOrnament->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_setOrnament->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_setTwinOrnament = Gtk2::CheckMenuItem->new('Also set _twin exits');
+            my $item_setTwinOrnament = Gtk3::CheckMenuItem->new('Also set _twin exits');
             $item_setTwinOrnament->set_active($self->worldModelObj->setTwinOrnamentFlag);
             $item_setTwinOrnament->signal_connect('toggled' => sub {
 
@@ -7062,7 +6886,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'also_set_twin_exits', $item_setTwinOrnament);
 
-        my $item_setOrnament = Gtk2::MenuItem->new('Set _ornaments');
+        my $item_setOrnament = Gtk3::MenuItem->new('Set _ornaments');
         $item_setOrnament->set_submenu($subMenu_setOrnament);
         $column_exits->append($item_setOrnament);
         # (Requires $self->currentRegionmap & either $self->selectedExit or
@@ -7070,42 +6894,42 @@
         $self->ivAdd('menuToolItemHash', 'set_ornament_sub', $item_setOrnament);
 
             # 'Set exit type' submenu
-            my $subMenu_setExitType = Gtk2::Menu->new();
+            my $subMenu_setExitType = Gtk3::Menu->new();
 
                 # 'Set hidden' sub-submenu
-                my $subSubMenu_setHidden = Gtk2::Menu->new();
+                my $subSubMenu_setHidden = Gtk3::Menu->new();
 
-                my $item_setHiddenExit = Gtk2::MenuItem->new('Mark exit _hidden');
+                my $item_setHiddenExit = Gtk3::MenuItem->new('Mark exit _hidden');
                 $item_setHiddenExit->signal_connect('activate' => sub {
 
                     $self->hiddenExitCallback(TRUE);
                 });
                 $subSubMenu_setHidden->append($item_setHiddenExit);
 
-                my $item_setNotHiddenExit = Gtk2::MenuItem->new('Mark exit _not hidden');
+                my $item_setNotHiddenExit = Gtk3::MenuItem->new('Mark exit _not hidden');
                 $item_setNotHiddenExit->signal_connect('activate' => sub {
 
                     $self->hiddenExitCallback(FALSE);
                 });
                 $subSubMenu_setHidden->append($item_setNotHiddenExit);
 
-            my $item_setHidden = Gtk2::MenuItem->new('Set _hidden');
+            my $item_setHidden = Gtk3::MenuItem->new('Set _hidden');
             $item_setHidden->set_submenu($subSubMenu_setHidden);
             $subMenu_setExitType->append($item_setHidden);
             # (Requires $self->currentRegionmap and $self->selectedExit)
             $self->ivAdd('menuToolItemHash', 'set_hidden_sub', $item_setHidden);
 
                 # 'Set broken' sub-submenu
-                my $subSubMenu_setBroken = Gtk2::Menu->new();
+                my $subSubMenu_setBroken = Gtk3::Menu->new();
 
-                my $item_markBrokenExit = Gtk2::MenuItem->new('_Mark exit as broken');
+                my $item_markBrokenExit = Gtk3::MenuItem->new('_Mark exit as broken');
                 $item_markBrokenExit->signal_connect('activate' => sub {
 
                     $self->markBrokenExitCallback();
                 });
                 $subSubMenu_setBroken->append($item_markBrokenExit);
 
-                my $item_toggleBrokenExit = Gtk2::MenuItem->new('_Toggle bent broken exit');
+                my $item_toggleBrokenExit = Gtk3::MenuItem->new('_Toggle bent broken exit');
                 $item_toggleBrokenExit->signal_connect('activate' => sub {
 
                     $self->worldModelObj->toggleBentExit(
@@ -7118,50 +6942,50 @@
                 #   exit)
                 $self->ivAdd('menuToolItemHash', 'toggle_bent_exit', $item_toggleBrokenExit);
 
-                $subSubMenu_setBroken->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setBroken->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_restoreBrokenExit = Gtk2::MenuItem->new('_Restore unbroken exit');
+                my $item_restoreBrokenExit = Gtk3::MenuItem->new('_Restore unbroken exit');
                 $item_restoreBrokenExit->signal_connect('activate' => sub {
 
                     $self->restoreBrokenExitCallback();
                 });
                 $subSubMenu_setBroken->append($item_restoreBrokenExit);
 
-            my $item_setBroken = Gtk2::MenuItem->new('Set _broken');
+            my $item_setBroken = Gtk3::MenuItem->new('Set _broken');
             $item_setBroken->set_submenu($subSubMenu_setBroken);
             $subMenu_setExitType->append($item_setBroken);
             # (Requires $self->currentRegionmap and $self->selectedExit)
             $self->ivAdd('menuToolItemHash', 'set_broken_sub', $item_setBroken);
 
                 # 'Set one-way' sub-submenu
-                my $subSubMenu_setOneWay = Gtk2::Menu->new();
+                my $subSubMenu_setOneWay = Gtk3::Menu->new();
 
-                my $item_markOneWayExit = Gtk2::MenuItem->new('_Mark exit as one-way');
+                my $item_markOneWayExit = Gtk3::MenuItem->new('_Mark exit as one-way');
                 $item_markOneWayExit->signal_connect('activate' => sub {
 
                     $self->markOneWayExitCallback();
                 });
                 $subSubMenu_setOneWay->append($item_markOneWayExit);
 
-                $subSubMenu_setOneWay->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setOneWay->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_restoreUncertainExit = Gtk2::MenuItem->new('Restore _uncertain exit');
+                my $item_restoreUncertainExit = Gtk3::MenuItem->new('Restore _uncertain exit');
                 $item_restoreUncertainExit->signal_connect('activate' => sub {
 
                     $self->restoreOneWayExitCallback(FALSE);
                 });
                 $subSubMenu_setOneWay->append($item_restoreUncertainExit);
 
-                my $item_restoreTwoWayExit = Gtk2::MenuItem->new('Restore _two-way exit');
+                my $item_restoreTwoWayExit = Gtk3::MenuItem->new('Restore _two-way exit');
                 $item_restoreTwoWayExit->signal_connect('activate' => sub {
 
                     $self->restoreOneWayExitCallback(TRUE);
                 });
                 $subSubMenu_setOneWay->append($item_restoreTwoWayExit);
 
-                $subSubMenu_setOneWay->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setOneWay->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_setIncomingDir = Gtk2::MenuItem->new('Set incoming direction...');
+                my $item_setIncomingDir = Gtk3::MenuItem->new('Set incoming _direction...');
                 $item_setIncomingDir->signal_connect('activate' => sub {
 
                     $self->setIncomingDirCallback();
@@ -7171,42 +6995,42 @@
                 #   exit)
                 $self->ivAdd('menuToolItemHash', 'set_incoming_dir', $item_setIncomingDir);
 
-            my $item_setOneWay = Gtk2::MenuItem->new('Set _one-way');
+            my $item_setOneWay = Gtk3::MenuItem->new('Set _one-way');
             $item_setOneWay->set_submenu($subSubMenu_setOneWay);
             $subMenu_setExitType->append($item_setOneWay);
             # (Requires $self->currentRegionmap and $self->selectedExit)
             $self->ivAdd('menuToolItemHash', 'set_oneway_sub', $item_setOneWay);
 
                 # 'Set retracing' sub-submenu
-                my $subSubMenu_setRetracing = Gtk2::Menu->new();
+                my $subSubMenu_setRetracing = Gtk3::Menu->new();
 
-                my $item_markRetracingExit = Gtk2::MenuItem->new('_Mark exit as retracing');
+                my $item_markRetracingExit = Gtk3::MenuItem->new('_Mark exit as retracing');
                 $item_markRetracingExit->signal_connect('activate' => sub {
 
                     $self->markRetracingExitCallback();
                 });
                 $subSubMenu_setRetracing->append($item_markRetracingExit);
 
-                $subSubMenu_setRetracing->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setRetracing->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_restoreRetracingExit = Gtk2::MenuItem->new('Restore _incomplete exit');
+                my $item_restoreRetracingExit = Gtk3::MenuItem->new('_Restore incomplete exit');
                 $item_restoreRetracingExit->signal_connect('activate' => sub {
 
                     $self->restoreRetracingExitCallback();
                 });
                 $subSubMenu_setRetracing->append($item_restoreRetracingExit);
 
-            my $item_setRetracing = Gtk2::MenuItem->new('Set _retracing');
+            my $item_setRetracing = Gtk3::MenuItem->new('Set _retracing');
             $item_setRetracing->set_submenu($subSubMenu_setRetracing);
             $subMenu_setExitType->append($item_setRetracing);
             # (Requires $self->currentRegionmap and $self->selectedExit)
             $self->ivAdd('menuToolItemHash', 'set_retracing_sub', $item_setRetracing);
 
                 # 'Set random' sub-submenu
-                my $subSubMenu_setRandomExit = Gtk2::Menu->new();
+                my $subSubMenu_setRandomExit = Gtk3::Menu->new();
 
-                my $item_markRandomRegion = Gtk2::MenuItem->new(
-                    'Set random destination in same region',
+                my $item_markRandomRegion = Gtk3::MenuItem->new(
+                    'Set random destination in same _region',
                 );
                 $item_markRandomRegion->signal_connect('activate' => sub {
 
@@ -7215,7 +7039,7 @@
                 $subSubMenu_setRandomExit->append($item_markRandomRegion);
 
                 my $item_markRandomAnywhere
-                    = Gtk2::MenuItem->new('Set random destination anywhere');
+                    = Gtk3::MenuItem->new('Set random destination _anywhere');
                 $item_markRandomAnywhere->signal_connect('activate' => sub {
 
                     $self->markRandomExitCallback('any_region');
@@ -7223,47 +7047,47 @@
                 $subSubMenu_setRandomExit->append($item_markRandomAnywhere);
 
                 my $item_randomTempRegion
-                    = Gtk2::MenuItem->new('_Create destination in temporary region');
+                    = Gtk3::MenuItem->new('_Create destination in temporary region');
                 $item_randomTempRegion->signal_connect('activate' => sub {
 
                     $self->markRandomExitCallback('temp_region');
                 });
                 $subSubMenu_setRandomExit->append($item_randomTempRegion);
 
-                my $item_markRandomList = Gtk2::MenuItem->new('Use list of random destinations');
+                my $item_markRandomList = Gtk3::MenuItem->new('_Use list of random destinations');
                 $item_markRandomList->signal_connect('activate' => sub {
 
                     $self->markRandomExitCallback('room_list');
                 });
                 $subSubMenu_setRandomExit->append($item_markRandomList);
 
-                $subSubMenu_setRandomExit->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setRandomExit->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_restoreRandomExit = Gtk2::MenuItem->new('Restore _incomplete exit');
+                my $item_restoreRandomExit = Gtk3::MenuItem->new('Restore _incomplete exit');
                 $item_restoreRandomExit->signal_connect('activate' => sub {
 
                     $self->restoreRandomExitCallback();
                 });
                 $subSubMenu_setRandomExit->append($item_restoreRandomExit);
 
-            my $item_setRandomExit = Gtk2::MenuItem->new('Set r_andom');
+            my $item_setRandomExit = Gtk3::MenuItem->new('Set r_andom');
             $item_setRandomExit->set_submenu($subSubMenu_setRandomExit);
             $subMenu_setExitType->append($item_setRandomExit);
             # (Requires $self->currentRegionmap and $self->selectedExit)
             $self->ivAdd('menuToolItemHash', 'set_random_sub', $item_setRandomExit);
 
                 # 'Set super' sub-submenu
-                my $subSubMenu_setSuperExit = Gtk2::Menu->new();
+                my $subSubMenu_setSuperExit = Gtk3::Menu->new();
 
-                my $item_markSuper = Gtk2::MenuItem->new('Mark exit as _super-region exit');
+                my $item_markSuper = Gtk3::MenuItem->new('Mark exit as _super-region exit');
                 $item_markSuper->signal_connect('activate' => sub {
 
                     $self->markSuperExitCallback(FALSE);
                 });
                 $subSubMenu_setSuperExit->append($item_markSuper);
 
-                my $item_markSuperExcl = Gtk2::MenuItem->new(
-                    '_Mark exit as exclusive super-region exit',
+                my $item_markSuperExcl = Gtk3::MenuItem->new(
+                    'Mark exit as _exclusive super-region exit',
                 );
                 $item_markSuperExcl->signal_connect('activate' => sub {
 
@@ -7271,24 +7095,24 @@
                 });
                 $subSubMenu_setSuperExit->append($item_markSuperExcl);
 
-                $subSubMenu_setSuperExit->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setSuperExit->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_markNotSuper = Gtk2::MenuItem->new('Mark exit as _normal region exit');
+                my $item_markNotSuper = Gtk3::MenuItem->new('Mark exit as _normal region exit');
                 $item_markNotSuper->signal_connect('activate' => sub {
 
                     $self->restoreSuperExitCallback();
                 });
                 $subSubMenu_setSuperExit->append($item_markNotSuper);
 
-            my $item_setSuperExit = Gtk2::MenuItem->new('Set _super');
+            my $item_setSuperExit = Gtk3::MenuItem->new('Set _super');
             $item_setSuperExit->set_submenu($subSubMenu_setSuperExit);
             $subMenu_setExitType->append($item_setSuperExit);
             # (Requires $self->currentRegionmap and $self->selectedExit which is a region exit)
             $self->ivAdd('menuToolItemHash', 'set_super_sub', $item_setSuperExit);
 
-            $subMenu_setExitType->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_setExitType->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_setExitTwin = Gtk2::MenuItem->new('Set exit _twin...');
+            my $item_setExitTwin = Gtk3::MenuItem->new('Set exit _twin...');
             $item_setExitTwin->signal_connect('activate' => sub {
 
                 $self->setExitTwinCallback();
@@ -7298,16 +7122,16 @@
             #   exit or an uncertain exit)
             $self->ivAdd('menuToolItemHash', 'set_exit_twin', $item_setExitTwin);
 
-        my $item_setExitType = Gtk2::MenuItem->new('Set e_xit type');
+        my $item_setExitType = Gtk3::MenuItem->new('Set _exit type');
         $item_setExitType->set_submenu($subMenu_setExitType);
         $column_exits->append($item_setExitType);
         # (Requires $self->currentRegionmap and $self->selectedExit)
         $self->ivAdd('menuToolItemHash', 'set_exit_type', $item_setExitType);
 
             # 'Exit tags' submenu
-            my $subMenu_exitTags = Gtk2::Menu->new();
+            my $subMenu_exitTags = Gtk3::Menu->new();
 
-            my $item_setExitText = Gtk2::MenuItem->new('_Edit tag text');
+            my $item_setExitText = Gtk3::MenuItem->new('_Edit tag text');
             $item_setExitText->signal_connect('activate' => sub {
 
                 $self->editExitTagCallback();
@@ -7317,7 +7141,7 @@
             #   exit, or a $self->selectedExitTag)
             $self->ivAdd('menuToolItemHash', 'edit_tag_text', $item_setExitText);
 
-            my $item_toggleExitTag = Gtk2::MenuItem->new('_Toggle exit tag');
+            my $item_toggleExitTag = Gtk3::MenuItem->new('_Toggle exit tag');
             $item_toggleExitTag->signal_connect('activate' => sub {
 
                 $self->toggleExitTagCallback();
@@ -7327,9 +7151,9 @@
             #   exit, or a $self->selectedExitTag)
             $self->ivAdd('menuToolItemHash', 'toggle_exit_tag', $item_toggleExitTag);
 
-            $subMenu_exitTags->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitTags->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_resetPositions = Gtk2::MenuItem->new('Reset tag positio_ns');
+            my $item_resetPositions = Gtk3::MenuItem->new('_Reset tag positions');
             $item_resetPositions->signal_connect('activate' => sub {
 
                 $self->resetExitOffsetsCallback();
@@ -7339,9 +7163,9 @@
             #   $self->selectedExitHash, $self->selectedExitTag and $self->selectedExitTagHash)
             $self->ivAdd('menuToolItemHash', 'reset_exit_tags', $item_resetPositions);
 
-            $subMenu_exitTags->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitTags->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_applyExitTags = Gtk2::MenuItem->new('_Apply all tags in region');
+            my $item_applyExitTags = Gtk3::MenuItem->new('_Apply all tags in region');
             $item_applyExitTags->signal_connect('activate' => sub {
 
                 $self->applyExitTagsCallback(TRUE);
@@ -7349,23 +7173,23 @@
             $subMenu_exitTags->append($item_applyExitTags);
 
 
-            my $item_cancelExitTags = Gtk2::MenuItem->new('_Cancel all tags in region');
+            my $item_cancelExitTags = Gtk3::MenuItem->new('_Cancel all tags in region');
             $item_cancelExitTags->signal_connect('activate' => sub {
 
                 $self->applyExitTagsCallback(FALSE);
             });
             $subMenu_exitTags->append($item_cancelExitTags);
 
-        my $item_exitTags = Gtk2::MenuItem->new('Exit _tags');
+        my $item_exitTags = Gtk3::MenuItem->new('Exit _tags');
         $item_exitTags->set_submenu($subMenu_exitTags);
         $column_exits->append($item_exitTags);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'exit_tags', $item_exitTags);
 
-        $column_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_editExit = Gtk2::ImageMenuItem->new('_Edit exit...');
-        my $img_editExit = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editExit = Gtk3::ImageMenuItem->new('Edit e_xit...');
+        my $img_editExit = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editExit->set_image($img_editExit);
         $item_editExit->signal_connect('activate' => sub {
 
@@ -7375,19 +7199,19 @@
         # (Requires $self->currentRegionmap and $self->selectedExit)
         $self->ivAdd('menuToolItemHash', 'edit_exit', $item_editExit);
 
-        $column_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Exit options' submenu
-            my $subMenu_exitOptions = Gtk2::Menu->new();
+            my $subMenu_exitOptions = Gtk3::Menu->new();
 
-            my $item_completeSelected = Gtk2::MenuItem->new('Complete selected _uncertain exits');
+            my $item_completeSelected = Gtk3::MenuItem->new('_Complete selected uncertain exits');
             $item_completeSelected->signal_connect('activate' => sub {
 
                 $self->completeExitsCallback();
             });
             $subMenu_exitOptions->append($item_completeSelected);
 
-            my $item_connectAdjacent = Gtk2::MenuItem->new('Connect selected _adjacent rooms');
+            my $item_connectAdjacent = Gtk3::MenuItem->new('C_onnect selected adjacent rooms');
             $item_connectAdjacent->signal_connect('activate' => sub {
 
                 $self->connectAdjacentCallback();
@@ -7396,9 +7220,9 @@
             # (Requires $self->currentRegionmap and one or more selected rooms)
             $self->ivAdd('menuToolItemHash', 'connect_adjacent', $item_connectAdjacent);
 
-            $subMenu_exitOptions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitOptions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_autocomplete = Gtk2::CheckMenuItem->new('A_utocomplete uncertain exits');
+            my $item_autocomplete = Gtk3::CheckMenuItem->new('_Autocomplete uncertain exits');
             $item_autocomplete->set_active($self->worldModelObj->autocompleteExitsFlag);
             $item_autocomplete->signal_connect('toggled' => sub {
 
@@ -7416,7 +7240,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'autocomplete_uncertain', $item_autocomplete);
 
-            my $item_intUncertain = Gtk2::CheckMenuItem->new('_Intelligent uncertain exits');
+            my $item_intUncertain = Gtk3::CheckMenuItem->new('_Intelligent uncertain exits');
             $item_intUncertain->set_active(
                 $self->worldModelObj->intelligentExitsFlag,
             );
@@ -7436,9 +7260,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'intelligent_uncertain', $item_intUncertain);
 
-            $subMenu_exitOptions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitOptions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_collectChecked = Gtk2::CheckMenuItem->new('Collect _checked directions');
+            my $item_collectChecked = Gtk3::CheckMenuItem->new('Co_llect checked directions');
             $item_collectChecked->set_active(
                 $self->worldModelObj->collectCheckedDirsFlag,
             );
@@ -7458,7 +7282,7 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'collect_checked_dirs', $item_collectChecked);
 
-            my $item_drawChecked = Gtk2::CheckMenuItem->new('Draw c_hecked directions');
+            my $item_drawChecked = Gtk3::CheckMenuItem->new('_Draw checked directions');
             $item_drawChecked->set_active(
                 $self->worldModelObj->drawCheckedDirsFlag,
             );
@@ -7484,12 +7308,13 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'draw_checked_dirs', $item_drawChecked);
 
-            $subMenu_exitOptions->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitOptions->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
                  # 'Checkable directions' sub-submenu
-                my $subSubMenu_checkable = Gtk2::Menu->new();
+                my $subSubMenu_checkable = Gtk3::Menu->new();
 
-                my $item_checkableSimple = Gtk2::RadioMenuItem->new(undef, 'Count NSEW');
+                my $item_checkableSimple
+                    = Gtk3::RadioMenuItem->new_with_mnemonic(undef, 'Count _NSEW');
                 $item_checkableSimple->signal_connect('toggled' => sub {
 
                     if ($item_checkableSimple->get_active) {
@@ -7502,9 +7327,9 @@
                 # (Never desensitised)
                 $self->ivAdd('menuToolItemHash', 'checkable_dir_simple', $item_checkableSimple);
 
-                my $item_checkableDiku = Gtk2::RadioMenuItem->new(
+                my $item_checkableDiku = Gtk3::RadioMenuItem->new_with_mnemonic(
                     $item_checkableGroup,
-                    'Count NSEWUD',
+                    'Count NSEW_UD',
                 );
                 if ($self->worldModelObj->checkableDirMode eq 'diku') {
 
@@ -7521,9 +7346,9 @@
                 # (Never desensitised)
                 $self->ivAdd('menuToolItemHash', 'checkable_dir_diku', $item_checkableDiku);
 
-                my $item_checkableLP = Gtk2::RadioMenuItem->new(
+                my $item_checkableLP = Gtk3::RadioMenuItem->new_with_mnemonic(
                     $item_checkableGroup,
-                    'Count NSEWUD, NE/NW/SE/SW',
+                    'Count NSEWUD, N_E/NW/SE/SW',
                 );
                 if ($self->worldModelObj->checkableDirMode eq 'lp') {
 
@@ -7540,9 +7365,9 @@
                 # (Never desensitised)
                 $self->ivAdd('menuToolItemHash', 'checkable_dir_lp', $item_checkableLP);
 
-                my $item_checkableComplex = Gtk2::RadioMenuItem->new(
+                my $item_checkableComplex = Gtk3::RadioMenuItem->new_with_mnemonic(
                     $item_checkableGroup,
-                    'Count all primary directions',
+                    'Count _all primary directions',
                 );
                 if ($self->worldModelObj->checkableDirMode eq 'complex') {
 
@@ -7559,52 +7384,52 @@
                 # (Never desensitised)
                 $self->ivAdd('menuToolItemHash', 'checkable_dir_complex', $item_checkableComplex);
 
-            my $item_exits = Gtk2::MenuItem->new('_Checkable directions');
+            my $item_exits = Gtk3::MenuItem->new('C_heckable directions');
             $item_exits->set_submenu($subSubMenu_checkable);
             $subMenu_exitOptions->append($item_exits);
 
-        my $item_exitOptions = Gtk2::MenuItem->new('Exit _options');
+        my $item_exitOptions = Gtk3::MenuItem->new('Exit o_ptions');
         $item_exitOptions->set_submenu($subMenu_exitOptions);
         $column_exits->append($item_exitOptions);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'exit_options', $item_exitOptions);
 
             # 'Exit lengths' submenu
-            my $subMenu_exitLengths = Gtk2::Menu->new();
+            my $subMenu_exitLengths = Gtk3::Menu->new();
 
-            my $item_horizontalLength = Gtk2::MenuItem->new('Set _horizontal length...');
+            my $item_horizontalLength = Gtk3::MenuItem->new('Set _horizontal length...');
             $item_horizontalLength->signal_connect('activate' => sub {
 
                 $self->setExitLengthCallback('horizontal');
             });
             $subMenu_exitLengths->append($item_horizontalLength);
 
-            my $item_verticalLength = Gtk2::MenuItem->new('Set _vertical length...');
+            my $item_verticalLength = Gtk3::MenuItem->new('Set _vertical length...');
             $item_verticalLength->signal_connect('activate' => sub {
 
                 $self->setExitLengthCallback('vertical');
             });
             $subMenu_exitLengths->append($item_verticalLength);
 
-            $subMenu_exitLengths->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitLengths->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_resetLength = Gtk2::MenuItem->new('_Reset exit lengths');
+            my $item_resetLength = Gtk3::MenuItem->new('_Reset exit lengths');
             $item_resetLength->signal_connect('activate' => sub {
 
                 $self->resetExitLengthCallback();
             });
             $subMenu_exitLengths->append($item_resetLength);
 
-        my $item_exitLengths = Gtk2::MenuItem->new('Exit _lengths...');
+        my $item_exitLengths = Gtk3::MenuItem->new('Exit _lengths...');
         $item_exitLengths->set_submenu($subMenu_exitLengths);
         $column_exits->append($item_exitLengths);
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'exit_lengths', $item_exitLengths);
 
-        $column_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $column_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_deleteExit = Gtk2::ImageMenuItem->new('_Delete exit');
-        my $img_deleteExit = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteExit = Gtk3::ImageMenuItem->new('_Delete exit');
+        my $img_deleteExit = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteExit->set_image($img_deleteExit);
         $item_deleteExit->signal_connect('activate' => sub {
 
@@ -7628,7 +7453,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -7642,14 +7467,14 @@
         }
 
         # Set up column
-        my $column_labels = Gtk2::Menu->new();
+        my $column_labels = Gtk3::Menu->new();
         if (! $column_labels) {
 
             return undef;
         }
 
-        my $item_addLabelAtClick = Gtk2::ImageMenuItem->new('Add label at _click');
-        my $img_addLabelAtClick = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addLabelAtClick = Gtk3::ImageMenuItem->new('Add label at _click');
+        my $img_addLabelAtClick = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addLabelAtClick->set_image($img_addLabelAtClick);
         $item_addLabelAtClick->signal_connect('activate' => sub {
 
@@ -7664,8 +7489,8 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'add_label_at_click', $item_addLabelAtClick);
 
-        my $item_addLabelAtBlock = Gtk2::ImageMenuItem->new('Add label at _block');
-        my $img_addLabelAtBlock = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addLabelAtBlock = Gtk3::ImageMenuItem->new('Add label at _block');
+        my $img_addLabelAtBlock = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addLabelAtBlock->set_image($img_addLabelAtBlock);
         $item_addLabelAtBlock->signal_connect('activate' => sub {
 
@@ -7675,10 +7500,10 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'add_label_at_block', $item_addLabelAtBlock);
 
-        $column_labels->append(Gtk2::SeparatorMenuItem->new()); # Separator
+        $column_labels->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-        my $item_setLabel = Gtk2::ImageMenuItem->new('_Set label...');
-        my $img_setLabel = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_setLabel = Gtk3::ImageMenuItem->new('_Set label...');
+        my $img_setLabel = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_setLabel->set_image($img_setLabel);
         $item_setLabel->signal_connect('activate' => sub {
 
@@ -7688,8 +7513,8 @@
         # (Requires $self->currentRegionmap and $self->selectedLabel)
         $self->ivAdd('menuToolItemHash', 'set_label', $item_setLabel);
 
-        my $item_customiseLabel = Gtk2::ImageMenuItem->new('_Customise label...');
-        my $img_customiseLabel = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_customiseLabel = Gtk3::ImageMenuItem->new('C_ustomise label...');
+        my $img_customiseLabel = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_customiseLabel->set_image($img_customiseLabel);
         $item_customiseLabel->signal_connect('activate' => sub {
 
@@ -7699,7 +7524,7 @@
         # (Requires $self->currentRegionmap and $self->selectedLabel)
         $self->ivAdd('menuToolItemHash', 'customise_label', $item_customiseLabel);
 
-            my $item_useMultiLine = Gtk2::CheckMenuItem->new('Use _multiline labels');
+            my $item_useMultiLine = Gtk3::CheckMenuItem->new('Use _multiline labels');
             $item_useMultiLine->set_active($self->worldModelObj->mapLabelTextViewFlag);
             $item_useMultiLine->signal_connect('toggled' => sub {
 
@@ -7717,9 +7542,9 @@
             # (Never desensitised)
             $self->ivAdd('menuToolItemHash', 'use_multi_line', $item_useMultiLine);
 
-        $column_labels->append(Gtk2::SeparatorMenuItem->new()); # Separator
+        $column_labels->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-        my $item_selectLabel = Gtk2::MenuItem->new('_Select label...');
+        my $item_selectLabel = Gtk3::MenuItem->new('S_elect label...');
         $item_selectLabel->signal_connect('activate' => sub {
 
             $self->selectLabelCallback();
@@ -7728,10 +7553,10 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'select_label', $item_selectLabel);
 
-        $column_labels->append(Gtk2::SeparatorMenuItem->new()); # Separator
+        $column_labels->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-        my $item_addStyle = Gtk2::ImageMenuItem->new('_Add label style...');
-        my $img_addStyle = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addStyle = Gtk3::ImageMenuItem->new('_Add label style...');
+        my $img_addStyle = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addStyle->set_image($img_addStyle);
         $item_addStyle->signal_connect('activate' => sub {
 
@@ -7739,8 +7564,8 @@
         });
         $column_labels->append($item_addStyle);
 
-        my $item_editStyle = Gtk2::ImageMenuItem->new('_Edit label style...');
-        my $img_editStyle = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editStyle = Gtk3::ImageMenuItem->new('Ed_it label style...');
+        my $img_editStyle = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editStyle->set_image($img_editStyle);
         $item_editStyle->signal_connect('activate' => sub {
 
@@ -7751,9 +7576,9 @@
         $self->ivAdd('menuToolItemHash', 'edit_style', $item_selectLabel);
 
             # 'Label alignment' submenu
-            my $subMenu_alignment = Gtk2::Menu->new();
+            my $subMenu_alignment = Gtk3::Menu->new();
 
-            my $item_alignHorizontal = Gtk2::CheckMenuItem->new('Align _horizontally');
+            my $item_alignHorizontal = Gtk3::CheckMenuItem->new('Align _horizontally');
             $item_alignHorizontal->set_active($self->worldModelObj->mapLabelAlignXFlag);
             $item_alignHorizontal->signal_connect('toggled' => sub {
 
@@ -7776,7 +7601,7 @@
             });
             $subMenu_alignment->append($item_alignHorizontal);
 
-            my $item_alignVertical = Gtk2::CheckMenuItem->new('Align _vertically');
+            my $item_alignVertical = Gtk3::CheckMenuItem->new('Align _vertically');
             $item_alignVertical->set_active($self->worldModelObj->mapLabelAlignYFlag);
             $item_alignVertical->signal_connect('toggled' => sub {
 
@@ -7799,14 +7624,14 @@
             });
             $subMenu_alignment->append($item_alignVertical);
 
-        my $item_alignment = Gtk2::MenuItem->new('Label _alignment');
+        my $item_alignment = Gtk3::MenuItem->new('_Label alignment');
         $item_alignment->set_submenu($subMenu_alignment);
         $column_labels->append($item_alignment);
 
-        $column_labels->append(Gtk2::SeparatorMenuItem->new()); # Separator
+        $column_labels->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-        my $item_deleteLabel = Gtk2::ImageMenuItem->new('_Delete labels');
-        my $img_deleteLabel = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteLabel = Gtk3::ImageMenuItem->new('_Delete labels');
+        my $img_deleteLabel = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteLabel->set_image($img_deleteLabel);
         $item_deleteLabel->signal_connect('activate' => sub {
 
@@ -7818,8 +7643,8 @@
         #   $self->selectedLabelHash)
         $self->ivAdd('menuToolItemHash', 'delete_label', $item_deleteLabel);
 
-        my $item_quickDelete = Gtk2::ImageMenuItem->new('_Quick label deletion...');
-        my $img_quickDelete = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_quickDelete = Gtk3::ImageMenuItem->new('_Quick label deletion...');
+        my $img_quickDelete = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_quickDelete->set_image($img_quickDelete);
         $item_quickDelete->signal_connect('activate' => sub {
 
@@ -7836,7 +7661,7 @@
     sub enableCanvasPopupMenu {
 
         # Called by $self->canvasEventHandler
-        # Creates a popup-menu for the Gtk2::Canvas when no rooms, exits, room tags or labels are
+        # Creates a popup-menu for the Gtk3::Canvas when no rooms, exits, room tags or labels are
         #   selected
         #
         # Expected arguments
@@ -7847,7 +7672,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my (
             $self, $clickXPosPixels, $clickYPosPixels, $clickXPosBlocks, $clickYPosBlocks, $check,
@@ -7862,7 +7687,7 @@
         }
 
         # Set up the popup menu
-        my $menu_canvas = Gtk2::Menu->new();
+        my $menu_canvas = Gtk3::Menu->new();
         if (! $menu_canvas) {
 
             return undef;
@@ -7870,8 +7695,8 @@
 
         # (Everything here assumes $self->currentRegionmap)
 
-        my $item_addFirstRoom = Gtk2::ImageMenuItem->new('Add _first room');
-        my $img_addFirstRoom = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addFirstRoom = Gtk3::ImageMenuItem->new('Add _first room');
+        my $img_addFirstRoom = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addFirstRoom->set_image($img_addFirstRoom);
         $item_addFirstRoom->signal_connect('activate' => sub {
 
@@ -7884,8 +7709,8 @@
             $item_addFirstRoom->set_sensitive(FALSE);
         }
 
-        my $item_addRoomHere = Gtk2::ImageMenuItem->new('Add room _here');
-        my $img_addRoomHere = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addRoomHere = Gtk3::ImageMenuItem->new('Add _room here');
+        my $img_addRoomHere = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addRoomHere->set_image($img_addRoomHere);
         $item_addRoomHere->signal_connect('activate' => sub {
 
@@ -7916,10 +7741,10 @@
         });
         $menu_canvas->append($item_addRoomHere);
 
-        $menu_canvas->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_canvas->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_addLabelHere = Gtk2::ImageMenuItem->new('Add _label here');
-        my $img_addLabelHere = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_addLabelHere = Gtk3::ImageMenuItem->new('Add _label here');
+        my $img_addLabelHere = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_addLabelHere->set_image($img_addLabelHere);
         $item_addLabelHere->signal_connect('activate' => sub {
 
@@ -7927,9 +7752,9 @@
         });
         $menu_canvas->append($item_addLabelHere);
 
-        $menu_canvas->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_canvas->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_centreMap = Gtk2::MenuItem->new('_Centre map here');
+        my $item_centreMap = Gtk3::MenuItem->new('_Centre map here');
         $item_centreMap->signal_connect('activate' => sub {
 
             $self->centreMapOverRoom(
@@ -7940,10 +7765,10 @@
         });
         $menu_canvas->append($item_centreMap);
 
-        $menu_canvas->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_canvas->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_editRegionmap = Gtk2::ImageMenuItem->new('Edit _regionmap...');
-        my $img_editRegionmap = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editRegionmap = Gtk3::ImageMenuItem->new('_Edit regionmap...');
+        my $img_editRegionmap = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editRegionmap->set_image($img_editRegionmap);
         $item_editRegionmap->signal_connect('activate' => sub {
 
@@ -7959,8 +7784,8 @@
         });
         $menu_canvas->append($item_editRegionmap);
 
-        my $item_preferences = Gtk2::ImageMenuItem->new('Edit _world model...');
-        my $img_preferences = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_preferences = Gtk3::ImageMenuItem->new('Edit world _model...');
+        my $img_preferences = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_preferences->set_image($img_preferences);
         $item_preferences->signal_connect('activate' => sub {
 
@@ -7992,7 +7817,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -8003,7 +7828,7 @@
         }
 
         # Set up the popup menu
-        my $menu_rooms = Gtk2::Menu->new();
+        my $menu_rooms = Gtk3::Menu->new();
         if (! $menu_rooms) {
 
             return undef;
@@ -8011,21 +7836,21 @@
 
         # (Everything here assumes $self->currentRegionmap and $self->selectedRoom)
 
-        my $item_setCurrentRoom = Gtk2::MenuItem->new('_Set current room');
+        my $item_setCurrentRoom = Gtk3::MenuItem->new('_Set current room');
         $item_setCurrentRoom->signal_connect('activate' => sub {
 
             $self->mapObj->setCurrentRoom($self->selectedRoom);
         });
         $menu_rooms->append($item_setCurrentRoom);
 
-        my $item_centreMap = Gtk2::MenuItem->new('Centre _map over room');
+        my $item_centreMap = Gtk3::MenuItem->new('_Centre map over room');
         $item_centreMap->signal_connect('activate' => sub {
 
             $self->centreMapOverRoom($self->selectedRoom);
         });
         $menu_rooms->append($item_centreMap);
 
-        my $item_executeScripts = Gtk2::MenuItem->new('Run A_Basic scripts');
+        my $item_executeScripts = Gtk3::MenuItem->new('Run _Axbasic scripts');
         $item_executeScripts->signal_connect('activate' => sub {
 
             $self->executeScriptsCallback();
@@ -8037,33 +7862,33 @@
             $item_executeScripts->set_sensitive(FALSE);
         }
 
-        $menu_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Pathfinding' submenu
-            my $subMenu_pathFinding = Gtk2::Menu->new();
+            my $subMenu_pathFinding = Gtk3::Menu->new();
 
-            my $item_highlightPath = Gtk2::MenuItem->new('_Highlight path');
+            my $item_highlightPath = Gtk3::MenuItem->new('_Highlight path');
             $item_highlightPath->signal_connect('activate' => sub {
 
                 $self->processPathCallback('select_room');
             });
             $subMenu_pathFinding->append($item_highlightPath);
 
-            my $item_displayPath = Gtk2::MenuItem->new('_Edit path');
+            my $item_displayPath = Gtk3::MenuItem->new('_Edit path...');
             $item_displayPath->signal_connect('activate' => sub {
 
                 $self->processPathCallback('pref_win');
             });
             $subMenu_pathFinding->append($item_displayPath);
 
-            my $item_goToRoom = Gtk2::MenuItem->new('_Go to room');
+            my $item_goToRoom = Gtk3::MenuItem->new('_Go to room');
             $item_goToRoom->signal_connect('activate' => sub {
 
                 $self->processPathCallback('send_char');
             });
             $subMenu_pathFinding->append($item_goToRoom);
 
-        my $item_pathFinding = Gtk2::MenuItem->new('_Pathfinding');
+        my $item_pathFinding = Gtk3::MenuItem->new('_Pathfinding');
         $item_pathFinding->set_submenu($subMenu_pathFinding);
         $menu_rooms->append($item_pathFinding);
         # (Also requires $self->mapObj->currentRoom)
@@ -8073,16 +7898,16 @@
         }
 
             # 'Moves rooms/labels' submenu
-            my $subMenu_moveRooms = Gtk2::Menu->new();
+            my $subMenu_moveRooms = Gtk3::Menu->new();
 
-            my $item_moveSelected = Gtk2::MenuItem->new('Move in _direction...');
+            my $item_moveSelected = Gtk3::MenuItem->new('Move in _direction...');
             $item_moveSelected->signal_connect('activate' => sub {
 
                 $self->moveSelectedRoomsCallback();
             });
             $subMenu_moveRooms->append($item_moveSelected);
 
-            my $item_moveSelectedToClick = Gtk2::MenuItem->new('Move to _click');
+            my $item_moveSelectedToClick = Gtk3::MenuItem->new('Move to _click');
             $item_moveSelectedToClick->signal_connect('activate' => sub {
 
                 # Set the free clicking mode: $self->mouseClickEvent will move the objects when the
@@ -8091,16 +7916,16 @@
             });
             $subMenu_moveRooms->append($item_moveSelectedToClick);
 
-            $subMenu_moveRooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_moveRooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
                 # 'Transfer to region' sub-submenu
-                my $subSubMenu_transferRegion = Gtk2::Menu->new();
+                my $subSubMenu_transferRegion = Gtk3::Menu->new();
 
                 if ($self->recentRegionList) {
 
                     foreach my $name ($self->recentRegionList) {
 
-                        my $item_regionName = Gtk2::MenuItem->new($name);
+                        my $item_regionName = Gtk3::MenuItem->new($name);
                         $item_regionName->signal_connect('activate' => sub {
 
                             $self->transferSelectedRoomsCallback($name);
@@ -8110,21 +7935,21 @@
 
                 } else {
 
-                    my $item_regionNone = Gtk2::MenuItem->new('(No recent regions)');
+                    my $item_regionNone = Gtk3::MenuItem->new('(No recent regions)');
                     $item_regionNone->set_sensitive(FALSE);
                     $subSubMenu_transferRegion->append($item_regionNone);
                 }
 
-                $subSubMenu_transferRegion->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_transferRegion->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_transferSelect = Gtk2::MenuItem->new('Select region...');
+                my $item_transferSelect = Gtk3::MenuItem->new('Select region...');
                 $item_transferSelect->signal_connect('activate' => sub {
 
                     $self->transferSelectedRoomsCallback();
                 });
                 $subSubMenu_transferRegion->append($item_transferSelect);
 
-            my $item_transferRegion = Gtk2::MenuItem->new('_Transfer to region');
+            my $item_transferRegion = Gtk3::MenuItem->new('_Transfer to region');
             $item_transferRegion->set_submenu($subSubMenu_transferRegion);
             $subMenu_moveRooms->append($item_transferRegion);
             # (Also requires at least two regions in the world model)
@@ -8133,9 +7958,9 @@
                 $item_transferRegion->set_sensitive(FALSE);
             }
 
-            $subMenu_moveRooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_moveRooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_mergeRoom = Gtk2::MenuItem->new('_Merge room');
+            my $item_mergeRoom = Gtk3::MenuItem->new('_Merge room');
             $item_mergeRoom->signal_connect('activate' => sub {
 
                 $self->doMerge($self->mapObj->currentRoom);
@@ -8152,82 +7977,82 @@
             }
 
                 # 'Compare room' sub-submenu
-                my $subSubMenu_compareRoom = Gtk2::Menu->new();
+                my $subSubMenu_compareRoom = Gtk3::Menu->new();
 
-                my $item_compareRoomRegion = Gtk2::MenuItem->new('...with rooms in region');
+                my $item_compareRoomRegion = Gtk3::MenuItem->new('...with rooms in region');
                 $item_compareRoomRegion->signal_connect('activate' => sub {
 
                     $self->compareRoomCallback(FALSE);
                 });
                 $subSubMenu_compareRoom->append($item_compareRoomRegion);
 
-                my $item_compareRoomModel = Gtk2::MenuItem->new('...with rooms in whole world');
+                my $item_compareRoomModel = Gtk3::MenuItem->new('...with rooms in whole world');
                 $item_compareRoomModel->signal_connect('activate' => sub {
 
                     $self->compareRoomCallback(TRUE);
                 });
                 $subSubMenu_compareRoom->append($item_compareRoomModel);
 
-            my $item_compareRoom = Gtk2::MenuItem->new('_Compare room');
+            my $item_compareRoom = Gtk3::MenuItem->new('_Compare room');
             $item_compareRoom->set_submenu($subSubMenu_compareRoom);
             $subMenu_moveRooms->append($item_compareRoom);
 
-        my $item_moveRooms = Gtk2::MenuItem->new('_Move rooms/labels');
+        my $item_moveRooms = Gtk3::MenuItem->new('_Move rooms/labels');
         $item_moveRooms->set_submenu($subMenu_moveRooms);
         $menu_rooms->append($item_moveRooms);
 
             # 'Add pattern' submenu
-            my $subMenu_exitPatterns = Gtk2::Menu->new();
+            my $subMenu_exitPatterns = Gtk3::Menu->new();
 
-            my $item_addFailedExitRoom = Gtk2::MenuItem->new('Add _failed exit...');
+            my $item_addFailedExitRoom = Gtk3::MenuItem->new('Add _failed exit...');
             $item_addFailedExitRoom->signal_connect('activate' => sub {
 
                 $self->addFailedExitCallback(FALSE, $self->selectedRoom);
             });
             $subMenu_exitPatterns->append($item_addFailedExitRoom);
 
-            $subMenu_exitPatterns->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_exitPatterns->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_addInvoluntaryExitRoom = Gtk2::MenuItem->new('Add _involuntary exit...');
+            my $item_addInvoluntaryExitRoom = Gtk3::MenuItem->new('Add _involuntary exit...');
             $item_addInvoluntaryExitRoom->signal_connect('activate' => sub {
 
                 $self->addInvoluntaryExitCallback($self->selectedRoom);
             });
             $subMenu_exitPatterns->append($item_addInvoluntaryExitRoom);
 
-            my $item_addRepulseExitRoom = Gtk2::MenuItem->new('Add r_epulse exit...');
+            my $item_addRepulseExitRoom = Gtk3::MenuItem->new('Add _repulse exit...');
             $item_addRepulseExitRoom->signal_connect('activate' => sub {
 
                 $self->addRepulseExitCallback($self->selectedRoom);
             });
             $subMenu_exitPatterns->append($item_addRepulseExitRoom);
 
-            $subMenu_exitPatterns->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_exitPatterns->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_addSpecialDepartRoom = Gtk2::MenuItem->new('Add _special departure...');
+            my $item_addSpecialDepartRoom = Gtk3::MenuItem->new('Add _special departure...');
             $item_addSpecialDepartRoom->signal_connect('activate' => sub {
 
                 $self->addSpecialDepartureCallback($self->selectedRoom);
             });
             $subMenu_exitPatterns->append($item_addSpecialDepartRoom);
 
-            my $item_addUnspecifiedRoom = Gtk2::MenuItem->new('Add _unspecified room pattern...');
+            my $item_addUnspecifiedRoom = Gtk3::MenuItem->new('Add _unspecified room pattern...');
             $item_addUnspecifiedRoom->signal_connect('activate' => sub {
 
                 $self->addUnspecifiedPatternCallback($self->selectedRoom);
             });
             $subMenu_exitPatterns->append($item_addUnspecifiedRoom);
 
-        $menu_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_patterns = Gtk2::MenuItem->new('Add patter_n');
+        my $item_patterns = Gtk3::MenuItem->new('Add pa_ttern');
         $item_patterns->set_submenu($subMenu_exitPatterns);
         $menu_rooms->append($item_patterns);
 
             # 'Add to model' submenu
-            my $subMenu_addToModel = Gtk2::Menu->new();
+            my $subMenu_addToModel = Gtk3::Menu->new();
 
-            my $item_addRoomContents = Gtk2::MenuItem->new('Add _contents...');
+            my $item_addRoomContents = Gtk3::MenuItem->new('Add _contents...');
             $item_addRoomContents->signal_connect('activate' => sub {
 
                 $self->addContentsCallback(FALSE);
@@ -8239,16 +8064,16 @@
                 $item_addRoomContents->set_sensitive(FALSE);
             }
 
-            my $item_addContentsString = Gtk2::MenuItem->new('Add contents from _string...');
+            my $item_addContentsString = Gtk3::MenuItem->new('Add c_ontents from string...');
             $item_addContentsString->signal_connect('activate' => sub {
 
                 $self->addContentsCallback(TRUE);
             });
             $subMenu_addToModel->append($item_addContentsString);
 
-            $subMenu_addToModel->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_addToModel->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addHiddenObj = Gtk2::MenuItem->new('Add _hidden object...');
+            my $item_addHiddenObj = Gtk3::MenuItem->new('Add _hidden object...');
             $item_addHiddenObj->signal_connect('activate' => sub {
 
                 $self->addHiddenObjCallback(FALSE);
@@ -8260,16 +8085,16 @@
                 $item_addHiddenObj->set_sensitive(FALSE);
             }
 
-            my $item_addHiddenString = Gtk2::MenuItem->new('Add hidden object _from string...');
+            my $item_addHiddenString = Gtk3::MenuItem->new('Add h_idden object from string...');
             $item_addHiddenString->signal_connect('activate' => sub {
 
                 $self->addHiddenObjCallback(TRUE);
             });
             $subMenu_addToModel->append($item_addHiddenString);
 
-            $subMenu_addToModel->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_addToModel->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addSearchResult = Gtk2::MenuItem->new('Add search _result...');
+            my $item_addSearchResult = Gtk3::MenuItem->new('Add _search result...');
             $item_addSearchResult->signal_connect('activate' => sub {
 
                 $self->addSearchResultCallback();
@@ -8281,16 +8106,16 @@
                 $item_addSearchResult->set_sensitive(FALSE);
             }
 
-        my $item_addToModel = Gtk2::MenuItem->new('_Add to model');
+        my $item_addToModel = Gtk3::MenuItem->new('Add to m_odel');
         $item_addToModel->set_submenu($subMenu_addToModel);
         $menu_rooms->append($item_addToModel);
 
-        $menu_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
              # 'Add/set exits' submenu
-            my $subMenu_setExits = Gtk2::Menu->new();
+            my $subMenu_setExits = Gtk3::Menu->new();
 
-            my $item_addExit = Gtk2::MenuItem->new('Add _normal exit...');
+            my $item_addExit = Gtk3::MenuItem->new('Add _normal exit...');
             $item_addExit->signal_connect('activate' => sub {
 
                 $self->addExitCallback(FALSE);      # FALSE - not a hidden exit
@@ -8302,7 +8127,7 @@
                 $item_addExit->set_sensitive(FALSE);
             }
 
-            my $item_addHiddenExit = Gtk2::MenuItem->new('Add _hidden exit...');
+            my $item_addHiddenExit = Gtk3::MenuItem->new('Add _hidden exit...');
             $item_addHiddenExit->signal_connect('activate' => sub {
 
                 $self->addExitCallback(TRUE);       # TRUE - a hidden exit
@@ -8314,18 +8139,18 @@
                 $item_addHiddenExit->set_sensitive(FALSE);
             }
 
-            $subMenu_setExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_setExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_addMultiple = Gtk2::MenuItem->new('Add _multiple exits...');
+            my $item_addMultiple = Gtk3::MenuItem->new('Add _multiple exits...');
             $item_addMultiple->signal_connect('activate' => sub {
 
                 $self->addMultipleExitsCallback();
             });
             $subMenu_setExits->append($item_addMultiple);
 
-            $subMenu_setExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_setExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_removeChecked = Gtk2::MenuItem->new('Remove checked direction...');
+            my $item_removeChecked = Gtk3::MenuItem->new('Remove _checked direction...');
             $item_removeChecked->signal_connect('activate' => sub {
 
                 $self->removeCheckedDirCallback(FALSE);
@@ -8337,7 +8162,7 @@
                 $item_removeChecked->set_sensitive(FALSE);
             }
 
-            my $item_removeCheckedAll = Gtk2::MenuItem->new('Remove all checked directions');
+            my $item_removeCheckedAll = Gtk3::MenuItem->new('Remove _all checked directions');
             $item_removeCheckedAll->signal_connect('activate' => sub {
 
                 $self->removeCheckedDirCallback(TRUE);
@@ -8349,16 +8174,16 @@
                 $item_removeCheckedAll->set_sensitive(FALSE);
             }
 
-            $subMenu_setExits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+            $subMenu_setExits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-            my $item_markNormal = Gtk2::MenuItem->new('Mark room as normal');
+            my $item_markNormal = Gtk3::MenuItem->new('Mark room as n_ormal');
             $item_markNormal->signal_connect('activate' => sub {
 
                 $self->setWildCallback('normal');
             });
             $subMenu_setExits->append($item_markNormal);
 
-            my $item_markWild = Gtk2::MenuItem->new('Mark room as wilderness');
+            my $item_markWild = Gtk3::MenuItem->new('Mark room as _wilderness');
             $item_markWild->signal_connect('activate' => sub {
 
                 $self->setWildCallback('wild');
@@ -8370,7 +8195,7 @@
                 $item_markWild->set_sensitive(FALSE);
             }
 
-            my $item_markBorder = Gtk2::MenuItem->new('Mark room as wilderness border');
+            my $item_markBorder = Gtk3::MenuItem->new('Mark room as wilderness _border');
             $item_markBorder->signal_connect('activate' => sub {
 
                 $self->setWildCallback('border');
@@ -8382,23 +8207,23 @@
                 $item_markBorder->set_sensitive(FALSE);
             }
 
-        my $item_setExits = Gtk2::ImageMenuItem->new('Add/set e_xits');
-        my $img_setExits = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_setExits = Gtk3::ImageMenuItem->new('Add/set _exits');
+        my $img_setExits = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_setExits->set_image($img_setExits);
         $item_setExits->set_submenu($subMenu_setExits);
         $menu_rooms->append($item_setExits);
 
-        my $item_selectExit = Gtk2::MenuItem->new('Se_lect exit...');
+        my $item_selectExit = Gtk3::MenuItem->new('Se_lect exit...');
         $item_selectExit->signal_connect('activate' => sub {
 
             $self->selectExitCallback();
         });
         $menu_rooms->append($item_selectExit);
 
-        $menu_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_editRoom = Gtk2::ImageMenuItem->new('_Edit room...');
-        my $img_editRoom = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editRoom = Gtk3::ImageMenuItem->new('Ed_it room...');
+        my $img_editRoom = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editRoom->set_image($img_editRoom);
         $item_editRoom->signal_connect('activate' => sub {
 
@@ -8418,55 +8243,97 @@
         $menu_rooms->append($item_editRoom);
 
             # 'Set room text' submenu
-            my $subMenu_setRoomText = Gtk2::Menu->new();
+            my $subMenu_setRoomText = Gtk3::Menu->new();
 
-            my $item_setRoomTag = Gtk2::MenuItem->new('Set room _tag...');
+            my $item_setRoomTag = Gtk3::MenuItem->new('Set room _tag...');
             $item_setRoomTag->signal_connect('activate' => sub {
 
                 $self->setRoomTagCallback();
             });
             $subMenu_setRoomText->append($item_setRoomTag);
 
-            my $item_setGuild = Gtk2::MenuItem->new('Set roo_m guild...');
+            my $item_setGuild = Gtk3::MenuItem->new('Set room _guild...');
             $item_setGuild->signal_connect('activate' => sub {
 
                 $self->setRoomGuildCallback();
             });
             $subMenu_setRoomText->append($item_setGuild);
 
-            $subMenu_setRoomText->append(Gtk2::SeparatorMenuItem->new());  # Separator
+            $subMenu_setRoomText->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-            my $item_resetPositions = Gtk2::MenuItem->new('Reset text posit_ions');
+            my $item_resetPositions = Gtk3::MenuItem->new('_Reset text posit_ions');
             $item_resetPositions->signal_connect('activate' => sub {
 
                 $self->resetRoomOffsetsCallback();
             });
             $subMenu_setRoomText->append($item_resetPositions);
 
-        my $item_setRoomText = Gtk2::MenuItem->new('Set r_oom text');
+        my $item_setRoomText = Gtk3::MenuItem->new('Set _room text');
         $item_setRoomText->set_submenu($subMenu_setRoomText);
         $menu_rooms->append($item_setRoomText);
 
             # 'Toggle room flag' submenu
-            my $subMenu_toggleRoomFlag = Gtk2::Menu->new();
+            my $subMenu_toggleRoomFlag = Gtk3::Menu->new();
 
-            foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
+            if ($self->worldModelObj->roomFlagShowMode eq 'default') {
 
-                # A sub-sub menu for $filter
-                my $subSubMenu_filter = Gtk2::Menu->new();
+                # Show all room flags, sorted by filter
+                foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
 
-                my @nameList = $self->worldModelObj->getRoomFlagsInFilter($filter);
-                foreach my $name (@nameList) {
+                    # A sub-sub menu for $filter
+                    my $subSubMenu_filter = Gtk3::Menu->new();
 
-                    my $obj = $self->worldModelObj->ivShow('roomFlagHash', $name);
-                    if ($obj) {
+                    my @nameList = $self->worldModelObj->getRoomFlagsInFilter($filter);
+                    foreach my $name (@nameList) {
 
-                        my $menuItem = Gtk2::MenuItem->new($obj->descrip);
+                        my $obj = $self->worldModelObj->ivShow('roomFlagHash', $name);
+                        if ($obj) {
+
+                            my $menuItem = Gtk3::MenuItem->new($obj->descrip);
+                            $menuItem->signal_connect('activate' => sub {
+
+                                # Toggle the flags for all selected rooms, redraw them and (if the
+                                #   flag is one of the hazardous room flags) recalculate the
+                                #   regionmap's paths. The TRUE argument tells the world model to
+                                #   redraw the rooms
+                                $self->worldModelObj->toggleRoomFlags(
+                                    $self->session,
+                                    TRUE,
+                                    $obj->name,
+                                    $self->compileSelectedRooms(),
+                                );
+                            });
+                            $subSubMenu_filter->append($menuItem);
+                        }
+                    }
+
+                    if (! @nameList) {
+
+                        my $menuItem = Gtk3::MenuItem->new('(No flags in this filter)');
+                        $menuItem->set_sensitive(FALSE);
+                        $subSubMenu_filter->append($menuItem);
+                    }
+
+                    my $menuItem = Gtk3::MenuItem->new(ucfirst($filter));
+                    $menuItem->set_submenu($subSubMenu_filter);
+                    $subMenu_toggleRoomFlag->append($menuItem);
+                }
+
+            } else {
+
+                # Show selected room flags, sorted only by priority
+                my %showHash = $self->worldModelObj->getVisibleRoomFlags();
+                if (%showHash) {
+
+                    foreach my $obj (sort {$a->priority <=> $b->priority} (values %showHash)) {
+
+                        my $menuItem = Gtk3::MenuItem->new($obj->descrip);
                         $menuItem->signal_connect('activate' => sub {
 
-                            # Toggle the flags for all selected rooms, redraw them and (if the flag
-                            #   is one of the hazardous room flags) recalculate the regionmap's
-                            #   paths. The TRUE argument tells the world model to redraw the rooms
+                            # Toggle the flags for all selected rooms, redraw them and (if the
+                            #   flag is one of the hazardous room flags) recalculate the
+                            #   regionmap's paths. The TRUE argument tells the world model to
+                            #   redraw the rooms
                             $self->worldModelObj->toggleRoomFlags(
                                 $self->session,
                                 TRUE,
@@ -8474,33 +8341,28 @@
                                 $self->compileSelectedRooms(),
                             );
                         });
-                        $subSubMenu_filter->append($menuItem);
+                        $subMenu_toggleRoomFlag->append($menuItem);
                     }
-                }
 
-                if (! @nameList) {
+                } else {
 
-                    my $menuItem = Gtk2::MenuItem->new('(No flags in this filter)');
+                    my $menuItem = Gtk3::MenuItem->new('(None are marked visible)');
                     $menuItem->set_sensitive(FALSE);
-                    $subSubMenu_filter->append($menuItem);
+                    $subMenu_toggleRoomFlag->append($menuItem);
                 }
-
-                my $menuItem = Gtk2::MenuItem->new(ucfirst($filter));
-                $menuItem->set_submenu($subSubMenu_filter);
-                $subMenu_toggleRoomFlag->append($menuItem);
             }
 
-        my $item_toggleRoomFlag = Gtk2::MenuItem->new('_Toggle room flags');
+        my $item_toggleRoomFlag = Gtk3::MenuItem->new('To_ggle room flags');
         $item_toggleRoomFlag->set_submenu($subMenu_toggleRoomFlag);
         $menu_rooms->append($item_toggleRoomFlag);
 
             # 'Other room features' submenu
-            my $subMenu_roomFeatures = Gtk2::Menu->new();
+            my $subMenu_roomFeatures = Gtk3::Menu->new();
 
                 # 'Update character visits' sub-submenu
-                my $subSubMenu_updateVisits = Gtk2::Menu->new();
+                my $subSubMenu_updateVisits = Gtk3::Menu->new();
 
-                my $item_increaseSetCurrent = Gtk2::MenuItem->new('Increase & set _current');
+                my $item_increaseSetCurrent = Gtk3::MenuItem->new('Increase & set _current');
                 $item_increaseSetCurrent->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('increase');
@@ -8508,39 +8370,39 @@
                 });
                 $subSubMenu_updateVisits->append($item_increaseSetCurrent);
 
-                $subSubMenu_updateVisits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+                $subSubMenu_updateVisits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-                my $item_increaseVisits = Gtk2::MenuItem->new('_Increase by one');
+                my $item_increaseVisits = Gtk3::MenuItem->new('_Increase by one');
                 $item_increaseVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('increase');
                 });
                 $subSubMenu_updateVisits->append($item_increaseVisits);
 
-                my $item_decreaseVisits = Gtk2::MenuItem->new('_Decrease by one');
+                my $item_decreaseVisits = Gtk3::MenuItem->new('_Decrease by one');
                 $item_decreaseVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('decrease');
                 });
                 $subSubMenu_updateVisits->append($item_decreaseVisits);
 
-                my $item_manualVisits = Gtk2::MenuItem->new('Set _manually');
+                my $item_manualVisits = Gtk3::MenuItem->new('Set _manually');
                 $item_manualVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('manual');
                 });
                 $subSubMenu_updateVisits->append($item_manualVisits);
 
-                my $item_resetVisits = Gtk2::MenuItem->new('_Reset to zero');
+                my $item_resetVisits = Gtk3::MenuItem->new('_Reset to zero');
                 $item_resetVisits->signal_connect('activate' => sub {
 
                     $self->updateVisitsCallback('reset');
                 });
                 $subSubMenu_updateVisits->append($item_resetVisits);
 
-                $subSubMenu_updateVisits->append(Gtk2::SeparatorMenuItem->new()); # Separator
+                $subSubMenu_updateVisits->append(Gtk3::SeparatorMenuItem->new()); # Separator
 
-                my $item_toggleGraffiti = Gtk2::MenuItem->new('Toggle _graffiti');
+                my $item_toggleGraffiti = Gtk3::MenuItem->new('Toggle _graffiti');
                 $item_toggleGraffiti->signal_connect('activate' => sub {
 
                     $self->toggleGraffitiCallback();
@@ -8552,65 +8414,65 @@
                     $item_toggleGraffiti->set_sensitive(FALSE);
                 }
 
-            my $item_updateVisits = Gtk2::MenuItem->new('Update character visits');
+            my $item_updateVisits = Gtk3::MenuItem->new('Update character _visits');
             $item_updateVisits->set_submenu($subSubMenu_updateVisits);
             $subMenu_roomFeatures->append($item_updateVisits);
 
             # 'Room exclusivity' submenu
-            my $subMenu_exclusivity = Gtk2::Menu->new();
+            my $subMenu_exclusivity = Gtk3::Menu->new();
 
-                my $item_toggleExclusivity = Gtk2::MenuItem->new('_Toggle exclusivity');
+                my $item_toggleExclusivity = Gtk3::MenuItem->new('_Toggle exclusivity');
                 $item_toggleExclusivity->signal_connect('activate' => sub {
 
                     $self->toggleExclusiveProfileCallback();
                 });
                 $subMenu_exclusivity->append($item_toggleExclusivity);
 
-                my $item_addExclusiveProf = Gtk2::MenuItem->new('_Add exclusive profile...');
+                my $item_addExclusiveProf = Gtk3::MenuItem->new('_Add exclusive profile...');
                 $item_addExclusiveProf->signal_connect('activate' => sub {
 
                     $self->addExclusiveProfileCallback();
                 });
                 $subMenu_exclusivity->append($item_addExclusiveProf);
 
-                my $item_clearExclusiveProf = Gtk2::MenuItem->new('_Clear exclusive profiles');
+                my $item_clearExclusiveProf = Gtk3::MenuItem->new('_Clear exclusive profiles');
                 $item_clearExclusiveProf->signal_connect('activate' => sub {
 
                     $self->resetExclusiveProfileCallback();
                 });
                 $subMenu_exclusivity->append($item_clearExclusiveProf);
 
-            my $item_exclusivity = Gtk2::MenuItem->new('_Room exclusivity');
+            my $item_exclusivity = Gtk3::MenuItem->new('Room _exclusivity');
             $item_exclusivity->set_submenu($subMenu_exclusivity);
             $subMenu_roomFeatures->append($item_exclusivity);
 
                 # 'Source code' sub-submenu
-                my $subSubMenu_sourceCode = Gtk2::Menu->new();
+                my $subSubMenu_sourceCode = Gtk3::Menu->new();
 
-                my $item_setFilePath = Gtk2::MenuItem->new('_Set file path...');
+                my $item_setFilePath = Gtk3::MenuItem->new('_Set file path...');
                 $item_setFilePath->signal_connect('activate' => sub {
 
                     $self->setFilePathCallback();
                 });
                 $subSubMenu_sourceCode->append($item_setFilePath);
 
-                my $item_setVirtualArea = Gtk2::MenuItem->new('Set virtual _area...');
+                my $item_setVirtualArea = Gtk3::MenuItem->new('Set virtual _area...');
                 $item_setVirtualArea->signal_connect('activate' => sub {
 
                     $self->setVirtualAreaCallback(TRUE);
                 });
                 $subSubMenu_sourceCode->append($item_setVirtualArea);
 
-                my $item_resetVirtualArea = Gtk2::MenuItem->new('_Reset virtual area...');
+                my $item_resetVirtualArea = Gtk3::MenuItem->new('_Reset virtual area...');
                 $item_resetVirtualArea->signal_connect('activate' => sub {
 
                     $self->setVirtualAreaCallback(FALSE);
                 });
                 $subSubMenu_sourceCode->append($item_resetVirtualArea);
 
-                $subSubMenu_sourceCode->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_sourceCode->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_viewSource = Gtk2::MenuItem->new('_View source file...');
+                my $item_viewSource = Gtk3::MenuItem->new('_View source file...');
                 $item_viewSource->signal_connect('activate' => sub {
 
                     my $flag;
@@ -8643,7 +8505,7 @@
                     $item_viewSource->set_sensitive(FALSE);
                 }
 
-                my $item_editSource = Gtk2::MenuItem->new('Edit so_urce file...');
+                my $item_editSource = Gtk3::MenuItem->new('Edit so_urce file...');
                 $item_editSource->signal_connect('activate' => sub {
 
                     if ($self->selectedRoom) {
@@ -8670,18 +8532,18 @@
                     $item_editSource->set_sensitive(FALSE);
                 }
 
-            my $item_sourceCode = Gtk2::MenuItem->new('Source _code');
+            my $item_sourceCode = Gtk3::MenuItem->new('Source _code');
             $item_sourceCode->set_submenu($subSubMenu_sourceCode);
             $subMenu_roomFeatures->append($item_sourceCode);
 
-        my $item_roomFeatures = Gtk2::MenuItem->new('Other room _features');
+        my $item_roomFeatures = Gtk3::MenuItem->new('Ot_her room features');
         $item_roomFeatures->set_submenu($subMenu_roomFeatures);
         $menu_rooms->append($item_roomFeatures);
 
-        $menu_rooms->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_rooms->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_deleteRoom = Gtk2::ImageMenuItem->new('_Delete room');
-        my $img_deleteRoom = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteRoom = Gtk3::ImageMenuItem->new('_Delete room');
+        my $img_deleteRoom = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteRoom->set_image($img_deleteRoom);
         $item_deleteRoom->signal_connect('activate' => sub {
 
@@ -8705,7 +8567,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -8719,7 +8581,7 @@
         }
 
         # Set up the popup menu
-        my $menu_tags = Gtk2::Menu->new();
+        my $menu_tags = Gtk3::Menu->new();
         if (! $menu_tags) {
 
             return undef;
@@ -8727,14 +8589,14 @@
 
         # (Everything here assumes $self->currentRegionmap and $self->selectedRoomTag)
 
-        my $item_editTag = Gtk2::MenuItem->new('_Set room tag...');
+        my $item_editTag = Gtk3::MenuItem->new('_Set room tag...');
         $item_editTag->signal_connect('activate' => sub {
 
             $self->setRoomTagCallback();
         });
         $menu_tags->append($item_editTag);
 
-        my $item_resetPosition = Gtk2::MenuItem->new('_Reset position');
+        my $item_resetPosition = Gtk3::MenuItem->new('_Reset position');
         $item_resetPosition->signal_connect('activate' => sub {
 
             if ($self->selectedRoomTag) {
@@ -8764,7 +8626,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -8778,7 +8640,7 @@
         }
 
         # Set up the popup menu
-        my $menu_guilds = Gtk2::Menu->new();
+        my $menu_guilds = Gtk3::Menu->new();
         if (! $menu_guilds) {
 
             return undef;
@@ -8786,14 +8648,14 @@
 
         # (Everything here assumes $self->currentRegionmap and $self->selectedRoomGuild)
 
-        my $item_editGuild = Gtk2::MenuItem->new('_Set room guild...');
+        my $item_editGuild = Gtk3::MenuItem->new('_Set room guild...');
         $item_editGuild->signal_connect('activate' => sub {
 
             $self->setRoomGuildCallback();
         });
         $menu_guilds->append($item_editGuild);
 
-        my $item_resetPosition = Gtk2::MenuItem->new('_Reset position');
+        my $item_resetPosition = Gtk3::MenuItem->new('_Reset position');
         $item_resetPosition->signal_connect('activate' => sub {
 
             if ($self->selectedRoomGuild) {
@@ -8823,7 +8685,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -8837,7 +8699,7 @@
         }
 
         # Set up the popup menu
-        my $menu_exits = Gtk2::Menu->new();
+        my $menu_exits = Gtk3::Menu->new();
         if (! $menu_exits) {
 
             return undef;
@@ -8846,9 +8708,9 @@
         # (Everything here assumes $self->currentRegionmap and $self->selectedExit)
 
             # 'Allocate map direction' submenu
-            my $subMenu_setDir = Gtk2::Menu->new();
+            my $subMenu_setDir = Gtk3::Menu->new();
 
-            my $item_changeDir = Gtk2::MenuItem->new('_Change direction...');
+            my $item_changeDir = Gtk3::MenuItem->new('_Change direction...');
             $item_changeDir->signal_connect('activate' => sub {
 
                 $self->changeDirCallback();
@@ -8862,18 +8724,18 @@
                 $item_changeDir->set_sensitive(FALSE);
             }
 
-            my $item_altDir = Gtk2::MenuItem->new('Set _alternative direction(s)...');
+            my $item_altDir = Gtk3::MenuItem->new('Set _alternative direction(s)...');
             $item_altDir->signal_connect('activate' => sub {
 
                 $self->setAltDirCallback();
             });
             $subMenu_setDir->append($item_altDir);
 
-        my $item_setDir = Gtk2::MenuItem->new('Set _direction');
+        my $item_setDir = Gtk3::MenuItem->new('Set di_rection');
         $item_setDir->set_submenu($subMenu_setDir);
         $menu_exits->append($item_setDir);
 
-        my $item_setAssisted = Gtk2::MenuItem->new('Set assisted _move...');
+        my $item_setAssisted = Gtk3::MenuItem->new('Set assisted _move...');
         $item_setAssisted->signal_connect('activate' => sub {
 
             $self->setAssistedMoveCallback();
@@ -8886,9 +8748,9 @@
         }
 
             # 'Allocate map direction' submenu
-            my $subMenu_allocateMapDir = Gtk2::Menu->new();
+            my $subMenu_allocateMapDir = Gtk3::Menu->new();
 
-            my $item_allocatePrimary = Gtk2::MenuItem->new('Choose _direction...');
+            my $item_allocatePrimary = Gtk3::MenuItem->new('Choose _direction...');
             $item_allocatePrimary->signal_connect('activate' => sub {
 
                 $self->allocateMapDirCallback();
@@ -8896,14 +8758,14 @@
             $subMenu_allocateMapDir->append($item_allocatePrimary);
 
 
-            my $item_confirmTwoWay = Gtk2::MenuItem->new('Confirm _two-way exit...');
+            my $item_confirmTwoWay = Gtk3::MenuItem->new('Confirm _two-way exit...');
             $item_confirmTwoWay->signal_connect('activate' => sub {
 
                 $self->confirmTwoWayCallback();
             });
             $subMenu_allocateMapDir->append($item_confirmTwoWay);
 
-        my $item_allocateMapDir = Gtk2::MenuItem->new('_Allocate map direction...');
+        my $item_allocateMapDir = Gtk3::MenuItem->new('_Allocate map direction...');
         $item_allocateMapDir->set_submenu($subMenu_allocateMapDir);
         $menu_exits->append($item_allocateMapDir);
         # (Also requires $self->selectedExit->drawMode is 'temp_alloc' or 'temp_unalloc')
@@ -8914,7 +8776,7 @@
             $item_allocateMapDir->set_sensitive(FALSE);
         }
 
-        my $item_allocateShadow = Gtk2::MenuItem->new('Allocate _shadow...');
+        my $item_allocateShadow = Gtk3::MenuItem->new('Allocate _shadow...');
         $item_allocateShadow->signal_connect('activate' => sub {
 
             $self->allocateShadowCallback();
@@ -8928,9 +8790,9 @@
             $item_allocateShadow->set_sensitive(FALSE);
         }
 
-        $menu_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_connectExitToClick = Gtk2::MenuItem->new('_Connect to click');
+        my $item_connectExitToClick = Gtk3::MenuItem->new('_Connect to click');
         $item_connectExitToClick->signal_connect('activate' => sub {
 
             $self->connectToClickCallback();
@@ -8942,16 +8804,16 @@
             $item_connectExitToClick->set_sensitive(FALSE);
         }
 
-        my $item_disconnectExit = Gtk2::MenuItem->new('D_isconnect exit');
+        my $item_disconnectExit = Gtk3::MenuItem->new('D_isconnect exit');
         $item_disconnectExit->signal_connect('activate' => sub {
 
             $self->disconnectExitCallback();
         });
         $menu_exits->append($item_disconnectExit);
 
-        $menu_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_addExitBend = Gtk2::MenuItem->new('Add _bend');
+        my $item_addExitBend = Gtk3::MenuItem->new('Add _bend');
         $item_addExitBend->signal_connect('activate' => sub {
 
             $self->addBendCallback();
@@ -8968,7 +8830,7 @@
             $item_addExitBend->set_sensitive(FALSE);
         }
 
-        my $item_removeExitBend = Gtk2::MenuItem->new('_Remove bend');
+        my $item_removeExitBend = Gtk3::MenuItem->new('Remo_ve bend');
         $item_removeExitBend->signal_connect('activate' => sub {
 
             $self->removeBendCallback();
@@ -8985,10 +8847,10 @@
             $item_removeExitBend->set_sensitive(FALSE);
         }
 
-        $menu_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Set ornaments' submenu
-            my $subMenu_setOrnament = Gtk2::Menu->new();
+            my $subMenu_setOrnament = Gtk3::Menu->new();
 
             # Create a list of exit ornament types, in groups of two, in the form
             #   (menu_item_title, exit_ornament_type)
@@ -9009,7 +8871,7 @@
                 $title = shift @titleList;
                 $type = shift @titleList;
 
-                my $menuItem = Gtk2::MenuItem->new($title);
+                my $menuItem = Gtk3::MenuItem->new($title);
                 $menuItem->signal_connect('activate' => sub {
 
                     $self->exitOrnamentCallback($type);
@@ -9018,9 +8880,9 @@
 
             } until (! @titleList);
 
-            $subMenu_setOrnament->append(Gtk2::SeparatorMenuItem->new());   # Separator
+            $subMenu_setOrnament->append(Gtk3::SeparatorMenuItem->new());   # Separator
 
-            my $item_setTwinOrnament = Gtk2::CheckMenuItem->new('Also set _twin exits');
+            my $item_setTwinOrnament = Gtk3::CheckMenuItem->new('Also set _twin exits');
             $item_setTwinOrnament->set_active($self->worldModelObj->setTwinOrnamentFlag);
             $item_setTwinOrnament->signal_connect('toggled' => sub {
 
@@ -9036,45 +8898,45 @@
             });
             $subMenu_setOrnament->append($item_setTwinOrnament);
 
-        my $item_setOrnament = Gtk2::MenuItem->new('Set _ornaments');
+        my $item_setOrnament = Gtk3::MenuItem->new('Set _ornaments');
         $item_setOrnament->set_submenu($subMenu_setOrnament);
         $menu_exits->append($item_setOrnament);
 
             # 'Set exit type' submenu
-            my $subMenu_setExitType = Gtk2::Menu->new();
+            my $subMenu_setExitType = Gtk3::Menu->new();
 
                 # 'Set hidden' sub-submenu
-                my $subSubMenu_setHidden = Gtk2::Menu->new();
+                my $subSubMenu_setHidden = Gtk3::Menu->new();
 
-                my $item_setHiddenExit = Gtk2::MenuItem->new('Mark exit _hidden');
+                my $item_setHiddenExit = Gtk3::MenuItem->new('Mark exit _hidden');
                 $item_setHiddenExit->signal_connect('activate' => sub {
 
                     $self->hiddenExitCallback(TRUE);
                 });
                 $subSubMenu_setHidden->append($item_setHiddenExit);
 
-                my $item_setNotHiddenExit = Gtk2::MenuItem->new('Mark exit _not hidden');
+                my $item_setNotHiddenExit = Gtk3::MenuItem->new('Mark exit _not hidden');
                 $item_setNotHiddenExit->signal_connect('activate' => sub {
 
                     $self->hiddenExitCallback(FALSE);
                 });
                 $subSubMenu_setHidden->append($item_setNotHiddenExit);
 
-            my $item_setHidden = Gtk2::MenuItem->new('Set h_idden');
+            my $item_setHidden = Gtk3::MenuItem->new('Set _hidden');
             $item_setHidden->set_submenu($subSubMenu_setHidden);
             $subMenu_setExitType->append($item_setHidden);
 
                 # 'Set broken' sub-submenu
-                my $subSubMenu_setBroken = Gtk2::Menu->new();
+                my $subSubMenu_setBroken = Gtk3::Menu->new();
 
-                my $item_markBrokenExit = Gtk2::MenuItem->new('_Mark exit as broken');
+                my $item_markBrokenExit = Gtk3::MenuItem->new('_Mark exit as broken');
                 $item_markBrokenExit->signal_connect('activate' => sub {
 
                     $self->markBrokenExitCallback();
                 });
                 $subSubMenu_setBroken->append($item_markBrokenExit);
 
-                my $item_toggleBrokenExit = Gtk2::MenuItem->new('_Toggle bent broken exit');
+                my $item_toggleBrokenExit = Gtk3::MenuItem->new('_Toggle bent broken exit');
                 $item_toggleBrokenExit->signal_connect('activate' => sub {
 
                     $self->worldModelObj->toggleBentExit(
@@ -9089,48 +8951,48 @@
                     $item_toggleBrokenExit->set_sensitive(FALSE);
                 }
 
-                $subSubMenu_setBroken->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_setBroken->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_restoreBrokenExit = Gtk2::MenuItem->new('_Restore unbroken exit');
+                my $item_restoreBrokenExit = Gtk3::MenuItem->new('_Restore unbroken exit');
                 $item_restoreBrokenExit->signal_connect('activate' => sub {
 
                     $self->restoreBrokenExitCallback();
                 });
                 $subSubMenu_setBroken->append($item_restoreBrokenExit);
 
-            my $item_setBroken = Gtk2::MenuItem->new('Set bro_ken');
+            my $item_setBroken = Gtk3::MenuItem->new('Set _broken');
             $item_setBroken->set_submenu($subSubMenu_setBroken);
             $subMenu_setExitType->append($item_setBroken);
 
                 # 'Set one-way' sub-submenu
-                my $subSubMenu_setOneWay = Gtk2::Menu->new();
+                my $subSubMenu_setOneWay = Gtk3::Menu->new();
 
-                my $item_markOneWayExit = Gtk2::MenuItem->new('_Mark exit as one-way');
+                my $item_markOneWayExit = Gtk3::MenuItem->new('_Mark exit as one-way');
                 $item_markOneWayExit->signal_connect('activate' => sub {
 
                     $self->markOneWayExitCallback();
                 });
                 $subSubMenu_setOneWay->append($item_markOneWayExit);
 
-                $subSubMenu_setOneWay->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_setOneWay->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_restoreUncertainExit = Gtk2::MenuItem->new('Restore _uncertain exit');
+                my $item_restoreUncertainExit = Gtk3::MenuItem->new('Restore _uncertain exit');
                 $item_restoreUncertainExit->signal_connect('activate' => sub {
 
                     $self->restoreOneWayExitCallback(FALSE);
                 });
                 $subSubMenu_setOneWay->append($item_restoreUncertainExit);
 
-                my $item_restoreTwoWayExit = Gtk2::MenuItem->new('Restore _two-way exit');
+                my $item_restoreTwoWayExit = Gtk3::MenuItem->new('Restore _two-way exit');
                 $item_restoreTwoWayExit->signal_connect('activate' => sub {
 
                     $self->restoreOneWayExitCallback(TRUE);
                 });
                 $subSubMenu_setOneWay->append($item_restoreTwoWayExit);
 
-                $subSubMenu_setOneWay->append(Gtk2::SeparatorMenuItem->new());  # Separator
+                $subSubMenu_setOneWay->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-                my $item_setIncomingDir = Gtk2::MenuItem->new('Set incoming direction...');
+                my $item_setIncomingDir = Gtk3::MenuItem->new('Set incoming _direction...');
                 $item_setIncomingDir->signal_connect('activate' => sub {
 
                     $self->setIncomingDirCallback();
@@ -9142,37 +9004,37 @@
                     $item_setIncomingDir->set_sensitive(FALSE);
                 }
 
-            my $item_setOneWay = Gtk2::MenuItem->new('Set one-_way');
+            my $item_setOneWay = Gtk3::MenuItem->new('Set _one-way');
             $item_setOneWay->set_submenu($subSubMenu_setOneWay);
             $subMenu_setExitType->append($item_setOneWay);
 
                 # 'Set retracing' sub-submenu
-                my $subSubMenu_setRetracing = Gtk2::Menu->new();
+                my $subSubMenu_setRetracing = Gtk3::Menu->new();
 
-                my $item_markRetracingExit = Gtk2::MenuItem->new('_Mark exit as retracing');
+                my $item_markRetracingExit = Gtk3::MenuItem->new('_Mark exit as retracing');
                 $item_markRetracingExit->signal_connect('activate' => sub {
 
                     $self->markRetracingExitCallback();
                 });
                 $subSubMenu_setRetracing->append($item_markRetracingExit);
 
-                $subSubMenu_setRetracing->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setRetracing->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_restoreRetracingExit = Gtk2::MenuItem->new('_Restore incomplete exit');
+                my $item_restoreRetracingExit = Gtk3::MenuItem->new('_Restore incomplete exit');
                 $item_restoreRetracingExit->signal_connect('activate' => sub {
 
                     $self->restoreRetracingExitCallback();
                 });
                 $subSubMenu_setRetracing->append($item_restoreRetracingExit);
 
-            my $item_setRetracing = Gtk2::MenuItem->new('Set _retracing');
+            my $item_setRetracing = Gtk3::MenuItem->new('Set _retracing');
             $item_setRetracing->set_submenu($subSubMenu_setRetracing);
             $subMenu_setExitType->append($item_setRetracing);
 
                 # 'Set random' sub-submenu
-                my $subSubMenu_setRandomExit = Gtk2::Menu->new();
+                my $subSubMenu_setRandomExit = Gtk3::Menu->new();
 
-                my $item_markRandomRegion = Gtk2::MenuItem->new(
+                my $item_markRandomRegion = Gtk3::MenuItem->new(
                     'Set random destination in same _region',
                 );
                 $item_markRandomRegion->signal_connect('activate' => sub {
@@ -9181,7 +9043,7 @@
                 });
                 $subSubMenu_setRandomExit->append($item_markRandomRegion);
 
-                my $item_markRandomAnywhere = Gtk2::MenuItem->new(
+                my $item_markRandomAnywhere = Gtk3::MenuItem->new(
                     'Set random destination _anywhere',
                 );
                 $item_markRandomAnywhere->signal_connect('activate' => sub {
@@ -9190,7 +9052,7 @@
                 });
                 $subSubMenu_setRandomExit->append($item_markRandomAnywhere);
 
-                my $item_randomTempRegion = Gtk2::MenuItem->new(
+                my $item_randomTempRegion = Gtk3::MenuItem->new(
                     '_Create destination in temporary region',
                 );
                 $item_randomTempRegion->signal_connect('activate' => sub {
@@ -9199,38 +9061,38 @@
                 });
                 $subSubMenu_setRandomExit->append($item_randomTempRegion);
 
-                my $item_markRandomList = Gtk2::MenuItem->new('_Use list of random destinations');
+                my $item_markRandomList = Gtk3::MenuItem->new('_Use list of random destinations');
                 $item_markRandomList->signal_connect('activate' => sub {
 
                     $self->markRandomExitCallback('room_list');
                 });
                 $subSubMenu_setRandomExit->append($item_markRandomList);
 
-                $subSubMenu_setRandomExit->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setRandomExit->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_restoreRandomExit = Gtk2::MenuItem->new('_Restore incomplete exit');
+                my $item_restoreRandomExit = Gtk3::MenuItem->new('Restore _incomplete exit');
                 $item_restoreRandomExit->signal_connect('activate' => sub {
 
                     $self->restoreRandomExitCallback();
                 });
                 $subSubMenu_setRandomExit->append($item_restoreRandomExit);
 
-            my $item_setRandomExit = Gtk2::MenuItem->new('Set ra_ndom');
+            my $item_setRandomExit = Gtk3::MenuItem->new('Set r_andom');
             $item_setRandomExit->set_submenu($subSubMenu_setRandomExit);
             $subMenu_setExitType->append($item_setRandomExit);
 
                 # 'Set super' sub-submenu
-                my $subSubMenu_setSuperExit = Gtk2::Menu->new();
+                my $subSubMenu_setSuperExit = Gtk3::Menu->new();
 
-                my $item_markSuper = Gtk2::MenuItem->new('Mark exit as _super-region exit');
+                my $item_markSuper = Gtk3::MenuItem->new('Mark exit as _super-region exit');
                 $item_markSuper->signal_connect('activate' => sub {
 
                     $self->markSuperExitCallback(FALSE);
                 });
                 $subSubMenu_setSuperExit->append($item_markSuper);
 
-                my $item_markSuperExcl = Gtk2::MenuItem->new(
-                    '_Mark exit as exclusive super-region exit',
+                my $item_markSuperExcl = Gtk3::MenuItem->new(
+                    'Mark exit as _exclusive super-region exit',
                 );
                 $item_markSuperExcl->signal_connect('activate' => sub {
 
@@ -9238,16 +9100,16 @@
                 });
                 $subSubMenu_setSuperExit->append($item_markSuperExcl);
 
-                $subSubMenu_setSuperExit->append(Gtk2::SeparatorMenuItem->new());    # Separator
+                $subSubMenu_setSuperExit->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-                my $item_markNotSuper = Gtk2::MenuItem->new('Mark exit as _normal region exit');
+                my $item_markNotSuper = Gtk3::MenuItem->new('Mark exit as _normal region exit');
                 $item_markNotSuper->signal_connect('activate' => sub {
 
                     $self->restoreSuperExitCallback();
                 });
                 $subSubMenu_setSuperExit->append($item_markNotSuper);
 
-            my $item_setSuperExit = Gtk2::MenuItem->new('Set s_uper');
+            my $item_setSuperExit = Gtk3::MenuItem->new('Set _super');
             $item_setSuperExit->set_submenu($subSubMenu_setSuperExit);
             $subMenu_setExitType->append($item_setSuperExit);
             # (Also requires $self->selectedExit->regionFlag)
@@ -9256,9 +9118,9 @@
                 $item_setSuperExit->set_sensitive(FALSE);
             }
 
-            $subMenu_setExitType->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_setExitType->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_setExitTwin = Gtk2::MenuItem->new('Set exit _twin...');
+            my $item_setExitTwin = Gtk3::MenuItem->new('Set exit _twin...');
             $item_setExitTwin->signal_connect('activate' => sub {
 
                 $self->setExitTwinCallback();
@@ -9278,37 +9140,37 @@
                 $item_setExitTwin->set_sensitive(FALSE);
             }
 
-        my $item_setExitType = Gtk2::MenuItem->new('Set e_xit type');
+        my $item_setExitType = Gtk3::MenuItem->new('Set _exit type');
         $item_setExitType->set_submenu($subMenu_setExitType);
         $menu_exits->append($item_setExitType);
 
             # 'Exit tags' submenu
-            my $subMenu_exitTags = Gtk2::Menu->new();
+            my $subMenu_exitTags = Gtk3::Menu->new();
 
-            my $item_editTag = Gtk2::MenuItem->new('_Edit exit tag');
+            my $item_editTag = Gtk3::MenuItem->new('_Edit exit tag');
             $item_editTag->signal_connect('activate' => sub {
 
                 $self->editExitTagCallback();
             });
             $subMenu_exitTags->append($item_editTag);
 
-            my $item_toggleExitTag = Gtk2::MenuItem->new('_Toggle exit tag');
+            my $item_toggleExitTag = Gtk3::MenuItem->new('_Toggle exit tag');
             $item_toggleExitTag->signal_connect('activate' => sub {
 
                 $self->toggleExitTagCallback();
             });
             $subMenu_exitTags->append($item_toggleExitTag);
 
-            $subMenu_exitTags->append(Gtk2::SeparatorMenuItem->new());    # Separator
+            $subMenu_exitTags->append(Gtk3::SeparatorMenuItem->new());    # Separator
 
-            my $item_resetPosition = Gtk2::MenuItem->new('Reset text positio_n');
+            my $item_resetPosition = Gtk3::MenuItem->new('_Reset text position');
             $item_resetPosition->signal_connect('activate' => sub {
 
                 $self->resetExitOffsetsCallback();
             });
             $subMenu_exitTags->append($item_resetPosition);
 
-        my $item_exitTags = Gtk2::MenuItem->new('Exit _tags');
+        my $item_exitTags = Gtk3::MenuItem->new('Exit _tags');
         $item_exitTags->set_submenu($subMenu_exitTags);
         $menu_exits->append($item_exitTags);
         # (Also requires either a $self->selectedExit which is a region exit)
@@ -9317,10 +9179,10 @@
             $item_exitTags->set_sensitive(FALSE);
         }
 
-        $menu_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_editExit = Gtk2::ImageMenuItem->new('_Edit exit...');
-        my $img_editExit = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_editExit = Gtk3::ImageMenuItem->new('Edit e_xit...');
+        my $img_editExit = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_editExit->set_image($img_editExit);
         $item_editExit->signal_connect('activate' => sub {
 
@@ -9328,10 +9190,10 @@
         });
         $menu_exits->append($item_editExit);
 
-        $menu_exits->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_exits->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_deleteExit = Gtk2::ImageMenuItem->new('_Delete exit');
-        my $img_deleteExit = Gtk2::Image->new_from_stock('gtk-add', 'menu');
+        my $item_deleteExit = Gtk3::ImageMenuItem->new('_Delete exit');
+        my $img_deleteExit = Gtk3::Image->new_from_stock('gtk-add', 'menu');
         $item_deleteExit->set_image($img_deleteExit);
         $item_deleteExit->signal_connect('activate' => sub {
 
@@ -9355,7 +9217,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -9369,7 +9231,7 @@
         }
 
         # Set up the popup menu
-        my $menu_tags = Gtk2::Menu->new();
+        my $menu_tags = Gtk3::Menu->new();
         if (! $menu_tags) {
 
             return undef;
@@ -9377,32 +9239,32 @@
 
         # (Everything here assumes $self->currentRegionmap and $self->selectedExitTag)
 
-        my $item_editTag = Gtk2::MenuItem->new('_Edit exit tag');
+        my $item_editTag = Gtk3::MenuItem->new('_Edit exit tag');
         $item_editTag->signal_connect('activate' => sub {
 
             $self->editExitTagCallback();
         });
         $menu_tags->append($item_editTag);
 
-        my $item_cancelTag = Gtk2::MenuItem->new('_Cancel exit tag');
+        my $item_cancelTag = Gtk3::MenuItem->new('_Cancel exit tag');
         $item_cancelTag->signal_connect('activate' => sub {
 
             $self->toggleExitTagCallback();
         });
         $menu_tags->append($item_cancelTag);
 
-        $menu_tags->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_tags->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_viewDestination = Gtk2::MenuItem->new('_View destination');
+        my $item_viewDestination = Gtk3::MenuItem->new('_View destination');
         $item_viewDestination->signal_connect('activate' => sub {
 
             $self->viewExitDestination();
         });
         $menu_tags->append($item_viewDestination);
 
-        $menu_tags->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_tags->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_resetPosition = Gtk2::MenuItem->new('_Reset position');
+        my $item_resetPosition = Gtk3::MenuItem->new('_Reset position');
         $item_resetPosition->signal_connect('activate' => sub {
 
             $self->resetExitOffsetsCallback();
@@ -9425,7 +9287,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Menu created
+        #   Otherwise returns the Gtk3::Menu created
 
         my ($self, $check) = @_;
 
@@ -9436,7 +9298,7 @@
         }
 
         # Set up the popup menu
-        my $menu_labels = Gtk2::Menu->new();
+        my $menu_labels = Gtk3::Menu->new();
         if (! $menu_labels) {
 
             return undef;
@@ -9444,8 +9306,8 @@
 
         # (Everything here assumes $self->currentRegionmap and $self->selectedLabel)
 
-        my $item_setLabel = Gtk2::ImageMenuItem->new('_Set label...');
-        my $img_setLabel = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_setLabel = Gtk3::ImageMenuItem->new('_Set label...');
+        my $img_setLabel = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_setLabel->set_image($img_setLabel);
         $item_setLabel->signal_connect('activate' => sub {
 
@@ -9453,8 +9315,8 @@
         });
         $menu_labels->append($item_setLabel);
 
-        my $item_customiseLabel = Gtk2::ImageMenuItem->new('_Customise label...');
-        my $img_customiseLabel = Gtk2::Image->new_from_stock('gtk-edit', 'menu');
+        my $item_customiseLabel = Gtk3::ImageMenuItem->new('_Customise label...');
+        my $img_customiseLabel = Gtk3::Image->new_from_stock('gtk-edit', 'menu');
         $item_customiseLabel->set_image($img_customiseLabel);
         $item_customiseLabel->signal_connect('activate' => sub {
 
@@ -9462,15 +9324,15 @@
         });
         $menu_labels->append($item_customiseLabel);
 
-        $menu_labels->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_labels->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
             # 'Set label style' submenu
-            my $subMenu_setStyle = Gtk2::Menu->new();
+            my $subMenu_setStyle = Gtk3::Menu->new();
 
             foreach my $style (
                 sort {lc($a) cmp lc($b)} ($self->worldModelObj->ivKeys('mapLabelStyleHash'))
             ) {
-                my $item_thisStyle = Gtk2::MenuItem->new($style);
+                my $item_thisStyle = Gtk3::MenuItem->new($style);
                 $item_thisStyle->signal_connect('activate' => sub {
 
                     $self->setLabelDirectCallback($style);
@@ -9478,7 +9340,7 @@
                 $subMenu_setStyle->append($item_thisStyle);
             }
 
-        my $item_setStyle = Gtk2::MenuItem->new('Set label st_yle');
+        my $item_setStyle = Gtk3::MenuItem->new('S_et label style');
         $item_setStyle->set_submenu($subMenu_setStyle);
         $menu_labels->append($item_setStyle);
         # (Also requires at least one label style)
@@ -9487,10 +9349,10 @@
             $item_setStyle->set_sensitive(FALSE);
         }
 
-        $menu_labels->append(Gtk2::SeparatorMenuItem->new());  # Separator
+        $menu_labels->append(Gtk3::SeparatorMenuItem->new());  # Separator
 
-        my $item_deleteLabel = Gtk2::ImageMenuItem->new('_Delete label');
-        my $img_deleteLabel = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_deleteLabel = Gtk3::ImageMenuItem->new('_Delete label');
+        my $img_deleteLabel = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_deleteLabel->set_image($img_deleteLabel);
         $item_deleteLabel->signal_connect('activate' => sub {
 
@@ -9504,8 +9366,8 @@
         });
         $menu_labels->append($item_deleteLabel);
 
-        my $item_quickDelete = Gtk2::ImageMenuItem->new('_Quick label deletion...');
-        my $img_quickDelete = Gtk2::Image->new_from_stock('gtk-delete', 'menu');
+        my $item_quickDelete = Gtk3::ImageMenuItem->new('_Quick label deletion...');
+        my $img_quickDelete = Gtk3::Image->new_from_stock('gtk-delete', 'menu');
         $item_quickDelete->set_image($img_quickDelete);
         $item_quickDelete->signal_connect('activate' => sub {
 
@@ -9524,14 +9386,14 @@
     sub enableToolbar {
 
         # Called by $self->drawWidgets
-        # Sets up the Automapper window's Gtk2::Toolbar widget(s)
+        # Sets up the Automapper window's Gtk3::Toolbar widget(s)
         #
         # Expected arguments
         #   (none besides $self)
         #
         # Return values
         #   'undef' on improper arguments or if one of the widgets can't be created
-        #   Otherwise returns a list of Gtk2::Toolbar widgets created
+        #   Otherwise returns a list of Gtk3::Toolbar widgets created
 
         my ($self, $check) = @_;
 
@@ -9637,7 +9499,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Toolbar created
+        #   Otherwise returns the Gtk3::Toolbar created
 
         my ($self, $set, $origFlag, $check) = @_;
 
@@ -9660,7 +9522,7 @@
         }
 
         # Create the toolbar widget
-        my $toolbar = Gtk2::Toolbar->new();
+        my $toolbar = Gtk3::Toolbar->new();
         if (! $toolbar) {
 
             return undef;
@@ -9677,7 +9539,7 @@
 
         if ($axmud::CLIENT->toolbarLabelFlag) {
 
-            # Otherwise, these values continue to be 'undef', which is what Gtk2::ToolButton is
+            # Otherwise, these values continue to be 'undef', which is what Gtk3::ToolButton is
             #   expecting
             $text = 'Switch button sets';
             $text2 = 'Add button set';
@@ -9688,8 +9550,8 @@
         if ($origFlag) {
 
             # Draw an add button, which adds new toolbars (unless all button sets are visible)
-            my $toolButton = Gtk2::ToolButton->new(
-                Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add.png'),
+            my $toolButton = Gtk3::ToolButton->new(
+                Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add.png'),
                 $text2,
             );
             $toolButton->signal_connect('clicked' => sub {
@@ -9702,8 +9564,8 @@
 
             # Draw a switcher button, which cycles through button sets that aren't visible in other
             #   toolbars
-            my $toolButton2 = Gtk2::ToolButton->new(
-                Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_switch.png'),
+            my $toolButton2 = Gtk3::ToolButton->new(
+                Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_switch.png'),
                 $text,
             );
             $toolButton2->signal_connect('clicked' => sub {
@@ -9722,8 +9584,8 @@
         } else {
 
             # Draw a remove button, which adds new toolbars (unless all button sets are visible)
-            my $toolButton = Gtk2::ToolButton->new(
-                Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_remove.png'),
+            my $toolButton = Gtk3::ToolButton->new(
+                Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_remove.png'),
                 $text3,
             );
             $toolButton->signal_connect('clicked' => sub {
@@ -9737,7 +9599,7 @@
         }
 
         # Immediately to the right of those buttons is a separator
-        my $separator2 = Gtk2::SeparatorToolItem->new();
+        my $separator2 = Gtk3::SeparatorToolItem->new();
         $toolbar->insert($separator2, -1);
 
         # After the separator, we draw the specified button set. This function decides which
@@ -9750,7 +9612,7 @@
             my $label;
 
             # (Separators don't have labels, so we need to check for that)
-            if (! $axmud::CLIENT->toolbarLabelFlag && $button->isa('Gtk2::ToolButton')) {
+            if (! $axmud::CLIENT->toolbarLabelFlag && $button->isa('Gtk3::ToolButton')) {
 
                 $button->set_label(undef);
             }
@@ -9866,7 +9728,7 @@
             my $label;
 
             # (Separators don't have labels, so we need to check for that)
-            if (! $axmud::CLIENT->toolbarLabelFlag && $button->isa('Gtk2::ToolButton')) {
+            if (! $axmud::CLIENT->toolbarLabelFlag && $button->isa('Gtk3::ToolButton')) {
 
                 $button->set_label(undef);
             }
@@ -9939,14 +9801,14 @@
         }
 
         # Set up the popup menu
-        my $popupMenu = Gtk2::Menu->new();
+        my $popupMenu = Gtk3::Menu->new();
         if (! $popupMenu) {
 
             return undef;
         }
 
         # Add a title menu item, which does nothing
-        my $title_item = Gtk2::MenuItem->new('Add button set:');
+        my $title_item = Gtk3::MenuItem->new('Add button set:');
         $title_item->signal_connect('activate' => sub {
 
             return undef;
@@ -9954,12 +9816,12 @@
         $title_item->set_sensitive(FALSE);
         $popupMenu->append($title_item);
 
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
         # Fill the popup menu with button sets
         foreach my $descrip (@list) {
 
-            my $menu_item = Gtk2::MenuItem->new($descrip);
+            my $menu_item = Gtk3::MenuItem->new($descrip);
             $menu_item->signal_connect('activate' => sub {
 
                 # Add the set to the world model's list of button sets...
@@ -9971,9 +9833,9 @@
         }
 
         # Also add a 'Cancel' menu item, which does nothing
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
-        my $cancel_item = Gtk2::MenuItem->new('Cancel');
+        my $cancel_item = Gtk3::MenuItem->new('Cancel');
         $cancel_item->signal_connect('activate' => sub {
 
             return undef;
@@ -9984,7 +9846,7 @@
         $popupMenu->popup(
             undef, undef, undef, undef,
             1,                              # Left mouse button
-            Gtk2->get_current_event_time(),
+            Gtk3::get_current_event_time(),
         );
 
         $popupMenu->show_all();
@@ -10113,13 +9975,13 @@
         }
 
         # Radio button for 'wait mode'
-        my $radioButton_waitMode = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_waitMode = Gtk3::RadioToolButton->new(undef);
         if ($self->mode eq 'wait') {
 
             $radioButton_waitMode->set_active(TRUE);
         }
         $radioButton_waitMode->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_wait.png')
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_wait.png')
         );
         $radioButton_waitMode->set_label('Wait mode');
         $radioButton_waitMode->set_tooltip_text('Wait mode');
@@ -10137,13 +9999,13 @@
         $self->ivAdd('menuToolItemHash', 'icon_set_wait_mode', $radioButton_waitMode);
 
         # Radio button for 'follow mode'
-        my $radioButton_followMode = Gtk2::RadioToolButton->new_from_widget($radioButton_waitMode);
+        my $radioButton_followMode = Gtk3::RadioToolButton->new_from_widget($radioButton_waitMode);
         if ($self->mode eq 'follow') {
 
             $radioButton_followMode->set_active(TRUE);
         }
         $radioButton_followMode->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_follow.png')
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_follow.png')
         );
         $radioButton_followMode->set_label('Follow mode');
         $radioButton_followMode->set_tooltip_text('Follow mode');
@@ -10159,7 +10021,7 @@
         $self->ivAdd('menuToolItemHash', 'icon_set_follow_mode', $radioButton_followMode);
 
         # Radio button for 'update' mode
-        my $radioButton_updateMode = Gtk2::RadioToolButton->new_from_widget(
+        my $radioButton_updateMode = Gtk3::RadioToolButton->new_from_widget(
             $radioButton_followMode,
         );
         if ($self->mode eq 'update') {
@@ -10167,7 +10029,7 @@
             $radioButton_updateMode->set_active(TRUE);
         }
         $radioButton_updateMode->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_update.png')
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_update.png')
         );
         $radioButton_updateMode->set_label('Update mode');
         $radioButton_updateMode->set_tooltip_text('Update mode');
@@ -10183,13 +10045,22 @@
         #   FALSE and a session not in 'connect offline' mode
         $self->ivAdd('menuToolItemHash', 'icon_set_update_mode', $radioButton_updateMode);
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+
+        # DEBUG
+        # Temporary fix for Gtk problems: on MSWin, don't show separators (this applies to several
+        #   functions in the automapper window)
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toolbutton for 'move up level'
-        my $toolButton_moveUpLevel = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_move_up.png'),
+        my $toolButton_moveUpLevel = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_move_up.png'),
             'Move up level',
         );
         $toolButton_moveUpLevel->set_tooltip_text('Move up level');
@@ -10205,8 +10076,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_move_up_level', $toolButton_moveUpLevel);
 
         # Toolbutton for 'move down level'
-        my $toolButton_moveDownLevel = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_move_down.png'),
+        my $toolButton_moveDownLevel = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_move_down.png'),
             'Move down level',
         );
         $toolButton_moveDownLevel->set_tooltip_text('Move down level');
@@ -10221,13 +10092,18 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'icon_move_down_level', $toolButton_moveDownLevel);
 
-        # Separator
-        my $separator2 = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator2);
+#        # Separator
+#        my $separator2 = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator2);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toolbutton for 'reset locator'
-        my $toolButton_resetLocator = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_reset_locator.png'),
+        my $toolButton_resetLocator = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_reset_locator.png'),
             'Reset Locator task',
         );
         $toolButton_resetLocator->set_tooltip_text('Reset locator task');
@@ -10240,8 +10116,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_reset_locator', $toolButton_resetLocator);
 
         # Toolbutton for 'set current room'
-        my $toolButton_setCurrentRoom = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_set.png'),
+        my $toolButton_setCurrentRoom = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_set.png'),
             'Set current room',
         );
         $toolButton_setCurrentRoom->set_tooltip_text('Set current room');
@@ -10254,8 +10130,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_set_current_room', $toolButton_setCurrentRoom);
 
         # Toolbutton for 'set failed exit'
-        my $toolButton_setFailedExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_fail_exit.png'),
+        my $toolButton_setFailedExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_fail_exit.png'),
             'Set failed exit',
         );
         $toolButton_setFailedExit->set_tooltip_text('Set failed exit');
@@ -10268,10 +10144,10 @@
         $self->ivAdd('menuToolItemHash', 'icon_fail_exit', $toolButton_setFailedExit);
 
         # Toggle button for 'drag mode'
-        my $toggleButton_dragMode = Gtk2::ToggleToolButton->new();
+        my $toggleButton_dragMode = Gtk3::ToggleToolButton->new();
         $toggleButton_dragMode->set_active($self->dragModeFlag);
         $toggleButton_dragMode->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_drag_mode.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_drag_mode.png'),
         );
         $toggleButton_dragMode->set_label('Drag mode');
         $toggleButton_dragMode->set_tooltip_text('Drag mode');
@@ -10295,8 +10171,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_drag_mode', $toggleButton_dragMode);
 
         # Toolbutton for 'move selected rooms to click'
-        my $toolButton_moveClick = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_move_click.png'),
+        my $toolButton_moveClick = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_move_click.png'),
             'Move selected rooms to click',
         );
         $toolButton_moveClick->set_tooltip_text('Move selected rooms to click');
@@ -10311,8 +10187,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_move_to_click', $toolButton_moveClick);
 
         # Toolbutton for 'connect to click'
-        my $toolButton_connectClick = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_connect_click.png'),
+        my $toolButton_connectClick = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_connect_click.png'),
             'Connect selected exit to room',
         );
         $toolButton_connectClick->set_tooltip_text('Connect selected exit to room');
@@ -10326,8 +10202,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_connect_click', $toolButton_connectClick);
 
         # Toolbutton for 'take screenshot'
-        my $toolButton_visibleScreenshot = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_take_screenshot.png'),
+        my $toolButton_visibleScreenshot = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_take_screenshot.png'),
             'Take screenshot of visible map',
         );
         $toolButton_visibleScreenshot->set_tooltip_text('Take screenshot of visible map');
@@ -10367,9 +10243,9 @@
         }
 
         # Radio button for 'use region exit settings' mode
-        my $radioButton_deferDrawExits = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_deferDrawExits = Gtk3::RadioToolButton->new(undef);
         $radioButton_deferDrawExits->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_use_region.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_use_region.png'),
         );
         $radioButton_deferDrawExits->set_label('Use region exit settings');
         $radioButton_deferDrawExits->set_tooltip_text('Use region exit settings');
@@ -10391,7 +10267,7 @@
         $self->ivAdd('menuToolItemHash', 'icon_draw_defer_exits', $radioButton_deferDrawExits);
 
         # Radio button for 'draw no exits' mode
-        my $radioButton_drawNoExits = Gtk2::RadioToolButton->new_from_widget(
+        my $radioButton_drawNoExits = Gtk3::RadioToolButton->new_from_widget(
             $radioButton_deferDrawExits,
         );
         if ($self->worldModelObj->drawExitMode eq 'no_exit') {
@@ -10399,7 +10275,7 @@
             $radioButton_drawNoExits->set_active(TRUE);
         }
         $radioButton_drawNoExits->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_none.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_none.png'),
         );
         $radioButton_drawNoExits->set_label('Draw no exits');
         $radioButton_drawNoExits->set_tooltip_text('Draw no exits');
@@ -10421,7 +10297,7 @@
         $self->ivAdd('menuToolItemHash', 'icon_draw_no_exits', $radioButton_drawNoExits);
 
         # Radio button for 'draw simple exits' mode
-        my $radioButton_drawSimpleExits = Gtk2::RadioToolButton->new_from_widget(
+        my $radioButton_drawSimpleExits = Gtk3::RadioToolButton->new_from_widget(
             $radioButton_drawNoExits,
         );
         if ($self->worldModelObj->drawExitMode eq 'simple_exit') {
@@ -10429,7 +10305,7 @@
             $radioButton_drawSimpleExits->set_active(TRUE);
         }
         $radioButton_drawSimpleExits->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_simple.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_simple.png'),
         );
         $radioButton_drawSimpleExits->set_label('Draw simple exits');
         $radioButton_drawSimpleExits->set_tooltip_text('Draw simple exits');
@@ -10451,7 +10327,7 @@
         $self->ivAdd('menuToolItemHash', 'icon_draw_simple_exits', $radioButton_drawSimpleExits);
 
         # Radio button for 'draw complex exits' mode
-        my $radioButton_drawComplexExits = Gtk2::RadioToolButton->new_from_widget(
+        my $radioButton_drawComplexExits = Gtk3::RadioToolButton->new_from_widget(
             $radioButton_drawSimpleExits,
         );
         if ($self->worldModelObj->drawExitMode eq 'complex_exit') {
@@ -10459,7 +10335,7 @@
             $radioButton_drawComplexExits->set_active(TRUE);
         }
         $radioButton_drawComplexExits->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_complex.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_complex.png'),
         );
         $radioButton_drawComplexExits->set_label('Draw complex exits');
         $radioButton_drawComplexExits->set_tooltip_text('Draw complex exits');
@@ -10480,13 +10356,18 @@
         # (Never desensitised)
         $self->ivAdd('menuToolItemHash', 'icon_draw_complex_exits', $radioButton_drawComplexExits);
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toolbutton for 'horizontal exit length'
-        my $toolButton_exitLengths = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_exit_lengths.png'),
+        my $toolButton_exitLengths = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_exit_lengths.png'),
             'Horizontal exit length',
         );
         $toolButton_exitLengths->set_tooltip_text('Exit lengths');
@@ -10498,15 +10379,20 @@
         # (Requires $self->currentRegionmap)
         $self->ivAdd('menuToolItemHash', 'icon_exit_lengths', $toolButton_exitLengths);
 
-        # Separator2
-        my $separator2 = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator2);
+#        # Separator
+#        my $separator2 = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator2);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toggle button for 'draw exit ornaments'
-        my $toggleButton_drawExitOrnaments = Gtk2::ToggleToolButton->new();
+        my $toggleButton_drawExitOrnaments = Gtk3::ToggleToolButton->new();
         $toggleButton_drawExitOrnaments->set_active($self->worldModelObj->drawOrnamentsFlag);
         $toggleButton_drawExitOrnaments->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_ornaments.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_draw_ornaments.png'),
         );
         $toggleButton_drawExitOrnaments->set_label('Draw exit ornaments');
         $toggleButton_drawExitOrnaments->set_tooltip_text('Draw exit ornaments');
@@ -10528,8 +10414,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_draw_ornaments', $toggleButton_drawExitOrnaments);
 
         # Toolbutton for 'no ornament'
-        my $toolButton_noOrnament = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_no_ornament.png'),
+        my $toolButton_noOrnament = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_no_ornament.png'),
             'Set no ornament',
         );
         $toolButton_noOrnament->set_tooltip_text('Set no ornament');
@@ -10542,13 +10428,18 @@
         #   $self->selectedExitHash)
         $self->ivAdd('menuToolItemHash', 'icon_no_ornament', $toolButton_noOrnament);
 
-        # Separator
-        my $separator3 = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator3);
+#        # Separator
+#        my $separator3 = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator3);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toolbutton for 'openable exit'
-        my $toolButton_openableExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_openable_exit.png'),
+        my $toolButton_openableExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_openable_exit.png'),
             'Set openable exit',
         );
         $toolButton_openableExit->set_tooltip_text('Set openable exit');
@@ -10562,8 +10453,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_openable_exit', $toolButton_openableExit);
 
         # Toolbutton for 'lockable exit'
-        my $toolButton_lockableExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_lockable_exit.png'),
+        my $toolButton_lockableExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_lockable_exit.png'),
             'Set lockable exit',
         );
         $toolButton_lockableExit->set_tooltip_text('Set lockable exit');
@@ -10577,8 +10468,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_lockable_exit', $toolButton_lockableExit);
 
         # Toolbutton for 'pickable exit'
-        my $toolButton_pickableExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_pickable_exit.png'),
+        my $toolButton_pickableExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_pickable_exit.png'),
             'Set pickable exit',
         );
         $toolButton_pickableExit->set_tooltip_text('Set pickable exit');
@@ -10592,8 +10483,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_pickable_exit', $toolButton_pickableExit);
 
         # Toolbutton for 'breakable exit'
-        my $toolButton_breakableExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_breakable_exit.png'),
+        my $toolButton_breakableExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_breakable_exit.png'),
             'Set breakable exit',
         );
         $toolButton_breakableExit->set_tooltip_text('Set breakable exit');
@@ -10607,8 +10498,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_breakable_exit', $toolButton_breakableExit);
 
         # Toolbutton for 'impassable exit'
-        my $toolButton_impassableExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_impassable_exit.png'),
+        my $toolButton_impassableExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_impassable_exit.png'),
             'Set impassable exit',
         );
         $toolButton_impassableExit->set_tooltip_text('Set impassable exit');
@@ -10622,8 +10513,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_impassable_exit', $toolButton_impassableExit);
 
         # Toolbutton for 'mystery exit'
-        my $toolButton_mysteryExit = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_mystery_exit.png'),
+        my $toolButton_mysteryExit = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_mystery_exit.png'),
             'Set mystery exit',
         );
         $toolButton_mysteryExit->set_tooltip_text('Set mystery exit');
@@ -10672,10 +10563,10 @@
         $self->ivEmpty('toolbarRoomFlagHash');
 
         # Toggle button for 'enable painter'
-        my $toggleButton_enablePainter = Gtk2::ToggleToolButton->new();
+        my $toggleButton_enablePainter = Gtk3::ToggleToolButton->new();
         $toggleButton_enablePainter->set_active($self->painterFlag);
         $toggleButton_enablePainter->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_enable_painter.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_enable_painter.png'),
         );
         $toggleButton_enablePainter->set_label('Enable painter');
         $toggleButton_enablePainter->set_tooltip_text('Enable painter');
@@ -10702,8 +10593,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_enable_painter', $toggleButton_enablePainter);
 
         # Toolbutton for 'edit painter'
-        my $toolButton_editPainter = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_edit_painter.png'),
+        my $toolButton_editPainter = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_edit_painter.png'),
             'Edit painter',
         );
         $toolButton_editPainter->set_tooltip_text('Edit painter');
@@ -10722,9 +10613,9 @@
         push (@buttonList, $toolButton_editPainter);
 
         # Radio button for 'paint all rooms'
-        my $radioButton_paintAllRooms = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_paintAllRooms = Gtk3::RadioToolButton->new(undef);
         $radioButton_paintAllRooms->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_all.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_all.png'),
         );
         $radioButton_paintAllRooms->set_label('Paint all rooms');
         $radioButton_paintAllRooms->set_tooltip_text('Paint all rooms');
@@ -10746,13 +10637,15 @@
         $self->ivAdd('menuToolItemHash', 'icon_paint_all', $radioButton_paintAllRooms);
 
         # Radio button for 'paint only new rooms'
-        my $radioButton_paintNewRooms = Gtk2::RadioToolButton->new($radioButton_paintAllRooms);
+        my $radioButton_paintNewRooms = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_paintAllRooms,
+        );
         if (! $self->worldModelObj->paintAllRoomsFlag) {
 
             $radioButton_paintNewRooms->set_active(TRUE);
         }
         $radioButton_paintNewRooms->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_new.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_new.png'),
         );
         $radioButton_paintNewRooms->set_label('Paint only new rooms');
         $radioButton_paintNewRooms->set_tooltip_text('Paint only new rooms');
@@ -10774,9 +10667,9 @@
         $self->ivAdd('menuToolItemHash', 'icon_paint_new', $radioButton_paintNewRooms);
 
         # Radio button for 'paint normal rooms'
-        my $radioButton_paintNormalRooms = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_paintNormalRooms = Gtk3::RadioToolButton->new(undef);
         $radioButton_paintNormalRooms->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_normal.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_normal.png'),
         );
         $radioButton_paintNormalRooms->set_label('Paint normal rooms');
         $radioButton_paintNormalRooms->set_tooltip_text('Paint normal rooms');
@@ -10798,13 +10691,15 @@
         $self->ivAdd('menuToolItemHash', 'icon_paint_normal', $radioButton_paintNormalRooms);
 
         # Radio button for 'paint wilderness rooms'
-        my $radioButton_paintWildRooms = Gtk2::RadioToolButton->new($radioButton_paintNormalRooms);
+        my $radioButton_paintWildRooms = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_paintNormalRooms,
+        );
         if ($self->worldModelObj->painterObj->wildMode eq 'wild') {
 
             $radioButton_paintWildRooms->set_active(TRUE);
         }
         $radioButton_paintWildRooms->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_wild.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_wild.png'),
         );
         $radioButton_paintWildRooms->set_label('Paint wilderness rooms');
         $radioButton_paintWildRooms->set_tooltip_text('Paint wilderness rooms');
@@ -10826,13 +10721,15 @@
         $self->ivAdd('menuToolItemHash', 'icon_paint_wild', $radioButton_paintWildRooms);
 
         # Radio button for 'paint wilderness border rooms'
-        my $radioButton_paintBorderRooms = Gtk2::RadioToolButton->new($radioButton_paintWildRooms);
+        my $radioButton_paintBorderRooms = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_paintWildRooms,
+        );
         if ($self->worldModelObj->painterObj->wildMode eq 'border') {
 
             $radioButton_paintBorderRooms->set_active(TRUE);
         }
         $radioButton_paintBorderRooms->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_border.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_paint_border.png'),
         );
         $radioButton_paintBorderRooms->set_label('Paint wilderness border rooms');
         $radioButton_paintBorderRooms->set_tooltip_text('Paint wilderness border rooms');
@@ -10853,12 +10750,17 @@
         # (Requires $self->session->currentWorld->basicMappingFlag to be FALSE)
         $self->ivAdd('menuToolItemHash', 'icon_paint_border', $radioButton_paintBorderRooms);
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
 
-        my $toolButton_addRoomFlag = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add_room_flag.png'),
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
+
+        my $toolButton_addRoomFlag = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add_room_flag.png'),
             'Add preferred room flag',
         );
         $toolButton_addRoomFlag->set_tooltip_text('Add preferred room flag');
@@ -10868,8 +10770,8 @@
         });
         push (@buttonList, $toolButton_addRoomFlag);
 
-        my $toolButton_removeRoomFlag = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_remove_room_flag.png'),
+        my $toolButton_removeRoomFlag = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_remove_room_flag.png'),
             'Remove preferred room flag',
         );
         $toolButton_removeRoomFlag->set_tooltip_text('Remove preferred room flag');
@@ -10901,11 +10803,11 @@
 
                 # Create a pixbuf, with its own sub-region. Use $colour to fill the sub-region,
                 #   leaving the renaming area of the pixbuf as a black frame
-                my $pixbuf = Gtk2::Gdk::Pixbuf->new(
+                my $pixbuf = Gtk3::Gdk::Pixbuf->new(
                     'GDK_COLORSPACE_RGB',
                     FALSE,
                     # Same values as ->get_bits_per_sample, ->get_width, ->get_height as a
-                    #   Gtk2::Gdk::Pixbuf loaded from one of the icon files in ../share/icons/map
+                    #   Gtk3::Gdk::Pixbuf loaded from one of the icon files in ../share/icons/map
                     8,
                     20,
                     20,
@@ -10917,7 +10819,7 @@
                 my $subPixbuf = $pixbuf->new_subpixbuf(1, 1, 18, 18);
                 $subPixbuf->fill($colour);
 
-                my $toolButton = Gtk2::ToggleToolButton->new();
+                my $toolButton = Gtk3::ToggleToolButton->new();
                 if (exists $oldHash{$roomFlag}) {
 
                     $toolButton->set_active(TRUE);
@@ -10925,7 +10827,7 @@
                     $self->ivAdd('toolbarRoomFlagHash', $roomFlag, undef);
                 }
                 $toolButton->set_icon_widget(
-                    Gtk2::Image->new_from_pixbuf($pixbuf),
+                    Gtk3::Image->new_from_pixbuf($pixbuf),
                 );
                 $toolButton->set_label($text);
                 $toolButton->set_tooltip_text($text);
@@ -10985,9 +10887,9 @@
         $self->ivEmpty('toolbarRoomFlagHash');
 
         # Radio button for 'paint all rooms'
-        my $radioButton_quickSingle = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_quickSingle = Gtk3::RadioToolButton->new(undef);
         $radioButton_quickSingle->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_quick_single.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_quick_single.png'),
         );
         $radioButton_quickSingle->set_label('Quick paint then reset');
         $radioButton_quickSingle->set_tooltip_text('Quick paint then reset');
@@ -11006,13 +10908,15 @@
         push (@buttonList, $radioButton_quickSingle);
 
         # Radio button for 'paint only new rooms'
-        my $radioButton_quickMulti = Gtk2::RadioToolButton->new($radioButton_quickSingle);
+        my $radioButton_quickMulti = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_quickSingle,
+        );
         if ($self->worldModelObj->quickPaintMultiFlag) {
 
             $radioButton_quickMulti->set_active(TRUE);
         }
         $radioButton_quickMulti->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_quick_multi.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_quick_multi.png'),
         );
         $radioButton_quickMulti->set_label('Quick paint without resetting');
         $radioButton_quickMulti->set_tooltip_text('Quick paint without resetting');
@@ -11025,12 +10929,17 @@
         });
         push (@buttonList, $radioButton_quickMulti);
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
 
-        my $toolButton_addRoomFlag = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add_quick_flag.png'),
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
+
+        my $toolButton_addRoomFlag = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add_quick_flag.png'),
             'Add preferred room flag',
         );
         $toolButton_addRoomFlag->set_tooltip_text('Add preferred room flag');
@@ -11040,8 +10949,8 @@
         });
         push (@buttonList, $toolButton_addRoomFlag);
 
-        my $toolButton_removeRoomFlag = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_remove_quick_flag.png'),
+        my $toolButton_removeRoomFlag = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_remove_quick_flag.png'),
             'Remove preferred room flag',
         );
         $toolButton_removeRoomFlag->set_tooltip_text('Remove preferred room flag');
@@ -11073,11 +10982,11 @@
 
                 # Create a pixbuf, with its own sub-region. Use $colour to fill the sub-region,
                 #   leaving the renaming area of the pixbuf as a black frame
-                my $pixbuf = Gtk2::Gdk::Pixbuf->new(
+                my $pixbuf = Gtk3::Gdk::Pixbuf->new(
                     'GDK_COLORSPACE_RGB',
                     FALSE,
                     # Same values as ->get_bits_per_sample, ->get_width, ->get_height as a
-                    #   Gtk2::Gdk::Pixbuf loaded from one of the icon files in ../share/icons/map
+                    #   Gtk3::Gdk::Pixbuf loaded from one of the icon files in ../share/icons/map
                     8,
                     20,
                     20,
@@ -11089,7 +10998,7 @@
                 my $subPixbuf = $pixbuf->new_subpixbuf(1, 1, 18, 18);
                 $subPixbuf->fill($colour);
 
-                my $toolButton = Gtk2::ToggleToolButton->new();
+                my $toolButton = Gtk3::ToggleToolButton->new();
                 if (exists $oldHash{$roomFlag}) {
 
                     $toolButton->set_active(TRUE);
@@ -11097,7 +11006,7 @@
                     $self->ivAdd('toolbarRoomFlagHash', $roomFlag, undef);
                 }
                 $toolButton->set_icon_widget(
-                    Gtk2::Image->new_from_pixbuf($pixbuf),
+                    Gtk3::Image->new_from_pixbuf($pixbuf),
                 );
                 $toolButton->set_label($text);
                 $toolButton->set_tooltip_text($text);
@@ -11178,13 +11087,13 @@
         }
 
         # Radio button for 'no background colouring'
-        my $radioButton_bgDefault = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_bgDefault = Gtk3::RadioToolButton->new(undef);
         if ($self->bgColourMode eq 'default') {
 
             $radioButton_bgDefault->set_active(TRUE);
         }
         $radioButton_bgDefault->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_default.png')
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_default.png')
         );
         $radioButton_bgDefault->set_label('No background colouring');
         $radioButton_bgDefault->set_tooltip_text('No background colouring');
@@ -11207,13 +11116,13 @@
         push (@buttonList, $radioButton_bgDefault);
 
         # Radio button for 'colour single blocks'
-        my $radioButton_bgColour = Gtk2::RadioToolButton->new_from_widget($radioButton_bgDefault);
+        my $radioButton_bgColour = Gtk3::RadioToolButton->new_from_widget($radioButton_bgDefault);
         if ($self->bgColourMode eq 'square_start') {
 
             $radioButton_bgColour->set_active(TRUE);
         }
         $radioButton_bgColour->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_colour.png')
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_colour.png')
         );
         $radioButton_bgColour->set_label('Colour single blocks');
         $radioButton_bgColour->set_tooltip_text('Colour single blocks');
@@ -11234,13 +11143,13 @@
         push (@buttonList, $radioButton_bgColour);
 
         # Radio button for 'colour multiple blocks'
-        my $radioButton_bgShape = Gtk2::RadioToolButton->new_from_widget($radioButton_bgDefault);
+        my $radioButton_bgShape = Gtk3::RadioToolButton->new_from_widget($radioButton_bgDefault);
         if ($self->bgColourMode eq 'rect_start' || $self->bgColourMode eq 'rect_stop') {
 
             $radioButton_bgShape->set_active(TRUE);
         }
         $radioButton_bgShape->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_shape.png')
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_shape.png')
         );
         $radioButton_bgShape->set_label('Colour multiple blocks');
         $radioButton_bgShape->set_tooltip_text('Colour multiple blocks');
@@ -11261,10 +11170,10 @@
         push (@buttonList, $radioButton_bgShape);
 
         # Toggle button for 'colour on all levels'
-        my $toggleButton_colourAllLevel = Gtk2::ToggleToolButton->new();
+        my $toggleButton_colourAllLevel = Gtk3::ToggleToolButton->new();
         $toggleButton_colourAllLevel->set_active($self->bgAllLevelFlag);
         $toggleButton_colourAllLevel->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_colour_all_level.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_colour_all_level.png'),
         );
         $toggleButton_colourAllLevel->set_label('Colour on all levels');
         $toggleButton_colourAllLevel->set_tooltip_text('Colour on all levels');
@@ -11279,13 +11188,18 @@
         });
         push (@buttonList, $toggleButton_colourAllLevel);
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toolbutton for 'add background colour'
-        my $toolButton_addColour = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_add.png'),
+        my $toolButton_addColour = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_add.png'),
             'Add background colour',
         );
         $toolButton_addColour->set_tooltip_text('Add background colour');
@@ -11296,8 +11210,8 @@
         push (@buttonList, $toolButton_addColour);
 
         # Toolbutton for 'remove background colour'
-        my $toolButton_removeColour = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_remove.png'),
+        my $toolButton_removeColour = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_remove.png'),
             'Remove background colour',
         );
         $toolButton_removeColour->set_tooltip_text('Remove background colour');
@@ -11310,13 +11224,13 @@
         $self->ivAdd('menuToolItemHash', 'icon_bg_remove', $toolButton_removeColour);
 
         # Radiobutton for 'use default colour'
-        my $radioButton_useDefault = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_useDefault = Gtk3::RadioToolButton->new(undef);
         if (! defined $self->bgColourChoice) {
 
             $radioButton_useDefault->set_active(TRUE);
         }
         $radioButton_useDefault->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_blank.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_bg_blank.png'),
         );
         $radioButton_useDefault->set_label('No background colouring');
         $radioButton_useDefault->set_tooltip_text('No background colouring');
@@ -11343,11 +11257,11 @@
 
             # Create a pixbuf, with its own sub-region. Use $colour to fill the sub-region, leaving
             #   the renaming area of the pixbuf as a black frame
-            my $pixbuf = Gtk2::Gdk::Pixbuf->new(
+            my $pixbuf = Gtk3::Gdk::Pixbuf->new(
                 'GDK_COLORSPACE_RGB',
                 FALSE,
                 # Same values as ->get_bits_per_sample, ->get_width, ->get_height as a
-                #   Gtk2::Gdk::Pixbuf loaded from one of the icon files in ../share/icons/map
+                #   Gtk3::Gdk::Pixbuf loaded from one of the icon files in ../share/icons/map
                 8,
                 20,
                 20,
@@ -11359,13 +11273,13 @@
             my $subPixbuf = $pixbuf->new_subpixbuf(1, 1, 18, 18);
             $subPixbuf->fill($colour);
 
-            my $radioButton = Gtk2::RadioToolButton->new($radioButton_useDefault);
+            my $radioButton = Gtk3::RadioToolButton->new_from_widget($radioButton_useDefault);
             if (defined $self->bgColourChoice && $self->bgColourChoice eq $rgb) {
 
                 $radioButton->set_active(TRUE);
             }
             $radioButton->set_icon_widget(
-                Gtk2::Image->new_from_pixbuf($pixbuf),
+                Gtk3::Image->new_from_pixbuf($pixbuf),
             );
             $radioButton->set_label($text);
             $radioButton->set_tooltip_text($text);
@@ -11407,8 +11321,8 @@
         }
 
         # Toolbutton for 'centre map on current room'
-        my $toolButton_centreCurrentRoom = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_current.png'),
+        my $toolButton_centreCurrentRoom = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_current.png'),
             'Centre map on current room',
         );
         $toolButton_centreCurrentRoom->set_tooltip_text('Centre map on current room');
@@ -11425,8 +11339,8 @@
         );
 
         # Toolbutton for 'centre map on selected room'
-        my $toolButton_centreSelectedRoom = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_selected.png'),
+        my $toolButton_centreSelectedRoom = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_selected.png'),
             'Centre map on selected room',
         );
         $toolButton_centreSelectedRoom->set_tooltip_text('Centre map on selected room');
@@ -11443,8 +11357,8 @@
         );
 
         # Toolbutton for 'centre map on last known room'
-        my $toolButton_centreLastKnownRoom = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_last.png'),
+        my $toolButton_centreLastKnownRoom = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_last.png'),
             'Centre map on last known room',
         );
         $toolButton_centreLastKnownRoom->set_tooltip_text('Centre map on last known room');
@@ -11461,8 +11375,8 @@
         );
 
         # Toolbutton for 'centre map on middle of grid'
-        my $toolButton_centreMiddleGrid = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_middle.png'),
+        my $toolButton_centreMiddleGrid = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_centre_middle.png'),
             'Centre map on middle of grid',
         );
         $toolButton_centreMiddleGrid->set_tooltip_text('Centre map on middle of grid');
@@ -11478,15 +11392,20 @@
             $toolButton_centreMiddleGrid,
         );
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toggle button for 'track current room'
-        my $toggleButton_trackCurrentRoom = Gtk2::ToggleToolButton->new();
+        my $toggleButton_trackCurrentRoom = Gtk3::ToggleToolButton->new();
         $toggleButton_trackCurrentRoom->set_active($self->worldModelObj->trackPosnFlag);
         $toggleButton_trackCurrentRoom->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_room.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_room.png'),
         );
         $toggleButton_trackCurrentRoom->set_label('Track current room');
         $toggleButton_trackCurrentRoom->set_tooltip_text('Track current room');
@@ -11508,7 +11427,7 @@
         $self->ivAdd('menuToolItemHash', 'icon_track_current_room', $toggleButton_trackCurrentRoom);
 
         # Radio button for 'always track position'
-        my $radioButton_trackAlways = Gtk2::RadioToolButton->new(undef);
+        my $radioButton_trackAlways = Gtk3::RadioToolButton->new(undef);
         if (
             $self->worldModelObj->trackingSensitivity != 0.33
             && $self->worldModelObj->trackingSensitivity != 0.66
@@ -11519,7 +11438,7 @@
             $radioButton_trackAlways->set_active(TRUE);
         }
         $radioButton_trackAlways->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_always.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_always.png'),
         );
         $radioButton_trackAlways->set_label('Always track position');
         $radioButton_trackAlways->set_tooltip_text('Always track position');
@@ -11535,13 +11454,15 @@
         $self->ivAdd('menuToolItemHash', 'icon_track_always', $radioButton_trackAlways);
 
         # Radio button for 'track position near centre'
-        my $radioButton_trackNearCentre = Gtk2::RadioToolButton->new($radioButton_trackAlways);
+        my $radioButton_trackNearCentre = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_trackAlways,
+        );
         if ($self->worldModelObj->trackingSensitivity == 0.33) {
 
             $radioButton_trackNearCentre->set_active(TRUE);
         }
         $radioButton_trackNearCentre->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_centre.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_centre.png'),
         );
         $radioButton_trackNearCentre->set_label('Track position near centre');
         $radioButton_trackNearCentre->set_tooltip_text('Track position near centre');
@@ -11557,13 +11478,15 @@
         $self->ivAdd('menuToolItemHash', 'icon_track_near_centre', $radioButton_trackNearCentre);
 
         # Radio button for 'track near edge'
-        my $radioButton_trackNearEdge = Gtk2::RadioToolButton->new($radioButton_trackNearCentre);
+        my $radioButton_trackNearEdge = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_trackNearCentre,
+        );
         if ($self->worldModelObj->trackingSensitivity == 0.66) {
 
             $radioButton_trackNearEdge->set_active(TRUE);
         }
         $radioButton_trackNearEdge->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_edge.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_edge.png'),
         );
         $radioButton_trackNearEdge->set_label('Track position near edge');
         $radioButton_trackNearEdge->set_tooltip_text('Track position near edge');
@@ -11579,13 +11502,15 @@
         $self->ivAdd('menuToolItemHash', 'icon_track_near_edge', $radioButton_trackNearEdge);
 
         # Radio button for 'track if not visible'
-        my $radioButton_trackNotVisible = Gtk2::RadioToolButton->new($radioButton_trackNearEdge);
+        my $radioButton_trackNotVisible = Gtk3::RadioToolButton->new_from_widget(
+            $radioButton_trackNearEdge,
+        );
         if ($self->worldModelObj->trackingSensitivity == 1) {
 
             $radioButton_trackNotVisible->set_active(TRUE);
         }
         $radioButton_trackNotVisible->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_visible.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_track_visible.png'),
         );
         $radioButton_trackNotVisible->set_label('Track if not visible');
         $radioButton_trackNotVisible->set_tooltip_text('Track position if not visible');
@@ -11628,8 +11553,8 @@
         }
 
         # Toolbutton for 'increase visits and set current'
-        my $toolButton_incVisitsCurrent = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file(
+        my $toolButton_incVisitsCurrent = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file(
                 $axmud::SHARE_DIR . '/icons/map/icon_inc_visits_current.png',
             ),
             'Increase visits and set current',
@@ -11645,8 +11570,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_inc_visits_current', $toolButton_incVisitsCurrent);
 
         # Toolbutton for 'increase visits by one'
-        my $toolButton_incVisits = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_inc_visits.png'),
+        my $toolButton_incVisits = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_inc_visits.png'),
             'Increase visits by one',
         );
         $toolButton_incVisits->set_tooltip_text('Increase visits by one');
@@ -11660,8 +11585,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_inc_visits', $toolButton_incVisits);
 
         # Toolbutton for 'decrease visits by one'
-        my $toolButton_decVisits = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_dec_visits.png'),
+        my $toolButton_decVisits = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_dec_visits.png'),
             'Decrease visits by one',
         );
         $toolButton_decVisits->set_tooltip_text('Decrease visits by one');
@@ -11675,8 +11600,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_dec_visits', $toolButton_decVisits);
 
         # Toolbutton for 'set visits manually'
-        my $toolButton_setVisits = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_set_visits.png'),
+        my $toolButton_setVisits = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_set_visits.png'),
             'Set visits manually',
         );
         $toolButton_setVisits->set_tooltip_text('Set visits manually');
@@ -11690,8 +11615,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_set_visits', $toolButton_setVisits);
 
         # Toolbutton for 'reset visits'
-        my $toolButton_resetVisits = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_reset_visits.png'),
+        my $toolButton_resetVisits = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_reset_visits.png'),
             'Reset visits to zero',
         );
         $toolButton_resetVisits->set_tooltip_text('Reset visits to zero');
@@ -11704,15 +11629,20 @@
         #   $self->selectedRoomHash)
         $self->ivAdd('menuToolItemHash', 'icon_reset_visits', $toolButton_resetVisits);
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toggle button for 'graffiti mode'
-        my $toggleButton_graffitMode = Gtk2::ToggleToolButton->new();
+        my $toggleButton_graffitMode = Gtk3::ToggleToolButton->new();
         $toggleButton_graffitMode->set_active($self->graffitiModeFlag);
         $toggleButton_graffitMode->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_graffiti_mode.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_graffiti_mode.png'),
         );
         $toggleButton_graffitMode->set_label('Graffiti mode');
         $toggleButton_graffitMode->set_tooltip_text('Graffiti mode');
@@ -11739,8 +11669,8 @@
         $self->ivAdd('menuToolItemHash', 'icon_graffiti_mode', $toggleButton_graffitMode);
 
         # Toolbutton for 'toggle graffiti'
-        my $toolButton_toggleGraffiti = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_toggle_graffiti.png'),
+        my $toolButton_toggleGraffiti = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_toggle_graffiti.png'),
             'Toggle graffiti',
         );
         $toolButton_toggleGraffiti->set_tooltip_text('Toggle graffiti in selected rooms');
@@ -11752,13 +11682,18 @@
         # (Requires $self->currentRegionmap, $self->graffitiModeFlag and one or more selected rooms
         $self->ivAdd('menuToolItemHash', 'icon_toggle_graffiti', $toolButton_toggleGraffiti);
 
-        # Separator
-        my $separator2 = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator2);
+#        # Separator
+#        my $separator2 = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator2);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Toolbutton for 'edit world model'
-        my $toolButton_editWorldModel = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_edit_model.png'),
+        my $toolButton_editWorldModel = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_edit_model.png'),
             'Edit world model preferences',
         );
         $toolButton_editWorldModel->set_tooltip_text('Edit world model');
@@ -11777,8 +11712,8 @@
         push (@buttonList, $toolButton_editWorldModel);
 
         # Toolbutton for 'search world model'
-        my $toolButton_searchWorldModel = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_search_model.png'),
+        my $toolButton_searchWorldModel = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_search_model.png'),
             'Search world model',
         );
         $toolButton_searchWorldModel->set_tooltip_text('Search world model');
@@ -11795,8 +11730,8 @@
         push (@buttonList, $toolButton_searchWorldModel);
 
         # Toolbutton for 'add words'
-        my $toolButton_addQuickWords = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add_word.png'),
+        my $toolButton_addQuickWords = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_add_word.png'),
             'Add dictionary words',
         );
         $toolButton_addQuickWords->set_tooltip_text('Add dictionary words');
@@ -11812,8 +11747,8 @@
         push (@buttonList, $toolButton_addQuickWords);
 
         # Toolbutton for 'edit dictionary'
-        my $toolButton_editDictionary = Gtk2::ToolButton->new(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_edit_dict.png'),
+        my $toolButton_editDictionary = Gtk3::ToolButton->new(
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_edit_dict.png'),
             'Edit current dictionary',
         );
         $toolButton_editDictionary->set_tooltip_text('Edit current dictionary');
@@ -11859,10 +11794,10 @@
         }
 
         # Toggle button for 'release all filters'
-        my $radioButton_releaseAllFilters = Gtk2::ToggleToolButton->new();
+        my $radioButton_releaseAllFilters = Gtk3::ToggleToolButton->new();
         $radioButton_releaseAllFilters->set_active($self->worldModelObj->allRoomFiltersFlag);
         $radioButton_releaseAllFilters->set_icon_widget(
-            Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_all_filters.png'),
+            Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/icon_all_filters.png'),
         );
         $radioButton_releaseAllFilters->set_label('Release all filters');
         $radioButton_releaseAllFilters->set_tooltip_text('Release all filters');
@@ -11887,15 +11822,20 @@
             $radioButton_releaseAllFilters,
         );
 
-        # Separator
-        my $separator = Gtk2::SeparatorToolItem->new();
-        push (@buttonList, $separator);
+#        # Separator
+#        my $separator = Gtk3::SeparatorToolItem->new();
+#        push (@buttonList, $separator);
+        if ($^O ne 'MSWin32') {
+
+            my $separator = Gtk3::SeparatorToolItem->new();
+            push (@buttonList, $separator);
+        }
 
         # Filter icons
         foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
 
             # Filter button
-            my $toolButton_filter = Gtk2::ToggleToolButton->new();
+            my $toolButton_filter = Gtk3::ToggleToolButton->new();
             $toolButton_filter->set_active(
                 $self->worldModelObj->ivShow('roomFilterApplyHash', $filter),
             );
@@ -11919,7 +11859,7 @@
             }
 
             $toolButton_filter->set_icon_widget(
-                Gtk2::Image->new_from_file($iconFile)
+                Gtk3::Image->new_from_file($iconFile)
             );
 
             $toolButton_filter->set_label('Toggle ' . $filter . ' filter');
@@ -12034,9 +11974,9 @@
             # (For $count = 0, $buttonGroup is 'undef')
             my $radioButton;
             if ($mode eq 'none') {
-                $radioButton = Gtk2::RadioToolButton->new(undef);
+                $radioButton = Gtk3::RadioToolButton->new(undef);
             } else {
-                $radioButton = Gtk2::RadioToolButton->new_from_widget($lastButton);
+                $radioButton = Gtk3::RadioToolButton->new_from_widget($lastButton);
             }
 
             if ($self->worldModelObj->roomInteriorMode eq $mode) {
@@ -12044,7 +11984,7 @@
                 $radioButton->set_active(TRUE);
             }
             $radioButton->set_icon_widget(
-                Gtk2::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/' . $iconHash{$mode}),
+                Gtk3::Image->new_from_file($axmud::SHARE_DIR . '/icons/map/' . $iconHash{$mode}),
             );
             $radioButton->set_label($interiorHash{$mode});
             $radioButton->set_tooltip_text($interiorHash{$mode});
@@ -12065,9 +12005,14 @@
             # (Add a separator after the first toolbar button)
             if ($mode eq 'none') {
 
-                # Separator
-                my $separator = Gtk2::SeparatorToolItem->new();
-                push (@buttonList, $separator);
+#                # Separator
+#                my $separator = Gtk3::SeparatorToolItem->new();
+#                push (@buttonList, $separator);
+                if ($^O ne 'MSWin32') {
+
+                    my $separator = Gtk3::SeparatorToolItem->new();
+                    push (@buttonList, $separator);
+                }
             }
         }
 
@@ -12106,14 +12051,14 @@
         }
 
         # Set up the popup menu
-        my $popupMenu = Gtk2::Menu->new();
+        my $popupMenu = Gtk3::Menu->new();
         if (! $popupMenu) {
 
             return undef;
         }
 
         # Add a title menu item, which does nothing
-        my $title_item = Gtk2::MenuItem->new('Add preferred room flag:');
+        my $title_item = Gtk3::MenuItem->new('Add preferred room flag:');
         $title_item->signal_connect('activate' => sub {
 
             return undef;
@@ -12121,13 +12066,13 @@
         $title_item->set_sensitive(FALSE);
         $popupMenu->append($title_item);
 
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
         # Fill the popup menu with room flags
         foreach my $filter ($axmud::CLIENT->constRoomFilterList) {
 
             # A sub-sub menu for $filter
-            my $subSubMenu_filter = Gtk2::Menu->new();
+            my $subSubMenu_filter = Gtk3::Menu->new();
 
             my @nameList = $self->worldModelObj->getRoomFlagsInFilter($filter);
             foreach my $name (@nameList) {
@@ -12135,7 +12080,7 @@
                 my $obj = $self->worldModelObj->ivShow('roomFlagHash', $name);
                 if ($obj) {
 
-                    my $menuItem = Gtk2::MenuItem->new($obj->descrip);
+                    my $menuItem = Gtk3::MenuItem->new($obj->descrip);
                     $menuItem->signal_connect('activate' => sub {
 
                         # Add the room flag to the world model's list of preferred room flags...
@@ -12150,20 +12095,20 @@
 
             if (! @nameList) {
 
-                my $menuItem = Gtk2::MenuItem->new('(No flags in this filter)');
+                my $menuItem = Gtk3::MenuItem->new('(No flags in this filter)');
                 $menuItem->set_sensitive(FALSE);
                 $subSubMenu_filter->append($menuItem);
             }
 
-            my $menuItem = Gtk2::MenuItem->new(ucfirst($filter));
+            my $menuItem = Gtk3::MenuItem->new(ucfirst($filter));
             $menuItem->set_submenu($subSubMenu_filter);
             $popupMenu->append($menuItem);
         }
 
         # Also add a 'Cancel' menu item, which does nothing
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
-        my $cancel_item = Gtk2::MenuItem->new('Cancel');
+        my $cancel_item = Gtk3::MenuItem->new('Cancel');
         $cancel_item->signal_connect('activate' => sub {
 
             return undef;
@@ -12174,7 +12119,7 @@
         $popupMenu->popup(
             undef, undef, undef, undef,
             1,                              # Left mouse button
-            Gtk2->get_current_event_time(),
+            Gtk3::get_current_event_time(),
         );
 
         $popupMenu->show_all();
@@ -12205,14 +12150,14 @@
         }
 
         # Set up the popup menu
-        my $popupMenu = Gtk2::Menu->new();
+        my $popupMenu = Gtk3::Menu->new();
         if (! $popupMenu) {
 
             return undef;
         }
 
         # Add a title menu item, which does nothing
-        my $title_item = Gtk2::MenuItem->new('Remove preferred room flag:');
+        my $title_item = Gtk3::MenuItem->new('Remove preferred room flag:');
         $title_item->signal_connect('activate' => sub {
 
             return undef;
@@ -12220,12 +12165,12 @@
         $title_item->set_sensitive(FALSE);
         $popupMenu->append($title_item);
 
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
         # Fill the popup menu with room flags
         foreach my $roomFlag ($self->worldModelObj->preferRoomFlagList) {
 
-            my $menu_item = Gtk2::MenuItem->new($roomFlag);
+            my $menu_item = Gtk3::MenuItem->new($roomFlag);
             $menu_item->signal_connect('activate' => sub {
 
                 # Remove the room flag from the world model's list of preferred room flags...
@@ -12239,9 +12184,9 @@
         }
 
         # Add a 'remove all' menu item
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
-        my $remove_all_item = Gtk2::MenuItem->new('Remove all');
+        my $remove_all_item = Gtk3::MenuItem->new('Remove all');
         $remove_all_item->signal_connect('activate' => sub {
 
             my ($total, $choice);
@@ -12282,7 +12227,7 @@
         $popupMenu->append($remove_all_item);
 
         # Also add a 'Cancel' menu item, which does nothing
-        my $cancel_item = Gtk2::MenuItem->new('Cancel');
+        my $cancel_item = Gtk3::MenuItem->new('Cancel');
         $cancel_item->signal_connect('activate' => sub {
 
             return undef;
@@ -12293,7 +12238,7 @@
         $popupMenu->popup(
             undef, undef, undef, undef,
             1,                              # Left mouse button
-            Gtk2->get_current_event_time(),
+            Gtk3::get_current_event_time(),
         );
 
         $popupMenu->show_all();
@@ -12362,14 +12307,14 @@
         }
 
         # Set up the popup menu
-        my $popupMenu = Gtk2::Menu->new();
+        my $popupMenu = Gtk3::Menu->new();
         if (! $popupMenu) {
 
             return undef;
         }
 
         # Add a title menu item, which does nothing
-        my $title_item = Gtk2::MenuItem->new('Remove preferred background colour:');
+        my $title_item = Gtk3::MenuItem->new('Remove preferred background colour:');
         $title_item->signal_connect('activate' => sub {
 
             return undef;
@@ -12377,12 +12322,12 @@
         $title_item->set_sensitive(FALSE);
         $popupMenu->append($title_item);
 
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
         # Fill the popup menu with colours
         foreach my $colour ($self->worldModelObj->preferBGColourList) {
 
-            my $menu_item = Gtk2::MenuItem->new($colour);
+            my $menu_item = Gtk3::MenuItem->new($colour);
             $menu_item->signal_connect('activate' => sub {
 
                 # Remove the colour from the world model's list of preferred background colours...
@@ -12394,9 +12339,9 @@
         }
 
         # Add a 'remove all' menu item
-        $popupMenu->append(Gtk2::SeparatorMenuItem->new());     # Separator
+        $popupMenu->append(Gtk3::SeparatorMenuItem->new());     # Separator
 
-        my $remove_all_item = Gtk2::MenuItem->new('Remove all');
+        my $remove_all_item = Gtk3::MenuItem->new('Remove all');
         $remove_all_item->signal_connect('activate' => sub {
 
             my ($total, $choice);
@@ -12429,7 +12374,7 @@
         $popupMenu->append($remove_all_item);
 
         # Also add a 'Cancel' menu item, which does nothing
-        my $cancel_item = Gtk2::MenuItem->new('Cancel');
+        my $cancel_item = Gtk3::MenuItem->new('Cancel');
         $cancel_item->signal_connect('activate' => sub {
 
             return undef;
@@ -12440,7 +12385,7 @@
         $popupMenu->popup(
             undef, undef, undef, undef,
             1,                              # Left mouse button
-            Gtk2->get_current_event_time(),
+            Gtk3::get_current_event_time(),
         );
 
         $popupMenu->show_all();
@@ -12461,7 +12406,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::ScrolledWindow containing the Gtk2::TreeView created
+        #   Otherwise returns the Gtk3::ScrolledWindow containing the Gtk3::TreeView created
 
         my ($self, $check) = @_;
 
@@ -12472,8 +12417,8 @@
         }
 
         # Create the treeview
-        my $objectModel = Gtk2::TreeStore->new('Glib::String');
-        my $treeView = Gtk2::TreeView->new($objectModel);
+        my $objectModel = Gtk3::TreeStore->new( ['Glib::String'] );
+        my $treeView = Gtk3::TreeView->new($objectModel);
         if (! $objectModel || ! $treeView) {
 
             return undef;
@@ -12484,15 +12429,15 @@
 
         # Append a single column to the treeview
         $treeView->append_column(
-            Gtk2::TreeViewColumn->new_with_attributes(
+            Gtk3::TreeViewColumn->new_with_attributes(
                 'Regions',
-                Gtk2::CellRendererText->new,
+                Gtk3::CellRendererText->new,
                 markup => 0,
             )
         );
 
         # Make the treeview scrollable
-        my $treeViewScroller = Gtk2::ScrolledWindow->new;
+        my $treeViewScroller = Gtk3::ScrolledWindow->new;
         $treeViewScroller->add($treeView);
         $treeViewScroller->set_policy(qw/automatic automatic/);
 
@@ -12646,7 +12591,7 @@
 
                 # Add this region to the treeview now
                 $pointer = $model->append(undef);
-                $model->set($pointer, 0 => $markupHash{$regionObj});
+                $model->set( $pointer, [0], [$markupHash{$regionObj}] );
 
                 # Store $pointer in a hash, so that if this region has any child regions, they can
                 #   be added directly below in the treeview
@@ -12682,7 +12627,7 @@
                     # Add this region to the treeview, just below its parent
                     $pointer = $pointerHash{$parentObj->name};
                     $childPointer = $model->append($pointer);
-                    $model->set($childPointer, 0 => $markupHash{$regionObj});
+                    $model->set( $childPointer, [0], [$markupHash{$regionObj}] );
 
                     # Store $childPointer in a hash, so that if this region has any child regions,
                     #   they can be added directly below in the treeview
@@ -12715,7 +12660,7 @@
 
             # Add this region to the treeview now
             $pointer = $model->append(undef);
-            $model->set($pointer, 0 => $regionObj->name);
+            $model->set( $pointer, [0], [$regionObj->name] );
         }
 
         # Now expand any of the rows that were expanded before the call to this function
@@ -12761,7 +12706,7 @@
         # Expands rows in the tree model, to make sure that a certain region is visible.
         #
         # Expected arguments
-        #   $model          - The treeview model (a Gtk2::TreeModel object)
+        #   $model          - The treeview model (a Gtk3::TreeModel object)
         #   $expandRegion   - The name of a region that should be visible. This function expands
         #                       the row belonging to $expandRegion's parent (if any), then calls
         #                       this function recursively, to expand the row for the parent's
@@ -12880,7 +12825,7 @@
         # Called from an anonymous sub in $self->enableTreeView
         #
         # Expected arguments
-        #   $selection  - A Gtk2::Selection
+        #   $selection  - A Gtk3::Selection
         #
         # Return values
         #   'undef' on improper arguments or if the selection is not recognised
@@ -12925,7 +12870,7 @@
         # Called from an anonymous sub in $self->enableTreeView
         #
         # Expected arguments
-        #   $iter       - A Gtk2::TreeIter
+        #   $iter       - A Gtk3::TreeIter
         #
         # Return values
         #   'undef' on improper arguments
@@ -12961,7 +12906,7 @@
         # Called from an anonymous sub in $self->enableTreeView
         #
         # Expected arguments
-        #   $iter       - A Gtk2::TreeIter
+        #   $iter       - A Gtk3::TreeIter
         #
         # Return values
         #   'undef' on improper arguments
@@ -13029,7 +12974,7 @@
         }
 
         # Highlight the region
-        $self->treeView->set_cursor($path);
+        $self->treeView->set_cursor($path, undef, 0);
 
         return 1;
     }
@@ -13046,7 +12991,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if the widget can't be created
-        #   Otherwise returns the Gtk2::Frame containing the Gtk2::Canvas created
+        #   Otherwise returns the Gtk3::Frame containing the Gtk3::Canvas created
 
         my ($self, $check) = @_;
 
@@ -13057,11 +13002,11 @@
         }
 
         # Create a frame
-        my $canvasFrame = Gtk2::Frame->new(undef);
+        my $canvasFrame = Gtk3::Frame->new(undef);
         $canvasFrame->set_border_width(3);
 
         # Create a scrolled window
-        my $canvasScroller = Gtk2::ScrolledWindow->new();
+        my $canvasScroller = Gtk3::ScrolledWindow->new();
         my $canvasHAdjustment = $canvasScroller->get_hadjustment();
         my $canvasVAdjustment = $canvasScroller->get_vadjustment();
         $canvasScroller->set_border_width(3);
@@ -13070,6 +13015,16 @@
 
         # Add the scrolled window to the frame
         $canvasFrame->add($canvasScroller);
+
+        # The only way to scroll the map to the correct position, is to store the scrolled window's
+        #   size allocation whenever it is set
+        $canvasScroller->signal_connect('size-allocate' => sub {
+
+            my ($widget, $hashRef) = @_;
+
+            $self->ivPoke('canvasScrollerWidth', $$hashRef{width});
+            $self->ivPoke('canvasScrollerHeight', $$hashRef{height});
+        });
 
         # Store the remaining widgets
         $self->ivPoke('canvasFrame', $canvasFrame);
@@ -13106,14 +13061,14 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->enableTooltips', @_);
         }
 
-        # Create a Gtk2::Window to act as a tooltip, being visible (or not) as appropriate
-        my $tooltipLabel = Gtk2::Label->new();
-        my $tooltipWin = Gtk2::Window->new('popup');
+        # Create a Gtk3::Window to act as a tooltip, being visible (or not) as appropriate
+        my $tooltipLabel = Gtk3::Label->new();
+        my $tooltipWin = Gtk3::Window->new('popup');
         $tooltipWin->set_decorated(FALSE);
         $tooltipWin->set_position('mouse');
         $tooltipWin->set_border_width(2);
-        $tooltipWin->modify_fg('normal', Gtk2::Gdk::Color->parse('black'));
-        $tooltipWin->modify_bg('normal', Gtk2::Gdk::Color->parse('yellow'));
+        $tooltipWin->modify_fg('normal', [Gtk3::Gdk::Color::parse('black')]->[1]);
+        $tooltipWin->modify_bg('normal', [Gtk3::Gdk::Color::parse('yellow')]->[1]);
         $tooltipWin->add($tooltipLabel);
 
         # Update IVs
@@ -13128,7 +13083,7 @@
     sub setMapPosn {
 
         # Can be called by anything
-        # Sets the position of the canvas scrollbars, revealing a portion of the map
+        # Scroll the canvas to the desired position, revealing a portion of the map
         #
         # Expected arguments
         #   $xPos   - Value between 0 (far left) and 1 (far right)
@@ -13141,7 +13096,7 @@
         my ($self, $xPos, $yPos, $check) = @_;
 
         # Local variables
-        my ($xLow, $xHigh, $xLength, $newXPos, $yLow, $yHigh, $yLength, $newYPos);
+        my ($canvasWidget, $xBlocks, $yBlocks, $xPixels, $yPixels, $scrollX, $scrollY);
 
         # Check for improper arguments
         if (! defined $xPos || ! defined $yPos || defined $check) {
@@ -13155,30 +13110,64 @@
             return undef;
         }
 
-        # This line is needed because, during a zoom, we have to wait for the scrollbars'
-        #   properties (e.g. $self->canvasHAdjustment->lower) to be set to their proper values
-        # Update Gtk2's events queue
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->setMapPosn');
+        # Get the canvas widget to be scrolled
+        $canvasWidget = $self->currentParchment->ivShow(
+            'canvasWidgetHash',
+            $self->currentRegionmap->currentLevel,
+        );
 
-        # Get the lowest and highest horizontal positions of the horizontal scrollbar, and the
-        #   distance between them
-        $xLow = $self->canvasHAdjustment->lower;
-        $xHigh = ($self->canvasHAdjustment->upper - $self->canvasHAdjustment->page_size);
-        $xLength = $xHigh - $xLow;
-        # Set the new position of the horizontal scrollbar
-        $newXPos = $xLow + ($xLength * $xPos);
+        # The code in this function, which uses GooCanvas2::Canvas->scroll_to, produces a slightly
+        #   different value to the code in $self->getMapPosn, which uses scrollbar positions
+        # When moving up and down through map levels, this causes the scroll position to drift from
+        #   its original position
+        # The only way to deal with this is to adjust $xPos and $yPos so that they represent the
+        #   middle of a gridblock. In that way, the first change of level might adjust the map's
+        #   scroll position (slightly), but subsequent changes preserve the exact same scroll
+        #   position
+        $xBlocks = int(
+            ($xPos * $self->currentRegionmap->mapWidthPixels)
+            / $self->currentRegionmap->blockWidthPixels
+        );
 
-        # Get the lowest and highest vertical positions of the vertical scrollbar, and the distance
-        #   between them
-        $yLow = $self->canvasVAdjustment->lower;
-        $yHigh = ($self->canvasVAdjustment->upper - $self->canvasVAdjustment->page_size);
-        $yLength = $yHigh - $yLow;
-        # Set the new position of the vertical scrollbar
-        $newYPos = $yLow + ($yLength * $yPos);
+        $yBlocks = int(
+            ($yPos * $self->currentRegionmap->mapHeightPixels)
+            / $self->currentRegionmap->blockHeightPixels
+        );
 
-        # Move the scrollbars
-        $self->canvasHAdjustment->set_value($newXPos);
-        $self->canvasVAdjustment->set_value($newYPos);
+        $xPixels = ($xBlocks * $self->currentRegionmap->blockWidthPixels)
+            + int($self->currentRegionmap->blockWidthPixels / 2) + 1;
+        $yPixels = ($yBlocks * $self->currentRegionmap->blockHeightPixels)
+            + int ($self->currentRegionmap->blockHeightPixels / 2) + 1;
+
+        $xPos = $xPixels / $self->currentRegionmap->mapWidthPixels;
+        $yPos = $yPixels / $self->currentRegionmap->mapHeightPixels;
+
+        # Previously, the map's position was set by moving the scrollbars directly. Under GooCanvas2
+        #   that no longer works, so we'll use the ->scroll_to() function instead
+        # Previously, a map that was smaller than the available area was positioned in the centre
+        #   of the available area. Under GooCanvas2 that's no longer possible, so a small map is now
+        #   positioned in the top-left corner
+        $scrollX = int (
+            ($xPos * $self->currentRegionmap->mapWidthPixels)
+            - (($self->canvasScrollerWidth / $canvasWidget->get_scale()) / 2)
+        );
+
+        if ($scrollX < 0) {
+
+            $scrollX = 0;
+        }
+
+        $scrollY = int (
+            ($yPos * $self->currentRegionmap->mapHeightPixels)
+            - (($self->canvasScrollerHeight / $canvasWidget->get_scale()) / 2)
+        );
+
+        if ($scrollY < 0) {
+
+            $scrollY = 0;
+        }
+
+        $canvasWidget->scroll_to($scrollX, $scrollY);
 
         return 1;
     }
@@ -13233,38 +13222,44 @@
         }
 
         # Get the position of the horizontal scrollbar (a value between 0 and 1)
-        if ($self->canvasHAdjustment->upper == $self->canvasHAdjustment->page_size) {
+        if ($self->canvasHAdjustment->get_upper() == $self->canvasHAdjustment->get_page_size()) {
 
             $xOffset = 0;
 
         } else {
 
-            $xOffset = $self->canvasHAdjustment->value
-                / ($self->canvasHAdjustment->upper - $self->canvasHAdjustment->page_size);
+            $xOffset = $self->canvasHAdjustment->get_value()
+                / (
+                    $self->canvasHAdjustment->get_upper()
+                    - $self->canvasHAdjustment->get_page_size()
+                );
         }
 
         # Get the position of the vertical scrollbar (a value between 0 and 1)
-        if ($self->canvasVAdjustment->upper == $self->canvasVAdjustment->page_size) {
+        if ($self->canvasVAdjustment->get_upper() == $self->canvasVAdjustment->get_page_size()) {
 
             $yOffset = 0;
 
         } else {
 
-            $yOffset = $self->canvasVAdjustment->value
-                / ($self->canvasVAdjustment->upper - $self->canvasVAdjustment->page_size);
+            $yOffset = $self->canvasVAdjustment->get_value()
+                / (
+                    $self->canvasVAdjustment->get_upper()
+                    - $self->canvasVAdjustment->get_page_size()
+                );
         }
 
         # Get the position of the left end of the visible portion of the map (a value between
         #   0 and 1)
-        $xPos = $self->canvasHAdjustment->value / $self->canvasHAdjustment->upper;
+        $xPos = $self->canvasHAdjustment->get_value() / $self->canvasHAdjustment->get_upper();
         # Get the position of the top end of the visible portion of the map (a value between
         #   0 and 1)
-        $yPos = $self->canvasVAdjustment->value / $self->canvasVAdjustment->upper;
+        $yPos = $self->canvasVAdjustment->get_value() / $self->canvasVAdjustment->get_upper();
 
         # Get the size of the horizontal scrollbar (a value between 0 and 1)
-        $width = $self->canvasHAdjustment->page_size / $self->canvasHAdjustment->upper;
+        $width = $self->canvasHAdjustment->get_page_size() / $self->canvasHAdjustment->get_upper();
         # Get the size of the horizontal scrollbar (a value between 0 and 1)
-        $height = $self->canvasVAdjustment->page_size / $self->canvasVAdjustment->upper;
+        $height = $self->canvasVAdjustment->get_page_size() / $self->canvasVAdjustment->get_upper();
 
         return ($xOffset, $yOffset, $xPos, $yPos, $width, $height);
     }
@@ -13363,11 +13358,7 @@
         my ($self, $roomObj, $xPosBlocks, $yPosBlocks, $check) = @_;
 
         # Local variables
-        my (
-            $regionObj, $width, $height, $blockCentreXPosPixels, $blockCentreYPosPixels,
-            $blockCentreXPos, $blockCentreYPos, $newVisibleCentreXPos, $newVisibleCentreYPos,
-            $newVisibleCornerXPos, $newVisibleCornerYPos, $scrollBarXPos, $scrollBarYPos,
-        );
+        my ($regionObj, $blockCentreXPosPixels, $blockCentreYPosPixels);
 
         # Check for improper arguments
         if (defined $check) {
@@ -13404,74 +13395,16 @@
             return undef;
         }
 
-        # Get the size of the horizontal scrollbar (a value between 0 and 1)
-        $width = $self->canvasHAdjustment->page_size / $self->canvasHAdjustment->upper;
-        # Get the size of the horizontal scrollbar (a value between 0 and 1)
-        $height = $self->canvasVAdjustment->page_size / $self->canvasVAdjustment->upper;
-
-        # Get the centre of a hypothetical visible window, exactly the same size as the current one,
-        #   as if it were centred exactly over the gridblock (values between 0 and 1)
+        # Convert that position into canvas coordinates, and centre the map at that position
         ($blockCentreXPosPixels, $blockCentreYPosPixels) = $self->getBlockCentre(
-            $xPosBlocks,
-            $yPosBlocks,
+            $roomObj->xPosBlocks,
+            $roomObj->yPosBlocks,
         );
 
-        $blockCentreXPos = $blockCentreXPosPixels / $self->currentRegionmap->mapWidthPixels;
-        $blockCentreYPos = $blockCentreYPosPixels / $self->currentRegionmap->mapHeightPixels;
-
-        # If any part of this hypothetical visible window is outside the map, correct its position,
-        #   so that the whole visible window is inside the map (as close to the room as possible)
-        if ($blockCentreXPos < ($width / 2)) {
-            $newVisibleCentreXPos = ($width / 2);
-        } elsif ($blockCentreXPos > (1 - ($width / 2))) {
-            $newVisibleCentreXPos = (1 - ($width / 2));
-        } else {
-            $newVisibleCentreXPos = $blockCentreXPos;
-        }
-
-        if ($blockCentreYPos < ($height / 2)) {
-            $newVisibleCentreYPos = ($height / 2);
-        } elsif ($blockCentreYPos > (1 - ($height / 2))) {
-            $newVisibleCentreYPos = (1 - ($height / 2));
-        } else {
-            $newVisibleCentreYPos = $blockCentreYPos;
-        }
-
-        # Get the coordinates of the top-left corner of the new visible window (values between 0
-        #   and 1)
-        $newVisibleCornerXPos = $newVisibleCentreXPos - ($width / 2);
-        $newVisibleCornerYPos = $newVisibleCentreYPos - ($height / 2);
-
-        # Get the position that the scrollbars have to be in, in order to be showing this new
-        #   visible window (values in the range 0 to 1)
-        if ($width == 1) {
-            $scrollBarXPos = 0;
-        } else {
-            $scrollBarXPos = $newVisibleCornerXPos / (1 - $width);
-        }
-
-        if ($height == 1) {
-            $scrollBarYPos = 0;
-        } else {
-            $scrollBarYPos = $newVisibleCornerYPos / (1 - $height);
-        }
-
-        # Correct for rounding errors when the new visible window is touching the edge of the map
-        if ($scrollBarXPos < 0.005) {
-            $scrollBarXPos = 0;
-        } elsif ($scrollBarXPos > 0.995) {
-            $scrollBarXPos = 1;
-        }
-
-        if ($scrollBarYPos < 0.005) {
-            $scrollBarYPos = 0;
-        } elsif ($scrollBarXPos > 0.995) {
-            $scrollBarXPos = 1;
-        }
-
-        # Move the scrollbars to this position, thus centreing the map as close as possible to the
-        #   gridblock
-        $self->setMapPosn($scrollBarXPos, $scrollBarYPos);
+        $self->setMapPosn(
+            ($blockCentreXPosPixels / $self->currentRegionmap->mapWidthPixels),
+            ($blockCentreYPosPixels / $self->currentRegionmap->mapHeightPixels),
+        );
 
         return 1;
     }
@@ -13503,76 +13436,11 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->doZoom', @_);
         }
 
-        # Set the visible map's size. Each Gnome2::Canvas automatically takes care of its position,
-        #   so that the same part of the map is visible in the window
+        # Set the visible map's size. Each GooCanvas2::Canvas automatically takes care of its
+        #   position, so that the same part of the map is visible in the window
         foreach my $canvasWidget ($self->currentParchment->ivValues('canvasWidgetHash')) {
 
-            $canvasWidget->set_pixels_per_unit($self->currentRegionmap->magnification);
-        }
-
-        # Gnome2::Canvas helpfully redraws text after a zoom, so it's the same size it was before.
-        #   Therefore, we have to redraw any rooms with interior text/room tags/room guilds, and
-        #   any exits with exit tags, and also all labels
-        # Create a list of objects that must be redrawn. Use %newHash to make sure the same room
-        #   isn't drawn more than once
-        foreach my $levelObj ($self->currentParchment->ivValues('levelHash')) {
-
-            foreach my $posn ($levelObj->ivKeys('drawnRoomTagHash')) {
-
-                my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
-                if ($roomNum && ! exists $newHash{$roomNum}) {
-
-                    push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
-                    $newHash{$roomNum} = undef;
-                }
-            }
-
-            foreach my $posn ($levelObj->ivKeys('drawnRoomGuildHash')) {
-
-                my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
-                if ($roomNum && ! exists $newHash{$roomNum}) {
-
-                    push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
-                    $newHash{$roomNum} = undef;
-                }
-            }
-
-            foreach my $posn ($levelObj->ivKeys('drawnRoomTextHash')) {
-
-                my $roomNum = $self->currentRegionmap->fetchRoom(split(/_/, $posn));
-                if ($roomNum && ! exists $newHash{$roomNum}) {
-
-                    push(@redrawList, 'room', $self->worldModelObj->ivShow('modelHash', $roomNum));
-                    $newHash{$roomNum} = undef;
-                }
-            }
-
-            foreach my $number ($levelObj->ivKeys('drawnExitTagHash')) {
-
-                if ($self->currentRegionmap->ivExists('gridExitTagHash', $number)) {
-
-                    push (
-                        @redrawList,
-                        'exit',
-                        $self->worldModelObj->ivShow('exitModelHash', $number),
-                    );
-                }
-            }
-
-            foreach my $number ($levelObj->ivKeys('drawnLabelHash')) {
-
-                my $labelObj = $self->currentRegionmap->ivShow('gridLabelHash', $number);
-                if ($labelObj) {
-
-                    push (@redrawList, 'label', $labelObj);
-                }
-            }
-        }
-
-        # Redraw any rooms or labels that must be redrawn, to get text the right size
-        if (@redrawList) {
-
-            $self->worldModelObj->updateMaps(@redrawList);
+            $canvasWidget->set_scale($self->currentRegionmap->magnification);
         }
 
         # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
@@ -14510,7 +14378,7 @@
     sub sensitiseWidgets {
 
         # Called by anything. Frequently called by $self->restrictWidgets
-        # Given a list of Gtk2 widgets (all of them menu/toolbar items), sets them as sensitive
+        # Given a list of Gtk3 widgets (all of them menu/toolbar items), sets them as sensitive
         #
         # Expected arguments
         #   (none besides $self)
@@ -14541,7 +14409,7 @@
     sub desensitiseWidgets {
 
         # Called by anything. Frequently called by $self->restrictWidgets
-        # Given a list of Gtk2 widgets (all of them menu/toolbar items), sets them as insensitive
+        # Given a list of Gtk3 widgets (all of them menu/toolbar items), sets them as insensitive
         #
         # Expected arguments
         #   (none besides $self)
@@ -14746,8 +14614,8 @@
         #   treat as if it were a click on the map background
         #
         # Expected arguments
-        #   $canvasObj     - The Gnome2::Canvas::Item::Rect which is the map's background (or the
-        #                       Gnome2::Canvas::Item which is a room echo, which should be treated
+        #   $canvasObj     - The GooCanvas2::CanvasRect which is the map's background (or the
+        #                       GooCanvas2::CanvasRect which is a room echo, which should be treated
         #                       as part of the map background)
         #
         # Return values
@@ -14762,27 +14630,34 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->setupCanvasEvent', @_);
         }
 
-        $canvasObj->signal_connect('event' => sub {
+        $canvasObj->signal_connect('button_press_event' => sub {
 
-            my ($obj, $event) = @_;
+            my ($item, $target, $event) = @_;
 
-            if (
-                $event->type eq 'button-press'
-                || $event->type eq '2button-press'
-                || $event->type eq '3button-press'
-                || $event->type eq 'button-release'
-            ) {
-                # If the tooltips are visible, hide them
-                $self->hideTooltips();
+            # If the tooltips are visible, hide them
+            $self->hideTooltips();
 
-                # All clicks on the canvas itself are handled by this function
-                $self->canvasEventHandler($obj, $event);
+            # All clicks on the canvas itself are handled by this function
+            $self->canvasEventHandler($canvasObj, $event);
+        });
 
-            } elsif (
-                $event->type eq 'motion-notify'
-                && $self->selectBoxFlag
-                && $event->state =~ m/button1-mask/
-            ) {
+        $canvasObj->signal_connect('button_release_event' => sub {
+
+            my ($item, $target, $event) = @_;
+
+            # If the tooltips are visible, hide them
+            $self->hideTooltips();
+
+            # All clicks on the canvas itself are handled by this function
+            $self->canvasEventHandler($canvasObj, $event);
+        });
+
+        $canvasObj->signal_connect('motion_notify_event' => sub {
+
+            my ($item, $target, $event) = @_;
+
+            if ($self->selectBoxFlag && $event->state =~ m/button1-mask/) {
+
                 # Continue the selection box operation by re-drawing the canvas object at its new
                 #   position
                 $self->continueSelectBox($event);
@@ -14805,7 +14680,9 @@
         # Expected arguments
         #   $type       - What type of canvas object this is - 'room', 'room_tag', 'room_guild',
         #                   'exit', 'exit_tag', 'label', 'square' or 'rect'
-        #   $canvasObj  - The Gnome2::Canvas::Item on which the user has clicked
+        #   $canvasObj  - The canvas object on which the user has clicked (i.e.
+        #                   GooCanvas2::CanvasRect, GooCanvas2::CanvasPath,
+        #                   GooCanvas2::CanvasEllipse or GooCanvas2::CanvasText)
         #
         # Optional arguments
         #   $modelObj   - The GA::ModelObj::Room, GA::Obj::Exit or GA::Obj::MapLabel which is
@@ -14818,31 +14695,73 @@
 
         my ($self, $type, $canvasObj, $modelObj, $check) = @_;
 
-        # Local variables
-        my ($xPos, $yPos);
-
         # Check for improper arguments
         if (! defined $type || ! defined $canvasObj || defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->setupCanvasObjEvent', @_);
         }
 
-        $canvasObj->signal_connect('event' => sub {
+        $canvasObj->signal_connect('button_press_event' => sub {
 
-            my ($obj, $event) = @_;
-
-            # Get the coordinates of the click on the canvas (required for dragging operations)
-            ($xPos, $yPos) = $canvasObj->parent->w2i($event->coords());
+            my ($item, $target, $event) = @_;
 
             # Coloured blocks/rectangles can't be clicked; treat a click on one of these canvas
             #   objects as if it was a click on the map background
             if (! $modelObj) {
 
-               if (
-                    $event->type eq 'motion-notify'
-                    && $self->selectBoxFlag
-                    && $event->state =~ m/button1-mask/
-                ) {
+                $self->canvasEventHandler($canvasObj, $event);
+
+            # For left-clicks, if the Alt-Gr key is pressed down (or if we're in drag mode), it's a
+            #   drag operation
+            } elsif (
+                $event->button == 1 && ($event->state =~ m/mod5-mask/ || $self->dragModeFlag)
+            ) {
+                # Respond to the start of a drag operation
+                $self->startDrag(
+                    $type,
+                    $canvasObj,
+                    $modelObj,
+                    $event,
+                    $event->x_root,
+                    $event->y_root,
+                );
+
+            # All other clicks on a canvas object are handled by the event handler
+            } elsif ($event->type eq 'button-press' || $event->type eq '2button-press') {
+
+                $self->canvasObjEventHandler($type, $canvasObj, $modelObj, $event);
+            }
+        });
+
+        $canvasObj->signal_connect('button_release_event' => sub {
+
+            my ($item, $target, $event) = @_;
+
+            if (! $modelObj) {
+
+                $self->canvasEventHandler($canvasObj, $event);
+
+            } elsif (
+                $self->dragFlag
+                && (
+                    $canvasObj eq $self->dragCanvasObj
+                    # When dragging labels with a box, there are two canvas objects
+                    || $self->ivFind('dragCanvasObjList', $canvasObj)
+                )
+            ) {
+                # Respond to the end of a drag operation
+                $self->stopDrag($event, $event->x_root, $event->y_root);
+            }
+        });
+
+        $canvasObj->signal_connect('motion_notify_event' => sub {
+
+            my ($item, $target, $event) = @_;
+
+            if (! $modelObj) {
+
+                if ($self->selectBoxFlag && $event->state =~ m/button1-mask/) {
+
                     # Continue the selection box operation by re-drawing the canvas object at its
                     #   new position
                     $self->continueSelectBox($event);
@@ -14852,37 +14771,10 @@
                     $self->canvasEventHandler($canvasObj, $event);
                 }
 
-            # For left-clicks, if the Alt-Gr key is pressed down (or if we're in drag mode), it's a
-            #   drag operation
-            } elsif (
-                $event->type eq 'button-press'
-                && $event->button == 1
-                && ($event->state =~ m/mod5-mask/ || $self->dragModeFlag)
-            ) {
-                $self->startDrag($type, $canvasObj, $modelObj, $event, $xPos, $yPos);
-
-            } elsif (
-                $event->type eq 'button-release'
-                && $self->dragFlag
-                && (
-                    $canvasObj eq $self->dragCanvasObj
-                    # When dragging labels with a box, there are two canvas objects
-                    || $self->ivFind('dragCanvasObjList', $canvasObj)
-                )
-            ) {
-                # Respond to the end of a drag operation
-                $self->stopDrag($event, $xPos, $yPos);
-
-            # All other clicks on a canvas object are handled by the event handler
-            } elsif ($event->type eq 'button-press' || $event->type eq '2button-press') {
-
-                $self->canvasObjEventHandler($type, $canvasObj, $modelObj, $event);
-
             # Process mouse events - when the mouse moves over a canvas object, or leaves it -
             #   in order to display tooltips, etc
             } elsif (
-                $event->type eq 'motion-notify'
-                && $self->dragFlag
+                $self->dragFlag
                 && (
                     $canvasObj eq $self->dragCanvasObj
                     # When dragging labels with a box, there are two canvas objects
@@ -14891,20 +14783,29 @@
                 && $event->state =~ m/button1-mask/
             ) {
                 # Continue the drag operation by re-drawing the object(s) at their new position
-                $self->continueDrag($event, $xPos, $yPos);
+                $self->continueDrag($event, $event->x_root, $event->y_root);
+            }
+        });
 
-            } elsif (
-                $event->type eq 'enter-notify'
-                && $self->worldModelObj->showTooltipsFlag
-                && ! $self->canvasTooltipObj
-            ) {
+        $canvasObj->signal_connect('enter_notify_event' => sub {
+
+            my ($item, $target, $event) = @_;
+
+            if ($modelObj && $self->worldModelObj->showTooltipsFlag && ! $self->canvasTooltipObj) {
+
                 # Show the tooltips window
-                $self->showTooltips($type, $obj, $modelObj);
+                $self->showTooltips($type, $canvasObj, $modelObj);
+            }
+        });
 
-            } elsif (
-                $event->type eq 'leave-notify'
+        $canvasObj->signal_connect('leave_notify_event' => sub {
+
+            my ($item, $target, $event) = @_;
+
+            if (
+                $modelObj
                 && $self->canvasTooltipFlag
-                && $self->canvasTooltipObj eq $obj
+                && $self->canvasTooltipObj eq $canvasObj
                 && $self->canvasTooltipObjType eq $type
             ) {
                 # Hide the tooltips window
@@ -14928,7 +14829,7 @@
         #
         # Expected arguments
         #   $canvasObj  - The canvas object which intercepted an event signal
-        #   $event      - The Gtk2::Gdk::Event that caused the signal
+        #   $event      - The Gtk3::Gdk::Event that caused the signal
         #
         # Return values
         #   'undef' on improper arguments, if there is no region map or if the signal $event is one
@@ -14940,9 +14841,8 @@
         # Local variables
         my (
             $clickXPosPixels, $clickYPosPixels, $clickType, $button, $shiftFlag, $ctrlFlag,
-            $clickXPosBlocks, $clickYPosBlocks, $newRoomObj, $roomNum, $roomObj,
-            $borderCornerXPosPixels, $borderCornerYPosPixels, $exitObj, $listRef, $result, $result2,
-            $twinExitObj, $popupMenu,
+            $clickXPosBlocks, $clickYPosBlocks, $newRoomObj, $roomNum, $roomObj, $exitObj, $listRef,
+            $result, $twinExitObj, $result2, $popupMenu,
         );
 
         # Check for improper arguments
@@ -15075,69 +14975,7 @@
             $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
         }
 
-        if (
-            $roomObj
-            && ($clickType eq 'double' || $clickType eq 'triple')
-            && $button eq 'left'
-            && $self->worldModelObj->quickPathFindFlag
-        ) {
-            # Don't know why double click signals are picked up by the background, but there you go.
-            #   See if the click was within the room
-
-            # Find the coordinates of the pixel at the top-left corner of the room's border
-            ($borderCornerXPosPixels, $borderCornerYPosPixels) = $self->getBorderCorner(
-                $clickXPosBlocks,
-                $clickYPosBlocks,
-            );
-
-            # Did the user click on the room (or its border), or in the surrounding area of the
-            #   gridblock?
-            if (
-                $clickXPosPixels >= $borderCornerXPosPixels
-                && $clickYPosPixels >= $borderCornerYPosPixels
-                && $clickXPosPixels
-                    <= ($borderCornerXPosPixels + $self->currentRegionmap->roomWidthPixels - 1)
-                && $clickYPosPixels
-                    <= ($borderCornerYPosPixels + $self->currentRegionmap->roomHeightPixels - 1)
-            ) {
-                # User double-clicked on the room (or its border)
-
-                # Don't do anything if the current room isn't known, or if the user clicked on the
-                #   current room and the automapper object isn't set up to perform a merge
-                if (! $self->mapObj->currentRoom) {
-
-                    return 1;
-
-                } elsif ($roomObj eq $self->mapObj->currentRoom) {
-
-                    if ($self->mapObj->currentMatchFlag) {
-
-                        return $self->doMerge($roomObj);
-
-                    } else {
-
-                        return 1;
-                    }
-
-                } else {
-
-                    # Select the clicked room...
-                    $self->setSelectedObj(
-                        [$roomObj, 'room'],
-                        FALSE,          # Select this object; unselect all other objects
-                    );
-
-                    # ...and go there
-                    return $self->processPathCallback('send_char');
-                }
-
-            } else {
-
-                # Ignore double clicks outside a room's border
-                return 1;
-            }
-
-        } elsif ($roomObj && $clickType eq 'single' && $self->currentRegionmap->gridExitHash) {
+        if ($roomObj && $clickType eq 'single' && $self->currentRegionmap->gridExitHash) {
 
             # Usually, when we click on the map on an empty pixel, all selected objects are
             #   unselected
@@ -15286,7 +15124,7 @@
         #   $canvasObj  - The canvas object which intercepted an event signal
         #   $modelObj   - The GA::ModelObj::Room, GA::Obj::Exit or GA::Obj::MapLabel which is
         #                   represented by this canvas object
-        #   $event      - The Gtk2::Gdk::Event that caused the signal
+        #   $event      - The Gtk3::Gdk::Event that caused the signal
         #
         # Return values
         #   'undef' on improper arguments or if the signal $event is one that this function doesn't
@@ -15297,8 +15135,8 @@
 
         # Local variables
         my (
-            $clickType, $selectFlag, $button, $shiftFlag, $ctrlFlag, $otherRoomObj, $result,
-            $result2, $twinExitObj, $startX, $stopX, $startY, $stopY, $popupMenu,
+            $clickType, $button, $shiftFlag, $ctrlFlag, $selectFlag, $clickTime, $otherRoomObj,
+            $startX, $stopX, $startY, $stopY, $result, $twinExitObj, $result2, $popupMenu,
         );
 
         # Check for improper arguments
@@ -15339,6 +15177,10 @@
         ) {
             $selectFlag = TRUE;
         }
+
+        # For capturing double-clicks on rooms, we need to compare the times at which each click is
+        #   received
+        $clickTime = $axmud::CLIENT->getTime();
 
         # Process single left clicks
         if ($clickType eq 'single' && $button eq 'left') {
@@ -15465,6 +15307,43 @@
                 #   with any selected exits, room tags and labels)
                 $self->selectRoomsInArea($startX, $startY, $stopX, $stopY);
 
+            # Process double-clicked rooms
+            } elsif (
+                $objType eq 'room'
+                && $button eq 'left'
+                && ! $shiftFlag
+                && ! $ctrlFlag
+                && $self->worldModelObj->quickPathFindFlag
+                && $self->mapObj->currentRoom
+                && $self->leftClickTime
+                && ($self->leftClickTime + $self->leftClickWaitTime) > $clickTime
+                && $self->leftClickObj eq $modelObj
+            ) {
+                # Double-click detected. Reset IVs
+                $self->ivUndef('leftClickTime');
+                $self->ivUndef('leftClickObj');
+
+                # Don't do anything if the user clicked on the current room and the automapper
+                #   object isn't set up to perform a merge
+                if ($modelObj eq $self->mapObj->currentRoom) {
+
+                    if ($self->mapObj->currentMatchFlag) {
+
+                        $self->doMerge($modelObj);
+                    }
+
+                } else {
+
+                    # Ensure the double-clicked room is the only one selected...
+                    $self->setSelectedObj(
+                        [$modelObj, 'room'],
+                        FALSE,          # Select this object; unselect all other objects
+                    );
+
+                    # ...so the callback function knows which room is the destination room
+                    return $self->processPathCallback('send_char');
+                }
+
             # Process left-clicked room tags (ignoring the SHIFT key, but checking for the CTRL key)
             } elsif ($objType eq 'room_tag') {
 
@@ -15482,8 +15361,7 @@
                 } else {
 
                     # If this object is already a selected object, unselect it
-                    $result = $self->unselectObj($modelObj, 'room_tag');
-                    if (! $result) {
+                    if (! $self->unselectObj($modelObj, 'room_tag')) {
 
                         # The room tag wasn't already selected, so select it
                         $self->setSelectedObj(
@@ -15512,8 +15390,7 @@
                 } else {
 
                     # If this object is already a selected object, unselect it
-                    $result = $self->unselectObj($modelObj, 'room_guild');
-                    if (! $result) {
+                    if (! $self->unselectObj($modelObj, 'room_guild')) {
 
                         # The room guild wasn't already selected, so select it
                         $self->setSelectedObj(
@@ -15585,8 +15462,7 @@
                 } else {
 
                     # If this object is already a selected object, unselect it
-                    $result = $self->unselectObj($modelObj, 'exit_tag');
-                    if (! $result) {
+                    if (! $self->unselectObj($modelObj, 'exit_tag')) {
 
                         # The exit tag wasn't already selected, so select it
                         $self->setSelectedObj(
@@ -15599,6 +15475,13 @@
 
             # Process other kinds of left-click
             } else {
+
+                if ($objType eq 'room' && ! $shiftFlag && ! $ctrlFlag) {
+
+                    # Single click detected; it might be the start of a double-click
+                    $self->ivPoke('leftClickTime', $clickTime);
+                    $self->ivPoke('leftClickObj', $modelObj);
+                }
 
                 # If a group of things are already selected, unselect them all and select the object
                 #   that was clicked
@@ -15614,8 +15497,7 @@
                 } else {
 
                     # If this object is already a selected object, unselect it
-                    $result = $self->unselectObj($modelObj);
-                    if (! $result) {
+                    if (! $self->unselectObj($modelObj)) {
 
                         # The room or label wasn't already selected, so select it
                         $self->setSelectedObj(
@@ -16050,7 +15932,7 @@
         # Expected arguments
         #   $type           - What type of canvas object this is - 'room', 'room_tag', 'room_guild',
         #                       'exit', 'exit_tag' or 'label'
-        #   $canvasObj      - The Gnome2::Canvas::Item on which the user clicked
+        #   $canvasObj      - The canvas object on which the user clicked
         #   $modelObj       - The GA::ModelObj::Room, GA::Obj::Exit or GA::Obj::MapLabel which
         #                       corresponds to the canvas object $canvasObj
         #   $event          - The mouse click event (a Gtk::Gdk::Event)
@@ -16086,7 +15968,7 @@
         # If the tooltips are visible, hide them
         $self->hideTooltips();
 
-        # Gtk2 can return fractional values for $xPos, $yPos. We definitely want only integers
+        # Gtk3 can return fractional values for $xPos, $yPos. We definitely want only integers
         $xPos = int($xPos);
         $yPos = int($yPos);
 
@@ -16100,10 +15982,9 @@
 
         if ($type eq 'room') {
 
-            # If the room(s) have been drawn emphasised (a normal box with a border, plus an extra
-            #   square just outside it, in the same colour as the border, giving the impression of a
-            #   thicker border), we need to re-draw them without emphasis - otherwise the extra
-            #   square will be left behind on the canvas while the room is being dragged around
+            # If the room(s) have been drawn with an emphasised border, we need to re-draw them
+            #   without emphasis - otherwise the extra square will be left behind on the canvas
+            #   while the room is being dragged around
 
             # Check that the room is selected. If not, we need to select it (which unselects any
             #   other selected rooms/labels)
@@ -16118,8 +15999,8 @@
                 $self->setSelectedObj([$modelObj, 'room']);
             }
 
-            # Temporarily set a few draw cycle IVs, which allows the drawing functions to work as if
-            #   we were in a draw cycle (i.e. a call to $self->doDraw). They are reset by
+            # Temporarily set a few drawing cycle IVs, which allows the drawing functions to work as
+            #   if we were in a drawing cycle (i.e. a call to $self->doDraw). They are reset by
             #   $self->stopDrag
             $self->ivPoke('drawRegionmap', $self->currentRegionmap);
             $self->ivPoke('drawParchment', $self->currentParchment);
@@ -16138,7 +16019,7 @@
                     #   border
                     # (NB Calling $self->drawRoom here, instead of calling ->markObjs then ->doDraw
                     #   as usual, is allowed. Because of the TRUE argument, ->drawRoom is expecting
-                    #   a call from this function
+                    #   a call from this function)
                     $self->drawRoom($roomObj, $mode, TRUE);
 
                     $listRef = $self->currentParchment->getDrawnRoom($roomObj);
@@ -16160,12 +16041,12 @@
                         push (@fakeRoomList, $fakeRoomObj);
 
                         # Don't let the fake room object be obscured by room echos
-                        $fakeRoomObj->raise_to_top();
+                        $fakeRoomObj->raise();
                     }
 
                     # Raise the canvas object above others so that, while we're dragging it around,
                     #   it doesn't disappear under exits (and so on)
-                    $thisCanvasObj->raise_to_top();
+                    $thisCanvasObj->raise();
                 }
             }
 
@@ -16183,16 +16064,13 @@
                     if ($thisCanvasObj2) {
 
                         push (@canvasObjList, $thisCanvasObj2);
-                        $thisCanvasObj2->raise_to_top();
+                        $thisCanvasObj2->raise();
                     }
 
                     push (@canvasObjList, $thisCanvasObj);
-                    $thisCanvasObj->raise_to_top();
+                    $thisCanvasObj->raise();
                 }
             }
-
-            # Update Gtk2's events queue
-            $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->startDrag');
 
         } elsif ($type eq 'exit') {
 
@@ -16203,8 +16081,8 @@
                 $twinExitObj = $self->worldModelObj->ivShow('exitModelHash', $modelObj->twinExit);
             }
 
-            # Temporarily set a few draw cycle IVs, which allows the drawing functions to work as if
-            #   we were in a draw cycle (i.e. a call to $self->doDraw). They are reset by
+            # Temporarily set a few drawing cycle IVs, which allows the drawing functions to work as
+            #   if we were in a drawing cycle (i.e. a call to $self->doDraw). They are reset by
             #   $self->stopDrag
             $self->ivPoke('drawRegionmap', $self->currentRegionmap);
             $self->ivPoke('drawParchment', $self->currentParchment);
@@ -16283,8 +16161,6 @@
                 # Draw a draggable exit, starting from $exitObj's normal start position, and ending
                 #   at the position of the mouse click
                 $canvasObj = $self->drawDraggableExit($modelObj, $xPos, $yPos);
-                # Update Gtk2's events queue
-                $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->startDrag');
             }
 
             push (@canvasObjList, $canvasObj);
@@ -16300,7 +16176,7 @@
             foreach my $thisCanvasObj (reverse @$listRef) {
 
                 push (@canvasObjList, $thisCanvasObj);
-                $thisCanvasObj->raise_to_top();         # Text last, raised above box
+                $thisCanvasObj->raise();         # Text last, raised above box
             }
 
             # The canvas object to grab is always the label text, not the box (as $self->stopDrag
@@ -16311,13 +16187,14 @@
 
             # For room tags, room guilds and exit tags, just raise the canvas object above others
             push (@canvasObjList, $canvasObj);
-            $canvasObj->raise_to_top();
+            $canvasObj->raise();
         }
 
         # Grab the dragged canvas object
-        $canvasObj->grab(
+        $canvasObj->get_canvas->pointer_grab(
+            $canvasObj,
             [qw/pointer-motion-mask button-release-mask/],
-            Gtk2::Gdk::Cursor->new('fleur'),
+            Gtk3::Gdk::Cursor->new('fleur'),
             $event->time,
         );
 
@@ -16372,7 +16249,7 @@
             $self->ivPoke('dragContinueFlag', TRUE);
         }
 
-        # Gtk2 can return fractional values for $xPos, $yPos. We definitely want only integers
+        # Gtk3 can return fractional values for $xPos, $yPos. We definitely want only integers
         $xPos = int($xPos);
         $yPos = int($yPos);
 
@@ -16384,13 +16261,13 @@
 
             foreach my $canvasObj ($self->dragCanvasObjList) {
 
-                $canvasObj->move($moveX, $moveY);
+                $canvasObj->translate($moveX, $moveY);
             }
 
         } else {
 
             # Ungrab the exit's canvas object
-            $self->dragCanvasObj->ungrab($event->time);
+            $self->dragCanvasObj->get_canvas->pointer_ungrab($self->dragCanvasObj, $event->time);
 
             # If dragging an exit bend...
             if (defined $self->dragBendNum) {
@@ -16454,24 +16331,22 @@
             } else {
 
                 # Destroy the old canvas object
-                $self->dragCanvasObj->destroy();
+                $self->dragCanvasObj->remove();
 
                 # Replace it with a new one draggable exit at the current mouse position
                 $canvasObj = $self->drawDraggableExit($self->dragModelObj, $xPos, $yPos);
             }
 
-            # Grab the canvas object
-            $canvasObj->grab(
+            # Grab the new canvas object
+            $canvasObj->get_canvas->pointer_grab(
+                $canvasObj,
                 [qw/pointer-motion-mask button-release-mask/],
-                Gtk2::Gdk::Cursor->new('fleur'),
+                Gtk3::Gdk::Cursor->new('fleur'),
                 $event->time,
             );
 
             $self->ivPoke('dragCanvasObj', $canvasObj);
         }
-
-        # Show the canvas object(s) in their new position
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->continueDrag');
 
         # Update IVs
         $self->ivPoke('dragCurrentXPos', $xPos);
@@ -16504,12 +16379,12 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->stopDrag', @_);
         }
 
-        # Gtk2 can return fractional values for $xPos, $yPos. We definitely want only integers
+        # Gtk3 can return fractional values for $xPos, $yPos. We definitely want only integers
         $xPos = int($xPos);
         $yPos = int($yPos);
 
         # Ungrab the grabbed canvas object
-        $self->dragCanvasObj->ungrab($event->time);
+        $self->dragCanvasObj->get_canvas->pointer_ungrab($self->dragCanvasObj, $event->time);
 
         # Mark the drag operation as finished
         $self->ivPoke('dragFlag', FALSE);
@@ -16530,13 +16405,13 @@
             # Destroy any fake room canvas objects
             foreach my $fakeRoomObj ($self->dragFakeRoomList) {
 
-                $fakeRoomObj->destroy();
+                $fakeRoomObj->remove();
             }
 
             # Destroy the moving room/label canvas objects, as we're not redrawing the whole region
             foreach my $moveRoomObj ($self->dragCanvasObjList) {
 
-                $moveRoomObj->destroy();
+                $moveRoomObj->remove();
             }
 
             # Calculate the grid coordinates of the dragged room's new gridblock
@@ -16712,7 +16587,7 @@
             if (! defined $self->dragBendNum) {
 
                 # Destroy the draggable exit
-                $self->dragCanvasObj->destroy();
+                $self->dragCanvasObj->remove();
 
                 # Work out whether the end of the draggable exit (the coordinates are $xPos, $yPos)
                 #   was over a room that wasn't the exit's parent room or its existing destination
@@ -16769,7 +16644,7 @@
         $self->ivUndef('dragBendTwinInitYPos');
         $self->ivUndef('dragExitDrawMode');
 
-        # Also reset the draw cycle IVs set by $self->startDrag
+        # Also reset the drawing cycle IVs set by $self->startDrag
         $self->tidyUpDraw();
 
         return 1;
@@ -16828,7 +16703,7 @@
         #   the operation
         #
         # Expected arguments
-        #   $event      - The Gtk2::Gdk::Event that caused the signal
+        #   $event      - The Gtk3::Gdk::Event that caused the signal
         #
         # Return values
         #   'undef' on improper arguments
@@ -16856,7 +16731,7 @@
 
             # No need to call $self->deleteCanvasObj - the canvas object we're drawing doesn't
             #   represent anything in the world model
-            $self->selectBoxCanvasObj->destroy();
+            $self->selectBoxCanvasObj->remove();
         }
 
         # Set the selection box's coordinates
@@ -16886,18 +16761,19 @@
             }
 
             # Draw the new canvas object
-            $canvasObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Rect',
-                x1 => $x1,
-                y1 => $y1,
-                x2 => $x2,
-                y2 => $y2,
-                outline_color => $self->worldModelObj->selectBoxColour,
+            $canvasObj = GooCanvas2::CanvasRect->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'x' => $x1,
+                'y' => $y1,
+                'width' => $x2 - $x1 + 1,
+                'height' => $y2 - $y1 + 1,
+#                'line-width' => 2,
+                'stroke-color' => $self->worldModelObj->selectBoxColour,
+#                'fill-color' => $self->worldModelObj->selectBoxColour,
             );
 
             # Move it above everything else
-            $canvasObj->raise_to_top();
+            $canvasObj->raise();
 
             $self->ivPoke('selectBoxCanvasObj', $canvasObj);
         }
@@ -16916,7 +16792,7 @@
         #   $self->selectAllInBox to handle selecting any objects within the selection box
         #
         # Expected arguments
-        #   $event          - The Gtk2::Gdk::Event that caused the signal
+        #   $event          - The Gtk3::Gdk::Event that caused the signal
         #   $xPos, $yPos    - The coordinates of the release-click on the canvas
         #
         # Return values
@@ -16942,7 +16818,7 @@
 
         } else {
 
-            $self->selectBoxCanvasObj->destroy();
+            $self->selectBoxCanvasObj->remove();
 
             $x1 = $self->selectBoxInitXPos;
             $y1 = $self->selectBoxInitYPos;
@@ -17380,7 +17256,7 @@
         #   that area, and select them
         #
         # Expected arguments
-        #   $event          - The Gtk2::Gdk::Event that caused the signal
+        #   $event          - The Gtk3::Gdk::Event that caused the signal
         #   $x1, $y1        - Canvas coordinates of the top-left corner of the selection box
         #   $x2, $y2        - Coordinates of the bottom-right corner
         #
@@ -17498,7 +17374,7 @@
             # Find a list of labels whose start position is within the selection box
             foreach my $labelObj ($self->currentRegionmap->ivValues('gridLabelHash')) {
 
-                my ($listRef, $canvasObj, $labelX1, $labelY1, $labelX2, $labelY2);
+                my ($listRef, $canvasObj, $boundsObj, $labelX1, $labelY1, $labelX2, $labelY2);
 
                 if ($labelObj->level == $level) {
 
@@ -17513,13 +17389,12 @@
                             $canvasObj = $$listRef[0];
                         }
 
-                        ($labelX1, $labelY1, $labelX2, $labelY2) = $canvasObj->get_bounds();
-
+                        $boundsObj = $canvasObj->get_bounds();
                         if (
-                            $labelX1 <= $x2
-                            && $labelX2 >= $x1
-                            && $labelY1 <= $y2
-                            && $labelY2 >= $y1
+                            $boundsObj->x1 <= $x2
+                            && $boundsObj->x2 >= $x1
+                            && $boundsObj->y1 <= $y2
+                            && $boundsObj->y2 >= $y1
                         ) {
                             push (@selectList, $labelObj, 'label');
                         }
@@ -17798,7 +17673,7 @@
         #   and/or CTRL keys were held down during the click
         #
         # Expected arguments
-        #   $event  - The Gtk2::Gdk::Event caused by the mouse click
+        #   $event  - The Gtk3::Gdk::Event caused by the mouse click
         #
         # Return values
         #   An empty list on improper arguments, or if $event wasn't cause by a single, double or
@@ -18081,7 +17956,7 @@
                     # Split the text into two lines of no more than 40 characters. The TRUE
                     #   arguments tells the function to append an ellipsis, if any text is
                     #   removed
-                    $text = $self->splitText($text, 2, 40, TRUE);
+                    $text = $axmud::CLIENT->splitText($text, 2, 40, TRUE);
                     $label .= "\n(D) " . $text;
 
                     $flag = TRUE;
@@ -18108,7 +17983,7 @@
 
                 # Split the text into five lines of no more than 40 characters, appending an
                 #   ellipsis
-                $text = $self->splitText($text, 5, 40, TRUE);
+                $text = $axmud::CLIENT->splitText($text, 5, 40, TRUE);
                 $label .= "\n(N) " . $text;
             }
 
@@ -18220,104 +18095,6 @@
         return $label;
     }
 
-    sub splitText {
-
-        # Called by $self->setTooltips
-        # Splits a line of text into a specified number of rows separated by line break characters
-        # Each line will be no longer than a specified number of characters, but words are not
-        #   split (unless they're longer than the line)
-        # Discards any extra text and optionally appends an ellipsis if doing so
-        #
-        # Expected arguments
-        #   $line           - The line of text to split
-        #   $rows           - The number of rows (minimum 1)
-        #   $columns        - The maximum number of columns per line (minimum 10)
-        #
-        # Optional arguments
-        #   $ellipsisFlag   - If set to TRUE, an ellipsis is appended if any text is discarded.
-        #                       If set to FALSE (or 'undef'), no ellipsis is appended
-        #
-        # Return values
-        #   The unmodified value of $text on improper arguments, or if $rows and/or $columns are
-        #       invalid values
-        #   Otherwise, returns the modified string
-
-        my ($self, $line, $rows, $columns, $ellipsisFlag, $check) = @_;
-
-        # Local variables
-        my (
-            $newLine,
-            @array,
-        );
-
-        # Check for improper arguments
-        if (! defined $line || ! defined $rows || ! defined $columns || defined $check) {
-
-            $axmud::CLIENT->writeImproper($self->_objClass . '->splitText', @_);
-        }
-
-        # Check for valid values of $rows and $columns
-        if ($rows < 1 || $columns < 10) {
-
-            return $line;
-        }
-
-        # Split the text
-        until ($line eq '' || (scalar @array) >= $rows) {
-
-            my $i = 0;
-
-            if (length($line) <= $columns) {
-
-                # No need to split anything (and this is the final iteration)
-                push(@array, $line);
-                $line = '';
-
-            } else {
-
-                # The line is going to be split near character number $columns. Find the space (or
-                #   tab) nearest to the end of the line
-                OUTER: for ($i = $columns; $i > 0; $i--) {
-
-                    if (substr($line, $i, 1) eq " " || substr($line, $i, 1) eq "\t") {
-
-                        last OUTER;
-                    }
-                }
-
-                # A space (or tab) was found. Split the line there
-                if ($i > 1) {
-
-                    push @array, substr($line, 0, $i);
-                    $line = substr($line, ($i + 1));
-
-                # There is no space at which the line can be split. Split a word (using a hyphen)
-                } else {
-
-                    push @array, substr($line, 0, ($columns) . '-');
-                    $line = substr($line, $columns);
-                }
-            }
-        }
-
-        # Join the split lines together with newline characters
-        if ($rows > 1) {
-
-            $newLine = join("\n", @array);
-            # If we're discarding extra text, append an ellipsis (if allowed)
-            if ($line && $ellipsisFlag) {
-
-                $newLine .= '...';
-            }
-
-        } else {
-
-            $newLine = $line;
-        }
-
-        return $newLine;
-    }
-
     # Menu 'File' column callbacks
 
     sub importModelCallback {
@@ -18413,7 +18190,7 @@
                 'Unsaved world model',
                 'question',
                 'The world model in memory is not saved. Do you want to save it before exporting?'
-                . ' (If you choose \'no\', the previously saved world model file will be exported'
+                . ' (If you choose \'No\', the previously saved world model file will be exported'
                 . ' instead)',
                 'yes-no',
             );
@@ -19235,6 +19012,8 @@
                 'info',
                 $text,
                 'ok',
+                undef,
+                TRUE,           # Preserve newline characters in $text
             );
 
         } else {
@@ -19243,8 +19022,8 @@
             if ($type eq 'all_above') {
 
                 $title = 'Select exits';
-                $text = "There are no more unallocated, uncertain or\n"
-                    . "incomplete exits in this region";
+                $text = 'There are no more unallocated, uncertain or incomplete exits in this'
+                            . ' region';
 
             } else {
 
@@ -19300,11 +19079,11 @@
         }
 
         # Prompt the user for a room number
-        $msg = "Enter a room number";
+        $msg = 'Enter a room number';
         if ($self->worldModelObj->modelObjCount > 1) {
-            $msg .= "\n(range 1-" . $self->worldModelObj->modelObjCount . "), or\nenter a room tag";
+            $msg .= ' (range 1-' . $self->worldModelObj->modelObjCount . '), or enter a room tag';
         } else {
-            $msg .= "\nor enter a room tag";
+            $msg .= ' or enter a room tag';
         }
 
         $choice = $self->showEntryDialogue(
@@ -19426,6 +19205,8 @@
             'info',
             $msg,
             'ok',
+            undef,
+            TRUE,           # Preserve newline characters in $msg
         );
     }
 
@@ -19466,10 +19247,10 @@
         }
 
         # Prompt the user for an exit number
-        $msg = "Enter the exit number";
+        $msg = 'Enter the exit number';
         if ($self->worldModelObj->exitObjCount > 1) {
 
-            $msg .= "\n(range 1-" . $self->worldModelObj->exitObjCount . ")";
+            $msg .= ' (range 1-' . $self->worldModelObj->exitObjCount . ')';
         }
 
         $number = $self->showEntryDialogue(
@@ -19558,6 +19339,8 @@
             'info',
             $msg,
             'ok',
+            undef,
+            TRUE,           # Preserve newline characters in $msg
         );
     }
 
@@ -20033,7 +19816,6 @@
         $choice = $self->showComboDialogue(
             'Select character',
             'Select which character\'s visits to draw',
-            FALSE,
             \@comboList,
         );
 
@@ -20364,7 +20146,7 @@
         # Prompt for a new number of verbose characters to match
         $number = $self->showEntryDialogue(
             'Match verbose description',
-            "Enter number of initial characters to match\n(0 = match whole description)",
+            'Enter number of initial characters to match (0 = match whole description)',
             undef,
             $self->worldModelObj->matchDescripCharCount,
         );
@@ -20459,9 +20241,8 @@
         # Prompt for a new maximum
         $number = $self->showEntryDialogue(
             'Set limit on room comparisons',
-            "When comparing the Locator task\'s current room\n"
-            . "against rooms in the model, set the maximum\n"
-            . "number of rooms to compare (0 - no limit)",
+            'When comparing the Locator task\'s current room against rooms in the model, set the'
+            . ' maximum number of rooms to compare (0 - no limit)',
             undef,
             $self->worldModelObj->autoCompareMax,
         );
@@ -20502,9 +20283,8 @@
         # Prompt for a new maximum
         $number = $self->showEntryDialogue(
             'Set limit on slide distance',
-            "When sliding a new room into an unoccupied\n"
-            . "gridblock, set the maximum slide distance\n"
-            . "(minimum value: 1)",
+            'When sliding a new room into an unoccupied gridblock, set the maximum slide distance'
+            . ' (minimum value: 1)',
             undef,
             $self->worldModelObj->autoSlideMax,
         );
@@ -20744,7 +20524,6 @@
         $parent = $self->showComboDialogue(
             'Change parent region',
             'Select the new parent region for \'' . $self->currentRegionmap->name . '\'',
-            FALSE,
             \@sortedList,
         );
 
@@ -21022,6 +20801,8 @@
             'info',
             $text,
             'ok',
+            undef,
+            TRUE,           # Preserve newline characters in $text
         );
 
         return 1;
@@ -21076,122 +20857,31 @@
         return 1;
     }
 
-    sub visibleScreenshotCallback {
-
-        # Called by $self->enableRegionsColumn
-        # Takes a screenshot of the visible portion of the currently displayed region, at the
-        #   currently displayed level, and saves it in the /screenshots directory
-        #
-        # Expected arguments
-        #   (none besides $self)
-        #
-        # Return values
-        #   'undef' on improper arguments or if the standard callback check fails
-        #   1 otherwise
-
-        my ($self, $check) = @_;
-
-        # Local variables
-        my ($width, $height, $file, $path, $count);
-
-        # Check for improper arguments
-        if (defined $check) {
-
-            return $axmud::CLIENT->writeImproper(
-                $self->_objClass . '->visibleScreenshotCallback',
-                @_,
-            );
-        }
-
-        # Standard callback check
-        if (! $self->currentRegionmap) {
-
-            return undef;
-        }
-
-        # The menu column is presumably still open - which will get in the way of the screenshot.
-        #   Give it a chance to close
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->visibleScreenshotCallback');
-
-        # Get the size of the canvas
-        ($width, $height) = $self->canvas->window->get_size();
-
-        # Create a blank pixbuffer to hold the image
-        my $pixBuffer = Gtk2::Gdk::Pixbuf->new(
-            'rgb',
-            0,
-            8,
-            $width,
-            $height,
-        );
-
-        # Take the screenshot by transfering the canvas to the pixbuffer
-        $pixBuffer->get_from_drawable(
-            $self->canvas->window,
-            undef, 0, 0, 0, 0,
-            $width, $height,
-        );
-
-        $file = $self->currentRegionmap->name . '_level_' . $self->currentRegionmap->currentLevel;
-        $path = $axmud::DATA_DIR . '/screenshots/' . $file . '.jpg';
-
-        # If the file $path already exists, add a postscript to create a filepath that doesn't yet
-        #   exist
-        if (-e $path) {
-
-            $count = 0;
-
-            do {
-
-                $count++;
-
-                my $newFile = $file . '_(' . $count . ')';
-                $path = $axmud::DATA_DIR . '/screenshots/' . $newFile . '.jpg'
-
-            } until (! -e $path);
-        }
-
-        # Save the file as a .jpeg
-        $pixBuffer->save($path, 'jpeg', quality => 100);
-
-        # Display a confirmation dialogue
-        $self->showMsgDialogue(
-            'Screenshot',
-            'info',
-            'Screenshot saved to ' . $path,
-            'ok',
-        );
-
-        return 1;
-    }
-
     sub regionScreenshotCallback {
 
         # Called by $self->enableRegionsColumn
-        # Takes a screenshot of the entire regionmap (or the occupied portion of it), at the
-        #   currently displayed level, and saves it in the /screenshots directory
+        # Takes a screenshot of a portion of the regionmap (or the whole regionmap), at the
+        #   currently displayed level, and saves it in the ../screenshots directory
         #
         # Expected arguments
-        #   $wholeFlag  - If set to TRUE, capture the whole regionmap. If set to FALSE, capture only
-        #                   the occupied part of the regionmap
+        #   $type       - 'visible' for the visible portion of the canvas, 'occupied' for the
+        #                   occupied portion of the canvas, and 'whole' for the whole canvas
         #
         # Return values
         #   'undef' on improper arguments, if the standard callback check fails or if the user
         #       declines to take the screenshot after a warning
         #   1 otherwise
 
-        my ($self, $wholeFlag, $check) = @_;
+        my ($self, $type, $check) = @_;
 
         # Local variables
         my (
-            $canvasWidth, $canvasHeight, $x, $y, $viewPortWidth, $viewPortHeight, $viewPortDepth,
-            $columnCount, $columnMod, $rowCount, $rowMod, $file, $path, $count, $barXPos, $barYPos,
-            $msg, $result, $left, $right, $top, $bottom, $startX, $stopX, $startY, $stopY,
-            $wholeWidthFlag, $wholeHeightFlag, $imageWidth, $imageHeight,
+            $xOffset, $yOffset, $xPos, $yPos, $left, $top, $right, $bottom, $width, $height, $msg,
+            $result, $file, $path, $count,
         );
 
         # Check for improper arguments
-        if (! defined $wholeFlag || defined $check) {
+        if (! defined $type || defined $check) {
 
             return $axmud::CLIENT->writeImproper(
                 $self->_objClass . '->regionScreenshotCallback',
@@ -21207,75 +20897,39 @@
 
         # The menu column is presumably still open - which will get in the way of the screenshot.
         #   Give it a chance to close
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->regionScreenshotCallback');
+        $axmud::CLIENT->desktopObj->updateWidgets(
+            $self->_objClass . '->regionScreenshotCallback',
+        );
 
-        # Get the size of the canvas
-        ($canvasWidth, $canvasHeight) = $self->canvas->get_size();
-        # Get the dimensions of the viewport, through which the canvas is seen
-        ($x, $y, $viewPortWidth, $viewPortHeight, $viewPortDepth)
-            = $self->canvas->window->get_geometry();
-        # Paraphrased from original code, "a hack to slide the viewport and grab each viewable area"
-        $columnCount = int($canvasWidth / $viewPortWidth);
-        $columnMod = $canvasWidth % $viewPortWidth;
-        $rowCount = int($canvasHeight / $viewPortHeight);
-        $rowMod = $canvasHeight % $viewPortHeight;
+        if ($type eq 'visible') {
 
-        # If $wholeFlag is TRUE, we capture the whole regionmap. If FALSE, we capture only the
-        #   occupied portion of the regionmap
-        if (! $wholeFlag) {
+            # Find the position of the top-left corner of the visible canvas
+            ($xOffset, $yOffset, $xPos, $yPos) = $self->getMapPosn();
+            $left = int($self->currentRegionmap->mapWidthPixels * $xPos);
+            $top = int($self->currentRegionmap->mapHeightPixels * $yPos);
+            # Import the size of the visible canvas
+            $width = $self->canvasScrollerWidth;
+            $height = $self->canvasScrollerHeight;
 
+        } elsif ($type eq 'occupied') {
+
+            # Find the extent of the occupied map, in pixels
             ($left, $right, $top, $bottom) = $self->findOccupiedMap();
-        }
-
-        if ($wholeFlag || ! defined $left) {
-
-            $startX = 0;
-            $stopX = $columnCount - 1;
-            $startY = 0;
-            $stopY = $rowCount - 1;
-
-            # We're using the whole map
-            $wholeWidthFlag = TRUE;
-            $wholeHeightFlag = TRUE;
-            $imageWidth = $canvasWidth;
-            $imageHeight = $canvasHeight;
+            $width = $right - $left + 1;
+            $height = $bottom - $top + 1;
 
         } else {
 
-            $startX = int ($left / $viewPortWidth);
-            $stopX = int ($right / $viewPortWidth);
-            $startY = int ($top / $viewPortHeight);
-            $stopY = int ($bottom / $viewPortHeight);
-
-            if ($startX <= 0 && $stopX >= ($columnCount - 1)) {
-
-                # We're using the whole width
-                $wholeWidthFlag = TRUE;
-                $imageWidth = $canvasWidth;
-
-            } else {
-
-                $imageWidth = (($stopX - $startX + 1) * $viewPortWidth);
-            }
-
-            if ($startY <= 0 && $stopY >= ($rowCount - 1)) {
-
-                # We're using the whole height
-                $wholeHeightFlag = TRUE;
-                $imageHeight = $canvasHeight;
-
-            } else {
-
-                $imageHeight = (($stopY - $startY + 1) * $viewPortHeight);
-            }
+            # Import the size of the whole canvas
+            $width = $self->currentRegionmap->mapWidthPixels;
+            $height = $self->currentRegionmap->mapHeightPixels;
         }
 
-        # For very large canvases (about 300x300 gridblocks, at 51 pixels per gridblock, and larger
-        #   - produces a screenshot of about 5MB), display a warning before starting the operation
-        if ($imageWidth * $imageHeight > 250_000_000) {
+        # For very large screenshots, display a warning before starting the operation
+        if ($width * $height > 100_000_000) {
 
-            $msg = 'This operation will produce a very large image (' . $imageWidth . 'x'
-                    . $imageHeight . ' pixels). ' . 'Are you sure you want to continue?';
+            $msg = 'This operation will produce a very large image (' . $width . 'x' . $height
+                        . ' pixels). ' . 'Are you sure you want to continue?';
 
             $result = $self->showMsgDialogue(
                 'Screenshot',
@@ -21290,173 +20944,41 @@
             }
         }
 
-        # Get the current position of the scrollbars, so they can be returned to their starting
-        #   positions when the operation is complete
-        ($barXPos, $barYPos) = $self->getMapPosn();
-
-        # Create a blank pixbuffer to hold the (stiched) image
-        my $pixBuffer = Gtk2::Gdk::Pixbuf->new(
-            'rgb',
-            0,
-            8,
-            $imageWidth,
-            $imageHeight
-        );
-
-        # When there are a large number of rows and columns to capture, make the pause window
-        #   visible
-        if ((($stopX - $startX) * ($stopY - $startY)) > 16) {
+        # For large-ish screenshots, show the pause window
+        if ($width * $height > 5_000_000) {
 
             $self->showPauseWin();
         }
 
-        # Grab each portion of the canvas in turn
-        for (my $cols = $startX; $cols <= $stopX; $cols++) {
+        # Take the screenshot
+        my $surface = Cairo::ImageSurface->create('rgb24', $width, $height);
+        my $cr = Cairo::Context->create($surface);
+        $cr->rectangle(0, 0, $width, $height);
+        $cr->set_source_rgb(1, 1, 1);
+        $cr->fill();
 
-            # Slide the viewport to the right
-            $self->canvasHAdjustment->set_value($cols * $viewPortWidth);
+        if ($type eq 'visible' || $type eq 'occupied') {
 
-            for (my $rows = $startY; $rows <= $stopY; $rows++) {
-
-                # Slide the viewport down
-                $self->canvasVAdjustment->set_value($rows * $viewPortHeight);
-
-                # Create a blank pixbuffer to hold the small image
-                my $smallPixBuffer = Gtk2::Gdk::Pixbuf->new(
-                    'rgb',
-                    0,
-                    8,
-                    $viewPortWidth,
-                    $viewPortHeight,
-                );
-
-                # Get an image of the visible region
-                $smallPixBuffer->get_from_drawable(
-                    $self->canvas->window,
-                    undef, 0, 0, 0, 0,
-                    $viewPortWidth, $viewPortHeight,
-                );
-
-                # Copy it into the large (stitched) image
-                $smallPixBuffer->copy_area(
-                    0, 0,
-                    $viewPortWidth, $viewPortHeight,
-                    $pixBuffer,
-                    (($cols - $startX) * $viewPortWidth),
-                    (($rows - $startY) * $viewPortHeight),
-                );
-            }
+            $cr->translate(-$left, -$top);
         }
 
-        if ($wholeWidthFlag) {
+        $self->canvas->render($cr, undef, 1);
 
-            # Get the bottom row, except for the lower right corner
-            for (my $cols = 0; $cols < $columnCount; $cols++) {
+        my $loader = Gtk3::Gdk::PixbufLoader->new();
+        $surface->write_to_png_stream (
+            sub {
+                my ($loader, $buffer) = @_;
+                $loader->write([map ord, split //, $buffer]);
+                return TRUE;
+            },
+            $loader,
+        );
+        $loader->close();
 
-                # Slide the viewport
-                $self->canvasHAdjustment->set_value($cols * $viewPortWidth);
-                $self->canvasVAdjustment->set_value($rowCount * $viewPortHeight);
+        my $pixbuf = $loader->get_pixbuf();
 
-                # Create a blank pixbuffer to hold the small image
-                my $smallPixBuffer = Gtk2::Gdk::Pixbuf->new(
-                    'rgb',
-                    0,
-                    8,
-                    $viewPortWidth,
-                    $rowMod,
-                );
-
-                # Get an image of the visible region
-                $smallPixBuffer->get_from_drawable(
-                    $self->canvas->window,
-                    undef, 0, 0, 0, 0,
-                    $viewPortWidth, $rowMod,
-                );
-
-                # Copy it into the large (stitched) image
-                $smallPixBuffer->copy_area(
-                    0, 0,
-                    $viewPortWidth, $rowMod,
-                    $pixBuffer,
-                    ($cols * $viewPortWidth), ($rowCount * $viewPortHeight),
-                );
-            }
-        }
-
-        if ($wholeHeightFlag) {
-
-            # Get the right column, except for the lower right corner
-            for (my $rows = 0; $rows < $rowCount; $rows++) {
-
-                # Slide the viewport
-                $self->canvasHAdjustment->set_value($columnCount * $viewPortWidth);
-                $self->canvasVAdjustment->set_value($rows * $viewPortHeight);
-
-                # Create a blank pixbuffer to hold the small image
-                my $smallPixBuffer = Gtk2::Gdk::Pixbuf->new(
-                    'rgb',
-                    0,
-                    8,
-                    $columnMod,
-                    $viewPortHeight,
-                );
-
-                # Get an image of the visible region
-                $smallPixBuffer->get_from_drawable(
-                    $self->canvas->window,
-                    undef, 0, 0, 0, 0,
-                    $columnMod, $viewPortHeight,
-                );
-
-                # Copy it into the large (stitched) image
-                $smallPixBuffer->copy_area(
-                    0, 0,
-                    $columnMod, $viewPortHeight,
-                    $pixBuffer,
-                    ($columnCount * $viewPortWidth), ($rows * $viewPortHeight),
-                );
-            }
-        }
-
-        if ($wholeWidthFlag && $wholeHeightFlag) {
-
-            # Get the bottom-right corner
-
-            # Slide the viewport
-            $self->canvasHAdjustment->set_value($columnCount * $viewPortWidth);
-            $self->canvasVAdjustment->set_value($rowCount * $viewPortHeight);
-
-            # Create a blank pixbuffer to hold the small image
-            my $smallPixBuffer = Gtk2::Gdk::Pixbuf->new(
-                'rgb',
-                0,
-                8,
-                $columnMod,
-                $rowMod,
-            );
-
-            # Get an image of the visible region
-            $smallPixBuffer->get_from_drawable(
-                $self->canvas->window,
-                undef, 0, 0, 0, 0,
-                $columnMod, $rowMod,
-            );
-
-            # Copy it into the large (stitched) image
-            $smallPixBuffer->copy_area(
-                0, 0,
-                $columnMod, $rowMod,
-                $pixBuffer,
-                ($canvasWidth - $columnMod), ($canvasHeight - $rowMod),
-            );
-        }
-
-        # Return the scrollbars to their original positions
-        $self->setMapPosn($barXPos, $barYPos);
-
-        # Save the screenshot
         $file = $self->currentRegionmap->name . '_level_' . $self->currentRegionmap->currentLevel;
-        $path = $axmud::DATA_DIR . '/screenshots/' . $file . '.jpg';
+        $path = $axmud::DATA_DIR . '/screenshots/' . $file . '.png';
 
         # If the file $path already exists, add a postscript to create a filepath that doesn't yet
         #   exist
@@ -21469,13 +20991,13 @@
                 $count++;
 
                 my $newFile = $file . '_(' . $count . ')';
-                $path = $axmud::DATA_DIR . '/screenshots/' . $newFile . '.jpg'
+                $path = $axmud::DATA_DIR . '/screenshots/' . $newFile . '.png';
 
             } until (! -e $path);
         }
 
         # Save the file as a .jpeg
-        $pixBuffer->save($path, 'jpeg', quality => 100);
+        $pixbuf->save($path, 'png');
 
         # Make the pause window invisible
         $self->hidePauseWin();
@@ -21586,8 +21108,7 @@
         # Prompt the user to select one of the room flags
         $choice = $self->showComboDialogue(
             'Remove room flags',
-            "Select which room flag should be removed\nfrom every room in this region",
-            FALSE,
+            'Select which room flag should be removed from every room in this region',
             \@nameList,
         );
 
@@ -21601,11 +21122,11 @@
             $count = $self->worldModelObj->removeRoomFlagInRegion($self->currentRegionmap, $choice);
 
             # Display a confirmation message
-            $msg = "Room flag \'" . $choice . "\' removed from\n";
+            $msg = 'Room flag \'' . $choice . '\' removed from ';
             if ($count == 1) {
-                $msg .= "1 room in this region",
+                $msg .= '1 room in this region',
             } else {
-                $msg .= $count . " rooms in this region",
+                $msg .= $count . ' rooms in this region',
             }
 
             $self->showMsgDialogue(
@@ -21648,9 +21169,8 @@
         # Prompt the user
         $choice = $self->showEntryDialogue(
             'Pre-drawn regions',
-            "Set the minimum size (in rooms) of any regions that\n"
-            . "should be pre-drawn when the Automapper window\n"
-            . "opens (or use 0 to pre-draw all regions)",
+            'Set the minimum size (in rooms) of any regions that should be pre-drawn when the'
+            . ' Automapper window opens (or use 0 to pre-draw all regions)',
             undef,              # No maximum characters
             $self->worldModelObj->preDrawMinRooms,
         );
@@ -21663,7 +21183,7 @@
         return 1;
     }
 
-    sub retainDrawSizeCallback {
+    sub preDrawRetainCallback {
 
         # Called by $self->enableRegionsColumn
         # Prompts the user to set the minimum size for drawn parchments that should be retained in
@@ -21684,7 +21204,7 @@
         # Check for improper arguments
         if (defined $check) {
 
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->retainDrawSizeCallback', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->preDrawRetainCallback', @_);
         }
 
         # (No standard callback check)
@@ -21692,16 +21212,15 @@
         # Prompt the user
         $choice = $self->showEntryDialogue(
             'Retain drawn regions',
-            "Set the minimum size (in rooms) of any regions that\n"
-            . "should be retained in memory when they're not\n"
-            . "visible (or use 0 to retain all drawn regions)",
+            'Set the minimum size (in rooms) of any regions that should be retained in memory when'
+            . ' they\'re not visible (or use 0 to retain all drawn regions)',
             undef,              # No maximum characters
-            $self->worldModelObj->retainDrawMinRooms,
+            $self->worldModelObj->preDrawRetainRooms,
         );
 
         if (defined $choice && $axmud::CLIENT->intCheck($choice, 0)) {
 
-            $self->worldModelObj->set_retainDrawMinRooms($choice);
+            $self->worldModelObj->set_preDrawRetainRooms($choice);
         }
 
         return 1;
@@ -21710,8 +21229,8 @@
     sub preDrawSpeedCallback {
 
         # Called by $self->enableRegionsColumn
-        # Prompts the user to set the number of queued canvas objects that should be drawn per
-        #   second (an approximate measure)
+        # Prompts the user to set the (approximate) percentage of available processor time to be
+        #   spent on pre-drawing operations
         #
         # Expected arguments
         #   (none besides $self)
@@ -21735,17 +21254,16 @@
 
         # Prompt the user
         $choice = $self->showEntryDialogue(
-            'Pre-drawn regions',
-            "When pre-drawing regions, set the approximate\n"
-            . "number of objects that should be drawn per\n"
-            . "second (or use 0 to prevent pre-drawn regions)\n",
+            'Pre-drawing speed',
+            'Set the approximate percentage of processor time that should be spent on pre-drawing'
+            . ' maps (use a value in the range 1-100)',
             undef,              # No maximum characters
-            $self->worldModelObj->queueDrawMaxObjs,
+            $self->worldModelObj->preDrawAllocation,
         );
 
-        if (defined $choice && $axmud::CLIENT->intCheck($choice, 0)) {
+        if (defined $choice && $axmud::CLIENT->intCheck($choice, 1, 100)) {
 
-            $self->worldModelObj->set_queueDrawMaxObjs($choice);
+            $self->worldModelObj->set_preDrawAllocation($choice);
         }
 
         return 1;
@@ -21858,7 +21376,6 @@
             $choice = $self->showComboDialogue(
                 'Recalculate region paths',
                 'Select the region whose paths should be recalculated',
-                FALSE,
                 \@nameList,
             );
 
@@ -22094,7 +21611,6 @@
             $regionName = $self->showComboDialogue(
                 'Select region',
                 'Select the region in which to search',
-                FALSE,
                 \@regionList,
             );
 
@@ -22344,8 +21860,7 @@
             # Prompt the user
             $choice = $self->showComboDialogue(
                 'Remove background colour',
-                "Choose a colour to remove from those\nused on the map background to remove",
-                FALSE,
+                'Choose a colour to remove from those used on the map background to remove',
                 \@comboList,
             );
 
@@ -22551,22 +22066,42 @@
                 'question',
                 $msg,
                 'yes-no',
+                undef,
+                TRUE,           # Preserve newline characters in $msg
             );
 
             if ($result ne 'yes') {
 
                 return undef;
+
+            } else {
+
+                # Show a pause window, if necessary. The call to ->redrawRegions below will turn it
+                #   off again
+                if ((scalar @roomList) > 200) {
+
+                    # If the tooltips are visible, hide them
+                    $self->hideTooltips();
+                    # Show the pause window
+                    $self->showPauseWin();
+                }
+
+                # Empty the region
+                $self->worldModelObj->emptyRegion(
+                    $self->session,
+                    FALSE,
+                    $regionObj,
+                );
+
+                # Redraw the empty region
+                $self->redrawRegions(
+                    $self->worldModelObj->ivShow('regionmapHash', $regionObj->name),
+                    TRUE,                   # Only redraw this region
+                );
+
+                return 1;
             }
         }
-
-        # Empty the region
-        $self->worldModelObj->emptyRegion(
-            $self->session,
-            TRUE,              # Update Automapper windows now
-            $regionObj,
-        );
-
-        return 1;
     }
 
     sub deleteRegionCallback {
@@ -22635,6 +22170,8 @@
                 'question',
                 $msg,
                 'yes-no',
+                undef,
+                TRUE,           # Preserve newline characters in $msg
             );
 
             if ($result ne 'yes') {
@@ -22859,7 +22396,6 @@
         $choice = $self->showComboDialogue(
             'Set facing direction',
             'Set the direction the character is facing',
-            FALSE,
             \@comboList,
         );
 
@@ -23420,7 +22956,6 @@
             $regionName = $self->showComboDialogue(
                 'Select region',
                 'Select the destination region',
-                FALSE,
                 \@comboList,
             );
 
@@ -23878,7 +23413,7 @@
         # Add an entry to the exit's assisted moves hash, if one was specified by the user
         if ($assistedProf && $assistedMove) {
 
-            $self->worldModelObj->addAssistedMove($exitObj, $assistedProf, $assistedMove);
+            $self->worldModelObj->setAssistedMove($exitObj, $assistedProf, $assistedMove);
         }
 
         # Mark it as a hidden exit, if necessary
@@ -24509,7 +24044,6 @@
             $choice = $self->showComboDialogue(
                 'Remove checked direction',
                 'Select the checked direction to remove',
-                FALSE,
                 \@comboList,
             );
 
@@ -24670,7 +24204,6 @@
         $choice = $self->showComboDialogue(
             'Select exit',
             'Choose which exit to select',
-            FALSE,
             \@comboList,
         );
 
@@ -24803,6 +24336,8 @@
             'info',
             $msg,
             'ok',
+            undef,
+            TRUE,           # Preserve newline characters in $msg
         );
 
         return 1;
@@ -25286,7 +24821,7 @@
                 $self->showMsgDialogue(
                     'Set virtual area',
                     'info',
-                    "Set the virtual area file for " . $msg . " to:\n" . $virtualPath,
+                    'Set the virtual area file for ' . $msg . ' to: ' . $virtualPath,
                     'ok',
                 );
             }
@@ -25650,7 +25185,6 @@
         $choice = $self->showComboDialogue(
             'Select object',
             'Choose which object(s) to add to the world model',
-            FALSE,
             \@comboList,
         );
 
@@ -25950,7 +25484,7 @@
         # Prompt the user for a tag
         $tag = $self->showEntryDialogue(
             'Set room tag',
-            "Enter the selected room\'s tag\n(or leave empty to delete a tag)",
+            'Enter the selected room\'s tag (or leave empty to delete a tag)',
             undef,                  # No maximum number of characters
             $roomObj->roomTag,
         );
@@ -26001,18 +25535,18 @@
                     $oldRoomObj = $self->worldModelObj->ivShow('modelHash', $oldRoomNum);
 
                     $text = 'The tag \'' . $oldRoomObj->roomTag . '\' is already assigned to room #'
-                                . $oldRoomNum . "\n";
+                                . $oldRoomNum;
 
                     if (
                         $self->currentRegionmap
                         && $self->currentRegionmap->number eq $oldRoomObj->parent
                     ) {
-                        $text .= 'in this region. ';
+                        $text .= ' in this region. ';
 
                     } else {
 
                         $regionObj = $self->worldModelObj->ivShow('modelHash', $oldRoomObj->parent);
-                        $text .= 'in the region \'' . $regionObj->name . '\'. ';
+                        $text .= ' in the region \'' . $regionObj->name . '\'. ';
                     }
 
                     $text .= 'Do you want to reassign it?';
@@ -26125,7 +25659,6 @@
         $choice = $self->showComboDialogue(
             'Select room guild',
             'Select the guild for the ' . $msg,
-            FALSE,
             \@comboList,
         );
 
@@ -26412,7 +25945,6 @@
         $choice = $self->showComboDialogue(
             'Select profile',
             'Select a profile which has exclusive access to this room',
-            FALSE,
             \@comboList,
         );
 
@@ -26658,7 +26190,7 @@
         # Prompt the user for the new alternative nominal direction string
         $choice = $self->showEntryDialogue(
             'Set alternative direction(s)',
-            "Add one or more alternative directions\n(or empty the box to reset them)",
+            'Add one or more alternative directions (or empty the box to reset them)',
             undef,                  # No maximum chars
             $exitObj->altDir,
         );
@@ -26745,8 +26277,10 @@
             return undef;
         }
 
-        # Update the exit
-        $self->worldModelObj->addAssistedMove($exitObj, $assistedProf, $assistedMove);
+        # Update the exit. If the user emptied the box (meaning that $assistedMove is an empty
+        #   string), the assisted move for the profile $assistedProf is removed; otherwise an
+        #   assisted move is added
+        $self->worldModelObj->setAssistedMove($exitObj, $assistedProf, $assistedMove);
 
         return 1;
     }
@@ -26857,8 +26391,7 @@
         # Prompt the user for a primary direction
         $choice = $self->showComboDialogue(
             'Select map direction',
-            "Choose a primary direction\nfor the \'" . $exitObj->dir . "\' exit",
-            FALSE,
+            'Choose a primary direction for the \'' . $exitObj->dir . '\' exit',
             \@comboList,
         );
 
@@ -26997,8 +26530,7 @@
 
             $choice = $self->showComboDialogue(
                 'Confirm two-way exit',
-                "Select which incoming exit should be\nconnected to the selected exit",
-                FALSE,
+                'Select which incoming exit should be connected to the selected exit',
                 \@comboList,
             );
 
@@ -27148,7 +26680,6 @@
         $choice = $self->showComboDialogue(
             'Select shadow',
             'Choose a shadow exit for \'' . $selectedExitObj->dir . '\'',
-            FALSE,
             \@comboList,
         );
 
@@ -27177,6 +26708,21 @@
                 [$shadowExitObj, 'exit'],
                 FALSE,                  # Select this object; unselect all other objects
             );
+
+            # DEBUG
+            if ($axmud::TEST_MODEL_FLAG && ! $self->worldModelObj->testModel($self->session)) {
+
+                $self->session->writeDebug(
+                    'ALLOCATE SHADOW MODEL TEST: World model test failed at '
+                    . $axmud::CLIENT->localTime(),
+                );
+
+                $axmud::CLIENT->playSound('alarm');
+
+                # Test failed. Don't keep running tests
+                $axmud::TEST_MODEL_FLAG = FALSE;
+            }
+            # DEBUG
 
             return 1;
         }
@@ -27239,8 +26785,7 @@
             # Prompt the user to choose which exit to edit
             $choice = $self->showComboDialogue(
                 'Select exit',
-                'Select which exit to connect:',
-                FALSE,
+                'Select which exit to connect',
                 \@comboList,
             );
 
@@ -27384,8 +26929,7 @@
                 # Prompt the user to choose which exit to use
                 $choice = $self->showComboDialogue(
                     'Set ornaments',
-                    'Select which exit should have its ornaments set:',
-                    FALSE,
+                    'Select which exit should have its ornaments set',
                     \@comboList,
                 );
 
@@ -27510,15 +27054,14 @@
 
             # Prompt the user to choose which exit to hide
             if ($hiddenFlag) {
-                $text = 'Select which exit to hide:';
+                $text = 'Select which exit to hide';
             } else {
-                $text = 'Select which exit to unhide:';
+                $text = 'Select which exit to unhide';
             }
 
             $choice = $self->showComboDialogue(
                 'Select exit',
                 $text,
-                FALSE,
                 \@comboList,
             );
 
@@ -27794,7 +27337,6 @@
             $choice = $self->showComboDialogue(
                 'Select exit',
                 'Select which exit to make one-way',
-                FALSE,
                 \@stringList,
             );
 
@@ -28063,8 +27605,7 @@
             # Prompt the user to choose which exit to edit
             $choice = $self->showComboDialogue(
                 'Select exit',
-                'Select which exit to modify:',
-                FALSE,
+                'Select which exit to modify',
                 \@comboList,
             );
 
@@ -28249,8 +27790,7 @@
             # Prompt the user to choose which exit to edit
             $choice = $self->showComboDialogue(
                 'Select exit',
-                'Select which exit to modify:',
-                FALSE,
+                'Select which exit to modify',
                 \@comboList,
             );
 
@@ -28425,8 +27965,7 @@
             # Prompt the user to choose which exit to modify
             $choice = $self->showComboDialogue(
                 'Select exit',
-                'Select which exit to modify:',
-                FALSE,
+                'Select which exit to modify',
                 \@comboList,
             );
 
@@ -28561,8 +28100,7 @@
             # Prompt the user to choose which exit to modify
             $choice = $self->showComboDialogue(
                 'Select exit',
-                'Select which exit to modify:',
-                FALSE,
+                'Select which exit to modify',
                 \@comboList,
             );
 
@@ -28713,9 +28251,8 @@
 
         $choice = $self->showComboDialogue(
             'Set exit twin',
-            "Select which uncertain/one-way exit to\ntwin with the selected exit \'"
+            'Select which uncertain/one-way exit to\ntwin with the selected exit \''
             . $self->selectedExit->dir . '\'',
-            FALSE,
             \@comboList,
         );
 
@@ -28824,9 +28361,8 @@
         # Prompt the user for a new incoming direction
         $choice = $self->showComboDialogue(
             'Set incoming direction',
-            "Select the direction in which this \'" . $self->selectedExit->dir
-            . "\' exit is\ndrawn as it approaches its destination room",
-            FALSE,
+            'Select the direction in which this \'' . $self->selectedExit->dir
+            . '\' exit is drawn as it approaches its destination room',
             \@comboList,
         );
 
@@ -29018,7 +28554,7 @@
         # Prompt the user for the new contents of the exit tag
         $text = $self->showEntryDialogue(
             'Edit exit tag',
-            "Enter the new contents of the exit tag\n(leave empty to reset)",
+            'Enter the new contents of the exit tag (leave empty to reset)',
             40,                 # Max chars
             $exitObj->exitTag,
         );
@@ -29265,6 +28801,8 @@
             'info',
             $msg,
             'ok',
+            undef,
+            TRUE,           # Preserve newline characters in $msg
         );
 
         return 1;
@@ -29322,7 +28860,6 @@
             $choice = $self->showComboDialogue(
                 'Select exit',
                 'Select which exit to edit:',
-                FALSE,
                 \@comboList,
             );
 
@@ -29679,8 +29216,8 @@
         if ($type eq 'vertical') {
 
             $title = 'Set vertical exit length';
-            $msg = "Set the distance between stacked rooms\n" . $range;
-            $msg .= $self->worldModelObj->verticalExitLengthBlocks . ')';
+            $msg = 'Set the distance between stacked rooms ' . $range
+                        . $self->worldModelObj->verticalExitLengthBlocks . ')';
 
         } else {
 
@@ -29688,8 +29225,8 @@
             #   'horizontal')
             $type = 'horizontal';
             $title = 'Set horizontal exit length';
-            $msg = "Set the distance between adjacent rooms\n" . $range;
-            $msg .= $self->worldModelObj->horizontalExitLengthBlocks . ')';
+            $msg = 'Set the distance between adjacent rooms ' . $range
+                        . $self->worldModelObj->horizontalExitLengthBlocks . ')';
         }
 
         $length = $self->showEntryDialogue(
@@ -29842,8 +29379,7 @@
             # Prompt the user to choose which exit to delete
             $choice = $self->showComboDialogue(
                 'Select exit',
-                'Select which exit to delete:',
-                FALSE,
+                'Select which exit to delete',
                 \@comboList,
             );
 
@@ -30408,7 +29944,6 @@
         $choice = $self->showComboDialogue(
             'Select label',
             'Choose a label to mark as selected',
-            FALSE,
             \@comboList,
         );
 
@@ -30474,7 +30009,7 @@
         # Prompt the user for a name
         $name = $self->showEntryDialogue(
             'Add label style',
-            "Enter a name for a new label style\n(max 16 characters including spaces)",
+            'Enter a name for a new label style (max 16 characters including spaces)',
         );
 
         if (! defined $name) {
@@ -30555,7 +30090,6 @@
         $choice = $self->showComboDialogue(
             'Edit label style',
             'Select which label style to edit',
-            FALSE,
             \@comboList,
         );
 
@@ -30872,8 +30406,8 @@
 
         # Local variables
         my (
-            $oldRegionmapObj, $oldParchmentObj, $count, $recycleFlag, $scrollXPos, $scrollYPos,
-            $regionmapObj, $index, $parchmentObj, $currentRoom, $recycleObj,
+            $scrollXPos, $scrollYPos, $oldRegionmapObj, $oldParchmentObj, $count, $destroyFlag,
+            $index, $regionmapObj, $destroyObj, $parchmentObj, $currentRoom,
             @newList,
             %occupyHash,
         );
@@ -30905,12 +30439,12 @@
             # If this region contains fewer rooms than the minimum (or if the region has just been
             #   deleted), then its parchment object will not be retained in memory
             # If the region has no rooms, the map is not retained in memory, regardless of the value
-            #   of GA::Obj::WorldModel->retainDrawMinRooms
+            #   of GA::Obj::WorldModel->preDrawRetainRooms
             if (
-                (! $count || $count < $self->worldModelObj->retainDrawMinRooms)
+                (! $count || $count < $self->worldModelObj->preDrawRetainRooms)
                 && $self->worldModelObj->ivExists('regionmapHash', $oldRegionmapObj->name)
             ) {
-                $recycleFlag = TRUE;
+                $destroyFlag = TRUE;
             }
         }
 
@@ -30934,11 +30468,19 @@
             # Sensitise/desensitise menu bar/toolbar items, depending on current conditions
             $self->restrictWidgets();
 
-            # Any previously drawn map should be recycled, if required (otherwise, its parchment
-            #   object is retained in memory)
-            if ($recycleFlag) {
+            # Destroy any previously-drawn map, if required
+            if ($destroyFlag) {
 
-                $self->recycleMap($oldParchmentObj);
+                $self->ivDelete('parchmentHash', $oldParchmentObj->name);
+                $self->ivDelete('parchmentReadyHash', $oldParchmentObj->name);
+                $index = $self->ivFind('parchmentQueueList', $oldParchmentObj);
+                if (defined $index) {
+
+                    $self->ivSplice('parchmentQueueList', $index, 1);
+
+                    # Show the next region to be pre-drawn (if any) in the window's title bar
+                    $self->setWinTitle();
+                }
             }
 
             return 1;
@@ -30995,55 +30537,40 @@
 
             $self->ivUnshift('parchmentQueueList', $self->currentParchment);
 
-            # At the end of this function, any previously drawn map should be recycled, if required
+            # At the end of this function, any previously-drawn map should be destroyed, if required
             #   (otherwise, its parchment object is retained in memory)
-            if ($recycleFlag && $oldRegionmapObj ne $regionmapObj) {
+            if ($destroyFlag && $oldRegionmapObj ne $regionmapObj) {
 
-                $recycleObj = $oldParchmentObj;
+                $destroyObj = $oldParchmentObj;
             }
 
-        # Otherwise, create a new parchment or re-use an existing one
+        # Otherwise, create a new parchment
         } else {
 
-            # If the previously-drawn map is marked to be recycled, then perform the recycling
-            #   operation now, retaining its existing canvas widgets
-            if ($recycleFlag) {
+            # If the previously-drawn map is marked to be destroyed, then perform the destruction
+            #   operation now
+            if ($destroyFlag) {
 
-                $self->recycleMap($oldParchmentObj);
+                $self->ivDelete('parchmentHash', $oldParchmentObj->name);
+                $self->ivDelete('parchmentReadyHash', $oldParchmentObj->name);
+                $index = $self->ivFind('parchmentQueueList', $oldParchmentObj);
+                if (defined $index) {
+
+                    $self->ivSplice('parchmentQueueList', $index, 1);
+                }
             }
 
-            # If a recycled parchment object is waiting to be re-used (either as a result of the
-            #   code just above, or from an earlier call to this function), then reuse it
-            if ($self->spareParchmentObj) {
+            # Create the new parchment object
+            $parchmentObj = Games::Axmud::Obj::Parchment->new(
+                $regionmapObj->name,
+                $self->worldModelObj,
+            );
 
-                # Set the parchment object IVs to match the new region
-                $parchmentObj = $self->spareParchmentObj;
-                $self->ivUndef('spareParchmentObj');
-
-                $parchmentObj->{_objName} = $regionmapObj->name;
-                $parchmentObj->ivPoke('name', $regionmapObj->name);
-
-                # Update our own IVs
-                $self->ivAdd('parchmentHash', $parchmentObj->name, $parchmentObj);
-                $self->ivPoke('currentRegionmap', $regionmapObj);
-                $self->ivPoke('currentParchment', $parchmentObj);
-                $self->ivUnshift('parchmentQueueList', $parchmentObj);
-
-            # Otherwise, create a new parchment object
-            } else {
-
-                # Create the new parchment object
-                $parchmentObj = Games::Axmud::Obj::Parchment->new(
-                    $regionmapObj->name,
-                    $self->worldModelObj,
-                );
-
-                # Update our own IVs
-                $self->ivAdd('parchmentHash', $parchmentObj->name, $parchmentObj);
-                $self->ivPoke('currentRegionmap', $regionmapObj);
-                $self->ivPoke('currentParchment', $parchmentObj);
-                $self->ivUnshift('parchmentQueueList', $parchmentObj);
-            }
+            # Update our own IVs
+            $self->ivAdd('parchmentHash', $parchmentObj->name, $parchmentObj);
+            $self->ivPoke('currentRegionmap', $regionmapObj);
+            $self->ivPoke('currentParchment', $parchmentObj);
+            $self->ivUnshift('parchmentQueueList', $parchmentObj);
 
             # Create a hash of levels in the region that are occupied by rooms and/or labels (exits
             #   can't exist independently of rooms, so no need to check them)
@@ -31066,27 +30593,10 @@
             #   level, in the expectation that we're going to need it
             $occupyHash{0} = undef;
 
-            # At each occupied level, either create a canvas widget, or (if the parchment object was
-            #   previously recycled, and a canvas widget for the level still exists), re-use the
-            #   existing one
+            # At each occupied level, create a canvas widget
             foreach my $level (keys %occupyHash) {
 
                 $self->createMap($regionmapObj, $parchmentObj, $level);
-            }
-
-            # If the parchment object was previously recycled, any canvas widgets that are no longer
-            #   needed can now be destroyed
-            foreach my $level ($parchmentObj->ivKeys('canvasWidgetHash')) {
-
-                my $canvasWidget;
-
-                if (! exists $occupyHash{$level}) {
-
-                    $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $level);
-                    $canvasWidget->destroy();
-
-                    $parchmentObj->ivDelete('canvasWidgetHash', $level);
-                }
             }
         }
 
@@ -31134,11 +30644,20 @@
             $self->swapCanvasWidget();
         }
 
-        # If an old parchment object is marked to be recycled, and hasn't been recycled yet, then
+        # If an old parchment object is marked to be destroyed, and hasn't been destroyed yet, then
         #   perform that operation
-        if ($recycleObj) {
+        if ($destroyObj) {
 
-            $self->recycleMap($recycleObj);
+            $self->ivDelete('parchmentHash', $destroyObj->name);
+            $self->ivDelete('parchmentReadyHash', $destroyObj->name);
+            $index = $self->ivFind('parchmentQueueList', $destroyObj);
+            if (defined $index) {
+
+                $self->ivSplice('parchmentQueueList', $index, 1);
+
+                # (Need to update the window's title bar again, just in case)
+                $self->setWinTitle();
+            }
         }
 
         return 1;
@@ -31978,12 +31497,18 @@
         my ($self, $optionalText, $check) = @_;
 
         # Local variables
-        my ($text, $upFlag, $downFlag, $regionCount, $worldCount);
+        my ($parchmentObj, $text, $upFlag, $downFlag, $regionCount, $worldCount);
 
         # Check for improper arguments
         if (defined $check) {
 
             return $axmud::CLIENT->writeImproper($self->_objClass . '->setWinTitle', @_);
+        }
+
+        # If pre-drawing operatiosn are taking place, get the partially-drawn parchment object
+        if ($self->parchmentQueueList) {
+
+            $parchmentObj = $self->ivFirst('parchmentQueueList');
         }
 
         if ($self->currentRegionmap) {
@@ -32022,8 +31547,13 @@
                     $text .= '   ';
                 }
 
+                # If pre-drawing operations are taking place, show the partially-drawn region
+                if ($parchmentObj) {
+
+                    $text .= ' (Drawing '  . $parchmentObj->name . ')';
+
                 # If graffiti mode is on, show room counts
-                if ($self->graffitiModeFlag) {
+                } elsif ($self->graffitiModeFlag) {
 
                     $regionCount = 0;
                     $worldCount = 0;
@@ -32051,12 +31581,20 @@
 
                 # Show just the current region
                 $text = 'Automapper [' . $self->currentRegionmap->name . ']';
+                if ($parchmentObj) {
+
+                    $text .= ' (Drawing '  . $parchmentObj->name . ')';
+                }
             }
 
         } else {
 
             # Don't show the current region
             $text = 'Automapper';
+            if ($parchmentObj) {
+
+                $text .= ' (Drawing '  . $parchmentObj->name . ')';
+            }
         }
 
         # Add optional text, if any was specified
@@ -32081,7 +31619,8 @@
         #   was reset)
         # Compiles a list of regions that should be pre-drawn using background processes (i.e.
         #   regular calls to $self->winUpdate). For any regions selected, creates parchment objects
-        #   (GA::Obj::Parchment) ready for the drawing functions to use
+        #   (GA::Obj::Parchment) ready for the drawing functions to use, and creates a queue of
+        #   rooms and labels to draw in each parchment
         #
         # Expected arguments
         #   (none besides $self)
@@ -32107,7 +31646,7 @@
 
         # Any regions that contain more rooms than the number specified by
         #   GA::Obj::WorldModel->preDrawMinRooms must be added to the queue now
-        if ($self->worldModelObj->queueDrawMaxObjs) {
+        if ($self->worldModelObj->preDrawAllowFlag) {
 
             # Compile a hash of affected regionmaps. Store the number of rooms so we can draw those
             #   regions, largest first
@@ -32149,13 +31688,30 @@
 
                 # Create a hash of levels in the region that are occupied by rooms and/or labels
                 #   (exits can't exist independently of rooms, so no need to check them)
-                # At the same time, add all rooms and labels to the drawing queue
-                foreach my $roomNum ($regionmapObj->ivValues('gridRoomHash')) {
+                # At the same time, add all rooms and labels to the drawing queue. If room echoes
+                #   aren't allowed to be drawn, we can skip that stage in the queue
+                if ($self->worldModelObj->drawRoomEchoFlag) {
 
-                    my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+                    foreach my $roomNum ($regionmapObj->ivValues('gridRoomHash')) {
 
-                    $occupyHash{$roomObj->zPosBlocks} = undef;
-                    $parchmentObj->ivAdd('queueRoomHash', $roomObj->number, $roomObj);
+                        my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                        $occupyHash{$roomObj->zPosBlocks} = undef;
+                        # (Room echoes are drawn first, followed by other room features)
+                        $parchmentObj->ivAdd('queueRoomEchoHash', $roomObj->number, $roomObj);
+                    }
+
+                } else {
+
+                    # No room echoes drawn, so start each room by drawings its room box
+                    foreach my $roomNum ($regionmapObj->ivValues('gridRoomHash')) {
+
+                        my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                        $occupyHash{$roomObj->zPosBlocks} = undef;
+                        # (Room boxes are drawn first, followed by other room features)
+                        $parchmentObj->ivAdd('queueRoomBoxHash', $roomObj->number, $roomObj);
+                    }
                 }
 
                 foreach my $mapLabelObj ($regionmapObj->ivValues('gridLabelHash')) {
@@ -32175,6 +31731,9 @@
                 }
             }
         }
+
+        # Show the next region to be pre-drawn (if any) in the window's title bar
+        $self->setWinTitle();
 
         return 1;
     }
@@ -32212,47 +31771,49 @@
         $self->hideTooltips();
 
         # Create the canvas widget
-        my $canvas = Gnome2::Canvas->new();
+        my $canvasWidget = GooCanvas2::Canvas->new();
 
         # Add the canvas widget to its scrolled window and set its default size
-        $canvas->set_scroll_region(
+        $canvasWidget->set_size_request(
+            $self->worldModelObj->defaultMapWidthPixels,
+            $self->worldModelObj->defaultMapHeightPixels,
+        );
+        $canvasWidget->set_bounds(
             0,
             0,
             $self->worldModelObj->defaultMapWidthPixels,
             $self->worldModelObj->defaultMapHeightPixels,
         );
+        $canvasWidget->set_scale(1);
 
-        $canvas->set_center_scroll_region(1);
-        $canvas->set_pixels_per_unit(1);
-
-        foreach my $child ($self->canvasScroller->get_children() ) {
+        foreach my $child ($self->canvasScroller->get_children()) {
 
             $self->canvasScroller->remove($child);
         }
 
-        $self->canvasScroller->add($canvas);
+        $self->canvasScroller->add($canvasWidget);
 
         # Draw the background canvas object (default colour: white), encompassing the whole map
         $colour = $self->worldModelObj->noBackgroundColour;
 
-        my $canvasObj = Gnome2::Canvas::Item->new(
-            $canvas->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => 0,
-            y1 => 0,
-            x2 => $self->worldModelObj->defaultMapWidthPixels,
-            y2 => $self->worldModelObj->defaultMapHeightPixels,
-            fill_color => $colour,
-            outline_color => $colour,
+        my $canvasObj = GooCanvas2::CanvasRect->new(
+            'parent' => $canvasWidget->get_root_item(),
+            x => 0,
+            y => 0,
+            width => $self->worldModelObj->defaultMapWidthPixels,
+            height => $self->worldModelObj->defaultMapHeightPixels,
+#            'line-width' => 2,
+            'stroke-color' => $colour,
+            'fill-color' => $colour,
         );
 
         # Update IVs
-        $self->ivPoke('canvas', $canvas);
+        $self->ivPoke('canvas', $canvasWidget);
         $self->ivPoke('canvasBackground', $canvasObj);
         $self->ivPoke('emptyMapFlag', TRUE);
 
         # The background canvas object created here is lower than any other canvas object
-        $self->setMapStackPosn($canvasObj);
+        $canvasObj->lower();
         # Set up the event handler for clicks on the background canvas object
         $self->setupCanvasEvent($canvasObj);
 
@@ -32282,7 +31843,7 @@
         my ($self, $regionmapObj, $parchmentObj, $level, $check) = @_;
 
         # Local variables
-        my ($canvas, $colour, $levelObj);
+        my ($canvasWidget, $colour, $levelObj);
 
         # Check for improper arguments
         if (
@@ -32297,25 +31858,27 @@
 
         # If the parchment object has been recycled and a canvas widget at this level already
         #   exists, use it; otherwise create a new one
-        $canvas = $parchmentObj->ivShow('canvasWidgetHash', $level);
-        if (! $canvas) {
+        $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $level);
+        if (! $canvasWidget) {
 
-            $canvas = Gnome2::Canvas->new();
+            $canvasWidget = GooCanvas2::Canvas->new();
         }
 
         # Set the default size
-        $canvas->set_scroll_region(
+        $canvasWidget->set_size_request(
+            $regionmapObj->mapWidthPixels,
+            $regionmapObj->mapHeightPixels,
+        );
+        $canvasWidget->set_bounds(
             0,
             0,
             $regionmapObj->mapWidthPixels,
             $regionmapObj->mapHeightPixels,
         );
-
-        $canvas->set_center_scroll_region(1);
-        $canvas->set_pixels_per_unit($regionmapObj->magnification);
+        $canvasWidget->set_scale($regionmapObj->magnification);
 
         # Handle mouse button scrolls from here
-        $canvas->signal_connect('scroll-event' => sub {
+        $canvasWidget->signal_connect('scroll-event' => sub {
 
             my ($widget, $event) = @_;
 
@@ -32333,30 +31896,49 @@
 
         # Draw the background canvas object (default colour: cream), encompassing the whole map
         $colour = $self->worldModelObj->backgroundColour;
-
-        my $canvasObj = Gnome2::Canvas::Item->new(
-            $canvas->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => 0,
-            y1 => 0,
-            x2 => $regionmapObj->mapWidthPixels,
-            y2 => $regionmapObj->mapHeightPixels,
-            fill_color => $colour,
-            outline_color => $colour,
+        my $canvasObj = GooCanvas2::CanvasRect->new(
+            'parent' => $canvasWidget->get_root_item(),
+            x => 0,
+            y => 0,
+            width => $regionmapObj->mapWidthPixels,
+            height => $regionmapObj->mapHeightPixels,
+#            'line-width' => 2,
+            'stroke-color' => $colour,
+            'fill-color' => $colour,
         );
 
         # Create a parchment level object to store all the canvas objects drawn on this $level
         $levelObj = Games::Axmud::Obj::ParchmentLevel->new($regionmapObj->name, $level);
 
         # Update IVs
-        $parchmentObj->ivAdd('canvasWidgetHash', $level, $canvas);
+        $parchmentObj->ivAdd('canvasWidgetHash', $level, $canvasWidget);
         $parchmentObj->ivAdd('bgCanvasObjHash', $level, $canvasObj);
         $parchmentObj->ivAdd('levelHash', $level, $levelObj);
 
         # The background canvas object created here is lower than any other canvas object
-        $self->setMapStackPosn($canvasObj);
+        $canvasObj->lower();
         # Set up the event handler for clicks on the background canvas object
         $self->setupCanvasEvent($canvasObj);
+
+        # Create eight slave canvas objects, hidden away in one corner of the map, so that we can
+        #   arrange real canvas objects in the drawing stack easily
+        # (See the comments in GA::Obj::ParchmentLevel->new for a longer explanation)
+        for (my $count = 0; $count < 8; $count++ ) {
+
+            my $slaveObj = GooCanvas2::CanvasRect->new(
+                'parent' => $canvasWidget->get_root_item(),
+                x => 0,
+                y => 0,
+                width => 0,
+                height => 0,
+#                'line-width' => 2,
+                'stroke-color' => $colour,
+#               'fill-color' => $colour,
+            );
+
+            $levelObj->ivPush('slaveCanvasObjList', $slaveObj);
+            $slaveObj->raise();
+        }
 
         # Draw coloured squares and rectangles for this level (but not for the default canvas)
         if (defined $level) {
@@ -32370,10 +31952,11 @@
     sub refreshMap {
 
         # Called by $self->redrawRegions (only)
-        # Resets IVs in a region's parchment object (GA::Obj::Parchment). Any canvas objects drawn
-        #   in that region are added to the destruction queue, as are the canvas widgets themselves
-        # Then creates new canvas widgets for every occupied level. It's up to the calling function
-        #   to mark rooms/exits/labels to be drawn now, or to add them to the drawing queue
+        # Refreshes a parchment object (GA::Obj::Parchment). The canvas widget (GooCanvas2::Canvas),
+        #   along with any canvas objects drawon on it, are destroyed
+        # Then resets the parchment object's IVs
+        # Finally, creates new canvas widgets for every occupied level. It's up to the calling
+        #   function to mark rooms/exits/labels to be drawn now, or to add them to the drawing queue
         #
         # Expected arguments
         #   $regionmapObj   - The regionmap whose canvas widget should be refreshed. If not
@@ -32391,7 +31974,6 @@
         # Local variables
         my (
             $index,
-            @destroyList,
             %occupyHash,
         );
 
@@ -32411,42 +31993,20 @@
             $self->ivSplice('parchmentQueueList', $index, 1);
         }
 
-        # Because of performance issues for very big maps (with thousands of rooms), we can't simply
-        #   call ->destroy on every existing canvas object. Current solution is to add them all to a
-        #   destruction queue, and allow $self->winUpdate to destroy them a few at a time
+        # Destroy all canvas widgets (which destroys any canvas objects drawn on them)
         foreach my $levelObj ($parchmentObj->ivValues('levelHash')) {
+
+            my $canvasWidget;
 
             # Briefly store which levels are occupied by canvas objects
             $occupyHash{$levelObj->level} = undef;
 
-            # Now add the level's canvas objects to the destruction queue
-            foreach my $listRef (
-                $levelObj->ivValues('drawnRoomHash'),
-                $levelObj->ivValues('drawnRoomEchoHash'),
-                $levelObj->ivValues('drawnRoomTagHash'),
-                $levelObj->ivValues('drawnRoomGuildHash'),
-                $levelObj->ivValues('drawnRoomTextHash'),
-                $levelObj->ivValues('drawnExitHash'),
-                $levelObj->ivValues('drawnExitTagHash'),
-                $levelObj->ivValues('drawnOrnamentHash'),
-                $levelObj->ivValues('drawnLabelHash'),
-                $levelObj->ivValues('drawnCheckedDirHash'),
-            ) {
-                push (@destroyList, @$listRef);
-            }
-
-            # Also destroy the background canvas object
-            push (@destroyList, $parchmentObj->ivShow('bgCanvasObjHash', $levelObj->level));
-
-            # Once all of its canvas objects have been destroyed, the canvas widget can also be
-            #   destroyed
-            push (@destroyList, $parchmentObj->ivShow('canvasWidgetHash', $levelObj->level));
+            # Destory the canvas widgets
+            $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $levelObj->level);
+            $canvasWidget->destroy();
         }
 
-        # Update IVs
-        $self->ivPush('destroyQueueList', @destroyList);
-
-        # Discard every canvas widget, and all the canvas objects drawn on them
+        # Reset parchment object IVs
         $parchmentObj->ivEmpty('canvasWidgetHash');
         $parchmentObj->ivEmpty('bgCanvasObjHash');
         $parchmentObj->ivEmpty('levelHash');
@@ -32454,7 +32014,6 @@
         $parchmentObj->ivEmpty('colouredSquareHash');
         $parchmentObj->ivEmpty('colouredRectHash');
 
-        # Any objects that were marked to be drawn (or re-drawn) can now be removed
         $parchmentObj->ivEmpty('markedRoomHash');
         $parchmentObj->ivEmpty('markedRoomTagHash');
         $parchmentObj->ivEmpty('markedRoomGuildHash');
@@ -32462,11 +32021,11 @@
         $parchmentObj->ivEmpty('markedExitTagHash');
         $parchmentObj->ivEmpty('markedLabelHash');
 
-        $parchmentObj->ivEmpty('queueRoomHash');
-        $parchmentObj->ivEmpty('queueRoomTagHash');
-        $parchmentObj->ivEmpty('queueRoomGuildHash');
-        $parchmentObj->ivEmpty('queueExitHash');
-        $parchmentObj->ivEmpty('queueExitTagHash');
+        $parchmentObj->ivEmpty('queueRoomEchoHash');
+        $parchmentObj->ivEmpty('queueRoomBoxHash');
+        $parchmentObj->ivEmpty('queueRoomTextHash');
+        $parchmentObj->ivEmpty('queueRoomExitHash');
+        $parchmentObj->ivEmpty('queueRoomInfoHash');
         $parchmentObj->ivEmpty('queueLabelHash');
 
         # Draw new canvas widgets for every occupied level, ready for the calling function to call
@@ -32476,106 +32035,9 @@
             $self->createMap($regionmapObj, $parchmentObj, $level);
         }
 
-        return 1;
-    }
+        # Show the next region to be pre-drawn (if any) in the window's title bar
+        $self->setWinTitle();
 
-    sub recycleMap {
-
-        # Called by $self->setCurrentRegion (only)
-        # When a new current region is set, the old region's parchment object can sometimes be
-        #   recycled, which means that its existing canvas widgets (Gnome2::Canvas objects) can be
-        #   re-used
-        # This prevents Axmud swallowing up huge amounts of memory. Large regions are drawn once
-        #   and then retained in memory, even when not visible. Smaller regions are drawn when
-        #   required, and when no longer visible, are removed from memory
-        #
-        # Expected arguments
-        #   $parchmentObj       - The parchment object (GA::Obj::Parchment) to be recycled
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $parchmentObj, $check) = @_;
-
-        # Local variables
-        my $index;
-
-        # Check for improper arguments
-        if (! defined $parchmentObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->recycleMap', @_);
-        }
-
-        # Remove the parchment object from our registries...
-        $self->ivDelete('parchmentHash', $parchmentObj->name);
-        $self->ivDelete('parchmentReadyHash', $parchmentObj->name);
-        $index = $self->ivFind('parchmentQueueList', $parchmentObj);
-        if (defined $index) {
-
-            $self->ivSplice('parchmentQueueList', $index, 1);
-        }
-
-        # ...but mark it as being available to be re-used
-        $self->ivPoke('spareParchmentObj', $parchmentObj);
-
-        # Destroy all of the parchment's canvas objects (but retain its canvas widgets)
-        # Because the parchment might be re-used almost immediately, we don't add canvas objects to
-        #   the usual queue, but we destroy them immediately
-        foreach my $levelObj ($parchmentObj->ivValues('levelHash')) {
-
-            foreach my $listRef (
-                $levelObj->ivValues('drawnRoomHash'),
-                $levelObj->ivValues('drawnRoomEchoHash'),
-                $levelObj->ivValues('drawnRoomTagHash'),
-                $levelObj->ivValues('drawnRoomGuildHash'),
-                $levelObj->ivValues('drawnRoomTextHash'),
-                $levelObj->ivValues('drawnExitHash'),
-                $levelObj->ivValues('drawnExitTagHash'),
-                $levelObj->ivValues('drawnOrnamentHash'),
-                $levelObj->ivValues('drawnLabelHash'),
-                $levelObj->ivValues('drawnCheckedDirHash'),
-            ) {
-                foreach my $canvasObj (@$listRef) {
-
-                    $canvasObj->destroy();
-                }
-            }
-        }
-
-        foreach my $canvasObj (
-            $parchmentObj->ivValues('bgCanvasObjHash'),
-            $parchmentObj->ivValues('colouredSquareHash'),
-            $parchmentObj->ivValues('colouredRectHash'),
-        ) {
-            $canvasObj->destroy();
-        }
-
-        # Reset the parchment object's IVs (but retain its canvas widgets, so they can be reused)
-        $parchmentObj->{_objName} = undef;
-        $parchmentObj->ivUndef('name');
-
-        $parchmentObj->ivEmpty('bgCanvasObjHash');
-        $parchmentObj->ivEmpty('levelHash');
-
-        $parchmentObj->ivEmpty('colouredSquareHash');
-        $parchmentObj->ivEmpty('colouredRectHash');
-
-        $parchmentObj->ivEmpty('markedRoomHash');
-        $parchmentObj->ivEmpty('markedRoomTagHash');
-        $parchmentObj->ivEmpty('markedRoomGuildHash');
-        $parchmentObj->ivEmpty('markedExitHash');
-        $parchmentObj->ivEmpty('markedExitTagHash');
-        $parchmentObj->ivEmpty('markedLabelHash');
-
-        $parchmentObj->ivEmpty('queueRoomHash');
-        $parchmentObj->ivEmpty('queueRoomTagHash');
-        $parchmentObj->ivEmpty('queueRoomGuildHash');
-        $parchmentObj->ivEmpty('queueExitHash');
-        $parchmentObj->ivEmpty('queueExitTagHash');
-        $parchmentObj->ivEmpty('queueLabelHash');
-
-        # Operation complete
         return 1;
     }
 
@@ -32585,7 +32047,7 @@
         # Redraws one or more regions. If there is a current regionmap and it's one of those which
         #   is to be redrawn, the drawing operation for the regionmap's current level takes place
         #   immediately. All other regions and levels are queued to be redrawn
-        # NB If GA::Obj::WorldModel->queueDrawMaxObjs is 0, all parchment objects except the
+        # NB If GA::Obj::WorldModel->preDrawAllowFlag is FALSE, all parchment objects except the
         #   visible one are simply destroyed (since rooms, exits and labels can't be queued to be
         #   drawn)
         #
@@ -32597,7 +32059,7 @@
         #                       $self->currentRegionmap is used
         #   $onlyFlag       - If TRUE, only one regionmap (the specified one, or the current one if
         #                       no regionmap is specified) is to be redrawn. If FALSE or 'undef',
-        #                       all regions for which a parchemnt object exists are redrawn
+        #                       all regions for which a parchment object exists are redrawn
         #
         # Return values
         #   'undef' on improper arguments or if there is nothing to redraw
@@ -32609,7 +32071,9 @@
         my (
             $doDrawFlag,
             @parchmentList,
-            %regionHash,
+            %regionHash, %markedRoomHash, %markedRoomTagHash, %markedRoomGuildHash, %markedExitHash,
+            %markedExitTagHash, %markedLabelHash, %queueRoomEchoHash, %queueRoomBoxHash,
+            %queueRoomTextHash, %queueRoomExitHash, %queueRoomInfoHash, %queueLabelHash,
         );
 
         # Check for improper arguments
@@ -32630,28 +32094,14 @@
             return undef;
         }
 
-        # Previous calls to this function transferred all canvas widgets/objects which are no longer
-        #   needed to a destruction list, $self->destroyQueueList. Objects in this list are
-        #   destroyed, a few at a time, by $self->winUpdate
-        # After a few rapid successive calls to this function, however, the Gnome2::Canvas code
-        #   seems to run out of memory, or something, and the overall time to complete this function
-        #   quadruples
-        # Therefore we must call ->destroy for all the canvas widgets/objects that haven't been
-        #   destroyed yet. In testing, simply emptying the list (and relying on Perl's garbage
-        #   collection) is consistently 10-15% faster than calling ->destroy on thousands of
-        #   objects, so we'll do that
-        #
         # Show a pause window, if necessary
-        if ($self->destroyQueueList > 1000) {
+        if ($regionmapObj && $regionmapObj->ivPairs('gridRoomHash') > 500) {
 
             # If the tooltips are visible, hide them
             $self->hideTooltips();
             # Show the pause window
             $self->showPauseWin();
         }
-
-        # Now empty the destruction queue
-        $self->ivEmpty('destroyQueueList');
 
         # Compile a list of parchment objects to redraw, starting with the one for which ->doDraw
         #   must be called now (all others are added to a queue)
@@ -32690,7 +32140,7 @@
                 = $self->worldModelObj->ivShow('regionmapHash', $thisParchmentObj->name);
 
             # Refresh the parchment object, removing any canvas objects that have been drawn, ready
-            #   for this function to draw new ones
+            #   for this function to draw new ones, and resetting the object's IVs
             $self->refreshMap($thisRegionmapObj, $thisParchmentObj);
             if ($self->currentRegionmap && $self->currentRegionmap eq $thisRegionmapObj) {
 
@@ -32703,16 +32153,34 @@
 
                 # Mark any rooms and labels in the current level to be drawn now; rooms and labels
                 #   on other levels are queued to be drawn
-                if ($self->worldModelObj->queueDrawMaxObjs) {
+                if ($self->worldModelObj->preDrawAllowFlag) {
 
-                    foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+                    # (If room echoes aren't allowed to be drawn, we can skip those drawing
+                    #   operations, and start drawing each room with its room box)
+                    if ($self->worldModelObj->drawRoomEchoFlag) {
 
-                        my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+                        foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
 
-                        if ($roomObj->zPosBlocks == $thisRegionmapObj->currentLevel) {
-                            $thisParchmentObj->ivAdd('markedRoomHash', $roomNum, $roomObj);
-                        } else {
-                            $thisParchmentObj->ivAdd('queueRoomHash', $roomNum, $roomObj);
+                            my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                            if ($roomObj->zPosBlocks == $thisRegionmapObj->currentLevel) {
+                                $thisParchmentObj->ivAdd('markedRoomHash', $roomNum, $roomObj);
+                            } else {
+                                $thisParchmentObj->ivAdd('queueRoomEchoHash', $roomNum, $roomObj);
+                            }
+                        }
+
+                    } else {
+
+                        foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+
+                            my $roomObj = $self->worldModelObj->ivShow('modelHash', $roomNum);
+
+                            if ($roomObj->zPosBlocks == $thisRegionmapObj->currentLevel) {
+                                $thisParchmentObj->ivAdd('markedRoomHash', $roomNum, $roomObj);
+                            } else {
+                                $thisParchmentObj->ivAdd('queueRoomBoxHash', $roomNum, $roomObj);
+                            }
                         }
                     }
 
@@ -32738,7 +32206,7 @@
 
                 } else {
 
-                    # Nothing can be queued to be drawn, so makr everything to be drawn now
+                    # Nothing can be queued to be drawn, so mark everything to be drawn now
                     foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
 
                         $thisParchmentObj->ivAdd(
@@ -32758,10 +32226,10 @@
                     }
                 }
 
-                # In the code just below, call ->doDraw
+                # In the code just below, call ->doQuickDraw to draw all the marked rooms/labels
                 $doDrawFlag = TRUE;
 
-            } elsif ($self->worldModelObj->queueDrawMaxObjs) {
+            } elsif ($self->worldModelObj->preDrawAllowFlag) {
 
                 # Add the parchment object to the end of the queue. Canvas objects on all levels are
                 #   drawn by regular calls to $self->winUpdate
@@ -32769,13 +32237,27 @@
 
                 # Add all rooms and labels to the queue (any room tags, room guilds, exits or exits
                 #   tags will be automatically drawn alongside them)
-                foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+                if ($self->worldModelObj->drawRoomEchoFlag) {
 
-                    $thisParchmentObj->ivAdd(
-                        'queueRoomHash',
-                        $roomNum,
-                        $self->worldModelObj->ivShow('modelHash', $roomNum),
-                    );
+                    foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+
+                        $thisParchmentObj->ivAdd(
+                            'queueRoomEchoHash',
+                            $roomNum,
+                            $self->worldModelObj->ivShow('modelHash', $roomNum),
+                        );
+                    }
+
+                } else {
+
+                    foreach my $roomNum ($thisRegionmapObj->ivValues('gridRoomHash')) {
+
+                        $thisParchmentObj->ivAdd(
+                            'queueRoomBoxHash',
+                            $roomNum,
+                            $self->worldModelObj->ivShow('modelHash', $roomNum),
+                        );
+                    }
                 }
 
                 foreach my $mapLabelObj ($thisRegionmapObj->ivValues('gridLabelHash')) {
@@ -32792,18 +32274,107 @@
 
             # Perform a drawing cycle so that the current region can be redrawn, if it's one of
             #   those that has just been updated
-            if (! $self->doDraw()) {
+            # When drawing large numbers of rooms, the algorithm in ->doQuickDraw is quicker than
+            #   the one in ->doDraw
+            # ->doQuickDraw acts on the IVs used for pre-drawing rooms/labels, a few at a time. In
+            #   order to call it, we need to move rooms/labels which are marked to be drawn now
+            #   into the IVs used for pre-drawing
+            # Temporarily store the marked and queued objects of ->queueRoomEchoHash (etc)
+            %markedRoomHash = $self->currentParchment->markedRoomHash;
+            %markedRoomTagHash = $self->currentParchment->markedRoomTagHash;
+            %markedRoomGuildHash = $self->currentParchment->markedRoomGuildHash;
+            %markedExitHash = $self->currentParchment->markedExitHash;
+            %markedExitTagHash = $self->currentParchment->markedExitTagHash;
+            %markedLabelHash = $self->currentParchment->markedLabelHash;
 
-                # Draw cycle was already in operation. $self->winUpdate will try again; when it
+            %queueRoomEchoHash = $self->currentParchment->queueRoomEchoHash;
+            %queueRoomBoxHash = $self->currentParchment->queueRoomBoxHash;
+            %queueRoomTextHash = $self->currentParchment->queueRoomTextHash;
+            %queueRoomExitHash = $self->currentParchment->queueRoomExitHash;
+            %queueRoomInfoHash = $self->currentParchment->queueRoomInfoHash;
+            %queueLabelHash = $self->currentParchment->queueLabelHash;
+
+            $self->currentParchment->reset_queueHash();
+
+            if ($self->worldModelObj->drawRoomEchoFlag) {
+
+                $self->currentParchment->ivPoke(
+                    'queueRoomEchoHash',
+                    $self->currentParchment->markedRoomHash,
+                );
+
+            } else {
+
+                $self->currentParchment->ivPoke(
+                    'queueRoomBoxHash',
+                    $self->currentParchment->markedRoomHash,
+                );
+            }
+
+            $self->currentParchment->ivPoke(
+                'queueLabelHash',
+                $self->currentParchment->markedLabelHash,
+            );
+
+            $self->currentParchment->reset_markedHash();
+
+            # Emptying those IVs means that the contents of ->drawCycleExitHash are now irrelevant
+            $self->ivEmpty('drawCycleExitHash');
+
+            if (! defined $self->doQuickDraw($self->currentParchment)) {
+
+                # Drawing cycle was already in operation. $self->winUpdate will try again; when it
                 #   succeeds, make the replacement canvas widget visible
                 $self->ivPoke('winUpdateShowFlag', TRUE);
+
+                # Restore the parchment objects IVs to allow ->winUpdate to call both ->doDraw and
+                #   ->doQuickDraw, as appropriate
+                $self->currentParchment->ivPoke('markedRoomHash', %markedRoomHash);
+                $self->currentParchment->ivPoke('markedRoomTagHash', %markedRoomTagHash);
+                $self->currentParchment->ivPoke('markedRoomGuildHash', %markedRoomGuildHash);
+                $self->currentParchment->ivPoke('markedExitHash', %markedExitHash);
+                $self->currentParchment->ivPoke('markedExitTagHash', %markedExitTagHash);
+                $self->currentParchment->ivPoke('markedLabelHash', %markedLabelHash);
+
+                $self->currentParchment->ivPoke('queueRoomEchoHash', %queueRoomEchoHash);
+                $self->currentParchment->ivPoke('queueRoomBoxHash', %queueRoomBoxHash);
+                $self->currentParchment->ivPoke('queueRoomTextHash', %queueRoomTextHash);
+                $self->currentParchment->ivPoke('queueRoomExitHash', %queueRoomExitHash);
+                $self->currentParchment->ivPoke('queueRoomInfoHash', %queueRoomInfoHash);
+                $self->currentParchment->ivPoke('queueLabelHash', %queueLabelHash);
 
             } else {
 
                 # Make the replacement canvas widget visible
                 $self->swapCanvasWidget();
+
+                # Reset parchment object IVs
+                $self->currentParchment->ivPoke('queueRoomEchoHash', %queueRoomEchoHash);
+                $self->currentParchment->ivPoke('queueRoomBoxHash', %queueRoomBoxHash);
+                $self->currentParchment->ivPoke('queueRoomTextHash', %queueRoomTextHash);
+                $self->currentParchment->ivPoke('queueRoomExitHash', %queueRoomExitHash);
+                $self->currentParchment->ivPoke('queueRoomInfoHash', %queueRoomInfoHash);
+                $self->currentParchment->ivPoke('queueLabelHash', %queueLabelHash);
+            }
+
+            # The call to $self->doQuickDraw may have removed $self->currentParchment from the
+            #   pre-drawing queue, in which case, we should re-insert it
+            if (
+                $self->currentParchment->queueRoomEchoHash
+                || $self->currentParchment->queueRoomBoxHash
+                || $self->currentParchment->queueRoomTextHash
+                || $self->currentParchment->queueRoomExitHash
+                || $self->currentParchment->queueRoomInfoHash
+                || $self->currentParchment->queueLabelHash
+                && $self->ivExists('parchmentReadyHash', $self->currentParchment->name)
+            ) {
+                $self->ivUnshift('parchmentQueueList', $self->currentParchment);
+                $self->ivDelete('parchmentReadyHash', $self->currentParchment->name);
             }
         }
+
+        # Show the next region to be pre-drawn (if any) in the window's title bar
+        $self->setWinTitle();
 
         # Make the pause window invisible, if visible
         $self->hidePauseWin();
@@ -32850,52 +32421,48 @@
         }
 
         # Check all canvas objects in the drawing queue, and mark any which should be drawn now
-        foreach my $obj ($parchmentObj->ivValues('queueRoomHash')) {
+        foreach my $obj ($parchmentObj->ivValues('queueRoomEchoHash')) {
 
             if ($obj->zPosBlocks == $level) {
 
                 $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
-                $parchmentObj->ivDelete('queueRoomHash', $obj->number);
+                $parchmentObj->ivDelete('queueRoomEchoHash', $obj->number);
             }
         }
 
-        foreach my $obj ($parchmentObj->ivValues('queueRoomTagHash')) {
+        foreach my $obj ($parchmentObj->ivValues('queueRoomBoxHash')) {
 
             if ($obj->zPosBlocks == $level) {
 
-                $parchmentObj->ivAdd('markedRoomTagHash', $obj->number, $obj);
-                $parchmentObj->ivDelete('queueRoomTagHash', $obj->number);
+                $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomBoxHash', $obj->number);
             }
         }
 
-        foreach my $obj ($parchmentObj->ivValues('queueRoomGuildHash')) {
+        foreach my $obj ($parchmentObj->ivValues('queueRoomTextHash')) {
 
             if ($obj->zPosBlocks == $level) {
 
-                $parchmentObj->ivAdd('markedRoomGuildHash', $obj->number, $obj);
-                $parchmentObj->ivDelete('queueRoomGuildHash', $obj->number);
+                $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomTextHash', $obj->number);
             }
         }
 
-        foreach my $obj ($parchmentObj->ivValues('queueExitHash')) {
+        foreach my $obj ($parchmentObj->ivValues('queueRoomExitHash')) {
 
-            my $roomObj = $self->worldModelObj->ivShow('modelHash', $obj->parent);
+            if ($obj->zPosBlocks == $level) {
 
-            if ($roomObj->zPosBlocks == $level) {
-
-                $parchmentObj->ivAdd('markedExitHash', $obj->number, $obj);
-                $parchmentObj->ivDelete('queueExitHash', $obj->number);
+                $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomExitHash', $obj->number);
             }
         }
 
-        foreach my $obj ($parchmentObj->ivValues('queueExitTagHash')) {
+        foreach my $obj ($parchmentObj->ivValues('queueRoomInfoHash')) {
 
-            my $roomObj = $self->worldModelObj->ivShow('modelHash', $obj->parent);
+            if ($obj->zPosBlocks == $level) {
 
-            if ($roomObj->zPosBlocks == $level) {
-
-                $parchmentObj->ivAdd('markedExitTagHash', $obj->number, $obj);
-                $parchmentObj->ivDelete('queueExitTagHash', $obj->number);
+                $parchmentObj->ivAdd('markedRoomHash', $obj->number, $obj);
+                $parchmentObj->ivDelete('queueRoomInfoHash', $obj->number);
             }
         }
 
@@ -32923,11 +32490,11 @@
             # Draw the canvas object(s) (which empties $parchmentObj->markedRoomHash, etc)
             if (
                 $self->doDraw()
-                && ! $parchmentObj->queueRoomHash
-                && ! $parchmentObj->queueRoomTagHash
-                && ! $parchmentObj->queueRoomGuildHash
-                && ! $parchmentObj->queueExitHash
-                && ! $parchmentObj->queueExitTagHash
+                && ! $parchmentObj->queueRoomEchoHash
+                && ! $parchmentObj->queueRoomBoxHash
+                && ! $parchmentObj->queueRoomTextHash
+                && ! $parchmentObj->queueRoomExitHash
+                && ! $parchmentObj->queueRoomInfoHash
                 && ! $parchmentObj->queueLabelHash
             ) {
                 # Mark this parchment object as fully drawn
@@ -32936,6 +32503,9 @@
                 if (defined $index) {
 
                     $self->ivSplice('parchmentQueueList', $index, 1);
+
+                    # Show the next region to be pre-drawn (if any) in the window's title bar
+                    $self->setWinTitle();
                 }
             }
         }
@@ -32946,7 +32516,7 @@
     sub swapCanvasWidget {
 
         # Called by $self->->winUpdate, ->setCurrentRegion, ->setCurrentLevel and ->redrawRegions
-        # Removes the visible canvas widget (Gnome2::Canvas), if any, and replaces it with the
+        # Removes the visible canvas widget (GooCanvas2::Canvas), if any, and replaces it with the
         #   canvas widget for the current region's current level
         #
         # Expected arguments
@@ -32973,15 +32543,10 @@
             return undef;
         }
 
-        # Reduce the time required for replacing the canvas widget as much as possible, by updating
-        #   everything so far
-        $self->winShowAll($self->_objClass . '->setCurrentRegion');
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->setCurrentRegion');
-
-        # For very large maps, if we simply remove the canvas widget (Gnome2::Canvas) from its
-        #   scrolled window (Gtk2::ScrolledWindow), the user sees a grey background momentarily
+        # For very large maps, if we simply remove the canvas widget (GooCanvas2::Canvas) from its
+        #   scrolled window (Gtk3::ScrolledWindow), the user sees a grey background momentarily
         # To avoid this, we have to take a roundabout route - create a new scrolled window, add the
-        #   replacement canvas widget to it, call ->show_al
+        #   replacement canvas widget to it, call ->show_all
         # Then we replace the old scrolled window with the new one
         # Finally we remove the previous canvas widget from the defunct scrolled window, so it's
         #   ready for the next time it's made visible
@@ -32991,6 +32556,20 @@
             'canvasWidgetHash',
             $self->currentRegionmap->currentLevel,
         );
+
+        if (! $canvasWidget) {
+
+            # This can happen if the user goes up to (say) level 5 in a region where level 5 is
+            #   empty, then switches to a different visible region, then switches back to
+            #   $self->currentRegionmap. Because the level is empty, no canvas widget has been
+            #   created for it
+            # Solution is to set the default level (for which a canvas widget always exists,
+            #   even if the level is empty)
+            $self->currentRegionmap->ivPoke('currentLevel', 0);
+            $canvasWidget = $self->currentParchment->ivShow('canvasWidgetHash', 0);
+            # Need to update the window title too
+            $self->setWinTitle();
+        }
 
         # If the replacement canvas widget is the same as the previous canvas widget, the code below
         #   will fail (because the canvas widget will be given two parents)
@@ -33008,7 +32587,7 @@
         if (! $matchFlag) {
 
             # Create a new scrolled window
-            my $canvasScroller = Gtk2::ScrolledWindow->new();
+            my $canvasScroller = Gtk3::ScrolledWindow->new();
             my $canvasHAdjustment = $canvasScroller->get_hadjustment();
             my $canvasVAdjustment = $canvasScroller->get_vadjustment();
             $canvasScroller->set_border_width(3);
@@ -33018,10 +32597,20 @@
             # Add the replacement canvas widget to the new scrolled window
             $canvasScroller->add($canvasWidget);
 
+            # The only way to scroll the map to the correct position, is to store the scrolled
+            #   window's size allocation whenever it is set
+            $canvasScroller->signal_connect('size-allocate' => sub {
+
+                my ($widget, $hashRef) = @_;
+
+                $self->ivPoke('canvasScrollerWidth', $$hashRef{width});
+                $self->ivPoke('canvasScrollerHeight', $$hashRef{height});
+            });
+
             # This line is the one that prevents the grey background from appearing momentarily
             $canvasScroller->show_all();
 
-            # Remove the old canvas scroller from its parent Gtk2::Frame, and insert the new one
+            # Remove the old canvas scroller from its parent Gtk3::Frame, and insert the new one
             foreach my $child ($self->canvasFrame->get_children() ) {
 
                 $self->canvasFrame->remove($child);
@@ -33062,10 +32651,6 @@
 
         # Make sure the correct region is highlighted in the treeview region list
         $self->treeViewSelectLine($self->currentRegionmap->name);
-
-        # Make the changes visible
-        $self->winShowAll($self->_objClass . '->setCurrentRegion');
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->setCurrentRegion');
 
         # Update IVs
         $self->ivPoke('emptyMapFlag', FALSE);
@@ -33140,16 +32725,13 @@
                     if ($parchmentObj) {
 
                         if (
-                            $self->worldModelObj->queueDrawMaxObjs
+                            $self->worldModelObj->preDrawAllowFlag
                             && (! defined $currentRegion || $currentRegion ne $parchmentObj->name)
                         ) {
-
                             if ($type eq 'room') {
-                                $parchmentObj->ivAdd('queueRoomHash', $obj->number, $obj);
-                            } elsif ($type eq 'room_tag') {
-                                $parchmentObj->ivAdd('queueRoomTagHash', $obj->number, $obj);
+                                $parchmentObj->ivAdd('queueRoomEchoHash', $obj->number, $obj);
                             } else {
-                                $parchmentObj->ivAdd('queueRoomGuildHash', $obj->number, $obj);
+                                $parchmentObj->ivAdd('queueRoomInfoHash', $obj->number, $obj);
                             }
 
                         } else {
@@ -33173,13 +32755,24 @@
                     if ($parchmentObj) {
 
                         if (
-                            $self->worldModelObj->queueDrawMaxObjs
+                            $self->worldModelObj->preDrawAllowFlag
                             && (! defined $currentRegion || $currentRegion ne $parchmentObj->name)
                         ) {
                             if ($type eq 'exit') {
-                                $parchmentObj->ivAdd('queueExitHash', $obj->number, $obj);
+
+                                $parchmentObj->ivAdd(
+                                    'queueRoomExitHash',
+                                    $roomObj->number,
+                                    $roomObj,
+                                );
+
                             } elsif ($type eq 'exit_tag') {
-                                $parchmentObj->ivAdd('queueExitTagHash', $obj->number, $obj);
+
+                                $parchmentObj->ivAdd(
+                                    'queueRoomInfoHash',
+                                    $roomObj->number,
+                                    $roomObj,
+                                );
                             }
 
                         } else {
@@ -33199,7 +32792,7 @@
                     if ($parchmentObj) {
 
                         if (
-                            $self->worldModelObj->queueDrawMaxObjs
+                            $self->worldModelObj->preDrawAllowFlag
                             && (! defined $currentRegion || $currentRegion ne $parchmentObj->name)
                         ) {
                             $parchmentObj->ivAdd('queueLabelHash', $obj->number, $obj);
@@ -33385,7 +32978,7 @@
         # Draw a coloured square on each of those levels
         OUTER: foreach my $z (@list) {
 
-            my ($coord, $canvasWidget, $newObj);
+            my ($coord, $canvasWidget, $newObj, $levelObj);
 
             # Before drawing the canvas object for this coloured square, destroy the existing canvas
             #   object from the last time the square was drawn
@@ -33396,19 +32989,20 @@
             $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $z);
 
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Rect',
-                x1 => $xPos,
-                y1 => $yPos,
-                x2 => $xPos + $blockWidth - 1,
-                y2 => $yPos + $blockHeight - 1,
-                outline_color => $colour,
-                fill_color => $colour,
+            $newObj = GooCanvas2::CanvasRect->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'x' => $xPos,
+                'y' => $yPos,
+                'width' => $blockWidth,
+                'height' => $blockHeight,
+                'line-width' => 0,
+#                'stroke-color' => $colour,
+                'fill-color' => $colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setSquareStackPosn($newObj);
+            $levelObj = $parchmentObj->ivShow('levelHash', $z);
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 0));
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('square', $newObj);
             # Store the canvas object
@@ -33485,7 +33079,7 @@
         # Draw a coloured rectangle on each of those levels
         OUTER: foreach my $z (@list) {
 
-            my ($key, $canvasWidget, $newObj);
+            my ($key, $canvasWidget, $newObj, $levelObj);
 
             # Before drawing the canvas object for this coloured rectangle, destroy the existing
             #   canvas object from the last time the rectangle was drawn
@@ -33496,19 +33090,20 @@
             $canvasWidget = $parchmentObj->ivShow('canvasWidgetHash', $z);
 
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Rect',
-                x1 => $colourObj->x1 * $blockWidth,
-                y1 => $colourObj->y1 * $blockHeight,
-                x2 => ((($colourObj->x2) + 1) * $blockWidth) - 1,
-                y2 => ((($colourObj->y2) + 1) * $blockHeight) - 1,
-                outline_color => $colourObj->colour,
-                fill_color => $colourObj->colour,
+            $newObj = GooCanvas2::CanvasRect->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'x' => $colourObj->x1 * $blockWidth,
+                'y' => $colourObj->y1 * $blockHeight,
+                'width' => ($colourObj->x2 - $colourObj->x1 + 1) * $blockWidth,
+                'height' => ($colourObj->y2 - $colourObj->y1 + 1) * $blockHeight,
+                'line-width' => 0,
+#                'stroke-color' => $colourObj->colour,
+                'fill-color' => $colourObj->colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setRectStackPosn($parchmentObj, $newObj);
+            $levelObj = $parchmentObj->ivShow('levelHash', $z);
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 1));
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('rect', $newObj);
             # Store the canvas object
@@ -33518,7 +33113,7 @@
         return 1;
     }
 
-    # Graphical operations - drawing canvas objects
+    # Graphical operations - initial functions for drawing on the canvas
 
     sub doDraw {
 
@@ -33583,7 +33178,7 @@
         }
 
         # If this value is greater than the one specified by the world model IV (default: 500),
-        #   make the pause window visible for the duration of the draw cycle
+        #   make the pause window visible for the duration of the drawing cycle
         if ($drawCount > $self->worldModelObj->drawPauseNum) {
 
             $self->showPauseWin();
@@ -33603,10 +33198,28 @@
         OUTER: foreach my $parchmentObj (@parchmentList) {
 
             my (
-                $index, $mode,
+                $regionmapObj, $roomCount, $exitCount, $index, $mode,
                 %markedRoomHash, %markedRoomTagHash, %markedRoomGuildHash, %markedExitHash,
                 %markedExitTagHash, %markedLabelHash,
             );
+
+            # For large numbers of rooms, the algorithm in $self->doQuickDraw is quicker than the
+            #   one in this function. If at least half the rooms and/or half the exits are marked
+            #   to be drawn, just redraw the whole region
+            $regionmapObj = $self->worldModelObj->ivShow('regionmapHash', $parchmentObj->name);
+            $roomCount = $regionmapObj->ivPairs('gridRoomHash');
+            $exitCount = $regionmapObj->ivPairs('gridExitHash');
+            if (
+                ($roomCount > 100 && $parchmentObj->ivPairs('markedRoomHash') > ($roomCount / 2))
+                || ($exitCount > 200 && $parchmentObj->ivPairs('markedExitHash') > ($exitCount / 2))
+            ) {
+                # The TRUE flag means 'only redraw this region'
+                if ($self->redrawRegions($regionmapObj, TRUE)) {
+
+                    # Redraw successful. If not, continue with this function's algorithm
+                    next OUTER;
+                }
+            }
 
             # For speed, import the parchment object's hashes of objects marked to be drawn
             #   drawn
@@ -33635,25 +33248,25 @@
 
             # ...and if the parchment has no queued objects, it can be marked as fully drawn
             if (
-                ! $parchmentObj->queueRoomHash && ! $parchmentObj->queueRoomTagHash
-                && ! $parchmentObj->queueRoomGuildHash && ! $parchmentObj->queueExitHash
-                && ! $parchmentObj->queueExitTagHash && ! $parchmentObj->queueLabelHash
+                ! $parchmentObj->queueRoomEchoHash && ! $parchmentObj->queueRoomBoxHash
+                && ! $parchmentObj->queueRoomTextHash && ! $parchmentObj->queueRoomExitHash
+                && ! $parchmentObj->queueRoomInfoHash && ! $parchmentObj->queueLabelHash
             ) {
                 $self->ivAdd('parchmentReadyHash', $parchmentObj->name, $parchmentObj);
                 $index = $self->ivFind('parchmentQueueList', $parchmentObj);
                 if (defined $index) {
 
                     $self->ivSplice('parchmentQueueList', $index, 1);
+
+                    # Show the next region to be pre-drawn (if any) in the window's title bar
+                    $self->setWinTitle();
                 }
             }
 
             # Set IV so that individual draw functions can quickly look up the regionmap and
             #   parchment objects being drawn
             $self->ivPoke('drawParchment', $parchmentObj);
-            $self->ivPoke(
-                'drawRegionmap',
-                $self->worldModelObj->ivShow('regionmapHash', $parchmentObj->name),
-            );
+            $self->ivPoke('drawRegionmap', $regionmapObj);
 
             # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
             #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
@@ -33715,23 +33328,14 @@
 
                 $self->drawLabel($labelObj);
             }
-
-            # If this region is the current one, make it visible now
-            if ($self->currentRegionmap && $self->currentRegionmap->name eq $parchmentObj->name) {
-
-                # Update the event queue to make the changes visible
-                $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->doDraw');
-            }
         }
 
         # Make the pause window invisible
         $self->hidePauseWin();
 
-        # Update the event queue to make the changes visible
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->doDraw');
-
-        # Tidy up by resetting draw cycle IVs
+        # Tidy up by resetting drawing cycle IVs
         $self->tidyUpDraw();
+        $self->ivEmpty('drawCycleExitHash');
 
         # Further calls to this function are now allowed
         $self->ivPoke('delayDrawFlag', FALSE);
@@ -33740,10 +33344,623 @@
         return 1;
     }
 
+    sub doQuickDraw {
+
+        # Called by $self->winUpdate to perform some pre-drawing operations, drawing a limited
+        #   number of rooms, exits and/or labels on the map, several times a second
+        # Also called by $self->redrawRegions, because for drawing large number of rooms, the
+        #   algorithm in this function is faster than the one in ->doDraw
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) on which pre-draw operations
+        #                       are currently taking place
+        #
+        # Optional arguments
+        #   $limitFlag      - Set to TRUE if a limit can be placed on the  number of rooms, exits
+        #                       and/or labels during a call to this function; the limit applied
+        #                       depends on the value of GA::Obj::WorldModel->preDrawAllocation. Set
+        #                       to FALSE (or 'undef') when no limit is required (i.e. when called by
+        #                       $self->redrawRegions)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $limitFlag, $check) = @_;
+
+        # Local variables
+        my ($mode, $checkTime, $stopFlag, $wmObj, $count, $checkCount);
+
+        # Check for improper arguments
+        if (! defined $parchmentObj || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->doQuickDraw', @_);
+        }
+
+        # If there is already a drawing cycle in progress (i.e. another call to this function or to
+        #   $self->doDraw, do nothing)
+        if ($self->delayDrawFlag || $self->dragFlag) {
+
+            return undef;
+
+        } else {
+
+            # One a drawing cycle starts, it must not be interrupted by another call to this
+            #   function, or to ->doDraw
+            $self->ivPoke('delayDrawFlag', TRUE);
+        }
+
+        # When pre-drawing, objects are drawn in stack order, from bottom to top; in very large
+        #   maps (thousands of rooms), GooCanvas2 can complete the drawing much more quickly
+        #   when everything can be raised to the top of the stack, rather than being
+        #   arbitrarily inserted somewhere in the middle
+        # Tell individual drawing functions like $self->drawRoomBox, ->drawIncompleteExit (etc) to
+        #   raise the canvas object to the top of the drawing stack every time
+        $self->ivPoke('quickDrawFlag', TRUE);
+
+        # Set IV so that individual draw functions can quickly look up the regionmap and parchment
+        #   objects being drawn
+        $self->ivPoke('drawParchment', $parchmentObj);
+        $self->ivPoke(
+            'drawRegionmap',
+            $self->worldModelObj->ivShow('regionmapHash', $parchmentObj->name),
+        );
+
+        # Decide how exits are drawn. GA::Obj::WorldModel->drawExitMode is one of the values
+        #   'ask_regionmap', 'no_exit', 'simple_exit' and 'complex_exit'. The regionmap's
+        #   ->drawExitMode is any of these values except 'ask_regionmap'
+        if ($self->worldModelObj->drawExitMode eq 'ask_regionmap') {
+            $mode = $self->drawRegionmap->drawExitMode;
+        } else {
+            $mode = $self->worldModelObj->drawExitMode;
+        }
+
+        # Set the time at which this function should stop drawing, and return control to the
+        #   GA::Session (the next call to ->winUpdate will resume pre-drawing operations, if
+        #   required)
+        # $self->winUpdate is called by GA::Session->maintainLoopDelay several times a second. Aim
+        #   to spend only a proportion of the available processor time on pre-drawing operations
+        #   (the percentage is GA::Obj::WorldModel->preDrawAllocation, a value in the range 1-100)
+        #   Aim to spend no more than half the available time on pre-drawing operations
+        # If $limitFlag was not set, then there's no limit
+        if ($limitFlag) {
+
+            $checkTime = $axmud::CLIENT->getTime() + (
+                            $self->session->maintainLoopDelay
+                            * $self->worldModelObj->preDrawAllocation
+                            / 100
+                         );
+
+            # We'll check that this time has passed after every 10 calls to ->drawRoom, ->drawLabel
+            #   (etc)
+            $count = 0;
+            $checkCount = 10;
+        }
+
+        # Optimise the drawing process by doing many of the size and position calculations in
+        #   advance
+        $self->prepareDraw($mode);
+
+        # Import the world model object (for speed)
+        $wmObj = $self->worldModelObj;
+
+        # Draw room echoes (position #2 in the canvas drawing stack)
+        if (! $stopFlag) {
+
+            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomEchoHash')) {
+
+                # (Check the room still exists. This check, and the similar checks below, check for
+                #   momentary inconsistencies while some other process takes place; code in the
+                #   world model GA::Obj::WorldModel should update parchment objects automatically)
+                $parchmentObj->ivDelete('queueRoomEchoHash', $roomObj->number);
+                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
+
+                    next OUTER;
+                }
+
+                # Don't draw this room at all if:
+                #   1. Its position on the map has not been set
+                #   2. The room isn't in the right region
+                if (
+                    # (We'll assume that if ->xPosBlocks is set, so are ->yPosBlocks and
+                    #   ->zPosBlocks)
+                    ! defined $roomObj->xPosBlocks
+                    || $roomObj->parent != $self->drawRegionmap->number
+                ) {
+                    next OUTER;
+                }
+
+                # Draw the room echoes (if allowed)
+                if ($wmObj->drawRoomEchoFlag) {
+
+                    $self->drawRoomEcho($roomObj, $mode, 1);
+                    $self->drawRoomEcho($roomObj, $mode, -1);
+
+                    $count++;
+                }
+
+                # Room boxes are higher in the drawing stack than room echoes
+                $parchmentObj->ivAdd('queueRoomBoxHash', $roomObj->number, $roomObj);
+
+                if (! $parchmentObj->queueRoomEchoHash) {
+
+                    $self->updateSlaveInStack($parchmentObj, 2);
+                }
+
+                if ($checkTime && $count >= $checkCount) {
+
+                    if ($checkTime < $axmud::CLIENT->getTime()) {
+
+                        # We've used up the allotted time, so give up
+                        $stopFlag = TRUE;
+                        last OUTER;
+
+                    } else {
+
+                        # Check again after 10 more calls ->drawRoom, ->drawLabel (etc)
+                        $count = 0;
+                    }
+                }
+            }
+        }
+
+        # Draw room boxes (position #3 in the canvas drawing stack)
+        if (! $stopFlag) {
+
+            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomBoxHash')) {
+
+                # (Check the room still exists)
+                $parchmentObj->ivDelete('queueRoomBoxHash', $roomObj->number);
+                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
+
+                    next OUTER;
+                }
+
+                # Draw the room's border and interior
+                $self->drawRoomBox(
+                    $mode,
+                    $roomObj,
+                    $self->borderCornerXPosPixels
+                        + ($roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels),
+                    $self->borderCornerYPosPixels
+                        + ($roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels),
+                );
+
+                $count++;
+
+                # Room internal text is higher in the drawing stack than room boxes
+                $parchmentObj->ivAdd('queueRoomTextHash', $roomObj->number, $roomObj);
+
+                if (! $parchmentObj->queueRoomBoxHash) {
+
+                    $self->updateSlaveInStack($parchmentObj, 3);
+                }
+
+                if ($checkTime && $count >= $checkCount) {
+
+                    if ($checkTime < $axmud::CLIENT->getTime()) {
+
+                        $stopFlag = TRUE;
+                        last OUTER;
+
+                    } else {
+
+                        $count = 0;
+                    }
+                }
+            }
+        }
+
+        # Draw room internal text (position #4 in the canvas drawing stack)
+        if (! $stopFlag) {
+
+            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomTextHash')) {
+
+                my (
+                    $canvasWidget, $xPos, $yPos, $unallocatedCount, $unallocatableCount,
+                    $shadowCount, $regionCount, $superRegionCount,
+                );
+
+                # (Check the room still exists)
+                $parchmentObj->ivDelete('queueRoomTextHash', $roomObj->number);
+                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
+
+                    next OUTER;
+                }
+
+                # Set the canvas widget and position of the room's gridblock (for speed)
+                $canvasWidget = $self->drawParchment->ivShow(
+                    'canvasWidgetHash',
+                    $roomObj->zPosBlocks,
+                );
+
+                $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
+                $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
+
+                # Draw room interior text (if allowed)
+                if ($wmObj->roomInteriorMode ne 'none') {
+
+                    # Check each exit in the room, compiling various counts
+                    $unallocatedCount = 0;
+                    $unallocatableCount = 0;
+                    $shadowCount = 0;
+                    $regionCount = 0;
+                    $superRegionCount = 0;
+
+                    INNER: foreach my $number ($roomObj->ivValues('exitNumHash')) {
+
+                        my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
+                        if ($exitObj) {
+
+                            # Keep count of the total number of unallocated exits, and the number of
+                            #   unallocatable exits - we'll need the counts later in this function
+                            if (
+                                $exitObj->drawMode eq 'temp_alloc'
+                                || $exitObj->drawMode eq 'temp_unalloc'
+                            ) {
+                                $unallocatedCount++;
+                                if ($exitObj->drawMode eq 'temp_unalloc') {
+
+                                    $unallocatableCount++;
+                                }
+                            }
+
+                            # Likewise, we keep count of the number of exits with shadow exits
+                            if ($exitObj->shadowExit) {
+
+                                $shadowCount++;
+                            }
+
+                            # And we also keep count of region/super region exits
+                            if ($exitObj->superFlag) {
+
+                                $superRegionCount++;
+                            }
+
+                            if ($exitObj->regionFlag) {
+
+                                $regionCount++;
+                            }
+                        }
+                    }
+
+                    # Draw the room interior text
+                    $self->drawRoomInteriorInfo(
+                        $roomObj,
+                        $canvasWidget,
+                        $self->borderCornerXPosPixels
+                            + ($roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels),
+                        $self->borderCornerYPosPixels
+                            + ($roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels),
+                        $unallocatedCount,
+                        $shadowCount,
+                        $regionCount,
+                        $superRegionCount,
+                    );
+
+                    $count++;
+
+                } else {
+
+                    # (Unallocatable exits are always shown, so count them)
+                    $unallocatableCount = 0;
+
+                    INNER: foreach my $number ($roomObj->ivValues('exitNumHash')) {
+
+                        my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
+                        if ($exitObj && $exitObj->drawMode eq 'temp_unalloc') {
+
+                            $unallocatableCount++;
+                        }
+                    }
+                }
+
+                # If there are any unallocatable exits, the number is drawn in the bottom-centre of
+                #   the room box
+                if ($unallocatableCount) {
+
+                    $self->drawUnallocatableCount($roomObj, $canvasWidget, $unallocatableCount);
+                }
+
+                # Exits/exit ornaments/checked directions are higher in the drawing stack than room
+                #   internal text
+                $parchmentObj->ivAdd('queueRoomExitHash', $roomObj->number, $roomObj);
+
+                if (! $parchmentObj->queueRoomTextHash) {
+
+                    $self->updateSlaveInStack($parchmentObj, 4);
+                }
+
+                if ($checkTime && $count >= $checkCount) {
+
+                    if ($checkTime < $axmud::CLIENT->getTime()) {
+
+                        $stopFlag = TRUE;
+                        last OUTER;
+
+                    } else {
+
+                        $count = 0;
+                    }
+                }
+            }
+        }
+
+        # Draw exits, exit ornaments and checked directions (position #5 in the canvas drawing
+        #   stack)
+        if (! $stopFlag) {
+
+            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomExitHash')) {
+
+                my ($canvasWidget, $xPos, $yPos);
+
+                # (Check the room still exists)
+                $parchmentObj->ivDelete('queueRoomExitHash', $roomObj->number);
+                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
+
+                    next OUTER;
+                }
+
+                # Set the canvas widget (for speed)
+                $canvasWidget = $self->drawParchment->ivShow(
+                    'canvasWidgetHash',
+                    $roomObj->zPosBlocks,
+                );
+
+                # Draw exits and exit ornaments
+                if ($roomObj->exitNumHash) {
+
+                    INNER: foreach my $number ($roomObj->ivValues('exitNumHash')) {
+
+                        my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
+                        if ($exitObj) {
+
+                            # Draw the exit. In $mode 'no_exit', we only draw exits whose ->mapDir
+                            #   is 'up' or 'down'
+                            if (
+                                $mode ne 'no_exit'
+                                || (
+                                    $exitObj->mapDir
+                                    && ($exitObj->mapDir eq 'up' || $exitObj->mapDir eq 'down')
+                                )
+                            ) {
+                                $self->drawExit(
+                                    $exitObj,
+                                    $mode,
+                                    $canvasWidget,
+                                    $roomObj,
+                                );
+                            }
+                        }
+                    }
+                }
+
+                # Draw checked directions (if allowed)
+                if ($self->worldModelObj->drawCheckedDirsFlag && $mode ne 'no_exit') {
+
+                    my @newObjList;
+
+                    foreach my $dir ($roomObj->ivKeys('checkedDirHash')) {
+
+                        my $canvasObj = $self->drawCheckedDir($roomObj, $canvasWidget, $dir);
+                        if ($canvasObj) {
+
+                            push (@newObjList, $canvasObj);
+                        }
+                    }
+
+                    if (@newObjList) {
+
+                        $self->drawParchment->addDrawnCheckedDir($roomObj, \@newObjList);
+                    }
+                }
+
+                # (Whether or not any exits/checked directions were drawn, count this as a single
+                #   drawing operation)
+                $count++;
+
+                # Room tags, room guilds and exit tags are higher in the drawing stack than exits
+                $parchmentObj->ivAdd('queueRoomInfoHash', $roomObj->number, $roomObj);
+
+                if (! $parchmentObj->queueRoomTextHash) {
+
+                    $self->updateSlaveInStack($parchmentObj, 5);
+                }
+
+                if ($checkTime && $count >= $checkCount) {
+
+                    if ($checkTime < $axmud::CLIENT->getTime()) {
+
+                        $stopFlag = TRUE;
+                        last OUTER;
+
+                    } else {
+
+                        $count = 0;
+                    }
+                }
+            }
+        }
+
+        # Draw room tags, room guilds and exit tags (position #6 in the canvas drawing stack)
+        if (! $stopFlag) {
+
+            OUTER: foreach my $roomObj ($parchmentObj->ivValues('queueRoomInfoHash')) {
+
+                my $canvasWidget;
+
+                # (Check the room still exists)
+                $parchmentObj->ivDelete('queueRoomInfoHash', $roomObj->number);
+                if (! $wmObj->ivExists('modelHash', $roomObj->number)) {
+
+                    next OUTER;
+                }
+
+                # Set the canvas widget (for speed)
+                $canvasWidget = $self->drawParchment->ivShow(
+                    'canvasWidgetHash',
+                    $roomObj->zPosBlocks,
+                );
+
+                # Draw the room tag, if there is one
+                if ($roomObj->roomTag) {
+
+                    # Draw the room tag
+                    $self->drawRoomTag(
+                        $roomObj,
+                        $canvasWidget,
+                        ($roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels),
+                        ($roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels),
+                    );
+                }
+
+                # Draw the room guild, if there is one
+                if ($roomObj->roomGuild) {
+
+                    # Draw the room guild
+                    $self->drawRoomGuild(
+                        $roomObj,
+                        $canvasWidget,
+                        ($roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels),
+                        ($roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels),
+                    );
+                }
+
+                # Draw exit tags, if there are any
+                if ($roomObj->exitNumHash) {
+
+                    OUTER: foreach my $number ($roomObj->ivValues('exitNumHash')) {
+
+                        my $exitObj = $self->worldModelObj->ivShow('exitModelHash', $number);
+                        if ($exitObj) {
+
+                            # Draw the exit tag, if any, but not in mode 'no_exit'
+                            if ($mode ne 'no_exit' && $exitObj->exitTag) {
+
+                                $self->drawExitTag(
+                                    $exitObj,
+                                    $canvasWidget,
+                                    $roomObj,
+                                );
+                            }
+                        }
+                    }
+                }
+
+                # (Whether or not any room tags/room guilds/exit tags were drawn, count this as a
+                #   single drawing operation)
+                $count++;
+
+                if (! $parchmentObj->queueRoomInfoHash) {
+
+                    $self->updateSlaveInStack($parchmentObj, 6);
+                }
+
+                if ($checkTime && $count >= $checkCount) {
+
+                    if ($checkTime < $axmud::CLIENT->getTime()) {
+
+                        $stopFlag = TRUE;
+                        last OUTER;
+
+                    } else {
+
+                        $count = 0;
+                    }
+                }
+            }
+        }
+
+        # Draw labels (position #7 in the canvas drawing stack)
+        if (! $stopFlag) {
+
+            OUTER: foreach my $labelObj ($parchmentObj->ivValues('queueLabelHash')) {
+
+                $parchmentObj->ivDelete('queueLabelHash', $labelObj->number);
+
+                # Draw the label
+                $self->drawLabel($labelObj);
+                $count++;
+
+                if (! $parchmentObj->queueLabelHash) {
+
+                    $self->updateSlaveInStack($parchmentObj, 7);
+                }
+
+                if ($checkTime && $count >= $checkCount) {
+
+                    if ($checkTime < $axmud::CLIENT->getTime()) {
+
+                        $stopFlag = TRUE;
+                        last OUTER;
+
+                    } else {
+
+                        $count = 0;
+                    }
+                }
+            }
+        }
+
+        # Tidy up by resetting drawing cycle IVs
+        $self->tidyUpDraw();
+
+        # The next drawing cycle can insert canvas objects at arbitrary positions in the canvas
+        #   drawing stack
+        $self->ivPoke('quickDrawFlag', FALSE);
+        # Further calls to this function and to $self->doDraw are now allowed
+        $self->ivPoke('delayDrawFlag', FALSE);
+
+        # Return control to the calling function, having drawn some (or possibly all) of the
+        #   rooms, exits and/or labels waiting to be drawn
+        return 1;
+    }
+
+    sub updateSlaveInStack {
+
+        # Called by $self->doQuickDraw
+        # Canvas objects are arranged in a stack (so that labels are drawn above rooms). So that we
+        #   can quickly position new canvas objects in that stick, we use a small number of
+        #   invisible canvas objects. This function is called after (for example) all room boxes
+        #   have been drawn, or all exits have been drawn, to move one of the invisible canvas
+        #   objects to their correct stack position, which at the time of calling is at the top of
+        #   the stack
+        #
+        # Expected arguments
+        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) on which pre-draw operations
+        #                       are currently taking place
+        #   $posn           - The relative position of the invisible canvas objects, a value in the
+        #                       range 0-7 (defined in the comments for GA::Obj::Parchment->new)
+        #
+        # Return values
+        #   'undef' on improper arguments
+        #   1 otherwise
+
+        my ($self, $parchmentObj, $posn, $check) = @_;
+
+        # Check for improper arguments
+        if (! defined $parchmentObj || ! defined $posn || defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->updateSlaveInStack', @_);
+        }
+
+        foreach my $levelObj ($parchmentObj->ivValues('levelHash')) {
+
+            my $slaveObj = $levelObj->ivIndex('slaveCanvasObjList', $posn);
+            if ($slaveObj) {
+
+                $slaveObj->raise();
+            }
+        }
+
+        return 1;
+    }
+
     sub prepareDraw {
 
-        # During a drawing cycle, called by $self->doDraw for each region in which canvas objects
-        #   will be drawn (also called, outside of a drawing cycle, by $self->startDrag)
+        # During a drawing cycle, called by $self->doDraw/->doQuickDraw for each region in which
+        #   canvas objects will be drawn (also called, outside of a drawing cycle, by
+        #   $self->startDrag)
         # Optimises the drawing process by doing many of the size and position calculations in
         #   advance
         #
@@ -33779,32 +33996,11 @@
         # Decide on the size of room interior text. The value is based on the size of the room, by
         #   default; the value can be increased (or decreased) by the text size ratios stored in the
         #   world model
-        $self->ivPoke(
-            'drawRoomTextSize',
-            (
-                ($self->drawRoomTextWidth - 3) / 2
-                * Gtk2::Pango->scale()
-                * $self->drawRegionmap->magnification
-            ),
-        );
-
+        $self->ivPoke('drawRoomTextSize', (($self->drawRoomTextWidth - 3) / 2));
         # Decide on the size of text drawn for labels, room tags, room guilds and exit tags. The
         #   value is the size of text used by room tags, by default; the value can be increased (or
         #   (decreased) by the text size ratios stored in the world model
-        $self->ivPoke(
-            'drawOtherTextSize',
-            (
-                ($self->drawRegionmap->roomWidthPixels - 3) / 2
-                * Gtk2::Pango->scale()
-                * $self->drawRegionmap->magnification
-            ),
-        );
-
-        # (This value is used, when magnification is not applied to the size)
-        $self->ivPoke(
-            'drawDefaultTextSize',
-            (($self->drawRegionmap->roomWidthPixels - 3) / 2 * Gtk2::Pango->scale()),
-        );
+        $self->ivPoke('drawOtherTextSize', (($self->drawRegionmap->roomWidthPixels - 3) / 2));
 
         # Work out the position of each kind of exit in the sixteen cardinal directions, as if they
         #   were to be drawn at the top-left gridblock
@@ -33821,8 +34017,8 @@
 
     sub tidyUpDraw {
 
-        # Called by $self->doDraw at the end of a drawing cycle (also called, outside of a drawing
-        #   cycle, by $self->stopDrag)
+        # Called by $self->doDraw/->doQuickDraw at the end of a drawing cycle (also called, outside
+        #   of a drawing cycle, by $self->stopDrag)
         # Resets all drawing cycle IVs
         #
         # Expected arguments
@@ -33840,14 +34036,14 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->tidyUpDraw', @_);
         }
 
+        # (NB $self->drawCycleExitHash is emptied, when appropriate, by other functions)
+
         $self->ivUndef('drawRegionmap');
         $self->ivUndef('drawParchment');
-        $self->ivEmpty('drawCycleExitHash');
         $self->ivUndef('drawRoomTextSize');
         $self->ivUndef('drawRoomTextWidth');
         $self->ivUndef('drawRoomTextHeight');
         $self->ivUndef('drawOtherTextSize');
-        $self->ivUndef('drawDefaultTextSize');
 
         $self->ivUndef('blockCornerXPosPixels');
         $self->ivUndef('blockCornerYPosPixels');
@@ -34024,7 +34220,7 @@
             $vectorRef = $vectorHash{$key};
 
             # Find the coordinates of the pixel at the edge of the room, just outside the border,
-            #   from which a cardinal exit (one using the eigh compass directions) starts
+            #   from which a cardinal exit (one using the eight compass directions) starts
             ($exitStartXPosPixels, $exitStartYPosPixels) = $self->getExitStart(
                 0,
                 0,
@@ -34358,6 +34554,8 @@
         return 1;
     }
 
+    # Graphical operations - drawing canvas objects
+
     sub drawRoom {
 
         # Called by $self->doDraw or $self->startDrag
@@ -34381,8 +34579,8 @@
 
         # Local variables
         my (
-            $canvasWidget, $xPos, $yPos, $unallocatedCount, $unallocatableCount, $shadowCount,
-            $regionCount, $superRegionCount, $checkedCount, $roomTagCanvasObj,
+            $canvasWidget, $interiorMode, $xPos, $yPos, $unallocatedCount, $unallocatableCount,
+            $shadowCount, $regionCount, $superRegionCount, $checkedCount, $roomTagCanvasObj,
         );
 
         # Check for improper arguments
@@ -34409,6 +34607,9 @@
         }
 
         $canvasWidget = $self->drawParchment->ivShow('canvasWidgetHash', $roomObj->zPosBlocks);
+
+        # Get the interior text mode (e.g. 'none'), for speed
+        $interiorMode = $self->worldModelObj->roomInteriorMode;
 
         # Before drawing the canvas objects that make up this room, destroy any existing canvas
         #   objects from the last time the room was drawn
@@ -34453,32 +34654,35 @@
 
                     # Keep count of the total number of unallocated exits, and the number of
                     #   unallocatable exits - we'll need the counts later in this function
-                    if (
-                        $exitObj->drawMode eq 'temp_alloc'
-                        || $exitObj->drawMode eq 'temp_unalloc'
-                    ) {
-                        $unallocatedCount++;
-                        if ($exitObj->drawMode eq 'temp_unalloc') {
+                    if ($interiorMode ne 'none') {
 
-                            $unallocatableCount++;
+                        if (
+                            $exitObj->drawMode eq 'temp_alloc'
+                            || $exitObj->drawMode eq 'temp_unalloc'
+                        ) {
+                            $unallocatedCount++;
+                            if ($exitObj->drawMode eq 'temp_unalloc') {
+
+                                $unallocatableCount++;
+                            }
                         }
-                    }
 
-                    # Likewise, we keep count of the number of exits with shadow exits
-                    if ($exitObj->shadowExit) {
+                        # Likewise, we keep count of the number of exits with shadow exits
+                        if ($exitObj->shadowExit) {
 
-                        $shadowCount++;
-                    }
+                            $shadowCount++;
+                        }
 
-                    # And we also keep count of region/super region exits
-                    if ($exitObj->superFlag) {
+                        # And we also keep count of region/super region exits
+                        if ($exitObj->superFlag) {
 
-                        $superRegionCount++;
-                    }
+                            $superRegionCount++;
+                        }
 
-                    if ($exitObj->regionFlag) {
+                        if ($exitObj->regionFlag) {
 
-                        $regionCount++;
+                            $regionCount++;
+                        }
                     }
 
                     # Draw the exit. In $mode 'no_exit', we only draw exits whose ->mapDir is 'up'
@@ -34530,7 +34734,7 @@
                     #   for the room in a single entry in the hash
                     # (Also, there is no event handler for the canvas object(s) - clicking a checked
                     #   direction does nothing)
-                    $self->drawnParchment->addDrawnCheckedDir($roomObj, \@newObjList);
+                    $self->drawParchment->addDrawnCheckedDir($roomObj, \@newObjList);
                 }
             }
         }
@@ -34540,7 +34744,7 @@
             # Draw information displayed in the room's interior. If ->roomInteriorMode is set to
             #   'shadow_count', $unallocatedCount and $shadowCount are displayed; otherwise, these
             #   values are ignored and some other values are displayed
-            if ($self->worldModelObj->roomInteriorMode ne 'none') {
+            if ($interiorMode ne 'none') {
 
                 $self->drawRoomInteriorInfo(
                     $roomObj,
@@ -34591,7 +34795,7 @@
 
     sub drawExit {
 
-        # Called by $self->doDraw or $self->drawRoom
+        # Called by $self->doDraw/->doQuickDraw or $self->drawRoom
         # Draws a single exit (and its exit tag, if necessary)
         #
         # Expected arguments
@@ -34602,9 +34806,9 @@
         #
         # Optional arguments
         #   $canvasWidget, $roomObj
-        #               - Set when called by $self->drawRoom; the Gnome2::Canvas on which the room
-        #                   is drawn and the parent room itself. If not set, this function fetches
-        #                   them
+        #               - Set when called by $self->drawRoom; the canvas widget (GooCanvas2::Canvas)
+        #                   on which the room is drawn and the parent room itself. If not set, this
+        #                   function fetches them
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -34764,7 +34968,7 @@
         #   during the current drawing cycle
         # Exceptions: draw both and exit and its twin if they are broken or regions exits, but do
         #   draw both if the twin's map direction is 'up' or 'down'
-        $self->ivAdd('drawCycleExitHash', $exitObj->number, $exitObj);
+        $self->ivAdd('drawCycleExitHash', $exitObj->number, undef);
         if (
             $twinExitObj
             && $twinExitObj->mapDir ne 'up'
@@ -34772,11 +34976,7 @@
             && (! $twinExitObj->brokenFlag || $exitObj->bentFlag)
             && ! $twinExitObj->regionFlag
         ) {
-            $self->ivAdd(
-                'drawCycleExitHash',
-                $twinExitObj->number,
-                $twinExitObj,
-            );
+            $self->ivAdd('drawCycleExitHash', $twinExitObj->number, undef);
 
             # Delete the twin's canvas object (if it has one), so that $exitObj isn't drawn on
             #   top of its twin exit
@@ -34798,15 +34998,16 @@
 
     sub drawRoomTag {
 
-        # Called by $self->doDraw or $self->drawRoom
+        # Called by $self->doDraw/->doQuickDraw or $self->drawRoom
         # Draws (or redraws) a room tag, close to the room itself
         #
         # Expected arguments
         #   $roomObj        - The GA::ModelObj::Room whose tag is being drawn
         #
         # Optional arguments
-        #   $canvasWidget   - Set when called by $self->drawRoom; the Gnome2::Canvas on which the
-        #                       room is drawn. If not set, this function fetches its
+        #   $canvasWidget   - Set when called by $self->drawRoom; the canvas widget
+        #                       (GooCanvas2::Canvas) on which the room is drawn. If not set, this
+        #                       function fetches it
         #   $blockCornerXPosPixels, $blockCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's
         #                       gridblock. If not set, this function fetches them
@@ -34820,7 +35021,7 @@
         ) = @_;
 
         # Local variables
-        my ($posnListRef, $text, $textSize, $newObj, $adjust);
+        my ($posnListRef, $text, $textSize, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -34880,27 +35081,28 @@
         }
 
         # Set the text size
-        if (! $self->worldModelObj->fixedRoomTagFlag) {
-            $textSize = int($self->drawOtherTextSize * $self->worldModelObj->roomTagRatio);
-        } else {
-            $textSize = int($self->drawDefaultTextSize * $self->worldModelObj->roomTagRatio);
-        }
+        $textSize = int($self->drawOtherTextSize * $self->worldModelObj->roomTagRatio);
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Text',
-            x => ($blockCornerXPosPixels + $$posnListRef[2] + $roomObj->roomTagXOffset),
-            y => ($blockCornerYPosPixels + $$posnListRef[3] + $roomObj->roomTagYOffset),
-            fill_color => $self->getRoomTagColour($roomObj),
-            font => $self->worldModelObj->mapFont,
-            size => $textSize,
-            anchor => 'GTK_ANCHOR_CENTER',   # Default position is at the hypothetical exit
-            text => $text,
+        $newObj = GooCanvas2::CanvasText->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'anchor' => 'center',
+            'x' => ($blockCornerXPosPixels + $$posnListRef[2] + $roomObj->roomTagXOffset),
+            'y' => ($blockCornerYPosPixels + $$posnListRef[3] + $roomObj->roomTagYOffset),
+            'font' => $self->worldModelObj->mapFont . ' ' . $textSize,
+#            'use-markup' => FALSE,
+            'text' => $text,
+            'width' => -1,
+            'fill-color' => $self->getRoomTagColour($roomObj),
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTagStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 6));
+        }
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('room_tag', $newObj, $roomObj);
@@ -34913,15 +35115,16 @@
 
     sub drawRoomGuild {
 
-        # Called by $self->doDraw or $self->drawRoom
+        # Called by $self->doDraw/->doQuickDraw or $self->drawRoom
         # Draws (or redraws) a room guild, close to the room itself
         #
         # Expected arguments
         #   $roomObj        - The GA::ModelObj::Room whose tag is being drawn
         #
         # Optional arguments
-        #   $canvasWidget   - Set when called by $self->drawRoom; the Gnome2::Canvas on which the
-        #                       room is drawn. If not set, this function fetches its
+        #   $canvasWidget   - Set when called by $self->drawRoom; the the canvas widget
+        #                       (GooCanvas2::Canvas) on which the room is drawn. If not set, this
+        #                       function fetches it
         #   $blockCornerXPosPixels, $blockCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's
         #                       gridblock. If not set, this function fetches them
@@ -34935,7 +35138,7 @@
         ) = @_;
 
         # Local variables
-        my ($posnListRef, $textSize, $newObj, $adjust);
+        my ($posnListRef, $textSize, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -34983,27 +35186,28 @@
         $posnListRef = $self->ivShow('preDrawnLongExitHash', 'south');
 
         # Set the text size
-        if (! $self->worldModelObj->fixedRoomGuildFlag) {
-            $textSize = int($self->drawOtherTextSize * $self->worldModelObj->roomGuildRatio);
-        } else {
-            $textSize = int($self->drawDefaultTextSize * $self->worldModelObj->roomGuildRatio);
-        }
+        $textSize = int($self->drawOtherTextSize * $self->worldModelObj->roomGuildRatio);
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Text',
-            x => ($blockCornerXPosPixels + $$posnListRef[2] + $roomObj->roomGuildXOffset),
-            y => ($blockCornerYPosPixels + $$posnListRef[3] + $roomObj->roomGuildYOffset),
-            fill_color => $self->getRoomGuildColour($roomObj),
-            font => $self->worldModelObj->mapFont,
-            size => $textSize,
-            anchor => 'GTK_ANCHOR_CENTER',  # Default position is at the hypothetical exit
-            text => $roomObj->roomGuild,
+        $newObj = GooCanvas2::CanvasText->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'anchor' => 'center',
+            'x' => ($blockCornerXPosPixels + $$posnListRef[2] + $roomObj->roomGuildXOffset),
+            'y' => ($blockCornerYPosPixels + $$posnListRef[3] + $roomObj->roomGuildYOffset),
+            'font' => $self->worldModelObj->mapFont . ' ' . $textSize,
+#            'use-markup' => FALSE,
+            'text' => $roomObj->roomGuild,
+            'width' => -1,
+            'fill-color' => $self->getRoomGuildColour($roomObj),
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTagStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 6));
+        }
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('room_guild', $newObj, $roomObj);
@@ -35016,7 +35220,7 @@
 
     sub drawExitTag {
 
-        # Called by $self->doDraw, ->drawRoom and ->drawExit
+        # Called by $self->doDraw/->doQuickDraw, ->drawRoom and ->drawExit
         # Draws (or redraws) an exit tag, close to the exit itself
         #
         # Expected arguments
@@ -35024,9 +35228,9 @@
         #
         # Optional arguments
         #   $canvasWidget, $roomObj
-        #               - Set when called by $self->drawRoom/->drawExit; the Gnome2::Canvas on which
-        #                   the room is drawn and the parent room itself. If not set, this function
-        #                   fetches them
+        #               - Set when called by $self->drawRoom/->drawExit; the canvas widget
+        #                   (GooCanvas2::Canvas) on which the room is drawn and the parent room
+        #                   itself. If not set, this function fetches them
         #
         # Return values
         #   'undef' on improper arguments or if the room tag can't be drawn
@@ -35035,7 +35239,7 @@
         my ($self, $exitObj, $canvasWidget, $roomObj, $check) = @_;
 
         # Local variables
-        my ($posnListRef, $colour, $textSize, $xPos, $yPos, $newObj);
+        my ($posnListRef, $colour, $textSize, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $exitObj || defined $check) {
@@ -35081,31 +35285,33 @@
         $colour = $self->getExitTagColour($exitObj);
 
         # Set the text size
-        if (! $self->worldModelObj->fixedExitTagFlag) {
-            $textSize = int($self->drawOtherTextSize * $self->worldModelObj->exitTagRatio);
-        } else {
-            $textSize = int($self->drawDefaultTextSize * $self->worldModelObj->exitTagRatio);
-        }
+        $textSize = int($self->drawOtherTextSize * $self->worldModelObj->exitTagRatio);
 
         # Get the position of $roomObj's gridblock
         $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
         $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Text',
-            x => ($$posnListRef[2] + $xPos + $exitObj->exitTagXOffset),
-            y => ($$posnListRef[3] + $yPos + $exitObj->exitTagYOffset),
-            fill_color => $colour,
-            font => $self->worldModelObj->mapFont,
-            size => $textSize,
-            anchor => $self->ivShow('constGtkAnchorHash', $exitObj->mapDir), # e.g. 'GTK_ANCHOR_S'
-            text => $exitObj->exitTag,
+        $newObj = GooCanvas2::CanvasText->new(
+            'parent' => $canvasWidget->get_root_item(),
+            # e.g. 'GOO_CANVAS_ANCHOR_S'
+            'anchor' => $self->ivShow('constGtkAnchorHash', $exitObj->mapDir),
+            'x' => ($$posnListRef[2] + $xPos + $exitObj->exitTagXOffset),
+            'y' => ($$posnListRef[3] + $yPos + $exitObj->exitTagYOffset),
+            'font' => $self->worldModelObj->mapFont . ' ' . $textSize,
+#            'use-markup' => FALSE,
+            'text' => $exitObj->exitTag,
+            'width' => -1,
+            'fill-color' => $colour,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTagStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 6));
+        }
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('exit_tag', $newObj, $exitObj);
@@ -35118,7 +35324,7 @@
 
     sub drawLabel {
 
-        # Called by $self->doDraw
+        # Called by $self->doDraw/->doQuickDraw
         # Draws (or redraws) a map label
         #
         # Expected arguments
@@ -35132,8 +35338,8 @@
 
         # Local variables
         my (
-            $canvasWidget, $styleObj, $useObj, $colour, $markup, $textSize, $newObj, $newObj2, $x1,
-            $y1, $x2, $y2,
+            $canvasWidget, $styleObj, $useObj, $colour, $markup, $text, $textSize, $newObj,
+            $boundsObj, $newObj2,
             @newObjList,
         );
 
@@ -35207,18 +35413,15 @@
             }
         }
 
-        if ($useObj->gravity) {
-
-            if (! $markup) {
-                $markup = 'gravity="' . $useObj->gravity . '"';
-            } else {
-                $markup .= ' gravity="' . $useObj->gravity . '"';
-            }
-        }
-
         if ($markup) {
 
-            $markup = '<span ' . $markup . '>' . $labelObj->name . '</span>';
+            $text = $labelObj->name;
+            # Pango will complain about certain characters, so replace them with an entity
+            $text =~ s/\&/&amp;/g;
+            $text =~ s/\</&lt;/g;
+            $text =~ s/\>/&gt;/g;
+
+            $markup = '<span ' . $markup . '>' . $text . '</span>';
         }
 
         if ($useObj->italicsFlag) {
@@ -35241,67 +35444,64 @@
             $markup = '<s>' . $markup . '</s>';
         }
 
-        # Gnome2::Canvas will complain about & characters, so replace them with an entity
-        $markup =~ s/\&/&amp;/;
-
         # Set the text size
-        if (! $self->worldModelObj->fixedLabelFlag) {
-
-            $textSize = int(
-                $self->drawOtherTextSize * $self->worldModelObj->labelRatio * $useObj->relSize
-            );
-
-        } else {
-
-            $textSize = int(
-                $self->drawDefaultTextSize * $self->worldModelObj->labelRatio * $useObj->relSize
-            );
-        }
+        $textSize = int(
+            $self->drawOtherTextSize * $self->worldModelObj->labelRatio * $useObj->relSize
+        );
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Text',
-            x => $labelObj->xPosPixels,
-            y => $labelObj->yPosPixels,
-            font => $self->worldModelObj->mapFont,
-            size => $textSize,
-            anchor => 'GTK_ANCHOR_W',   # Draw text to the right of the original mouse click
-            markup => $markup,
+        $newObj = GooCanvas2::CanvasText->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'anchor' => 'GOO_CANVAS_ANCHOR_W',  # Draw text to the right of the original mouse click
+            'x' => $labelObj->xPosPixels,
+            'y' => $labelObj->yPosPixels,
+            'font' => $self->worldModelObj->mapFont . ' ' . $textSize,
+            'use-markup' => TRUE,
+            'text' => $markup,
+            'width' => -1,
+#            'fill-color' => '#000000',
         );
 
         push (@newObjList, $newObj);
 
+        # Rotate the label, if required
+        if ($useObj->rotateAngle) {
+
+            $newObj->rotate($useObj->rotateAngle, $labelObj->xPosPixels, $labelObj->yPosPixels);
+        }
+
+        # Get the bounds of the space used by the label (a GooCanvas2::CanvasBounds objects)
+        $boundsObj = $newObj->get_bounds();
+
         # Draw a box at the same position, if required
         if ($useObj->boxFlag) {
 
-            ($x1, $y1, $x2, $y2) = $newObj->get_bounds();
-
             if (! $useObj->underlayColour) {
 
-                $newObj2 = Gnome2::Canvas::Item->new(
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Rect',
-                    x1 => $x1 - 10,
-                    y1 => $y1 - 10,
-                    x2 => $x2 + 10,
-                    y2 => $y2 + 10,
-                    outline_color => $colour,
+                $newObj2 = GooCanvas2::CanvasRect->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'x' => $boundsObj->x1 - 10,
+                    'y' => $boundsObj->y1 - 10,
+                    'width' => $boundsObj->x2 - $boundsObj->x1 + 20,
+                    'height' => $boundsObj->y2 - $boundsObj->y1 + 20,
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
 
             } else {
 
                 # Use the fill colour as the text's underlay colour, so everything inside the box
                 #   border is coloured
-                $newObj2 = Gnome2::Canvas::Item->new(
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Rect',
-                    x1 => $x1 - 10,
-                    y1 => $y1 - 10,
-                    x2 => $x2 + 10,
-                    y2 => $y2 + 10,
-                    outline_color => '#000000',
-                    fill_color => $useObj->underlayColour,
+                $newObj2 = GooCanvas2::CanvasRect->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'x' => $boundsObj->x1 - 10,
+                    'y' => $boundsObj->y1 - 10,
+                    'width' => $boundsObj->x2 - $boundsObj->x1 + 20,
+                    'height' => $boundsObj->y2 - $boundsObj->y1 + 20,
+#                    'line-width' => 2,
+                    'stroke-color' => '#000000',
+                    'fill-color' => $useObj->underlayColour,
                 );
             }
 
@@ -35312,7 +35512,7 @@
         #   the text
         foreach my $canvasObj (reverse @newObjList) {
 
-            $self->setLabelStackPosn($canvasObj);
+            $canvasObj->raise();
         }
 
         # Set up the event handler for the canvas object (only for the text - not the box)
@@ -35328,12 +35528,12 @@
         return 1;
     }
 
-    # Graphical operations - map object support functions
+    # Graphical operations - drawing canvas objects, supplementary functions
 
     sub drawRoomBox {
 
-        # Called by $self->drawRoom to draw the room box in two colours - a border, and an interior
-        #   (and some graffiti, if this room has been tagged with graffiti)
+        # Called by $self->drawRoom/->doQuickDraw to draw the room box in two colours - a border,
+        #   and an interior (and some graffiti, if this room has been tagged with graffiti)
         #
         # Expected arguments
         #   $mode       - Matches the ->drawExitMode IV in GA::Obj::WorldModel or
@@ -35344,8 +35544,8 @@
         #
         # Optional arguments
         #   $canvasWidget
-        #               - Set when called by $self->drawRoom; the Gnome2::Canvas on which the room
-        #                   box is drawn. If not set, this function fetches it
+        #               - Set when called by $self->drawRoom; the canvas widget (GooCanvas2::Canvas)
+        #                   on which the room box is drawn. If not set, this function fetches it
         #   $dragFlag   - Set to TRUE when called by $self->drawRoom was itself called by
         #                   $self->startDrag, in which case we don't draw extra markings like
         #                   interior text or an emphasised border
@@ -35361,9 +35561,9 @@
 
         # Local variables
         my (
-            $x2, $y2, $borderColour, $currentMode, $roomColour, $newObj, $newObj2, $newObj3,
-            $newObj4, $newObj5, $newObj6, $gap, $posnSet, $origColour, $fillColour, $centreX,
-            $centreY, $xSize, $ySize,
+            $roomWidth, $roomHeight, $borderColour, $currentMode, $roomColour, $borderSize,
+            $levelObj, $newObj, $origColour, $newObj2, $fillColour, $xSize, $ySize, $newObj3,
+            $strokeColour, $newObj4, $slaveObj,
             @objList,
         );
 
@@ -35384,17 +35584,15 @@
         # In draw exit mode 'no_exit' (draw no exits), the room takes up the whole gridblock
         if ($mode eq 'no_exit') {
 
-            # Delete 2 pixels to allow a 1-pixel border on each side of the room box; otherwise,
-            #   the room's borders touch and will look like double-width lines
-            $x2 = $borderCornerXPosPixels + $self->drawRegionmap->blockWidthPixels - 3;
-            $y2 = $borderCornerYPosPixels + $self->drawRegionmap->blockHeightPixels - 3;
+            $roomWidth = $self->drawRegionmap->blockWidthPixels;
+            $roomHeight = $self->drawRegionmap->blockWidthPixels;
 
         # In draw exit mode 'simple_exit'/'complex_exit', the room takes up the middle part of the
         #   gridblock
         } else {
 
-            $x2 = $borderCornerXPosPixels + $self->drawRegionmap->roomWidthPixels - 1;
-            $y2 = $borderCornerYPosPixels + $self->drawRegionmap->roomHeightPixels - 1;
+            $roomWidth = $self->drawRegionmap->roomWidthPixels;
+            $roomHeight = $self->drawRegionmap->roomHeightPixels;
         }
 
         # Get the border colour. If $roomObj is the current, last known or ghost room, $currentMode
@@ -35413,44 +35611,31 @@
             $roomColour = $self->getRoomColour($roomObj);
         }
 
-        # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => $borderCornerXPosPixels,
-            y1 => $borderCornerYPosPixels,
-            x2 => $x2,
-            y2 => $y2,
-            outline_color => $borderColour,
-            fill_color => $roomColour,
+        # Set the room box's border width
+        if (! $dragFlag && $currentMode eq 'double') {
+            $borderSize = 4;
+        } else {
+            $borderSize = 2;
+        }
+
+        # Need to adjust the canvas objects' stack positions, later in the function
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+
+        # Draw the canvas object for the room box itself
+        $newObj = GooCanvas2::CanvasRect->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'x' => $borderCornerXPosPixels + ($borderSize / 2) - 1,
+            'y' => $borderCornerYPosPixels + ($borderSize / 2) - 1,
+            'width' => $roomWidth - $borderSize + 1,
+            'height' => $roomHeight - $borderSize + 1,
+            'line-width' => $borderSize,
+            'stroke-color' => $borderColour,
+            'fill-color' => $roomColour,
         );
 
         push (@objList, $newObj);
 
         if (! $dragFlag) {
-
-            # For current/last known/ghost rooms, the border can be drawn 2 pixels wide
-            # In fact, we draw another box, just below the first one
-            if ($currentMode eq 'double') {
-
-                $newObj2 = Gnome2::Canvas::Item->new(
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Rect',
-                    x1 => ($borderCornerXPosPixels - 1),
-                    y1 => ($borderCornerYPosPixels - 1),
-                    x2 => ($x2 + 1),
-                    y2 => ($y2 + 1),
-                    outline_color => $borderColour,
-                );
-
-                push (@objList, $newObj2);
-
-                $gap = 2;       # Use this value for drawing graffiti in the right place
-
-            } else {
-
-                $gap = 1;
-            }
 
             # Grafitti and wilderness markings don't change colour along with the room border
             $origColour = $self->worldModelObj->borderColour;
@@ -35458,35 +35643,23 @@
             # If the room has been tagged with graffiti, draw a big X
             if ($self->graffitiModeFlag && $self->ivExists('graffitiHash', $roomObj->number)) {
 
-                $newObj3 = Gnome2::Canvas::Item->new(
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [
-                        ($borderCornerXPosPixels + $gap),
-                        ($borderCornerYPosPixels + $gap),
-                        ($x2 - $gap),
-                        ($y2 - $gap),
-                    ],
-                    fill_color => $origColour,
-                    width_units => 2,
-                    cap_style => 'round',
+                $newObj2 = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' =>
+                        'M ' . ($borderCornerXPosPixels + 1)
+                        . ' ' . ($borderCornerYPosPixels + 1)
+                        . ' L ' . ($borderCornerXPosPixels + $roomWidth - 1)
+                        . ' ' . ($borderCornerYPosPixels + $roomHeight - 1)
+                        . ' M ' . ($borderCornerXPosPixels + $roomWidth - 1)
+                        . ' ' . ($borderCornerYPosPixels + 1)
+                        . ' L ' . ($borderCornerXPosPixels + 1)
+                        . ' ' . ($borderCornerYPosPixels + $roomHeight - 1),
+#                    'line-width' => 2,
+                    'stroke-color' => $origColour,
+#                    'fill-color' => $origColour,
                 );
 
-                $newObj4 = Gnome2::Canvas::Item->new(
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [
-                        ($x2 - $gap),
-                        ($borderCornerYPosPixels + $gap),
-                        ($borderCornerXPosPixels + $gap),
-                        ($y2 - $gap),
-                    ],
-                    fill_color => $origColour,
-                    width_units => 2,
-                    cap_style => 'round',
-                );
-
-                push (@objList, $newObj3, $newObj4);
+                push (@objList, $newObj2);
             }
 
             # If it's a wilderness room, mark it as one
@@ -35498,27 +35671,23 @@
                     $fillColour = $roomColour;          # Empty circle
                 }
 
-                $centreX = $borderCornerXPosPixels + int($self->drawRegionmap->roomWidthPixels / 2);
-                $centreY = $borderCornerYPosPixels
-                    + int($self->drawRegionmap->roomHeightPixels / 2);
-                $xSize = int($self->drawRegionmap->roomWidthPixels / 10);    # Either side of centre
-                $ySize = int($self->drawRegionmap->roomHeightPixels / 5);    # One side of centre
-
                 # Don't draw a circle of zero size/width
+                $xSize = int($roomWidth / 10);
+                $ySize = int($roomHeight / 10);    # One side of centre
                 if ($xSize && $ySize) {
 
-                    $newObj5 = Gnome2::Canvas::Item->new(
-                        $canvasWidget->root(),
-                        'Gnome2::Canvas::Ellipse',
-                        x1 => $centreX - $xSize,
-                        y1 => $centreY,
-                        x2 => $centreX + $xSize,
-                        y2 => $centreY + $ySize,
-                        outline_color => $origColour,
-                        fill_color => $fillColour,
+                    $newObj3 = GooCanvas2::CanvasEllipse->new(
+                        'parent' => $canvasWidget->get_root_item(),
+                        # center-x and center-y are fractional numbers, to get the position right
+                        'center-x' => $borderCornerXPosPixels + ($roomWidth / 2),
+                        'center-y' => $borderCornerYPosPixels + ($roomHeight / 2) + $ySize,
+                        'radius_x'  => $xSize,
+                        'radius_y' => $ySize,
+                        'stroke-color' => $origColour,
+                        'fill-color' => $fillColour,
                     );
 
-                    push (@objList, $newObj5);
+                    push (@objList, $newObj3);
                 }
             }
 
@@ -35528,120 +35697,88 @@
                 && $self->mapObj->currentRoom
                 && $self->mapObj->currentRoom eq $roomObj
             ) {
-                # (Use the same coordinates as the wilderness room marking)
-                if (! defined $centreX) {
-
-                    $centreX = $borderCornerXPosPixels
-                        + int($self->drawRegionmap->roomWidthPixels / 2);
-                    $centreY = $borderCornerYPosPixels
-                        + int($self->drawRegionmap->roomHeightPixels / 2);
-                    $xSize = int($self->drawRegionmap->roomWidthPixels / 10);
-                    $ySize = int($self->drawRegionmap->roomHeightPixels / 5);
-                }
-
                 # Don't draw a square of zero size/width
+                $xSize = int($roomWidth / 10);
+                $ySize = int($roomHeight / 10);
                 if ($xSize && $ySize) {
 
                     # For 1 matching room, draw a (default) black square. For multiple matching
                     #   rooms, draw a (default) red square
                     if ($self->mapObj->ivNumber('currentMatchList') == 1) {
-
-                        $newObj6 = Gnome2::Canvas::Item->new(
-                            $canvasWidget->root(),
-                            'Gnome2::Canvas::Rect',
-                            x1 => $centreX - $xSize,
-                            y1 => $centreY,
-                            x2 => $centreX + $xSize,
-                            y2 => $centreY + $ySize,
-                            outline_color => $origColour,
-                        );
-
+                        $strokeColour = $origColour;
                     } else {
-
-                        $newObj6 = Gnome2::Canvas::Item->new(
-                            $canvasWidget->root(),
-                            'Gnome2::Canvas::Rect',
-                            x1 => $centreX - $xSize,
-                            y1 => $centreY,
-                            x2 => $centreX + $xSize,
-                            y2 => $centreY + $ySize,
-                            outline_color => $self->worldModelObj->currentBorderColour,
-                        );
+                        $strokeColour = $self->worldModelObj->currentBorderColour;
                     }
 
-                    push (@objList, $newObj6);
+                    $newObj4 = GooCanvas2::CanvasRect->new(
+                        'parent' => $canvasWidget->get_root_item(),
+                        'x' => $borderCornerXPosPixels + ($roomWidth / 2) - $xSize,
+                        'y' => $borderCornerYPosPixels + ($roomHeight / 2),
+                        'width' => ($xSize * 2),
+                        'height' => ($ySize * 2),
+#                        'line-width' => 2,
+                        'stroke-color' => $strokeColour,
+#                        'fill-color' => $strokeColour,
+                    );
+
+                    push (@objList, $newObj4);
                 }
             }
+        }
 
-            # Set the objects' positions in the canvas drawing stack
-            if ($newObj5) {
-
-                $posnSet = $self->setRoomStackPosn($self->drawParchment, $newObj5, $roomObj);
-
-                # Set up the event handlers for the canvas objects
-                $self->setupCanvasObjEvent('room', $newObj5, $roomObj);
-            }
-
-            if ($newObj6) {
-
-                # $posnSet 'undef' if room not in wilderness mode
-                $posnSet = $self->setRoomStackPosn(
-                    $self->drawParchment,
-                    $newObj6,
-                    $roomObj,
-                    $posnSet,
-                );
-
-                # Set up the event handlers for the canvas objects
-                $self->setupCanvasObjEvent('room', $newObj6, $roomObj);
-            }
+        # Set the canvas objects' positions in the canvas drawing stack, and set up event handlers
+        #   for each canvas object
+        if ($self->quickDrawFlag) {
 
             if ($newObj3) {
 
-                $posnSet = $self->setRoomStackPosn(
-                    $self->drawParchment,
-                    $newObj3,
-                    $roomObj,
-                    $posnSet,
-                );
-
-                $posnSet = $self->setRoomStackPosn(
-                    $self->drawParchment,
-                    $newObj4,
-                    $roomObj,
-                    $posnSet,
-                );
-
-                # Set up the event handlers for the canvas objects
+                $newObj3->raise();
                 $self->setupCanvasObjEvent('room', $newObj3, $roomObj);
+            }
+
+            if ($newObj4) {
+
+                $newObj4->raise();
                 $self->setupCanvasObjEvent('room', $newObj4, $roomObj);
             }
 
             if ($newObj2) {
 
-                $posnSet = $self->setRoomStackPosn(
-                    $self->drawParchment,
-                    $newObj2,
-                    $roomObj,
-                    $posnSet,
-                );
-
-                # Set up the event handler for the canvas object
+                $newObj2->raise();
                 $self->setupCanvasObjEvent('room', $newObj2, $roomObj);
             }
-        }
 
-        # $posnSet 'undef' if room not emphasised
-        $self->setRoomStackPosn($self->drawParchment, $newObj, $roomObj, $posnSet);
-        # Set up the event handler for the canvas object
-        $self->setupCanvasObjEvent('room', $newObj, $roomObj);
+            $newObj->raise();
+            $self->setupCanvasObjEvent('room', $newObj, $roomObj);
+
+        } else {
+
+            $slaveObj = $levelObj->ivIndex('slaveCanvasObjList', 3);
+
+            if ($newObj3) {
+
+                $newObj3->lower($slaveObj);
+                $self->setupCanvasObjEvent('room', $newObj3, $roomObj);
+            }
+
+            if ($newObj4) {
+
+                $newObj4->lower($slaveObj);
+                $self->setupCanvasObjEvent('room', $newObj4, $roomObj);
+            }
+
+            if ($newObj2) {
+
+                $newObj2->lower($slaveObj);
+                $self->setupCanvasObjEvent('room', $newObj2, $roomObj);
+            }
+
+            $newObj->lower($slaveObj);
+            $self->setupCanvasObjEvent('room', $newObj, $roomObj);
+        }
 
         # Store the canvas object(s)
         $self->drawParchment->addDrawnRoom($roomObj, \@objList);
-        if ($newObj2) {
-
-            $self->drawParchment->addDrawnDummyRoom($roomObj, \@objList);
-        }
 
         return 1;
     }
@@ -35657,12 +35794,12 @@
         #
         # Return values
         #   'undef' on improper arguments or if the fake room can't be drawn
-        #   Otherwise, returns the Gnome2::Canvas::Rect drawn
+        #   Otherwise, returns the GooCanvas2::CanvasRect drawn
 
         my ($self, $roomObj, $check) = @_;
 
         # Local variables
-        my ($canvasWidget, $mode, $xPos, $yPos, $x1, $y1, $x2, $y2, $newObj);
+        my ($canvasWidget, $mode, $roomWidth, $roomHeight, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || defined $check) {
@@ -35693,41 +35830,43 @@
             $mode = $self->worldModelObj->drawExitMode;
         }
 
-        # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels;
-
-        # Get the coordinates of the top-left corner of the room's border
-        $x1 = $self->borderCornerXPosPixels + $xPos;
-        $y1 = $self->borderCornerYPosPixels + $yPos;
-        # Get the coordinates of the bottom-right corner of the room's border
+        # In draw exit mode 'no_exit' (draw no exits), the room takes up the whole gridblock
         if ($mode eq 'no_exit') {
 
-            $x2 = $x1 + $self->currentRegionmap->blockWidthPixels - 3;
-            $y2 = $y1 + $self->currentRegionmap->blockHeightPixels - 3;
+            $roomWidth = $self->drawRegionmap->blockWidthPixels;
+            $roomHeight = $self->drawRegionmap->blockWidthPixels;
 
+        # In draw exit mode 'simple_exit'/'complex_exit', the room takes up the middle part of the
+        #   gridblock
         } else {
 
-            $x2 = $x1 + $self->currentRegionmap->roomWidthPixels - 1;
-            $y2 = $y1 + $self->currentRegionmap->roomHeightPixels - 1;
+            $roomWidth = $self->drawRegionmap->roomWidthPixels;
+            $roomHeight = $self->drawRegionmap->roomHeightPixels;
         }
 
         # The fake room has a normal border colour (default black) and the same interior colour as
         #   the map itself (default cream)
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => $x1,
-            y1 => $y1,
-            x2 => $x2,
-            y2 => $y2,
-            outline_color => $self->worldModelObj->borderColour,
-            fill_color => $self->worldModelObj->backgroundColour,
+        $newObj = GooCanvas2::CanvasRect->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'x' => $self->borderCornerXPosPixels
+                    + ($roomObj->xPosBlocks * $self->currentRegionmap->blockWidthPixels) + 1,
+            'y' => $self->borderCornerYPosPixels
+                    + ($roomObj->yPosBlocks * $self->currentRegionmap->blockHeightPixels) + 1,
+            'width' => $roomWidth - 2,
+            'height' => $roomHeight - 2,
+#            'line-width' => 2,
+            'stroke-color' => $self->worldModelObj->borderColour,
+            'fill-color' => $self->worldModelObj->backgroundColour,
         );
 
-        # Set the object's position in the canvas drawing stack
-        # (Same priority as room echos, 1 above map background)
-        $self->setEchoStackPosn($self->currentParchment, $newObj);
+        # Set the canvas object's position in the canvas drawing stack (using same priority as room
+        #   echoes). There is event handler for this canvas object
+        $levelObj = $self->currentParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 2));
+        }
 
         # The calling function stores $newObj in an IV
         return $newObj;
@@ -35735,7 +35874,7 @@
 
     sub drawRoomEcho {
 
-        # Called by $self->drawRoom
+        # Called by $self->drawRoom/->doQuickDraw
         # Draws a room echo for a room just above or just below the current level
         #
         # Expected arguments
@@ -35755,8 +35894,8 @@
 
         # Local variables
         my (
-            $canvasWidget, $xPos, $yPos, $x1, $y1, $x2, $y2, $xMod, $yMod, $outlineColour,
-            $fillColour, $newObj,
+            $canvasWidget, $roomWidth, $roomHeight, $xMod, $yMod, $outlineColour, $fillColour,
+            $newObj, $levelObj,
         );
 
         # Check for improper arguments
@@ -35776,32 +35915,29 @@
             );
         }
 
-        $canvasWidget
-            = $self->drawParchment->ivShow('canvasWidgetHash', ($roomObj->zPosBlocks + $echoMode));
+        $canvasWidget = $self->drawParchment->ivShow(
+            'canvasWidgetHash',
+            ($roomObj->zPosBlocks + $echoMode),
+        );
 
-        # Get the position of $roomObj's gridblock
-        $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
-        $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
-
-        # Get the coordinates of the top-left corner of the room's border
-        $x1 = $self->borderCornerXPosPixels + $xPos;
-        $y1 = $self->borderCornerYPosPixels + $yPos;
-        # Get the coordinates of the bottom-right corner of the room's border
+        # In draw exit mode 'no_exit' (draw no exits), the room takes up the whole gridblock
         if ($exitMode eq 'no_exit') {
 
-            $x2 = $x1 + $self->drawRegionmap->blockWidthPixels - 3;
-            $y2 = $y1 + $self->drawRegionmap->blockHeightPixels - 3;
+            $roomWidth = $self->drawRegionmap->blockWidthPixels;
+            $roomHeight = $self->drawRegionmap->blockWidthPixels;
 
+        # In draw exit mode 'simple_exit'/'complex_exit', the room takes up the middle part of the
+        #   gridblock
         } else {
 
-            $x2 = $x1 + $self->drawRegionmap->roomWidthPixels - 1;
-            $y2 = $y1 + $self->drawRegionmap->roomHeightPixels - 1;
+            $roomWidth = $self->drawRegionmap->roomWidthPixels;
+            $roomHeight = $self->drawRegionmap->roomHeightPixels;
         }
 
         # A room above the current level should be drawn slightly northwest of the usual position.
         #   A room below the current level should be drawn slightly southeast
-        $xMod = int($echoMode * ($self->drawRegionmap->roomWidthPixels / 5));
-        $yMod = int($echoMode * ($self->drawRegionmap->roomHeightPixels / 5));
+        $xMod = int($echoMode * ($roomWidth / 5));
+        $yMod = int($echoMode * ($roomHeight / 5));
 
         # Set the colours to use
         if ($echoMode == 1) {
@@ -35816,20 +35952,26 @@
         }
 
         # Draw the room echo
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => ($x1 - $xMod),        # Use minus so that rooms above are drawn to northwest...
-            y1 => ($y1 - $yMod),        # ...and rooms below are drawn to southeast
-            x2 => ($x2 - $xMod),
-            y2 => ($y2 - $yMod),
-            outline_color => $outlineColour,
-            fill_color => $fillColour,
+        $newObj = GooCanvas2::CanvasRect->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'x' => $self->borderCornerXPosPixels + $xMod + 1
+                    + ($roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels),
+            'y' => $self->borderCornerYPosPixels + $yMod + 1
+                    + ($roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels),
+            'width' => $roomWidth - 2,
+            'height' => $roomHeight - 2,
+#            'line-width' => 2,
+            'stroke-color' => $outlineColour,
+            'fill-color' => $fillColour,
         );
 
-        # Set the object's position in the canvas drawing stack
-        $self->setEchoStackPosn($self->drawParchment, $newObj);
-
+        # Set the canvas object's position in the canvas drawing stack (using same priority as room
+        #   echoes)
+        $levelObj = $self->drawParchment->ivShow('levelHash', ($roomObj->zPosBlocks + $echoMode));
+        # We don't check ->quickDrawFlag, as we usually would, because the level that's being drawn
+        #   by a call to $self->doQuickDraw isn't necessarily the one on which the room echo
+        #   appears
+        $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 2));
         # Set up the event handler for the canvas object. Pretend that it was a click on the map
         #   background by calling ->setupCanvasEvent, not ->setupCanvasObjEvent
         $self->setupCanvasEvent($newObj);
@@ -35843,14 +35985,14 @@
 
     sub drawRoomInteriorInfo {
 
-        # Called by $self->drawRoom
+        # Called by $self->drawRoom/->doQuickDraw
         # Draws information displayed in the room interior. Which information to display depends on
         #   GA::Obj::WorldModel->roomInteriorMode (for example, in mode 'temp_count', the number of
         #   living and non-living things in the Locator's current room is displayed)
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #
@@ -36155,7 +36297,7 @@
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #   $corner         - Which corner to use
@@ -36169,7 +36311,7 @@
         #   $text           - The text to draw. If an empty string or 'undef', nothing is drawn
         #   $style          - The text's style, 'normal', 'oblique' or 'italic'. If 'undef',
         #                       'normal' is used
-        #   $underline      - The text's underline, 'none', 'single', 'double' or 'error'. If
+        #   $underline      - The text's underline, 'none', 'single', 'double', 'low' or 'error'. If
         #                       'undef', 'none' is used (NB Only intended to be used for up/down
         #                       exits)
         #   $weight         - The text's weight. A normal weight is 400; a bold weight is 600. If
@@ -36185,7 +36327,7 @@
         ) = @_;
 
         # Local variables
-        my ($textXPosPixels, $textYPosPixels, $textSizePixels, $listRef, $newObj, $yMod);
+        my ($textXPosPixels, $textYPosPixels, $markup, $yMod, $newObj, $levelObj);
 
         # Check for improper arguments
         if (
@@ -36235,50 +36377,61 @@
             $textYPosPixels = $borderCornerYPosPixels + int($self->drawRoomTextHeight / 2) + 1;
         }
 
-        # Set the style, if not specified
+        # Set the style, underline and weight attributes. Some underline settings need us to move
+        #   the characters up a few pixels, in which case $yMod is set
+        $markup = '<span ';
+
         if (! $style) {
-
-            $style = 'normal';
+            $markup .= ' font_style="normal"';
+        } else {
+            $markup .= ' font_style="' . $style . '"';
         }
 
-        # Set the underline, if not specified. Some underline settings need us to move the
-        #   character up a few pixels, in which case $yMod is set
         $yMod = 0;
+        if (! $underline || $underline eq 'none') {
 
-        if (! $underline) {
-            $underline = 'none';
-        } elsif ($underline eq 'single') {
-            $yMod = -2;
-        } elsif ($underline eq 'error') {
-            $yMod = -2;     # -3 would be consistent with other values
-        } elsif ($underline eq 'double') {
-            $yMod = -4;     # not currently used by any text
+            $markup .= ' underline="none"';
+
+        } else {
+
+            $markup .= ' underline="' . $underline . '"';
+
+            if ($underline eq 'single' || $underline eq 'low') {
+                $yMod = -1;
+            } elsif ($underline eq 'double' || $underline eq 'error') {
+                $yMod = -2;
+            }
         }
 
-        # Set the weight, if not specified
         if (! $weight) {
-
-            $weight = 400;
+            $markup .= ' weight=\'400\'';
+        } else {
+            $markup .= ' weight=\'' . $weight . '\'';
         }
+
+        $markup .= '>' . $text . '</span>';
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new(
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Text',
-            x => $textXPosPixels,
-            y => $textYPosPixels + $yMod,
-            font => $self->worldModelObj->mapFont,
-            size => int($self->drawRoomTextSize * $self->worldModelObj->roomTextRatio),
-            fill_color => $self->worldModelObj->roomTextColour,
-            anchor => 'GTK_ANCHOR_NW',
-            text => $text,
-            style => $style,
-            underline => $underline,
-            weight => $weight,
+        $newObj = GooCanvas2::CanvasText->new(
+            'parent' => $canvasWidget->get_root_item(),
+#            'anchor' => 'nw',
+            'x' => $textXPosPixels,
+            'y' => $textYPosPixels + $yMod,
+            'font' => $self->worldModelObj->mapFont . ' '
+                        . int($self->drawRoomTextSize * $self->worldModelObj->roomTextRatio),
+            'use-markup' => TRUE,
+            'text' => $markup,
+            'width' => -1,
+            'fill-color' => $self->worldModelObj->roomTextColour,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setTextStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 4));
+        }
 
         # (No event handler for this canvas object)
 
@@ -36290,12 +36443,12 @@
 
     sub drawUnallocatableCount {
 
-        # Called by $self->drawRoom to display the number of unallocatable exits for this room in
-        #   the bottom-centre of the room box
+        # Called by $self->drawRoom/->doQuickDraw to display the number of unallocatable exits for
+        #   this room in the bottom-centre of the room box
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $count          - The number of unallocatable exits in this room
         #
         # Return values
@@ -36347,7 +36500,7 @@
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #   $leftCount      - The number drawn in the top-left of the room's interior
@@ -36419,7 +36572,7 @@
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #   $roomFlag       - The room flag to draw. Matches a key in
@@ -36471,7 +36624,7 @@
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #
@@ -36526,7 +36679,7 @@
         #
         # Expected arguments
         #   $roomObj        - The GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #
@@ -36596,7 +36749,7 @@
         #
         # Expected arguments
         #   $roomObj        - The GA::ModelObj::Room being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $borderCornerXPosPixels, $borderCornerYPosPixels
         #                   - Coordinates of the pixel at the top-left corner of the room's border
         #
@@ -36673,7 +36826,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments
@@ -36788,7 +36941,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -36797,7 +36950,7 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj);
+        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
@@ -36831,22 +36984,25 @@
             $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new (
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Line',
-                points => [
-                    $$posnListRef[0] + $xPos,
-                    $$posnListRef[1] + $yPos,
-                    $$posnListRef[2] + $xPos,
-                    $$posnListRef[3] + $yPos,
-                ],
-                fill_color => $colour,
-                width_units => 1,
-                cap_style => 'projecting',
+            $newObj = GooCanvas2::CanvasPath->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'data' =>
+                    'M ' . ($$posnListRef[0] + $xPos)
+                    . ' ' . ($$posnListRef[1] + $yPos)
+                    . ' L ' . ($$posnListRef[2] + $xPos)
+                    . ' ' . ($$posnListRef[3] + $yPos),
+#                'line-width' => 2,
+                'stroke-color' => $colour,
+#                'fill-color' => $colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -36884,7 +37040,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -36893,7 +37049,7 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my ($mapDir, $xPos, $yPos, $posnListRef, $colour, $newObj);
+        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
@@ -36927,22 +37083,25 @@
             $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new (
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Line',
-                points => [
-                    $$posnListRef[0] + $xPos,
-                    $$posnListRef[1] + $yPos,
-                    $$posnListRef[2] + $xPos,
-                    $$posnListRef[3] + $yPos,
-                ],
-                fill_color => $colour,
-                width_units => 1,
-                cap_style => 'projecting',
+            $newObj = GooCanvas2::CanvasPath->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'data' =>
+                    'M ' . ($$posnListRef[0] + $xPos)
+                    . ' ' . ($$posnListRef[1] + $yPos)
+                    . ' L ' . ($$posnListRef[2] + $xPos)
+                    . ' ' . ($$posnListRef[3] + $yPos),
+#                'line-width' => 2,
+                'stroke-color' => $colour,
+#                'fill-color' => $colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -36978,7 +37137,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -36988,8 +37147,9 @@
 
         # Local variables
         my (
-            $mapDir, $oneWayDir, $posnListRef, $posnListRef2, $colour, $xPos, $yPos, $destRoomObj,
-            $destXPos, $destYPos, $newObj, $newObj2, $newObj3, $alignMode, $twinExitObj,
+            $mapDir, $oneWayDir, $destRoomObj, $posnListRef, $destXPos, $destYPos, $posnListRef2,
+            $alignMode, $xPos, $yPos, $colour, $arrowVectorRef, $arrowHead, $newObj, $levelObj,
+            $twinExitObj,
         );
 
         # Check for improper arguments
@@ -37015,7 +37175,7 @@
         # Draw cardinal directions (the sixteen primary directions which aren't 'up' and 'down')
         } else {
 
-            # $exitObj is supposed to touch the destination room at the point, at which a
+            # $exitObj is supposed to touch the destination room at the point at which a
             #   hypothetical exit in the direction $exitObj->oneWayDir is drawn (e.g. if ->mapDir
             #   is 'east', ->oneWayDir is, by default, 'west')
             # Find out if the destination room has an exit (an incomplete exit, or some other kind
@@ -37061,96 +37221,84 @@
             # Decide which colour to use
             $colour = $self->getExitColour($exitObj);
 
+            # Find the exit's arrow vector - a reference to a list, (x1, y1, x2, y2)
+            # (x1, y1) is a vector showing the direction of one half of the arrowhead, starting at
+            #   the edge of the block. (x2, y2) is a vector showing the direction of travel of the
+            #   other half
+            # (NB The calling function has already checked that $exitObj->mapDir is defined)
+            $arrowVectorRef = $self->ivShow('constArrowVectorHash', $exitObj->mapDir);
+            # Prepare the arrowhead, as a list of points
+            $arrowHead = $self->prepareArrowHead($exitObj, $xPos, $yPos, $posnListRef);
+
             # Draw the canvas object for the line part of the exit
             if ($alignMode eq 'opposite') {
 
                 # Draw this exit all the way to the destination room, where $mapDir and $oneWayDir
                 #   are opposites
-                $newObj = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [
-                        $$posnListRef[0] + $xPos,
-                        $$posnListRef[1] + $yPos,
-                        $$posnListRef2[0] + $destXPos,
-                        $$posnListRef2[1] + $destYPos,
-                    ],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
+                $newObj = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' =>
+                        'M ' . ($$posnListRef[0] + $xPos)
+                        . ' ' . ($$posnListRef[1] + $yPos)
+                        . ' L ' . ($$posnListRef2[0] + $destXPos)
+                        . ' ' . ($$posnListRef2[1] + $destYPos)
+                        . $arrowHead,
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
-
 
             } elsif ($alignMode eq 'not_opposite') {
 
                 # Draw this exit all the way to the destination room, where $mapDir and $oneWayDir
                 #   are not opposites
-                $newObj = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [
-                        $$posnListRef[0] + $xPos,
-                        $$posnListRef[1] + $yPos,
-                        $$posnListRef[2] + $xPos,
-                        $$posnListRef[3] + $yPos,
-                        $$posnListRef2[2] + $destXPos,
-                        $$posnListRef2[3] + $destYPos,
-                        $$posnListRef2[0] + $destXPos,
-                        $$posnListRef2[1] + $destYPos,
-                    ],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
+                $newObj = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' =>
+                        'M ' . ($$posnListRef[0] + $xPos)
+                        . ' ' . ($$posnListRef[1] + $yPos)
+                        . ' L ' . ($$posnListRef[2] + $xPos)
+                        . ' ' . ($$posnListRef[3] + $yPos)
+                        . ' L ' . ($$posnListRef2[2] + $destXPos)
+                        . ' ' . ($$posnListRef2[3] + $destYPos)
+                        . ' L ' . ($$posnListRef2[0] + $destXPos)
+                        . ' ' . ($$posnListRef2[1] + $destYPos)
+                        . $arrowHead,
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
 
             } else {
 
                 # Draw this exit to the edge of its own gridblock
-                $newObj = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [
-                        $$posnListRef[0] + $xPos,
-                        $$posnListRef[1] + $yPos,
-                        $$posnListRef[2] + $xPos,
-                        $$posnListRef[3] + $yPos,
-                    ],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
+                $newObj = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' =>
+                        'M ' . ($$posnListRef[0] + $xPos)
+                        . ' ' . ($$posnListRef[1] + $yPos)
+                        . ' L ' . ($$posnListRef[2] + $xPos)
+                        . ' ' . ($$posnListRef[3] + $yPos)
+                        . $arrowHead,
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
             }
 
-            # Draw the canvas objects for the arrowhead part of the exit
-            ($newObj2, $newObj3) = $self->drawArrowHead(
-                $exitObj,
-                $canvasWidget,
-                $xPos,
-                $yPos,
-                $posnListRef,
-                $colour,
-            );
+            # Set the object's position in the canvas drawing stack
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
-            # Set the objects' position in the canvas drawing stack (this has already been done for
-            #   $newObj2 and $newObj3)
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-
-            # Set up the event handlers for the canvas objects (this has already been done for
-            #   $newObj2 and $newObj3)
+            # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
-            if ($newObj2 && $newObj3) {
-
-                $self->drawParchment->addDrawnExit(
-                    $roomObj,
-                    $exitObj,
-                    [$newObj, $newObj2, $newObj3],
-                );
-
-            } else {
-
-                $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
-            }
+            # Store the canvas object
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
 
             # Draw ornaments for this exit and/or the twin exit, if there are any (and if allowed)
             if ($self->worldModelObj->drawOrnamentsFlag) {
@@ -37182,111 +37330,6 @@
         return 1;
     }
 
-    sub drawArrowHead {
-
-        # Called by $self->drawOneWayExit and $self->drawBentExit to draw an arrow-head on a one-way
-        #   exit, on the line section nearest to the parent room
-        #
-        # Expected arguments
-        #   $exitObj        - The GA::Obj::Exit for which an arrowhead is being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
-        #   $xPos, $yPos    - The position of the parent room's gridblock on the map
-        #   $posnListRef    - Reference to a list of coordinates describing the start and end of
-        #                       the line section nearest to the parent room (only the first four
-        #                       items in the list are used)
-        #   $colour         - The exit's colour
-        #
-        # Return values
-        #   An empty list on improper arguments
-        #   Otherwise, returns a list of canvas objects for the arrowhead, which the calling
-        #       function can add to the other canvas objects that comprise the drawn exit
-
-        my ($self, $exitObj, $canvasWidget, $xPos, $yPos, $posnListRef, $colour, $check) = @_;
-
-        # Local variables
-        my (
-            $arrowVectorRef, $newObj, $newObj2, $posnSet, $roomObj,
-            @emptyList,
-        );
-
-        # Check for improper arguments
-        if (
-            ! defined $exitObj || ! defined $canvasWidget || ! defined $xPos || ! defined $yPos
-            || ! defined $posnListRef || ! defined $colour || defined $check
-        ) {
-            $axmud::CLIENT->writeImproper($self->_objClass . '->drawArrowHead', @_);
-            return @emptyList;
-        }
-
-        # Find the exit's arrow vector - a reference to a list, (x1, y1, x2, y2)
-        # (x1, y1) is a vector showing the direction of one half of the arrowhead, starting at
-        #   the edge of the block. (x2, y2) is a vector showing the direction of travel of the
-        #   other half
-        # (NB The calling function has already checked that $exitObj->mapDir is defined)
-        $arrowVectorRef = $self->ivShow('constArrowVectorHash', $exitObj->mapDir);
-
-        # Draw the arrowhead canvas objects
-        $newObj = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [
-                $$posnListRef[2] + $xPos,
-                $$posnListRef[3] + $yPos,
-                $$posnListRef[2] + $xPos + (
-                    $$arrowVectorRef[0] * int(
-                        ($self->drawRegionmap->blockWidthPixels
-                            - $self->drawRegionmap->roomWidthPixels) / 3
-                    )
-                ),
-                $$posnListRef[3] + $yPos + (
-                    $$arrowVectorRef[1] * int(
-                        ($self->drawRegionmap->blockHeightPixels
-                            - $self->drawRegionmap->roomHeightPixels) / 3
-                    )
-                ),
-            ],
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
-        );
-
-        $newObj2 = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [
-                $$posnListRef[2] + $xPos,
-                $$posnListRef[3] + $yPos,
-                $$posnListRef[2] + $xPos + (
-                    $$arrowVectorRef[2] * int(
-                        ($self->drawRegionmap->blockWidthPixels
-                            - $self->drawRegionmap->roomWidthPixels) / 3
-                    )
-                ),
-                $$posnListRef[3] + $yPos + (
-                    $$arrowVectorRef[3] * int(
-                        ($self->drawRegionmap->blockHeightPixels
-                            - $self->drawRegionmap->roomHeightPixels) / 3
-                    )
-                ),
-            ],
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
-        );
-
-        # Set the objects' position in the canvas drawing stack
-        $roomObj = $self->worldModelObj->ivShow('modelHash', $exitObj->parent);
-        $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-
-        $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
-
-        # Set up the event handlers for the canvas objects
-        $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
-        $self->setupCanvasObjEvent('exit', $newObj2, $exitObj);
-
-        return ($newObj, $newObj2);
-    }
-
     sub drawTwoWayExit {
 
         # Called by $self->drawExit to draw a two-way exit. The exit is drawn as two parallel lines
@@ -37295,7 +37338,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $mode           - Mathces the ->drawExitMode IV in GA::Obj::WorldModel or
         #                       $self->drawRegionmap; set to 'simple_exit' or 'complex_exit'
         #
@@ -37308,7 +37351,7 @@
         # Local variables
         my (
             $mapDir, $posnListRef, $vectorRef, $doubleVectorRef, $colour, $xPos, $yPos,
-            $destRoomObj, $destXPos, $destYPos, $newObj, $newObj2, $twinExitObj, $posnSet,
+            $destRoomObj, $destXPos, $destYPos, $newObj, $levelObj, $twinExitObj,
         );
 
         # Check for improper arguments
@@ -37358,110 +37401,108 @@
             if ($mode eq 'complex_exit') {
 
                 # (Complex exits) For diagonal two-way exits, we have a small problem
-                # We need to increase the length of each of the two lines by one pixel, to
-                #   compensate for the fact that each line is being drawn 1 pixel closer to one of
+                # We need to increase the length of each of the two lines by two pixels, to
+                #   compensate for the fact that each line is being drawn 2 pixels closer to one of
                 #   the rooms (and one pixel further away from the others)
-                # When the exit is diagonal, $$vectorRef[0] and $$vectorRef[1] both equal either 1
-                #   or -1
+                # When the exit is diagonal, $$vectorRef[0] and $$vectorRef[1] both equal either 2
+                #   or -2
 
                 # Draw the canvas objects
                 if ($$vectorRef[0] && $$vectorRef[1] && ! $$vectorRef[2]) {
 
                     # It's a diagonal two-way exit
-                    $newObj = Gnome2::Canvas::Item->new (
-                        $canvasWidget->root(),
-                        'Gnome2::Canvas::Line',
-                        points => [
-                            $$posnListRef[0] + $xPos + $$doubleVectorRef[0],
-                            $$posnListRef[1] + $yPos + $$doubleVectorRef[1],
-                            $$posnListRef[4] + $destXPos + $$doubleVectorRef[0] + $$vectorRef[0],
-                            $$posnListRef[5] + $destYPos + $$doubleVectorRef[1] + $$vectorRef[1],
-                        ],
-                        fill_color => $colour,
-                        width_units => 1,
-                        cap_style => 'projecting',
-                    );
-
-                    $newObj2 = Gnome2::Canvas::Item->new (
-                        $canvasWidget->root(),
-                        'Gnome2::Canvas::Line',
-                        points => [
-                            $$posnListRef[0] + $xPos + $$doubleVectorRef[2],
-                            $$posnListRef[1] + $yPos + $$doubleVectorRef[3],
-                            $$posnListRef[4] + $destXPos + $$doubleVectorRef[2] + $$vectorRef[0],
-                            $$posnListRef[5] + $destYPos + $$doubleVectorRef[3] + $$vectorRef[1],
-                        ],
-                        fill_color => $colour,
-                        width_units => 1,
-                        cap_style => 'projecting',
+                    $newObj = GooCanvas2::CanvasPath->new(
+                        'parent' => $canvasWidget->get_root_item(),
+                        'data' =>
+                            # First line
+                            'M ' . ($$posnListRef[0] + $xPos + $$doubleVectorRef[0])
+                            . ' ' . ($$posnListRef[1] + $yPos + $$doubleVectorRef[1])
+                            . ' L ' . (
+                                $$posnListRef[4] + $destXPos + $$doubleVectorRef[0]
+                                + ($$vectorRef[0] * 2)
+                            )
+                            . ' ' . (
+                                $$posnListRef[5] + $destYPos + $$doubleVectorRef[1]
+                                + ($$vectorRef[1] * 2)
+                            )
+                            # Second line
+                            . ' M ' . ($$posnListRef[0] + $xPos + $$doubleVectorRef[2])
+                            . ' ' . ($$posnListRef[1] + $yPos + $$doubleVectorRef[3])
+                            . ' L ' . (
+                                $$posnListRef[4] + $destXPos + $$doubleVectorRef[2]
+                                + ($$vectorRef[0] * 2)
+                            )
+                            . ' ' . (
+                                $$posnListRef[5] + $destYPos + $$doubleVectorRef[3]
+                                + ($$vectorRef[1] * 2)
+                            ),
+#                        'line-width' => 2,
+                        'stroke-color' => $colour,
+#                        'fill-color' => $colour,
                     );
 
                 } else {
 
                     # It's not a diagonal two-way exit
-                    $newObj = Gnome2::Canvas::Item->new (
-                        $canvasWidget->root(),
-                        'Gnome2::Canvas::Line',
-                        points => [
-                            $$posnListRef[0] + $xPos + $$doubleVectorRef[0],
-                            $$posnListRef[1] + $yPos + $$doubleVectorRef[1],
-                            $$posnListRef[4] + $destXPos + $$doubleVectorRef[0],
-                            $$posnListRef[5] + $destYPos + $$doubleVectorRef[1],
-                        ],
-                        fill_color => $colour,
-                        width_units => 1,
-                        cap_style => 'projecting',
-                    );
-
-                    $newObj2 = Gnome2::Canvas::Item->new (
-                        $canvasWidget->root(),
-                        'Gnome2::Canvas::Line',
-                        points => [
-                            $$posnListRef[0] + $xPos + $$doubleVectorRef[2],
-                            $$posnListRef[1] + $yPos + $$doubleVectorRef[3],
-                            $$posnListRef[4] + $destXPos + $$doubleVectorRef[2],
-                            $$posnListRef[5] + $destYPos + $$doubleVectorRef[3],
-                        ],
-                        fill_color => $colour,
-                        width_units => 1,
-                        cap_style => 'projecting',
+                    $newObj = GooCanvas2::CanvasPath->new(
+                        'parent' => $canvasWidget->get_root_item(),
+                        'data' =>
+                            # First line
+                            'M ' . ($$posnListRef[0] + $xPos + $$doubleVectorRef[0])
+                            . ' ' . ($$posnListRef[1] + $yPos + $$doubleVectorRef[1])
+                            . ' L ' . ($$posnListRef[4] + $destXPos + $$doubleVectorRef[0])
+                            . ' ' . ($$posnListRef[5] + $destYPos + $$doubleVectorRef[1])
+                            # Second line
+                            . ' M ' . ($$posnListRef[0] + $xPos + $$doubleVectorRef[2])
+                            . ' ' . ($$posnListRef[1] + $yPos + $$doubleVectorRef[3])
+                            . ' L ' . ($$posnListRef[4] + $destXPos + $$doubleVectorRef[2])
+                            . ' ' . ($$posnListRef[5] + $destYPos + $$doubleVectorRef[3]),
+#                        'line-width' => 2,
+                        'stroke-color' => $colour,
+#                        'fill-color' => $colour,
                     );
                 }
 
                 # Set the object's position in the canvas drawing stack
-                $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-                $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
+                $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                if ($self->quickDrawFlag) {
+                    $newObj->raise();
+                } else {
+                    $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+                }
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
-                $self->setupCanvasObjEvent('exit', $newObj2, $exitObj);
 
                 # Store the canvas objects together
                 $self->drawParchment->addDrawnExit(
                     $roomObj,
                     $exitObj,
-                    [$newObj, $newObj2],
+                    [$newObj],
                 );
 
             } else {
 
                 # (Simple exits) Draw the canvas object
-                $newObj = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [
-                        $$posnListRef[0] + $xPos,
-                        $$posnListRef[1] + $yPos,
-                        $$posnListRef[4] + $destXPos,
-                        $$posnListRef[5] + $destYPos,
-                    ],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
+                $newObj = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' =>
+                        'M ' . ($$posnListRef[0] + $xPos)
+                        . ' ' . ($$posnListRef[1] + $yPos)
+                        . ' L ' . ($$posnListRef[4] + $destXPos)
+                        . ' ' . ($$posnListRef[5] + $destYPos),
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
 
                 # Set the object's position in the canvas drawing stack
-                $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+                $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                if ($self->quickDrawFlag) {
+                    $newObj->raise();
+                } else {
+                    $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+                }
 
                 # Set up the event handler for the canvas object
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -37510,7 +37551,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -37519,7 +37560,7 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $newObj2, $posnSet);
+        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
@@ -37552,49 +37593,36 @@
             $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
             $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
-            # Draw the canvas objects
-            $newObj = Gnome2::Canvas::Item->new (
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Line',
-                points => [
-                    $$posnListRef[0] + $xPos,
-                    $$posnListRef[1] + $yPos,
-                    $$posnListRef[2] + $xPos,
-                    $$posnListRef[3] + $yPos,
-                ],
-                fill_color => $colour,
-                width_units => 1,
-                cap_style => 'projecting',
-            );
-
-            $newObj2 = Gnome2::Canvas::Item->new (
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Line',
-                points => [
-                    $$posnListRef[2] + $xPos,
-                    $$posnListRef[1] + $yPos,
-                    $$posnListRef[0] + $xPos,
-                    $$posnListRef[3] + $yPos,
-                ],
-                fill_color => $colour,
-                width_units => 1,
-                cap_style => 'projecting',
+            # Draw the canvas object
+            $newObj = GooCanvas2::CanvasPath->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'data' =>
+                    'M ' . ($$posnListRef[0] + $xPos)
+                    . ' ' . ($$posnListRef[1] + $yPos)
+                    . ' L ' . ($$posnListRef[2] + $xPos)
+                    . ' ' . ($$posnListRef[3] + $yPos)
+                    . ' M ' . ($$posnListRef[2] + $xPos)
+                    . ' ' . ($$posnListRef[1] + $yPos)
+                    . ' L ' . ($$posnListRef[0] + $xPos)
+                    . ' ' . ($$posnListRef[3] + $yPos),
+                'line-width' => 1,
+                'stroke-color' => $colour,
+#                'fill-color' => $colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-            $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
-            # Set up the event handlers for the canvas objects
+            # Set up the event handlers for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
-            $self->setupCanvasObjEvent('exit', $newObj2, $exitObj);
 
-            # Store the canvas objects together
-            $self->drawParchment->addDrawnExit(
-                $roomObj,
-                $exitObj,
-                [$newObj, $newObj2],
-            );
+            # Store the canvas object
+            $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
         }
 
         return 1;
@@ -37615,7 +37643,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Optional arguments
         #   $twinExitObj    - The twin GA::Obj::Exit, if there is one ('undef' otherwise)
@@ -37628,8 +37656,8 @@
 
         # Local variables
         my (
-            $colour, $twinRoomObj,
-            @list, @newObjList,
+            $twinRoomObj, $colour, $levelObj,
+            @list,
         );
 
         # Check for improper arguments
@@ -37678,11 +37706,7 @@
 
         do {
 
-            my (
-                $thisExitObj, $thisRoomObj, $mapDir, $posnListRef, $xPos, $yPos, $newObj,
-                $squareStartXPosPixels, $squareStopYPosPixels, $squareStopXPosPixels,
-                $squareStartYPosPixels,
-            );
+            my ($thisExitObj, $thisRoomObj, $mapDir, $xPos, $yPos, $posnListRef, $newObj);
 
             $thisExitObj = shift @list;
             $thisRoomObj = shift @list;
@@ -37717,37 +37741,32 @@
                         # Draw an impassable/mystery exit. Find the exit's position
                         $posnListRef = $self->ivShow('preDrawnSquareExitHash', $mapDir);
 
-                        # Invert the coordinates of the square occupied by the exit so that
-                        #   ($squareStartXPosPixels, $squareStartYPosPixels) is the top-left corner,
-                        #   rather than the bottom-left corner
-                        (
-                            $squareStartXPosPixels, $squareStopYPosPixels,
-                            $squareStopXPosPixels, $squareStartYPosPixels,
-                        ) = (
-                            $$posnListRef[0], $$posnListRef[1],
-                            $$posnListRef[2], $$posnListRef[3],
-                        );
-
-                        # Draw the canvas object
-                        $newObj = Gnome2::Canvas::Item->new (
-                            $canvasWidget->root(),
-                            'Gnome2::Canvas::Rect',
-                            x1 => $squareStartXPosPixels + $xPos,
-                            y1 => $squareStartYPosPixels + $yPos,
-                            x2 => $squareStopXPosPixels + $xPos,
-                            y2 => $squareStopYPosPixels + $yPos,
-                            outline_color => $colour,
-                            fill_color => $colour,
+                        $newObj = GooCanvas2::CanvasRect->new(
+                            'parent' => $canvasWidget->get_root_item(),
+                            'x' => $xPos + $$posnListRef[0],
+                            'y' => $yPos + $$posnListRef[3],
+                            'width' => $$posnListRef[2] - $$posnListRef[0],
+                            'height' => $$posnListRef[1] - $$posnListRef[3],
+                            'line-width' => 0,
+#                            'stroke-color' => $colour,
+                            'fill-color' => $colour,
                         );
 
                         # Set the object's position in the canvas drawing stack
-                        $self->setExitStackPosn($self->drawParchment, $newObj, $thisRoomObj);
+                        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                        if ($self->quickDrawFlag) {
+                            $newObj->raise();
+                        } else {
+                            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+                        }
 
                         # Set up the event handler for the canvas object (using the first exit in
                         #   @exitList, even if there are two)
                         $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
-                        push (@newObjList, $newObj);
+                        # Store the canvas object
+                        $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
+
 
                     } else {
 
@@ -37756,51 +37775,49 @@
                         $posnListRef = $self->ivShow('preDrawnUncertainExitHash', $mapDir);
 
                         # Draw the canvas object
-                        $newObj = Gnome2::Canvas::Item->new (
-                            $canvasWidget->root(),
-                            'Gnome2::Canvas::Line',
-                            points => [
-                                $$posnListRef[0] + $xPos,
-                                $$posnListRef[1] + $yPos,
-                                $$posnListRef[2] + $xPos,
-                                $$posnListRef[3] + $yPos,
-                            ],
-                            fill_color => $colour,
-                            width_units => 1,
-                            cap_style => 'projecting',
+                        $newObj = GooCanvas2::CanvasPath->new(
+                            'parent' => $canvasWidget->get_root_item(),
+                            'data' =>
+                                'M ' . ($$posnListRef[0] + $xPos)
+                                . ' ' . ($$posnListRef[1] + $yPos)
+                                . ' L ' . ($$posnListRef[2] + $xPos)
+                                . ' ' . ($$posnListRef[3] + $yPos),
+#                            'line-width' => 2,
+                            'stroke-color' => $colour,
+#                            'fill-color' => $colour,
                         );
 
                         # Set the object's position in the canvas drawing stack
-                        $self->setExitStackPosn($self->drawParchment, $newObj, $thisRoomObj);
+                        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                        if ($self->quickDrawFlag) {
+                            $newObj->raise();
+                        } else {
+                            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+                        }
 
                         # Set up the event handler for the canvas object (using the first exit in
                         #   @exitList, even if there are two)
                         $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
-                        push (@newObjList, $newObj);
+                        # Store the canvas object
+                        $self->drawParchment->addDrawnExit($roomObj, $exitObj, [$newObj]);
                     }
                 }
             }
 
         } until (! @list);
 
-        # Store the canvas objects (assuming at least one was created)
-        if (@newObjList) {
-
-            $self->drawParchment->addDrawnExit($roomObj, $exitObj, \@newObjList);
-        }
-
         return 1;
     }
 
     sub drawCheckedDir {
 
-        # Called by $self->drawRoom to draw a checked direction (after a character tries to move in
-        #   a certain direction, and that attempt generates a failed exit message)
+        # Called by $self->drawRoom/->doQuickDraw to draw a checked direction (after a character
+        #   tries to move in a certain direction, and that attempt generates a failed exit message)
         #
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $dir            - The checked direction (a custom primary or secondary direction)
         #
         # Return values
@@ -37810,10 +37827,7 @@
         my ($self, $roomObj, $canvasWidget, $dir, $check) = @_;
 
         # Local variables
-        my (
-            $xPos, $yPos, $posnListRef, $squareStartXPosPixels, $squareStopYPosPixels,
-            $squareStopXPosPixels, $squareStartYPosPixels, $colour, $newObj,
-        );
+        my ($xPos, $yPos, $posnListRef, $colour, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $canvasWidget || ! defined $dir || defined $check) {
@@ -37834,34 +37848,28 @@
         # Find the position of an exit drawn in this direction
         $posnListRef = $self->ivShow('preDrawnSquareExitHash', $dir);
 
-        # Invert the coordinates of the square occupied by the exit so that
-        #   ($squareStartXPosPixels, $squareStartYPosPixels) is the top-left corner, rather than the
-        #   bottom-left corner
-        (
-            $squareStartXPosPixels, $squareStopYPosPixels,
-            $squareStopXPosPixels, $squareStartYPosPixels,
-        ) = (
-            $$posnListRef[0], $$posnListRef[1],
-            $$posnListRef[2], $$posnListRef[3],
-        );
-
         # Get the colour for checked directions
         $colour = $self->worldModelObj->checkedDirColour;
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Rect',
-            x1 => $squareStartXPosPixels + $xPos,
-            y1 => $squareStartYPosPixels + $yPos,
-            x2 => $squareStopXPosPixels + $xPos,
-            y2 => $squareStopYPosPixels + $yPos,
-            outline_color => $colour,
-            fill_color => $colour,
+        $newObj = GooCanvas2::CanvasRect->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'x' => $xPos + $$posnListRef[0],
+            'y' => $yPos + $$posnListRef[3],
+            'width' => $$posnListRef[2] - $$posnListRef[0],
+            'height' => $$posnListRef[1] - $$posnListRef[3],
+            'line-width' => 0,
+#            'stroke-color' => $colour,
+            'fill-color' => $colour,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+        }
 
         # (There is no event handler for the canvas object - clicking the checked direction does
         #   nothing)
@@ -37887,7 +37895,7 @@
         # Optional arguments
         #   $twinExitObj    - The exit's twin (if it has one - must be specified, if so; set to
         #                       'undef', if not)
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -37897,10 +37905,10 @@
 
         # Local variables
         my (
-            $mapDir, $xPos, $yPos, $colour, $posnListRef, $destRoomObj, $destXPos, $destYPos,
-            $posnListRef2, $vectorRef, $doubleVectorRef, $newObj, $newObj2, $newObj3, $bendSize,
-            $listRef2, $listRef3, $posnSet,
-            @offsetList, @pointList, @pointList2, @pointList3, @canvasObjList,
+            $destRoomObj, $mapDir, $xPos, $yPos, $colour, $posnListRef, $destXPos, $destYPos,
+            $posnListRef2, $vectorRef, $doubleVectorRef, $listRef2, $listRef3, $points, $newObj,
+            $levelObj, $bendSize,
+            @pointList, @offsetList, @pointList2, @pointList3, @canvasObjList,
         );
 
         # Check for improper arguments
@@ -38079,18 +38087,18 @@
                 }
 
                 # For diagonal two-way exits, we have a small problem
-                # We need to increase the length of each of the two lines by one pixel, to
-                #   compensate for the fact that each line is being drawn 1 pixel closer to one of
+                # We need to increase the length of each of the two lines by two pixels, to
+                #   compensate for the fact that each line is being drawn 2 pixels closer to one of
                 #   the rooms (and one pixel further away from the others)
-                # When the exit is diagonal, $$vectorRef[0] and $$vectorRef[1] both equal either 1
-                #   or -1
+                # When the exit is diagonal, $$vectorRef[0] and $$vectorRef[1] both equal either 2
+                #   or -2
                 if ($$vectorRef[0] && $$vectorRef[1] && ! $$vectorRef[2]) {
 
-                    $pointList2[-2] += $$vectorRef[0];
-                    $pointList2[-1] += $$vectorRef[1];
+                    $pointList2[-2] += ($$vectorRef[0] * 2);
+                    $pointList2[-1] += ($$vectorRef[1] * 2);
 
-                    $pointList3[-2] += $$vectorRef[0];
-                    $pointList3[-1] += $$vectorRef[1];
+                    $pointList3[-2] += ($$vectorRef[0] * 2);
+                    $pointList3[-1] += ($$vectorRef[1] * 2);
                 }
 
                 # Depending on the relative positions of the two twinned exits, and the positions
@@ -38103,81 +38111,82 @@
                     \@pointList3,
                 );
 
-                @pointList2 = @$listRef2;
-                @pointList3 = @$listRef3;
+                # Convert the lists to the format GooCanvas2::CanvasPath expects
+                $points = 'M ' . (shift @$listRef2) . ' ' . (shift @$listRef2);
+                do {
 
-                # Draw the canvas objects
-                $newObj = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [@pointList2],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
-                );
+                    $points .= ' L ' . (shift @$listRef2) . ' ' . (shift @$listRef2);
 
-                $newObj2 = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [@pointList3],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
+                } until (! @$listRef2);
+
+                $points .= ' M ' . (shift @$listRef3) . ' ' . (shift @$listRef3);
+                do {
+
+                    $points .= ' L ' . (shift @$listRef3) . ' ' . (shift @$listRef3);
+
+                } until (! @$listRef3);
+
+                # Draw the canvas object
+                $newObj = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' => $points,
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
 
                 # Set the object's position in the canvas drawing stack
-                $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-                $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
+                $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                if ($self->quickDrawFlag) {
+                    $newObj->raise();
+                } else {
+                    $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+                }
 
                 # Set up the event handlers for the canvas objects
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
-                $self->setupCanvasObjEvent('exit', $newObj2, $exitObj);
 
-                push (@canvasObjList, $newObj, $newObj2);
+                # Store the canvas object later in the function
+                push (@canvasObjList, $newObj);
 
             } else {
 
                 # Draw a one-way exit in simple/complex exits mode, or a two-way exit in simple
                 #   exits mode
 
+                # Convert the lists to the format GooCanvas2::CanvasPath expects
+                $points = 'M ' . (shift @pointList) . ' ' . (shift @pointList);
+                do {
+
+                    $points .= ' L ' . (shift @pointList) . ' ' . (shift @pointList);
+
+                } until (! @pointList);
+
+                # Add the arrow head
+                $points .= $self->prepareArrowHead($exitObj, $xPos, $yPos, $posnListRef);
+
                 # Draw the canvas object
-                $newObj = Gnome2::Canvas::Item->new (
-                    $canvasWidget->root(),
-                    'Gnome2::Canvas::Line',
-                    points => [@pointList],
-                    fill_color => $colour,
-                    width_units => 1,
-                    cap_style => 'projecting',
+                $newObj = GooCanvas2::CanvasPath->new(
+                    'parent' => $canvasWidget->get_root_item(),
+                    'data' => $points,
+#                    'line-width' => 2,
+                    'stroke-color' => $colour,
+#                    'fill-color' => $colour,
                 );
 
-                # For one-way exits, draw the arrowhead over the first section of the bent exit
-                if ($exitObj->oneWayFlag) {
-
-                    # Draw the canvas objects for the arrowhead part of the exit
-                    ($newObj2, $newObj3) = $self->drawArrowHead(
-                        $exitObj,
-                        $canvasWidget,
-                        $xPos,
-                        $yPos,
-                        $posnListRef,
-                        $colour,
-                    );
+                # Set the object's position in the canvas drawing stack
+                $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                if ($self->quickDrawFlag) {
+                    $newObj->raise();
+                } else {
+                    $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
                 }
 
-                # Set the object's position in the canvas drawing stack (this has already been done
-                #   for $newObj2 and $newObj3, if set)
-                $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-
-                # Set up the event handler for the canvas object (this has already been done for
-                #   $newObj2 and $newObj3, if set)
+                # Set up the event handler for the canvas object
                 $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
-                # Store the canvas object(s)
+                # Store the canvas object later in the function
                 push (@canvasObjList, $newObj);
-                if ($newObj2 && $newObj3) {
-
-                    push (@canvasObjList, $newObj2, $newObj3);
-                }
             }
 
             # For a selected exit, draw a square at each bend
@@ -38197,7 +38206,7 @@
                 )
             ) {
                 @offsetList = $exitObj->bendOffsetList;
-                $bendSize = $self->exitBendSize;            # Default 2
+                $bendSize = $self->exitBendSize;            # Default 4
                 do {
 
                     my ($offsetXPos, $offsetYPos, $bendObj);
@@ -38206,19 +38215,24 @@
                     $offsetYPos = (shift @offsetList) + $$posnListRef[3];
 
                     # Draw the canvas object
-                    $bendObj = Gnome2::Canvas::Item->new(
-                        $canvasWidget->root(),
-                        'Gnome2::Canvas::Rect',
-                        x1 => $xPos + $offsetXPos - $bendSize,
-                        y1 => $yPos + $offsetYPos - $bendSize,
-                        x2 => $xPos + $offsetXPos + $bendSize,
-                        y2 => $yPos + $offsetYPos + $bendSize,
-                        outline_color => $colour,
-                        fill_color => $colour,
+                    $bendObj = GooCanvas2::CanvasRect->new(
+                        'parent' => $canvasWidget->get_root_item(),
+                        'x' => $xPos + $offsetXPos - ($bendSize / 2),
+                        'y' => $yPos + $offsetYPos - ($bendSize / 2),
+                        'width' => $bendSize,
+                        'height' => $bendSize,
+                        'line-width' => 0,
+#                        'stroke-color' => $colour,
+                        'fill-color' => $colour,
                     );
 
                     # Set the object's position in the canvas drawing stack
-                    $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+                    $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+                    if ($self->quickDrawFlag) {
+                        $newObj->raise();
+                    } else {
+                        $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+                    }
 
                     # Set up the event handler for the canvas object
                     $self->setupCanvasObjEvent('exit', $bendObj, $exitObj);
@@ -38255,100 +38269,6 @@
         return 1;
     }
 
-    sub reverseIntersectingLines {
-
-        # Called by $self->drawBentExit when drawing a 2-way bent exit with two roughly parellel
-        #   lines
-        # This function detects whether those lines intersect each other, rather than run roughly
-        #   parallel and, if so, corrrects the problem
-        #
-        # Expected arguments
-        #   $listRef, $listRef2
-        #           - Two list references, each of which contain a list of points which make up the
-        #               beginning, end and middle bends of a single line
-        #           - Each list is in the form
-        #               (x, y, x, y, x, y, ...)
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   Otherwise returns a list containing the modified $listRef and $listRef2
-
-        my ($self, $listRef, $listRef2, $check) = @_;
-
-        # Local variables
-        my $total;
-
-        # Check for improper arguments
-        if (! defined $listRef || ! defined $listRef2 || defined $check) {
-
-            return $axmud::CLIENT->writeImproper(
-                $self->_objClass . '->reverseIntersectingLines',
-                @_,
-            );
-        }
-
-        # Each pair of neighbouring points:
-        #   x = $$listRef[n], y = $$listRef[n + 1]
-        #   x = $$listRef2[n], y = $$listRef2[n + 1]
-        # ...may be the wrong way around, such that the two lines are not roughly parallel, but
-        #   cross over each other somewhere between the two points
-        #
-        # For each neighbouring pairs of points, [n] and [n+1], work out whether the two lines
-        #   between them lines intersect each other (rather than remaining roughly parallel) and, if
-        #   so, reverse them to remove the intersection
-
-        # Get the number of points in the line (2 for each end of the line, plus the number of
-        #   bends - if there are no bends, there are four points in the line)
-        $total = (scalar @$listRef / 2);
-        # Don't reverse points at the beginning of the lines (but we might have to reverse points
-        #   at the end, as a knock-on effect of reversing points somewhere in the middle)
-        for (my $count = 1; $count < ($total - 1); $count++) {
-
-            my ($index, $dist1, $dist2, $dist3, $dist4, $spare);
-
-            $index = $count * 2;
-
-            # Work out the length of the two lines that should be parallel, as they are at the
-            #   moment
-            $dist1 = sqrt(
-                        (($$listRef[$index] - $$listRef[($index+ 2)]) ** 2)
-                        + (($$listRef[($index + 1)] - $$listRef[($index + 3)]) ** 2)
-                    );
-
-            $dist2 = sqrt(
-                        (($$listRef2[$index] - $$listRef2[($index + 2)]) ** 2)
-                        + (($$listRef2[($index + 1)] - $$listRef2[($index + 3)]) ** 2)
-                    );
-
-            # Work out the length of the two lines that would be drawn, if the points at one end
-            #   were reversed
-            $dist3 = sqrt(
-                        (($$listRef[$index] - $$listRef2[($index + 2)]) ** 2)
-                        + (($$listRef[($index + 1)] - $$listRef2[($index + 3)]) ** 2)
-                    );
-
-            $dist4 = sqrt(
-                        (($$listRef2[$index] - $$listRef[($index + 2)]) ** 2)
-                        + (($$listRef2[($index + 1)] - $$listRef[($index + 3)]) ** 2)
-                    );
-
-            # By adding the distances, we can work out if the second pair of points need to be
-            #   reversed, in order to make the lines parallel
-            if (($dist1 + $dist2) > ($dist3 + $dist4)) {
-
-                $spare = $$listRef[($index + 2)];
-                $$listRef[($index + 2)] = $$listRef2[($index + 2)];
-                $$listRef2[($index + 2)] = $spare;
-
-                $spare = $$listRef[($index + 3)];
-                $$listRef[($index + 3)] = $$listRef2[($index + 3)];
-                $$listRef2[($index + 3)] = $spare;
-            }
-        }
-
-        return $listRef, $listRef2;
-    }
-
     sub drawDraggableExit {
 
         # Called by $self->startDrag and ->continueDrag to draw a draggable exit
@@ -38366,10 +38286,7 @@
         my ($self, $exitObj, $mouseXPos, $mouseYPos, $check) = @_;
 
         # Local variables
-        my (
-            $mapDir, $roomObj, $xPos, $yPos, $posnListRef, $canvasWidget, $newObj,
-            @pointList,
-        );
+        my ($mapDir, $roomObj, $xPos, $yPos, $posnListRef, $points, $canvasWidget, $newObj);
 
         # Check for improper arguments
         if (! defined $exitObj || ! defined $mouseXPos || ! defined $mouseYPos || defined $check) {
@@ -38396,17 +38313,16 @@
         # The first section of a draggable exit consists of the line that would be drawn as an
         #   uncertain exit. $posnListRef is a reference to a list in the form (startx, starty,
         #   stopx, stopy)
-        $posnListRef = $self->ivShow('preDrawnUncertainExitHash', $mapDir);
-        push (@pointList,
-            ($xPos + $$posnListRef[0]),
-            ($yPos + $$posnListRef[1]),
-            ($xPos + $$posnListRef[2]),
-            ($yPos + $$posnListRef[3]),
-        );
-
         # The middle section of a draggable exit leads from the end of the hypothetical uncertain
         #   exit, to the current mouse position
-        push (@pointList, $mouseXPos, $mouseYPos);
+        $posnListRef = $self->ivShow('preDrawnUncertainExitHash', $mapDir);
+        $points =
+            'M ' . ($xPos + $$posnListRef[0])
+            . ' ' . ($yPos + $$posnListRef[1])
+            . ' L ' . ($xPos + $$posnListRef[2])
+            . ' ' . ($yPos + $$posnListRef[3])
+            . ' L ' . $mouseXPos
+            . ' ' . $mouseYPos;
 
         # Draw the canvas object
         $canvasWidget = $self->currentParchment->ivShow(
@@ -38414,17 +38330,17 @@
             $self->currentRegionmap->currentLevel,
         );
 
-        $newObj = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [@pointList],
-            fill_color => $self->worldModelObj->dragExitColour,
-            width_units => 1,
-            cap_style => 'projecting',
+        $newObj = GooCanvas2::CanvasPath->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'data' => $points,
+#            'line-width' => 2,
+            'stroke-color' => $self->worldModelObj->dragExitColour,
+#            'fill-color' => $self->worldModelObj->dragExitColour,
         );
 
         # Set the object's position in the canvas drawing stack
-        $self->setLabelStackPosn($newObj);
+        $newObj->raise();
+
         # Set up the event handlers for the canvas objects
         $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
 
@@ -38440,7 +38356,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -38449,10 +38365,7 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my (
-            $mapDir, $posnListRef, $colour, $xPos, $yPos, $squareStartXPosPixels,
-            $squareStopYPosPixels, $squareStopXPosPixels, $squareStartYPosPixels, $newObj,
-        );
+        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
@@ -38485,28 +38398,25 @@
             $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
             $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
-            # Invert the coordinates of the square occupied by the exit so that
-            #   ($squareStartXPosPixels, $squareStartYPosPixels) is the top-left corner, rather than
-            #   the bottom-left corner
-            (
-                $squareStartXPosPixels, $squareStopYPosPixels,
-                $squareStopXPosPixels, $squareStartYPosPixels,
-            ) = ($$posnListRef[0], $$posnListRef[1], $$posnListRef[2], $$posnListRef[3]);
-
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Rect',
-                x1 => $squareStartXPosPixels + $xPos,
-                y1 => $squareStartYPosPixels + $yPos,
-                x2 => $squareStopXPosPixels + $xPos,
-                y2 => $squareStopYPosPixels + $yPos,
-                outline_color => $colour,
-                fill_color => $colour,
+            $newObj = GooCanvas2::CanvasRect->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'x' => $xPos + $$posnListRef[0],
+                'y' => $yPos + $$posnListRef[3],
+                'width' => $$posnListRef[2] - $$posnListRef[0],
+                'height' => $$posnListRef[1] - $$posnListRef[3],
+                'line-width' => 0,
+#                'stroke-color' => $colour,
+                'fill-color' => $colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -38526,7 +38436,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -38535,10 +38445,7 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my (
-            $mapDir, $posnListRef, $xPos, $yPos, $newObj, $squareStartXPosPixels,
-            $squareStopYPosPixels, $squareStopXPosPixels, $squareStartYPosPixels,
-        );
+        my ($mapDir, $posnListRef, $xPos, $yPos, $newObj, $levelObj);
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
@@ -38569,27 +38476,25 @@
             $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
             $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
-            # Invert the coordinates of the square occupied by the exit so that
-            #   ($squareStartXPosPixels, $squareStartYPosPixels) is the top-left corner, rather than
-            #   the bottom-left corner
-            (
-                $squareStartXPosPixels, $squareStopYPosPixels,
-                $squareStopXPosPixels, $squareStartYPosPixels,
-            ) = ($$posnListRef[0], $$posnListRef[1], $$posnListRef[2], $$posnListRef[3]);
-
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Rect',
-                x1 => $squareStartXPosPixels + $xPos,
-                y1 => $squareStartYPosPixels + $yPos,
-                x2 => $squareStopXPosPixels + $xPos,
-                y2 => $squareStopYPosPixels + $yPos,
-                outline_color => $self->getExitColour($exitObj),
+            $newObj = GooCanvas2::CanvasRect->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'x' => $xPos + $$posnListRef[0],
+                'y' => $yPos + $$posnListRef[3],
+                'width' => $$posnListRef[2] - $$posnListRef[0],
+                'height' => $$posnListRef[1] - $$posnListRef[3],
+                'line-width' => 1,
+                'stroke-color' => $self->getExitColour($exitObj),
+#                'fill-color' => $self->getExitColour($exitObj),
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -38608,7 +38513,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -38617,7 +38522,10 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my ($mapDir, $posnListRef, $colour, $xPos, $yPos, $newObj, $outlineColour, $fillColour);
+        my (
+            $mapDir, $posnListRef, $xPos, $yPos, $colour, $outlineColour, $fillColour, $newObj,
+            $levelObj,
+        );
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || defined $check) {
@@ -38651,12 +38559,16 @@
             # Set the exit colour
             $colour = $self->getExitColour($exitObj);
 
-            # Other types of random exits are filled in
-            if ($exitObj->randomType eq 'same_region') {
+            # Some types of random exits are filled in
+            if ($colour ne $self->worldModelObj->exitColour) {
+
+                # Exit is probably selected; use that colour rather than a random exit colour
+                $outlineColour = $fillColour = $colour;
+
+            } elsif ($exitObj->randomType eq 'same_region') {
 
                 # Default - black circle
-                $outlineColour = $colour;
-                $fillColour = $colour;
+                $outlineColour = $fillColour = $colour;
 
             } elsif ($exitObj->randomType eq 'any_region') {
 
@@ -38677,19 +38589,24 @@
             }
 
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Ellipse',
-                x1 => $$posnListRef[0] + $xPos,
-                y1 => $$posnListRef[1] + $yPos,
-                x2 => $$posnListRef[2] + $xPos,
-                y2 => $$posnListRef[3] + $yPos,
-                outline_color => $outlineColour,
-                fill_color => $fillColour,
+            $newObj = GooCanvas2::CanvasEllipse->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'x' => $xPos + $$posnListRef[0],
+                'y' => $yPos + $$posnListRef[3],
+                'width' => abs($$posnListRef[2] - $$posnListRef[0]),
+                'height' => abs($$posnListRef[1] - $$posnListRef[3]),
+#                'line-width' => 2,
+                'stroke-color' => $outlineColour,
+                'fill-color' => $fillColour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -38709,7 +38626,7 @@
         # Expected arguments
         #   $roomObj        - Blessed reference of the parent GA::ModelObj::Room
         #   $exitObj        - Blessed reference of the GA::Obj::Exit being drawn
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #
         # Return values
         #   'undef' on improper arguments or if the exit can't be drawn
@@ -38718,7 +38635,10 @@
         my ($self, $roomObj, $exitObj, $canvasWidget, $check) = @_;
 
         # Local variables
-        my ($mapDir, $lineListRef, $squareListRef, $triangleListRef, $xPos, $yPos, $newObj);
+        my (
+            $mapDir, $lineListRef, $squareListRef, $triangleListRef, $xPos, $yPos, $colour, $newObj,
+            $levelObj,
+        );
 
         # Check for improper arguments
         if (! defined $roomObj || ! defined $exitObj || ! defined $canvasWidget || defined $check) {
@@ -38756,6 +38676,7 @@
 
                 ($$squareListRef[0], $$squareListRef[2]) = ($$squareListRef[2], $$squareListRef[0]);
             }
+
             if ($$squareListRef[1] > $$squareListRef[3]) {
 
                 ($$squareListRef[1], $$squareListRef[3]) = ($$squareListRef[3], $$squareListRef[1]);
@@ -38768,29 +38689,37 @@
             $xPos = $roomObj->xPosBlocks * $self->drawRegionmap->blockWidthPixels;
             $yPos = $roomObj->yPosBlocks * $self->drawRegionmap->blockHeightPixels;
 
+            # Set the exit colour
+            $colour = $self->getExitColour($exitObj);
+
             # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new(
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Polygon',
-                points => [
+            $newObj = GooCanvas2::CanvasPath->new(
+                'parent' => $canvasWidget->get_root_item(),
+                'data' =>
                     # Triangle corner nearest the room
-                    $$lineListRef[0] + $xPos,
-                    $$lineListRef[1] + $yPos,
+                    'M ' . ($xPos + $$lineListRef[0])
+                    . ' ' . ($yPos + $$lineListRef[1])
                     # Second triangle corner
-                    $$squareListRef[$$triangleListRef[0]] + $xPos,
-                    $$squareListRef[$$triangleListRef[1]] + $yPos,
+                    . ' L ' . ($xPos + $$squareListRef[$$triangleListRef[0]])
+                    . ' ' . ($yPos + $$squareListRef[$$triangleListRef[1]])
                     # Third triangle corner
-                    $$squareListRef[$$triangleListRef[2]] + $xPos,
-                    $$squareListRef[$$triangleListRef[3]] + $yPos,
+                    . ' L ' . ($xPos + $$squareListRef[$$triangleListRef[2]])
+                    . ' ' . ($yPos + $$squareListRef[$$triangleListRef[3]])
                     # Back to the beginning
-                    $$lineListRef[0] + $xPos,
-                    $$lineListRef[1] + $yPos,
-                ],
-                outline_color => $self->getExitColour($exitObj),
+                    . ' L ' . ($xPos + $$lineListRef[0])
+                    . ' ' . ($yPos + $$lineListRef[1]),
+#                'line-width' => 2,
+                'stroke-color' => $colour,
+                'fill-color' => $colour,
             );
 
             # Set the object's position in the canvas drawing stack
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+            $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+            if ($self->quickDrawFlag) {
+                $newObj->raise();
+            } else {
+                $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            }
 
             # Set up the event handler for the canvas object
             $self->setupCanvasObjEvent('exit', $newObj, $exitObj);
@@ -38813,7 +38742,7 @@
         # Expected arguments
         #   $exitObj        - The GA::Obj::Exit being drawn in a drawing cycle initiated by
         #                       $self->doDraw
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by GA::Obj::Exit's parent room
         #
@@ -38967,7 +38896,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -38988,10 +38917,10 @@
 
         # Local variables
         my (
-            $vectorRef, $perpVectorRef, $startXPosPixels, $startYPosPixels, $stopXPosPixels,
-            $stopYPosPixels, $exitMiddleXPosPixels, $exitMiddleYPosPixels, $perpStartXPosPixels,
-            $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels, $newObj, $newObj2,
-            $newObj3, $listRef, $roomObj, $posnSet,
+            $exitMiddleXPosPixels, $exitMiddleYPosPixels, $vectorRef, $perpVectorRef,
+            $perpStartXPosPixels, $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels,
+            $startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels, $newObj, $newObj2,
+            $roomObj, $levelObj,
             @polygonList,
         );
 
@@ -39072,21 +39001,6 @@
             )
         );
 
-        # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [
-                $perpStartXPosPixels,
-                $perpStartYPosPixels,
-                $perpStopXPosPixels,
-                $perpStopYPosPixels,
-            ],
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
-        );
-
         # Now get the vertices of the polygon that would have been drawn in a pickable
         #   ornament
         push (@polygonList, $self->findPerpendicular(
@@ -39111,47 +39025,53 @@
 
         push (@polygonList, $stopXPosPixels, $stopYPosPixels, $startXPosPixels, $startYPosPixels);
 
-        # Draw lines between adjacent points on the polygon
-        $newObj2 = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [
-                $polygonList[0], $polygonList[1],
-                $polygonList[6], $polygonList[7],
-            ],
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
+        # Draw the canvas objects. Draw two objects rather than one, so their widths can be
+        #   different
+        $newObj = GooCanvas2::CanvasPath->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'data' =>
+                'M ' . ($perpStartXPosPixels) . ' ' . ($perpStartYPosPixels)
+                . ' L ' . ($perpStopXPosPixels) . ' ' . ($perpStopYPosPixels),
+            'line-width' => 1,
+            'stroke-color' => $colour,
+#            'fill-color' => $colour,
         );
 
-        $newObj3 = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [
-                $polygonList[2], $polygonList[3],
-                $polygonList[4], $polygonList[5],
-            ],
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
+        $newObj2 = GooCanvas2::CanvasPath->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'data' =>
+                'M ' . ($polygonList[0]) . ' ' . ($polygonList[1])
+                . ' L ' . ($polygonList[6]) . ' ' . ($polygonList[7])
+                . 'M ' . ($polygonList[2]) . ' ' . ($polygonList[3])
+                . ' L ' . ($polygonList[4]) . ' ' . ($polygonList[5]),
+#            'line-width' => 2,
+            'stroke-color' => $colour,
+#            'fill-color' => $colour,
         );
 
         # Set the objects' position in the canvas drawing stack
         $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
-        $posnSet = $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-        $self->setExitStackPosn($self->drawParchment, $newObj2, $roomObj, $posnSet);
-        $self->setExitStackPosn($self->drawParchment, $newObj3, $roomObj, $posnSet);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+
+            $newObj->raise();
+            $newObj2->raise();
+
+        } else {
+
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+            $newObj2->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+        }
 
         # Set up the event handler for the canvas objects
         $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
         $self->setupCanvasObjEvent('exit', $newObj2, $drawObj);
-        $self->setupCanvasObjEvent('exit', $newObj3, $drawObj);
 
         # Store the canvas objects
         $self->drawParchment->addDrawnOrnament(
             $roomObj,
             $drawObj,
-            [$newObj, $newObj2, $newObj3],
+            [$newObj, $newObj2],
         );
 
         return 1;
@@ -39170,7 +39090,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -39191,9 +39111,9 @@
 
         # Local variables
         my (
-            $vectorRef, $perpVectorRef, $startXPosPixels, $startYPosPixels, $stopXPosPixels,
-            $stopYPosPixels, $exitMiddleXPosPixels, $exitMiddleYPosPixels, $newObj, $listRef,
-            $roomObj,
+            $exitMiddleXPosPixels, $exitMiddleYPosPixels, $vectorRef, $perpVectorRef,
+            $startXPosPixels, $startYPosPixels, $stopXPosPixels, $stopYPosPixels, $points, $newObj,
+            $roomObj, $levelObj,
             @polygonList,
         );
 
@@ -39219,7 +39139,7 @@
             $posnListRef = $self->ivShow('preDrawnUncertainExitHash', $parentObj->mapDir);
         }
 
-        # Get the coordinates at the pixel in the middle of this hypothetical line
+        # Get the coordinates at the pixel in the middle of the hypothetical line
         ($exitMiddleXPosPixels, $exitMiddleYPosPixels) = $self->findExitMiddle(
             ($$posnListRef[0] + $xPos), ($$posnListRef[1] + $yPos),
             ($$posnListRef[2] + $xPos), ($$posnListRef[3] + $yPos),
@@ -39231,8 +39151,7 @@
         $perpVectorRef = $self->ivShow('constPerpVectorHash', $parentObj->mapDir);
 
         # The ornament is made up of two lines running parallel to each other, which is then drawn
-        #   as a polygon (in Gnome2::Canvas, actually a series of lines, each ending where the
-        #   previous one stopped)
+        #   as a polygon (actually a series of lines, each ending where the previous one stopped)
         # Call ->findPerpendicular to find the coordinates of both ends of each line, and store them
         #   in @polygonList - a sequential list of coordinates of the vertices of the polygon,
         #   i.e. (x, y, x, y, ...)
@@ -39263,18 +39182,29 @@
         push (@polygonList, $polygonList[0], $polygonList[1]);
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => \@polygonList,
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
+        $points = 'M ' . (shift @polygonList) . ' ' . shift (@polygonList);
+        do {
+
+            $points .= ' L ' . (shift @polygonList) . ' ' . shift (@polygonList);
+
+        } until (! @polygonList);
+
+        $newObj = GooCanvas2::CanvasPath->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'data' => $points,
+            'line-width' => 1,
+            'stroke-color' => $colour,
+#            'fill-color' => $colour,
         );
 
         # Set the object's position in the canvas drawing stack
         $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
-        $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+        }
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
@@ -39298,7 +39228,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -39321,8 +39251,8 @@
         my (
             $exitMiddleXPosPixels, $exitMiddleYPosPixels, $vectorRef, $perpVectorRef,
             $perpStartXPosPixels, $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels,
-            $listRef, $roomObj,
-            @factorList, @newObjList,
+            $points, $newObj, $roomObj, $levelObj,
+            @factorList,
         );
 
         # Check for improper arguments
@@ -39365,8 +39295,6 @@
         # Draw each line in turn, one pixel apart
         foreach my $factor (@factorList) {
 
-            my ($newObj);
-
             ($perpStartXPosPixels, $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels)
                 = $self->findPerpendicular(
                     $vectorRef,
@@ -39377,33 +39305,35 @@
                     $self->drawRegionmap,
                 );
 
-            # Draw the canvas object
-            $newObj = Gnome2::Canvas::Item->new (
-                $canvasWidget->root(),
-                'Gnome2::Canvas::Line',
-                points => [
-                    $perpStartXPosPixels,
-                    $perpStartYPosPixels,
-                    $perpStopXPosPixels,
-                    $perpStopYPosPixels,
-                ],
-                fill_color => $colour,
-                width_units => 1,
-                cap_style => 'projecting',
-            );
-
-            # Set the object's position in the canvas drawing stack
-            $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
-            $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
-
-            # Set up the event handler for the canvas object
-            $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
-
-            push (@newObjList, $newObj);
+            $points .= ' M ' . $perpStartXPosPixels
+                . ' ' . $perpStartYPosPixels
+                . ' L ' . $perpStopXPosPixels
+                . ' ' . $perpStopYPosPixels;
         }
 
+        # Draw the canvas object
+        $newObj = GooCanvas2::CanvasPath->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'data' => $points,
+            'line-width' => 1,
+            'stroke-color' => $colour,
+#            'fill-color' => $colour,
+        );
+
+        # Set the object's position in the canvas drawing stack
+        $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+        }
+
+        # Set up the event handler for the canvas object
+        $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
+
         # Store the canvas objects
-        $self->drawParchment->addDrawnOrnament($roomObj, $drawObj, \@newObjList);
+        $self->drawParchment->addDrawnOrnament($roomObj, $drawObj, [$newObj]);
 
         return 1;
     }
@@ -39421,7 +39351,7 @@
         #                       for an exit, $parentObj and $drawObj will be the same, but if we're
         #                       drawing an ornament for the twin, $drawObj will be the exit and
         #                       $parentObj will be the twin
-        #   $canvasWidget   - The Gnome2::Canvas on which the room is drawn
+        #   $canvasWidget   - The canvas widget (GooCanvas2::Canvas) on which the room is drawn
         #   $colour         - The colour in which the whole exit is being drawn
         #   $xPos, $yPos    - Coordinates of the gridblock occupied by the parent room of the
         #                       GA::Obj::Exit whose ornament is being drawn (i.e. $parentObj)
@@ -39444,8 +39374,8 @@
         # Local variables
         my (
             $exitMiddleXPosPixels, $exitMiddleYPosPixels, $perpVectorRef, $perpStartXPosPixels,
-            $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels, $newObj, $listRef,
-            $roomObj,
+            $perpStartYPosPixels, $perpStopXPosPixels, $perpStopYPosPixels, $newObj, $roomObj,
+            $levelObj,
         );
 
         # Check for improper arguments
@@ -39511,23 +39441,24 @@
         );
 
         # Draw the canvas object
-        $newObj = Gnome2::Canvas::Item->new (
-            $canvasWidget->root(),
-            'Gnome2::Canvas::Line',
-            points => [
-                $perpStartXPosPixels,
-                $perpStartYPosPixels,
-                $perpStopXPosPixels,
-                $perpStopYPosPixels,
-            ],
-            fill_color => $colour,
-            width_units => 1,
-            cap_style => 'projecting',
+        $newObj = GooCanvas2::CanvasPath->new(
+            'parent' => $canvasWidget->get_root_item(),
+            'data' =>
+                'M ' . ($perpStartXPosPixels) . ' ' . ($perpStartYPosPixels)
+                . ' L ' . ($perpStopXPosPixels) . ' ' . ($perpStopYPosPixels),
+            'line-width' => 1,
+            'stroke-color' => $colour,
+#            'fill-color' => $colour,
         );
 
         # Set the object's position in the canvas drawing stack
         $roomObj = $self->worldModelObj->ivShow('modelHash', $drawObj->parent);
-        $self->setExitStackPosn($self->drawParchment, $newObj, $roomObj);
+        $levelObj = $self->drawParchment->ivShow('levelHash', $roomObj->zPosBlocks);
+        if ($self->quickDrawFlag) {
+            $newObj->raise();
+        } else {
+            $newObj->lower($levelObj->ivIndex('slaveCanvasObjList', 5));
+        }
 
         # Set up the event handler for the canvas object
         $self->setupCanvasObjEvent('exit', $newObj, $drawObj);
@@ -39538,361 +39469,180 @@
         return 1;
     }
 
-    # Graphical operations - map object stack functions
+    # Graphical operations - drawing canvas objects, support functions
 
-    sub setMapStackPosn {
+    sub prepareArrowHead {
 
-        # Called by $self->resetMap and ->refreshMap
-        # Sets the background canvas object's position in the canvas drawing stack
-        #
-        # The canvas drawing stack is organised like this:
-        #   8   - labels and draggable exits (placed at the top of the stack)
-        #   7   - room tags, room guilds and exit tags (lowered from the top)
-        #   6   - exits, exit ornaments and checked directions (lowered from the top)
-        #   5   - room interior text (raised from the bottom)
-        #   4   - room boxes (raised from the bottom)
-        #   3   - room echoes and fake room boxes (raised from the bottom)
-        #   2   - coloured rectangles on the map background (raised from the bottom)
-        #   1   - coloured blocks on the map background (raised from the bottom)
-        #   0   - map background (placed at the bottom of the stack)
+        # Called by $self->drawOneWayExit and $self->drawBentExit to prepare the position of an
+        #   arrow-head on a one-way exit, on the line section nearest to the parent room
         #
         # Expected arguments
-        #   $canvasObj      - The background canvas object which has just been drawn
+        #   $exitObj        - The GA::Obj::Exit for which an arrowhead is being drawn
+        #   $xPos, $yPos    - The position of the parent room's gridblock on the map
+        #   $posnListRef    - Reference to a list of coordinates describing the start and end of
+        #                       the line section nearest to the parent room (only the first four
+        #                       items in the list are used)
         #
         # Return values
         #   'undef' on improper arguments
-        #   1 otherwise
+        #   Otherwise returns the data string expected by GooCanvas2::CanvasRect
 
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setMapStackPosn', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-
-        return 1;
-    }
-
-    sub setSquareStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Coloured blocks are drawn as priority 1 (above the map background)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setSquareStackPosn', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(1);
-
-        return 1;
-    }
-
-    sub setRectStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Coloured rectangles are drawn as priority 2 (above the map background and coloured blocks)
-        #
-        # Expected arguments
-        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $parchmentObj, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $parchmentObj || ! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setRectStackPosn', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(
-            $parchmentObj->ivPairs('colouredSquareHash')
-            # The younger rectangle must be drawn above older rectangles
-            + $parchmentObj->ivPairs('colouredRectHash')
-            + 1,
-        );
-
-        return 1;
-    }
-
-    sub setEchoStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room echos and fake room boxes are drawn as priority 3 (above the map background, coloured
-        #   blocks and coloured rectangles)
-        #
-        # Expected arguments
-        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $parchmentObj, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $parchmentObj || ! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setEchoStackPosn', @_);
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(
-            $parchmentObj->ivPairs('colouredSquareHash')
-            + $parchmentObj->ivPairs('colouredRectHash')
-            + 1,
-        );
-
-        return 1;
-    }
-
-    sub setRoomStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room boxes are drawn as priority 4 (above the map background, coloured squares, coloured
-        #   rectangles, room echos and fake room boxes)
-        #
-        # Expected arguments
-        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
-        #   $canvasObj      - The canvas object which has just been drawn
-        #   $roomObj        - The room model object which has just been drawn
-        #
-        # Optional arguments
-        #   $posn           - If this function has just been called by the same room-drawing
-        #                       function, we don't need to calculate the stack position; we can use
-        #                       the same one. Set to 'undef' otherwise
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   Otherwise returns the canvas object's drawing stack position, in case the same calling
-        #       function wants to call this function again
-
-        my ($self, $parchmentObj, $canvasObj, $roomObj, $posn, $check) = @_;
+        my ($self, $exitObj, $xPos, $yPos, $posnListRef, $check) = @_;
 
         # Local variables
-        my $levelObj;
+        my ($arrowVectorRef, $points);
 
         # Check for improper arguments
         if (
-            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
+            ! defined $exitObj || ! defined $xPos || ! defined $yPos || ! defined $posnListRef
+            || defined $check
         ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setRoomStackPosn', @_);
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->prepareArrowHead', @_);
         }
 
-        if (! defined $posn) {
+        # Find the exit's arrow vector - a reference to a list, (x1, y1, x2, y2)
+        # (x1, y1) is a vector showing the direction of one half of the arrowhead, starting at
+        #   the edge of the block. (x2, y2) is a vector showing the direction of travel of the
+        #   other half
+        # (NB The calling function has already checked that $exitObj->mapDir is defined)
+        $arrowVectorRef = $self->ivShow('constArrowVectorHash', $exitObj->mapDir);
+        # Prepare the arrowhead, as a list of points
+        $points = ' M '
+            # Start
+            . (
+                $$posnListRef[2] + $xPos + (
+                    $$arrowVectorRef[0] * int(
+                        ($self->drawRegionmap->blockWidthPixels
+                            - $self->drawRegionmap->roomWidthPixels) / 3
+                       )
+                )
+            )
+            . ' '
+            . (
+                $$posnListRef[3] + $yPos + (
+                    $$arrowVectorRef[1] * int(
+                        ($self->drawRegionmap->blockHeightPixels
+                            - $self->drawRegionmap->roomHeightPixels) / 3
+                    )
+                )
+            )
+            # Centre (intersecting the exit line itself)
+            . ' L ' . ($$posnListRef[2] + $xPos) . ' ' . ($$posnListRef[3] + $yPos)
+            # End
+            . ' L '
+            . (
+                $$posnListRef[2] + $xPos + (
+                    $$arrowVectorRef[2] * int(
+                        ($self->drawRegionmap->blockWidthPixels
+                            - $self->drawRegionmap->roomWidthPixels) / 3
+                    )
+                )
+            )
+            . ' '
+            . (
+                $$posnListRef[3] + $yPos + (
+                    $$arrowVectorRef[3] * int(
+                        ($self->drawRegionmap->blockHeightPixels
+                            - $self->drawRegionmap->roomHeightPixels) / 3
+                    )
+                )
+            );
 
-            $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
-
-            $posn = $parchmentObj->ivPairs('colouredSquareHash')
-                        + $parchmentObj->ivPairs('colouredRectHash')
-                        + $levelObj->ivPairs('drawnRoomEchoHash')
-                        + 1;
-        }
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise($posn);
-
-        return $posn;
+        return $points;
     }
 
-    sub setTextStackPosn {
+    sub reverseIntersectingLines {
 
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room interior text is drawn as priority 5 (above the map background, coloured blocks,
-        #   coloured rectangles, room echos, fake room boxes and real room boxes)
+        # Called by $self->drawBentExit when drawing a 2-way bent exit with two roughly parellel
+        #   lines
+        # This function detects whether those lines intersect each other, rather than run roughly
+        #   parallel and, if so, corrrects the problem
         #
         # Expected arguments
-        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
-        #   $canvasObj      - The canvas object which has just been drawn
-        #   $roomObj        - The room model object which has just been drawn
+        #   $listRef, $listRef2
+        #           - Two list references, each of which contain a list of points which make up the
+        #               beginning, end and middle bends of a single line
+        #           - Each list is in the form
+        #               (x, y, x, y, x, y, ...)
         #
         # Return values
         #   'undef' on improper arguments
-        #   1 otherwise
+        #   Otherwise returns a list containing the modified $listRef and $listRef2
 
-        my ($self, $parchmentObj, $canvasObj, $roomObj, $check) = @_;
+        my ($self, $listRef, $listRef2, $check) = @_;
 
         # Local variables
-        my $levelObj;
+        my $total;
 
         # Check for improper arguments
-        if (
-            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setTextStackPosn', @_);
+        if (! defined $listRef || ! defined $listRef2 || defined $check) {
+
+            return $axmud::CLIENT->writeImproper(
+                $self->_objClass . '->reverseIntersectingLines',
+                @_,
+            );
         }
 
-        $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
-
-        $canvasObj->lower_to_bottom();
-        $canvasObj->raise(
-            $parchmentObj->ivPairs('colouredSquareHash')
-            + $parchmentObj->ivPairs('colouredRectHash')
-            + $levelObj->ivPairs('drawnRoomEchoHash')
-            + $levelObj->ivPairs('drawnRoomHash')
-            + $levelObj->ivPairs('drawnDummyRoomHash')
-            + 1
-        );
-
-        return 1;
-    }
-
-    sub setExitStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
+        # Each pair of neighbouring points:
+        #   x = $$listRef[n], y = $$listRef[n + 1]
+        #   x = $$listRef2[n], y = $$listRef2[n + 1]
+        # ...may be the wrong way around, such that the two lines are not roughly parallel, but
+        #   cross over each other somewhere between the two points
         #
-        # Exits and exit ornaments are drawn as priority 6 (below labels, draggable exits, room
-        #   tags, room guilds and exit tags)
-        #
-        # Expected arguments
-        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
-        #   $canvasObj      - The canvas object which has just been drawn
-        #   $roomObj        - The exit's parent room model object
-        #
-        # Optional arguments
-        #   $posn           - If this function has just been called by the same exit-drawing
-        #                       function, we don't need to calculate the stack position; we can use
-        #                       the same one. Set to 'undef' otherwise
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   Otherwise returns the canvas object's drawing stack position, in case the same calling
-        #       function wants to call this function again
+        # For each neighbouring pairs of points, [n] and [n+1], work out whether the two lines
+        #   between them lines intersect each other (rather than remaining roughly parallel) and, if
+        #   so, reverse them to remove the intersection
 
-        my ($self, $parchmentObj, $canvasObj, $roomObj, $posn, $check) = @_;
+        # Get the number of points in the line (2 for each end of the line, plus the number of
+        #   bends - if there are no bends, there are four points in the line)
+        $total = (scalar @$listRef / 2);
+        # Don't reverse points at the beginning of the lines (but we might have to reverse points
+        #   at the end, as a knock-on effect of reversing points somewhere in the middle)
+        for (my $count = 1; $count < ($total - 1); $count++) {
 
-        # Local variables
-        my $levelObj;
+            my ($index, $dist1, $dist2, $dist3, $dist4, $spare);
 
-        # Check for improper arguments
-        if (
-            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setExitStackPosn', @_);
+            $index = $count * 2;
+
+            # Work out the length of the two lines that should be parallel, as they are at the
+            #   moment
+            $dist1 = sqrt(
+                        (($$listRef[$index] - $$listRef[($index+ 2)]) ** 2)
+                        + (($$listRef[($index + 1)] - $$listRef[($index + 3)]) ** 2)
+                    );
+
+            $dist2 = sqrt(
+                        (($$listRef2[$index] - $$listRef2[($index + 2)]) ** 2)
+                        + (($$listRef2[($index + 1)] - $$listRef2[($index + 3)]) ** 2)
+                    );
+
+            # Work out the length of the two lines that would be drawn, if the points at one end
+            #   were reversed
+            $dist3 = sqrt(
+                        (($$listRef[$index] - $$listRef2[($index + 2)]) ** 2)
+                        + (($$listRef[($index + 1)] - $$listRef2[($index + 3)]) ** 2)
+                    );
+
+            $dist4 = sqrt(
+                        (($$listRef2[$index] - $$listRef[($index + 2)]) ** 2)
+                        + (($$listRef2[($index + 1)] - $$listRef[($index + 3)]) ** 2)
+                    );
+
+            # By adding the distances, we can work out if the second pair of points need to be
+            #   reversed, in order to make the lines parallel
+            if (($dist1 + $dist2) > ($dist3 + $dist4)) {
+
+                $spare = $$listRef[($index + 2)];
+                $$listRef[($index + 2)] = $$listRef2[($index + 2)];
+                $$listRef2[($index + 2)] = $spare;
+
+                $spare = $$listRef[($index + 3)];
+                $$listRef[($index + 3)] = $$listRef2[($index + 3)];
+                $$listRef2[($index + 3)] = $spare;
+            }
         }
 
-        if (! $posn) {
-
-            $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
-
-            $posn = $levelObj->ivPairs('drawnLabelHash')
-                        + $levelObj->ivPairs('drawnRoomTagHash')
-                        + $levelObj->ivPairs('drawnRoomGuildHash')
-                        + $levelObj->ivPairs('drawnExitTagHash');
-        }
-
-        $canvasObj->raise_to_top();
-
-        # (The call to $canvasObj->lower won't accept a value of 0, so only call it for a positive
-        #   value)
-        if ($posn) {
-
-            $canvasObj->lower($posn);
-        }
-
-        return $posn;
-    }
-
-    sub setTagStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Room tags, room guilds and exit tags are drawn as priority 7 (below labels and draggable
-        #   exits)
-        #
-        # Expected arguments
-        #   $parchmentObj   - The parchment object (GA::Obj::Parchment) that stores canvas objects
-        #   $canvasObj      - The canvas object which has just been drawn
-        #   $roomObj        - The room model object (for exit tags, the exit's parent room)
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $parchmentObj, $canvasObj, $roomObj, $check) = @_;
-
-        # Local variables
-        my ($levelObj, $posn);
-
-        # Check for improper arguments
-        if (
-            ! defined $parchmentObj || ! defined $canvasObj || ! defined $roomObj || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setTagStackPosn', @_);
-        }
-
-        $levelObj = $parchmentObj->ivShow('levelHash', $roomObj->zPosBlocks);
-        $posn = $levelObj->ivPairs('drawnLabelHash');
-
-        $canvasObj->raise_to_top();
-
-        # (The call to $canvasObj->lower won't accept a value of 0, so only call it for a positive
-        #   value)
-        if ($posn) {
-
-            $canvasObj->lower($posn);
-        }
-
-        return 1;
-    }
-
-    sub setLabelStackPosn {
-
-        # Called by various drawing functions
-        # Sets the canvas object's position in the canvas drawing stack
-        #
-        # Labels (and draggable exits) are drawn as priority 8 (above everything else)
-        #
-        # Expected arguments
-        #   $canvasObj      - The canvas object which has just been drawn
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $canvasObj, $check) = @_;
-
-        # Check for improper arguments
-        if (! defined $canvasObj || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->setLabelStackPosn', @_);
-        }
-
-        $canvasObj->raise_to_top();
-
-        return 1;
+        return $listRef, $listRef2;
     }
 
     # Graphical lookup functions
@@ -42767,7 +42517,7 @@
         }
 
         # Show the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
+        my $dialogueWin = Gtk3::Dialog->new(
             'Select gridblock',
             $self->winWidget,          # Parent window is this window
             [qw/modal destroy-with-parent/],
@@ -42776,7 +42526,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         $dialogueWin->signal_connect('delete-event' => sub {
 
@@ -42787,43 +42537,43 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # X co-ordinate
-        my $labelX = Gtk2::Label->new();
-        $vBox2->pack_start($labelX, 0, 0, 5);
+        my $labelX = Gtk3::Label->new();
+        $vBox2->pack_start($labelX, FALSE, FALSE, 5);
         $labelX->set_alignment(0, 0);
         $labelX->set_markup(
             'X co-ordinate (0-' . ($self->currentRegionmap->gridWidthBlocks - 1) . ')'
         );
 
-        my $entryX = Gtk2::Entry->new();
-        $vBox2->pack_start($entryX, 0, 0, 5);
+        my $entryX = Gtk3::Entry->new();
+        $vBox2->pack_start($entryX, FALSE, FALSE, 5);
 
         # Y co-ordinate
-        my $labelY = Gtk2::Label->new;
-        $vBox2->pack_start($labelY, 0, 0, 5);
+        my $labelY = Gtk3::Label->new;
+        $vBox2->pack_start($labelY, FALSE, FALSE, 5);
         $labelY->set_alignment(0, 0);
         $labelY->set_markup(
             'Y co-ordinate (0-' . ($self->currentRegionmap->gridHeightBlocks - 1) . ')'
         );
 
-        my $entryY = Gtk2::Entry->new();
-        $vBox2->pack_start($entryY, 0, 0, 5);
+        my $entryY = Gtk3::Entry->new();
+        $vBox2->pack_start($entryY, FALSE, FALSE, 5);
 
         # Z co-ordinate
-        my $labelZ = Gtk2::Label->new;
-        $vBox2->pack_start($labelZ, 0, 0, 5);
+        my $labelZ = Gtk3::Label->new;
+        $vBox2->pack_start($labelZ, FALSE, FALSE, 5);
         $labelZ->set_alignment(0, 0);
         $labelZ->set_markup(
             'Z co-ordinate (any value)'
         );
 
-        my $entryZ = Gtk2::Entry->new();
-        $vBox2->pack_start($entryZ, 0, 0, 5);
+        my $entryZ = Gtk3::Entry->new();
+        $vBox2->pack_start($entryZ, FALSE, FALSE, 5);
 
         # As a timesaver, enter the currently displayed level (if any)
         if ($self->currentRegionmap) {
@@ -42915,29 +42665,32 @@
 
         # Prepare a list of map sizes
         @sizeList = (
-            'Default (' . $self->worldModelObj->defaultGridWidthBlocks . '/'
+            'Default (' . $self->worldModelObj->defaultGridWidthBlocks . ' x '
             . $self->worldModelObj->defaultGridHeightBlocks. ')',
                 $self->worldModelObj->defaultGridWidthBlocks,
                 $self->worldModelObj->defaultGridHeightBlocks,
-            'Tiny (11x11)',
+            'Minuscule (5 x 5)',
+                5,
+                5,
+            'Tiny (11 x 11)',
                 11,
                 11,
-            'Very small (21x21)',
+            'Very small (21 x 21)',
                 21,
                 21,
-            'Small (51x51)',
+            'Small (51 x 51)',
                 51,
                 51,
-            'Compact (101x101)',
+            'Compact (101 x 101)',
                 101,
                 101,
-            'Normal (201x201)',
+            'Normal (201 x 201)',
                 201,
                 201,
-            'Large (501x501)',
+            'Large (501 x 501)',
                 501,
                 501,
-            'Enormous (1001x1001)',
+            'Enormous (1001 x 1001)',
                 1001,
                 1001,
         );
@@ -42963,7 +42716,7 @@
         } until (! @sizeList);
 
         # That completes the setup. Now, show the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
+        my $dialogueWin = Gtk3::Dialog->new(
             $title,
             $self->winWidget,
             [qw/modal destroy-with-parent/],
@@ -42972,7 +42725,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         $dialogueWin->signal_connect('delete-event' => sub {
 
@@ -42983,13 +42736,13 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # Add widgets
-        my $label = Gtk2::Label->new();
+        my $label = Gtk3::Label->new();
         $vBox2->pack_start($label, FALSE, FALSE, $spacing);
         $label->set_alignment(0, 0);
         $label->set_markup(
@@ -42997,15 +42750,16 @@
             . "or leave empty to generate a generic name",
         );
 
-        my $entry = Gtk2::Entry->new_with_max_length(32);
+        my $entry = Gtk3::Entry->new();
         $vBox2->pack_start($entry, FALSE, FALSE, $spacing);
+        $entry->set_max_length(32);
 
-        my $label2 = Gtk2::Label->new();
+        my $label2 = Gtk3::Label->new();
         $vBox2->pack_start($label2, FALSE, FALSE, $spacing);
         $label2->set_alignment(0, 0);
         $label2->set_markup('(Optional) select the parent region');
 
-        my $combo = Gtk2::ComboBox->new_text();
+        my $combo = Gtk3::ComboBoxText->new();
         $vBox2->pack_start($combo, FALSE, FALSE, $spacing);
         foreach my $item (@comboList) {
 
@@ -43013,13 +42767,18 @@
         }
 
         $combo->set_active(0);
+        if ((scalar @comboList) == 1) {
 
-        my $label3 = Gtk2::Label->new();
+            # No regions exist, so no need to offer a parent region
+            $combo->set_sensitive(FALSE);
+        }
+
+        my $label3 = Gtk3::Label->new();
         $vBox2->pack_start($label3, FALSE, FALSE, $spacing);
         $label3->set_alignment(0, 0);
         $label3->set_markup('(Optional) change the map size');
 
-        my $combo2 = Gtk2::ComboBox->new_text();
+        my $combo2 = Gtk3::ComboBoxText->new();
         $vBox2->pack_start($combo2, FALSE, FALSE, $spacing);
         foreach my $item (@comboList2) {
 
@@ -43209,7 +42968,7 @@
         unshift (@profList, $self->session->currentWorld->name);
 
         # That completes the setup. Now, show the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
+        my $dialogueWin = Gtk3::Dialog->new(
             $title,
             $self->winWidget,
             [qw/modal destroy-with-parent/],
@@ -43218,7 +42977,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         $dialogueWin->signal_connect('delete-event' => sub {
 
@@ -43229,9 +42988,9 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # Add widgets
@@ -43273,13 +43032,13 @@
             }
 
             # Add a combobox to choose the map direction
-            my $label = Gtk2::Label->new();
-            $vBox2->pack_start($label, 0, 0, 5);
+            my $label = Gtk3::Label->new();
+            $vBox2->pack_start($label, FALSE, FALSE, 5);
             $label->set_alignment(0, 0);
             $label->set_markup('Standard map direction, e.g. <i>\'north\' </i>');
 
-            $comboBox = Gtk2::ComboBox->new_text;
-            $vBox2->pack_start($comboBox, 0, 0, 5);
+            $comboBox = Gtk3::ComboBoxText->new();
+            $vBox2->pack_start($comboBox, FALSE, FALSE, 5);
             foreach my $dir (@availableList) {
 
                 $comboBox->append_text($dir);
@@ -43287,13 +43046,13 @@
             $comboBox->set_active($match);
 
             # Add an entry box to choose the exit's nominal direction, if different
-            my $label2 = Gtk2::Label->new();
-            $vBox2->pack_start($label2, 0, 0, 5);
+            my $label2 = Gtk3::Label->new();
+            $vBox2->pack_start($label2, FALSE, FALSE, 5);
             $label2->set_alignment(0, 0);
             $label2->set_markup('Matches named exit, e.g. <i>\'north\', \'portal\' </i>');
 
-            $entry = Gtk2::Entry->new();
-            $vBox2->pack_start($entry, 0, 0, 5);
+            $entry = Gtk3::Entry->new();
+            $vBox2->pack_start($entry, FALSE, FALSE, 5);
 
             if ($exitObj && $mode eq 'change_dir') {
 
@@ -43354,8 +43113,8 @@
                 });
             }
 
-            my $line = Gtk2::HSeparator->new();
-            $vBox2->pack_start($line, 0, 0, 5);
+            my $line = Gtk3::HSeparator->new();
+            $vBox2->pack_start($line, FALSE, FALSE, 5);
         }
 
         # Called by ->setAssistedMoveCallback
@@ -43363,13 +43122,13 @@
 
             # Add two entry boxes, which can't be modified, to inform the user which exit they're
             #   modifying. The format is the same as for the add exit 'dialogue' window
-            my $label = Gtk2::Label->new();
-            $vBox2->pack_start($label, 0, 0, 5);
+            my $label = Gtk3::Label->new();
+            $vBox2->pack_start($label, FALSE, FALSE, 5);
             $label->set_alignment(0, 0);
             $label->set_markup('Direction drawn on map, e.g. <i>\'north\' </i>');
 
-            $entry3 = Gtk2::Entry->new();
-            $vBox2->pack_start($entry3, 0, 0, 5);
+            $entry3 = Gtk3::Entry->new();
+            $vBox2->pack_start($entry3, FALSE, FALSE, 5);
             if ($exitObj->mapDir) {
                 $entry3->set_text($exitObj->mapDir);
             } else {
@@ -43377,13 +43136,13 @@
             }
             $entry3->set_sensitive(FALSE);
 
-            my $label2 = Gtk2::Label->new();
-            $vBox2->pack_start($label2, 0, 0, 5);
+            my $label2 = Gtk3::Label->new();
+            $vBox2->pack_start($label2, FALSE, FALSE, 5);
             $label2->set_alignment(0, 0);
             $label2->set_markup('Matches named exit, e.g. <i>\'north\', \'portal\' </i>');
 
-            $entry4 = Gtk2::Entry->new();
-            $vBox2->pack_start($entry4, 0, 0, 5);
+            $entry4 = Gtk3::Entry->new();
+            $vBox2->pack_start($entry4, FALSE, FALSE, 5);
             $entry4->set_text($exitObj->dir);
             $entry4->set_sensitive(FALSE);
         }
@@ -43392,8 +43151,8 @@
         if (! $exitObj || ($exitObj && $mode eq 'set_assist')) {
 
             # Add a combobox and an entry to add an optional key-value pair to ->assistedMoveHash
-            my $label4 = Gtk2::Label->new();
-            $vBox2->pack_start($label4, 0, 0, 5);
+            my $label4 = Gtk3::Label->new();
+            $vBox2->pack_start($label4, FALSE, FALSE, 5);
             $label4->set_alignment(0, 0);
 
             if (! $exitObj) {
@@ -43403,8 +43162,8 @@
             }
 
 
-            $comboBox2 = Gtk2::ComboBox->new_text();
-            $vBox2->pack_start($comboBox2, 0, 0, 5);
+            $comboBox2 = Gtk3::ComboBoxText->new();
+            $vBox2->pack_start($comboBox2, FALSE, FALSE, 5);
             foreach my $profile (@profList) {
 
                 $comboBox2->append_text($profile);
@@ -43412,15 +43171,15 @@
 
             $comboBox2->set_active(0);
 
-            my $label5 = Gtk2::Label->new();
-            $vBox2->pack_start($label5, 0, 0, 5);
+            my $label5 = Gtk3::Label->new();
+            $vBox2->pack_start($label5, FALSE, FALSE, 5);
             $label5->set_alignment(0, 0);
             $label5->set_markup(
                 'Command sequence, e.g. <i>\'push button' . $axmud::CLIENT->cmdSep . 'north\' </i>',
             );
 
-            $entry2 = Gtk2::Entry->new();
-            $vBox2->pack_start($entry2, 0, 0, 5);
+            $entry2 = Gtk3::Entry->new();
+            $vBox2->pack_start($entry2, FALSE, FALSE, 5);
 
             # When called by ->setAssistedMoveCallback, the entry box should contain the assisted
             #   move for the profile displayed in $comboBox2, if any
@@ -43595,7 +43354,7 @@
         }
 
         # That completes the setup. Now, show the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
+        my $dialogueWin = Gtk3::Dialog->new(
             'Add multiple exits',
             $self->winWidget,
             [qw/modal destroy-with-parent/],
@@ -43604,7 +43363,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         # Destroy the window, when required
         $dialogueWin->signal_connect('delete-event' => sub {
@@ -43616,19 +43375,19 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # Add a table, and arrange widgets on it
-        my $table = Gtk2::Table->new(3, 12, FALSE);
+        my $table = Gtk3::Grid->new();
         $vBox2->pack_start($table, TRUE, TRUE, $axmud::CLIENT->constFreeSpacingPixels);
-        $table->set_row_spacings($axmud::CLIENT->constFreeSpacingPixels);
-        $table->set_col_spacings($axmud::CLIENT->constFreeSpacingPixels);
+        $table->set_column_spacing($axmud::CLIENT->constFreeSpacingPixels);
+        $table->set_row_spacing($axmud::CLIENT->constFreeSpacingPixels);
 
-        my $label = Gtk2::Label->new();
-        $table->attach_defaults($label, 0, 3, 0, 1);
+        my $label = Gtk3::Label->new();
+        $table->attach($label, 0, 0, 3, 1);
         $label->set_alignment(0, 0);
         if ($self->selectedRoom) {
 
@@ -43653,12 +43412,12 @@
         ) {
             $count++;
 
-            my $checkButton = Gtk2::CheckButton->new_with_label($dir);
+            my $checkButton = Gtk3::CheckButton->new_with_label($dir);
 
             if ($count <= 9) {
-                $table->attach_defaults($checkButton, 0, 1, $count, ($count + 1));
+                $table->attach($checkButton, 0, $count, 1, 1);
             } else {
-                $table->attach_defaults($checkButton, 1, 3, ($count - 9), ($count - 8));
+                $table->attach($checkButton, 1, ($count - 9), 2, 1);
             }
 
             $checkButton->signal_connect('toggled' => sub {
@@ -43683,8 +43442,8 @@
 
         # Add two buttons at the bottom to select all/no available directions, and to specify
         #   hidden exits
-        my $button = Gtk2::Button->new('Select all');
-        $table->attach_defaults($button, 0, 2, 10, 11);
+        my $button = Gtk3::Button->new('Select all');
+        $table->attach($button, 0, 10, 2, 1);
         $button->signal_connect('clicked' => sub {
 
             foreach my $checkButton (@widgetList) {
@@ -43696,8 +43455,8 @@
             }
         });
 
-        my $button2 = Gtk2::Button->new('Select none');
-        $table->attach_defaults($button2, 2, 3, 10, 11);
+        my $button2 = Gtk3::Button->new('Select none');
+        $table->attach($button2, 2, 10, 1, 1);
         $button2->signal_connect('clicked' => sub {
 
             foreach my $checkButton (@widgetList) {
@@ -43709,12 +43468,12 @@
             }
         });
 
-        my $button3 = Gtk2::CheckButton->new_with_label('Add these exits as hidden exits');
-        $table->attach_defaults($button3, 0, 3, 11, 12);
+        my $button3 = Gtk3::CheckButton->new_with_label('Add these exits as hidden exits');
+        $table->attach($button3, 0, 11, 3, 1);
 
         # Add a seperator above the OK/Cancel buttons
-        my $separator = Gtk2::HSeparator->new();
-        $vBox2->pack_start($separator, 0, 0, 10);
+        my $separator = Gtk3::HSeparator->new();
+        $vBox2->pack_start($separator, FALSE, FALSE, 10);
 
         # Display the dialogue
         $vBox->show_all();
@@ -43796,7 +43555,6 @@
         $choice = $self->showComboDialogue(
             'Select exit',
             $text,
-            FALSE,
             $stringListRef,
         );
 
@@ -43843,7 +43601,7 @@
         }
 
         # Create the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
+        my $dialogueWin = Gtk3::Dialog->new(
             'Set file path',
             $self->winWidget,
             [qw/modal destroy-with-parent/],
@@ -43852,7 +43610,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         $dialogueWin->signal_connect('delete-event' => sub {
 
@@ -43863,9 +43621,9 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # First label and entry
@@ -43876,19 +43634,19 @@
             $msg .= "<i>(current value: not set)</i>";
         }
 
-        my $label = Gtk2::Label->new();
-        $vBox2->pack_start($label, 0, 0, 5);
+        my $label = Gtk3::Label->new();
+        $vBox2->pack_start($label, FALSE, FALSE, 5);
         $label->set_alignment(0, 0);
         $label->set_markup($msg);
 
-        my $entry = Gtk2::Entry->new();
-        $vBox2->pack_start($entry, 0, 0, 5);
+        my $entry = Gtk3::Entry->new();
+        $vBox2->pack_start($entry, FALSE, FALSE, 5);
         # Use the room's existing path, if it has one; otherwise, copy the last path entered by
         #   the user, so they can edit it without re-typing the whole thing
         if ($roomObj->sourceCodePath) {
-            $entry->append_text($roomObj->sourceCodePath);
+            $entry->set_text($roomObj->sourceCodePath);
         } elsif ($self->worldModelObj->lastFilePath) {
-            $entry->append_text($self->worldModelObj->lastFilePath);
+            $entry->set_text($self->worldModelObj->lastFilePath);
         }
 
         # Second label and entry
@@ -43899,16 +43657,16 @@
             $msg2 .= "<i>(current value: not set)</i>";
         }
 
-        my $label2 = Gtk2::Label->new();
-        $vBox2->pack_start($label2, 0, 0, 5);
+        my $label2 = Gtk3::Label->new();
+        $vBox2->pack_start($label2, FALSE, FALSE, 5);
         $label2->set_alignment(0, 0);
         $label2->set_markup($msg2);
 
-        my $hBox = Gtk2::HBox->new(FALSE, 0);
-        $vBox->pack_start($hBox, 0, 0, 5);
+        my $hBox = Gtk3::HBox->new(FALSE, 0);
+        $vBox->pack_start($hBox, FALSE, FALSE, 5);
 
-        my $entry2 = Gtk2::Entry->new();
-        $hBox->pack_start($entry2, 1, 1, 0);
+        my $entry2 = Gtk3::Entry->new();
+        $hBox->pack_start($entry2, TRUE, TRUE, 0);
         # Use the room's existing virtual area path, if it has one; otherwise use the last path
         #   entered by the user
         if ($roomObj->virtualAreaPath) {
@@ -43923,16 +43681,14 @@
             $entry2->set_sensitive(FALSE);
         }
 
-        my $tooltips = Gtk2::Tooltips->new();
-
-        my $button = Gtk2::Button->new('Copy');
-        $hBox->pack_start($button, 1, 1, 5);
+        my $button = Gtk3::Button->new('Copy');
+        $hBox->pack_start($button, TRUE, TRUE, 5);
         $button->signal_connect('clicked' => sub {
 
             # Copy the contents of the first entry into the second
             $entry2->set_text($entry->get_text());
         });
-        $tooltips->set_tip($button, 'Copy the file path into this entry box');
+        $button->set_tooltip_text('Copy the file path into this entry box');
 
         # The second entry can only be edited when the first contains text
         $entry->signal_connect('changed' => sub {
@@ -43971,7 +43727,7 @@
     sub promptAdjacentMode {
 
         # Called by $self->adjacentModeCallback
-        # Prompts the user to enter new values for GA::Obj::WorldModel->adjancentMode and
+        # Prompts the user to enter new values for GA::Obj::WorldModel->adjacentMode and
         #   ->adjacentCount, and returns them
         #
         # Expected arguments
@@ -44002,7 +43758,7 @@
         $spacing = $axmud::CLIENT->constFreeSpacingPixels;
 
         # Show the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
+        my $dialogueWin = Gtk3::Dialog->new(
             'Adjacent regions regions mode',
             $self->winWidget,
             [qw/modal destroy-with-parent/],
@@ -44011,7 +43767,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         $dialogueWin->signal_connect('delete-event' => sub {
 
@@ -44022,13 +43778,13 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # First label and combo
-        my $label = Gtk2::Label->new();
+        my $label = Gtk3::Label->new();
         $vBox2->pack_start($label, FALSE, FALSE, $spacing);
         $label->set_alignment(0, 0);
         $label->set_markup(
@@ -44068,7 +43824,7 @@
         unshift (@comboList, $first);
 
         # Fill the combo box with the specified lines, and display the first line
-        my $combo = Gtk2::ComboBox->new_text();
+        my $combo = Gtk3::ComboBoxText->new();
         $vBox2->pack_start($combo, FALSE, FALSE, $spacing);
         foreach my $line (@comboList) {
 
@@ -44078,7 +43834,7 @@
         # (->signal_connect appears below)
 
         # Second label and entry
-        my $label2 = Gtk2::Label->new();
+        my $label2 = Gtk3::Label->new();
         $vBox2->pack_start($label2, FALSE, FALSE, $spacing);
         $label2->set_alignment(0, 0);
         $label2->set_markup(
@@ -44088,8 +43844,9 @@
         );
 
         # (Use the same maximum characters that the 'edit' window uses
-        my $entry = Gtk2::Entry->new_with_max_length(4);
+        my $entry = Gtk3::Entry->new();
         $vBox2->pack_start($entry, FALSE, FALSE, $spacing);
+        $entry->set_max_length(4);
         $entry->set_text($self->worldModelObj->adjacentCount);
         if ($self->worldModelObj->adjacentMode ne 'near') {
 
@@ -44117,7 +43874,7 @@
         #   consistently active (don't know why this works; it just does)
         $dialogueWin->show_all();
         $dialogueWin->present();
-        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->showEntryComboDialogue');
+        $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->promptAdjacentMode');
 
         # Get the response. If the user clicked 'cancel', $response will be 'reject'
         # Otherwise, user clicked 'ok', and we need to get the contents of the two boxes
@@ -44173,10 +43930,10 @@
 
         # Local variables
         my (
-            $current, $response, $textColour, $underlayColour, $count, $index, $relSize, $text,
-            $choice,
+            $title, $current, $response, $textColour, $underlayColour, $count, $index, $relSize,
+            $text, $choice, $angleFlag,
             @emptyList, @list, @comboList,
-            %descripHash,
+            %descripHash, %revDescripHash,
         );
 
         # Check for improper arguments
@@ -44187,8 +43944,14 @@
         }
 
         # Show the 'dialogue' window
-        my $dialogueWin = Gtk2::Dialog->new(
-            'Add label',
+        if (! $customiseFlag) {
+            $title = 'Add label';
+        } else {
+            $title = 'Customise label';
+        }
+
+        my $dialogueWin = Gtk3::Dialog->new(
+            $title,
             $self->winWidget,
             [qw/modal destroy-with-parent/],
             'gtk-cancel' => 'reject',
@@ -44196,7 +43959,7 @@
         );
 
         $dialogueWin->set_position('center-always');
-        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->dialogueWinIconList);
+        $dialogueWin->set_icon_list($axmud::CLIENT->desktopObj->{dialogueWinIconList});
 
         $dialogueWin->signal_connect('delete-event' => sub {
 
@@ -44207,13 +43970,13 @@
         });
 
         # Add widgets to the 'dialogue' window
-        my $vBox = $dialogueWin->vbox;
+        my $vBox = $dialogueWin->get_content_area();
         # The call to ->addDialogueIcon splits $vBox in two, with an icon on the left, and a new
-        #   Gtk2::VBox on the right, into which we put everything
+        #   Gtk3::VBox on the right, into which we put everything
         my $vBox2 = $self->addDialogueIcon($vBox);
 
         # First label and entry/textview
-        my $label = Gtk2::Label->new();
+        my $label = Gtk3::Label->new();
         $vBox2->pack_start($label, FALSE, FALSE, 5);
         $label->set_alignment(0, 0);
         $label->set_markup('Enter the label text');
@@ -44227,7 +43990,7 @@
             && (! $labelObj || ! ($labelObj->name =~ m/\n/))
         ) {
             # Create an entry
-            $entry = Gtk2::Entry->new();
+            $entry = Gtk3::Entry->new();
             # (->signal_connect appears below)
             $vBox2->pack_start($entry, FALSE, FALSE, 5);
             if ($labelObj) {
@@ -44249,20 +44012,21 @@
         } else {
 
             # Create a textview using the system's preferred colours and fonts
-            $scroller = Gtk2::ScrolledWindow->new(undef, undef);
+            $scroller = Gtk3::ScrolledWindow->new(undef, undef);
             $vBox2->pack_start($scroller, FALSE, FALSE, 5);
             $scroller->set_shadow_type('etched-out');
             $scroller->set_policy('automatic', 'automatic');
             $scroller->set_size_request(200, 75);
 
             # Create a textview with default colours/fonts for a dialogue window
-            $axmud::CLIENT->desktopObj->getTextViewStyle('dialogue');
-            $textView = Gtk2::TextView->new();
+            $textView = Gtk3::TextView->new();
             $scroller->add($textView);
-            $buffer = Gtk2::TextBuffer->new();
+            $buffer = Gtk3::TextBuffer->new();
             $textView->set_buffer($buffer);
             $textView->set_editable(TRUE);
             $textView->set_cursor_visible(TRUE);
+
+            $axmud::CLIENT->desktopObj->setTextViewStyle('dialogue', $textView);
 
             if ($labelObj) {
 
@@ -44278,12 +44042,13 @@
             $label5, $entry2,
             $checkButton, $checkButton2, $checkButton3, $checkButton4, $checkButton5,
             $label6, $combo2,
+            $entry3,
         );
 
         if (! $customiseFlag) {
 
             # Second label and combo
-            $label2 = Gtk2::Label->new();
+            $label2 = Gtk3::Label->new();
             $vBox2->pack_start($label2, FALSE, FALSE, 5);
             $label2->set_alignment(0, 0);
             $label2->set_markup('Select a label style');
@@ -44310,8 +44075,8 @@
                 unshift(@comboList, $current);
             }
 
-            $combo = Gtk2::ComboBox->new_text();
-            $vBox2->pack_start($combo, 0, 0, 5);
+            $combo = Gtk3::ComboBoxText->new();
+            $vBox2->pack_start($combo, FALSE, FALSE, 5);
             foreach my $item (@comboList) {
 
                 $combo->append_text($item);
@@ -44319,21 +44084,20 @@
 
             $combo->set_active(0);
 
-#        } elsif ($labelObj && $customiseFlag) {
         } else {
 
             # Extra widgets for all map label object IVs apart from ->style (which is about to be
             #   reset). A lot to fit in, so we're going to need a table
-            $table = Gtk2::Table->new(7, 12, FALSE);
+            $table = Gtk3::Grid->new();
             $vBox2->pack_start($table, TRUE, TRUE, $axmud::CLIENT->constFreeSpacingPixels);
-            $table->set_row_spacings($axmud::CLIENT->constFreeSpacingPixels);
-            $table->set_col_spacings($axmud::CLIENT->constFreeSpacingPixels);
+            $table->set_column_spacing($axmud::CLIENT->constFreeSpacingPixels);
+            $table->set_row_spacing($axmud::CLIENT->constFreeSpacingPixels);
 
             # Text colour
             $textColour = $labelObj->textColour;            # May be 'undef'
 
-            $label3 = Gtk2::Label->new();
-            $table->attach_defaults($label3, 0, 3, 0, 1);
+            $label3 = Gtk3::Label->new();
+            $table->attach($label3, 0, 0, 3, 1);
             $label3->set_markup('Text colour');
             $label3->set_alignment(0, 0.5);
 
@@ -44343,8 +44107,8 @@
                 3, 6, 0, 1,
             );
 
-            $button = Gtk2::Button->new('Set');
-            $table->attach_defaults($button, 6, 9, 0, 1);
+            $button = Gtk3::Button->new('Set');
+            $table->attach($button, 6, 0, 3, 1);
             $button->signal_connect('clicked' => sub {
 
                 my $choice = $self->showColourSelectionDialogue(
@@ -44359,8 +44123,8 @@
                 }
             });
 
-            $button2 = Gtk2::Button->new('Reset');
-            $table->attach_defaults($button2, 9, 12, 0, 1);
+            $button2 = Gtk3::Button->new('Reset');
+            $table->attach($button2, 9, 0, 3, 1);
             $button2->signal_connect('clicked' => sub {
 
                 $textColour = undef;
@@ -44370,8 +44134,8 @@
             # Underlay colour
             $underlayColour = $labelObj->underlayColour;    # May be 'undef'
 
-            $label4 = Gtk2::Label->new();
-            $table->attach_defaults($label4, 0, 3, 1, 2);
+            $label4 = Gtk3::Label->new();
+            $table->attach($label4, 0, 1, 3, 1);
             $label4->set_markup('Underlay colour');
             $label4->set_alignment(0, 0.5);
 
@@ -44381,8 +44145,8 @@
                 3, 6, 1, 2,
             );
 
-            $button3 = Gtk2::Button->new('Set');
-            $table->attach_defaults($button3, 6, 9, 1, 2);
+            $button3 = Gtk3::Button->new('Set');
+            $table->attach($button3, 6, 1, 3, 1);
             $button3->signal_connect('clicked' => sub {
 
                 my $choice = $self->showColourSelectionDialogue(
@@ -44397,8 +44161,8 @@
                 }
             });
 
-            $button4 = Gtk2::Button->new('Reset');
-            $table->attach_defaults($button4, 9, 12, 1, 2);
+            $button4 = Gtk3::Button->new('Reset');
+            $table->attach($button4, 9, 1, 3, 1);
             $button4->signal_connect('clicked' => sub {
 
                 $underlayColour = undef;
@@ -44406,76 +44170,112 @@
             });
 
             # Relative size
-            $label5 = Gtk2::Label->new();
-            $table->attach_defaults($label5, 0, 3, 2, 3);
+            $label5 = Gtk3::Label->new();
+            $table->attach($label5, 0, 2, 3, 1);
             $label5->set_markup('Size (0.5 - 10)');
             $label5->set_alignment(0, 0.5);
 
-            $entry2 = Gtk2::Entry->new();
-            $table->attach_defaults($entry2, 3, 12, 2, 3);
+            $entry2 = Gtk3::Entry->new();
+            $table->attach($entry2, 3, 2, 9, 1);
             $entry2->set_text($labelObj->relSize);
             $entry2->set_width_chars(8);
             $entry2->set_max_length(8);
 
             # Flags
-            $checkButton = Gtk2::CheckButton->new_with_label('Italics');
-            $table->attach_defaults($checkButton, 0, 3, 3, 4);
+            $checkButton = Gtk3::CheckButton->new_with_label('Italics');
+            $table->attach($checkButton, 0, 3, 3, 1);
             $checkButton->set_active($labelObj->italicsFlag);
 
-            $checkButton2 = Gtk2::CheckButton->new_with_label('Bold');
-            $table->attach_defaults($checkButton2, 0, 3, 4, 5);
+            $checkButton2 = Gtk3::CheckButton->new_with_label('Bold');
+            $table->attach($checkButton2, 0, 4, 3, 1);
             $checkButton2->set_active($labelObj->boldFlag);
 
-            $checkButton3 = Gtk2::CheckButton->new_with_label('Underline');
-            $table->attach_defaults($checkButton3, 0, 3, 5, 6);
+            $checkButton3 = Gtk3::CheckButton->new_with_label('Underline');
+            $table->attach($checkButton3, 0, 5, 3, 1);
             $checkButton3->set_active($labelObj->underlineFlag);
 
-            $checkButton4 = Gtk2::CheckButton->new_with_label('Strike');
-            $table->attach_defaults($checkButton4, 3, 12, 3, 4);
+            $checkButton4 = Gtk3::CheckButton->new_with_label('Strike');
+            $table->attach($checkButton4, 3, 3, 9, 1);
             $checkButton4->set_active($labelObj->strikeFlag);
 
-            $checkButton5 = Gtk2::CheckButton->new_with_label('Draw box');
-            $table->attach_defaults($checkButton5, 3, 12, 4, 5);
+            $checkButton5 = Gtk3::CheckButton->new_with_label('Draw box');
+            $table->attach($checkButton5, 3, 4, 9, 1);
             $checkButton5->set_active($labelObj->boxFlag);
 
-#            # Gravity
-#            $label6 = Gtk2::Label->new();
-#            $table->attach_defaults($label6, 0, 3, 6, 7);
-#            $label6->set_markup('Orientation');
-#            $label6->set_alignment(0, 0.5);
-#
-#            $count = -1;
-#            @list = (
-#                'south' => 'Normal',
-#                'north' => 'Rotated 180 degrees',
-#                'west'  => '90 degrees clockwise',
-#                'east'  => '90 degrees anti-clockwise',
-#            );
-#
-#            do {
-#
-#                my $gravity = shift @list;
-#                my $descrip = shift @list;
-#
-#                push (@comboList, $descrip);
-#                $descripHash{$descrip} = $gravity;
-#
-#                $count++;
-#                if ($gravity eq $labelObj->gravity) {
-#
-#                    $index = $count;
-#                }
-#
-#            } until (! @list);
-#
-#            $combo2 = Gtk2::ComboBox->new_text();
-#            $table->attach_defaults($combo2, 3, 12, 6, 7);
-#            foreach my $item (@comboList) {
-#
-#                $combo2->append_text($item);
-#            }
-#
-#            $combo2->set_active($index);
+            # Orientation
+            $count = -1;
+            @list = (
+                0 => 'Normal orientation',
+                180 => 'Rotated 180 degrees',
+                90  => 'Rotated 90 degrees clockwise',
+                270  => 'Rotated 90 degrees anti-clockwise',
+                -1 => 'Custom orientation (set below)',
+            );
+
+            do {
+
+                my $angle = shift @list;
+                my $descrip = shift @list;
+
+                push (@comboList, $descrip);
+                $descripHash{$descrip} = $angle;
+                $revDescripHash{$angle} = $descrip;
+
+                $count++;
+                if ($angle == $labelObj->rotateAngle) {
+
+                    $index = $count;
+                    $angleFlag = TRUE;
+                }
+
+            } until (! @list);
+
+            $combo2 = Gtk3::ComboBoxText->new();
+            $table->attach($combo2, 0, 6, 12, 1);
+            foreach my $item (@comboList) {
+
+                $combo2->append_text($item);
+            }
+            # ->signal_connect appears below
+
+            $label6 = Gtk3::Label->new();
+            $table->attach($label6, 0, 7, 3, 1);
+            $label6->set_markup('Degrees (0-359)');
+            $label6->set_alignment(0, 0.5);
+
+            $entry3 = Gtk3::Entry->new();
+            $table->attach($entry3, 3, 7, 9, 1);
+            $entry3->set_text($labelObj->rotateAngle);
+            $entry3->set_width_chars(3);
+            $entry3->set_max_length(3);
+
+            if ($angleFlag) {
+
+                $combo2->set_active($index);
+                $entry3->set_sensitive(FALSE);
+
+            } else {
+
+                $combo2->set_active($count);
+                $entry3->set_sensitive(TRUE);
+            }
+
+            # ->signal_connect from above
+            $combo2->signal_connect('changed' => sub {
+
+                my $descrip = $combo2->get_active_text();
+
+                if ($descrip eq $revDescripHash{-1}) {
+
+                    $entry3->set_sensitive(TRUE);
+                    $entry3->set_text(0);
+
+                } else {
+
+                    $entry3->set_sensitive(FALSE);
+                    $entry3->set_text($descripHash{$descrip});
+                }
+            });
         }
 
         # Display the dialogue window. The double call to ->present is needed so the user can type
@@ -44489,7 +44289,7 @@
 
         if (defined $text) {
 
-            # User pressed their ENTER key in the Gtk2::Entry, so $text is already set
+            # User pressed their ENTER key in the Gtk3::Entry, so $text is already set
             $response = 'accept';
 
         } elsif ($entry) {
@@ -44518,7 +44318,6 @@
 
             return ($text, $choice);
 
-#        } elsif ($labelObj && $customiseFlag) {
         } else {
 
             # Update the map label object's IVs
@@ -44561,7 +44360,11 @@
                 $labelObj->ivPoke('boxFlag', TRUE);
             }
 
-#            $labelObj->ivPoke('gravity', $combo2->get_active_text());
+            if ($axmud::CLIENT->intCheck($entry3->get_text(), 0, 359)) {
+                $labelObj->ivPoke('rotateAngle', $entry3->get_text());
+            } else {
+                $labelObj->ivPoke('rotateAngle', 0);
+            }
 
             # The following function call takes care of the ->name IV, and redraws the label in
             #   every automapper window
@@ -44770,6 +44573,8 @@
                 $string . "Coloured squares: " . (scalar @squareList) . "\nColoured rectangles: "
                 . (scalar @rectList),
                 'yes-no',
+                undef,
+                TRUE,           # Preserve newline characters in the message
             );
 
             if (! defined $choice || $choice ne 'yes') {
@@ -44938,6 +44743,8 @@
                     . "Coloured squares: " . (scalar @squareList) . "\n"
                     . "Coloured rectangles: " . (scalar @rectList),
                     'yes-no',
+                    undef,
+                    TRUE,           # Preserve newline characters in the message
                 );
 
                 if (defined $choice && $choice eq 'yes') {
@@ -46317,9 +46124,9 @@
 
         # Local variables
         my (
-            $roomObj, $sensitivity, $startXBlocks, $startYBlocks, $widthBlocks, $heightBlocks,
-            $centreXBlocks, $centreYBlocks, $insideStartXBlocks, $insideStartYBlocks,
-            $insideStopXBlocks, $insideStopYBlocks,
+            $roomObj, $sensitivity, $centreFlag, $startXBlocks, $startYBlocks, $widthBlocks,
+            $heightBlocks, $centreXBlocks, $centreYBlocks, $insideStartXBlocks, $insideStartYBlocks,
+            $insideStopXBlocks, $insideStopYBlocks, $scrollXPos, $scrollYPos,
         );
 
         # Check for improper arguments
@@ -46350,7 +46157,7 @@
 
             # Don't bother checking the current room's position in the visible map - go ahead and
             #   centre it
-            $self->centreMapOverRoom($roomObj);
+            $centreFlag = TRUE;
 
         } else {
 
@@ -46388,8 +46195,17 @@
                 || $roomObj->xPosBlocks > $insideStopXBlocks
                 || $roomObj->yPosBlocks > $insideStopYBlocks
             ) {
-                $self->centreMapOverRoom($roomObj);
+                $centreFlag = TRUE;
             }
+        }
+
+        if ($centreFlag) {
+
+            $self->centreMapOverRoom($roomObj);
+            # Update the regionmap, so that the new position is remembered
+            ($scrollXPos, $scrollYPos) = $self->getMapPosn();
+            $self->currentRegionmap->ivPoke('scrollXPos', $scrollXPos);
+            $self->currentRegionmap->ivPoke('scrollYPos', $scrollYPos);
         }
 
         return 1;
@@ -46615,7 +46431,7 @@
 
     sub findOccupiedMap {
 
-        # Called by $self->regionScreenshotCallback
+        # Called by $self->occupiedScreenshotCallback
         # Finds the boundaries of the regionmap occupied by rooms and labels on the current level
         #
         # Expected arguments
@@ -47229,6 +47045,11 @@
     sub canvasVAdjustment
         { $_[0]->{canvasVAdjustment} }
 
+    sub canvasScrollerWidth
+        { $_[0]->{canvasScrollerWidth} }
+    sub canvasScrollerHeight
+        { $_[0]->{canvasScrollerHeight} }
+
     sub canvasTooltipObj
         { $_[0]->{canvasTooltipObj} }
     sub canvasTooltipObjType
@@ -47242,12 +47063,6 @@
         { $_[0]->{currentParchment} }
     sub recentRegionList
         { my $self = shift; return @{$self->{recentRegionList}}; }
-    sub destroyQueueList
-        { my $self = shift; return @{$self->{destroyQueueList}}; }
-    sub constDestroyQueueMax
-        { $_[0]->{constDestroyQueueMax} }
-    sub drawQueueDefault
-        { $_[0]->{drawQueueDefault} }
 
     sub emptyMapFlag
         { $_[0]->{emptyMapFlag} }
@@ -47264,8 +47079,6 @@
         { my $self = shift; return %{$self->{parchmentReadyHash}}; }
     sub parchmentQueueList
         { my $self = shift; return @{$self->{parchmentQueueList}}; }
-    sub spareParchmentObj
-        { $_[0]->{spareParchmentObj} }
 
     sub selectedRoom
         { $_[0]->{selectedRoom} }
@@ -47300,6 +47113,8 @@
 
     sub delayDrawFlag
         { $_[0]->{delayDrawFlag} }
+    sub quickDrawFlag
+        { $_[0]->{quickDrawFlag} }
 
     sub drawRegionmap
         { $_[0]->{drawRegionmap} }
@@ -47315,8 +47130,6 @@
         { $_[0]->{drawRoomTextHeight} }
     sub drawOtherTextSize
         { $_[0]->{drawOtherTextSize} }
-    sub drawDefaultTextSize
-        { $_[0]->{drawDefaultTextSize} }
     sub blockCornerXPosPixels
         { $_[0]->{blockCornerXPosPixels} }
     sub blockCornerYPosPixels
@@ -47362,6 +47175,13 @@
         { $_[0]->{exitClickXPosn} }
     sub exitClickYPosn
         { $_[0]->{exitClickYPosn} }
+
+    sub leftClickTime
+        { $_[0]->{leftClickTime} }
+    sub leftClickObj
+        { $_[0]->{leftClickObj} }
+    sub leftClickWaitTime
+        { $_[0]->{leftClickWaitTime} }
 
     sub mode
         { $_[0]->{mode} }

@@ -471,11 +471,11 @@ Standard Moroccan Tamazight locale.
    1995-12-22T09:05:02 = ⴰⵙⵉⵎ 22 ⴷⵓⵊ
   -0010-09-15T04:44:23 = ⴰⵙⵉⴹ 15 ⵛⵓⵜ
 
-=head3 MMMMW-count-other ('week' W 'of' MMM)
+=head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of ⴱⵕⴰ
-   1995-12-22T09:05:02 = week 3 of ⴷⵓⵊ
-  -0010-09-15T04:44:23 = week 2 of ⵛⵓⵜ
+   2008-02-05T18:30:30 = week 1 of ⴱⵕⴰⵢⵕ
+   1995-12-22T09:05:02 = week 3 of ⴷⵓⵊⴰⵏⴱⵉⵔ
+  -0010-09-15T04:44:23 = week 2 of ⵛⵓⵜⴰⵏⴱⵉⵔ
 
 =head3 MMMMd (MMMM d)
 

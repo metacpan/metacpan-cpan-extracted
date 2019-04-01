@@ -1,5 +1,8 @@
 Revision history for App::calendr
 
+0.24  Sun Mar 31 11:40:00 2019
+      - Used namespace::autoclean instead.
+
 0.23  Thu Sep 28 12:20:00 2017
       - Downgraded min version requirement for Calendar::Julian.
       - Upgraded min version requirement for Calendar::Bahai in the test script t/app-calendr.t

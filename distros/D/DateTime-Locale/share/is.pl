@@ -29,8 +29,8 @@
     MMM => "LLL",
     MMMEd => "E, d. MMM",
     MMMMEd => "E, d. MMMM",
-    "MMMMW-count-one" => "'viku' W '\N{U+00ed}' MMM",
-    "MMMMW-count-other" => "'viku' W '\N{U+00ed}' MMM",
+    "MMMMW-count-one" => "'viku' W '\N{U+00ed}' MMMM",
+    "MMMMW-count-other" => "'viku' W '\N{U+00ed}' MMMM",
     MMMMd => "d. MMMM",
     MMMd => "d. MMM",
     Md => "d.M.",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

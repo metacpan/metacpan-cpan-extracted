@@ -1,0 +1,30 @@
+NAME
+
+    Alien::cmark - Alien wrapper for cmark
+
+DESCRIPTION
+
+    This module provides the cmark reference implementation of CommonMark
+    <http://commonmark.org/>, consisting of the libcmark library and cmark
+    command-line tool. See Alien::Build::Manual::AlienUser for usage.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2019 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    CommonMark
+

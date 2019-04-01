@@ -471,17 +471,17 @@ Azerbaijani locale.
    1995-12-22T09:05:02 = 22 dek, C.
   -0010-09-15T04:44:23 = 15 sen, Ş.
 
-=head3 MMMMW-count-one (MMM, W 'həftə')
+=head3 MMMMW-count-one (MMMM, W 'həftə')
 
-   2008-02-05T18:30:30 = fev, 1 həftə
-   1995-12-22T09:05:02 = dek, 3 həftə
-  -0010-09-15T04:44:23 = sen, 2 həftə
+   2008-02-05T18:30:30 = fevral, 1 həftə
+   1995-12-22T09:05:02 = dekabr, 3 həftə
+  -0010-09-15T04:44:23 = sentyabr, 2 həftə
 
-=head3 MMMMW-count-other (MMM, W 'həftə')
+=head3 MMMMW-count-other (MMMM, W 'həftə')
 
-   2008-02-05T18:30:30 = fev, 1 həftə
-   1995-12-22T09:05:02 = dek, 3 həftə
-  -0010-09-15T04:44:23 = sen, 2 həftə
+   2008-02-05T18:30:30 = fevral, 1 həftə
+   1995-12-22T09:05:02 = dekabr, 3 həftə
+  -0010-09-15T04:44:23 = sentyabr, 2 həftə
 
 =head3 MMMMd (d MMMM)
 

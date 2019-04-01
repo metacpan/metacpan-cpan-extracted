@@ -64,6 +64,7 @@ HTMLStream
 HTMLTag
 Handler
 HorizontalRule
+Hornburg
 Hukins
 Ibaev
 Image
@@ -83,6 +84,7 @@ Parser
 PayPal
 Polina
 Preformatted
+Racke
 Regexes
 Role
 Rolsky
@@ -111,6 +113,7 @@ StartTableCell
 StartTableHeader
 StartTableRow
 StartUnorderedList
+Stefan
 Text
 Theory
 Tom
@@ -139,6 +142,7 @@ parameterized
 parser's
 parsers
 preformatted
+racke
 shlomif
 tom
 unordered

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Parameters;
 use Quiq::AnsiColor;
@@ -42,7 +42,7 @@ aufgerufen wird.
 
 Die MediaWiki-API empfängt und liefert alle Daten in UTF-8.
 
-Insbesondere implementiert die Klasse die Methode $mw->L</load>(), mit
+Insbesondere implementiert die Klasse die Methode $mw->L<load|"load() - Lade Seite oder Mediendatei ins Wiki">(), mit
 welcher sowohl Seiten als auch Mediendateien (z.B. Bilder)
 "intelligent" geladen werden können.
 
@@ -374,7 +374,7 @@ Response (Hash-Referenz)
 
 Dies ist die Lowlevel-Methode zum Speichern einer Seite oder
 des Contents einer Seite. Eine weitergehende Logik, die auch
-Titelnderungen erlaubt, implementiert die  Methode $mw->L</load>().
+Titelnderungen erlaubt, implementiert die  Methode $mw->L<load|"load() - Lade Seite oder Mediendatei ins Wiki">().
 
 In Fassung [1] wird der Content der Seite mit der Page-Id $pageId
 auf Text $text gesetzt. Die Seite muss existieren.
@@ -806,6 +806,7 @@ sub uploadFile {
     );
 
 =pod
+
     # Datei hochladen (wir lesen $file selbst)
 
     my $p = Quiq::Path->new;
@@ -819,6 +820,7 @@ sub uploadFile {
         filename => $filename,
         file => [undef,$filename,Content=>$data],
     );
+
 =cut
 }
 
@@ -986,25 +988,8 @@ sub load {
         my $exists = $p->exists($varFile);
         if ($force || !$exists || $p->compare($file,$varFile)) {
             my $res = $self->uploadFile($file,-force=>1);
-            #!! FIXME: Methode schreiben, die in die Tiefe abfragt
-            #if ($res->{'upload'}->{'warnings'}) {
-            #    if (my $arr = $res->{'upload'}->{'warnings'}->{'duplicate'}) {
-            #        print 'File exists';
-            #        my $wikiName = $arr->[0];
-            #        if (lc($wikiName) ne lc($cacheName)) {
-            #            say " under the name: $arr->[0]";
-            #        }
-            #        else {
-            #            say ": $arr->[0]";
-            #        }
-            #        # Wir kopieren die Datei nicht in den Cache
-            #        return;
-            #    }
-            #}
-            #else {
-                printf "File %s: %s\n",$exists? 'updated': 'created',
-                    ucfirst $cacheName;
-            #}
+            printf "File %s: %s\n",$exists? 'updated': 'created',
+                ucfirst $cacheName;
             $p->copy($file,$varFile);
         }
 
@@ -1372,7 +1357,7 @@ sub log {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

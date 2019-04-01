@@ -33,8 +33,8 @@
     MMMEd => "E, d.MM",
     MMMM => "LLLL",
     MMMMEd => "E, d MMMM",
-    "MMMMW-count-one" => "'\N{U+0441}\N{U+0435}\N{U+0434}\N{U+043c}\N{U+0438}\N{U+0446}\N{U+0430}' W '\N{U+043e}\N{U+0442}' MMM",
-    "MMMMW-count-other" => "'\N{U+0441}\N{U+0435}\N{U+0434}\N{U+043c}\N{U+0438}\N{U+0446}\N{U+0430}' W '\N{U+043e}\N{U+0442}' MMM",
+    "MMMMW-count-one" => "'\N{U+0441}\N{U+0435}\N{U+0434}\N{U+043c}\N{U+0438}\N{U+0446}\N{U+0430}' W '\N{U+043e}\N{U+0442}' MMMM",
+    "MMMMW-count-other" => "'\N{U+0441}\N{U+0435}\N{U+0434}\N{U+043c}\N{U+0438}\N{U+0446}\N{U+0430}' W '\N{U+043e}\N{U+0442}' MMMM",
     MMMMd => "d MMMM",
     MMMMdd => "d MMMM",
     MMMd => "d.MM",
@@ -276,5 +276,5 @@
   time_format_medium => "H:mm:ss '\N{U+0447}'.",
   time_format_short => "H:mm '\N{U+0447}'.",
   variant => undef,
-  version => 34,
+  version => 35,
 }

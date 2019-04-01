@@ -16,6 +16,8 @@ t/01llzma-generic.t
 t/050interop-xz.t	
 t/19nonpv.t	
 t/99pod.t
+t/meta-json.t 
+t/meta-yaml.t
 t/compress/CompTestUtils.pm
 t/Test/Builder.pm
 t/Test/More.pm

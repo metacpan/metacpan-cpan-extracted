@@ -3,7 +3,7 @@
 my $fcgi;
 
 use CGI::Fast;
-use Test::More tests => 9;
+use Test::More tests => 15;
 
 # Shut up "used only once" warnings.
 () = $CGI::Q;
@@ -22,3 +22,18 @@ is($CGI::HEADERS_ONCE,1, "pragma in subclass set package variable in parent clas
 $q = CGI::Fast->new({ a => 1 });
 ok($q, "reality check: something was returned from CGI::Fast->new besides undef");
 is($CGI::HEADERS_ONCE,1, "package variable in parent class persists through multiple calls to CGI::Fast->new ");
+
+# overloaded argument testing
+
+my $initializer = 'something';
+ok( $q = CGI::Fast->new($initializer),'initializer as first arg' );
+
+no warnings 'redefine';
+no warnings 'prototype';
+*FCGI::Accept = sub { 1 };
+
+ok( $q = CGI::Fast->new(),'no constructor args' );
+ok( $q = CGI::Fast->new( sub {} ),'hook as first arg' );
+ok( $q = CGI::Fast->new( sub {},"anything" ),'CGI::Fast' );
+ok( $q = CGI::Fast->new( sub {},"anything",0 ),'CGI::Fast' );
+ok( $q = CGI::Fast->new( sub {},"anything",0,$initializer ),'CGI::Fast' );

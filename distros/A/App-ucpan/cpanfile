@@ -1,13 +1,21 @@
 requires 'perl', '5.008001';
 
-requires 'Term::ReadKey', 0;
-requires 'File::Which', 0;
-requires 'Path::Class', 0;
-requires 'YAML', 0;
-requires 'Config', 0;
-requires 'App::cpanminus', 0;
-requires 'App::cpanoutdated', 0;
-requires 'version', 0;
+requires 'bytes';
+requires 'Config';
+requires 'constant';
+requires 'feature';
+requires 'File::Copy';
+requires 'File::Which';
+requires 'Getopt::Long';
+requires 'Path::Class';
+requires 'strict';
+requires 'Term::ANSIColor';
+requires 'Term::ReadKey';
+requires 'utf8';
+requires 'version';
+requires 'warnings';
+requires 'Win32::Console::ANSI';
+requires 'YAML';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

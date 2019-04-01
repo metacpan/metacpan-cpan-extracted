@@ -22,11 +22,11 @@ VSGDR::StaticData - Static data script support package for SSDT post-deployment 
 
 =head1 VERSION
 
-Version 0.44
+Version 0.46
 
 =cut
 
-our $VERSION = '0.44';
+our $VERSION = '0.46';
 
 
 sub databaseName {
@@ -121,7 +121,7 @@ sub generateScript {
     my $database                        = databaseName($dbh);
 
     no warnings;
-    my $userName                        = $OSNAME eq 'MSWin32' ? Win32::LoginName : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
+    my $userName                        = $OSNAME eq 'MSWin32' ? eval('Win32::LoginName') : ${[getpwuid( $< )]}->[6]; $userName =~ s/,.*//;
     use warnings;                      
 
     my $date                            = strftime "%d/%m/%Y", localtime;
@@ -1068,7 +1068,7 @@ select  Column_name
         as datasize
 ,       isnull(case	when lower(Data_type) = 'float'
 				then '('+cast(Numeric_precision as varchar(10))+')' 
-				when lower(Data_type) not like '%int%' and Numeric_precision is not null 
+				when lower(Data_type) not like '%int%' and lower(Data_type) not like '%money%' and Numeric_precision is not null 
 				then '('+cast(Numeric_precision as varchar(10))+','+cast(Numeric_scale as varchar(10))+')' 
 				else '' 
 				end 

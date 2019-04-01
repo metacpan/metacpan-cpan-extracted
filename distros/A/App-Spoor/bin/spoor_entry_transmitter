@@ -1,0 +1,45 @@
+#!/usr/bin/perl -T
+
+use strict;
+use warnings;
+use utf8;
+use v5.10;
+
+use App::Spoor::Security;
+
+App::Spoor::Security::check_config_directory($<) || die("Security concerns with the config directory. Exiting.\n");
+App::Spoor::Security::check_config_file($<) || die("Security concerns with the config file. Exiting.\n");
+App::Spoor::Security::check_persistence_directory($<) ||
+  die("Security concerns with the persistence directory. Exiting.\n");
+App::Spoor::Security::check_parsed_persistence_directory($<) ||
+  die("Security concerns with the parsed persistence directory. Exiting.\n");
+
+use App::Spoor::Config;
+use App::Spoor::EntryTransmitter;
+use App::Spoor::ParsedFileManager;
+use App::Spoor::TransmissionFormatter;
+
+use LWP::UserAgent;
+use LWP::Protocol::https;
+use Sys::Hostname;
+
+my $application_config = App::Spoor::Config::get_application_config();
+my $transmission_config = App::Spoor::Config::get_transmission_config();
+$transmission_config->{'reporter'} = hostname;
+
+sub transmitter {
+  App::Spoor::EntryTransmitter::transmit(
+    App::Spoor::TransmissionFormatter::format(shift, hostname),
+    LWP::UserAgent->new,
+    $transmission_config
+  );
+}
+
+sub parsed_file_security_check {
+  App::Spoor::Security::check_file(shift, $>, 0600);
+}
+
+while(1) {
+  App::Spoor::ParsedFileManager::process_parsed_files($application_config, \&parsed_file_security_check, \&transmitter);
+  sleep 5;
+}

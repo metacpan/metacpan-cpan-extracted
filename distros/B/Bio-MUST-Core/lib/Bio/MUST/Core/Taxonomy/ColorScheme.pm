@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.190690';
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -131,9 +131,9 @@ sub BUILD {
     my $self = shift;
 
     # TODO: check that is has any effect at all!
-    carp 'Warning: name and color list sizes differ!'
+    carp '[BMC] Warning: name and color list sizes differ!'
         unless $self->count_names == $self->count_colors;
-    carp 'Warning: non unique names!'
+    carp '[BMC] Warning: non unique names!'
         unless $self->count_names == uniq @{ $self->names };
 
     return;
@@ -245,7 +245,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

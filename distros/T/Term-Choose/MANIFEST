@@ -37,20 +37,15 @@ xt/Y3_choose_function_invalid.t
 xt/Y3_choose_method.t
 xt/Y3_choose_method_invalid.t
 xt/Y_choose_function_arguments.pl
-xt/Y_choose_function_arguments_hae.pl
 xt/Y_choose_function_invalid_arguments.pl
-xt/Y_choose_function_invalid_arguments_hae.pl
 xt/Y_choose_method_arguments.pl
-xt/Y_choose_method_arguments_hae.pl
 xt/Y_choose_method_invalid_arguments.pl
-xt/Y_choose_method_invalid_arguments_hae.pl
 xt/Y_Data_Test_Arguments.pm
 xt/year_copyright.t
 xt/Z0_clone_win.t
 xt/Z1_hide_cursor.t
 xt/Z2_choose.t
 xt/Z_choose.pl
-xt/Z_choose_hae.pl
 xt/Z_Data_Test_Choose.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

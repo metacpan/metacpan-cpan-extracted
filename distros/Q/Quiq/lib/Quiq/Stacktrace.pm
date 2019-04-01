@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 # -----------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ bzw.
     $ less +17 ./test.pl
 
 Der unterste Eintrag im Stacktrace ist der Aufruf des
-Konstruktors L</new>() oder der Methode L</asString>(), wenn sie
+Konstruktors L<new|"new() - Konstruktor">() oder der Methode L<asString|"asString() - Visualisiere Stacktrace-Objekt">(), wenn sie
 als Klassenmethode gerufen wird. Sollen Stacktrace-Frames am
 Ende weggelassen werden, kann dies durch Angabe des Parameters
 $i erreicht werden.
@@ -152,7 +152,7 @@ sub new {
 
 =item $i (Default: 0)
 
-Siehe L</new>().
+Siehe L<new|"new() - Konstruktor">().
 
 =back
 
@@ -190,7 +190,7 @@ sub asString {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

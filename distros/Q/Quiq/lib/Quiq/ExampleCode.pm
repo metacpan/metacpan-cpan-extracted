@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Option;
 use Quiq::String;
@@ -130,7 +130,7 @@ ausgegeben wird.
 
 =item -objectReturn => $bool (Default: 0)
 
-Liefere bei Aufruf von $exa->L</execute>() nicht den Wert des
+Liefere bei Aufruf von $exa->L<execute|"execute() - Führe Beispielcode aus">() nicht den Wert des
 Beispielcode, sondern ein Objekt, das den Beispielcode und
 den Wert enthält.
 
@@ -189,7 +189,7 @@ sub new {
 =head4 Description
 
 Setze Variable, so dass die folgende Kommando-Ausführung (Methode
-L</execute>()) im Kontext der Klasse Quiq::ExampleCode ausgeführt werden
+L<execute|"execute() - Führe Beispielcode aus">()) im Kontext der Klasse Quiq::ExampleCode ausgeführt werden
 kann. Die Methode liefert keinen Wert zurück.
 
 Anstelle mittels dieser Methode, können die Variablen auch beim Aufruf
@@ -247,7 +247,7 @@ Setzung ist nur im Falle von -objectReturn=>1 nötig
 
 =item -objectReturn => $bool (Default: 0)
 
-Liefere bei Aufruf von $exa->L</execute>() nicht den Wert des
+Liefere bei Aufruf von $exa->L<execute|"execute() - Führe Beispielcode aus">() nicht den Wert des
 Beispielcode, sondern ein Objekt, das den Beispielcode und
 den Wert enthält.
 
@@ -379,7 +379,7 @@ sub execute {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

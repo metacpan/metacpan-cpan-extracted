@@ -1,7 +1,7 @@
 package Dancer::Serializer::XML;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: serializer for handling XML data
-$Dancer::Serializer::XML::VERSION = '1.3510';
+$Dancer::Serializer::XML::VERSION = '1.3512';
 use strict;
 use warnings;
 use Carp;
@@ -91,7 +91,7 @@ Dancer::Serializer::XML - serializer for handling XML data
 
 =head1 VERSION
 
-version 1.3510
+version 1.3512
 
 =head1 SYNOPSIS
 

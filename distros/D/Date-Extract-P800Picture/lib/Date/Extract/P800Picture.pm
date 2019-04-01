@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2008-2017, Roland van Ipenburg
-package Date::Extract::P800Picture 0.108;
+# Copyright (C) 2008-2019, Roland van Ipenburg
+package Date::Extract::P800Picture v1.1.1;
 
 use strict;
 use warnings;
@@ -163,7 +163,7 @@ Date::Extract::P800Picture - extract the date from Sony Ericsson P800 pictures.
 
 =head1 VERSION
 
-This document describes Date::Extract::P800Picture version 0.108.
+This document describes Date::Extract::P800Picture version v1.1.1.
 
 =head1 SYNOPSIS
 
@@ -290,7 +290,7 @@ Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008-2017, Roland van Ipenburg
+Copyright (C) 2008-2019, Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

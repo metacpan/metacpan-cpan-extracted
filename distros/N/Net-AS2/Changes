@@ -1,5 +1,41 @@
 Revision history for perl module Net::AS2
 
+1.0101 2019-03-11
+
+ [Message-Id]
+ - POST request sets the Message-Id surrounded with angle brackets
+
+ [Content-Disposition]
+ - send() accepts Filename key to set Content-Disposition filename
+ - decode_message() extracts Content-Disposition filename.
+   On success, Net::AS2::Message->filename() will return it.
+   The filename value is also stored in the serialised Message.
+
+ [MDN->match_mic]
+ - MDN->match_mic() returns 1 when both partners request Encryption only
+
+1.01 2019-02-21
+
+ [Content-Disposition]
+ - Set default filename, so that Oracle B2B accepts the request
+
+1.001 2019-02-08
+
+ [Message-Id]
+ - Validate message id using Email::Address::addr_spec
+   Allow for angle bracket quotes
+
+ [File extensions]
+ - Accept any file extension for key and certificate files
+
+ [Distribution]
+ - Use $VERSION instead of package MODULE VERSION
+ - pass harsher Perl Critic tests
+
+ [AS2 Version]
+ - Update documentation to specify AS2 Version 1.0.
+   Version 1.1 compression is not implemented
+
 1.0 2019-01-30
 
  - Update POD documentation

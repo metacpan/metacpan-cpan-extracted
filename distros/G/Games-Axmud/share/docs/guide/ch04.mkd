@@ -207,15 +207,15 @@ For those of you familiar with the Perl 5 language, here's an example of a trivi
 
         /my $string = "kill orcs"; return $string;
 
-Echo commands and Perl commands aren't very useful when they are typed in the main window, but they are very useful when creating triggers (see Section 7.1).
+Echo commands and Perl commands aren't very useful when they are typed in the main window, but they are very useful when creating triggers (see [Section 7.1](ch07.html#7.1)).
 
-If you want to run Perl scripts with full functionality, you can use plugins (see Section 13).
+If you want to run Perl scripts with full functionality, you can use plugins (see [Section 13](ch13.html)).
 
 The forward slash character is used by some worlds for other purposes, so if you don't need Perl commands, you should probably leave them turned off.
 
 ###<a name="4.4.3">4.4.3 Script commands</a>
 
-Axmud comes with its own scripting language, Axbasic (see Section 10). Script commands are a convenient of starting an Axbasic script.
+Axmud comes with its own scripting language, Axbasic (see [Section 10](ch10.html)). Script commands are a convenient of starting an Axbasic script.
 
 Use this command to turn script commands on or off:
 
@@ -290,7 +290,7 @@ Here's a summary of the most important buttons.
 
 ![Broom icon](img/ch04/icon_broom.png) Clears the command entry box. If commands are being sent to the world, one character at a time, clicking this button tells Axmud that you're about to start typing a new world command
 
-![Add icon](img/ch04/icon_add.png) Axmud provides three entry boxes. The main one, which is always visible, is where you type commands. The other two are optional; you can make one or both of them appear if you keep clicking this button. 
+![Add icon](img/ch04/icon_add.png) Axmud provides three entry boxes. The main one, which is always visible, is where you type commands. The other two are optional; you can make one or both of them appear if you keep clicking this button.
 
 Anything you type in the other boxes is added to a world command before it's sent to the world. For example, if you want to have a long conversation, you can type **say** in the box on the left - then, you don't need to type **say** every time you type something in the main box.
 
@@ -443,7 +443,7 @@ If you want to stored data in a different location - on a USB stick, or an exter
 
 If you use Axmud on multiple devices - a desktop and a laptop, for example - you can set the location to a network drive that both devices can access.
 
-Note that you shouldn't use both devices simultaneously - if you try, Axmud on one device will arbitrarily overwrite filed saved by Axmud on the other device. 
+Note that you shouldn't use both devices simultaneously - if you try, Axmud on one device will arbitrarily overwrite filed saved by Axmud on the other device.
 
 (If you don't have your own network drive, or don't know how to set one up, you might like to use a commerical service like [Dropbox](https://www.dropbox.com)).
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Path;
 use Quiq::Parameters;
@@ -42,7 +42,7 @@ Prozesse parallel ausgeführt werden.
     });
 
 Bei großen Datenmengen oder wenn die Gesamtmenge vorab nicht bekannt
-ist, bietet sich die Methode $class->L</runFetch>() an. Hier ein
+ist, bietet sich die Methode $class->L<runFetch|"runFetch() - Führe Subroutine parallel über gefetchten Elementen aus">() an. Hier ein
 Beispiel mit einer unbekannt großen Datenbank-Selektion:
 
     my $cur = $db->select("
@@ -90,7 +90,7 @@ Die Subroutine, die für jedes Element in @elements ausgeführt wird.
 
 =head4 Options
 
-Die gleichen wie L</runFetch>().
+Die gleichen wie L<runFetch|"runFetch() - Führe Subroutine parallel über gefetchten Elementen aus">().
 
 =head4 Returns
 
@@ -345,7 +345,7 @@ sub runFetch {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

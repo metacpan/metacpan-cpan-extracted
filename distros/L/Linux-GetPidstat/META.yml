@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Linux::GetPidstat:
     file: lib/Linux/GetPidstat.pm
-    version: '0.09'
+    version: '0.10'
   Linux::GetPidstat::Collector:
     file: lib/Linux/GetPidstat/Collector.pm
   Linux::GetPidstat::Collector::Parser:
@@ -55,7 +55,9 @@ resources:
   bugtracker: https://github.com/yoheimuta/Linux-GetPidstat/issues
   homepage: https://github.com/yoheimuta/Linux-GetPidstat
   repository: git://github.com/yoheimuta/Linux-GetPidstat.git
-version: '0.09'
+version: '0.10'
 x_contributors:
-  - 'Songmu <y.songmu@gmail.com>'
   - 'Makoto Sasaki <wanigoya@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

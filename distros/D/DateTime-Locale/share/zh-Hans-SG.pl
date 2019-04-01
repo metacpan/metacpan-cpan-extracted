@@ -28,7 +28,7 @@
     MEd => "M-dE",
     MMM => "M\N{U+6708}",
     MMMEd => "M\N{U+6708}d\N{U+65e5}E",
-    "MMMMW-count-other" => "MMM\N{U+7b2c}W\N{U+5468}",
+    "MMMMW-count-other" => "MMMM\N{U+7b2c}W\N{U+5468}",
     MMMMd => "M\N{U+6708}d\N{U+65e5}",
     MMMMdd => "M\N{U+6708}d\N{U+65e5}",
     MMMd => "M\N{U+6708}d\N{U+65e5}",
@@ -269,5 +269,5 @@
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

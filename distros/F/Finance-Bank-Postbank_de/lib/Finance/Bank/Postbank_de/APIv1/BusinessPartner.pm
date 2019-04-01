@@ -7,7 +7,7 @@ extends 'HAL::Resource';
 
 use Finance::Bank::Postbank_de::APIv1::Account;
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 =head1 NAME
 
@@ -59,7 +59,7 @@ or via mail to L<finance-bank-postbank_de-Bugs@rt.cpan.org>.
 
 =head1 COPYRIGHT (c)
 
-Copyright 2003-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2003-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

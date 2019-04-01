@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Hash;
 
@@ -25,8 +25,8 @@ L<Quiq::Hash>
 
 Die Klasse erzeugt den HTML-Code einer jQuery UI Accordion Reiterleiste.
 Dem Konstruktor wird die Reiterkonfiguration mit dem Attribut
-C<tabs> übergeben. Die Methode L</html>() generiert den HTML-Code.
-Siehe Abschnitt L</EXAMPLE>.
+C<tabs> übergeben. Die Methode L<html|"html() - Generiere HTML">() generiert den HTML-Code.
+Siehe Abschnitt L<EXAMPLE|"EXAMPLE">.
 
 =head1 ATTRIBUTES
 
@@ -66,8 +66,7 @@ Perl:
 
     $html = Quiq::JQuery::Accordion->html($h,
         id=>'accordion',
-        tabs=>[
-            {
+        tabs=>[{
                 label=>'A',
                 link=>'a',
             },{
@@ -76,8 +75,7 @@ Perl:
                     -text=>1,
                     'Text des Reiters B',
                 ),
-            },
-        ],
+        }],
     );
 
 HTML:
@@ -190,7 +188,7 @@ sub html {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-Gitignore
 
+0.02 2019-03-27T20:54:45Z
+
+    - fix negated patterns starting with / by Flavio Poletti
+
 0.01 2018-04-07T11:27:08Z
 
     - original version

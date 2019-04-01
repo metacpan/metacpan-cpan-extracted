@@ -1,0 +1,59 @@
+{
+   "abstract" : "create form fields based on a definition in a JSON file",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-FormFieldsFromJSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.67",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::FormFieldsFromJSON" : {
+         "file" : "lib/Mojolicious/Plugin/FormFieldsFromJSON.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON.git",
+         "web" : "http://github.com/reneeb/Mojolicious-Plugin-FormFieldsFromJSON"
+      }
+   },
+   "version" : "1.01",
+   "x_contributors" : [
+      "Csizmar Roland <csizmar.roland@mithrandir.hu>",
+      "Helmut Wollmersdorfer <helmut@wollmersdorfer.at>",
+      "Mario Minati <mario.minati@minati.de>",
+      "Onufriev Anton <a.onyfriev@sports.ru>",
+      "reneeb <github@renee-baecker.de>",
+      "reneeb <info@perl-services.de>",
+      "Renee <reb@perl-services.de>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.04"
+}
+

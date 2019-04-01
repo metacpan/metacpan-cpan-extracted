@@ -1,5 +1,14 @@
 Revision history for Perl extension Test-AutoMock
 
+0.04 2019-03-30T15:39:34Z
+    - fix tests failed on Perl 5.20.3
+
+0.03 2019-03-30T10:15:28Z
+    - fix tests failed on Perl 5.10.1 and 5.12.5
+
+0.02 2019-03-29T03:03:21Z
+    - fix tests failed on older perls
+
 0.01 2019-03-15T03:14:54Z
 
     - original version

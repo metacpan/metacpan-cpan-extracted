@@ -55,41 +55,41 @@ JS
             this.currentLocale = locale;
 
             Ext.Date.monthNames = [
-                $l10n->{January}, $l10n->{February}, $l10n->{March},
-                $l10n->{April},   $l10n->{May},      $l10n->{June},
-                $l10n->{July},    $l10n->{August},   $l10n->{September},
-                $l10n->{October}, $l10n->{November}, $l10n->{December}
+                $l10n{January}, $l10n{February}, $l10n{March},
+                $l10n{April},   $l10n{May},      $l10n{June},
+                $l10n{July},    $l10n{August},   $l10n{September},
+                $l10n{October}, $l10n{November}, $l10n{December}
             ];
 
             Ext.Date.shortMonthNames = [
-                $l10n->{Jan}, $l10n->{Feb}, $l10n->{Mar},
-                $l10n->{Apr}, $l10n->{May}, $l10n->{Jun},
-                $l10n->{Jul}, $l10n->{Aug}, $l10n->{Sep},
-                $l10n->{Oct}, $l10n->{Nov}, $l10n->{Dec}
+                $l10n{Jan}, $l10n{Feb}, $l10n{Mar},
+                $l10n{Apr}, $l10n{May}, $l10n{Jun},
+                $l10n{Jul}, $l10n{Aug}, $l10n{Sep},
+                $l10n{Oct}, $l10n{Nov}, $l10n{Dec}
             ];
 
             Ext.Date.dayNames = [
-                $l10n->{Sunday},    $l10n->{Monday},   $l10n->{Tuesday},
-                $l10n->{Wednesday}, $l10n->{Thursday}, $l10n->{Friday},
-                $l10n->{Saturday}
+                $l10n{Sunday},    $l10n{Monday},   $l10n{Tuesday},
+                $l10n{Wednesday}, $l10n{Thursday}, $l10n{Friday},
+                $l10n{Saturday}
             ];
 
             Ext.Date.dayNamesShort = [
-                $l10n->{Sun}, $l10n->{Mon}, $l10n->{Tue},
-                $l10n->{Wed}, $l10n->{Thu}, $l10n->{Fri},
-                $l10n->{Sat}
+                $l10n{Sun}, $l10n{Mon}, $l10n{Tue},
+                $l10n{Wed}, $l10n{Thu}, $l10n{Fri},
+                $l10n{Sat}
             ];
 
             Ext.Date.monthNumbers = {
-                [$l10n->{January}]: 0, [$l10n->{February}]: 1,  [$l10n->{March}]: 2,
-                [$l10n->{April}]: 3,   [$l10n->{May}]: 4,       [$l10n->{June}]: 5,
-                [$l10n->{July}]: 6,    [$l10n->{August}]: 7,    [$l10n->{September}]: 8,
-                [$l10n->{October}]: 9, [$l10n->{November}]: 10, [$l10n->{December}]: 11,
+                [$l10n{January}]: 0, [$l10n{February}]: 1,  [$l10n{March}]: 2,
+                [$l10n{April}]: 3,   [$l10n{May}]: 4,       [$l10n{June}]: 5,
+                [$l10n{July}]: 6,    [$l10n{August}]: 7,    [$l10n{September}]: 8,
+                [$l10n{October}]: 9, [$l10n{November}]: 10, [$l10n{December}]: 11,
 
-                [$l10n->{Jan}]: 0, [$l10n->{Feb}]: 1,  [$l10n->{Mar}]: 2,
-                [$l10n->{Apr}]: 3, [$l10n->{May}]: 4,  [$l10n->{Jun}]: 5,
-                [$l10n->{Jul}]: 6, [$l10n->{Aug}]: 7,  [$l10n->{Sep}]: 8,
-                [$l10n->{Oct}]: 9, [$l10n->{Nov}]: 10, [$l10n->{Dec}]: 11
+                [$l10n{Jan}]: 0, [$l10n{Feb}]: 1,  [$l10n{Mar}]: 2,
+                [$l10n{Apr}]: 3, [$l10n{May}]: 4,  [$l10n{Jun}]: 5,
+                [$l10n{Jul}]: 6, [$l10n{Aug}]: 7,  [$l10n{Sep}]: 8,
+                [$l10n{Oct}]: 9, [$l10n{Nov}]: 10, [$l10n{Dec}]: 11
             };
 
             Ext.apply(Ext.util.Format, (this.locale[locale].settings || this.locale.en.settings));

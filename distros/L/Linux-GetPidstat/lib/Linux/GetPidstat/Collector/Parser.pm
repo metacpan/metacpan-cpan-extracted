@@ -5,6 +5,7 @@ use warnings;
 
 use Exporter qw(import);
 use List::Util qw(sum reduce);
+use Math::BigFloat;
 
 our @EXPORT = qw(parse_pidstat_output);
 
@@ -97,7 +98,9 @@ sub _get_metric_mean($$) {
 }
 
 sub _mean(@) {
-    return sprintf '%.2f', sum(@_)/@_;
+    my $sum = Math::BigFloat->new(sum(@_));
+    my $mean = $sum->bdiv(scalar @_);
+    return $mean->bfround(-2)->numify();
 }
 
 *parse_pidstat_output = \&parse;

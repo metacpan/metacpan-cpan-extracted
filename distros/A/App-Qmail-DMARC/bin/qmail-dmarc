@@ -29,9 +29,9 @@ sub domain {
     shift =~ s/.*\@//r;
 }
 
-sub if_defined {
+sub if_set {
     my ( $key, $value ) = @_;
-    return unless defined $value;
+    return unless defined $value && length $value;
     $key => $value;
 }
 
@@ -95,13 +95,11 @@ else {
             my $dmarc_result = Mail::DMARC::PurePerl->new(
                 source_ip   => $ENV{TCPREMOTEIP},
                 envelope_to => domain( ( $message->to )[0] ),
-                if_defined( envelope_from => domain($envelope_from) ),
-                if_defined( header_from   => $header_from_domain ),
+                if_set( envelope_from => domain($envelope_from) ),
+                if_set( header_from   => $header_from_domain ),
                 dkim => $dkim,
                 spf  => {
-                    if_defined(
-                        domain => $header_from_domain
-                    ),
+                    if_set( domain => $header_from_domain ),
                     scope  => 'mfrom',
                     result => $spf_result,
                 },

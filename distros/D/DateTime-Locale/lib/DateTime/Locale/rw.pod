@@ -471,11 +471,11 @@ Kinyarwanda locale.
    1995-12-22T09:05:02 = uku. 22, gnu.
   -0010-09-15T04:44:23 = nze. 15, gnd.
 
-=head3 MMMMW-count-other ('week' W 'of' MMM)
+=head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of gas.
-   1995-12-22T09:05:02 = week 3 of uku.
-  -0010-09-15T04:44:23 = week 2 of nze.
+   2008-02-05T18:30:30 = week 1 of Gashyantare
+   1995-12-22T09:05:02 = week 3 of Ukuboza
+  -0010-09-15T04:44:23 = week 2 of Nzeli
 
 =head3 MMMMd (MMMM d)
 

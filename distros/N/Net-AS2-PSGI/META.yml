@@ -1,0 +1,27 @@
+---
+abstract: 'AS2 Protocol Plack application'
+author:
+  - 'Andrew Maguire <ajm@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-AS2-PSGI
+requires:
+  JSON::XS: '0'
+  Net::AS2: '1.0101'
+  Plack::Builder: '0'
+  Plack::Request: '0'
+resources:
+  homepage: https://github.com/andrewjmaguire/Net-AS2-PSGI
+  repository: https://github.com/andrewjmaguire/Net-AS2-PSGI.git
+version: '1.0'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::en_MO - Locale data examples for the English Macau SAR China (en-MO) locale
+DateTime::Locale::en_MO - Locale data examples for the English Macao SAR China (en-MO) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-English Macau SAR China locale.
+English Macao SAR China locale.
 
 =head2 Days
 

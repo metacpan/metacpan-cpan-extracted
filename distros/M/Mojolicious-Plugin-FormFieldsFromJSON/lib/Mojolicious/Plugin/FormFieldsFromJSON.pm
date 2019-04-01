@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 # ABSTRACT: create form fields based on a definition in a JSON file
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Carp;
 use File::Basename;
@@ -14,6 +14,7 @@ use List::Util qw(first);
 use Mojo::Asset::File;
 use Mojo::Collection;
 use Mojo::ByteStream;
+use Mojo::File;
 use Mojo::JSON qw(decode_json);
 
 use Mojolicious ();
@@ -27,6 +28,11 @@ sub register {
     my ($self, $app, $config) = @_;
 
     $config //= {};
+
+    if ( $config->{template_file} ) {
+        $config->{template} = Mojo::File->new( $app->home, 'templates', $config->{template_file} )->slurp;
+        $config->{template} //= $app->renderer->get_data_template( $config->{template_file} );
+    }
   
     my %configs;
     if(ref $config->{dir} eq "ARRAY"){
@@ -212,8 +218,12 @@ sub register {
 
             my @fields;
 
+            my %fields_to_show = map { $_ => 1 } @{ $params{fields} || [] };
+
             FIELD:
-            for my $field ( @{ $field_config } ) {
+            for my $field ( @{$field_config} ) {
+                next FIELD if %fields_to_show && !$fields_to_show{ $field->{name} };
+
                 my $field_content = $self->_build_form_field($c, $field, \%params, $config, \%valid_types);
 
                 if (length $field_content) {
@@ -332,6 +342,7 @@ sub _build_form_field {
     $form_field = Mojo::ByteStream->new( $form_field );
 
     my $template = $field->{template} // $plugin_config->{templates}->{$orig_type} // $plugin_config->{template};
+
     if ( $template && $type ne 'hidden' ) {
         my $label = $field->{label} // '';
         my $loc   = $plugin_config->{translation_method};
@@ -360,7 +371,16 @@ sub _hidden {
     my ($self, $c, $field, %params) = @_;
 
     my $name  = $field->{name} // $field->{label} // '';
-    my $value = $params{$name}->{data} // $c->stash( $name ) // $c->param( $name ) // $field->{data} // '';
+
+    my $from_stash_key = $params{from_stash};
+    my $from_stash     = $from_stash_key ?
+        $c->stash( $from_stash_key )->{$name} :
+        undef;
+
+    my $value = $params{$name}->{data} // $from_stash //
+        $c->stash( $name ) // $c->param( $name ) //
+        $field->{data} // '';
+
     my $id    = $field->{id} // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
@@ -371,7 +391,16 @@ sub _text {
     my ($self, $c, $field, %params) = @_;
 
     my $name  = $field->{name} // $field->{label} // '';
-    my $value = $params{$name}->{data} // $c->stash( $name ) // $c->param( $name ) // $field->{data} // '';
+
+    my $from_stash_key = $params{from_stash};
+    my $from_stash     = $from_stash_key ?
+        $c->stash( $from_stash_key )->{$name} :
+        undef;
+
+    my $value = $params{$name}->{data} // $from_stash //
+        $c->stash( $name ) // $c->param( $name ) //
+        $field->{data} // '';
+
     my $id    = $field->{id} // $name;
     my %attrs = %{ $field->{attributes} || {} };
 
@@ -382,6 +411,11 @@ sub _select {
     my ($self, $c, $field, %params) = @_;
 
     my $name   = $field->{name} // $field->{label} // '';
+
+    my $from_stash_key = $params{from_stash};
+    my $from_stash     = $from_stash_key ?
+        $c->stash( $from_stash_key )->{$name} :
+        undef;
 
     my $field_params = $params{$name} || {},
 
@@ -395,6 +429,11 @@ sub _select {
         my $local_stash = $c->stash( $name );
         $stash_values = ref $local_stash ? $local_stash : [ $local_stash ];
     }
+
+    if ( $from_stash ) {
+        $stash_values = ref $from_stash ? $from_stash : [ $from_stash ];
+    }
+
     my $reset;
     if ( @{ $stash_values || [] } ) {
         $select_params{selected} = $self->_get_highlighted_values(
@@ -468,6 +507,13 @@ sub _get_select_values {
     my ($self, $c, $field, %params) = @_;
 
     my $data = $params{data} || $field->{data} || [];
+    if ( $field->{data_cb} ) {
+        my @parts   = split /::/, $field->{data_cb};
+        my $subname = pop @parts;
+        my $class   = join '::', @parts;
+        my $sub     = $class->can( $subname );
+        $data       = $sub->() if $sub;
+    }
 
     my @values;
     if ( 'ARRAY' eq ref $data ) {
@@ -768,7 +814,7 @@ Mojolicious::Plugin::FormFieldsFromJSON - create form fields based on a definiti
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -1101,6 +1147,11 @@ For I<text>, I<textarea>, I<password> and I<hidden> this is the value for the fi
 =item 3. Data in the request
 
 =item 4. Data defined in the field configuration
+
+=item 5. Data passed via stash - part two
+
+  $c->stash( any_name => { fieldname => 'test' } );
+  $c->form_fields( 'form', from_stash => 'any_name' );
 
 =back
 
@@ -2235,7 +2286,7 @@ Renee Baecker <reneeb@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Renee Baecker.
+This software is Copyright (c) 2018 by Renee Baecker.
 
 This is free software, licensed under:
 

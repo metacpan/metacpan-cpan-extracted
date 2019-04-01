@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2018 A S Lewis
+# Copyright (C) 2011-2019 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # Lesser Public License as published by the Free Software Foundation, either version 3 of the
@@ -11,7 +11,7 @@
 # You should have received a copy of the GNU Lesser Public License along with this program.  If not,
 # see <http://www.gnu.org/licenses/>.
 #
-# Our own version of Net::Telnet (v3.04) by Jay Rogers; with a few modifications
+# Games::Axmud::Obj::Telnet, a modification of Net::Telnet (v3.04) by Jay Rogers
 #
 # List of changes (besides cosmetic ones):
 #   - Removed user documentation
@@ -21,7 +21,7 @@
 #       errors when the $$state argument was 'undef'
 #   - Removed 'require 5.002', since Axmud requires 5.008 anyway
 #   - Removed 'require FileHandle' for the same reason
-#   - Implemented MCCP (Mud Client Compression Protocol, http://tintin.sourceforge.net/mccp/)
+#   - Implemented MCCP (Mud Client Compression Protocol, http://tintin.sourceforge.io/mccp/)
 #       - Added 'use Compress::Zlib'
 #       - Added new IVs to ->new() : ->axmud_mccp_mode, ->axmud_zlib_obj and ->axmud_session
 #       - Modified _>_fillbuf to decompress text when MCCP enabled

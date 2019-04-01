@@ -17,7 +17,7 @@
 <p>An example of an object part is <strong>prof.deathmud</strong>, representing a world profile called <strong>deathmud</strong>, and an example of an IV part is <strong>port</strong>. Thus, you can access the world's port by peeking the string <strong>prof.deathmud.port</strong>.</p>
 <p>The object part is translated into the blessed reference of the object. (In Perl terminology, the blessed reference is a name given to each distinct object.)</p>
 <p>If an IV part is specified, the peek/poke operation returns the value of the IV. If no IV part is specified, the peek/poke operation returns the blessed reference of the object.</p>
-<p>This section contains a complete list of strings that can be used in peek/poke operations.</p>
+<p>This Section contains a complete list of strings that can be used in peek/poke operations.</p>
 <p>In some cases, the string corresponds to a particular IV in a particular object, e.g. <strong>world.current</strong> refers to the current world profile (the Perl class is <strong>GA::Session-&gt;currentWorld</strong>).</p>
 <p>In some cases, the string refers to a whole object, e.g. <strong>dict.current</strong> refers to the current dictionary (the Perl class is <strong>GA::Session-&gt;currentDict</strong>). In those cases, you can add any valid IV to the string, e.g. <strong>dict.current.weaponHash</strong>. The IV part is case-sensitive, so <strong>dict.current.weaponhash</strong> will not work.</p>
 <p>Axmud global variables like <strong>$axmud::SCRIPT</strong> are used here as if they were IVs in the GA::Client object (for convenience).</p>
@@ -904,6 +904,8 @@ F protocol.mxp.crosslink
 F protocol.mxp.room
      Locator uses MXP room tags exclusively change
         (GA::Client-&gt;allowMxpRoomFlag)
+F protocol.mxp.flexible
+     Allow (some) illegal MXP keywords (GA::Client-&gt;allowMxpFlexibleFlag)
 
 S protocol.mode.echo
      Current session's ECHO mode (GA::Session-&gt;echoMode)

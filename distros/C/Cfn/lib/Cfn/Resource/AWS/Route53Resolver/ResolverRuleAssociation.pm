@@ -1,4 +1,4 @@
-# AWS::Route53Resolver::ResolverRuleAssociation generated from spec 2.20.0
+# AWS::Route53Resolver::ResolverRuleAssociation generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Route53Resolver::ResolverRuleAssociation',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::Route53Resolver::ResolverRuleAssociation {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::Route53Resolver::ResolverRuleAssociation', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'Name','ResolverRuleAssociationId','ResolverRuleId','VPCId' ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-southeast-1','ap-southeast-2','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

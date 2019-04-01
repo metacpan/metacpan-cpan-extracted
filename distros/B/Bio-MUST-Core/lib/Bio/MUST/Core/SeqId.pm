@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.190690';
+$Bio::MUST::Core::SeqId::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -199,12 +199,11 @@ const my @GENERA  => qw(
     4-nitrophenol
     A-2
     Activation-tagging
-    Adeno-Associated
     Adeno-associated
+    Adeno-Associated
     Aids-associated
     alk-system
     Altai-like
-    Amherstieae-Detarieae
     ammonia-oxidizing
     aniline-degrading
     ANME-1
@@ -235,6 +234,7 @@ const my @GENERA  => qw(
     BD1-11
     BD1-7
     BD2-11
+    Bean-associated
     Bean-pod
     Begomovirus-associated
     Bemisia-associated
@@ -246,14 +246,21 @@ const my @GENERA  => qw(
     Bi-allelically
     Bi-directional
     Bi-molecular
+    Bidnavirus-like
     biocide-degrading
     biphenthrin-degrading
     biphenyl-degrading
+    Birds-foot
+    Black-and-white
     Black-eyed
     Black-headed
+    Blackcurrant-associated
+    Bo-Circo-like
+    Bombus-associated
     Bovine-like
     Broad-leafed
     bromate-reducing
+    bromoform-metabolizing
     Bromus-associated
     BTEX-degrading
     BtMd-BetaCoV/HuB2013
@@ -329,9 +336,11 @@ const my @GENERA  => qw(
     Corn-reddening
     Corynebacterium-like
     COS-degrading
+    Cotton-top
     Counter-selectable
     Cowpox-Vaccinia
     Coxiella-like
+    crAss-like
     Cre-expression
     Cre-lox
     Crimean-Congo
@@ -340,6 +349,7 @@ const my @GENERA  => qw(
     Cryphonectria-Endothia
     Cryptaulaxoides-like
     Ctenophore-associated
+    Culex-associated
     Culicine-associated
     cyanobacteria-associated
     Cyrto-hypnum
@@ -368,7 +378,6 @@ const my @GENERA  => qw(
     Dual-tagging
     Duck-dominant
     Dyella-like
-    early-diverging
     EDTA-degrading
     Ehrlichia-like
     EIAV-based
@@ -388,8 +397,10 @@ const my @GENERA  => qw(
     fenpropathrin-degrading
     fenthion-degrading
     Fermo-like
+    Fesa-like
     Fibropapilloma-associated
     Finkel-Biskis-Jinkins
+    Fisa-like
     FLAG-tagging
     Flavobacterium-like
     Flexibacter-like
@@ -410,18 +421,23 @@ const my @GENERA  => qw(
     Glaucous-winged
     Glaucus-gull
     Gluconacetobacter-like
+    glycerol-degrading
     GO-respiring
+    Golden-headed
     Gonad-specific
     Goose-dominant
     Gordonia-like
     Gram-negative
     Gram-positive
     Grass-Cactus
+    Gray-bellied
+    Gyrovirus-like
     H-1
     H-Pelican
     H-Stinger
     Hantaan-like
     Hardy-Zuckerman
+    Haruka-associated
     HCV/GBV-B
     Hedyotis-Oldenlandia
     Helper-independent
@@ -460,6 +476,7 @@ const my @GENERA  => qw(
     Janibacter-like
     jellyfish-degrading
     Jiangxi12-B14
+    Johnson-sea-linkia
     Juquitiba-like
     K139-like
     Kineococcus-like
@@ -469,6 +486,7 @@ const my @GENERA  => qw(
     Leafhopper-borne
     Legionella-like
     Leptotrichia-like
+    lignocellulose-degrading
     LMWdDNA-degrading
     Long-fingered
     long-tailed
@@ -515,6 +533,7 @@ const my @GENERA  => qw(
     mosquito-borne
     mouse-rat
     Multi-host
+    Murine-associated
     Mx-Lox
     Mycobacteria-E.coli
     N-peptide-mCherry
@@ -526,7 +545,6 @@ const my @GENERA  => qw(
     Nebraska-like
     Negev-like
     Neo-uvaria
-    Newbury-1
     NFAT-DsRed
     nitrite-oxidizing
     nitrogen-fixing
@@ -585,8 +603,8 @@ const my @GENERA  => qw(
     PCB-dechlorinating
     Pechuel-loeschea
     Peptococcus-like
-    Perchlorate-reducing
     perchlorate-reducing
+    Perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     Pfiesteria-like
@@ -626,10 +644,14 @@ const my @GENERA  => qw(
     R6K-based
     Raccoon-associated
     RDHV-like
+    Red-bellied
     Red-crowned
+    Red-faced
+    Red-fronted
+    Red-handed
     Red-recombineering
     Regulator-reporter
-    resin-producing
+    Retro-megavirus
     Retro-transcribing
     Rigidomastix-like
     RIOMV-3
@@ -642,6 +664,7 @@ const my @GENERA  => qw(
     Rous-associated
     rpL23-fusion
     Rubrivivax-like
+    Rudolf-kamelinia
     RV-African
     RV-Bower
     RV-Brook
@@ -670,8 +693,12 @@ const my @GENERA  => qw(
     RVA/Human-wt/ZAF/3133WC/2009/G12P4
     RVA/Human-wt/ZAF/3176WC/2009/G12P6
     RVA/Human-wt/ZAF/3203WC/2009/G2P4
+    S10-like
+    S2-like
     S5-like
+    S7-like
     Santee-Cooper
+    Sapelovirus-like
     SARS-like
     SARS-related
     Saxo-fridericia
@@ -689,7 +716,7 @@ const my @GENERA  => qw(
     Simian-Human
     Sindbis-like
     Single-copy
-    Sint-Jans
+    Sint-Jan
     Site-specific
     SIV-derived
     SIV-wrc
@@ -743,9 +770,10 @@ const my @GENERA  => qw(
     Thrips-associated
     Ti-curing
     Tick-associated
-    Tick-borne
     tick-borne
+    Tick-borne
     toluene-degrading
+    Totivirus-like
     Tri-shuttle
     trichloroacetic-acid-degrading
     triclosan-degrading
@@ -773,6 +801,7 @@ const my @GENERA  => qw(
     Virus-associated
     Virus-induced
     Virus-like
+    Visna-maedi
     Vittaforma-like
     WA-like
     wall-less
@@ -782,6 +811,8 @@ const my @GENERA  => qw(
     White-sloanea
     White-tailed
     white-throated
+    White-tufted-ear
+    Whitefly-associated
     Whitefly-transmitted
     WPS-2
     X-cell
@@ -796,6 +827,7 @@ const my @GENERA  => qw(
     Yado-nushi
     Yaounde-like
     Yellow-bellied
+    Yellow-breasted
     Yellow-wax
     );
 
@@ -813,7 +845,6 @@ const my @SPECIES => qw(
     108_oclvp22
     109_oclvp514
     10_xplvp428
-    10A_co2
     110_oclvp17
     111_oclvp16
     112_oclvp26
@@ -1053,6 +1084,9 @@ const my @SPECIES => qw(
     59_oclvp166
     5_25as
     5_xplvp440
+    5P_1
+    5P_2
+    5P_3
     603_MR-2014
     60_oclvp187
     61_oclvp108
@@ -1368,7 +1402,12 @@ const my @SPECIES => qw(
     ADB_BD042
     ADB_BD111
     AF_NAK1-3
+    Al31_1
     AO2_32
+    apr34_000142F
+    apr34_1784
+    apr34_1789
+    apr34_1792
     ARS04068_00002
     ARS04158_00005
     ARS04414_00003
@@ -1379,6 +1418,8 @@ const my @SPECIES => qw(
     ARS07370_00002
     AstV_Rat1
     AstV_Rat4
+    ATA3_5Q_KO9_cl1
+    ATA3_5Q_KO9_cl2
     AZD10a_EZLN1
     AZD10a_EZLN2
     AZD11_3
@@ -1419,6 +1460,48 @@ const my @SPECIES => qw(
     B_D75_82
     B_EHO
     B_UC1
+    Bact_1
+    Bact_10
+    Bact_11
+    Bact_12
+    Bact_13
+    Bact_14
+    Bact_15
+    Bact_16
+    Bact_17
+    Bact_18
+    Bact_19
+    Bact_2
+    Bact_20
+    Bact_21
+    Bact_22
+    Bact_23
+    Bact_24
+    Bact_25
+    Bact_26
+    Bact_27
+    Bact_28
+    Bact_29
+    Bact_3
+    Bact_30
+    Bact_31
+    Bact_32
+    Bact_33
+    Bact_34
+    Bact_35
+    Bact_36
+    Bact_37
+    Bact_38
+    Bact_39
+    Bact_4
+    Bact_40
+    Bact_41
+    Bact_42
+    Bact_5
+    Bact_6
+    Bact_7
+    Bact_8
+    Bact_9
     bacteriumRM12EL_02D
     bacteriumRM12EL_05A
     BCoV/PB675/Art_lit/PAN/2011
@@ -1727,12 +1810,14 @@ const my @SPECIES => qw(
     ES5_1357
     ES6_1418
     ES6_478
+    ES_ALL_000190F
     ex4484_74
     Ex_DG74
     F01_14wb_b10_2005-12-15
     F3_an4
     F3_an5
     F3H1_a10
+    FA1-2_000172F
     FA_121
     FA_130
     FA_132
@@ -1743,6 +1828,9 @@ const my @SPECIES => qw(
     FA_183B
     FA_2CB*
     FA_86
+    FAKO05_000032F
+    FAKO27_000238F
+    FAKO27_000271F
     Fen2266_11
     Fen418_41
     Fen4707_41
@@ -1772,6 +1860,7 @@ const my @SPECIES => qw(
     G_22
     G_23
     geoffroys_cat/URU-01/2009
+    GF1-2_000079F
     GI/Hu/BG/2011/GI.P3_GI.3/RV1253
     GI/Hu/BG/2011/GI.Pb_GI.6/NV2(341)
     GI/Hu/JP/2007/GI.P3_GI.3/Shimizu/KK2866
@@ -1934,6 +2023,7 @@ const my @SPECIES => qw(
     GII/Hu/JP/2000/GII.P12_GII.12/Saitama/KU16
     GII/Hu/JP/2001/GII.P12_GII.12/Saitama/T15
     GII/Hu/JP/2001/GII.P12_GII.12/Saitama/T18
+    GII/Hu/JP/2001/GII.P16_GII.17/OC01031-1
     GII/Hu/JP/2001/GII.P22_GII.5/Saitama/T49
     GII/Hu/JP/2002/GII.P12_GII.13/Saitama/T80
     GII/Hu/JP/2002/GII.P16_GII.17/Saitama/T87
@@ -2065,6 +2155,8 @@ const my @SPECIES => qw(
     GS2_2_25
     GS2_2_29
     GS3_1_3
+    GSM_I_36B_cl_10_2
+    GSM_I_36B_cl_11_3
     GW2011_AR1
     GW2011_AR10
     GW2011_AR11
@@ -2104,18 +2196,6 @@ const my @SPECIES => qw(
     Hare_CoV/La08_60/Lep_gra/ESP/2008
     Hare_CoV/La08_96/Lep_gra/ESP/2008
     Hare_CoV/La08_99/Lep_gra/ESP/2008
-    HCA1-7_Pa
-    HCA2-12_Pa
-    HCA2-17_Pa
-    HCA2-19_Pa
-    HCA2-3_Pa
-    HCA2-4_Pa
-    HCA2-6_Pa
-    HCA3-12_Pa
-    HCA3-15_Pa
-    HCA3-4_Pa
-    HCA3-5_Pa
-    HCA3-9_Pa
     HMP_JCVI_SC0102
     HMP_JCVI_SC0110
     HMP_JCVI_SC0119
@@ -2666,7 +2746,11 @@ const my @SPECIES => qw(
     Hu/GII/JP/2015/GII.P2_GII.2/Saitama-169
     Hu/GII/JP/2015/GII.Pe_GII.4/Osaka/OSF78
     Hu/GII/JP/2016/GII.P16_GII.4_Sydney2012/Kawasaki194
+    Hu/GII/JP/2016/P16_GII.2/Aichi430
+    Hu/GII/JP/2016/P16_GII.2/AichiF219
+    Hu/GII/JP/2016/P16_GII.2/AichiF243
     Hu/GII/JP/2017/GII.P17_GII.17/Tokyo330021
+    Hu/GII/JP/2017/P16_GII.2/Aichi156
     Hu/GII/MP_Jul09_3880/ZAF
     Hu/GII/MP_Mar11_2949/ZAF
     Hu/GII/OuagadougouBF102/GII.4_Sydney2012/2011/BFA
@@ -2877,6 +2961,8 @@ const my @SPECIES => qw(
     Human/GII/InDRE3402_Ver/2006/Mexico
     Human/GII/InDRE3432_Tamps/2006/Mexico
     Human/GII/InDRE3437_Tamps/2006/Mexico
+    I_35_MF_cl1
+    I_35_MF_cl2
     idli_24
     idli_26
     idli_29
@@ -2971,6 +3057,8 @@ const my @SPECIES => qw(
     JL4_S
     JN18_A7_F*
     JPL_7
+    K12_27
+    K12_28b
     kmd_008
     kmd_043
     kmd_065
@@ -4929,6 +5017,11 @@ const my @SPECIES => qw(
     NG_cow23
     NG_sheep50
     NIO_00081
+    NQ1K_cl_15_1d
+    NQ1K_cl_15_2b
+    NQ1K_cl_15_3b
+    NQ1K_cl_15_5d
+    NQ2B_9
     NSA_12
     NSA_23
     O_ANT70
@@ -4972,6 +5065,7 @@ const my @SPECIES => qw(
     PE_IPFFD21
     PE_IPMFB27
     PE_IPMFB28
+    pEBO_BDBV-GP
     PEPV_San92
     PGPV10K_LD1
     PGPV10K_RP1
@@ -4986,6 +5080,7 @@ const my @SPECIES => qw(
     PGPVO_Pi4
     Ph1_Loihi
     Ph2_Loihi
+    pHC_pUC_ori
     PI_GH1.1.B5
     PI_GH2.1.C2
     pig/P15_2/2004/SVN
@@ -4996,6 +5091,7 @@ const my @SPECIES => qw(
     Pip1_Cr_FR_2014
     Pip2_Cr_FR_2014
     Pip3_M_FR_2014
+    pLC_pBBR1_ori
     PM58B_RA
     PREDICT_AdV-69
     PREDICT_AdV-72
@@ -5195,6 +5291,12 @@ const my @SPECIES => qw(
     PREDICT_PyV-31
     PREDICT_RbdV-14
     PREDICT_RbdV-15
+    pStA0.BBa_J23100
+    pStA0.BBa_J23102
+    pStA0.BBa_J23107
+    pStA0.BBa_J23113
+    pStA0.BBa_J23116
+    pStA0.BBa_J23118
     Q_sR_OV_011
     Q_sR_OV_019
     Q_sR_OV_020
@@ -5425,6 +5527,7 @@ const my @SPECIES => qw(
     sp.R0101_021
     sp_1_GP
     sp_2_GP
+    sp_AL
     Spd2B_4
     Sq1_host
     SRC_DS3
@@ -5695,6 +5798,8 @@ const my @SPECIES => qw(
     WS18_483
     WS19_479
     Y4_579_1
+    YS1-2_2434
+    YS1-2_2437
     );
 
 my %is_hyphenated  = map { $_ => 1 } @GENERA;
@@ -6079,7 +6184,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

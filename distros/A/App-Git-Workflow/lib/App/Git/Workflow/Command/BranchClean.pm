@@ -8,11 +8,12 @@ package App::Git::Workflow::Command::BranchClean;
 
 use strict;
 use warnings;
+use version;
 use English qw/ -no_match_vars /;
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION = 1.1.1;
+our $VERSION = version->new(1.1.2);
 our $workflow = App::Git::Workflow->new;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -154,7 +155,7 @@ git-branch-clean - Clean old branches out of the repository
 
 =head1 VERSION
 
-This documentation refers to git-branch-clean version 1.1.1
+This documentation refers to git-branch-clean version 1.1.2
 
 =head1 SYNOPSIS
 

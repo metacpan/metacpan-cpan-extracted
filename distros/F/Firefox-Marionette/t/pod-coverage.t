@@ -7,5 +7,6 @@ all_pod_coverage_ok({ trustme => [
 		 qr/^BY_(ID|NAME|CLASS|TAG|SELECTOR|LINK|PARTIAL|XPATH)$/,
 		 qr/^(find_elements?|page_source|send_keys)$/,
 		 qr/^(list.*)$/,
+		 qr/^(accept_dialog)$/,
 		 qr/^(find_by_.*)$/,
 			 ] });

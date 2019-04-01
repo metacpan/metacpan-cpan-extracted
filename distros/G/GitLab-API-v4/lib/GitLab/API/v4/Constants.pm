@@ -1,7 +1,7 @@
 package GitLab::API::v4::Constants;
 use 5.010001;
 use strictures 2;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =encoding utf8
 
@@ -146,12 +146,17 @@ push @EXPORT_OK, '@GITLAB_SNIPPET_VISIBILITY_LEVELS';
 1;
 __END__
 
+=head1 SUPPORT
+
+See L<GitLab::API::v4/SUPPORT>.
+
 =head1 AUTHORS
 
-See L<GitLab::API::v4/AUTHOR> and L<GitLab::API::v4/CONTRIBUTORS>.
+See L<GitLab::API::v4/AUTHORS>.
 
 =head1 LICENSE
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+See L<GitLab::API::v4/LICENSE>.
+
+=cut
 

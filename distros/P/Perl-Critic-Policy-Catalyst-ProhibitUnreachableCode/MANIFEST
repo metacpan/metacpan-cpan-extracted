@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Perl/Critic/Policy/Catalyst/ProhibitUnreachableCode.pm
+minil.toml
+t/BadContext.pm
+t/BadController.pm
+t/Good.pm
+t/basic.t
+META.yml
+MANIFEST

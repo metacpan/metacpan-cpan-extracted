@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 no bytes;
 use Quiq::Section::Object;
@@ -214,7 +214,7 @@ die Liste (Skalar-Kontext).
 
 Parse die Eingabe und liefere die Liste der Abschnittsobjekte zurück.
 Die Eingabe besteht aus einer Folge von 0 bis n
-L</Syntax>. Die Methode kann wiederholt mit
+L<Syntax|"Syntax">. Die Methode kann wiederholt mit
 verschiedenen Eingaben aufgerufen werden.
 
 =cut
@@ -545,7 +545,7 @@ gerufen.
 Die Methode instantiiert per Default ein Objekt der Klasse
 C<< Quiq::Section::Object >> und liefert eine Referenz auf dieses Objekt
 zurück. Das Objekt wird zur Liste der Abschnittsobjekte hinzugefügt.
-Die Liste der Abschnittsobjekte wird von der Methode L</parse>()
+Die Liste der Abschnittsobjekte wird von der Methode L<parse|"parse() - Parse Abschnitte">()
 zurückgeliefert. In abgeleiteten Klassen kann die Methode überschrieben
 und ein anderes Verhalten implementiert werden.
 
@@ -728,7 +728,7 @@ Als Beispiel siehe quiq-confluence:
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

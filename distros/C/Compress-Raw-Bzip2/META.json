@@ -34,6 +34,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.084",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pmqs/Compress-Raw-Bzip2/issues"
+      },
+      "homepage" : "https://github.com/pmqs/Compress-Raw-Bzip2",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pmqs/Compress-Raw-Bzip2.git",
+         "web" : "https://github.com/pmqs/Compress-Raw-Bzip2"
+      }
+   },
+   "version" : "2.086",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -45,7 +45,7 @@
     yMEd => "y.MM.dd. E",
     yMMM => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMM",
     yMMMEd => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMM'\N{U+044b}\N{U+043d}' d. E",
-    yMMMM => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMM",
+    yMMMM => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMMM",
     yMMMd => "y '\N{U+043e}\N{U+043d}\N{U+044b}' MMM'\N{U+044b}\N{U+043d}' d",
     yMd => "y.MM.dd",
     yQQQ => "y '\N{U+043e}\N{U+043d}\N{U+044b}' QQQ",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

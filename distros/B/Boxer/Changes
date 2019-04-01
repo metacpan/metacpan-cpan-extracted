@@ -7,6 +7,32 @@ Home page:    <https://wiki.debian.org/Boxer>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v1.4.0	2019-04-01
+
+ [ Bug Fixes ]
+ - Fix avoid option --verbose overriding stronger verbosity set as
+   environment variables.
+
+ [ Documentation ]
+ - Improve pod of Boxer::Task.
+ - Mention Elbe commands and isar in SEE ALSO pod.
+ - Mention Perl module Footprintless in Boxer pod section SEE ALSO.
+ - Update TODOs.
+
+ [ Other ]
+ - Added: Fix implement boxer-compose/boxer-bootstrap option --verbose.
+ - Added: Implement boxer-bootstrap option --mode.
+ - Emit shell command notice via Log::Any to stderr (not explicitly to
+   stdout).
+ - Execute reclass in Boxer::World::Reclass (not Boxer::Task::Classify).
+ - Improve logging.
+ - Load Moo-related modules (base classes and roles) before other modules.
+ - Stop use version: Unneeded.
+ - Tidy coercion hints.
+ - Tidy to consistently use qw() in module use.
+ - Tighten author-test pod-spell to rely on english aspell disctionary
+   being installed.
+
 v1.3.0	2019-03-01
 
  [ Documentation ]

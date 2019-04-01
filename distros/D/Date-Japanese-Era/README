@@ -1,113 +1,140 @@
 NAME
+
     Date::Japanese::Era - Conversion between Japanese Era / Gregorian
     calendar
 
 SYNOPSIS
-      use Date::Japanese::Era;
 
+      use utf8;
+      use Date::Japanese::Era;
+    
       # from Gregorian (month + day required)
       $era = Date::Japanese::Era->new(1970, 1, 1);
-
+    
       # from Japanese Era
-      $era = Date::Japanese::Era->new('¾¼ÏÂ', 52);
-
-      $name      = $era->name;         # '¾¼ÏÂ' in EUC-jp (default)
-      $gengou    = $era->gengou;       # same
-
+      $era = Date::Japanese::Era->new("æ˜­å’Œ", 52); # SHOWA
+    
+      $name      = $era->name;         # æ˜­å’Œ (in Unicode)
+      $gengou    = $era->gengou;       # Ditto
+    
       $year      = $era->year;         # 52
       $gregorian = $era->gregorian_year;       # 1977
+    
+      # use JIS X0301 table for conversion
+      use Date::Japanese::Era 'JIS_X0301';
+    
+      # more DWIMmy
+      $era = Date::Japanese::Era->new("æ˜­å’Œäº”åäºŒå¹´");
+      $era = Date::Japanese::Era->new("æ˜­å’Œ52å¹´");
 
 DESCRIPTION
+
     Date::Japanese::Era handles conversion between Japanese Era and
     Gregorian calendar.
 
 METHODS
-    codeset
-          $codeset = Date::Japanese::Era->codeset;
-          Date::Japanese::Era->codeset($encoding);
-
-        sets / gets external encoding of Japanese era names. For example
-        with the following code, input and output of era names are encoded
-        in UTF-8.
-
-          Date::Japanese::Era->codeset('utf8');
-          $era = Date::Japanese::Era->new($name, $year); # $name is UTF-8
-          print $era->name;                              # also UTF-8
-
-        You need Jcode module installed to make use of this feature.
-        Otherwise, calls to codeset() are simply ignored (with warning).
 
     new
-          $era = Date::Japanese::Era->new($year, $month, $day);
-          $era = Date::Japanese::Era->new($era_name, $year);
 
-        Constructs new Date::Japanese::Era instance. When constructed from
-        Gregorian date, month and day is required. You need Date::Calc to
-        construct from Gregorian.
+        $era = Date::Japanese::Era->new($year, $month, $day);
+        $era = Date::Japanese::Era->new($era_name, $year);
+        $era = Date::Japanese::Era->new($era_year_string);
 
-        Name of era can be either of Japanese / ASCII. Input encodings can
-        be specified via codeset(), suppose you have Jcode module installed.
-        Default is EUC-JP.
+      Constructs new Date::Japanese::Era instance. When constructed from
+      Gregorian date, month and day is required. You need Date::Calc to
+      construct from Gregorian.
 
-        Exceptions are thrown when inputs are invalid (e.g: non-existent era
-        name and year combination, unknwon era-name, etc.).
+      Name of era can be either of Japanese / ASCII. If you pass Japanese
+      text, they should be in Unicode.
+
+      Errors will be thrown if you pass byte strings such as UTF-8 or
+      EUC-JP, since Perl doesn't understand what encoding they're in. Use
+      the utf8 pragma if you want to write them in literals.
+
+      Exceptions are thrown when inputs are invalid, such as non-existent
+      era name and year combination, unknwon era-name, etc.
 
     name
-          $name = $era->name;
 
-        returns era name in Japanese. Encoding can be specified via
-        codeset() class method. Default is EUC-JP.
+        $name = $era->name;
+
+      returns era name in Japanese in Unicode.
 
     gengou
-        alias for name().
+
+      alias for name().
 
     name_ascii
-          $name_ascii = $era->name_ascii;
 
-        returns era name in US-ASCII.
+        $name_ascii = $era->name_ascii;
+
+      returns era name in US-ASCII.
 
     year
-          $year = $era->year;
 
-        returns year as Japanese era.
+        $year = $era->year;
+
+      returns year as Japanese era.
 
     gregorian_year
-          $year = $era->gregorian_year;
 
-        returns year as Gregorian.
+        $year = $era->gregorian_year;
+
+      returns year as Gregorian.
 
 EXAMPLES
-      use Date::Japanese::Era;
 
+      use utf8;
+      use Date::Japanese::Era;
+    
       # 2001 is H-13
       my $era = Date::Japanese::Era->new(2001, 8, 31);
       printf "%s-%s", uc(substr($era->name_ascii, 0, 1)), $era->year;
-
+    
       # to Gregorian
-      my $era = Date::Japanese::Era->new('Ê¿À®', 13);
+      my $era = Date::Japanese::Era->new("å¹³æˆ", 13); # HEISEI 13
       print $era->gregorian_year;   # 2001
 
 CAVEATS
-    *   Days when era just changed are handled as newer (later) one.
 
-    *   Currently supported era is up to 'meiji'.
+      * Currently supported era is up to 'meiji'. And before Meiji
+      05.12.02, gregorius calendar was not used there, but lunar calendar
+      was. This module does not support lunar calendar, but gives warnings
+      in such cases ("In %d they didn't use gregorius calendar").
 
-    *   If someday current era (heisei) is changed,
-        Date::Japanese::Era::Table should be upgraded. (Table is declared as
-        global variable, so you can overwrite it if necessary).
+      To use calendar ealier than that, see
+      DateTime::Calendar::Japanese::Era, which is based on DateTime
+      framework and is more comprehensive.
 
-TODO
-    *   Date parameters can be in various format. I should replace
-        Date::Simple or whatever for that.
+      * There should be discussion how we handle the exact day the era has
+      changed (former one or latter one?). This module default handles the
+      day as newer one, but you can change so that it sticks to JIS table
+      (older one) by saying:
 
-    *   Support earlier eras.
+        use Date::Japanese::Era 'JIS_X0301';
+
+      For example, 1912-07-30 is handled as:
+
+        default       Taishou 1 07-30
+        JIS_X0301     Meiji 45 07-30
+
+      * If someday current era (reiwa) is changed,
+      Date::Japanese::Era::Table should be upgraded.
 
 AUTHOR
+
     Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+
+    Tatsuhiko Miyagawa, 2001-
+
+LICENSE
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
 SEE ALSO
-    the Date::Calc manpage, the Jcode manpage, the Date::Simple manpage
+
+    DateTime::Calendar::Japanese::Era, Date::Calc, Encode
 

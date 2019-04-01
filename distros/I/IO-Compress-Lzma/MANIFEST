@@ -54,6 +54,8 @@ t/110encode-xz.t
 t/110encode-lzip.t
 t/25interop-io-string.t
 t/999pod.t
+t/meta-json.t 
+t/meta-yaml.t
 t/Test/Builder.pm
 t/Test/More.pm
 t/Test/Simple.pm

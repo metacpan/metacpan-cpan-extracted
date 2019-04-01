@@ -7,22 +7,74 @@ package Boxer::Task;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie;
 
 use Moo;
 use MooX::StrictConstructor;
-with 'MooX::Role::Logger', 'Boxer::Role::Interact';
+with qw( MooX::Role::Logger Boxer::Role::Interact );
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
+
+=head1 DESCRIPTION
+
+This is the base class for L<Boxer> tasks.
+
+Tasks coerce, validate, and process application commands.
+
+Currently implemented tasks:
+
+=over 4
+
+=item *
+
+L<Classify|Boxer::Task::Classify>
+
+=item *
+
+L<Serialize|Boxer::Task::Serialize>
+
+=item *
+
+L<Bootstrap|Boxer::Task::Bootstrap>
+
+=back
+
+
+=head1 IDEAS
+
+Tasks are separated from commands
+to allow for different front-end interfaces,
+even if currently only a single command-line tool is provided.
+
+=head2 wrappers
+
+Might be useful to provide wrappers for existing command-line tools,
+preserving full behavior of the underlying tool
+only extending it with relevant boxer options.
+
+Examples:
+
+=over 4
+
+=item *
+
+C<debootstrap-boxer [...] [--boxer-node=NODE[,NODE2...]] [...]>
+
+=back
+
+=head2 web
+
+Would be cool to offer a web service
+where you could request a customized system image
+to be generated for you on demand.
 
 =head1 AUTHOR
 

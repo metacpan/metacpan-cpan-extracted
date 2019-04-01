@@ -1,0 +1,81 @@
+{
+   "abstract" : "ÉsÉ¹ÇÊÇÉá´Î::ÊxÇâ¥::ÇÉ¯Éâ",
+   "author" : [
+      "<ɯoɔ˙ꞁᴉɐɯɓ@ǝuᴉɯɥʇɹoʍ> (ǝuᴉɯɥʇɹoʍ)ɐpᴉɥso⅄ ᴉʞn⅄"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.4",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-Text-Viceversa",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::More::UTF8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::Text::Viceversa" : {
+         "file" : "lib/Acme/Text/Viceversa.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/worthmine/Acme-Text-Viceversa/issues"
+      },
+      "homepage" : "https://github.com/worthmine/Acme-Text-Viceversa",
+      "repository" : {
+         "url" : "git://github.com/worthmine/Acme-Text-Viceversa.git",
+         "web" : "https://github.com/worthmine/Acme-Text-Viceversa"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:WORTHMINE",
+   "x_contributors" : [
+      "Yuki Yoshida <worthmine@gmail.com>",
+      "Yuki Yoshida <worthmine@users.noreply.github.com>",
+      "worthmine <worthmine@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.00",
+   "x_static_install" : 1
+}

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 # -----------------------------------------------------------------------------
 
@@ -188,7 +188,7 @@ sub hereDoc {
 
 =head4 Description
 
-Wie Methode L</hereDoc>(), wobei über die Einrückung hinaus
+Wie Methode L<hereDoc|"hereDoc() - Entferne Einrückung von "Here Document"">(), wobei über die Einrückung hinaus
 
 =over 2
 
@@ -274,7 +274,7 @@ sub string {
 
 =head4 Description
 
-Wie die Methoden L</hereDoc>() und L</string>(), wobei über die
+Wie die Methoden L<hereDoc|"hereDoc() - Entferne Einrückung von "Here Document"">() und L<string|"string() - Entferne Einrückung von mehrzeiligem String-Literal">(), wobei über die
 Einrückung hinaus
 
 =over 2
@@ -380,7 +380,7 @@ sub trim {
 
 =head4 Description
 
-Wie die Methode L</trim>(), jedoch wird am Ende genau ein Newline
+Wie die Methode L<trim|"trim() - Entferne Einrückung und Whitespace am Anfang und Ende">(), jedoch wird am Ende genau ein Newline
 angehängt, sofern der Sting nicht leer ist.
 
 =cut
@@ -403,7 +403,7 @@ sub trimNl {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

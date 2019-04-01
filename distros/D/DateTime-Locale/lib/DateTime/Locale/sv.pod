@@ -477,17 +477,17 @@ Swedish locale.
    1995-12-22T09:05:02 = fre 22 december
   -0010-09-15T04:44:23 = lör 15 september
 
-=head3 MMMMW-count-one ('vecka' W 'i' MMM)
+=head3 MMMMW-count-one ('vecka' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = vecka 1 i feb.
-   1995-12-22T09:05:02 = vecka 3 i dec.
-  -0010-09-15T04:44:23 = vecka 2 i sep.
+   2008-02-05T18:30:30 = vecka 1 i februari
+   1995-12-22T09:05:02 = vecka 3 i december
+  -0010-09-15T04:44:23 = vecka 2 i september
 
-=head3 MMMMW-count-other ('vecka' W 'i' MMM)
+=head3 MMMMW-count-other ('vecka' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = vecka 1 i feb.
-   1995-12-22T09:05:02 = vecka 3 i dec.
-  -0010-09-15T04:44:23 = vecka 2 i sep.
+   2008-02-05T18:30:30 = vecka 1 i februari
+   1995-12-22T09:05:02 = vecka 3 i december
+  -0010-09-15T04:44:23 = vecka 2 i september
 
 =head3 MMMMd (d MMMM)
 

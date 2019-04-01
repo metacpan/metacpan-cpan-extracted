@@ -1,6 +1,7 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::DB;
-$Arango::DB::VERSION = '0.003';
+$Arango::DB::VERSION = '0.004';
+use base 'Arango::DB::API';
 use Arango::DB::Database;
 use Arango::DB::Collection;
 
@@ -10,6 +11,7 @@ use HTTP::Tiny;
 use JSON;
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
+use JSON::Schema::Fit;
 
 sub new {
     my ($package, %opts) = @_;
@@ -34,75 +36,21 @@ sub _auth {
     return "Basic " . encode_base64url( $self->{username} . ":" . $self->{password} );
 }
 
-my %API = (
-    'list_databases'  => {
-        method => 'get',
-        uri => '_api/database',
-        'params' => { details => 'boolean' }
-    },
-    'create_database' => {
-        method => 'post',
-        uri => '_api/database',
-        'builder' => sub { 
-            my ($self, %params) = @_;
-            return Arango::DB::Database->new(arango => $self, 'name' => $params{name});
-        }
-    },
-    'create_document' => {
-        method => 'post',
-        uri => '{database}_api/document/{collection}'
-    },
-    'create_collection' => {
-        method => 'post',
-        uri => '{database}_api/collection',
-        'builder' => sub {
-            my ($self, %params) = @_;
-            return Arango::DB::Collection->new(arango => $self, database => $params{database}, 'name' => $params{name});
-        }
-    },
-    'delete_collection' => {
-        method => 'delete',
-        uri => '{database}_api/collection/{name}'
-    },
-    'delete_database' => {
-        method => 'delete',
-        uri => '_api/database/{name}'
-    },
-    'list_collections' => {
-        method => 'get',
-        uri => '{database}_api/collection'
-    },
-    'all_keys' => {
-        method => 'put',
-        uri => '{database}_api/simple/all-keys'
-    },
-    'version' => {
-        method => 'get',
-        uri => '_api/version'
-    },
-    'create_cursor' => {
-        method => 'post',
-        uri => '{database}_api/cursor'
-    },
-    
-);
-
-
 sub version {
     my ($self, %opts) = @_;
-    return $self->_api('version', {}, \%opts);
+    return $self->_api('version', \%opts);
 }
 
 sub list_collections {
     my ($self, $name) = @_;
-    return $self->_api('list_collections', { database => $name });
+    return $self->_api('list_collections', { database => $name })->{result};
 }
 
 sub database {
     my ($self, $name) = @_;
     my $databases = $self->list_databases;
     if (grep {$name eq $_} @$databases) {
-        return Arango::DB::Database->new( arango => $self, name => $name);
+        return Arango::DB::Database->_new( arango => $self, name => $name);
     } else {
         die "Arango::DB | Database not found."
     }
@@ -110,7 +58,7 @@ sub database {
 
 sub list_databases {
     my $self = shift;
-    return $self->_api('list_databases');
+    return  $self->_api('list_databases')->{result};
 }
 
 sub create_database {
@@ -122,62 +70,6 @@ sub delete_database {
     my ($self, $name) = @_;
     return $self->_api('delete_database', { name => $name });
 }
-
-sub _check_options {
-    my ($params, $schema) = @_;
-    for my $key (keys %$params) {
-        delete $params->{$key} unless exists $schema->{$key};
-        if ($schema->{$key} eq "boolean" && $schema->{$key} !~ /^(true|false)$/) {
-            $params->{$key} = $params->{$key} ? "true" : "false"
-        }
-    }
-    return $params;
-}
-
-sub _api {
-    my ($self, $action, $body, $uri_opts) = @_;
-    
-    my $uri = $API{$action}{uri};
-
-    $uri =~ s!\{database\}! defined $body->{database} ? "_db/$body->{database}/" : "" !e;
-    $uri =~ s/\{([^}]+)\}/$body->{$1}/g;
-    
-    my $url = "http://" . $self->{host} . ":" . $self->{port} . "/" . $uri;
-
-    my $opts = {};
-    if (ref($body) eq "HASH") {
-        $opts = { content => exists $body->{body} ? encode_json $body->{body} : encode_json $body };
-    }
-    
-    if (ref($uri_opts) eq "HASH" && %$uri_opts) {
-        if (exists($API{$action}{params})) {
-            $uri_opts = _check_options($uri_opts, $API{$action}{params});
-        }
-        $url .= "?" . join("&", map { "$_=" . uri_encode($uri_opts->{$_} )} keys %$uri_opts);
-    }
-    
-    # print STDERR "\n -- $API{$action}{method} | $url\n";
-
-    my $response = $self->{http}->request($API{$action}{method}, $url, $opts);
-
-    if ($response->{success}) {
-        my $ans = decode_json($response->{content});
-        if ($ans->{error}) {
-            return $ans;
-        } elsif (exists($API{$action}{builder})) {
-            return $API{$action}{builder}->( $self, %$body );
-        } elsif (exists($ans->{result})) {
-            return $ans->{result};
-        } else {
-            return $ans;
-        }
-    }
-    else {
-        die "Arango::DB | ($response->{status}) $response->{reason}";   
-    }
-}
-
-
 
 1;
 
@@ -193,7 +85,7 @@ Arango::DB - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSYS
 

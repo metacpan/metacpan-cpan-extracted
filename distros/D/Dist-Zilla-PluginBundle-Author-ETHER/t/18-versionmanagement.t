@@ -79,7 +79,7 @@ cmp_deeply(
         methods(
             [ isa => 'Dist::Zilla::Plugin::Git::Tag' ] => bool(1),
             plugin_name => re(qr{^\@Author::ETHER/\@Git::VersionManager/Git::Tag$}),
-            tag_format => 'v%v',
+            tag_format => any('v%v', 'v%V'),
             tag_message => 'v%v%t',
         ),
         methods(

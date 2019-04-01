@@ -40,7 +40,6 @@
       "test" : {
          "requires" : {
             "TeX::Hyphen::Pattern" : "0.103",
-            "Test::CheckManifest" : "1.01",
             "Test::Kwalitee" : "0",
             "Test::Pod" : "1",
             "Test::Pod::Coverage" : "1",
@@ -52,7 +51,7 @@
    "provides" : {
       "HTML::Hyphenate" : {
          "file" : "lib/HTML/Hyphenate.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.1.2"
       }
    },
    "release_status" : "stable",
@@ -64,6 +63,6 @@
          "url" : "https://github.com/ipenburg/HTML-Hyphenate"
       }
    },
-   "version" : "v1.1.1",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v1.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

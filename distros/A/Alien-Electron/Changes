@@ -1,3 +1,6 @@
+0.201   2019-04-01
+  * Upgrade to electron 2.0.17 (thanks Árpád Szász)
+
 0.200   2018-05-17
   * Upgrade to electron 2.0.1
   * Add strict to module stub package (thanks Mohammad S Anwar)

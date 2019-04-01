@@ -28,8 +28,8 @@ use App::SpreadRevolutionaryDate::Target::Freenode::Bot;
 
     *App::SpreadRevolutionaryDate::Target::Freenode::Bot::tick = undef;
     *App::SpreadRevolutionaryDate::Target::Freenode::Bot::said = sub {
-        my $self = shift;
-        my $message = shift;
+        my ($self, $message) = @_;
+
         return if $message->{who} eq 'freenode-connect';
         ok($message->{who} eq 'NickServ' && $message->{body} =~ /^You are now identified for/, 'Freenode connection with actual credentials in user conf');
         $self->shutdown('Shutdown overridden said');

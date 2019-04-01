@@ -11705,6 +11705,10 @@ SKIP: {
     value   ( perl_version_introduced => [], '5.000' );
     value   ( perl_version_removed => [], undef );
 
+    '5.18' le $]
+	or $ENV{AUTHOR_TESTING}
+	or skip 'Illegal characters are noisy below Perl 5.18, and therefore author tests', 57;
+
     $delim = "\N{U+11FFFF}";	# Illegal character
     replace_characters(
 	$delim	=> '\\N{U+11FFFF}',

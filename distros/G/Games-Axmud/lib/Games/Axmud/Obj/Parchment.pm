@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2018 A S Lewis
+# Copyright (C) 2011-2019 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -70,22 +70,23 @@
             # The world model (GA::Obj::WorldModel) used by this session
             worldModelObj               => $worldModelObj,
 
-            # A hash of Gnome2::Canvas widgets, one for each level on which rooms, exits and labels
-            #   are drawn
+            # A hash of Goo2Canvas::Canvas widgets, one for each level on which rooms, exits and
+            #   labels are drawn
             # Hash in the form
-            #   $canvasWidgetHash{level} = Gnome2::Canvas
+            #   $canvasWidgetHash{level} = Goo2Canvas::Canvas
             canvasWidgetHash            => {},
-            # In order to make the background the colour we want, a single Gnome2::Canvas::Item
+            # In order to make the background the colour we want, a single Goo2Canvas::CanvasRect
             #   (called the 'background canvas object) is drawn, one for each level
             # Hash in the form
-            #   $bgHash{level} = Gnome2::Canvas::Item
+            #   $bgHash{level} = Goo2Canvas::CanvasRect
             bgCanvasObjHash             => {},
 
             # The map itself is just a collection of GA::ModelObj::Room objects, GA::Obj::Exit
             #   objects and GA::Obj::MapLabel objects. They are stored in each region's
             #   GA::Obj::Regionmap
-            # This parchment objects consists of one or more canvas widgets (Gnome2::Canvas objects,
-            #   stored above), and a collection of canvas objects (Gnome2::Canvas::Item)
+            # This parchment objects consists of one or more canvas widgets (Goo2Canvas::Canvas
+            #   objects, stored above), and a collection of canvas objects
+            #   (Goo2Canvas::CanvasRect, Goo2Canvas::CanvasText, etc)
             # Each GA::ModelObj::Room, GA::Obj::Exit and GA::Obj::MapLabel object is drawn using
             #   one or more canvas objects
             # In order to stack the canvas objects correctly (i.e. so labels appear above rooms),
@@ -152,22 +153,44 @@
             #
             # For (3) draw things using background processes, objects are added to these hashes
             #   until the background processes are ready to draw them
+            # Canvas objects are arranged in a stack (so that labels are drawn above rooms). The
+            #   stack is in the order:
+            #   7   - labels and draggable exits (placed at the top of the stack)
+            #   6   - room tags, room guilds and exit tags
+            #   5   - exits, exit ornaments and checked directions
+            #   4   - room interior text
+            #   3   - room boxes
+            #   2   - room echoes and fake room boxes
+            #   1   - coloured rectangles on the map background
+            #   0   - coloured blocks on the map background
+            #   -   - map background (at the bottom of the stack)
+            # When pre-drawing, objects are drawn in stack order, from bottom to top; in very large
+            #   maps (thousands of rooms), GooCanvas2 can complete the drawing much more quickly
+            #   when everything can be raised to the top of the stack, rather than being
+            #   arbitrarily inserted somewhere in the middle
             #
-            # Hash of rooms waiting to be drawn, in the form
-            #   $queueRoomHash{model_number} = blessed_reference_to_room_object
-            queueRoomHash               => {},
-            # Hash of room tags waiting to be drawn, in the form
-            #   $queueRoomTagHash{model_number} = blessed_reference_to_room_object
-            queueRoomTagHash            => {},
-            # Hash of room guilds waiting to be drawn, in the form
-            #   $queueRoomGuildHash{model_number} = blessed_reference_to_room_object
-            queueRoomGuildHash          => {},
-            # Hash of exits waiting to be drawn, in the form
-            #   $queueExitHash{exit_model_number} = blessed_reference_to_exit_object
-            queueExitHash               => {},
-            # Hash of exit tags waiting to be drawn, in the form
-            #   $queueExitTagHash{exit_model_number} = blessed_reference_to_exit_object
-            queueExitTagHash            => {},
+            # Hash of rooms whose room echoes are waiting to be drawn. in the form
+            #   $queueRoomEchoHash{model_number} = blessed_reference_to_room_object
+            # (When the echo is drawn, the room is removed from this hash, and added to the next)
+            queueRoomEchoHash           => {},
+            # Hash of rooms whose room boxes are waiting to be drawn, in the form
+            #   $queueRoomBoxHash{model_number} = blessed_reference_to_room_object
+            # (When the box is drawn, the room is removed from this hash, and added to the next)
+            queueRoomBoxHash            => {},
+            # Hash of rooms whose interior text is waiting to be drawn, in the form
+            #   $queueRoomTextHash{model_number} = blessed_reference_to_room_object
+            # (When the text is drawn, the room is removed from this hash, and added to the next)
+            queueRoomTextHash           => {},
+            # Hash of rooms whose exits, exit ornaments and checked directions are waiting to be
+            #   drawn, in the form
+            #   $queueRoomExitHash{model_number} = blessed_reference_to_room_object
+            # (When the text is drawn, the room is removed from this hash, and added to the next)
+            queueRoomExitHash           => {},
+            # Hash of rooms whose room tags, room guilds and exit tags are waiting to be drawn, in
+            #   the form
+            #   $queueRoomInfoHash{model_number} = blessed_reference_to_room_object
+            # (When the text is drawn, the room is completely drawn, so is removed from this hash)
+            queueRoomInfoHash           => {},
             # Hash of labels waiting to be drawn, in the form
             #   $queueLabelHash{label_number} = blessed_reference_to_label_object
             queueLabelHash              => {},
@@ -337,43 +360,6 @@
 
             $levelObj->ivAdd(
                 'drawnRoomHash',
-                $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks,
-                $listRef,
-            );
-        }
-
-        return 1;
-    }
-
-    sub addDrawnDummyRoom {
-
-        # After drawing a room model object (GA::ModelObj::Room) with a double-size border, the
-        #   automapper window calls this function to store the canvas object(s)
-        #
-        # Expected arguments
-        #   $roomObj    - The room model object
-        #   $listRef    - Reference to a list of canvas objects
-        #
-        # Return values
-        #   'undef' on improper arguments
-        #   1 otherwise
-
-        my ($self, $roomObj, $listRef, $check) = @_;
-
-        # Local variables
-        my $levelObj;
-
-        # Check for improper arguments
-        if (! defined $roomObj || ! defined $listRef || defined $check) {
-
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->addDrawnDummyRoom', @_);
-        }
-
-        $levelObj = $self->ivShow('levelHash', $roomObj->zPosBlocks);
-        if ($levelObj) {
-
-            $levelObj->ivAdd(
-                'drawnDummyRoomHash',
                 $roomObj->xPosBlocks . '_' . $roomObj->yPosBlocks . '_' . $roomObj->zPosBlocks,
                 $listRef,
             );
@@ -720,18 +706,18 @@
 
     # Delete canvas objects
 
-    sub deleteDrawnRoom {
+    sub deleteDrawnRoom {           # modded, changed ->destroy to ->move
 
         # Called by various functions
         # Checks whether a room model object (GA::ModelObj::Room) has been drawn for this region. If
-        #   so, destroys the canvas objects used to draw it and updates IVs
+        #   so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $roomObj    - The room model object
         #
         # Optional arguments
         #   $allFlag    - If TRUE, canvas objects for any room echoes/room tags/room guilds/room
-        #                   text/checked directions are destroyed at the same time. FALSE (or
+        #                   text/checked directions are removed at the same time. FALSE (or
         #                   'undef') otherwise
         #
         # Return values
@@ -759,13 +745,10 @@
                 # Delete these canvas objects
                 foreach my $canvasObj (@$listRef) {
 
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                 }
 
                 $levelObj->ivDelete('drawnRoomHash', $posn);
-                # (If there's an entry in the hash containing a sub-set of key-value pairs from
-                #   $parchmentObj->drawnRoomHash, delete that entry, too)
-                $levelObj->ivDelete('drawnDummyRoomHash', $posn);
             }
 
             if ($allFlag) {
@@ -780,7 +763,7 @@
 
                             foreach my $canvasObj (@$listRef) {
 
-                                $canvasObj->destroy();
+                                $canvasObj->remove();
                             }
 
                             $echoLevelObj->ivDelete('drawnRoomEchoHash', $posn);
@@ -793,7 +776,7 @@
 
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnRoomTagHash', $posn);
@@ -804,7 +787,7 @@
 
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnRoomGuildHash', $posn);
@@ -815,7 +798,7 @@
 
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnRoomTextHash', $posn);
@@ -826,7 +809,7 @@
 
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnCheckedDirHash', $posn);
@@ -841,7 +824,7 @@
 
         # Called by various functions
         # Checks whether a room echo for a room model object (GA::ModelObj::Room) has been drawn for
-        #   this region. If so, destroys the canvas objects used to draw it and updates IVs
+        #   this region. If so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $roomObj    - The room model object
@@ -876,7 +859,7 @@
                     # Delete these canvas objects
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnRoomEchoHash', $posn);
@@ -891,7 +874,7 @@
 
         # Called by various functions
         # Checks whether a room tag for a room model object (GA::ModelObj::Room) has been drawn for
-        #   this region. If so, destroys the canvas objects used to draw it and updates IVs
+        #   this region. If so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $roomObj    - The room model object
@@ -921,7 +904,7 @@
                 # Delete these canvas objects
                 foreach my $canvasObj (@$listRef) {
 
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                 }
 
                 $levelObj->ivDelete('drawnRoomTagHash', $posn);
@@ -935,7 +918,7 @@
 
         # Called by various functions
         # Checks whether a room guild for a room model object (GA::ModelObj::Room) has been drawn
-        #   for this region. If so, destroys the canvas objects used to draw it and updates IVs
+        #   for this region. If so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $roomObj    - The room model object
@@ -965,7 +948,7 @@
                 # Delete these canvas objects
                 foreach my $canvasObj (@$listRef) {
 
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                 }
 
                 $levelObj->ivDelete('drawnRoomGuildHash', $posn);
@@ -979,7 +962,7 @@
 
         # Called by various functions
         # Checks whether room text for a room model object (GA::ModelObj::Room) has been drawn for
-        #   this region. If so, destroys the canvas objects used to draw it and updates IVs
+        #   this region. If so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $roomObj    - The room model object
@@ -1009,7 +992,7 @@
                 # Delete these canvas objects
                 foreach my $canvasObj (@$listRef) {
 
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                 }
 
                 $levelObj->ivDelete('drawnRoomTextHash', $posn);
@@ -1023,14 +1006,14 @@
 
         # Called by various functions
         # Checks whether an exit model object (GA::Obj::Exit) has been drawn for this region. If
-        #   so, destroys the canvas objects used to draw it and updates IVs
+        #   so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $exitObj    - The exit model object
         #
         # Optional arguments
         #   $roomObj    - The exit's parent room, if known. Otherwise this function fetches it
-        #   $allFlag    - If TRUE, canvas objects for any exit tags/ornaments are destroyed at the
+        #   $allFlag    - If TRUE, canvas objects for any exit tags/ornaments are removed at the
         #                   same time. FALSE (or 'undef') otherwise
         #
         # Return values
@@ -1064,7 +1047,7 @@
                     # Delete these canvas objects
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnExitHash', $exitObj->number);
@@ -1077,7 +1060,7 @@
 
                         foreach my $canvasObj (@$listRef) {
 
-                            $canvasObj->destroy();
+                            $canvasObj->remove();
                         }
 
                         $levelObj->ivDelete('drawnExitTagHash', $exitObj->number);
@@ -1088,7 +1071,7 @@
 
                         foreach my $canvasObj (@$listRef) {
 
-                            $canvasObj->destroy();
+                            $canvasObj->remove();
                         }
 
                         $levelObj->ivDelete('drawnOrnamentHash', $exitObj->number);
@@ -1104,7 +1087,7 @@
 
         # Called by various functions
         # Checks whether an exit tag for an exit model object (GA::Obj::Exit) has been drawn for
-        #   this region. If so, destroys the canvas objects used to draw it and updates IVs
+        #   this region. If so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $exitObj    - The exit model object
@@ -1143,7 +1126,7 @@
                     # Delete these canvas objects
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnExitTagHash', $exitObj->number);
@@ -1158,7 +1141,7 @@
 
         # Called by various functions
         # Checks whether an exit ornament for an exit model object (GA::Obj::Exit) has been drawn
-        #   for this region. If so, destroys the canvas objects used to draw it and updates IVs
+        #   for this region. If so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $exitObj    - The exit model object
@@ -1197,7 +1180,7 @@
                     # Delete these canvas objects
                     foreach my $canvasObj (@$listRef) {
 
-                        $canvasObj->destroy();
+                        $canvasObj->remove();
                     }
 
                     $levelObj->ivDelete('drawnOrnamentHash', $exitObj->number);
@@ -1212,7 +1195,7 @@
 
         # Called by various functions
         # Checks whether a map label object (GA::Obj::MapLabel) has been drawn for this region. If
-        #   so, destroys the canvas objects used to draw it and updates IVs
+        #   so, removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $labelObj   - The map label object
@@ -1241,7 +1224,7 @@
                 # Delete these canvas objects
                 foreach my $canvasObj (@$listRef) {
 
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                 }
 
                 $levelObj->ivDelete('drawnLabelHash', $labelObj->number);
@@ -1255,7 +1238,7 @@
 
         # Called by various functions
         # Checks whether checked directions for a room model object (GA::ModelObj::Room) have been
-        #   drawn for this region. If so, destroys the canvas objects used to draw them and updates
+        #   drawn for this region. If so, removes the canvas objects used to draw them and updates
         #   IVs
         #
         # Expected arguments
@@ -1286,7 +1269,7 @@
                 # Delete these canvas objects
                 foreach my $canvasObj (@$listRef) {
 
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                 }
 
                 $levelObj->ivDelete('drawnCheckedDirHash', $posn);
@@ -1300,7 +1283,7 @@
 
         # Called by various functions
         # Checks whether a particular coloured square has been drawn for this region. If so,
-        #   destroys the canvas objects used to draw it and updates IVs
+        #   removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $string     - A string used to stored the coloured square in $self->colouredSquareHash;
@@ -1326,7 +1309,7 @@
         if ($canvasObj) {
 
             # $string is in the form 'x_y_z'. Delete the canvas object
-            $canvasObj->destroy();
+            $canvasObj->remove();
             $self->ivDelete('colouredSquareHash', $string);
 
         } else {
@@ -1339,7 +1322,7 @@
                 if ($canvasObj) {
 
                     # Delete the canvas object
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                     $self->ivDelete('colouredSquareHash', $key);
                 }
             }
@@ -1352,7 +1335,7 @@
 
         # Called by various functions
         # Checks whether a particular coloured rectangle has been drawn for this region. If so,
-        #   destroys the canvas objects used to draw it and updates IVs
+        #   removes the canvas objects used to draw it and updates IVs
         #
         # Expected arguments
         #   $string     - A string used to stored the coloured rectangle in $self->colouredRectHash;
@@ -1378,7 +1361,7 @@
         if ($canvasObj) {
 
             # $string is in the form 'object-number_level'. Delete the canvas object
-            $canvasObj->destroy();
+            $canvasObj->remove();
             $self->ivDelete('colouredRectHash', $string);
 
         } else {
@@ -1391,7 +1374,7 @@
                 if ($canvasObj) {
 
                     # Delete the canvas object
-                    $canvasObj->destroy();
+                    $canvasObj->remove();
                     $self->ivDelete('colouredRectHash', $key);
                 }
             }
@@ -1402,6 +1385,46 @@
 
     ##################
     # Accessors - set
+
+    sub reset_markedHash {
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->reset_markedHash', @_);
+        }
+
+        $self->ivEmpty('markedRoomHash');
+        $self->ivEmpty('markedRoomTagHash');
+        $self->ivEmpty('markedRoomGuildHash');
+        $self->ivEmpty('markedExitHash');
+        $self->ivEmpty('markedExitTagHash');
+        $self->ivEmpty('markedLabelHash');
+
+        return 1;
+    }
+
+    sub reset_queueHash {
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+            return $axmud::CLIENT->writeImproper($self->_objClass . '->reset_queueHash', @_);
+        }
+
+        $self->ivEmpty('queueRoomEchoHash');
+        $self->ivEmpty('queueRoomBoxHash');
+        $self->ivEmpty('queueRoomTextHash');
+        $self->ivEmpty('queueRoomExitHash');
+        $self->ivEmpty('queueRoomInfoHash');
+        $self->ivEmpty('queueLabelHash');
+
+        return 1;
+    }
 
     ##################
     # Accessors - get
@@ -1437,16 +1460,16 @@
     sub markedLabelHash
         { my $self = shift; return %{$self->{markedLabelHash}}; }
 
-    sub queueRoomHash
-        { my $self = shift; return %{$self->{queueRoomHash}}; }
-    sub queueRoomTagHash
-        { my $self = shift; return %{$self->{queueRoomTagHash}}; }
-    sub queueRoomGuildHash
-        { my $self = shift; return %{$self->{queueRoomGuildHash}}; }
-    sub queueExitHash
-        { my $self = shift; return %{$self->{queueExitHash}}; }
-    sub queueExitTagHash
-        { my $self = shift; return %{$self->{queueExitTagHash}}; }
+    sub queueRoomEchoHash
+        { my $self = shift; return %{$self->{queueRoomEchoHash}}; }
+    sub queueRoomBoxHash
+        { my $self = shift; return %{$self->{queueRoomBoxHash}}; }
+    sub queueRoomTextHash
+        { my $self = shift; return %{$self->{queueRoomTextHash}}; }
+    sub queueRoomExitHash
+        { my $self = shift; return %{$self->{queueRoomExitHash}}; }
+    sub queueRoomInfoHash
+        { my $self = shift; return %{$self->{queueRoomInfoHash}}; }
     sub queueLabelHash
         { my $self = shift; return %{$self->{queueLabelHash}}; }
 }
@@ -1522,10 +1545,6 @@
             # Hash of drawn rooms from this regionmap, in the form
             #   $drawnRoomHash{'x_y_z'} = [canvas_object, canvas_object...]
             drawnRoomHash               => {},
-            # A subset of key-value pairs from ->drawnRoomHash, containing only those rooms which
-            #   have been drawn with a double-size border (current, ghost and lost rooms, but only
-            #   when GA::Obj::WorldModel->currentRoomMode is 'double')
-            drawnDummyRoomHash          => {},
             # Hash of drawn room echos from this regionmap, in the form
             #   $drawnRoomEchoHash{'x_y_z'} = [canvas_object, canvas_object...]
             # NB A room has two echoes, one on the level above it, one on the level below; therefore
@@ -1558,6 +1577,30 @@
             #   room are stored together as a single key-value pair. Hash in the form
             #   $drawnCheckedDirHash{'x_y_z'} = [canvas_object, canvas_object...]
             drawnCheckedDirHash         => {},
+
+            # Canvas objects are arranged in a stack (so that labels are drawn above rooms). The
+            #   stack is in the order:
+            #   7   - labels and draggable exits (placed at the top of the stack)
+            #   6   - room tags, room guilds and exit tags
+            #   5   - exits, exit ornaments and checked directions
+            #   4   - room interior text
+            #   3   - room boxes
+            #   2   - room echoes and fake room boxes
+            #   1   - coloured rectangles on the map background
+            #   0   - coloured blocks on the map background
+            #   -   - map background (at the bottom of the stack)
+            # GooCanvas provides ->lower and ->raise functions, which move a canvas object above or
+            #   below an existing canvas object (or to the top/bottom of the stack)
+            # It would be nice to place a new room above the highest existing room in the stack, but
+            #   we can't, because if the room is deleted we have no way of finding the next-highest
+            #   room in the stack
+            # Instead, we'll create eight slave canvas objects, hidden away in one corner of the
+            #   map. Because the slave objects are never deleted, we can place every new canvas
+            #   object immediately below one of the slave objects
+            # Hence, we have a list of eight stunt objects, [0 1 2 3 4 5 6 7]. For example, the
+            #   slave object at index 3 is just above all room boxes, and therefore all new room
+            #   boxes are added to the stack just below it
+            slaveCanvasObjList          => [],
         };
 
         # Bless the object into existence
@@ -1583,8 +1626,6 @@
 
     sub drawnRoomHash
         { my $self = shift; return %{$self->{drawnRoomHash}}; }
-    sub drawnDummyRoomHash
-        { my $self = shift; return %{$self->{drawnDummyRoomHash}}; }
     sub drawnRoomEchoHash
         { my $self = shift; return %{$self->{drawnRoomEchoHash}}; }
     sub drawnRoomTagHash
@@ -1603,6 +1644,9 @@
         { my $self = shift; return %{$self->{drawnLabelHash}}; }
     sub drawnCheckedDirHash
         { my $self = shift; return %{$self->{drawnCheckedDirHash}}; }
+
+    sub slaveCanvasObjList
+        { my $self = shift; return @{$self->{slaveCanvasObjList}}; }
 }
 
 # Package must return a true value

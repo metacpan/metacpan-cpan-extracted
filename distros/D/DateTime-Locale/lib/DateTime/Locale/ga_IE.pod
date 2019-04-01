@@ -471,35 +471,35 @@ Irish Ireland locale.
    1995-12-22T09:05:02 = Aoine 22 Noll
   -0010-09-15T04:44:23 = Sath 15 MFómh
 
-=head3 MMMMW-count-few ('seachtain' 'a' W 'i' MMM)
+=head3 MMMMW-count-few ('seachtain' 'a' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = seachtain a 1 i Feabh
-   1995-12-22T09:05:02 = seachtain a 3 i Noll
-  -0010-09-15T04:44:23 = seachtain a 2 i MFómh
+   2008-02-05T18:30:30 = seachtain a 1 i Feabhra
+   1995-12-22T09:05:02 = seachtain a 3 i Nollaig
+  -0010-09-15T04:44:23 = seachtain a 2 i Meán Fómhair
 
-=head3 MMMMW-count-many ('seachtain' 'a' W 'i' MMM)
+=head3 MMMMW-count-many ('seachtain' 'a' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = seachtain a 1 i Feabh
-   1995-12-22T09:05:02 = seachtain a 3 i Noll
-  -0010-09-15T04:44:23 = seachtain a 2 i MFómh
+   2008-02-05T18:30:30 = seachtain a 1 i Feabhra
+   1995-12-22T09:05:02 = seachtain a 3 i Nollaig
+  -0010-09-15T04:44:23 = seachtain a 2 i Meán Fómhair
 
-=head3 MMMMW-count-one ('seachtain' 'a' W 'i' MMM)
+=head3 MMMMW-count-one ('seachtain' 'a' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = seachtain a 1 i Feabh
-   1995-12-22T09:05:02 = seachtain a 3 i Noll
-  -0010-09-15T04:44:23 = seachtain a 2 i MFómh
+   2008-02-05T18:30:30 = seachtain a 1 i Feabhra
+   1995-12-22T09:05:02 = seachtain a 3 i Nollaig
+  -0010-09-15T04:44:23 = seachtain a 2 i Meán Fómhair
 
-=head3 MMMMW-count-other ('seachtain' 'a' W 'i' MMM)
+=head3 MMMMW-count-other ('seachtain' 'a' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = seachtain a 1 i Feabh
-   1995-12-22T09:05:02 = seachtain a 3 i Noll
-  -0010-09-15T04:44:23 = seachtain a 2 i MFómh
+   2008-02-05T18:30:30 = seachtain a 1 i Feabhra
+   1995-12-22T09:05:02 = seachtain a 3 i Nollaig
+  -0010-09-15T04:44:23 = seachtain a 2 i Meán Fómhair
 
-=head3 MMMMW-count-two ('seachtain' 'a' W 'i' MMM)
+=head3 MMMMW-count-two ('seachtain' 'a' W 'i' MMMM)
 
-   2008-02-05T18:30:30 = seachtain a 1 i Feabh
-   1995-12-22T09:05:02 = seachtain a 3 i Noll
-  -0010-09-15T04:44:23 = seachtain a 2 i MFómh
+   2008-02-05T18:30:30 = seachtain a 1 i Feabhra
+   1995-12-22T09:05:02 = seachtain a 3 i Nollaig
+  -0010-09-15T04:44:23 = seachtain a 2 i Meán Fómhair
 
 =head3 MMMMd (d MMMM)
 

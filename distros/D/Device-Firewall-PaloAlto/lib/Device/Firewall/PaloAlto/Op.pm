@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op;
-$Device::Firewall::PaloAlto::Op::VERSION = '0.1.2';
+$Device::Firewall::PaloAlto::Op::VERSION = '0.1.3';
 
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use Device::Firewall::PaloAlto::Op::SysInfo;
 use Device::Firewall::PaloAlto::Op::Interfaces;
 use Device::Firewall::PaloAlto::Op::ARPTable;
 use Device::Firewall::PaloAlto::Op::VirtualRouter;
+use Device::Firewall::PaloAlto::Op::Tunnels;
 
 use XML::LibXML;
 
@@ -58,6 +59,16 @@ sub virtual_router {
     return Device::Firewall::PaloAlto::Op::VirtualRouter->_new( $self->_send_op_cmd('show routing route virtual-router', $table_name) );
 }
 
+
+sub tunnels {
+    my $self = shift;
+
+    return Device::Firewall::PaloAlto::Op::Tunnels->_new( 
+        $self->_send_op_cmd('show vpn ike-sa'),
+        $self->_send_op_cmd('show vpn ipsec-sa') 
+    );
+}
+
 sub _send_op_cmd {
     my $self = shift;
     my ($cmd, $var) = @_;
@@ -65,6 +76,7 @@ sub _send_op_cmd {
 
     return $self->{fw}->_send_request(type => 'op', cmd => _gen_op_xml($cmd, $var));
 }
+
 
 
 # Generates the proper XML RPC call to go in the operational 'cmd' field.
@@ -121,7 +133,7 @@ Device::Firewall::PaloAlto::Op - Operations module for Palo Alto firewalls
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 
@@ -150,7 +162,7 @@ Returns a L<Device::Firewall::PaloAlto::Op::SysInfo> object containing system in
 
 Returns a L<Device::Firewall::PaloAlto::Op::Interfaces> object containing all of the interfaces, both physical and logical, on the device.
 
-=head2
+=head2 arp_table
 
     my $arp = $fw->op->arp_table();
 
@@ -165,6 +177,10 @@ Returns a L<Device::Firewall::PaloAlto::Op::ARPTable> object representing all of
     my $vr = $fw->op->virtual_router('guest_vr');
 
 Returns a L<Device::Firewall::PaloAlto::Op::VirtualRouter> object representing all of the routing tables on the firewall.
+
+=head2 tunnels
+
+Returns a L<Device::Firewall::PaloAlto::Op::Tunnels> object representing the current active IPSEC tunnels.
 
 =head1 AUTHOR
 

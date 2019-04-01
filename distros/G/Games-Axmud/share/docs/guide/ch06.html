@@ -24,7 +24,7 @@
 <p>A <em>regular expression</em> - or <em>regex</em> - is just another way of saying <em>pattern</em>. (Axmud uses these terms interchangeably.)</p>
 <p>Many of times a second, Axmud will look at a line of text and ask, 'Does it match this pattern?'</p>
 <p>Axmud uses regular expressions all the time,  so it's important to know something about them.</p>
-<p>There are a million and one tutorials on the internet, but here is another one anyway. It's as short as possible and all the example relate to what you might see in a MUD. (Skip to Section 7 if you already understand regular expressions.)</p>
+<p>There are a million and one tutorials on the internet, but here is another one anyway. It's as short as possible and all the example relate to what you might see in a MUD. (Skip to <a href="ch07.html">Section 7</a> if you already understand regular expressions.)</p>
 <h2><a name="6.1">6.1 Regular expressions</a></h2>
 <p>A pattern can be as simple as the word <strong>troll</strong>. The pattern <strong>troll</strong> matches all of these lines:</p>
 <pre><code>    You see a troll, two dwarves and an elf
@@ -124,12 +124,12 @@
 <pre><code>    You have (.*) gold coins
 </code></pre>
 <p>A pair of brackets (braces) means <em>save everything in the middle for later</em>. In this case, we don't just want to recognise a line matching this pattern - we want to store the number of gold coins for later use.</p>
-<p>The <strong>(.*)</strong> combination is one example of a <em>group</em>. The contents of the group - in this case, <strong>100</strong> - is called the <em>substring</em>. </p>
+<p>The <strong>(.*)</strong> combination is one example of a <em>group</em>. The contents of the group - in this case, <strong>100</strong> - is called the <em>substring</em>.</p>
 <p>Sometimes we'll need to use several groups on the same line.</p>
 <pre><code>    You have (.*) gold, (.*) silver and (.*) brass coins
 </code></pre>
 <p>Because we have three groups, three different substrings are stored for later. These substrings are numbered 1, 2 and 3 (not 0, 1 and 2).</p>
-<p>That's the end of the regular expression tutorial. In the next section we'll go ahead and create some interfaces.</p>
+<p>That's the end of the regular expression tutorial. In the next Section we'll go ahead and create some interfaces.</p>
 <hr>
 <p><a href="ch05.html">Previous</a> <a href="index.html">Index</a> <a href="ch07.html">Next</a></p>
 </body>

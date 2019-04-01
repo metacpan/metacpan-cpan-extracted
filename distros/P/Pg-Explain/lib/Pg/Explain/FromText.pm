@@ -9,11 +9,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =cut
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 =head1 SYNOPSIS
 

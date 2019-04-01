@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Twitter;
-$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.08';
+$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.10';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Twitter.
 
 use Moose;
@@ -20,7 +20,6 @@ with 'App::SpreadRevolutionaryDate::Target'
 use namespace::autoclean;
 use Net::Twitter::Lite::WithAPIv1_1;
 use Net::OAuth 0.25;
-use Encode qw(encode);
 
 has 'consumer_key' => (
     is  => 'ro',
@@ -48,8 +47,8 @@ has 'access_token_secret' => (
 
 
 around BUILDARGS => sub {
-  my $orig = shift;
-  my $class = shift;
+  my ($orig, $class) = @_;
+
   my $args = $class->$orig(@_);
 
   $args->{obj} = Net::Twitter::Lite::WithAPIv1_1->new(
@@ -64,12 +63,16 @@ around BUILDARGS => sub {
 
 
 sub spread {
-  my $self = shift;
-  my $msg = shift;
-  my $test = shift // 0;
+  my ($self, $msg, $test) = @_;
+  $test //= 0;
+
   if ($test) {
+    use Encode qw(encode);
+    use IO::Handle;
+    my $io = IO::Handle->new;
+    $io->fdopen(fileno(STDOUT), "w");
     my $utf8_msg = encode('UTF-8', $msg);
-    print "Spread to Twitter: $utf8_msg\n";
+    $io->say("Spread to Twitter: $utf8_msg");
   } else {
     $self->obj->update($msg);
   }
@@ -98,7 +101,7 @@ App::SpreadRevolutionaryDate::Target::Twitter - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 METHODS
 
@@ -127,6 +130,12 @@ Spreads a message to Twitter. Takes one mandatory argument: C<$msg> which should
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
 
 =back
 

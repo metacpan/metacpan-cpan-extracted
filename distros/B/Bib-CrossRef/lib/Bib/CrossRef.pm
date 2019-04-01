@@ -21,7 +21,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 
 #use Data::Dumper;
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(
@@ -29,6 +29,8 @@ sethtml clearhtml parse_text parse_doi print printheader printfooter
 doi score date atitle jtitle volume issue genre spage epage authcount auth query
 );
 %EXPORT_TAGS = (all => \@EXPORT_OK);
+# disable SSL cert checking
+$ENV{'PERL_LWP_SSL_VERIFY_HOSTNAME'} = 0;
 
 sub new {
     my $self;
@@ -217,40 +219,46 @@ sub parse_text {
   my $cites_clean = $cites;
   # tidy up string, escape nasty characters etc.
   $cites_clean =~ s/\s+/+/g; #$cites_clean = uri_escape_utf8($cites_clean);
-  my $req = HTTP::Request->new(GET => 'http://search.crossref.org/dois?q='.$cites_clean);
+  # crossref like us to give a mailto email when making request so they can get in touch if the script is generating errors,
+  # feel free to change the email address here to something more appropriate
+  # change to using /works API instead of /dois API
+  my $req = HTTP::Request->new(GET => 'https://api.crossref.org/works?mailto=doug@leith.ie&rows=1&query='.$cites_clean);
   my $ua = LWP::UserAgent->new;
   my $res = $ua->request($req);
   if ($res->is_success) {
     # extract json response
     my $json = decode_json($res->decoded_content);
+    use Data::Dumper;
+    #print Dumper($json->{'message'}{'items'});
     my $ref={};
     # keep a record of the query string we used
     $ref->{'query'} = $cites;
+    my $response = $json->{'message'}{'items'}[0];
+    #print Dumper($response);
     # extract doi and matching score
-    $ref->{'doi'} = $json->[0]{'doi'};
-    $ref->{'url'} = $json->[0]{'doi'};
-    $ref->{'score'} = $json->[0]{'score'}; #$json->[0]{'normalizedScore'};
-    # and get the rest of the details from the coins encoded payload ...
-    if (exists $json->[0]{'coins'}) {
-      my $coins = $json->[0]{'coins'};
-      my @list = split(';',$coins);
-      my $authcount=0;
-      foreach my $val (@list) {
-        my @pieces = split('=',$val);
-        $pieces[0] =~ s/rft\.//;
-        if ($pieces[0] =~ m/au$/) {
-          $authcount++;
-          $pieces[0] = 'au'.$authcount;
-        }
-        $pieces[1] = uri_unescape($pieces[1]);
-        $pieces[1] = decode_entities($pieces[1]); # shouldn't be needed, but some html can creep into titles etc
-        $pieces[1] =~ s/\&$//; $pieces[1] =~ s/\s+//g; $pieces[1] =~ s/\+/ /g;
-        $pieces[1] =~ s/^\s+//;
-        $ref->{$pieces[0]} = $pieces[1];
-      }
-      $ref->{'authcount'} = $authcount;
-      $self->{ref} = $ref;
+    $ref->{'doi'} = $response->{'DOI'};
+    $ref->{'doi'} =~ s/http:\/\/dx.doi.org\///;  # remove any http header
+    $ref->{'url'} = $response->{'URL'};
+    $ref->{'score'} = $response->{'score'}; #$json->[0]{'normalizedScore'};
+    $ref->{'issue'} = $response->{'journal-issue'}{'issue'};
+    $ref->{'genre'} = $response->{'type'};
+    if ($ref->{'genre'} eq 'journal-article') { $ref->{'genre'}='article';} # for backward compatibility
+    $ref->{'jtitle'} = $response->{'container-title'}[0];
+    $ref->{'atitle'} = $response->{'title'}[0];
+    $ref->{'volume'} = $response->{'volume'};
+    my @bits = split /-/, $response->{'page'};
+    $ref->{'spage'} = $bits[0];
+    $ref->{'epage'} = $bits[1];
+    $ref->{'date'} = $response->{'issued'}{'date-parts'}[0][0];
+    $ref->{'authcount'}=0;
+    while (defined $response->{'author'}[$ref->{'authcount'}]) {
+       my $val = $response->{'author'}[$ref->{'authcount'}];
+       #print Dumper($val);
+       $ref->{'authcount'}++;
+       $ref->{'au'.$ref->{'authcount'}} = $val->{'given'}.' '.$val->{'family'};
     }
+    
+    $self->{ref} = $ref;
   } else {
     $self->_err("Problem with search.crossref.org: ".$res->status_line);
   }

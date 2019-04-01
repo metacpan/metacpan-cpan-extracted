@@ -38,9 +38,9 @@ my $instance = Linux::GetPidstat::Collector->new(%opt);
             'cswch_per_sec' => '19.87',
             'disk_read_per_sec' => '0',
             'disk_write_per_sec' => '0',
-            'memory_percent' => '34.63',
+            'memory_percent' => '34.64',
             'memory_rss' => '10881534000',
-            'nvcswch_per_sec' => '30.45',
+            'nvcswch_per_sec' => '30.44',
             'stk_ref' => '25500',
             'stk_size' => '128500'
         },
@@ -49,9 +49,9 @@ my $instance = Linux::GetPidstat::Collector->new(%opt);
             'cswch_per_sec' => '19.87',
             'disk_read_per_sec' => '0',
             'disk_write_per_sec' => '0',
-            'memory_percent' => '34.63',
+            'memory_percent' => '34.64',
             'memory_rss' => '10881534000',
-            'nvcswch_per_sec' => '30.45',
+            'nvcswch_per_sec' => '30.44',
             'stk_ref' => '25500',
             'stk_size' => '128500'
         }
@@ -69,9 +69,9 @@ my $instance = Linux::GetPidstat::Collector->new(%opt);
             'cswch_per_sec' => '19.87',
             'disk_read_per_sec' => '0',
             'disk_write_per_sec' => '0',
-            'memory_percent' => '34.63',
+            'memory_percent' => '34.64',
             'memory_rss' => '10881534000',
-            'nvcswch_per_sec' => '30.45',
+            'nvcswch_per_sec' => '30.44',
             'stk_ref' => '25500',
             'stk_size' => '128500'
         },
@@ -80,9 +80,9 @@ my $instance = Linux::GetPidstat::Collector->new(%opt);
             'cswch_per_sec' => '59.61',
             'disk_read_per_sec' => '0',
             'disk_write_per_sec' => '0',
-            'memory_percent' => '103.89',
+            'memory_percent' => '103.92',
             'memory_rss' => '32644602000',
-            'nvcswch_per_sec' => '91.35',
+            'nvcswch_per_sec' => '91.32',
             'stk_ref' => '76500',
             'stk_size' => '385500'
         }

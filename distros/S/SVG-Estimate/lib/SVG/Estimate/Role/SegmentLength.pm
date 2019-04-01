@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::SegmentLength;
-$SVG::Estimate::Role::SegmentLength::VERSION = '1.0111';
+$SVG::Estimate::Role::SegmentLength::VERSION = '1.0112';
 use strict;
 use Moo::Role;
 
@@ -9,7 +9,7 @@ SVG::Estimate::Role::SegmentLength - Estimate the distance along a curve
 
 =head1 VERSION
 
-version 1.0111
+version 1.0112
 
 =head1 METHODS
 

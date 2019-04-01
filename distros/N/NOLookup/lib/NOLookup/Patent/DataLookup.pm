@@ -1,3 +1,4 @@
+
 package NOLookup::Patent::DataLookup;
 
 use warnings;
@@ -104,12 +105,9 @@ sub _lookup_tm_entries {
 	$self->error(1);
 	return $self;
     }
-
-    my $json = decode_json($mech->text);
-
-    #print STDERR "URL: $URL\n";
-    #print "JSON: ", Dumper $json, "\n";
     
+    my $json = decode_json($mech->content(format=>'text'));
+
     if ($json) {
 	$self->raw_json_decoded($json);
 	

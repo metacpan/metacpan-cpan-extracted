@@ -1,6 +1,10 @@
 package Data::MethodProxy;
+use 5.008001;
+use strict;
+use warnings;
+our $VERSION = '0.04';
 
-$Data::MethodProxy::VERSION = '0.03';
+=encoding utf8
 
 =head1 NAME
 
@@ -84,9 +88,6 @@ You'd still need to create a C<MyApp::Config> package, and add a
 C<get_db_password> method to it.
 
 =cut
-
-use strict;
-use warnings;
 
 use Scalar::Util qw( refaddr );
 use Module::Runtime qw( require_module is_module_name );
@@ -217,9 +218,16 @@ sub is_callable {
 1;
 __END__
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+Please submit bugs and feature requests to the
+Data-MethodProxy GitHub issue tracker:
+
+L<https://github.com/bluefeet/Data-MethodProxy/issues>
+
+=head1 AUTHORS
+
+    Aran Clary Deltac <bluefeet@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -232,4 +240,6 @@ development this distribution would not exist.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

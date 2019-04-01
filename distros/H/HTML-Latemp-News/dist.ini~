@@ -1,0 +1,14 @@
+name = HTML-Latemp-News
+author = Shlomi Fish <shlomif@cpan.org>
+license = MIT
+copyright_holder = Shlomi Fish
+copyright_year = 2005
+version = 0.2.0
+
+[@Filter]
+-bundle = @SHLOMIF
+-remove = MakeMaker
+-remove = PodCoverageTests
+dist = HTML-Latemp-News
+[MetaProvides::Package]
+[Test::TidyAll]

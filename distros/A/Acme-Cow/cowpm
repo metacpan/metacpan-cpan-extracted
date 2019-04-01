@@ -1,0 +1,73 @@
+#!/usr/local/bin/perl
+# This file is part of cowsay.  (c) 2001-2002 Tony Monroe
+
+use strict;
+use Text::Template;
+
+unless ($ARGV[0]) {
+    die "Usage: $0 name\n";
+}
+
+my $pkg_tmpl = <<'EOF';
+package Acme::Cow::{$NAME};
+use strict;
+use Acme::Cow;
+@Acme::Cow::{$NAME}::ISA = qw(Acme::Cow);
+
+my ${$name} = <<'EOC'; 
+
+Insert cute ASCII art here
+
+EOC
+
+sub new 
+\{
+    my $proto = shift;
+    my $class = ref $proto || $proto;
+    my $self = $class->SUPER::new();
+    return bless $self, $class;
+\}
+
+sub as_string
+\{
+    my $self = shifT;
+    return $self->SUPER::as_string(${$name});
+\}
+
+1;
+EOF
+
+my $template = new Text::Template(TYPE => 'STRING', SOURCE => $pkg_tmpl);
+$private::name = lc($ARGV[0]);
+$private::NAME = ucfirst($ARGV[0]);
+print $template->fill_in(PACKAGE => 'private');
+__END__
+
+=pod
+
+=head1 NAME
+
+cowpm - Simple boilerplate generator for C<Acme::Cow>-derived classes
+
+=head1 SYNOPSIS
+
+cowpm Name > Name.pm
+
+=head1 DESCRIPTION
+
+Handles most of the tedium detailed in L<Acme::Cow::Example>.
+Complains if you don't give it an argument.  Does one module at a
+time.
+
+=head1 SEE ALSO
+
+L<cowsay>, L<Acme::Cow>, L<Acme::Cow::Example>
+
+=head1 AUTHOR
+
+Tony Monroe <tmonroe plus perl at nog dot net>
+
+=head1 BUGS
+
+Few.
+

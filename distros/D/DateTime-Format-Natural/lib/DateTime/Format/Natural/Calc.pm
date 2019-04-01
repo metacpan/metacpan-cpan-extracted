@@ -12,7 +12,7 @@ use constant MORNING   => '08';
 use constant AFTERNOON => '14';
 use constant EVENING   => '20';
 
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 sub _no_op
 {
@@ -394,6 +394,20 @@ sub _variant_last_month
         $day = $self->_Days_in_Month($self->{datetime}->year, $self->{datetime}->month);
     }
     $self->_set(day => $day);
+}
+
+sub _variant_quarter
+{
+    my $self = shift;
+    $self->_register_trace;
+    my $opts = pop;
+    my ($when) = @_;
+    $self->_subtract(day => $self->{datetime}->day_of_quarter - 1);
+    $self->_add_or_subtract({
+        when  => $when,
+        unit  => $opts->{unit},
+        value => 3,
+    });
 }
 
 1;

@@ -1,4 +1,4 @@
-# AWS::RAM::ResourceShare generated from spec 2.24.0
+# AWS::RAM::ResourceShare generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::RAM::ResourceShare',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::RAM::ResourceShare {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::RAM::ResourceShare', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'Arn' ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 

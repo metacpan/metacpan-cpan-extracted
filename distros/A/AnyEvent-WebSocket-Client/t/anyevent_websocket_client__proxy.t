@@ -1,3 +1,5 @@
+use lib 't/lib';
+use Test2::Plugin::AnyEvent::Timeout;
 use Test2::V0 -no_srand => 1;
 use AnyEvent;
 use AnyEvent::WebSocket::Client;

@@ -14,7 +14,7 @@ use Bio::MUST::Core::Utils qw(cmp_store);
 my $class = 'Bio::MUST::Core::GeneticCode::Factory';
 
 my @exp_codes = (
-    1..6, 9..16, 21..31,
+    1..6, 9..16, 21..32,
     'Standard',
     'SGC0',
     'Vertebrate Mitochondrial',
@@ -55,6 +55,7 @@ my @exp_codes = (
     'Karyorelict Nuclear',
     'Mesodinium Nuclear',
     'Peritrich Nuclear',
+    'Balanophoraceae Plastid',
 );
 
 my @translations = (

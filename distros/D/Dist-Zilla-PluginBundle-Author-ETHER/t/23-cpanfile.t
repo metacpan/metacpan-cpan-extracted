@@ -93,7 +93,9 @@ cmp_deeply(
         allow_dirty => [ map str($_), 'Changes', 'cpanfile' ],
     ),
     'payload for [Git::NextVersion] is passed along to [Git::Commit] that performs the release snapshot',
-);
+)
+or diag 'got allow_dirty payload: ',
+    explain (first { $_->isa('Dist::Zilla::Plugin::Git::Commit') } @{ $tzil->plugins })->allow_dirty;
 
 diag 'got log messages: ', explain $tzil->log_messages
     if not Test::Builder->new->is_passing;

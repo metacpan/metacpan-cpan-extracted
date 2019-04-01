@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Ali::Stash;
 # ABSTRACT: Thin wrapper for an indexed Ali read from disk
-$Bio::MUST::Core::Ali::Stash::VERSION = '0.190690';
+$Bio::MUST::Core::Ali::Stash::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -63,7 +63,7 @@ sub get_seq_with_id {
     return $self->get_seq($index)
         if defined $index;
 
-    carp "Warning: cannot find seq with id: $id; returning undef!";
+    carp "[BMC] Warning: cannot find seq with id: $id; returning undef!";
     return;
 }
 
@@ -99,7 +99,7 @@ Bio::MUST::Core::Ali::Stash - Thin wrapper for an indexed Ali read from disk
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

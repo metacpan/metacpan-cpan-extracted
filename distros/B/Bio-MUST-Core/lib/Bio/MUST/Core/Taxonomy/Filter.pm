@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Filter;
 # ABSTRACT: Helper class for filtering seqs according to taxonomy
-$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.190690';
+$Bio::MUST::Core::Taxonomy::Filter::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -55,7 +55,7 @@ sub BUILD {
 
     # warn in case of ambiguous taxa
     for my $taxon (@wanted, @unwanted) {
-        carp "Warning: $taxon is taxonomically ambiguous in filter!"
+        carp "[BMC] Warning: $taxon is taxonomically ambiguous in filter!"
             if $self->tax->is_dupe($taxon);
     }
 
@@ -117,7 +117,7 @@ Bio::MUST::Core::Taxonomy::Filter - Helper class for filtering seqs according to
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

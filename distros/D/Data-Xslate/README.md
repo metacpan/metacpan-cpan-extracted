@@ -4,49 +4,55 @@ Data::Xslate - Templatize your data.
 
 # SYNOPSIS
 
-    use Data::Xslate;
-    
-    my $xslate = Data::Xslate->new();
-    
-    my $output = $xslate->render( $input );
+```perl
+use Data::Xslate;
+
+my $xslate = Data::Xslate->new();
+
+my $output = $xslate->render( $input );
+```
 
 Given this input data structure:
 
-    {
-        color_names => ['red', 'blue', 'orange'],
-        email => {
-            message => 'Do you like the color <: $user.color_name :>?',
-            subject => 'Hello <: $user.name :>!',
-            to      => '=user.email',
-        },
-        'email.from=' => 'george@example.com',
-        user => {
-            color_id => 2,
-            color_name => '<: node("color_names")[$color_id] :>',
-            email => '<: $login :>@example.com',
-            login => 'john',
-            name  => 'John',
-        },
-    }
+```perl
+{
+    color_names => ['red', 'blue', 'orange'],
+    email => {
+        message => 'Do you like the color <: $user.color_name :>?',
+        subject => 'Hello <: $user.name :>!',
+        to      => '=user.email',
+    },
+    'email.from=' => 'george@example.com',
+    user => {
+        color_id => 2,
+        color_name => '<: node("color_names")[$color_id] :>',
+        email => '<: $login :>@example.com',
+        login => 'john',
+        name  => 'John',
+    },
+}
+```
 
 This data will be output:
 
-    {
-        color_names => ['red', 'blue', 'orange'],
-        email => {
-            from => 'george@example.com',
-            message => 'Do you like the color orange?',
-            subject => 'Hello John!',
-            to => 'john@example.com',
-        },
-        user => {
-            color_id => '2',
-            color_name => 'orange',
-            email => 'john@example.com',
-            login => 'john',
-            name => 'John',
-        },
-    }
+```perl
+{
+    color_names => ['red', 'blue', 'orange'],
+    email => {
+        from => 'george@example.com',
+        message => 'Do you like the color orange?',
+        subject => 'Hello John!',
+        to => 'john@example.com',
+    },
+    user => {
+        color_id => '2',
+        color_name => 'orange',
+        email => 'john@example.com',
+        login => 'john',
+        name => 'John',
+    },
+}
+```
 
 # DESCRIPTION
 
@@ -57,44 +63,52 @@ This module provides a syntax for templatizing data structures.
 The most powerful feature by far is templating, where you can
 use [Text::Xslate](https://metacpan.org/pod/Text::Xslate) in your values.
 
-    {
-        foo => 'green',
-        bar => 'It is <: $foo :>!',
-    }
-    # { foo=>'green', bar=>'It is green!' }
+```perl
+{
+    foo => 'green',
+    bar => 'It is <: $foo :>!',
+}
+# { foo=>'green', bar=>'It is green!' }
+```
 
 There is a lot you can do with this beyond simply including values
 from other keys:
 
-    {
-        prod => 1,
-        memcached_host => '<: if $prod { :>memcached.example.com<: } else { :>127.0.0.1<: } :>',
-    }
-    # { prod=>1, memcached_host=>'memcached.example.com' }
+```perl
+{
+    prod => 1,
+    memcached_host => '<: if $prod { :>memcached.example.com<: } else { :>127.0.0.1<: } :>',
+}
+# { prod=>1, memcached_host=>'memcached.example.com' }
+```
 
 Values in arrays are also processed for templating:
 
-    {
-        ceo_name => 'Sara',
-        employees => [
-            '<: $ceo_name :>',
-            'Fred',
-            'Alice',
-        ],
-    }
-    # {
-    #     ceo_name => 'Sara',
-    #     employees => [
-    #         'Sara',
-    #         'Fred',
-    #         'Alice',
-    #     ],
-    # }
+```perl
+{
+    ceo_name => 'Sara',
+    employees => [
+        '<: $ceo_name :>',
+        'Fred',
+        'Alice',
+    ],
+}
+# {
+#     ceo_name => 'Sara',
+#     employees => [
+#         'Sara',
+#         'Fred',
+#         'Alice',
+#     ],
+# }
+```
 
 As well as using array values in a template:
 
-    { foo=>'<: $bar.1 :>', bar=>[4,5,6] }
-    # { foo=>5, bar=>[4,5,6] }
+```perl
+{ foo=>'<: $bar.1 :>', bar=>[4,5,6] }
+# { foo=>5, bar=>[4,5,6] }
+```
 
 Data structures of any arbitrary depth and complexity are handled
 correctly, and keys from any level can be referred to following
@@ -106,27 +120,33 @@ Substituion allows you to retrieve a value from one key and use it
 as the value for the current key.  To do this your hash or array
 value must start with the ["substitution\_tag"](#substitution_tag) (defaults to `=`):
 
-    {
-        foo => 14,
-        bar => '=foo',
-    }
-    # { foo=>14, bar=>14 }
+```perl
+{
+    foo => 14,
+    bar => '=foo',
+}
+# { foo=>14, bar=>14 }
+```
 
 Templating could be used instead of substitution:
 
-    {
-        foo => 14,
-        bar => '<: $foo :>',
-    }
+```perl
+{
+    foo => 14,
+    bar => '<: $foo :>',
+}
+```
 
 But, templating only works with strings.  Substitutions become vital
 when you want to substitute an array or hash:
 
-    {
-        foo => [1,2,3],
-        bar => '=foo',
-    }
-    # { foo=>[1,2,3], bar=>[1,2,3] }
+```perl
+{
+    foo => [1,2,3],
+    bar => '=foo',
+}
+# { foo=>[1,2,3], bar=>[1,2,3] }
+```
 
 The keys in substitution follow the ["Scope"](#scope) rules.
 
@@ -137,8 +157,10 @@ separating keys with the ["key\_separator"](#key_separator) (defaults to a dot, 
 and ending the key with the ["nested\_key\_tag"](#nested_key_tag) (defaults to `=`).
 Consider this:
 
-    { a=>{ b=>1 }, 'a.b=' => 2 }
-    # { a=>{ b=>2 } }
+```perl
+{ a=>{ b=>1 }, 'a.b=' => 2 }
+# { a=>{ b=>2 } }
+```
 
 So, nested keys are a way to set values in other data structures.  This
 feature is very handy when you are merging data structures from different
@@ -172,19 +194,27 @@ programming.
 
 For example, you can refer to a key in the same scope:
 
-    { a=>1, b=>'=a' }
+```perl
+{ a=>1, b=>'=a' }
+```
 
 You may refer to a key in a lower scope:
 
-    { a=>{ b=>1 }, c=>'=a.b' }
+```perl
+{ a=>{ b=>1 }, c=>'=a.b' }
+```
 
 You may refer to a key in a higher scope:
 
-    { a=>{ b=>'=c' }, c=>1 }
+```perl
+{ a=>{ b=>'=c' }, c=>1 }
+```
 
 You may refer to a key in a higher scope that is nested:
 
-    { a=>{ b=>'=c.d' }, c=>{ d=>1 } }
+```perl
+{ a=>{ b=>'=c.d' }, c=>{ d=>1 } }
+```
 
 The logic behind this is pretty flexible, so more complex use cases will
 just work like you would expect.
@@ -197,12 +227,16 @@ In the case of templating a special `node` function is provided which
 will allow you to retrieve an absolute key.  For example these two lines
 would do the same thing (printing out a relative key value):
 
-    <: $foo.bar :>
-    <: node("foo.bar") :>
+```
+<: $foo.bar :>
+<: node("foo.bar") :>
+```
 
 But if you wanted to refer to an absolute key you'd have to do this:
 
-    <: node(".foo.bar") :>
+```
+<: node(".foo.bar") :>
+```
 
 # ARGUMENTS
 
@@ -210,50 +244,64 @@ Any arguments you pass to `new`, which this class does not directly
 handle, will be used when creating the underlying [Text::Xslate](https://metacpan.org/pod/Text::Xslate) object.
 So, any arguments which [Text::Xslate](https://metacpan.org/pod/Text::Xslate) supports may be set.  For example:
 
-    my $xslate = Data::Xslate->new(
-        substitution_tag => ']]', # A Data::Xslate argument.
-        verbose          => 2,    # A Text::Xslate argument.
-    );
+```perl
+my $xslate = Data::Xslate->new(
+    substitution_tag => ']]', # A Data::Xslate argument.
+    verbose          => 2,    # A Text::Xslate argument.
+);
+```
 
 ## substitution\_tag
 
 The string to look for at the beginning of any string value which
-signifies ["SUBSTITUTION"](#substitution).  Defaults to `=`.  This is used in
+signifies ["Substitution"](#substitution).  Defaults to `=`.  This is used in
 data like this:
 
-    { a=>{ b=>2 }, c => '=a.b' }
-    # { a=>{ b=>2 }, c => 2 }
+```perl
+{ a=>{ b=>2 }, c => '=a.b' }
+# { a=>{ b=>2 }, c => 2 }
+```
 
 ## nested\_key\_tag
 
 The string to look for at the end of any key which signifies
-["NESTED KEYS"](#nested-keys).  Defaults to `=`.  This is used in data
+["Nested Keys"](#nested-keys).  Defaults to `=`.  This is used in data
 like this:
 
-    { a=>{ b=>2 }, 'a.c=' => 3 }
-    # { a=>{ b=>2, c=>3 } }
+```perl
+{ a=>{ b=>2 }, 'a.c=' => 3 }
+# { a=>{ b=>2, c=>3 } }
+```
 
 ## key\_separator
 
 The string which will be used between keys.  The default is a dot (`.`)
 which looks like this:
 
-    { a=>{ b=>2 }, c => '=a.b' }
+```perl
+{ a=>{ b=>2 }, c => '=a.b' }
+```
 
 Whereas, for example, if you changed the `key_separator` to a forward
 slash it would look like this:
 
-    { a=>{ b=>2 }, c => '=a/b' }
+```perl
+{ a=>{ b=>2 }, c => '=a/b' }
+```
 
 Which looks rather good with absolute keys:
 
-    { a=>{ b=>2 }, c => '=/a/b' }
+```perl
+{ a=>{ b=>2 }, c => '=/a/b' }
+```
 
 # METHODS
 
 ## render
 
-    my $data_out = $xslate->render( $data_in );
+```perl
+my $data_out = $xslate->render( $data_in );
+```
 
 Processes the data and returns new data.  The passed in data is not
 modified.
@@ -267,8 +315,10 @@ Data-Xslate GitHub issue tracker:
 
 # AUTHORS
 
-    Aran Clary Deltac <bluefeet@gmail.com>
-    Mohammad S Anwar <mohammad.anwar@yahoo.com>
+```
+Aran Clary Deltac <bluefeet@gmail.com>
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+```
 
 # ACKNOWLEDGEMENTS
 

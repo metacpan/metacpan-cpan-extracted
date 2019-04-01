@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Array;
 use Quiq::Hash;
@@ -56,7 +56,7 @@ Platzhalter, die bei einer Selektion durch die Selektionsskriterien
 ersetzt werden.
 
 Die Einsetzung von Selektionskriterien in das Template nimmt
-die Methode L</selectStmt>() vor.
+die Methode L<selectStmt|"selectStmt() - Liefere Select-Statement der Klasse">() vor.
 
 =head4 Example
 
@@ -123,7 +123,7 @@ Select-Statement (String)
 
 Liefere ein Select-Statement der Klasse gemäß den Selektionskriterien
 C<@select>. Die Selektionskriterien werden in das Muster-Statement
-eingesetzt (siehe L</selectTemplate>().
+eingesetzt (siehe L<selectTemplate|"selectTemplate() - Liefere Select-Template der Klasse">().
 
 =cut
 
@@ -262,7 +262,7 @@ sub cast {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

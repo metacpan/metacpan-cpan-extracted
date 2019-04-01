@@ -136,7 +136,7 @@ There are downsides to this approach:
 These limitations are due to the assumption by Devel::DProf that the
 code you are profiling is running under a standard Perl binary (the
 one you run from the command line).  C<Devel::Dprof> relies on the
-Perl C<-d> switch for intialization of the Perl debugger, which
+Perl C<-d> switch for initialization of the Perl debugger, which
 happens inside C<perl_parse()> function call.  It also relies on
 Perl's special C<END> subroutines for termination when it writes the
 raw profile to I<tmon.out>.  Under the standard command line Perl

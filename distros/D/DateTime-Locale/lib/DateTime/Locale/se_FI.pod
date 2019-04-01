@@ -471,19 +471,19 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = be 22 juov
   -0010-09-15T04:44:23 = lá 15 čakč
 
-=head3 MMMMW-count-one (MMMM':a vahkku' W)
+=head3 MMMMW-count-one (MMMM:'a' 'vahkku' W)
 
    2008-02-05T18:30:30 = guovvamánnu:a vahkku 1
    1995-12-22T09:05:02 = juovlamánnu:a vahkku 3
   -0010-09-15T04:44:23 = čakčamánnu:a vahkku 2
 
-=head3 MMMMW-count-other (MMMM':a vahkku' W)
+=head3 MMMMW-count-other (MMMM:'a' 'vahkku' W)
 
    2008-02-05T18:30:30 = guovvamánnu:a vahkku 1
    1995-12-22T09:05:02 = juovlamánnu:a vahkku 3
   -0010-09-15T04:44:23 = čakčamánnu:a vahkku 2
 
-=head3 MMMMW-count-two (MMMM':a vahkku' W)
+=head3 MMMMW-count-two (MMMM:'a' 'vahkku' W)
 
    2008-02-05T18:30:30 = guovvamánnu:a vahkku 1
    1995-12-22T09:05:02 = juovlamánnu:a vahkku 3
@@ -609,19 +609,7 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = 4. njealjádas 1995
   -0010-09-15T04:44:23 = 3. njealjádas -10
 
-=head3 yw-count-one ('week' w 'of' Y)
-
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
-
 =head3 yw-count-other ('week' w 'of' Y)
-
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
-
-=head3 yw-count-two ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995

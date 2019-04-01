@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.190690';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -466,7 +466,8 @@ around qr{ _from_name \z }xms => sub {
     return undef unless $name;      ## no critic (ProhibitExplicitReturnUndef)
 
     if ( $self->is_dupe($name) ) {
-        carp "Warning: $name is taxonomically ambiguous; returning undef!";
+        carp "[BMC] Warning: $name is taxonomically ambiguous;"
+            . ' returning undef!';
         return undef;               ## no critic (ProhibitExplicitReturnUndef)
     }
 
@@ -481,9 +482,9 @@ around qw( get_taxonomy get_taxonomy_with_levels get_term_at_level ) => sub {
     # update taxon_id if merged in current version of NCBI Taxonomy
     # in contrast, we don't do anything if taxon_id has been deleted
     if ( defined $taxon_id && $self->is_merged($taxon_id) ) {
-        my $msg = "Warning: merged taxid for $taxon_id; ";
+        my $msg = "[BMC] Warning: merged taxid for $taxon_id;";
         $taxon_id = $self->merged_for($taxon_id);
-        carp $msg . "using $taxon_id instead!";
+        carp "$msg using $taxon_id instead!";
     }
 
     return $self->$method($taxon_id, @_);
@@ -651,8 +652,8 @@ sub _taxonomy_from_seq_id_ {
     # ... to ensure that no (undef) list is returned by our additional methods
     # Note: our policy is thus unlike get_taxonomy and get_taxid_from_name
     @taxonomy = () unless $taxonomy[0];
-    carp 'Warning: cannot fetch tax for ' . $seq_id->full_id . '; ignoring it!'
-        unless @taxonomy;
+    carp '[BMC] Warning: cannot fetch tax for ' . $seq_id->full_id
+        . '; ignoring it!' unless @taxonomy;
 
     # examine context for returning plain array or ArrayRef
     return wantarray ? @taxonomy : \@taxonomy;
@@ -836,7 +837,8 @@ sub attach_taxa_to_entities {
 
     # ensure meaningful subtree collapsing WRT naming
     if ($target_for{collapse} < $target_for{name}) {
-        carp 'Warning: collapsing level must include naming level; upgrading!';
+        carp '[BMC] Warning: collapsing level must include naming level;'
+            . ' upgrading!';
         $target_for{collapse} = $target_for{name};
     }
 
@@ -1003,7 +1005,8 @@ sub _taxids_from_gis {
 
             # stop trying if batch_size falls to zero
             unless ($batch_size) {
-                carp 'Warning: no answer from NCBI E-utilities; dropping GIs!';
+                carp '[BMC] Warning: no answer from NCBI E-utilities;'
+                    . ' dropping GIs!';
                 last ESUMMARY;
             }
         }
@@ -1358,7 +1361,7 @@ sub setup_taxdir {
         my $zipfile = file($tax_dir, $target)->stringify;
         # Note: stringify is required by getstore
         my $ret_code = getstore($url, $zipfile);
-        croak "Error: cannot download $url: error $ret_code; aborting!"
+        croak "[BMC] Error: cannot download $url: error $ret_code; aborting!"
             unless $ret_code == 200;
 
         # TODO: use modules for unarchiving (not that easy)
@@ -1463,7 +1466,7 @@ sub _make_gca_files {
 
         ### Downloading: $url
         my $ret_code = getstore($url, $file);
-        croak "Error: cannot download $url: error $ret_code; aborting!"
+        croak "[BMC] Error: cannot download $url: error $ret_code; aborting!"
             unless $ret_code == 200;
 
         # parse file for accession numbers and related taxon_ids
@@ -1487,8 +1490,8 @@ sub _make_gca_files {
             my @taxonomy;
             try_fatal_warnings { @taxonomy = $tax->get_taxonomy($taxon_id) };
             unless (@taxonomy) {
-                carp 'Warning: NCBI assembly reports and Taxonomy out-of-sync'
-                    . " for: $taxon_id; skipping $accession!";
+                carp '[BMC] Warning: out-of-sync NCBI assembly reports and'
+                    . " Taxonomy for: $taxon_id; skipping $accession!";
                 next LINE;
             }
             my $org = $taxonomy[-1];
@@ -1637,7 +1640,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

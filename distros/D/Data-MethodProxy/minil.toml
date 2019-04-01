@@ -1,1 +1,3 @@
 name = "Data-MethodProxy"
+authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"

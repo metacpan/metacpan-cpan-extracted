@@ -2,3 +2,4 @@ Revision history for Bib-CrossRef
 
 0.01    Date/time
         First version, released on an unsuspecting world.
+0.11	Change to use new crossref API

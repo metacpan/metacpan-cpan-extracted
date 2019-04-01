@@ -18,14 +18,14 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "HTML-Latemp-News",
-  "dist_version" => "0.1.12",
+  "dist_version" => "0.2.1",
   "license" => "mit",
   "module_name" => "HTML::Latemp::News",
   "recursive_test_files" => 1,
   "requires" => {
     "CGI" => 0,
     "XML::RSS" => 0,
-    "perl" => "5.008",
+    "perl" => "5.014",
     "strict" => 0,
     "warnings" => 0
   },

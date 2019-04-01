@@ -949,6 +949,8 @@ Peek / Poke list
    F protocol.mxp.room
         Locator uses MXP room tags exclusively change
            (GA::Client->allowMxpRoomFlag)
+   F protocol.mxp.flexible
+        Allow (some) illegal MXP keywords (GA::Client->allowMxpFlexibleFlag)
 
    S protocol.mode.echo
         Current session's ECHO mode (GA::Session->echoMode)

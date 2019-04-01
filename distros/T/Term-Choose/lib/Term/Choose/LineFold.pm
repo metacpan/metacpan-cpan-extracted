@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.644';
+our $VERSION = '1.645';
 
 use Exporter qw( import );
 
@@ -36,7 +36,7 @@ sub char_width {
         return 1;
     }
     while ( $max >= $min ) {
-        $mid = int( ( $min + $max) / 2 );
+        $mid = int( ( $min + $max ) / 2 );
         if ( $_[0] > $table->[$mid][1] ) {
             $min = $mid + 1;
         }
@@ -57,7 +57,7 @@ sub print_columns {
     for my $i ( 0 .. ( length( $_[0] ) - 1 ) ) {
         my $c = ord substr $_[0], $i, 1;
         if ( ! defined $cache->[$c] ) {
-            $cache->[$c] = char_width( $c )
+            $cache->[$c] = char_width( $c );
         }
         $width = $width + $cache->[$c];
     }

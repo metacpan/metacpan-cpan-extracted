@@ -50,7 +50,7 @@ for my $account ($finanzstatus->get_accountsPrivate ) {
     print $account->iban || '',"\n";
     print $account->amount, " ", $account->currency,"\n";
 
-    if( $account->productType eq 'depot' ) {
+    if( $account->is_depot ) {
         my $depot = $account->fetch_resource('depot', class => 'Finance::Bank::Postbank_de::APIv1::Depot');
 
         print join " ", $depot->date, $depot->depotValue, $depot->depotCurrency;

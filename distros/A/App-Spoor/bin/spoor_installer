@@ -1,0 +1,40 @@
+#!/usr/bin/perl -T
+
+use strict;
+use warnings;
+use utf8;
+use v5.10;
+use Term::ANSIColor;
+
+use App::Spoor::Installer;
+
+print color('bold blue');
+print "Welcome to the Spoor installer\n";
+print color('reset');
+
+my ($login_log_path, $access_log_path, $error_log_path, $api_identifier, $api_secret);
+
+print "Please provide the path to the CPanel login log\n";
+chomp($login_log_path = <STDIN>);
+
+print "Please provide the full path to the CPanel access log\n";
+chomp($access_log_path = <STDIN>);
+
+print "Please provide the full path to the CPanel error log\n";
+chomp($error_log_path = <STDIN>);
+
+print "Please provide your Spoor API identifier\n";
+chomp($api_identifier = <STDIN>);
+
+print "Please provide your Spoor API secret\n";
+chomp($api_secret = <STDIN>);
+
+my %installation_config = (
+  login_log_path => $login_log_path,
+  access_log_path => $access_log_path,
+  error_log_path => $error_log_path,
+  api_identifier => $api_identifier,
+  api_secret => $api_secret
+);
+
+App::Spoor::Installer::install(\%installation_config);

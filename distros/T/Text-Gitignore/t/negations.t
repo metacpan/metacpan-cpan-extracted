@@ -36,4 +36,11 @@ subtest 'negate any path' => sub {
     is_deeply \@matched, ['somewhere/there/else.js'];
 };
 
+subtest 'negate anchored at beginning' => sub {
+    my (@matched) = match_gitignore( [ '*.pm', '!/foo.pm' ],
+        'foo.pm', 'bar.pm' );
+
+    is_deeply \@matched, ['bar.pm'];
+};
+
 done_testing;

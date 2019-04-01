@@ -1,0 +1,41 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::PluginBundle::Author::GSG' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DBIx::Class' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBD::SQLite' => '0',
+                                   'DBIx::Class::Core' => '0',
+                                   'DBIx::Class::Schema' => '0',
+                                   'DateTime' => '0',
+                                   'DateTime::Format::SQLite' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'JSON::PP' => '0',
+                                   'Pod::Coverage::TrustPod' => '0',
+                                   'Test::Mock::Time' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Pod' => '0',
+                                   'Test::Pod::Coverage' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

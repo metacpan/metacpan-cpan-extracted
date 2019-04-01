@@ -477,17 +477,17 @@ Swahili Tanzania locale.
    1995-12-22T09:05:02 = Ijumaa, 22 Desemba
   -0010-09-15T04:44:23 = Jumamosi, 15 Septemba
 
-=head3 MMMMW-count-one ('wiki' W 'ya' MMM)
+=head3 MMMMW-count-one ('wiki' W 'ya' MMMM)
 
-   2008-02-05T18:30:30 = wiki 1 ya Feb
-   1995-12-22T09:05:02 = wiki 3 ya Des
-  -0010-09-15T04:44:23 = wiki 2 ya Sep
+   2008-02-05T18:30:30 = wiki 1 ya Februari
+   1995-12-22T09:05:02 = wiki 3 ya Desemba
+  -0010-09-15T04:44:23 = wiki 2 ya Septemba
 
-=head3 MMMMW-count-other ('wiki' W 'ya' MMM)
+=head3 MMMMW-count-other ('wiki' W 'ya' MMMM)
 
-   2008-02-05T18:30:30 = wiki 1 ya Feb
-   1995-12-22T09:05:02 = wiki 3 ya Des
-  -0010-09-15T04:44:23 = wiki 2 ya Sep
+   2008-02-05T18:30:30 = wiki 1 ya Februari
+   1995-12-22T09:05:02 = wiki 3 ya Desemba
+  -0010-09-15T04:44:23 = wiki 2 ya Septemba
 
 =head3 MMMMd (d MMMM)
 

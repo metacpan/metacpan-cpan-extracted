@@ -50,7 +50,10 @@ L<Net::AS2>
 
 =cut
 
-package Net::AS2::FAQ 1.0;
+package Net::AS2::FAQ;
+
 use strict;
+use warnings;
+our $VERSION = '1.0101'; # VERSION
 
 1;

@@ -16,7 +16,7 @@ Axmud supports other speech engines, too. (Not all of them are free.)
 
 On Microsoft Windows, Axmud also supports espeak-ng and Swift (which is a part of Cepstral). On Linux, Axmud supports espeak-ng, Flite, Festival and Swift.
 
-The rest of this section assumes that you're using optimised settings.
+The rest of this Section assumes that you're using optimised settings.
 
 ##16.2 Connecting to a world
 
@@ -56,7 +56,7 @@ Another useful client command is the **;save** command - typed as a semicolon, f
 
 If you get disconnected, the main window will not close.  You can use the **;reconnect** command (a semicolon, followed by the world **reconnect**) to re-establish a connection to the same world.
 
-Alternatively, you can use the **;connect** command to connect to a different world. If you want to connect to *Discworld MUD*, you can type **;connect discworld**. If you have already set up a character profile called Gandalf, you can type **;connect discworld gandalf**. 
+Alternatively, you can use the **;connect** command to connect to a different world. If you want to connect to *Discworld MUD*, you can type **;connect discworld**. If you have already set up a character profile called Gandalf, you can type **;connect discworld gandalf**.
 
 After disconnecting, you can halt Axmud by typing the **;stopclient** command. (**stopclient** is typed as a single word with no spaces.)
 
@@ -162,13 +162,13 @@ Now we'll customise the rest of the configuration. Make sure you're using the eS
 
 Axmud uses a set range of values for the word speed, word rate, pitch and volume. Regardless of the engine, the range is zero to a hundred.
 
-To change the voice speed, type the command **;config receive speed 50**. This will slow down the voice. To speed it up, type **;config receive speed 90**. 
+To change the voice speed, type the command **;config receive speed 50**. This will slow down the voice. To speed it up, type **;config receive speed 90**.
 
-The Festival and Swift engines use a word rate, rather than a word speed. To change the rate, type **;config receive rate 50** or **;config receive rate 90**. 
+The Festival and Swift engines use a word rate, rather than a word speed. To change the rate, type **;config receive rate 50** or **;config receive rate 90**.
 
-To make the word pitch higher, type **;config receive pitch 80**. To make it lower, type **;config receive pitch 20**.  
+To make the word pitch higher, type **;config receive pitch 80**. To make it lower, type **;config receive pitch 20**.
 
-The eSpeak engine doesn't allow us to change the volume, but if you've modified the configuration to use the Festival or Swift engines, you can can reduce the volume by typing **;config receive volume 50**. 
+The eSpeak engine doesn't allow us to change the volume, but if you've modified the configuration to use the Festival or Swift engines, you can can reduce the volume by typing **;config receive volume 50**.
 
 Again, to reset the voice, speed, rate, pitch and volume to default values for this engine, type **;config receive engine espeak**.
 

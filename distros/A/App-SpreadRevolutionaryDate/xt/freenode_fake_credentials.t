@@ -21,6 +21,7 @@ use App::SpreadRevolutionaryDate::Target::Freenode::Bot;
 
     *App::SpreadRevolutionaryDate::Target::Freenode::Bot::tick = sub {
       my $self = shift;
+
       $self->{nb_ticks} = 1 unless $self->{nb_ticks};
       if ($nb_ticks == 2) {
         ok(1, 'Freenode no authentication with fake credentials');
@@ -28,9 +29,10 @@ use App::SpreadRevolutionaryDate::Target::Freenode::Bot;
       };
       return 1;
     };
+
     *App::SpreadRevolutionaryDate::Target::Freenode::Bot::said = sub {
-        my $self = shift;
-        my $message = shift;
+        my ($self, $message) = @_;
+
         return if $message->{who} ne 'NickServ';
         ok($message->{who} eq 'NickServ' && $message->{body} !~ /You are now identified for/, 'Freenode no authentication with fake credentials');
         $self->shutdown('Shutdown overridden said');

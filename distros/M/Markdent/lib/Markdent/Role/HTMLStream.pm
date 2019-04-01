@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use HTML::Entities qw( encode_entities );
 use Markdent::CheckedOutput;
@@ -623,7 +623,8 @@ sub _attributes {
     my $attr = shift;
 
     return join q{ },
-        map { $self->_attribute( $_, $attr->{$_} ) } keys %{$attr};
+        map { $self->_attribute( $_, $attr->{$_} ) }
+        sort { $a cmp $b } keys %{$attr};
 }
 
 sub _attribute {
@@ -656,7 +657,7 @@ Markdent::Role::HTMLStream - A role for handlers which generate HTML
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 DESCRIPTION
 

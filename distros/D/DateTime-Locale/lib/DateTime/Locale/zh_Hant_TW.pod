@@ -471,7 +471,7 @@ Chinese Taiwan Traditional locale.
    1995-12-22T09:05:02 = 12月22日 週五
   -0010-09-15T04:44:23 = 9月15日 週六
 
-=head3 MMMMW-count-other (MMM的第W週)
+=head3 MMMMW-count-other (MMMM的第W週)
 
    2008-02-05T18:30:30 = 2月的第1週
    1995-12-22T09:05:02 = 12月的第3週

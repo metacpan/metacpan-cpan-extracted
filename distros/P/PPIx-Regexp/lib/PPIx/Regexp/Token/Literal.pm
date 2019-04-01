@@ -45,7 +45,19 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
+
+sub __new {
+    my ( $class, $content, %arg ) = @_;
+
+    my $self = $class->SUPER::__new( $content, %arg )
+	or return;
+
+    defined $arg{ordinal}
+	and $self->{ordinal} = $arg{ordinal};
+
+    return $self;
+}
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -320,6 +332,26 @@ The following is from perlop:
 		},
 	    );
 	},
+
+	'\\o{}' => sub {
+	    my ( $tokenizer, $accept ) = @_;
+	    return $tokenizer->make_token( $accept, TOKEN_UNKNOWN, {
+		    error	=> q<Empty \\o{} is an error>,
+		},
+	    );
+	},
+
+	'\\x{}' => sub {
+	    my ( $tokenizer, $accept ) = @_;
+	    $tokenizer->strict()
+		and return $tokenizer->make_token( $accept,
+		TOKEN_UNKNOWN, {
+		    error	=>
+			q<Empty \\x{} is an error under "use re 'strict'">,
+		},
+	    );
+	    return $accept;
+	},
     );
 
     sub _escaped {
@@ -328,6 +360,42 @@ The following is from perlop:
 	$character eq '\\'
 	    or return;
 
+	if ( my $accept = $tokenizer->find_regexp(	# {
+		qr< \A \\ ( [ox] ) [{] ( [^}]* ) [}] >smx
+	    ) ) {
+	    my $match = $tokenizer->match();
+	    my $code;
+	    $code = $special{$match}
+		and return $code->( $tokenizer, $accept );
+	    my ( $kind, $value ) = $tokenizer->capture();
+	    my $invalid = {
+		o	=> qr<[^0-7]>smx,
+		x	=> qr<[[:^xdigit:]]>smx,
+	    }->{$kind};
+	    $value =~ m/ $invalid /smxg		# /g for pos()
+		or return $accept;
+	    $tokenizer->strict()
+		and return $tokenizer->make_token( $accept,
+		TOKEN_UNKNOWN, {
+		    error	=> sprintf(
+			'Non-%s character in \\%s{...}',
+			{
+			    o	=> 'octal',
+			    x	=> 'hex',
+			}->{$kind},
+			$kind,
+		    ),
+		},
+	    );
+	    return $tokenizer->make_token( $accept, __PACKAGE__, {
+		    ordinal	=> {
+			o	=> sub { oct $_[0] },
+			x	=> sub { hex $_[0] },
+		    }->{$kind}->( substr( $value, 0, pos $value ) || 0 ),
+		},
+	    );
+	}
+
 	if ( my $accept = $tokenizer->find_regexp(
 		qr< \A \\ (?:
 		    [^\w\s] |		# delimiters/metas
@@ -335,8 +403,9 @@ The following is from perlop:
 		    0 [01234567]{0,2} |	# octal
 #		    [01234567]{1,3} |	# made from backref by lexer
 		    c [][\@[:alpha:]\\^_?] |	# control characters
-		    x (?: \{ [[:xdigit:]]* \} | [[:xdigit:]]{0,2} ) | # hex
-		    o [{] [01234567]+ [}] |	# octal as of 5.13.3
+##		    x (?: \{ [[:xdigit:]]* \} | [[:xdigit:]]{0,2} ) | # hex
+##		    o [{] [01234567]+ [}] |	# octal as of 5.13.3
+		    x [[:xdigit:]]{0,2} | # hex - brackets handled above
 ##		    N (?: \{ (?: [[:alpha:]] [\w\s:()-]* | # must begin w/ alpha
 ##		    U [+] [[:xdigit:]]+ ) \} ) |	# unicode
 		    N (?: [{] (?= [^0-9] ) [^\}]* [}] )	# unicode
@@ -347,6 +416,7 @@ The following is from perlop:
 		and return $code->( $tokenizer, $accept );
 	    return $accept;
 	}
+
 	return;
     }
 }
@@ -464,16 +534,16 @@ because I don't understand the syntax.
 	$octal{$indicator} and return oct substr $content, 1;
 
 	if ( $indicator eq 'x' ) {
-	    $content =~ m/ \A \\ x \{ ( [[:xdigit:]]+ ) \} \z /smx
-		and return hex $1;
+	    $content =~ m/ \A \\ x \{ ( [[:xdigit:]]* ) /smx
+		and return hex "0$1";
 	    $content =~ m/ \A \\ x ( [[:xdigit:]]{0,2} ) \z /smx
 		and return hex $1;
 	    return;
 	}
 
 	if ( $indicator eq 'o' ) {
-	    $content =~ m/ \A \\ o [{] ( [01234567]+ ) [}] \z /smx
-		and return oct $1;
+	    $content =~ m/ \A \\ o [{] ( [01234567]* ) \z /smx
+		and return oct "0$1";
 	    return;	# Shouldn't happen, but ...
 	}
 
@@ -554,7 +624,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 by Thomas R. Wyant, III
+Copyright (C) 2009-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

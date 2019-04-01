@@ -28,7 +28,6 @@
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::NoWarnings" : "0",
-            "Test::Output" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
@@ -45,8 +44,12 @@
             "DateTime::Calendar::FrenchRevolutionary" : "0",
             "Encode" : "0",
             "File::HomeDir" : "0",
+            "Getopt::Long" : "0",
+            "IO::Handle" : "0",
+            "IO::Prompt::Hooked" : "0",
             "Mastodon::Client" : "0",
             "Moose" : "0",
+            "Moose::Role" : "0",
             "MooseX::NonMoose" : "0",
             "MooseX::Role::Parameterized" : "0",
             "Net::Async::HTTP" : "0.43",
@@ -56,6 +59,7 @@
             "URI::Escape" : "0",
             "namespace::autoclean" : "0",
             "namespace::clean" : "0",
+            "open" : "0",
             "perl" : "5.014",
             "strict" : "0",
             "utf8" : "0",
@@ -66,41 +70,54 @@
          "requires" : {
             "File::Find" : "0",
             "File::Temp" : "0",
-            "IO::Handle" : "0",
+            "FindBin" : "0",
             "Test::More" : "0",
             "Test::NoWarnings" : "0",
-            "Test::Output" : "0"
+            "Test::Output" : "0",
+            "Test::Trap" : "0"
          }
       }
    },
    "provides" : {
       "App::SpreadRevolutionaryDate" : {
          "file" : "lib/App/SpreadRevolutionaryDate.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::SpreadRevolutionaryDate::Config" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Config.pm",
-         "version" : "0.08"
+         "version" : "0.10"
+      },
+      "App::SpreadRevolutionaryDate::MsgMaker" : {
+         "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker.pm",
+         "version" : "0.10"
+      },
+      "App::SpreadRevolutionaryDate::MsgMaker::PromptUser" : {
+         "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm",
+         "version" : "0.10"
+      },
+      "App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate" : {
+         "file" : "lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm",
+         "version" : "0.10"
       },
       "App::SpreadRevolutionaryDate::Target" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::SpreadRevolutionaryDate::Target::Freenode" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Freenode.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::SpreadRevolutionaryDate::Target::Freenode::Bot" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::SpreadRevolutionaryDate::Target::Mastodon" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "App::SpreadRevolutionaryDate::Target::Twitter" : {
          "file" : "lib/App/SpreadRevolutionaryDate/Target/Twitter.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -116,7 +133,7 @@
          "web" : "https://github.com/gibus/SpreadRevolutionaryDate"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }

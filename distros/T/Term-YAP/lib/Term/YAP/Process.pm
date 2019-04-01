@@ -1,5 +1,4 @@
 package Term::YAP::Process;
-$Term::YAP::Process::VERSION = '0.07';
 use strict;
 use warnings;
 use Types::Standard 1.000005 qw(Int Bool);
@@ -7,8 +6,8 @@ use Config;
 use Carp qw(confess);
 use Moo 2.000002;
 use namespace::clean 0.26;
-
 extends 'Term::YAP';
+our $VERSION = '0.08'; # VERSION
 
 =head1 NAME
 

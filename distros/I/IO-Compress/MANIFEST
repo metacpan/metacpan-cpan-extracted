@@ -108,6 +108,7 @@ t/107multi-deflate.t
 t/107multi-gzip.t
 t/107multi-rawdeflate.t
 t/107multi-zip.t
+t/107multi-zip-only.t
 t/108anyunc-bzip2.t
 t/108anyunc-deflate.t
 t/108anyunc-gzip.t
@@ -124,6 +125,9 @@ t/110encode-gzip.t
 t/110encode-rawdeflate.t
 t/110encode-zip.t
 t/111const-deflate.t
+t/112utf8-zip.t
+t/999meta-json.t
+t/999meta-yml.t
 t/999pod.t
 t/cz-01version.t
 t/cz-03zlib-v1.t
@@ -145,6 +149,7 @@ t/compress/prime.pl
 t/compress/tied.pl
 t/compress/truncate.pl
 t/compress/zlib-generic.pl
+t/files/bad-efs.zip
 t/files/meta.xml
 t/files/test.ods
 t/globmapper.t

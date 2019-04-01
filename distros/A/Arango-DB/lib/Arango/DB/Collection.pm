@@ -1,10 +1,10 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::DB::Collection;
-$Arango::DB::Collection::VERSION = '0.003';
+$Arango::DB::Collection::VERSION = '0.004';
 use warnings;
 use strict;
 
-sub new {
+sub _new {
     my ($class, %opts) = @_;
     return bless {%opts} => $class;
 }
@@ -17,7 +17,7 @@ sub create_document {
 
 sub document_paths {
     my ($self) = @_;
-    return $self->{arango}->_api('all_keys', { database => $self->{database}, collection => $self->{name}, type => "path"})
+    return $self->{arango}->_api('all_keys', { database => $self->{database}, collection => $self->{name}, type => "path"})->{result}
 }
 
 1;
@@ -34,7 +34,7 @@ Arango::DB::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 USAGE
 

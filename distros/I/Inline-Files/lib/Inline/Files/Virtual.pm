@@ -1,5 +1,5 @@
 package Inline::Files::Virtual;
-$VERSION = '0.53';
+$VERSION = '0.70';
 use strict;
 use Carp;
 use Cwd qw(abs_path);

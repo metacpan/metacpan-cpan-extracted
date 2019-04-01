@@ -29,8 +29,8 @@
     MMM => "LLL",
     MMMEd => "E, d MMM",
     MMMMEd => "E, d MMMM",
-    "MMMMW-count-one" => "'java' W 'e' MMM",
-    "MMMMW-count-other" => "'java' W 'e' MMM",
+    "MMMMW-count-one" => "'java' W 'e' MMMM",
+    "MMMMW-count-other" => "'java' W 'e' MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     MMdd => "d.M",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

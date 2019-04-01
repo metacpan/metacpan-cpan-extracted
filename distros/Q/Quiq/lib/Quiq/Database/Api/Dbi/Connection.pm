@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Option;
 use DBI ();
@@ -147,6 +147,9 @@ sub new {
             $errstr =~ s|\(\d+\)$||; # "(1)" entf.
             $msg = sprintf('SQLITE-%05d: %s',$err,$errstr);
         }
+        elsif ($dbms eq 'mssql') {
+            $msg = sprintf('MSSQL-%05d: %s',$err,$errstr);
+        }
         elsif ($dbms eq 'access') {
             $msg = sprintf('ACCESS-%05d: %s',$err,$errstr);
         }
@@ -223,6 +226,13 @@ sub new {
             if ($utf8) {
                 $dbh->{'odbc_utf8_on'} = 1;
             }
+        }
+        elsif ($dbms eq 'mssql') {
+            if ($utf8) {
+                $dbh->{'odbc_utf8_on'} = 1;
+            }
+            $dbh->{LongTruncOk} = 0; # RuV Auftrags-DB
+            $dbh->{LongReadLen} = 32768; # RuV Auftrags-DB
         }
         else {
             $class->throw('Not implemented');
@@ -510,7 +520,7 @@ sub sql {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

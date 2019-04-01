@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::en_SZ - Locale data examples for the English Swaziland (en-SZ) locale
+DateTime::Locale::en_SZ - Locale data examples for the English Eswatini (en-SZ) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-English Swaziland locale.
+English Eswatini locale.
 
 =head2 Days
 

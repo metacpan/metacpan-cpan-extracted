@@ -7,31 +7,28 @@ package Boxer::Task::Classify;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie qw(:all);
 use IPC::System::Simple;
 
 use File::BaseDir qw(data_dirs);
-use Capture::Tiny qw(capture_stdout);
-use YAML::XS;
 use Boxer::World::Reclass;
-use Boxer::Part::Reclass;
 
 use Moo;
 use MooX::StrictConstructor;
-use Types::Standard qw( Maybe Str Undef );
+extends qw(Boxer::Task);
+
+use Types::Standard qw(Maybe);
 use Boxer::Types qw( DataDir ClassDir NodeDir Suite );
-extends 'Boxer::Task';
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 # permit callers to sloppily pass undefined values
 sub BUILDARGS
@@ -62,55 +59,58 @@ has classdir => (
 	isa      => ClassDir,
 	coerce   => 1,
 	required => 1,
-	default  => sub {
-		$_[0]->datadir
-			? $_[0]->datadir->child('classes')
-			: scalar( data_dirs( 'boxer', $_[0]->suite, 'classes' ) );
-	},
 );
+
+sub _build_classdir
+{
+	my ($self) = @_;
+	my $dir;
+	if ( $self->datadir ) {
+		$self->_logger->trace('Resolving nodedir from datadir');
+		$dir = $self->datadir->child('classes');
+	}
+	else {
+		$self->_logger->trace('Resolving nodedir from XDG_DATA_DIRS');
+		$dir = scalar data_dirs( 'boxer', $_[0]->suite, 'classes' );
+	}
+	return $dir;
+}
 
 has nodedir => (
 	is       => 'lazy',
 	isa      => NodeDir,
 	coerce   => 1,
 	required => 1,
-	default  => sub { $_[0]->datadir ? $_[0]->datadir->child('nodes') : '.' },
 );
+
+sub _build_nodedir
+{
+	my ($self) = @_;
+	my $dir;
+	if ( $self->datadir ) {
+		$self->_logger->trace('Resolving nodedir from datadir');
+		$dir = $self->datadir->child('nodes');
+	}
+	else {
+		$self->_logger->trace('Setting nodedir to current directory');
+		$dir = '.';
+	}
+	return $dir;
+}
 
 sub run
 {
 	my $self = shift;
-
-	my $data = Load(
-		scalar(
-			capture_stdout {
-				system(
-					'reclass',
-					'-b',
-					'',
-					'-c',
-					$self->classdir,
-					'-u',
-					$self->nodedir,
-					'--inventory',
-				);
-			}
-		)
+	my @args = (
+		suite    => scalar $self->suite,
+		classdir => scalar $self->classdir,
+		nodedir  => scalar $self->nodedir,
 	);
-
-	my @parts;
-	for ( keys %{ $data->{nodes} } ) {
-		push @parts,
-			Boxer::Part::Reclass->new(
-			id    => $_,
-			epoch => $self->suite,
-			%{ $data->{nodes}{$_}{parameters} }
-			);
-	}
-
-	return Boxer::World::Reclass->new(
-		parts => \@parts,
+	$self->_logger->info(
+		'Classifying with reclass',
+		$self->_logger->is_debug() ? {@args} : (),
 	);
+	return Boxer::World::Reclass->new(@args);
 }
 
 =head1 AUTHOR

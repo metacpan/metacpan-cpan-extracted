@@ -54,7 +54,7 @@
    "provides" : {
       "Test::AutoMock" : {
          "file" : "lib/Test/AutoMock.pm",
-         "version" : "0.01"
+         "version" : "0.04"
       },
       "Test::AutoMock::Manager" : {
          "file" : "lib/Test/AutoMock/Manager.pm"
@@ -89,7 +89,7 @@
          "web" : "https://github.com/hiratara/p5-Test-AutoMock"
       }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_contributors" : [
       "Masahiro Honma <hira.tara@gmail.com>"
    ],

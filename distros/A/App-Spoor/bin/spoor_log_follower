@@ -1,0 +1,50 @@
+#!/usr/bin/perl -T
+
+use strict;
+use warnings;
+use utf8;
+use v5.10;
+
+use App::Spoor::Security;
+
+App::Spoor::Security::check_config_directory($<) || die("Security concerns with the config directory. Exiting.\n");
+App::Spoor::Security::check_config_file($<) || die("Security concerns with the config file. Exiting.\n");
+App::Spoor::Security::check_persistence_directory($<) ||
+  die("Security concerns with the persistence directory. Exiting.\n");
+App::Spoor::Security::check_parsed_persistence_directory($<) ||
+  die("Security concerns with the parsed persistence directory. Exiting.\n");
+
+use File::Tail;
+use App::Spoor::Config;
+use App::Spoor::LoginEntryParser;
+use App::Spoor::AccessEntryParser;
+use App::Spoor::ErrorEntryParser;
+use App::Spoor::ParsedEntryWriter;
+
+my $log_type = shift @ARGV;
+my $follower_config = App::Spoor::Config::get_follower_config($log_type);
+my $parsed_entry_ref;
+
+my $file = File::Tail->new(
+	name=> $follower_config->{name},
+	tail=> $follower_config->{tail},
+	maxinterval=> $follower_config->{maxinterval},
+	debug=> $follower_config->{debug}
+);
+
+while (defined(my $entry=$file->read)) {
+  print("$entry\n");
+  # TODO This is tainted
+  if ($log_type eq 'login') {
+    $parsed_entry_ref = App::Spoor::LoginEntryParser::parse($entry);
+  } elsif ($log_type eq 'access') {
+    $parsed_entry_ref = App::Spoor::AccessEntryParser::parse($entry);
+  } elsif ($log_type eq 'error') {
+    $parsed_entry_ref = App::Spoor::ErrorEntryParser::parse($entry);
+  }
+
+  App::Spoor::ParsedEntryWriter::write_parsed_entry(
+    $parsed_entry_ref,
+    App::Spoor::Config::get_application_config(),
+  );
+}

@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::Arc;
-$SVG::Estimate::Path::Arc::VERSION = '1.0111';
+$SVG::Estimate::Path::Arc::VERSION = '1.0112';
 use Moo;
 use Math::Trig qw/pi acos deg2rad rad2deg/;
 use Clone qw/clone/;
@@ -15,7 +15,7 @@ SVG::Estimate::Path::Arc - Handles estimating arcs.
 
 =head1 VERSION
 
-version 1.0111
+version 1.0112
 
 =head1 SYNOPSIS
 

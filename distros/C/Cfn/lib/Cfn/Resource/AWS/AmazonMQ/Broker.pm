@@ -1,4 +1,4 @@
-# AWS::AmazonMQ::Broker generated from spec 2.22.0
+# AWS::AmazonMQ::Broker generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::AmazonMQ::Broker {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AmazonMQ::Broker', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'AmqpEndpoints','Arn','ConfigurationId','ConfigurationRevision','IpAddresses','MqttEndpoints','OpenWireEndpoints','StompEndpoints','WssEndpoints' ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 

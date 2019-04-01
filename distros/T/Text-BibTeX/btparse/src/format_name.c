@@ -755,6 +755,7 @@ format_name (bt_name_format * format,
 
       for (j = 0; j < num_tokens[part]; j++)
       {
+	 if (!tokens[part][j]) continue; // ignore empty tokens
          offset += append_text (fname, offset, 
                                 format->pre_token[part], 0, -1);
 

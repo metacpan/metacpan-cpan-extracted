@@ -1,0 +1,12 @@
+{ # Asynchronous AS2 configuration
+    "Mdn"                    : "async",
+    "MyId"                   : "B",
+    "PartnerId"              : "A",
+    "PartnerUrl"             : "http://127.0.0.1:{{PORT_A}}/receive/A2B/async",
+    "MdnAsyncUrl"            : "http://127.0.0.1:{{PORT_B}}/MDNreceive/B2A/async",
+    "MyKeyFile"              : "B.key",
+    "MyCertificateFile"      : "B.cert",
+    "PartnerCertificateFile" : "A.cert",
+    "Signature"              : "sha256",
+    "Encryption"             : "3des",
+}

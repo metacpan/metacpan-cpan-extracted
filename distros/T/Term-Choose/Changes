@@ -1,6 +1,12 @@
 Revision history for Term::Choose
 
 
+1.645   2019-03-31
+    - Update char-width tables.
+    - Fast forward/backward: 10 instead of 25 pages at once.
+    - Add missing semicolon in 'print_columns'.
+    - Code refactoring.
+
 1.644   2019-01-25
     - Option 'll': allow the use of the full term width.
 

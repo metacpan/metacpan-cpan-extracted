@@ -2,7 +2,7 @@
 #
 # 0013_option_space_test.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -14,6 +14,8 @@ BEGIN {
     @test = (
         ["\x81\x40",'cp932x',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
         ["\x81\x40",'cp932',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
+        ["\x81\x40",'cp932ibm','cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
+        ["\x81\x40",'cp932nec','cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
         ["\x81\x40",'sjis2004','cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
         ["\x81\x40",'cp00930', 'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x44\xE2"},"\x44\xE2"],
         ["\x81\x40",'keis78',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x40\x40"},"\x40\x40"],
@@ -25,6 +27,7 @@ BEGIN {
         ["\x81\x40",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x40\x40"},"\x40\x40"],
         ["\x81\x40",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\xA1\xA1"},"\xA1\xA1"],
         ["\x81\x40",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
+        ["\x81\x40",'utf8.1',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
         ["\x81\x40",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D','SPACE'=>"\x20\x20"},"\x20\x20"],
     );
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }

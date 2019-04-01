@@ -9,21 +9,7 @@
 static void my_init_debugger()
 {
     dTHR;
-    PL_curstash = PL_debstash;
-    PL_dbargs = 
-	GvAV(gv_AVadd((gv_fetchpv("DB::args", GV_ADDMULTI, SVt_PVAV))));
-    AvREAL_off(PL_dbargs);
-    PL_DBgv = gv_fetchpv("DB::DB", GV_ADDMULTI, SVt_PVGV);
-    PL_DBline = gv_fetchpv("DB::dbline", GV_ADDMULTI, SVt_PVAV);
-    PL_DBsub = gv_HVadd(gv_fetchpv("DB::sub", GV_ADDMULTI, SVt_PVHV));
-    PL_DBsingle = GvSV((gv_fetchpv("DB::single", GV_ADDMULTI, SVt_PV)));
-    sv_setiv(PL_DBsingle, 0); 
-    PL_DBtrace = GvSV((gv_fetchpv("DB::trace", GV_ADDMULTI, SVt_PV)));
-    sv_setiv(PL_DBtrace, 0); 
-    PL_DBsignal = GvSV((gv_fetchpv("DB::signal", GV_ADDMULTI, SVt_PV)));
-    sv_setiv(PL_DBsignal, 0); 
-    PL_curstash = PL_defstash;
-
+    Perl_init_debugger(aTHX);
 }
 
 static Sighandler_t ApacheSIGINT = NULL;
@@ -56,7 +42,7 @@ void
 ApacheSIGINT(...)
 
     CODE:
-#if ((PERL_REVISION == 5) && (PERL_VERSION >= 10))
+#if ((PERL_REVISION == 5) && (PERL_VERSION >= 10)) && defined(HAS_SIGACTION) && defined(SA_SIGINFO)
     if (ApacheSIGINT) (*ApacheSIGINT)(SIGINT, NULL, NULL); 
 #else 
     if (ApacheSIGINT) (*ApacheSIGINT)(SIGINT);

@@ -471,17 +471,17 @@ Asturian locale.
    1995-12-22T09:05:02 = vie, 22 avi
   -0010-09-15T04:44:23 = sáb, 15 set
 
-=head3 MMMMW-count-one ('selmana' W 'de' MMM)
+=head3 MMMMW-count-one ('selmana' W 'de' MMMM)
 
-   2008-02-05T18:30:30 = selmana 1 de feb
-   1995-12-22T09:05:02 = selmana 3 de avi
-  -0010-09-15T04:44:23 = selmana 2 de set
+   2008-02-05T18:30:30 = selmana 1 de de febreru
+   1995-12-22T09:05:02 = selmana 3 de d’avientu
+  -0010-09-15T04:44:23 = selmana 2 de de setiembre
 
-=head3 MMMMW-count-other ('selmana' W 'de' MMM)
+=head3 MMMMW-count-other ('selmana' W 'de' MMMM)
 
-   2008-02-05T18:30:30 = selmana 1 de feb
-   1995-12-22T09:05:02 = selmana 3 de avi
-  -0010-09-15T04:44:23 = selmana 2 de set
+   2008-02-05T18:30:30 = selmana 1 de de febreru
+   1995-12-22T09:05:02 = selmana 3 de d’avientu
+  -0010-09-15T04:44:23 = selmana 2 de de setiembre
 
 =head3 MMMMd (d MMMM)
 

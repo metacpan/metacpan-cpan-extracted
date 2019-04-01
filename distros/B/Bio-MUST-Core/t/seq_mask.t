@@ -168,6 +168,8 @@ my @exp_masks = (
     );
 }
 
+# TODO: provision gblocks
+
 SKIP: {
     skip q{Cannot find 'Gblocks' in $PATH}, 3 unless qx{which Gblocks};
 
@@ -186,6 +188,8 @@ SKIP: {
 
     # TODO: test exceptions with shared gaps (gblocks_gaps.fasta)
 }
+
+# TODO: provision BMGE
 
 SKIP: {
     skip q{Cannot find 'bmge.sh' in $PATH}, 3 unless qx{which bmge.sh};

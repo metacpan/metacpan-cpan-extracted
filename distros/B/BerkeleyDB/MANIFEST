@@ -43,6 +43,8 @@ t/filter.t
 t/hash.t
 t/heap.t
 t/join.t
+t/meta-json.t
+t/meta-yaml.t
 t/mldbm.t
 t/pod.t
 t/queue.t

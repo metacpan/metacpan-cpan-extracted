@@ -1,5 +1,4 @@
 package Term::YAP::iThread;
-$Term::YAP::iThread::VERSION = '0.07';
 use strict;
 use warnings;
 use threads 2.01;
@@ -7,8 +6,9 @@ use Thread::Queue 3.05;
 use Types::Standard 1.000005 qw(InstanceOf Bool);
 use Moo 2.000002;
 use namespace::clean 0.26;
-
 extends 'Term::YAP';
+
+our $VERSION = '0.08'; # VERSION
 
 =head1 NAME
 
@@ -24,19 +24,24 @@ See parent class.
 
 Subclass of L<Term::YAP> implemented with ithreads. The pun with it's name is intended.
 
-Despite the limitation of L<http://perldoc.perl.org/threads.html#WARNING|'ithreads'> some platforms (like Microsoft Windows) does not work well
-with process handling of Perl. If you in this case, this implementation of L<Term::YAP> might help you.
+Despite the limitation of L<http://perldoc.perl.org/threads.html#WARNING|'ithreads'>
+some platforms (like Microsoft Windows) does not work well with process
+handling of Perl. If you in this case, this implementation of L<Term::YAP>
+might help you.
 
-If you program code does not handle C<ithreads> correctly, consider initiation a Term::YAP::iThread object in a C<BEGIN> block to avoid loading
+If you program code does not handle C<ithreads> correctly, consider initiation
+a Term::YAP::iThread object in a C<BEGIN> block to avoid loading
 the code that does not support C<ithreads>.
 
 =head1 ATTRIBUTES
 
-Additionally to all attributes from superclass, this class also has the C<queue> attribute.
+Additionally to all attributes from superclass, this class also has the
+C<queue> attribute.
 
 =head2 queue
 
-Keeps a reference of a L<Thread::Queue> instance. This instance is created automatically during L<Term::YAP::iThread> creation.
+Keeps a reference of a L<Thread::Queue> instance. This instance is created
+automatically during L<Term::YAP::iThread> creation.
 
 =cut
 
@@ -49,7 +54,8 @@ has queue => (
 
 =head2 detach
 
-A "private" attribute. Used to control when the created thread is expected to exists it's infinite loop after C<start_pulse> method invocation.
+A "private" attribute. Used to control when the created thread is expected to
+exists it's infinite loop after C<start_pulse> method invocation.
 
 =cut
 
@@ -81,20 +87,17 @@ Getter for the C<queue> attribute.
 
 Creates a thread right after object instantiation.
 
-The thread will start only after C<start> method is called. 
+The thread will start only after C<start> method is called.
 
 =cut
 
 sub BUILD {
-
-    my $self = shift;
+    my $self   = shift;
     my $thread = threads->create( sub { $self->_keep_pulsing() } );
     $thread->detach();
-
 }
 
 around start => sub {
-
     my ( $orig, $self ) = ( shift, shift );
     $self->get_queue()->enqueue('start');
     $self->_sleep();
@@ -106,22 +109,18 @@ around start => sub {
     else {
         $self->_set_running(0);
     }
-    $self->$orig;
 
+    $self->$orig;
 };
 
 around _keep_pulsing => sub {
-
     my ( $orig, $self ) = ( shift, shift );
 
     while ( $self->_no_detach() ) {
-
         my $task = $self->get_queue()->dequeue();
 
-        if ( $task eq 'start' ) {
-
+        if ( ( defined($task) ) and ( $task eq 'start' ) ) {
             $self->$orig(@_);
-
         }
 
     }
@@ -129,56 +128,50 @@ around _keep_pulsing => sub {
 };
 
 around _is_enough => sub {
-
     my ( $orig, $self ) = ( shift, shift );
-
     my $message = $self->get_queue()->dequeue_nb();
 
     if ( ( defined($message) ) and ( $message eq 'stop' ) ) {
-
         return 1;
-
     }
     else {
-
         return 0;
-
     }
 
 };
 
 around stop => sub {
-
     my ( $orig, $self ) = ( shift, shift );
     $self->get_queue()->enqueue('stop');
     $self->$orig;
-
 };
 
 =pod
 
 =head2 DEMOLISH
 
-This method will take care to "terminated" the L<Thread::Queue> object used to provide communication with the thread.
+This method will take care to "terminated" the L<Thread::Queue> object used to
+provide communication with the thread.
 
 =cut
 
 sub DEMOLISH {
-
     my $self = shift;
     $self->get_queue()->end();
-
 }
 
 =pod
 
 =head1 CAVEATS
 
-To enable usage of this module with code that does not supports L<threads>, this class will create a detached thread as soon as the object
-was created. This thread will remain active until the end of the program, waiting to receive a command to start the pulse (or stop it).
+To enable usage of this module with code that does not supports L<threads>,
+this class will create a detached thread as soon as the object
+was created. This thread will remain active until the end of the program,
+waiting to receive a command to start the pulse (or stop it).
 
-That said, the class will not try to create new threads and will not check if the created thread exited successfully (but it does check if
-the thread is retrieving items from the L<Thread::Queue> object created).
+That said, the class will not try to create new threads and will not check if
+the created thread exited successfully (but it does check if the thread is
+retrieving items from the L<Thread::Queue> object created).
 
 =head1 SEE ALSO
 

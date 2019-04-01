@@ -471,17 +471,17 @@ Italian Vatican City locale.
    1995-12-22T09:05:02 = ven 22 dic
   -0010-09-15T04:44:23 = sab 15 set
 
-=head3 MMMMW-count-one ('settimana' W 'di' MMM)
+=head3 MMMMW-count-one ('settimana' W 'di' MMMM)
 
-   2008-02-05T18:30:30 = settimana 1 di feb
-   1995-12-22T09:05:02 = settimana 3 di dic
-  -0010-09-15T04:44:23 = settimana 2 di set
+   2008-02-05T18:30:30 = settimana 1 di febbraio
+   1995-12-22T09:05:02 = settimana 3 di dicembre
+  -0010-09-15T04:44:23 = settimana 2 di settembre
 
-=head3 MMMMW-count-other ('settimana' W 'di' MMM)
+=head3 MMMMW-count-other ('settimana' W 'di' MMMM)
 
-   2008-02-05T18:30:30 = settimana 1 di feb
-   1995-12-22T09:05:02 = settimana 3 di dic
-  -0010-09-15T04:44:23 = settimana 2 di set
+   2008-02-05T18:30:30 = settimana 1 di febbraio
+   1995-12-22T09:05:02 = settimana 3 di dicembre
+  -0010-09-15T04:44:23 = settimana 2 di settembre
 
 =head3 MMMMd (d MMMM)
 

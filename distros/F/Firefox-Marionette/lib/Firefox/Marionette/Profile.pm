@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '0.69';
+our $VERSION = '0.71';
 
 sub _ANY_PORT           { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -272,7 +272,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 0.69
+Version 0.71
 
 =head1 SYNOPSIS
 
@@ -319,7 +319,7 @@ accepts a profile name and returns a L<profile|Firefox::Marionette::Profile> obj
 
 =head2 parse
 
-accepts a path as the parameter.  This path should be to a C<prefs.js> fileParses the file and returns it as a L<profile|Firefox::Marionette::Profile>.
+accepts a path as the parameter.  This path should be to a C<prefs.js> file.  Parses the file and returns it as a L<profile|Firefox::Marionette::Profile>.
 
 =head2 save
 

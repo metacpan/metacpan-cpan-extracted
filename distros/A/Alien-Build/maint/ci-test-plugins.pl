@@ -1,9 +1,12 @@
 use strict;
 use warnings;
+use File::Glob qw( bsd_glob );
 
 exit if $] < 5.010001;
 
 my $exit = 0;
+
+my @fails;
 
 sub run
 {
@@ -11,10 +14,15 @@ sub run
   system(@_);
   if($?)
   {
-    $exit = 2;
+    push @fails, [@_];
     warn "command failed!";
   }
 }
+
+my(@tarball) = bsd_glob 'Alien-Build-*.tar.gz';
+die "not exactly one tarball: @tarball" if @tarball != 1;
+my $tarball = shift @tarball;
+run 'cpanm', '-n', $tarball;
 
 my @mods = qw(
   Alien::Build::MB
@@ -31,4 +39,9 @@ foreach my $mod (@mods)
   run 'cpanm', '--reinstall', '-v', $mod;
 }
 
-exit $exit;
+if(@fails)
+{
+  print "failure summary:\n";
+  print "+@{[ @$_ ]}" for @fails;
+  exit 2;
+}

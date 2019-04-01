@@ -51,7 +51,7 @@ sub _build_code_for {
 
     # split file content into code blocks
     my @codes = $self->_get_gcprt_content =~ m/ \{ ( [^{}]+ ) \} /xmsgc;
-    croak "Error: cannot parse 'gc.prt' file; aborting!" unless @codes;
+    croak "[BMC] Error: cannot parse 'gc.prt' file; aborting!" unless @codes;
 
 # Genetic-code-table ::= {
 # ...

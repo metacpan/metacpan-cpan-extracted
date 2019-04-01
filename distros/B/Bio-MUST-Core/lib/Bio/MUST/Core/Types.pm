@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Types;
 # ABSTRACT: Distribution-wide Moose types for Bio::MUST::Core
-$Bio::MUST::Core::Types::VERSION = '0.190690';
+$Bio::MUST::Core::Types::VERSION = '0.190900';
 use Moose::Util::TypeConstraints;
 
 use autodie;
@@ -88,31 +88,17 @@ coerce 'Bio::MUST::Core::Types::full_ids'
 # quite tolerant subtype designed to preserve original casing
 # however FASTA '-' symbols are converted to ALI '*' during coercion
 # whereas spaces and '?' are left untouched
-# moreover single trailing '*' (explicit STOP codons) are deleted
 # Note: \A are \z are absolutely required for converting hard-wrapped seqs
 subtype 'Bio::MUST::Core::Types::Seq'
     => as 'Str'
-    => where {
-            m{\A [\*\ A-Za-z\?]*    \z}xms  # possibly gapped seq
-        && !m{\A [    A-Za-z\?]* \* \z}xms  # but not plain seq ending in '*'
-       }
-    => message {
-            'Only IUPAC codes, gaps [*-<blank>] '
-            . 'and missing states [X?] are allowed.'
-       }
+    => where { m{\A [\*\ A-Za-z\?]* \z}xms }
+    => message { 'Only IUPAC codes and gaps [*-<space>?] are allowed.' }
 ;
 
 coerce 'Bio::MUST::Core::Types::Seq'
     => from 'Str'
-    => via { ( my $seq = $_ ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq =~ tr{-\n}{*}dr }
-#     => via {
-#             my $seq =  tr{\n}{}dr;                  # concat all lines into one
-#                $seq =~ s{\A ([^*]+) \* \z}{$1}xms;  # remove single trailing '*'
-#                $seq =~ tr{-}{*};                    # use '*' instead of '-'
-#                $seq;
-#        }
-#   => via { ( my $seq = tr{-\n}{*}dr ) =~ s{\A ([^*]+) \* \z}{$1}xms; $seq }
-;   # Note: s/// only modifies plain seqs ending in '*'
+    => via { tr/-\n/*/dr }          # convert FASTA on the fly
+;                                   # ('-' => '*' and delete newlines)
 
 # subtype for a stringified NCBI Taxonomy lineage
 subtype 'Bio::MUST::Core::Types::Lineage'
@@ -202,7 +188,7 @@ coerce 'Bio::MUST::Core::Types::Dir'
 ;
 
 # === in part borrowed from Bio::FastParsers to avoid dependency
-# TODO: find a way to avoid this repetition of code
+# TODO: consolidate at next update of FastParsers as it is now a dependency
 
 # subtype for 'file' attributes
 subtype 'Bio::MUST::Core::Types::File'
@@ -235,7 +221,7 @@ Bio::MUST::Core::Types - Distribution-wide Moose types for Bio::MUST::Core
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

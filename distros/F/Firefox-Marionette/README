@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.69
+    Version 0.71
 
 SYNOPSIS
 
@@ -640,6 +640,27 @@ SUBROUTINES/METHODS
     set the current browsing context for future commands to the parent of
     the current browsing context
 
+ new_window
+
+    accepts an optional hash as the parameter. Allowed keys are below;
+
+      * focus - a boolean field representing if the new window be opened in
+      the foreground (focused) or background (not focused). Defaults to
+      false.
+
+      * type - the type of the new window. Can be one of 'tab' or 'window'.
+      Defaults to 'tab'.
+
+    Returns the window handle for the new window.
+
+        use Firefox::Marionette();
+    
+        my $firefox = Firefox::Marionette->new();
+    
+        my $window_handle = $firefox->new_window(type => 'tab');
+    
+        $firefox->switch_to_window($window_handle);
+
  close_current_chrome_window_handle
 
     closes the current chrome window (that is the entire window, not just
@@ -681,7 +702,7 @@ SUBROUTINES/METHODS
 
     dismisses a currently displayed modal message box
 
- accept_dialog
+ accept_alert
 
     accepts a currently displayed modal message box
 

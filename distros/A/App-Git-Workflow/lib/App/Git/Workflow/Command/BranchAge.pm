@@ -8,6 +8,7 @@ package App::Git::Workflow::Command::BranchAge;
 
 use strict;
 use warnings;
+use version;
 use English qw/ -no_match_vars /;
 use List::MoreUtils qw/zip/;
 use Term::ANSIColor qw/colored/;
@@ -15,7 +16,7 @@ use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 use DateTime::Format::HTTP;
 
-our $VERSION  = 1.0.3;
+our $VERSION  = version->new(1.1.2);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -107,7 +108,7 @@ git-branch-age - grep tags
 
 =head1 VERSION
 
-This documentation refers to git-branch-age version 1.0.3
+This documentation refers to git-branch-age version 1.1.2
 
 =head1 SYNOPSIS
 

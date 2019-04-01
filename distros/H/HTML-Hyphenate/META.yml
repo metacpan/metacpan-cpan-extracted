@@ -4,7 +4,6 @@ author:
   - 'Roland van Ipenburg <ipenburg@xs4all.nl>'
 build_requires:
   TeX::Hyphen::Pattern: '0.103'
-  Test::CheckManifest: '1.01'
   Test::Kwalitee: '0'
   Test::More: '0.86'
   Test::NoWarnings: '0'
@@ -24,7 +23,7 @@ name: HTML-Hyphenate
 provides:
   HTML::Hyphenate:
     file: lib/HTML/Hyphenate.pm
-    version: v1.1.1
+    version: v1.1.2
 requires:
   Log::Log4perl: '0'
   Mojolicious: '6'
@@ -37,5 +36,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/HTML-Hyphenate
-version: v1.1.1
+version: v1.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

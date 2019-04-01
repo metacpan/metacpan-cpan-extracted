@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.108';
+our $VERSION = '0.109';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -102,7 +102,7 @@ sub __set_defaults {
     $self->{codepage_mapping}  = 0      if ! defined $self->{codepage_mapping};
     $self->{color}             = 0      if ! defined $self->{color};
     $self->{decimal_separator} = '.'    if ! defined $self->{decimal_separator};
-    $self->{grid}              = 0      if ! defined $self->{grid};
+    $self->{grid}              = 1      if ! defined $self->{grid};
     $self->{keep_header}       = 1      if ! defined $self->{keep_header};
     $self->{squash_spaces}     = 0      if ! defined $self->{squash_spaces};
     $self->{max_rows}          = 200000 if ! defined $self->{max_rows};
@@ -699,7 +699,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.108
+Version 0.109
 
 =cut
 
@@ -904,7 +904,7 @@ Default: 0
 If enabled, columns are separated from each other with lines and the header row is separated with a line from the rest
 of the table.
 
-Default: 0
+Default: 1
 
 =head3 keep_header
 

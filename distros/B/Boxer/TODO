@@ -5,7 +5,16 @@
   * Handle bugs as parameters, and extend data documentation.
   * Resolve default suite from system, favored over hardcoded string.
   * Resolve named suites (e.g. stretch) from relative (e.g. testing).
-  * Use warnings::warnif instead of carp (and croak?). Or Throwable?
+  * Resolve fallback to stabler suite when known less stable is missing
+    + oldoldstable < oldstable < stable < testing < unstable < experimental
+    + foo < foo-security < foo-updates < foo-backports
+  * Resolve suite from addon, and extend apt sources to include addon
+    + foo-security
+    + foo-updates
+    + foo-backports
+  * Resolve suite from snapshot, and tweak apt sources to only use snapshot
+  * Support passing suite as URL, and then extract apt protocol too
+  * Use Throwable with Moo, and else Exception::Class or failures (not Carp)
   * Use IPC::PrettyPipe
   * Introduce compose option --nodepath (and maybe deprecate --nodedir)
     + nodepath is colon-separated lookup list for node
@@ -78,6 +87,7 @@ misc.
       when including package unattended-upgrades.
     + Tweaking conffiles
       (known to fail later upgrade: See bug#311188).
-  * Use MooX::StrictConstructor.
   * Track unit testing code coverage:
     <https://stackoverflow.com/questions/533553/perl-build-unit-testing-code-coverage-a-complete-working-example>
+  * Ask for node(s) interactively if not provided
+    * But fail if not on an interactive terminal

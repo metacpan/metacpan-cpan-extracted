@@ -1,8 +1,8 @@
 #!/usr/bin/perl
-use App::colorcoke;
-
 our $APP     = 'colorcoke';
+our $VERSION = '0.430';
 
+no warnings 'experimental::smartmatch';
 
 use strict;
 use Getopt::Long;
@@ -23,7 +23,8 @@ our $opt_random_g       = 256;
 our $opt_random_b       = 256;
 our $opt_single_hex     = 0;
 our @opt_single_color   = ();
-our @opt_do_not_modify  = (0,7,15,232);
+#our @opt_do_not_modify  = (0,7,15,232);
+our @opt_do_not_modify  = ();
 
 if(!@ARGV) {
   print "$APP $VERSION\n\n";
@@ -137,10 +138,6 @@ sub make_shade {
     my $hex_g = sprintf("%02x", $g);
     my $hex_b = sprintf("%02x", $b);
 
-    if($ENV{DEBUG}) {
-      printf "#%s%s%s\n", $hex_r, $hex_g, $hex_b;
-    }
-
 
     push(@tint, "$hex_r$hex_g$hex_b");
 
@@ -207,6 +204,7 @@ randomizing option is used.
   CPAN ID: WOLDRICH
   m@japh.se
   http://japh.se
+  https://github.com/trapd00r
 
 =head1 SEE ALSO
 
@@ -214,8 +212,8 @@ L<Term::ExtendedColor>, L<Term::ExtendedColor::Xresources>, L<Term::ExtendedColo
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011, 2018 Magnus Woldrich <m@japh.se>. This program is free
-software; you may redistribute it and/or modify it under the same terms as
-Perl itself.
+Copyright 2010, 2011, 2019- Magnus Woldrich <m@japh.se>. This program is
+free software; you may redistribute it and/or modify it under the same
+terms as Perl itself.
 
 =cut

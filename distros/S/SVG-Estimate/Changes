@@ -1,7 +1,10 @@
+1.0112 2019-03-31
+ * Allow SVG number pairs in polyline/polygon.
+
 1.0111 2019-01-21
  * Auto generate META.json using dzil plugin [MetaJSON]. (Mohammad S Anwar)
 
-1.0109 2018-12-09
+1.0110 2018-12-09
  * Set minimum version of perl to be 5.010
 
 1.0109 2018-12-05

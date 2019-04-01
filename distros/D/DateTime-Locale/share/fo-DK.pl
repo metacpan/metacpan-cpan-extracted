@@ -28,8 +28,8 @@
     MEd => "E dd.MM",
     MMM => "LLL",
     MMMEd => "E d. MMM",
-    "MMMMW-count-one" => "W. 'vika' '\N{U+00ed}' MMM",
-    "MMMMW-count-other" => "W. 'vika' '\N{U+00ed}' MMM",
+    "MMMMW-count-one" => "W. 'vika' '\N{U+00ed}' MMMM",
+    "MMMMW-count-other" => "W. 'vika' '\N{U+00ed}' MMMM",
     MMMMd => "d. MMMM",
     MMMd => "d. MMM",
     Md => "dd.MM",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

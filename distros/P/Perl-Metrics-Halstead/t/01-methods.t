@@ -4,6 +4,7 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Capture::Tiny ':all';
 
 use_ok 'Perl::Metrics::Halstead';
 
@@ -39,7 +40,9 @@ my $y = $pmh->dump;
 isa_ok $y, 'HASH';
 is keys %$y, 15, 'dump';
 
-can_ok $pmh, 'report';
+my ($stdout, $stderr) = capture { $pmh->report };
+ok !$stderr, 'stderr';
+like $stdout, qr/difficulty: $x/, 'stdout';
 
 $pmh = Perl::Metrics::Halstead->new( file => 'eg/tester2.pl' );
 ok $pmh->difficulty > $x, 'increasing difficulty';

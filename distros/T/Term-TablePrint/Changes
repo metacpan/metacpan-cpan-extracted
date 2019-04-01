@@ -1,6 +1,9 @@
 Revision history for Term::TablePrint
 
 
+0.109   2019-03-29
+        - Option 'grid' enabled by default.
+
 0.108   2019-01-26
         - Use the whole terminal width
 

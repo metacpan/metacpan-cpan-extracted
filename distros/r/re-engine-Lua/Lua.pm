@@ -8,7 +8,7 @@ BEGIN {
     # All engines should subclass the core Regexp package
     our @ISA = qw( Regexp );
 
-    our $VERSION = '0.17';
+    our $VERSION = '0.19';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -32,10 +32,8 @@ __END__
 re::engine::Lua - Lua regular expression engine
 
 =for html
-<a href="https://travis-ci.org/fperrad/re-engine-lua"><img alt="Build Status" src="https://travis-ci.org/fperrad/re-engine-lua.png?branch=master" /></a>
-<a href="https://coveralls.io/repos/fperrad/re-engine-lua?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/fperrad/re-engine-lua.png?branch=master" /></a>
-<a href="http://badge.fury.io/pl/re-engine-Lua"><img alt="CPAN version" src="http://badge.fury.io/pl/re-engine-Lua.svg" /></a>
-<a href="COPYRIGHT"><img alt="Licence" src="http://img.shields.io/badge/Licence-MIT-brightgreen.svg" /></a>
+<a href="http://cpants.charsbar.org/dist/overview/re-engine-Lua"><img alt="Kwalitee Status" src="http://cpants.cpanauthors.org/dist/re-engine-Lua.png" /></a>
+<a href="LICENSE"><img alt="Licence" src="http://img.shields.io/badge/Licence-MIT-brightgreen.svg" /></a>
 
 =head1 SYNOPSIS
 
@@ -234,11 +232,11 @@ FranE<ccedil>ois PERRAD <francois.perrad@gadz.org>
 
 =head1 HOMEPAGE
 
-The development is hosted at L<https://github.com/fperrad/re-engine-lua>.
+The development is hosted at L<https://framagit.org/perrad/re-engine-lua>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2007-2016 FranE<ccedil>ois PERRAD.
+Copyright 2007-2019 FranE<ccedil>ois PERRAD.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Lua.

@@ -8,6 +8,7 @@ package App::Git::Workflow::Command::Recent;
 
 use strict;
 use warnings;
+use version;
 use Getopt::Long;
 use Pod::Usage ();
 use List::MoreUtils qw/uniq/;
@@ -17,7 +18,7 @@ use CHI::Memoize qw(:all);
 use App::Git::Workflow;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.1.1;
+our $VERSION  = version->new(1.1.2);
 our $workflow = App::Git::Workflow->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -275,7 +276,7 @@ git-recent - Find what files have been changed recently in a repository
 
 =head1 VERSION
 
-This documentation refers to git-recent version 1.1.1
+This documentation refers to git-recent version 1.1.2
 
 =head1 SYNOPSIS
 

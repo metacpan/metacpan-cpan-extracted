@@ -1,0 +1,90 @@
+{
+   "abstract" : "Grant Street Group CPAN dists",
+   "author" : [
+      "Grant Street Group <developers@grantstreet.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-GSG",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::Bootstrap::lib" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::ChangelogFromGit" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::NextVersion" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GitHub::Meta" : "0",
+            "Dist::Zilla::Plugin::GitHub::UploadRelease" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::StaticInstall" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Role::LicenseProvider" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Git::Wrapper" : "0",
+            "Moose" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "File::pushd" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.14",
+            "Test::Strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG.git",
+         "web" : "https://github.com/GrantStreetGroup/p5-Dist-Zilla-PluginBundle-Author-GSG"
+      }
+   },
+   "version" : "0.0.4",
+   "x_contributors" : [
+      "Andrew Fresh <andrew.fresh@grantstreet.com>"
+   ],
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 4.0",
+   "x_static_install" : 1
+}
+

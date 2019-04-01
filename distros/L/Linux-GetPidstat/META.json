@@ -4,7 +4,7 @@
       "yoheimuta <yoheimuta@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.1",
+   "generated_by" : "Minilla/v3.1.4",
    "license" : [
       "perl_5"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "Linux::GetPidstat" : {
          "file" : "lib/Linux/GetPidstat.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       },
       "Linux::GetPidstat::Collector" : {
          "file" : "lib/Linux/GetPidstat/Collector.pm"
@@ -96,9 +96,11 @@
          "web" : "https://github.com/yoheimuta/Linux-GetPidstat"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
-      "Songmu <y.songmu@gmail.com>",
-      "Makoto Sasaki <wanigoya@gmail.com>"
-   ]
+      "Makoto Sasaki <wanigoya@gmail.com>",
+      "Songmu <y.songmu@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

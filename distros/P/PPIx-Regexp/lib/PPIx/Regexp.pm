@@ -124,28 +124,28 @@ L<perl_version_removed()|/perl_version_removed> will return the version
 in which they were removed. When the new functionality appears, the
 parse produced by this software will reflect the new functionality.
 
-B<NOTE> that a literal left curly after a literal character was made an
-error in Perl 5.25.1, but became a warning again in 5.27.1 due to its
-use in GNU Autoconf.  Whether it will ever become illegal again is not
-clear to me based on the contents of F<perl5271delta>. At the moment
-C<PPIx::Regexp> considers this usage to have been removed in 5.25.1, and
-this will not change based on anything in 5.27.x. But if 5.26.1 comes
-out allowing this usage, the removal version will become C<undef>. The
-same will apply to any other usages that were re-allowed in 5.27.1, if I
-can identify them.
+B<NOTE> that the situation with a literal left curly after a literal
+character is complicated. It was made an error in Perl 5.25.1, and
+remained so through all 5.26 releases, but became a warning again in
+5.27.1 due to its use in GNU Autoconf. Whether it will ever become
+illegal again is not clear to me based on the contents of
+F<perl5271delta>. At the moment
+L<perl_version_removed()|PPIx::Regexp::Element/perl_version_removed>
+returns C<undef>, but obviously that is not the whole story, and methods
+L<accepts_perl()|PPIx::Regexp::Element/accepts_perl> and
+L<requirements_for_perl()|PPIx::Regexp::Element/requirements_for_perl>
+were introduced to deal with this complication.
+
+=item C<\o{...}>
+
+is parsed as the octal equivalent of C<\x{...}>. This is its meaning as
+of perl 5.13.2. Before 5.13.2 it was simply literal C<'o'> and so on.
 
 =back
 
 There are very probably other examples of this. When they come to light
 they will be documented as producing the modern parse, and the code
 modified to produce this parse if necessary.
-
-The functionality that parses string literals (the C<parse> argument to
-C<new()>) was introduced in version 0.045, but its use is discouraged.
-The preferred package for string literals is
-L<PPIx::QuoteLike|PPIx::QuoteLike>, and once I consider that package to
-be stable the string literal functionality in this package will be put
-through a deprecation cycle and removed.
 
 =head1 METHODS
 
@@ -170,7 +170,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
 
 =head2 new
 
@@ -522,6 +522,38 @@ attempt succeeded.
 sub explain {
     return;
 }
+
+=head2 extract_regexps
+
+ my $doc = PPI::Document->new( $path );
+ $doc->index_locations();
+ my @res = PPIx::Regexp->extract_regexps( $doc )
+
+This convenience (well, sort-of) static method takes as its argument a
+L<PPI::Document|PPI::Document> object and returns C<PPIx::Regexp>
+objects corresponding to all regular expressions found in it, in the
+order in which they occur in the document. You will need to keep a
+reference to the original L<PPI::Document|PPI::Document> object if you
+wish to be able to recover the original L<PPI::Element|PPI::Element>
+objects via the L<PPIx::Regexp::Element|PPIx::Regexp::Element>
+L<source()|PPIx::Regexp::Element/source> method.
+
+=cut
+
+sub extract_regexps {
+    my ( $class, $doc ) = @_;
+    my @found = map { @{ $doc->find( $_ ) || [] } } qw{
+	PPI::Token::QuoteLike::Regexp
+	PPI::Token::Regexp::Match
+	PPI::Token::Regexp::Substitute
+    };
+    return ( map { $class->new( $_ ) } map { $_->[0] }
+	sort { $a->[1][0] <=> $b->[1][0] || $a->[1][1] <=> $b->[1][1] }
+	map { [ $_, $_->location() ] }
+	@found
+    );
+}
+
 
 =head2 failures
 
@@ -881,7 +913,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 by Thomas R. Wyant, III
+Copyright (C) 2009-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

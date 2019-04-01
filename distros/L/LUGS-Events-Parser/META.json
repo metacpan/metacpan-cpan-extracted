@@ -4,7 +4,7 @@
       "Steven Schubiger <schubiger@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,33 +16,33 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Spec" : 0,
-            "File::Temp" : 0,
-            "FindBin" : 0,
-            "Test::More" : 0
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "DateTime" : 0,
-            "HTML::Entities" : 0,
-            "HTML::Parser" : 0,
-            "List::MoreUtils" : 0,
-            "Params::Validate" : 0,
-            "boolean" : 0
+            "Carp" : "0",
+            "DateTime" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Parser" : "0",
+            "List::MoreUtils" : "0",
+            "Params::Validate" : "0",
+            "boolean" : "0"
          }
       }
    },
    "provides" : {
       "LUGS::Events::Parser" : {
          "file" : "lib/LUGS/Events/Parser.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "LUGS::Events::Parser::Event" : {
          "file" : "lib/LUGS/Events/Parser/Event.pm",
@@ -57,7 +57,11 @@
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/LUGS-Events-Parser"
+      }
    },
-   "version" : "0.10"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

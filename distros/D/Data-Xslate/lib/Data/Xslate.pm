@@ -2,7 +2,7 @@ package Data::Xslate;
 use 5.008001;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Text::Xslate;
 use Carp qw( croak );
@@ -239,6 +239,8 @@ sub _set_node {
 1;
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Data::Xslate - Templatize your data.
@@ -459,7 +461,7 @@ So, any arguments which L<Text::Xslate> supports may be set.  For example:
 =head2 substitution_tag
 
 The string to look for at the beginning of any string value which
-signifies L</SUBSTITUTION>.  Defaults to C<=>.  This is used in
+signifies L</Substitution>.  Defaults to C<=>.  This is used in
 data like this:
 
     { a=>{ b=>2 }, c => '=a.b' }
@@ -468,7 +470,7 @@ data like this:
 =head2 nested_key_tag
 
 The string to look for at the end of any key which signifies
-L</NESTED KEYS>.  Defaults to C<=>.  This is used in data
+L</Nested Keys>.  Defaults to C<=>.  This is used in data
 like this:
 
     { a=>{ b=>2 }, 'a.c=' => 3 }
@@ -522,4 +524,6 @@ development this distribution would not exist.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

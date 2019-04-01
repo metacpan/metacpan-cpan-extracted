@@ -9,7 +9,7 @@ use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8jp );
+my @encoding = qw( cp932x cp932 cp932ibm cp932nec sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8.1 utf8jp );
 
 my %tr = ();
 open(JACODE4E,"$FindBin::Bin/../lib/Jacode4e.pm") || die;
@@ -31,7 +31,7 @@ while (<JACODE4E>) {
 }
 close(JACODE4E);
 
-my @io_encoding = (grep( ! /^(utf8|unicode)$/, @encoding), 'jef9p');
+my @io_encoding = (grep( ! /^(utf8|utf8\.1|unicode)$/, @encoding), 'jef9p');
 
 my $fileno = 3001;
 for my $INPUT_encoding (@io_encoding) {

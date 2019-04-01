@@ -1,5 +1,8 @@
 Revision history for Acme-Affinity
 
+0.0103 2019-03-31 21:02:46
+    - Added 100% and 0% test cases.
+
 0.0102 2017-11-03 02:05:50
     - Fixed tiny typo.
     - Improve variable naming.

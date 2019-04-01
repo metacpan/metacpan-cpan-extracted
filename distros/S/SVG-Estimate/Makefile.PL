@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "SVG-Estimate",
   "EXE_FILES" => [
+    "bin/dumpsvg",
     "bin/estimatesvg"
   ],
   "LICENSE" => "perl",
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::LX" => 0,
     "XML::LibXML" => 0
   },
-  "VERSION" => "1.0111",
+  "VERSION" => "1.0112",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }

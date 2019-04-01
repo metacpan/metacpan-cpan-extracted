@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2018 A S Lewis
+# Copyright (C) 2011-2019 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -123,22 +123,20 @@
             #   displayed in a 'dialogue' window)
             pseudoCmdMode               => 'win_error',
 
-            # The window widget. For most window objects, the Gtk2::Window. For pseudo-windows, the
-            #   parent 'main' window's Gtk2::Window
+            # The window widget. For most window objects, the Gtk3::Window. For pseudo-windows, the
+            #   parent 'main' window's Gtk3::Window
             # The code should use this IV when it wants to do something to the window itself
             #   (minimise it, make it active, etc)
             winWidget                   => undef,
-            # The window container. For most window objects, the Gtk2::Window. For pseudo-windows,
+            # The window container. For most window objects, the Gtk3::Window. For pseudo-windows,
             #   the parent GA::Table::PseudoWin table object
             # The code should use this IV when it wants to add, modify or remove widgets inside the
             #   window itself
             winBox                      => undef,
-            # The Gnome2::Wnck::Window, if known
-            wnckWin                     => undef,
             # Flag set to TRUE if the window actually exists (after a call to $self->winEnable),
             #   FALSE if not
             enabledFlag                 => FALSE,
-            # Flag set to TRUE if the Gtk2 window itself is visible (after a call to
+            # Flag set to TRUE if the Gtk3 window itself is visible (after a call to
             #   $self->setVisible), FALSE if it is not visible (after a call to $self->setInvisible)
             visibleFlag                 => TRUE,
             # Registry hash of 'free' windows for which this window is the parent (always empty,
@@ -172,18 +170,14 @@
             #   inside a GA::Table::PseudoWin table object), the table object created. Always
             #   'undef' for 'external' windows which can't be pseudo-windows
             pseudoWinTableObj           => undef,
-            # The name of the GA::Obj::Winmap object that specifies the Gtk2::Window's layout when
+            # The name of the GA::Obj::Winmap object that specifies the Gtk3::Window's layout when
             #   it is first created. Always 'undef' for 'external' windows
             winmap                      => undef,
 
             # Standard IVs for 'external' windows
 
-            # The position and size of the 'external' window, before it was grabbed onto one of
-            #   Axmud's workspace grids by ;grabwindow
-            prevXPosPixels              => undef,
-            prevYPosPixels              => undef,
-            prevWidthPixels             => undef,
-            prevHeightPixels            => undef,
+            # The X11::WMCtrl internal ID for this window
+            internalID                  => undef,
         };
 
         # Bless the object into existence
@@ -201,13 +195,13 @@
         # The actual window already exists, but we still need to update IVs
         #
         # Expected arguments
-        #   $wnckWin    - The 'external' window's Gnome2::Wnck::Window
+        #   $internalID     - The X11::WMCtrl internal ID for this window
         #
         # Return values
         #   'undef' on improper arguments
         #   1 on success
 
-        my ($self, $wnckWin, $check) = @_;
+        my ($self, $internalID, $check) = @_;
 
         # Check for improper arguments
         if (defined $check) {
@@ -216,7 +210,7 @@
         }
 
         # Update IVs
-        $self->ivPoke('wnckWin', $wnckWin);
+        $self->ivPoke('internalID', $internalID);
 
         return 1;
     }
@@ -245,12 +239,7 @@
              return $axmud::CLIENT->writeImproper($self->_objClass . '->winEnable', @_);
         }
 
-        # Set up ->signal_connects
-        $self->setDeleteEvent();            # 'delete-event'
-        $self->setWindowClosedEvent();      # 'window-closed'
-
-        # Make the window appear on the desktop
-        $self->winShowAll($self->_objClass . '->winEnable');
+        # Update IVs to be consistent with 'internal' windows
         $self->ivPoke('enabledFlag', TRUE);
 
         return 1;
@@ -284,7 +273,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->winDisengage', @_);
         }
 
-        if (! $self->winBox) {
+        if (! $self->internalID) {
 
             # Window already disengaged in a previous call to this function
             return undef;
@@ -307,19 +296,16 @@
         $axmud::CLIENT->desktopObj->del_gridWin($self);
 
         # Look for other 'grid' windows (besides this one) handling the same 'external' window. If
-        #   there are none, it's safe to restore the 'external' window to its original size and
-        #   position
-        # (Don't bother if the original size/position isn't known)
-        if (defined $self->prevXPosPixels) {
+        #   there are none, it's safe to minimise the 'external' window
+        if (defined $self->internalID) {
 
             OUTER: foreach my $winObj ($axmud::CLIENT->desktopObj->ivValues('gridWinHash')) {
 
                 if (
-                    ($self->winBox && $winObj->winBox && $self->winBox eq $winObj->winBox)
-                    || (
-                        $self->wnckWin && $winObj->wnckWin
-                        && $self->wnckWin eq $winObj->wnckWin
-                    )
+                    $winObj->winType eq 'external'
+                    && $self->internalID
+                    && $winObj->internalID
+                    && $self->internalID eq $winObj->internalID
                 ) {
                     $flag = TRUE;
                     last OUTER;
@@ -328,27 +314,14 @@
 
             if (! $flag) {
 
-                # Restore the 'external' window to its original size and position
-                $self->workspaceObj->moveResizeWin(
-                    $self,
-                    $self->prevXPosPixels,
-                    $self->prevYPosPixels,
-                    $self->prevWidthPixels,
-                    $self->prevHeightPixels,
-                );
-
                 # Minimise the window so that, visually, it appears to have been removed from
                 #   Axmud's control
-                if ($self->wnckWin) {
-
-                    $self->wnckWin->minimize();
-                }
+                $self->minimise();
             }
         }
 
         # Operation complete
-        $self->ivUndef('winWidget');
-        $self->ivUndef('winBox');
+        $self->ivUndef('internalID');
 
         return 1;
     }
@@ -375,7 +348,7 @@
             return $axmud::CLIENT->writeImproper($self->_objClass . '->winDestroy', @_);
         }
 
-        if (! $self->winBox) {
+        if (! $self->internalID) {
 
             # Window already disengaged in a previous call to this function
             return undef;
@@ -404,8 +377,7 @@
         }
 
         # Operation complete
-        $self->ivUndef('winWidget');
-        $self->ivUndef('winBox');
+        $self->ivUndef('internalID');
 
         return 1;
     }
@@ -421,10 +393,7 @@
     sub setDeleteEvent {
 
         # Called by $self->winEnable
-        # Set up a ->signal_connect to watch out for the user manually closing the 'external' window
-        #   (in which case the window must be removed from its workspace grid)
-        # This function uses $self->winBox; the next function uses $self->wnckWin (in case one of
-        #   them is not set)
+        # Does nothing (there is no way to detect that the 'external' window has closed)
         #
         # Expected arguments
         #   (none besides $self)
@@ -441,16 +410,7 @@
              return $axmud::CLIENT->writeImproper($self->_objClass . '->setDeleteEvent', @_);
         }
 
-        # (We don't assume that $self->winBox is known)
-        if ($self->winBox) {
-
-            $self->winBox->signal_connect('delete-event' => sub {
-
-                # Prevent Gtk2 from taking action directly. Instead remove the window object from
-                #   its workspace grid
-                return $self->winDestroy();
-            });
-        }
+        # (Do nothing)
 
         return 1;
     }
@@ -458,8 +418,7 @@
     sub setWindowClosedEvent {
 
         # Called by $self->winEnable
-        # Set up a ->signal_connect to watch out for the user manually closing the 'external' window
-        #   (in which case the window must be removed from its workspace grid)
+        # Does nothing (there is no way to detect that the 'external' window has closed)
         #
         # Expected arguments
         #   (none besides $self)
@@ -470,69 +429,120 @@
 
         my ($self, $check) = @_;
 
-        # Local variables
-        my $screen;
-
         # Check for improper arguments
         if (defined $check) {
 
              return $axmud::CLIENT->writeImproper($self->_objClass . '->setWindowClosedEvent', @_);
         }
 
-        # (We don't assume that $self->wnckWin is known)
-        if ($self->wnckWin) {
-
-            $screen = $self->wnckWin->get_screen();
-
-            $screen->signal_connect('window-closed' => sub {
-
-                my ($screen, $closedWin) = @_;
-
-                if ($closedWin eq $self->wnckWin) {
-
-                    # Remove the window object from its workspace grid
-                    return $self->winDestroy();
-                }
-            });
-        }
+        # (Do nothing)
 
         return 1;
+    }
+
+    # Other functions
+
+    sub minimise {
+
+        # Can be called by anything
+        # Minimises the 'external' window
+        #
+        # NB The author of X11::WMCtrl reports that 'Currently minimize() and unminimize() don't
+        #   work. This appears to be a problem with wmctrl itself'
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the window can't be minimised
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+             return $axmud::CLIENT->writeImproper($self->_objClass . '->minimise', @_);
+        }
+
+        if (! $self->internalID) {
+
+            return undef;
+
+        } else {
+
+            # Unmaximise the window
+            $axmud::CLIENT->desktopObj->wmCtrlObj->wmctrl(
+                '-r',
+                $self->internalID,
+                '-i',
+                '-b',
+                'remove,maximised_vert,maximised_horz',
+            );
+
+            # Then minimise it
+            $axmud::CLIENT->desktopObj->wmCtrlObj->wmctrl(
+                '-r',
+                $self->internalID,
+                '-i',
+                '-b',
+                'add,hidden',
+            );
+
+            return 1
+        }
+    }
+
+    sub unminimise {
+
+        # Can be called by anything
+        # Unminimises the 'external' window
+        #
+        # NB The author of X11::WMCtrl reports that 'Currently minimize() and unminimize() don't
+        #   work. This appears to be a problem with wmctrl itself'
+        #
+        # Expected arguments
+        #   (none besides $self)
+        #
+        # Return values
+        #   'undef' on improper arguments or if the window can't be unminimised
+        #   1 otherwise
+
+        my ($self, $check) = @_;
+
+        # Check for improper arguments
+        if (defined $check) {
+
+             return $axmud::CLIENT->writeImproper($self->_objClass . '->unminimise', @_);
+        }
+
+        if (! $self->internalID) {
+
+            return undef;
+
+        } else {
+
+            # Unminimise the window
+            $axmud::CLIENT->desktopObj->wmCtrlObj->wmctrl(
+                '-r',
+                $self->internalID,
+                '-i',
+                '-b',
+                'remove,hidden',
+            );
+
+            return 1;
+        }
     }
 
     ##################
     # Accessors - set
 
-    sub set_oldPosn {
-
-        my ($self, $xPos, $yPos, $width, $height, $check) = @_;
-
-        # Check for improper arguments
-        if (
-            ! defined $xPos || ! defined $yPos || ! defined $width || ! defined $height
-            || defined $check
-        ) {
-            return $axmud::CLIENT->writeImproper($self->_objClass . '->set_oldPosn', @_);
-        }
-
-        $self->ivPoke('prevXPosPixels', $xPos);
-        $self->ivPoke('prevYPosPixels', $yPos);
-        $self->ivPoke('prevWidthPixels', $width);
-        $self->ivPoke('prevHeightPixels', $height);
-
-        return 1;
-    }
-
     ##################
     # Accessors - get
 
-    sub prevXPosPixels
-        { $_[0]->{prevXPosPixels} }
-    sub prevYPosPixels
-        { $_[0]->{prevYPosPixels} }
-    sub prevWidthPixels
-        { $_[0]->{prevWidthPixels} }
-    sub prevHeightPixels
-        { $_[0]->{prevHeightPixels} }
+    sub internalID
+        { $_[0]->{internalID} }
 }
 
 # Package must return a true value

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Html::Table::List;
 use Quiq::Unindent;
@@ -33,7 +33,7 @@ L<Quiq::Hash>
 
 =end html
 
-Quelltext siehe Abschnitt L</"Beispiel Synopsis">.
+Quelltext siehe Abschnitt L<Beispiel Synopsis|"Beispiel Synopsis">.
 
 =head1 DESCRIPTION
 
@@ -222,7 +222,7 @@ erzeugt den HTML-Code (lange Zeilen umbrochen)
 
 Beispiel für die Angabe von Instantiierungs-Argumenten. Dies
 kann bei Aufruf der Methode
-L</"instantiate() - Instantiiere Widget in JavaScript">
+L<instantiate() - Instantiiere Widget in JavaScript|"instantiate() - Instantiiere Widget in JavaScript">
 
     $dt->instantiate(q~
         fixedHeader: true,
@@ -680,7 +680,7 @@ sub getColumns {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

@@ -1,8 +1,5 @@
 package JSON::Schema::Fit;
-{
-  $JSON::Schema::Fit::VERSION = '0.01';
-}
-
+$JSON::Schema::Fit::VERSION = '0.02';
 # ABSTRACT: adjust data structure according to json-schema
 
 
@@ -11,7 +8,6 @@ use strict;
 use warnings;
 use utf8;
 
-use Mouse;
 use Carp;
 
 use JSON;
@@ -20,25 +16,44 @@ use List::Util qw/first/;
 use Math::Round qw/round nearest/;
 
 
-
-has booleans => ( is => 'rw', isa => 'Bool', default => 1 );
-
+sub booleans { return _attr('booleans', @_); }
 
 
-has numbers => ( is => 'rw', isa => 'Bool', default => 1 );
+sub numbers { return _attr('numbers', @_); }
 
 
 
-has round_numbers => ( is => 'rw', isa => 'Bool', default => 1 );
+sub round_numbers { return _attr('round_numbers', @_); }
 
 
 
-has strings => ( is => 'rw', isa => 'Bool', default => 1 );
+sub strings { return _attr('strings', @_); }
 
 
+sub hash_keys { return _attr('hash_keys', @_); }
 
-has hash_keys => ( is => 'rw', isa => 'Bool', default => 1 );
+# Store valid options as well as default values
+my %valid_option = ( map { ($_ => 1) } qw!booleans numbers round_numbers strings hash_keys! );
 
+sub new { 
+    my ($class, %opts) = @_;
+    my $self = bless {}, $class;
+    for my $k (keys %opts) {
+        next unless exists $valid_option{$k};
+        $self->_attr($k, $opts{$k});
+    }
+    return $self
+}
+
+sub _attr {
+    my ($attr, $self, $val) = @_;
+
+    if ($val) {
+        return $self->{$attr} = $val;
+    } else {
+        return $self->{$attr} //= $valid_option{$attr};
+    }
+}
 
 
 sub get_adjusted {
@@ -64,8 +79,8 @@ sub _adjuster_by_type {
 sub _get_adjusted_boolean {
     my ($self, $struc, $schema, $jpath) = @_;
 
-    return $struc  if !$self->booleans();
-    return JSON::true  if $struc;
+    return $struc if !$self->booleans();
+    return JSON::true if $struc;
     return JSON::false;
 }
 
@@ -160,13 +175,13 @@ sub _jpath {
 }
 
 
-__PACKAGE__->meta->make_immutable();
-
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -174,7 +189,7 @@ JSON::Schema::Fit - adjust data structure according to json-schema
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -235,9 +250,17 @@ Default: 1
 
 =head1 METHODS
 
+=head2 new
+
+    my $jsf = JSON::Schema::Fit->new(booleans => 0);
+
+Create a new C<JSON::Schema::Fit> instance. See bellow for valid options.
+
 =head2 get_adjusted
 
 Returns "semi-copy" of data structure with adjusted values. Original data is not affected.
+
+=head1 CONSTRUCTOR
 
 =head1 SEE ALSO
 
@@ -247,14 +270,13 @@ Json-schema home: L<http://json-schema.org/>
 
 =head1 AUTHOR
 
-liosha <liosha@yandex-tean.ru>
+liosha <liosha@yandex-team.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by liosha.
+This software is copyright (c) 2019 by liosha.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

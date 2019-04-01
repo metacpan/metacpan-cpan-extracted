@@ -12,13 +12,13 @@ SYNOPSIS
      }
 
 DESCRIPTION
-    `LUGS::Events::Parser' parses the events file of the Linux User Group
+    "LUGS::Events::Parser" parses the events file of the Linux User Group
     Switzerland (LUGS). It offers according accessor methods and may
     optionally filter HTML markup.
 
 CONSTRUCTOR
   new
-    Creates a new `LUGS::Events::Parser' object.
+    Creates a new "LUGS::Events::Parser" object.
 
     Without options:
 
@@ -38,18 +38,22 @@ CONSTRUCTOR
                strip_text => [ 'mailto:' ],
      });
 
-    * `filter_html'
+    *   "filter_html"
+
         Extract HTML and rewrite it. Accepts a boolean.
 
-    * `tag_handlers'
-        Handlers for rewriting HTML. See TAG HANDLERS for a format
+    *   "tag_handlers"
+
+        Handlers for rewriting HTML. See "TAG HANDLERS" for a format
         explanation.
 
-    * `purge_tags'
+    *   "purge_tags"
+
         Optionally purge all remaining tags without attribute values.
         Accepts an array reference with field names.
 
-    * `strip_text'
+    *   "strip_text"
+
         Optionally strip text from filtered content. Accepts an array
         reference with literals.
 
@@ -57,12 +61,12 @@ METHODS
   next_event
      $event = $parser->next_event;
 
-    Returns a `LUGS::Events::Parser::Event' object.
+    Returns a "LUGS::Events::Parser::Event" object.
 
   get_event_date
      $date = $event->get_event_date;
 
-    Fetch the full `'event'' date field.
+    Fetch the full 'event' date field.
 
   get_event_year
      $year = $event->get_event_year;
@@ -82,42 +86,42 @@ METHODS
   get_event_simple_day
      $simple_day = $event->get_event_simple_day;
 
-    Fetch the event `'day'' field (without zeroes).
+    Fetch the event 'day' field (without zeroes).
 
   get_event_weekday
      $weekday = $event->get_event_weekday;
 
-    Fetch the event `'weekday'' field.
+    Fetch the event 'weekday' field.
 
   get_event_time
      $time = $event->get_event_time;
 
-    Fetch the event `'time'' field.
+    Fetch the event 'time' field.
 
   get_event_title
      $title = $event->get_event_title;
 
-    Fetch the event `'title'' field.
+    Fetch the event 'title' field.
 
   get_event_color
      $color = $event->get_event_color;
 
-    Fetch the event `'color'' field.
+    Fetch the event 'color' field.
 
   get_event_location
      $location = $event->get_event_location;
 
-    Fetch the event `'location'' field.
+    Fetch the event 'location' field.
 
   get_event_responsible
      $responsible = $event->get_event_responsible;
 
-    Fetch the event `'responsible'' field.
+    Fetch the event 'responsible' field.
 
   get_event_more
      $more = $event->get_event_more;
 
-    Fetch the event `'more'' field.
+    Fetch the event 'more' field.
 
   get_event_anchor
      $anchor = $event->get_event_anchor;
@@ -126,11 +130,11 @@ METHODS
 
 FILTERING AND REWRITING
     Filtering HTML markup and separating it from plaintext is optional and
-    may be enabled via the `filter_html' option. The `filter_html' option
+    may be enabled via the "filter_html" option. The "filter_html" option
     set on its own does not suffice since no according tag handlers are
-    defined which must be provided by the `tag_handlers' option. Remaining
-    tags without attribute values may be purged by the `purge_tags' option.
-    The `strip_text' option may contain literal strings to be removed from
+    defined which must be provided by the "tag_handlers" option. Remaining
+    tags without attribute values may be purged by the "purge_tags" option.
+    The "strip_text" option may contain literal strings to be removed from
     the filtered and rewritten content.
 
     The order of processing is: HTML markup is filtered first and then being
@@ -138,7 +142,7 @@ FILTERING AND REWRITING
     requested. Then literal strings as specified are stripped from the
     content. Finally, HTML entities are unconditionally decoded.
 
-    `LUGS::Events::Parser' internally uses HTML::Parser to push tags and
+    "LUGS::Events::Parser" internally uses HTML::Parser to push tags and
     text on a stack. If tags are nested, the innermost tag will be retrieved
     first and the outermost tag last. The top of the stack will be removed
     after the data for each tag set has been gathered completely.
@@ -147,22 +151,22 @@ TAG HANDLERS
     HTML markup is rewritten through the tag handlers provided within the
     options of the constructor. The handlers of a tag group are referenced
     by either its tagname or its tagname and an attribute name. Each handler
-    must consist of a mandatory `rewrite' and `fields' entry. The `rewrite'
+    must consist of a mandatory "rewrite" and "fields" entry. The "rewrite"
     entry defines the substitute pattern for HTML markup (i.e., start tag,
     text and end tag) found. The pattern may consist of placeholders (e.g.,
-    `$NAME'), simple text or both. It may also be empty (which has the
-    effect of removing the markup and text entirely).
+    $NAME), simple text or both. It may also be empty (which has the effect
+    of removing the markup and text entirely).
 
-    For tags which enclose text, the placeholder `$TEXT' will represent the
-    enclosed text. If attributes are available, for example `href', then
-    `$HREF' will contain the value of the `href' attribute. Placeholders
+    For tags which enclose text, the placeholder $TEXT will represent the
+    enclosed text. If attributes are available, for example "href", then
+    $HREF will contain the value of the "href" attribute. Placeholders
     provided for standalone tags will not be substituted.
 
-    The `fields' entry contains the field names to which rewriting applies.
-    Specifying a literal `*' will match all field names.
+    The "fields" entry contains the field names to which rewriting applies.
+    Specifying a literal "*" will match all field names.
 
 SEE ALSO
-    http://www.lugs.ch/lugs/
+    <http://www.lugs.ch/lugs/>
 
 AUTHOR
     Steven Schubiger <schubiger@cpan.org>
@@ -171,5 +175,5 @@ LICENSE
     This program is free software; you may redistribute it and/or modify it
     under the same terms as Perl itself.
 
-    See http://dev.perl.org/licenses/
+    See <http://dev.perl.org/licenses/>
 

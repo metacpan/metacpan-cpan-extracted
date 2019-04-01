@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.644';
+our $VERSION = '1.645';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -161,6 +161,54 @@ sub __validate_and_add_options {
 }
 
 
+sub __copy_orig_list {
+    my ( $self, $orig_list_ref ) = @_;
+    if ( $self->{ll} ) {
+        $self->{list} = $orig_list_ref;
+    }
+    else {
+        $self->{list} = [ @$orig_list_ref ];
+        if ( $self->{color} ) {
+            $self->{orig_list} = $orig_list_ref;
+        }
+        for ( @{$self->{list}} ) {
+            if ( ! $_ ) {
+                $_ = $self->{undef} if ! defined $_;
+                $_ = $self->{empty} if $_ eq '';    #
+            }
+            if ( $self->{color} ) {
+                s/\x{feff}//g;
+                s/\e\[[\d;]*m/\x{feff}/msg;
+            }
+            s/\t/ /g;
+            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
+            # \p{Cn} might not be up to date and remove assigned codepoints
+            # therefore only \p{Noncharacter_Code_Point}
+            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
+        }
+    }
+}
+
+
+sub __length_list_elements {
+    my ( $self ) = @_;
+    my $list = $self->{list};
+    if ( $self->{ll} ) {
+        $self->{col_width} = $self->{ll};
+    }
+    else {
+        my $length_elements = [];
+        my $longest = 0;
+        for my $i ( 0 .. $#$list ) {
+            $length_elements->[$i] = print_columns( $list->[$i] );
+            $longest = $length_elements->[$i] if $length_elements->[$i] > $longest;
+        }
+        $self->{length} = $length_elements;
+        $self->{col_width} = $longest;
+    }
+}
+
+
 sub __init_term {
     my ( $self ) = @_;
     my $config = { mode => 'ultra-raw', mouse => $self->{mouse}, hide_cursor => $self->{hide_cursor} };
@@ -232,8 +280,7 @@ sub __choose {
         print $opt->{codepage_mapping} ? "\e(K" : "\e(U";
     }
     $self->__copy_orig_list( $orig_list_ref );
-    $self->__length_longest();
-    $self->{col_width} = $self->{length_longest} + $self->{pad};
+    $self->__length_list_elements();
     local $SIG{'INT'} = sub {
         # my $signame = shift;
         exit 1;
@@ -241,10 +288,10 @@ sub __choose {
     $self->__init_term();
     ( $self->{term_width}, $self->{term_height} ) = $self->{plugin}->__get_term_size();
     $self->__write_first_screen();
-    my $fast_page = 25;
-    #if ( $self->{count_pp} > 30_000 ) {
-    #    $fast_page = $self->{count_pp} / 5000 * 5;
-    #}
+    my $fast_page = 10;
+    if ( $self->{pp_count} > 10_000 ) {
+        $fast_page = 20;
+    }
     my $saved_pos;
 
     GET_KEY: while ( 1 ) {
@@ -289,7 +336,7 @@ sub __choose {
             $saved_pos = undef;
         }
 
-        # $self->{rc2idx} holds the new list (AoA) formatted in "__size_and_layout" appropriate to the chosen layout.
+        # $self->{rc2idx} holds the new list (AoA) formatted in "__list_idx_to_rowcol" appropriate to the chosen layout.
         # $self->{rc2idx} does not hold the values directly but the respective list indexes from the original list.
         # If the original list would be ( 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' ) and the new formatted list should be
         #     a d g
@@ -598,6 +645,397 @@ sub __choose {
 }
 
 
+sub __prepare_promptline {
+    my ( $self ) = @_;
+    my $prompt = '';
+    if ( length $self->{info} ) {
+        $prompt .= $self->{info};
+        $prompt .= "\n" if length $self->{prompt};
+    }
+    $prompt .= $self->{prompt};
+    if ( $prompt eq '' ) {
+        $self->{prompt_copy} = '';
+        $self->{nr_prompt_lines} = 0;
+        return;
+    }
+    my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
+    my $subseq = $self->{lf}[1] ? $self->{lf}[1] : 0;
+    my @color;
+    if ( $self->{color} ) {
+        $prompt =~ s/\x{feff}//g;
+        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
+    }
+    $self->{prompt_copy} = line_fold( $prompt, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
+    $self->{prompt_copy} .= "\n\r";
+    # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
+    #                 don't translate newline to carriage return-newline
+    $self->{nr_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
+    if ( @color ) {
+        $self->{prompt_copy} =~ s/\x{feff}/shift @color/ge;
+        $self->{prompt_copy} .= RESET;
+    }
+}
+
+
+sub __prepare_page_number {
+    my ( $self ) = @_;
+    if ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) {
+        my $pp_total = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
+        my $pp_total_w = length $pp_total;
+        $self->{footer_fmt} = '--- Page %0' . $pp_total_w . 'd/' . $pp_total . ' ---';
+        if ( length( sprintf $self->{footer_fmt}, $pp_total ) > $self->{avail_width} ) {
+            $self->{footer_fmt} = '%0' . $pp_total_w . 'd/' . $pp_total;
+            if ( length( sprintf $self->{footer_fmt}, $pp_total ) > $self->{avail_width} ) {
+                $pp_total_w = $self->{avail_width} if $pp_total_w > $self->{avail_width};
+                $self->{footer_fmt} = '%0' . $pp_total_w . '.' . $pp_total_w . 's';
+            }
+        }
+        $self->{pp_count} = $pp_total;
+    }
+    else {
+        $self->{avail_height} += $self->{pp_row};
+        $self->{pp_row} = 0;
+        $self->{pp_count} = 1;
+    }
+}
+
+
+sub __set_default_cell {
+    my ( $self ) = @_;
+    LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
+        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
+            if ( $self->{default} == $self->{rc2idx}[$i][$j] ) {
+                $self->{pos} = [ $i, $j ];
+                last LOOP;
+            }
+        }
+    }
+    $self->{p_begin} = $self->{avail_height} * int( $self->{pos}[ROW] / $self->{avail_height} );
+    $self->{p_end} = $self->{p_begin} + $self->{avail_height} - 1;
+    $self->{p_end} = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
+}
+
+
+sub __write_first_screen {
+    my ( $self ) = @_;
+    ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
+    if ( $self->{col_width} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
+        $self->{avail_width} += WIDTH_CURSOR;
+        # + WIDTH_CURSOR: use also the last terminal column if there is only one print-column;
+        #                 with only one print-column the output doesn't get messed up if an item
+        #                 reaches the right edge of the terminal on a non-MSWin32-OS
+    }
+    #if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
+    #    return -2;
+    #}
+    if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
+        $self->{avail_width} = $self->{max_width};
+    }
+    if ( $self->{mouse} == 2 ) {
+        $self->{avail_width}  = MAX_COL_MOUSE_1003 if $self->{avail_width}  > MAX_COL_MOUSE_1003;
+        $self->{avail_height} = MAX_ROW_MOUSE_1003 if $self->{avail_height} > MAX_ROW_MOUSE_1003;
+}
+    if ( $self->{avail_width} < 1 ) {
+        $self->{avail_width} = 1;
+    }
+    $self->__prepare_promptline();
+    $self->{pp_row} = $self->{page} ? 1 : 0;
+    $self->{avail_height} -= $self->{nr_prompt_lines} + $self->{pp_row};
+    if ( $self->{avail_height} < $self->{keep} ) {
+        $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
+    }
+    if ( $self->{max_height} && $self->{max_height} < $self->{avail_height} ) {
+        $self->{avail_height} = $self->{max_height};
+    }
+    $self->__current_layout();
+    $self->__list_idx_to_rowcol();
+    if ( $self->{page} ) {
+        $self->__prepare_page_number();
+    }
+    $self->{avail_height_idx} = $self->{avail_height} - 1;
+    $self->{p_begin} = 0;
+    $self->{p_end}   = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
+    $self->{i_row}   = 0;
+    $self->{i_col}   = 0;
+    $self->{pos}     = [ 0, 0 ];
+    $self->{marked}  = [];
+    if ( $self->{wantarray} && defined $self->{mark} ) {
+        $self->__marked_idx2rc( $self->{mark}, 1 );
+    }
+    if ( defined $self->{default} && $self->{default} <= $#{$self->{list}} ) {
+        $self->__set_default_cell();
+    }
+    if ( $self->{clear_screen} ) {
+        print CLEAR_SCREEN;
+    }
+    else {
+        print "\r" . CLEAR_TO_END_OF_SCREEN;
+    }
+    if ( $self->{prompt_copy} ne '' ) {
+        print $self->{prompt_copy};
+    }
+    $self->__wr_screen();
+    if ( $self->{mouse} ) {
+        $self->{plugin}->__get_cursor_position();
+    }
+    $self->{cursor_row} = $self->{i_row};
+}
+
+
+sub __wr_screen {
+    my ( $self ) = @_;
+    $self->__goto( 0, 0 );
+    print "\r" . CLEAR_TO_END_OF_SCREEN;
+    if ( $self->{pp_row} ) {
+        $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
+        my $pp_line = sprintf $self->{footer_fmt}, int( $self->{p_begin} / $self->{avail_height} ) + 1;
+        print $pp_line;
+        $self->{i_col} += length $pp_line;
+     }
+    for my $row ( $self->{p_begin} .. $self->{p_end} ) {
+        for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
+            $self->__wr_cell( $row, $col );
+        }
+    }
+    $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
+}
+
+
+sub __wr_cell {
+    my( $self, $row, $col ) = @_;
+    my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
+    my $emphasised = ( $self->{marked}[$row][$col] ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
+    my $idx = $self->{rc2idx}[$row][$col];
+    if ( $self->{ll} ) {
+        $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width_plus} );
+        $self->{i_col} = $self->{i_col} + $self->{col_width};
+        if ( $self->{color} ) {
+            my $str = $self->{list}[$idx];
+            if ( $emphasised ) {
+                if ( $is_current_pos ) {
+                    # no color for selected cell
+                    $str =~ s/(\e\[[\d;]*m)//g;
+                }
+                else {
+                    # keep cell marked after color escapes
+                    $str =~ s/(\e\[[\d;]*m)/${1}$emphasised/g;
+                }
+                $str = $emphasised . $str;
+            }
+            print $str . RESET; # if \e[
+        }
+        else {
+            if ( $emphasised ) {
+                print $emphasised . $self->{list}[$idx] . RESET;
+            }
+            else {
+                print $self->{list}[$idx];
+            }
+        }
+    }
+    else {
+        my $str;
+        if ( $self->{current_layout} == -1 ) {
+            my $x = 0;
+            if ( $col > 0 ) {
+                for my $cl ( 0 .. $col - 1 ) {
+                    my $i = $self->{rc2idx}[$row][$cl];
+                    $x += $self->{length}[$i] + $self->{pad};
+                }
+            }
+            $self->__goto( $row - $self->{p_begin}, $x );
+            $self->{i_col} = $self->{i_col} + $self->{length}[$idx];
+            $str = $self->{list}[$idx];
+        }
+        else {
+            $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width_plus} );
+            $self->{i_col} = $self->{i_col} + $self->{col_width};
+            $str = $self->__pad_str_to_colwidth( $idx );
+        }
+        if ( $self->{color} ) {
+            my @color = ( $self->{orig_list}[$idx] || '' ) =~ /(\e\[[\d;]*m)/g;
+            if ( $emphasised ) {
+                for ( @color ) {
+                    # keep cell marked after color escapes
+                    $_ .= $emphasised;
+                }
+                $str = $emphasised . $str . RESET;
+                if ( $is_current_pos ) {
+                    # no color for selected cell
+                    @color = ();
+                    $str =~ s/\x{feff}//g;
+                }
+            }
+            if ( @color ) {
+                $str =~ s/\x{feff}/shift @color/ge;
+                if ( ! $emphasised ) {
+                    $str .= RESET;
+                }
+            }
+            print $str;
+        }
+        else {
+            if ( $emphasised ) {
+                print $emphasised . $str . RESET;
+            }
+            else {
+                print $str;
+            }
+        }
+    }
+}
+
+
+sub __pad_str_to_colwidth {
+    my ( $self, $idx ) = @_;
+    if ( $self->{length}[$idx] < $self->{col_width} ) {
+        if ( $self->{justify} == 0 ) {
+            return $self->{list}[$idx] . ( " " x ( $self->{col_width} - $self->{length}[$idx] ) );
+        }
+        elsif ( $self->{justify} == 1 ) {
+            return " " x ( $self->{col_width} - $self->{length}[$idx] ) . $self->{list}[$idx];
+        }
+        elsif ( $self->{justify} == 2 ) {
+            my $all = $self->{col_width} - $self->{length}[$idx];
+            my $half = int( $all / 2 );
+            return ( " " x $half ) . $self->{list}[$idx] . ( " " x ( $all - $half ) );
+        }
+    }
+    elsif ( $self->{length}[$idx] > $self->{col_width} ) {
+        if ( $self->{col_width} > 6 ) {
+            return cut_to_printwidth( $self->{list}[$idx], $self->{col_width} - 3 ) . '...';
+        }
+        else {
+            return cut_to_printwidth( $self->{list}[$idx], $self->{col_width} );
+        }
+    }
+    else {
+        return $self->{list}[$idx];
+    }
+}
+
+
+sub __goto {
+    my ( $self, $newrow, $newcol ) = @_;
+    # up, down, left, right: 1 or greater
+    if ( $newrow > $self->{i_row} ) {
+        print "\r\n" x ( $newrow - $self->{i_row} );
+        $self->{i_row} = $self->{i_row} + ( $newrow - $self->{i_row} );
+        $self->{i_col} = 0;
+    }
+    elsif ( $newrow < $self->{i_row} ) {
+        print "\e[" . ( $self->{i_row} - $newrow ) . "A";
+        #print UP x ( $self->{i_row} - $newrow );
+        $self->{i_row} = $self->{i_row} - ( $self->{i_row} - $newrow );
+    }
+    if ( $newcol > $self->{i_col} ) {
+        print "\e[" . ( $newcol - $self->{i_col} ) . "C";
+        #print RIGHT x ( $newcol - $self->{i_col} );
+        $self->{i_col} = $self->{i_col} + ( $newcol - $self->{i_col} );
+    }
+    elsif ( $newcol < $self->{i_col} ) {
+        print "\e[" . ( $self->{i_col} - $newcol ) . "D";
+        #print LEFT x ( $self->{i_col} - $newcol );
+        $self->{i_col} = $self->{i_col} - ( $self->{i_col} - $newcol );
+    }
+}
+
+
+sub __current_layout {
+    my ( $self ) = @_;
+    my $all_in_first_row;
+    if ( $self->{layout} <= 1 && ! $self->{ll} ) {
+        my $firstrow_w = 0;
+        for my $idx ( 0 .. $#{$self->{list}} ) {
+            $firstrow_w += $self->{length}[$idx] + $self->{pad};
+            if ( $firstrow_w - $self->{pad} > $self->{avail_width} ) {
+                $firstrow_w = 0;
+                last;
+            }
+        }
+        $all_in_first_row = $firstrow_w;
+    }
+    if ( $all_in_first_row ) {
+        $self->{current_layout} = -1;
+    }
+    elsif ( $self->{col_width} >= $self->{avail_width} ) {
+        $self->{current_layout} = 3;
+        $self->{col_width} = $self->{avail_width};
+    }
+    else {
+        $self->{current_layout} = $self->{layout};
+    }
+    $self->{col_width_plus} = $self->{col_width} + $self->{pad};
+    # 'col_width_plus' no effects if layout == 3
+}
+
+
+sub __list_idx_to_rowcol {
+    my ( $self ) = @_;
+    my $layout = $self->{current_layout};
+    $self->{rc2idx} = [];
+    if ( $layout == -1 ) {
+        $self->{rc2idx}[0] = [ 0 .. $#{$self->{list}} ];
+    }
+    elsif ( $layout == 3 ) {
+        for my $idx ( 0 .. $#{$self->{list}} ) {
+            $self->{rc2idx}[$idx][0] = $idx;
+        }
+    }
+    else {
+        $self->{col_width_plus} = $self->{col_width} + $self->{pad};
+        my $tmp_avail_width = $self->{avail_width} + $self->{pad};
+        # auto_format
+        if ( $layout == 1 || $layout == 2 ) {
+            my $tmc = int( @{$self->{list}} / $self->{avail_height} );
+            $tmc++ if @{$self->{list}} % $self->{avail_height};
+            $tmc *= $self->{col_width_plus};
+            if ( $tmc < $tmp_avail_width ) {
+                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 1.5 ) ) if $layout == 1;
+                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 4 ) )   if $layout == 2;
+                $tmp_avail_width = $tmc;
+            }
+        }
+        # order
+        my $cols_per_row = int( $tmp_avail_width / $self->{col_width_plus} );
+        $cols_per_row = 1 if $cols_per_row < 1;
+        $self->{rest} = @{$self->{list}} % $cols_per_row;
+        if ( $self->{order} == 1 ) {
+            my $rows = int( ( @{$self->{list}} - 1 + $cols_per_row ) / $cols_per_row );
+            my @rearranged_idx;
+            my $begin = 0;
+            my $end = $rows - 1;
+            for my $c ( 0 .. $cols_per_row - 1 ) {
+                --$end if $self->{rest} && $c >= $self->{rest};
+                $rearranged_idx[$c] = [ $begin .. $end ];
+                $begin = $end + 1;
+                $end = $begin + $rows - 1;
+            }
+            for my $r ( 0 .. $rows - 1 ) {
+                my @temp_idx;
+                for my $c ( 0 .. $cols_per_row - 1 ) {
+                    next if $r == $rows - 1 && $self->{rest} && $c >= $self->{rest};
+                    push @temp_idx, $rearranged_idx[$c][$r];
+                }
+                push @{$self->{rc2idx}}, \@temp_idx;
+            }
+        }
+        else {
+            my $begin = 0;
+            my $end = $cols_per_row - 1;
+            $end = $#{$self->{list}} if $end > $#{$self->{list}};
+            push @{$self->{rc2idx}}, [ $begin .. $end ];
+            while ( $end < $#{$self->{list}} ) {
+                $begin += $cols_per_row;
+                $end   += $cols_per_row;
+                $end    = $#{$self->{list}} if $end > $#{$self->{list}};
+                push @{$self->{rc2idx}}, [ $begin .. $end ];
+            }
+        }
+    }
+}
+
+
 sub __marked_idx2rc {
     my ( $self, $list_of_indexes, $boolean ) = @_;
     my $last_list_idx = $#{$self->{list}};
@@ -663,431 +1101,6 @@ sub __marked_rc2idx {
 }
 
 
-sub __copy_orig_list {
-    my ( $self, $orig_list_ref ) = @_;
-    if ( $self->{ll} ) {
-        $self->{list} = $orig_list_ref;
-    }
-    else {
-        $self->{list} = [ @$orig_list_ref ];
-        if ( $self->{color} ) {
-            $self->{orig_list} = $orig_list_ref;
-        }
-        for ( @{$self->{list}} ) {
-            if ( ! $_ ) {
-                $_ = $self->{undef} if ! defined $_;
-                $_ = $self->{empty} if $_ eq '';    #
-            }
-            if ( $self->{color} ) {
-                s/\x{feff}//g;
-                s/\e\[[\d;]*m/\x{feff}/msg;
-            }
-            s/\t/ /g;
-            s/[\x{000a}-\x{000d}\x{0085}\x{2028}\x{2029}]+/\ \ /g; # \v 5.10
-            # \p{Cn} might not be up to date and remove assigned codepoints
-            # therefore only \p{Noncharacter_Code_Point}
-            s/[\p{Cc}\p{Noncharacter_Code_Point}\p{Cs}]//g;
-        }
-    }
-}
-
-
-sub __length_longest {
-    my ( $self ) = @_;
-    my $list = $self->{list};
-    if ( $self->{ll} ) {
-        $self->{length_longest} = $self->{ll};
-    }
-    else {
-        my $len = [];
-        my $longest = 0;
-        for my $i ( 0 .. $#$list ) {
-            $len->[$i] = print_columns( $list->[$i] );
-            $longest = $len->[$i] if $len->[$i] > $longest;
-        }
-        $self->{length_longest} = $longest;
-        $self->{length} = $len;
-    }
-}
-
-
-sub __write_first_screen {
-    my ( $self ) = @_;
-    ( $self->{avail_width}, $self->{avail_height} ) = ( $self->{term_width}, $self->{term_height} );
-    if ( $self->{length_longest} > $self->{avail_width} && $^O ne 'MSWin32' && $^O ne 'cygwin' ) {
-        $self->{avail_width} += WIDTH_CURSOR;
-        # + WIDTH_CURSOR: use also the last terminal column if there is only one print-column;
-        #                 with only one print-column the output doesn't get messed up if an item
-        #                 reaches the right edge of the terminal on a non-MSWin32-OS
-    }
-    if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
-        return -2;                                                          ###
-    }
-    if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
-        $self->{avail_width} = $self->{max_width};
-    }
-    if ( $self->{mouse} == 2 ) {
-        $self->{avail_width}  = MAX_COL_MOUSE_1003 if $self->{avail_width}  > MAX_COL_MOUSE_1003;
-        $self->{avail_height} = MAX_ROW_MOUSE_1003 if $self->{avail_height} > MAX_ROW_MOUSE_1003;
-    }
-    if ( $self->{avail_width} < 1 ) {
-        $self->{avail_width} = 1;
-    }
-    $self->__prepare_promptline();
-    $self->{pp_row} = $self->{page} ? 1 : 0;
-    $self->{avail_height} -= $self->{nr_prompt_lines} + $self->{pp_row};
-    if ( $self->{avail_height} < $self->{keep} ) {
-        $self->{avail_height} = $self->{term_height} >= $self->{keep} ? $self->{keep} : $self->{term_height};
-    }
-    if ( $self->{max_height} && $self->{max_height} < $self->{avail_height} ) {
-        $self->{avail_height} = $self->{max_height};
-    }
-    $self->__size_and_layout();
-    if ( $self->{page} ) {
-        $self->__prepare_page_number();
-    }
-    $self->{avail_height_idx} = $self->{avail_height} - 1;
-    $self->{p_begin} = 0;
-    $self->{p_end}   = $self->{avail_height_idx} > $#{$self->{rc2idx}} ? $#{$self->{rc2idx}} : $self->{avail_height_idx};
-    $self->{i_row}   = 0;
-    $self->{i_col}   = 0;
-    $self->{pos}     = [ 0, 0 ];
-    $self->{marked}  = [];
-    if ( $self->{wantarray} && defined $self->{mark} ) {
-        $self->__marked_idx2rc( $self->{mark}, 1 );
-    }
-    if ( defined $self->{default} && $self->{default} <= $#{$self->{list}} ) {
-        $self->__set_default_cell();
-    }
-    if ( $self->{clear_screen} ) {
-        print CLEAR_SCREEN;
-    }
-    else {
-        print "\r" . CLEAR_TO_END_OF_SCREEN;
-    }
-    if ( $self->{prompt_copy} ne '' ) {
-        print $self->{prompt_copy};
-    }
-    $self->__wr_screen();
-    if ( $self->{mouse} ) {
-        $self->{plugin}->__get_cursor_position();
-    }
-    $self->{cursor_row} = $self->{i_row};
-}
-
-
-sub __prepare_promptline {
-    my ( $self ) = @_;
-    my $prompt = '';
-    if ( length $self->{info} ) {
-        $prompt .= $self->{info};
-        $prompt .= "\n" if length $self->{prompt};
-    }
-    $prompt .= $self->{prompt};
-    if ( $prompt eq '' ) {
-        $self->{prompt_copy} = '';
-        $self->{nr_prompt_lines} = 0;
-        return;
-    }
-    my $init   = $self->{lf}[0] ? $self->{lf}[0] : 0;
-    my $subseq = $self->{lf}[1] ? $self->{lf}[1] : 0;
-    my @color;
-    if ( $self->{color} ) {
-        $prompt =~ s/\x{feff}//g;
-        $prompt =~ s/(\e\[[\d;]*m)/push( @color, $1 ) && "\x{feff}"/ge;
-    }
-    $self->{prompt_copy} = line_fold( $prompt, $self->{avail_width}, ' ' x $init, ' ' x $subseq );
-    $self->{prompt_copy} .= "\n\r";
-    # s/\n/\n\r/g; -> stty 'raw' mode and Term::Readkey 'ultra-raw' mode
-    #                 don't translate newline to carriage return-newline
-    $self->{nr_prompt_lines} = $self->{prompt_copy} =~ s/\n/\n\r/g;
-    if ( @color ) {
-        $self->{prompt_copy} =~ s/\x{feff}/shift @color/ge;
-        $self->{prompt_copy} .= RESET;
-    }
-}
-
-
-sub __size_and_layout {
-    my ( $self ) = @_;
-    my $layout = $self->{layout};
-    $self->{rc2idx} = [];
-    if ( $self->{length_longest} >= $self->{avail_width} ) {
-        $self->{avail_col_width} = $self->{avail_width};
-        $layout = 3;
-    }
-    else {
-        $self->{avail_col_width} = $self->{length_longest};
-    }
-    $self->{current_layout} = $layout;
-    my $all_in_first_row = '';
-    if ( $layout == 0 || $layout == 1 ) {
-        my $firstrow_w = 0;
-        for my $idx ( 0 .. $#{$self->{list}} ) {
-            $all_in_first_row .= $self->{list}[$idx];
-            $firstrow_w += defined $self->{length}[$idx] ? $self->{length}[$idx] : $self->{length_longest};
-            if ( $idx < $#{$self->{list}} ) {
-                $all_in_first_row .= ' ' x $self->{pad};
-                $firstrow_w += $self->{pad};
-            }
-            if ( $firstrow_w > $self->{avail_width} ) {
-                $all_in_first_row = '';
-                last;
-            }
-        }
-    }
-    if ( $all_in_first_row ) {
-        $self->{rc2idx}[0] = [ 0 .. $#{$self->{list}} ];
-    }
-    elsif ( $layout == 3 ) {
-        for my $idx ( 0 .. $#{$self->{list}} ) {
-            $self->{rc2idx}[$idx][0] = $idx;
-        }
-    }
-    else {
-        my $tmp_avail_width = $self->{avail_width} + $self->{pad};
-        # auto_format
-        if ( $layout == 1 || $layout == 2 ) {
-            my $tmc = int( @{$self->{list}} / $self->{avail_height} );
-            $tmc++ if @{$self->{list}} % $self->{avail_height};
-            $tmc *= $self->{col_width};
-            if ( $tmc < $tmp_avail_width ) {
-                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 1.5 ) ) if $layout == 1;
-                $tmc = int( $tmc + ( ( $tmp_avail_width - $tmc ) / 4 ) )   if $layout == 2;
-                $tmp_avail_width = $tmc;
-            }
-        }
-        # order
-        my $cols_per_row = int( $tmp_avail_width / $self->{col_width} );
-        $cols_per_row = 1 if $cols_per_row < 1;
-        $self->{rest} = @{$self->{list}} % $cols_per_row;
-        if ( $self->{order} == 1 ) {
-            my $rows = int( ( @{$self->{list}} - 1 + $cols_per_row ) / $cols_per_row );
-            my @rearranged_idx;
-            my $begin = 0;
-            my $end = $rows - 1;
-            for my $c ( 0 .. $cols_per_row - 1 ) {
-                --$end if $self->{rest} && $c >= $self->{rest};
-                $rearranged_idx[$c] = [ $begin .. $end ];
-                $begin = $end + 1;
-                $end = $begin + $rows - 1;
-            }
-            for my $r ( 0 .. $rows - 1 ) {
-                my @temp_idx;
-                for my $c ( 0 .. $cols_per_row - 1 ) {
-                    next if $r == $rows - 1 && $self->{rest} && $c >= $self->{rest};
-                    push @temp_idx, $rearranged_idx[$c][$r];
-                }
-                push @{$self->{rc2idx}}, \@temp_idx;
-            }
-        }
-        else {
-            my $begin = 0;
-            my $end = $cols_per_row - 1;
-            $end = $#{$self->{list}} if $end > $#{$self->{list}};
-            push @{$self->{rc2idx}}, [ $begin .. $end ];
-            while ( $end < $#{$self->{list}} ) {
-                $begin += $cols_per_row;
-                $end   += $cols_per_row;
-                $end    = $#{$self->{list}} if $end > $#{$self->{list}};
-                push @{$self->{rc2idx}}, [ $begin .. $end ];
-            }
-        }
-    }
-}
-
-
-sub __set_default_cell {
-    my ( $self ) = @_;
-    LOOP: for my $i ( 0 .. $#{$self->{rc2idx}} ) {
-        for my $j ( 0 .. $#{$self->{rc2idx}[$i]} ) {
-            if ( $self->{default} == $self->{rc2idx}[$i][$j] ) {
-                $self->{pos} = [ $i, $j ];
-                last LOOP;
-            }
-        }
-    }
-    $self->{p_begin} = $self->{avail_height} * int( $self->{pos}[ROW] / $self->{avail_height} );
-    $self->{p_end} = $self->{p_begin} + $self->{avail_height} - 1;
-    $self->{p_end} = $#{$self->{rc2idx}} if $self->{p_end} > $#{$self->{rc2idx}};
-}
-
-
-sub __goto {
-    my ( $self, $newrow, $newcol ) = @_;
-    # up, down, left, right: 1 or greater
-    if ( $newrow > $self->{i_row} ) {
-        print "\r\n" x ( $newrow - $self->{i_row} );
-        $self->{i_row} += ( $newrow - $self->{i_row} );
-        $self->{i_col} = 0;
-    }
-    elsif ( $newrow < $self->{i_row} ) {
-        print "\e[" . ( $self->{i_row} - $newrow ) . "A";
-        #print UP x ( $self->{i_row} - $newrow );
-        $self->{i_row} -= ( $self->{i_row} - $newrow );
-    }
-    if ( $newcol > $self->{i_col} ) {
-        print "\e[" . ( $newcol - $self->{i_col} ) . "C";
-        #print RIGHT x ( $newcol - $self->{i_col} );
-        $self->{i_col} += ( $newcol - $self->{i_col} );
-    }
-    elsif ( $newcol < $self->{i_col} ) {
-        print "\e[" . ( $self->{i_col} - $newcol ) . "D";
-        #print LEFT x ( $self->{i_col} - $newcol );
-        $self->{i_col} -= ( $self->{i_col} - $newcol );
-    }
-}
-
-
-sub __prepare_page_number {
-    my ( $self ) = @_;
-    #my $total_pp = 0;
-    if ( @{$self->{rc2idx}} / ( $self->{avail_height} + $self->{pp_row} ) > 1 ) {
-        my $total_pp = int( $#{$self->{rc2idx}} / $self->{avail_height} ) + 1;
-        my $total_pp_w = length $total_pp;
-        $self->{footer_fmt} = '--- Page %0' . $total_pp_w . 'd/' . $total_pp . ' ---';
-        if ( length( sprintf $self->{footer_fmt}, $total_pp ) > $self->{avail_width} ) {
-            $self->{footer_fmt} = '%0' . $total_pp_w . 'd/' . $total_pp;
-            if ( length( sprintf $self->{footer_fmt}, $total_pp ) > $self->{avail_width} ) {
-                $total_pp_w = $self->{avail_width} if $total_pp_w > $self->{avail_width};
-                $self->{footer_fmt} = '%0' . $total_pp_w . '.' . $total_pp_w . 's';
-            }
-        }
-    }
-    else {
-        $self->{avail_height} += $self->{pp_row};
-        $self->{pp_row} = 0;
-    }
-    #$self->{count_pp} = $total_pp;
-}
-
-
-sub __wr_screen {
-    my ( $self ) = @_;
-    $self->__goto( 0, 0 );
-    print "\r" . CLEAR_TO_END_OF_SCREEN;
-    if ( $self->{pp_row} ) {
-        $self->__goto( $self->{avail_height_idx} + $self->{pp_row}, 0 );
-        my $pp_line = sprintf $self->{footer_fmt}, int( $self->{p_begin} / $self->{avail_height} ) + 1;
-        print $pp_line;
-        $self->{i_col} += length $pp_line;
-     }
-    for my $row ( $self->{p_begin} .. $self->{p_end} ) {
-        for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
-            $self->__wr_cell( $row, $col );
-        }
-    }
-    $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
-}
-
-
-sub __wr_cell {
-    my( $self, $row, $col ) = @_;
-    my $idx = $self->{rc2idx}[$row][$col];
-    if ( $#{$self->{rc2idx}} == 0 && $#{$self->{rc2idx}[0]} > 0 ) {
-        my $lngth = 0;
-        if ( $col > 0 ) {
-            for my $cl ( 0 .. $col - 1 ) {
-                my $i = $self->{rc2idx}[$row][$cl];
-                $lngth += defined $self->{length}[$i] ? $self->{length}[$i] : $self->{length_longest};
-                $lngth += $self->{pad};
-            }
-        }
-        $self->__goto( $row - $self->{p_begin}, $lngth );
-        $self->{avail_col_width} = defined $self->{length}[$idx] ? $self->{length}[$idx] : $self->{length_longest};
-    }
-    else {
-        $self->__goto( $row - $self->{p_begin}, $col * $self->{col_width} );
-    }
-    $self->{i_col} += $self->{avail_col_width};
-    my $is_current_pos = $row == $self->{pos}[ROW] && $col == $self->{pos}[COL];
-    my $is_marked = $self->{marked}[$row][$col]; ###
-    if ( $self->{ll} ) {
-        if ( $self->{color} ) {
-            my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
-            my $str = $self->{list}[$idx];
-            if ( $emphasised ) {
-                if ( $is_current_pos ) {
-                    $str =~ s/(\e\[[\d;]*m)//g;
-                }
-                else {
-                    # keep emphasise after color escapes
-                    $str =~ s/(\e\[[\d;]*m)/${1}$emphasised/g;
-                }
-                $str = $emphasised . $str;
-            }
-            print $str . RESET; # if \e[
-        }
-        else {
-            print BOLD_UNDERLINE if $is_marked;
-            print REVERSE        if $is_current_pos;
-            print $self->{list}[$idx];
-            print RESET if $is_marked || $is_current_pos;
-        }
-    }
-    else {
-        my $str;
-        my ( $pre, $post ) = ( '', '' );
-        if ( $self->{length}[$idx] < $self->{avail_col_width} ) {
-            $str = $self->{list}[$idx];
-            if ( $self->{justify} == 0 ) {
-                $post = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
-            }
-            elsif ( $self->{justify} == 1 ) {
-                $pre = " " x ( $self->{avail_col_width} - $self->{length}[$idx] );
-            }
-            elsif ( $self->{justify} == 2 ) {
-                my $all = $self->{avail_col_width} - $self->{length}[$idx];
-                my $half = int( $all / 2 );
-                ( $pre, $post ) = ( " " x $half, " " x ( $all - $half ) );
-            }
-        }
-        elsif ( $self->{length}[$idx] > $self->{avail_col_width} ) {
-            if ( $self->{avail_col_width} > 6 ) {
-                $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} - 3 ) . '...';
-            }
-            else {
-                $str = cut_to_printwidth( $self->{list}[$idx], $self->{avail_col_width} );
-            }
-        }
-        else {
-            $str = $self->{list}[$idx];
-        }
-        if ( $self->{color} ) {
-            my $emphasised = ( $is_marked ? BOLD_UNDERLINE : '' ) . ( $is_current_pos ? REVERSE : '' );
-            my @color = ( $self->{orig_list}[$idx] || '' ) =~ /(\e\[[\d;]*m)/g;
-            if ( $emphasised ) {
-                for ( @color ) {
-                    # keep emphasise after color escapes
-                    $_ .= $emphasised;
-                }
-                $str = $emphasised . $pre . $str . $post . RESET;
-                if ( $is_current_pos ) {
-                    @color = ();
-                    $str =~ s/\x{feff}//g;
-                }
-            }
-            else {
-                $str = $pre . $str . $post;
-            }
-            if ( @color ) {
-                $str =~ s/\x{feff}/shift @color/ge;
-                if ( ! $emphasised ) {
-                    $str .= RESET;
-                }
-            }
-            print $str;
-        }
-        else {
-            print BOLD_UNDERLINE if $is_marked;
-            print REVERSE        if $is_current_pos;
-            print $pre . $str . $post;
-            print RESET if $is_marked || $is_current_pos;
-        }
-    }
-}
-
-
 sub __mouse_info_to_key {
     my ( $self, $abs_cursor_y, $button, $abs_mouse_x, $abs_mouse_y ) = @_;
     if ( $button == 4 ) {
@@ -1111,14 +1124,12 @@ sub __mouse_info_to_key {
 
     COL: for my $col ( 0 .. $#{$self->{rc2idx}[$row]} ) {
         my $end_this_col;
-        if ( $#{$self->{rc2idx}} == 0 ) {
+        if ( $self->{current_layout} == -1 ) {
             my $idx = $self->{rc2idx}[$row][$col];
-            $end_this_col = $end_last_col
-                          + ( defined $self->{length}[$idx] ? $self->{length}[$idx] : $self->{length_longest} )
-                          + $self->{pad};
+            $end_this_col = $end_last_col + $self->{length}[$idx] + $self->{pad};
         }
         else { #
-            $end_this_col = $end_last_col + $self->{col_width};
+            $end_this_col = $end_last_col + $self->{col_width_plus};
         }
         if ( $col == 0 ) {
             $end_this_col -= int( $self->{pad} / 2 );
@@ -1135,15 +1146,10 @@ sub __mouse_info_to_key {
     if ( ! defined $matched_col ) {
         return NEXT_get_key;
     }
-    my $return_char = '';
     if ( $button == 1 ) {
-        $return_char = KEY_ENTER;
-    }
-    elsif ( $button == 3 ) {
-        $return_char = KEY_SPACE;
-    }
-    else {
-        return NEXT_get_key;
+        $self->{pos}[ROW] = $row;
+        $self->{pos}[COL] = $matched_col;
+        return KEY_ENTER;
     }
     if ( $row != $self->{pos}[ROW] || $matched_col != $self->{pos}[COL] ) {
         my $not_pos = $self->{pos};
@@ -1151,7 +1157,12 @@ sub __mouse_info_to_key {
         $self->__wr_cell( $not_pos->[0], $not_pos->[1] );
         $self->__wr_cell( $self->{pos}[ROW], $self->{pos}[COL] );
     }
-    return $return_char;
+    if ( $button == 3 ) {
+        return KEY_SPACE;
+    }
+    else {
+        return NEXT_get_key;
+    }
 }
 
 
@@ -1171,7 +1182,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.644
+Version 1.645
 
 =cut
 
@@ -1330,7 +1341,7 @@ the C<PageUp> key (or C<Ctrl-B>) to go back one page, the C<PageDown> key (or C<
 
 =item *
 
-the C<Insert> key to go back 25 pages, the C<Delete> key to go forward 25 pages,
+the C<Insert> key to go back 10 pages, the C<Delete> key to go forward 10 pages,
 
 =item *
 
@@ -1570,8 +1581,6 @@ The replacements described in L</Modifications for the output> are not applied. 
 characters the output might break.
 
 If I<ll> is set to a value less than the length of the elements, the output could break.
-
-If the value of I<ll> is greater than the screen width, C<choose> returns immediately C<-2>.
 
 If I<ll> is set and the window size has changed, choose returns immediately C<-1>.
 

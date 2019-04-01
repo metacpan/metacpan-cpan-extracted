@@ -2,7 +2,7 @@ NAME
     Boxer - system deployment ninja tricks
 
 VERSION
-    Version v1.3.0
+    Version v1.4.0
 
 DESCRIPTION
     Framework for system deployment ninja tricks.
@@ -21,7 +21,13 @@ SEE ALSO
 
     Debian Pure Blends <https://wiki.debian.org/DebianPureBlends>
 
+    Footprintless
+
     FAI class system <https://fai-project.org/fai-guide/#defining%20classes>
+
+    Elbe commands <https://elbe-rfs.org/docs/sphinx/elbe.html>
+
+    isar <https://github.com/ilbers/isar>
 
     Debathena config-package-dev <https://debathena.mit.edu/config-packages/>
 

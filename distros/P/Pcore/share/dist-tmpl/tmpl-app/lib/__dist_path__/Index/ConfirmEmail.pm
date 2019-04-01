@@ -12,7 +12,7 @@ sub run ( $self, $req ) {
     my $accept = sub {
         $req->(
             200, [ 'Content-Type' => 'text/html' ], <<"HTML"
-                <h1><center>$l10n->{'Email address confirmed successfully'}.</center></h1>
+                <h1><center>$l10n{'Email address confirmed successfully'}.</center></h1>
 HTML
         )->finish;
 
@@ -22,7 +22,7 @@ HTML
     my $reject = sub {
         $req->(
             400, [ 'Content-Type' => 'text/html' ], <<"HTML"
-                <h1><center>$l10n->{'Token is invalid or email address is already confirmed'}.</center></h1>
+                <h1><center>$l10n{'Token is invalid or email address is already confirmed'}.</center></h1>
 HTML
         )->finish;
 

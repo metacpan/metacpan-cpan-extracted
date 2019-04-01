@@ -7,7 +7,6 @@ package Boxer::Types;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean;
 
@@ -17,16 +16,16 @@ use Type::Library -base, -declare => qw(
 	DataDir ClassDir NodeDir SkelDir Basename Suite SerializationList );
 use Type::Utils;
 use Types::Standard qw( ArrayRef Split Str Tuple StrMatch slurpy );
-use Types::Common::String qw(NonEmptySimpleStr LowerCaseSimpleStr);
+use Types::Common::String qw( NonEmptySimpleStr LowerCaseSimpleStr );
 use Types::Path::Tiny qw(Dir);
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 declare DataDir, as Dir, coercion => 1, message {
 	'Must be an existing directory containing directories for boxer classes and/or boxer nodes';

@@ -11,11 +11,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =cut
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,7 @@ sub parse_source {
         require Pg::Explain::FromXML;
         $self->{ 'top_node' } = Pg::Explain::FromXML->new()->parse_source( $source );
     }
-    elsif ( $source =~ m{ ^ (\s*) \[ \s* \n .*? \1 \] \s* \n }xms ) {
+    elsif ( $source =~ m{ ^ (\s*) \[ \s* \n .*? \1 \] \s* }xms ) {
         require Pg::Explain::FromJSON;
         $self->{ 'top_node' } = Pg::Explain::FromJSON->new()->parse_source( $source );
     }

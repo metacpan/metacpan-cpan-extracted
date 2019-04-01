@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Object;
 use Cwd ();
@@ -185,7 +185,7 @@ Variable $@ gibt den Grund an.
 
 =head4 See Also
 
-L</loadClass>()
+L<loadClass|"loadClass() - Lade Klasse, falls nicht existent">()
 
 =cut
 
@@ -529,7 +529,7 @@ sub classExists {
 
 =head4 Description
 
-Lade Klasse $class. Im Unterschied zu Methode L</use>() wird die
+Lade Klasse $class. Im Unterschied zu Methode L<use|"use() - Lade Klasse per use">() wird die
 Moduldatei nur zu laden versucht, wenn es den Namensraum (Package)
 der Klasse noch nicht gibt.
 
@@ -1532,11 +1532,11 @@ Die Liste entspricht dem Ergebnis des Aufrufs
 
 =item *
 
-L</additionalIncPaths>()
+L<additionalIncPaths|"additionalIncPaths() - Zusätzliche Modul-Suchpfade">()
 
 =item *
 
-L</incPaths>()
+L<incPaths|"incPaths() - Alle Modul-Suchpfade">()
 
 =back
 
@@ -1591,11 +1591,11 @@ Suchpfade des Perl_interpreters hinausgehen.
 
 =item *
 
-L</basicIncPaths>()
+L<basicIncPaths|"basicIncPaths() - Grundlegende Modul-Suchpfade">()
 
 =item *
 
-L</incPaths>()
+L<incPaths|"incPaths() - Alle Modul-Suchpfade">()
 
 =back
 
@@ -1636,11 +1636,11 @@ Referenz auf das Array.
 
 =item *
 
-L</basicIncPaths>()
+L<basicIncPaths|"basicIncPaths() - Grundlegende Modul-Suchpfade">()
 
 =item *
 
-L</additionalIncPaths>()
+L<additionalIncPaths|"additionalIncPaths() - Zusätzliche Modul-Suchpfade">()
 
 =back
 
@@ -1776,7 +1776,7 @@ sub removePod {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

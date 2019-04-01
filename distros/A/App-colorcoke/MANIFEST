@@ -1,7 +1,7 @@
 bin/colorcoke
-lib/App/colorcoke.pm
 Makefile.PL
 MANIFEST			This list of files
+README
 scripts/cc-blue
 scripts/cc-candybar
 scripts/cc-deeppurple

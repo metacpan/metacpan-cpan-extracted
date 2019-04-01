@@ -8,7 +8,7 @@ use warnings;
 # The first version that completely worked with newer versions of Specio.
 use Moose 2.1802 ();
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 1;
 
@@ -26,7 +26,7 @@ Markdent - An event-based Markdown parser toolkit
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ dialect is implemented is to look at one of the existing dialect classes:
 =back
 
 You'll also need to dig into the core L<Markdent::Parser::BlockParser> and
-L<Markdent::Parser::SpanParser> classes in order to see h ow these dialects
+L<Markdent::Parser::SpanParser> classes in order to see how these dialects
 interact with the core parser.
 
 =head1 DONATIONS
@@ -174,7 +174,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Speer Denis Ibaev Jason McIntosh Polina Shubina Shlomi Fish Tom Hukins
+=for stopwords Andrew Speer Denis Ibaev Jason McIntosh Polina Shubina Shlomi Fish Stefan Hornburg (Racke) Tom Hukins
 
 =over 4
 
@@ -197,6 +197,10 @@ Polina Shubina <925043@mai.com>
 =item *
 
 Shlomi Fish <shlomif@shlomifish.org>
+
+=item *
+
+Stefan Hornburg (Racke) <racke@linuxia.de>
 
 =item *
 

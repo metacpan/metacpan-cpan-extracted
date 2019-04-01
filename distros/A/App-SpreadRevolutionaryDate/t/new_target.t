@@ -24,16 +24,16 @@ has 'subcomandantes' => (is => 'ro', isa => 'ArrayRef[Str]', required => 1);
 has 'land' => (is => 'ro', isa => 'Str', required => 1);
 
 around BUILDARGS => sub {
-  my $orig = shift;
-  my $class = shift;
+  my ($orig, $class) = @_;
+
   my $io = IO::Handle->new;
-  $io->fdopen(fileno(STDOUT),"w");
+  $io->fdopen(fileno(STDOUT), "w");
   return $class->$orig(@_, obj => $io);
 };
 
 sub spread {
-  my $self = shift;
-  my $msg = shift;
+  my ($self, $msg) = @_;
+
   $self->{obj}->say("From " . $self->land . "\n$msg\nSubcomandantes " . join(', ', @{$self->subcomandantes}));
   $self->obj->flush;
 }

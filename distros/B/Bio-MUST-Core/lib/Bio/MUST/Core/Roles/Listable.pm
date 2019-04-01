@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Listable;
 # ABSTRACT: Listable Moose role for objects with implied id lists
-$Bio::MUST::Core::Roles::Listable::VERSION = '0.190690';
+$Bio::MUST::Core::Roles::Listable::VERSION = '0.190900';
 use Moose::Role;
 
 use autodie;
@@ -51,7 +51,7 @@ around qw(complete_seq_list len_mapper) => sub {
 
     # ensure that seqs are available (e.g., the object is an Ali)
     unless ( $self->can('all_seqs') ) {
-        carp 'Warning: cannot proceed without seqs; returning undef!';
+        carp '[BMC] Warning: cannot proceed without seqs; returning undef!';
         return;
     }
 
@@ -241,7 +241,7 @@ Bio::MUST::Core::Roles::Listable - Listable Moose role for objects with implied 
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package SVG::Estimate::Polygon;
-$SVG::Estimate::Polygon::VERSION = '1.0111';
+$SVG::Estimate::Polygon::VERSION = '1.0112';
 use Moo;
 use Math::Trig qw/pi/;
 use Clone qw/clone/;
@@ -12,7 +12,7 @@ SVG::Estimate::Polygon - Handles estimating shapes of more than 3 points with st
 
 =head1 VERSION
 
-version 1.0111
+version 1.0112
 
 =head1 SYNOPSIS
 
@@ -34,9 +34,9 @@ This class extends L<SVG::Estimate::Polyline>.
 around _get_pairs => sub {
     my $orig = shift;
     my $self = shift;
-    my @points = $self->$orig(@_);
-    push @points, $points[0];
-    return @points
+    my @pairs = $self->$orig(@_);
+    push @pairs, $pairs[0];
+    return @pairs
 };
 
 1;

@@ -121,8 +121,8 @@
     "\N{U+516c}\N{U+5143}",
   ],
   era_narrow => [
-    "\N{U+897f}\N{U+5143}\N{U+524d}",
-    "\N{U+897f}\N{U+5143}",
+    "\N{U+516c}\N{U+5143}\N{U+524d}",
+    "\N{U+516c}\N{U+5143}",
   ],
   era_wide => [
     "\N{U+516c}\N{U+5143}\N{U+524d}",
@@ -219,7 +219,7 @@
     "11\N{U+6708}",
     "12\N{U+6708}",
   ],
-  name => "Chinese Macau SAR China Traditional",
+  name => "Chinese Macao SAR China Traditional",
   native_language => "\N{U+4e2d}\N{U+6587}",
   native_name => "\N{U+4e2d}\N{U+6587} \N{U+4e2d}\N{U+570b}\N{U+6fb3}\N{U+9580}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340} \N{U+7e41}\N{U+9ad4}\N{U+5b57}",
   native_script => "\N{U+7e41}\N{U+9ad4}\N{U+5b57}",
@@ -262,11 +262,11 @@
     "\N{U+7b2c}4\N{U+5b63}",
   ],
   script => "Traditional",
-  territory => "Macau SAR China",
+  territory => "Macao SAR China",
   time_format_full => "ah:mm:ss [zzzz]",
   time_format_long => "ah:mm:ss [z]",
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

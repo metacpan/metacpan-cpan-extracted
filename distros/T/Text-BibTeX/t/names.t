@@ -113,9 +113,9 @@ $uname = Text::BibTeX::Name->new({binmode => 'raw'},'𝓺aa Smith, John');
 is (join('', $uname->part('von')), encode('UTF-8','𝓺aa'), "check raw mode");# 4-byte UTF-8 lowercase (U+1D4FA)
 
 
-ok ($pentry = Text::BibTeX::Entry->new($protected_test));
+ok ($pentry = Text::BibTeX::Entry->new($protected_test), "Got an Entry");
 my $pauthor = $pentry->get ('author');
-is ($pauthor, '{U.S. Department of Health and Human Services, National Institute of Mental Health, National Heart, Lung and Blood Institute}');
+is ($pauthor, '{U.S. Department of Health and Human Services, National Institute of Mental Health, National Heart, Lung and Blood Institute}', "Protected test author is correct");
 @pnames = $pentry->split ('author');
 ok (@pnames == 1 && $pnames[0] eq '{U.S. Department of Health and Human Services, National Institute of Mental Health, National Heart, Lung and Blood Institute}');
 @pnames = $pentry->names ('author');

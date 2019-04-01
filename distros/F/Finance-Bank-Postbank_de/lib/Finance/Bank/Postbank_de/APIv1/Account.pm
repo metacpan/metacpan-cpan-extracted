@@ -5,7 +5,7 @@ no warnings 'experimental::signatures';
 use feature 'signatures';
 extends 'HAL::Resource';
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 =head1 NAME
 
@@ -13,11 +13,60 @@ Finance::Bank::Postbank_de::APIv1::Account - Postbank Account
 
 =head1 SYNOPSIS
 
+    for my $account ($bp->get_accounts()) {
+        print $account->productType;
+        print $account->name;
+        print $account->iban;
+        print $account->currency;
+        print $account->amount;
+    }
+
+=head1 ACCESSORS
+
+=over 4
+
+=item *
+
+C<accountHolder>
+
+=item *
+
+=item *
+
+C<name>
+
+=item *
+
+C<iban>
+
+=item *
+
+C<currency>
+
+=item *
+
+C<amount>
+
+=item *
+
+C<productType>
+
+=back
+
 =cut
 
 has [ 'accountHolder', 'name', 'iban', 'currency', 'amount',
       'productType',
     ] => ( is => 'ro' );
+
+=head1 METHODS
+
+=head2 C<< ->transactions >>
+
+Returns the transactions in this account as a list
+of L<Finance::Bank::Postbank_de::APIv1::Transaction> objects.
+
+=cut
 
 sub transactions_future( $self ) {
     $self->fetch_resource_future( 'transactions' )->then(sub( $r ) {
@@ -40,6 +89,10 @@ sub transactions_csv_future( $self ) {
     });
 }
 
+=head2 C<< ->transactions_csv >>
+
+=cut
+
 sub transactions_csv( $self ) {
     $self->transactions_csv_future->get
 }
@@ -52,8 +105,63 @@ sub transactions_xml_future( $self ) {
     });
 }
 
+=head2 C<< ->transactions_xml >>
+
+=cut
+
 sub transactions_xml( $self ) {
     $self->transactions_xml_future->get
+}
+
+=head2 C<< ->is_depot >>
+
+Returns true if the account is a brokerage account.
+
+=cut
+
+sub is_depot( $self ) {
+    $self->productType =~ /^depot$/i
+}
+
+=head2 C<< ->is_mortgage >>
+
+Returns true if the account is a mortgage repayment account
+("Baufinanzierung").
+
+=cut
+
+sub is_mortgage( $self ) {
+    $self->productType =~ /^baufinanzierung$/i
+}
+
+=head2 C<< ->is_checking >>
+
+Returns true if the account is a simple checking account.
+
+=cut
+
+sub is_checking( $self ) {
+    $self->productType =~ /^giro$/i
+}
+
+=head2 C<< ->is_savings >>
+
+Returns true if the account is a simple savings account.
+
+=cut
+
+sub is_savings( $self ) {
+    $self->productType =~ /^spar$/i
+}
+
+=head2 C<< ->is_calldeposit >>
+
+Returns true if the account is a call deposit account.
+
+=cut
+
+sub is_calldeposit( $self ) {
+    $self->productType =~ /^tagesgeld$/i
 }
 
 1;
@@ -84,7 +192,7 @@ or via mail to L<finance-bank-postbank_de-Bugs@rt.cpan.org>.
 
 =head1 COPYRIGHT (c)
 
-Copyright 2003-2018 by Max Maischein C<corion@cpan.org>.
+Copyright 2003-2019 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

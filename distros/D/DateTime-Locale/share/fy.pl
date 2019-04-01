@@ -28,8 +28,8 @@
     MEd => "E d-M",
     MMM => "LLL",
     MMMEd => "E d MMM",
-    "MMMMW-count-one" => "'wike' W 'fan' MMM",
-    "MMMMW-count-other" => "'wike' W 'fan' MMM",
+    "MMMMW-count-one" => "'wike' W 'fan' MMMM",
+    "MMMMW-count-other" => "'wike' W 'fan' MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "d-M",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

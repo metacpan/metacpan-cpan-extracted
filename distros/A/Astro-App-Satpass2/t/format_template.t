@@ -511,6 +511,19 @@ SKIP: {
 
     load_or_skip 'DateTime::Calendar::Christian', 1;
 
+    eval {
+	require DateTime::TimeZone;
+	my $tz = DateTime::TimeZone->new( name => 'local' );
+	1;
+    } or do {
+	my $err = $@;
+	defined $err
+		or $err = 'Cannot determine local time zone';
+	chomp $err;
+	skip "$err under $^O", 1;
+    };
+
+
     $ft->template( fubar => q<[% data.date( width = '' ) %]> );
     $ft->time_formatter(
 	q<DateTime::Strftime,back_end=DateTime::Calendar::Christian> );

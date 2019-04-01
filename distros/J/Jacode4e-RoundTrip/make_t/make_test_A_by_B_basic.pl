@@ -19,7 +19,7 @@ while (<JACODE4E>) {
 }
 close(JACODE4E);
 
-my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8jp );
+my @encoding = qw( cp932x cp932 cp932ibm cp932nec sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8.1 utf8jp );
 my @io_encoding = (grep( ! /^unicode$/, @encoding), 'jef9p');
 
 my $fileno = 2001;

@@ -52,7 +52,6 @@ note("tests requiring a network connection ...\n");
 $ref = new_ok("Bib::CrossRef"); # fresh ref
 $ref->parse_text("Survey of gain-scheduling analysis and design DJ Leith, WE Leithead International journal of control 73 (11), 1001-1025");
 $r = $ref->{ref};
-#print Dumper($r);
 SKIP: {
   skip "Optional network tests", 9 unless (exists $r->{query});
   is($r->{query},"Survey of gain-scheduling analysis and design DJ Leith, WE Leithead International journal of control 73 (11), 1001-1025");
@@ -60,8 +59,8 @@ SKIP: {
   is($ref->jtitle,'International Journal of Control');
   is($ref->authcount,2);
   is($ref->auth(1),'D. J. Leith');
-  is($ref->doi,'http://dx.doi.org/10.1080/002071700411304');
-  is($ref->doi(),'http://dx.doi.org/10.1080/002071700411304');
+  is($ref->doi,'10.1080/002071700411304');
+  is($ref->doi(),'10.1080/002071700411304');
   ok($out=$ref->print('1'));
   $expected="1. article: 2000, D. J. Leith and W. E. Leithead, 'Survey of gain-scheduling analysis and design'. International Journal of Control, 73(11),pp1001-1025, DOI: 10.1080/002071700411304, http://dx.doi.org/10.1080/002071700411304";
   is($out,$expected);

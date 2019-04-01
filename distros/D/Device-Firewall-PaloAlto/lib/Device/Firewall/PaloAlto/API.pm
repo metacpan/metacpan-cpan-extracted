@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::API;
-$Device::Firewall::PaloAlto::API::VERSION = '0.1.2';
+$Device::Firewall::PaloAlto::API::VERSION = '0.1.3';
 use strict;
 use warnings;
 use 5.010;
@@ -211,7 +211,7 @@ Device::Firewall::PaloAlto::API - Palo Alto firewall API module
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 DESCRIPTION
 

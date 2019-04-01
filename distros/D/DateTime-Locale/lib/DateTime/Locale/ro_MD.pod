@@ -477,23 +477,23 @@ Romanian Moldova locale.
    1995-12-22T09:05:02 = Vin, 22 decembrie
   -0010-09-15T04:44:23 = Sâm, 15 septembrie
 
-=head3 MMMMW-count-few ('săptămâna' W 'din' MMM)
+=head3 MMMMW-count-few ('săptămâna' W 'din' MMMM)
 
-   2008-02-05T18:30:30 = săptămâna 1 din feb.
-   1995-12-22T09:05:02 = săptămâna 3 din dec.
-  -0010-09-15T04:44:23 = săptămâna 2 din sept.
+   2008-02-05T18:30:30 = săptămâna 1 din februarie
+   1995-12-22T09:05:02 = săptămâna 3 din decembrie
+  -0010-09-15T04:44:23 = săptămâna 2 din septembrie
 
-=head3 MMMMW-count-one ('săptămâna' W 'din' MMM)
+=head3 MMMMW-count-one ('săptămâna' W 'din' MMMM)
 
-   2008-02-05T18:30:30 = săptămâna 1 din feb.
-   1995-12-22T09:05:02 = săptămâna 3 din dec.
-  -0010-09-15T04:44:23 = săptămâna 2 din sept.
+   2008-02-05T18:30:30 = săptămâna 1 din februarie
+   1995-12-22T09:05:02 = săptămâna 3 din decembrie
+  -0010-09-15T04:44:23 = săptămâna 2 din septembrie
 
-=head3 MMMMW-count-other ('săptămâna' W 'din' MMM)
+=head3 MMMMW-count-other ('săptămâna' W 'din' MMMM)
 
-   2008-02-05T18:30:30 = săptămâna 1 din feb.
-   1995-12-22T09:05:02 = săptămâna 3 din dec.
-  -0010-09-15T04:44:23 = săptămâna 2 din sept.
+   2008-02-05T18:30:30 = săptămâna 1 din februarie
+   1995-12-22T09:05:02 = săptămâna 3 din decembrie
+  -0010-09-15T04:44:23 = săptămâna 2 din septembrie
 
 =head3 MMMMd (d MMMM)
 

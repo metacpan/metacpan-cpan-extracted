@@ -471,17 +471,17 @@ Uzbek Latin locale.
    1995-12-22T09:05:02 = Jum, 22-dek
   -0010-09-15T04:44:23 = Shan, 15-sen
 
-=head3 MMMMW-count-one (MMM, W-'hafta')
+=head3 MMMMW-count-one (MMMM, W-'hafta')
 
-   2008-02-05T18:30:30 = fev, 1-hafta
-   1995-12-22T09:05:02 = dek, 3-hafta
-  -0010-09-15T04:44:23 = sen, 2-hafta
+   2008-02-05T18:30:30 = fevral, 1-hafta
+   1995-12-22T09:05:02 = dekabr, 3-hafta
+  -0010-09-15T04:44:23 = sentabr, 2-hafta
 
-=head3 MMMMW-count-other (MMM, W-'hafta')
+=head3 MMMMW-count-other (MMMM, W-'hafta')
 
-   2008-02-05T18:30:30 = fev, 1-hafta
-   1995-12-22T09:05:02 = dek, 3-hafta
-  -0010-09-15T04:44:23 = sen, 2-hafta
+   2008-02-05T18:30:30 = fevral, 1-hafta
+   1995-12-22T09:05:02 = dekabr, 3-hafta
+  -0010-09-15T04:44:23 = sentabr, 2-hafta
 
 =head3 MMMMd (d-MMMM)
 

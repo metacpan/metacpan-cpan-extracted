@@ -1,0 +1,28 @@
+Source: libnet-as2-perl
+Section: perl
+Priority: optional
+Maintainer: Andrew Maguire <ajm@cpan.org>
+Build-Depends: debhelper (>= 9), quilt
+Build-Depends-Indep: libcrypt-smime-perl,
+ libdigest-sha-perl,
+ libemail-address-perl,
+ libhttp-message-perl,
+ libmime-tools-perl,
+ libwww-perl,
+ perl
+Standards-Version: 4.1.3
+Homepage: https://metacpan.org/release/Net-AS2
+
+Package: libnet-as2-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libcrypt-smime-perl,
+ libdigest-sha-perl,
+ libemail-address-perl,
+ libhttp-message-perl,
+ libmime-tools-perl,
+ libwww-perl
+Description: AS2 Protocol implementation (RFC 4130) used in Electronic Data Exchange (EDI)
+ This is a class for handling AS2 (RFC-4130) communication - sending message
+ (optionally sign and encrypt), decoding MDN. Receiving message and produce
+ corresponding MDN.

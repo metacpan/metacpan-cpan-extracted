@@ -3,11 +3,11 @@ use utf8;
 use feature qw/say/;
 use strict;
 
-use YAML;
+use YAML ();
 use File::Which ();
 use Path::Class;
 use Config;
-
+use Carp;
 use Getopt::Long ();
 
 use constant WIN32 => $^O eq 'MSWin32';
@@ -25,7 +25,7 @@ my $CONFIG = {
     updater_options  => [],
 };
 
-my $APPNAME = file($0)->basename;
+my $APPNAME;
 
 BEGIN {
     $APPNAME = file($0)->basename;
@@ -58,14 +58,14 @@ EO_USAGE
 }
 
 # Process OPTIONS
-{
+sub process_options {
     my $CPANM_OPT     = [];
     my $CUD_OPT       = [];
     my $set_cpanm_opt = sub {
         push @$CPANM_OPT, "--$_[0]=$_[1]";
     };
     my $set_both_opt = sub {
-        if ( $_[0] eq 'M' ) {
+        if ( $_[0] eq 'mirror' ) {
             push @$CPANM_OPT, "--from"   => $_[1];
             push @$CUD_OPT,   "--mirror" => $_[1];
         }
@@ -81,21 +81,17 @@ EO_USAGE
 
     my $set_debugging = sub {
         shift;    # skip option-str
-        $DEBUG{verbose} = 0;
-        $DEBUG{head}    = 1;
+        $DEBUG{head} = 0;
         my $value = shift;
         if ($value) {
             my @item = split ',', $value;
             my @bads;
             for my $i (@item) {
-                if ( $i =~ /^v(?:erbose)?(?:=(\d+))?$/ ) {
-                    $DEBUG{verbose} = defined $1 ? $1 : 1;
-                }
-                elsif ( $i =~ /^(?:fl|fakelib)(?:=(.+))?$/ ) {
+                if ( $i =~ /^(?:fl|fakelib)(?:=(.+))?$/ ) {
                     $DEBUG{fakelib} = $1 || './fakelib';
                 }
-                elsif ( $i =~ /^(?:nh|nohead)$/ ) {
-                    $DEBUG{head} = 0;
+                elsif ( $i =~ /^(?:h|head)$/ ) {
+                    $DEBUG{head} = 1;
                 }
                 elsif ( $i =~ /^(?:i|maxitem)(?:=(\d+))?/ ) {
                     $DEBUG{maxitem} = $1 || 10;
@@ -110,13 +106,6 @@ EO_USAGE
                 exit 9;
             }
         }
-        if ( $DEBUG{verbose} ) {
-            eval {
-                require Smart::Comments
-                    && Smart::Comments->import(
-                    '#' x ( $DEBUG{verbose} + 2 ) );
-            };
-        }
         if ( $DEBUG{fakelib} ) {
             ( $DEBUG{fakelib} = dir( $DEBUG{fakelib} )->absolute )
                 =~ s:\\:/:g;
@@ -128,7 +117,7 @@ EO_USAGE
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.06');
+            our $VERSION = version->declare('1.07');
             print __PACKAGE__->VERSION, $/;
             exit;
         },
@@ -143,7 +132,6 @@ EO_USAGE
         'l|local-lib=s'           => $set_both_opt,
         'L|local-lib-contained=s' => $set_both_opt,
         'mirror=s'                => $set_both_opt,
-        'M|from=s'                => $set_both_opt,
         'exclude-core'            => $set_both_opt,
         'S|sudo=s'                => $set_cpanm_opt,
         'no-sudo=s'               => $set_cpanm_opt,
@@ -200,37 +188,47 @@ my $RECFILEBASE = '.ucpandb';
     $file =~ s!\\!/!g;
     $CONFIG->{cfg_file} = $file;
 }
-if ( $DEBUG{fakelib} ) {
-    my $FAKELIB = $DEBUG{fakelib};
-    $ENV{PERL5LIB}            = "$FAKELIB/lib/perl5";
-    $ENV{PERL_LOCAL_LIB_ROOT} = $FAKELIB;
-    $ENV{PERL_MB_OPT}         = "--install_base=$FAKELIB";
-    $ENV{PERL_MM_OPT}         = "INSTALL_BASE=$FAKELIB";
-    $ENV{PERL_CPANM_HOME}     = $FAKELIB;
-    $CONFIG->{cfg_file} = file( $FAKELIB, $RECFILEBASE );
+
+sub _setup_debugger {
+    if ( $DEBUG{fakelib} ) {
+        my $FAKELIB = $DEBUG{fakelib};
+        $ENV{PERL5LIB}            = "$FAKELIB/lib/perl5";
+        $ENV{PERL_LOCAL_LIB_ROOT} = $FAKELIB;
+        $ENV{PERL_MB_OPT}         = "--install_base=$FAKELIB";
+        $ENV{PERL_MM_OPT}         = "INSTALL_BASE=$FAKELIB";
+        $ENV{PERL_CPANM_HOME}     = $FAKELIB;
+        $CONFIG->{cfg_file} = file( $FAKELIB, $RECFILEBASE );
+    }
+    if ( $DEBUG{head} ) {
+        warn "=" x 20 . " DEBUGGING MODE " . "=" x 20 . $/;
+        warn sprintf "%25s: %s$/", 'Debug Option',
+            join( ' ',
+            map {"$_=$DEBUG{$_}"}
+            grep { $_ !~ /^(?:enable|head)/ } keys %DEBUG );
+        warn sprintf "%25s: %s$/", 'Checker Option',
+            join( ' ', @{ $CONFIG->{checker_options} } );
+        warn sprintf "%25s: %s$/", 'Updater Option',
+            join( ' ', @{ $CONFIG->{updater_options} } );
+        warn sprintf "%25s: %s$/", 'Config File', $CONFIG->{cfg_file};
+    }
 }
-if ( $DEBUG{head} ) {
-    warn "=" x 20 . " DEBUGGING MODE " . "=" x 20 . $/;
-    warn sprintf "%25s: %s$/", 'Verbose Level', $DEBUG{verbose};
-    warn sprintf "%25s: %s$/", 'Debug Option',
-        join( ' ',
-        map {"$_=$DEBUG{$_}"}
-        grep { $_ !~ /^(?:enable|verbose|head)/ } keys %DEBUG );
-    warn sprintf "%25s: %s$/", 'Checker Option',
-        join( ' ', @{ $CONFIG->{checker_options} } );
-    warn sprintf "%25s: %s$/", 'Updater Option',
-        join( ' ', @{ $CONFIG->{updater_options} } );
-    warn sprintf "%25s: %s$/", 'Config File', $CONFIG->{cfg_file};
+
+sub _load_yaml {  # guard against reopen closed STDERR
+    my $file = shift;
+    open my $fh,'<',$file or carp($!),return;
+    my $got = do {local $/; <$fh>};
+    close $fh;
+    YAML::Load($got);
 }
 
 #== RECOVER MODE ==#
-if ($RECOVER) {
+sub recover_config_file {
     eval { require File::Copy } or die $@;
     *STDERR->autoflush;
 
     my $f = $CONFIG->{cfg_file};
     do { warn "$f not exist...ABORT!!"; exit; } unless -f $f;
-    my $c = YAML::LoadFile $f;
+    my $c = _load_yaml($f);
     my $count;
     for ( keys %{ $c->{SKIP} } ) {
         if ( $c->{SKIP}->{$_}->{fail_at} =~ /^(?:UNKNOWN|\?)$/ ) {
@@ -250,16 +248,18 @@ if ($RECOVER) {
     else {
         print STDERR "$f: up-to-date.";
     }
-    exit;
 }
 
-$CONFIG->{user_setting}
-    = -r $CONFIG->{cfg_file} ? YAML::LoadFile( $CONFIG->{cfg_file} ) : {};
+sub load_config {
+    $CONFIG->{user_setting}
+        = -r $CONFIG->{cfg_file} ? _load_yaml( $CONFIG->{cfg_file} ) : {};
+}
 
 #== Custom STDERR
 my $FH_ORG_STDERR;
 open $FH_ORG_STDERR, '>&STDERR';
 $FH_ORG_STDERR->autoflush;
+close STDERR unless WIN32;
 # make doing warn() correctly
 local $SIG{__WARN__} = sub {
     *STDERR = $FH_ORG_STDERR;
@@ -296,20 +296,9 @@ sub pr_white;
     };
 }
 
-#== for reporting
-my $mod_fold = sub {
-    local $_ = shift();
-    my $limit = shift();
-    my @self;
-    while ( length > $limit ) {
-        s/(.{,$limit}::)// || s/(.{,$limit-1})// || last;
-        push @self, $1;
-    }
-    return @self, $_;
-};
-
 ## common vars
 my $skip_entries;
+
 my ( $fn, $fc, $fl, $fs );
 ( $fn, $fc, $fl ) = qw/32 10 10/;
 $fs = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
@@ -317,7 +306,6 @@ my $output_format_3 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds$/},
     ($fn) x 2, ($fc) x 2, ($fl) x 2;
 my $output_format_4 = sprintf qq{%%%d.%ds %%%d.%ds %%%d.%ds %%%d.%ds$/},
     ($fn) x 2, ($fc) x 2, ($fl) x 2, ($fs) x 2;
-
 my $output_format_fold_head = "%s$/";
 
 ## set foldize
@@ -344,23 +332,22 @@ sub make_table_row {
 }
 
 ## Show Skips
-if ($SHOW_SKIPS) {
+sub show_skips {
     pr_black qq|>>> Show FAILED Modules...$/|;
-    $skip_entries = $CONFIG->{user_setting}->{SKIP};
+    my $skips = $CONFIG->{user_setting}->{SKIP};
 
     my @mods;
     @mods = sort { $a->{module} cmp $b->{module} }
         map {
-        my @a = @{ $skip_entries->{$_}->{modules} };
-        my $f = $skip_entries->{$_}->{fail_at};
+        my @a = @{ $skips->{$_}->{modules} };
+        my $f = $skips->{$_}->{fail_at};
         $_->{fail_at} = $f for @a;
         @a
-        } keys %$skip_entries;
+        } keys %$skips;
     pr_cyan
         sprintf( $output_format_4, 'Name', 'Current', 'Latest',
         'Fail at...' );
     print make_table_row($_) for @mods;
-    exit;
 }
 
 #
@@ -381,39 +368,40 @@ sub _kill_group {
 ## Phase 1: check outdated
 PHASE_1:
 
-#my @checkers = qw/cpan-outdated/;
-my @checkers       = qw/cpan-outdated/;
-my @avail_checkers = grep {$_} map { File::Which::which($_) } @checkers;
-die "Cannot find CPAN-update-checker(@checkers)" unless @avail_checkers;
-my $checker;
-for my $c (@avail_checkers) {
-    system "perl -wc $c >" . File::Spec->devnull . " 2>&1";
-    next if $?;
-    $checker = $c;
-    last;
+sub setup_checker {
+    my @checkers       = @_;
+    my @avail_checkers = grep {$_} map { File::Which::which($_) } @checkers;
+    die "Cannot find CPAN-update-checker(@checkers)" unless @avail_checkers;
+    my $checker;
+    for my $c (@avail_checkers) {
+        system "perl -wc $c >" . File::Spec->devnull . " 2>&1";
+        next if $?;
+        $checker = $c;
+        last;
+    }
+    die "No CPAN-update-checker is avail" unless $checker;
+    $CONFIG->{checker} = _build_pipecmd( $checker, qw/--verbose/,
+        @{ $CONFIG->{checker_options} } );
 }
-die "No CPAN-update-checker is avail" unless $checker;
 
-$CONFIG->{checker} = _build_pipecmd( $checker, qw/--verbose/,
-    @{ $CONFIG->{checker_options} } );
 # list of succeed & skipped
 my @skipped;
 my $num_of_upgrade;
 
-if ($LOAD) {
-    my $file = file($LOAD);
-    print "Loading update list from " . $file . " ...";
-    %outdated       = %{ YAML::LoadFile($file) };
-    $num_of_upgrade = scalar keys %outdated;
-    print " done." . $/;
-    goto PHASE_2;
-}
-pr_black qq|>>> Checking Outdated Modules...$/|;
-$skip_entries = $CONFIG->{user_setting}->{SKIP};
 ( $fn, $fc, $fl ) = qw/32 10 10/;
 $fs = $screenX - ( 2 * 3 + 1 ) - $fn - $fc - $fl;
 
-my $reader = sub {
+sub _load_outdated_from {
+    my $file = file($LOAD);
+    do { warn "$file not exist...ABORT!!"; exit; } unless -f $file;
+    print "Loading update list from " . $file . " ...";
+    %outdated       = %{ _load_yaml($file) };
+    $num_of_upgrade = scalar keys %outdated;
+    print " done." . $/;
+}
+
+my $GUARD_SELF_UPGRADE;
+sub _process_outdated {
     my ($line) = @_;
     chomp $line;
     my ( $mod, $current, $new, $file ) = split /\s+/, $line;
@@ -425,6 +413,15 @@ my $reader = sub {
     $current      = version->parse($current);
     $new          = version->parse($new);
     my $info = +{ module => $mod, current => $current, new => $new };
+    if ($dist_name eq 'App-ucpan' && WIN32) {
+        $info->{fail_at} = "self-upgrade";
+        pr_red make_table_row($info);
+        $GUARD_SELF_UPGRADE = << "EOM";
+You cannot upgrade yourself from App::ucpan on your system.
+Please run "cpanm App::ucpan" instead.
+EOM
+        return;
+    }
 # Checking SKIP ENTRIES
     if ( my $old = $skip_entries->{$dist_name} ) {
         $info->{fail_at} = $skip_entries->{$dist_name}->{fail_at} || '?';
@@ -450,13 +447,16 @@ my $reader = sub {
         };
     pr_yellow make_table_row($info);
     return;
-};
-
-pr_cyan
-    sprintf( $output_format_4, 'Name', 'Current', 'Latest', 'Fail at...' );
+}
 
 ## run cpan-outdated
-{
+sub run_checker {
+    $skip_entries = $CONFIG->{user_setting}->{SKIP};
+    pr_black qq|>>> Checking Outdated Modules...$/|;
+    pr_cyan
+        sprintf( $output_format_4, 'Name', 'Current', 'Latest',
+        'Fail at...' );
+
     my $start_time = time;
     my $checker_abort_ok;
     if ( my $pid = open my $pipe, '-|',
@@ -465,7 +465,7 @@ pr_cyan
         ## trap for cleanup children
         local $SIG{INT} = sub { _kill_group($pid); exit 3; };
         while (<$pipe>) {
-            $reader->($_);
+            _process_outdated($_);
             if ( $DEBUG{maxitem} && keys(%outdated) >= $DEBUG{maxitem} ) {
                 kill TERM => $pid;
                 waitpid $pid, 0;
@@ -488,11 +488,13 @@ pr_cyan
     elsif ( !defined $pid ) {
         die "$CONFIG->{checker} start FAILED!!";
     }
+    if ( !%outdated ) {
+        say $/, q|--- Nothing to upgrade ---|;
+        pr_red $GUARD_SELF_UPGRADE if $GUARD_SELF_UPGRADE;
+        return;
+    }
+    return 1;
 }
-if ($DUMP) {
-    YAML::DumpFile( file($DUMP), \%outdated );
-}
-exit if $CHECK_ONLY;
 
 PHASE_2:
 ## Phase 2: Upgrading
@@ -501,7 +503,6 @@ PHASE_2:
 my $count_of_upgrade;
 my $total_upgrade;
 my $total_added;
-my $phase;
 
 # set color-output
 my %pr = (
@@ -527,50 +528,44 @@ sub pr {
     $pr{DEFAULT}->(@args);
 }
 
-# skip this phase if up-to-date
-goto PHASE_3 unless %outdated;
+my $state = +{};
 
-my $cpanm_file = File::Which::which('cpanm');
-$cpanm_file =~ s/\\/\//g;
-
-# override system & symlink in App::cpanminus::script
-if (WIN32) {
-    no warnings 'once';
-    *App::cpanminus::script::system = sub {
-        my $cmd = shift;
-        $cmd .= ' 2>&1';
-        CORE::system $cmd;
-    };
-    *CORE::GLOBAL::symlink = sub {
-        my ( $org, $dest ) = @_;
-        return 1 unless ( $org || $dest );
-        ( $org, $dest ) = map file($_)->stringify, $org, $dest;
-        my $flag = '';
-        if ( -d $org ) {
-            $flag = '/J';
-            rmdir $dest;
-        }
-        !system qq{mklink $flag "$dest" "$org" >NUL};
-    };
-}
-
-#== customizing cpanm!!
-
-eval qq{require '$cpanm_file'};
-my $app = App::cpanminus::script->new;
-
-# give undef as dummy. this is needed for build argv correctly
-$app->parse_options( @{ $CONFIG->{updater_options} }, undef );
-pop @{ $app->{argv} };
-
-pr_black qq|>>> Upgrading outdated modules$/|;
-
-my @outdated = sort { lc($a) cmp lc($b) } keys %outdated;
-{
+sub run_cpanm {
     my $ORG_STDERR = \*STDERR;
-    my $state      = +{};
     my $ispace     = ' ' x 2;    # indent witdh
     my $org_m;
+    my $cpanm_file = File::Which::which('cpanm');
+    $cpanm_file =~ s/\\/\//g;
+
+# override system & symlink in App::cpanminus::script
+    if (WIN32) {
+        no warnings 'once';
+        *App::cpanminus::script::system = sub {
+            my $cmd = shift;
+            $cmd .= ' 2>&1';
+            CORE::system $cmd;
+        };
+        *CORE::GLOBAL::symlink = sub {
+            my ( $org, $dest ) = @_;
+            return 1 unless ( $org || $dest );
+            ( $org, $dest ) = map file($_)->stringify, $org, $dest;
+            my $flag = '';
+            if ( -d $org ) {
+                $flag = '/J';
+                rmdir $dest;
+            }
+            !system qq{mklink $flag "$dest" "$org" >NUL};
+        };
+    }
+
+#== customizing cpanm!!
+    eval qq{require '$cpanm_file'};
+    my $app = App::cpanminus::script->new;
+
+# give undef as dummy. this is needed for build argv correctly
+    $app->parse_options( @{ $CONFIG->{updater_options} }, undef );
+    pop @{ $app->{argv} };
+
     {
         no strict 'refs';
         $org_m
@@ -624,7 +619,6 @@ my @outdated = sort { lc($a) cmp lc($b) } keys %outdated;
         my ( $dist, $mod, $ver, $file )
             = @{ $self->resolve_name($m) }
             {qw/dist module module_version pathname/};
-### INSTALL_MODULE: +{MODULE=>$mod,DIST=>$dist,VERSION=>$ver,FILE=>$file}
         my ( $target, @mods );
         if ( !$outdated{$dist} ) {
             ($file) = $file =~ m#([^/]+/[^/]+)$#;
@@ -678,7 +672,6 @@ my @outdated = sort { lc($a) cmp lc($b) } keys %outdated;
         };
 
         if ($res) {
-### $diag_msg
             if ( $diag_msg =~ /up to date/i ) {
                 $$target->{status} = 1;
                 $total_upgrade++;
@@ -779,9 +772,13 @@ my @outdated = sort { lc($a) cmp lc($b) } keys %outdated;
         no warnings 'redefine';
         *{ 'App::cpanminus::script::' . $method } = sub { };
     }
-## run cpanm
+
     local $SIG{INT} = sub { _kill_group($$); exit 3; };
     local $ENV{HARNESS_OPTIONS} = "j$DEBUG{jobs}" if $DEBUG{jobs};
+
+    pr_black qq|>>> Upgrading outdated modules$/|;
+
+    my @outdated   = sort { lc($a) cmp lc($b) } keys %outdated;
     my $start_time = time;
     for my $key (@outdated) {
         my $file = $outdated{$key}->{file};
@@ -798,10 +795,7 @@ my @outdated = sort { lc($a) cmp lc($b) } keys %outdated;
 ## Phase 3: display SUCCESS & FAILED modules
 PHASE_3:
 
-if ( !%outdated ) {
-    say $/, q|--- Nothing to upgrade ---|;
-}
-else {
+sub show_result {
     my @success
         = map { @{ $_->{modules} } }
         delete(
@@ -823,9 +817,7 @@ else {
         pr_red qq|Fail to upgrade| . q|-| x 50 . $/;
         printf $output_format_4, "Name", "Current", "Latest", "Fail at...";
         for my $fail_mod ( keys %outdated ) {
-### require: $outdated{$fail_mod}->{modules}
             $outdated{$fail_mod}->{fail_at} //= 'UNKNOWN';
-### failed:  $outdated{$fail_mod}->{modules}
             my @od   = @{ $outdated{$fail_mod}->{modules} || [] };
             my $info = {};
             $info->{fail_at} = $outdated{$fail_mod}->{fail_at};
@@ -847,14 +839,38 @@ else {
     pr_green $total_added, $total_added > 1 ? " modules" : " module",
         " added.", $/
         if $total_added;
-    pr_red $total_fail, " module", $total_fail > 1 ? "s" : "", " FAILURE.", $/
+    pr_red $total_fail, " module", $total_fail > 1 ? "s" : "",
+        " FAILURE.", $/
         if $total_fail;
+
+    say qq|$/All Done.|;
 }
 
-_save_config();
-say qq|$/All Done.|;
+sub main {
+    process_options();
+    _setup_debugger() if $DEBUG{enable};
+    recover_config_file(), exit() if $RECOVER;
+    load_config();
+    show_skips(), exit() if $SHOW_SKIPS;
+    setup_checker(qw/cpan-outdated/);
+    if ($LOAD) {
+        _load_outdated_from($LOAD);
+    }
+    else {
+        my $status = run_checker();
+        pr_red $GUARD_SELF_UPGRADE if $CHECK_ONLY && $GUARD_SELF_UPGRADE;
+        exit if $CHECK_ONLY || !$status;
+    }
+    run_cpanm() && show_result();
+    pr_red $GUARD_SELF_UPGRADE if $GUARD_SELF_UPGRADE;
 
-exit;
+    YAML::DumpFile( file($DUMP), \%outdated ) if $DUMP;
+    save_config();
+
+    exit;
+}
+
+&main() unless caller;
 
 ## EO_MAIN_CODE
 
@@ -862,7 +878,7 @@ sub pr_spent_time {
     return unless @_;
     my ($elapsed) = @_;
     my $str = '  ' . ( $elapsed + 0 ) . 'sec.';
-    printf sprintf( '%%%d.%ds', ( $screenX - length($str) - 2 ) x 2 ), ' ';
+    printf( '%*.*s', ( $screenX - length($str) - 2 ) x 2 , '');
     pr_black $str. $/;
 }
 
@@ -872,14 +888,17 @@ sub pr_progress {
     pr( DEFAULT => ( "\b" x length $prev ) . $prev );
 }
 
-sub _save_config {
-    YAML::DumpFile( $CONFIG->{cfg_file}, $CONFIG->{user_setting} );
+sub save_config {
+    my $file = file($CONFIG->{cfg_file});
+    $file->parent->mkpath() unless -f $file->parent;
+    YAML::DumpFile( $file, $CONFIG->{user_setting} );
 }
 
 sub _build_pipecmd {
-    return [ $^X, '-e', '$|=1;' . "require '" . shift . "';", "--", @_ ];
+    return [ $^X, '-e', "\$|=1;do '" . shift . "';", "--", @_ ];
 }
 
+## helper class for foldize long module name
 {
 
     package Foldize;
@@ -1170,22 +1189,18 @@ Never list the core modules in the outdated module list.
 
 =item --mirror
 
-Works same as L<cpanm>, and also same as L<cpan-outdated>.
+Works same as L<cpanm>, and also same as L<cpan-outdated>,
+but L<cpanm> and L<cpan-outdated> have differences in the behavior of this option.
 
-See L<cpanm> for more detail.
+Note: This option follows the behavior of cpan-outdated:
 
-=over 4
+=over 2
 
-Note: This option follows the behavior of cpan-outdated: L<cpanm> can take more than one mirror, but L<cpan-outdated> only enables last one.
+=item * L<cpanm> can take more than one mirror, but L<cpan-outdated> only enables last one.
+
+=item * L<cpan-outdated> only looks at the modules list of the mirror looking for outdated modules. It does not reference metacpan's database like L<cpanm>.
 
 =back
-
-=item -M, --from
-
-Works same as L<cpanm>.
-This option also adjusts the behavior of L<cpan-outdated>.
-
-See L<cpanm> for more detail.
 
 =item --configure-timeout
 
@@ -1284,6 +1299,8 @@ The following environment variables affect this program.
 =item PERL5LIB, PERL_LOCAL_LIB_ROOT, PERL_MB_OPT, PERL_MM_OPT,
 
 =item PERL_CPANM_HOME, PERL_CPANM_OPT
+
+=item HARNESS_OPTIONS( for test environment )
 
 =back
 

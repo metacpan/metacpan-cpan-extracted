@@ -10,11 +10,11 @@ Pg::Explain::FromJSON - Parser for explains in JSON format
 
 =head1 VERSION
 
-Version 0.77
+Version 0.78
 
 =cut
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 =head1 SYNOPSIS
 
@@ -36,13 +36,23 @@ sub parse_source {
     my $source = shift;
     my $prefix = '';
 
-    unless ( $source =~ s{\A .*? ^ (\s*) ( \[ \s* \n .*? ^ \1 \] \s* \n ) .* \z}{$1$2}xms ) {
-        carp( 'Source does not match first s///' );
-        return;
-    }
-    $prefix = $1;
+    # We need to remove things before and/or after explain
+    # To do this, first - split explain into lines...
+    my @source_lines = split( /[\r\n]+/, $source );
+    my $prefix = '';
 
-    my $struct = from_json( $source );
+    # Now, find first line of explain, and cache it's prefix (some spaces ...)
+    for my $l ( @source_lines ) {
+        next unless $l =~ m{\A (\s*) \[ \s* \z }x;
+        $prefix = $1;
+    }
+
+    # Now, extract lines with explain using known prefix
+    my @use_lines = grep { /\A$prefix\[\s*\z/ .. /\A$prefix\]\s*\z/ } @source_lines;
+    my $use_source = join( "\n", @use_lines );
+
+    # And now parse the json...
+    my $struct = from_json( $use_source );
 
     my $top_node = $self->make_node_from( $struct->[ 0 ]->{ 'Plan' } );
 

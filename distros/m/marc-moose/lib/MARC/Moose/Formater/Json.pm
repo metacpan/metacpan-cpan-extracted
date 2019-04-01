@@ -1,6 +1,6 @@
 package MARC::Moose::Formater::Json;
 # ABSTRACT: Record formater into a Json representation
-$MARC::Moose::Formater::Json::VERSION = '1.0.38';
+$MARC::Moose::Formater::Json::VERSION = '1.0.39';
 use Moose;
 
 extends 'MARC::Moose::Formater';
@@ -47,7 +47,7 @@ MARC::Moose::Formater::Json - Record formater into a Json representation
 
 =head1 VERSION
 
-version 1.0.38
+version 1.0.39
 
 =head1 DESCRIPTION
 
@@ -101,7 +101,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Frédéric Demians.
+This software is copyright (c) 2019 by Frédéric Demians.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

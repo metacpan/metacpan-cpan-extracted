@@ -304,7 +304,7 @@ JS
 
                     // not authenticated
                     if (!session.is_authenticated) {
-                        Ext.toast($l10n->{'You have no permissions to access this area'}, 3000);
+                        Ext.toast($l10n{'You have no permissions to access this area'}, 3000);
 
                         return;
                     }
@@ -354,7 +354,7 @@ JS
 
             me.doChangePassword(password, token, function (res) {
                 if (res.isSuccess()) {
-                    Ext.toast($l10n->{'Password changed'}, 5000);
+                    Ext.toast($l10n{'Password changed'}, 5000);
 
                     if (cb) cb(true);
                 }
@@ -371,7 +371,7 @@ JS
 
             me.doRecoverPassword(username, function (res) {
                 if (res.isSuccess()) {
-                    Ext.toast($l10n->{'Password change instructions was sent to the email address, associated with your account.'}, 5000);
+                    Ext.toast($l10n{'Password change instructions was sent to the email address, associated with your account.'}, 5000);
 
                     if (cb) cb(true);
                 }
@@ -433,10 +433,10 @@ sub EXT_connection_error : Extend('Ext.Panel') {
         },
 
         items => [
-            { html => $l10n->{'Error connecting to the application server.'}, },
+            { html => $l10n{'Error connecting to the application server.'}, },
             {   xtype   => 'button',
                 iconCls => $FAS_REDO,
-                text    => $l10n->{'Try again.'},
+                text    => $l10n{'Try again.'},
                 handler => func ['btn'],
                 <<'JS',
                     btn.up().callback();
@@ -554,7 +554,7 @@ sub EXT_change_password_controller : Extend('Ext.app.ViewController') : Type('co
                     password1_field = form.getFields('password1');
 
                 if (password != password1_field.getValue()) {
-                    password1_field.setError($l10n->{'Passwords are not match'});
+                    password1_field.setError($l10n{'Passwords are not match'});
 
                     return;
                 }

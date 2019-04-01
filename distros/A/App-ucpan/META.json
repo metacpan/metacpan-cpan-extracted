@@ -42,15 +42,23 @@
       },
       "runtime" : {
          "requires" : {
-            "App::cpanminus" : "0",
-            "App::cpanoutdated" : "0",
             "Config" : "0",
+            "File::Copy" : "0",
             "File::Which" : "0",
+            "Getopt::Long" : "0",
             "Path::Class" : "0",
+            "Term::ANSIColor" : "0",
             "Term::ReadKey" : "0",
+            "Win32::Console::ANSI" : "0",
             "YAML" : "0",
+            "bytes" : "0",
+            "constant" : "0",
+            "feature" : "0",
             "perl" : "5.008001",
-            "version" : "0"
+            "strict" : "0",
+            "utf8" : "0",
+            "version" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -62,11 +70,11 @@
    "provides" : {
       "App::ucpan" : {
          "file" : "lib/App/ucpan.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
-   "version" : "1.06",
+   "version" : "1.07",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpanx@gmail.com>"

@@ -187,13 +187,16 @@ sub test_compute : Test(1) {
 
 # -----------------------------------------------------------------------------
 
-sub test_AUTOLOAD : Test(2) {
+sub test_AUTOLOAD : Test(3) {
     my $self = shift;
 
     my $h = Quiq::Hash->new(a=>1,b=>2,c=>3);
 
     my $val = $h->a;
     $self->is($val,1);
+
+    $h->a = 3;
+    $self->is($h->a,3);
 
     eval{$h->d};
     $self->like($@,qr/HASH-00001/);

@@ -3,37 +3,39 @@ abstract: 'Event parser for the Linux User Group Switzerland'
 author:
   - 'Steven Schubiger <schubiger@cpan.org>'
 build_requires:
-  File::Spec: 0
-  File::Temp: 0
-  FindBin: 0
-  Test::More: 0
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: LUGS-Events-Parser
 provides:
   LUGS::Events::Parser:
     file: lib/LUGS/Events/Parser.pm
-    version: 0.10
+    version: '0.11'
   LUGS::Events::Parser::Event:
     file: lib/LUGS/Events/Parser/Event.pm
-    version: 0.04
+    version: '0.04'
   LUGS::Events::Parser::Filter:
     file: lib/LUGS/Events/Parser/Filter.pm
-    version: 0.06
+    version: '0.06'
 requires:
-  Carp: 0
-  DateTime: 0
-  HTML::Entities: 0
-  HTML::Parser: 0
-  List::MoreUtils: 0
-  Params::Validate: 0
-  boolean: 0
+  Carp: '0'
+  DateTime: '0'
+  HTML::Entities: '0'
+  HTML::Parser: '0'
+  List::MoreUtils: '0'
+  Params::Validate: '0'
+  boolean: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.10
+  repository: https://github.com/stsc/LUGS-Events-Parser
+version: '0.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

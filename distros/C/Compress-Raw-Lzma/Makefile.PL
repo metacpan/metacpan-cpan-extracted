@@ -47,11 +47,33 @@ WriteMakefile(
         : ()
     ),
 
-    META_MERGE => {
-        no_index => {
-            directory => [ 't', 'private' ],
-        },
-    },    
+     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
+        ? ( META_MERGE  => {
+    
+                "meta-spec" => { version => 2 },
+
+                no_index => {
+                    directory => [ 't', 'private' ],
+                },
+
+                resources   => {
+                
+                    bugtracker  => {
+                        web     => 'https://github.com/pmqs/Compress-Raw-Lzma/issues'
+                    },
+
+                    homepage    => 'https://github.com/pmqs/Compress-Raw-Lzma',
+
+                    repository  => {
+                        type    => 'git',
+                        url     => 'git://github.com/pmqs/Compress-Raw-Lzma.git',
+                        web     => 'https://github.com/pmqs/Compress-Raw-Lzma',
+                    },        
+                },
+              } 
+            ) 
+        : ()
+    ),   
 
     ((ExtUtils::MakeMaker->VERSION() gt '6.30') ?
         ('LICENSE'  => 'perl')         : ()),    

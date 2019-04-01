@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Roles::Taxable;
 # ABSTRACT: Taxable Moose role for objects that query a taxonomy
-$Bio::MUST::Core::Roles::Taxable::VERSION = '0.190690';
+$Bio::MUST::Core::Roles::Taxable::VERSION = '0.190900';
 use Moose::Role;
 
 use autodie;
@@ -32,7 +32,7 @@ sub _build_tax {
 
     my $tax_dir = $self->tax_dir;
     unless ($tax_dir) {
-        carp 'Warning: no valid tax_dir specified; disabling taxonomy!';
+        carp '[BMC] Warning: no valid tax_dir specified; disabling taxonomy!';
         return;
     }
 
@@ -54,7 +54,7 @@ Bio::MUST::Core::Roles::Taxable - Taxable Moose role for objects that query a ta
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,11 @@
 
+1.850 10 Feb 2019
+   * Added soure to github
+     https://github.com/pmqs/DB_File
+
+   * Added .travis.yml
+
+   * Added t/meta-json.t & t/meta-yaml.t
 
 1.843 2 November 2018
 

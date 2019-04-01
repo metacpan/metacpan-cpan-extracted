@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Moose;
 use MooseX::StrictConstructor;
@@ -32,7 +32,7 @@ Markdent::Event::EndLink - An event for the end of a link
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,44 @@
+---
+abstract: "É\x90sÉ¹Ç\x9DÊ\x8CÇ\x9DÉ\x94á´\x89Î\x9B::Ê\x87xÇ\x9Dâ\x8A¥::Ç\x9DÉ¯É\x94â\x88\x80"
+author:
+  - '<ɯoɔ˙ꞁᴉɐɯɓ@ǝuᴉɯɥʇɹoʍ> (ǝuᴉɯɥʇɹoʍ)ɐpᴉɥso⅄ ᴉʞn⅄'
+build_requires:
+  Test::More: '0.98'
+  Test::More::UTF8: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Text-Viceversa
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Acme::Text::Viceversa:
+    file: lib/Acme/Text/Viceversa.pm
+    version: '0.06'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/worthmine/Acme-Text-Viceversa/issues
+  homepage: https://github.com/worthmine/Acme-Text-Viceversa
+  repository: git://github.com/worthmine/Acme-Text-Viceversa.git
+version: '0.06'
+x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'Yuki Yoshida <worthmine@gmail.com>'
+  - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
+  - 'worthmine <worthmine@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_static_install: 1

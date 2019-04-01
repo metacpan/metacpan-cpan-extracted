@@ -29,8 +29,8 @@
     MMM => "LLL",
     MMMEd => "E, d. MMM",
     MMMMEd => "E, d. MMMM",
-    "MMMMW-count-one" => "'Woche' W 'im' MMM",
-    "MMMMW-count-other" => "'Woche' W 'im' MMM",
+    "MMMMW-count-one" => "'Woche' W 'im' MMMM",
+    "MMMMW-count-other" => "'Woche' W 'im' MMMM",
     MMMMd => "d. MMMM",
     MMMd => "d. MMM",
     MMd => "d.MM.",
@@ -273,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

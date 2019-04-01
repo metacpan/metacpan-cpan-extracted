@@ -144,7 +144,7 @@ sub _lookup_org_entries {
 	return $self;
     }
 
-    my $json = decode_json($mech->text);
+    my $json = decode_json($mech->content(format=>'text'));
 
     if ($json) {
 	$self->raw_json_decoded($json);

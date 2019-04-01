@@ -1,5 +1,10 @@
 Revision history for CGI::Fast
 
+2.15 2019-03-29
+    [FIX]
+    - ensure upload hooks are passed to CGI.pm constructor
+     (GH #19, thanks to ikegami)
+
 2.14 2019-03-26
     [DOCUMENTATION]
     - Add a link to the "you probably shouldn't use CGI.pm" docs

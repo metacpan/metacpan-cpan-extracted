@@ -477,23 +477,23 @@ Afrikaans South Africa locale.
    1995-12-22T09:05:02 = Vr. 22 Desember
   -0010-09-15T04:44:23 = Sa. 15 September
 
-=head3 MMMMW-count-one ('week' W 'van' MMM)
+=head3 MMMMW-count-one ('week' W 'van' MMMM)
 
-   2008-02-05T18:30:30 = week 1 van Feb.
-   1995-12-22T09:05:02 = week 3 van Des.
-  -0010-09-15T04:44:23 = week 2 van Sep.
+   2008-02-05T18:30:30 = week 1 van Februarie
+   1995-12-22T09:05:02 = week 3 van Desember
+  -0010-09-15T04:44:23 = week 2 van September
 
-=head3 MMMMW-count-other ('week' W 'van' MMM)
+=head3 MMMMW-count-other ('week' W 'van' MMMM)
 
-   2008-02-05T18:30:30 = week 1 van Feb.
-   1995-12-22T09:05:02 = week 3 van Des.
-  -0010-09-15T04:44:23 = week 2 van Sep.
+   2008-02-05T18:30:30 = week 1 van Februarie
+   1995-12-22T09:05:02 = week 3 van Desember
+  -0010-09-15T04:44:23 = week 2 van September
 
-=head3 MMMMd (d MMM)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = 5 Feb.
-   1995-12-22T09:05:02 = 22 Des.
-  -0010-09-15T04:44:23 = 15 Sep.
+   2008-02-05T18:30:30 = 5 Februarie
+   1995-12-22T09:05:02 = 22 Desember
+  -0010-09-15T04:44:23 = 15 September
 
 =head3 MMMd (d MMM)
 

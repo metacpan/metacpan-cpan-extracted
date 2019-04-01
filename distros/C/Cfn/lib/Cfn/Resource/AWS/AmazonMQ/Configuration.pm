@@ -1,4 +1,4 @@
-# AWS::AmazonMQ::Configuration generated from spec 2.20.0
+# AWS::AmazonMQ::Configuration generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AmazonMQ::Configuration',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::AmazonMQ::Configuration {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AmazonMQ::Configuration', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'Arn','Id','Revision' ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 

@@ -13,7 +13,7 @@ use constant skip  => true;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.62';
+our $VERSION = '1.63';
 
 our (%init,
      %timespan,
@@ -4038,6 +4038,48 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
          { truncate_to => [q(day)] },
        ],
     ],
+    variant_quarter => [
+       [ 'REGEXP', 'SCALAR' ],
+       [
+         { 0 => qr/^(last)$/i, 1 => 'quarter' },
+         [],
+         [],
+         [
+           [
+             { 0 => [ $flag{last_this_next} ] },
+           ],
+         ],
+         [ { unit => 'month' } ],
+         [ '_variant_quarter' ],
+         { truncate_to => [q(day)] },
+       ],
+       [
+         { 0 => qr/^(this)$/i, 1 => 'quarter' },
+         [],
+         [],
+         [
+           [
+             { 0 => [ $flag{last_this_next} ] },
+           ],
+         ],
+         [ { unit => 'month' } ],
+         [ '_variant_quarter' ],
+         { truncate_to => [q(day)] },
+       ],
+       [
+         { 0 => qr/^(next)$/i, 1 => 'quarter' },
+         [],
+         [],
+         [
+           [
+             { 0 => [ $flag{last_this_next} ] },
+           ],
+         ],
+         [ { unit => 'month' } ],
+         [ '_variant_quarter' ],
+         { truncate_to => [q(day)] },
+       ],
+    ],
 );
 
 1;
@@ -4119,6 +4161,9 @@ also parsable with precision in seconds):
  last month
  this month
  next month
+ last quarter
+ this quarter
+ next quarter
  last year
  this year
  next year

@@ -11,13 +11,16 @@ WriteMakefile(
     PREREQ_PM => {
         'Capture::Tiny' => '0',
         'File::Basename' => '0',
+        'File::Spec' => '0',
+        'File::Temp' => '0',
+        'ExtUtils::ParseXS' => '3.35',
     },
     TEST_REQUIRES  => {
         'Capture::Tiny' => '0',
         'Module::Build' => '0',
+        'ExtUtils::CBuilder' => '0.280231',
         'ExtUtils::MakeMaker' => '0',
         'Test::More' => '0.88',
-        'File::Spec' => '0',
         'ExtUtils::Manifest' => '0',
         'Fatal' => '0',
         'Cwd' => '0',
@@ -27,6 +30,7 @@ WriteMakefile(
     META_MERGE => {
       "meta-spec" => { version => 2 },
       resources => {
+        bugtracker => { web => 'https://github.com/tsee/extutils-cppguess/issues' },
         repository => {
           type => 'git',
           url => 'git://github.com/tsee/extutils-cppguess',

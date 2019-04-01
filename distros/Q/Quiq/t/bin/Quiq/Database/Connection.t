@@ -59,7 +59,15 @@ our @PersonTitles = qw/per_id per_vorname per_nachname/;
 sub test_new_startup : Startup(8) {
     my ($self,$udl) = @_;
 
-    # diag $udl;
+    # $self->diag("### $udl ###");
+
+    my $udlObj = Quiq::Udl->new($udl);
+    if ($udlObj->dbms eq 'sqlite') {
+        # Um Permission-Probleme bei CPAN-Tests zu vermeiden
+
+        my $file = $udlObj->db;
+        Quiq::Path->chmod($file,0600);
+    }
 
     # Datenbankverbindung aufbauen
 
@@ -547,6 +555,9 @@ sub test_dbms : Test(1) {
     elsif ($db->isAccess) {
         $self->is($dbms,'Access');
     }
+    elsif ($db->isMSSQL) {
+        $self->is($dbms,'MSSQL');
+    }
     else {
         $self->ok(0);
     }
@@ -626,6 +637,18 @@ sub test_isAccess : Test(1) {
 
     my $bool = $db->isAccess;
     $self->ok($dbms eq 'access'? $bool: !$bool);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isMSSQL : Test(1) {
+    my ($self,$udl) = @_;
+
+    my $dbms = Quiq::Udl->new($udl)->dbms;
+    my $db = $self->get('db');
+
+    my $bool = $db->isMSSQL;
+    $self->ok($dbms eq 'mssql'? $bool: !$bool);
 }
 
 # -----------------------------------------------------------------------------

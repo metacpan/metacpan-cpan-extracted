@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
-$Bio::MUST::Core::Tree::VERSION = '0.190690';
+$Bio::MUST::Core::Tree::VERSION = '0.190900';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -252,7 +252,7 @@ sub match_branch_lengths {
     }
 
     # ensure that bipartitions matching proceeded as expected
-    carp 'Warning: cannot match all bipartitions; returning useless hash!'
+    carp '[BMC] Warning: cannot match all bipartitions; returning useless hash!'
         unless List::AllUtils::all {
             @{ $blens_for{$_} } == 2
         } keys %blens_for;
@@ -472,7 +472,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

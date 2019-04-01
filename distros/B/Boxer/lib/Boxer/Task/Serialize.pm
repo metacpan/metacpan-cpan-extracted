@@ -7,7 +7,6 @@ package Boxer::Task::Serialize;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie;
@@ -18,18 +17,19 @@ use Boxer::File::WithSkeleton;
 
 use Moo;
 use MooX::StrictConstructor;
+extends qw(Boxer::Task);
+
 use Types::Standard qw( Bool Maybe Str Undef InstanceOf );
 use Types::Path::Tiny qw( Dir File Path );
 use Boxer::Types qw( SkelDir SerializationList );
-extends 'Boxer::Task';
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 has world => (
 	is       => 'ro',
@@ -46,31 +46,31 @@ has skeldir => (
 has infile => (
 	is     => 'ro',
 	isa    => File,
-	coerce => File->coercion,
+	coerce => 1,
 );
 
 has altinfile => (
 	is     => 'ro',
 	isa    => File,
-	coerce => File->coercion,
+	coerce => 1,
 );
 
 has outdir => (
 	is     => 'ro',
 	isa    => Dir,
-	coerce => Dir->coercion,
+	coerce => 1,
 );
 
 has outfile => (
 	is     => 'ro',
 	isa    => Path,
-	coerce => Path->coercion,
+	coerce => 1,
 );
 
 has altoutfile => (
 	is     => 'ro',
 	isa    => Path,
-	coerce => Path->coercion,
+	coerce => 1,
 );
 
 has node => (
@@ -100,24 +100,34 @@ sub run
 	my $world = $self->world->flatten( $self->node, $self->nonfree, );
 
 	if ( grep( /^preseed$/, @{ $self->format } ) ) {
-		my $file = Boxer::File::WithSkeleton->new(
+		my @args = (
 			basename      => 'preseed.cfg',
 			skeleton_dir  => $self->skeldir,
 			skeleton_path => $self->infile,
 			file_dir      => $self->outdir,
 			file_path     => $self->outfile,
 		);
+		$self->_logger->info(
+			'Serializing to preseed',
+			$self->_logger->is_debug() ? {@args} : (),
+		);
+		my $file = Boxer::File::WithSkeleton->new(@args);
 		$world->as_file($file);
 	}
 
 	if ( grep( /^script$/, @{ $self->format } ) ) {
-		my $file = Boxer::File::WithSkeleton->new(
+		my @args = (
 			basename      => 'script.sh',
 			skeleton_dir  => $self->skeldir,
 			skeleton_path => $self->altinfile,
 			file_dir      => $self->outdir,
 			file_path     => $self->altoutfile,
 		);
+		$self->_logger->info(
+			'Serializing to script',
+			$self->_logger->is_debug() ? {@args} : (),
+		);
+		my $file = Boxer::File::WithSkeleton->new(@args);
 		$world->as_file( $file, 1 );
 	}
 

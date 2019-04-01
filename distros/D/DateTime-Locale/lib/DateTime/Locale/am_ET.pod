@@ -477,17 +477,11 @@ Amharic Ethiopia locale.
    1995-12-22T09:05:02 = ዓርብ፣ ዲሴምበር 22
   -0010-09-15T04:44:23 = ቅዳሜ፣ ሴፕቴምበር 15
 
-=head3 MMMMW-count-one ('week' W 'of' MMM)
+=head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of ፌብሩ
-   1995-12-22T09:05:02 = week 3 of ዲሴም
-  -0010-09-15T04:44:23 = week 2 of ሴፕቴ
-
-=head3 MMMMW-count-other ('week' W 'of' MMM)
-
-   2008-02-05T18:30:30 = week 1 of ፌብሩ
-   1995-12-22T09:05:02 = week 3 of ዲሴም
-  -0010-09-15T04:44:23 = week 2 of ሴፕቴ
+   2008-02-05T18:30:30 = week 1 of ፌብሩወሪ
+   1995-12-22T09:05:02 = week 3 of ዲሴምበር
+  -0010-09-15T04:44:23 = week 2 of ሴፕቴምበር
 
 =head3 MMMMd (MMMM d)
 
@@ -608,12 +602,6 @@ Amharic Ethiopia locale.
    2008-02-05T18:30:30 = 1ኛው ሩብ 2008
    1995-12-22T09:05:02 = 4ኛው ሩብ 1995
   -0010-09-15T04:44:23 = 3ኛው ሩብ -10
-
-=head3 yw-count-one ('week' w 'of' Y)
-
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
 
 =head3 yw-count-other ('week' w 'of' Y)
 

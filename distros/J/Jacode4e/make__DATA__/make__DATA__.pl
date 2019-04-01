@@ -2,7 +2,7 @@
 #
 # make__DATA__.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
@@ -16,8 +16,11 @@ require 'EBCDIC/EBCDIC_FUJITSU_by_JIS8.pl';
 require 'EBCDIC/EBCDIC_NEC_by_JIS8.pl';
 require 'Unicode/Unicode_by_CP932.pl';
 require 'UTF8/UTF8_by_Unicode.pl';
+require 'UTF8.1/UTF8.1_by_Unicode.pl';
 require 'CP932X/CP932X_by_Unicode.pl';
 require 'CP932/CP932_by_Unicode.pl';
+require 'CP932IBM/CP932IBM_by_Unicode.pl';
+require 'CP932NEC/CP932NEC_by_Unicode.pl';
 require 'ShiftJIS2004/ShiftJIS2004_by_Unicode.pl';
 require 'CP00930/make_CP00930.pl';
 require 'KEIS/make_KEIS78.pl';
@@ -32,25 +35,28 @@ binmode(STDOUT);
 
 print STDOUT <<'COMMENT';
 __DATA__
-############################################################################################
+###################################################################################################################
 # Jacode4e table
-############################################################################################
-#+++++++------------------------------------------------------------------------------------ CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-#||||||| ++++------------------------------------------------------------------------------- Microsoft CP932, IANA Windows-31J
-#||||||| |||| ++++-------------------------------------------------------------------------- JISC Shift_JIS-2004
-#||||||| |||| |||| ++++--------------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-#||||||| |||| |||| |||| ++++---------------------------------------------------------------- HITACHI KEIS78
-#||||||| |||| |||| |||| |||| ++++----------------------------------------------------------- HITACHI KEIS83
-#||||||| |||| |||| |||| |||| |||| ++++------------------------------------------------------ HITACHI KEIS90
-#||||||| |||| |||| |||| |||| |||| |||| ++++------------------------------------------------- FUJITSU JEF
-#||||||| |||| |||| |||| |||| |||| |||| |||| ++++-------------------------------------------- NEC JIPS(J)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------- NEC JIPS(E)
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------- UNISYS LetsJ
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------ Unicode
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++----------- UTF-8
-#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
-#2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 12345678
-#VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVV
+###################################################################################################################
+#+++++++----------------------------------------------------------------------------------------------------------- CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+#||||||| ++++------------------------------------------------------------------------------------------------------ Microsoft CP932, IANA Windows-31J
+#||||||| |||| ++++------------------------------------------------------------------------------------------------- IBM CP932
+#||||||| |||| |||| ++++-------------------------------------------------------------------------------------------- NEC CP932
+#||||||| |||| |||| |||| ++++--------------------------------------------------------------------------------------- JISC Shift_JIS-2004
+#||||||| |||| |||| |||| |||| ++++---------------------------------------------------------------------------------- IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+#||||||| |||| |||| |||| |||| |||| ++++----------------------------------------------------------------------------- HITACHI KEIS78
+#||||||| |||| |||| |||| |||| |||| |||| ++++------------------------------------------------------------------------ HITACHI KEIS83
+#||||||| |||| |||| |||| |||| |||| |||| |||| ++++------------------------------------------------------------------- HITACHI KEIS90
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| ++++-------------------------------------------------------------- FUJITSU JEF
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++--------------------------------------------------------- NEC JIPS(J)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++---------------------------------------------------- NEC JIPS(E)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ++++----------------------------------------------- UNISYS LetsJ
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| +++++++++------------------------------------- Unicode
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| ++++++++++++------------------------ UTF-8.0 (aka UTF-8)
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| ++++++++++++----------- UTF-8.1
+#||||||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| |||| ||||||||| |||||||||||| |||||||||||| ++++++++-- UTF-8-SPUA-JP, JIS X 0213 on SPUA ordered by JIS level, plane, row, cell
+#2345678 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 1234 123456789 123456789012 123456789012 12345678
+#VVVVVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVV VVVVVVVVV VVVVVVVVVVVV VVVVVVVVVVVV VVVVVVVV
 COMMENT
 
 my $spua_jp = 0xF0000;
@@ -73,19 +79,22 @@ for my $jis8 (qw(
     F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 FA FB FC FD FE FF
 )) {
     my $data = join("", map { sprintf($_->[1],$_->[0]) }
-        [(                                 $jis8   || '  ----  ') => '%-8s ' ], # CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-        [(                                 $jis8   || ' -- '    ) => '%-4s ' ], # CP932
-        [(                                 $jis8   || ' -- '    ) => '%-4s ' ], # Shift_JIS-2004
-        [(EBCDIC_IBM_CPGID00290_by_JIS8   ($jis8)  || ' -- '    ) => '%-4s ' ], # IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
-        [(EBCDIK_HITACHI_by_JIS8          ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS78
-        [(EBCDIK_HITACHI_by_JIS8          ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS83
-        [(EBCDIK_HITACHI_by_JIS8          ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS90
-        [(EBCDIC_FUJITSU_by_JIS8          ($jis8)  || ' -- '    ) => '%-4s ' ], # FUJITSU JEF
-        [(                                 $jis8   || ' -- '    ) => '%-4s ' ], # NEC JIPS(J)
-        [(EBCDIC_NEC_by_JIS8              ($jis8)  || ' -- '    ) => '%-4s ' ], # NEC JIPS(E)
-        [(                                 $jis8   || ' -- '    ) => '%-4s ' ], # UNISYS LetsJ
-        [(Unicode_by_CP932                ($jis8)  || ' --- '   ) => '%-9s ' ], # Unicode
-        [(UTF8_by_Unicode(Unicode_by_CP932($jis8)) || '  --  '  ) => '%-12s '], # UTF-8
+        [(                                   $jis8   || '  ----  ') => '%-8s ' ], # CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # Microsoft CP932, IANA Windows-31J
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # IBM CP932
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # NEC CP932
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # Shift_JIS-2004
+        [(EBCDIC_IBM_CPGID00290_by_JIS8     ($jis8)  || ' -- '    ) => '%-4s ' ], # IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
+        [(EBCDIK_HITACHI_by_JIS8            ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS78
+        [(EBCDIK_HITACHI_by_JIS8            ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS83
+        [(EBCDIK_HITACHI_by_JIS8            ($jis8)  || ' -- '    ) => '%-4s ' ], # HITACHI KEIS90
+        [(EBCDIC_FUJITSU_by_JIS8            ($jis8)  || ' -- '    ) => '%-4s ' ], # FUJITSU JEF
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # NEC JIPS(J)
+        [(EBCDIC_NEC_by_JIS8                ($jis8)  || ' -- '    ) => '%-4s ' ], # NEC JIPS(E)
+        [(                                   $jis8   || ' -- '    ) => '%-4s ' ], # UNISYS LetsJ
+        [(Unicode_by_CP932                  ($jis8)  || ' --- '   ) => '%-9s ' ], # Unicode
+        [(UTF8_by_Unicode(Unicode_by_CP932  ($jis8)) || '  --  '  ) => '%-12s '], # UTF-8.0 (aka UTF-8)
+        [(UTF8p1_by_Unicode(Unicode_by_CP932($jis8)) || '  --  '  ) => '%-12s '], # UTF-8.1
     );
     print $data;
     print STDOUT UTF8_by_Unicode(sprintf('%05X', $spua_jp));
@@ -113,6 +122,8 @@ for my $jis8 (qw(
 my %unicode = map { $_ => 1 } (
     keys_of_CP932X_by_Unicode(),
     keys_of_CP932_by_Unicode(),
+    keys_of_CP932IBM_by_Unicode(),
+    keys_of_CP932NEC_by_Unicode(),
     keys_of_ShiftJIS2004_by_Unicode(),
     keys_of_CP00930_by_Unicode(),
     keys_of_KEIS78_by_Unicode(),
@@ -130,7 +141,9 @@ for my $unicode (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys %unico
     $data{CP932X_by_Unicode($unicode)} = 
         join("", map { sprintf($_->[1],$_->[0]) }
         [(CP932X_by_Unicode      ($unicode) || '  ----  ') => '%-8s ' ], # CP932X, Extended CP932 to JIS X 0213 using 0x9C5A as single shift
-        [(CP932_by_Unicode       ($unicode) || ' -- '    ) => '%-4s ' ], # CP932
+        [(CP932_by_Unicode       ($unicode) || ' -- '    ) => '%-4s ' ], # Microsoft CP932, IANA Windows-31J
+        [(CP932IBM_by_Unicode    ($unicode) || ' -- '    ) => '%-4s ' ], # IBM CP932
+        [(CP932NEC_by_Unicode    ($unicode) || ' -- '    ) => '%-4s ' ], # NEC CP932
         [(ShiftJIS2004_by_Unicode($unicode) || ' -- '    ) => '%-4s ' ], # Shift_JIS-2004
         [(CP00930_by_Unicode     ($unicode) || ' -- '    ) => '%-4s ' ], # IBM CP00930(CP00290+CP00300), CCSID 5026 katakana
         [(KEIS78_by_Unicode      ($unicode) || ' -- '    ) => '%-4s ' ], # HITACHI KEIS78
@@ -141,7 +154,8 @@ for my $unicode (sort { (length($a) <=> length($b)) || ($a cmp $b) } keys %unico
         [(JIPSE_by_Unicode       ($unicode) || ' -- '    ) => '%-4s ' ], # NEC JIPS(E)
         [(LetsJ_by_Unicode       ($unicode) || ' -- '    ) => '%-4s ' ], # UNISYS LetsJ
         [(                        $unicode  || ' --- '   ) => '%-9s ' ], # Unicode
-        [(UTF8_by_Unicode        ($unicode) || '  --  '  ) => '%-12s '], # UTF-8
+        [(UTF8_by_Unicode        ($unicode) || '  --  '  ) => '%-12s '], # UTF-8.0 (aka UTF-8)
+        [(UTF8p1_by_Unicode      ($unicode) || '  --  '  ) => '%-12s '], # UTF-8.1
     );
     $char{CP932X_by_Unicode($unicode)} = pack('H*', UTF8_by_Unicode($unicode));
 }
@@ -639,9 +653,9 @@ for my $cp932x (@cp932x_full) {
 }
 
 print STDOUT <<COMMENT;
-############################################################################################
+###################################################################################################################
 # End of table
-############################################################################################
+###################################################################################################################
 COMMENT
 
 1;

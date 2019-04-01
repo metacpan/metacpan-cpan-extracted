@@ -2,6 +2,9 @@ This directory contains example scripts using PPIx::Regexp. Specifically:
 
 README - is this file.
 
+find-variable-length-lookarounds - is a script that examines Perl files
+    looking for variable-length lookarounds.
+
 interpolated - is a script that takes as its arguments a list of files
     and/or directories, and lists all Perl regular expressions which
     interpolate. If the -once option is asserted, only those expressions

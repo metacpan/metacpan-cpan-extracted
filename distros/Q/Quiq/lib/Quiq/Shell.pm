@@ -9,7 +9,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Time::HiRes ();
 use Quiq::Option;
@@ -207,7 +207,7 @@ Liefere Ausgabe auf stdout und stderr getrennt.
 
 =back
 
-Für Beispiele siehe Abschnitt L</exec/Examples>.
+Für Beispiele siehe Abschnitt ""exec/Examples"".
 
 =item -quiet => $bool (Default: 0)
 
@@ -411,7 +411,8 @@ für den gesamten Prozess, nicht nur für das Shell-Objekt.
 # -----------------------------------------------------------------------------
 
 sub cd {
-    my ($self,$dir) = @_;
+    my $self = shift;
+    my $dir = Quiq::Path->expandTilde(shift);
 
     my $dryRun = $self->{'dryRun'};
     my $log = $self->{'log'};
@@ -587,7 +588,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

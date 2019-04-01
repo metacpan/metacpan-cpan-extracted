@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Time::RFC822;
 
@@ -53,7 +53,7 @@ nimmt der Browser den Pfad des URL an.
 
 Verfallszeitpunkt des Cookie nach RFC822 im Format
 "Wdy, DD Mon YYYY HH:MM:SS GMT" oder mit einer Zeitangabe nach
-Quiq::Time::RFC822 (siehe Abschnitt L</EXAMPLES>). Fehlt die Angabe,
+Quiq::Time::RFC822 (siehe Abschnitt L<EXAMPLES|"EXAMPLES">). Fehlt die Angabe,
 verfällt der Cookie mit dem Schließen des Browsers.
 
 =item secure => $bool (optional)
@@ -90,7 +90,7 @@ Cookie-Spezifikation von Netscape
     __END__
     Set-Cookie: sid=4711; expires=Fri, 11-Nov-2012 12:24:12 GMT
 
-Die Angabe '+1y' wird von Methode L</asString>() durch Aufruf
+Die Angabe '+1y' wird von Methode L<asString|"asString() - Generiere Zeichenketten-Repräsentation">() durch Aufruf
 von Quiq::Time::RFC822->get() in eine gültige RFC822-Datumsangabe
 gewandelt. Weitere abkürzende Schreibweisen siehe dort.
 
@@ -113,7 +113,7 @@ Referenz auf das Cookie-Objekt.
 Instantiiere einen Cookie mit Name $name, Wert $value und den
 optionalen Attributen @keyVal.
 
-Siehe Abschnitt L</ATTRIBUTES> für mögliche Werte für @keyVal.
+Siehe Abschnitt L<ATTRIBUTES|"ATTRIBUTES"> für mögliche Werte für @keyVal.
 
 =cut
 
@@ -199,7 +199,7 @@ ohne Semikolon, Komma, Gleichheitszeichen und Leerzeichen bestehen.
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

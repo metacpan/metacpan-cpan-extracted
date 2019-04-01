@@ -10,6 +10,7 @@ my $arango = Arango::DB->new( );
 clean_test_environment($arango);
 
 my $db = $arango->create_database("tmp_");
+
 my $collection = $db->create_collection("collection");
 
 $collection->create_document( { Hello => 'World' });

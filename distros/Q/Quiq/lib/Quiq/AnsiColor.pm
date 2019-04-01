@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Term::ANSIColor ();
 
@@ -120,7 +120,7 @@ sub new {
 
 =head2 Objektmethoden
 
-=head3 active() - Farbdarstellung eingeschaltet
+=head3 active() - Farbdarstellung eingeschaltet?
 
 =head4 Synopsis
 
@@ -157,7 +157,7 @@ sub active {
 =item $attr
 
 Attribut-Spezifikation gemäß Term::ANSIColor (siehe auch
-L</Terminal-Eigenschaften>).
+L<Terminal-Eigenschaften|"Terminal-Eigenschaften">).
 
 =item $str
 
@@ -196,7 +196,7 @@ sub str {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

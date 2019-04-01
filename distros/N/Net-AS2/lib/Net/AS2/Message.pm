@@ -1,6 +1,9 @@
-package Net::AS2::Message 1.0;
+package Net::AS2::Message;
+
 use strict;
 use warnings;
+
+our $VERSION = '1.0101'; # VERSION
 
 =head1 NAME
 
@@ -26,7 +29,7 @@ my $crlf = "\x0d\x0a";
 
 =over 4
 
-=item Net::AS2::Message->new($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg)
+=item Net::AS2::Message->new($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg, $filename)
 
 Create a new AS2 message.
 
@@ -34,17 +37,18 @@ Create a new AS2 message.
 
 sub new
 {
-    my ($class, $message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg) = @_;
+    my ($class, $message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg, $filename) = @_;
 
     my $self = $class->_create_message($message_id, $async_url, $should_mdn_sign);
     $self->{success} = 1;
     $self->{content} = $content;
     $self->{mic} = $mic;
     $self->{mic_alg} = $mic_alg;
+    $self->{filename} = $filename;
     return $self;
 }
 
-=item Net::AS2::Message->create_error_message($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg)
+=item Net::AS2::Message->create_error_message($message_id, $async_url, $should_mdn_sign, $status_text, $plain_text)
 
 Create a new AS2 'error' message.
 
@@ -52,12 +56,13 @@ Create a new AS2 'error' message.
 
 sub create_error_message
 {
-    my $self = _create_message(@_);
+    my ($class, @args) = @_;
+    my $self = $class->_create_message(@args);
     $self->{error} = 1;
     return $self;
 }
 
-=item Net::AS2::Message->create_failure_message($message_id, $async_url, $should_mdn_sign, $mic, $content, $mic_alg)
+=item Net::AS2::Message->create_failure_message($message_id, $async_url, $should_mdn_sign, $status_text, $plain_text)
 
 Create a new AS2 'failure' message.
 
@@ -65,7 +70,8 @@ Create a new AS2 'failure' message.
 
 sub create_failure_message
 {
-    my $self = _create_message(@_);
+    my ($class, @args) = @_;
+    my $self = $class->_create_message(@args);
     $self->{failure} = 1;
     return $self;
 }
@@ -97,7 +103,7 @@ sub create_from_serialized_state
 {
     my ($class, $state) = @_;
 
-    my ($version, $status, $message_id, $mic, $mic_alg, $async_url, $should_mdn_sign, $status_text, $plain_text)
+    my ($version, $status, $message_id, $mic, $mic_alg, $async_url, $should_mdn_sign, $status_text, $plain_text, $filename)
         = split(/\n/, $state);
     croak "Net::AS2::Message state version is not supported"
         unless defined $version && $version eq 'v1' && defined $plain_text;
@@ -109,13 +115,14 @@ sub create_from_serialized_state
             $status eq '-1' ? ( error => 1 ) :
             ( failure => 1 )
         ),
-        message_id => $message_id,
-        mic => $mic,
-        mic_alg => $mic_alg,
-        status_text => $status_text,
+        message_id      => $message_id,
+        mic             => $mic,
+        mic_alg         => $mic_alg,
+        status_text     => $status_text,
         should_mdn_sign => $should_mdn_sign,
-        plain_text => $plain_text,
-        async_url => $async_url
+        plain_text      => $plain_text,
+        async_url       => $async_url,
+        filename        => $filename,
     };
     bless ($self, $class);
 
@@ -205,6 +212,16 @@ This is only defined when C<is_success> is true.
 
 sub mic_alg { return (shift)->{mic_alg}; }
 
+=item $msg->filename
+
+Returns the content-disposition filename parameter of the message, if any.
+
+This is only defined when C<is_success> is true.
+
+=cut
+
+sub filename { return (shift)->{filename}; }
+
 =item $msg->error_status_text
 
 Dedicated short error text that should goes into machine readable report in the MDN.
@@ -245,12 +262,13 @@ sub serialized_state {
         'v1',
         $self->is_success ? 1 : $self->is_error ? -1 : -2,
         $self->{message_id},
-        $self->{mic} // '',
-        $self->{mic_alg} // 'sha1',
-        $self->{async_url} // '',
+        $self->{mic}             // '',
+        $self->{mic_alg}         // 'sha1',
+        $self->{async_url}       // '',
         $self->{should_mdn_sign} // '',
-        $self->{status_text} // '',
-        $self->{plain_text} // ''
+        $self->{status_text}     // '',
+        $self->{plain_text}      // '',
+        $self->{filename}        // '',
     );
 }
 
@@ -271,7 +289,7 @@ sub notification_options_check
     my ($options) = @_;
     foreach (split(/;/, $options))
     {
-        my ($key, $value) = $_ =~ /^\s*(.+?)\s*=\s*(.+?)\s*$/;
+        my ($key, $value) = (/^\s*(.+?)\s*=\s*(.+?)\s*$/);
         my ($requireness, @values) = lc($value) =~ /\s*(.+?)\s*(?:,|$)/g;
 
         if (lc($key) eq 'signed-receipt-protocol') {

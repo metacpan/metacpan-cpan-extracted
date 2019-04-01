@@ -1,5 +1,11 @@
 Revision history for Perl module Text::BibTeX
 
+0.86 2019-03-31    
+ * Install btparse.h header file (Alberto Simões)
+ * Fix compilation issues with some compilers (Tobias Schlemmer) 
+ * Fix some crashes and malfunctinos in bt_format_name and bt_split_name (Tobias Schlemmer)
+ * Issue warnings for unmatched braces (Tobias Schlemmer) 
+
 0.85 2017-08-31
  * FreeBSD includes a definition of strlcat, so no need to redefine it.
 

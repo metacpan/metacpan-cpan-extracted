@@ -13,7 +13,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20190314;                                                        # Version
+our $VERSION = 20190330;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -70,10 +70,10 @@ sub fff($$@)                                                                    
  {my ($line, $file, @m) = @_;                                                   # Line, file, messages
   return unless (join '', @_) =~ m(\S)s;
 
-  my $m = join '', timeStamp, " ", @m;                                          # Time stamp each message
+  my $m = join ' ', @m;                                                         # Time stamp each message
   $m .= " at $file line $line";
 
-  confess "$m\n";                                                               # Confess
+  confess "  $m\n";                                                               # Confess
  }
 
 sub lll(@)                                                                      # Log messages including the project name if available. This method is not merged as we need to retain its prototype.
@@ -356,28 +356,33 @@ BEGIN{*fpf=*filePath}
 
 sub fp($)                                                                       # Get path from file name.
  {my ($file) = @_;                                                              # File name
+  $file or confess "File required";
   return '' unless $file =~ m(\/);                                              # Must have a / in it else no path
   $file =~ s([^/]*+\Z) ()gsr
  }
 
 sub fpn($)                                                                      # Remove extension from file name.
  {my ($file) = @_;                                                              # File name
+  $file or confess "File required";
   return '' unless $file =~ m(/);                                               # Must have a / in it else no path
   $file =~ s(\.[^.]+?\Z) ()gsr
  }
 
 sub fn($)                                                                       #I Remove path and extension from file name.
  {my ($file) = @_;                                                              # File name
+  $file or confess "File required";
   $file =~ s(\A.*/) ()gsr =~ s(\.[^.]+?\Z) ()gsr
  }
 
 sub fne($)                                                                      # Remove path from file name.
  {my ($file) = @_;                                                              # File name
+  $file or confess "File required";
   $file =~ s(\A.*/) ()gsr;
  }
 
 sub fe($)                                                                       # Get extension of file name.
  {my ($file) = @_;                                                              # File name
+  $file or confess "File required";
   return '' unless $file =~ m(\.)s;                                             # Must have a period
   my $f = $file =~ s(\.[^.]*?\Z) ()gsr;
   substr($file, length($f)+1)
@@ -432,6 +437,15 @@ sub swapFolderPrefix($$$)                                                       
  {my ($file, $known, $new) = @_;                                                # File name, existing prefix, new prefix
   swapFilePrefix($file, fpd($known), fpd($new));
  } # swapFolderPrefix
+
+sub removeDuplicatePrefixes($)                                                  # Remove duplicated leading path components from a file name.
+ {my ($file) = @_;                                                              # File name
+  return $file unless $file =~ m(/)s;                                           # No path to deduplicate
+  return $file if $file =~ m(\A[/.]);                                           # Later
+  my ($p, @p) = split m(/), $file;
+  shift @p while @p && $p[0] eq $p;
+  join "/", $p, @p;
+ } # removeDuplicatePrefixes
 
 sub trackFiles($@)                                                              #P Track the existence of files.
  {my ($label, @files) = @_;                                                     # Label, files
@@ -496,7 +510,7 @@ sub printFullFileName                                                           
   "\n\'".dump(fullFileName($file))."\'\n'"
  } # printFullFileName
 
-sub absFromAbsPlusRel($$)                                                       # Create an absolute file from an absolute file and a relative file.
+sub absFromAbsPlusRel2($$)                                                      #P Create an absolute file from an absolute file and a relative file.
  {my ($a, $f) = @_;                                                             # Absolute file name, relative file name
   my $m = "file name for the";
   defined $a or confess "Specify an absolute $m first parameter\n";
@@ -524,6 +538,12 @@ sub absFromAbsPlusRel($$)                                                       
   return q(/).$A[0].q(/) if @A == 1 and !defined($ff);
   return q(/).$A[0]      if @A == 1 and  defined($ff);
   q(/)
+ } # absFromAbsPlusRel2
+
+sub absFromAbsPlusRel($$)                                                       # Create an absolute file from an absolute file and a relative file.
+ {my ($a, $f) = @_;                                                             # Absolute file name, relative file name
+  my $r = absFromAbsPlusRel2($a, $f);
+  $r =~ s(/+) (/)gsr                                                            # Remove doubles slashes
  } # absFromAbsPlusRel
 
 sub relFromAbsAgainstAbs($$)                                                    # Derive a relative file name for the first absolute file name relative to the second absolute file name.
@@ -637,21 +657,21 @@ sub fileList($)                                                                 
 
 sub searchDirectoryTreesForMatchingFiles(@)                                     #I Search the specified directory trees for the files (not folders) that match the specified extensions. The argument list should include at least one path name to be useful. If no file extension is supplied then all the files below the specified paths are returned.
  {my (@foldersandExtensions) = @_;                                              # Mixture of folder names and extensions
-  my @extensions = grep {!-d $_ and !m([\/])} @_;                               # Extensions are not directories
+  my @extensions = grep {$_ and !-d $_ and !m([\/])} @_;                        # Extensions are not directories
   for(@extensions)                                                              # Prefix period to extension of not all ready there - however this can lead to errors if there happens to be a folder with the same name as an undotted extension.
    {$_ = qq(\.$_) unless m(\A\.)s
    }
   my $ext = @extensions ? join '|', @extensions : undef;                        # Extensions
   my @file;                                                                     # Files
   for my $dir(@_)                                                               # Directories
-   {next unless -d $dir;                                                        # Do not include folder names
+   {next unless $dir && -d $dir;                                                # Do not include folder names
 
     for my $d(findAllFilesAndFolders($dir))                                     # All files and folders beneath each folder
      {next if -d $d;                                                            # Do not include folder names
       push @file, $d if !$ext or $d =~ m(($ext)\Z)is;                           # Filter by extension if requested.
      }
    }
-  my @sorted = sort @file;                                                       # Return sorted file list
+  my @sorted = sort @file;                                                      # Return sorted file list
   @sorted
  } # searchDirectoryTreesForMatchingFiles
 
@@ -821,7 +841,7 @@ sub makePath($)                                                                 
  {my ($file) = @_;                                                              # File
   my @path = split /[\\\/]+/, $file;
   return 1 unless @path > 1;
-  pop @path unless $file =~ /[\\\/]\Z/;
+  pop @path unless $file =~ /[\\\/]\Z/;                                         # Remove file component allowing us to present files as well as folders
   my $path = join '/', @path;
   return 2 if -d $path;
   eval {make_path($path)};
@@ -984,12 +1004,41 @@ END
 
 sub nameFromString($)                                                           # Create a readable name from an arbitrary string of text.
  {my ($string) = @_;                                                            # String
-  $string =~ s([^a-z0-9_])(_)girs =~ s(_+)(_)grs =~ s((\A_+|_+\Z)) ()grs        # Name
+  my $prefix = sub                                                              # These are well known values that are used to enhance the name if they are present in the source string
+   {if ($string =~ m(<(bookmap|concept|html|reference|task))s)
+     {return substr($1, 0, 1).q(_);
+     }
+    q();
+   }->();
+  $string =~ s(<[^>]*>) (_)gs;                                                  # Remove xml/html tags
+  $string =~ s([^a-z0-9_])(_)gis;                                               # Reduce character set to produce a readable name
+  $string =~ s(_+)(_)gs;                                                        # Remove runs of underscores
+  $string =~ s((\A_+|_+\Z)) ()gs;                                               # Remove leading and trailing underscores
+  firstNChars($prefix.$string, 128);                                            # Limit the name length
+ }
+
+sub nameFromStringRestrictedToTitle($)                                          # Create a readable name from a string of text that might contain a title tag - fall back to L<nameFromString|/nameFromString> if that is not possible.
+ {my ($string) = @_;                                                            # String
+  my $prefix = sub                                                              # These are well known values that are used to enhance the name if they are present in the source string
+   {if ($string =~ m(<(bookmap|concept|html|reference|task))s)
+     {return substr($1, 0, 1).q(_);
+     }
+    q();
+   }->();
+  if ($string =~ m(<title>(.*?)</title)is)
+   {$string = $1 if length($1) > 8;
+   }
+  $string =~ s(<[^>]*>) (_)gs;                                                  # Remove xml/html tags
+  $string =~ s([^a-z0-9_])(_)gis;                                               # Reduce character set to produce a readable name
+  $string =~ s(_+)(_)gs;                                                        # Remove runs of underscores
+  $string =~ s((\A_+|_+\Z)) ()gs;                                               # Remove leading and trailing underscores
+  firstNChars($prefix.$string, 128);                                            # Limit the name length
  }
 
 sub uniqueNameFromFile($)                                                       # Create a unique name from a file name and the md5 sum of its content
  {my ($source) = @_;                                                            # Source file
   my $sourceFile = fn $source;                                                  # File name component
+  return fne($source) if $sourceFile =~ m([0-9a-z]{32}\Z)is;                    # Name already normalized
   my $sourceFileLimited = nameFromString($sourceFile);                          # File name with limited character set
   my $md5 = fileMd5Sum($source);                                                # Normalizing Md5 sum
   fpe($sourceFileLimited.q(_).$md5, fe $source);                                # Normalized name
@@ -1003,12 +1052,14 @@ sub nameFromFolder($)                                                           
   undef
  }
 
-sub copyFileMd5Normalized(;$$)                                                  # Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an accompanying file if the accompanying file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An accompanying file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the accompanying file is copied as well to maintain the link back to the original name of the file.
+sub copyFileMd5Normalized(;$$)                                                  # Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in a companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. A companion file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the companion file is copied as well to maintain the link back to the original name of the file.
  {my ($source, $Target) = @_;                                                   # Source file, target folder or a file in the target folder
+  -e $source && !-d $source or
+    confess "Source file to normalize does not exist:\n$source";
   my $target = fp($Target // $source);                                          # Target folder
   my $sourceFile = fn $source;                                                  # File name component
 
-  if ($sourceFile =~ m([0-9a-z]{32}\Z)is)                                       # Name already guidized
+  if ($sourceFile =~ m([0-9a-z]{32}\Z)is)                                       # Name already normalized
    {if (@_== 2)                                                                 # Copy source to new folder if necessary
      {my $target = fpf(fp($Target), fne($source));
       copyFile($source, $target);
@@ -1027,42 +1078,45 @@ sub copyFileMd5Normalized(;$$)                                                  
     return $source;                                                             # File is already normalized
    }
 
-  my $out = fpf($target, uniqueNameFromFile($source));                          # Normalized name in new folder
-  my $id  = setFileExtension($source);                                          # Accompanying file carrying original name
-  my $od  = setFileExtension($out);                                             # Accompanying file carrying original name
+  my $out = fpe($target, nameFromString(readFile($source)));                    # Create normalized name in new folder depending only on the content of the source file
+  my $id  = setFileExtension($source);                                          # Source companion file carrying original name
+  my $od  = setFileExtension($out);                                             # Target companion file carrying original name
 
-  if (@_ == 1)                                                                  # Rename an existing file
-   {rename $source, $out;
-    owf($od, $source) unless -e $od;                                            # Create accompanying file
-   }
-  elsif (!-e $out)                                                              # Copy file unless it is already there - we know the target is correct because its name is normalized
+  if (!-e $out)                                                                 # Copy file unless it is already there - we know the target is correct because its name is normalized
    {copyFile($source, $out);                                                    # Copy source to normalized target
-    if (-e $id)                                                                 # Copy or create accompanying file
+    if (-e $id)                                                                 # Copy or create companion file
      {copyFile($id, $od);
      }
     elsif (!-e $od)
-     {owf($od, $source);
+     {owf($od, $source);                                                        # Create a companion file as none exists
      }
    }
   $out                                                                          # Return normalized image file name
  }
 
-sub copyFileMd5NormalizedCreate($$$$)                                           # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
- {my ($Folder, $content, $extension, $Name) = @_;                               # Target folder or a file in that folder, content of the file, file extension, original file name.
+sub copyFileMd5NormalizedCreate($$$$@)                                          # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyFileMd5Normalized|/copyFileMd5Normalized> regardless of the other files in the target folders.
+ {my ($Folder, $content, $extension, $companionContent, %options) = @_;         # Target folder or a file in that folder, content of the file, file extension contents of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
-  my $name   = nameFromString($Name);                                           # File name with limited character set
-  my $md5 = fileMd5Sum($content);
-  my $od  = fpf($folder, $name.q(_).$md5);                                      # Accompanying file
-  my $out = fpe($od, $extension);                                               # Normalized file
+  my $name   = nameFromString($content);                                        # Entirely satisfactory
+     $name   = nameFromStringRestrictedToTitle($content) if $options{titleOnly};# Not entirely satisfactory
+  my $md5    = fileMd5Sum($content);
+  my $od     = fpf($folder, $name.q(_).$md5);                                   # Companion file
+  my $out    = fpe($od, $extension);                                            # Normalized file
   owf($out, $content);                                                          # Write file content
-  owf($od, $Name);                                                              # Write file name
+  owf($od,  $companionContent );                                                # Write companion file
   $out
  }
 
-sub copyFileMd5NormalizedGetOriginalName($)                                     # Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.imageDef> file does not exist.
+sub copyFileMd5NormalizedGetCompanionContent($)                                 # Return the content of the companion file to the specified B<$source> file after it has been normalized via L<copyFileMd5Normalized|/copyFileMd5Normalized> or L<copyFileMd5NormalizedCreate|/copyFileMd5NormalizedCreate> or return B<undef> if the corresponding companion file does not exist.
  {my ($source) = @_;                                                            # Source file.
   my $id = setFileExtension($source);
   -e $source && -e $id ? readFile($id) : undef
+ }
+
+sub copyFileMd5NormalizedDelete($)                                              # Delete a normalized and its companion file
+ {my ($file) = @_;                                                              # File
+  my $companion = setFileExtension($file);
+  unlink $_ for $companion, $file;
  }
 
 sub copyBinaryFile($$)                                                          # Copy a binary file and return the target name,
@@ -1079,20 +1133,21 @@ END
   $target
  }
 
-sub copyBinaryFileMd5Normalized(;$$)                                            # Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an accompanying file if the accompanying file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An accompanying file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the accompanying file is copied as well to maintain the link back to the original name of the file.
+sub copyBinaryFileMd5Normalized($;$)                                            # Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in a companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. A companion file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the companion file is copied as well to maintain the link back to the original name of the file.
  {my ($source, $Target) = @_;                                                   # Source file, target folder or a file in the target folder
-  my $target = fp($Target // $source);                                          # Target folder
-  my $out = fpe($target, fileMd5Sum($source), fe $source);                      # Normalized name in new folder
-  my $id  = setFileExtension($source);                                             # Accompanying file carrying original name
-  my $od  = setFileExtension($out);                                             # Accompanying file carrying original name
+  -e $source or confess "File does not exist:\n$source\n";
 
-  if (@_ == 1)
-   {rename $source, $out;
-    owf($od, $source) unless -e $od;                                            # Create accompanying file
-   }
-  elsif (!-e $out)                                                              # Copy file unless it is already there - we know the target is correct because its name is normalized
+  return $source if fn($source) =~ m([0-9a-z]{32}\Z)is and @_ == 1;             # Name already normalized and no target
+
+  my $target = fp($Target);                                                     # Target folder
+  my $ext = fe($source);                                                        # Extension
+  my $out = fpe($target, $ext.q(_).fileMd5Sum($source), $ext);                  # Normalized name in new folder
+  my $id  = setFileExtension($source);                                          # Source companion file carrying original name
+  my $od  = setFileExtension($out);                                             # Target companion file carrying original name
+
+  if (!-e $out)                                                                 # Copy file unless it is already there - we know the target is correct because its name is normalized
    {overWriteBinaryFile($out, readBinaryFile($source));
-    if (-e $id)                                                                 # Copy or create accompanying file
+    if (-e $id)                                                                 # Copy or create companion file
      {copyFile($id, $od);
      }
     elsif (!-e $od)
@@ -1102,18 +1157,20 @@ sub copyBinaryFileMd5Normalized(;$$)                                            
   $out                                                                          # Return normalized image file name
  }
 
-sub copyBinaryFileMd5NormalizedCreate($$$$)                                     # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
- {my ($Folder, $content, $extension, $name) = @_;                               # Target folder or a file in that folder, content of the file, file extension, original file name.
+sub copyBinaryFileMd5NormalizedCreate($$$$)                                     # Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has a companion file with the same name minus the extension  which contains the specified B<$companionContent>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
+ {my ($Folder, $content, $extension, $companionContent) = @_;                   # Target folder or a file in that folder, content of the file, file extension, original file name, optional content of the companion file.
   my $folder = fp $Folder;                                                      # Normalized folder name
-  my $md5 = fileMd5Sum($content);
-  my $od  = fpf($folder, $md5);                                                 # Accompanying file
-  my $out = fpe($od, $extension);                                               # Normalized file
-  overWriteBinaryFile($out, $content);                                          # Write file content
-  owf($od, $name);                                                              # Write file name
+  my $md5    = fileMd5Sum($content);                                            # Md5 sum of content
+  my $od     = fpf($folder, $extension.q(_).$md5);                              # Companion file
+  my $out    = fpe($od, $extension);                                            # Normalized file
+  owf($out, $content);                                                          # Write file content
+  owf($od, $companionContent);                                                  # Write companion file
+  -e $out or confess "Failed to create file $out";
+  -e $od  or confess "Failed to create companion file $od";
   $out
  }
 
-sub copyBinaryFileMd5NormalizedGetOriginalName($)                               # Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.imageDef> file does not exist.
+sub copyBinaryFileMd5NormalizedGetCompanionContent($)                           # Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or L<copyBinaryFileMd5NormalizedCreate|/copyBinaryFileMd5NormalizedCreate> or return B<undef> if the corresponding companion file does not exist.
  {my ($source) = @_;                                                            # Source file.
   my $id = setFileExtension($source);
   -e $source && -e $id ? readFile($id) : undef
@@ -3026,6 +3083,21 @@ sub Data::Exchange::Service::check($$)                                          
 
 #D1 Documentation                                                               # Extract, format and update documentation for a perl module.
 
+sub parseDitaRef($)                                                             # Parse a dita reference into its components
+ {my ($ref) = @_;                                                               # Reference to parse
+  return (q()) x 3 unless $ref and $ref =~ m(\S)s;
+
+  my ($file, $rest) = split /#/, $ref, 2;
+      $file //= q();
+             $rest //= q();
+
+  my ($topicId, $id) = split m(/), $rest, 2;
+      $topicId //= q();
+                $id //= q();
+
+  ($file, $topicId, $id)
+ }
+
 sub reportSettings($;$)                                                         # Report the current values of parameterless subs in a B<$sourceFile> that match \Asub\s+(\w+)\s*\{ and optionally write the report to B<$reportFile>. Return the text of the report.
  {my ($sourceFile, $reportFile) = @_;                                           # Source file, optional report file
   my $s = readFile($sourceFile);
@@ -3053,6 +3125,32 @@ END
     title     => qq(Attributes in program: $sourceFile),
     summarize => 1,
     $reportFile ? (file=>$reportFile) : ());
+ }
+
+sub reportAttributes($;$)                                                       # Report the attributes present in a B<$sourceFile>
+ {my ($sourceFile, $reportFile) = @_;                                           # Source file, optional report file
+  my $s = readFile($sourceFile);
+
+  my %s;
+  for my $l(split /\n/, $s)                                                     # Find the attribute subs
+   {if ($l =~ m(\Asub\s*(\w+)\s*\{.*?#\s+(.*)\Z))
+     {$s{$1} = $2;
+     }
+   }
+  \%s
+ }
+
+sub reportReplacableMethods($;$)                                                # Report the replaceable methods in a B<$sourceFile>
+ {my ($sourceFile, $reportFile) = @_;                                           # Source file, optional report file
+  my $s = readFile($sourceFile);
+
+  my %s;
+  for my $l(split /\n/, $s)                                                     # Find the attribute subs
+   {if ($l =~ m(\Asub\s*(\w+).*?#\w*r\s+(.*)\Z)i)
+     {$s{$1} = $2;
+     }
+   }
+  \%s
  }
 
 sub htmlToc($@)                                                                 # Generate a table of contents for some html.
@@ -3188,7 +3286,7 @@ END
           push @testLines, extractTest($nextLine);
           last if $nextLine =~ m/\A }/;                                         # Finish on closing brace in column 2
           my $L = $l + 1;
-          $N < $M or confess "More than $M line example at line $L\n";          # Prevent overruns
+          $N < $M or fff($L, $perlModule, "Too many lines in example");         # Prevent overruns
          }
        }
 
@@ -3214,7 +3312,7 @@ END
         push @testLines, extractTest($nextLine);
         last if $nextLine =~ m/\A }/;                                           # Finish on closing brace in column 2
         my $L = $l + 1;
-        $N < $M or confess "More than $M line example at line $L\n";            # Prevent overruns
+        $N < $M or fff($L, $perlModule, "Too many lines in test");              # Prevent overruns
        }
       push @testLines, '';                                                      # Blank line between each test line
 
@@ -3752,25 +3850,25 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT_OK    = qw(
  absFromAbsPlusRel addCertificate addLValueScalarMethods adopt appendFile
  arrayProduct arraySum arrayTimes arrayToHash asciiToHexString assertPackageRefs
- assertRef
- awsIp
+ assertRef awsIp
  binModeAllUtf8 boldString boldStringUndo
  call checkFile checkFilePath checkFilePathDir checkFilePathExt checkKeys
  clearFolder containingPowerOfTwo contains convertDocxToFodt convertImageToJpx
  convertUnicodeToXml copyBinaryFile copyBinaryFileMd5Normalized
  copyBinaryFileMd5NormalizedCreate
- copyBinaryFileMd5NormalizedGetOriginalName
- copyFile copyFolder countFileExtensions
+ copyBinaryFileMd5NormalizedGetCompanionContent copyFile copyFileMd5Normalized
+ copyFileMd5NormalizedCreate copyFileMd5NormalizedDelete
+ copyFileMd5NormalizedGetCompanionContent copyFolder countFileExtensions
  countFileTypes createEmptyFile currentDirectory currentDirectoryAbove
  cutOutImagesInFodtFile
  dateStamp dateTimeStamp dateTimeStampName decodeBase64 decodeJson deSquareArray
  dumpFile dumpGZipFile
  enclosedReversedString enclosedReversedStringUndo enclosedString
  enclosedStringUndo encodeBase64 encodeJson evalFile evalGZipFile
- fe fff fileInWindowsFormat fileList fileMd5Sum fileModTime fileOutOfDate filePath
- filePathDir filePathExt fileSize findDirs findFiles findFileWithExtension
- firstFileThatExists firstNChars fn fne formatTableBasic formattedTablesReport
- fp fpd fpe fpf fpn fullFileName
+ fe fff fileInWindowsFormat fileList fileMd5Sum fileModTime fileOutOfDate
+ filePath filePathDir filePathExt fileSize findDirs findFiles
+ findFileWithExtension firstFileThatExists firstNChars fn fne formatTableBasic
+ formattedTablesReport fp fpd fpe fpf fpn fullFileName
  genClass genHash genLValueArrayMethods genLValueHashMethods
  genLValueScalarMethods genLValueScalarMethodsWithDefaultValues guidFromMd5
  guidFromString
@@ -3779,25 +3877,24 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  isSubInPackage
  javaPackage javaPackageAsFileName
  keyCount
- lll
- loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines loadHash
+ lll loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines loadHash
  loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
  makeDieConfess makePath matchPath max md5FromGuid microSecondsSinceEpoch min
- nameFromFolder nameFromString
- newProcessStarter newServiceIncarnation newUdsrClient newUdsrServer
- numberOfLinesInFile numberOfLinesInString nws
+ nameFromFolder nameFromString nameFromStringRestrictedToTitle newProcessStarter
+ newServiceIncarnation newUdsrClient newUdsrServer numberOfLinesInFile
+ numberOfLinesInString nws
  overWriteBinaryFile overWriteFile owf
  pad parseCommandLineArguments parseFileName powerOfTwo printFullFileName
+ parseDitaRef
  printQw
  quoteFile
  readBinaryFile readFile readGZipFile readUtf16File relFromAbsAgainstAbs
- reloadHashes removeBOM removeFilePrefix
- reportSettings
- retrieveFile
+ reloadHashes removeBOM removeDuplicatePrefixes removeFilePrefix
+ reportAttributes reportReplacableMethods reportSettings retrieveFile
  saveCodeToS3 saveSourceToS3 searchDirectoryTreesForMatchingFiles
- setFileExtension
- setIntersection setIntersection setIntersectionOfArraysOfStrings
- setIntersectionOverUnion setIntersectionOverUnion setPackageSearchOrder
+ setFileExtension setIntersection setIntersection
+ setIntersectionOfArraysOfStrings setIntersectionOverUnion
+ setIntersectionOverUnion setPackageSearchOrder
  setPartitionOnIntersectionOverUnion
  setPartitionOnIntersectionOverUnionOfHashStringSets
  setPartitionOnIntersectionOverUnionOfSetsOfWords
@@ -3806,13 +3903,12 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  subScriptString subScriptStringUndo summarizeColumn superScriptString
  superScriptStringUndo swapFilePrefix swapFolderPrefix
  temporaryDirectory temporaryFile temporaryFolder timeStamp trackFiles trim
- uniqueNameFromFile
- updateDocumentation updatePerlModuleDocumentation userId
+ uniqueNameFromFile updateDocumentation updatePerlModuleDocumentation userId
  versionCode versionCodeDashed
  waitForAllStartedProcessesToFinish writeBinaryFile writeFile writeFiles
  writeGZipFile wwwDecode wwwEncode
  xxx
- XXX
+ yyy
  zzz
  ˢ
 );
@@ -5702,7 +5798,7 @@ B<Example:>
 
 =head3 copyFileMd5Normalized($$)
 
-Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an accompanying file if the accompanying file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An accompanying file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the accompanying file is copied as well to maintain the link back to the original name of the file.
+Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An companion file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the companion file is copied as well to maintain the link back to the original name of the file.
 
      Parameter  Description
   1  $source    Source file
@@ -5733,7 +5829,7 @@ B<Example:>
 
     ok fne($A) eq fne($_) for $B, $C;
     ok readFile($_) eq $content for $A, $B, $C;
-    ok copyFileMd5NormalizedGetOriginalName($_) eq $a for $A, $B, $C;
+    ok copyFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
     clearFolder($dir, 10);
@@ -5742,7 +5838,7 @@ B<Example:>
 
 =head3 copyFileMd5NormalizedCreate($$$$)
 
-Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
+Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an companion file with the same name minus the extension  which contains the specified B<$name>.  Such a file can be copied multiple times by L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> regardless of the other files in the target folders while retaining the original name information.
 
      Parameter   Description
   1  $Folder     Target folder or a file in that folder
@@ -5775,14 +5871,14 @@ B<Example:>
 
     ok fne($A) eq fne($_) for $B, $C;
     ok readFile($_) eq $content for $A, $B, $C;
-    ok copyFileMd5NormalizedGetOriginalName($_) eq $a for $A, $B, $C;
+    ok copyFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
     clearFolder($dir, 10);
    }
 
 
-=head3 copyFileMd5NormalizedGetOriginalName($)
+=head3 copyFileMd5NormalizedGetCompanionContent($)
 
 Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.imageDef> file does not exist.
 
@@ -5863,7 +5959,7 @@ B<Example:>
 
 =head3 copyBinaryFileMd5Normalized($$)
 
-Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an accompanying file if the accompanying file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An accompanying file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the accompanying file is copied as well to maintain the link back to the original name of the file.
+Normalize the name of the specified B<$source> file to the md5 sum of its content, retaining its current extension, while placing the original file name in an companion file if the companion file does not already exist.  If no B<$target> folder is supplied the file is renamed to its normalized form in situ, otherwise it is copied to the target folder and renamed there. An accompanying file for the B<$source> file is created by removing the extension of the normalized file and writing the original B<$source> file name to it unless such a file already exists as we assume that it contains the 'original' original name of the B<$source> file. If the B<$source> file is copied to a new location then the accompanying file is copied as well to maintain the link back to the original name of the file.
 
      Parameter  Description
   1  $source    Source file
@@ -5894,7 +5990,7 @@ B<Example:>
 
     ok fne($A) eq fne($_) for $B, $C;
     ok readBinaryFile($_) eq $content for $A, $B, $C;
-    ok copyBinaryFileMd5NormalizedGetOriginalName($_) eq $a for $A, $B, $C;
+    ok copyBinaryFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
     clearFolder($dir, 10);
@@ -5936,14 +6032,14 @@ B<Example:>
 
     ok fne($A) eq fne($_) for $B, $C;
     ok readBinaryFile($_) eq $content for $A, $B, $C;
-    ok copyBinaryFileMd5NormalizedGetOriginalName($_) eq $a for $A, $B, $C;
+    ok copyBinaryFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
     ok 6 == searchDirectoryTreesForMatchingFiles($dir);
     clearFolder($dir, 10);
    }
 
 
-=head3 copyBinaryFileMd5NormalizedGetOriginalName($)
+=head3 copyBinaryFileMd5NormalizedGetCompanionContent($)
 
 Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.imageDef> file does not exist.
 
@@ -9044,7 +9140,7 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 29 L<copyBinaryFileMd5NormalizedCreate|/copyBinaryFileMd5NormalizedCreate> - Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.
 
-30 L<copyBinaryFileMd5NormalizedGetOriginalName|/copyBinaryFileMd5NormalizedGetOriginalName> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.
+30 L<copyBinaryFileMd5NormalizedGetCompanionContent|/copyBinaryFileMd5NormalizedGetCompanionContent> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.
 
 31 L<copyFile|/copyFile> - Copy a file encoded in utf8 and return the target name
 
@@ -9052,7 +9148,7 @@ B<temporaryDirectory> is a synonym for L<temporaryFolder|/temporaryFolder> - Cre
 
 33 L<copyFileMd5NormalizedCreate|/copyFileMd5NormalizedCreate> - Create a file in the specified B<$folder> whose name is constructed from the md5 sum of the specified B<$content>, whose content is B<$content>, whose extension is B<$extension> and which has an accompanying file with the same name minus the extension  which contains the specified B<$name>.
 
-34 L<copyFileMd5NormalizedGetOriginalName|/copyFileMd5NormalizedGetOriginalName> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.
+34 L<copyFileMd5NormalizedGetCompanionContent|/copyFileMd5NormalizedGetCompanionContent> - Return the original name of the specified B<$source> file after it has been normalized via L<copyBinaryFileMd5Normalized|/copyBinaryFileMd5Normalized> or B<undef> if the corresponding B<.
 
 35 L<copyFolder|/copyFolder> - Copy a folder
 
@@ -9497,7 +9593,7 @@ __DATA__
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 518;
+use Test::More tests => 532;
 my $haiku     = $^O =~ m(haiku)i;
 my $windows   = $^O =~ m(MSWin32)i;
 my $mac       = $^O =~ m(darwin)i;
@@ -9957,6 +10053,9 @@ is_deeply [0, 1, 5], [contains(qr(a+), qw(a baa c d e aa b c d e))];            
 
 is_deeply [qw(a b)], [&removeFilePrefix(qw(a/ a/a a/b))];                       #TremoveFilePrefix
 is_deeply [qw(b)],   [&removeFilePrefix("a/", "a/b")];                          #TremoveFilePrefix
+ok q(a/b.c) eq removeDuplicatePrefixes("a/a/b.c");                              #TremoveDuplicatePrefixes
+ok q(a/b.c) eq removeDuplicatePrefixes("a/b.c");                                #TremoveDuplicatePrefixes
+ok q(b.c) eq removeDuplicatePrefixes("b.c");                                    #TremoveDuplicatePrefixes
 
 if (0) {                                                                        #TfileOutOfDate
   my @Files = qw(a b c);
@@ -10341,15 +10440,18 @@ if (0) {                                                                        
   ok nws($@) =~ m(\AInvalid options chosen: d Permitted.+?: a 1 b 2 c 3);       #TcheckKeys
  }
 
-if (1) {
-  my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];             #TformatTableBasic
-  ok formatTableBasic($d) eq <<END;                                             #TformatTableBasic
+if (1) {                                                                        #TformatTableBasic
+  my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
+  say STDERR "AAAA ", dump(formatTableBasic($d));
+  ok formatTableBasic($d) eq <<END, q(ftb);
 a        1
 bb      22
 ccc    333
 dddd  4444
 END
   }
+
+#say STDERR "AAAA ", dump(Test::More->builder->{Stack}[0]{count});
 
 if (0) {                                                                        #TstartProcess #TwaitForAllStartedProcessesToFinish
   my %pids;
@@ -10359,7 +10461,8 @@ if (0) {                                                                        
  }
 
 if (!$windows) {
-ok dateTimeStamp     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z);               #TdateTimeStamp
+say STDERR "BBBB ", dump(dateTimeStamp);
+ok dateTimeStamp     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z), q(dts);       #TdateTimeStamp
 ok dateTimeStampName =~ m(\A_on_\d{4}_\d\d_\d\d_at_\d\d_\d\d_\d\d\Z);           #TdateTimeStampName
 ok dateStamp         =~ m(\A\d{4}-\w{3}-\d\d\Z);                                #TdateStamp
 ok versionCode       =~ m(\A\d{8}-\d{6}\Z);                                     #TversionCode
@@ -11227,37 +11330,34 @@ END
   }
 
 
-ok q(help) eq nameFromString(q(!@#$%^help___<>?><?>));                          #TnameFromString
+if (1) {                                                                        #TnameFromString #TnameFromStringRestrictedToTitle
+ok q(help) eq nameFromString(q(!@#$%^help___<>?><?>));
+ok q(b_The_skyscraper_analogy) eq nameFromString(<<END);
+<bookmap id="b1">
+<title>The skyscraper analogy</title>
+</bookmap>
+END
 
-if (1) {                                                                        #TcopyBinaryFileMd5Normalized #TcopyBinaryFileMd5NormalizedGetOriginalName #TcopyBinaryFileMd5NormalizedCreate
-  my $dir = temporaryFolder;
-  my $a = fpe($dir, qw(a a jpg));
-  my $b = fpe($dir, qw(b a jpg));
-  my $c = fpe($dir, qw(c a jpg));
+ok q(b_The_skyscraper_analogy_An_exciting_tale_of_two_skyscrapers_that_meet_in_downtown_Houston)
+   eq nameFromString(<<END);
+<bookmap id="b1">
+<title>The skyscraper analogy</title>
+An exciting tale of two skyscrapers that meet in downtown Houston
+<concept><html>
+</bookmap>
+END
 
-  my $content = join '', 1..1e3;
-
-  my $A = copyBinaryFileMd5NormalizedCreate($a, $content, q(jpg), $a);
-  ok readBinaryFile($A) eq $content;
-  ok $A eq copyBinaryFileMd5Normalized($A);
-
-  my $B = copyBinaryFileMd5Normalized($A, $b);
-  ok readBinaryFile($B) eq $content;
-  ok $B eq copyBinaryFileMd5Normalized($B);
-
-  my $C = copyBinaryFileMd5Normalized($B, $c);
-  ok readBinaryFile($C) eq $content;
-  ok $C eq copyBinaryFileMd5Normalized($C);
-
-  ok fne($A) eq fne($_) for $B, $C;
-  ok readBinaryFile($_) eq $content for $A, $B, $C;
-  ok copyBinaryFileMd5NormalizedGetOriginalName($_) eq $a for $A, $B, $C;
-
-  ok 6 == searchDirectoryTreesForMatchingFiles($dir);
-  clearFolder($dir, 10);
+ok q(b_The_skyscraper_analogy) eq nameFromStringRestrictedToTitle(<<END);
+<bookmap id="b1">
+<title>The skyscraper analogy</title>
+An exciting tale of two skyscrapers that meet in downtown Houston
+<concept><html>
+</bookmap>
+END
  }
 
-if (1) {                                                                        #TcopyFileMd5Normalized #TcopyFileMd5NormalizedGetOriginalName #TcopyFileMd5NormalizedCreate
+
+if (1) {                                                                        #TcopyFileMd5Normalized #TcopyFileMd5NormalizedGetCompanionContent #TcopyFileMd5NormalizedCreate
   my $dir = temporaryFolder;
   my $a = fpe($dir, qw(a a jpg));
   my $b = fpe($dir, qw(b a jpg));
@@ -11279,7 +11379,43 @@ if (1) {                                                                        
 
   ok fne($A) eq fne($_) for $B, $C;
   ok readFile($_) eq $content for $A, $B, $C;
-  ok copyFileMd5NormalizedGetOriginalName($_) eq $a for $A, $B, $C;
+  ok copyFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
+
+  ok 6 == searchDirectoryTreesForMatchingFiles($dir);
+  copyFileMd5NormalizedDelete($A);
+  ok 4 == searchDirectoryTreesForMatchingFiles($dir);
+  copyFileMd5NormalizedDelete($B);
+  ok 2 == searchDirectoryTreesForMatchingFiles($dir);
+  copyFileMd5NormalizedDelete($C);
+  ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+
+  clearFolder($dir, 10);
+  ok 0 == searchDirectoryTreesForMatchingFiles($dir);
+ }
+
+if (1) {                                                                        #TcopyBinaryFileMd5Normalized #TcopyBinaryFileMd5NormalizedGetCompanionContent #TcopyBinaryFileMd5NormalizedCreate
+  my $dir = temporaryFolder;
+  my $a = fpe($dir, qw(a a jpg));
+  my $b = fpe($dir, qw(b a jpg));
+  my $c = fpe($dir, qw(c a jpg));
+
+  my $content = join '', 1..1e3;
+
+  my $A = copyBinaryFileMd5NormalizedCreate($a, $content, q(jpg), $a);
+  ok readBinaryFile($A) eq $content;
+  ok $A eq copyBinaryFileMd5Normalized($A);
+
+  my $B = copyBinaryFileMd5Normalized($A, $b);
+  ok readBinaryFile($B) eq $content;
+  ok $B eq copyBinaryFileMd5Normalized($B);
+
+  my $C = copyBinaryFileMd5Normalized($B, $c);
+  ok readBinaryFile($C) eq $content;
+  ok $C eq copyBinaryFileMd5Normalized($C);
+
+  ok fne($A) eq fne($_) for $B, $C;
+  ok readBinaryFile($_) eq $content for $A, $B, $C;
+  ok copyBinaryFileMd5NormalizedGetCompanionContent($_) eq $a for $A, $B, $C;
 
   ok 6 == searchDirectoryTreesForMatchingFiles($dir);
   clearFolder($dir, 10);
@@ -11300,6 +11436,14 @@ if (1) {                                                                        
  }
 
 ok nameFromFolder(fpe(qw( a b c d e))) eq q(c);                                 #TnameFromFolder
+
+
+if (1) {                                                                        #TparseDitaRef
+  is_deeply [parseDitaRef(q(a#b/c))], [qw(a b c)];
+  is_deeply [parseDitaRef(q(#b/c))],  [q(), qw(b c)];
+  is_deeply [parseDitaRef(q(#b))],    [q(), q(b), q()];
+  is_deeply [parseDitaRef(q(#/c))],   [q(), q(), q(c)];
+ }
 
 #tttt
 

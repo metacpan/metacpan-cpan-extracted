@@ -1,5 +1,21 @@
 Revision history for Perl extension NOLookup
 
+1.17 2019-03-31
+
+     - NOLookup::Brreg::DataLookup, NOLookup::BrregDifi::DataLookup:
+       $mech->text should not be called unless content is html, so
+       clone version 1.16 change.
+       This will make the module it more future safe in case '<' or
+       other problematic html char should be allowed in a company name
+       or other field. None problematic chars seen so far though.
+
+1.16 2019-03-28
+
+     - NOLookup::Patent::DataLookup: use
+       $mech->content(format=>'text') instead of $mech->text, since
+       decode_json() on the the latter fails and dies if a json key
+       contains letter '<'.
+
 1.15 2019-02-25
 
      - Support NOLookup::Brreg::DataLookup version accept_header

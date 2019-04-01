@@ -1,3 +1,8 @@
+0.008   2019-03-28 (PERLANCAR)
+
+	- Observe RSYNC_NEW2OLD_RSYNC_CMD environment variable.
+
+
 0.007   2018-01-24 (PERLANCAR)
 
 	- [ux] Use rsynccolor if available.

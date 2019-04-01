@@ -20,7 +20,7 @@ The object part is translated into the blessed reference of the object. (In Perl
 
 If an IV part is specified, the peek/poke operation returns the value of the IV. If no IV part is specified, the peek/poke operation returns the blessed reference of the object.
 
-This section contains a complete list of strings that can be used in peek/poke operations.
+This Section contains a complete list of strings that can be used in peek/poke operations.
 
 In some cases, the string corresponds to a particular IV in a particular object, e.g. **world.current** refers to the current world profile (the Perl class is **GA::Session->currentWorld**).
 
@@ -919,6 +919,8 @@ The strings specified below return the following kinds of value in a peek/poke o
     F protocol.mxp.room
          Locator uses MXP room tags exclusively change
             (GA::Client->allowMxpRoomFlag)
+    F protocol.mxp.flexible
+         Allow (some) illegal MXP keywords (GA::Client->allowMxpFlexibleFlag)
 
     S protocol.mode.echo
          Current session's ECHO mode (GA::Session->echoMode)

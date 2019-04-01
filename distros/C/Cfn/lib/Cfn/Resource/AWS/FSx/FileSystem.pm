@@ -1,4 +1,4 @@
-# AWS::FSx::FileSystem generated from spec 2.24.0
+# AWS::FSx::FileSystem generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::FSx::FileSystem',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::FSx::FileSystem {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::FSx::FileSystem', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

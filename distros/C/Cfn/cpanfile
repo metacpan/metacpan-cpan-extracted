@@ -3,6 +3,7 @@ requires 'MooseX::StrictConstructor';
 requires 'MooseX::SlurpyConstructor';
 requires 'JSON';
 requires 'Module::Runtime';
+requires 'Module::Find';
 
 on test => sub {
   requires 'Data::Printer';
@@ -21,4 +22,5 @@ on develop => sub {
   requires 'JSON::MaybeXS';
   requires 'Sort::Topological';
   requires 'Template';
+  requires 'Mojo::UserAgent';
 };

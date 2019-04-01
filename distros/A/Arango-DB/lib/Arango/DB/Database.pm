@@ -1,13 +1,13 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::DB::Database;
-$Arango::DB::Database::VERSION = '0.003';
+$Arango::DB::Database::VERSION = '0.004';
 use Arango::DB::Cursor;
 
 use warnings;
 use strict;
 
-sub new {
+sub _new {
     my ($class, %opts) = @_;
     return bless {%opts} => $class;
 }
@@ -16,7 +16,7 @@ sub collection {
    my ($self, $name) = @_;
    my @match = grep { $_->{name} eq $name } @{$self->list_collections};
    if (scalar(@match)) {
-      return Arango::DB::Collection->new(arango => $self->{arango}, database => $self->{name}, 'name' => $name);
+      return Arango::DB::Collection->_new(arango => $self->{arango}, database => $self->{name}, 'name' => $name);
    }
    else {
       die "Arango::DB | Collection not found in database $self->{name}."
@@ -25,7 +25,7 @@ sub collection {
 
 sub cursor {
     my ($self, $aql, %opts) = @_;
-    return Arango::DB::Cursor->new(arango => $self->{arango}, database => $self->{name}, query => $aql, %opts);
+    return Arango::DB::Cursor->_new(arango => $self->{arango}, database => $self->{name}, query => $aql, %opts);
 }
 
 sub list_collections {
@@ -59,7 +59,7 @@ Arango::DB::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 USAGE
 
@@ -91,6 +91,12 @@ Opens an existing collection, and returns a reference to a L<Arango::DB::Collect
    $database->delete_collection("col_name");
 
 Deletes a collection.
+
+=head2 C<cursor>
+
+   my $cursor = $database->cursor( $aql_query );
+
+Performs AQL queries, returning a cursor.
 
 =head1 AUTHOR
 

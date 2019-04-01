@@ -56,6 +56,6 @@
          "url" : "https://github.com/leejo/cgi-fast"
       }
    },
-   "version" : "2.14",
+   "version" : "2.15",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

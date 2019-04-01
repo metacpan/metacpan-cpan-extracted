@@ -1287,12 +1287,16 @@ sub _interpolate_magic_comments {
     $format ||= 'DEFAULT';
     my $latex = $doc->as_latex;
     # format is validated.
-    my $re = qr{^
+    # switch is gmx, no "s", we are line-based here
+    my $prefix = qr{
                 \%
                 \x{20}+
                 \:\Q$format\E\:
                 \x{20}+
                 \\textbackslash\{\}
+               }x;
+   $latex =~ s/^
+                $prefix
                 ( # permitted commands
                     sloppy |
                     fussy  |
@@ -1301,8 +1305,40 @@ sub _interpolate_magic_comments {
                     vskip\x{20}+[1-9][0-9]*(?:mm|cm|pt)
                 )
                 \x{20}*
-                $}xms;
-    $latex =~ s/$re/\\$1/g;
+                $
+              /\\$1/gmx;
+    $latex =~ s/^
+                $prefix
+                ( (this)? pagestyle )
+                \\ \{
+                ( plain | empty | headings | myheadings | scrheadings )
+                \\ \}
+                \x{20}*
+                $
+               /\\$1\{$3\}/gmx;
+
+    my $regular = qr{[^\#\$\%\&\~\^\\\{\}_]+};
+    $latex =~ s/^
+                $prefix
+                markboth
+                \\ \{
+                ($regular)
+                \\\}
+                \\\{
+                ($regular)
+                \\\}
+                \x{20}*
+                $
+               /\\markboth\{$1}\{$2\}/gmx;
+    $latex =~ s/^
+                $prefix
+                markright
+                \\ \{
+                ($regular)
+                \\\}
+                \x{20}*
+                $
+               /\\markright\{$1}/gmx;
     return $latex;
 }
 

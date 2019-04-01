@@ -5,7 +5,7 @@ Location information
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -38,6 +38,10 @@ Geo::Location::Point stores a place.
 Determine the distance between two locations,
 returns a [Class::Measure::Length](https://metacpan.org/pod/Class::Measure::Length) object.
 
+## as\_string
+
+Prints the object in human-readable format.
+
 ## attr
 
 Get/set location attributes, e.g. city
@@ -45,10 +49,6 @@ Get/set location attributes, e.g. city
     $location->city('London');
     $location->country('UK');
     print $location->as_string(), "\n";
-
-## as\_string
-
-Prints the object in human-readable format.
 
 # AUTHOR
 

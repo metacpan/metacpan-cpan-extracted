@@ -2,7 +2,7 @@ package Date::Japanese::Era::Table::Builder;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 use vars qw(@ISA @EXPORT %ERA_TABLE %ERA_JA2ASCII %ERA_ASCII2JA);
 require Exporter;
@@ -60,6 +60,7 @@ Date::Japanese::Era::Table::Builder - conversion table builder for Date::Japanes
     ["\x{5927}\x{6B63}", 'taishou', 1912,  7, 31],
     ["\x{662D}\x{548C}", 'shouwa',  1926, 12, 26],
     ["\x{5E73}\x{6210}", 'heisei',  1989,  1,  8],
+    ["\x{4EE4}\x{548C}", 'reiwa',   2019,  5,  1],
   );
 
 =head1 DESCRIPTION

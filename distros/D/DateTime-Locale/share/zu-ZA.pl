@@ -28,7 +28,6 @@
     MEd => "MM-dd, E",
     MMM => "LLL",
     MMMEd => "E, MMM d",
-    "MMMMW-count-one" => "'week' W 'of' MMM",
     "MMMMW-count-other" => "'week' W 'of' MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
@@ -50,7 +49,6 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "zu-ZA",
@@ -268,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

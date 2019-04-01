@@ -121,8 +121,8 @@
     "\N{U+516c}\N{U+5143}",
   ],
   era_narrow => [
-    "\N{U+897f}\N{U+5143}\N{U+524d}",
-    "\N{U+897f}\N{U+5143}",
+    "\N{U+516c}\N{U+5143}\N{U+524d}",
+    "\N{U+516c}\N{U+5143}",
   ],
   era_wide => [
     "\N{U+516c}\N{U+5143}\N{U+524d}",
@@ -268,5 +268,5 @@
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

@@ -27,6 +27,14 @@ typedef struct Compress__Zstd__Decompressor_s {
     size_t bufsize;
 }* Compress__Zstd__Decompressor;
 
+typedef ZSTD_CCtx* Compress__Zstd__CompressionContext;
+
+typedef ZSTD_DCtx* Compress__Zstd__DecompressionContext;
+
+typedef ZSTD_CDict* Compress__Zstd__CompressionDictionary;
+
+typedef ZSTD_DDict* Compress__Zstd__DecompressionDictionary;
+
 static SV*
 decompress_using_streaming(pTHX_ const char* src, size_t srcSize)
 {
@@ -371,3 +379,233 @@ CODE:
     ZSTD_freeDStream(self->stream);
     Safefree(self->buf);
     Safefree(self);
+
+
+MODULE = Compress::Zstd PACKAGE = Compress::Zstd::CompressionContext
+
+PROTOTYPES: DISABLE
+
+Compress::Zstd::CompressionContext
+new(klass)
+    const char* klass;
+CODE:
+    ZSTD_CCtx* cctx = ZSTD_createCCtx();
+    if (cctx == NULL) {
+        croak("Failed to call ZSTD_createCCtx()");
+    }
+    RETVAL = (Compress__Zstd__CompressionContext) cctx;
+OUTPUT:
+    RETVAL
+
+SV*
+compress(self, source, level = 1)
+    Compress::Zstd::CompressionContext self;
+    SV* source;
+    int level;
+PREINIT:
+    const char* src;
+    STRLEN src_len;
+    SV* dest;
+    char* dst;
+    size_t bound, ret;
+PPCODE:
+    if (!SvOK(source)) {
+        XSRETURN_UNDEF;
+    }
+    src = SvPVbyte(source, src_len);
+    bound = ZSTD_compressBound(src_len);
+    dest = sv_2mortal(newSV(bound + 1));
+    dst = SvPVX(dest);
+    ret = ZSTD_compressCCtx((ZSTD_CCtx*) self, dst, bound + 1, src, src_len, level);
+    if (ZSTD_isError(ret)) {
+        XSRETURN_UNDEF;
+    }
+    dst[ret] = '\0';
+    SvCUR_set(dest, ret);
+    SvPOK_on(dest);
+    EXTEND(SP, 1);
+    PUSHs(dest);
+
+SV*
+compress_using_dict(self, source, dict)
+    Compress::Zstd::CompressionContext self;
+    SV* source;
+    Compress::Zstd::CompressionDictionary dict;
+PREINIT:
+    const char* src;
+    STRLEN src_len;
+    SV* dest;
+    char* dst;
+    size_t bound, ret;
+PPCODE:
+    if (!SvOK(source)) {
+        XSRETURN_UNDEF;
+    }
+    src = SvPVbyte(source, src_len);
+    bound = ZSTD_compressBound(src_len);
+    dest = sv_2mortal(newSV(bound + 1));
+    dst = SvPVX(dest);
+    ret = ZSTD_compress_usingCDict((ZSTD_CCtx*) self, dst, bound + 1, src, src_len, (ZSTD_CDict*) dict);
+    if (ZSTD_isError(ret)) {
+        XSRETURN_UNDEF;
+    }
+    dst[ret] = '\0';
+    SvCUR_set(dest, ret);
+    SvPOK_on(dest);
+    EXTEND(SP, 1);
+    PUSHs(dest);
+
+void
+DESTROY(self)
+    Compress::Zstd::CompressionContext self;
+CODE:
+    ZSTD_freeCCtx((ZSTD_CCtx*) self);
+
+
+MODULE = Compress::Zstd PACKAGE = Compress::Zstd::DecompressionContext
+
+PROTOTYPES: DISABLE
+
+Compress::Zstd::DecompressionContext
+new(klass)
+    const char* klass;
+CODE:
+    ZSTD_DCtx* dctx = ZSTD_createDCtx();
+    if (dctx == NULL) {
+        croak("Failed to call ZSTD_createDCtx()");
+    }
+    RETVAL = (Compress__Zstd__DecompressionContext) dctx;
+OUTPUT:
+    RETVAL
+
+SV*
+decompress(self, source)
+    Compress::Zstd::DecompressionContext self;
+    SV* source;
+ALIAS:
+    uncompress = 1
+PREINIT:
+    const char* src;
+    STRLEN src_len;
+    unsigned long long dest_len;
+    SV* dest;
+    char* dst;
+    size_t ret;
+PPCODE:
+    if (!SvOK(source)) {
+        XSRETURN_UNDEF;
+    }
+    src = SvPVbyte(source, src_len);
+    dest_len = ZSTD_getFrameContentSize(src, src_len);
+    if (dest_len == ZSTD_CONTENTSIZE_UNKNOWN || dest_len == ULLONG_MAX || ZSTD_isError(dest_len)) {
+        /* TODO: Support ZSTD_CONTENTSIZE_UNKNOWN */
+        XSRETURN_UNDEF;
+    }
+    dest = sv_2mortal(newSV(dest_len + 1));
+    dst = SvPVX(dest);
+    ret = ZSTD_decompressDCtx((ZSTD_DCtx*) self, dst, dest_len + 1, src, src_len);
+    if (ZSTD_isError(ret)) {
+        XSRETURN_UNDEF;
+    }
+    dst[ret] = '\0';
+    SvCUR_set(dest, ret);
+    SvPOK_on(dest);
+    EXTEND(SP, 1);
+    PUSHs(dest);
+
+SV*
+decompress_using_dict(self, source, dict)
+    Compress::Zstd::DecompressionContext self;
+    SV* source;
+    Compress::Zstd::DecompressionDictionary dict;
+PREINIT:
+    const char* src;
+    STRLEN src_len;
+    unsigned long long dest_len;
+    SV* dest;
+    char* dst;
+    size_t ret;
+PPCODE:
+    if (!SvOK(source)) {
+        XSRETURN_UNDEF;
+    }
+    src = SvPVbyte(source, src_len);
+    dest_len = ZSTD_getFrameContentSize(src, src_len);
+    if (dest_len == ZSTD_CONTENTSIZE_UNKNOWN || dest_len == ULLONG_MAX || ZSTD_isError(dest_len)) {
+        /* TODO: Support ZSTD_CONTENTSIZE_UNKNOWN */
+        XSRETURN_UNDEF;
+    }
+    dest = sv_2mortal(newSV(dest_len + 1));
+    dst = SvPVX(dest);
+    ret = ZSTD_decompress_usingDDict((ZSTD_DCtx*) self, dst, dest_len + 1, src, src_len, (ZSTD_DDict*) dict);
+    if (ZSTD_isError(ret)) {
+        XSRETURN_UNDEF;
+    }
+    dst[ret] = '\0';
+    SvCUR_set(dest, ret);
+    SvPOK_on(dest);
+    EXTEND(SP, 1);
+    PUSHs(dest);
+
+void
+DESTROY(self)
+    Compress::Zstd::DecompressionContext self;
+CODE:
+    ZSTD_freeDCtx((ZSTD_DCtx*) self);
+
+MODULE = Compress::Zstd PACKAGE = Compress::Zstd::CompressionDictionary
+
+PROTOTYPES: DISABLE
+
+Compress::Zstd::CompressionDictionary
+new(klass, dict, level = 1)
+    const char* klass;
+    SV* dict;
+    int level;
+PREINIT:
+    ZSTD_CDict* cdict;
+    const char* dct;
+    size_t dct_len;
+CODE:
+    dct = SvPVbyte(dict, dct_len);
+    cdict = ZSTD_createCDict(dct, dct_len, level);
+    if (cdict == NULL) {
+        croak("Failed to call ZSTD_createCDict()");
+    }
+    RETVAL = (Compress__Zstd__CompressionDictionary) cdict;
+OUTPUT:
+    RETVAL
+
+void
+DESTROY(self)
+    Compress::Zstd::CompressionDictionary self;
+CODE:
+    ZSTD_freeCDict((ZSTD_CDict*) self);
+
+MODULE = Compress::Zstd PACKAGE = Compress::Zstd::DecompressionDictionary
+
+PROTOTYPES: DISABLE
+
+Compress::Zstd::DecompressionDictionary
+new(klass, dict)
+    const char* klass;
+    SV* dict;
+PREINIT:
+    ZSTD_DDict* ddict;
+    const char* dct;
+    size_t dct_len;
+CODE:
+    dct = SvPVbyte(dict, dct_len);
+    ddict = ZSTD_createDDict(dct, dct_len);
+    if (ddict == NULL) {
+        croak("Failed to call ZSTD_createDDict()");
+    }
+    RETVAL = (Compress__Zstd__DecompressionDictionary) ddict;
+OUTPUT:
+    RETVAL
+
+void
+DESTROY(self)
+    Compress::Zstd::DecompressionDictionary self;
+CODE:
+    ZSTD_freeDDict((ZSTD_DDict*) self);

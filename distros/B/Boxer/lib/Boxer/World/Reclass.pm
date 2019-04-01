@@ -11,28 +11,32 @@ Boxer::World::Reclass - software as serialized by reclass
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie;
 use Carp qw<croak>;
 
+use Capture::Tiny qw(capture_stdout);
+use YAML::XS;
 use Try::Tiny;
 
 use Moo;
 use MooX::StrictConstructor;
-use Types::Standard qw(ArrayRef InstanceOf);
+extends qw(Boxer::World);
+
+use Types::Standard qw( ArrayRef InstanceOf );
+use Boxer::Types qw( ClassDir NodeDir Suite );
+
+use Boxer::Part::Reclass;
 use Boxer::World::Flat;
-extends 'Boxer::World';
-with qw(MooX::Role::Logger);
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 =head1 DESCRIPTION
 
@@ -47,11 +51,60 @@ L<Boxer>.
 
 =cut
 
-has parts => (
+has suite => (
 	is       => 'ro',
-	isa      => ArrayRef [ InstanceOf ['Boxer::Part::Reclass'] ],
+	isa      => Suite,
 	required => 1,
 );
+
+has classdir => (
+	is       => 'lazy',
+	isa      => ClassDir,
+	required => 1,
+);
+
+has nodedir => (
+	is       => 'lazy',
+	isa      => NodeDir,
+	required => 1,
+);
+
+has parts => (
+	is       => 'lazy',
+	isa      => ArrayRef [ InstanceOf ['Boxer::Part::Reclass'] ],
+	init_arg => undef,
+);
+
+sub _build_parts
+{
+	my ($self) = @_;
+	my $data = Load(
+		scalar(
+			capture_stdout {
+				system(
+					'reclass',
+					'-b',
+					'',
+					'-c',
+					$self->classdir,
+					'-u',
+					$self->nodedir,
+					'--inventory',
+				);
+			}
+		)
+	);
+	my @parts;
+	for ( keys %{ $data->{nodes} } ) {
+		push @parts,
+			Boxer::Part::Reclass->new(
+			id    => $_,
+			epoch => $self->suite,
+			%{ $data->{nodes}{$_}{parameters} }
+			);
+	}
+	return [@parts];
+}
 
 sub get_node_by_id
 {

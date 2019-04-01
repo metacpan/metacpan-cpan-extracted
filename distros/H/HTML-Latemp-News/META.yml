@@ -20,27 +20,27 @@ name: HTML-Latemp-News
 provides:
   HTML::Latemp::News:
     file: lib/HTML/Latemp/News.pm
-    version: v0.1.12
+    version: v0.2.1
   HTML::Latemp::News::Base:
     file: lib/HTML/Latemp/News.pm
-    version: v0.1.12
+    version: v0.2.1
   HTML::Latemp::News::Item:
     file: lib/HTML/Latemp/News.pm
-    version: v0.1.12
+    version: v0.2.1
 requires:
   CGI: '0'
   XML::RSS: '0'
-  perl: '5.008'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/shlomif/html-latemp-news/issues
   homepage: http://metacpan.org/release/HTML-Latemp-News
   repository: git://github.com/shlomif/html-latemp-news.git
-version: 0.1.12
+version: 0.2.1
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.028001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -380,5 +380,5 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.012'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -7,7 +7,6 @@ package Boxer::CLI::Command::Compose;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 
@@ -17,11 +16,11 @@ use Boxer::CLI -command;
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 use constant {
 	abstract   => q[compose system recipe from reclass node],
@@ -65,6 +64,9 @@ sub execute
 {
 	my $self = shift;
 	my ( $opt, $args ) = @_;
+
+	Log::Any::Adapter->set( 'Screen', default_level => 'info' )
+		if ( $opt->{verbose} );
 
 	my $world = use_module('Boxer::Task::Classify')->new(
 		suite    => $opt->{suite},

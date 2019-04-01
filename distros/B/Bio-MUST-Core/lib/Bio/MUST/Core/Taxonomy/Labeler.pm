@@ -1,6 +1,6 @@
 package Bio::MUST::Core::Taxonomy::Labeler;
 # ABSTRACT: Helper class for simple labeler based on taxonomy
-$Bio::MUST::Core::Taxonomy::Labeler::VERSION = '0.190690';
+$Bio::MUST::Core::Taxonomy::Labeler::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -27,7 +27,7 @@ sub BUILD {
 
     # warn in case of ambiguous taxa
     for my $taxon ( $self->all_labels ) {
-        carp "Warning: $taxon is taxonomically ambiguous in labeler!"
+        carp "[BMC] Warning: $taxon is taxonomically ambiguous in labeler!"
             if $self->tax->is_dupe($taxon);
     }
 
@@ -65,7 +65,7 @@ Bio::MUST::Core::Taxonomy::Labeler - Helper class for simple labeler based on ta
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

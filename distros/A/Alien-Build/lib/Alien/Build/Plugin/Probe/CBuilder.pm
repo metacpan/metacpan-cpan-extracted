@@ -8,7 +8,7 @@ use File::Temp ();
 use Capture::Tiny qw( capture_merged capture );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 
 has options => sub { {} };
@@ -123,7 +123,9 @@ sub init
       
       if(defined $self->version)
       {
-        ($build->install_prop->{plugin_probe_cbuilder_gather}->{version}) = $out =~ $self->version;
+        my($version) = $out =~ $self->version;
+        $build->hook_prop->{version} = $version;
+        $build->install_prop->{plugin_probe_cbuilder_gather}->{version} = $version;
       }
       
       'system';
@@ -159,7 +161,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 1.60
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -279,7 +281,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2018 by Graham Ollis.
+This software is copyright (c) 2011-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

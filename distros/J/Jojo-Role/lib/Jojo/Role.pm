@@ -1,6 +1,6 @@
 
 package Jojo::Role;
-$Jojo::Role::VERSION = '0.5.0';
+
 # ABSTRACT: Role::Tiny + lexical "with"
 use 5.018;
 use strict;
@@ -9,46 +9,38 @@ use utf8;
 use feature      ();
 use experimental ();
 
+our $VERSION = '0.6.0';
+
 BEGIN {
-  require Role::Tiny;
-  Role::Tiny->VERSION('2.000006');
-  our @ISA = qw(Role::Tiny);
+  require Jojo::Role::Tiny;
+  Jojo::Role::Tiny->VERSION('2.000006');
+  our @ISA = qw(Jojo::Role::Tiny);
 }
 
 use Sub::Inject 0.3.0 ();
 
-# Aliasing of Role::Tiny symbols
+# Aliasing of Jojo::Role::Tiny symbols
 BEGIN {
-  *INFO           = \%Role::Tiny::INFO;
-  *APPLIED_TO     = \%Role::Tiny::APPLIED_TO;
-  *COMPOSED       = \%Role::Tiny::COMPOSED;
-  *COMPOSITE_INFO = \%Role::Tiny::COMPOSITE_INFO;
-  *ON_ROLE_CREATE = \@Role::Tiny::ON_ROLE_CREATE;
-
-  *_getstash = \&Role::Tiny::_getstash;
+  *INFO           = \%Jojo::Role::Tiny::INFO;
+  *ON_ROLE_CREATE = \@Jojo::Role::Tiny::ON_ROLE_CREATE;
 }
 
 our %INFO;
-our %APPLIED_TO;
-our %COMPOSED;
-our %COMPOSITE_INFO;
-our @ON_ROLE_CREATE;
 
 our %EXPORT_TAGS;
 our %EXPORT_GEN;
 
-
 # Jojo::Role->apply_roles_to_package('Some::Package', qw(Some::Role +Other::Role));
 sub apply_roles_to_package {
   my ($self, $target) = (shift, shift);
-  return $self->Role::Tiny::apply_roles_to_package($target,
+  return $self->Jojo::Role::Tiny::apply_roles_to_package($target,
     map { /^\+(.+)$/ ? "${target}::Role::$1" : $_ } @_);
 }
 
 # Jojo::Role->create_class_with_roles('Some::Base', qw(Some::Role1 +Role2));
 sub create_class_with_roles {
   my ($self, $target) = (shift, shift);
-  return $self->Role::Tiny::create_class_with_roles($target,
+  return $self->Jojo::Role::Tiny::create_class_with_roles($target,
     map { /^\+(.+)$/ ? "${target}::Role::$1" : $_ } @_);
 }
 
@@ -73,31 +65,6 @@ sub import {
 }
 
 sub role_provider { $_[0] }
-
-sub make_role {
-  my ($me, $target) = @_;
-  return if $me->is_role($target);    # already exported into this package
-  $INFO{$target}{is_role} = 1;
-
-  # get symbol table reference
-  my $stash = _getstash($target);
-
-  # grab all *non-constant* (stash slot is not a scalarref) subs present
-  # in the symbol table and store their refaddrs (no need to forcibly
-  # inflate constant subs into real subs) with a map to the coderefs in
-  # case of copying or re-use
-  my @not_methods
-    = map +(ref $_ eq 'CODE' ? $_ : ref $_ ? () : *$_{CODE} || ()),
-    values %$stash;
-  @{$INFO{$target}{not_methods} = {}}{@not_methods} = @not_methods;
-
-  # a role does itself
-  $APPLIED_TO{$target} = {$target => undef};
-  foreach my $hook (@ON_ROLE_CREATE) {
-    $hook->($target);
-  }
-  return;
-}
 
 BEGIN {
   %EXPORT_TAGS = (    #
@@ -182,7 +149,7 @@ sub _generate_subs {
 #pod
 #pod     use Jojo::Base -with;
 #pod
-#pod =head1 IMPORTED SUBROUTINES: TAG C<-role>
+#pod =head1 IMPORTED -role SUBROUTINES
 #pod
 #pod The C<-role> tag exports the following subroutines into the caller.
 #pod
@@ -191,7 +158,7 @@ sub _generate_subs {
 #pod   after foo => sub { ... };
 #pod
 #pod Declares an
-#pod L<< "after" | Class::Method::Modifiers/after method(s) => sub { ... } >>
+#pod L<< "after" |Class::Method::Modifiers/after method(s) => sub { ... } >>
 #pod modifier to be applied to the named method at composition time.
 #pod
 #pod =head2 around
@@ -199,7 +166,7 @@ sub _generate_subs {
 #pod   around => sub { ... };
 #pod
 #pod Declares an
-#pod L<< "around" | Class::Method::Modifiers/around method(s) => sub { ... } >>
+#pod L<< "around" |Class::Method::Modifiers/around method(s) => sub { ... } >>
 #pod modifier to be applied to the named method at composition time.
 #pod
 #pod =head2 before
@@ -207,7 +174,7 @@ sub _generate_subs {
 #pod   before => sub { ... };
 #pod
 #pod Declares a
-#pod L<< "before" | Class::Method::Modifiers/before method(s) => sub { ... } >>
+#pod L<< "before" |Class::Method::Modifiers/before method(s) => sub { ... } >>
 #pod modifier to be applied to the named method at composition time.
 #pod
 #pod =head2 requires
@@ -224,7 +191,7 @@ sub _generate_subs {
 #pod
 #pod Composes one or more roles into the current role.
 #pod
-#pod =head1 IMPORTED SUBROUTINES: TAG C<-with>
+#pod =head1 IMPORTED -with SUBROUTINES
 #pod
 #pod The C<-with> tag exports the following subroutine into the caller.
 #pod It is equivalent to using L<Role::Tiny::With>.
@@ -256,7 +223,7 @@ sub _generate_subs {
 #pod
 #pod =head2 make_role
 #pod
-#pod   Role::Tiny->make_role('Some::Package');
+#pod   Jojo::Role->make_role('Some::Package');
 #pod
 #pod Promotes a given package to a role.
 #pod No subroutines are imported into C<'Some::Package'>.
@@ -301,7 +268,7 @@ Jojo::Role - Role::Tiny + lexical "with"
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -342,7 +309,7 @@ Second, to compose one or more roles into a class, via
 
     use Jojo::Base -with;
 
-=head1 IMPORTED SUBROUTINES: TAG C<-role>
+=head1 IMPORTED -role SUBROUTINES
 
 The C<-role> tag exports the following subroutines into the caller.
 
@@ -351,7 +318,7 @@ The C<-role> tag exports the following subroutines into the caller.
   after foo => sub { ... };
 
 Declares an
-L<< "after" | Class::Method::Modifiers/after method(s) => sub { ... } >>
+L<< "after" |Class::Method::Modifiers/after method(s) => sub { ... } >>
 modifier to be applied to the named method at composition time.
 
 =head2 around
@@ -359,7 +326,7 @@ modifier to be applied to the named method at composition time.
   around => sub { ... };
 
 Declares an
-L<< "around" | Class::Method::Modifiers/around method(s) => sub { ... } >>
+L<< "around" |Class::Method::Modifiers/around method(s) => sub { ... } >>
 modifier to be applied to the named method at composition time.
 
 =head2 before
@@ -367,7 +334,7 @@ modifier to be applied to the named method at composition time.
   before => sub { ... };
 
 Declares a
-L<< "before" | Class::Method::Modifiers/before method(s) => sub { ... } >>
+L<< "before" |Class::Method::Modifiers/before method(s) => sub { ... } >>
 modifier to be applied to the named method at composition time.
 
 =head2 requires
@@ -384,7 +351,7 @@ Declares a list of methods that must be defined to compose the role.
 
 Composes one or more roles into the current role.
 
-=head1 IMPORTED SUBROUTINES: TAG C<-with>
+=head1 IMPORTED -with SUBROUTINES
 
 The C<-with> tag exports the following subroutine into the caller.
 It is equivalent to using L<Role::Tiny::With>.
@@ -416,7 +383,7 @@ following new ones.
 
 =head2 make_role
 
-  Role::Tiny->make_role('Some::Package');
+  Jojo::Role->make_role('Some::Package');
 
 Promotes a given package to a role.
 No subroutines are imported into C<'Some::Package'>.

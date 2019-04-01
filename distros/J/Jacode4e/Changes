@@ -1,5 +1,11 @@
 Revision history for this software.
 
+2.13.6.12 2019/04/01 00:00:00
+  - support 'utf8.1' for $OUTPUT_encoding and $INPUT_encoding
+  - support 'cp932ibm' for $OUTPUT_encoding
+  - support 'cp932nec' for $OUTPUT_encoding
+  - created by INABA Hitoshi
+
 2.13.6.11 2019/01/03 00:00:00
   - avoid ActiveState Code PPM INDEX: Too much output (limit is 10.0 MB)
   - support INPUT_LAYOUT option when $INPUT_encoding is cp932x, cp932, sjis2004

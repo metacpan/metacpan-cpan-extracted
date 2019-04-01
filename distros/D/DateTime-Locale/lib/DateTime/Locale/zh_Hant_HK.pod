@@ -241,8 +241,8 @@ Chinese Hong Kong SAR China Traditional locale.
 
 =head3 Narrow (format)
 
-  西元前
-  西元
+  公元前
+  公元
 
 =head2 Date Formats
 

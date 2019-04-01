@@ -22,10 +22,10 @@ no_index:
 provides:
   Dancer2::Plugin::Chain:
     file: lib/Dancer2/Plugin/Chain.pm
-    version: '0.09'
+    version: '0.10'
   Dancer2::Plugin::Chain::Router:
     file: lib/Dancer2/Plugin/Chain/Router.pm
-    version: '0.09'
+    version: '0.10'
 requires:
   Dancer2: '0.159002'
   Dancer2::Plugin: '0.159002'
@@ -34,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Dancer2-Plugin-Chain.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

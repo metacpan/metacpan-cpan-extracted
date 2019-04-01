@@ -34,6 +34,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.085",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pmqs/Compress-Raw-Lzma/issues"
+      },
+      "homepage" : "https://github.com/pmqs/Compress-Raw-Lzma",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pmqs/Compress-Raw-Lzma.git",
+         "web" : "https://github.com/pmqs/Compress-Raw-Lzma"
+      }
+   },
+   "version" : "2.086",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

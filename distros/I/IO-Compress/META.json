@@ -34,13 +34,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Raw::Bzip2" : "2.084",
-            "Compress::Raw::Zlib" : "2.084",
+            "Compress::Raw::Bzip2" : "2.086",
+            "Compress::Raw::Zlib" : "2.086",
             "Scalar::Util" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.084",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pmqs/IO-Compress/issues"
+      },
+      "homepage" : "https://github.com/pmqs/IO-Compress",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pmqs/IO-Compress.git",
+         "web" : "https://github.com/pmqs/IO-Compress"
+      }
+   },
+   "version" : "2.086",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

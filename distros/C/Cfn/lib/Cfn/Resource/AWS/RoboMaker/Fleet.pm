@@ -1,4 +1,4 @@
-# AWS::RoboMaker::Fleet generated from spec 2.24.0
+# AWS::RoboMaker::Fleet generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::RoboMaker::Fleet',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::RoboMaker::Fleet {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::RoboMaker::Fleet', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [ 'Arn' ]
+  }
+  sub supported_regions {
+    [ 'eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

@@ -1,4 +1,4 @@
-# AWS::AppSync::GraphQLSchema generated from spec 2.2.0
+# AWS::AppSync::GraphQLSchema generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLSchema',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::AppSync::GraphQLSchema {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AppSync::GraphQLSchema', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','ap-southeast-2','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

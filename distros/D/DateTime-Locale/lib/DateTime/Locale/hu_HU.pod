@@ -471,17 +471,17 @@ Hungarian Hungary locale.
    1995-12-22T09:05:02 = dec. 22., P
   -0010-09-15T04:44:23 = szept. 15., Szo
 
-=head3 MMMMW-count-one (MMM W. 'hete')
+=head3 MMMMW-count-one (MMMM W. 'hete')
 
-   2008-02-05T18:30:30 = febr. 1. hete
-   1995-12-22T09:05:02 = dec. 3. hete
-  -0010-09-15T04:44:23 = szept. 2. hete
+   2008-02-05T18:30:30 = február 1. hete
+   1995-12-22T09:05:02 = december 3. hete
+  -0010-09-15T04:44:23 = szeptember 2. hete
 
-=head3 MMMMW-count-other (MMM W. 'hete')
+=head3 MMMMW-count-other (MMMM W. 'hete')
 
-   2008-02-05T18:30:30 = febr. 1. hete
-   1995-12-22T09:05:02 = dec. 3. hete
-  -0010-09-15T04:44:23 = szept. 2. hete
+   2008-02-05T18:30:30 = február 1. hete
+   1995-12-22T09:05:02 = december 3. hete
+  -0010-09-15T04:44:23 = szeptember 2. hete
 
 =head3 MMMMd (MMMM d.)
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Inline::Files.
 
+0.71  Sun Mar 31 10:16:28 WEST 2019 (AMBS)
+    - Remove weird symbol in the source.
+
+0.70  Sun Mar 31 10:16:28 WEST 2019 (AMBS)
+    - Added Test::Harness config file (Roy Ivy)
+    - Added repository information on META
+
 0.69  Sun May 24 11:39:27 WEST 2015 (AMBS)
     - Skip superuser test in Cygwin.
 

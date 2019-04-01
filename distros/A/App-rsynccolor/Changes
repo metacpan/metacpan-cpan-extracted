@@ -1,3 +1,8 @@
+0.005   2019-03-28 (PERLANCAR)
+
+	- Observe RSYNCCOLOR_RSYNC_CMD environment variable.
+
+
 0.004   2018-12-02 (PERLANCAR)
 
 	- Observe NO_COLOR (see https://no-color.org).

@@ -1,0 +1,413 @@
+==================================================
+Changes from 2018-03-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.9.1 at 2019-03-28 19:21:43 +0000
+------------------------------------------
+
+  Change: fb394395fb0f20c476789f372ebe471a3e766ae5
+  Author: Andrew Fresh <andrew+github@afresh1.com>
+  Date : 2019-03-28 15:05:05 +0000
+
+    Merge pull request #1 from GrantStreetGroup/convert-to-gsg-dzil
+
+    Convert to gsg dzil 
+
+  Change: 3ea7576517d647d2736427a5ade82a2d2617f0f4
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-03-28 14:20:38 +0000
+
+    Pull in Author::GSG supplied files
+
+    with `make update`. 
+
+  Change: 163a9cc8d519a47992a98a9d64abc65b209750be
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-03-28 14:00:23 +0000
+
+    Convert to Dist::Zilla::PluginBundle::Author::GSG
+
+    Remove all the crufty stuff and add the suggested Makefile and
+    cpanfile changes from the documentation. 
+
+------------------------------------------
+version 0.9.0 at 2019-03-01 20:02:12 +0000
+------------------------------------------
+
+  Change: 2e26e77bd50ca1298cd6bd851293314ee04c7b62
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-03-01 15:02:12 +0000
+
+    Simplify Makefile
+
+    Rather than assuming plenv, just add a requirement that we have
+    carton available and remove some of our other internal only features. 
+
+  Change: bd6d810c57f9449c7c9bcc047c28fdfe94d4d3e0
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-03-01 11:19:53 +0000
+
+    Remove more internal cruft
+
+    We don't use gitc externally 
+
+  Change: bd71cb287e5758dd94ae57e3f4ab32132cf5c73b
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-02-27 20:08:29 +0000
+
+    Add a README
+
+    Just the output of pod2markdown, but it's something. 
+
+  Change: dfc8520981a79d3076d647b1dd9db6ea80dc75ee
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-02-27 18:31:19 +0000
+
+    Remove GSG extension from cpanfile
+
+    It doesn't work outside 
+
+  Change: c5a0851bd4e0064be7745de936783ef56e2359f9
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2019-02-27 17:09:37 +0000
+
+    Merge branch 'SM-1722' 
+
+  Change: 12681568de5c9311097e7f5d5ce06e558f1b088b
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-02-26 12:02:11 +0000
+
+    Don't let $Carp::Verbose confuse expected exception
+
+    If you have PERL5OPT=-MCarp=verbose or something similar, this test
+    would fail, so force Carp not to be verbose when we don't want it to. 
+
+  Change: a8cc1671a49df2abff5f47e55fd9dbc65e657455
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-02-20 18:55:45 +0000
+
+    Switch dist.ini to use public plugins
+
+    Not our internal Bundle. 
+
+  Change: eb4aace6e291a8c8cace3a9f6cf1a2826dbd0c2a
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2019-02-20 17:45:18 +0000
+
+    Correct dependencies
+
+    Apparently the DateTime dependency snuck in, not sure how. 
+
+  Change: 6b440f2c50538e5a4fba723a111ed257ff744fe6
+  Author: Justin Wheeler <justin.wheeler@grantstreet.com>
+  Date : 2018-06-28 12:11:15 +0000
+
+    Merge branch 'SM-1418' 
+
+  Change: 0ab42b6dad77238718695f6a3ca5ed144799dfdf
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-06-22 15:59:06 +0000
+
+    Improve description of the two tables
+
+    The old wording was not very clear. 
+
+  Change: 5db23d15ebdf6ca6788e488b5e93a2cdab2b3771
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-06-22 14:47:23 +0000
+
+    Don't pass all modified columns as event params
+
+    If one of the modified columns on the tracked object matches a unique
+    column on the tracking table it will do the Wrong Thing. The easiest
+    to describe is if both tables have the same name for the PK, perhaps
+    "id". If you insert and then update a record, the tracking table will
+    now have a MAX(id) of 2 so if you try to insert another tracked item
+    it will insert id 2 and try to insert an event with the same id and
+    violate the unique constraint as well as not doing what you'd want. 
+
+  Change: 71e63e75daba72448462665391174f24ca4919a5
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-06-22 14:42:17 +0000
+
+    Add tests for events with key that matches default
+
+    This currently fails as we attempt to copy all changed columns to the
+    event, which may have the same name as a unique column. 
+
+  Change: 16ab7a4d0511d899b36894eedd6796d5f9d86020
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-05-24 16:22:31 +0000
+
+    Merge branch 'SM-1325' 
+
+  Change: cffe4cad1058d6c08c856645dacdf856681d6c76
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2018-05-24 15:27:30 +0000
+
+    SM-1325: POD edits
+
+    Move the sections around, sentence tweaks. 
+
+  Change: a1dd877b57e055670cb8e33a6249a6ab6249acd7
+  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
+  Date : 2018-05-24 15:26:40 +0000
+
+    SM-1325: Add test dep for JSON::PP
+
+    According to corelist, JSON::PP was first released with perl v5.13.9,
+    so it's best to include the dep in cpanfile. 
+
+  Change: 00b1ac550204b0521d7ca319bb7e7893960c91c9
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:59:53 +0000
+
+    Improve documentation.
+
+    * Document that we don't support bulk actions
+
+    That is, if you call update or delete on a ResultSet it won't create
+
+    events for all effected objects in the database.
+
+    I think that's pretty obvious from the "triggers" wording in the
+
+    ResultSet documentation, so point folks there.
+
+    * Document the three required columns for the events table and that
+
+    we should allow you to configure their names.
+
+    * More clearly document where "name_change" and "last_name_change"
+
+    are from because it's a useful idiom and one we use a lot in our
+    actual
+
+    code, but this forced example doesn't clearly show why it exists.
+
+    * Attempt to clarify how event_defaults and the %params are used
+
+    by the event method
+
+    * More clearly show that we are updating a value in the "details",
+
+    and were just rewriting the whole thing to dirty the column.
+
+    * List possible uses in a list so we can more easily add more as we
+
+    think of them.
+
+    * List PRECONFIGURED EVENTS as items
+
+    if we do, then test coverage will note that we have them documented,
+
+    which probably would be important if we ever add Pod::Coverage tests.
+
+    * Suggest indexing triggered_on before event as that has better
+
+    cardinality
+
+    * Move SETUP methods and attributes under CONFIGURATION 
+
+  Change: dcc45a111c49b6c52898ebbccfad16e2466f4281
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Remove the `event_columns` method
+
+    It turns out that it doesn't really accomplish much, if someone
+    passes in columns, we probably want to update them if they exist.
+
+    The fact that I didn't break any tests probably means it wasn't a
+    good feature anyway. 
+
+  Change: 80e3d6a10bfe5a61ec7c2301f63f74e1691e852f
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Don't force triggered_on in event_defaults
+
+    Because we can mock what SQLite does and just use a database default
+    instead. 
+
+  Change: 8cd3a3df4ff4d6717a6b5fde8daeb1d062e0329e
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Spell it column not field
+
+    That is the way it is documented in DBIx::Class, so keep with that
+    more correct terminology. 
+
+  Change: a7cb98732e26598120a637efeeddff6dd0443443
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Revert "Optimize state_at to only look for columns we need"
+
+    This added complexity and possible source of bugs does not seem to be
+    worth the code to do it.
+
+    This reverts commit bcd2b3d5351539e09c5d21615ddced6129e1e7ed. 
+
+  Change: d582cb641a6bfe7cdecd0897f8a8d605ac43ed7c
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Optimize state_at to only look for columns we need
+
+    To work, we assume primary columns won't change in state_at, this may
+    not be a good guess, but it *seems* likely 
+
+  Change: 30093e8f6808ba8054fd59d0cebc6e272a22caf0
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Add tests that we optimized the number of next calls
+
+    Because maybe we didn't. 
+
+  Change: dab5400ccc6dd4bfb2414a44762e66a800f9ed55
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Optimize finding the state_at
+
+    Look backwards until we find all the information we are looking for. 
+
+  Change: dc36f2c11c03f8a70755f9aa4081b89c0aa88241
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Use $self and @args consistently in triggers
+
+    Because it was a bit hard to read with the custom names and such that
+    we don't actually care about. 
+
+  Change: 9f4f6bfdab939bcc3dfb0f93364c0d8c80570c78
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Create the delete event after deleting
+
+    That way we don't create a spurious event if the delete fails.
+
+    While here, improve the comment about why we check if we are called
+    as a class method. 
+
+  Change: 587b74133c8048bf254f578ab21d6f1def2bdcba
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Add test that event type is required
+
+    Coverage checking reminded me that it was required 
+
+  Change: 91a3241a0f54140b2b8b7167c53481a42d7fa266
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Switch tests to JSON::PP to avoid cpan dependency
+
+    Because we don't need to force folks to install that. 
+
+  Change: 47011e13b35192b83817992b0ad4530ac6fc5b52
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-26 18:38:16 +0000
+
+    Remove useless version that dzil will set
+
+    It doesn't do anything there except confuse folks.
+
+    When we get this to github we may need it, but not for now. 
+
+  Change: 863fdbec81c1589e9534d83f64042db30ae4c7ca
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-25 18:53:53 +0000
+
+    Remove test reliant on a newer DateTime feature
+
+    We test the exact same thing in the next assertion, just get the
+    format correctly, not guessing what the backend will like. 
+
+  Change: 4131e019e0c2bbac731a7ef08757bd105c535a04
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-25 18:23:28 +0000
+
+    Improve testcoverage Makefile target 
+
+  Change: 712ea7f4f73435f035342a041cf2a57757777ac5
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-19 12:50:05 +0000
+
+    Initial implementation of DBIx::Class::Events
+
+    This loses all the history from our internal module as I don't know
+    what might have been proprietary about it. 
+
+  Change: 9689008b769257653b25a3b24cf774497d1bd1aa
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 19:32:59 +0000
+
+    Fix .gitignore 
+
+  Change: c0712bbb075d34465721e4d8e62dc546c20d797c
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 19:29:08 +0000
+
+    Fix name of package to index 
+
+  Change: 3f9ef3c636f599b96fd88c6166f9e4485c6d42d9
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:29:16 +0000
+
+    Make test init an in-memory database
+
+    That we can use to run tests against eventually. 
+
+  Change: ee5289475fb94d22861a873054e33a9e2cfcf704
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:29:16 +0000
+
+    Move DBIx::Class examples to t/
+
+    That's where we're going to use it for testing.
+
+    And remove some things we're not going to use. 
+
+  Change: f848027808473495730b69e5feeeb782167bd787
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:29:16 +0000
+
+    Copy DBIx::Class CD Database example
+
+    Because we'll use it for our tests 
+
+  Change: 7436247d3b238f3ca33e63e3eba924c907423927
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:29:16 +0000
+
+    Add boilerplate for module and test 
+
+  Change: 1013fb60a3cf6c6e4c7d2f966b9fcc0980abd079
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:29:16 +0000
+
+    Add a Makefile for easily running tests 
+
+  Change: bc9a3262c7c57c90d7da9645924b8089e8a8be87
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:29:16 +0000
+
+    Correct gitignore and dist.ini 
+
+  Change: 7178c418ae316cc8493b43ceeea4e6b19582fd1f
+  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
+  Date : 2018-04-16 18:06:12 +0000
+
+    repository initialized by gitc initialize-repo 
+
+================
+End of releases.
+================

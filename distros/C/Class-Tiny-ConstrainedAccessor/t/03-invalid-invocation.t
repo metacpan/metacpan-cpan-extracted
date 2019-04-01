@@ -12,6 +12,7 @@ require Class::Tiny::ConstrainedAccessor;
     package SuperSimpleConstraint;
     use Class::Tiny { dummy => 0xdeadbeef };
     sub check { 1 }
+    sub name { __PACKAGE__ }    # For coverage testing
 }
 my $constraint = SuperSimpleConstraint->new;
 
@@ -20,8 +21,18 @@ my $constraint = SuperSimpleConstraint->new;
 {
     package NotAConstraint;
     use Class::Tiny { dummy => 0xdeadbeef };
+    sub description { __PACKAGE__ }     # For coverage testing
 }
 my $nonconstraint = NotAConstraint->new;
+
+# An object that supports inline_check() for a non-inlineable type.
+# This is for coverage.
+{
+    package NonInlineableConstraint;
+    use Class::Tiny { dummy => 0xdeadbeef };
+    sub inline_check { '@invalid syntax!' }
+}
+my $niconstraint = NonInlineableConstraint->new;
 
 # Tests to run: description => [arguments to use()]
 my %tests = (
@@ -33,6 +44,7 @@ my %tests = (
     'Rejects scalar constraint' => ['foo', 'wow'],
     'Rejects non-blessed constraint' => ['foo', {}],
     'Rejects constraint that cannot assert_valid' => ['foo', $nonconstraint],
+    'Rejects non-inlineable constraint' => ['foo', $niconstraint],
 );
 
 foreach my $test (keys %tests) {

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Easier Looping over resultsets",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-ResultSet-SetControl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.003001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DBIx::Class" : "0.52",
+            "Test::Most" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl.git",
+         "web" : "https://github.com/jjn1056/DBIx-Class-ResultSet-SetControl"
+      }
+   },
+   "version" : "0.002",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+}
+

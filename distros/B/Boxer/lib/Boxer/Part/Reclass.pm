@@ -11,24 +11,24 @@ Boxer::Part::Reclass - software component as a reclass node or class
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie;
 
 use Moo;
 use MooX::StrictConstructor;
+extends qw(Boxer::Part);
+
 use Types::Standard qw(Str Maybe ArrayRef HashRef);
 use Types::TypeTiny qw(StringLike);
-extends 'Boxer::Part';
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 =head1 DESCRIPTION
 

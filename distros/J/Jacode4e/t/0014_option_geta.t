@@ -2,7 +2,7 @@
 #
 # 0014_option_geta_test.t
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
@@ -14,6 +14,8 @@ BEGIN {
     @test = (
         ["\xFC\xFC",'cp932x',  'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x81\xA1"        },"\x81\xA1"        ],
         ["\xFC\xFC",'cp932',   'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x81\xA1"        },"\x81\xA1"        ],
+        ["\xFC\xFC",'cp932ibm','cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x81\xA1"        },"\x81\xA1"        ],
+        ["\xFC\xFC",'cp932nec','cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x81\xA1"        },"\x81\xA1"        ],
         ["\xFC\xFC",'sjis2004','cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x81\xA1"        },"\x81\xA1"        ],
         ["\xFC\xFC",'cp00930', 'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x44\xEA"        },"\x44\xEA"        ],
         ["\xFC\xFC",'keis78',  'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xA2\xA3"        },"\xA2\xA3"        ],
@@ -25,6 +27,7 @@ BEGIN {
         ["\xFC\xFC",'jipse',   'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\x7F\x4B"        },"\x7F\x4B"        ],
         ["\xFC\xFC",'letsj',   'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xA2\xA3"        },"\xA2\xA3"        ],
         ["\xFC\xFC",'utf8',    'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xE2\x96\xA0"    },"\xE2\x96\xA0"    ],
+        ["\xFC\xFC",'utf8.1',  'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xE2\x96\xA0"    },"\xE2\x96\xA0"    ],
         ["\xFC\xFC",'utf8jp',  'cp932x',{'INPUT_LAYOUT'=>'D','GETA'=>"\xF3\xB0\x85\xA0"},"\xF3\xB0\x85\xA0"],
     );
     $|=1; print "1..",scalar(@test),"\n"; my $testno=1; sub ok { print $_[0]?'ok ':'not ok ',$testno++,$_[1]?" - $_[1]\n":"\n" }

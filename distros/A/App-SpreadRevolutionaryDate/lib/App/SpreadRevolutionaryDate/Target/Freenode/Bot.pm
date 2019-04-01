@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode::Bot;
-$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.08';
+$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.10';
 # ABSTRACT: Subclass overriding L<Bot::BasicBot> to post a message on some Freenode channels
 
 use Moose;
@@ -45,18 +45,20 @@ has 'msg' => (
 
 sub connected {
   my $self = shift;
+
   $self->say({who => 'NickServ', channel => 'msg', body => 'IDENTIFY ' . $self->{freenode_nickname} . ' ' . $self->{freenode_password}});
 }
 
 sub said {
-  my $self = shift;
-  my $message = shift;
+  my ($self, $message) = @_;
+
   $self->nb_said(1) if ($message->{who} eq 'NickServ' && $message->{body} =~ /^You are now identified for/);
   return;
 }
 
 sub tick {
   my $self = shift;
+
   if ($self->nb_said) {
     if ($self->nb_said > scalar($self->channels)) {
       $self->shutdown;
@@ -100,7 +102,7 @@ App::SpreadRevolutionaryDate::Target::Freenode::Bot - Subclass overriding L<Bot:
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SEE ALSO
 
@@ -119,6 +121,12 @@ version 0.08
 =item L<App::SpreadRevolutionaryDate::Target::Mastodon>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
 
 =back
 

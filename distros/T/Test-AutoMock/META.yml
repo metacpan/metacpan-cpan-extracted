@@ -26,7 +26,7 @@ no_index:
 provides:
   Test::AutoMock:
     file: lib/Test/AutoMock.pm
-    version: '0.01'
+    version: '0.04'
   Test::AutoMock::Manager:
     file: lib/Test/AutoMock/Manager.pm
   Test::AutoMock::Mock::Basic:
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/hiratara/p5-Test-AutoMock/issues
   homepage: https://github.com/hiratara/p5-Test-AutoMock
   repository: git://github.com/hiratara/p5-Test-AutoMock.git
-version: '0.01'
+version: '0.04'
 x_contributors:
   - 'Masahiro Honma <hira.tara@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

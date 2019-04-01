@@ -1,5 +1,13 @@
 Revision history for Perl extension DateTime::Format::Natural.
 
+1.07  2019-03-29  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.06_01  2019-03-13  <schubiger@cpan.org>
+
+ - New supported format: <variant> quarter. [Xiao Yafeng]
+
 1.06  2018-10-28  <schubiger@cpan.org>
 
  - Merged development version to stable.

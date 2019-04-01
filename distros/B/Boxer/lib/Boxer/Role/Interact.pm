@@ -7,20 +7,20 @@ package Boxer::Role::Interact;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 
 use Moo::Role;
+
 use Types::Standard qw< Bool >;
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 has verbose => (
 	is       => 'rw',

@@ -165,11 +165,11 @@ The trigger style can combine colours and other typographical features. **Foregr
 
 You can also apply italics, strikethrough, blinking text and underlines (underscores). If you apply the **link** style, the text will be a clickable link which Axmud will try to open in a web browser.
 
-Axmud triggers have a *stimulus* and a *response*. If you just want to apply the style and do nothing else, you can tell Axmud to ignore this trigger's response. 
+Axmud triggers have a *stimulus* and a *response*. If you just want to apply the style and do nothing else, you can tell Axmud to ignore this trigger's response.
 
 * From the main window menu, click **Edit > World triggers**
 * In the **Trigger stimulus** box, enter **The orc drops its treasure**
-* In the **Trigger response** box, enter anything you like 
+* In the **Trigger response** box, enter anything you like
     * There must be a response, even though it's ignored
 * Click on **Page 1**
 * Select the **Ignore the trigger response (e.g. just apply a style)** button
@@ -217,7 +217,7 @@ You could use a pattern like this:
 
 When the trigger fires, any part of the line matching the group **(.*)** is stored as a substring. In this case, the first substring contains the winner, **Gandalf**.
 
-We can use the first substring in the substituted text by specifying the variable **$1**. 
+We can use the first substring in the substituted text by specifying the variable **$1**.
 
         And the winner is $1
 
@@ -234,22 +234,22 @@ So now we're ready to create our trigger:
 When the trigger fires, the text at the top of this Section will be converted to:
 
         And the winner is Gandalf
-        
+
 There are a few things left to mention:
 
 * NB Before v1.1.270, the substituted text had to be enclosed in double-quotes
     * e.g. **"And the winner is $1"**
     * This is no longer necessary (but your old triggers will continue to work)
 * If you *actually* want the substituted text to begin and end with double quotes, you must duplicate them
-    * e.g. **""And the winner is $1""**  
+    * e.g. **""And the winner is $1""**
 * If you want the substituted text to contain a literal **$1**, precede it with a backslash
     * e.g. **You have \\$1 gold coins in your $1**
 * If you *actually* want a backslash *anywhere* in the substituted text, use must use two of them
-    * e.g. **apples and\\\\or oranges** 
+    * e.g. **apples and\\\\or oranges**
 
 ###<a name="7.1.6">7.1.6 Substrings in other triggers</a>
 
-Substrings can be used in non-rewriter triggers, too. 
+Substrings can be used in non-rewriter triggers, too.
 
 In this example, we'll create a trigger that joins in any fight started by Gandalf. If he attacks an orc, the trigger fires and Axmud sends the world command **kill orc**.
 
@@ -258,7 +258,7 @@ In this example, we'll create a trigger that joins in any fight started by Ganda
 * In the **Name** box, enter the name **attacktrigger**
 * Click the **Rewriter** checkbutton to select it
 * Click the **Add** button to create the trigger
- 
+
 The rules about literal double quotes, literal dollars and literal backwards slashes, mentioned just above, still apply.
 
 ###<a name="7.1.7">7.1.7 Splitter triggers</a>
@@ -480,9 +480,9 @@ There are a few things left to mention:
     * e.g. **""give $1 gold coins to $2""**
 * If you want the instruction to contain a literal **$1**, precede it with a backslash
     * e.g. **give \$1 to $1**
-        * This instruction would look something like **give $1 to Gandalf** 
+        * This instruction would look something like **give $1 to Gandalf**
 * If you *actually* want a backslash *anywhere* in the instruction, use must use two of them
-    * e.g. **apples and\\\\or oranges** 
+    * e.g. **apples and\\\\or oranges**
 
 ##<a name="7.3">7.3 Macros</a>
 

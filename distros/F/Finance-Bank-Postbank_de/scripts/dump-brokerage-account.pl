@@ -48,7 +48,7 @@ my @columns = qw(isin shortDescription amount averageQuote depotCurrQuote quoteC
 my @output;
 push @output, \@columns;
 my ($bp) = $finanzstatus->get_businesspartners;
-for my $account ( grep { $_->productType eq 'depot' } $bp->get_accounts ) {
+for my $account ( grep { $_->is_depot } $bp->get_accounts ) {
 
     my $depot = $account->fetch_resource('depot', class => 'Finance::Bank::Postbank_de::APIv1::Depot');
 

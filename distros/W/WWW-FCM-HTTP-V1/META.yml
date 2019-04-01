@@ -1,0 +1,51 @@
+---
+abstract: 'Client for Firebase Cloud Messaging HTTP v1 API'
+author:
+  - 'omohayui <omohayui@gmail.com>'
+build_requires:
+  Test::Exception: '0.43'
+  Test::Fake::HTTPD: '0.08'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-FCM-HTTP-V1
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  WWW::FCM::HTTP::V1:
+    file: lib/WWW/FCM/HTTP/V1.pm
+    version: '0.01'
+  WWW::FCM::HTTP::V1::OAuth:
+    file: lib/WWW/FCM/HTTP/V1/OAuth.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  Crypt::OpenSSL::RSA: '0'
+  Furl: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  JSON::WebToken: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/omohayui/WWW-FCM-HTTP-V1/issues
+  homepage: https://github.com/omohayui/WWW-FCM-HTTP-V1
+  repository: git://github.com/omohayui/WWW-FCM-HTTP-V1.git
+version: '0.01'
+x_authority: cpan:OMOHAYUI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

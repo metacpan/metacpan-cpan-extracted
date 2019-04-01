@@ -3,6 +3,7 @@ abstract: 'Compute Halstead complexity metrics'
 author:
   - 'Gene Boggs <gene@cpan.org>'
 build_requires:
+  Capture::Tiny: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -31,7 +32,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Metrics-Halstead
   repository: https://github.com/ology/Perl-Metrics-Halstead
-version: '0.0601'
+version: '0.0602'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

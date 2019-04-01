@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig::LibPkgConf
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -77,6 +77,7 @@ sub init
       my $pkg = $client->find($pkg_name);
       die "package $pkg_name not found" unless $pkg;
 
+      $build->hook_prop->{version} = $pkg->version;
       my $atleast_version = $self->atleast_version;
       $atleast_version = $self->minimum_version unless defined $self->atleast_version;
       if($atleast_version)
@@ -165,7 +166,7 @@ Alien::Build::Plugin::PkgConfig::LibPkgConf - Probe system and determine library
 
 =head1 VERSION
 
-version 1.60
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -282,7 +283,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2018 by Graham Ollis.
+This software is copyright (c) 2011-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

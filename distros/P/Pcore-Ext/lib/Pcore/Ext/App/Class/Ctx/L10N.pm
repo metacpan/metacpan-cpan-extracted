@@ -108,7 +108,7 @@ Pcore::Ext::App::Class::Ctx::L10N - ExtJS function call generator
         text => 'prefix' . l10n('singular form', 'plural form', 5) . 'suffix',
 
         method => func <<"JS",
-            console.log('prefix' + $l10n->{'singular form'} + 'suffix');
+            console.log('prefix' + $l10n{'singular form'} + 'suffix');
 
             console.log('prefix' + $str + 'suffix');
 

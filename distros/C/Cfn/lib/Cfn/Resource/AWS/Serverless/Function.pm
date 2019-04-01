@@ -9,7 +9,12 @@ package Cfn::Resource::AWS::Serverless::Function {
   extends 'Cfn::Resource';
   has Properties => ( isa => 'Cfn::Resource::Properties::AWS::Serverless::Function', is => 'rw', coerce => 1 );
 
-  sub _build_attributes {
+  sub supported_regions {
+    require Cfn::Resource::AWS::Lambda::Function;
+    Cfn::Resource::AWS::Lambda::Function->supported_regions;
+  }
+
+  sub AttributeList {
     ['Arn']
   }
 }

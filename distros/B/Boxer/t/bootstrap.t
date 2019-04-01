@@ -7,6 +7,8 @@ use strictures 2;
 use Test::More;
 use File::Which;
 use App::Cmd::Tester::CaptureExternal;
+use Log::Any::Test;
+use Log::Any qw($log);
 
 use Boxer::CLI;
 
@@ -17,25 +19,74 @@ my $result;
 my @base_cmd = qw{bootstrap --datadir examples --skeldir share/skel --dryrun};
 
 $result = test_app( 'Boxer::CLI' => [ @base_cmd, qw(lxp5) ] );
-like $result->stdout,
-	qr/^mmdebstrap --include [a-z]\S+,[a-z]\S+- buster\n$/,
-	'printed what we expected';
-is $result->stderr, "No tweaks resolved\n", 'nothing sent to sderr';
-is $result->error, undef, 'threw no exceptions';
+is $result->stdout, '',    'nothing sent to stdout';
+is $result->stderr, '',    'nothing sent to stderr';
+is $result->error,  undef, 'threw no exceptions';
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Classifying /,       'classification logged' );
+$log->contains_ok( qr/^No tweaks /,         'lack of tweaks logged' );
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Enabling apt mode needed by bootstrap helper mmdebstrap$/,
+	'apt mode enabling logged'
+);
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Bootstrap with mmdebstrap .*--include(?!.*--exclude).*buster[^,]+$/,
+	'command logged'
+);
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Skip execute command in dry-run mode$/,
+	'skip command logged'
+);
+$log->empty_ok("no more logs");
 
 $result = test_app(
 	'Boxer::CLI' => [ @base_cmd, qw(--helper debootstrap lxp5) ] );
-like $result->stdout,
-	qr/^debootstrap --include [a-z]\S+ --exclude [a-z]\S+ buster\n$/,
-	'printed what we expected';
-is $result->stderr, "No tweaks resolved\n", 'nothing sent to sderr';
-is $result->error, undef, 'threw no exceptions';
+is $result->stdout, '',    'nothing sent to stdout';
+is $result->stderr, '',    'nothing sent to stderr';
+is $result->error,  undef, 'threw no exceptions';
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Classifying /,       'classification logged' );
+$log->contains_ok( qr/^No tweaks /,         'lack of tweaks logged' );
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Bootstrap with debootstrap .*--exclude.*buster[^,]+$/,
+	'command logged'
+);
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Skip execute command in dry-run mode$/,
+	'skip command logged'
+);
+$log->empty_ok("no more logs");
 
 $result = test_app( 'Boxer::CLI' => [ @base_cmd, qw(lxp5 -- foo bar) ] );
-like $result->stdout,
-	qr/^mmdebstrap --include [a-z]\S+,[a-z]\S+- buster foo bar\n$/,
-	'printed what we expected';
-is $result->stderr, "No tweaks resolved\n", 'nothing sent to sderr';
-is $result->error, undef, 'threw no exceptions';
+is $result->stdout, '',    'nothing sent to stdout';
+is $result->stderr, '',    'nothing sent to stderr';
+is $result->error,  undef, 'threw no exceptions';
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Classifying /,       'classification logged' );
+$log->contains_ok( qr/^No tweaks /,         'lack of tweaks logged' );
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Enabling apt mode needed by bootstrap helper mmdebstrap$/,
+	'apt mode enabling logged'
+);
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Bootstrap with mmdebstrap .*--include(?!.*--exclude).*bar[^,]+$/,
+	'command logged'
+);
+$log->category_contains_ok(
+	'Boxer::Task::Bootstrap',
+	qr/^Skip execute command in dry-run mode$/,
+	'skip command logged'
+);
+$log->empty_ok("no more logs");
 
 done_testing();

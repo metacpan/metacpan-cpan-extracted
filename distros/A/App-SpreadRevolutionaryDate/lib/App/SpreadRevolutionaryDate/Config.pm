@@ -10,12 +10,15 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.08';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.10';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
 use MooseX::NonMoose;
+
 extends 'AppConfig';
+
+use Getopt::Long;
 use AppConfig qw(:argcount);
 use File::HomeDir;
 use Class::Load ':all';
@@ -24,24 +27,44 @@ use namespace::clean;
 
 sub new {
   my ($class, $filename) = @_;
+
+  # Backup command line arguments to be consumed twice
+  my @orig_argv = @ARGV;
+
+  # Parse command line only parameters
+  my $config_first = Getopt::Long::Parser->new;
+  $config_first->configure('pass_through');
+
+  if ($filename) {
+    $config_first->getoptions("version|v" => sub { say $App::SpreadRevolutionaryDate::Config::VERSION; exit 0; },
+                              "help|h|?" => \&usage);
+  } else {
+    $config_first->getoptions("version|v" => sub { say $App::SpreadRevolutionaryDate::Config::VERSION; exit 0; },
+                              "help|h|?" => \&usage,
+                              "conf|c=s" => \$filename);
+  }
+
   # If filename is not a file path but a GLOB or an opend filehandle
   # we'll need to rewind it to the beginning before reading it twice
   my $file_start;
   $file_start = tell $filename if $filename && ref($filename);
 
-  # Backup command line arguments to be consumed twice
-  my @orig_argv = @ARGV;
-
   # Find targets
-  my $config_targets = AppConfig::new($class, {CREATE => 1},
+  my $config_targets = AppConfig::new($class, {CREATE => 1, ERROR => sub {}},
+                                      'conf' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'c'},
+                                      'version' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'v'},
+                                      'help' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'h|?'},
                                       'targets' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'tg'},
-                                      'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
+                                      'msgmaker' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'mm'},
                                       'test' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'no|n'},
                                       'locale' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'l'},
+                                      'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
                                       'twitter' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 't'},
                                       'mastodon' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'm'},
                                       'freenode' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'f'});
   $config_targets->parse_file($filename);
+  # Rewind command line arguments and process them
+  @ARGV = @orig_argv;
   $config_targets->parse_command_line;
 
   # Add targets defined with targets option
@@ -52,7 +75,7 @@ sub new {
   foreach my $potential_target (keys %potential_targets) {
     next unless $potential_targets{$potential_target};
     next if $potential_target =~ /_/;
-    if ($potential_target !~ /^(?:acab|test|locale|targets)$/) {
+    if ($potential_target !~ /^(?:acab|test|locale|targets|msgmaker|conf|version|help)$/) {
       push @targets, $potential_target;
     }
   }
@@ -79,19 +102,51 @@ sub new {
     foreach my $target_meta_attribute ($target_meta->get_all_attributes) {
       next if $target_meta_attribute->name eq 'obj';
       my $target_meta_attribute_type = $target_meta_attribute->type_constraint;
-      my $target_meta_attribute_argcount = $target_meta_attribute_type =~ /ArrayRef/ ? ARGCOUNT_LIST : $target_meta_attribute_type =~ /HashRef/ ? ARGCOUNT_HASH : ARGCOUNT_ONE;
-      $target_attributes{$target . '_' . $target_meta_attribute->name} = { ARGCOUNT => $target_meta_attribute_argcount };
-      $target_attributes{$target} = { ARGCOUNT => ARGCOUNT_NONE };
+      my $target_meta_attribute_argcount = $target_meta_attribute_type =~ /ArrayRef/ ? ARGCOUNT_LIST : $target_meta_attribute_type =~ /HashRef/ ? ARGCOUNT_HASH : $target_meta_attribute_type =~ /Bool/ ? ARGCOUNT_NONE : ARGCOUNT_ONE;
+      $target_attributes{lc($target) . '_' . $target_meta_attribute->name} = { ARGCOUNT => $target_meta_attribute_argcount };
+      $target_attributes{lc($target)} = { ARGCOUNT => ARGCOUNT_NONE };
+
+      if ($target_meta_attribute->has_default) {
+        $target_attributes{lc($target) . '_' . $target_meta_attribute->name}{DEFAULT} = $target_meta_attribute->default;
+      }
+    }
+  }
+
+  # Guess attributes for MsgMaker
+  my %msgmaker_attributes;
+  my $msgmaker = $config_targets->msgmaker || 'RevolutionaryDate';
+  my $msgmaker_class = 'App::SpreadRevolutionaryDate::MsgMaker::' . $msgmaker;
+  my $msgmaker_meta;
+  try_load_class($msgmaker_class)
+    or die "Cannot found msgmaker class $msgmaker_class for msgmaker $msgmaker\n";
+  load_class($msgmaker_class);
+  eval { $msgmaker_meta = $msgmaker_class->meta; };
+  die "Cannot found msgmaker meta class $msgmaker_class for msgmaker $msgmaker: $@\n" if $@;
+  foreach my $msgmaker_meta_attribute ($msgmaker_meta->get_all_attributes) {
+    next if $msgmaker_meta_attribute->name eq 'locale';
+
+    my $msgmaker_meta_attribute_type = $msgmaker_meta_attribute->type_constraint;
+    my $msgmaker_meta_attribute_argcount = $msgmaker_meta_attribute_type =~ /ArrayRef/ ? ARGCOUNT_LIST : $msgmaker_meta_attribute_type =~ /HashRef/ ? ARGCOUNT_HASH : $msgmaker_meta_attribute_type =~ /Bool/ ? ARGCOUNT_NONE : ARGCOUNT_ONE;
+    $msgmaker_attributes{lc($msgmaker) . '_' . $msgmaker_meta_attribute->name} = { ARGCOUNT => $msgmaker_meta_attribute_argcount };
+    $msgmaker_attributes{lc($msgmaker)} = { ARGCOUNT => ARGCOUNT_NONE };
+
+    if ($msgmaker_meta_attribute->has_default) {
+      $msgmaker_attributes{lc($msgmaker) . '_' . $msgmaker_meta_attribute->name}{DEFAULT} = $msgmaker_meta_attribute->default;
     }
   }
 
   # Build actual instance
   my $self = AppConfig::new($class,
     %target_attributes,
+    %msgmaker_attributes,
+    'conf' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'c'},
+    'version' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'v'},
+    'help' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'h|?'},
     'targets' => {ARGCOUNT => ARGCOUNT_LIST, ALIAS => 'tg'},
-    'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
+    'msgmaker' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'mm', default => 'RevolutionaryDate'},
     'test' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'no|n'},
-    'locale' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'l'},
+    'locale' => {ARGCOUNT => ARGCOUNT_ONE, ALIAS => 'l', default => 'fr'},
+    'acab' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 'a'},
     # Overwrite found attributes for default targets
     # for backward compatibility with aliases
     'twitter' => {ARGCOUNT => ARGCOUNT_NONE, ALIAS => 't'},
@@ -127,7 +182,7 @@ sub new {
   foreach my $potential_target (keys %confvars) {
     next unless $confvars{$potential_target};
     next if $potential_target =~ /_/;
-    if ($potential_target !~ /^(?:acab|test|locale|targets)$/) {
+    if ($potential_target !~ /^(?:acab|test|locale|targets|msgmaker|conf|version|help)$/) {
       push @targets, $potential_target;
       $self->targets($potential_target);
     }
@@ -147,13 +202,20 @@ sub new {
     $self->check_target_mandatory_options($target);
   }
 
+  # Add acab option for RevolutionaryDate for backward compatibility
+  $self->revolutionarydate_acab($self->acab)
+    if  $self->msgmaker eq 'RevolutionaryDate'
+        && !$self->revolutionarydate_acab
+        && $self->acab;
+
+
   return $self;
 }
 
 
 sub parse_file {
-  my $self = shift;
-  my $filename = shift;
+  my ($self, $filename) = @_;
+
   foreach my $default_path (
                 File::HomeDir->my_home . '/.config/spread-revolutionary-date/spread-revolutionary-date.conf',
                 File::HomeDir->my_home . '/.spread-revolutionary-date.conf') {
@@ -165,13 +227,13 @@ sub parse_file {
 
 sub parse_command_line {
   my $self = shift;
+
   $self->args;
 }
 
 
 sub check_target_mandatory_options {
-  my $self = shift;
-  my $target = shift;
+  my ($self, $target) = @_;
 
   my $target_class = 'App::SpreadRevolutionaryDate::Target::' . ucfirst(lc($target));
   my $target_meta;
@@ -192,8 +254,8 @@ sub check_target_mandatory_options {
 
 
 sub get_target_arguments {
-  my $self = shift;
-  my $target = lc(shift);
+  my ($self, $target) = @_;
+  $target = lc($target);
 
   my %target_args = $self->varlist("^${target}_", 1);
 
@@ -204,6 +266,56 @@ sub get_target_arguments {
     }
   }
   return %target_args;
+}
+
+
+sub get_msgmaker_arguments {
+  my ($self, $msgmaker) = @_;
+  $msgmaker = lc($msgmaker);
+
+  my %msgmaker_args = $self->varlist("^${msgmaker}_", 1);
+
+  # Add acab option for RevolutionaryDate for backward compatibility
+  $msgmaker_args{acab} = $self->acab
+    if  $msgmaker eq 'RevolutionaryDate'
+        && !exists($msgmaker_args{acab})
+        && $self->acab;
+
+  return %msgmaker_args;
+}
+
+
+sub usage {
+ print << "USAGE";
+Usage: $0 <OPTIONS>
+  with <OPTIONS>:
+    --conf|-c <file>: path to configuration file (default: ~/.config/spread-revolutionary-date/spread-revolutionary-date.conf or ~/.spread-revolutionary-date.conf)'
+    --version|-v': print out version
+    --help|-h|-?': print out this help
+    --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: twitter, mastodon, freenode)
+    --msgmaker|-mm <MsgMakerClass>: define message maker (default: RevolutionaryDate)
+    --locale|-l <en|fr>: define locale (default: fr)
+    --test|--no|-n: do not spread, just print out message or spread to test channels for Freenode
+    --acab|-a: DEPRECATED, use --revolutionarydate-acab
+    --twitter|-t: DEPRECATED, use --targets=twitter
+    --mastodon|-m: DEPRECATED, use --targets=mastodon
+    --freenode|-f: DEPRECATED, use --targets=freenode
+    --twitter_consumer_key|-tck <key>: define Twitter consumer key
+    --twitter_consumer_secret|-tcs <secret>: define Twitter consumer secret
+    --twitter_access_token|-tat <token>: define Twitter access token
+    --twitter_access_token_secret|tats <token_secret>: define Twitter access token secret
+    --mastodon_instance|-mi <instance>: define Mastodon instance
+    --mastodon_client_id|-mci <id>: define Mastodon client id
+    --mastodon_client_secret|-mcs <secret>: define Mastodon client secret
+    --mastodon_access_token|-mat <token>: define Mastodon access token
+    --freenode_nickname|-fn <nick>: define Freenode nickname
+    --freenode_password|-fp <passwd>: define Freenode password
+    --freenode_test_channels|-ftc <channel_1>  [--freenode_test_channels|-ftc <channel_2> […--freenode_test_channels|-ftc <channel_n>]]: define Freenode channels
+    --freenode_channels|-fc <channel_1>  [--freenode_channels|-fc <channel_2> […--freenode_channels|-fc <channel_n>]]: define Freenode test channels
+    --revolutionarydate-acab: pretend it is 01:31:20
+    --promptuser-default: define default message when --msgmaker=PromptUser
+USAGE
+ exit 0;
 }
 
 
@@ -229,7 +341,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 METHODS
 
@@ -253,6 +365,14 @@ Checks whether target configuration options are set to authenticate on specified
 
 Takes one mandatory argument: C<target> as a string in lower case, without any underscore (like C<'twitter'>, C<'mastodon'> or C<'freenode'>). Returns a hash with configuration options relative to the passed C<target> argument. If C<test> option is true, any value for an option starting with C<"test_"> will be set for the option with the same name without C<"test_"> (eg. values of C<test_channels> are set to option C<channels> for C<Freenode> target).
 
+=head2 get_msgmaker_arguments
+
+Takes one mandatory argument: C<msgmaker> as a string. Returns a hash with configuration options relative to the passed C<msgmaker> argument.
+
+=head2 usage
+
+Prints usage with command line parameters and exits.
+
 =head1 SEE ALSO
 
 =over
@@ -270,6 +390,12 @@ Takes one mandatory argument: C<target> as a string in lower case, without any u
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
 
 =back
 

@@ -1,7 +1,7 @@
 package Dancer::SharedData;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Shared-data singleton for Dancer
-$Dancer::SharedData::VERSION = '1.3510';
+$Dancer::SharedData::VERSION = '1.3512';
 use strict;
 use warnings;
 use Dancer::Timer;
@@ -42,6 +42,10 @@ sub response {
 }
 sub reset_response { $_response = undef }
 
+# sessions singleton
+my $_sessions;
+sub sessions { (@_ == 2) ? $_sessions = $_[1] : $_sessions }
+
 # request timer
 my $_timer;
 sub timer { $_timer ||= Dancer::Timer->new }
@@ -57,6 +61,7 @@ sub reset_all {
     if (!$is_forward) {
         $vars = {};
     }
+    undef $_sessions;
     undef $_request;
     undef $_headers;
     reset_timer();
@@ -77,7 +82,7 @@ Dancer::SharedData - Shared-data singleton for Dancer
 
 =head1 VERSION
 
-version 1.3510
+version 1.3512
 
 =head1 AUTHOR
 

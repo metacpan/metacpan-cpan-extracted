@@ -37,53 +37,51 @@ sub init ( $self, $args ) {
 
     my $repo_id = "$repo_namespace/$repo_name";
 
-    my $confirm = P->term->prompt( qq[Create DockerHub repository "$repo_id"?], [qw[yes no]], enter => 1 );
+    my $confirm = P->term->prompt( qq[Create DockerHub repository "$repo_id"?], [qw[yes no cancel]], enter => 1 );
 
-    if ( $confirm eq 'no' ) {
+    if ( $confirm eq 'cancel' ) {
         exit 3;
     }
+    elsif ( $confirm eq 'yes' ) {
+        my $api = $self->dockerhub_api;
 
-    my $api = $self->dockerhub_api;
+        print q[Creating DockerHub repository ... ];
 
-    print q[Creating DockerHub repository ... ];
+        my $res = $api->create_autobuild(
+            $repo_id,
+            $scm_upstream->{hosting},
+            $scm_upstream->{repo_id},
+            $self->{dist}->module->abstract || $self->{dist}->name,
+            private => 0,
+            active  => 1
+        );
 
-    my $res = $api->create_autobuild(
-        $repo_id,
-        $scm_upstream->{hosting},
-        $scm_upstream->{repo_id},
-        $self->{dist}->module->abstract || $self->{dist}->name,
-        private => 0,
-        active  => 1
-    );
+        say $res->{reason};
 
-    say $res->{reason};
-
-    if ( !$res->is_success ) {
-        exit 3;
+        exit 3 if !$res->is_success;
     }
-    else {
-        require Pcore::Util::File::Tree;
 
-        # copy files
-        my $files = Pcore::Util::File::Tree->new;
+    require Pcore::Util::File::Tree;
 
-        $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/docker/' );
+    # copy files
+    my $files = Pcore::Util::File::Tree->new;
 
-        # do not overwrite Dockerfile
-        $files->remove_file('Dockerfile') if -f "$self->{dist}->{root}/Dockerfile";
+    $files->add_dir( $ENV->{share}->get_location('/Pcore/dist-tmpl') . '/docker/' );
 
-        $files->move_tree( '__dist_name__', lc $self->{dist}->name );
+    # do not overwrite Dockerfile
+    $files->remove_file('Dockerfile') if -f "$self->{dist}->{root}/Dockerfile";
 
-        $files->render_tmpl( {
-            author                        => $self->{dist}->cfg->{author},
-            dist_path                     => lc $self->{dist}->name,
-            dockerhub_dist_repo_namespace => $repo_namespace,
-            dockerhub_dist_repo_name      => $repo_name,
-            dockerhub_pcore_repo_id       => $ENV->{pcore}->docker->{repo_id},
-        } );
+    $files->move_tree( '__dist_name__', lc $self->{dist}->name );
 
-        $files->write_to( $self->{dist}->{root} );
-    }
+    $files->render_tmpl( {
+        author                        => $self->{dist}->cfg->{author},
+        dist_path                     => lc $self->{dist}->name,
+        dockerhub_dist_repo_namespace => $repo_namespace,
+        dockerhub_dist_repo_name      => $repo_name,
+        dockerhub_pcore_repo_id       => $ENV->{pcore}->docker->{repo_id},
+    } );
+
+    $files->write_to( $self->{dist}->{root} );
 
     return;
 }
@@ -642,7 +640,7 @@ sub build_local ( $self, $tag, $args ) {
     # push images
     if ( $args->{push} ) {
         for my $tag (@tags) {
-            print qq[Pusing image "$tag" ... ];
+            print qq[Pushing image "$tag" ... ];
             $res = $docker->image_push($tag);
             say $res;
         }
@@ -719,10 +717,10 @@ sub _build_dockerignore ( $self, $path ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 127                  | * Subroutine "status" with high complexity score (28)                                                          |
-## |      | 300                  | * Subroutine "build_status" with high complexity score (31)                                                    |
+## |      | 125                  | * Subroutine "status" with high complexity score (28)                                                          |
+## |      | 298                  | * Subroutine "build_status" with high complexity score (31)                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 477                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 475                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

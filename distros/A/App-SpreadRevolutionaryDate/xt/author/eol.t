@@ -10,16 +10,24 @@ my @files = (
     'bin/spread-revolutionary-date',
     'lib/App/SpreadRevolutionaryDate.pm',
     'lib/App/SpreadRevolutionaryDate/Config.pm',
+    'lib/App/SpreadRevolutionaryDate/MsgMaker.pm',
+    'lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm',
+    'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm',
     'lib/App/SpreadRevolutionaryDate/Target.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Freenode.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm',
     'lib/App/SpreadRevolutionaryDate/Target/Twitter.pm',
     't/00-compile.t',
+    't/command_line.t',
     't/config.t',
     't/locale.t',
+    't/mastodon.t',
     't/new_target.t',
-    't/objects.t'
+    't/objects.t',
+    't/promptuser.t',
+    't/twitter.t',
+    't/wikipedia.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

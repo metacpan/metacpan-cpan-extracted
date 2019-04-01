@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Bytes::Random::Secure" => 0,
     "Carp" => 0,
-    "Crypt::AuthEnc::CCM" => 0,
+    "Crypt::AuthEnc::CCM" => "0.057",
     "MIME::Base64" => 0,
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::UseAllModules" => "0.17"
   },
-  "VERSION" => "1.181840",
+  "VERSION" => "1.190901",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +50,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Bytes::Random::Secure" => 0,
   "Carp" => 0,
-  "Crypt::AuthEnc::CCM" => 0,
+  "Crypt::AuthEnc::CCM" => "0.057",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "MIME::Base64" => 0,

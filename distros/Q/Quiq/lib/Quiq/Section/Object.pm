@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Path;
 
@@ -666,7 +666,7 @@ Wert (Skalar-Kontext) oder Wertliste (Array-Kontext)
 Liefere den Wert zu Schlüssel $key bzw. die liste der Werte zu den
 Schlüsseln @keys. Beginnt der $key mit einem Großbuchstaben, ist
 es ein fataler Fehler, wenn zu dem Schlüssel mehrere Werte existieren.
-Solche Schlüssel müssen mit $obj->L</getArray>() abgefragt werden.
+Solche Schlüssel müssen mit $obj->L<getArray|"getArray() - Liefere Wertliste zu Schlüssel">() abgefragt werden.
 
 =cut
 
@@ -822,7 +822,7 @@ Wert (Skalar)
 
 =head4 Description
 
-Wie $sec->L</get>(), nur dass ein Wert existieren muss, sonst
+Wie $sec->L<get|"get() - Liefere Wert zu Schlüssel">(), nur dass ein Wert existieren muss, sonst
 wird eine Exception geworfen.
 
 =cut
@@ -916,7 +916,7 @@ sub search {
 
 =head4 Description
 
-Wie L</get>(), nur dass im Falle eines unerlaubten Schlüssels
+Wie L<get|"get() - Liefere Wert zu Schlüssel">(), nur dass im Falle eines unerlaubten Schlüssels
 keine Exception geworfen, sondern C<undef> geliefert wird.
 
 =cut
@@ -985,7 +985,7 @@ sub memoize {
 
 =head4 Description
 
-Die Methode ist identisch zu $sec->L</memoize>(), nur dass eine
+Die Methode ist identisch zu $sec->L<memoize|"memoize() - Ermittele Wert und cache ihn auf Attribut">(), nur dass eine
 Referenz ermittelt und automatisch zu einer schwachen Referenz
 gemacht wird.
 
@@ -1432,7 +1432,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

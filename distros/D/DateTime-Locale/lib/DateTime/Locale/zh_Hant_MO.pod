@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::zh_Hant_MO - Locale data examples for the Chinese Macau SAR China Traditional (zh-Hant-MO) locale
+DateTime::Locale::zh_Hant_MO - Locale data examples for the Chinese Macao SAR China Traditional (zh-Hant-MO) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Chinese Macau SAR China Traditional locale.
+Chinese Macao SAR China Traditional locale.
 
 =head2 Days
 
@@ -241,8 +241,8 @@ Chinese Macau SAR China Traditional locale.
 
 =head3 Narrow (format)
 
-  西元前
-  西元
+  公元前
+  公元
 
 =head2 Date Formats
 

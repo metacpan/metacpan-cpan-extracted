@@ -1,0 +1,43 @@
+=====================
+Acme::Cow version 0.1
+=====================
+
+Talking cows.  ASCII artwork.  A veritable foundation of the
+Internet.
+
+Now you can make the cows say whatever you want.  Acme::Cow is the
+module that does all the work behind the new version of cow{say,think}
+(also included in this distribution).  Now you can incorporate
+loquactious cattle into any program you want, quickly and easily.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Optionally, you may:
+
+    make install-cows
+
+If you think it's necessary, you can take the contents of the cows/
+directory herein and make yourself a copy.  Adding that directory
+to your COWPATH environment variable might do you some good.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Text::Template
+
+COPYRIGHT AND LICENSE
+
+Acme::Cow and cowsay are distributed under the same license terms
+as Perl itself.
+
+Copyright (c) 2002 Tony Monroe <tmonroe plus perl at nog dot net>
+
+$Id: README,v 1.2 2002/03/23 01:41:26 tony Exp $

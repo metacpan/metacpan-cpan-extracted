@@ -4,8 +4,8 @@ use warnings;
 
 use Perl::Metrics::Halstead;
 
-# Possible metrics: effort, difficulty, volume, level, lang_level, intel_content, time_to_program, delivered_bugs
-my $metric = shift || die "Usage: perl $0 metric file1.pm file2.pl [file3.pm...]\n";
+# Possible metrics: effort difficulty volume level lang_level intel_content time_to_program delivered_bugs
+my $metric = shift || die "Usage: perl $0 metric file1.pm [file2.pl file3.pm ...]\n";
 
 die "Invalid Halstead metric: $metric\n" unless Perl::Metrics::Halstead->can($metric);
 
@@ -20,7 +20,7 @@ for my $file (@packages) {
     push @scores, [ $file, $m->$metric ];
 }
 
-# Output the sorted file list.
+# Output the sorted file list by score.
 my $n = 0;
 for my $i ( sort{ $a->[1] <=> $b->[1] } @scores ){
     printf "%d. %.4f %s\n", ++$n, $i->[1], $i->[0];

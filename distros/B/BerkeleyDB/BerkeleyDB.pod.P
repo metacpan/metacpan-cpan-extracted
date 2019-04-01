@@ -1,6 +1,6 @@
 =head1 NAME
 
-BerkeleyDB - Perl extension for Berkeley DB version 2, 3, 4 or 5
+BerkeleyDB - Perl extension for Berkeley DB version 2, 3, 4, 5 or 6
 
 =head1 SYNOPSIS
 
@@ -2290,6 +2290,29 @@ want to make the same transformation to all keys and/or values in a DBM
 database. All of the database classes (BerkeleyDB::Hash,
 BerkeleyDB::Btree and BerkeleyDB::Recno) support DBM Filters.
 
+An example is when you need to encode your data in UTF-8 before writing to
+the database and then decode the UTF-8 when reading from the database file.
+
+There are two ways to use a DBM Filter.
+
+=over 5
+
+=item 1.
+
+Using the low-level API defined below.
+
+=item 2.
+
+Using the L<DBM_Filter> module. 
+This module hides the complexity of the API defined below and comes
+with a number of "canned" filters that cover some of the common use-cases.
+
+=back
+
+Use of the L<DBM_Filter> module is recommended.
+
+=head2 DBM Filter Low-level API
+
 There are four methods associated with DBM Filters. All work
 identically, and each is used to install (or uninstall) a single DBM
 Filter. Each expects a single parameter, namely a reference to a sub.
@@ -2462,7 +2485,7 @@ The official web site for Berkeley DB is F<http://www.oracle.com/technology/prod
 
 =head1 COPYRIGHT
 
-Copyright (c) 1997-2015 Paul Marquess. All rights reserved. This program
+Copyright (c) 1997-2019 Paul Marquess. All rights reserved. This program
 is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.
 

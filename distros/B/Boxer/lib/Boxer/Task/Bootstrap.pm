@@ -7,7 +7,6 @@ package Boxer::Task::Bootstrap;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 use autodie qw(:all);
@@ -15,16 +14,17 @@ use IPC::System::Simple qw(runx);
 
 use Moo;
 use MooX::StrictConstructor;
-use Types::Standard qw( Bool Str InstanceOf ArrayRef );
-extends 'Boxer::Task';
+extends qw(Boxer::Task);
+
+use Types::Standard qw( Bool Str InstanceOf ArrayRef Maybe );
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 has world => (
 	is       => 'ro',
@@ -44,6 +44,11 @@ has helper => (
 	required => 1,
 );
 
+has mode => (
+	is  => 'ro',
+	isa => Maybe [Str],
+);
+
 has helper_args => (
 	is  => 'ro',
 	isa => ArrayRef,
@@ -60,7 +65,22 @@ has apt => (
 	is  => 'lazy',
 	isa => Bool,
 );
-sub _build_apt { $_[0]->{helper} eq 'mmdebstrap' }
+
+sub _build_apt
+{
+	my ($self) = @_;
+	my $flag;
+	foreach my $helper (qw(mmdebstrap)) {
+		if ( $self->{helper} eq $helper ) {
+			$self->_logger->tracef(
+				'Enabling apt mode needed by bootstrap helper %s',
+				$helper,
+			);
+			return 1;
+		}
+	}
+	return 0;
+}
 
 has dryrun => (
 	is       => 'ro',
@@ -88,13 +108,25 @@ sub run
 		if (@pkgs);
 	push @opts, '--exclude', join( ',', @pkgs_avoid )
 		if (@pkgs_avoid);
-	push @opts, $world->epoch, @{ $self->helper_args };
+	push @opts, $world->epoch, @{ $self->mode, $self->helper_args };
 
-	if ( $self->dryrun ) {
-		runx 'echo', $self->helper, @opts;
+	my @command;
+	if ( $self->mode and $self->mode eq 'sudo' ) {
+		@command = ( 'sudo', '--', $self->helper, @opts );
 	}
 	else {
-		runx $self->helper, @opts;
+		@command = ( $self->helper, @opts );
+	}
+
+	$self->_logger->info(
+		"Bootstrap with " . $self->helper,
+		$self->_logger->is_debug() ? { commandline => [@command] } : (),
+	);
+	if ( $self->dryrun ) {
+		$self->_logger->debug('Skip execute command in dry-run mode');
+	}
+	else {
+		runx @command;
 	}
 
 	1;

@@ -28,7 +28,7 @@
     MEd => "E d/M",
     MMM => "LLL",
     MMMEd => "E d MMM",
-    "MMMMW-count-other" => "\N{U+179f}\N{U+1794}\N{U+17d2}\N{U+178f}\N{U+17b6}\N{U+17a0}\N{U+17cd}\N{U+1791}\N{U+17b8} W \N{U+1793}\N{U+17c3}\N{U+1781}\N{U+17c2} MMM",
+    "MMMMW-count-other" => "\N{U+179f}\N{U+1794}\N{U+17d2}\N{U+178f}\N{U+17b6}\N{U+17a0}\N{U+17cd}\N{U+1791}\N{U+17b8} W \N{U+1793}\N{U+17c3}\N{U+1781}\N{U+17c2} MMMM",
     MMMMd => "MMMM d",
     MMMd => "d MMM",
     Md => "d/M",
@@ -266,5 +266,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 34,
+  version => 35,
 }

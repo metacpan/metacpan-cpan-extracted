@@ -501,29 +501,29 @@ Lithuanian Lithuania locale.
    1995-12-22T09:05:02 = gruodžio 22 d., pn
   -0010-09-15T04:44:23 = rugsėjo 15 d., št
 
-=head3 MMMMW-count-few (MMM W 'sav'.)
+=head3 MMMMW-count-few (MMMM W 'sav'.)
 
-   2008-02-05T18:30:30 = vas. 1 sav.
-   1995-12-22T09:05:02 = gruod. 3 sav.
-  -0010-09-15T04:44:23 = rugs. 2 sav.
+   2008-02-05T18:30:30 = vasario 1 sav.
+   1995-12-22T09:05:02 = gruodžio 3 sav.
+  -0010-09-15T04:44:23 = rugsėjo 2 sav.
 
-=head3 MMMMW-count-many (MMM W 'sav'.)
+=head3 MMMMW-count-many (MMMM W 'sav'.)
 
-   2008-02-05T18:30:30 = vas. 1 sav.
-   1995-12-22T09:05:02 = gruod. 3 sav.
-  -0010-09-15T04:44:23 = rugs. 2 sav.
+   2008-02-05T18:30:30 = vasario 1 sav.
+   1995-12-22T09:05:02 = gruodžio 3 sav.
+  -0010-09-15T04:44:23 = rugsėjo 2 sav.
 
-=head3 MMMMW-count-one (MMM W 'sav'.)
+=head3 MMMMW-count-one (MMMM W 'sav'.)
 
-   2008-02-05T18:30:30 = vas. 1 sav.
-   1995-12-22T09:05:02 = gruod. 3 sav.
-  -0010-09-15T04:44:23 = rugs. 2 sav.
+   2008-02-05T18:30:30 = vasario 1 sav.
+   1995-12-22T09:05:02 = gruodžio 3 sav.
+  -0010-09-15T04:44:23 = rugsėjo 2 sav.
 
-=head3 MMMMW-count-other (MMM W 'sav'.)
+=head3 MMMMW-count-other (MMMM W 'sav'.)
 
-   2008-02-05T18:30:30 = vas. 1 sav.
-   1995-12-22T09:05:02 = gruod. 3 sav.
-  -0010-09-15T04:44:23 = rugs. 2 sav.
+   2008-02-05T18:30:30 = vasario 1 sav.
+   1995-12-22T09:05:02 = gruodžio 3 sav.
+  -0010-09-15T04:44:23 = rugsėjo 2 sav.
 
 =head3 MMMMd (MMMM d 'd'.)
 

@@ -471,17 +471,17 @@ Norwegian Bokmål Norway locale.
    1995-12-22T09:05:02 = fre. 22. des.
   -0010-09-15T04:44:23 = lør. 15. sep.
 
-=head3 MMMMW-count-one (W. 'uke' 'i' MMM)
+=head3 MMMMW-count-one (W. 'uke' 'i' MMMM)
 
-   2008-02-05T18:30:30 = 1. uke i feb.
-   1995-12-22T09:05:02 = 3. uke i des.
-  -0010-09-15T04:44:23 = 2. uke i sep.
+   2008-02-05T18:30:30 = 1. uke i februar
+   1995-12-22T09:05:02 = 3. uke i desember
+  -0010-09-15T04:44:23 = 2. uke i september
 
-=head3 MMMMW-count-other (W. 'uke' 'i' MMM)
+=head3 MMMMW-count-other (W. 'uke' 'i' MMMM)
 
-   2008-02-05T18:30:30 = 1. uke i feb.
-   1995-12-22T09:05:02 = 3. uke i des.
-  -0010-09-15T04:44:23 = 2. uke i sep.
+   2008-02-05T18:30:30 = 1. uke i februar
+   1995-12-22T09:05:02 = 3. uke i desember
+  -0010-09-15T04:44:23 = 2. uke i september
 
 =head3 MMMMd (d. MMMM)
 

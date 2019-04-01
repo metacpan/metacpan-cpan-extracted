@@ -11,17 +11,16 @@ Boxer - system deployment ninja tricks
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 =head1 DESCRIPTION
 
@@ -43,7 +42,13 @@ L<Hands-off|http://hands.com/d-i/>
 
 L<Debian Pure Blends|https://wiki.debian.org/DebianPureBlends>
 
+L<Footprintless>
+
 L<FAI class system|https://fai-project.org/fai-guide/#defining%20classes>
+
+L<Elbe commands|https://elbe-rfs.org/docs/sphinx/elbe.html>
+
+L<isar|https://github.com/ilbers/isar>
 
 L<Debathena config-package-dev|https://debathena.mit.edu/config-packages/>
 

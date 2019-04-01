@@ -110,6 +110,7 @@ t/Handler/CaptureEvents.t
 t/Handler/HTMLFilter.t
 t/Handler/HTMLStream/Document.t
 t/Handler/HTMLStream/Fragment.t
+t/Handler/HTMLStream/SortedAttributes.t
 t/Handler/HTMLStream/bad-filehandle.t
 t/Handler/HTMLStream/unicode.t
 t/Handler/Multiplexer.t

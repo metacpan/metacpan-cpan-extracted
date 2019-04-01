@@ -45,4 +45,42 @@ is_deeply $affinity->you, $you, 'you';
 my $score = $affinity->score();
 is sprintf( '%.2f', $score ), 94.41, 'score';
 
+$me = [
+    [ 'very organized', 'very organized', 'very important' ],
+    [ 'no',             'no',             'a little important' ],
+];
+$you = [
+    [ 'very organized', 'very organized', 'very important' ],
+    [ 'no',             'no',             'very important' ],
+];
+
+$affinity = Acme::Affinity->new(
+    questions  => $questions,
+    importance => $importance,
+    me         => $me,
+    you        => $you,
+);
+
+$score = $affinity->score();
+is $score, 100, 'score';
+
+$me = [
+    [ 'very organized', 'very organized', 'very important' ],
+    [ 'no',             'no',             'a little important' ],
+];
+$you = [
+    [ 'very messy', 'very messy', 'irrelevant' ],
+    [ 'yes',        'yes',        'very important' ],
+];
+
+$affinity = Acme::Affinity->new(
+    questions  => $questions,
+    importance => $importance,
+    me         => $me,
+    you        => $you,
+);
+
+$score = $affinity->score();
+is $score, 0, 'score';
+
 done_testing();

@@ -501,17 +501,17 @@ Spanish Latin America locale.
    1995-12-22T09:05:02 = vie., 22 de diciembre
   -0010-09-15T04:44:23 = sáb., 15 de septiembre
 
-=head3 MMMMW-count-one ('semana' W 'de' MMM)
+=head3 MMMMW-count-one ('semana' W 'de' MMMM)
 
-   2008-02-05T18:30:30 = semana 1 de feb.
-   1995-12-22T09:05:02 = semana 3 de dic.
-  -0010-09-15T04:44:23 = semana 2 de sep.
+   2008-02-05T18:30:30 = semana 1 de febrero
+   1995-12-22T09:05:02 = semana 3 de diciembre
+  -0010-09-15T04:44:23 = semana 2 de septiembre
 
-=head3 MMMMW-count-other ('semana' W 'de' MMM)
+=head3 MMMMW-count-other ('semana' W 'de' MMMM)
 
-   2008-02-05T18:30:30 = semana 1 de feb.
-   1995-12-22T09:05:02 = semana 3 de dic.
-  -0010-09-15T04:44:23 = semana 2 de sep.
+   2008-02-05T18:30:30 = semana 1 de febrero
+   1995-12-22T09:05:02 = semana 3 de diciembre
+  -0010-09-15T04:44:23 = semana 2 de septiembre
 
 =head3 MMMMd (d 'de' MMMM)
 

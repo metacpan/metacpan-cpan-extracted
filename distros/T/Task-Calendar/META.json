@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-Calendar",
    "no_index" : {
@@ -32,13 +32,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Calendar::Bahai" : "0.48",
-            "Calendar::Gregorian" : "0.17",
-            "Calendar::Hebrew" : "0.07",
-            "Calendar::Hijri" : "0.35",
-            "Calendar::Julian" : "0.08",
-            "Calendar::Persian" : "0.37",
-            "Calendar::Saka" : "1.36",
+            "Calendar::Bahai" : "0.49",
+            "Calendar::Gregorian" : "0.18",
+            "Calendar::Hebrew" : "0.08",
+            "Calendar::Hijri" : "0.36",
+            "Calendar::Julian" : "0.09",
+            "Calendar::Persian" : "0.38",
+            "Calendar::Saka" : "1.37",
             "perl" : "5.006"
          }
       }
@@ -51,6 +51,6 @@
          "web" : "https://github.com/manwar/Task-Calendar"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

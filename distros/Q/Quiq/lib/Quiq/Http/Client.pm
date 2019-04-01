@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Option;
 use Quiq::Url;
@@ -29,11 +29,11 @@ L<Quiq::Object>
 
 Die Klasse implementiert einen HTTP-Client für GET- und POST-Requests.
 
-Die zentrale Methode ist $class->L</sendReceive>(). Diese sendet eine
+Die zentrale Methode ist $class->L<sendReceive|"sendReceive() - Führe HTTP-Request aus">(). Diese sendet eine
 HTTP-Request-Message, die der Aufrufer konfiguriert hat, an einen
 Server (URL), und gibt die HTTP-Response-Message des Servers zurück.
 Die Methode beherrscht GET- und POSTS-Requests. Auf ihrer Basis
-sind die spezielleren Methoden $class->L</get>() und $class->L</post>()
+sind die spezielleren Methoden $class->L<get|"get() - Führe GET-Request aus">() und $class->L<post|"post() - Führe POST-Request aus">()
 implementiert. Die HTTP-Messages, sowohl gesendete als auch empfangene,
 sind Instanzen der Klasse Quiq::HTTP::Message.
 
@@ -232,7 +232,7 @@ Quiq::Http::Message.
 
 =head4 Options
 
-Siehe Methode L</sendReceive>().
+Siehe Methode L<sendReceive|"sendReceive() - Führe HTTP-Request aus">().
 
 =head4 Description
 
@@ -275,7 +275,7 @@ Der URL, gegen den der GET-Request ausgeführt wird.
 
 =head4 Options
 
-Siehe Methode L</sendReceive>().
+Siehe Methode L<sendReceive|"sendReceive() - Führe HTTP-Request aus">().
 
 =head4 Description
 
@@ -299,7 +299,7 @@ sub post {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

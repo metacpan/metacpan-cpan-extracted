@@ -1,0 +1,7 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data_cb" : "MY::TestData::testdata"
+    }
+  ]

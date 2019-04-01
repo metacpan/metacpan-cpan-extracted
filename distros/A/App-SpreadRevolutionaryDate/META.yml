@@ -5,10 +5,11 @@ author:
 build_requires:
   File::Find: '0'
   File::Temp: '0'
-  IO::Handle: '0'
+  FindBin: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
   Test::Output: '0'
+  Test::Trap: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -21,25 +22,34 @@ name: App-SpreadRevolutionaryDate
 provides:
   App::SpreadRevolutionaryDate:
     file: lib/App/SpreadRevolutionaryDate.pm
-    version: '0.08'
+    version: '0.10'
   App::SpreadRevolutionaryDate::Config:
     file: lib/App/SpreadRevolutionaryDate/Config.pm
-    version: '0.08'
+    version: '0.10'
+  App::SpreadRevolutionaryDate::MsgMaker:
+    file: lib/App/SpreadRevolutionaryDate/MsgMaker.pm
+    version: '0.10'
+  App::SpreadRevolutionaryDate::MsgMaker::PromptUser:
+    file: lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm
+    version: '0.10'
+  App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate:
+    file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm
+    version: '0.10'
   App::SpreadRevolutionaryDate::Target:
     file: lib/App/SpreadRevolutionaryDate/Target.pm
-    version: '0.08'
+    version: '0.10'
   App::SpreadRevolutionaryDate::Target::Freenode:
     file: lib/App/SpreadRevolutionaryDate/Target/Freenode.pm
-    version: '0.08'
+    version: '0.10'
   App::SpreadRevolutionaryDate::Target::Freenode::Bot:
     file: lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm
-    version: '0.08'
+    version: '0.10'
   App::SpreadRevolutionaryDate::Target::Mastodon:
     file: lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm
-    version: '0.08'
+    version: '0.10'
   App::SpreadRevolutionaryDate::Target::Twitter:
     file: lib/App/SpreadRevolutionaryDate/Target/Twitter.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   AppConfig: '0'
   Bot::BasicBot: '0'
@@ -47,8 +57,12 @@ requires:
   DateTime::Calendar::FrenchRevolutionary: '0'
   Encode: '0'
   File::HomeDir: '0'
+  Getopt::Long: '0'
+  IO::Handle: '0'
+  IO::Prompt::Hooked: '0'
   Mastodon::Client: '0'
   Moose: '0'
+  Moose::Role: '0'
   MooseX::NonMoose: '0'
   MooseX::Role::Parameterized: '0'
   Net::Async::HTTP: '0.43'
@@ -58,6 +72,7 @@ requires:
   URI::Escape: '0'
   namespace::autoclean: '0'
   namespace::clean: '0'
+  open: '0'
   perl: '5.014'
   strict: '0'
   utf8: '0'
@@ -66,6 +81,6 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-SpreadRevolutionaryDate
   homepage: http://search.cpan.org/dist/App-SpreadRevolutionaryDate/
   repository: git://github.com/gibus/SpreadRevolutionaryDate.git
-version: '0.08'
+version: '0.10'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

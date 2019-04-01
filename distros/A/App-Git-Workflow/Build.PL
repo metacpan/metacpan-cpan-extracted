@@ -20,6 +20,7 @@ my $builder = Module::Build->new(
         'XML::Tiny'              => 0,
         'Time::Piece'            => 0,
         'YAML'                   => 0,
+        'version'                => 0,
     },
     configure_requires => {
         'Module::Build' => 0.38,

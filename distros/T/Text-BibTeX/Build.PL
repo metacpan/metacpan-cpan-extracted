@@ -59,11 +59,13 @@ my $builder = MyBuilder->new(
         'btparse/tests/case_test',
         'btparse/tests/name_test',
         'btparse/tests/purify_test',
+        'btparse/tests/namebug'
     ],
 );
 
 ## HACK  HACK  HACK  HACK
 my $libdir = $builder->install_destination("bin");
+my $hdrdir = undef;
 if ( $^O =~ /mswin32/i ) {
     $libdir = undef;
 
@@ -86,7 +88,7 @@ if ( $^O =~ /mswin32/i ) {
     }
 }
 else {
-    if ( $Config{archname} =~ /^x86_64|^ppc64|^s390x|^aarch64/ ) {
+    if ( $Config{archname} =~ /^x86_64|^ppc64|^s390x|^aarch64|^riscv64/ ) {
         $libdir =~ s/\bbin\b/lib64/;
         if ( !-d $libdir ) {
             my $test = $libdir;
@@ -97,12 +99,17 @@ else {
     else {
         $libdir =~ s/\bbin\b/lib/;
     }
+    $hdrdir = $libdir;
+    $hdrdir =~ s!/[^/]+/?$!/include!
 }
 $builder->notes( 'btparse_version' => $version );
 $builder->notes( 'lib_path'        => $libdir );
 $builder->add_build_element('usrlib');
-$builder->install_path( 'usrlib' => $libdir );
-
+$builder->install_path( 'usrlib'     => $libdir );
+if (defined($hdrdir)) {
+    $builder->add_build_element('usrinclude');
+    $builder->install_path( 'usrinclude' => $hdrdir );
+}
 $builder->create_build_script;
 
 sub get_version {

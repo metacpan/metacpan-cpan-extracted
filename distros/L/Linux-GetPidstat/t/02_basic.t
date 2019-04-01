@@ -227,36 +227,36 @@ __DATA__
 2016-06-10T00:00:00,1465484400,target_script2,stk_ref,153000
 2016-06-10T00:00:00,1465484400,target_script2,disk_read_per_sec,0
 2016-06-10T00:00:00,1465484400,target_script2,cswch_per_sec,119.22
-2016-06-10T00:00:00,1465484400,target_script2,nvcswch_per_sec,182.7
-2016-06-10T00:00:00,1465484400,target_script2,memory_percent,207.78
+2016-06-10T00:00:00,1465484400,target_script2,nvcswch_per_sec,182.64
+2016-06-10T00:00:00,1465484400,target_script2,memory_percent,207.84
 2016-06-10T00:00:00,1465484400,target_script2,disk_write_per_sec,0
 2016-06-10T00:00:00,1465484400,target_script2,memory_rss,65289204000
 2016-06-10T00:00:00,1465484400,target_script2,stk_size,771000
 2016-06-10T00:00:00,1465484400,target_script,cswch_per_sec,19.87
-2016-06-10T00:00:00,1465484400,target_script,nvcswch_per_sec,30.45
+2016-06-10T00:00:00,1465484400,target_script,nvcswch_per_sec,30.44
 2016-06-10T00:00:00,1465484400,target_script,cpu,21.2
 2016-06-10T00:00:00,1465484400,target_script,stk_ref,25500
 2016-06-10T00:00:00,1465484400,target_script,disk_read_per_sec,0
 2016-06-10T00:00:00,1465484400,target_script,disk_write_per_sec,0
 2016-06-10T00:00:00,1465484400,target_script,memory_rss,10881534000
 2016-06-10T00:00:00,1465484400,target_script,stk_size,128500
-2016-06-10T00:00:00,1465484400,target_script,memory_percent,34.63
+2016-06-10T00:00:00,1465484400,target_script,memory_percent,34.64
 @@ output.mkr
-mackerel post: name=custom.batch_nvcswch_per_sec.target_script, time=1465484400, metric=30.45
+mackerel post: name=custom.batch_nvcswch_per_sec.target_script, time=1465484400, metric=30.44
 mackerel post: name=custom.batch_stk_size.target_script, time=1465484400, metric=128500
 mackerel post: name=custom.batch_memory_rss.target_script, time=1465484400, metric=10881534000
 mackerel post: name=custom.batch_disk_write_per_sec.target_script, time=1465484400, metric=0
 mackerel post: name=custom.batch_cswch_per_sec.target_script, time=1465484400, metric=19.87
 mackerel post: name=custom.batch_stk_ref.target_script, time=1465484400, metric=25500
 mackerel post: name=custom.batch_cpu.target_script, time=1465484400, metric=21.2
-mackerel post: name=custom.batch_memory_percent.target_script, time=1465484400, metric=34.63
+mackerel post: name=custom.batch_memory_percent.target_script, time=1465484400, metric=34.64
 mackerel post: name=custom.batch_disk_read_per_sec.target_script, time=1465484400, metric=0
 mackerel post: name=custom.batch_disk_write_per_sec.target_script2, time=1465484400, metric=0
 mackerel post: name=custom.batch_cswch_per_sec.target_script2, time=1465484400, metric=119.22
 mackerel post: name=custom.batch_cpu.target_script2, time=1465484400, metric=127.2
-mackerel post: name=custom.batch_memory_percent.target_script2, time=1465484400, metric=207.78
+mackerel post: name=custom.batch_memory_percent.target_script2, time=1465484400, metric=207.84
 mackerel post: name=custom.batch_disk_read_per_sec.target_script2, time=1465484400, metric=0
 mackerel post: name=custom.batch_stk_ref.target_script2, time=1465484400, metric=153000
 mackerel post: name=custom.batch_memory_rss.target_script2, time=1465484400, metric=65289204000
 mackerel post: name=custom.batch_stk_size.target_script2, time=1465484400, metric=771000
-mackerel post: name=custom.batch_nvcswch_per_sec.target_script2, time=1465484400, metric=182.7
+mackerel post: name=custom.batch_nvcswch_per_sec.target_script2, time=1465484400, metric=182.64

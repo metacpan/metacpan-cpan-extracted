@@ -501,7 +501,7 @@ Korean locale.
    1995-12-22T09:05:02 = 12월 22일 (금)
   -0010-09-15T04:44:23 = 9월 15일 (토)
 
-=head3 MMMMW-count-other (MMM W번째 주)
+=head3 MMMMW-count-other (MMMM W번째 주)
 
    2008-02-05T18:30:30 = 2월 1번째 주
    1995-12-22T09:05:02 = 12월 3번째 주

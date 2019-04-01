@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdList;
 # ABSTRACT: Id list for selecting specific sequences
-$Bio::MUST::Core::IdList::VERSION = '0.190690';
+$Bio::MUST::Core::IdList::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -241,7 +241,7 @@ sub load_lis {
 
     $list->_set_ids( \@ids );
 
-    carp 'Warning: id list size does not match id count in header!'
+    carp '[BMC] Warning: id list size does not match id count in header!'
         unless $list->count_ids == $count;
 
     return $list;
@@ -289,7 +289,7 @@ Bio::MUST::Core::IdList - Id list for selecting specific sequences
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

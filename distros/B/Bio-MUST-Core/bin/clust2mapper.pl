@@ -40,7 +40,7 @@ clust2mapper.pl - Build id mapper from UCLUST/CD-HIT clusters for tree formattin
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 USAGE
 

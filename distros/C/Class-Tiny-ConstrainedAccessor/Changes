@@ -1,5 +1,12 @@
 Revision history for Class-Tiny-ConstrainedAccessor
 
+0.000008    2019-03-28
+        - Finally remember to update this file! :)
+
+0.000007    2019-03-27
+        - No substantive changes
+        - Added tests for 100% code coverage
+
 0.000006    2019-03-26
         - No changes from 0.000005 trial release.
         - Compared to v0.000003, the package now checks constructor

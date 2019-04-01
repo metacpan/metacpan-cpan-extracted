@@ -29,6 +29,7 @@
     MMM => "LLL",
     MMMEd => "E, MMM d",
     MMMMEd => "E, MMMM d",
+    "MMMMW-count-one" => "'week' W 'of' MMMM",
     "MMMMW-count-other" => "'week' W 'of' MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
@@ -50,10 +51,11 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
+    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ha-NG",
-  date_format_full => "EEEE, d MMMM, y",
+  date_format_full => "EEEE d MMMM, y",
   date_format_long => "d MMMM, y",
   date_format_medium => "d MMM, y",
   date_format_short => "d/M/yy",
@@ -116,11 +118,11 @@
     "Lahadi",
   ],
   era_abbreviated => [
-    "KHAI",
+    "K.H",
     "BHAI",
   ],
   era_narrow => [
-    "KHAI",
+    "K.H",
     "BHAI",
   ],
   era_wide => [
@@ -267,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

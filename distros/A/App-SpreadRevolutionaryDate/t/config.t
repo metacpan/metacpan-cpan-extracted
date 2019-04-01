@@ -9,7 +9,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 
-use Test::More tests => 22;
+use Test::More tests => 28;
 use Test::NoWarnings;
 
 use App::SpreadRevolutionaryDate;
@@ -21,11 +21,14 @@ my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 isa_ok($spread_revolutionary_date, 'App::SpreadRevolutionaryDate', 'Base class constructor');
 isa_ok($spread_revolutionary_date->config, 'App::SpreadRevolutionaryDate::Config', 'Config class constructor');
 
+is($spread_revolutionary_date->config->test, 1, 'Test option set');
+is($spread_revolutionary_date->config->locale, 'fr', 'Locale option value');
+
+is_deeply($spread_revolutionary_date->config->targets, ['twitter', 'mastodon', 'freenode'], 'Default targets options set by default');
+
 ok($spread_revolutionary_date->config->twitter, 'Twitter option set by default');
 ok($spread_revolutionary_date->config->mastodon, 'Mastodon option set by default');
 ok($spread_revolutionary_date->config->freenode, 'Freenode option set by default');
-
-is($spread_revolutionary_date->config->test, 1, 'Test option set');
 
 is($spread_revolutionary_date->config->twitter_consumer_key, 'ConsumerKey', 'Twitter consumer_key value');
 is($spread_revolutionary_date->config->twitter_consumer_secret, 'ConsumerSecret', 'Twitter consumer_secret value');
@@ -42,9 +45,14 @@ is($spread_revolutionary_date->config->freenode_password, 'Password', 'Freenode 
 is_deeply($spread_revolutionary_date->config->freenode_test_channels, ['#TestChannel1', '#TestChannel2'], 'Freenode test_channels values');
 is_deeply($spread_revolutionary_date->config->freenode_channels, ['#Channel1', '#Channel2', '#Channel3'], 'Freenode channels values');
 
-push @ARGV, '--twitter';
+is($spread_revolutionary_date->config->msgmaker, 'RevolutionaryDate', 'MsgMaker option default value');
+is($spread_revolutionary_date->config->locale, 'fr', 'MsgMaker locale option value');
+ok(!$spread_revolutionary_date->config->acab, 'MsgMaker acab option value');
+
+push @ARGV, '--twitter', '--test';
 seek DATA, $data_start, 0;
 my $spread_only_to_twitter = App::SpreadRevolutionaryDate->new(\*DATA);
+is_deeply($spread_only_to_twitter->config->targets, ['twitter'], 'Targets options set');
 ok($spread_only_to_twitter->config->twitter, 'Twitter option explicitely set');
 ok(!$spread_only_to_twitter->config->mastodon, 'Mastodon option not explicitely set');
 ok(!$spread_only_to_twitter->config->freenode, 'Freenode option not explicitely set');

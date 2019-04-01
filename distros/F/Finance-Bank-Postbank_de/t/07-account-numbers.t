@@ -64,11 +64,13 @@ SKIP: {
   };
 
   for (reverse @fetched_accounts) {
+    sleep 1;
     isa_ok($account->get_account_statement(account_number => $_),'Finance::Bank::Postbank_de::Account', "Account $_")
         or save_content($account,'account-'.$_);
     #$account->agent(undef); # workaround for buggy Postbank site
   };
   for (sort @fetched_accounts) {
+    sleep 1;
     isa_ok($account->get_account_statement(account_number => $_),'Finance::Bank::Postbank_de::Account', "Account $_")
         or save_content($account,'account-'.$_);
     #$account->agent(undef); # workaround for buggy Postbank site

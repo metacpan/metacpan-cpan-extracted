@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Digest::SHA();
 use MIME::Base64();
-use Test::More tests => 351;
+use Test::More tests => 367;
 use Cwd();
 use Firefox::Marionette qw(:all);
 use Config;
@@ -33,7 +33,6 @@ sub start_firefox {
 		$parameters{firefox_binary} = $ENV{FIREFOX_BINARY};
 		diag("Overriding firefox binary to $parameters{firefox_binary}");
 	}
-$parameters{debug} = 1;
 	if (defined $parameters{capabilities}) {
 		if ($major_version < 52) {
 			delete $parameters{capabilities}->{page_load_strategy};
@@ -337,14 +336,8 @@ SKIP: {
 	}
 	ok($firefox->application_type(), "\$firefox->application_type() returns " . $firefox->application_type());
 	ok($firefox->marionette_protocol() =~ /^\d+$/smx, "\$firefox->marionette_protocol() returns " . $firefox->marionette_protocol());
-	TODO: {
-		local $TODO = $major_version >= 60 ? $capabilities->browser_version() . " probably does not have support for \$firefox->window_type()" : q[];
-		my $window_type;
-		eval {
-			$window_type = $firefox->window_type();
-		};
-		ok($window_type && $window_type eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser'");
-	}
+	my $window_type = $firefox->window_type();
+	ok($window_type && $window_type eq 'navigator:browser', "\$firefox->window_type() returns 'navigator:browser':$window_type");
 	ok($firefox->sleep_time_in_ms() == 1, "\$firefox->sleep_time_in_ms() is 1 millisecond");
 	my $new_x = 3;
 	my $new_y = 9;
@@ -1269,8 +1262,8 @@ SKIP: {
 	ok($firefox->find_name('lucky')->click($element), "Clicked the \"I'm Feeling Lucky\" button");
 	diag("Going to Test::More page with a page load strategy of " . ($capabilities->page_load_strategy() || ''));
 	SKIP: {
-		if ($major_version < 31) {
-			skip("Firefox below 31 (at least 24) does not support the getContext method", 2);
+		if ($major_version < 45) {
+			skip("Firefox below 45 (at least 24) does not support the getContext method", 2);
 		}
 		ok($firefox->bye(sub { $firefox->find_id('search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download'); })->click(), "Clicked on the download link");
 		diag("Clicked download link");
@@ -1539,7 +1532,7 @@ SKIP: {
 		$at_least_one_success = 1;
 	}
 	if ($skip_message) {
-		skip($skip_message, 12);
+		skip($skip_message, 28);
 	}
 	ok($firefox, "Firefox has started in Marionette mode with definable capabilities set to different values");
 	my $capabilities = $firefox->capabilities();
@@ -1583,7 +1576,53 @@ SKIP: {
 		ok($capabilities->moz_accessibility_checks() == 0, "\$capabilities->moz_accessibility_checks() is set to false");
 	}
 	ok(not($capabilities->moz_headless()), "\$capabilities->moz_headless() is set to false");
+	SKIP: {
+		if ($major_version < 66) {
+			skip("Firefox $major_version does not support \$firefox->new_window()", 15);
+		}
+		ok(scalar $firefox->window_handles() == 1, "The number of window handles is currently 1");
+		my ($old_window) = $firefox->window_handles();
+		my $new_window = $firefox->new_window();
+		ok(check_for_window($firefox, $new_window), "\$firefox->new_window() has created a new tab");
+		ok($firefox->switch_to_window($new_window), "\$firefox->switch_to_window(\$new_window) has switched focus to new tab");
+		ok($firefox->close_current_window_handle(), "Closed new tab");
+		ok(!check_for_window($firefox, $new_window), "\$firefox->new_window() has closed ");
+		ok($firefox->switch_to_window($old_window), "\$firefox->switch_to_window(\$old_window) has switched focus to original window");
+		$new_window = $firefox->new_window(focus => 1, type => 'window');
+		ok(check_for_window($firefox, $new_window), "\$firefox->new_window() has created a new in focus window");
+		$firefox->switch_to_window($new_window);
+		ok($firefox->close_current_window_handle(), "Closed new window");
+		ok(!check_for_window($firefox, $new_window), "\$firefox->new_window() has been closed");
+		ok($firefox->switch_to_window($old_window), "\$firefox->switch_to_window(\$old_window) has switched focus to original window");
+		$new_window = $firefox->new_window(focus => 0, type => 'tab');
+		ok(check_for_window($firefox, $new_window), "\$firefox->new_window() has created a new tab");
+		ok($firefox->switch_to_window($new_window), "\$firefox->switch_to_window(\$new_window) has switched focus to new tab");
+		ok($firefox->close_current_window_handle(), "Closed new tab");
+		ok(!check_for_window($firefox, $new_window), "\$firefox->new_window() has been closed");
+		ok(scalar $firefox->window_handles() == 1, "The number of window handles is currently 1");
+		$firefox->switch_to_window($old_window);
+	}
+	my $alert_text = 'testing alert';
+	SKIP: {
+		if ($major_version < 50) {
+			skip("Firefox $major_version may hang when executing \$firefox->script(qq[alert(...)])", 1);
+		}
+		$firefox->script(qq[alert('$alert_text')]);
+		ok($firefox->accept_alert(), "\$firefox->accept_alert() accepts alert box");
+	}
 	ok($firefox->quit() == $correct_exit_status, "Firefox has closed with an exit status of $correct_exit_status:" . $firefox->child_error());
+}
+
+sub check_for_window {
+	my ($firefox, $window_handle) = @_;
+	if (defined $window_handle) {
+		foreach my $existing_handle ($firefox->window_handles()) {
+			if ($existing_handle == $window_handle) {
+				return 1;
+			} 
+		}
+	}
+	return 0;
 }
 
 SKIP: {

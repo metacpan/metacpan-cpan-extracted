@@ -13,6 +13,7 @@ __DATA__
 AO
 Aghem
 Ahad
+Ajé
 Akan
 Alatsinainy
 Altine
@@ -110,6 +111,7 @@ Eg
 Ehm
 Ehms
 Embu
+Eswatini
 Etheridge
 Etleeni
 Ewondo
@@ -568,6 +570,8 @@ ccp_BD
 ccp_IN
 ce
 ce_RU
+ceb
+ceb_PH
 cgg
 cgg_UG
 chr
@@ -634,6 +638,7 @@ el_GR
 en
 en_001
 en_150
+en_AE
 en_AG
 en_AI
 en_AS
@@ -1155,6 +1160,7 @@ prg
 prg_001
 ps
 ps_AF
+ps_PK
 pt
 pt_AO
 pt_BR
@@ -1225,6 +1231,7 @@ seh_MZ
 selmana
 semaine
 semana
+septimana
 ses
 ses_ML
 setmana
@@ -1309,6 +1316,7 @@ tk
 tk_TM
 to
 to_TO
+toddobaadka
 tr
 tr_CY
 tr_TR

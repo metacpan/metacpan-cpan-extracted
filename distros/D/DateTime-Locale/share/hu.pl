@@ -28,8 +28,8 @@
     MEd => "M. d., E",
     MMM => "LLL",
     MMMEd => "MMM d., E",
-    "MMMMW-count-one" => "MMM W. 'hete'",
-    "MMMMW-count-other" => "MMM W. 'hete'",
+    "MMMMW-count-one" => "MMMM W. 'hete'",
+    "MMMMW-count-other" => "MMMM W. 'hete'",
     MMMMd => "MMMM d.",
     MMMd => "MMM d.",
     Md => "M. d.",
@@ -269,5 +269,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

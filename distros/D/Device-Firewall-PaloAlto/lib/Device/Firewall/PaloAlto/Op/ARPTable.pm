@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::ARPTable;
-$Device::Firewall::PaloAlto::Op::ARPTable::VERSION = '0.1.2';
+$Device::Firewall::PaloAlto::Op::ARPTable::VERSION = '0.1.3';
 use strict;
 use warnings;
 use 5.010;
@@ -56,7 +56,7 @@ Device::Firewall::PaloAlto::Op::ARPTable - Palo Alto firewall ARP table
 
 =head1 VERSION
 
-version 0.1.2
+version 0.1.3
 
 =head1 SYNOPSIS
 

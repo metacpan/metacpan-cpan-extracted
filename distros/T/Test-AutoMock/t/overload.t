@@ -210,15 +210,28 @@ use Test::AutoMock qw(mock_overloaded manager);
     ok $z ? 1 : 0;
     like "$z", qr/\bAutoMock\b/;
     is sprintf('%d', $z), '1';
-    is qr/$z/, qr//;
+    my $qr = qr/$z/;
+    is $qr, qr// if $] >= 5.012;
+
+    my @expected = (
+        ['z', []],
+        ['z->`bool`', [undef, '']],
+        ['z->`""`', [undef, '']],
+        ['z->`0+`', [undef, '']],
+        (
+            $] >= 5.012
+                ? (
+                      ['z->`qr`', [undef, '']],
+                  )
+                : (
+                      ['z->`""`', [undef, '']],
+                      ['z->`""`', [undef, '']],
+                  ),
+        ),
+    );
 
     my @calls = manager($mock)->calls;
-    is @calls, 5;
-    is_deeply $calls[0], ['z', []];
-    is_deeply $calls[1], ['z->`bool`', [undef, '']];
-    is_deeply $calls[2], ['z->`""`', [undef, '']];
-    is_deeply $calls[3], ['z->`0+`', [undef, '']];
-    is_deeply $calls[4], ['z->`qr`', [undef, '']];
+    is_deeply \@calls, \@expected;
 }
 
 {
@@ -237,11 +250,25 @@ use Test::AutoMock qw(mock_overloaded manager);
     my $z = $mock->z;
     my (undef) = (-e $z);
 
+    my @expected = (
+        ['z', []],
+        (
+            $] >= 5.012
+                ? (
+                    ['z->`-X`', ['e', '']],
+                    (
+                        $] >= 5.018 ? (['z->`-X`->`bool`', [undef, '']])
+                                    : ()
+                    ),
+                ) : (
+                    ['z->`""`', [undef, '']],
+                )
+        ),
+        ,
+    );
+
     my @calls = manager($mock)->calls;
-    is @calls, 3;
-    is_deeply $calls[0], ['z', []];
-    is_deeply $calls[1], ['z->`-X`', ['e', '']];
-    is_deeply $calls[2], ['z->`-X`->`bool`', [undef, '']];
+    is_deeply \@calls, \@expected;
 }
 
 # {

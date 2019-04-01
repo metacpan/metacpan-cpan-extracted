@@ -65,6 +65,9 @@ my @simple = (
     { 'last month'                     => '01.10.2006 00:00:00'     },
     { 'this month'                     => '01.11.2006 00:00:00'     },
     { 'next month'                     => '01.12.2006 00:00:00'     },
+    { 'last quarter'                   => '01.07.2006 00:00:00'     },
+    { 'this quarter'                   => '01.10.2006 00:00:00'     },
+    { 'next quarter'                   => '01.01.2007 00:00:00'     },
     { 'last year'                      => '01.01.2005 00:00:00'     },
     { 'this year'                      => '01.01.2006 00:00:00'     },
     { 'next year'                      => '01.01.2007 00:00:00'     },
@@ -278,7 +281,7 @@ my @specific = (
     { '+2d'                                => '26.11.2006 01:13:08'     },
 );
 
-_run_tests(666, [ [ \@simple ], [ \@complex ], [ \@specific ] ], \&compare);
+_run_tests(669, [ [ \@simple ], [ \@complex ], [ \@specific ] ], \&compare);
 
 sub compare
 {

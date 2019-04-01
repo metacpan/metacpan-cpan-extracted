@@ -1,7 +1,8 @@
 package SVG::Estimate::Polyline;
-$SVG::Estimate::Polyline::VERSION = '1.0111';
+$SVG::Estimate::Polyline::VERSION = '1.0112';
 use Moo;
 use Clone qw/clone/;
+use List::Util qw/pairs/;
 
 extends 'SVG::Estimate::Shape';
 with 'SVG::Estimate::Role::Pythagorean';
@@ -12,7 +13,7 @@ SVG::Estimate::Polyline - Handles estimating multi-part lines.
 
 =head1 VERSION
 
-version 1.0111
+version 1.0112
 
 =head1 SYNOPSIS
 
@@ -59,25 +60,52 @@ has parsed_points => (
     is          => 'ro',
     lazy        => 1,
     default     => sub {
-        my $self = shift;
-        return $self->parse_points($self->points);
+        return [];
     },
 );
+
+##Blatantly stolen from Image::SVG::Path
+
+# Match the e or E in an exponent.
+
+my $e = qr/[eE]/;
+
+# These regular expressions are directly taken from the SVG grammar,
+# https://www.w3.org/TR/SVG/paths.html#PathDataBNF
+
+our $sign = qr/\+|\-/;
+
+our $wsp = qr/[\x20\x09\x0D\x0A]/;
+
+our $comma_wsp = qr/(?:$wsp+,?$wsp*|,$wsp*)/;
+
+# The following regular expression splits the path into pieces Note we
+# only split on '-' or '+' when not preceeded by 'e'.  This regular
+# expression is not following the SVG grammar, it is going our own
+# way.
+
+my $split_re = qr/
+		     (?:
+			 $wsp*,$wsp*
+		     |
+			 (?<!$e)(?=-)
+		     |
+			 (?<!$e)(?:\+)
+		     |
+			 $wsp+
+		     )
+		 /x;
 
 sub BUILDARGS {
     my ($class, @args) = @_;
     ##Upgrade to hashref
     my $args = @args % 2 ? $args[0] : { @args };
-    my $string = $args->{points};
-    $string =~ s/^\s+|\s+$//g;
-    my @pairs = $class->_get_pairs($string);
-    my @points = ();
+    my @pairs = $class->_get_pairs($args->{points});
     my ($min_x, $max_x, $min_y, $max_y) = (1e10, -1e10, 1e10, -1e10);
     my $first  = 1;
     my $start  = [];
     my $length = 0;
-    PAIR: foreach my $pair (@pairs) {
-        my $point =  [ split ',', $pair ];
+    PAIR: foreach my $point (@pairs) {
         if ($args->{transformer}->has_transforms) {
             $point = $args->{transformer}->transform($point);
         }
@@ -85,7 +113,6 @@ sub BUILDARGS {
         $max_x = $point->[0] if $point->[0] > $max_x;
         $min_y = $point->[1] if $point->[1] < $min_y;
         $max_y = $point->[1] if $point->[1] > $max_y;
-        push @points, $point;
         if ($first) {
             $first = 0;
             $start = $point;
@@ -94,13 +121,13 @@ sub BUILDARGS {
         $length += $class->pythagorean($start, $point);
         $start = $point;
     }
-    $args->{parsed_points} = \@points;
+    $args->{parsed_points} = \@pairs;
     $args->{min_x} = $min_x;
     $args->{max_x} = $max_x;
     $args->{min_y} = $min_y;
     $args->{max_y} = $max_y;
-    $args->{draw_start}   = clone $points[0];
-    $args->{draw_end}     = clone $points[-1];
+    $args->{draw_start}   = clone $pairs[0];
+    $args->{draw_end}     = clone $pairs[-1];
     $args->{shape_length} = $length;
     return $args;
 }
@@ -109,7 +136,9 @@ sub BUILDARGS {
 
 sub _get_pairs {
     my ($class, $string) = @_;
-    return split ' ', $string;
+    my @points = split $split_re, $string;
+    my @pairs = pairs @points;
+    return @pairs;
 }
 
 1;

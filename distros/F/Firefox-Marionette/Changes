@@ -1,5 +1,11 @@
 Revision history for Firefox-Marionette
 
+0.71  Fri Mar 29 20:12:00 2019
+       Fixing new_window tests for only Firefox 66+
+
+0.70  Thu Mar 28 20:29:00 2019
+       Adding support for new_window, accept_alert.  Fixing window_type.  Deprecating accept_dialog
+
 0.69  Mon Mar 25 19:6:00 2019
        Including support for Firefox 24 and Firefox 66
 

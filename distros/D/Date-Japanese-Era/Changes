@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Japanese::Era.
 
+0.07  2019-03-31 20:30:40 PDT
+        - Updated the table to support 令和/Reiwa era
+
 0.06  Thu Jun 15 11:07:39 JST 2006
         - Oops, forgot to update Changes
 

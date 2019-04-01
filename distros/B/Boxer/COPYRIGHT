@@ -253,12 +253,12 @@ Files: lib/Boxer/CLI/Command/Bootstrap.pm
 Copyright: Copyright Â© 2019 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: lib/Boxer/Part/Reclass.pm
 Copyright: Copyright Â© 2016 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

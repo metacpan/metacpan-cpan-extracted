@@ -1,10 +1,35 @@
 ==================================================
-Changes from 2015-07-12 00:00:00 +0000 to present.
+Changes from 2018-03-29 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.07 at 2016-07-11 23:17:30 +0000
+version 0.08 at 2019-03-29 18:03:23 +0000
 -----------------------------------------
+
+  Change: 660a0d92ca0756063e0294e2f4d1f932c219cbad
+  Author: Alceu Rodrigues de Freitas Junior <arfjunior@uolinc.com>
+  Date : 2019-03-29 15:02:12 +0000
+
+    Small fixes
+
+    Fixes in Pod. Increased test coverage. Code refactoring to make it
+    easier for testing. 
+
+  Change: 67d8f48331d248f0a11bcdf95001f74b0b89dba6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-11-28 12:29:00 +0000
+
+    Fixed version 
+
+  Change: 91099ee759f468f281e490dcd530eee44ef426e3
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-11-28 12:24:07 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/Term-YAP
+
+    Conflicts:
+
+    dist.ini 
 
   Change: a66e33598d5fe60d13c0b8102d9c84fe53191de8
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
@@ -20,9 +45,13 @@ version 0.07 at 2016-07-11 23:17:30 +0000
     information with Dist::Zilla Generating meta information in JSON with
     Dist::Zilla 
 
------------------------------------------
-version 0.07 at 2016-05-30 04:24:37 +0000
------------------------------------------
+  Change: 74fb5f41eb5df535de39205514c736130e12b5c5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-05-30 10:22:24 +0000
+
+    Not doing math at all to finish the progress bar. This should avoid
+    errors regarding negative values and still keeping formatting.
+    Replaced PkgVersion plug-in by OurPkgVersion 
 
   Change: d555680c800e29e7a01be5bd6475465a0988684d
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

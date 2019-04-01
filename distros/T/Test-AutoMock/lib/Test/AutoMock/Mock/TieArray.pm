@@ -121,10 +121,15 @@ sub SPLICE {
     });
 }
 
-# sub EXTEND {
-#     my ($self, $count) = @_;
-#     # NOP
-# }
+sub EXTEND {
+    my ($self, $count) = @_;
+    my $manager = $$self;
+
+    $manager->_call_method(EXTEND => [$count], sub {
+        my ($self, $count) = @_;
+        # NOP
+    });
+}
 
 sub DELETE {
     my ($self, $key) = @_;

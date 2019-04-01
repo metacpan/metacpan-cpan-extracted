@@ -183,7 +183,6 @@ achi.nagano.jp;achi.nagano.jp
 aco;aco
 act.au;act.au
 act.edu.au;act.edu.au
-active;active
 actor;actor
 ad;ad
 ad.jp;ad.jp
@@ -507,7 +506,6 @@ aso.kumamoto.jp;aso.kumamoto.jp
 ass.km;ass.km
 assabu.hokkaido.jp;assabu.hokkaido.jp
 assassination.museum;assassination.museum
-assedic.fr;assedic.fr
 assisi.museum;assisi.museum
 assn.lk;assn.lk
 asso.bj;asso.bj
@@ -996,6 +994,7 @@ budapest;budapest
 budejju.no;budejju.no
 bugatti;bugatti
 build;build
+builder.nu;builder.nu
 builders;builders
 building.museum;building.museum
 bukhara.su;bukhara.su
@@ -1366,6 +1365,7 @@ cnt.br;cnt.br
 co;co
 co.ae;co.ae
 co.ag;co.ag
+co.am;co.am
 co.ao;co.ao
 co.at;co.at
 co.bb;co.bb
@@ -1460,6 +1460,7 @@ com.af;com.af
 com.ag;com.ag
 com.ai;com.ai
 com.al;com.al
+com.am;com.am
 com.ar;com.ar
 com.au;com.au
 com.aw;com.aw
@@ -1591,6 +1592,7 @@ com.ws;com.ws
 com.zm;com.zm
 comcast;comcast
 commbank;commbank
+commune.am;commune.am
 communication.museum;communication.museum
 communications.museum;communications.museum
 community;community
@@ -2738,6 +2740,7 @@ gmx;gmx
 gn;gn
 gniezno.pl;gniezno.pl
 go-vip.co;go-vip.co
+go-vip.net;go-vip.net
 go.ci;go.ci
 go.cr;go.cr
 go.dyndns.org;go.dyndns.org
@@ -5331,6 +5334,7 @@ net.af;net.af
 net.ag;net.ag
 net.ai;net.ai
 net.al;net.al
+net.am;net.am
 net.ar;net.ar
 net.au;net.au
 net.az;net.az
@@ -5908,6 +5912,7 @@ org.af;org.af
 org.ag;org.ag
 org.ai;org.ai
 org.al;org.al
+org.am;org.am
 org.ar;org.ar
 org.au;org.au
 org.az;org.az
@@ -6347,7 +6352,6 @@ press.ma;press.ma
 press.museum;press.museum
 press.se;press.se
 presse.ci;presse.ci
-presse.fr;presse.fr
 presse.km;presse.km
 presse.ml;presse.ml
 prgmr.com;prgmr.com
@@ -7129,6 +7133,7 @@ singles;singles
 siracusa.it;siracusa.it
 sirdal.no;sirdal.no
 site;site
+site.builder.nu;site.builder.nu
 siteleaf.net;siteleaf.net
 sites.static.land;sites.static.land
 sj;sj
@@ -8330,6 +8335,7 @@ wolomin.pl;wolomin.pl
 wolterskluwer;wolterskluwer
 woodside;woodside
 work;work
+workers.dev;workers.dev
 workinggroup.aero;workinggroup.aero
 workisboring.com;workisboring.com
 works;works

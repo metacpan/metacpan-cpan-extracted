@@ -2,7 +2,7 @@
 #
 # make_test_A_by_B.pl
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict; die $_ if ($_=`$^X -cw @{[__FILE__]} 2>&1`) !~ /^.+ syntax OK$/;
@@ -19,11 +19,13 @@ while (<JACODE4E>) {
 }
 close(JACODE4E);
 
-my @encoding = qw( cp932x cp932 sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8jp );
+my @encoding = qw( cp932x cp932 cp932ibm cp932nec sjis2004 cp00930 keis78 keis83 keis90 jef jipsj jipse letsj unicode utf8 utf8.1 utf8jp );
 my @io_encoding = (grep( ! /^unicode$/, @encoding), 'jef9p');
 my %geta = (
     'cp932x'   => '81AC',
     'cp932'    => '81AC',
+    'cp932ibm' => '81AC',
+    'cp932nec' => '81AC',
     'sjis2004' => '81AC',
     'cp00930'  => '447D',
     'keis78'   => 'A2AE',
@@ -35,6 +37,7 @@ my %geta = (
     'jipse'    => '7F4B',
     'letsj'    => 'A2AE',
     'utf8'     => 'E38093',
+    'utf8.1'   => 'E38093',
     'utf8jp'   => 'F3B085AB',
 );
 
@@ -51,7 +54,7 @@ print STDERR $filename, "\n";
 #
 # %s
 #
-# Copyright (c) 2018 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;

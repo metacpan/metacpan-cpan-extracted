@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -112,7 +112,7 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head2 Accessors
+=head2 Akzessoren
 
 =head3 rowClass() - Liefere Namen der Datensatz-Klasse
 
@@ -568,7 +568,7 @@ sub formats {
             my $mask = 0;
     
             my $title = $titles->[$i];
-            foreach my $row (@$rowA) {
+            for my $row (@$rowA) {
                 my $val = $isRaw? $row->[$i]: $row->$title;
     
                 # Anzahl Nullwerte
@@ -1062,7 +1062,7 @@ sub diffReport {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

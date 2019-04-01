@@ -1,6 +1,6 @@
 package Bio::MUST::Core::SeqMask::Rates;
 # ABSTRACT: Evolutionary rates for sequence sites
-$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.190690';
+$Bio::MUST::Core::SeqMask::Rates::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -54,7 +54,7 @@ sub delta_rates {
     # potential bugs could come from constant sites etc
     my $s_width = $self->mask_len;
     my $o_width = $othr->mask_len;
-    carp "Warning: Rates widths do not match: $s_width vs. $o_width!"
+    carp "[BMC] Warning: Rates widths do not match: $s_width vs. $o_width!"
         unless $s_width == $o_width;
 
     my @deltas;
@@ -237,7 +237,7 @@ Bio::MUST::Core::SeqMask::Rates - Evolutionary rates for sequence sites
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

@@ -471,17 +471,17 @@ Basque Spain locale.
    1995-12-22T09:05:02 = abe. 22, or.
   -0010-09-15T04:44:23 = ira. 15, lr.
 
-=head3 MMMMW-count-one (MMM W. 'astea')
+=head3 MMMMW-count-one (MMMM W. 'astea')
 
-   2008-02-05T18:30:30 = ots. 1. astea
-   1995-12-22T09:05:02 = abe. 3. astea
-  -0010-09-15T04:44:23 = ira. 2. astea
+   2008-02-05T18:30:30 = otsaila 1. astea
+   1995-12-22T09:05:02 = abendua 3. astea
+  -0010-09-15T04:44:23 = iraila 2. astea
 
-=head3 MMMMW-count-other (MMM W. 'astea')
+=head3 MMMMW-count-other (MMMM W. 'astea')
 
-   2008-02-05T18:30:30 = ots. 1. astea
-   1995-12-22T09:05:02 = abe. 3. astea
-  -0010-09-15T04:44:23 = ira. 2. astea
+   2008-02-05T18:30:30 = otsaila 1. astea
+   1995-12-22T09:05:02 = abendua 3. astea
+  -0010-09-15T04:44:23 = iraila 2. astea
 
 =head3 MMMMd (MMMM d)
 

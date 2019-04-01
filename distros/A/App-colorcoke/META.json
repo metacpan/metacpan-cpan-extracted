@@ -34,17 +34,23 @@
          "requires" : {
             "Term::ExtendedColor" : "0",
             "Term::ExtendedColor::Xresources" : "0",
-            "Test::More" : "0",
             "perl" : "5.01"
          }
       }
    },
    "provides" : {
       "App::colorcoke" : {
-         "file" : "lib/App/colorcoke.pm"
+         "file" : "bin/colorcoke"
       }
    },
    "release_status" : "stable",
-   "version" : "0.422",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/trapd00r/colorcoke.git",
+         "web" : "https://github.com/trapd00r/colorcoke"
+      }
+   },
+   "version" : "0.430",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

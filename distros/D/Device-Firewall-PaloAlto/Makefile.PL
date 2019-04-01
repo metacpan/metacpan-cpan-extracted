@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Class::Error" => 0,
     "Data::Dumper" => 0,
     "Data::Structure::Util" => 0,
+    "DateTime::Format::Strptime" => 0,
     "HTTP::Request" => 0,
     "Hook::LexWrap" => 0,
     "JSON" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::UseAllModules" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "0.1.2",
+  "VERSION" => "0.1.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,6 +52,7 @@ my %FallbackPrereqs = (
   "Class::Error" => 0,
   "Data::Dumper" => 0,
   "Data::Structure::Util" => 0,
+  "DateTime::Format::Strptime" => 0,
   "HTTP::Request" => 0,
   "Hook::LexWrap" => 0,
   "JSON" => 0,

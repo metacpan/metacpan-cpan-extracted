@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::mk_MK - Locale data examples for the Macedonian Macedonia (mk-MK) locale
+DateTime::Locale::mk_MK - Locale data examples for the Macedonian North Macedonia (mk-MK) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Macedonian Macedonia locale.
+Macedonian North Macedonia locale.
 
 =head2 Days
 
@@ -477,17 +477,17 @@ Macedonian Macedonia locale.
    1995-12-22T09:05:02 = пет., 22 декември
   -0010-09-15T04:44:23 = саб., 15 септември
 
-=head3 MMMMW-count-one (W 'седмица' 'од' MMM)
+=head3 MMMMW-count-one (W 'седмица' 'од' MMMM)
 
-   2008-02-05T18:30:30 = 1 седмица од фев.
-   1995-12-22T09:05:02 = 3 седмица од дек.
-  -0010-09-15T04:44:23 = 2 седмица од септ.
+   2008-02-05T18:30:30 = 1 седмица од февруари
+   1995-12-22T09:05:02 = 3 седмица од декември
+  -0010-09-15T04:44:23 = 2 седмица од септември
 
-=head3 MMMMW-count-other (W 'седмица' 'од' MMM)
+=head3 MMMMW-count-other (W 'седмица' 'од' MMMM)
 
-   2008-02-05T18:30:30 = 1 седмица од фев.
-   1995-12-22T09:05:02 = 3 седмица од дек.
-  -0010-09-15T04:44:23 = 2 седмица од септ.
+   2008-02-05T18:30:30 = 1 седмица од февруари
+   1995-12-22T09:05:02 = 3 седмица од декември
+  -0010-09-15T04:44:23 = 2 седмица од септември
 
 =head3 MMMMd (d MMMM)
 

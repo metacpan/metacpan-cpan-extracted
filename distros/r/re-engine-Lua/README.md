@@ -1,11 +1,11 @@
-# re-engine-Lua
+re-engine-Lua
+=============
 
-[![Build Status](https://travis-ci.org/fperrad/re-engine-lua.png?branch=master)](https://travis-ci.org/fperrad/re-engine-lua)
-[![Coverage Status](https://coveralls.io/repos/fperrad/re-engine-lua/badge.png?branch=master)](https://coveralls.io/repos/fperrad/re-engine-lua?branch=master)
-[![CPAN version](https://badge.fury.io/pl/re-engine-Lua.svg)](http://badge.fury.io/pl/re-engine-Lua)
-[![Licence](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](COPYRIGHT)
+[![Kwalitee Status](http://cpants.cpanauthors.org/dist/re-engine-Lua.png)](http://cpants.charsbar.org/dist/overview/re-engine-Lua)
+[![Licence](http://img.shields.io/badge/Licence-MIT-brightgreen.svg)](LICENSE)
 
-## INSTALLATION
+INSTALLATION
+------------
 
 To install this module type the following:
 
@@ -14,17 +14,20 @@ To install this module type the following:
     make test
     make install
 
-## DEPENDENCIES
+DEPENDENCIES
+------------
 
 Needs Perl 5.10 or later for pluggable regex support.
 
-## HOMEPAGE
+HOMEPAGE
+--------
 
-This module is hosted at https://github.com/fperrad/re-engine-lua
+This module is hosted at https://framagit.org/perrad/re-engine-lua
 
-## COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENCE
+---------------------
 
-Copyright 2007-2015 by Francois PERRAD
+Copyright 2007-2019 by Francois PERRAD
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Lua.

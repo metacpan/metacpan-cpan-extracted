@@ -1,7 +1,7 @@
 use strict;
-use Test::More tests => 27;
+use Test::More;
 
-use encoding "utf-8";
+use utf8;
 use Date::Japanese::Era 'JIS_X0301';
 
 my @tests = (
@@ -31,6 +31,4 @@ for my $test (@tests) {
     is($e2->gregorian_year, $year, 'Japanese era to Gregorian');
 }
 
-
-
-
+done_testing;

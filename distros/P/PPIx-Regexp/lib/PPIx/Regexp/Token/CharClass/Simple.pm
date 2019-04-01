@@ -19,7 +19,8 @@ C<PPIx::Regexp::Token::CharClass::Simple> has no descendants.
 
 This class represents one of the simple character classes that can occur
 anywhere in a regular expression. This includes not only the truly
-simple things like \w, but also Unicode properties.
+simple things like \w, but also Unicode properties, including properties
+with wildcard values.
 
 =head1 METHODS
 
@@ -45,7 +46,22 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.063';
+our $VERSION = '0.064';
+
+use constant UNICODE_PROPERTY_LITERAL =>
+    qr/ \A \\ [Pp] (?:
+		\{ \s* \^? \w [\w:=\s-]* \} |
+		[CLMNPSZ]	# perluniprops for 5.26.1
+    ) /smx;
+
+# CAVEAT: The following regular expression, despite its name, matches
+# ALL unicode property values. To actually match a wildcard property you
+# must first eliminate anything that matches UNICODE_PROPERTY_LITERAL.
+use constant UNICODE_PROPERTY_WILDCARD =>
+    qr/ \A \\ [Pp] \{ \s* [\w\s-]+ [:=] [^}]+ \} /smx;
+
+use constant UNICODE_PROPERTY =>
+    qr/ @{[ UNICODE_PROPERTY_LITERAL ]} | @{[ UNICODE_PROPERTY_WILDCARD ]} /smx;
 
 {
 
@@ -167,14 +183,15 @@ our $VERSION = '0.063';
 	if ( defined( my $minver = $introduced{$content} ) ) {
 	    return $minver;
 	}
-	if ( $content =~ m/ \A \\ [Pp] /smxg ) {
-	    # I must have read perl5113delta and thought this
-	    # represented the change they were talking about, but I sure
-	    # don't see it now. So, until things become clearer ...
-#	    $content =~ m/ \G .*? [\s=-] /smxgc
-#		and return '5.011003';
-	    return '5.006001';
-	}
+	# I must have read perl5113delta and thought this
+	# represented the change they were talking about, but I sure
+	# don't see it now. So, until things become clearer ...
+#	$content =~ m/ \G .*? [\s=-] /smxgc
+#	    and return '5.011003';
+	$content  =~ UNICODE_PROPERTY_LITERAL
+	    and return '5.006001';
+	$content =~ UNICODE_PROPERTY_WILDCARD
+	    and return '5.029009';
 	return MINIMUM_PERL;
     }
 
@@ -221,11 +238,7 @@ sub __PPIX_TOKENIZER__regexp {
     }
 
     if ( my $accept = $tokenizer->find_regexp(
-	    qr{ \A \\ (?:
-		[wWsSdDvVhHXRNC] |
-		[Pp] \{ \s* \^? [\w:=\s-]+ \} |
-		[Pp] [CLMNPSZ]	# perluniprops for 5.26.1
-	    ) }smx
+	    qr{ \A \\ [wWsSdDvVhHXRNC] }smx
 	) ) {
 	if ( $in_class ) {
 	    my $match = $tokenizer->match();
@@ -241,6 +254,18 @@ sub __PPIX_TOKENIZER__regexp {
 	    '\\R' eq $match and return;
 	}
 	return $accept;
+    }
+
+    if ( my $accept = $tokenizer->find_regexp( UNICODE_PROPERTY ) ) {
+	return $accept;
+    }
+
+    if ( my $accept = $tokenizer->find_regexp( qr< \A \\ p [{] \s* [}] >smx )
+    ) {
+	return $tokenizer->make_token( $accept, TOKEN_UNKNOWN, {
+		error => 'Empty \\p{} is an error',
+	    },
+	);
     }
 
     return;
@@ -261,7 +286,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 by Thomas R. Wyant, III
+Copyright (C) 2009-2019 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

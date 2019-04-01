@@ -23,7 +23,6 @@ Module::Build->new(
         'Test::Pod'            => 1.00,
         'Test::Pod::Coverage'  => 1.00,
         'Test::TestCoverage'   => 0.08,
-        'Test::CheckManifest'  => 1.01,
         'Test::Kwalitee'       => 0,
         'Test::Warn'           => 0,
         'TeX::Hyphen::Pattern' => 0.103,

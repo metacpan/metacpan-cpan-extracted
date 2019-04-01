@@ -1,4 +1,4 @@
-# AWS::IoTAnalytics::Channel generated from spec 2.18.0
+# AWS::IoTAnalytics::Channel generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTAnalytics::Channel',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::IoTAnalytics::Channel {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::IoTAnalytics::Channel', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 

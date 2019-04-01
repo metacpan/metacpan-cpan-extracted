@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2016-2018 Joelle Maslak
+# Copyright (C) 2016-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -55,7 +55,15 @@ my (@MSG) = (
           . '4469436d57304b676f6b7535',
         key  => 'abcd1234abcd1234abcd1234abcd1234',
         text => 'Plain Text Message URL encoded',
-    }
+    },
+    {
+        ct => '334e4f6b4b593032495164595a46362d686673324148477254'
+          . '503063786c496a376a467379354c5376706466557331546f556e'
+          . '68566b5a426e2d347839316d723656576c435074473445704438'
+          . '696e3071397736365f7141755143714661686b3d',
+        key  => 'abcd1234abcd1234abcd1234abcd1234',
+        text => 'Plain Text Message Portable encoded',
+    },
 );
 
 my $cnt = 0;

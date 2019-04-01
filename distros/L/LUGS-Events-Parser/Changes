@@ -1,5 +1,16 @@
 Revision history for Perl extension LUGS::Events::Parser.
 
+0.11  2019-03-31  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.10_01  2017-12-31  <schubiger@cpan.org>
+
+ - Use Params::Validate callback to assert a file being
+   passed to new().
+
+ - Add metadata repository link.
+
 0.10  2012-06-09  <schubiger@cpan.org>
 
  - Merged development version to stable.

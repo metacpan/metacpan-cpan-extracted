@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -312,7 +312,7 @@ sub getRef {
 
 Liefere die Liste von Werten des Schlüssels $key. Im Skalarkontext
 liefere eine Referenz auf die Liste (der Aufruf hat dann die gleiche
-Wirkung wie der Aufruf von $h->L</get>()). Der Wert von $key muss
+Wirkung wie der Aufruf von $h->L<get|"get() - Werte abfragen">()). Der Wert von $key muss
 eine Array-Referenz sein.
 
 =cut
@@ -336,7 +336,7 @@ sub getArray {
 
 =head4 Description
 
-Wie L</get>(), nur dass im Falle eines unerlaubten Schlüssels
+Wie L<get|"get() - Werte abfragen">(), nur dass im Falle eines unerlaubten Schlüssels
 keine Exception geworfen, sondern C<undef> geliefert wird.
 
 =cut
@@ -410,7 +410,7 @@ sub set {
 
 =head4 Description
 
-Wie L</set>(), nur dass im Falle eines unerlaubten Schlüssels keine
+Wie L<set|"set() - Setze Schlüssel/Wert-Paare">(), nur dass im Falle eines unerlaubten Schlüssels keine
 Exception generiert, sondern der Hash um das Schlüssel/Wert-Paar
 erweitert wird.
 
@@ -534,7 +534,7 @@ Der Rückgabewert der Subroutine wird an Schlüssel $key zugewiesen.
 
 =head4 Example
 
-Methode L</increment>() mit apply() realisiert:
+Methode L<increment|"increment() - Inkrementiere (Integer-)Wert">() mit apply() realisiert:
 
     $val = $h->compute($key,sub {
         my ($h,$key) = @_;
@@ -579,23 +579,30 @@ Gegenüberstellung:
 
     Hash-Zugriff           get()/set()               Methoden-Zugriff
     --------------------   -----------------------   --------------------
-    $name = $h->{'name'}   $name = $h->get('name')   $name = $h->name;
-    $h->{'name'} = $name   $h->set(name=>$name)      $h->name($name)
+    $name = $h->{'name'}   $name = $h->get('name')   $name = $h->name
+    $h->{'name'} = $name   $h->set(name=>$name)      $h->name($name) -or-
+                                                     $h->name = $name
 
 In der letzten Spalte ("Methoden-Zugriff") steht die Syntax der
 automatisch generierten Akzessor-Methoden.
 
+Die Akzessor-Methode wird als lvalue-Methode generiert, d.h. die
+Hash-Komponente kann per Akzessor-Aufruf manipuliert werden. Beispiele:
+
+    $h->name = $name;
+    $h->name =~ s/-//g;
+
 Die Erzeugung einer Akzessor-Methode erfolgt (vom Aufrufer unbemerkt)
-beim ersten Aufruf. Danach wird die Methode unmittelbar aufgerufen.
+beim ersten Aufruf. Danach wird die Methode unmittelbar gerufen.
 
 Der Zugriff über eine automatisch generierte Attributmethode ist ca. 30%
-schneller als über $h->L</get>().
+schneller als über $h->L<get|"get() - Werte abfragen">().
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-sub AUTOLOAD {
+sub AUTOLOAD :lvalue {
     my $this = shift;
     # @_: Methodenargumente
 
@@ -625,7 +632,7 @@ sub AUTOLOAD {
     # brauchen wir die Existenz des Attributs nicht selbst prüfen.
 
     no strict 'refs';
-    *{$AUTOLOAD} = sub {
+    *{$AUTOLOAD} = sub :lvalue {
         my $self = shift;
         # @_: $val
 
@@ -755,7 +762,7 @@ gleichen Schlüssel/Wert-Paaren. Es wird I<nicht> rekursiv kopiert,
 sondern eine "shallow copy" erzeugt.
 
 Sind Schlüssel/Wert-Paare @keyVal angegeben, werden
-diese nach dem Kopieren per L</set>() auf dem neuen Hash gesetzt.
+diese nach dem Kopieren per L<set|"set() - Setze Schlüssel/Wert-Paare">() auf dem neuen Hash gesetzt.
 
 =cut
 
@@ -1385,7 +1392,7 @@ Zugriffsmethoden:
     C 8104988/s 478%  66%  53%   4%   --  -7%
     A 8745272/s 524%  79%  65%  12%   8%   --
 
-Den Hash via $h->L</get>() zuzugreifen (F) ist ca. 85% langsamer
+Den Hash via $h->L<get|"get() - Werte abfragen">() zuzugreifen (F) ist ca. 85% langsamer
 als der einfachste Hash-Lookup (A). Wird auf den Methodenaufruf
 verzichtet und per $h->{$key} zugegriffen (E), ist der Zugriff nur
 11% langsamer. Es ist also ratsam, intern per $h->{$key}
@@ -1393,7 +1400,7 @@ zuzugreifen. Per $h->get() können immerhin 1.400.000 Lookups pro
 CPU-Sekunde ausgeführt werden. Bei nicht-zugriffsintensiven
 Anwendungen ist das sicherlich schnell genug.  Die Anzahl der
 Aufrufe von $h->get() und $h->set() wird intern gezählt und kann
-per $class->L</getCount>() und $class->L</setCount>() abgefragt
+per $class->L<getCount|"getCount() - Anzahl der get-Aufrufe">() und $class->L<setCount|"setCount() - Anzahl der set-Aufrufe">() abgefragt
 werden.
 
 Das Benchmark-Programm (bench-hash):
@@ -1435,7 +1442,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

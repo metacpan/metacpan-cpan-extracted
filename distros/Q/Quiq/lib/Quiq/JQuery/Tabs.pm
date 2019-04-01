@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Hash;
 use Quiq::Html::List;
@@ -26,8 +26,8 @@ L<Quiq::Hash>
 
 Die Klasse erzeugt den HTML-Code einer jQuery UI Reiterleiste.
 Dem Konstruktor wird die Reiterkonfiguration mit dem Attribut
-C<tabs> übergeben. Die Methode L</html>() generiert den HTML-Code.
-Siehe Abschnitt L</EXAMPLE>.
+C<tabs> übergeben. Die Methode L<html|"html() - Generiere HTML">() generiert den HTML-Code.
+Siehe Abschnitt L<EXAMPLE|"EXAMPLE">.
 
 =head1 ATTRIBUTES
 
@@ -198,7 +198,7 @@ sub html {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

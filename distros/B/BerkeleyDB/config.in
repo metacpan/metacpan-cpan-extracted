@@ -9,7 +9,8 @@
 
 #INCLUDE	= /usr/local/include
 #INCLUDE	= ../..
-INCLUDE	= /usr/local/BerkeleyDB/include
+#INCLUDE	= /usr/local/BerkeleyDB/include
+INCLUDE	= libraries/6.1.10/include
 
 # 2. Where is libdb?
 #
@@ -18,8 +19,8 @@ INCLUDE	= /usr/local/BerkeleyDB/include
 
 #LIB	= /usr/local/lib
 #LIB	= ../..
-LIB	= /usr/local/BerkeleyDB/lib
-
+#LIB	= /usr/local/BerkeleyDB/lib
+LIB = libraries/6.1.10/lib
 # 3. Is the library called libdb?
 #
 #    If you have copies of both 1.x and 2.x Berkeley DB installed on

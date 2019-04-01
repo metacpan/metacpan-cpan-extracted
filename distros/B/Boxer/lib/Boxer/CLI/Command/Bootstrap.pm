@@ -7,7 +7,6 @@ package Boxer::CLI::Command::Bootstrap;
 use v5.14;
 use utf8;
 use strictures 2;
-use version;
 use Role::Commons -all;
 use namespace::autoclean 0.16;
 
@@ -18,11 +17,11 @@ use Boxer::CLI -command;
 
 =head1 VERSION
 
-Version v1.3.0
+Version v1.4.0
 
 =cut
 
-our $VERSION = version->declare("v1.3.0");
+our $VERSION = "v1.4.0";
 
 use constant {
 	abstract   => q[bootstrap system image from reclass node],
@@ -56,6 +55,7 @@ sub opt_spec
 		[ "classdir=s", "location of classes (XDG datadir + suite/classes)" ],
 		[ "datadir=s",  "location containing nodes and classes" ],
 		[ "skeldir=s",  "location of skeleton files (use builtin)" ],
+		[ "mode=s",     "mode passed to helper, and use sudo in sudo mode" ],
 		[ "helper=s",   "bootstrapping tool to use (mmdebstrap)" ],
 		[ "nonfree",    "enable use of contrib and non-free code" ],
 		[ "dryrun",     "only echo command, without executing it" ],
@@ -67,6 +67,9 @@ sub execute
 {
 	my $self = shift;
 	my ( $opt, $args ) = @_;
+
+	Log::Any::Adapter->set( 'Screen', default_level => 'info' )
+		if ( $opt->{verbose} );
 
 	my @args = before { $_ eq '--' } @{$args};
 	my @helper_args = after { $_ eq '--' } @{$args};
@@ -81,6 +84,7 @@ sub execute
 		use_module('Boxer::Task::Bootstrap')->new(
 			world       => $world,
 			helper      => $opt->{helper} || 'mmdebstrap',
+			mode        => $opt->{mode},
 			helper_args => [@helper_args],
 			nonfree     => $opt->{nonfree},
 			dryrun      => $opt->{dryrun},

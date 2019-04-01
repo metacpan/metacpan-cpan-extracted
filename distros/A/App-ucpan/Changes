@@ -1,5 +1,14 @@
 Revision history for Perl extension App-ucpan
 
+1.07 2019-04-01T13:06:23Z
+    - Improve POD
+    - Abolish the option "--from"
+    - Make sure that the recording file can be saved
+    - Fix output leakage prevention around STDERR
+    - Prevent self upgrading on Win32
+    - List prereqs strictly
+    - Tidy the code
+
 1.06 2019-03-21T07:16:47Z
     - Add Term::ReadKey to prereq.(issue #128900)
 

@@ -1,3 +1,27 @@
+0.064		2019-04-01	T. R. Wyant
+    Empty \p{} should be an error.
+    
+    \x{} and \x{ non-hex } should be errors under "use re 'strict'"
+
+    \o{} should be an error
+
+    \o{ non-octal } should be an error under "use re 'strict'"
+
+    Support wildcard Unicode property values. These were added in
+    5.29.9.
+
+    Add eg/find-variable-length-lookarounds
+
+    Add convenience method extract_regexps(). This is a static method
+    on PPIx::Regexp that takes as its argument a PPI::Document and
+    manufactures PPIx::Regexp objects out of anything that parses to a
+    regexp of some sort.
+
+    Don't run illegal character tests before Perl 5.18 unless we're
+    author testing, because they are noisy. I think the issue is not the
+    Perl version per se, but the version of Unicode; Perl5180delta says
+    it shipped with Unicode 6.2.
+
 0.063		2018-11-08	T. R. Wyant
     Silence weird-character parse tests and make them no longer
     author-only.

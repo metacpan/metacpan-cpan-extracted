@@ -69,6 +69,30 @@ WriteMakefile(
         : ()
     ),
 
+     ( eval { ExtUtils::MakeMaker->VERSION(6.46) }  
+        ? ( META_MERGE  => {
+    
+                "meta-spec" => { version => 2 },
+                
+                resources   => {
+                
+                    bugtracker  => {
+                        web     => 'https://github.com/pmqs/BerkeleyDB/issues'
+                    },
+
+                    homepage    => 'https://github.com/pmqs/BerkeleyDB',
+
+                    repository  => {
+                        type    => 'git',
+                        url     => 'git://github.com/pmqs/BerkeleyDB.git',
+                        web     => 'https://github.com/pmqs/BerkeleyDB',
+                    },        
+                },
+            } 
+            ) 
+        : ()
+    ),
+
 	);
 
 

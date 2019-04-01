@@ -1,0 +1,3 @@
+name = "Perl-Critic-Policy-Catalyst-ProhibitUnreachableCode"
+authority="cpan:BLUEFEET"
+markdown_maker = "Pod::Markdown::Github"

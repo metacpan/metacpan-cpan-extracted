@@ -8,7 +8,7 @@ use DateTime::Locale::Util qw( parse_locale_code );
 use Params::ValidationCompiler 0.13 qw( validation_for );
 use Specio::Declare;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 my @FormatLengths;
 
@@ -136,7 +136,7 @@ sub _make_datetime_format {
     return $dt_format;
 }
 
-my $length = enum( values => [qw( full long medium short )] );
+my $length    = enum( values => [qw( full long medium short )] );
 my $validator = validation_for(
     name             => '_check_length_parameter',
     name_is_optional => 1,
@@ -288,7 +288,7 @@ DateTime::Locale::FromData - Class for locale objects instantiated from pre-defi
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 SYNOPSIS
 
@@ -516,7 +516,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2018 by Dave Rolsky.
+This software is copyright (c) 2003 - 2019 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

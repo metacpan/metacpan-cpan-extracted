@@ -2,7 +2,9 @@ Changes
 lib/ExtUtils/CppGuess.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
+t/00-report-prereqs.t
 t/001_load.t
 t/002_icpp.t
 t/010_module_build.t

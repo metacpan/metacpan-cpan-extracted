@@ -7,7 +7,7 @@ use 5.004;
 $^C ||= 0;
 
 use strict;
-use vars qw($VERSION);
+our ($VERSION);
 $VERSION = '0.30';
 $VERSION = eval $VERSION;    # make the alpha version come out as a number
 
@@ -167,7 +167,7 @@ test might be run multiple times in the same process.
 
 =cut
 
-use vars qw($Level);
+our ($Level);
 
 sub reset {
     my ($self) = @_;

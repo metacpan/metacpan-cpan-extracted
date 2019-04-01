@@ -477,17 +477,17 @@ Estonian Estonia locale.
    1995-12-22T09:05:02 = R, 22. detsember
   -0010-09-15T04:44:23 = L, 15. september
 
-=head3 MMMMW-count-one (MMM (W. 'nädal'))
+=head3 MMMMW-count-one (MMMM (W. 'nädal'))
 
-   2008-02-05T18:30:30 = veebr (1. nädal)
-   1995-12-22T09:05:02 = dets (3. nädal)
-  -0010-09-15T04:44:23 = sept (2. nädal)
+   2008-02-05T18:30:30 = veebruar (1. nädal)
+   1995-12-22T09:05:02 = detsember (3. nädal)
+  -0010-09-15T04:44:23 = september (2. nädal)
 
-=head3 MMMMW-count-other (MMM (W. 'nädal'))
+=head3 MMMMW-count-other (MMMM (W. 'nädal'))
 
-   2008-02-05T18:30:30 = veebr (1. nädal)
-   1995-12-22T09:05:02 = dets (3. nädal)
-  -0010-09-15T04:44:23 = sept (2. nädal)
+   2008-02-05T18:30:30 = veebruar (1. nädal)
+   1995-12-22T09:05:02 = detsember (3. nädal)
+  -0010-09-15T04:44:23 = september (2. nädal)
 
 =head3 MMMMd (d. MMMM)
 

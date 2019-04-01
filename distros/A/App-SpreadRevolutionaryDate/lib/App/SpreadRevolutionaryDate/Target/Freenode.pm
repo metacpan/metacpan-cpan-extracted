@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode;
-$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.08';
+$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.10';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Freenode.
 
 use Moose;
@@ -41,8 +41,7 @@ has 'channels' => (
 
 
 around BUILDARGS => sub {
-  my $orig = shift;
-  my $class = shift;
+  my ($orig, $class) = @_;
 
   my $port = 6667;
   my $ssl = 0;
@@ -77,8 +76,7 @@ around BUILDARGS => sub {
 
 
 sub spread {
-  my $self = shift;
-  my $msg = shift;
+  my ($self, $msg) = @_;
 
   $self->obj->msg($msg);
   $self->obj->run;
@@ -108,7 +106,7 @@ App::SpreadRevolutionaryDate::Target::Freenode - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 METHODS
 
@@ -137,6 +135,12 @@ Spreads a message to Freenode channels configured with the multivalued option C<
 =item L<App::SpreadRevolutionaryDate::Target::Mastodon>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
 
 =back
 

@@ -1,4 +1,4 @@
-# AWS::WAFRegional::SqlInjectionMatchSet generated from spec 1.11.0
+# AWS::WAFRegional::SqlInjectionMatchSet generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::WAFRegional::SqlInjectionMatchSet',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::WAFRegional::SqlInjectionMatchSet {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::WAFRegional::SqlInjectionMatchSet', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'ap-northeast-1','eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

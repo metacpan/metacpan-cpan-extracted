@@ -1,0 +1,15 @@
+  [
+    {
+      "type" : "select",
+      "name" : "language",
+      "data" : [
+        "de",
+        "en"
+      ]
+    },
+    {
+      "label" : "Name",
+      "type" : "text",
+      "name" : "name"
+    }
+  ]

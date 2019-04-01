@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Shell;
 use Quiq::Path;
@@ -70,7 +70,7 @@ Liefere den Künstler der Audio-Datei.
 
 =head4 See Also
 
-L</extractMetaData>()
+L<extractMetaData|"extractMetaData() - Ermittele Künstler und Titel">()
 
 =cut
 
@@ -100,7 +100,7 @@ Liefere den Titel der Audio-Datei.
 
 =head4 See Also
 
-L</extractMetaData>()
+L<extractMetaData|"extractMetaData() - Ermittele Künstler und Titel">()
 
 =cut
 
@@ -185,7 +185,7 @@ Liefere die Extension der Audio-Datei.
 
 =head4 See Also
 
-L</extractMetaData>()
+L<extractMetaData|"extractMetaData() - Ermittele Künstler und Titel">()
 
 =cut
 
@@ -306,7 +306,7 @@ sub extractMetaData {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

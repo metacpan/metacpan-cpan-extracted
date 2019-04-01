@@ -29,6 +29,6 @@ resources:
   bugtracker: https://github.com/ingydotnet/inline-pm/issues
   homepage: https://github.com/ingydotnet/inline-pm
   repository: https://github.com/ingydotnet/inline-pm.git
-version: '0.81'
+version: '0.82'
 x_generated_by_perl: v5.24.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

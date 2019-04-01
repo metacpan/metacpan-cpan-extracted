@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0602';
 
 use Moo;
 use strictures 2;
@@ -225,21 +225,21 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
   use Perl::Metrics::Halstead;
 
-  my $pmh = Perl::Metrics::Halstead->new(file => '/some/perl/code.pl');
+  my $halstead = Perl::Metrics::Halstead->new(file => '/some/perl/code.pl');
 
-  my $metrics = $pmh->dump;
+  my $metrics = $halstead->dump;
 
-  $pmh->report;
+  $halstead->report;
 
 =head1 DESCRIPTION
 
-C<Perl::Metrics::Halstead> computes Halstead complexity metrics.
+C<Perl::Metrics::Halstead> computes software Halstead complexity metrics.
 
 Please see the explanatory links in the L</"SEE ALSO"> section for descriptions
 of what these attributes mean and how they are computed.
@@ -249,126 +249,126 @@ L<http://techn.ology.net/halstead-software-complexity-of-perl-code/>
 
 =head1 ATTRIBUTES
 
-All attributes are calculated except for B<file>, which is required to be given
-in the constructor.
+B<All> attributes are calculated except for B<file>, which is required to be
+given in the constructor.
 
 =head2 file
 
-  $file = $pmh->file;
+  $file = $halstead->file;
 
 The file to analyze.
 
 =head2 n_operators
 
-  $n_operators = $pmh->n_operators;
+  $n = $halstead->n_operators;
 
 The total number of operators.
 
 =head2 n_operands
 
-  $n_operands = $pmh->n_operands;
+  $n = $halstead->n_operands;
 
 The total number of operands.
 
 =head2 n_distinct_operators
 
-  $n_distinct_operators = $pmh->n_distinct_operators;
+  $n = $halstead->n_distinct_operators;
 
 The number of distinct operators.
 
 =head2 n_distinct_operands
 
-  $n_distinct_operands = $pmh->n_distinct_operands;
+  $n = $halstead->n_distinct_operands;
 
 The number of distinct operands.
 
 =head2 prog_vocab
 
-  $prog_vocab = $pmh->prog_vocab;
+  $x = $halstead->prog_vocab;
 
 The program vocabulary.
 
 =head2 prog_length
 
-  $prog_length = $pmh->prog_length;
+  $x = $halstead->prog_length;
 
 The program length.
 
 =head2 est_prog_length
 
-  $est_prog_length = $pmh->est_prog_length;
+  $x = $halstead->est_prog_length;
 
 The estimated program length.
 
 =head2 volume
 
-  $volume = $pmh->volume;
+  $x = $halstead->volume;
 
 The program volume.
 
 =head2 difficulty
 
-  $difficulty = $pmh->difficulty;
+  $x = $halstead->difficulty;
 
 The program difficulty.
 
 =head2 level
 
-  $level = $pmh->level;
+  $x = $halstead->level;
 
 The program level.
 
 =head2 lang_level
 
-  $lang_level = $pmh->lang_level;
+  $x = $halstead->lang_level;
 
 The programming language level.
 
 =head2 intel_content
 
-  $intel_content = $pmh->intel_content;
+  $x = $halstead->intel_content;
 
 Measure of the information content of a program.
 
 =head2 effort
 
-  $effort = $pmh->effort;
+  $x = $halstead->effort;
 
 The program effort.
 
 =head2 time_to_program
 
-  $time_to_program = $pmh->time_to_program;
+  $x = $halstead->time_to_program;
 
 The time to program (in seconds).
 
 =head2 delivered_bugs
 
-  $delivered_bugs = $pmh->delivered_bugs;
+  $x = $halstead->delivered_bugs;
 
 Delivered bugs.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
-  $pmh = Perl::Metrics::Halstead->new(file => $file);
+  $halstead = Perl::Metrics::Halstead->new(file => $file);
 
 Create a new C<Perl::Metrics::Halstead> object given the B<file> argument.
 
-=head2 BUILD()
+=head2 BUILD
 
 Process the given B<file> into the computed metrics.
 
-=head2 report()
+=head2 report
 
-  $pmh->report();
+  $halstead->report;
 
 Print the computed metrics to C<STDOUT>.
 
-=head2 dump()
+=head2 dump
 
-  $metrics = $pmh->dump();
+  $metrics = $halstead->dump;
 
 Return a hashref of the metrics and their computed values.
 

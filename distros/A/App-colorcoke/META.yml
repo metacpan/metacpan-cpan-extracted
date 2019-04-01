@@ -19,11 +19,12 @@ no_index:
     - inc
 provides:
   App::colorcoke:
-    file: lib/App/colorcoke.pm
+    file: bin/colorcoke
 requires:
   Term::ExtendedColor: '0'
   Term::ExtendedColor::Xresources: '0'
-  Test::More: '0'
   perl: '5.01'
-version: '0.422'
+resources:
+  repository: https://github.com/trapd00r/colorcoke.git
+version: '0.430'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

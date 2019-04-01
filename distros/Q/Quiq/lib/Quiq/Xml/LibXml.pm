@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Encode ();
 
@@ -111,7 +111,7 @@ $nod->removeChildNodes().
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

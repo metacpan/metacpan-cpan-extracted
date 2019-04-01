@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Class::Tiny;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000008';
 
 # Docs {{{1
 
@@ -144,43 +144,52 @@ sub _get_constraint_sub {
     my ($type) = @_;
     my ($checker, $get_message);
 
+    # Get type's name, if any
+    my $name = eval { $type->can('name') || $type->can('description') };
+    $name = $type->$name() if $name;
+
+    # Set default message
+    $get_message = $name ?  sub { 'Value is not a ' . $name } :
+                            sub { 'Value did not satisfy constraint' };
+
+    # Try the different types of constraints we know about
     DONE: {
 
-        if ( eval { $type->can('compiled_check') }) { # Type::Tiny
-            $checker = $type->compiled_check();
+        if ( my $method = eval { $type->can('compiled_check') }) { # Type::Tiny
+            $checker = $type->$method();
             $get_message = sub { $type->get_message($_[0]) };
             last DONE;
         }
 
-        if (my $method = eval { $type->can('inline_check') || $type->can('_inline_check') }) { # Moose
-            $checker = eval { eval sprintf 'sub { my $value = shift; %s }', $type->$method('$value') };
-                # Note: will fail if type cannot be inlined
-            $get_message = sub { 'Constraint failed' };     # TODO
+        if (my $method = eval { $type->can('inline_check') || $type->can('_inline_check') }) { # Specio::Constraint::Simple
+            $checker = eval {
+                my $text = $type->$method('$value');
+                    # $method() will fail if type cannot be inlined.
+                local $SIG{__WARN__} = sub { };     # Eval failure => silent
+                eval "sub { my \$value = shift; $text }"
+            };
             last DONE if $checker;
         }
 
         if (eval { $type->can('check') } ) { # Moose, Mouse
             $checker = sub { $type->check(@_) };
-            $get_message = sub { 'Constraint failed' };     # TODO
             last DONE;
         }
 
         if (ref($type) eq 'CODE') { # MooX::Types
             $checker = sub { eval { $type->(@_); 1 } };
-            $get_message = sub { 'Constraint failed' };     # TODO
             last DONE;
         }
 
         if(eval { $type->can('value_is_valid') }) { # Specio::Constraint::Simple
             $checker = sub { $type->value_is_valid(@_) };
-            $get_message = sub { 'Value is not a ' . $type->description };
             last DONE;
         }
 
     } #DONE
 
     die "I don't know how to use this type (" . (ref($type)||'scalar') . ")"
-        unless $checker and $get_message;
+        unless $checker;
 
     return ($checker, $get_message);
 } #_get_constraint_sub()

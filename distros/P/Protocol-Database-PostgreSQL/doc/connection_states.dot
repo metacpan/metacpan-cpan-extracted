@@ -1,0 +1,28 @@
+digraph {
+ node [shape=box];
+ Unconnected;
+ Connected;
+ AuthRequested;
+ Authenticated;
+ Idle;
+ Parsing;
+ Describing;
+ Binding;
+ Executing;
+ ShuttingDown;
+ CopyIn;
+
+ Unconnected -> Connected;
+ Connected -> AuthRequested;
+ AuthRequested -> Authenticated;
+ Authenticated -> Idle;
+ Idle -> Parsing;
+ Parsing -> Describing;
+ Describing -> Binding;
+ Binding -> Executing;
+ Executing -> Idle;
+ Idle -> ShuttingDown;
+ Idle -> CopyIn;
+ ShuttingDown -> Unconnected;
+}
+

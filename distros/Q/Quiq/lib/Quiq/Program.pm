@@ -5,12 +5,13 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Perl;
 use Encode ();
 use Quiq::Parameters;
 use Quiq::Option;
+use Time::HiRes ();
 use Quiq::FileHandle;
 use PerlIO::encoding;
 use Quiq::System;
@@ -92,7 +93,7 @@ Optionen und Argumente:
 
 =head4 Options
 
-Siehe Methode L</new>()
+Siehe Methode L<new|"new() - Instantiiere Programm-Objekt">()
 
 =cut
 
@@ -155,7 +156,7 @@ sub run {
 Terminiere das Programm mit Exitcode $exitCode. Ist kein Exitcode
 angegeben, terminiere mit dem Exitcode der auf dem Programmobjekt
 gesetzt ist. Die Methode kehrt nicht zurück. Nach ihrem Aufruf wird
-die Methode L</finish>() ausgeführt.
+die Methode L<finish|"finish() - Abschließender Code vor Programmende">() ausgeführt.
 
 =cut
 
@@ -256,7 +257,7 @@ Das Default-Verhalten ist, dass der Exception-Text auf STDERR
 ausgegeben und der Exitcode auf 99 gesetzt wird.
 
 Das Programm terminiert nicht sofort, sondern die Methode
-L</finish>() wird noch ausgeführt.
+L<finish|"finish() - Abschließender Code vor Programmende">() wird noch ausgeführt.
 
 =cut
 
@@ -673,6 +674,33 @@ sub projectDir {
 
 # -----------------------------------------------------------------------------
 
+=head2 Zeitmessung
+
+=head3 elapsed() - Vergangene Zeit in Sekunden
+
+=head4 Synopsis
+
+    $sec = $prg->elapsed;
+
+=head4 Returns
+
+Sekunden (Float)
+
+=head4 Description
+
+Ermittele die vergangene Zeit in Sekunden und liefere diese zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub elapsed {
+    my $self = shift;
+    return Time::HiRes::gettimeofday-$self->{'t0'};
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Hilfe
 
 =head3 help() - Gib Hilfetext aus und beende Programm
@@ -837,6 +865,7 @@ sub new {
         encoding=>$encoding,
         exitCode=>0,
         optH=>Quiq::Hash->new,
+        t0=>Time::HiRes::gettimeofday,
     );
 }
 
@@ -844,7 +873,7 @@ sub new {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

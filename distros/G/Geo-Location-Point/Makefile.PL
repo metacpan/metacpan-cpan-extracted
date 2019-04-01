@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,19 +14,22 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Geo-Location-Point",
   "LICENSE" => "gpl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Geo::Location::Point",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::Dumper" => 0,
     "GIS::Distance" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Test::Carp" => 0,
     "Test::Most" => 0,
     "Test::NoWarnings" => 0,
     "Test::Number::Delta" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,8 +37,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::Dumper" => 0,
   "GIS::Distance" => 0,
+  "Test::Carp" => 0,
   "Test::Most" => 0,
   "Test::NoWarnings" => 0,
   "Test::Number::Delta" => 0,

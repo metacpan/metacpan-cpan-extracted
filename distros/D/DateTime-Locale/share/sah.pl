@@ -28,7 +28,7 @@
     MEd => "MM-dd, E",
     MMM => "LLL",
     MMMEd => "MMM d, E",
-    "MMMMW-count-other" => "MMM W '\N{U+043d}\N{U+044d}\N{U+0434}\N{U+0438}\N{U+044d}\N{U+043b}\N{U+044d}\N{U+0442}\N{U+044d}'",
+    "MMMMW-count-other" => "MMMM W '\N{U+043d}\N{U+044d}\N{U+0434}\N{U+0438}\N{U+044d}\N{U+043b}\N{U+044d}\N{U+0442}\N{U+044d}'",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "MM-dd",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

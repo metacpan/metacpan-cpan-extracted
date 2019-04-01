@@ -1,5 +1,8 @@
 Revision history for Date-Japanese-Era-Table-Builder
 
-0.01    Date/time
+0.02    2019-04-01
+        Updated documentation to reflect the upcoming change to 令和/Reiwa era.
+
+0.01    2015-01-15
         First version, released on an unsuspecting world.
 

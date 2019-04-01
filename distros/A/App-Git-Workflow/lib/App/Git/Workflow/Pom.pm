@@ -8,6 +8,7 @@ package App::Git::Workflow::Pom;
 
 use strict;
 use warnings;
+use version;
 use Carp qw/carp croak cluck confess longmess/;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
@@ -16,7 +17,7 @@ use App::Git::Workflow::Repository qw//;
 use App::Git::Workflow;
 use base qw/App::Git::Workflow/;
 
-our $VERSION = 1.1.1;
+our $VERSION = version->new(1.1.2);
 
 sub new {
     my $class = shift;
@@ -81,9 +82,9 @@ sub get_pom_versions {
 
             my $xml = eval { $self->git->show("$branch:$pom"); };
 
-            next if !$xml;
+            next BRANCH if !$xml;
             chomp $xml;
-            next if !$xml;
+            next BRANCH if !$xml;
 
             $branch =~ s{^origin/}{}xms;
 
@@ -105,12 +106,12 @@ sub get_pom_versions {
                 version   => $version,
                 time      => $current->{time},
             };
-            $self->save_settings() if $count++ % 20 == 0;
+            $self->save_settings() if $count++ % 50 == 0;
         }
-        $max_age *= 2;
         $run++;
     }
-    $settings->{max_age} = $max_age;
+
+    $self->save_settings();
 
     return \%versions;
 }
@@ -120,7 +121,8 @@ sub pom_version {
 
     if ( $pom && $pom =~ /[.]json$/ ) {
         require JSON;
-        my $json = JSON::decode_json($xml);
+        my $json = eval { JSON::decode_json($xml) }
+            or do { warn "Could not read $xml as json : $@\n"; };
         return $json->{version};
     }
     if ( $pom && $pom =~ /[.]ya?ml$/ ) {
@@ -164,7 +166,7 @@ App::Git::Workflow::Pom - Tools for maven POM files with git
 
 =head1 VERSION
 
-This documentation refers to App::Git::Workflow::Pom version 1.1.1
+This documentation refers to App::Git::Workflow::Pom version 1.1.2
 
 =head1 SYNOPSIS
 

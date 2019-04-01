@@ -1,7 +1,7 @@
 package GitLab::API::v4;
 use 5.010001;
 use strictures 2;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =encoding utf8
 
@@ -1521,6 +1521,30 @@ sub commit {
     croak 'The #2 argument ($commit_sha) to commit must be a scalar' if ref($_[1]) or (!defined $_[1]);
     my $options = {};
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits/:commit_sha', [@_], $options );
+}
+
+=item commit_refs
+
+    my $refs = $api->commit_refs(
+        $project_id,
+        $commit_sha,
+        \%params,
+    );
+
+Sends a C<GET> request to C<projects/:project_id/repository/commits/:commit_sha/refs> and returns the decoded response content.
+
+=cut
+
+sub commit_refs {
+    my $self = shift;
+    croak 'commit_refs must be called with 2 to 3 arguments' if @_ < 2 or @_ > 3;
+    croak 'The #1 argument ($project_id) to commit_refs must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The #2 argument ($commit_sha) to commit_refs must be a scalar' if ref($_[1]) or (!defined $_[1]);
+    croak 'The last argument (\%params) to commit_refs must be a hash ref' if defined($_[2]) and ref($_[2]) ne 'HASH';
+    my $params = (@_ == 3) ? pop() : undef;
+    my $options = {};
+    $options->{query} = $params if defined $params;
+    return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/commits/:commit_sha/refs', [@_], $options );
 }
 
 =item cherry_pick_commit
@@ -6512,6 +6536,21 @@ sub pipeline {
 
 Sends a C<POST> request to C<projects/:project_id/pipeline> and returns the decoded response content.
 
+Git ref (branch or tag) name must be specified in the C<ref> field of the
+C<%params> hash. It's also possible to pass variables to a pipeline in
+the C<variables> field like in the following example:
+
+    my $pipeline = $api->create_pipeline(
+        $project_id,
+        {
+            'ref'     => 'master',
+            variables => [
+                { 'key' => 'VARIABLE1', 'value' => 'VALUE1' },
+                { 'key' => 'VARIABLE2', 'value' => 'VALUE2' },
+            ],
+        },
+    );
+
 =cut
 
 sub create_pipeline {
@@ -6701,6 +6740,48 @@ sub delete_trigger {
     $options->{decode} = 0;
     $self->_call_rest_client( 'DELETE', 'projects/:project_id/triggers/:trigger_id', [@_], $options );
     return;
+}
+
+=item trigger_pipeline
+
+    my $pipeline = $api->trigger_pipeline(
+        $project_id,
+        \%params,
+    );
+
+Sends a C<POST> request to C<projects/:project_id/trigger/pipeline> and returns the decoded response content.
+
+The API authentication token (L</private_token> or L</access_token>
+parameters in a constructor) is not needed when using this method, however
+You must pass trigger token (generated at the trigger creation) as C<token>
+field and git ref name as C<ref> field in the C<%params> hash. You can also
+pass variables to be set in a pipeline in the C<variables> field. Example:
+
+    my $pipeline = $api->trigger_pipeline(
+        $project_id,
+        {
+            token => 'd69dba9162ab6ac72fa0993496286ada',
+            'ref' => 'master',
+            variables => {
+                variable1 => 'value1',
+                variable2 => 'value2',
+            },
+        },
+    );
+
+Read more at L<https://docs.gitlab.com/ce/ci/triggers/#triggering-a-pipeline>.
+
+=cut
+
+sub trigger_pipeline {
+    my $self = shift;
+    croak 'trigger_pipeline must be called with 1 to 2 arguments' if @_ < 1 or @_ > 2;
+    croak 'The #1 argument ($project_id) to trigger_pipeline must be a scalar' if ref($_[0]) or (!defined $_[0]);
+    croak 'The last argument (\%params) to trigger_pipeline must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
+    my $params = (@_ == 2) ? pop() : undef;
+    my $options = {};
+    $options->{content} = $params if defined $params;
+    return $self->_call_rest_client( 'POST', 'projects/:project_id/trigger/pipeline', [@_], $options );
 }
 
 =back
@@ -7239,7 +7320,6 @@ sub delete_project {
 Sends a C<POST> request to C<projects/:project_id/uploads> and returns the decoded response content.
 
 The C<file> parameter must point to a readable file on the local filesystem.
-
 =cut
 
 sub upload_file_to_project {
@@ -8392,7 +8472,7 @@ sub raw_blob {
         \%params,
     );
 
-Sends a C<GET> request to C<projects/:project_id/repository/archive> and returns the decoded response content.
+Sends a C<GET> request to C<projects/:project_id/repository/archive> and returns the raw response content.
 
 =cut
 
@@ -8403,6 +8483,7 @@ sub archive {
     croak 'The last argument (\%params) to archive must be a hash ref' if defined($_[1]) and ref($_[1]) ne 'HASH';
     my $params = (@_ == 2) ? pop() : undef;
     my $options = {};
+    $options->{decode} = 0;
     $options->{query} = $params if defined $params;
     return $self->_call_rest_client( 'GET', 'projects/:project_id/repository/archive', [@_], $options );
 }
@@ -10193,12 +10274,6 @@ sub delete_wiki_page {
 1;
 __END__
 
-=head1 SEE ALSO
-
-L<Net::Gitlab> purports to provide an interface to the GitLab API, but
-it is hard to tell due to a complete lack of documentation via either
-POD or unit tests.
-
 =head1 CONTRIBUTING
 
 This module is auto-generated from a set of YAML files defining the
@@ -10215,59 +10290,28 @@ for more information.
 Alternatively, you can
 L<open a ticket|https://github.com/bluefeet/GitLab-API-v4/issues>.
 
-=head1 AUTHOR
+=head1 SUPPORT
 
-Aran Clary Deltac <bluefeetE<64>gmail.com>
+Please submit bugs and feature requests to the
+GitLab-API-v4 GitHub issue tracker:
 
-=head1 CONTRIBUTORS
+L<https://github.com/bluefeet/GitLab-API-v4/issues>
 
-=over
+=head1 AUTHORS
 
-=item *
-
-Dotan Dimet <dotanE<64>corky.net>
-
-=item *
-
-Nigel Gregoire <nigelgregoireE<64>gmail.com>
-
-=item *
-
-trunov-ms <trunov.msE<64>gmail.com>
-
-=item *
-
-Marek R. Sotola <Marek.R.SotolaE<64>nasa.gov>
-
-=item *
-
-José Joaquín Atria <jjatriaE<64>gmail.com>
-
-=item *
-
-Dave Webb <githubE<64>d5ve.com>
-
-=item *
-
-Simon Ruderich <simonE<64>ruderich.org>
-
-=item *
-
-royce55 <royceE<64>ecs.vuw.ac.nz>
-
-=item *
-
-gregor herrmann <gregoaE<64>debian.org>
-
-=item *
-
-Luc Didry <lucE<64>framasoft.org>
-
-=item *
-
-Kieren Diment <kieren.dimentE<64>staples.com.au>
-
-=back
+    Aran Clary Deltac <bluefeet@gmail.com>
+    Dotan Dimet <dotan@corky.net>
+    Nigel Gregoire <nigelgregoire@gmail.com>
+    trunov-ms <trunov.ms@gmail.com>
+    Marek R. Sotola <Marek.R.Sotola@nasa.gov>
+    José Joaquín Atria <jjatria@gmail.com>
+    Dave Webb <github@d5ve.com>
+    Simon Ruderich <simon@ruderich.org>
+    royce55 <royce@ecs.vuw.ac.nz>
+    gregor herrmann <gregoa@debian.org>
+    Luc Didry <luc@framasoft.org>
+    Kieren Diment <kieren.diment@staples.com.au>
+    Dmitry Frolov <dmitry.frolov@gmail.com>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -10280,4 +10324,6 @@ development this distribution would not exist.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 

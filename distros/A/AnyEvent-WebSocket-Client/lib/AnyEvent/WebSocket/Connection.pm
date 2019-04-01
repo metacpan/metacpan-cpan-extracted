@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 
 has handle => (
@@ -340,7 +340,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 

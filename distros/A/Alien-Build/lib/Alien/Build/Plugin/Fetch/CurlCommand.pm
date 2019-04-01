@@ -11,7 +11,7 @@ use File::Temp qw( tempdir );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 
 sub curl_command
@@ -80,7 +80,7 @@ sub init
 
         my @command = (
           $self->curl_command,
-          '-L', '-f', -o => 'content',
+          '-L', '-f', '-O',
           -w => '@writeout',
         );
 
@@ -91,17 +91,6 @@ sub init
         my($stdout, $stderr) = $self->_execute($build, @command);
 
         my %h = map { my($k,$v) = m/^ab-(.*?)\s*:(.*)$/; $k => $v } split /\n/, $stdout;
-
-        if($h{url} =~ m{/([^/]+)$})
-        {
-          $h{filename} = $1;
-        }
-        else
-        {
-          $h{filename} = 'index.html';
-        }
-
-        rename 'content', $h{filename};
 
         if(-e 'head')
         {
@@ -221,7 +210,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.60
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -330,7 +319,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2018 by Graham Ollis.
+This software is copyright (c) 2011-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

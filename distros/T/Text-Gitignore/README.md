@@ -51,6 +51,10 @@ Copyright (C) Viacheslav Tykhanovskyi.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+# CREDITS
+
+Flavio Poletti
+
 # AUTHOR
 
 Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>

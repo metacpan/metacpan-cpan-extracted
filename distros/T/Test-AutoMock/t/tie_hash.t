@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More import => [qw(ok eq_set is is_deeply done_testing)];
+use Test::More import => [qw(ok eq_set is is_deeply like done_testing)];
 use Test::AutoMock qw(mock_overloaded manager);
 
 {
@@ -30,7 +30,9 @@ use Test::AutoMock qw(mock_overloaded manager);
     $hash->{mno} = 2;
     ok eq_set [keys %$hash], [qw(jkl mno)];
 
-    is scalar %$hash, 2;
+    # It returns # of keys (2) or # of buckets ("2/8") in Perl 5.24 and earlier.
+    # The hash contains 2 keys, so it uses 1 or 2 buckets.
+    like scalar %$hash, qr/^[12]\b/;
 
     my @calls = manager($mock)->calls;
     is @calls, 16;

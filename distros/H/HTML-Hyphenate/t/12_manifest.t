@@ -1,10 +1,21 @@
+#!/usr/bin/env perl -w    # -*- cperl -*-
 use strict;
 use warnings;
+use 5.014000;
 use utf8;
 
-use Test::More;
-if ( !eval { require Test::CheckManifest; 1 } ) {
-    plan skip_all => q{Test::CheckManifest required for testing test coverage};
-}
-Test::CheckManifest::ok_manifest(
-    { filter => [qr/(Debian_CPANTS.txt|\.(svn|bak))/] } );
+use Test::More tests => 2;
+
+our $VERSION = v1.1.2;
+
+eval {
+    require ExtUtils::Manifest;
+    1;
+} or do {
+    my $msg = q{ExtUtils::Manifest required to check manifest};
+    plan 'skip_all' => $msg;
+};
+
+use ExtUtils::Manifest;
+is_deeply [ ExtUtils::Manifest::manicheck() ], [], 'missing';
+is_deeply [ ExtUtils::Manifest::filecheck() ], [], 'extra';

@@ -93,7 +93,7 @@ my $can_fork = $Config{d_fork} ||
    $Config{useithreads} and $Config{ccflags} =~ /-DPERL_IMPLICIT_SYS/);
 
 my $tests = @TESTS;
-my $tport = 8333;
+my $tport = 8334;
 
 my $tsock = IO::Socket::INET->new(LocalAddr => '0.0.0.0',
                                   LocalPort => $tport,

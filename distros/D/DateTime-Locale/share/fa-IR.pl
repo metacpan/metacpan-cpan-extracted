@@ -30,8 +30,8 @@
     MMM => "LLL",
     MMMEd => "E d LLL",
     MMMMEd => "E d LLLL",
-    "MMMMW-count-one" => "\N{U+0647}\N{U+0641}\N{U+062a}\N{U+0647} W \N{U+0627}\N{U+0632} MMM",
-    "MMMMW-count-other" => "\N{U+0647}\N{U+0641}\N{U+062a}\N{U+0647} W \N{U+0627}\N{U+0632} MMM",
+    "MMMMW-count-one" => "\N{U+0647}\N{U+0641}\N{U+062a}\N{U+06c0} W \N{U+0627}\N{U+0632} LLLL",
+    "MMMMW-count-other" => "\N{U+0647}\N{U+0641}\N{U+062a}\N{U+06c0} W \N{U+0627}\N{U+0632} LLLL",
     MMMMd => "d LLLL",
     MMMd => "d LLL",
     Md => "M/d",
@@ -272,5 +272,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

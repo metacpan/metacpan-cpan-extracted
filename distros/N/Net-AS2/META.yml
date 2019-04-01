@@ -18,12 +18,16 @@ requires:
   Carp: '0'
   Crypt::SMIME: '0'
   Digest::SHA: '0'
+  Email::Address: '0'
   HTTP::Message: '0'
   LWP::UserAgent: '0'
   MIME::Base64: '0'
   MIME::Tools: '0'
+  autodie: '0'
+  parent: '0'
+  perl: '5.010'
 resources:
   homepage: https://github.com/andrewjmaguire/Net-AS2
   repository: https://github.com/andrewjmaguire/Net-AS2.git
-version: '1.0'
+version: '1.0101'
 x_serialization_backend: 'YAML::Tiny version 1.70'

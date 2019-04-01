@@ -4,6 +4,38 @@ use warnings;
 package DBIx::Class::ResultSet::SetControl;
 use DBIx::Class::Util::ResultSet::Iterator;
 
+our $VERSION='0.002';
+
+my $_itr = sub {
+  my $self = shift;
+  return my $itr = DBIx::Class::Util::ResultSet::Iterator->new(resultset=>$self);
+};
+
+sub map {
+  my ($self, $target, $sub, $fail) = @_;
+
+  my $itr = $self->$_itr;
+  while(my $row = $itr->next) {
+    { 
+      local $_ = $row; 
+      my ($return, @err) = $sub->($itr, $row);
+      $self->throw_exception("'->map' must return a scalar") if @err;
+      push @$target, $return;
+    };
+    if($itr->has_escaped) {
+      return $itr->resultset;
+    }
+  }
+
+  if($fail && $itr->has_not_been_used) {
+    my ($return, @err) = $fail->($self);
+    $self->throw_exception("'->map' must return a scalar") if @err;
+    push @$target, $return;
+  }
+
+  return $self;
+}
+
 sub each {
   my($self, $func_proto, $fail) = @_;
 
@@ -164,6 +196,49 @@ this is all pointless line noise.  As you wish :)
 =head1 METHODS
 
 This component defines the following methods.
+
+=head2 map
+
+Arguments: $rs->map(\my @mapped_to, $coderef, ?$if_empty_coderef)
+Returns: Original Resultset OR partly iterated Resultset
+
+Example:
+
+    $schema
+      ->resultset('Person')
+      ->map(\my @list, sub {
+          my ($i, $row) = @_;
+          return +{ id => $row->id };
+        });
+
+Where @list will be an array of hashes in the form +{ id => 111 }.
+
+Basically this is like:
+
+    my @list = map { ${ id => $_->id }  } $person_rs->all;
+
+The two main advantages are that the method returns the resultset so you can chain it
+and the $i iterator has some ability to control and escape the loop.  Also ->all will
+inflate the entire set whereas map will inflate one at a time (possible memory savings.)
+
+$i has some nice 'status of the loop' features such as if the current $row is the first
+one, or if its odd/even.  Be sure to check L<DBIx::Class::Util::ResultSet::Iterator>.
+
+It also has an optional third argument that only runs if the set is empty.  It runs once
+and can be used to provide a default value to the target array:
+
+    $schema
+      ->resultset('Person')
+      ->map(\my @list, sub {
+          my ($i, $row) = @_;
+          return +{ id => $row->id };
+        }, sub {
+          return 'empty list';
+        });
+
+
+Its not amazingly useful standalone but if you are using the other stuff its a nice to
+have to make the API more complete.
 
 =head2 each
 

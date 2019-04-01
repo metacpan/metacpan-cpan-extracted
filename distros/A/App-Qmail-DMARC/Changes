@@ -1,4 +1,8 @@
 Revision history for App-Qmail-DMARC
 
+0.43    2019-03-29 03:49
+        Do not pass empty RFC5321.MailFrom to Mail::DMARC::PurePerl,
+        because it does not like that.
+
 0.42    2019-03-19 00:07
         prepared first release for CPAN

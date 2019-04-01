@@ -1,7 +1,7 @@
 package Dancer::Route::Registry;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: Route registry for Dancer
-$Dancer::Route::Registry::VERSION = '1.3510';
+$Dancer::Route::Registry::VERSION = '1.3512';
 use strict;
 use warnings;
 use Carp;
@@ -159,7 +159,7 @@ Dancer::Route::Registry - Route registry for Dancer
 
 =head1 VERSION
 
-version 1.3510
+version 1.3512
 
 =head1 AUTHOR
 

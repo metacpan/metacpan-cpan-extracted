@@ -1,5 +1,20 @@
 Revision history for git-workflow-tools
 
+1.1.2   2019-03-30
+        Updating for release of version 1.1.2
+        Adding new dependency (Ivan Wills)
+        Stopping some tests for the moment (Ivan Wills)
+        Fixing chomping undefined data (Ivan Wills)
+        Fixing test data (Ivan Wills)
+        Fixed version number (Ivan Wills)
+        Switching to using version module (Ivan Wills)
+        Adding files to skip (Ivan Wills)
+        Fixing passing around pom file names vs pom content (Ivan Wills)
+        Trapping errors for badly formatted JSON (Ivan Wills)
+        Fixing up saving and determining old information (Ivan Wills)
+        Don't create a blank settings left code read from file (Ivan Wills)
+        Fixing version number comparison (Ivan Wills)
+
 1.1.1   2019-02-22
         Updating for release of version 1.1.1
         Updated date (Ivan Wills)

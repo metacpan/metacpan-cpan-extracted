@@ -7,7 +7,7 @@ use File::chdir;
 use Path::Tiny ();
 
 # ABSTRACT: Plugin for fetching a local directory
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 
 has root => undef;
@@ -91,7 +91,7 @@ Alien::Build::Plugin::Fetch::LocalDir - Plugin for fetching a local directory
 
 =head1 VERSION
 
-version 1.60
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -199,7 +199,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2018 by Graham Ollis.
+This software is copyright (c) 2011-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

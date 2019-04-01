@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.08';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.10';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
@@ -53,7 +53,7 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -82,6 +82,12 @@ If the target needs authentication, it can be carried out in the constructor (wi
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
 
 =back
 

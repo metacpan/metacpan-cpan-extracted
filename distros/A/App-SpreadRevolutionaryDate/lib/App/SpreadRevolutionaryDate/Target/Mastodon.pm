@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Mastodon;
-$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.08';
+$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.10';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Mastodon.
 
 use Moose;
@@ -19,7 +19,6 @@ with 'App::SpreadRevolutionaryDate::Target'
 
 use namespace::autoclean;
 use Mastodon::Client;
-use Encode qw(encode);
 
 has 'instance' => (
     is  => 'ro',
@@ -47,8 +46,8 @@ has 'access_token' => (
 
 
 around BUILDARGS => sub {
-  my $orig = shift;
-  my $class = shift;
+  my ($orig, $class) = @_;
+
   my $args = $class->$orig(@_);
 
   $args->{obj} = Mastodon::Client->new(
@@ -62,12 +61,16 @@ around BUILDARGS => sub {
 
 
 sub spread {
-  my $self = shift;
-  my $msg = shift;
-  my $test = shift // 0;
+  my ($self, $msg, $test) = @_;
+  $test //= 0;
+
   if ($test) {
+    use Encode qw(encode);
+    use IO::Handle;
+    my $io = IO::Handle->new;
+    $io->fdopen(fileno(STDOUT), "w");
     my $utf8_msg = encode('UTF-8', $msg);
-    print "Spread to Mastodon $utf8_msg\n";
+    $io->say("Spread to Mastodon: $utf8_msg");
   } else {
     $self->obj->post_status($msg);
   }
@@ -96,7 +99,7 @@ App::SpreadRevolutionaryDate::Target::Mastodon - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 METHODS
 
@@ -125,6 +128,12 @@ Spreads a message to Mastodon. Takes one mandatory argument: C<$msg> which shoul
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
 
 =back
 

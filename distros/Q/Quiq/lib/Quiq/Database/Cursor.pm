@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Database::Row::Array;
 use Quiq::Database::Row::Object;
@@ -117,7 +117,7 @@ sub close {
 
 # -----------------------------------------------------------------------------
 
-=head2 Accessors
+=head2 Akzessoren
 
 =head3 bindVars() - Liefere Anzahl der Bind-Variablen
 
@@ -532,7 +532,7 @@ sub fetchAll {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

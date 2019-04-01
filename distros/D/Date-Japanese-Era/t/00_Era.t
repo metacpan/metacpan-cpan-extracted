@@ -1,11 +1,14 @@
 use strict;
-use Test::More tests => 47;
+use Test::More;
 
 BEGIN { use_ok('Date::Japanese::Era'); }
 
-use encoding "utf-8";
+use utf8;
 
 my @tests = (
+    [ 2020, 1, 1, '令和', 2 ],
+    [ 2019, 5, 1, '令和', 1 ],
+    [ 2019, 4, 30, '平成', 31 ],
     [ 2001, 9, 1, '平成', 13 ],
     [ 1989, 1, 8, '平成', 1 ],
     [ 1989, 1, 7, '昭和', 64 ],
@@ -51,10 +54,6 @@ for my $fail (@fail) {
     like($@, qr/$fail->[1]/, 'various ways to fail');
 }
 
-my $utf8 = "\xe6\x98\xad\xe5\x92\x8c";	# 昭和
-my $era = Date::Japanese::Era->new($utf8, 52);
-is($era->name, $utf8, 'input / output UTF-8');
-
 {
     my @era;
     push @era, Date::Japanese::Era->new('昭和52年');
@@ -70,4 +69,5 @@ is($era->name, $utf8, 'input / output UTF-8');
     }
 }
 
+done_testing;
 

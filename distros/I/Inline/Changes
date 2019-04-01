@@ -1,3 +1,6 @@
+0.82 Sun 31 Mar 2019 04:10:24 PM CEST
+ - Another fix for @INC PR#69 TINITA
+
 0.81 Sun 03 Feb 2019 04:42:05 PM CET
  - Regular release, see developer releases
 

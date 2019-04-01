@@ -1,5 +1,12 @@
 Revision history for Perl extension Finance::Bank::Postbank_de.
 
+0.57 2019-03-31
+  * Test suite stability fixes
+    We now sleep a second between each access...
+  * New predicates on ::Account to check the account type.
+    This centralizes checking for the ->productType field.
+  * Documentation
+
 0.56 2019-01-06
   * Made buildtool and few others not executable (MANWAR)
   * Send the "device-signature" header again
@@ -11,7 +18,7 @@ Revision history for Perl extension Finance::Bank::Postbank_de.
     BAUFINANZIERUNG accounts will not be returned for the time being
 
 0.54 2018-09-02
-  + Add missing prerequisite for JSON, Future
+  * Add missing prerequisite for JSON, Future
     This addresses RT #127022 , reported by Slaven Rezic
 
 0.53 2018-09-02

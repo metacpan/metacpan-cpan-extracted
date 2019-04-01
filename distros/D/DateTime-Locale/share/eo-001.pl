@@ -219,9 +219,9 @@
   ],
   name => "Esperanto World",
   native_language => "esperanto",
-  native_name => "esperanto 001",
+  native_name => "esperanto Mondo",
   native_script => undef,
-  native_territory => "001",
+  native_territory => "Mondo",
   native_variant => undef,
   quarter_format_abbreviated => [
     "Q1",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

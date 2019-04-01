@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
-        'Date::Persian::Simple'      => '0.20',
+        'Date::Persian::Simple'      => '0.21',
         'Calendar::Plugin::Renderer' => '0.12',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -29,7 +29,7 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Persian' => { file => 'lib/Calendar/Persian.pm', version => '0.37' },
+            'Calendar::Persian' => { file => 'lib/Calendar/Persian.pm', version => '0.38' },
         },
         resources => {
             repository => {

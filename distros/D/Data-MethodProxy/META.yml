@@ -26,19 +26,21 @@ no_index:
 provides:
   Config::MethodProxy:
     file: lib/Config/MethodProxy.pm
-    version: '0.03'
+    version: '0.04'
   Data::MethodProxy:
     file: lib/Data/MethodProxy.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '0'
   Exporter: '0'
   Module::Runtime: '0.014'
   Scalar::Util: '0'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/bluefeet/Data-MethodProxy/issues
   homepage: https://github.com/bluefeet/Data-MethodProxy
   repository: git://github.com/bluefeet/Data-MethodProxy.git
-version: '0.03'
+version: '0.04'
+x_authority: cpan:BLUEFEET
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

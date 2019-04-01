@@ -1,0 +1,40 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::Database::PostgreSQL::Client
+at lib/Protocol/Database/PostgreSQL/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::Database::PostgreSQL::Client - support for the PostgreSQL wire protocol
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 SEE ALSO
+
+L<DBD::Pg>, which uses the official library and has had far more testing.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::Database::PostgreSQL>
+
+L<backend_state|Protocol::Database::PostgreSQL/backend_state>, L<build_message|Protocol::Database::PostgreSQL/build_message>, L<configure|Protocol::Database::PostgreSQL/configure>, L<copy_data|Protocol::Database::PostgreSQL/copy_data>, L<copy_done|Protocol::Database::PostgreSQL/copy_done>, L<current_state|Protocol::Database::PostgreSQL/current_state>, L<extract_message|Protocol::Database::PostgreSQL/extract_message>, L<frontend_bind|Protocol::Database::PostgreSQL/frontend_bind>, L<frontend_close|Protocol::Database::PostgreSQL/frontend_close>, L<frontend_copy_data|Protocol::Database::PostgreSQL/frontend_copy_data>, L<frontend_copy_done|Protocol::Database::PostgreSQL/frontend_copy_done>, L<frontend_describe|Protocol::Database::PostgreSQL/frontend_describe>, L<frontend_execute|Protocol::Database::PostgreSQL/frontend_execute>, L<frontend_parse|Protocol::Database::PostgreSQL/frontend_parse>, L<frontend_password_message|Protocol::Database::PostgreSQL/frontend_password_message>, L<frontend_query|Protocol::Database::PostgreSQL/frontend_query>, L<frontend_startup_message|Protocol::Database::PostgreSQL/frontend_startup_message>, L<frontend_sync|Protocol::Database::PostgreSQL/frontend_sync>, L<frontend_terminate|Protocol::Database::PostgreSQL/frontend_terminate>, L<handle_message|Protocol::Database::PostgreSQL/handle_message>, L<is_authenticated|Protocol::Database::PostgreSQL/is_authenticated>, L<is_first_message|Protocol::Database::PostgreSQL/is_first_message>, L<is_known_frontend_message_type|Protocol::Database::PostgreSQL/is_known_frontend_message_type>, L<is_ready|Protocol::Database::PostgreSQL/is_ready>, L<message|Protocol::Database::PostgreSQL/message>, L<message_length|Protocol::Database::PostgreSQL/message_length>, L<method_for_frontend_type|Protocol::Database::PostgreSQL/method_for_frontend_type>, L<new|Protocol::Database::PostgreSQL/new>, L<outgoing|Protocol::Database::PostgreSQL/outgoing>, L<send_copy_data|Protocol::Database::PostgreSQL/send_copy_data>, L<send_message|Protocol::Database::PostgreSQL/send_message>, L<send_startup_request|Protocol::Database::PostgreSQL/send_startup_request>, L<simple_query|Protocol::Database::PostgreSQL/simple_query>, L<ssl_request|Protocol::Database::PostgreSQL/ssl_request>, L<state|Protocol::Database::PostgreSQL/state>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2010-2019. Licensed under the same terms as Perl itself.
+

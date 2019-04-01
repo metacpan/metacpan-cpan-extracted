@@ -17,6 +17,8 @@ lib/Device/Firewall/PaloAlto/Op/Interface.pm
 lib/Device/Firewall/PaloAlto/Op/Interfaces.pm
 lib/Device/Firewall/PaloAlto/Op/Route.pm
 lib/Device/Firewall/PaloAlto/Op/SysInfo.pm
+lib/Device/Firewall/PaloAlto/Op/Tunnel.pm
+lib/Device/Firewall/PaloAlto/Op/Tunnels.pm
 lib/Device/Firewall/PaloAlto/Op/VirtualRouter.pm
 t/00-load.t
 t/00-new.t
@@ -26,4 +28,5 @@ t/release-01-interfaces.t
 t/release-02-arp.t
 t/release-03-virtual_router.t
 t/release-04-system_info.t
+t/release-05-tunnels.t
 tags

@@ -14,6 +14,7 @@ t/03-invalid-invocation.t
 t/04-bad-defaults-type-tiny.t
 t/05-type-tiny-build.t
 t/06-type-tiny-nobuild.t
+t/07-value-is-valid.t
 t/10-moox-types-mooselike.t
 t/11-mousex-types.t
 t/12-specio.t
@@ -25,12 +26,14 @@ t/MY/Class/TypeTiny.pm
 t/MY/Class/TypeTinyBadDefaults.pm
 t/MY/Class/TypeTinyBUILD.pm
 t/MY/Class/TypeTinyNOBUILD.pm
+t/MY/Class/ValueIsValid.pm
 t/MY/Helpers.pm
 t/MY/Kit.pm
 t/MY/Tests.pm
 t/MY/TypeLib/MooXTypesMooseLike.pm
 t/MY/TypeLib/MouseX.pm
 t/MY/TypeLib/Specio.pm
+t/MY/TypeLib/ValueIsValid.pm
 xt/boilerplate.t
 xt/manifest.t
 xt/pod-coverage.t

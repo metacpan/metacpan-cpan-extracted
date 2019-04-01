@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Chain::Router;
 
-$Dancer2::Plugin::Chain::Router::VERSION   = '0.09';
+$Dancer2::Plugin::Chain::Router::VERSION   = '0.10';
 $Dancer2::Plugin::Chain::Router::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Chain::Router - Helper package for Dancer2::Plugin::Chain.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has "path_segments" => (is => 'ro', default => sub { [] });
 has 'code_blocks'   => (is => 'ro', default => sub { [] });

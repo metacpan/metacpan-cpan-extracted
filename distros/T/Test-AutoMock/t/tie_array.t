@@ -49,25 +49,32 @@ use Test::AutoMock qw(mock_overloaded manager);
     # assert size of array
     is scalar @$array, 2;
 
+    my @expected = (
+        ['ref_array', []],
+        ['ref_array->[0]', []],
+        ['ref_array->[0]->some_other_method', []],
+        ['ref_array->[1]', [10]],
+        ($] < 5.020 ? (['ref_array->FETCHSIZE', []]) : ()),
+        ['ref_array->[1]', []],
+        ['ref_array->FETCHSIZE', []],
+        ['ref_array->STORESIZE', [3]],
+        ['ref_array->FETCHSIZE', []],
+        ['ref_array->CLEAR', []],
+        ($] < 5.024 ? (['ref_array->EXTEND', [0]]) : ()),
+        ['ref_array->PUSH', [0, 10, 20]],
+        ($] < 5.012 ? (['ref_array->FETCHSIZE', []]) : ()),
+        ['ref_array->POP', []],
+        ['ref_array->SHIFT', []],
+        ['ref_array->UNSHIFT', [30, 40, 50]],
+        ($] < 5.012 ? (['ref_array->FETCHSIZE', []]) : ()),
+        ['ref_array->SPLICE', [1, 2]],
+        ['ref_array->DELETE', [0]],
+        ['ref_array->EXISTS', [1]],
+        ['ref_array->FETCHSIZE', []],
+    );
+
     my @calls = manager($mock)->calls;
-    is @calls, 17;
-    is_deeply $calls[0], ['ref_array', []];
-    is_deeply $calls[1], ['ref_array->[0]', []];
-    is_deeply $calls[2], ['ref_array->[0]->some_other_method', []];
-    is_deeply $calls[3], ['ref_array->[1]', [10]];
-    is_deeply $calls[4], ['ref_array->[1]', []];
-    is_deeply $calls[5], ['ref_array->FETCHSIZE', []];
-    is_deeply $calls[6], ['ref_array->STORESIZE', [3]];
-    is_deeply $calls[7], ['ref_array->FETCHSIZE', []];
-    is_deeply $calls[8], ['ref_array->CLEAR', []];
-    is_deeply $calls[9], ['ref_array->PUSH', [0, 10, 20]];
-    is_deeply $calls[10], ['ref_array->POP', []];
-    is_deeply $calls[11], ['ref_array->SHIFT', []];
-    is_deeply $calls[12], ['ref_array->UNSHIFT', [30, 40, 50]];
-    is_deeply $calls[13], ['ref_array->SPLICE', [1, 2]];
-    is_deeply $calls[14], ['ref_array->DELETE', [0]];
-    is_deeply $calls[15], ['ref_array->EXISTS', [1]];
-    is_deeply $calls[16], ['ref_array->FETCHSIZE', []];
+    is_deeply \@calls, \@expected;
 }
 
 done_testing;

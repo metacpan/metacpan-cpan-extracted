@@ -86,7 +86,6 @@ for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
     my $list = IdList->$method($infile);
-    ### Here!
 
     # fetch and clean up list items
     # Note: using apply instead of map for satisfying Perl::Critic
@@ -170,7 +169,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 USAGE
 

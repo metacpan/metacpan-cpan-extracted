@@ -109,6 +109,8 @@ lib/DateTime/Locale/ccp_BD.pod
 lib/DateTime/Locale/ccp_IN.pod
 lib/DateTime/Locale/ce.pod
 lib/DateTime/Locale/ce_RU.pod
+lib/DateTime/Locale/ceb.pod
+lib/DateTime/Locale/ceb_PH.pod
 lib/DateTime/Locale/cgg.pod
 lib/DateTime/Locale/cgg_UG.pod
 lib/DateTime/Locale/chr.pod
@@ -156,6 +158,7 @@ lib/DateTime/Locale/el_GR.pod
 lib/DateTime/Locale/en.pod
 lib/DateTime/Locale/en_001.pod
 lib/DateTime/Locale/en_150.pod
+lib/DateTime/Locale/en_AE.pod
 lib/DateTime/Locale/en_AG.pod
 lib/DateTime/Locale/en_AI.pod
 lib/DateTime/Locale/en_AS.pod
@@ -587,6 +590,7 @@ lib/DateTime/Locale/prg.pod
 lib/DateTime/Locale/prg_001.pod
 lib/DateTime/Locale/ps.pod
 lib/DateTime/Locale/ps_AF.pod
+lib/DateTime/Locale/ps_PK.pod
 lib/DateTime/Locale/pt.pod
 lib/DateTime/Locale/pt_AO.pod
 lib/DateTime/Locale/pt_BR.pod
@@ -864,6 +868,8 @@ share/ccp-IN.pl
 share/ccp.pl
 share/ce-RU.pl
 share/ce.pl
+share/ceb-PH.pl
+share/ceb.pl
 share/cgg-UG.pl
 share/cgg.pl
 share/chr-US.pl
@@ -910,6 +916,7 @@ share/el-GR.pl
 share/el.pl
 share/en-001.pl
 share/en-150.pl
+share/en-AE.pl
 share/en-AG.pl
 share/en-AI.pl
 share/en-AS.pl
@@ -1338,6 +1345,7 @@ share/pl.pl
 share/prg-001.pl
 share/prg.pl
 share/ps-AF.pl
+share/ps-PK.pl
 share/ps.pl
 share/pt-AO.pl
 share/pt-CH.pl

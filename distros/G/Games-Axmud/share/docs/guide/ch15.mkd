@@ -95,7 +95,7 @@ If you're using a pre-configured world, you're good to go: you can start drawing
 ![Wizard hat icon](img/ch15/icon_wizard.png) Axmud provides a *Locator wizard* which can handle most of the configuration process (with just a little assistance from you). Simply click this button in the main window and follow the  instructions.
 
 **Hint 1**
-The wizard has a 100% accuracy rate with some worlds, but struggles to cope with other worlds. If you have problems configuring your favourite MUD, visit us at the [Axmud website](https://axmud.sourceforge.net/) and we'll try to help.
+The wizard has a 100% accuracy rate with some worlds, but struggles to cope with other worlds. If you have problems configuring your favourite MUD, visit us at the [Axmud website](https://axmud.sourceforge.io/) and we'll try to help.
 
 **Hint 2**
 The wizard can learn to recognise all the components of a room statement: the room title, the verbose description, the exit list and the contents list. In most cases, the only component you really need is the exit list. If you're having problems, run the wizard again, ignoring everything except the line with the list of exits.
@@ -313,7 +313,7 @@ First select the rooms you want to move. If you want to move rooms within the sa
 
 Some keyboards don't have an **ALT-GR** key, in which case you can use the blue *Drag mode* button.
 
-![Drag mode button](img/ch15/drag_mode_button.png) 
+![Drag mode button](img/ch15/drag_mode_button.png)
 
 * Click the button to turn on **Drag mode**
 * Drag the room(s) to their new position
@@ -321,7 +321,7 @@ Some keyboards don't have an **ALT-GR** key, in which case you can use the blue 
 
 Another method, which is especially useful if you want to move rooms to a new region, is to use **CTRL+C**.
 
-* Select a group of rooms 
+* Select a group of rooms
     * Any selected labels are moved with them
 * Press **CTRL+C**
 * Click on a map to move the selected rooms/labels to that position
@@ -339,7 +339,7 @@ You can transfer rooms to a different region. The rooms are moved to the same po
     * Any selected labels are moved with them
 * From the menu, click **Rooms > Move rooms/labels > Transfer to region > Select region... **
     * Other regions you've recently viewed are also listed here, for your convenience
-* Select a destination region 
+* Select a destination region
 
 ###<a name="15.11.1">15.11.1 Dragging exits</a>
 
@@ -594,7 +594,7 @@ But, in fact, when you turn on complex exits, you'll find that a path only exist
 
 Reason 2: *Axmud's pathfinding optimisation has failed*
 
-Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a *very* long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region. 
+Some maps can contain many tens thousands of rooms. Finding a path between two rooms might take a long time - perhaps, a *very* long time - so Amxud tries to do some of the work in advance, working out the shortest paths across each region.
 
 This approach works well when each pair of regions are connected to each other by a single exit. Sometimes it doesn't work so well when there are many exits connecting a single pair of regions.
 
@@ -622,7 +622,7 @@ Experience shows that *the best settings for most users are the default settings
 
 In a map with many thousands of rooms spread across dozens of regions, finding a path between two rooms might take a long time.
 
-Axmud's pathfinding optimisation works by calculating the paths through regions in advance. In other words, if three regions are linked like this:  
+Axmud's pathfinding optimisation works by calculating the paths through regions in advance. In other words, if three regions are linked like this:
 
         A --- B --- C
 
@@ -630,7 +630,7 @@ Axmud's pathfinding optimisation works by calculating the paths through regions 
 
 This approach works well in regions with just a few region exits, but would be useless in a large region with dozens or hundreds of region exits. (Working out all the possible paths would take *much* longer than actually moving between two rooms!)
 
-As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them. 
+As a compromise, Axmud calculates a single path between two non-adjacent regions, ignoring all other possible paths between them.
 
         A --- B --- C
 
@@ -1014,7 +1014,7 @@ In crafty moves mode, if you character moves north from a room that doesn't cont
 
 A transient exit is one which moves from room to room.
 
-Transient exits usually lead to a room that represents a moving vehicle. As the vehicle moves around the world, a transient exit like *board wagon* moves with it. 
+Transient exits usually lead to a room that represents a moving vehicle. As the vehicle moves around the world, a transient exit like *board wagon* moves with it.
 
 This causes a problem for the automapper, which usually checks the exits in a new room to make sure they're the exits it was expecting. If the *board wagon* exit has moved somewhere else, the automapper will assume it has lost track of the current location.
 
@@ -1066,9 +1066,9 @@ In most cases, though, you can set the automapper to start drawing rooms in a di
 
 ###<a name="15.29.1">15.29.1 Auto-compare mode</a>
 
-Some worlds arrange their rooms on a regular grid that's very easy to map. 
+Some worlds arrange their rooms on a regular grid that's very easy to map.
 
-Many other worlds, however, arrange their rooms in a most irregular way. This can be very tricky to map, especially if you're not familiar with the area. 
+Many other worlds, however, arrange their rooms in a most irregular way. This can be very tricky to map, especially if you're not familiar with the area.
 
 In this situation, you might like to make use of **Auto-compare mode**. Auto-compare mode is available whenever the automapper window is open and in **Update mode**.
 
@@ -1100,7 +1100,7 @@ All of the matching rooms are selected. If you want to merge the current room wi
 * Double-click on the current room
 * Left-click on one of the matching selected rooms
 
-You don't need to merge one room at a time; you can merge a whole group of rooms, if that's more convenient. 
+You don't need to merge one room at a time; you can merge a whole group of rooms, if that's more convenient.
 
 The automapper is fairly intelligent in the way it decides which pairs of rooms should be merged. It carefully compares how rooms are connected to each other; as a result, it makes little difference to the result if you've been dragging rooms all around your map.
 

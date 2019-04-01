@@ -1,4 +1,10 @@
-package Net::AS2::HTTPS 1.0;
+package Net::AS2::HTTPS;
+
+use strict;
+use warnings;
+our $VERSION = '1.0101'; # VERSION
+
+use parent 'Net::AS2::HTTP';
 
 =head1 NAME
 
@@ -26,12 +32,7 @@ L<LWP::UserAgent>.
 
 =cut
 
-use strict;
-use warnings;
-
 use Carp;
-
-use parent 'Net::AS2::HTTP';
 
 =head1 METHODS
 

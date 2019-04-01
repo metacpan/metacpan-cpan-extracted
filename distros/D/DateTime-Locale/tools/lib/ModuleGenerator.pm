@@ -127,7 +127,7 @@ sub _write_data_files ($self) {
 
     for my $code ( sort keys %raw_locales ) {
         my $dumped = $self->_dump_with_unicode( $raw_locales{$code} );
-        my $file = path( 'share', $code . '.pl' );
+        my $file   = path( 'share', $code . '.pl' );
         ## no critic (InputOutput::RequireCheckedSyscalls)
         say "Generating $file";
         $file->spew($dumped);

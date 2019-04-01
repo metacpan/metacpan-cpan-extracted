@@ -1,6 +1,6 @@
 package Bio::MUST::Core::IdMapper;
 # ABSTRACT: Id mapper for translating sequence ids
-$Bio::MUST::Core::IdMapper::VERSION = '0.190690';
+$Bio::MUST::Core::IdMapper::VERSION = '0.190900';
 use Moose;
 use namespace::autoclean;
 
@@ -79,11 +79,11 @@ sub BUILD {
     my $self = shift;
 
     # TODO: check that is has any effect at all!
-    carp 'Warning: long and abbreviated id list sizes differ!'
+    carp '[BMC] Warning: long and abbreviated id list sizes differ!'
         unless $self->count_long_ids == $self->count_abbr_ids;
-    carp 'Warning: non unique long ids!'
+    carp '[BMC] Warning: non unique long ids!'
         unless $self->count_long_ids == uniq @{ $self->long_ids };
-    carp 'Warning: non unique abbreviated ids!'
+    carp '[BMC] Warning: non unique abbreviated ids!'
         unless $self->count_abbr_ids == uniq @{ $self->abbr_ids };
 
     return;
@@ -185,7 +185,7 @@ Bio::MUST::Core::IdMapper - Id mapper for translating sequence ids
 
 =head1 VERSION
 
-version 0.190690
+version 0.190900
 
 =head1 SYNOPSIS
 

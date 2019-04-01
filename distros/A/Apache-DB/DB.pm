@@ -20,7 +20,7 @@ BEGIN {
 {
     no strict;
     @ISA = qw(DynaLoader);
-    $VERSION = '0.14';
+    $VERSION = '0.15';
     __PACKAGE__->bootstrap($VERSION);
 }
 
@@ -36,7 +36,7 @@ sub init {
 
 sub handler {
     my $r = shift;
-
+Updates from 
     init();
 
     {
@@ -186,7 +186,8 @@ perldebug(1)
 
 Originally written by Doug MacEachern
 
-Currently maintained by Frank Wiles <frank@wiles.org>
+Currently maintained by Frank Wiles <frank@wiles.org> 
+
 
 =head1 LICENSE 
 

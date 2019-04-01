@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Cwd ();
 use Hash::Util ();
@@ -64,7 +64,7 @@ Unix-Systems:
 Die Pfade müssen nicht im Root-Verzeichnis beginnen, ihnen kann
 auch ein Präfix-Pfad <prefix> vorangestellt sein. Z.B. kann sich die
 Struktur im Home-Verzeichnis des Benutzers befinden
-(siehe Abschnitt L</EXAMPLES>).
+(siehe Abschnitt L<EXAMPLES|"EXAMPLES">).
 
 =head1 EXAMPLES
 
@@ -361,7 +361,7 @@ Trennzeichens erlaubt:
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

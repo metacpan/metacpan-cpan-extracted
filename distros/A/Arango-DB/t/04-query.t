@@ -10,6 +10,7 @@ my $arango = Arango::DB->new( );
 clean_test_environment($arango);
 
 my $db = $arango->create_database("tmp_");
+
 my $collection = $db->create_collection("collection");
 
 my $documents = [
@@ -26,13 +27,16 @@ for my $doc (@$documents) {
 my $list = $collection->document_paths();
 is scalar(@$list), 5, "Five documents imported correctly";
 
-my $cursor = $db->cursor(<<EOQ);
-    FOR p IN collection LIMIT 2 return p
-EOQ
+my $query = q{FOR p IN collection LIMIT 2 RETURN p};
+my $cursor = $db->cursor($query);
 
 isa_ok $cursor, 'Arango::DB::Cursor';
-ok exists($cursor->{results}) => 'Results key exists';
-is scalar(@{$cursor->{results}}) => 2 => 'Correct number of hits';
+ok exists($cursor->{result}) => 'Results key exists';
+is scalar(@{$cursor->{result}}) => 2 => 'Correct number of hits';
+
+$cursor = $db->cursor($query, count => 'true');
+isa_ok $cursor, 'Arango::DB::Cursor';
+ok exists($cursor->{count}) => 'Results count exists';
 
 $arango->delete_database("tmp_");
 

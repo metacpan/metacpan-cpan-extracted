@@ -1,3 +1,42 @@
+1.137 2019-03-30
+================
+Kwalitee Issues bearbeitet.
+
+1.136 2019-03-30
+================
+Link-Generierung für POD verbessert.
+
+[Quiq::Database::Api::Dbi::Connection]
+* DBMS MSSQL eingeführt.
+
+[Quiq::Database::Connection]
+* DBMS MSSQL eingeführt.
+
+[Quiq::Sdoc::Node]
+* Link-Generierung für POD korrigiert.
+
+[Quiq::Cascm]
+* Methode movePackage() hinzugefügt.
+* Methode demoteToBase() entfernt.
+
+[Quiq::Hash]
+* Akzessoren zu lvalue-Methoden gemacht.
+
+[Quiq::Program]
+* Zeitmessung durch Methode elapsed() eingeführt.
+
+[Quiq::Shell]
+* Tilde-Expansion zu cd() hinzugefügt.
+
+[Quiq::Sql]
+* DBMS MSSQL eingeführt.
+
+[Quiq:: TreeFormatter]
+* Parameter $level zu Callback-Methode hinzugefügt.
+
+[Quiq::Udl]
+* DBMS MSSQL eingeführt.
+
 1.135 2019-03-02
 ================
 [Quiq::Database::ResultSet]

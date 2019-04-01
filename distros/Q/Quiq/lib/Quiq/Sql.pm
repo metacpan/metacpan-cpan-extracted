@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Hash;
 use Quiq::Option;
@@ -127,7 +127,7 @@ sub new {
 
 # -----------------------------------------------------------------------------
 
-=head2 Accessors
+=head2 Akzessoren
 
 =head3 dbms() - Name des DBMS in kanonischer Form
 
@@ -162,12 +162,13 @@ Liefere folgende Liste von DBMS-Namen (in dieser Reihenfolge):
     SQLite
     MySQL
     Access
+    MSSQL
 
 =cut
 
 # -----------------------------------------------------------------------------
 
-my @DbmsNames = qw/Oracle PostgreSQL SQLite MySQL Access/;
+my @DbmsNames = qw/Oracle PostgreSQL SQLite MySQL Access MSSQL/;
 
 sub dbmsNames {
     my $this = shift;
@@ -182,7 +183,7 @@ sub dbmsNames {
 
 =head4 Synopsis
 
-    ($oracle,$postgresql,$sqlite,$mysql,$access) = $self->dbmsTestVector;
+    ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) = $self->dbmsTestVector;
 
 =head4 Description
 
@@ -293,6 +294,23 @@ sub isMySQL {
 sub isAccess {
     my $self = shift;
     return $self->{'dbms'} eq 'Access'? 1: 0;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 isMSSQL() - Teste auf MSSQL
+
+=head4 Synopsis
+
+    $bool = $class->isMSSQL;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub isMSSQL {
+    my $self = shift;
+    return $self->{'dbms'} eq 'MSSQL'? 1: 0;
 }
 
 # -----------------------------------------------------------------------------
@@ -695,6 +713,15 @@ my %DataType = (
         DATETIME=>'DATETIME',
         BLOB=>'LONGBINARY',
     },
+    MSSQL=>{
+        # FIXME: Ungeprüft
+        STRING=>'TEXT',
+        TEXT=>'MEMO',
+        INTEGER=>'LONG',
+        REAL=>'DOUBLE',
+        DATETIME=>'DATETIME',
+        BLOB=>'LONGBINARY',
+    },
 );
 
 sub dataType {
@@ -1046,7 +1073,8 @@ sub setDateFormat {
     my $self = shift;
     my $format = shift || 'iso';
 
-    my ($oracle,$postgresql,$sqlite,$mysql,$access) = $self->dbmsTestVector;
+    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+        $self->dbmsTestVector;
 
     # Statement generieren
 
@@ -1064,7 +1092,7 @@ sub setDateFormat {
             return ('SET datestyle TO iso, ymd');
         }
     }
-    elsif ($sqlite || $mysql || $access) {
+    elsif ($sqlite || $mysql || $access || $mssql) {
         return; # FIXME: bislang nicht untersucht
     }
 
@@ -1112,7 +1140,8 @@ sub setNumberFormat {
     my $self = shift;
     my $format = shift || '.,';
 
-    my ($oracle,$postgresql,$sqlite,$mysql,$access) = $self->dbmsTestVector;
+    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+        $self->dbmsTestVector;
 
     # Statement generieren
 
@@ -1120,7 +1149,7 @@ sub setNumberFormat {
     if ($oracle) {
         return ("ALTER SESSION SET NLS_NUMERIC_CHARACTERS = '$format'");
     }
-    elsif ($postgresql || $sqlite || $mysql || $access) {
+    elsif ($postgresql || $sqlite || $mysql || $access || $mssql) {
         return; # FIXME: bislang nicht untersucht
     }
 
@@ -3826,7 +3855,8 @@ sub select {
         -stmt=>\$stmt,
     );
 
-    my ($oracle,$postgresql,$sqlite,$mysql) = $self->dbmsTestVector;
+    my ($oracle,$postgresql,$sqlite,$mysql,$access,$mssql) =
+        $self->dbmsTestVector;
 
     if (defined $offset && $oracle) {
         die;
@@ -3850,6 +3880,12 @@ sub select {
     }
 
     # Select-Klausel ($selectClause)
+
+    if (@select == 1 && (!defined $select[0] || $select[0] eq '')) {
+        # Wenn die SELECT-Liste aus einem einzigen leeren Wert
+        # besteht, leeren wir sie.
+        @select = ();
+    }
 
     my $selectClause;
     if (@select) {
@@ -3875,7 +3911,7 @@ sub select {
 
     # Im Falle von $limit u.U. @where erweitern
 
-    if (defined $limit) {
+    if (defined($limit) && $limit ne '') {
         if ($limit == 0) {
             push @where,'1 = 0';
             $limit = undef; # keine zusätzliche LIMIT-Klausel generieren
@@ -4037,35 +4073,55 @@ sub select {
             );
         }
     }
+    elsif ($mssql && ($offset || $limit)) {
+        # Bei MSSQL sind OFFSET und LIMIT Ergänzungen zu ORDER BY.
+        # Wir brauchen also eine ORDER BY Klausel, wenn -offset
+        # und/oder -limit angegeben sind
+        $stmt .= "\nORDER BY\n    1";
+    }
 
     unless ($oracle) {
-        if ($limit) {
-            if ($body =~ /%LIMIT%/) {
-                $stmt =~ s/%LIMIT%/$limit/g;
-            }
-            elsif ($body !~ /\bLIMIT\b/i) {
-                $stmt .= "\nLIMIT\n    $limit";
-            }
-            else {
-                $self->throw(
-                    q~SELECT-00003: Kein Platzhalter für LIMIT~,
-                    Stmt=>$stmt,
-                    Limit=>$limit,
-                );
-            }
-        }
         if (defined $offset) {
             if ($body =~ /%OFFSET%/) {
                 $stmt =~ s/%OFFSET%/$offset/g;
             }
             elsif ($body !~ /\bOFFSET\b/i) {
                 $stmt .= "\nOFFSET\n    $offset";
+                if ($mssql) {
+                    $stmt .= ' ROWS';
+                }
             }
             else {
                 $self->throw(
                     q~SELECT-00003: Kein Platzhalter für OFFSET~,
                     Stmt=>$stmt,
                     Offset=>$offset,
+                );
+            }
+        }
+        if ($limit) {
+            if ($body =~ /%LIMIT%/) {
+                $stmt =~ s/%LIMIT%/$limit/g;
+            }
+            elsif ($body !~ /\bLIMIT\b/i) {
+                if ($mssql) {
+                    if (!$offset) {
+                        # Bei MSSQL ist FETCH eine Ergänzug zu OFFSET.
+                        # Wir brauchen also eine OFFSET-Klausel, wenn
+                        # -limit angegeben ist.
+                        $stmt .= "\nOFFSET\n    0 ROWS";
+                    }
+                    $stmt .= "\nFETCH\n    NEXT $limit ROWS ONLY";
+                }
+                else {
+                    $stmt .= "\nLIMIT\n    $limit";
+                }
+            }
+            else {
+                $self->throw(
+                    q~SELECT-00003: Kein Platzhalter für LIMIT~,
+                    Stmt=>$stmt,
+                    Limit=>$limit,
                 );
             }
         }
@@ -5354,7 +5410,7 @@ sub diff {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

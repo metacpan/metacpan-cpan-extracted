@@ -125,7 +125,7 @@ else
 }
 
 
-if ($is_linux || $is_osx || ($is_bsd && !$is_gkfreebsd && !$is_openbsd))
+if ($is_linux || $is_osx)
 {
 	push @opts,
 		'ZMQ_HAVE_TCP_KEEPCNT',
@@ -133,7 +133,7 @@ if ($is_linux || $is_osx || ($is_bsd && !$is_gkfreebsd && !$is_openbsd))
 		'ZMQ_HAVE_TCP_KEEPALIVE';
 }
 
-if (($is_linux || $is_bsd) && !$is_gkfreebsd)
+if ($is_linux)
 {
 	push @opts,
 		'ZMQ_HAVE_TCP_KEEPIDLE',
@@ -254,7 +254,7 @@ sub MY::c_o {
 
 	my $std_switch = '';
 	if ($is_gcc && !$legacy_gcc) {
-		$std_switch = '-std=c++11'
+		$std_switch = '-std=c++0x'
 	}
 
 	my $line = qq{

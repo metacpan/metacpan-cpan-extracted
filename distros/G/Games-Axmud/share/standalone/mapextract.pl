@@ -2,6 +2,7 @@
 package mapextract;
 # Axmud map extraction tool, by A S Lewis
 # Version 1.0, 17 Dec 2018
+# Version 1.1, 12 Feb 2019 (update to Gtk3)
 # Works on data files produced by Axmud v1.1.0 or later
 # This file is in the public domain
 
@@ -12,7 +13,7 @@ use warnings;
 use Glib qw(TRUE FALSE);
 
 # Modules used by this script
-use Gtk2 '-init';
+use Gtk3 '-init';
 use Storable qw(lock_nstore lock_retrieve);
 
 # Global variable
@@ -20,30 +21,30 @@ use vars qw( $FINISH_FLAG );
 $FINISH_FLAG = FALSE;
 
 # Standard window creation
-my $mainWin = Gtk2::Window->new('toplevel');
-$mainWin->signal_connect('delete_event' => sub { Gtk2->main_quit; });
+my $mainWin = Gtk3::Window->new('toplevel');
+$mainWin->signal_connect('delete_event' => sub { Gtk3->main_quit; });
 $mainWin->set_default_size(600, 400);
 $mainWin->set_border_width(5);
 $mainWin->set_position('center_always');
 $mainWin->set_title('Axmud map extractor');
 
 # Show a textview for confirmations, and a button to do stuff
-my $vBox = Gtk2::VBox->new(FALSE, 0);
+my $vBox = Gtk3::VBox->new(FALSE, 0);
 $mainWin->add($vBox);
 
-my $scrollWin = Gtk2::ScrolledWindow->new(undef, undef);
+my $scrollWin = Gtk3::ScrolledWindow->new(undef, undef);
 $vBox->pack_start($scrollWin, TRUE, TRUE, 5);
 $scrollWin->set_policy('automatic', 'automatic');
 $scrollWin->set_border_width(0);
 
-my $textView = Gtk2::TextView->new;
+my $textView = Gtk3::TextView->new;
 $scrollWin->add_with_viewport($textView);
-$textView->can_focus(FALSE);
+$textView->set_can_focus(FALSE);
 $textView->set_wrap_mode('word-char');
 $textView->set_justification('left');
 my $buffer = $textView->get_buffer();
 
-my $button = Gtk2::Button->new_with_label('Select file');
+my $button = Gtk3::Button->new_with_label('Select file');
 $vBox->pack_start($button, FALSE, FALSE, 5);
 $button->signal_connect('clicked' => sub {
 
@@ -76,7 +77,7 @@ $buffer->set_text(
 $mainWin->show_all();
 
 # Main event loop
-Gtk2->main();
+Gtk3->main();
 
 # Callback functions
 
@@ -91,7 +92,7 @@ sub buttonCallback {
     # Get a path to the worldmodel.axm file
     my $path;
 
-    my $dialogueWin = Gtk2::FileChooserDialog->new(
+    my $dialogueWin = Gtk3::FileChooserDialog->new(
         'Select the world model file (worldmodel.axm)',
         $mainWin,
         'open',
@@ -190,7 +191,7 @@ sub buttonCallback {
     # Get a directory where the extracted file should be saved
     my $path2;
 
-    my $dialogueWin2 = Gtk2::FileChooserDialog->new(
+    my $dialogueWin2 = Gtk3::FileChooserDialog->new(
         'Set the name and location of the new file',
         $mainWin,
         'save',

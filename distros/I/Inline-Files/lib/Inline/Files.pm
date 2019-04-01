@@ -1,5 +1,5 @@
 package Inline::Files;
-$VERSION = '0.69';
+$VERSION = '0.71';
 use strict;
 
 use Inline::Files::Virtual;
@@ -12,7 +12,6 @@ my %files;
 
 sub import {
     DEBUG && TRACE(@_);
-    $DB::single = 1;
     my ($class, @args) = @_;
     my ($package, $file, $line) = caller;
 

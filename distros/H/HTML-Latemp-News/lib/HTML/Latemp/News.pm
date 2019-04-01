@@ -1,14 +1,14 @@
 package HTML::Latemp::News;
-$HTML::Latemp::News::VERSION = '0.1.12';
+$HTML::Latemp::News::VERSION = '0.2.1';
 use warnings;
 use strict;
 
-use 5.008;
+use 5.014;
 
 
 package HTML::Latemp::News::Base;
-$HTML::Latemp::News::Base::VERSION = '0.1.12';
-use CGI;
+$HTML::Latemp::News::Base::VERSION = '0.2.1';
+use CGI ();
 
 sub new
 {
@@ -20,7 +20,7 @@ sub new
 }
 
 package HTML::Latemp::News::Item;
-$HTML::Latemp::News::Item::VERSION = '0.1.12';
+$HTML::Latemp::News::Item::VERSION = '0.2.1';
 our @ISA = (qw(HTML::Latemp::News::Base));
 
 sub author
@@ -235,6 +235,30 @@ sub managing_editor
     return $self->{managing_editor};
 }
 
+sub lastBuildDate
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{lastBuildDate} = shift;
+    }
+
+    return $self->{lastBuildDate};
+}
+
+sub pubDate
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{pubDate} = shift;
+    }
+
+    return $self->{pubDate};
+}
+
 sub rating
 {
     my $self = shift;
@@ -326,6 +350,15 @@ sub initialize
     $self->managing_editor( $args{'managing_editor'} || $self->webmaster() );
     $self->description( $args{'description'} );
 
+    if ( defined( my $date = delete $args{lastBuildDate} ) )
+    {
+        $self->lastBuildDate($date);
+    }
+    if ( defined( my $date = delete $args{pubDate} ) )
+    {
+        $self->pubDate($date);
+    }
+
     return 0;
 }
 
@@ -391,14 +424,15 @@ sub generate_rss_feed
 
     my $rss_feed = XML::RSS->new( 'version' => "2.0" );
     $rss_feed->channel(
-        'title'          => $self->title(),
-        'link'           => $self->link(),
-        'language'       => $self->language(),
-        'description'    => $self->description(),
-        'rating'         => $self->rating(),
-        'copyright'      => $self->copyright(),
-        'pubDate'        => ( scalar( localtime() ) ),
-        'lastBuildDate'  => ( scalar( localtime() ) ),
+        'title'       => $self->title(),
+        'link'        => $self->link(),
+        'language'    => $self->language(),
+        'description' => $self->description(),
+        'rating'      => $self->rating(),
+        'copyright'   => $self->copyright(),
+        'pubDate'     => ( $self->pubDate // ( scalar( localtime() ) ) ),
+        'lastBuildDate' =>
+            ( $self->lastBuildDate // ( scalar( localtime() ) ) ),
         'docs'           => $self->docs(),
         'ttl'            => $self->ttl(),
         'generator'      => $self->generator(),
@@ -527,7 +561,7 @@ web frameworks)
 
 =head1 VERSION
 
-version 0.1.12
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -584,7 +618,7 @@ data.
 
 =head1 VERSION
 
-version 0.1.12
+version 0.2.1
 
 =head1 FUNCTION
 

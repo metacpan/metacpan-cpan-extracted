@@ -489,17 +489,11 @@ Romansh Switzerland locale.
    1995-12-22T09:05:02 = ve 22. december
   -0010-09-15T04:44:23 = so 15. settember
 
-=head3 MMMMW-count-one ('week' W 'of' MMM)
+=head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of favr.
-   1995-12-22T09:05:02 = week 3 of dec.
-  -0010-09-15T04:44:23 = week 2 of sett.
-
-=head3 MMMMW-count-other ('week' W 'of' MMM)
-
-   2008-02-05T18:30:30 = week 1 of favr.
-   1995-12-22T09:05:02 = week 3 of dec.
-  -0010-09-15T04:44:23 = week 2 of sett.
+   2008-02-05T18:30:30 = week 1 of favrer
+   1995-12-22T09:05:02 = week 3 of december
+  -0010-09-15T04:44:23 = week 2 of settember
 
 =head3 MMMMd (d. MMMM)
 
@@ -650,12 +644,6 @@ Romansh Switzerland locale.
    2008-02-05T18:30:30 = 2008 1. quartal
    1995-12-22T09:05:02 = 1995 4. quartal
   -0010-09-15T04:44:23 = -10 3. quartal
-
-=head3 yw-count-one ('week' w 'of' Y)
-
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
 
 =head3 yw-count-other ('week' w 'of' Y)
 

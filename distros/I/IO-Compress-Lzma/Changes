@@ -1,6 +1,14 @@
 CHANGES
 -------
 
+  2.086 31 March 2019
+
+      * Moved source to github https://github.com/pmqs/IO-Compress-Lzma
+
+      * Add META_MERGE to Makefile.PL
+
+      * Added meta-json.t & meta-yaml.t
+      
   2.084 5 January 2019
 
       * Added support for lzip

@@ -1,10 +1,17 @@
-package Net::AS2 1.0;
+package Net::AS2;
+
 use strict;
 use warnings;
+use autodie qw(:file :filesys);
+our $VERSION = '1.0101'; # VERSION
 
 =head1 NAME
 
 Net::AS2 - AS2 Protocol implementation (RFC 4130) used in Electronic Data Exchange (EDI)
+
+=head1 VERSION
+
+This documentation is for AS2 Protocol Version 1.0.
 
 =head1 SYNOPSIS
 
@@ -13,7 +20,9 @@ Net::AS2 - AS2 Protocol implementation (RFC 4130) used in Electronic Data Exchan
             MyId => 'alice',
             MyKey => '...RSA KEY in PEM...',
             MyCert => '...X509 Cert in PEM...'
-            PartnerId => 'bob', PartnerCert => '...X509 Cert in PEM...'
+            PartnerId => 'bob',
+            CertificateDirectory => '/etc/AS2',
+            PartnerCertFile => 'partner.certificate.file',
         );
 
     ### Sending Message (Sync MDN)
@@ -58,9 +67,10 @@ Net::AS2 - AS2 Protocol implementation (RFC 4130) used in Electronic Data Exchan
 
 =head1 DESCRIPTION
 
-This is a class for handling AS2 (RFC-4130) communication - sending
-message (optionally sign and encrypt), decoding MDN. Receving message
-and produce corresponding MDN.
+This is a class for handling AS2 (RFC 4130) communication - sending
+message (optionally sign and encrypt), decoding Message Disposition
+Notification. Receiving message and produce corresponding Message
+Disposition Notification.
 
 =head2 Protocol Introduction
 
@@ -86,21 +96,24 @@ The certificates could be self-signed.
 
 =cut
 
+use Carp;
+use Crypt::SMIME;
+use Digest::SHA;
+use Email::Address;
+use Encode;
+use HTTP::Headers;
+use HTTP::Request;
+use LWP::UserAgent;
+use MIME::Base64;
+use MIME::Entity;
+use MIME::Parser;
+use Scalar::Util qw(blessed);
+use Sys::Hostname;
+use Scalar::Util qw(blessed);
+
 use Net::AS2::HTTP;
 use Net::AS2::MDN;
 use Net::AS2::Message;
-
-use Carp;
-use Crypt::SMIME;
-use LWP::UserAgent;
-use HTTP::Headers;
-use HTTP::Request;
-use Digest::SHA;
-use MIME::Base64;
-use MIME::Parser;
-use Encode;
-use MIME::Entity;
-use Sys::Hostname;
 
 my $crlf = "\x0d\x0a";
 
@@ -282,11 +295,19 @@ sub new
 
     my $s_e = $self->{_smime_enc} = Crypt::SMIME->new();
 
-    eval { $s_e->setPrivateKey($self->{MyEncryptionKey}, $self->{MyEncryptionCertificate}); };
-    croak "Unable to load private key/certificate for encryption: $@" if $@;
+    eval {
+        $s_e->setPrivateKey($self->{MyEncryptionKey}, $self->{MyEncryptionCertificate});
+        1;
+    } or do {
+        croak "Unable to load private key/certificate for encryption: $@";
+    };
 
-    eval { $s_e->setPublicKey($self->{PartnerEncryptionCertificate}); };
-    croak "Unable to load public certificate for encryption: $@" if $@;
+    eval {
+        $s_e->setPublicKey($self->{PartnerEncryptionCertificate});
+        1;
+    } or do {
+        croak "Unable to load public certificate for encryption: $@";
+    };
 
     if (
         $self->{MyEncryptionKey} eq $self->{MySignatureKey} &&
@@ -298,11 +319,19 @@ sub new
     {
         my $s_s = $self->{_smime_sign} = Crypt::SMIME->new();
 
-        eval { $s_s->setPrivateKey($self->{MySignatureKey}, $self->{MySignatureCertificate}); };
-        croak "Unable to load private key/certificate for signature: $@" if $@;
+        eval {
+            $s_s->setPrivateKey($self->{MySignatureKey}, $self->{MySignatureCertificate});
+            1;
+        } or do {
+            croak "Unable to load private key/certificate for signature: $@";
+        };
 
-        eval { $s_s->setPublicKey($self->{PartnerSignatureCertificate}); };
-        croak "Unable to load public certificate for signature: $@" if $@;
+        eval {
+            $s_s->setPublicKey($self->{PartnerSignatureCertificate});
+            1;
+        } or do {
+            croak "Unable to load public certificate for signature: $@";
+        };
     }
 
     return $self;
@@ -314,15 +343,15 @@ sub _validations
 
     $self->{Encryption} = lc($self->{Encryption} // '3des');
     croak sprintf("encryption %s is not supported", $self->{Encryption})
-        unless !$self->{Encryption} || $self->{Encryption} eq '3des';
+        if $self->{Encryption} && $self->{Encryption} ne '3des';
 
     $self->{Signature} = lc($self->{Signature} // 'sha1');
     croak sprintf("signature %s is not supported", $self->{Signature})
-        unless !$self->{Signature} || $self->{Signature} =~ qr{^sha-?(?:1|224|256|384|512)$};
+        if $self->{Signature} && $self->{Signature} !~ qr{^sha-?(?:1|224|256|384|512)$};
 
-    $self->_setup('My',      'Key',         qr{[.]key$});
-    $self->_setup('My',      'Certificate', qr{[.]cert?$});
-    $self->_setup('Partner', 'Certificate', qr{[.]cert?$});
+    $self->_setup('My',      'Key');
+    $self->_setup('My',      'Certificate');
+    $self->_setup('Partner', 'Certificate');
 
     delete $self->{MyKey};
     delete $self->{MyCertificate};
@@ -346,11 +375,13 @@ sub _validations
     croak sprintf("mdn %s is not supported", $self->{Mdn})
         unless grep { $_ eq lc($self->{Mdn}) } qw(sync async);
 
-    croak "mdn_async_url is invalid"
-        unless
-            !defined $self->{MdnAsyncUrl} && $self->{Mdn} eq 'sync' ||
-            defined $self->{MdnAsyncUrl} && $self->{MdnAsyncUrl} =~ m{^https?://[\x20-\x7E]+$} &&
-                $self->{Mdn} eq 'async';
+    if ($self->{Mdn} eq 'sync') {
+        croak "MdnAsyncUrl is not required for synchronous Mdn"
+          if defined $self->{MdnAsyncUrl};
+    } else {
+        croak "MdnAsyncUrl is invalid for asynchronous Mdn"
+          if ($self->{MdnAsyncUrl} // '') !~ m{^https?://[\x20-\x7E]+$};
+    }
 
     if (($self->{Signature} // '') =~ /^sha-?(\d+)/i) {
         $self->{Digest} = Digest::SHA->new($1);
@@ -362,6 +393,8 @@ sub _validations
     $self->{UserAgentClass} //= "Net::AS2::HTTP";
 
     $self->create_useragent() or croak "cannot create $self->{UserAgentClass}";
+
+    return;
 }
 
 # Internal routine that configures the private key(s) and certificates
@@ -374,22 +407,23 @@ sub _validations
 # that indicate their start and expiry dates.
 
 sub _setup {
-    my ($self, $prefix, $postfix, $regexp) = @_;
+    my ($self, $prefix, $postfix) = @_;
 
     foreach my $type (('', 'Encryption', 'Signature')) {
         my $key_name = $prefix . $type . $postfix;
         my $key_file = $key_name . 'File';
         if (exists $self->{$key_file}) {
-            $self->{$key_name} //= $self->_read_pattern($key_file, $regexp);
+            $self->{$key_name} //= $self->_read_pattern($key_file);
         }
         next if $type eq '';
 
         $self->{$key_name} //= $self->{$prefix . $postfix};
     }
+    return;
 }
 
 sub _read_pattern {
-    my ($self, $key_file, $regex) = @_;
+    my ($self, $key_file) = @_;
 
     my $pattern = $self->{$key_file} // '';
 
@@ -398,17 +432,18 @@ sub _read_pattern {
 
     croak "No file matching '$pattern'" unless -f $file;
 
-    croak "'$key_file' file pattern '$pattern' does not match its expected regex" if $pattern !~ $regex;
-
     return _read_file($file);
 }
 
 sub _read_file {
     my($file) = @_;
+    local $/ = undef;
 
-    open my $fh, '<', $file or croak "Failed to read $file";
-    local($/) = undef;
-    return scalar(<$fh>);
+    open my $fh, '<', $file;
+    my $contents = scalar(<$fh>);
+    close $fh;
+
+    return $contents;
 }
 
 =head2 Methods
@@ -441,15 +476,23 @@ sub decode_message
     $headers = $self->_http_headers($headers) if ref($headers) eq 'HASH';
 
     croak 'headers must be an HTTP::Headers compatible object'
-        unless UNIVERSAL::can($headers, 'header_field_names');
+      unless blessed($headers) && $headers->can('header_field_names');
     croak 'content is undefined'
-        unless defined $content;
+      unless defined $content;
 
-    my $message_id = $headers->header('Message-Id');
-    my $async_url  = $headers->header('Receipt-Delivery-Option');
-    my @new_prefix = ($message_id, $async_url, 0);
+    my @new_prefix = (
+        scalar($headers->header('Message-Id')),
+        scalar($headers->header('Receipt-Delivery-Option')),
+        0
+    );
 
-    unless (!defined $async_url || $async_url =~ m{^https?://}) {
+    # Validate Message-Id format
+    eval {
+        $new_prefix[0] = $self->get_message_id($new_prefix[0]);
+    } or do {
+        return Net::AS2::Message->create_error_message(@new_prefix, 'unexpected-processing-error', "Malformed AS2 Message, $@.");
+    };
+    if (defined($new_prefix[1]) && $new_prefix[1] !~ m{^https?://}) {
         $new_prefix[1] = undef;
         return Net::AS2::Message->create_failure_message(@new_prefix, 'Async transport other than http/https is not supported');
     }
@@ -468,7 +511,7 @@ sub decode_message
 
     unless (
         defined $content_type &&
-        defined $message_id   &&
+        defined $new_prefix[0] &&
         defined $version &&
         defined $from &&
         defined $to)
@@ -477,8 +520,8 @@ sub decode_message
     }
 
     if (
-        _parse_as2_id($from) ne $self->{PartnerId} ||
-        _parse_as2_id($to)   ne $self->{MyId}
+        $self->parse_as2_id($from) ne $self->{PartnerId} ||
+        $self->parse_as2_id($to)   ne $self->{MyId}
     ) {
         return Net::AS2::Message->create_error_message(@new_prefix, 'authentication-failed', 'AS2-From or AS2-To is not expected');
     }
@@ -532,7 +575,7 @@ sub decode_message
 
     my $mic = $self->_base64_digest($content);
 
-    my $parser = new MIME::Parser;
+    my $parser = MIME::Parser->new();
     $parser->output_to_core(1);
     $parser->tmp_to_core(1);
     my $entity = $parser->parse_data($is_content_raw ? $merged_headers . $content : $content);
@@ -544,7 +587,8 @@ sub decode_message
         unless defined $bh;
 
     $content = $bh->as_string;
-    return Net::AS2::Message->new(@new_prefix, $mic, $content, $self->{Signature});
+    my $filename = $entity->head->mime_attr('content-disposition.filename');
+    return Net::AS2::Message->new(@new_prefix, $mic, $content, $self->{Signature}, $filename);
 }
 
 =item $mdn = $as2->decode_mdn($headers, $content)
@@ -570,10 +614,11 @@ sub decode_mdn
     my ($self, $headers, $content) = @_;
 
     $headers = $self->_http_headers($headers) if ref($headers) eq 'HASH';
+
     croak 'headers must be an HTTP::Headers compatible object'
-        unless UNIVERSAL::can($headers, 'header_field_names');
+      unless blessed($headers) && $headers->can('header_field_names');
     croak "content is undefined"
-        unless defined $content;
+      unless defined $content;
 
     my $content_type = $headers->content_type;
     my $message_id   = $headers->header('Message-Id');
@@ -592,8 +637,8 @@ sub decode_mdn
     }
 
     if (
-        _parse_as2_id($from) ne $self->{PartnerId} ||
-        _parse_as2_id($to)   ne $self->{MyId}
+        $self->parse_as2_id($from) ne $self->{PartnerId} ||
+        $self->parse_as2_id($to)   ne $self->{MyId}
     ) {
         return Net::AS2::MDN->create_unparsable_mdn('AS2-From or AS2-To is not expected')
     }
@@ -638,11 +683,10 @@ sub prepare_sync_mdn
 {
     my ($self, $mdn, $message_id) = @_;
 
+    $message_id = $self->get_message_id($message_id, generate => 1);
+
     $mdn->recipient($self->{MyId});
 
-    $message_id =
-        defined $message_id && $message_id =~ /@/ ? $message_id :
-        sprintf('<%s@%s>', ($message_id || time + rand()), hostname);
     my ($headers, $payload) =
         $self->_send_preprocess($mdn->as_mime->stringify, $message_id, undef, undef,
             1, $mdn->should_sign);
@@ -668,20 +712,19 @@ sub send_async_mdn
 {
     my ($self, $mdn, $message_id) = @_;
 
+    $message_id = $self->get_message_id($message_id, generate => 1);
+
     $mdn->recipient($self->{MyId});
     my $target_url = $mdn->async_url;
 
     croak "MDN async url is not defined" unless $target_url;
     croak "MDN async url is not valid" unless $target_url =~ m{^https?://};
 
-    $message_id =
-        defined $message_id && $message_id =~ /@/ ? $message_id :
-        sprintf('<%s@%s>', ($message_id || time + rand()), hostname);
     my ($headers, $payload) =
         $self->_send_preprocess($mdn->as_mime->stringify, $message_id, $target_url, undef,
             1, $mdn->should_sign);
 
-    my $req = HTTP::Request->new(POST => $target_url, \@$headers);
+    my $req = HTTP::Request->new(POST => $target_url, $headers);
     $req->content($payload);
 
     my $ua = $self->create_useragent;
@@ -711,6 +754,11 @@ Message id of this request should be supplied, or a random one would be generate
 
 Content type of the message should be supplied.
 
+=item Filename
+
+I<Optional.>
+Sets the Content-Disposition filename. Default is "payload".
+
 =back
 
 In case of HTTP failure, the MDN object will be marked with C<$mdn-E<gt>is_error>.
@@ -722,7 +770,7 @@ be true.
 
 =cut
 
-sub send
+sub send ## no critic (ProhibitBuiltinHomonyms)
 {
     my ($self, $data, %opts) = @_;
 
@@ -734,17 +782,15 @@ sub send
     $mic = $self->_base64_digest($data)
         unless $self->{Signature} || $self->{Encryption};
 
-    my $message_id = $opts{MessageId} // '';
-    $message_id =
-        $message_id =~ /@/ ? $message_id :
-        sprintf('<%s@%s>', ($message_id || time + rand()), hostname);
+    my $message_id = $self->get_message_id($opts{MessageId}, generate => 1);
 
+    my $filename = delete $opts{Filename} // 'payload';
     $opts{Encoding} = 'base64';
-    $opts{Disposition} //= 'attachment';
+    $opts{Disposition} //= qq{attachment; filename="$filename"};
     $opts{Subject} //= 'AS2 Message';
     $opts{'X-Mailer'} = undef;
 
-    my $mime = new MIME::Entity->build(Data => $data, %opts);
+    my $mime = MIME::Entity->build(Data => $data, %opts);
     return $self->_send($mime->stringify, $message_id, $mic);
 }
 
@@ -764,8 +810,6 @@ sub _send_preprocess
     }
 
     my ($header, $payload) = $data =~ /^(.*?)$crlf$crlf(.*)$/s;
-
-    $header =~ //;
 
     my @header;
     my ($prev_head, $prev_value);
@@ -793,9 +837,10 @@ sub _send_preprocess
 
     push @header, (
         defined $target_url ? ('Recipient-Address' => $target_url) : (),
-        'Message-Id' => $message_id,
+        'Message-Id'  => "<$message_id>",
         'AS2-Version' => '1.0',
-        'AS2-From' => _encode_as2_id($self->{MyId}), 'AS2-To' => _encode_as2_id($self->{PartnerId}),
+        'AS2-From'    => $self->encode_as2_id($self->{MyId}),
+        'AS2-To'      => $self->encode_as2_id($self->{PartnerId}),
         $is_mdn ? () : (
             'Disposition-notification-To' => 'example@example.com',
             ($self->{Signature} ? (
@@ -825,6 +870,83 @@ sub create_useragent
     my $self = shift;
 
     return $self->{UserAgentClass}->new($self);
+}
+
+=item $as2->encode_as2_id( $id )
+
+Return an AS2 ID quoted appropriately.
+
+=cut
+
+sub encode_as2_id {
+    my ($self, $as2_id) = @_;
+    if ($as2_id =~ s/(\\|")/\\$1/g || $as2_id =~ / /) {
+        return qq{"$as2_id"};
+    }
+    return $as2_id;
+}
+
+=item $as2->parse_as2_id( $id )
+
+Parse an AS2 ID from the given string, C<$id>, removing surrounding
+spaces and quotes.
+
+=cut
+
+sub parse_as2_id {
+    my ($self, $as2_id) = @_;
+    my $chars = '\x23-\x5B\x5D-\x7E';
+    $as2_id =~ /^ (?: ([!$chars]+) | "((?:\\\\|\\"|[!$chars ])+)" ) $/x;
+    if (defined $1) {
+        return $1;
+    } elsif (defined $2) {
+        $as2_id = $2;
+        $as2_id =~ s/\\(\\|")/$1/g;
+        return $as2_id;
+    }
+    return;
+}
+
+=item $id = $as2->get_message_id( $message_id, generate => ? )
+
+Returns, or generates, a message id. Any angle brackets surrounding
+the id are removed.
+
+If C<$message_id> is defined and not an empty string and conforms to
+RFC 2822, then this id is returned.
+
+If C<$message_id> is defined and not an empty string but does not conform to
+RFC 2822, then the method dies with an error message.
+
+If C<generate> is true then a basic random message ID is created
+using C<time()>, C<rand()> and C<hostname()>.
+
+If C<generate> is false (default) then the method dies with an error message.
+
+For production systems, it is strongly recommended to generate and use
+an ID using a better random generator function and pass it in to this module.
+
+=cut
+
+sub get_message_id {
+    my ($self, $message_id, %opt ) = @_;
+
+    if ($message_id) {
+        if ($message_id =~ /<?($Email::Address::addr_spec)>?/) {
+            $message_id = $1;
+        }
+        else {
+            croak "Message-Id does not conform to RFC 2822: '$message_id'";
+        }
+    }
+    elsif ($opt{generate}) {
+        $message_id = sprintf('%s@%s', (time() + rand()), hostname());
+    }
+    else {
+        croak "Message-Id is undefined, empty or can generate option is false";
+    }
+
+    return $message_id;
 }
 
 sub _send
@@ -878,33 +1000,10 @@ sub _parse_mdn
     return Net::AS2::MDN->parse_mdn($content);
 }
 
-
-sub _parse_as2_id {
-    my $as2_id = shift;
-    $as2_id =~ /^ (?: ([!\x23-\x5B\x5D-\x7E]+) | "((?:\\\\|\\"|[!\x23-\x5B\x5D-\x7E ])+)" ) $/x;
-    if (defined $1) {
-        return $1;
-    } elsif (defined $2) {
-        $as2_id = $2;
-        $as2_id =~ s/\\(\\|")/$1/g;
-        return $as2_id;
-    }
-    return;
-}
-
-sub _encode_as2_id {
-    my $as2_id = shift;
-    if ($as2_id =~ s/(\\|")/\\$1/g || $as2_id =~ / /) {
-        return qq{"$as2_id"};
-    } else {
-        return $as2_id;
-    }
-}
-
 sub _pkcs7_base64
 {
     my ($content) = @_;
-    my $parser = new MIME::Parser;
+    my $parser = MIME::Parser->new;
 
     $parser->output_to_core(1);
     $parser->tmp_to_core(1);
@@ -930,8 +1029,14 @@ sub _base64_digest {
 
     $self->{Digest}->add($content);
 
-    # = is required for padding the base64 string.
-    return $self->{Digest}->b64digest() . '=';
+    my $digest = $self->{Digest}->b64digest();
+
+    # pad the base64 string
+    while (length($digest) % 4) {
+        $digest .= '=';
+    }
+
+    return $digest;
 }
 
 sub _http_headers {
@@ -974,7 +1079,7 @@ L<Net::AS2::HTTP>, L<Net::AS2::HTTPS>
 
 L<Net::AS2::FAQ>, L<Net::AS2::Message>, L<Net::AS2::MDN>, L<MIME::Entity>
 
-Source code is maintained here at L<https://github.com/sam0737/perl-net-as2>. Patches are welcome.
+L<RFC 4130|https://www.ietf.org/rfc/rfc4130.txt>, L<RFC 2822|https://www.ietf.org/rfc/rfc2822.txt>
 
 =head1 COPYRIGHT AND LICENSE
 

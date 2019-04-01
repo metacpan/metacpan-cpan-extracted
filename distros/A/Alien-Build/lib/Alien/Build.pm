@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -401,9 +401,7 @@ sub _call_hook
   my $config = ref($_[0]) eq 'HASH' ? shift : {};
   my($name, @args) = @_;
 
-  local $self->{hook_prop} = {
-    name => $name,
-  };
+  local $self->{hook_prop} = {};
 
   $self->meta->call_hook( $config, $name => $self, @args );
 }
@@ -1015,6 +1013,13 @@ sub call_hook
 
   foreach my $hook (@hooks)
   {
+    if(eval { $args[0]->isa('Alien::Build') })
+    {
+      %{ $args[0]->{hook_prop} } = (
+        name => $name,
+      );
+    }
+
     my $wrapper = $self->{around}->{$name} || sub { my $code = shift; $code->(@_) };
     my $value;
     $args{before}->() if $args{before};
@@ -1146,7 +1151,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.60
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -1586,6 +1591,12 @@ If no hook is currently running then C<hook_prop> will return C<undef>.
 =item name
 
 The name of the currently running hook.
+
+=item version (probe)
+
+Probe and PkgConfig plugins I<may> set this property indicating the
+version of the alienized package.  Not all plugins and configurations
+may be able to provide this.
 
 =back
 
@@ -2046,7 +2057,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2018 by Graham Ollis.
+This software is copyright (c) 2011-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,14 @@
+Revision history for Mojolicious-Plugin-GetSentry
+
+0.0.1   2019-03-28
+        Initial version
+
+0.0.2   2019-03-28
+        Add missing requirements
+
+0.0.3   2019-03-29
+        Extends Datetime
+        Additional methods: days_from_now, first_day_of_prev_month, months_from_now
+
+0.0.4   2019-04-01
+        Contructor bugfix

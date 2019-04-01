@@ -1,0 +1,20 @@
+[Unit]
+Description=Net::AS2 Service
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/var/www/as2/starman-as2.pid
+ExecStart=/usr/bin/starman -D --env development -MNet::AS2::PSGI\
+   --pid /var/www/as2/starman-as2.pid\
+   --listen 127.0.0.1:4080 --listen 192.168.0.1:4080\
+   --workers 2\
+   --access-log /var/www/as2/logs/access-starman-eec-as2.log --error-log /var/www/as2/logs/error-starman-eec-as2.log\
+   /var/www/as2/as2.psgi
+ExecReload=/sbin/start-stop-daemon --quiet --stop -s HUP --pidfile /var/www/as2/starman-as2.pid
+ExecStop=-/sbin/start-stop-daemon --quiet --stop --retry QUIT/5 --pidfile /var/www/as2/starman-as2.pid
+TimeoutStopSec=5
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the affinity between two people
 
-our $VERSION = '0.0102';
+our $VERSION = '0.0103';
 
 use Moo;
 use strictures 2;
@@ -104,19 +104,23 @@ Acme::Affinity - Compute the affinity between two people
 
 =head1 VERSION
 
-version 0.0102
+version 0.0103
 
 =head1 SYNOPSIS
 
   use Acme::Affinity;
+
   my %arguments = ( questions => [], importance => {}, me => [], you => [] );
+
   my $affinity = Acme::Affinity->new(%arguments);
+
   my $score = $affinity->score();
 
 =head1 DESCRIPTION
 
-An C<Acme::Affinity> object computes the affinity between two people based on a common list of questions and answers
-and their weighted importance.
+An C<Acme::Affinity> object computes the relationship affinity between two
+people based on a common list of questions and answers and their weighted
+importance.
 
 =head1 ATTRIBUTES
 
@@ -134,7 +138,7 @@ Example:
 
 A hash reference with importance level keys and weight values.
 
-Example:
+Default:
 
   { 'irrelevant'         => 0,
     'a little important' => 1,
@@ -145,7 +149,8 @@ Example:
 
 =head2 me
 
-An array reference triple of question responses, desired responses and importance levels for person A.
+An array reference triple of question responses, desired responses and
+importance levels for person A.
 
 Example:
 
@@ -156,7 +161,8 @@ Example:
 
 =head2 you
 
-An array reference triple of question responses, desired responses and importance levels for person B.
+An array reference triple of question responses, desired responses and
+importance levels for person B.
 
 Example:
 
@@ -182,6 +188,8 @@ Compute the affinity score for the two given people.
 
 L<Moo>
 
+L<Math::BigRat>
+
 L<https://www.youtube.com/watch?v=m9PiPlRuy6E>
 
 =head1 AUTHOR
@@ -190,7 +198,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Gene Boggs.
+This software is copyright (c) 2019 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

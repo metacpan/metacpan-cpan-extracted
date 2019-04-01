@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "File::Path" => "2.12",
     "File::Spec" => 0,
     "File::Which" => 0,
-    "Getopt::Long" => 0,
+    "Getopt::Long" => "2.50",
     "strict" => 0,
     "warnings" => 0
   },
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "File::Path" => "2.12",
   "File::Spec" => 0,
   "File::Which" => 0,
-  "Getopt::Long" => 0,
+  "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Test::More" => 0,

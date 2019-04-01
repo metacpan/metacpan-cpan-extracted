@@ -1,8 +1,12 @@
 
 Release history for Jojo-Role
 
-0.5.0     2018-07-05 16:29:55-07:00 America/Los_Angeles
+0.6.0     2019-03-29 12:57:01-07:00 America/Los_Angeles
 
+
+v0.6      2019-03-29 19:54:20+00:00 UTC
+
+   - Use a fork of Role::Tiny
 
 v0.5      2018-07-05 16:26:46-07:00 America/Los_Angeles
 

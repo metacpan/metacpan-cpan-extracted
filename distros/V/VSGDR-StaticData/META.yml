@@ -32,5 +32,5 @@ requires:
   indirect: '0'
   perl: '5.010000'
   version: '0'
-version: '0.44'
+version: '0.46'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

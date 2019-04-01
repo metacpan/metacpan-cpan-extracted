@@ -1,0 +1,161 @@
+#!perl
+
+our $DATE = '2019-03-28'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+my %Opts = (
+    tries => 0,
+    waitretry => 10,
+    exit_statuses => [
+        split /\s*,\s*/,
+        (defined $ENV{WGET_RETRY_EXIT_STATUSES} ?
+             $ENV{WGET_RETRY_EXIT_STATUSES} : "4")],
+);
+
+my @ORIG_ARGV = @ARGV;
+Getopt::Long::Configure(
+    'bundling', 'pass_through', 'no_auto_abbrev', 'permute');
+GetOptions(
+    'help|h|?' => sub {
+        print <<'_';
+Usage: wget-retry [options] <url>...
+
+Options:
+  --help, -h, -?   Show this message and exit.
+  --version        Show program version and exit.
+
+All the other options will be passed to wget.
+
+See manpage for more detailed documentation.
+_
+        exit 0;
+    },
+    'version' => sub {
+        no warnings 'once';
+        print "wget-retry version ", ($main::VERSION || "dev"),
+            ($main::DATE ? " ($main::DATE)" : ""), "\n";
+        exit 0;
+    },
+
+    'tries|t=i' => \$Opts{tries},
+    'waitretry=i' => \$Opts{waitretry},
+);
+
+my $wget_cmd = $ENV{WGET_RETRY_WGET_CMD} || "wget";
+
+my $retries = 0;
+while (1) {
+    system {$wget_cmd} $wget_cmd, @ORIG_ARGV;
+    last unless $?;
+    my $exit_code = $? >> 8;
+    if ($exit_code =~ /\A(4)\z/) {
+        $retries++;
+        if ($Opts{tries} == 0 || $retries <= $Opts{tries}) {
+            warn "wget-retry: $wget_cmd exit-code is $exit_code, retrying ($retries) after $Opts{waitretry} second(s) ...\n";
+            sleep $Opts{waitretry};
+            next;
+        } else {
+            warn "wget-retry: $wget_cmd exit-code is $exit_code, won't retry anymore, exiting\n";
+            exit $exit_code;
+        }
+    } else {
+        exit $exit_code;
+    }
+}
+
+# ABSTRACT: Wget wrapper to retry harder
+# PODNAME: wget-retry
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+wget-retry - Wget wrapper to retry harder
+
+=head1 VERSION
+
+This document describes version 0.001 of wget-retry (from Perl distribution App-wget-retry), released on 2019-03-28.
+
+=head1 SYNOPSIS
+
+Use like you would use B<wget>:
+
+ % wget-retry -c -t0 https://example.com/url1 ...
+
+=head1 DESCRIPTION
+
+By default, B<wget> doesn't retry harder; only upon disconnection in the middle
+of downloading (with C<-t>/C<--tries>, e.g. C<-t 0>) and on connection refused
+(with C<--retry-connrefused>) but not on other network failures, e.g. DNS
+resolution failure (which can happen sometimes).
+
+This wrapper runs B<wget> then check its exit code. If exit code indicates
+network failure (4) it will re-run wget.
+
+The number of tries is unlimited, or from the C<-t> (<--tries>) option. The
+number of seconds to wait before each try is 10 seconds or from the
+C<--waitretry> option.
+
+=head1 OPTIONS
+
+=head2 --help
+
+Shortcuts: -h, -?.
+
+=head2 --version
+
+=head1 ENVIRONMENT
+
+=head2 WGET_RETRY_EXIT_STATUSES
+
+A comma-separated list of exit statuses to retry. For example, C<3,4,5,8> means
+file I/O, network failure, SSL verification failure, as well as error response
+from server will make wget-retry rerun wget. The default is . For more details
+on wget exit statuses, see the wget's manpage.
+
+=head2 WGET_RETRY_WGET_CMD
+
+String. Wget command to use. Defaults to C<wget>. Can be used to chain several
+wrappers together.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-wget-retry>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-wget-retry>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-wget-retry>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+B<wget>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

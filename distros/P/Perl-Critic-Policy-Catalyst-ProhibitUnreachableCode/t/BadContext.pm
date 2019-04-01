@@ -1,0 +1,2 @@
+$c->detach;
+print "hi!";

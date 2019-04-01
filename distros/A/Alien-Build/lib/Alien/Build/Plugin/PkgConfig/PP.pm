@@ -8,7 +8,7 @@ use File::Which ();
 use Env qw( @PKG_CONFIG_PATH );
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig.pm
-our $VERSION = '1.60'; # VERSION
+our $VERSION = '1.62'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -84,6 +84,7 @@ sub init
       my $pkg = PkgConfig->find($pkg_name);
       die "package @{[ $pkg_name ]} not found" if $pkg->errmsg;
 
+      $build->hook_prop->{version} = $pkg->pkg_version;
       my $version = PkgConfig::Version->new($pkg->pkg_version);
 
       my $atleast_version = $self->atleast_version;
@@ -187,7 +188,7 @@ Alien::Build::Plugin::PkgConfig::PP - Probe system and determine library or tool
 
 =head1 VERSION
 
-version 1.60
+version 1.62
 
 =head1 SYNOPSIS
 
@@ -300,7 +301,7 @@ Paul Evans (leonerd, PEVANS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011-2018 by Graham Ollis.
+This software is copyright (c) 2011-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

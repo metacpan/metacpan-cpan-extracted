@@ -20,11 +20,11 @@ name: Crypt-EAMessage
 provides:
   Crypt::EAMessage:
     file: lib/Crypt/EAMessage.pm
-    version: '1.181840'
+    version: '1.190901'
 requires:
   Bytes::Random::Secure: '0'
   Carp: '0'
-  Crypt::AuthEnc::CCM: '0'
+  Crypt::AuthEnc::CCM: '0.057'
   MIME::Base64: '0'
   Moose: '0'
   Moose::Util::TypeConstraints: '0'
@@ -38,7 +38,7 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Crypt-EAMessage/issues
   repository: git://github.com/jmaslak/Crypt-EAMessage.git
-version: '1.181840'
+version: '1.190901'
 x_contributor_covenant:
   version: 0.02
 x_serialization_backend: 'YAML::Tiny version 1.70'

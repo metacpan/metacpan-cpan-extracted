@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+bin/dumpsvg
 bin/estimatesvg
 dist.ini
 lib/SVG/Estimate.pm

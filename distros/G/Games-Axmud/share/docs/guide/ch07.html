@@ -132,11 +132,11 @@
 <p>...you can draw attention to the <strong>100</strong> by clicking on <strong>Mode n</strong>, then selecting the number 1 (meaning, the substring matching the first group in the pattern) in the box just below.</p>
 <p>The trigger style can combine colours and other typographical features. <strong>Foreground colour</strong> is the colour of the text itself.  <strong>Underlay colour</strong> is the colour of the background immediately below the text. (Bold colours are shown in CAPITAL LETTERS). If you don't specify a colour, the line's normal colours are not changed.</p>
 <p>You can also apply italics, strikethrough, blinking text and underlines (underscores). If you apply the <strong>link</strong> style, the text will be a clickable link which Axmud will try to open in a web browser.</p>
-<p>Axmud triggers have a <em>stimulus</em> and a <em>response</em>. If you just want to apply the style and do nothing else, you can tell Axmud to ignore this trigger's response. </p>
+<p>Axmud triggers have a <em>stimulus</em> and a <em>response</em>. If you just want to apply the style and do nothing else, you can tell Axmud to ignore this trigger's response.</p>
 <ul>
 <li>From the main window menu, click <strong>Edit &gt; World triggers</strong></li>
 <li>In the <strong>Trigger stimulus</strong> box, enter <strong>The orc drops its treasure</strong></li>
-<li>In the <strong>Trigger response</strong> box, enter anything you like <ul>
+<li>In the <strong>Trigger response</strong> box, enter anything you like<ul>
 <li>There must be a response, even though it's ignored</li>
 </ul>
 </li>
@@ -175,7 +175,7 @@
 </code></pre>
 <p>(<a href="ch06.html#6.1.4">Section 6.1.4</a> explains that + means <em>one or more of the previous characters</em>, in this case, one or more =  characters.)</p>
 <p>When the trigger fires, any part of the line matching the group <strong>(.*)</strong> is stored as a substring. In this case, the first substring contains the winner, <strong>Gandalf</strong>.</p>
-<p>We can use the first substring in the substituted text by specifying the variable <strong>$1</strong>. </p>
+<p>We can use the first substring in the substituted text by specifying the variable <strong>$1</strong>.</p>
 <pre><code>    And the winner is $1
 </code></pre>
 <p>(If there is more than one substring, you can also use <strong>$2</strong>, <strong>$3</strong> and so on.)</p>
@@ -198,7 +198,7 @@
 </ul>
 </li>
 <li>If you <em>actually</em> want the substituted text to begin and end with double quotes, you must duplicate them<ul>
-<li>e.g. <strong>""And the winner is $1""</strong>  </li>
+<li>e.g. <strong>""And the winner is $1""</strong></li>
 </ul>
 </li>
 <li>If you want the substituted text to contain a literal <strong>$1</strong>, precede it with a backslash<ul>
@@ -206,12 +206,12 @@
 </ul>
 </li>
 <li>If you <em>actually</em> want a backslash <em>anywhere</em> in the substituted text, use must use two of them<ul>
-<li>e.g. <strong>apples and\\or oranges</strong> </li>
+<li>e.g. <strong>apples and\\or oranges</strong></li>
 </ul>
 </li>
 </ul>
 <h3><a name="7.1.6">7.1.6 Substrings in other triggers</a></h3>
-<p>Substrings can be used in non-rewriter triggers, too. </p>
+<p>Substrings can be used in non-rewriter triggers, too.</p>
 <p>In this example, we'll create a trigger that joins in any fight started by Gandalf. If he attacks an orc, the trigger fires and Axmud sends the world command <strong>kill orc</strong>.</p>
 <ul>
 <li>In the <strong>Trigger stimulus</strong> box, enter the pattern <strong>Gandalf attacks (.*)</strong></li>
@@ -402,13 +402,13 @@
 </li>
 <li>If you want the instruction to contain a literal <strong>$1</strong>, precede it with a backslash<ul>
 <li>e.g. <strong>give \$1 to $1</strong><ul>
-<li>This instruction would look something like <strong>give $1 to Gandalf</strong> </li>
+<li>This instruction would look something like <strong>give $1 to Gandalf</strong></li>
 </ul>
 </li>
 </ul>
 </li>
 <li>If you <em>actually</em> want a backslash <em>anywhere</em> in the instruction, use must use two of them<ul>
-<li>e.g. <strong>apples and\\or oranges</strong> </li>
+<li>e.g. <strong>apples and\\or oranges</strong></li>
 </ul>
 </li>
 </ul>

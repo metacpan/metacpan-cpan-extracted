@@ -1,3 +1,45 @@
+libnet-as2-perl (1.0101-1) stable; urgency=low
+
+  * Message-Id
+     - POST request sets the Message-Id surrounded with angle brackets
+
+  * Content-Disposition
+     - send() accepts Filename key to set Content-Disposition filename
+     - decode_message() extracts Content-Disposition filename.
+       On success, Net::AS2::Message->filename() will return it.
+       The filename value is also stored in the serialised Message.
+
+  * MDN->match-mic
+     - MDN->match_mic() returns 1 when both partners request Encryption only
+
+ -- Andrew Maguire <ajm@cpan.org>  Mon, 11 Mar 2019 15:44:20 +1300
+
+libnet-as2-perl (1.01-1) stable; urgency=low
+
+  * Content-Disposition
+    - Set default filename, so that Oracle B2B accepts the request
+
+ -- Andrew Maguire <ajm@cpan.org>  Thu, 21 Feb 2019 11:21:50 +1300
+
+libnet-as2-perl (1.001-1) stable; urgency=low
+
+  * Message-Id
+    - Validate message id using Email::Address::addr_spec
+      Allow for angle bracket quotes
+
+  * File-extensions
+    - Accept any file extension for key and certificate files
+
+  * Distribution
+    - Use $VERSION instead of package MODULE VERSION
+    - Pass harsher Perl Critic tests
+
+  * AS2-Version
+    - Update documentation to specify AS2 Version 1.0.
+      Version 1.1 compression is not implemented
+
+ -- Andrew Maguire <ajm@cpan.org>  Fri, 8 Feb 2019 15:10:00 +1300
+
 libnet-as2-perl (1.0-1) stable; urgency=low
 
   * HTTP::Headers

@@ -17,5 +17,9 @@ no_index:
   directory:
     - t
     - inc
-version: '1.843'
+resources:
+  bugtracker: https://github.com/pmqs/DB_File/issues
+  homepage: https://github.com/pmqs/DB_File
+  repository: git://github.com/pmqs/DB_File.git
+version: '1.850'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

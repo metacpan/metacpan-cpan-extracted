@@ -1,0 +1,83 @@
+Revision history for perl module Net::AS2
+
+1.0101 2019-03-01
+
+ [Message-Id]
+ - POST request sets the Message-Id surrounded with angle brackets
+
+ [Content-Disposition]
+ - send() accepts Filename key to set Content-Disposition filename
+ - decode_message() extracts Content-Disposition filename.
+   On success, Net::AS2::Message->filename() will return it.
+
+1.01 2019-02-21
+
+ [Content-Disposition]
+ - Set default filename, so that Oracle B2B accepts the request
+
+1.001 2019-02-08
+
+ [Message-Id]
+ - Validate message id using Email::Address::addr_spec
+   Allow for angle bracket quotes
+
+ [File extensions]
+ - Accept any file extension for key and certificate files
+
+ [Distribution]
+ - Use $VERSION instead of package MODULE VERSION
+ - pass harsher Perl Critic tests
+
+ [AS2 Version]
+ - Update documentation to specify AS2 Version 1.0.
+   Version 1.1 compression is not implemented
+
+1.0 2019-01-30
+
+ - Update POD documentation
+
+ [HTTP::Headers]
+ - Accept an HTTP::Headers compatible object for the headers parameter in
+   decode_message() and decode_mdn(). A hash ref is also still accepted.
+
+ [Packaging]
+ - Use and configure Dist::Zilla
+ - Review POD style
+ - Fix POD content errors
+
+ [*File options]
+ - Enable private key and certificates to be read in from files
+
+ [HTTPS support]
+ - Enable UserAgent class to be configured
+ - Provide support for sending requests over HTTPS
+
+ [Enable SHA-2 support]
+ - Use Digest::SHA to provide support for sha1 and sha2 signing.
+   SHA-2 is not officially part of the AS2 RFC specification but
+   is commonly implemented in AS2 implementations.
+
+ [Bugfixes to ensure communication compatibility]
+ - Tested communication with as2-server
+ - Tested communication with RSSBus
+
+ [Miscellaneous]
+ - Remove trailing whitespace
+ - Remove use of experimental smartmatch feature
+ - minor corrections of POD
+ - Split up tests so that older Perl versions pass.
+   This avoids some memory leak with Crypt::SMIME.
+ - Add 2019 copyright
+ - Update Maintainer information
+
+0.03 2015-02-12
+
+ - Fixing MIME::Tools dependency typo in Makefile
+
+0.02 2012-11-26
+
+ - Make create_useragent() a public method, primarily for testing
+
+0.01 2012-11-22
+
+ - Initial version

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.508';
+our $VERSION = '0.509';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -157,49 +157,48 @@ sub __calculate_threshold {
 sub __before_readline {
     my ( $self, $opt, $m ) = @_;
     my @info = split /\n/, line_fold( $opt->{info}, $self->{i}{term_w} ), -1;
-    my @before;
-    my $prompt_ok;
-    if ( $opt->{show_context} && $m->{diff} ) {
-        my $line_s = '';
-        my $line_w = 0;
-        for my $i ( reverse( 0 .. $m->{diff} - 1 ) ) {
-            if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
-                unshift @before, $line_s;
-                $line_s = $m->{str}[$i][0];
-                $line_w = $m->{str}[$i][1];
-                next;
+    if ( $opt->{show_context} ) {
+        my @before_lines;
+        if ( $m->{diff} ) {
+            my $line = '';
+            my $line_w = 0;
+            for my $i ( reverse( 0 .. $m->{diff} - 1 ) ) {
+                if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
+                    unshift @before_lines, $line;
+                    $line   = $m->{str}[$i][0];
+                    $line_w = $m->{str}[$i][1];
+                    next;
+                }
+                $line   = $m->{str}[$i][0] . $line;
+                $line_w = $m->{str}[$i][1] + $line_w;
             }
-            $line_s = $m->{str}[$i][0] . $line_s;
-            $line_w = $m->{str}[$i][1] + $line_w;
-
-        }
-        my $comb_w = $self->{i}{max_key_w} + $line_w;
-        if ( $comb_w <= $self->{i}{term_w} ) {
-            my $empty_w = $self->{i}{term_w} - $comb_w;
-            unshift @before, $self->{i}{prompt} . ( ' ' x $empty_w ) . $line_s;
-            $prompt_ok = 1;
-        }
-        else {
-            my $empty_w = $self->{i}{term_w} - $line_w;
-            unshift @before, ' ' x $empty_w . $line_s;
-        }
-    }
-    if ( ! @before ) {
-        if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $self->{i}{term_w} ) {
-            $self->{i}{keys}[0] = $self->{i}{prompt};
-            $prompt_ok = 1;
-        }
-        else {
+            my $total_first_line_w = $self->{i}{max_key_w} + $line_w;
+            if ( $total_first_line_w <= $self->{i}{term_w} ) {
+                my $empty_w = $self->{i}{term_w} - $total_first_line_w;
+                unshift @before_lines, $self->{i}{prompt} . ( ' ' x $empty_w ) . $line;
+            }
+            else {
+                my $empty_w = $self->{i}{term_w} - $line_w;
+                unshift @before_lines, ' ' x $empty_w . $line;
+                unshift @before_lines, $self->{i}{prompt};
+            }
             $self->{i}{keys}[0] = '';
         }
+        else {
+            if ( ( $m->{str_w} + $self->{i}{max_key_w} ) <= $self->{i}{term_w} ) {
+                $self->{i}{keys}[0] = $self->{i}{prompt};
+            }
+            else {
+                $self->{i}{keys}[0] = '';
+                unshift @before_lines, $self->{i}{prompt};
+            }
+        }
+        $self->{i}{pre_text} = join "\n", @info, @before_lines;
     }
     else {
-        $self->{i}{keys}[0] = '';
+        $self->{i}{keys}[0] = $self->{i}{prompt};
+        $self->{i}{pre_text} = join "\n", @info;
     }
-    if ( ! $prompt_ok ) {
-        unshift @before, $self->{i}{prompt};
-    }
-    $self->{i}{pre_text} = join "\n", @info, @before;
     $self->{i}{pre_text_row_count} = $self->{i}{pre_text} =~ tr/\n//;
     if ( length $self->{i}{pre_text} ) {
         ++$self->{i}{pre_text_row_count};
@@ -215,23 +214,23 @@ sub __after_readline {
         $self->{i}{post_text_row_count} = 0;
         return;
     }
-    my @after;
-    my $line_s = '';
+    my @after_lines;
+    my $line = '';
     my $line_w = 0;
     for my $i ( ( @{$m->{str}} - $count_chars_after ) .. $#{$m->{str}} ) {
         if ( $line_w + $m->{str}[$i][1] > $self->{i}{term_w} ) {
-            push @after, $line_s;
-            $line_s = $m->{str}[$i][0];
+            push @after_lines, $line;
+            $line = $m->{str}[$i][0];
             $line_w = $m->{str}[$i][1];
             next;
         }
-        $line_s = $line_s . $m->{str}[$i][0];
+        $line = $line . $m->{str}[$i][0];
         $line_w = $line_w + $m->{str}[$i][1];
     }
     if ( $line_w ) {
-        push @after, $line_s;
+        push @after_lines, $line;
     }
-    $self->{i}{post_text} = join "\n", @after;
+    $self->{i}{post_text} = join "\n", @after_lines;
     if ( length $self->{i}{post_text} ) {
         $self->{i}{post_text_row_count} = $self->{i}{post_text} =~ tr/\n//;
         ++$self->{i}{post_text_row_count};
@@ -337,7 +336,8 @@ sub readline {
             carp "EOT: $!";
             return;
         }
-        $m->{avail_w} = $self->{i}{avail_w}; # reset to default
+        # reset $m->{avail_w} to default:
+        $m->{avail_w} = $self->{i}{avail_w};
         $self->__calculate_threshold( $m );
         if    ( $char == NEXT_get_key ) { next CHAR }
         elsif ( $char == KEY_TAB      ) { next CHAR }
@@ -362,7 +362,7 @@ sub readline {
                 return;
             }
         }
-        elsif ( $char == VK_UP || $char == VK_DOWN || $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
+        elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
         }
         else {
@@ -476,6 +476,9 @@ sub __bspace {
 sub __delete {
     my ( $self, $m, $char ) = @_;
     if ( $m->{pos} < @{$m->{str}} ) {
+        if ( ! $m->{diff} ) { # no '<'
+            $m->{avail_w} = $self->{i}{avail_w} + $self->{i}{arrow_w};
+        }
         _remove_pos( $m );
     }
     else {
@@ -627,21 +630,21 @@ sub _remove_pos {
 
 sub _fill_from_end {
     my ( $m ) = @_;
-    $m->{pos}      = @{$m->{str}};
-    @{$m->{p_str}} = ();
-    $m->{p_str_w}  = 0;
-    $m->{diff}     = @{$m->{str}};
-    $m->{p_pos}    = 0;
+    $m->{pos}     = @{$m->{str}};
+    $m->{p_str}   = [];
+    $m->{p_str_w} = 0;
+    $m->{diff}    = @{$m->{str}};
+    $m->{p_pos}   = 0;
     _unshift_till_avail_w( $m, [ 0 .. $#{$m->{str}} ] );
 }
 
 sub _fill_from_begin {
     my ( $m ) = @_;
-    $m->{pos}      = 0;
-    $m->{p_pos}    = 0;
-    $m->{diff}     = 0;
-    @{$m->{p_str}} = ();
-    $m->{p_str_w}  = 0;
+    $m->{pos}     = 0;
+    $m->{p_pos}   = 0;
+    $m->{diff}    = 0;
+    $m->{p_str}   = [];
+    $m->{p_str_w} = 0;
     _push_till_avail_w( $m, [ 0 .. $#{$m->{str}} ] );
 }
 
@@ -711,9 +714,10 @@ sub __prepare_width {
         $self->{i}{max_key_w} = int( $term_w / 3 );
     }
     $self->{i}{avail_w} = $term_w - ( $self->{i}{max_key_w} + length( $self->{i}{sep} ) + $self->{i}{arrow_w} );
-    # minus 'arrow_w' for the '<' before the string. In each case where no '<'-prefix is required (if diff==0)
-    # 'arrow_w' is added to the 'avail_w' in the code: __left, __bspace, __home, __ctrl_u
-    # - 1 for the cursor (or the '>') behind the string already subtracted by __get_term_size
+    # Subtract $self->{i}{arrow_w} for the '<' before the string.
+    # In each case where no '<'-prefix is required (diff==0) $self->{i}{arrow_w} is added again.
+    # Routins where $self->{i}{arrow_w} is added:  __left, __bspace, __home, __ctrl_u, __delete
+    # The required space (1) for the cursor (or the '>') behind the string is already subtracted in __get_term_size
     $self->{i}{th} = int( $self->{i}{avail_w} / 5 );
     $self->{i}{th} = 40 if $self->{i}{th} > 40;
 }
@@ -885,7 +889,7 @@ sub fill_form {
     $self->{i}{arrow_left}  = '<';
     $self->{i}{arrow_right} = '>';
     $self->{i}{arrow_w} = 1;
-    $self->{i}{pre} = [ [$opt->{confirm}, ] ];
+    $self->{i}{pre} = [ [ $opt->{confirm}, ] ];
     if ( length $opt->{back} ) {
         unshift @{$self->{i}{pre}}, [ $opt->{back}, ];
     }
@@ -936,7 +940,8 @@ sub fill_form {
             $self->__write_first_screen( $opt, $list, 0, $auto_up );
             $m = $self->__string_and_pos( $list );
         }
-        $m->{avail_w} = $self->{i}{avail_w}; # reset to default
+        # reset $m->{avail_w} to default:
+        $m->{avail_w} = $self->{i}{avail_w};
         $self->__calculate_threshold( $m );
         if ( $char == KEY_BSPACE || $char == CONTROL_H ) {
             $k = 1;
@@ -1180,7 +1185,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.508
+Version 0.509
 
 =cut
 

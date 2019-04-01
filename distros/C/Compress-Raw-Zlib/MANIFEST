@@ -12,6 +12,8 @@ t/Test/Builder.pm
 t/Test/More.pm
 t/Test/Simple.pm
 t/compress/CompTestUtils.pm
+t/meta-json.t 
+t/meta-yaml.t
 Zlib.xs
 typemap
 Makefile.PL

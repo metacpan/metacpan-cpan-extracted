@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Cfn",
   "PREREQ_PM" => {
     "JSON" => 0,
+    "Module::Find" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
     "MooseX::SlurpyConstructor" => 0,
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Pod" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +45,7 @@ my %FallbackPrereqs = (
   "FindBin" => 0,
   "IO::Dir" => 0,
   "JSON" => 0,
+  "Module::Find" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,
   "MooseX::SlurpyConstructor" => 0,

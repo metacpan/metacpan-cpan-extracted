@@ -1,7 +1,7 @@
 package Dancer::Handler::Debug;
 our $AUTHORITY = 'cpan:SUKRIA';
 #ABSTRACT: a debug handler for easy tracing
-$Dancer::Handler::Debug::VERSION = '1.3510';
+$Dancer::Handler::Debug::VERSION = '1.3512';
 use strict;
 use warnings;
 
@@ -84,7 +84,7 @@ Dancer::Handler::Debug - a debug handler for easy tracing
 
 =head1 VERSION
 
-version 1.3510
+version 1.3512
 
 =head1 DESCRIPTION
 

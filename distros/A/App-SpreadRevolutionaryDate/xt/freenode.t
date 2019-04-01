@@ -35,14 +35,15 @@ use App::SpreadRevolutionaryDate;
 
   sub connected {
     my $self = shift;
+
     foreach my $channel ($self->channels) {
       $channels_said{$channel} = 0;
     }
   }
 
   sub said {
-    my $self = shift;
-    my $message = shift;
+    my ($self, $message) = @_;
+
     return if $message->{who} eq 'freenode-connect';
 
     if ($message->{who} eq 'RevolutionaryDat') {
@@ -60,6 +61,7 @@ use App::SpreadRevolutionaryDate;
 
   sub tick {
     my $self = shift;
+
     $nb_ticks++;
     if ($nb_ticks > 5) {
       ok(0, "Spread only to " . scalar(grep { $channels_said{$_} } keys %channels_said) . "/" . scalar($self->channels) . " Freenode channels");

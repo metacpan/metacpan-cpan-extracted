@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Fibu::Buchung;
 
@@ -306,6 +306,15 @@ sub toBuchungen {
 
     # *** Einmalige Buchungen ***
 
+    elsif ($self->buchungsdetails =~ /DHL Onlinefrankierung/i) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Porto',
+                text => 'Porto',
+                beleg => 1,
+            ),
+        ;
+    }
     elsif ($self->buchungsdatum eq '25.10.2018' &&
             $self->empfaenger eq 'EBAY GMBH') {
         push @arr,
@@ -339,6 +348,34 @@ sub toBuchungen {
                 vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
                 betrag => '-1465,50',
                 text => 'Nebenkosten Nachzahlung',
+            ),
+        ;
+    }
+    elsif ($self->buchungshinweis =~ /23.01.19 VISA CARD/) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-0,99',
+                text => 'Samsung Cloud Service (2018-12-27)',
+                beleg => 0,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-6,28',
+                text => 'github.com (2018-12-28)',
+                beleg => 1,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Sonstige Kosten',
+                betrag => '-9,93',
+                text => 'Amazon Server (2019-01-03)',
+                beleg => 1,
+            ),
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Geldabgänge / Entnahme nach Privat',
+                betrag => '-20,00',
+                text => 'Privatentnahme',
+                beleg => 0,
             ),
         ;
     }
@@ -734,6 +771,36 @@ sub toBuchungen {
             Quiq::Fibu::Buchung->new(
                 vorgang => 'Betriebseinnahmen / Erlöse',
                 text => "Rechnung 5166",
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->empfaenger =~ /Wieland Direkt Steuerberatung/i &&
+            $self->buchungshinweis =~ m|Referenz 1901041443-0000031|i) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Rechts- und Beratungskosten',
+                text => "Steuererklärung 2017",
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->empfaenger =~ /Wieland Direkt Steuerberatung/i &&
+            $self->buchungshinweis =~ m|Referenz 1901041443-0000032|i) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Rechts- und Beratungskosten',
+                text => "Steuererklärung 2016",
+                beleg => 1,
+            ),
+        ;
+    }
+    elsif ($self->empfaenger =~ /Wieland Direkt Steuerberatung/i &&
+            $self->buchungshinweis =~ m|Referenz 1901041443-0000033|i) {
+        push @arr,
+            Quiq::Fibu::Buchung->new(
+                vorgang => 'Sonstige Kosten / Rechts- und Beratungskosten',
+                text => "Jahresabschluss 2017",
                 beleg => 1,
             ),
         ;
@@ -1329,7 +1396,7 @@ sub saldoZahl {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

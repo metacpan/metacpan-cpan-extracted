@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2009-2018, Roland van Ipenburg
-package HTML::Hyphenate v1.1.1;
+# Copyright (C) 2009-2019, Roland van Ipenburg
+package HTML::Hyphenate v1.1.2;
 use Moose;
 use utf8;
 use 5.014000;
@@ -250,7 +250,7 @@ sub _get_nearest_ancestor_level_by_classname {
         && ( $node->ancestors->size ) )
     {
         my $selector = $DOT . join $CLASS_JOINER, $classnames->members;
-        my $nearest = $node->ancestors($selector)->first;
+        my $nearest  = $node->ancestors($selector)->first;
         if ($nearest) {
             return $nearest->ancestors->size;
         }
@@ -280,7 +280,7 @@ HTML::Hyphenate - insert soft hyphens into HTML.
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version v1.1.1.
+This document describes HTML::Hyphenate version v1.1.2.
 
 =head1 SYNOPSIS
 
@@ -449,7 +449,7 @@ Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009-2018, Roland van Ipenburg
+Copyright (C) 2009-2019, Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

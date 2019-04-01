@@ -471,11 +471,11 @@ Malay Brunei locale.
    1995-12-22T09:05:02 = Jum, 22 Dis
   -0010-09-15T04:44:23 = Sab, 15 Sep
 
-=head3 MMMMW-count-other ('week' W 'of' MMM)
+=head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of Feb
-   1995-12-22T09:05:02 = week 3 of Dis
-  -0010-09-15T04:44:23 = week 2 of Sep
+   2008-02-05T18:30:30 = week 1 of Februari
+   1995-12-22T09:05:02 = week 3 of Disember
+  -0010-09-15T04:44:23 = week 2 of September
 
 =head3 MMMMd (d MMMM)
 

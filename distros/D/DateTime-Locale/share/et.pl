@@ -29,8 +29,8 @@
     MMM => "MMMM",
     MMMEd => "E, d. MMM",
     MMMMEd => "E, d. MMMM",
-    "MMMMW-count-one" => "MMM (W. 'n\N{U+00e4}dal')",
-    "MMMMW-count-other" => "MMM (W. 'n\N{U+00e4}dal')",
+    "MMMMW-count-one" => "MMMM (W. 'n\N{U+00e4}dal')",
+    "MMMMW-count-other" => "MMMM (W. 'n\N{U+00e4}dal')",
     MMMMd => "d. MMMM",
     MMMd => "d. MMM",
     Md => "d.M",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

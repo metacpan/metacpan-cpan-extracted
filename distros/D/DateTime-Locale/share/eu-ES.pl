@@ -28,8 +28,8 @@
     MEd => "M/d, E",
     MMM => "LLL",
     MMMEd => "MMM d, E",
-    "MMMMW-count-one" => "MMM W. 'astea'",
-    "MMMMW-count-other" => "MMM W. 'astea'",
+    "MMMMW-count-one" => "MMMM W. 'astea'",
+    "MMMMW-count-other" => "MMMM W. 'astea'",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

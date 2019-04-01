@@ -89,7 +89,7 @@
          "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
       }
    },
-   "version" : "0.52",
+   "version" : "0.53",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Toshio Ito (debug-ito, TOSHIOITO)",

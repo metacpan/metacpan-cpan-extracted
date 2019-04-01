@@ -4,7 +4,7 @@ use Pcore -export;
 use Pcore::Util::Scalar qw[is_plain_hashref];
 
 our $EXPORT = {    #
-    DEFAULT => [qw[l10n $l10n]],
+    DEFAULT => [qw[l10n %l10n]],
 };
 
 our $LOCALE             = undef;    # current locale
@@ -13,7 +13,7 @@ our $LOCALE_PLURAL_FORM = {};
 our $PROCESSED;                     # all dists are processed
 our $LOADED_DIST_LOCALES;
 
-tie our $l10n->%*, 'Pcore::Core::L10N::_l10n';
+tie our %l10n, 'Pcore::Core::L10N::_l10n';
 
 sub set_locale ($locale = undef) {
     $LOCALE = $locale if @_;
@@ -236,7 +236,7 @@ Pcore::Core::L10N - localization subsystem.
     say l10n('single');
     say l10n( 'single', 'plural', 1 );
     say l10n( 'single', 'plural' )->(5);
-    say $l10n->{'single'};
+    say $l10n{'single'};
 
 =head1 DESCRIPTION
 

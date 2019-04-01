@@ -20,13 +20,12 @@ exit
 # Copyright (c) 2008, 2009, 2010, 2018, 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.02';
+$VERSIONE = '0.03';
 use strict;
 use FindBin;
 use File::Path;
 use File::Copy;
 use File::Basename;
-use Test::Harness;
 
 unless (@ARGV) {
     if ($^O =~ /\A (?: MSWin32 | NetWare | symbian | dos ) \z/oxms) {
@@ -74,14 +73,12 @@ close FH_MANIFEST;
 for my $target (@ARGV) {
     if ($target eq 'test') {
         my @test = grep m{ \A (?: test\.pl | t/.+\.t ) \z }xmsi, @file;
-        unshift @INC, "$FindBin::Bin/lib";
-        runtests(@test);
+        _runtests(@test);
         print STDERR "\a";
     }
     elsif ($target eq 'xtest') {
         my @test = grep m{ \A (?: test\.pl | t/.+\.t | xt/.+\.t ) \z }xmsi, @file;
-        unshift @INC, "$FindBin::Bin/lib";
-        runtests(@test);
+        _runtests(@test);
         print STDERR "\a";
     }
     elsif ($target eq 'install') {
@@ -231,8 +228,6 @@ requires:
   File::Path: 1.0401
   FindBin: 1.42
   Getopt::Std: 1.01
-  Test: 1.122
-  Test::Harness: 1.1602
   perl: 5.005_03
   strict: 1.01
 build_requires:
@@ -704,13 +699,21 @@ LICENSING
             system(qq{gzip $tardir.tar});
         }
         else {
+
+#-----------------------------------------------------------------------------
+# https://metacpan.org/search?q=Archive%3A%3ATar%3A%3AConstant
+# https://metacpan.org/release/Archive-Tar-Streamed
+#-----------------------------------------------------------------------------
             eval q{
                 use Compress::Zlib;
                 use Archive::Tar;
             };
+            my $BLOCK_SIZE = 512;
+            my $ZERO_BLOCK = "\0" x $BLOCK_SIZE;
 
             # make *.tar file
-            my $tar = Archive::Tar->new;
+            open(FH_TAR, ">$tardir.tar") || die "Can't open file: $tardir.tar\n";
+            binmode FH_TAR;
             for my $file (@file) {
                 if (-e $file) {
                     mkpath(dirname("$tardir/$file"), 0, 0777);
@@ -741,6 +744,7 @@ LICENSING
 # Change the permissions of Build.PL/Makefile.PL to not-executable.
 #-----------------------------------------------------------------------------
 
+                    my $tar = Archive::Tar->new;
                     if ($file =~ m/ (?: Build\.PL | Makefile\.PL ) \z/oxmsi) {
                         $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
                     }
@@ -750,6 +754,10 @@ LICENSING
                     else {
                         $tar->add_data("$tardir/$file", $data, {'mode' => 0664});
                     }
+                    my $format_tar_file = $tar->write;
+                    syswrite FH_TAR, $format_tar_file, length($format_tar_file) - length($ZERO_BLOCK . $ZERO_BLOCK);
+                    undef $tar;
+
 #-----------------------------------------------------------------------------
                 }
                 else {
@@ -757,7 +765,10 @@ LICENSING
                 }
             }
 
-            $tar->write("$tardir.tar");
+            # syswrite FH_TAR, $ZERO_BLOCK; makes "tar: A lone zero block at %s"
+            syswrite FH_TAR, ($ZERO_BLOCK . $ZERO_BLOCK);
+
+            close FH_TAR;
             rmtree($tardir,0,0);
 
             # make *.tar.gz file
@@ -1006,6 +1017,75 @@ sub which {
             }
         }
         return $_[0];
+    }
+}
+
+# Test::Harness::runtests cannot work heavy load.
+sub _runtests {
+    my @script = @_;
+    my @fail_testno = ();
+    my $ok_script = 0;
+    my $not_ok_script = 0;
+    my $total_ok = 0;
+    my $total_not_ok = 0;
+
+    my $scriptno = 0;
+    for my $script (@script) {
+        my @result = qx{$^X $script};
+        my($tests) = $result[0] =~ /^1..([0-9]+)/;
+
+        my $testno = 1;
+        my $ok = 0;
+        my $not_ok = 0;
+        for my $result (@result) {
+            if ($result =~ /^ok /) {
+                $ok++;
+            }
+            elsif ($result =~ /^not ok /) {
+                push @{$fail_testno[$scriptno]}, $testno;
+                $not_ok++;
+            }
+            $testno++;
+        }
+
+        if ($ok == $tests) {
+            printf("$script ok\n");
+            $ok_script++;
+        }
+        else {
+            printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+            $not_ok_script++;
+        }
+
+        $total_ok += $ok;
+        $total_not_ok += $not_ok;
+        $scriptno++;
+    }
+
+    if (scalar(@script) == $ok_script) {
+        printf <<'END', scalar(@script), $total_ok + $total_not_ok;
+All tests successful.
+Files=%d, Tests=%d
+Result: PASS
+END
+    }
+    else {
+        print <<'END';
+
+Test Summary Report
+-------------------
+END
+        my $scriptno = 0;
+        for my $fail_testno (@fail_testno) {
+            if (defined $fail_testno) {
+                print $script[$scriptno], "\n";
+                print '  Failed test:  ', join(', ', @{$fail_testno[$scriptno]}), "\n";
+            }
+            $scriptno++;
+        }
+        printf("Files=%d, Tests=%d\n", scalar(@script), $total_ok + $total_not_ok);
+        printf("Result: FAIL\n");
+        printf("Failed %d/%d test programs. %d/%d subtests failed.\n", $not_ok_script, scalar(@script), $total_not_ok, $total_ok + $total_not_ok);
     }
 }
 

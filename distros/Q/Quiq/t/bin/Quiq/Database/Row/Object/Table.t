@@ -32,7 +32,7 @@ sub udls : Foreach {
 sub test_unitTest_startup : Startup(0) {
     my ($self,$udl) = @_;
 
-    # diag $udl;
+    # diag "###$udl###";
 
     # Datenbankverbindung aufbauen
 

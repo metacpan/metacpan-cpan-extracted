@@ -58,6 +58,7 @@ t/langs.t
 t/leaks.t
 t/log-encoding.log
 t/logger.t
+t/magic-comments-2.t
 t/magic-comments.t
 t/manifest.t
 t/manual/br-in-footnotes.muse

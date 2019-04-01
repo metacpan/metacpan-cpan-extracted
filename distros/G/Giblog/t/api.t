@@ -438,6 +438,12 @@ Hello World!
 <pre>
 my $foo = 1 > 3 && 2 < 5;
 </pre>
+<script>
+  alert('aaa');
+</script>
+<style>
+  body {}
+</style>
 EOS
     
     my $data = {content => $input};
@@ -457,6 +463,12 @@ EOS
 <pre>
 my $foo = 1 &gt; 3 && 2 &lt; 5;
 </pre>
+<script>
+  alert('aaa');
+</script>
+<style>
+  body {}
+</style>
 EOS
     
     is($content, $expect);

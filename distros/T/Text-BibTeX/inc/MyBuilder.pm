@@ -64,6 +64,7 @@ sub ACTION_install {
              . "It seems you are installing in a non standard path.\n"
              . "You might need to add $usrlib to your library search path.\n";
       }
+    
 }
 
 sub ACTION_code {
@@ -105,6 +106,10 @@ sub ACTION_code {
     $self->dispatch("create_tests");
 
     $self->dispatch("compile_xscode");
+
+    $self->copy_if_modified( from    => 'btparse/src/btparse.h',
+                                 to_dir  => "blib/usrinclude",
+                                 flatten => 1);
 
     $self->SUPER::ACTION_code;
 }
@@ -300,6 +305,14 @@ sub ACTION_create_tests {
 
     $exe_file = catfile("btparse","tests","name_test$EXEEXT");
     $objects  = [ map{catfile("btparse","tests","$_.o")}(qw.name_test.) ];
+    if (!$self->up_to_date($objects, $exe_file)) {
+        $libbuilder->link_executable(exe_file => $exe_file,
+                                     extra_linker_flags => '-Lbtparse/src -lbtparse ',
+                                     objects => $objects);
+    }
+
+    $exe_file = catfile("btparse","tests","namebug$EXEEXT");
+    $objects  = [ map{catfile("btparse","tests","$_.o")}(qw.namebug.) ];
     if (!$self->up_to_date($objects, $exe_file)) {
         $libbuilder->link_executable(exe_file => $exe_file,
                                      extra_linker_flags => '-Lbtparse/src -lbtparse ',

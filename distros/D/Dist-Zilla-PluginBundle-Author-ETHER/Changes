@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.148     2019-03-31 04:31:27Z
+          - adjusted test of [Git::Tag] option to account for changes to the
+            default made in version 2.046
+
 0.147     2019-02-23 21:42:13Z
           - amended CONTRIBUTING file to clarify that the Changes file should
             be edited in a pull request, and all tests should pass.

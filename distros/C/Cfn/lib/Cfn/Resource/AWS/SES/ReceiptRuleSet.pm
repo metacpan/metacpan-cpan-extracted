@@ -1,4 +1,4 @@
-# AWS::SES::ReceiptRuleSet generated from spec 2.0.0
+# AWS::SES::ReceiptRuleSet generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRuleSet',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::SES::ReceiptRuleSet {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::SES::ReceiptRuleSet', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'eu-west-1','us-east-1','us-west-2' ]
   }
 }
 

@@ -35,7 +35,7 @@ my $filler = ' ' x 26 ;
 
 chdir "libraries" || die "Cannot chdir into './libraries': $!\n";
 
-foreach my $name (sort tuple glob "[2-9]*")
+foreach my $name (sort tuple glob("[2-9]*"), glob("[1-9][0-9]*"))
 {
     next if $name =~ /(NOHEAP|NC|private)$/;
 

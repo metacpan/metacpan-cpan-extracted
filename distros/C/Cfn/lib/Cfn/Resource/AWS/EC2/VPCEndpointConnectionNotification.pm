@@ -1,4 +1,4 @@
-# AWS::EC2::VPCEndpointConnectionNotification generated from spec 2.22.0
+# AWS::EC2::VPCEndpointConnectionNotification generated from spec 2.25.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::VPCEndpointConnectionNotification',
@@ -9,8 +9,12 @@ package Cfn::Resource::AWS::EC2::VPCEndpointConnectionNotification {
   use Moose;
   extends 'Cfn::Resource';
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::EC2::VPCEndpointConnectionNotification', is => 'rw', coerce => 1);
-  sub _build_attributes {
+  
+  sub AttributeList {
     [  ]
+  }
+  sub supported_regions {
+    [ 'eu-north-1','us-east-1' ]
   }
 }
 

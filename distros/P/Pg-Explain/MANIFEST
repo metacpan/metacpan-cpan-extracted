@@ -53,6 +53,8 @@ t/14-json-plans/6.expect
 t/14-json-plans/6.json
 t/14-json-plans/7.expect
 t/14-json-plans/7.json
+t/14-json-plans/8.expect
+t/14-json-plans/8.json
 t/15-yaml-plans.t
 t/15-yaml-plans/1.expect
 t/15-yaml-plans/1.yaml
@@ -123,6 +125,10 @@ t/28-anonymization-of-group-keys.t
 t/29-extract-subquery-source.t
 t/30-parallel-query.t
 t/31-parallel-query-2.t
+t/32-parallel-index-scan-backward.t
+t/33-parallel-index-scan.t
+t/34-parallel-index-only-scan.t
+t/35-sort-mode-and-buffers-from-json.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc
@@ -176,7 +182,3 @@ t/plans/24-expect
 t/plans/24-plan
 t/plans/25-expect
 t/plans/25-plan
-t/34-parallel-index-only-scan.t
-t/33-parallel-index-scan.t
-t/32-parallel-index-scan-backward.t
-t/35-sort-mode-and-buffers-from-json.t

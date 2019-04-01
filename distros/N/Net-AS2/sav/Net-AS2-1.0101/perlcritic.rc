@@ -1,0 +1,23 @@
+severity = 3
+
+[Documentation::RequirePodLinksIncludeText]
+severity = 1
+[Documentation::RequirePodSections]
+severity = 1
+lib_sections    = NAME | SYNOPSIS | BUGS AND LIMITATIONS | AUTHOR
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | AUTHOR
+[RegularExpressions::RequireDotMatchAnything]
+severity = 1
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 15
+severity = 1
+[RegularExpressions::RequireLineBoundaryMatching]
+severity = 1
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+[Subroutines::ProhibitManyArgs]
+max_arguments = 8
+[ValuesAndExpressions::ProhibitConstantPragma]
+severity = 1
+[Variables::ProhibitPackageVars]
+packages = Email::Address

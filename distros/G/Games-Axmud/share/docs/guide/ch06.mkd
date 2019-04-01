@@ -21,7 +21,7 @@ Many of times a second, Axmud will look at a line of text and ask, 'Does it matc
 
 Axmud uses regular expressions all the time,  so it's important to know something about them.
 
-There are a million and one tutorials on the internet, but here is another one anyway. It's as short as possible and all the example relate to what you might see in a MUD. (Skip to Section 7 if you already understand regular expressions.)
+There are a million and one tutorials on the internet, but here is another one anyway. It's as short as possible and all the example relate to what you might see in a MUD. (Skip to [Section 7](ch07.html) if you already understand regular expressions.)
 
 ##<a name="6.1">6.1 Regular expressions</a>
 
@@ -160,7 +160,7 @@ The patterns they use often look like this:
 
 A pair of brackets (braces) means *save everything in the middle for later*. In this case, we don't just want to recognise a line matching this pattern - we want to store the number of gold coins for later use.
 
-The __(.\*)__ combination is one example of a *group*. The contents of the group - in this case, **100** - is called the *substring*. 
+The __(.\*)__ combination is one example of a *group*. The contents of the group - in this case, **100** - is called the *substring*.
 
 Sometimes we'll need to use several groups on the same line.
 
@@ -168,7 +168,7 @@ Sometimes we'll need to use several groups on the same line.
 
 Because we have three groups, three different substrings are stored for later. These substrings are numbered 1, 2 and 3 (not 0, 1 and 2).
 
-That's the end of the regular expression tutorial. In the next section we'll go ahead and create some interfaces.
+That's the end of the regular expression tutorial. In the next Section we'll go ahead and create some interfaces.
 
 ---
 

@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::zh_Hans_MO - Locale data examples for the Chinese Macau SAR China Simplified (zh-Hans-MO) locale
+DateTime::Locale::zh_Hans_MO - Locale data examples for the Chinese Macao SAR China Simplified (zh-Hans-MO) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Chinese Macau SAR China Simplified locale.
+Chinese Macao SAR China Simplified locale.
 
 =head2 Days
 
@@ -471,11 +471,11 @@ Chinese Macau SAR China Simplified locale.
    1995-12-22T09:05:02 = 12月22日周五
   -0010-09-15T04:44:23 = 9月15日周六
 
-=head3 MMMMW-count-other (MMM第W周)
+=head3 MMMMW-count-other (MMMM第W周)
 
-   2008-02-05T18:30:30 = 2月第1周
-   1995-12-22T09:05:02 = 12月第3周
-  -0010-09-15T04:44:23 = 9月第2周
+   2008-02-05T18:30:30 = 二月第1周
+   1995-12-22T09:05:02 = 十二月第3周
+  -0010-09-15T04:44:23 = 九月第2周
 
 =head3 MMMMd (M月d日)
 

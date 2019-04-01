@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+092a}\N{U+0942}\N{U+0930}\N{U+094d}\N{U+0935}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}",
-    "\N{U+0905}\N{U+092a}\N{U+0930}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}",
+    "am",
+    "pm",
   ],
   available_formats => {
     Bh => "B h",
@@ -29,8 +29,8 @@
     MMM => "LLL",
     MMMEd => "E, d MMM",
     MMMMEd => "E, d MMMM",
-    "MMMMW-count-one" => "MMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
-    "MMMMW-count-other" => "MMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
+    "MMMMW-count-one" => "MMMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
+    "MMMMW-count-other" => "MMMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     MMdd => "dd/MM",
@@ -272,5 +272,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 34,
+  version => 35,
 }

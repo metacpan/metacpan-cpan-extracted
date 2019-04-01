@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 #
-# Copyright (C) 2018 Joelle Maslak
+# Copyright (C) 2018-2019 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -19,15 +19,17 @@ use Crypt::EAMessage;
 MAIN: {
     my $eamsg = Crypt::EAMessage->new( hex_key => '12345678901234567890123456789012' );
 
-    ok( dies( sub { $eamsg->decrypt_auth() } ),         'decrypt_auth no args' );
-    ok( dies( sub { $eamsg->encrypt_auth() } ),         'encrypt_auth no args' );
-    ok( dies( sub { $eamsg->encrypt_auth_ascii() } ),   'encrypt_auth_ascii no args' );
-    ok( dies( sub { $eamsg->encrypt_auth_urlsafe() } ), 'encrypt_auth_urlsafe no args' );
+    ok( dies( sub { $eamsg->decrypt_auth() } ),          'decrypt_auth no args' );
+    ok( dies( sub { $eamsg->encrypt_auth() } ),          'encrypt_auth no args' );
+    ok( dies( sub { $eamsg->encrypt_auth_ascii() } ),    'encrypt_auth_ascii no args' );
+    ok( dies( sub { $eamsg->encrypt_auth_urlsafe() } ),  'encrypt_auth_urlsafe no args' );
+    ok( dies( sub { $eamsg->encrypt_auth_portable() } ), 'encrypt_auth_portable no args' );
 
     ok( dies( sub { $eamsg->decrypt_auth( 1, 2 ) } ), 'decrypt_auth two args' );
     ok( dies( sub { $eamsg->encrypt_auth( 1, 2 ) } ), 'encrypt_auth two args' );
     ok( dies( sub { $eamsg->encrypt_auth_ascii( 1, 2, 3 ) } ), 'encrypt_auth_ascii three args' );
     ok( dies( sub { $eamsg->encrypt_auth_urlsafe( 1, 2 ) } ), 'encrypt_auth_urlsafe two args' );
+    ok( dies( sub { $eamsg->encrypt_auth_portable( 1, 2 ) } ), 'encrypt_auth_portable two args' );
 
 }
 

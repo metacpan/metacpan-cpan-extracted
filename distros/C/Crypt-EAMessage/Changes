@@ -1,4 +1,16 @@
+1.190901  2019-03-31 07:45:41-06:00 America/Denver
+ * Slaven Rezić reported some versions of a dependency can segfault, so
+   incremented the prereq required version
+
+1.190900  2019-03-30 20:43:58-06:00 America/Denver
+Joelle Maslak <jmaslak@antelope.net>
+ * Added tests for unsupported encodings
+ * Added test for tampered-with message
+ * Added portable message format (for future cross-language
+   compatibility)
+
 1.181840  2018-07-02 20:58:55-06:00 America/Denver
+Joelle Maslak <jmaslak@antelope.net>
  * Added code of conduct
 
 1.007 - Jun 16, 2018

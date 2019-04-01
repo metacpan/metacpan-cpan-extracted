@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.644';
+our $VERSION = '1.645';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -41,11 +41,11 @@ sub __get_key_OS {
     if ( $c1 eq "\e" ) {
         my $c2 = _getc_wrapper( 0.10 );
         if    ( ! defined $c2 ) { return KEY_ESC; } # unused
-        #elsif ( $c3 eq 'A' ) { return VK_UP; }     vt 52
-        #elsif ( $c3 eq 'B' ) { return VK_DOWN; }
-        #elsif ( $c3 eq 'C' ) { return VK_RIGHT; }
-        #elsif ( $c3 eq 'D' ) { return VK_LEFT; }
-        #elsif ( $c3 eq 'H' ) { return VK_HOME; }
+        #elsif ( $c2 eq 'A' ) { return VK_UP; }     vt 52
+        #elsif ( $c2 eq 'B' ) { return VK_DOWN; }
+        #elsif ( $c2 eq 'C' ) { return VK_RIGHT; }
+        #elsif ( $c2 eq 'D' ) { return VK_LEFT; }
+        #elsif ( $c2 eq 'H' ) { return VK_HOME; }
          elsif ( $c2 eq 'O' ) {
             my $c3 = _getc_wrapper( 0 );
             if    ( $c3 eq 'A' ) { return VK_UP; }

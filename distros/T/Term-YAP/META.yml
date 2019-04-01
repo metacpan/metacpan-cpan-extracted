@@ -4,15 +4,19 @@ author:
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
 build_requires:
   Capture::Tiny: '0.30'
+  File::Spec: '0'
+  IO::File: '0'
   Moose: '2.1604'
+  Test::Exception: '0.43'
   Test::Moose: '2.1604'
   Test::More: '0'
+  Test::TempDir::Tiny: '0.018'
   perl: '5.008009'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.008009'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,13 +25,13 @@ name: Term-YAP
 provides:
   Term::YAP:
     file: lib/Term/YAP.pm
-    version: '0.07'
+    version: '0.08'
   Term::YAP::Process:
     file: lib/Term/YAP/Process.pm
-    version: '0.07'
+    version: '0.08'
   Term::YAP::iThread:
     file: lib/Term/YAP/iThread.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Capture::Tiny: '0.30'
   Moo: '2.000002'
@@ -41,4 +45,6 @@ resources:
   bugtracker: https://github.com/glasswalk3r/Term-YAP/issues
   homepage: https://github.com/glasswalk3r/Term-YAP
   repository: https://github.com/glasswalk3r/Term-YAP.git
-version: '0.07'
+version: '0.08'
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

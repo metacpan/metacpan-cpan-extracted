@@ -1,3 +1,11 @@
+0.039		2019-03-29	T. R. Wyant
+    Fix test failures when local zone not determined. This was a single
+    test in t/format_template.t that attempted to use
+    DateTime::Calendar::Christian to format March 15, 44 BC. The problem
+    is referred from DateTime::TimeZone::Local, which can not determine
+    the local zone under Haiku, and dies. Thanks to Serguei Trouchelle
+    for the tests that exposed this.
+
 0.038		2019-03-13	T. R. Wyant
     The 'model' setting is no longer ignored. It is now actually applied
     to the TLE objects when loading them, and a change in value causes

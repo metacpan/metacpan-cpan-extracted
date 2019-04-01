@@ -65,33 +65,33 @@ sub test_unitTest_tree: Test(1) {
     my $t = $self->get('obj');
 
     $self->is($t->asText,Quiq::Unindent->string(q~
-    +--A
-       |
-       +--B
-       |  |
-       |  +--C
-       |  |  |
-       |  |  +--D
-       |  |
-       |  +--E
-       |  |
-       |  +--F
-       |     |
-       |     +--G
-       |        |
-       |        +--H
-       |
-       +--I
-       |
-       +--J
-       |  |
-       |  +--K
-       |  |
-       |  +--L
-       |
-       +--M
-          |
-          +--N
+        A
+        |
+        +--B
+        |  |
+        |  +--C
+        |  |  |
+        |  |  +--D
+        |  |
+        |  +--E
+        |  |
+        |  +--F
+        |     |
+        |     +--G
+        |        |
+        |        +--H
+        |
+        +--I
+        |
+        +--J
+        |  |
+        |  +--K
+        |  |
+        |  +--L
+        |
+        +--M
+           |
+           +--N
     ~));
 }
 
@@ -101,20 +101,20 @@ sub test_unitTest_debug: Test(1) {
     my $t = $self->get('obj');
 
     $self->is($t->asText(-format=>'debug'),Quiq::Unindent->string(q~
-    0 0 A
-    1 1   B
-    1 2     C
-    0 3       D
-    1 2     E
-    0 2     F
-    0 3       G
-    0 4         H
-    1 1   I
-    1 1   J
-    1 2     K
-    0 2     L
-    0 1   M
-    0 2     N
+        0 0 A
+        1 1   B
+        1 2     C
+        0 3       D
+        1 2     E
+        0 2     F
+        0 3       G
+        0 4         H
+        1 1   I
+        1 1   J
+        1 2     K
+        0 2     L
+        0 1   M
+        0 2     N
     ~));
 }
 
@@ -124,20 +124,20 @@ sub test_unitTest_compact: Test(1) {
     my $t = $self->get('obj');
 
     $self->is($t->asText(-format=>'compact'),Quiq::Unindent->string(q~
-    A
-      B
-        C
-          D
-        E
-        F
-          G
-            H
-      I
-      J
-        K
-        L
-      M
-        N
+        A
+          B
+            C
+              D
+            E
+            F
+              G
+                H
+          I
+          J
+            K
+            L
+          M
+            N
     ~));
 }
 

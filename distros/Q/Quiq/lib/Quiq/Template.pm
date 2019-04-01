@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Path;
 use Quiq::Option;
@@ -219,7 +219,7 @@ Ersetze alle Platzhalter durch ihre Werte. Platzhalter und
 Werte werden als Paare @keyVal übergeben.
 
 Der Wert kann ein String, eine Arrayrefernz, eine Codereferenz oder
-ein Template-Objekt sein. Siehe Methode L</value>().
+ein Template-Objekt sein. Siehe Methode L<value|"value() - Liefere Platzhalter-Wert als Zeichenkette">().
 
 Es wird für jeden Platzhalter mit einem Wert ungleich C<undef> geprüft,
 ob dieser im Template vorkommt. Wenn nicht, wird eine Exception geworfen.
@@ -262,7 +262,7 @@ Subroutine liefert Platzhalter-Wert:
 Die Subroutine, die den Wert des Platzhalters __ORDERLINES__ berechnet,
 liefert keinen String, sondern eine Referenz auf ein Array von
 Template-Objekten. Wie jeder Platzhalterwert wird dieser von der
-Methode $tpl->L</value>() in einen String (oder C<undef>) umgesetzt.
+Methode $tpl->L<value|"value() - Liefere Platzhalter-Wert als Zeichenkette">() in einen String (oder C<undef>) umgesetzt.
 
 =cut
 
@@ -442,7 +442,7 @@ sub key {
 
 =head4 Description
 
-Die Methode liefert die Zeichenkette $str zum (bei L</replace>()
+Die Methode liefert die Zeichenkette $str zum (bei L<replace|"replace() - Ersetze Platzhalter">()
 angegebenen) Platzhalter-Wert $arg.
 
 =over 4
@@ -463,7 +463,7 @@ Returnwerts.
 
 =item Template-Objekt:
 
-Rufe Methode L</asString>() des Objekts auf und liefere
+Rufe Methode L<asString|"asString() - Liefere Inhalt">() des Objekts auf und liefere
 das Resultat zurück.
 
 =back
@@ -803,7 +803,7 @@ sub asStringNL {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

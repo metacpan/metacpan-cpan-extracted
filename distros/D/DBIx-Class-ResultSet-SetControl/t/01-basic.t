@@ -283,4 +283,30 @@ ok $schema
     is $rs->first->id, $arg, "Did for $arg";
   },1);
 
-done_testing(147);
+
+$schema
+  ->resultset('Person')
+  ->map(\my @list, sub {
+      my ($i, $row) = @_;
+      return +{ id => $row->id };
+    });
+
+is_deeply \@list => [
+    {
+      id => 1,
+    },
+    {
+      id => 2,
+    },
+    {
+      id => 3,
+    },
+    {
+      id => 4,
+    },
+    {
+      id => 5,
+    },
+  ];
+
+done_testing(148);

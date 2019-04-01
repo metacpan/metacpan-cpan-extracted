@@ -9,6 +9,8 @@ use Test::Fatal;
 use Test::File::Contents;
 use File::Which;
 use Path::Tiny;
+use Log::Any::Test;
+use Log::Any qw($log);
 
 plan skip_all => 'reclass executable required' unless which('reclass');
 
@@ -61,6 +63,18 @@ file_contents_like $outdir->child('script.sh'),
 file_contents_like $outdir->child('script.sh'),
 	qr{\n _setvar /etc/default/acpi-support },
 	'script.sh strips "/target" prefix from paths';
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Resolving nodedir /, 'nodedir resolving logged' );
+$log->contains_ok( qr/^Classifying with reclass /, 'classification logged' );
+$log->category_contains_ok(
+	'Boxer::Task::Serialize',
+	qr/^Serializing to preseed /, 'preseed logged'
+);
+$log->category_contains_ok(
+	'Boxer::Task::Serialize',
+	qr/^Serializing to script /, 'script logged'
+);
+$log->empty_ok("no more logs");
 
 my $preseeddir = Path::Tiny->tempdir;
 note("Temporary directory for preseed format is $preseeddir");
@@ -76,6 +90,8 @@ my $to_preseed = new_ok(
 ok $to_preseed->run;
 ok -e $preseeddir->child('preseed.cfg'), 'preseed.cfg generated';
 ok !-e $preseeddir->child('script.sh'),  'script.sh not generated';
+$log->contains_ok( qr/^Serializing to preseed /, 'preseed logged' );
+$log->does_not_contain_ok( qr/^Serializing to /, 'no more logged' );
 
 my $scriptdir = Path::Tiny->tempdir;
 note("Temporary directory for script format is $scriptdir");
@@ -91,6 +107,8 @@ my $to_script = new_ok(
 ok $to_script->run;
 ok !-e $scriptdir->child('preseed.cfg'), 'preseed.cfg not generated';
 ok -e $scriptdir->child('script.sh'),    'script.sh generated';
+$log->contains_ok( qr/^Serializing to script /, 'script logged' );
+$log->does_not_contain_ok( qr/^Serializing to /, 'no more logged' );
 
 like exception {
 	Boxer::Task::Serialize->new(

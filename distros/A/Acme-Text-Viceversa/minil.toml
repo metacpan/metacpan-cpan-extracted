@@ -1,0 +1,6 @@
+name = "Acme-Text-Viceversa"
+badges = ["travis-ci.com", "metacpan"]
+authority="cpan:WORTHMINE"
+
+module_maker="ModuleBuildTiny"
+

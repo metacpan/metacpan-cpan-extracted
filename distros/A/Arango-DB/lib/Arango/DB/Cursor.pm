@@ -1,21 +1,18 @@
 # ABSTRACT: ArangoDB Cursor object
 package Arango::DB::Cursor;
-$Arango::DB::Cursor::VERSION = '0.003';
+$Arango::DB::Cursor::VERSION = '0.004';
 use warnings;
 use strict;
 
 use Data::Dumper;
 
-sub new {
+sub _new {
     my ($class, %opts) = @_;
     my $self = { arango => $opts{arango}, database => $opts{database} };
 
-    delete $opts{arango};
-
     my $ans = $self->{arango}->_api('create_cursor', \%opts);
-    $self->{results} = $ans;
 
-    return bless $self => $class;
+    return bless { %$ans, %$self } => $class;
 }
 
 1;
@@ -32,7 +29,7 @@ Arango::DB::Cursor - ArangoDB Cursor object
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 USAGE
 

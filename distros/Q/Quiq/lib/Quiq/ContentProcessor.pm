@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Path;
 use Quiq::Option;
@@ -59,19 +59,19 @@ die per registerType() registierten Entitäts-Klassen
 Entitäts-Strukturen auf, aus denen die Ausgabedateien generiert
 werden. Die Entitäts-Klassen sind nicht Teil des ContentProzessors.
 
-Bei Anwendung der Operation L</commit>() wird der Quelltext jeder
+Bei Anwendung der Operation L<commit|"commit() - Übertrage Änderungen in den Storage">() wird der Quelltext jeder
 Entität gegen den Stand im Storage verglichen. Im Falle einer
 Änderung wird die Entität als geändert gekennzeichnet, d.h. ihre
 Ausgabedateien müssen neu generiert werden.
 
 Das Resultat der Ausführung ist eine Menge von Entitäts-Objekten
 plus ihrem Änderungs-Status. Die Menge der Entitäts-Objekte kann
-mit der Methode L</entities>() abgefragt werden.
+mit der Methode L<entities|"entities() - Liste der geladenen Entities">() abgefragt werden.
 
 =head2 Universelles Plugin
 
 Ein I<Universelles Plugin> kann definiert werden, indem bei
-L</registerType>() nur $pluginClass und $extension als Argumente
+L<registerType|"registerType() - Registriere Entitäts-Typ">() nur $pluginClass und $extension als Argumente
 angegeben werden. An diese Plugin-Klasse werden alle
 (Haupt-)Abschnitts-Objekte delegiert, für die kein Plugin
 definiert ist. Logischerweise kann es höchstens ein Universelles
@@ -305,7 +305,7 @@ gespeichert, das vom ContentProcessor mit den instantiierten
 Entitäten verbunden wird.
 
 Es kann auch ein I<Universelles Plugin> definiert werden (siehe
-Abschnitt L</"Universelles Plugin">).
+Abschnitt L<Universelles Plugin|"Universelles Plugin">).
 
 =cut
 
@@ -708,7 +708,7 @@ Wird als Verzeichnis ein Bindestrich (-) angegeben, werden die
 Entitäts-Definitionen nach STDOUT geschrieben.
 
 Die Methode bezieht die zu schreibenden Dateien von der Methode
-L</filesToFetch>(), an die der Parameter $layout weiter gereicht
+L<filesToFetch|"filesToFetch() - Liste der Dateien für fetch">(), an die der Parameter $layout weiter gereicht
 wird. Die Methode kann in abgeleiteten Klassen überschrieben
 werden, um andere Strukturen zu generieren.
 
@@ -815,7 +815,7 @@ Array mit zweielementigen Arrays
 
 =head4 Description
 
-Liefere die Liste der Dateien, die von der Methode L</fetch>()
+Liefere die Liste der Dateien, die von der Methode L<fetch|"fetch() - Hole Entitäts-Definitionen aus dem Storage">()
 geschrieben werden. Jede Datei wird durch ein zweielementiges
 Array repräsentiert, bestehend aus einem Datei-Pfad sowie dem
 Datei-Inhalt. Der Datei-Inhalt kann als String oder
@@ -943,7 +943,7 @@ auf die Liste.
 =head4 Description
 
 Durchsuche Verzeichnis $dir nach Entitäts-Dateien unter Verwendung
-des Regex, der von L</extensionRegex>() geliefert wird.
+des Regex, der von L<extensionRegex|"extensionRegex() - Regex zum Auffinden von Eingabe-Dateien">() geliefert wird.
 
 =cut
 
@@ -1392,7 +1392,7 @@ sub msg {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

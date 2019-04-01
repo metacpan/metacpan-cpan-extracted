@@ -6,7 +6,7 @@ use Carp qw(croak);
 use POSIX qw(strftime);
 use Moo 2;
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 has [
     'number',

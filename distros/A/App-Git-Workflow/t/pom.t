@@ -56,11 +56,12 @@ sub pom_versions {
             [
                 { branch     => ['* master', '  origin/master', '  origin/veryold'] },
                 { config     => undef },
+                {'rev-parse' => "t/git" },
+                { config     => undef },
                 { log        => ($now - 1) . "\x{1}6ee992acaa81f6c90d9fa7e52898e33b00f6fa90" },
                 { show       => '<project><version>1.0.0-SNAPSHOT</version></project>' },
                 { log        => ($now - 2) . "\x{1}5ee992acaa81f6c90d9fa7e52898e33b00f6fa90" },
                 { show       => '<project><version>2.0.0-SNAPSHOT</version></project>' },
-                { log        => "1210113842\x{1}5ee992aca381f6c90d9fa7e52898e33b00f6fa90" },
             ],
             {
                 '2.0.0' => {master => '2.0.0-SNAPSHOT'},

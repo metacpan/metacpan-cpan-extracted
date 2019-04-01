@@ -8,8 +8,10 @@ META.json
 META.yml
 README
 dist.ini
+dist.ini~
 inc/Test/Run/Builder.pm
 lib/HTML/Latemp/News.pm
+lib/HTML/Latemp/News.pm~
 t/00-compile.t
 t/00-load.t
 weaver.ini

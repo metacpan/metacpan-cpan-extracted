@@ -8,11 +8,12 @@ package App::Git::Workflow::Command::Feature;
 
 use strict;
 use warnings;
+use version;
 use English qw/ -no_match_vars /;
 use App::Git::Workflow::Pom;
 use App::Git::Workflow::Command qw/get_options/;
 
-our $VERSION  = 1.1.1;
+our $VERSION  = version->new(1.1.2);
 our $workflow = App::Git::Workflow::Pom->new;
 our ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 our %option;
@@ -112,7 +113,7 @@ git-feature - Create a feature branch from the "current release"
 
 =head1 VERSION
 
-This documentation refers to git-feature version 1.1.1
+This documentation refers to git-feature version 1.1.2
 
 =head1 SYNOPSIS
 

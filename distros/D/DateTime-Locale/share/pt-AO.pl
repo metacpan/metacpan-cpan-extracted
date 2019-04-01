@@ -29,8 +29,8 @@
     MMM => "LLL",
     MMMEd => "E, d/MM",
     MMMMEd => "ccc, d 'de' MMMM",
-    "MMMMW-count-one" => "W.'\N{U+00aa}' 'semana' 'de' MMM",
-    "MMMMW-count-other" => "W.'\N{U+00aa}' 'semana' 'de' MMM",
+    "MMMMW-count-one" => "W.'\N{U+00aa}' 'semana' 'de' MMMM",
+    "MMMMW-count-other" => "W.'\N{U+00aa}' 'semana' 'de' MMMM",
     MMMMd => "d 'de' MMMM",
     MMMd => "d/MM",
     MMdd => "dd/MM",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

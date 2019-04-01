@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2018 A S Lewis
+# Copyright (C) 2011-2019 A S Lewis
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU
 # General Public License as published by the Free Software Foundation, either version 3 of the
@@ -68,7 +68,7 @@
         #                   placed. 'undef' in $workspaceObj->gridEnableFlag = FALSE
         #   $areaObj    - The GA::Obj::Area (a region of a workspace grid zone) which handles this
         #                   window. 'undef' in $workspaceObj->gridEnableFlag = FALSE
-        #   $winmap     - The ->name of the GA::Obj::Winmap object that specifies the Gtk2::Window's
+        #   $winmap     - The ->name of the GA::Obj::Winmap object that specifies the Gtk3::Window's
         #                   layout when it is first created. If 'undef', a default winmap is used
         #
         # Return values
@@ -142,22 +142,20 @@
             #   displayed in a 'dialogue' window)
             pseudoCmdMode               => 'win_error',
 
-            # The window widget. For most window objects, the Gtk2::Window. For pseudo-windows, the
-            #   parent 'main' window's Gtk2::Window
+            # The window widget. For most window objects, the Gtk3::Window. For pseudo-windows, the
+            #   parent 'main' window's Gtk3::Window
             # The code should use this IV when it wants to do something to the window itself
             #   (minimise it, make it active, etc)
             winWidget                   => undef,
-            # The window container. For most window objects, the Gtk2::Window. For pseudo-windows,
+            # The window container. For most window objects, the Gtk3::Window. For pseudo-windows,
             #   the parent GA::Table::PseudoWin table object
             # The code should use this IV when it wants to add, modify or remove widgets inside the
             #   window itself
             winBox                      => undef,
-            # The Gnome2::Wnck::Window, if known
-            wnckWin                     => undef,
             # Flag set to TRUE if the window actually exists (after a call to $self->winEnable),
             #   FALSE if not
             enabledFlag                 => FALSE,
-            # Flag set to TRUE if the Gtk2 window itself is visible (after a call to
+            # Flag set to TRUE if the Gtk3 window itself is visible (after a call to
             #   $self->setVisible), FALSE if it is not visible (after a call to $self->setInvisible)
             visibleFlag                 => TRUE,
             # Registry hash of 'free' windows (excluding 'dialogue' windows) for which this window
@@ -175,8 +173,8 @@
             #       (sub_name, argument_list_ref, sub_name, argument_list_ref...)
             childDestroyHash            => {},
 
-            # The container widget into which all other widgets are packed (usually a Gtk2::VBox or
-            #   Gtk2::HBox, but any container widget can be used; takes up the whole window client
+            # The container widget into which all other widgets are packed (usually a Gtk3::VBox or
+            #   Gtk3::HBox, but any container widget can be used; takes up the whole window client
             #   area)
             packingBox                  => undef,
 
@@ -196,7 +194,7 @@
             #   this window object is a real 'grid' window
             # NB 'main' windows can't be pseudo-windows, but 'protocol' and 'custom' windows can
             pseudoWinTableObj           => undef,
-            # The ->name of the GA::Obj::Winmap object that specifies the Gtk2::Window's layout when
+            # The ->name of the GA::Obj::Winmap object that specifies the Gtk3::Window's layout when
             #   it is first created. If 'undef', a default winmap is used
             winmap                      => $winmap,
 
@@ -259,7 +257,7 @@
 
             # The actual window size (in pixels). $self->winEnable sets up a ->signal_connect to
             #   react when the window size changes, but the same ->signal_connect fires when (for
-            #   example) text is written to a Gtk2::TextView
+            #   example) text is written to a Gtk3::TextView
             # The new size is stored in these IVs every time the ->signal_connect fires, so we can
             #   tell if the window's actual size has changed, or not
             actualWinWidth              => undef,
@@ -286,7 +284,7 @@
     sub winSetup {
 
         # Called by GA::Obj::Workspace->createGridWin or ->createSimpleGridWin
-        # Creates the Gtk2::Window itself
+        # Creates the Gtk3::Window itself
         #
         # Expected arguments
         #   (none besides $self)
@@ -294,7 +292,7 @@
         # Optional arguments
         #   $title      - The window title. If 'undef' or an empty string, a default title will be
         #                   used
-        #   $listRef    - Reference to a list of functions to call, just after the Gtk2::Window is
+        #   $listRef    - Reference to a list of functions to call, just after the Gtk3::Window is
         #                   created (can be used to set up further ->signal_connects, if this
         #                   window needs them)
         #
@@ -319,8 +317,8 @@
             return undef;
         }
 
-        # Create the Gtk2::Window
-        my $winWidget = Gtk2::Window->new('toplevel');
+        # Create the Gtk3::Window
+        my $winWidget = Gtk3::Window->new('toplevel');
         if (! $winWidget) {
 
             return undef;
@@ -396,7 +394,7 @@
 
         # Set the icon list for this window
         $iv = $self->winType . 'WinIconList';
-        $winWidget->set_icon_list($axmud::CLIENT->desktopObj->$iv);
+        $winWidget->set_icon_list($axmud::CLIENT->desktopObj->{$iv});
 
         # Draw the widgets used by this window
         if (! $self->drawWidgets()) {
@@ -412,14 +410,14 @@
     sub winEnable {
 
         # Called by GA::Obj::Workspace->createGridWin or ->createSimpleGridWin
-        # After the Gtk2::Window has been setup and moved into position, makes it visible and calls
+        # After the Gtk3::Window has been setup and moved into position, makes it visible and calls
         #   any further ->signal_connects that must be not be setup until the window is visible
         #
         # Expected arguments
         #   (none besides $self)
         #
         # Optional arguments
-        #   $listRef    - Reference to a list of functions to call, just after the Gtk2::Window is
+        #   $listRef    - Reference to a list of functions to call, just after the Gtk3::Window is
         #                   created (can be used to set up further ->signal_connects, if this
         #                   window needs them)
         #
@@ -439,13 +437,13 @@
         $self->winShowAll($self->_objClass . '->winEnable');
         $self->ivPoke('enabledFlag', TRUE);
 
-        # For windows about to be placed on a grid, briefly minimise the window so it doesn't
-        #   appear in the centre of the desktop before being moved to its correct workspace, size
-        #   and position
-        if ($self->workspaceGridObj && $self->winWidget eq $self->winBox) {
-
-            $self->winWidget->iconify();
-        }
+#        # For windows about to be placed on a grid, briefly minimise the window so it doesn't
+#        #   appear in the centre of the desktop before being moved to its correct workspace, size
+#        #   and position
+#        if ($self->workspaceGridObj && $self->winWidget eq $self->winBox) {
+#
+#            $self->minimise();
+#        }
 
         # Set up ->signal_connects that must not be set up until the window is visible
         $self->setConfigureEvent();         # 'configure-event'
@@ -469,7 +467,7 @@
         # Called by GA::Obj::WorkspaceGrid->stop or by any other function
         # Informs the window's strip objects of their imminent demise, informs the parent workspace
         #   grid (if this 'grid' window is on a workspace grid) and the desktop object, and then
-        #   destroys the Gtk2::Window (if it is open)
+        #   destroys the Gtk3::Window (if it is open)
         #
         # Expected arguments
         #   (none besides $self)
@@ -515,7 +513,7 @@
         # Inform the desktop object
         $axmud::CLIENT->desktopObj->del_gridWin($self);
 
-        # Destroy the Gtk2::Window
+        # Destroy the Gtk3::Window
         eval { $self->winBox->destroy(); };
         if ($@) {
 
@@ -601,7 +599,7 @@
     sub drawWidgets {
 
         # Called by $self->winSetup (also by $self->resetWinmap)
-        # Sets up the Gtk2::Window by drawing the strip objects and table objects specified by
+        # Sets up the Gtk3::Window by drawing the strip objects and table objects specified by
         #   $self->winmap (the name of a GA::Obj::Winmap object)
         #
         # Expected arguments
@@ -671,9 +669,9 @@
         # Create a packing box
         my $packingBox;
         if ($winmapObj->orientation eq 'top' || $winmapObj->orientation eq 'bottom') {
-            $packingBox = Gtk2::VBox->new(FALSE, 0);
+            $packingBox = Gtk3::VBox->new(FALSE, 0);
         } else {
-            $packingBox = Gtk2::HBox->new(FALSE, 0);
+            $packingBox = Gtk3::HBox->new(FALSE, 0);
         }
 
         $self->winBox->add($packingBox);
@@ -754,9 +752,9 @@
                         if ($stripObj->packingBox) {
 
                             if ($stripObj->allowFocusFlag) {
-                                $stripObj->packingBox->can_focus(TRUE);
+                                $stripObj->packingBox->set_can_focus(TRUE);
                             } else {
-                                $stripObj->packingBox->can_focus(FALSE);
+                                $stripObj->packingBox->set_can_focus(FALSE);
                             }
                         }
 
@@ -849,7 +847,7 @@
     sub redrawWidgets {
 
         # Can be called by anything
-        # Resets the Gtk2::Window by re-packing the strip objects in $self->stripList
+        # Resets the Gtk3::Window by re-packing the strip objects in $self->stripList
         # When called by $self->addStripObj, the new strip object will be packed for the first time.
         #   When called by $self->removeStripObj, the removed strip object won't be packed at all
         #
@@ -939,8 +937,8 @@
         $self->restrictMenuBars();
         $self->restrictToolbars();
 
-        # Any Gtk2::TextViews will now be using the colours of the most recently-created
-        #   Gtk2::TextView, not the colours that we want them to use. Update colours for all pane
+        # Any Gtk3::TextViews will now be using the colours of the most recently-created
+        #   Gtk3::TextView, not the colours that we want them to use. Update colours for all pane
         #   objects (GA::Table::Pane) before the forthcoming call to ->winShowAll
         $self->updateColourScheme(undef, TRUE);
 
@@ -1025,7 +1023,7 @@
                 # Halt the client
                 $axmud::CLIENT->stop();
 
-                # Allow Gtk2 to close the window directly
+                # Allow Gtk3 to close the window directly
                 return undef;
             });
 
@@ -1040,7 +1038,7 @@
                     return 1;
                 }
 
-                # Prevent Gtk2 from taking action directly. Instead redirect the request to
+                # Prevent Gtk3 from taking action directly. Instead redirect the request to
                 #   $self->winDestroy, which does things like resetting a portion of the workspace
                 #   grid, as well as actually destroying the window
                 return $self->winDestroy();
@@ -1085,7 +1083,7 @@
             );
 
             # Get the system keycode for this keypress
-            $keycode = Gtk2::Gdk->keyval_name($event->keyval);
+            $keycode = Gtk3::Gdk::keyval_name($event->keyval);
             # Translate it into a standard Axmud keycode
             $standard = $axmud::CLIENT->reverseKeycode($keycode);
 
@@ -1256,7 +1254,7 @@
 
             if ($paneObj) {
 
-                # Get the pane's visible tab and the scrollable Gtk2::Textview
+                # Get the pane's visible tab and the scrollable Gtk3::Textview
                 $tabObj = $paneObj->getVisibleTab();
                 if ($tabObj) {
 
@@ -1279,7 +1277,7 @@
                     $slice = $tabObj->textViewObj->buffer->get_slice($startIter, $endIter, FALSE);
                     if (defined $slice && $slice ne '') {
 
-                        $clipboard = Gtk2::Clipboard->get(Gtk2::Gdk->SELECTION_CLIPBOARD);
+                        $clipboard = Gtk3::Clipboard::get(Gtk3::Gdk::Atom::intern('CLIPBOARD', 0));
                         if ($clipboard) {
 
                             $clipboard->set_text($slice);
@@ -1304,9 +1302,9 @@
 
                 # Get the lowest and highest vertical positions of the scrollbar, and the distance
                 #   between them
-                $high = ($vAdjust->upper - $vAdjust->page_size);
-                $length = $high - $vAdjust->lower;
-                $modValue = $vAdjust->value;
+                $high = ($vAdjust->get_upper() - $vAdjust->get_page_size());
+                $length = $high - $vAdjust->get_lower();
+                $modValue = $vAdjust->get_value();
 
                 # Set the new position of the vertical scrollbar (assuming one is visible)
                 if ($length) {
@@ -1333,9 +1331,9 @@
 
                             # Scroll up
                             if (! $axmud::CLIENT->smoothScrollKeysFlag) {
-                                $modValue -= $vAdjust->page_size;
+                                $modValue -= $vAdjust->get_page_size();
                             } else {
-                                $modValue -= $vAdjust->page_increment;
+                                $modValue -= $vAdjust->get_page_increment();
                             }
 
                             if ($modValue < 0) {
@@ -1347,9 +1345,9 @@
 
                             # Scroll down
                             if (! $axmud::CLIENT->smoothScrollKeysFlag) {
-                                $modValue += $vAdjust->page_size;
+                                $modValue += $vAdjust->get_page_size();
                             } else {
-                                $modValue += $vAdjust->page_increment;
+                                $modValue += $vAdjust->get_page_increment();
                             }
 
                             if ($modValue > $high) {
@@ -1490,7 +1488,7 @@
             my ($keycode, $standard);
 
             # Get the system keycode for this keypress
-            $keycode = Gtk2::Gdk->keyval_name($event->keyval);
+            $keycode = Gtk3::Gdk::keyval_name($event->keyval);
             # Translate it into a standard Axmud keycode
             $standard = $axmud::CLIENT->reverseKeycode($keycode);
 
@@ -1545,9 +1543,6 @@
 
             my ($widget, $event) = @_;
 
-            # Local variables
-            my ($stripObj, $changeFlag);
-
             # Has the window size actually changed, or just its position?
             if (
                 ! defined $self->actualWinWidth            # Windows size checked for the first time
@@ -1556,7 +1551,6 @@
             ) {
                 $self->ivPoke('actualWinWidth', $event->width);
                 $self->ivPoke('actualWinHeight', $event->height);
-                $changeFlag = TRUE;
             }
 
             # Every textview object (GA::Obj::TextView) in this window must update its size IVs,
@@ -1567,17 +1561,6 @@
 
                     # Update the IVs once the changes have been rendered
                     $textViewObj->set_sizeUpdateFlag();
-                }
-            }
-
-            if ($changeFlag) {
-
-                # If a gauge box is visible, redraw gauges and update the GA::Client's hash of
-                #   stored window positions (if required)
-                $stripObj = $self->ivShow('firstStripHash', 'Games::Axmud::Strip::GaugeBox');
-                if ($stripObj && $stripObj->canvas) {
-
-                    $self->updateGauges();
                 }
             }
 
@@ -1628,20 +1611,7 @@
 
             my ($widget, $event) = @_;
 
-            # Local variables
-            my ($state, $stripObj);
-
-            $state = $event->changed_mask();
-            $stripObj = $self->ivShow('firstStripHash', 'Games::Axmud::Strip::GaugeBox');
-
-            if ($state =~ m/maximized/ && $stripObj && $stripObj->canvas) {
-
-                $stripObj->updateGauges();
-                $axmud::CLIENT->desktopObj->updateWidgets(
-                    $self->_objClass . '->setWindowStateEvent',
-                );
-
-                $stripObj->updateGauges();
+            if ($event->changed_mask() =~ m/maximized/) {
 
                 # This code makes sure textview(s) in pane object(s) are scrolled to the bottom
                 #   after un-maximising a window (otherwise, the scrollbar position moves
@@ -1663,7 +1633,7 @@
 
         # Called by $self->winEnable
         # Set up a ->signal_connect to watch out for the 'internal' window receiving the focus,
-        #   which should be redirected towards the GA::Strip::Entry object's Gtk2::Entry (if there
+        #   which should be redirected towards the GA::Strip::Entry object's Gtk3::Entry (if there
         #   is one)
         #
         # Expected arguments
@@ -1770,9 +1740,9 @@
 
         # Called by GA::Cmd::UpdateColourScheme->do (usually after a colour scheme is modified) and
         #   by GA::Cmd::SetXTerm->do (when the xterm colour cube is switched)
-        # Also called by $self->redrawWidgets, to neutralise Gtk2's charming tendency to redraw all
+        # Also called by $self->redrawWidgets, to neutralise Gtk3's charming tendency to redraw all
         #   our textviews the wrong colour
-        # Checks all textview objects in all pane objects in this window's Gtk2::Table and updates
+        # Checks all textview objects in all pane objects in this window's Gtk3::Grid and updates
         #   colours for any textview objects that use the specified colour scheme
         #
         # Expected arguments
@@ -1824,7 +1794,7 @@
 
         # Called by GA::Cmd::ApplyColourScheme->do
         # Applies a colour scheme to all textview objects in all pane objects in this window's
-        #   Gtk2::Table, replacing any colour schemes used before
+        #   Gtk3::Grid, replacing any colour schemes used before
         #
         # Expected arguments
         #   $colourScheme   - The name of the colour scheme to apply (matches a key in
@@ -1922,7 +1892,7 @@
         #
         # Return values
         #   'undef' on improper arguments or if there is no table object of the specified type in
-        #       the Gtk2::Table
+        #       the Gtk3::Grid
         #   Otherwise returns the table object of the specified type with the lowest ->number
 
         my ($self, $type, $check) = @_;
@@ -2570,8 +2540,6 @@
             # 'File' column
             'test_file',
             'show_files', 'show_file_meta',
-            # 'Display' column
-            'session_screenshot',
             # 'Axbasic' column
             'check_script', 'edit_script',
             # 'Plugins' column
@@ -3129,7 +3097,7 @@
             return undef;
         }
 
-        # Remove all strip objects (table objects in the compulsory Gtk2::Table are also destroyed)
+        # Remove all strip objects (table objects in the compulsory Gtk3::Grid are also destroyed)
         foreach my $stripObj ($self->ivValues('stripHash')) {
 
             $stripObj->objDestroy();
@@ -3140,7 +3108,7 @@
             }
         }
 
-        # Remove the Gtk2::HBox or Gtk2::VBox into which everything is packed
+        # Remove the Gtk3::HBox or Gtk3::VBox into which everything is packed
         $axmud::CLIENT->desktopObj->removeWidget($self->winBox, $self->packingBox);
 
         # Update IVs
@@ -3315,9 +3283,9 @@
         } else {
 
             if ($stripObj->allowFocusFlag) {
-                $stripObj->packingBox->can_focus(TRUE);
+                $stripObj->packingBox->set_can_focus(TRUE);
             } else {
-                $stripObj->packingBox->can_focus(FALSE);
+                $stripObj->packingBox->set_can_focus(FALSE);
             }
         }
 
@@ -3449,7 +3417,7 @@
 
         # Tell the strip object it's about to be removed, so it can do any necessary tidying up
         $stripObj->objDestroy();
-        # Remove the Gtk2 widget that's contains the whole strip
+        # Remove the Gtk3 widget that's contains the whole strip
         $axmud::CLIENT->desktopObj->removeWidget($self->packingBox, $stripObj->packingBox);
 
         # Remove the object by updating IVs
@@ -3495,6 +3463,19 @@
         # Make everything visible
         $self->winShowAll($self->_objClass . '->removeStripObj');
         $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->removeStripObj');
+
+        # Hack to resolve a Gtk3 issue, in which a white area appears at the bottom of textviews
+        #   when the gauge strip object is removed (and possibly in similar situations)
+        foreach my $tableObj ($self->tableStripObj->ivValues('tableObjHash')) {
+
+            if ($tableObj->type eq 'pane') {
+
+                foreach my $tabObj ($tableObj->ivValues('tabObjHash')) {
+
+                    $tabObj->textViewObj->insertNewLine();
+                }
+            }
+        }
 
         # Adding/removing widgets upsets the position of the scrollbar in each tab's textview.
         #   Make sure all the textviews are scrolled to the bottom
@@ -3671,7 +3652,7 @@
             return undef
         }
 
-        # Remove the Gtk2 widget that contains the whole strip
+        # Remove the Gtk3 widget that contains the whole strip
         $axmud::CLIENT->desktopObj->removeWidget($self->packingBox, $stripObj->packingBox);
         # Update IVs
         $stripObj->set_visibleFlag(FALSE);
@@ -3683,6 +3664,19 @@
         # Make everything visible
         $self->winShowAll($self->_objClass . '->hideStripObj');
         $axmud::CLIENT->desktopObj->updateWidgets($self->_objClass . '->hideStripObj');
+
+        # Hack to resolve a Gtk3 issue, in which a white area appears at the bottom of textviews
+        #   when the gauge strip object is removed (and possibly in similar situations)
+        foreach my $tableObj ($self->tableStripObj->ivValues('tableObjHash')) {
+
+            if ($tableObj->type eq 'pane') {
+
+                foreach my $tabObj ($tableObj->ivValues('tabObjHash')) {
+
+                    $tabObj->textViewObj->insertNewLine();
+                }
+            }
+        }
 
         # Adding/removing widgets upsets the position of the scrollbar in each tab's textview.
         #   Make sure all the textviews are scrolled to the bottom
@@ -3867,7 +3861,7 @@
         }
 
 
-        # Remove the old Gtk2 widget that contains the whole strip
+        # Remove the old Gtk3 widget that contains the whole strip
         $axmud::CLIENT->desktopObj->removeWidget($self->packingBox, $stripObj->packingBox);
         # Pack the newly-visible strip, leaving a gap if it's not at the beginning or end of the
         #   list

@@ -12,8 +12,8 @@ author.yml
 corpus/basic.xml
 dist.ini
 lib/Alien/Libxml2.pm
+maint/cip-before-install
 maint/tags-to-versions.pl
-maint/travis-install-mods
 t/00_diag.t
 t/alien_libxml2.t
 xt/author/eol.t

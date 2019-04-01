@@ -28,8 +28,8 @@
     MEd => "E, dd/MM",
     MMM => "LLL",
     MMMEd => "E, d-MMM",
-    "MMMMW-count-one" => "MMM, W-'hafta'",
-    "MMMMW-count-other" => "MMM, W-'hafta'",
+    "MMMMW-count-one" => "MMMM, W-'hafta'",
+    "MMMMW-count-other" => "MMMM, W-'hafta'",
     MMMMd => "d-MMMM",
     MMMd => "d-MMM",
     Md => "dd/MM",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

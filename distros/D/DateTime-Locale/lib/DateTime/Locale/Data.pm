@@ -20,11 +20,11 @@ use namespace::autoclean;
 
 use File::ShareDir qw( dist_file );
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 34;
+our $CLDRVersion = 35;
 ### :end CLDRVersion:
 #>>>
 
@@ -118,6 +118,8 @@ our %Codes = (
   "ccp-IN" => 1,
   ce => 1,
   "ce-RU" => 1,
+  ceb => 1,
+  "ceb-PH" => 1,
   cgg => 1,
   "cgg-UG" => 1,
   chr => 1,
@@ -165,6 +167,7 @@ our %Codes = (
   en => 1,
   "en-001" => 1,
   "en-150" => 1,
+  "en-AE" => 1,
   "en-AG" => 1,
   "en-AI" => 1,
   "en-AS" => 1,
@@ -596,6 +599,7 @@ our %Codes = (
   "prg-001" => 1,
   ps => 1,
   "ps-AF" => 1,
+  "ps-PK" => 1,
   pt => 1,
   "pt-AO" => 1,
   "pt-BR" => 1,
@@ -802,7 +806,7 @@ our %Names = (
   Albanian => "sq",
   "Albanian Albania" => "sq-AL",
   "Albanian Kosovo" => "sq-XK",
-  "Albanian Macedonia" => "sq-MK",
+  "Albanian North Macedonia" => "sq-MK",
   Amharic => "am",
   "Amharic Ethiopia" => "am-ET",
   Arabic => "ar",
@@ -888,6 +892,8 @@ our %Names = (
   "Catalan Italy" => "ca-IT",
   "Catalan Spain" => "ca-ES",
   "Catalan Spain Valencian" => "ca-ES-VALENCIA",
+  Cebuano => "ceb",
+  "Cebuano Philippines" => "ceb-PH",
   "Central Atlas Tamazight" => "tzm",
   "Central Atlas Tamazight Morocco" => "tzm-MA",
   "Central Kurdish" => "ckb",
@@ -906,8 +912,8 @@ our %Names = (
   "Chinese China Simplified" => "zh-Hans-CN",
   "Chinese Hong Kong SAR China Simplified" => "zh-Hans-HK",
   "Chinese Hong Kong SAR China Traditional" => "zh-Hant-HK",
-  "Chinese Macau SAR China Simplified" => "zh-Hans-MO",
-  "Chinese Macau SAR China Traditional" => "zh-Hant-MO",
+  "Chinese Macao SAR China Simplified" => "zh-Hans-MO",
+  "Chinese Macao SAR China Traditional" => "zh-Hant-MO",
   "Chinese Simplified" => "zh-Hans",
   "Chinese Singapore Simplified" => "zh-Hans-SG",
   "Chinese Taiwan Traditional" => "zh-Hant-TW",
@@ -966,6 +972,7 @@ our %Names = (
   "English Diego Garcia" => "en-DG",
   "English Dominica" => "en-DM",
   "English Eritrea" => "en-ER",
+  "English Eswatini" => "en-SZ",
   "English Europe" => "en-150",
   "English Falkland Islands" => "en-FK",
   "English Fiji" => "en-FJ",
@@ -989,7 +996,7 @@ our %Names = (
   "English Kiribati" => "en-KI",
   "English Lesotho" => "en-LS",
   "English Liberia" => "en-LR",
-  "English Macau SAR China" => "en-MO",
+  "English Macao SAR China" => "en-MO",
   "English Madagascar" => "en-MG",
   "English Malawi" => "en-MW",
   "English Malaysia" => "en-MY",
@@ -1027,7 +1034,6 @@ our %Names = (
   "English St. Lucia" => "en-LC",
   "English St. Vincent & Grenadines" => "en-VC",
   "English Sudan" => "en-SD",
-  "English Swaziland" => "en-SZ",
   "English Sweden" => "en-SE",
   "English Switzerland" => "en-CH",
   "English Tanzania" => "en-TZ",
@@ -1039,6 +1045,7 @@ our %Names = (
   "English U.S. Outlying Islands" => "en-UM",
   "English U.S. Virgin Islands" => "en-VI",
   "English Uganda" => "en-UG",
+  "English United Arab Emirates" => "en-AE",
   "English United Kingdom" => "en-GB",
   "English United States" => "en-US",
   "English United States Computer" => "en-US-POSIX",
@@ -1249,7 +1256,7 @@ our %Names = (
   Luyia => "luy",
   "Luyia Kenya" => "luy-KE",
   Macedonian => "mk",
-  "Macedonian Macedonia" => "mk-MK",
+  "Macedonian North Macedonia" => "mk-MK",
   Machame => "jmc",
   "Machame Tanzania" => "jmc-TZ",
   "Makhuwa-Meetto" => "mgh",
@@ -1324,6 +1331,7 @@ our %Names = (
   "Ossetic Russia" => "os-RU",
   Pashto => "ps",
   "Pashto Afghanistan" => "ps-AF",
+  "Pashto Pakistan" => "ps-PK",
   Persian => "fa",
   "Persian Afghanistan" => "fa-AF",
   "Persian Iran" => "fa-IR",
@@ -1336,7 +1344,7 @@ our %Names = (
   "Portuguese Equatorial Guinea" => "pt-GQ",
   "Portuguese Guinea-Bissau" => "pt-GW",
   "Portuguese Luxembourg" => "pt-LU",
-  "Portuguese Macau SAR China" => "pt-MO",
+  "Portuguese Macao SAR China" => "pt-MO",
   "Portuguese Mozambique" => "pt-MZ",
   "Portuguese Portugal" => "pt-PT",
   "Portuguese Switzerland" => "pt-CH",
@@ -1560,6 +1568,10 @@ our %NativeNames = (
   "Aghem K\N{U+00e0}m\N{U+00e0}l\N{U+00fb}\N{U+014b}" => "agq-CM",
   Akan => "ak",
   "Akan Gaana" => "ak-GH",
+  "As\N{U+1ee5}s\N{U+1ee5} Igbo" => "ig",
+  "As\N{U+1ee5}s\N{U+1ee5} Igbo Na\N{U+1ecb}j\N{U+1ecb}r\N{U+1ecb}a" => "ig-NG",
+  Cebuano => "ceb",
+  "Cebuano Pilipinas" => "ceb-PH",
   Chimakonde => "kde",
   "Chimakonde Tanzania" => "kde-TZ",
   Cymraeg => "cy",
@@ -1602,6 +1614,7 @@ our %NativeNames = (
   "English Diego Garcia" => "en-DG",
   "English Dominica" => "en-DM",
   "English Eritrea" => "en-ER",
+  "English Eswatini" => "en-SZ",
   "English Europe" => "en-150",
   "English Falkland Islands" => "en-FK",
   "English Fiji" => "en-FJ",
@@ -1625,7 +1638,7 @@ our %NativeNames = (
   "English Kiribati" => "en-KI",
   "English Lesotho" => "en-LS",
   "English Liberia" => "en-LR",
-  "English Macau SAR China" => "en-MO",
+  "English Macao SAR China" => "en-MO",
   "English Madagascar" => "en-MG",
   "English Malawi" => "en-MW",
   "English Malaysia" => "en-MY",
@@ -1663,7 +1676,6 @@ our %NativeNames = (
   "English St. Lucia" => "en-LC",
   "English St. Vincent & Grenadines" => "en-VC",
   "English Sudan" => "en-SD",
-  "English Swaziland" => "en-SZ",
   "English Sweden" => "en-SE",
   "English Switzerland" => "en-CH",
   "English Tanzania" => "en-TZ",
@@ -1675,6 +1687,7 @@ our %NativeNames = (
   "English U.S. Outlying Islands" => "en-UM",
   "English U.S. Virgin Islands" => "en-VI",
   "English Uganda" => "en-UG",
+  "English United Arab Emirates" => "en-AE",
   "English United Kingdom" => "en-GB",
   "English United States" => "en-US",
   "English United States Computer" => "en-US-POSIX",
@@ -1705,8 +1718,6 @@ our %NativeNames = (
   "Hibena Hutanzania" => "bez-TZ",
   Ichibemba => "bem",
   "Ichibemba Zambia" => "bem-ZM",
-  Igbo => "ig",
-  "Igbo Na\N{U+1ecb}j\N{U+1ecb}r\N{U+1ecb}a" => "ig-NG",
   Ikirundi => "rn",
   "Ikirundi Uburundi" => "rn-BI",
   Indonesia => "id",
@@ -1926,7 +1937,7 @@ our %NativeNames = (
   "espa\N{U+00f1}ol Uruguay" => "es-UY",
   "espa\N{U+00f1}ol Venezuela" => "es-VE",
   esperanto => "eo",
-  "esperanto 001" => "eo-001",
+  "esperanto Mondo" => "eo-001",
   euskara => "eu",
   "euskara Espainia" => "eu-ES",
   ewondo => "ewo",
@@ -2076,7 +2087,7 @@ our %NativeNames = (
   "sena Mo\N{U+00e7}ambique" => "seh-MZ",
   shqip => "sq",
   "shqip Kosov\N{U+00eb}" => "sq-XK",
-  "shqip Maqedoni" => "sq-MK",
+  "shqip Maqedonia e Veriut" => "sq-MK",
   "shqip Shqip\N{U+00eb}ri" => "sq-AL",
   "sloven\N{U+010d}ina" => "sk",
   "sloven\N{U+010d}ina Slovensko" => "sk-SK",
@@ -2098,8 +2109,8 @@ our %NativeNames = (
   vo => "vo",
   "vo 001" => "vo-001",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1}" => "yo",
+  "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Oril\N{U+1eb9}\N{U+0300}-\N{U+00e8}d\N{U+00e8} N\N{U+00e0}\N{U+00ec}j\N{U+00ed}r\N{U+00ed}\N{U+00e0}" => "yo-NG",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+025b}\N{U+0301}\N{U+00e8}de B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}" => "yo-BJ",
-  "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+1eb9}\N{U+0301}\N{U+00e8}de N\N{U+00e0}\N{U+00ec}j\N{U+00ed}r\N{U+00ed}\N{U+00e0}" => "yo-NG",
   "\N{U+00ed}slenska" => "is",
   "\N{U+00ed}slenska \N{U+00cd}sland" => "is-IS",
   "\N{U+010d}e\N{U+0161}tina" => "cs",
@@ -2125,7 +2136,7 @@ our %NativeNames = (
   "\N{U+043a}\N{U+044b}\N{U+0440}\N{U+0433}\N{U+044b}\N{U+0437}\N{U+0447}\N{U+0430}" => "ky",
   "\N{U+043a}\N{U+044b}\N{U+0440}\N{U+0433}\N{U+044b}\N{U+0437}\N{U+0447}\N{U+0430} \N{U+041a}\N{U+044b}\N{U+0440}\N{U+0433}\N{U+044b}\N{U+0437}\N{U+0441}\N{U+0442}\N{U+0430}\N{U+043d}" => "ky-KG",
   "\N{U+043c}\N{U+0430}\N{U+043a}\N{U+0435}\N{U+0434}\N{U+043e}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438}" => "mk",
-  "\N{U+043c}\N{U+0430}\N{U+043a}\N{U+0435}\N{U+0434}\N{U+043e}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+041c}\N{U+0430}\N{U+043a}\N{U+0435}\N{U+0434}\N{U+043e}\N{U+043d}\N{U+0438}\N{U+0458}\N{U+0430}" => "mk-MK",
+  "\N{U+043c}\N{U+0430}\N{U+043a}\N{U+0435}\N{U+0434}\N{U+043e}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0421}\N{U+0435}\N{U+0432}\N{U+0435}\N{U+0440}\N{U+043d}\N{U+0430} \N{U+041c}\N{U+0430}\N{U+043a}\N{U+0435}\N{U+0434}\N{U+043e}\N{U+043d}\N{U+0438}\N{U+0458}\N{U+0430}" => "mk-MK",
   "\N{U+043c}\N{U+043e}\N{U+043d}\N{U+0433}\N{U+043e}\N{U+043b}" => "mn",
   "\N{U+043c}\N{U+043e}\N{U+043d}\N{U+0433}\N{U+043e}\N{U+043b} \N{U+041c}\N{U+043e}\N{U+043d}\N{U+0433}\N{U+043e}\N{U+043b}" => "mn-MN",
   "\N{U+043d}\N{U+043e}\N{U+0445}\N{U+0447}\N{U+0438}\N{U+0439}\N{U+043d}" => "ce",
@@ -2211,11 +2222,12 @@ our %NativeNames = (
   "\N{U+067e}\N{U+0646}\N{U+062c}\N{U+0627}\N{U+0628}\N{U+06cc} \N{U+067e}\N{U+0627}\N{U+06a9}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646} \N{U+0639}\N{U+0631}\N{U+0628}\N{U+06cc}" => "pa-Arab-PK",
   "\N{U+067e}\N{U+069a}\N{U+062a}\N{U+0648}" => "ps",
   "\N{U+067e}\N{U+069a}\N{U+062a}\N{U+0648} \N{U+0627}\N{U+0641}\N{U+063a}\N{U+0627}\N{U+0646}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646}" => "ps-AF",
+  "\N{U+067e}\N{U+069a}\N{U+062a}\N{U+0648} \N{U+067e}\N{U+0627}\N{U+06a9}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646}" => "ps-PK",
   "\N{U+06a9}\N{U+0648}\N{U+0631}\N{U+062f}\N{U+06cc}\N{U+06cc} \N{U+0646}\N{U+0627}\N{U+0648}\N{U+06d5}\N{U+0646}\N{U+062f}\N{U+06cc}" => "ckb",
   "\N{U+06a9}\N{U+0648}\N{U+0631}\N{U+062f}\N{U+06cc}\N{U+06cc} \N{U+0646}\N{U+0627}\N{U+0648}\N{U+06d5}\N{U+0646}\N{U+062f}\N{U+06cc} \N{U+0626}\N{U+06ce}\N{U+0631}\N{U+0627}\N{U+0646}" => "ckb-IR",
   "\N{U+06a9}\N{U+0648}\N{U+0631}\N{U+062f}\N{U+06cc}\N{U+06cc} \N{U+0646}\N{U+0627}\N{U+0648}\N{U+06d5}\N{U+0646}\N{U+062f}\N{U+06cc} \N{U+0639}\N{U+06ce}\N{U+0631}\N{U+0627}\N{U+0642}" => "ckb-IQ",
   "\N{U+06a9}\N{U+0672}\N{U+0634}\N{U+064f}\N{U+0631}" => "ks",
-  "\N{U+06a9}\N{U+0672}\N{U+0634}\N{U+064f}\N{U+0631} \N{U+06c1}\N{U+0650}\N{U+0646}\N{U+065b}\N{U+062f}\N{U+0648}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646}" => "ks-IN",
+  "\N{U+06a9}\N{U+0672}\N{U+0634}\N{U+064f}\N{U+0631} \N{U+06c1}\N{U+0650}\N{U+0646}\N{U+062f}\N{U+0648}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646}" => "ks-IN",
   "\N{U+0915}\N{U+094b}\N{U+0902}\N{U+0915}\N{U+0923}\N{U+0940}" => "kok",
   "\N{U+0915}\N{U+094b}\N{U+0902}\N{U+0915}\N{U+0923}\N{U+0940} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "kok-IN",
   "\N{U+0928}\N{U+0947}\N{U+092a}\N{U+093e}\N{U+0932}\N{U+0940}" => "ne",
@@ -2423,6 +2435,7 @@ our %ISO639Aliases = (
   eng => "en",
   "eng-001" => "en-001",
   "eng-150" => "en-150",
+  "eng-AE" => "en-AE",
   "eng-AG" => "en-AG",
   "eng-AI" => "en-AI",
   "eng-AS" => "en-AS",
@@ -2755,6 +2768,7 @@ our %ISO639Aliases = (
   "por-TL" => "pt-TL",
   pus => "ps",
   "pus-AF" => "ps-AF",
+  "pus-PK" => "ps-PK",
   que => "qu",
   "que-BO" => "qu-BO",
   "que-EC" => "qu-EC",
@@ -2938,12 +2952,12 @@ my %LocaleData = (
       MMM => "LLL",
       MMMEd => "E\N{U+060c} d MMM",
       MMMMEd => "E\N{U+060c} d MMMM",
-      "MMMMW-count-few" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMM",
-      "MMMMW-count-many" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMM",
-      "MMMMW-count-one" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMM",
-      "MMMMW-count-other" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMM",
-      "MMMMW-count-two" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMM",
-      "MMMMW-count-zero" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMM",
+      "MMMMW-count-few" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMMM",
+      "MMMMW-count-many" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMMM",
+      "MMMMW-count-one" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMMM",
+      "MMMMW-count-other" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMMM",
+      "MMMMW-count-two" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMMM",
+      "MMMMW-count-zero" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} W \N{U+0645}\N{U+0646} MMMM",
       MMMMd => "d MMMM",
       MMMd => "d MMM",
       MMdd => "dd\N{U+200f}/MM",
@@ -3188,7 +3202,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   en => {
     am_pm_abbreviated => [
@@ -3460,7 +3474,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "en-CA" => {
     am_pm_abbreviated => [
@@ -3739,7 +3753,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "en-US" => {
     am_pm_abbreviated => [
@@ -4011,12 +4025,12 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   es => {
     am_pm_abbreviated => [
-      "a. m.",
-      "p. m.",
+      "a.\N{U+00a0}m.",
+      "p.\N{U+00a0}m.",
     ],
     available_formats => {
       Bh => "h B",
@@ -4048,8 +4062,8 @@ my %LocaleData = (
       MMM => "LLL",
       MMMEd => "E, d MMM",
       MMMMEd => "E, d 'de' MMMM",
-      "MMMMW-count-one" => "'semana' W 'de' MMM",
-      "MMMMW-count-other" => "'semana' W 'de' MMM",
+      "MMMMW-count-one" => "'semana' W 'de' MMMM",
+      "MMMMW-count-other" => "'semana' W 'de' MMMM",
       MMMMd => "d 'de' MMMM",
       MMMd => "d MMM",
       MMd => "d/M",
@@ -4294,7 +4308,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
@@ -4566,12 +4580,12 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   hi => {
     am_pm_abbreviated => [
-      "\N{U+092a}\N{U+0942}\N{U+0930}\N{U+094d}\N{U+0935}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}",
-      "\N{U+0905}\N{U+092a}\N{U+0930}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}",
+      "am",
+      "pm",
     ],
     available_formats => {
       Bh => "B h",
@@ -4599,8 +4613,8 @@ my %LocaleData = (
       MMM => "LLL",
       MMMEd => "E, d MMM",
       MMMMEd => "E, d MMMM",
-      "MMMMW-count-one" => "MMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
-      "MMMMW-count-other" => "MMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
+      "MMMMW-count-one" => "MMMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
+      "MMMMW-count-other" => "MMMM \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} W",
       MMMMd => "d MMMM",
       MMMd => "d MMM",
       MMdd => "dd/MM",
@@ -4842,7 +4856,7 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
@@ -5119,7 +5133,7 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
@@ -5396,7 +5410,7 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
@@ -5428,7 +5442,7 @@ my %LocaleData = (
       MEd => "M/dE",
       MMM => "LLL",
       MMMEd => "M\N{U+6708}d\N{U+65e5}E",
-      "MMMMW-count-other" => "MMM\N{U+7b2c}W\N{U+5468}",
+      "MMMMW-count-other" => "MMMM\N{U+7b2c}W\N{U+5468}",
       MMMMd => "M\N{U+6708}d\N{U+65e5}",
       MMMd => "M\N{U+6708}d\N{U+65e5}",
       MMdd => "MM/dd",
@@ -5668,7 +5682,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 34,
+    version => 35,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
@@ -5700,7 +5714,7 @@ my %LocaleData = (
       MEd => "M/d\N{U+ff08}E\N{U+ff09}",
       MMM => "LLL",
       MMMEd => "M\N{U+6708}d\N{U+65e5} E",
-      "MMMMW-count-other" => "MMM\N{U+7684}\N{U+7b2c}W\N{U+9031}",
+      "MMMMW-count-other" => "MMMM\N{U+7684}\N{U+7b2c}W\N{U+9031}",
       MMMMd => "M\N{U+6708}d\N{U+65e5}",
       MMMd => "M\N{U+6708}d\N{U+65e5}",
       MMdd => "MM/dd",
@@ -5940,7 +5954,7 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 34,
+    version => 35,
   },
 );
 ### :end LocaleData:
@@ -5999,7 +6013,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.23
+version 1.24
 
 =head1 DESCRIPTION
 
@@ -6024,7 +6038,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2018 by Dave Rolsky.
+This software is copyright (c) 2003 - 2019 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

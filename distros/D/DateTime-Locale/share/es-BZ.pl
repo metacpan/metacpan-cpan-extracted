@@ -33,8 +33,8 @@
     MMM => "LLL",
     MMMEd => "E, d MMM",
     MMMMEd => "E, d 'de' MMMM",
-    "MMMMW-count-one" => "'semana' W 'de' MMM",
-    "MMMMW-count-other" => "'semana' W 'de' MMM",
+    "MMMMW-count-one" => "'semana' W 'de' MMMM",
+    "MMMMW-count-other" => "'semana' W 'de' MMMM",
     MMMMd => "d 'de' MMMM",
     MMMd => "d MMM",
     MMMdd => "dd-MMM",
@@ -280,5 +280,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

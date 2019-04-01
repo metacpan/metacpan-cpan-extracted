@@ -1,6 +1,5 @@
 bin/convert2fb3.pl
 bin/cutfb3.pl
-bin/cutfb3.pl.mp3
 bin/fb3_2_json.pl
 bin/fb3_to_fb2.pl
 Build.PL

@@ -28,7 +28,7 @@
     MEd => "E, dd-MM",
     MMM => "LLL",
     MMMEd => "E, d MMM",
-    "MMMMW-count-other" => "'\N{U+04b3}\N{U+0430}\N{U+0444}\N{U+0442}\N{U+0430}\N{U+0438}' W, MMM",
+    "MMMMW-count-other" => "'\N{U+04b3}\N{U+0430}\N{U+0444}\N{U+0442}\N{U+0430}\N{U+0438}' W, MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "dd-MM",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

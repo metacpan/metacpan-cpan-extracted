@@ -1,0 +1,11 @@
+{
+    "Mdn"                    : "sync",
+    "MyId"                   : "B",
+    "PartnerId"              : "A",
+    "PartnerUrl"             : "http://127.0.0.1:{{PORT_A}}/receive/A2B/sync",
+    "MyKeyFile"              : "B.key",
+    "MyCertificateFile"      : "B.cert",
+    "PartnerCertificateFile" : "A.cert",
+    "Signature"              : "sha1",
+    "Encryption"             : "3des"
+}

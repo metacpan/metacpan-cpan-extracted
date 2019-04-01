@@ -10,4 +10,4 @@ tpt / testpattern             Opens the Pattern Test window
          them to your plugins or scripts.
          
    User commands:
-      tpt / testregex / testpattern
+      tpt / testregex / patterntest / testpattern

@@ -22,6 +22,7 @@
       "develop" : {
          "requires" : {
             "JSON::MaybeXS" : "0",
+            "Mojo::UserAgent" : "0",
             "MooseX::DataModel" : "0",
             "MooseX::Types::Path::Class" : "0",
             "Sort::Topological" : "0",
@@ -31,6 +32,7 @@
       "runtime" : {
          "requires" : {
             "JSON" : "0",
+            "Module::Find" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
             "MooseX::SlurpyConstructor" : "0",
@@ -60,7 +62,7 @@
          "web" : "https://github.com/pplu/cfn-perl"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.24.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
 }

@@ -29,8 +29,8 @@
     MMM => "LLL",
     MMMEd => "E d MMM",
     MMMMEd => "E d MMMM",
-    "MMMMW-count-one" => "'vecka' W 'i' MMM",
-    "MMMMW-count-other" => "'vecka' W 'i' MMM",
+    "MMMMW-count-one" => "'vecka' W 'i' MMMM",
+    "MMMMW-count-other" => "'vecka' W 'i' MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     MMd => "d/M",
@@ -272,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 34,
+  version => 35,
 }

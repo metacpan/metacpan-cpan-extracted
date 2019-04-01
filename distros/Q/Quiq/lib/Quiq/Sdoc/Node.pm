@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10.0;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Array;
 use Quiq::Converter;
@@ -41,7 +41,7 @@ Elementtyp. Folgende Elementtypen existieren:
 
 =head1 METHODS
 
-=head2 Accessors
+=head2 Akzessoren
 
 =head3 parent() - Liefere/Setze Elternknoten
 
@@ -667,7 +667,10 @@ sub linkSegment {
     }
     elsif ($format eq 'pod') {
         # Wenn Whitespace im Anker, in "..." einfassen
-        return $anchor =~ /\s/? qq|L</"$anchor">|: "L</$anchor>";
+        # return $anchor =~ /\s/? qq|L</"$anchor">|: "L</$anchor>";
+        my $node = $arr->[0];
+        my $title = $node->title;
+        return qq{L<$anchor|"$title">};
     }
 
     return $anchor;
@@ -863,7 +866,7 @@ sub tableOfContents {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 use v5.10.0;
 use utf8;
 
-our $VERSION = 1.135;
+our $VERSION = 1.137;
 
 use Quiq::Perl;
 
@@ -39,11 +39,11 @@ einzelnen Datenbank-Tabelle stammt.
 
 Die DML-Operationen (select, insert, update, delete) der Klasse
 operieren auf der Tabelle. Entsprechend definiert die Klasse einen
-Tabellennamen. Dieser wird von der Methode L</tableName>() geliefert.
+Tabellennamen. Dieser wird von der Methode L<tableName|"tableName() - Liefere Namen der Datenbanktabelle">() geliefert.
 
 Über eine Tabelle wird vorausgesetzt, dass diese eine
 Primärschlüssel-Kolumne besitzt. Deren Name wird von der Methode
-L</primaryKey>() geliefert.
+L<primaryKey|"primaryKey() - Liefere Namen der Primärschlüssel-Kolumne">() geliefert.
 
 =head1 METHODS
 
@@ -437,7 +437,7 @@ sub delete {
 
 =head1 VERSION
 
-1.135
+1.137
 
 =head1 AUTHOR
 

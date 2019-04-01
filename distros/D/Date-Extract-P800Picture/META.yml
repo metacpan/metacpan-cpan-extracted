@@ -5,7 +5,6 @@ author:
 build_requires:
   Perl::Critic: '0'
   Perl::Critic::StricterSubs: '0'
-  Test::CheckManifest: '1.01'
   Test::Kwalitee: '0'
   Test::More: '0.81'
   Test::Pod: '1'
@@ -14,7 +13,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +22,10 @@ name: Date-Extract-P800Picture
 provides:
   Date::Extract::P800Picture:
     file: lib/Date/Extract/P800Picture.pm
-    version: '0.108'
+    version: v1.1.1
   Date::Extract::P800Picture::Exceptions:
     file: lib/Date/Extract/P800Picture/Exceptions.pm
-    version: '0.108'
+    version: v1.1.1
 recommends:
   File::Basename: '0'
   Getopt::Long: '0'
@@ -45,5 +44,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/Date-Extract-P800Picture
-version: '0.108'
+version: v1.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
