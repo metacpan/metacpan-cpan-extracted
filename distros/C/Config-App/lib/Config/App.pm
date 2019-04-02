@@ -13,7 +13,7 @@ use JSON::XS ();
 use YAML::XS ();
 use POSIX ();
 
-our $VERSION = '1.09'; # VERSION
+our $VERSION = '1.11'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -38,7 +38,16 @@ sub import {
     }
 
     unshift( @INC, $root_dir . "/$_" ) for ( @libs || 'lib' );
-    eval { $self->new($location) };
+
+    my $error = do {
+        local $@;
+        eval {
+            $self->new($location);
+        };
+        $@;
+    };
+
+    die $error . "\n" if ($error);
     return;
 }
 
@@ -85,14 +94,17 @@ sub put {
     my $new_value = pop;
     my $path      = [@_];
     my $node      = pop @{$path};
-
-    eval {
-        my $data = $self->{_conf};
-        $data = $data->{$_} for ( @{$path} );
-        $data->{$node} = $new_value;
+    my $error     = do {
+        local $@;
+        eval {
+            my $data = $self->{_conf};
+            $data = $data->{$_} for ( @{$path} );
+            $data->{$node} = $new_value;
+        };
+        $@;
     };
 
-    return ($@) ? 0 : 1;
+    return ($error) ? 0 : 1;
 }
 
 sub conf {
@@ -245,41 +257,38 @@ sub _find_root_dir {
 
         my ( $config, @errors );
         for my $type (@types) {
-            if (
-                my $error = do {
-                    local $@;
-                    eval {
-                        if ( $type eq 'json' ) {
-                            $json_xs ||= JSON::XS->new
-                                ->utf8
-                                ->relaxed
-                                ->allow_nonref
-                                ->allow_unknown
-                                ->allow_blessed
-                                ->allow_tags;
+            my $error = do {
+                local $@;
+                eval {
+                    if ( $type eq 'json' ) {
+                        $json_xs ||= JSON::XS->new
+                            ->utf8
+                            ->relaxed
+                            ->allow_nonref
+                            ->allow_unknown
+                            ->allow_blessed
+                            ->allow_tags;
 
-                            $config = $json_xs->decode($raw_config);
-                        }
-                        else {
-                            $config = YAML::XS::Load($raw_config);
-                        }
-                    };
-                    $@;
-                }
-            ) {
-                push(
-                    @errors,
-                    'Failed to parse '
-                        . join( ' -> ', map { "\"$_\"" } @source_path, $location )
-                        . $_,
-                );
+                        $config = $json_xs->decode($raw_config);
+                    }
+                    else {
+                        $config = YAML::XS::Load($raw_config);
+                    }
+                };
+                $@;
+            };
+
+            if ($error) {
+                my $message =
+                    'Failed to parse ' .
+                    join( ' -> ', map { "\"$_\"" } @source_path, $location ) . '; ' .
+                    $error;
+                croak($message) if ( not $config );
+                carp($message);
             }
 
             last if ($config);
         }
-
-        croak @errors if ( @errors and not $config );
-        carp @errors if (@errors);
 
         return $config;
     }
@@ -320,7 +329,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.09
+version 1.11
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Config-App.svg)](https://travis-ci.org/gryphonshafer/Config-App)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Config-App/badge.png)](https://coveralls.io/r/gryphonshafer/Config-App)

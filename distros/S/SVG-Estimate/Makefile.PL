@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Image::SVG::Path" => "0.23",
     "Image::SVG::Transform" => "0.04",
     "List::MoreUtils" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.29",
     "Math::Trig" => 0,
     "Moo" => 0,
     "Ouch" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "XML::Hash::LX" => 0,
     "XML::LibXML" => 0
   },
-  "VERSION" => "1.0112",
+  "VERSION" => "1.0113",
   "test" => {
     "TESTS" => "t/*.t t/Path/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Image::SVG::Path" => "0.23",
   "Image::SVG::Transform" => "0.04",
   "List::MoreUtils" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.29",
   "Math::Trig" => 0,
   "Moo" => 0,
   "Ouch" => 0,

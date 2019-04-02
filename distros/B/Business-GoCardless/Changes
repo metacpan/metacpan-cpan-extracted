@@ -1,5 +1,8 @@
 Revision history for Business-GoCardless
 
+0.33     2019-04-02
+        - Fix support more legacy params in call to redirect flows
+
 0.32     2018-12-14
         - Fix PUT/POST requests when no content lenght (GH #13)
 

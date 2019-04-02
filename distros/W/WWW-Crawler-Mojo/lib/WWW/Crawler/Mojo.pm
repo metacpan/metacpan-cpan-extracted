@@ -8,7 +8,7 @@ use WWW::Crawler::Mojo::UserAgent;
 use WWW::Crawler::Mojo::ScraperUtil qw{
   collect_urls_css html_handler_presets reduce_html_handlers resolve_href decoded_body};
 use Mojo::Message::Request;
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 has clock_speed       => 0.25;
 has html_handlers     => sub { html_handler_presets() };
@@ -40,7 +40,8 @@ sub init {
   $self->on(
     'error',
     sub {
-      say sprintf("An error occured during crawling %s: %s", $_[2]->url, $_[1]);
+      say
+        sprintf("An error occured during crawling %s: %s", $_[2]->url, $_[1]);
     }
   ) unless $self->has_subscribers('error');
   $self->on('res', sub { $_[1]->() }) unless $self->has_subscribers('res');
@@ -194,12 +195,14 @@ sub _make_child {
 
 sub enqueue {
   my ($self, @jobs) = @_;
-  $self->queue->enqueue(WWW::Crawler::Mojo::Job->upgrade($_)) for @jobs;
+  return
+    map { $self->queue->enqueue(WWW::Crawler::Mojo::Job->upgrade($_)) } @jobs;
 }
 
 sub requeue {
   my ($self, @jobs) = @_;
-  $self->queue->requeue(WWW::Crawler::Mojo::Job->upgrade($_)) for @jobs;
+  return
+    map { $self->queue->requeue(WWW::Crawler::Mojo::Job->upgrade($_)) } @jobs;
 }
 
 sub _urls_redirect {
@@ -442,17 +445,18 @@ Stop crawling.
 
 =head2 enqueue
 
-Appends one or more URLs or L<WWW::Crawler::Mojo::Job> objects.
+Appends one or more URLs or L<WWW::Crawler::Mojo::Job> objects. Returns the jobs
+actually added.
 
-    $bot->enqueue('http://example.com/index1.html');
-
-OR
-
-    $bot->enqueue($job1, $job2);
+    my @jobs = $bot->enqueue('http://example.com/index1.html');
 
 OR
 
-    $bot->enqueue(
+    my @jobs = $bot->enqueue($job1, $job2);
+
+OR
+
+    my @jobs = $bot->enqueue(
         'http://example.com/index1.html',
         'http://example.com/index2.html',
         'http://example.com/index3.html',
@@ -461,7 +465,7 @@ OR
 =head2 requeue
 
 Appends one or more URLs or jobs for re-try. This accepts same arguments as
-enqueue method.
+enqueue method. Returns the jobs actually added.
 
     $self->on(error => sub {
         my ($self, $msg, $job) = @_;

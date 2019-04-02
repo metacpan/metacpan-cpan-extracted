@@ -1,0 +1,54 @@
+{
+   "abstract" : "A non-blocking Graphite metric writer using the Mojo stack",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Graphite-Writer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.026"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8.0",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Graphite::Writer" : {
+         "file" : "lib/Mojo/Graphite/Writer.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojo-Graphite-Writer/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojo-Graphite-Writer"
+      }
+   },
+   "version" : "0.02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

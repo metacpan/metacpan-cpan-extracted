@@ -29,4 +29,10 @@ has bo => (
     isa => HashRef,
 );
 
+has bop => (
+    is      => 'const',
+    isa     => HashRef[Int],
+    default => sub { { x => 1 } },
+);
+
 1;

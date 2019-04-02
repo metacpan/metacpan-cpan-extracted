@@ -1,0 +1,12 @@
+TYPEMAP
+string	T_CPPSTRING
+
+INPUT
+
+T_CPPSTRING
+	$var = ($type)SvPV_nolen($arg)
+
+OUTPUT
+
+T_CPPSTRING
+	sv_setpv((SV*)$arg, $var.c_str());

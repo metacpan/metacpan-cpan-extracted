@@ -23,6 +23,8 @@ WriteMakefile(
     "Devel::Cover" => 0,
     "Path::Tiny"   => 0,
   },
-
+  TEST_REQUIRES => {
+    "JSON::MaybeXS" => 0,
+  },
   test => {TESTS => 't/*.t'}
 );

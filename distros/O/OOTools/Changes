@@ -1,5 +1,15 @@
 OOTools Latest Versions Changes
 
+Version 2.41 - 2019-04-02
+- add Test::Pod to build requirements
+
+Version 2.30 - 2012-03-05
+- maintainance release fixing deprecated warnings and 
+  test case that was broken beause the used syntax for
+  accessing namespaces is not supported by perl anymore since
+  version 5.10
+- new maintainer is Sebastian Knapp <rock@ccls-online.de>
+
 Version 2.21
 - Little documentation improvement
 

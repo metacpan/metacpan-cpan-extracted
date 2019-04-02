@@ -90,7 +90,7 @@ resources:
   bugtracker: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders/issues
   homepage: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders
   repository: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders.git
-version: '0.000021'
+version: '0.000022'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -131,7 +131,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MAXMIND::TidyAll
       name: '@Author::OALDERS/MAXMIND::TidyAll'
-      version: '0.13'
+      version: '0.83'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Author::OALDERS/AutoPrereqs'
@@ -363,7 +363,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::OALDERS/Git::GatherDir'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromRelease
       config:
@@ -394,7 +394,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -414,6 +414,14 @@ x_Dist_Zilla:
       name: '@Author::OALDERS/ReadmeMdInBuild'
       version: '0.163250'
     -
+      class: Dist::Zilla::Plugin::StaticInstall
+      config:
+        Dist::Zilla::Plugin::StaticInstall:
+          dry_run: 1
+          mode: auto
+      name: '@Author::OALDERS/StaticInstall'
+      version: '0.012'
+    -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::OALDERS/ShareDir'
       version: '6.012'
@@ -421,6 +429,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::TravisCI::StatusBadge
       name: '@Author::OALDERS/TravisCI::StatusBadge'
       version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::CheckIssues
+      name: '@Author::OALDERS/CheckIssues'
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::OALDERS/ConfirmRelease'
@@ -468,7 +480,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
-          commit_msg: v%v%n%n%c
+          commit_msg: v%V%n%n%c
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -487,7 +499,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/release snapshot'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -495,16 +507,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000021
-          tag_format: v%v
-          tag_message: v%v
+          tag: v0.000022
+          tag_format: v%V
+          tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
           git_version: 2.20.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/Git::Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
       config:
@@ -541,7 +553,7 @@ x_Dist_Zilla:
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::OALDERS/@Git::VersionManager/post-release commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -553,7 +565,7 @@ x_Dist_Zilla:
           git_version: 2.20.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:

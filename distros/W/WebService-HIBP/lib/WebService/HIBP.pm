@@ -6,10 +6,12 @@ use JSON();
 use URI::Escape();
 use LWP::UserAgent();
 use Digest::SHA();
+use Encode();
+use Unicode::Normalize();
 use WebService::HIBP::Breach();
 use WebService::HIBP::Paste();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 sub _LENGTH_OF_PASSWORD_PREFIX { return 5; }
 
@@ -155,7 +157,10 @@ sub account {
 
 sub password {
     my ( $self, $password ) = @_;
-    my $sha1 = uc Digest::SHA::sha1_hex($password);
+    my $normalised = Unicode::Normalize::NFD($password)
+      ; # No API documentation on normalisation, chose NFD based on compatibility with the front end at https://haveibeenpwned.com/Passwords.
+    my $sha1 =
+      uc Digest::SHA::sha1_hex( Encode::encode( 'UTF-8', $normalised, 1 ) );
     my $url = $self->{password_url} . substr $sha1, 0,
       _LENGTH_OF_PASSWORD_PREFIX();
     my $response = $self->_get($url);
@@ -183,7 +188,7 @@ WebService::HIBP - An interface to the Have I Been Pwned webservice at haveibeen
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -347,11 +352,23 @@ WebService::HIBP requires no configuration files or environment variables.  Howe
 
 WebService::HIBP requires the following non-core modules
 
-  JSON
-  LWP::UserAgent
-  LWP::Protocol::https
-  URI::Escape
-  Digest::SHA
+=over
+
+=item  L<Encode|Encode>
+
+=item  L<Unicode::Normalize|Unicode::Normalize>
+
+=item  L<JSON|JSON>
+
+=item  L<LWP::UserAgent|LWP::UserAgent>
+
+=item  L<LWP::Protocol::https|LWP::Protocol::https>
+
+=item  L<URI::Escape|URI::Escape>
+
+=item  L<Digest::SHA|Digest::SHA>
+
+=back
 
 =head1 INCOMPATIBILITIES
 

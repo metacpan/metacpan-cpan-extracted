@@ -64,6 +64,6 @@
          "url" : "https://github.com/Humanstate/business-gocardless"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -47,6 +47,9 @@ print $fhb $foo__qux__myclass;
 close $fhb;
 
 eval qq[
+  # this is needed to avoid false passes if was done first without 'info'
+  use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
   use Inline CPP =>
     '$tdir/Foo__Qux__MyClass.c',
     filters   => 'Preprocess',
@@ -54,7 +57,8 @@ eval qq[
     classes   => {
       'Foo__Bar__MyClass' => 'Bar::MyClass',
       'Foo__Qux__MyClass' => 'Qux::MyClass'
-    };
+    },
+    force_build => 1, clean_after_build => 0;
 ];
 
 unlink "$tdir/Foo__Bar__MyClass.c", "$tdir/Foo__Qux__MyClass.c";

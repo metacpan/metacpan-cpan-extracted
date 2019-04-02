@@ -19,7 +19,7 @@ use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.8');
+our $VERSION = version->new('0.1.9');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -348,7 +348,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.8
+This documentation refers to App::VTide::Command::Run version 0.1.9
 
 =head1 SYNOPSIS
 

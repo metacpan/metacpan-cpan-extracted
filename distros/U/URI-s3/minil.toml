@@ -1,0 +1,4 @@
+name = "URI-s3"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

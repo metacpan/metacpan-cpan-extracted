@@ -14,7 +14,7 @@ sub dequeue {
 }
 
 sub enqueue {
-  shift->_enqueue(@_);
+  return shift->_enqueue(@_);
 }
 
 sub length {
@@ -38,12 +38,11 @@ sub _enqueue {
   my ($self, $job, $requeue) = @_;
   my $digest = $job->digest;
   my $redund = $self->redundancy_storage;
-  return if (!$requeue && $redund->{$digest});
-  delete($redund->{$self->dequeue->digest})
-    if ($self->cap && $self->cap < $self->length);
+  return if !$requeue  && $redund->{$digest};
+  return if $self->cap && $self->cap < $self->length;
   push(@{$self->jobs}, $job);
   $redund->{$digest} = 1;
-  return $self;
+  return $job;
 }
 
 1;

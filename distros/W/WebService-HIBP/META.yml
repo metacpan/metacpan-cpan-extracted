@@ -19,13 +19,15 @@ no_index:
     - inc
 requires:
   Digest::SHA: '0'
+  Encode: '0'
   JSON: '0'
   LWP::Protocol::https: '6.06'
   LWP::UserAgent: '0'
   URI: '1.53'
   URI::Escape: '3.3'
+  Unicode::Normalize: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

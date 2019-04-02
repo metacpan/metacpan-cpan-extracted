@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-use Test::PerlTidy;
+use Test::PerlTidy ();
 
 my @wanted_files = sort qw(
   Build.PL

@@ -1,0 +1,7 @@
+Revision history for Perl module Mojo::Graphite::Writer
+
+0.02 2019-04-01
+  - Bugfix
+
+0.01 2019-04-01
+  - Initial release

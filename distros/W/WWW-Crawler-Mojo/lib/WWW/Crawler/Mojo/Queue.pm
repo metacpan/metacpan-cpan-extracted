@@ -43,7 +43,8 @@ Shifts the oldest job and returns it.
 
     $queue->enqueue($job);
 
-Pushes a job unless the job has been already pushed before.
+Pushes a job unless the job has been already pushed before. Returns the job if
+actually enqueued otherwise returns undef.
 
 =head2 next
 

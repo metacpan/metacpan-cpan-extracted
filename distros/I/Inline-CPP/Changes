@@ -1,5 +1,15 @@
 Revision history for Perl extension Inline::CPP.
 
+0.79
+  - Whitespace cleanup in POD.
+  - support Perl 5.8.1
+  - show how to use typemaps - fix #36
+  - doc tweak - fix #46
+  - Better handling of PRD <1.90 - fix #47
+  - just use EU::CppG, not roll own
+  - make I::CPP data structure right for I::C::info - fix #45
+  - fix problem with abstract classes that had constructors
+
 0.75 2018-09-18
   - Fix info (print_info) to call super. (https://github.com/daoswald/Inline-CPP/issues/40)
 

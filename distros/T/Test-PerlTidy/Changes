@@ -1,5 +1,11 @@
 CHANGES
 
+20190402        2019-04-02
+
+            * Fix https://github.com/shlomif/Test-PerlTidy/issues/2
+                $VERSION overrided the one set by dzil
+            * Made the "use" imports explicit.
+
 20190309.001    2019-03-09
 
             * Fix for minimal Perl::Tidy version in META.yml

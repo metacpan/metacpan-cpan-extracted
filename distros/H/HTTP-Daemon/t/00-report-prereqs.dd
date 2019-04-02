@@ -55,12 +55,11 @@ do { my $x = {
                    'requires' => {
                                    'File::Spec' => '0',
                                    'IO::Socket::INET' => '0',
-                                   'LWP::RobotUA' => '0',
-                                   'LWP::UserAgent' => '0',
                                    'Module::Metadata' => '0',
                                    'Socket' => '0',
                                    'Test' => '0',
                                    'Test::More' => '0',
+                                   'Test::Needs' => '0',
                                    'URI' => '0',
                                    'perl' => '5.006'
                                  }

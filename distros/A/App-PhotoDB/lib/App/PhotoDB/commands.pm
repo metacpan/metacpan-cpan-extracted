@@ -62,6 +62,10 @@ Add a new mount adapter to the database
 
 Add a new projector to the database
 
+=head3 accessory search
+
+Search for an accessory
+
 =head3 accessory teleconverter
 
 Add a new teleconverter to the database
@@ -83,6 +87,7 @@ Add a new category of general accessory to the database
 		'projector'     => { 'handler' => \&projector_add,      'desc' => 'Add a new projector to the database' },
 		'teleconverter' => { 'handler' => \&teleconverter_add,  'desc' => 'Add a new teleconverter to the database' },
 		'category'      => { 'handler' => \&accessory_category, 'desc' => 'Add a new category of general accessory to the database' },
+		'search'        => { 'handler' => \&accessory_search,   'desc' => 'Search for an accessory' },
 	};
 
 =head2 archive
@@ -194,6 +199,10 @@ Add available metering mode info to a camera
 
 Repair a camera
 
+=head3 camera search
+
+Search for a camera
+
 =head3 camera sell
 
 Sell a camera
@@ -217,6 +226,7 @@ Add available shutter speed info to a camera
 		'info'            => { 'handler' => \&camera_info,            'desc' => 'Show information about a camera' },
 		'meteringmode'    => { 'handler' => \&camera_meteringmode,    'desc' => 'Add available metering mode info to a camera' },
 		'repair'          => { 'handler' => \&camera_repair,          'desc' => 'Repair a camera' },
+		'search'          => { 'handler' => \&camera_search,          'desc' => 'Search for a camera' },
 		'sell'            => { 'handler' => \&camera_sell,            'desc' => 'Sell a camera' },
 		'show-lenses'     => { 'handler' => \&notimplemented,         'desc' => 'Not yet implemented' },
 		'shutterspeeds'   => { 'handler' => \&camera_shutterspeeds,   'desc' => 'Add available shutter speed info to a camera' },
@@ -392,6 +402,10 @@ Load a film into a camera
 
 Locate where this film is
 
+=head3 film search
+
+Search for a film
+
 =head3 film stocks
 
 List the films that are currently in stock
@@ -411,6 +425,7 @@ Write EXIF tags to scans from a film
 		'info'     => { 'handler' => \&film_info,     'desc' => 'Show information about a film' },
 		'load'     => { 'handler' => \&film_load,     'desc' => 'Load a film into a camera' },
 		'locate'   => { 'handler' => \&film_locate,   'desc' => 'Locate where this film is' },
+		'search'   => { 'handler' => \&film_search,   'desc' => 'Search for a film' },
 		'stocks'   => { 'handler' => \&film_stocks,   'desc' => 'List the films that are currently in stock' },
 		'tag'      => { 'handler' => \&film_tag,      'desc' => 'Write EXIF tags to scans from a film' },
 	};
@@ -439,6 +454,10 @@ Show information about a lens
 
 Repair a lens
 
+=head3 lens search
+
+Search for a lens
+
 =head3 lens sell
 
 Sell a lens
@@ -450,6 +469,7 @@ Sell a lens
 		'edit'      => { 'handler' => \&lens_edit,      'desc' => 'Edit an existing lens' },
 		'info'      => { 'handler' => \&lens_info,      'desc' => 'Show information about a lens' },
 		'repair'    => { 'handler' => \&lens_repair,    'desc' => 'Repair a lens' },
+		'search'    => { 'handler' => \&lens_search,    'desc' => 'Search for a lens' },
 		'sell'      => { 'handler' => \&lens_sell,      'desc' => 'Sell a lens' },
 	};
 
@@ -539,6 +559,10 @@ Show information about a negative
 
 Find all prints made from a negative
 
+=head3 negative search
+
+Search for a negative
+
 =head3 negative tag
 
 Write EXIF tags to scans from a negative
@@ -549,6 +573,7 @@ Write EXIF tags to scans from a negative
 		'bulk-add' => { 'handler' => \&negative_bulkadd, 'desc' => 'Bulk add multiple negatives to the database as part of a film' },
 		'info'     => { 'handler' => \&negative_info,    'desc' => 'Show information about a negative' },
 		'prints'   => { 'handler' => \&negative_prints,  'desc' => 'Find all prints made from a negative' },
+		'search'   => { 'handler' => \&negative_search,  'desc' => 'Search for a negative' },
 		'tag'      => { 'handler' => \&negative_tag,     'desc' => 'Write EXIF tags to scans from a negative' },
 	};
 

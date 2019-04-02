@@ -3,10 +3,7 @@ package ILCPPConfig::OldCompilerGuess;
 use strict;
 use warnings;
 use Config;
-use Exporter;
 
-our @ISA       = 'Exporter';
-our @EXPORT_OK = 'guess_compiler';
 our $VERSION   = '0.01';
 
 # This is the logic we used to keep in Makefile.PL that was used to make an

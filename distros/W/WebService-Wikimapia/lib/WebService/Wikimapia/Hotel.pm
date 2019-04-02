@@ -1,6 +1,6 @@
 package WebService::Wikimapia::Hotel;
 
-$WebService::Wikimapia::Hotel::VERSION   = '0.13';
+$WebService::Wikimapia::Hotel::VERSION   = '0.14';
 $WebService::Wikimapia::Hotel::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::Hotel - Placeholder for 'hotel' of L<WebService::Wikimapi
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'name'         => (is => 'ro');
 has 'title'        => (is => 'ro');

@@ -7,7 +7,7 @@
 ^.gitignore$
 
 # Makemaker generated files and dirs.
-^MANIFEST\.
+^MANIFEST\.bak
 ^Makefile$
 ^blib/
 ^MakeMaker-\d
@@ -29,3 +29,6 @@
 MYMETA\b
 ^Inline-CPP-\d+\.\d+/
 \.perltidyrc
+^lib/Inline/CPP/Config.pm$
+\.swp$
+^\.travis\.yml$

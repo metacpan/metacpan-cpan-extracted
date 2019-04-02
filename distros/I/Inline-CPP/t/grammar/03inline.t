@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 # Testing proper handling of functions defined inline within a class.
 
 use Inline 'CPP';

@@ -1,3 +1,5 @@
+use Test::Needs 'LWP::RobotUA';
+
 if($^O eq "MacOS") {
     print "1..0\n";
     exit(0);
@@ -64,7 +66,6 @@ sub url {
 
 print "Will access HTTP server at $base\n";
 
-require LWP::RobotUA;
 require HTTP::Request;
 $ua = new LWP::RobotUA 'lwp-spider/0.1', 'gisle@aas.no';
 $ua->delay(0.05);  # rather quick robot

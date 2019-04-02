@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Test-PerlTidy",
-  "dist_version" => "20190309.001",
+  "dist_version" => 20190402,
   "license" => "perl",
   "module_name" => "Test::PerlTidy",
   "recursive_test_files" => 1,

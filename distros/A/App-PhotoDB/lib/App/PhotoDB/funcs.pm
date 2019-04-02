@@ -23,8 +23,9 @@ use YAML;
 use Image::ExifTool;
 use Term::ReadLine;
 use Term::ReadLine::Perl;
+use File::Basename;
 
-our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term);
+our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci);
 
 =head2 prompt
 
@@ -289,7 +290,7 @@ sub db {
 	use DB::SQL::Migrations;
 	my $migrator = DB::SQL::Migrations->new(dbh=>$dbh, migrations_directory=>'migrations');
 
-	print "Checking database schema... ";
+	print "Checking database schema... \n";
 
 	# Creates migrations table if it doesn't exist
 	$migrator->create_migrations_table();
@@ -381,7 +382,7 @@ sub updaterecord {
 	# Execute query
 	my $sth = $db->prepare($stmt);
 	my $rows = $sth->execute(@bind);
-	$rows = 0 if ($rows eq  '0E0');
+	$rows = &unsci($rows);
 	print "Updated $rows rows\n" unless $silent;
 	&logger({db=>$db, type=>'EDIT', message=>"$table $rows rows"}) if $log;
 	return $rows;
@@ -454,7 +455,7 @@ sub deleterecord {
 	# Execute query
 	my $sth = $db->prepare($stmt);
 	my $rows = $sth->execute(@bind);
-	$rows = 0 if ($rows eq  '0E0');
+	$rows = &unsci($rows);
 	print "Deleted $rows rows\n" unless $silent;
 	&logger({db=>$db, type=>'DELETE', message=>"$table $rows rows"}) if $log;
 	return $rows;
@@ -775,7 +776,7 @@ Print arbitrary rows from the database as an easy way of displaying data
 
 =head4 Returns
 
-Nothing
+Integer representing the number of rows printed
 
 =cut
 
@@ -799,6 +800,7 @@ sub printlist {
 		my($stmt, @bind) = $sql->select($table, $cols, $where, $order);
 		$sth = $db->prepare($stmt);
 		$rows = $sth->execute(@bind);
+		$rows = &unsci($rows);
 	} else {
 		print "Must pass in table, cols, where\n";
 		return;
@@ -807,7 +809,7 @@ sub printlist {
 	while (my $ref = $sth->fetchrow_hashref) {
 		print "\t$ref->{id}\t$ref->{opt}\n";
 	}
-	return;
+	return $rows;
 }
 
 # Return values from an arbitrary column from database as an arrayref
@@ -1070,8 +1072,7 @@ sub updatedata {
 	my $query = shift;	# Plain SQL query
 	my $sth = $db->prepare($query) or die "Couldn't prepare statement: " . $db->errstr;
 	my $rows = $sth->execute();
-	# DBD returns scientific 0E0 instead of 0
-	$rows = 0 if ($rows eq '0E0');
+	$rows = &unsci($rows);
 	return $rows;
 }
 
@@ -1213,6 +1214,13 @@ sub writeconfig {
 		die "filename '$inifile' has invalid characters.\n";
 	}
 	$inifile = $1;
+
+	# Check for existence of config dir
+	my $dir = dirname($inifile);
+	if (!-d $dir) {
+		# Create it if necessary
+		mkdir $dir or die "Can't create config directory $dir";
+	}
 
 	my %inidata;
 	$inidata{'database'}{'host'} = &prompt({default=>'localhost', prompt=>'Database hostname or IP address', type=>'text'});
@@ -1719,9 +1727,10 @@ sub tag {
 	# Prepare and execute the SQL
 	my $sth = $db->prepare($stmt) or die "Couldn't prepare statement: " . $db->errstr;
 	my $rows = $sth->execute(@bind);
+	$rows - &unsci($rows);
 
 	# Get confirmation
-	if ($rows eq  '0E0') {
+	if ($rows == 0) {
 		print "No scans be will tagged\n";
 		return;
 	}
@@ -2005,6 +2014,31 @@ sub dbfiles {
 	@dbfiles = grep {$_} @dbfiles;
 
 	return @dbfiles;
+}
+
+
+=head2 unsci
+
+DBD returns integer zero in scientific format as 0E0. This rewrites it.
+
+=head4 Usage
+
+    $int = &unsci($int);
+
+=head4 Arguments
+
+=item * C<$int> an integer returned by DBD
+
+=head4 Returns
+
+The same integer as passed in, except with string 0E0 rewritten as integer 0
+
+=cut
+
+sub unsci {
+	my $int = shift;
+	$int = 0 if ($int eq '0E0');
+	return $int;
 }
 
 # This ensures the lib loads smoothly

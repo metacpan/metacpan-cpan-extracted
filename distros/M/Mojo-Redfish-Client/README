@@ -1,0 +1,121 @@
+NAME
+
+    Mojo::Redfish::Client - A Redfish client with a Mojo flair
+
+SYNOPSIS
+
+      my $client = Mojo::Redfish::Client->new(host => '192.168.0.1');
+      my $system = $client->root->get('/Systems')->get('/Members')->first;
+      my $name   = $system->value('/Name');
+      say "Name: $name";
+
+DESCRIPTION
+
+    Redfish <https://redfish.dmtf.org/> is a modern standards-based system
+    for querying computer systems for information. It replaces the existing
+    IPMI "standard", such as it was, both in standardization and in using
+    JSON over HTTP rather than binary protocols.
+
+    Mojo::Redfish::Client is, as the name suggests, a client for Redfish.
+    It works to smooth out some of the common pain points of working with
+    Redfish, especially the task of walking the data structure to find
+    relevant information.
+
+    This is still a work-in-progress, however the author uses it in work
+    application so every effort will be made to keep the api reasonably
+    stable while improving where possible.
+
+ATTRIBUTES
+
+    Mojo::Redfish::Client inherits all attributes from Mojo::Base and
+    implements the following new ones.
+
+ host
+
+    The Redfish host. Required.
+
+ password
+
+    Password used for authentication by the default "ua" (with "username").
+
+ ssl
+
+    If true, the default "ua" will establish the connection using SSL/TLS.
+    Default is true.
+
+ token
+
+    Session token to be used by the default "ua", overrides "username" and
+    "password".
+
+ ua
+
+    The instance of Mojo::UserAgent used to make requests. The default is
+    an instance which subscribes to "prepare" in Mojo::UserAgent to set
+    authentication and ssl.
+
+ username
+
+    Username used for authentication by the default "ua" (with "password").
+
+METHODS
+
+    Mojo::Redfish::Client inherits all methods from Mojo::Base and
+    implements the following new ones.
+
+get
+
+      my $result = $client->get('/redfish/v1/Systems');
+
+    Requests the requested url via the "ua". Returns an instance of
+    Mojo::Redfish::Client::Result. Dies on errors (the exact exception and
+    behavior is subject to change).
+
+root
+
+      my $result = $client->root;
+
+    Requests the Redfish root url (/redfish/v1) from the "host" via "get"
+    or fetches a cached copy. Caches and returns the result.
+
+      # same as (except for the caching)
+      my $result = $client->get('/redfish/v1');
+
+FUTURE WORK
+
+    This module is still in early development. Future work will include
+
+      * Non-blocking (promise-based) api
+
+      * Session management
+
+      * Testing
+
+SEE ALSO
+
+    https://redfish.dmtf.org.
+
+THANKS
+
+    This module's development was sponsored by ServerCentral Turing Group
+    <https://www.servercentral.com/>.
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Mojo-Redfish-Client
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+CONTRIBUTORS
+
+    None yet.
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2019 by "AUTHOR" and "CONTRIBUTORS"
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

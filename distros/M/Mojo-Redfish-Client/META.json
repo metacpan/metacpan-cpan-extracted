@@ -1,0 +1,56 @@
+{
+   "abstract" : "A Redfish client with a Mojo flair",
+   "author" : [
+      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.026",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojo-Redfish-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.026"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "8.03"
+         }
+      }
+   },
+   "provides" : {
+      "Mojo::Redfish::Client" : {
+         "file" : "lib/Mojo/Redfish/Client.pm",
+         "version" : "0.01"
+      },
+      "Mojo::Redfish::Client::Result" : {
+         "file" : "lib/Mojo/Redfish/Client/Result.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/Mojo-Redfish-Client/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/Mojo-Redfish-Client"
+      }
+   },
+   "version" : "0.01",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

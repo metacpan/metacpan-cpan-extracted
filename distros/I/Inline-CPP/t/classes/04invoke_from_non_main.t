@@ -3,7 +3,8 @@ package Bur; ## no critic (package)
 use strict;
 use warnings;
 
-use Inline CPP => config => namespace => '' => classes => { 'Fuu' => 'MyFuu'};
+use Inline CPP => config => namespace => '' => classes => { 'Fuu' => 'MyFuu'},
+  force_build => 1, clean_after_build => 0;
 
 use Inline CPP => <<'EOCPP';
 

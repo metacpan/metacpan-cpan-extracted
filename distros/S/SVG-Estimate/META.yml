@@ -18,7 +18,7 @@ requires:
   Image::SVG::Path: '0.23'
   Image::SVG::Transform: '0.04'
   List::MoreUtils: '0'
-  List::Util: '0'
+  List::Util: '1.29'
   Math::Trig: '0'
   Moo: '0'
   Ouch: '0'
@@ -30,6 +30,6 @@ requires:
 resources:
   bugtracker: http://github.com/rizen/SVG-Estimate/issues
   repository: git://github.com/rizen/SVG-Estimate.git
-version: '1.0112'
+version: '1.0113'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

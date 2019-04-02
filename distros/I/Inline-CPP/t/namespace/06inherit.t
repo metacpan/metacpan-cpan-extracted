@@ -5,9 +5,9 @@ package Foo;
 use strict;
 use warnings;
 
-# Notice, case insensitive 'config'. Let's keep it that way in support of
-# t/15config_case.t
-use Inline CPP => config => namespace => '';
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0,
+  namespace => '';
 
 use Inline CPP => <<'EOCPP';
 

@@ -10,6 +10,7 @@ config/alt.yaml
 config/app.yaml
 config/app_optional.yaml
 config/app_optional_missing.yaml
+config/broken.yaml
 config/include.json
 config/libs.yaml
 config/merge.yaml
@@ -26,4 +27,5 @@ t/author-portability.t
 t/author-synopsis.t
 t/merge.t
 t/module.t
+t/regress.t
 t/release-kwalitee.t

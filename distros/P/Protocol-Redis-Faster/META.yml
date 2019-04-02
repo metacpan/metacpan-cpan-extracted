@@ -28,7 +28,7 @@ no_index:
 provides:
   Protocol::Redis::Faster:
     file: lib/Protocol/Redis/Faster.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Carp: '0'
   Protocol::Redis: '1.0000'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Protocol-Redis-Faster/issues
   homepage: https://github.com/Grinnz/Protocol-Redis-Faster
   repository: https://github.com/Grinnz/Protocol-Redis-Faster.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -189,7 +189,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.002'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

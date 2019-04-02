@@ -1,10 +1,10 @@
-package HTTP::Daemon; # git description: 5e29095
+package HTTP::Daemon; # git description: v6.03-2-gb274cc6
 # ABSTRACT: A simple http server class
 
 use strict;
 use warnings;
 
-our $VERSION = '6.02';
+our $VERSION = '6.04';
 
 use IO::Socket qw(AF_INET INADDR_ANY INADDR_LOOPBACK inet_ntoa);
 our @ISA = qw(IO::Socket::INET);
@@ -631,7 +631,7 @@ HTTP::Daemon - A simple http server class
 
 =head1 VERSION
 
-version 6.02
+version 6.04
 
 =head1 SYNOPSIS
 
@@ -926,7 +926,7 @@ Gisle Aas <gisle@activestate.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ville Skyttä Mark Stosberg Slaven Rezic Olaf Alders Karen Etheridge Zefram Tom Hukins Chase Whitener Mike Schilli Alexey Tourbin Bron Gondwana Hans-H. Froehlich Ian Kilgore Jacob J Ondrej Hanak Perlover Peter Rabbitson Robert Stone Rolf Grossmann Sean M. Burke Spiros Denaxas Steve Hay Todd Lipcon Tony Finch Toru Yamaguchi Yuri Karaban amire80 jefflee john9art murphy phrstbrn ruff Adam Kennedy sasao Sjogren Alex Kapranoff Andreas J. Koenig Bill Mann DAVIDRW Daniel Hedlund David E. Wheeler FWILES Father Chrysostomos Gavin Peters Graeme Thompson
+=for stopwords Ville Skyttä Olaf Alders Mark Stosberg Slaven Rezic Karen Etheridge Zefram Tom Hukins Chase Whitener Mike Schilli Alexey Tourbin Bron Gondwana Hans-H. Froehlich Ian Kilgore Jacob J Ondrej Hanak Perlover Peter Rabbitson Robert Stone Rolf Grossmann Sean M. Burke Spiros Denaxas Steve Hay Todd Lipcon Tony Finch Toru Yamaguchi Yuri Karaban amire80 jefflee john9art murphy phrstbrn ruff Adam Kennedy sasao Sjogren Alex Kapranoff Andreas J. Koenig Bill Mann DAVIDRW Daniel Hedlund David E. Wheeler FWILES Father Chrysostomos Gavin Peters Graeme Thompson
 
 =over 4
 
@@ -936,15 +936,15 @@ Ville Skyttä <ville.skytta@iki.fi>
 
 =item *
 
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
 Mark Stosberg <MARKSTOS@cpan.org>
 
 =item *
 
 Slaven Rezic <slaven@rezic.de>
-
-=item *
-
-Olaf Alders <olaf@wundersolutions.com>
 
 =item *
 

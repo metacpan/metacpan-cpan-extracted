@@ -5,7 +5,8 @@ package Fuu;
 use strict;
 use warnings;
 
-use Inline CPP => config => namespace => q{} => classes => { 'Fuu' => 'MyFuu'};
+use Inline CPP => config => namespace => q{} => classes => { 'Fuu' => 'MyFuu'},
+    force_build => 1, clean_after_build => 0;
 
 use Inline CPP => <<'EOCPP';
 

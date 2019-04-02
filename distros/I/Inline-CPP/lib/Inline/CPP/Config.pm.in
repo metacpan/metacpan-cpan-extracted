@@ -1,0 +1,26 @@
+package Inline::CPP::Config;
+
+# Configuration data for CPP.pm; Compiler, libs, iostream filename, #defines.
+
+use strict;
+use warnings;
+
+our $VERSION = '%s';
+#$VERSION = eval $VERSION; ## no critic (eval)
+
+our $compiler = '%s';
+our $libs     = '%s';
+
+our $iostream_fn = '%s';
+
+our $cpp_flavor_defs =  <<'END_FLAVOR_DEFINITIONS';
+%s
+END_FLAVOR_DEFINITIONS
+
+1;
+
+__END__
+
+=head1 NAME
+
+Inline::CPP::Config - for internal consumption; nothing to document

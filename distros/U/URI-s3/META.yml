@@ -1,0 +1,38 @@
+---
+abstract: 's3 URI scheme'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: URI-s3
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  URI::s3:
+    file: lib/URI/s3.pm
+    version: v0.1.0
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/URI-s3/issues
+  homepage: https://github.com/karupanerura/URI-s3
+  repository: git://github.com/karupanerura/URI-s3.git
+version: v0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

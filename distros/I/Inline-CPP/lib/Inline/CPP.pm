@@ -19,7 +19,7 @@ our @ISA = qw( Inline::C );    ## no critic (ISA)
 # Development releases will have a _0xx version suffix.
 # We eval the version number to accommodate dev. version numbering, as
 # described in perldoc perlmodstyle.
-our $VERSION = '0.75';
+our $VERSION = '0.79';
 # $VERSION = eval $VERSION; ## no critic (eval)
 
 my $TYPEMAP_KIND;
@@ -244,13 +244,10 @@ sub info {
         next unless $scope eq 'public' and $type eq 'method';
         next
           unless $o->check_type($thing, $name eq $class, $name eq "~$class",);
-        my $rtype = $thing->{rtype} || q{};
+        my $rtype = $thing->{return_type} || q{};
         push @class, "\t\t$rtype" . ($rtype ? q{ } : q{});
         push @class, $class . "::$name(";
-        my @args = grep { $_->{name} ne '...' } @{$thing->{args}};
-        my $ellipsis = (scalar @{$thing->{args}} - scalar @args) != 0;
-        push @class, join ', ', (map {"$_->{type} $_->{name}"} @args),
-          $ellipsis ? '...' : ();
+        push @class, _get_args($thing);
         push @class, ");\n";
       }
       push @class, "\t};\n";
@@ -261,12 +258,9 @@ sub info {
       my $func = $data->{function}{$function};
       next if $function =~ m/::/x;
       next unless $o->check_type($func, 0, 0);
-      push @func, "\t" . $func->{rtype} . q{ };
+      push @func, "\t" . $func->{return_type} . q{ };
       push @func, $func->{name} . '(';
-      my @args = grep { $_->{name} ne '...' } @{$func->{args}};
-      my $ellipsis = (scalar @{$func->{args}} - scalar @args) != 0;
-      push @func, join ', ', (map {"$_->{type} $_->{name}"} @args),
-        $ellipsis ? '...' : ();
+      push @func, _get_args($func);
       push @func, ");\n";
     }
   }
@@ -281,6 +275,14 @@ sub info {
   }
   $info .= Inline::Struct::info($o) if $o->{STRUCT}{'.any'};
   return $info;
+}
+
+sub _get_args {
+  my ($thing) = @_;
+  my $count = @{ $thing->{arg_names} };
+  my @rarg_indexes = grep $thing->{arg_names}[$_] ne '...', 0..$count-1;
+  my $ellipsis = ($count - scalar @rarg_indexes) != 0;
+  join ', ', (map "$thing->{arg_types}[$_] $thing->{arg_names}[$_]", @rarg_indexes), $ellipsis ? '...' : ();
 }
 
 #============================================================================
@@ -378,7 +380,13 @@ sub _generate_member_xs_wrappers {
   my ($o, $pkg, $class, $proper_pkg) = @_;
   my @XS;
   my $data = $o->{ILSM}{parser}{data};
-  my ($ctor, $dtor, $abstract) = (0, 0, 0);    ## no critic (ambiguous)
+  my ($ctor, $dtor) = (0, 0);    ## no critic (ambiguous)
+
+  # Look ahead to see if the class is abstract, i.e., has unimplemented
+  # virtual methods and therefore can never be instantiated directly
+  my $abstract = grep $_->{thing} eq 'method' && $_->{abstract},
+    @{$data->{class}{$class}};
+
   for my $thing (@{$data->{class}{$class}}) {
     my ($name, $scope, $type) = @{$thing}{qw| name scope thing |};
 
@@ -386,7 +394,7 @@ sub _generate_member_xs_wrappers {
 
     # Get/set methods will go here:
     # Cases we skip:
-    $abstract ||= ($type eq 'method' and $thing->{abstract});
+    next if $abstract && ($name eq $class || $name eq "~$class");
     next if ($type eq 'method' and $thing->{abstract});
     next if $scope ne 'public';
     if ($type eq 'enum') {
@@ -472,8 +480,8 @@ sub _generate_nonmember_xs_wrappers {
   for my $function (@{$data->{functions}}) {
 
     # lose constructor defs outside class decls (and "implicit int")
-    next if $data->{function}{$function}{rtype} eq q{};
-    next if $data->{function}{$function}{rtype} =~ m/static/;    #specl case
+    next if $data->{function}{$function}{return_type} eq q{};
+    next if $data->{function}{$function}{return_type} =~ m/static/;    #specl case
     next if $function =~ m/::/x;         # skip member functions.
     next if $function =~ m/operator/;    # and operators.
     push @XS, $o->wrap($data->{function}{$function}, $function);
@@ -516,23 +524,27 @@ sub wrap {
   # Filter out optional subroutine arguments
   my (@args, @opts, $ellipsis, $void);
 
-  $_->{optional} ? push @opts, $_ : push @args, $_ for @{$thing->{args}};
+  $thing->{arg_optional}[$_] ? push @opts, $_ : push @args, $_
+    for 0..$#{$thing->{arg_names}};
 
-  $ellipsis = pop @args if (@args and $args[-1]{name} eq '...');
+  if (@args and $thing->{arg_names}[$args[-1]] eq '...') {
+    $ellipsis = 1;
+    pop @args;
+  }
 
-  $void = ($thing->{rtype} and $thing->{rtype} eq 'void');
+  $void = ($thing->{return_type} and $thing->{return_type} eq 'void');
 
   push @XS, join q{},
     (
     '(',
     join(', ',
-      (map { $_->{name} } @args),
+      (map $thing->{arg_names}[$_], @args),
       (scalar @opts or $ellipsis) ? '...' : ()),
     ")\n",
     );
 
   # Declare the non-optional arguments for XS type-checking
-  push @XS, "\t$_->{type}\t$_->{name}\n" for @args;
+  push @XS, "\t$thing->{arg_types}[$_]\t$thing->{arg_names}[$_]\n" for @args;
 
   # Wrap "complicated" subs in stack-checking code
   if ($void or $ellipsis) {
@@ -541,7 +553,8 @@ sub wrap {
   }
 
   if (@opts) {
-    push @PREINIT, "\t$_->{type}\t$_->{name};\n" for @opts;
+    push @PREINIT, "\t$thing->{arg_types}[$_]\t$thing->{arg_names}[$_];\n"
+      for @opts;
     push @CODE, 'switch(items' . ($class ? '-1' : q{}) . ") {\n";
 
     my $offset = scalar @args;             # which is the first optional?
@@ -550,8 +563,8 @@ sub wrap {
       push @CODE, 'case ' . ($i + 1) . ":\n";
       my @tmp;
       for my $j ($offset .. $i) {
-        my $targ = $opts[$j - $offset]{name};
-        my $type = $opts[$j - $offset]{type};
+        my $targ = $thing->{arg_names}[$opts[$j - $offset]];
+        my $type = $thing->{arg_types}[$opts[$j - $offset]];
         my $src  = "ST($j)";
         my $conv = $o->typeconv($targ, $src, $type, 'input_expr');
         push @CODE, $conv . ";\n";
@@ -560,28 +573,28 @@ sub wrap {
       push @CODE, "\tRETVAL = " unless $void;
       push @CODE,
         call_or_instantiate($name, $ctor, $dtor, $class, $thing->{rconst},
-        $thing->{rtype}, (map { $_->{name} } @args), @tmp);
+        $thing->{return_type}, (map $thing->{arg_names}[$_], @args), @tmp);
       push @CODE, "\tbreak; /* case " . ($i + 1) . " */\n";
     }
     push @CODE, "default:\n";
     push @CODE, "\tRETVAL = " unless $void;
     push @CODE,
       call_or_instantiate($name, $ctor, $dtor, $class, $thing->{rconst},
-      $thing->{rtype}, map { $_->{name} } @args);
+      $thing->{return_type}, map $thing->{arg_names}[$_], @args);
     push @CODE, "} /* switch(items) */ \n";
   }
   elsif ($void) {
     push @CODE, "\t";
     push @CODE,
       call_or_instantiate($name, $ctor, $dtor, $class, 0, q{},
-      map { $_->{name} } @args);
+      map $thing->{arg_names}[$_], @args);
   }
   elsif ($ellipsis or $thing->{rconst}) {
     push @CODE, "\t";
     push @CODE, 'RETVAL = ';
     push @CODE,
       call_or_instantiate($name, $ctor, $dtor, $class, $thing->{rconst},
-      $thing->{rtype}, map { $_->{name} } @args);
+      $thing->{return_type}, map $thing->{arg_names}[$_], @args);
   }
   if ($void) {
     push @CODE, <<'END';
@@ -623,10 +636,10 @@ sub _map_subnames_cpp_to_perl {
     $dtor = 1;
   }
   elsif ($class) {                # method
-    $XS = "$thing->{rtype}\n$class" . "::$thing->{name}";
+    $XS = "$thing->{return_type}\n$class" . "::$thing->{name}";
   }
   else {                          # function
-    $XS = "$thing->{rtype}\n$thing->{name}";
+    $XS = "$thing->{return_type}\n$thing->{name}";
   }
   return ($XS, $ctor, $dtor);
 }
@@ -727,14 +740,14 @@ sub check_type {
   # strip "useless" modifiers so the type is found in typemap:
 BADTYPE: while (1) {
     if (!($ctor || $dtor)) {
-      my $t = $thing->{rtype};
+      my $t = $thing->{return_type};
       $t =~ s/^(\s|const|virtual|static)+//xg;
       if ($t ne 'void' && !$o->typeconv(q{}, q{}, $t, 'output_expr')) {
         $badtype = $t;
         last BADTYPE;
       }
     }
-    foreach (map { $_->{type} } @{$thing->{args}}) {
+    foreach (@{ $thing->{arg_types} }) {
       s/^(?:const|\s)+//xgo;
       if ($_ ne '...' && !$o->typeconv(q{}, q{}, $_, 'input_expr')) {
         $badtype = $_;
@@ -747,9 +760,9 @@ BADTYPE: while (1) {
   # I don't really like this verbosity. This is what 'info' is for. Maybe we
   # should ask Brian for an Inline=DEBUG option.
   warn "No typemap for type $badtype. "
-    . "Skipping $thing->{rtype} $thing->{name}("
-    . join(', ', map { $_->{type} } @{$thing->{args}}) . ")\n"
-    if 0;
+    . "Skipping $thing->{return_type} $thing->{name}("
+    . join(', ', @{ $thing->{arg_types} }) . ")\n"
+    if 1;
   return 0;
 }
 

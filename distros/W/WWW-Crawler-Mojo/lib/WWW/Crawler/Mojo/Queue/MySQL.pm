@@ -63,7 +63,7 @@ sub dequeue {
 }
 
 sub enqueue {
-  shift->_enqueue(@_);
+  return shift->_enqueue(@_);
 }
 
 sub length {
@@ -114,7 +114,7 @@ sub _enqueue {
     $tx->commit;
     $redund->{$digest} = 1;
   };
-  return $self;
+  return $job;
 }
 
 1;

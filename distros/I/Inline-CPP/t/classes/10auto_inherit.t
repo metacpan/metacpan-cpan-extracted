@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More tests => 28;
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 use Inline (CPP => 'DATA', classes => sub { join('::', split('__', shift)); } );
 
 can_ok 'Inline::Test::Parent', 'new';

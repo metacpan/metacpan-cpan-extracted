@@ -1,2 +1,6 @@
+0.002     2019-04-01 21:51:36 EDT
+  - Minor optimizations
+  - Correct behavior when on_message callback calls on_message or parse
+
 0.001     2019-03-12 21:19:05 EDT
   - First release

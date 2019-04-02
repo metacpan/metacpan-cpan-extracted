@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Path::Tiny qw(path);
 
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 
 sub report {
     my ($pkg, $db, $options) = @_;
@@ -13,7 +13,6 @@ sub report {
 
     my $otxt = qq(<coverage version="1">\n);
     for my $file ( @{ $options->{file} } ) {
-
         my $f  = $cover->file($file);
         my $st = $f->statement;
         my $br = $f->branch;

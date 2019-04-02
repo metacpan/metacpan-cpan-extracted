@@ -1,6 +1,6 @@
 package WebService::Wikimapia::UserAgent;
 
-$WebService::Wikimapia::UserAgent::VERSION   = '0.13';
+$WebService::Wikimapia::UserAgent::VERSION   = '0.14';
 $WebService::Wikimapia::UserAgent::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::UserAgent - Interface to user agent for Wikimapia API.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -21,7 +21,7 @@ use WebService::Wikimapia::Params qw($API_KEY);
 use WebService::Wikimapia::UserAgent::Exception;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'api_key' => (is => 'ro', isa => $API_KEY, required => 1);
 has 'ua'      => (is => 'rw', default  => sub { HTTP::Tiny->new(agent => "WebService-Wikimapia/v1"); } );
@@ -45,7 +45,7 @@ sub get {
     @caller    = caller(2) if $caller[3] eq '(eval)';
 
     unless ($response->{success}) {
-	WebService::Wikimapia::UserAgent::Exception->throw({
+    WebService::Wikimapia::UserAgent::Exception->throw({
             method      => $caller[3],
             message     => "request to API failed",
             code        => $response->{status},

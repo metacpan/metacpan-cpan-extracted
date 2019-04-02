@@ -22,7 +22,7 @@ name: Test-PerlTidy
 provides:
   Test::PerlTidy:
     file: lib/Test/PerlTidy.pm
-    version: '20190309.001'
+    version: '20190402'
 requires:
   Carp: '0'
   English: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/shlomif/test-perltidy/issues
   homepage: http://metacpan.org/release/Test-PerlTidy
   repository: https://github.com/shlomif/Test-PerlTidy
-version: '20190309.001'
+version: '20190402'
 x_Dist_Zilla:
   perl:
     version: '5.028001'

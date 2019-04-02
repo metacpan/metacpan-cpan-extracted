@@ -76,12 +76,11 @@
          "requires" : {
             "File::Spec" : "0",
             "IO::Socket::INET" : "0",
-            "LWP::RobotUA" : "0",
-            "LWP::UserAgent" : "0",
             "Module::Metadata" : "0",
             "Socket" : "0",
             "Test" : "0",
             "Test::More" : "0",
+            "Test::Needs" : "0",
             "URI" : "0",
             "perl" : "5.006"
          }
@@ -164,7 +163,7 @@
    "provides" : {
       "HTTP::Daemon" : {
          "file" : "lib/HTTP/Daemon.pm",
-         "version" : "6.02"
+         "version" : "6.04"
       }
    },
    "release_status" : "stable",
@@ -181,7 +180,7 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "6.02",
+   "version" : "6.04",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -224,7 +223,12 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "CONTRIBUTING",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
+                  ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,
@@ -977,7 +981,11 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
-                     "Changes"
+                     "CONTRIBUTING",
+                     "Changes",
+                     "INSTALL",
+                     "LICENCE",
+                     "README.pod"
                   ],
                   "allow_dirty_match" : [],
                   "changelog" : "Changes"
@@ -1000,7 +1008,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.02",
+                  "tag" : "v6.04",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1237,9 +1245,9 @@
    "x_authority" : "cpan:GAAS",
    "x_contributors" : [
       "Ville Skytt\u00e4 <ville.skytta@iki.fi>",
+      "Olaf Alders <olaf@wundersolutions.com>",
       "Mark Stosberg <MARKSTOS@cpan.org>",
       "Slaven Rezic <slaven@rezic.de>",
-      "Olaf Alders <olaf@wundersolutions.com>",
       "Karen Etheridge <ether@cpan.org>",
       "Zefram <zefram@fysh.org>",
       "Tom Hukins <tom@eborcom.com>",

@@ -120,9 +120,6 @@ from Perl space. If the function's signature is not recognized, it will not
 be available from Perl, but will be available from other functions or classes
 within the C++ code.
 
-For more information about the grammar used to parse C++ code, see the
-section called "Grammar".
-
 The following example shows how C++ snippets map to Perl:
 
 Example 1:
@@ -187,20 +184,20 @@ Much of this is documented more fully in the L<Inline> POD, but here are some
 basics:
 
     use Inline CPP => 'DATA';
-    
+
     # Perl code here
-    
+
     __DATA__
     __CPP__
-    
+
     // C++ code here.
-    
+
 Or....
 
     use Inline CPP => <<'END_CPP';
         // C++ code here.
     END_CPP
-    
+
 Structurally where does it belong?  For simple one-off scripts, just put it
 anywhere you want.  But in the spirit of code reusability, it's often better to
 simply create a module that houses the functionality build upon C++ code:
@@ -208,9 +205,9 @@ simply create a module that houses the functionality build upon C++ code:
     # Foo/Bar.pm
     package Foo::Bar;
     use Inline CPP => 'DATA';
-    
+
     # Perl code here, including Exporter mantra, if needed.
-    
+
     __DATA__
     __CPP__
     // C++ here.....
@@ -233,14 +230,14 @@ will never see the startup lag associated with C++ code compilation.
 An example and proof-of-concept for this approach can be found in the CPAN
 module L<Math::Prime::FastSieve>.
 
-This approach involves using L<Inline::MakeMaker>, and is well documented in 
+This approach involves using L<Inline::MakeMaker>, and is well documented in
 the L<Inline> POD under the heading
 L<Writing Modules with Inline|http://search.cpan.org/perldoc?Inline#Writing_Modules_with_Inline>
 
 However, you may wish to remove the Inline::CPP dependency altogether from the
-code that you bundle into a distribution.  This can be done using 
+code that you bundle into a distribution.  This can be done using
 L<InlineX::CPP2XS>, which converts the Inline::CPP generated code to
-Perl XS code, fit for distribution without the Inline::CPP dependency.  
+Perl XS code, fit for distribution without the Inline::CPP dependency.
 L<InlineX::CPP2XS> includes an example/ directory that actually converts
 Math::Prime::FastSieve to pure XS.
 
@@ -269,10 +266,10 @@ Let's say you use Inline::CPP like this:
 
     END_CPP
     1;
-    
-The issue is that the C++ class, "C<Foo>" will be mapped to Perl below the 
-C<Some::Foo> namespace, as C<Some::Foo::Foo>, and would need to be instantiated 
-like this: C<< my $foo = Some::Foo::Foo->new() >>.  This probably isn't what 
+
+The issue is that the C++ class, "C<Foo>" will be mapped to Perl below the
+C<Some::Foo> namespace, as C<Some::Foo::Foo>, and would need to be instantiated
+like this: C<< my $foo = Some::Foo::Foo->new() >>.  This probably isn't what
 the user intended. Use the L<namespace> configuration option to set your base
 namespace:
 
@@ -332,49 +329,49 @@ Specifies extra compiler flags. Corresponds to the MakeMaker option.
 
     use Inline CPP => config => ccflags => '-std=c++11';
 
-=head2 classes 
+=head2 classes
 
-    use Inline CPP => config => 
+    use Inline CPP => config =>
         classes => { 'CPPFoo' => 'PerlFoo', 'CPPBar' => 'PerlBar' };
 
-    use Inline CPP => config => 
-        namespace => 'Qux' => 
+    use Inline CPP => config =>
+        namespace => 'Qux' =>
         classes => { 'CPPFoo' => 'PerlFoo', 'CPPBar' => 'PerlBar' };
 
-    use Inline CPP => config => 
-        classes => sub { 
-            my $cpp_class = shift; 
-            ... 
-            return($perl_package); 
+    use Inline CPP => config =>
+        classes => sub {
+            my $cpp_class = shift;
+            ...
+            return($perl_package);
         };
 
 Override C++ class name.
 
 Under default behavior, a C++ class naming conflict will arise by attempting
 to implement the C++ classes C<Foo::Bar::MyClass> and C<Foo::Qux::MyClass>
-which depend upon one another in some way, because C++ sees both classes as 
-named only C<MyClass>.  We are unable to solve this C++ conflict by using just 
-the C<namespace> config option, because C<namespace> is only applied to the 
+which depend upon one another in some way, because C++ sees both classes as
+named only C<MyClass>.  We are unable to solve this C++ conflict by using just
+the C<namespace> config option, because C<namespace> is only applied to the
 Perl package name, not the C++ class name.
 
-In the future, this issue may be solved via Inline::CPP suport for the native 
+In the future, this issue may be solved via Inline::CPP suport for the native
 C++ C<namespace> operator and/or C++ class names which contain the C<::>
 double-colon scope token.
 
 For now, this issue is solved by using the C<classes> config option, which
 accepts either a hash reference or a code reference.  When a hash reference
-is provided, each hash key is a C++ class name, and each hash value is a 
-corresponding Perl class name.  This hash reference serves as a C++-to-Perl 
-class name mapping mechanism, and may be used in combination with the 
-C<namespace> config option to exercise full control over class and package 
+is provided, each hash key is a C++ class name, and each hash value is a
+corresponding Perl class name.  This hash reference serves as a C++-to-Perl
+class name mapping mechanism, and may be used in combination with the
+C<namespace> config option to exercise full control over class and package
 naming.
 
-When a code reference is provided, it must accept as its sole argument the C++ 
-class name, and return a single string value containing the generated Perl 
+When a code reference is provided, it must accept as its sole argument the C++
+class name, and return a single string value containing the generated Perl
 package name.  When a code reference is provided for the C<classes> config
 option, the value of the C<namespace> config option is ignored.
 
-The hash reference may be considered a manual mapping method, and the code 
+The hash reference may be considered a manual mapping method, and the code
 reference an automatic mapping method.
 
 Example file C</tmp/Foo__Bar__MyClass.c>:
@@ -439,12 +436,12 @@ Updated example file C</tmp/Foo__Qux__MyClass.c>:
     };
 
 First, consider the following updated call to Inline using the hash reference
-method to manually map the namespace and class names.  This example does not 
+method to manually map the namespace and class names.  This example does not
 give any C++ errors, and runs correctly in both C++ and Perl:
 
-    use Inline  CPP => '/tmp/Foo__Qux__MyClass.c' => 
-                namespace => 'Foo' => 
-                classes => { 'Foo__Bar__MyClass' => 'Bar::MyClass', 
+    use Inline  CPP => '/tmp/Foo__Qux__MyClass.c' =>
+                namespace => 'Foo' =>
+                classes => { 'Foo__Bar__MyClass' => 'Bar::MyClass',
                              'Foo__Qux__MyClass' => 'Qux::MyClass' };
 
 Next, consider another updated call to Inline using the code reference method
@@ -452,7 +449,7 @@ to automatically map the namespace and class names, which may be deployed across
 more complex codebases.  This example automates the mapping of the '__' double-
 underscore to the '::' double-colon scope token.
 
-    use Inline CPP => config => 
+    use Inline CPP => config =>
         classes => sub { join('::', split('__', shift)); };
 
 For more information, please see the runnable examples:
@@ -715,6 +712,62 @@ functions and return them from functions. Please note that
 Inline::Struct does not understand any C++ features, so constructors
 and member functions are not supported. See L<Inline::Struct> for more
 details.
+
+=head2 Example
+
+Say you want to use a C++ standard C<string> type. A C++ method that
+takes or returns such will be ignored unless you tell Perl how to map
+it to and from Perl data types.
+
+Put this in a file called F<typemap>:
+
+  TYPEMAP
+  string  T_CPPSTRING
+
+  INPUT
+
+  T_CPPSTRING
+          $var = ($type)SvPV_nolen($arg)
+
+  OUTPUT
+
+  T_CPPSTRING
+          sv_setpv((SV*)$arg, $var.c_str());
+
+Then this script will work:
+
+  use Inline CPP => config => typemaps => "typemap";
+  use Inline CPP => <<'END';
+
+  #ifdef __INLINE_CPP_STANDARD_HEADERS
+  #include <string>
+  #else
+  #include <string.h>
+  #endif
+
+  #ifdef __INLINE_CPP_NAMESPACE_STD
+  using namespace std;
+  #endif
+
+  class Abstract {
+    public:
+          virtual string greet2() {
+              string retval = "yo";
+              return retval;
+          }
+  };
+
+  class Impl : public Abstract {
+    public:
+      Impl() {}
+      ~Impl() {}
+  };
+  END
+
+  my $o = Impl->new;
+  print $o->greet2, "\n";
+
+See F<t/grammar/09purevt.t> for this within the test suite.
 
 =head1 <iostream>, Standard Headers, C++ Namespaces, and Portability Solutions
 
@@ -1100,19 +1153,19 @@ the functions here.  So we write a wrapper to take control ourselves:
     say multiadd( 1, 2, 3, 4 ); # No dispatch; throw an exception.
     __DATA__
     __CPP__
-    
+
     #include <stdexcept>
-    
+
     // Inline::CPP won't create predictable bindings to overloaded functions.
-    
+
     int add ( int a, int b ) {
       return a + b;
     }
-    
+
     int add ( int a, int b, int c ) {
       return a + b + c;
     }
-    
+
     // But a function call with elipses can dispatch to overloaded functions since
     // no Perl binding is required in reaching those functions.
     int multiadd ( SV * a, ... ) {
@@ -1221,12 +1274,12 @@ And finally, I<Rvalue references>:
 L<Inline::CPP> doesn't (yet) understand this:
 
     int x = 100;
-     
+
     int getInt ()
     {
         return x;
     }
-     
+
     int && getRvalueInt ()
     {
         return std::move( x );
@@ -1260,7 +1313,7 @@ When reporting a bug, please do the following:
    your bug report.
  - Patches are always welcome, as are tests that tickle a newfound bug.
 
- - Pull requests should avoid touching irrelevant sections of code/POD, and 
+ - Pull requests should avoid touching irrelevant sections of code/POD, and
    tests are required before they can be considered for merge.
 
 ...or...
@@ -1307,7 +1360,7 @@ will give the compiler a type to work with.
 Perl doesn't know about C++'s function overload resolution rules.  And C++
 doesn't know about Perl.  XS was never designed to deal with this sort of
 mismatch.  This prevents implementing the I<Rule of Three> for code that is
-intended to bind with Perl, but because Perl handles your bindings, that's 
+intended to bind with Perl, but because Perl handles your bindings, that's
 probably not an issue.
 
 These three issues (Templates, Operator Overloading, and Function Overloading)
@@ -1394,10 +1447,10 @@ L<GitHub issue tracker|https://github.com/daoswald/Inline-CPP/issues>.
 
 Contributors may also fork the repo and issue a pull requests.  Tests
 should accompany pull requests, and effort should be made to minimize the
-scope of any single pull request.  
+scope of any single pull request.
 
-Pull requests should not add author names. Non-trivial contributions 
-generally warrant attribution in the log maintained in the C<Changes> 
+Pull requests should not add author names. Non-trivial contributions
+generally warrant attribution in the log maintained in the C<Changes>
 file, though the decision to do at the discretion of the maintainers.
 
 Please refer to the Artistic 2.0 license, contained in the C<LICENSE> file,

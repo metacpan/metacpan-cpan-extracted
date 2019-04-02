@@ -1,5 +1,19 @@
 Revision history for MooX-Const:
 
+v0.3.1    2019-04-02 18:47:14+01:00 Europe/London
+  [Other]
+  - Removed unnecessary prerequisites.
+
+v0.3.0    2019-04-02 18:35:06+01:00 Europe/London
+  [Incompatable Changes]
+  - Removed support for Perls before v5.10.1.
+
+  [Documentation]
+  - Documented handling of non-existent hash reference keys.
+
+  [Tests]
+  - Added more tests.
+
 v0.2.2    2018-12-06 18:00:47+00:00 Europe/London
   [Other]
   - Added recommended minimum version of Types::Const.

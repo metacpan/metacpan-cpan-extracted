@@ -1,5 +1,5 @@
 package JSON::Schema::Fit;
-$JSON::Schema::Fit::VERSION = '0.02';
+$JSON::Schema::Fit::VERSION = '0.03';
 # ABSTRACT: adjust data structure according to json-schema
 
 
@@ -40,16 +40,17 @@ sub new {
     my $self = bless {}, $class;
     for my $k (keys %opts) {
         next unless exists $valid_option{$k};
-        $self->_attr($k, $opts{$k});
+        _attr($k, $self, $opts{$k});
     }
     return $self
 }
 
 sub _attr {
-    my ($attr, $self, $val) = @_;
+    my $attr = shift;
+    my $self = shift;
 
-    if ($val) {
-        return $self->{$attr} = $val;
+    if (@_) {
+        return $self->{$attr} = shift;
     } else {
         return $self->{$attr} //= $valid_option{$attr};
     }
@@ -189,7 +190,7 @@ JSON::Schema::Fit - adjust data structure according to json-schema
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,9 @@ use warnings;
 
 use Test::More tests => 2;
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 use Inline CPP => 'DATA';
 
 # Test verifying classes that store member c-string.

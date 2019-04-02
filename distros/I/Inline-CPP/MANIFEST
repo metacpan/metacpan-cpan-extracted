@@ -1,31 +1,23 @@
 Changes
-MANIFEST
-MANIFEST.SKIP
-Makefile.PL
-README
-TESTED
-LICENSE
-inc/ILCPPConfig/OldCompilerGuess.pm
 inc/ILCPPConfig/CompilerGuess.pm
+inc/ILCPPConfig/OldCompilerGuess.pm
 lib/Inline/CPP.pm
 lib/Inline/CPP.pod
+lib/Inline/CPP/Config.pm.in
 lib/Inline/CPP/Parser/RecDescent.pm
-lib/Inline/CPP/Config.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
 t/00load_prereqs.t
 t/01fn_cans.t
 t/02basic.t
-t/05pod.t
 t/03prefix.t
 t/04charptr.t
 t/06fn_regress.t
-t/07perlcritic.t
 t/08cppguess.t
-t/09pod_coverage.t
-t/10kwalitee.t
-t/11rewrite_config.t
 t/12custom_libs.t
-t/13version_numbers.t
-t/14changes.t
 t/15config_case.t
 t/16info.t
 t/classes/01empty_ns_is_main.t
@@ -57,11 +49,21 @@ t/grammar/16varlst.t
 t/grammar/17memberarray.t
 t/grammar/18namespace.t
 t/grammar/19multidimarray.t
+t/grammar/typemap.09purevt
 t/namespace/01empty_ns_is_main.t
 t/namespace/02main_ns_is_main.t
 t/namespace/03baz_ns_is_baz.t
 t/namespace/04invoke_from_non_main.t
 t/namespace/05invalid_ns.t
 t/namespace/06inherit.t
-META.yml                            Module YAML meta-data (added by MakeMaker)
-META.json                           Module JSON meta-data (added by MakeMaker)
+TESTED
+xt/05pod.t
+xt/07perlcritic.t
+xt/09pod_coverage.t
+xt/10kwalitee.t
+xt/11rewrite_config.t
+xt/13version_numbers.t
+xt/14changes.t
+xt/manifest.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

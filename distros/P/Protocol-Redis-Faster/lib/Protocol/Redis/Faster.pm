@@ -6,27 +6,24 @@ use Carp ();
 
 use parent 'Protocol::Redis';
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
+
+my %simple_types = ('+' => 1, '-' => 1, ':' => 1);
 
 sub encode {
-  my ($self, $input) = @_;
+  my $self = shift;
 
-  my @stack = $input;
   my $encoded = '';
-  while (@stack) {
-    my $message = shift @stack;
+  while (@_) {
+    my $message = shift;
 
-    # Simple strings, errors, and integers
-    if ($message->{type} eq '+' or $message->{type} eq '-' or $message->{type} eq ':') {
-      $encoded .= $message->{type} . $message->{data} . "\r\n";
-    }
+    # Order optimized for client encoding;
+    # client commands are sent as arrays of bulk strings
 
     # Bulk strings
-    elsif ($message->{type} eq '$') {
-      my $data = $message->{data};
-
-      if (defined $data) {
-        $encoded .= '$' . length($data) . "\r\n" . $data . "\r\n";
+    if ($message->{type} eq '$') {
+      if (defined $message->{data}) {
+        $encoded .= '$' . length($message->{data}) . "\r\n" . $message->{data} . "\r\n";
       }
       else {
         $encoded .= '$-1' . "\r\n";
@@ -35,15 +32,18 @@ sub encode {
 
     # Arrays
     elsif ($message->{type} eq '*') {
-      my $data = $message->{data};
-
-      if (defined $data) {
-        $encoded .= '*' . scalar(@$data) . "\r\n";
-        unshift @stack, @$data;
+      if (defined $message->{data}) {
+        $encoded .= '*' . scalar(@{$message->{data}}) . "\r\n";
+        unshift @_, @{$message->{data}};
       }
       else {
         $encoded .= '*-1' . "\r\n";
       }
+    }
+
+    # Simple strings, errors, and integers
+    elsif (exists $simple_types{$message->{type}}) {
+      $encoded .= $message->{type} . $message->{data} . "\r\n";
     }
 
     # Invalid type
@@ -66,82 +66,82 @@ sub parse {
   my ($self, $input) = @_;
   $self->{_buf} .= $input;
 
-  my $curr = $self->{_curr} ||= {};
-  my $buf  = \$self->{_buf};
-  my $cb   = $self->{_on_message_cb};
+  my $buf = \$self->{_buf};
 
   CHUNK:
   while (length $$buf) {
 
     # Look for message type and get the actual data,
     # length of the bulk string or the size of the array
-    if (!$curr->{type}) {
+    if (!$self->{_curr}{type}) {
       my $pos = index $$buf, "\r\n";
       return if $pos < 0; # Wait for more data
 
-      $curr->{type} = substr $$buf, 0, 1;
-      $curr->{len}  = substr $$buf, 1, $pos - 1;
+      $self->{_curr}{type} = substr $$buf, 0, 1;
+      $self->{_curr}{len}  = substr $$buf, 1, $pos - 1;
       substr $$buf, 0, $pos + 2, ''; # Remove type + length/data + \r\n
     }
 
+    # Order optimized for client decoding;
+    # large array replies usually contain bulk strings
+
     # Bulk strings
-    if ($curr->{type} eq '$') {
-      if ($curr->{len} == -1) {
-        $curr->{data} = undef;
+    if ($self->{_curr}{type} eq '$') {
+      if ($self->{_curr}{len} == -1) {
+        $self->{_curr}{data} = undef;
       }
-      elsif (length($$buf) - 2 < $curr->{len}) {
+      elsif (length($$buf) - 2 < $self->{_curr}{len}) {
         return; # Wait for more data
       }
       else {
-        $curr->{data} = substr $$buf, 0, $curr->{len}, '';
+        $self->{_curr}{data} = substr $$buf, 0, $self->{_curr}{len}, '';
       }
 
       substr $$buf, 0, 2, ''; # Remove \r\n
     }
 
     # Simple strings, errors, and integers
-    elsif ($curr->{type} eq '+' or $curr->{type} eq '-' or $curr->{type} eq ':') {
-      $curr->{data} = delete $curr->{len};
+    elsif (exists $simple_types{$self->{_curr}{type}}) {
+      $self->{_curr}{data} = delete $self->{_curr}{len};
     }
 
     # Arrays
-    elsif ($curr->{type} eq '*') {
-      $curr->{data} = $curr->{len} < 0 ? undef : [];
+    elsif ($self->{_curr}{type} eq '*') {
+      $self->{_curr}{data} = $self->{_curr}{len} < 0 ? undef : [];
 
       # Fill the array with data
-      if ($curr->{len} > 0) {
-        $curr = $self->{_curr} = {parent => $curr};
+      if ($self->{_curr}{len} > 0) {
+        $self->{_curr} = {parent => $self->{_curr}};
         next CHUNK;
       }
     }
 
     # Invalid input
     else {
-      Carp::croak(qq/Unexpected input "$curr->{type}"/);
+      Carp::croak(qq/Unexpected input "$self->{_curr}{type}"/);
     }
 
     # Fill parent array with data
-    while (my $parent = delete $curr->{parent}) {
-      delete $curr->{len};
-      push @{$parent->{data}}, $curr;
+    while (my $parent = delete $self->{_curr}{parent}) {
+      delete $self->{_curr}{len};
+      push @{$parent->{data}}, $self->{_curr};
 
       if (@{$parent->{data}} < $parent->{len}) {
-        $curr = $self->{_curr} = {parent => $parent};
+        $self->{_curr} = {parent => $parent};
         next CHUNK;
       }
       else {
-        $curr = $self->{_curr} = $parent;
+        $self->{_curr} = $parent;
       }
     }
 
     # Emit a complete message
-    delete $curr->{len};
-    if (defined $cb) {
-      $cb->($self, $curr);
+    delete $self->{_curr}{len};
+    if (defined $self->{_on_message_cb}) {
+      $self->{_on_message_cb}->($self, delete $self->{_curr});
     } else {
-      push @{$self->{_messages}}, $curr;
+      push @{$self->{_messages}}, delete $self->{_curr};
     }
-    $curr = $self->{_curr} = {};
   }
 }
 

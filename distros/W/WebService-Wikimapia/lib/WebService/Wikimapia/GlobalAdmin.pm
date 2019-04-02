@@ -1,6 +1,6 @@
 package WebService::Wikimapia::GlobalAdmin;
 
-$WebService::Wikimapia::GlobalAdmin::VERSION   = '0.13';
+$WebService::Wikimapia::GlobalAdmin::VERSION   = '0.14';
 $WebService::Wikimapia::GlobalAdmin::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::GlobalAdmin - Placeholder for 'gadm' of L<WebService::Wik
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'id'            => (is => 'ro');
 has 'name'          => (is => 'ro');

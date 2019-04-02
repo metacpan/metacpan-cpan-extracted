@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008000;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,15 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "MooX-Const",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008000",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "MooX::Const",
   "PREREQ_PM" => {
     "Moo" => "1.006000",
-    "Safe::Isa" => 0,
     "Types::Const" => "0.3.3",
     "Types::Standard" => 0,
-    "namespace::autoclean" => 0,
-    "version" => "0.77"
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -32,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.2.2",
+  "VERSION" => "v0.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,14 +41,12 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "Module::Metadata" => 0,
   "Moo" => "1.006000",
-  "Safe::Isa" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "Types::Const" => "0.3.3",
   "Types::Standard" => 0,
   "lib" => 0,
-  "namespace::autoclean" => 0,
-  "version" => "0.77"
+  "namespace::autoclean" => 0
 );
 
 

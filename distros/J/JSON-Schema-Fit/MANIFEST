@@ -10,3 +10,4 @@ lib/JSON/Schema/Fit.pm
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/get_adjusted.t
+t/partial.t

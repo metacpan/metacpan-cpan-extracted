@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use File::Spec;
-use Test::PerlTidy;
+use File::Spec ();
+use Test::PerlTidy qw( run_tests );
 
 my $perltidyrc = File::Spec->catfile( 't', '_perltidyrc.txt' );
 

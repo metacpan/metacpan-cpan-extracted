@@ -366,6 +366,11 @@ SKIP: {
     $count = $hibp->password($good_password);
     ok( $count == 0,
         "Good password '$good_password' returns a count of $count" );
+    my $utf8_password = (chr hex "03D2") . (chr hex "0308"); # from https://www.unicode.org/faq/normalization.html#6
+    $count = $hibp->password($utf8_password);
+    my $encoded_password = Encode::encode('UTF-8', $utf8_password, 1);
+    ok( $count == 0, "UTF-8 password '$encoded_password' returns a count of $count" );
+    ok ($hibp->last_request()->uri() eq 'https://api.pwnedpasswords.com/range/F50FE', "Correctly encoded the uri for a password check for '$encoded_password' into " . $hibp->last_request()->uri());
 	$ENV{HTTPS_PROXY} = 'http://incorrect.example.com';
 	$hibp = WebService::HIBP->new();
 	eval {

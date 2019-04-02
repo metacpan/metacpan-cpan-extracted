@@ -3,12 +3,12 @@ package MooX::Const;
 # ABSTRACT: Syntactic sugar for constant and write-once Moo attributes
 
 use utf8;
-use v5.8;
+use v5.10.1;
 
 use Carp qw( croak );
 use Moo       ();
 use Moo::Role ();
-use Safe::Isa qw( $_isa );
+use Scalar::Util qw/ blessed /;
 use Types::Const qw( Const );
 use Types::Standard qw( Value Object Ref );
 
@@ -17,13 +17,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.2';
-
-
-sub VERSION { # for older Perls
-    require version;
-    return version->parse($VERSION);
-}
+our $VERSION = 'v0.3.1';
 
 
 sub import {
@@ -54,7 +48,7 @@ sub _process_has {
 
         if ( my $isa = $opts{isa} ) {
 
-            unless ( $isa->$_isa('Type::Tiny') ) {
+            unless ( blessed($isa) && $isa->isa('Type::Tiny') ) {
                 croak "isa must be a Type::Tiny type";
             }
 
@@ -120,7 +114,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.2.2
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -169,14 +163,18 @@ references:
 This allows you to set the attribute I<once>. The value is coerced
 into a constant, and cannot be changed again.
 
-=for Pod::Coverage VERSION
+=head1 KNOWN ISSUES
 
-=head1 ROADMAP
+Accessing non-existent keys for hash references will throw an
+error. This is a feature, not a bug, of read-only hash references, and
+it can be used to catch mistakes in code that refer to non-existent
+keys.
 
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
+Unfortunately, this behaviour is not replicated with array references.
 
 =head1 SEE ALSO
+
+L<Const::Fast>
 
 L<Moo>
 
@@ -213,7 +211,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

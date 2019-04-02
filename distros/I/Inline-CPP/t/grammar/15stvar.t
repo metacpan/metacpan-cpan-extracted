@@ -3,6 +3,9 @@ use warnings;
 use Test::More;
 # Test static variables
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 use Inline CPP => <<'END';
 class Foo {
   public:

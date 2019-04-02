@@ -1,6 +1,6 @@
 package WebService::Wikimapia::Language;
 
-$WebService::Wikimapia::Language::VERSION   = '0.13';
+$WebService::Wikimapia::Language::VERSION   = '0.14';
 $WebService::Wikimapia::Language::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::Language - Placeholder for 'language' of L<WebService::Wi
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'lang_id'           => (is => 'ro');
 has 'lang_name'         => (is => 'ro');

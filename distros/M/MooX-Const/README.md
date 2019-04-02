@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.2.2
+version v0.3.1
 
 # SYNOPSIS
 
@@ -59,12 +59,18 @@ has setting => (
 This allows you to set the attribute _once_. The value is coerced
 into a constant, and cannot be changed again.
 
-# ROADMAP
+# KNOWN ISSUES
 
-Support for Perl versions earlier than 5.10 will be removed sometime
-in 2019.
+Accessing non-existent keys for hash references will throw an
+error. This is a feature, not a bug, of read-only hash references, and
+it can be used to catch mistakes in code that refer to non-existent
+keys.
+
+Unfortunately, this behaviour is not replicated with array references.
 
 # SEE ALSO
+
+[Const::Fast](https://metacpan.org/pod/Const::Fast)
 
 [Moo](https://metacpan.org/pod/Moo)
 
@@ -99,7 +105,7 @@ Kang-min Liu 劉康民 <gugod@gugod.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

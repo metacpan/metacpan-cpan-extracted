@@ -144,7 +144,7 @@
          "web" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders"
       }
    },
-   "version" : "0.000021",
+   "version" : "0.000022",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -197,7 +197,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@Author::OALDERS/MAXMIND::TidyAll",
-            "version" : "0.13"
+            "version" : "0.83"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
@@ -495,7 +495,7 @@
                }
             },
             "name" : "@Author::OALDERS/Git::GatherDir",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
@@ -536,7 +536,7 @@
                }
             },
             "name" : "@Author::OALDERS/Git::Check",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -563,6 +563,17 @@
             "version" : "0.163250"
          },
          {
+            "class" : "Dist::Zilla::Plugin::StaticInstall",
+            "config" : {
+               "Dist::Zilla::Plugin::StaticInstall" : {
+                  "dry_run" : 1,
+                  "mode" : "auto"
+               }
+            },
+            "name" : "@Author::OALDERS/StaticInstall",
+            "version" : "0.012"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::OALDERS/ShareDir",
             "version" : "6.012"
@@ -571,6 +582,11 @@
             "class" : "Dist::Zilla::Plugin::TravisCI::StatusBadge",
             "name" : "@Author::OALDERS/TravisCI::StatusBadge",
             "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckIssues",
+            "name" : "@Author::OALDERS/CheckIssues",
+            "version" : "0.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
@@ -633,7 +649,7 @@
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
                   "add_files_in" : [],
-                  "commit_msg" : "v%v%n%n%c"
+                  "commit_msg" : "v%V%n%n%c"
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
@@ -658,7 +674,7 @@
                }
             },
             "name" : "@Author::OALDERS/@Git::VersionManager/release snapshot",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -667,9 +683,9 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.000021",
-                  "tag_format" : "v%v",
-                  "tag_message" : "v%v"
+                  "tag" : "v0.000022",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
                   "git_version" : "2.20.1",
@@ -680,7 +696,7 @@
                }
             },
             "name" : "@Author::OALDERS/@Git::VersionManager/Git::Tag",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
@@ -730,7 +746,7 @@
                }
             },
             "name" : "@Author::OALDERS/@Git::VersionManager/post-release commit",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",
@@ -747,7 +763,7 @@
                }
             },
             "name" : "@Author::OALDERS/Git::Push",
-            "version" : "2.045"
+            "version" : "2.046"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -847,6 +863,6 @@
       "Olaf Alders <olaf@wundersolutions.com>"
    ],
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

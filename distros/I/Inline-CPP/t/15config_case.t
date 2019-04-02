@@ -7,7 +7,9 @@ use Test::More tests => 1;
 # option.  See t/namespace/06inherit.t for testing of insensitive Inline::CPP
 # handled options.
 
-use Inline CPP => config => prefix => 'test_';
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0,
+  prefix => 'test_';
 
 use Inline CPP => <<'EOCPP';
 

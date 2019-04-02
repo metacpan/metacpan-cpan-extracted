@@ -17,11 +17,11 @@ use App::PhotoDB::funcs qw(/./);
 use App::PhotoDB::queries;
 
 our @EXPORT_OK = qw(
-	film_add film_load film_archive film_develop film_tag film_locate film_bulk film_annotate film_stocks film_current film_choose film_info
-	camera_add camera_displaylens camera_sell camera_repair camera_addbodytype camera_exposureprogram camera_shutterspeeds camera_accessory camera_meteringmode camera_info camera_choose camera_edit
+	film_add film_load film_archive film_develop film_tag film_locate film_bulk film_annotate film_stocks film_current film_choose film_info film_search
+	camera_add camera_displaylens camera_sell camera_repair camera_addbodytype camera_exposureprogram camera_shutterspeeds camera_accessory camera_meteringmode camera_info camera_choose camera_edit camera_search
 	mount_add mount_info mount_adapt
-	negative_add negative_bulkadd negative_prints negative_info negative_tag
-	lens_add lens_sell lens_repair lens_accessory lens_info lens_edit
+	negative_add negative_bulkadd negative_prints negative_info negative_tag negative_search
+	lens_add lens_sell lens_repair lens_accessory lens_info lens_edit lens_search
 	print_add print_tone print_sell print_order print_fulfil print_archive print_unarchive print_locate print_info print_exhibit print_label print_worklist print_tag
 	paperstock_add
 	developer_add
@@ -31,7 +31,7 @@ our @EXPORT_OK = qw(
 	teleconverter_add
 	filter_add filter_adapt
 	manufacturer_add
-	accessory_add accessory_category accessory_info
+	accessory_add accessory_category accessory_info accessory_search
 	enlarger_add enlarger_info enlarger_sell
 	flash_add
 	battery_add
@@ -229,6 +229,21 @@ sub film_choose {
 			return &listchoices({db=>$db, cols=>['film_id as id', 'notes as opt'], table=>'FILM', where=>$thinwhere, required=>1});
 		}
 	}
+	return;
+}
+
+# Search for a film
+sub film_search {
+	my $db = shift;
+	my $searchterm = &prompt({prompt=>'Enter film search term'});
+	my $rows = &printlist({
+		db    => $db,
+		msg   => "films that match '$searchterm'",
+		cols  => ['film_id as id', 'notes as opt'],
+		table => 'FILM',
+		where => "notes like '%$searchterm%' collate utf8mb4_general_ci",
+	});
+	print "Found $rows rows\n";
 	return;
 }
 
@@ -444,6 +459,21 @@ sub camera_displaylens {
 	return &updaterecord({db=>$db, data=>\%data, table=>'CAMERA', where=>"camera_id=$camera_id"});
 }
 
+# Search for a camera
+sub camera_search {
+	my $db = shift;
+	my $searchterm = &prompt({prompt=>'Enter camera search term'});
+	my $rows = &printlist({
+		db    => $db,
+		msg   => "cameras that match '$searchterm'",
+		cols  => ['id', 'opt'],
+		table => 'choose_camera',
+		where => "opt like '%$searchterm%' collate utf8mb4_general_ci",
+	});
+	print "Found $rows rows\n";
+	return;
+}
+
 # Sell a camera
 sub camera_sell {
 	my $db = shift;
@@ -649,10 +679,25 @@ sub negative_prints {
 
 # Write EXIF tags to scans from a negative
 sub negative_tag {
-        my $db = shift;
+	my $db = shift;
 	my $neg_id = &chooseneg({db=>$db});
-        &tag($db, {negative_id=>$neg_id});
-        return;
+	&tag($db, {negative_id=>$neg_id});
+	return;
+}
+
+# Search for a negative
+sub negative_search {
+	my $db = shift;
+	my $searchterm = &prompt({prompt=>'Enter negative search term'});
+	my $rows = &printlist({
+		db    => $db,
+		msg   => "negatives that match '$searchterm'",
+		cols  => ["concat(film_id, '/', frame) as id", 'description as opt'],
+		table => 'NEGATIVE',
+		where => "description like '%$searchterm%' collate utf8mb4_general_ci",
+	});
+	print "Found $rows rows\n";
+	return;
 }
 
 # Add a new lens to the database
@@ -756,6 +801,21 @@ sub lens_accessory {
 		&newrecord({db=>$db, data=>\%compatdata, table=>'ACCESSORY_COMPAT'});
 		last if (!&prompt({default=>'yes', prompt=>'Add more accessory compatibility info?', type=>'boolean'}));
 	}
+	return;
+}
+
+# Search for a camera
+sub lens_search {
+	my $db = shift;
+	my $searchterm = &prompt({prompt=>'Enter lens search term'});
+	my $rows = &printlist({
+		db    => $db,
+		msg   => "lenses that match '$searchterm'",
+		cols  => ['id', 'opt'],
+		table => 'choose_lens',
+		where => "opt like '%$searchterm%' collate utf8mb4_general_ci",
+	});
+	print "Found $rows rows\n";
 	return;
 }
 
@@ -1188,6 +1248,21 @@ sub accessory_info {
 	my $accessory_id = &listchoices({db=>$db, table=>'choose_accessory'});
 	my $accessorydata = &lookupcol({db=>$db, table=>'info_accessory', where=>{'`Accessory ID`'=>$accessory_id}});
 	print Dump($accessorydata);
+	return;
+}
+
+# Search for an accessory
+sub accessory_search {
+	my $db = shift;
+	my $searchterm = &prompt({prompt=>'Enter accessory search term'});
+	my $rows = &printlist({
+		db    => $db,
+		msg   => "accessories that match '$searchterm'",
+		cols  => ['id', 'opt'],
+		table => 'choose_accessory',
+		where => "opt like '%$searchterm%' collate utf8mb4_general_ci",
+	});
+	print "Found $rows rows\n";
 	return;
 }
 
@@ -1747,15 +1822,19 @@ sub scan_search {
 					if ($auto || &prompt({prompt=>"This looks like a scan of negative $film_id/$frame. Add it?", type=>'boolean', default=>'yes', required=>1})) {
 						my $neg_id = &lookupval({db=>$db, col=>"lookupneg($film_id, '$frame')", table=>'NEGATIVE'});
 						my $subdir = &lookupval({db=>$db, col=>'directory', table=>'FILM', where=>{film_id=>$film_id}});
-						my $basepath = &basepath;
-						my $correctpath = "$basepath/$subdir/$filename";
 
-						# Test to make sure it's in a valid directory
-						if ($fsonlyfile ne $correctpath) {
-							if (&prompt({prompt=>"Move scan $fsonlyfile to its correct path $correctpath?", type=>'boolean', default=>'yes'})) {
-								# Rename it to the correct dir and continue using the new path
-								rename(&untaint($fsonlyfile), &untaint($correctpath));
-								$fsonlyfile = $correctpath;
+						# Test for non-null subdir
+						if ($subdir =~ m/.+/) {
+							my $basepath = &basepath;
+							my $correctpath = "$basepath/$subdir/$filename";
+
+							# Test to make sure it's in a valid directory
+							if ($fsonlyfile ne $correctpath) {
+								if (&prompt({prompt=>"Move scan $fsonlyfile to its correct path $correctpath?", type=>'boolean', default=>'yes'})) {
+									# Rename it to the correct dir and continue using the new path
+									rename(&untaint($fsonlyfile), &untaint($correctpath));
+									$fsonlyfile = $correctpath;
+								}
 							}
 						}
 

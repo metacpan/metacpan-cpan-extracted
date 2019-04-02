@@ -9,7 +9,8 @@ use warnings;
 
 my $res0 = eval q[
 
-  use Inline CPP => config => namespace => 'BurBat' => classes => 'MyFuu';
+  use Inline CPP => config => namespace => 'BurBat' => classes => 'MyFuu',
+    force_build => 1, clean_after_build => 0;
 
   use Inline CPP => <<'EOCPP';
     class Fuu {
@@ -34,6 +35,7 @@ like $@,
 my $res1 = eval q[
 
   use Inline CPP => config =>
+    force_build => 1, clean_after_build => 0,
     namespace => 'BurBat',
     classes   => { '!@#$' => 'MyFuu'};
     
@@ -56,6 +58,7 @@ like $@, qr/is not a supported C\+\+ class\./, 'Correct message.';
 
 my $res2 = eval q[
   use Inline CPP => config =>
+    force_build => 1, clean_after_build => 0,
     namespace => 'BurBat',
     classes   => { 'Fuu' => '!@#$'};
     

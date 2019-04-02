@@ -1,5 +1,5 @@
 package Class::props ;
-$VERSION = 2.21 ;
+$VERSION = 2.41 ;
 use 5.006_001 ;
 use strict ;
   
@@ -156,9 +156,9 @@ __END__
 
 Class::props - Pragma to implement lvalue accessors with options
 
-=head1 VERSION 2.21
+=head1 VERSION 2.41
 
-Included in OOTools 2.21 distribution.
+Included in OOTools 2.41 distribution.
 
 The latest versions changes are reported in the F<Changes> file in this distribution.
 
@@ -170,35 +170,35 @@ The distribution includes:
 
 Pragma to implement lvalue accessors with options
 
-=item * Package::groups
+=item Package::groups
 
 Pragma to implement groups of properties accessors with options
 
-=item * Class::constr
+=item Class::constr
 
 Pragma to implement constructor methods
 
-=item * Class::props
+=item Class::props
 
 Pragma to implement lvalue accessors with options
 
-=item * Class::groups
+=item Class::groups
 
 Pragma to implement groups of properties accessors with options
 
-=item * Class::Error
+=item Class::Error
 
 Delayed checking of object failure
 
-=item * Class::Util
+=item Class::Util
 
 Class utility functions
 
-=item * Object::props
+=item Object::props
 
 Pragma to implement lvalue accessors with options
 
-=item * Object::groups
+=item Object::groups
 
 Pragma to implement groups of properties accessors with options
 
@@ -515,7 +515,7 @@ If you need support or if you want just to send me some feedback or request, ple
 
 =head1 AUTHOR and COPYRIGHT
 
-© 2004-2005 by Domizio Demichelis.
+Copyright 2004-2005 by Domizio Demichelis.
 
 All Rights Reserved. This module is free software. It may be used, redistributed and/or modified under the same terms as perl itself.
 

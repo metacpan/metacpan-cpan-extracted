@@ -1,6 +1,6 @@
 package WebService::Wikimapia::City;
 
-$WebService::Wikimapia::City::VERSION   = '0.13';
+$WebService::Wikimapia::City::VERSION   = '0.14';
 $WebService::Wikimapia::City::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::City - Placeholder for 'city' of L<WebService::Wikimapia:
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'id'            => (is => 'ro');
 has 'title'         => (is => 'ro');

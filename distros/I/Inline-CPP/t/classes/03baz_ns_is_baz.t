@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Inline CPP => config =>
+  force_build => 1, clean_after_build => 0,
   namespace => 'Buz',
   classes   => { 'Fuu' => 'MyFuu', 'Bur' => 'MyBur'};
 

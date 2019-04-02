@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Carp;
 
@@ -137,12 +137,17 @@ be turned into an immediate-failed C<Future> rather than making the call
 itself propagate the exception, which is usually what you wanted when dealing
 with futures.
 
-=head1 EARLY-VERSION WARNING
+=head1 BETA-VERSION WARNING
 
-B<WARNING>: The actual semantics in this module are in an early state of
-implementation. Some things will randomly break. While it seems stable enough
-for small-scale development and experimental testing, don't expect to be able
-to use this module reliably in production yet.
+This module is still relatively new. While it seems stable enough for
+small-scale development and experimental testing, don't expect to be able to
+use this module reliably in production yet. It doesn't memory leak in most
+simple cases, but I don't have a great amount of confidence that there aren't
+still some corner-cases left which do.
+
+That said, using it just in places like unit-tests and short-term scripts it
+does appear to be quite stable, so do try experimenting with it in this sort
+of situation, and let me know what does and doesn't work. 
 
 =head2 Things That Work
 
@@ -361,19 +366,11 @@ at L<https://rt.cpan.org/Dist/Display.html?Name=Future-AsyncAwait>.
 
 =item *
 
-Named loop controls do not work; they fail to find the jump label when split
-across an C<await> call.
+In some situations, foreach values on computed lists of expressions may lose
+values. A workaround for this is to calculate values ahead of time into a
+lexical array, and iterate over that.
 
-   async sub func
-   {
-      FUTURE: foreach my $f ( @futures ) {
-         await $f and last FUTURE;
-      }
-   }
-
-This only affects the label search; non-labeled loop controls work fine.
-
-L<https://rt.cpan.org/Ticket/Display.html?id=128205>
+L<https://rt.cpan.org/Ticket/Display.html?id=128619>
 
 =back
 

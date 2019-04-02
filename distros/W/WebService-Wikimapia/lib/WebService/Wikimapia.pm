@@ -1,6 +1,6 @@
 package WebService::Wikimapia;
 
-$WebService::Wikimapia::VERSION   = '0.13';
+$WebService::Wikimapia::VERSION   = '0.14';
 $WebService::Wikimapia::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia - Interface to Wikimapia API.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -26,7 +26,7 @@ use WebService::Wikimapia::Params qw($Disable $Format $Pack $FIELDS $Language $N
 use WebService::Wikimapia::UserAgent::Exception;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 extends 'WebService::Wikimapia::UserAgent';
 
 has 'base_url' => (is => 'ro', default => sub { return 'http://api.wikimapia.org/'; });

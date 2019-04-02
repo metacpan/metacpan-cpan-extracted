@@ -3,6 +3,9 @@ use warnings;
 use Test::More;
 # Test declarations of multiple variables in a member data list.
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 use Inline CPP => <<'END';
 
 #define NUMBER 25

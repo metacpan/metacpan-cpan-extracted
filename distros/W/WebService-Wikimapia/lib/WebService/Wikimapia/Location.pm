@@ -1,6 +1,6 @@
 package WebService::Wikimapia::Location;
 
-$WebService::Wikimapia::Location::VERSION   = '0.13';
+$WebService::Wikimapia::Location::VERSION   = '0.14';
 $WebService::Wikimapia::Location::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WebService::Wikimapia::Location - Placeholder for 'location' of L<WebService::Wi
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -18,7 +18,7 @@ use Data::Dumper;
 use WebService::Wikimapia::GlobalAdmin;
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 has 'east'           => (is => 'ro');
 has 'west'           => (is => 'ro');

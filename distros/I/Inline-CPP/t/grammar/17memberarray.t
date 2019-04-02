@@ -3,6 +3,9 @@ use warnings;
 use Test::More;
 # Test member array feature (single-dimensional only).
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 use Inline CPP => 'DATA';
 
 my $obj = new_ok( 'TestMemberArray' );

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use File::Spec;
+use File::Spec ();
 use Test::More;
 
 unless ( $ENV{TEST_AUTHOR} ) {

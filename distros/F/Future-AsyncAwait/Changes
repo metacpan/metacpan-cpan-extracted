@@ -1,5 +1,14 @@
 Revision history for Future-AsyncAwait
 
+0.22    2019-04-02 00:12:47
+        [CHANGES]
+         * More detailed annotations in Devel::MAT::Dumper helper
+
+        [BUGFIXES]
+         * Partial attempt at freeing things when dropping a pending await
+           future (RT128620)
+         * Fix for labeled loop controls (RT128205)
+
 0.21    2019-02-02 17:19:35
         [BUGFIXES]
          * Fix more memory leaks - simple test case now executes cleanly

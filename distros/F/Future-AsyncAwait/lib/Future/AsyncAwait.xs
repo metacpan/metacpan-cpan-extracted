@@ -86,6 +86,8 @@ struct SuspendedFrame {
   U32 marklen;
   I32 *marks;
 
+  COP *oldcop;
+
   /* items from the save stack */
   U32 savedlen;
   struct Saved {
@@ -267,6 +269,28 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
   ret += DMD_ANNOTATE_SV(sv, state->awaiting_future, "the awaiting Future");
   ret += DMD_ANNOTATE_SV(sv, state->returning_future, "the returning Future");
 
+  SuspendedFrame *frame;
+  for(frame = state->frames; frame; frame = frame->next) {
+    if(frame->stacklen) {
+      int i;
+      for(i = 0; i < frame->stacklen; i++)
+        ret += DMD_ANNOTATE_SV(sv, frame->stack[i], "a suspended stack temporary");
+    }
+  }
+
+  if(state->padlen) {
+    int i;
+    for(i = 0; i < state->padlen - 1; i++)
+      if(state->padslots[i])
+        ret += DMD_ANNOTATE_SV(sv, state->padslots[i], "a suspended pad slot");
+  }
+
+  if(state->mortallen) {
+    int i;
+    for(i = 0; i < state->mortallen; i++)
+      ret += DMD_ANNOTATE_SV(sv, state->mortals[i], "a suspended mortal");
+  }
+
   return ret;
 }
 #endif
@@ -305,23 +329,86 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
   SuspendedState *state = (SuspendedState *)mg->mg_ptr;
 
   if(state->awaiting_future) {
-    fprintf(stderr, "TODO: free ->awaiting_future\n");
+    SvREFCNT_dec(state->awaiting_future);
+    state->awaiting_future = NULL;
   }
 
   if(state->returning_future) {
-    fprintf(stderr, "TODO: free ->returning_future\n");
+    SvREFCNT_dec(state->returning_future);
+    state->returning_future = NULL;
   }
 
   if(state->frames) {
-    fprintf(stderr, "TODO: free ->frames\n");
+    SuspendedFrame *frame, *next = state->frames;
+    while((frame = next)) {
+      next = frame->next;
+
+      if(frame->stacklen) {
+        /* The stack isn't refcounted, so we should not SvREFCNT_dec() these
+         * items
+         */
+        Safefree(frame->stack);
+      }
+
+      if(frame->marklen) {
+        Safefree(frame->marks);
+      }
+
+      if(frame->saved) {
+        int idx;
+        for(idx = 0; idx < frame->savedlen; idx++) {
+          struct Saved *saved = &frame->saved[idx];
+          switch(saved->type) {
+            /* Saved types for which we've no cleanup needed */
+#ifdef SAVEt_CLEARPADRANGE
+            case SAVEt_CLEARPADRANGE:
+#endif
+            case SAVEt_CLEARSV:
+            case SAVEt_COMPPAD:
+            case SAVEt_INT_SMALL:
+#ifdef SAVEt_STRLEN
+            case SAVEt_STRLEN:
+#endif
+            case SAVEt_SET_SVFLAGS:
+              break;
+
+            default:
+              fprintf(stderr, "TODO: free saved slot type %d\n", saved->type);
+              break;
+          }
+        }
+
+        Safefree(frame->saved);
+      }
+
+      /* TODO: maybe free items of the el.loop */
+
+#ifdef HAVE_ITERVAR
+      if(frame->itervar)
+        fprintf(stderr, "TODO: free frame->itervar\n");
+#endif
+
+      Safefree(frame);
+    }
   }
 
   if(state->padslots) {
-    fprintf(stderr, "TODO: free ->padslots\n");
+    int i;
+    for(i = 0; i < state->padlen - 1; i++) {
+      if(state->padslots[i])
+        SvREFCNT_dec(state->padslots[i]);
+    }
+
+    Safefree(state->padslots);
+    state->padslots = NULL;
   }
 
   if(state->mortals) {
-    fprintf(stderr, "TODO: free ->mortals\n");
+    int i;
+    for(i = 0; i < state->mortallen; i++)
+      sv_2mortal(state->mortals[i]);
+
+    Safefree(state->mortals);
   }
 
   Safefree(state);
@@ -359,6 +446,8 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     }
     PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp;
   }
+
+  frame->oldcop = cx->blk_oldcop;
 
   I32 old_saveix = OLDSAVEIX(cx);
   /* This is an over-estimate but it doesn't matter. We just waste a bit of RAM
@@ -731,6 +820,9 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
     Newx(frame, 1, SuspendedFrame);
     frame->next = state->frames;
     state->frames = frame;
+#ifdef HAVE_ITERVAR
+    frame->itervar = NULL;
+#endif
 
     suspend_block(frame, cx);
 
@@ -933,6 +1025,8 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     Safefree(frame->marks);
   }
 
+  cx->blk_oldcop = frame->oldcop;
+
   for(i = frame->savedlen - 1; i >= 0; i--) {
     struct Saved *saved = &frame->saved[i];
 
@@ -1095,6 +1189,7 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
 #  endif
         SvREFCNT_dec(*CxITERVAR(cx));
         *CxITERVAR(cx) = frame->itervar;
+        frame->itervar = NULL;
 #else
         cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
 #endif
@@ -1445,6 +1540,7 @@ static OP *pp_await(pTHX)
   future_on_ready(f, curcv);
 
   state->awaiting_future = newSVsv(f);
+  sv_rvweaken(state->awaiting_future);
 
   if(!state->returning_future)
     state->returning_future = future_new_from_proto(f);
@@ -1453,8 +1549,11 @@ static OP *pp_await(pTHX)
     SvREFCNT_dec((SV *)curcv);
 
   PUSHMARK(SP);
-  PUSHs(state->returning_future);
+  mPUSHs(newSVsv(state->returning_future));
   PUTBACK;
+
+  if(!SvWEAKREF(state->returning_future))
+    sv_rvweaken(state->returning_future);
 
   TRACEPRINT("LEAVE await curcv=%p [%s:%d]\n", curcv, CopFILE(curcop), CopLINE(curcop));
 

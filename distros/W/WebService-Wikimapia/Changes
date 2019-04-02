@@ -1,5 +1,8 @@
 Revision history for WebService::Wikimapia
 
+0.14  Tue Apr 02 17:05:00 2019
+      - Used namespace::autoclean instead.
+
 0.13  Mon Mar 12 15:55:00 2018
       - Improved method exporting.
 

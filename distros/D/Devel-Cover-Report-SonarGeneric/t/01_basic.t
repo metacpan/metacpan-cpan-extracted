@@ -3,6 +3,7 @@ use warnings;
 
 use Test::More;
 use Path::Tiny qw(path);
+use Devel::Cover::DB;
 
 use_ok "Devel::Cover::Report::SonarGeneric";
 
@@ -15,7 +16,11 @@ unlink $rfn if -e $rfn;
 ok(! -e $rfn, 'start fresh');
 
 $ENV{DEVEL_COVER_DB_FORMAT} = 'JSON';
-system('cover -report SonarGeneric');
+
+my $db    = Devel::Cover::DB->new(db => 'cover_db');
+my @files = sort $db->cover->items;
+
+Devel::Cover::Report::SonarGeneric->report($db, {file => \@files});
 
 ok(-e $rfn, 'report generated');
 

@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use Test::More tests => 5;
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0;
+
 use Inline (CPP => 'DATA', classes => sub { join('::', split('__', shift)); } );  # AUTOMATIC
 #use Inline (CPP => 'DATA', classes => { 'Inline__Test__Inline_CPP_Debug' => 'Inline::Test::Inline_CPP_Debug'} );  # MANUAL
 

@@ -3,7 +3,7 @@ package Dist::Zilla::PluginBundle::Author::OALDERS;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000022';
 
 use feature qw( say );
 
@@ -46,6 +46,11 @@ sub configure {
 
     my @allow_dirty
         = ( 'dist.ini', 'Changes', @copy_from_build, @copy_from_release );
+
+    my $static_install_mode = $self->payload->{'StaticInstall.mode'}
+        // 'auto';
+    my $static_install_dry_run = $self->payload->{'StaticInstall.dry_run'}
+        // 1;
 
     my @plugins = (
         [
@@ -130,8 +135,15 @@ sub configure {
                 type     => 'markdown',
             }
         ],
+        [
+            'StaticInstall' => {
+                ':version' => '0.005', mode => $static_install_mode,
+                dry_run    => $static_install_dry_run
+            }
+        ],
         'ShareDir',
         'TravisCI::StatusBadge',
+        'CheckIssues',
         'ConfirmRelease',
         'UploadToCPAN',
     );
@@ -185,7 +197,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000021
+version 0.000022
 
 =head2 configure
 

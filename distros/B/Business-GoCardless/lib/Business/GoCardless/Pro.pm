@@ -431,12 +431,15 @@ sub _redirect_flow_from_legacy_params {
                     ( $params{user}{billing_address1} ? ( address_line1 => $params{user}{billing_address1} ) : () ),
                     ( $params{user}{billing_address2} ? ( address_line2 => $params{user}{billing_address2} ) : () ),
                     ( $params{user}{billing_address3} ? ( address_line3 => $params{user}{billing_address3} ) : () ),
+                    ( $params{user}{billing_town}     ? ( city          => $params{user}{billing_town} ) : () ),
+                    ( $params{user}{billing_postcode} ? ( postal_code   => $params{user}{billing_postcode} ) : () ),
+
                     ( $params{user}{last_name}        ? ( family_name   => $params{user}{last_name} ) : () ),
-                    ( $params{user}{postal_code}      ? ( postal_code   => $params{user}{postal_code} ) : () ),
+                    ( $params{user}{first_name}       ? ( given_name    => $params{user}{first_name} ) : () ),
 
                     (
                         map { ( $params{user}{$_} ? ( $_ => $params{user}{$_} ) : () ) }
-                        qw/ city company_name country_code email given_name language region swedish_identity_number /
+                        qw/ city company_name country_code email given_name language region swedish_identity_number postal_code /
                     ),
                 },
             )

@@ -3,7 +3,9 @@ package main; ## no critic (package)
 use strict;
 use warnings;
 
-use Inline CPP => config => namespace => '';
+# this is needed to avoid false passes if was done first without 'info'
+use Inline CPP => config => force_build => 1, clean_after_build => 0,
+  namespace => '';
 
 use Inline CPP => <<'EOCPP';
 

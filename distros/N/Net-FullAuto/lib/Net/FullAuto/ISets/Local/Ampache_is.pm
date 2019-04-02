@@ -1973,7 +1973,11 @@ END
       my $output.=Net::FullAuto::FA_Core::fetch($handle);
       last if $output=~/$prompt/;
       print $output;
-      if (-1<index $output,'choose a different)') {
+      if (-1<index $output,'bash_profile? [N/y/f]') {
+         $handle->{_cmd_handle}->print('y');
+         $output='';
+         next;
+      } elsif (-1<index $output,'choose a different)') {
          $handle->{_cmd_handle}->print('y');
          $output='';
          next;

@@ -2,6 +2,9 @@ use strict;
 use warnings;
 use Test::More tests => 12;
 
+# this is needed to avoid false passes if was done first without 'info'
+use Inline 'C++' => config => force_build => 1, clean_after_build => 0;
+
 # Test modified from original: Constructor must make copies of the strings
 # passed in as params, otherwise pointers may become invalid.
 

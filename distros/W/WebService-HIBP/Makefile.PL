@@ -21,6 +21,8 @@ WriteMakefile(
         'strict'                => 0,
         'warnings'              => 0,
         'Digest::SHA'           => 0,
+        'Encode'                => 0,
+        'Unicode::Normalize'    => 0, 
         'URI::Escape'           => 3.30,
         'URI'                   => 1.53,
         'JSON'                  => 0,

@@ -25,6 +25,7 @@ my @files = (
     't/author-synopsis.t',
     't/merge.t',
     't/module.t',
+    't/regress.t',
     't/release-kwalitee.t'
 );
 

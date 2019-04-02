@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::Moveto;
-$SVG::Estimate::Path::Moveto::VERSION = '1.0112';
+$SVG::Estimate::Path::Moveto::VERSION = '1.0113';
 use Moo;
 
 extends 'SVG::Estimate::Path::Command';
@@ -11,7 +11,7 @@ SVG::Estimate::Path::Moveto - Handles estimating non-drawn movement.
 
 =head1 VERSION
 
-version 1.0112
+version 1.0113
 
 =head1 SYNOPSIS
 

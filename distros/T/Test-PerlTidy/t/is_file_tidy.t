@@ -5,8 +5,8 @@ use warnings;
 
 use Test::More tests => 2;
 
-use File::Spec;
-use Test::PerlTidy;
+use File::Spec     ();
+use Test::PerlTidy ();
 
 my $perltidyrc = File::Spec->catfile( 't', '_perltidyrc.txt' );
 

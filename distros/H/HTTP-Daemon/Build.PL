@@ -87,7 +87,7 @@ EOW
         "Gisle Aas <gisle\@activestate.com>"
       ],
       "dist_name" => "HTTP-Daemon",
-      "dist_version" => "6.02",
+      "dist_version" => "6.04",
       "license" => "perl",
       "module_name" => "HTTP::Daemon",
       "recursive_test_files" => 1,
@@ -107,12 +107,11 @@ EOW
       "test_requires" => {
         "File::Spec" => 0,
         "IO::Socket::INET" => 0,
-        "LWP::RobotUA" => 0,
-        "LWP::UserAgent" => 0,
         "Module::Metadata" => 0,
         "Socket" => 0,
         "Test" => 0,
         "Test::More" => 0,
+        "Test::Needs" => 0,
         "URI" => 0,
         "perl" => "5.006"
       }
@@ -122,12 +121,11 @@ EOW
     my %fallback_build_requires = (
       "File::Spec" => 0,
       "IO::Socket::INET" => 0,
-      "LWP::RobotUA" => 0,
-      "LWP::UserAgent" => 0,
       "Module::Metadata" => 0,
       "Socket" => 0,
       "Test" => 0,
       "Test::More" => 0,
+      "Test::Needs" => 0,
       "URI" => 0,
       "perl" => "5.006"
     );

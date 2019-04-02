@@ -4,13 +4,13 @@
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-Wikimapia",
    "no_index" : {
@@ -36,7 +36,7 @@
             "JSON" : "0",
             "Moo" : "0",
             "Throwable" : "0",
-            "namespace::clean" : "0",
+            "namespace::autoclean" : "0.28",
             "perl" : "5.006"
          }
       }
@@ -44,79 +44,79 @@
    "provides" : {
       "WebService::Wikimapia" : {
          "file" : "lib/WebService/Wikimapia.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Category" : {
          "file" : "lib/WebService/Wikimapia/Category.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Category::Synonym" : {
          "file" : "lib/WebService/Wikimapia/Category/Synonym.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::City" : {
          "file" : "lib/WebService/Wikimapia/City.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Comment" : {
          "file" : "lib/WebService/Wikimapia/Comment.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::GlobalAdmin" : {
          "file" : "lib/WebService/Wikimapia/GlobalAdmin.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Hotel" : {
          "file" : "lib/WebService/Wikimapia/Hotel.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Language" : {
          "file" : "lib/WebService/Wikimapia/Language.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Location" : {
          "file" : "lib/WebService/Wikimapia/Location.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Object" : {
          "file" : "lib/WebService/Wikimapia/Object.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Params" : {
          "file" : "lib/WebService/Wikimapia/Params.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Photo" : {
          "file" : "lib/WebService/Wikimapia/Photo.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Place" : {
          "file" : "lib/WebService/Wikimapia/Place.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Polygon" : {
          "file" : "lib/WebService/Wikimapia/Polygon.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Street" : {
          "file" : "lib/WebService/Wikimapia/Street.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::Tag" : {
          "file" : "lib/WebService/Wikimapia/Tag.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::User" : {
          "file" : "lib/WebService/Wikimapia/User.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::UserAgent" : {
          "file" : "lib/WebService/Wikimapia/UserAgent.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       },
       "WebService::Wikimapia::UserAgent::Exception" : {
          "file" : "lib/WebService/Wikimapia/UserAgent/Exception.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -127,6 +127,6 @@
          "web" : "https://github.com/manwar/WebService-Wikimapia"
       }
    },
-   "version" : "0.13",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,5 +1,5 @@
 package SVG::Estimate::Role::MakePolygon;
-$SVG::Estimate::Role::MakePolygon::VERSION = '1.0112';
+$SVG::Estimate::Role::MakePolygon::VERSION = '1.0113';
 use strict;
 use Moo::Role;
 use Image::SVG::Transform;
@@ -11,7 +11,7 @@ SVG::Estimate::Role::MakePolygon - Approximate shapes that are hard to estimate
 
 =head1 VERSION
 
-version 1.0112
+version 1.0113
 
 =head1 METHODS
 

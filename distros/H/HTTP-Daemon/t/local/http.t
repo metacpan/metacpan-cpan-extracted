@@ -1,3 +1,7 @@
+#!perl
+
+use Test::Needs 'LWP::UserAgent';
+
 if ($^O eq "MacOS") {
     print "1..0\n";
     exit(0);
@@ -63,9 +67,8 @@ sub url {
 
 print "Will access HTTP server at $base\n";
 
-require LWP::UserAgent;
 require HTTP::Request;
-$ua = new LWP::UserAgent;
+$ua = LWP::UserAgent->new;
 $ua->agent("Mozilla/0.01 " . $ua->agent);
 $ua->from('gisle@aas.no');
 

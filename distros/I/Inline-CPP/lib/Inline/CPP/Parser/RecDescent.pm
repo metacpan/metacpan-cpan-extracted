@@ -4,7 +4,7 @@ package Inline::CPP::Parser::RecDescent;
 # Dev versions will have a _0xx suffix.
 # We eval the $VERSION to accommodate dev version numbering as described in
 # perldoc perlmodstyle
-our $VERSION = '0.75';
+our $VERSION = '0.79';
 #$VERSION = eval $VERSION;  ## no critic (eval)
 
 use Carp;
@@ -36,7 +36,7 @@ END
     return $parser;
 }
 
-use vars qw($TYPEMAP_KIND $class_part $class_decl $star);
+use vars qw($TYPEMAP_KIND $fixkey);
 
 # Parse::RecDescent 1.90 and later have an incompatible change
 # 'The key of an %item entry for a repeated subrule now includes
@@ -54,9 +54,8 @@ require Parse::RecDescent;
       # Use that "stable release" version number as the basis for our numeric
       # comparison.
   my $stable_version = eval $Parse::RecDescent::VERSION;    ## no critic (eval)
-  ($class_part, $class_decl, $star)
-    = map { ($stable_version > 1.89) ? "$_(s?)" : $_ }
-    qw ( class_part class_decl star );
+  $fixkey = ($stable_version > 1.89)
+    ? sub{ $_[0] } : sub{ local $_=shift; s/\(.*\)$//; $_ };
 }    # End lexical scope.
 
 
@@ -103,6 +102,19 @@ sub grammar {
 { use Data::Dumper; }
 
 {
+  sub fixkey { &$Inline::CPP::Parser::RecDescent::fixkey }
+}
+
+{
+    sub handle_args {
+        my ($args) = @_;
+        my %argsdef;
+        $argsdef{arg_names} = [ map $_->{name}, @$args ];
+        $argsdef{arg_types} = [ map $_->{type}, @$args ];
+        $argsdef{arg_offsets} = [ map $_->{offset}, @$args ];
+        $argsdef{arg_optional} = [ map $_->{optional}, @$args ];
+        \%argsdef;
+    }
     sub handle_class_def {
         my ($thisparser, $def) = @_;
 #         print "Found a class: $def->[0]\n";
@@ -169,7 +181,9 @@ part: comment
                           $item[1]->{args});
      push @{$thisparser->{data}{functions}}, $name
            unless defined $thisparser->{data}{function}{$name};
-     $thisparser->{data}{function}{$name} = $item[1];
+     my %funcdef = %{ $item[1] };
+     %funcdef = (%funcdef, %{ handle_args(delete $funcdef{args}) });
+     $thisparser->{data}{function}{$name} = \%funcdef;
 #    print Dumper $item[1];
      1;
       }
@@ -179,7 +193,7 @@ typedef: 'typedef' class IDENTIFIER(?) '{' <commit> class_part(s?) '}' IDENTIFIE
        {
      my ($class, $parts);
          $class = $item[3][0] || 'anon_class'.($thisparser->{data}{anonclass}++);
-         ($class, $parts)= handle_class_def($thisparser, [$class, $item{$Inline::CPP::Parser::RecDescent::class_part}]);
+         ($class, $parts)= handle_class_def($thisparser, [$class, $item{fixkey('class_part(s?)')}]);
      { thing => 'typedef', name => $item[8], type => $class, body => $parts }
        }
        | 'typedef' IDENTIFIER IDENTIFIER ';'
@@ -192,7 +206,7 @@ typedef: 'typedef' class IDENTIFIER(?) '{' <commit> class_part(s?) '}' IDENTIFIE
 
 enum: 'enum' IDENTIFIER(?) '{' <leftop: enum_item ',' enum_item> '}' ';'
        {
-    { thing => 'enum', name => $item{IDENTIFIER}[0],
+    { thing => 'enum', name => $item{fixkey('IDENTIFIER(?)')}[0],
           body => $item{__DIRECTIVE1__} }
        }
 
@@ -203,13 +217,13 @@ enum_item: IDENTIFIER '=' <commit> /[0-9]+/
 
 class_def: class IDENTIFIER '{' <commit> class_part(s?) '}' ';'
            {
-              [@item{'IDENTIFIER',$Inline::CPP::Parser::RecDescent::class_part}]
-       }
+              [@item{'IDENTIFIER',fixkey('class_part(s?)')}]
+           }
      | class IDENTIFIER ':' <commit> <leftop: inherit ',' inherit>
             '{' class_part(s?) '}' ';'
        {
-          push @{$item{$Inline::CPP::Parser::RecDescent::class_part}}, [$item{__DIRECTIVE2__}];
-          [@item{'IDENTIFIER',$Inline::CPP::Parser::RecDescent::class_part}]
+          push @{$item{fixkey('class_part(s?)')}}, [$item{__DIRECTIVE2__}];
+          [@item{'IDENTIFIER',fixkey('class_part(s?)')}]
        }
 
 inherit: scope IDENTIFIER
@@ -218,10 +232,10 @@ inherit: scope IDENTIFIER
 class_part: comment { [ {thing => 'comment'} ] }
       | scope ':' <commit> class_decl(s?)
             {
-          for my $part (@{$item{$Inline::CPP::Parser::RecDescent::class_decl}}) {
+          for my $part (@{$item{fixkey('class_decl(s?)')}}) {
                   $_->{scope} = $item[1] for @$part;
           }
-          $item{$Inline::CPP::Parser::RecDescent::class_decl}
+          $item{fixkey('class_decl(s?)')}
         }
       | class_decl(s)
             {
@@ -250,7 +264,9 @@ class_decl: comment { [{thing => 'comment'}] }
           }
           Inline::CPP::Parser::RecDescent::strip_ellipsis($thisparser,
                            $item[1]->{args});
-          [$item[1]];
+          my %funcdef = %{ $item[1] };
+          %funcdef = (%funcdef, %{ handle_args(delete $funcdef{args}) });
+          [\%funcdef];
         }
           | member_def
         {
@@ -269,15 +285,15 @@ function_def: operator <commit> ';'
               }
             | IDENTIFIER '(' <commit> <leftop: arg ',' arg>(s?) ')' smod(?) code_block
               {
-                {name => $item{IDENTIFIER}, args => $item{__DIRECTIVE2__}, rtype => '' }
+                {name => $item{IDENTIFIER}, args => $item{__DIRECTIVE2__}, return_type => '' }
               }
-            | rtype IDENTIFIER '(' <leftop: arg ',' arg>(s?) ')' ';'
+            | return_type IDENTIFIER '(' <leftop: arg ',' arg>(s?) ')' ';'
               {
-                {rtype => $item[1], name => $item[2], args => $item{__DIRECTIVE1__} }
+                {return_type => $item[1], name => $item[2], args => $item{__DIRECTIVE1__} }
               }
-            | rtype IDENTIFIER '(' <leftop: arg ',' arg>(s?) ')' smod(?) code_block
+            | return_type IDENTIFIER '(' <leftop: arg ',' arg>(s?) ')' smod(?) code_block
               {
-                {rtype => $item{rtype}, name => $item[2], args => $item{__DIRECTIVE1__} }
+                {return_type => $item{return_type}, name => $item[2], args => $item{__DIRECTIVE1__} }
               }
 
 method_def: operator <commit> method_imp
@@ -291,18 +307,18 @@ method_def: operator <commit> method_imp
 #         print "con-/de-structor found: $item[1]\n";
               {name => $item[1], args => $item{__DIRECTIVE2__}, abstract => ${$item{method_imp}} };
             }
-          | rtype IDENTIFIER '(' <leftop: arg ',' arg>(s?) ')' method_imp
+          | return_type IDENTIFIER '(' <leftop: arg ',' arg>(s?) ')' method_imp
             {
 #         print "method found: $item[2]\n";
           $return =
-                {name => $item[2], rtype => $item[1], args => $item[4],
+                {name => $item[2], return_type => $item[1], args => $item[4],
              abstract => ${$item[6]},
                  rconst => $thisparser->{data}{smod}{const},
                 };
           $thisparser->{data}{smod}{const} = 0;
             }
 
-operator: rtype(?) 'operator' /\(\)|[^()]+/ '(' <leftop: arg ',' arg>(s?) ')'
+operator: return_type(?) 'operator' /\(\)|[^()]+/ '(' <leftop: arg ',' arg>(s?) ')'
           {
 #            print "Found operator: $item[1][0] operator $item[3]\n";
             {name=> "operator $item[3]", args => $item[5], ret => $item[1][0]}
@@ -373,7 +389,7 @@ IDENTIFIER: <leftop: ident_part '::' ident_part>
 
 # Parse::RecDescent is retarded in this one case: if a subrule fails, it
 # gives up the entire rule. This is a stupid way to get around that.
-rtype: rtype2 | rtype1
+return_type: rtype2 | rtype1
 rtype1: TYPE star(s?)
         {
          $return = $item[1];
@@ -400,7 +416,7 @@ type: type2 | type1
 type1: TYPE star(s?)
         {
          $return = $item[1];
-         $return .= join '',' ',@{$item{$Inline::CPP::Parser::RecDescent::star}} if @{$item{$Inline::CPP::Parser::RecDescent::star}};
+         $return .= join '',' ',@{$item{fixkey('star(s?)')}} if @{$item{fixkey('star(s?)')}};
 #    print "type1: $return\n";
 #          return undef
 #            unless(defined$thisparser->{data}{typeconv}{valid_types}{$return});
@@ -409,7 +425,7 @@ type2: modifier(s) TYPE star(s?)
     {
          $return = $item{TYPE};
          $return = join ' ',grep{$_}@{$item[1]},$return if @{$item[1]};
-         $return .= join '',' ',@{$item{$Inline::CPP::Parser::RecDescent::star}} if @{$item{$Inline::CPP::Parser::RecDescent::star}};
+         $return .= join '',' ',@{$item{fixkey('star(s?)')}} if @{$item{fixkey('star(s?)')}};
 #    print "type2: $return\n";
 #          return undef
 #            unless(defined$thisparser->{data}{typeconv}{valid_types}{$return});
