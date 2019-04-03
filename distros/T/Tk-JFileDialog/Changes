@@ -72,3 +72,7 @@ Revision history for Tk-JFileDialog
         * Added -FNameList => arrayref option to allow developer to 
         specify a reference to a specific list of filenames to display in 
         the listbox for the user to select from.
+2.20    * Added -nonLatinFilenames flag for use with international (non-
+        low ASCII characters) file and directory-names to address a Perl 
+        UTF-8/unicode bug.  Closes cpan bug (Feature-request)# 128958.
+        * Added official license text and touched up docs.

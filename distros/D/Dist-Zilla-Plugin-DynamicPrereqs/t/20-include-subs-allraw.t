@@ -93,7 +93,7 @@ run_makemaker($tzil);
     cmp_deeply(
         \%{'main::MyTestMakeMaker::'},
         superhashof({
-            map {; $_ => *{"MyTestMakeMaker::$_"} } 'isnt_os',
+            map +($_ => *{"MyTestMakeMaker::$_"}), 'isnt_os',
         }),
         'Makefile.PL defined all required subroutines',
     ) or diag 'Makefile.PL defined symbols: ', explain \%{'main::MyTestMakeMaker::'};

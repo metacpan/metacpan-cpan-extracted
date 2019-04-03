@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.033-5-g41bb612
+package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.034-10-gf786638
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Specify dynamic (user-side) prerequisites for your distribution
 # KEYWORDS: plugin distribution metadata MYMETA prerequisites Makefile.PL dynamic
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 use Moose;
 with
@@ -102,7 +102,7 @@ sub BUILD
             and not eval { Dist::Zilla::Plugin::MakeMaker::Awesome->VERSION('0.19') };
 
     my %extra_args = %$args;
-    delete @extra_args{ map { $_->name } $self->meta->get_all_attributes };
+    delete @extra_args{ map $_->name, $self->meta->get_all_attributes };
     if (my @keys = keys %extra_args)
     {
         $self->log('Warning: unrecognized argument' . (@keys > 1 ? 's' : '')
@@ -197,17 +197,17 @@ sub _build__sub_definitions
 {
     my $self = shift;
 
-    my @include_subs = grep { not exists $included_subs{$_} } $self->_all_required_subs;
+    my @include_subs = grep +(not exists $included_subs{$_}), $self->_all_required_subs;
     return '' if not @include_subs;
 
     my $content;
     $content .= "\n" . $self->_header if not keys %included_subs;
 
-    if (my @missing_subs = grep { !-f path($self->_include_sub_root, $_) } @include_subs)
+    if (my @missing_subs = grep !-f path($self->_include_sub_root, $_), @include_subs)
     {
         $self->log_fatal(
             @missing_subs > 1
-                ? [ 'no definitions available for subs %s!', join(', ', map { "'" . $_  ."'" } @missing_subs) ]
+                ? [ 'no definitions available for subs %s!', join(', ', map "'".$_."'", @missing_subs) ]
                 : [ 'no definition available for sub \'%s\'!', $missing_subs[0] ]
         );
     }
@@ -216,7 +216,7 @@ sub _build__sub_definitions
     # use some sub definitions without copious danger tape.
     $self->_warn_include_subs(@include_subs);
 
-    my @sub_definitions = map { path($self->_include_sub_root, $_)->slurp_utf8 } @include_subs;
+    my @sub_definitions = map path($self->_include_sub_root, $_)->slurp_utf8, @include_subs;
     $content .= "\n"
         . $self->fill_in_string(
             join("\n", @sub_definitions),
@@ -356,7 +356,7 @@ has _all_required_subs => (
             grep {
                 my $sub_name = $_;
                 any { /\b$sub_name\b\(/ } @code
-            } map { $_->basename } path($self->_include_sub_root)->children;
+            } map $_->basename, path($self->_include_sub_root)->children;
 
         [ sort($self->_all_required_subs_for(uniq(
             $self->include_subs, @subs_in_code,
@@ -392,7 +392,7 @@ sub _warn_include_subs
     my ($self, @include_subs) = @_;
 
     $self->log(colored('Use ' . $_ . ' with great care! Please consult the documentation!', 'bright_yellow'))
-        foreach grep { exists $warn_include_sub{$_} } @include_subs;
+        foreach grep exists $warn_include_sub{$_}, @include_subs;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -409,7 +409,7 @@ Dist::Zilla::Plugin::DynamicPrereqs - Specify dynamic (user-side) prerequisites 
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

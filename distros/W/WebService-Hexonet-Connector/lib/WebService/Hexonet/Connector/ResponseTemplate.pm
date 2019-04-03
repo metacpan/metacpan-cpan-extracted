@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use WebService::Hexonet::Connector::ResponseParser;
 
-use version 0.9917; our $VERSION = version->declare('v2.0.1');
+use version 0.9917; our $VERSION = version->declare('v2.1.0');
 
 
 sub new {

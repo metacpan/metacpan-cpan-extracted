@@ -2,6 +2,7 @@ aio_req		T_AIO
 aio_req_ornot	T_AIO_ORNOT
 SV8 *		T_SV8
 
+VAL64		T_VAL64
 size_t          T_VAL64
 ssize_t         T_VAL64
 off_t           T_VAL64

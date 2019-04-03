@@ -1137,6 +1137,10 @@ The initial percentage to throttle guest vCPUs
 The additional percentage step size to throttle guest vCPUs if
 progress is not made
 
+=item C<Sys::Virt::Domain::MIGRATE_PARAM_PARALLEL_CONNECTIONS>
+
+The number of connections used during parallel migration.
+
 =back
 
 =item $ddom = $dom->migrate(destcon, flags=0, dname=undef, uri=undef, bandwidth=0)
@@ -2539,6 +2543,12 @@ Setting this flag will cause the migration to attempt to use the
 TLS environment configured by the hypervisor in order to perform
 the migration. If incorrectly configured on either source or
 destination, the migration will fail.
+
+=item Sys::Virt::Domain::MIGRATE_PARALLEL
+
+Send memory pages to the destination host through several network
+connections. See C<Sys::Virt::Domain::MIGRATE_PARAM_PARALLEL_*>
+parameters for configuring the parallel migration.
 
 =back
 

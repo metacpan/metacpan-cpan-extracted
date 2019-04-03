@@ -1,5 +1,8 @@
 Revision history for perl distribution LinkEmbedder
 
+1.04 2019-04-03T16:21:20+0700
+ - Fix https://app.thorsen.pm/linkembedder demo links #10
+
 1.03 2018-12-25T11:18:02+0900
  - Add support for X-Request-Base to example app
  - Fix serve() would render multiple responses for "json"

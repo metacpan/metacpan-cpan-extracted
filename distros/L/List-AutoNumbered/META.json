@@ -1,0 +1,83 @@
+{
+   "abstract" : "Add line numbers to lists while creating them",
+   "author" : [
+      "Christopher White <cxwembedded@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "List-AutoNumbered",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::RewriteVersion" : "0",
+            "Module::Metadata" : "1.000016"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "1.50",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Import::Into" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "lib::relative" : "0.002"
+         }
+      }
+   },
+   "provides" : {
+      "List::AutoNumbered" : {
+         "file" : "lib/List/AutoNumbered.pm",
+         "version" : "0.000003"
+      },
+      "List::AutoNumbered::Skipper" : {
+         "file" : "lib/List/AutoNumbered.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cxw42/List-AutoNumbered/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cxw42/List-AutoNumbered.git",
+         "web" : "https://github.com/cxw42/List-AutoNumbered"
+      }
+   },
+   "version" : "0.000003",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

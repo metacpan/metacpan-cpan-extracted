@@ -14,10 +14,10 @@ m4_include([libeio/libeio.m4])
 AC_CACHE_CHECK(for set/getrlimit, ac_cv_rlimits, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <sys/time.h>
 #include <sys/resource.h>
-int res;
 int main (void)
 {
    struct rlimit srl;
+   int res;
    srl.rlim_cur = srl.rlim_max = RLIM_INFINITY;
    res = getrlimit (RLIMIT_NOFILE, &srl);
    res = setrlimit (RLIMIT_NOFILE, &srl);
@@ -67,9 +67,14 @@ AC_CHECK_HEADERS([sys/sysmacros.h])
 dnl solaris major/minor
 AC_CHECK_HEADERS([sys/mkdev.h])
 
+dnl readv / preadv, vmsplice
+AC_CHECK_HEADERS([sys/uio.h])
+
+
 AC_CACHE_CHECK([for splice, vmsplice and tee], ac_cv_linux_splice, [AC_LINK_IFELSE([AC_LANG_SOURCE([
 #include <sys/types.h>
 #include <fcntl.h>
+#include <sys/uio.h>
 int main (void)
 {
    ssize_t res;
@@ -84,9 +89,9 @@ test $ac_cv_linux_splice = yes && AC_DEFINE(HAVE_LINUX_SPLICE, 1, splice/vmsplic
 AC_CACHE_CHECK(for pipe2, ac_cv_pipe2, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <fcntl.h>
 #include <unistd.h>
-int res;
 int main (void)
 {
+   int res;
    res = pipe2 (0, 0);
    return 0;
 }
@@ -95,21 +100,21 @@ test $ac_cv_pipe2 = yes && AC_DEFINE(HAVE_PIPE2, 1, pipe2(2) is available)
 
 AC_CACHE_CHECK(for eventfd, ac_cv_eventfd, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <sys/eventfd.h>
-int res;
 int main (void)
 {
+   int res;
    res = eventfd (1, EFD_CLOEXEC | EFD_NONBLOCK);
    return 0;
 }
 ]])],ac_cv_eventfd=yes,ac_cv_eventfd=no)])
 test $ac_cv_eventfd = yes && AC_DEFINE(HAVE_EVENTFD, 1, eventfd(2) is available)
 
-AC_CACHE_CHECK(for timerfd, ac_cv_timerfd, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+AC_CACHE_CHECK(for timerfd_*, ac_cv_timerfd, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <sys/timerfd.h>
-int res;
 int main (void)
 {
    struct itimerspec its;
+   int res;
    res = timerfd_create (CLOCK_REALTIME, TFD_CLOEXEC | TFD_NONBLOCK);
    res = timerfd_settime (res, TFD_TIMER_ABSTIME /*| TFD_TIMER_CANCEL_ON_SET*/, &its, 0);
    res = timerfd_gettime (res, &its);
@@ -118,13 +123,23 @@ int main (void)
 ]])],ac_cv_timerfd=yes,ac_cv_timerfd=no)])
 test $ac_cv_timerfd = yes && AC_DEFINE(HAVE_TIMERFD, 1, timerfd_*(2) are available)
 
+AC_CACHE_CHECK(for memfd_create, ac_cv_memfd_create, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/mman.h>
+int main (void)
+{
+   int res = memfd_create ("name", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+   return 0;
+}
+]])],ac_cv_memfd_create=yes,ac_cv_memfd_create=no)])
+test $ac_cv_memfd_create = yes && AC_DEFINE(HAVE_MEMFD_CREATE, 1, memfd_create(2) is available)
+
 AC_CACHE_CHECK(for copy_file_range, ac_cv_copy_file_range, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
 #include <unistd.h>
 #include <sys/syscall.h>
 /*#include <linux/copy.h>*/
-int res;
 int main (void)
 {
+   int res;
    /*res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, COPY_FR_REFLINK | COPY_FR_DEDUP | COPY_FR_COPY);*/
    res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, 0);
    return 0;
@@ -197,6 +212,27 @@ int main (void)
 }
 ]])],ac_cv_st_gen=yes,ac_cv_st_gen=no)])
 test $ac_cv_st_gen = yes && AC_DEFINE(HAVE_ST_GEN, 1, stat st_gen member)
+
+AC_CACHE_CHECK(for statx, ac_cv_statx, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+int res;
+int main (void)
+{
+   struct statx sx;
+   int res;
+   res = statx (AT_FDCWD, ".",
+         AT_EMPTY_PATH | AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW | AT_STATX_SYNC_AS_STAT | AT_STATX_FORCE_SYNC | AT_STATX_DONT_SYNC,
+         STATX_ALL, &sx);
+   STATX_TYPE; STATX_MODE; STATX_NLINK; STATX_UID; STATX_GID; STATX_ATIME; STATX_MTIME; STATX_CTIME;
+   STATX_INO; STATX_SIZE; STATX_BLOCKS; STATX_BASIC_STATS; STATX_BTIME; STATX_ALL;
+   STATX_ATTR_COMPRESSED; STATX_ATTR_IMMUTABLE; STATX_ATTR_APPEND; STATX_ATTR_NODUMP; STATX_ATTR_ENCRYPTED;
+   return 0;
+}
+]])],ac_cv_statx=yes,ac_cv_statx=no)])
+test $ac_cv_statx = yes && AC_DEFINE(HAVE_STATX, 1, statx(2) is available)
 
 AC_OUTPUT
 

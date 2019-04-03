@@ -7,13 +7,17 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'coreapi.1api.net' => 80 );
 
-use version 0.9917; our $VERSION = version->declare('v2.0.1');
+use version 0.9917; our $VERSION = version->declare('v2.1.0');
 
-# T1-3: test import modules
+# T1-4: test import modules
+use_ok('Config');
+use_ok( 'POSIX',                          qw(uname) );
 use_ok( 'Scalar::Util',                   qw(blessed) );
 use_ok( 'WebService::Hexonet::Connector', $VERSION );
 use_ok('Readonly');
 use Readonly;
+use Config;
+use POSIX;
 Readonly my $CMD_LIMIT          => 1000;
 Readonly my $INDEX_NOT_FOUND    => -1;
 Readonly my $TMP_ERR_423        => 423;
@@ -26,14 +30,14 @@ Readonly my @EXPECTED_COL_KEYS  => qw(COUNT  DOMAIN FIRST LAST LIMIT TOTAL);
 Readonly my @EXPECTED_COL_KEYS2 => qw(COUNT CURRENTPAGE FIRST LAST LIMIT NEXTPAGE PAGES PREVIOUSPAGE TOTAL);
 
 # ---- Module "Column" ---- #
-# - T6
+# - T7
 my $col = WebService::Hexonet::Connector::Column->new( 'DOMAIN', ( 'mydomain1.com', 'mydomain2.com', 'mydomain3.com' ) );
 my $cls = blessed($col);
 is( $cls, 'WebService::Hexonet::Connector::Column', 'COLUMN: Instance type check' );
 is( $col->getKey(), 'DOMAIN', 'COLUMN: Column Name check' );
 
 # ---- Module "Record" ---- #
-# - T8
+# - T9
 my $data = {
     DOMAIN => 'mydomain.com',
     RATING => 1,
@@ -47,20 +51,20 @@ is( $rec->getData(),                      $data,                                
 is( $rec->getDataByKey('KEYNOTEXISTING'), undef,                                    'RECORD: Record Key Data check' );
 
 # ---- Module "ResponseParser" ---- #
-# T9
+# T10
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 $cls = blessed($rtm);
 is( $cls, 'WebService::Hexonet::Connector::ResponseTemplateManager', 'RTM: Instance type check' );
 $rtm->addTemplate( 'OK', $rtm->generateTemplate( '200', 'Command completed successfully' ) );
 $rtm->addTemplate( 'listP0', "[RESPONSE]\r\nPROPERTY[TOTAL][0]=2701\r\nPROPERTY[FIRST][0]=0\r\nPROPERTY[DOMAIN][0]=0-60motorcycletimes.com\r\nPROPERTY[DOMAIN][1]=0-be-s01-0.com\r\nPROPERTY[COUNT][0]=2\r\nPROPERTY[LAST][0]=1\r\nPROPERTY[LIMIT][0]=2\r\nDESCRIPTION=Command completed successfully\r\nCODE=200\r\nQUEUETIME=0\r\nRUNTIME=0.023\r\nEOF\r\n" );
 
-# T10 ~> parse method
+# T11 ~> parse method
 my $plain = $rtm->generateTemplate( '421', q{} );
 $plain =~ s/\r\nDESCRIPTION=//msx;
 my $h = WebService::Hexonet::Connector::ResponseParser::parse($plain);
 is( length $h->{DESCRIPTION}, 0, 'RP: Description Property length check' );
 
-# T11 ~> serialize method #1
+# T12 ~> serialize method #1
 my $r = $rtm->getTemplate('OK');
 $h = $r->getHash();
 $h->{PROPERTY} = {
@@ -71,12 +75,12 @@ $h->{PROPERTY} = {
 $plain = WebService::Hexonet::Connector::ResponseParser::serialize($h);
 is( $plain, "[RESPONSE]\r\nPROPERTY[DOMAIN][0]=mydomain1.com\r\nPROPERTY[DOMAIN][1]=mydomain2.com\r\nPROPERTY[DOMAIN][2]=mydomain3.com\r\nPROPERTY[RATING][0]=0\r\nPROPERTY[RATING][1]=1\r\nPROPERTY[RATING][2]=2\r\nPROPERTY[SUM][0]=2\r\nCODE=200\r\nDESCRIPTION=Command completed successfully\r\nEOF\r\n", 'RP: Serialize result check #1' );
 
-# T12 ~> serialize method #2
+# T13 ~> serialize method #2
 my $tpl = $rtm->getTemplate('OK');
 $plain = WebService::Hexonet::Connector::ResponseParser::serialize( $tpl->getHash() );
 is( $plain, $tpl->getPlain(), 'RP: Serialize result check #2' );
 
-# T13 ~> serialize method #3
+# T14 ~> serialize method #3
 $r = $rtm->getTemplate('OK');
 $h = $r->getHash();
 delete $h->{CODE};
@@ -84,7 +88,7 @@ delete $h->{DESCRIPTION};
 $plain = WebService::Hexonet::Connector::ResponseParser::serialize($h);
 is( $plain, "[RESPONSE]\r\nEOF\r\n", 'RP: Serialize result check #3' );
 
-# T14 ~> serialize method #4
+# T15 ~> serialize method #4
 $r              = $rtm->getTemplate('OK');
 $h              = $r->getHash();
 $h->{QUEUETIME} = '0';
@@ -93,7 +97,7 @@ $plain          = WebService::Hexonet::Connector::ResponseParser::serialize($h);
 is( $plain, "[RESPONSE]\r\nCODE=200\r\nDESCRIPTION=Command completed successfully\r\nQUEUETIME=0\r\nRUNTIME=0.12\r\nEOF\r\n", 'RP: Serialize result check #4' );
 
 # ---- Module "SocketConfig" ---- #
-# T15
+# T16
 my $sc = WebService::Hexonet::Connector::SocketConfig->new();
 my $d  = $sc->getPOSTData();
 is( %{$d}, 0, 'SocketConfig: Check initial POST data' );
@@ -579,6 +583,21 @@ $r = $cl->request( { COMMAND => 'GetUserIndex' } );
 $cls = blessed($r);
 is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if resetUserView method is working. #1' );
 is( $r->isSuccess(), 1, 'AC: Check if resetUserView method is working. #2' );
+
+# ~> getUserAgent method test
+my $arch       = ( uname() )[ 4 ];
+my $os         = ( uname() )[ 0 ];
+my $rv         = $cl->getVersion();
+my $uaexpected = "PERL-SDK ($os; $arch; rv:$rv) perl/$Config{version}";
+my $ua         = $cl->getUserAgent();
+is( $ua, $uaexpected, "AC: Check if getUserAgent method is working." );
+
+# ~> setUserAgent method test
+$uaexpected = "WHMCS ($os; $arch; rv:7.7.0) perl-sdk/$rv perl/$Config{version}";
+$cls        = blessed( $cl->setUserAgent( "WHMCS", "7.7.0" ) );
+$ua         = $cl->getUserAgent();
+is( $cls, 'WebService::Hexonet::Connector::APIClient', 'AC: Check if setUserAgent method is working. #1' );
+is( $ua, $uaexpected, "AC: Check if setUserAgent method is working. #2" );
 
 done_testing();
 

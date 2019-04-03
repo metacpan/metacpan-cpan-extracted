@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.04";
 
 use constant { border => 1000000 };
 
@@ -29,6 +29,7 @@ use Time::Piece;
 my $t = localtime;
 
 has price => ( is => 'rw', isa => 'Int', default => 0 );
+has amount => ( is => 'rw', isa => 'Int', default => 1 );
 has date => ( is => 'rw', isa => 'Str', default => $t->ymd() );
 has no_wh => ( is => 'ro', isa => 'Bool', default => 0 );
 
@@ -40,25 +41,29 @@ sub net {
     return $self->price();
 }
 
+sub subtotal {
+    my $self = shift;
+    return $self->price() * $self->amount();
+}
+
 sub tax {
     my $self = shift;
-    return int( $self->price() * $consumption{'rate'} );
+    return int( $self->subtotal() * $consumption{'rate'} );
 }
 
 sub full {
     my $self = shift;
-    return int( $self->price() + $self->tax() );
+    return int( $self->subtotal() + $self->tax() );
 }
 
 sub withholding {
     my $self = shift;
     return 0 if $self->no_wh();
     my $rate = $self->rate();
-    if( $self->price() <= border ) {
-        return int( $self->price() * $rate );
+    if( $self->subtotal() <= border ) {
+        return int( $self->subtotal() * $rate );
     }else{
-        my $base = $self->price() - border;
-        
+        my $base = $self->subtotal() - border;
         return int( $base * $rate * 2 + border * $rate );
     }
 }
@@ -66,9 +71,9 @@ sub withholding {
 sub rate {
     my $self = shift;
     my $rate = $withholding{'rate'};
-    my $from = $t->strptime( $special{'from'}, '%Y-%m-%d');
-    my $until = $t->strptime( $special{'until'}, '%Y-%m-%d');
-    my $date = $t->strptime( $self->date(), '%Y-%m-%d');
+    my $from = $t->strptime( $special{'from'}, '%Y-%m-%d' );
+    my $until = $t->strptime( $special{'until'}, '%Y-%m-%d' );
+    my $date = $t->strptime( $self->date(), '%Y-%m-%d' );
 
     return $rate if $date < $from or $until < $date;
     return $rate + $special{'rate'};
@@ -77,7 +82,6 @@ sub rate {
 sub total {
     my $self = shift;
     return $self->full - $self->withholding;
-
 }
 
 1;
@@ -95,26 +99,30 @@ Business::Tax::Withholding::JP - 日本の消費税と源泉徴収のややこ�
 =head1 SYNOPSIS
 
  use Business::Tax::Withholding::JP;
- my $tax = Business::Tax::Withholding::JP->new( price => 10000 );
+ my $calc = Business::Tax::Withholding::JP->new( price => 10000 );
 
- $tax->net();           # 10000
- $tax->tax();           # 800
- $tax->full();          # 10800
- $tax->withholding();   # 1021
- $tax->total();         # 9779
+ $calc->net();          # 10000
+ $calc->amount();       # 1
+ $calc->subtotal();     # 10000
+ $calc->tax();          # 800
+ $calc->full();         # 10800
+ $calc->withholding();  # 1021
+ $calc->total();        # 9779
 
  # Or you can set the date in period of special tax being expired
- $tax = Business::Tax::Withholding::JP->new( date => '2038-01-01' );
- $tax->price(10000);
- $tax->withholding();   # 1000
- $tax->total();         # 9800
+ $calc = Business::Tax::Withholding::JP->new( date => '2038-01-01' );
+ $calc->price(10000);
+ $calc->withholding();  # 1000
+ $calc->total();        # 9800
 
  # And you may ignore the withholings
- $tax = Business::Tax::Withholding::JP->new( no_wh => 1 );
- $tax->price(10000);
- $tax->tax();           # 800
- $tax->withholding();   # 0
- $tax->total();         # 10800
+ $calc = Business::Tax::Withholding::JP->new( no_wh => 1 );
+ $calc->price(10000);   # 10000
+ $calc->amount(2);      # 2
+ $calc->subtotal();     # 20000
+ $calc->tax();          # 1600
+ $calc->withholding();  # 0
+ $calc->total();        # 21600
 
 =head1 DESCRIPTION
 
@@ -134,7 +142,7 @@ Business::Tax::Withholding::JP は日本のビジネスで長期的に使える�
  
 =head2 Constructor
 
-=head3 new( price => I<Int>, date => I<Date>, no_wh => I<Bool> );
+=head3 new( price => I<Int>, amount => I<Int>, date => I<Date>, no_wh => I<Bool> );
 
 You can omit these paramators.
 
@@ -144,10 +152,16 @@ You can omit these paramators.
  
 =item price
  
-price of your products will be set. defaults 0.
+the price of your products will be set. defaults 0.
  
 税抜価格を指定してください。指定しなければ0です。
+
+=item amount
  
+the amount of your products will be set. defaults 1.
+ 
+数量を指定してください。指定しなければ1です。
+
 =item date
 
 You can set payday. the net of withholding depends on this. default is today.
@@ -172,6 +186,12 @@ You can reset the price.
 
 price に値を代入可能です。
  
+=item amount
+ 
+You can reset the amount.
+ 
+amount に値を代入可能です。
+
 =item date
 
 You can reset the payday like 'YYYY-MM-DD'
@@ -184,6 +204,12 @@ You can get the net of your pay. it's equal to the price.
 So it's the alias of price().
  
 net は price と同じ働きをします。
+ 
+=item subtotal
+ 
+it returns price() * amount()
+
+subtotal は値と数量の積（小計）を返します。
  
 =item tax
  

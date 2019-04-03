@@ -34,7 +34,7 @@
    "provides" : {
       "Mojo::Graphite::Writer" : {
          "file" : "lib/Mojo/Graphite/Writer.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "url" : "http://github.com/jberger/Mojo-Graphite-Writer"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

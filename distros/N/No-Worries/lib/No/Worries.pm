@@ -13,8 +13,8 @@
 package No::Worries;
 use strict;
 use warnings;
-our $VERSION  = "1.5";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.32 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.6";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.34 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -196,6 +196,8 @@ Here are the relevant sub-modules and what they provide:
 
 =item * file_write(PATH[, OPTIONS])
 
+=item * file_update(PATH[, OPTIONS])
+
 =back
 
 =item L<No::Worries::Log> - logging (log and filter information):
@@ -267,6 +269,8 @@ Here are the relevant sub-modules and what they provide:
 =item * proc_run(OPTIONS)
 
 =item * proc_detach([OPTIONS])
+
+=item * proc_status(STATUS)
 
 =back
 
@@ -374,4 +378,4 @@ L<Params::Validate>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2017
+Copyright (C) CERN 2012-2019

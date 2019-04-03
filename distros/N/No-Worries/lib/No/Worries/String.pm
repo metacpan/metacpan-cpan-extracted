@@ -13,8 +13,8 @@
 package No::Worries::String;
 use strict;
 use warnings;
-our $VERSION  = "1.5";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.13 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.6";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.14 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -140,27 +140,72 @@ sub _strpad ($$$) {
 }
 
 #
+# return a string generated from a repeated pattern
+#
+
+sub _strgen ($$) {
+    my($pattern, $length) = @_;
+
+    return(substr($pattern x $length, 0, $length));
+}
+
+#
+# return a formatted table line
+#
+
+sub _tblfmt ($$) {
+    my($column, $option) = @_;
+    my($line, $index);
+
+    $line = $option->{indent};
+    $line .= $option->{lsep};
+    $index = 0;
+    while ($index < @{ $option->{collen} }) {
+        $line .= $option->{colsep} if $index;
+        $line .= _strpad($column->[$index],
+                         $option->{collen}[$index],
+                         $option->{align}[$index]);
+        $index++;
+    }
+    $line .= $option->{rsep};
+    $line .= "\n";
+    return($line);
+}
+
+#
 # transform a table into a string
 #
 
 my %string_table_options = (
-    align   => { optional => 1, type => ARRAYREF },
-    colsep  => { optional => 1, type => SCALAR },
-    header  => { optional => 1, type => ARRAYREF },
-    headsep => { optional => 1, type => SCALAR },
-    indent  => { optional => 1, type => SCALAR },
+    align    => { optional => 1, type => ARRAYREF },
+    colsep   => { optional => 1, type => SCALAR },
+    header   => { optional => 1, type => ARRAYREF },
+    headsep  => { optional => 1, type => SCALAR },
+    indent   => { optional => 1, type => SCALAR },
+    markdown => { optional => 1, type => BOOLEAN },
 );
 
 sub string_table ($@) {
-    my($lines, %option, @collen, $index, $length, $result);
+    my($lines, %option, @collen, @headsep, $index, $length, $result);
 
     # handle options
     $lines = shift(@_);
     %option = validate(@_, \%string_table_options) if @_;
     $option{align} ||= [];
-    $option{colsep} = " | " unless defined($option{colsep});
-    $option{headsep} = "=" unless defined($option{headsep});
-    $option{indent} = "" unless defined($option{indent});
+    $option{colsep} = " | "
+        unless defined($option{colsep});
+    $option{headsep} = $option{markdown} ? "-" : "="
+        unless defined($option{headsep});
+    $option{indent} = ""
+        unless defined($option{indent});
+    if ($option{markdown}) {
+        $option{lsep} = $option{rsep} = $option{colsep};
+        $option{lsep} =~ s/^\s+//;
+        $option{rsep} =~ s/\s+$//;
+    } else {
+        $option{lsep} = "";
+        $option{rsep} = "";
+    }
     # compute column lengths
     foreach my $line ($option{header} ? ($option{header}) : (), @{ $lines }) {
         $index = 0;
@@ -172,36 +217,29 @@ sub string_table ($@) {
         }
     }
     # compute total length
-    $length = length($option{colsep}) * (@collen - 1);
+    $length = length($option{lsep}) + length($option{rsep});
+    $length += length($option{colsep}) * (@collen - 1);
     foreach my $collen (@collen) {
         $length += $collen;
     }
+    $option{collen} = \@collen;
     $result = "";
     # format header
     if ($option{header}) {
-        $result .= $option{indent};
-        $index = 0;
-        while ($index < @collen) {
-            $result .= $option{colsep} if $index;
-            $result .= _strpad($option{header}[$index],
-                               $collen[$index], $option{align}[$index]);
-            $index++;
+        $result .= _tblfmt($option{header}, \%option);
+        if (length($option{headsep})) {
+            if ($option{markdown}) {
+                @headsep = map(_strgen($option{headsep}, $_), @collen);
+                $result .= _tblfmt(\@headsep, \%option);
+            } else {
+                $result .= $option{indent};
+                $result .= _strgen($option{headsep}, $length) . "\n";
+            }
         }
-        $result .= "\n";
-        $result .= $option{indent};
-        $result .= substr($option{headsep} x $length, 0, $length) . "\n";
     }
     # format lines
     foreach my $line (@{ $lines }) {
-        $result .= $option{indent};
-        $index = 0;
-        while ($index < @collen) {
-            $result .= $option{colsep} if $index;
-            $result .= _strpad($line->[$index],
-                               $collen[$index], $option{align}[$index]);
-            $index++;
-        }
-        $result .= "\n";
+        $result .= _tblfmt($line, \%option);
     }
     return($result);
 }
@@ -333,9 +371,11 @@ possible values are "left", "center" and "right"
 
 =item * C<header>: array reference of column headers (default: none)
 
-=item * C<headsep>: header separator (default: "=")
+=item * C<headsep>: header separator (default: "=" or "-" for MarkDown)
 
 =item * C<indent>: string to prepend to each line (default: "")
+
+=item * C<markdown>: return a MarkDown compatible table
 
 =back
 
@@ -353,4 +393,4 @@ L<No::Worries>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2017
+Copyright (C) CERN 2012-2019

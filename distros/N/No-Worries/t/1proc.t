@@ -18,7 +18,7 @@ our($perl, $tmpdir, $path, $status, $stdin, $stdout, $stderr, $test, %proc);
 if ($^O =~ /^(cygwin|dos|MSWin32)$/) {
     plan skip_all => "Not supported (yet) on $^O";
 } else {
-    plan tests => 41;
+    plan tests => 43;
 }
 
 #
@@ -101,6 +101,9 @@ ok(unlink($path), "unlink");
 
 $stdout = proc_output(tp(qw(--count 1 --stdout)));
 is($stdout, "stdout 1\n", "output");
+
+is(proc_status(0), "ok", "proc_status(0)");
+is(proc_status(256), "code=1", "proc_status(256)");
 
 #
 # advanced tests

@@ -72,6 +72,7 @@ lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Page.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Login.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Plugins.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/ui/Screen.js
+lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/util/format/NumberFormat.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/test/DemoTest.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/theme/Appearance.js
 lib/CallBackery/qooxdoo/callbackery/source/class/callbackery/theme/Color.js

@@ -76,7 +76,7 @@ __DEFINITION__
 CONTENT
 
 my $definitions = join("\n",
-    map { path(File::ShareDir::module_dir('Dist::Zilla::Plugin::DynamicPrereqs'), 'include_subs', $_)->slurp_utf8 }
+    map path(File::ShareDir::module_dir('Dist::Zilla::Plugin::DynamicPrereqs'), 'include_subs', $_)->slurp_utf8,
     sort qw(can_run maybe_command)
 );
 $expected_subs =~ s/__DEFINITION__\n/$definitions/;

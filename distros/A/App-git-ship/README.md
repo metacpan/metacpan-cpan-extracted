@@ -4,7 +4,7 @@ App::git::ship - Git command for shipping your project
 
 # VERSION
 
-0.32
+0.33
 
 # SYNOPSIS
 
@@ -85,6 +85,10 @@ This class is used to build the object that runs all the actions on your
 project. This is autodetected by looking at the structure and files in
 your project. For now this value can be [App::git::ship](https://metacpan.org/pod/App::git::ship) or
 [App::git::ship::perl](https://metacpan.org/pod/App::git::ship::perl), but any customization is allowed.
+
+## GIT\_SHIP\_CONTRIBUTORS
+
+Comma-separated list with `name <email>` of the contributors to this project.
 
 ## GIT\_SHIP\_DEBUG
 
@@ -230,3 +234,9 @@ the terms of the Artistic License version 2.0.
 # AUTHOR
 
 Jan Henning Thorsen - `jhthorsen@cpan.org`
+
+mohawk2 - `mohawk2@users.noreply.github.com`
+
+Rolf Stöckli - `tekki@cpan.org`.
+
+Shoichi Kaji - `skaji@cpan.org`

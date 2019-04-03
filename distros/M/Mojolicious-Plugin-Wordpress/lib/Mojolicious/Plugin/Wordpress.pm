@@ -7,13 +7,13 @@ use Mojo::Util 'trim';
 
 use constant DEBUG => $ENV{MOJO_WORDPRESS_DEBUG} || 0;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 has base_url       => 'http://localhost/wp-json';                       # Will become a Mojo::URL object
 has meta_replacer  => undef;
 has post_processor => undef;
 has ua             => sub { Mojo::UserAgent->new->max_redirects(3) };
-has yoast_meta_key => 'yoast_meta';
+has yoast_meta_key => 'yoast';
 
 sub register {
   my ($self, $app, $config) = @_;
@@ -57,7 +57,10 @@ sub _add_wp_assets_route {
         my $proxy_h  = $proxy_tx->res->headers;
         my $res_h    = $c->res->headers;
 
-        $res_h->$_($proxy_h->$_) for qw(content_length content_type expires);
+        $res_h->$_($proxy_h->$_) for qw(content_length content_type);
+        $res_h->cache_control($proxy_h->cache_control || 'max-age=86400');
+        $res_h->etag($proxy_h->etag || Mojo::Util::md5_sum($proxy_tx->res->body));
+        $res_h->last_modified($proxy_h->last_modified) if $proxy_h->last_modified;
         $c->render(data => $proxy_tx->res->body);
       });
     }
@@ -98,7 +101,8 @@ sub _helper_meta_from {
   for my $key (keys %{$post->{x_metadata} || {}}, keys %{$post->{$yoast_key} || {}}) {
     next unless my $val = $post->{x_metadata}{$key} || $post->{$yoast_key}{$key};
     my $meta_key = $key;
-    next unless $meta_key =~ s!^_?yoast_wpseo_!!;
+    next unless $meta_key =~ s!^_?yoast_wpseo_!! or $post->{$yoast_key}{$key};
+    $meta_key =~ s!-!_!g;
     $meta{$meta_key} ||= $val;
   }
 
@@ -108,6 +112,12 @@ sub _helper_meta_from {
   $meta{"opengraph_$_"}      ||= $meta{"twitter_$_"} || $meta{$_} for qw(description title);
   $meta{twitter_description} ||= $meta{opengraph_description};
   $meta{twitter_title} ||= $meta{opengraph_title} || $meta{title};
+
+  if (my ($base_url, $url_for) = $self->_rewrite_asset_url_info($c)) {
+    for my $k (keys %meta) {
+      $meta{$k} =~ s!\b$base_url/?(\S+)!{$url_for->($1)->to_abs}!ge;
+    }
+  }
 
   for my $key (keys %meta) {
     my $prefixed = "$self->{prefix}_$key";
@@ -166,13 +176,10 @@ sub _helper_rewrite_content {
   my ($self, $c) = @_;
   my $content = Mojo::DOM->new($_[2] // '');
 
-  my $assets_route_name = "$self->{prefix}.assets";
-  my $assets_route      = $c->app->routes->lookup($assets_route_name);
-  if ($assets_route) {
-    my $base_url = $assets_route->to->{base_assets_url}->to_string;
+  if (my ($base_url, $url_for) = $self->_rewrite_asset_url_info($c)) {
     $content->find(qq([src^="$base_url"], [srcset*="$base_url"]))->each(sub {
       for my $k (qw(src srcset)) {
-        $_[0]->{$k} =~ s!\b$base_url/?(\S+)!{$c->url_for($assets_route_name, {proxy_path => $1})}!ge if $_[0]->{$k};
+        $_[0]->{$k} =~ s!\b$base_url/?(\S+)!{$url_for->($1)}!ge if $_[0]->{$k};
       }
     });
   }
@@ -194,6 +201,15 @@ sub _raw {
 
   warn "[Wordpress] $method $url\n" if DEBUG;
   return $self->ua->$method($url, @data);
+}
+
+sub _rewrite_asset_url_info {
+  my ($self, $c) = @_;
+  my $assets_route_name = "$self->{prefix}.assets";
+  my $assets_route      = $c->app->routes->lookup($assets_route_name) or return;
+
+  return ($assets_route->to->{base_assets_url}->to_string,
+    sub { $c->url_for($assets_route_name, {proxy_path => $_[0]}) });
 }
 
 1;
@@ -261,6 +277,7 @@ C<%hash> that looks something like this:
   {
     wp_canonical             => "",
     wp_title                 => "",
+    wp_metadesc              => "",
     wp_description           => "",
     wp_opengraph_title       => "",
     wp_opengraph_description => "",
@@ -273,7 +290,7 @@ Note that some keys might be missing or some keys might be added, depending on
 how the Wordpress server has been set up.
 
 Suggested Wordpress plugins: L<https://wordpress.org/plugins/wordpress-seo/>
-and L<https://github.com/niels-garve/yoast-to-rest-api>.
+and L<https://github.com/jhthorsen/wp-api-yoast-meta>.
 
 =head2 rewrite_content
 
@@ -332,10 +349,13 @@ Holds a L<Mojo::UserAgent> object that is used to get data from Wordpress.
 =head2 yoast_meta_key
 
   my $str = $wp->yaost_meta_key;
-  my $wp  = $wp->yaost_meta_key("yoast_meta");
+  my $wp  = $wp->yaost_meta_key("yoast");
 
 The key in the post JSON response that holds
-L<YOAST|https://wordpress.org/plugins/wordpress-seo/> meta information.
+L<Yoast|https://wordpress.org/plugins/wordpress-seo/> meta information.
+
+This information is not enabled by default. To enable it through the API, you
+can add this plugin: L<https://github.com/jhthorsen/wp-api-yoast-meta>.
 
 =head1 METHODS
 

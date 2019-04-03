@@ -119,6 +119,10 @@
 # include <sys/mman.h>
 #endif
 
+#if HAVE_SYS_UIO_H
+# include <sys/uio.h>
+#endif
+
 #if HAVE_ST_XTIMENSEC
 # define ATIMENSEC PL_statcache.st_atimensec
 # define MTIMENSEC PL_statcache.st_mtimensec
@@ -291,6 +295,7 @@ static MGVTBL sysfree_vtbl = {
 /*****************************************************************************/
 
 /* helper: set scalar to foreign ptr with custom free */
+ecb_noinline
 static void
 sv_set_foreign (SV *sv, const MGVTBL *const vtbl, void *addr, IV length)
 {
@@ -427,6 +432,15 @@ done:
 
 static int close_fd; /* dummy fd to close fds via dup2 */
 
+#if HAVE_STATX
+static struct statx stx;
+#define statx_offsetof(member) offsetof (struct statx, member)
+#define eio__statx statx
+#else
+#define statx_offsetof(member) 0
+#define eio__statx(dir,path,flags,mask,stx) EIO_ENOSYS()
+#endif
+
 enum {
   FLAG_SV2_RO_OFF = 0x40, /* data was set readonly */
 };
@@ -459,6 +473,7 @@ done_poll (void)
 }
 
 /* must be called at most once */
+ecb_noinline
 static SV *
 req_sv (aio_req req, HV *stash)
 {
@@ -477,6 +492,7 @@ newSVaio_wd (aio_wd wd)
   return sv_bless (newRV_noinc (newSViv ((intptr_t)wd)), aio_wd_stash);
 }
 
+ecb_noinline
 static aio_req
 SvAIO_REQ (SV *sv)
 {
@@ -549,6 +565,7 @@ aio_grp_feed (aio_req grp)
     }
 }
 
+ecb_noinline
 static void
 req_submit (eio_req *req)
 {
@@ -885,7 +902,8 @@ req_cancel_subs (aio_req grp)
   eio_grp_cancel (grp);
 }
 
-static void ecb_cold
+ecb_cold
+static void
 create_respipe (void)
 {
   if (s_epipe_renew (&respipe))
@@ -929,7 +947,8 @@ poll_cb (void)
     }
 }
 
-static void ecb_cold
+ecb_cold
+static void
 reinit (void)
 {
   create_respipe ();
@@ -947,6 +966,7 @@ get_cb (SV *cb_sv)
   return SvOK (cb_sv) ? s_get_cv_croak (cb_sv) : 0;
 }
 
+ecb_noinline
 static aio_req ecb_noinline
 dreq (SV *callback)
 {
@@ -978,8 +998,10 @@ dreq (SV *callback)
   if (GIMME_V != G_VOID)					\
     XPUSHs (req_sv (req, aio_req_stash));
 
-ecb_inline void
-req_set_path (aio_req req, SV *path, SV **wdsv, SV **pathsv, eio_wd *wd, void **ptr)
+/* *wdsv, *pathsv, *wd and *ptr must be 0-initialized */
+ecb_inline
+void
+req_set_path (SV *path, SV **wdsv, SV **pathsv, eio_wd *wd, void **ptr)
 {
   if (expect_false (SvROK (path)))
     {
@@ -1014,13 +1036,15 @@ req_set_path (aio_req req, SV *path, SV **wdsv, SV **pathsv, eio_wd *wd, void **
   *ptr = SvPVbyte_nolen (*pathsv);
 }
 
-static void ecb_noinline
+ecb_noinline
+static void
 req_set_path1 (aio_req req, SV *path)
 {
-  req_set_path (req, path, &req->sv1, &req->sv3, &req->wd, &req->ptr1);
+  req_set_path (path, &req->sv1, &req->sv3, &req->wd, &req->ptr1);
 }
 
-static void ecb_noinline
+ecb_noinline
+static void
 req_set_fh_or_path (aio_req req, int type_path, int type_fh, SV *fh_or_path)
 {
   SV *rv = SvROK (fh_or_path) ? SvRV (fh_or_path) : fh_or_path;
@@ -1263,6 +1287,10 @@ BOOT:
     const_iv (EFD_NONBLOCK)
     const_iv (EFD_SEMAPHORE)
 
+    const_iv (MFD_CLOEXEC)
+    const_iv (MFD_ALLOW_SEALING)
+    const_iv (MFD_HUGETLB)
+
     const_iv (CLOCK_REALTIME)
     const_iv (CLOCK_MONOTONIC)
     const_iv (CLOCK_BOOTTIME)
@@ -1274,6 +1302,27 @@ BOOT:
 
     const_iv (TFD_TIMER_ABSTIME)
     const_iv (TFD_TIMER_CANCEL_ON_SET)
+
+    const_iv (STATX_TYPE)
+    const_iv (STATX_MODE)
+    const_iv (STATX_NLINK)
+    const_iv (STATX_UID)
+    const_iv (STATX_GID)
+    const_iv (STATX_ATIME)
+    const_iv (STATX_MTIME)
+    const_iv (STATX_CTIME)
+    const_iv (STATX_INO)
+    const_iv (STATX_SIZE)
+    const_iv (STATX_BLOCKS)
+    const_iv (STATX_BASIC_STATS)
+    const_iv (STATX_ALL)
+    const_iv (STATX_BTIME)
+    const_iv (STATX_ATTR_COMPRESSED)
+    const_iv (STATX_ATTR_IMMUTABLE)
+    const_iv (STATX_ATTR_APPEND)
+    const_iv (STATX_ATTR_NODUMP)
+    const_iv (STATX_ATTR_ENCRYPTED)
+    const_iv (STATX_ATTR_AUTOMOUNT)
 
     /* these are libeio constants, and are independent of gendef0 */
     const_eio (SEEK_SET)
@@ -1850,7 +1899,7 @@ aio_link (SV8 *oldpath, SV8 *newpath, SV *callback = &PL_sv_undef)
 	
         req->type = ix;
         req_set_path1 (req, oldpath);
-        req_set_path (req, newpath, &req->sv2, &req->sv4, &wd2, &req->ptr2);
+        req_set_path (newpath, &req->sv2, &req->sv4, &wd2, &req->ptr2);
         req->int3 = (long)wd2;
 	
 	REQ_SEND;
@@ -1865,7 +1914,7 @@ aio_rename2 (SV8 *oldpath, SV8 *newpath, int flags = 0, SV *callback = &PL_sv_un
 	
         req->type = EIO_RENAME;
         req_set_path1 (req, oldpath);
-        req_set_path (req, newpath, &req->sv2, &req->sv4, &wd2, &req->ptr2);
+        req_set_path (newpath, &req->sv2, &req->sv4, &wd2, &req->ptr2);
         req->int2 = flags;
         req->int3 = (long)wd2;
 	
@@ -2297,6 +2346,151 @@ munlockall ()
         RETVAL
 
 int
+statx (SV8 *pathname, int flags, UV mask)
+        CODE:
+{
+	/* undocumented, and might go away, and anyway, should use eio_statx */
+	SV *wdsv = 0;
+        SV *pathsv = 0;
+        eio_wd wd = EIO_CWD;
+        void *ptr;
+        int res;
+
+	req_set_path (pathname, &wdsv, &pathsv, &wd, &ptr);
+        RETVAL = eio__statx (!wd || wd->fd == EIO_CWD ? AT_FDCWD : wd->fd, ptr, flags, mask & STATX_ALL, &stx);
+
+        SvREFCNT_dec (pathsv);
+        SvREFCNT_dec (wdsv);
+}
+	OUTPUT:
+        RETVAL
+
+U32
+stx_mode ()
+	PROTOTYPE:
+	CODE:
+#if HAVE_STATX
+        RETVAL = stx.stx_mode;
+#else
+	XSRETURN_UNDEF;
+#endif
+	OUTPUT:
+        RETVAL
+
+#define STATX_OFFSET_mask            statx_offsetof (stx_mask)
+#define STATX_OFFSET_blksize         statx_offsetof (stx_blksize)
+#define STATX_OFFSET_nlink           statx_offsetof (stx_nlink)
+#define STATX_OFFSET_uid             statx_offsetof (stx_uid)
+#define STATX_OFFSET_gid             statx_offsetof (stx_gid)
+#define STATX_OFFSET_rdev_major      statx_offsetof (stx_rdev_major)
+#define STATX_OFFSET_rdev_minor      statx_offsetof (stx_rdev_minor)
+#define STATX_OFFSET_dev_major       statx_offsetof (stx_dev_major)
+#define STATX_OFFSET_dev_minor       statx_offsetof (stx_dev_minor)
+#define STATX_OFFSET_attributes      statx_offsetof (stx_attributes)
+#define STATX_OFFSET_ino             statx_offsetof (stx_ino)
+#define STATX_OFFSET_size            statx_offsetof (stx_size)
+#define STATX_OFFSET_blocks          statx_offsetof (stx_blocks)
+#define STATX_OFFSET_attributes_mask statx_offsetof (stx_attributes_mask)
+#define STATX_OFFSET_atime           statx_offsetof (stx_atime)
+#define STATX_OFFSET_btime           statx_offsetof (stx_btime)
+#define STATX_OFFSET_ctime           statx_offsetof (stx_ctime)
+#define STATX_OFFSET_mtime           statx_offsetof (stx_mtime)
+
+U32
+stx_mask ()
+	PROTOTYPE:
+        ALIAS:
+        stx_mask       = STATX_OFFSET_mask
+        stx_blksize    = STATX_OFFSET_blksize
+        stx_nlink      = STATX_OFFSET_nlink
+        stx_uid        = STATX_OFFSET_uid
+        stx_gid        = STATX_OFFSET_gid
+        stx_rdev_major = STATX_OFFSET_rdev_major
+        stx_rdev_minor = STATX_OFFSET_rdev_minor
+        stx_dev_major  = STATX_OFFSET_dev_major
+        stx_dev_minor  = STATX_OFFSET_dev_minor
+	CODE:
+#if HAVE_STATX
+        RETVAL = *(__u32 *)((char *)&stx + ix);
+#else
+	XSRETURN_UNDEF;
+#endif
+	OUTPUT:
+        RETVAL
+
+VAL64
+stx_attributes ()
+	PROTOTYPE:
+        ALIAS:
+        stx_attributes      = STATX_OFFSET_attributes
+        stx_ino             = STATX_OFFSET_ino
+        stx_size            = STATX_OFFSET_size
+        stx_blocks          = STATX_OFFSET_blocks
+        stx_attributes_mask = STATX_OFFSET_attributes_mask
+	CODE:
+#if HAVE_STATX
+        RETVAL = *(__u64 *)((char *)&stx + ix);
+#else
+	XSRETURN_UNDEF;
+#endif
+	OUTPUT:
+        RETVAL
+
+NV
+stx_atime ()
+	PROTOTYPE:
+        ALIAS:
+        stx_atime      = STATX_OFFSET_atime
+        stx_btime      = STATX_OFFSET_btime
+        stx_ctime      = STATX_OFFSET_ctime
+        stx_mtime      = STATX_OFFSET_mtime
+	CODE:
+#if HAVE_STATX
+        struct statx_timestamp *ts = (struct statx_timestamp *)((char *)&stx + ix);
+        RETVAL = ts->tv_sec + ts->tv_nsec * 1e-9;
+#else
+	XSRETURN_UNDEF;
+#endif
+	OUTPUT:
+        RETVAL
+
+VAL64
+stx_atimesec ()
+	PROTOTYPE:
+        ALIAS:
+        stx_atimesec   = STATX_OFFSET_atime
+        stx_btimesec   = STATX_OFFSET_btime
+        stx_ctimesec   = STATX_OFFSET_ctime
+        stx_mtimesec   = STATX_OFFSET_mtime
+	CODE:
+#if HAVE_STATX
+        struct statx_timestamp *ts = (struct statx_timestamp *)((char *)&stx + ix);
+        RETVAL = ts->tv_sec;
+#else
+	XSRETURN_UNDEF;
+#endif
+	OUTPUT:
+        RETVAL
+
+U32
+stx_atimensec ()
+	PROTOTYPE:
+        ALIAS:
+        stx_atimensec  = STATX_OFFSET_atime
+        stx_btimensec  = STATX_OFFSET_btime
+        stx_ctimensec  = STATX_OFFSET_ctime
+        stx_mtimensec  = STATX_OFFSET_mtime
+	CODE:
+#if HAVE_STATX
+        struct statx_timestamp *ts = (struct statx_timestamp *)((char *)&stx + ix);
+        RETVAL = ts->tv_nsec;
+#else
+        RETVAL = 0;
+#endif
+	OUTPUT:
+        RETVAL
+
+int
 splice (aio_rfd rfh, SV *off_in, aio_wfd wfh, SV *off_out, size_t length, unsigned int flags)
         CODE:
 {
@@ -2437,6 +2631,20 @@ timerfd_gettime (SV *fh)
 #else
         errno = ENOSYS;
 #endif
+}
+
+void
+memfd_create (SV8 *pathname, int flags = 0)
+	PPCODE:
+{
+	int fd;
+#if HAVE_MEMFD_CREATE
+        fd = memfd_create (SvPVbyte_nolen (pathname), flags);
+#else
+        fd = (errno = ENOSYS, -1);
+#endif
+	
+        XPUSHs (newmortalFH (fd, O_RDWR));
 }
 
 UV

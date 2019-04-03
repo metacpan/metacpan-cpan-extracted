@@ -33,4 +33,4 @@ requires:
   Sys::Syslog: 0
   Time::HiRes: 0
   URI::Escape: 0
-version: 1.5
+version: 1.6

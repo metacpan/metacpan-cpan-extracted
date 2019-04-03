@@ -7,7 +7,7 @@ my(%param, $emv, $name);
 %param = (
     NAME                   => 'No::Worries',
     AUTHOR                 => 'Lionel Cons <lionel.cons@cern.ch>',
-    VERSION                => '1.5',
+    VERSION                => '1.6',
     ABSTRACT_FROM          => 'lib/No/Worries.pm',
     LICENSE                => 'perl',
     PL_FILES               => {},

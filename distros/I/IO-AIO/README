@@ -223,11 +223,14 @@ FUNCTIONS
        IO::AIO::nreqs
        IO::AIO::nready
        IO::AIO::npending
+       IO::AIO::reinit
+
        $nfd = IO::AIO::get_fdlimit [EXPERIMENTAL]
        IO::AIO::min_fdlimit $nfd [EXPERIMENTAL]
 
        IO::AIO::sendfile $ofh, $ifh, $offset, $count
        IO::AIO::fadvise $fh, $offset, $len, $advice
+
        IO::AIO::mmap $scalar, $length, $prot, $flags[, $fh[, $offset]]
        IO::AIO::munmap $scalar
        IO::AIO::mremap $scalar, $new_length, $flags[, $new_address]
@@ -235,6 +238,25 @@ FUNCTIONS
        IO::AIO::mprotect $scalar, $offset, $length, $protect
        IO::AIO::munlock $scalar, $offset = 0, $length = undef
        IO::AIO::munlockall
+
+       # stat extensions
+       $counter = IO::AIO::st_gen
+       $seconds = IO::AIO::st_atime, IO::AIO::st_mtime, IO::AIO::st_ctime, IO::AIO::st_btime
+       ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtime
+       $nanoseconds = IO::AIO::st_atimensec, IO::AIO::st_mtimensec, IO::AIO::st_ctimensec, IO::AIO::st_btimensec
+       $seconds = IO::AIO::st_btimesec
+       ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtimensec
+
+       # very much unportable syscalls
+       IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
+       IO::AIO::tee $r_fh, $w_fh, $length, $flags
+       $actual_size = IO::AIO::pipesize $r_fh[, $new_size]
+       ($rfh, $wfh) = IO::AIO::pipe2 [$flags]
+       $fh = IO::AIO::memfd_create $pathname[, $flags]
+       $fh = IO::AIO::eventfd [$initval, [$flags]]
+       $fh = IO::AIO::timerfd_create $clockid[, $flags]
+       ($cur_interval, $cur_value) = IO::AIO::timerfd_settime $fh, $flags, $new_interval, $nbw_value
+       ($cur_interval, $cur_value) = IO::AIO::timerfd_gettime $fh
 
   API NOTES
     All the "aio_*" calls are more or less thin wrappers around the syscall
@@ -1643,7 +1665,7 @@ FUNCTIONS
         File birth time is only available when the OS and perl support it
         (on FreeBSD and NetBSD at the time of this writing, although support
         is adaptive, so if your OS/perl gains support, IO::AIO can take
-        avdantage of it). On systems where it isn't available, 0 is
+        advantage of it). On systems where it isn't available, 0 is
         currently returned, but this might change to "undef" in a future
         version.
 
@@ -1919,7 +1941,26 @@ FUNCTIONS
            my ($rfh, $wfh) = IO::AIO::pipe2 IO::AIO::O_CLOEXEC
               or die "pipe2: $!\n";
 
-    $fh = IO::AIO::eventfd [$initval, [$flags]]
+    $fh = IO::AIO::memfd_create $pathname[, $flags]
+        This is a direct interface to the Linux memfd_create(2) system call.
+        The (unhelpful) default for $flags is 0, but your default should be
+        "IO::AIO::MFD_CLOEXEC".
+
+        On success, the new memfd filehandle is returned, otherwise returns
+        "undef". If the memfd_create syscall is missing, fails with
+        "ENOSYS".
+
+        Please refer to memfd_create(2) for more info on this call.
+
+        The following $flags values are available: "IO::AIO::MFD_CLOEXEC",
+        "IO::AIO::MFD_ALLOW_SEALING" and "IO::AIO::MFD_HUGETLB".
+
+        Example: create a new memfd.
+
+           my $fh = IO::AIO::memfd_create "somenameforprocfd", IO::AIO::MFD_CLOEXEC
+              or die "m,emfd_create: $!\n";
+        =item $fh = IO::AIO::eventfd [$initval, [$flags]]
+
         This is a direct interface to the Linux eventfd(2) system call. The
         (unhelpful) defaults for $initval and $flags are 0 for both.
 
@@ -1935,16 +1976,17 @@ FUNCTIONS
 
         Example: create a new eventfd filehandle:
 
-           $fh = IO::AIO::eventfd 0, IO::AIO::O_CLOEXEC
+           $fh = IO::AIO::eventfd 0, IO::AIO::EFD_CLOEXEC
               or die "eventfd: $!\n";
 
     $fh = IO::AIO::timerfd_create $clockid[, $flags]
         This is a direct interface to the Linux timerfd_create(2) system
-        call. The (unhelpful) default for $flags is 0.
+        call. The (unhelpful) default for $flags is 0, but your default
+        should be "IO::AIO::TFD_CLOEXEC".
 
         On success, the new timerfd filehandle is returned, otherwise
-        returns "undef". If the eventfd syscall is missing, fails with
-        "ENOSYS".
+        returns "undef". If the timerfd_create syscall is missing, fails
+        with "ENOSYS".
 
         Please refer to timerfd_create(2) for more info on this call.
 

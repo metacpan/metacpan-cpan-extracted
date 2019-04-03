@@ -1,5 +1,9 @@
 Revision history for perl distribution App-git-ship
 
+0.33 2019-04-03T21:13:01+0700
+ - Add x_contributors to Makefile.PL #22
+ - Fix correct UTF-8 encoding #22
+
 0.32 2019-03-23T18:38:58+0800
  - Fix adding .travis.yml to the first commit
  - Fix bug in default .gitignore

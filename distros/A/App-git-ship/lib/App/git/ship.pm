@@ -7,11 +7,12 @@ use IPC::Run3    ();
 use Mojo::File 'path';
 use Mojo::Loader;
 use Mojo::Template;
+use Mojo::Util qw(decode encode);
 
 use constant DEBUG  => $ENV{GIT_SHIP_DEBUG}  || 0;
 use constant SILENT => $ENV{GIT_SHIP_SILENT} || 0;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 # Need to be overridden in subclass
 sub build { $_[0]->abort('build() is not available for %s', ref $_[0]) }
@@ -40,7 +41,7 @@ sub config {
     return $self->$param_method if $self->can($param_method);
 
     my $env_key = uc "GIT_SHIP_$key";
-    return $ENV{$env_key} // '';
+    return decode 'UTF-8', $ENV{$env_key} // '';
   }
 
   # Set single key
@@ -99,7 +100,7 @@ sub render_template {
   }
 
   $file->dirname->make_path unless -d $file->dirname;
-  $file->spurt($template->process({%$args, ship => $self}));
+  $file->spurt(encode 'UTF-8', $template->process({%$args, ship => $self}));
   say "# Generated $file" unless SILENT;
   return $self;
 }
@@ -170,7 +171,7 @@ sub _build_config {
 
   my $file   = $ENV{GIT_SHIP_CONFIG} || '.ship.conf';
   my $config = {};
-  return $config unless open my $CFG, '<', $file;
+  return $config unless open my $CFG, '<:encoding(UTF-8)', $file;
 
   while (<$CFG>) {
     chomp;
@@ -195,7 +196,7 @@ sub _build_config_param_author {
 
   open my $GIT, '-|', qw(git log), "--format=$format"
     or $self->abort("git log --format=$format: $!");
-  my $author = readline $GIT;
+  my $author = decode 'UTF-8', readline $GIT;
   $self->abort("Could not find any author in git log") unless $author;
   chomp $author;
   warn "[ship::author] $format = $author\n" if DEBUG;
@@ -259,7 +260,7 @@ App::git::ship - Git command for shipping your project
 
 =head1 VERSION
 
-0.32
+0.33
 
 =head1 SYNOPSIS
 
@@ -340,6 +341,10 @@ This class is used to build the object that runs all the actions on your
 project. This is autodetected by looking at the structure and files in
 your project. For now this value can be L<App::git::ship> or
 L<App::git::ship::perl>, but any customization is allowed.
+
+=head2 GIT_SHIP_CONTRIBUTORS
+
+Comma-separated list with C<< name <email> >> of the contributors to this project.
 
 =head2 GIT_SHIP_DEBUG
 
@@ -489,6 +494,12 @@ the terms of the Artistic License version 2.0.
 =head1 AUTHOR
 
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+mohawk2 - C<mohawk2@users.noreply.github.com>
+
+Rolf Stöckli - C<tekki@cpan.org>.
+
+Shoichi Kaji - C<skaji@cpan.org>
 
 =cut
 

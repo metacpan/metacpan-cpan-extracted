@@ -95,11 +95,11 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                         );
                         if (col.format != null) {
                             cr.setNumberFormat(
-                                new qx.util.format.NumberFormat(col.locale)
-                                    .set(col.format)
+                                new callbackery.util.format.NumberFormat()
+                                .set(col.format)
                             );
                         }
-                        break;
+                        break;    
                 }
                 if (cr){
                     tcm.setDataCellRenderer(i, cr);

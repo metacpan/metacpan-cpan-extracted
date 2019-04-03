@@ -1,0 +1,147 @@
+#!perl
+use alienfile;
+
+use lib 'util';
+use MyInstallUtil;
+
+# For Windows and OSX we download from Anaconda repo instead as plotly-orca's
+# github releases page. This is because latter's Windows and OSX downloads
+# still needs installation.
+# For Linux we still use the AppImage from plotly-orca's github repo releases,
+# as that's a bundle of everything needed so we can probably avoid dependency
+# issues.
+
+my $plotly_orca_version          = '1.2.1';
+my $plotly_orca_version_anaconda = '1.2.1-1';
+
+my $anaconda_base_url =
+  "https://anaconda.org/plotly/plotly-orca/${plotly_orca_version}/download";
+my $make_url_anaconda = sub {
+
+    # $_[0] is one of "win-64", "osx-64", "linux-64"
+    # see also https://anaconda.org/plotly/plotly-orca/files
+    join( '/',
+        $anaconda_base_url, $_[0],
+        "plotly-orca-${plotly_orca_version_anaconda}.tar.bz2" );
+};
+
+my $github_base_url = "https://github.com/plotly/orca/releases/download";
+my $make_url_github = sub {
+
+    # $_[0] is one of the file names on https://github.com/plotly/orca/releases
+    join( '/', $github_base_url, "v${plotly_orca_version}", $_[0] );
+};
+
+my %download_url = (
+    MSWin32 => $make_url_anaconda->('win-64'),
+    darwin  => $make_url_anaconda->('osx-64'),
+    linux => $make_url_github->("orca-${plotly_orca_version}-x86_64.AppImage"),
+);
+
+die 'Unsupported OS' unless grep { $^O eq $_ } ( keys %download_url );
+
+if ( MyInstallUtil::need_xvfb() and not MyInstallUtil::can_xvfb() ) {
+    die "plotly-orca requires a running X service. "
+      . "But your host seems to be headless and you don't have xvfb at all. "
+      . "Please install xvfb.";
+}
+
+configure {
+    'Capture::Tiny'         => 0,
+    'File::Which'           => 0,
+    'Path::Tiny'            => 0,
+    'File::Copy::Recursive' => 0,
+};
+
+plugin 'Probe::CommandLine' => (
+    command => MyInstallUtil::wrap_orca('orca'),
+    args    => ['-h'],
+    match   => qr/plotly/i,
+);
+
+share {
+    require Path::Tiny;
+
+    start_url( $ENV{ALIEN_PLOTLY_ORCA_DOWNLOAD_URL} || $download_url{$^O} );
+
+    plugin 'Download';
+    if ( $^O eq 'linux' ) {
+        extract sub {
+            my ( $build, $src ) = @_;
+            my $dst = Path::Tiny::path('.')->absolute;
+            Path::Tiny::path($src)->copy($dst);
+        };
+    }
+    else {
+        plugin 'Extract' => 'tar.bz2';
+    }
+
+    patch sub {
+        my ($build) = @_;
+
+        if ( $^O eq 'linux' ) {
+            my $extract = $build->install_prop->{extract};
+            my ($appimage_file) = glob("$extract/*.AppImage");
+
+            my $orca = Path::Tiny::path( $extract, 'bin', 'orca' );
+            $orca->touchpath;
+            Path::Tiny::path($appimage_file)->move($orca);
+            $orca->chmod('0755');
+        }
+        else {
+            return patch_anaconda($build);
+        }
+    };
+
+    build sub {
+        my ($build) = @_;
+
+        my $extract = $build->install_prop->{extract};
+        my $prefix  = $build->install_prop->{prefix};
+
+        require File::Copy::Recursive;
+        File::Copy::Recursive::dircopy( $extract, $prefix );
+    };
+
+    gather sub {
+        my ($build) = @_;
+
+        $build->runtime_prop->{version} = MyInstallUtil::detect_orca_version();
+    };
+};
+
+sub patch_anaconda {
+    my ($build) = @_;
+
+    my $extract = $build->install_prop->{extract};
+
+    # Patch orca.cmd as Anaconda's orca.cmd uses Anaconda's path.
+    if ( $^O eq 'MSWin32' ) {
+
+        # on Windows also adjust the directory structure.
+        Path::Tiny::path( $extract, 'orca.cmd' )->remove;
+        my $orca = Path::Tiny::path( $extract, 'bin', 'orca.cmd' );
+        $orca->touchpath;
+        $orca->spew(<<'END_OF_TEXT');
+@echo off
+%~dp0\..\orca_app\orca.exe %*
+END_OF_TEXT
+    }
+    else {
+        my $orca = Path::Tiny::path( $extract, 'bin', 'orca' );
+        $orca->spew(<<'END_OF_TEXT');
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+# Mac OSX
+exec ${DIR}/../lib/orca.app/Contents/MacOS/orca "$@"
+else
+# Assume linux
+exec ${DIR}/../lib/orca_app/orca "$@"
+fi
+END_OF_TEXT
+        $orca->chmod('0755');
+    }
+}

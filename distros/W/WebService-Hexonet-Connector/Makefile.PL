@@ -17,7 +17,8 @@ WriteMakefile(
         'Carp'                 => 0,
         'POSIX'                => 0,
         'List::MoreUtils'      => 0.416,
-        'version'              => 0.9917
+        'version'              => 0.9917,
+        'Config'               => 0
     },
     TEST_REQUIRES => {
         'Perl::Critic'           => 1.132,
@@ -28,7 +29,9 @@ WriteMakefile(
         'Test::RequiresInternet' => 0.05,
         'Scalar::Util'           => 0,
         'Readonly'               => 2.05,
-        'version'                => 0.9917
+        'version'                => 0.9917,
+        'POSIX'                  => 0,
+        'Config'                 => 0
     },
     ABSTRACT_FROM    => 'lib/WebService/Hexonet/Connector.pm',
     AUTHOR           => 'hexonet <middleware@hexonet.net>',

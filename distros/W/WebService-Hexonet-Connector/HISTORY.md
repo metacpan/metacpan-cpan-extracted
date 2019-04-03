@@ -1,3 +1,15 @@
+# [2.1.0](https://github.com/hexonet/perl-sdk/compare/v2.0.1...v2.1.0) (2019-04-03)
+
+
+### Bug Fixes
+
+* **npm:** security dep bump ([3e1d2fe](https://github.com/hexonet/perl-sdk/commit/3e1d2fe))
+
+
+### Features
+
+* **APIClient:** review user-agent usage ([dbc9b62](https://github.com/hexonet/perl-sdk/commit/dbc9b62))
+
 ## [2.0.1](https://github.com/hexonet/perl-sdk/compare/v2.0.0...v2.0.1) (2018-12-17)
 
 

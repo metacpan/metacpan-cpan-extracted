@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Sys::Virt;
+use XML::XPath;
+use XML::XPath::XMLParser;
 
 my $addr = @ARGV ? shift @ARGV : "";
 
@@ -32,6 +34,17 @@ foreach my $info (@info) {
     }
     print "\n";
 }
+
+my $poolCaps = $hv->get_storage_pool_capabilities();
+my @poolTypes = ();
+
+my $xp = XML::XPath->new(xml => $poolCaps);
+my $nodeset = $xp->find('/storagepoolCapabilities/pool[@supported="yes"]/@type');
+foreach my $node ($nodeset->get_nodelist) {
+    push (@poolTypes, $node->getNodeValue());
+}
+
+print "Supported pool types: @poolTypes\n";
 
 my $xml = $hv->get_domain_capabilities(undef, "x86_64", undef, "kvm");
 print $xml;

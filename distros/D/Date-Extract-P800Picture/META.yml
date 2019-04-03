@@ -22,10 +22,10 @@ name: Date-Extract-P800Picture
 provides:
   Date::Extract::P800Picture:
     file: lib/Date/Extract/P800Picture.pm
-    version: v1.1.1
+    version: v1.1.2
   Date::Extract::P800Picture::Exceptions:
     file: lib/Date/Extract/P800Picture/Exceptions.pm
-    version: v1.1.1
+    version: v1.1.2
 recommends:
   File::Basename: '0'
   Getopt::Long: '0'
@@ -44,5 +44,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/Date-Extract-P800Picture
-version: v1.1.1
+version: v1.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

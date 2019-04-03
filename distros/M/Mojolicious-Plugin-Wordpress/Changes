@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojolicious-Plugin-Wordpress
 
+0.03 2019-04-03T09:53:39+0700
+ - Fix rewriting meta_for asset URLs
+ - Changed logic for getting Yoast SEO data
+ - Improved response headers for static files
+
 0.02 2019-03-22T10:59:10+0800
  - Fix "Not an ARRAY reference at Wordpress.pm line 92", when fetching posts
    with ?page=$too_high.

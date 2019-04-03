@@ -8,3 +8,4 @@ README
 cpanfile
 lib/Mojo/Graphite/Writer.pm
 t/00-use.t
+t/basic.t

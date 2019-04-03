@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-DynamicPrereqs
 
+0.035     2019-04-03 04:46:16Z
+          - the result of parse_args() is now cached so it can be called
+            multiple times with efficiency
+
 0.034     2017-12-21 00:49:09Z
           - can_cc implementation updated to match
             Module::Install::Can::can_cc, by adding a code snippet for VMS

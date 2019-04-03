@@ -55,7 +55,7 @@ has cfgHash => sub {
     my $self = shift;
     my $cfg_file = shift;
     my $parser = $self->makeParser();
-    my $cfg = $parser->parse($self->file) or croak($parser->{err});
+    my $cfg = $parser->parse($self->file, {encoding => 'utf8'}) or croak($parser->{err});
     $self->postProcessCfg($cfg);
     return $cfg;
 };

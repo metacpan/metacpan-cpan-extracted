@@ -1,5 +1,14 @@
 Revision history for perl module Sys::Virt
 
+5.2.0 2019-04-03
+
+ - Add VIR_DOMAIN_SNAPSHOT_LIST_TOPOLOGICAL constant
+ - Add VIR_ERR_INVALID_DOMAIN_CHECKPOINT, VIR_ERR_NO_DOMAIN_BACKUP,
+   VIR_ERR_NO_DOMAIN_CHECKPOINT constants
+ - Add VIR_FROM_DOMAIN_CHECKPOINT constant
+ - Add VIR_MIGRATE_PARALLEL and VIR_MIGRATE_PARAM_PARALLEL_CONNECTIONS
+   constants
+
 5.1.0 2019-03-04
 
  - Add VIR_FROM_FIREWALLD constant
@@ -7,6 +16,7 @@ Revision history for perl module Sys::Virt
  - Add VIR_DOMAIN_MIGRATE_MAX_SPEED_POSTCOPY constant
  - Add VIR_DOMAIN_SAVE_IMAGE_XML_SECURE and
    VIR_DOMAIN_SNAPSHOT_XML_SECURE constants
+ - Add virConnectGetStoragePoolCapabilities binding
 
 5.0.0 2019-01-21
 

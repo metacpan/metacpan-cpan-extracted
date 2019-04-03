@@ -13,7 +13,7 @@
 package No::Worries::Stat;
 use strict;
 use warnings;
-our $VERSION  = "1.5";
+our $VERSION  = "1.6";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.12 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -471,4 +471,4 @@ L<No::Worries>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2017
+Copyright (C) CERN 2012-2019

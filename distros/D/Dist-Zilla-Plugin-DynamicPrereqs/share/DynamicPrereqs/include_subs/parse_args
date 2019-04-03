@@ -1,10 +1,14 @@
-sub parse_args {
-  require ExtUtils::MakeMaker;
-  require Text::ParseWords;
-  ExtUtils::MakeMaker::parse_args(
-    my $tmp = {},
-    Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),
-    @ARGV,
-  );
-  return $tmp->{ARGS} || {};
+{
+  my $parsed_args;
+  sub parse_args {
+    return $parsed_args if defined $parsed_args;
+    require ExtUtils::MakeMaker;
+    require Text::ParseWords;
+    ExtUtils::MakeMaker::parse_args(
+      my $tmp = {},
+      Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),
+      @ARGV,
+    );
+    $parsed_args = $tmp->{ARGS} || {};
+  }
 }

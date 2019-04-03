@@ -13,8 +13,8 @@
 package No::Worries::File;
 use strict;
 use warnings;
-our $VERSION  = "1.5";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.18 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.6";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.19 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
@@ -22,7 +22,9 @@ our $REVISION = sprintf("%d.%02d", q$Revision: 1.18 $ =~ /(\d+)\.(\d+)/);
 
 use No::Worries qw($_IntegerRegexp);
 use No::Worries::Die qw(dief);
+use No::Worries::Dir qw(dir_ensure dir_parent);
 use No::Worries::Export qw(export_control);
+use No::Worries::Proc qw(proc_run);
 use Params::Validate qw(validate :types);
 
 #
@@ -157,7 +159,7 @@ my %file_rw_options = (
 #
 
 my %file_read_options = (%file_rw_options,
-    data    => { optional => 1, type => SCALARREF | CODEREF },
+    data => { optional => 1, type => SCALARREF | CODEREF },
 );
 
 sub file_read ($@) {
@@ -177,7 +179,7 @@ sub file_read ($@) {
 #
 
 my %file_write_options = (%file_rw_options,
-    data    => { optional => 0, type => SCALAR | SCALARREF | CODEREF },
+    data => { optional => 0, type => SCALAR | SCALARREF | CODEREF },
 );
 
 sub file_write ($@) {
@@ -189,6 +191,58 @@ sub file_write ($@) {
     $fh = _open($path, ">", \%option);
     _write($path, $fh, $option{data}, $option{bufsize});
     close($fh) or dief("cannot close(%s): %s", $path, $!);
+}
+
+#
+# update a file (high level wrapper for text files)
+#
+
+my %file_update_options = (
+    data     => { optional => 0, type => SCALAR },
+    diff     => { optional => 1, type => BOOLEAN },
+    noaction => { optional => 1, type => BOOLEAN },
+    silent   => { optional => 1, type => BOOLEAN },
+);
+
+sub file_update ($@) {
+    my($path, %option, $data, $fh);
+
+    $path = shift(@_);
+    %option = validate(@_, \%file_update_options);
+    if (-f $path) {
+        $data = file_read($path);
+        if ($data eq $option{data}) {
+            printf("did not update %s (already up-to-date)\n", $path)
+                unless $option{silent};
+        } else {
+            proc_run(
+                command => [ qw(diff -u), $path, "-" ],
+                stdin   => \$option{data},
+            ) if $option{diff};
+            if ($option{noaction}) {
+                printf("did not update %s (noaction)\n", $path)
+                    unless $option{silent};
+            } else {
+                file_write($path, data => $option{data});
+                printf("updated %s\n", $path)
+                    unless $option{silent};
+            }
+        }
+    } else {
+        proc_run(
+            command => [ qw(diff -u /dev/null), "-" ],
+            stdin   => \$option{data},
+        ) if $option{diff};
+        if ($option{noaction}) {
+            printf("did not create %s (noaction)\n", $path)
+                unless $option{silent};
+        } else {
+            dir_ensure(dir_parent($path));
+            file_write($path, data => $option{data});
+            printf("created %s\n", $path)
+                unless $option{silent};
+        }
+    }
 }
 
 #
@@ -205,7 +259,7 @@ sub import : method {
     my($pkg, %exported);
 
     $pkg = shift(@_);
-    grep($exported{$_}++, map("file_$_", qw(read write)));
+    grep($exported{$_}++, map("file_$_", qw(read write update)));
     export_control(scalar(caller()), $pkg, \%exported, @_);
 }
 
@@ -219,7 +273,7 @@ No::Worries::File - file handling without worries
 
 =head1 SYNOPSIS
 
-  use No::Worries::File qw(file_read file_write);
+  use No::Worries::File qw(file_read file_write file_update);
 
   # read a file
   $data = file_read($path);
@@ -232,6 +286,9 @@ No::Worries::File - file handling without worries
 
   # idem but with data passed by reference
   file_write($path, data => \"hello world");
+
+  # verbosely update a file
+  file_update($path, data => "hello world", diff => 1);
 
 =head1 DESCRIPTION
 
@@ -283,13 +340,30 @@ or code reference
 
 =back
 
+=item file_update(PATH[, OPTIONS])
+
+check the text file at the given path and update it if needed, printing what
+has been done on stdout; supported options:
+
+=over
+
+=item * C<data>: provide the file contents via this scalar
+
+=item * C<diff>: show differences
+
+=item * C<noaction>: do not update the file
+
+=item * C<silent>: do not print any message on stdout
+
+=back
+
 =back
 
 =head1 OPTIONS
 
-Both functions support a C<handle> option that can contain a file handle to
-use. When given, this handle will be used (and closed at the end of the I/O
-operations) as is, without calling binmode() on it (see below).
+Both file_read() and file_write() support a C<handle> option that can contain
+a file handle to use. When given, this handle will be used (and closed at the
+end of the I/O operations) as is, without calling binmode() on it (see below).
 
 These functions also support a C<binary> option and a C<binmode> option
 specifying how the file handle should be treated with respect to binmode().
@@ -309,6 +383,9 @@ At the end of the file, the subroutine will be called with an empty string.
 file_write() can be given a code reference via the C<data> option. It should
 return data in a way similar to sysread(), returning an empty string to
 indicate the end of the data to be written to the file.
+
+file_update() only supports text files (no C<binary> or C<binmode> options)
+and the C<data> option can only be a scalar.
 
 =head1 GLOBAL VARIABLES
 
@@ -331,4 +408,4 @@ L<No::Worries>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2017
+Copyright (C) CERN 2012-2019

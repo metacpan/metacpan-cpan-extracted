@@ -1,9 +1,15 @@
-MANIFEST
+Bookmarks.txt
 Changes
-README
+COPYING
+COPYING.LESSER
+JFileDialog.htm
+JFileDialogTest.pl
 lib/Tk/JFileDialog.pm
 Makefile.PL
-JFileDialogTest.pl
-test.pl
+MANIFEST
 META.yml                                 Module meta-data (added by MakeMaker)
+PathHistory.txt
+README
+t/10_Tk-JFileDialog.t
+t/99_Tk-JFileDialog_demo.t
 META.json                                Module JSON meta-data (added by MakeMaker)

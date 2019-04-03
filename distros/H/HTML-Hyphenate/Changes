@@ -1,5 +1,11 @@
 Revision history for Perl extension HTML::Hyphenate.
 
+v1.1.3 Tue Apr  2 07:28:44 UTC 2019
+	- chore: ignore Built.bat from manifest
+
+v1.1.2 Mon Apr  1 10:38:15 UTC 2019
+	- chore: fixed RT128189 manifest fails
+
 v1.1.1 Sun Nov 11 11:03:51 UTC 2018
 	- RT127614 add Mojolicious minimum version 6.0 to requirements
 	- Refactored and improved critics

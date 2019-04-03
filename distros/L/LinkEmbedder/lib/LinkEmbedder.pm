@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -58,7 +58,7 @@ sub get_p {
 
   $args = ref $args eq 'HASH' ? {%$args} : {url => $args};
   $args->{url} = Mojo::URL->new($args->{url} || '') unless ref $args->{url};
-  $args->{ua} = $self->ua;
+  $args->{ua}  = $self->ua;
 
   $link ||= delete $args->{class};
   $link ||= ucfirst $1 if $args->{url} =~ $PROTOCOL_RE;
@@ -155,11 +155,11 @@ These web pages are currently supported:
 
 =item * L<http://imgur.com/>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=http://imgur.com/gallery/ohL3e>
+Example: L<https://app.thorsen.pm/linkembedder?url=http://imgur.com/gallery/ohL3e>
 
 =item * L<https://instagram.com/>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://www.instagram.com/p/BSRYg_Sgbqe/>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://www.instagram.com/p/BSRYg_Sgbqe/>
 
 Instagram need some additional JavaScript. Please look at
 L<https://github.com/jhthorsen/linkembedder/blob/master/examples/embedder.pl> and
@@ -168,59 +168,59 @@ for more information.
 
 =item * L<https://appear.in/>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://appear.in/link-embedder-demo>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://appear.in/link-embedder-demo>
 
 =item * L<https://gist.github.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://gist.github.com/jhthorsen/3738de6f44f180a29bbb>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://gist.github.com/jhthorsen/3738de6f44f180a29bbb>
 
 =item * L<https://github.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://github.com/jhthorsen/linkembedder/blob/master/t/basic.t>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://github.com/jhthorsen/linkembedder/blob/master/t/basic.t>
 
 =item * L<https://ix.io>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=http://ix.io/fpW>
+Example: L<https://app.thorsen.pm/linkembedder?url=http://ix.io/fpW>
 
 =item * L<https://maps.google.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https%3A%2F%2Fwww.google.no%2Fmaps%2Fplace%2FOslo%2C%2BNorway%2F%4059.8937806%2C10.645035…m4!1s0x46416e61f267f039%3A0x7e92605fd3231e9a!8m2!3d59.9138688!4d10.7522454>
+Example: L<https://app.thorsen.pm/linkembedder?url=https%3A%2F%2Fwww.google.no%2Fmaps%2Fplace%2FOslo%2C%2BNorway%2F%4059.8937806%2C10.645035…m4!1s0x46416e61f267f039%3A0x7e92605fd3231e9a!8m2!3d59.9138688!4d10.7522454>
 
 =item * L<https://metacpan.org>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://metacpan.org/pod/Mojolicious>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://metacpan.org/pod/Mojolicious>
 
 =item * L<https://paste.fedoraproject.org/>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?https://paste.fedoraproject.org/paste/9qkGGjN-D3fL2M-bimrwNQ>
+Example: L<https://app.thorsen.pm/linkembedder?https://paste.fedoraproject.org/paste/9qkGGjN-D3fL2M-bimrwNQ>
 
 =item * L<http://paste.opensuse.org>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=http://paste.opensuse.org/2931429>
+Example: L<https://app.thorsen.pm/linkembedder?url=http://paste.opensuse.org/2931429>
 
 =item * L<http://paste.scsys.co.uk>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=http://paste.scsys.co.uk/557716>
+Example: L<https://app.thorsen.pm/linkembedder?url=http://paste.scsys.co.uk/557716>
 
 =item * L<http://pastebin.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://pastebin.com/V5gZTzhy>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://pastebin.com/V5gZTzhy>
 
 =item * L<https://www.spotify.com/>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=spotify:track:0aBi2bHHOf3ZmVjt3x00wv>
+Example: L<https://app.thorsen.pm/linkembedder?url=spotify:track:0aBi2bHHOf3ZmVjt3x00wv>
 
 =item * L<https://ted.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://www.ted.com/talks/jill_bolte_taylor_s_powerful_stroke_of_insight>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://www.ted.com/talks/jill_bolte_taylor_s_powerful_stroke_of_insight>
 
 =item * L<https://travis-ci.org>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://travis-ci.org/Nordaaker/convos/builds/47421379>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://travis-ci.org/Nordaaker/convos/builds/47421379>
 
 =item * L<https://twitter.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://twitter.com/jhthorsen/status/786688349536972802>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://twitter.com/jhthorsen/status/786688349536972802>
 
 Twitter need some additional JavaScript. Please look at
 L<https://github.com/jhthorsen/linkembedder/blob/master/examples/embedder.pl> and
@@ -229,22 +229,22 @@ for more information.
 
 =item * L<https://vimeo.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https://vimeo.com/154038415>
+Example: L<https://app.thorsen.pm/linkembedder?url=https://vimeo.com/154038415>
 
 =item * L<https://youtube.com>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DOspRE1xnLjE>
+Example: L<https://app.thorsen.pm/linkembedder?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DOspRE1xnLjE>
 
 =item * L<https://www.xkcd.com/>
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=http://xkcd.com/927>
+Example: L<https://app.thorsen.pm/linkembedder?url=http://xkcd.com/927>
 
 =item * HTML
 
 Any web page will be parsed, and "og:", "twitter:", meta tags and other
 significant elements will be used to generate a oEmbed response.
 
-Example: L<http://home.thorsen.pm/demo/link-embedder?url=http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html>
+Example: L<https://app.thorsen.pm/linkembedder?url=http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html>
 
 =item * Images
 

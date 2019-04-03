@@ -16,7 +16,6 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa364963%28v=vs.85%29.as
 http://msdn.microsoft.com/en-us/library/windows/desktop/aa364996%28v=vs.85%29.aspx
 http://msdn.microsoft.com/en-us/library/windows/desktop/aa364994%28v=vs.85%29.aspx
 TODO: extra socket/tcp constants &c?
-TODO: http://lwn.net/Articles/593918/ SHMEM_SET_SEALS, SHMEM_GET_SEALS, SEAL_SHRINK, SEAL_GROW, SEAL_WRITE, int memfd_create(const char *name, u64 size, u64 flags);, MFD_CLOEXEC, int fd = open("/tmp", O_RDWR | O_TMPFILE | O_EXCL, S_IRWXU);
 TODO: name_to_handle_At + open_by_handle_at = clone fds
 TODO: lchown
 TODO: mount/umount2/MS_* flags
@@ -37,6 +36,17 @@ TODO: mlock2, MLOCK_ONFAULT
 TODO: dup3, pipe2, accept4
 TODO: dump config.log when automated testign and configure fails
 TODO: ns time resolution in utime
+TODO: statx
+
+4.72 Wed Apr  3 04:56:03 CEST 2019
+        - (libeio) if fd 0 is available do not use it for aio_wd, as it
+          collides with IO::AIO::CWD.
+	- added IO::AIO::memfd_create.
+	- correctly include <sys/uio.h> in the vmsplice test.
+        - reduce codesize by ~7% on amd64 by declaring more functions
+          as noinline.
+        - documentation fixes and updates.
+        - experimental and undocumented preliminary support for synchronous statx.
 
 4.71 Sun Mar 10 13:09:26 CET 2019
 	- due to an error in the linux manpages, the configure tests

@@ -20,8 +20,8 @@ use lib 't/lib';
 use Helper;
 
 my @subs = sort
-    grep { !/^\./ }
-    map { $_->basename }
+    grep !/^\./,
+    map $_->basename,
     path(File::ShareDir::module_dir('Dist::Zilla::Plugin::DynamicPrereqs'), 'include_subs')->children;
 
 my $tzil = Builder->from_config(
@@ -46,9 +46,9 @@ is(
 );
 
 cmp_deeply(
-    [ map { colorstrip($_) } @{ $tzil->log_messages } ],
+    [ map colorstrip($_), @{ $tzil->log_messages } ],
     supersetof(
-        map { re(qr/^\Q[DynamicPrereqs] Use $_ with great care! Please consult the documentation!\E$/) } qw(can_cc can_run can_xs),
+        map re(qr/^\Q[DynamicPrereqs] Use $_ with great care! Please consult the documentation!\E$/), qw(can_cc can_run can_xs),
     ),
     'warning printed for unstable sub implementations',
 ) or diag 'got log messages: ', explain $tzil->log_messages;
@@ -102,7 +102,7 @@ run_makemaker($tzil);
     cmp_deeply(
         \%{'main::MyTestMakeMaker::'},
         superhashof({
-            map {; $_ => *{"MyTestMakeMaker::$_"} } @subs
+            map +($_ => *{"MyTestMakeMaker::$_"}), @subs
         }),
         'Makefile.PL defined all required subroutines',
     ) or diag 'Makefile.PL defined symbols: ', explain \%{'main::MyTestMakeMaker::'};

@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Config" : "0",
             "Data::Dumper" : "2.161",
             "LWP::Protocol::https" : "6.07",
             "LWP::UserAgent" : "6.35",
@@ -49,7 +50,9 @@
       "test" : {
          "requires" : {
             "CPAN::Uploader" : "0.103013",
+            "Config" : "0",
             "Devel::Cover" : "1.3",
+            "POSIX" : "0",
             "Perl::Critic" : "1.132",
             "Readonly" : "2.05",
             "Scalar::Util" : "0",
@@ -61,6 +64,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.0.1",
+   "version" : "v2.1.0",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

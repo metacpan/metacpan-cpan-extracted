@@ -14,13 +14,14 @@ package No::Worries::Proc;
 use strict;
 use warnings;
 use 5.005; # need the four-argument form of substr()
-our $VERSION  = "1.5";
-our $REVISION = sprintf("%d.%02d", q$Revision: 1.23 $ =~ /(\d+)\.(\d+)/);
+our $VERSION  = "1.6";
+our $REVISION = sprintf("%d.%02d", q$Revision: 1.26 $ =~ /(\d+)\.(\d+)/);
 
 #
 # used modules
 #
 
+use Config qw(%Config);
 use IO::Select qw();
 use No::Worries qw($_IntegerRegexp $_NumberRegexp);
 use No::Worries::Die qw(dief);
@@ -34,7 +35,7 @@ use Time::HiRes qw();
 # global variables
 #
 
-our($Transient);
+our(@SigName, $Transient);
 
 #
 # check a command to be executed
@@ -130,6 +131,7 @@ sub _read_zombie ($$$) {
         # read until EOF then close
         $done = 1;
         while ($done) {
+            last if $iosr and not grep($fh eq $_, $iosr->can_read(1));
             $buf = "";
             $done = sysread($fh, $buf, 8192);
             dief("cannot sysread(): %s", $!) unless defined($done);
@@ -663,6 +665,30 @@ sub proc_detach (@) {
 }
 
 #
+# return a string representation of the process status
+#
+
+sub proc_status ($) {
+    my($status) = @_;
+    my($signum, @list);
+
+    return("ok") unless $status;
+    $signum = $status & 127;
+    push(@list, sprintf("code=%d", $status >> 8));
+    push(@list, sprintf("signal=%s", $SigName[$signum] || $signum))
+        if $signum;
+    push(@list, "(core dumped)")
+        if $status & 128;
+    return(join(" ", @list));
+}
+
+#
+# module initialization
+#
+
+@SigName[split(/\s+/, $Config{sig_num})] = split(/\s+/, $Config{sig_name});
+
+#
 # export control
 #
 
@@ -671,7 +697,7 @@ sub import : method {
 
     $pkg = shift(@_);
     grep($exported{$_}++,
-         map("proc_$_", qw(create detach monitor output terminate run)));
+         map("proc_$_", qw(create detach monitor output run status terminate)));
     export_control(scalar(caller()), $pkg, \%exported, @_);
 }
 
@@ -809,6 +835,10 @@ in list context; supported options: the ones of proc_create()
 detach the current process so that it becomes a daemon running in the
 background (this implies forking and re-opening std*); supported options:
 
+=item proc_status(STATUS)
+
+return a string representation of the given process status (i.e. $?)
+
 =over
 
 =item * C<callback>: code reference that will be executed by the parent
@@ -911,4 +941,4 @@ L<No::Worries>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2017
+Copyright (C) CERN 2012-2019

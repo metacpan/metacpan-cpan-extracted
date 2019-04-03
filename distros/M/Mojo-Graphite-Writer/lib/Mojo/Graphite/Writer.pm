@@ -10,7 +10,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{MOJO_GRAPHITE_WRITER_DEBUG};
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 $VERSION = eval $VERSION;
 
 has address    => sub { Carp::croak 'address is required' };
@@ -74,18 +74,17 @@ sub _write {
       my $write = sub {
         my $queue = $self->{queue};
 
-        # queue is empty
-        unless (@$queue) {
-          $self->{writing} = 0;
-          return;
-        }
-
         # this batch is done
         unless (@{ $queue->[0][0] }) {
           my $item = shift @$queue;
           my $p = $item->[1];
           $p->resolve;
-          return unless @$queue;
+        }
+
+        # queue is empty
+        unless (@$queue) {
+          $self->{writing} = 0;
+          return;
         }
 
         my $string = join '', map { chomp; "$_\n" } splice @{ $queue->[0][0] }, 0, $self->batch_size;
@@ -177,7 +176,7 @@ If the writer is not already connected, calling write will implicitly call L</co
 Returns a L<Mojo::Promise> that will be resolved when the metrics passed B<in this write call> are written.
 The promise is rejected if any write in the write queue fails, even if it is not from the write call.
 
-=head1
+=head1 FUTURE WORK
 
 This module is still in early development.
 Future work will include
@@ -191,10 +190,6 @@ Passing structures to L</write> and handling the formatting
 =item *
 
 Possibly a blocking api, though this is questionable
-
-=item *
-
-Testing
 
 =back
 
@@ -223,6 +218,10 @@ Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 =head1 CONTRIBUTORS
 
 None yet.
+
+=head1 THANKS
+
+Mohammad S Anwar (manwar)
 
 =head1 COPYRIGHT AND LICENSE
 

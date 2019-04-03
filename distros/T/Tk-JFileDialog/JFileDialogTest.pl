@@ -76,7 +76,9 @@ sub getfile
 			-HistDeleteOk => 1,
 			-HistFile => "./FileHistory.txt",
 			-PathFile => "./Bookmarks.txt",
-			-Create => 1);
+			-Create => 1,
+			-nonLatinFilenames => 1,
+	);
 
 	$myfile = $fileDialog->Show();
 	if ($myfile =~ /\S/o)
@@ -94,7 +96,9 @@ sub getfiles
 			-Path => $path,
 			-SelectMode => 'multiple',
 			#-QuickSelect => 2,
-			-Create => 1);
+			-Create => 1,
+			-nonLatinFilenames => 1,
+	);
 
 	$myfile = $fileDialog->Show();
 	if ($myfile =~ /\S/o)
@@ -114,7 +118,9 @@ sub getpath
 			-HistFile => "./PathHistory.txt",
 			-PathFile => "./Bookmarks.txt",
 			-SelDir => 1,
-			-Create => 0);
+			-Create => 0,
+			-nonLatinFilenames => 1,
+	);
 
 	$myfile = $fileDialog->Show();
 	if ($myfile =~ /\S/)

@@ -268,6 +268,11 @@ Only list snapshots stored in internal disk images
 Only list snapshots taken while the guest was running,
 which did not include memory state.
 
+=item Sys::Virt::DomainSnapshot::LIST_TOPOLOGICAL
+
+Sort list in topological order wrt to parent/child
+relationships.
+
 =back
 
 

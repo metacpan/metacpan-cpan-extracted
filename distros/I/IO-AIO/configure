@@ -4280,10 +4280,10 @@ else
 
 #include <sys/time.h>
 #include <sys/resource.h>
-int res;
 int main (void)
 {
    struct rlimit srl;
+   int res;
    srl.rlim_cur = srl.rlim_max = RLIM_INFINITY;
    res = getrlimit (RLIMIT_NOFILE, &srl);
    res = setrlimit (RLIMIT_NOFILE, &srl);
@@ -4415,6 +4415,20 @@ fi
 done
 
 
+for ac_header in sys/uio.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "sys/uio.h" "ac_cv_header_sys_uio_h" "$ac_includes_default"
+if test "x$ac_cv_header_sys_uio_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_SYS_UIO_H 1
+_ACEOF
+
+fi
+
+done
+
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for splice, vmsplice and tee" >&5
 $as_echo_n "checking for splice, vmsplice and tee... " >&6; }
 if ${ac_cv_linux_splice+:} false; then :
@@ -4425,6 +4439,7 @@ else
 
 #include <sys/types.h>
 #include <fcntl.h>
+#include <sys/uio.h>
 int main (void)
 {
    ssize_t res;
@@ -4459,9 +4474,9 @@ else
 
 #include <fcntl.h>
 #include <unistd.h>
-int res;
 int main (void)
 {
+   int res;
    res = pipe2 (0, 0);
    return 0;
 }
@@ -4490,9 +4505,9 @@ else
 /* end confdefs.h.  */
 
 #include <sys/eventfd.h>
-int res;
 int main (void)
 {
+   int res;
    res = eventfd (1, EFD_CLOEXEC | EFD_NONBLOCK);
    return 0;
 }
@@ -4512,8 +4527,8 @@ test $ac_cv_eventfd = yes &&
 $as_echo "#define HAVE_EVENTFD 1" >>confdefs.h
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for timerfd" >&5
-$as_echo_n "checking for timerfd... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for timerfd_*" >&5
+$as_echo_n "checking for timerfd_*... " >&6; }
 if ${ac_cv_timerfd+:} false; then :
   $as_echo_n "(cached) " >&6
 else
@@ -4521,10 +4536,10 @@ else
 /* end confdefs.h.  */
 
 #include <sys/timerfd.h>
-int res;
 int main (void)
 {
    struct itimerspec its;
+   int res;
    res = timerfd_create (CLOCK_REALTIME, TFD_CLOEXEC | TFD_NONBLOCK);
    res = timerfd_settime (res, TFD_TIMER_ABSTIME /*| TFD_TIMER_CANCEL_ON_SET*/, &its, 0);
    res = timerfd_gettime (res, &its);
@@ -4546,6 +4561,36 @@ test $ac_cv_timerfd = yes &&
 $as_echo "#define HAVE_TIMERFD 1" >>confdefs.h
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for memfd_create" >&5
+$as_echo_n "checking for memfd_create... " >&6; }
+if ${ac_cv_memfd_create+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/mman.h>
+int main (void)
+{
+   int res = memfd_create ("name", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_memfd_create=yes
+else
+  ac_cv_memfd_create=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_memfd_create" >&5
+$as_echo "$ac_cv_memfd_create" >&6; }
+test $ac_cv_memfd_create = yes &&
+$as_echo "#define HAVE_MEMFD_CREATE 1" >>confdefs.h
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for copy_file_range" >&5
 $as_echo_n "checking for copy_file_range... " >&6; }
 if ${ac_cv_copy_file_range+:} false; then :
@@ -4557,9 +4602,9 @@ else
 #include <unistd.h>
 #include <sys/syscall.h>
 /*#include <linux/copy.h>*/
-int res;
 int main (void)
 {
+   int res;
    /*res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, COPY_FR_REFLINK | COPY_FR_DEDUP | COPY_FR_COPY);*/
    res = syscall (SYS_copy_file_range, 0, 0, 0, 0, 0, 0);
    return 0;
@@ -4739,6 +4784,47 @@ fi
 $as_echo "$ac_cv_st_gen" >&6; }
 test $ac_cv_st_gen = yes &&
 $as_echo "#define HAVE_ST_GEN 1" >>confdefs.h
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for statx" >&5
+$as_echo_n "checking for statx... " >&6; }
+if ${ac_cv_statx+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+int res;
+int main (void)
+{
+   struct statx sx;
+   int res;
+   res = statx (AT_FDCWD, ".",
+         AT_EMPTY_PATH | AT_NO_AUTOMOUNT | AT_SYMLINK_NOFOLLOW | AT_STATX_SYNC_AS_STAT | AT_STATX_FORCE_SYNC | AT_STATX_DONT_SYNC,
+         STATX_ALL, &sx);
+   STATX_TYPE; STATX_MODE; STATX_NLINK; STATX_UID; STATX_GID; STATX_ATIME; STATX_MTIME; STATX_CTIME;
+   STATX_INO; STATX_SIZE; STATX_BLOCKS; STATX_BASIC_STATS; STATX_BTIME; STATX_ALL;
+   STATX_ATTR_COMPRESSED; STATX_ATTR_IMMUTABLE; STATX_ATTR_APPEND; STATX_ATTR_NODUMP; STATX_ATTR_ENCRYPTED;
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_statx=yes
+else
+  ac_cv_statx=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_statx" >&5
+$as_echo "$ac_cv_statx" >&6; }
+test $ac_cv_statx = yes &&
+$as_echo "#define HAVE_STATX 1" >>confdefs.h
 
 
 cat >confcache <<\_ACEOF

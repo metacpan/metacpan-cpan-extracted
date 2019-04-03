@@ -57,11 +57,11 @@
    "provides" : {
       "Date::Extract::P800Picture" : {
          "file" : "lib/Date/Extract/P800Picture.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.1.2"
       },
       "Date::Extract::P800Picture::Exceptions" : {
          "file" : "lib/Date/Extract/P800Picture/Exceptions.pm",
-         "version" : "v1.1.1"
+         "version" : "v1.1.2"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "url" : "https://github.com/ipenburg/Date-Extract-P800Picture"
       }
    },
-   "version" : "v1.1.1",
+   "version" : "v1.1.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

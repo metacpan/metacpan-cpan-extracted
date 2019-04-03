@@ -15,7 +15,7 @@ name: Mojo-Graphite-Writer
 provides:
   Mojo::Graphite::Writer:
     file: lib/Mojo/Graphite/Writer.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Mojolicious: '8.0'
   perl: v5.16.0
@@ -23,5 +23,5 @@ resources:
   bugtracker: http://github.com/jberger/Mojo-Graphite-Writer/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-Graphite-Writer
-version: '0.02'
+version: '0.03'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -52,6 +52,6 @@
          "web" : "https://github.com/jhthorsen/linkembedder"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

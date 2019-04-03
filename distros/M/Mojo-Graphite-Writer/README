@@ -81,14 +81,13 @@ METHODS
     in this write call are written. The promise is rejected if any write in
     the write queue fails, even if it is not from the write call.
 
+FUTURE WORK
 
     This module is still in early development. Future work will include
 
       * Passing structures to "write" and handling the formatting
 
       * Possibly a blocking api, though this is questionable
-
-      * Testing
 
 SEE ALSO
 
@@ -110,6 +109,10 @@ AUTHOR
 CONTRIBUTORS
 
     None yet.
+
+THANKS
+
+    Mohammad S Anwar (manwar)
 
 COPYRIGHT AND LICENSE
 

@@ -11,10 +11,12 @@ use LWP::UserAgent;
 use Carp;
 use Readonly;
 use Data::Dumper;
+use Config;
+use POSIX;
 
 Readonly my $SOCKETTIMEOUT => 300;    # 300s or 5 min
 
-use version 0.9917; our $VERSION = version->declare('v2.0.1');
+use version 0.9917; our $VERSION = version->declare('v2.1.0');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
@@ -24,7 +26,8 @@ sub new {
     my $self  = bless {
         socketURL    => 'https://coreapi.1api.net/api/call.cgi',
         debugMode    => 0,
-        socketConfig => WebService::Hexonet::Connector::SocketConfig->new()
+        socketConfig => WebService::Hexonet::Connector::SocketConfig->new(),
+        ua           => q{}
     }, $class;
     $self->setURL('https://coreapi.1api.net/api/call.cgi');
     $self->useLIVESystem();
@@ -81,6 +84,28 @@ sub getSession {
 sub getURL {
     my $self = shift;
     return $self->{socketURL};
+}
+
+
+sub getUserAgent {
+    my $self = shift;
+    if ( !( length $self->{ua} ) ) {
+        my $arch = (POSIX::uname)[ 4 ];
+        my $os   = (POSIX::uname)[ 0 ];
+        my $rv   = $self->getVersion();
+        $self->{ua} = "PERL-SDK ($os; $arch; rv:$rv) perl/$Config{version}";
+    }
+    return $self->{ua};
+}
+
+
+sub setUserAgent {
+    my ( $self, $str, $rv ) = @_;
+    my $arch = (POSIX::uname)[ 4 ];
+    my $os   = (POSIX::uname)[ 0 ];
+    my $rv2  = $self->getVersion();
+    $self->{ua} = "$str ($os; $arch; rv:$rv) perl-sdk/$rv2 perl/$Config{version}";
+    return $self;
 }
 
 
@@ -211,7 +236,7 @@ sub request {
     my $data = $self->getPOSTData($cmd);
 
     my $ua = LWP::UserAgent->new();
-    $ua->agent( 'PERL-SDK::' . $self->getVersion() );
+    $ua->agent( $self->getUserAgent() );
     $ua->default_header( 'Expect', q{} );
     $ua->timeout($SOCKETTIMEOUT);
 
@@ -338,7 +363,7 @@ To be used in the way:
     use WebService::Hexonet::Connector;
 
     # Create a connection with the URL, entity, login and password
-    # Use "1234" as entity for the OT&E, and "54cd" for productive use
+    # Use " 1234 " as entity for the OT&E, and " 54 cd " for productive use
     # Don't have a Hexonet Account yet? Get one here: www.hexonet.net/sign-up
 
     # create a new instance
@@ -364,7 +389,7 @@ To be used in the way:
     # ---------------------------
     $r = $cl->login();
     # or if 2FA is active, provide your otp code by
-    # $cl->login("12345678");
+    # $cl->login(" 12345678 ");
     if ($r->isSuccess()) {
         # use saveSession for your needs
         # to apply the API session to your frontend session.
@@ -400,7 +425,7 @@ To be used in the way:
 	my $code = $r->getCode();
 	my $description = $r->getDescription();
 
-	print "$code $description";
+	print "$code$description ";
 
 	# There are further useful methods that help to access data
 	# like getColumnIndex, getColumn, getRecord, etc.
@@ -446,6 +471,10 @@ Returns the API session in use as string.
 =item C<getURL>
 
 Returns the url in use pointing to the Backend System to communicate with, as string.
+
+=item C<getUserAgent>
+
+Returns the user-agent string.
 
 =item C<getVersion>
 
@@ -499,6 +528,12 @@ specified account specified by $user.
 The specified password $pw belongs to the role user, not to the account.
 Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining.
 
+=item C<setUserAgent( $str, $rv )>
+
+Set a custom user agent header. This is useful for tools that use our SDK.
+Specify the client label in $str and the revision number in $rv.
+Returns the current L<WebService::Hexonet::Connector::APIClient|WebService::Hexonet::Connector::APIClient> instance in use for method chaining .
+
 =item C<login( $otpcode )>
 
 Perform a session login. Entry point for the session-based communication.
@@ -509,7 +544,7 @@ Returns an instance of L<WebService::Hexonet::Connector::Response|WebService::He
 
 Perform a session login. Entry point for the session-based communication.
 You may specify your OTP code by $otpcode.
-Specify additional command parameter for API command "StartSession" in
+Specify additional command parameter for API command " StartSession " in
 Hash $params.
 Possible parameters can be found in the L<API Documentation for StartSession|https://github.com/hexonet/hexonet-api-documentation/blob/master/API/USER/SESSION/STARTSESSION.md>.
 Returns an instance of L<WebService::Hexonet::Connector::Response|WebService::Hexonet::Connector::Response>.

@@ -87,11 +87,24 @@ has tableCfg => sub {
         },
         {
             label => trm('Page'),
-            type => 'string',
+            type => 'number',
             width => '1*',
             key => 'song_page',
             sortable => true,
         },
+#        {
+#            label => trm('Size'),
+#            type => 'number',
+#            format => {
+#                unitPrefix => 'metric',
+#                maximumFractionDigits => 2,
+#                postfix => 'Byte',
+#                locale => 'en'
+#            },
+#            width => '1*',
+#            key => 'song_size',
+#            sortable => true,
+#        },
         {
             label => trm('Note'),
             type => 'string',
@@ -99,6 +112,15 @@ has tableCfg => sub {
             key => 'song_note',
             sortable => true,
         },
+#       {
+#            label => trm('Created'),
+#            type => 'date',
+#            format => 'yyyy-MM-dd HH:mm:ss Z',
+#            width => '3*',
+#            key => 'song_date',
+#            sortable => true,
+#       },
+        
      ]
 };
 

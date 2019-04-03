@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Extract::P800Picture.
 
+v1.1.2 Tue Apr  2 07:28:44 UTC 2019
+	- chore: ignore Built.bat from manifest
+
 v1.1.1 Mon Apr  1 09:58:36 UTC 2019
 	- chore: fixed RT#128985
 

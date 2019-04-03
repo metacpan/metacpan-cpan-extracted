@@ -27,6 +27,9 @@
 /* splice/vmsplice/tee(2) are available */
 #undef HAVE_LINUX_SPLICE
 
+/* memfd_create(2) is available */
+#undef HAVE_MEMFD_CREATE
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -56,6 +59,9 @@
 
 /* sendfile(2) is available and supported */
 #undef HAVE_SENDFILE
+
+/* statx(2) is available */
+#undef HAVE_STATX
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -107,6 +113,9 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/uio.h> header file. */
+#undef HAVE_SYS_UIO_H
 
 /* timerfd_*(2) are available */
 #undef HAVE_TIMERFD

@@ -474,6 +474,15 @@
 #ifndef EFD_SEMAPHORE
 #define EFD_SEMAPHORE 0
 #endif
+#ifndef MFD_CLOEXEC
+#define MFD_CLOEXEC 0
+#endif
+#ifndef MFD_ALLOW_SEALING
+#define MFD_ALLOW_SEALING 0
+#endif
+#ifndef MFD_HUGETLB
+#define MFD_HUGETLB 0
+#endif
 #ifndef CLOCK_REALTIME
 #define CLOCK_REALTIME 0
 #endif
@@ -500,4 +509,64 @@
 #endif
 #ifndef TFD_TIMER_CANCEL_ON_SET
 #define TFD_TIMER_CANCEL_ON_SET 0
+#endif
+#ifndef STATX_TYPE
+#define STATX_TYPE 0
+#endif
+#ifndef STATX_MODE
+#define STATX_MODE 0
+#endif
+#ifndef STATX_NLINK
+#define STATX_NLINK 0
+#endif
+#ifndef STATX_UID
+#define STATX_UID 0
+#endif
+#ifndef STATX_GID
+#define STATX_GID 0
+#endif
+#ifndef STATX_ATIME
+#define STATX_ATIME 0
+#endif
+#ifndef STATX_MTIME
+#define STATX_MTIME 0
+#endif
+#ifndef STATX_CTIME
+#define STATX_CTIME 0
+#endif
+#ifndef STATX_INO
+#define STATX_INO 0
+#endif
+#ifndef STATX_SIZE
+#define STATX_SIZE 0
+#endif
+#ifndef STATX_BLOCKS
+#define STATX_BLOCKS 0
+#endif
+#ifndef STATX_BASIC_STATS
+#define STATX_BASIC_STATS 0
+#endif
+#ifndef STATX_ALL
+#define STATX_ALL 0
+#endif
+#ifndef STATX_BTIME
+#define STATX_BTIME 0
+#endif
+#ifndef STATX_ATTR_COMPRESSED
+#define STATX_ATTR_COMPRESSED 0
+#endif
+#ifndef STATX_ATTR_IMMUTABLE
+#define STATX_ATTR_IMMUTABLE 0
+#endif
+#ifndef STATX_ATTR_APPEND
+#define STATX_ATTR_APPEND 0
+#endif
+#ifndef STATX_ATTR_NODUMP
+#define STATX_ATTR_NODUMP 0
+#endif
+#ifndef STATX_ATTR_ENCRYPTED
+#define STATX_ATTR_ENCRYPTED 0
+#endif
+#ifndef STATX_ATTR_AUTOMOUNT
+#define STATX_ATTR_AUTOMOUNT 0
 #endif

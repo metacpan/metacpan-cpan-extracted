@@ -23,7 +23,7 @@ name: HTML-Hyphenate
 provides:
   HTML::Hyphenate:
     file: lib/HTML/Hyphenate.pm
-    version: v1.1.2
+    version: v1.1.3
 requires:
   Log::Log4perl: '0'
   Mojolicious: '6'
@@ -36,5 +36,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ipenburg/HTML-Hyphenate
-version: v1.1.2
+version: v1.1.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

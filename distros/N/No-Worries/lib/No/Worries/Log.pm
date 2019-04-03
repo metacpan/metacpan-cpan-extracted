@@ -13,7 +13,7 @@
 package No::Worries::Log;
 use strict;
 use warnings;
-our $VERSION  = "1.5";
+our $VERSION  = "1.6";
 our $REVISION = sprintf("%d.%02d", q$Revision: 1.17 $ =~ /(\d+)\.(\d+)/);
 
 #
@@ -888,4 +888,4 @@ L<No::Worries::Syslog>.
 
 Lionel Cons L<http://cern.ch/lionel.cons>
 
-Copyright (C) CERN 2012-2017
+Copyright (C) CERN 2012-2019

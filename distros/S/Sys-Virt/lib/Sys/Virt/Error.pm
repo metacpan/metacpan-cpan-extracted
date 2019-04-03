@@ -410,6 +410,10 @@ The resource control subsystem
 
 The firewalld service
 
+=item Sys::Virt::Error::FROM_DOMAIN_CHECKPOINT
+
+The domain checkpoint
+
 =back
 
 =head2 ERROR CODE CONSTANTS
@@ -827,6 +831,18 @@ Invalid nwfilter binding
 =item Sys::Virt::Error::ERR_NO_NWFILTER_BINDING
 
 No nwfilter binding
+
+=item Sys::Virt::Error::ERR_INVALID_DOMAIN_CHECKPOINT
+
+Invalid domain checkpoint
+
+=item Sys::Virt::Error::ERR_NO_DOMAIN_BACKUP
+
+Domain checkpoint not found
+
+=item Sys::Virt::Error::ERR_NO_DOMAIN_CHECKPOINT
+
+Domain backup job id not found
 
 =back
 

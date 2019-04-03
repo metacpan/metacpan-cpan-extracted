@@ -4,8 +4,10 @@ author:
   - 'hexonet <middleware@hexonet.net>'
 build_requires:
   CPAN::Uploader: '0.103013'
+  Config: '0'
   Devel::Cover: '1.3'
   ExtUtils::MakeMaker: '0'
+  POSIX: '0'
   Perl::Critic: '1.132'
   Readonly: '2.05'
   Scalar::Util: '0'
@@ -28,6 +30,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Config: '0'
   Data::Dumper: '2.161'
   LWP::Protocol::https: '6.07'
   LWP::UserAgent: '6.35'
@@ -39,5 +42,5 @@ requires:
   perl: '5.026000'
   utf8: '0'
   version: '0.9917'
-version: v2.0.1
+version: v2.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

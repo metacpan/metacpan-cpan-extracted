@@ -34,7 +34,7 @@ foreach my $subs (
                     [ DynamicPrereqs => {
                             '-condition' => '1 == 1',
                             -raw => [
-                                map { $_ . q|('strict', '0.23');| } @$subs
+                                map $_.q|('strict', '0.23');|, @$subs
                             ],
                         } ],
                 ),
@@ -77,7 +77,7 @@ foreach my $subs (
     isnt(
         index(
             $makefile,
-            "if (1 == 1) {\n" . join("\n", map { $_ . q|('strict', '0.23');| } @$subs) . "\n" . "}\n",
+            "if (1 == 1) {\n" . join("\n", map $_.q|('strict', '0.23');|, @$subs) . "\n" . "}\n",
         ),
         -1,
         'Makefile.PL condition and raw clauses are correct',
@@ -96,7 +96,7 @@ foreach my $subs (
         cmp_deeply(
             \%{'main::MyTestMakeMaker::'},
             superhashof({
-                map {; $_ => *{"MyTestMakeMaker::$_"} } @$subs
+                map +($_ => *{"MyTestMakeMaker::$_"}), @$subs
             }),
             'Makefile.PL defined all required subroutines',
         ) or diag 'Makefile.PL defined symbols: ', explain \%{'main::MyTestMakeMaker::'};
