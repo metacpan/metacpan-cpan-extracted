@@ -22,14 +22,14 @@ WriteMakefile(
         'Moo'                        => '2.000000',
         'namespace::autoclean'       => '0.28',
         'Date::Hebrew::Simple'       => '0.11',
-        'Calendar::Plugin::Renderer' => '0.12',
+        'Calendar::Plugin::Renderer' => '0.14',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Calendar-Hebrew-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Calendar::Hebrew' => { file => 'lib/Calendar/Hebrew.pm', version => '0.08' },
+            'Calendar::Hebrew' => { file => 'lib/Calendar/Hebrew.pm', version => '0.09' },
         },
         resources => {
             repository => {

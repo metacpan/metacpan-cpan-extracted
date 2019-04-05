@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.070    2019-04-05
+        - readline: to return undef press Ctrl-X instead of Ctrl-D.
+
 2.069    2019-03-09
         - Attach/detach database: fix file name hash key.
 

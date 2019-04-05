@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.646   2019-04-05
+    - Add Ctrl-Q and Ctrl-X to the constants.
+    - To return undef: Ctrl-Q instead of Ctrl-D.
+
 1.645   2019-03-31
     - Update char-width tables.
     - Fast forward/backward: 10 instead of 25 pages at once.

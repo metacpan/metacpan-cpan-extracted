@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Consul" => "0.016",
-    "HTTP::Headers" => 0,
+    "HTTP::Headers" => "6.07",
     "HTTP::Request" => 0,
     "Hash::MultiValue" => 0,
     "List::Util" => "1.29",
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Consul" => "0.016",
-  "HTTP::Headers" => 0,
+  "HTTP::Headers" => "6.07",
   "HTTP::Request" => 0,
   "Hash::MultiValue" => 0,
   "IO::Async::Loop" => 0,

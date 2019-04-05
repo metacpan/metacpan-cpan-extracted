@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "File::MoreUtil",
   "PREREQ_PM" => {
     "Cwd" => 0,
-    "Exporter" => 0,
+    "Exporter" => "5.57",
     "strict" => 0,
     "warnings" => 0
   },
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.61",
+  "VERSION" => "0.620",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Cwd" => 0,
-  "Exporter" => 0,
+  "Exporter" => "5.57",
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,

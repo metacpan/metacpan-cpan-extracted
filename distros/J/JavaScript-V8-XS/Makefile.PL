@@ -2,11 +2,13 @@ use 5.008009;
 use ExtUtils::MakeMaker;
 
 my @V8_CC_OPTS;
+my @V8_WARNINGS;
 my @V8_INCS;
 my @V8_LIBS;
 
 # these apply always
-push @V8_CC_OPTS, qw< -Wall -Wextra -O2 --std=c++11 >;
+push @V8_CC_OPTS, qw< -O2 --std=c++11 >;
+push @V8_WARNINGS, qw< all extra no-unused-parameter >;
 push @V8_LIBS, qw< v8 v8_libbase v8_libplatform icuuc icui18n >;
 
 if ($^O eq 'linux') {
@@ -19,8 +21,14 @@ if ($^O eq 'linux') {
 my $CC = 'c++';
 my $LD = 'c++';
 
-my $CC_OPTS = join(' ', @V8_CC_OPTS, map { "-I$_" } @V8_INCS);
-my $LD_OPTS = join(' ', map { "-l$_" } @V8_LIBS);
+my $CC_OPTS = join(' ',
+    (@V8_CC_OPTS),
+    (map { "-W$_" } @V8_WARNINGS),
+    (map { "-I$_" } @V8_INCS),
+);
+my $LD_OPTS = join(' ',
+    map { "-l$_" } @V8_LIBS,
+);
 
 WriteMakefile(
     NAME           => 'JavaScript::V8::XS',

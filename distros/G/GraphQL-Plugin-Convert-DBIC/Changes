@@ -1,5 +1,8 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.13	Fri  5 Apr 04:56:21 BST 2019
+ - fix get-one - thanks @jjn1056
+
 0.12	Wed 27 Feb 13:25:53 GMT 2019
  - Postgres network types - thanks @ccakes
 

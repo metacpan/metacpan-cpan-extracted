@@ -4,9 +4,10 @@ use Mojo::Base -role;
 use Mojo::UserAgent::Role::Cache::Driver::File;
 use Mojo::Util 'term_escape';
 
-use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || 0;
+use constant DEBUG => $ENV{MOJO_CLIENT_DEBUG} || $ENV{MOJO_UA_CACHE_DEBUG} || 0;
+use constant TRACE => $ENV{MOJO_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my $DEFAULT_STRATEGY = 'playback_or_record';
 
@@ -14,20 +15,21 @@ has cache_driver => sub { shift->cache_driver_singleton };
 
 has cache_key => sub {
   return sub {
-    my $req  = shift->req;
-    my $url  = $req->url;
-    my @keys = (lc $req->method);
+    my $req = shift->req;
+    my $url = $req->url;
+    my @key = (lc $req->method, $url->host || 'local', map { _escape($_) } @{$url->path});
 
-    push @keys, $url->host // '';
-    push @keys, $url->path_query;
-    push @keys, Mojo::Util::md5_sum($req->body) if length $req->body // '';
+    # The question marks is a hack to make sure the path parts will
+    # never be in conflict with the query and body.
+    push @key, '?q=' . $url->query->to_string;
+    push @key, '?b=' . Mojo::Util::md5_sum($req->body) if length $req->body // '';
 
-    return \@keys;
+    return \@key;
   };
 };
 
 has cache_strategy => sub {
-  my $strategy = $ENV{MOJO_USERAGENT_CACHE_STRATEGY} || $DEFAULT_STRATEGY;
+  my $strategy   = $ENV{MOJO_USERAGENT_CACHE_STRATEGY} || $DEFAULT_STRATEGY;
   my @strategies = map { split /=/, $_, 2 } split '&', $strategy;
   my %strategies = @strategies == 1 ? () : @strategies;
 
@@ -57,6 +59,13 @@ around start => sub {
   return $self->$method($tx, @_);
 };
 
+sub _escape {
+  local $_ = Mojo::Util::url_escape($_[0]);
+  s!_!%5F!g;
+  s!%!_!g;
+  $_;
+}
+
 sub _url { shift->req->url->to_abs }
 
 sub _cache_get_tx {
@@ -79,7 +88,7 @@ sub _cache_set_tx {
 sub _cache_start_playback {
   my ($self, $tx_input, $cb) = @_;
   my $tx_output = $self->_cache_get_tx($tx_input);
-  my $status = $tx_output ? '<<<' : '!!!';
+  my $status    = $tx_output ? '<<<' : '!!!';
 
   # Not in cache
   unless ($tx_output) {
@@ -87,8 +96,8 @@ sub _cache_start_playback {
     $tx_output->res->error({message => 'Not in cache.'});
   }
 
-  warn term_escape "-- Client >>> Cache (@{[_url($tx_input)]})\n@{[$tx_input->req->to_string]}\n"      if DEBUG;
-  warn term_escape "-- Client $status Cache (@{[_url($tx_input)]})\n@{[$tx_output->res->to_string]}\n" if DEBUG;
+  warn term_escape "-- Client >>> Cache (@{[_url($tx_input)]})\n@{[$tx_input->req->to_string]}\n"      if TRACE;
+  warn term_escape "-- Client $status Cache (@{[_url($tx_input)]})\n@{[$tx_output->res->to_string]}\n" if TRACE;
 
   # Blocking
   return $tx_output unless $cb;
@@ -108,8 +117,8 @@ sub _cache_start_playback_or_record {
     return $self->_cache_start_record($tx_input, $cb ? ($cb) : ());
   }
 
-  warn term_escape "-- Client >>> Cache (@{[_url($tx_input)]})\n@{[$tx_input->req->to_string]}\n"  if DEBUG;
-  warn term_escape "-- Client <<< Cache (@{[_url($tx_input)]})\n@{[$tx_output->res->to_string]}\n" if DEBUG;
+  warn term_escape "-- Client >>> Cache (@{[_url($tx_input)]})\n@{[$tx_input->req->to_string]}\n"  if TRACE;
+  warn term_escape "-- Client <<< Cache (@{[_url($tx_input)]})\n@{[$tx_output->res->to_string]}\n" if TRACE;
 
   # Blocking
   return $tx_output unless $cb;
@@ -218,11 +227,21 @@ the transaction and see if it wants to cache the request at all.
 
 =head1 WARNING
 
+=head2 Experimenntal
+
 L<Mojo::UserAgent::Role::Cache> is still under development, so there will be
 changes and there is probably bugs that needs fixing. Please report in if you
 find a bug or find this role interesting.
 
 L<https://github.com/jhthorsen/mojo-useragent-role-cache/issues>
+
+=head2 Upgrading from 0.02 to 0.03
+
+Upgrading from version 0.02 to 0.03 will cause all your cached files to be
+invalid, since the L</cache_key> is changed. If you are using
+L<Mojo::UserAgent::Role::Cache::Driver::File>, you can set the environment
+variable C<MOJO_UA_CACHE_RENAME=1> to on-the-fly rename the old files to the
+new format.
 
 =head1 ATTRIBUTES
 

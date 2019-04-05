@@ -415,6 +415,7 @@ share/app/lib/Dwarf/Plugin/PHP/Session.pm
 share/app/lib/Dwarf/Plugin/PHP/Session/Memcached.pm
 share/app/lib/Dwarf/Plugin/Proctitle.pm
 share/app/lib/Dwarf/Plugin/Runtime.pm
+share/app/lib/Dwarf/Plugin/Sentry.pm
 share/app/lib/Dwarf/Plugin/Teng.pm
 share/app/lib/Dwarf/Plugin/Text/CSV_XS.pm
 share/app/lib/Dwarf/Plugin/Text/Xslate.pm
@@ -423,6 +424,8 @@ share/app/lib/Dwarf/Plugin/XML/Simple.pm
 share/app/lib/Dwarf/Pragma.pm
 share/app/lib/Dwarf/Request.pm
 share/app/lib/Dwarf/Response.pm
+share/app/lib/Dwarf/SQLBuilder.pm
+share/app/lib/Dwarf/SQLBuilder/Query.pm
 share/app/lib/Dwarf/Session.pm
 share/app/lib/Dwarf/Session/State/Cookie.pm
 share/app/lib/Dwarf/Session/Store/DBI.pm
@@ -463,9 +466,11 @@ share/app/t/00_dwarf/11_error.t
 share/app/t/00_dwarf/12_trigger.t
 share/app/t/00_dwarf/13_data_validator.t
 share/app/t/00_dwarf/14_module_dsl.t
+share/app/t/00_dwarf/15_sql_builder.t
 share/app/t/00_dwarf/file/post_data.txt
 share/app/t/00_dwarf/file/sample.csv
 share/app/t/00_dwarf/plugin/cors.t
+share/app/t/00_dwarf/plugin/sentry.t
 share/app/t/00_dwarf/plugin/text_csv_xs.t
 share/app/t/00_dwarf/validator/001_simple.t
 share/app/t/00_dwarf/validator/002_not_null.t

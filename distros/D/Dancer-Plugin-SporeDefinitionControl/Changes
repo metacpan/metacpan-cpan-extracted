@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-SporeDefinitionControl
 
+0.17    2019-04-05, Frédéric Lechauve, Nicolas Oudard
+        update the way origin is manage + access-control-allow-credentials on all requests (Frederic Lechauve)
+
 0.16    2019-01-28, Nicolas Oudard
         _load_path_validation must be done if path_validation does not exist (Frederic Lechauve)
 

@@ -1,3 +1,10 @@
+0.000012    2019-04-05
+            * Fix broken compilation on linux.
+
+0.000011    2019-04-05
+            * Fix conversion of large integers from Perl to JS.
+            * Hide some undesired warnings.
+
 0.000010    2019-03-04
             * Support sending cyclic data to the console.
             * Update ppport.h to 3.43.

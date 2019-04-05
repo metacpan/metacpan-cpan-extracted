@@ -147,7 +147,7 @@ Dwarf は Router::Simple を使ってルーティングを実装しています�
 
         before add_routes => sub {
                 my $self = shift;
-                $self->router->connect("/images/:{id:-?[0-9]+}", { controller => "Web::Images::Detail" });
+                $self->router->connect("/images/{id:-?[0-9]+}", { controller => "Web::Images::Detail" });
         };
 
 ### splat について

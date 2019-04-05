@@ -74,12 +74,12 @@ V8Context::V8Context(HV* opt)
                 continue;
             }
             if (memcmp(kstr, V8_OPT_NAME_MAX_MEMORY_BYTES, klen) == 0) {
-                int param = SvIV(value);
+                size_t param = SvIV(value);
                 max_allocated_bytes = param > MAX_MEMORY_MINIMUM ? param : MAX_MEMORY_MINIMUM;
                 continue;
             }
             if (memcmp(kstr, V8_OPT_NAME_MAX_TIMEOUT_US, klen) == 0) {
-                int param = SvIV(value);
+                long param = SvIV(value);
                 max_timeout_us = param > MAX_TIMEOUT_MINIMUM ? param : MAX_TIMEOUT_MINIMUM;
                 continue;
             }

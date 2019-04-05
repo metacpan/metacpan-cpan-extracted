@@ -228,7 +228,7 @@ static const Local<Object> pl_perl_to_v8_impl(pTHX_ SV* value, V8Context* ctx, M
         int val = SvTRUE(value);
         ret = Local<Object>::Cast(Boolean::New(ctx->isolate, val));
     } else if (SvIOK(value)) {
-        int val = SvIV(value);
+        long val = SvIV(value);
         if (ref && (val == 0 || val == 1)) {
             ret = Local<Object>::Cast(Boolean::New(ctx->isolate, val));
         } else {

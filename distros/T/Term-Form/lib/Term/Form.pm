@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.509';
+our $VERSION = '0.510';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -56,7 +56,7 @@ sub __init_term {
 
 
 sub __reset_term {
-    my ( $self, $hide_cursor ) = @_;
+    my ( $self, $up ) = @_;
     if ( defined $self->{pg} ) {
         $self->{pg}->__reset_mode();
     }
@@ -65,6 +65,10 @@ sub __reset_term {
         delete $self->{$key};
     }
     $self->__set_defaults();
+    if ( $up ) {
+        print UP x $up;
+    }
+    print "\r". CLEAR_TO_END_OF_SCREEN;
 }
 
 
@@ -341,10 +345,10 @@ sub readline {
         $self->__calculate_threshold( $m );
         if    ( $char == NEXT_get_key ) { next CHAR }
         elsif ( $char == KEY_TAB      ) { next CHAR }
-        elsif ( $char == VK_UP   ) { # documentation
+        elsif ( $char == VK_UP   ) {
             for ( 1 .. $big_step ) { last if $m->{pos} == 0; $self->__left( $m  ) }
         }
-        elsif ( $char == VK_DOWN ) { # documentation
+        elsif ( $char == VK_DOWN ) {
             for ( 1 .. $big_step ) { last if $m->{pos} == @{$m->{str}}; $self->__right( $m ) }
         }
         elsif ( $char == CONTROL_U                        ) { $self->__ctrl_u( $m ) }
@@ -354,13 +358,10 @@ sub readline {
         elsif ( $char == VK_END     || $char == CONTROL_E ) { $self->__end(    $m ) }
         elsif ( $char == VK_HOME    || $char == CONTROL_A ) { $self->__home(   $m ) }
         elsif ( $char == KEY_BSPACE || $char == CONTROL_H ) { $self->__bspace( $m ) }
-        elsif ( $char == VK_DELETE  || $char == CONTROL_D ) {
-            my $leave = $self->__delete( $m, $char );
-            if ( $leave ) {
-                print "\n";
-                $self->__reset_term();
-                return;
-            }
+        elsif ( $char == VK_DELETE  || $char == CONTROL_D ) { $self->__delete( $m ) }
+        elsif ( $char == CONTROL_X ) {
+            $self->__reset_term( $self->{i}{pre_text_row_count} );
+            return;
         }
         elsif ( $char == VK_PAGE_UP || $char == VK_PAGE_DOWN || $char == VK_INSERT ) {
             $self->{i}{beep} = 1;
@@ -369,10 +370,7 @@ sub readline {
             $char = chr $char;
             utf8::upgrade $char;
             if ( $char eq "\n" || $char eq "\r" ) { #
-                print "\n";
-                print UP x ( $self->{i}{pre_text_row_count} + 1 );
-                print "\r". CLEAR_TO_END_OF_SCREEN;
-                $self->__reset_term();
+                $self->__reset_term( $self->{i}{pre_text_row_count} );
                 return join( '', map { $_->[0] } @{$m->{str}} );
             }
             else {
@@ -474,7 +472,7 @@ sub __bspace {
 }
 
 sub __delete {
-    my ( $self, $m, $char ) = @_;
+    my ( $self, $m ) = @_;
     if ( $m->{pos} < @{$m->{str}} ) {
         if ( ! $m->{diff} ) { # no '<'
             $m->{avail_w} = $self->{i}{avail_w} + $self->{i}{arrow_w};
@@ -482,13 +480,7 @@ sub __delete {
         _remove_pos( $m );
     }
     else {
-        if ( defined $char && $char == CONTROL_D ) {
-            return 1;
-        }
-        else {
-            $self->{i}{beep} = 1;
-            return
-        }
+        return;
     }
 }
 
@@ -1084,16 +1076,12 @@ sub fill_form {
                 my $up = $self->{i}{curr_row} - $self->{i}{begin_row};
                 $up += $self->{i}{pre_text_row_count} if $self->{i}{pre_text_row_count};
                 if ( $list->[$self->{i}{curr_row}][0] eq $opt->{back} ) {                                               # if ENTER on   {back/0}: leave and return nothing
-                    print UP x $up;
-                    print "\r" . CLEAR_TO_END_OF_SCREEN;
-                    $self->__reset_term();
+                    $self->__reset_term( $up );
                     return;
                 }
                 elsif ( $list->[$self->{i}{curr_row}][0] eq $opt->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
-                    print UP x $up;
-                    print "\r" . CLEAR_TO_END_OF_SCREEN;
+                    $self->__reset_term( $up );
                     splice @$list, 0, @{$self->{i}{pre}};
-                    $self->__reset_term();
                     return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
                 }
                 if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
@@ -1185,7 +1173,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.509
+Version 0.510
 
 =cut
 
@@ -1218,32 +1206,35 @@ The output is removed after leaving the method, so the user can decide what rema
 
 =head2 Keys
 
-C<BackSpace> or C<Strg-H>: Delete the character behind the cursor.
+C<BackSpace> or C<Ctrl-H>: Delete the character behind the cursor.
 
-C<Delete> or C<Strg-D>: Delete  the  character at point. C<readline> returns nothing if C<Strg-D> was pressed and the
-input puffer is empty.
+C<Delete> or C<Ctrl-D>: Delete  the  character at point.
 
-C<Strg-U>: Delete the text backward from the cursor to the beginning of the line.
+C<Ctrl-U>: Delete the text backward from the cursor to the beginning of the line.
 
-C<Strg-K>: Delete the text from the cursor to the end of the line.
+C<Ctrl-K>: Delete the text from the cursor to the end of the line.
 
 C<Right-Arrow>: Move forward a character.
 
 C<Left-Arrow>: Move back a character.
 
-C<Home> or C<Strg-A>: Move to the start of the line.
+C<Home> or C<Ctrl-A>: Move to the start of the line.
 
-C<End> or C<Strg-E>: Move to the end of the line.
+C<End> or C<Ctrl-E>: Move to the end of the line.
 
 C<Up-Arrow>: in C<fill_form> move up one row, in C<readline> move back 10 characters.
 
 C<Down-Arrow>: in C<fill_form> move down one row, in C<readline> move forward 10 characters.
 
+Only in C<readline>:
+
+C<Ctrl-X>: C<readline> returns nothing (undef).
+
 Only in C<fill_form>:
 
-C<Page-Up> or C<Strg-B>: Move back one page.
+C<Page-Up> or C<Ctrl-B>: Move back one page.
 
-C<Page-Down> or C<Strg-F>: Move forward one page.
+C<Page-Down> or C<Ctrl-F>: Move forward one page.
 
 =head1 METHODS
 

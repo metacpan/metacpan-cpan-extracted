@@ -7,7 +7,7 @@ use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -324,11 +324,10 @@ sub to_graphql {
           my ($args, $content, $info) = @_;
           my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
           DEBUG and _debug('DBIC.root_value', @subfieldrels);
-          $dbic_schema_cb->()->resultset($name)->find({
-            $_ => $args->{$_},
-          }, {
-            prefetch => \@subfieldrels,
-          });
+          $dbic_schema_cb->()->resultset($name)->find(
+            $args,
+            { prefetch => \@subfieldrels }
+          );
         };
         $root_value{$pksearch_name_plural} = sub {
           my ($args, $context, $info) = @_;

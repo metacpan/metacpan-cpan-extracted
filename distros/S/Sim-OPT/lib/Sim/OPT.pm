@@ -64,10 +64,10 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 @sweeps @miditers @varnumbers @caseseed @chanceseed @chancedata $dimchance $tee @pars_tocheck retrieve
 report newretrieve newreport washn
 $target %dowhat readsweeps $max_processes $computype $calcprocedure %specularratios @totalcases @winneritems
-toil genstar solvestar integratebox filterbox__ clean
+toil genstar solvestar integratebox filterbox__ clean %dowhat
 );
 
-$VERSION = '0.335';
+$VERSION = '0.337';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program encouraging problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -484,9 +484,10 @@ sub clean
 
 sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 {
-	my ( $tempc_r, $mypath, $file, $instn, $dowhat_ref ) = @_;
+	my ( $tempc_r, $mypath, $file, $instn, $inst_ref, $dowhat_ref ) = @_;
 	my %tempc = %{ $tempc_r }; #say $tee "IN MAKEFILENAME \$tempc $tempc";
-	%dowhat = %{ $dowhat_ref };
+	my %inst = %{ $inst_ref };
+	my %dowhat = %{ $dowhat_ref };
 	my $cleanto;
 	foreach my $key (sort {$a <=> $b} (keys %tempc) )
 	{
@@ -498,7 +499,7 @@ sub makefilename # IT DEFINES A FILE NAME GIVEN A %carrier.
 	my $cleancrypto = $instn . "__"; #say $tee "IN MAKEFILENAME \$cleancrypto $cleancrypto";
 	#my $cleancrypto = $instn . "-";
 	my $crypto = "$mypath/$file" . "_" . "$cleancrypto"; #say $tee "IN MAKEFILENAME \$crypto $crypto";
-	my $it;
+	my $it; #say "DOWHATNAMES: " . $dowhat{names}; #say "DOWHAT: " . dump ( \%dowhat ) ;
 	if ( $dowhat{names} eq "short" )
 	{
 		$it{to} = $to;

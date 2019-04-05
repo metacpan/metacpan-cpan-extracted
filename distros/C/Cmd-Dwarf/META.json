@@ -54,6 +54,7 @@
             "DateTime::Format::HTTP" : "0",
             "DateTime::Format::Pg" : "0",
             "DateTime::Format::Strptime" : "0",
+            "Devel::StackTrace" : "0",
             "Email::MIME" : "0",
             "Email::Sender::Simple" : "0",
             "Email::Valid" : "0",
@@ -84,10 +85,12 @@
             "Regexp::Common" : "0",
             "Router::Simple" : "0",
             "Scalar::Util" : "0",
+            "Sentry::Raven" : "0",
             "Starman" : "0",
             "String::CamelCase" : "0",
             "Teng" : "v0.2.0",
-            "Test::PostgreSQL" : "0",
+            "Test::PostgreSQL" : "== 1.06",
+            "Text::TestBase" : "0",
             "Text::Xslate" : "0",
             "UNIVERSAL::require" : "0",
             "WWW::Mechanize" : "0",
@@ -102,11 +105,11 @@
    "provides" : {
       "Cmd::Dwarf" : {
          "file" : "lib/Cmd/Dwarf.pm",
-         "version" : "1.70"
+         "version" : "1.83"
       },
       "Dwarf" : {
          "file" : "lib/Dwarf.pm",
-         "version" : "1.70"
+         "version" : "1.83"
       }
    },
    "release_status" : "stable",
@@ -120,15 +123,15 @@
          "web" : "https://github.com/seagirl/dwarf"
       }
    },
-   "version" : "1.70",
-   "x_authority" : "cpan:seagirl",
+   "version" : "1.83",
+   "x_authority" : "cpan:SEAGIRL",
    "x_contributors" : [
       "tak <yoshizu@sb163.s2factory.co.jp>",
       "seagirl <yoshizu@sb106.s2factory.co.jp>",
       "Takuho Yoshizu <n0.sigur@gmail.com>",
       "Naoko Umeta <umeta@s2factory.co.jp>",
-      "takano <takano@s2factory.co.jp>",
-      "Jun Kuriyama <kuriyama@s2factory.co.jp>"
+      "Jun Kuriyama <kuriyama@s2factory.co.jp>",
+      "takano <takano@s2factory.co.jp>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27202"
 }

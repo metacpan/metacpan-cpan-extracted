@@ -83,6 +83,16 @@ sub receive_server_error {
 
 	load_plugins('Devel::StackTrace' => {});
 
+	# if (conf('/sentry/dsn')) {
+	# 	load_plugins(Sentry => { dsn => conf('/sentry/dsn') });
+	# 	my %opt;
+	# 	# ユーザー情報を追加できる。
+	# 	if (session) {
+	# 		$opt{user_context} = { username => ... };
+	# 	}
+	# 	$c->call_sentry($error, %opt);
+	# }
+
 	my $data = {
 		error_code    => 500,
 		error_message => $c->stacktrace($error),

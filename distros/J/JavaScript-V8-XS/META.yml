@@ -33,5 +33,5 @@ requires:
   perl: '5.018'
 resources:
   repository: https://github.com/gonzus/JavaScript-V8-XS
-version: '0.000010'
+version: '0.000012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

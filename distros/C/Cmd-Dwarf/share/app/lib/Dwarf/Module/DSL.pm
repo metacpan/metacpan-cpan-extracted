@@ -1,6 +1,7 @@
 package Dwarf::Module::DSL;
 use Dwarf::Pragma;
 use Dwarf::Data::Validator;
+use Dwarf::SQLBuilder;
 use Dwarf::Util qw/load_class dwarf_log/;
 use Carp qw/croak/;
 use Scalar::Util qw/weaken/;
@@ -19,7 +20,7 @@ our @FUNC = qw/
 	not_found unauthorized finish redirect
 	is_cli is_production
 	load_plugin load_plugins
-	render dump args
+	render dump new_query args
 /;
 
 sub new {
@@ -76,6 +77,8 @@ sub load_plugin   { shift->c->load_plugin(@_) }
 sub load_plugins  { shift->c->load_plugins(@_) }
 sub render        { shift->c->render(@_) }
 sub dump          { shift->c->dump(@_) }
+
+sub new_query     { Dwarf::SQLBuilder->new_query }
 
 sub args {
 	my ($self, $rules, $module, $args) = @_;

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.645';
+our $VERSION = '1.646';
 
 use Term::Choose::Constants qw( :screen :linux );
 
@@ -174,7 +174,9 @@ sub __mouse_event_to_button {
 
 sub __set_mode {
     my ( $self, $config ) = @_;
-    if ( $self->{mouse} = $config->{mouse} ) {
+    $self->{mouse}       = $config->{mouse};        # so options passed with $config are
+    $self->{hide_cursor} = $config->{hide_cursor};  # also available in __reset_mode
+    if ( $self->{mouse} ) {
         if ( $self->{mouse} == 3 ) {
             my $return = binmode STDIN, ':utf8';
             if ( $return ) {
@@ -229,7 +231,7 @@ sub __set_mode {
         chomp $Stty;
         system( "stty -echo $mode_stty" ) == 0 or die $?;
     }
-    if ( $self->{hide_cursor} = $config->{hide_cursor} ) {
+    if ( $self->{hide_cursor} ) {
         print HIDE_CURSOR;
     }
     return $self->{mouse};

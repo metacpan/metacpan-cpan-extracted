@@ -1,5 +1,11 @@
 Revision history File::Slurp
 
+9999.27     2019-04-05
+    - Update the documentation on the atomic write. We no longer use the pid
+      and I neglected to update the documentation as such. (RT #129029)
+    - Localize $^W to stop File::Temp from warning the user when the -w flag
+      is on while we're grabbing a temporary file name. (RT #129029)
+
 9999.26     2019-02-13
     - Reduce the size of handle.t to prevent failures on systems with limits set
     - Skip all tests in the suite that relied on overriding syswrite to test

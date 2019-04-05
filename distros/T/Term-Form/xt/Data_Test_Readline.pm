@@ -41,6 +41,11 @@ sub key_seq {
 
 sub return_test_data {
     return [
+        #{
+        #     used_keys => [ 'CONTROL_U', "a", 'ENTER'],
+        #     expected  => "<a>",
+        #     arguments => [ 'Prompt: ', { default => "many words " x 100, no_echo => 0 } ],
+        #},
         {
             used_keys => [ "-", 'ENTER' ],
             expected  => "<->",
@@ -76,11 +81,7 @@ sub return_test_data {
             expected  => "<56789>",
             arguments => [ ': ' ],
         },
-        {
-             used_keys => [ 'CONTROL_U', "a", 'ENTER'],
-             expected  => "<a>",
-             arguments => [ 'Prompt: ', { default => "many words " x 100, no_echo => 0 } ],
-        },
+
         {
             used_keys => [ "abcde ", "XY " x 10, ( 'LEFT' ) x 36, ( 'RIGHT' ) x 8, 'CONTROL_K', 'ENTER' ],
             expected  => "<DEFAULT abcde XY>",

@@ -1,5 +1,5 @@
 package Net::Async::Consul;
-$Net::Async::Consul::VERSION = '0.002';
+$Net::Async::Consul::VERSION = '0.003';
 # ABSTRACT: Make async calls to Consul via IO::Async
 
 use warnings;
@@ -8,7 +8,7 @@ use strict;
 use Consul 0.016;
 use Net::Async::HTTP;
 use HTTP::Request;
-use HTTP::Headers;
+use HTTP::Headers 6.07;
 use Hash::MultiValue;
 use List::Util 1.29 qw(pairmap);
 use Carp qw(croak);

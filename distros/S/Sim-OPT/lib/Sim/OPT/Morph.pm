@@ -4944,9 +4944,9 @@ sub use_modish
 
 			print $tee "rm -f $to/rad/*\n";
 			`rm -f $to/rad/*`;
-			print $tee "perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces \r\n";
+			print $tee "perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces \r\n";
 			#`perl ./Modish.pm $modishdefpath $to/cfg/$fileconfig $zonenumber  @surfaces `;
-			`perl ./Modish.pm $to/cfg/$fileconfig $zonenumber  @surfaces `;
+			`perl ./Modish.pm $to/cfg/$fileconfig $zonenumber @surfaces `;
 			#print $tee "modish(\"$to/cfg/$fileconfig\", $zonenumber, @surfaces);\r\n";
 			#modish("$to/cfg/$fileconfig", $zonenumber, @surfaces);
 

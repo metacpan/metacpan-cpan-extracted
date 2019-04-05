@@ -1,7 +1,7 @@
 package File::MoreUtil;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.61'; # VERSION
+our $DATE = '2019-04-05'; # DATE
+our $VERSION = '0.620'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,17 @@ use Cwd ();
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(file_exists l_abs_path dir_empty);
+our @EXPORT_OK = qw(
+                       file_exists
+                       l_abs_path
+                       dir_empty
+                       dir_has_files
+                       dir_has_dot_files
+                       dir_has_non_dot_files
+                       dir_has_subdirs
+                       dir_has_dot_subdirs
+                       dir_has_non_dot_subdirs
+               );
 
 our %SPEC;
 
@@ -42,10 +52,87 @@ sub dir_empty {
     my ($dir) = @_;
     return undef unless (-d $dir);
     return undef unless opendir my($dh), $dir;
-    my @d = grep {$_ ne '.' && $_ ne '..'} readdir($dh);
-    my $res = !@d;
-    #$log->tracef("dir_is_empty(%s)? %d", $dir, $res);
-    $res;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        return 0;
+    }
+    1;
+}
+
+sub dir_has_files {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        next unless -f "$dir/$e";
+        return 1;
+    }
+    0;
+}
+
+sub dir_has_dot_files {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        next unless $e =~ /\A\./;
+        next unless -f "$dir/$e";
+        return 1;
+    }
+    0;
+}
+
+sub dir_has_non_dot_files {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        next if $e =~ /\A\./;
+        next unless -f "$dir/$e";
+        return 1;
+    }
+    0;
+}
+
+sub dir_has_subdirs {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        next unless -d "$dir/$e";
+        return 1;
+    }
+    0;
+}
+
+sub dir_has_dot_subdirs {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        next unless $e =~ /\A\./;
+        next unless -d "$dir/$e";
+        return 1;
+    }
+    0;
+}
+
+sub dir_has_non_dot_subdirs {
+    my ($dir) = @_;
+    return undef unless (-d $dir);
+    return undef unless opendir my($dh), $dir;
+    while (defined(my $e = readdir $dh)) {
+        next if $e eq '.' || $e eq '..';
+        next if $e =~ /\A\./;
+        next unless -d "$dir/$e";
+        return 1;
+    }
+    0;
 }
 
 1;
@@ -63,11 +150,21 @@ File::MoreUtil - File-related utilities
 
 =head1 VERSION
 
-This document describes version 0.61 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2017-07-11.
+This document describes version 0.620 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2019-04-05.
 
 =head1 SYNOPSIS
 
- use File::MoreUtil qw(file_exists l_abs_path dir_empty);
+ use File::MoreUtil qw(
+     file_exists
+     l_abs_path
+     dir_empty
+     dir_has_files
+     dir_has_dot_files
+     dir_has_non_dot_files
+     dir_has_subdirs
+     dir_has_dot_subdirs
+     dir_has_non_dot_subdirs
+ );
 
  print "file exists" if file_exists("/path/to/file/or/dir");
  print "absolute path = ", l_abs_path("foo");
@@ -79,7 +176,11 @@ This document describes version 0.61 of File::MoreUtil (from Perl distribution F
 
 None are exported by default, but they are exportable.
 
-=head2 file_exists($path) => BOOL
+=head2 file_exists
+
+Usage:
+
+ file_exists($path) => BOOL
 
 This routine is just like the B<-e> test, except that it assume symlinks with
 non-existent target as existing. If C<sym> is a symlink to a non-existing
@@ -96,7 +197,11 @@ This function performs the following test:
 
  !(-l "sym") && (-e _) || (-l _)
 
-=head2 l_abs_path($path) => STR
+=head2 l_abs_path
+
+Usage:
+
+ l_abs_path($path) => STR
 
 Just like Cwd::abs_path(), except that it will not follow symlink if $path is
 symlink (but it will follow symlinks for the parent paths).
@@ -117,9 +222,65 @@ Mnemonic: l_abs_path -> abs_path is analogous to lstat -> stat.
 
 Note: currently uses hardcoded C</> as path separator.
 
-=head2 dir_empty($dir) => BOOL
+=head2 dir_empty
+
+Usage:
+
+ dir_empty($dir) => BOOL
 
 Will return true if C<$dir> exists and is empty.
+
+=head2 dir_has_files
+
+Usage:
+
+ dir_has_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more regular files in it.
+
+=head2 dir_has_dot_files
+
+Usage:
+
+ dir_has_dot_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more regular dot files (i.e.
+files with names beginning with a dot) in it.
+
+=head2 dir_has_non_dot_files
+
+Usage:
+
+ dir_has_non_dot_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more regular non-dot files
+(i.e. files with names not beginning with a dot) in it.
+
+=head2 dir_has_subdirs
+
+Usage:
+
+ dir_has_files($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more subdirectories in it.
+
+=head2 dir_has_dot_subdirs
+
+Usage:
+
+ dir_has_dot_subdirs($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more regular dot
+subdirectories (i.e. subdirectories with names beginning with a dot) in it.
+
+=head2 dir_has_non_dot_subdirs
+
+Usage:
+
+ dir_has_non_dot_subdirs($dir) => BOOL
+
+Will return true if C<$dir> exists and has one or more regular non-dot
+subdirectories (i.e. subdirectories with names not beginning with a dot) in it.
 
 =head1 FAQ
 
@@ -150,7 +311,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

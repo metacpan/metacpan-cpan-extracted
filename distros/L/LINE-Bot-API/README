@@ -82,13 +82,13 @@ METHODS
         }
 
     You can get a reply_token from a webhook event object
-    <https://developers.line.me/en/reference/messaging-api/#webhook-event-o
-    bjects>. See the documentation for the parse_events_from_json($json)
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
+    objects>. See the documentation for the parse_events_from_json($json)
     method.
 
     See also the API reference of this method:
-    https://developers.line.me/en/reference/messaging-api/#send-reply-messa
-    ge
+    https://developers.line.biz/en/reference/messaging-api/#send-reply-mess
+    age
 
  push_message($user_id|$room_id|$group_id, [ $message, ... ])
 
@@ -99,13 +99,13 @@ METHODS
         $bot->push_message($user_id, $messages->build);
 
     You can get a user_id, room_id or group_id from a webhook event object
-    <https://developers.line.me/en/reference/messaging-api/#webhook-event-o
-    bjects> See the documentation for the parse_events_from_json($json)
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
+    objects> See the documentation for the parse_events_from_json($json)
     method.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.me/en/reference/messaging-api/#send-push-messag
-    e
+    https://developers.line.biz/en/reference/messaging-api/#send-push-messa
+    ge
 
  multicast([$user_id, ... ], [ $message, ... ])
 
@@ -116,13 +116,13 @@ METHODS
         $bot->multicast([ $user_id ], $messages->build);
 
     You can get a user_id from a webhook event object
-    <https://developers.line.me/en/reference/messaging-api/#webhook-event-o
-    bjects>. See the documentation for the parse_events_from_json($json)
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
+    objects>. See the documentation for the parse_events_from_json($json)
     method.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.me/en/reference/messaging-api/#send-multicast-m
-    essages
+    https://developers.line.biz/en/reference/messaging-api/#send-multicast-
+    messages
 
  validate_signature($json, $signature)
 
@@ -168,8 +168,8 @@ METHODS
         $bot->leave_room($room_id);
 
     You can get a room_id by a Webhook Event Object
-    <https://developers.line.me/en/reference/messaging-api/#webhook-event-o
-    bjects>. And see also parse_events_from_json($json) method's document.
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
+    objects>. And see also parse_events_from_json($json) method's document.
 
  leave_group($group_id)
 
@@ -178,8 +178,8 @@ METHODS
         $bot->leave_group($group_id);
 
     You can get a group_id from a webhook event object
-    <https://developers.line.me/en/reference/messaging-api/#webhook-event-o
-    bjects>. See the documentation for the parse_events_from_json($json)
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
+    objects>. See the documentation for the parse_events_from_json($json)
     method.
 
  get_message_content($message_id)
@@ -194,14 +194,14 @@ METHODS
         }
 
     You can get a message_id from a webhook event object
-    <https://developers.line.me/en/reference/messaging-api/#webhook-event-o
-    bjects>. See the documentation for the parse_events_from_json($json)
+    <https://developers.line.biz/en/reference/messaging-api/#webhook-event-
+    objects>. See the documentation for the parse_events_from_json($json)
     method.
 
     You can also see the online API reference documentation.
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.me/en/reference/messaging-api/#get-content
+    https://developers.line.biz/en/reference/messaging-api/#get-content
 
  get_profile($user_id)
 
@@ -216,7 +216,7 @@ METHODS
         }
 
     See also the LINE Developers API reference of this method:
-    https://developers.line.me/en/reference/messaging-api/#get-profile
+    https://developers.line.biz/en/reference/messaging-api/#get-profile
 
  get_number_of_sent_reply_messages($date)
 
@@ -259,8 +259,8 @@ METHODS
  How to build a send message object
 
     See the LINE Developers API reference about Message objects
-    <https://developers.line.me/en/reference/messaging-api/#message-objects
-    >
+    <https://developers.line.biz/en/reference/messaging-api/#message-object
+    s>
 
     When the LINE::Bot::API::Builder::SendMessage class is used, it is
     possible easily to build a send message object. That class supports a
@@ -464,7 +464,7 @@ METHODS
             text  => 'postback message',
         );
         $carousel->add_column($column1->build);
-        
+    
         my $column2 = LINE::Bot::API::Builder::TemplateMessage::ImageColumn->new(
             image_url => 'https://example.com/bot/images/item2.jpg',
         )->add_message_action(
@@ -472,7 +472,7 @@ METHODS
             text  => 'message',
         );
         $carousel->add_column($column2->build);
-        
+    
         my $column3 = LINE::Bot::API::Builder::TemplateMessage::ImageColumn->new(
             image_url => 'https://example.com/bot/images/item3.jpg',
         )->add_uri_action(
@@ -495,6 +495,6 @@ COPYRIGHT & LICENSE
 
 SEE ALSO
 
-    LINE::Bot::API::Event, https://business.line.me/,
-    https://developers.line.me/
+    LINE::Bot::API::Event, https://developers.line.biz/,
+    https://at.line.me/
 

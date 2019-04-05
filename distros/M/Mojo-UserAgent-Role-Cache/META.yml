@@ -25,5 +25,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-useragent-role-cache/issues
   homepage: https://github.com/jhthorsen/mojo-useragent-role-cache
   repository: https://github.com/jhthorsen/mojo-useragent-role-cache.git
-version: '0.02'
+version: '0.03'
+x_contributors:
+  - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

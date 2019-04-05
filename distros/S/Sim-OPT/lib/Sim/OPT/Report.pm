@@ -217,7 +217,7 @@ $retfile
 -
 YYY
 ";
-        if ($exeonfiles eq "y")
+        if ( ( $exeonfiles eq "y" ) or ( $dowhat{newretrieve} eq "y" ) )
         {
           say $tee "#Retrieving temperature results.";
           print `$printthis`;
@@ -343,7 +343,7 @@ TTT
           say $tee "THERE ALREADY IS A RETFILE!";
         }
       }
-      if ($exeonfiles eq "y")
+      if ( ($exeonfiles eq "y") or ( $dowhat{newretrieve} eq "y" ) )
       {
 
         say $tee "#Retrieving $themereport results.";
@@ -400,7 +400,7 @@ TTT
 $printthis
 ";
 
-          if ($exeonfiles eq "y")
+          if ( ($exeonfiles eq "y") or ( $dowhat{newretrieve} eq "y" ) )
           {
 
             say $tee "#Retrieving $themereport results.";
@@ -442,7 +442,7 @@ TTT
 $printthis
 ";
 
-          if ($exeonfiles eq "y")
+          if ( ($exeonfiles eq "y") or ( $dowhat{newretrieve} eq "y" ) )
           {
 
             say $tee "#Retrieving $themereport results.";
@@ -482,7 +482,7 @@ TTT
 $printthis
 ";
 
-          if ($exeonfiles eq "y")
+          if ( ( $exeonfiles eq "y" ) or ( $dowhat{newretrieve} eq "y" ) )
           {
 
             say $tee "#Retrieving $themereport results.";
@@ -522,7 +522,7 @@ TTT
 $printthis
 ";
 
-          if ($exeonfiles eq "y")
+          if ( ( $exeonfiles eq "y" ) or ( $dowhat{newretrieve} eq "y" ) )
           {
 
             say $tee "#Retrieving $themereport results.";
@@ -562,7 +562,7 @@ TTT
 $printthis
 ";
 
-            if ($exeonfiles eq "y")
+            if ( ( $exeonfiles eq "y" ) or ( $dowhat{newretrieve} eq "y" ) )
             {
 
               say $tee "#Retrieving $themereport results.";

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.645';
+our $VERSION = '1.646';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -555,7 +555,7 @@ sub __choose {
                 }
             }
         }
-        elsif ( $key == KEY_q || $key == CONTROL_D ) {
+        elsif ( $key == KEY_q || $key == CONTROL_Q ) {
             $self->__reset_term( 1 );
             return;
         }
@@ -1182,7 +1182,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.645
+Version 1.646
 
 =cut
 
@@ -1318,7 +1318,7 @@ If the items of the list don't fit on the screen, the user can scroll to the nex
 
 If the window size is changed, then as soon as the user enters a keystroke C<choose> rewrites the screen.
 
-C<choose> returns C<undef> or an empty list in list context if the C<q> key (or C<Ctrl-D>) is pressed.
+C<choose> returns C<undef> or an empty list in list context if the C<q> key (or C<Ctrl-Q>) is pressed.
 
 With a I<mouse> mode enabled (and if supported by the terminal) the item can be chosen with the left mouse key, in list
 context the right mouse key can be used instead the C<SpaceBar> key.

@@ -1,5 +1,6 @@
 FROM perl
 
+RUN apt-get clean
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install postfix libsasl2-modules
 

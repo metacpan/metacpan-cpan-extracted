@@ -684,3 +684,49 @@ __END__
 	foo => 0,
 	bar => 0,
 )
+
+=== BIGINT
+--- query: { hoge => '9223372036854775807', fuga => '-9223372036854775807', hoga => 'ascii', foo => "1\n", min => '-9223372036854775809', max => '9223372036854775808', len => '9223372036854775808000' }
+--- rule
+(
+	hoge => [qw/BIGINT/],
+	fuga => [qw/BIGINT/],
+	hoga => [qw/BIGINT/],
+	foo  => [qw/BIGINT/],
+	min  => [qw/BIGINT/],
+	max  => [qw/BIGINT/],
+	len  => [qw/BIGINT/],
+)
+--- expected
+(
+	hoge => 0,
+	fuga => 0,
+	hoga => 1,
+	foo  => 1,
+	min  => 1,
+	max  => 1,
+	len  => 1,
+)
+
+=== BIGUINT
+--- query: { hoge => '9223372036854775807', fuga => '-9223372036854775807', hoga => 'ascii', foo => "1\n", min => '-9223372036854775809', max => '9223372036854775808', len => '9223372036854775808000' }
+--- rule
+(
+	hoge => [qw/BIGUINT/],
+	fuga => [qw/BIGUINT/],
+	hoga => [qw/BIGUINT/],
+	foo  => [qw/BIGUINT/],
+	min  => [qw/BIGUINT/],
+	max  => [qw/BIGUINT/],
+	len  => [qw/BIGUINT/],
+)
+--- expected
+(
+	hoge => 0,
+	fuga => 1,
+	hoga => 1,
+	foo  => 1,
+	min  => 1,
+	max  => 1,
+	len  => 1,
+)

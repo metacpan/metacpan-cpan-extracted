@@ -260,4 +260,30 @@ EOF
   );
 };
 
+subtest 'just get one blog' => sub {
+  my $doc = <<'EOF';
+{
+  blog(id: 1) {
+    id
+    title
+  }
+}
+EOF
+  run_test(
+    [
+      $converted->{schema}, $doc, $converted->{root_value},
+      (undef) x 3, $converted->{resolver},
+    ],
+    {
+      data => {
+        blog =>
+        {
+          id => 1,
+          title => "Hello!",
+        },
+      }
+    }
+  );
+};
+
 done_testing;

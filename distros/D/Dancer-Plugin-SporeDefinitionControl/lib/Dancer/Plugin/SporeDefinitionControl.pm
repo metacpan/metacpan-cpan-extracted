@@ -17,11 +17,11 @@ Dancer Plugin to control validity of route from a Spore configuration file
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -236,7 +236,10 @@ register 'check_spore_definition' => sub {
             $is_ok = 1;
         }
         return _returned_error($error,400) unless $is_ok;
-
+        
+        #set the access-control-allow-credentials if needed
+        my $build_options_route = plugin_setting->{'build_options_route'};
+        header 'access-control-allow-credentials' => $build_options_route->{'header_allow_credentials'} if defined $build_options_route->{'header_allow_credentials'};
       };
 };
 
@@ -285,12 +288,20 @@ sub _returned_options_methods
   my @unique_methods = grep { !$seen{$_}++ } @{$methods};
   my $build_options_route = plugin_setting->{'build_options_route'};
   if (defined $methods){
+  my $req = request;
+  my $origin_allowed;
+  #check that header contain origin and that url is permit by api
+  $origin_allowed = $req->header('Origin') if (defined $req->header('Origin') 
+                                                && defined $build_options_route->{'header_allow_allow_origins'} 
+                                                &&  $req->header('Origin') ~~ @{$build_options_route->{'header_allow_allow_origins'}}
+                                               );
+
   set serializer => 'JSON';
   status 200;
   header 'access-control-allow-credentials' => $build_options_route->{'header_allow_credentials'} || '';
   header 'access-control-allow-headers' => $build_options_route->{'header_allow_headers'} || '';
   header 'access-control-allow-methods' => join(",",@unique_methods,'OPTIONS');
-  header 'access-control-allow-origin' => $build_options_route->{'header_allow_allow_origin'} || '';
+  header 'access-control-allow-origin' => $origin_allowed if defined $origin_allowed;
   header 'access-control-max-age' => $build_options_route->{'header_max_age'}  || '';
   return halt('{"status":200,"message":"OK"}');
   }

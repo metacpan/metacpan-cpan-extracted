@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.069';
+our $VERSION = '2.070';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.069
+Version 2.070
 
 =cut
 
@@ -146,7 +146,7 @@ C<Home> or C<Strg-A> to move to the start of the line, C<End> or C<Strg-E> to mo
 
 =back
 
-To leave a C<read-line> without returning anything press C<Ctrl-D>. When the input puffer is empty and an C<Enter> is
+To leave a C<read-line> without returning anything press C<Ctrl-X>. When the input puffer is empty and an C<Enter> is
 pressed, C<read-line> returns an empty string.
 
 =head1 OUTPUT

@@ -1,6 +1,11 @@
 App-Spoor
 
-Ease integration with the Spoor API for CPanel installations.
+Ease integration with the Spoor API for cPanel installations.
+
+WHAT IS SPOOR?
+
+Spoor is a service that helps to lessen the impact of email compromises by providing early warning of compromised 
+mailboxes. If you would like access to the API, mail rorymckinley@capefox.co and with 'Spoor Access' in the subject.
 
 INSTALLING
 
@@ -12,6 +17,9 @@ To install this module, run the following commands:
 	./Build install
 
 POST-INSTALLATION
+
+For Spoor to provide maximum functionality it needs to capture to successful logins. cPanel does not do this by default.
+To enable it in cPanel, go to Server Configuration -> Tweak Settings -> Logging and switch on 'Log successful logins'.
 
   # Run as root
   spoor_installer
@@ -50,6 +58,11 @@ UNINSTALLING
   rm /etc/systemd/system/spoor-error-follower.service
   rm /etc/systemd/system/spoor-transmitter.service
   rm /var/cpanel/perl5/lib/SpoorForwardHook.pm
+
+UPDATING
+
+When updating App::Spoor, it is recommended that you stop the asorted Spoor services that are running and restart them
+afterwards.
 
 SUPPORT AND DOCUMENTATION
 

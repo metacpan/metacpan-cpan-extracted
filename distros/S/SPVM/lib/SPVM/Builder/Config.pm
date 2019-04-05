@@ -3,7 +3,6 @@ package SPVM::Builder::Config;
 use strict;
 use warnings;
 use Config;
-use SPVM::Builder::Util;
 
 sub new {
   my $class = shift;
@@ -18,20 +17,81 @@ sub new {
 sub new_default {
   my $class = shift;
   
-  my $bconf = SPVM::Builder::Util::new_default_build_config();
+  my $bconf = SPVM::Builder::Config->new;
+  
+  # Use default config
+  my $default_config = {%Config};
+  $bconf->replace_all_config($default_config);
+  
+  # Add include directory to ccflags
+  my $include_dir = $INC{"SPVM/Builder/Config.pm"};
+  $include_dir =~ s/\/Config\.pm$//;
+  $include_dir .= '/include';
+  $bconf->add_ccflags("-I$include_dir");
+  
+  # Add math library to extra_linker_flags
+  $bconf->add_extra_linker_flags("-lm");
+  
+  # C99
+  $bconf->set_std('c99');
+  
+  # Optimize
+  $bconf->set_optimize('-O3');
+  
+  # I want to print warnings, but if gcc version is different, can't suppress no needed warning message.
+  # so I dicide not to print warning in release version
+  if ($ENV{SPVM_TEST_ENABLE_WARNINGS}) {
+    $bconf->add_ccflags("-Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable -Wno-missing-field-initializers");
+  }
   
   return $bconf;
 }
 
-sub new_with_make_maker_option {
-  my ($class, $mconfig) = @_;
+sub new_cpp {
+  my $class = shift;
   
-  my $config = $class->new;
+  my $bconf = SPVM::Builder::Config->new;
   
-  # Parse MakeMaker options
-  if (defined(my $ccflags = $mconfig->{CCFLGAS})) {
-    $config->set_ccflags($ccflags);
-  }
+  # Use default config
+  my $default_config = {%Config};
+  $bconf->replace_all_config($default_config);
+  
+  # Add include directory to ccflags
+  my $include_dir = $INC{"SPVM/Builder/Config.pm"};
+  $include_dir =~ s/\/Config\.pm$//;
+  $include_dir .= '/include';
+  $bconf->add_ccflags("-I$include_dir");
+  
+  # Add math library to extra_linker_flags
+  $bconf->add_extra_linker_flags("-lm");
+  
+  # Optimize
+  $bconf->set_optimize('-O3');
+  
+  # CC
+  $bconf->set_cc('g++');
+  
+  # LD
+  $bconf->set_ld('g++');
+  
+  # Delete std
+  $bconf->delete_std;
+  
+  return $bconf;
+}
+
+sub cache {
+  my ($self, $cache) = @_;
+  
+  return $self->{cache};
+}
+
+sub set_cache {
+  my ($self, $cache) = @_;
+  
+  $self->{cache} = $cache;
+  
+  return $self;
 }
 
 sub replace_all_config {
@@ -97,6 +157,20 @@ sub set_std {
   $ccflags =~ s/-std=[^ ]+//g;
   
   $ccflags .= " -std=$spec";
+  
+  # Add -std=foo section
+  $self->set_ccflags($ccflags);
+  
+  return $self;
+}
+
+sub delete_std {
+  my ($self) = @_;
+  
+  my $ccflags = $self->get_ccflags;
+  
+  # Remove -std=foo section
+  $ccflags =~ s/-std=[^ ]+//g;
   
   # Add -std=foo section
   $self->set_ccflags($ccflags);
@@ -174,6 +248,20 @@ sub set_extra_compiler_flags {
   return $self;
 }
 
+sub quiet {
+  my ($self, $quiet) = @_;
+  
+  return $self->{quiet};
+}
+
+sub set_quiet {
+  my ($self, $quiet) = @_;
+  
+  $self->{quiet} = $quiet;
+  
+  return $self;
+}
+
 sub get_extra_compiler_flags {
   my $self = shift;
   
@@ -217,6 +305,8 @@ sub add_extra_linker_flags {
   
   return $self;
 }
+
+1;
 
 =head1 NAME
 
@@ -341,6 +431,8 @@ Get C<lddlflags>.
 
 Add C<lddlflags> after current C<lddlflags>.
 
-=cut
+=head2 new_default
+  
+  my $bconf = SPVM::Builder::Config->new_default;
 
-1;
+Create defaulgt build config. This is L<SPVM::Builder::Config> object.

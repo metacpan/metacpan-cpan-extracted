@@ -29,7 +29,11 @@ sub str2dt {
 	return $string if (ref($string) and ref($string) eq 'DateTime');
 	$string =~ s|^(\d\d-\d\d)$|$1T00:00:00|;
 	$string =~ s|T(\d\d:\d\d)$|T$1:00|;
-	$string =~ s|^(\d\d-\d\d)T|2013-$1T|;
+	if ($string =~ m|^(\d\d-\d\d)T|) {
+		my @t = localtime;
+		my $year = $t[5] + 1900;
+		$string =~ s|^(\d\d-\d\d)T|${year}-$1T|;
+	}
 	$string =~ s|^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})|$1T$2|;
 	DateTime::Format::Strptime->new(pattern => '%FT%T', time_zone => 'Asia/Tokyo')->parse_datetime($string);
 }

@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojo-UserAgent-Role-Cache
 
+0.03 2019-04-05T12:37:40+0700
+ - Can debug cache info with MOJO_UA_CACHE_DEBUG=1, without dumping req/res
+ - Breaking change: The file cache name will have readable parts if it
+   only contains "\w", "." or "-".
+
 0.02 2018-09-28T21:29:01+0900
  - Fix unique filename per cache entry
  - Add attribute "cache_key"

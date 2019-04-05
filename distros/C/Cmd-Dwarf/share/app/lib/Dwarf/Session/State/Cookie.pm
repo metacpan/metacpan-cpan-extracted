@@ -36,7 +36,7 @@ sub header_filter {
         }->()
     );
     if (Scalar::Util::blessed($res)) {
-        $res->header( 'Set-Cookie' => $cookie->as_string );
+        $res->headers->push_header( 'Set-Cookie' => $cookie->as_string );
         $res;
     } else {
         push @{$res->[1]}, 'Set-Cookie' => $cookie->as_string;

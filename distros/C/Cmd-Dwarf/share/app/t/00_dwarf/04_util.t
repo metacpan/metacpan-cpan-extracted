@@ -94,6 +94,13 @@ subtest "datetime" => sub {
 		hour  => "18",
 	);
 	ok !Dwarf::Util::DateTime::is_duration_positive($the_time, $now);
+
+	is Dwarf::Util::DateTime::str2dt("2014-06-14 18:00:00"), "2014-06-14T18:00:00", 'str2dt';
+	is Dwarf::Util::DateTime::str2dt("2018-06-14T18:00:00"), "2018-06-14T18:00:00", 'str2dt';
+	is Dwarf::Util::DateTime::str2dt("2018-06-14T18:00"),    "2018-06-14T18:00:00", 'str2dt';
+	my @t = localtime;
+	my $year = $t[5] + 1900;
+	is Dwarf::Util::DateTime::str2dt("06-14T18:00:00"), "${year}-06-14T18:00:00", 'str2dt';
 };
 
 done_testing();

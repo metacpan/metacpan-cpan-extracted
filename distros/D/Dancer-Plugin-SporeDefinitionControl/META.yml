@@ -25,4 +25,4 @@ requires:
   File::Spec: '0'
   Test::More: '0'
   YAML: '0'
-version: '0.16'
+version: '0.17'

@@ -1,5 +1,28 @@
 Revision history for Perl extension dwarf
 
+1.83 2019-04-05T09:05:36Z
+
+    - fix authority issue
+
+1.82 2019-04-05T05:36:12Z
+
+    - update minil.toml
+
+1.81 2019-04-05T05:20:40Z
+
+    - modify Makefile to use ${ENV} for cpanm
+    - fix BIGINT of validation rules
+
+1.80 2018-08-18T11:41:43Z
+
+    - SQLBuilder was integrated to Dwarf::Module::DSL and renamed to Dwarf::SQLBuilder
+    - modify finalization of session cookie
+    - update Makefile
+    - add Text::TestBase to cpanfile
+    - add Dwarf::Plugin::Sentry
+    - use version 2.1 in docker-compose.yml of exapmles project
+    - fix a bug of Dwarf::Util::DateTime
+
 1.70 2018-03-17T07:33:57Z
     - add examples
     - improve templates

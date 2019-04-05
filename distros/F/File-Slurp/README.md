@@ -180,7 +180,7 @@ The `overwrite_file` function is simply a synonym for the
     use File::Slurp qw(prepend_file);
     prepend_file('/path/file', $header);
     prepend_file('/path/file', \@lines);
-    prepend_file('/path/file', { binmode => 'raw:'}, $bin_data);
+    prepend_file('/path/file', { binmode => ':raw'}, $bin_data);
 
     # equivalent to:
     use File::Slurp qw(read_file write_file);
@@ -409,11 +409,10 @@ The next argument(s) is either a hash reference or a flattened hash,
 
     The `atomic` option is a boolean option, defaulted to false (`0`). Setting
     this option to true (`1`) will cause the file to be be written to in an
-    atomic fashion. A temporary file name is created by appending the pid
-    (`$$`) to the file name argument and that file is spewed to. After the
-    file is closed it is renamed to the original file name (and `rename` is
-    an atomic operation on most OSes). If the program using this were to
-    crash in the middle of this, then the file with the pid suffix could
+    atomic fashion. A temporary file name is created using ["tempfile" in File::Temp](https://metacpan.org/pod/File::Temp#tempfile).
+    After the file is closed it is renamed to the original file name
+    (and `rename` is an atomic operation on most OSes). If the program using
+    this were to crash in the middle of this, then the temporary file could
     be left behind.
 
 - binmode

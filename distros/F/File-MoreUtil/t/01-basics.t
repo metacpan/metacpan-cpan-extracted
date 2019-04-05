@@ -1,22 +1,21 @@
 #!perl
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
+use Test::More 0.98;
 
 use Cwd qw(abs_path);
 use File::chdir;
 use File::Slurper qw(write_text);
 use File::Spec;
-use Test::More 0.98;
-
-plan skip_all => "symlink() not available"
-    unless eval { symlink "", ""; 1 };
-
+use File::MoreUtil qw(file_exists l_abs_path dir_empty dir_has_files dir_has_dot_files dir_has_non_dot_files dir_has_subdirs dir_has_dot_subdirs dir_has_non_dot_subdirs);
 use File::Temp qw(tempfile tempdir);
-use File::MoreUtil qw(file_exists l_abs_path dir_empty);
 
 subtest file_exists => sub {
+    plan skip_all => "symlink() not available"
+        unless eval { symlink "", ""; 1 };
+
     my ($fh1, $target)  = tempfile();
     my ($fh2, $symlink) = tempfile();
 
@@ -34,6 +33,9 @@ subtest file_exists => sub {
 };
 
 subtest l_abs_path => sub {
+    plan skip_all => "symlink() not available"
+        unless eval { symlink "", ""; 1 };
+
     my $dir = abs_path(tempdir(CLEANUP=>1));
     local $CWD = $dir;
 
@@ -56,7 +58,7 @@ subtest l_abs_path => sub {
     is(l_abs_path("tmp/symnep" ), "$dir/tmp/symnep" , "l_abs_path symnep");
 };
 
-subtest dir_empty => sub {
+subtest "dir_empty, dir_has_*files, dir_has_*subdirs" => sub {
     my $dir = tempdir(CLEANUP=>1);
     local $CWD = $dir;
 
@@ -73,12 +75,67 @@ subtest dir_empty => sub {
 
     mkdir "unreadable", 0000;
 
-    ok( dir_empty("empty"), "empty");
-    ok(!dir_empty("doesntexist"), "doesntexist");
-    ok(!dir_empty("hasfiles"), "hasfiles");
-    ok(!dir_empty("hasdotfiles"), "hasdotfiles");
-    ok(!dir_empty("hasdotdirs"), "hasdotdirs");
-    ok(!dir_empty("unreadable"), "unreadable") if $>;
+    mkdir "hassubdirs", 0755;
+    mkdir "hassubdirs/d1", 0755;
+
+    mkdir "hasdotsubdirs", 0755;
+    mkdir "hasdotsubdirs/.d1", 0755;
+
+    ok( dir_empty("empty"));
+    ok(!dir_empty("doesntexist"));
+    ok(!dir_empty("hasfiles"));
+    ok(!dir_empty("hasdotfiles"));
+    ok(!dir_empty("hasdotdirs"));
+    ok(!dir_empty("unreadable")) if $>;
+
+    ok(!dir_has_files("empty"));
+    ok(!dir_has_files("doesntexist"));
+    ok( dir_has_files("hasfiles"));
+    ok( dir_has_files("hasdotfiles"));
+    ok(!dir_has_files("hassubdirs"));
+    ok(!dir_has_files("hasdotsubdirs"));
+
+    ok(!dir_has_dot_files("empty"));
+    ok(!dir_has_dot_files("doesntexist"));
+    ok(!dir_has_dot_files("hasfiles"));
+    ok( dir_has_dot_files("hasdotfiles"));
+    ok(!dir_has_dot_files("hassubdirs"));
+    ok(!dir_has_dot_files("hasdotsubdirs"));
+
+    ok(!dir_has_non_dot_files("empty"));
+    ok(!dir_has_non_dot_files("doesntexist"));
+    ok( dir_has_non_dot_files("hasfiles"));
+    ok(!dir_has_non_dot_files("hasdotfiles"));
+    ok(!dir_has_non_dot_files("hassubdirs"));
+    ok(!dir_has_non_dot_files("hasdotsubdirs"));
+
+    ok(!dir_has_subdirs("empty"));
+    ok(!dir_has_subdirs("doesntexist"));
+    ok(!dir_has_subdirs("hasfiles"));
+    ok(!dir_has_subdirs("hasdotfiles"));
+    ok( dir_has_subdirs("hassubdirs"));
+    ok( dir_has_subdirs("hasdotsubdirs"));
+
+    ok(!dir_has_subdirs("empty"));
+    ok(!dir_has_subdirs("doesntexist"));
+    ok(!dir_has_subdirs("hasfiles"));
+    ok(!dir_has_subdirs("hasdotfiles"));
+    ok( dir_has_subdirs("hassubdirs"));
+    ok( dir_has_subdirs("hasdotsubdirs"));
+
+    ok(!dir_has_dot_subdirs("empty"));
+    ok(!dir_has_dot_subdirs("doesntexist"));
+    ok(!dir_has_dot_subdirs("hasfiles"));
+    ok(!dir_has_dot_subdirs("hasdotfiles"));
+    ok(!dir_has_dot_subdirs("hassubdirs"));
+    ok( dir_has_dot_subdirs("hasdotsubdirs"));
+
+    ok(!dir_has_non_dot_subdirs("empty"));
+    ok(!dir_has_non_dot_subdirs("doesntexist"));
+    ok(!dir_has_non_dot_subdirs("hasfiles"));
+    ok(!dir_has_non_dot_subdirs("hasdotfiles"));
+    ok( dir_has_non_dot_subdirs("hassubdirs"));
+    ok(!dir_has_non_dot_subdirs("hasdotsubdirs"));
 };
 
 DONE_TESTING:

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '1.645';
+our $VERSION = '1.646';
 
 
 use Encode qw( decode );
@@ -98,6 +98,7 @@ sub __get_key_OS {
 
 sub __set_mode {
     my ( $self, $config ) = @_;
+    $self->{hide_cursor} = $config->{hide_cursor};
     $self->{input} = Win32::Console->new( STD_INPUT_HANDLE );
     $self->{old_in_mode} = $self->{input}->Mode();
     if ( $config->{mouse} ) {
@@ -112,7 +113,7 @@ sub __set_mode {
     $self->{bg_color}  = $self->{curr_attr} & 0x70;
     $self->{fill_attr} = $self->{bg_color} | $self->{bg_color};
     $self->{inverse}   = ( $self->{bg_color} >> 4 ) | ( $self->{fg_color} << 4 );
-    if ( $self->{hide_cursor} = $config->{hide_cursor} ) {
+    if ( $self->{hide_cursor} ) {
         $self->__hide_cursor();
     }
     return $config->{mouse};

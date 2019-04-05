@@ -11,11 +11,11 @@ App::Spoor::AccessEntryParser
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -29,7 +29,7 @@ This package contains the necessary functionality to parse CPanel access log ent
 This subroutine accepts a single line from a CPanel access log (as a string) and returns a reference to a hash 
 representation of that entry.
 
-The hash representation contains the following elements:
+The hash representation contains the following elements when the entry could be successfully parsed:
 
 =over 2
 
@@ -49,6 +49,16 @@ The hash representation contains the following elements:
 
 =back
 
+If the entry could not be successfully parsed, it will contain the following items:
+
+=over 2
+
+=item * type: This is hardcoded to 'access'
+
+=item * event: This is hardcoded to 'unrecognised'.
+
+=back
+
 =cut
 
 sub parse {
@@ -60,9 +70,10 @@ sub parse {
   my $event;
   my $status;
   my $forward_recipient;
+  my %result;
   my $date_parser = DateTime::Format::Strptime->new(pattern => '%m/%d/%Y:%H:%M:%S %z', on_error => 'croak');
 
-  $log_entry =~ /
+  if ($log_entry =~ /
     \A
     (?<ip>\S+)\s
     -\s
@@ -70,49 +81,54 @@ sub parse {
     \[(?<timestamp>[^\]]+)\]\s
     "(?<http_request>[^"]+)"\s
     (?<response_code>\d{3})\s
-  /x;
+  /x) {
+    my $log_time = $date_parser->parse_datetime($+{timestamp})->epoch();
+    my $credential = uri_unescape($+{username});
+    my $ip = $+{ip};
+    my $http_request = $+{http_request};
+    my $response_code = $+{response_code};
 
-  my $log_time = $date_parser->parse_datetime($+{timestamp})->epoch();
-  my $credential = uri_unescape($+{username});
-  my $ip = $+{ip};
-  my $http_request = $+{http_request};
-  my $response_code = $+{response_code};
+    if ($credential =~ /@/) {
+      $level = 'mailbox';
+    } else {
+      $level = 'unrecognised';
+    }
 
-  if ($credential =~ /@/) {
-    $level = 'mailbox';
+    if ($response_code eq '200') {
+      $status = 'success';
+    } else {
+      $status = 'failed';
+    }
+
+    if ($credential =~ /@/ && $http_request =~ /\APOST.+doaddfwd.html/) {
+      $event = 'forward_added_partial_ip';
+    } elsif (
+      $credential =~ /@/ &&
+      $http_request =~ /\AGET.+dodelfwd.html\?.*emaildest=(?<forward_recipient>[^\s?]+)/
+    ) {
+      $event = 'forward_removed';
+      $forward_recipient = uri_unescape($+{forward_recipient});
+    } else {
+      $event = 'unrecognised';
+    }
+
+    %result = (
+      type => 'access',
+      log_time => $log_time,
+      event => $event,
+      ip => $ip,
+      credential => $credential,
+      context => $level,
+      status => $status,
+    );
+
+    $result{forward_recipient} = $forward_recipient if($forward_recipient);
   } else {
-    $level = 'unrecognised';
+    %result = (
+      type  => 'access',
+      event => 'unrecognised',
+    );
   }
-
-  if ($response_code eq '200') {
-    $status = 'success';
-  } else {
-    $status = 'failed';
-  }
-
-  if ($credential =~ /@/ && $http_request =~ /\APOST.+doaddfwd.html/) {
-    $event = 'forward_added_partial_ip';
-  } elsif (
-    $credential =~ /@/ &&
-    $http_request =~ /\AGET.+dodelfwd.html\?.*emaildest=(?<forward_recipient>[^\s?]+)/
-  ) {
-    $event = 'forward_removed';
-    $forward_recipient = uri_unescape($+{forward_recipient});
-  } else {
-    $event = 'unrecognised';
-  }
-
-  my %result = (
-    type => 'access',
-    log_time => $log_time,
-    event => $event,
-    ip => $ip,
-    credential => $credential,
-    context => $level,
-    status => $status,
-  );
-
-  $result{forward_recipient} = $forward_recipient if($forward_recipient);
 
   \%result;
 }

@@ -322,13 +322,13 @@ is_deeply(
   'Parses an access log entry - removing a forward with the incorrect verb with a trailing newline'
 );
 
-my $access_log_forward_removed_par = '10.10.10.10 - rorymckinley%40blah.capefox.co [03/05/2019:10:38:37 -0000] ' .
+my $access_log_forward_removed_parameter = '10.10.10.10 - rorymckinley%40blah.capefox.co [03/05/2019:10:38:37 -0000] ' .
   '"GET /cpsess9858418447/webmail/paper_lantern/mail/dodelfwd.html?email=rorymckinley%40blah.capefox.co' .
   ' HTTP/1.1" 200 0 "https://cp6.capefox.co:2096/" ' .
   '"Mozilla/5.0 (X11; Fedora; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.96 ' .
   'Safari/537.36" "s" "-" 2096';
 
-my %parsed_forward_removed_par = (
+my %parsed_forward_removed_parameter = (
   type => 'access',
   ip => '10.10.10.10',
   credential => 'rorymckinley@blah.capefox.co',
@@ -347,15 +347,35 @@ my %parsed_forward_removed_par = (
 );
 
 is_deeply(
-  App::Spoor::AccessEntryParser::parse($access_log_forward_removed_par),
-  \%parsed_forward_removed_par,
+  App::Spoor::AccessEntryParser::parse($access_log_forward_removed_parameter),
+  \%parsed_forward_removed_parameter,
   'Parses an access log entry - removing a forward emaildest par missing'
 );
 
 is_deeply(
-  App::Spoor::AccessEntryParser::parse("$access_log_forward_removed_par\n"),
-  \%parsed_forward_removed_par,
+  App::Spoor::AccessEntryParser::parse("$access_log_forward_removed_parameter\n"),
+  \%parsed_forward_removed_parameter,
   'Parses an access log entry - removing a forward emaildest par missing with a trailing newline'
+);
+
+my $access_log_broken_entry = '10.0.0.1 - - [04/05/2019:01:31:09 -0000] "��$�h#�NG�T�
+                                                          �]"��=��N��B�J�/����n�0�,�2�.�/�+�1�-���������(�$��" 400 0 "-" "-" "-" "-" 2082';
+
+my %parsed_broken_entry = (
+  type => 'access',
+  event => 'unrecognised',
+);
+
+is_deeply(
+  App::Spoor::AccessEntryParser::parse($access_log_broken_entry),
+  \%parsed_broken_entry,
+  'Flags a broken log entry as unrecognised'
+);
+
+is_deeply(
+  App::Spoor::AccessEntryParser::parse("$access_log_broken_entry\n"),
+  \%parsed_broken_entry,
+  'Flags a broken log entry with a trailing newline as unrecognised'
 );
 
 done_testing();
