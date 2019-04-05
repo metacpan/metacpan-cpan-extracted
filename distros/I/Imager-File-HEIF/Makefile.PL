@@ -139,11 +139,12 @@ sub _heif_test_code {
     printf("libheif %d.%d.%d (%x)\n",
 	    ver >> 24, (ver >> 16) & 0xFF, (ver >> 8) & 0xFF, ver);
 
-    if (ver < 0x01030000) {
-        printf("At least version 1.3.0 of libheif is required\n");
+    if (ver < 0x01040000) {
+        printf("At least version 1.4.0 of libheif is required\n");
+        printf("Older versions can produce invalid files for non-trivial programs\n");
         return 1;
     }
-    printf("libheif is sufficiently recent (1.3.0 required).\n");
+    printf("libheif is sufficiently recent (1.4.0 required).\n");
 
     if (!ctx) {
         printf("Couldn't allocate a libheif context - memory?\n");

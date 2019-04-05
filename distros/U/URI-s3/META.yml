@@ -26,13 +26,16 @@ no_index:
 provides:
   URI::s3:
     file: lib/URI/s3.pm
-    version: v0.1.0
+    version: v0.2.0
 requires:
+  URI: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/karupanerura/URI-s3/issues
   homepage: https://github.com/karupanerura/URI-s3
   repository: git://github.com/karupanerura/URI-s3.git
-version: v0.01
+version: v0.2
+x_contributors:
+  - 'Michal Josef Špaček <michal.spacek@gooddata.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

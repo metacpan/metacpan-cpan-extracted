@@ -8,7 +8,7 @@ specification that can also handle object-oriented, procedural or mixed
 object-oriented/procedural situations and returns the passed arguments as
 a hash.
 
-See the POD docs for details.
+See the POD docs at https://metacpan.org/pod/Getargs::Mixed for details.
 
 INSTALLATION
 

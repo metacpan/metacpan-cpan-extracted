@@ -296,7 +296,6 @@ write_heif(struct heif_context *ctx, const void *data,
 undef_int
 i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   struct heif_context *ctx = heif_context_alloc();
-  struct heif_encoder *encoder = NULL;
   struct heif_error err;
   struct heif_writer writer;
   int i;
@@ -329,12 +328,6 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   }
 #endif
 
-  err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
-  if (err.code != heif_error_Ok) {
-    i_push_errorf(0, "heif error %d", (int)err.code);
-    goto fail;
-  }
-
   for (i = 0; i < count; ++i) {
     i_img *im = imgs[i];
     int ch;
@@ -343,23 +336,29 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
     int has_alpha = i_img_alpha_channel(im, &alpha_chan);
     enum heif_chroma chroma = has_alpha ? heif_chroma_interleaved_RGBA : heif_chroma_interleaved_RGB;
     enum heif_colorspace cs = heif_colorspace_RGB;
-    int lossless = 0, quality = 80;
-    
+    int lossless = 0, quality = -1;
+    struct heif_encoder *encoder = NULL;
+
+    err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
+    if (err.code != heif_error_Ok) {
+      i_push_errorf(0, "heif error %d", (int)err.code);
+      goto fail;
+    }
+
     (void)i_tags_get_int(&im->tags, "heif_lossless", 0, &lossless);
-    (void)i_tags_get_int(&im->tags, "heif_quality", 0, &quality);
-    heif_encoder_set_lossless(encoder, lossless);
-    if (!lossless) {
+    if (i_tags_get_int(&im->tags, "heif_quality", 0, &quality)) {
       heif_encoder_set_lossy_quality(encoder, quality);
     }
-    heif_encoder_set_lossy_quality(encoder, 80);
+    mm_log((1, "heif: colorspace %d chroma %d lossless %d quality %d\n",
+	    (int)cs, (int)chroma, lossless, quality));
+
+    heif_encoder_set_lossless(encoder, lossless);
 
     err = heif_image_create(im->xsize, im->ysize, cs, chroma, &him);
     if (err.code != heif_error_Ok) {
       i_push_errorf(0, "heif error %d", (int)err.code);
       goto fail;
     }
-    /* FIXME: compression level */
-    /* FIXME: "lossless" (rgb->YCbCr will lose some data) */
     /* FIXME: metadata */
     /* FIXME: leaks? */
     {
@@ -381,6 +380,7 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
       if (err.code != heif_error_Ok) {
 	i_push_error(0, "failed to add plane");
       failimage:
+	heif_encoder_release(encoder);
 	heif_image_release(him);
 	goto fail;
       }
@@ -396,6 +396,9 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
 	i_push_error(0, "fail to encode");
 	goto failimage;
       }
+      heif_image_release(him);
+      heif_image_handle_release(him_h);
+      heif_encoder_release(encoder);
     }
   }
 
@@ -409,13 +412,10 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
     goto fail;
   }
   
-  heif_encoder_release(encoder);
   heif_context_free(ctx);
   return 1;
   
  fail:
-  if (encoder)
-    heif_encoder_release(encoder);
   heif_context_free(ctx);
 
   return 0;

@@ -200,7 +200,8 @@ sub _parse_message_cb {
           return $err if defined $err;
           push @res, $res;
         }
-        elsif ($encoding and defined $m->{data}) {
+        # Only bulk string replies can contain binary-safe encoded data
+        elsif ($m->{type} eq '$' and $encoding and defined $m->{data}) {
           push @res, Mojo::Util::decode($encoding, $m->{data});
         }
         else {
@@ -251,7 +252,7 @@ Mojo::Redis::Connection - Low level connection class for talking to Redis
 
   my $conn = Mojo::Redis::Connection->new(
                ioloop   => Mojo::IOLoop->singleton,
-               protocol => Protocol::Redis::XS->new(api => 1),
+               protocol => Protocol::Redis::Faster->new(api => 1),
                url      => Mojo::URL->new("redis://localhost"),
              );
 
@@ -316,8 +317,8 @@ Holds an instance of L<Mojo::IOLoop>.
   $protocol = $conn->protocol;
   $conn     = $conn->protocol(Protocol::Redis::XS->new(api => 1));
 
-Holds a protocol object, such as L<Protocol::Redis> that is used to generate
-and parse Redis messages.
+Holds a protocol object, such as L<Protocol::Redis::Faster> that is used to
+generate and parse Redis messages.
 
 =head2 url
 

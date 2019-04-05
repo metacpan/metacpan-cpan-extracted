@@ -1,4 +1,7 @@
 Revision history for Alien-libuuid
 
+0.02      2019-04-04 12:23:58 -0400
+  - Use https instead of http
+
 0.01      2018-09-03 09:11:19 -0400
   - initial version

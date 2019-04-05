@@ -1,0 +1,51 @@
+---
+abstract: 'Simple grouping and aggregate functions for DBIx::Class'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Class::Load: '0'
+  DBD::SQLite: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::ResultSet: '0'
+  DBIx::Class::Schema: '0'
+  File::Spec: '0'
+  Module::Metadata: '0'
+  SQL::Abstract::Test: '0'
+  SQL::Translator: '0.11018'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Roo: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - DBIC
+  - DBIx::Class
+  - plugin
+  - aggregated
+  - function
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Helper-SimpleStats
+provides:
+  DBIx::Class::Helper::SimpleStats:
+    file: lib/DBIx/Class/Helper/SimpleStats.pm
+    version: v0.1.1
+recommends:
+  Ref::Util::XS: '0'
+requires:
+  DBIx::Class: '0'
+  List::Util: '1.45'
+  Ref::Util: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/robrwo/DBIx-Class-Helper-SimpleStats/issues
+  repository: git://github.com/robrwo/DBIx-Class-Helper-SimpleStats.git
+version: v0.1.1
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'

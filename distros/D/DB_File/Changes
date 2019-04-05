@@ -1,5 +1,10 @@
 
+1.851 4 April Feb 2019
+
+   * Fix typo in MANIFEST with .travis.yml file
+
 1.850 10 Feb 2019
+
    * Added soure to github
      https://github.com/pmqs/DB_File
 

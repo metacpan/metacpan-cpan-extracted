@@ -1,3 +1,6 @@
+0.0301  2019-04-04
+    - dzil cleanups and convert to @SHLOMIF.
+
 0.0300  2016-03-31
     - Add an "-m" option for the command line client as a shortened form
     of "--msg".

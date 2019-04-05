@@ -1,5 +1,15 @@
 Revision history for Getargs-Mixed
 
+1.05		2019-04-04
+		No changes since 1.04_2 (trial version)
+
+1.04_2		2019-03-28
+		Better checking for invalid specifications; additional tests.
+
+1.04_1		2019-02-23
+		Better handling of specifications that include multiple semicolons
+		(which is unsupported).
+
 1.04        2019-02-11
         Added OO interface (new()) and -undef_ok option.
 

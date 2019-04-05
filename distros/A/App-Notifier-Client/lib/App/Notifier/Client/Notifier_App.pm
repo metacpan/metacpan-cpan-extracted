@@ -1,11 +1,7 @@
 package App::Notifier::Client::Notifier_App;
-
+$App::Notifier::Client::Notifier_App::VERSION = '0.0301';
 use strict;
 use warnings;
-
-use vars qw($VERSION);
-
-$VERSION = '0.0300';
 
 use 5.012;
 
@@ -16,32 +12,11 @@ use YAML::XS qw( LoadFile );
 
 use App::Notifier::Client;
 
-=head1 NAME
-
-App::Notifier::Client::Notifier_App - implements the notifier command-line
-app.
-
-=head1 SYNOPSIS
-
-    use strict;
-    use warnings;
-
-    use App::Notifier::Client::Notifier_App;
-
-    App::Notifier::Client::Notifier_App->new({argv => [@ARGV],})->run();
-
-=head1 FUNCTIONS
-
-=head2 new({argv => [@ARGV]})
-
-The constructor - call it with the command-line options.
-
-=cut
 
 sub new
 {
     my $class = shift;
-    my $self = bless {}, $class;
+    my $self  = bless {}, $class;
     $self->_init(@_);
     return $self;
 }
@@ -50,28 +25,23 @@ sub _argv
 {
     my $self = shift;
 
-    if (@_) {
+    if (@_)
+    {
         $self->{_argv} = shift;
     }
 
     return $self->{_argv};
 }
 
-
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    $self->_argv([ @{$args->{argv}} ]);
+    $self->_argv( [ @{ $args->{argv} } ] );
 
     return;
 }
 
-=head2 run
-
-Actually run the command line application.
-
-=cut
 
 sub run
 {
@@ -81,37 +51,41 @@ sub run
 
     my $op = shift(@$argv);
 
-    if (!defined($op))
+    if ( !defined($op) )
     {
         die "You did not specify any arguments - see --help";
     }
 
-    if (($op eq "-h") || ($op eq "--help"))
+    if ( ( $op eq "-h" ) || ( $op eq "--help" ) )
     {
         pod2usage(1);
     }
-    elsif ($op eq "--man")
+    elsif ( $op eq "--man" )
     {
-        pod2usage(-verbose => 2);
+        pod2usage( -verbose => 2 );
     }
 
-    if ($op ne 'notify')
+    if ( $op ne 'notify' )
     {
         die "Unknown operation - '$op'!";
     }
 
     my $help = 0;
-    my $man = 0;
-    my ($to, $url, $cmd_id, $msg);
-    if (! (my $ret = GetOptionsFromArray(
-        $argv,
-        'help|h' => \$help,
-        man => \$man,
-        'to=s' => \$to,
-        'url=s' => \$url,
-        'cmd=s' => \$cmd_id,
-        'msg|m=s' => \$msg,
-    )))
+    my $man  = 0;
+    my ( $to, $url, $cmd_id, $msg );
+    if (
+        !(
+            my $ret = GetOptionsFromArray(
+                $argv,
+                'help|h'  => \$help,
+                man       => \$man,
+                'to=s'    => \$to,
+                'url=s'   => \$url,
+                'cmd=s'   => \$cmd_id,
+                'msg|m=s' => \$msg,
+            )
+        )
+        )
     {
         die "GetOptions failed!";
     }
@@ -123,24 +97,24 @@ sub run
 
     if ($man)
     {
-        pod2usage(-verbose => 2);
+        pod2usage( -verbose => 2 );
     }
 
-    if (!defined($url))
+    if ( !defined($url) )
     {
-        if (!defined($to))
+        if ( !defined($to) )
         {
             $to = 'default';
         }
 
-        my $config_fn = ($ENV{'NOTIFIER_CONFIG'}
-            || File::Spec->catfile($ENV{HOME}, '.app_notifier.yml'));
+        my $config_fn = ( $ENV{'NOTIFIER_CONFIG'}
+                || File::Spec->catfile( $ENV{HOME}, '.app_notifier.yml' ) );
 
         my $config = LoadFile($config_fn);
 
         my $host_config = $config->{client}->{targets}->{$to};
 
-        if (!defined($host_config))
+        if ( !defined($host_config) )
         {
             die "Cannot find host config '$to' in $config_fn.";
         }
@@ -148,7 +122,7 @@ sub run
         $url = $host_config->{url};
     }
 
-    if (!defined( $url ))
+    if ( !defined($url) )
     {
         die "No URL specified - please specify one.";
     }
@@ -156,13 +130,58 @@ sub run
     App::Notifier::Client->notify(
         {
             base_url => $url,
-            ( defined($cmd_id) ? (cmd_id => $cmd_id) : () ),
-            ( defined($msg) ? (msg => $msg) : () ),
+            ( defined($cmd_id) ? ( cmd_id => $cmd_id ) : () ),
+            ( defined($msg)    ? ( msg    => $msg )    : () ),
         }
     );
 
     return;
 }
+
+
+1;    # End of Module::Format::PerlMF_App
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+App::Notifier::Client::Notifier_App
+
+=head1 VERSION
+
+version 0.0301
+
+=head1 SYNOPSIS
+
+    use strict;
+    use warnings;
+
+    use App::Notifier::Client::Notifier_App;
+
+    App::Notifier::Client::Notifier_App->new({argv => [@ARGV],})->run();
+
+=head1 NAME
+
+App::Notifier::Client::Notifier_App - implements the notifier command-line
+app.
+
+=head1 VERSION
+
+version 0.0301
+
+=head1 FUNCTIONS
+
+=head2 new({argv => [@ARGV]})
+
+The constructor - call it with the command-line options.
+
+=head2 run
+
+Actually run the command line application.
 
 =head1 AUTHOR
 
@@ -202,7 +221,16 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut
-
-1; # End of Module::Format::PerlMF_App

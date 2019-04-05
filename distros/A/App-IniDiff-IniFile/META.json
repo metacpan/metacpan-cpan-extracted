@@ -1,0 +1,62 @@
+{
+   "abstract" : "App::IniDiff, scripts to diff and patch INI files",
+   "author" : [
+      "Michael Rendell, Memorial University of Newfoundland",
+      "Jeremy Squires <j.squires@computer.org> (Current Maintainer)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-IniDiff-IniFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Getopt::Std" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Temp" : "0",
+            "Test2::Bundle::More" : "0",
+            "Test::Cmd" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/jeremysquires/App-IniDiff"
+      }
+   },
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

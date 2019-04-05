@@ -20,7 +20,7 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Authen::Passphrase' => '0.008',
 		'Crypt::Argon2' => '0.005',
-		'Mime::Base64' => 0,
+		'MIME::Base64' => 0,
 		'Data::GUID' => '0.049',
 		'Carp' => 0,
 		'Syntax::Construct' => '1.004',
@@ -36,7 +36,8 @@ WriteMakefile(
 		},
 		x_contributors => [
 			'Alexander Hartmaier <abraxxa@cpan.org>',
-			'Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 <daxim@cpan.org>'
+			'Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 <daxim@cpan.org>',
+			'Wesley Schwengle <waterkip@cpan.org>'
 		],
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

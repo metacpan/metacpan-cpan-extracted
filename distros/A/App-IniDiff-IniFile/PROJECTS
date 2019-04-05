@@ -1,0 +1,21 @@
+Things to do:
+
+IniFile.pm:
+	- write perldocs for the library routines
+    - add unit tests for IniFile.pm
+    - modify to allow use of different INI/IOD parsers
+    - make it an Exporter
+
+scripts:
+    - add bad data tests
+        - quotehandling.ini
+    - inicat
+        - allow comment and whitespace processing via options
+    - inifilter
+        - fix sectionsspace deletion test in t/data/anotherFilterFile.ini
+
+windows registry:
+    - add a script to round trip registry dumps to INI and back
+
+parsers:
+    - allow different INI parsers to be used to support wider INI formats

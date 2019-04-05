@@ -7,3 +7,6 @@ Revision history for Authen-Passphrase-Argon2
 		Take some inspiration for rfc2307 from abraxxa // daxim github implementation's
 		re-facotor the new subroutine
 		et write some more tests
+
+0.06    04/04/2019
+        Fix dependency typo for MIME::Base64 (waterkip)

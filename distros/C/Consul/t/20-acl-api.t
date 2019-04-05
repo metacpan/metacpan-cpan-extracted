@@ -5,11 +5,12 @@ use strict;
 
 use Test::More;
 use Test::Exception;
-use Test::Consul 0.007;
+use Test::Consul 0.013;
 
 use Consul;
 
 Test::Consul->skip_all_if_no_bin;
+Test::Consul->skip_all_unless_version(0, 1_004_000);
 
 my $tc = Test::Consul->start(
   enable_acls => 1,

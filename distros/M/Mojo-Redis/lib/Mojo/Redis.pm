@@ -7,8 +7,9 @@ use Mojo::Redis::Cache;
 use Mojo::Redis::Cursor;
 use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
+use Scalar::Util 'blessed';
 
-our $VERSION = '3.19';
+our $VERSION = '3.20';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 
@@ -16,7 +17,7 @@ has encoding        => 'UTF-8';
 has max_connections => 5;
 
 has protocol_class => do {
-  my $class = $ENV{MOJO_REDIS_PROTOCOL} || 'Protocol::Redis';
+  my $class = $ENV{MOJO_REDIS_PROTOCOL} || 'Protocol::Redis::Faster';
   eval "require $class; 1" or die $@;
   $class;
 };
@@ -35,8 +36,10 @@ sub db { Mojo::Redis::Database->new(redis => shift) }
 
 sub new {
   my $class = shift;
-  return $class->SUPER::new(url => Mojo::URL->new(shift), @_) if @_ % 2 and ref $_[0] ne 'HASH';
-  return $class->SUPER::new(@_);
+  return $class->SUPER::new(@_) unless @_ % 2 and ref $_[0] ne 'HASH';
+  my $url = shift;
+  $url = Mojo::URL->new($url) unless blessed $url and $url->isa('Mojo::URL');
+  return $class->SUPER::new(url => $url, @_);
 }
 
 sub _connection {
@@ -156,7 +159,7 @@ limitations:
 
 =item * Cannot handle binary data
 
-L<Mojo::Redis::Cache> uses L<Protocol::Redis> for now, since
+L<Mojo::Redis::Cache> uses L<Protocol::Redis::Faster> for now, since
 L<Protocol::Redis::XS> fail to handle binary data.
 
 See L<https://github.com/dgl/protocol-redis-xs/issues/4> for more information.
@@ -172,9 +175,7 @@ See L<https://github.com/dgl/protocol-redis-xs/issues/5> for more information.
 =back
 
 If you experience any issues with L<Protocol::Redis::XS> then please report
-them to L<https://github.com/dgl/protocol-redis-xs/issues>. It is still the
-default L</protocol> though, since it is a lot faster than L<Protocol::Redis>
-for most tasks.
+them to L<https://github.com/dgl/protocol-redis-xs/issues>.
 
 =head1 EVENTS
 
@@ -211,9 +212,9 @@ Maximum number of idle database handles to cache for future use, defaults to
   $str   = $redis->protocol_class;
   $redis = $redis->protocol_class("Protocol::Redis::XS");
 
-Default to L<Protocol::Redis>. This will be changed in the future, if we see a
-more stable version of an alternative to L<Protocol::Redis::XS>.  See
-L</CAVEATS> for details.
+Default to L<Protocol::Redis::Faster>. You can change this to
+L<Protocol::Redis::XS> if you need a faster protocl parser, but do look at
+L</CAVEATS> for first.
 
 =head2 pubsub
 
@@ -261,9 +262,11 @@ L<Mojo::Redis::Cursor/new>. for possible commands.
 Object constructor. Can coerce a string into a L<Mojo::URL> and set L</url>
 if present.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jan Henning Thorsen
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+Dan Book - C<grinnz@grinnz.com>
 
 =head1 COPYRIGHT AND LICENSE
 

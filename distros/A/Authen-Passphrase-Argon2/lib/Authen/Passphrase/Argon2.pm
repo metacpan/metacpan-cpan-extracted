@@ -11,7 +11,7 @@ use Syntax::Construct qw( ?<> /a );
 
 use parent 'Authen::Passphrase';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our (%salts, %hashes, @argons);
 BEGIN {
@@ -195,7 +195,7 @@ Authen::Passphrase::Argon2 - Store and check password using Argon2
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 

@@ -13,7 +13,7 @@
 
 package Data::Table::Text;
 use v5.20;
-our $VERSION = 20190330;                                                        # Version
+our $VERSION = 20190404;                                                        # Version
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess carp cluck);
@@ -73,14 +73,14 @@ sub fff($$@)                                                                    
   my $m = join ' ', @m;                                                         # Time stamp each message
   $m .= " at $file line $line";
 
-  confess "  $m\n";                                                               # Confess
+  confess "  $m\n";                                                             # Confess
  }
 
 sub lll(@)                                                                      # Log messages including the project name if available. This method is not merged as we need to retain its prototype.
  {my (@m) = @_;                                                                 # Messages
   return unless (join '', @_) =~ m(\S)s;
 
-  my $m = join '', timeStamp, " ", @_;                                          # Time stamp each message
+  my $m = join ' ', timeStamp, @_;                                              # Time stamp each message
   my ($p, $f, $l) = caller();
   $m .= " at $f line $l";
 
@@ -2444,6 +2444,25 @@ sub numberOfLinesInString($)                                                    
   scalar split /\n/, $string;
  }
 
+sub javaScriptExports($)                                                        # Extract the Javascript functions marked for export in a file or string.  Functions are marked for export by placing function in column 1 followed by //E on the same line.  The end of the exported function is located by \n }
+ {my ($fileOrString) = @_;                                                      # File or string
+  my $s = $fileOrString =~ m(\n) ? $fileOrString : readFile($fileOrString);
+  my @s;
+  my $state = 0;
+  for my $line(split /\n/, $s)
+   {if      ($state == 0)
+     {if ($line =~ m(\Afunction.*\/\/E))
+       {$state = 1;
+        push @s, q(), $line;
+       }
+     }
+    elsif ($state == 1)
+     {$state = 0 if $line =~ m(\A \});
+      push @s, $line;
+     }
+   }
+  join "\n", @s, '';
+ }
 
 #D1 Unicode                                                                     # Translate ascii alphanumerics in strings to various Unicode blocks.
 
@@ -2537,7 +2556,7 @@ sub newUdsr(@)                                                                  
    );
  }
 
-sub newUdsrServer(@)                                                          # Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
+sub newUdsrServer(@)                                                            # Create a communications server - a means to communicate between processes on the same machine via L<Udsr::read|/Udsr::read> and L<Udsr::write|/Udsr::write>.
  {my (@parms) = @_;                                                             # Attributes per L<Udsr Definition|/Udsr Definition>
   my $u = newUdsr(@_);
   unlink $u->socketPath;
@@ -2727,7 +2746,7 @@ sub wwwDecode($)                                                                
   $r
  }
 
-sub awsTranslateText($$$;$)                                                      # Translate B<$text> from English to a specified B<$language> using AWS Translate with the specified global B<$options> and return the translated string.  Translations are cached in the specified B<$cacheFolder> for reuse were feasible.
+sub awsTranslateText($$$;$)                                                     # Translate B<$text> from English to a specified B<$language> using AWS Translate with the specified global B<$options> and return the translated string.  Translations are cached in the specified B<$cacheFolder> for reuse were feasible.
  {my ($string, $language, $cacheFolder, $Options) = @_;                         # String to translate, language code, cache folder, aws global options string
 
   $language =~ m(\A(ar|zh|zh\-TW|cs|da|nl|en|fi|fr|de|he|id|it|ja|ko|pl|pt|ru|es|sv|tr)\Z)i or
@@ -3875,7 +3894,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
  hexToAsciiString hostName htmlToc
  imageSize indentString indexOfMax indexOfMin ipAddressViaArp isBlank isFileUtf8
  isSubInPackage
- javaPackage javaPackageAsFileName
+ javaPackage javaPackageAsFileName javaScriptExports
  keyCount
  lll loadArrayArrayFromLines loadArrayFromLines loadArrayHashFromLines loadHash
  loadHashArrayFromLines loadHashFromLines loadHashHashFromLines
@@ -9590,10 +9609,13 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
+use Test::Harness qw($verbose);
+   $Test::Harness::verbose = 1;
+
 Test::More->builder->output("/dev/null")                                        # Reduce number of confirmation messages during testing
   if ((caller(1))[0]//'Data::Table::Text') eq "Data::Table::Text";
 
-use Test::More tests => 532;
+use Test::More tests => 533;
 my $haiku     = $^O =~ m(haiku)i;
 my $windows   = $^O =~ m(MSWin32)i;
 my $mac       = $^O =~ m(darwin)i;
@@ -10442,7 +10464,6 @@ if (0) {                                                                        
 
 if (1) {                                                                        #TformatTableBasic
   my $d = [[qw(a 1)], [qw(bb 22)], [qw(ccc 333)], [qw(dddd 4444)]];
-  say STDERR "AAAA ", dump(formatTableBasic($d));
   ok formatTableBasic($d) eq <<END, q(ftb);
 a        1
 bb      22
@@ -10450,8 +10471,6 @@ ccc    333
 dddd  4444
 END
   }
-
-#say STDERR "AAAA ", dump(Test::More->builder->{Stack}[0]{count});
 
 if (0) {                                                                        #TstartProcess #TwaitForAllStartedProcessesToFinish
   my %pids;
@@ -10461,14 +10480,21 @@ if (0) {                                                                        
  }
 
 if (!$windows) {
-say STDERR "BBBB ", dump(dateTimeStamp);
+say STDERR "AAAA ";
 ok dateTimeStamp     =~ m(\A\d{4}-\d\d-\d\d at \d\d:\d\d:\d\d\Z), q(dts);       #TdateTimeStamp
+say STDERR "BBBB ";
 ok dateTimeStampName =~ m(\A_on_\d{4}_\d\d_\d\d_at_\d\d_\d\d_\d\d\Z);           #TdateTimeStampName
+say STDERR "CCCC ";
 ok dateStamp         =~ m(\A\d{4}-\w{3}-\d\d\Z);                                #TdateStamp
+say STDERR "DDDD ";
 ok versionCode       =~ m(\A\d{8}-\d{6}\Z);                                     #TversionCode
+say STDERR "EEEE ";
 ok versionCodeDashed =~ m(\A\d{4}-\d\d-\d\d-\d\d:\d\d:\d\d\Z);                  #TversionCodeDashed
+say STDERR "FFFF ";
 ok timeStamp         =~ m(\A\d\d:\d\d:\d\d\Z);                                  #TtimeStamp
+say STDERR "GGGG ";
 ok microSecondsSinceEpoch > 47*365*24*60*60*1e6;                                #TmicroSecondsSinceEpoch
+say STDERR "HHHH ";
  }
 else
  {ok 1 for 1..7;
@@ -11437,12 +11463,34 @@ if (1) {                                                                        
 
 ok nameFromFolder(fpe(qw( a b c d e))) eq q(c);                                 #TnameFromFolder
 
-
 if (1) {                                                                        #TparseDitaRef
   is_deeply [parseDitaRef(q(a#b/c))], [qw(a b c)];
   is_deeply [parseDitaRef(q(#b/c))],  [q(), qw(b c)];
   is_deeply [parseDitaRef(q(#b))],    [q(), q(b), q()];
   is_deeply [parseDitaRef(q(#/c))],   [q(), q(), q(c)];
+ }
+
+if (1) {                                                                        #TjavaScriptExports
+  ok javaScriptExports(<<END) eq <<END;
+function aaa()            //E
+ {console.log('aaa');
+ }
+
+//EEEEEEEEE
+
+function bbb()            //E
+ {console.log('bbb');
+ }
+END
+
+function aaa()            //E
+ {console.log('aaa');
+ }
+
+function bbb()            //E
+ {console.log('bbb');
+ }
+END
  }
 
 #tttt

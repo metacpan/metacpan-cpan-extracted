@@ -17,7 +17,7 @@ for my $v ($] - 0.001, $], $] + 0.001) {
     qq["$str_v"],
     qq["v$str_v"],
     qq[v$str_v],
-    qq[version->parse("$str_v")]
+    qq[version->new("$str_v")]
   ) {
     SKIP: {
       skip "version.pm not available", 1

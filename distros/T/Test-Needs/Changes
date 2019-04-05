@@ -1,5 +1,12 @@
 Revision history for Test::Needs
 
+0.002006 - 2019-04-04
+  - added additional references to related modules in pod
+  - various internal cleanups
+  - fix backwards compatibility with earlier versions of version.pm
+  - fix output from test script when tests fail
+  - added note about RELEASE_TESTING to test message on forced failures
+
 0.002005 - 2016-09-27
   - fix skipping when Test::Tester (Test::More < v2) is loaded
 

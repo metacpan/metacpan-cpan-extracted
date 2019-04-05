@@ -33,7 +33,7 @@
    "provides" : {
       "Mojo::Redfish::Client" : {
          "file" : "lib/Mojo/Redfish/Client.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Mojo::Redfish::Client::Result" : {
          "file" : "lib/Mojo/Redfish/Client/Result.pm"
@@ -51,6 +51,6 @@
          "url" : "http://github.com/jberger/Mojo-Redfish-Client"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

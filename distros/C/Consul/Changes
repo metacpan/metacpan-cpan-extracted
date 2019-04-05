@@ -1,3 +1,6 @@
+0.025     2019-04-05 12:05:24+11:00 Australia/Melbourne
+- Test updates for Test::Consul 0.013 / consul >= 1.4
+
 0.024     2019-02-21 08:22:12+11:00 Australia/Melbourne
 - Bugfix: Not all meta fields are required.
 

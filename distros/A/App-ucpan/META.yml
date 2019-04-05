@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.15, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.18, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   App::ucpan:
     file: lib/App/ucpan.pm
-    version: '1.07'
+    version: '1.08'
 requires:
   Config: '0'
   File::Copy: '0'
@@ -45,7 +45,7 @@ requires:
   utf8: '0'
   version: '0'
   warnings: '0'
-version: '1.07'
+version: '1.08'
 x_authority: cpan:KPEE
 x_contributors:
   - 'KPEE <kpee.cpanx@gmail.com>'

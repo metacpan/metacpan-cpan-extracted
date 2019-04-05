@@ -67,17 +67,24 @@ SEE ALSO
         Part of the Test2 ecosystem. Only supports running as a "use"
         command to skip an entire plan.
 
-AUTHOR
+    Test2::Require::Perl
+        Part of the Test2 ecosystem. Only supports running as a "use"
+        command to skip an entire plan. Checks perl versions.
+
+    Test::If
+        Acts as a "use" statement. Only supports running as a "use" command
+        to skip an entire plan. Can skip based on subref results.
+
+AUTHORS
     haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
 
 CONTRIBUTORS
     None so far.
 
-COPYRIGHT
-    Copyright (c) 2016 the Test::Needs "AUTHOR" and "CONTRIBUTORS" as listed
-    above.
+COPYRIGHT AND LICENSE
+    Copyright (c) 2016 the Test::Needs "AUTHORS" and "CONTRIBUTORS" as
+    listed above.
 
-LICENSE
     This library is free software and may be distributed under the same
     terms as perl itself. See <http://dev.perl.org/licenses/>.
 

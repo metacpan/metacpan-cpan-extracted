@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::Solution::Base;
-$Games::Solitaire::Verify::Solution::Base::VERSION = '0.1900';
+$Games::Solitaire::Verify::Solution::Base::VERSION = '0.2000';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ sub _init
                 my $t = readline( $args->{input_fh} );
                 $t =~ s/ +$//gms;
                 $t;
-                }
+            }
         ]
     );
     $self->_ln(0);
@@ -100,11 +100,11 @@ all Games::Solitaire::Verify::Solution::* classes.
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 AUTHOR
 

@@ -1,5 +1,15 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.8 2019-04-04T09:03:04Z
+
+    - Fix bug of code handling of in-memory file.
+
+4.10.7 2019-04-04T07:07:56Z
+
+    - Fix problem when comparing /dev/fd/* files.
+
+    To get the "optex -Mtextconv" module to work.
+
 4.10.6 2019-03-20T08:20:46Z
 
     - Fix bug of 'sdif --cdif' does not work.

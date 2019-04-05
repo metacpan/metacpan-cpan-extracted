@@ -26,6 +26,7 @@ lib/Games/Solitaire/Verify/Column.pm
 lib/Games/Solitaire/Verify/Exception.pm
 lib/Games/Solitaire/Verify/Foundations.pm
 lib/Games/Solitaire/Verify/Freecells.pm
+lib/Games/Solitaire/Verify/HorneAutomovePrune.pm
 lib/Games/Solitaire/Verify/KlondikeTalon.pm
 lib/Games/Solitaire/Verify/Move.pm
 lib/Games/Solitaire/Verify/Solution.pm
@@ -61,6 +62,7 @@ t/data/sample-solutions/fcs-larrysan-kings-only-0-freecells-unlimited-move.txt
 t/data/sample-solutions/fcs-relaxed-freecell-11982.txt
 t/data/sample-solutions/fcs-seahaven-towers-1977.txt
 t/data/sample-solutions/fcs-simple-simon-24.txt
+t/data/sample-solutions/from-patsolve--want.txt
 t/data/sample-solutions/patsolve-338741497-win-solution.txt
 t/expand-solution.t
 t/from-patsolve.t

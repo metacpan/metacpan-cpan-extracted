@@ -8,7 +8,7 @@ const shareDir = process.env.WEBPACK_SHARE_DIR || './assets';
 const sourceMap = process.env.WEBPACK_SOURCE_MAPS ? true : isDev ? true : false;
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const WebpackMd5Hash = require('webpack-md5-hash');
+const HashOutput = require('webpack-plugin-hash-output');
 
 const config = {
   mode: isDev ? 'development' : 'production',
@@ -23,6 +23,7 @@ const config = {
     path: outDir
   },
   plugins: [
+    new HashOutput(),
     new HtmlWebpackPlugin({
       cache: true,
       filename: './webpack.' + (process.env.WEBPACK_CUSTOM_NAME ? process.env.WEBPACK_CUSTOM_NAME : isDev ? 'development' : 'production') + '.html',
@@ -33,7 +34,6 @@ const config = {
       template: shareDir + '/webpack.html',
       xhtml: false
     }),
-    new WebpackMd5Hash()
   ]
 };
 

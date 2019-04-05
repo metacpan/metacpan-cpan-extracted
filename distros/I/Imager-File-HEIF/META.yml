@@ -27,5 +27,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager-File-HEIF
   homepage: http://imager.perl.org/
   repository: git://github.com/tonycoz/imager-file-heif.git
-version: '0.002'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

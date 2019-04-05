@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "URI" : "0",
             "perl" : "5.008001"
          }
       },
@@ -54,7 +55,7 @@
    "provides" : {
       "URI::s3" : {
          "file" : "lib/URI/s3.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -68,7 +69,10 @@
          "web" : "https://github.com/karupanerura/URI-s3"
       }
    },
-   "version" : "v0.01",
+   "version" : "v0.2",
+   "x_contributors" : [
+      "Michal Josef Špaček <michal.spacek@gooddata.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

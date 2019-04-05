@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::App::CmdLine::From_Patsolve;
-$Games::Solitaire::Verify::App::CmdLine::From_Patsolve::VERSION = '0.1900';
+$Games::Solitaire::Verify::App::CmdLine::From_Patsolve::VERSION = '0.2000';
 use strict;
 use warnings;
 
@@ -390,7 +390,7 @@ converting from patsolve solutions to fc-solve ones.
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 SYNOPSIS
 
@@ -403,7 +403,7 @@ converting from patsolve solutions to fc-solve ones.
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 METHODS
 

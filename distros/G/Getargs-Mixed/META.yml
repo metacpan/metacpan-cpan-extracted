@@ -21,7 +21,7 @@ no_index:
 provides:
   Getargs::Mixed:
     file: lib/Getargs/Mixed.pm
-    version: '1.04'
+    version: '1.05'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -31,7 +31,7 @@ requires:
 resources:
   bugtracker: https://github.com/cxw42/Getargs-Mixed/issues
   repository: https://github.com/cxw42/Getargs-Mixed.git
-version: '1.04'
+version: '1.05'
 x_contributors:
   - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
   - 'Christopher White <cxw@cpan.org>'

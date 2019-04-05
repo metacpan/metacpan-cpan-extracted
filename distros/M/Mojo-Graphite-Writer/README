@@ -20,7 +20,7 @@ DESCRIPTION
     batching and queuing writes to the server.
 
     This is still a work-in-progress, however the author uses it in work
-    application so every effort will be made to keep the api reasonably
+    applications so every effort will be made to keep the api reasonably
     stable while improving where possible.
 
 ATTRIBUTES

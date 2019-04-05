@@ -1,3 +1,8 @@
+0.013     2019-04-05 12:00:24+11:00 Australia/Melbourne
+ - add find_version and skip_all_unless_version
+ - croak when enabling ACLs on Consul >= 1.4.0 (not currently supported)
+ - support for Consul >= 1.0.5 (disable gRPC port)
+
 0.012     2017-10-18 22:30:21+11:00 Australia/Melbourne
  - minor fixes to support Consul 1.0.0
 

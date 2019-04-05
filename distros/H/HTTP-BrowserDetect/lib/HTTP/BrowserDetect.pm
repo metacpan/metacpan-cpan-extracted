@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.22';
+our $VERSION = '3.23';
 
 use vars qw(@ALL_TESTS);
 
@@ -1060,7 +1060,8 @@ sub _init_robots {
         $robot_fragment = 'msnbot';
     }
     elsif (index( $ua, 'binglocalsearch' ) != -1
-        || index( $ua, 'bingbot' ) != -1 ) {
+        || index( $ua, 'bingbot' ) != -1
+        || index( $ua, 'bingpreview' ) != -1 ) {
         $r                      = 'bingbot';
         $robot_tests->{bingbot} = 1;
         $robot_fragment         = 'bingbot';
@@ -2979,7 +2980,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.22
+version 3.23
 
 =head1 SYNOPSIS
 

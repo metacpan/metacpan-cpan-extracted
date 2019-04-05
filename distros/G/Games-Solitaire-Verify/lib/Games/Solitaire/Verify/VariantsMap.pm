@@ -1,5 +1,5 @@
 package Games::Solitaire::Verify::VariantsMap;
-$Games::Solitaire::Verify::VariantsMap::VERSION = '0.1900';
+$Games::Solitaire::Verify::VariantsMap::VERSION = '0.2000';
 use strict;
 use warnings;
 
@@ -219,11 +219,11 @@ their parameters.
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 FUNCTIONS
 
@@ -313,10 +313,6 @@ L<http://annocpan.org/dist/Games-Solitaire-Verify>
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Games-Solitaire-Verify>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Games-Solitaire-Verify>
 
 =back
 

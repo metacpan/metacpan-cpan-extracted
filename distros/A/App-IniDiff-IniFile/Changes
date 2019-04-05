@@ -1,0 +1,57 @@
+Revision history for App-IniDiff-IniFile
+
+## Release Notes ##
+
+0.16    2019-04-02
+        Conversion from 0.15 Regutils package here:
+        https://sourceforge.net/projects/regutils/
+
+        add -o outfile to inicat.pl
+
+0.15    March 5, 2014 Jeremy Squires
+
+        Build system modified for Windows
+            modified to work with Cygwin and gcc
+            default compiler changed to gcc in Makefile
+        added make_exes.bat for building Perl exes
+            requires ActiveState Perl (tested on 5.8.9) and PDK 7.1
+        Added binary distribution targets
+        Fixed issue with Deletion of Upper Case Fields
+
+0.14    Jan 6, 2014 Jeremy Squires
+
+        inidiff add options
+          -i ignore the case of comparisons.
+          -M add ^M to output to support old (pre-NT) Windows/DOS systems 
+            (old default, now optional).
+          -c strip trailing inline comments after semicolon 
+            (old default, now optional).
+        IniFile.pm add support for new options and ; comment character
+        added internal documentation throughout
+        Fixed a few compatibility bugs to support Perl 5.8
+        inifilter added options
+          -e  Exports the filter results to a text format (debug purposes)
+          -p  Preserves the order of Ordered Field names
+              (such as mod_1, mod_2, etc.)
+
+0.11    Jan 6, 2014 Jeremy Squires
+
+        fixes to the POD documentation were made
+        added make targets to manage HTML docs
+        added make targets to manage patching source files more efficiently
+        added do_subst.pl for those without sh
+
+0.10
+
+        patch from Jeff Muizelaar to fix empty hex values (regedit)
+        regsort may now handle files with DOS style \r\n.
+
+0.9
+
+        patch from Jeff Muizelaar to fix exporting of win98 registeries.
+
+0.8
+
+        first public release (see README).
+
+

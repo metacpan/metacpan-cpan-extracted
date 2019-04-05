@@ -2,7 +2,7 @@ use alienfile;
 plugin 'PkgConfig' => 'uuid';
 share {
   plugin Download => (
-    url => 'http://sourceforge.net/projects/libuuid/files/libuuid-1.0.3.tar.gz',
+    url => 'https://sourceforge.net/projects/libuuid/files/libuuid-1.0.3.tar.gz',
     version => qr/([0-9\.]+)/,
   );
   plugin Extract => 'tar.gz';

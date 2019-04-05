@@ -1,5 +1,5 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.012';
+$Test::Consul::VERSION = '0.013';
 # ABSTRACT: Run a consul server for testing
 
 use 5.010;
@@ -17,7 +17,7 @@ use Scalar::Util qw( blessed );
 
 use Moo;
 use Types::Standard qw( Bool Enum Undef );
-use Types::Common::Numeric qw( PositiveInt );
+use Types::Common::Numeric qw( PositiveInt PositiveOrZeroInt );
 use Types::Common::String qw( NonEmptySimpleStr );
 
 my $start_port = 49152;
@@ -117,13 +117,22 @@ has bin => (
 );
 sub _build_bin {
     my ($self) = @_;
-    return $self->found_bin();
+    return $self->found_bin;
 }
 
 has datadir => (
     is        => 'ro',
     isa       => NonEmptySimpleStr,
     predicate => 1,
+);
+
+has version => (
+  is => 'lazy',
+  isa => PositiveOrZeroInt,
+  default => sub {
+    my ($self) = @_;
+    return $self->found_version;
+  },
 );
 
 sub running {
@@ -141,19 +150,9 @@ sub start {
     }
 
     my $bin = $self->bin();
-    unless (defined($bin) && -x $bin) {
-        croak "can't find consul binary";
-    }
 
     # Make sure we have at least Consul 0.6.1 which supports the -dev option.
-    my ($version) = qx{$bin version};
-    if ($version and $version =~ m{v(\d+)\.(\d+)\.(\d+)}) {
-        $version = sprintf('%03d%03d%03d', $1, $2, $3);
-    }
-    else {
-        $version = 0;
-    }
-    unless ($version >= 6_001) {
+    unless ($self->version >= 6_001) {
         croak "consul not version 0.6.1 or newer";
     }
 
@@ -176,11 +175,22 @@ sub start {
     # Version 0.7.0 reduced default performance behaviors in a way
     # that makese these tests slower to startup.  Override this and
     # make leadership election happen ASAP.
-    if ($version >= 7_000) {
+    if ($self->version >= 7_000) {
         $config{performance} = { raft_multiplier => 1 };
     }
 
+    # gRPC health checks were added 1.0.5, and in dev mode are enabled and bind
+    # to port 8502, which then clashes if you want to run up a second
+    # Test::Consul. Just disable it.
+    if ($self->version >= 1_000_005) {
+      $config{ports}{grpc} = -1;
+    }
+
     if ($self->enable_acls()) {
+      if ($self->version >= 1_004_000) {
+        croak "ACLs not supported with Consul >= 1.4.0"
+      }
+
         $config{acl_master_token} = $self->acl_master_token();
         $config{acl_default_policy} = $self->acl_default_policy();
         $config{acl_datacenter} = $self->datacenter();
@@ -276,12 +286,13 @@ sub wan_join {
     }
 }
 
-my ($bin, $bin_searched_for);
 sub found_bin {
-    return $bin if $bin_searched_for;
-    $bin = $ENV{CONSUL_BIN} || which "consul";
-    $bin_searched_for = 1;
-    return $bin;
+  state ($bin, $bin_searched_for);
+  return $bin if $bin_searched_for;
+  my $binpath = $ENV{CONSUL_BIN} || which "consul";
+  $bin = $binpath if defined($binpath) && -x $binpath;
+  $bin_searched_for = 1;
+  return $bin;
 }
 
 sub skip_all_if_no_bin {
@@ -295,6 +306,44 @@ sub skip_all_if_no_bin {
     return if defined $class->found_bin();
 
     main::plan( skip_all => 'The Consul binary must be available to run this test.' );
+}
+
+sub found_version {
+  state ($version);
+  return $version if defined $version;
+  my $bin = found_bin();
+  ($version) = qx{$bin version};
+  if ($version and $version =~ m{v(\d+)\.(\d+)\.(\d+)}) {
+    $version = sprintf('%03d%03d%03d', $1, $2, $3);
+  }
+  else {
+    $version = 0;
+  }
+}
+
+sub skip_all_unless_version {
+    my ($class, $minver, $maxver) = @_;
+
+    croak 'usage: Test::Consul->skip_all_unless_version($minver, [$maxver])'
+      unless defined $minver;
+
+    croak 'The skip_all_unless_version method may only be used if the plan ' .
+          'function is callable on the main package (which Test::More ' .
+          'and Test2::Tools::Basic provide)'
+          if !main->can('plan');
+
+    $class->skip_all_if_no_bin;
+
+    my $version = $class->found_version;
+
+    if (defined $maxver) {
+      return if $minver <= $version && $maxver > $version;
+      main::plan( skip_all => "Consul must be between version $minver and $maxver to run this test." );
+    }
+    else {
+      return if $minver <= $version;
+      main::plan( skip_all => "Consul must be version $minver or higher to run this test." );
+    }
 }
 
 1;
@@ -354,7 +403,10 @@ this defaults to a random unused port.
 
 =head2 enable_acls
 
-Set this to true to enable ACLs.
+Set this to true to enable ACLs. Note that Consul ACLs changed substantially in
+Consul 1.4, and L<Test::Consul> has not yet been updated to support them. If
+you try to enable them with Consul 1.4+, L<Test::Consul> will croak. See
+L<https://github.com/robn/Test-Consul/issues/7> for more info.
 
 =head2 acl_default_policy
 
@@ -437,6 +489,19 @@ binary could be found.
 
 This class method issues a C<skip_all> on the main package if the
 consul binary could not be found (L</found_bin> returns false).
+
+=head2 found_version
+
+Return the version of the consul binary, by running the binary return by
+L</found_bin> with the C<version> argument. Returns 0 if the version can't be
+determined.
+
+=head2 skip_all_unless_version
+
+    Test::Consul->skip_all_unless_version($minver, [$maxver]);
+
+This class method issues a C<skip_all> on the main package if the consul binary
+is not between C<$minver> and C<$maxvar> (exclusive).
 
 =head1 SEE ALSO
 

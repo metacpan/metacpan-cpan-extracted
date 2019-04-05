@@ -10,7 +10,7 @@ Mojo::IOLoop->server(
   {port => $port},
   sub {
     my ($loop, $stream) = @_;
-    my $protocol = Protocol::Redis->new(api => 1);
+    my $protocol = Protocol::Redis::Faster->new(api => 1);
     my @res = ({type => '$', data => 'OK'});
 
     push @res,

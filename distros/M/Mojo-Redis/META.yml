@@ -19,10 +19,13 @@ no_index:
     - inc
 requires:
   Mojolicious: '7.80'
-  Protocol::Redis: '1.0006'
+  Protocol::Redis::Faster: '0.002'
 resources:
   bugtracker: https://github.com/jhthorsen/mojo-redis/issues
   homepage: https://github.com/jhthorsen/mojo-redis
   repository: https://github.com/jhthorsen/mojo-redis.git
-version: '3.19'
+version: '3.20'
+x_contributors:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - 'Dan Book <grinnz@grinnz.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

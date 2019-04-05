@@ -9,3 +9,4 @@ cpanfile
 lib/Mojo/Redfish/Client.pm
 lib/Mojo/Redfish/Client/Result.pm
 t/00-use.t
+t/basic.t

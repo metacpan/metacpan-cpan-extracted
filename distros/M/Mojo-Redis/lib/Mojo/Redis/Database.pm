@@ -101,9 +101,10 @@ sub multi {
 }
 
 sub multi_p {
-  my $self = shift;
+  my ($self, @p) = @_;
   $self->{txn} = 'default';
-  return $self->connection->write_p('MULTI');
+  my $p = $self->connection->write_p('MULTI');
+  return @p ? $p->then(sub { Mojo::Promise->all(@p) }) : $p;
 }
 
 sub _add_method {
@@ -1078,10 +1079,21 @@ See L</multi_p>.
   $res     = $db->multi;
   $db      = $db->multi(sub { my ($db, $err, $res) = @_ });
   $promise = $db->multi_p;
+  $promise = $db->multi_p(@promises);
 
 Mark the start of a transaction block. Commands issued after L</multi> will
 automatically be discarded if C<$db> goes out of scope. Need to call
 L</exec> to commit the queued commands to Redis.
+
+When calling L</multi_p>, you can directly pass in the new instructions:
+
+  $db->multi_p(
+    $db->set_p("x:y:z" => 1011),
+    $db->get_p("x:y:z"),
+    $db->incr_p("x:y:z"),
+    $db->incrby_p("x:y:z" => -10),
+  )->then(sub {
+  });
 
 See L<https://redis.io/commands/multi> for more information.
 

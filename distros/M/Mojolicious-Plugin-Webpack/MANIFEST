@@ -34,6 +34,7 @@ t/builder.t
 t/command-webpack.t
 t/cwd.t
 t/example-build-assets.t
+t/headers.t
 t/Helper.pm
 t/install-deps.t
 t/markup.t
@@ -51,6 +52,8 @@ t/process-sass.t
 t/public/asset/add.dev.js
 t/public/asset/basic.dev.css
 t/public/asset/basic.dev.js
+t/public/asset/myapp.1df3519d71cda2667d35.js
+t/public/asset/myapp.658763d47b8fd5499dbf.css
 t/public/asset/myapp.83c8bca1a5ad16e5cf99.js
 t/public/asset/myapp.c809af61534a2c87e89a.css
 t/public/asset/myapp.dev.css
@@ -63,6 +66,7 @@ t/public/asset/webpack.process-js.html
 t/public/asset/webpack.process-sass.html
 t/public/asset/webpack.production.html
 t/public/asset/webpack.register.html
+t/public/no-max-age.txt
 t/register.t
 t/shim.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

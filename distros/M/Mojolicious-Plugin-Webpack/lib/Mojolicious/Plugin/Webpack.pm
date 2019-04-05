@@ -9,7 +9,7 @@ use Mojo::Util;
 
 use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 sub assets_dir { shift->{assets_dir} }
 sub out_dir    { shift->{out_dir} }
@@ -32,6 +32,7 @@ sub register {
   $self->{out_dir}    ||= $self->_build_out_dir($app);
 
   $app->helper(($config->{helper} || 'asset') => sub { $self->_helper(@_) });
+  $app->hook(after_static => \&_after_static_hook) unless $config->{no_after_static_hook};
   $app->plugin('Webpack::Builder' => $config) if $ENV{MOJO_WEBPACK_BUILD};
   $self->_register_assets;
 }
@@ -40,6 +41,18 @@ sub url_for {
   my ($self, $c, $name) = @_;
   my $asset = $self->{assets}{$name} or confess qq(Unknown asset name "$name".);
   return $c->url_for('webpack.asset', $asset->[1]);
+}
+
+sub _after_static_hook {
+  my $c = shift;
+
+  my $asset_path = $c->app->{'webpack.asset.path'} ||= do {
+    my $p = Mojo::Path->new($c->asset->route->render({name => 'name.ext'}));
+    pop @$p;
+    $p->to_string;
+  };
+
+  $c->res->headers->cache_control(LAZY ? 'no-cache' : 'max-age=86400') if 0 == index $c->req->url->path, $asset_path;
 }
 
 sub _build_assets_dir {
@@ -114,15 +127,15 @@ One or more assets need to be defined. The minimum is to create one
 L<entry point|https://webpack.js.org/concepts/#entry> and add it to
 the C<webpack.custom.js> file.
 
-  # Entrypoint: ./assets/app.js
+  # Entrypoint: ./assets/entry-cool_beans.js
   // This will result in one css and one js asset.
-  import "../css/css-example.css";
-  console.log("I'm loaded!");
+  import '../css/css-example.css';
+  console.log('I'm loaded!');
 
   # Config file: ./assets/webpack.custom.js
   module.exports = function(config) {
     config.entry = {
-      "cool_beans": "./assets/app.js",
+      'cool_beans': './assets/entry-cool_beans.js',
     };
   };
 
@@ -140,8 +153,8 @@ See L</register> for more config options.
 To include the generated assets in your template, you can use the L</asset>
 helper:
 
-  %= asset "myapp.css"
-  %= asset "myapp.js"
+  %= asset "cool_beans.css"
+  %= asset "cool_beans.js"
 
 =head2 Start application
 

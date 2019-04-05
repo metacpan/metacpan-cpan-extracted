@@ -10,10 +10,15 @@ my $on_automated_rig
   || $ENV{TRAVIS}
   || $ENV{APPVEYOR};
 
+my @aliens_l_and_I = qw(
+        Alien::geos::af
+        Alien::proj
+        Alien::sqlite
+  );
+
 #  make sure we get GEOS, PROJ and other support
 use Alien::geos::af;
 use Alien::proj;
-use Alien::spatialite;
 use Alien::sqlite;
 my $sep_char = $on_windows ? ';' : ':';
 $ENV{PATH} .= $sep_char
@@ -21,17 +26,20 @@ $ENV{PATH} .= $sep_char
     $sep_char,
     Alien::geos::af->bin_dir,
     Alien::proj->bin_dir,
-    Alien::spatialite->bin_dir,
     Alien::sqlite->bin_dir,
   );
+my $have_spatialite = eval 'require
+  Alien::spatialite';
+if ($have_spatialite) {
+    $have_spatialite = 'Alien' . '::' . 'spatialite';  #  hide from scanners
+    $ENV{PATH} .= $sep_char
+    . $have_spatialite->bin_dir;
+    push @aliens_l_and_I, $have_spatialite;
+}
+
 
 plugin 'Build::SearchDep' => (
-  aliens   => [qw(
-        Alien::geos::af
-        Alien::proj
-        Alien::sqlite
-        Alien::spatialite
-  )],
+  aliens   => [@aliens_l_and_I],
   public_I => 1,
   public_l => 1,
 );
@@ -162,8 +170,8 @@ share {
   if (Alien::sqlite->install_type eq 'share') {
     $with_sqlite3 = '--with-sqlite3=' . Alien::sqlite->dist_dir;
   }
-  if (Alien::spatialite->install_type eq 'share') {
-    $with_spatialite = '--with-spatialite=' . Alien::spatialite->dist_dir;
+  if ($have_spatialite && $have_spatialite->install_type eq 'share') {
+    $with_spatialite = '--with-spatialite=' . $have_spatialite->dist_dir;
   }
 
   build [

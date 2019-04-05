@@ -29,7 +29,7 @@
             "Alien::geos::af" : "1.005",
             "Alien::patch" : "0",
             "Alien::proj" : "1.02",
-            "Alien::spatialite" : "1.03",
+            "Alien::spatialite" : "0",
             "Alien::sqlite" : "1.02",
             "Archive::Tar" : "0",
             "Env::ShellWords" : "0.01",
@@ -55,7 +55,6 @@
             "Alien::geos::af" : "1.005",
             "Alien::patch" : "0",
             "Alien::proj" : "1.02",
-            "Alien::spatialite" : "1.03",
             "Alien::sqlite" : "1.02",
             "ExtUtils::MakeMaker" : "6.52",
             "FFI::CheckLib" : "0.23",
@@ -88,9 +87,9 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-gdal"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.51",
+      "generated_by" : "Alien::Build::MM version 1.62",
       "requires" : {
          "share" : {
             "Alien::MSYS" : "0.07",

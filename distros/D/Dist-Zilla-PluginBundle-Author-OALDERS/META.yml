@@ -32,6 +32,7 @@ requires:
   Dist::Zilla::Plugin::AutoPrereqs: '0'
   Dist::Zilla::Plugin::CPANFile: '0'
   Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CheckIssues: '0.01'
   Dist::Zilla::Plugin::ConfirmRelease: '0'
   Dist::Zilla::Plugin::ContributorsFile: '0'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
@@ -64,6 +65,7 @@ requires:
   Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
   Dist::Zilla::Plugin::RunExtraTests: '0'
   Dist::Zilla::Plugin::ShareDir: '0'
+  Dist::Zilla::Plugin::StaticInstall: '0.012'
   Dist::Zilla::Plugin::Test::CPAN::Changes: '0'
   Dist::Zilla::Plugin::Test::PodSpelling: '0'
   Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
@@ -90,7 +92,7 @@ resources:
   bugtracker: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders/issues
   homepage: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders
   repository: https://github.com/oalders/dist-zilla-pluginbundle-author-oalders.git
-version: '0.000022'
+version: '0.000023'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -391,7 +393,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.046'
@@ -399,7 +401,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.20.1
+          git_version: 2.21.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -494,7 +496,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -507,11 +509,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.000022
+          tag: v0.000023
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -548,7 +550,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -562,7 +564,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.21.0
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.046'
@@ -641,4 +643,4 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
 x_generated_by_perl: v5.26.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_serialization_backend: 'YAML::Tiny version 1.70'

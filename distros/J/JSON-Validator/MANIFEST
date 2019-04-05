@@ -100,6 +100,7 @@ t/remotes/folder/folderInteger.json
 t/remotes/integer.json
 t/remotes/subSchemas.json
 t/schema-as-attr.t
+t/spec/bundle-no-leaking-filename.json
 t/spec/bundlecheck.json
 t/spec/missing-ref.json
 t/spec/person.json

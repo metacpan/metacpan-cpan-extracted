@@ -4,7 +4,7 @@
       "lnation <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -36,7 +36,7 @@
             "Carp" : "0",
             "Crypt::Argon2" : "0.005",
             "Data::GUID" : "0.049",
-            "Mime::Base64" : "0",
+            "MIME::Base64" : "0",
             "Syntax::Construct" : "1.004",
             "perl" : "5.006"
          }
@@ -50,10 +50,11 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Authen-Passphrase-Argon2"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_contributors" : [
       "Alexander Hartmaier <abraxxa@cpan.org>",
-      "Lars DÉªá´á´á´á´á´¡ è¿ªææ¯ <daxim@cpan.org>"
+      "Lars DÉªá´á´á´á´á´¡ è¿ªææ¯ <daxim@cpan.org>",
+      "Wesley Schwengle <waterkip@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

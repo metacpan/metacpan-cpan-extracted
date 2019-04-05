@@ -36,6 +36,6 @@ t/meta-json.t
 t/meta-yaml.t
 typemap
 version.c
-.travis
+.travis.yml
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

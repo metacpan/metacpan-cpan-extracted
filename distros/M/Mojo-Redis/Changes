@@ -1,5 +1,10 @@
 Revision history for perl distribution Mojo-Redis
 
+3.20 2019-04-04T10:31:03+0700
+ - Use Protocol::Redis::Faster instead of Protocol::Redis #38
+ - Only decode data from bulk string responses #40
+ - Fix allowing custom URL object with userinfo in constructor #41
+
 3.19 2019-01-31T13:03:11+0900
  - Add support for encoding and decoding of JSON messages in Mojo::Redis::PubSub
 

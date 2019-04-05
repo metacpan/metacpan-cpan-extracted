@@ -1,5 +1,11 @@
 Revision history for Alien::gdal
 
+1.16 2019-04-04
+    - Disable Alien::spatialite for now, as it need
+      to be updated for recent proj changes. It will
+      still be linked to if it has been
+      pre-installed on a user's system.
+
 1.15 2019-01-25
     - Chain the dynamic libs from all alien deps.
       Hopefully this will avoid some Geo::GDAL::FFI issues.

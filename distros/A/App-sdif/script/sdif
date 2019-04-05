@@ -328,14 +328,6 @@ if ($opt_d) {
     printf STDERR "\$DIFF = %s\n", $DIFF // "undef";
 }
 
-if ($readfile) {
-    open(OLD, $OLD) || die "$OLD: $!\n";
-    open(NEW, $NEW) || die "$NEW: $!\n";
-    if ($opt_view) {
-	$DIFF = "/dev/null";
-    }
-}
-
 if ($opt_cdif) {
     my $pid = open DIFF, '-|';
     if (not defined $pid) {
@@ -357,6 +349,20 @@ if ($opt_cdif) {
     }
 } else {
     open(DIFF, $DIFF) || die "cannot open diff: $!\n";
+}
+
+if ($readfile) {
+
+    my $DIFFOUT = encode('utf8', do { local $/; <DIFF> });
+    close DIFF;
+    open  DIFF, '<', \$DIFFOUT or die;
+
+    open OLD, $OLD or die "$OLD: $!\n";
+    open NEW, $NEW or die "$NEW: $!\n";
+
+    # For reading /dev/fd/*
+    seek OLD, 0, 0 or die;
+    seek NEW, 0, 0 or die;
 }
 
 my @boundary = $opt_onword ? (boundary => 'word') : ();

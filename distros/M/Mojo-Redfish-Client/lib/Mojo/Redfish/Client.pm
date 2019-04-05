@@ -7,12 +7,11 @@ use Mojo::Collection;
 use Mojo::Redfish::Client::Result;
 use Scalar::Util ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 $VERSION = eval $VERSION;
 
-has host => sub { Carp::croak 'host is required' };
 has ssl  => 1;
-has [qw/password token username/];
+has [qw/host password token username/];
 
 has ua => sub {
   my $self = shift;
@@ -22,10 +21,17 @@ has ua => sub {
   $ua->on(prepare => sub {
     my ($ua, $tx) = @_;
     my $url = $tx->req->url;
-    $url->host($self->host);
-    $url->scheme($self->ssl ? 'https' : 'http');
+
+    if (defined(my $host = $self->host)) {
+      $url->host($host);
+    }
+
+    if (defined(my $ssl = $self->ssl)) {
+      $url->scheme($ssl ? 'https' : 'http');
+    }
+
     if (my $token = $self->token) {
-      $tx->req->header->header('X-Auth-Token', $token);
+      $tx->req->headers->header('X-Auth-Token', $token);
     } elsif (my $userinfo = $self->_userinfo) {
       $url->userinfo($userinfo);
     }
@@ -92,7 +98,6 @@ L<Mojo::Redfish::Client> inherits all attributes from L<Mojo::Base> and implemen
 =head2 host
 
 The Redfish host.
-Required.
 
 =head2 password
 
@@ -100,7 +105,9 @@ Password used for authentication by the default L</ua> (with L</username>).
 
 =head2 ssl
 
-If true, the default L</ua> will establish the connection using SSL/TLS.
+If true, the default L</ua> will establish the connection using SSL/TLS by setting the request scheme to C<https>.
+If false, the request scheme will be C<http>.
+If not defined, the url scheme will not be set.
 Default is true.
 
 =head2 token
@@ -120,7 +127,7 @@ Username used for authentication by the default L</ua> (with L</password>).
 
 L<Mojo::Redfish::Client> inherits all methods from L<Mojo::Base> and implements the following new ones.
 
-=head1 get
+=head2 get
 
   my $result = $client->get('/redfish/v1/Systems');
 
@@ -128,7 +135,7 @@ Requests the requested url via the L</ua>.
 Returns an instance of L<Mojo::Redfish::Client::Result>.
 Dies on errors (the exact exception and behavior is subject to change).
 
-=head1 root
+=head2 root
 
   my $result = $client->root;
 
@@ -155,7 +162,7 @@ Session management
 
 =item *
 
-Testing
+Even more testing
 
 =back
 

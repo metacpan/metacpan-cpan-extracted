@@ -1,0 +1,43 @@
+Testing
+
+  gmake test
+
+Check Tests
+
+  prove -I lib
+
+Using Test::Cmd
+
+  Test::Cmd is a module to allow testing command line scripts.
+  If you decide to use Test::Cmd match_exact with Test2::Bundle::More,
+  there are some caveats which the following example illustrates:
+
+  Example:
+
+    my $compare_stdout;
+    # need to capture stdout here before calling match_exact (scope?)
+    my $stdout = $test->stdout;
+    if ($test->match_exact($stdout, $archive)) {
+      $compare_stdout = 'true';
+    } else {
+      $compare_stdout = 'false';
+    }
+    # Do not mix printing 'ok test_number' with use of Test::More is()
+    # use pass() and fail() so that test numbers match up
+    if ($compare_stdout eq 'true') {
+      pass('match_exact');
+    } else {
+      fail('match_exact');
+    }
+
+Testing Pod
+
+  prove -I lib xt/pod.t
+  cpanm App::Pod2CpanHtml
+  pod2cpanhtml scripts/inicat.pl > inicat.html
+  pod2cpanhtml scripts/inidiff.pl > inidiff.html
+  pod2cpanhtml scripts/iniedit.pl > iniedit.html
+  pod2cpanhtml scripts/inifilter.pl > inifilter.html
+  pod2cpanhtml lib/App/IniDiff/IniFile.pm > IniFile.html
+  Open these files in a browser and check them
+

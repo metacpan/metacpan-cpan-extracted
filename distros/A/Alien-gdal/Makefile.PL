@@ -14,7 +14,6 @@ my %common_reqs = (
     "Alien::Build::Plugin::Cleanse::BuildDir" => 0,
     'Sort::Versions' => 0,
     "Alien::geos::af" => '1.005',
-    "Alien::spatialite" => '1.03',
     "Alien::proj" => '1.02',
     "Alien::sqlite" => '1.02',
     "FFI::CheckLib"   => "0.23",
@@ -52,14 +51,25 @@ my %WriteMakefileArgs = (
                 web => 'https://github.com/shawnlaffan/perl-alien-gdal/issues/',
             },
         },
+        #prereqs => {
+        #    build => {
+        #        suggests => {
+        #            "Alien::spatialite" => '1.03',
+        #        },
+        #    },
+        #},
     },
     "DISTNAME" => "Alien-gdal",
     "LICENSE"  => "perl",
 );
 
 use Alien::Build::MM;
-my $abmm = Alien::Build::MM->new ();
-%WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
+my $abmm = Alien::Build::MM->new (
+    #my_alienfile_meta => 0,
+);
+%WriteMakefileArgs = $abmm->mm_args(
+    %WriteMakefileArgs,
+);
 
 WriteMakefile(%WriteMakefileArgs);
 

@@ -42,6 +42,7 @@ Hao
 Heiko
 Iceweasel
 Ihnen
+James
 Jensen
 Jon
 KHTML
@@ -85,6 +86,7 @@ Uwe
 Voelker
 WAP
 Walsham
+Waters
 WebKit
 Wilson
 WinNT
@@ -145,6 +147,7 @@ ipad
 iphone
 ipod
 ipsagent
+james
 joatis
 joatis3
 jon

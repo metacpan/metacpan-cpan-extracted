@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download and install libuuid
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 
@@ -29,7 +29,7 @@ Alien::libuuid - Find or download and install libuuid
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -77,9 +77,9 @@ In your L<FFI::Platypus> script or module:
 
 =head1 DESCRIPTION
 
-This distribution provides libuuid so that it can be used by other 
-Perl distributions that are on CPAN.  It does this by first trying to 
-detect an existing install of libuuid on your system.  If found it 
+This distribution provides libuuid so that it can be used by other
+Perl distributions that are on CPAN.  It does this by first trying to
+detect an existing install of libuuid on your system.  If found it
 will use that.  If it cannot be found, the source code will be downloaded
 from the internet and it will be installed in a private share location
 for the use of other modules.

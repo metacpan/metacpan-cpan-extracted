@@ -12,7 +12,7 @@ our $WORKER_PID = -1;
 *CORE::GLOBAL::exit = sub { $WORKER_PID == $$ ? $_[0] : CORE::exit($_[0] // $!) };
 
 has description => 'Start application with HTTP, WebSocket and Webpack development server';
-has usage => sub { shift->extract_usage };
+has usage       => sub { shift->extract_usage };
 
 has _morbo => sub {
   require Mojo::Server::Morbo;
@@ -46,6 +46,7 @@ sub _exec_mojo_webpack {
 
 sub _parse_argv {
   my ($self, @argv) = @_;
+  my @orig_argv = @argv;
 
   getopt \@argv,
     'b|backend=s' => \$ENV{MOJO_MORBO_BACKEND},
@@ -56,7 +57,7 @@ sub _parse_argv {
     'w|watch=s'   => \my @watch;
 
   # Need to run "mojo webpack" and not "./myapp.pl webpack" to have a clean environment
-  $self->_exec_mojo_webpack($self->_script_name, @argv) if path($self->_script_name)->basename ne 'mojo';
+  $self->_exec_mojo_webpack($self->_script_name, @orig_argv) if path($self->_script_name)->basename ne 'mojo';
 
   die join "\n\n", $self->description, $self->usage if $help or !(my $app = shift @argv);
 

@@ -1,5 +1,8 @@
 Revision history for Calendar::Gregorian
 
+0.19  Thu Apr 04 17:00:00 2019
+      - Updated dependency on Calendar::Plugin::Renderer v0.14.
+
 0.18  Sun Mar 24 10:45:00 2019
       - Updated dependency on Date::Gregorian::Simple v0.13.
 

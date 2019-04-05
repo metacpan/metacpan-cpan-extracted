@@ -1,5 +1,9 @@
 Revision history for Perl extension URI-s3
 
+v0.2 2019-04-04T18:37:38Z
+
+    - fix deps (thanks Michal)
+
 v0.01 2019-04-01T18:41:54Z
 
     - original version

@@ -1,5 +1,8 @@
 Revision history for Perl module Mojo::Graphite::Writer
 
+0.04 2019-04-04
+  - Made test more robust
+
 0.03 2019-04-03
   - Fix bug that prevented multiple writes
   - Added some basic tests

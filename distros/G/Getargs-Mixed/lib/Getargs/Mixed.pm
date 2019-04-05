@@ -3,7 +3,6 @@ package Getargs::Mixed;
 use 5.008;
 use strict;
 use warnings;
-
 use Carp;
 
 require Exporter;
@@ -12,7 +11,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw( parameters );
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 NAME
 
@@ -64,7 +63,9 @@ Getargs::Mixed - Perl extension allowing subs to handle mixed parameter lists
   My::Class->baz($x, -z => $z, -y => $y);
   baz($x, -z => $z, -y => $y); # etc...
 
-=head1 THE parameters() FUNCTION
+=head1 FUNCTIONAL INTERFACE
+
+=head2 parameters
 
 This allows for the handling mixed argument lists to subroutines. It is meant
 to be flexible and lightweight. It doesn't do any "type-checking", it simply
@@ -74,11 +75,19 @@ The main function in this module is C<parameters> and it handles all the work
 of figuring out which parameters have been sent and which have not. When it
 detects an error, it will die with L<Carp::confess|Carp/confess>.
 
-=head2 Arguments
-
 The C<parameters> function takes either two or three arguments. If the first
-argument is a string, it takes three arguments. If the first argument is
-an array reference, it takes just two.
+argument is a string, it takes at least two arguments: invocant and
+specification.  For example:
+
+	parameters('invocant', [qw(specification)], @_);
+
+If the first argument is an array reference, it takes at least one argument:
+the specification.  For example:
+
+	parameters([qw(specification)], @_);
+
+In either case, the specification is followed by any arguments to be parsed
+(C<@_> in the examples above).
 
 =head3 Invocant
 
@@ -122,12 +131,12 @@ parameters will be placed in array reference and assigned to the '*' key of the
 returned arguments list. If '*' is not specified and extra arguments are found
 C<parameters> will die.
 
-=head3 Arguments to parse
+=head3 The arguments to be parsed
 
 The final argument to C<parameters> is always the list of arguments passed to
 the caller, usually C<@_>.
 
-=head2 Results
+=head3 The results of a parameters() call
 
 The result returned from the C<parameters> function depends on whether there
 are two arguments or three. If C<parameters> is called with two arguments,
@@ -165,7 +174,7 @@ sub parameters {
 	}
 
 	croak "Getopt::Mixed specification contains more than one semicolon."
-			if grep /;/, @$spec > 1;
+			if grep(/;/, @$spec) > 1;
 
 	# Extract invocant
 	my $self;
@@ -185,16 +194,22 @@ sub parameters {
 	my @required;
 	for (0 .. $#$spec) {
 		last if $$spec[$_] eq '*';
+
 		if ($$spec[$_] eq ';') {
 			splice(@$spec, $_, 1);
 
 			last;
-		} elsif ($$spec[$_] =~ /;/) {
-			my @els = split /;/, $$spec[$_];
-			shift @els if $els[0] eq '';
 
-			croak "Getopt::Mixed specification contains more than one semicolon."
+		} elsif ($$spec[$_] =~ /;/) {
+			$$spec[$_] =~ s/(^\s+)|(\s+$)//g;		# Trim whitespace
+			my @els = split /;/, $$spec[$_], -1;	# -1 => keep empty fields
+			croak "Getopt::Mixed specification contains multiple semicolons."
 					if @els > 2;
+
+			shift @els if $els[0] eq '';	# semicolon first.
+				# @els is always nonempty because $$spec[$_] contains a
+				# semicolon (the regex matched) and so split /;/...-1
+				# gives us at least one field.
 
 			push @required, $els[0] unless $$spec[$_] =~ /^;/;
 			splice(@$spec, $_, 1, @els);
@@ -203,14 +218,18 @@ sub parameters {
 		}
 
 		push @required, $$spec[$_];
-	}
-
+	} #foreach element of @$spec
 
 	my %result;
 
 	# Scan for positional parameters
 	while (@_ > 0) {
 		last if defined $_[0] and $_[0] =~ /^-/; # stop if named
+
+		# Trap, e.g., [qw(;)], which leaves an empty element in the spec.
+		croak "I have a positional parameter but no name for it"
+			unless @$spec && $$spec[0];
+
 		if ($$spec[0] eq '*') {
 			push @{$result{'*'}}, shift;
 		} else {
@@ -265,7 +284,9 @@ to adjust how the parameters are processed.  For example:
   my %args = $getargs->parameters([ qw( x y z ) ], @_);
 
 The arguments to the C<parameters> method are exactly the same as when
-C<parameters> is called as a function.
+C<parameters> is called as a function.  This includes the invocant,
+since C<$getargs> is not the invocant of the function that is invoking
+C<< $getargs->parameters() >>.
 
 =head2 new
 

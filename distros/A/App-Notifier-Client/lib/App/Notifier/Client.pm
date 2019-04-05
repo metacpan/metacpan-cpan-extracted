@@ -1,11 +1,7 @@
 package App::Notifier::Client;
-
+$App::Notifier::Client::VERSION = '0.0301';
 use strict;
 use warnings;
-
-use vars qw($VERSION);
-
-$VERSION = '0.0300';
 
 use 5.012;
 
@@ -21,32 +17,31 @@ sub notify
     my ($args) = @_;
 
     my $base_url = $args->{base_url};
-    my $cmd_id = $args->{cmd_id};
-    my $msg = $args->{msg};
+    my $cmd_id   = $args->{cmd_id};
+    my $msg      = $args->{msg};
 
     my $ua = LWP::UserAgent->new;
-    my $url = URI->new($base_url .
-        ($base_url =~ m#/\z# ? '' : '/') .
-        'notify'
-    );
+    my $url =
+        URI->new( $base_url . ( $base_url =~ m#/\z# ? '' : '/' ) . 'notify' );
 
     my $query = [];
 
-    if (defined($cmd_id))
+    if ( defined($cmd_id) )
     {
-        push @$query, (cmd_id => $cmd_id);
+        push @$query, ( cmd_id => $cmd_id );
     }
 
-    if (defined($msg))
+    if ( defined($msg) )
     {
-        push @$query, (text_params => scalar(encode_json({msg => $msg,})));
+        push @$query,
+            ( text_params => scalar( encode_json( { msg => $msg, } ) ) );
     }
 
     $url->query_form($query);
 
     my $response = $ua->get($url);
 
-    if (! $response->is_success())
+    if ( !$response->is_success() )
     {
         die "Error " . $response->status_line();
     }
@@ -58,11 +53,17 @@ sub notify
 
 __END__
 
+=pod
+
 =encoding utf-8
 
 =head1 NAME
 
-App::Notifier::Client - a client library for App::Notifier::Service
+App::Notifier::Client
+
+=head1 VERSION
+
+version 0.0301
 
 =head1 SYNOPSIS
 
@@ -95,6 +96,14 @@ App::Notifier::Client - a client library for App::Notifier::Service
 
 This module is used to invoke a notification at a remote
 L<App::Notifier::Service> . It provides one class method - notify() .
+
+=head1 NAME
+
+App::Notifier::Client - a client library for App::Notifier::Service
+
+=head1 VERSION
+
+version 0.0301
 
 =head1 METHODS
 
@@ -142,9 +151,7 @@ L<http://metacpan.org/release/App-Notifier-Client>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 COPYRIGHT & LICENSE
 
@@ -173,5 +180,17 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

@@ -13,11 +13,11 @@ Auth::Yubikey_WebClient - Authenticating the Yubikey against the Yubico Web API
 
 =head1 VERSION
 
-Version 4.01
+Version 4.02
 
 =cut
 
-our $VERSION = '4.01';
+our $VERSION = '4.02';
 
 =head1 SYNOPSIS
 
@@ -88,36 +88,28 @@ sub new
 	my $self = {};
 
 	bless $self, ref $class || $class;
-       
-	if(! defined $options_ref)
-	{
+
+	if(! defined $options_ref) {
 		die "You did not pass any parameters to the Yubikey Web Client initialization";
-	} 
+	}
 	my %options = %{$options_ref};
 
 	# grab the variables from the initialization
-	if(defined $options{id})
-	{
+	if(defined $options{id}) {
         	$self->{id} = $options{id};
-	}
-	else
-	{
+	} else {
 		die "Can not start without a Yubikey ID";
 	}
 
-	if(defined $options{api})
-        {
-                $self->{api} = $options{api};
+	if(defined $options{api}) {
+		$self->{api} = $options{api};
 
-		if(length($self->{api}) % 4 != 0)
-		{
+		if(length($self->{api}) % 4 != 0) {
 			die "Your API key must be in 4 byte lengths";
 		}
-        }
-        else
-        {
-                die "Can not start without a Yubikey API key";
-        }
+  	} else {
+		die "Can not start without a Yubikey API key";
+	}
 
 	$self->{nonce} = defined $options{nonce} ? $options{nonce} : '';
 
@@ -154,10 +146,10 @@ sub debug
 	print "sl             = $self->{sl}\n";
 	print "timestamp      = $self->{timestamp}\n";
 	print "sessioncounter = $self->{sessioncounter}\n";
-	print "sessionuse     = $self->{sessionuse}\n";	
+	print "sessionuse     = $self->{sessionuse}\n";
 
 #	print "response = $self->{response}\n";
-	
+
 }
 
 =head2 yubikey_webclient
@@ -193,13 +185,12 @@ sub otp
 	$self->{otp} = $otp;
 
 	# lets do a basic sanity check on the otp, before we blast it off to yubico...
-	if($self->{otp} !~ /[cbdefghijklnrtuv]/i || length($self->{otp}) < 32)
-	{
+	if($self->{otp} !~ /[cbdefghijklnrtuv]/i || length($self->{otp}) < 32) 	{
 		$self->{status} = "ERR_BAD_OTP";
-		return $self->{status};	
+		return $self->{status};
 	}
 
-	# Generate nonce unless passed 
+	# Generate nonce unless passed
 	$self->{nonce} = hmac_sha1_hex(time, rand()) unless $self->{nonce};
 
 	# Start generating the parameters
@@ -208,20 +199,17 @@ sub otp
 
 	# pass the request to yubico
 	my $ua = LWP::UserAgent->new(ssl_opts => { verify_hostname => $self->{verify_hostname} });
+	$ua->env_proxy();	# 4.02
 	my $req = HTTP::Request->new(GET => $self->{url} . "?$self->{params}");
 	my $res = $ua->request($req);
-	if($res->is_success)
-	{
+	if($res->is_success) {
 		$self->{response} = $res->content;
-	}
-	else
-	{
+	} else {
 		print $res->status_line . "\n";
 	}
 	chomp($self->{response});
 
-	if($self->{response} !~ /status=ok/i)
-	{
+	if($self->{response} !~ /status=ok/i) {
 		# If the status is not ok, let's not even go through the rest...
 		$self->{response} =~ m/status=(.+)/;
 		$self->{status} = "ERR_$1";
@@ -231,9 +219,8 @@ sub otp
 
 	#extract each of the lines, and store in a hash...
 
-	my %result;	
-	foreach (split(/\n/,$self->{response}))
-	{
+	my %result;
+	foreach (split(/\n/,$self->{response})) {
 		chomp;
                 if($_ =~ /=/)
                 {
@@ -251,8 +238,7 @@ sub otp
         my $datastring='';
 
 	my $key;
-        foreach $key (sort keys %result)
-        {
+        foreach $key (sort keys %result) {
                 $result{$key} =~ s/\s//g;
                 $datastring .= "$key=$result{$key}&";
         }
@@ -263,21 +249,16 @@ sub otp
 
 	return "ERR_MSG_AUTH" unless ($self->{nonce} eq $result{nonce} and $self->{otp} eq $result{otp});
 
-        my $hmac = encode_base64(hmac_sha1($datastring,decode_base64($self->{api})));
-
-        chomp($hmac);
-
-        if($hmac eq $signatur)
-        {
+  	my $hmac = encode_base64(hmac_sha1($datastring,decode_base64($self->{api})));
+	chomp($hmac);
+  	if($hmac eq $signatur) {
 		$self->{publicid} = substr(lc($self->{otp}),0,12);
 		$self->{status} = "OK";
                 return "OK";
-        }
-        else
-        {
+   } else {
 		$self->{status} = "ERR_HMAC";
-                return "ERR_HMAC";
-        }
+		return "ERR_HMAC";
+	}
 }
 
 =head1 USAGE
@@ -334,6 +315,7 @@ L<http://search.cpan.org/dist/Auth-Yubikey_WebClient>
 2.01 - Response turning into an array due to \r bug (Thanks to Peter Norin)
 3.00 - Major update
 4.01 - 13.10.2016 - Requested by Peter Norin - update to use LWP::UserAgent, and the option to overwrite a valid SSL certificate (verify_hostname).  The API default server is changed to ssl.
+4.02 - 2019.04.04 - Request by Alexandre Linte - Support for proxy servers
 
 =head1 ACKNOWLEDGEMENTS
 

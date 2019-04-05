@@ -32,7 +32,7 @@ ATTRIBUTES
 
  host
 
-    The Redfish host. Required.
+    The Redfish host.
 
  password
 
@@ -40,8 +40,10 @@ ATTRIBUTES
 
  ssl
 
-    If true, the default "ua" will establish the connection using SSL/TLS.
-    Default is true.
+    If true, the default "ua" will establish the connection using SSL/TLS
+    by setting the request scheme to https. If false, the request scheme
+    will be http. If not defined, the url scheme will not be set. Default
+    is true.
 
  token
 
@@ -63,7 +65,7 @@ METHODS
     Mojo::Redfish::Client inherits all methods from Mojo::Base and
     implements the following new ones.
 
-get
+ get
 
       my $result = $client->get('/redfish/v1/Systems');
 
@@ -71,7 +73,7 @@ get
     Mojo::Redfish::Client::Result. Dies on errors (the exact exception and
     behavior is subject to change).
 
-root
+ root
 
       my $result = $client->root;
 
@@ -89,7 +91,7 @@ FUTURE WORK
 
       * Session management
 
-      * Testing
+      * Even more testing
 
 SEE ALSO
 

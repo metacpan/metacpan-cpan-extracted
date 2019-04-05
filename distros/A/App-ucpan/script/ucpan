@@ -58,11 +58,14 @@ EO_USAGE
 }
 
 # Process OPTIONS
+my $RECFILE_BASE;
+my $RECFILE_NAME = '.ucpandb';
 sub process_options {
     my $CPANM_OPT     = [];
     my $CUD_OPT       = [];
     my $set_cpanm_opt = sub {
-        push @$CPANM_OPT, "--$_[0]=$_[1]";
+        my $l = length( $_[0] ) > 1 ? '--' : '-';
+        push @$CPANM_OPT, "$l$_[0]" => $_[1];
     };
     my $set_both_opt = sub {
         if ( $_[0] eq 'mirror' ) {
@@ -76,6 +79,9 @@ sub process_options {
             my $l = length( $_[0] ) > 1 ? '--' : '-';
             push @$CPANM_OPT, "$l$_[0]" => $_[1];
             push @$CUD_OPT,   "$l$_[0]" => $_[1];
+            if ( $_[0] eq 'l' || $_[0] eq 'L' ) {
+                $RECFILE_BASE = $_[1];
+            }
         }
     };
 
@@ -117,7 +123,7 @@ sub process_options {
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.07');
+            our $VERSION = version->declare('1.08');
             print __PACKAGE__->VERSION, $/;
             exit;
         },
@@ -142,6 +148,20 @@ sub process_options {
         );
     push @{ $CONFIG->{updater_options} }, @$CPANM_OPT;
     push @{ $CONFIG->{checker_options} }, @$CUD_OPT;
+
+    {    # set config file path
+        my $dir;
+        my $file;
+        if ($RECFILE_BASE) {
+            $dir = file( $RECFILE_BASE, "lib", @Config{qw/package archname/} );
+        }
+        else {
+            $dir = $INC[0];
+        }
+        $file = file( $dir, $RECFILE_NAME );
+        $file =~ s!\\!/!g;
+        $CONFIG->{cfg_file} = $file;
+    }
 }
 
 #== Console Configuration ~~ ADDED: 2013/08/29
@@ -172,23 +192,6 @@ else {
     select $old_fh;
 }
 
-#== PROGRAM CONFIGURATION
-my $RECFILEBASE = '.ucpandb';
-{    # set config file path
-    my $dir;
-    my $file;
-    if ( $dir = ( grep {/^--[lL]=/} @{ $CONFIG->{updater_options} } )[-1] ) {
-        $dir =~ s/^--(?:l|L)=//;
-        $dir = file( $dir, "lib", @Config{qw/package archname/} );
-    }
-    else {
-        $dir = $INC[0];
-    }
-    $file = file( $dir, $RECFILEBASE );
-    $file =~ s!\\!/!g;
-    $CONFIG->{cfg_file} = $file;
-}
-
 sub _setup_debugger {
     if ( $DEBUG{fakelib} ) {
         my $FAKELIB = $DEBUG{fakelib};
@@ -197,7 +200,7 @@ sub _setup_debugger {
         $ENV{PERL_MB_OPT}         = "--install_base=$FAKELIB";
         $ENV{PERL_MM_OPT}         = "INSTALL_BASE=$FAKELIB";
         $ENV{PERL_CPANM_HOME}     = $FAKELIB;
-        $CONFIG->{cfg_file} = file( $FAKELIB, $RECFILEBASE );
+        $CONFIG->{cfg_file} = file( $FAKELIB, $RECFILE_NAME );
     }
     if ( $DEBUG{head} ) {
         warn "=" x 20 . " DEBUGGING MODE " . "=" x 20 . $/;
@@ -353,17 +356,6 @@ sub show_skips {
 #
 ## helper functions--------
 # hack: kill -SIG,$pid[perlport#kill@win32] does not work on Win32. taskkill instead.
-sub _kill_group {
-    my ($pid) = @_;
-    if ( !WIN32 ) {
-        CORE::kill -TERM => $pid;
-    }
-    else {
-        return if $pid == 0;    # guard
-        system qq:taskkill /F /T /PID $pid >NUL 2>&1:;
-        waitpid $pid, 0;
-    }
-}
 
 ## Phase 1: check outdated
 PHASE_1:
@@ -463,7 +455,6 @@ sub run_checker {
         join( ' ', map( qq{"$_"}, @{ $CONFIG->{checker} }, '2>&1' ) ) )
     {
         ## trap for cleanup children
-        local $SIG{INT} = sub { _kill_group($pid); exit 3; };
         while (<$pipe>) {
             _process_outdated($_);
             if ( $DEBUG{maxitem} && keys(%outdated) >= $DEBUG{maxitem} ) {
@@ -598,8 +589,7 @@ sub run_cpanm {
                 local $STDERR = $ORG_STDERR;
                 $self->diag_fail(
                     "Timed out (> ${timeout}s). Use --verbose to retry.");
-                _kill_group($pid);
-                waitpid $pid, 0;
+                CORE::kill -KILL => $pid;
                 return;
             }
             return !$exit_code;
@@ -773,7 +763,6 @@ sub run_cpanm {
         *{ 'App::cpanminus::script::' . $method } = sub { };
     }
 
-    local $SIG{INT} = sub { _kill_group($$); exit 3; };
     local $ENV{HARNESS_OPTIONS} = "j$DEBUG{jobs}" if $DEBUG{jobs};
 
     pr_black qq|>>> Upgrading outdated modules$/|;
@@ -1154,7 +1143,7 @@ therefore, the latest version number of modules installed without this program a
 =item -r, --recover
 
 Recover recoding file againt unwanted result.
-In this mode, failed modules are removed from the previous execution record except test failure.
+In this mode, failed modules are removed from the previous execution record except usual failure( this failure is marked as "UNKNOWN" ).
 
 =item -v, --version
 

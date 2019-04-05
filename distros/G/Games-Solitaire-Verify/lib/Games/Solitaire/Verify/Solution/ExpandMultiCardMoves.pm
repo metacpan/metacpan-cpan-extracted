@@ -1,7 +1,8 @@
 package Games::Solitaire::Verify::Solution::ExpandMultiCardMoves;
-$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::VERSION = '0.1900';
+$Games::Solitaire::Verify::Solution::ExpandMultiCardMoves::VERSION = '0.2000';
 use warnings;
 use strict;
+use 5.014;
 
 
 use parent 'Games::Solitaire::Verify::Solution::Base';
@@ -9,13 +10,12 @@ use parent 'Games::Solitaire::Verify::Solution::Base';
 # TODO : Merge with lib/Games/Solitaire/Verify/Solution.pm
 
 use POSIX qw( ceil );
-use IO::Handle;    # For $fh->print(...)
 
-use Games::Solitaire::Verify::Exception;
-use Games::Solitaire::Verify::Card;
-use Games::Solitaire::Verify::Column;
-use Games::Solitaire::Verify::Move;
-use Games::Solitaire::Verify::State;
+use Games::Solitaire::Verify::Exception ();
+use Games::Solitaire::Verify::Card      ();
+use Games::Solitaire::Verify::Column    ();
+use Games::Solitaire::Verify::Move      ();
+use Games::Solitaire::Verify::State     ();
 
 use List::Util qw( min );
 
@@ -432,7 +432,7 @@ moves.
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 SYNOPSIS
 
@@ -467,7 +467,7 @@ version 0.1900
 
 =head1 VERSION
 
-version 0.1900
+version 0.2000
 
 =head1 METHODS
 

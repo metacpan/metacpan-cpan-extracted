@@ -1,5 +1,5 @@
 package Consul::API::Agent;
-$Consul::API::Agent::VERSION = '0.024';
+$Consul::API::Agent::VERSION = '0.025';
 use namespace::autoclean;
 
 use Moo::Role;
@@ -140,7 +140,7 @@ sub service_maintenance {
 }
 
 package Consul::API::Agent::Check;
-$Consul::API::Agent::Check::VERSION = '0.024';
+$Consul::API::Agent::Check::VERSION = '0.025';
 use Moo;
 use Types::Standard qw(Str);
 
@@ -154,7 +154,7 @@ has service_id   => ( is => 'ro', isa => Str, init_arg => 'ServiceID',   require
 has service_name => ( is => 'ro', isa => Str, init_arg => 'ServiceName', required => 1 );
 
 package Consul::API::Agent::Service;
-$Consul::API::Agent::Service::VERSION = '0.024';
+$Consul::API::Agent::Service::VERSION = '0.025';
 use Moo;
 use Types::Standard qw(Str Int ArrayRef);
 
@@ -165,7 +165,7 @@ has port    => ( is => 'ro', isa => Int,           init_arg => 'Port',    requir
 has tags    => ( is => 'ro', isa => ArrayRef[Str], init_arg => 'Tags',    required => 1, coerce => sub { $_[0] || [] } );
 
 package Consul::API::Agent::Member;
-$Consul::API::Agent::Member::VERSION = '0.024';
+$Consul::API::Agent::Member::VERSION = '0.025';
 use Moo;
 use Types::Standard qw(Str Int HashRef);
 
@@ -182,7 +182,7 @@ has delegate_max => ( is => 'ro', isa => Int,          init_arg => 'DelegateMax'
 has delegate_cur => ( is => 'ro', isa => Int,          init_arg => 'DelegateCur', required => 1 );
 
 package Consul::API::Agent::Self;
-$Consul::API::Agent::Self::VERSION = '0.024';
+$Consul::API::Agent::Self::VERSION = '0.025';
 use Moo;
 use Types::Standard qw(HashRef);
 use Type::Utils qw(class_type);

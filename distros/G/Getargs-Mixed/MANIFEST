@@ -8,6 +8,7 @@ t/errors.t
 t/errors_oo.t
 t/extra.t
 t/extra_oo.t
+t/invalid_spec.t
 t/method.t
 t/method_oo.t
 t/oddoptional.t

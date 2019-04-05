@@ -1,4 +1,7 @@
 Revision history for Perl module Mojo::Redfish::Client
 
+0.02 2019-04-03
+  - Fixed a bug in token handling
+  - Improved testing
 0.01 2019-04-01
   - Initial release

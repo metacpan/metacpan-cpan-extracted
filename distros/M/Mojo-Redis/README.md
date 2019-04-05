@@ -59,7 +59,7 @@ limitations:
 
 - Cannot handle binary data
 
-    [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo::Redis::Cache) uses [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis) for now, since
+    [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo::Redis::Cache) uses [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol::Redis::Faster) for now, since
     [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) fail to handle binary data.
 
     See [https://github.com/dgl/protocol-redis-xs/issues/4](https://github.com/dgl/protocol-redis-xs/issues/4) for more information.
@@ -73,9 +73,7 @@ limitations:
     See [https://github.com/dgl/protocol-redis-xs/issues/5](https://github.com/dgl/protocol-redis-xs/issues/5) for more information.
 
 If you experience any issues with [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) then please report
-them to [https://github.com/dgl/protocol-redis-xs/issues](https://github.com/dgl/protocol-redis-xs/issues). It is still the
-default ["protocol"](#protocol) though, since it is a lot faster than [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis)
-for most tasks.
+them to [https://github.com/dgl/protocol-redis-xs/issues](https://github.com/dgl/protocol-redis-xs/issues).
 
 # EVENTS
 
@@ -112,9 +110,9 @@ Maximum number of idle database handles to cache for future use, defaults to
     $str   = $redis->protocol_class;
     $redis = $redis->protocol_class("Protocol::Redis::XS");
 
-Default to [Protocol::Redis](https://metacpan.org/pod/Protocol::Redis). This will be changed in the future, if we see a
-more stable version of an alternative to [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS).  See
-["CAVEATS"](#caveats) for details.
+Default to [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol::Redis::Faster). You can change this to
+[Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) if you need a faster protocl parser, but do look at
+["CAVEATS"](#caveats) for first.
 
 ## pubsub
 
@@ -162,9 +160,11 @@ Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo::Redi
 Object constructor. Can coerce a string into a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) and set ["url"](#url)
 if present.
 
-# AUTHOR
+# AUTHORS
 
-Jan Henning Thorsen
+Jan Henning Thorsen - `jhthorsen@cpan.org`
+
+Dan Book - `grinnz@grinnz.com`
 
 # COPYRIGHT AND LICENSE
 

@@ -12,7 +12,7 @@ use constant DEBUG => $ENV{MOJO_WEBPACK_DEBUG} ? 1 : 0;
 
 has dependencies => sub {
   return {
-    core => [qw(webpack webpack-cli webpack-md5-hash html-webpack-plugin)],
+    core => [qw(webpack webpack-cli webpack-plugin-hash-output html-webpack-plugin)],
     css  => [qw(css-loader mini-css-extract-plugin optimize-css-assets-webpack-plugin)],
     js   => [qw(@babel/core @babel/preset-env babel-loader terser-webpack-plugin)],
     sass => [qw(node-sass sass-loader)],
@@ -188,7 +188,7 @@ sub _render_to_file {
 
   state $VERSION = $Mojolicious::Plugin::Webpack::VERSION;
 
-  return $self->{files}{$name} = [custom => $out_file] if !$is_generated and -r $out_file;
+  return $self->{files}{$name} = [custom  => $out_file] if !$is_generated and -r $out_file;
   return $self->{files}{$name} = [current => $out_file] if $is_generated =~ /\b$VERSION\b/;
 
   my $template = $self->_share_dir->child($name)->slurp;
@@ -214,7 +214,7 @@ sub _webpack_run {
   warn "[Webpack] @cmd\n" if DEBUG;
 
   my $run_with = (grep {/--watch/} @cmd) ? 'exec' : 'system';
-  my $CWD = Mojolicious::Plugin::Webpack::CWD->new($config_file->dirname);
+  my $CWD      = Mojolicious::Plugin::Webpack::CWD->new($config_file->dirname);
   local $!;    # Make sure only system/exec sets $!
   { local %ENV = %$env; $run_with eq 'exec' ? exec @cmd : system @cmd }
   die "[Webpack] $run_with @cmd: $!" if $!;
