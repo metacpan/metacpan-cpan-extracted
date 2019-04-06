@@ -22,4 +22,5 @@ t/data/foo.tgz
 t/lib/ATWDumbbench.pm
 xt/performance-small.t
 README.md
+CONTRIBUTING.md
 META.json                                Module JSON meta-data (added by MakeMaker)

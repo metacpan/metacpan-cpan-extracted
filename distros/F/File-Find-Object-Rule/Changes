@@ -1,6 +1,10 @@
 Changes Log for File-Find-Object-Rule:
 --------------------------------------
 
+0.0310  2019-04-05
+    - Fully qualified shebang for findorule (thanks to mageia linux)
+    - Enable tidyall in dist.ini.
+
 0.0309  2018-06-20
     - Remove stray *.orig files from the CPAN dist.
         - Thanks to gregor .

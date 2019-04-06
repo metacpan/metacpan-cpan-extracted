@@ -1,5 +1,5 @@
 # -*-CPerl-*-
-# Last changed Time-stamp: <2019-01-07 00:39:42 mtw>
+# Last changed Time-stamp: <2019-04-05 22:37:36 mtw>
 # place of birth: somewhere over Newfoundland
 
 # Bio::RNA::RNAaliSplit::WrapRscape.pm: A versatile object-oriented
@@ -9,7 +9,7 @@
 
 package Bio::RNA::RNAaliSplit::WrapRscape;
 
-use version; our $VERSION = qv('0.09');
+use version; our $VERSION = qv('0.10');
 use Carp;
 use Data::Dumper;
 use Moose;

@@ -3,7 +3,7 @@ use strict;
 use Test::More;
 
 BEGIN {
-    use_ok( 'SpamcupNG', qw(read_config main_loop get_browser) );
+    use_ok( 'App::SpamcupNG', qw(read_config main_loop get_browser) );
 }
 
 done_testing;

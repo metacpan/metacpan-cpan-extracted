@@ -1,7 +1,7 @@
 #       $Id: /mirror/lab/perl/File-Find-Rule/lib/File/Find/Rule.pm 2102 2006-06-01T15:39:03.942922Z richardc  $
 
 package File::Find::Object::Rule;
-$File::Find::Object::Rule::VERSION = '0.0309';
+$File::Find::Object::Rule::VERSION = '0.0310';
 use strict;
 use warnings;
 
@@ -12,35 +12,37 @@ use File::Spec;
 use Text::Glob 'glob_to_regex';
 use Number::Compare;
 use Carp qw/croak/;
-use File::Find::Object; # we're only wrapping for now
+use File::Find::Object;    # we're only wrapping for now
 use File::Basename;
-use Cwd;           # 5.00503s File::Find goes screwy with max_depth == 0
+use Cwd;                   # 5.00503s File::Find goes screwy with max_depth == 0
 
-use Class::XSAccessor
-    accessors => {
-        "extras" => "extras",
-        "finder" => "finder",
-        "_match_cb" => "_match_cb",
-        "rules" => "rules",
-        "_relative" => "_relative",
-        "_subs" => "_subs",
-        "_maxdepth" => "_maxdepth",
-        "_mindepth" => "_mindepth",
-    }
-    ;
+use Class::XSAccessor accessors => {
+    "extras"    => "extras",
+    "finder"    => "finder",
+    "_match_cb" => "_match_cb",
+    "rules"     => "rules",
+    "_relative" => "_relative",
+    "_subs"     => "_subs",
+    "_maxdepth" => "_maxdepth",
+    "_mindepth" => "_mindepth",
+};
 
 # we'd just inherit from Exporter, but I want the colon
-sub import {
+sub import
+{
     my $pkg = shift;
     my $to  = caller;
-    for my $sym ( qw( find rule ) ) {
+    for my $sym (qw( find rule ))
+    {
         no strict 'refs';
         *{"$to\::$sym"} = \&{$sym};
     }
-    for (grep /^:/, @_) {
+    for ( grep /^:/, @_ )
+    {
         my ($extension) = /^:(.*)/;
         eval "require File::Find::Object::Rule::$extension";
-        croak "couldn't bootstrap File::Find::Object::Rule::$extension: $@" if $@;
+        croak "couldn't bootstrap File::Find::Object::Rule::$extension: $@"
+            if $@;
     }
 }
 
@@ -48,27 +50,33 @@ sub import {
 # the procedural shim
 
 *rule = \&find;
-sub find {
-    my $object = __PACKAGE__->new();
-    my $not = 0;
 
-    while (@_) {
+sub find
+{
+    my $object = __PACKAGE__->new();
+    my $not    = 0;
+
+    while (@_)
+    {
         my $method = shift;
         my @args;
 
-        if ($method =~ s/^\!//) {
+        if ( $method =~ s/^\!// )
+        {
             # jinkies, we're really negating this
             unshift @_, $method;
             $not = 1;
             next;
         }
-        unless (defined prototype $method) {
+        unless ( defined prototype $method )
+        {
             my $args = shift;
             @args = ref $args eq 'ARRAY' ? @$args : $args;
         }
-        if ($not) {
-            $not = 0;
-            @args = ref($object)->new->$method(@args);
+        if ($not)
+        {
+            $not    = 0;
+            @args   = ref($object)->new->$method(@args);
             $method = "not";
         }
 
@@ -79,29 +87,29 @@ sub find {
 }
 
 
-
-sub new {
+sub new
+{
     # We need this to maintain compatibility with File-Find-Object.
     # However, Randal Schwartz recommends against this practice in general:
     # http://www.stonehenge.com/merlyn/UnixReview/col52.html
     my $referent = shift;
-    my $class = ref $referent || $referent;
+    my $class    = ref $referent || $referent;
 
-    return
-    bless {
-        rules    => [],  # [0]
-        _subs     => [],  # [1]
-        iterator => [],
-        extras   => {},
+    return bless {
+        rules     => [],      # [0]
+        _subs     => [],      # [1]
+        iterator  => [],
+        extras    => {},
         _maxdepth => undef,
         _mindepth => undef,
         _relative => 0,
     }, $class;
 }
 
-sub _force_object {
+sub _force_object
+{
     my $object = shift;
-    if (! ref($object))
+    if ( !ref($object) )
     {
         $object = $object->new();
     }
@@ -109,27 +117,31 @@ sub _force_object {
 }
 
 
-sub _flatten {
+sub _flatten
+{
     my @flat;
-    while (@_) {
+    while (@_)
+    {
         my $item = shift;
-        ref $item eq 'ARRAY' ? push @_, @{ $item } : push @flat, $item;
+        ref $item eq 'ARRAY' ? push @_, @{$item} : push @flat, $item;
     }
     return @flat;
 }
 
-sub _add_rule {
-    my $self = shift;
+sub _add_rule
+{
+    my $self     = shift;
     my $new_rule = shift;
 
-    push @{$self->rules()}, $new_rule;
+    push @{ $self->rules() }, $new_rule;
 
     return;
 }
 
-sub name {
-    my $self = _force_object shift;
-    my @names = map { ref $_ eq "Regexp" ? $_ : glob_to_regex $_ } _flatten( @_ );
+sub name
+{
+    my $self  = _force_object shift;
+    my @names = map { ref $_ eq "Regexp" ? $_ : glob_to_regex $_ } _flatten(@_);
 
     $self->_add_rule(
         {
@@ -145,31 +157,24 @@ sub name {
 
 use vars qw( %X_tests );
 %X_tests = (
-    -r  =>  readable           =>  -R  =>  r_readable      =>
-    -w  =>  writeable          =>  -W  =>  r_writeable     =>
-    -w  =>  writable           =>  -W  =>  r_writable      =>
-    -x  =>  executable         =>  -X  =>  r_executable    =>
-    -o  =>  owned              =>  -O  =>  r_owned         =>
+    -r => readable => -R => r_readable => -w => writeable => -W =>
+        r_writeable => -w => writable => -W => r_writable => -x =>
+        executable => -X => r_executable => -o => owned => -O => r_owned =>
 
-    -e  =>  exists             =>  -f  =>  file            =>
-    -z  =>  empty              =>  -d  =>  directory       =>
-    -s  =>  nonempty           =>  -l  =>  symlink         =>
-                               =>  -p  =>  fifo            =>
-    -u  =>  setuid             =>  -S  =>  socket          =>
-    -g  =>  setgid             =>  -b  =>  block           =>
-    -k  =>  sticky             =>  -c  =>  character       =>
-                               =>  -t  =>  tty             =>
-    -M  =>  modified                                       =>
-    -A  =>  accessed           =>  -T  =>  ascii           =>
-    -C  =>  changed            =>  -B  =>  binary          =>
-   );
+        -e => exists => -f => file => -z => empty => -d => directory => -s =>
+        nonempty => -l => symlink => => -p => fifo  => -u => setuid => -S =>
+        socket   => -g => setgid  => -b    => block => -k => sticky => -c =>
+        character => => -t => tty => -M => modified => -A => accessed => -T =>
+        ascii => -C => changed => -B => binary =>
+);
 
-for my $test (keys %X_tests) {
+for my $test ( keys %X_tests )
+{
     my $sub = eval 'sub () {
         my $self = _force_object shift;
         $self->_add_rule({
             code => "' . $test . ' \$path",
-            rule => "'.$X_tests{$test}.'",
+            rule => "' . $X_tests{$test} . '",
         });
         $self;
     } ';
@@ -178,25 +183,29 @@ for my $test (keys %X_tests) {
 }
 
 
-
 use vars qw( @stat_tests );
 @stat_tests = qw( dev ino mode nlink uid gid rdev
-                  size atime mtime ctime blksize blocks );
+    size atime mtime ctime blksize blocks );
 {
     my $i = 0;
-    for my $test (@stat_tests) {
-        my $index = $i++; # to close over
-        my $sub = sub {
+    for my $test (@stat_tests)
+    {
+        my $index = $i++;    # to close over
+        my $sub   = sub {
             my $self = _force_object shift;
 
             my @tests = map { Number::Compare->parse_to_perl($_) } @_;
 
-            $self->_add_rule({
-                rule => $test,
-                args => \@_,
-                code => 'do { my $val = (stat $path)['.$index.'] || 0;'.
-                  join ('||', map { "(\$val $_)" } @tests ).' }',
-            });
+            $self->_add_rule(
+                {
+                    rule => $test,
+                    args => \@_,
+                    code => 'do { my $val = (stat $path)['
+                        . $index
+                        . '] || 0;'
+                        . join( '||', map { "(\$val $_)" } @tests ) . ' }',
+                }
+            );
             $self;
         };
         no strict 'refs';
@@ -205,41 +214,50 @@ use vars qw( @stat_tests );
 }
 
 
-sub any {
-    my $self = _force_object shift;
+sub any
+{
+    my $self     = _force_object shift;
     my @rulesets = @_;
 
-    $self->_add_rule({
-        rule => 'any',
-        code => '(' . join( ' || ', map {
-            "( " . $_->_compile($self->_subs()) . " )"
-        } @rulesets ) . ")",
-        args => \@rulesets,
-    });
+    $self->_add_rule(
+        {
+            rule => 'any',
+            code => '('
+                . join( ' || ',
+                map { "( " . $_->_compile( $self->_subs() ) . " )" } @rulesets )
+                . ")",
+            args => \@rulesets,
+        }
+    );
     $self;
 }
 
 *or = \&any;
 
 
-sub not {
-    my $self = _force_object shift;
+sub not
+{
+    my $self     = _force_object shift;
     my @rulesets = @_;
 
-    $self->_add_rule({
-        rule => 'not',
-        args => \@rulesets,
-        code => '(' . join ( ' && ', map {
-            "!(". $_->_compile($self->_subs()) . ")"
-        } @_ ) . ")",
-    });
+    $self->_add_rule(
+        {
+            rule => 'not',
+            args => \@rulesets,
+            code => '('
+                . join( ' && ',
+                map { "!(" . $_->_compile( $self->_subs() ) . ")" } @_ )
+                . ")",
+        }
+    );
     $self;
 }
 
 *none = \&not;
 
 
-sub prune () {
+sub prune ()
+{
     my $self = _force_object shift;
 
     $self->_add_rule(
@@ -253,19 +271,23 @@ sub prune () {
 }
 
 
-sub discard () {
+sub discard ()
+{
     my $self = _force_object shift;
 
-    $self->_add_rule({
-        rule => 'discard',
-        code => '$discarded = 1',
-    });
+    $self->_add_rule(
+        {
+            rule => 'discard',
+            code => '$discarded = 1',
+        }
+    );
 
     return $self;
 }
 
 
-sub exec {
+sub exec
+{
     my $self = _force_object shift;
     my $code = shift;
 
@@ -280,48 +302,56 @@ sub exec {
 }
 
 
-sub grep {
-    my $self = _force_object shift;
+sub grep
+{
+    my $self    = _force_object shift;
     my @pattern = map {
-        ref $_
-          ? ref $_ eq 'ARRAY'
-            ? map { [ ( ref $_ ? $_ : qr/$_/ ) => 0 ] } @$_
-            : [ $_ => 1 ]
-          : [ qr/$_/ => 1 ]
-      } @_;
+              ref $_
+            ? ref $_ eq 'ARRAY'
+                ? map { [ ( ref $_ ? $_ : qr/$_/ ) => 0 ] } @$_
+                : [ $_ => 1 ]
+            : [ qr/$_/ => 1 ]
+    } @_;
 
-    $self->exec( sub {
-        local *FILE;
-        open FILE, $self->finder->item() or return;
-        local ($_, $.);
-        while (<FILE>) {
-            for my $p (@pattern) {
-                my ($rule, $ret) = @$p;
-                return $ret
-                  if ref $rule eq 'Regexp'
-                    ? /$rule/
-                      : $rule->(@_);
+    $self->exec(
+        sub {
+            local *FILE;
+            open FILE, $self->finder->item() or return;
+            local ( $_, $. );
+            while (<FILE>)
+            {
+                for my $p (@pattern)
+                {
+                    my ( $rule, $ret ) = @$p;
+                    return $ret
+                        if ref $rule eq 'Regexp'
+                        ? /$rule/
+                        : $rule->(@_);
+                }
             }
+            return;
         }
-        return;
-    } );
+    );
 }
 
 
-sub maxdepth {
+sub maxdepth
+{
     my $self = _force_object shift;
     $self->_maxdepth(shift);
     return $self;
 }
 
-sub mindepth {
+sub mindepth
+{
     my $self = _force_object shift;
     $self->_mindepth(shift);
     return $self;
 }
 
 
-sub relative () {
+sub relative ()
+{
     my $self = _force_object shift;
     $self->_relative(1);
 
@@ -329,10 +359,12 @@ sub relative () {
 }
 
 
-sub DESTROY {}
-sub AUTOLOAD {
+sub DESTROY { }
+
+sub AUTOLOAD
+{
     $AUTOLOAD =~ /::not_([^:]*)$/
-      or croak "Can't locate method $AUTOLOAD";
+        or croak "Can't locate method $AUTOLOAD";
     my $method = $1;
 
     my $sub = sub {
@@ -347,30 +379,33 @@ sub AUTOLOAD {
 }
 
 
-
-sub _call_find {
-    my $self = shift;
+sub _call_find
+{
+    my $self  = shift;
     my $paths = shift;
 
-    my $finder = File::Find::Object->new( $self->extras(), @$paths);
+    my $finder = File::Find::Object->new( $self->extras(), @$paths );
 
     $self->finder($finder);
 
     return;
 }
 
-sub _compile {
+sub _compile
+{
     my $self = shift;
     my $subs = shift;
 
     return '1' unless @{ $self->rules() };
 
     my $code = join " && ", map {
-        if (ref $_->{code}) {
+        if ( ref $_->{code} )
+        {
             push @$subs, $_->{code};
             "\$subs->[$#{$subs}]->(\@args) # $_->{rule}\n";
         }
-        else {
+        else
+        {
             "( $_->{code} ) # $_->{rule}\n";
         }
     } @{ $self->rules() };
@@ -378,15 +413,16 @@ sub _compile {
     return $code;
 }
 
-sub in {
-    my $self = _force_object shift;
+sub in
+{
+    my $self  = _force_object shift;
     my @paths = @_;
 
     $self->start(@paths);
 
     my @results;
 
-    while (defined(my $match = $self->match()))
+    while ( defined( my $match = $self->match() ) )
     {
         push @results, $match;
     }
@@ -395,17 +431,17 @@ sub in {
 }
 
 
-
-sub start {
-    my $self = _force_object shift;
+sub start
+{
+    my $self  = _force_object shift;
     my @paths = @_;
 
-    my $fragment = $self->_compile($self->_subs());
+    my $fragment = $self->_compile( $self->_subs() );
 
     my $subs = $self->_subs();
 
     warn "relative mode handed multiple paths - that's a bit silly\n"
-      if $self->_relative() && @paths > 1;
+        if $self->_relative() && @paths > 1;
 
     my $code = 'sub {
         my $path_obj = shift;
@@ -449,46 +485,44 @@ sub start {
     my $callback = eval "$code" or die "compile error '$code' $@";
 
     $self->_match_cb($callback);
-    $self->_call_find(\@paths);
+    $self->_call_find( \@paths );
 
     return $self;
 }
 
 
-
-sub match {
+sub match
+{
     my $self = _force_object shift;
 
     my $finder = $self->finder();
 
-    my $match_cb = $self->_match_cb();
+    my $match_cb   = $self->_match_cb();
     my $preproc_cb = $self->extras()->{'preprocess'};
 
-    while(defined(my $next_obj = $finder->next_obj()))
+    while ( defined( my $next_obj = $finder->next_obj() ) )
     {
-        if (defined($preproc_cb) && $next_obj->is_dir())
+        if ( defined($preproc_cb) && $next_obj->is_dir() )
         {
             $finder->set_traverse_to(
                 $preproc_cb->(
-                        $self,
-                        [ @{$finder->get_current_node_files_list()} ]
+                    $self, [ @{ $finder->get_current_node_files_list() } ]
                 )
             );
         }
 
-        if (defined(my $path = $match_cb->($next_obj, $next_obj->path())))
+        if ( defined( my $path = $match_cb->( $next_obj, $next_obj->path() ) ) )
         {
-            if ($self->_relative)
+            if ( $self->_relative )
             {
                 my $comps = $next_obj->full_components();
                 if (@$comps)
                 {
-                    return
-                        ($next_obj->is_dir()
+                    return (
+                        $next_obj->is_dir()
                         ? File::Spec->catdir(@$comps)
                         : File::Spec->catfile(@$comps)
-                        )
-                    ;
+                    );
                 }
             }
             else
@@ -516,7 +550,7 @@ File::Find::Object::Rule - Alternative interface to File::Find::Object
 
 =head1 VERSION
 
-version 0.0309
+version 0.0310
 
 =head1 SYNOPSIS
 
@@ -548,7 +582,7 @@ L<File::Find::Object::Rule> to its RT CPAN Queue.
 
 =head1 VERSION
 
-version 0.0309
+version 0.0310
 
 =head1 METHODS
 
@@ -1095,7 +1129,7 @@ and Andy Lester andy@petdance.com.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Richard Clampwith input gained from this.
+This software is copyright (c) 2019 by Richard Clampwith input gained from this.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

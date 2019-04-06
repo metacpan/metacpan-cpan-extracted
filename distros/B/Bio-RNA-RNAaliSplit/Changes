@@ -1,5 +1,8 @@
 Revision history for Bio::RNA::RNAaliSplit
 
+0.10	Fri Apr 05 2019
+	- add constrained base pair distance -m dBc
+
 0.09	Mon Jan 07 2019
 	- use Test2::V0 framework instead of Test::More
 	- fix a typo in scripts/RNAalisplit.pl

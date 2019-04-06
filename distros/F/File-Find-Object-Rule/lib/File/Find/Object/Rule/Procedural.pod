@@ -12,7 +12,7 @@ File::Find::Object::Rule::Procedural - File::Find::Object::Rule's procedural int
 
 =head1 VERSION
 
-version 0.0309
+version 0.0310
 
 =head1 SYNOPSIS
 
@@ -67,7 +67,7 @@ like so:
 
 =head1 VERSION
 
-version 0.0309
+version 0.0310
 
 =head1 AUTHOR
 
@@ -100,7 +100,7 @@ and Andy Lester andy@petdance.com.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Richard Clampwith input gained from this.
+This software is copyright (c) 2019 by Richard Clampwith input gained from this.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

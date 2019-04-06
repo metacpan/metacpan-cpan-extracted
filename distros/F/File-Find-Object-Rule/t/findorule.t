@@ -14,61 +14,53 @@ use File::Find::Object::TreeCreate;
 my $tree_creator = File::Find::Object::TreeCreate->new();
 
 {
-    my $tree =
-    {
+    my $tree = {
         'name' => "findorule-t-copy-to/",
-        'subs' =>
-        [
+        'subs' => [
             {
-                'name' => "File-Find-Rule.t",
+                'name'     => "File-Find-Rule.t",
                 'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/File-Find-Rule.t"
-                ),
+                    "./t/sample-data/to-copy-from/File-Find-Rule.t"),
             },
             {
-                'name' => "findorule.t",
+                'name'     => "findorule.t",
                 'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/findorule.t"
-                ),
+                    "./t/sample-data/to-copy-from/findorule.t"),
             },
             {
                 'name' => "foobar",
-                'contents' => $tree_creator->cat(
-                    "./t/sample-data/to-copy-from/foobar"
-                ),
+                'contents' =>
+                    $tree_creator->cat("./t/sample-data/to-copy-from/foobar"),
 
             },
             {
                 'name' => "lib/",
-                'subs' =>
-                [
+                'subs' => [
                     {
                         'name' => "File/",
-                        'subs' =>
-                        [
+                        'subs' => [
                             {
                                 name => "Find/",
-                                subs =>
-                                [
+                                subs => [
                                     {
                                         name => "Object/",
-                                        subs =>
-                                        [
+                                        subs => [
                                             {
                                                 name => "Rule/",
-                                                subs =>
-                                                [
+                                                subs => [
                                                     {
                                                         name => "Test/",
-                                                        subs =>
-                                                        [
-                                                        {
-                                                            name => "ATeam.pm",
-content => $tree_creator->cat(
-    "./t/sample-data/to-copy-from/lib/File/Find/Object/Rule/Test/ATeam.pm"
+                                                        subs => [
+                                                            {
+                                                                name =>
+                                                                    "ATeam.pm",
+                                                                content =>
+                                                                    $tree_creator
+                                                                    ->cat(
+"./t/sample-data/to-copy-from/lib/File/Find/Object/Rule/Test/ATeam.pm"
 
-),
-}
+                                                                    ),
+                                                            }
                                                         ],
                                                     },
                                                 ],
@@ -84,55 +76,51 @@ content => $tree_creator->cat(
         ],
     };
 
-    $tree_creator->create_tree("./t/sample-data/", $tree);
+    $tree_creator->create_tree( "./t/sample-data/", $tree );
 }
 
 # extra tests for findorule.  these are more for testing the parsing code.
 
-sub run ($) {
+sub run
+{
     my $expr = shift;
-    my $script = File::Spec->catfile(
-        File::Spec->curdir(), "bin", "findorule"
-    );
+    my $script =
+        File::Spec->catfile( File::Spec->curdir(), "bin", "findorule" );
 
     [ sort split /\n/, `$^X -Mblib $script $expr` ];
 }
 
-my $copy_fn = $tree_creator->get_path(
-    "./t/sample-data/findorule-t-copy-to/"
-);
+my $copy_fn = $tree_creator->get_path("./t/sample-data/findorule-t-copy-to/");
 
 my $FFR_t = $tree_creator->get_path(
-    "./t/sample-data/findorule-t-copy-to/File-Find-Rule.t"
-);
-my $findorule_t = $tree_creator->get_path(
-    "./t/sample-data/findorule-t-copy-to/findorule.t"
-);
-my $foobar_fn = $tree_creator->get_path(
-    "./t/sample-data/findorule-t-copy-to/foobar"
-);
+    "./t/sample-data/findorule-t-copy-to/File-Find-Rule.t");
+my $findorule_t =
+    $tree_creator->get_path("./t/sample-data/findorule-t-copy-to/findorule.t");
+my $foobar_fn =
+    $tree_creator->get_path("./t/sample-data/findorule-t-copy-to/foobar");
 
 # TEST
-is_deeply(run $copy_fn . ' -file -name foobar', [ $foobar_fn ],
-          '-file -name foobar');
+is_deeply( run( $copy_fn . ' -file -name foobar' ),
+    [$foobar_fn], '-file -name foobar' );
 
 # TEST
-is_deeply(run $copy_fn . ' -maxdepth 0 -directory',
-          [ $copy_fn ], 'last clause has no args');
-
+is_deeply( run( $copy_fn . ' -maxdepth 0 -directory' ),
+    [$copy_fn], 'last clause has no args' );
 
 {
     local $TODO = "Win32 cmd.exe hurts my brain"
-      if ($^O =~ m/Win32/ || $^O eq 'dos');
+        if ( $^O =~ m/Win32/ || $^O eq 'dos' );
 
     # TEST
-    is_deeply(run $copy_fn . ' -file -name \( foobar \*.t \)',
-              [ $FFR_t, $findorule_t, $foobar_fn ],
-              'grouping ()');
+    is_deeply(
+        run( $copy_fn . ' -file -name \( foobar \*.t \)' ),
+        [ $FFR_t, $findorule_t, $foobar_fn ],
+        'grouping ()'
+    );
 
     # TEST
-    is_deeply(run $copy_fn . ' -name \( -foo foobar \)',
-              [ $foobar_fn ], 'grouping ( -literal )');
+    is_deeply( run( $copy_fn . ' -name \( -foo foobar \)' ),
+        [$foobar_fn], 'grouping ( -literal )' );
 }
 
 # Remming out due to capturing STDERR using unixisms. In the future, we
@@ -141,7 +129,7 @@ is_deeply(run $copy_fn . ' -maxdepth 0 -directory',
 #          [ "unknown option 'baz'" ], 'no implicit grouping');
 
 # TEST
-is_deeply(run $copy_fn . ' -maxdepth 0 -name -file',
-          [], 'terminate at next -');
+is_deeply( run( $copy_fn . ' -maxdepth 0 -name -file' ),
+    [], 'terminate at next -' );
 
 rmtree($copy_fn);

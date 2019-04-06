@@ -1,5 +1,5 @@
 package Archive::Any::Tar;
-$Archive::Any::Tar::VERSION = '0.0945';
+our $VERSION = '0.0946';
 use strict;
 use warnings;
 require Archive::Any;
@@ -13,7 +13,7 @@ sub new {
 
     my $self = bless {}, $class;
 
-    $self->{handler} = Archive::Tar->new( $file );
+    $self->{handler} = Archive::Tar->new($file);
     return unless $self->{handler};
 
     $self->{file} = $file;
@@ -22,7 +22,7 @@ sub new {
 }
 
 sub files {
-    my ( $self ) = shift;
+    my ($self) = shift;
 
     $self->{handler}->list_files;
 }
@@ -31,14 +31,14 @@ sub extract {
     my ( $self, $dir ) = @_;
 
     my $orig_dir;
-    if ( $dir ) {
+    if ($dir) {
         $orig_dir = getcwd;
         chdir $dir;
     }
 
     my $success = $self->{handler}->extract;
 
-    if ( $dir ) {
+    if ($dir) {
         chdir $orig_dir;
     }
 
@@ -65,7 +65,7 @@ Archive::Any::Tar - Archive::Any wrapper around Archive::Tar
 
 =head1 VERSION
 
-version 0.0945
+version 0.0946
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ Olaf Alders (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Olaf Alders.
+This software is copyright (c) 2016 by Michael G Schwern, Clint Moore, Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,23 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.35 (2019/04/05):
+    Added _rem_dots method, a improved way to remove '.' and '..' from readdir(), supposed to be faster than previous implementation with sort() and shift().
+    Added two more tests to increase testing coverage.
+    Fixed a small bug regarding Pod, that now covers 100% of the code.
+    Small fixes to documentation.
+
+0.34 (2019/03/22):
+    Increased test coverage.
+    Refactored code to make it easier for testing.
+    Disabled performance-small.t for now.
+    Refactored bzip2 tests.
+    Adding META.yml "provides" from Makefile.PL
+    Covered methods that didn't have Pod.
+    Refactored all Pod following best practices.
+    Refactored a single method to be "private".
+    Slightly changed new() to enable unit testing for OS specific configurations.
+
 0.33 (2018/07/10):
     Skipping bzip2 testing if the program is not available
     (https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues/11).

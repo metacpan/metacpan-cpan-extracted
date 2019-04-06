@@ -1,5 +1,5 @@
 package Archive::Any::Zip;
-$Archive::Any::Zip::VERSION = '0.0945';
+our $VERSION = '0.0946';
 use strict;
 use warnings;
 
@@ -14,7 +14,7 @@ sub new {
     my $self = bless {}, $class;
 
     Archive::Zip::setErrorHandler( sub { } );
-    $self->{handler} = Archive::Zip->new( $file );
+    $self->{handler} = Archive::Zip->new($file);
     return unless $self->{handler};
 
     $self->{file} = $file;
@@ -23,7 +23,7 @@ sub new {
 }
 
 sub files {
-    my ( $self ) = shift;
+    my ($self) = shift;
 
     $self->{handler}->memberNames;
 }
@@ -32,14 +32,14 @@ sub extract {
     my ( $self, $dir ) = @_;
 
     my $orig_dir;
-    if ( $dir ) {
+    if ($dir) {
         $orig_dir = getcwd;
         chdir $dir;
     }
 
     $self->{handler}->extractTree;
 
-    if ( $dir ) {
+    if ($dir) {
         chdir $orig_dir;
     }
 
@@ -49,13 +49,6 @@ sub extract {
 sub type {
     return 'zip';
 }
-
-# ABSTRACT: Archive::Any wrapper around Archive::Zip
-
-
-1;
-
-__END__
 
 =pod
 
@@ -67,7 +60,7 @@ Archive::Any::Zip - Archive::Any wrapper around Archive::Zip
 
 =head1 VERSION
 
-version 0.0945
+version 0.0946
 
 =head1 SYNOPSIS
 
@@ -99,9 +92,16 @@ Olaf Alders (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Olaf Alders.
+This software is copyright (c) 2016 by Michael G Schwern, Clint Moore, Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+
+1;
+
+# ABSTRACT: Archive::Any wrapper around Archive::Zip

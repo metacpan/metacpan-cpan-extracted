@@ -41,7 +41,6 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Perl::Tidy::Sweetened' => '1.12',
                                    'Pod::Tidy' => '0.10',
-                                   'SpamcupNG' => '0',
                                    'Test::Code::TidyAll' => '0.69',
                                    'Test::More' => '0'
                                  }

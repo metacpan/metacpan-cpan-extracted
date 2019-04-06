@@ -11,7 +11,7 @@ use File::Spec;
 use App::SpamcupNG
   qw(main_loop get_browser read_config %OPTIONS_MAP config_logger);
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 
@@ -279,8 +279,7 @@ Compatibility with the original Spamcup project: you can reuse your configuratio
 
 =head2 MOTIVATIONS
 
-The motivations for this distribution where inquired at L<http://cpanratings.perl.org/dist/spamcupNG#13180>, and since I considered it a fair 
-question, here are the motivations of using SpamcupNG instead of L<WWW::Mechanize::SpamCop>.
+The motivations for this distribution where inquired while comparing it to L<WWW::Mechanize::SpamCop>. Here is the rationale:
 
 =over
 
@@ -307,7 +306,7 @@ developed.
 
 =item WWW::Mechanize is not required
 
-L<WWW::Mechanize> (the base of L<WWW::Mechanize::SpamCop>) is pretty neaty, easier to use then L<LWP::UserAgent>, but on the other hand has 
+L<WWW::Mechanize> (the base of L<WWW::Mechanize::SpamCop>) is pretty neaty, easier to use than L<LWP::UserAgent>, but on the other hand has 
 more dependencies and wouldn't add any value compared to the already in place webcrawler implementation. If the Spamcop.net website changes, I
 might consider moving to it, but not before that.
 

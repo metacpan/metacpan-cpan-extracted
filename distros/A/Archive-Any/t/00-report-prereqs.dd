@@ -1,0 +1,59 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
+                                      },
+                      'requires' => {
+                                      'Code::TidyAll' => '0.71',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                                      'Code::TidyAll::Plugin::Test::Vars' => '0.04',
+                                      'Code::TidyAll::Plugin::UniqueLines' => '0.000003',
+                                      'Parallel::ForkManager' => '1.19',
+                                      'Perl::Critic' => '1.132',
+                                      'Perl::Tidy' => '20180220',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Vars' => '0.014'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Archive::Tar' => '0',
+                                      'Archive::Zip' => '0',
+                                      'Cwd' => '0',
+                                      'File::MMagic' => '0',
+                                      'File::Spec::Functions' => '0',
+                                      'MIME::Types' => '0',
+                                      'Module::Find' => '0',
+                                      'base' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Warn' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

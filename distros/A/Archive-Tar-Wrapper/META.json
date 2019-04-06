@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Archive-Tar-Wrapper",
    "no_index" : {
@@ -52,20 +52,20 @@
    "provides" : {
       "Archive::Tar::Wrapper" : {
          "file" : "lib/Archive/Tar/Wrapper.pm",
-         "version" : "0.34"
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git",
+         "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
       }
    },
-   "version" : "0.34",
-   "x_repository" : {
-      "type" : "git",
-      "url" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl.git",
-      "web" : "https://github.com/glasswalk3r/archive-tar-wrapper-perl"
-   },
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.35",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

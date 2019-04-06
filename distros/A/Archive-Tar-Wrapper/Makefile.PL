@@ -79,12 +79,13 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
         'bugtracker' => {
             'web' =>
               'https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues',
+        },
+        'repository' => {
+            'type' => 'git',
+            'url' =>
+              'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
+            'web' => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
         }
-    };
-    $WriteMakefileArgs{META_MERGE}->{'repository'} = {
-        'type' => 'git',
-        'url'  => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl.git',
-        'web'  => 'https://github.com/glasswalk3r/archive-tar-wrapper-perl',
     };
 }
 

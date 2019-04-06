@@ -14,6 +14,7 @@ Archive::Tar::Wrapper - API wrapper around the 'tar' utility
 
     # Iterate over all entries in the archive
     $arch->list_reset(); # Reset Iterator
+
     # Iterate through archive
     while(my $entry = $arch->list_next()) {
         my($tar_path, $phys_path) = @$entry;

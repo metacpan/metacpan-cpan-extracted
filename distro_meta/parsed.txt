@@ -54828,3 +54828,12 @@ G/GL/GLBRUNE/Sim-OPT-0.337.tar.gz
 K/KI/KIMOTO/SPVM-0.0421.tar.gz
 K/KU/KUERBIS/Term-Choose-1.646.tar.gz
 K/KU/KUERBIS/Term-Form-0.510.tar.gz
+A/AR/ARFREITAS/App-SpamcupNG-0.002.tar.gz
+O/OA/OALDERS/Archive-Any-0.0946.tar.gz
+A/AR/ARFREITAS/Archive-Tar-Wrapper-0.35.tar.gz
+L/LN/LNATION/Authen-Passphrase-Argon2-0.08.tar.gz
+M/MT/MTW/Bio-RNA-RNAaliSplit-v0.10.tar.gz
+B/BI/BINGOS/CPAN-Perl-Releases-3.94.tar.gz
+S/SH/SHLOMIF/File-Find-Object-Rule-0.0310.tar.gz
+I/IL/ILYAZ/modules/Math-Pari-2.030517.zip
+M/MS/MSISK/Net-Silk-2.08.tar.gz

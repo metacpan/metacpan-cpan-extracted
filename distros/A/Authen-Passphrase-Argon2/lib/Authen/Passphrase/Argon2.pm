@@ -1,6 +1,6 @@
 package Authen::Passphrase::Argon2;
 
-use 5.006;
+use 5.014;
 use strict;
 use warnings;
 use Crypt::Argon2 qw/argon2id_pass argon2id_verify/;
@@ -11,7 +11,7 @@ use Syntax::Construct qw( ?<> /a );
 
 use parent 'Authen::Passphrase';
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 our (%salts, %hashes, @argons);
 BEGIN {
@@ -195,7 +195,7 @@ Authen::Passphrase::Argon2 - Store and check password using Argon2
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 

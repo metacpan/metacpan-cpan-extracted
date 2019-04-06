@@ -91,13 +91,15 @@ sub test_archive {
 
     # And now we chdir out from under it.  This causes serious problems
     # if we're not careful to use absolute paths internally.
-    chdir( 't' );
+    chdir('t');
 
-    ok( defined $archive,                "new($file)" );
-    ok( $archive->isa( 'Archive::Any' ), "  it's an object" );
+    ok( defined $archive,              "new($file)" );
+    ok( $archive->isa('Archive::Any'), "  it's an object" );
 
-    ok( eq_set( [ $archive->files ], $expect->{files} ),
-        '  lists the right files' );
+    ok(
+        eq_set( [ $archive->files ], $expect->{files} ),
+        '  lists the right files'
+    );
     ok( $archive->type(), "backwards compatibility" );
 
     #    is( $archive->handler, $expect->{handler},    '  right handler' );
@@ -113,5 +115,5 @@ sub test_archive {
         }
     }
 
-    chdir( updir );
+    chdir(updir);
 }

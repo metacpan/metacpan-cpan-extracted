@@ -10,7 +10,7 @@ WriteMakefile(
 	ABSTRACT_FROM    => 'lib/Authen/Passphrase/Argon2.pm',
 	LICENSE          => 'artistic_2',
 	PL_FILES         => {},
-	MIN_PERL_VERSION => '5.006',
+	MIN_PERL_VERSION => '5.014',
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 	},

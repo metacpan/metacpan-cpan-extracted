@@ -58,5 +58,5 @@ resources:
   bugtracker: https://github.com/mtw/Bio-RNA-RNAaliSplit/issues
   homepage: https://github.com/mtw/Bio-RNA-RNAaliSplit
   repository: https://github.com/mtw/Bio-RNA-RNAaliSplit.git
-version: v0.09
+version: v0.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

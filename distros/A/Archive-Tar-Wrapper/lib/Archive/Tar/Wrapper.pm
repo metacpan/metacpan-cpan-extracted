@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 my $logger = get_logger();
 
 =pod
@@ -38,6 +38,7 @@ Archive::Tar::Wrapper - API wrapper around the 'tar' utility
 
     # Iterate over all entries in the archive
     $arch->list_reset(); # Reset Iterator
+
     # Iterate through archive
     while(my $entry = $arch->list_next()) {
         my($tar_path, $phys_path) = @$entry;
@@ -224,6 +225,13 @@ sub new {
         gzip_regex  => qr/\.t? # an optional t for matching tgz
                                     gz$ # ending with gz, which means compressed by gzip
                                     /ix,
+        tar_error_msg => undef,
+        version_info  => undef,
+        tar_exit_code => undef,
+        is_gnu        => undef,
+        is_bsd        => undef,
+        version_info  => undef,
+        tar_exit_code => undef,
         %options,
     };
 
@@ -389,7 +397,7 @@ sub list_reset {
 
     #TODO: keep the file list as a fixed attribute of the instance
     my $list_file = File::Spec->catfile( $self->{objdir}, 'list' );
-    my $cwd = getcwd();
+    my $cwd       = getcwd();
     chdir $self->{tardir} or LOGDIE "Can't chdir to $self->{tardir}: $!";
     open( my $fh, '>', $list_file ) or LOGDIE "Can't open $list_file: $!";
 
@@ -419,34 +427,41 @@ sub list_reset {
     return 1;
 }
 
-sub _acquire_tar_info {
+sub _read_from_tar {
     my $self = shift;
     my ( $wtr, $rdr, $err ) = ( gensym, gensym, gensym );
     my $pid = open3( $wtr, $rdr, $err, "$self->{tar} --version" );
     my ( $output, $error );
+
     {
         local $/ = undef;
         $output = <$rdr>;
         $error  = <$err>;
     }
+
     close($rdr);
     close($err);
     close($wtr);
     waitpid( $pid, 0 );
-    my $exit = $? >> 8;
-
     $self->{tar_error_msg} = $error;
     $self->{version_info}  = $output;
+    $self->{tar_exit_code} = $? >> 8;
+}
+
+sub _acquire_tar_info {
+    my ( $self, $skip ) = @_;
+    $self->_read_from_tar() unless ($skip);
     my $bsd_regex = qr/bsd/i;
     $self->{is_gnu} = 0;
     $self->{is_bsd} = 0;
 
     # bsdtar exit code is 1 when asking for version
-    unless ( ( $exit == 0 ) or ( $self->{tar} =~ $bsd_regex ) ) {
+    unless ( ( $self->{tar_exit_code} == 0 ) or ( $self->{tar} =~ $bsd_regex ) )
+    {
         $self->{version_info} = 'Information not available. Search for errors';
     }
     else {
-        if ( $output =~ /GNU/ ) {
+        if ( $self->{version_info} =~ /GNU/ ) {
             $self->{is_gnu} = 1;
         }
         elsif ( $self->{tar} =~ $bsd_regex ) {
@@ -586,7 +601,7 @@ sub add {
     $gid     = $opts->{gid}     if defined $opts->{gid};
     $binmode = $opts->{binmode} if defined $opts->{binmode};
 
-    my $target = File::Spec->catfile( $self->{tardir}, $rel_path );
+    my $target     = File::Spec->catfile( $self->{tardir}, $rel_path );
     my $target_dir = dirname($target);
 
     unless ( -d $target_dir ) {
@@ -852,11 +867,8 @@ sub write {    ## no critic (ProhibitBuiltinHomonyms)
     opendir( my $dir, '.' ) or LOGDIE "Cannot open $self->{tardir}: $!";
     my @top_entries = readdir($dir);
     closedir($dir);
-    @top_entries = sort(@top_entries);
 
-    # removing the '.' and '..' entries
-    shift(@top_entries);
-    shift(@top_entries);
+    $self->_rem_dots( \@top_entries );
 
     my $cmd = [
         $self->{tar}, "${compr_opt}cf$self->{tar_write_options}",
@@ -891,6 +903,42 @@ sub write {    ## no critic (ProhibitBuiltinHomonyms)
     WARN $err if $err;
     chdir $cwd or LOGDIE "Cannot chdir to $cwd";
     return 1;
+}
+
+sub _rem_dots {
+    my ( $self, $entries_ref ) = @_;
+    my ( $first, $second );
+    my $index = 0;
+    my $found = 0;
+
+    for ( @{$entries_ref} ) {
+
+        if (    ( length($_) <= 2 )
+            and ( ( $_ eq '.' ) or ( $_ eq '..' ) ) )
+        {
+            if ( $found < 1 ) {
+                $first = $index;
+                $found++;
+                $index++;
+                next;
+            }
+            else {
+                $second = $index;
+                last;
+            }
+
+        }
+        else {
+            $index++;
+        }
+    }
+
+    splice( @{$entries_ref}, $first, 1 );
+
+    # array length is now shortened by one
+    splice( @{$entries_ref}, ( $second - 1 ), 1 );
+    return 1;
+
 }
 
 sub DESTROY {
@@ -1003,7 +1051,7 @@ sub ramdisk_mount {
     return 1;
 }
 
-=head2 ramdisk_umount
+=head2 ramdisk_unmount
 
 Unmounts the RAM disk already mounted with C<ramdisk_mount>.
 

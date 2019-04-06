@@ -1,7 +1,9 @@
 package Archive::Any;
-$Archive::Any::VERSION = '0.0945';
+
 use strict;
 use warnings;
+
+our $VERSION = '0.0946';
 
 use Archive::Any::Plugin;
 use File::Spec::Functions qw( rel2abs splitdir );
@@ -11,18 +13,18 @@ use MIME::Types qw(by_suffix);
 sub new {
     my ( $class, $file, $type ) = @_;
 
-    $file = rel2abs( $file );
+    $file = rel2abs($file);
     return unless -f $file;
 
     my %available;
 
     my @plugins = Archive::Any::Plugin->findsubmod;
-    foreach my $plugin ( @plugins ) {
+    foreach my $plugin (@plugins) {
         eval "require $plugin";
         next if $@;
 
         my @types = $plugin->can_handle();
-        foreach my $type ( @types ) {
+        foreach my $type (@types) {
             next if exists( $available{$type} );
             $available{$type} = $plugin;
         }
@@ -30,18 +32,18 @@ sub new {
 
     my $mime_type;
 
-    if ( $type ) {
+    if ($type) {
 
         # The user forced the type.
-        ( $mime_type ) = by_suffix( $type );
-        unless ( $mime_type ) {
+        ($mime_type) = by_suffix($type);
+        unless ($mime_type) {
             warn "No mime type found for type '$type'";
             return;
         }
     }
     else {
         # Autodetect the type.
-        $mime_type = File::MMagic->new()->checktype_filename( $file );
+        $mime_type = File::MMagic->new()->checktype_filename($file);
     }
 
     my $handler = $available{$mime_type};
@@ -61,7 +63,7 @@ sub extract {
     my $self = shift;
     my $dir  = shift;
 
-    return defined( $dir )
+    return defined($dir)
         ? $self->{handler}->_extract( $self->{file}, $dir )
         : $self->{handler}->_extract( $self->{file} );
 }
@@ -74,16 +76,16 @@ sub files {
 sub is_impolite {
     my $self = shift;
 
-    my @files         = $self->files;
-    my $first_file    = $files[0];
-    my ( $first_dir ) = splitdir( $first_file );
+    my @files       = $self->files;
+    my $first_file  = $files[0];
+    my ($first_dir) = splitdir($first_file);
 
     return grep( !/^\Q$first_dir\E/, @files ) ? 1 : 0;
 }
 
 sub is_naughty {
-    my ( $self ) = shift;
-    return ( grep {m{^(?:/|(?:\./)*\.\./)}} $self->files ) ? 1 : 0;
+    my ($self) = shift;
+    return ( grep { m{^(?:/|(?:\./)*\.\./)} } $self->files ) ? 1 : 0;
 }
 
 sub mime_type {
@@ -103,10 +105,6 @@ sub type {
 
 1;
 
-# ABSTRACT: Single interface to deal with file archives.
-
-__END__
-
 =pod
 
 =encoding UTF-8
@@ -117,13 +115,13 @@ Archive::Any - Single interface to deal with file archives.
 
 =head1 VERSION
 
-version 0.0945
+version 0.0946
 
 =head1 SYNOPSIS
 
     use Archive::Any;
 
-    my $archive = Archive::Any->new( $archive_file );
+    my $archive = Archive::Any->new( 'archive_file.zip' );
 
     my @files = $archive->files;
 
@@ -144,7 +142,7 @@ Tarballs, zip files, etc.
 =item B<new>
 
     my $archive = Archive::Any->new( $archive_file );
-    my $archive = Archive::Any->new( $archive_file, $type );
+    my $archive_with_type = Archive::Any->new( $archive_file, $type );
 
 $type is optional.  It lets you force the file type in case Archive::Any can't
 figure it out.
@@ -248,9 +246,14 @@ Olaf Alders (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Olaf Alders.
+This software is copyright (c) 2016 by Michael G Schwern, Clint Moore, Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+__END__
+
+
+# ABSTRACT: Single interface to deal with file archives.

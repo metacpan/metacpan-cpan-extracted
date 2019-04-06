@@ -1,5 +1,5 @@
 package Archive::Any::Plugin;
-$Archive::Any::Plugin::VERSION = '0.0945';
+our $VERSION = '0.0946';
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ sub _extract {
         chdir $dir;
     }
 
-    my $success = $self->extract( $file );
+    $self->extract($file);
 
     if ( defined $dir ) {
         chdir $orig_dir;
@@ -40,7 +40,7 @@ Archive::Any::Plugin - Anatomy of an Archive::Any plugin.
 
 =head1 VERSION
 
-version 0.0945
+version 0.0946
 
 =head1 SYNOPSIS
 
@@ -118,7 +118,7 @@ Olaf Alders (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Olaf Alders.
+This software is copyright (c) 2016 by Michael G Schwern, Clint Moore, Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

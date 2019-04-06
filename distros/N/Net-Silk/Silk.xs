@@ -1,6 +1,6 @@
 /*
 **
-** Copyright (C) 2011-2018 by Carnegie Mellon University
+** Copyright (C) 2011-2019 by Carnegie Mellon University
 **
 ** Use of the Net-Silk library and related source code is subject to the
 ** terms of the following licenses:
@@ -2661,9 +2661,6 @@ _get_range(THIS, sv_key)
       case SKPREFIXMAP_CONT_ADDR_V4:
         addr_key = SvIPV4ADDR(aTHX_ sv_key);
         rv = skPrefixMapFindRange(THIS, &addr_key, &addr_lo, &addr_hi);
-        if (rv != SKPREFIXMAP_OK)
-            croak("error %d finding pmap range: %s",
-                  rv, skPrefixMapStrerror(rv));
         sv_lo = newSvIPV4ADDR(aTHX_ &addr_lo);
         sv_hi = newSvIPV4ADDR(aTHX_ &addr_hi);
         break;
@@ -2671,9 +2668,6 @@ _get_range(THIS, sv_key)
       case SKPREFIXMAP_CONT_ADDR_V6:
         addr_key = SvIPV6ADDR(aTHX_ sv_key);
         rv = skPrefixMapFindRange(THIS, &addr_key, &addr_lo, &addr_hi);
-        if (rv != SKPREFIXMAP_OK)
-            croak("error %d finding pmap range: %s",
-                  rv, skPrefixMapStrerror(rv));
         sv_lo = newSvIPV4ADDR(aTHX_ &addr_lo);
         sv_hi = newSvIPV4ADDR(aTHX_ &addr_hi);
         break;
@@ -2681,9 +2675,6 @@ _get_range(THIS, sv_key)
       case SKPREFIXMAP_CONT_PROTO_PORT:
         pp_key = SvPROTOPORT(aTHX_ sv_key);
         rv = skPrefixMapFindRange(THIS, &pp_key, &pp_lo, &pp_hi);
-        if (rv != SKPREFIXMAP_OK)
-            croak("error %d finding pmap range: %s",
-                  rv, skPrefixMapStrerror(rv));
         sv_lo = newSvPROTOPORT(aTHX_ pp_lo);
         sv_hi = newSvPROTOPORT(aTHX_ pp_hi);
         break;

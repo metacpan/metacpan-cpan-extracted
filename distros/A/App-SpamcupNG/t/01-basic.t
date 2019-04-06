@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Test::More;
 
-my $module = 'SpamcupNG';
+my $module = 'App::SpamcupNG';
 require_ok($module);
 can_ok( $module, qw(read_config main_loop get_browser) );
 

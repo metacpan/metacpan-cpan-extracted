@@ -9,7 +9,7 @@ lib/Bio/RNA/RNAaliSplit/WrapRNAz.pm
 lib/Bio/RNA/RNAaliSplit/WrapRscape.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.md
 scripts/RNAalisplit.pl
 scripts/eval_alignment.pl
 share/aln/all.SL.JEVG.aln

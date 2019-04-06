@@ -1,23 +1,35 @@
-#!perl -w
+#!/usr/bin/env perl
+
 use strict;
+use warnings;
+
 use File::Find::Object::Rule;
 use File::Spec::Functions qw(catdir);
 
 # bootstrap extensions
-for (@INC) {
-    my $dir = catdir($_, qw( File Find Rule ) );
+for (@INC)
+{
+    my $dir = catdir( $_, qw( File Find Rule ) );
     next unless -d $dir;
-    my @pm = find( name => '*.pm', maxdepth => 1,
-                   exec => sub { my $name = $_[0]; $name =~ s/\.pm$//;
-                                 eval "require File::Find::Object::Rule::$name"; },
-                   in => $dir );
+    my @pm = find(
+        name     => '*.pm',
+        maxdepth => 1,
+        exec     => sub {
+            my $name = $_[0];
+            $name =~ s/\.pm$//;
+            eval "require File::Find::Object::Rule::$name";
+        },
+        in => $dir
+    );
 }
 
 # what directories are we searching in?
 my @where;
-while (@ARGV) {
+while (@ARGV)
+{
     local $_ = shift @ARGV;
-    if (/^-/) {
+    if (/^-/)
+    {
         unshift @ARGV, $_;
         last;
     }
@@ -26,16 +38,19 @@ while (@ARGV) {
 
 # parse arguments, build a rule object
 my $rule = new File::Find::Object::Rule;
-while (@ARGV) {
+while (@ARGV)
+{
     my $clause = shift @ARGV;
 
-    unless ( $clause =~ s/^-// && $rule->can( $clause ) ) {
+    unless ( $clause =~ s/^-// && $rule->can($clause) )
+    {
         # not a known rule - complain about this
-        die "unknown option '$clause'\n"
+        die "unknown option '$clause'\n";
     }
 
     # it was the last switch
-    unless (@ARGV) {
+    unless (@ARGV)
+    {
         $rule->$clause();
         next;
     }
@@ -43,27 +58,30 @@ while (@ARGV) {
     # consume the parameters
     my $param = shift @ARGV;
 
-    if ($param =~ /^-/) {
+    if ( $param =~ /^-/ )
+    {
         # it's the next switch - put it back, and add one with no params
         unshift @ARGV, $param;
         $rule->$clause();
         next;
     }
 
-    if ($param eq '(') {
+    if ( $param eq '(' )
+    {
         # multiple values - just look for the closing parenthesis
         my @p;
-        while (@ARGV) {
+        while (@ARGV)
+        {
             my $val = shift @ARGV;
             last if $val eq ')';
             push @p, $val;
         }
-        $rule->$clause( @p );
+        $rule->$clause(@p);
         next;
     }
 
     # a single argument
-    $rule->$clause( $param );
+    $rule->$clause($param);
 }
 
 # add a print rule so things happen faster
@@ -85,7 +103,7 @@ findorule - command line wrapper to File::Find::Object::Rule
 
 =head1 VERSION
 
-version 0.0309
+version 0.0310
 
 =head1 DESCRIPTION
 
@@ -126,7 +144,7 @@ extension modules, so check the documentation to see what those would be.
 
 =head1 VERSION
 
-version 0.0309
+version 0.0310
 
 =head1 USAGE
 
@@ -166,7 +184,7 @@ and Andy Lester andy@petdance.com.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Richard Clampwith input gained from this.
+This software is copyright (c) 2019 by Richard Clampwith input gained from this.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

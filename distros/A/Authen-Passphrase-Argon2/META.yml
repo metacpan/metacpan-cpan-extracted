@@ -24,10 +24,10 @@ requires:
   Data::GUID: '0.049'
   MIME::Base64: '0'
   Syntax::Construct: '1.004'
-  perl: '5.006'
+  perl: '5.014'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/Authen-Passphrase-Argon2.git
-version: '0.06'
+version: '0.08'
 x_contributors:
   - 'Alexander Hartmaier <abraxxa@cpan.org>'
   - "Lars DÉªá´�á´�á´�á´�á´¡ è¿ªæ��æ�¯ <daxim@cpan.org>"

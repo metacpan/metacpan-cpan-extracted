@@ -10,3 +10,9 @@ Revision history for Authen-Passphrase-Argon2
 
 0.06    04/04/2019
         Fix dependency typo for MIME::Base64 (waterkip)
+
+0.07    06/04/2019
+        Syntax::Construct /a requires 5.014
+
+0.08    06/04/2019
+        update Makefile^^ 

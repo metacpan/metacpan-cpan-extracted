@@ -128,8 +128,8 @@ $bench->add_instances(
                 }
             }
 
-            splice( @temp, $first,  1, 1 );
-            splice( @temp, $second, 1, 1 );
+            splice( @temp, $first, 1 );
+            splice( @temp, ( $second - 1 ), 1 );
         }
     ),
     Dumbbench::Instance::PerlSub->new(

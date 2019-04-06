@@ -86,6 +86,6 @@
          "web" : "https://github.com/mtw/Bio-RNA-RNAaliSplit"
       }
    },
-   "version" : "v0.09",
+   "version" : "v0.10",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

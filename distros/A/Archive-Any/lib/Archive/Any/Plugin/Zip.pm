@@ -1,5 +1,5 @@
 package Archive::Any::Plugin::Zip;
-$Archive::Any::Plugin::Zip::VERSION = '0.0945';
+our $VERSION = '0.0946';
 use strict;
 use warnings;
 use base qw(Archive::Any::Plugin);
@@ -13,14 +13,14 @@ sub can_handle {
 sub files {
     my ( $self, $file ) = @_;
 
-    my $z = Archive::Zip->new( $file );
+    my $z = Archive::Zip->new($file);
     return $z->memberNames;
 }
 
 sub extract {
     my ( $self, $file ) = @_;
 
-    my $z = Archive::Zip->new( $file );
+    my $z = Archive::Zip->new($file);
     $z->extractTree;
 
     return 1;
@@ -47,7 +47,7 @@ Archive::Any::Plugin::Zip - Archive::Any wrapper around Archive::Zip
 
 =head1 VERSION
 
-version 0.0945
+version 0.0946
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,7 @@ Olaf Alders (current maintainer)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Olaf Alders.
+This software is copyright (c) 2016 by Michael G Schwern, Clint Moore, Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

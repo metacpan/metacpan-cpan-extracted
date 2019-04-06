@@ -20,9 +20,6 @@ t/findorule.t
 t/foobar
 t/lib/File/Find/Object/Rule/Test/ATeam.pm
 t/lib/File/Find/Object/TreeCreate.pm
-t/pod-coverage.t
-t/pod.t
-t/readme-pod.t
 t/release-trailing-space.t
 t/sample-data/to-copy-from/File-Find-Rule.txt
 t/sample-data/to-copy-from/findorule.txt
@@ -33,5 +30,6 @@ xt/author/eol.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
+xt/author/tidyall.t
 xt/release/cpan-changes.t
 xt/release/trailing-space.t
