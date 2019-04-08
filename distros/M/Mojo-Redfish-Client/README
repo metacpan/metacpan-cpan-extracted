@@ -30,6 +30,14 @@ ATTRIBUTES
     Mojo::Redfish::Client inherits all attributes from Mojo::Base and
     implements the following new ones.
 
+ concurrency
+
+    The per-operation concurrency limit. This is not a global concurrency,
+    it only limits concurrency when a single operation would make several
+    concurrent requests within it. For example (and the only current case),
+    "get_p" in Mojo::Redfish::Client on an array. If zero (or otherwise
+    falsey), no concurrency limit will be applied. Default is 5.
+
  host
 
     The Redfish host.
@@ -73,6 +81,10 @@ METHODS
     Mojo::Redfish::Client::Result. Dies on errors (the exact exception and
     behavior is subject to change).
 
+ get_p
+
+    Same as "get" but returns a Mojo::Promise that resolves to the result.
+
  root
 
       my $result = $client->root;
@@ -83,15 +95,16 @@ METHODS
       # same as (except for the caching)
       my $result = $client->get('/redfish/v1');
 
+ root_p
+
+    Same as "root" but returns a Mojo::Promise that resolves to the
+    (possibly cached) root result.
+
 FUTURE WORK
 
     This module is still in early development. Future work will include
 
-      * Non-blocking (promise-based) api
-
       * Session management
-
-      * Even more testing
 
 SEE ALSO
 

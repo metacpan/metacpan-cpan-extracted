@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0602';
+our $VERSION = '0.0603';
 
 use Moo;
 use strictures 2;
@@ -111,7 +111,7 @@ sub BUILD {
 
     my $doc = PPI::Document->new( $self->file );
 
-    my $dump = PPI::Dumper->new( $doc, whitespace => 0 );
+    my $dump = PPI::Dumper->new( $doc, whitespace => 0, comments => 0 );
 
     my %halstead;
 
@@ -120,9 +120,7 @@ sub BUILD {
         $item =~ s/\s*$//;
         my @item = split /\s+/, $item, 2;
         next unless defined $item[1];
-        next if $item[0] eq 'PPI::Token::Comment'
-            or $item[0] eq 'PPI::Token::Pod'
-            or $item[0] eq 'PPI::Token::End';
+        next if $item[0] eq 'PPI::Token::Pod' or $item[0] eq 'PPI::Token::End';
         push @{ $halstead{ $item[0] } }, $item[1];
     }
 #use Data::Dumper;warn(__PACKAGE__,' ',__LINE__,' ',Dumper\%halstead);
@@ -155,6 +153,9 @@ sub BUILD {
 
     $self->{n_distinct_operators} = keys %{ $distinct{operators} };
     $self->{n_distinct_operands}  = keys %{ $distinct{operands} };
+
+    die 'No distinct operands. Computation cannot continue.'
+        unless $self->{n_distinct_operands};
 }
 
 
@@ -225,7 +226,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0602
+version 0.0603
 
 =head1 SYNOPSIS
 
@@ -246,6 +247,8 @@ of what these attributes mean and how they are computed.
 
 My write-up about this technique is at
 L<http://techn.ology.net/halstead-software-complexity-of-perl-code/>
+
+The installed program for computing this is called L<halstead>.
 
 =head1 ATTRIBUTES
 

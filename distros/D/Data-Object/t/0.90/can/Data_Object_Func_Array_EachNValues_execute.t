@@ -60,7 +60,7 @@ $func = Data::Object::Func::Array::EachNValues->new(
 
 my $result = $func->execute;
 
-is_deeply $result, $data;
+is_deeply $result, [1,2];
 
 is_deeply $sets, [[1,2],[3,4]];
 

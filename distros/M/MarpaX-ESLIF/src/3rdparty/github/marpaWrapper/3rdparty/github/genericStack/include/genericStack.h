@@ -200,6 +200,7 @@ typedef enum genericStackItemType {
 #if GENERICSTACK_HAVE_CUSTOM
   GENERICSTACKITEMTYPE_CUSTOM,
 #endif
+  GENERICSTACKITEMTYPE_LONG_DOUBLE,
   _GENERICSTACKITEMTYPE_MAX
 } genericStackItemType_t;
 
@@ -228,6 +229,7 @@ typedef struct genericStackItem {
 #if GENERICSTACK_HAVE_CUSTOM > 0
     GENERICSTACK_CUSTOM custom;
 #endif
+    long double ld;
   } u;
 } genericStackItem_t;
 
@@ -440,6 +442,7 @@ typedef struct genericStack {
 #define GENERICSTACK_SET_SHORT(stackName, var, index)  _GENERICSTACK_SET_BY_TYPE((stackName), short,  (var), GENERICSTACKITEMTYPE_SHORT, s, (index))
 #define GENERICSTACK_SET_INT(stackName, var, index)    _GENERICSTACK_SET_BY_TYPE((stackName), int,    (var), GENERICSTACKITEMTYPE_INT, i, (index))
 #define GENERICSTACK_SET_LONG(stackName, var, index)   _GENERICSTACK_SET_BY_TYPE((stackName), long,   (var), GENERICSTACKITEMTYPE_LONG, l, (index))
+#define GENERICSTACK_SET_LONG_DOUBLE(stackName, var, index)   _GENERICSTACK_SET_BY_TYPE((stackName), long double,   (var), GENERICSTACKITEMTYPE_LONG, ld, (index))
 #define GENERICSTACK_SET_FLOAT(stackName, var, index)  _GENERICSTACK_SET_BY_TYPE((stackName), float,  (var), GENERICSTACKITEMTYPE_FLOAT, f, (index))
 #define GENERICSTACK_SET_DOUBLE(stackName, var, index) _GENERICSTACK_SET_BY_TYPE((stackName), double, (var), GENERICSTACKITEMTYPE_DOUBLE, d, (index))
 #define GENERICSTACK_SET_PTR(stackName, var, index)    _GENERICSTACK_SET_BY_TYPE((stackName), void *, (var), GENERICSTACKITEMTYPE_PTR, p, (index))
@@ -520,6 +523,7 @@ typedef struct genericStack {
 #define GENERICSTACK_GET_SHORT(stackName, index)  _GENERICSTACK_ITEM_DST((stackName), (index), u.s)
 #define GENERICSTACK_GET_INT(stackName, index)    _GENERICSTACK_ITEM_DST((stackName), (index), u.i)
 #define GENERICSTACK_GET_LONG(stackName, index)   _GENERICSTACK_ITEM_DST((stackName), (index), u.l)
+#define GENERICSTACK_GET_LONG_DOUBLE(stackName, index)   _GENERICSTACK_ITEM_DST((stackName), (index), u.ld)
 #define GENERICSTACK_GET_FLOAT(stackName, index)  _GENERICSTACK_ITEM_DST((stackName), (index), u.f)
 #define GENERICSTACK_GET_DOUBLE(stackName, index) _GENERICSTACK_ITEM_DST((stackName), (index), u.d)
 #define GENERICSTACK_GET_PTR(stackName, index)    _GENERICSTACK_ITEM_DST((stackName), (index), u.p)
@@ -551,6 +555,7 @@ typedef struct genericStack {
 #define GENERICSTACK_PUSH_SHORT(stackName, var)  GENERICSTACK_SET_SHORT((stackName), (var), (stackName)->used)
 #define GENERICSTACK_PUSH_INT(stackName, var)    GENERICSTACK_SET_INT((stackName), (var), (stackName)->used)
 #define GENERICSTACK_PUSH_LONG(stackName, var)   GENERICSTACK_SET_LONG((stackName), (var), (stackName)->used)
+#define GENERICSTACK_PUSH_LONG_DOUBLE(stackName, var)   GENERICSTACK_SET_LONG_DOUBLE((stackName), (var), (stackName)->used)
 #define GENERICSTACK_PUSH_FLOAT(stackName, var)  GENERICSTACK_SET_FLOAT((stackName), (var), (stackName)->used)
 #define GENERICSTACK_PUSH_DOUBLE(stackName, var) GENERICSTACK_SET_DOUBLE((stackName), (var), (stackName)->used)
 #define GENERICSTACK_PUSH_PTR(stackName, var)    GENERICSTACK_SET_PTR((stackName), (var), (stackName)->used)
@@ -580,6 +585,7 @@ typedef struct genericStack {
 #define GENERICSTACK_POP_SHORT(stackName)  (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_SHORT((stackName),  --(stackName)->used))
 #define GENERICSTACK_POP_INT(stackName)    (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_INT((stackName),    --(stackName)->used))
 #define GENERICSTACK_POP_LONG(stackName)   (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_LONG((stackName),   --(stackName)->used))
+#define GENERICSTACK_POP_LONG_DOUBLE(stackName)   (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_LONG_DOUBLE((stackName),   --(stackName)->used))
 #define GENERICSTACK_POP_FLOAT(stackName)  (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_FLOAT((stackName),  --(stackName)->used))
 #define GENERICSTACK_POP_DOUBLE(stackName) (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_DOUBLE((stackName), --(stackName)->used))
 #define GENERICSTACK_POP_PTR(stackName)    (_GENERICSTACK_REDUCE_LENGTH((stackName)), GENERICSTACK_GET_PTR((stackName),    --(stackName)->used))
@@ -635,6 +641,7 @@ typedef struct genericStack {
 #define GENERICSTACKITEMTYPE2TYPE_SHORT  short
 #define GENERICSTACKITEMTYPE2TYPE_INT    int
 #define GENERICSTACKITEMTYPE2TYPE_LONG   long
+#define GENERICSTACKITEMTYPE2TYPE_LONG_DOUBLE   long double
 #define GENERICSTACKITEMTYPE2TYPE_FLOAT  float
 #define GENERICSTACKITEMTYPE2TYPE_DOUBLE double
 #define GENERICSTACKITEMTYPE2TYPE_PTR    void *
@@ -694,6 +701,7 @@ typedef struct genericStack {
 #define GENERICSTACK_IS_SHORT(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_SHORT))
 #define GENERICSTACK_IS_INT(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_INT))
 #define GENERICSTACK_IS_LONG(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_LONG))
+#define GENERICSTACK_IS_LONG_DOUBLE(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_LONG_DOUBLE))
 #define GENERICSTACK_IS_FLOAT(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_FLOAT))
 #define GENERICSTACK_IS_DOUBLE(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_DOUBLE))
 #define GENERICSTACK_IS_PTR(stackName, i) (GENERICSTACK_EXISTS(stackName, i) && (GENERICSTACKITEMTYPE((stackName), (i)) == GENERICSTACKITEMTYPE_PTR))
@@ -757,6 +765,9 @@ typedef struct genericStack {
 	break;								\
       case GENERICSTACKITEMTYPE_ARRAY:					\
 	fprintf(stderr, "Element[%3d/%3d] type     : ARRAY\n", _i_for_dump, GENERICSTACK_USED(stackName)); \
+	break;								\
+      case GENERICSTACKITEMTYPE_LONG_DOUBLE:                            \
+	fprintf(stderr, "Element[%3d/%3d] type     : LONG DOUBLE\n", _i_for_dump, GENERICSTACK_USED(stackName)); \
 	break;								\
       default:								\
 	fprintf(stderr, "Element[%3d/%3d] type     : %d\n", _i_for_dump, GENERICSTACK_USED(stackName), GENERICSTACKITEMTYPE(stackName, _i_for_dump)); \

@@ -26,7 +26,7 @@ do { my $x = {
                       'requires' => {
                                       'DBIx::Class::ResultSet' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.8.0'
+                                      'perl' => 'v5.10.0'
                                     }
                     },
        'test' => {
@@ -40,7 +40,7 @@ do { my $x = {
                                    'DBIx::Class::Schema' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
-                                   'SQL::Abstract' => '0',
+                                   'SQL::Abstract' => '1.83',
                                    'SQL::Abstract::Test' => '0',
                                    'SQL::Translator' => '0.11018',
                                    'Test::More' => '0',

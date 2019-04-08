@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 package Math::Lapack;
-
+$Math::Lapack::VERSION = '0.002';
 use parent 'DynaLoader';
 
 bootstrap Math::Lapack;
@@ -31,7 +31,7 @@ Math::Lapack - Perl interface to LAPACK
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for Pod::Coverage seed_rng
 

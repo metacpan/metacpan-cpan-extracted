@@ -368,10 +368,10 @@ static short producer(tconv_helper_t *tconv_helperp, void *voidp, char **bufpp, 
     /* We do not want to continue */
 #ifndef TCONV_NTRACE
     if (contextp->verbose) {
-      GENERICLOGGER_TRACEF(NULL, "%s: guess mode - faking eof", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)");
+      GENERICLOGGER_TRACEF(NULL, "%s: guess mode - forcing end", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)");
     }
 #endif
-    return tconv_helper_stopb(tconv_helperp);
+    return tconv_helper_endb(tconv_helperp);
   } else if (countl == 0) {
     /* For a file descriptor, if countl is 0 then this is a eof */
 #ifndef TCONV_NTRACE
@@ -402,9 +402,7 @@ static short consumer(tconv_helper_t *tconv_helperp, void *voidp, char *bufp, si
 
   if (contextp->guessb || contextp->fromPrintb) {
     if (contextp->firstconsumercallb != 0) {
-      if (contextp->guessb || contextp->fromPrintb) {
-        GENERICLOGGER_INFOF(NULL, "%s: %s", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", tconv_fromcode(contextp->tconvp));
-      }
+      GENERICLOGGER_INFOF(NULL, "%s: %s", (contextp->filenames != NULL) ? contextp->filenames : "(standard input)", tconv_fromcode(contextp->tconvp));
       contextp->firstconsumercallb = 0;
     }
   }

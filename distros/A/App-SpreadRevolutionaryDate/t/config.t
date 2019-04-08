@@ -9,7 +9,13 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 
-use Test::More tests => 28;
+BEGIN {
+    $ENV{OUTPUT_CHARSET} = 'UTF-8';
+    $ENV{PERL_UNICODE} = 'AS';
+}
+binmode(DATA, ":encoding(UTF-8)");
+
+use Test::More tests => 29;
 use Test::NoWarnings;
 
 use App::SpreadRevolutionaryDate;
@@ -56,6 +62,11 @@ is_deeply($spread_only_to_twitter->config->targets, ['twitter'], 'Targets option
 ok($spread_only_to_twitter->config->twitter, 'Twitter option explicitely set');
 ok(!$spread_only_to_twitter->config->mastodon, 'Mastodon option not explicitely set');
 ok(!$spread_only_to_twitter->config->freenode, 'Freenode option not explicitely set');
+
+push @ARGV, '--targets=freenode', '--test', '-ftc', '#TestOnlyMe';
+seek DATA, $data_start, 0;
+my $spread_freenode = App::SpreadRevolutionaryDate->new(\*DATA);
+is_deeply($spread_freenode->config->freenode_test_channels, ['#TestOnlyMe'], 'Freenode multivalued test_channels option overridden by command line argument');
 
 __DATA__
 

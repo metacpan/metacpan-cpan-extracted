@@ -1,6 +1,30 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.10 2019-03-30T20:59:56
+0.14 2019-04-07T21:58:42
+ - Fix errors in USAGE doc
+
+0.13 2019-04-07T20:48:20Z
+ - Fix pod links with Dist::Zilla::Plugin::Test::Pod::LinkCheck
+ - Fix App::SpreadRevolutionaryDate::MsgMaker namespace in SEE ALSO and
+   README
+
+0.12 2019-04-07T15:26:49Z
+ - Update CONTRIBUTING and TODO
+ - Fix errors in USAGE doc
+
+0.11 2019-04-07T14:26:45Z
+ - Add German localization of PromptUser msgmaker
+ - Add documentation for i18n/l10n
+ - Let multivalued options be overridden by command line arguments
+ - Add App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale
+   role and moosify consuming classes
+ - Add localization template
+ - Add Italian localization
+ - Overload DateTime::Calendar::FrenchRevolutionary to extend defaults
+   fr/en locales
+ - Add localization with Locale::TextDomain
+
+0.10 2019-03-30T20:59:56Z
  - Add --conf, --version and --help command line parameters
  - Fix and improve doc
  - Add default value when defined for options guessed from Target and

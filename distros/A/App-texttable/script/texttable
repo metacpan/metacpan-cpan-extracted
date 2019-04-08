@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/texttable/texttable
 # and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2019-01-11'; # DATE
+our $DATE = '2019-02-24'; # DATE
 our $DIST = 'App-texttable'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ texttable - Render a text table using Text::Table::Any
 
 =head1 VERSION
 
-This document describes version 0.030 of texttable (from Perl distribution App-texttable), released on 2019-01-11.
+This document describes version 0.031 of texttable (from Perl distribution App-texttable), released on 2019-02-24.
 
 =head1 SYNOPSIS
 
@@ -78,7 +78,7 @@ Valid values:
 
 Valid values:
 
- ["Text::Table::Tiny","Text::Table::TinyColor","Text::Table::TinyColorWide","Text::Table::TinyWide","Text::Table::Org","Text::Table::CSV","Text::Table::TSV","Text::Table::LTSV","Text::Table::ASV","Text::Table::HTML","Text::Table::HTML::DataTables","Text::Table::Paragraph","Text::ANSITable","Text::ASCIITable","Text::FormatTable","Text::MarkdownTable","Text::Table","Text::TabularDisplay","Text::Table::XLSX"]
+ ["Text::Table::Tiny","Text::Table::TinyColor","Text::Table::TinyColorWide","Text::Table::TinyWide","Text::Table::Org","Text::Table::CSV","Text::Table::TSV","Text::Table::LTSV","Text::Table::ASV","Text::Table::HTML","Text::Table::HTML::DataTables","Text::Table::Paragraph","Text::ANSITable","Text::ASCIITable","Text::FormatTable","Text::MarkdownTable","Text::Table","Text::TabularDisplay","Text::Table::XLSX","Term::TablePrint"]
 
 =item B<--header-row>
 
@@ -125,45 +125,6 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
-
-=back
-
-=head2 Output options
-
-=over
-
-=item B<--format>=I<s>
-
-Choose output format, e.g. json, text.
-
-Default value:
-
- undef
-
-=item B<--json>
-
-Set output format to json.
-
-=item B<--naked-res>
-
-When outputing as JSON, strip result envelope.
-
-Default value:
-
- 0
-
-By default, when outputing as JSON, the full enveloped result is returned, e.g.:
-
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
-
-The reason is so you can get the status (1st element), status message (2nd
-element) as well as result metadata/extra result (4th element) instead of just
-the result (3rd element). However, sometimes you want just the result, e.g. when
-you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
-
-    [1,2,3]
-
 
 =back
 
@@ -235,9 +196,7 @@ List of available configuration parameters:
 
  action (see --action)
  backend (see --backend)
- format (see --format)
  header_row (see --header-row)
- naked_res (see --naked-res)
  rows (see --rows)
 
 =head1 ENVIRONMENT

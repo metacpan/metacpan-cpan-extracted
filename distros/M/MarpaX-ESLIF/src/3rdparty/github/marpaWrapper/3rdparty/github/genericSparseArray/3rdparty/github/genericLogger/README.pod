@@ -1,4 +1,4 @@
-=for html <a href="https://travis-ci.org/jddurand/c-genericLogger"><img src="https://travis-ci.org/jddurand/c-genericLogger.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-genericLogger"><img src="https://badge.fury.io/gh/jddurand%2Fc-genericLogger.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
+=for html <a href="https://travis-ci.org/jddurand/c-genericLogger"><img src="https://travis-ci.org/jddurand/c-genericLogger.svg?branch=master" alt="Travis CI build status" height="18"></a> <a href="https://ci.appveyor.com/project/jddurand/c-genericlogger"><img src="https://ci.appveyor.com/api/projects/status/github/jddurand/c-genericLogger?branch=master&svg=true" alt="AppVeyor CI build status" height="18"></a> <a href="https://badge.fury.io/gh/jddurand%2Fc-genericLogger"><img src="https://badge.fury.io/gh/jddurand%2Fc-genericLogger.svg" alt="GitHub version" height="18"></a> <a href="http://opensource.org/licenses/MIT" rel="nofollow noreferrer"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License MIT" height="18"></a>
 
 =head1 NAME
 
@@ -42,6 +42,13 @@ genericLogger - generic logging interface
   genericLoggerLevel_t genericLogger_logLevel_seti(genericLogger_t *genericLoggerp,
                                                    genericLoggerLevel_t logLeveli);
   genericLoggerLevel_t genericLogger_logLevel_geti(genericLogger_t *genericLoggerp);
+
+  /* ------------------ */
+  /* Context management */
+  /* ------------------ */
+  void *genericLogger_userDatavp_setp(genericLogger_t *genericLoggerp,
+                                      void *userDatavp);
+  void *genericLogger_userDatavp_getp(genericLogger_t *genericLoggerp);
 
 =head1 DESCRIPTION
 
@@ -129,13 +136,26 @@ va_list version of genericLogger_logv().
   genericLoggerLevel_t genericLogger_logLevel_seti(genericLogger_t *genericLoggerp,
                                                    genericLoggerLevel_t logLeveli);
 
-Set the log level to C<leveLeveli> and return it.
+Set the log level to C<leveLeveli> and returns previous value.
 
 =head2 genericLogger_logLevel_geti
 
   genericLoggerLevel_t genericLogger_logLevel_geti(genericLogger_t *genericLoggerp);
 
 Return the current log level.
+
+=head2 genericLogger_userDatavp_setp
+
+  void *genericLogger_userDatavp_setp(genericLogger_t *genericLoggerp,
+                                      void *userDatavp);
+
+Set the context to C<userDatavp> and returns previous value.
+
+=head2 genericLogger_userDatavp_getp
+
+  void *genericLogger_userDatavp_getp(genericLogger_t *genericLoggerp);
+
+Return the current context.
 
 =head2 genericLogger_versions
 

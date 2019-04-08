@@ -3,16 +3,27 @@ package Siffra::Logger;
 use 5.014;
 use strict;
 use warnings;
-use utf8;
 use Carp;
+$Carp::Verbose = 1;
+use utf8;
+use Data::Dumper;
+use DDP;
+use Log::Any qw($log);
+use Scalar::Util qw(blessed);
 
 $| = 1;    #autoflush
+
+use constant {
+    FALSE => 0,
+    TRUE  => 1,
+    DEBUG => $ENV{ DEBUG } // 0,
+};
 
 BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -21,16 +32,29 @@ BEGIN
     %EXPORT_TAGS = ();
 } ## end BEGIN
 
+=head1 Log-Levels
+    trace
+    debug
+    info (inform)
+    notice
+    warning (warn)
+    error (err)
+    critical (crit, fatal)
+    alert
+    emergency
+=cut
+
 BEGIN
 {
+    binmode( STDOUT, ":encoding(UTF-8)" );
+    binmode( STDERR, ":encoding(UTF-8)" );
+
     use Log::Any::Adapter;
     use Log::Dispatch;
     use File::Basename;
     use Data::Dumper;
     use POSIX qw/strftime/;
 
-    binmode( STDOUT, ":encoding(UTF-8)" );
-    binmode( STDERR, ":encoding(UTF-8)" );
     $ENV{ LC_ALL } = $ENV{ LANG } = 'pt_BR.UTF-8';
 
     my ( $filename, $baseDirectory, $suffix ) = fileparse( $0, qr/\.[^.]*/ );
@@ -43,7 +67,7 @@ BEGIN
             [
                 'Screen',
                 name      => 'screen',
-                min_level => 'debug',
+                min_level => DEBUG ? 'debug' : 'info',
                 max_level => 'warning',
                 newline   => 1,
                 utf8      => 0,
@@ -63,10 +87,22 @@ BEGIN
                 'File',
                 name      => 'file-01',
                 filename  => $logDirectory . $logFilename,
-                min_level => 'debug',
+                min_level => DEBUG ? 'debug' : 'info',
                 newline   => 1,
                 mode      => 'write',
                 binmode   => ':encoding(UTF-8)',
+            ],
+            [
+                'Email::Siffra',
+                name      => 'Email',
+                subject   => 'Subject',
+                to        => 'luiz@siffra.com.br',
+                from      => 'avell@siffra.local',
+                min_level => 'error',
+                buffered  => 1,
+                smtp      => 'mail',
+                port      => 2525,
+                utf8      => 1,
             ]
         ],
         callbacks => [
@@ -90,6 +126,7 @@ BEGIN
                     push( @array_caller, $auxiliar );
                 } until ( !defined $line or $line == 0 or $subroutine =~ /(eval)/ );
 
+                $msg{ message } =~ s/\n|\r//g;
                 my $mensage = sprintf( "%s [ %9.9s ] [ pid: %d ] - %s - [ %s ]", strftime( "%F %H:%M:%S", localtime ), uc( $msg{ level } ), $$, $msg{ message }, $array_caller[ -2 ]->{ subroutine } );
 
                 return $mensage;
@@ -99,6 +136,23 @@ BEGIN
 
     Log::Any::Adapter->set( 'Dispatch', dispatcher => $dispatcher );
 } ## end BEGIN
+
+sub DESTROY
+{
+    my ( $self, %parameters ) = @_;
+
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+
+    if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
+    {
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+    }
+    else
+    {
+        # TODO
+    }
+} ## end sub DESTROY
 
 #################### main pod documentation begin ###################
 ## Below is the stub of documentation for your module.

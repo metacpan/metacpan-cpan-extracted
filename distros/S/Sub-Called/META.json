@@ -28,32 +28,22 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Data::Dumper" : "0",
-            "File::Path" : "2.0",
-            "File::Spec" : "3.40",
-            "JSON" : "0",
-            "List::Util" : "0",
-            "Moo" : "1.003001",
-            "MySQL::Workbench::Parser" : "1.08",
+            "B" : "0",
+            "Exporter" : "0",
             "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0",
-            "File::Copy" : "0",
-            "File::Path" : "2.0",
-            "FindBin" : "0",
             "Pod::Coverage::TrustPod" : "0",
-            "Test::LongString" : "0.16"
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Sub::Called" : {
          "file" : "lib/Sub/Called.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -68,7 +58,7 @@
          "web" : "http://github.com/reneeb/Sub-Called"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"

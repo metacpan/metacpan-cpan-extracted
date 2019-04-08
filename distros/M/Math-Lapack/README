@@ -1,1 +1,25 @@
-This Perl module, Math::Lapack, is an optimized set of operations on matrices.
+NAME
+
+    Math::Lapack - Perl interface to LAPACK
+
+VERSION
+
+    version 0.002
+
+ DESCRIPTION
+
+    This module exists, for now, as a wrapper for the C/XS code, for
+    interaction with Lapack C libraries. Please refer to
+    Math::Lapack::Matrix for usage details.
+
+AUTHOR
+
+    Rui Meira
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2018-2019 by Rui Meira.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

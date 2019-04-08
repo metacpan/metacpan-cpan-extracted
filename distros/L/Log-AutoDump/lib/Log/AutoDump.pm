@@ -34,7 +34,7 @@ Version 0.15
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 $VERSION = eval $VERSION;
 
@@ -359,68 +359,22 @@ sub msg
     {
         if ( my $label = ref $thing )
         {
-#
-# THIS WILL COME BACK INTO PLAY SOON
-#
-#           if ( $label eq 'CGI' )   # don't dump the whole CGI object
-#           {
-#               $msg .= "CGI Params...\n";
-#               
-#               my $max_param_length = 0;
-#                               
-#               foreach my $param ( $thing->param )
-#               {
-#                   $max_param_length = length($param) if length($param) > $max_param_length;
-#               }
-#                               
-#               foreach my $param ( sort { $a cmp $b } grep { $_ !~ /\n/ } $thing->param )
-#               {
-#                   $msg .= "\t" . sprintf("%-*s", $max_param_length, $param) . " = " . $thing->param($param) . "\n";
-#               } 
-#
-#               $msg .= "CGI URL Params...\n";
-#               
-#               $max_param_length = 0;
-#                               
-#               foreach my $param ( $thing->url_param )
-#               {
-#                   $max_param_length = length($param) if length($param) > $max_param_length;
-#               }
-#                               
-#               foreach my $param ( sort { $a cmp $b } grep { $_ !~ /\n/ } $thing->url_param )
-#               {
-#                   $msg .= "\t" . sprintf("%-*s", $max_param_length, $param) . " = " . ( $thing->url_param($param) || '' ) . "\n";
-#               } 
-#
-#               $msg .= "CGI Cookies...\n";
-#               
-#               my $max_cookie_length = 0;
-#                               
-#               foreach my $cookie ( $thing->cookie )
-#               {
-#                   $max_cookie_length = length($cookie) if length($cookie) > $max_cookie_length;
-#               }
-#
-#               foreach my $cookie ( sort { $a cmp $b } $thing->cookie )
-#               {
-#                   $msg .= "\t" . sprintf("%-*s", $max_cookie_length, $cookie ) . " = " . ( $thing->cookie($cookie) || '' ) . "\n";
-#               } 
-#           }   
-#           else
-#           {
-                if ( $self->dumps || $level == 0 )
-                {
-                    $Data::Dumper::Maxdepth = 9 if $level == 0;
+            if ( $self->dumps || $level == 0 )
+            {
+                $Data::Dumper::Maxdepth = 9 if $level == 0;
 
-                    $msg .= Dumper $thing;
+                my $dumped = Data::Dumper->Dump( [ $thing ], [ $label ] );
 
-                    $Data::Dumper::Maxdepth = $self->dump_depth;
-                }
-                else
-                {
-                    $msg .= $prefix . "NOT DUMPING [ " . $label . " ]";
-                }
-#           }
+                my @lines = split( "\n", $dumped );
+
+                $msg .= join( "\n", map { $prefix . $_ } @lines );
+
+                $Data::Dumper::Maxdepth = $self->dump_depth;
+            }
+            else
+            {
+                $msg .= $prefix . "NOT DUMPING [ " . $label . " ]";
+            }
         }
         else
         {
@@ -489,16 +443,23 @@ sub debug
 {
     my $self = shift;
 
-    if ( scalar( @_ ) == 1 && $_[ 0 ] =~ /^#/ && $_[ 0 ] =~ /#$/ )
+    my @lines = @_;
+
+    for ( my $i = 0; $i < scalar( @lines ); $i ++ )
     {
-        $self->msg( DEBUG, '#' x length( $_[ 0 ] ) ) if $self->is_debug;
-        $self->msg( DEBUG, @_ ) if $self->is_debug;
-        $self->msg( DEBUG, '#' x length( $_[ 0 ] ) ) if $self->is_debug;
+        next if ref $lines[ $i ];
+
+        if ( $lines[ $i ] =~ /^#/ && $lines[ $i ] =~ /#$/ && $lines[ $i ] !~ /^#+$/ )
+        {
+            splice( @lines, $i, 0, '#' x length( $_[ 0 ] ) );
+            splice( @lines, $i + 2, 0, '#' x length( $_[ 0 ] ) );
+
+            $i += 2;
+        }
     }
-    else
-    {
-        $self->msg( DEBUG, @_ ) if $self->is_debug;
-    }
+
+    $self->msg( DEBUG, @lines ) if $self->is_debug;
+
     return $self;
 }
 

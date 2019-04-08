@@ -1,5 +1,8 @@
 Revision history for Perl module Text::BibTeX
 
+0.87 2019-04-06
+ * Fix 0.86 release
+
 0.86 2019-03-31    
  * Install btparse.h header file (Alberto Simões)
  * Fix compilation issues with some compilers (Tobias Schlemmer) 

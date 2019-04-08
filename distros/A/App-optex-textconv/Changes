@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-textconv
 
+0.02 2019-04-08T09:14:47Z
+
+    - update dependency
+
 0.01 2019-04-04T07:22:45Z
 
     - original version

@@ -4,7 +4,20 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "DBIC",
+      "DBIx::Class",
+      "over",
+      "partition",
+      "plugin",
+      "rank",
+      "dense_rank",
+      "row_number",
+      "SQLA",
+      "SQL::Abstract",
+      "window-function"
+   ],
    "license" : [
       "artistic_2"
    ],
@@ -41,7 +54,7 @@
          "requires" : {
             "DBIx::Class::ResultSet" : "0",
             "parent" : "0",
-            "perl" : "v5.8.0"
+            "perl" : "v5.10.0"
          }
       },
       "test" : {
@@ -55,7 +68,7 @@
             "DBIx::Class::Schema" : "0",
             "File::Spec" : "0",
             "Module::Metadata" : "0",
-            "SQL::Abstract" : "0",
+            "SQL::Abstract" : "1.83",
             "SQL::Abstract::Test" : "0",
             "SQL::Translator" : "0.11018",
             "Test::More" : "0",
@@ -67,7 +80,7 @@
    "provides" : {
       "DBIx::Class::Helper::ResultSet::WindowFunctions" : {
          "file" : "lib/DBIx/Class/Helper/ResultSet/WindowFunctions.pm",
-         "version" : "v0.1.2"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -75,17 +88,19 @@
       "bugtracker" : {
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions/issues"
       },
+      "homepage" : "https://metacpan.org/pod/DBIx::Class::Helper::ResultSet::WindowFunctions",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions.git",
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-ResultSet-WindowFunctions"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.2.0",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Peter Rabbitson <ribasushi@leporine.io>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"
 }
 

@@ -58,7 +58,7 @@ $func = Data::Object::Func::Hash::EachKey->new(
 
 my $result = $func->execute;
 
-is_deeply $result, $data;
+is_deeply $result, [1,2,3,4,5];
 
 is_deeply [sort @$sets], [1,3,5,7,9];
 

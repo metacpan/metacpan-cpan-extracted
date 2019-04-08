@@ -30,13 +30,14 @@ my %WriteMakefileArgs = (
     "DBIx::Class::Schema" => 0,
     "File::Spec" => 0,
     "Module::Metadata" => 0,
+    "SQL::Abstract" => "1.83",
     "SQL::Abstract::Test" => 0,
     "SQL::Translator" => "0.11018",
     "Test::More" => 0,
     "Test::Most" => 0,
     "Test::Roo" => 0
   },
-  "VERSION" => "v0.1.1",
+  "VERSION" => "v0.1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "List::Util" => "1.45",
   "Module::Metadata" => 0,
   "Ref::Util" => 0,
+  "SQL::Abstract" => "1.83",
   "SQL::Abstract::Test" => 0,
   "SQL::Translator" => "0.11018",
   "Test::More" => 0,

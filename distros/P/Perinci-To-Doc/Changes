@@ -1,3 +1,8 @@
+0.865   2019-04-08 (PERLANCAR)
+
+	- Separate methods to METHODS section.
+
+
 0.864   2018-10-10 (PERLANCAR)
 
 	- Change terminology result -> payload in enveloped result.

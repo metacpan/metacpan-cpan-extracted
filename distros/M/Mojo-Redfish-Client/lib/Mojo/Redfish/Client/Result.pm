@@ -4,6 +4,7 @@ use Mojo::Base -base;
 
 use Carp ();
 use Mojo::Collection;
+use Mojo::Promise;
 use Mojo::JSON::Pointer;
 use Scalar::Util ();
 
@@ -17,6 +18,13 @@ sub get {
   return $self unless defined $path;
   my $target = Mojo::JSON::Pointer->new($self->data)->get($path);
   return $self->_get($target);
+}
+
+sub get_p {
+  my ($self, $path) = @_;
+  return $self unless defined $path;
+  my $target = Mojo::JSON::Pointer->new($self->data)->get($path);
+  return $self->_get_p($target);
 }
 
 sub value {
@@ -53,6 +61,32 @@ sub _get {
   }
 
   return $self->client->get($target);
+}
+
+sub _get_p {
+  my ($self, $target) = @_;
+  return Mojo::Promise->resolve($target)
+    if $target->$isa('Mojo::Redfish::Client::Result');
+
+  $target = $target->to_array
+    if $target->$isa('Mojo::Collection');
+
+  if (ref $target eq 'ARRAY') {
+    my %opt;
+    if (my $c = $self->client->concurrency) { $opt{concurrency} = $c }
+    return Mojo::Promise->map(\%opt, sub{ $self->_get_p($_) }, @$target)
+      ->then(sub{ Mojo::Collection->new(map { $_->[0] } @_) });
+  }
+
+  if (ref $target eq 'HASH') {
+    if (keys %$target == 1 && exists $target->{'@odata.id'}) {
+      $target = $target->{'@odata.id'};
+    } else {
+      return $self->_clone($target);
+    }
+  }
+
+  return $self->client->get_p($target);
 }
 
 sub _clone {
@@ -99,6 +133,10 @@ L<Mojo::Redfish::Client::Result> inherits all of the methods from L<Mojo::Base> 
 Get the value of the L</data> for the given JSON Pointer, making additional requests to follow links if needed.
 Array values are upgraded to L<Mojo::Collection> objects and all (directly) contained values are fetched (if needed).
 The result is always either a result object or a collection; use L</value> to get a simple value out of the data by pointer.
+
+=head2 get_p
+
+Same as L</get> but returns a L<Mojo::Promise> that resolves to the result.
 
 =head2 value
 

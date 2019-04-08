@@ -14,12 +14,14 @@ subtest 'test the each_key method' => sub {
   my @argument = (sub { push @$keys, shift; });
   my $each_key = $hash->each_key(@argument);
 
-  is refaddr($hash), refaddr($each_key);
-  is_deeply $each_key, $hash;
+  # deprecated
+  # is refaddr($hash), refaddr($each_key);
+
+  is_deeply $each_key, [1,2,3,4];
   is_deeply [sort @$keys], [sort keys %{$hash}];
 
   isa_ok $hash,     'Data::Object::Hash';
-  isa_ok $each_key, 'Data::Object::Hash';
+  isa_ok $each_key, 'Data::Object::Array';
 };
 
 ok 1 and done_testing;

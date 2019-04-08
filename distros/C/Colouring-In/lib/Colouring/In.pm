@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 our %TOOL;
 
@@ -14,7 +14,7 @@ BEGIN {
 		max => sub { $_[ ($_[0] || 0) < ($_[1] || 0) ] || 0 },
 		min => sub { $_[ ($_[0] || 0) > ($_[1] || 0) ] || 0 },
 		round => sub {
-			return sprintf '%.' . ( $_[1] // 0 ) . 'f', $_[0];
+			return sprintf '%.' . ( defined $_[1] ? $_[1] : 0 ) . 'f', $_[0];
 		},
 		numIs => sub { return defined $_[0] && $_[0] =~ /^[0-9]+/; },
 		percent => sub { return ( $_[0] * 100 ) . '%'; },
@@ -51,6 +51,7 @@ BEGIN {
 				'#'	=> 'hex2rgb',
 				'rgb' => 'rgb2rgb',
 				'hsl' => 'hsl2rgb',
+				'hsla' => 'hsl2rgb',
 				'hsv' => 'hsv2rgb',
 			);
 			my $reg = join '|', reverse sort keys %converter;
@@ -72,49 +73,71 @@ BEGIN {
 				: map { hex($_) } $hex =~ m/../g;
 		},
 		hsl2rgb => sub {
-			my ( $h, $s, $l, $a, $m1, $m2 ) = $TOOL{numbers}(shift);
-
+			my ( $h, $s, $l, $a, $m1, $m2 ) = scalar @_ > 1 ? @_ : $TOOL{numbers}(shift);
 			$h = ( $h % 360 ) / 360;
-			$s = $TOOL{depercent}($s);
-			$l = $TOOL{depercent}($l);
-
+			unless ($m1) {
+				$s = $TOOL{depercent}($s);
+				$l = $TOOL{depercent}($l);
+			}
 			$m2 = $l <= 0.5 ? $l * ( $s + 1 ) : $l + $s - $l * $s;
 			$m1 = $l * 2 - $m2;
-
 			return (
-				$TOOL{hue}( $h + 1 / 3, $m1, $m2 ) * 255,
-				$TOOL{hue}( $h,			$m1, $m2 ) * 255,
-				$TOOL{hue}( $h - 1 / 3, $m1, $m2 ) * 255,
+				($TOOL{hue}( $h + 1 / 3, $m1, $m2 ) * 255),
+				($TOOL{hue}( $h,			$m1, $m2 ) * 255),
+				($TOOL{hue}( $h - 1 / 3, $m1, $m2 ) * 255),
 				( defined $a ? $a : () ),
 			);
 		},
 		numbers => sub {
-			return ( $_[0] =~ m/([0-9]+)/g );
+			return ( $_[0] =~ m/([0-9.]+)/g );
 		},
 		hsl => sub {
 			my $colour = shift;
 			if ( ref \$colour eq 'SCALAR' ) {
 				$colour = Colouring::In->new($colour);
 			}
-			my $hsl = $colour->asHSL;
+			my $hsl = $TOOL{asHSL}($colour);
 			return ( $hsl, $colour );
 		},
 		hash2array => sub {
 			my $hash = shift;
 			return map { $hash->{$_} } @_;
 		},
+		asHSL => sub {
+			my ( $r, $g, $b, $max, $min, $d, $h, $s, $l ) = $TOOL{rgb2hs}( $_[0]->colour );
+
+			$l = ( $max + $min ) / 2;
+			if ( $max == $min ) {
+				$h = $s = 0;
+			}
+			else {
+				$s = $l > 0.5 ? $d / ( 2 - $max - $min ) : $d / ( $max + $min );
+				$h = ( $max == $r )
+					? ( $g - $b ) / $d + ( $g < $b ? 6 : 0 )
+					: ( $max == $g )
+							? ( $b - $r ) / $d + +2
+							: ( $r - $g ) / $d + 4;
+				$h /= 6;
+			}
+
+			return {
+				h => $h * 360,
+				s => $s,
+				l => $l,
+				a => $_[0]->{alpha},
+			};
+		}
 	);
 }
 
 sub import {
-       my ($pkg, @exports) = @_;
-       my $caller = caller;
+	my ($pkg, @exports) = @_;
+	my $caller = caller;
 
-       if (scalar @exports) {
-               no strict 'refs';
-               *{"${caller}::${_}"} = \&{"${_[0]}::${_}"} foreach @exports;
-               return;
-       }
+	if (scalar @exports) {
+		no strict 'refs';
+		*{"${caller}::${_}"} = \&{"${_[0]}::${_}"} foreach @exports;
+	}
 }
 
 sub rgb {
@@ -127,23 +150,13 @@ sub rgba {
 }
 
 sub hsl {
-	return $_[0]->hsla( $_[1], $_[2], $_[3], $_[4] );
+	my $self = shift;
+	return $self->rgba($TOOL{hsl2rgb}(@_, 1));
 }
 
 sub hsla {
-	my ( $self, $h, $s, $l, $a ) = @_;
-	my ( $m1, $m2 );
-
-	$h  = ( $h % 360 ) / 360;
-	$m2 = $l <= 0.5 ? $l * ( $s + 1 ) : $l + $s - $l * $s;
-	$m1 = $l * 2 - $m2;
-
-	return $self->rgba(
-		( $TOOL{hue}( $h + 1 / 3, $m1, $m2 ) * 255 ),
-		( $TOOL{hue}( $h, $m1, $m2 ) * 255 ),
-		( $TOOL{hue}( $h - 1 / 3, $m1, $m2 ) * 255 ),
-		$a
-	 );
+	my $self = shift;
+	return $self->rgba($TOOL{hsl2rgb}(@_, 1));
 }
 
 sub new {
@@ -165,7 +178,7 @@ sub new {
 
 sub toCSS {
 	my $alpha = $TOOL{round}( $_[0]->{alpha}, $_[1] );
-	return ( $alpha != 1 ) ? $_[0]->toRGB($alpha) : $_[0]->toHEX( $_[2] );
+	return ( $alpha != 1 ) ? $_[0]->toRGBA() : $_[0]->toHEX( $_[2] );
 }
 
 sub toRGB {
@@ -194,33 +207,8 @@ sub toHEX {
 	return $colour;
 }
 
-sub asHSL {
-	my ( $r, $g, $b, $max, $min, $d, $h, $s, $l ) = $TOOL{rgb2hs}( $_[0]->colour );
-
-	$l = ( $max + $min ) / 2;
-	if ( $max == $min ) {
-		$h = $s = 0;
-	}
-	else {
-		$s = $l > 0.5 ? $d / ( 2 - $max - $min ) : $d / ( $max + $min );
-		$h = ( $max == $r )
-			? ( $g - $b ) / $d + ( $g < $b ? 6 : 0 )
-			: ( $max == $g )
-					? ( $b - $r ) / $d + +2
-					: ( $r - $g ) / $d + 4;
-		$h /= 6;
-	}
-
-	return {
-		h => $h * 360,
-		s => $s,
-		l => $l,
-		a => $_[0]->{alpha},
-	};
-}
-
 sub toHSL {
-	my $hsl = $_[0]->asHSL;
+	my $hsl = $TOOL{asHSL}($_[0]);
 
 	sprintf( "hsl(%s,%s,%s)",
 		$hsl->{h},
@@ -254,7 +242,9 @@ sub toHSV {
 
 sub lighten {
 	my ( $colour, $amt, $meth, $hsl ) = @_;
+
 	( $hsl, $colour ) = $TOOL{hsl}($colour);
+
 	$amt = $TOOL{depercent}($amt);
 	$hsl->{l} += $TOOL{clamp}(
 		( $meth && $meth eq 'relative' )
@@ -329,15 +319,11 @@ Colouring::In - color or colour.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
 =head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
 
 	use Colouring::In;
 
@@ -368,77 +354,147 @@ Perhaps a little code snippet.
 
 	my $colour = fadein('rgba(125,125,125,0'), '100%');
 
-=head1 SUBROUTINES/METHODS
-
-=head2 new
+=head1 Instantiate
 
 =cut
 
-=head2 rgb 
+=head2 new
+
+Instantiate an Colouring::In Object using a supported colour formated string or RGBA array reference.
+
+	my $colour = Colouring::In->new('hsla(0, 0%, 100%, 0.3)');
+	my $colour = Colouring::In->new([255, 255, 255, 0.3]);
+
+=cut
+
+=head2 rgb
+
+Instantiate an Colouring::In Object opaque colour from decimal red, green and blue (RGB) values.
+
+	my $colour = Colouring::In->rgb(0, 0, 0);
 
 =cut
 
 =head2 rgba
 
+Instantiate an Colouring::In Object transparent colour from decimal red, green, blue and alpha (RGBA) values.
+
+	my $colour = Colouring::In->rgb(0, 0, 0, 0.5);
+
 =cut
 
 =head2 hsl
 
+Instantiate an Colouring::In Object opaque colour from hue, saturation and lightness (HSL) values.
+
+	my $colour = Colouring::In->hsl(0, 0%, 100%);
 =cut
 
 =head2 hsla
 
-=cut
+Instantiate an Colouring::In Object tranparent colour from hue, saturation, lightness and alpha (HSLA) values.
 
-=head2 toCSS
-
-=cut
-
-=head2 toRGB
+	my $colour = Colouring::In->hsla(0, 0%, 100%, 1);
 
 =cut
 
-=head2 toRGBA
-
-=cut
-
-=head2 toHEX
-
-=cut
-
-=head2 asHSL
-
-=cut
-
-=head2 toHSL
-
-=cut
-
-=head2 toHSV
+=head1 Methods
 
 =cut
 
 =head2 lighten
 
+Increase the lightness of the colour.
+
+	my $lighter = $colour->lighten('50%');
+
 =cut
 
 =head2 darken
+
+Decrease the lightness of the colour.
+
+	my $darken = $colour->darken('50%');
 
 =cut
 
 =head2 fade
 
+Set the absolute opacity of the colour.
+
+	my $fade = $colour->fade('50%');
+
 =cut
 
 =head2 fadeout
+
+Decrease the opacity of the colour.
+
+	my $fadeout = $colour->fadeout('10%');
 
 =cut
 
 =head2 fadein
 
+Increase the opacity of the colour.
+
+	my $fadein = $colour->fadein('5%');
+
+=cut
+
+=head2 toCSS
+
+Returns either an rgba or hex colour string based on whether the alpha value is set.
+
+	my $string = $colour->toCSS;
+
+=cut
+
+=head2 toRGB
+
+Returns an opaque colour string from decimal red, green and blue (RGB) values.
+
+	my $string = $colour->toCSS;
+
+=cut
+
+=head2 toRGBA
+
+Returns an transparent colour string from decimal red, green, blue and alpha (RGBA) values.
+
+	my $string = $colour->toRGBA;
+
+=cut
+
+=head2 toHEX
+
+Returns an opaque colour string from decimal red, green and blue (RGB) values.
+
+	my $string = $colour->toHEX;
+
+=cut
+
+=head2 toHSL
+
+Returns an opaque colour string from hue, saturation and lightness (HSL) values.
+
+	my $string = $colour->toHSL;
+
+=cut
+
+=head2 toHSV
+
+Returns an opaque colour string from hue, saturation and value (HSV) values.
+
+	my $string = $colour->toHSV;
+
 =cut
 
 =head2 colour
+
+Returns an array containeing the red, green and blue (RGB) values.
+
+	my $string = $colour->colour;
 
 =cut
 

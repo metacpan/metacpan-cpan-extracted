@@ -13,6 +13,7 @@ on 'test' => sub {
   requires "DBIx::Class::Schema" => "0";
   requires "File::Spec" => "0";
   requires "Module::Metadata" => "0";
+  requires "SQL::Abstract" => "1.83";
   requires "SQL::Abstract::Test" => "0";
   requires "SQL::Translator" => "0.11018";
   requires "Test::More" => "0";

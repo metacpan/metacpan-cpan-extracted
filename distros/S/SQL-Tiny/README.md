@@ -1,17 +1,55 @@
 # SQL::Tiny, a Perl module for generating simple SQL statements
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+A very simple SQL-building library.  It's not for all your SQL needs,
+only the very simple ones.
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+It doesn't handle JOINs.  It doesn't handle subselects.  It's only for simple SQL.
 
-## INSTALLATION
+    my ($sql,$binds) = sql_select( 'users', [ 'name', 'status' ], { status => [ 'Deleted', 'Inactive' ] }, { order_by => 'name' } );
+
+    my ($sql,$binds) = sql_insert( 'users', { name => 'Dave', status => 'Active' } );
+
+    my ($sql,$binds) = sql_update( 'users', { status => 'Inactive' }, { password => undef } );
+
+    my ($sql,$binds) = sql_delete( 'users', { status => 'Inactive' } );
+
+In my test suites, I have a lot of ad hoc SQL queries, and it drives me
+nuts to have so much SQL code lying around.  SQL::Tiny is for generating
+SQL code for simple cases.
+
+I'd far rather have:
+
+    my ($sql,$binds) = sql_insert(
+        'users',
+        {
+            name      => 'Dave',
+            salary    => 50000,
+            status    => 'Active',
+            dateadded => \'SYSDATE()',
+        }
+    );
+
+than hand-coding:
+
+    my $sql   = 'INSERT INTO users (name,salary,status,dateadded) VALUES (:name,:status,:salary,SYSDATE())';
+    my $binds = {
+        ':name'      => 'Dave',
+        ':salary'    => 50000,
+        ':status'    => 'Active',
+        ':dateadded' => \'SYSDATE()',
+    };
+
+or even the positional:
+
+    my $sql   = 'INSERT INTO users (name,salary,status,dateadded) VALUES (?,?,?,SYSDATE())';
+    my $binds = [ 'Dave', 50000, 'Active' ];
+
+# Build status of dev branch
+
+* Travis (Linux) [![Build Status](https://travis-ci.org/petdance/sql-tiny.png?branch=dev)](https://travis-ci.org/petdance/sql-tiny)
+* [CPAN Testers](https://cpantesters.org/distro/S/sql-tiny.html)
+
+# Installation
 
 To install this module, run the following commands:
 
@@ -20,7 +58,7 @@ To install this module, run the following commands:
     make test
     make install
 
-## SUPPORT AND DOCUMENTATION
+# Support and Documentation
 
 After installing, you can find documentation for this module with the
 perldoc command.
@@ -33,45 +71,15 @@ You can also look for information at:
         https://metacpan.org/release/SQL-Tiny
 
     Project home page
-        https://github.com/petdance/sql-simple
+        https://github.com/petdance/sql-tiny
 
     Project issue tracker
-        https://github.com/petdance/sql-simple/issues
+        https://github.com/petdance/sql-tiny/issues
 
-## LICENSE AND COPYRIGHT
+# License and Copyright
 
 Copyright (C) 2019 Andy Lester
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the
 [Artistic License 2.0](http://www.perlfoundation.org/artistic_license_2_0).
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

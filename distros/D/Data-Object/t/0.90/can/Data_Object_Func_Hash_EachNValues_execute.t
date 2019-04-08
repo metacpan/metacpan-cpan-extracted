@@ -60,7 +60,7 @@ $func = Data::Object::Func::Hash::EachNValues->new(
 
 my $result = $func->execute;
 
-is_deeply $result, $data;
+is_deeply $result, [2,4,5];
 
 is_deeply [sort @$list], [0,2,4,6,8];
 

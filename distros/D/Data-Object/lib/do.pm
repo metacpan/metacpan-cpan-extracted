@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '0.93'; # VERSION
+our $VERSION = '0.95'; # VERSION
 
 # BUILD
 # METHODS
@@ -30,27 +30,20 @@ Minimalist Perl Development Framework
 
 =head1 SYNOPSIS
 
-  package Cli;
+  #!perl
 
-  use do cli;
+  use do;
 
-  has 'user';
+  my $phrase = do('cast', 'hello world');
 
-  method main(:$args) {
-    say "Hello @{[$self->user]}, how are you?";
-  }
-
-  method specs(:$args) {
-    'user|u=s'
-  }
-
-  run Cli;
+  $phrase->titlecase->say;
 
 =cut
 
 =head1 DESCRIPTION
 
 The "do" module is focused on simplicity and productivity. It encapsulates the
-Data-Object framework features, is minimalist, and is designed for scripting.
+L<Data::Object> framework features, is minimalist, and is designed for
+scripting.
 
 =cut

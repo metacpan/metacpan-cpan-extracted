@@ -9,22 +9,27 @@ use File::Find;
 use File::Spec::Functions ':ALL';
 use Test::More;
 
-my @list;
-
-my $this = $0;
-my $home = getcwd;
-my $here = dirname $this;
-my $libs = join '/', $home, 'lib';
-my $file = sub { push @list, $File::Find::name if -f };
-
-find $file, $libs;
-
 # SETUP
+
+sub lib {
+  my $this = $0;
+  my $home = getcwd;
+
+  return catfile($home, 'lib');
+}
+
+sub list {
+  my @list;
+
+  find sub { push @list, $File::Find::name if -f }, lib();
+
+  return (@list);
+}
 
 sub files {
   my (@files) = @_;
 
-  return (map abs2rel($_, $libs), sort(@files));
+  return (map abs2rel($_, lib()), sort(@files));
 }
 
 sub headings {
@@ -82,9 +87,10 @@ sub test {
 sub test_exists {
   my ($path, $subs) = @_;
 
-  my $name = $path =~ s/\//_/gr;
+  my $name = $path =~ s/\W+/_/gr;
+  my @list = map catfile("t", "0.90", "can", "${name}_$_.t"), @$subs;
 
-  ok -f "t/0.90/can/${name}_$_.t", "t/0.90/can/${name}_$_.t exists" for @$subs;
+  ok -f $_, "$_ exists" for @list;
 
   return;
 }
@@ -92,9 +98,10 @@ sub test_exists {
 sub test_sections {
   my ($path, $subs) = @_;
 
-  my $name = $path =~ s/\//_/gr;
+  my $name = $path =~ s/\W+/_/gr;
+  my @list = map catfile("t", "0.90", "can", "${name}_$_.t"), @$subs;
 
-  for my $file (grep -f, map "t/0.90/can/${name}_$_.t", @$subs) {
+  for my $file (grep -f, @list) {
     my $headings = { map +($_, $_), headings($file) };
 
     ok exists $headings->{name}, "$file has pod name-section";
@@ -126,4 +133,4 @@ sub type {
 
 # TESTING
 
-test(mods(@list)) and done_testing;
+test(mods(list())) and done_testing;

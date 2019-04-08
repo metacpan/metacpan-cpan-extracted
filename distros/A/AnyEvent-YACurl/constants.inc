@@ -1,3 +1,9 @@
+        hv_stores(the_hv, "CURLALTSVC_ALTUSED", newSViv(CURLALTSVC_ALTUSED));
+        hv_stores(the_hv, "CURLALTSVC_H1", newSViv(CURLALTSVC_H1));
+        hv_stores(the_hv, "CURLALTSVC_H2", newSViv(CURLALTSVC_H2));
+        hv_stores(the_hv, "CURLALTSVC_H3", newSViv(CURLALTSVC_H3));
+        hv_stores(the_hv, "CURLALTSVC_IMMEDIATELY", newSViv(CURLALTSVC_IMMEDIATELY));
+        hv_stores(the_hv, "CURLALTSVC_READONLYFILE", newSViv(CURLALTSVC_READONLYFILE));
         hv_stores(the_hv, "CURLAUTH_ANY", newSViv(CURLAUTH_ANY));
         hv_stores(the_hv, "CURLAUTH_ANYSAFE", newSViv(CURLAUTH_ANYSAFE));
         hv_stores(the_hv, "CURLAUTH_BASIC", newSViv(CURLAUTH_BASIC));
@@ -327,6 +333,8 @@
         hv_stores(the_hv, "CURLOPT_ACCEPTTIMEOUT_MS", newSViv(CURLOPT_ACCEPTTIMEOUT_MS));
         hv_stores(the_hv, "CURLOPT_ACCEPT_ENCODING", newSViv(CURLOPT_ACCEPT_ENCODING));
         hv_stores(the_hv, "CURLOPT_ADDRESS_SCOPE", newSViv(CURLOPT_ADDRESS_SCOPE));
+        hv_stores(the_hv, "CURLOPT_ALTSVC", newSViv(CURLOPT_ALTSVC));
+        hv_stores(the_hv, "CURLOPT_ALTSVC_CTRL", newSViv(CURLOPT_ALTSVC_CTRL));
         hv_stores(the_hv, "CURLOPT_APPEND", newSViv(CURLOPT_APPEND));
         hv_stores(the_hv, "CURLOPT_AUTOREFERER", newSViv(CURLOPT_AUTOREFERER));
         hv_stores(the_hv, "CURLOPT_BUFFERSIZE", newSViv(CURLOPT_BUFFERSIZE));
@@ -686,6 +694,7 @@
         hv_stores(the_hv, "CURLSSLBACKEND_OPENSSL", newSViv(CURLSSLBACKEND_OPENSSL));
         hv_stores(the_hv, "CURLSSLBACKEND_POLARSSL", newSViv(CURLSSLBACKEND_POLARSSL));
         hv_stores(the_hv, "CURLSSLBACKEND_SCHANNEL", newSViv(CURLSSLBACKEND_SCHANNEL));
+        hv_stores(the_hv, "CURLSSLBACKEND_SECURETRANSPORT", newSViv(CURLSSLBACKEND_SECURETRANSPORT));
         hv_stores(the_hv, "CURLSSLBACKEND_WOLFSSL", newSViv(CURLSSLBACKEND_WOLFSSL));
         hv_stores(the_hv, "CURLSSLOPT_ALLOW_BEAST", newSViv(CURLSSLOPT_ALLOW_BEAST));
         hv_stores(the_hv, "CURLSSLOPT_NO_REVOKE", newSViv(CURLSSLOPT_NO_REVOKE));
@@ -859,6 +868,7 @@
         hv_stores(the_hv, "CURL_TRAILERFUNC_ABORT", newSViv(CURL_TRAILERFUNC_ABORT));
         hv_stores(the_hv, "CURL_TRAILERFUNC_OK", newSViv(CURL_TRAILERFUNC_OK));
         hv_stores(the_hv, "CURL_UPKEEP_INTERVAL_DEFAULT", newSViv(CURL_UPKEEP_INTERVAL_DEFAULT));
+        hv_stores(the_hv, "CURL_VERSION_ALTSVC", newSViv(CURL_VERSION_ALTSVC));
         hv_stores(the_hv, "CURL_VERSION_ASYNCHDNS", newSViv(CURL_VERSION_ASYNCHDNS));
         hv_stores(the_hv, "CURL_VERSION_BROTLI", newSViv(CURL_VERSION_BROTLI));
         hv_stores(the_hv, "CURL_VERSION_CONV", newSViv(CURL_VERSION_CONV));

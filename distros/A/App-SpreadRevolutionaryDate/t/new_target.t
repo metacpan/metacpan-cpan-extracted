@@ -10,6 +10,12 @@
 #
 use utf8;
 
+BEGIN {
+    $ENV{OUTPUT_CHARSET} = 'UTF-8';
+    $ENV{PERL_UNICODE} = 'AS';
+}
+binmode(DATA, ":encoding(UTF-8)");
+
 use Test::More tests => 5;
 use Test::Output;
 use Test::NoWarnings;

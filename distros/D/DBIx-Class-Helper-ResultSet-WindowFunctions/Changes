@@ -1,5 +1,21 @@
 Revision history for DBIx-Class-Helper-ResultSet-WindowFunctions:
 
+v0.2.0    2019-04-06 11:27:29+01:00 Europe/London
+  [Incompatible Changes]
+  - Incremented minimum Perl version to v5.10, since the $VERSION string
+    was never handled properly.
+
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  - Updated Copyright year.
+
+  [Tests]
+  - Added minimum version for prereq of SQL::Abstract::Test.
+
+  [Toolchain]
+  - Added keywords to distribution metadata.
+
 v0.1.2    2018-05-24 21:19:08+01:00 Europe/London
   [Documentation]
   - Fixed a broken Changes file due to a toolchain hiccup.

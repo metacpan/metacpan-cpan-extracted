@@ -16,10 +16,11 @@ test_insert(
         rank       => 'Sergeant',
         height     => undef,
         date_added => \'SYSDATE()',
+        startdate  => \[ "to_date(?,'MM/DD/YYYY')", '03/02/2003' ],
     },
 
-    'INSERT INTO users (date_added,height,name,rank,serialno) VALUES (SYSDATE(),NULL,?,?,?)',
-    [ 'Dave', 'Sergeant', 12345 ]
+    "INSERT INTO users (date_added,height,name,rank,serialno,startdate) VALUES (SYSDATE(),NULL,?,?,?,to_date(?,'MM/DD/YYYY'))",
+    [ 'Dave', 'Sergeant', 12345, '03/02/2003' ]
 );
 
 

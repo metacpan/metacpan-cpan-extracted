@@ -4,7 +4,7 @@ DBIx::Class::Helper::ResultSet::WindowFunctions - Add support for window functio
 
 # VERSION
 
-version v0.1.2
+version v0.2.0
 
 # SYNOPSIS
 
@@ -75,7 +75,7 @@ Peter Rabbitson <ribasushi@leporine.io>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

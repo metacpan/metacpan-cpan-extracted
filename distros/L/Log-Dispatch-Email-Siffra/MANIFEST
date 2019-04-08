@@ -1,0 +1,14 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+MANIFEST.SKIP
+t/pod-coverage.t
+t/pod.t
+t/perlcritic.t
+Makefile.PL
+lib/Log/Dispatch/Email/Siffra.pm
+t/001_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

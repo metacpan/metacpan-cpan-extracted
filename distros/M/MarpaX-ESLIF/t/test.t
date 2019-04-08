@@ -128,15 +128,6 @@ sub do_symbol {
     return $do_symbol;
 }
 
-sub do_free {
-    my ($self, $result) = @_;
-
-    $self->{log}->fatalf("do_free(%s) called and this should never happen", $result);
-    $self->trace_local_variables('do_free');
-    die "do_free() called and this should never happen";
-    undef $result;
-}
-
 sub do_int {
     my ($self, $number) = @_;
 
@@ -178,7 +169,7 @@ sub do_op {
 sub isWithHighRankOnly {
     my ($self) = @_;
     my $isWithHighRankOnly = 1;
-    $self->{log}->tracef("isWithHighRankOnly => %s");
+    $self->{log}->tracef("isWithHighRankOnly => %s", $isWithHighRankOnly);
     return $isWithHighRankOnly;
 }
 
@@ -278,7 +269,7 @@ use Encode qw/decode encode/;
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = TRACE, Screen
+log4perl.rootLogger              = INFO, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -336,8 +327,7 @@ ok($ngrammar > 0, "Number of grammars is > 0");
 my $currentLevel = $eslifGrammar->currentLevel;
 ok($currentLevel >= 0, "Current level is >= 0");
 my %GRAMMAR_PROPERTIES_BY_LEVEL = (
-    '0' => { defaultFreeAction   => ":defaultFreeActions",
-             defaultRuleAction   => "do_op",
+    '0' => { defaultRuleAction   => "do_op",
              defaultSymbolAction => "do_symbol",
              description         => "Grammar level 0",
              discardId           => 1,
@@ -347,8 +337,7 @@ my %GRAMMAR_PROPERTIES_BY_LEVEL = (
              ruleIds             => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
              startId             => 0,
              symbolIds           => [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18] },
-    '1' => { defaultFreeAction   => ":defaultFreeActions",
-             defaultRuleAction   => "::concat",
+    '1' => { defaultRuleAction   => "::concat",
              defaultSymbolAction => "::transfer",
              description         => "Grammar level 1",
              discardId           => -1,
@@ -375,6 +364,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [2],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
@@ -393,6 +383,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [3],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
@@ -411,6 +402,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [5],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -430,6 +422,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [6],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -449,6 +442,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [7],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -468,6 +462,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [8],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -487,6 +482,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [9],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -506,6 +502,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [4],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -525,6 +522,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [10,6,11],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -544,6 +542,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [9,12,8],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -563,6 +562,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [7,13,8],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -582,6 +582,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [7,14,8],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -601,6 +602,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [6,15,7],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -620,6 +622,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [6,16,7],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -639,6 +642,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [17],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
@@ -657,6 +661,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [18],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
@@ -677,6 +682,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [1],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 0,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE|
@@ -696,6 +702,7 @@ my %RULE_PROPERTIES_BY_LEVEL = (
                  proper                   => 0,
                  rank                     => 0,
                  rhsIds                   => [3],
+                 skipIndices              => undef,
                  separatorId              => -1,
                  sequence                 => 1,
                  propertyBitSet           => MarpaX::ESLIF::Rule::PropertyBitSet->MARPAESLIF_RULE_IS_PRODUCTIVE,
@@ -1624,7 +1631,6 @@ sub doDiscardTry {
             $log->debugf("... Testing discard at current position gave \"%s\"", $discard);
         }
     } catch {
-        # Because we test with a symbol that is not a lexeme, and that raises an exception
         $log->debugf($_);
     }
 }
@@ -1680,7 +1686,6 @@ __DATA__
 :start   ::= Expression
 :default ::=             action        => do_op
                          symbol-action => do_symbol
-                         free-action   => do_free
 :discard ::= whitespaces event  => discard_whitespaces$
 :discard ::= comment     event  => discard_comment$
 

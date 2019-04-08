@@ -12,12 +12,23 @@ use Scalar::Util qw(blessed);
 use Config::Any;
 use IO::Prompter;
 
+$| = 1;    #autoflush
+
+use constant {
+    FALSE => 0,
+    TRUE  => 1,
+    DEBUG => $ENV{ DEBUG } // 0,
+};
+
 BEGIN
 {
+    binmode( STDOUT, ":encoding(UTF-8)" );
+    binmode( STDERR, ":encoding(UTF-8)" );
+
     require Siffra::Tools;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.02';
+    $VERSION = '0.03';
     @ISA     = qw(Siffra::Tools Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -45,7 +56,7 @@ See Also   :
 #################### subroutine header end ####################
 
 =head2 C<new()>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -56,16 +67,16 @@ See Also   :
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
 
 sub new
 {
     my ( $class, %parameters ) = @_;
+    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
 
     my $self = $class->SUPER::new( %parameters );
-
-    $log->info( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
+    $self->{ beachmarck }->{ started } = time();
 
     $self->_initialize( %parameters );
     return $self;
@@ -75,11 +86,17 @@ sub _initialize()
 {
     my ( $self, %parameters ) = @_;
     $self->SUPER::_initialize( %parameters );
-    $log->info( "_initialize", { package => __PACKAGE__ } );
+    $log->debug( "_initialize", { package => __PACKAGE__ } );
+}
+
+sub _finalize()
+{
+    my ( $self, %parameters ) = @_;
+    $log->debug( "_finalize", { package => __PACKAGE__ } );
 }
 
 =head2 C<loadApplication()>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -90,24 +107,22 @@ sub _initialize()
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
 
 sub loadApplication()
 {
     my ( $self, %parameters ) = @_;
-    $log->info( "loadApplication", { package => __PACKAGE__ } );
-
-    ( my $configurationFile = $0 ) =~ s/\.pl/\-config\.json/;
+    my $configurationFile = $parameters{ configurationFile };
+    $log->debug( "loadApplication", { package => __PACKAGE__ } );
 
     if ( !-e $configurationFile )
     {
+        ( $configurationFile = $0 ) =~ s/\.pl/\-config\.json/;
         $log->error( "Não existe o arquivo de configuração...", { package => __PACKAGE__ } );
 
         if ( prompt 'Não existe o arquivo de configuração, deseja criar agora ?', -yn1, -default => 'y' )
         {
-            $log->info( "SIM" );
-
             my $config;
 
             $config->{ $configurationFile }->{ applicationName }   = prompt( 'Application Name     :', -v, -echostyle => 'bold white' );
@@ -130,28 +145,149 @@ sub loadApplication()
         } ## end if ( prompt 'Não existe o arquivo de configuração, deseja criar agora ?'...)
         else
         {
-            $log->info( "NÃO" );
+            return FALSE;
         }
     } ## end if ( !-e $configurationFile...)
 
     my @configFiles = ( $configurationFile );
-    my $configLala = Config::Any->load_files( { files => \@configFiles, flatten_to_hash => 1, use_ext => 1 } );
+    my $configAny = Config::Any->load_files( { files => \@configFiles, flatten_to_hash => 1, use_ext => 1 } );
+
+    foreach my $configFile ( keys %$configAny )
+    {
+        $self->{ configurations }->{ $_ } = $configAny->{ $configFile }->{ $_ } foreach ( keys %{ $configAny->{ $configFile } } );
+    }
+
+    $log->info( "Configurações lidas com sucesso na aplicação [  $self->{ configurations }->{ application }->{ name } ]..." );
+
+    $log->error( 'Falta passar nome da biblioteca' ) if ( $self->{ configurations }->{ application }->{ package } !~ /^\D/ );
+
+    eval "use $self->{ configurations }->{ application }->{ fileName };";    ## Usando o módulo.
+
+    if ( $@ )
+    {
+        $log->error( "Problemas ao usar o arquivo [ $self->{ configurations }->{ application }->{ fileName } ]..." );
+        return 0;
+    }
+    else
+    {
+        $self->{ application }->{ instance } = eval { $self->{ configurations }->{ application }->{ package }->new( bootstrap => $self ); };
+        if ( !$self->{ application }->{ instance } )
+        {
+            $log->error( "Erro ao iniciar o módulo [ $self->{ configurations }->{ application }->{ package } ]..." );
+            return FALSE;
+        }
+    } ## end else [ if ( $@ ) ]
+
+    if ( $self->{ configurations }->{ databases } )
+    {
+        $log->info( "Conectando nos bancos..." );
+
+        while ( my ( $key, $values ) = each( %{ $self->{ configurations }->{ databases } } ) )
+        {
+            if ( !$self->connectDatabase( %$values ) )
+            {
+
+                return FALSE;
+            }
+        } ## end while ( my ( $key, $values...))
+
+    } ## end if ( $self->{ configurations...})
+    return TRUE;
 } ## end sub loadApplication
+
+=head2 C<connectDatabase()>
+=cut
+
+sub connectDatabase()
+{
+    my ( $self, %parameters ) = @_;
+    $log->debug( "connectDatabase", { package => __PACKAGE__ } );
+
+    my ( $database, $host, $password, $port, $username, $connection, $alias );
+
+    $database   = $parameters{ database };
+    $host       = $parameters{ host };
+    $password   = $parameters{ password };
+    $port       = $parameters{ port };
+    $username   = $parameters{ username };
+    $connection = $parameters{ connection };
+    $alias      = $parameters{ alias } // 'mainDB';
+
+    use DBI;
+    use DBD::Pg;
+    $self->{ databases }->{ connection }->{ $alias } = eval { DBI->connect( "DBI:Pg:dbname=$database;host=$host;port=$port", $username, $password, { RaiseError => 1, PrintError => 0 } ); };
+
+    if ( $@ )
+    {
+        $log->error( "Erro ao conectar ao banco [ $username\@$host:$port ]." );
+        $log->debug( $@ );
+    }
+
+    return $self->{ databases }->{ connection }->{ $alias };
+} ## end sub connectDatabase
+
+=head2 C<run()>
+=cut
+
+sub run
+{
+    my ( $self, %parameters ) = @_;
+    my $retorno = {};
+
+    if ( ref $self->{ application }->{ instance } eq $self->{ configurations }->{ application }->{ package } )
+    {
+        $retorno = eval { $self->{ application }->{ instance }->start(); };
+        $log->error( "Problemas durante execucao de start: $@" ) if ( $@ );
+    }
+    else
+    {
+        $log->error( "Impossivel de executar $self->{ configurations }->{ application }->{ package }::start\nSub nao existe" );
+    }
+
+    return $retorno;
+} ## end sub run
+
+=head2 C<getExecutionTime()>
+=cut
+
+sub getExecutionTime()
+{
+    my ( $self, %parameters ) = @_;
+    return ( time() - $self->{ beachmarck }->{ started } );
+}
+
+=head2 C<getExecutionInfo()>
+=cut
+
+sub getExecutionInfo()
+{
+    my ( $self, %parameters ) = @_;
+
+    $log->info( "Quantidade de erro(s): 0" );
+    $log->info( "Tempo de execucao: " . $self->getExecutionTime() . " segundo(s)" );
+    $log->info( "Fim da aplicacao." );
+} ## end sub getExecutionInfo
 
 sub END
 {
-    $log->info( "END", { package => __PACKAGE__ } );
+    my ( $self, %parameters ) = @_;
+    $log->debug( "END", { package => __PACKAGE__ } );
+    eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
 }
 
 sub DESTROY
 {
     my ( $self, %parameters ) = @_;
-    $log->info( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    if ( ${^GLOBAL_PHASE} eq 'DESTRUCT' )
+    {
+        $self->getExecutionInfo() if ( blessed( $self ) && $self->isa( __PACKAGE__ ) );
+        return;
+    }
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
-        $log->alert( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
     }
     else
     {
@@ -219,7 +355,7 @@ LICENSE file included with this module.
 =head1 SEE ALSO
 
 perl(1).
- 
+
 =cut
 
 #################### main pod documentation end ###################

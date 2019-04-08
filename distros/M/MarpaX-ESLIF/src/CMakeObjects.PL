@@ -28,8 +28,8 @@ make_path(File::Spec->catdir('output', '3rdparty'));
 # ------------------------------------------------------------
 # Generation of objects using perl setup, for use in perl's XS
 # ------------------------------------------------------------
-my $version = get_version();
-print "Generating config for marpaESLIF version $version\n";
+my ($MARPAESLIF_VERSION, $MARPAESLIF_VERSION_MAJOR, $MARPAESLIF_VERSION_MINOR, $MARPAESLIF_VERSION_PATCH) = get_version();
+print "Generating config for marpaESLIF version $MARPAESLIF_VERSION (major=$MARPAESLIF_VERSION_MAJOR, minor=$MARPAESLIF_VERSION_MINOR, patch=$MARPAESLIF_VERSION_PATCH)\n";
 
 # ------------------------
 # Write configuration file
@@ -39,7 +39,7 @@ my $config_h    = File::Spec->catfile('include', 'marpaESLIF', 'internal', 'conf
 make_path(dirname($config_h));
 
 Config::AutoConf::INI->new(logfile => 'config.log')->check;
-write_config($version, $config_h_in, $config_h);
+write_config($MARPAESLIF_VERSION, $MARPAESLIF_VERSION_MAJOR, $MARPAESLIF_VERSION_MINOR, $MARPAESLIF_VERSION_PATCH, $config_h_in, $config_h);
 # -------------
 # Fake export.h
 # -------------
@@ -159,10 +159,21 @@ AUTOCONF
 }
 push(@additional_includes, File::Spec->catdir('output', '3rdparty', 'pcre2-10.23'));
 
+# -------------------------------------------
+# marpaESLIF embeds my unpanic version of lua
+# -------------------------------------------
+push(@additional_includes, File::Spec->catdir('3rdparty', 'github', 'luaunpanic', 'include', 'luaunpanic', 'lua'));
+push(@additional_includes, File::Spec->catdir('output', '3rdparty', 'luaunpanic', 'output', 'include', 'luaunpanic', 'lua')); # for luaconf.h
+
+# ------------------------------
+# marpaESLIF embeds lua bindings
+# ------------------------------
+push(@additional_includes, File::Spec->catdir('src', 'bindings', 'lua', 'include'));
+
 # ----------------------------------------------------------------
 # We depend on these* stuff that can manage themselves, eventually
 # ----------------------------------------------------------------
-foreach (qw/genericLogger genericStack genericHash marpaWrapper tconv/) {
+foreach (qw/genericLogger genericStack genericHash marpaWrapper tconv luaunpanic/) {
     print "... Copying $_\n";
     if (! dircopy(File::Spec->catdir('3rdparty', 'github', $_),
                   File::Spec->catdir('output', '3rdparty', $_))) {
@@ -197,6 +208,7 @@ my @sources = File::Spec->catfile('src', 'marpaESLIF.c');
 
 # ----------------------------------------------------------------------------------------
 # Generate objects
+# Our embedded lua requires some public C flags that we cannot invent
 # ----------------------------------------------------------------------------------------
 my $cbuilder = ExtUtils::CBuilder->new();
 my $obj_dir = File::Spec->catfile('output', 'obj4perl');
@@ -208,7 +220,7 @@ foreach my $source (@sources) {
     $cbuilder->compile(
 	source        => $source,
 	object_file   => $obj,
-        extra_compiler_flags => "-DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC -DMARPAESLIF_BUFSIZ=1048576 -DMARPAESLIF_NTRACE=1",
+        extra_compiler_flags => "-DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC -DMARPAESLIF_BUFSIZ=1048576 -DMARPAESLIF_NTRACE=1 -DMARPAESLIFLUA_EMBEDDED", #  -DLUA_32BITS -DLUA_USE_C89
 	include_dirs  => [ 'include', File::Spec->catdir('output', 'include'), @additional_includes ],
 	'C++'         => $is_cplusplus
 	);
@@ -220,28 +232,36 @@ foreach my $source (@sources) {
 exit(EXIT_SUCCESS);
 
 sub get_version {
+    my ($major, $minor, $patch);
     open(my $fh, '<', 'CMakeLists.txt') || die "Cannot open CMakeLists.txt, $!";
     my $content = do { local $/; <$fh>; };
     close($fh) || warn "Failed to close CMakeLists.txt, $!";
 
     my @rc;
     if ($content =~ /^MYPACKAGESTART\s*\(\s*marpaESLIF\s+(\d+)\s+(\d+)\s+(\d+)\s*\)/sm) {
-        @rc = ($1, $2, $3);
+        @rc = ($major = $1, $minor = $2, $patch = $3);
     } else {
         foreach (qw/MARPAESLIF_VERSION_MAJOR MARPAESLIF_VERSION_MINOR MARPAESLIF_VERSION_PATCH/) {
             if ($content =~ /^SET\s*\(\s*$_\s*(\d+)\s*\)/sm) {
                 push(@rc, $1);
+                if ($_ eq 'MARPAESLIF_VERSION_MAJOR') {
+                    $major = $1;
+                } elsif ($_ eq 'MARPAESLIF_VERSION_MINOR') {
+                    $minor = $1;
+                } elsif ($_ eq 'MARPAESLIF_VERSION_PATCH') {
+                    $patch = $1;
+                }
             } else {
                 die "Failed to find $_",
             }
         }
     }
 
-    return join('.', @rc)
+    return (join('.', @rc), $major, $minor, $patch)
 }
 
 sub write_config {
-    my ($version, $input, $output) = @_;
+    my ($version, $major, $minor, $patch, $input, $output) = @_;
 
     make_path(dirname($output));
     open(my $fh, '<', $input) || die "Cannot open $input, $!";
@@ -259,22 +279,33 @@ sub write_config {
 #include <marpaESLIF/config_autoconf.h>
 
 #define MARPAESLIF_VERSION "$version"
+#define MARPAESLIF_VERSION_MAJOR $major
+#define MARPAESLIF_VERSION_MINOR $minor
+#define MARPAESLIF_VERSION_PATCH $patch
+   
+#define MARPAESLIFLUA_VERSION MARPAESLIF_VERSION
+#define MARPAESLIFLUA_VERSION_MAJOR MARPAESLIF_VERSION_MAJOR
+#define MARPAESLIFLUA_VERSION_MINOR MARPAESLIF_VERSION_MINOR
+#define MARPAESLIFLUA_VERSION_PATCH MARPAESLIF_VERSION_PATCH
    
 $source
 
-#if defined(SIZEOF_UINT32) && (SIZEOF_UINT32 == 4)
-typedef uint32 marpaESLIF_uint32_t;
+#if defined(SIZEOF_UINT32_T) && (SIZEOF_UINT32_T == 4)
+typedef uint32_t marpaESLIF_uint32_t;
 #else
-#  if defined(SIZEOF___UINT32) && (SIZEOF___UINT32 == 4)
-typedef __uint32 marpaESLIF_uint32_t;
+#  if defined(SIZEOF__UINT32_T) && (SIZEOF__UINT32_T == 4)
+typedef _uint32_t marpaESLIF_uint32_t;
 #  else
-#    if defined(SIZEOF_UNSIGNED_LONG) && (SIZEOF_UNSIGNED_LONG == 4)
-typedef unsigned long int marpaESLIF_uint32_t;
-#    else
-#      if defined(SIZEOF_UNSIGNED_INT) && (SIZEOF_UNSIGNED_INT == 4)
-typedef unsigned int marpaESLIF_uint32_t;
+#    if defined(SIZEOF___UINT32_T) && (SIZEOF___UINT32_T == 4)
+typedef __uint32_t marpaESLIF_uint32_t;
+#      if defined(SIZEOF_UNSIGNED_LONG) && (SIZEOF_UNSIGNED_LONG == 4)
+typedef unsigned long marpaESLIF_uint32_t;
 #      else
-#        error "Cannot determine marpaESLIF_uint32_t"
+#        if defined(SIZEOF_UNSIGNED_INT) && (SIZEOF_UNSIGNED_INT == 4)
+typedef unsigned int marpaESLIF_uint32_t;
+#        else
+#          error "Cannot determine marpaESLIF_uint32_t"
+#        endif
 #      endif
 #    endif
 #  endif

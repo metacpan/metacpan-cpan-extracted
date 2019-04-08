@@ -7,8 +7,8 @@ META.yml
 Makefile.PL
 README
 README.md
+bin/halstead
 dist.ini
-eg/analyze
 eg/tester1.pl
 eg/tester2.pl
 eg/tester3.pl

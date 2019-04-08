@@ -1,5 +1,5 @@
 {
-   "abstract" : "module to replace document file by its text contents",
+   "abstract" : "optex module to replace document file by its text contents",
    "author" : [
       "Kazumasa Utashiro"
    ],
@@ -42,6 +42,8 @@
       },
       "runtime" : {
          "requires" : {
+            "App::optex" : "v0.3.0",
+            "List::Util" : "1.45",
             "perl" : "5.014"
          }
       },
@@ -54,11 +56,11 @@
    "provides" : {
       "App::optex::textconv" : {
          "file" : "lib/App/optex/textconv.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "App::optex::textconv::msdoc" : {
          "file" : "lib/App/optex/textconv/msdoc.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -72,7 +74,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-textconv"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>"

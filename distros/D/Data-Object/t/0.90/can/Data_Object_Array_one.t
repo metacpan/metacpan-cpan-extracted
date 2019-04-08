@@ -15,15 +15,19 @@ one
 
   # given [2..5]
 
-  $array->one('$value == 5'); # 1; true
-  $array->one('$value == 6'); # 0; false
+  $array->one(fun ($value) {
+    $value == 5; # 1; true
+  });
+
+  $array->one(fun ($value) {
+    $value == 6; # 0; false
+  });
 
 =description
 
 The one method returns true if only one of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =signature
 

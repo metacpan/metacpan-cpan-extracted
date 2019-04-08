@@ -1,4 +1,4 @@
-# Copyright 2015 Jeffrey Kegler
+# Copyright 2018 Jeffrey Kegler
 # This file is part of Marpa::R2.  Marpa::R2 is free software: you can
 # redistribute it and/or modify it under the terms of the GNU Lesser
 # General Public License as published by the Free Software Foundation,
@@ -14,6 +14,20 @@
 # http://www.gnu.org/licenses/.
 
 Revision history for Marpa::R2
+
+8.000000 (libmarpa 8.6.2) Sun Dec 16 16:02:45 EST 2018
+
+   * Fix bug which, under unusual conditions, causes
+     $recce->resume(), $recce->lexeme_complete() integer
+     arguments to be ignored.
+
+7.001_000 (libmarpa 8.6.2) Wed Dec  5 12:23:23 EST 2018
+
+   * Developer's version
+
+6.000000 (libmarpa 8.6.2) Sun Dec  2 13:53:38 EST 2018
+
+   * Improved diagnostics, doc fixes.
 
 4.000000 (libmarpa 8.6.0) Mon Mar 13 16:02:45 PDT 2017
 

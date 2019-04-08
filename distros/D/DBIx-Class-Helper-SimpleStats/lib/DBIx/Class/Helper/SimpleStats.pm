@@ -17,7 +17,7 @@ use Ref::Util qw/ is_plain_hashref is_ref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 
 
@@ -111,7 +111,7 @@ DBIx::Class::Helper::SimpleStats - Simple grouping and aggregate functions for D
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 

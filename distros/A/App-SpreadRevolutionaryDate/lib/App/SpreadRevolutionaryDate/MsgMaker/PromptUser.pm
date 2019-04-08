@@ -10,15 +10,17 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.10';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.14';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
 with 'App::SpreadRevolutionaryDate::MsgMaker';
 
-use namespace::autoclean;
-use open qw(:std :utf8);
+use open qw(:std :encoding(UTF-8));
 use IO::Prompt::Hooked;
+
+use Locale::TextDomain 'App-SpreadRevolutionaryDate';
+use namespace::autoclean;
 
 has 'default' => (
     is  => 'ro',
@@ -40,20 +42,33 @@ around BUILDARGS => sub {
 sub compute {
   my $self = shift;
 
-  my $confirm = 'n';
+  my $question = __"Please, enter message to spread";
+  #TRANSLATORS: initial used in case insensitive context
+  my $confirm_ok = lc(substr(__("yes"), 0, 1));
+  #TRANSLATORS: initial used  case insensitive context
+  my $confirm_nok = lc(substr(__("no"), 0, 1));
+  #TRANSLATORS: initial used in case sensitive context
+  my $confirm_abort = substr(__("Abort"), 0, 1);
+  my $confirm_abort_text = __x("or {abort} to abort", abort => $confirm_abort);
+  my $confirm_intro = __"Spread";
+  my $confirm_question = __x("confirm ({confirm_ok}/{confirm_nok} {confirm_abort_text})?", confirm_ok => $confirm_ok, confirm_nok => $confirm_nok, confirm_abort_text => $confirm_abort_text);
+  my $confirm_error = __x("Input must be \"{confirm_ok}\" or \"{confirm_nok}\"\n", confirm_ok => $confirm_ok, confirm_nok => $confirm_nok);
+  my $abort = __"OK not spreading";
+
+  my $confirm = $confirm_nok;
   my $msg;
-  while (defined $confirm && $confirm !~ /^y/) {
-    $msg = prompt('Please, enter message to spread', $self->default);
+  while (defined $confirm && $confirm !~ qr($confirm_ok)) {
+    $msg = prompt($question, $self->default);
     $confirm = prompt(
-      message  => 'Spread "' . $msg . '", confirm (y/n) or A to abort?',
-      default  => 'y',
-      validate => qr/^[yn]$/i,
-      escape   => qr/^A$/,
-      error    => 'Input must be "y" or "n" ("A" to abort input.)' . "\n",
+      message  => $confirm_intro . ' "' . $msg . '", ' . $confirm_question,
+      default  => $confirm_ok,
+      validate => qr/^[$confirm_ok$confirm_nok]$/i,
+      escape   => qr/^$confirm_abort$/,
+      error    => $confirm_error,
       tries    => 2,
     );
   }
-  die "OK not spreading\n" unless $confirm;
+  die "$abort\n" unless defined $confirm && $confirm =~ qr($confirm_ok);
   return $msg;
 }
 
@@ -80,7 +95,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 METHODS
 
@@ -92,7 +107,7 @@ Prompts user for the message to be spread. Takes no argument. Returns message as
 
 =over
 
-=item L<spread-revolutionary-date|https://metacpan.org/pod/distribution/App-SpreadRevolutionaryDate/bin/spread-revolutionary-date>
+=item L<spread-revolutionary-date>
 
 =item L<App::SpreadRevolutionaryDate>
 
@@ -108,9 +123,19 @@ Prompts user for the message to be spread. Takes no argument. Returns message as
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
 
 =back
 

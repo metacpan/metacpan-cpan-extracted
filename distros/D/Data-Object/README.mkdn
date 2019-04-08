@@ -407,11 +407,8 @@ benefits of a [Moo](https://metacpan.org/pod/Moo) or [Moose](https://metacpan.or
     # Data::Object::Any
     # Data::Object::Array
     # Data::Object::Class
-    # Data::Object::Cli
     # Data::Object::Code
     # Data::Object::Config
-    # Data::Object::Data
-    # Data::Object::Dispatch
     # Data::Object::Exception
     # Data::Object::Float
     # Data::Object::Hash

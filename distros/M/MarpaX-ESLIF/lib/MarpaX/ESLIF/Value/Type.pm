@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '2.0.43'; # VERSION
+our $VERSION = '3.0.3'; # VERSION
 
 
 # This section should be replaced on-the-fly at build time
@@ -30,7 +30,7 @@ MarpaX::ESLIF::Value::Type - ESLIF Value Types
 
 =head1 VERSION
 
-version 2.0.43
+version 3.0.3
 
 =head1 SYNOPSIS
 
@@ -46,6 +46,11 @@ version 2.0.43
   $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_DOUBLE;        #  6
   $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_PTR;           #  7
   $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_ARRAY;         #  8
+  $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_BOOL;          #  9
+  $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_STRING;        #  10
+  $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_ROW;           #  11
+  $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_TABLE;         #  12
+  $valueType = MarpaX::ESLIF::Value::Type->MARPAESLIF_VALUE_TYPE_LONG_DOUBLE;   #  13
 
 =head1 DESCRIPTION
 
@@ -88,6 +93,22 @@ I<C>'s C<void *>.
 =head2 MARPAESLIF_VALUE_TYPE_ARRAY
 
 I<C>'s pointer to a C<{void *, size_t}> structure.
+
+=head2 MARPAESLIF_VALUE_TYPE_BOOL
+
+I<C>'s C<short> where any value different than zero means a true value.
+
+=head2 MARPAESLIF_VALUE_TYPE_STRING
+
+A string. Encoding is contextual and depend on the action that generated that string. Lexemes that comes from a grammar running in character mode are guaranteed to be in UTF-8.
+
+=head2 MARPAESLIF_VALUE_TYPE_ROW
+
+An array of values.
+
+=head2 MARPAESLIF_VALUE_TYPE_TABLE
+
+An array of values, where number of values is even.
 
 =head1 AUTHOR
 

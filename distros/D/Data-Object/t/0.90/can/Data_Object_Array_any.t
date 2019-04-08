@@ -15,15 +15,19 @@ any
 
   # given [2..5]
 
-  $array->any('$value > 5'); # 0; false
-  $array->any('$value > 3'); # 1; true
+  $array->any(fun ($value) {
+    $value > 5; # 0; false
+  });
+
+  $array->any(fun ($value) {
+    $value > 3; # 1; true
+  });
 
 =description
 
 The any method returns true if any of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =signature
 

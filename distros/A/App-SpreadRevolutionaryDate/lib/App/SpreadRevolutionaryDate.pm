@@ -10,14 +10,22 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate;
-$App::SpreadRevolutionaryDate::VERSION = '0.10';
+$App::SpreadRevolutionaryDate::VERSION = '0.14';
 # ABSTRACT: Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon and Freenode.
 
 use Moose;
-use namespace::autoclean;
 use App::SpreadRevolutionaryDate::Config;
-use DateTime::Calendar::FrenchRevolutionary;
 use Class::Load ':all';
+
+use Locale::TextDomain 'App-SpreadRevolutionaryDate';
+use Locale::Messages qw(bind_textdomain_filter);
+use Encode;
+BEGIN {
+  $ENV{PERL_UNICODE} = 'AS';
+  $ENV{OUTPUT_CHARSET} = 'UTF-8';
+  bind_textdomain_filter 'App-SpreadRevolutionaryDate' => \&Encode::decode_utf8, Encode::FB_DEFAULT;
+}
+use namespace::autoclean;
 
 has 'config' => (
     is  => 'ro',
@@ -100,7 +108,7 @@ App::SpreadRevolutionaryDate - Spread date and time from Revolutionary (Republic
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 METHODS
 
@@ -120,7 +128,7 @@ Spreads calendar date to configured targets. Takes no argument.
 
 =over
 
-=item L<spread-revolutionary-date|https://metacpan.org/pod/distribution/App-SpreadRevolutionaryDate/bin/spread-revolutionary-date>
+=item L<spread-revolutionary-date>
 
 =item L<App::SpreadRevolutionaryDate::Config>
 
@@ -134,11 +142,21 @@ Spreads calendar date to configured targets. Takes no argument.
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =back
 

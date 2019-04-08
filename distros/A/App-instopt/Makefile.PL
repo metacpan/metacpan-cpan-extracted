@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
-    "File::MoreUtil" => 0,
+    "File::MoreUtil" => "0.620",
     "File::Path" => 0,
     "File::chdir" => 0,
     "Filename::Archive" => 0,
@@ -51,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,7 +65,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
-  "File::MoreUtil" => 0,
+  "File::MoreUtil" => "0.620",
   "File::Path" => 0,
   "File::Spec" => 0,
   "File::chdir" => 0,

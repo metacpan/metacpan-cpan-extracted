@@ -11,7 +11,14 @@
 use 5.014;
 use utf8;
 
-use Test::More tests => 3;
+BEGIN {
+    $ENV{OUTPUT_CHARSET} = 'UTF-8';
+    $ENV{PERL_UNICODE} = 'AS';
+}
+use open qw(:std :encoding(UTF-8));
+binmode(DATA, ":encoding(UTF-8)");
+
+use Test::More tests => 5;
 use Test::NoWarnings;
 use Test::Output;
 use File::HomeDir;
@@ -19,19 +26,30 @@ use File::HomeDir;
 
 use App::SpreadRevolutionaryDate;
 
-@ARGV = ('--test', '--twitter');
+@ARGV = ('--test', '--twitter', '--locale', 'en');
 my $data_start = tell DATA;
 my $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 
 # Default message
-stdout_like { $spread_revolutionary_date->spread } qr/Spread to Twitter: Goodbye old world, hello revolutionary worlds$/, 'Spread default to Twitter';
+stdout_like { $spread_revolutionary_date->spread } qr/Spread on Twitter: Goodbye old world, hello revolutionary worlds$/, 'Spread default on Twitter';
 
 # Set message
 @ARGV = ('--test', '--twitter', '--promptuser_default', 'Thinking, attacking, building – such is our fabulous agenda.');
 seek DATA, $data_start, 0;
 $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
-stdout_like { $spread_revolutionary_date->spread } qr/Spread to Twitter: Thinking, attacking, building – such is our fabulous agenda\.$/, 'Spread message to Twitter';
+stdout_like { $spread_revolutionary_date->spread } qr/Diffusé sur Twitter : Thinking, attacking, building – such is our fabulous agenda\.$/, 'Spread message on Twitter';
 
+# Deault message in Italian
+@ARGV = ('--test', '--twitter', '--locale', 'it');
+seek DATA, $data_start, 0;
+$spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
+stdout_like { $spread_revolutionary_date->spread } qr/Diffondi su Twitter : Goodbye old world, hello revolutionary worlds$/, 'Spread in Italian';
+
+# Use locale oustide of languages allowed by RevolutionaryDate
+@ARGV = ('--test', '--twitter', '--locale', 'de');
+seek DATA, $data_start, 0;
+$spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
+stdout_like { $spread_revolutionary_date->spread } qr/Überträgt auf Twitter: Goodbye old world, hello revolutionary worlds$/, 'Spread in German';
 
 __DATA__
 

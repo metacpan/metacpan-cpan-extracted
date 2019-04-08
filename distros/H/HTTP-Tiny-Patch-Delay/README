@@ -1,0 +1,57 @@
+NAME
+    HTTP::Tiny::Patch::Delay - Add sleep() between requests to slow down
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Patch::Delay (from
+    Perl distribution HTTP-Tiny-Patch-Delay), released on 2019-04-07.
+
+SYNOPSIS
+    From Perl:
+
+     use HTTP::Tiny::Patch::Delay
+         # -between_requests => 1.5, # optional, default is 1
+     ;
+
+     my $res  = HTTP::Tiny->new->get("http://www.example.com/");
+
+DESCRIPTION
+    This patch adds sleep() between HTTP::Tiny requests.
+
+CONFIGURATION
+  -between_request
+    Float. Default is 1. Number of seconds to sleep() after each request.
+    Uses Time::HiRes so you can include fractions of a second, e.g. 0.1 or
+    1.5.
+
+FAQ
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Patch-Delay>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Patch-Delay>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Patch-Delay
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    LWP::UserAgent::Patch::Delay
+
+    HTTP::Tiny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

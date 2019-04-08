@@ -15,10 +15,11 @@ test_delete(
         height     => undef,
         date_added => \'SYSDATE()',
         status     => [qw( X Y Z )],
+        qty        => \[ 'ROUND(?)', 14.5 ],
     },
 
-    'DELETE FROM users WHERE date_added=SYSDATE() AND height IS NULL AND serialno=? AND status IN (?,?,?)',
-    [ 12345, 'X', 'Y', 'Z' ],
+    'DELETE FROM users WHERE date_added=SYSDATE() AND height IS NULL AND qty=ROUND(?) AND serialno=? AND status IN (?,?,?)',
+    [ 14.5, 12345, 'X', 'Y', 'Z' ],
 
     'Standard mish-mash'
 );

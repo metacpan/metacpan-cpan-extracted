@@ -1,10 +1,10 @@
 # NAME
 
-textconv - module to replace document file by its text contents
+textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 0.01
+Version 0.02
 
 # SYNOPSIS
 
@@ -32,6 +32,7 @@ Next command simply produces the same result.
 
 # SEE ALSO
 
+[https://github.com/kaz-utashiro/optex](https://github.com/kaz-utashiro/optex)
 [https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
 
 # LICENSE

@@ -21,4 +21,6 @@ my %hash = (
     foo   => foo(),
 );
 
+&dummy; foo();
+
 done_testing();

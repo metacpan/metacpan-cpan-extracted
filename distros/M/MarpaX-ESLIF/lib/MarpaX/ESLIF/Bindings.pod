@@ -1,0 +1,358 @@
+# PODNAME: MarpaX::ESLIF::Bindings
+
+# ABSTRACT: MarpaX::ESLIF's Bindings
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+MarpaX::ESLIF::Bindings - MarpaX::ESLIF's Bindings
+
+=head1 VERSION
+
+version 3.0.3
+
+=head1 DESCRIPTION
+
+MarpaX::ESLIF is a Scanless Interface expressed in a BNF format, that is using L<marpaWrapper|https://github.com/jddurand/c-marpaWrapper>, itself being a thin interface on top of L<libmarpa|https://jeffreykegler.github.io/Marpa-web-site/libmarpa.html> parser.
+
+The L<MarpaX::ESLIF BNF|https://github.com/jddurand/c-marpaESLIF/tree/master/doc/BNF> is inspired from L<Marpa::R2's DSL|https://metacpan.org/pod/distribution/Marpa-R2/pod/Scanless/DSL.pod>, though with some incompatible changes and add-ons:
+
+This document explains language bindings to the perl, java and lua languages.
+
+=head1 NAME
+
+=head1 JAVA
+
+Java version 1.4 or later is required.
+
+Note that autoboxing is used implicitely in the interface, e.g. Java's C<byte> native type and Java's C<java.lang.Byte> object are equivalent, and so on.
+
+=head2 Java to marpaESLIF
+
+  [--------------------------------------------------------------------------]
+  | Java     | MarpaX::ESLIF                                                    |
+  [--------------------------------------------------------------------------]
+  | null     | UNDEF                                                         |
+  | byte     | CHAR, SHORT, INT, LONG, LONG_LONG or PTR (opaque) [1]         |
+  | short    | CHAR, SHORT, INT, LONG, LONG_LONG or PTR (opaque) [1]         |
+  | float    | FLOAT, DOUBLE, LONG_DOUBLE (if available) or PTR (opaque) [2] |
+  | double   | FLOAT, DOUBLE, LONG_DOUBLE (if available) or PTR (opaque) [2] |
+  | byte[]   | ARRAY                                                         |
+  | bool     | BOOL                                                          |
+  | char     | STRING [3]                                                    |
+  | String   | STRING                                                        |
+  | object[] | ROW                                                           |
+  | Map      | TABLE [4]                                                     |
+  | other    | PTR [5]                                                       |
+  [--------------------------------------------------------------------------]
+
+=over
+
+=item [1]
+
+Every non decimal number goes to a generic method that looks to the size of the data in JNI, i.e. the size of C<jbyte>, C<jshort>, C<jint>, C<jlong>. This JNI size is compared to the shortest C<C> integral integer types, i.e. C<char>, C<short>, C<int>, C<long> and C<long long>, that maps exactly to MarpaX::ESLIF types C<CHAR>, C<SHORT>, C<INT>, C<LONG> and C<LONG_LONG>, respectively. The shortest C<C> type is taken. If not found then the java value is kept into a global reference, and exported using a marpaESLIF's C<PTR> type, that only JNI will be able to understand when it comes back.
+
+=item [2]
+
+Every decimal number goes to a generic method that looks to the size of the data in JNI, i.e. the size of C<jfloat>, C<jdouble>. This JNI size is compared to the shortest C<C> floating types, i.e. C<float>, C<double>, C<long double> (if available), that maps exactly to MarpaX::ESLIF types C<FLOAT>, C<DOUBLE>, C<LONG_DOUBLE> (if available), respectively. The shortest C<C> type is taken. If not found then the java value is kept into a global reference, and exported using a marpaESLIF's C<PTR> type, that only JNI will be able to understand when it comes back.
+
+=item [2]
+
+A character embeds a charset, therefore it is exported as a marpaESLIF's C<STRING>.
+
+=item [4]
+
+Every object that is an instance of C<java.util.Map> abstract class is mapped to a marpaESLIF's C<TABLE>.
+
+=item [4]
+
+Every object that is not mappable into a MarpaX::ESLIF type, is exported using marpaESLIF's C<PTR>. The JNI takes a global reference to it, and will be able to recognizes ot when it comes back, derefencing it to the native object.
+
+=back
+
+=head2 MarpaX::ESLIF to Java
+
+  [----------------------------------------------------------------------]
+  | MarpaX::ESLIF  | Java                                                   |
+  [----------------------------------------------------------------------]
+  | UNDEF       | null                                                   |
+  | CHAR        | byte or short or int or long or Math.BigInteger [1]    |
+  | SHORT       | byte or short or int or long or Math.BigInteger [1]    |
+  | INT         | byte or short or int or long or Math.BigInteger [1]    |
+  | LONG        | byte or short or int or long or Math.BigInteger [1]    |
+  | FLOAT       | float or double or Math.BigDecimal [2]                 |
+  | DOUBLE      | float or double or Math.BigDecimal [2]                 |
+  | PTR         | Java specific value or long [3]                        |
+  | ARRAY       | byte[]                                                 |
+  | BOOL        | bool                                                   |
+  | STRING      | String                                                 |
+  | ROW         | Object[]                                               |
+  | TABLE       | HashMap                                                |
+  | LONG_DOUBLE | float or double or Math.BigDecimal [2]                 |
+  | LONG_LONG   | byte or short or int or long or Math.BigInteger [1]    |
+  [----------------------------------------------------------------------]
+
+=over
+
+=item [1]
+
+The number of bits of the C<C> type is compared to the number of bits in java, that is fixed whatever the java version. The shortest java type is used, else a Math.BigInteger default if not java type is found.
+
+=item [2]
+
+The number of bits of the C<C> type is compared to the number of bits in java, that is fixed whatever the java version. The shortest java type is used, else a Math.BigDecimal default if not java type is found.
+
+=item [3]
+
+A java specific value is something that the JNI exported to MarpaX::ESLIF using an opaque pointer. In such a case, when it comes back to JNI, the binding recognizes this case, and dereferences the native java object as it was originally, via a global reference that it maintained. In any other case, this is a pointer not owned by Java, and it is transformed to a Java's C<long>.
+
+=back
+
+=head1 PERL
+
+Perl version 5.10.0 or later is required.
+
+=head2 Perl to marpaESLIF
+
+  [--------------------------------------------------------------------------]
+  | Perl     | MarpaX::ESLIF                                                    |
+  [--------------------------------------------------------------------------]
+  | undef    | UNDEF                                                         |
+  | HASH     | TABLE                                                         |
+  | ARRAY    | ROW                                                           |
+  | boolean  | BOOL [1]                                                      |
+  | integer  | SHORT, INT, LONG, LONG_LONG or PTR (opaque) [2]               |
+  | number   | DOUBLE, LONG_DOUBLE (if availabe) or PTR (opaque) [3]         |
+  | string   | STRING, ARRAY [4]                                             |
+  | other    | PTR [5]                                                       |
+  [--------------------------------------------------------------------------]
+
+=over
+
+=item [1]
+
+The method C<MarpaX::ESLIF::is_bool> is used to determine the boolean nature. Default is to call C<JSON::MaybeXS::is_bool>.
+
+=item [2]
+
+The method C<MarpaX::ESLIF::is_int> is used to determine the integer nature. Default is to call C<Types::Standard::is_Int>. Storage is decided when comparing the size of a Perl's XS's C<IV>, and defaults to an opaque PTR that only perl will understand if not found.
+
+=item [3]
+
+The method C<MarpaX::ESLIF::is_StrictNum> is used to determine the number nature. Default is to call C<Types::Standard::is_StrictNum>. Storage depends on the size of an Perl's XS's C<NV>, and defaults to an opaque PTR that only perl will understand if not found.
+
+=item [4]
+
+An instance of a L<MarpaX::ESLIF::String> instance or the method C<MarpaX::ESLIF::is_Str> is used to determine the string nature. Default for C<MarpaX::ESLIF::is_Str> is to call C<Types::Standard::is_Str>. If encoding information is found, then it becomes a marpaESLIF's STRING, else a marpaESLIF's ARRAY.
+
+When it is not a L<MarpaX::ESLIF::String> instance, only perl's C<PV> that have the UTF-8 flag set are considered to be strings, and this information is trusted. Note that it respects the existence of C<bytes> pragma, if any.
+
+=item [5]
+
+Default is to export as an opaque marpaESLIF's PTR, that only perl will be able to understand. The perl bindings then keeps a reference to this value.
+
+=back
+
+=head2 MarpaX::ESLIF to Perl
+
+  [----------------------------------------------------------------------]
+  | MarpaX::ESLIF  | Perl                                                   |
+  [----------------------------------------------------------------------]
+  | UNDEF       | undef                                                  |
+  | CHAR        | string [1]                                             |
+  | SHORT       | integer or Math::BigInt [2]                            |
+  | INT         | integer or Math::BigInt [2]                            |
+  | LONG        | integer or Math::BigInt [2]                            |
+  | FLOAT       | number [3]                                             |
+  | DOUBLE      | number [3]                                             |
+  | PTR         | perl specific value or integer [4]                     |
+  | ARRAY       | string [1]                                             |
+  | BOOL        | $MarpaX::ESLIF::true or $MarpaX::ESLIF::false [5]      |
+  | STRING      | string or MarpaX::ESLIF::String instance [6]           |
+  | ROW         | array                                                  |
+  | TABLE       | hash                                                   |
+  | LONG_DOUBLE | number or Math::BigFloat [3]                           |
+  | LONG_LONG   | integer or Math::BigInt [2]                            |
+  [----------------------------------------------------------------------]
+
+=over
+
+=item [1]
+
+True perl string (i.e. a Perl's XS's C<PV*>).
+
+=item [2]
+
+If the size of Perl's XS's C<IV> is large enough, use it, else use a Math::BigInt instance.
+
+=item [3]
+
+The size of Perl's XS's C<NV> is always at least the size of a C's C<double>, so is always large enough to handle a C's C<float> or C<double>.
+
+=item [4]
+
+An opaque pointer understandable by perl only, or a true perl integer (using a Perl C<IV>) representing the value of the pointer.
+
+=item [5]
+
+Default implementations of C<$MarpaX::ESLIF::true> and C<$MarpaX::ESLIF::false> are C<JSON::MaybeXS::true()> and C<JSON::MaybeXS::false()>, respectively.
+
+=item [6]
+
+If the encoding is "UTF-8", returns a true perl string (using a perl C<PV>), else returns a C<MarpaX::ESLIF::String> instance.
+
+=back
+
+=head1 LUA
+
+Lua version 5.2 or later is required.
+
+The following lua specifics are added by the lua binding library:
+
+=over
+
+=item embedded version
+
+Embedded lua is fixed to version 5.3.4. Any lua panic is catched by marpaESLIF.
+
+=item pairs
+
+Lua bindings never loops on table using the "next", but always with the "pairs" metamethod if it exists (fallbacking to "next").
+
+=item string encoding metadata
+
+string metatable has a new string "encoding" metatada, defaults to nil. Because strings in lua are always unique, two instances of string cannot have different encoding information.
+
+=item canarray table metadata
+
+The "canarray" boolean metadata is looked up on table, to determine if the the end-user definitely wants the binding to see table as an array or not. This applies only to table than <can> be exported as an array, i.e. that have adjacent integer keys.
+
+=item opaque table metadata
+
+The "opaue" boolean metadata is looked up on table, to determine if the the end-user definitely wants the binding to never transform data when doing through marpaESLIF. Then only the lua interpreter will be able to understand what is behind, any other host language will see an opaque ununderstable pointer.
+
+=item Niled table support
+
+An implementation quite similar to L<Storing Nils In Tables|http://lua-users.org/wiki/StoringNilsInTables> is available, using these methods:
+
+=over
+
+=item NiledTable
+
+=item niledarray
+
+=item niledtablekv
+
+=back
+
+=back
+
+=head2 Lua to marpaESLIF
+
+  [--------------------------------------------------------------------------]
+  | Lua      | MarpaX::ESLIF                                                    |
+  [--------------------------------------------------------------------------]
+  | nil      | UNDEF                                                         |
+  | integer  | SHORT, INT, LONG, LONG_LONG or PTR (opaque) [1]               |
+  | number   | FLOAT, DOUBLE, LONG_DOUBLE or PTR (opaque) [2]                |
+  | bool     | BOOL                                                          |
+  | string   | STRING, ARRAY [3]                                             |
+  | userdata | ROW, TABLE [4]                                                |
+  | other    | PTR [5]                                                       |
+  [--------------------------------------------------------------------------]
+
+=over
+
+=item [1]
+
+The shortest C's integral integer type is used, else the value is exported as an opaque pointer that only Lua can understand.
+
+=item [2]
+
+The shortest C's float type is used, else the value is exported as an opaque pointer that only Lua can understand.
+
+=item [3]
+
+In Lua, strings are as in C: an opaque byte array. The lua binding adds the "encoding" meta data to the string object, and if set a lua string will be exported to a marpaESLIF's STRING, else as a marpaESLIF's ARRAY.
+
+=item [4]
+
+In Lua, arrays are just a simple form of tables. Lua binding add the support of a "canarray" table meta data, which defaults to true. If the lua table looks like an array and this flag is true, data will be exported as a marpaESLIF's ROW, else as a marpaESLIF's TABLE.
+
+=item [5]
+
+Fallback is to export lua value as an opaque pointer, that only Lua can understand. Then lua binding keeps a reference internally to this value as long as necessary.
+
+=back
+
+=head2 MarpaX::ESLIF to Lua
+
+  [----------------------------------------------------------------------]
+  | MarpaX::ESLIF  | Perl                                                   |
+  [----------------------------------------------------------------------]
+  | UNDEF       | nil                                                    |
+  | CHAR        | string [1]                                             |
+  | SHORT       | integer [2]                                            |
+  | INT         | integer [2]                                            |
+  | LONG        | integer [2]                                            |
+  | FLOAT       | number [3]                                             |
+  | DOUBLE      | number [3]                                             |
+  | PTR         | Lua specific value or light user data [4]              |
+  | ARRAY       | string [1]                                             |
+  | BOOL        | bool                                                   |
+  | STRING      | string [4]                                             |
+  | ROW         | niledtable [5]                                         |
+  | TABLE       | niledtable [6]                                         |
+  | LONG_DOUBLE | number [3]                                             |
+  | LONG_LONG   | integer [2]                                            |
+  [----------------------------------------------------------------------]
+
+=over
+
+=item [1]
+
+String with no associated encoding.
+
+=item [2]
+
+Casted to a Lua's C<lua_Integer>, i.e. truncation if possible.
+
+=item [3]
+
+Casted to a Lua's C<lua_Number>, i.e. truncation if possible.
+
+=item [4]
+
+When the pointer is not Lua specific, the whole original information is kept, so that opaque information coming from host languages is kept as-is.
+
+=item [5]
+
+Table with niled values support, explicitly marked to be exported to a marpaESLIF's ROW if it ever happens.
+
+=item [6]
+
+Table with niled values support, explicitly marked to be exported to a marpaESLIF's TABLE if it ever happens.
+
+=back
+
+=head1 SEE ALSO
+
+L<marpaESLIF|https://github.com/jddurand/c-marpaESLIF/tree/master>
+
+=head1 AUTHOR
+
+Jean-Damien Durand <jeandamiendurand@free.fr>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jean-Damien Durand.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

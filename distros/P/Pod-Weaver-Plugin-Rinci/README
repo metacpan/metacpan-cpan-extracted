@@ -2,8 +2,9 @@ NAME
     Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 VERSION
-    This document describes version 0.77 of Pod::Weaver::Plugin::Rinci (from
-    Perl distribution Pod-Weaver-Plugin-Rinci), released on 2017-07-07.
+    This document describes version 0.780 of Pod::Weaver::Plugin::Rinci
+    (from Perl distribution Pod-Weaver-Plugin-Rinci), released on
+    2019-04-08.
 
 SYNOPSIS
     In your weaver.ini:
@@ -23,13 +24,13 @@ DESCRIPTION
 
         From "description" property from package metadata, if any.
 
-    *   FUNCTIONS
+    *   FUNCTIONS (or METHODS)
 
-        Documentation for each function for which the metadata is found
-        under the package will be added here. For each function, there will
-        be summary, description, usage, list of arguments and their
-        documentation, as well as examples, according to what's available in
-        the function metadata of corresponding function.
+        Documentation for each function (or method) for which the metadata
+        is found under the package will be added here. For each function,
+        there will be summary, description, usage, list of arguments and
+        their documentation, as well as examples, according to what's
+        available in the function metadata of corresponding function.
 
     To get Rinci metadata from a module, Perinci::Access::Perl is used.
 
@@ -106,8 +107,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
-    by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012,
+    2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

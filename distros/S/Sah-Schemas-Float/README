@@ -2,10 +2,14 @@ NAME
     Sah::Schemas::Float - Sah schemas for various floating types
 
 VERSION
-    This document describes version 0.002 of Sah::Schemas::Float (from Perl
-    distribution Sah-Schemas-Float), released on 2018-06-04.
+    This document describes version 0.003 of Sah::Schemas::Float (from Perl
+    distribution Sah-Schemas-Float), released on 2019-04-08.
 
 SAH SCHEMAS
+    *   negfloat
+
+        Negative float.
+
     *   percent
 
         A float.
@@ -13,6 +17,10 @@ SAH SCHEMAS
         This type is basically "float", with "str_as_percent" coerce rule.
         So the percent sign is optional, but the number is always
         interpreted as percent, e.g. "1" is interpreted as 1% (0.01).
+
+    *   posfloat
+
+        Positive float.
 
     *   share
 
@@ -27,6 +35,12 @@ SAH SCHEMAS
         Due to different interpretations, particularly "1" (some people
         might expect it to mean "0.01" or "1%") use of this type is
         discouraged. Use Sah::Schema::percent instead.
+
+    *   ufloat
+
+        Non-negative float.
+
+        See also "posfloat" for floats that are larger than 0.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -52,7 +66,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

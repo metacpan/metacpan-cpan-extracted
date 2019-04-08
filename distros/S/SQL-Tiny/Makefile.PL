@@ -33,7 +33,16 @@ WriteMakefile(
 
 sub MY::postamble {
     return <<'MAKE_FRAG';
+.PHONY: tags critic
+
 critic:
 	perlcritic -1 -q -profile perlcriticrc lib/SQL/Tiny.pm t/*.t
+
+tags:
+	ctags -f tags --recurse --totals \
+		--exclude=blib \
+		--exclude=.git \
+		--exclude='*~' \
+		--languages=Perl --langmap=Perl:+.t \
 MAKE_FRAG
 }

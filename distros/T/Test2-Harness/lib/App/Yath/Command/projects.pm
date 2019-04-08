@@ -2,7 +2,7 @@ package App::Yath::Command::projects;
 use strict;
 use warnings;
 
-our $VERSION = '0.001071';
+our $VERSION = '0.001072';
 
 use parent 'App::Yath::Command::test';
 use Test2::Harness::Util::HashBase;
@@ -553,6 +553,12 @@ Specify the formatter to use
 (Default: "Test2")
 
 Only useful when a renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+
+=item --no-progress
+
+Turn off progress indicators
+
+This disables "events seen" counter and buffered event pre-display
 
 =item --qvf
 

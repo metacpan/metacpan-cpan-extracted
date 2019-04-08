@@ -1,0 +1,125 @@
+#!/usr/bin/env perl
+# PODNAME: halstead
+use strict;
+use warnings;
+
+use Perl::Metrics::Halstead;
+use Getopt::Long;
+use Pod::Usage;
+
+my $metric = 'effort';
+my $report = 0;
+my $help   = 0;
+my $man    = 0;
+
+GetOptions(
+    'metric|m=s' => \$metric,
+    'report|r'   => \$report,
+    'help|?'     => \$help,
+    'man'        => \$man,
+) or pod2usage(2);
+
+pod2usage(1) if $help || !@ARGV;
+pod2usage( -exitval => 0, -verbose => 2 ) if $man;
+
+die "Invalid Halstead metric: $metric\n" unless Perl::Metrics::Halstead->can($metric);
+
+my @packages = @ARGV;
+
+my @scores;
+
+my $i = 0;
+
+# Compute the Halstead metric for each given file.
+for my $file (@packages) {
+    next unless -e $file;
+
+    $i++;
+
+    print "$i. Processing $file:\n" if $report;
+
+    my $m;
+    eval {
+        $m = Perl::Metrics::Halstead->new( file => $file )
+    };
+    if ( $@ ) {
+        warn "$@\n";
+    }
+
+    if ( $report ) {
+        $m->report;
+    }
+    else {
+        push @scores, [ $file, $m->$metric ] if $metric && $m;
+    }
+}
+
+if ( @scores ) {
+    # Output the sorted file list.
+    my $n = 0;
+    for my $i ( sort{ $a->[1] <=> $b->[1] } @scores ){
+        printf "%d. %.4f %s\n", ++$n, $i->[1], $i->[0];
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+halstead
+
+=head1 VERSION
+
+version 0.0603
+
+=head1 SYNOPSIS
+
+  halstead [--options] /some/perl/file.pl [/another/Perl.pm ...]
+
+=head1 NAME
+
+halstead - Analyze Perl code for Halstead complexity
+
+=head1 OPTIONS
+
+=head2 metric
+
+  --metric difficulty
+
+The Halstead sorted metric to use for non-report output.
+
+However, if set to the empty string (C<''>) C<--report> output is assumed.
+
+Possible metrics:
+
+  effort
+  difficulty
+  volume
+  level
+  lang_level
+  intel_content
+  time_to_program
+  delivered_bugs
+
+=head2 report
+
+  --report
+
+Output a Halstead report for each given file.
+
+=head1 AUTHOR
+
+Gene Boggs <gene@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019 by Gene Boggs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

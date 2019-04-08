@@ -49,7 +49,7 @@ sub _post {
         unless $args{ type };
 
     # check for required params per type:
-    
+
     if ( $post_required_params{ $args{ type } } ) {
         my $req = $post_required_params{ $args{ type } };
         if ( ref $req && ref $req eq 'HASH' && defined $req->{any} ) {
@@ -73,7 +73,7 @@ sub _post {
         return decode_json( $response->decoded_content)->{response};
     } else {
         $self->error( WWW::Tumblr::ResponseError->new(
-            response => $response    
+            response => $response
         ));
         return
     }
@@ -130,7 +130,7 @@ WWW::Tumblr::Blog
   );
 
   # Posting to the blog:
-  
+
   # using the source param:
   my $post = $blog->post(
       type => 'photo',
@@ -178,4 +178,3 @@ L<WWW::Tumblr>, L<WWW::Tumblr::ResponseError>.
 Same as L<WWW::Tumblr>.
 
 =cut
-

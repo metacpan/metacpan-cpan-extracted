@@ -232,6 +232,30 @@ Example:
      ->say
      ->await;
 
+=head2 ignore
+
+Receives items, but ignores them entirely.
+
+Emits nothing and eventually completes when the upstream L<Ryu::Source> is done.
+
+Might be useful for keeping a source alive.
+
+=head2 buffer
+
+Accumulate items while any downstream sources are paused.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<high> - once at least this many items are buffered, will L</pause>
+the upstream L<Ryu::Source>.
+
+=item * C<low> - if the buffered count drops to this number, will L</resume>
+the upstream L<Ryu::Source>.
+
+=back
+
 =head2 as_list
 
 Resolves to a list consisting of all items emitted by this source.

@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/data-object/issues
   homepage: http://metacpan.org/release/Data-Object/
   repository: git://github.com/iamalnewkirk/data-object.git
-version: '0.93'
+version: '0.95'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Anthony Brummett <abrummet@genome.wustl.edu>'

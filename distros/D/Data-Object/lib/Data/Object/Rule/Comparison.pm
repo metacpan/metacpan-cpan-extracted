@@ -5,6 +5,8 @@ use warnings;
 
 use Data::Object::Rule;
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 requires 'eq';

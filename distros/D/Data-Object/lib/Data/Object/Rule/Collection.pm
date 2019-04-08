@@ -5,7 +5,9 @@ use warnings;
 
 use Data::Object::Rule;
 
-#BUILD
+our $VERSION = '0.95'; # VERSION
+
+# BUILD
 
 requires 'each';
 requires 'each_key';

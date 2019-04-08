@@ -17,24 +17,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sub::Called",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Data::Dumper" => 0,
-    "File::Path" => "2.0",
-    "File::Spec" => "3.40",
-    "JSON" => 0,
-    "List::Util" => 0,
-    "Moo" => "1.003001",
-    "MySQL::Workbench::Parser" => "1.08"
+    "B" => 0,
+    "Exporter" => 0
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0,
-    "File::Copy" => 0,
-    "File::Path" => "2.0",
-    "FindBin" => 0,
     "Pod::Coverage::TrustPod" => 0,
-    "Test::LongString" => "0.16"
+    "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,19 +32,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Capture::Tiny" => 0,
-  "Carp" => 0,
-  "Data::Dumper" => 0,
-  "File::Copy" => 0,
-  "File::Path" => "2.0",
-  "File::Spec" => "3.40",
-  "FindBin" => 0,
-  "JSON" => 0,
-  "List::Util" => 0,
-  "Moo" => "1.003001",
-  "MySQL::Workbench::Parser" => "1.08",
+  "B" => 0,
+  "Exporter" => 0,
   "Pod::Coverage::TrustPod" => 0,
-  "Test::LongString" => "0.16"
+  "Test::More" => 0
 );
 
 

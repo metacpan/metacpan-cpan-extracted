@@ -1,4 +1,5 @@
 package Math::Lapack::Expr;
+$Math::Lapack::Expr::VERSION = '0.002';
 use warnings;
 use strict;
 use strictures 2;
@@ -235,7 +236,7 @@ Math::Lapack::Expr
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for Pod::Coverage T add_ast div_ast dot_ast eval_ast exp_ast log_ast mul_ast pow_ast sub_ast sum to_string transpose inverse
 

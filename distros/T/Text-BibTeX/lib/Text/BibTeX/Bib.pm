@@ -111,7 +111,7 @@ package Text::BibTeX::BibStructure;
 use strict;
 use vars qw(@ISA $VERSION);
 @ISA = qw(Text::BibTeX::Structure);
-$VERSION = '0.86';
+$VERSION = '0.87';
 
 =head1 STRUCTURE OPTIONS
 
@@ -450,7 +450,7 @@ package Text::BibTeX::BibEntry;
 use strict;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '0.86';
+$VERSION = '0.87';
 
 use Text::BibTeX::BibSort;
 use Text::BibTeX::BibFormat;

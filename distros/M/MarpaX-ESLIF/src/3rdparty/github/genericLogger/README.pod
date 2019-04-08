@@ -43,6 +43,13 @@ genericLogger - generic logging interface
                                                    genericLoggerLevel_t logLeveli);
   genericLoggerLevel_t genericLogger_logLevel_geti(genericLogger_t *genericLoggerp);
 
+  /* ------------------ */
+  /* Context management */
+  /* ------------------ */
+  void *genericLogger_userDatavp_setp(genericLogger_t *genericLoggerp,
+                                      void *userDatavp);
+  void *genericLogger_userDatavp_getp(genericLogger_t *genericLoggerp);
+
 =head1 DESCRIPTION
 
 genericLogger is like a portable printf() with level filtering capability, designed to propagate already-formatted messages to user-defined log implementations.
@@ -129,13 +136,26 @@ va_list version of genericLogger_logv().
   genericLoggerLevel_t genericLogger_logLevel_seti(genericLogger_t *genericLoggerp,
                                                    genericLoggerLevel_t logLeveli);
 
-Set the log level to C<leveLeveli> and return it.
+Set the log level to C<leveLeveli> and returns previous value.
 
 =head2 genericLogger_logLevel_geti
 
   genericLoggerLevel_t genericLogger_logLevel_geti(genericLogger_t *genericLoggerp);
 
 Return the current log level.
+
+=head2 genericLogger_userDatavp_setp
+
+  void *genericLogger_userDatavp_setp(genericLogger_t *genericLoggerp,
+                                      void *userDatavp);
+
+Set the context to C<userDatavp> and returns previous value.
+
+=head2 genericLogger_userDatavp_getp
+
+  void *genericLogger_userDatavp_getp(genericLogger_t *genericLoggerp);
+
+Return the current context.
 
 =head2 genericLogger_versions
 

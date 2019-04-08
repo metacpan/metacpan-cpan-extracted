@@ -15,26 +15,19 @@ Minimalist Perl Development Framework
 
 =synopsis
 
-  package Cli;
+  #!perl
 
-  use do cli;
+  use do;
 
-  has 'user';
+  my $phrase = do('cast', 'hello world');
 
-  method main(:$args) {
-    say "Hello @{[$self->user]}, how are you?";
-  }
-
-  method specs(:$args) {
-    'user|u=s'
-  }
-
-  run Cli;
+  $phrase->titlecase->say;
 
 =description
 
 The "do" module is focused on simplicity and productivity. It encapsulates the
-Data-Object framework features, is minimalist, and is designed for scripting.
+L<Data::Object> framework features, is minimalist, and is designed for
+scripting.
 
 =cut
 

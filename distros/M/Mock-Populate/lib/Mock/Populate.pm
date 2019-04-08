@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Mock data creation
 
-our $VERSION = '0.1700';
+our $VERSION = '0.1701';
 
 use strict;
 use warnings;
@@ -36,15 +36,12 @@ sub date_ranger {
     my $date2 = date($args{end});
     my $range = Date::Range->new($date1, $date2);
 
-    # Declare the number of days in the range.
-    my $offset = 0;
-
     # Bucket for our result list.
     my @results;
 
     for(1 .. $args{N}) {
         # Get a random number of days in the range.
-        $offset = int(rand $range->length);
+        my $offset = int(rand $range->length);
 
         # Save the stringified start date plus the offest.
         my $date = $date1 + $offset;
@@ -97,27 +94,25 @@ sub time_ranger {
     my $range = $end_time - $start_time;
     #warn "R: $end_time (@end) - $start_time (@start) = $range\n";
 
-    # Declare the number of seconds.
-    my $offset = 0;
-
     # Bucket for our result list.
     my @results;
 
     # Generate a time, N times.
     for(1 .. $args{N}) {
         # Get a random number of seconds in the range.
-        $offset = int(rand $range);
+        my $offset = int(rand $range);
 
         # Print the start time plus the offest seconds.
         if ($args{stamp}) {
             # In HH:MM::SS format.
             my $time = scalar localtime($start_time + $offset);
-            push @results, (split / /, $time)[3];
+            push @results, (split /\s+/, $time)[3];
         }
         else {
             # As a number of seconds from the "epoc."
             push @results, $start_time + $offset;
         }
+#use Data::Dumper;warn(__PACKAGE__,' ',__LINE__," MARK: ",Dumper\@results);
     }
 
     return \@results;
@@ -181,8 +176,7 @@ sub name_ranger {
     for my $i (1 .. $args{N}) {
         # Get our random person.
         my $p = '';
-        # If gender is 'both' alternate male-female.
-        # Or if gender is not 'male' then ...female!
+        # If gender is 'both' alternate male/female.
         if (($args{gender} eq 'b' && $i % 2) || $args{gender} eq 'f') {
             $p = Mock::Person::name(sex => 'female', country => $args{country});
         }
@@ -191,7 +185,6 @@ sub name_ranger {
         }
         # Only use the requested number of names.
         my @names = split / /, $p;
-        my $name = '';
         if ($args{names} == 1) {
             push @results, $names[-1];
         }
@@ -210,11 +203,10 @@ sub name_ranger {
 sub email_modifier {
     my @people = @_;
 
+    my @tld = qw( com net org edu );
+
     # Bucket for our results.
     my @results = ();
-
-    # Generate email addresses if requested.
-    my @tld = qw( com net org edu );
 
     for my $p (@people) {
         # Break up the name.
@@ -391,7 +383,7 @@ Mock::Populate - Mock data creation
 
 =head1 VERSION
 
-version 0.1700
+version 0.1701
 
 =head1 SYNOPSIS
 

@@ -70,7 +70,7 @@
          "web" : "https://github.com/ology/Mock-Populate"
       }
    },
-   "version" : "0.1700",
+   "version" : "0.1701",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"
@@ -445,6 +445,6 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.27.7",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.10"
 }
 

@@ -415,11 +415,8 @@ benefits of a L<Moo> or L<Moose> derived object.
   # Data::Object::Any
   # Data::Object::Array
   # Data::Object::Class
-  # Data::Object::Cli
   # Data::Object::Code
   # Data::Object::Config
-  # Data::Object::Data
-  # Data::Object::Dispatch
   # Data::Object::Exception
   # Data::Object::Float
   # Data::Object::Hash

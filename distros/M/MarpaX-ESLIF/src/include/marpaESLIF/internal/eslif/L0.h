@@ -41,6 +41,7 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_TERMINAL_PCRE2_MODIFIERS,
   L0_TERMINAL_STRING_MODIFIERS,
   L0_TERMINAL_RESTRICTED_ASCII_GRAPH_CHARACTERS,
+  L0_TERMINAL_LUA_ACTION_NAME,
   L0_TERMINAL_SEMICOLON,
   /* ----- Non terminals ------ */
   L0_META_WHITESPACE,
@@ -57,6 +58,7 @@ typedef enum bootstrap_grammar_L0_enum {
   L0_META_ONE_OR_MORE_WORD_CHARACTERS,
   L0_META_ZERO_OR_MORE_WORD_CHARACTERS,
   L0_META_RESTRICTED_ASCII_GRAPH_NAME,
+  L0_META_LUA_ACTION_NAME,
   L0_META_BARE_NAME,
   L0_META_STANDARD_NAME,
   L0_META_BRACKETED_NAME,
@@ -84,6 +86,7 @@ bootstrap_grammar_meta_t bootstrap_grammar_L0_metas[] = {
   { L0_META_ONE_OR_MORE_WORD_CHARACTERS,  "one or more word characters",               0,       0,           0,            0 },
   { L0_META_ZERO_OR_MORE_WORD_CHARACTERS, "zero or more word characters",              0,       0,           0,            0 },
   { L0_META_RESTRICTED_ASCII_GRAPH_NAME,  L0_JOIN_G1_META_RESTRICTED_ASCII_GRAPH_NAME, 0,       0,           0,            0 },
+  { L0_META_LUA_ACTION_NAME,              L0_JOIN_G1_META_LUA_ACTION_NAME,             0,       0,           0,            0 },
   { L0_META_BARE_NAME,                    L0_JOIN_G1_META_BARE_NAME,                   0,       0,           0,            0 },
   { L0_META_STANDARD_NAME,                L0_JOIN_G1_META_STANDARD_NAME,               0,       0,           0,            0 },
   { L0_META_BRACKETED_NAME,               L0_JOIN_G1_META_BRACKETED_NAME,              0,       0,           0,            0 },
@@ -164,7 +167,7 @@ __DATA__
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
   { L0_TERMINAL_OP_DECLARE_ANY_GRAMMAR, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
-    ":\\[(\\d+)\\]:=",
+    ":\\[\\d+\\]:=",
 #ifndef MARPAESLIF_NTRACE
     ":[0123]:=", ":[0"
 #else
@@ -306,10 +309,10 @@ __DATA__
     NULL, NULL
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
-  /* Taken from Regexp::Common::delimited, $RE{delimited}{-delim=>q{'"\{}}{-cdelim=>q{'"\}}} */
+  /* Taken from Regexp::Common::delimited, $RE{delimited}{-delim=>q{'"}}{-cdelim=>q{'"}} */
   /* Perl stringified version is: (?:(?|(?:\')(?:[^\\\']*(?:\\.[^\\\']*)*)(?:\')|(?:\")(?:[^\\\"]*(?:\\.[^\\\"]*)*)(?:\"))) */
   { L0_TERMINAL_QUOTED_STRING, MARPAESLIF_TERMINAL_TYPE_REGEX, "su",
-    "(?:(?|(?:')(?:[^\\\\']*(?:\\\\.[^\\\\']*)*)(?:')|(?:\")(?:[^\\\\\"]*(?:\\\\.[^\\\\\"]*)*)(?:\")))",
+    "(?:(?|(?:')(?:[^\\\\']*(?:\\\\.[^\\\\']*)*)(?:')|(?:\")(?:[^\\\\\"]*(?:\\\\.[^\\\\\"]*)*)(?:\")|(?:\\x{201C})(?:[^\\\\\\x{201D}]*(?:\\\\.[^\\\\\\x{201D}]*)*)(?:\\x{201D})))",
 #ifndef MARPAESLIF_NTRACE
     "'A string'", "'"
 #else
@@ -359,7 +362,12 @@ __DATA__
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
   { L0_TERMINAL_RESTRICTED_ASCII_GRAPH_CHARACTERS, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
-    "[-!#$%&()*+./;<>?@\\[\\\\\\]^_`|~A-Za-z0-9][-!#$%&()*+./:;<>?@\\[\\\\\\]^_`|~A-Za-z0-9]*",
+    "[!#$%&*+./;?\\[\\\\\\]^_`~A-Za-z0-9][!#$%&*+./;?\\[\\\\\\]^_`~A-Za-z0-9]*",
+    NULL, NULL
+  },
+  /* --------------------------------------------------------------------------------------------------------------------------------- */
+  { L0_TERMINAL_LUA_ACTION_NAME, MARPAESLIF_TERMINAL_TYPE_REGEX, NULL,
+    "::lua->[a-zA-Z_][a-zA-Z0-9_]*",
     NULL, NULL
   },
   /* --------------------------------------------------------------------------------------------------------------------------------- */
@@ -399,6 +407,7 @@ bootstrap_grammar_rule_t bootstrap_grammar_L0_rules[] = {
     lhsi                                      descs                                           type                          nrhsl  { rhsi }                                       }  minimumi           separatori  properb hideseparatorb actions
   */
   { L0_META_RESTRICTED_ASCII_GRAPH_NAME,      "restricted ascii graph name",                  MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_RESTRICTED_ASCII_GRAPH_CHARACTERS}, -1,                        -1,      -1,             0, NULL },
+  { L0_META_LUA_ACTION_NAME,                  "lua action name",                              MARPAESLIF_RULE_TYPE_ALTERNATIVE, 1, { L0_TERMINAL_LUA_ACTION_NAME                  }, -1,                        -1,      -1,             0, NULL },
   { L0_META_BARE_NAME,                        "bare name",                                    MARPAESLIF_RULE_TYPE_SEQUENCE,    1, { L0_META_WORD_CHARACTER                       },  1,                        -1,      -1,             0, NULL },
   { L0_META_STANDARD_NAME,                    "standard name",                                MARPAESLIF_RULE_TYPE_ALTERNATIVE, 2, { L0_TERMINAL_LATIN_ALPHABET_LETTER,
                                                                                                                                      L0_META_ZERO_OR_MORE_WORD_CHARACTERS         }, -1,                        -1,      -1,             0, NULL },

@@ -1,5 +1,17 @@
 Revision history for re::engine::PCRE2
 
+0.15 Mon 08 Apr 2019 11:30:04 AM CEST rurban
+
+    - fixup 1-basic.t for v5.29.9 Variable length lookbehind support
+    - fixup for libpcre2 >= 10.32 unicode semantic changes:
+      - Allow :NAME on (*ACCEPT), (*FAIL), and (*COMMIT) and fix bug with (*MARK)
+        followed by (*ACCEPT) in an assertion.
+      - Add support for \N{U+dd...}, for ASCII and Unicode modes only.
+        Caused unicode regression https://bugs.exim.org/show_bug.cgi?id=2305
+        (need to observe unicode folding rules for \N{U+NNNN} chars)
+    - add jit-sealloc test (Petr Písař #29) for pcre2 bug
+      https://bugs.exim.org/show_bug.cgi?id=1749
+
 0.14 Tue Jul 25 11:25:04 CEST 2017 rurban
 
     - Allocate match data in comp, not exec (Ævar Arnfjörð Bjarmason PR #18).

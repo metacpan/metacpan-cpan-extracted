@@ -10,11 +10,11 @@ SQL::Tiny - A very simple SQL-building library
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use parent 'Exporter';
 
@@ -32,21 +32,22 @@ our %EXPORT_TAGS = (
 
 =head1 SYNOPSIS
 
-    my ($sql,$bind) = sql_select( 'users', [ 'name', 'status' ], { status => [ 'Deleted', 'Inactive' ] );
+    my ($sql,$binds) = sql_select( 'users', [ 'name', 'status' ], { status => [ 'Deleted', 'Inactive' ] }, { order_by => 'name' } );
 
-    my ($sql,$bind) = sql_insert( 'users', { name => 'Dave', status => 'Active' } );
+    my ($sql,$binds) = sql_select( 'users', [ 'COUNT(*)' ], { status => [ 'Deleted', 'Inactive' ] }, { group_by => 'status' } );
 
-    my ($sql,$bind) = sql_update( 'users', { status => 'Inactive' }, { password => undef } );
+    my ($sql,$binds) = sql_insert( 'users', { name => 'Dave', status => 'Active' } );
 
-    my ($sql,$bind) = sql_delete( 'users', { status => 'Inactive' } );
+    my ($sql,$binds) = sql_update( 'users', { status => 'Inactive' }, { password => undef } );
+
+    my ($sql,$binds) = sql_delete( 'users', { status => 'Inactive' } );
 
 =head1 DOCUMENTATION
 
 A very simple SQL-building library.  It's not for all your SQL needs,
 only the very simple ones.
 
-It doesn't handle JOINs.  It doesn't handle GROUP BY.  It doesn't handle
-subselects.  It's only for simple SQL.
+It doesn't handle JOINs.  It doesn't handle subselects.  It's only for simple SQL.
 
 In my test suites, I have a lot of ad hoc SQL queries, and it drives me
 nuts to have so much SQL code lying around.  SQL::Tiny is for generating
@@ -61,23 +62,25 @@ I'd far rather have:
             salary    => 50000,
             status    => 'Active',
             dateadded => \'SYSDATE()',
+            qty       => \[ 'ROUND(?)', 14.5 ],
         }
     );
 
 than hand-coding:
 
-    my $sql   = 'INSERT INTO users (name,salary,status,dateadded) VALUES (:name,:status,:salary,SYSDATE())';
+    my $sql   = 'INSERT INTO users (name,salary,status,dateadded,qty) VALUES (:name,:status,:salary,SYSDATE(),ROUND(:qty))';
     my $binds = {
         ':name'      => 'Dave',
         ':salary'    => 50000,
         ':status'    => 'Active',
         ':dateadded' => \'SYSDATE()',
+        ':qty'       => 14.5,
     };
 
 or even the positional:
 
-    my $sql   = 'INSERT INTO users (name,salary,status,dateadded) VALUES (?,?,?,SYSDATE())';
-    my $binds = [ 'Dave', 50000, 'Active' ];
+    my $sql   = 'INSERT INTO users (name,salary,status,dateadded,qty) VALUES (?,?,?,SYSDATE(),ROUND(?))';
+    my $binds = [ 'Dave', 50000, 'Active', 14.5 ];
 
 The trade-off for that brevity of code is that SQL::Tiny has to make new
 SQL and binds from the input every time. You can't cache the SQL that
@@ -186,6 +189,13 @@ sub sql_insert {
         elsif ( ref($value) eq 'SCALAR' ) {
             push @values, ${$value};
         }
+        elsif ( ref($value) eq 'REF' ) {
+            my $deepval = ${$value};
+
+            my ($literal,$bind) = @{$deepval};
+            push @values, $literal;
+            push @binds, $bind;
+        }
         else {
             push @values, '?';
             push @binds, $value;
@@ -244,6 +254,13 @@ sub sql_update {
         }
         elsif ( ref($value) eq 'SCALAR' ) {
             push @columns, "$key=${$value}";
+        }
+        elsif ( ref($value) eq 'REF' ) {
+            my $deepval = ${$value};
+
+            my ($literal,$bind) = @{$deepval};
+            push @columns, "$key=$literal";
+            push @binds, $bind;
         }
         else {
             push @columns, "$key=?";
@@ -319,6 +336,13 @@ sub _build_where_section {
         elsif ( ref($value) eq 'SCALAR' ) {
             push @conditions, "$key=${$value}";
         }
+        elsif ( ref($value) eq 'REF' ) {
+            my $deepval = ${$value};
+
+            my ($literal,$bind) = @{$deepval};
+            push @conditions, "$key=$literal";
+            push @{$binds}, $bind;
+        }
         else {
             push @conditions, "$key=?";
             push @{$binds}, $value;
@@ -358,7 +382,7 @@ Andy Lester, C<< <andy at petdance.com> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-L<https://github.com/petdance/sql-simple/issues>, or email me directly.
+L<https://github.com/petdance/sql-tiny/issues>, or email me directly.
 
 =head1 SUPPORT
 
@@ -376,13 +400,14 @@ L<https://metacpan.org/release/SQL-Tiny>
 
 =item * GitHub issue tracker
 
-L<https://github.com/petdance/sql-simple/issues>
+L<https://github.com/petdance/sql-tiny/issues>
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to the following folks for their contributions:
+Mohammad S Anwar,
 Tim Heaney.
 
 =head1 LICENSE AND COPYRIGHT

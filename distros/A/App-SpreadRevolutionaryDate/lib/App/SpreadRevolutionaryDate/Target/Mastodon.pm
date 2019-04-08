@@ -10,15 +10,17 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Mastodon;
-$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.10';
+$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.14';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Mastodon.
 
 use Moose;
 with 'App::SpreadRevolutionaryDate::Target'
   => {worker => 'Mastodon::Client'};
 
-use namespace::autoclean;
 use Mastodon::Client;
+
+use Locale::TextDomain 'App-SpreadRevolutionaryDate';
+use namespace::autoclean;
 
 has 'instance' => (
     is  => 'ro',
@@ -65,12 +67,17 @@ sub spread {
   $test //= 0;
 
   if ($test) {
-    use Encode qw(encode);
+    $msg = __("Spread on Mastodon: ") . $msg;
+
+    use open qw(:std :encoding(UTF-8));
     use IO::Handle;
     my $io = IO::Handle->new;
     $io->fdopen(fileno(STDOUT), "w");
-    my $utf8_msg = encode('UTF-8', $msg);
-    $io->say("Spread to Mastodon: $utf8_msg");
+
+    use Encode qw(encode decode is_utf8);
+    $msg = encode('UTF-8', $msg) if is_utf8($msg);
+
+    $io->say($msg);
   } else {
     $self->obj->post_status($msg);
   }
@@ -99,7 +106,7 @@ App::SpreadRevolutionaryDate::Target::Mastodon - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 METHODS
 
@@ -115,7 +122,7 @@ Spreads a message to Mastodon. Takes one mandatory argument: C<$msg> which shoul
 
 =over
 
-=item L<spread-revolutionary-date|https://metacpan.org/pod/distribution/App-SpreadRevolutionaryDate/bin/spread-revolutionary-date>
+=item L<spread-revolutionary-date>
 
 =item L<App::SpreadRevolutionaryDate>
 
@@ -129,11 +136,21 @@ Spreads a message to Mastodon. Takes one mandatory argument: C<$msg> which shoul
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =back
 

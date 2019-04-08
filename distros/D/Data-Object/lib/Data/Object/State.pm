@@ -5,6 +5,8 @@ use warnings;
 
 use parent 'Data::Object::Class';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub import {

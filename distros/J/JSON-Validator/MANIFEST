@@ -4,6 +4,7 @@
 .github/PULL_REQUEST_TEMPLATE.md
 .perltidyrc
 .travis.yml
+.vstags
 Changes
 lib/JSON/Validator.pm
 lib/JSON/Validator/cache/10a5eeb37fcd5d829449028f7ceb0774
@@ -26,6 +27,7 @@ t/00-basic.t
 t/acceptance.t
 t/booleans.t
 t/bundle.t
+t/coerce-default.t
 t/coerce.t
 t/deep-mixed-ref.t
 t/definitions/age.json

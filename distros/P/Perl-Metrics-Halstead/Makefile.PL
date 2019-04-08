@@ -13,15 +13,22 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Perl-Metrics-Halstead",
+  "EXE_FILES" => [
+    "bin/halstead"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Perl::Metrics::Halstead",
   "PREREQ_PM" => {
+    "Getopt::Long" => 0,
     "Moo" => 2,
     "PPI::Document" => 0,
     "PPI::Dumper" => 0,
+    "Pod::Usage" => 0,
     "namespace::clean" => 0,
-    "strictures" => 2
+    "strict" => 0,
+    "strictures" => 2,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
@@ -29,11 +36,9 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
-    "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.0602",
+  "VERSION" => "0.0603",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,11 +48,13 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "File::Spec" => 0,
+  "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moo" => 2,
   "PPI::Document" => 0,
   "PPI::Dumper" => 0,
+  "Pod::Usage" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
   "namespace::clean" => 0,

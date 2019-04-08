@@ -23,6 +23,8 @@ Gene
 Halstead
 Metrics
 Perl
+bin
 foo
 gene
+halstead
 lib

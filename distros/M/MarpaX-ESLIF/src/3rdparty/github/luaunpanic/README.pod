@@ -1,0 +1,73 @@
+=head1 LUAUNPANIC
+
+luaunpanic - lua wrapped into an unpanic library
+
+=head1 DESCRIPTION
+
+This library wraps lua so that lua's default panic behaviour (in other words: end of your application...) never happens.
+
+The lua code base in use here is version B<5.3.4>.
+
+=head2 Why this library
+
+Because playing with C<abort()> try catch in C is not easy, this library hides all the technical difficuly of a correct I<try/catch> pattern in the C language over I<all> lua methods. In addition, for those wanting to catch any lua error without this library, there is a difficulty at the very beginning: setting a try/catch handler can abort without the abort being already set... this library handles also this bootstrap case.
+
+=head2 Wrappers semantics
+
+=over
+
+=item
+
+Any function like C<type lua_xxx(...args...)> has a wrapper like C<short luaunpanic_xxx(type *luaunpanic_result, ...args...)>.
+
+=item
+
+Any function like C<void lua_xxx(...args...)> has a wrapper like C<short luaunpanic_xxx(...args...)>.
+
+=back
+
+Lua return code semantic is preserved and native behaviour is preserved:
+
+=over
+
+=item
+
+luaunpanic wrappers always return C<0> in case of success, C<1> in case of failure.
+
+=item
+
+The C<lua_State> pointer returned with the unpanic versions of C<lua_State> creation methods can still be used with I<native> lua methods, available within the library.
+
+=item
+
+A new method to retreive the latest panic string exists:
+
+  short luaunpanic_panicstring(char **panicstringp, lua_State *L)
+
+=back
+
+=head2 Wrapper usage
+
+In other words, non-void native calls such as:
+
+  if (lua_call(xxx)) { yyy /* failure */} else { zzz /* success */ }
+
+should be translated to:
+
+  if (luaunpanic_call(&luarc, xxx) || luarcrc) { yyy /* failure */ } else { zzz /* success */ }
+
+Similary for void native lua calls:
+
+  lua_call(xxx);
+
+should be translated to:
+
+  if (luaunpanic_call(xxx)) { /* failure */ }
+
+=head1 USAGE
+
+Obviously, this is targetting embedded lua interpreters into third-party libraries: by using luaunpanic, you make sure that your library will never exit because of lua default I<abort()> behaviour.
+
+=head1 SEE ALSO
+
+L<Lua error handing in C|https://www.lua.org/manual/5.3/manual.html#4.6>

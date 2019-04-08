@@ -375,6 +375,12 @@ if ($INC{'re/engine/PCRE2.pm'}) {
         diag("too old PCRE2 $pcre2ver, skipping 2 tests");
         push @pcre_skip, (1957,1958); # skip old pcre2 versions which do crash
     }
+    my ($libver) = $pcre2ver =~ /^(\d+\.\d+)/;
+    if ($libver >= 10.32) {
+        #10.32-RC1 regressions: # diag $pcre2ver;
+        push @pcre_fail, (1443, 1444, 1960, 1961); # 10.32-RC1 changed semantics, GH #31
+        # 1443: "a\x{e1}" =~ /\N{U+41}\x{c1}/i
+    }
 }
 if (!$num) {
     @pcre_fail{@pcre_fail} = ();

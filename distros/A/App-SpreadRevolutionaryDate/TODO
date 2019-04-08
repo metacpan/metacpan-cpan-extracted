@@ -1,16 +1,7 @@
-* Add an i18n framework. It should be *light* (Locale::Maketext is
-  surely overkill for our needs). When spreading date, we have only two
-  locales (fr and en) due to DateTime::Calendar::FrenchRevolutionary,
-  and one translatable string. But with the possibility to extend to
-  other message makers, including PromptUser, more and more strings need
-  to be translated. Nevertheless, these needs for translation are quite
-  restricted, so do not used a full-flededg i18n framework!
-  Here are some links to look at:
-  * http://blogs.perl.org/users/aristotle/2011/04/stop-using-maketext.html
-  * https://justatheory.com/2014/09/localize-your-perl-apps-with-this-one-weird-trick/
-  * https://metacpan.org/pod/Dist::Zilla::LocaleTextDomain
-  * https://metacpan.org/pod/Locale::Wolowitz
-  * https://metacpan.org/pod/Locale::Maketext::Simple
+* Study whether localization of French Revolutionary Calendar could/should
+  use gettext system.
+
+* Add some new languages.
 
 * Add some new targets to spread to.
 

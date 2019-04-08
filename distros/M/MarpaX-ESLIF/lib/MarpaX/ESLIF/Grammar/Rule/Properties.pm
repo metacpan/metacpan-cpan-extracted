@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Rule::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '2.0.43'; # VERSION
+our $VERSION = '3.0.3'; # VERSION
 
 
 #
@@ -23,6 +23,7 @@ sub new {
         'lhsId'                    => $args{lhsId},
         'separatorId'              => $args{separatorId},
         'rhsIds'                   => $args{rhsIds},
+        'skipIndices'              => $args{skipIndices},
         'exceptionId'              => $args{exceptionId},
         'action'                   => $args{action},
         'discardEvent'             => $args{discardEvent},
@@ -80,6 +81,13 @@ sub getRhsIds {
     my ($self) = @_;
 
     return $self->{rhsIds}
+}
+
+
+sub getSkipIndices {
+    my ($self) = @_;
+
+    return $self->{skipIndices}
 }
 
 
@@ -210,7 +218,7 @@ MarpaX::ESLIF::Grammar::Rule::Properties - ESLIF Grammar Rule Properties
 
 =head1 VERSION
 
-version 2.0.43
+version 3.0.3
 
 =head1 SYNOPSIS
 
@@ -281,7 +289,11 @@ Returns Rule's separator symbol id (< 0 if the rule is not a sequence)
 
 =head2 $self->getRhsIds
 
-Returns Rule's RHS ids (none for a null rule)
+Returns Rule's RHS ids (none for a null rule or a sequence)
+
+=head2 $self->getSkipIndices
+
+Returns Rule's RHS skip indices (none for a null rule)
 
 =head2 $self->getExceptionId
 

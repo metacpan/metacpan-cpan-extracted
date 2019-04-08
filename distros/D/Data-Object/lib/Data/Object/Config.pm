@@ -12,6 +12,8 @@ use Data::Object::Export qw(
 use Import::Into;
 use Type::Tiny;
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub import {

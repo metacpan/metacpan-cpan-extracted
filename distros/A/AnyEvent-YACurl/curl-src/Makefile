@@ -43,7 +43,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2018, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -140,8 +140,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-build_triplet = x86_64-apple-darwin18.2.0
-host_triplet = x86_64-apple-darwin18.2.0
+build_triplet = x86_64-pc-linux-gnu
+host_triplet = x86_64-pc-linux-gnu
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_compile_check_sizeof.m4 \
@@ -303,27 +303,27 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing aclocal-1.16
+ACLOCAL = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing aclocal-1.16
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
-AR = /usr/bin/ar
+AR = /bin/ar
 AR_FLAGS = cr
 AS = as
-AUTOCONF = ${SHELL} /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoconf
-AUTOHEADER = ${SHELL} /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoheader
-AUTOMAKE = ${SHELL} /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing automake-1.16
-AWK = awk
+AUTOCONF = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoconf
+AUTOHEADER = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoheader
+AUTOMAKE = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing automake-1.16
+AWK = gawk
 BLANK_AT_MAKETIME = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -Qunused-arguments -Os -mmacosx-version-min=10.8 -Werror=partial-availability
+CFLAGS = -Werror-implicit-function-declaration -O2 -Wno-system-headers
 CFLAG_CURL_SYMBOL_HIDING = -fvisibility=hidden
-CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib' '--with-brotli=/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib' '--enable-ares=/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib' '--disable-shared' '--enable-static' '--prefix=/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib' '--with-pic' '--disable-threaded-resolver' '--disable-pthreads'"
+CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib' '--with-brotli=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib' '--enable-ares=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib' '--disable-shared' '--enable-static' '--prefix=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib' '--with-pic' '--disable-threaded-resolver' '--disable-pthreads'"
 CPP = gcc -E
-CPPFLAGS = -I/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/include -I/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -I/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
+CPPFLAGS = -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/include -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
 CPPFLAG_CURL_STATICLIB = -DCURL_STATICLIB
-CURLVERSION = 7.64.0
-CURL_CA_BUNDLE = 
+CURLVERSION = 7.64.1
+CURL_CA_BUNDLE = "/etc/pki/tls/certs/ca-bundle.crt"
 CURL_CFLAG_EXTRAS = 
 CURL_DISABLE_DICT = 
 CURL_DISABLE_FILE = 
@@ -331,8 +331,8 @@ CURL_DISABLE_FTP =
 CURL_DISABLE_GOPHER = 
 CURL_DISABLE_HTTP = 
 CURL_DISABLE_IMAP = 
-CURL_DISABLE_LDAP = 
-CURL_DISABLE_LDAPS = 
+CURL_DISABLE_LDAP = 1
+CURL_DISABLE_LDAPS = 1
 CURL_DISABLE_POP3 = 
 CURL_DISABLE_PROXY = 
 CURL_DISABLE_RTSP = 
@@ -349,57 +349,59 @@ DEFAULT_SSL_BACKEND = no
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
 DLLTOOL = false
-DSYMUTIL = dsymutil
+DSYMUTIL = 
 DUMPBIN = 
-ECHO_C = \c
-ECHO_N = 
+ECHO_C = 
+ECHO_N = -n
 ECHO_T = 
-EGREP = /usr/bin/grep -E
+EGREP = /bin/grep -E
 ENABLE_SHARED = no
 ENABLE_STATIC = yes
 EXEEXT = 
-FGREP = /usr/bin/grep -F
+FGREP = /bin/grep -F
+FISH_FUNCTIONS_DIR = ${prefix}/share/fish/completions
 GCOV = 
-GREP = /usr/bin/grep
+GREP = /bin/grep
 HAVE_BROTLI = 1
 HAVE_GNUTLS_SRP = 
 HAVE_LDAP_SSL = 1
 HAVE_LIBZ = 1
 HAVE_OPENSSL_SRP = 
+HAVE_PROTO_BSDSOCKET_H = 
 IDN_ENABLED = 
-INSTALL = /usr/bin/install -c
+INSTALL = /bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 IPV6_ENABLED = 1
 LCOV = 
-LD = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
-LDFLAGS = -L/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/lib -L/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/lib -L/Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/lib
-LIBCURL_LIBS = -lcares -lnghttp2 -lldap -lbrotlidec -lbrotlidec -lz
+LD = /bin/ld -m elf_x86_64
+LDFLAGS = -L/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/lib -L/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/lib -L/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/lib
+LIBCURL_LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz
 LIBMETALINK_CPPFLAGS = 
 LIBMETALINK_LDFLAGS = 
 LIBMETALINK_LIBS = 
 LIBOBJS = 
-LIBS = -lcares -lnghttp2 -lldap -lbrotlidec -lbrotlidec -lz
+LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
-LIPO = lipo
+LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
-MAKEINFO = ${SHELL} /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing makeinfo
+MAKEINFO = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing makeinfo
 MANIFEST_TOOL = :
 MANOPT = -man
-MKDIR_P = ./install-sh -c -d
-NM = /usr/bin/nm -B
-NMEDIT = nmedit
-NROFF = /usr/bin/nroff
+MKDIR_P = /bin/mkdir -p
+NM = /bin/nm -B
+NMEDIT = 
+NROFF = /bin/gnroff
 NSS_LIBS = 
 OBJDUMP = objdump
 OBJEXT = o
-OTOOL = otool
-OTOOL64 = :
+OTOOL = 
+OTOOL64 = 
 PACKAGE = curl
 PACKAGE_BUGREPORT = a suitable curl mailing list: https://curl.haxx.se/mail/
 PACKAGE_NAME = curl
@@ -408,26 +410,25 @@ PACKAGE_TARNAME = curl
 PACKAGE_URL = 
 PACKAGE_VERSION = -
 PATH_SEPARATOR = :
-PERL = /usr/bin/perl
+PERL = /bin/perl
 PKGADD_NAME = curl - a client that groks URLs
 PKGADD_PKG = HAXXcurl
 PKGADD_VENDOR = curl.haxx.se
-PKGCONFIG = /usr/local/bin/pkg-config
-RANDOM_FILE = 
+PKGCONFIG = /bin/pkg-config
+RANDOM_FILE = /dev/urandom
 RANLIB = ranlib
 REQUIRE_LIB_DEPS = yes
-SED = /usr/bin/sed
+SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
-SSL_BACKENDS = 
-SSL_ENABLED = 
-SSL_LIBS = 
+SSL_BACKENDS = OpenSSL
+SSL_ENABLED = 1
+SSL_LIBS = -lssl -lcrypto  
 STRIP = strip
-SUPPORT_FEATURES = IPv6 UnixSockets libz brotli AsynchDNS HTTP2
-SUPPORT_PROTOCOLS = DICT FILE FTP GOPHER HTTP IMAP LDAP LDAPS POP3 RTSP SMTP TELNET TFTP
+SUPPORT_FEATURES = SSL IPv6 UnixSockets libz brotli AsynchDNS NTLM NTLM_WB HTTP2 HTTPS-proxy
+SUPPORT_PROTOCOLS = DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
 USE_ARES = 1
 USE_CYASSL = 
-USE_DARWINSSL = 
 USE_GNUTLS = 
 USE_GNUTLS_NETTLE = 
 USE_LIBRTMP = 
@@ -440,16 +441,17 @@ USE_NSS =
 USE_OPENLDAP = 
 USE_POLARSSL = 
 USE_SCHANNEL = 
+USE_SECTRANSP = 
 USE_UNIX_SOCKETS = 1
 USE_WINDOWS_SSPI = 
 VERSION = -
-VERSIONNUM = 074000
+VERSIONNUM = 074001
 ZLIB_LIBS = -lz
 ZSH_FUNCTIONS_DIR = ${prefix}/share/zsh/site-functions
-abs_builddir = /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
-abs_srcdir = /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
-abs_top_builddir = /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
-abs_top_srcdir = /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_builddir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_srcdir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_top_builddir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_top_srcdir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
 ac_ct_AR = 
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
@@ -459,26 +461,26 @@ am__quote =
 am__tar = $${TAR-tar} chof - "$$tardir"
 am__untar = $${TAR-tar} xf -
 bindir = ${exec_prefix}/bin
-build = x86_64-apple-darwin18.2.0
+build = x86_64-pc-linux-gnu
 build_alias = 
 build_cpu = x86_64
-build_os = darwin18.2.0
-build_vendor = apple
+build_os = linux-gnu
+build_vendor = pc
 builddir = .
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-host = x86_64-apple-darwin18.2.0
+host = x86_64-pc-linux-gnu
 host_alias = 
 host_cpu = x86_64
-host_os = darwin18.2.0
-host_vendor = apple
+host_os = linux-gnu
+host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/install-sh
+install_sh = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libext = a
@@ -488,7 +490,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /Users/tomvanderwoerdt/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib
+prefix = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib
 program_transform_name = s,x,x,
 psdir = ${docdir}
 runstatedir = ${localstatedir}/run
@@ -624,9 +626,9 @@ WINBUILD_DIST = winbuild/BUILD.WINDOWS.txt winbuild/gen_resp_file.bat \
  winbuild/MakefileBuild.vc winbuild/Makefile.vc
 
 EXTRA_DIST = CHANGES COPYING maketgz Makefile.dist curl-config.in \
- RELEASE-NOTES buildconf libcurl.pc.in MacOSX-Framework scripts/zsh.pl \
+ RELEASE-NOTES buildconf libcurl.pc.in MacOSX-Framework \
  scripts/updatemanpages.pl $(CMAKE_DIST) $(VC_DIST) $(WINBUILD_DIST) \
- lib/libcurl.vers.in buildconf.bat scripts/coverage.sh
+ lib/libcurl.vers.in buildconf.bat scripts/coverage.sh scripts/completion.pl
 
 CLEANFILES = $(VC6_LIBDSP) $(VC6_SRCDSP) $(VC7_LIBVCPROJ) $(VC7_SRCVCPROJ) \
  $(VC71_LIBVCPROJ) $(VC71_SRCVCPROJ) $(VC8_LIBVCPROJ) $(VC8_SRCVCPROJ) \
@@ -648,11 +650,11 @@ LIB_VAUTH_HFILES = vauth/vauth.h vauth/digest.h vauth/ntlm.h
 LIB_VTLS_CFILES = vtls/openssl.c vtls/gtls.c vtls/vtls.c vtls/nss.c     \
   vtls/polarssl.c vtls/polarssl_threadlock.c                            \
   vtls/cyassl.c vtls/schannel.c vtls/schannel_verify.c                  \
-  vtls/darwinssl.c vtls/gskit.c vtls/mbedtls.c vtls/mesalink.c
+  vtls/sectransp.c vtls/gskit.c vtls/mbedtls.c vtls/mesalink.c
 
 LIB_VTLS_HFILES = vtls/openssl.h vtls/vtls.h vtls/gtls.h                \
   vtls/nssg.h vtls/polarssl.h vtls/polarssl_threadlock.h                \
-  vtls/cyassl.h vtls/schannel.h vtls/darwinssl.h vtls/gskit.h           \
+  vtls/cyassl.h vtls/schannel.h vtls/sectransp.h vtls/gskit.h           \
   vtls/mbedtls.h vtls/mesalink.h
 
 LIB_CFILES = file.c timeval.c base64.c hostip.c progress.c formdata.c   \
@@ -673,7 +675,7 @@ LIB_CFILES = file.c timeval.c base64.c hostip.c progress.c formdata.c   \
   curl_multibyte.c hostcheck.c conncache.c pipeline.c dotdot.c          \
   x509asn1.c http2.c smb.c curl_endian.c curl_des.c system_win32.c      \
   mime.c sha256.c setopt.c curl_path.c curl_ctype.c curl_range.c psl.c  \
-  doh.c urlapi.c
+  doh.c urlapi.c altsvc.c
 
 LIB_HFILES = arpa_telnet.h netrc.h file.h timeval.h hostip.h progress.h \
   formdata.h cookie.h http.h sendf.h ftp.h url.h dict.h if2ip.h         \
@@ -693,7 +695,8 @@ LIB_HFILES = arpa_telnet.h netrc.h file.h timeval.h hostip.h progress.h \
   curl_setup_once.h multihandle.h setup-vms.h pipeline.h dotdot.h       \
   x509asn1.h http2.h sigpipe.h smb.h curl_endian.h curl_des.h           \
   curl_printf.h system_win32.h rand.h mime.h curl_sha256.h setopt.h     \
-  curl_path.h curl_ctype.h curl_range.h psl.h doh.h urlapi-int.h
+  curl_path.h curl_ctype.h curl_range.h psl.h doh.h urlapi-int.h        \
+  altsvc.h
 
 LIB_RCFILES = libcurl.rc
 CSOURCES = $(LIB_CFILES) $(LIB_VAUTH_CFILES) $(LIB_VTLS_CFILES)

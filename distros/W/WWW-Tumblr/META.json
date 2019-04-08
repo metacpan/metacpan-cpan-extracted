@@ -4,13 +4,13 @@
       "David Moreno <david@axiombox.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WWW-Tumblr",
    "no_index" : {
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "LWP::Simple" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -40,6 +38,12 @@
             "Moose" : "0",
             "Net::OAuth::Client" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::Simple" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -50,8 +54,10 @@
       },
       "homepage" : "http://github.com/damog/www-tumblr",
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/damog/www-tumblr.git"
       }
    },
-   "version" : "5.2"
+   "version" : "5.3",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

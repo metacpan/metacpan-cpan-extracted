@@ -1,5 +1,5 @@
 package Math::Lapack::Matrix;
-
+$Math::Lapack::Matrix::VERSION = '0.002';
 use strict;
 use warnings;
 use Scalar::Util 'blessed';
@@ -8,8 +8,6 @@ use parent 'Exporter';
 use parent 'Math::Lapack::Expr';
 our @EXPORT = qw(ones slice);
 
-
-use Data::Dumper;
 
 
 sub _bless {
@@ -356,43 +354,32 @@ sub slice {
 
 
 
+
 sub read_csv{
 	my ($file, %opts) = @_;
-	#my ($x0, $x1, $y0, $y1) = _values_to_slice(%opts);
+	my ($x0, $x1, $y0, $y1) = _values_to_slice(%opts);
 
 	my ($rows, $cols) = rows_cols_from_file($file);
-
-
-	 
-	my $row_min = defined $opts{'y0'} ? $opts{'y0'} : 0;
-	my $row_max = defined $opts{'y1'} ? $opts{'y1'} : $rows;
-	my $col_min = defined $opts{'x0'} ? $opts{'x0'} : 0;
-	my $col_max = defined $opts{'x1'} ? $opts{'x1'} : $cols;
 	
-	#my $row_min = defined $opts{'y0'} ? $opts{'y0'} : 0;
-	#my $row_max = defined $opts{'y1'} ? $opts{'y1'} : $rows;
-	#my $col_min = defined $opts{'x0'} ? $opts{'x0'} : 0;
-	#my $col_max = defined $opts{'x1'} ? $opts{'x1'} : $cols;
+	$x0 = 0 if $x0 == -1;
+	$y0 = 0 if $y0 == -1;
+	$x1 = $rows - 1 if $x1 == -1;
+	$y1 = $cols - 1 if $y1 == -1;
 
 
 	open(my $data, '<', $file) or die "Could not open $file";
 
-	my $m = Math::Lapack::Matrix->zeros($row_max - $row_min, $col_max - $col_min);
+	my $m = Math::Lapack::Matrix->zeros($x1-$x0+1, $y1-$y0+1);
 
 	my $i = 0;
 	my $r = 0;
 	while( <$data> ){
-		if( $i >= $row_min && $i < $row_max){
+		if( $i >= $x0 && $i <= $x1){
 				chomp;
 				my @cols = split(/,/);
 				my ($j, $c) = (0,0);
-				####FIXME not passing this test :S
-				#unless( scalar (@cols) == $m->columns ){
-				#		print STDERR "Matrix need to have the same number of columns in every row\n";
-				#		exit;
-				#}
 				for my $v (@cols){
-					if($j >= $col_min && $j < $col_max){
+					if($j >= $y0 && $j <= $y1){
 						$m->set_element($r, $c, $v);
 						$c++;
 					}
@@ -507,7 +494,7 @@ Math::Lapack::Matrix
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =for Pod::Coverage matrix_id eval_add eval_pow eval_div eval_dot eval_exp eval_sub eval_mul eval_sum eval_transpose rows_cols_from_file eval_inverse eval_log
 
@@ -807,12 +794,17 @@ It argument is a hash of options. The options are:
 
 =head2 read_csv
 
- x0 - min col
- x1 - max col non inclusive
- y0 - min row
- y1 - max col non inclusive
- ####FIXME row - specific row
- ####FIXME col - specific col
+Allow read csv to a matrix.
+Its arguments are the file and a hash of options. The options are:
+
+	row_range => an array with two values of row min and row max to slice over the csv
+
+	col_range => an array with two values of col min and col max to slice over the csv
+
+	row => specific row
+	col => specific column
+    
+	Math::Lapack::Matrix::read_csv($file, row_range => [1,22])
 
 =head2 save
 

@@ -15,23 +15,30 @@ $| = 1;    #autoflush
 
 use constant {
     FALSE => 0,
-    TRUE  => 1
+    TRUE  => 1,
+    DEBUG => $ENV{ DEBUG } // 0,
 };
 
 BEGIN
 {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.01';
+    $VERSION = '0.02';
     @ISA     = qw(Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw();
     @EXPORT_OK   = qw();
     %EXPORT_TAGS = ();
+} ## end BEGIN
+
+BEGIN
+{
+    binmode( STDOUT, ":encoding(UTF-8)" );
+    binmode( STDERR, ":encoding(UTF-8)" );
 
     $SIG{ __DIE__ } = sub {
-        $log->info( 'Entrando em __DIE__', { package => __PACKAGE__ } );
+        $log->debug( 'Entrando em __DIE__', { package => __PACKAGE__ } );
         if ( $^S )
         {
             $log->debug( 'Entrando em __DIE__ eval {}', { package => __PACKAGE__ } );
@@ -55,7 +62,7 @@ BEGIN
 } ## end BEGIN
 
 =head2 C<new()>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -66,7 +73,7 @@ BEGIN
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
 
 sub new
@@ -77,7 +84,7 @@ sub new
 
     $self = bless( $self, ref( $class ) || $class );
 
-    $log->info( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
+    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
 
     return $self;
 } ## end sub new
@@ -85,16 +92,17 @@ sub new
 sub _initialize()
 {
     my ( $self, %parameters ) = @_;
-    $log->info( "_initialize", { package => __PACKAGE__ } );
+    $log->debug( "_initialize", { package => __PACKAGE__ } );
 }
 
 sub END
 {
-    $log->info( "END", { package => __PACKAGE__ } );
+    $log->debug( "END", { package => __PACKAGE__ } );
+    eval { $log->{ adapter }->{ dispatcher }->{ outputs }->{ Email }->flush; };
 }
 
 =head2 C<AUTOLOAD>
- 
+
   Usage     : $self->block_new_method() within text_pm_file()
   Purpose   : Build 'new()' method as part of a pm file
   Returns   : String holding sub new.
@@ -105,7 +113,7 @@ sub END
   Comment   : This method is a likely candidate for alteration in a subclass,
               e.g., pass a single hash-ref to new() instead of a list of
               parameters.
- 
+
 =cut
 
 sub AUTOLOAD
@@ -128,13 +136,13 @@ sub DESTROY
 {
     my ( $self, %parameters ) = @_;
 
-    $log->info( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
 
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
-        $log->alert( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
     }
     else
     {
@@ -200,7 +208,7 @@ LICENSE file included with this module.
 =head1 SEE ALSO
 
 perl(1).
- 
+
 =cut
 
 #################### main pod documentation end ###################

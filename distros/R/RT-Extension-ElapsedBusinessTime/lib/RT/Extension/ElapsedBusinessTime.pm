@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::ElapsedBusinessTime;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -226,8 +226,8 @@ sub calc {
             Short => $args{Short},
         );
     } else {
-        if ($args{Units} eq 'Hour') {
-            return sprintf("%d:%02d", int($elapsed_business_time / 3600), $elapsed_business_time % 3600);
+        if ($args{Unets} eq 'Hour') {
+            return sprintf("%d:%02d", int($elapsed_business_time / 3600), ($elapsed_business_time % 3600) / 60);
         } elsif ($args{Units} eq 'Second') {
             return $elapsed_business_time;
         } else {
@@ -300,6 +300,9 @@ sub calc_elapsed {
             if ($dt_current_date <= $bus_end_time) {
 #                RT->Logger->debug("end of work is before business day ends");
                 $day_end = $dt_current_date;
+            } elsif (defined $day_start && $day_start > $bus_end_time && $dt_current_date > $bus_end_time) {
+#                RT->Logger->debug("start and end of work is after business day ends, skip this change");
+                next;
             } else {
 #                RT->Logger->debug("end of work is after business day ends, or another day, use $end_time");
                 $day_end = $bus_end_time;

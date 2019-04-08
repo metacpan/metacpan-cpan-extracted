@@ -33,6 +33,8 @@ use overload (
 
 use parent 'Data::Object::Kind';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub new {
@@ -991,9 +993,8 @@ This package implements the following methods.
   all(CodeRef $arg1, Any @args) : NumObject
 
 The all method returns true if all of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =over 4
 
@@ -1001,8 +1002,13 @@ data type object. This method returns a L<Data::Object::Number> object.
 
   # given [2..5]
 
-  $array->all('$value > 1'); # 1; true
-  $array->all('$value > 3'); # 0; false|
+  $array->all(fun ($value, @args) {
+    $value > 1; # 1, true
+  });
+
+  $array->all(fun ($value, @args) {
+    $value > 3; # 0; false
+  });
 
 =back
 
@@ -1013,9 +1019,8 @@ data type object. This method returns a L<Data::Object::Number> object.
   any(CodeRef $arg1, Any @args) : NumObject
 
 The any method returns true if any of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =over 4
 
@@ -1023,8 +1028,13 @@ data type object. This method returns a L<Data::Object::Number> object.
 
   # given [2..5]
 
-  $array->any('$value > 5'); # 0; false
-  $array->any('$value > 3'); # 1; true
+  $array->any(fun ($value) {
+    $value > 5; # 0; false
+  });
+
+  $array->any(fun ($value) {
+    $value > 3; # 1; true
+  });
 
 =back
 
@@ -1117,9 +1127,8 @@ modifies the array.
 
 The each method iterates over each element in the array, executing the code
 reference supplied in the argument, passing the routine the index and value at
-the current position in the loop. This method supports codification, i.e, takes
-an argument which can be a codifiable string, a code reference, or a code data
-type object. This method returns a L<Data::Object::Array> object.
+the current position in the loop. This method returns a L<Data::Object::Array>
+object.
 
 =over 4
 
@@ -1127,9 +1136,7 @@ type object. This method returns a L<Data::Object::Array> object.
 
   # given ['a'..'g']
 
-  $array->each(sub{
-      my $index = shift; # 0
-      my $value = shift; # a
+  $array->each(fun ($index, $value) {
       ...
   });
 
@@ -1141,11 +1148,10 @@ type object. This method returns a L<Data::Object::Array> object.
 
   each_key(CodeRef $arg1, Any @args) : Object
 
-The each_key method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the index at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Array> object.
+The each_key method iterates over each element in the array, executing the code
+reference supplied in the argument, passing the routine the index at the
+current position in the loop. This method returns a L<Data::Object::Array>
+object.
 
 =over 4
 
@@ -1153,8 +1159,7 @@ object. This method returns a L<Data::Object::Array> object.
 
   # given ['a'..'g']
 
-  $array->each_key(sub{
-      my $index = shift; # 0
+  $array->each_key(fun ($index) {
       ...
   });
 
@@ -1166,11 +1171,10 @@ object. This method returns a L<Data::Object::Array> object.
 
   each_n_values(Num $arg1, CodeRef $arg2, Any @args) : Object
 
-The each_n_values method iterates over each element in the array, executing
-the code reference supplied in the argument, passing the routine the next n
-values until all values have been seen. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Array> object.
+The each_n_values method iterates over each element in the array, executing the
+code reference supplied in the argument, passing the routine the next n values
+until all values have been seen. This method returns a L<Data::Object::Array>
+object.
 
 =over 4
 
@@ -1178,11 +1182,11 @@ data type object. This method returns a L<Data::Object::Array> object.
 
   # given ['a'..'g']
 
-  $array->each_n_values(4, sub{
-      my $value_1 = shift; # a
-      my $value_2 = shift; # b
-      my $value_3 = shift; # c
-      my $value_4 = shift; # d
+  $array->each_n_values(4, fun (@values) {
+      $values[1] # a
+      $values[2] # b
+      $values[3] # c
+      $values[4] # d
       ...
   });
 
@@ -1196,9 +1200,8 @@ data type object. This method returns a L<Data::Object::Array> object.
 
 The each_value method iterates over each element in the array, executing the
 code reference supplied in the argument, passing the routine the value at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Array> object.
+current position in the loop. This method returns a L<Data::Object::Array>
+object.
 
 =over 4
 
@@ -1206,8 +1209,7 @@ object. This method returns a L<Data::Object::Array> object.
 
   # given ['a'..'g']
 
-  $array->each_value(sub{
-      my $value = shift; # a
+  $array->each_value(fun ($value, @args) {
       ...
   });
 
@@ -1336,12 +1338,10 @@ determined after execution.
 
   grep(CodeRef $arg1, Any @args) : ArrayObject
 
-The grep method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the value at the
-current position in the loop and returning a new array reference containing
-the elements for which the argument evaluated true. This method supports
-codification, i.e, takes an argument which can be a codifiable string, a code
-reference, or a code data type object. This method returns a
+The grep method iterates over each element in the array, executing the code
+reference supplied in the argument, passing the routine the value at the
+current position in the loop and returning a new array reference containing the
+elements for which the argument evaluated true. This method returns a
 L<Data::Object::Array> object.
 
 =over 4
@@ -1350,8 +1350,8 @@ L<Data::Object::Array> object.
 
   # given [1..5]
 
-  $array->grep(sub{
-      shift >= 3
+  $array->grep(fun ($value) {
+      $value >= 3
   });
 
   # [3,4,5]
@@ -1405,9 +1405,7 @@ returns a L<Data::Object::Hash> object.
 
 The hashify method returns a hash reference where the elements of array become
 the hash keys and the corresponding values are assigned a value of 1. This
-method supports codification, i.e, takes an argument which can be a codifiable
-string, a code reference, or a code data type object. Note, undefined elements
-will be dropped. This method returns a L<Data::Object::Hash> object.
+method returns a L<Data::Object::Hash> object.
 
 =over 4
 
@@ -1416,7 +1414,7 @@ will be dropped. This method returns a L<Data::Object::Hash> object.
   # given [1..5]
 
   $array->hashify; # {1=>1,2=>1,3=>1,4=>1,5=>1}
-  $array->hashify(sub { shift % 2 }); # {1=>1,2=>0,3=>1,4=>0,5=>1}
+  $array->hashify(fun ($value) { $value % 2 }); # {1=>1,2=>0,3=>1,4=>0,5=>1}
 
 =back
 
@@ -1751,9 +1749,8 @@ instance.
   none(CodeRef $arg1, Any $arg2) : NumObject
 
 The none method returns true if none of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =over 4
 
@@ -1761,8 +1758,13 @@ data type object. This method returns a L<Data::Object::Number> object.
 
   # given [2..5]
 
-  $array->none('$value <= 1'); # 1; true
-  $array->none('$value <= 2'); # 0; false
+  $array->none(fun ($value) {
+    $value <= 1; # 1; true
+  });
+
+  $array->none(fun ($value) {
+    $value <= 2; # 0; false
+  });
 
 =back
 
@@ -1792,9 +1794,8 @@ sorted numerically. This method returns a L<Data::Object::Array> object.
   one(CodeRef $arg1, Any $arg2) : NumObject
 
 The one method returns true if only one of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =over 4
 
@@ -1802,8 +1803,13 @@ data type object. This method returns a L<Data::Object::Number> object.
 
   # given [2..5]
 
-  $array->one('$value == 5'); # 1; true
-  $array->one('$value == 6'); # 0; false
+  $array->one(fun ($value) {
+    $value == 5; # 1; true
+  });
+
+  $array->one(fun ($value) {
+    $value == 6; # 0; false
+  });
 
 =back
 
@@ -1874,12 +1880,10 @@ returns a L<Data::Object::Hash> object.
 
   part(CodeRef $arg1, Any $arg2) : Tuple[ArrayRef, ArrayRef]
 
-The part method iterates over each element in the array, executing the
-code reference supplied in the argument, using the result of the code reference
-to partition to array into two distinct array references. This method returns
-an array reference containing exactly two array references. This method supports
-codification, i.e, takes an argument which can be a codifiable string, a code
-reference, or a code data type object. This method returns a
+The part method iterates over each element in the array, executing the code
+reference supplied in the argument, using the result of the code reference to
+partition to array into two distinct array references. This method returns an
+array reference containing exactly two array references. This method returns a
 L<Data::Object::Array> object.
 
 =over 4
@@ -1888,7 +1892,7 @@ L<Data::Object::Array> object.
 
   # given [1..10]
 
-  $array->part(sub { shift > 5 }); # [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]]
+  $array->part(fun ($value) { $value > 5 }); # [[6, 7, 8, 9, 10], [1, 2, 3, 4, 5]]
 
 =back
 

@@ -3,6 +3,9 @@
 #include "pl_util.h"
 #include "pl_console.h"
 
+#define NEED_newRV_noinc_GLOBAL
+#include "ppport.h"
+
 #if !defined(va_copy)
 #define va_copy(dest, src)  __va_copy(dest, src)
 #endif
@@ -65,7 +68,7 @@ static int save_console_messages(duk_uint_t flags, void* data,
     SV* message = newSVpvs("");
     va_list args_copy;
     va_copy(args_copy, ap);
-    Perl_sv_vcatpvf(aTHX_ message, fmt, &args_copy);
+    sv_vcatpvf(aTHX_ message, fmt, &args_copy);
     save_msg(aTHX_ duk, target, message);
     return SvCUR(message);
 }

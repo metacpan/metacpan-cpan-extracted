@@ -9,22 +9,27 @@ use File::Find;
 use File::Spec::Functions ':ALL';
 use Test::More;
 
-my @list;
-
-my $this = $0;
-my $home = getcwd;
-my $here = dirname $this;
-my $libs = join '/', $home, 'lib';
-my $file = sub { push @list, $File::Find::name if -f };
-
-find $file, $libs;
-
 # SETUP
+
+sub lib {
+  my $this = $0;
+  my $home = getcwd;
+
+  return catfile($home, 'lib');
+}
+
+sub list {
+  my @list;
+
+  find sub { push @list, $File::Find::name if -f }, lib();
+
+  return (@list);
+}
 
 sub files {
   my (@files) = @_;
 
-  return (map abs2rel($_, $libs), sort(@files));
+  return (map abs2rel($_, lib()), sort(@files));
 }
 
 sub headings {
@@ -66,9 +71,10 @@ sub test {
 sub test_exists {
   my ($path) = @_;
 
-  my $name = $path =~ s/\//_/gr;
+  my $name = $path =~ s/\W+/_/gr;
+  my $file = catfile("t", "0.90", "use", "$name.t");
 
-  ok -f "t/0.90/use/$name.t", "t/0.90/use/$name.t exists";
+  ok -f $file, "$file exists";
 
   return;
 }
@@ -85,8 +91,8 @@ sub test_modules {
 sub test_sections {
   my ($path) = @_;
 
-  my $name = $path =~ s/\//_/gr;
-  my $file = "t/0.90/use/$name.t";
+  my $name = $path =~ s/\W+/_/gr;
+  my $file = catfile('t', '0.90', 'use', '$name.t');
 
   return unless -f $file;
 
@@ -110,4 +116,4 @@ sub type {
 
 # TESTING
 
-test(mods(@list)) and done_testing;
+test(mods(list())) and done_testing;

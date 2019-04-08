@@ -5,6 +5,7 @@ Changes
 INSTALL
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
 Makefile.PL
@@ -19,11 +20,20 @@ lib/App/SpreadRevolutionaryDate/Config.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Calendar.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/en.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm
 lib/App/SpreadRevolutionaryDate/Target.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode.pm
 lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm
 lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm
 lib/App/SpreadRevolutionaryDate/Target/Twitter.pm
+lib/LocaleData/de/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
+lib/LocaleData/en/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
+lib/LocaleData/fr/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
+lib/LocaleData/it/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 t/00-compile.t
 t/command_line.t
 t/config.t
@@ -40,6 +50,7 @@ xt/author/critic.t
 xt/author/eol.t
 xt/author/no-tabs.t
 xt/author/pod-coverage.t
+xt/author/pod-linkcheck.t
 xt/author/pod-syntax.t
 xt/author/portability.t
 xt/freenode.t

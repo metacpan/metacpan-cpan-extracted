@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001071';
+our $VERSION = '0.001072';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -1212,6 +1212,7 @@ sub renderers {
         push @$renderers => $mod->new(
             verbose => $settings->{verbose},
             color   => $settings->{color},
+            progress => $settings->{progress},
             %args,
             settings => $self->{+SETTINGS},
         );

@@ -9,6 +9,11 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 
+BEGIN {
+    $ENV{OUTPUT_CHARSET} = 'UTF-8';
+    $ENV{PERL_UNICODE} = 'AS';
+}
+
 use Test::More tests => 27;
 use Test::NoWarnings;
 use Test::Trap;

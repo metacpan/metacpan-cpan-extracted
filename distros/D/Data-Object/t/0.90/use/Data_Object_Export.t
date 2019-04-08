@@ -38,10 +38,10 @@ The all export tag will export all exportable functions.
 
   use Data::Object::Export ':core';
 
-The core export tag will export the exportable functions C<cast>, C<codify>,
-C<const>, C<deduce>, C<deduce_deep>, C<deduce_type>, C<detract>,
-C<detract_deep>, C<dispatch>, C<dump>, C<immutable>, C<load>, C<prototype>,
-and C<throw> exclusively.
+The core export tag will export the exportable functions C<cast>, C<const>,
+C<deduce>, C<deduce_deep>, C<deduce_type>, C<detract>, C<detract_deep>,
+C<dispatch>, C<dump>, C<immutable>, C<load>, C<prototype>, and C<throw>
+exclusively.
 
 
 =cut

@@ -1,7 +1,7 @@
 package Pod::Weaver::Plugin::Rinci;
 
-our $DATE = '2017-07-07'; # DATE
-our $VERSION = '0.77'; # VERSION
+our $DATE = '2019-04-08'; # DATE
+our $VERSION = '0.780'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -103,12 +103,15 @@ sub _process_module {
         # skip inserting FUNCTIONS if there are no functions
         next if $sectname eq 'FUNCTIONS' && $sectcontent !~ /^=head2/m;
 
+        # skip inserting METHODS if there are no functions
+        next if $sectname eq 'METHODS' && $sectcontent !~ /^=head2/m;
+
         $found++;
         #$self->log(["generated POD section %s", $1]);
 
         my %opts;
         # position
-        if ($sectname eq 'FUNCTIONS') {
+        if ($sectname eq 'FUNCTIONS' || $sectname eq 'METHODS') {
             $opts{after_section} = [
                 'DESCRIPTION',
             ];
@@ -247,7 +250,7 @@ Pod::Weaver::Plugin::Rinci - Insert stuffs to POD from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.77 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2017-07-07.
+This document describes version 0.780 of Pod::Weaver::Plugin::Rinci (from Perl distribution Pod-Weaver-Plugin-Rinci), released on 2019-04-08.
 
 =head1 SYNOPSIS
 
@@ -272,10 +275,10 @@ For modules, the following are inserted:
 
 From C<description> property from package metadata, if any.
 
-=item * FUNCTIONS
+=item * FUNCTIONS (or METHODS)
 
-Documentation for each function for which the metadata is found under the
-package will be added here. For each function, there will be summary,
+Documentation for each function (or method) for which the metadata is found
+under the package will be added here. For each function, there will be summary,
 description, usage, list of arguments and their documentation, as well as
 examples, according to what's available in the function metadata of
 corresponding function.
@@ -366,7 +369,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

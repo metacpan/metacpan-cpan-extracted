@@ -28,10 +28,10 @@ no_index:
 provides:
   WWW::FCM::HTTP::V1:
     file: lib/WWW/FCM/HTTP/V1.pm
-    version: '0.01'
+    version: '0.02'
   WWW::FCM::HTTP::V1::OAuth:
     file: lib/WWW/FCM/HTTP/V1/OAuth.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Carp: '0'
   Class::Accessor::Lite: '0'
@@ -45,7 +45,9 @@ resources:
   bugtracker: https://github.com/omohayui/WWW-FCM-HTTP-V1/issues
   homepage: https://github.com/omohayui/WWW-FCM-HTTP-V1
   repository: git://github.com/omohayui/WWW-FCM-HTTP-V1.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:OMOHAYUI
+x_contributors:
+  - 'Yui Takeuchi <omohayui@users.noreply.github.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

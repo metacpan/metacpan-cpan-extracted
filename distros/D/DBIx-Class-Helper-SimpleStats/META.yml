@@ -10,6 +10,7 @@ build_requires:
   DBIx::Class::Schema: '0'
   File::Spec: '0'
   Module::Metadata: '0'
+  SQL::Abstract: '1.83'
   SQL::Abstract::Test: '0'
   SQL::Translator: '0.11018'
   Test::More: '0'
@@ -33,7 +34,7 @@ name: DBIx-Class-Helper-SimpleStats
 provides:
   DBIx::Class::Helper::SimpleStats:
     file: lib/DBIx/Class/Helper/SimpleStats.pm
-    version: v0.1.1
+    version: v0.1.2
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -45,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/DBIx-Class-Helper-SimpleStats/issues
   repository: git://github.com/robrwo/DBIx-Class-Helper-SimpleStats.git
-version: v0.1.1
+version: v0.1.2
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

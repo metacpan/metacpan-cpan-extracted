@@ -1,5 +1,6 @@
 #include "pl_util.h"
 #include "pl_inlined.h"
+#include "ppport.h"
 
 static struct {
     const char* file_name;

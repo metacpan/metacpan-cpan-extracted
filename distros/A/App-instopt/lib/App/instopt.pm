@@ -1,7 +1,7 @@
 package App::instopt;
 
-our $DATE = '2019-01-13'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-04-05'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -10,6 +10,7 @@ use Log::ger;
 
 use App::swcat ();
 use File::chdir;
+use File::MoreUtil qw(dir_has_non_dot_files);
 use Perinci::Object;
 use PerlX::Maybe;
 
@@ -297,7 +298,11 @@ sub list_downloaded {
             my @vers;
           VER:
             for my $e (glob "*") {
-                next unless -d $e;
+                if ($args{_arch}) {
+                    next unless dir_has_non_dot_files("$e/$args{_arch}");
+                } else {
+                    next unless -d $e;
+                }
                 next unless $mod->is_valid_version($e);
                 push @vers, $e;
             }
@@ -331,13 +336,16 @@ $SPEC{list_downloaded_versions} = {
     args => {
         %args_common,
         %App::swcat::arg0_software,
+        %argopt_arch,
     },
 };
 sub list_downloaded_versions {
     my %args = @_;
     my $state = _init(\%args);
 
-    my $res = list_downloaded(%args, _software=>$args{software}, detail=>1);
+    return [400, "Please specify software"] unless $args{software};
+
+    my $res = list_downloaded(%args, _software=>$args{software}, _arch=>$args{arch}, detail=>1);
     return $res unless $res->[0] == 200;
     my $row = $res->[2][0];
     return [200, "OK (none downloaded)"] unless $row;
@@ -449,7 +457,7 @@ sub download {
             next SW;
         }
 
-        my (@urls, @filenames);
+        my (@urls, @filenames, $got_arch);
       GET_DOWNLOAD_URL:
         {
             my $dlurlres = $mod->get_download_url(
@@ -462,6 +470,7 @@ sub download {
             @urls = ref($dlurlres->[2]) eq 'ARRAY' ? @{$dlurlres->[2]} : ($dlurlres->[2]);
             @filenames = _convert_download_urls_to_filenames(
                 res => $dlurlres, software => $sw, version => $v);
+            $got_arch = $dlurlres->[3]{'func.arch'} // $args{arch};
         }
 
         my $target_dir = join(
@@ -470,7 +479,7 @@ sub download {
             "/", substr($sw, 0, 1),
             "/", $sw,
             "/", $v,
-            "/", $args{arch},
+            "/", $got_arch,
         );
         File::Path::make_path($target_dir);
 
@@ -811,7 +820,7 @@ App::instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.007 of App::instopt (from Perl distribution App-instopt), released on 2019-01-13.
+This document describes version 0.008 of App::instopt (from Perl distribution App-instopt), released on 2019-04-05.
 
 =head1 SYNOPSIS
 
@@ -1071,6 +1080,8 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<arch> => I<software::arch>
 
 =item * B<download_dir> => I<dirname>
 

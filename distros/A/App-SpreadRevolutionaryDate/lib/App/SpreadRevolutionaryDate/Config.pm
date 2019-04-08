@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.10';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.14';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -22,7 +22,9 @@ use Getopt::Long;
 use AppConfig qw(:argcount);
 use File::HomeDir;
 use Class::Load ':all';
-use namespace::clean;
+
+use Locale::TextDomain 'App-SpreadRevolutionaryDate';
+use namespace::autoclean;
 
 
 sub new {
@@ -170,9 +172,25 @@ sub new {
   seek $filename, $file_start, 0 if $file_start;
   $self->parse_file($filename);
 
+  # Backup multivalued options so command line arguments can override them
+  my %args_list_backup;
+  my %args_list = $config_targets->varlist(".");
+  foreach my $arg_list (keys %args_list) {
+    next unless $self->_argcount($arg_list) == ARGCOUNT_LIST;
+    push @{$args_list_backup{$arg_list}}, @{$self->$arg_list};
+    $self->_default($arg_list);
+  }
+
   # Rewind command line arguments and process them
   @ARGV = @orig_argv;
   $self->parse_command_line;
+
+  # Restore multivalued options if not overridden by command line arguments
+  foreach my $arg_list (keys %args_list_backup) {
+    unless (scalar @{$self->$arg_list}) {
+      $self->$arg_list($_) foreach (@{$args_list_backup{$arg_list}});
+    }
+  }
 
   # Add targets defined with targets option
   @targets = @{$self->targets};
@@ -294,7 +312,7 @@ Usage: $0 <OPTIONS>
     --help|-h|-?': print out this help
     --targets|-tg <target_1> [--targets|-tg <target_2> […--targets|-tg <target_n>]]': define targets (default: twitter, mastodon, freenode)
     --msgmaker|-mm <MsgMakerClass>: define message maker (default: RevolutionaryDate)
-    --locale|-l <en|fr>: define locale (default: fr)
+    --locale|-l <fr|en|it>: define locale (default: fr)
     --test|--no|-n: do not spread, just print out message or spread to test channels for Freenode
     --acab|-a: DEPRECATED, use --revolutionarydate-acab
     --twitter|-t: DEPRECATED, use --targets=twitter
@@ -312,8 +330,8 @@ Usage: $0 <OPTIONS>
     --freenode_password|-fp <passwd>: define Freenode password
     --freenode_test_channels|-ftc <channel_1>  [--freenode_test_channels|-ftc <channel_2> […--freenode_test_channels|-ftc <channel_n>]]: define Freenode channels
     --freenode_channels|-fc <channel_1>  [--freenode_channels|-fc <channel_2> […--freenode_channels|-fc <channel_n>]]: define Freenode test channels
-    --revolutionarydate-acab: pretend it is 01:31:20
-    --promptuser-default: define default message when --msgmaker=PromptUser
+    --revolutionarydate-acab: pretend it is 01:31:20 (default: false)
+    --promptuser-default <msg>: define default message when --msgmaker=PromptUser (default: 'Goodbye old world, hello revolutionary worlds')
 USAGE
  exit 0;
 }
@@ -341,7 +359,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 METHODS
 
@@ -377,7 +395,7 @@ Prints usage with command line parameters and exits.
 
 =over
 
-=item L<spread-revolutionary-date|https://metacpan.org/pod/distribution/App-SpreadRevolutionaryDate/bin/spread-revolutionary-date>
+=item L<spread-revolutionary-date>
 
 =item L<App::SpreadRevolutionaryDate>
 
@@ -391,11 +409,21 @@ Prints usage with command line parameters and exits.
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =back
 

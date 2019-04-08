@@ -12,7 +12,7 @@ use Sub::Quote ();
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.1.7';
 
 # The names of all methods installed by this module.
 my %MINE;
@@ -105,7 +105,7 @@ DBIx::Class::Helper::Row::Enumeration - Add methods for emum values
 
 =head1 VERSION
 
-version v0.1.6
+version v0.1.7
 
 =head1 SYNOPSIS
 

@@ -12,6 +12,7 @@
 #define L0_JOIN_G1_META_BARE_NAME                        "bare name"
 #define L0_JOIN_G1_META_BRACKETED_NAME                   "bracketed name"
 #define L0_JOIN_G1_META_RESTRICTED_ASCII_GRAPH_NAME      "restricted ascii graph name" /* [[:graph:]] without the = */
+#define L0_JOIN_G1_META_LUA_ACTION_NAME                  "lua action name" /* ::lua->luaIdentifier */
 #define L0_JOIN_G1_META_OP_DECLARE_ANY_GRAMMAR           "op declare any grammar"
 #define L0_JOIN_G1_META_OP_DECLARE_TOP_GRAMMAR           "op declare top grammar"
 #define L0_JOIN_G1_META_OP_DECLARE_LEX_GRAMMAR           "op declare lex grammar"

@@ -1,7 +1,7 @@
 package Perinci::To::POD;
 
-our $DATE = '2018-10-12'; # DATE
-our $VERSION = '0.864'; # VERSION
+our $DATE = '2019-04-08'; # DATE
+our $VERSION = '0.865'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -111,13 +111,45 @@ sub gen_doc_section_functions {
     $self->SUPER::gen_doc_section_functions;
 
     # XXX categorize functions based on tags?
+    my $i;
     for my $furi (sort keys %{ $dres->{functions} }) {
+        $self->add_doc_lines('') if $i++;
+        my $meta = $dres->{function_metas}{$furi};
+        next if ($meta->{is_meth} || $meta->{is_class_meth}) && !($meta->{is_func} // 1);
         $self->add_doc_lines("");
         for (@{ $dres->{functions}{$furi} }) {
             chomp;
             $self->add_doc_lines($_);
         }
     }
+    $self->add_doc_lines('');
+}
+
+sub gen_doc_section_methods {
+    require Perinci::Sub::To::POD;
+
+    my ($self) = @_;
+    my $dres = $self->{_doc_res};
+
+    $self->add_doc_lines(
+        "=head1 " . uc(__("Methods")),
+    );
+
+    $self->SUPER::gen_doc_section_methods;
+
+    # XXX categorize methods based on tags?
+    my $i;
+    for my $furi (sort keys %{ $dres->{functions} }) {
+        $self->add_doc_lines('') if $i++;
+        my $meta = $dres->{function_metas}{$furi};
+        next unless ($meta->{is_meth} || $meta->{is_class_meth}) && !($meta->{is_func} // 1);
+        $self->add_doc_lines("");
+        for (@{ $dres->{functions}{$furi} }) {
+            chomp;
+            $self->add_doc_lines($_);
+        }
+    }
+    $self->add_doc_lines('');
 }
 
 sub gen_doc_section_links {
@@ -164,7 +196,7 @@ Perinci::To::POD - Generate POD documentation for a package from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.864 of Perinci::To::POD (from Perl distribution Perinci-To-Doc), released on 2018-10-12.
+This document describes version 0.865 of Perinci::To::POD (from Perl distribution Perinci-To-Doc), released on 2019-04-08.
 
 =head1 SYNOPSIS
 
@@ -204,7 +236,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

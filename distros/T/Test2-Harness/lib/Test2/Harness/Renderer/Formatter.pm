@@ -2,7 +2,7 @@ package Test2::Harness::Renderer::Formatter;
 use strict;
 use warnings;
 
-our $VERSION = '0.001071';
+our $VERSION = '0.001072';
 
 use Carp qw/croak/;
 
@@ -48,10 +48,11 @@ sub init {
     }
 
     $self->{+FORMATTER} = $f_class->new(
-        io      => $self->{+IO},
-        handles => [$self->{+IO}, $self->{+IO_ERR}, $self->{+IO}],
-        verbose => $settings->{verbose},
-        color   => $settings->{color},
+        io       => $self->{+IO},
+        progress => $self->{progress},
+        handles  => [$self->{+IO}, $self->{+IO_ERR}, $self->{+IO}],
+        verbose  => $settings->{verbose},
+        color    => $settings->{color},
     );
 
     $self->{+SHOW_JOB_INFO}   = $settings->{show_job_info}   unless defined $self->{+SHOW_JOB_INFO};

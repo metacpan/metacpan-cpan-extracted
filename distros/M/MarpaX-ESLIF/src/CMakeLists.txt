@@ -6,7 +6,8 @@ ENDIF ()
 # Usually the version here correspong to the NEXT version - it is git tagged
 # when we do make marpaESLIFPerlRelease
 #
-MYPACKAGESTART (marpaESLIF 2 0 43)
+# SET (MYPACKAGE_DEBUG TRUE)
+MYPACKAGESTART (marpaESLIF 3 0 3)
 
 ###########
 # Library #
@@ -29,12 +30,9 @@ ELSE ()
 ENDIF ()
 SET (MARPAESLIF_UINT32_T ${MYPACKAGE_UINT32_TYPEDEF})
 #
-# ... PCRE2 dependency
+# ... PCRE2 is always built-in, and it is built as an external project
 #
-FIND_PACKAGE (PCRE2)
-IF (NOT PCRE2_FOUND)
-  INCLUDE(cmake/BuildPCRE2.cmake)
-ENDIF ()
+INCLUDE(cmake/BuildPCRE2.cmake)
 #
 # ... Ok -;
 #
@@ -42,16 +40,18 @@ MYPACKAGELIBRARY(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.in
   ${INCLUDE_OUTPUT_PATH}/marpaESLIF/internal/config.h
   src/marpaESLIF.c)
+
 #
-# ... Add our specifics
+# Since we embed marpaESLIFLua with a #include directive, we have to propagate the
+# emebeded lua binding version, that are #define's usually generated with MYPACKAGELIBRARY()
 #
-FOREACH (_target marpaESLIF marpaESLIF_static)
-  TARGET_COMPILE_DEFINITIONS(${_target} PUBLIC -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8)
-  TARGET_INCLUDE_DIRECTORIES(${_target} PUBLIC ${PCRE2_INCLUDE_DIRS})
-  TARGET_LINK_LIBRARIES     (${_target} PUBLIC ${PCRE2_LIBRARIES})
-  IF (NOT PCRE2_FOUND)
-    ADD_DEPENDENCIES        (${_target} pcre2)
-  ENDIF ()
+FOREACH (_target ${PROJECT_NAME} ${PROJECT_NAME}_static)
+  TARGET_COMPILE_DEFINITIONS(${_target}
+    PRIVATE -DMARPAESLIFLUA_VERSION_MAJOR=${${PROJECT_NAME}_VERSION_MAJOR}
+    PRIVATE -DMARPAESLIFLUA_VERSION_MINOR=${${PROJECT_NAME}_VERSION_MINOR}
+    PRIVATE -DMARPAESLIFLUA_VERSION_PATCH=${${PROJECT_NAME}_VERSION_PATCH}
+    PRIVATE -DMARPAESLIFLUA_VERSION="${${PROJECT_NAME}_VERSION}"
+    )
 ENDFOREACH ()
 
 ###############
@@ -60,6 +60,7 @@ ENDFOREACH ()
 MYPACKAGETESTEXECUTABLE(marpaESLIFTester           test/marpaESLIFTester.c)
 MYPACKAGETESTEXECUTABLE(adventTester               test/adventTester.c)
 MYPACKAGETESTEXECUTABLE(jsonTester                 test/jsonTester.c)
+MYPACKAGETESTEXECUTABLE(jsonTesterLua              test/jsonTesterLua.c)
 MYPACKAGETESTEXECUTABLE(jsonTesterWithSharedStream test/jsonTesterWithSharedStream.c)
 MYPACKAGETESTEXECUTABLE(selfTester                 test/selfTester.c)
 MYPACKAGETESTEXECUTABLE(exceptionTester            test/exceptionTester.c)
@@ -70,11 +71,23 @@ MYPACKAGETESTEXECUTABLE(exceptionTester4           test/exceptionTester4.c)
 ################
 # Dependencies #
 ################
-MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS)
-MYPACKAGEDEPENDENCY (genericStack  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericStack"  LIBS)
-MYPACKAGEDEPENDENCY (genericHash   "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericHash"   LIBS)
-MYPACKAGEDEPENDENCY (marpaWrapper  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/marpaWrapper"  LIBS)
-MYPACKAGEDEPENDENCY (tconv         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/tconv"         LIBS)
+MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS LOCAL)
+MYPACKAGEDEPENDENCY (genericStack  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericStack"  LIBS LOCAL STATIC)
+MYPACKAGEDEPENDENCY (genericHash   "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericHash"   LIBS LOCAL STATIC)
+MYPACKAGEDEPENDENCY (marpaWrapper  "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/marpaWrapper"  LIBS LOCAL STATIC)
+MYPACKAGEDEPENDENCY (tconv         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/tconv"         LIBS LOCAL STATIC)
+MYPACKAGEDEPENDENCY (luaunpanic    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic"    LIBS LOCAL STATIC)
+
+#
+# pcre2 is built as an external project: we have to explicitly give the include path.
+# In addition, using pcre2 requires setting PCRE2_CODE_UNIT_WIDTH.
+#
+FOREACH (_target marpaESLIF marpaESLIF_static)
+  ADD_DEPENDENCIES           (${_target} pcre2)
+  TARGET_INCLUDE_DIRECTORIES (${_target} PRIVATE ${PCRE2_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/output/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/lua/include")
+  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC=1 -DMARPAESLIFLUA_EMBEDDED)
+  TARGET_LINK_LIBRARIES      (${_target} PRIVATE ${PCRE2_LIBRARIES})
+ENDFOREACH ()
 
 #########
 # Tests #
@@ -82,6 +95,8 @@ MYPACKAGEDEPENDENCY (tconv         "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/
 MYPACKAGECHECK(marpaESLIFTester)
 MYPACKAGECHECK(adventTester)
 MYPACKAGECHECK(jsonTester)
+MYPACKAGECHECK(jsonTesterLua)
+MYPACKAGECHECK(jsonTesterWithSharedStream)
 MYPACKAGECHECK(selfTester)
 MYPACKAGECHECK(exceptionTester)
 MYPACKAGECHECK(exceptionTester2)
@@ -145,6 +160,12 @@ IF (PERL_FOUND)
 ELSE ()
   MESSAGE(STATUS "")
   MESSAGE(STATUS "PERL Packaging cannot be done without perl -;")
+ENDIF ()
+
+# Lua bindings is in development phase
+INCLUDE(FindLua)
+IF (LUA_FOUND)
+  ADD_SUBDIRECTORY(src/bindings/lua EXCLUDE_FROM_ALL)
 ENDIF ()
 
 #############

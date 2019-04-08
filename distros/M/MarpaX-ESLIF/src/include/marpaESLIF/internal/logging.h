@@ -1,24 +1,28 @@
 #ifndef MARPAESLIF_INTERNAL_LOGGING_H
 #define MARPAESLIF_INTERNAL_LOGGING_H
-#include <stdio.h>
 
-#define MARPAESLIF_LOC_FMT "[v%s/%s at %s:%04d]"
+#include <stdio.h>
+#include <errno.h>
+
+#define MARPAESLIF_LOC_FMT "[v%s/%s at %12s:%05d]"
 #define MARPAESLIF_LOC_VAR MARPAESLIF_VERSION, funcs, FILENAMES, __LINE__
 
 #define MARPAESLIF2LOG(marpaESLIFp, rest) do {				\
     genericLogger_t *_genericLoggerp = ((marpaESLIFp) != NULL) ? (marpaESLIFp)->marpaESLIFOption.genericLoggerp : NULL; \
+    int _errnoi = errno;                                                \
     if (_genericLoggerp != NULL) {					\
       rest;								\
     }									\
+    errno = _errnoi;                                                    \
   } while (0)
 
 #ifndef MARPAESLIF_NTRACE
-#define MARPAESLIF_TRACEF(marpaESLIFp, funcs, fmts, ...) MARPAESLIF2LOG(marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[%s at %s:%04d] " fmts, funcs, FILENAMES, __LINE__, __VA_ARGS__))
-#define MARPAESLIF_TRACE(marpaESLIFp, funcs, msgs)       MARPAESLIF2LOG(marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[%s at %s:%04d] %s", funcs, FILENAMES, __LINE__, msgs))
+#define MARPAESLIF_TRACEF(marpaESLIFp, funcs, fmts, ...) MARPAESLIF2LOG(marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[%s at %12s:%05d] " fmts, funcs, FILENAMES, __LINE__, __VA_ARGS__))
+#define MARPAESLIF_TRACE(marpaESLIFp, funcs, msgs)       MARPAESLIF2LOG(marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[%s at %12s:%05d] %s", funcs, FILENAMES, __LINE__, msgs))
 #define MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, fmts, ...) \
-  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d][%s%-47s at %s:%04d]%*s" fmts, marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->leveli + marpaESLIFRecognizerp->callstackCounteri, " ", __VA_ARGS__))
+  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d][%s%-47s at %12s:%05d]%*s" fmts, marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->leveli + marpaESLIFRecognizerp->callstackCounteri, " ", __VA_ARGS__))
 #define MARPAESLIFRECOGNIZER_TRACE(marpaESLIFRecognizerp, funcs, msgs) \
-  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d][%s%-47s at %s:%04d]%*s%s", marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->leveli + marpaESLIFRecognizerp->callstackCounteri, " ", msgs))
+  MARPAESLIF2LOG(marpaESLIFRecognizerp->marpaESLIFp, GENERICLOGGER_TRACEF(_genericLoggerp, "[Level %2d Iter %4d][%s%-47s at %12s:%05d]%*s%s", marpaESLIFRecognizerp->leveli, marpaESLIFRecognizerp->resumeCounteri, marpaESLIFRecognizerp->discardb ? "!" : " ", funcs, FILENAMES, __LINE__, marpaESLIFRecognizerp->leveli + marpaESLIFRecognizerp->callstackCounteri, " ", msgs))
 #define MARPAESLIFRECOGNIZER_RESUMECOUNTER_INC do { marpaESLIFRecognizerp->resumeCounteri++; } while (0)
 #define MARPAESLIFRECOGNIZER_RESUMECOUNTER_DEC do { marpaESLIFRecognizerp->resumeCounteri--; } while (0)
 #define MARPAESLIFRECOGNIZER_CALLSTACKCOUNTER_INC do { marpaESLIFRecognizerp->callstackCounteri++; } while (0)
@@ -65,6 +69,7 @@
     size_t                         _lengthl = (size_t) (lengthl);       \
     short                         _traceb = (short) (traceb);           \
     genericLogger_t               *_genericLoggerp;                     \
+    int                            _errnoi = errno;                     \
     size_t  _i;                                                         \
     size_t  _j;                                                         \
                                                                         \
@@ -125,6 +130,8 @@
       }                                                                 \
       GENERICLOGGER_FREE(_genericLoggerp);                              \
     }                                                                   \
+                                                                        \
+    errno = _errnoi;                                                    \
   } while (0)
 
 #endif /* MARPAESLIF_INTERNAL_LOGGING_H */

@@ -14,12 +14,14 @@ subtest 'test the each_n_values method' => sub {
   my @argument      = (3, sub { push @$values, 0 + @_; });
   my $each_n_values = $hash->each_n_values(@argument);
 
-  is refaddr($hash), refaddr($each_n_values);
-  is_deeply $each_n_values, $hash;
+  # deprecated
+  # is refaddr($hash), refaddr($each_n_values);
+
+  is_deeply $each_n_values, [1,2];
   is_deeply $values, [3, 1];
 
   isa_ok $hash,          'Data::Object::Hash';
-  isa_ok $each_n_values, 'Data::Object::Hash';
+  isa_ok $each_n_values, 'Data::Object::Array';
 };
 
 ok 1 and done_testing;

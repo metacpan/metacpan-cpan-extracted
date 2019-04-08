@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-texttable
   homepage: https://metacpan.org/release/App-texttable
   repository: git://github.com/perlancar/perl-App-texttable.git
-version: '0.030'
+version: '0.031'
 x_Dist_Zilla:
   perl:
     version: '5.026001'

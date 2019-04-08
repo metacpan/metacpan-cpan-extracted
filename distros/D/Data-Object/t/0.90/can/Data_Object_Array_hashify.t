@@ -16,15 +16,13 @@ hashify
   # given [1..5]
 
   $array->hashify; # {1=>1,2=>1,3=>1,4=>1,5=>1}
-  $array->hashify(sub { shift % 2 }); # {1=>1,2=>0,3=>1,4=>0,5=>1}
+  $array->hashify(fun ($value) { $value % 2 }); # {1=>1,2=>0,3=>1,4=>0,5=>1}
 
 =description
 
 The hashify method returns a hash reference where the elements of array become
 the hash keys and the corresponding values are assigned a value of 1. This
-method supports codification, i.e, takes an argument which can be a codifiable
-string, a code reference, or a code data type object. Note, undefined elements
-will be dropped. This method returns a L<Data::Object::Hash> object.
+method returns a L<Data::Object::Hash> object.
 
 =signature
 

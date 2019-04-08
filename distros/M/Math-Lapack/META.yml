@@ -29,14 +29,16 @@ no_index:
 provides:
   Math::Lapack:
     file: lib/Math/Lapack.pm
-    version: '0.001'
+    version: '0.002'
   Math::Lapack::Expr:
     file: lib/Math/Lapack/Expr.pm
-    version: '0.001'
+    version: '0.002'
   Math::Lapack::Matrix:
     file: lib/Math/Lapack/Matrix.pm
-    version: '0.001'
-version: '0.001'
+    version: '0.002'
+resources:
+  repository: https://bitbucket.org/ruisteve/math-lapack/
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -53,6 +55,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::License
       name: '@Starter/License'
       version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      config:
+        Dist::Zilla::Role::FileWatcher:
+          version: '0.006'
+      name: '@Starter/ReadmeAnyFromPod'
+      version: '0.163250'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Starter/PodSyntaxTests'
@@ -277,6 +286,14 @@ x_Dist_Zilla:
           default_jobs: 1
       name: RunExtraTests
       version: '0.029'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: '6.010'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: '6.010'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

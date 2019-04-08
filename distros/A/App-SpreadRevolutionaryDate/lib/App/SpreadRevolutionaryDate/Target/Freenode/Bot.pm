@@ -10,12 +10,15 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode::Bot;
-$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.10';
-# ABSTRACT: Subclass overriding L<Bot::BasicBot> to post a message on some Freenode channels
+$App::SpreadRevolutionaryDate::Target::Freenode::Bot::VERSION = '0.14';
+# ABSTRACT: Subclass overloading L<Bot::BasicBot> to post a message on some Freenode channels
 
 use Moose;
 use MooseX::NonMoose;
 extends 'Bot::BasicBot';
+
+use Locale::TextDomain 'App-SpreadRevolutionaryDate';
+use namespace::autoclean;
 
 has 'nb_said' => (
     traits  => ['Counter'],
@@ -98,17 +101,17 @@ __END__
 
 =head1 NAME
 
-App::SpreadRevolutionaryDate::Target::Freenode::Bot - Subclass overriding L<Bot::BasicBot> to post a message on some Freenode channels
+App::SpreadRevolutionaryDate::Target::Freenode::Bot - Subclass overloading L<Bot::BasicBot> to post a message on some Freenode channels
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SEE ALSO
 
 =over
 
-=item L<spread-revolutionary-date|https://metacpan.org/pod/distribution/App-SpreadRevolutionaryDate/bin/spread-revolutionary-date>
+=item L<spread-revolutionary-date>
 
 =item L<App::SpreadRevolutionaryDate>
 
@@ -122,11 +125,11 @@ version 0.10
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker>
+=item L<App::SpreadRevolutionaryDate::MsgMaker>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =back
 

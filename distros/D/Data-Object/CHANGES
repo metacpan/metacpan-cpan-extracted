@@ -1,6 +1,26 @@
 Changelog for Data-Object
 
-0.93 2019-03-26T16:39:13
+0.95 2019-04-07T17:33:09
+ - Revert "Build 0.94 (#170)" (#171)
+ - Remove all POD before regenerating
+ - Removed lingering POD
+ - Build 0.94 (#170)
+ - Updated POD
+ - Fixed test failures
+ - Removed Dispatch, to be released separately
+ - Removed Data, to be released separately
+ - Removed Cli, to be released separately
+ - Refactored functions to collect results for mappables
+ - Update Travis CI stages
+ - Removed all traces of codification
+ - Added VERSION markers to all modules to fix CPAN issues
+ - Added missing markers in stray Rule and Func classes
+ - Short-circuit (where applicable) array search operations
+ - Fixed Win32 test failures due to path assumptions
+ - Build 0.93 (#168)
+
+0.93 2019-03-26T16:39:31
+ - Built release version 0.93
  - Reorganized main module POD
  - Dynamically generating main module overview POD
  - Autoloading feature bundle :5.14

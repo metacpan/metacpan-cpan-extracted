@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 BNF
+Bindings
 Calculator
 Durand
 ESLIF
@@ -26,6 +27,7 @@ Properties
 PropertyBitSet
 Recognizer
 Rule
+String
 Symbol
 Tutorial
 Type

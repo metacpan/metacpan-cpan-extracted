@@ -68,6 +68,7 @@
             "DBIx::Class::Schema" : "0",
             "File::Spec" : "0",
             "Module::Metadata" : "0",
+            "SQL::Abstract" : "1.83",
             "SQL::Abstract::Test" : "0",
             "SQL::Translator" : "0.11018",
             "Test::More" : "0",
@@ -79,7 +80,7 @@
    "provides" : {
       "DBIx::Class::Helper::SimpleStats" : {
          "file" : "lib/DBIx/Class/Helper/SimpleStats.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -93,7 +94,7 @@
          "web" : "https://github.com/robrwo/DBIx-Class-Helper-SimpleStats"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.09"

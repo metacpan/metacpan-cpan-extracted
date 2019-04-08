@@ -4,6 +4,8 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Func::Array';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 has arg1 => (
@@ -31,16 +33,16 @@ sub execute {
 
   my ($data, $code, @args) = $self->unpack;
 
-  my @caught;
+  my $results = [];
 
   for (my $i = 0; $i < @$data; $i++) {
     my $index = $i;
     my $value = $data->[$i];
 
-    push @caught, $value if $code->($value, @args);
+    push @$results, $value if $code->($value, @args);
   }
 
-  return [@caught];
+  return $results;
 }
 
 sub mapping {

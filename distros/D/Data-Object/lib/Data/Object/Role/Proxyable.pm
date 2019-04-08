@@ -7,6 +7,8 @@ use Data::Object::Role;
 
 use Carp ();
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub AUTOLOAD {

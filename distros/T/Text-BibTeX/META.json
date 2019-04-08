@@ -44,55 +44,55 @@
    "provides" : {
       "Text::BibTeX" : {
          "file" : "lib/Text/BibTeX.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::BibEntry" : {
          "file" : "lib/Text/BibTeX/Bib.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::BibFormat" : {
          "file" : "lib/Text/BibTeX/BibFormat.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::BibSort" : {
          "file" : "lib/Text/BibTeX/BibSort.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::BibStructure" : {
          "file" : "lib/Text/BibTeX/Bib.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::Entry" : {
          "file" : "lib/Text/BibTeX/Entry.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::File" : {
          "file" : "lib/Text/BibTeX/File.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::Name" : {
          "file" : "lib/Text/BibTeX/Name.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::NameFormat" : {
          "file" : "lib/Text/BibTeX/NameFormat.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::SimpleValue" : {
          "file" : "lib/Text/BibTeX/Value.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::Structure" : {
          "file" : "lib/Text/BibTeX/Structure.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::StructuredEntry" : {
          "file" : "lib/Text/BibTeX/Structure.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       },
       "Text::BibTeX::Value" : {
          "file" : "lib/Text/BibTeX/Value.pm",
-         "version" : "0.86"
+         "version" : "0.87"
       }
    },
    "release_status" : "stable",
@@ -104,6 +104,6 @@
          "url" : "http://github.com/ambs/Text-BibTeX"
       }
    },
-   "version" : "0.86",
+   "version" : "0.87",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

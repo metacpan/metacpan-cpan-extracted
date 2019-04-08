@@ -65,6 +65,10 @@ Set C<var> expression result, explicitely typecasted into an C<int>.
 
 Set C<var> expression result, explicitely typecasted into a C<long>.
 
+=item GENERICSTACK_SET_LONG_DOUBLE
+
+Set C<var> expression result, explicitely typecasted into a C<long double>.
+
 =item GENERICSTACK_SET_FLOAT
 
 Set C<var> expression result, explicitely typecasted into a C<float>.
@@ -144,6 +148,8 @@ Get an entry in stack C<stackName>, at index C<index> (numbering start 0). The d
 =item GENERICSTACK_GET_INT
 
 =item GENERICSTACK_GET_LONG
+
+=item GENERICSTACK_GET_LONG_DOUBLE
 
 =item GENERICSTACK_GET_FLOAT
 

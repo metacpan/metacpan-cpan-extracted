@@ -4,6 +4,9 @@
 #include "pl_util.h"
 #include "pl_duk.h"
 
+#define NEED_sv_2pv_flags
+#include "ppport.h"
+
 #define PL_GC_RUNS 2
 
 #define PL_JSON_CLASS                         "JSON::PP"
@@ -57,7 +60,7 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
                 SV** answer = hv_fetch(seen, kstr, klen, 0);
                 if (answer) {
                     /* TODO: weaken reference? */
-                    ret = newRV(*answer);
+                    ret = newRV_inc(*answer);
                 } else {
                     int array_top = 0;
                     int j = 0;
@@ -66,7 +69,7 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
                     if (hv_store(seen, kstr, klen, values, 0)) {
                         SvREFCNT_inc(values);
                     }
-                    ret = newRV(values);
+                    ret = newRV_inc(values);
 
                     array_top = duk_get_length(ctx, pos);
                     for (j = 0; j < array_top; ++j) {
@@ -91,14 +94,14 @@ static SV* pl_duk_to_perl_impl(pTHX_ duk_context* ctx, int pos, HV* seen)
                 SV** answer = hv_fetch(seen, kstr, klen, 0);
                 if (answer) {
                     /* TODO: weaken reference? */
-                    ret = newRV(*answer);
+                    ret = newRV_inc(*answer);
                 } else {
                     HV* values_hash = newHV();
                     SV* values = sv_2mortal((SV*) values_hash);
                     if (hv_store(seen, kstr, klen, values, 0)) {
                         SvREFCNT_inc(values);
                     }
-                    ret = newRV(values);
+                    ret = newRV_inc(values);
 
                     duk_enum(ctx, pos, 0);
                     while (duk_next(ctx, -1, 1)) { /* get key and value */
@@ -151,15 +154,15 @@ static int pl_perl_to_duk_impl(pTHX_ SV* value, duk_context* ctx, HV* seen, int 
         int val = SvTRUE(value);
         duk_push_boolean(ctx, val);
     } else if (SvIOK(value)) {
-        int val = SvIV(value);
+        long val = SvIV(value);
         if (ref && (val == 0 || val == 1)) {
             duk_push_boolean(ctx, val);
         } else {
-            duk_push_int(ctx, val);
+            duk_push_number(ctx, (duk_double_t) val);
         }
     } else if (SvNOK(value)) {
         double val = SvNV(value);
-        duk_push_number(ctx, val);
+        duk_push_number(ctx, (duk_double_t) val);
     } else if (SvPOK(value)) {
         STRLEN vlen = 0;
         const char* vstr = SvPV_const(value, vlen);
@@ -501,7 +504,7 @@ int pl_set_global_or_property(pTHX_ duk_context* ctx, const char* name, SV* valu
     int len = 0;
     int last_dot = 0;
 
-    // fprintf(stderr, "STACK: %ld\n", (long) duk_get_top(ctx));
+    /* fprintf(stderr, "STACK: %ld\n", (long) duk_get_top(ctx)); */
 
     if (pl_perl_to_duk(aTHX_ value, ctx)) {
         /* that put value in stack */
@@ -648,7 +651,7 @@ SV* pl_global_objects(pTHX_ duk_context* ctx)
         duk_pop(ctx); /* key */
     }
     duk_pop_2(ctx);  /* iterator and global object */
-    return newRV((SV*) values);
+    return newRV_inc((SV*) values);
 }
 
 static duk_ret_t perl_caller(duk_context* ctx)

@@ -9,6 +9,8 @@ use Types::TypeTiny;
 
 use parent 'Data::Object::Kind';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub new {

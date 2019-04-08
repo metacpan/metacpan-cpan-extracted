@@ -14,6 +14,20 @@ sub new {
   return bless $self, $class;
 }
 
+sub parse_dll_infos {
+  my $self = shift;
+  
+  my $linker_flags = $self->get_lddlflags . " " . $self->get_extra_linker_flags;
+  my $dll_infos = [];
+  while ($linker_flags =~ /-(L|l)([\S]+)/g) {
+    my $type = $1;
+    my $name = $2;
+    push @$dll_infos, {type => $type, name => $name};
+  }
+  
+  return $dll_infos;
+}
+
 sub new_default {
   my $class = shift;
   
@@ -80,7 +94,7 @@ sub new_cpp {
   return $bconf;
 }
 
-sub cache {
+sub get_cache {
   my ($self, $cache) = @_;
   
   return $self->{cache};
@@ -248,7 +262,7 @@ sub set_extra_compiler_flags {
   return $self;
 }
 
-sub quiet {
+sub get_quiet {
   my ($self, $quiet) = @_;
   
   return $self->{quiet};

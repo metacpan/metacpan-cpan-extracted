@@ -1,3 +1,12 @@
+0.008   2019-04-05 (PERLANCAR)
+
+	- [bugfix] list_downloaded_versions(): Check VERSION/ARCH/ directory
+	  instead of just VERSION/ directory.
+
+	- [bugfix] download(): Use arch from get_download_url() instead of
+          arch specified by user.
+
+
 0.007   2019-01-13 (PERLANCAR)
 
 	- [bugfix] Forgot to init in some functions.

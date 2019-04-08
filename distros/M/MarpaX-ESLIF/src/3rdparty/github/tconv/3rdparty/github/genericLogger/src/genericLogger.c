@@ -58,9 +58,27 @@ genericLogger_t *genericLogger_clonep(genericLogger_t *genericLoggerp) {
 /*******************************/
 /* genericLogger_logLevel_seti */
 /*******************************/
+void *genericLogger_userDatavp_setp(genericLogger_t *genericLoggerp, void *userDatavp) {
+  void *previousUserDatavp = genericLoggerp->userDatavp;
+  genericLoggerp->userDatavp = userDatavp;
+  return previousUserDatavp;
+}
+
+/*********************************/
+/* genericLogger_userDatavp_getp */
+/*********************************/
+void *genericLogger_userDatavp_getp(genericLogger_t *genericLoggerp)
+{
+  return genericLoggerp->userDatavp;
+}
+
+/*******************************/
+/* genericLogger_logLevel_seti */
+/*******************************/
 genericLoggerLevel_t genericLogger_logLevel_seti(genericLogger_t *genericLoggerp, genericLoggerLevel_t logLeveli) {
+  genericLoggerLevel_t previousLogLeveli = genericLoggerp->genericLoggerLeveli;
   genericLoggerp->genericLoggerLeveli = logLeveli;
-  return genericLoggerp->genericLoggerLeveli;
+  return previousLogLeveli;
 }
 
 /*******************************/

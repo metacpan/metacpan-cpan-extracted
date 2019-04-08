@@ -5,6 +5,7 @@
 
 #include "EXTERN.h"
 #include "perl.h"
+#include "ppport.h"
 
 #define DUK_OPT_NAME_GATHER_STATS      "gather_stats"
 #define DUK_OPT_NAME_SAVE_MESSAGES     "save_messages"

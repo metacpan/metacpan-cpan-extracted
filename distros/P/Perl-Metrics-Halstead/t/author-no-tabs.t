@@ -15,6 +15,7 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
+    'bin/halstead',
     'lib/Perl/Metrics/Halstead.pm',
     't/00-compile.t',
     't/01-methods.t'

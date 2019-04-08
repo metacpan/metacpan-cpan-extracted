@@ -4,6 +4,10 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Func::Undef';
 
+our $VERSION = '0.95'; # VERSION
+
+# BUILD
+
 has arg1 => (
   is => 'ro',
   isa => 'Object',
@@ -16,6 +20,7 @@ has arg2 => (
   req => 1
 );
 
+# METHODS
 
 sub execute {
   my ($self) = @_;

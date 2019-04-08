@@ -33,7 +33,7 @@ sub tumblr_api_method ($$) {
             extra_args  => $args,
         });
 
-        if ( $response->is_success || ( $response->code == 301 && $method_name eq 'avatar') ) {
+        if ( $response->is_success || ( ($response->code == 301 || $response->code == 302) && $method_name eq 'avatar') ) {
             return decode_json($response->decoded_content)->{response};
         } else {
             $self->error( WWW::Tumblr::ResponseError->new(

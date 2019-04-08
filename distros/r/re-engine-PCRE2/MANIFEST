@@ -10,6 +10,7 @@ t/00-compile.t
 t/1-basic.t
 t/capture.t
 t/config.t
+t/gh29-segv.t
 t/import.t
 t/match.t
 t/perl/pat.t

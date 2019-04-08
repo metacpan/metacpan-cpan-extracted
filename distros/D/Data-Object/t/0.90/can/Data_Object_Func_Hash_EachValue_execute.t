@@ -58,7 +58,7 @@ $func = Data::Object::Func::Hash::EachValue->new(
 
 my $result = $func->execute;
 
-is_deeply $result, $data;
+is_deeply $result, [1,2,3,4,5];
 
 is_deeply [sort map { grep defined, @$_ } @$sets], [2,4,6,8];
 

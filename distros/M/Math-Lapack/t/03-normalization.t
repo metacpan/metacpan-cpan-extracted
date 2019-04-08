@@ -1,7 +1,6 @@
 #!perl
 use Test2::V0 qw'is float done_testing';
 use Math::Lapack::Matrix;
-use Math::Lapack::Expr;
 use warnings;
 use strict;
 

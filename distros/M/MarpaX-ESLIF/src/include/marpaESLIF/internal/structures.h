@@ -14,6 +14,7 @@
 #include <genericLogger.h>
 #include <pcre2.h>
 #include <tconv.h>
+#include "marpaESLIF/internal/lua.h" /* For lua_State* */
 
 #define INTERNAL_ANYCHAR_PATTERN "."                    /* This ASCII string is UTF-8 compatible */
 #define INTERNAL_UTF8BOM_PATTERN "\\x{FEFF}"            /* FEFF Unicode code point i.e. EFBBBF in UTF-8 encoding */
@@ -174,6 +175,7 @@ struct marpaESLIF_rule {
   genericStack_t         _rhsStack;                    /* Stack of RHS symbols */
   genericStack_t        *rhsStackp;                    /* Pointer to stack of RHS symbols */
   int                   *rhsip;                        /* Convenience array of RHS ids for rule introspection */
+  short                 *skipbp;                       /* Convenience array of RHS ids for skip introspection */
   marpaESLIF_symbol_t   *exceptionp;                   /* Exception symbol */
   int                    exceptionIdi;                 /* Exception symbol Id */
   marpaESLIFAction_t    *actionp;                      /* Action */
@@ -207,7 +209,6 @@ struct marpaESLIF_grammar {
   genericStack_t        *ruleStackp;                         /* Pointer to stack of rules */
   marpaESLIFAction_t    *defaultSymbolActionp;               /* Default action for symbols - never NULL */
   marpaESLIFAction_t    *defaultRuleActionp;                 /* Default action for rules - never NULL */
-  marpaESLIFAction_t    *defaultFreeActionp;                 /* Default action for free - can be NULL */
   int                    starti;                             /* Default start symbol ID - filled during grammar validation */
   char                  *starts;                             /* Default start symbol name - filled during grammar validation - shallow pointer */
   int                   *ruleip;                             /* Array of rule IDs - filled by grammar validation */
@@ -223,27 +224,41 @@ struct marpaESLIF_grammar {
 /* Definition of the opaque structures */
 /* ----------------------------------- */
 struct marpaESLIF {
-  marpaESLIFGrammar_t   *marpaESLIFGrammarp;          /* ESLIF has its own grammar -; */
-  marpaESLIFOption_t     marpaESLIFOption;
-  marpaESLIF_terminal_t *anycharp;                    /* internal regex for match any character */
-  marpaESLIF_terminal_t *utf8bomp;                    /* Internal regex for match UTF-8 BOM */
-  marpaESLIF_terminal_t *newlinep;                    /* Internal regex for match newline */
-  marpaESLIF_terminal_t *stringModifiersp;            /* Internal regex for match string modifiers */
-  marpaESLIF_terminal_t *characterClassModifiersp;    /* Internal regex for match character class modifiers */
-  marpaESLIF_terminal_t *regexModifiersp;             /* Internal regex for match regex modifiers */
-  genericLogger_t       *traceLoggerp;                /* For cases where this is silent mode but compiled with TRACE */
-  short                  NULLisZeroBytesb;            /* An internal boolean to help when we can safely do calloc() */
+  marpaESLIFGrammar_t    *marpaESLIFGrammarp;          /* ESLIF has its own grammar -; */
+  marpaESLIFOption_t      marpaESLIFOption;
+  marpaESLIF_terminal_t  *anycharp;                    /* internal regex for match any character */
+  marpaESLIF_terminal_t  *newlinep;                    /* Internal regex for match newline */
+  marpaESLIF_terminal_t  *stringModifiersp;            /* Internal regex for match string modifiers */
+  marpaESLIF_terminal_t  *characterClassModifiersp;    /* Internal regex for match character class modifiers */
+  marpaESLIF_terminal_t  *regexModifiersp;             /* Internal regex for match regex modifiers */
+  genericLogger_t        *traceLoggerp;                /* For cases where this is silent mode but compiled with TRACE */
+  short                   NULLisZeroBytesb;            /* An internal boolean to help when we can safely do calloc() */
+  char                   *versions;                    /* Version */
+  int                     versionMajori;               /* Major version */
+  int                     versionMinori;               /* Minor version */
+  int                     versionPatchi;               /* Patch version */
+  marpaESLIFValueResult_t marpaESLIFValueResultTrue;   /* Pre-filled ::true value result */
+  marpaESLIFValueResult_t marpaESLIFValueResultFalse;  /* Pre-filled ::false value result */
+  char                    float_fmts[128];            /* Pre-filled format string for floats */
+  char                    double_fmts[128];           /* Pre-filled format string for double */
+  char                    long_double_fmts[128];      /* Pre-filled format string for double */
 };
 
 struct marpaESLIFGrammar {
   marpaESLIF_t              *marpaESLIFp;
   marpaESLIFGrammarOption_t  marpaESLIFGrammarOption;
-  genericStack_t             _grammarStack;     /* Stack of grammars */
-  genericStack_t            *grammarStackp;     /* Pointer to stack of grammars */
-  marpaESLIF_grammar_t      *grammarp;          /* This is a SHALLOW copy of current grammar in grammarStackp, defaulting to the top grammar */
-  short                      warningIsErrorb;   /* Current warningIsErrorb setting (used when parsing grammars ) */
-  short                      warningIsIgnoredb; /* Current warningIsErrorb setting (used when parsing grammars ) */
-  short                      autorankb;         /* Current autorank setting */
+  genericStack_t             _grammarStack;      /* Stack of grammars */
+  genericStack_t            *grammarStackp;      /* Pointer to stack of grammars */
+  marpaESLIF_grammar_t      *grammarp;           /* This is a SHALLOW copy of current grammar in grammarStackp, defaulting to the top grammar */
+  short                      warningIsErrorb;    /* Current warningIsErrorb setting (used when parsing grammars ) */
+  short                      warningIsIgnoredb;  /* Current warningIsErrorb setting (used when parsing grammars ) */
+  short                      autorankb;          /* Current autorank setting */
+  char                      *luabytep;           /* Lua script source */
+  size_t                     luabytel;           /* Lua script source length in byte */
+  char                      *luaprecompiledp;    /* Lua script source precompiled */
+  size_t                     luaprecompiledl;    /* Lua script source precompiled length in byte */
+  marpaESLIF_string_t       *luadescp;           /* Delayed until show is requested */
+  int                        internalRuleCounti; /* Internal counter when creating internal rules (groups '(-...-)' and '(...)' */
 };
 
 struct marpaESLIF_meta {
@@ -259,19 +274,27 @@ struct marpaESLIF_meta {
 };
 
 struct marpaESLIFValue {
-  marpaESLIF_t            *marpaESLIFp;
-  marpaESLIFRecognizer_t  *marpaESLIFRecognizerp;
-  marpaESLIFValueOption_t  marpaESLIFValueOption;
-  marpaWrapperValue_t     *marpaWrapperValuep;
-  short                    previousPassWasPassthroughb;
-  int                      previousArg0i;
-  int                      previousArgni;
-  genericStack_t          *valueResultStackp;
-  short                    inValuationb;
-  marpaESLIF_symbol_t     *symbolp;
-  marpaESLIF_rule_t       *rulep;
-  char                    *actions; /* True external name of best-effort ASCII in case of literal */
-  marpaESLIF_string_t     *stringp; /* Not NULL only when is a literal - then callback is forced to be internal */
+  marpaESLIF_t                *marpaESLIFp;
+  marpaESLIFRecognizer_t      *marpaESLIFRecognizerp;
+  marpaESLIFValueOption_t      marpaESLIFValueOption;
+  marpaWrapperValue_t         *marpaWrapperValuep;
+  short                        previousPassWasPassthroughb;
+  int                          previousArg0i;
+  int                          previousArgni;
+  genericStack_t              *valueResultStackp;
+  short                        inValuationb;
+  marpaESLIF_symbol_t         *symbolp;
+  marpaESLIF_rule_t           *rulep;
+  char                        *actions; /* True external name of best-effort ASCII in case of literal */
+  marpaESLIF_string_t         *stringp; /* Not NULL only when is a literal - then callback is forced to be internal */
+  lua_State                   *L;
+  void                        *marpaESLIFLuaValueContextp;
+  genericStack_t               _beforePtrStack;
+  genericStack_t              *beforePtrStackp;
+  genericHash_t                _beforePtrHash;
+  genericHash_t               *beforePtrHashp;
+  genericHash_t                _afterPtrHash;
+  genericHash_t               *afterPtrHashp;
 };
 
 struct marpaESLIF_stream {
@@ -298,6 +321,7 @@ struct marpaESLIF_stream {
   tconv_t                tconvp;               /* current converter. Always != NULL when charconvb is true. Always NULL when charconvb is false. */
   size_t                 linel;                /* Line number */
   size_t                 columnl;              /* Column number */
+  short                  bomdoneb;             /* In char mode, flag indicating if BOM was processed successfully (BOM existence or not) */
 };
 
 struct marpaESLIFRecognizer {
@@ -372,6 +396,17 @@ struct marpaESLIFRecognizer {
   marpaESLIF_grammar_t         grammarDiscard;
   marpaESLIFRecognizerOption_t marpaESLIFRecognizerOptionDiscard;
   marpaESLIFValueOption_t      marpaESLIFValueOptionDiscard;
+
+  /* Embedded lua */
+  void                        *marpaESLIFLuaRecognizerContextp;
+
+  /* Lexeme input stack is a marpaESLIFValueResult stack */
+  genericStack_t               _beforePtrStack;
+  genericStack_t              *beforePtrStackp;
+  genericHash_t                _beforePtrHash;
+  genericHash_t               *beforePtrHashp;
+  genericHash_t                _afterPtrHash;
+  genericHash_t               *afterPtrHashp;
 };
 
 struct marpaESLIF_lexeme_data {
@@ -387,11 +422,10 @@ struct marpaESLIF_lexeme_data {
    - when this is a top-level recognizer, everything is allocated on the heap.
 */
 struct marpaESLIF_alternative {
-  marpaESLIF_symbol_t *symbolp;         /* Associated symbol */
-  void                *valuep;          /* Associated value and length */
-  size_t               valuel;          /* 0 when it is external */
-  int                  grammarLengthi;  /* Length within the grammar (1 in the token-stream model) */
-  short                usedb;           /* Is this structure in use ? */
+  marpaESLIF_symbol_t *symbolp;                  /* Associated symbol - shallow pointer */
+  marpaESLIFValueResult_t marpaESLIFValueResult; /* Associated value */
+  int                     grammarLengthi;        /* Length within the grammar (1 in the token-stream model) */
+  short                   usedb;                 /* Is this structure in use ? */
 };
 
 marpaESLIF_alternative_t marpaESLIF_alternative_default = {
@@ -429,13 +463,12 @@ marpaESLIFGrammarOption_t marpaESLIFGrammarOption_default_template = {
   NULL, /* bytep */
   0,    /* bytel */
   NULL, /* encodings */
-  0,    /* encodingl */
-  NULL  /* encodingOfEncodings */
+  0     /* encodingl */
 };
 
 marpaESLIFRecognizerOption_t marpaESLIFRecognizerOption_default_template = {
   NULL,              /* userDatavp */
-  NULL,              /* marpaESLIFReaderCallbackp */
+  NULL,              /* readerCallbackp */
   0,                 /* disableThresholdb */
   0,                 /* exhaustedb */
   0,                 /* newlineb */
@@ -449,12 +482,18 @@ marpaESLIFValueOption_t marpaESLIFValueOption_default_template = {
   NULL, /* userDatavp - filled at run-time */
   NULL, /* ruleActionResolverp */
   NULL, /* symbolActionResolverp */
-  NULL, /* freeActionResolverp */
+  NULL, /* importerp */
   1,    /* highRankOnlyb */
   1,    /* orderByRankb */
   0,    /* ambiguousb */
   0,    /* nullb */
   0     /* maxParsesi */
+};
+
+/* String helper */
+struct marpaESLIFStringHelper {
+  marpaESLIF_t       *marpaESLIFp;
+  marpaESLIFString_t *marpaESLIFStringp;
 };
 
 #include "marpaESLIF/internal/eslif.h"

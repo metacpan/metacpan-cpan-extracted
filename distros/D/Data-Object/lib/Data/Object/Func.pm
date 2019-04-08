@@ -6,6 +6,8 @@ extends 'Data::Object::Kind';
 
 with 'Data::Object::Role::Throwable';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub BUILDARGS {

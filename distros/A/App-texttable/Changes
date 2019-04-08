@@ -1,3 +1,9 @@
+0.031   2019-02-24 (PERLANCAR)
+
+	- [Bugfix] Don't return enveloped result when function meta has
+	  cmdline.skip_format=>1.
+
+
 0.030   2019-01-11 (PERLANCAR)
 
 	- Add options --backend (or -b) and -l.

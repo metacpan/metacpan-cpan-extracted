@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use SQL::Tiny ':all';
 
@@ -18,6 +18,18 @@ test_select(
 
     'SELECT userid,name FROM users WHERE code IN (?,?,?) AND status=? ORDER BY name,state',
     [ 2112, 5150, 90125, 'X' ]
+);
+
+
+test_select(
+    [
+        'users',
+        [qw( userid name )],
+        { startdate => \[ "to_date(?,'MM/DD/YYYY')", '03/02/2003' ], status => [ 'X', 'Y', 'Z' ] },
+    ],
+
+    q{SELECT userid,name FROM users WHERE startdate=to_date(?,'MM/DD/YYYY') AND status IN (?,?,?)},
+    [ '03/02/2003', 'X', 'Y', 'Z' ],
 );
 
 

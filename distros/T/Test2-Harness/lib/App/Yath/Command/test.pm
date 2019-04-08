@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001071';
+our $VERSION = '0.001072';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -271,6 +271,17 @@ sub options {
                     delete $settings->{formatter};
                 }
             },
+        },
+
+        {
+            spec => 'progress!',
+            field => 'progress',
+            default => 1,
+            used_by => {display => 1},
+            section   => 'Display Options',
+            usage     => ['--no-progress'],
+            summary   => ['Turn off progress indicators'],
+            long_desc => 'This disables "events seen" counter and buffered event pre-display',
         },
 
         {
@@ -1163,6 +1174,12 @@ Specify the formatter to use
 (Default: "Test2")
 
 Only useful when a renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.
+
+=item --no-progress
+
+Turn off progress indicators
+
+This disables "events seen" counter and buffered event pre-display
 
 =item --qvf
 

@@ -1,6 +1,7 @@
 #ifndef PL_STATS_H
 #define PL_STATS_H
 
+#include "ppport.h"
 #include "pl_duk.h"
 
 typedef struct Stats {

@@ -1,1 +1,1 @@
-requires 'Mojolicious', '8.03'; # weak accessors
+requires 'Mojolicious', '8.13'; # Mojo::Promise::map

@@ -2,15 +2,54 @@ use strict;
 use warnings FATAL => 'all';
 
 package MarpaX::ESLIF;
+use MarpaX::ESLIF::String;   # Make sure it is loaded, the XS is using it
 
 # ABSTRACT: ESLIF is Extended ScanLess InterFace
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use vars qw/$VERSION/;
+use Config;
+#
+# It is difficult to make perl communicate with other languages using
+# a "native" type, and the only unambiguous thingies are:
+# - undef (managed directly the XS)
+# - strict number (uses Types::Standard)
+# - integer (subset of the above)
+# - string is sort of catch-all fallback for scalars
+# - else data will remain opaque to perl
+#
+use Types::Standard qw//;
 
+#
+# Internal routine used at bootstrap that says is nvtype is a double
+#
+sub _nvtype_is_long_double {
+    return (($Config{nvtype} || '') =~ /^\s*long\s+double\s*$/) ? 1 : 0
+}
+#
+# Internal routine used at bootstrap that says is nvtype is a __float128
+#
+sub _nvtype_is___float128 {
+    return (($Config{nvtype} || '') eq '__float128') ? 1 : 0
+}
+
+#
+# At bootstrap we cache $true and $false so they must be available before the XS loader
+#
+our $true;
+our $false;
 BEGIN {
-    our $VERSION = '2.0.43'; # VERSION
+    use JSON::MaybeXS 1.004000 qw//;
+    $true = JSON::MaybeXS::true();
+    $false = JSON::MaybeXS::false();
+}
+
+#
+# Bootstrap
+#
+BEGIN {
+    our $VERSION = '3.0.3'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -27,6 +66,10 @@ use MarpaX::ESLIF::Symbol::PropertyBitSet;
 use MarpaX::ESLIF::Symbol::Type;
 use MarpaX::ESLIF::Value::Type;
 use MarpaX::ESLIF::Rule::PropertyBitSet;
+
+# Other modules
+use Math::BigFloat qw//;
+use Math::BigInt qw//;
 
 
 my @REGISTRY = ();
@@ -64,16 +107,16 @@ sub getInstance {
     goto &new
 }
 
-sub version {
-    return MarpaX::ESLIF::Engine::version
-}
-
 sub _getInstance {
     return $_[0]->[0]
 }
 
 sub _getLoggerInterface {
     return $_[0]->[1]
+}
+
+sub version {
+    MarpaX::ESLIF::Engine->version($_[0]->[0])
 }
 
 sub CLONE {
@@ -86,6 +129,16 @@ sub CLONE {
 sub DESTROY {
     MarpaX::ESLIF::Engine->dispose($_[0]->[0])
 }
+
+
+sub is_bool { goto \&JSON::MaybeXS::is_bool }
+
+
+sub is_Int       { goto \&Types::Standard::is_Int }
+sub is_StrictNum { goto \&Types::Standard::is_StrictNum }
+
+
+sub is_Str { goto \&Types::Standard::is_Str }
 
 
 1;
@@ -102,7 +155,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 2.0.43
+version 3.0.3
 
 =head1 SYNOPSIS
 
@@ -173,9 +226,43 @@ Returns a string containing the current underlying ESLIF library version.
 
 The perl interface is an I<all-in-one> version of L<marpaESLIF|https://github.com/jddurand/c-marpaESLIF> library, which means that character conversion is using C<iconv> (or C<iconv>-like on Windows) instead of ICU, even if the later is available on your system.
 
+=head2 BOOLEAN TYPE
+
+ESLIF has a boolean type, perl has not. In order to not reinvent the wheel, the widely JSON's Perl's boolean utilities via L<JSON::MaybeXS> wrapper are used, i.e.:
+
+=over
+
+=item true
+
+A I<true> value. You may localize C<$MarpaX::ESLIF::true> before using ESLIF to change it.
+
+Defaults to C<JSON::MaybeXS::true()>.
+
+=item false
+
+A I<false> value. You may localize C<$MarpaX::ESLIF::false> before using ESLIF to change it.
+
+Defaults to C<JSON::MaybeXS::false()>.
+
+=item is_bool($value)
+
+Returns a true value if C<$value> is a boolean. You may localize C<MarpaX::ESLIF::is_bool()> function before using ESLIF to change it.
+
+Defaults to C<JSON::MaybeXS::is_bool($value)>
+
+=back
+
+=head2 NUMERIC TYPES
+
+ESLIF has two functions C<MarpaX::ESLIF::is_Int()> and C<MarpaX::ESLIF::is_StrictNum()>, that maps by default to the L<Types::Standard> implementations. You may localize them before using ESLIF if needed.
+
+=head2 STRING TYPE
+
+ESLIF has the function C<MarpaX::ESLIF::is_Str()>, that maps by default to the L<Types::Standard> implementation. You may localize it before using ESLIF if needed.
+
 =head1 SEE ALSO
 
-L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::BNF>, L<MarpaX::ESLIF::Logger::Interface>, L<MarpaX::ESLIF::Grammar>, L<MarpaX::ESLIF::Recognizer>.
+L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::BNF>, L<MarpaX::ESLIF::Logger::Interface>, L<MarpaX::ESLIF::Grammar>, L<MarpaX::ESLIF::Recognizer>, L<Types::Standard>, L<JSON::MaybeXS>.
 
 =head1 AUTHOR
 

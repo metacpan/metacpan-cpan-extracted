@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::Temp" => 0,
     "Perinci::Access::Perl" => "0.87",
-    "Perinci::CmdLine::Dump" => "0.08",
+    "Perinci::CmdLine::Dump" => "0.120",
     "Perinci::CmdLine::POD" => "0.003",
     "Perinci::CmdLine::Util" => "0.13",
     "Perinci::To::POD" => "0.81",
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.77",
+  "VERSION" => "0.780",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Access::Perl" => "0.87",
-  "Perinci::CmdLine::Dump" => "0.08",
+  "Perinci::CmdLine::Dump" => "0.120",
   "Perinci::CmdLine::POD" => "0.003",
   "Perinci::CmdLine::Util" => "0.13",
   "Perinci::To::POD" => "0.81",

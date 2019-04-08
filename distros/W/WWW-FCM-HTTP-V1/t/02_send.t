@@ -8,6 +8,8 @@ use HTTP::Status qw(:constants);
 
 use WWW::FCM::HTTP::V1;
 
+plan skip_all => 'Not supported on MSWin32' if $^O eq 'MSWin32';
+
 my $dummy_api_key_json = '{
 "type": "service_account",
 "project_id": "test-project",

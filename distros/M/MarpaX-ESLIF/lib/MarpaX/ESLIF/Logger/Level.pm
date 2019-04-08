@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '2.0.43'; # VERSION
+our $VERSION = '3.0.3'; # VERSION
 
 # This section should be replaced on-the-fly at build time
 # AUTOLOAD
@@ -29,7 +29,7 @@ MarpaX::ESLIF::Logger::Level - ESLIF Logger levels
 
 =head1 VERSION
 
-version 2.0.43
+version 3.0.3
 
 =head1 SYNOPSIS
 

@@ -11,6 +11,7 @@ use ExtUtils::CBuilder;
 use File::Copy 'copy', 'move';
 use File::Path 'mkpath';
 use DynaLoader;
+use Config;
 
 use File::Basename 'dirname', 'basename';
 
@@ -106,8 +107,66 @@ sub create_cfunc_name {
   return $cfunc_name;
 }
 
+sub get_config_runtime {
+  my ($self, $package_name, $category) = @_;
+  
+  my $module_file = $self->builder->get_module_file($package_name);
+  my $src_dir = SPVM::Builder::Util::remove_package_part_from_file($module_file, $package_name);
+
+  # Config file
+  my $config_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'config');
+  my $config_file = "$src_dir/$config_rel_file";
+  
+  # Config
+  my $bconf;
+  if (-f $config_file) {
+    open my $config_fh, '<', $config_file
+      or confess "Can't open $config_file: $!";
+    my $config_content = do { local $/; <$config_fh> };
+    $bconf = eval "$config_content";
+    if (my $messge = $@) {
+      confess "Can't parser $config_file: $@";
+    }
+  }
+  else {
+    $bconf = SPVM::Builder::Config->new_default;
+  }
+  
+  return $bconf;
+}
+
 sub bind_subs {
   my ($self, $dll_file, $package_name, $sub_names) = @_;
+  
+  # Load pre-required dlls
+  my $category = $self->category;
+  my $bconf = $self->get_config_runtime($package_name, $category);
+  my $dll_infos = $bconf->parse_dll_infos;
+  
+  my $libpth = $Config{libpth};
+  my @dll_load_paths = split(/ +/, $libpth);
+  my $build_lib_dir = $self->{build_dir} . '/lib';
+  push @dll_load_paths, $build_lib_dir;
+  
+  for my $dll_info (@$dll_infos) {
+    if ($dll_info->{type} eq 'L') {
+      push @dll_load_paths, $dll_info->{name};
+    }
+    elsif ($dll_info->{type} eq 'l') {
+      for my $dll_load_path (reverse @dll_load_paths) {
+        my $name = $dll_info->{name};
+        my $dlext = $Config{dlext};
+        my $dll_file = "$dll_load_path/lib$name.$dlext";
+        if (-f $dll_file) {
+          my $dll_libref = DynaLoader::dl_load_file($dll_file);
+          unless ($dll_libref) {
+            confess "Can't load pre required dll file \"$dll_file\"";
+          }
+          last;
+        }
+      }
+    }
+  }
   
   for my $sub_name (@$sub_names) {
     my $sub_abs_name = "${package_name}::$sub_name";
@@ -115,7 +174,6 @@ sub bind_subs {
     my $cfunc_name = $self->create_cfunc_name($package_name, $sub_name);
     my $cfunc_address = SPVM::Builder::Util::get_dll_func_address($dll_file, $cfunc_name);
     
-    my $category = $self->category;
     if ($category eq 'native') {
       $self->bind_sub_native($package_name, $sub_name, $cfunc_address);
     }
@@ -189,7 +247,7 @@ sub compile {
   }
 
   # Quiet output
-  my $quiet = defined $bconf->quiet ? $bconf->quiet : $self->quiet;
+  my $quiet = defined $bconf->get_quiet ? $bconf->get_quiet : $self->quiet;
   
   # Source file
   my $src_rel_file_no_ext = SPVM::Builder::Util::convert_package_name_to_category_rel_file_without_ext($package_name, $category);
@@ -237,7 +295,7 @@ sub compile {
       $do_compile = 1;
     }
     else {
-      if (defined $bconf->cache && !$bconf->cache) {
+      if (defined $bconf->get_cache && !$bconf->get_cache) {
         $do_compile = 1;
       }
       else {
@@ -325,7 +383,7 @@ sub link {
   }
 
   # Quiet output
-  my $quiet = defined $bconf->quiet ? $bconf->quiet : $self->quiet;
+  my $quiet = defined $bconf->get_quiet ? $bconf->get_quiet : $self->quiet;
   
   # CBuilder configs
   my $lddlflags = $bconf->get_lddlflags;

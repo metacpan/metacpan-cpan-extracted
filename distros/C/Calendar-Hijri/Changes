@@ -1,5 +1,8 @@
 Revision history for Calendar::Hijri
 
+0.37  Sat Apr 06 08:35:00 2019
+      - Added dependency on Calendar::Plugin::Renderer v0.14.
+
 0.36  Tue Mar 26 19:20:00 2019
       - Updated dependency on Date::Hijri::Simple v0.21.
 

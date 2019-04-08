@@ -319,11 +319,11 @@ API是通过加载`Openwx插件`的形式提供的，上述代码保存成 xxxx.
 |调用示例|http://127.0.0.1:3000/openwx/send_friend_message?id=xxxx&content=hello<br>http://127.0.0.1:3000/openwx/send_friend_message?markname=xxx&content=%e4%bd%a0%e5%a5%bd<br>http://127.0.0.1:3000/openwx/send_friend_message?id=xxx&media_path=https%3a%2f%2fss0.bdstatic.com%2flogo.png<br>http://127.0.0.1:3000/openwx/send_friend_message?id=xxx&media_id=%40crypt_1eb0ba44_cb3de736e6ccd5ae8%3a3|
 特殊处理：id=@all 表示群发消息给所有的好友
 
-####文本消息返回JSON数据格式:
+#### 文本消息返回JSON数据格式:
 ```
 {"status":"发送成功","msg_id":23910327,"code":0} #code为 0 表示发送成功
 ```
-####媒体消息返回的JSON数据格式：
+#### 媒体消息返回的JSON数据格式：
 ```
 {"status":"发送成功","msg_id":23910327,"media_id":"@crypt_1eb0ba44_cb3de736e6ccd5ae8:3","code":0} #code为 0 表示发送成功
 ```
@@ -342,11 +342,11 @@ API是通过加载`Openwx插件`的形式提供的，上述代码保存成 xxxx.
 |数据格式|application/x-www-form-urlencoded|
 |调用示例|http://127.0.0.1:3000/openwx/send_group_message?id=xxxx&content=hello<br>http://127.0.0.1:3000/openwx/send_group_message?displayname=xxx&content=%e4%bd%a0%e5%a5%bd<br>http://127.0.0.1:3000/openwx/send_group_message?id=xxx&media_path=https%3a%2f%2fss0.bdstatic.com%2flogo.png<br>http://127.0.0.1:3000/openwx/send_group_message?displayname=xxx&media_path=https%3a%2f%2fss0.bdstatic.com%2flogo.png<br>http://127.0.0.1:3000/openwx/send_group_message?id=xxx&media_id=%40crypt_1eb0ba44_cb3de736e6ccd5ae8%3a3|
 
-####文本消息返回JSON数据格式:
+#### 文本消息返回JSON数据格式:
 ```
 {"status":"发送成功","msg_id":23910327,"code":0} #code为 0 表示发送成功
 ```
-####媒体消息返回的JSON数据格式：
+#### 媒体消息返回的JSON数据格式：
 ```
 {"status":"发送成功","msg_id":23910327,"media_id":"@crypt_1eb0ba44_cb3de736e6ccd5ae8:3","code":0} #code为 0 表示发送成功
 ```
@@ -462,6 +462,7 @@ $client->load("Openwx",data=>{
     post_stdout => 0,                            #可选，上报数据是否打印到stdout，适合管道交互信息方式，默认0
     post_media_data => 1,                        #可选，是否上报经过base64编码的图片原始数据，默认值为1
     post_event_list => ['login','stop','state_change','input_qrcode'], #可选，上报事件列表
+    #post_message_filter => {class => "recv", "type" => "friend_message",format=>"app",sender_name=>"微信支付"},#可选，消息过滤
 });
 ```
 
@@ -489,6 +490,16 @@ $client->load("Openwx",data=>{
 #### 接收消息上报 
 
 当接收到消息时，会把消息通过JSON格式数据POST到该接口
+
+可以在Openwx插件中，通过 post_message_filter 参数来过滤上报的消息内容, 支持对消息中的任意多个属性进行过滤
+
+```
+$client->load("Openwx",data=>{
+    listen => [{host=>xxx,port=>xxx}],           #可选，发送消息api监听端口
+    post_api=> 'http://127.0.0.1:3000/post_api', #可选，接收消息或事件的上报地址
+    post_message_filter => {class => "recv", "type" => "friend_message",format=>"app",sender_name=>"微信支付"},#仅上报微信支付消息
+});
+```
 
 普通好友消息或群消息上报
 

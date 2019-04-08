@@ -15,18 +15,16 @@ each_key
 
   # given ['a'..'g']
 
-  $array->each_key(sub{
-      my $index = shift; # 0
+  $array->each_key(fun ($index) {
       ...
   });
 
 =description
 
-The each_key method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the index at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Array> object.
+The each_key method iterates over each element in the array, executing the code
+reference supplied in the argument, passing the routine the index at the
+current position in the loop. This method returns a L<Data::Object::Array>
+object.
 
 =signature
 
@@ -44,6 +42,14 @@ use_ok 'Data::Object::Array';
 
 my $data = Data::Object::Array->new(['a'..'g']);
 
-is_deeply $data->each_key(sub { [@_] }), $data;
+is_deeply $data->each_key(sub { [@_] }), [
+  [0],
+  [1],
+  [2],
+  [3],
+  [4],
+  [5],
+  [6]
+];
 
 ok 1 and done_testing;

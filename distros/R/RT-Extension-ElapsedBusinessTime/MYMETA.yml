@@ -21,4 +21,4 @@ requires:
   Set::Object: '0'
   Try::Tiny: '0'
   perl: '5.008003'
-version: '0.02'
+version: '0.03'

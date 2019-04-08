@@ -10,17 +10,30 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker;
-$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.10';
+$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.14';
 # ABSTRACT: Role providing interface for crafting a message to be spread by L<App::SpreadRevolutionaryDate>.
 
 use Moose::Role;
+use Locale::Util qw(set_locale);
+use Locale::Messages qw(LC_ALL nl_putenv);
+
+use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
 
 has locale => (
   is => 'ro',
   isa => 'Str',
   required => 1,
-  default => 'fr'
+  default => 'fr',
+  trigger => sub {
+    # Set locale to $val, see https://metacpan.org/pod/Locale::TextDomain::FAQ#How-do-I-switch-languages-or-force-a-certain-language-independently-from-user-settings-read-from-the-environment?
+    my ( $self, $val, $old_val ) = @_;
+    Locale::Messages->select_package('gettext_pp');
+    set_locale(LC_ALL, $val, undef, 'utf-8');
+    nl_putenv("LANGUAGE=$val");
+    nl_putenv("LANG=$val");
+    nl_putenv("OUTPUT_CHARSET=utf-8");
+  },
 );
 
 requires 'compute';
@@ -45,7 +58,7 @@ App::SpreadRevolutionaryDate::MsgMaker - Role providing interface for crafting a
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -59,7 +72,7 @@ This role provides a C<locale> required attribute (defaults to C<'fr'>), which h
 
 =over
 
-=item L<spread-revolutionary-date|https://metacpan.org/pod/distribution/App-SpreadRevolutionaryDate/bin/spread-revolutionary-date>
+=item L<spread-revolutionary-date>
 
 =item L<App::SpreadRevolutionaryDate>
 
@@ -75,9 +88,19 @@ This role provides a C<locale> required attribute (defaults to C<'fr'>), which h
 
 =item L<App::SpreadRevolutionaryDate::Target::Freenode::Bot>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::RevolutionaryDate>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate>
 
-=item L<App::SpreadRevolutionaryDate::Target::MsgMaker::PromptUser>
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 
 =back
 

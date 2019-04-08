@@ -4,25 +4,22 @@ use 5.014;
 use strict;
 use warnings;
 use Carp;
+$Carp::Verbose = 1;
 use utf8;
 use Data::Dumper;
 use DDP;
 use Log::Any qw($log);
 use Scalar::Util qw(blessed);
 
-$Carp::Verbose = 1;
-
-use Term::ProgressBar;
-
-#use Progress::Any '$progress';
-#use Progress::Any::Output 'TermProgressBarColor';
-
 $| = 1;    #autoflush
 
 use constant {
     FALSE => 0,
-    TRUE  => 1
+    TRUE  => 1,
+    DEBUG => $ENV{ DEBUG } // 0,
 };
+
+use Term::ProgressBar;
 
 #-------------------------------------------------------------------------------
 # Tipos de protocolos suportados
@@ -33,12 +30,29 @@ my $supportedProtocols = {
     'LOCAL' => TRUE
 };
 
+#-------------------------------------------------------------------------------
+# Tipos de MIMI-Types suportados
+#-------------------------------------------------------------------------------
+my $supported_mimi_types = {
+    'application/x-tar-gz'         => FALSE,          # .tar.gz
+    'application/x-bzip'           => FALSE,          # .bz2
+    'application/zip'              => 'unZipFile',    # .zip
+    'application/x-rar-compressed' => FALSE,          # .rar
+    'application/x-tar'            => FALSE,          # .tar
+    'application/pdf'              => FALSE,          # .pdf
+                                                      # este não existe MIME Type, mas usem este:
+    'deltax/tar-bz2'               => FALSE,          # tar.bz2
+};
+
 BEGIN
 {
+    binmode( STDOUT, ":encoding(UTF-8)" );
+    binmode( STDERR, ":encoding(UTF-8)" );
+
     require Siffra::Base;
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION = '0.01';
+    $VERSION = '0.02';
     @ISA     = qw(Siffra::Base Exporter);
 
     #Give a hoot don't pollute, do not export more than needed by default
@@ -69,21 +83,22 @@ sub new
     my $self = $class->SUPER::new( %parameters );
 
     $self->{ config } = {
-        protocol      => undef,
-        host          => undef,
-        user          => undef,
-        password      => undef,
-        port          => undef,
-        passive       => undef,
-        identity_file => undef,
-        debug         => undef,
-        directories   => {},
+        protocol       => undef,
+        host           => undef,
+        user           => undef,
+        password       => undef,
+        port           => undef,
+        passive        => undef,
+        identity_file  => undef,
+        debug          => undef,
+        localDirectory => undef,
+        directories    => {},
     };
 
     $self->{ connection } = undef;
     $self->{ json }       = undef;
 
-    $log->info( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
+    $log->debug( "new", { progname => $0, pid => $$, perl_version => $], package => __PACKAGE__ } );
 
     $self->_initialize( %parameters );
 
@@ -94,12 +109,12 @@ sub _initialize()
 {
     my ( $self, %parameters ) = @_;
     $self->SUPER::_initialize( %parameters );
-    $log->info( "_initialize", { package => __PACKAGE__ } );
+    $log->debug( "_initialize", { package => __PACKAGE__ } );
 }
 
 sub END
 {
-    $log->info( "END", { package => __PACKAGE__ } );
+    $log->debug( "END", { package => __PACKAGE__ } );
 }
 
 #################################################### Sets
@@ -133,17 +148,47 @@ my $setPassive = sub {
     my ( $self, $value ) = @_;
     return $self->{ config }->{ passive } = $value;
 };
+my $setLocalDirectory = sub {
+    my ( $self, $value ) = @_;
+    return $self->{ config }->{ localDirectory } = ( $value // './download/' );
+};
 my $setDirectories = sub {
     my ( $self, $value ) = @_;
 
     while ( my ( $remoteDirectory, $configuration ) = each( %{ $value } ) )
     {
-        p $configuration;
+        $configuration->{ remoteDirectory } = $remoteDirectory;
+        return FALSE unless $self->addDirectory( $configuration );
     }
     return TRUE;
 };
 
 #################################################### Sets
+
+=head2 C<addDirectory()>
+=cut
+
+#-------------------------------------------------------------------------------
+# Adiciona uma configuracao para upload
+#-------------------------------------------------------------------------------
+sub addDirectory
+{
+    my ( $self, $configuration ) = @_;
+    $self->{ config }->{ directories }->{ $configuration->{ remoteDirectory } } = $configuration;
+    return TRUE;
+}
+
+=head2 C<cleanDirectories()>
+=cut
+
+#-------------------------------------------------------------------------------
+# Limpa os directories
+#-------------------------------------------------------------------------------
+sub cleanDirectories
+{
+    my ( $self ) = @_;
+    return $self->{ config }->{ directories } = {};
+}
 
 =head2 C<setConfig()>
 =cut
@@ -159,9 +204,10 @@ sub setConfig()
     $self->$setPort( $parameters{ port } );
     $self->$setDebug( $parameters{ debug } );
     $self->$setPassive( $parameters{ passive } );
+    $self->$setLocalDirectory( $parameters{ localDirectory } );
     $self->$setDirectories( $parameters{ directories } );
 
-    return $self->testConfig();
+    return $self->testConfig( %parameters );
 } ## end sub setConfig
 
 =head2 C<testConfig()>
@@ -198,6 +244,7 @@ sub connect()
         $retorno = TRUE;
     }
 
+    return $retorno;
 } ## end sub connect
 
 =head2 C<connectFTP()>
@@ -206,7 +253,52 @@ sub connect()
 sub connectFTP()
 {
     my ( $self, %parameters ) = @_;
-}
+
+    eval { require Net::FTP; };
+
+    if ( $@ )
+    {
+        $log->error( "Erro ao usar o módulo [ Net::FTP ]..." . $@ );
+        return FALSE;
+    }
+
+    my %args = (
+        Host    => $self->{ config }->{ host },
+        Port    => $self->{ config }->{ port } // 21,
+        Debug   => $self->{ config }->{ debug },
+        Passive => $self->{ config }->{ passive } // 1,
+    );
+
+    $self->{ connection } = Net::FTP->new( %args );
+
+    if ( $@ )
+    {
+        $log->error( "Erro ao conectar no FTP [ $args{Host}\:$args{Port} ] ... [ $@ ]" );
+        return FALSE;
+    }
+
+    if ( $self->{ connection } )
+    {
+        my $user     = $self->{ config }->{ user };
+        my $password = $self->{ config }->{ password };
+        if ( !$self->{ connection }->login( $user, $password ) )
+        {
+            $log->error( $self->{ connection }->message );
+            return FALSE;
+        }
+        else
+        {
+            $log->info( "Logged on [ ${user}\@$args{Host} ]..." );
+            return TRUE;
+        }
+
+    } ## end if ( $self->{ connection...})
+    else
+    {
+        $log->error( "Não foi possível criar o objeto FTP..." );
+        return FALSE;
+    }
+} ## end sub connectFTP
 
 =head2 C<connectSFTP()>
 =cut
@@ -214,76 +306,41 @@ sub connectFTP()
 sub connectSFTP()
 {
     my ( $self, %parameters ) = @_;
-    my $remotePath = '/valid/upload/';
-    my $localpath  = './download/';
+
+    eval { require Net::SFTP::Foreign; };
+
+    if ( $@ )
+    {
+        $log->error( "Erro ao usar o módulo [ Net::SFTP::Foreign ]..." . $@ );
+        return FALSE;
+    }
 
     my %args = (
-        user => 'valid',
-        more => [ -o => 'StrictHostKeyChecking no' ],
+        host     => $self->{ config }->{ host },
+        user     => $self->{ config }->{ user },
+        password => $self->{ config }->{ password },
+        port     => $self->{ config }->{ port } // 22,
+        autodie  => 0,
+        more     => [ -o => 'StrictHostKeyChecking no' ],
     );
 
+    $args{ key_path } = [ $self->{ config }->{ identity_file } ] if $self->{ config }->{ identity_file };
     push @{ $args{ more } }, '-v' if ( $self->{ config }->{ debug } );
 
-    $self->{ connection } = eval {
-        require Net::SFTP::Foreign;
-        Net::SFTP::Foreign->new( $self->{ config }->{ host }, %args );
-    };
+    $self->{ connection } = eval { Net::SFTP::Foreign->new( %args ); };
 
-    if ( $self->{ connection }->error )
+    if ( $@ )
+    {
+        $log->error( $@ );
+        return FALSE;
+    }
+    elsif ( $self->{ connection }->error )
     {
         $log->error( $self->{ connection }->error );
+        return FALSE;
     }
-    else
-    {
-        my $ls = $self->{ connection }->ls(
-            $remotePath,
-            wanted => sub {
-                my $entry = $_[ 1 ];
-                return ( $entry->{ a }->{ size } > 0 and $entry->{ filename } =~ /\.TXT$/i );
-            }
-        );
 
-        my $callback = sub {
-            my ( $sftp, $data, $offset, $size, $progress ) = @_;
-            $offset = $size if ( $offset >= $size );
-            $progress->update( $offset );
-        };
-
-        my $contador;
-        foreach my $file ( @{ $ls } )
-        {
-            $contador++;
-
-            my $progress = Term::ProgressBar->new(
-                {
-                    name   => $file->{ filename } . " ( $file->{ a }->{ size } ) ",
-                    count  => $file->{ a }->{ size },
-                    ETA    => 'linear',
-                    remove => 1,
-                }
-            );
-            $progress->minor( 0 );
-
-            my %options = (
-                callback => sub { &$callback( @_, $progress ); },
-                mkpath   => 1
-            );
-            $self->{ connection }->get( $remotePath . $file->{ filename }, $localpath . $file->{ filename }, %options );
-
-            if ( $self->{ connection }->error )
-            {
-                $log->error( $self->{ connection }->error );
-            }
-            else
-            {
-                $log->info( "Download do arquivo [ $file->{ filename } ] feito com sucesso..." );
-            }
-
-            last if $contador % 3 == 0;
-        } ## end foreach my $file ( @{ $ls }...)
-
-    } ## end else [ if ( $self->{ connection...})]
-
+    return TRUE;
 } ## end sub connectSFTP
 
 =head2 C<connectLocal()>
@@ -294,16 +351,281 @@ sub connectLocal()
     my ( $self, %parameters ) = @_;
 }
 
+=head2 C<getActiveDirectory()>
+=cut
+
+#-------------------------------------------------------------------------------
+# Pega o diretorio atual
+#-------------------------------------------------------------------------------
+sub getActiveDirectory()
+{
+    my ( $self ) = @_;
+
+    $self->{ config }->{ activeDirectory } = $self->{ config }->{ activeDirectory } ? $self->{ config }->{ activeDirectory } : '/';
+
+    return $self->{ config }->{ activeDirectory };
+} ## end sub getActiveDirectory
+
+=head2 C<setActiveDirectory()>
+=cut
+
+#-------------------------------------------------------------------------------
+# Pega o diretorio atual
+#-------------------------------------------------------------------------------
+sub setActiveDirectory()
+{
+    my ( $self, $directory ) = @_;
+
+    return $self->{ config }->{ activeDirectory } = $directory;
+}
+
+=head2 C<getFiles()>
+=cut
+
+sub getFiles
+{
+    my ( $self, %parameters ) = @_;
+
+    return FALSE unless ( $self->testConfig() );
+
+    my $getFilesFunctions = {
+        'FTP'   => 'getFilesFTP',
+        'SFTP'  => 'getFilesSFTP',
+        'LOCAL' => 'getFilesLOCAL'
+    };
+
+    my $protocol = uc $self->{ config }->{ protocol };
+    my $subName;
+
+    if ( !$getFilesFunctions->{ $protocol } )
+    {
+        $log->error( "SUB getFiles para o protocolo [ $protocol ] não existe." );
+        return FALSE;
+    }
+    else
+    {
+        $subName = $getFilesFunctions->{ $protocol };
+    }
+
+    my $retorno = {};
+
+    while ( my ( $directory, $directoryConfiguration ) = each( %{ $self->{ config }->{ directories } } ) )
+    {
+        $self->setActiveDirectory( $directory );
+
+        $retorno->{ $directory } = $self->$subName( %parameters );
+
+        if ( ( ref $retorno->{ $directory } eq 'HASH' ) && ( $retorno->{ $directory }->{ error } == 0 ) && ( $directoryConfiguration->{ 'unpack' } ) )
+        {
+            foreach my $file ( @{ $retorno->{ $directory }->{ files } } )
+            {
+                if ( ref $file eq 'HASH' && $file->{ error } == 0 )
+                {
+                    $file->{ 'unpack' } = $self->unPackFile( conf => $directoryConfiguration, file => $file );
+                }
+
+            } ## end foreach my $file ( @{ $retorno...})
+
+        } ## end if ( ( ref $retorno->{...}))
+
+    } ## end while ( my ( $directory, ...))
+
+    return $retorno;
+} ## end sub getFiles
+
+=head2 C<getFilesFTP()>
+=cut
+
+sub getFilesFTP()
+{
+    my ( $self, %parameters ) = @_;
+
+    return TRUE;
+}
+
+=head2 C<getFilesSFTP()>
+=cut
+
+sub getFilesSFTP()
+{
+    my ( $self, %parameters ) = @_;
+
+    my $retorno = {
+        error              => 0,
+        message            => 'ok',
+        downloadedFiles    => [],
+        notDownloadedFiles => []
+    };
+
+    my $remoteDirectory = $self->getActiveDirectory();
+    my $configuration   = $self->{ config }->{ directories }->{ $remoteDirectory };
+    my $localDirectory  = $self->{ config }->{ localDirectory };                      #'./download/';
+
+    $log->info( "Entrando em [ getFilesSFTP ] para o diretório [ $remoteDirectory ]..." );
+
+    my $ls = $self->{ connection }->ls(
+        $remoteDirectory,
+        wanted => sub {
+            my $entry = $_[ 1 ];
+            return ( $entry->{ a }->{ size } > 0 and ( $entry->{ filename } =~ qr/$configuration->{ fileNameRule }/i ) and ref $configuration->{ downloadedFiles } eq 'HASH' and !$configuration->{ downloadedFiles }->{ $entry->{ filename } } );
+        }
+    );
+
+    my $callback = sub {
+        my ( $sftp, $data, $offset, $size, $progress ) = @_;
+        $offset = $size if ( $offset >= $size );
+        $progress->update( $offset );
+    };
+
+    foreach my $remoteFile ( @{ $ls } )
+    {
+        my $progress = Term::ProgressBar->new(
+            {
+                name   => $remoteFile->{ filename } . " ( $remoteFile->{ a }->{ size } ) ",
+                count  => $remoteFile->{ a }->{ size },
+                ETA    => 'linear',
+                remove => 1,
+            }
+        );
+        $progress->minor( 0 );
+
+        my %options = ( callback => sub { &$callback( @_, $progress ); }, mkpath => 1 );
+        $self->{ connection }->get( $remoteDirectory . $remoteFile->{ filename }, $localDirectory . $remoteFile->{ filename }, %options );
+
+        my $downloadedFile = {
+            error    => FALSE,
+            message  => undef,
+            filename => $remoteFile->{ filename },
+            size     => $remoteFile->{ a }->{ size },
+            md5sum   => undef,
+            filePath => $localDirectory . $remoteFile->{ filename },
+        };
+
+        if ( $self->{ connection }->error )
+        {
+            $log->error( $self->{ connection }->error );
+            $downloadedFile->{ error }   = TRUE;
+            $downloadedFile->{ message } = $self->{ connection }->error;
+        } ## end if ( $self->{ connection...})
+        else
+        {
+            $downloadedFile->{ md5sum } = $self->getFileMD5( file => $localDirectory . $remoteFile->{ filename } );
+            $downloadedFile->{ message } = 'Ok';
+            $log->info( "Download do arquivo [ $downloadedFile->{ filename } ] feito com sucesso..." );
+        } ## end else [ if ( $self->{ connection...})]
+
+        push( @{ $retorno->{ downloadedFiles } }, $downloadedFile );
+    } ## end foreach my $remoteFile ( @{...})
+
+    return $retorno;
+} ## end sub getFilesSFTP
+
+=head2 C<getFilesLOCAL()>
+=cut
+
+sub getFilesLOCAL()
+{
+    my ( $self, %parameters ) = @_;
+    return TRUE;
+}
+
+=head2 C<getFileMD5()>
+=cut
+
+#-------------------------------------------------------------------------------
+# Retorna o MD5 do arquivo
+# Parametro 1 - Caminho e nome do arquivo a ser calculado
+# Retorna o MD5 do arquivo informado
+#-------------------------------------------------------------------------------
+sub getFileMD5()
+{
+    my ( $self, %parameters ) = @_;
+    my $file = $parameters{ file };
+    my $retorno;
+
+    return FALSE unless ( -e $file );
+
+    require Digest::MD5;
+
+    open( my $fh, '<', $file ) or croak( "Can't open '$file': $!" );
+    binmode( $fh );
+    $retorno = Digest::MD5->new->addfile( $fh )->hexdigest;
+    close( $fh );
+
+    return $retorno;
+} ## end sub getFileMD5
+
+#-------------------------------------------------------------------------------
+# Descompacta arquivos
+#-------------------------------------------------------------------------------
+
+=head2 C<unPackFile()>
+=cut
+
+sub unPackFile()
+{
+    my ( $self, %parameters ) = @_;
+    my $mmt = $parameters{ conf }{ 'MIMI-Type' };
+
+    my $files = [];
+    if ( !$supported_mimi_types->{ $mmt } == FALSE )
+    {
+        my $unPackParam = {
+            fileName => $parameters{ file }{ file_path },
+            out_path => $parameters{ conf }{ unpackDirectory }
+        };
+
+        my $subname = $supported_mimi_types->{ $mmt };
+        $files = $self->$subname( $unPackParam );
+
+    } ## end if ( !$supported_mimi_types...)
+    else
+    {
+        return { message => "MIMI-Type $mmt não suportado", error => 1 };
+    }
+
+    return { error => 0, files => $files };
+} ## end sub unPackFile
+
+#-------------------------------------------------------------------------------
+# Descompacta arquivos ZIP
+#-------------------------------------------------------------------------------
+
+=head2 C<unZipFile()>
+=cut
+
+sub unZipFile()
+{
+
+    my ( $self, $param ) = @_;
+
+    my $cmd   = "unzip -o -b \"$param->{fileName}\" -d \"$param->{out_path}\"";
+    my @files = `$cmd`;
+
+    my $unpack = [];
+
+    foreach ( @files )
+    {
+        next unless ( $_ =~ /inflating:\s(.+)$/ );
+        my $fileName = $1;
+        $fileName =~ s/(^\s*)|(\s*$)//g;
+        push( @{ $unpack }, $fileName );
+
+    } ## end foreach ( @files )
+
+    return $unpack;
+} ## end sub unZipFile
+
 sub DESTROY
 {
     my ( $self, %parameters ) = @_;
-    $log->info( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
+    $log->debug( 'DESTROY', { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE} } );
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
 
     if ( blessed( $self ) && $self->isa( __PACKAGE__ ) )
     {
         $self->SUPER::DESTROY( %parameters );
-        $log->alert( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
+        $log->debug( "DESTROY", { package => __PACKAGE__, GLOBAL_PHASE => ${^GLOBAL_PHASE}, blessed => 1 } );
     }
     else
     {

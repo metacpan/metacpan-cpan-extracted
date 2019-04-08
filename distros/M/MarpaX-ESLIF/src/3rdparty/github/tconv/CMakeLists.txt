@@ -2,7 +2,13 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0.0 FATAL_ERROR)
 IF (NOT MYPACKAGEBOOTSTRAP_DONE)
   INCLUDE ("3rdparty/github/cmake-utils/cmake/MyPackageBootstrap.cmake")
 ENDIF ()
-MYPACKAGESTART (tconv 1 0 51)
+MYPACKAGESTART (tconv 1 0 58)
+
+####################
+# Specific options #
+####################
+OPTION(TCONV_USE_ICU   "Enable ICU plugin if found" ON)
+OPTION(TCONV_USE_ICONV "Enable ICONV plugin plugin" ON)
 
 ###########
 # Library #
@@ -10,43 +16,44 @@ MYPACKAGESTART (tconv 1 0 51)
 SET (libtconv_src src/tconv.c src/tconv/charset/tconv_charset_cchardet.c)
 SET (libtconv_inc)
 
-# ------------------------------------
-# iconv sources: libiconv-1.15 builtin
-# ------------------------------------
-MESSAGE (STATUS "Unpacking libiconv")
-EXECUTE_PROCESS(
-  COMMAND "${CMAKE_COMMAND}" -E tar xzf ${PROJECT_SOURCE_DIR}/3rdparty/tar/libiconv-1.15.tar.gz
-  WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
-  )
-#
-# iconv uses config.h, we are using tconv_config.h, so there is no clash luckily
-#
-FILE (WRITE
-  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/config.h
+IF (TCONV_USE_ICONV)
+  # ------------------------------------
+  # iconv sources: libiconv-1.15 builtin
+  # ------------------------------------
+  MESSAGE (STATUS "Unpacking libiconv")
+  EXECUTE_PROCESS(
+    COMMAND "${CMAKE_COMMAND}" -E tar xzf ${PROJECT_SOURCE_DIR}/3rdparty/tar/libiconv-1.15.tar.gz
+    WORKING_DIRECTORY "${3RDPARTY_OUTPUT_PATH}"
+    )
+  #
+  # iconv uses config.h, we are using tconv_config.h, so there is no clash luckily
+  #
+  FILE (WRITE
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/config.h
 "
 /* Generated file */
 /* localcharset.c will play itself with WIN32_LEAN_AND_MEAN... */
 #undef WIN32_LEAN_AND_MEAN
 "
   )
-FUNCTION (CREATE_ICONV_H src dst)
-  SET (DLL_VARIABLE "") # Just to be sure
-  SET (EILSEQ 134679) # Fallback value if any
-  SET (ICONV_CONST "")
-  SET (USE_MBSTATE_T "0")
-  SET (HAVE_WCHAR_T "0")
-  MESSAGE (STATUS "Configuring ${dst}")
-  CONFIGURE_FILE (${src} ${dst})
-ENDFUNCTION ()
-FUNCTION (CREATE_LOCALCHARSET_H src dst)
-  MESSAGE (STATUS "Configuring ${dst}")
-  CONFIGURE_FILE (${src} ${dst})
-ENDFUNCTION ()
+  FUNCTION (CREATE_ICONV_H src dst)
+    SET (DLL_VARIABLE "") # Just to be sure
+    SET (EILSEQ 134679) # Fallback value if any
+    SET (ICONV_CONST "")
+    SET (USE_MBSTATE_T "0")
+    SET (HAVE_WCHAR_T "0")
+    MESSAGE (STATUS "Configuring ${dst}")
+    CONFIGURE_FILE (${src} ${dst})
+  ENDFUNCTION ()
+  FUNCTION (CREATE_LOCALCHARSET_H src dst)
+    MESSAGE (STATUS "Configuring ${dst}")
+    CONFIGURE_FILE (${src} ${dst})
+  ENDFUNCTION ()
 
-CREATE_ICONV_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h @ONLY)
-CREATE_LOCALCHARSET_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h @ONLY)
-INCLUDE (CheckCSourceCompiles)
-CHECK_C_SOURCE_COMPILES("
+  CREATE_ICONV_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include/iconv.h @ONLY)
+  CREATE_LOCALCHARSET_H(${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h.in ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include/localcharset.h @ONLY)
+  INCLUDE (CheckCSourceCompiles)
+  CHECK_C_SOURCE_COMPILES("
   #include <stdlib.h>
   #include <langinfo.h>
   int main(int ac, char **av)
@@ -54,60 +61,91 @@ CHECK_C_SOURCE_COMPILES("
     char *cs = nl_langinfo(CODESET);
     exit(0);
   }"
-  HAVE_LANGINFO_CODESET)
+    HAVE_LANGINFO_CODESET)
 
-INCLUDE ( CheckSymbolExists )
-CHECK_SYMBOL_EXISTS ( getc_unlocked "stdio.h" HAVE_DECL_GETC_UNLOCKED )
-SET (ENABLE_EXTRA TRUE)
+  INCLUDE ( CheckSymbolExists )
+  CHECK_SYMBOL_EXISTS ( getc_unlocked "stdio.h" HAVE_DECL_GETC_UNLOCKED )
+  SET (ENABLE_EXTRA TRUE)
 
-INCLUDE (TestBigEndian)
-TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
-IF (NOT IS_BIG_ENDIAN)
-  SET (WORDS_LITTLEENDIAN TRUE)
-ENDIF ()
+  INCLUDE (TestBigEndian)
+  TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+  IF (NOT IS_BIG_ENDIAN)
+    SET (WORDS_LITTLEENDIAN TRUE)
+  ENDIF ()
 
-LIST (APPEND libtconv_iconv_src
-  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/lib/localcharset.c
-  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/relocatable.c
-  ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/iconv.c
-  )
-FOREACH (_iconv_src ${libtconv_iconv_src})
-  SET_PROPERTY(
-    SOURCE ${_iconv_src}
-    PROPERTY COMPILE_FLAGS
-    " -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include"
+  LIST (APPEND libtconv_iconv_src
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/lib/localcharset.c
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/relocatable.c
+    ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/lib/iconv.c
     )
-  SET_PROPERTY(
-    SOURCE ${_iconv_src}
-    APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    ICONV_CONST=
-    )
-  SET_PROPERTY(
-    SOURCE ${_iconv_src}
-    APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    LIBDIR=""
-    )
-  SET_PROPERTY(
-    SOURCE ${_iconv_src}
-    APPEND
-    PROPERTY COMPILE_DEFINITIONS
-    HAVE_WORKING_O_NOFOLLOW=0
-    )
-  FOREACH (_have HAVE_LANGINFO_CODESET HAVE_DECL_GETC_UNLOCKED ENABLE_EXTRA WORDS_LITTLEENDIAN)
-    IF (${${_have}})
+  FOREACH (_iconv_src ${libtconv_iconv_src})
+    SET_PROPERTY(
+      SOURCE ${_iconv_src}
+      PROPERTY COMPILE_FLAGS
+      " -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include -I${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/libcharset/include"
+      )
+    #
+    # Remove the const thingy
+    #
+    SET_PROPERTY(
+      SOURCE ${_iconv_src}
+      APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      ICONV_CONST=
+      )
+    SET_PROPERTY(
+      SOURCE ${_iconv_src}
+      APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      LIBDIR=""
+      )
+    SET_PROPERTY(
+      SOURCE ${_iconv_src}
+      APPEND
+      PROPERTY COMPILE_DEFINITIONS
+      HAVE_WORKING_O_NOFOLLOW=0
+      )
+    IF (WORDS_LITTLEENDIAN)
       SET_PROPERTY(
-	SOURCE ${_iconv_src}
-	APPEND
-	PROPERTY COMPILE_DEFINITIONS
-	${_have}=1
-	)
+        SOURCE ${_iconv_src}
+        APPEND
+        PROPERTY COMPILE_DEFINITIONS
+        WORDS_LITTLEENDIAN=1
+        )
     ENDIF ()
+    IF (HAVE_DECL_GETC_UNLOCKED)
+      SET_PROPERTY(
+        SOURCE ${_iconv_src}
+        APPEND
+        PROPERTY COMPILE_DEFINITIONS
+        HAVE_DECL_GETC_UNLOCKED=1
+        )
+    ENDIF ()
+    IF (HAVE_LANGINFO_CODESET)
+      SET_PROPERTY(
+        SOURCE ${_iconv_src}
+        APPEND
+        PROPERTY COMPILE_DEFINITIONS
+        HAVE_LANGINFO_CODESET=1
+        )
+    ENDIF ()
+    #
+    # Flags that are always turned on
+    #
+    FOREACH (_have ENABLE_EXTRA)
+      IF (${${_have}})
+        SET_PROPERTY(
+	  SOURCE ${_iconv_src}
+	  APPEND
+	  PROPERTY COMPILE_DEFINITIONS
+	  ${_have}=1
+	  )
+      ENDIF ()
+    ENDFOREACH ()
   ENDFOREACH ()
-ENDFOREACH ()
 
-LIST (APPEND libtconv_src ${libtconv_iconv_src})
+  LIST (APPEND libtconv_src ${libtconv_iconv_src})
+ENDIF ()
 
 # ----------------
 # ccharset sources
@@ -182,7 +220,12 @@ ENDIF ()
 # ---
 # ICU
 # ---
-FIND_PACKAGE (ICU)
+IF (NOT TCONV_USE_ICU)
+  MESSAGE (STATUS "ICU plugin is disabled")
+  SET (ICU_FOUND FALSE)
+ELSE ()
+  FIND_PACKAGE (ICU)
+ENDIF ()
 IF (ICU_FOUND)
   SET (TCONV_HAVE_ICU 1)
   SET (icu_src src/tconv/charset/tconv_charset_ICU.c src/tconv/convert/tconv_convert_ICU.c)
@@ -199,13 +242,20 @@ ENDIF ()
 # -----
 # ICONV
 # -----
-SET (ICONV_FOUND TRUE)
-SET (TCONV_HAVE_ICONV 1)
-SET (ICONV_SECOND_ARGUMENT_IS_CONST FALSE)
-SET (ICONV_CAN_TRANSLIT TRUE)
-SET (ICONV_CAN_IGNORE TRUE)
-LIST (APPEND libtconv_src src/tconv/convert/tconv_convert_iconv.c)
-LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include)
+IF (NOT TCONV_USE_ICONV)
+  MESSAGE (STATUS "ICONV plugin is disabled")
+  SET (ICONV_FOUND FALSE)
+ELSE ()
+  SET (ICONV_FOUND TRUE)
+ENDIF ()
+IF (ICONV_FOUND)
+  SET (TCONV_HAVE_ICONV 1)
+  SET (ICONV_SECOND_ARGUMENT_IS_CONST FALSE)
+  SET (ICONV_CAN_TRANSLIT TRUE)
+  SET (ICONV_CAN_IGNORE TRUE)
+  LIST (APPEND libtconv_src src/tconv/convert/tconv_convert_iconv.c)
+  LIST (APPEND libtconv_inc ${3RDPARTY_OUTPUT_PATH}/libiconv-1.15/include)
+ENDIF ()
 
 MYPACKAGELIBRARY(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/tconv_config.h.in
@@ -215,7 +265,7 @@ MYPACKAGELIBRARY(
 LIST (LENGTH libtconv_inc libtconv_inc_length)
 FOREACH (_target tconv tconv_static)
   IF (${libtconv_inc_length} GREATER 0)
-    TARGET_INCLUDE_DIRECTORIES(${_target} PUBLIC ${libtconv_inc})
+    TARGET_INCLUDE_DIRECTORIES(${_target} PRIVATE ${libtconv_inc})
   ENDIF ()
   IF (ICU_FOUND)
     TARGET_LINK_LIBRARIES(${_target} PUBLIC ${ICU_LINK_FLAGS})
@@ -227,11 +277,6 @@ FOREACH (_target tconv tconv_static)
     TARGET_LINK_LIBRARIES(${_target} PUBLIC "psapi")
   ENDIF ()
 ENDFOREACH ()
-
-################
-# Dependencies #
-################
-MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS)
 
 ###############
 # Executables #
@@ -273,6 +318,11 @@ ENDFOREACH ()
 #########
 MYPACKAGECHECK(tconvExe -t UTF-16 -o tconv.tconv-UTF-16.c "${PROJECT_SOURCE_DIR}/src/tconv.c")
 MYPACKAGECHECK(tconvExample)
+
+################
+# Dependencies #
+################
+MYPACKAGEDEPENDENCY (genericLogger "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/genericLogger" LIBS STATIC LOCAL)
 
 ###########
 # Install #

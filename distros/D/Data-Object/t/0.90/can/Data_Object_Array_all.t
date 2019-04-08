@@ -15,15 +15,19 @@ all
 
   # given [2..5]
 
-  $array->all('$value > 1'); # 1; true
-  $array->all('$value > 3'); # 0; false|
+  $array->all(fun ($value, @args) {
+    $value > 1; # 1, true
+  });
+
+  $array->all(fun ($value, @args) {
+    $value > 3; # 0; false
+  });
 
 =description
 
 The all method returns true if all of the elements in the array meet the
-criteria set by the operand and rvalue. This method supports codification, i.e,
-takes an argument which can be a codifiable string, a code reference, or a code
-data type object. This method returns a L<Data::Object::Number> object.
+criteria set by the operand and rvalue. This method returns a
+L<Data::Object::Number> object.
 
 =signature
 

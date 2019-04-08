@@ -10,6 +10,8 @@ use overload (
   fallback => 1
 );
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub BUILD {

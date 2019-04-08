@@ -1,5 +1,8 @@
 Revision history for Calendar::Saka
 
+1.38  Mon Apr 08 15:10:00 2019
+      - Updated dependency on Calendar::Plugin::Renderer v0.14.
+
 1.37  Fri Mar 29 16:40:00 2019
       - Updated dependency on Date::Saka::Simple v0.22.
 

@@ -95,64 +95,6 @@ _float($n->get_element(1,2), 6, "New: Element correct at 1,2");
 
 
 
-#save matrix
-my $s = Math::Lapack::Matrix->new( [ [1, 2, 3], [4, 5, 6] ] );
-isa_ok $s, ['Math::Lapack::Matrix'], "New returned a S matrix";
-
-$s->save("test.txt");
-
-my $read = Math::Lapack::Matrix->read_matrix("test.txt");
-
-
-isa_ok $read, ['Math::Lapack::Matrix'], "New returned a Read matrix";
-
-_float($read->get_element(1,0), 4, "Element correct at 1,0");
-
-#transpose
-my $t = Math::Lapack::Matrix->new( [ [2], [4] ] );
- 
-isa_ok $t, ['Math::Lapack::Matrix'], "New returned a t matrix";
-
-my $tr = Math::Lapack::Matrix::eval_transpose($t);
-
-isa_ok $tr, ['Math::Lapack::Matrix'], "New returned a tr matrix";
-
-is($tr->rows, 1, "get right number of rows");
-
-is($tr->columns, 2, "get right number of columns");
-
-_float($tr->get_element(0,0), 2, "Element correct at 0,0");
-_float($tr->get_element(0,1), 4, "Element correct at 0,1");
-my $t_aux = Math::Lapack::Matrix->new( [ [0, 0, 0, 1], [1, 0, 0, 0], [0, 1, 0, 0] ]);
-my $t_1 = Math::Lapack::Matrix::eval_transpose($t_aux);
-is($t_1->rows, 4, "get right number of rows"); 
-is($t_1->columns, 3, "get right number of cols"); 
-_float($t_1->get_element(0,0), 0, "Element correct at 0,0");
-_float($t_1->get_element(0,1), 1, "Element correct at 0,1");
-_float($t_1->get_element(0,2), 0, "Element correct at 0,2");
-_float($t_1->get_element(1,0), 0, "Element correct at 1,0");
-_float($t_1->get_element(1,1), 0, "Element correct at 1,1");
-_float($t_1->get_element(1,2), 1, "Element correct at 1,2");
-_float($t_1->get_element(2,0), 0, "Element correct at 2,0");
-_float($t_1->get_element(2,1), 0, "Element correct at 2,1");
-_float($t_1->get_element(2,2), 0, "Element correct at 2,2");
-_float($t_1->get_element(3,0), 1, "Element correct at 3,0");
-_float($t_1->get_element(3,1), 0, "Element correct at 3,1");
-_float($t_1->get_element(3,2), 0, "Element correct at 3,2");
-
-#inverse
-my $i = Math::Lapack::Matrix->new( [ [1, 2], [3, 4]] );
-isa_ok $i, ['Math::Lapack::Matrix'], "New returned a i matrix";
-my $i_t = Math::Lapack::Matrix::eval_transpose($i);
-my $inv = $i_t->inverse();
-my $inv_t = Math::Lapack::Matrix::eval_transpose($inv);
-
-_float($inv_t->get_element(0,0), -2, "Element correct at 0,0");
-_float($inv_t->get_element(0,1), 1, "Element correct at 0,1");
-_float($inv_t->get_element(1,0), 1.5, "Element correct at 1,0");
-_float($inv_t->get_element(1,1), -0.5, "Element correct at 1,1");
-
-
 done_testing;
 
 

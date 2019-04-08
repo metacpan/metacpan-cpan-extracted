@@ -1,7 +1,7 @@
 package Perinci::Sub::To::Text;
 
-our $DATE = '2018-10-12'; # DATE
-our $VERSION = '0.864'; # VERSION
+our $DATE = '2019-04-08'; # DATE
+our $VERSION = '0.865'; # VERSION
 
 use 5.010001;
 use Log::ger;
@@ -106,7 +106,7 @@ Perinci::Sub::To::Text - Generate text documentation from Rinci function metadat
 
 =head1 VERSION
 
-This document describes version 0.864 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2018-10-12.
+This document describes version 0.865 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2019-04-08.
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

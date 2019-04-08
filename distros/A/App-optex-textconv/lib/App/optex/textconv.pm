@@ -4,17 +4,17 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 =encoding utf-8
 
 =head1 NAME
 
-textconv - module to replace document file by its text contents
+textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,7 @@ Next command simply produces the same result.
 
 =head1 SEE ALSO
 
+L<https://github.com/kaz-utashiro/optex>
 L<https://github.com/kaz-utashiro/optex-textconv>
 
 =head1 LICENSE
@@ -60,9 +61,7 @@ Kazumasa Utashiro
 use utf8;
 use Encode;
 use Data::Dumper;
-
-use Exporter qw(import);
-our @EXPORT = qw(exec_command);
+use List::Util qw(first);
 
 my($mod, $argv);
 sub initialize {
@@ -84,8 +83,6 @@ my @converter = (
     [ qr/\.jpe?g$/i  => "exif \"%s\"" ],
     [ qr[^https?://] => "w3m -dump \"%s\"" ],
     );
-
-use List::Util qw(first);
 
 sub converter {
     my $filename = shift;

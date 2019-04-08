@@ -2,8 +2,8 @@ NAME
     App::texttable - Generate text table using Text::Table::Any
 
 VERSION
-    This document describes version 0.030 of App::texttable (from Perl
-    distribution App-texttable), released on 2019-01-11.
+    This document describes version 0.031 of App::texttable (from Perl
+    distribution App-texttable), released on 2019-02-24.
 
 DESCRIPTION
 FUNCTIONS

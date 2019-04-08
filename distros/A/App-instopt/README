@@ -2,8 +2,8 @@ NAME
     App::instopt - Download and install software
 
 VERSION
-    This document describes version 0.007 of App::instopt (from Perl
-    distribution App-instopt), released on 2019-01-13.
+    This document describes version 0.008 of App::instopt (from Perl
+    distribution App-instopt), released on 2019-04-05.
 
 SYNOPSIS
     See instopt script.
@@ -212,6 +212,8 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   arch => *software::arch*
 
     *   download_dir => *dirname*
 

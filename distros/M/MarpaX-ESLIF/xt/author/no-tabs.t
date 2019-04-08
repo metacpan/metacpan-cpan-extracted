@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'lib/MarpaX/ESLIF.pm',
     'lib/MarpaX/ESLIF/BNF.pod',
+    'lib/MarpaX/ESLIF/Bindings.pod',
     'lib/MarpaX/ESLIF/Event/Type.pm',
     'lib/MarpaX/ESLIF/Grammar.pm',
     'lib/MarpaX/ESLIF/Grammar/Properties.pm',
@@ -20,6 +21,7 @@ my @files = (
     'lib/MarpaX/ESLIF/Recognizer.pod',
     'lib/MarpaX/ESLIF/Recognizer/Interface.pod',
     'lib/MarpaX/ESLIF/Rule/PropertyBitSet.pm',
+    'lib/MarpaX/ESLIF/String.pm',
     'lib/MarpaX/ESLIF/Symbol/PropertyBitSet.pm',
     'lib/MarpaX/ESLIF/Symbol/Type.pm',
     'lib/MarpaX/ESLIF/Tutorial/Calculator.pod',
@@ -30,6 +32,8 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/advent.t',
+    't/import_export.t',
+    't/json.t',
     't/jsonWithSharedStream.t',
     't/test.t',
     't/thread.t'

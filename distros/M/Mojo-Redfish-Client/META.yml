@@ -15,14 +15,14 @@ name: Mojo-Redfish-Client
 provides:
   Mojo::Redfish::Client:
     file: lib/Mojo/Redfish/Client.pm
-    version: '0.02'
+    version: '0.03'
   Mojo::Redfish::Client::Result:
     file: lib/Mojo/Redfish/Client/Result.pm
 requires:
-  Mojolicious: '8.03'
+  Mojolicious: '8.13'
 resources:
   bugtracker: http://github.com/jberger/Mojo-Redfish-Client/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-Redfish-Client
-version: '0.02'
+version: '0.03'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

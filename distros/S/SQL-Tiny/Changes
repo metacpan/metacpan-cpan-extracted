@@ -1,5 +1,10 @@
 Revision history for Perl module SQL::Tiny
 
+0.04 2019-04-06 22:32:46 CDT
+
+    - Added ability to pass SQL functions.
+
+
 0.02 2019-03-13 00:40:14 CST
 
     - Added 'group_by' capability to sql_select.

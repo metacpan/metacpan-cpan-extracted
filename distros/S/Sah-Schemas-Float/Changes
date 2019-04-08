@@ -1,3 +1,8 @@
+0.003   2019-04-08 (PERLANCAR)
+
+	- Add schemas: ufloat, posfloat, negfloat.
+
+
 0.002   2018-06-04 (PERLANCAR)
 
 	- Update to Data::Sah::Coerce 0.025 (coerce rule module metadata

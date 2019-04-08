@@ -34,7 +34,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Calendar::Plugin::Renderer" : "0.12",
+            "Calendar::Plugin::Renderer" : "0.14",
             "Date::Persian::Simple" : "0.21",
             "Moo" : "2.000000",
             "namespace::autoclean" : "0.28",
@@ -45,7 +45,7 @@
    "provides" : {
       "Calendar::Persian" : {
          "file" : "lib/Calendar/Persian.pm",
-         "version" : "0.38"
+         "version" : "0.39"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "web" : "https://github.com/manwar/Calendar-Persian"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

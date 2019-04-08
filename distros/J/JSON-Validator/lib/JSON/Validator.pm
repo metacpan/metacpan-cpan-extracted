@@ -24,7 +24,7 @@ use constant REPORT            => $ENV{JSON_VALIDATOR_REPORT} // DEBUG >= 2;
 use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 
-our $VERSION = '3.07';
+our $VERSION = '3.08';
 our @EXPORT_OK = qw(joi validate_json);
 
 # $YAML_LOADER should be considered internal
@@ -37,6 +37,7 @@ sub D {
   Data::Dumper->new([@_])->Sortkeys(1)->Indent(0)->Maxdepth(2)->Pair(':')
     ->Useqq(1)->Terse(1)->Dump;
 }
+
 sub E { JSON::Validator::Error->new(@_) }
 
 sub S {
@@ -128,12 +129,21 @@ sub bundle {
 
 sub coerce {
   my $self = shift;
-  return $self->{coerce} ||= {} unless @_;
-  $self->{coerce}
-    = $_[0] eq '1' ? {booleans => 1, numbers => 1, strings => 1}
-    : ref $_[0]    ? {%{$_[0]}}
-    :                {@_};
-  $self;
+  return $self->{coerce} ||= {} unless defined(my $what = shift);
+
+  if ($what eq '1') {
+    Mojo::Util::deprecated('coerce(1) will be deprecated.');
+    $what = {booleans => 1, numbers => 1, strings => 1};
+  }
+
+  state $short = {bool => 'booleans', def => 'defaults', num => 'numbers',
+    str => 'strings'};
+
+  $what = {map { ($_ => 1) } split /,/, $what} unless ref $what;
+  $self->{coerce} = {};
+  $self->{coerce}{($short->{$_} || $_)} = $what->{$_} for keys %$what;
+
+  return $self;
 }
 
 sub get {
@@ -159,6 +169,12 @@ sub load_and_validate_schema {
     if @errors;
   $self->{schema} = Mojo::JSON::Pointer->new($spec);
   $self;
+}
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  $self->coerce($self->{coerce}) if defined $self->{coerce};
+  return $self;
 }
 
 sub schema {
@@ -318,6 +334,7 @@ sub _load_schema_from_text {
   die "[JSON::Validator] YAML::XS 0.67 is missing or could not be loaded."
     unless $YAML_LOADER;
 
+  no warnings 'once';
   local $YAML::XS::Boolean = 'JSON::PP';
   return $visit->($YAML_LOADER->($$text));
 }
@@ -376,13 +393,15 @@ sub _register_schema {
 
 sub _report {
   my $table = Mojo::Util::tablify($_[0]->{report});
-  $table =~ s!^(\W*)(N?OK|<<<)(.*)!{
-    my ($x, $y, $z) = ($1, $2, $3);
-    my $c = $y eq 'OK' ? 'green' : $y eq '<<<' ? 'blue' : 'magenta';
-    $c = "$c bold" if $z =~ /\s\w+Of\s/;
-    Term::ANSIColor::colored([$c], "$x$y$z")
-  }!gme if COLORS;
+  $table =~ s!^(\W*)(N?OK|<<<)(.*)!{_report_colored()}!gme;
   warn "---\n$table";
+}
+
+sub _report_colored {
+  my ($x, $y, $z) = ($1, $2, $3);
+  my $c = $y eq 'OK' ? 'green' : $y eq '<<<' ? 'blue' : 'magenta';
+  $c = "$c bold" if $z =~ /\s\w+Of\s/;
+  Term::ANSIColor::colored([$c], "$x$y$z");
 }
 
 sub _report_errors {
@@ -883,9 +902,13 @@ sub _validate_type_object {
       : $self->_validate($data, $path, $schema->{then} // {});
   }
 
+  my $coerce_defaults = $self->{coerce}{defaults};
   while (my ($k, $r) = each %{$schema->{properties}}) {
     push @{$rules{$k}}, $r;
+    next unless $coerce_defaults;
+    $data->{$k} = $r->{default} if exists $r->{default} and !exists $data->{$k};
   }
+
   while (my ($p, $r) = each %{$schema->{patternProperties} || {}}) {
     push @{$rules{$_}}, $r for sort grep { $_ =~ /$p/ } @dkeys;
   }
@@ -1305,13 +1328,40 @@ Default is to use the value from the L</schema> attribute.
 
 =head2 coerce
 
-  my $jv = $jv->coerce(booleans => 1, numbers => 1, strings => 1);
-  my $jv = $jv->coerce({booleans => 1, numbers => 1, strings => 1});
-  my $hash_ref  = $jv->coerce;
+  my $jv       = $jv->coerce('bool,def,num,str');
+  my $jv       = $jv->coerce('booleans,defaults,numbers,strings');
+  my $hash_ref = $jv->coerce;
 
 Set the given type to coerce. Before enabling coercion this module is very
 strict when it comes to validating types. Example: The string C<"1"> is not
-the same as the number C<1>, unless you have coercion enabled.
+the same as the number C<1>, unless you have "numbers" coercion enabled.
+
+=over 2
+
+=item * booleans
+
+Will convert what looks can be interpreted as a boolean to a
+L<JSON::PP::Boolean> object. Note that "foo" is not considered a true value and
+will fail the validation.
+
+=item * defaults
+
+Will copy the default value defined in the schema, into the input structure,
+if the input value is non-existing.
+
+Note that support for "default" is currently EXPERIMENTAL, and enabling this
+might be changed in future versions.
+
+=item * numbers
+
+Will convert strings that looks like numbers, into true numbers. This works for
+both the "integer" and "number" types.
+
+=item * strings
+
+Will convert a number into a string. This works for the "string" type.
+
+=back
 
 Loading a YAML document will enable "booleans" automatically. This feature is
 experimental, but was added since YAML has no real concept of booleans, such
@@ -1332,6 +1382,13 @@ same time resolve C<$ref> if found. Example:
 
 The argument can also be an array-ref with the different parts of the pointer
 as each elements.
+
+=head2 new
+
+  $jv = JSON::Validator->new(%attributes);
+  $jv = JSON::Validator->new(\%attributes);
+
+Creates a new L<JSON::Validate> object.
 
 =head2 load_and_validate_schema
 

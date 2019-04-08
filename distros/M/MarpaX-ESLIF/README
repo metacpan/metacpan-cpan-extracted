@@ -77,9 +77,50 @@ NOTES
     character conversion is using iconv (or iconv-like on Windows) instead
     of ICU, even if the later is available on your system.
 
+ BOOLEAN TYPE
+
+    ESLIF has a boolean type, perl has not. In order to not reinvent the
+    wheel, the widely JSON's Perl's boolean utilities via JSON::MaybeXS
+    wrapper are used, i.e.:
+
+    true
+
+      A true value. You may localize $MarpaX::ESLIF::true before using
+      ESLIF to change it.
+
+      Defaults to JSON::MaybeXS::true().
+
+    false
+
+      A false value. You may localize $MarpaX::ESLIF::false before using
+      ESLIF to change it.
+
+      Defaults to JSON::MaybeXS::false().
+
+    is_bool($value)
+
+      Returns a true value if $value is a boolean. You may localize
+      MarpaX::ESLIF::is_bool() function before using ESLIF to change it.
+
+      Defaults to JSON::MaybeXS::is_bool($value)
+
+ NUMERIC TYPES
+
+    ESLIF has two functions MarpaX::ESLIF::is_Int() and
+    MarpaX::ESLIF::is_StrictNum(), that maps by default to the
+    Types::Standard implementations. You may localize them before using
+    ESLIF if needed.
+
+ STRING TYPE
+
+    ESLIF has the function MarpaX::ESLIF::is_Str(), that maps by default to
+    the Types::Standard implementation. You may localize it before using
+    ESLIF if needed.
+
 SEE ALSO
 
     MarpaX::ESLIF::Introduction, PCRE2 <http://www.pcre.org/>,
     MarpaX::ESLIF::BNF, MarpaX::ESLIF::Logger::Interface,
-    MarpaX::ESLIF::Grammar, MarpaX::ESLIF::Recognizer.
+    MarpaX::ESLIF::Grammar, MarpaX::ESLIF::Recognizer, Types::Standard,
+    JSON::MaybeXS.
 

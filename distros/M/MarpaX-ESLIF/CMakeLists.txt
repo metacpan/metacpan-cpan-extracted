@@ -76,5 +76,5 @@ ADD_CUSTOM_TARGET (marpaESLIFPerlXtest ${CMAKE_COMMAND} -E echo "${PERL_EXECUTAB
 # Check
 # -----
 # Quite painful but apparently CTest revisit all parameters differently v.s. the OS...
-ADD_TEST (marpaESLIFPerlTest ${PERL_EXECUTABLE} -MDist::Zilla::App -e "Dist::Zilla::App->run" -- test)
+ADD_TEST (marpaESLIFPerlTest ${PERL_EXECUTABLE} -MDist::Zilla::App -e "Dist::Zilla::App->run" -- -v test)
 ADD_DEPENDENCIES (check marpaESLIFPerlCopy)

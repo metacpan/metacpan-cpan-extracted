@@ -15,20 +15,18 @@ grep
 
   # given [1..5]
 
-  $array->grep(sub{
-      shift >= 3
+  $array->grep(fun ($value) {
+      $value >= 3
   });
 
   # [3,4,5]
 
 =description
 
-The grep method iterates over each element in the array, executing the
-code reference supplied in the argument, passing the routine the value at the
-current position in the loop and returning a new array reference containing
-the elements for which the argument evaluated true. This method supports
-codification, i.e, takes an argument which can be a codifiable string, a code
-reference, or a code data type object. This method returns a
+The grep method iterates over each element in the array, executing the code
+reference supplied in the argument, passing the routine the value at the
+current position in the loop and returning a new array reference containing the
+elements for which the argument evaluated true. This method returns a
 L<Data::Object::Array> object.
 
 =signature

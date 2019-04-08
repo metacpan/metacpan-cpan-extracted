@@ -15,8 +15,7 @@ each_value
 
   # given ['a'..'g']
 
-  $array->each_value(sub{
-      my $value = shift; # a
+  $array->each_value(fun ($value, @args) {
       ...
   });
 
@@ -24,9 +23,8 @@ each_value
 
 The each_value method iterates over each element in the array, executing the
 code reference supplied in the argument, passing the routine the value at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Array> object.
+current position in the loop. This method returns a L<Data::Object::Array>
+object.
 
 =signature
 
@@ -44,6 +42,14 @@ use_ok 'Data::Object::Array';
 
 my $data = Data::Object::Array->new(['a'..'g']);
 
-is_deeply $data->each_value(sub { [@_] }), $data;
+is_deeply $data->each_value(sub { [@_] }), [
+  ['a'],
+  ['b'],
+  ['c'],
+  ['d'],
+  ['e'],
+  ['f'],
+  ['g']
+];
 
 ok 1 and done_testing;

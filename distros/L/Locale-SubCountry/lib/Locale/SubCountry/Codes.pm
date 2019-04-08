@@ -11,8 +11,8 @@ NOTE, THIS FILE IS CREATED WITH UTF-8 ENCODING. THIS SHOULD NOT BE CHANGED.
 
 =head1 SOURCE
 
-All codes have been downloaded from the latest version of the Alioth project
-l<https://pkg-isocodes.alioth.debian.org/>
+All codes have been downloaded from the latest version of the Debian Salsa project
+L<https://salsa.debian.org/iso-codes-team/iso-codes>
 
 
 =cut
@@ -21,7 +21,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 package Locale::SubCountry::Codes;
 
 $Locale::SubCountry::Codes::JSON =
@@ -1702,6 +1702,7 @@ q{
       "official_name": "Republic of Zimbabwe"
     }
   ],
+  
   "3166-2": [
     {
       "code": "AD-02",
@@ -5462,174 +5463,174 @@ q{
       "type": "Province"
     },
     {
-      "code": "CN-11",
-      "name": "Beijing",
+      "code": "CN-AH",
+      "name": "Anhui Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-BJ",
+      "name": "Beijing Shi",
       "type": "Municipality"
     },
     {
-      "code": "CN-12",
-      "name": "Tianjin",
+      "code": "CN-CQ",
+      "name": "Chongqing Shi",
       "type": "Municipality"
     },
     {
-      "code": "CN-13",
-      "name": "Hebei",
+      "code": "CN-FJ",
+      "name": "Fujian Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-14",
-      "name": "Shanxi",
+      "code": "CN-GD",
+      "name": "Guangdong Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-15",
-      "name": "Nei Mongol",
+      "code": "CN-GS",
+      "name": "Gansu Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-GX",
+      "name": "Guangxi Zhuangzu Zizhiqu",
       "type": "Autonomous region"
     },
     {
-      "code": "CN-21",
-      "name": "Liaoning",
+      "code": "CN-GZ",
+      "name": "Guizhou Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-22",
-      "name": "Jilin",
+      "code": "CN-HA",
+      "name": "Henan Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-23",
-      "name": "Heilongjiang",
+      "code": "CN-HB",
+      "name": "Hubei Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-31",
-      "name": "Shanghai",
-      "type": "Municipality"
-    },
-    {
-      "code": "CN-32",
-      "name": "Jiangsu",
+      "code": "CN-HE",
+      "name": "Hebei Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-33",
-      "name": "Zhejiang",
+      "code": "CN-HI",
+      "name": "Hainan Sheng",
       "type": "Province"
     },
     {
-      "code": "CN-34",
-      "name": "Anhui",
-      "type": "Province"
-    },
-    {
-      "code": "CN-35",
-      "name": "Fujian",
-      "type": "Province"
-    },
-    {
-      "code": "CN-36",
-      "name": "Jiangxi",
-      "type": "Province"
-    },
-    {
-      "code": "CN-37",
-      "name": "Shandong",
-      "type": "Province"
-    },
-    {
-      "code": "CN-41",
-      "name": "Henan",
-      "type": "Province"
-    },
-    {
-      "code": "CN-42",
-      "name": "Hubei",
-      "type": "Province"
-    },
-    {
-      "code": "CN-43",
-      "name": "Hunan",
-      "type": "Province"
-    },
-    {
-      "code": "CN-44",
-      "name": "Guangdong",
-      "type": "Province"
-    },
-    {
-      "code": "CN-45",
-      "name": "Guangxi",
-      "type": "Autonomous region"
-    },
-    {
-      "code": "CN-46",
-      "name": "Hainan",
-      "type": "Province"
-    },
-    {
-      "code": "CN-50",
-      "name": "Chongqing",
-      "type": "Municipality"
-    },
-    {
-      "code": "CN-51",
-      "name": "Sichuan",
-      "type": "Province"
-    },
-    {
-      "code": "CN-52",
-      "name": "Guizhou",
-      "type": "Province"
-    },
-    {
-      "code": "CN-53",
-      "name": "Yunnan",
-      "type": "Province"
-    },
-    {
-      "code": "CN-54",
-      "name": "Xizang",
-      "type": "Autonomous region"
-    },
-    {
-      "code": "CN-61",
-      "name": "Shaanxi",
-      "type": "Province"
-    },
-    {
-      "code": "CN-62",
-      "name": "Gansu",
-      "type": "Province"
-    },
-    {
-      "code": "CN-63",
-      "name": "Qinghai",
-      "type": "Province"
-    },
-    {
-      "code": "CN-64",
-      "name": "Ningxia",
-      "type": "Autonomous region"
-    },
-    {
-      "code": "CN-65",
-      "name": "Xinjiang",
-      "type": "Autonomous region"
-    },
-    {
-      "code": "CN-71",
-      "name": "Taiwan",
-      "type": "Province"
-    },
-    {
-      "code": "CN-91",
-      "name": "Xianggang (Hong-Kong)",
+      "code": "CN-HK",
+      "name": "Hong Kong SAR (see also separate country code entry under HK)",
       "type": "Special administrative region"
     },
     {
-      "code": "CN-92",
-      "name": "Aomen (Macau)",
+      "code": "CN-HL",
+      "name": "Heilongjiang Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-HN",
+      "name": "Hunan Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-JL",
+      "name": "Jilin Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-JS",
+      "name": "Jiangsu Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-JX",
+      "name": "Jiangxi Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-LN",
+      "name": "Liaoning Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-MO",
+      "name": "Macao SAR (see also separate country code entry under MO)",
       "type": "Special administrative region"
+    },
+    {
+      "code": "CN-NM",
+      "name": "Nei Mongol Zizhiqu",
+      "type": "Autonomous region"
+    },
+    {
+      "code": "CN-NX",
+      "name": "Ningxia Huizi Zizhiqu",
+      "type": "Autonomous region"
+    },
+    {
+      "code": "CN-QH",
+      "name": "Qinghai Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-SC",
+      "name": "Sichuan Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-SD",
+      "name": "Shandong Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-SH",
+      "name": "Shanghai Shi",
+      "type": "Municipality"
+    },
+    {
+      "code": "CN-SN",
+      "name": "Shaanxi Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-SX",
+      "name": "Shanxi Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-TJ",
+      "name": "Tianjin Shi",
+      "type": "Municipality"
+    },
+    {
+      "code": "CN-TW",
+      "name": "Taiwan Sheng (see also separate country code entry under TW)",
+      "type": "Province"
+    },
+    {
+      "code": "CN-XJ",
+      "name": "Xinjiang Uygur Zizhiqu",
+      "type": "Autonomous region"
+    },
+    {
+      "code": "CN-XZ",
+      "name": "Xizang Zizhiqu",
+      "type": "Autonomous region"
+    },
+    {
+      "code": "CN-YN",
+      "name": "Yunnan Sheng",
+      "type": "Province"
+    },
+    {
+      "code": "CN-ZJ",
+      "name": "Zhejiang Sheng",
+      "type": "Province"
     },
     {
       "code": "CO-AMA",
@@ -12392,7 +12393,7 @@ q{
     },
     {
       "code": "IN-DD",
-      "name": "Damen and Diu",
+      "name": "Daman and Diu",
       "type": "Union territory"
     },
     {
@@ -12482,7 +12483,7 @@ q{
     },
     {
       "code": "IN-OR",
-      "name": "Orissa",
+      "name": "Odisha",
       "type": "State"
     },
     {
@@ -12503,6 +12504,11 @@ q{
     {
       "code": "IN-SK",
       "name": "Sikkim",
+      "type": "State"
+    },
+    {
+      "code": "IN-TG",
+      "name": "Telangana",
       "type": "State"
     },
     {
@@ -18300,19 +18306,19 @@ q{
       "type": "State"
     },
     {
+      "code": "MX-CMX",
+      "name": "Ciudad de México",
+      "type": "Federal district"
+    },
+    {
       "code": "MX-COA",
-      "name": "Coahuila",
+      "name": "Coahuila de Zaragoza",
       "type": "State"
     },
     {
       "code": "MX-COL",
       "name": "Colima",
       "type": "State"
-    },
-    {
-      "code": "MX-DIF",
-      "name": "Distrito Federal",
-      "type": "Federal district"
     },
     {
       "code": "MX-DUR",
@@ -18346,7 +18352,7 @@ q{
     },
     {
       "code": "MX-MIC",
-      "name": "Michoacán",
+      "name": "Michoacán de Ocampo",
       "type": "State"
     },
     {
@@ -18416,7 +18422,7 @@ q{
     },
     {
       "code": "MX-VER",
-      "name": "Veracruz",
+      "name": "Veracruz de Ignacio de la Llave",
       "type": "State"
     },
     {
@@ -27052,7 +27058,7 @@ q{
       "type": "Province"
     },
     {
-      "code": "ZA-GP",
+      "code": "ZA-GT",
       "name": "Gauteng",
       "type": "Province"
     },
@@ -27072,6 +27078,11 @@ q{
       "type": "Province"
     },
     {
+      "code": "ZA-NL",
+      "name": "Kwazulu-Natal",
+      "type": "Province"
+    },
+    {
       "code": "ZA-NW",
       "name": "North-West (South Africa)",
       "type": "Province"
@@ -27079,11 +27090,6 @@ q{
     {
       "code": "ZA-WC",
       "name": "Western Cape",
-      "type": "Province"
-    },
-    {
-      "code": "ZA-ZN",
-      "name": "Kwazulu-Natal",
       "type": "Province"
     },
     {
@@ -27181,7 +27187,7 @@ q{
       "name": "Mashonaland West",
       "type": "Province"
     }
-  ]  
+  ]
 }
 
 };

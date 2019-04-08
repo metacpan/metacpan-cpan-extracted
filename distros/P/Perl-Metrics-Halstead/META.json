@@ -34,12 +34,16 @@
       },
       "runtime" : {
          "requires" : {
+            "Getopt::Long" : "0",
             "Moo" : "2",
             "PPI::Document" : "0",
             "PPI::Dumper" : "0",
+            "Pod::Usage" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
-            "strictures" : "2"
+            "strict" : "0",
+            "strictures" : "2",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -50,9 +54,7 @@
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "perl" : "5.006",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.006"
          }
       }
    },
@@ -67,7 +69,7 @@
          "web" : "https://github.com/ology/Perl-Metrics-Halstead"
       }
    },
-   "version" : "0.0602",
+   "version" : "0.0603",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.027007"

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-01-13'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2019-04-05'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010;
 use strict;
@@ -46,7 +46,7 @@ instopt - Download and install software
 
 =head1 VERSION
 
-This document describes version 0.007 of instopt (from Perl distribution App-instopt), released on 2019-01-13.
+This document describes version 0.008 of instopt (from Perl distribution App-instopt), released on 2019-04-05.
 
 =head1 SYNOPSIS
 
@@ -374,6 +374,8 @@ See C<--software-or-pattern>.
 
 =over
 
+=item B<--arch>=I<s>
+
 =item B<--software>=I<s>*
 
 =back
@@ -517,6 +519,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand list-downloaded-versions
 
+ arch (see --arch)
  software (see --software)
 
 =head2 Configuration for subcommand list-installed

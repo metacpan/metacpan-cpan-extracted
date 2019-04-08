@@ -15,9 +15,12 @@ If you want to help:
  
 Some things you can do that would make me smile:
  
+  * You can translate this distribution to other languages than fr, en
+    and it, see INTERNATIONALIZATION AND LOCALIZATION in README.
   * Obviously, you can extend this distribution by adding some new
     targets to spread to, or new ways to craft the message to be spread,
-    see README to know how to do this.
+    see EXTENDING TO NEW TARGETS and EXTENDING TO NEW MESSAGE MAKERS
+    in README to know how to do this.
   * If you think about an extending target or message maker but feel shy
     to implement it, just leave me a feature request on RT, Github, or
     by email. I'll take a look on how to code your bright idea.

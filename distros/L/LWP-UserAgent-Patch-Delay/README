@@ -1,0 +1,53 @@
+NAME
+    LWP::UserAgent::Patch::Delay - Add sleep() between requests to slow down
+
+VERSION
+    This document describes version 0.003 of LWP::UserAgent::Patch::Delay
+    (from Perl distribution LWP-UserAgent-Patch-Delay), released on
+    2019-04-07.
+
+SYNOPSIS
+     use LWP::UserAgent::Patch::Delay;
+
+DESCRIPTION
+    This patch adds sleep() between LWP::UserAgent's requests.
+
+CONFIGURATION
+  -between_request
+    Float. Default is 1. Number of seconds to sleep() after each request.
+    Uses Time::HiRes so you can include fractions of a second, e.g. 0.1 or
+    1.5.
+
+FAQ
+  Why not subclass?
+    By patching, you do not need to replace all the client code which uses
+    LWP::UserAgent (or WWW::Mechanize, and so on).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Patch-Delay>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Patch-Delay>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Patch-D
+    elay>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    LWP::UserAgent
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

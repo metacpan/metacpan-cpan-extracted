@@ -35,6 +35,6 @@ use_ok 'Data::Object::Registry';
 
 my $data = Data::Object::Registry->new();
 
-isa_ok $data->obj(), 'Type::Registry';
+isa_ok $data->obj('main'), 'Type::Registry';
 
 ok 1 and done_testing;

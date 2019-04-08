@@ -106,7 +106,7 @@ void print_error (bt_error *err)
       something_printed = TRUE;
    }
 
-   name = errclass_names[(int) err->class];
+   name = errclass_names[(int) err->errclass];
    if (name)
    {
       if (something_printed)
@@ -132,7 +132,7 @@ void print_error (bt_error *err)
  */
 
 void
-report_error (bt_errclass class, 
+report_error (bt_errclass errclass,
               char *      filename,
               int         line,
               char *      item_desc,
@@ -145,13 +145,13 @@ report_error (bt_errclass class,
    int       msg_len;
 #endif
 
-   err.class = class;
+   err.errclass = errclass;
    err.filename = filename;
    err.line = line;
    err.item_desc = item_desc;
    err.item = item;
 
-   errclass_counts[(int) class]++;
+   errclass_counts[(int) errclass]++;
 
 
    /* 
@@ -181,46 +181,46 @@ report_error (bt_errclass class,
 #endif
 
    err.message = error_buf;
-   if (err_handlers[class])
-      (*err_handlers[class]) (&err);
+   if (err_handlers[errclass])
+      (*err_handlers[errclass]) (&err);
 
-   switch (err_actions[class])
+   switch (err_actions[errclass])
    {
       case BTACT_NONE: return;
       case BTACT_CRASH: exit (1);
       case BTACT_ABORT: abort ();
       default: internal_error ("invalid error action %d for class %d (%s)", 
-                               (int) err_actions[class],
-                               (int) class, errclass_names[class]);
+                               (int) err_actions[errclass],
+                               (int) errclass, errclass_names[errclass]);
    }
 
 } /* report_error() */
 
 
 GEN_ERRFUNC (general_error,
-             (bt_errclass class, 
+             (bt_errclass errclass, 
               char *      filename,
               int         line,
               char *      item_desc,
               int         item,
               char *      fmt,
               ...),
-             class, filename, line, item_desc, item, fmt)
+             errclass, filename, line, item_desc, item, fmt)
 
 GEN_ERRFUNC (error,
-             (bt_errclass class,
+             (bt_errclass errclass,
               char *      filename, 
               int         line, 
               char *      fmt,
               ...),
-             class, filename, line, NULL, -1, fmt)
+             errclass, filename, line, NULL, -1, fmt)
 
 GEN_ERRFUNC (ast_error,
-             (bt_errclass class,
+             (bt_errclass errclass,
               AST *       ast,
               char *      fmt,
               ...),
-             class, ast->filename, ast->line, NULL, -1, fmt)
+             errclass, ast->filename, ast->line, NULL, -1, fmt)
 
 GEN_ERRFUNC (notify,
              (char * fmt, ...),

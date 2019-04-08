@@ -22,7 +22,7 @@ use XML::Entities::Data;
 use Time::HiRes qw(gettimeofday sleep);
 binmode(STDOUT,':utf8');
 
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 =head1 NAME
 
@@ -349,7 +349,7 @@ sub new {
   if ($Args{'metadata'}) {
     $X->Error("Meta file ".$Args{'metadata'}." not exists\n") unless -f $Args{'metadata'};
     $X->{'metadata'} = $Args{'metadata'};
-    $X->ParseMetaFile() unless $Args{'simple'};     
+    $X->ParseMetaFile() unless $Args{'simple'}; 
     File::Copy::copy($X->{'metadata'}, $X->{'DestinationDir'}."/fb3/description.xml");
   } elsif ($Args{'meta'}) {
     #или мета из  параметров  

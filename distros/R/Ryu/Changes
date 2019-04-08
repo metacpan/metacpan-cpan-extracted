@@ -1,5 +1,15 @@
 Revision history for Ryu
 
+1.000     2019-04-08 22:56:19+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->ignore method added: this throws away all its input
+
+    Bugs fixed:
+
+    - pause handling on sinks could previously report errors if nothing
+    had called `->pause($src)` before the ->is_paused check
+
 0.037     2019-03-25 17:42:43+08:00 Asia/Kuala_Lumpur
     No new features.
 

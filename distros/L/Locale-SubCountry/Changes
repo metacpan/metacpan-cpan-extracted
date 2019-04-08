@@ -1,5 +1,8 @@
 Revision history for Perl CPAN module Locale::SubCountry
 
+2.05 6 Apr 2019
+    Used latest iso-codes package from Debian Salsa
+
 2.04 29 Dec 2017    
     Added strict and warnings pragmas to Codes.pm as per github request by manwar
 

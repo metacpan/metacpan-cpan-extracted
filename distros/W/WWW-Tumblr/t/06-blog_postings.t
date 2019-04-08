@@ -14,8 +14,12 @@ my %post_types = (
     photo   => { source => 'http://lorempixel.com/400/200/' },
     quote   => { quote => decode_json( get 'http://quotesondesign.com/api/3.0/api-3.0.json' )->{quote} },
     link    => do {
-        my ( $author, $release) = @{ decode_json( get("http://api.metacpan.org/v0/favorite/_search?size=50&fields=author,release&sort=date:desc") )->{hits}->{hits}->[ int rand 50 ]->{fields} }{'author', 'release'};
-        { url => "http://metacpan.org/release/$author/$release" },
+        eval {
+            my ( $author, $release) = @{ decode_json( get("http://api.metacpan.org/v0/favorite/_search?size=50&fields=author,release&sort=date:desc") )->{hits}->{hits}->[ int rand 50 ]->{fields} }{'author', 'release'};
+            { url => "http://metacpan.org/release/$author/$release" }
+        } or do {
+            { url => "https://damog.net/blog" }
+        };
     },
 );
 
@@ -29,5 +33,3 @@ for my $type ( sort keys %post_types ) {
 
 
 done_testing();
-
-

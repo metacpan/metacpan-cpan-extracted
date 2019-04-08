@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '2.0.43'; # VERSION
+our $VERSION = '3.0.3'; # VERSION
 
 
 #
@@ -26,7 +26,6 @@ sub new {
                    latm                => $args{latm},
                    defaultSymbolAction => $args{defaultSymbolAction},
                    defaultRuleAction   => $args{defaultRuleAction},
-                   defaultFreeAction   => $args{defaultFreeAction},
                    startId             => $args{startId},
                    discardId           => $args{discardId},
                    symbolIds           => $args{symbolIds},
@@ -86,13 +85,6 @@ sub getDefaultRuleAction {
 }
 
 
-sub getDefaultFreeAction {
-  my ($self) = @_;
-
-  return $self->{defaultFreeAction}
-}
-
-
 sub getStartId {
   my ($self) = @_;
 
@@ -134,7 +126,7 @@ MarpaX::ESLIF::Grammar::Properties - ESLIF Grammar Properties
 
 =head1 VERSION
 
-version 2.0.43
+version 3.0.3
 
 =head1 SYNOPSIS
 
@@ -221,10 +213,6 @@ Grammar default symbol action
 
 Grammar default rule action
 
-=item defaultFreeAction
-
-Grammar default free action
-
 =item startId
 
 Start symbol Id
@@ -270,10 +258,6 @@ Returns grammar's default symbol action, never null
 =head2 $self->getDefaultRuleAction
 
 Returns grammar's default rule action, can be null
-
-=head2 $self->getDefaultFreeAction
-
-Returns grammar's default free action, never null and always ":defaultFreeActions" (hardcoded in the JNI interface)
 
 =head2 $self->getStartId
 

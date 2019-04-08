@@ -1,7 +1,7 @@
 package App::texttable;
 
-our $DATE = '2019-01-11'; # DATE
-our $VERSION = '0.030'; # VERSION
+our $DATE = '2019-02-24'; # DATE
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -56,7 +56,7 @@ sub texttable {
     if ($args{action} eq 'list_backends') {
         join("", map {"$_\n"} @Text::Table::Any::BACKENDS);
     } else {
-        return [400, "Please specify rows"] unless $args{rows};
+        die "Please specify rows" unless $args{rows};
         Text::Table::Any::table(
             rows => $args{rows},
             header_row => $args{header_row},
@@ -80,7 +80,7 @@ App::texttable - Generate text table using Text::Table::Any
 
 =head1 VERSION
 
-This document describes version 0.030 of App::texttable (from Perl distribution App-texttable), released on 2019-01-11.
+This document describes version 0.031 of App::texttable (from Perl distribution App-texttable), released on 2019-02-24.
 
 =head1 DESCRIPTION
 

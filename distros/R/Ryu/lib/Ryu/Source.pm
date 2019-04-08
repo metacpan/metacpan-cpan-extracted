@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '1.000'; # VERSION
 
 =head1 NAME
 
@@ -682,6 +682,43 @@ sub sprintf_methods {
         $src->emit(sprintf $fmt, map $item->$_ // '', @methods)
     }, $src);
 }
+
+=head2 ignore
+
+Receives items, but ignores them entirely.
+
+Emits nothing and eventually completes when the upstream L<Ryu::Source> is done.
+
+Might be useful for keeping a source alive.
+
+=cut
+
+sub ignore {
+    my ($self) = @_;
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    $self->completed->on_ready(sub {
+        shift->on_ready($src->completed) unless $src->completed->is_ready
+    });
+    return $src;
+}
+
+=head2 buffer
+
+Accumulate items while any downstream sources are paused.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<high> - once at least this many items are buffered, will L</pause>
+the upstream L<Ryu::Source>.
+
+=item * C<low> - if the buffered count drops to this number, will L</resume>
+the upstream L<Ryu::Source>.
+
+=back
+
+=cut
 
 sub buffer {
     my $self = shift;

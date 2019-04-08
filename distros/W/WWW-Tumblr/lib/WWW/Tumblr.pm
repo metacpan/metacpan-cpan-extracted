@@ -3,7 +3,7 @@ package WWW::Tumblr;
 use strict;
 use warnings;
 
-our $VERSION = '5.2';
+our $VERSION = '5.3';
 
 =pod
 
@@ -23,7 +23,7 @@ WWW::Tumblr - Perl bindings for the Tumblr API
      token           => $token,
      token_secret    => $token_secret,
   );
- 
+
   my $blog = $t->blog('perlapi.tumblr.com');
 
   print Dumper $blog->info;
@@ -42,12 +42,12 @@ meaning that you will have User, Blog and Tagged methods:
 
   # Once you have a WWW::Tumblr object, you can get a WWW::Tumblr::Blog object
   # by calling the blog() method from the former object:
-  
+
   my $blog = $t->blog('perlapi.tumblr.com');
- 
+
   # And then just use WWW::Tumblr::Blog methods from it:
   if ( my $post = $blog->post( type => 'text', body => 'Hell yeah, son!' ) ) {
-     say "I have published post id: " . $post->{id};    
+     say "I have published post id: " . $post->{id};
   } else {
      print STDERR Dumper $blog->error;
      die "I couldn't post it :(";
@@ -151,7 +151,7 @@ L<Moose>, likewise.
 =head1 COPYRIGHT and LICENSE
 
 This software is copyright (c) 2013 by David Moreno.
- 
+
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
@@ -194,7 +194,7 @@ has 'oauth',            is => 'rw', isa => 'Net::OAuth::Client', default => sub 
 		request_token_path => 'http://www.tumblr.com/oauth/request_token',
 		authorize_path => 'http://www.tumblr.com/oauth/authorize',
 		access_token_path => 'http://www.tumblr.com/oauth/access_token',
-		callback => $self->callback, 
+		callback => $self->callback,
 		session => sub { if (@_ > 1) { $self->_session($_[0] => $_[1]) }; return $self->_session($_[0]) },
 	);
 };
@@ -261,10 +261,16 @@ sub _none_request {
 
     my $req;
     if ( $method eq 'GET' ) {
-        print "Requesting... " .'http://api.tumblr.com/v2/' . $url_path, "\n";
+        # print "Requesting... " .'https://api.tumblr.com/v2/' . $url_path, "\n";
+
+        my $request = $self->_oauth_request_sign(
+            $method, $url_path, $params
+        );
         $req = HTTP::Request->new(
             $method => 'http://api.tumblr.com/v2/' . $url_path,
+            [ Accept => 'application/json', Authorization => $request->to_authorization_header ]
         );
+
     } elsif ( $method eq 'POST' ) {
         Carp::croak "Unimplemented";
     } else {
@@ -300,6 +306,26 @@ sub _apikey_request {
 
 }
 
+sub _oauth_request_sign {
+    my $self = shift;
+    my $method = shift;
+    my $url_path = shift;
+    my $params = shift;
+
+    my $request = $self->oauth->_make_request(
+        'protected resource',
+        request_method => uc $method,
+        request_url => 'http://api.tumblr.com/v2/' . $url_path,
+        consumer_key => $self->consumer_key,
+        consumer_secret => $self->secret_key,
+        token => $self->token,
+        token_secret => $self->token_secret,
+        extra_params => $params,
+    );
+    $request->sign;
+    return $request;
+}
+
 sub _oauth_request {
 	my $self = shift;
 	my $method = shift;
@@ -308,27 +334,19 @@ sub _oauth_request {
 
     my $data = delete $params->{data};
 
-	my $request = $self->oauth->_make_request(
-		'protected resource', 
-		request_method => uc $method,
-		request_url => 'http://api.tumblr.com/v2/' . $url_path,
-		consumer_key => $self->consumer_key,
-	    consumer_secret => $self->secret_key,
-		token => $self->token,
-		token_secret => $self->token_secret,
-		extra_params => $params,
-	);
-	$request->sign;
+    my $request = $self->_oauth_request_sign(
+        $method, $url_path, $params
+    );
 
-    my $authorization_signature = $request->to_authorization_header;
+    my $authorization_header = $request->to_authorization_header;
 
     my $message;
     if ( $method eq 'GET' ) {
-        $message = GET 'http://api.tumblr.com/v2/' . $url_path . '?' . $request->normalized_message_parameters, 'Authorization' => $authorization_signature;
+        $message = GET 'http://api.tumblr.com/v2/' . $url_path . '?' . $request->normalized_message_parameters, 'Authorization' => $authorization_header;
     } elsif ( $method eq 'POST' ) {
         $message = POST('http://api.tumblr.com/v2/' . $url_path,
             Content_Type => 'form-data',
-            Authorization => $authorization_signature,
+            Authorization => $authorization_header,
             Content => [
                 %$params, ( $data ? do {
                    if (ref($data) eq 'ARRAY') {
@@ -341,7 +359,9 @@ sub _oauth_request {
             ]);
     }
 
-	return $self->ua->request( $message );
+    my $res = $self->ua->request( $message );
+
+    return $res;
 }
 
 sub _session {
@@ -356,4 +376,3 @@ sub _session {
 }
 
 1;
-

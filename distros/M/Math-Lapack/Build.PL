@@ -25,7 +25,7 @@ my %module_build_args = (
     "Rui Meira"
   ],
   "dist_name" => "Math-Lapack",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "perl",
   "module_name" => "Math::Lapack",
   "recursive_test_files" => 1,

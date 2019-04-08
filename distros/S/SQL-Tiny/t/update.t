@@ -11,15 +11,17 @@ use SQL::Tiny ':all';
 test_update(
     'users',
     {
-        status     => 'X',
-        lockdate   => undef,
+        lockdate => undef,
+        qty      => \[ 'TRUNC(?)', 19.85 ],
+        status   => 'X',
     },
     {
         orderdate => \'SYSDATE()',
+        qty       => \[ 'ROUND(?)', 14.5 ],
     },
 
-    'UPDATE users SET lockdate=NULL, status=? WHERE orderdate=SYSDATE()',
-    [ 'X' ],
+    'UPDATE users SET lockdate=NULL, qty=TRUNC(?), status=? WHERE orderdate=SYSDATE() AND qty=ROUND(?)',
+    [ 19.85, 'X', 14.5 ],
 
     'Standard mish-mash'
 );

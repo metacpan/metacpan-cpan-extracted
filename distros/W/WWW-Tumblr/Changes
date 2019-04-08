@@ -1,3 +1,8 @@
+5.3 - Sat 06 Apr 2019 03:31:37 PM CEST
+  - Let's not get ahead ourselves.
+  - Addressing changes on Tumblr API. Please see:
+    https://github.com/damog/www-tumblr/issues/14
+
 5.2 - Sat Sep 19 13:53:09 CEST 2015
   - Apparently I'm a moron with the versioning :(
 

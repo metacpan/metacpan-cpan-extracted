@@ -212,8 +212,9 @@ If the country has no sub countries, returns undef.
 
 =head1 SEE ALSO
 
-All codes have been downloaded from the latest version of the Alioth project
-L<https://pkg-isocodes.alioth.debian.org/>
+All codes have been downloaded from the latest version of the Debian Salsa project
+L<https://salsa.debian.org/iso-codes-team/iso-codes>
+
 
 
 L<Locale::Country>,L<Lingua::EN::AddressParse>,
@@ -275,10 +276,9 @@ Terrence Brannon produced Locale::US, which was the starting point for
 this module.
 
 
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2018 Kim Ryan. All rights reserved.
+Copyright (c) 2019 Kim Ryan. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -298,7 +298,7 @@ use Locale::SubCountry::Codes;
 #-------------------------------------------------------------------------------
 
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 # Define all the methods for the 'world' class here. Note that because the
 # name space inherits from the Locale::SubCountry name space, the
@@ -354,7 +354,7 @@ sub all_codes
 #-------------------------------------------------------------------------------
 
 package Locale::SubCountry;
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #-------------------------------------------------------------------------------
 # Initialization code which will be run first to create global data structure.

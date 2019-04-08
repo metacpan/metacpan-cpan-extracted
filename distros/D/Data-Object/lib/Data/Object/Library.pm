@@ -9,8 +9,6 @@ use Type::Utils -all;
 use Data::Object::Type::Any;
 use Data::Object::Type::Array;
 use Data::Object::Type::Code;
-use Data::Object::Type::Data;
-use Data::Object::Type::Dispatch;
 use Data::Object::Type::Exception;
 use Data::Object::Type::Float;
 use Data::Object::Type::Func;
@@ -25,6 +23,8 @@ use Data::Object::Type::Space;
 use Data::Object::Type::String;
 use Data::Object::Type::Undef;
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 extends 'Types::Standard';
@@ -37,8 +37,6 @@ extends 'Types::Common::String';
 register Data::Object::Type::Any;
 register Data::Object::Type::Array;
 register Data::Object::Type::Code;
-register Data::Object::Type::Data;
-register Data::Object::Type::Dispatch;
 register Data::Object::Type::Exception;
 register Data::Object::Type::Float;
 register Data::Object::Type::Func;

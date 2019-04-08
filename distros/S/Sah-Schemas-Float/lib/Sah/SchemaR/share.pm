@@ -1,7 +1,7 @@
 package Sah::SchemaR::share;
 
-our $DATE = '2018-06-04'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-04-08'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 our $rschema = ["float",[{description=>"\nAccepted in one of these forms:\n\n    0.5      # a normal float between 0 and 1\n    10       # a float between 1 (exclusive) and 100, interpreted as percent\n    10%      # a percentage string, between 0% and 100%\n\nDue to different interpretations, particularly \"1\" (some people might expect it\nto mean \"0.01\" or \"1%\") use of this type is discouraged. Use\n<pm:Sah::Schema::percent> instead.\n\n",summary=>"A float between 0 and 1","x.perl.coerce_rules"=>["str_share"]}],["float"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::share - A float between 0 and 1
 
 =head1 VERSION
 
-This document describes version 0.002 of Sah::SchemaR::share (from Perl distribution Sah-Schemas-Float), released on 2018-06-04.
+This document describes version 0.003 of Sah::SchemaR::share (from Perl distribution Sah-Schemas-Float), released on 2019-04-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

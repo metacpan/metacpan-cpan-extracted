@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-Helper-SimpleStats:
 
+v0.1.2    2019-04-06 11:19:31+01:00 Europe/London
+  [Tests]
+  - Added minimum version for prereq of SQL::Abstract::Test.
+
 v0.1.1    2019-04-04 20:38:29+01:00 Europe/London
   [Documentation]
   - Fixed formatting in Changes.

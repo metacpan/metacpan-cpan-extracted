@@ -18,7 +18,6 @@
 #ifndef BTPARSE_H
 #define BTPARSE_H
 
-#include "bt_config.h"
 #include <sys/types.h>
 #include <stdio.h>
 
@@ -198,7 +197,7 @@ typedef enum
 
 typedef struct
 {
-   bt_errclass class;
+   bt_errclass errclass;
    char *      filename;
    int         line;
    char *      item_desc;

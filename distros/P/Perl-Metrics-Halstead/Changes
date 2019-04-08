@@ -1,5 +1,9 @@
 Revision history for Perl-Metrics-Halstead
 
+0.0603 2019-04-06 08:40:29
+    - Fix comment skipping logic.
+    - Turn eg/analyze into bin/halstead with Getopt::Long goodness.
+
 0.0602 2019-03-28 00:45:12
     - Improve documentation.
     - Add report output tests.

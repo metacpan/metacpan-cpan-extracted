@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +23,4 @@ resources:
   bugtracker: https://github.com/petdance/sql-tiny/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/petdance/sql-tiny.git
-version: '0.02'
+version: '0.04'

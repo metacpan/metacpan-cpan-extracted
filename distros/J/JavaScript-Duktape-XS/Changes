@@ -1,4 +1,7 @@
-0.000075    2019-00-31
+0.000076    2019-04-08
+            * Fix handling of large integers between Perl and JS.
+
+0.000075    2019-01-31
             * Fix memory leak associated to checking for cyclic data.
             * Properly cleanup duktape stack in several cases.
             * Add test for calling Perl callback with non-Perl args.

@@ -45,7 +45,7 @@ use open ':std', ':encoding(utf8)';
 # Init log
 #
 our $defaultLog4perlConf = '
-log4perl.rootLogger              = TRACE, Screen
+log4perl.rootLogger              = INFO, Screen
 log4perl.appender.Screen         = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr  = 0
 log4perl.appender.Screen.layout  = PatternLayout
@@ -56,19 +56,22 @@ Log::Any::Adapter->set('Log4perl');
 
 BEGIN { require_ok('MarpaX::ESLIF') };
 
-my $base_dsl = <<'END_OF_BASE_DSL';
+my $base_dsl = q{
 :desc ::= '$TEST'
 :start ::= deal
+:default ::= action => ::convert[UTF-8]
+             symbol-action => ::concat
+
 deal ::= hands
 hands ::= hand | hands ';' hand
-hand ::= card card card card card
-card ~ face suit
-face ~ [2-9jqka] | '10'
+hand ::= CARD CARD CARD CARD CARD
+CARD ~ FACE SUIT
+FACE ~ [2-9jqka] | '10'
 WS ~ [\s]
 :discard ::= WS
 
-:lexeme ::= <card>  pause => after event => card
-END_OF_BASE_DSL
+:lexeme ::= <CARD>  pause => after event => CARD
+};
 
 my $eslif = MarpaX::ESLIF->new($log);
 isa_ok($eslif, 'MarpaX::ESLIF');
@@ -129,9 +132,9 @@ push @tests,
     ];
 
 my @suit_line = (
-    [ 'suit ~ [\x{2665}\x{2666}\x{2663}\x{2660}]:u', 'hex' ],
-    [ 'suit ~ [♥♦♣♠]',                     'char class' ],
-    [ q{suit ~ '♥' | '♦' | '♣'| '♠'},      'strings' ],
+    [ 'SUIT ~ [\x{2665}\x{2666}\x{2663}\x{2660}]:u', 'hex' ],
+    [ 'SUIT ~ [♥♦♣♠]',                     'char class' ],
+    [ q{SUIT ~ '♥' | '♦' | '♣'| '♠'},      'strings' ],
 );
 
 for my $test_data (@tests) {
@@ -162,11 +165,11 @@ for my $test_data (@tests) {
           while ($ok && $re->isCanContinue()) {
 
             # In our example there is a single event: no need to ask what it is
-            my $card = $re->lexemeLastPause('card');
-            ok(utf8::is_utf8($card), "Card '$card' have the utf8 flag");
-            if ( ++$played{$card} > 1 ) {
+            my $CARD = $re->lexemeLastPause('CARD');
+            ok(utf8::is_utf8($CARD), "Card '$CARD' have the utf8 flag");
+            if ( ++$played{$CARD} > 1 ) {
                 $actual_result = 'Parse stopped by application';
-                $actual_value  = "Duplicate card " . $card;
+                $actual_value  = "Duplicate card " . $CARD;
                 last PROCESSING;
             }
             $ok = $re->resume();
@@ -179,13 +182,20 @@ for my $test_data (@tests) {
 
           my $valueInterface = MyValueInterface->new();
           my $status = eval { MarpaX::ESLIF::Value->new($re, $valueInterface)->value() };
+          if (! defined($status)) {
+              $log->errorf("MarpaX::ESLIF::Value->new error, %s", $@);
+          }
           my $last_hand;
           my ($handoffset, $handlength) = eval { $re->lastCompletedLocation('hand') };
+          if (! defined($handoffset) && ! defined($handlength)) {
+              $log->errorf("MarpaX::ESLIF::Value->new error, %s", $@);
+          }
           if ( $handlength ) {
               $last_hand = decode('UTF-8', my $tmp = substr($byte_input, $handoffset, $handlength), Encode::FB_CROAK);
           }
           if ($status) {
               my $value = $valueInterface->getResult();
+	      # UTF-8 outputs are true strings. In case of any other encoding, you have to explicitly stringify, i.e.: utf8::is_utf8("$value")
               ok(utf8::is_utf8($value), "Value '$value' have the utf8 flag");
               $actual_result = 'Parse OK';
               $actual_value  = "Hand was $last_hand";

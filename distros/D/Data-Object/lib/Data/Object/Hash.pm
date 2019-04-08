@@ -33,6 +33,8 @@ use overload (
 
 use parent 'Data::Object::Kind';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 sub new {
@@ -786,10 +788,9 @@ after execution.
   each(CodeRef $arg1, Any @args) : Any
 
 The each method iterates over each element in the hash, executing the code
-reference supplied in the argument, passing the routine the key and value at the
-current position in the loop. This method supports codification, i.e, takes an
-argument which can be a codifiable string, a code reference, or a code data type
-object. This method returns a L<Data::Object::Hash> object.
+reference supplied in the argument, passing the routine the key and value at
+the current position in the loop. This method returns a L<Data::Object::Hash>
+object.
 
 =over 4
 
@@ -797,9 +798,8 @@ object. This method returns a L<Data::Object::Hash> object.
 
   # given {1..8}
 
-  $hash->each(sub{
-      my $key   = shift; # 1
-      my $value = shift; # 2
+  $hash->each(fun ($key, $value) {
+      ...
   });
 
 =back
@@ -812,9 +812,7 @@ object. This method returns a L<Data::Object::Hash> object.
 
 The each_key method iterates over each element in the hash, executing the code
 reference supplied in the argument, passing the routine the key at the current
-position in the loop. This method supports codification, i.e, takes an argument
-which can be a codifiable string, a code reference, or a code data type object.
-This method returns a L<Data::Object::Hash> object.
+position in the loop. This method returns a L<Data::Object::Hash> object.
 
 =over 4
 
@@ -822,8 +820,8 @@ This method returns a L<Data::Object::Hash> object.
 
   # given {1..8}
 
-  $hash->each_key(sub{
-      my $key = shift; # 1
+  $hash->each_key(fun ($key) {
+      ...
   });
 
 =back
@@ -836,9 +834,8 @@ This method returns a L<Data::Object::Hash> object.
 
 The each_n_values method iterates over each element in the hash, executing the
 code reference supplied in the argument, passing the routine the next n values
-until all values have been seen. This method supports codification, i.e, takes
-an argument which can be a codifiable string, a code reference, or a code data
-type object. This method returns a L<Data::Object::Hash> object.
+until all values have been seen. This method returns a L<Data::Object::Hash>
+object.
 
 =over 4
 
@@ -846,11 +843,11 @@ type object. This method returns a L<Data::Object::Hash> object.
 
   # given {1..8}
 
-  $hash->each_n_values(4, sub {
-      my $value_1 = shift; # 2
-      my $value_2 = shift; # 4
-      my $value_3 = shift; # 6
-      my $value_4 = shift; # 8
+  $hash->each_n_values(4, fun (@values) {
+      $values[1] # 2
+      $values[2] # 4
+      $values[3] # 6
+      $values[4] # 8
       ...
   });
 
@@ -862,11 +859,10 @@ type object. This method returns a L<Data::Object::Hash> object.
 
   each(CodeRef $arg1, Any @args) : Any
 
-The each_value method iterates over each element in the hash, executing the code
-reference supplied in the argument, passing the routine the value at the current
-position in the loop. This method supports codification, i.e, takes an argument
-which can be a codifiable string, a code reference, or a code data type object.
-This method returns a L<Data::Object::Hash> object.
+The each_value method iterates over each element in the hash, executing the
+code reference supplied in the argument, passing the routine the value at the
+current position in the loop. This method returns a L<Data::Object::Hash>
+object.
 
 =over 4
 
@@ -874,8 +870,8 @@ This method returns a L<Data::Object::Hash> object.
 
   # given {1..8}
 
-  $hash->each_value(sub {
-      my $value = shift; # 2
+  $hash->each_value(fun ($value) {
+      ...
   });
 
 =back
@@ -1049,9 +1045,7 @@ The grep method iterates over each key/value pair in the hash, executing the
 code reference supplied in the argument, passing the routine the key and value
 at the current position in the loop and returning a new hash reference
 containing the elements for which the argument evaluated true. This method
-supports codification, i.e, takes an argument which can be a codifiable string,
-a code reference, or a code data type object. This method returns a
-L<Data::Object::Hash> object.
+returns a L<Data::Object::Hash> object.
 
 =over 4
 
@@ -1059,8 +1053,8 @@ L<Data::Object::Hash> object.
 
   # given {1..4}
 
-  $hash->grep(sub {
-      shift >= 3
+  $hash->grep(fun ($value) {
+      $value >= 3
   });
 
   # {3=>5}

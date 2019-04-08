@@ -1,6 +1,6 @@
 package WebService::KoreanSpeller;
 
-our $VERSION = '0.014';
+our $VERSION = '0.015';
 $VERSION = eval $VERSION;
 
 use Moose;
@@ -22,7 +22,7 @@ sub spellcheck {
     my $ua = LWP::UserAgent->new;
     my $text = $self->text;
     my $text1 = encode('utf8', $text);
-    my $req = POST 'http://speller.cs.pusan.ac.kr/PnuWebSpeller/lib/check.asp', [ text1 => $text1 ];
+    my $req = POST 'http://speller.cs.pusan.ac.kr/results', [ text1 => $text1 ];
     my $res = $ua->request($req);
 
     die unless $res->is_success;
@@ -30,24 +30,27 @@ sub spellcheck {
     #print "$content"; exit;
 
     my @items;
-    my @tables = $content =~ m{<table id='tableErr_\d+'.*?>(.*?)</TABLE>}sg;
+    my ($res_json) = ( $content =~ m/\bdata = \[\{"str":.*?"errInfo":(\[.*?\])/ );
+    return @items unless defined $res_json; # No error
+
+    my @tables = $res_json =~ m/(\{"help":.*?\})/g;
     return @items unless @tables; # No error
+
     foreach my $table (@tables) {
         my %item;
-        @item{qw/incorrect correct comment/} =
-             (
-                map { 
-                        $_ =~s/<.*?br\/>/\n/g;
-                        $_ =~s/^\s+//s;
-                        $_ =~s/\s+$//s;
-                        $_ =~s/&nbsp;/ /gs;
-                        $_
-                    } $table =~ m{<TD id='td(?:ErrorWord|ReplaceWord|Help)_\d+'.*?>(.*?)</TD>}sg
-             )[0,1,2];
-        $text =~ m/\Q$item{incorrect}\E/g;
-        $item{position} = pos($text) - length($item{incorrect});
+        @item{qw/comment position incorrect correct/} =
+        (
+            map {
+            $_ =~s/&#xA;/\n/g;
+            $_ =~s/^\s+//s;
+            $_ =~s/\s+$//s;
+            $_ =~s/&apos;//gs;
+            $_
+            } $table =~ m{"help":"(.*?)".*?,"start":(\d+),.*?,"orgStr":"(.*?)","candWord":"(.*?)"}sg
+        );
         push @items, \%item;
     }
+
     return @items;
 }
 

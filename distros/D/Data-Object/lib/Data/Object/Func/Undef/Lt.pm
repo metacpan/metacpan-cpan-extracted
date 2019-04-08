@@ -4,6 +4,8 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Func::Undef';
 
+our $VERSION = '0.95'; # VERSION
+
 # BUILD
 
 has arg1 => (
