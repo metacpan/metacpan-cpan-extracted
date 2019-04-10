@@ -1,8 +1,8 @@
 package Data::Object::Number;
 
 use Try::Tiny;
+use Role::Tiny::With;
 
-use Data::Object::Class;
 use Data::Object::Export qw(
   cast
   croak
@@ -14,7 +14,6 @@ map with($_), my @roles = qw(
   Data::Object::Role::Dumper
   Data::Object::Role::Output
   Data::Object::Role::Throwable
-  Data::Object::Role::Type
 );
 
 map with($_), my @rules = qw(
@@ -28,38 +27,11 @@ use overload (
   fallback => 1
 );
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base::Number';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my $role = 'Data::Object::Role::Type';
-
-  if (Scalar::Util::blessed($arg)) {
-    $arg = $arg->data if $arg->can('does') && $arg->does($role);
-  }
-
-  if (defined $arg) {
-    $arg =~ s/^\+//; # not keen on this but ...
-  }
-
-  if (!defined($arg) || ref($arg)) {
-    croak('Instantiation Error: Not a Number');
-  }
-
-  if (!Scalar::Util::looks_like_number($arg)) {
-    croak('Instantiation Error: Not an Number');
-  }
-
-  $arg += 0 unless $arg =~ /[a-zA-Z]/;
-
-  return bless \$arg, $class;
-}
-
 # METHODS
 
 sub roles {
@@ -855,24 +827,6 @@ L<Data::Object::Integer> object.
 
 =cut
 
-=head2 new
-
-  new(Int $arg1) : NumObject
-
-The new method expects a number and returns a new class instance.
-
-=over 4
-
-=item new example
-
-  # given 1_000_000
-
-  my $number = Data::Object::Number->new(1_000_000);
-
-=back
-
-=cut
-
 =head2 pow
 
   pow() : NumObject
@@ -1031,10 +985,6 @@ L<Data::Object::Role::Output>
 =item *
 
 L<Data::Object::Role::Throwable>
-
-=item *
-
-L<Data::Object::Role::Type>
 
 =back
 

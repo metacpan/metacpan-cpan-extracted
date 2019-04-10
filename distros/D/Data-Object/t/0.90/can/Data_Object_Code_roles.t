@@ -46,6 +46,4 @@ is_deeply $roles->[1], 'Data::Object::Role::Dumper';
 
 is_deeply $roles->[2], 'Data::Object::Role::Throwable';
 
-is_deeply $roles->[3], 'Data::Object::Role::Type';
-
 ok 1 and done_testing;

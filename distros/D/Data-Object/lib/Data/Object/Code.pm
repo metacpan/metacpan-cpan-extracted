@@ -1,8 +1,8 @@
 package Data::Object::Code;
 
 use Try::Tiny;
+use Role::Tiny::With;
 
-use Data::Object::Class;
 use Data::Object::Export qw(
   cast
   croak
@@ -13,7 +13,6 @@ map with($_), my @roles = qw(
   Data::Object::Role::Detract
   Data::Object::Role::Dumper
   Data::Object::Role::Throwable
-  Data::Object::Role::Type
 );
 
 map with($_), my @rules = qw(
@@ -27,28 +26,11 @@ use overload (
   fallback => 1
 );
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base::Code';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my $role = 'Data::Object::Role::Type';
-
-  if (Scalar::Util::blessed($arg)) {
-    $arg = $arg->data if $arg->can('does') && $arg->does($role);
-  }
-
-  unless (ref($arg) eq 'CODE') {
-    croak('Instantiation Error: Not a CodeRef');
-  }
-
-  return bless $arg, $class;
-}
-
 # METHODS
 
 sub self {
@@ -363,24 +345,6 @@ argument as the rvalue. This method returns a L<Data::Object::Code> object.
 
 =cut
 
-=head2 new
-
-  new(CodeRef $arg1) : CodeObject
-
-The new method expects a code reference and returns a new class instance.
-
-=over 4
-
-=item new example
-
-  # given sub { shift + 1 }
-
-  my $code = Data::Object::Code->new(sub { shift + 1 });
-
-=back
-
-=cut
-
 =head2 next
 
   next(Any $arg1) : Any
@@ -491,10 +455,6 @@ L<Data::Object::Role::Dumper>
 =item *
 
 L<Data::Object::Role::Throwable>
-
-=item *
-
-L<Data::Object::Role::Type>
 
 =back
 

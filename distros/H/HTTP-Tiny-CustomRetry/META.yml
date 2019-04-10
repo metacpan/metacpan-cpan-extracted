@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: HTTP-Tiny-CustomRetry
 requires:
+  Algorithm::Backoff: '0'
   HTTP::Tiny: '0.057'
   Log::ger: '0.023'
   Time::HiRes: '0'
@@ -28,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-CustomRetry
   homepage: https://metacpan.org/release/HTTP-Tiny-CustomRetry
   repository: git://github.com/perlancar/perl-HTTP-Tiny-CustomRetry.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

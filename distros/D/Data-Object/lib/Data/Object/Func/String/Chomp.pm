@@ -4,7 +4,7 @@ use Data::Object 'Class';
 
 extends 'Data::Object::Func::String';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 

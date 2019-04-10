@@ -14,6 +14,7 @@ use JSON::Schema::Fit;
 
 
 *_n = \&TypeComparator::real_number;
+*_f = \&TypeComparator::real_float_number;
 *_s = \&TypeComparator::real_string;
 
 my @tests = (
@@ -24,7 +25,7 @@ my @tests = (
     [ { type => 'integer', multipleOf => 5 }, 22.3, _n(20) ],
     [ { type => 'integer', multipleOf => 5 }, 23.3, _n(25) ],
 
-    [ { type => 'number', multipleOf => 0.01 }, 2/3, _n(0.67) ],
+    [ { type => 'number', multipleOf => 0.01 }, 2/3, _f(0.67) ],
 
     [ { type => 'string' }, 22.3, _s(22.3) ],
 

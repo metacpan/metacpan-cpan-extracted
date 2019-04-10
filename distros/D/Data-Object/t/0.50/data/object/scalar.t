@@ -10,7 +10,6 @@ ok Data::Object::Scalar->does('Data::Object::Role::Detract');
 ok Data::Object::Scalar->does('Data::Object::Role::Dumper');
 ok Data::Object::Scalar->does('Data::Object::Role::Output');
 ok Data::Object::Scalar->does('Data::Object::Role::Throwable');
-ok Data::Object::Scalar->does('Data::Object::Role::Type');
 
 # no longer supported
 # ok Data::Object::Scalar->does('Data::Object::Role::Value');
@@ -24,7 +23,6 @@ can_ok 'Data::Object::Scalar', 'ge';
 can_ok 'Data::Object::Scalar', 'gt';
 can_ok 'Data::Object::Scalar', 'le';
 can_ok 'Data::Object::Scalar', 'lt';
-can_ok 'Data::Object::Scalar', 'methods';
 can_ok 'Data::Object::Scalar', 'ne';
 can_ok 'Data::Object::Scalar', 'new';
 can_ok 'Data::Object::Scalar', 'print';

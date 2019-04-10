@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Twitter;
-$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.17';
+$App::SpreadRevolutionaryDate::Target::Twitter::VERSION = '0.18';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Twitter.
 
 use Moose;
@@ -24,27 +24,27 @@ use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
 
 has 'consumer_key' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'consumer_secret' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'access_token' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'access_token_secret' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 
@@ -108,7 +108,7 @@ App::SpreadRevolutionaryDate::Target::Twitter - Target class for L<App::SpreadRe
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 METHODS
 

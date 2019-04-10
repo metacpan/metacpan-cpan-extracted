@@ -15,12 +15,15 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-HTTPTinyUtils",
   "EXE_FILES" => [
     "script/http-tiny",
-    "script/http-tiny-cache"
+    "script/http-tiny-cache",
+    "script/http-tiny-customretry",
+    "script/http-tiny-retry"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::HTTPTinyUtils",
   "PREREQ_PM" => {
+    "Complete::Module" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::hash" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -28,7 +31,7 @@ my %WriteMakefileArgs = (
     "HTTP::Tiny::Cache" => 0,
     "Log::ger" => "0.023",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.811",
+    "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
     "Perinci::Sub::Util" => "0.46",
     "strict" => 0,
@@ -40,7 +43,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,6 +51,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Complete::Module" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::hash" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -58,7 +62,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.023",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.811",
+  "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
   "Perinci::Sub::Util" => "0.46",
   "Test::More" => 0,

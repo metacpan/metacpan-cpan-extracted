@@ -80,12 +80,50 @@ METHODS
     instance reference, but must provide the methods named above.
 
     This method is intended to be called by event loops and other similar
-    places, to provide a better integration.
+    places, to provide a better integration. Another way, which doesn't
+    involve directly depending on Future::IO or loading it, is to use the
+    $IMPL variable; see below.
 
     Can only be called once, and only if the default implementation is not
     in use, therefore a module that wishes to override this ought to invoke
     it as soon as possible on program startup, before any of the main
     Future::IO methods may have been called.
+
+THE $IMPL VARIABLE
+
+    Since version 0.02.
+
+    As an alternative to setting an implementation by using override_impl,
+    a package variable is also available that allows modules such as event
+    systems to opportunistically provide an implementation without needing
+    to depend on the module, or loading it require. Simply directly set
+    that package variable to the name of an implementing package or an
+    object instance.
+
+    Additionally, implementors may use a name within the Future::IO::Impl::
+    namespace, suffixed by the name of their event system.
+
+    For example, something like the following code arrangement is
+    recommended.
+
+       package Future::IO::Impl::BananaLoop;
+    
+       {
+          no warnings 'once';
+          ( $Future::IO::IMPL //= __PACKAGE__ ) eq __PACKAGE__ or
+             warn "Unable to set Future::IO implementation to " . __PACKAGE__ .
+                " as it is already $Future::IO::IMPL\n";
+       }
+    
+       sub sleep
+       {
+          ...
+       }
+    
+       sub sysread
+       {
+          ...
+       }
 
 AUTHOR
 

@@ -1,4 +1,12 @@
 Revision history for Future-IO
 
+0.02    2019-04-10 14:01:17
+        [CHANGES]
+         * Provide and document the $IMPL package variable mechanism
+
+        [BUGFIXES]
+         * Skip t/10sleep+sysread.t on MSWin32 because Windows doesn't support
+           select() on pipes (RT129108)
+
 0.01    2019-04-10 01:44:18
         First version, released on an unsuspecting world.

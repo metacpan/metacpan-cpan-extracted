@@ -2,6 +2,14 @@
 ##
 ## Change log for perl distribution Alien::DDC::Concordance
 
+v0.005 Wed, 10 Apr 2019 10:14:43 +0200 moocow
+	+ add --disable-jemalloc option to alien configure call
+	+ attempt to fix jemalloc segfaults on fedora 28 (RT #129101)
+
+v0.004 Wed, 10 Apr 2019 09:59:56 +0200 moocow
+	+ explicitly use https for alien_repository (should fix RT bug #129102)
+	  (see https://github.com/Perl5-Alien/Alien-Base-ModuleBuild/issues/6#issuecomment-417097485)
+
 v0.003 Thu, 22 Feb 2018 13:35:09 +0100 moocow
 	+ cowardly refuse to build anywhere but linux ("fixes" RT bug #124451)
 

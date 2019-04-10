@@ -1,15 +1,15 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2+2;
+use Test::More tests => 2+5+3;
 use Code::DRY;
 #########################
 can_ok('Code::DRY', 'set_lcp_to_zero_for_shadowed_substrings');
 can_ok('Code::DRY', 'find_duplicates_in');
 
-TODO: {
+##TODO: {
 
-local $TODO = 'more research needed for substring filtering';
+##local $TODO = 'more research needed for substring filtering';
 # create a memory file
 my $teststring = 'missssissssippi';
 
@@ -19,24 +19,24 @@ my $teststring = 'missssissssippi';
 # 1  11 ippi                        (i)
 # 2   6 issssippi              (issss)
 # 3   1 issssissssippi    (issss)
-# 4   0 missssissssippi
+# 4   0 missssissssippi  (m)
 # 5  13 pi                           (p)
 # 6  12 ppi                           (p)
-# 7  10 sippi
-# 8   5 sissssippi
-# 9   9 ssippi
-#10   4 ssissssippi
-#11   8 sssippi
-#12   3 sssissssippi
-#13   7 ssssippi
-#14   2 ssssissssippi
+# 7  10 sippi                      (s)
+# 8   5 sissssippi            (s)
+# 9   9 ssippi                    (s)
+#10   4 ssissssippi          (s)
+#11   8 sssippi                  (s)
+#12   3 sssissssippi        (s)
+#13   7 ssssippi                (s)
+#14   2 ssssissssippi      (s)
 
 #lcp offset
 # p map { (my $s=substr($teststring, Code::DRY::get_offset_at($_), Code::DRY::get_len_at($_)))=~s{\n}{\\n}g; sprintf "#%2d  %2d (%s)\n",$_,Code::DRY::get_len_at($_),$s } (0..Code::DRY::get_size()-1)
 # 0   0 ()           -> @14/0 (--,--)          5: @13/>0?      
 # 1   1 (i)          -> @11/1 (11,11) (14,14)  7: @10/>=1? || @13/>=1 not shadowed because @10/0 || @13/0
 # 2   1 (i)          -> @6/1  ( 6, 6) (11,11)  8:  @5/>=1? || @10/>=1     shadowed because @5/2  || @10/0
-# 3   5 (issss)      -> @1/5  ( 1, 5) ( 6,10)  4:  @0/>=5? || @5/>=5  not shadowed because @0/0  || @5/2
+# 3   6 (issssi)     -> @1/6  ( 1, 6) ( 6,11)  4:  @0/>=6? || @5/>=6  not shadowed because @0/0  || @5/2
 # 4   0 ()           -> @0/0  (--,--)                          shadowed per definition for first offset
 # 5   0 ()           -> @13/0 (--,--)          6: @12/>0?
 # 6   1 (p)          -> @12/1 (12,12) (13,13)  1: @11/>=1? not shadowed because @11/1
@@ -69,10 +69,18 @@ my $teststring = 'missssissssippi';
 #14   0 i               0 ()           @14/0 (--,--)
 
 Code::DRY::build_suffixarray_and_lcp($teststring);
+is_deeply([14,11,6,1,0,13,12,10,5,9,4,8,3,7,2], [ map { Code::DRY::get_offset_at($_) } (0 .. Code::DRY::get_size()-1)],
+  "build_suffixarray_and_lcp() builds suffix array");
+is_deeply([0,1,1,6,0,0,1,0,2,1,3,2,4,3,5], [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)],
+  "build_suffixarray_and_lcp() builds lcp array");
 Code::DRY::reduce_lcp_to_nonoverlapping_lengths();
-Code::DRY::set_lcp_to_zero_for_shadowed_substrings();
-is_deeply([0,1,0,5,0,0,1,0,0,0,0,0,0,0,0], [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)],
+is_deeply([0,1,1,5,0,0,1,0,2,1,3,2,4,3,5], [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)],
   "set_lcp_to_zero_for_shadowed_substrings() sets all shadowed prefixes to zero length");
+Code::DRY::set_lcp_to_zero_for_shadowed_substrings();
+is_deeply([0,1,0,5,0,0,1,0,0,0,0,0,0,3,0], [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)],
+  "set_lcp_to_zero_for_shadowed_substrings() sets all shadowed prefixes to zero length");
+is_deeply([4,3,14,12,10,8,2,13,11,9,7,1,6,5,0], [ map { Code::DRY::get_isa_at($_) } (0 .. Code::DRY::get_size()-1)],
+  "build_suffixarray_and_lcp() builds inverse suffix array");
 
 my @files = ($teststring);
 my @filerefs = map { \$_ } @files;
@@ -86,6 +94,8 @@ Code::DRY::build_suffixarray_and_lcp($teststring);
 Code::DRY::clip_lcp_to_fileboundaries(\@Code::DRY::fileoffsets);
 Code::DRY::reduce_lcp_to_nonoverlapping_lengths();
 Code::DRY::set_lcp_to_zero_for_shadowed_substrings();
+is_deeply([0,4,1,8,5,2,9,6,3,10,7], [ map { Code::DRY::get_offset_at($_) } (0 .. Code::DRY::get_size()-1)],
+  "build_suffixarray_and_lcp() builds suffix array");
 #remove_shadow substrings
 #isa ordering
 # 0   0 12341235235 0 ()    @0/0  (--,--)
@@ -99,8 +109,10 @@ Code::DRY::set_lcp_to_zero_for_shadowed_substrings();
 # 8   3 235         2 (23)  @8/2  ( 8, 9) ( 1, 2) cancel, is part of longer 1 and 4 problem
 # 9   6 35          1 (3)   @9/1  ( 9, 9) ( 2, 2) cancel, is part of 3
 #10   9 5           0 ()    @10/0 (--,--)
-is_deeply([0,3,0,0,3,0,0,0,0,0,0], [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)],
+is_deeply([0,3,0,2,3,0,0,0,0,0,0], [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)],
   "set_lcp_to_zero_for_shadowed_substrings() sets all shadowed prefixes to zero length");
+is_deeply([0,2,5,8,1,4,7,10,3,6,9], [ map { Code::DRY::get_isa_at($_) } (0 .. Code::DRY::get_size()-1)],
+  "build_suffixarray_and_lcp() builds inverse suffix array");
 
 #Code::DRY::find_duplicates_in(-1, undef, @filerefs);
 @filerefs = map { \$_ } ("1234", "1235", "1236", "1237", "1238", "1239");
@@ -112,4 +124,4 @@ Code::DRY::reduce_lcp_to_nonoverlapping_lengths();
 Code::DRY::set_lcp_to_zero_for_shadowed_substrings();
 Code::DRY::find_duplicates_in(-1, undef, @filerefs);
 
-}
+##}

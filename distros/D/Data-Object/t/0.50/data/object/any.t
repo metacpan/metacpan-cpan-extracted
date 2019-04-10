@@ -10,7 +10,6 @@ ok Data::Object::Any->does('Data::Object::Role::Detract');
 ok Data::Object::Any->does('Data::Object::Role::Dumper');
 ok Data::Object::Any->does('Data::Object::Role::Output');
 ok Data::Object::Any->does('Data::Object::Role::Throwable');
-ok Data::Object::Any->does('Data::Object::Role::Type');
 
 # no longer supported
 # ok Data::Object::Any->does('Data::Object::Role::Value');
@@ -24,7 +23,6 @@ can_ok 'Data::Object::Any', 'ge';
 can_ok 'Data::Object::Any', 'gt';
 can_ok 'Data::Object::Any', 'le';
 can_ok 'Data::Object::Any', 'lt';
-can_ok 'Data::Object::Any', 'methods';
 can_ok 'Data::Object::Any', 'ne';
 can_ok 'Data::Object::Any', 'new';
 can_ok 'Data::Object::Any', 'print';

@@ -6,6 +6,7 @@ build_requires:
   Function::Parameters: '2.001003'
   Import::Into: '1.002005'
   Moo: '2.000001'
+  Role::Tiny: '2.000006'
   Try::Tiny: '0.30'
   Type::Tiny: '1.000005'
   perl: v5.14.0
@@ -22,6 +23,7 @@ requires:
   Function::Parameters: '2.001003'
   Import::Into: '1.002005'
   Moo: '2.000001'
+  Role::Tiny: '2.000006'
   Try::Tiny: '0.30'
   Type::Tiny: '1.000005'
   perl: v5.14.0
@@ -29,7 +31,7 @@ resources:
   bugtracker: https://github.com/iamalnewkirk/data-object/issues
   homepage: http://metacpan.org/release/Data-Object/
   repository: git://github.com/iamalnewkirk/data-object.git
-version: '0.95'
+version: '0.96'
 x_authority: cpan:AWNCORP
 x_contributors:
   - 'Anthony Brummett <abrummet@genome.wustl.edu>'

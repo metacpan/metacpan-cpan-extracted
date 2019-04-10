@@ -1,12 +1,14 @@
 package HTTP::Tiny::Retry;
 
 our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
+
+use Time::HiRes qw(sleep);
 
 use parent 'HTTP::Tiny';
 
@@ -37,7 +39,7 @@ sub request {
         return $res if $res->{status} !~ /\A[5]/;
         last if $retries >= $self->{retries};
         $retries++;
-        log_trace "Failed requesting %s (%s - %s), retrying in %d second(s) (%d of %d) ...",
+        log_trace "Failed requesting %s (%s - %s), retrying in %.1f second(s) (%d of %d) ...",
             $url,
             $res->{status},
             $res->{reason},
@@ -64,7 +66,7 @@ HTTP::Tiny::Retry - Retry failed HTTP::Tiny requests
 
 =head1 VERSION
 
-This document describes version 0.003 of HTTP::Tiny::Retry (from Perl distribution HTTP-Tiny-Retry), released on 2019-04-10.
+This document describes version 0.004 of HTTP::Tiny::Retry (from Perl distribution HTTP-Tiny-Retry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 

@@ -1,8 +1,8 @@
 package Data::Object::String;
 
 use Try::Tiny;
+use Role::Tiny::With;
 
-use Data::Object::Class;
 use Data::Object::Export qw(
   cast
   croak
@@ -14,7 +14,6 @@ map with($_), my @roles = qw(
   Data::Object::Role::Dumper
   Data::Object::Role::Output
   Data::Object::Role::Throwable
-  Data::Object::Role::Type
 );
 
 map with($_), my @rules = qw(
@@ -28,30 +27,11 @@ use overload (
   fallback => 1
 );
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base::String';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my $role = 'Data::Object::Role::Type';
-
-  if (Scalar::Util::blessed($arg)) {
-    $arg = $arg->data if $arg->can('does') && $arg->does($role);
-  }
-
-  $arg = $arg ? "$arg" : "";
-
-  if (!defined($arg) || ref($arg)) {
-    croak('Instantiation Error: Not a String');
-  }
-
-  return bless \$arg, $class;
-}
-
 # METHODS
 
 sub roles {
@@ -996,24 +976,6 @@ represented by the object. This method returns a number value.
 
 =cut
 
-=head2 new
-
-  new(Str $arg1) : StrObject
-
-The new method expects a string and returns a new class instance.
-
-=over 4
-
-=item new example
-
-  # given abcedfghi
-
-  my $string = Data::Object::String->new('abcedfghi');
-
-=back
-
-=cut
-
 =head2 replace
 
   replace(Str $arg1, Str $arg2) : StrObject
@@ -1334,10 +1296,6 @@ L<Data::Object::Role::Output>
 =item *
 
 L<Data::Object::Role::Throwable>
-
-=item *
-
-L<Data::Object::Role::Type>
 
 =back
 

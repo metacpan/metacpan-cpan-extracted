@@ -1,8 +1,8 @@
 package Data::Object::Any;
 
 use Try::Tiny;
+use Role::Tiny::With;
 
-use Data::Object::Class;
 use Data::Object::Export qw(
   cast
   croak
@@ -14,7 +14,6 @@ map with($_), my @roles = qw(
   Data::Object::Role::Dumper
   Data::Object::Role::Output
   Data::Object::Role::Throwable
-  Data::Object::Role::Type
 );
 
 map with($_), my @rules = qw(
@@ -28,27 +27,11 @@ use overload (
   fallback => 1
 );
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base::Any';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my $role = 'Data::Object::Role::Type';
-
-  if (Scalar::Util::blessed($arg)) {
-    $arg = $arg->data if $arg->can('does') && $arg->does($role);
-  }
-  if (Scalar::Util::blessed($arg) && $arg->isa('Regexp') && $^V <= v5.12.0) {
-    $arg = do { \(my $q = qr/$arg/) };
-  }
-
-  return bless ref($arg) ? $arg : \$arg, $class;
-}
-
 # METHODS
 
 sub roles {
@@ -314,22 +297,6 @@ The ne method returns truthy if argument and object data are not equal.
 
 =cut
 
-=head2 new
-
-  new(Any $arg1) : AnyObject
-
-Construct a new object.
-
-=over 4
-
-=item new example
-
-  my $any = Data::Object::Any->new(\*main);
-
-=back
-
-=cut
-
 =head2 roles
 
   roles() : ArrayRef
@@ -385,10 +352,6 @@ L<Data::Object::Role::Output>
 =item *
 
 L<Data::Object::Role::Throwable>
-
-=item *
-
-L<Data::Object::Role::Type>
 
 =back
 

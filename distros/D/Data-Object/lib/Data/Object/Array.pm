@@ -1,8 +1,8 @@
 package Data::Object::Array;
 
 use Try::Tiny;
+use Role::Tiny::With;
 
-use Data::Object::Class;
 use Data::Object::Export qw(
   cast
   croak
@@ -14,7 +14,6 @@ map with($_), my @roles = qw(
   Data::Object::Role::Dumper
   Data::Object::Role::Output
   Data::Object::Role::Throwable
-  Data::Object::Role::Type
 );
 
 map with($_), my @rules = qw(
@@ -31,28 +30,11 @@ use overload (
   fallback => 1
 );
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base::Array';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my $role = 'Data::Object::Role::Type';
-
-  if (Scalar::Util::blessed($arg)) {
-    $arg = $arg->data if $arg->can('does') && $arg->does($role);
-  }
-
-  unless (ref($arg) eq 'ARRAY') {
-    croak('Instantiation Error: Not a ArrayRef');
-  }
-
-  return bless $arg, $class;
-}
-
 # METHODS
 
 sub self {
@@ -1724,26 +1706,6 @@ This method will throw an exception if called.
 
 =cut
 
-=head2 new
-
-  new(ArrayRef $arg1) : ArrayObject
-
-The new method expects a list or array reference and returns a new class
-instance.
-
-=over 4
-
-=item new example
-
-  # given 1..9
-
-  my $array = Data::Object::Array->new(1..9);
-  my $array = Data::Object::Array->new([1..9]);
-
-=back
-
-=cut
-
 =head2 none
 
   none(CodeRef $arg1, Any $arg2) : NumObject
@@ -2311,10 +2273,6 @@ L<Data::Object::Role::Output>
 =item *
 
 L<Data::Object::Role::Throwable>
-
-=item *
-
-L<Data::Object::Role::Type>
 
 =back
 

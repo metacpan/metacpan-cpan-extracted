@@ -9,6 +9,8 @@ use IO::Handle;
 
 use Future::IO;
 
+plan skip_all => "Cannot select() on pipes on Windows" if $^O eq "MSWin32";
+
 # sleep + sysread IO ready
 {
    pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";

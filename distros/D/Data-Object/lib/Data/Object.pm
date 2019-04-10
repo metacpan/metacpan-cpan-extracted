@@ -7,7 +7,7 @@ use warnings;
 
 use parent 'Data::Object::Config';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 # METHODS
@@ -465,7 +465,6 @@ benefits of a L<Moo> or L<Moose> derived object.
   # Data::Object::Float
   # Data::Object::Hash
   # Data::Object::Integer
-  # Data::Object::Kind
   # Data::Object::Number
   # Data::Object::Regexp
   # Data::Object::Replace

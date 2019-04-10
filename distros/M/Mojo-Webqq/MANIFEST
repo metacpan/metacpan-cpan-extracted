@@ -10,6 +10,7 @@ demo/openqq-client.pl
 demo/openqq-client.sh
 doc/Webqq.pod
 docker-image/Dockerfile
+docker-image/Dockerfile-ubuntu
 Docker.md
 FAQ.md
 IRC.md

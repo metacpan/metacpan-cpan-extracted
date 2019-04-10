@@ -23,7 +23,7 @@ use Data::Object::Type::Space;
 use Data::Object::Type::String;
 use Data::Object::Type::Undef;
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 

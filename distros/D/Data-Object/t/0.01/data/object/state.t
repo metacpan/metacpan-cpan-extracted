@@ -11,7 +11,7 @@ ok blessed $object;
 
 my $addr1 = refaddr($object);
 my $addr2 = refaddr(main->new);
-my $addr3 = refaddr(main->RENEW);
+my $addr3 = refaddr(main->renew);
 my $addr4 = refaddr(main->new);
 
 is $addr1, $addr2;

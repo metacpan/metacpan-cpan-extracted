@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JSON-Schema-Fit",
    "prereqs" : {
@@ -52,7 +52,7 @@
    "provides" : {
       "JSON::Schema::Fit" : {
          "file" : "lib/JSON/Schema/Fit.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -63,8 +63,8 @@
          "web" : "https://github.com/liosha/json-schema-fit"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
 }
 

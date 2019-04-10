@@ -30,6 +30,7 @@ unsigned int *LCP= 0;
 //unsigned int *RANKS= 0;
 //unsigned int *LAST_RANK= 0;
 //unsigned int *RANKP= 0;
+unsigned char * T;
 size_t n= 0;
 
 /*AV *
@@ -96,7 +97,6 @@ build_suffixarray_and_lcp(in)
     SV * in
 INIT:
     size_t size;
-    unsigned char * T;
     unsigned int *sa;
     unsigned int *isa;
     unsigned int i;
@@ -113,11 +113,15 @@ CODE:
 
   size = sv_len(in);
   T = SvPV_nolen(in);
-  if(T == NULL) {
+  if (T == NULL) {
     RETVAL = -1;
     goto MYOUTPUT;
   }
 
+  /* TODO
+ *   steal this input string from perl
+ *   and set the original scalar to undef
+ * */
   //printf("len %u, >%s<\n",size, T);
 
   SA  = (unsigned int *)malloc((size_t)(size+1) * sizeof(int)); // +1 for computing LCP
@@ -332,8 +336,27 @@ fprintf(stderr, "  at %u: offset (%u) set lcp from %u to 0\n", ISA[offset], offs
       }
    }
 
-
-
+SV *
+get_substr_from_input(offset=0, length=n)
+  unsigned offset;
+  unsigned length;
+CODE:
+  if (-(int)offset > 0) {
+    offset = n +(int)offset;
+  }
+  if (offset > n) {
+    RETVAL = &PL_sv_undef;
+  } else {
+    if (-(int)length > 0) {
+      length = n +(int)length;
+    }
+    if (length > n - offset) {
+      length = n - offset;
+    }
+    RETVAL = newSVpvn(T+offset,length);
+  }
+OUTPUT:
+  RETVAL
 
 
 AV *
@@ -422,3 +445,4 @@ CODE:
   free(ISA);
   n = 0;
 
+  

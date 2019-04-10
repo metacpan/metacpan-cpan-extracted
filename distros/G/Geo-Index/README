@@ -1,0 +1,46 @@
+Geo::Index allows the creation of in-memory geographic indices of sets of 
+points.  Once an index has been created one can run fast searches against 
+the index.  The module supports search by distance, by bounding box and 
+by proximity.
+
+While by default computations are done for the Earth, other bodies can be 
+used by supplying appropriates radii and circumferences.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+	Carp, Math::Trig, POSIX (for ceil), Config
+
+If possible, accelerated versions of certain functions will automatically be 
+used.  Use of the accelerated code requires a C99-compliant C compiler.
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Geo::Index
+
+LICENSE AND COPYRIGHT
+
+Copyright 2019 Alexander Hajnal, All rights reserved
+
+This module is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.  See https://dev.perl.org/licenses/artistic.html
+
+AUTHOR
+
+Alex Kent Hajnal
+
+akh@cpan.org
+https://alephnull.net/software
+https://github.com/Alex-Kent/Geo-Index

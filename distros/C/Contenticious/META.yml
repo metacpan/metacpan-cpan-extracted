@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.13'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -39,5 +40,5 @@ resources:
   bugtracker: http://github.com/memowe/contenticious/issues
   homepage: http://memowe.github.com/contenticious/
   repository: http://github.com/memowe/contenticious
-version: '0.392'
+version: '0.393'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

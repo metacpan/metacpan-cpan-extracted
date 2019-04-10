@@ -1,0 +1,105 @@
+NAME
+    Algorithm::Backoff - Various backoff strategies for retry
+
+VERSION
+    This document describes version 0.003 of Algorithm::Backoff (from Perl
+    distribution Algorithm-Backoff), released on 2019-04-10.
+
+SYNOPSIS
+     # 1. pick a strategy and instantiate
+
+     use Algorithm::Backoff::Constant;
+     my $ar = Algorithm::Backoff::Constant->new(
+         delay             => 2, # required
+         #delay_on_success => 0, # optional, default 0
+     );
+
+     # 2. log success/failure and get a new number of seconds to delay, timestamp is
+     # optional but must be monotonically increasing.
+
+     my $secs = $ar->failure(); # => 2
+     my $secs = $ar->success(); # => 0
+     my $secs = $ar->failure(); # => 2
+
+DESCRIPTION
+    This distribution provides several classes that implement various
+    backoff strategies for setting delay between retry attempts.
+
+    This class ("Algorithm::Backoff") is a base class only.
+
+METHODS
+  new
+    Usage:
+
+     new(%args) -> obj
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   jitter_factor => *float*
+
+        How much to add randomness.
+
+        If you set this to a value larger than 0, the actual delay will be
+        between a random number between original_delay * (1-jitter_factor)
+        and original_delay * (1+jitter_factor). Jitters are usually added to
+        avoid so-called "thundering herd" problem.
+
+    *   max_attempts => *uint* (default: 0)
+
+        Maximum number consecutive failures before giving up.
+
+        0 means to retry endlessly without ever giving up. 1 means to give
+        up after a single failure (i.e. no retry attempts). 2 means to retry
+        once after a failure. Note that after a success, the number of
+        attempts is reset (as expected). So if max_attempts is 3, and if you
+        fail twice then succeed, then on the next failure the algorithm will
+        retry again for a maximum of 3 times.
+
+    Return value: (obj)
+
+  success
+    Usage:
+
+     my $secs = $obj->success([ $timestamp ]);
+
+    Log a successful attempt. If not specified, $timestamp defaults to
+    current time. Will return the suggested number of seconds to wait before
+    doing another attempt.
+
+  failure
+    Usage:
+
+     my $secs = $obj->failure([ $timestamp ]);
+
+    Log a failed attempt. If not specified, $timestamp defaults to current
+    time. Will return the suggested number of seconds to wait before doing
+    another attempt, or -1 if it suggests that one gives up (e.g. if
+    "max_attempts" parameter has been exceeded).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Algorithm-Backoff>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Algorithm-Backoff>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Algorithm-Backoff>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

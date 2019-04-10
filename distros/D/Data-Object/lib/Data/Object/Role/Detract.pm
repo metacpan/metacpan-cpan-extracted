@@ -5,7 +5,7 @@ use warnings;
 
 use Data::Object::Role;
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 # METHODS

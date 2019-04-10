@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Data::Object::Class';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 
@@ -19,7 +19,7 @@ sub import {
   no strict 'refs';
 
   *{"${target}::BUILD"} = $class->can('BUILD');
-  *{"${target}::RENEW"} = $class->can('RENEW');
+  *{"${target}::renew"} = $class->can('renew');
 
   return;
 }
@@ -40,7 +40,7 @@ sub BUILD {
 
 # METHODS
 
-sub RENEW {
+sub renew {
   my ($self, @args) = @_;
 
   my $class = ref($self) || $self;
@@ -92,15 +92,15 @@ This package implements the following methods.
 
 =head2 renew
 
-  RENEW(Any @args) : Object
+  renew(Any @args) : Object
 
-The RENEW method resets the state and returns a new singleton.
+The renew method resets the state and returns a new singleton.
 
 =over 4
 
-=item RENEW example
+=item renew example
 
-  my $RENEW = $self->RENEW(@args);
+  my $renew = $self->renew(@args);
 
 =back
 

@@ -413,7 +413,6 @@ benefits of a [Moo](https://metacpan.org/pod/Moo) or [Moose](https://metacpan.or
     # Data::Object::Float
     # Data::Object::Hash
     # Data::Object::Integer
-    # Data::Object::Kind
     # Data::Object::Number
     # Data::Object::Regexp
     # Data::Object::Replace

@@ -1,6 +1,16 @@
 Changelog for Data-Object
 
-0.95 2019-04-07T17:33:09
+0.96 2019-04-10T13:05:56
+ - Updated documentation
+ - Moved Role::Type functionality into Base
+ - Replaced Kind with Base
+ - Renamed State#RENEW to State#renew
+ - Minor cosmetic change to Kind#space
+ - Cleaned up Regexp dispatchers
+ - Build 0.95 (#172)
+
+0.95 2019-04-07T17:33:28
+ - Built release version 0.95
  - Revert "Build 0.94 (#170)" (#171)
  - Remove all POD before regenerating
  - Removed lingering POD

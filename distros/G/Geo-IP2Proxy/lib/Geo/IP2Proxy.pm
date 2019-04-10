@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -962,7 +962,7 @@ __END__
 
 Geo::IP2Proxy - Reverse search of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots and data center ranges using IP2Proxy BIN database. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name and last seen date.
 
-This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. It supports both IPv4 and IPv6 addressing.
+This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP2Proxy Proxy Detection|https://www.ip2location.com/database/ip2proxy> upon subscription. It supports both IPv4 and IPv6 addressing.
 
 =head1 SYNOPSIS
 
@@ -994,22 +994,19 @@ This pure Perl module uses a file based IP2Proxy .BIN database available at http
 
 This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots and data center ranges using IP2Proxy BIN database. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name and last seen date.
 
-This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. You can visit https://www.ip2location.com/development-libraries to download BIN sample files. It supports both IPv4 and IPv6 addressing.
+This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP2Proxy Product Page|https://www.ip2location.com/database/ip2proxy> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download BIN sample files. It supports both IPv4 and IPv6 addressing.
 
 
 =head1 IP2PROXY DATABASES
 
-The complete IPv4 and IPv6 proxy database are available at 
+The complete IPv4 and IPv6 proxy database are available at L<IP2Proxy product page|https://www.ip2location.com/database/ip2proxy>
 
-https://www.ip2location.com/database/ip2proxy
+Meanwhile, sample databases are available at L<IP2Proxy development libraries|https://www.ip2location.com/development-libraries>
 
-Meanwhile, sample databases are available at
-
-https://www.ip2location.com/development-libraries
 
 The IP2Proxy database is being updated in daily basis for greater accuracy.
 
-Free creative-common monthly database with open proxies data only is available at https://lite.ip2location.com
+Free creative-common monthly database with open proxies data only is available at L<IP2Proxy LITE|https://lite.ip2location.com>
 
 
 =head1 CLASS METHODS
@@ -1114,11 +1111,11 @@ Returns the version number of Geo::IP2Proxy Perl module.
 
 =head1 SEE ALSO
 
-https://www.ip2location.com/database/ip2proxy
+L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-2.01
+2.02
 
 =head1 AUTHOR
 

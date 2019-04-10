@@ -2,18 +2,18 @@ NAME
     HTTP::Tiny::CustomRetry - Retry failed HTTP::Tiny requests
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::CustomRetry (from
+    This document describes version 0.002 of HTTP::Tiny::CustomRetry (from
     Perl distribution HTTP-Tiny-CustomRetry), released on 2019-04-10.
 
 SYNOPSIS
      use HTTP::Tiny::CustomRetry;
 
      my $res  = HTTP::Tiny::CustomRetry->new(
-         retry_strategy => 'ExponentialBackoff', # required, pick a strategy (which is name of submodule under Algorithm::Retry::*)
+         retry_strategy => 'Exponential', # required, pick a strategy (which is name of submodule under Algorithm::Backoff::*)
 
-         # the following attributes are available to customize the
-         # ExponentialBackoff strategy, which are attributes from
-         # Algorithm::Retry::ExponentialBackoff with retry_ prefix.
+         # the following attributes are available to customize the Exponential
+         # strategy, which are attributes from Algorithm::Backoff::Exponential with
+         # retry_ prefix.
 
          # retry_max_attempts     => ...,
          # retry_jitter_factor    => ...,

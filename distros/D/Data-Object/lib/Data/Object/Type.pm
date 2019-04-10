@@ -7,9 +7,9 @@ use Type::Tiny;
 use Type::Coercion;
 use Types::TypeTiny;
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 

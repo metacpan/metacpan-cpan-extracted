@@ -699,8 +699,8 @@ mv Data/Object/Integer/roles.t Data_Object_Integer_roles.t
 mv Data/Object/Integer/rules.t Data_Object_Integer_rules.t
 mv Data/Object/Integer/to.t Data_Object_Integer_to.t
 mv Data/Object/Integer/upto.t Data_Object_Integer_upto.t
-mv Data/Object/Kind/class.t Data_Object_Kind_class.t
-mv Data/Object/Kind/space.t Data_Object_Kind_space.t
+mv Data/Object/Base/class.t Data_Object_Base_class.t
+mv Data/Object/Base/space.t Data_Object_Base_space.t
 mv Data/Object/Number/abs.t Data_Object_Number_abs.t
 mv Data/Object/Number/atan2.t Data_Object_Number_atan2.t
 mv Data/Object/Number/cos.t Data_Object_Number_cos.t

@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "HTTP::Tiny" => "0.057",
     "Log::ger" => "0.023",
+    "Time::HiRes" => 0,
     "parent" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +44,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::ger" => "0.023",
   "Test::More" => 0,
+  "Time::HiRes" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

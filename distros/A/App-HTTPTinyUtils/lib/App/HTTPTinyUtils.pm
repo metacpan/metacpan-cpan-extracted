@@ -1,7 +1,7 @@
 package App::HTTPTinyUtils;
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-04-10'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +29,8 @@ sub _http_tiny {
         $opts{content} = <STDIN>;
     }
 
-    my $res = $class->new->request($method, $url, \%opts);
+    my $res = $class->new(%{ $args{attributes} // {} })
+        ->request($method, $url, \%opts);
 
     if ($args{raw}) {
         [200, "OK", $res];
@@ -57,6 +58,12 @@ $SPEC{http_tiny} = {
                 post   => {summary => 'Shortcut for --method POST'  , is_flag=>1, code=>sub { $_[0]{method} = 'POST'   } },
                 put    => {summary => 'Shortcut for --method PUT'   , is_flag=>1, code=>sub { $_[0]{method} = 'PUT'    } },
             },
+        },
+        attributes => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'attribute',
+            summary => 'Pass attributes to HTTP::Tiny constructor',
+            schema => ['hash*', each_key => 'str*'],
         },
         headers => {
             schema => ['hash*', of=>'str*'],
@@ -91,6 +98,68 @@ _
     output_code => sub { _http_tiny('HTTP::Tiny::Cache', @_) },
 );
 
+gen_modified_sub(
+    output_name => 'http_tiny_retry',
+    base_name   => 'http_tiny',
+    summary => 'Perform request with HTTP::Tiny::Retry',
+    description => <<'_',
+
+Like `http_tiny`, but uses <pm:HTTP::Tiny::Retry> instead of <pm:HTTP::Tiny>.
+See the documentation of HTTP::Tiny::Retry for more details.
+
+_
+    modify_meta => sub {
+        my $meta = shift;
+
+        $meta->{args}{attributes}{cmdline_aliases} = {
+            retries => {
+                summary => 'Number of retries',
+                code => sub { $_[0]{attributes}{retries} = $_[1] },
+            },
+            retry_delay => {
+                summary => 'Retry delay',
+                code => sub { $_[0]{attributes}{retry_delay} = $_[1] },
+            },
+        };
+    },
+    output_code => sub { _http_tiny('HTTP::Tiny::Retry', @_) },
+);
+
+gen_modified_sub(
+    output_name => 'http_tiny_customretry',
+    base_name   => 'http_tiny',
+    summary => 'Perform request with HTTP::Tiny::CustomRetry',
+    description => <<'_',
+
+Like `http_tiny`, but uses <pm:HTTP::Tiny::CustomRetry> instead of
+<pm:HTTP::Tiny>. See the documentation of HTTP::Tiny::CustomRetry for more
+details.
+
+_
+    modify_meta => sub {
+        my $meta = shift;
+
+        $meta->{args}{attributes}{cmdline_aliases} = {
+            retry_strategy => {
+                summary => 'Choose backoff strategy',
+                code => sub { $_[0]{attributes}{retry_strategy} = $_[1] },
+                # disabled, unrecognized for now
+                _completion => sub {
+                    require Complete::Module;
+
+                    my %args = @_;
+
+                    Complete::Module::complete_module(
+                        word => $args{word},
+                        ns_prefix => 'Algorithm::Backoff',
+                    );
+                },
+            },
+        };
+    },
+    output_code => sub { _http_tiny('HTTP::Tiny::CustomRetry', @_) },
+);
+
 1;
 # ABSTRACT: Command-line utilities related to HTTP::Tiny
 
@@ -106,7 +175,7 @@ App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.003 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2018-10-18.
+This document describes version 0.004 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
@@ -119,6 +188,10 @@ This distribution includes several utilities related to L<HTTP::Tiny>:
 =item * L<http-tiny>
 
 =item * L<http-tiny-cache>
+
+=item * L<http-tiny-customretry>
+
+=item * L<http-tiny-retry>
 
 =back
 
@@ -138,6 +211,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<attributes> => I<hash>
+
+Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
@@ -163,6 +240,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 http_tiny_cache
 
 Usage:
@@ -179,6 +257,103 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<attributes> => I<hash>
+
+Pass attributes to HTTP::Tiny constructor.
+
+=item * B<content> => I<str>
+
+=item * B<headers> => I<hash>
+
+=item * B<method> => I<str> (default: "GET")
+
+=item * B<raw> => I<bool>
+
+=item * B<url>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 http_tiny_customretry
+
+Usage:
+
+ http_tiny_customretry(%args) -> [status, msg, payload, meta]
+
+Perform request with HTTP::Tiny::CustomRetry.
+
+Like C<http_tiny>, but uses L<HTTP::Tiny::CustomRetry> instead of
+L<HTTP::Tiny>. See the documentation of HTTP::Tiny::CustomRetry for more
+details.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<attributes> => I<hash>
+
+Pass attributes to HTTP::Tiny constructor.
+
+=item * B<content> => I<str>
+
+=item * B<headers> => I<hash>
+
+=item * B<method> => I<str> (default: "GET")
+
+=item * B<raw> => I<bool>
+
+=item * B<url>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 http_tiny_retry
+
+Usage:
+
+ http_tiny_retry(%args) -> [status, msg, payload, meta]
+
+Perform request with HTTP::Tiny::Retry.
+
+Like C<http_tiny>, but uses L<HTTP::Tiny::Retry> instead of L<HTTP::Tiny>.
+See the documentation of HTTP::Tiny::Retry for more details.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<attributes> => I<hash>
+
+Pass attributes to HTTP::Tiny constructor.
 
 =item * B<content> => I<str>
 
@@ -225,7 +400,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

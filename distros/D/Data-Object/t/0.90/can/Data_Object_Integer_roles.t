@@ -48,6 +48,4 @@ is $roles->[2], 'Data::Object::Role::Output';
 
 is $roles->[3], 'Data::Object::Role::Throwable';
 
-is $roles->[4], 'Data::Object::Role::Type';
-
 ok 1 and done_testing;

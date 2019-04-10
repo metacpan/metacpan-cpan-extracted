@@ -5,6 +5,8 @@ use strict;
 use Test::Deep;
 use B;
 
+our $EPSILON = 0.0000001;
+
 # copied from JSON::packportPP::_looks_like_number
 sub _is_number {
     my $value = shift;
@@ -21,6 +23,16 @@ sub real_number {
         my $got = shift;
         return (0, "value has string flags") if !_is_number($got);
         return $got == $expected;
+    };
+}
+
+# real float number comparator
+sub real_float_number {
+    my $expected = shift;
+    return code sub {
+        my $got = shift;
+        return (0, "value has string flags") if !_is_number($got);
+        return abs($got - $expected) <= $EPSILON * $got;
     };
 }
 

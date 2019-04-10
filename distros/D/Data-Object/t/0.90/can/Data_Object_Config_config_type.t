@@ -42,6 +42,6 @@ my $config = Data::Object::Config::config_type();
 
 is_deeply $config->[0], ['use', 'Data::Object::Class'];
 is_deeply $config->[1], ['use', 'Data::Object::ClassHas'];
-is_deeply $config->[2], ['call', 'extends', 'Data::Object::Kind'];
+is_deeply $config->[2], ['call', 'extends', 'Data::Object::Base'];
 
 ok 1 and done_testing;

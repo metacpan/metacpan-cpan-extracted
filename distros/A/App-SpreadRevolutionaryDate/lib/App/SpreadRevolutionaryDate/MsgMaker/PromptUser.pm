@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.17';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.18';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -24,10 +24,10 @@ use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
 
 has 'default' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
-    default => 'Goodbye old world, hello revolutionary worlds',
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
+  default => 'Goodbye old world, hello revolutionary worlds',
 );
 
 around BUILDARGS => sub {
@@ -37,10 +37,7 @@ around BUILDARGS => sub {
     # Get sure locale has .mo file
     my ($volume, $directory, $file) = File::Spec->splitpath(__FILE__);
     my $locale_mo = File::Spec->catfile($directory, '..', '..', '..', 'LocaleData', $args{locale}, 'LC_MESSAGES', 'App-SpreadRevolutionaryDate.mo');
-    $args{locale} = 'fr' unless -f $locale_mo;
-  } else {
-    # Defaults to French
-    $args{locale} = 'fr';
+    $args{locale} = 'en' unless -f $locale_mo;
   }
 
   # Do not pass default => undef to force default in attribute definition
@@ -106,7 +103,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 METHODS
 

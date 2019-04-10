@@ -13,6 +13,7 @@ use JSON;
 use JSON::Schema::Fit;
 
 *_n = \&TypeComparator::real_number;
+*_f = \&TypeComparator::real_float_number;
 *_s = \&TypeComparator::real_string;
 
 my $schema = {
@@ -36,31 +37,31 @@ my $raw_data = {
 
 my @tests = (
     [ default => JSON::Schema::Fit->new(),
-        {aa => JSON::true, bb => _n(20), cc => _n(33.33), dd => _s(77)},
+        {aa => JSON::true, bb => _n(20), cc => _f(33.33), dd => _s(77)},
     ],
 
     [ full => JSON::Schema::Fit->new(clamp_numbers => 1),
-        {aa => JSON::true, bb => _n(10), cc => _n(33.33), dd => _s(77)},
+        {aa => JSON::true, bb => _n(10), cc => _f(33.33), dd => _s(77)},
     ],
 
     [ no_booleans => JSON::Schema::Fit->new(booleans => 0),
-        {aa => 1, bb => _n(20), cc => _n(33.33), dd => _s(77)},
+        {aa => 1, bb => _n(20), cc => _f(33.33), dd => _s(77)},
     ],
     [ no_rounding => JSON::Schema::Fit->new(round_numbers => 0),
-        {aa => JSON::true, bb => _n(22), cc => _n(33.333333), dd => _s(77)},
+        {aa => JSON::true, bb => _n(22), cc => _f(33.333333), dd => _s(77)},
     ],
     [ no_numbers => JSON::Schema::Fit->new(numbers => 0),
         {aa => JSON::true, bb => _s(22), cc => _s(33.333333), dd => _s(77)},
     ],
     [ no_strings => JSON::Schema::Fit->new(strings => 0),
-        {aa => JSON::true, bb => _n(20), cc => _n(33.33), dd => _n(77)},
+        {aa => JSON::true, bb => _n(20), cc => _f(33.33), dd => _n(77)},
     ],
     [ no_hash_keys => JSON::Schema::Fit->new(hash_keys => 0),
-        {aa => JSON::true, bb => _n(20), cc => _n(33.33), dd => _s(77), _debug => "stacktrace"},
+        {aa => JSON::true, bb => _n(20), cc => _f(33.33), dd => _s(77), _debug => "stacktrace"},
     ],
 
     [ with_clamp_numbers => JSON::Schema::Fit->new(clamp_numbers => 1),
-        {aa => JSON::true, bb => _n(10), cc => _n(33.33), dd => _s(77)},
+        {aa => JSON::true, bb => _n(10), cc => _f(33.33), dd => _s(77)},
     ],
 
     [ disable_all => JSON::Schema::Fit->new(map {$_ => 0} qw/booleans numbers round_numbers strings hash_keys/), $raw_data ],

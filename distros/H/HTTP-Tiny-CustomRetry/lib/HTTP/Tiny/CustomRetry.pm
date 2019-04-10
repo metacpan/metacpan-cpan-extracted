@@ -1,7 +1,7 @@
 package HTTP::Tiny::CustomRetry;
 
 our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,13 +29,13 @@ sub new {
 sub request {
     my ($self, $method, $url, $options) = @_;
 
-    # initiate retry strategy
-    unless ($self->{_retry}) {
+    # initiate backoff strategy
+    unless ($self->{_backoff}) {
 
         my $strategy = $self->{retry_strategy} //
             $ENV{HTTP_TINY_CUSTOMRETRY_STRATEGY};
         die "Please specify retry_strategy" unless $strategy;
-        my $pkg = "Algorithm::Retry::$strategy";
+        my $pkg = "Algorithm::Backoff::$strategy";
         (my $pkg_pm = "$pkg.pm") =~ s!::!/!g;
         require $pkg_pm;
 
@@ -53,17 +53,17 @@ sub request {
             }
         }
 
-        $self->{_retry} = $pkg->new(%ar_attrs);
+        $self->{_backoff} = $pkg->new(%ar_attrs);
     }
 
     my $res;
     while (1) {
         $res = $self->SUPER::request($method, $url, $options);
         if ($res->{status} !~ /\A[5]/) {
-            $self->{_retry}->success;
+            $self->{_backoff}->success;
             return $res;
         }
-        my $secs = $self->{_retry}->failure;
+        my $secs = $self->{_backoff}->failure;
         if ($secs == -1) {
             log_trace "Failed requesting %s (%s - %s), giving up",
                 $url,
@@ -76,7 +76,7 @@ sub request {
             $res->{status},
             $res->{reason},
             $secs,
-            $self->{_retry}{_attempts};
+            $self->{_backoff}{_attempts};
         sleep $secs;
     }
     $res;
@@ -97,18 +97,18 @@ HTTP::Tiny::CustomRetry - Retry failed HTTP::Tiny requests
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::CustomRetry (from Perl distribution HTTP-Tiny-CustomRetry), released on 2019-04-10.
+This document describes version 0.002 of HTTP::Tiny::CustomRetry (from Perl distribution HTTP-Tiny-CustomRetry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
  use HTTP::Tiny::CustomRetry;
 
  my $res  = HTTP::Tiny::CustomRetry->new(
-     retry_strategy => 'ExponentialBackoff', # required, pick a strategy (which is name of submodule under Algorithm::Retry::*)
+     retry_strategy => 'Exponential', # required, pick a strategy (which is name of submodule under Algorithm::Backoff::*)
 
-     # the following attributes are available to customize the
-     # ExponentialBackoff strategy, which are attributes from
-     # Algorithm::Retry::ExponentialBackoff with retry_ prefix.
+     # the following attributes are available to customize the Exponential
+     # strategy, which are attributes from Algorithm::Backoff::Exponential with
+     # retry_ prefix.
 
      # retry_max_attempts     => ...,
      # retry_jitter_factor    => ...,

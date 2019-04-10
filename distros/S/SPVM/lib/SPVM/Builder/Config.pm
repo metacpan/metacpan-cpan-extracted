@@ -4,6 +4,20 @@ use strict;
 use warnings;
 use Config;
 
+sub get_ext {
+  my ($self, $ext) = @_;
+  
+  return $self->{ext};
+}
+
+sub set_ext {
+  my ($self, $ext) = @_;
+  
+  $self->{ext} = $ext;
+  
+  return $self;
+}
+
 sub new {
   my $class = shift;
   
@@ -41,7 +55,7 @@ sub new_default {
   my $include_dir = $INC{"SPVM/Builder/Config.pm"};
   $include_dir =~ s/\/Config\.pm$//;
   $include_dir .= '/include';
-  $bconf->add_ccflags("-I$include_dir");
+  $bconf->add_extra_compiler_flags("-I$include_dir");
   
   # Add math library to extra_linker_flags
   $bconf->add_extra_linker_flags("-lm");
@@ -52,10 +66,13 @@ sub new_default {
   # Optimize
   $bconf->set_optimize('-O3');
   
+  # Extension
+  $bconf->set_ext('c');
+  
   # I want to print warnings, but if gcc version is different, can't suppress no needed warning message.
   # so I dicide not to print warning in release version
   if ($ENV{SPVM_TEST_ENABLE_WARNINGS}) {
-    $bconf->add_ccflags("-Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable -Wno-missing-field-initializers");
+    $bconf->add_extra_compiler_flags("-Wall -Wextra -Wno-unused-label -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wno-unused-variable -Wno-missing-field-initializers");
   }
   
   return $bconf;
@@ -74,7 +91,7 @@ sub new_cpp {
   my $include_dir = $INC{"SPVM/Builder/Config.pm"};
   $include_dir =~ s/\/Config\.pm$//;
   $include_dir .= '/include';
-  $bconf->add_ccflags("-I$include_dir");
+  $bconf->add_extra_compiler_flags("-I$include_dir");
   
   # Add math library to extra_linker_flags
   $bconf->add_extra_linker_flags("-lm");
@@ -87,6 +104,9 @@ sub new_cpp {
   
   # LD
   $bconf->set_ld('g++');
+  
+  # Extension
+  $bconf->set_ext('cpp');
   
   # Delete std
   $bconf->delete_std;

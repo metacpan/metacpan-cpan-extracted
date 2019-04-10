@@ -1,5 +1,11 @@
 Revision history for Perl extension Code::DRY.
 
+0.04
+	- Build.PL added
+	- documentation fixes
+	- increase test coverage
+	- exclude symbolically or hard linked files
+
 0.03
 	- bugfix for salcpis.c: this caused SIGABRT signals under OpenBSD
 	- bugfix for DRY.xs: accessor functions should never access unallocated memory.

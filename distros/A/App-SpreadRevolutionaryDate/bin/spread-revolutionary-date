@@ -34,7 +34,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,7 @@ This option can only be specified once, with a value as string. Spread a message
 
 =head3 locale
 
-This option can only be specified once, with a value as string. Spread with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'>. Defaults to C<'fr'>. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
+This option can only be specified once, with a value as string. Spread with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'>. Defaults to C<'fr'> for C<RevolutionaryDate> and C<'en'> otherwise. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
 
 =head3 test
 

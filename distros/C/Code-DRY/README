@@ -1,5 +1,5 @@
-Code::DRY version 0.01
-================
+Code::DRY version
+=================
 
 Code::DRY (short for Don't Repeat Yourself) is a Perl distribution
 used to detect repeated code fragments in Perl source code.
@@ -15,25 +15,23 @@ To install this module type the following:
    make test
    make install
 
-or
-   perl BUILD.PL
-   perl Build
-   perl Build test
-   perl Build install
 
 DEPENDENCIES
 
 Core module File::Find will be used for scanning directories.
 
-Core module Test::More is used in the tests.
+Core module Test::More and optionally non core module Test::Output is used in the tests.
 
-Core module Getopt::Long is used in the application CP_reporter.pl
+Test::Distribution, Test::Kwalitee, Test::CheckManifest, Test::Pod, Test::Pod::Coverage
+are needed for extra tests in the xt directory.
 
-Optional module Term::ANIColor is used by CP_reporter.pl
+Core module Getopt::Long is used in the application CP_reporter
+
+Optional module Term::ANSIColor is used by CP_reporter
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014 by hexcoder
+Copyright (C) 2014-2015,2019 by hexcoder
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

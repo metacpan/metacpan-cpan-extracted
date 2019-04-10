@@ -12,7 +12,6 @@ ok Data::Object::Array->does('Data::Object::Role::Dumper');
 ok Data::Object::Array->does('Data::Object::Rule::List');
 ok Data::Object::Array->does('Data::Object::Role::Output');
 ok Data::Object::Array->does('Data::Object::Role::Throwable');
-ok Data::Object::Array->does('Data::Object::Role::Type');
 
 can_ok 'Data::Object::Array', 'all';
 can_ok 'Data::Object::Array', 'any';
@@ -50,7 +49,6 @@ can_ok 'Data::Object::Array', 'list';
 can_ok 'Data::Object::Array', 'lt';
 can_ok 'Data::Object::Array', 'map';
 can_ok 'Data::Object::Array', 'max';
-can_ok 'Data::Object::Array', 'methods';
 can_ok 'Data::Object::Array', 'min';
 can_ok 'Data::Object::Array', 'ne';
 can_ok 'Data::Object::Array', 'new';

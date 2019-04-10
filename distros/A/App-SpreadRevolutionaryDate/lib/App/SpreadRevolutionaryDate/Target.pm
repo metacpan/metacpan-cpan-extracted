@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target;
-$App::SpreadRevolutionaryDate::Target::VERSION = '0.17';
+$App::SpreadRevolutionaryDate::Target::VERSION = '0.18';
 # ABSTRACT: Role providing interface for targets of L<App::SpreadRevolutionaryDate>.
 
 use MooseX::Role::Parameterized;
@@ -19,20 +19,20 @@ use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
 
 parameter worker => (
-    isa     => 'Str',
-    default => 'Any',
+  isa     => 'Str',
+  default => 'Any',
 );
 
 role {
-    my $p = shift;
+  my $p = shift;
 
-    has obj => (
-        is => 'ro',
-        isa => $p->worker,
-        required => 1,
-    );
+  has obj => (
+    is => 'ro',
+    isa => $p->worker,
+    required => 1,
+  );
 
-    requires 'spread';
+  requires 'spread';
 };
 
 
@@ -55,7 +55,7 @@ App::SpreadRevolutionaryDate::Target - Role providing interface for targets of L
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 

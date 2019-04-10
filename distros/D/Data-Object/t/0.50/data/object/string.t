@@ -10,7 +10,6 @@ ok Data::Object::String->does('Data::Object::Role::Detract');
 ok Data::Object::String->does('Data::Object::Role::Dumper');
 ok Data::Object::String->does('Data::Object::Role::Output');
 ok Data::Object::String->does('Data::Object::Role::Throwable');
-ok Data::Object::String->does('Data::Object::Role::Type');
 
 # no longer supported
 # ok Data::Object::String->does('Data::Object::Role::Value');
@@ -37,7 +36,6 @@ can_ok 'Data::Object::String', 'length';
 can_ok 'Data::Object::String', 'lines';
 can_ok 'Data::Object::String', 'lowercase';
 can_ok 'Data::Object::String', 'lt';
-can_ok 'Data::Object::String', 'methods';
 can_ok 'Data::Object::String', 'ne';
 can_ok 'Data::Object::String', 'new';
 can_ok 'Data::Object::String', 'print';

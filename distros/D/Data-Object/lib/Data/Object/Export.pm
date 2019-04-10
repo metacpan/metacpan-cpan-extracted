@@ -8,7 +8,7 @@ use Scalar::Util;
 
 use parent 'Exporter';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 

@@ -1,21 +1,23 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/HTTPTinyUtils/http_tiny_cache
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.487
 
-our $DATE = '2018-10-18'; # DATE
+our $DATE = '2019-04-10'; # DATE
 our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/HTTPTinyUtils/http_tiny_cache",
     program_name => "http-tiny-cache",
+    log => 1,
     read_config => 0,
     read_env => 0,
 );
@@ -37,7 +39,7 @@ http-tiny-cache - Perform request with HTTP::Tiny::Cache
 
 =head1 VERSION
 
-This document describes version 0.003 of http-tiny-cache (from Perl distribution App-HTTPTinyUtils), released on 2018-10-18.
+This document describes version 0.004 of http-tiny-cache (from Perl distribution App-HTTPTinyUtils), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
@@ -57,6 +59,16 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--attributes-json>=I<s>
+
+Pass attributes to HTTP::Tiny constructor (JSON-encoded).
+
+See C<--attributes>.
+
+=item B<--attributes>=I<s>
+
+Pass attributes to HTTP::Tiny constructor.
 
 =item B<--content>=I<s>
 
@@ -107,6 +119,32 @@ See C<--method>.
 =item B<--raw>
 
 =item B<--url>=I<s>*
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -219,7 +257,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

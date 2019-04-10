@@ -8,7 +8,7 @@ package Future::IO;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -16,7 +16,7 @@ use Carp;
 my @alarms;
 my @readers;
 
-my $IMPL = "Future::IO::_Impl";
+our $IMPL;
 
 =head1 NAME
 
@@ -87,7 +87,7 @@ sub sleep
    shift;
    my ( $secs ) = @_;
 
-   return $IMPL->sleep( $secs );
+   return ( $IMPL //= "Future::IO::_Impl" )->sleep( $secs );
 }
 
 =head2 sysread
@@ -111,7 +111,7 @@ sub sysread
    shift;
    my ( $fh, $length ) = @_;
 
-   return $IMPL->sysread( $fh, $length );
+   return ( $IMPL //= "Future::IO::_Impl" )->sysread( $fh, $length );
 }
 
 =head2 override_impl
@@ -123,7 +123,9 @@ internal implementation. This can either be a package name or an object
 instance reference, but must provide the methods named above.
 
 This method is intended to be called by event loops and other similar places,
-to provide a better integration.
+to provide a better integration. Another way, which doesn't involve directly
+depending on C<Future::IO> or loading it, is to use the C<$IMPL> variable; see
+below.
 
 Can only be called once, and only if the default implementation is not in use,
 therefore a module that wishes to override this ought to invoke it as soon as
@@ -137,12 +139,11 @@ my $overridden;
 sub override_impl
 {
    shift;
-   croak "Future::IO implementation is already set" if $overridden;
+   croak "Future::IO implementation is already overridden" if defined $IMPL;
    croak "Future::IO implementation cannot be set once default is already in use"
       if @alarms or @readers;
 
    ( $IMPL ) = @_;
-   $overridden++;
 }
 
 package
@@ -253,6 +254,40 @@ sub await
       ( shift @alarms )->f->done;
    }
 }
+
+=head1 THE C<$IMPL> VARIABLE
+
+I<Since version 0.02.>
+
+As an alternative to setting an implementation by using L<override_impl>, a
+package variable is also available that allows modules such as event systems
+to opportunistically provide an implementation without needing to depend on
+the module, or loading it C<require>. Simply directly set that package
+variable to the name of an implementing package or an object instance.
+
+Additionally, implementors may use a name within the C<Future::IO::Impl::>
+namespace, suffixed by the name of their event system.
+
+For example, something like the following code arrangement is recommended.
+
+   package Future::IO::Impl::BananaLoop;
+
+   {
+      no warnings 'once';
+      ( $Future::IO::IMPL //= __PACKAGE__ ) eq __PACKAGE__ or
+         warn "Unable to set Future::IO implementation to " . __PACKAGE__ .
+            " as it is already $Future::IO::IMPL\n";
+   }
+
+   sub sleep
+   {
+      ...
+   }
+
+   sub sysread
+   {
+      ...
+   }
 
 =head1 AUTHOR
 

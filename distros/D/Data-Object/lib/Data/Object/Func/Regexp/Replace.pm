@@ -6,7 +6,7 @@ use Data::Object::Replace;
 
 extends 'Data::Object::Func::Regexp';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 

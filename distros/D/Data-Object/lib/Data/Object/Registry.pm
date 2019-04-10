@@ -6,9 +6,9 @@ use warnings;
 use Data::Object::State;
 use Type::Registry;
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 # METHODS

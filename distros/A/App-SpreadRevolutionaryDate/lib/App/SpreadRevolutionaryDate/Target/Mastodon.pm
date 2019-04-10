@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Mastodon;
-$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.17';
+$App::SpreadRevolutionaryDate::Target::Mastodon::VERSION = '0.18';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Mastodon.
 
 use Moose;
@@ -23,27 +23,27 @@ use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
 
 has 'instance' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'client_id' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'client_secret' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'access_token' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 
@@ -106,7 +106,7 @@ App::SpreadRevolutionaryDate::Target::Mastodon - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 METHODS
 

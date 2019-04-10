@@ -12,7 +12,8 @@ ok Data::Object::Float->does('Data::Object::Role::Dumper');
 # ok Data::Object::Float->does('Data::Object::Role::Numeric');
 ok Data::Object::Float->does('Data::Object::Role::Output');
 ok Data::Object::Float->does('Data::Object::Role::Throwable');
-ok Data::Object::Float->does('Data::Object::Role::Type');
+# no longer supported
+# ok Data::Object::Float->does('Data::Object::Role::Type');
 # no longer supported
 # ok Data::Object::Float->does('Data::Object::Role::Value');
 
@@ -26,7 +27,6 @@ can_ok 'Data::Object::Float', 'ge';
 can_ok 'Data::Object::Float', 'gt';
 can_ok 'Data::Object::Float', 'le';
 can_ok 'Data::Object::Float', 'lt';
-can_ok 'Data::Object::Float', 'methods';
 can_ok 'Data::Object::Float', 'ne';
 can_ok 'Data::Object::Float', 'new';
 can_ok 'Data::Object::Float', 'print';

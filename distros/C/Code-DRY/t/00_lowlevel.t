@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2+4+4+5+7+6+3;
-BEGIN { use_ok('Code::DRY') };
+use Test::More tests => 2+8+5+5+5+13+6+3;
+sub latest_version { return '0.04' }
+BEGIN { use_ok('Code::DRY', latest_version()) };
 require_ok('Code::DRY');
 
 #########################
@@ -13,12 +14,14 @@ can_ok('Code::DRY', 'get_offset_at');
 can_ok('Code::DRY', 'get_isa_at');
 can_ok('Code::DRY', 'get_len_at');
 can_ok('Code::DRY', 'get_size');
+can_ok('Code::DRY', 'get_substr_from_input');
 can_ok('Code::DRY', '__free_all');
 
 is(Code::DRY::get_size(), 0, "initial get_size() gives 0");
 is(Code::DRY::get_offset_at(0), 0xffffffff, "initial get_offset_at() gives ~0");
 is(Code::DRY::get_len_at(0), 0xffffffff, "initial get_len_at() gives ~0");
 is(Code::DRY::get_isa_at(0), 0xffffffff, "initial get_isa_at() gives ~0");
+is(Code::DRY::get_substr_from_input(0,0), undef, "initial get_substr_from_input() gives undef");
 
 Code::DRY::__free_all();
 
@@ -26,10 +29,15 @@ is(Code::DRY::get_size(), 0, "get_size() after __free_all gives 0");
 is(Code::DRY::get_offset_at(0), 0xffffffff, "get_offset_at() after __free_all gives ~0");
 is(Code::DRY::get_len_at(0), 0xffffffff, "get_len_at() after __free_all gives ~0");
 is(Code::DRY::get_isa_at(0), 0xffffffff, "get_isa_at() after __free_all gives ~0");
+is(Code::DRY::get_substr_from_input(0,0), undef, "get_substr_from_input() after __free_all gives undef");
 
 my ($SA, $LCP, $ISA);
 my $teststring = 'aba';
-is(Code::DRY::build_suffixarray_and_lcp($teststring), 0, "build the suffix array for '$teststring' succeeds");
+my $teststring2 = $teststring;
+is(Code::DRY::build_suffixarray_and_lcp($teststring2), 0, "build the suffix array for '$teststring2' succeeds");
+#TODO: encapsulate the input string (without copying (move-semantics) and memory leaks)
+#$teststring2 = 'Code-DRY-teststring';
+undef $teststring2;
 
 is(Code::DRY::get_size(), length $teststring, "get_size() gives the right size back");
 
@@ -51,10 +59,23 @@ is_deeply($ISA, [1, 2, 0], "the content of the inverse suffix array is correct")
 # 1    (a)
 # 0    ()
 
-TODO: { local $TODO = 'a trivial case that does not work yet';
 $LCP = [ map { Code::DRY::get_len_at($_) } (0 .. Code::DRY::get_size()-1)];
 is_deeply($LCP, [0, 1, 0], "the content of the longest common prefix array is correct");
-}
+
+is(Code::DRY::get_substr_from_input(1,1), 'b', "get_substr_from_input(secondCharacter,1) after build_suffixarray_and_lcp gives second character");
+is(Code::DRY::get_substr_from_input(3,0), '', "get_substr_from_input(behindEndOfString, 0) gives empty string");
+is(Code::DRY::get_substr_from_input(2,1), 'a', "get_substr_from_input(lastCharOfString, 1) gives last character");
+is(Code::DRY::get_substr_from_input(2,2), 'a', "get_substr_from_input(lastCharOfString, 2) gives last character");
+is(Code::DRY::get_substr_from_input(-1,0), '', "get_substr_from_input(-1,0) gives empty string");
+is(Code::DRY::get_substr_from_input(-2,1), 'b', "get_substr_from_input(secondCharacter,1) after build_suffixarray_and_lcp gives second character");
+is(Code::DRY::get_substr_from_input(-1,1), 'a', "get_substr_from_input(lastCharOfString, 1) gives last character");
+is(Code::DRY::get_substr_from_input(-1,2), 'a', "get_substr_from_input(lastCharOfString, 2) gives last character");
+is(Code::DRY::get_substr_from_input(0,-1), 'ab', "get_substr_from_input(0, -1) gives string without last character");
+is(Code::DRY::get_substr_from_input(0,-2), 'a', "get_substr_from_input(0, -2) gives string without last two characters");
+is(Code::DRY::get_substr_from_input(-2,-1), 'ba', "get_substr_from_input(-2, -1) gives string without first character");
+is(Code::DRY::get_substr_from_input(-2), 'ba', "get_substr_from_input(-2) gives string without first character");
+is(Code::DRY::get_substr_from_input(), 'aba', "get_substr_from_input() gives complete string");
+
 
 $teststring = 'mississippi';
 is(Code::DRY::build_suffixarray_and_lcp($teststring), 0, "build the suffix array for '$teststring' succeeds");

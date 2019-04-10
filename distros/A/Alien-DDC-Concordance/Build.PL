@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Alien::Base::ModuleBuild;
 
-##-- we don't expect this package to build anywhere but linux
+##-- we don't expect this package to build anywhere but linux (RT #124451)
 die("cowardly refusing to build on non-linux system; edit Build.PL and try again!") if ($^O !~ /linux/i);
 
 ##======================================================================
@@ -28,7 +28,7 @@ my $builder = $class->new
    module_name => 'Alien::DDC::Concordance',
    license => 'perl',
    configure_requires => {
-			  'Alien::Base::ModuleBuild'  => '0.027',
+			  'Alien::Base::ModuleBuild'  => '0.027', ##-- RT #112613
 			  'Module::Build' => '0.38',
 			 },
    test_requires => {
@@ -43,7 +43,7 @@ my $builder = $class->new
    dist_author => 'Bryan Jurish <moocow@cpan.org>',
    alien_name => 'ddc',
    alien_repository => {
-			protocol => 'http',
+			protocol => 'https', ##-- RT #129102
 			host     => 'sourceforge.net',
 			##--
 			#location => 'projects/ddc-concordance/files/ddc-concordance/2.0/',
@@ -53,7 +53,8 @@ my $builder = $class->new
 			exact_filename => 'download',
 		       },
    alien_build_commands => [
-			    '%c --prefix=%s --enable-shared --enable-static',
+			    ##-- RT #129101: jemalloc causes segfaults on fedora 28?
+			    '%c --prefix=%s --enable-shared --enable-static --disable-jemalloc',
 			    'make AM_MAKEFLAGS=-j4',
 			   ],
    ##

@@ -2,7 +2,7 @@ package Test2::Formatter::QVF;
 use strict;
 use warnings;
 
-our $VERSION = '0.001072';
+our $VERSION = '0.001073';
 
 BEGIN { require Test2::Formatter::Test2; our @ISA = qw(Test2::Formatter::Test2) }
 
@@ -43,6 +43,7 @@ sub write {
     $self->{+ECOUNT}++;
 
     return unless $self->{+TTY};
+    return unless $self->{+PROGRESS};
 
     $show ||= 1 unless $self->{+ECOUNT} % 10;
 

@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny::Retry - Retry failed HTTP::Tiny requests
 
 VERSION
-    This document describes version 0.003 of HTTP::Tiny::Retry (from Perl
+    This document describes version 0.004 of HTTP::Tiny::Retry (from Perl
     distribution HTTP-Tiny-Retry), released on 2019-04-10.
 
 SYNOPSIS

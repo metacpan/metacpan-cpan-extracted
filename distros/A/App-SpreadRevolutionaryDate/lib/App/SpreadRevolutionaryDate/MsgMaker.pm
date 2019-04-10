@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker;
-$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.17';
+$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.18';
 # ABSTRACT: Role providing interface for crafting a message to be spread by L<App::SpreadRevolutionaryDate>.
 
 use Moose::Role;
@@ -24,15 +24,17 @@ has locale => (
   is => 'ro',
   isa => 'Str',
   required => 1,
-  default => 'fr',
+  default => 'en',
   trigger => sub {
     # Set locale to $val, see https://metacpan.org/pod/Locale::TextDomain::FAQ#How-do-I-switch-languages-or-force-a-certain-language-independently-from-user-settings-read-from-the-environment?
     my ( $self, $val, $old_val ) = @_;
-    Locale::Messages->select_package('gettext_pp');
-    set_locale(LC_ALL, $val, undef, 'utf-8');
-    nl_putenv("LANGUAGE=$val");
-    nl_putenv("LANG=$val");
-    nl_putenv("OUTPUT_CHARSET=utf-8");
+    if ($val) {
+      Locale::Messages->select_package('gettext_pp');
+      set_locale(LC_ALL, $val, undef, 'utf-8');
+      nl_putenv("LANGUAGE=$val");
+      nl_putenv("LANG=$val");
+      nl_putenv("OUTPUT_CHARSET=utf-8");
+    }
   },
 );
 
@@ -58,7 +60,7 @@ App::SpreadRevolutionaryDate::MsgMaker - Role providing interface for crafting a
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 

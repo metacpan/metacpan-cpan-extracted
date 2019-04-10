@@ -17,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-HTTPTinyUtils
 requires:
+  Complete::Module: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -24,7 +25,7 @@ requires:
   HTTP::Tiny::Cache: '0'
   Log::ger: '0.023'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.811'
+  Perinci::CmdLine::Base: '1.816'
   Perinci::CmdLine::Classic: '1.770'
   Perinci::Sub::Util: '0.46'
   perl: '5.010001'
@@ -34,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-HTTPTinyUtils
   homepage: https://metacpan.org/release/App-HTTPTinyUtils
   repository: git://github.com/perlancar/perl-App-HTTPTinyUtils.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -46,6 +47,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript http-tiny-cache'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript http-tiny-retry'
+      version: '0.421'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript http-tiny-customretry'
       version: '0.421'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
@@ -122,7 +131,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -285,7 +294,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -353,7 +362,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

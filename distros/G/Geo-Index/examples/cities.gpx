@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="MapSource 6.16.3" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+
+	<wpt lat="-90.0" lon="0.0">
+		<name>South pole, Antarctica</name>
+	</wpt>
+	
+	<wpt lat="-77.846323" lon="166.668235">
+		<name>McMurdo Station, Antarctica</name>
+	</wpt>
+	
+	<wpt lat="90.0" lon="0.0">
+		<name>North pole, Arctic</name>
+	</wpt>
+	
+	<wpt lat="34.28" lon="69.11">
+		<name>Kabul, Afghanistan</name>
+	</wpt>
+	
+	<wpt lat="41.18" lon="19.49">
+		<name>Tirane, Albania</name>
+	</wpt>
+	
+	<wpt lat="36.42" lon="03.08">
+		<name>Algiers, Algeria</name>
+	</wpt>
+	
+	<wpt lat="-14.16" lon="-170.43">
+		<name>Pago Pago, American Samoa</name>
+	</wpt>
+	
+	<wpt lat="42.31" lon="01.32">
+		<name>Andorra la Vella, Andorra</name>
+	</wpt>
+	
+	<wpt lat="-08.50" lon="13.15">
+		<name>Luanda, Angola</name>
+	</wpt>
+	
+	<wpt lat="17.20" lon="-61.48">
+		<name>West Indies, Antigua and Barbuda</name>
+	</wpt>
+	
+	<wpt lat="-36.30" lon="-60.00">
+		<name>Buenos Aires, Argentina</name>
+	</wpt>
+	
+	<wpt lat="-54.801944" lon="-68.303056">
+		<name>Ushuaia, Argentina</name>
+	</wpt>
+	
+	<wpt lat="40.10" lon="44.31">
+		<name>Yerevan, Armenia</name>
+	</wpt>
+	
+	<wpt lat="12.32" lon="-70.02">
+		<name>Oranjestad, Aruba</name>
+	</wpt>
+	
+	<wpt lat="-35.15" lon="149.08">
+		<name>Canberra, Australia</name>
+	</wpt>
+	
+	<wpt lat="-42.88188" lon="147.32683">
+		<name>Hobart, Tasmania, Australia</name>
+	</wpt>
+	
+	<wpt lat="48.12" lon="16.22">
+		<name>Vienna, Austria</name>
+	</wpt>
+	
+	<wpt lat="40.29" lon="49.56">
+		<name>Baku, Azerbaijan</name>
+	</wpt>
+	
+	<wpt lat="25.05" lon="-77.20">
+		<name>Nassau, Bahamas</name>
+	</wpt>
+	
+	<wpt lat="26.10" lon="50.30">
+		<name>Manama, Bahrain</name>
+	</wpt>
+	
+	<wpt lat="23.43" lon="90.26">
+		<name>Dhaka, Bangladesh</name>
+	</wpt>
+	
+	<wpt lat="13.05" lon="-59.30">
+		<name>Bridgetown, Barbados</name>
+	</wpt>
+	
+	<wpt lat="53.52" lon="27.30">
+		<name>Minsk, Belarus</name>
+	</wpt>
+	
+	<wpt lat="50.51" lon="04.21">
+		<name>Brussels, Belgium</name>
+	</wpt>
+	
+	<wpt lat="17.18" lon="-88.30">
+		<name>Belmopan, Belize</name>
+	</wpt>
+	
+	<wpt lat="06.23" lon="02.42">
+		<name>Porto Novo (constitutional) / Cotonou (seat of government), Benin</name>
+	</wpt>
+	
+	<wpt lat="27.31" lon="89.45">
+		<name>Thimphu, Bhutan</name>
+	</wpt>
+	
+	<wpt lat="-16.20" lon="-68.10">
+		<name>La Paz (administrative) / Sucre (legislative), Bolivia</name>
+	</wpt>
+	
+	<wpt lat="43.52" lon="18.26">
+		<name>Sarajevo, Bosnia and Herzegovina</name>
+	</wpt>
+	
+	<wpt lat="-24.45" lon="25.57">
+		<name>Gaborone, Botswana</name>
+	</wpt>
+	
+	<wpt lat="-15.47" lon="-47.55">
+		<name>Brasilia, Brazil</name>
+	</wpt>
+	
+	<wpt lat="18.27" lon="-64.37">
+		<name>Road Town, British Virgin Islands</name>
+	</wpt>
+	
+	<wpt lat="04.52" lon="115.00">
+		<name>Bandar Seri Begawan, Brunei Darussalam</name>
+	</wpt>
+	
+	<wpt lat="42.45" lon="23.20">
+		<name>Sofia, Bulgaria</name>
+	</wpt>
+	
+	<wpt lat="12.15" lon="-01.30">
+		<name>Ouagadougou, Burkina Faso</name>
+	</wpt>
+	
+	<wpt lat="-03.16" lon="29.18">
+		<name>Bujumbura, Burundi</name>
+	</wpt>
+	
+	<wpt lat="11.33" lon="104.55">
+		<name>Phnom Penh, Cambodia</name>
+	</wpt>
+	
+	<wpt lat="03.50" lon="11.35">
+		<name>Yaounde, Cameroon</name>
+	</wpt>
+	
+	<wpt lat="45.27" lon="-75.42">
+		<name>Ottawa, Canada</name>
+	</wpt>
+	
+	<wpt lat="15.02" lon="-23.34">
+		<name>Praia, Cape Verde</name>
+	</wpt>
+	
+	<wpt lat="19.20" lon="-81.24">
+		<name>George Town, Cayman Islands</name>
+	</wpt>
+	
+	<wpt lat="04.23" lon="18.35">
+		<name>Bangui, Central African Republic</name>
+	</wpt>
+	
+	<wpt lat="12.10" lon="14.59">
+		<name>N'Djamena, Chad</name>
+	</wpt>
+	
+	<wpt lat="-33.24" lon="-70.40">
+		<name>Santiago, Chile</name>
+	</wpt>
+	
+	<wpt lat="39.55" lon="116.20">
+		<name>Beijing, China</name>
+	</wpt>
+	
+	<wpt lat="04.34" lon="-74.00">
+		<name>Bogota, Colombia</name>
+	</wpt>
+	
+	<wpt lat="-11.40" lon="43.16">
+		<name>Moroni, Comros</name>
+	</wpt>
+	
+	<wpt lat="-04.09" lon="15.12">
+		<name>Brazzaville, Congo</name>
+	</wpt>
+	
+	<wpt lat="09.55" lon="-84.02">
+		<name>San Jose, Costa Rica</name>
+	</wpt>
+	
+	<wpt lat="06.49" lon="-05.17">
+		<name>Yamoussoukro, Cote d'Ivoire</name>
+	</wpt>
+	
+	<wpt lat="45.50" lon="15.58">
+		<name>Zagreb, Croatia</name>
+	</wpt>
+	
+	<wpt lat="23.08" lon="-82.22">
+		<name>Havana, Cuba</name>
+	</wpt>
+	
+	<wpt lat="35.10" lon="33.25">
+		<name>Nicosia, Cyprus</name>
+	</wpt>
+	
+	<wpt lat="50.05" lon="14.22">
+		<name>Prague, Czech Republic</name>
+	</wpt>
+	
+	<wpt lat="-04.20" lon="15.15">
+		<name>Kinshasa, Democratic Republic of the Congo</name>
+	</wpt>
+	
+	<wpt lat="55.41" lon="12.34">
+		<name>Copenhagen, Denmark</name>
+	</wpt>
+	
+	<wpt lat="11.08" lon="42.20">
+		<name>Djibouti, Djibouti</name>
+	</wpt>
+	
+	<wpt lat="15.20" lon="-61.24">
+		<name>Roseau, Dominica</name>
+	</wpt>
+	
+	<wpt lat="18.30" lon="-69.59">
+		<name>Santo Domingo, Dominica Republic</name>
+	</wpt>
+	
+	<wpt lat="-08.29" lon="125.34">
+		<name>Dili, East Timor</name>
+	</wpt>
+	
+	<wpt lat="-00.15" lon="-78.35">
+		<name>Quito, Ecuador</name>
+	</wpt>
+	
+	<wpt lat="30.01" lon="31.14">
+		<name>Cairo, Egypt</name>
+	</wpt>
+	
+	<wpt lat="13.40" lon="-89.10">
+		<name>San Salvador, El Salvador</name>
+	</wpt>
+	
+	<wpt lat="03.45" lon="08.50">
+		<name>Malabo, Equatorial Guinea</name>
+	</wpt>
+	
+	<wpt lat="15.19" lon="38.55">
+		<name>Asmara, Eritrea</name>
+	</wpt>
+	
+	<wpt lat="59.22" lon="24.48">
+		<name>Tallinn, Estonia</name>
+	</wpt>
+	
+	<wpt lat="09.02" lon="38.42">
+		<name>Addis Ababa, Ethiopia</name>
+	</wpt>
+	
+	<wpt lat="-51.40" lon="-59.51">
+		<name>Stanley, Falkland Islands (Malvinas)</name>
+	</wpt>
+	
+	<wpt lat="62.05" lon="-06.56">
+		<name>Torshavn, Faroe Islands</name>
+	</wpt>
+	
+	<wpt lat="-18.06" lon="178.30">
+		<name>Suva, Fiji</name>
+	</wpt>
+	
+	<wpt lat="60.15" lon="25.03">
+		<name>Helsinki, Finland</name>
+	</wpt>
+	
+	<wpt lat="48.50" lon="02.20">
+		<name>Paris, France</name>
+	</wpt>
+	
+	<wpt lat="05.05" lon="-52.18">
+		<name>Cayenne, French Guiana</name>
+	</wpt>
+	
+	<wpt lat="-17.32" lon="-149.34">
+		<name>Papeete, French Polynesia</name>
+	</wpt>
+	
+	<wpt lat="00.25" lon="09.26">
+		<name>Libreville, Gabon</name>
+	</wpt>
+	
+	<wpt lat="13.28" lon="-16.40">
+		<name>Banjul, Gambia</name>
+	</wpt>
+	
+	<wpt lat="41.43" lon="44.50">
+		<name>T'bilisi, Georgia</name>
+	</wpt>
+	
+	<wpt lat="52.30" lon="13.25">
+		<name>Berlin, Germany</name>
+	</wpt>
+	
+	<wpt lat="05.35" lon="-00.06">
+		<name>Accra, Ghana</name>
+	</wpt>
+	
+	<wpt lat="37.58" lon="23.46">
+		<name>Athens, Greece</name>
+	</wpt>
+	
+	<wpt lat="64.1175" lon="-51.738889">
+		<name>Nuuk, Greenland</name>
+	</wpt>
+	
+	<wpt lat="16.00" lon="-61.44">
+		<name>Basse-Terre, Guadeloupe</name>
+	</wpt>
+	
+	<wpt lat="14.40" lon="-90.22">
+		<name>Guatemala, Guatemala</name>
+	</wpt>
+	
+	<wpt lat="49.26" lon="-02.33">
+		<name>St. Peter Port, Guernsey</name>
+	</wpt>
+	
+	<wpt lat="09.29" lon="-13.49">
+		<name>Conakry, Guinea</name>
+	</wpt>
+	
+	<wpt lat="11.45" lon="-15.45">
+		<name>Bissau, Guinea-Bissau</name>
+	</wpt>
+	
+	<wpt lat="06.50" lon="-58.12">
+		<name>Georgetown, Guyana</name>
+	</wpt>
+	
+	<wpt lat="18.40" lon="-72.20">
+		<name>Port-au-Prince, Haiti</name>
+	</wpt>
+	
+	<wpt lat="-53.00" lon="74.00">
+		<name> , Heard Island and McDonald Islands</name>
+	</wpt>
+	
+	<wpt lat="14.05" lon="-87.14">
+		<name>Tegucigalpa, Honduras</name>
+	</wpt>
+	
+	<wpt lat="47.29" lon="19.05">
+		<name>Budapest, Hungary</name>
+	</wpt>
+	
+	<wpt lat="64.133333" lon="-21.933333">
+		<name>Reykjavik, Iceland</name>
+	</wpt>
+	
+	<wpt lat="28.37" lon="77.13">
+		<name>New Delhi, India</name>
+	</wpt>
+	
+	<wpt lat="-06.09" lon="106.49">
+		<name>Jakarta, Indonesia</name>
+	</wpt>
+	
+	<wpt lat="35.44" lon="51.30">
+		<name>Tehran, Iran (Islamic Republic of)</name>
+	</wpt>
+	
+	<wpt lat="33.20" lon="44.30">
+		<name>Baghdad, Iraq</name>
+	</wpt>
+	
+	<wpt lat="53.21" lon="-06.15">
+		<name>Dublin, Ireland</name>
+	</wpt>
+	
+	<wpt lat="31.71" lon="35.10">
+		<name>Jerusalem, Israel</name>
+	</wpt>
+	
+	<wpt lat="41.54" lon="12.29">
+		<name>Rome, Italy</name>
+	</wpt>
+	
+	<wpt lat="18.00" lon="-76.50">
+		<name>Kingston, Jamaica</name>
+	</wpt>
+	
+	<wpt lat="31.57" lon="35.52">
+		<name>Amman, Jordan</name>
+	</wpt>
+	
+	<wpt lat="51.10" lon="71.30">
+		<name>Astana, Kazakhstan</name>
+	</wpt>
+	
+	<wpt lat="-01.17" lon="36.48">
+		<name>Nairobi, Kenya</name>
+	</wpt>
+	
+	<wpt lat="01.30" lon="173.00">
+		<name>Tarawa, Kiribati</name>
+	</wpt>
+	
+	<wpt lat="29.30" lon="48.00">
+		<name>Kuwait, Kuwait</name>
+	</wpt>
+	
+	<wpt lat="42.54" lon="74.46">
+		<name>Bishkek, Kyrgyzstan</name>
+	</wpt>
+	
+	<wpt lat="17.58" lon="102.36">
+		<name>Vientiane, Lao People's Democratic Republic</name>
+	</wpt>
+	
+	<wpt lat="56.53" lon="24.08">
+		<name>Riga, Latvia</name>
+	</wpt>
+	
+	<wpt lat="33.53" lon="35.31">
+		<name>Beirut, Lebanon</name>
+	</wpt>
+	
+	<wpt lat="-29.18" lon="27.30">
+		<name>Maseru, Lesotho</name>
+	</wpt>
+	
+	<wpt lat="06.18" lon="-10.47">
+		<name>Monrovia, Liberia</name>
+	</wpt>
+	
+	<wpt lat="32.49" lon="13.07">
+		<name>Tripoli, Libyan Arab Jamahiriya</name>
+	</wpt>
+	
+	<wpt lat="47.08" lon="09.31">
+		<name>Vaduz, Liechtenstein</name>
+	</wpt>
+	
+	<wpt lat="54.38" lon="25.19">
+		<name>Vilnius, Lithuania</name>
+	</wpt>
+	
+	<wpt lat="49.37" lon="06.09">
+		<name>Luxembourg, Luxembourg</name>
+	</wpt>
+	
+	<wpt lat="22.12" lon="113.33">
+		<name>Macau, Macao, China</name>
+	</wpt>
+	
+	<wpt lat="-18.55" lon="47.31">
+		<name>Antananarivo, Madagascar</name>
+	</wpt>
+	
+	<wpt lat="42.01" lon="21.26">
+		<name>Skopje, Macedonia (Former Yugoslav Republic)</name>
+	</wpt>
+	
+	<wpt lat="-14.00" lon="33.48">
+		<name>Lilongwe, Malawi</name>
+	</wpt>
+	
+	<wpt lat="03.09" lon="101.41">
+		<name>Kuala Lumpur, Malaysia</name>
+	</wpt>
+	
+	<wpt lat="04.00" lon="73.28">
+		<name>Male, Maldives</name>
+	</wpt>
+	
+	<wpt lat="12.34" lon="-07.55">
+		<name>Bamako, Mali</name>
+	</wpt>
+	
+	<wpt lat="35.54" lon="14.31">
+		<name>Valletta, Malta</name>
+	</wpt>
+	
+	<wpt lat="14.36" lon="-61.02">
+		<name>Fort-de-France, Martinique</name>
+	</wpt>
+	
+	<wpt lat="-20.10" lon="57.30">
+		<name>Nouakchott, Mauritania</name>
+	</wpt>
+	
+	<wpt lat="-12.48" lon="45.14">
+		<name>Mamoudzou, Mayotte</name>
+	</wpt>
+	
+	<wpt lat="19.20" lon="-99.10">
+		<name>Mexico, Mexico</name>
+	</wpt>
+	
+	<wpt lat="06.55" lon="158.09">
+		<name>Palikir, Micronesia (Federated States of)</name>
+	</wpt>
+	
+	<wpt lat="47.02" lon="28.50">
+		<name>Chisinau, Moldova, Republic of</name>
+	</wpt>
+	
+	<wpt lat="-25.58" lon="32.32">
+		<name>Maputo, Mozambique</name>
+	</wpt>
+	
+	<wpt lat="16.45" lon="96.20">
+		<name>Yangon, Myanmar</name>
+	</wpt>
+	
+	<wpt lat="-22.35" lon="17.04">
+		<name>Windhoek, Namibia</name>
+	</wpt>
+	
+	<wpt lat="27.45" lon="85.20">
+		<name>Kathmandu, Nepal</name>
+	</wpt>
+	
+	<wpt lat="52.23" lon="04.54">
+		<name>Amsterdam / The Hague (seat of Government), Netherlands</name>
+	</wpt>
+	
+	<wpt lat="12.05" lon="-69.00">
+		<name>Willemstad, Netherlands Antilles</name>
+	</wpt>
+	
+	<wpt lat="-22.17" lon="166.30">
+		<name>Noumea, New Caledonia</name>
+	</wpt>
+	
+	<wpt lat="-41.19" lon="174.46">
+		<name>Wellington, New Zealand</name>
+	</wpt>
+	
+	<wpt lat="12.06" lon="-86.20">
+		<name>Managua, Nicaragua</name>
+	</wpt>
+	
+	<wpt lat="13.27" lon="02.06">
+		<name>Niamey, Niger</name>
+	</wpt>
+	
+	<wpt lat="09.05" lon="07.32">
+		<name>Abuja, Nigeria</name>
+	</wpt>
+	
+	<wpt lat="-45.20" lon="168.43">
+		<name>Kingston, Norfolk Island</name>
+	</wpt>
+	
+	<wpt lat="39.09" lon="125.30">
+		<name>Pyongyang, North Korea</name>
+	</wpt>
+	
+	<wpt lat="15.12" lon="145.45">
+		<name>Saipan, Northern Mariana Islands</name>
+	</wpt>
+	
+	<wpt lat="59.55" lon="10.45">
+		<name>Oslo, Norway</name>
+	</wpt>
+	
+	<wpt lat="78.666667" lon="16.333333">
+		<name>Svalbard, Norway</name>
+	</wpt>
+	
+	<wpt lat="23.37" lon="58.36">
+		<name>Masqat, Oman</name>
+	</wpt>
+	
+	<wpt lat="33.40" lon="73.10">
+		<name>Islamabad, Pakistan</name>
+	</wpt>
+	
+	<wpt lat="07.20" lon="134.28">
+		<name>Koror, Palau</name>
+	</wpt>
+	
+	<wpt lat="09.00" lon="-79.25">
+		<name>Panama, Panama</name>
+	</wpt>
+	
+	<wpt lat="-09.24" lon="147.08">
+		<name>Port Moresby, Papua New Guinea</name>
+	</wpt>
+	
+	<wpt lat="-25.10" lon="-57.30">
+		<name>Asuncion, Paraguay</name>
+	</wpt>
+	
+	<wpt lat="-12.00" lon="-77.00">
+		<name>Lima, Peru</name>
+	</wpt>
+	
+	<wpt lat="14.40" lon="121.03">
+		<name>Manila, Philippines</name>
+	</wpt>
+	
+	<wpt lat="52.13" lon="21.00">
+		<name>Warsaw, Poland</name>
+	</wpt>
+	
+	<wpt lat="38.42" lon="-09.10">
+		<name>Lisbon, Portugal</name>
+	</wpt>
+	
+	<wpt lat="18.28" lon="-66.07">
+		<name>San Juan, Puerto Rico</name>
+	</wpt>
+	
+	<wpt lat="25.15" lon="51.35">
+		<name>Doha, Qatar</name>
+	</wpt>
+	
+	<wpt lat="37.31" lon="126.58">
+		<name>Seoul, Republic of Korea</name>
+	</wpt>
+	
+	<wpt lat="44.27" lon="26.10">
+		<name>Bucuresti, Romania</name>
+	</wpt>
+	
+	<wpt lat="55.45" lon="37.35">
+		<name>Moskva, Russian Federation</name>
+	</wpt>
+	
+	<wpt lat="-01.59" lon="30.04">
+		<name>Kigali, Rawanda</name>
+	</wpt>
+	
+	<wpt lat="17.17" lon="-62.43">
+		<name>Basseterre, Saint Kitts and Nevis</name>
+	</wpt>
+	
+	<wpt lat="14.02" lon="-60.58">
+		<name>Castries, Saint Lucia</name>
+	</wpt>
+	
+	<wpt lat="46.46" lon="-56.12">
+		<name>Saint-Pierre, Saint Pierre and Miquelon</name>
+	</wpt>
+	
+	<wpt lat="13.10" lon="-61.10">
+		<name>Kingstown, Saint Vincent and the Greeadines</name>
+	</wpt>
+	
+	<wpt lat="-13.50" lon="-171.50">
+		<name>Apia, Samoa</name>
+	</wpt>
+	
+	<wpt lat="43.55" lon="12.30">
+		<name>San Marino, San Marino</name>
+	</wpt>
+	
+	<wpt lat="00.10" lon="06.39">
+		<name>Sao Tome, Sao Tome and Principe</name>
+	</wpt>
+	
+	<wpt lat="24.41" lon="46.42">
+		<name>Riyadh, Saudi Arabia</name>
+	</wpt>
+	
+	<wpt lat="14.34" lon="-17.29">
+		<name>Dakar, Senegal</name>
+	</wpt>
+	
+	<wpt lat="08.30" lon="-13.17">
+		<name>Freetown, Sierra Leone</name>
+	</wpt>
+	
+	<wpt lat="48.10" lon="17.07">
+		<name>Bratislava, Slovakia</name>
+	</wpt>
+	
+	<wpt lat="46.04" lon="14.33">
+		<name>Ljubljana, Slovenia</name>
+	</wpt>
+	
+	<wpt lat="-09.27" lon="159.57">
+		<name>Honiara, Solomon Islands</name>
+	</wpt>
+	
+	<wpt lat="02.02" lon="45.25">
+		<name>Mogadishu, Somalia</name>
+	</wpt>
+	
+	<wpt lat="-25.44" lon="28.12">
+		<name>Pretoria (administrative) / Cape Town (legislative) / Bloemfontein (judicial), South Africa</name>
+	</wpt>
+	
+	<wpt lat="40.25" lon="-03.45">
+		<name>Madrid, Spain</name>
+	</wpt>
+	
+	<wpt lat="15.31" lon="32.35">
+		<name>Khartoum, Sudan</name>
+	</wpt>
+	
+	<wpt lat="05.50" lon="-55.10">
+		<name>Paramaribo, Suriname</name>
+	</wpt>
+	
+	<wpt lat="-26.18" lon="31.06">
+		<name>Mbabane (administrative), Swaziland</name>
+	</wpt>
+	
+	<wpt lat="59.20" lon="18.03">
+		<name>Stockholm, Sweden</name>
+	</wpt>
+	
+	<wpt lat="46.57" lon="07.28">
+		<name>Bern, Switzerland</name>
+	</wpt>
+	
+	<wpt lat="33.30" lon="36.18">
+		<name>Damascus, Syrian Arab Republic</name>
+	</wpt>
+	
+	<wpt lat="38.33" lon="68.48">
+		<name>Dushanbe, Tajikistan</name>
+	</wpt>
+	
+	<wpt lat="13.45" lon="100.35">
+		<name>Bangkok, Thailand</name>
+	</wpt>
+	
+	<wpt lat="06.09" lon="01.20">
+		<name>Lome, Togo</name>
+	</wpt>
+	
+	<wpt lat="-21.10" lon="-174.00">
+		<name>Nuku'alofa, Tonga</name>
+	</wpt>
+	
+	<wpt lat="36.50" lon="10.11">
+		<name>Tunis, Tunisia</name>
+	</wpt>
+	
+	<wpt lat="39.57" lon="32.54">
+		<name>Ankara, Turkey</name>
+	</wpt>
+	
+	<wpt lat="38.00" lon="57.50">
+		<name>Ashgabat, Turkmenistan</name>
+	</wpt>
+	
+	<wpt lat="-08.31" lon="179.13">
+		<name>Funafuti, Tuvalu</name>
+	</wpt>
+	
+	<wpt lat="00.20" lon="32.30">
+		<name>Kampala, Uganda</name>
+	</wpt>
+	
+	<wpt lat="50.30" lon="30.28">
+		<name>Kiev, Ukraine</name>
+	</wpt>
+	
+	<wpt lat="24.28" lon="54.22">
+		<name>Abu Dhabi, United Arab Emirates</name>
+	</wpt>
+	
+	<wpt lat="51.36" lon="-00.05">
+		<name>London, United Kingdom of Great Britain and Northern Ireland</name>
+	</wpt>
+	
+	<wpt lat="-06.08" lon="35.45">
+		<name>Dodoma, United Republic of Tanzania</name>
+	</wpt>
+	
+	<wpt lat="39.91" lon="-77.02">
+		<name>Washington DC, United States of America</name>
+	</wpt>
+	
+	<wpt lat="18.21" lon="-64.56">
+		<name>Charlotte Amalie, United States Virgin Islands</name>
+	</wpt>
+	
+	<wpt lat="-34.50" lon="-56.11">
+		<name>Montevideo, Uruguay</name>
+	</wpt>
+	
+	<wpt lat="41.20" lon="69.10">
+		<name>Tashkent, Uzbekistan</name>
+	</wpt>
+	
+	<wpt lat="-17.45" lon="168.18">
+		<name>Port-Vila, Vanuatu</name>
+	</wpt>
+	
+	<wpt lat="10.30" lon="-66.55">
+		<name>Caracas, Venezuela</name>
+	</wpt>
+	
+	<wpt lat="21.05" lon="105.55">
+		<name>Hanoi, Viet Nam</name>
+	</wpt>
+	
+	<wpt lat="44.50" lon="20.37">
+		<name>Belgrade, Yugoslavia</name>
+	</wpt>
+	
+	<wpt lat="-15.28" lon="28.16">
+		<name>Lusaka, Zambia</name>
+	</wpt>
+	
+	<wpt lat="-17.43" lon="31.02">
+		<name>Zimbabwe, Harare</name>
+	</wpt>
+	
+</gpx>

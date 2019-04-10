@@ -12,7 +12,7 @@ use Data::Object::Export qw(
 use Import::Into;
 use Type::Tiny;
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 
@@ -84,9 +84,9 @@ sub choose {
     return 'config_integer';
   }
 
-  # config kind
-  if (subject($type, 'kind')) {
-    return 'config_kind';
+  # config base
+  if (subject($type, 'base')) {
+    return 'config_base';
   }
 
   # config number
@@ -340,10 +340,10 @@ sub config_integer {
   ]
 }
 
-sub config_kind {
+sub config_base {
   [
     prepare_use('Role::Tiny::With'),
-    prepare_use('parent', 'Data::Object::Kind')
+    prepare_use('parent', 'Data::Object::Base')
   ]
 }
 
@@ -419,7 +419,7 @@ sub config_try {
 sub config_type {
   [
     @{config_class()},
-    prepare_call('extends', 'Data::Object::Kind')
+    prepare_call('extends', 'Data::Object::Base')
   ]
 }
 
@@ -583,6 +583,23 @@ L<Data::Object::Class> which extends L<Data::Object::Array>.
 
 =cut
 
+=head2 config_base
+
+  config_base() : ArrayRef
+
+The config_base function returns plans for configuring the package to be a
+L<Data::Object::Class> which extends L<Data::Object::Base>.
+
+=over 4
+
+=item config_base example
+
+  my $plans = config_base;
+
+=back
+
+=cut
+
 =head2 config_class
 
   config_class() : ArrayRef
@@ -714,23 +731,6 @@ L<Data::Object::Class> which extends L<Data::Object::Integer>.
 =item config_integer example
 
   my $plans = config_integer;
-
-=back
-
-=cut
-
-=head2 config_kind
-
-  config_kind() : ArrayRef
-
-The config_kind function returns plans for configuring the package to be a
-L<Data::Object::Class> which extends L<Data::Object::Kind>.
-
-=over 4
-
-=item config_kind example
-
-  my $plans = config_kind;
 
 =back
 

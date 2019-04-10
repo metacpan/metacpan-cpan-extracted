@@ -1,3 +1,8 @@
+0.002   2019-04-10 (PERLANCAR)
+
+	- Algorithm::Retry was renamed to Algorithm::Backoff.
+
+
 0.001    2019-04-10 (PERLANCAR)
 
          - First release.

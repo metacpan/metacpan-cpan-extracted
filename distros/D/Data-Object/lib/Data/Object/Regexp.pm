@@ -1,8 +1,8 @@
 package Data::Object::Regexp;
 
 use Try::Tiny;
+use Role::Tiny::With;
 
-use Data::Object::Class;
 use Data::Object::Export qw(
   cast
   croak
@@ -14,7 +14,6 @@ map with($_), my @roles = qw(
   Data::Object::Role::Dumper
   Data::Object::Role::Output
   Data::Object::Role::Throwable
-  Data::Object::Role::Type
 );
 
 map with($_), my @rules = qw(
@@ -27,28 +26,11 @@ use overload (
   fallback => 1
 );
 
-use parent 'Data::Object::Kind';
+use parent 'Data::Object::Base::Regexp';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
-
-sub new {
-  my ($class, $arg) = @_;
-
-  my $role = 'Data::Object::Role::Type';
-
-  if (Scalar::Util::blessed($arg)) {
-    $arg = $arg->data if $arg->can('does') && $arg->does($role);
-  }
-
-  if (!defined($arg) || !re::is_regexp($arg)) {
-    croak('Instantiation Error: Not a RegexpRef');
-  }
-
-  return bless \$arg, $class;
-}
-
 # METHODS
 
 sub roles {
@@ -65,9 +47,9 @@ sub defined {
   my ($self, @args) = @_;
 
   try {
-    my $func = $self->_funcs('defined');
+    my $func = 'Data::Object::Func::Regexp::Defined';
 
-    return cast($func->build($self, @args)->execute);
+    return cast(load($func)->new($self, @args)->execute);
   }
   catch {
     my $error = $_;
@@ -82,9 +64,9 @@ sub search {
   my ($self, @args) = @_;
 
   try {
-    my $func = $self->_funcs('search');
+    my $func = 'Data::Object::Func::Regexp::Search';
 
-    return $func->build($self, @args)->execute;
+    return cast(load($func)->new($self, @args)->execute);
   }
   catch {
     my $error = $_;
@@ -97,25 +79,15 @@ sub replace {
   my ($self, @args) = @_;
 
   try {
-    my $func = $self->_funcs('replace');
+    my $func = 'Data::Object::Func::Regexp::Replace';
 
-    return $func->build($self, @args)->execute;
+    return cast(load($func)->new($self, @args)->execute);
   }
   catch {
     my $error = $_;
 
     $self->throw(ref($error) ? $error->message : "$error");
   };
-}
-
-sub _funcs {
-  my ($self, $name) = @_;
-
-  return if !$name;
-
-  my $space = $self->space;
-
-  return $space->parent->child('func', $space->base, $name);
 }
 
 1;
@@ -171,25 +143,6 @@ L<Data::Object::Number> object.
   # given $regexp
 
   $regexp->defined; # 1
-
-=back
-
-=cut
-
-=head2 new
-
-  new(RegexpRef $arg1) : RegexpObject
-
-The new method expects a regular-expression object and returns a new class
-instance.
-
-=over 4
-
-=item new example
-
-  # given qr(something to match against)
-
-  my $re = Data::Object::Regexp->new(qr(something to match against));
 
 =back
 
@@ -298,10 +251,6 @@ L<Data::Object::Role::Output>
 =item *
 
 L<Data::Object::Role::Throwable>
-
-=item *
-
-L<Data::Object::Role::Type>
 
 =back
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode;
-$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.17';
+$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.18';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Freenode.
 
 use Moose;
@@ -24,21 +24,21 @@ use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
 
 has 'nickname' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'password' => (
-    is  => 'ro',
-    isa => 'Str',
-    required => 1,
+  is  => 'ro',
+  isa => 'Str',
+  required => 1,
 );
 
 has 'channels' => (
-    is  => 'ro',
-    isa => 'ArrayRef[Str]',
-    required => 1,
+  is  => 'ro',
+  isa => 'ArrayRef[Str]',
+  required => 1,
 );
 
 
@@ -108,7 +108,7 @@ App::SpreadRevolutionaryDate::Target::Freenode - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 METHODS
 

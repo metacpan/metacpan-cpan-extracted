@@ -1,9 +1,11 @@
 Changes
 salcpis.c
 salcpis.h
-bin/CP_reporter
 DRY.xs
+lib/Code/DRY.pm
+bin/CP_reporter
 Makefile.PL
+Build.PL
 MANIFEST
 ppport.h
 README
@@ -11,9 +13,12 @@ t/00_lowlevel.t
 t/10_helper.t
 t/20_filelevel.t
 t/30_dirlevel.t
+t/50_CP_reporter.t
+t/empty
 xt/98_pod.t
 xt/99_podcover.t
 xt/manifest.t
-lib/Code/DRY.pm
+xt/distribution.t
+xt/kwalitee.t
 META.yml
 META.json

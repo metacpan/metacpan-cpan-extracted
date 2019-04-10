@@ -12,7 +12,6 @@ ok Data::Object::Hash->does('Data::Object::Role::Dumper');
 ok Data::Object::Hash->does('Data::Object::Rule::List');
 ok Data::Object::Hash->does('Data::Object::Role::Output');
 ok Data::Object::Hash->does('Data::Object::Role::Throwable');
-ok Data::Object::Hash->does('Data::Object::Role::Type');
 
 can_ok 'Data::Object::Hash', 'clear';
 can_ok 'Data::Object::Hash', 'count';
@@ -47,7 +46,6 @@ can_ok 'Data::Object::Hash', 'lookup';
 can_ok 'Data::Object::Hash', 'lt';
 can_ok 'Data::Object::Hash', 'map';
 can_ok 'Data::Object::Hash', 'merge';
-can_ok 'Data::Object::Hash', 'methods';
 can_ok 'Data::Object::Hash', 'ne';
 can_ok 'Data::Object::Hash', 'new';
 can_ok 'Data::Object::Hash', 'pairs';

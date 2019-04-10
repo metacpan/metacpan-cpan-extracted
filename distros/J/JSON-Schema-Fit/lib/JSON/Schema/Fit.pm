@@ -1,5 +1,5 @@
 package JSON::Schema::Fit;
-$JSON::Schema::Fit::VERSION = '0.04';
+$JSON::Schema::Fit::VERSION = '0.06';
 # ABSTRACT: adjust data structure according to json-schema
 
 
@@ -203,7 +203,7 @@ JSON::Schema::Fit - adjust data structure according to json-schema
 
 =head1 VERSION
 
-version 0.04
+version 0.06
 
 =head1 SYNOPSIS
 

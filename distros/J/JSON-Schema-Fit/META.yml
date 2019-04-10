@@ -20,7 +20,7 @@ name: JSON-Schema-Fit
 provides:
   JSON::Schema::Fit:
     file: lib/JSON/Schema/Fit.pm
-    version: '0.04'
+    version: '0.06'
 requires:
   Carp: '0'
   JSON: '0'
@@ -33,6 +33,6 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/liosha/json-schema-fit.git
-version: '0.04'
+version: '0.06'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

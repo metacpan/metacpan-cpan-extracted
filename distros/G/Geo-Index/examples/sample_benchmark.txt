@@ -1,0 +1,151 @@
+Running configuration:
+    Key type:   numeric
+    Code type:  double
+    Levels:     20  (approximately 76 meter wide tiles at equator)
+    Index size: 1,000,000 points
+    Point area: Points distributed over entire planet
+                510,101,300 square km
+                0.00196039492419394 points per square km
+                1.9073486328125 per tile at full index depth
+
+Number of points: 1,000,000
+
+Before searching:
+    Size of points:      464,388,859 B (  442.88 MB )
+    Size of index*:    4,951,337,270 B (    4.61 GB )
+
+After searching:
+    Size of points:      571,064,966 B (  544.61 MB )
+    Size of index*:    5,058,013,481 B (    4.71 GB )
+
+* includes size of points
+
+
+Index statistics:
+
+Level  Used tiles  Min./tile  Max./tile  Avg./tile
+-----  ----------  ---------  ---------  ---------
+    0           2     499618     500382   500000.0
+    1          10      87915     146818   100000.0
+    2          50      13377      38313    20000.0
+    3         226       1683       9633     4424.8
+    4         962        173       2475     1039.5
+    5        3970         13        624      251.9
+    6       16126          1        159       62.0
+    7       63750          1         46       15.7
+    8      233194          1         17        4.3
+    9      596973          1         10        1.7
+   10      867438          1          6        1.2
+   11      964199          1          4        1.0
+   12      990800          1          4        1.0
+   13      997656          1          3        1.0
+   14      999426          1          2        1.0
+   15      999855          1          2        1.0
+   16      999969          1          2        1.0
+   17      999993          1          2        1.0
+   18      999999          1          2        1.0
+   19     1000000          1          1        1.0
+
+                   Description  Avg. res. Count/Sec.      Count Sec.
+------------------------------ ---------- ---------- ---------- ----
+  Create index, 1000000 points              44935.59    1000000 22.3
+
+      Search, normal, r=0.1 km       0.00  106231.76     531159  5.0
+        +traveral (read value)       0.00  107014.77     535074  5.0
+     Search, normal, r=0.33 km       0.00  110215.25     551077  5.0
+        +traveral (read value)       0.00  111082.69     555414  5.0
+        Search, normal, r=1 km       0.01   96723.68     483619  5.0
+        +traveral (read value)       0.01   97332.98     486665  5.0
+      Search, normal, r=3.3 km       0.07   98618.63     493094  5.0
+        +traveral (read value)       0.07   98927.84     494640  5.0
+       Search, normal, r=10 km       0.61   73561.77     367809  5.0
+        +traveral (read value)       0.61   72756.37     363782  5.0
+       Search, normal, r=33 km       6.70   25697.80     128490  5.0
+        +traveral (read value)       6.70   22236.68     111184  5.0
+      Search, normal, r=100 km      61.59    3267.49      16338  5.0
+        +traveral (read value)      61.56    3108.53      15543  5.0
+      Search, normal, r=330 km     670.91     266.39       1332  5.0
+        +traveral (read value)     671.03     251.25       1257  5.0
+     Search, normal, r=1000 km    6148.30      42.19        211  5.0
+        +traveral (read value)    6149.27      38.39        192  5.0
+
+       Search, quick, r=0.1 km       1.00  122632.58     613163  5.0
+       +traversal (read value)       1.00  118353.44     591768  5.0
+ +traversal (compute distance)       1.00   99475.88     497380  5.0
+      Search, quick, r=0.33 km       1.00  130091.12     650456  5.0
+       +traversal (read value)       1.00  124189.13     620947  5.0
+ +traversal (compute distance)       1.00   91708.77     458544  5.0
+         Search, quick, r=1 km       1.02  112615.58     563078  5.0
+       +traversal (read value)       1.02  109385.27     546927  5.0
+ +traversal (compute distance)       1.02   92019.29     460097  5.0
+       Search, quick, r=3.3 km       1.32  120257.21     601287  5.0
+       +traversal (read value)       1.32  114511.76     572559  5.0
+ +traversal (compute distance)       1.32   93865.58     469328  5.0
+        Search, quick, r=10 km       4.93  121014.70     605074  5.0
+       +traversal (read value)       4.93   94348.87     471745  5.0
+ +traversal (compute distance)       4.93   67179.71     335899  5.0
+        Search, quick, r=33 km      27.25   91983.38     459917  5.0
+       +traversal (read value)      27.26   39537.68     197690  5.0
+ +traversal (compute distance)      27.27   20000.58     100003  5.0
+       Search, quick, r=100 km     312.59  113397.22     566987  5.0
+       +traversal (read value)     313.22    5928.49      29643  5.0
+ +traversal (compute distance)     313.13    2687.95      13441  5.0
+       Search, quick, r=330 km    4152.08  141686.60     708433  5.0
+       +traversal (read value)    4141.29     494.20       2471  5.0
+ +traversal (compute distance)    4138.83     213.71       1069  5.0
+      Search, quick, r=1000 km   25241.95  126442.80     632214  5.0
+       +traversal (read value)   25311.34      83.00        416  5.0
+ +traversal (compute distance)   25099.00      35.59        179  5.0
+
+                    Closest, 1       1.00    8957.03      44786  5.0
+                    Closest, 3       3.00    4892.99      24465  5.0
+                   Closest, 10      10.00    1242.47       6213  5.0
+                   Closest, 33      33.00     566.45       2833  5.0
+                  Closest, 100     100.00     271.19       1356  5.0
+                  Closest, 330     330.00      94.09        471  5.0
+                 Closest, 1000    1000.00      28.26        143  5.1
+
+                   Farthest, 1       1.00    1063.39       5317  5.0
+                   Farthest, 3       3.00     994.10       4971  5.0
+                  Farthest, 10      10.00     836.22       4182  5.0
+                  Farthest, 33      33.00     561.28       2807  5.0
+                 Farthest, 100     100.00     265.99       1330  5.0
+                 Farthest, 330     330.00      95.53        478  5.0
+                Farthest, 1000    1000.00      27.99        140  5.0
+
+            Closest, 1, <100km       1.00    1065.25       5327  5.0
+            Closest, 3, <100km       3.00    1002.58       5013  5.0
+           Closest, 10, <100km      10.00     809.84       4050  5.0
+           Closest, 33, <100km      33.00     572.47       2863  5.0
+          Closest, 100, <100km      61.84     395.31       1977  5.0
+          Closest, 330, <100km      61.84     394.99       1976  5.0
+         Closest, 1000, <100km      61.84     394.97       1976  5.0
+
+   Search, sort, max 1, <100km       1.00    2695.74      13480  5.0
+   Search, sort, max 3, <100km       3.00    2670.20      13352  5.0
+  Search, sort, max 10, <100km      10.00    2708.86      13545  5.0
+  Search, sort, max 33, <100km      33.00    2699.16      13496  5.0
+ Search, sort, max 100, <100km      61.58    2710.48      13553  5.0
+ Search, sort, max 330, <100km      61.59    2689.12      13446  5.0
+Search, sort, max 1000, <100km      61.58    2719.39      13598  5.0
+
+
+    Linear search, sort, max 1       1.00       0.16          1  6.4
+ Linear search, sort, max 1000    1000.00       0.16          1  6.4
+
+        SearchByBounds, normal   96531.48       5.15         26  5.0
+         SearchByBounds, quick  116402.07    7737.52      39032  5.0
+
+For searches above, tile_adjust was 0
+Each test was run for at least 5 seconds.
+
+For index creation line:
+  'Count/Sec.' is the number of points indexed per second
+  'Count' is the total number of points indexed across all tests
+  'Sec.' is the number of seconds taken to run all tests
+
+For other lines:
+  'Avg. res.' is the average number of points returned by each search
+  'Count/Sec.' is the number of searches per second
+  'Count' is the total number of searches performed
+  'Sec.' is the number of seconds taken to run all searches

@@ -31,6 +31,7 @@
          "requires" : {
             "HTTP::Tiny" : "0.057",
             "Log::ger" : "0.023",
+            "Time::HiRes" : "0",
             "parent" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -58,7 +59,7 @@
          "web" : "https://github.com/perlancar/perl-HTTP-Tiny-Retry"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

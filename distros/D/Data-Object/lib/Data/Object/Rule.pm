@@ -7,7 +7,7 @@ use Data::Object;
 
 use parent 'Moo::Role';
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 # METHODS

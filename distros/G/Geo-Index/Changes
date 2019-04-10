@@ -1,0 +1,59 @@
+Revision history for Geo::Index
+
+0.0.8   2019-04-10
+Corrected internal links, CPAN release
+
+  o Corrected POD links to use spaces instead of underscores
+  o Uploaded to CPAN
+
+
+0.0.7   2019-04-08
+Methods can now be called using snake case
+
+  o Added method aliases so that CamelCase methods can also be called using 
+    snake_case.
+
+0.0.6   2019-04-05
+Bug fixes, additional tests
+
+  o GetIntLatLon(...): Fixed off-by-one error at the north pole
+    This affected Index(...) and Search(...).
+  o GetIntLat(...): Fixed off-by-one error at the north pole
+  o More thorough tests
+  o Improved documentation
+
+
+0.0.5   2019-04-04
+Added methods, enhancements
+
+  o PointCount( ): New method
+  o AllPoints( ): New method
+  o Sweep(...): Added extra_keys option
+  o Vacuum(...): Added extra_keys option
+
+0.0.4   2019-04-03
+Switched from Inline::C to XS for low-level C functions, minor restructuring
+
+  o Switched to XS for C code:
+    Low-level C code is now in Index.xs.
+    All references to Inline::C have been removed.
+  o Deprecated DeletePointIndex(...) and replaced it with Unindex(...)
+
+0.0.3   2019-04-01
+Added Vacuum(...), Sweep(...), and tests plus bugfixes and minor enhancements
+
+  o Sweep(...): New method
+  o Vacuum(...): New method
+  o Added tests
+  o SearchByBounds(...): Bug fixes
+  o new(...): Added 'quiet' option
+
+0.0.2   2019-03-31
+Bug fixes and minor enhancements
+
+  o Index(...): Fixed bug for points added near (but not at) the north pole
+  o GetConfiguration(...): Added 'supported_key_types', 'supported_code_types', 
+	  and 'tile_meters' values
+
+0.0.1   2019-03-30
+Initial release

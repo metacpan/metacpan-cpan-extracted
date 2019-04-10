@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "HTTP::Tiny::CustomRetry",
   "PREREQ_PM" => {
+    "Algorithm::Backoff" => 0,
     "HTTP::Tiny" => "0.057",
     "Log::ger" => "0.023",
     "Time::HiRes" => 0,
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Algorithm::Backoff" => 0,
   "File::Spec" => 0,
   "HTTP::Tiny" => "0.057",
   "IO::Handle" => 0,

@@ -23,7 +23,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load( 'Code::DRY', $VERSION );
@@ -32,6 +32,7 @@ XSLoader::load( 'Code::DRY', $VERSION );
 
 my @files;
 our ( @fileoffsets, @file_lineoffsets );
+my %filename2inode;
 
 my $codetotal;
 my $verbose = 0;
@@ -107,20 +108,19 @@ my $default_callback = sub {
                 || $dup->[7] > $offsetLineEnd )
             {
                 warn
-                    "\n\ninternal error: $offsetLineBegin, $dup->[4], $dup->[5], $offsetLineEnd, Zeilennummer $linenumber";
+                    "\n\ninternal error: $offsetLineBegin, $dup->[4], $dup->[5], $offsetLineEnd, line number $linenumber";
             }
 
-            print substr( $codetotal, $offsetLineBegin,
+            print get_substr_from_input($offsetLineBegin,
                 $dup->[6] - $offsetLineBegin );
             print " ==>>" if ( $units eq 'bytes' );
         }
 
-        print substr( $codetotal, $dup->[4], $dup->[5] - $dup->[4] + 1 );
+        print get_substr_from_input( $dup->[4], $dup->[5] - $dup->[4] + 1 );
         print "<<== " if ( $units eq 'bytes' );
 
         if ( $units eq 'bytes' ) {
-            print substr(
-                $codetotal,
+            print get_substr_from_input(
                 $dup->[7] + 1,
                 $offsetLineEnd - $dup->[7]
             ) if ( $dup->[7] + 1 < $offsetLineEnd );
@@ -149,8 +149,6 @@ sub clearData {
     @fileoffsets      = ();
     @file_lineoffsets = ();
 
-    #  $SA = undef;
-    #  $LCP = undef;
     __free_all();
 }
 
@@ -236,6 +234,7 @@ sub offset2filename {
 sub offset2fileindex {
     my $offset = shift;
     my ( $l, $r ) = ( 0, $#fileoffsets );
+    return if ( !defined $offset );
     return 0 if ( 0 == $r );
 
     my $file = int( ( $r + $l ) / 2 );
@@ -267,6 +266,7 @@ sub offset2fileindex {
 #line number is 1 based
 sub offsetAndFileindex2line {
     my ( $offset, $fileindex, $rRoundedUp_line, $rRoundedDown_line ) = @_;
+    return if ( !defined $offset );
     return if ( !defined $fileindex );
 
     my $base = $fileindex == 0 ? 0 : $fileoffsets[ $fileindex - 1 ] + 1;
@@ -283,7 +283,7 @@ sub offsetAndFileindex2line {
         }
         return 0;
     }
-    return 0 if ( 0 == $r );
+
     my $line = int( ( $r + $l ) / 2 );
 
     while ( $l < $r ) {
@@ -344,19 +344,30 @@ sub enter_files {
 
     # reset all info
     @fileoffsets = @file_lineoffsets = ();
+    %filename2inode = ();
     $codetotal = '';
 
-    # preprocess files content
     my $here = 0;
     for my $file (@{$rfiles}) {
+        # check metadata
+        my @statresult = stat($file);
+        if (0 < $#statresult) {
+            my $inode = $statresult[1]; # inode
+            if (exists $filename2inode{$inode}) {
+                $file = undef;
+                next; # avoid hard and symbolic links
+            }
+	    $filename2inode{$inode} = undef; # inode
+        }
+        # preprocess files content
         if (-z $file) {
-            splice @{$rfiles}, $here, 1;
+            $file = undef;
             next;    # skip empty files
 	}
 
         my ( $code, @lineoffsets ) = __get_text($file);
         if ($code eq '') {
-            splice @{$rfiles}, $here, 1;
+            $file = undef;
             next;    # skip empty files
 	}
 
@@ -368,6 +379,8 @@ sub enter_files {
         push @file_lineoffsets, [@lineoffsets];
         ++$here;
     }
+    @{$rfiles} = grep { defined $_ } @{$rfiles};
+    return $here;
 }
 
 sub find_duplicates_in {
@@ -377,6 +390,7 @@ sub find_duplicates_in {
     # enter codestring
     build_suffixarray_and_lcp($codetotal) == 0
         or die "Error building suffix array:$!\n";
+    $codetotal = undef; # release memory
     warn "analysing content of ", length $codetotal, " bytes out of ",
         scalar @files, " files...\n" if ($verbose);
     clip_lcp_to_fileboundaries( \@fileoffsets );
@@ -403,7 +417,7 @@ sub find_duplicates_in {
         # ignore filter
         my $off;
         if ( $res && defined $ignoreContentFilter ) {
-            $res = substr( $codetotal, $off = get_offset_at($_), $lcp )
+            $res = get_substr_from_input( $off = get_offset_at($_), $lcp )
                 !~ m{$ignoreContentFilter}xms;
         }
 
@@ -460,7 +474,7 @@ sub scan_directories {
     if ( defined $regexAccept && ref $regexAccept ne 'Regexp' ) {
         $regexAccept = qr{$regexAccept}xms;
     }
-    if ( defined $regexIgnore && ref $regexIgnore ne 'Regexp' ) {
+    if ( ref $regexIgnore ne 'Regexp' ) {
         $regexIgnore = qr{$regexIgnore}xms;
     }
     if ( defined $ignoreContentFilter
@@ -473,13 +487,20 @@ sub scan_directories {
         # enable globs
         @dirs = <$dirs[0]>;
     }
+    @dirs = grep { -e $_ && -d $_ } @dirs;
+    if ( 0 == scalar @dirs ) {
+        print "no valid directories given!\n";
+        return;
+    }
 
     File::Find::find(
         sub {
-            if ( -f $_ && -s $_
-                && ( !defined($regexAccept) || $_ =~ m{$regexAccept}o ) )
+            #if ( -f $_ && -s $_
+            if ( -s $_
+                && ( !defined($regexAccept) || $_ =~ m{$regexAccept} ) )
             {
-                if ( !defined($regexIgnore) || $_ !~ m{$regexIgnore}o ) {
+                if ( $_ =~ m{$regexIgnore} ) {
+                } else {
                     push @filepaths, $File::Find::name;
                 }
             }
@@ -676,6 +697,10 @@ This is a core module now for a while.
 
 Required if you want to run Code::DRY's own tests.
 
+=item * L<Test::Output>
+
+Optional if you want to run Code::DRY's own tests.
+
 =back
 
 
@@ -849,6 +874,10 @@ This XS function returns the index number from the suffix array where the C<$off
 
 This XS function sets all prefix lengths to zero for those entries where the suffix is contained in another longer (or more leftward) suffix.
 
+=head2 C<get_substr_from_input($offset, $length)>
+
+This XS function returns the given text portion of the internal concatenated string (after being fed to C<build_suffixarray_and_lcp>) at offset C<$offset> with a length of C<$length>.
+
 =head2 C<get_concatenated_text($offset, $length)>
 
 This function returns the given text portion of the internal concatenated string at offset C<$offset> with a length of C<$length>.
@@ -970,7 +999,7 @@ Heiko Eiﬂfeldt, E<lt>hexcoder@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014 by hexcoder
+Copyright (C) 2014,2019 by hexcoder
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

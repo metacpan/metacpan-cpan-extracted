@@ -27,7 +27,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.13"
          }
       },
       "runtime" : {
@@ -62,6 +63,6 @@
          "url" : "http://github.com/memowe/contenticious"
       }
    },
-   "version" : "0.392",
+   "version" : "0.393",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

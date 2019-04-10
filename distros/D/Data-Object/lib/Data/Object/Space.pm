@@ -4,7 +4,7 @@ use Carp;
 
 use Data::Object::Class;
 
-our $VERSION = '0.95'; # VERSION
+our $VERSION = '0.96'; # VERSION
 
 # BUILD
 
