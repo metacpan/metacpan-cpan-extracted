@@ -26,8 +26,8 @@
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
             "schema:ContactPoint",
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:dateRead" : {
@@ -64,19 +64,19 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:AuthorizeAction",
+            "schema:SendAction",
+            "schema:CommunicateAction",
             "schema:PayAction",
             "schema:TipAction",
-            "schema:CommunicateAction",
-            "schema:SendAction",
             "schema:DonateAction",
             "schema:ReturnAction",
             "schema:Message",
-            "schema:AuthorizeAction",
             "schema:GiveAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Audience",
             "schema:ContactPoint",
+            "schema:Audience",
             "schema:Organization",
             "schema:Person"
          ]
@@ -87,13 +87,13 @@
          "rdfs:label" : "sender",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Message",
-            "schema:ReceiveAction"
+            "schema:ReceiveAction",
+            "schema:Message"
          ],
          "schema:rangeIncludes" : [
             "schema:Person",
-            "schema:Audience",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Audience"
          ]
       },
       "schema:toRecipient" : {
@@ -103,10 +103,10 @@
          "rdfs:subPropertyOf" : "schema:recipient",
          "schema:domainIncludes" : "schema:Message",
          "schema:rangeIncludes" : [
-            "schema:Organization",
+            "schema:ContactPoint",
             "schema:Audience",
             "schema:Person",
-            "schema:ContactPoint"
+            "schema:Organization"
          ]
       }
    }

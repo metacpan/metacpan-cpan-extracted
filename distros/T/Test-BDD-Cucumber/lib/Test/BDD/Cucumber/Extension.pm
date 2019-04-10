@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Extension;
-$Test::BDD::Cucumber::Extension::VERSION = '0.56';
+$Test::BDD::Cucumber::Extension::VERSION = '0.57';
 =head1 NAME
 
 Test::BDD::Cucumber::Extension - Abstract superclass for extensions
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 DESCRIPTION
 
@@ -44,14 +44,19 @@ the extension is loaded.
 
 sub step_directories { return []; }
 
-=head2 pre_execute()
+=head2 pre_execute($app)
 
 Invoked by C<App::pherkin> before executing any features.  This callback
-allows generic extension setup. Reports errors by calling croak().
+allows generic extension setup. Reports errors by calling croak(). It is
+called once per C<App::pherkin> instance.
 
-Note: When the C<TAP::Parser::SourceHandler::Feature> plugin for C<prove>
- is used, there are no guarantees at this point that this hook is called
- exactly once (or even just once per feature directory).
+Note that the C<TAP::Parser::SourceHandler::Feature> plugin for C<prove>
+might instantiate multipte C<App::pherkin> objects, meaning it will create
+multiple instances of the extensions too. As such, this callback may be
+called once per instance, but multiple times in a Perl image.
+
+The source handler C<fork>s the running Perl instance in order to support
+the parallel testing C<-j> option. This callback will be called pre-fork.
 
 =head2 post_execute()
 
@@ -61,7 +66,7 @@ croak().
 
 Note: When the C<TAP::Parser::SourceHandler::Feature> plugin for C<prove>
  is used, there are no guarantees at this point that this hook is called
- at all (be it per feature directory or per C<prove> run).
+ only once. 
 
 =cut
 
@@ -111,12 +116,17 @@ Feature and scenario stashes can be reached through
 
 Note: *executed* steps, so not called for skipped steps.
 
-=head2 post_step($step, $step_context, $failed)
+=head2 post_step($step, $step_context, $failed, $result)
 
 Invoked by the Executor after each executed step in $scenario.
 Reports errors by calling croak().
 
-$failure indicates whether the step has failed.
+$failed indicates that the step has not been completed succesfully;
+this means the step can have failed, be marked as TODO or pending
+(not implemented).
+
+$result is a C<Test::BDD::Cucumber::Model::Result> instance which
+holds the completion status of the step.
 
 Note: *executed* steps, so not called for skipped steps.
 

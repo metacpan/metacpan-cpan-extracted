@@ -1,5 +1,26 @@
 Revision history for SemanticWeb-Schema:
 
+v3.5.0    2019-04-09 23:34:22+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 3.5 of the schema.
+
+    Note that the VERSION of this and future releases of SemanticWeb-Schema
+    will be based on the schema version.
+
+  - Include the health-lifesci extensions, since some of the schema
+    classes depend on these.
+
+  - Include the auto (automotive) extensions.
+
+  - Include the bib (bibliographic) extensions.
+
+  - Add Class::XSAccessor as a recommended prereq.
+
+  [Toolchain]
+  - Tweaks to dist.ini.
+
+  - Update MANIFEST.SKIP.
+
 v0.0.4    2018-11-06 21:04:04+00:00 Europe/London
   [Bug Fixes]
   - Remove cache/ from distribution.

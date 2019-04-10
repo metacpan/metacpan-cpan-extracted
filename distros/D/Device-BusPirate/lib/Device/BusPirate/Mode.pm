@@ -8,7 +8,9 @@ package Device::BusPirate::Mode;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
+
+use Carp;
 
 use constant {
    CONF_CS     => 0x01,
@@ -154,6 +156,53 @@ sub _update_peripherals
          $buf eq "\x01" or return Future->fail( "Expected ACK response to _update_peripherals" );
          return Future->done;
       });
+}
+
+=head2 set_pwm
+
+   $mode->set_pwm( freq => $freq, duty => $duty )->get
+
+Sets the PWM generator to the given frequency and duty cycle, as a percentage.
+If unspecified, duty cycle will be 50%. Set frequency to 0 to disable.
+
+=cut
+
+use constant {
+   PRESCALE_1 => 0,
+   PRESCALE_8 => 1,
+   PRESCALE_64 => 2,
+   PRESCALE_256 => 3,
+};
+
+sub set_pwm
+{
+   my $self = shift;
+   my %args = @_;
+
+   $self->MODE eq "BB" or
+      croak "Cannot ->set_pwm except in BB mode";
+
+   my $freq = $args{freq} // croak "Require freq";
+   my $duty = $args{duty} // 50;
+
+   if( $freq == 0 ) {
+      return $self->pirate->write_expect_ack( "\x13", "clear PWM" );
+   }
+
+   # in fCPU counts at 16MHz
+   my $period = 16E6 / $freq;
+
+   my $prescale = PRESCALE_1;
+   $prescale = PRESCALE_8,   $period /= 8 if $period >= 2**16;
+   $prescale = PRESCALE_64,  $period /= 8 if $period >= 2**16;
+   $prescale = PRESCALE_256, $period /= 4 if $period >= 2**16;
+   croak "PWM frequency too low" if $period >= 2**16;
+
+   $duty = $period * $duty / 100;
+
+   $self->pirate->write_expect_ack(
+      pack( "C C S> S>", 0x12, $prescale, $duty, $period ), "set PWM"
+   );
 }
 
 =head1 AUTHOR

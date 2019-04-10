@@ -1,0 +1,85 @@
+use utf8;
+
+package SemanticWeb::Schema::MedicalScholarlyArticle;
+
+# ABSTRACT: A scholarly article in the medical domain.
+
+use Moo;
+
+extends qw/ SemanticWeb::Schema::ScholarlyArticle /;
+
+
+use MooX::JSON_LD 'MedicalScholarlyArticle';
+use Ref::Util qw/ is_plain_hashref /;
+# RECOMMEND PREREQ: Ref::Util::XS
+
+use namespace::autoclean;
+
+our $VERSION = 'v3.5.0';
+
+
+has publication_type => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'publicationType',
+);
+
+
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+SemanticWeb::Schema::MedicalScholarlyArticle - A scholarly article in the medical domain.
+
+=head1 VERSION
+
+version v3.5.0
+
+=head1 DESCRIPTION
+
+A scholarly article in the medical domain.
+
+=head1 ATTRIBUTES
+
+=head2 C<publication_type>
+
+C<publicationType>
+
+=for html The type of the medical article, taken from the US NLM MeSH publication
+type catalog. See also <a
+href="http://www.nlm.nih.gov/mesh/pubtypes.html">MeSH documentation</a>.
+
+A publication_type should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head1 SEE ALSO
+
+L<SemanticWeb::Schema::ScholarlyArticle>
+
+=head1 AUTHOR
+
+Robert Rothenberg <rrwo@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Robert Rothenberg.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

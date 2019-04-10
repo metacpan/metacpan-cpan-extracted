@@ -22,9 +22,7 @@ sub make {
     my $class = shift;
     my $argvs = { @_ };
 
-    my $methodargv = {};
     my $hookmethod = $argvs->{'hook'} || undef;
-    my $bouncedata = undef;
     my $processing = {
         'from'   => '',     # From_ line
         'header' => {},     # Email header
@@ -32,8 +30,7 @@ sub make {
         'ds'     => [],     # Parsed data, Delivery Status
         'catch'  => undef,  # Data parsed by callback method
     };
-
-    $methodargv = {
+    my $methodargv = {
         'load'  => $argvs->{'load'}  || [],
         'order' => $argvs->{'order'} || [],
     };
@@ -42,9 +39,7 @@ sub make {
 
     # Rewrite message body for detecting the bounce reason
     $methodargv = { 'hook' => $hookmethod, 'json' => $argvs->{'data'} };
-    $bouncedata = __PACKAGE__->parse(%$methodargv);
-
-    return undef unless $bouncedata;
+    return undef unless my $bouncedata = __PACKAGE__->parse(%$methodargv);
     return undef unless keys %$bouncedata;
 
     $processing->{'ds'}     = $bouncedata->{'ds'};
@@ -63,9 +58,8 @@ sub load {
     my $class = shift;
     my $argvs = { @_ };
 
-    my @modulelist = ();
+    my @modulelist;
     my $tobeloaded = [];
-    my $modulepath = '';
 
     for my $e ('load', 'order') {
         # The order of MTA modules specified by user
@@ -80,7 +74,7 @@ sub load {
         for my $v ( @{ $argvs->{'load'} } ) {
             # Load user defined MTA module
             eval { 
-                ($modulepath = $v) =~ s|::|/|g; 
+                (my $modulepath = $v) =~ s|::|/|g; 
                 require $modulepath.'.pm';
             };
             next if $@;
@@ -309,7 +303,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

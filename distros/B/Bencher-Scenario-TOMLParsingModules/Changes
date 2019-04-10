@@ -1,3 +1,8 @@
+0.003   2019-04-09 (PERLANCAR)
+
+	- [bugfix] Add missing dependency to TOML::Examples [RT#129073].
+
+
 0.002   2017-05-09 (PERLANCAR)
 
 	- Add participant: TOML.

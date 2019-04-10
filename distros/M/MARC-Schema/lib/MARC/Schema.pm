@@ -3,7 +3,7 @@ package MARC::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Cpanel::JSON::XS;
 use File::Share ':all';
@@ -113,7 +113,7 @@ sub check_field {
             # everything is ok
         }
         else {
-            $errors{ind1} = {message => "unknown indicator1 value `$code'"};
+            $errors{ind1} = {message => "unknown indicator1 value '$code'"};
         }
     }
 
@@ -128,7 +128,7 @@ sub check_field {
             # everything is ok
         }
         else {
-            $errors{ind2} = {message => "unknown indicator2 value `$code'"};
+            $errors{ind2} = {message => "unknown indicator2 value '$code'"};
         }
     }
 

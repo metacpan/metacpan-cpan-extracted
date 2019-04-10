@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 use XSLoader;
 
-our $VERSION = '4.005'; # Don't forget to update the TestCompat set for testing against installed decoders!
+our $VERSION = '4.007'; # Don't forget to update the TestCompat set for testing against installed decoders!
 our $XS_VERSION = $VERSION; $VERSION= eval $VERSION;
 
 # not for public consumption, just for testing.
@@ -79,6 +79,7 @@ our @EXPORT_OK = qw(
   SRL_UNCOMPRESSED
   SRL_SNAPPY
   SRL_ZLIB
+  SRL_ZSTD
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 # export by default if run from command line
@@ -456,7 +457,7 @@ needlessly.
 
 =head2 encode_to_file
 
-    Sereal::Decoder->encode_to_file($file,$data,$append);
+    Sereal::Encoder->encode_to_file($file,$data,$append);
     $encoder->encode_to_file($file,$data,$append);
 
 Encode the data specified and write it the named file.

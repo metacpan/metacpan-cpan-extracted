@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Level of evidence for a medical guideline. Enumerated type.",
+      "rdfs:label" : "MedicalEvidenceLevel",
+      "rdfs:subClassOf" : "schema:MedicalEnumeration",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

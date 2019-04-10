@@ -1,0 +1,8 @@
+----
+NOTE
+----
+
+Where can I download more samples?
+
+You can visit https://www.ip2location.com/development-libraries to download all the samples BIN file.
+

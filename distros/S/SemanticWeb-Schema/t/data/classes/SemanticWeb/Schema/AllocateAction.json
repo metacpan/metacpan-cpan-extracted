@@ -5,5 +5,21 @@
       "rdfs:label" : "AllocateAction",
       "rdfs:subClassOf" : "schema:OrganizeAction"
    },
-   "properties" : {}
+   "properties" : {
+      "schema:purpose" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
+         "rdfs:label" : "purpose",
+         "schema:domainIncludes" : [
+            "schema:AllocateAction",
+            "schema:MedicalDevice",
+            "schema:PayAction"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalDevicePurpose",
+            "schema:Thing"
+         ]
+      }
+   }
 }

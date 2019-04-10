@@ -1,0 +1,43 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any recommendation made by a standard society (e.g. ACC/AHA) or consensus statement that denotes how to diagnose and treat a particular condition. Note: this type should be used to tag the actual guideline recommendation; if the guideline recommendation occurs in a larger scholarly article, use MedicalScholarlyArticle to tag the overall article, not this type. Note also: the organization making the recommendation should be captured in the recognizingAuthority base property of MedicalEntity.",
+      "rdfs:label" : "MedicalGuideline",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:evidenceLevel" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Strength of evidence of the data used to formulate the guideline (enumerated).",
+         "rdfs:label" : "evidenceLevel",
+         "schema:domainIncludes" : "schema:MedicalGuideline",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalEvidenceLevel"
+      },
+      "schema:evidenceOrigin" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Source of the data used to formulate the guidance, e.g. RCT, consensus opinion, etc.",
+         "rdfs:label" : "evidenceOrigin",
+         "schema:domainIncludes" : "schema:MedicalGuideline",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:guidelineDate" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Date on which this guideline's recommendation was made.",
+         "rdfs:label" : "guidelineDate",
+         "schema:domainIncludes" : "schema:MedicalGuideline",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Date"
+      },
+      "schema:guidelineSubject" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The medical conditions, treatments, etc. that are the subject of the guideline.",
+         "rdfs:label" : "guidelineSubject",
+         "schema:domainIncludes" : "schema:MedicalGuideline",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalEntity"
+      }
+   }
+}

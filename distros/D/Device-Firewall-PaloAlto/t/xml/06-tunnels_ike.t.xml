@@ -1,0 +1,20 @@
+<response status="success"><result>
+  <entry>
+    <name>second_vr</name>
+    <created>Apr.01 14:16:36</created>
+    <expires>Apr.01 22:16:36</expires>
+    <gwid>1</gwid>
+    <role>Init</role>
+    <mode>Main</mode>
+    <algo>PSK/ DH2/ AES/SHA1</algo>
+  </entry>
+  <entry>
+    <name>default_vr</name>
+    <created>Apr.01 14:16:36</created>
+    <expires>Apr.01 22:16:36</expires>
+    <gwid>2</gwid>
+    <role>Resp</role>
+    <mode>Main</mode>
+    <algo>PSK/ DH2/ AES/SHA1</algo>
+  </entry>
+</result></response>

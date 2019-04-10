@@ -16,6 +16,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
+                                        'Class::XSAccessor' => '1.18',
                                         'Ref::Util::XS' => '0',
                                         'Type::Tiny::XS' => '0',
                                         'aliased' => '0'

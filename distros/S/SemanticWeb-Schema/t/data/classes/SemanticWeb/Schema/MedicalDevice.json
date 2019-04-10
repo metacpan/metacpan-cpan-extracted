@@ -1,0 +1,99 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/63653004",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any object used in a medical capacity, such as to diagnose or treat a patient.",
+      "rdfs:label" : "MedicalDevice",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:adverseOutcome" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A possible complication and/or side effect of this therapy. If it is known that an adverse outcome is serious (resulting in death, disability, or permanent damage; requiring hospitalization; or is otherwise life-threatening or requires immediate medical attention), tag it as a seriouseAdverseOutcome instead.",
+         "rdfs:label" : "adverseOutcome",
+         "schema:domainIncludes" : [
+            "schema:MedicalDevice",
+            "schema:TherapeuticProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalEntity"
+      },
+      "schema:contraindication" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A contraindication for this therapy.",
+         "rdfs:label" : "contraindication",
+         "schema:domainIncludes" : [
+            "schema:MedicalDevice",
+            "schema:MedicalTherapy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalContraindication",
+            "schema:Text"
+         ]
+      },
+      "schema:indication" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
+         "rdfs:label" : "indication",
+         "schema:domainIncludes" : [
+            "schema:MedicalProcedure",
+            "schema:MedicalDevice",
+            "schema:TherapeuticProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalIndication"
+      },
+      "schema:postOp" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A description of the postoperative procedures, care, and/or followups for this device.",
+         "rdfs:label" : "postOp",
+         "schema:domainIncludes" : "schema:MedicalDevice",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:preOp" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A description of the workup, testing, and other preparations required before implanting this device.",
+         "rdfs:label" : "preOp",
+         "schema:domainIncludes" : "schema:MedicalDevice",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:procedure" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A description of the procedure involved in setting up, using, and/or installing the device.",
+         "rdfs:label" : "procedure",
+         "schema:domainIncludes" : "schema:MedicalDevice",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:purpose" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A goal towards an action is taken. Can be concrete or abstract.",
+         "rdfs:label" : "purpose",
+         "schema:domainIncludes" : [
+            "schema:AllocateAction",
+            "schema:MedicalDevice",
+            "schema:PayAction"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalDevicePurpose",
+            "schema:Thing"
+         ]
+      },
+      "schema:seriousAdverseOutcome" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A possible serious complication and/or serious side effect of this therapy. Serious adverse outcomes include those that are life-threatening; result in death, disability, or permanent damage; require hospitalization or prolong existing hospitalization; cause congenital anomalies or birth defects; or jeopardize the patient and may require medical or surgical intervention to prevent one of the outcomes in this definition.",
+         "rdfs:label" : "seriousAdverseOutcome",
+         "schema:domainIncludes" : [
+            "schema:MedicalDevice",
+            "schema:MedicalTherapy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalEntity"
+      }
+   }
+}

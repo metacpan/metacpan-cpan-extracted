@@ -1,12 +1,16 @@
 Build.PL
 Changes
 MANIFEST
-README
+README.md
+CONTRIBUTING.md
 lib/Math/ContinuedFraction.pm
 t/convergent0.t
 t/convergent1.t
 t/from_ratio.t
+t/from_root.t
 t/to_ascii.t
 t/pod.t
 Makefile.PL
 META.yml
+LICENSE
+META.json

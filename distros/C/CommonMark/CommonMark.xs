@@ -66,6 +66,13 @@
 
 #endif /* CMARK_VERSION < 0x001700 */
 
+#ifdef CMARK_OPT_UNSAFE
+  #define OPT_UNSAFE CMARK_OPT_UNSAFE
+#else
+  /* Hardcoded value, ignored by old libcmark versions. */
+  #define OPT_UNSAFE (1 << 17)
+#endif
+
 static SV*
 S_create_or_incref_node_sv(pTHX_ cmark_node *node) {
     SV *new_obj = NULL;
@@ -169,6 +176,20 @@ S_sv2c(pTHX_ SV *sv, const char *class_name, STRLEN len, CV *cv,
     return INT2PTR(void*, SvIV(SvRV(sv)));
 }
 
+/* Handle SAFE/UNSAFE options. */
+static int
+S_process_options(int options) {
+    if (options & CMARK_OPT_SAFE) {
+        /* SAFE takes predence over UNSAFE. */
+        options &= ~OPT_UNSAFE;
+    }
+    else if ((options & OPT_UNSAFE) == 0) {
+        /* For old libcmark versions, set SAFE unless UNSAFE was set. */
+        options |= CMARK_OPT_SAFE;
+    }
+    return options;
+}
+
 
 MODULE = CommonMark  PACKAGE = CommonMark  PREFIX = cmark_
 
@@ -241,7 +262,8 @@ BOOT:
 #endif
             { "OPT_NORMALIZE", CMARK_OPT_NORMALIZE },
             { "OPT_VALIDATE_UTF8", CMARK_OPT_VALIDATE_UTF8 },
-            { "OPT_SMART", CMARK_OPT_SMART }
+            { "OPT_SMART", CMARK_OPT_SMART },
+            { "OPT_UNSAFE", OPT_UNSAFE }
         };
         size_t num_constants = sizeof(constants) / sizeof(constants[0]);
         size_t i;
@@ -268,6 +290,7 @@ PREINIT:
 CODE:
     (void)package;
     buffer = SvPVutf8(string, len);
+    options = S_process_options(options);
     RETVAL = cmark_markdown_to_html(buffer, len, options);
 OUTPUT:
     RETVAL
@@ -501,12 +524,16 @@ POSTCALL:
 
 char*
 interface_render(cmark_node *root, int options = 0)
+INIT:
+    options = S_process_options(options);
 INTERFACE:
     cmark_node_render_html
     cmark_node_render_xml
 
 char*
 interface_render_width(cmark_node *root, int options = 0, int width = 0)
+INIT:
+    options = S_process_options(options);
 INTERFACE:
     cmark_node_render_man
     cmark_node_render_commonmark

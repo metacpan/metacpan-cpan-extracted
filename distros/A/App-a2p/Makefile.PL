@@ -28,20 +28,18 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Devel::FindPerl" => 0,
     "File::Spec::Functions" => 0,
     "File::Temp" => 0,
     "IPC::Open2" => 0,
     "Test::More" => "0.89"
   },
-  "VERSION" => "1.010",
+  "VERSION" => "1.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 my %FallbackPrereqs = (
-  "Devel::FindPerl" => 0,
   "File::Spec::Functions" => 0,
   "File::Temp" => 0,
   "IPC::Open2" => 0,

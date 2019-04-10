@@ -5,5 +5,19 @@
       "rdfs:label" : "MedicalOrganization",
       "rdfs:subClassOf" : "schema:Organization"
    },
-   "properties" : {}
+   "properties" : {
+      "schema:medicalSpecialty" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical specialty of the provider.",
+         "rdfs:label" : "medicalSpecialty",
+         "schema:domainIncludes" : [
+            "schema:Physician",
+            "schema:Hospital",
+            "schema:MedicalClinic",
+            "schema:MedicalOrganization"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalSpecialty"
+      }
+   }
 }

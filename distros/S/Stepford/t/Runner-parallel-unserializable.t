@@ -11,7 +11,7 @@ use Test::Fatal;
 use Test::More;
 
 my $tempdir = tempdir( CLEANUP => 1 );
-my $file1 = $tempdir->file('file1');
+my $file1   = $tempdir->file('file1');
 $file1->spew('stuff in the file');
 
 my $file2 = $tempdir->file('file2');

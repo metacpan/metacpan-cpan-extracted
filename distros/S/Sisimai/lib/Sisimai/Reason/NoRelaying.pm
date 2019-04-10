@@ -13,7 +13,8 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $index = [
+
+    state $index = [
         'as a relay',
         'insecure mail relay',
         'mail server requires authentication when attempting to send to a non-local e-mail address',    # MailEnable 
@@ -27,7 +28,6 @@ sub match {
         'this system is not configured to relay mail',
         'unable to relay for',
     ];
-
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
@@ -42,8 +42,7 @@ sub true {
     my $class = shift;
     my $argvs = shift // return undef;
 
-    my $r = $argvs->reason // '';
-    if( $r ) {
+    if( my $r = $argvs->reason // '' ) {
         # Do not overwrite the reason
         return 0 if( $r eq 'securityerror' || $r eq 'systemerror' || $r eq 'undefined' );
     } else {

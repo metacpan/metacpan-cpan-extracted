@@ -19,12 +19,23 @@
          "rdfs:comment" : "A flag to signal that the item, event, or place is accessible for free.",
          "rdfs:label" : "isAccessibleForFree",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
             "schema:Event",
             "schema:PublicationEvent",
+            "schema:CreativeWork",
             "schema:Place"
          ],
          "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:publishedBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An agent associated with the publication event.",
+         "rdfs:label" : "publishedBy",
+         "schema:domainIncludes" : "schema:PublicationEvent",
+         "schema:isPartOf" : "http:bib.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
       },
       "schema:publishedOn" : {
          "rdf:type" : "rdf:Property",

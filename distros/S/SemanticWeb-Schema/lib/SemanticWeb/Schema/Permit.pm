@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has issued_by => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::Permit - A permit issued by an organization, e
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -144,7 +144,7 @@ A permit_audience should be one of the following types:
 
 C<validFor>
 
-The time validity of the permit.
+The duration of validity of a permit or similar thing.
 
 A valid_for should be one of the following types:
 
@@ -172,7 +172,7 @@ A valid_from should be one of the following types:
 
 C<validIn>
 
-The geographic area where the permit is valid.
+The geographic area where a permit or similar thing is valid.
 
 A valid_in should be one of the following types:
 

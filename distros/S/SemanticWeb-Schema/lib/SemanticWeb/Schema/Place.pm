@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has additional_property => (
@@ -110,6 +110,86 @@ has geo => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'geo',
+);
+
+
+
+has geo_contains => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoContains',
+);
+
+
+
+has geo_covered_by => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoCoveredBy',
+);
+
+
+
+has geo_covers => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoCovers',
+);
+
+
+
+has geo_crosses => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoCrosses',
+);
+
+
+
+has geo_disjoint => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoDisjoint',
+);
+
+
+
+has geo_equals => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoEquals',
+);
+
+
+
+has geo_intersects => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoIntersects',
+);
+
+
+
+has geo_overlaps => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoOverlaps',
+);
+
+
+
+has geo_touches => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoTouches',
+);
+
+
+
+has geo_within => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'geoWithin',
 );
 
 
@@ -226,6 +306,14 @@ has reviews => (
 
 
 
+has slogan => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'slogan',
+);
+
+
+
 has smoking_allowed => (
     is        => 'rw',
     predicate => 1,
@@ -266,7 +354,7 @@ SemanticWeb::Schema::Place - Entities that have a somewhat fixed
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -303,9 +391,9 @@ A address should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
+
+=item C<Str>
 
 =back
 
@@ -448,9 +536,201 @@ A geo should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
+
 =item C<InstanceOf['SemanticWeb::Schema::GeoCoordinates']>
 
-=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
+=back
+
+=head2 C<geo_contains>
+
+C<geoContains>
+
+=for html Represents a relationship between two geometries (or the places they
+represent), relating a containing geometry to a contained geometry. "a
+contains b iff no points of b lie in the exterior of a, and at least one
+point of the interior of b lies in the interior of a". As defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_contains should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<geo_covered_by>
+
+C<geoCoveredBy>
+
+=for html Represents a relationship between two geometries (or the places they
+represent), relating a geometry to another that covers it. As defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_covered_by should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<geo_covers>
+
+C<geoCovers>
+
+=for html Represents a relationship between two geometries (or the places they
+represent), relating a covering geometry to a covered geometry. "Every
+point of b is a point of (the interior or boundary of) a". As defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_covers should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=back
+
+=head2 C<geo_crosses>
+
+C<geoCrosses>
+
+=for html Represents a relationship between two geometries (or the places they
+represent), relating a geometry to another that crosses it: "a crosses b:
+they have some but not all interior points in common, and the dimension of
+the intersection is less than that of at least one of them". As defined in
+<a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_crosses should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<geo_disjoint>
+
+C<geoDisjoint>
+
+=for html Represents spatial relations in which two geometries (or the places they
+represent) are topologically disjoint: they have no point in common. They
+form a set of disconnected geometries." (a symmetric relationship, as
+defined in <a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>)
+
+A geo_disjoint should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<geo_equals>
+
+C<geoEquals>
+
+=for html Represents spatial relations in which two geometries (or the places they
+represent) are topologically equal, as defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>. "Two geometries are
+topologically equal if their interiors intersect and no part of the
+interior or boundary of one geometry intersects the exterior of the other"
+(a symmetric relationship)
+
+A geo_equals should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=back
+
+=head2 C<geo_intersects>
+
+C<geoIntersects>
+
+=for html Represents spatial relations in which two geometries (or the places they
+represent) have at least one point in common. As defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_intersects should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<geo_overlaps>
+
+C<geoOverlaps>
+
+=for html Represents a relationship between two geometries (or the places they
+represent), relating a geometry to another that geospatially overlaps it,
+i.e. they have some but not all points in common. As defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_overlaps should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=back
+
+=head2 C<geo_touches>
+
+C<geoTouches>
+
+=for html Represents spatial relations in which two geometries (or the places they
+represent) touch: they have at least one boundary point in common, but no
+interior points." (a symmetric relationship, as defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a> )
+
+A geo_touches should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<geo_within>
+
+C<geoWithin>
+
+=for html Represents a relationship between two geometries (or the places they
+represent), relating a geometry to one that contains it, i.e. it is inside
+(i.e. within) its interior. As defined in <a
+href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a>.
+
+A geo_within should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::GeospatialGeometry']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
 
 =back
 
@@ -525,9 +805,9 @@ A logo should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
+
+=item C<Str>
 
 =back
 
@@ -591,9 +871,9 @@ A photo should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Photograph']>
-
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Photograph']>
 
 =back
 
@@ -605,9 +885,9 @@ A photos should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Photograph']>
+
+=item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
 
 =back
 
@@ -648,6 +928,18 @@ A reviews should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Review']>
+
+=back
+
+=head2 C<slogan>
+
+A slogan or motto associated with the item.
+
+A slogan should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Add line numbers to lists while creating them",
+   "abstract" : "Add sequential numbers to lists while creating them",
    "author" : [
       "Christopher White <cxwembedded@gmail.com>"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "List::AutoNumbered" : {
          "file" : "lib/List/AutoNumbered.pm",
-         "version" : "0.000003"
+         "version" : "0.000005"
       },
       "List::AutoNumbered::Skipper" : {
          "file" : "lib/List/AutoNumbered.pm"
@@ -78,6 +78,6 @@
          "web" : "https://github.com/cxw42/List-AutoNumbered"
       }
    },
-   "version" : "0.000003",
+   "version" : "0.000005",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

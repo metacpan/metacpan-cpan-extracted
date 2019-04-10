@@ -42,7 +42,7 @@
       },
       "schema:recipeCategory" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The category of the recipeâfor example, appetizer, entree, etc.",
+         "rdfs:comment" : "The category of the recipeÃ¢ÂÂfor example, appetizer, entree, etc.",
          "rdfs:label" : "recipeCategory",
          "schema:domainIncludes" : "schema:Recipe",
          "schema:rangeIncludes" : "schema:Text"
@@ -69,9 +69,9 @@
          "rdfs:subPropertyOf" : "schema:step",
          "schema:domainIncludes" : "schema:Recipe",
          "schema:rangeIncludes" : [
-            "schema:ItemList",
+            "schema:Text",
             "schema:CreativeWork",
-            "schema:Text"
+            "schema:ItemList"
          ]
       },
       "schema:recipeYield" : {
@@ -90,8 +90,8 @@
          "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
          "rdfs:label" : "suitableForDiet",
          "schema:domainIncludes" : [
-            "schema:MenuItem",
-            "schema:Recipe"
+            "schema:Recipe",
+            "schema:MenuItem"
          ],
          "schema:rangeIncludes" : "schema:RestrictedDiet"
       }

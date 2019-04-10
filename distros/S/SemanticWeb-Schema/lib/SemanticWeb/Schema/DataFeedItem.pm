@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has date_created => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::DataFeedItem - A single item within a larger data feed.
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -121,7 +121,7 @@ A date_modified should be one of the following types:
 =head2 C<item>
 
 An entity represented by an entry in a list or data feed (e.g. an 'artist'
-in a list of 'artists')’.
+in a list of 'artists')â.
 
 A item should be one of the following types:
 

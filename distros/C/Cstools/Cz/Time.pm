@@ -34,8 +34,8 @@ By default they are returned in ISO-8859-2.
 
 =head1 AUTHORS
 
-(c) 1997 Jan Pazdziora <adelton@fi.muni.cz>,
-    1997 Michael Mráka <michael@fi.muni.cz>
+(c) 1997 Jan Pazdziora
+    1997 Michael Mráka
 
 at Faculty of Informatics, Masaryk University, Brno
 

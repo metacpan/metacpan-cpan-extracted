@@ -1,0 +1,143 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A product taken by mouth that contains a dietary ingredient intended to supplement the diet. Dietary ingredients may include vitamins, minerals, herbs or other botanicals, amino acids, and substances such as enzymes, organ tissues, glandulars and metabolites.",
+      "rdfs:label" : "DietarySupplement",
+      "rdfs:subClassOf" : "schema:Substance",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:activeIngredient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
+         "rdfs:label" : "activeIngredient",
+         "schema:domainIncludes" : [
+            "schema:DrugStrength",
+            "schema:Drug",
+            "schema:Substance",
+            "schema:DietarySupplement"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:background" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Descriptive information establishing a historical perspective on the supplement. May include the rationale for the name, the population where the supplement first came to prominence, etc.",
+         "rdfs:label" : "background",
+         "schema:domainIncludes" : "schema:DietarySupplement",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:isProprietary" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "True if this item's name is a proprietary/brand name (vs. generic name).",
+         "rdfs:label" : "isProprietary",
+         "schema:domainIncludes" : [
+            "schema:Drug",
+            "schema:DietarySupplement"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:legalStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The drug or supplement's legal status, including any controlled substance schedules that apply.",
+         "rdfs:label" : "legalStatus",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:MedicalEntity",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:DrugLegalStatus",
+            "schema:MedicalEnumeration",
+            "schema:Text"
+         ]
+      },
+      "schema:manufacturer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The manufacturer of the product.",
+         "rdfs:label" : "manufacturer",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:maximumIntake" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
+         "rdfs:label" : "maximumIntake",
+         "schema:domainIncludes" : [
+            "schema:Substance",
+            "schema:DietarySupplement",
+            "schema:Drug",
+            "schema:DrugStrength"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MaximumDoseSchedule"
+      },
+      "schema:mechanismOfAction" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The specific biochemical interaction through which this drug or supplement produces its pharmacological effect.",
+         "rdfs:label" : "mechanismOfAction",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:nonProprietaryName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The generic name of this drug or supplement.",
+         "rdfs:label" : "nonProprietaryName",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:proprietaryName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Proprietary name given to the diet plan, typically by its originator or creator.",
+         "rdfs:label" : "proprietaryName",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:recommendedIntake" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
+         "rdfs:label" : "recommendedIntake",
+         "schema:domainIncludes" : "schema:DietarySupplement",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:RecommendedDoseSchedule"
+      },
+      "schema:safetyConsideration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any potential safety concern associated with the supplement. May include interactions with other drugs and foods, pregnancy, breastfeeding, known adverse reactions, and documented efficacy of the supplement.",
+         "rdfs:label" : "safetyConsideration",
+         "schema:domainIncludes" : "schema:DietarySupplement",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:targetPopulation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Characteristics of the population for which this is intended, or which typically uses it, e.g. 'adults'.",
+         "rdfs:label" : "targetPopulation",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:DoseSchedule"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

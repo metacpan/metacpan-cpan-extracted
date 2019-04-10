@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::Interfaces;
-$Device::Firewall::PaloAlto::Op::Interfaces::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::Interfaces::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -94,7 +94,7 @@ Device::Firewall::PaloAlto::Op::Interfaces - new module
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 

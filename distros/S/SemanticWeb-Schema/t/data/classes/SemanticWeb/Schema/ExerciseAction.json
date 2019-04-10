@@ -15,13 +15,22 @@
          "schema:rangeIncludes" : "schema:Place",
          "schema:supersededBy" : "schema:exerciseCourse"
       },
+      "schema:diet" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The diet used in this action.",
+         "rdfs:label" : "diet",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Diet"
+      },
       "schema:distance" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The distance travelled, e.g. exercising or travelling.",
          "rdfs:label" : "distance",
          "schema:domainIncludes" : [
-            "schema:TravelAction",
-            "schema:ExerciseAction"
+            "schema:ExerciseAction",
+            "schema:TravelAction"
          ],
          "schema:rangeIncludes" : "schema:Distance"
       },
@@ -33,6 +42,35 @@
          "schema:domainIncludes" : "schema:ExerciseAction",
          "schema:rangeIncludes" : "schema:Place"
       },
+      "schema:exercisePlan" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The exercise plan used on this action.",
+         "rdfs:label" : "exercisePlan",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:ExercisePlan"
+      },
+      "schema:exerciseRelatedDiet" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sub property of instrument. The diet used in this action.",
+         "rdfs:label" : "exerciseRelatedDiet",
+         "rdfs:subPropertyOf" : "schema:instrument",
+         "schema:domainIncludes" : "schema:ExerciseAction",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Diet"
+      },
+      "schema:exerciseType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Type(s) of exercise or activity, such as strength training, flexibility training, aerobics, cardiac rehabilitation, etc.",
+         "rdfs:label" : "exerciseType",
+         "schema:domainIncludes" : [
+            "schema:ExerciseAction",
+            "schema:ExercisePlan"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
       "schema:fromLocation" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A sub property of location. The original location of the object or the agent before the action.",
@@ -40,8 +78,8 @@
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
             "schema:MoveAction",
-            "schema:ExerciseAction",
-            "schema:TransferAction"
+            "schema:TransferAction",
+            "schema:ExerciseAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       },
@@ -83,10 +121,10 @@
          "rdfs:label" : "toLocation",
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
-            "schema:TransferAction",
             "schema:InsertAction",
-            "schema:MoveAction",
-            "schema:ExerciseAction"
+            "schema:ExerciseAction",
+            "schema:TransferAction",
+            "schema:MoveAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       }

@@ -1,0 +1,11 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1689",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An aggregate rating of an Organization related to its role as an employer.",
+      "rdfs:label" : "EmployerAggregateRating",
+      "rdfs:subClassOf" : "schema:AggregateRating",
+      "schema:category" : "issue-1689"
+   },
+   "properties" : {}
+}

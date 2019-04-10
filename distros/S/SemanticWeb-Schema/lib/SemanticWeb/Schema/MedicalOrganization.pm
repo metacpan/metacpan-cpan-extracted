@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
+
+
+has medical_specialty => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'medicalSpecialty',
+);
+
 
 
 
@@ -34,12 +42,28 @@ SemanticWeb::Schema::MedicalOrganization - A medical organization (physical or n
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
 A medical organization (physical or not), such as hospital, institution or
 clinic.
+
+=head1 ATTRIBUTES
+
+=head2 C<medical_specialty>
+
+C<medicalSpecialty>
+
+A medical specialty of the provider.
+
+A medical_specialty should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MedicalSpecialty']>
+
+=back
 
 =head1 SEE ALSO
 

@@ -16,6 +16,7 @@ use namespace::autoclean;
 our $VERSION = '[% version %]';
 
 # RECOMMEND PREREQ: aliased
+# RECOMMEND PREREQ: Class::XSAccessor 1.18
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 

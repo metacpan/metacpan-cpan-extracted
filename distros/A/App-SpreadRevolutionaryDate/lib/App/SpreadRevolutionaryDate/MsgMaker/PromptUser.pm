@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::PromptUser;
-$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.14';
+$App::SpreadRevolutionaryDate::MsgMaker::PromptUser::VERSION = '0.17';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message by prompting user
 
 use Moose;
@@ -18,6 +18,7 @@ with 'App::SpreadRevolutionaryDate::MsgMaker';
 
 use open qw(:std :encoding(UTF-8));
 use IO::Prompt::Hooked;
+use File::Spec;
 
 use Locale::TextDomain 'App-SpreadRevolutionaryDate';
 use namespace::autoclean;
@@ -31,6 +32,16 @@ has 'default' => (
 
 around BUILDARGS => sub {
   my ($orig, $class, %args) = @_;
+
+  if ($args{locale}) {
+    # Get sure locale has .mo file
+    my ($volume, $directory, $file) = File::Spec->splitpath(__FILE__);
+    my $locale_mo = File::Spec->catfile($directory, '..', '..', '..', 'LocaleData', $args{locale}, 'LC_MESSAGES', 'App-SpreadRevolutionaryDate.mo');
+    $args{locale} = 'fr' unless -f $locale_mo;
+  } else {
+    # Defaults to French
+    $args{locale} = 'fr';
+  }
 
   # Do not pass default => undef to force default in attribute definition
   delete $args{default}
@@ -95,7 +106,7 @@ App::SpreadRevolutionaryDate::MsgMaker::PromptUser - MsgMaker class for L<App::S
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 METHODS
 
@@ -136,6 +147,8 @@ Prompts user for the message to be spread. Takes no argument. Returns message as
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es>
 
 =back
 

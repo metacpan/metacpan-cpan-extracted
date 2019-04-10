@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_LRMIClass",
+      "dc:source" : "schemadotorgsources:source_LRMIClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An EducationalAudience.",
       "rdfs:label" : "EducationalAudience",

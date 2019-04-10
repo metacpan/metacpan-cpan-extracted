@@ -18,7 +18,7 @@ my %module_build_args = (
     "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-MARC",
-  "dist_version" => "1.241",
+  "dist_version" => "1.251",
   "license" => "perl",
   "module_name" => "Catmandu::MARC",
   "recursive_test_files" => 1,
@@ -33,6 +33,7 @@ my %module_build_args = (
     "MARC::Lint" => 0,
     "MARC::Parser::RAW" => 0,
     "MARC::Record" => "v2.0.6",
+    "MARC::Schema" => "0.07",
     "MARC::Spec" => "v2.0.3",
     "Memoize" => 0,
     "Moo" => "1.0",

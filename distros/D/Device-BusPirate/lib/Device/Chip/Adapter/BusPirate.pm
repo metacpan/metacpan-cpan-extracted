@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 
@@ -178,8 +178,8 @@ sub _find_speed
 
     return first {
         my $rate = $_;
-        $rate =~ s/k$/000/;
-        $rate =~ s/M$/000000/;
+        $rate =~ m/(.*)k$/ and $rate = 1E3 * $1;
+        $rate =~ m/(.*)M$/ and $rate = 1E6 * $1;
 
         $rate <= $max_bitrate
     } @speeds;
@@ -187,6 +187,14 @@ sub _find_speed
 
 # Most modes only have access to the AUX GPIO pin
 sub list_gpios { return qw( AUX ) }
+
+sub meta_gpios
+{
+   my $self = shift;
+
+   return map { Device::Chip::Adapter::GPIODefinition( $_, "rw", 0 ) }
+          $self->list_gpios;
+}
 
 sub write_gpios
 {
@@ -355,6 +363,12 @@ sub configure
     push @f, $self->{mode}->pullup( 1 );
 
     Future->needs_all( @f );
+}
+
+sub DESTROY
+{
+   my $self = shift;
+   $self->{mode}->pullup( 0 )->get if $self->{mode};
 }
 
 sub write

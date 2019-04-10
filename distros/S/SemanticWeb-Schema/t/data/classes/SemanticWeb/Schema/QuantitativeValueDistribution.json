@@ -1,0 +1,74 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A statistical distribution of values.",
+      "rdfs:label" : "QuantitativeValueDistribution",
+      "rdfs:subClassOf" : "schema:StructuredValue",
+      "schema:category" : "issue-1698"
+   },
+   "properties" : {
+      "schema:duration" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
+         "rdfs:label" : "duration",
+         "schema:category" : "issue-1698",
+         "schema:domainIncludes" : [
+            "schema:Movie",
+            "schema:Event",
+            "schema:MusicRelease",
+            "schema:Audiobook",
+            "schema:QuantitativeValueDistribution",
+            "schema:MusicRecording",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : "schema:Duration"
+      },
+      "schema:median" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The median value.",
+         "rdfs:label" : "median",
+         "schema:category" : "issue-1698",
+         "schema:domainIncludes" : "schema:QuantitativeValueDistribution",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:percentile10" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The 10th percentile value.",
+         "rdfs:label" : "percentile10",
+         "schema:category" : "issue-1698",
+         "schema:domainIncludes" : "schema:QuantitativeValueDistribution",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:percentile25" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The 25th percentile value.",
+         "rdfs:label" : "percentile25",
+         "schema:category" : "issue-1698",
+         "schema:domainIncludes" : "schema:QuantitativeValueDistribution",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:percentile75" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The 75th percentile value.",
+         "rdfs:label" : "percentile75",
+         "schema:category" : "issue-1698",
+         "schema:domainIncludes" : "schema:QuantitativeValueDistribution",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:percentile90" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The 90th percentile value.",
+         "rdfs:label" : "percentile90",
+         "schema:category" : "issue-1698",
+         "schema:domainIncludes" : "schema:QuantitativeValueDistribution",
+         "schema:rangeIncludes" : "schema:Number"
+      }
+   }
+}

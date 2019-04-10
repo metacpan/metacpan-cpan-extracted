@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Enumerated categories of medical drug costs.",
+      "rdfs:label" : "DrugCostCategory",
+      "rdfs:subClassOf" : "schema:MedicalEnumeration",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

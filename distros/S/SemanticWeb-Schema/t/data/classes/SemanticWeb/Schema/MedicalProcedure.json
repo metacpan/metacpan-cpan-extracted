@@ -1,0 +1,100 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/50731006",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A process of care used in either a diagnostic, therapeutic, preventive or palliative capacity that relies on invasive (surgical), non-invasive, or other techniques.",
+      "rdfs:label" : "MedicalProcedure",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:bodyLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Location in the body of the anatomical structure.",
+         "rdfs:label" : "bodyLocation",
+         "schema:domainIncludes" : [
+            "schema:AnatomicalStructure",
+            "schema:MedicalProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:followup" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Typical or recommended followup care after the procedure is performed.",
+         "rdfs:label" : "followup",
+         "schema:domainIncludes" : "schema:MedicalProcedure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:howPerformed" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "How the procedure is performed.",
+         "rdfs:label" : "howPerformed",
+         "schema:domainIncludes" : "schema:MedicalProcedure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:indication" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A factor that indicates use of this therapy for treatment and/or prevention of a condition, symptom, etc. For therapies such as drugs, indications can include both officially-approved indications as well as off-label uses. These can be distinguished by using the ApprovedIndication subtype of MedicalIndication.",
+         "rdfs:label" : "indication",
+         "schema:domainIncludes" : [
+            "schema:MedicalProcedure",
+            "schema:MedicalDevice",
+            "schema:TherapeuticProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalIndication"
+      },
+      "schema:outcome" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Expected or actual outcomes of the study.",
+         "rdfs:label" : "outcome",
+         "schema:domainIncludes" : [
+            "schema:MedicalProcedure",
+            "schema:MedicalStudy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalEntity",
+            "schema:Text"
+         ]
+      },
+      "schema:preparation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Typical preparation that a patient must undergo before having the procedure performed.",
+         "rdfs:label" : "preparation",
+         "schema:domainIncludes" : "schema:MedicalProcedure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:MedicalEntity"
+         ]
+      },
+      "schema:procedureType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of procedure, for example Surgical, Noninvasive, or Percutaneous.",
+         "rdfs:label" : "procedureType",
+         "schema:domainIncludes" : "schema:MedicalProcedure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalProcedureType"
+      },
+      "schema:status" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The status of the study (enumerated).",
+         "rdfs:label" : "status",
+         "schema:domainIncludes" : [
+            "schema:MedicalStudy",
+            "schema:MedicalCondition",
+            "schema:MedicalProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:EventStatusType",
+            "schema:Text",
+            "schema:MedicalStudyStatus"
+         ]
+      }
+   }
+}

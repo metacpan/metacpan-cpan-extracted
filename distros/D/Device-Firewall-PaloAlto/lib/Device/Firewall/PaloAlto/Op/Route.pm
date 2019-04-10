@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::Route;
-$Device::Firewall::PaloAlto::Op::Route::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::Route::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -96,7 +96,7 @@ Device::Firewall::PaloAlto::Op::Route - Palto Alto firewall route
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 

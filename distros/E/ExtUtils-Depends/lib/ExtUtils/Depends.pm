@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 package ExtUtils::Depends;
 
 use strict;
@@ -12,7 +8,7 @@ use File::Find;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.405';
+our $VERSION = '0.8000';
 
 sub import {
 	my $class = shift;
@@ -223,11 +219,13 @@ sub load {
 	{
 		instpath => $instpath,
 		typemaps => \@typemaps,
-		inc      => "-I$instpath $inc",
+		inc      => "-I". _quote_if_space($instpath) ." $inc",
 		libs     => $libs,
 		deps     => \@deps,
 	}
 }
+
+sub _quote_if_space { $_[0] =~ / / ? qq{"$_[0]"} : $_[0] }
 
 sub load_deps {
 	my $self = shift;
@@ -366,7 +364,9 @@ sub find_extra_libs {
 		}, map { -d $_ ? ($_) : () } @INC); # only extant dirs
 
 		if ($matching_file && -f $matching_file) {
-			push @found_libs, ('-L' . $matching_dir, '-l' . $stem);
+			push @found_libs,
+				'-L' . _quote_if_space($matching_dir),
+				'-l' . $stem;
 			# Android's linker ignores the RTLD_GLOBAL flag
 			# and loads everything as if under RTLD_LOCAL.
 			# What this means in practice is that modules need

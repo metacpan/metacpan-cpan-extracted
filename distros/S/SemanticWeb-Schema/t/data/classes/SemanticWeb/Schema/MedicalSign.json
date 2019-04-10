@@ -1,0 +1,27 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any physical manifestation of a person's medical condition discoverable by objective diagnostic tests or physical examination.",
+      "rdfs:label" : "MedicalSign",
+      "rdfs:subClassOf" : "schema:MedicalSignOrSymptom",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:identifyingExam" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A physical examination that can identify this sign.",
+         "rdfs:label" : "identifyingExam",
+         "schema:domainIncludes" : "schema:MedicalSign",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:PhysicalExam"
+      },
+      "schema:identifyingTest" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A diagnostic test that can identify this sign.",
+         "rdfs:label" : "identifyingTest",
+         "schema:domainIncludes" : "schema:MedicalSign",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalTest"
+      }
+   }
+}

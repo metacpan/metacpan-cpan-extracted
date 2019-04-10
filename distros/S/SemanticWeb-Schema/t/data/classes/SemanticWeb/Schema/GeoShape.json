@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_rNews",
+      "dc:source" : "schemadotorgsources:source_rNews",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The geographic shape of a place. A GeoShape can be described using several properties whose values are based on latitude/longitude pairs. Either whitespace or commas can be used to separate latitude and longitude; whitespace should be used when writing a list of several such points.",
       "rdfs:label" : "GeoShape",
@@ -13,14 +13,14 @@
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
             "schema:Place",
-            "schema:GeoCoordinates",
-            "schema:GeoShape",
             "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:GeoCoordinates",
+            "schema:GeoShape"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:Text"
          ]
       },
       "schema:addressCountry" : {
@@ -29,12 +29,12 @@
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
-            "schema:PostalAddress",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
-            "schema:Country",
-            "schema:Text"
+            "schema:Text",
+            "schema:Country"
          ]
       },
       "schema:box" : {
@@ -53,7 +53,7 @@
       },
       "schema:elevation" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The elevation of a location (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>).",
+         "rdfs:comment" : "The elevation of a location (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>). Values may be of the form 'NUMBER UNIT<em>OF</em>MEASUREMENT' (e.g., '1,000 m', '3,200 ft') while numbers alone should be assumed to be a value in meters.",
          "rdfs:label" : "elevation",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
@@ -84,8 +84,8 @@
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
             "schema:PostalAddress",
-            "schema:GeoCoordinates",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

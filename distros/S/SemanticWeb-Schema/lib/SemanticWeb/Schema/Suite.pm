@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has bed => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::Suite - A suite in a hotel or other public accommodation
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,8 @@ A bed should be one of the following types:
 
 =item C<Str>
 
+=item C<InstanceOf['SemanticWeb::Schema::BedType']>
+
 =back
 
 =head2 C<number_of_rooms>
@@ -102,9 +104,9 @@ A number_of_rooms should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Num>
 
 =back
 

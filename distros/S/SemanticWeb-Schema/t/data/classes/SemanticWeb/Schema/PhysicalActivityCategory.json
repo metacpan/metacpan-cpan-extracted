@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Categories of physical activity, organized by physiologic classification.",
+      "rdfs:label" : "PhysicalActivityCategory",
+      "rdfs:subClassOf" : "schema:Enumeration",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

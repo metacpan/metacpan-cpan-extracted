@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Design models for observational medical studies. Enumerated type.",
+      "rdfs:label" : "MedicalObservationalStudyDesign",
+      "rdfs:subClassOf" : "schema:MedicalEnumeration",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

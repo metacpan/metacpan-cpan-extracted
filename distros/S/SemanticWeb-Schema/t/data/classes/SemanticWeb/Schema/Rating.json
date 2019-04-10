@@ -15,8 +15,8 @@
             "schema:Rating"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:bestRating" : {
@@ -38,6 +38,18 @@
             "schema:Text",
             "schema:Number"
          ]
+      },
+      "schema:reviewAspect" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1689",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "This Review or Rating is relevant to this part or facet of the itemReviewed.",
+         "rdfs:label" : "reviewAspect",
+         "schema:category" : "issue-1689",
+         "schema:domainIncludes" : [
+            "schema:Review",
+            "schema:Rating"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
       },
       "schema:worstRating" : {
          "rdf:type" : "rdf:Property",

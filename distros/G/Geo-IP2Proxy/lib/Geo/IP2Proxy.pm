@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2017 IP2Location.com
+# Copyright (C) 2002-2019 IP2Location.com
 # All Rights Reserved
 #
 # This library is free software: you can redistribute it and/or
@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '1.00';
+$VERSION = '2.01';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -42,22 +42,37 @@ use constant CITY => 4;
 use constant ISP => 5;
 use constant PROXYTYPE => 6;
 use constant ISPROXY => 7;
+use constant DOMAIN => 8;
+use constant USAGETYPE => 9;
+use constant ASN => 10;
+use constant AS => 11;
+use constant LASTSEEN => 12;
 
 use constant ALL => 100;
 use constant IPV4 => 0;
 use constant IPV6 => 1;
 
-my @IPV4_COUNTRY_POSITION =             (0,  2,  3,  3,  3);
-my @IPV4_REGION_POSITION =              (0,  0,  0,  4,  4);
-my @IPV4_CITY_POSITION =                (0,  0,  0,  5,  5);
-my @IPV4_ISP_POSITION =                 (0,  0,  0,  0,  6);
-my @IPV4_PROXYTYPE_POSITION =           (0,  0,  2,  2,  2);
+my @IPV4_COUNTRY_POSITION =             (0,  2,  3,  3,  3,  3,  3,  3,  3);
+my @IPV4_REGION_POSITION =              (0,  0,  0,  4,  4,  4,  4,  4,  4);
+my @IPV4_CITY_POSITION =                (0,  0,  0,  5,  5,  5,  5,  5,  5);
+my @IPV4_ISP_POSITION =                 (0,  0,  0,  0,  6,  6,  6,  6,  6);
+my @IPV4_PROXYTYPE_POSITION =           (0,  0,  2,  2,  2,  2,  2,  2,  2);
+my @IPV4_DOMAIN_POSITION =              (0,  0,  0,  0,  0,  7,  7,  7,  7);
+my @IPV4_USAGETYPE_POSITION =           (0,  0,  0,  0,  0,  0,  8,  8,  8);
+my @IPV4_ASN_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  9,  9);
+my @IPV4_AS_POSITION =                  (0,  0,  0,  0,  0,  0,  0, 10, 10);
+my @IPV4_LASTSEEN_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0, 11);
 
-my @IPV6_COUNTRY_POSITION =             (0,  2,  3,  3,  3);
-my @IPV6_REGION_POSITION =              (0,  0,  0,  4,  4);
-my @IPV6_CITY_POSITION =                (0,  0,  0,  5,  5);
-my @IPV6_ISP_POSITION =                 (0,  0,  0,  0,  6);
-my @IPV6_PROXYTYPE_POSITION =           (0,  0,  2,  2,  2);
+my @IPV6_COUNTRY_POSITION =             (0,  2,  3,  3,  3,  3,  3,  3,  3);
+my @IPV6_REGION_POSITION =              (0,  0,  0,  4,  4,  4,  4,  4,  4);
+my @IPV6_CITY_POSITION =                (0,  0,  0,  5,  5,  5,  5,  5,  5);
+my @IPV6_ISP_POSITION =                 (0,  0,  0,  0,  6,  6,  6,  6,  6);
+my @IPV6_PROXYTYPE_POSITION =           (0,  0,  2,  2,  2,  2,  2,  2,  2);
+my @IPV6_DOMAIN_POSITION =              (0,  0,  0,  0,  0,  7,  7,  7,  7);
+my @IPV6_USAGETYPE_POSITION =           (0,  0,  0,  0,  0,  0,  8,  8,  8);
+my @IPV6_ASN_POSITION =                 (0,  0,  0,  0,  0,  0,  0,  9,  9);
+my @IPV6_AS_POSITION =                  (0,  0,  0,  0,  0,  0,  0, 10, 10);
+my @IPV6_LASTSEEN_POSITION =            (0,  0,  0,  0,  0,  0,  0,  0, 11);
 
 my $IPv6_re = qr/:(?::[0-9a-fA-F]{1,4}){0,5}(?:(?::[0-9a-fA-F]{1,4}){1,2}|:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})))|[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}:(?:[0-9a-fA-F]{1,4}|:)|(?::(?:[0-9a-fA-F]{1,4})?|(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))))|:(?:(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})?|))|(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|:[0-9a-fA-F]{1,4}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){0,2})|:))|(?:(?::[0-9a-fA-F]{1,4}){0,2}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){1,2})|:))|(?:(?::[0-9a-fA-F]{1,4}){0,3}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){1,2})|:))|(?:(?::[0-9a-fA-F]{1,4}){0,4}(?::(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))|(?::[0-9a-fA-F]{1,4}){1,2})|:))/;
 my $IPv4_re = qr/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
@@ -220,6 +235,81 @@ sub isProxy {
 	}	
 }
 
+sub getDomain {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validateIP($ipaddr);
+	if ($ipv == 4) {
+		return $obj->getIPv4Record($ipnum, DOMAIN);
+	} else {
+		if ($ipv == 6) {
+			return $obj->getIPv6Record($ipnum, DOMAIN);
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}	
+}
+
+sub getUsageType {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validateIP($ipaddr);
+	if ($ipv == 4) {
+		return $obj->getIPv4Record($ipnum, USAGETYPE);
+	} else {
+		if ($ipv == 6) {
+			return $obj->getIPv6Record($ipnum, USAGETYPE);
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}	
+}
+
+sub getASN {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validateIP($ipaddr);
+	if ($ipv == 4) {
+		return $obj->getIPv4Record($ipnum, ASN);
+	} else {
+		if ($ipv == 6) {
+			return $obj->getIPv6Record($ipnum, ASN);
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}	
+}
+
+sub getAS {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validateIP($ipaddr);
+	if ($ipv == 4) {
+		return $obj->getIPv4Record($ipnum, AS);
+	} else {
+		if ($ipv == 6) {
+			return $obj->getIPv6Record($ipnum, AS);
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}	
+}
+
+sub getLastSeen {
+	my $obj = shift(@_);
+	my $ipaddr = shift(@_);
+	my ($ipv, $ipnum) = $obj->validateIP($ipaddr);
+	if ($ipv == 4) {
+		return $obj->getIPv4Record($ipnum, LASTSEEN);
+	} else {
+		if ($ipv == 6) {
+			return $obj->getIPv6Record($ipnum, LASTSEEN);
+		} else {
+			return INVALID_IP_ADDRESS;
+		}
+	}	
+}
+
 sub getAll {
 	my $obj = shift(@_);
 	my $ipaddr = shift(@_);
@@ -230,7 +320,7 @@ sub getAll {
 		if ($ipv == 6) {
 			return $obj->getIPv6Record($ipnum, ALL);	
 		} else {
-			return (-1, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS);
+			return (-1, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS, INVALID_IP_ADDRESS);
 		}
 	}
 }
@@ -243,7 +333,7 @@ sub getIPv6Record {
 
 	if ($ipnum eq "") {
 		if ($mode == ALL) {
-			return (-1, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
+			return (-1, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
 		} else {
 			return NO_IP;
 		}
@@ -267,6 +357,21 @@ sub getIPv6Record {
 	if (($mode == PROXYTYPE) && ($IPV6_PROXYTYPE_POSITION[$dbtype] == 0)) {
 		return NOT_SUPPORTED;
 	}
+	if (($mode == DOMAIN) && ($IPV6_DOMAIN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == USAGETYPE) && ($IPV6_USAGETYPE_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == ASN) && ($IPV6_ASN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == AS) && ($IPV6_AS_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == LASTSEEN) && ($IPV6_LASTSEEN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
 
 	my $realipno = $ipnum;
 	my $handle = $obj->{"filehandle"};
@@ -277,7 +382,7 @@ sub getIPv6Record {
 
 	if ($dbcount == 0) {
 		if ($mode == ALL) {
-			return (IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN);
+			return (IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN, IPV6_ADDRESS_IN_IPV4_BIN);
 		} else {
 			return IPV6_ADDRESS_IN_IPV4_BIN;
 		}
@@ -319,6 +424,11 @@ sub getIPv6Record {
 				my $city = NOT_SUPPORTED;
 				my $isp = NOT_SUPPORTED;
 				my $proxytype = NOT_SUPPORTED;
+				my $domain = NOT_SUPPORTED;
+				my $usagetype = NOT_SUPPORTED;
+				my $asn = NOT_SUPPORTED;
+				my $as = NOT_SUPPORTED;
+				my $lastseen = NOT_SUPPORTED;
 				my $isproxy  = -1;
 				
 				if ($IPV6_COUNTRY_POSITION[$dbtype] != 0) {
@@ -338,16 +448,31 @@ sub getIPv6Record {
 				if ($IPV6_PROXYTYPE_POSITION[$dbtype] != 0) {
 					$proxytype = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype])));
 				}
+				if ($IPV6_DOMAIN_POSITION[$dbtype] != 0) {
+					$domain = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_DOMAIN_POSITION[$dbtype])));
+				}
+				if ($IPV6_USAGETYPE_POSITION[$dbtype] != 0) {
+					$usagetype = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_USAGETYPE_POSITION[$dbtype])));
+				}
+				if ($IPV6_ASN_POSITION[$dbtype] != 0) {
+					$asn = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_ASN_POSITION[$dbtype])));
+				}
+				if ($IPV6_AS_POSITION[$dbtype] != 0) {
+					$as = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_AS_POSITION[$dbtype])));
+				}
+				if ($IPV6_LASTSEEN_POSITION[$dbtype] != 0) {
+					$lastseen = $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_LASTSEEN_POSITION[$dbtype])));
+				}
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
 				} else {
-					if ($proxytype eq "DCH") {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
 					}
 				}
-				return ($isproxy, $proxytype, $countryshort, $countrylong, $region, $city, $isp);
+				return ($isproxy, $proxytype, $countryshort, $countrylong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen);
 			}
 			if ($mode == COUNTRYSHORT) {
 				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_COUNTRY_POSITION[$dbtype])));
@@ -367,6 +492,21 @@ sub getIPv6Record {
 			if ($mode == PROXYTYPE) {
 				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_PROXYTYPE_POSITION[$dbtype])));
 			}
+			if ($mode == DOMAIN) {
+				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_DOMAIN_POSITION[$dbtype])));
+			}
+			if ($mode == USAGETYPE) {
+				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_USAGETYPE_POSITION[$dbtype])));
+			}
+			if ($mode == ASN) {
+				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_ASN_POSITION[$dbtype])));
+			}
+			if ($mode == AS) {
+				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_AS_POSITION[$dbtype])));
+			}
+			if ($mode == LASTSEEN) {
+				return $obj->readStr($handle, $obj->read32($handle, $row_pointer + 8 + 4 * ($IPV6_LASTSEEN_POSITION[$dbtype])));
+			}
 			if ($mode == ISPROXY) {
 				my $countryshort = NOT_SUPPORTED;
 				my $proxytype = NOT_SUPPORTED;
@@ -380,7 +520,7 @@ sub getIPv6Record {
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
 				} else {
-					if ($proxytype eq "DCH") {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
@@ -397,7 +537,7 @@ sub getIPv6Record {
 		}
 	}
 	if ($mode == ALL) {
-		return (-1, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+		return (-1, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
 	} else {
 		return UNKNOWN;
 	}
@@ -411,7 +551,7 @@ sub getIPv4Record {
 
 	if ($ipnum eq "") {
 		if ($mode == ALL) {
-			return (-1, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
+			return (-1, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP, NO_IP);
 		} else {
 			return NO_IP;
 		}
@@ -435,7 +575,22 @@ sub getIPv4Record {
 	if (($mode == PROXYTYPE) && ($IPV4_PROXYTYPE_POSITION[$dbtype] == 0)) {
 		return NOT_SUPPORTED;
 	}
-	
+	if (($mode == DOMAIN) && ($IPV4_DOMAIN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == USAGETYPE) && ($IPV4_USAGETYPE_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == ASN) && ($IPV4_ASN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == AS) && ($IPV4_AS_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+	if (($mode == LASTSEEN) && ($IPV4_LASTSEEN_POSITION[$dbtype] == 0)) {
+		return NOT_SUPPORTED;
+	}
+
 	my $realipno = $ipnum;
 	my $handle = $obj->{"filehandle"};
 	my $baseaddr = $obj->{"ipv4databaseaddr"};
@@ -475,6 +630,11 @@ sub getIPv4Record {
 				my $city = NOT_SUPPORTED;
 				my $isp = NOT_SUPPORTED;
 				my $proxytype = NOT_SUPPORTED;
+				my $domain = NOT_SUPPORTED;
+				my $usagetype = NOT_SUPPORTED;
+				my $asn = NOT_SUPPORTED;
+				my $as = NOT_SUPPORTED;
+				my $lastseen = NOT_SUPPORTED;
 				my $isproxy  = -1;
 
 				if ($IPV4_COUNTRY_POSITION[$dbtype] != 0) {
@@ -494,16 +654,31 @@ sub getIPv4Record {
 				if ($IPV4_PROXYTYPE_POSITION[$dbtype] != 0) {
 					$proxytype = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1)));
 				}
+				if ($IPV4_DOMAIN_POSITION[$dbtype] != 0) {
+					$domain = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_DOMAIN_POSITION[$dbtype]-1)));
+				}
+				if ($IPV4_USAGETYPE_POSITION[$dbtype] != 0) {
+					$usagetype = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_USAGETYPE_POSITION[$dbtype]-1)));
+				}
+				if ($IPV4_ASN_POSITION[$dbtype] != 0) {
+					$asn = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_ASN_POSITION[$dbtype]-1)));
+				}
+				if ($IPV4_AS_POSITION[$dbtype] != 0) {
+					$as = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_AS_POSITION[$dbtype]-1)));
+				}
+				if ($IPV4_LASTSEEN_POSITION[$dbtype] != 0) {
+					$lastseen = $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_LASTSEEN_POSITION[$dbtype]-1)));
+				}
 				if ($countryshort eq "-") {
 					$isproxy = 0;
 				} else {
-					if ($proxytype eq "DCH") {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
 					}
 				}
-				return ($isproxy, $proxytype, $countryshort, $countrylong, $region, $city, $isp);
+				return ($isproxy, $proxytype, $countryshort, $countrylong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen);
 			}
 			if ($mode == COUNTRYSHORT) {
 				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_COUNTRY_POSITION[$dbtype]-1)));
@@ -523,6 +698,21 @@ sub getIPv4Record {
 			if ($mode == PROXYTYPE) {
 				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_PROXYTYPE_POSITION[$dbtype]-1)));
 			}
+			if ($mode == DOMAIN) {
+				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_DOMAIN_POSITION[$dbtype]-1)));
+			}
+			if ($mode == USAGETYPE) {
+				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_USAGETYPE_POSITION[$dbtype]-1)));
+			}
+			if ($mode == ASN) {
+				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_ASN_POSITION[$dbtype]-1)));
+			}
+			if ($mode == AS) {
+				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_AS_POSITION[$dbtype]-1)));
+			}
+			if ($mode == LASTSEEN) {
+				return $obj->readStr($handle, $obj->read32($handle, $baseaddr + ($mid * $dbcolumn * 4) + 4 * ($IPV4_LASTSEEN_POSITION[$dbtype]-1)));
+			}
 			if ($mode == ISPROXY) {
 				my $countryshort = NOT_SUPPORTED;
 				my $proxytype = NOT_SUPPORTED;
@@ -536,7 +726,7 @@ sub getIPv4Record {
 				if (($countryshort eq "-") || ($proxytype eq "-")) {
 					$isproxy = 0;
 				} else {
-					if ($proxytype eq "DCH") {
+					if (($proxytype eq "DCH") || ($proxytype eq "SES")) {
 						$isproxy = 2;
 					} else {
 						$isproxy = 1;
@@ -553,7 +743,7 @@ sub getIPv4Record {
 		}
 	}
 	if ($mode == ALL) {
-		return (-1, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+		return (-1, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
 	} else {
 		return UNKNOWN;
 	}
@@ -770,12 +960,14 @@ __END__
 
 =head1 NAME
 
-Geo::IP2Proxy - Reverse lookup IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes and data center ranges using IP2Proxy BIN database. It supports both IPv4 and IPv6 addressing. Please visit https://www.ip2location.com/proxy-database for more information.
+Geo::IP2Proxy - Reverse search of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots and data center ranges using IP2Proxy BIN database. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name and last seen date.
+
+This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. It supports both IPv4 and IPv6 addressing.
 
 =head1 SYNOPSIS
 
-  use Geo::IP2Proxy;
-	my $obj = Geo::IP2Proxy->open("IP2PROXY-IP-PROXYTYPE-COUNTRY-REGION-CITY-ISP.BIN");
+	use Geo::IP2Proxy;
+	my $obj = Geo::IP2Proxy->open("IP2PROXY-IP-PROXYTYPE-COUNTRY-REGION-CITY-ISP-DOMAIN-USAGETYPE-ASN-LASTSEEN.BIN");
 
 	my $packageversion = $obj->getPackageVersion();
 	my $dbversion = $obj->getDatabaseVersion();
@@ -784,27 +976,41 @@ Geo::IP2Proxy - Reverse lookup IP address to detect VPN servers, open proxies, w
 	my $countrylong = $obj->getCountryLong("1.2.3.4");
 	my $region = $obj->getRegion("1.2.3.4");
 	my $city = $obj->getCity("1.2.3.4");
+	my $isp = $obj->getISP("1.2.3.4");
+	my $domain = $obj->getDomain("1.2.3.4");
+	my $usagetype = $obj->getUsageType("1.2.3.4");
+	my $asn = $obj->getASN("1.2.3.4");
+	my $as = $obj->getAS("1.2.3.4");
+	my $lastseen = $obj->getLastSeen("1.2.3.4");
 	my $proxytype = $obj->getProxyType("1.2.3.4");
 	my $isproxy = $obj->isProxy("1.2.3.4");
 
-	($isproxy, $proxytype, $coshort, $colong, $region, $city, $isp) = $obj->getAll("1.2.3.4");
-	($isproxy, $proxytype, $coshort, $colong, $region, $city, $isp) = $obj->getAll("2001:0000:0000:0000:0000:0000:0000:0000");
-	
+	($isproxy, $proxytype, $coshort, $colong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen) = $obj->getAll("1.2.3.4");
+	($isproxy, $proxytype, $coshort, $colong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen) = $obj->getAll("2001:0000:0000:0000:0000:0000:0000:0000");
+
 	$obj->close();
 
 =head1 DESCRIPTION
 
-This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes and data center ranges using IP2Proxy BIN database. This module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/proxy-database upon subscription. It supports both IPv4 and IPv6 addressing.
+This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots and data center ranges using IP2Proxy BIN database. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name and last seen date.
+
+This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. You can visit https://www.ip2location.com/development-libraries to download BIN sample files. It supports both IPv4 and IPv6 addressing.
+
 
 =head1 IP2PROXY DATABASES
 
-The complete IPv4 and IPv6 proxy database are available at:
+The complete IPv4 and IPv6 proxy database are available at 
 
-https://www.ip2location.com/proxy-database
+https://www.ip2location.com/database/ip2proxy
 
-The database will be updated in daily basis for greater accuracy.
+Meanwhile, sample databases are available at
+
+https://www.ip2location.com/development-libraries
+
+The IP2Proxy database is being updated in daily basis for greater accuracy.
 
 Free creative-common monthly database with open proxies data only is available at https://lite.ip2location.com
+
 
 =head1 CLASS METHODS
 
@@ -824,6 +1030,17 @@ Constructs a new Geo::IP2Proxy object with the database located at $database_fil
 
 Returns 0 if IP address is not a proxy. Returns 1 if it is proxy excluding data center range. Returns 2 if is is data center range. Returns -1 if error.
 
+=item $proxytype = $obj->getProxyType( $ip );
+
+Returns the proxy type of proxy's IP address or domain name. Returns "-" if not a proxy.
+
+  VPN   Anonymizing VPN services.
+  TOR   Tor Exit Nodes.
+  PUB   Public Proxies.
+  WEB   Web Proxies.
+  DCH   Hosting Providers/Data Center.
+  SES   Search Engine Robots.
+
 =item $countryshort = $obj->getCountryShort( $ip );
 
 Returns the ISO 3166 country code of proxy's IP address or domain name. Returns "-" if not a proxy.
@@ -840,23 +1057,46 @@ Returns the region of proxy's IP address or domain name. Returns "-" if not a pr
 
 Returns the city of IP address or domain name. Returns "-" if not a proxy.
 
-=item $latitude = $obj->getISP( $ip );
+=item $isp = $obj->getISP( $ip );
 
 Returns the ISP name of proxy's IP address or domain name. Returns "-" if not a proxy.
 
-=item $proxytype = $obj->getProxyType( $ip );
+=item $domain = $obj->getDomain( $ip );
 
-Returns the proxy type of proxy's IP address or domain name. Returns "-" if not a proxy.
+Returns the domain name of proxy's IP address or domain name. Returns "-" if not a proxy.
 
-	VPN 	Anonymizing VPN services.
-	TOR 	Tor Exit Nodes.
-	PUB 	Public Proxies.
-	WEB		Web Proxies.
-	DCH 	Hosting Providers/Data Center.
+=item $usagetype = $obj->getUsageType( $ip );
 
-=item ($isproxy, $proxytype, $coshort, $colong, $region, $city, $isp) = $obj->getAll( $ip );
+Returns the ISP's usage type of proxy's IP address or domain name. Returns "-" if not a proxy.
 
-Returns an array of proxy status, proxy type, country short and long name, region, city and ISP of proxy's IP address or domain name. Returns "-" in most field if not a proxy.
+  COM   Commercial
+  ORG   Organization
+  GOV   Government
+  MIL   Military
+  EDU   University/College/School
+  LIB   Library
+  CDN   Content Delivery Network
+  ISP   Fixed Line ISP
+  MOB   Mobile ISP
+  DCH   Data Center/Web Hosting/Transit
+  SES   Search Engine Spider
+  RSV   Reserved
+
+=item $asn = $obj->getASN( $ip );
+
+Returns the autonomous system number (ASN) of proxy's IP address or domain name. Returns "-" if not a proxy.
+
+=item $as = $obj->getAS( $ip );
+
+Returns the autonomous system (AS) name of proxy's IP address or domain name. Returns "-" if not a proxy.
+
+=item $lastseen = $obj->getLastSeen( $ip );
+
+Returns the last seen days ago value of proxy's IP address or domain name. Returns "-" if not a proxy.
+
+=item ($isproxy, $proxytype, $coshort, $colong, $region, $city, $isp, $domain, $usagetype, $asn, $as, $lastseen) = $obj->getAll( $ip );
+
+Returns an array of proxy status, proxy type, country short and long name, region, city, ISP, domain name, usage type, AS number, AS name and last seen days of proxy's IP address or domain name. Returns "-" in most field if not a proxy.
 
 =item $packageversion = $obj->getPackageVersion();
 
@@ -870,17 +1110,19 @@ Returns the version number of IP2Proxy database.
 
 Returns the version number of Geo::IP2Proxy Perl module.
 
+=back
+
 =head1 SEE ALSO
 
-https://www.ip2location.com/proxy-database
+https://www.ip2location.com/database/ip2proxy
 
 =head1 VERSION
 
-1.00
+2.01
 
 =head1 AUTHOR
 
-Copyright (c) 2017 IP2Location.com
+Copyright (c) 2019 IP2Location.com
 
 All rights reserved. This package is free software; It is licensed under the GPL.
 

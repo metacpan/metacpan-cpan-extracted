@@ -58,7 +58,7 @@ cstocs(1).
 
 =head1 AUTHOR
 
-Jan Pazdziora, adelton@fi.muni.cz.
+Jan Pazdziora
 
 =cut
 

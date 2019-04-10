@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A class of medical drugs, e.g., statins. Classes can represent general pharmacological class, common mechanisms of action, common physiological effects, etc.",
+      "rdfs:label" : "DrugClass",
+      "rdfs:subClassOf" : "schema:MedicalEnumeration",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:drug" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
+         "rdfs:label" : "drug",
+         "schema:domainIncludes" : [
+            "schema:TherapeuticProcedure",
+            "schema:MedicalCondition",
+            "schema:Patient",
+            "schema:DrugClass"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Drug"
+      }
+   }
+}

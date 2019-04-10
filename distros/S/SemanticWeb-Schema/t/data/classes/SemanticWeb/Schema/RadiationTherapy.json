@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A process of care using radiation aimed at improving a health condition.",
+      "rdfs:label" : "RadiationTherapy",
+      "rdfs:subClassOf" : "schema:MedicalTherapy",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Offer;
 
-# ABSTRACT: An offer to transfer some rights to an item or to provide a service — for example
+# ABSTRACT: An offer to transfer some rights to an item or to provide a service â for example
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has accepted_payment_method => (
@@ -358,15 +358,15 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to provide a service — for example
+SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to provide a service â for example
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
-=for html An offer to transfer some rights to an item or to provide a service — for
+=for html An offer to transfer some rights to an item or to provide a service â for
 example, an offer to sell tickets to an event, to rent the DVD of a movie,
 to stream a TV show over the internet, to repair a motorcycle, or to loan a
 book.<br/><br/> For <a
@@ -389,9 +389,9 @@ A accepted_payment_method should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::PaymentMethod']>
-
 =item C<InstanceOf['SemanticWeb::Schema::LoanOrCredit']>
+
+=item C<InstanceOf['SemanticWeb::Schema::PaymentMethod']>
 
 =back
 
@@ -451,13 +451,13 @@ A area_served should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
-
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+
+=item C<Str>
 
 =back
 
@@ -558,6 +558,8 @@ A category should be one of the following types:
 =over
 
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::PhysicalActivityCategory']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
@@ -753,11 +755,11 @@ A ineligible_region should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
-
 =item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =back
 
@@ -957,9 +959,9 @@ A seller should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 

@@ -17,7 +17,7 @@ use strict;
 @ISA = qw(Verilog::Netlist::Pin::Struct
 	Verilog::Netlist::Subclass);
 
-$VERSION = '3.460';
+$VERSION = '3.462';
 
 structs('_new_base',
 	'Verilog::Netlist::Pin::Struct'
@@ -86,11 +86,12 @@ sub delete {
 # Legacy accessors
 sub netname {
     return undef if !defined($_[0]->_pinselects);
-    return @{$_[0]->_pinselects}[0]->{netname};
+    return @{$_[0]->_pinselects}[0]->{_netname};
 }
 sub net {
     my $nets = $_[0]->_nets;
     return undef if !defined($nets);
+    return undef if !@{$nets}[0];
     return @{$nets}[0]->{net};
 }
 

@@ -6,6 +6,14 @@
       "rdfs:subClassOf" : "schema:CreativeWork"
    },
    "properties" : {
+      "schema:abridged" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates whether the book is an abridged edition.",
+         "rdfs:label" : "abridged",
+         "schema:domainIncludes" : "schema:Book",
+         "schema:isPartOf" : "http:bib.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
       "schema:bookEdition" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The edition of the book.",

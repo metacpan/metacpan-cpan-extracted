@@ -12,8 +12,8 @@
          "rdfs:label" : "breadcrumb",
          "schema:domainIncludes" : "schema:WebPage",
          "schema:rangeIncludes" : [
-            "schema:BreadcrumbList",
-            "schema:Text"
+            "schema:Text",
+            "schema:BreadcrumbList"
          ]
       },
       "schema:lastReviewed" : {
@@ -50,8 +50,8 @@
          "rdfs:label" : "reviewedBy",
          "schema:domainIncludes" : "schema:WebPage",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:significantLink" : {
@@ -68,6 +68,21 @@
          "schema:domainIncludes" : "schema:WebPage",
          "schema:rangeIncludes" : "schema:URL",
          "schema:supersededBy" : "schema:significantLink"
+      },
+      "schema:speakable" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1389",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates sections of a Web page that are particularly 'speakable' in the sense of being highlighted as being especially appropriate for text-to-speech conversion. Other sections of a page may also be usefully spoken in particular circumstances; the 'speakable' property serves to indicate the parts most likely to be generally useful for speech.<br/><br/>\n\nThe <em>speakable</em> property can be repeated an arbitrary number of times, with three kinds of possible 'content-locator' values:<br/><br/>\n\n1.) <em>id-value</em> URL references - uses <em>id-value</em> of an element in the page being annotated. The simplest use of <em>speakable</em> has (potentially relative) URL values, referencing identified sections of the document concerned.<br/><br/>\n\n2.) CSS Selectors - addresses content in the annotated page, eg. via class attribute. Use the <a class=\"localLink\" href=\"http://schema.org/cssSelector\">cssSelector</a> property.<br/><br/>\n\n3.)  XPaths - addresses content via XPaths (assuming an XML view of the content). Use the <a class=\"localLink\" href=\"http://schema.org/xpath\">xpath</a> property.<br/><br/>\n\nFor more sophisticated markup of speakable sections beyond simple ID references, either CSS selectors or XPath expressions to pick out document section(s) as speakable. For this\nwe define a supporting type, <a class=\"localLink\" href=\"http://schema.org/SpeakableSpecification\">SpeakableSpecification</a>  which is defined to be a possible value of the <em>speakable</em> property.",
+         "rdfs:label" : "speakable",
+         "schema:category" : "issue-1389",
+         "schema:domainIncludes" : [
+            "schema:WebPage",
+            "schema:Article"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:SpeakableSpecification",
+            "schema:URL"
+         ]
       },
       "schema:specialty" : {
          "rdf:type" : "rdf:Property",

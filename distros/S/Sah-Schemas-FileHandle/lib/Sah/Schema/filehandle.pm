@@ -1,7 +1,7 @@
 package Sah::Schema::filehandle;
 
-our $DATE = '2019-03-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-09'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $schema = ['any', {
     summary => 'Filehandle',
@@ -25,7 +25,7 @@ Sah::Schema::filehandle - Filehandle
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::filehandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-03-17.
+This document describes version 0.002 of Sah::Schema::filehandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-04-09.
 
 =head1 HOMEPAGE
 
@@ -33,7 +33,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Filehandle>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-FileHandle>.
 
 =head1 BUGS
 

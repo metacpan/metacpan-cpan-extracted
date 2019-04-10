@@ -6,7 +6,7 @@ pherkin - Execute tests written using Test::BDD::Cucumber
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,10 @@ Controlling @INC
  -l, --lib              Add 'lib' to @INC
  -b, --blib             Add 'blib/lib' and 'blib/arch' to @INC
  -I [dir]               Add given directory to @INC
+
+Controlling Execution
+
+ -m, --match            Only match steps in from features with available ones
 
 Output formatting
 

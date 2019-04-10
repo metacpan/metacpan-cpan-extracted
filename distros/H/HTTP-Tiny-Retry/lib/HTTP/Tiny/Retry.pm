@@ -1,7 +1,7 @@
 package HTTP::Tiny::Retry;
 
-our $DATE = '2018-12-09'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,22 +10,40 @@ use Log::ger;
 
 use parent 'HTTP::Tiny';
 
+sub new {
+    my ($class, %attrs) = @_;
+
+    my %our_attrs;
+    for ("retries", "retry_delay") {
+        $our_attrs{$_} = delete $attrs{$_}
+            if exists $attrs{$_};
+    }
+
+    my $self = $class->SUPER::new(%attrs);
+    $self->{$_} = $our_attrs{$_} for keys %our_attrs;
+    $self;
+}
+
 sub request {
     my ($self, $method, $url, $options) = @_;
 
-    my $config_retries = $self->{retries} // $ENV{HTTP_TINY_RETRIES} // 3;
-    my $config_retry_delay = $self->{retry_delay} // $ENV{HTTP_TINY_RETRY_DELAY} // 2;
+    $self->{retries} //= $ENV{HTTP_TINY_RETRIES} // 3;
+    $self->{retry_delay} //= $ENV{HTTP_TINY_RETRY_DELAY} // 2;
 
     my $retries = 0;
     my $res;
     while (1) {
-        my $res = $self->SUPER::request($method, $url, $options);
+        $res = $self->SUPER::request($method, $url, $options);
         return $res if $res->{status} !~ /\A[5]/;
-        last if $retries >= $config_retries;
+        last if $retries >= $self->{retries};
         $retries++;
-        log_trace "Failed requesting $url ($res->{status} - $res->{reason}), retrying" .
-            ($config_retry_delay ? " in $config_retry_delay second(s)" : "") .
-            " ($retries of $config_retries) ...";
+        log_trace "Failed requesting %s (%s - %s), retrying in %d second(s) (%d of %d) ...",
+            $url,
+            $res->{status},
+            $res->{reason},
+            $self->{retry_delay},
+            $retries,
+            $self->{retries};
         sleep $self->{retry_delay};
     }
     $res;
@@ -46,7 +64,7 @@ HTTP::Tiny::Retry - Retry failed HTTP::Tiny requests
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::Retry (from Perl distribution HTTP-Tiny-Retry), released on 2018-12-09.
+This document describes version 0.003 of HTTP::Tiny::Retry (from Perl distribution HTTP-Tiny-Retry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
@@ -96,13 +114,16 @@ L<HTTP::Tiny>
 
 L<HTTP::Tiny::Patch::Retry>, patch version of this module.
 
+L<HTTP::Tiny::CustomRetry> and L<HTTP::Tiny::Patch::CustomRetry> for
+customizable retry/backoff strategies.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

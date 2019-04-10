@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:MBZ",
+      "dc:source" : "schemadotorgsources:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Classification of the album by it's type of content: soundtrack, live album, studio album, etc.",
       "rdfs:label" : "MusicAlbumProductionType",

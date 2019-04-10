@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A created collection of Creative Works or other artefacts.",
+      "rdfs:label" : "Collection",
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:isPartOf" : "http:bib.schema.org"
+   },
+   "properties" : {}
+}

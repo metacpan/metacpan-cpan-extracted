@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
+
+
+has purpose => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'purpose',
+);
+
 
 
 
@@ -34,11 +42,27 @@ SemanticWeb::Schema::AllocateAction - The act of organizing tasks/objects/events
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
 The act of organizing tasks/objects/events by associating resources to it.
+
+=head1 ATTRIBUTES
+
+=head2 C<purpose>
+
+A goal towards an action is taken. Can be concrete or abstract.
+
+A purpose should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MedicalDevicePurpose']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=back
 
 =head1 SEE ALSO
 

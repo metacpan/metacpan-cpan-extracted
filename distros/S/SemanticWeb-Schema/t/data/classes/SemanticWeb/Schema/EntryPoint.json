@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_ActionCollabClass",
+      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An entry point, within some Web-based protocol.",
       "rdfs:label" : "EntryPoint",

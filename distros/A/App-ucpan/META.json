@@ -49,7 +49,6 @@
             "Path::Class" : "0",
             "Term::ANSIColor" : "0",
             "Term::ReadKey" : "0",
-            "Win32::Console::ANSI" : "0",
             "YAML" : "0",
             "bytes" : "0",
             "constant" : "0",
@@ -70,11 +69,11 @@
    "provides" : {
       "App::ucpan" : {
          "file" : "lib/App/ucpan.pm",
-         "version" : "1.08"
+         "version" : "1.11"
       }
    },
    "release_status" : "stable",
-   "version" : "1.08",
+   "version" : "1.11",
    "x_authority" : "cpan:KPEE",
    "x_contributors" : [
       "KPEE <kpee.cpanx@gmail.com>"

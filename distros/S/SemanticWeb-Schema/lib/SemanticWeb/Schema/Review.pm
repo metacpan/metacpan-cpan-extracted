@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has item_reviewed => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'itemReviewed',
+);
+
+
+
+has review_aspect => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'reviewAspect',
 );
 
 
@@ -58,7 +66,7 @@ SemanticWeb::Schema::Review - A review of an item - for example
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -77,6 +85,21 @@ A item_reviewed should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
+
+=back
+
+=head2 C<review_aspect>
+
+C<reviewAspect>
+
+This Review or Rating is relevant to this part or facet of the
+itemReviewed.
+
+A review_aspect should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

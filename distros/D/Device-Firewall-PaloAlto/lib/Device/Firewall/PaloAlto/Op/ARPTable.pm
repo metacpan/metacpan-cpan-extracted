@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::ARPTable;
-$Device::Firewall::PaloAlto::Op::ARPTable::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::ARPTable::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -29,6 +29,16 @@ sub _new {
     return bless \%arp_table, $class;
 }
 
+
+sub entry {
+    my $self = shift;
+    my ($ip) = @_;
+    my $entry = $self->{entries}{$ip};
+
+    return $entry ? $entry : Class::Error->new('ARP entry not found', 0);
+}
+
+
 sub current_entries { return $_[0]->{total_entries} + 0 }
 
 
@@ -56,7 +66,7 @@ Device::Firewall::PaloAlto::Op::ARPTable - Palo Alto firewall ARP table
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 
@@ -65,6 +75,12 @@ version 0.1.3
 =head1 ERRORS 
 
 =head1 METHODS
+
+=head2 entry 
+
+Takes an IP address and returns a L<Device::Firewall::PaloAlto::Op::ARPEntry> object representing the ARP entry. 
+
+If the ARP entry doesn't exist, it returns a L<Class::Error> object.
 
 =head2 current_entries
 

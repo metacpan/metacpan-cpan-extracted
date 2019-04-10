@@ -66,16 +66,17 @@ sub find {
     #                           did not include SMTP Reply Code value
     # @since v4.14.0
     my $class = shift;
-    my $argv1 = shift || return '';
+    my $argv1 = shift || return undef;
+    return '' if uc($argv1) =~ /X-UNIX;/;
+
     my $value = '';
-    my $ip4re = qr{\b
+    state $ip4re = qr{\b
         (?:\d|[01]?\d\d|2[0-4]\d|25[0-5])[.]
         (?:\d|[01]?\d\d|2[0-4]\d|25[0-5])[.]
         (?:\d|[01]?\d\d|2[0-4]\d|25[0-5])[.]
         (?:\d|[01]?\d\d|2[0-4]\d|25[0-5])
     \b}x;
 
-    return '' if uc($argv1) =~ /X-UNIX;/;
 
     # Convert found IPv4 addresses to '***.***.***.***' to avoid that the
     # following code detects an octet of the IPv4 adress as an SMTP reply

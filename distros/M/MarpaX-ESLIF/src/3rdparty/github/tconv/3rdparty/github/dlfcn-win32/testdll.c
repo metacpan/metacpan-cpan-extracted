@@ -30,6 +30,12 @@
 #define EXPORT
 #endif
 
+EXPORT int function2( void )
+{
+    printf( "Hello, world! from original library\n" );
+    return 0;
+}
+
 EXPORT int function( void )
 {
     printf( "Hello, world!\n" );

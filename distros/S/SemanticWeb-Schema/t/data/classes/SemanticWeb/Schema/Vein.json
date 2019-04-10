@@ -1,0 +1,41 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A type of blood vessel that specifically carries blood to the heart.",
+      "rdfs:label" : "Vein",
+      "rdfs:subClassOf" : "schema:Vessel",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:drainsTo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The vasculature that the vein drains into.",
+         "rdfs:label" : "drainsTo",
+         "schema:domainIncludes" : "schema:Vein",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Vessel"
+      },
+      "schema:regionDrained" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The anatomical or organ system drained by this vessel; generally refers to a specific part of an organ.",
+         "rdfs:label" : "regionDrained",
+         "schema:domainIncludes" : [
+            "schema:LymphaticVessel",
+            "schema:Vein"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
+         ]
+      },
+      "schema:tributary" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The anatomical or organ system that the vein flows into; a larger structure that the vein connects to.",
+         "rdfs:label" : "tributary",
+         "schema:domainIncludes" : "schema:Vein",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      }
+   }
+}

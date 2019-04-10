@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has actor => (
@@ -114,7 +114,7 @@ SemanticWeb::Schema::Episode - A media episode (e
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -187,9 +187,9 @@ A episode_number should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Integer']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
 
@@ -203,9 +203,9 @@ A music_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

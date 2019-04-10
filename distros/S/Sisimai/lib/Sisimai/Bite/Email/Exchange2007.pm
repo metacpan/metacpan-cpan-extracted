@@ -7,7 +7,7 @@ use warnings;
 my $Indicators = __PACKAGE__->INDICATORS;
 my $StartingOf = { 'rfc822' => ['Original message headers:'] };
 my $MarkingsOf = {
-    'message' => qr/[ ]Microsoft[ ]Exchange[ ]Server[ ]20\d{2}/,
+    'message' => qr/\ADiagnostic[ ]information[ ]for[ ]administrators:/,
     'error'   => qr/[ ]((?:RESOLVER|QUEUE)[.][A-Za-z]+(?:[.]\w+)?);/,
     'rhost'   => qr/\AGenerating[ ]server:[ ]?(.*)/,
 };
@@ -20,14 +20,14 @@ my $NDRSubject = {
     'RESOLVER.ADR.RecipLimit'       => 'toomanyconn',   # 550 5.5.3 RESOLVER.ADR.RecipLimit
     'RESOLVER.ADR.InvalidInSmtp'    => 'systemerror',   # 550 5.1.0 RESOLVER.ADR.InvalidInSmtp
     'RESOLVER.ADR.Ambiguous'        => 'systemerror',   # 550 5.1.4 RESOLVER.ADR.Ambiguous, 420 4.2.0 RESOLVER.ADR.Ambiguous
-    'RESOLVER.RST.AuthRequired'     => 'filtered',      # 550 5.7.1 RESOLVER.RST.AuthRequired
+    'RESOLVER.RST.AuthRequired'     => 'securityerror', # 550 5.7.1 RESOLVER.RST.AuthRequired
     'RESOLVER.RST.NotAuthorized'    => 'rejected',      # 550 5.7.1 RESOLVER.RST.NotAuthorized
     'RESOLVER.RST.RecipSizeLimit'   => 'mesgtoobig',    # 550 5.2.3 RESOLVER.RST.RecipSizeLimit
     'QUEUE.Expired'                 => 'expired',       # 550 4.4.7 QUEUE.Expired
 };
 
 # Content-Language: en-US
-sub headerlist  { return ['Content-Language'] };
+sub headerlist  { return ['content-language'] };
 sub description { 'Microsoft Exchange Server 2007' }
 sub scan {
     # Detect an error from Microsoft Exchange Server 2007
@@ -51,7 +51,6 @@ sub scan {
     return undef unless $mhead->{'content-language'} =~ /\A[a-z]{2}(?:[-][A-Z]{2})?\z/;
 
     my $dscontents = [__PACKAGE__->DELIVERYSTATUS];
-    my @hasdivided = split("\n", $$mbody);
     my $rfc822part = '';    # (String) message/rfc822-headers part
     my $rfc822list = [];    # (Array) Each line in message/rfc822 part string
     my $blanklines = 0;     # (Integer) The number of blank lines
@@ -63,7 +62,7 @@ sub scan {
     };
     my $v = undef;
 
-    for my $e ( @hasdivided ) {
+    for my $e ( split("\n", $$mbody) ) {
         # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
             # Beginning of the bounce message or delivery status part
@@ -82,16 +81,15 @@ sub scan {
         }
 
         if( $readcursor & $Indicators->{'message-rfc822'} ) {
-            # After "message/rfc822"
+            # Inside of the original message part
             unless( length $e ) {
-                $blanklines++;
-                last if $blanklines > 1;
+                last if ++$blanklines > 1;
                 next;
             }
             push @$rfc822list, $e;
 
         } else {
-            # Before "message/rfc822"
+            # Error message part
             next unless $readcursor & $Indicators->{'deliverystatus'};
 
             if( $connvalues == scalar(keys %$connheader) ) {
@@ -124,23 +122,21 @@ sub scan {
                     $v->{'diagnosis'} = $e;
 
                 } else {
-                    if( $v->{'diagnosis'} && substr($v->{'diagnosis'}, -1, 1) eq '=' ) {
-                        # Continued line of error messages
-                        substr($v->{'diagnosis'}, -1, 1, $e);
-                    }
+                    # Continued line of error messages
+                    next unless $v->{'diagnosis'};
+                    next unless substr($v->{'diagnosis'}, -1, 1) eq '=';
+                    substr($v->{'diagnosis'}, -1, 1, $e);
                 }
             } else {
                 # Diagnostic information for administrators:
                 #
                 # Generating server: mta22.neko.example.org
-                if( $e =~ $MarkingsOf->{'rhost'} ) {
-                    # Generating server: mta22.neko.example.org
-                    next if $connheader->{'rhost'};
-                    $connheader->{'rhost'} = $1;
-                    $connvalues++;
-                }
+                next unless $e =~ $MarkingsOf->{'rhost'};
+                next if $connheader->{'rhost'};
+                $connheader->{'rhost'} = $1;
+                $connvalues++;
             }
-        } # End of if: rfc822
+        } # End of error message part
     }
     return undef unless $recipients;
 
@@ -207,7 +203,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it::VERSION = '0.14';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it::VERSION = '0.17';
 # ABSTRACT: Italian localization of (part of) L<DateTime::Calendar::FrenchRevolutionary>
 
 use Moose;
@@ -505,11 +505,11 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it - Italian 
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 DESCRIPTION
 
-This modules adds Italian translations to L<DateTime::Calendar::FrenchRevolutionary>, based on Wikipedia: L<https://it.wikipedia.org/wiki/Calendario_rivoluzionario_francese>
+This modules adds Italian translations to L<DateTime::Calendar::FrenchRevolutionary>, based on Wikipedia: L<https://it.wikipedia.org/wiki/Calendario_rivoluzionario_francese>.
 
 =head1 SEE ALSO
 
@@ -540,6 +540,8 @@ This modules adds Italian translations to L<DateTime::Calendar::FrenchRevolution
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 

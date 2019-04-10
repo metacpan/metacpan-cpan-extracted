@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::VirtualRouter;
-$Device::Firewall::PaloAlto::Op::VirtualRouter::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::VirtualRouter::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -26,6 +26,10 @@ sub _new {
     # become arrays. 
 
     for my $route (@routes) {
+        # Is the route active? If not, skip it.
+        # This isn't the ideal implementation - would rather call the
+        # Route object method. FIXME
+        next unless $route->{flags} =~ m{^A};
         my $dst = $route->{destination};
 
         $virtual_router{$dst}{num_routes}++;
@@ -74,7 +78,7 @@ Device::Firewall::PaloAlto::Op::VirtualRouter - new module
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 

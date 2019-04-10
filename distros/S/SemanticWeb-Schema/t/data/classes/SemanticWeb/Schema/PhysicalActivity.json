@@ -1,0 +1,68 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any bodily activity that enhances or maintains physical fitness and overall health and wellness. Includes activity that is part of daily living and routine, structured exercise, and exercise prescribed as part of a medical treatment or recovery plan.",
+      "rdfs:label" : "PhysicalActivity",
+      "rdfs:subClassOf" : "schema:LifestyleModification",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:associatedAnatomy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The anatomy of the underlying organ system or structures associated with this entity.",
+         "rdfs:label" : "associatedAnatomy",
+         "schema:domainIncludes" : [
+            "schema:MedicalCondition",
+            "schema:PhysicalActivity"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:AnatomicalSystem",
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure"
+         ]
+      },
+      "schema:category" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
+         "rdfs:label" : "category",
+         "schema:category" : "issue-1741",
+         "schema:domainIncludes" : [
+            "schema:Service",
+            "schema:PhysicalActivity",
+            "schema:Product",
+            "schema:ActionAccessSpecification",
+            "schema:Offer",
+            "schema:Invoice"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:PhysicalActivityCategory",
+            "schema:Thing"
+         ]
+      },
+      "schema:epidemiology" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The characteristics of associated patients, such as age, gender, race etc.",
+         "rdfs:label" : "epidemiology",
+         "schema:domainIncludes" : [
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:pathophysiology" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Changes in the normal mechanical, physical, and biochemical functions that are associated with this activity or condition.",
+         "rdfs:label" : "pathophysiology",
+         "schema:domainIncludes" : [
+            "schema:MedicalCondition",
+            "schema:PhysicalActivity"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

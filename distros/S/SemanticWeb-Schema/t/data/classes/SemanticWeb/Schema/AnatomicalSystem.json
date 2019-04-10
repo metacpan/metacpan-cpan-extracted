@@ -1,0 +1,66 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An anatomical system is a group of anatomical structures that work together to perform a certain task. Anatomical systems, such as organ systems, are one organizing principle of anatomy, and can includes circulatory, digestive, endocrine, integumentary, immune, lymphatic, muscular, nervous, reproductive, respiratory, skeletal, urinary, vestibular, and other systems.",
+      "rdfs:label" : "AnatomicalSystem",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:associatedPathophysiology" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If applicable, a description of the pathophysiology associated with the anatomical system, including potential abnormal changes in the mechanical, physical, and biochemical functions of the system.",
+         "rdfs:label" : "associatedPathophysiology",
+         "schema:domainIncludes" : [
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:comprisedOf" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifying something physically contained by something else. Typically used here for the underlying anatomical structures, such as organs, that comprise the anatomical system.",
+         "rdfs:label" : "comprisedOf",
+         "schema:domainIncludes" : "schema:AnatomicalSystem",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:AnatomicalSystem",
+            "schema:AnatomicalStructure"
+         ]
+      },
+      "schema:relatedCondition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical condition associated with this anatomy.",
+         "rdfs:label" : "relatedCondition",
+         "schema:domainIncludes" : [
+            "schema:AnatomicalSystem",
+            "schema:AnatomicalStructure",
+            "schema:SuperficialAnatomy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      },
+      "schema:relatedStructure" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Related anatomical structure(s) that are not part of the system but relate or connect to it, such as vascular bundles associated with an organ system.",
+         "rdfs:label" : "relatedStructure",
+         "schema:domainIncludes" : "schema:AnatomicalSystem",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      },
+      "schema:relatedTherapy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical therapy related to this anatomy.",
+         "rdfs:label" : "relatedTherapy",
+         "schema:domainIncludes" : [
+            "schema:AnatomicalSystem",
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalTherapy"
+      }
+   }
+}

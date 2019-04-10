@@ -105,10 +105,13 @@ SemanticWeb-Schema-.*/
 SemanticWeb-Schema-.*/
 SemanticWeb-Schema-.*\.tar\.gz
 \.mailmap$
+perltidy\.(LOG|ERR)
+fatlib/
 cpanfile\.snapshot$
+local/
 lib/SemanticWeb/Schema/DataType.pm
 lib/SemanticWeb/Schema/Float.pm
 lib/SemanticWeb/Schema/Integer.pm
 lib/SemanticWeb/Schema/URL.pm
-local/
+lib/SemanticWeb/Schema/MedicalCode.pm
 cache/

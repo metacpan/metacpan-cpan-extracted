@@ -1,0 +1,17 @@
+Revision history for Alien-Build-Plugin-Download-GitHub
+
+0.03      2019-04-09 04:33:06 -0400
+  - Fixed bug where json was improperly decoded for fetch plugins that use temp files (gh#4,gh#5)
+  - Added a number of unit tests (gh#2, gh#5)
+  - Fixed bug where version wasn't being correctly parsed from the index (gh#1, gh#5)
+
+0.02      2019-04-08 21:14:57 -0400
+  - Update documentation.
+  - Changed the default of the prefer property from 1 to 0.
+  - When prefer property is set to 0, a default prefer hook is added, which
+    leaves the list of releases unsorted.  This is different from the
+    Download Negotiator plugin.  Since GitHub usually returns a
+    sorted list of releases this will frequently be what you want.
+
+0.01      2019-04-08 20:51:34 -0400
+  - initial version

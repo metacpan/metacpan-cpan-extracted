@@ -1,0 +1,75 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The most generic type of entity related to health and the practice of medicine.",
+      "rdfs:label" : "MedicalEntity",
+      "rdfs:subClassOf" : "schema:Thing",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:code" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical code for the entity, taken from a controlled vocabulary or ontology such as ICD-9, DiseasesDB, MeSH, SNOMED-CT, RxNorm, etc.",
+         "rdfs:label" : "code",
+         "schema:domainIncludes" : "schema:MedicalEntity",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCode"
+      },
+      "schema:guideline" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical guideline related to this entity.",
+         "rdfs:label" : "guideline",
+         "schema:domainIncludes" : "schema:MedicalEntity",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalGuideline"
+      },
+      "schema:legalStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The drug or supplement's legal status, including any controlled substance schedules that apply.",
+         "rdfs:label" : "legalStatus",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:MedicalEntity",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:DrugLegalStatus",
+            "schema:MedicalEnumeration",
+            "schema:Text"
+         ]
+      },
+      "schema:medicineSystem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The system of medicine that includes this MedicalEntity, for example 'evidence-based', 'homeopathic', 'chiropractic', etc.",
+         "rdfs:label" : "medicineSystem",
+         "schema:domainIncludes" : "schema:MedicalEntity",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicineSystem"
+      },
+      "schema:recognizingAuthority" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If applicable, the organization that officially recognizes this entity as part of its endorsed system of medicine.",
+         "rdfs:label" : "recognizingAuthority",
+         "schema:domainIncludes" : "schema:MedicalEntity",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:relevantSpecialty" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If applicable, a medical specialty in which this entity is relevant.",
+         "rdfs:label" : "relevantSpecialty",
+         "schema:domainIncludes" : "schema:MedicalEntity",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalSpecialty"
+      },
+      "schema:study" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical study or trial related to this entity.",
+         "rdfs:label" : "study",
+         "schema:domainIncludes" : "schema:MedicalEntity",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalStudy"
+      }
+   }
+}

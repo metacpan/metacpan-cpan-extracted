@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::any::validate_dirhandle;
 
-our $DATE = '2019-03-17'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-09'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Data::Sah::Coerce::perl::any::validate_dirhandle - Validate dirhandle
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Sah::Coerce::perl::any::validate_dirhandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-03-17.
+This document describes version 0.002 of Data::Sah::Coerce::perl::any::validate_dirhandle (from Perl distribution Sah-Schemas-FileHandle), released on 2019-04-09.
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Filehandle>.
+Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-FileHandle>.
 
 =head1 BUGS
 

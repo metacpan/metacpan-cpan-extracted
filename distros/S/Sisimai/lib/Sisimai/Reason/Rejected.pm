@@ -13,13 +13,15 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $isnot = [
+
+    state $isnot = [
         '5.1.0 address rejected',
         'recipient address rejected',
         'sender ip address rejected',
     ];
-    my $index = [
+    state $index = [
         '<> invalid sender',
+        'access denied (in reply to mail from command)',
         'address rejected',
         'administrative prohibition',
         'batv failed to verify',    # SoniWall
@@ -57,7 +59,6 @@ sub match {
         'unroutable sender address',
         'you are sending to/from an address that has been blacklisted',
     ];
-
     return 0 if grep { rindex($argv1, $_) > -1 } @$isnot;
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
@@ -73,18 +74,18 @@ sub true {
     my $class = shift;
     my $argvs = shift // return undef;
 
-    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus) || 'undefined';
-    my $diagnostic = lc $argvs->diagnosticcode;
-
     return 1 if $argvs->reason eq 'rejected';
+    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus) || 'undefined';
     return 1 if $tempreason eq 'rejected';  # Delivery status code points "rejected".
 
     # Check the value of Diagnosic-Code: header with patterns
-    if( $argvs->smtpcommand eq 'MAIL' ) {
+    my $diagnostic = lc $argvs->diagnosticcode;
+    my $commandtxt = $argvs->smtpcommand;
+    if( $commandtxt eq 'MAIL' ) {
         # The session was rejected at 'MAIL FROM' command
         return 1 if __PACKAGE__->match($diagnostic);
 
-    } elsif( $argvs->smtpcommand eq 'DATA' ) {
+    } elsif( $commandtxt eq 'DATA' ) {
         # The session was rejected at 'DATA' command
         if( $tempreason ne 'userunknown' ) {
             # Except "userunknown"
@@ -151,7 +152,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

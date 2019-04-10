@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::Interface;
-$Device::Firewall::PaloAlto::Op::Interface::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::Interface::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -40,7 +40,7 @@ Device::Firewall::PaloAlto::Op::Interface - Palo Alto firewall interface
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 

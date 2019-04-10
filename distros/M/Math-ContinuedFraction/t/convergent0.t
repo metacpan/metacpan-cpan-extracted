@@ -1,23 +1,34 @@
 #!perl
 
-use Test::Simple tests => 4;
-
 use Math::BigRat;
 use Math::BigInt;
 use Math::ContinuedFraction;
 
-#
-# Create phi.
-#
-my $cf = Math::ContinuedFraction->new([1, [1]]);
+use Test::More tests => 11;
 
-my($n, $d) = $cf->convergent(2);
-ok(($n == 2 and $d == 1), "->convergent(2) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(3);
-ok(($n == 3 and $d == 2), "->convergent(3) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(4);
-ok(($n == 5 and $d == 3), "->convergent(4) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(5);
-ok(($n == 8 and $d == 5), "->convergent(5) returns (". $n . ", " . $d . ")");
+my $phi_seq = [1, [1]];
+
+my @conv = (
+	{n => 1, d => 0},
+	{n => 2, d => 1},
+	{n => 3, d => 2},
+	{n => 5, d => 3},
+	{n => 8, d => 5},
+	{n => 13, d => 8},
+	{n => 21, d => 13},
+	{n => 34, d => 21},
+	{n => 55, d => 34},
+	{n => 89, d => 55},
+	{n => 144, d => 89},
+);
+
+my $cf = Math::ContinuedFraction->new($phi_seq);
+
+for my $j (0 .. $#conv)
+{
+	my($n, $d) = $cf->convergent($j + 1);
+	ok(($n == $conv[$j]->{n} and $d == $conv[$j]->{d}),
+		"->convergent(" . $j + 1 . ") returns (". $n . ", " . $d . ")");
+}
 
 exit(0);

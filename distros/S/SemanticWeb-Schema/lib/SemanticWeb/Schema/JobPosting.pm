@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has base_salary => (
@@ -38,14 +38,6 @@ has date_posted => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'datePosted',
-);
-
-
-
-has education_requirements => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'educationRequirements',
 );
 
 
@@ -122,10 +114,10 @@ has occupational_category => (
 
 
 
-has qualifications => (
+has relevant_occupation => (
     is        => 'rw',
     predicate => 1,
-    json_ld   => 'qualifications',
+    json_ld   => 'relevantOccupation',
 );
 
 
@@ -202,7 +194,7 @@ SemanticWeb::Schema::JobPosting - A listing that describes a job opening in a ce
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -220,9 +212,9 @@ A base_salary should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<InstanceOf['SemanticWeb::Schema::PriceSpecification']>
+
+=item C<Num>
 
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
 
@@ -254,20 +246,6 @@ A date_posted should be one of the following types:
 
 =back
 
-=head2 C<education_requirements>
-
-C<educationRequirements>
-
-Educational background needed for the position.
-
-A education_requirements should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
 =head2 C<employment_type>
 
 C<employmentType>
@@ -287,7 +265,7 @@ A employment_type should be one of the following types:
 
 C<experienceRequirements>
 
-Description of skills and experience needed for the position.
+Description of skills and experience needed for the position or Occupation.
 
 A experience_requirements should be one of the following types:
 
@@ -393,21 +371,23 @@ A occupational_category should be one of the following types:
 
 =back
 
-=head2 C<qualifications>
+=head2 C<relevant_occupation>
 
-Specific qualifications required for this role.
+C<relevantOccupation>
 
-A qualifications should be one of the following types:
+The Occupation for the JobPosting.
+
+A relevant_occupation should be one of the following types:
 
 =over
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::Occupation']>
 
 =back
 
 =head2 C<responsibilities>
 
-Responsibilities associated with this role.
+Responsibilities associated with this role or Occupation.
 
 A responsibilities should be one of the following types:
 
@@ -435,7 +415,7 @@ A salary_currency should be one of the following types:
 
 =head2 C<skills>
 
-Skills required to fulfill this role.
+Skills required to fulfill this role or in this Occupation.
 
 A skills should be one of the following types:
 

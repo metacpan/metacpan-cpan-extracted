@@ -1,0 +1,93 @@
+NAME
+
+    Future::IO - Future-returning IO methods
+
+SYNOPSIS
+
+       use Future::IO;
+    
+       my $delay = Future::IO->sleep( 5 );
+       # $delay will become done in 5 seconds time
+    
+       my $input = Future::IO->sysread( \*STDIN, 4096 );
+       # $input will yield some input from the STDIN IO handle
+
+DESCRIPTION
+
+    This package provides a few basic methods that behave similarly to the
+    same-named core perl functions relating to IO operations, but yield
+    their results asynchronously via Future instances.
+
+    This is provided primarily as a decoupling mechanism, to allow modules
+    to be written that perform IO in an asynchronous manner to depend
+    directly on this, while allowing asynchronous event systems to provide
+    an implementation of these operations.
+
+ Default Implementation
+
+    If the override_impl method is not invoked, a default implementation of
+    these operations is provided. This implementation allows a single queue
+    of sysread calls on a single filehandle only, combined with sleep
+    calls. It is provided for the simple cases where modules only need one
+    filehandle (most likely a single network socket or hardware device
+    handle), allowing such modules to work without needing a better event
+    system.
+
+    If there are both sysread and sleep futures pending, the implementation
+    will use select() to wait for either. This may be problematic on
+    MSWin32, depending on what type of filehandle is involved.
+
+    For cases where multiple filehandles are required, or for doing more
+    involved IO operations, a real implementation based on an actual event
+    loop should be provided.
+
+ Unit Testing
+
+    The replaceable implementation is also useful for writing unit test
+    scripts. If the implementation is set to an instance of some sort of
+    test fixture or mocking object, a unit test can check that the
+    appropriate IO operations happen as part of the test.
+
+METHODS
+
+ sleep
+
+       $f = Future::IO->sleep( $secs )
+
+    Returns a Future that will become done a fixed delay from now, given in
+    seconds. This value may be fractional.
+
+ sysread
+
+       $f = Future::IO->sysread( $fh, $length )
+          $bytes = $f->get
+
+    Returns a Future that will become done when at least one byte can be
+    read from the given filehandle. It may return up to $length bytes. On
+    EOF, the returned future will yield an empty list (or undef in scalar
+    context). On any error (other than EAGAIN / EWOULDBLOCK which are
+    ignored), the future fails with a suitable error message.
+
+    Note specifically this may perform only a single sysread() call, and
+    thus is not guaranteed to actually return the full length.
+
+ override_impl
+
+       Future::IO->override_impl( $impl )
+
+    Sets a new implementation for Future::IO, replacing the minimal default
+    internal implementation. This can either be a package name or an object
+    instance reference, but must provide the methods named above.
+
+    This method is intended to be called by event loops and other similar
+    places, to provide a better integration.
+
+    Can only be called once, and only if the default implementation is not
+    in use, therefore a module that wishes to override this ought to invoke
+    it as soon as possible on program startup, before any of the main
+    Future::IO methods may have been called.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

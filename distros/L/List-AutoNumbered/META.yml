@@ -1,5 +1,5 @@
 ---
-abstract: 'Add line numbers to lists while creating them'
+abstract: 'Add sequential numbers to lists while creating them'
 author:
   - 'Christopher White <cxwembedded@gmail.com>'
 build_requires:
@@ -27,7 +27,7 @@ no_index:
 provides:
   List::AutoNumbered:
     file: lib/List/AutoNumbered.pm
-    version: '0.000003'
+    version: '0.000005'
   List::AutoNumbered::Skipper:
     file: lib/List/AutoNumbered.pm
 requires:
@@ -40,5 +40,5 @@ requires:
 resources:
   bugtracker: https://github.com/cxw42/List-AutoNumbered/issues
   repository: https://github.com/cxw42/List-AutoNumbered.git
-version: '0.000003'
+version: '0.000005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

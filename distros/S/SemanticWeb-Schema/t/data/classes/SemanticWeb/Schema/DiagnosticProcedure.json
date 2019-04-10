@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A medical procedure intended primarily for diagnostic, as opposed to therapeutic, purposes.",
+      "rdfs:label" : "DiagnosticProcedure",
+      "rdfs:subClassOf" : "schema:MedicalProcedure",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

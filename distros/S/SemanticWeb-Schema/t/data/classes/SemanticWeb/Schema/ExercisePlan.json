@@ -1,0 +1,99 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Fitness-related activity designed for a specific health-related purpose, including defined exercise routines as well as activity prescribed by a clinician.",
+      "rdfs:label" : "ExercisePlan",
+      "rdfs:subClassOf" : [
+         "schema:CreativeWork",
+         "schema:PhysicalActivity"
+      ],
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:activityDuration" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Length of time to engage in the activity.",
+         "rdfs:label" : "activityDuration",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
+            "schema:Duration"
+         ]
+      },
+      "schema:activityFrequency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "How often one should engage in the activity.",
+         "rdfs:label" : "activityFrequency",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:QualitativeValue"
+         ]
+      },
+      "schema:additionalVariable" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any additional component of the exercise prescription that may need to be articulated to the patient. This may include the order of exercises, the number of repetitions of movement, quantitative distance, progressions over time, etc.",
+         "rdfs:label" : "additionalVariable",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:exerciseType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Type(s) of exercise or activity, such as strength training, flexibility training, aerobics, cardiac rehabilitation, etc.",
+         "rdfs:label" : "exerciseType",
+         "schema:domainIncludes" : [
+            "schema:ExerciseAction",
+            "schema:ExercisePlan"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:intensity" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Quantitative measure gauging the degree of force involved in the exercise, for example, heartbeats per minute. May include the velocity of the movement.",
+         "rdfs:label" : "intensity",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
+            "schema:Text"
+         ]
+      },
+      "schema:repetitions" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Number of times one should repeat the activity.",
+         "rdfs:label" : "repetitions",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:QualitativeValue"
+         ]
+      },
+      "schema:restPeriods" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "How often one should break from the activity.",
+         "rdfs:label" : "restPeriods",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:QualitativeValue",
+            "schema:Text"
+         ]
+      },
+      "schema:workload" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Quantitative measure of the physiologic output of the exercise; also referred to as energy expenditure.",
+         "rdfs:label" : "workload",
+         "schema:domainIncludes" : "schema:ExercisePlan",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Energy",
+            "schema:QualitativeValue"
+         ]
+      }
+   }
+}

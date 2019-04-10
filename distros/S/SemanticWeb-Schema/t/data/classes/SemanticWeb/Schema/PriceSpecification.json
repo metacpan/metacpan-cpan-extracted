@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A structured value representing a price or price range. Typically, only the subclasses of this type are used for markup. It is recommended to use <a class=\"localLink\" href=\"http://schema.org/MonetaryAmount\">MonetaryAmount</a> to describe independent amounts of money such as a salary, credit card limits, etc.",
       "rdfs:label" : "PriceSpecification",
@@ -8,31 +8,31 @@
    },
    "properties" : {
       "schema:eligibleQuantity" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The interval and unit of measurement of ordering quantities for which the offer or price specification is valid. This allows e.g. specifying that a certain freight charge is valid only for a certain quantity.",
          "rdfs:label" : "eligibleQuantity",
          "schema:domainIncludes" : [
             "schema:Offer",
-            "schema:PriceSpecification",
-            "schema:Demand"
+            "schema:Demand",
+            "schema:PriceSpecification"
          ],
          "schema:rangeIncludes" : "schema:QuantitativeValue"
       },
       "schema:eligibleTransactionVolume" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The transaction volume, in a monetary unit, for which the offer or price specification is valid, e.g. for indicating a minimal purchasing volume, to express free shipping above a certain order volume, or to limit the acceptance of credit cards to purchases to a certain minimal amount.",
          "rdfs:label" : "eligibleTransactionVolume",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:Offer",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:PriceSpecification"
       },
       "schema:maxPrice" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The highest price if the price is a range.",
          "rdfs:label" : "maxPrice",
@@ -40,7 +40,7 @@
          "schema:rangeIncludes" : "schema:Number"
       },
       "schema:minPrice" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The lowest price if the price is a range.",
          "rdfs:label" : "minPrice",
@@ -69,44 +69,45 @@
             "schema:Reservation",
             "schema:Offer",
             "schema:Ticket",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:TradeAction"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:validFrom" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:MonetaryAmount",
-            "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification",
-            "schema:OpeningHoursSpecification",
-            "schema:Demand",
-            "schema:Permit"
-         ],
-         "schema:rangeIncludes" : "schema:DateTime"
-      },
-      "schema:validThrough" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
-         "rdfs:label" : "validThrough",
-         "schema:domainIncludes" : [
-            "schema:PriceSpecification",
             "schema:LocationFeatureSpecification",
             "schema:MonetaryAmount",
-            "schema:Offer",
-            "schema:JobPosting",
             "schema:Demand",
+            "schema:PriceSpecification",
+            "schema:Permit",
+            "schema:Offer",
             "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
+      "schema:validThrough" : {
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
+         "rdfs:label" : "validThrough",
+         "schema:domainIncludes" : [
+            "schema:Offer",
+            "schema:OpeningHoursSpecification",
+            "schema:JobPosting",
+            "schema:PriceSpecification",
+            "schema:Demand",
+            "schema:MonetaryAmount",
+            "schema:LocationFeatureSpecification"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
       "schema:valueAddedTaxIncluded" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Specifies whether the applicable value-added tax (VAT) is included in the price specification or not.",
          "rdfs:label" : "valueAddedTaxIncluded",

@@ -1,0 +1,27 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any rule set or interactive tool for estimating the risk of developing a complication or condition.",
+      "rdfs:label" : "MedicalRiskEstimator",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:estimatesRiskOf" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The condition, complication, or symptom whose risk is being estimated.",
+         "rdfs:label" : "estimatesRiskOf",
+         "schema:domainIncludes" : "schema:MedicalRiskEstimator",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalEntity"
+      },
+      "schema:includedRiskFactor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A modifiable or non-modifiable risk factor included in the calculation, e.g. age, coexisting condition.",
+         "rdfs:label" : "includedRiskFactor",
+         "schema:domainIncludes" : "schema:MedicalRiskEstimator",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalRiskFactor"
+      }
+   }
+}

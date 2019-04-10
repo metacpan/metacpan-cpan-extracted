@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has about => (
@@ -538,6 +538,14 @@ has publisher => (
 
 
 
+has publisher_imprint => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'publisherImprint',
+);
+
+
+
 has publishing_principles => (
     is        => 'rw',
     predicate => 1,
@@ -594,6 +602,14 @@ has source_organization => (
 
 
 
+has spatial => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'spatial',
+);
+
+
+
 has spatial_coverage => (
     is        => 'rw',
     predicate => 1,
@@ -606,6 +622,14 @@ has sponsor => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'sponsor',
+);
+
+
+
+has temporal => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'temporal',
 );
 
 
@@ -638,6 +662,14 @@ has time_required => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'timeRequired',
+);
+
+
+
+has translation_of_work => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'translationOfWork',
 );
 
 
@@ -682,6 +714,14 @@ has work_example => (
 
 
 
+has work_translation => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'workTranslation',
+);
+
+
+
 
 
 1;
@@ -698,7 +738,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -917,6 +957,8 @@ A audio should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::AudioObject']>
 
+=item C<InstanceOf['SemanticWeb::Schema::Clip']>
+
 =back
 
 =head2 C<author>
@@ -929,9 +971,9 @@ A author should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -1039,9 +1081,9 @@ A content_rating should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Rating']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Rating']>
 
 =back
 
@@ -1380,9 +1422,9 @@ A in_language should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Language']>
+
+=item C<Str>
 
 =back
 
@@ -1443,11 +1485,11 @@ A is_based_on should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+=item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =item C<Str>
 
-=item C<InstanceOf['SemanticWeb::Schema::Product']>
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
 
@@ -1580,9 +1622,9 @@ A material should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
+
+=item C<Str>
 
 =back
 
@@ -1636,9 +1678,9 @@ A producer should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -1652,9 +1694,9 @@ A provider should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -1684,6 +1726,20 @@ A publisher should be one of the following types:
 
 =back
 
+=head2 C<publisher_imprint>
+
+C<publisherImprint>
+
+The publishing division which published the comic.
+
+A publisher_imprint should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=back
+
 =head2 C<publishing_principles>
 
 C<publishingPrinciples>
@@ -1709,9 +1765,9 @@ A publishing_principles should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
 
@@ -1799,6 +1855,25 @@ A source_organization should be one of the following types:
 
 =back
 
+=head2 C<spatial>
+
+=for html The "spatial" property can be used in cases when more specific properties
+(e.g. <a class="localLink"
+href="http://schema.org/locationCreated">locationCreated</a>, <a
+class="localLink"
+href="http://schema.org/spatialCoverage">spatialCoverage</a>, <a
+class="localLink"
+href="http://schema.org/contentLocation">contentLocation</a>) are not known
+to be appropriate.
+
+A spatial should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
 =head2 C<spatial_coverage>
 
 C<spatialCoverage>
@@ -1828,9 +1903,28 @@ A sponsor should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
+=back
+
+=head2 C<temporal>
+
+=for html The "temporal" property can be used in cases where more specific properties
+(e.g. <a class="localLink"
+href="http://schema.org/temporalCoverage">temporalCoverage</a>, <a
+class="localLink" href="http://schema.org/dateCreated">dateCreated</a>, <a
+class="localLink" href="http://schema.org/dateModified">dateModified</a>,
+<a class="localLink"
+href="http://schema.org/datePublished">datePublished</a>) are not known to
+be appropriate.
+
+A temporal should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 
@@ -1849,7 +1943,11 @@ content e.g. ScholarlyArticle, Book, TVSeries or TVEpisode may indicate
 their temporalCoverage in broader terms - textually or via well-known URL.
 Written works such as books may sometimes have precise temporal coverage
 too, e.g. a work set in 1939 - 1945 can be indicated in ISO 8601 interval
-format format via "1939/1945".
+format format via "1939/1945".<br/><br/> Open-ended date ranges can be
+written with ".." in place of the end date. For example, "2015-11/.."
+indicates a range beginning in November 2015 and with no specified final
+date. This is tentative and might be updated in future when ISO 8601 is
+officially updated.
 
 A temporal_coverage should be one of the following types:
 
@@ -1900,6 +1998,21 @@ A time_required should be one of the following types:
 
 =back
 
+=head2 C<translation_of_work>
+
+C<translationOfWork>
+
+The work that this work has been translated from. e.g. ç©ç§èµ·æº is a
+translationOf âOn the Origin of Speciesâ
+
+A translation_of_work should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=back
+
 =head2 C<translator>
 
 Organization or person who adapts a creative work to different languages,
@@ -1938,9 +2051,9 @@ A version should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<Num>
+
+=item C<Str>
 
 =back
 
@@ -1951,6 +2064,8 @@ An embedded video object.
 A video should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::Clip']>
 
 =item C<InstanceOf['SemanticWeb::Schema::VideoObject']>
 
@@ -1964,6 +2079,23 @@ Example/instance/realization/derivation of the concept of this creative
 work. eg. The paperback edition, first edition, or eBook.
 
 A work_example should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
+
+=back
+
+=head2 C<work_translation>
+
+C<workTranslation>
+
+A work that is a translation of the content of this work. e.g. è¥¿éè¨
+has an English workTranslation âJourney to the Westâ,a German
+workTranslation âMonkeys Pilgerfahrtâ and a Vietnamese translation TÃ¢y
+du kÃ½ bÃ¬nh kháº£o.
+
+A work_translation should be one of the following types:
 
 =over
 

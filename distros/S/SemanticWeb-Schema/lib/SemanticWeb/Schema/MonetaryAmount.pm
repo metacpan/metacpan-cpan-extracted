@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has currency => (
@@ -82,14 +82,14 @@ SemanticWeb::Schema::MonetaryAmount - A monetary value or range
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
 =for html A monetary value or range. This type can be used to describe an amount of
 money such as $50 USD, or a range as in describing a bank account being
-suitable for a balance between £1,000 and £1,000,000 GBP, or the value of a
-salary, etc. It is recommended to use <a class="localLink"
+suitable for a balance between Â£1,000 and Â£1,000,000 GBP, or the value of
+a salary, etc. It is recommended to use <a class="localLink"
 href="http://schema.org/PriceSpecification">PriceSpecification</a> Types to
 describe the price of an Offer, Invoice, etc.
 
@@ -188,11 +188,11 @@ A value should be one of the following types:
 
 =item C<Num>
 
-=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
-
 =item C<Bool>
 
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
 
 =back
 

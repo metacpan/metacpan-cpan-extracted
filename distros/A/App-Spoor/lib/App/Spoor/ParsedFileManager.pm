@@ -15,7 +15,7 @@ App::Spoor::ParsedFileManager
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
@@ -74,13 +74,9 @@ sub process_parsed_files {
   my ($source_file_path, $file_contents);
   opendir my $parsed_entries_dir, $config->{parsed_entries_path};
 
-  while(readdir $parsed_entries_dir) {
-    next if (/\A\.{1,2}\z/);
+  my @sanitised_file_names = grep { /\A((error|access|login)\.\d+\.\d+\.json)\z/ } readdir $parsed_entries_dir;
 
-    my ( $sanitised_file_name ) = $_ =~ /\A((error|access|login)\.\d+\.\d+\.json)\z/;
-
-    next unless $sanitised_file_name;
-
+  foreach my $sanitised_file_name (@sanitised_file_names) {
     $source_file_path = File::Spec->catfile($config->{parsed_entries_path}, $sanitised_file_name);
     if ($file_security_check->($source_file_path)) {
       $file_contents = from_json(path($source_file_path)->slurp_utf8());
@@ -92,6 +88,8 @@ sub process_parsed_files {
       }
     }
   }
+
+  closedir $parsed_entries_dir;
 }
 
 =head1 AUTHOR

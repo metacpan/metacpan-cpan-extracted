@@ -1,0 +1,41 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A type of blood vessel that specifically carries lymph fluid unidirectionally toward the heart.",
+      "rdfs:label" : "LymphaticVessel",
+      "rdfs:subClassOf" : "schema:Vessel",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:originatesFrom" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The vasculature the lymphatic structure originates, or afferents, from.",
+         "rdfs:label" : "originatesFrom",
+         "schema:domainIncludes" : "schema:LymphaticVessel",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Vessel"
+      },
+      "schema:regionDrained" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The anatomical or organ system drained by this vessel; generally refers to a specific part of an organ.",
+         "rdfs:label" : "regionDrained",
+         "schema:domainIncludes" : [
+            "schema:LymphaticVessel",
+            "schema:Vein"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
+         ]
+      },
+      "schema:runsTo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The vasculature the lymphatic structure runs, or efferents, to.",
+         "rdfs:label" : "runsTo",
+         "schema:domainIncludes" : "schema:LymphaticVessel",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Vessel"
+      }
+   }
+}

@@ -1,0 +1,40 @@
+<response status="success"><result>
+  <max>250</max>
+  <total>4</total>
+  <timeout>1800</timeout>
+  <dp>dp0</dp>
+  <entries>
+    <entry>
+      <status>  c  </status>
+      <ip>192.168.122.1</ip>
+      <mac>52:54:00:d8:ec:73</mac>
+      <ttl>1798</ttl>
+      <interface>ethernet1/1</interface>
+      <port>ethernet1/1</port>
+    </entry>
+    <entry>
+      <status>  s  </status>
+      <ip>10.101.10.10</ip>
+      <mac>f0:1f:af:02:96:36</mac>
+      <ttl>N/A</ttl>
+      <interface>ethernet1/3</interface>
+      <port>ethernet1/3</port>
+    </entry>
+    <entry>
+      <status>  s  </status>
+      <ip>10.101.10.11</ip>
+      <mac>f0:1f:af:02:96:37</mac>
+      <ttl>N/A</ttl>
+      <interface>ethernet1/4</interface>
+      <port>ethernet1/4</port>
+    </entry>
+    <entry>
+      <status>  s  </status>
+      <ip>10.101.10.12</ip>
+      <mac>f0:1f:af:02:96:38</mac>
+      <ttl>N/A</ttl>
+      <interface>ethernet1/3.16</interface>
+      <port>ethernet1/3</port>
+    </entry>
+  </entries>
+</result></response>

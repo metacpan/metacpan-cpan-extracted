@@ -1,0 +1,79 @@
+NAME
+    HTTP::Tiny::CustomRetry - Retry failed HTTP::Tiny requests
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::CustomRetry (from
+    Perl distribution HTTP-Tiny-CustomRetry), released on 2019-04-10.
+
+SYNOPSIS
+     use HTTP::Tiny::CustomRetry;
+
+     my $res  = HTTP::Tiny::CustomRetry->new(
+         retry_strategy => 'ExponentialBackoff', # required, pick a strategy (which is name of submodule under Algorithm::Retry::*)
+
+         # the following attributes are available to customize the
+         # ExponentialBackoff strategy, which are attributes from
+         # Algorithm::Retry::ExponentialBackoff with retry_ prefix.
+
+         # retry_max_attempts     => ...,
+         # retry_jitter_factor    => ...,
+         # retry_initial_delay    => ...,
+         # retry_max_delay        => ...,
+         # retry_exponent_base    => ...,
+         # retry_delay_on_success => ...,
+
+     )->get("http://www.example.com/");
+
+DESCRIPTION
+    This class is a subclass of HTTP::Tiny that retry fail responses (a.k.a.
+    responses with 5xx statuses; 4xx are considered the client's fault so we
+    don't retry those).
+
+    It's a more elaborate version of HTTP::Tiny::Retry which offers a simple
+    retry strategy: using a constant delay between attempts.
+    HTTP::Tiny::CustomRetry uses Algorithm::Retry to offer several
+    retry/backoff strategies.
+
+ENVIRONMENT
+  HTTP_TINY_CUSTOMRETRY_STRATEGY
+    String. Used to set default for the "retry_strategy" attribute.
+
+    Other "retry_ATTRNAME" attributes can also be set via environment
+    HTTP_TINY_CUSTOMRETRY_*ATTRNAME*, for example "retry_max_attempts" can
+    be set via HTTP_TINY_CUSTOMRETRY_MAX_ATTEMPTS.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-CustomRetry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-CustomRetry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-CustomRetry
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Algorithm::Retry and "Algorithm::Retry::*" strategy modules.
+
+    HTTP::Tiny
+
+    HTTP::Tiny::Retry and HTTP::Tiny::Patch::Retry, simpler retry strategy
+    (constant delay).
+
+    HTTP::Tiny::Patch::CustomRetry, patch version of this module.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

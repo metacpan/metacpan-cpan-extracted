@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A guideline recommendation that is regarded as efficacious and where quality of the data supporting the recommendation is sound.",
+      "rdfs:label" : "MedicalGuidelineRecommendation",
+      "rdfs:subClassOf" : "schema:MedicalGuideline",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:recommendationStrength" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Strength of the guideline's recommendation (e.g. 'class I').",
+         "rdfs:label" : "recommendationStrength",
+         "schema:domainIncludes" : "schema:MedicalGuidelineRecommendation",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

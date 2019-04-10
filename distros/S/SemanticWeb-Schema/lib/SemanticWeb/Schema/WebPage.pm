@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has breadcrumb => (
@@ -82,6 +82,14 @@ has significant_links => (
 
 
 
+has speakable => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'speakable',
+);
+
+
+
 has specialty => (
     is        => 'rw',
     predicate => 1,
@@ -106,7 +114,7 @@ SemanticWeb::Schema::WebPage - A web page
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -127,9 +135,9 @@ A breadcrumb should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::BreadcrumbList']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::BreadcrumbList']>
 
 =back
 
@@ -201,9 +209,9 @@ A reviewed_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -232,6 +240,40 @@ non-navigation links that are clicked on the most.
 A significant_links should be one of the following types:
 
 =over
+
+=item C<Str>
+
+=back
+
+=head2 C<speakable>
+
+=for html Indicates sections of a Web page that are particularly 'speakable' in the
+sense of being highlighted as being especially appropriate for
+text-to-speech conversion. Other sections of a page may also be usefully
+spoken in particular circumstances; the 'speakable' property serves to
+indicate the parts most likely to be generally useful for speech.<br/><br/>
+The <em>speakable</em> property can be repeated an arbitrary number of
+times, with three kinds of possible 'content-locator' values:<br/><br/> 1.)
+<em>id-value</em> URL references - uses <em>id-value</em> of an element in
+the page being annotated. The simplest use of <em>speakable</em> has
+(potentially relative) URL values, referencing identified sections of the
+document concerned.<br/><br/> 2.) CSS Selectors - addresses content in the
+annotated page, eg. via class attribute. Use the <a class="localLink"
+href="http://schema.org/cssSelector">cssSelector</a> property.<br/><br/>
+3.) XPaths - addresses content via XPaths (assuming an XML view of the
+content). Use the <a class="localLink"
+href="http://schema.org/xpath">xpath</a> property.<br/><br/> For more
+sophisticated markup of speakable sections beyond simple ID references,
+either CSS selectors or XPath expressions to pick out document section(s)
+as speakable. For this we define a supporting type, <a class="localLink"
+href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
+which is defined to be a possible value of the <em>speakable</em> property.
+
+A speakable should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::SpeakableSpecification']>
 
 =item C<Str>
 

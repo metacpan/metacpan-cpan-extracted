@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has address => (
@@ -82,7 +82,7 @@ SemanticWeb::Schema::GeoCoordinates - The geographic coordinates of a place or e
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -98,9 +98,9 @@ A address should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
+
+=item C<Str>
 
 =back
 
@@ -116,9 +116,9 @@ A address_country should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Country']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Country']>
 
 =back
 
@@ -126,6 +126,9 @@ A address_country should be one of the following types:
 
 =for html The elevation of a location (<a
 href="https://en.wikipedia.org/wiki/World_Geodetic_System">WGS 84</a>).
+Values may be of the form 'NUMBER UNIT<em>OF</em>MEASUREMENT' (e.g., '1,000
+m', '3,200 ft') while numbers alone should be assumed to be a value in
+meters.
 
 A elevation should be one of the following types:
 
@@ -161,9 +164,9 @@ A longitude should be one of the following types:
 
 =over
 
-=item C<Num>
-
 =item C<Str>
+
+=item C<Num>
 
 =back
 

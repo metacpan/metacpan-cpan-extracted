@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has area_served => (
@@ -114,7 +114,7 @@ SemanticWeb::Schema::ContactPoint - A contact point&#x2014;for example
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -132,13 +132,13 @@ A area_served should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
-
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
+
+=item C<Str>
 
 =back
 
@@ -261,11 +261,11 @@ A service_area should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
-
 =item C<InstanceOf['SemanticWeb::Schema::GeoShape']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::AdministrativeArea']>
 
 =back
 

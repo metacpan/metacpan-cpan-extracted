@@ -1,0 +1,49 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A specific dosing schedule for a drug or supplement.",
+      "rdfs:label" : "DoseSchedule",
+      "rdfs:subClassOf" : "schema:MedicalIntangible",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:doseUnit" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unit of the dose, e.g. 'mg'.",
+         "rdfs:label" : "doseUnit",
+         "schema:domainIncludes" : "schema:DoseSchedule",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:doseValue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The value of the dose, e.g. 500.",
+         "rdfs:label" : "doseValue",
+         "schema:domainIncludes" : "schema:DoseSchedule",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:QualitativeValue"
+         ]
+      },
+      "schema:frequency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "How often the dose is taken, e.g. 'daily'.",
+         "rdfs:label" : "frequency",
+         "schema:domainIncludes" : "schema:DoseSchedule",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:targetPopulation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Characteristics of the population for which this is intended, or which typically uses it, e.g. 'adults'.",
+         "rdfs:label" : "targetPopulation",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:DoseSchedule"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

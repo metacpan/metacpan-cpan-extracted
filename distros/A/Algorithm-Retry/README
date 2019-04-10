@@ -2,24 +2,24 @@ NAME
     Algorithm::Retry - Various retry/backoff strategies
 
 VERSION
-    This document describes version 0.001 of Algorithm::Retry (from Perl
-    distribution Algorithm-Retry), released on 2019-04-08.
+    This document describes version 0.002 of Algorithm::Retry (from Perl
+    distribution Algorithm-Retry), released on 2019-04-10.
 
 SYNOPSIS
      # 1. pick a strategy and instantiate
 
      use Algorithm::Retry::Constant;
      my $ar = Algorithm::Retry::Constant->new(
-         delay_on_failure  => 2, # required
+         delay             => 2, # required
          #delay_on_success => 0, # optional, default 0
      );
 
      # 2. log success/failure and get a new number of seconds to delay, timestamp is
      # optional but must be monotonically increasing.
 
-     my $secs = $ar->failure(1554652553); # => 2
-     my $secs = $ar->success();           # => 0
-     my $secs = $ar->failure();           # => 2
+     my $secs = $ar->failure(); # => 2
+     my $secs = $ar->success(); # => 0
+     my $secs = $ar->failure(); # => 2
 
 DESCRIPTION
     This distribution provides several classes that implement various

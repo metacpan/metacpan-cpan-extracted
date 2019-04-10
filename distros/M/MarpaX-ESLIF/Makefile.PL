@@ -56,37 +56,129 @@ $ENV{LDFLAGS} //= '';
 # OTHERLDFLAGS remains local and must affect ONLY this process, not sub-processes
 my @OTHERLDFLAGS = ();
 #
-print "\n";
 print "==========================================\n";
 print "Original compilers and linker settings as per ExtUtils::CBuilder\n";
 print "\n";
-print "\$ENV{CC}       (overwrite) " . ($ENV{CC} // '') . "\n";
-print "\$ENV{CFLAGS}   (   append) " . ($ENV{CFLAGS} // '') . "\n";
-print "\$ENV{CXX}      (overwrite) " . ($ENV{CXX} // '') . "\n";
-print "\$ENV{CXXFLAGS} (overwrite) " . ($ENV{CXXFLAGS} // '') . "\n";
-print "\$ENV{LD}       (overwrite) " . ($ENV{LD} // '') . "\n";
-print "\$ENV{LDFLAGS}  (   append) " . ($ENV{LDFLAGS} // '') . "\n";
+print "CC           (overwrite) $ENV{CC}\n";
+print "CFLAGS       (    fixed) " . ($cbuilder_config{ccflags} // '') . "\n";
+print "CFLAGS       (   append) $ENV{CFLAGS}\n";
+print "CXX          (overwrite) $ENV{CXX}\n";
+print "CXXFLAGS     (overwrite) $ENV{CXXFLAGS}\n";
+print "LD           (overwrite) $ENV{LD}\n";
+print "LDFLAGS      (    fixed) " . ($cbuilder_config{ldflags} // '') . "\n";
+print "LDFLAGS      (   append) $ENV{LDFLAGS}\n";
 print "==========================================\n";
 print "\n";
 
 my $ac = Config::AutoConf->new();
 $ac->check_cc;
 
+#
+# Guess CXX configuration
+#
+#
+# Sun/Solaris CC is a special case, we know that guess_compiler will always get it wrong
+#
+my $solariscase = 0;
+$ac->msg_checking(sprintf "if this is solaris compiler");
+if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"this is not solaris compiler\"\n#endif\nint main() { return 0; }")) {
+  $ac->msg_result('yes');
+  if (which("CC")) {
+    $ac->msg_notice("Forcing CXX to CC");
+    $ENV{CXX} = 'CC';
+    $ac->msg_notice("Adding -lCrun to OTHERLDFLAGS");
+    push(@OTHERLDFLAGS, '-lCrun');
+    $solariscase = 1;
+  }
+} else {
+  $ac->msg_result('no');
+}
+if (! $solariscase) {
+  try {
+    my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler();
+    if (defined($cxx_guess) && (length($cxx_guess) > 0) && which($cxx_guess)) {
+      $ac->msg_notice("Setting CXX to $cxx_guess");
+      $ENV{CXX} = $cxx_guess;
+      if (defined($extra_cxxflags_guess) && (length($extra_cxxflags_guess) > 0)) {
+        $ac->msg_notice("Appending $extra_cxxflags_guess to CXXFLAGS");
+        $ENV{CXXFLAGS} .= " $extra_cxxflags_guess";
+      }
+      if (defined($extra_ldflags_guess) && (length($extra_ldflags_guess) > 0)) {
+        $ac->msg_notice("Pushing $extra_ldflags_guess to OTHERLDFLAGS");
+        push(@OTHERLDFLAGS, $extra_ldflags_guess)
+      }
+    }
+  };
+}
+if ((! "$ENV{CXX}") || (! which($ENV{CXX}))) {
+  $ac->msg_notice("Fallback mode trying to guess from C compiler");
+  my $cc_basename = basename($ENV{CC});
+  my $cc_dirname = dirname($ENV{CC});
+  #
+  # Traditionally xxxxcc becomes xxxx++
+  #
+  if ($cc_basename =~ /cc$/i) {
+    my $cxx_basename = $cc_basename;
+    $cxx_basename =~ s/cc$/++/;
+    my $cxx = File::Spec->catfile($cc_dirname, $cxx_basename);
+    if (which($cxx)) {
+      $ac->msg_notice("Setting CXX to found $cxx");
+      $ENV{CXX} = $cxx;
+    }
+  }
+  #
+  # Or xxxxlang becomes lang++
+  #
+  elsif ($cc_basename =~ /lang$/i) {
+    my $cxx_basename = $cc_basename;
+    $cxx_basename .= "++";
+    my $cxx = File::Spec->catfile($cc_dirname, $cxx_basename);
+    if (which($cxx)) {
+      $ac->msg_notice("Setting CXX to found $cxx");
+      $ENV{CXX} = $cxx;
+    }
+  }
+  #
+  # Cross fingers, and use C compiler
+  #
+  else {
+    $ac->msg_notice("Setting CXX to fallback $ENV{CC}");
+    $ENV{CXX} = $ENV{CC};
+  }
+}
+
 # -------------
 # CC and CFLAGS
 # --------------
 #
-if (is_os_type('Windows')) {
-  print "# Windows platform: in case of MINGW headers, force -D__NO_INLINE__\n";
-  $ENV{CFLAGS} .= ' -D__NO_INLINE__';
-  $ENV{CXXFLAGS} .= ' -D__NO_INLINE__';
+my $isc99 = 0;
+if (($cbuilder_config{cc} // 'cc') ne 'cl') {
+    $ac->msg_checking("Checking if C99 is enabled by default:");
+    if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}")) {
+        $ac->msg_result('yes');
+        $isc99 = 1;
+    } else {
+        $ac->msg_result('no');
+        $ac->msg_notice("Checking what CFLAGS is required for C99:");
+        foreach my $flag (qw/-std=gnu99 -std=c99 -c99 -AC99 -xc99=all -qlanglvl=extc99/) {
+            $ac->msg_checking("Checking if flag $flag works:");
+            if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}", $flag)) {
+                $ac->msg_result('yes');
+                $ENV{CFLAGS} .= " $flag";
+                $isc99 = 1;
+                last;
+            } else {
+                $ac->msg_result('no');
+            }
+        }
+    }
 }
 
 #
 # When the compiler is clang, there is a bug with inlining, c.f. for example
 # https://sourceforge.net/p/resil/tickets/6/
 #
-# if (is_os_type('Unix', 'darwin'))
+if (is_os_type('Unix', 'darwin') && ! $isc99)
 {
   $ac->msg_checking(sprintf "if this is clang compiler");
   if ($ac->link_if_else("#ifndef __clang__\n#error \"this is not clang compiler\"\n#endif\nint main() { return 0; }")) {
@@ -102,47 +194,30 @@ if (is_os_type('Windows')) {
   }
 }
 
-# ----------------
-# CXX and CXXFLAGS
-# ----------------
-$ac->msg_checking(sprintf "if this is solaris compiler");
-if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"this is not solaris compiler\"\n#endif\nint main() { return 0; }")) {
-   $ac->msg_result('yes');
-   $ac->msg_notice("Forcing CXX to CC");
-   $ENV{CXX} = 'CC';
-   # We know that ExtUtils::CBuilder will get that wrong...
-   # Since a cpp compiler can always compile c code, it is quite safe to assume that the cpp compiler shipped by the same c compiler vendor will accept all CFLAGS
-   $ac->msg_notice("Forcing CXXFLAGS to original perl CFLAGS");
-   $ENV{CXXFLAGS} = $cbuilder_config{ccflags} // '';
-   $ac->msg_notice("Adding -lCrun to OTHERLDFLAGS");
-   push(@OTHERLDFLAGS, '-lCrun');
-} else {
-   $ac->msg_result('no');
-   try {
-      my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler();
-      #
-      # guess_compiler can lie, giving a CXX that does not exist
-      #
-      if (which($cxx_guess)) {
-        $ENV{CXX} = $cxx_guess;
-        $ENV{CXXFLAGS} = ($cbuilder_config{ccflags} // '') . " $extra_cxxflags_guess";
-      }
-      push(@OTHERLDFLAGS, $extra_ldflags_guess) if $extra_ldflags_guess;
-   };
+if ($^O eq "netbsd" && ! $isc99) {
+  #
+  # We need long long, that C99 guarantees, else _NETBSD_SOURCE will do it
+  #
+  $ac->msg_notice("NetBSD platform: Append _NETBSD_SOURCE to CFLAGS to have long long");
+  $ENV{CFLAGS} .= ' -D_NETBSD_SOURCE';
 }
 
 #
 # On windows we are using dlfcn-win32 that will imply a dependency on psapi. We verify this library is available
 #
+
 if (is_os_type('Windows')) {
-  print "# Determining the need for -lpsapi\n";
+  $ac->msg_notice("Windows platform: Append -D__NO_INLINE__ to CFLAGS and CXXFLAGS");
+  $ENV{CFLAGS} .= ' -D__NO_INLINE__';
+  $ENV{CXXFLAGS} .= ' -D__NO_INLINE__';
+  $ac->msg_notice("Windows platform: Determining the need for -lpsapi");
   $ac->push_libraries('psapi');
   if ($ac->link_if_else("#include <windows.h>\n#include <psapi.h>\nint main() { EnumProcessModules(NULL, NULL, 0, NULL); }")) {
     if (basename($Config{cc}) =~ /^cl/i) {
-      $ac->msg_notice("Adding psapi.lib to OTHERLDFLAGS");
+      $ac->msg_notice("Windows platform: Adding psapi.lib to OTHERLDFLAGS");
       push(@OTHERLDFLAGS, "psapi.lib");
     } else {
-      $ac->msg_notice("Adding -lpsapi to OTHERLDFLAGS");
+      $ac->msg_notice("Windows platform: Adding -lpsapi to OTHERLDFLAGS");
       push(@OTHERLDFLAGS, "-lpsapi");
     }
   }
@@ -153,13 +228,15 @@ print "\n";
 print "==========================================\n";
 print "Tweaked compilers and linker settings\n";
 print "\n";
-print "\$ENV{CC}       (overwrite) " . ($ENV{CC} // '') . "\n";
-print "\$ENV{CFLAGS}   (   append) " . ($ENV{CFLAGS} // '') . "\n";
-print "\$ENV{CXX}      (overwrite) " . ($ENV{CXX} // '') . "\n";
-print "\$ENV{CXXFLAGS} (overwrite) " . ($ENV{CXXFLAGS} // '') . "\n";
-print "\$ENV{LD}       (overwrite) " . ($ENV{LD} // '') . "\n";
-print "\$ENV{LDFLAGS}  (   append) " . ($ENV{LDFLAGS} // '') . "\n";
-print "OTHERLDFLAGS               $OTHERLDFLAGS\n";
+print "CC           (overwrite) $ENV{CC}\n";
+print "CFLAGS       (    fixed) " . ($cbuilder_config{ccflags} // '') . "\n";
+print "CFLAGS       (   append) $ENV{CFLAGS}\n";
+print "CXX          (overwrite) $ENV{CXX}\n";
+print "CXXFLAGS     (overwrite) $ENV{CXXFLAGS}\n";
+print "LD           (overwrite) $ENV{LD}\n";
+print "LDFLAGS      (    fixed) " . ($cbuilder_config{ldflags} // '') . "\n";
+print "LDFLAGS      (   append) $ENV{LDFLAGS}\n";
+print "OTHERLDFLAGS             $OTHERLDFLAGS\n";
 print "==========================================\n";
 print "\n";
 
@@ -280,6 +357,30 @@ sub _trim_whitespace {
   return $string;
 }
 
+sub try_compile {
+    my ($csource, $extra_compiler_flags) = @_;
+
+    my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
+    print $fh "$csource\n";
+    close($fh);
+    my $source = $fh->filename;
+    my $rc = 0;
+
+    try {
+        my $cbuilder = ExtUtils::CBuilder->new();
+        my $obj = basename($cbuilder->object_file($source));
+        $cbuilder->compile(
+            source               => $source,
+            object_file          => $obj,
+            extra_compiler_flags => $extra_compiler_flags
+            );
+        $rc = 1;
+    };
+    unlink $fh->filename;
+
+    return $rc;
+}
+
 my %WriteMakefileArgs = (
   "ABSTRACT" => "ESLIF is Extended ScanLess InterFace",
   "AUTHOR" => "Jean-Damien Durand <jeandamiendurand\@free.fr>",
@@ -350,7 +451,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.3",
+  "VERSION" => "3.0.4",
   "test" => {
     "TESTS" => "t/*.t"
   }

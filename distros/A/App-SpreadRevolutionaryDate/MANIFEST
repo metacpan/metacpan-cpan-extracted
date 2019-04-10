@@ -23,6 +23,7 @@ lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Calendar.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/en.pm
+lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm
 lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm
 lib/App/SpreadRevolutionaryDate/Target.pm
@@ -32,6 +33,7 @@ lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm
 lib/App/SpreadRevolutionaryDate/Target/Twitter.pm
 lib/LocaleData/de/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/en/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
+lib/LocaleData/es/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/fr/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 lib/LocaleData/it/LC_MESSAGES/App-SpreadRevolutionaryDate.mo
 t/00-compile.t

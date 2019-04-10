@@ -1,0 +1,13 @@
+Changes
+lib/Algorithm/MinPerfHashTwoLevel.pm
+lib/Tie/Hash/MinPerfHashTwoLevel/OnDisk.pm
+Makefile.PL
+MANIFEST
+MinPerfHashTwoLevel.xs
+ppport.h
+README
+stadtx_hash.h
+t/Algorithm-MinPerfHashTwoLevel.t
+t/OnDisk.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,8 @@
+0.003   2019-04-10 (PERLANCAR)
+
+	- Add options: --retry-on, --retry-on-all.
+
+
 0.002   2019-03-27 (PERLANCAR)
 
 	- No functional changes.

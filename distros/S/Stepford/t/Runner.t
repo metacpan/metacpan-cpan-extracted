@@ -11,7 +11,6 @@ use Log::Dispatch::Array;
 use Path::Class qw( tempdir );
 use Stepford::Runner;
 use Time::HiRes 1.9726 qw( stat time );
-use Graph::Easy 0.76;
 
 use Test::Differences;
 use Test::Fatal;
@@ -39,11 +38,13 @@ my $tempdir = tempdir( CLEANUP => 1 );
         logger          => $logger,
     );
 
-    my $plan_graph
-        = Graph::Easy->new(
-              '[Test1::Step::CombineFiles] -> [Test1::Step::UpdateFiles]'
-            . '[Test1::Step::UpdateFiles]  -> [Test1::Step::CreateA1]'
-            . '[Test1::Step::UpdateFiles]  -> [Test1::Step::CreateA2]' );
+    my $plan_graph = <<'EOF';
+[ Stepford::FinalStep ] --> [ Test1::Step::CombineFiles ]
+[ Test1::Step::CombineFiles ] --> [ Test1::Step::UpdateFiles ]
+[ Test1::Step::UpdateFiles ] --> [ Test1::Step::CreateA1 ]
+[ Test1::Step::UpdateFiles ] --> [ Test1::Step::CreateA2 ]
+EOF
+
     _test_plan(
         $runner,
         'Test1::Step',
@@ -74,7 +75,7 @@ my $tempdir = tempdir( CLEANUP => 1 );
 
     is(
         $graph_message->{message},
-        "Graph for Test1::Step::CombineFiles:\n" . $plan_graph->as_txt,
+        "Graph for Test1::Step::CombineFiles:\n" . $plan_graph,
         'logged plan when ->run was called'
     );
 
@@ -238,16 +239,19 @@ my $tempdir = tempdir( CLEANUP => 1 );
         step_namespaces => 'Test2::Step',
     );
 
+    my $plan_graph = <<'EOF';
+[ Stepford::FinalStep ] --> [ Test2::Step::D ]
+[ Test2::Step::D ] --> [ Test2::Step::B ]
+[ Test2::Step::D ] --> [ Test2::Step::C ]
+[ Test2::Step::B ] --> [ Test2::Step::A ]
+[ Test2::Step::C ] --> [ Test2::Step::B ]
+EOF
+
     _test_plan(
         $runner,
         'Test2::Step',
         'D',
-        Graph::Easy->new(
-                  '[Test2::Step::D] -> [Test2::Step::B]'
-                . '[Test2::Step::D] -> [Test2::Step::C]'
-                . '[Test2::Step::B] -> [Test2::Step::A]'
-                . '[Test2::Step::C] -> [Test2::Step::B]'
-        ),
+        $plan_graph,
         'repeated steps correctly show up in plan'
     );
 }
@@ -619,19 +623,23 @@ my $tempdir = tempdir( CLEANUP => 1 );
         step_namespaces => 'Test8::Step',
     );
 
+    my $plan_graph = <<'EOF';
+[ Stepford::FinalStep ] --> [ Test8::Step::Final1 ]
+[ Stepford::FinalStep ] --> [ Test8::Step::Final2 ]
+[ Test8::Step::Final1 ] --> [ Test8::Step::ForFinal1::A ]
+[ Test8::Step::Final2 ] --> [ Test8::Step::ForFinal2::B ]
+[ Test8::Step::ForFinal1::A ] --> [ Test8::Step::Shared ]
+[ Test8::Step::ForFinal2::B ] --> [ Test8::Step::ForFinal2::A ]
+[ Test8::Step::Shared ] --> [ Test8::Step::ForShared::A ]
+[ Test8::Step::Shared ] --> [ Test8::Step::ForShared::B ]
+[ Test8::Step::ForFinal2::A ] --> [ Test8::Step::Shared ]
+EOF
+
     _test_plan(
         $runner,
         'Test8::Step',
         [ 'Final1', 'Final2' ],
-        Graph::Easy->new(
-                  '[Test8::Step::Final1]       -> [Test8::Step::ForFinal1::A]'
-                . '[Test8::Step::Final2]       -> [Test8::Step::ForFinal2::B]'
-                . '[Test8::Step::ForFinal1::A] -> [Test8::Step::Shared]'
-                . '[Test8::Step::ForFinal2::B] -> [Test8::Step::ForFinal2::A]'
-                . '[Test8::Step::ForFinal2::A] -> [Test8::Step::Shared]'
-                . '[Test8::Step::Shared]       -> [Test8::Step::ForShared::A]'
-                . '[Test8::Step::Shared]       -> [Test8::Step::ForShared::B]'
-        ),
+        $plan_graph,
         'runner comes up with an optimized plan for multiple final steps'
     );
 }
@@ -685,7 +693,7 @@ sub _test_plan {
 
     eq_or_diff(
         $got_str,
-        $expect->as_txt,
+        $expect,
         $desc
     );
 }

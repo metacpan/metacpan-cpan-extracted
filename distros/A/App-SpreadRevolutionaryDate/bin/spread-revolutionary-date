@@ -8,8 +8,7 @@
 #
 #   The GNU General Public License, Version 3, June 2007
 #
-use strict;
-use warnings;
+use 5.014;
 use utf8;
 
 BEGIN {
@@ -35,7 +34,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 DESCRIPTION
 
@@ -52,28 +51,38 @@ The revolutionary date and time is computed thanks to the L<DateTime::Calendar::
 =head1 USAGE
 
   # Just execute the script in your shell
-  # to spread current date to configured accounts on Twitter, Mastodon and Freenode:
+  # to spread current date to configured accounts
+  # on Twitter, Mastodon and Freenode:
   $ spread-revolutionary-date
 
-  # Or, since this script do nothing but calling the L<App::SpreadRevolutionaryDate> Perl module,
+  # Or, since this script does nothing but calling
+  # the L<App::SpreadRevolutionaryDate> Perl module,
   # use this one-liner:
-  $ perl -MApp::SpreadRevolutionaryDate -e 'App::SpreadRevolutionaryDate->new->spread;'
+  $ perl -MApp::SpreadRevolutionaryDate \
+      -e 'App::SpreadRevolutionaryDate->new->spread;'
 
   # Test spreading to Mastodon only:
-  $ spread-revolutionary-date --targets mastodon --test
+  $ spread-revolutionary-date \
+      --targets mastodon --test
 
   # Test spreading to Twitter only in English:
-  $ spread-revolutionary-date --targets twitter --test --locale en
+  $ spread-revolutionary-date \
+      --targets twitter \
+      --test \
+      --locale en
 
-  # Spread acab time to Twitter and Freenode explicit channels
-  $ spread-revolutionary-date --targets twitter \
+  # Spread acab time to Twitter and Freenode
+  # explicit channels
+  $ spread-revolutionary-date \
+      --targets twitter \
       --targets freenode \
       --freenode_channels '#revolution' \
       --freenode_channels '#acab' \
       --revolutionarydate_acab
 
   # Prompt user for a message to spread to mastodon
-  $ spread-revolutionary-date --targets mastodon \
+  $ spread-revolutionary-date \
+      --targets mastodon \
       --msgwriter UserPrompt
 
 =head1 CONFIGURATION
@@ -98,7 +107,7 @@ This option can only be specified once, with a value as string. Spread a message
 
 =head3 locale
 
-This option can only be specified once, with a value as string. Spread with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'> or C<'it'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'> or C<'de'>. Defaults to C<'fr'>. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
+This option can only be specified once, with a value as string. Spread with chosen language. As of L<App::SpreadRevolutionaryDate> 0.11 locale is limited to C<'fr'>, C<'en'>, C<'it'> or C<'es'> for C<RevolutionaryDate> and C<'fr'>, C<'en'>, C<'it'>, C<'es'> or C<'de'>. Defaults to C<'fr'>. To add more languages see L</INTERNATIONALIZATION AND LOCALIZATION>.
 
 =head3 test
 
@@ -226,7 +235,7 @@ Same as L</targets> configuration option above.
 
 Same as L</msgmaker> configuration option above.
 
-=head3 --locale | -l <fr|en|it>
+=head3 --locale | -l <fr|en|it|es>
 
 Same as L</locale> configuration option above.
 

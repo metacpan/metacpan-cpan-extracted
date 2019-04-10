@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-03-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-04-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -10,8 +10,10 @@ use File::Which;
 use Getopt::Long;
 
 my %Opts = (
-    retry_times => -1,
-    retry_delay => 30,
+    retry_times  => -1,
+    retry_delay  => 30,
+    retry_on     => [split /,/, "10,11,12,22,23,24,30,35"],
+    retry_on_all => 0,
 );
 
 Getopt::Long::Configure(
@@ -25,8 +27,11 @@ Options:
   --help, -h, -?   Show this message and exit.
   --version        Show program version and exit.
   --retry-times=i  Number of times to retry (0=no retry, -1=unlimited).
-                   Default: -1.
+                     Default: -1.
   --retry-delay=i  Number of seconds to wait before retrying. Default: 30.
+  --retry-on=s     Comma-separated list of rsync exit codes to trigger
+                     retry. Default: 10,11,12,22,23,24,30,35.
+  --retry-on-all   Retry on all non-zero exit codes.
 
 All the other options will be passed to rsync.
 
@@ -40,8 +45,12 @@ _
             ($main::DATE ? " ($main::DATE)" : ""), "\n";
         exit 0;
     },
-    'retry-times=i' => \$Opts{retry_times},
-    'retry-delay=i' => \$Opts{retry_delay},
+    'retry-times=i'  => \$Opts{retry_times},
+    'retry-delay=i'  => \$Opts{retry_delay},
+    'retry-on=s'     => sub {
+        $Opts{retry_on} = [split /\s*,\s*/, $_[1]];
+    },
+    'retry-on-all|a' => \$Opts{retry_on_all},
 );
 
 my $rsync_cmd = $ENV{RSYNC_RETRY_RSYNC_CMD} ||
@@ -52,17 +61,21 @@ while (1) {
     system {$rsync_cmd} $rsync_cmd, @ARGV;
     last unless $?;
     my $exit_code = $? >> 8;
-    if ($exit_code =~ /\A(10|11|12|22|23|24|30|35)\z/) {
+    my $needs_retry = $Opts{retry_on_all} && $exit_code ||
+        grep { $exit_code == $_ } @{ $Opts{retry_on} };
+    if ($needs_retry) {
         $retries++;
         if ($Opts{retry_times} == -1 || $retries <= $Opts{retry_times}) {
-            warn "rsync-retry: $rsync_cmd exit-code is $exit_code, retrying ($retries) after $Opts{retry_delay} second(s) ...\n";
+            warn "rsync-retry: $rsync_cmd exit code is $exit_code, retrying ($retries) after $Opts{retry_delay} second(s) ...\n";
             sleep $Opts{retry_delay};
             next;
         } else {
-            warn "rsync-retry: $rsync_cmd exit-code is $exit_code, won't retry anymore, exiting\n";
+            warn "rsync-retry: $rsync_cmd exit code is $exit_code, won't retry anymore, exiting\n";
             exit $exit_code;
         }
     } else {
+        warn "rsync-retry: $rsync_cmd exits with non-zero code ($exit_code), not retrying\n"
+            if $exit_code;
         exit $exit_code;
     }
 }
@@ -82,7 +95,7 @@ rsync-retry - Rsync wrapper to retry on transfer errors
 
 =head1 VERSION
 
-This document describes version 0.002 of rsync-retry (from Perl distribution App-rsync-retry), released on 2019-03-27.
+This document describes version 0.003 of rsync-retry (from Perl distribution App-rsync-retry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
@@ -92,7 +105,7 @@ Use like you would use B<rsync>:
 
 =head1 DESCRIPTION
 
-This wrapper runs B<rsync> then check its exit code. If exit code indicates
+This wrapper runs B<rsync> then checks its exit code. If exit code indicates
 transfer errors (e.g. I/O error, socket error, partial transfers, timeout) it
 will re-run the rsync. The number of retries to perform is set by the
 L</"--retry-times"> option, while the number of seconds to wait before each
@@ -106,13 +119,22 @@ Shortcuts: -h, -?.
 
 =head2 --version
 
-=head2 --retry-times
+=head2 --retry-times=i
 
 Default: -1 (unlimited).
 
-=head2 --retry-delay
+=head2 --retry-delay=i
 
 In seconds. Default: 30.
+
+=head2 --retry-on=s
+
+Specify comma-separated list of exit codes to trigger retry. Default:
+10,11,12,22,23,24,30,35.
+
+=head2 --retry-on-all
+
+Specify that rsync-retry should retry on all non-zero exit codes.
 
 =head1 ENVIRONMENT
 

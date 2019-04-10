@@ -1,0 +1,16 @@
+Changes
+lib/SQL/Abstract/Prefetch.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-report-prereqs.t
+t/basic.t
+t/schema/mysql.sql
+t/schema/pg.sql
+t/schema/sqlite.sql
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

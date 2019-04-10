@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has food_establishment => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::CookAction - The act of producing/preparing food.
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -77,9 +77,9 @@ A food_establishment should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::FoodEstablishment']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=item C<InstanceOf['SemanticWeb::Schema::FoodEstablishment']>
 
 =back
 

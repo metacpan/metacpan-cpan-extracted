@@ -3,7 +3,10 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A pharmacy or drugstore.",
       "rdfs:label" : "Pharmacy",
-      "rdfs:subClassOf" : "schema:MedicalOrganization"
+      "rdfs:subClassOf" : [
+         "schema:MedicalOrganization",
+         "schema:MedicalBusiness"
+      ]
    },
    "properties" : {}
 }

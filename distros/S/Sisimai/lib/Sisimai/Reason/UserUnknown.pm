@@ -13,7 +13,8 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $regex = qr{(?>
+
+    state $regex = qr{(?>
          .+[ ]user[ ]unknown
         |[#]5[.]1[.]1[ ]bad[ ]address
         |[<].+[>][ ]not[ ]found
@@ -75,6 +76,7 @@ sub match {
             |email[ ]addresses
             )
         |rcpt[ ][<].+[>][ ]does[ ]not[ ]exist
+        |recipient[ ]address[ ]rejected[.][ ][(]in[ ]reply[ ]to[ ]rcpt[ ]to[ ]command[)]
         |rece?ipient[ ](?:
              .+[ ]was[ ]not[ ]found[ ]in
             |address[ ]rejected:[ ](?:
@@ -122,14 +124,13 @@ sub match {
             |.+[ ]does[ ]not[ ]exist
             |does[ ]not[ ]exist
             |missing[ ]home[ ]directory
-            |not[ ](?:active|found|known)
+            |not[ ](?:active|exist|found|known)
             |unknown
             )
         |vdeliver:[ ]invalid[ ]or[ ]unknown[ ]virtual[ ]user
         |your[ ]envelope[ ]recipient[ ]is[ ]in[ ]my[ ]badrcptto[ ]list
         )
     }x;
-
     return 1 if $argv1 =~ $regex;
     return 0;
 }
@@ -145,23 +146,22 @@ sub true {
     my $argvs = shift // return undef;
     return 1 if $argvs->reason eq 'userunknown';
 
-    my $diagnostic = lc $argvs->diagnosticcode;
-    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus);
+    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus) || '';
     return 0 if $tempreason eq 'suspend';
 
+    my $diagnostic = lc $argvs->diagnosticcode;
     if( $tempreason eq 'userunknown' ) {
         # *.1.1 = 'Bad destination mailbox address'
         #   Status: 5.1.1
         #   Diagnostic-Code: SMTP; 550 5.1.1 <***@example.jp>:
         #     Recipient address rejected: User unknown in local recipient table
-        my $prematches = [qw|NoRelaying Blocked MailboxFull HasMoved Blocked Rejected|];
+        state $prematches = [qw|NoRelaying Blocked MailboxFull HasMoved Blocked Rejected|];
         my $matchother = 0;
-        my $modulepath = '';
 
         for my $e ( @$prematches ) {
             # Check the value of "Diagnostic-Code" with other error patterns.
             my $p = 'Sisimai::Reason::'.$e;
-            ($modulepath = $p) =~ s|::|/|g; 
+            (my $modulepath = $p) =~ s|::|/|g; 
             require $modulepath.'.pm';
 
             next unless $p->match($diagnostic);
@@ -169,7 +169,7 @@ sub true {
             $matchother = 1;
             last;
         }
-        return 1 if not $matchother;    # Did not match with other message patterns
+        return 1 unless $matchother;    # Did not match with other message patterns
 
     } elsif( $argvs->smtpcommand eq 'RCPT' ) {
         # When the SMTP command is not "RCPT", the session rejected by other
@@ -234,7 +234,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

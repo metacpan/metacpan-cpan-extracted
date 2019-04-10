@@ -18,8 +18,8 @@
          "rdfs:comment" : "The organization issuing the ticket or permit.",
          "rdfs:label" : "issuedBy",
          "schema:domainIncludes" : [
-            "schema:Permit",
-            "schema:Ticket"
+            "schema:Ticket",
+            "schema:Permit"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -31,7 +31,8 @@
             "schema:Reservation",
             "schema:Offer",
             "schema:Ticket",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:TradeAction"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -68,9 +69,9 @@
             "schema:Ticket"
          ],
          "schema:rangeIncludes" : [
+            "schema:PriceSpecification",
             "schema:Number",
-            "schema:Text",
-            "schema:PriceSpecification"
+            "schema:Text"
          ]
       },
       "schema:underName" : {
@@ -78,8 +79,8 @@
          "rdfs:comment" : "The person or organization the reservation or ticket is for.",
          "rdfs:label" : "underName",
          "schema:domainIncludes" : [
-            "schema:Ticket",
-            "schema:Reservation"
+            "schema:Reservation",
+            "schema:Ticket"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

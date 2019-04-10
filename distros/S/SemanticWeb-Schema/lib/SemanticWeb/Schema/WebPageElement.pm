@@ -15,7 +15,23 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
+
+
+has css_selector => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'cssSelector',
+);
+
+
+
+has xpath => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'xpath',
+);
+
 
 
 
@@ -34,11 +50,49 @@ SemanticWeb::Schema::WebPageElement - A web page element
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
 A web page element, like a table or an image.
+
+=head1 ATTRIBUTES
+
+=head2 C<css_selector>
+
+C<cssSelector>
+
+=for html A CSS selector, e.g. of a <a class="localLink"
+href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
+or <a class="localLink"
+href="http://schema.org/WebPageElement">WebPageElement</a>. In the latter
+case, multiple matches within a page can constitute a single conceptual
+"Web page element".
+
+A css_selector should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::CssSelectorType']>
+
+=back
+
+=head2 C<xpath>
+
+=for html An XPath, e.g. of a <a class="localLink"
+href="http://schema.org/SpeakableSpecification">SpeakableSpecification</a>
+or <a class="localLink"
+href="http://schema.org/WebPageElement">WebPageElement</a>. In the latter
+case, multiple matches within a page can constitute a single conceptual
+"Web page element".
+
+A xpath should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::XPathType']>
+
+=back
 
 =head1 SEE ALSO
 

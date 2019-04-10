@@ -7,14 +7,17 @@
    },
    "properties" : {
       "schema:about" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1670",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The subject matter of the content.",
          "rdfs:label" : "about",
+         "schema:category" : "issue-1670",
          "schema:domainIncludes" : [
-            "schema:CommunicateAction",
+            "schema:CreativeWork",
             "schema:Event",
-            "schema:CreativeWork"
+            "schema:CommunicateAction"
          ],
+         "schema:inverseOf" : "schema:subjectOf",
          "schema:rangeIncludes" : "schema:Thing"
       },
       "schema:inLanguage" : {
@@ -22,14 +25,15 @@
          "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
          "rdfs:label" : "inLanguage",
          "schema:domainIncludes" : [
-            "schema:CommunicateAction",
             "schema:CreativeWork",
-            "schema:Event",
-            "schema:WriteAction"
+            "schema:LinkRole",
+            "schema:WriteAction",
+            "schema:CommunicateAction",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
+            "schema:Language",
+            "schema:Text"
          ]
       },
       "schema:language" : {
@@ -38,8 +42,8 @@
          "rdfs:label" : "language",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
-            "schema:WriteAction",
-            "schema:CommunicateAction"
+            "schema:CommunicateAction",
+            "schema:WriteAction"
          ],
          "schema:rangeIncludes" : "schema:Language",
          "schema:supersededBy" : "schema:inLanguage"
@@ -50,19 +54,19 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:AuthorizeAction",
+            "schema:SendAction",
+            "schema:CommunicateAction",
             "schema:PayAction",
             "schema:TipAction",
-            "schema:CommunicateAction",
-            "schema:SendAction",
             "schema:DonateAction",
             "schema:ReturnAction",
             "schema:Message",
-            "schema:AuthorizeAction",
             "schema:GiveAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:Audience",
             "schema:ContactPoint",
+            "schema:Audience",
             "schema:Organization",
             "schema:Person"
          ]

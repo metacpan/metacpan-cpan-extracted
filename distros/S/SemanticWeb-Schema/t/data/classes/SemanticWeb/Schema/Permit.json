@@ -11,8 +11,8 @@
          "rdfs:comment" : "The organization issuing the ticket or permit.",
          "rdfs:label" : "issuedBy",
          "schema:domainIncludes" : [
-            "schema:Permit",
-            "schema:Ticket"
+            "schema:Ticket",
+            "schema:Permit"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -31,33 +31,43 @@
          "schema:rangeIncludes" : "schema:Audience"
       },
       "schema:validFor" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1779",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The time validity of the permit.",
+         "rdfs:comment" : "The duration of validity of a permit or similar thing.",
          "rdfs:label" : "validFor",
-         "schema:domainIncludes" : "schema:Permit",
+         "schema:category" : "issue-1779",
+         "schema:domainIncludes" : [
+            "schema:EducationalOccupationalCredential",
+            "schema:Permit"
+         ],
          "schema:rangeIncludes" : "schema:Duration"
       },
       "schema:validFrom" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:MonetaryAmount",
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification",
-            "schema:OpeningHoursSpecification",
+            "schema:MonetaryAmount",
             "schema:Demand",
-            "schema:Permit"
+            "schema:PriceSpecification",
+            "schema:Permit",
+            "schema:Offer",
+            "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
       "schema:validIn" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1779",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The geographic area where the permit is valid.",
+         "rdfs:comment" : "The geographic area where a permit or similar thing is valid.",
          "rdfs:label" : "validIn",
-         "schema:domainIncludes" : "schema:Permit",
+         "schema:category" : "issue-1779",
+         "schema:domainIncludes" : [
+            "schema:EducationalOccupationalCredential",
+            "schema:Permit"
+         ],
          "schema:rangeIncludes" : "schema:AdministrativeArea"
       },
       "schema:validUntil" : {

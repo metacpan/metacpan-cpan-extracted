@@ -6,7 +6,7 @@ package SemanticWeb::Schema::Campground;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CivicStructure SemanticWeb::Schema::LodgingBusiness /;
+extends qw/ SemanticWeb::Schema::LodgingBusiness SemanticWeb::Schema::CivicStructure /;
 
 
 use MooX::JSON_LD 'Campground';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::Campground - A camping site
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ marking up hotels and other forms of accommodations</a>.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::LodgingBusiness>
+L<SemanticWeb::Schema::CivicStructure>
 
 =head1 AUTHOR
 

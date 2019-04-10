@@ -14,11 +14,11 @@
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeason",
             "schema:CreativeWorkSeries",
+            "schema:Role",
             "schema:DatedMoneySpecification",
             "schema:Event",
-            "schema:Role"
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
@@ -26,7 +26,7 @@
          ]
       },
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources2:source_bibex",
+         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
@@ -34,9 +34,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:Blog",
+            "schema:WebSite",
             "schema:Dataset",
-            "schema:CreativeWorkSeries",
-            "schema:WebSite"
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -46,14 +46,14 @@
          "rdfs:label" : "startDate",
          "schema:domainIncludes" : [
             "schema:CreativeWorkSeason",
-            "schema:Role",
             "schema:Event",
             "schema:DatedMoneySpecification",
+            "schema:Role",
             "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
          ]
       }
    }

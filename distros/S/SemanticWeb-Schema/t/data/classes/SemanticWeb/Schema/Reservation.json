@@ -12,8 +12,8 @@
          "rdfs:label" : "bookingAgent",
          "schema:domainIncludes" : "schema:Reservation",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ],
          "schema:supersededBy" : "schema:broker"
       },
@@ -29,14 +29,14 @@
          "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Reservation",
             "schema:Service",
-            "schema:Order"
+            "schema:Order",
+            "schema:Reservation",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:modifiedTime" : {
@@ -54,7 +54,8 @@
             "schema:Reservation",
             "schema:Offer",
             "schema:Ticket",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:TradeAction"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -70,16 +71,16 @@
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
          "schema:domainIncludes" : [
-            "schema:Service",
-            "schema:Trip",
-            "schema:ParcelDelivery",
-            "schema:CreativeWork",
             "schema:Invoice",
-            "schema:Reservation"
+            "schema:Trip",
+            "schema:Reservation",
+            "schema:Service",
+            "schema:ParcelDelivery",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:Person"
          ]
       },
       "schema:reservationFor" : {
@@ -119,9 +120,9 @@
             "schema:Ticket"
          ],
          "schema:rangeIncludes" : [
+            "schema:PriceSpecification",
             "schema:Number",
-            "schema:Text",
-            "schema:PriceSpecification"
+            "schema:Text"
          ]
       },
       "schema:underName" : {
@@ -129,8 +130,8 @@
          "rdfs:comment" : "The person or organization the reservation or ticket is for.",
          "rdfs:label" : "underName",
          "schema:domainIncludes" : [
-            "schema:Ticket",
-            "schema:Reservation"
+            "schema:Reservation",
+            "schema:Ticket"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

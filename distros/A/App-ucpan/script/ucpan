@@ -123,7 +123,7 @@ sub process_options {
         unless Getopt::Long::GetOptions(
         'v|version' => sub {
             use version;
-            our $VERSION = version->declare('1.08');
+            our $VERSION = version->declare('1.11');
             print __PACKAGE__->VERSION, $/;
             exit;
         },

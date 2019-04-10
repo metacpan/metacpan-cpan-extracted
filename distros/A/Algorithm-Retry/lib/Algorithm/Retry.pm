@@ -1,7 +1,7 @@
 package Algorithm::Retry;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -10,6 +10,25 @@ use warnings;
 use Time::HiRes qw(time);
 
 our %SPEC;
+
+our %attr_consider_actual_delay = (
+    consider_actual_delay => {
+        summary => 'Whether to consider actual delay',
+        schema => ['bool*'],
+        default => 0,
+        description => <<'_',
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+_
+    },
+);
 
 our %attr_max_attempts = (
     max_attempts => {
@@ -40,14 +59,6 @@ random number between original_delay * (1-jitter_factor) and original_delay *
 herd" problem.
 
 _
-    },
-);
-
-our %attr_delay_on_failure = (
-    delay_on_failure => {
-        summary => 'Number of seconds to wait after a failure',
-        schema => 'ufloat*',
-        req => 1,
     },
 );
 
@@ -104,42 +115,60 @@ sub new {
 
 sub _success_or_failure {
     my ($self, $is_success, $timestamp) = @_;
-    $timestamp //= time();
+
     $self->{_last_timestamp} //= $timestamp;
     $timestamp >= $self->{_last_timestamp} or
         die ref($self).": Decreasing timestamp ".
         "($self->{_last_timestamp} -> $timestamp)";
-    my $res = $is_success ?
+    my $delay = $is_success ?
         $self->_success($timestamp) : $self->_failure($timestamp);
-    $res = $self->{max_delay}
-        if defined $self->{max_delay} && $res > $self->{max_delay};
-    $res;
+    $delay = $self->{max_delay}
+        if defined $self->{max_delay} && $delay > $self->{max_delay};
+    $delay;
+}
+
+sub _consider_actual_delay {
+    my ($self, $delay, $timestamp) = @_;
+
+    $self->{_last_delay} //= 0;
+    my $actual_delay = $timestamp - $self->{_last_timestamp};
+    my $new_delay = $delay + $self->{_last_delay} - $actual_delay;
+    $self->{_last_delay} = $new_delay;
+    $new_delay;
 }
 
 sub success {
     my ($self, $timestamp) = @_;
 
+    $timestamp //= time();
+
     $self->{_attempts} = 0;
 
-    my $res0 = $self->_success_or_failure(1, $timestamp);
-    $res0 -= ($timestamp - $self->{_last_timestamp});
+    my $delay = $self->_success_or_failure(1, $timestamp);
+    $delay = $self->_consider_actual_delay($delay, $timestamp)
+        if $self->{consider_actual_delay};
     $self->{_last_timestamp} = $timestamp;
-    return 0 if $res0 < 0;
-    $self->_add_jitter($res0);
+    return 0 if $delay < 0;
+
+    $self->_add_jitter($delay);
 }
 
 sub failure {
     my ($self, $timestamp) = @_;
 
+    $timestamp //= time();
+
     $self->{_attempts}++;
     return -1 if $self->{max_attempts} &&
         $self->{_attempts} >= $self->{max_attempts};
 
-    my $res0 = $self->_success_or_failure(0, $timestamp);
-    $res0 -= ($timestamp - $self->{_last_timestamp});
+    my $delay = $self->_success_or_failure(0, $timestamp);
+    $delay = $self->_consider_actual_delay($delay, $timestamp)
+        if $self->{consider_actual_delay};
     $self->{_last_timestamp} = $timestamp;
-    return 0 if $res0 < 0;
-    $self->_add_jitter($res0);
+    return 0 if $delay < 0;
+
+    $self->_add_jitter($delay);
 }
 
 sub _add_jitter {
@@ -165,7 +194,7 @@ Algorithm::Retry - Various retry/backoff strategies
 
 =head1 VERSION
 
-This document describes version 0.001 of Algorithm::Retry (from Perl distribution Algorithm-Retry), released on 2019-04-08.
+This document describes version 0.002 of Algorithm::Retry (from Perl distribution Algorithm-Retry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
@@ -173,16 +202,16 @@ This document describes version 0.001 of Algorithm::Retry (from Perl distributio
 
  use Algorithm::Retry::Constant;
  my $ar = Algorithm::Retry::Constant->new(
-     delay_on_failure  => 2, # required
+     delay             => 2, # required
      #delay_on_success => 0, # optional, default 0
  );
 
  # 2. log success/failure and get a new number of seconds to delay, timestamp is
  # optional but must be monotonically increasing.
 
- my $secs = $ar->failure(1554652553); # => 2
- my $secs = $ar->success();           # => 0
- my $secs = $ar->failure();           # => 2
+ my $secs = $ar->failure(); # => 2
+ my $secs = $ar->success(); # => 0
+ my $secs = $ar->failure(); # => 2
 
 =head1 DESCRIPTION
 

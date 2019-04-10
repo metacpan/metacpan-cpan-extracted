@@ -216,25 +216,25 @@ sub fixup_tex_encoding {
 	if (@dialetters) {
 		$regexp .= join '', '(',
 			join('|', map { "\Q$_"; } @dialetters),
-				")([ \\t]+[a-zA-Z]|[ \\t]*(\\\\[ij]([ \\t]+(\{\})?|[ \\t]*(\$|\{\}))|{([a-zA-Z]|\\\\[ij][ \\t]*(\{\})?)}))";
+				")([ \\t]+[a-zA-Z]|[ \\t]*(\\\\[ij]([ \\t]+(\\{\\})?|[ \\t]*(\$|\\{\\}))|\\{([a-zA-Z]|\\\\[ij][ \\t]*(\\{\\})?)\\}))";
 	}
 	if (@dianonletters) {
 		$regexp .= '|' if $regexp ne '';
 		$regexp .= '(' . join '',
 			join('|', map { "\Q$_"; } @dianonletters),
-				")[ \\t]*([a-zA-Z]|\\\\[ij]([ \\t]+(\{\})?|[ \\t]*(\$|\{\}))|{([a-zA-Z]|\\\\[ij][ \\t]*(\{\})?)})";
+				")[ \\t]*([a-zA-Z]|\\\\[ij]([ \\t]+(\\{\\})?|[ \\t]*(\$|\\{\\}))|\\{([a-zA-Z]|\\\\[ij][ \\t]*(\\{\\})?)\\})";
 	}
 	if (@nondialetters) {
 		$regexp .= '|' if $regexp ne '';
 		$regexp .= '(' . join '',
 			join('|', map { "\Q$_"; } @nondialetters),
-				")([ \\t]+(\{\})?|[ \\t]*\$)"
+				")([ \\t]+(\\{\\})?|[ \\t]*\$)"
 	}
 	if (@nondianonletters) {
 		$regexp .= '|' if $regexp ne '';
 		$regexp .= '(' . join '',
 			join('|', map { "\Q$_"; } @nondianonletters),
-				")[ \\t]*(\{\})?"
+				")[ \\t]*(\\{\\})?"
 	}
 
 	$regexp_matches{'tex'} = $regexp;
@@ -467,7 +467,7 @@ sub new {
 
 	my $fn = eval $fntext;
 	do {	chomp $@;
-		die "Fatal error in Cz::Cstocs: please report this to adelton\@fi.muni.cz so\n that we could find out what happened. Thanks.\n$@, line ", __LINE__, "\n";
+		die "Fatal error in Cz::Cstocs: $@, line ", __LINE__, "\n";
 	} if $@;
 	bless $fn, $class;
 	
@@ -597,7 +597,7 @@ unknown encoding in the use call style (like C<use Cz::Cstocs
 
 =head1 AUTHOR
 
-Jan Pazdziora, adelton@fi.muni.cz, created the module version.
+Jan Pazdziora created the module version.
 
 Jan "Yenya" Kasprzak has done the original Un*x implementation.
 

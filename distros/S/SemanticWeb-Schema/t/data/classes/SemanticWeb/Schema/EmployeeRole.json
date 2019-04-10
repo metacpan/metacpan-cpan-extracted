@@ -11,12 +11,12 @@
          "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
          "rdfs:label" : "baseSalary",
          "schema:domainIncludes" : [
-            "schema:EmployeeRole",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:EmployeeRole"
          ],
          "schema:rangeIncludes" : [
-            "schema:Number",
             "schema:PriceSpecification",
+            "schema:Number",
             "schema:MonetaryAmount"
          ]
       },
@@ -25,8 +25,8 @@
          "rdfs:comment" : "The currency (coded using <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217</a> ) used for the main salary information in this job posting or for this employee.",
          "rdfs:label" : "salaryCurrency",
          "schema:domainIncludes" : [
-            "schema:EmployeeRole",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:EmployeeRole"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

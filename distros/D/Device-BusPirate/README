@@ -14,19 +14,18 @@ DESCRIPTION
 
     This module and its various component modules are based on Future,
     allowing either synchronous or asynchronous communication with the
-    attached hardware device. For simple synchronous situations, the class
-    may be used on its own, and any method that returns a Future instance
-    should immediately call the get method on that instance to wait for and
-    obtain the eventual result:
+    attached hardware device.
+
+    To use it synchronously, call the get method of any returned Future
+    instances to obtain the eventual result:
 
      my $spi = $pirate->enter_mode( "SPI" )->get;
     
      $spi->power( 1 )->get;
      my $input = $spi->writeread_cs( $output )->get;
 
-    A truely-asynchronous program would be built using a subclass that
-    overrides the basic read and sleep methods for some event loop or
-    similar; these can then be chained using the then method:
+    A truely-asynchronous program would use the futures more
+    conventionally, perhaps by using ->then chaining:
 
      my $input = $pirate->enter_mode( "SPI" )
        ->then( sub {
@@ -36,6 +35,10 @@ DESCRIPTION
              $spi->writeread_cs( $output );
           });
        });
+
+    This module uses Future::IO for its underlying IO operations, so using
+    it in a program would require the event system to integrate with
+    Future::IO appropriately.
 
 CONSTRUCTOR
 
@@ -138,10 +141,7 @@ TODO
 
       * More modes - UART, 1-wire, raw-wire
 
-      * Documentation/examples/actual implementations of truely-async
-      subclass.
-
-      * PWM, AUX frequency measurement and ADC support.
+      * AUX frequency measurement and ADC support.
 
 AUTHOR
 

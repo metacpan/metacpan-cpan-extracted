@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A medical test performed by a laboratory that typically involves examination of a tissue sample by a pathologist.",
+      "rdfs:label" : "PathologyTest",
+      "rdfs:subClassOf" : "schema:MedicalTest",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:tissueSample" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of tissue sample required for the test.",
+         "rdfs:label" : "tissueSample",
+         "schema:domainIncludes" : "schema:PathologyTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

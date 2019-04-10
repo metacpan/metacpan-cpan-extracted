@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.62'; # VERSION
+our $VERSION = '1.63'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -316,7 +316,7 @@ sub load_requires
     if($eval)
     {
       eval { $check->() };
-      die "Required $mod @{[ $ver || 'undef' ]}, missing";
+      die "Required $mod @{[ $ver || 'undef' ]}, missing" if $@;
     }
     else
     {
@@ -1151,7 +1151,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.62
+version 1.63
 
 =head1 SYNOPSIS
 

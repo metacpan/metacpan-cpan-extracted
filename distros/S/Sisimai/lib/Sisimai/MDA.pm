@@ -101,10 +101,9 @@ sub scan {
     my $agentname0 = '';    # [String] MDA name
     my $reasonname = '';    # [String] Error reason
     my $bouncemesg = '';    # [String] Error message
-    my @hasdivided = split("\n", $$mbody);
-    my @linebuffer = ();
+    my @linebuffer;
 
-    for my $e ( @hasdivided ) {
+    for my $e ( split("\n", $$mbody) ) {
         # Check each line with each MDA's symbol regular expression.
         if( $agentname0 eq '' ) {
             # Try to match with each regular expression
@@ -130,8 +129,7 @@ sub scan {
         # Detect an error reason from message patterns of the MDA.
         for my $f ( @linebuffer ) {
             # Whether the error message include each message defined in $MessagesOf
-            my $g = lc $f;
-            next unless grep { index($g, $_) > -1 } @{ $MessagesOf->{ $agentname0 }->{ $e } };
+            next unless grep { index(lc($f), $_) > -1 } @{ $MessagesOf->{ $agentname0 }->{ $e } };
             $reasonname = $e;
             $bouncemesg = $f;
             last;
@@ -190,7 +188,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018,2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

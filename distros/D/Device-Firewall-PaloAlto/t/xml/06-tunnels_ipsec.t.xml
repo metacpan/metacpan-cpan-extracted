@@ -1,0 +1,33 @@
+<response status="success"><result>
+  <ntun>2</ntun>
+  <entries>
+    <entry>
+      <kb>0</kb>
+      <life>2512</life>
+      <enc>A128</enc>
+      <remote>1.1.5.1               </remote>
+      <name>IPSEC_second_to_default</name>
+      <proto>ESP</proto>
+      <i_spi>3867966326</i_spi>
+      <gwid>2</gwid>
+      <o_spi>2701885222</o_spi>
+      <tid>2</tid>
+      <hash>SHA1</hash>
+      <gateway>default_vr</gateway>
+    </entry>
+    <entry>
+      <kb>0</kb>
+      <life>2512</life>
+      <enc>A128</enc>
+      <remote>1.1.5.2               </remote>
+      <name>IPSEC_default_to_second</name>
+      <proto>ESP</proto>
+      <i_spi>2701885222</i_spi>
+      <gwid>1</gwid>
+      <o_spi>3867966326</o_spi>
+      <tid>1</tid>
+      <hash>SHA1</hash>
+      <gateway>second_vr</gateway>
+    </entry>
+  </entries>
+</result></response>

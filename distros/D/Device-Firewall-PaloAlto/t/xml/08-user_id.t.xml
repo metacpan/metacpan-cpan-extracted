@@ -1,0 +1,7 @@
+<response status="success"><result><entry><ip>192.0.2.2</ip><vsys>vsys1</vsys><type>XMLAPI</type><user>localdomainser_b</user><idle_timeout>3568</idle_timeout><timeout>3568</timeout></entry>
+<entry><ip>192.0.2.4</ip><vsys>vsys1</vsys><type>XMLAPI</type><user>localdomainser_c</user><idle_timeout>3575</idle_timeout><timeout>3575</timeout></entry>
+<entry><ip>192.0.2.1</ip><vsys>vsys1</vsys><type>XMLAPI</type><user>localdomainser_a</user><idle_timeout>3563</idle_timeout><timeout>3563</timeout></entry>
+<entry><ip>192.0.2.5</ip><vsys>vsys1</vsys><type>XMLAPI</type><user>localdomainser_c</user><idle_timeout>3578</idle_timeout><timeout>3578</timeout></entry>
+<entry><ip>192.0.2.3</ip><vsys>vsys1</vsys><type>XMLAPI</type><user>localdomainser_c</user><idle_timeout>3572</idle_timeout><timeout>3572</timeout></entry>
+<count>5</count>
+</result></response>

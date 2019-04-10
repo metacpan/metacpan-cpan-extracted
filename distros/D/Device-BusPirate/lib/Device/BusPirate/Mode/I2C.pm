@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode::I2C;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 
@@ -48,13 +48,6 @@ into C<I2C> mode. It provides methods to configure the hardware, and interact
 with one or more I2C-attached chips.
 
 =cut
-
-my $EXPECT_ACK = sub {
-   my ( $buf ) = @_;
-   $buf eq "\x01" x length $buf or
-      return Future->fail( 1 );
-   return Future->done;
-};
 
 =head1 METHODS
 
@@ -110,7 +103,7 @@ sub configure
    my $bytes = "";
 
    if( defined $args{speed} ) {
-      my $speed = $SPEEDS{$args{speed}} or
+      defined( my $speed = $SPEEDS{$args{speed}} ) or
          croak "Unrecognised speed '$args{speed}'";
 
       $bytes .= chr( 0x60 | $speed );
@@ -141,9 +134,7 @@ sub start_bit
 
    print STDERR "PIRATE I2C START-BIT\n" if PIRATE_DEBUG;
 
-   $self->pirate->write( "\x02" );
-   $self->pirate->read( 1, "I2C start_bit" )->then( $EXPECT_ACK )
-      ->else_fail( "Expected ACK response to I2C start_bit" );
+   $self->pirate->write_expect_ack( "\x02", "I2C start_bit" );
 }
 
 =head2 stop_bit
@@ -160,9 +151,7 @@ sub stop_bit
 
    print STDERR "PIRATE I2C STOP-BIT\n" if PIRATE_DEBUG;
 
-   $self->pirate->write( "\x03" );
-   $self->pirate->read( 1, "I2C stop_bit" )->then( $EXPECT_ACK )
-      ->else_fail( "Expected ACK response to I2C stop_bit" );
+   $self->pirate->write_expect_ack( "\x03", "I2C stop_bit" );
 }
 
 =head2 write
@@ -188,14 +177,9 @@ sub write
 
       my $len_1 = length( $bytes ) - 1;
 
-      $self->pirate->write( chr( 0x10 | $len_1 ) . $bytes );
-
-      $self->pirate->read( 1, "I2C write await ACK" )->then( sub {
-         my ( $buf ) = @_;
-         $buf eq "\x01" or return Future->fail( "Expected ACK response during I2C write" );
-
-         $self->pirate->read( length $bytes, "I2C write data" )
-      })->then( sub {
+      $self->pirate->write_expect_acked_data(
+         chr( 0x10 | $len_1 ) . $bytes, length $bytes, "I2C bulk transfer"
+      )->then( sub {
          my ( $buf ) = @_;
          $buf =~ m/^\x00*/;
          $+[0] == length $bytes and return Future->done;
@@ -230,9 +214,7 @@ sub read
 
       $self->pirate->read( 1, "I2C read data" )->then( sub {
          $ret .= $_[0];
-         $self->pirate->write( $ack ? "\x06" : "\x07" );
-         $self->pirate->read( 1, "I2C read send ACK" )->then( $EXPECT_ACK )
-            ->else_fail( "Expected ACK response to I2C ack_bit" );
+         $self->pirate->write_expect_ack( $ack ? "\x06" : "\x07", "I2C read send ACK" );
       });
    } foreach => [ (1) x ($length-1), 0 ],
      while => sub { not shift->failure },

@@ -1,3 +1,12 @@
+0.006000 2019-04-09
+
+- Stepford no longer depends on Graph::Easy. The output of Stepford::Graph's
+  as_string method is now always a representation similar to Graph::Easy's
+  txt representation. The method no longer takes an output format.
+- The dry_run attribute on Stepford::Runner is now a boolean and no longer
+  takes a Graph::Easy output format.
+
+
 0.005000 2018-01-31
 
 - Stepford is not alpha. It is used for serious things. We removed the

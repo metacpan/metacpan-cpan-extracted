@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A vet's office.",
+      "rdfs:label" : "VeterinaryCare",
+      "rdfs:subClassOf" : "schema:MedicalOrganization",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

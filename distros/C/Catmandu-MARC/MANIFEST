@@ -53,6 +53,7 @@ lib/Catmandu/Importer/MARC/Record.pm
 lib/Catmandu/Importer/MARC/XML.pm
 lib/Catmandu/MARC.pm
 lib/Catmandu/MARC/Tutorial.pod
+lib/Catmandu/Validator/MARC.pm
 t/Catmandu/Exporter/MARC.t
 t/Catmandu/Exporter/MARC/ALEPHSEQ.t
 t/Catmandu/Exporter/MARC/Base.t
@@ -96,6 +97,7 @@ t/Catmandu/Importer/MARC/RAW.t
 t/Catmandu/Importer/MARC/Record.t
 t/Catmandu/Importer/MARC/XML.t
 t/Catmandu/MARC.t
+t/Catmandu/Validator/MARC.t
 t/author-pod-syntax.t
 t/broken.xml
 t/bu_bibs.mrc

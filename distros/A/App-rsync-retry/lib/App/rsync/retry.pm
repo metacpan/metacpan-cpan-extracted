@@ -1,7 +1,7 @@
 package App::rsync::retry;
 
-our $DATE = '2019-03-27'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-04-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Rsync wrapper to retry on transfer errrors
@@ -18,7 +18,7 @@ App::rsync::retry - Rsync wrapper to retry on transfer errrors
 
 =head1 VERSION
 
-This document describes version 0.002 of App::rsync::retry (from Perl distribution App-rsync-retry), released on 2019-03-27.
+This document describes version 0.003 of App::rsync::retry (from Perl distribution App-rsync-retry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 

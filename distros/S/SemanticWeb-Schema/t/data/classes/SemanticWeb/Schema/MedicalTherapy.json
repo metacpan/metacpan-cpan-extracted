@@ -1,0 +1,44 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any medical intervention designed to prevent, treat, and cure human diseases and medical conditions, including both curative and palliative therapies. Medical therapies are typically processes of care relying upon pharmacotherapy, behavioral therapy, supportive therapy (with fluid or nutrition for example), or detoxification (e.g. hemodialysis) aimed at improving or preventing a health condition.",
+      "rdfs:label" : "MedicalTherapy",
+      "rdfs:subClassOf" : "schema:TherapeuticProcedure",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:contraindication" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A contraindication for this therapy.",
+         "rdfs:label" : "contraindication",
+         "schema:domainIncludes" : [
+            "schema:MedicalDevice",
+            "schema:MedicalTherapy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalContraindication",
+            "schema:Text"
+         ]
+      },
+      "schema:duplicateTherapy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A therapy that duplicates or overlaps this one.",
+         "rdfs:label" : "duplicateTherapy",
+         "schema:domainIncludes" : "schema:MedicalTherapy",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalTherapy"
+      },
+      "schema:seriousAdverseOutcome" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A possible serious complication and/or serious side effect of this therapy. Serious adverse outcomes include those that are life-threatening; result in death, disability, or permanent damage; require hospitalization or prolong existing hospitalization; cause congenital anomalies or birth defects; or jeopardize the patient and may require medical or surgical intervention to prevent one of the outcomes in this definition.",
+         "rdfs:label" : "seriousAdverseOutcome",
+         "schema:domainIncludes" : [
+            "schema:MedicalDevice",
+            "schema:MedicalTherapy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalEntity"
+      }
+   }
+}

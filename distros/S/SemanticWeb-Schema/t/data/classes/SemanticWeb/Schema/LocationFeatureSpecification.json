@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:STI_Accommodation_Ontology",
+      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Specifies a location feature by providing a structured value representing a feature of an accommodation as a property-value pair of varying degrees of formality.",
       "rdfs:label" : "LocationFeatureSpecification",
@@ -12,41 +12,41 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
+            "schema:LocationFeatureSpecification",
             "schema:Service",
-            "schema:ContactPoint",
-            "schema:LocationFeatureSpecification"
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
       },
       "schema:validFrom" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date when the item becomes valid.",
          "rdfs:label" : "validFrom",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:MonetaryAmount",
             "schema:LocationFeatureSpecification",
-            "schema:PriceSpecification",
-            "schema:OpeningHoursSpecification",
+            "schema:MonetaryAmount",
             "schema:Demand",
-            "schema:Permit"
+            "schema:PriceSpecification",
+            "schema:Permit",
+            "schema:Offer",
+            "schema:OpeningHoursSpecification"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
       "schema:validThrough" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:PriceSpecification",
-            "schema:LocationFeatureSpecification",
-            "schema:MonetaryAmount",
             "schema:Offer",
+            "schema:OpeningHoursSpecification",
             "schema:JobPosting",
+            "schema:PriceSpecification",
             "schema:Demand",
-            "schema:OpeningHoursSpecification"
+            "schema:MonetaryAmount",
+            "schema:LocationFeatureSpecification"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       }

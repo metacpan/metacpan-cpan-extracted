@@ -1,0 +1,67 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A muscle is an anatomical structure consisting of a contractile form of tissue that animals use to effect movement.",
+      "rdfs:label" : "Muscle",
+      "rdfs:subClassOf" : "schema:AnatomicalStructure",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:action" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Obsolete term for <a class=\"localLink\" href=\"http://schema.org/muscleAction\">muscleAction</a>. Not to be confused with <a class=\"localLink\" href=\"http://schema.org/potentialAction\">potentialAction</a>.",
+         "rdfs:label" : "action",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:antagonist" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The muscle whose action counteracts the specified muscle.",
+         "rdfs:label" : "antagonist",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Muscle"
+      },
+      "schema:bloodSupply" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The blood vessel that carries blood from the heart to the muscle.",
+         "rdfs:label" : "bloodSupply",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Vessel"
+      },
+      "schema:insertion" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The place of attachment of a muscle, or what the muscle moves.",
+         "rdfs:label" : "insertion",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      },
+      "schema:muscleAction" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The movement the muscle generates.",
+         "rdfs:label" : "muscleAction",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:nerve" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The underlying innervation associated with the muscle.",
+         "rdfs:label" : "nerve",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Nerve"
+      },
+      "schema:origin" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The place or point where a muscle arises.",
+         "rdfs:label" : "origin",
+         "schema:domainIncludes" : "schema:Muscle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      }
+   }
+}

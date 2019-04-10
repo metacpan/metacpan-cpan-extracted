@@ -1,0 +1,38 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/105590001",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any matter of defined composition that has discrete existence, whose origin may be biological, mineral or chemical.",
+      "rdfs:label" : "Substance",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:activeIngredient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
+         "rdfs:label" : "activeIngredient",
+         "schema:domainIncludes" : [
+            "schema:DrugStrength",
+            "schema:Drug",
+            "schema:Substance",
+            "schema:DietarySupplement"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:maximumIntake" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
+         "rdfs:label" : "maximumIntake",
+         "schema:domainIncludes" : [
+            "schema:Substance",
+            "schema:DietarySupplement",
+            "schema:Drug",
+            "schema:DrugStrength"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MaximumDoseSchedule"
+      }
+   }
+}

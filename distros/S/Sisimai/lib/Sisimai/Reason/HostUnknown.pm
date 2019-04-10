@@ -13,7 +13,8 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $index = [
+
+    state $index = [
         'domain does not exist',
         'domain is not reachable',
         'domain must exist',
@@ -29,7 +30,6 @@ sub match {
         'unknown host',
         'unrouteable address',
     ];
-
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
@@ -48,7 +48,7 @@ sub true {
     my $statuscode = $argvs->deliverystatus // '';
     my $diagnostic = lc $argvs->diagnosticcode // '';
 
-    if( Sisimai::SMTP::Status->name($statuscode) eq 'hostunknown' ) {
+    if( (Sisimai::SMTP::Status->name($statuscode) || '') eq 'hostunknown' ) {
         # Status: 5.1.2
         # Diagnostic-Code: SMTP; 550 Host unknown
         require Sisimai::Reason::NetworkError;

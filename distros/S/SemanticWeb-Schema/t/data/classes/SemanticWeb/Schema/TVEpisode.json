@@ -11,10 +11,10 @@
          "rdfs:comment" : "The country of the principal offices of the production company or individual responsible for the movie or program.",
          "rdfs:label" : "countryOfOrigin",
          "schema:domainIncludes" : [
-            "schema:TVSeason",
             "schema:TVEpisode",
+            "schema:Movie",
             "schema:TVSeries",
-            "schema:Movie"
+            "schema:TVSeason"
          ],
          "schema:rangeIncludes" : "schema:Country"
       },
@@ -24,9 +24,9 @@
          "rdfs:label" : "partOfTVSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
+            "schema:TVSeason",
             "schema:TVClip",
-            "schema:TVEpisode",
-            "schema:TVSeason"
+            "schema:TVEpisode"
          ],
          "schema:rangeIncludes" : "schema:TVSeries",
          "schema:supersededBy" : "schema:partOfSeries"
@@ -36,9 +36,9 @@
          "rdfs:comment" : "Languages in which subtitles/captions are available, in <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard format</a>.",
          "rdfs:label" : "subtitleLanguage",
          "schema:domainIncludes" : [
+            "schema:Movie",
             "schema:ScreeningEvent",
-            "schema:TVEpisode",
-            "schema:Movie"
+            "schema:TVEpisode"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",

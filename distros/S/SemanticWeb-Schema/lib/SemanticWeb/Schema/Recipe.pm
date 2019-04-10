@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has cook_time => (
@@ -114,7 +114,7 @@ SemanticWeb::Schema::Recipe - A recipe
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -183,7 +183,7 @@ A nutrition should be one of the following types:
 
 C<recipeCategory>
 
-The category of the recipe—for example, appetizer, entree, etc.
+The category of the recipeâfor example, appetizer, entree, etc.
 
 A recipe_category should be one of the following types:
 
@@ -232,11 +232,11 @@ A recipe_instructions should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
-=item C<Str>
+=item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
 =back
 

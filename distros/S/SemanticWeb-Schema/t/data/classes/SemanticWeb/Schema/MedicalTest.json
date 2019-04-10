@@ -1,0 +1,54 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any medical test, typically performed for diagnostic purposes.",
+      "rdfs:label" : "MedicalTest",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:affectedBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Drugs that affect the test's results.",
+         "rdfs:label" : "affectedBy",
+         "schema:domainIncludes" : "schema:MedicalTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Drug"
+      },
+      "schema:normalRange" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Range of acceptable values for a typical patient, when applicable.",
+         "rdfs:label" : "normalRange",
+         "schema:domainIncludes" : "schema:MedicalTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:MedicalEnumeration"
+         ]
+      },
+      "schema:signDetected" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A sign detected by the test.",
+         "rdfs:label" : "signDetected",
+         "schema:domainIncludes" : "schema:MedicalTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalSign"
+      },
+      "schema:usedToDiagnose" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A condition the test is used to diagnose.",
+         "rdfs:label" : "usedToDiagnose",
+         "schema:domainIncludes" : "schema:MedicalTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      },
+      "schema:usesDevice" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Device used to perform the test.",
+         "rdfs:label" : "usesDevice",
+         "schema:domainIncludes" : "schema:MedicalTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalDevice"
+      }
+   }
+}

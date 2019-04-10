@@ -8,26 +8,23 @@ package Device::BusPirate;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 
 use Fcntl qw( O_NOCTTY O_NDELAY );
 use Future::Mutex;
-use Future::Utils qw( repeat );
-use IO::Termios 0.06;
+use Future::IO;
+use Future::Utils qw( repeat try_repeat );
+use IO::Termios 0.07; # cfmakeraw
 use Time::HiRes qw( time );
 
 use Module::Pluggable
    search_path => "Device::BusPirate::Mode",
+   except      => qr/^Device::BusPirate::Mode::_/,
    require     => 1,
    sub_name    => "modes";
 my %MODEMAP = map { $_->MODE => $_ } __PACKAGE__->modes;
-
-use Struct::Dumb qw( readonly_struct );
-
-readonly_struct Reader => [qw( length future )];
-readonly_struct Alarm  => [qw( time future )];
 
 use constant BUS_PIRATE => $ENV{BUS_PIRATE} || "/dev/ttyUSB0";
 use constant PIRATE_DEBUG => $ENV{PIRATE_DEBUG} // 0;
@@ -51,18 +48,18 @@ L<http://dangerousprototypes.com/docs/Bus_Pirate>
 
 This module and its various component modules are based on L<Future>, allowing
 either synchronous or asynchronous communication with the attached hardware
-device. For simple synchronous situations, the class may be used on its own,
-and any method that returns a C<Future> instance should immediately call the
-C<get> method on that instance to wait for and obtain the eventual result:
+device.
+
+To use it synchronously, call the C<get> method of any returned C<Future>
+instances to obtain the eventual result:
 
  my $spi = $pirate->enter_mode( "SPI" )->get;
 
  $spi->power( 1 )->get;
  my $input = $spi->writeread_cs( $output )->get;
 
-A truely-asynchronous program would be built using a subclass that overrides
-the basic C<read> and C<sleep> methods for some event loop or similar; these
-can then be chained using the C<then> method:
+A truely-asynchronous program would use the futures more conventionally,
+perhaps by using C<< ->then >> chaining:
 
  my $input = $pirate->enter_mode( "SPI" )
    ->then( sub {
@@ -72,6 +69,10 @@ can then be chained using the C<then> method:
          $spi->writeread_cs( $output );
       });
    });
+
+This module uses L<Future::IO> for its underlying IO operations, so using it
+in a program would require the event system to integrate with C<Future::IO>
+appropriately.
 
 =cut
 
@@ -108,22 +109,28 @@ sub new
    my $class = shift;
    my %args = @_;
 
-   my $serial = $args{serial} || BUS_PIRATE;
-   my $baud   = $args{baud} || 115200;
+   # undocumented 'fh 'argument for unit testing
+   my $fh = $args{fh} // do {
+      my $serial = $args{serial} || BUS_PIRATE;
+      my $baud   = $args{baud} || 115200;
 
-   my $fh = IO::Termios->open( $serial, "$baud,8,n,1", O_NOCTTY|O_NDELAY )
-      or croak "Cannot open serial port $serial - $!";
+      my $fh = IO::Termios->open( $serial, "$baud,8,n,1", O_NOCTTY|O_NDELAY )
+         or croak "Cannot open serial port $serial - $!";
 
-   $fh->setflag_clocal( 1 );
-   $fh->setflag_icanon( 0 );
-   $fh->setflag_echo( 0 );
+      for( $fh->getattr ) {
+         $_->cfmakeraw();
+         $_->setflag_clocal( 1 );
 
-   $fh->blocking( 0 );
+         $fh->setattr( $_ );
+      }
+
+      $fh->blocking( 0 );
+
+      $fh;
+   };
 
    return bless {
       fh => $fh,
-      alarms => [],
-      readers => [],
    }, $class;
 }
 
@@ -142,7 +149,30 @@ sub write
 
    printf STDERR "PIRATE >> %v02x\n", $buf if PIRATE_DEBUG > 1;
 
-   $self->{fh}->syswrite( $buf );
+   $self->_syswrite( $self->{fh}, $buf );
+}
+
+sub write_expect_ack
+{
+   my $self = shift;
+   my ( $out, $name, $timeout ) = @_;
+
+   return $self->write_expect_acked_data( $out, 0, $name, $timeout )
+      ->then_done();
+}
+
+sub write_expect_acked_data
+{
+   my $self = shift;
+   my ( $out, $readlen, $name, $timeout ) = @_;
+
+   $self->write( $out );
+   $self->read( 1 + $readlen, $name, $timeout )->then( sub {
+      my ( $buf ) = @_;
+      substr( $buf, 0, 1, "" ) eq "\x01" or
+         return Future->fail( "Expected ACK response to $name" );
+      return Future->done( $buf );
+   });
 }
 
 # For Modes
@@ -151,7 +181,17 @@ sub read
    my $self = shift;
    my ( $n, $name, $timeout ) = @_;
 
-   push @{ $self->{readers} }, Reader( $n, my $f = $self->_new_future );
+   return Future->done( "" ) unless $n;
+
+   my $buf = "";
+   my $f = ( repeat {
+      Future::IO->sysread( $self->{fh}, $n - length $buf )->on_done( sub {
+         $buf .= $_[0];
+      });
+   } while => sub { !$_[0]->failure and $n > length $buf } )->then( sub {
+      printf STDERR "PIRATE << %v02x\n", $buf if Device::BusPirate::PIRATE_DEBUG > 1;
+      Future->done( $buf );
+   });
 
    return $f unless defined $name;
 
@@ -159,6 +199,15 @@ sub read
       $f,
       $self->sleep( $timeout // 2 )->then_fail( "Timeout waiting for $name" ),
    );
+}
+
+# Makes unit-testing a little easier
+sub _syswrite
+{
+   shift;
+   my ( $fh, $bytes ) = @_;
+
+   $fh->syswrite( $bytes );
 }
 
 =head2 sleep
@@ -175,20 +224,7 @@ sub sleep
    my $self = shift;
    my ( $timeout ) = @_;
 
-   my $alarms = $self->{alarms};
-
-   my $until = time() + $timeout;
-
-   my $pos = 0;
-   $pos++ while $pos < @$alarms and $alarms->[$pos]->time < $until;
-
-   splice @$alarms, $pos, 0, my $alarm = Alarm( $until, my $f = $self->_new_future );
-
-   $f->on_cancel( sub {
-      $self->{alarms} = [ grep { $_ != $alarm } @{ $self->{alarms} } ];
-   });
-
-   return $f;
+   return Future::IO->sleep( $timeout );
 }
 
 =head2 enter_mutex
@@ -320,63 +356,6 @@ sub stop
    $self->write( "\0\x0f" );
 }
 
-# Future support
-sub _new_future
-{
-   my $self = shift;
-   return Device::BusPirate::_Future->new( $self );
-}
-
-package Device::BusPirate::_Future;
-use base qw( Future );
-use Carp;
-
-use Time::HiRes qw( time );
-
-sub new
-{
-   my $proto = shift;
-   my $self = $proto->SUPER::new;
-   $self->{bp} = ref $proto ? $proto->{bp} : shift;
-   return $self;
-}
-
-sub await
-{
-   my $bp = shift->{bp};
-
-   my $alarm  = $bp->{alarms}[0];
-   my $reader = $bp->{readers}[0];
-
-   my $fh = $bp->{fh};
-
-   croak "Cannot await with nothing to do" unless $alarm or $reader;
-
-   my $buf = '';
-
-   while(1) {
-      if( $reader and length $buf >= $reader->length ) {
-         printf STDERR "PIRATE << %v02x\n", $buf if Device::BusPirate::PIRATE_DEBUG > 1;
-         shift @{ $bp->{readers} };
-         $reader->future->done( substr $buf, 0, $reader->length, "" );
-         return;
-      }
-
-      my $timeout = $alarm ? $alarm->time - time() : undef;
-      my $rvec = '';
-      vec( $rvec, $fh->fileno, 1 ) = 1 if $reader;
-
-      if( select( $rvec, undef, undef, $timeout ) ) {
-         $fh->sysread( $buf, $reader->length - length $buf, length $buf );
-      }
-      elsif( $timeout ) {
-         shift @{ $bp->{alarms} };
-         $alarm->future->done;
-         return;
-      }
-   }
-}
-
 =head1 TODO
 
 =over 4
@@ -387,11 +366,7 @@ More modes - UART, 1-wire, raw-wire
 
 =item *
 
-Documentation/examples/actual implementations of truely-async subclass.
-
-=item *
-
-PWM, AUX frequency measurement and ADC support.
+AUX frequency measurement and ADC support.
 
 =back
 

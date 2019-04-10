@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_DatasetClass",
+      "dc:source" : "schemadotorgsources:source_DatasetClass",
       "owl:equivalentClass" : [
          "void:Dataset",
          "dcat:Dataset",
@@ -52,7 +52,7 @@
          "schema:rangeIncludes" : "schema:DataCatalog"
       },
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources2:source_bibex",
+         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
@@ -60,28 +60,11 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:Blog",
+            "schema:WebSite",
             "schema:Dataset",
-            "schema:CreativeWorkSeries",
-            "schema:WebSite"
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : "schema:Text"
-      },
-      "schema:spatial" : {
-         "owl:equivalentProperty" : "dc:spatial",
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The range of spatial applicability of a dataset, e.g. for a dataset of New York weather, the state of New York.",
-         "rdfs:label" : "spatial",
-         "schema:domainIncludes" : "schema:Dataset",
-         "schema:rangeIncludes" : "schema:Place",
-         "schema:supersededBy" : "schema:spatialCoverage"
-      },
-      "schema:temporal" : {
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The range of temporal applicability of a dataset, e.g. for a 2011 census dataset, the year 2011 (in ISO 8601 time interval format).",
-         "rdfs:label" : "temporal",
-         "schema:domainIncludes" : "schema:Dataset",
-         "schema:rangeIncludes" : "schema:DateTime",
-         "schema:supersededBy" : "schema:temporalCoverage"
       }
    }
 }

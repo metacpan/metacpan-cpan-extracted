@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Future/IO.pm
+MANIFEST			This list of files
+t/00use.t
+t/01sleep.t
+t/02sysread.t
+t/10sleep+sysread.t
+t/20impl-override.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

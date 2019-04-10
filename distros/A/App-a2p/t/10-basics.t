@@ -6,7 +6,6 @@ use warnings;
 use Test::More 0.89;
 
 use Config;
-use Devel::FindPerl 'find_perl_interpreter';
 use IPC::Open2;
 use File::Spec::Functions 'catfile';
 use File::Temp 'tempdir';
@@ -57,7 +56,7 @@ sub runa2p {
 
 sub runperl {
 	my %args = @_;
-	my @command = find_perl_interpreter();
+	my @command = $^X;
 	push @command, $args{progfile} if $args{progfile};
 	push @command, @{ $args{args} } if $args{args};
 	return run_command(%args, command => \@command);

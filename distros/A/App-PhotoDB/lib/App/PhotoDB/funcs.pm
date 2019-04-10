@@ -24,8 +24,9 @@ use Image::ExifTool;
 use Term::ReadLine;
 use Term::ReadLine::Perl;
 use File::Basename;
+use Time::Piece;
 
-our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci);
+our @EXPORT_OK = qw(prompt db updaterecord deleterecord newrecord notimplemented nocommand nosubcommand listchoices lookupval lookuplist updatedata today validate ini printlist round pad lookupcol thin resolvenegid chooseneg annotatefilm keyword parselensmodel unsetdisplaylens welcome duration tag printbool hashdiff logger now choosescan basepath call untaint fsfiles dbfiles term unsci multiplechoice search);
 
 =head2 prompt
 
@@ -695,7 +696,7 @@ sub listchoices {
 		print "No valid $keyword options to choose from\n";
 		if ($inserthandler && &prompt({prompt=>"Add a new $keyword?", type=>'boolean', default=>'no'})) {
 			# add a new entry
-			my $id = $inserthandler->($db);
+			my $id = $inserthandler->({db=>$db});
 			return $id;
 		} elsif ($skipok) {
 			return;
@@ -744,12 +745,57 @@ sub listchoices {
 	# Spawn a new handler if that's what the user chose
 	# Otherwise return what we got
 	if ($input eq $char && $inserthandler) {
-		my $id = $inserthandler->($db);
+		my $id = $inserthandler->({db=>$db});
 		return $id;
 	} else {
 		# Return input
 		return $input;
 	}
+}
+
+
+=head2 multiplechoice
+
+Choose from a number of options expressed as an array, and return the index of the chosen option
+
+=head4 Usage
+
+    my @choices = [
+        { desc => 'Do nothing' },
+        { desc => 'Also do nothing' },
+    ];
+
+    my $action = &multiplechoice({choices => \@choices});
+
+=head4 Arguments
+
+=item * C<$choices> array of hashes of options
+
+=head4 Returns
+
+Integer of the chosen option
+
+=cut
+
+sub multiplechoice {
+	my $href = shift;
+	my $choices = $href->{choices};
+
+	my @allowedvals;
+	while (my ($index, $choice) = each @{$choices}) {
+		print "\t$index\t$$choice{desc}\n";
+		push(@allowedvals, $index);
+	}
+
+	# Loop until we get valid input
+	my $input;
+	my $msg = "Please select an action from the list";
+
+	do {
+		$input = &prompt({prompt=>$msg, type=>'integer'});
+	} while ($input && !($input ~~ [ map {"$_"} @allowedvals ] || $input eq ''));
+
+	return $input;
 }
 
 =head2 printlist
@@ -1068,8 +1114,9 @@ The number of rows updated
 =cut
 
 sub updatedata {
-	my $db = shift;		# DB handle
-	my $query = shift;	# Plain SQL query
+	my $href = shift;
+	my $db = $href->{db};		   # DB handle
+	my $query = $href->{query};	# Plain SQL query
 	my $sth = $db->prepare($query) or die "Couldn't prepare statement: " . $db->errstr;
 	my $rows = $sth->execute();
 	$rows = &unsci($rows);
@@ -1084,7 +1131,7 @@ Return today's date according to the DB
 
 =head4 Usage
 
-    my $todaysdate = &today($db);
+    my $todaysdate = &today;
 
 =head4 Arguments
 
@@ -1097,8 +1144,7 @@ Today's date, formatted C<YYYY-MM-DD>
 =cut
 
 sub today {
-	my $db = shift;		# DB handle
-	return &lookupval({db=>$db, col=>'curdate()', table=>'CAMERA'});
+	return localtime->strftime('%Y-%m-%d');
 }
 
 =head2 now
@@ -1107,7 +1153,7 @@ Return an SQL-formatted timestamp for the current time
 
 =head4 Usage
 
-    my $time = &now($db);
+    my $time = &now;
 
 =head4 Arguments
 
@@ -1120,8 +1166,7 @@ String containing the current time, formatted C<YYYY-MM-DD HH:MM:SS>
 =cut
 
 sub now {
-	my $db = shift;	 # DB handle
-	return &lookupval({db=>$db, col=>'now()', table=>'CAMERA'});
+	return localtime->strftime('%Y-%m-%d %H:%M:%S');
 }
 
 
@@ -1305,7 +1350,7 @@ Get a negative ID either from the neg ID or the film/frame ID
 
 =head4 Usage
 
-    my $negID = &resolvenegid($db, '10/4');
+    my $negID = &resolvenegid({db=>$db, string=>'10/4'});
 
 =head4 Arguments
 
@@ -1320,8 +1365,9 @@ Integer negative ID
 =cut
 
 sub resolvenegid {
-	my $db = shift;
-	my $string = shift;
+	my $href = shift;
+	my $db = $href->{db};
+	my $string = $href->{string};
 	if ($string =~ m/^\d+$/) {
 		# All digits - already a NegID
 		return $string;
@@ -1383,7 +1429,7 @@ Write out a text file in the film scans directory
 
 =head4 Usage
 
-    &annotatefilm($db, $film_id);
+    &annotatefilm({db=>$db, film_id=>$film_id});
 
 =head4 Arguments
 
@@ -1398,8 +1444,9 @@ Nothing
 =cut
 
 sub annotatefilm {
-	my $db = shift;
-	my $film_id = shift;
+	my $href = shift;
+	my $db = $href->{db};
+	my $film_id = $href->{film_id};
 
 	my $path = &basepath;
 	if (defined($path) && $path ne '' && -d $path) {
@@ -1662,9 +1709,9 @@ to the JPGs that have been scanned from negatives
 
 =head4 Usage
 
-    &tag($db, $where);
-    &tag($db, {film_id=1});
-    &tag($db, {negative_id=100});
+    &tag({db=>$db, where=>$where});
+    &tag({db=>$db, where=>{film_id=1}});
+    &tag({db=>$db, where=>{negative_id=100}});
 
 =head4 Arguments
 
@@ -1681,8 +1728,9 @@ Nothing
 sub tag {
 
 	# Read in cmdline args
-	my $db = shift;
-	my $where = shift;
+	my $href = shift;
+	my $db = $href->{db};
+	my $where = $href->{where};
 
 	# Make sure basepath is valid
 	my $basepath = &basepath;
@@ -1727,7 +1775,7 @@ sub tag {
 	# Prepare and execute the SQL
 	my $sth = $db->prepare($stmt) or die "Couldn't prepare statement: " . $db->errstr;
 	my $rows = $sth->execute(@bind);
-	$rows - &unsci($rows);
+	$rows = &unsci($rows);
 
 	# Get confirmation
 	if ($rows == 0) {
@@ -1866,7 +1914,7 @@ sub logger {
 	my $type = $href->{type};
 	my $message = $href->{message};
 
-	return &newrecord({db=>$db, data=>{datetime=>&now($db), type=>$type, message=>$message}, table=>'LOG', silent=>1, log=>0});
+	return &newrecord({db=>$db, data=>{datetime=>&now, type=>$type, message=>$message}, table=>'LOG', silent=>1, log=>0});
 }
 
 =head2 choosescan
@@ -1875,7 +1923,7 @@ Select a scan by specifying a filename. Allows user to pick if there are multipl
 
 =head4 Usage
 
-    my $id = &choosescan($db);
+    my $id = &choosescan({db=>$db});
 
 =head4 Arguments
 
@@ -1888,7 +1936,8 @@ Integer representing the scan ID
 =cut
 
 sub choosescan {
-	my $db = shift;
+	my $href = shift;
+	my $db = $href->{db};
 	# prompt user for filename of scan
 	my $filename = &prompt({prompt=>'Please enter the filename of the scan', type=>'text'});
 
@@ -2004,7 +2053,8 @@ Array of file paths of scans recorded in the database
 =cut
 
 sub dbfiles {
-	my $db = shift;
+	my $href = shift;
+	my $db = $href->{db};
 	my $basepath = &basepath;
 	# Query DB to find all known scans
 	my $dbfilesref = &lookuplist({db=>$db, col=>"concat('$basepath', '/', directory, '/', filename)", table=>'scans_negs'});
@@ -2039,6 +2089,90 @@ sub unsci {
 	my $int = shift;
 	$int = 0 if ($int eq '0E0');
 	return $int;
+}
+
+
+
+=head2 search
+
+Search for objects in the database
+
+=head4 Usage
+
+    my $id = &search({
+        db         => $db,
+        table      => 'choose_camera',
+        searchterm => $searchterm,
+        choices    => [
+            { desc => 'Do nothing' },
+            { desc => 'Get camera info', handler => \&camera_info, id=>'camera_id', },
+            { desc => 'Load a film', handler => \&film_load, id=>'camera_id', },
+            { desc => 'Sell this camera', handler => \&camera_sell, id=>'camera_id', }
+        ],
+    });
+
+=head4 Arguments
+
+=item * C<$db> database handle
+
+=item * C<$table> name of table or view to search in
+
+=item * C<$keyword> keyword to describe the thing being chosen, e.g. C<camera>. Defaults to attempting to figure it out with C<&keyword>
+
+=item * C<$searchterm> string to search for in the database
+
+=item * C<$cols> = pair of columns where the first will be returned as the matched ID and the second is the column to be searched in. Defaults to ['id', 'opt']
+
+=item * C<$where> where clause for the search. Defaults to C<"opt like '%$searchterm%' collate utf8mb4_general_ci">
+
+=item * C<$choices> arrayref to an array of hashes which represent actions to be taken on a located item. You must provide C<desc>, a description of the action, C<handler>, a function reference to a suitable handler, and C<id>, the name of the parameter to use to pass in the ID located object.
+
+=head4 Returns
+
+ID of located object
+
+=cut
+
+# Search for objects in the database
+sub search {
+	my $href = shift;
+	my $db = $href->{db};
+	my $table = $href->{table};
+	my $keyword = $href->{keyword} // &keyword($table);
+	my $searchterm = $href->{searchterm} // &prompt({prompt=>"Enter $keyword search term"});
+	my $cols = $href->{cols} // ['id', 'opt'];
+	my $where = $href->{where} // "opt like '%$searchterm%' collate utf8mb4_general_ci";
+	my $choices = $href->{choices};
+
+	print "Searching for $keyword objects that match '$searchterm'\n";
+
+	# Perform search
+	my $id = &listchoices({
+		db     => $db,
+		cols   => $cols,
+		table  => $table,
+		where  => $where,
+		skipok => 1,
+	});
+
+	# Bail out if no results found
+	if (!$id) {
+		print "No $keyword objects matching '$searchterm' were found\n";
+		return 0;
+	}
+
+	if ($choices && @$choices >0) {
+		# Ask user to choose a followup action
+		my $action = &multiplechoice({choices => $choices});
+
+		# Execute chosen handler with ID passed into named arg
+		if ($action && $choices->[$action]{handler}) {
+			$choices->[$action]{handler}->({db=>$db, $choices->[$action]{id}=>$id});
+		}
+	} else {
+		print "Selected $id\n";
+	}
+	return;
 }
 
 # This ensures the lib loads smoothly

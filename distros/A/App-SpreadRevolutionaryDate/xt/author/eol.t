@@ -16,6 +16,7 @@ my @files = (
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Calendar.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/en.pm',
+    'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm',
     'lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm',
     'lib/App/SpreadRevolutionaryDate/Target.pm',

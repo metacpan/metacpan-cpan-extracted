@@ -20,15 +20,28 @@
             "schema:Number"
          ]
       },
+      "schema:priceCurrency" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The currency of the price, or a price component when attached to <a class=\"localLink\" href=\"http://schema.org/PriceSpecification\">PriceSpecification</a> and its subtypes.<br/><br/>\n\nUse standard formats: <a href=\"http://en.wikipedia.org/wiki/ISO_4217\">ISO 4217 currency format</a> e.g. \"USD\"; <a href=\"https://en.wikipedia.org/wiki/List_of_cryptocurrencies\">Ticker symbol</a> for cryptocurrencies e.g. \"BTC\"; well known names for <a href=\"https://en.wikipedia.org/wiki/Local_exchange_trading_system\">Local Exchange Tradings Systems</a> (LETS) and other currency types e.g. \"Ithaca HOUR\".",
+         "rdfs:label" : "priceCurrency",
+         "schema:domainIncludes" : [
+            "schema:Reservation",
+            "schema:Offer",
+            "schema:Ticket",
+            "schema:PriceSpecification",
+            "schema:TradeAction"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
+      },
       "schema:priceSpecification" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "One or more detailed price specifications, indicating the unit price and delivery or payment charges.",
          "rdfs:label" : "priceSpecification",
          "schema:domainIncludes" : [
-            "schema:Demand",
             "schema:Offer",
-            "schema:TradeAction"
+            "schema:TradeAction",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : "schema:PriceSpecification"
       }

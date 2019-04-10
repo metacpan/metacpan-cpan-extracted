@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 3 0 3)
+MYPACKAGESTART (marpaESLIF 3 0 4)
 
 ###########
 # Library #

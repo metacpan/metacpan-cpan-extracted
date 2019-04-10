@@ -21,7 +21,7 @@ subtest "attr: initial_delay, max_delay, delay_on_success" => sub {
     is($ar->failure(1), 5);
     is($ar->failure(1), 10);
     is($ar->failure(1), 20);
-    is($ar->failure(8), 33); # timestamp
+    is($ar->failure(8), 40); # test consider_actual_delay=0
     is($ar->failure(8), 80);
     is($ar->failure(8), 100);
     is($ar->success(8), 1);

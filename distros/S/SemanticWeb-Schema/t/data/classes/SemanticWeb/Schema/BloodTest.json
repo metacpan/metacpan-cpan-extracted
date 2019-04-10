@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A medical test performed on a sample of a patient's blood.",
+      "rdfs:label" : "BloodTest",
+      "rdfs:subClassOf" : "schema:MedicalTest",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

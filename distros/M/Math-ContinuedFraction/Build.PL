@@ -1,29 +1,56 @@
+use 5.010001;
 use strict;
 use warnings;
 use Module::Build;
 
 my $builder = Module::Build->new(
-    module_name         => 'Math::ContinuedFraction',
-    abstract		=> 'Create and Use Continued Fractions',
-    dist_author         => q{John M. Gamble <jgamble@cpan.org>},
-    dist_version_from   => 'lib/Math/ContinuedFraction.pm',
+	module_name => 'Math::ContinuedFraction',
 
-    requires => {
-	'Math::BigRat' => 0,
-    },
+	dist_author => q{John M. Gamble <jgamble@cpan.org>},
+	dist_abstract => 'Create and manipulate continued fractions',
+	dist_version => '0.13',
+	release_status => 'stable',
 
-    build_requires => {
-        'Test::Simple' => 0,
-    },
+	provides => {
+		'Math::ContinuedFraction' => {
+			file => 'lib/Math/ContinuedFraction.pm',
+		},
+	},
 
-    add_to_cleanup      => [ 'Math-ContinuedFraction-*' ],
-    license             => 'perl',
-    create_readme	=> 0,
-    create_makefile_pl => 'traditional',
+	requires => {
+		perl => '5.10.1',
+		Carp => 0,
+		'Math::BigInt' => 0,
+		'Math::BigRat' => 0,
+	},
 
-    meta_merge	=> {
-	    keyword => [qw(math continued-fraction sequences)],
-    },
+	configure_requires => {
+		'Module::Build' => 0.4224,
+	},
+
+	build_requires => {
+		'Test::More' => 0,
+	},
+
+	license => 'perl',
+	create_license => 1,
+	create_readme => 0,
+	create_makefile_pl => 'traditional',
+	dynamic_config => 0,
+	add_to_cleanup => [ 'Math-ContinuedFraction-*' ],
+
+	meta_merge => {
+		keyword => [qw(math continued-fraction sequences)],
+
+		resources => {
+		    repository => 'git://github.com/jgamble/Math-ContinuedFraction.git',
+#		    repository => {
+#			url => 'git://github.com/jgamble/Math-ContinuedFraction.git',
+#			web => 'https://github.com/jgamble/Math-ContinuedFraction',
+#			type => 'git',
+#			},
+		},
+	},
 );
 
 $builder->create_build_script();

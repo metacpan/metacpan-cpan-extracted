@@ -7,17 +7,17 @@
    },
    "properties" : {
       "schema:feesAndCommissionsSpecification" : {
-         "dc:source" : "schemadotorgsources2:FIBO",
+         "dc:source" : "schemadotorgsources:FIBO",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Description of fees, commissions, and other terms applied either to a class of financial product, or by a financial service organization.",
          "rdfs:label" : "feesAndCommissionsSpecification",
          "schema:domainIncludes" : [
-            "schema:FinancialService",
-            "schema:FinancialProduct"
+            "schema:FinancialProduct",
+            "schema:FinancialService"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
          ]
       }
    }

@@ -14,7 +14,6 @@ requires 'Term::ReadKey';
 requires 'utf8';
 requires 'version';
 requires 'warnings';
-requires 'Win32::Console::ANSI';
 requires 'YAML';
 
 on 'test' => sub {

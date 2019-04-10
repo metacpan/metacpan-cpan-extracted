@@ -26,7 +26,7 @@ no_index:
 provides:
   App::ucpan:
     file: lib/App/ucpan.pm
-    version: '1.08'
+    version: '1.11'
 requires:
   Config: '0'
   File::Copy: '0'
@@ -35,7 +35,6 @@ requires:
   Path::Class: '0'
   Term::ANSIColor: '0'
   Term::ReadKey: '0'
-  Win32::Console::ANSI: '0'
   YAML: '0'
   bytes: '0'
   constant: '0'
@@ -45,7 +44,7 @@ requires:
   utf8: '0'
   version: '0'
   warnings: '0'
-version: '1.08'
+version: '1.11'
 x_authority: cpan:KPEE
 x_contributors:
   - 'KPEE <kpee.cpanx@gmail.com>'

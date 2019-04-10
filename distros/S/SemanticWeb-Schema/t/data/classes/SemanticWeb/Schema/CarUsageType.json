@@ -1,0 +1,11 @@
+{
+   "class" : {
+      "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A value indicating a special usage of a car, e.g. commercial rental, driving school, or as a taxi.",
+      "rdfs:label" : "CarUsageType",
+      "rdfs:subClassOf" : "schema:QualitativeValue",
+      "schema:isPartOf" : "http:auto.schema.org"
+   },
+   "properties" : {}
+}

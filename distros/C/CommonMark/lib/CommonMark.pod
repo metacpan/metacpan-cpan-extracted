@@ -21,25 +21,36 @@ CommonMark - Interface to the CommonMark C library
 This module is a wrapper around the official CommonMark C library
 I<libcmark>. It closely follows the original API.
 
-The main module provides some entry points to parse documents. The bulk of
-features is available through L<CommonMark::Node> objects of which the
-parse tree is made. L<CommonMark::Iterator> is a useful class to walk
-through the nodes in a tree. L<CommonMark::Parser> provides a push parser
-interface.
+The main module provides some entry points to parse documents and convenience
+functions for node creation. The bulk of features is available through
+L<CommonMark::Node> objects of which the parse tree is made.
+L<CommonMark::Iterator> is a useful class to walk through the nodes in a
+tree. L<CommonMark::Parser> provides a push parser interface.
 
 =head2 Installation
 
 =head3 Installation of libcmark
 
 Please note that the I<libcmark> API isn't stable yet. This version of the
-Perl bindings is known to work with all releases between 0.21.0 and 0.28.3,
+Perl bindings is known to work with all releases between 0.21.0 and 0.29.0,
 but there's no guarantee that it can be compiled with later versions. Also
 note that upgrading a dynamically linked version of libcmark may require
 recompilation of the Perl distribution.
 
-    curl -LJO https://github.com/jgm/cmark/archive/0.28.3.tar.gz
-    tar xzf cmark-0.28.3.tar.gz
-    cd cmark-0.28.3
+It is recommended to use the I<libcmark> packages provided by recent Linux
+distros. On Debian or Ubuntu, run:
+
+    sudo apt-get install libcmark-dev
+
+On Red Hat or CentOS, run:
+
+    sudo yum install cmark-devel
+
+To install I<libcmark> from source:
+
+    curl -LJO https://github.com/commonmark/cmark/archive/0.29.0.tar.gz
+    tar xzf cmark-0.29.0.tar.gz
+    cd cmark-0.29.0
     make [INSTALL_PREFIX=/prefix]
     make test
     make install
@@ -147,15 +158,20 @@ Parser options can be imported from L<CommonMark> with tag C<opt>.
     use CommonMark qw(:opt);
 
 C<OPT_NORMALIZE> makes sure that adjacent text nodes are merged in the parse
-tree. libcmark 0.28 or higher always normalizes text nodes.
+tree. This option has no effect with libcmark 0.28 or higher which always
+normalizes text nodes.
 
-C<OPT_SMART> enables the "smart quote" features which turns vertical into
+C<OPT_SMART> enables the "smart quote" feature which turns vertical into
 typographic quotation marks, double and triple hyphens into en and em dashes,
 and triple periods into ellipses.
 
-C<OPT_VALIDATE_UTF8> turns on UTF-8 validation. Normally, this isn't
-necessary because Perl should always provide proper UTF-8. The option may
-be used if you don't trust the safety of Perl's internal UTF-8 handling.
+C<OPT_VALIDATE_UTF8> turns on UTF-8 validation. Normally, this shouldn't be
+necessary because Perl strings should always contain valid UTF-8. But it is
+possible to create strings flagged as UTF-8 that contain invalid UTF-8, for
+example with XS. The option may be used if you don't trust the input data
+and want to make absolutely sure that the output is valid UTF-8. If invalid
+bytes are found, they are replaced with the Unicode replacement character
+U+FFFD.
 
 =head2 Node creation
 

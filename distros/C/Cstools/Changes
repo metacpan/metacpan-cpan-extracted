@@ -1,6 +1,13 @@
 
 Revision history for Perl extension Cstools.
 
+3.43 Tue 09 Apr 2019 02:57:51 PM UTC
+
+	Removed no-longer-working fi.muni.cz email address and URL.
+
+	Fix curly bracket escaping, addressing Unescaped left brace in
+	regex is deprecated here (and will be fatal in Perl 5.32).
+
 3.42 Fri Oct 18 11:29:40 MET DST 2002
 
 	t/cstocs.t: now skips MIME tests if MIME::Words is not

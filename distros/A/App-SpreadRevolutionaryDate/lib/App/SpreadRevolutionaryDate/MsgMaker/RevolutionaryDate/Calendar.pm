@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.14';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar::VERSION = '0.17';
 # ABSTRACT: Subclass overloading L<DateTime::Calendar::FrenchRevolutionary> to allow language extension
 
 use Moose;
@@ -29,8 +29,8 @@ sub set {
   my $locale_class;
 
   if ($locale_arg) {
-    die "only 'fr', 'en' and 'it' possible"
-      unless $locale_arg =~ /^(?:en|fr|it)$/;
+    die "only 'fr', 'en', 'it' and 'es' possible"
+      unless $locale_arg =~ /^(?:en|fr|it|es)$/;
 
     $locale_class = 'App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::' . $locale_arg;
   }
@@ -70,7 +70,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar - Subclass o
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 METHODS
 
@@ -117,6 +117,8 @@ Overloads L<DateTime::Calendar::FrenchRevolutionary> to allow setting locale, ex
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 

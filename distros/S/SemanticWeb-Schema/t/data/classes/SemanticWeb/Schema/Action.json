@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_ActionCollabClass",
+      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An action performed by a direct agent and indirect participants upon a direct object. Optionally happens at a location with the help of an inanimate instrument. The execution of the action may produce a result. Specific action sub-type documentation specifies the exact expectation of each argument/role.<br/><br/>\n\nSee also <a href=\"http://blog.schema.org/2014/04/announcing-schemaorg-actions.html\">blog post</a> and <a href=\"http://schema.org/docs/actions.html\">Actions overview document</a>.",
       "rdfs:label" : "Action",
@@ -20,17 +20,18 @@
          "rdfs:label" : "agent",
          "schema:domainIncludes" : "schema:Action",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:endTime" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>. For media, including audio and video, it's the time offset of the end of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "endTime",
          "schema:domainIncludes" : [
+            "schema:Action",
             "schema:FoodEstablishmentReservation",
-            "schema:Action"
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : "schema:DateTime"
       },
@@ -58,9 +59,9 @@
             "schema:Organization"
          ],
          "schema:rangeIncludes" : [
+            "schema:Place",
             "schema:PostalAddress",
-            "schema:Text",
-            "schema:Place"
+            "schema:Text"
          ]
       },
       "schema:object" : {
@@ -89,10 +90,11 @@
       },
       "schema:startTime" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
          "rdfs:label" : "startTime",
          "schema:domainIncludes" : [
             "schema:FoodEstablishmentReservation",
+            "schema:MediaObject",
             "schema:Action"
          ],
          "schema:rangeIncludes" : "schema:DateTime"

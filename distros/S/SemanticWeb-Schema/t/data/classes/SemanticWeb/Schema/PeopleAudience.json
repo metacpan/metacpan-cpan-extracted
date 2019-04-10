@@ -6,6 +6,18 @@
       "rdfs:subClassOf" : "schema:Audience"
    },
    "properties" : {
+      "schema:healthCondition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifying the health condition(s) of a patient, medical study, or other target audience.",
+         "rdfs:label" : "healthCondition",
+         "schema:domainIncludes" : [
+            "schema:Patient",
+            "schema:PeopleAudience",
+            "schema:MedicalStudy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      },
       "schema:requiredGender" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Audiences defined by a person's gender.",

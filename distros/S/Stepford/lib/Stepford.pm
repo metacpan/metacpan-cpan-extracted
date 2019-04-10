@@ -3,7 +3,7 @@ package Stepford;
 use strict;
 use warnings;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 1;
 
@@ -21,7 +21,7 @@ Stepford - A vaguely Rake/Make/Cake-like thing for Perl - create steps and let a
 
 =head1 VERSION
 
-version 0.005000
+version 0.006000
 
 =head1 SYNOPSIS
 
@@ -228,7 +228,7 @@ vti <viacheslav.t@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has additional_name => (
@@ -214,6 +214,14 @@ has global_location_number => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'globalLocationNumber',
+);
+
+
+
+has has_occupation => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'hasOccupation',
 );
 
 
@@ -482,7 +490,7 @@ SemanticWeb::Schema::Person - A person (alive
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -512,9 +520,9 @@ A address should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::PostalAddress']>
+
+=item C<Str>
 
 =back
 
@@ -634,9 +642,9 @@ A colleague should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -799,9 +807,9 @@ A gender should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::GenderType']>
+
+=item C<Str>
 
 =back
 
@@ -834,6 +842,21 @@ A global_location_number should be one of the following types:
 =over
 
 =item C<Str>
+
+=back
+
+=head2 C<has_occupation>
+
+C<hasOccupation>
+
+The Person's occupation. For past professions, use Role for expressing
+dates.
+
+A has_occupation should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Occupation']>
 
 =back
 
@@ -1116,9 +1139,9 @@ A publishing_principles should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
 
 =back
 
@@ -1183,9 +1206,9 @@ A sponsor should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 

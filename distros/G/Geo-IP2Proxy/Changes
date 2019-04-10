@@ -1,5 +1,17 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+2.01  Mon Apr 08 16:00:00 2019
+      Minor fix on POD
+
+2.00  Mon Apr 07 16:00:00 2019
+      Second release under the Geo::IP2Proxy
+      Added new function "getDomain"
+      Added new function "getUsageType"
+      Added new function "getASN"
+      Added new function "getAS"
+      Added new function "getLastSeen"
+      Support "SES" in proxy detection
+
 1.00  Mon Nov 21 16:00:00 2016
       First release under the Geo::IP2Proxy
       Added new function "open"

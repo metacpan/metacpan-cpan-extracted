@@ -3,7 +3,7 @@ package Stepford::Types::Internal;
 use strict;
 use warnings;
 
-our $VERSION = '0.005000';
+our $VERSION = '0.006000';
 
 use MooseX::Types::Common::String qw( NonEmptyStr );
 use MooseX::Types::Moose qw( ArrayRef Str );
@@ -17,13 +17,10 @@ use MooseX::Types -declare => [
         Logger
         PossibleClassName
         Step
-        OutputMode
         )
 ];
 
 use namespace::clean;
-
-enum OutputMode, [qw[ none txt boxart ascii svg graphviz graphml vcg gdl ]];
 
 subtype PossibleClassName, as Str, inline_as {
     ## no critic (Subroutines::ProtectPrivateSubs)
@@ -69,7 +66,7 @@ Stepford::Types::Internal - Internal type definitions for Stepford
 
 =head1 VERSION
 
-version 0.005000
+version 0.006000
 
 =head1 SUPPORT
 
@@ -81,7 +78,7 @@ Dave Rolsky <drolsky@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 - 2018 by MaxMind, Inc.
+This software is copyright (c) 2014 - 2019 by MaxMind, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

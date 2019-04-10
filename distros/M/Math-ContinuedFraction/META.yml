@@ -1,27 +1,33 @@
 ---
-name: Math-ContinuedFraction
-version: 0.11
+abstract: 'Create and manipulate continued fractions'
 author:
   - 'John M. Gamble <jgamble@cpan.org>'
-abstract: Create and Manipulate Continued Fractions.
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
 build_requires:
-  Test::Simple: 0
-requires:
-  Math::BigRat: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.340201
+  Module::Build: '0.4224'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-ContinuedFraction
 provides:
   Math::ContinuedFraction:
     file: lib/Math/ContinuedFraction.pm
-    version: 0.11
-generated_by: Module::Build version 0.340201
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-keyword:
+    version: '0.13'
+requires:
+  Carp: '0'
+  Math::BigInt: '0'
+  Math::BigRat: '0'
+  perl: v5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jgamble/Math-ContinuedFraction.git
+version: '0.13'
+x_keyword:
   - math
   - continued-fraction
   - sequences
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

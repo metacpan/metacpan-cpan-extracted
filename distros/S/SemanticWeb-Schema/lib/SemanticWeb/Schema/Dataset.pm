@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has catalog => (
@@ -66,22 +66,6 @@ has issn => (
 
 
 
-has spatial => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'spatial',
-);
-
-
-
-has temporal => (
-    is        => 'rw',
-    predicate => 1,
-    json_ld   => 'temporal',
-);
-
-
-
 
 
 1;
@@ -98,7 +82,7 @@ SemanticWeb::Schema::Dataset - A body of structured information describing some 
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -182,32 +166,6 @@ publication. You can repeat this property to identify different formats of,
 or the linking ISSN (ISSN-L) for, this serial publication.
 
 A issn should be one of the following types:
-
-=over
-
-=item C<Str>
-
-=back
-
-=head2 C<spatial>
-
-The range of spatial applicability of a dataset, e.g. for a dataset of New
-York weather, the state of New York.
-
-A spatial should be one of the following types:
-
-=over
-
-=item C<InstanceOf['SemanticWeb::Schema::Place']>
-
-=back
-
-=head2 C<temporal>
-
-The range of temporal applicability of a dataset, e.g. for a 2011 census
-dataset, the year 2011 (in ISO 8601 time interval format).
-
-A temporal should be one of the following types:
 
 =over
 

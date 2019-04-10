@@ -1,0 +1,11 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1125",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An agent orders a (not yet released) object/product/service to be delivered/sent.",
+      "rdfs:label" : "PreOrderAction",
+      "rdfs:subClassOf" : "schema:TradeAction",
+      "schema:category" : "issue-1125"
+   },
+   "properties" : {}
+}

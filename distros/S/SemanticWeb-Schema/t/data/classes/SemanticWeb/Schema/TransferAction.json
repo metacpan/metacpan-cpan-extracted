@@ -13,8 +13,8 @@
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
             "schema:MoveAction",
-            "schema:ExerciseAction",
-            "schema:TransferAction"
+            "schema:TransferAction",
+            "schema:ExerciseAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       },
@@ -24,10 +24,10 @@
          "rdfs:label" : "toLocation",
          "rdfs:subPropertyOf" : "schema:location",
          "schema:domainIncludes" : [
-            "schema:TransferAction",
             "schema:InsertAction",
-            "schema:MoveAction",
-            "schema:ExerciseAction"
+            "schema:ExerciseAction",
+            "schema:TransferAction",
+            "schema:MoveAction"
          ],
          "schema:rangeIncludes" : "schema:Place"
       }

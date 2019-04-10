@@ -14,6 +14,12 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 MIT-LICENSE
 README.md
+share/config
+share/pages/01_Perldoc.md
+share/pages/02_About.md
+share/pages/index.md
+share/public/styles.css
+share/webapp.pl
 t/01_nodes.t
 t/02_content.t
 t/03_generate.t
@@ -27,5 +33,6 @@ t/test_pages/18_bar/meta
 't/test_pages/19_baz quux/a.md'
 't/test_pages/19_baz quux/b c.md'
 't/test_pages/19_baz quux/index.md'
+TODO_DIST.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

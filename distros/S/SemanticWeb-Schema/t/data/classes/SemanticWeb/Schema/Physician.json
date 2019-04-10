@@ -3,7 +3,48 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A doctor's office.",
       "rdfs:label" : "Physician",
-      "rdfs:subClassOf" : "schema:MedicalOrganization"
+      "rdfs:subClassOf" : [
+         "schema:MedicalOrganization",
+         "schema:MedicalBusiness"
+      ]
    },
-   "properties" : {}
+   "properties" : {
+      "schema:availableService" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical service available from this provider.",
+         "rdfs:label" : "availableService",
+         "schema:domainIncludes" : [
+            "schema:MedicalClinic",
+            "schema:Hospital",
+            "schema:Physician"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalTherapy",
+            "schema:MedicalTest",
+            "schema:MedicalProcedure"
+         ]
+      },
+      "schema:hospitalAffiliation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A hospital with which the physician or office is affiliated.",
+         "rdfs:label" : "hospitalAffiliation",
+         "schema:domainIncludes" : "schema:Physician",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Hospital"
+      },
+      "schema:medicalSpecialty" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical specialty of the provider.",
+         "rdfs:label" : "medicalSpecialty",
+         "schema:domainIncludes" : [
+            "schema:Physician",
+            "schema:Hospital",
+            "schema:MedicalClinic",
+            "schema:MedicalOrganization"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalSpecialty"
+      }
+   }
 }

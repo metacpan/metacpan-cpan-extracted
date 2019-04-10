@@ -9,6 +9,7 @@ my $RhostClass = {
     qr/\A(?:smtp|mailstore1)[.]secureserver[.]net\z/ => 'GoDaddy',
     qr/\b(?:laposte[.]net|orange[.]fr)\z/            => 'FrancePTT',
     qr/[.](?:ezweb[.]ne[.]jp|au[.]com)\z/            => 'KDDI',
+    qr/mx[0-9]+[.]qq[.]com\z/                        => 'TencentQQ',
 };
 
 sub list {
@@ -24,9 +25,8 @@ sub match {
     #                           1: match
     my $class = shift;
     my $rhost = shift // return undef;
-    my $host0 = lc $rhost;
+    my $host0 = lc($rhost) || return 0;
     my $match = 0;
-    return $match unless $rhost;
 
     for my $e ( keys %$RhostClass ) {
         # Try to match with each key of $RhostClass
@@ -45,7 +45,6 @@ sub get {
     my $argvs = shift // return undef;
     return undef unless ref $argvs eq 'Sisimai::Data';
 
-    my $reasontext = '';
     my $remotehost = lc $argvs->rhost;
     my $rhostclass = '';
 
@@ -59,9 +58,7 @@ sub get {
 
     (my $modulepath = $rhostclass) =~ s|::|/|g; 
     require $modulepath.'.pm';
-    $reasontext = $rhostclass->get($argvs);
-
-    return $reasontext;
+    return $rhostclass->get($argvs);
 }
 
 1;
@@ -106,7 +103,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

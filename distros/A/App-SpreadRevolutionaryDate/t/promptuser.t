@@ -18,7 +18,7 @@ BEGIN {
 use open qw(:std :encoding(UTF-8));
 binmode(DATA, ":encoding(UTF-8)");
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Test::NoWarnings;
 use Test::Output;
 use File::HomeDir;
@@ -39,17 +39,29 @@ seek DATA, $data_start, 0;
 $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 stdout_like { $spread_revolutionary_date->spread } qr/Diffusé sur Twitter : Thinking, attacking, building – such is our fabulous agenda\.$/, 'Spread message on Twitter';
 
-# Deault message in Italian
+# Default message in Italian
 @ARGV = ('--test', '--twitter', '--locale', 'it');
 seek DATA, $data_start, 0;
 $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 stdout_like { $spread_revolutionary_date->spread } qr/Diffondi su Twitter : Goodbye old world, hello revolutionary worlds$/, 'Spread in Italian';
+
+# Default message in Spanish
+@ARGV = ('--test', '--twitter', '--locale', 'es');
+seek DATA, $data_start, 0;
+$spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
+stdout_like { $spread_revolutionary_date->spread } qr/Difundido en Twitter: Goodbye old world, hello revolutionary worlds$/, 'Spread in Italian';
 
 # Use locale oustide of languages allowed by RevolutionaryDate
 @ARGV = ('--test', '--twitter', '--locale', 'de');
 seek DATA, $data_start, 0;
 $spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
 stdout_like { $spread_revolutionary_date->spread } qr/Überträgt auf Twitter: Goodbye old world, hello revolutionary worlds$/, 'Spread in German';
+
+# Default message in French for untranslated locale
+@ARGV = ('--test', '--twitter', '--locale', 'tlh');
+seek DATA, $data_start, 0;
+$spread_revolutionary_date = App::SpreadRevolutionaryDate->new(\*DATA);
+stdout_like { $spread_revolutionary_date->spread } qr/Diffusé sur Twitter : Goodbye old world, hello revolutionary worlds$/, 'Spread in Klingon';
 
 __DATA__
 

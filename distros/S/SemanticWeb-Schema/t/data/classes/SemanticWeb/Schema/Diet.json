@@ -1,0 +1,65 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A strategy of regulating the intake of food to achieve or maintain a specific health-related goal.",
+      "rdfs:label" : "Diet",
+      "rdfs:subClassOf" : [
+         "schema:CreativeWork",
+         "schema:LifestyleModification"
+      ],
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:dietFeatures" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Nutritional information specific to the dietary plan. May include dietary recommendations on what foods to avoid, what foods to consume, and specific alterations/deviations from the USDA or other regulatory body's approved dietary guidelines.",
+         "rdfs:label" : "dietFeatures",
+         "schema:domainIncludes" : "schema:Diet",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:endorsers" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "People or organizations that endorse the plan.",
+         "rdfs:label" : "endorsers",
+         "schema:domainIncludes" : "schema:Diet",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:Organization"
+         ]
+      },
+      "schema:expertConsiderations" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Medical expert advice related to the plan.",
+         "rdfs:label" : "expertConsiderations",
+         "schema:domainIncludes" : "schema:Diet",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:overview" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Descriptive information establishing the overarching theory/philosophy of the plan. May include the rationale for the name, the population where the plan first came to prominence, etc.",
+         "rdfs:label" : "overview",
+         "schema:domainIncludes" : "schema:Diet",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:physiologicalBenefits" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specific physiologic benefits associated to the plan.",
+         "rdfs:label" : "physiologicalBenefits",
+         "schema:domainIncludes" : "schema:Diet",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:risks" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specific physiologic risks associated to the diet plan.",
+         "rdfs:label" : "risks",
+         "schema:domainIncludes" : "schema:Diet",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

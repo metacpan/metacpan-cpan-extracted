@@ -27,10 +27,13 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "B" => 0,
+    "FindBin" => 0,
     "Test::Deep" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,13 +41,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "B" => 0,
   "Carp" => 0,
+  "FindBin" => 0,
   "JSON" => 0,
   "List::Util" => 0,
   "Math::Round" => 0,
   "Scalar::Util" => 0,
   "Test::Deep" => 0,
   "Test::More" => 0,
+  "lib" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

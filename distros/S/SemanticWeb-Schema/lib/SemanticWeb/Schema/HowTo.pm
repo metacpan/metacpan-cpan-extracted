@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has estimated_cost => (
@@ -106,7 +106,7 @@ SemanticWeb::Schema::HowTo - Instructions that explain how to achieve a result b
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -126,9 +126,9 @@ A estimated_cost should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<Str>
 
 =back
 
@@ -173,9 +173,9 @@ A step should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::HowToSection']>
+
+=item C<Str>
 
 =item C<InstanceOf['SemanticWeb::Schema::HowToStep']>
 
@@ -192,11 +192,11 @@ A steps should be one of the following types:
 
 =over
 
+=item C<Str>
+
 =item C<InstanceOf['SemanticWeb::Schema::ItemList']>
 
 =item C<InstanceOf['SemanticWeb::Schema::CreativeWork']>
-
-=item C<Str>
 
 =back
 
@@ -255,9 +255,9 @@ A yield should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Str>
 
 =back
 

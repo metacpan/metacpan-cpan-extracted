@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Rigid connective tissue that comprises up the skeletal structure of the human body.",
+      "rdfs:label" : "Bone",
+      "rdfs:subClassOf" : "schema:AnatomicalStructure",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

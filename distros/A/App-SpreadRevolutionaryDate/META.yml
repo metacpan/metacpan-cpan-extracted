@@ -10,6 +10,8 @@ build_requires:
   Test::NoWarnings: '0'
   Test::Output: '0'
   Test::Trap: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -22,49 +24,52 @@ name: App-SpreadRevolutionaryDate
 provides:
   App::SpreadRevolutionaryDate:
     file: lib/App/SpreadRevolutionaryDate.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::Config:
     file: lib/App/SpreadRevolutionaryDate/Config.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::PromptUser:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/PromptUser.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Calendar.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/en.pm
-    version: '0.14'
+    version: '0.17'
+  App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es:
+    file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/es.pm
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::fr:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/fr.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it:
     file: lib/App/SpreadRevolutionaryDate/MsgMaker/RevolutionaryDate/Locale/it.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::Target:
     file: lib/App/SpreadRevolutionaryDate/Target.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::Target::Freenode:
     file: lib/App/SpreadRevolutionaryDate/Target/Freenode.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::Target::Freenode::Bot:
     file: lib/App/SpreadRevolutionaryDate/Target/Freenode/Bot.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::Target::Mastodon:
     file: lib/App/SpreadRevolutionaryDate/Target/Mastodon.pm
-    version: '0.14'
+    version: '0.17'
   App::SpreadRevolutionaryDate::Target::Twitter:
     file: lib/App/SpreadRevolutionaryDate/Target/Twitter.pm
-    version: '0.14'
+    version: '0.17'
 requires:
   AppConfig: '0'
   Bot::BasicBot: '0'
@@ -72,6 +77,7 @@ requires:
   DateTime::Calendar::FrenchRevolutionary: '0'
   Encode: '0'
   File::HomeDir: '0'
+  File::Spec: '0'
   Getopt::Long: '0'
   IO::Handle: '0'
   IO::Prompt::Hooked: '0'
@@ -91,13 +97,11 @@ requires:
   namespace::autoclean: '0'
   open: '0'
   perl: '5.014'
-  strict: '0'
   utf8: '0'
-  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=App-SpreadRevolutionaryDate
   homepage: http://search.cpan.org/dist/App-SpreadRevolutionaryDate/
   repository: git://github.com/gibus/SpreadRevolutionaryDate.git
-version: '0.14'
+version: '0.17'
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.70'

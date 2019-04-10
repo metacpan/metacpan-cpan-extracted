@@ -7,7 +7,7 @@
    },
    "properties" : {
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources2:source_bibex",
+         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
@@ -15,9 +15,9 @@
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
             "schema:Blog",
+            "schema:WebSite",
             "schema:Dataset",
-            "schema:CreativeWorkSeries",
-            "schema:WebSite"
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

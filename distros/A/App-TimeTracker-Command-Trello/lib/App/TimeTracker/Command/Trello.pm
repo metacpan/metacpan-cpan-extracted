@@ -6,7 +6,7 @@ use 5.010;
 # ABSTRACT: App::TimeTracker Trello plugin
 use App::TimeTracker::Utils qw(error_message warning_message);
 
-our $VERSION = "1.005";
+our $VERSION = "1.006";
 
 use Moose::Role;
 use WWW::Trello::Lite;
@@ -60,8 +60,16 @@ sub _build_trello_client {
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
+    my %args;
 
-    my %args = @_;
+    if (scalar @_ == 1) {
+        my $ref = shift(@_);
+        %args = %$ref;
+    }
+    else {
+        %args = @_;
+    }
+
     if ( $args{trello} && $args{trello} =~ /^https/ ) {
         $args{trello} =~ m|https://trello.com/c/([^/]+)/?|;
         $args{trello} = $1;
@@ -446,7 +454,7 @@ App::TimeTracker::Command::Trello - App::TimeTracker Trello plugin
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

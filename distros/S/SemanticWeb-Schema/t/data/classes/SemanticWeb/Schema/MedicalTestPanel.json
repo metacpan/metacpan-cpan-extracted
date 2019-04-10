@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any collection of tests commonly ordered together.",
+      "rdfs:label" : "MedicalTestPanel",
+      "rdfs:subClassOf" : "schema:MedicalTest",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:subTest" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A component test of the panel.",
+         "rdfs:label" : "subTest",
+         "schema:domainIncludes" : "schema:MedicalTestPanel",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalTest"
+      }
+   }
+}

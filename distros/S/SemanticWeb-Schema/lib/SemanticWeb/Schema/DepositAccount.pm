@@ -6,7 +6,7 @@ package SemanticWeb::Schema::DepositAccount;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::BankAccount SemanticWeb::Schema::InvestmentOrDeposit /;
+extends qw/ SemanticWeb::Schema::InvestmentOrDeposit SemanticWeb::Schema::BankAccount /;
 
 
 use MooX::JSON_LD 'DepositAccount';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::DepositAccount - A type of Bank Account with a main purpose
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ interest or other benefits.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::InvestmentOrDeposit>
+L<SemanticWeb::Schema::BankAccount>
 
 =head1 AUTHOR
 

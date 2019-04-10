@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode::BB;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 
@@ -110,37 +110,6 @@ sub configure
    return Future->done
 }
 
-=head2 cs
-
-=head2 miso
-
-=head2 clk
-
-=head2 mosi
-
-=head2 aux
-
-   $bb->cs( $state )->get
-
-   $bb->miso( $state )->get
-
-   $bb->clk( $state )->get
-
-   $bb->mosi( $state )->get
-
-   $bb->aux( $state )->get
-
-Set an output pin to the given logical state. Uses the C<open_drain>
-configuration setting to determine whether high should be hi-Z or 3.3V.
-
-=cut
-
-sub cs   { shift->_writeread( 0, { cs   => $_[0] }, [] ) }
-sub miso { shift->_writeread( 0, { miso => $_[0] }, [] ) }
-sub clk  { shift->_writeread( 0, { clk  => $_[0] }, [] ) }
-sub mosi { shift->_writeread( 0, { mosi => $_[0] }, [] ) }
-sub aux  { shift->_writeread( 0, { aux  => $_[0] }, [] ) }
-
 =head2 write
 
    $bb->write( %pins )->get
@@ -222,55 +191,18 @@ sub write
    $self->_writeread( 0, { @_ }, [] );
 }
 
-sub read_cs   { shift->_input1( MASK_CS,   @_ ) }
-sub read_miso { shift->_input1( MASK_MISO, @_ ) }
-sub read_clk  { shift->_input1( MASK_CLK,  @_ ) }
-sub read_mosi { shift->_input1( MASK_MOSI, @_ ) }
-sub read_aux  { shift->_input1( MASK_AUX,  @_ ) }
-
-=head2 read_cs
-
-=head2 read_miso
-
-=head2 read_clk
-
-=head2 read_mosi
-
-=head2 read_aux
-
-   $state = $bb->read_cs->get
-
-   $state = $bb->read_miso->get
-
-   $state = $bb->read_clk->get
-
-   $state = $bb->read_mosi->get
-
-   $state = $bb->read_aux->get
-
-Set a pin to input direction and read its current state.
-
-=cut
-
 sub _input1
 {
    my $self = shift;
    my ( $mask ) = @_;
 
-   $self->_input( $mask )->then( sub {
-      my ( $buf ) = @_;
-      Future->done( ord( $buf ) & $mask );
-   });
-}
-
-sub _input
-{
-   my $self = shift;
-   my ( $mask ) = @_;
-
    $self->{dir_mask} |= $mask;
+
    $self->pirate->write( chr( 0x40 | $self->{dir_mask} ) );
-   return $self->pirate->read( 1 );
+   $self->pirate->read( 1 )->then( sub {
+      my ( $buf ) = @_;
+      return Future->done( ord( $buf ) & $mask );
+   });
 }
 
 =head2 read
@@ -343,6 +275,35 @@ sub pullup
           : ( $self->{out_mask} &= ~CONF_PULLUP );
    $self->pirate->write( chr( 0x80 | $self->{out_mask} ) );
    $self->pirate->read( 1 )->then_done(); # ignore input
+}
+
+=head1 PER-PIN METHODS
+
+For each named pin, the following methods are defined. The pin names are
+
+   cs miso sck mosi aux
+
+=head2 I<PIN>
+
+   $bbio->PIN( $state )->get
+
+Sets the output state of the given pin.
+
+=head2 read_I<PIN>
+
+   $state = $bbio->read_PIN->get
+
+Sets the pin to input direction and reads its current state.
+
+=cut
+
+foreach my $pin ( keys %PIN_MASK ) {
+   no strict 'refs';
+   *$pin      = sub { shift->_writeread( 0, { $pin => $_[0] }, [] ) };
+
+   my $mask = __PACKAGE__->${\"MASK_\U$pin"};
+   my $read_pin = "read_$pin";
+   *$read_pin = sub { shift->_input1( $mask ) };
 }
 
 =head1 TODO

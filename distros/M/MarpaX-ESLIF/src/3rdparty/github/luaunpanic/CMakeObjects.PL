@@ -9,9 +9,11 @@ use File::Basename qw/basename dirname/;
 use File::Find qw/find/;
 use File::Path qw/make_path/;
 use File::Copy::Recursive qw/dircopy/;
+use File::Temp qw/tempfile/;
 use IPC::Run qw/run/;
 use POSIX qw/EXIT_SUCCESS/;
 use Perl::OSType qw/is_os_type/;
+use Try::Tiny;
 
 # ------------------------------------------------------------
 # Generation of objects using perl setup, for use in perl's XS
@@ -28,23 +30,48 @@ make_path(dirname($config_h));
 
 my $ac = Config::AutoConf::INI->new(logfile => 'config.log');
 my @extra_compiler_flags = ();
+my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
+my $isc99 = 0;
+if (($cbuilder_config{cc} // 'cc') ne 'cl') {
+    $ac->msg_checking("Checking if C99 is enabled by default:");
+    if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}")) {
+        $ac->msg_result('yes');
+        $isc99 = 1;
+    } else {
+        $ac->msg_result('no');
+        $ac->msg_notice("Checking what CFLAGS is required for C99:");
+        foreach my $flag (qw/-std=gnu99 -std=c99 -c99 -AC99 -xc99=all -qlanglvl=extc99/) {
+            $ac->msg_checking("Checking if flag $flag works:");
+            if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}", $flag)) {
+                $ac->msg_result('yes');
+                push(@extra_compiler_flags, $flag);
+                $isc99 = 1;
+                last;
+            } else {
+                $ac->msg_result('no');
+            }
+        }
+    }
+}
+
+if ($^O eq "netbsd" && ! $isc99) {
+    #
+    # We need long long, that C99 guarantees, else _NETBSD_SOURCE will do it
+    #
+    $ac->msg_notice("NetBSD platform and no c99: Append _NETBSD_SOURCE to CFLAGS to have long long");
+    push(@extra_compiler_flags, '-D_NETBSD_SOURCE');
+}
 #
 # Lua defaults are ok in most applications
 # push(@extra_compiler_flags, "-DLUA_32BITS", "-DLUA_USE_C89");
+#
 if (is_os_type('Windows')) {
     push(@extra_compiler_flags, '-DLUA_DL_DLL');
 } else {
     push(@extra_compiler_flags, '-DLUA_DL_DLOPEN');
     push(@extra_compiler_flags, '-DLUA_USE_POSIX');
 }
-$ac->msg_checking(sprintf "if this is solaris compiler");
-if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"this is not solaris compiler\"\n#endif\nint main() { return 0; }")) {
-    $ac->msg_result('yes');
-    $ac->msg_notice("Adding -xc99 to extra compiler flags");
-    push(@extra_compiler_flags, '-xc99');
-} else {
-    $ac->msg_result('no');
-}
+
 my $extra_compiler_flags = join(' ', @extra_compiler_flags);
 $ac->check;
 write_config($version, $config_h_in, $config_h);
@@ -173,4 +200,28 @@ $source
 #endif /* LUA_CONFIG_WRAPPER_H */
 CONFIG
     close($fh) || warn "Cannot close $output, $!";
+}
+
+sub try_compile {
+    my ($csource, $extra_compiler_flags) = @_;
+
+    my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
+    print $fh "$csource\n";
+    close($fh);
+    my $source = $fh->filename;
+    my $rc = 0;
+
+    try {
+        my $cbuilder = ExtUtils::CBuilder->new();
+        my $obj = basename($cbuilder->object_file($source));
+        $cbuilder->compile(
+            source               => $source,
+            object_file          => $obj,
+            extra_compiler_flags => $extra_compiler_flags
+            );
+        $rc = 1;
+    };
+    unlink $fh->filename;
+
+    return $rc;
 }

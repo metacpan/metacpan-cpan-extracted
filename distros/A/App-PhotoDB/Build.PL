@@ -46,6 +46,7 @@ my $builder = $class->new(
 		'DB::SQL::Migrations' => 0,
 		'Term::ReadLine' => 0,
 		'Term::ReadLine::Perl' => 0,
+		'Time::Piece' => 0,
 	},
 	test_requires => {
 		'Test::More' => '0.47',

@@ -55,7 +55,7 @@ use Test::More;
         exception {
             $runner->run(
                 final_steps => 'Test::Step::Top',
-                )
+            )
         },
         undef,
         'no exception when topic variable is modified by a step'

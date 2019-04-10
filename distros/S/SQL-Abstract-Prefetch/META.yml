@@ -1,0 +1,35 @@
+---
+abstract: 'implement "prefetch" for DBI RDBMS'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Abstract-Prefetch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '0'
+  Lingua::EN::Inflect::Number: '0'
+  Mojo::Base: '0'
+  SQL::Abstract::Pg: '0'
+  Scalar::Util: '0'
+  perl: '5.010001'
+resources:
+  IRC: irc://irc.perl.org/#dbix-class
+  bugtracker: https://github.com/mohawk2/SQL-Abstract-Prefetch/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/SQL-Abstract-Prefetch
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

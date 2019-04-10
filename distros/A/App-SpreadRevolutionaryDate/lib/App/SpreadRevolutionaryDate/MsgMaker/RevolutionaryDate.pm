@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::VERSION = '0.14';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::VERSION = '0.17';
 # ABSTRACT: MsgMaker class for L<App::SpreadRevolutionaryDate> to build message with revolutionary date
 
 use Moose;
@@ -40,7 +40,7 @@ around BUILDARGS => sub {
 
   $args{locale} = 'fr'
     unless   $args{locale}
-          && grep { $args{locale} eq $_ } ('en', 'it');
+          && grep { $args{locale} eq $_ } ('en', 'it', 'es');
   return $class->$orig(%args);
 };
 
@@ -49,7 +49,7 @@ sub compute {
   my $self = shift;
 
   # As of App::SpreadRevolutionaryDate 0.11
-  # locale is limited to 'fr', 'en' or 'it', defaults to 'fr'
+  # locale is limited to 'fr', 'en', 'it' or 'es', defaults to 'fr'
   # forced to 'fr' for any other value
   my $revolutionary = $self->acab ?
       App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Calendar->now->set(hour => 1, minute => 31, second => 20, locale => $self->locale)
@@ -97,7 +97,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate - MsgMaker class for L
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 METHODS
 
@@ -136,6 +136,8 @@ Computes revolutionary date. Takes no argument. Returns message as string, ready
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::en>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it>
+
+=item L<App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::es>
 
 =item L<App::SpreadRevolutionaryDate::MsgMaker::PromptUser>
 

@@ -1,5 +1,8 @@
 Revision history for Calendar::Julian
 
+0.10  Tue Apr 09 13:00:00 2019
+      - Updated dependency on Calendar::Plugin::Renderer v0.14.
+
 0.09  Wed Mar 27 15:40:00 2019
       - Added dependency on Date::Julian::Simple v0.07.
 

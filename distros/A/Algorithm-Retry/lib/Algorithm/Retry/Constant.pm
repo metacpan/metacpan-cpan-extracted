@@ -1,7 +1,7 @@
 package Algorithm::Retry::Constant;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -15,10 +15,15 @@ $SPEC{new} = {
     is_class_meth => 1,
     is_func => 0,
     args => {
+        %Algorithm::Retry::attr_consider_actual_delay,
         %Algorithm::Retry::attr_max_attempts,
         %Algorithm::Retry::attr_jitter_factor,
-        %Algorithm::Retry::attr_delay_on_failure,
         %Algorithm::Retry::attr_delay_on_success,
+        delay => {
+            summary => 'Number of seconds to wait after a failure',
+            schema => 'ufloat*',
+            req => 1,
+        },
     },
     result_naked => 1,
     result => {
@@ -33,7 +38,7 @@ sub _success {
 
 sub _failure {
     my ($self, $timestamp) = @_;
-    $self->{delay_on_failure};
+    $self->{delay};
 }
 
 1;
@@ -51,7 +56,7 @@ Algorithm::Retry::Constant - Retry using a constant wait time
 
 =head1 VERSION
 
-This document describes version 0.001 of Algorithm::Retry::Constant (from Perl distribution Algorithm-Retry), released on 2019-04-08.
+This document describes version 0.002 of Algorithm::Retry::Constant (from Perl distribution Algorithm-Retry), released on 2019-04-10.
 
 =head1 SYNOPSIS
 
@@ -60,9 +65,10 @@ This document describes version 0.001 of Algorithm::Retry::Constant (from Perl d
  # 1. instantiate
 
  my $ar = Algorithm::Retry::Constant->new(
+     #consider_actual_delay => 1, # optional, default 0
      #max_attempts     => 0, # optional, default 0 (retry endlessly)
      #jitter_factor    => 0, # optional, set to positive value to add randomness
-     delay_on_failure  => 2, # required
+     delay             => 2, # required
      #delay_on_success => 0, # optional, default 0
  );
 
@@ -95,7 +101,19 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<delay_on_failure>* => I<ufloat>
+=item * B<consider_actual_delay> => I<bool> (default: 0)
+
+Whether to consider actual delay.
+
+If set to true, will take into account the actual delay (timestamp difference).
+For example, when using the Constant strategy of delay=2, you log failure()
+again right after the previous failure() (i.e. specify the same timestamp).
+failure() will then return ~2+2 = 4 seconds. On the other hand, if you waited 2
+seconds before calling failure() again (i.e. specify the timestamp that is 2
+seconds larger than the previous timestamp), failure() will return 2 seconds.
+And if you waited 4 seconds or more, failure() will return 0.
+
+=item * B<delay>* => I<ufloat>
 
 Number of seconds to wait after a failure.
 

@@ -1,0 +1,11 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/387713003",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A medical procedure involving an incision with instruments; performed for diagnose, or therapeutic purposes.",
+      "rdfs:label" : "SurgicalProcedure",
+      "rdfs:subClassOf" : "schema:MedicalProcedure",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

@@ -347,6 +347,8 @@ src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/dlfcn.c
 src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/dlfcn.h
 src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/test.c
 src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/testdll.c
+src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/testdll2.c
+src/3rdparty/github/tconv/3rdparty/github/dlfcn-win32/testdll3.c
 src/3rdparty/github/tconv/3rdparty/github/genericLogger/CMakeLists.txt
 src/3rdparty/github/tconv/3rdparty/github/genericLogger/CMakeObjects.PL
 src/3rdparty/github/tconv/3rdparty/github/genericLogger/LICENSE

@@ -1,6 +1,7 @@
 ---
 abstract: unknown
 author:
+  - unknown
   - 'Gtk2-Perl Team <gtk-perl-list at gnome dot org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
@@ -11,12 +12,12 @@ configure_requires:
   File::Spec: '0'
   IO::File: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 keywords:
   - XS
   - 'XS extensions'
   - dependency
-license: perl
+license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -38,4 +39,5 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://dev.perl.org/licenses/
   repository: git://git.gnome.org/perl-ExtUtils-Depends
-version: '0.405'
+version: '0.8000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

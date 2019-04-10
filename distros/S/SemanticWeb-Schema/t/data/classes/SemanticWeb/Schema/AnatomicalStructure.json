@@ -1,0 +1,98 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any part of the human body, typically a component of an anatomical system. Organs, tissues, and cells are all anatomical structures.",
+      "rdfs:label" : "AnatomicalStructure",
+      "rdfs:subClassOf" : "schema:MedicalEntity",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:associatedPathophysiology" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "If applicable, a description of the pathophysiology associated with the anatomical system, including potential abnormal changes in the mechanical, physical, and biochemical functions of the system.",
+         "rdfs:label" : "associatedPathophysiology",
+         "schema:domainIncludes" : [
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure",
+            "schema:AnatomicalSystem"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:bodyLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Location in the body of the anatomical structure.",
+         "rdfs:label" : "bodyLocation",
+         "schema:domainIncludes" : [
+            "schema:AnatomicalStructure",
+            "schema:MedicalProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:connectedTo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Other anatomical structures to which this structure is connected.",
+         "rdfs:label" : "connectedTo",
+         "schema:domainIncludes" : "schema:AnatomicalStructure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      },
+      "schema:diagram" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An image containing a diagram that illustrates the structure and/or its component substructures and/or connections with other structures.",
+         "rdfs:label" : "diagram",
+         "schema:domainIncludes" : "schema:AnatomicalStructure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:ImageObject"
+      },
+      "schema:function" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Function of the anatomical structure.",
+         "rdfs:label" : "function",
+         "schema:domainIncludes" : "schema:AnatomicalStructure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:partOfSystem" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The anatomical or organ system that this structure is part of.",
+         "rdfs:label" : "partOfSystem",
+         "schema:domainIncludes" : "schema:AnatomicalStructure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalSystem"
+      },
+      "schema:relatedCondition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical condition associated with this anatomy.",
+         "rdfs:label" : "relatedCondition",
+         "schema:domainIncludes" : [
+            "schema:AnatomicalSystem",
+            "schema:AnatomicalStructure",
+            "schema:SuperficialAnatomy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      },
+      "schema:relatedTherapy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A medical therapy related to this anatomy.",
+         "rdfs:label" : "relatedTherapy",
+         "schema:domainIncludes" : [
+            "schema:AnatomicalSystem",
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalTherapy"
+      },
+      "schema:subStructure" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Component (sub-)structure(s) that comprise this anatomical structure.",
+         "rdfs:label" : "subStructure",
+         "schema:domainIncludes" : "schema:AnatomicalStructure",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      }
+   }
+}

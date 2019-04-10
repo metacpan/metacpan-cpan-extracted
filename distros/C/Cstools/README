@@ -78,10 +78,9 @@ Ideas, bug reports:
 	help me solve the problem faster.
 
 Available:
-	http://www.fi.muni.cz/~adelton/perl/ and from your favorite
-	CPAN site in the authors/id/JANPAZ/ directory.
+	From your favorite CPAN site in the authors/id/JANPAZ/ directory.
 	
-Copyright: (c) 1997--2002 Jan Pazdziora, adelton@fi.muni.cz. All rights
+Copyright: (c) 1997--2002 Jan Pazdziora. All rights
 	reserved. This library is free software; you can redistribute
 	it and/or modify it under the same terms as Perl itself.
 

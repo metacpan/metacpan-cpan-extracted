@@ -1,17 +1,22 @@
 # Contenticious [![Build Status](https://travis-ci.org/memowe/contenticious.svg?branch=master)](https://travis-ci.org/memowe/contenticious)
 
-Contenticious is a simple way to build a pretty simple website from Markdown content. It includes a helper script which will create example pages and directories for you to get you started in no time. With one single command Contenticious will create static HTML ready for upload. It's also possible to mount Contenticious in existing Mojolicious web apps.
+Contenticious is a simple way to build a pretty website from Markdown content. It includes a helper script which will create example pages and directories for you to get you started in no time. With one single command Contenticious will create static HTML ready for upload. It's also possible to mount Contenticious in existing Mojolicious web apps.
 
 See [memowe.github.com/contenticious](http://memowe.github.com/contenticious) for an introduction.
 
 ## Prerequisites
 
-    - perl 5.10.1
-    - File::Copy::Recursive 0.38
-    - Mojolicious 7.0
-    - Mojolicious::Plugin::Subdispatch 0.04
-    - Mojolicious::Plugin::RelativeUrlFor 0.052
-    - Text::Markdown 1.000031
+Package | Version
+---|---
+perl | 5.10.1
+File::Copy::Recursive | 0.38
+File::Share | 0.25
+Mojolicious | 8.05
+Mojolicious::Plugin::AssetPack | 1.45
+Mojolicious::Plugin::PODViewer | 0.004
+Mojolicious::Plugin::RelativeUrlFor | 0.052
+Mojolicious::Plugin::Subdispatch | 0.04
+Text::Markdown | 1.000031
 
 ## Installation
 
@@ -47,12 +52,13 @@ Copyright (c) [Mirko Westermeier](https://github.com/memowe), [mirko@westermeier
 
 Credits:
 
-    - [Joel Berger](https://github.com/jberger)
-    - [John Hall](https://github.com/dancingfrog)
-    - [Stephan Jauernick](https://github.com/stephan48)
-    - [Keedi Kim](https://github.com/keedi)
-    - [Joan Pujol Tarrés](https://github.com/mimosinnet)
-    - [Maxim Vuets](https://github.com/mvuets)
+- [Joel Berger](https://github.com/jberger)
+- [John Hall](https://github.com/dancingfrog)
+- [Stephan Jauernick](https://github.com/stephan48)
+- [Keedi Kim](https://github.com/keedi)
+- [Roy Storey](https://github.com/kiwiroy)
+- [Joan Pujol Tarrés](https://github.com/mimosinnet)
+- [Maxim Vuets](https://github.com/mvuets)
 
 Thank you for your contributions!
 

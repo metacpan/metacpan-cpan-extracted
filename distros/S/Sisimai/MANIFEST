@@ -19,6 +19,7 @@ lib/Sisimai/Address.pm
 lib/Sisimai/Bite.pm
 lib/Sisimai/Bite/Email.pm
 lib/Sisimai/Bite/Email/Activehunter.pm
+lib/Sisimai/Bite/Email/Amavis.pm
 lib/Sisimai/Bite/Email/AmazonSES.pm
 lib/Sisimai/Bite/Email/AmazonWorkMail.pm
 lib/Sisimai/Bite/Email/Aol.pm
@@ -89,6 +90,7 @@ lib/Sisimai/Message/JSON.pm
 lib/Sisimai/Order.pm
 lib/Sisimai/Order/Email.pm
 lib/Sisimai/Order/JSON.pm
+lib/Sisimai/RFC1894.pm
 lib/Sisimai/RFC3464.pm
 lib/Sisimai/RFC3834.pm
 lib/Sisimai/RFC5322.pm
@@ -128,6 +130,7 @@ lib/Sisimai/Rhost/FrancePTT.pm
 lib/Sisimai/Rhost/GoDaddy.pm
 lib/Sisimai/Rhost/GoogleApps.pm
 lib/Sisimai/Rhost/KDDI.pm
+lib/Sisimai/Rhost/TencentQQ.pm
 lib/Sisimai/SMTP.pm
 lib/Sisimai/SMTP/Error.pm
 lib/Sisimai/SMTP/Reply.pm
@@ -159,8 +162,6 @@ set-of-emails/jsonobj/json-sendgrid-14.json
 set-of-emails/jsonobj/json-sendgrid-15.json
 set-of-emails/jsonobj/json-sendgrid-16.json
 set-of-emails/jsonobj/json-sendgrid-17.json
-set-of-emails/logo/horizontalversions.png
-set-of-emails/logo/icon.png
 set-of-emails/mailbox/mbox-0
 set-of-emails/mailbox/mbox-1
 set-of-emails/maildir/bsd/arf-01.eml
@@ -176,8 +177,11 @@ set-of-emails/maildir/bsd/arf-19.eml
 set-of-emails/maildir/bsd/arf-20.eml
 set-of-emails/maildir/bsd/arf-21.eml
 set-of-emails/maildir/bsd/arf-22.eml
+set-of-emails/maildir/bsd/arf-23.eml
 set-of-emails/maildir/bsd/email-activehunter-01.eml
 set-of-emails/maildir/bsd/email-activehunter-02.eml
+set-of-emails/maildir/bsd/email-amavis-01.eml
+set-of-emails/maildir/bsd/email-amavis-02.eml
 set-of-emails/maildir/bsd/email-amazonses-01.eml
 set-of-emails/maildir/bsd/email-amazonses-02.eml
 set-of-emails/maildir/bsd/email-amazonses-03.eml
@@ -231,6 +235,7 @@ set-of-emails/maildir/bsd/email-exchange2003-07.eml
 set-of-emails/maildir/bsd/email-exchange2007-01.eml
 set-of-emails/maildir/bsd/email-exchange2007-02.eml
 set-of-emails/maildir/bsd/email-exchange2007-03.eml
+set-of-emails/maildir/bsd/email-exchange2007-04.eml
 set-of-emails/maildir/bsd/email-exim-01.eml
 set-of-emails/maildir/bsd/email-exim-02.eml
 set-of-emails/maildir/bsd/email-exim-03.eml
@@ -270,12 +275,14 @@ set-of-emails/maildir/bsd/email-exim-56.eml
 set-of-emails/maildir/bsd/email-exim-57.eml
 set-of-emails/maildir/bsd/email-exim-58.eml
 set-of-emails/maildir/bsd/email-exim-59.eml
+set-of-emails/maildir/bsd/email-exim-60.eml
 set-of-emails/maildir/bsd/email-ezweb-01.eml
 set-of-emails/maildir/bsd/email-ezweb-02.eml
 set-of-emails/maildir/bsd/email-ezweb-03.eml
 set-of-emails/maildir/bsd/email-ezweb-04.eml
 set-of-emails/maildir/bsd/email-ezweb-05.eml
 set-of-emails/maildir/bsd/email-ezweb-07.eml
+set-of-emails/maildir/bsd/email-ezweb-08.eml
 set-of-emails/maildir/bsd/email-facebook-03.eml
 set-of-emails/maildir/bsd/email-facebook-04.eml
 set-of-emails/maildir/bsd/email-fml-02.eml
@@ -298,6 +305,7 @@ set-of-emails/maildir/bsd/email-google-15.eml
 set-of-emails/maildir/bsd/email-google-16.eml
 set-of-emails/maildir/bsd/email-google-17.eml
 set-of-emails/maildir/bsd/email-google-18.eml
+set-of-emails/maildir/bsd/email-google-19.eml
 set-of-emails/maildir/bsd/email-gsuite-01.eml
 set-of-emails/maildir/bsd/email-gsuite-02.eml
 set-of-emails/maildir/bsd/email-gsuite-03.eml
@@ -336,6 +344,7 @@ set-of-emails/maildir/bsd/email-mcafee-01.eml
 set-of-emails/maildir/bsd/email-mcafee-02.eml
 set-of-emails/maildir/bsd/email-mcafee-03.eml
 set-of-emails/maildir/bsd/email-mcafee-04.eml
+set-of-emails/maildir/bsd/email-mcafee-05.eml
 set-of-emails/maildir/bsd/email-messagelabs-01.eml
 set-of-emails/maildir/bsd/email-messagelabs-02.eml
 set-of-emails/maildir/bsd/email-messagelabs-03.eml
@@ -350,6 +359,7 @@ set-of-emails/maildir/bsd/email-messagingserver-08.eml
 set-of-emails/maildir/bsd/email-messagingserver-09.eml
 set-of-emails/maildir/bsd/email-messagingserver-10.eml
 set-of-emails/maildir/bsd/email-messagingserver-11.eml
+set-of-emails/maildir/bsd/email-messagingserver-12.eml
 set-of-emails/maildir/bsd/email-mfilter-01.eml
 set-of-emails/maildir/bsd/email-mfilter-02.eml
 set-of-emails/maildir/bsd/email-mfilter-03.eml
@@ -417,6 +427,17 @@ set-of-emails/maildir/bsd/email-postfix-42.eml
 set-of-emails/maildir/bsd/email-postfix-43.eml
 set-of-emails/maildir/bsd/email-postfix-44.eml
 set-of-emails/maildir/bsd/email-postfix-45.eml
+set-of-emails/maildir/bsd/email-postfix-46.eml
+set-of-emails/maildir/bsd/email-postfix-47.eml
+set-of-emails/maildir/bsd/email-postfix-48.eml
+set-of-emails/maildir/bsd/email-postfix-49.eml
+set-of-emails/maildir/bsd/email-postfix-50.eml
+set-of-emails/maildir/bsd/email-postfix-51.eml
+set-of-emails/maildir/bsd/email-postfix-52.eml
+set-of-emails/maildir/bsd/email-postfix-53.eml
+set-of-emails/maildir/bsd/email-postfix-54.eml
+set-of-emails/maildir/bsd/email-postfix-55.eml
+set-of-emails/maildir/bsd/email-postfix-56.eml
 set-of-emails/maildir/bsd/email-qmail-01.eml
 set-of-emails/maildir/bsd/email-qmail-02.eml
 set-of-emails/maildir/bsd/email-qmail-03.eml
@@ -426,6 +447,7 @@ set-of-emails/maildir/bsd/email-qmail-06.eml
 set-of-emails/maildir/bsd/email-qmail-07.eml
 set-of-emails/maildir/bsd/email-qmail-08.eml
 set-of-emails/maildir/bsd/email-qmail-09.eml
+set-of-emails/maildir/bsd/email-qmail-10.eml
 set-of-emails/maildir/bsd/email-receivingses-01.eml
 set-of-emails/maildir/bsd/email-receivingses-02.eml
 set-of-emails/maildir/bsd/email-receivingses-03.eml
@@ -509,6 +531,7 @@ set-of-emails/maildir/bsd/email-x2-01.eml
 set-of-emails/maildir/bsd/email-x2-02.eml
 set-of-emails/maildir/bsd/email-x2-03.eml
 set-of-emails/maildir/bsd/email-x2-04.eml
+set-of-emails/maildir/bsd/email-x2-05.eml
 set-of-emails/maildir/bsd/email-x3-01.eml
 set-of-emails/maildir/bsd/email-x3-02.eml
 set-of-emails/maildir/bsd/email-x3-03.eml
@@ -569,10 +592,15 @@ set-of-emails/maildir/bsd/rhost-franceptt-02.eml
 set-of-emails/maildir/bsd/rhost-godaddy-02.eml
 set-of-emails/maildir/bsd/rhost-godaddy-03.eml
 set-of-emails/maildir/bsd/rhost-google-apps-01.eml
+set-of-emails/maildir/bsd/rhost-google-apps-02.eml
 set-of-emails/maildir/bsd/rhost-kddi-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-02.eml
+set-of-emails/maildir/bsd/rhost-tencentqq-01.eml
+set-of-emails/maildir/bsd/rhost-tencentqq-02.eml
+set-of-emails/maildir/bsd/rhost-tencentqq-03.eml
 set-of-emails/maildir/dos/arf-01.eml
 set-of-emails/maildir/dos/email-activehunter-01.eml
+set-of-emails/maildir/dos/email-amavis-01.eml
 set-of-emails/maildir/dos/email-amazonses-01.eml
 set-of-emails/maildir/dos/email-amazonworkmail-01.eml
 set-of-emails/maildir/dos/email-aol-01.eml
@@ -594,6 +622,7 @@ set-of-emails/maildir/dos/email-kddi-01.eml
 set-of-emails/maildir/dos/email-mailfoundry-01.eml
 set-of-emails/maildir/dos/email-mailru-01.eml
 set-of-emails/maildir/dos/email-mcafee-01.eml
+set-of-emails/maildir/dos/email-messagelabs-01.eml
 set-of-emails/maildir/dos/email-messagingserver-01.eml
 set-of-emails/maildir/dos/email-mfilter-01.eml
 set-of-emails/maildir/dos/email-mxlogic-01.eml
@@ -623,6 +652,7 @@ set-of-emails/maildir/dos/rhost-exchange-online-01.eml
 set-of-emails/maildir/dos/rhost-franceptt-01.eml
 set-of-emails/maildir/dos/rhost-google-apps-01.eml
 set-of-emails/maildir/dos/rhost-kddi-01.eml
+set-of-emails/maildir/dos/rhost-tencentqq-01.eml
 set-of-emails/maildir/err/make-test-01.eml
 set-of-emails/maildir/err/make-test-02.eml
 set-of-emails/maildir/err/make-test-03.eml
@@ -662,6 +692,7 @@ set-of-emails/maildir/err/make-test-36.eml
 set-of-emails/maildir/err/make-test-37.eml
 set-of-emails/maildir/mac/arf-01.eml
 set-of-emails/maildir/mac/email-activehunter-01.eml
+set-of-emails/maildir/mac/email-amavis-01.eml
 set-of-emails/maildir/mac/email-amazonses-01.eml
 set-of-emails/maildir/mac/email-amazonworkmail-01.eml
 set-of-emails/maildir/mac/email-aol-01.eml
@@ -683,6 +714,7 @@ set-of-emails/maildir/mac/email-kddi-01.eml
 set-of-emails/maildir/mac/email-mailfoundry-01.eml
 set-of-emails/maildir/mac/email-mailru-01.eml
 set-of-emails/maildir/mac/email-mcafee-01.eml
+set-of-emails/maildir/mac/email-messagelabs-01.eml
 set-of-emails/maildir/mac/email-messagingserver-01.eml
 set-of-emails/maildir/mac/email-mfilter-01.eml
 set-of-emails/maildir/mac/email-mxlogic-01.eml
@@ -712,6 +744,7 @@ set-of-emails/maildir/mac/rhost-exchange-online-01.eml
 set-of-emails/maildir/mac/rhost-franceptt-01.eml
 set-of-emails/maildir/mac/rhost-google-apps-01.eml
 set-of-emails/maildir/mac/rhost-kddi-01.eml
+set-of-emails/maildir/mac/rhost-tencentqq-01.eml
 set-of-emails/maildir/not/is-not-bounce-01.eml
 set-of-emails/maildir/not/is-not-bounce-02.eml
 set-of-emails/to-be-debugged-because/something-is-wrong/issue-106-01.eml
@@ -735,6 +768,7 @@ t/026-smtp-status.t
 t/027-smtp-reply.t
 t/028-smtp-error.t
 t/031-rfc5322.t
+t/032-rfc1894.t
 t/040-message.t
 t/041-order.t
 t/043-message-email.t
@@ -754,6 +788,7 @@ t/302-rhost-exchangeonline.t
 t/303-rhost-goddady.t
 t/304-rhost-franceptt.t
 t/305-rhost-kddi.t
+t/306-rhost-tencentqq.t
 t/500-data.t
 t/501-data-json.t
 t/502-data-yaml.t
@@ -809,6 +844,7 @@ t/647-bite-email-yahoo.t
 t/648-bite-email-yandex.t
 t/649-bite-email-zoho.t
 t/650-bite-email-fml.t
+t/651-bite-email-amavis.t
 t/697-rfc3834.t
 t/698-rfc3464.t
 t/699-arf.t
@@ -872,6 +908,7 @@ xt/647-bite-email-yahoo.t
 xt/648-bite-email-yandex.t
 xt/649-bite-email-zoho.t
 xt/650-bite-email-fml.t
+xt/651-bite-email-amavis.t
 xt/697-rfc3834.t
 xt/698-rfc3464.t
 xt/699-arf.t

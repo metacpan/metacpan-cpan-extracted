@@ -46,13 +46,13 @@ sub scan {
     my $jsonstring = '';
     my $foldedline = 0;
 
-    while( my $e = shift @hasdivided ) {
+    for my $e ( @hasdivided ) {
         # Find JSON string from the message body
         next unless length $e;
         last if $e eq '--';
         last if $e eq '__END_OF_EMAIL_MESSAGE__';
 
-        $e =~ s/\A[ ]// if $foldedline; # The line starts with " ", continued from !\n.
+        substr($e, 0, 1, '') if $foldedline; # The line starts with " ", continued from !\n.
         $foldedline = 0;
 
         if( substr($e, -1, 1) eq '!' ) {
@@ -164,9 +164,7 @@ sub adapt {
                 $v->{'reason'} = 'feedback';
                 $v->{'feedbacktype'} = $o->{'complaintFeedbackType'} || '';
             }
-
-            $v->{'date'} =  $o->{'timestamp'} || $argvs->{'mail'}->{'timestamp'};
-            $v->{'date'} =~ s/[.]\d+Z\z//;
+            ($v->{'date'} = $o->{'timestamp'} || $argvs->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
         }
     } elsif( $argvs->{'notificationType'} eq 'Delivery' ) {
         # { "notificationType":"Delivery", "delivery": { ...
@@ -195,13 +193,11 @@ sub adapt {
             $v->{'recipient'} = $e;
             $v->{'lhost'}     = $o->{'reportingMTA'} || '';
             $v->{'diagnosis'} = $o->{'smtpResponse'} || '';
-            $v->{'status'}    = Sisimai::SMTP::Status->find($v->{'diagnosis'});
-            $v->{'replycode'} = Sisimai::SMTP::Reply->find($v->{'diagnosis'});
+            $v->{'status'}    = Sisimai::SMTP::Status->find($v->{'diagnosis'}) || '';
+            $v->{'replycode'} = Sisimai::SMTP::Reply->find($v->{'diagnosis'})  || '';
             $v->{'reason'}    = 'delivered';
             $v->{'action'}    = 'deliverable';
-
-            $v->{'date'} =  $o->{'timestamp'} || $argvs->{'mail'}->{'timestamp'};
-            $v->{'date'} =~ s/[.]\d+Z\z//;
+            ($v->{'date'} = $o->{'timestamp'} || $argvs->{'mail'}->{'timestamp'}) =~ s/[.]\d+Z\z//;
         }
     } else {
         # The value of "notificationType" is not any of "Bounce", "Complaint",
@@ -281,7 +277,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2016-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2016-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

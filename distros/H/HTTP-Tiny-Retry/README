@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Retry - Retry failed HTTP::Tiny requests
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Retry (from Perl
-    distribution HTTP-Tiny-Retry), released on 2018-12-09.
+    This document describes version 0.003 of HTTP::Tiny::Retry (from Perl
+    distribution HTTP-Tiny-Retry), released on 2019-04-10.
 
 SYNOPSIS
      use HTTP::Tiny::Retry;
@@ -46,11 +46,14 @@ SEE ALSO
 
     HTTP::Tiny::Patch::Retry, patch version of this module.
 
+    HTTP::Tiny::CustomRetry and HTTP::Tiny::Patch::CustomRetry for
+    customizable retry/backoff strategies.
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

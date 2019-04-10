@@ -1,6 +1,7 @@
 Build.PL
 Changes
 examples/bbio-tickit-ui.pl
+examples/set-pwm.pl
 lib/Device/BusPirate.pm
 lib/Device/BusPirate/Chip.pm
 lib/Device/BusPirate/Mode.pm
@@ -14,4 +15,9 @@ META.json
 META.yml
 README
 t/00use.t
+t/01serial.t
+t/10bbio.t
+t/20spi.t
+t/30i2c.t
 t/99pod.t
+t/lib/TestBusPirate.pm

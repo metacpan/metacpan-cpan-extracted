@@ -310,10 +310,7 @@ perl(1), Cz::Cstocs(3).
 
 =head1 AUTHOR
 
-(c) 1997--2000 Jan Pazdziora <adelton@fi.muni.cz>,
-http://www.fi.muni.cz/~adelton/
-
-at Faculty of Informatics, Masaryk University, Brno
+(c) 1997--2000 Jan Pazdziora
 
 =cut
 

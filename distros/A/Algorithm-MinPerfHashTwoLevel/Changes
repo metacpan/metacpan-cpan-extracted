@@ -1,0 +1,6 @@
+Revision history for Perl extension Algorithm::MinPerfHashTwoLevel.
+
+0.01  Sat Mar 30 15:43:44 2019
+	- original version; created by h2xs 1.23 with options
+		-A -n Algorithm::MinPerfHashTwoLevel
+

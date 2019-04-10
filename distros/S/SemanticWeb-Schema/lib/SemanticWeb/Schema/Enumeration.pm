@@ -2,7 +2,7 @@ use utf8;
 
 package SemanticWeb::Schema::Enumeration;
 
-# ABSTRACT: Lists or enumerations—for example
+# ABSTRACT: Lists or enumerationsâfor example
 
 use Moo;
 
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has superseded_by => (
@@ -38,15 +38,16 @@ __END__
 
 =head1 NAME
 
-SemanticWeb::Schema::Enumeration - Lists or enumerations—for example
+SemanticWeb::Schema::Enumeration - Lists or enumerationsâfor example
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
-Lists or enumerations—for example, a list of cuisines or music genres, etc.
+Lists or enumerationsâfor example, a list of cuisines or music genres,
+etc.
 
 =head1 ATTRIBUTES
 
@@ -63,9 +64,9 @@ A superseded_by should be one of the following types:
 
 =item C<InstanceOf['SemanticWeb::Schema::Enumeration']>
 
-=item C<InstanceOf['SemanticWeb::Schema::Class']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Property']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Class']>
 
 =back
 

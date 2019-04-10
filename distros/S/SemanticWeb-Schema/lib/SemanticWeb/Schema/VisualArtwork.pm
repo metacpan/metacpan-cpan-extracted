@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has art_edition => (
@@ -42,10 +42,26 @@ has artform => (
 
 
 
+has artist => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'artist',
+);
+
+
+
 has artwork_surface => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'artworkSurface',
+);
+
+
+
+has colorist => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'colorist',
 );
 
 
@@ -62,6 +78,30 @@ has height => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'height',
+);
+
+
+
+has inker => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'inker',
+);
+
+
+
+has letterer => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'letterer',
+);
+
+
+
+has penciler => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'penciler',
 );
 
 
@@ -98,7 +138,7 @@ SemanticWeb::Schema::VisualArtwork - A work of art that is primarily visual in c
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -118,9 +158,9 @@ A art_edition should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Integer']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
 
 =back
 
@@ -153,6 +193,20 @@ A artform should be one of the following types:
 
 =back
 
+=head2 C<artist>
+
+The primary artist for a work in a medium other than pencils or digital
+line art--for example, if the primary artwork is done in watercolors or
+digital paints.
+
+A artist should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
 =head2 C<artwork_surface>
 
 C<artworkSurface>
@@ -168,6 +222,18 @@ A artwork_surface should be one of the following types:
 
 =back
 
+=head2 C<colorist>
+
+The individual who adds color to inked drawings.
+
+A colorist should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
 =head2 C<depth>
 
 The depth of the item.
@@ -176,9 +242,9 @@ A depth should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -193,6 +259,44 @@ A height should be one of the following types:
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=back
+
+=head2 C<inker>
+
+The individual who traces over the pencil drawings in ink after pencils are
+complete.
+
+A inker should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
+=head2 C<letterer>
+
+The individual who adds lettering, including speech balloons and sound
+effects, to artwork.
+
+A letterer should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=back
+
+=head2 C<penciler>
+
+The individual who draws the primary narrative artwork.
+
+A penciler should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 

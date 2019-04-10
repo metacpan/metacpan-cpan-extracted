@@ -13,7 +13,8 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $index = [
+
+    state $index = [
         'because the recipient is only accepting mail from specific email addresses',   # AOL Phoenix
         'bounced address',  # SendGrid|a message to an address has previously been Bounced.
         'due to extended inactivity new mail is not currently being accepted for this mailbox',
@@ -42,13 +43,14 @@ sub true {
     my $argvs = shift // return undef;
     return 1 if $argvs->reason eq 'filtered';
 
+    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus) || '';
+    return 0 if $tempreason eq 'suspend';
+
     require Sisimai::Reason::UserUnknown;
+    my $alterclass = 'Sisimai::Reason::UserUnknown';
     my $commandtxt = $argvs->smtpcommand // '';
     my $diagnostic = lc $argvs->diagnosticcode // '';
-    my $tempreason = Sisimai::SMTP::Status->name($argvs->deliverystatus);
-    my $alterclass = 'Sisimai::Reason::UserUnknown';
 
-    return 0 if $tempreason eq 'suspend';
     if( $tempreason eq 'filtered' ) {
         # Delivery status code points "filtered".
         return 1 if( $alterclass->match($diagnostic) || __PACKAGE__->match($diagnostic) );

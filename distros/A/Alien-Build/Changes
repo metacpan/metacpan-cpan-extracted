@@ -1,5 +1,11 @@
 Revision history for Alien-Build
 
+1.63      2019-04-08 17:19:03 -0400
+  - Documentation improvements
+  - Fixed bug in Test::Alien::Build alienfile_skip_if_missing_prereqs
+    where subtest / test was always skipped regardless of requirements.
+    It now (correctly) only skips if there are missing requirements.
+
 1.62      2019-03-27 11:34:00 -0400
   - Production release identical to 1.61_01
 

@@ -1,0 +1,24 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The frequency in MHz and the modulation used for a particular BroadcastService.",
+      "rdfs:label" : "BroadcastFrequencySpecification",
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:category" : "issue-1004"
+   },
+   "properties" : {
+      "schema:broadcastFrequencyValue" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The frequency in MHz for a particular broadcast.",
+         "rdfs:label" : "broadcastFrequencyValue",
+         "schema:category" : "issue-1004",
+         "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
+         "schema:rangeIncludes" : [
+            "schema:Number",
+            "schema:QuantitativeValue"
+         ]
+      }
+   }
+}

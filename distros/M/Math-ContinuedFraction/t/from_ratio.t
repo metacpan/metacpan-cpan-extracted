@@ -1,6 +1,6 @@
 #!perl
 
-use Test::Simple tests => 1;
+use Test::More tests => 1;
 
 use Math::ContinuedFraction;
 

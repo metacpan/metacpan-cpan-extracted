@@ -14,18 +14,25 @@
             "schema:MusicRecording",
             "schema:MusicAlbum"
          ],
-         "schema:rangeIncludes" : "schema:MusicGroup"
+         "schema:rangeIncludes" : [
+            "schema:Person",
+            "schema:MusicGroup"
+         ]
       },
       "schema:duration" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
+         "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
             "schema:Movie",
             "schema:Event",
             "schema:MusicRelease",
-            "schema:MusicRecording"
+            "schema:Audiobook",
+            "schema:QuantitativeValueDistribution",
+            "schema:MusicRecording",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -44,7 +51,7 @@
          "schema:rangeIncludes" : "schema:MusicPlaylist"
       },
       "schema:isrcCode" : {
-         "dc:source" : "schemadotorgsources2:MBZ",
+         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Recording Code for the recording.",
          "rdfs:label" : "isrcCode",
@@ -52,7 +59,7 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:recordingOf" : {
-         "dc:source" : "schemadotorgsources2:MBZ",
+         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The composition this track is a recording of.",
          "rdfs:label" : "recordingOf",

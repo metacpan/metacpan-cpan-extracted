@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A process of progressive physical care and rehabilitation aimed at improving a health condition.",
+      "rdfs:label" : "PhysicalTherapy",
+      "rdfs:subClassOf" : "schema:MedicalTherapy",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

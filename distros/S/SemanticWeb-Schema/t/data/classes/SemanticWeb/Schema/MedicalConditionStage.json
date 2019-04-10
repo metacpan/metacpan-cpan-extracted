@@ -1,0 +1,27 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A stage of a medical condition, such as 'Stage IIIa'.",
+      "rdfs:label" : "MedicalConditionStage",
+      "rdfs:subClassOf" : "schema:MedicalIntangible",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:stageAsNumber" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The stage represented as a number, e.g. 3.",
+         "rdfs:label" : "stageAsNumber",
+         "schema:domainIncludes" : "schema:MedicalConditionStage",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      },
+      "schema:subStageSuffix" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The substage, e.g. 'a' for Stage IIIa.",
+         "rdfs:label" : "subStageSuffix",
+         "schema:domainIncludes" : "schema:MedicalConditionStage",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

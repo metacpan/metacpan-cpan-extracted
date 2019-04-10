@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "Lists or enumerationsâfor example, a list of cuisines or music genres, etc.",
+      "rdfs:comment" : "Lists or enumerationsÃ¢ÂÂfor example, a list of cuisines or music genres, etc.",
       "rdfs:label" : "Enumeration",
       "rdfs:subClassOf" : "schema:Intangible"
    },
@@ -12,14 +12,14 @@
          "rdfs:label" : "supersededBy",
          "schema:domainIncludes" : [
             "schema:Enumeration",
-            "schema:Property",
-            "schema:Class"
+            "schema:Class",
+            "schema:Property"
          ],
          "schema:isPartOf" : "http:meta.schema.org",
          "schema:rangeIncludes" : [
             "schema:Enumeration",
-            "schema:Class",
-            "schema:Property"
+            "schema:Property",
+            "schema:Class"
          ]
       }
    }

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has additional_property => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::QuantitativeValue - A point value or interval for product c
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -195,11 +195,11 @@ A value should be one of the following types:
 
 =item C<Num>
 
-=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
-
 =item C<Bool>
 
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
 
 =back
 
@@ -214,15 +214,15 @@ A value_reference should be one of the following types:
 
 =over
 
+=item C<InstanceOf['SemanticWeb::Schema::Enumeration']>
+
+=item C<InstanceOf['SemanticWeb::Schema::PropertyValue']>
+
 =item C<InstanceOf['SemanticWeb::Schema::QualitativeValue']>
 
 =item C<InstanceOf['SemanticWeb::Schema::StructuredValue']>
 
 =item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
-=item C<InstanceOf['SemanticWeb::Schema::Enumeration']>
-
-=item C<InstanceOf['SemanticWeb::Schema::PropertyValue']>
 
 =back
 

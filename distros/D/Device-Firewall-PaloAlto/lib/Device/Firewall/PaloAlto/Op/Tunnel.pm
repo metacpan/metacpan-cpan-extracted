@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::Tunnel;
-$Device::Firewall::PaloAlto::Op::Tunnel::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::Tunnel::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -20,8 +20,11 @@ sub _new {
 
     # P1 params are in one string split by forward slashes as well
     # as some spaces. We split these out and clean up the spaces.
+    # We don't use the in-place modifier so we can remain compatble with
+    # verions prior to 5.1.4.
+    # https://www.perl.com/pub/2011/05/new-features-of-perl-514-non-destructive-substitution.html/
     $tunnel{phase_1}{params} = [ 
-        map { s{ }{}r }
+        map { my $c = $_; $c =~ s{ }{}; $c }
         split('/', delete $tunnel{phase_1}{algo}) 
     ];
 
@@ -79,7 +82,7 @@ Device::Firewall::PaloAlto::Op::Tunnel - Palo Alto IPSEC tunnel
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 

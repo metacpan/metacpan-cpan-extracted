@@ -6,6 +6,18 @@
       "rdfs:subClassOf" : "schema:Intangible"
    },
    "properties" : {
+      "schema:menuAddOn" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1541",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Additional menu item(s) such as a side dish of salad or side order of fries that can be added to this menu item. Additionally it can be a menu section containing allowed add-on menu items for this menu item.",
+         "rdfs:label" : "menuAddOn",
+         "schema:category" : "issue-1541",
+         "schema:domainIncludes" : "schema:MenuItem",
+         "schema:rangeIncludes" : [
+            "schema:MenuItem",
+            "schema:MenuSection"
+         ]
+      },
       "schema:nutrition" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Nutrition information about the recipe or menu item.",
@@ -22,11 +34,11 @@
          "rdfs:label" : "offers",
          "schema:domainIncludes" : [
             "schema:Event",
-            "schema:Trip",
             "schema:MenuItem",
+            "schema:Service",
             "schema:AggregateOffer",
             "schema:Product",
-            "schema:Service",
+            "schema:Trip",
             "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Offer"
@@ -36,8 +48,8 @@
          "rdfs:comment" : "Indicates a dietary restriction or guideline for which this recipe or menu item is suitable, e.g. diabetic, halal etc.",
          "rdfs:label" : "suitableForDiet",
          "schema:domainIncludes" : [
-            "schema:MenuItem",
-            "schema:Recipe"
+            "schema:Recipe",
+            "schema:MenuItem"
          ],
          "schema:rangeIncludes" : "schema:RestrictedDiet"
       }

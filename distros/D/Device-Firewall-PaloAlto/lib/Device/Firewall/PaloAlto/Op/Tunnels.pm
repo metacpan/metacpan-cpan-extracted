@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op::Tunnels;
-$Device::Firewall::PaloAlto::Op::Tunnels::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::Tunnels::VERSION = '0.1.5';
 use strict;
 use warnings;
 use 5.010;
@@ -22,6 +22,10 @@ sub _new {
     $tunnels{$_->{name}}{phase_1} = $_ foreach @{$ike_sas->{result}{entry}};
     $tunnels{$_->{gateway}}{phase_2} = $_ foreach @{$ipsec_sas->{result}{entries}{entry}};
 
+    # API CRUFT: there whitespace following the remote IP.
+    $_->{phase_2}{remote} =~ s{\s+$}{} foreach values %tunnels;
+    
+
     # Map the values to tunnel objects, still keyed on the IKE gateway name.
     %tunnels = map { $_ => Device::Firewall::PaloAlto::Op::Tunnel->_new($tunnels{$_}) } keys %tunnels;
 
@@ -35,9 +39,6 @@ sub gw {
     my ($gw) = @_;
     return $self->{$gw}
 };
-
-
-
 
 
 
@@ -58,7 +59,7 @@ Device::Firewall::PaloAlto::Op::Tunnels - Palo Alto IPSEC security associations
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 

@@ -10,6 +10,7 @@ dist.ini
 lib/Algorithm/Retry.pm
 lib/Algorithm/Retry/Constant.pm
 lib/Algorithm/Retry/ExponentialBackoff.pm
+lib/Algorithm/Retry/Fibonacci.pm
 t/00-compile.t
 t/01-base.t
 t/author-critic.t
@@ -17,5 +18,6 @@ t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/constant.t
 t/exponential_backoff.t
+t/fibonacci.t
 t/release-rinci.t
 weaver.ini

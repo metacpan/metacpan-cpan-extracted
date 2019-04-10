@@ -1,0 +1,13 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any specific branch of medical science or practice. Medical specialities include clinical specialties that pertain to particular organ systems and their respective disease states, as well as allied health specialties. Enumerated type.",
+      "rdfs:label" : "MedicalSpecialty",
+      "rdfs:subClassOf" : [
+         "schema:MedicalEnumeration",
+         "schema:Specialty"
+      ],
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

@@ -12,17 +12,17 @@
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
             "schema:Service",
-            "schema:Organization",
-            "schema:Offer",
-            "schema:ContactPoint",
+            "schema:DeliveryChargeSpecification",
             "schema:Demand",
-            "schema:DeliveryChargeSpecification"
+            "schema:Organization",
+            "schema:ContactPoint",
+            "schema:Offer"
          ],
          "schema:rangeIncludes" : [
-            "schema:AdministrativeArea",
-            "schema:Text",
             "schema:GeoShape",
-            "schema:Place"
+            "schema:Place",
+            "schema:AdministrativeArea",
+            "schema:Text"
          ]
       },
       "schema:availableLanguage" : {
@@ -30,10 +30,10 @@
          "rdfs:comment" : "A language someone may use with or at the item, service or place. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/inLanguage\">inLanguage</a>",
          "rdfs:label" : "availableLanguage",
          "schema:domainIncludes" : [
-            "schema:ServiceChannel",
-            "schema:LodgingBusiness",
             "schema:TouristAttraction",
-            "schema:ContactPoint"
+            "schema:ContactPoint",
+            "schema:ServiceChannel",
+            "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -59,8 +59,8 @@
          "rdfs:comment" : "Email address.",
          "rdfs:label" : "email",
          "schema:domainIncludes" : [
-            "schema:Person",
             "schema:ContactPoint",
+            "schema:Person",
             "schema:Organization"
          ],
          "schema:rangeIncludes" : "schema:Text"
@@ -82,9 +82,9 @@
          "rdfs:comment" : "The hours during which this service or contact is available.",
          "rdfs:label" : "hoursAvailable",
          "schema:domainIncludes" : [
+            "schema:LocationFeatureSpecification",
             "schema:Service",
-            "schema:ContactPoint",
-            "schema:LocationFeatureSpecification"
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
       },
@@ -108,9 +108,9 @@
             "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
-            "schema:AdministrativeArea",
             "schema:GeoShape",
-            "schema:Place"
+            "schema:Place",
+            "schema:AdministrativeArea"
          ],
          "schema:supersededBy" : "schema:areaServed"
       },
@@ -119,10 +119,10 @@
          "rdfs:comment" : "The telephone number.",
          "rdfs:label" : "telephone",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
-            "schema:Person",
             "schema:Organization",
-            "schema:Place"
+            "schema:Place",
+            "schema:Person",
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

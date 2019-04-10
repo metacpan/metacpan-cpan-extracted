@@ -1,5 +1,5 @@
 package JSON::Schema::Fit;
-$JSON::Schema::Fit::VERSION = '0.03';
+$JSON::Schema::Fit::VERSION = '0.04';
 # ABSTRACT: adjust data structure according to json-schema
 
 
@@ -26,6 +26,9 @@ sub numbers { return _attr('numbers', @_); }
 sub round_numbers { return _attr('round_numbers', @_); }
 
 
+sub clamp_numbers { return _attr('clamp_numbers', @_); }
+
+
 
 sub strings { return _attr('strings', @_); }
 
@@ -33,7 +36,10 @@ sub strings { return _attr('strings', @_); }
 sub hash_keys { return _attr('hash_keys', @_); }
 
 # Store valid options as well as default values
-my %valid_option = ( map { ($_ => 1) } qw!booleans numbers round_numbers strings hash_keys! );
+my %valid_option =(
+    ( map { ($_ => 1) } qw!booleans numbers round_numbers strings hash_keys! ),
+    ( map { ($_ => 0) } qw!clamp_numbers! ),
+);
 
 sub new { 
     my ($class, %opts) = @_;
@@ -101,10 +107,17 @@ sub _get_adjusted_number {
     return $struc  if !$self->numbers();
     my $result = 0+$struc;
 
-    return $result if !$self->round_numbers();
-    my $quantum = $schema->{multipleOf} || $schema->{divisibleBy};
-    return $result if !$quantum;
-    return nearest $quantum, $result;
+    if ($self->round_numbers) {
+        my $quantum = $schema->{multipleOf} || $schema->{divisibleBy};
+        $result = nearest $quantum, $result if $quantum;
+    }
+
+    if ($self->clamp_numbers) {
+        $result = $schema->{maximum} if exists $schema->{maximum} and $result > $schema->{maximum};
+        $result = $schema->{minimum} if exists $schema->{minimum} and $result < $schema->{minimum};
+    }
+
+    return $result;
 }
 
 
@@ -190,7 +203,7 @@ JSON::Schema::Fit - adjust data structure according to json-schema
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -236,6 +249,15 @@ Default: 1
 Round numbers according to 'multipleOf' schema value
 
 Default: 1
+
+=head2 clamp_numbers
+
+Crop numbers accordingly with 'maximum', 'minimum' attributes.
+
+Values outside these limits will be set to the defined in the maximum/minimum
+attributes. 
+
+Default: 0
 
 =head2 strings
 

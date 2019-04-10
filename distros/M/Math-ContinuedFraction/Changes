@@ -1,20 +1,42 @@
 Revision history for Math-ContinuedFraction
 
+0.13
+     2019-04-09
+	- End-of-array error in convergent() (which could result
+	  in a divide-by-zero error) found and fixed by James Morse.
+	- Gad. I never set a perl version limit. Currently set to 5.10.1.
+	- Get Build.PL and this file up to a more standard format. Added
+	  missing test file from_root.t to MANIFEST. Change README to
+          README.md. Added a CONTRIBUTING.md file.
+	- It looks like I never released version 0.12. I probably
+	  should release this version then.
+0.12
+     2013-05-20
+	- Add the 'b' portion of the ->new() method. Works for
+	  new BigRat and BigInt arguments, currently has no
+	  affect for the array sequence method, although the
+	  arguments are stored.
+     2013-01-27
+	- Fixed a documentation error and removed an unused variable as
+	  pointed out by Saasha Metsarantala (my apologies for missing
+	  diacritical marks in the name).
+
 0.11
-	21 January 2011
+     2011-01-21
 	- Got the named changed to its CamelCase form.
 	- More tests.
-	17 January 2011
+     2011-01-17
 	- Introduce from_root() method.
-	11 January 2011
+     2011-01-11
 	- Changed new() to allow creation of a continued fraction
 	  from a Math::BigRat object.
-	4 January 2011
+     2011-01-04
 	- Added code to from_ratio() to check for a zero divisor.
-	2 January 2011
+     2011-01-02
 	- Inevitable missing test files put in MANIFEST.
 
-0.10    1 January 2011
+0.10
+     2011-01-01
 	- Very basic version released: Can create CF objects two
 	  different ways, and return array form, ascii array form,
 	  and convergents using BigRat and BigInt types.

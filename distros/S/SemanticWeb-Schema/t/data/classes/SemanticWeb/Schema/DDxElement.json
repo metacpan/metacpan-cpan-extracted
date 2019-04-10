@@ -1,0 +1,30 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An alternative, closely-related condition typically considered later in the differential diagnosis process along with the signs that are used to distinguish it.",
+      "rdfs:label" : "DDxElement",
+      "rdfs:subClassOf" : "schema:MedicalIntangible",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:diagnosis" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "One or more alternative conditions considered in the differential diagnosis process as output of a diagnosis process.",
+         "rdfs:label" : "diagnosis",
+         "schema:domainIncludes" : [
+            "schema:DDxElement",
+            "schema:Patient"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      },
+      "schema:distinguishingSign" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "One of a set of signs and symptoms that can be used to distinguish this diagnosis from others in the differential diagnosis.",
+         "rdfs:label" : "distinguishingSign",
+         "schema:domainIncludes" : "schema:DDxElement",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalSignOrSymptom"
+      }
+   }
+}

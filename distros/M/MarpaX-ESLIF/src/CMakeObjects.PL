@@ -15,6 +15,8 @@ use File::Copy::Recursive qw/dircopy/;
 use IPC::Run qw/run/;
 use Perl::OSType qw/is_os_type/;
 use POSIX qw/EXIT_SUCCESS strftime/;
+use Try::Tiny;
+
 #
 # Move to current dir of this script
 #
@@ -22,6 +24,38 @@ my $okupdir = dirname($0);
 chdir($okupdir) || die "Cannot move to $okupdir, $!";
 
 print "Working directory set to $okupdir\n";
+
+my $isc99 = 0;
+my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
+if (($cbuilder_config{cc} // 'cc') ne 'cl') {
+    print "Checking if C99 is enabled by default: ";
+    if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}")) {
+        print "yes\n";
+        $isc99 = 1;
+    } else {
+        print "no\n";
+        print "Checking what CFLAGS is required for C99:\n";
+        foreach my $flag (qw/-std=gnu99 -std=c99 -c99 -AC99 -xc99=all -qlanglvl=extc99/) {
+            print "Checking if flag $flag works: ";
+            if (try_compile("#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n#error \"C99 is not enabled\"\n#endif\nint main(){return 0;}", $flag)) {
+                print "yes\n";
+                $ENV{CFLAGS} .= " $flag";
+                $isc99 = 1;
+                last;
+            } else {
+                print "no\n";
+            }
+        }
+    }
+}
+
+if ($^O eq "netbsd" && ! $isc99) {
+    #
+    # We need long long, that C99 guarantees, else _NETBSD_SOURCE will do it
+    #
+    print "NetBSD platform and no c99: Append _NETBSD_SOURCE to CFLAGS to have long long\n";
+    $ENV{CFLAGS} .= " -D_NETBSD_SOURCE";
+}
 
 make_path(File::Spec->catdir('output', '3rdparty'));
 
@@ -314,4 +348,28 @@ typedef unsigned int marpaESLIF_uint32_t;
 #endif /* MARPAESLIF_CONFIG_WRAPPER_H */
 CONFIG
     close($fh) || warn "Cannot close $output, $!";
+}
+
+sub try_compile {
+    my ($csource, $extra_compiler_flags) = @_;
+
+    my $fh = File::Temp->new(UNLINK => 0, SUFFIX => '.c');
+    print $fh "$csource\n";
+    close($fh);
+    my $source = $fh->filename;
+    my $rc = 0;
+
+    try {
+        my $cbuilder = ExtUtils::CBuilder->new();
+        my $obj = basename($cbuilder->object_file($source));
+        $cbuilder->compile(
+            source               => $source,
+            object_file          => $obj,
+            extra_compiler_flags => $extra_compiler_flags
+            );
+        $rc = 1;
+    };
+    unlink $fh->filename;
+
+    return $rc;
 }

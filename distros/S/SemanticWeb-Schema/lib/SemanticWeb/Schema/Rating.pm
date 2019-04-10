@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has author => (
@@ -38,6 +38,14 @@ has rating_value => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'ratingValue',
+);
+
+
+
+has review_aspect => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'reviewAspect',
 );
 
 
@@ -66,7 +74,7 @@ SemanticWeb::Schema::Rating - A rating is an evaluation on a numeric scale
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -84,9 +92,9 @@ A author should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Organization']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Person']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Organization']>
 
 =back
 
@@ -120,6 +128,21 @@ A rating_value should be one of the following types:
 =item C<Str>
 
 =item C<Num>
+
+=back
+
+=head2 C<review_aspect>
+
+C<reviewAspect>
+
+This Review or Rating is relevant to this part or facet of the
+itemReviewed.
+
+A review_aspect should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

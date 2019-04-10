@@ -1,0 +1,164 @@
+<response status="success"><result>
+	<flags>flags: A:active, ?:loose, C:connect, H:host, S:static, ~:internal, R:rip, O:ospf, B:bgp, Oi:ospf intra-area, Oo:ospf inter-area, O1:ospf ext-type-1, O2:ospf ext-type-2, E:ecmp, M:multicast</flags>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>0.0.0.0/0</destination>
+		<nexthop>192.168.122.1</nexthop>
+		<metric>10</metric>
+		<flags>A S E </flags>
+		<age></age>
+		<interface>ethernet1/1</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>0.0.0.0/0</destination>
+		<nexthop>192.168.122.2</nexthop>
+		<metric>10</metric>
+		<flags>A S E </flags>
+		<age></age>
+		<interface>ethernet1/1</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.4.0/24</destination>
+		<nexthop>1.1.4.1</nexthop>
+		<metric>0</metric>
+		<flags>A C   </flags>
+		<age></age>
+		<interface>vlan.32</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.4.1/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>0</metric>
+		<flags>A H   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.5.1/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>0</metric>
+		<flags>A H   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.5.2/32</destination>
+		<nexthop>vr second_vr</nexthop>
+		<metric>10</metric>
+		<flags>A S   </flags>
+		<age></age>
+		<interface>default/i3</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.5.3/32</destination>
+		<nexthop>discard</nexthop>
+		<metric>10</metric>
+		<flags>A S   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.5.4/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>10</metric>
+		<flags>A S   </flags>
+		<age></age>
+		<interface>ethernet1/1</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.6.0/24</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>10</metric>
+		<flags>  Oi  </flags>
+		<age>1057</age>
+		<interface>tunnel.1</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.6.0/24</destination>
+		<nexthop>1.1.6.1</nexthop>
+		<metric>0</metric>
+		<flags>A C   </flags>
+		<age></age>
+		<interface>tunnel.1</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.6.1/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>0</metric>
+		<flags>A H   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>1.1.10.1/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>0</metric>
+		<flags>A H   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>10.0.0.0/16</destination>
+		<nexthop>1.1.5.2</nexthop>
+		<metric></metric>
+		<flags>A?B   </flags>
+		<age>1054</age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>192.168.0.0/23</destination>
+		<nexthop>1.1.5.2</nexthop>
+		<metric></metric>
+		<flags>A?B   </flags>
+		<age>1054</age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>192.168.122.0/24</destination>
+		<nexthop>192.168.122.21</nexthop>
+		<metric>0</metric>
+		<flags>A C   </flags>
+		<age></age>
+		<interface>ethernet1/1</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>192.168.122.21/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>0</metric>
+		<flags>A H   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>192.168.123.0/24</destination>
+		<nexthop>192.168.123.1</nexthop>
+		<metric>0</metric>
+		<flags>A C   </flags>
+		<age></age>
+		<interface>ethernet1/2</interface>
+		<route-table>unicast</route-table></entry>
+	<entry>
+		<virtual-router>default</virtual-router>
+		<destination>192.168.123.1/32</destination>
+		<nexthop>0.0.0.0</nexthop>
+		<metric>0</metric>
+		<flags>A H   </flags>
+		<age></age>
+		<interface></interface>
+		<route-table>unicast</route-table></entry></result></response>

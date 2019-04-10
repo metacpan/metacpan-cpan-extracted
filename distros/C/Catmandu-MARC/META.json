@@ -52,6 +52,7 @@
             "MARC::Lint" : "0",
             "MARC::Parser::RAW" : "0",
             "MARC::Record" : "v2.0.6",
+            "MARC::Schema" : "0.07",
             "MARC::Spec" : "v2.0.3",
             "Memoize" : "0",
             "Moo" : "1.0",
@@ -86,7 +87,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-MARC"
       }
    },
-   "version" : "1.241",
+   "version" : "1.251",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
       "Carsten Klee <cKlee@users.noreply.github.com>",

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,4 +19,5 @@ requires:
 resources:
   homepage: http://timetracker.plix.at
   repository: git://github.com/domm/App-TimeTracker-Trello.git
-version: '1.005'
+version: '1.006'
+x_serialization_backend: 'YAML::Tiny version 1.69'

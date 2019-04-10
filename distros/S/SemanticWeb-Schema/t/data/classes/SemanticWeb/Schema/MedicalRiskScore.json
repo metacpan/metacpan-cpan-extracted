@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A simple system that adds up the number of risk factors to yield a score that is associated with prognosis, e.g. CHAD score, TIMI risk score.",
+      "rdfs:label" : "MedicalRiskScore",
+      "rdfs:subClassOf" : "schema:MedicalRiskEstimator",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:algorithm" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The algorithm or rules to follow to compute the score.",
+         "rdfs:label" : "algorithm",
+         "schema:domainIncludes" : "schema:MedicalRiskScore",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

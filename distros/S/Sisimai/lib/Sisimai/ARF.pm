@@ -3,6 +3,7 @@ use feature ':5.10';
 use strict;
 use warnings;
 use Sisimai::Bite::Email;
+use Sisimai::RFC5322;
 
 # http://tools.ietf.org/html/rfc5965
 # http://en.wikipedia.org/wiki/Feedback_loop_(email)
@@ -48,12 +49,13 @@ sub is_arf {
         # Microsoft (Hotmail, MSN, Live, Outlook) uses its own report format.
         # Amazon SES Complaints bounces
         my $title = 'complaint about message from ';
+        my $hfrom = Sisimai::Address->s3s4($heads->{'from'});
         my $mfrom = qr{(?:
              staff[@]hotmail[.]com
             |complaints[@]email-abuse[.]amazonses[.]com
             )\z
         }x;
-        if( $heads->{'from'} =~ $mfrom && index($heads->{'subject'}, $title) > -1) {
+        if( $hfrom =~ $mfrom && index($heads->{'subject'}, $title) > -1) {
             # From: staff@hotmail.com
             # From: complaints@email-abuse.amazonses.com
             # Subject: complaint about message from 192.0.2.1
@@ -81,7 +83,6 @@ sub scan {
     return undef unless is_arf(undef, $mhead);
 
     my $dscontents = [Sisimai::Bite::Email->DELIVERYSTATUS];
-    my @hasdivided = split("\n", $$mbody);
     my $rfc822part = '';    # (String) message/rfc822-headers part
     my $previousfn = '';    # (String) Previous field name
     my $readcursor = 0;     # (Integer) Points the current cursor position
@@ -121,10 +122,10 @@ sub scan {
     #      generator is using to generate the report.  The version number in
     #      this specification is set to "1".
     #
-    for my $e ( @hasdivided ) {
+    for my $e ( split("\n", $$mbody) ) {
         # Read each line between the start of the message and the start of rfc822 part.
         unless( $readcursor ) {
-            # Beginning of the bounce message or delivery status part
+            # Beginning of the bounce message or message/delivery-status part
             if( $e =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
@@ -141,7 +142,7 @@ sub scan {
         }
 
         if( $readcursor & $Indicators->{'message-rfc822'} ) {
-            # After "message/rfc822"
+            # message/rfc822 OR text/rfc822-headers part
             if( $e =~ /X-HmXmrOriginalRecipient:[ ]*(.+)\z/ ) {
                 # Microsoft ARF: original recipient.
                 $dscontents->[-1]->{'recipient'} = Sisimai::Address->s3s4($1);
@@ -155,11 +156,17 @@ sub scan {
             } elsif( $e =~ /\AFrom:[ ]*(.+)\z/ ) {
                 # Microsoft ARF: original sender.
                 $commondata->{'from'} ||= Sisimai::Address->s3s4($1);
-            
-            } elsif( $e =~ /\A([-0-9A-Za-z]+?)[:][ ]*(.+)\z/ ) {
+
+            } elsif( $e =~ /\A[ \t]+/ ) {
+                # Continued line from the previous line
+                $rfc822part .= $e."\n" if exists $LongFields->{ $previousfn };
+                next if length $e;
+                $rcptintext .= $e if $previousfn eq 'to';
+
+            } else {
                 # Get required headers only
-                my $lhs = lc $1;
-                my $rhs = $2;
+                my($lhs, $rhs) = split(/:[ ]*/, $e, 2);
+                next unless $lhs = lc($lhs || '');
 
                 $previousfn = '';
                 next unless exists $RFC822Head->{ $lhs };
@@ -167,15 +174,9 @@ sub scan {
                 $previousfn  = $lhs;
                 $rfc822part .= $e."\n";
                 $rcptintext  = $rhs if $lhs eq 'to';
-
-            } elsif( $e =~ /\A[ \t]+/ ) {
-                # Continued line from the previous line
-                $rfc822part .= $e."\n" if exists $LongFields->{ $previousfn };
-                next if length $e;
-                $rcptintext .= $e if $previousfn eq 'to';
-            }
+            } 
         } else {
-            # Before "message/rfc822"
+            # message/delivery-status part
             next unless $readcursor & $Indicators->{'deliverystatus'};
             next unless length $e;
 
@@ -266,10 +267,8 @@ sub scan {
 
     unless( $rfc822part =~ /\bFrom: [^ ]+[@][^ ]+\b/ ) {
         # There is no "From:" header in the original message
-        if( $commondata->{'from'} ) {
-            # Append the value of "Original-Mail-From" value as a sender address.
-            $rfc822part .= 'From: '.$commondata->{'from'}."\n";
-        }
+        # Append the value of "Original-Mail-From" value as a sender address.
+        $rfc822part .= 'From: '.$commondata->{'from'}."\n" if $commondata->{'from'};
     }
 
     if( $mhead->{'subject'} =~ /complaint about message from (\d{1,3}[.]\d{1,3}[.]\d{1,3}[.]\d{1,3})/ ) {
@@ -281,33 +280,30 @@ sub scan {
     }
 
     for my $e ( @$dscontents ) {
-        if( $e->{'recipient'} =~ /\A[^ ]+[@]\z/ ) {
-            # AOL = http://forums.cpanel.net/f43/aol-brutal-work-71473.html
-            $e->{'recipient'} = Sisimai::Address->s3s4($rcptintext);
-        }
+        # AOL = http://forums.cpanel.net/f43/aol-brutal-work-71473.html
+        $e->{'recipient'} = Sisimai::Address->s3s4($rcptintext) if $e->{'recipient'} =~ /\A[^ ]+[@]\z/;
         map { $e->{ $_ } ||= $arfheaders->{ $_ } } keys %$arfheaders;
         delete $e->{'authres'};
 
         $e->{'softbounce'}  = -1;
         $e->{'diagnosis'} ||= $commondata->{'diagnosis'};
         $e->{'date'}      ||= $mhead->{'date'};
+        $e->{'reason'}      = 'feedback';
+        $e->{'command'}     = '';
+        $e->{'action'}      = '';
+        $e->{'agent'}     ||= __PACKAGE__->smtpagent;
 
-        unless( $e->{'rhost'} ) {
-            # Get the remote IP address from the message body
-            if( $commondata->{'rhost'} ) {
-                # The value of "Reporting-MTA" header
-                $e->{'rhost'} = $commondata->{'rhost'};
+        # Get the remote IP address from the message body
+        next if $e->{'rhost'};
+        if( $commondata->{'rhost'} ) {
+            # The value of "Reporting-MTA" header
+            $e->{'rhost'} = $commondata->{'rhost'};
 
-            } elsif( $e->{'diagnosis'} =~ /\breceived from IP address ([^ ]+)/ ) {
-                # This is an email abuse report for an email message received
-                # from IP address 24.64.1.1 on Thu, 29 Apr 2010 00:00:00 +0000
-                $e->{'rhost'} = $1;
-            }
+        } elsif( $e->{'diagnosis'} =~ /\breceived from IP address ([^ ]+)/ ) {
+            # This is an email abuse report for an email message received
+            # from IP address 24.64.1.1 on Thu, 29 Apr 2010 00:00:00 +0000
+            $e->{'rhost'} = $1;
         }
-        $e->{'reason'}  = 'feedback';
-        $e->{'command'} = '';
-        $e->{'action'}  = '';
-        $e->{'agent'} ||= __PACKAGE__->smtpagent;
     }
     return { 'ds' => $dscontents, 'rfc822' => $rfc822part };
 }
@@ -360,7 +356,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

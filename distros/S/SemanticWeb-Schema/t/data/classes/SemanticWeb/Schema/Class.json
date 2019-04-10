@@ -1,5 +1,6 @@
 {
    "class" : {
+      "owl:equivalentClass" : "rdfs:Class",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A class, also often called a 'Type'; equivalent to rdfs:Class.",
       "rdfs:label" : "Class",
@@ -13,14 +14,14 @@
          "rdfs:label" : "supersededBy",
          "schema:domainIncludes" : [
             "schema:Enumeration",
-            "schema:Property",
-            "schema:Class"
+            "schema:Class",
+            "schema:Property"
          ],
          "schema:isPartOf" : "http:meta.schema.org",
          "schema:rangeIncludes" : [
             "schema:Enumeration",
-            "schema:Class",
-            "schema:Property"
+            "schema:Property",
+            "schema:Class"
          ]
       }
    }

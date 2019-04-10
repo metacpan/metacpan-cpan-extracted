@@ -7,6 +7,7 @@ requires "Types::Standard" => "0";
 requires "namespace::autoclean" => "0";
 requires "perl" => "v5.10.1";
 requires "utf8" => "0";
+recommends "Class::XSAccessor" => "1.18";
 recommends "Ref::Util::XS" => "0";
 recommends "Type::Tiny::XS" => "0";
 recommends "aliased" => "0";

@@ -1,5 +1,17 @@
 Revision history for Device-BusPirate
 
+0.17    2019-04-10 02:02:05
+        [CHANGES]
+         * Implement the ->meta_gpios Device::Chip method
+         * Add some unit tests
+         * Added ->set_pwm method
+         * Remember to shut down I²C pullups at DESTROY time
+         * Use Future::IO instead of internal custom implementation
+        
+        [BUGFIXES]
+         * Fixes for bitrate selection of SPI and I²C interfaces
+         * Put termios device into raw mode by using ->cfmakeraw
+
 0.16    2018-08-07 12:03:40
         [BUGFIXES]
          * Allow multiple I²C adapters for mounting multiple Device::Chips on

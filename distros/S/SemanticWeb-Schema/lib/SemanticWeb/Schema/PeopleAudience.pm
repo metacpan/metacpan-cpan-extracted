@@ -15,7 +15,15 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
+
+
+has health_condition => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'healthCondition',
+);
+
 
 
 has required_gender => (
@@ -82,7 +90,7 @@ SemanticWeb::Schema::PeopleAudience - A set of characteristics belonging to peop
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -90,6 +98,21 @@ A set of characteristics belonging to people, e.g. who compose an item's
 target audience.
 
 =head1 ATTRIBUTES
+
+=head2 C<health_condition>
+
+C<healthCondition>
+
+Specifying the health condition(s) of a patient, medical study, or other
+target audience.
+
+A health_condition should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MedicalCondition']>
+
+=back
 
 =head2 C<required_gender>
 

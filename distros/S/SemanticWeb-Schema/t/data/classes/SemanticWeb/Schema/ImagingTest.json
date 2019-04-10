@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Any medical imaging modality typically used for diagnostic purposes.",
+      "rdfs:label" : "ImagingTest",
+      "rdfs:subClassOf" : "schema:MedicalTest",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:imagingTechnique" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Imaging technique used.",
+         "rdfs:label" : "imagingTechnique",
+         "schema:domainIncludes" : "schema:ImagingTest",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalImagingTechnique"
+      }
+   }
+}

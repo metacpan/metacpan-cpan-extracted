@@ -1,0 +1,58 @@
+{
+   "abstract" : "Create and manipulate continued fractions",
+   "author" : [
+      "John M. Gamble <jgamble@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-ContinuedFraction",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Math::BigInt" : "0",
+            "Math::BigRat" : "0",
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Math::ContinuedFraction" : {
+         "file" : "lib/Math/ContinuedFraction.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jgamble/Math-ContinuedFraction.git"
+      }
+   },
+   "version" : "0.13",
+   "x_keyword" : [
+      "math",
+      "continued-fraction",
+      "sequences"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

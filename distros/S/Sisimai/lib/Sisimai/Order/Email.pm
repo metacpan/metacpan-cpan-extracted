@@ -21,19 +21,20 @@ my $EngineOrder2 = [
 my $EngineOrder3 = [
     # These modules have no MTA specific header but listed in the following
     # subject header based regular expressions.
+    'Sisimai::Bite::Email::Postfix',
+    'Sisimai::Bite::Email::Sendmail',
     'Sisimai::Bite::Email::qmail',
+    'Sisimai::Bite::Email::SendGrid',
+    'Sisimai::Bite::Email::Courier',
+    'Sisimai::Bite::Email::OpenSMTPD',
     'Sisimai::Bite::Email::Notes',
     'Sisimai::Bite::Email::MessagingServer',
     'Sisimai::Bite::Email::Domino',
-    'Sisimai::Bite::Email::EinsUndEins',
-    'Sisimai::Bite::Email::OpenSMTPD',
-    'Sisimai::Bite::Email::MXLogic',
-    'Sisimai::Bite::Email::Postfix',
-    'Sisimai::Bite::Email::Sendmail',
-    'Sisimai::Bite::Email::Courier',
-    'Sisimai::Bite::Email::IMailServer',
-    'Sisimai::Bite::Email::SendGrid',
     'Sisimai::Bite::Email::Bigfoot',
+    'Sisimai::Bite::Email::EinsUndEins',
+    'Sisimai::Bite::Email::MXLogic',
+    'Sisimai::Bite::Email::Amavis',
+    'Sisimai::Bite::Email::IMailServer',
     'Sisimai::Bite::Email::X4',
 ];
 my $EngineOrder4 = [
@@ -54,12 +55,12 @@ my $EngineOrder4 = [
 my $EngineOrder5 = [
     # These modules have one or more MTA specific headers but other headers
     # also required for detecting MTA name
-    'Sisimai::Bite::Email::Google',
     'Sisimai::Bite::Email::Outlook',
     'Sisimai::Bite::Email::MailRu',
     'Sisimai::Bite::Email::MessageLabs',
     'Sisimai::Bite::Email::MailMarshalSMTP',
     'Sisimai::Bite::Email::mFILTER',
+    'Sisimai::Bite::Email::Google',
 ];
 my $EngineOrder9 = [
     # These modules have one or more MTA specific headers
@@ -68,8 +69,8 @@ my $EngineOrder9 = [
     'Sisimai::Bite::Email::AmazonSES',
     'Sisimai::Bite::Email::GMX',
     'Sisimai::Bite::Email::Yandex',
-    'Sisimai::Bite::Email::ReceivingSES',
     'Sisimai::Bite::Email::Office365',
+    'Sisimai::Bite::Email::ReceivingSES',
     'Sisimai::Bite::Email::AmazonWorkMail',
     'Sisimai::Bite::Email::Zoho',
     'Sisimai::Bite::Email::McAfee',
@@ -83,9 +84,8 @@ my $PatternTable = {
     'subject' => {
         'delivery' => [
             'Sisimai::Bite::Email::Exim',
-            'Sisimai::Bite::Email::Courier',
-            'Sisimai::Bite::Email::Google',
             'Sisimai::Bite::Email::Outlook',
+            'Sisimai::Bite::Email::Courier',
             'Sisimai::Bite::Email::Domino',
             'Sisimai::Bite::Email::OpenSMTPD',
             'Sisimai::Bite::Email::EinsUndEins',
@@ -94,11 +94,11 @@ my $PatternTable = {
             'Sisimai::Bite::Email::X4',
             'Sisimai::Bite::Email::X3',
             'Sisimai::Bite::Email::X2',
+            'Sisimai::Bite::Email::Google',
         ],
         'noti' => [
-            'Sisimai::Bite::Email::qmail',
             'Sisimai::Bite::Email::Sendmail',
-            'Sisimai::Bite::Email::Google',
+            'Sisimai::Bite::Email::qmail',
             'Sisimai::Bite::Email::Outlook',
             'Sisimai::Bite::Email::Courier',
             'Sisimai::Bite::Email::MessagingServer',
@@ -106,37 +106,39 @@ my $PatternTable = {
             'Sisimai::Bite::Email::X4',
             'Sisimai::Bite::Email::X3',
             'Sisimai::Bite::Email::mFILTER',
+            'Sisimai::Bite::Email::Google',
         ],
         'return' => [
             'Sisimai::Bite::Email::Postfix',
             'Sisimai::Bite::Email::Sendmail',
             'Sisimai::Bite::Email::SendGrid',
             'Sisimai::Bite::Email::Bigfoot',
-            'Sisimai::Bite::Email::X1',
             'Sisimai::Bite::Email::EinsUndEins',
+            'Sisimai::Bite::Email::X1',
             'Sisimai::Bite::Email::Biglobe', 
             'Sisimai::Bite::Email::V5sendmail',
         ],
         'undeliver' => [
             'Sisimai::Bite::Email::Postfix',
+            'Sisimai::Bite::Email::Office365',
             'Sisimai::Bite::Email::Exchange2007',
             'Sisimai::Bite::Email::Exchange2003',
-            'Sisimai::Bite::Email::Notes',
-            'Sisimai::Bite::Email::Office365',
-            'Sisimai::Bite::Email::Verizon',
             'Sisimai::Bite::Email::SendGrid',
+            'Sisimai::Bite::Email::Notes',
+            'Sisimai::Bite::Email::Verizon',
+            'Sisimai::Bite::Email::Amavis',
             'Sisimai::Bite::Email::IMailServer',
             'Sisimai::Bite::Email::MailMarshalSMTP',
         ],
         'failure' => [
             'Sisimai::Bite::Email::qmail',
-            'Sisimai::Bite::Email::Domino',
-            'Sisimai::Bite::Email::Google',
             'Sisimai::Bite::Email::Outlook',
             'Sisimai::Bite::Email::MailRu',
+            'Sisimai::Bite::Email::Domino',
             'Sisimai::Bite::Email::X4',
             'Sisimai::Bite::Email::X2',
             'Sisimai::Bite::Email::mFILTER',
+            'Sisimai::Bite::Email::Google',
         ],
         'warning' => [
             'Sisimai::Bite::Email::Postfix',
@@ -181,8 +183,9 @@ sub headers {
     # @since v4.13.1
     my $class = shift;
     my $table = {};
-    my $skips = { 'return-path' => 1, 'x-mailer' => 1 };
-    my $order = [map { 'Sisimai::Bite::Email::'.$_ } @{ Sisimai::Bite::Email->heads }];
+
+    state $order = [map { 'Sisimai::Bite::Email::'.$_ } @{ Sisimai::Bite::Email->heads }];
+    state $skips = { 'return-path' => 1, 'x-mailer' => 1 };
 
     LOAD_MODULES: for my $e ( @$order ) {
         # Load email headers from each MTA module
@@ -191,9 +194,9 @@ sub headers {
 
         for my $v ( @{ $e->headerlist } ) {
             # Get header name which required each MTA module
-            my $q = lc $v;
-            next if exists $skips->{ $q };
-            $table->{ $q }->{ $e } = 1;
+            next if exists $skips->{ $v };
+            $table->{ $v } ||= [];
+            push @{ $table->{ $v } }, $e;
         }
     }
     return $table;
@@ -238,7 +241,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2015-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2015-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

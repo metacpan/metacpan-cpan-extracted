@@ -1,0 +1,35 @@
+Algorithm-MinPerfHashTwoLevel version 0.01
+==========================================
+
+This distribution contains two modules, Algorith::MinPerfHashTwoLevel
+which can construct a "two level" minimal perfect hash in an abstract
+form, and Tie::Hash::MinPerfHashTwoLevel::OnDisk which uses the
+abstract representation to create an ondisk image of the hash which
+can be efficiently mounted via mmap, allowing memory efficient access
+to the hash by multiple processes at the same time.
+
+Requires a 64 bit operating environment, and a little endian CPU.
+
+INSTALLATION
+
+To install these modules type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires a 64 bit build environment, a C compiler and a
+little endian CPU.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 by Yves Orton
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

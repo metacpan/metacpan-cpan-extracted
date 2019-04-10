@@ -72,9 +72,9 @@ use MARC::Schema;
         'unknown subfield';
     is $check[2]->{message}, 'unknown field', 'unknown field';
     is $check[3]->{subfields}->{ind1}->{message},
-        'unknown indicator1 value `a\'', 'unknown indicator1 value `a\'';
+        'unknown indicator1 value \'a\'', 'unknown indicator1 value \'a\'';
     is $check[4]->{subfields}->{ind2}->{message},
-        'unknown indicator2 value `x\'', 'unknown indicator2 value `x\'';
+        'unknown indicator2 value \'x\'', 'unknown indicator2 value \'x\'';
     ok @check == 5, 'not more than 5 errors';
 }
 

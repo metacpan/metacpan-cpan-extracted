@@ -28,8 +28,7 @@ sub token {
     my $epoch = shift // return '';
 
     # Format: STX(0x02) Sender-Address RS(0x1e) Recipient-Address ETX(0x03)
-    return Digest::SHA::sha1_hex(
-        sprintf("\x02%s\x1e%s\x1e%d\x03", lc $addr1, lc $addr2, $epoch));
+    return Digest::SHA::sha1_hex(sprintf("\x02%s\x1e%s\x1e%d\x03", lc $addr1, lc $addr2, $epoch));
 }
 
 sub is_8bit {
@@ -40,7 +39,6 @@ sub is_8bit {
     my $class = shift;
     my $argv1 = shift // return undef;
 
-    return undef unless ref $argv1;
     return undef unless ref $argv1 eq 'SCALAR';
     return 1 unless $$argv1 =~ /\A[\x00-\x7f]+\z/;
     return 0;
@@ -58,8 +56,8 @@ sub sweep {
     chomp $argv1;
     $argv1 =~ y/ //s;
     $argv1 =~ y/\t//d;
-    $argv1 =~ s/\A //g;
-    $argv1 =~ s/ \z//g;
+    $argv1 =~ s/\A //g if index($argv1, ' ') == 0;
+    $argv1 =~ s/ \z//g if substr($argv1, -1, 1) eq ' ';
     $argv1 =~ s/ [-]{2,}[^ \t].+\z//;
     return $argv1;
 }
@@ -72,12 +70,10 @@ sub to_plain {
     my $class = shift;
     my $argv1 = shift // return \'';
     my $loose = shift // 0;
-
-    return \'' unless ref $argv1;
     return \'' unless ref $argv1 eq 'SCALAR';
 
     my $plain = $$argv1;
-    my $match = {
+    state $match = {
         'html' => qr|<html[ >].+?</html>|sim,
         'body' => qr|<head>.+</head>.*<body[ >].+</body>|sim,
     };
@@ -123,7 +119,7 @@ sub to_utf8 {
     my $hasencoded = undef;
     my $hasguessed = Encode::Guess->guess($tobeutf8ed);
     my $encodingto = ref $hasguessed ? lc($hasguessed->name) : '';
-    my $dontencode = qr/\A(?>utf[-]?8|(?:us[-])?ascii)\z/;
+    state $dontencode = qr/\A(?>utf[-]?8|(?:us[-])?ascii)\z/;
 
     if( $encodefrom ) {
         # The 2nd argument is a encoding name of the 1st argument
@@ -141,22 +137,14 @@ sub to_utf8 {
             last;
         }
     }
+    return \$tobeutf8ed if $hasencoded;
+    return \$tobeutf8ed unless $encodingto;
+    return \$tobeutf8ed if $encodingto =~ $dontencode;
 
-    unless( $hasencoded ) {
-        # The 2nd argument was not given or failed to convert from $encodefrom
-        # to UTF-8
-        if( $encodingto ) {
-            # Guessed encoding name is available, try to encode using it.
-            unless( $encodingto =~ $dontencode ) {
-                # Encode a given string when the encoding of the string is neigther
-                # utf8 nor ascii.
-                eval { 
-                    Encode::from_to($tobeutf8ed, $encodingto, 'utf8');
-                    $hasencoded = 1;
-                };
-            }
-        }
-    }
+    # a. The 2nd argument was not given or failed to convert from $encodefrom to UTF-8
+    # b. Guessed encoding name is available, try to encode using it.
+    # c. Encode a given string when the encoding of the string is neigther utf8 nor ascii.
+    eval { Encode::from_to($tobeutf8ed, $encodingto, 'utf8') };
     return \$tobeutf8ed;
 }
 

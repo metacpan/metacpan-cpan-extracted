@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.10.9 2019-04-09T08:53:55Z
+
+    - Fix bug to handle process-substitution files.
+
 4.10.8 2019-04-04T09:03:04Z
 
     - Fix bug of code handling of in-memory file.

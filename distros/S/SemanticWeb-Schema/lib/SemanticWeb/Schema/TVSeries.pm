@@ -6,7 +6,7 @@ package SemanticWeb::Schema::TVSeries;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::CreativeWorkSeries /;
+extends qw/ SemanticWeb::Schema::CreativeWorkSeries SemanticWeb::Schema::CreativeWork /;
 
 
 use MooX::JSON_LD 'TVSeries';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has actor => (
@@ -154,7 +154,7 @@ SemanticWeb::Schema::TVSeries - CreativeWorkSeries dedicated to TV broadcast and
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -280,9 +280,9 @@ A music_by should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Person']>
-
 =item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =back
 
@@ -367,7 +367,7 @@ A trailer should be one of the following types:
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWorkSeries>
+L<SemanticWeb::Schema::CreativeWork>
 
 =head1 AUTHOR
 

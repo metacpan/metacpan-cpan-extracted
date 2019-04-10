@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has album_production_type => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::MusicAlbum - A collection of music tracks.
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -126,6 +126,8 @@ The artist that performed this album or recording.
 A by_artist should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::Person']>
 
 =item C<InstanceOf['SemanticWeb::Schema::MusicGroup']>
 

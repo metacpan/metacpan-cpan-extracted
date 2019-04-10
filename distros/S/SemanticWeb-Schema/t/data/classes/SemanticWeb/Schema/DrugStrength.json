@@ -1,0 +1,61 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A specific strength in which a medical drug is available in a specific country.",
+      "rdfs:label" : "DrugStrength",
+      "rdfs:subClassOf" : "schema:MedicalIntangible",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:activeIngredient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
+         "rdfs:label" : "activeIngredient",
+         "schema:domainIncludes" : [
+            "schema:DrugStrength",
+            "schema:Drug",
+            "schema:Substance",
+            "schema:DietarySupplement"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:availableIn" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The location in which the strength is available.",
+         "rdfs:label" : "availableIn",
+         "schema:domainIncludes" : "schema:DrugStrength",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AdministrativeArea"
+      },
+      "schema:maximumIntake" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
+         "rdfs:label" : "maximumIntake",
+         "schema:domainIncludes" : [
+            "schema:Substance",
+            "schema:DietarySupplement",
+            "schema:Drug",
+            "schema:DrugStrength"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MaximumDoseSchedule"
+      },
+      "schema:strengthUnit" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The units of an active ingredient's strength, e.g. mg.",
+         "rdfs:label" : "strengthUnit",
+         "schema:domainIncludes" : "schema:DrugStrength",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:strengthValue" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The value of an active ingredient's strength, e.g. 325.",
+         "rdfs:label" : "strengthValue",
+         "schema:domainIncludes" : "schema:DrugStrength",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Number"
+      }
+   }
+}

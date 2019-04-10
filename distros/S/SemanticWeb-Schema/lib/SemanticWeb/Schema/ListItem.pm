@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has item => (
@@ -66,7 +66,7 @@ SemanticWeb::Schema::ListItem - An list item, e
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ An list item, e.g. a step in a checklist or how-to description.
 =head2 C<item>
 
 An entity represented by an entry in a list or data feed (e.g. an 'artist'
-in a list of 'artists')’.
+in a list of 'artists')â.
 
 A item should be one of the following types:
 

@@ -1,5 +1,4 @@
 requires "Carp" => "0";
-requires "Graph::Easy" => "0.76";
 requires "List::AllUtils" => "0";
 requires "Log::Dispatch" => "0";
 requires "Log::Dispatch::Null" => "0";
@@ -32,7 +31,6 @@ on 'test' => sub {
   requires "Capture::Tiny" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
-  requires "Graph::Easy" => "0.76";
   requires "Log::Dispatch::Array" => "0";
   requires "MooseX::Types::Path::Tiny" => "0";
   requires "Path::Tiny" => "0";

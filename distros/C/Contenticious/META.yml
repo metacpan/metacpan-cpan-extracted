@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,12 +19,18 @@ no_index:
     - inc
 requires:
   Carp: '1.08'
+  Cwd: '3.62'
   File::Basename: '2.76'
+  File::Copy: '2.11'
   File::Copy::Recursive: '0.38'
   File::Path: '2.04'
+  File::Share: '0.25'
+  File::Spec: '3.62'
   FindBin: '1.49'
   List::Util: '1.19'
-  Mojolicious: '7.0'
+  Mojolicious: '8.05'
+  Mojolicious::Plugin::AssetPack: '1.45'
+  Mojolicious::Plugin::PODViewer: '0.004'
   Mojolicious::Plugin::RelativeUrlFor: '0.052'
   Mojolicious::Plugin::Subdispatch: '0.04'
   Text::Markdown: '1.000031'
@@ -33,5 +39,5 @@ resources:
   bugtracker: http://github.com/memowe/contenticious/issues
   homepage: http://memowe.github.com/contenticious/
   repository: http://github.com/memowe/contenticious
-version: '0.391'
+version: '0.392'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

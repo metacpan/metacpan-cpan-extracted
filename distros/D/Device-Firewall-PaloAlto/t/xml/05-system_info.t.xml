@@ -1,0 +1,29 @@
+<response status="success"><result><system><hostname>PA-VM</hostname><ip-address>192.168.122.20</ip-address><public-ip-address>unknown</public-ip-address><netmask>255.255.255.0</netmask><default-gateway>192.168.122.1</default-gateway><is-dhcp>no</is-dhcp><ipv6-address>unknown</ipv6-address><ipv6-link-local-address>fe80::5054:ff:fe3d:8797/64</ipv6-link-local-address><ipv6-default-gateway></ipv6-default-gateway><mac-address>52:54:00:3d:87:97</mac-address><time>Mon Apr  1 14:34:27 2019
+</time>
+<uptime>0 days, 0:19:41</uptime>
+<devicename>PA-VM</devicename>
+<family>vm</family><model>PA-VM</model><serial>unknown</serial><vm-mac-base>BA:DB:EE:FB:AD:00</vm-mac-base><vm-mac-count>255</vm-mac-count><vm-uuid>1D13C7E5-9BB7-4F87-8A0B-AA78135BBF56</vm-uuid><vm-cpuid>KVM:E3060500FFFB8B07</vm-cpuid><vm-license>none</vm-license><vm-mode>KVM</vm-mode>
+<cloud-mode>non-cloud</cloud-mode>
+<sw-version>8.1.3</sw-version>
+<global-protect-client-package-version>0.0.0</global-protect-client-package-version>
+<app-version>769-4439</app-version>
+<app-release-date></app-release-date>
+<av-version>0</av-version>
+<av-release-date></av-release-date>
+<threat-version>0</threat-version>
+<threat-release-date></threat-release-date>
+<wf-private-version>0</wf-private-version>
+<wf-private-release-date>unknown</wf-private-release-date>
+<url-db>paloaltonetworks</url-db>
+<wildfire-version>0</wildfire-version>
+<wildfire-release-date></wildfire-release-date>
+<url-filtering-version>0000.00.00.000</url-filtering-version>
+<global-protect-datafile-version>unknown</global-protect-datafile-version>
+<global-protect-datafile-release-date>unknown</global-protect-datafile-release-date><global-protect-clientless-vpn-version>0</global-protect-clientless-vpn-version>
+<global-protect-clientless-vpn-release-date></global-protect-clientless-vpn-release-date>
+<logdb-version>8.1.8</logdb-version>
+<platform-family>vm</platform-family>
+<vpn-disable-mode>off</vpn-disable-mode>
+<multi-vsys>off</multi-vsys>
+<operational-mode>normal</operational-mode>
+</system></result></response>

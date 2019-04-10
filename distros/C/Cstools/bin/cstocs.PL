@@ -139,7 +139,7 @@ Cz::Cstocs(3).
 
 Jan "Yenya" Kasprzak has done the original Un*x implementation.
 
-Jan Pazdziora, adelton@fi.muni.cz, created the Perl module version.
+Jan Pazdziora created the Perl module version.
 
 =cut
 

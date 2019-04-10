@@ -1,7 +1,7 @@
 package Contenticious;
 use Mojo::Base 'Mojolicious';
 
-our $VERSION = '0.391';
+our $VERSION = '0.392';
 
 use Contenticious::Content;
 use Carp;
@@ -38,7 +38,7 @@ sub startup {
     $self->renderer->classes(['Contenticious']);
 
     # perldoc renderer (to display Contenticious.pod for first-time-users)
-    $self->plugin('PODRenderer') if $self->config('perldoc');
+    $self->plugin('PODViewer') if $self->config('perldoc');
 
     # content action
     my $serve_content = sub {

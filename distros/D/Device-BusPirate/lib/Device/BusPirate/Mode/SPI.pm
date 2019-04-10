@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
 
 package Device::BusPirate::Mode::SPI;
 
@@ -9,11 +9,12 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Carp;
 
 use Future::Utils qw( repeat );
+use List::Util 1.33 qw( any );
 
 use constant MODE => "SPI";
 
@@ -52,13 +53,6 @@ into C<SPI> mode. It provides methods to configure the hardware, and interact
 with an SPI-attached chip.
 
 =cut
-
-my $EXPECT_ACK = sub {
-   my ( $buf ) = @_;
-   $buf eq "\x01" x length $buf or
-      return Future->fail( 1 );
-   return Future->done;
-};
 
 =head1 METHODS
 
@@ -181,23 +175,33 @@ sub configure
    defined $args{cpha} and $args{cke} = !delete $args{cpha};
 
    defined $args{$_} and $self->{$_} = !!$args{$_}
-      for (qw( open_drain ckp cke sample cs_high ));
+      for (qw( cs_high ));
 
-   if( defined $args{speed} ) {
-      $self->{speed} = $SPEEDS{$args{speed}} //
-         croak "Unrecognised speed '$args{speed}'";
+   my @f;
+
+   if( any { defined $args{$_} and !!$args{$_} != $self->{$_} } qw( open_drain ckp cke sample ) ) {
+      defined $args{$_} and $self->{$_} = !!$args{$_} for qw( open_drain ckp cke sample );
+
+      push @f, $self->pirate->write_expect_ack(
+         chr( 0x80 |
+            ( $self->{open_drain} ? 0 : 0x08 ) | # sense is reversed
+            ( $self->{ckp}     ? 0x04 : 0 ) |
+            ( $self->{cke}     ? 0x02 : 0 ) |
+            ( $self->{sample}  ? 0x01 : 0 ) ), "SPI configure" );
    }
 
-   $self->pirate->write( chr( 0x80 |
-      ( $self->{open_drain} ? 0 : 0x08 ) | # sense is reversed
-      ( $self->{ckp}     ? 0x04 : 0 ) |
-      ( $self->{cke}     ? 0x02 : 0 ) |
-      ( $self->{sample}  ? 0x01 : 0 ) )
-   );
-   $self->pirate->write( chr( 0x60 | $self->{speed} ) );
+   if( defined $args{speed} ) {{
+      my $speed = $SPEEDS{$args{speed}} //
+         croak "Unrecognised speed '$args{speed}'";
 
-   $self->pirate->read( 2, "SPI configure" )->then( $EXPECT_ACK )
-      ->else_fail( "Expected ACK response to SPI configure" );
+      last if $speed == $self->{speed};
+
+      $self->{speed} = $speed;
+      push @f, $self->pirate->write_expect_ack(
+         chr( 0x60 | $self->{speed} ), "SPI set speed" );
+   }}
+
+   return Future->needs_all( @f );
 }
 
 =head2 chip_select
@@ -215,9 +219,7 @@ sub chip_select
    my $self = shift;
    $self->{cs} = !!shift;
 
-   $self->pirate->write( $self->{cs} ? "\x03" : "\x02" );
-   $self->pirate->read( 1, "SPI chip_select" )->then( $EXPECT_ACK )
-      ->else_fail( "Expected ACK response to SPI chip_select" );
+   $self->pirate->write_expect_ack( $self->{cs} ? "\x03" : "\x02", "SPI chip_select" );
 }
 
 =head2 writeread
@@ -253,17 +255,11 @@ sub _writeread
 
       my $len_1 = length( $bytes ) - 1;
 
-      $self->pirate->write( chr( 0x10 | $len_1 ) . $bytes );
-
-      $self->pirate->read( 1, "SPI await ACK" )->then( sub {
-         my ( $buf ) = @_;
-         $buf eq "\x01" or return Future->fail( "Expected ACK response during SPI writeread" );
-
-         $self->pirate->read( length $bytes, "SPI read data" )
-            ->then( sub {
-               $ret .= $_[0];
-               Future->done
-            });
+      $self->pirate->write_expect_acked_data(
+         chr( 0x10 | $len_1 ) . $bytes, length $bytes, "SPI bulk transfer"
+      )->then( sub {
+         $ret .= $_[0];
+         Future->done
       });
    } foreach => \@chunks,
      while => sub { not shift->failure },

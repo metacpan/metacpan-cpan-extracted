@@ -264,7 +264,7 @@ use App::PhotoDB::handlers;
 use App::PhotoDB::commands;
 
 # Authoritative distro version
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub main {
 
@@ -303,7 +303,7 @@ sub main {
 
 			# Execute chosen handler
 			if (&prompt({prompt=>"$handlers{$command}{$subcommand}{'desc'}. Continue?", type=>'boolean', default=>'yes'})) {
-				$handlers{$command}{$subcommand}{'handler'}->($db);
+				$handlers{$command}{$subcommand}{'handler'}->({db=>$db});
 			}
 		} else {
 			# Print list of commands if unknown input is entered

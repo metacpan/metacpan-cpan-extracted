@@ -1,0 +1,468 @@
+<response status="success"><result>
+  <global>
+    <t>22906</t>
+    <counters>
+      <entry>
+        <category>packet</category>
+        <name>pkt_recv</name>
+        <value>1736</value>
+        <rate>1</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets received</desc>
+        <id>0</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>packet</category>
+        <name>pkt_sent</name>
+        <value>6</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets transmitted</desc>
+        <id>27</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>packet</category>
+        <name>pkt_sent_host</name>
+        <value>391</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets successfully transmitted to host interface</desc>
+        <id>45</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>packet</category>
+        <name>pkt_sock_recv</name>
+        <value>1220</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets received at socket level - delayed counter</desc>
+        <id>46</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>packet</category>
+        <name>pkt_stp_rcv</name>
+        <value>1182</value>
+        <rate>1</rate>
+        <aspect>pktproc</aspect>
+        <desc>STP BPDU packets received</desc>
+        <id>58</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>session</category>
+        <name>session_allocated</name>
+        <value>7</value>
+        <rate>0</rate>
+        <aspect>resource</aspect>
+        <desc>Sessions allocated</desc>
+        <id>65</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>session</category>
+        <name>session_freed</name>
+        <value>4</value>
+        <rate>0</rate>
+        <aspect>resource</aspect>
+        <desc>Sessions freed</desc>
+        <id>66</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>session</category>
+        <name>session_installed</name>
+        <value>7</value>
+        <rate>0</rate>
+        <aspect>resource</aspect>
+        <desc>Sessions installed</desc>
+        <id>67</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_ipv6_disabled</name>
+        <value>26</value>
+        <rate>0</rate>
+        <aspect>parse</aspect>
+        <desc>Packets dropped: IPv6 disabled on interface</desc>
+        <id>160</id>
+        <severity>drop</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_policy_nofwd</name>
+        <value>29</value>
+        <rate>0</rate>
+        <aspect>session</aspect>
+        <desc>Session setup: no destination zone from forwarding</desc>
+        <id>175</id>
+        <severity>drop</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_fwd_l3_mcast_drop</name>
+        <value>8</value>
+        <rate>0</rate>
+        <aspect>forward</aspect>
+        <desc>Packets dropped: no route for IP multicast</desc>
+        <id>214</id>
+        <severity>drop</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_fwd_mtu_exceeded</name>
+        <value>4</value>
+        <rate>0</rate>
+        <aspect>forward</aspect>
+        <desc>Packets lengths exceeded MTU</desc>
+        <id>250</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_ip6_mcast_off</name>
+        <value>26</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets received: IPv6 multicast pkts with flow off</desc>
+        <id>369</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_ipfrag_frag</name>
+        <value>176</value>
+        <rate>0</rate>
+        <aspect>ipfrag</aspect>
+        <desc>IP fragments transmitted</desc>
+        <id>537</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_arp_pkt_rcv</name>
+        <value>3</value>
+        <rate>0</rate>
+        <aspect>arp</aspect>
+        <desc>ARP packets received</desc>
+        <id>626</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_arp_pkt_replied</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>arp</aspect>
+        <desc>ARP requests replied</desc>
+        <id>628</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_arp_pkt_learned</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>arp</aspect>
+        <desc>ARP entry learned</desc>
+        <id>629</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_host_pkt_rcv</name>
+        <value>516</value>
+        <rate>0</rate>
+        <aspect>mgmt</aspect>
+        <desc>Packets received from control plane</desc>
+        <id>661</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_host_pkt_xmt</name>
+        <value>391</value>
+        <rate>0</rate>
+        <aspect>mgmt</aspect>
+        <desc>Packets transmitted to control plane</desc>
+        <id>662</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_host_decap_err</name>
+        <value>48</value>
+        <rate>0</rate>
+        <aspect>mgmt</aspect>
+        <desc>Packets dropped: decapsulation error from control plane</desc>
+        <id>665</id>
+        <severity>drop</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_host_service_allow</name>
+        <value>202</value>
+        <rate>0</rate>
+        <aspect>mgmt</aspect>
+        <desc>Device management session allowed</desc>
+        <id>669</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_host_service_unknown</name>
+        <value>232</value>
+        <rate>0</rate>
+        <aspect>mgmt</aspect>
+        <desc>Session discarded: unknown application to control plane</desc>
+        <id>671</id>
+        <severity>drop</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_tunnel_activate</name>
+        <value>2</value>
+        <rate>0</rate>
+        <aspect>tunnel</aspect>
+        <desc>Number of packets that triggerred tunnel activation</desc>
+        <id>710</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_tunnel_ipsec_wrong_spi</name>
+        <value>232</value>
+        <rate>0</rate>
+        <aspect>tunnel</aspect>
+        <desc>Packet dropped: IPsec SA for spi in packet not found</desc>
+        <id>717</id>
+        <severity>drop</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_tunnel_encap_resolve</name>
+        <value>234</value>
+        <rate>0</rate>
+        <aspect>tunnel</aspect>
+        <desc>tunnel structure lookup resolve</desc>
+        <id>734</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_tunnel_ctx_alloc</name>
+        <value>4</value>
+        <rate>0</rate>
+        <aspect>tunnel</aspect>
+        <desc>Tunnel context is allocated</desc>
+        <id>739</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_tunnel_ctx_free_modify</name>
+        <value>2</value>
+        <rate>0</rate>
+        <aspect>tunnel</aspect>
+        <desc>Tunnel context is freed upon tunnel modify</desc>
+        <id>743</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>flow</category>
+        <name>flow_ip_cksm_sw_validation</name>
+        <value>202</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets for which IP checksum validation was done in software</desc>
+        <id>1112</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>appid</category>
+        <name>appid_ident_by_icmp</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Application identified by icmp type</desc>
+        <id>1165</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>appid</category>
+        <name>appid_ident_by_dport</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Application identified by L4 dport</desc>
+        <id>1177</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>appid</category>
+        <name>appid_proc</name>
+        <value>2</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>The number of packets processed by Application identification</desc>
+        <id>1183</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>dfa</category>
+        <name>dfa_sw</name>
+        <value>7</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>The total number of dfa match using software</desc>
+        <id>1225</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>tcp</category>
+        <name>tcp_host_conn_close_fin</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>close tcp host connection with FIN</desc>
+        <id>1289</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>appid</category>
+        <name>appid_bypass_no_ctd</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>appid bypass due to no ctd</desc>
+        <id>1314</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>ctd</category>
+        <name>ctd_process</name>
+        <value>2</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>session processed by ctd</desc>
+        <id>1542</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>ctd</category>
+        <name>ctd_pkt_slowpath</name>
+        <value>11</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Packets processed by slowpath</desc>
+        <id>1543</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>ctd</category>
+        <name>ctd_hitcount_period_update</name>
+        <value>4</value>
+        <rate>0</rate>
+        <aspect>system</aspect>
+        <desc>Number of Policy Hit Count periodical update</desc>
+        <id>1564</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>log</category>
+        <name>log_traffic_cnt</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>system</aspect>
+        <desc>Number of traffic logs</desc>
+        <id>1756</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>log</category>
+        <name>log_pkt_diag_us</name>
+        <value>20</value>
+        <rate>0</rate>
+        <aspect>system</aspect>
+        <desc>Time (us) spent on writing packet-diag logs</desc>
+        <id>1758</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>log</category>
+        <name>log_dpi_cnt</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>system</aspect>
+        <desc>Number of DPI logs</desc>
+        <id>1763</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>log</category>
+        <name>log_dpi_bytes</name>
+        <value>84</value>
+        <rate>0</rate>
+        <aspect>system</aspect>
+        <desc>DPI log byte count</desc>
+        <id>1764</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>log</category>
+        <name>log_dpi_fields</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>system</aspect>
+        <desc>DPI log field count</desc>
+        <id>1765</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>proxy</category>
+        <name>proxy_timer_del_session_added</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Number of timers added for deleting proxy host connection</desc>
+        <id>1860</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>proxy</category>
+        <name>proxy_timer_del_sessions</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Number of proxy host connections deleted due to timer</desc>
+        <id>1861</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>ssl</category>
+        <name>ssl_hsm_up_down_event_rcv</name>
+        <value>1</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>The number of HSM up/down events received</desc>
+        <id>2020</id>
+        <severity>info</severity>
+      </entry>
+      <entry>
+        <category>ssl</category>
+        <name>ssl_sess_cache_msg_from_mp_failure</name>
+        <value>838497</value>
+        <rate>0</rate>
+        <aspect>pktproc</aspect>
+        <desc>Number of failures when receiving SSL session cache msg from MP</desc>
+        <id>2029</id>
+        <severity>info</severity>
+      </entry>
+    </counters>
+  </global>
+  <dp>dp0</dp>
+</result></response>

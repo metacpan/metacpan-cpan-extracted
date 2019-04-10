@@ -1,0 +1,10 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "An indication for treating an underlying condition, symptom, etc.",
+      "rdfs:label" : "TreatmentIndication",
+      "rdfs:subClassOf" : "schema:MedicalIndication",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

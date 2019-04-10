@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has additional_property => (
@@ -274,6 +274,14 @@ has sku => (
 
 
 
+has slogan => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'slogan',
+);
+
+
+
 has weight => (
     is        => 'rw',
     predicate => 1,
@@ -306,7 +314,7 @@ SemanticWeb::Schema::Product - Any offered product or service
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -414,6 +422,8 @@ A category should be one of the following types:
 
 =item C<Str>
 
+=item C<InstanceOf['SemanticWeb::Schema::PhysicalActivityCategory']>
+
 =item C<InstanceOf['SemanticWeb::Schema::Thing']>
 
 =back
@@ -438,9 +448,9 @@ A depth should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Distance']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
 
 =back
 
@@ -561,9 +571,9 @@ A is_related_to should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::Product']>
-
 =item C<InstanceOf['SemanticWeb::Schema::Service']>
+
+=item C<InstanceOf['SemanticWeb::Schema::Product']>
 
 =back
 
@@ -607,9 +617,9 @@ A logo should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::ImageObject']>
+
+=item C<Str>
 
 =back
 
@@ -633,9 +643,9 @@ A material should be one of the following types:
 
 =over
 
-=item C<Str>
-
 =item C<InstanceOf['SemanticWeb::Schema::Product']>
+
+=item C<Str>
 
 =back
 
@@ -650,9 +660,9 @@ A model should be one of the following types:
 
 =over
 
-=item C<InstanceOf['SemanticWeb::Schema::ProductModel']>
-
 =item C<Str>
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductModel']>
 
 =back
 
@@ -771,6 +781,18 @@ The Stock Keeping Unit (SKU), i.e. a merchant-specific identifier for a
 product or service, or the product to which the offer refers.
 
 A sku should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<slogan>
+
+A slogan or motto associated with the item.
+
+A slogan should be one of the following types:
 
 =over
 

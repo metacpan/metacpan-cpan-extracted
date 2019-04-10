@@ -1,5 +1,6 @@
 {
    "class" : {
+      "owl:equivalentClass" : "rdf:Property",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A property, used to indicate attributes and relationships of some Thing; equivalent to rdf:Property.",
       "rdfs:label" : "Property",
@@ -37,14 +38,14 @@
          "rdfs:label" : "supersededBy",
          "schema:domainIncludes" : [
             "schema:Enumeration",
-            "schema:Property",
-            "schema:Class"
+            "schema:Class",
+            "schema:Property"
          ],
          "schema:isPartOf" : "http:meta.schema.org",
          "schema:rangeIncludes" : [
             "schema:Enumeration",
-            "schema:Class",
-            "schema:Property"
+            "schema:Property",
+            "schema:Class"
          ]
       }
    }

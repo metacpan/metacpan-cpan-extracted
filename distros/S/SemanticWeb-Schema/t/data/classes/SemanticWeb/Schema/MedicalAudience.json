@@ -1,0 +1,14 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Target audiences for medical web pages. Enumerated type.",
+      "rdfs:label" : "MedicalAudience",
+      "rdfs:subClassOf" : [
+         "schema:PeopleAudience",
+         "schema:MedicalEnumeration",
+         "schema:Audience"
+      ],
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {}
+}

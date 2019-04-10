@@ -32,6 +32,7 @@ my $tickit = Tickit->new(
       ]
    )
 );
+$tickit->term->await_started( 0.05 );
 
 Tickit::Style->load_style( <<'EOSTYLE' );
 Static.heading {

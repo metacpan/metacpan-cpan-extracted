@@ -51,7 +51,6 @@ sub scan {
 
     require Sisimai::MDA;
     my $dscontents = [Sisimai::Bite::Email->DELIVERYSTATUS];
-    my @hasdivided = split("\n", $$mbody);
     my $scannedset = Sisimai::MDA->scan($mhead, $mbody);
     my $rfc822part = '';    # (String) message/rfc822-headers part
     my $rfc822list = [];    # (Array) Each line in message/rfc822 part string
@@ -66,13 +65,12 @@ sub scan {
     };
     my $v = undef;
     my $p = '';
-    my $d = '';
 
-    for my $e ( @hasdivided ) {
+    for my $e ( split("\n", $$mbody) ) {
         # Read each line between the start of the message and the start of rfc822 part.
-        $d = lc $e;
+        my $d = lc $e;
         unless( $readcursor ) {
-            # Beginning of the bounce message or delivery status part
+            # Beginning of the bounce message or message/delivery-status part
             if( $d =~ $MarkingsOf->{'message'} ) {
                 $readcursor |= $Indicators->{'deliverystatus'};
                 next;
@@ -80,7 +78,7 @@ sub scan {
         }
 
         unless( $readcursor & $Indicators->{'message-rfc822'} ) {
-            # Beginning of the original message part
+            # Beginning of the original message part(message/rfc822)
             if( $d =~ $MarkingsOf->{'rfc822'} ) {
                 $readcursor |= $Indicators->{'message-rfc822'};
                 next;
@@ -88,22 +86,21 @@ sub scan {
         }
 
         if( $readcursor & $Indicators->{'message-rfc822'} ) {
-            # After "message/rfc822"
+            # message/rfc822 OR text/rfc822-headers part
             unless( length $e ) {
-                $blanklines++;
-                last if $blanklines > 1;
+                last if ++$blanklines > 1;
                 next;
             }
             push @$rfc822list, $e;
 
         } else {
-            # Before "message/rfc822"
+            # message/delivery-status part
             next unless $readcursor & $Indicators->{'deliverystatus'};
             next unless length $e;
 
             $v = $dscontents->[-1];
-            if( $e =~ /\A(?:Final|Original)-Recipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ||
-                $e =~ /\A(?:Final|Original)-Recipient:[ ]*([^ ]+)\z/ ) {
+            if( $e =~ /\A(?:Final|Original)-[Rr]ecipient:[ ]*(?:RFC|rfc)822;[ ]*([^ ]+)\z/ ||
+                $e =~ /\A(?:Final|Original)-[Rr]Recipient:[ ]*([^ ]+)\z/ ) {
                 # 2.3.2 Final-Recipient field
                 #   The Final-Recipient field indicates the recipient for which this set
                 #   of per-recipient fields applies.  This field MUST be present in each
@@ -281,7 +278,7 @@ sub scan {
                     }
                 }
             }
-        } # End of if: rfc822
+        } # End of message/delivery-status
     } continue {
         # Save the current line for the next loop
         $p = $e;
@@ -309,7 +306,7 @@ sub scan {
         }
         last unless $match;
 
-        my $re_skip = qr{(?>
+        state $re_skip = qr{(?>
              \A[-]+=
             |\A\s+\z
             |\A\s*--
@@ -321,8 +318,7 @@ sub scan {
             |:[ ]--------
             )
         }x;
-
-        my $re_stop  = qr{(?:
+        state $re_stop  = qr{(?:
              \A[*][*][*][ ].+[ ].+[ ][*][*][*]
             |\Acontent-type:[ ]message/delivery-status
             |\Ahere[ ]is[ ]a[ ]copy[ ]of[ ]the[ ]first[ ]part[ ]of[ ]the[ ]message
@@ -344,8 +340,7 @@ sub scan {
             |your[ ]message[ ]reads[ ][(]in[ ]part[)]:
             )
         }x;
-
-        my $re_addr = qr{(?:
+        state $re_addr = qr{(?:
              \A\s*
             |\A["].+["]\s*
             |\A[ \t]*recipient:[ \t]*
@@ -377,7 +372,7 @@ sub scan {
         for my $e ( split("\n", $$mbody) ) {
             # Get the recipient's email address and error messages.
             last if $e eq '__END_OF_EMAIL_MESSAGE__';
-            $d = lc $e;
+            my $d = lc $e;
             last if $d =~ $MarkingsOf->{'rfc822'};
             last if $d =~ $re_stop;
 
@@ -414,17 +409,15 @@ sub scan {
         # Try to get a recipient address from email headers
         for my $e ( @$rfc822list ) {
             # Check To: header in the original message
-            if( $e =~ /\ATo:\s*(.+)\z/ ) {
-                my $r = Sisimai::Address->find($1, 1) || [];
-                my $b = undef;
-                next unless scalar @$r;
-                push @$dscontents, Sisimai::Bite::Email->DELIVERYSTATUS if scalar(@$dscontents) == $recipients;
+            next unless $e =~ /\ATo:\s*(.+)\z/;
+            my $r = Sisimai::Address->find($1, 1) || [];
+            next unless scalar @$r;
+            push @$dscontents, Sisimai::Bite::Email->DELIVERYSTATUS if scalar(@$dscontents) == $recipients;
 
-                $b = $dscontents->[-1];
-                $b->{'recipient'} = $r->[0]->{'address'};
-                $b->{'agent'} = __PACKAGE__->smtpagent.'::Fallback';
-                $recipients++;
-            }
+            my $b = $dscontents->[-1];
+            $b->{'recipient'} = $r->[0]->{'address'};
+            $b->{'agent'} = __PACKAGE__->smtpagent.'::Fallback';
+            $recipients++;
         }
     }
     return undef unless $recipients;
@@ -455,7 +448,7 @@ sub scan {
             $e->{'agent'} = __PACKAGE__->smtpagent;
         }
         $e->{'date'}   ||= $mhead->{'date'};
-        $e->{'status'} ||= Sisimai::SMTP::Status->find($e->{'diagnosis'});
+        $e->{'status'} ||= Sisimai::SMTP::Status->find($e->{'diagnosis'}) || '';
         $e->{'command'}  = $1 if $e->{'diagnosis'} =~ $MarkingsOf->{'command'};
     }
     $rfc822part = Sisimai::RFC5322->weedout($rfc822list);
@@ -504,7 +497,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2018 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

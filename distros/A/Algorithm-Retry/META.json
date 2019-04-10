@@ -45,7 +45,8 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Number::Delta" : "0"
          }
       }
    },
@@ -61,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Algorithm-Retry"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

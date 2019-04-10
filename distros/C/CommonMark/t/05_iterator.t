@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 132;
+use Test::More tests => 134;
 
 BEGIN {
     use_ok('CommonMark', ':node', ':event');
@@ -62,6 +62,11 @@ my @expected_events = (
 
     my @list = $iter->next;
     is(scalar(@list), 0, 'iterator done, list context');
+
+    $iter->reset($doc, EVENT_ENTER);
+    my ($ev_type, $node) = $iter->next;
+    is($ev_type, EVENT_ENTER, 'ev_type after iterator reset');
+    is($node, $doc->first_child, 'node after iterator reset');
 }
 
 {

@@ -13,6 +13,21 @@
          "schema:domainIncludes" : "schema:BroadcastChannel",
          "schema:rangeIncludes" : "schema:Text"
       },
+      "schema:broadcastFrequency" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The frequency used for over-the-air broadcasts. Numeric values or simple ranges e.g. 87-99. In addition a shortcut idiom is supported for frequences of AM and FM radio channels, e.g. \"87 FM\".",
+         "rdfs:label" : "broadcastFrequency",
+         "schema:category" : "issue-1004",
+         "schema:domainIncludes" : [
+            "schema:BroadcastService",
+            "schema:BroadcastChannel"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:BroadcastFrequencySpecification",
+            "schema:Text"
+         ]
+      },
       "schema:broadcastServiceTier" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of service required to have access to the channel (e.g. Standard or Premium).",
@@ -25,13 +40,13 @@
          "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
          "rdfs:label" : "genre",
          "schema:domainIncludes" : [
-            "schema:MusicGroup",
             "schema:BroadcastChannel",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:MusicGroup"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:inBroadcastLineup" : {
@@ -46,6 +61,7 @@
          "rdfs:comment" : "The BroadcastService offered on this channel.",
          "rdfs:label" : "providesBroadcastService",
          "schema:domainIncludes" : "schema:BroadcastChannel",
+         "schema:inverseOf" : "schema:hasBroadcastChannel",
          "schema:rangeIncludes" : "schema:BroadcastService"
       }
    }

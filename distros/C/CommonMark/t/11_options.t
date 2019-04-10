@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Encode;
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 BEGIN {
     use_ok('CommonMark', ':opt');
@@ -38,7 +38,14 @@ $expected = <<'EOF';
 <!-- raw HTML omitted -->
 <p>a <!-- raw HTML omitted --> <a href="">link</a></p>
 EOF
-is(CommonMark->markdown_to_html($md, OPT_SAFE), $expected, 'SAFE');
+is(CommonMark->markdown_to_html($md), $expected, 'SAFE is default');
+is(CommonMark->markdown_to_html($md, OPT_SAFE|OPT_UNSAFE), $expected,
+   'SAFE takes precedence over UNSAFE');
+$expected = <<'EOF';
+<script>alert('XSS')</script>
+<p>a <b/> <a href="javascript:alert(&#x27;XSS&#x27;)">link</a></p>
+EOF
+is(CommonMark->markdown_to_html($md, OPT_UNSAFE), $expected, 'UNSAFE');
 
 $md = "a\xC0b";
 Encode::_utf8_on($md);

@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_rNews",
+      "dc:source" : "schemadotorgsources:source_rNews",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Organization: A business corporation.",
       "rdfs:label" : "Corporation",

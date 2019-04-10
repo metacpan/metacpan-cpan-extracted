@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A medical laboratory that offers on-site or off-site diagnostic services.",
+      "rdfs:label" : "DiagnosticLab",
+      "rdfs:subClassOf" : "schema:MedicalOrganization",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:availableTest" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A diagnostic test or procedure offered by this lab.",
+         "rdfs:label" : "availableTest",
+         "schema:domainIncludes" : "schema:DiagnosticLab",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalTest"
+      }
+   }
+}

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has area => (
@@ -42,6 +42,14 @@ has broadcast_display_name => (
 
 
 
+has broadcast_frequency => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'broadcastFrequency',
+);
+
+
+
 has broadcast_timezone => (
     is        => 'rw',
     predicate => 1,
@@ -54,6 +62,14 @@ has broadcaster => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'broadcaster',
+);
+
+
+
+has has_broadcast_channel => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'hasBroadcastChannel',
 );
 
 
@@ -90,7 +106,7 @@ SemanticWeb::Schema::BroadcastService - A delivery service through which content
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -140,6 +156,24 @@ A broadcast_display_name should be one of the following types:
 
 =back
 
+=head2 C<broadcast_frequency>
+
+C<broadcastFrequency>
+
+The frequency used for over-the-air broadcasts. Numeric values or simple
+ranges e.g. 87-99. In addition a shortcut idiom is supported for frequences
+of AM and FM radio channels, e.g. "87 FM".
+
+A broadcast_frequency should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::BroadcastFrequencySpecification']>
+
+=item C<Str>
+
+=back
+
 =head2 C<broadcast_timezone>
 
 C<broadcastTimezone>
@@ -164,6 +198,20 @@ A broadcaster should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Organization']>
+
+=back
+
+=head2 C<has_broadcast_channel>
+
+C<hasBroadcastChannel>
+
+A broadcast channel of a broadcast service.
+
+A has_broadcast_channel should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::BroadcastChannel']>
 
 =back
 

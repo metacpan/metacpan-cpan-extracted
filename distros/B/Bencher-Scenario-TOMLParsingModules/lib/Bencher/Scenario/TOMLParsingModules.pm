@@ -1,7 +1,7 @@
 package Bencher::Scenario::TOMLParsingModules;
 
-our $DATE = '2017-05-09'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-04-09'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ Bencher::Scenario::TOMLParsingModules - Benchmark TOML parsing modules
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::TOMLParsingModules (from Perl distribution Bencher-Scenario-TOMLParsingModules), released on 2017-05-09.
+This document describes version 0.003 of Bencher::Scenario::TOMLParsingModules (from Perl distribution Bencher-Scenario-TOMLParsingModules), released on 2019-04-09.
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,7 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<TOML> 0.97
 
-L<TOML::Parser> 0.10
+L<TOML::Parser> 0.91
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -113,7 +113,7 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.2 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
 
 Benchmark with default options (C<< bencher -m TOMLParsingModules >>):
 
@@ -121,21 +121,21 @@ Benchmark with default options (C<< bencher -m TOMLParsingModules >>):
  +--------------+-----------+-----------+------------+---------+---------+
  | participant  | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +--------------+-----------+-----------+------------+---------+---------+
- | TOML         |       800 |      1200 |          1 | 3.1e-06 |      20 |
- | TOML::Parser |       820 |      1200 |          1 | 1.4e-06 |      20 |
+ | TOML::Parser |       770 |      1300 |          1 | 3.2e-06 |      20 |
+ | TOML         |       780 |      1300 |          1 |   2e-06 |      20 |
  +--------------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m TOMLParsingModules --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | TOML                | 2                            | 6                  | 20             |      30   |                   24.8 |        1   |   0.00038 |      21 |
- | TOML::Parser        | 0.82                         | 4.1                | 20             |      23   |                   17.8 |        1.3 |   0.00013 |      21 |
- | perl -e1 (baseline) | 3.1                          | 6.6                | 26             |       5.2 |                    0   |        5.8 | 3.6e-05   |      20 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+-----------+------------------------+------------+---------+---------+
+ | TOML                |      30   |                   25.1 |        1   | 9.1e-05 |      20 |
+ | TOML::Parser        |      24   |                   19.1 |        1.3 | 6.2e-05 |      20 |
+ | perl -e1 (baseline) |       4.9 |                    0   |        6.2 | 2.3e-05 |      21 |
+ +---------------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -162,7 +162,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

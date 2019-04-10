@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 
 has course => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'course',
+);
+
+
+
+has diet => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'diet',
 );
 
 
@@ -38,6 +46,30 @@ has exercise_course => (
     is        => 'rw',
     predicate => 1,
     json_ld   => 'exerciseCourse',
+);
+
+
+
+has exercise_plan => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'exercisePlan',
+);
+
+
+
+has exercise_related_diet => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'exerciseRelatedDiet',
+);
+
+
+
+has exercise_type => (
+    is        => 'rw',
+    predicate => 1,
+    json_ld   => 'exerciseType',
 );
 
 
@@ -106,7 +138,7 @@ SemanticWeb::Schema::ExerciseAction - The act of participating in exertive activ
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 DESCRIPTION
 
@@ -124,6 +156,18 @@ A course should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<diet>
+
+A sub property of instrument. The diet used in this action.
+
+A diet should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Diet']>
 
 =back
 
@@ -150,6 +194,49 @@ A exercise_course should be one of the following types:
 =over
 
 =item C<InstanceOf['SemanticWeb::Schema::Place']>
+
+=back
+
+=head2 C<exercise_plan>
+
+C<exercisePlan>
+
+A sub property of instrument. The exercise plan used on this action.
+
+A exercise_plan should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ExercisePlan']>
+
+=back
+
+=head2 C<exercise_related_diet>
+
+C<exerciseRelatedDiet>
+
+A sub property of instrument. The diet used in this action.
+
+A exercise_related_diet should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Diet']>
+
+=back
+
+=head2 C<exercise_type>
+
+C<exerciseType>
+
+Type(s) of exercise or activity, such as strength training, flexibility
+training, aerobics, cardiac rehabilitation, etc.
+
+A exercise_type should be one of the following types:
+
+=over
+
+=item C<Str>
 
 =back
 

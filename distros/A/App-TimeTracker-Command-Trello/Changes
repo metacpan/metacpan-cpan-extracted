@@ -1,5 +1,9 @@
 Revision history for App::TimeTracker::Command::Trello
 
+1.006	2019-04-09T22:08:51
+   - fiddle with @_ during BUILDARGS
+
+
 1.005   2016-06-05T21:41:25+0200
     - add listname_as_tag to store a card's list name
       as a tag (Thomas Klausner)

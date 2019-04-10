@@ -353,7 +353,8 @@ if ($opt_cdif) {
 
 if ($readfile) {
 
-    my $DIFFOUT = encode('utf8', do { local $/; <DIFF> });
+    binmode DIFF, ':raw';
+    my $DIFFOUT = do { local $/; <DIFF> };
     close DIFF;
     open  DIFF, '<', \$DIFFOUT or die;
 
@@ -361,8 +362,8 @@ if ($readfile) {
     open NEW, $NEW or die "$NEW: $!\n";
 
     # For reading /dev/fd/*
-    seek OLD, 0, 0 or die;
-    seek NEW, 0, 0 or die;
+    seek OLD, 0, 0 or die unless -p OLD;
+    seek NEW, 0, 0 or die unless -p NEW;
 }
 
 my @boundary = $opt_onword ? (boundary => 'word') : ();

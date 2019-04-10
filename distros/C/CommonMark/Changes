@@ -1,5 +1,15 @@
 Revision history for Perl module CommonMark
 
+0.290000  2019-04-09
+    - BREAKING CHANGE: Add support for OPT_UNSAFE
+      Safe HTML rendering is now enabled by default. Use OPT_UNSAFE to
+      get the old behavior.
+    - Fix warning in render helper
+    - Fix misplaced package statement
+    - Generate META.json
+    - Improve test coverage
+    - Improve documentation
+
 0.280301  2017-10-24
     - Add support for NOBREAKS option
     - Documentation fixes

@@ -1,0 +1,51 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A common pathway for the electrochemical nerve impulses that are transmitted along each of the axons.",
+      "rdfs:label" : "Nerve",
+      "rdfs:subClassOf" : "schema:AnatomicalStructure",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:branch" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The branches that delineate from the nerve bundle. Not to be confused with <a class=\"localLink\" href=\"http://schema.org/branchOf\">branchOf</a>.",
+         "rdfs:label" : "branch",
+         "schema:domainIncludes" : "schema:Nerve",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure",
+         "schema:supersededBy" : [
+            "schema:arterialBranch",
+            "schema:nerveBranch",
+            "schema:veinBranch"
+         ]
+      },
+      "schema:nerveMotor" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The neurological pathway extension that involves muscle control.",
+         "rdfs:label" : "nerveMotor",
+         "schema:domainIncludes" : "schema:Nerve",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Muscle"
+      },
+      "schema:sensoryUnit" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The neurological pathway extension that inputs and sends information to the brain or spinal cord.",
+         "rdfs:label" : "sensoryUnit",
+         "schema:domainIncludes" : "schema:Nerve",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:SuperficialAnatomy",
+            "schema:AnatomicalStructure"
+         ]
+      },
+      "schema:sourcedFrom" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The neurological pathway that originates the neurons.",
+         "rdfs:label" : "sourcedFrom",
+         "schema:domainIncludes" : "schema:Nerve",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:BrainStructure"
+      }
+   }
+}

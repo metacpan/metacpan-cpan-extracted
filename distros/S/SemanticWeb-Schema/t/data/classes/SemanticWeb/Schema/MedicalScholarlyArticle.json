@@ -1,0 +1,19 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A scholarly article in the medical domain.",
+      "rdfs:label" : "MedicalScholarlyArticle",
+      "rdfs:subClassOf" : "schema:ScholarlyArticle",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:publicationType" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The type of the medical article, taken from the US NLM MeSH publication type catalog. See also <a href=\"http://www.nlm.nih.gov/mesh/pubtypes.html\">MeSH documentation</a>.",
+         "rdfs:label" : "publicationType",
+         "schema:domainIncludes" : "schema:MedicalScholarlyArticle",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      }
+   }
+}

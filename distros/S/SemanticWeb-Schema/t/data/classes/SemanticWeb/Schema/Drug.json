@@ -1,0 +1,298 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/410942007",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A chemical or biologic substance, used as a medical therapy, that has a physiological effect on an organism. Here the term drug is used interchangeably with the term medicine although clinical knowledge make a clear difference between them.",
+      "rdfs:label" : "Drug",
+      "rdfs:subClassOf" : "schema:Substance",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:activeIngredient" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
+         "rdfs:label" : "activeIngredient",
+         "schema:domainIncludes" : [
+            "schema:DrugStrength",
+            "schema:Drug",
+            "schema:Substance",
+            "schema:DietarySupplement"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:administrationRoute" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A route by which this drug may be administered, e.g. 'oral'.",
+         "rdfs:label" : "administrationRoute",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:alcoholWarning" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any precaution, guidance, contraindication, etc. related to consumption of alcohol while taking this drug.",
+         "rdfs:label" : "alcoholWarning",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:availableStrength" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "An available dosage strength for the drug.",
+         "rdfs:label" : "availableStrength",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:DrugStrength"
+      },
+      "schema:breastfeedingWarning" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any precaution, guidance, contraindication, etc. related to this drug's use by breastfeeding mothers.",
+         "rdfs:label" : "breastfeedingWarning",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:clincalPharmacology" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of the absorption and elimination of drugs, including their concentration (pharmacokinetics, pK) and biological effects (pharmacodynamics, pD).",
+         "rdfs:label" : "clincalPharmacology",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:supersededBy" : "schema:clinicalPharmacology"
+      },
+      "schema:clinicalPharmacology" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Description of the absorption and elimination of drugs, including their concentration (pharmacokinetics, pK) and biological effects (pharmacodynamics, pD).",
+         "rdfs:label" : "clinicalPharmacology",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:cost" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Cost per unit of the drug, as reported by the source being tagged.",
+         "rdfs:label" : "cost",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:DrugCost"
+      },
+      "schema:dosageForm" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A dosage form in which this drug/supplement is available, e.g. 'tablet', 'suspension', 'injection'.",
+         "rdfs:label" : "dosageForm",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:doseSchedule" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A dosing schedule for the drug for a given population, either observed, recommended, or maximum dose based on the type used.",
+         "rdfs:label" : "doseSchedule",
+         "schema:domainIncludes" : [
+            "schema:Drug",
+            "schema:TherapeuticProcedure"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:DoseSchedule"
+      },
+      "schema:drugClass" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The class of drug this belongs to (e.g., statins).",
+         "rdfs:label" : "drugClass",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:DrugClass"
+      },
+      "schema:drugUnit" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The unit in which the drug is measured, e.g. '5 mg tablet'.",
+         "rdfs:label" : "drugUnit",
+         "schema:domainIncludes" : [
+            "schema:DrugCost",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:foodWarning" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any precaution, guidance, contraindication, etc. related to consumption of specific foods while taking this drug.",
+         "rdfs:label" : "foodWarning",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:interactingDrug" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Another drug that is known to interact with this drug in a way that impacts the effect of this drug or causes a risk to the patient. Note: disease interactions are typically captured as contraindications.",
+         "rdfs:label" : "interactingDrug",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Drug"
+      },
+      "schema:isAvailableGenerically" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "True if the drug is available in a generic form (regardless of name).",
+         "rdfs:label" : "isAvailableGenerically",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:isProprietary" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "True if this item's name is a proprietary/brand name (vs. generic name).",
+         "rdfs:label" : "isProprietary",
+         "schema:domainIncludes" : [
+            "schema:Drug",
+            "schema:DietarySupplement"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean"
+      },
+      "schema:labelDetails" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Link to the drug's label details.",
+         "rdfs:label" : "labelDetails",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:legalStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The drug or supplement's legal status, including any controlled substance schedules that apply.",
+         "rdfs:label" : "legalStatus",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:MedicalEntity",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:DrugLegalStatus",
+            "schema:MedicalEnumeration",
+            "schema:Text"
+         ]
+      },
+      "schema:manufacturer" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The manufacturer of the product.",
+         "rdfs:label" : "manufacturer",
+         "schema:domainIncludes" : [
+            "schema:Product",
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:rangeIncludes" : "schema:Organization"
+      },
+      "schema:maximumIntake" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
+         "rdfs:label" : "maximumIntake",
+         "schema:domainIncludes" : [
+            "schema:Substance",
+            "schema:DietarySupplement",
+            "schema:Drug",
+            "schema:DrugStrength"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MaximumDoseSchedule"
+      },
+      "schema:mechanismOfAction" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The specific biochemical interaction through which this drug or supplement produces its pharmacological effect.",
+         "rdfs:label" : "mechanismOfAction",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:nonProprietaryName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The generic name of this drug or supplement.",
+         "rdfs:label" : "nonProprietaryName",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:overdosage" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any information related to overdose on a drug, including signs or symptoms, treatments, contact information for emergency response.",
+         "rdfs:label" : "overdosage",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:pregnancyCategory" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Pregnancy category of this drug.",
+         "rdfs:label" : "pregnancyCategory",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:DrugPregnancyCategory"
+      },
+      "schema:pregnancyWarning" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any precaution, guidance, contraindication, etc. related to this drug's use during pregnancy.",
+         "rdfs:label" : "pregnancyWarning",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:prescribingInfo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Link to prescribing information for the drug.",
+         "rdfs:label" : "prescribingInfo",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:URL"
+      },
+      "schema:prescriptionStatus" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the status of drug prescription eg. local catalogs classifications or whether the drug is available by prescription or over-the-counter, etc.",
+         "rdfs:label" : "prescriptionStatus",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:DrugPrescriptionStatus",
+            "schema:Text"
+         ]
+      },
+      "schema:proprietaryName" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Proprietary name given to the diet plan, typically by its originator or creator.",
+         "rdfs:label" : "proprietaryName",
+         "schema:domainIncludes" : [
+            "schema:DietarySupplement",
+            "schema:Drug"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Text"
+      },
+      "schema:relatedDrug" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any other drug related to this one, for example commonly-prescribed alternatives.",
+         "rdfs:label" : "relatedDrug",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Drug"
+      },
+      "schema:warning" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Any FDA or other warnings about the drug (text or URL).",
+         "rdfs:label" : "warning",
+         "schema:domainIncludes" : "schema:Drug",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:Text",
+            "schema:URL"
+         ]
+      }
+   }
+}

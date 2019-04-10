@@ -13,9 +13,10 @@ use Types::Standard qw/ Str /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.0.4';
+our $VERSION = 'v3.5.0';
 
 # RECOMMEND PREREQ: aliased
+# RECOMMEND PREREQ: Class::XSAccessor 1.18
 # RECOMMEND PREREQ: Ref::Util::XS
 # RECOMMEND PREREQ: Type::Tiny::XS
 
@@ -45,7 +46,7 @@ SemanticWeb::Schema - Moo classes for http://schema.org/ classes
 
 =head1 VERSION
 
-version v0.0.4
+version v3.5.0
 
 =head1 SYNOPSIS
 
@@ -66,9 +67,15 @@ were generated automatically from the following sources:
 
 =over
 
-=item L<http://schema.org/version/3.4/ext-meta.rdf>
+=item L<http://schema.org/version/3.5/ext-meta.rdf>
 
-=item L<http://schema.org/version/3.4/schema.rdf>
+=item L<http://schema.org/version/3.5/ext-health-lifesci.rdf>
+
+=item L<http://schema.org/version/3.5/ext-auto.rdf>
+
+=item L<http://schema.org/version/3.5/ext-bib.rdf>
+
+=item L<http://schema.org/version/3.5/schema.rdf>
 
 =back
 

@@ -28,6 +28,21 @@
          "schema:domainIncludes" : "schema:BroadcastService",
          "schema:rangeIncludes" : "schema:Text"
       },
+      "schema:broadcastFrequency" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The frequency used for over-the-air broadcasts. Numeric values or simple ranges e.g. 87-99. In addition a shortcut idiom is supported for frequences of AM and FM radio channels, e.g. \"87 FM\".",
+         "rdfs:label" : "broadcastFrequency",
+         "schema:category" : "issue-1004",
+         "schema:domainIncludes" : [
+            "schema:BroadcastService",
+            "schema:BroadcastChannel"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:BroadcastFrequencySpecification",
+            "schema:Text"
+         ]
+      },
       "schema:broadcastTimezone" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The timezone in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 format</a> for which the service bases its broadcasts",
@@ -42,6 +57,16 @@
          "schema:domainIncludes" : "schema:BroadcastService",
          "schema:rangeIncludes" : "schema:Organization"
       },
+      "schema:hasBroadcastChannel" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A broadcast channel of a broadcast service.",
+         "rdfs:label" : "hasBroadcastChannel",
+         "schema:category" : "issue-1004",
+         "schema:domainIncludes" : "schema:BroadcastService",
+         "schema:inverseOf" : "schema:providesBroadcastService",
+         "schema:rangeIncludes" : "schema:BroadcastChannel"
+      },
       "schema:parentService" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A broadcast service to which the broadcast service may belong to such as regional variations of a national channel.",
@@ -55,8 +80,8 @@
          "rdfs:label" : "videoFormat",
          "schema:domainIncludes" : [
             "schema:ScreeningEvent",
-            "schema:BroadcastEvent",
-            "schema:BroadcastService"
+            "schema:BroadcastService",
+            "schema:BroadcastEvent"
          ],
          "schema:rangeIncludes" : "schema:Text"
       }

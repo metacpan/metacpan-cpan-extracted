@@ -1,6 +1,6 @@
 #!perl
 
-use Test::Simple tests => 5;
+use Test::More tests => 12;
 
 use Math::BigRat;
 use Math::BigInt;
@@ -10,17 +10,32 @@ use Math::ContinuedFraction;
 # Create sequence for pi with the first eleven terms.
 # (It's irrational, and does not have a repeating sequence.)
 #
-my $cf = Math::ContinuedFraction->new([3, 7, 15, 1, 292, 1, 1, 1, 21, 3, 1]);
+my @pi_seq = (3, 7, 15, 1, 292, 1, 1);
 
-my($n, $d) = $cf->convergent(1);
-ok(($n == 22 and $d == 7), "->convergent(2) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(2);
-ok(($n == 333 and $d == 106), "->convergent(2) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(3);
-ok(($n == 355 and $d == 113), "->convergent(3) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(4);
-ok(($n == 103993 and $d == 33102), "->convergent(4) returns (". $n . ", " . $d . ")");
-($n, $d) = $cf->convergent(5);
-ok(($n == 104348 and $d == 33215), "->convergent(5) returns (". $n . ", " . $d . ")");
+my @conv = (
+	{n => Math::BigInt->new(22), d => Math::BigInt->new(7)},
+	{n => Math::BigInt->new(333), d => Math::BigInt->new(106)},
+	{n => Math::BigInt->new(355), d => Math::BigInt->new(113)},
+	{n => Math::BigInt->new(103993), d => Math::BigInt->new(33102)},
+	{n => Math::BigInt->new(104348), d => Math::BigInt->new(33215)},
+	{n => Math::BigInt->new(208341), d => Math::BigInt->new(66317)},
+);
+
+my $cf = Math::ContinuedFraction->new([@pi_seq]);
+
+for my $j (1 .. scalar @conv)
+{
+	my($n, $d) = $cf->convergent($j);
+	ok(($n == $conv[$j - 1]->{n} and $d == $conv[$j - 1]->{d}),
+		"->convergent($j) returns (". $n . ", " . $d . ")");
+}
+
+for my $j (1 .. scalar @conv)
+{
+	my($r) = $cf->brconvergent($j);
+	my($n, $d) = $r->parts();
+	ok(($n == $conv[$j - 1]->{n} and $d == $conv[$j - 1]->{d}),
+		"->brconvergent($j) returns (". $n . ", " . $d . ")");
+}
 
 exit(0);

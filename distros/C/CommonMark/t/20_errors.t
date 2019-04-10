@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Symbol;
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 BEGIN {
     use_ok('CommonMark');
@@ -52,6 +52,16 @@ eval {
     $paragraph->set_url('/url');
 };
 like($@, qr/set_url: invalid operation/, 'set_url dies');
+
+eval {
+    $doc->render();
+};
+like($@, qr/must provide format/, 'render without format');
+
+eval {
+    $doc->render(format => 'non_existent');
+};
+like($@, qr/invalid format/, 'render with invalid format');
 
 eval {
     my $paragraph = CommonMark->create_paragraph(

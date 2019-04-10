@@ -1,0 +1,11 @@
+{
+   "class" : {
+      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/243",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A Workers Union (also known as a Labor Union, Labour Union, or Trade Union) is an organization that promotes the interests of its worker members by collectively bargaining with management, organizing, and political lobbying.",
+      "rdfs:label" : "WorkersUnion",
+      "rdfs:subClassOf" : "schema:Organization",
+      "schema:category" : "issue-243"
+   },
+   "properties" : {}
+}

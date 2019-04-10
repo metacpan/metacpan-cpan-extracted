@@ -1,3 +1,19 @@
+0.003   2019-04-10 (PERLANCAR)
+
+	- [bugfix] HTTP::Tiny didn't store our attributes.
+
+
+0.002    2019-04-10 (PERLANCAR)
+
+         - [bugfix] Fix setting default values (thanks Paul Lambert) [GH#1].
+
+         - [bugfix] Fix null return value when all retries fail (thanks Paul
+           Lambert) [GH#3].
+
+         - [doc] Mention HTTP::Tiny::CustomRetry and
+           HTTP::Tiny::Patch::CustomRetry.
+
+
 0.001    2018-12-09 (PERLANCAR)
 
          - First release.

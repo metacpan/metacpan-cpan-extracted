@@ -1,0 +1,22 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "The legal availability status of a medical drug.",
+      "rdfs:label" : "DrugLegalStatus",
+      "rdfs:subClassOf" : "schema:MedicalIntangible",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:applicableLocation" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The location in which the status applies.",
+         "rdfs:label" : "applicableLocation",
+         "schema:domainIncludes" : [
+            "schema:DrugCost",
+            "schema:DrugLegalStatus"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AdministrativeArea"
+      }
+   }
+}

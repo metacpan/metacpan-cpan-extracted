@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_GoodRelationsClass",
+      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A brand is a name used by an organization or business person for labeling a product, product group, or similar.",
       "rdfs:label" : "Brand",
@@ -12,33 +12,33 @@
          "rdfs:comment" : "The overall rating, based on a collection of reviews or ratings, of the item.",
          "rdfs:label" : "aggregateRating",
          "schema:domainIncludes" : [
-            "schema:Offer",
-            "schema:Event",
-            "schema:CreativeWork",
             "schema:Product",
-            "schema:Organization",
+            "schema:Offer",
             "schema:Brand",
             "schema:Place",
-            "schema:Service"
+            "schema:Organization",
+            "schema:Service",
+            "schema:Event",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:AggregateRating"
       },
       "schema:logo" : {
-         "dc:source" : "schemadotorgsources2:source_GoodRelationsTerms",
+         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An associated logo.",
          "rdfs:label" : "logo",
          "rdfs:subPropertyOf" : "schema:image",
          "schema:domainIncludes" : [
-            "schema:Brand",
-            "schema:Product",
-            "schema:Service",
+            "schema:Organization",
             "schema:Place",
-            "schema:Organization"
+            "schema:Product",
+            "schema:Brand",
+            "schema:Service"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:ImageObject"
+            "schema:ImageObject",
+            "schema:URL"
          ]
       },
       "schema:review" : {
@@ -46,16 +46,29 @@
          "rdfs:comment" : "A review of the item.",
          "rdfs:label" : "review",
          "schema:domainIncludes" : [
-            "schema:CreativeWork",
-            "schema:Offer",
-            "schema:Brand",
-            "schema:Service",
-            "schema:Organization",
             "schema:Product",
             "schema:Place",
-            "schema:Event"
+            "schema:Offer",
+            "schema:Brand",
+            "schema:Organization",
+            "schema:Event",
+            "schema:Service",
+            "schema:CreativeWork"
          ],
          "schema:rangeIncludes" : "schema:Review"
+      },
+      "schema:slogan" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "A slogan or motto associated with the item.",
+         "rdfs:label" : "slogan",
+         "schema:domainIncludes" : [
+            "schema:Place",
+            "schema:Service",
+            "schema:Brand",
+            "schema:Product",
+            "schema:Organization"
+         ],
+         "schema:rangeIncludes" : "schema:Text"
       }
    }
 }

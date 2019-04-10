@@ -15,8 +15,8 @@
             "schema:HowToSupply"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:MonetaryAmount"
+            "schema:MonetaryAmount",
+            "schema:Text"
          ]
       }
    }

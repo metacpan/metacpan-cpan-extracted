@@ -12,12 +12,12 @@
          "rdfs:label" : "addressCountry",
          "schema:domainIncludes" : [
             "schema:GeoCoordinates",
-            "schema:PostalAddress",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
-            "schema:Country",
-            "schema:Text"
+            "schema:Text",
+            "schema:Country"
          ]
       },
       "schema:addressLocality" : {
@@ -47,8 +47,8 @@
          "rdfs:label" : "postalCode",
          "schema:domainIncludes" : [
             "schema:PostalAddress",
-            "schema:GeoCoordinates",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },

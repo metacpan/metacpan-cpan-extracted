@@ -1058,6 +1058,14 @@ bl(int arg, int maybe)
 }
 
 void
+strmove(char* out, const char* in)
+{
+    size_t len = strlen(in);
+    memmove(out, in, len);
+    out[len] = '\0';
+}
+
+void
 fixup(STR *str)
 {
     char *s;
@@ -1065,7 +1073,7 @@ fixup(STR *str)
 
     for (s = str->str_ptr; *s; s++) {
 	if (*s == ';' && s[1] == ' ' && s[2] == '\n') {
-	    strcpy(s+1,s+2);
+	    strmove(s+1,s+2);
 	    s++;
 	}
 	else if (*s == '\n') {
@@ -1075,7 +1083,7 @@ fixup(STR *str)
 	    if (*t == '\n' && t-s > 1) {
 		if (s[-1] == '{')
 		    s--;
-		strcpy(s+1,t);
+		strmove(s+1,t);
 	    }
 	    s++;
 	}

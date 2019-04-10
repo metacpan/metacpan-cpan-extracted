@@ -199,5 +199,18 @@ my %opts = (
 
 $opts{META_MERGE}->{release_status} = 'testing' if $IS_TRIAL;
 
+# Some tests run on older versions of EUMM that do not support TEST_REQUIRES.
+# http://www.cpantesters.org/cpan/report/f445404a-56b8-11e9-bab0-5e087347484a
+# is one example.  This is a workaround, modified from
+# https://metacpan.org/source/RJBS/JSON-Typist-0.005/Makefile.PL ,
+# linked from http://blogs.perl.org/users/neilb/2017/05/specifying-dependencies-for-your-cpan-distribution.html .
+# If we are on a version of EUMM that doesn't support TEST_REQUIRES,
+# move those dependencies to PREREQ_PM.
+unless( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+    $opts{PREREQ_PM}->{$_} = $opts{TEST_REQUIRES}->{$_}
+        foreach keys %{$opts{TEST_REQUIRES}};
+    delete $opts{TEST_REQUIRES};
+}
+
 WriteMakefile(%opts);
 # vi: set fdm=marker: #

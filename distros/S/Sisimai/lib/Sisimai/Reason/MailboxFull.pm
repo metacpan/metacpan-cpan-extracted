@@ -13,7 +13,8 @@ sub match {
     # @since v4.0.0
     my $class = shift;
     my $argv1 = shift // return undef;
-    my $index = [
+
+    state $index = [
         'account disabled temporarly for exceeding receiving limits',
         'account is exceeding their quota',
         'account is over quota',
@@ -59,7 +60,6 @@ sub match {
         'was automatically rejected: quota exceeded',
         'would be over the allowed quota',
     ];
-
     return 1 if grep { rindex($argv1, $_) > -1 } @$index;
     return 0;
 }
@@ -80,7 +80,7 @@ sub true {
     # Delivery status code points "mailboxfull".
     # Status: 4.2.2
     # Diagnostic-Code: SMTP; 450 4.2.2 <***@example.jp>... Mailbox Full
-    return 1 if Sisimai::SMTP::Status->name($argvs->deliverystatus) eq 'mailboxfull';
+    return 1 if (Sisimai::SMTP::Status->name($argvs->deliverystatus) || '') eq 'mailboxfull';
 
     # Check the value of Diagnosic-Code: header with patterns
     return 1 if __PACKAGE__->match(lc $argvs->diagnosticcode);

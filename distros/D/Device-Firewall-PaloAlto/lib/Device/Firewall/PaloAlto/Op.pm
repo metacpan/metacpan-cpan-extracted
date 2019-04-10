@@ -1,5 +1,5 @@
 package Device::Firewall::PaloAlto::Op;
-$Device::Firewall::PaloAlto::Op::VERSION = '0.1.3';
+$Device::Firewall::PaloAlto::Op::VERSION = '0.1.5';
 
 use strict;
 use warnings;
@@ -10,6 +10,8 @@ use Device::Firewall::PaloAlto::Op::Interfaces;
 use Device::Firewall::PaloAlto::Op::ARPTable;
 use Device::Firewall::PaloAlto::Op::VirtualRouter;
 use Device::Firewall::PaloAlto::Op::Tunnels;
+use Device::Firewall::PaloAlto::Op::GlobalCounters;
+use Device::Firewall::PaloAlto::Op::IPUserMaps;
 
 use XML::LibXML;
 
@@ -68,6 +70,31 @@ sub tunnels {
         $self->_send_op_cmd('show vpn ipsec-sa') 
     );
 }
+
+
+sub global_counters {
+    my $self = shift;
+    my %args = @_;
+
+    $args{delta} //= 0;
+    my @cmd = $args{delta} ? 
+        ('show counter global filter delta', 'yes') :
+        ('show counter global');
+    
+    return Device::Firewall::PaloAlto::Op::GlobalCounters->_new(
+        $self->_send_op_cmd(@cmd)
+    );
+}
+
+
+
+sub ip_user_mapping {
+    my $self = shift;
+
+    return Device::Firewall::PaloAlto::Op::IPUserMaps->_new( $self->_send_op_cmd('show user ip-user-mapping all') );
+}
+
+
 
 sub _send_op_cmd {
     my $self = shift;
@@ -133,7 +160,7 @@ Device::Firewall::PaloAlto::Op - Operations module for Palo Alto firewalls
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.5
 
 =head1 SYNOPSIS
 
@@ -181,6 +208,14 @@ Returns a L<Device::Firewall::PaloAlto::Op::VirtualRouter> object representing a
 =head2 tunnels
 
 Returns a L<Device::Firewall::PaloAlto::Op::Tunnels> object representing the current active IPSEC tunnels.
+
+=head2 global_counters
+
+Returns a L<Device::Firewall::PaloAlto::Op::GlobalCounters> object representing the global counters.
+
+=head2 ip_user_mapping
+
+Returns IP to user mappings
 
 =head1 AUTHOR
 

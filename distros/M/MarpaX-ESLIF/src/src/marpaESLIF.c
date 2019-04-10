@@ -12962,7 +12962,7 @@ static void _marpaESLIF_generic_freeCallbackv(void *userDatavp, marpaESLIFValueR
     break;
   case MARPAESLIF_VALUE_TYPE_STRING:
     MARPAESLIFRECOGNIZER_TRACEF(marpaESLIFRecognizerp, funcs, "Freeing STRING {%p,%ld,encoding=%s}", marpaESLIFValueResultp->u.s.p, (unsigned long) marpaESLIFValueResultp->u.s.sizel, marpaESLIFValueResultp->u.s.encodingasciis != NULL ? marpaESLIFValueResultp->u.s.encodingasciis : "(null)");
-    string.bytep          = marpaESLIFValueResultp->u.s.p;
+    string.bytep          = (char *) marpaESLIFValueResultp->u.s.p;
     string.bytel          = marpaESLIFValueResultp->u.s.sizel;
     string.encodingasciis = marpaESLIFValueResultp->u.s.encodingasciis;
     string.asciis         = NULL;
@@ -13329,7 +13329,7 @@ static short _marpaESLIFRecognizer_concat_valueResultCallbackb(void *userDatavp,
           marpaESLIFValueResult.type               = MARPAESLIF_VALUE_TYPE_STRING;
           marpaESLIFValueResult.contextp           = NULL;
           marpaESLIFValueResult.representationp    = NULL;
-          marpaESLIFValueResult.u.s.p              = srcs;
+          marpaESLIFValueResult.u.s.p              = (unsigned char *) srcs;
           marpaESLIFValueResult.u.s.sizel          = srcl;
           marpaESLIFValueResult.u.s.encodingasciis = encodingasciis;
           marpaESLIFValueResult.u.s.shallowb       = 1;
@@ -13478,7 +13478,7 @@ static short _marpaESLIFRecognizer_concat_valueResultCallbackb(void *userDatavp,
          - binary mode: content
       */
       if (contextp->stringb) {
-        string.bytep          = marpaESLIFValueResult.u.s.p;
+        string.bytep          = (char *) marpaESLIFValueResult.u.s.p;
         string.bytel          = marpaESLIFValueResult.u.s.sizel;
         string.encodingasciis = marpaESLIFValueResult.u.s.encodingasciis;
         string.asciis         = NULL;
@@ -13512,7 +13512,7 @@ static short _marpaESLIFRecognizer_concat_valueResultCallbackb(void *userDatavp,
           _marpaESLIF_appendOpaqueDataToStringGenerator(marpaESLIF_stringGeneratorp, utf8p->bytep, utf8p->bytel);
         }
       } else {
-        _marpaESLIF_appendOpaqueDataToStringGenerator(marpaESLIF_stringGeneratorp, marpaESLIFValueResult.u.s.p, marpaESLIFValueResult.u.s.sizel);
+        _marpaESLIF_appendOpaqueDataToStringGenerator(marpaESLIF_stringGeneratorp, (char *) marpaESLIFValueResult.u.s.p, marpaESLIFValueResult.u.s.sizel);
       }
       break;
     case MARPAESLIF_VALUE_TYPE_ROW:
@@ -13745,7 +13745,7 @@ static inline short _marpaESLIF_generic_action___concatb(void *userDatavp, marpa
         marpaESLIFValueResult.type               = MARPAESLIF_VALUE_TYPE_STRING;
         marpaESLIFValueResult.contextp           = NULL;
         marpaESLIFValueResult.representationp    = NULL;
-        marpaESLIFValueResult.u.s.p              = converteds;
+        marpaESLIFValueResult.u.s.p              = (unsigned char *) converteds;
         marpaESLIFValueResult.u.s.sizel          = convertedl;
         marpaESLIFValueResult.u.s.encodingasciis = toEncodingDups;
         marpaESLIFValueResult.u.s.shallowb       = 0;
@@ -14060,7 +14060,7 @@ static short _marpaESLIF_rule_action___rowb(void *userDatavp, marpaESLIFValue_t 
 /*****************************************************************************/
 static short _marpaESLIF_rule_action___tableb(void *userDatavp, marpaESLIFValue_t *marpaESLIFValuep, int arg0i, int argni, int resulti, short nullableb)
 /*****************************************************************************/
-/* Exactly the same logic as for row except that the target is of type table and that we require an even number of elements
+/* Exactly the same logic as for row except that the target is of type table and that we require an even number of elements */
 /*****************************************************************************/
 {
   short                    rcb;

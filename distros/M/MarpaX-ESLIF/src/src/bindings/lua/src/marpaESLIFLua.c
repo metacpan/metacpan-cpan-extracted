@@ -3711,14 +3711,14 @@ static short marpaESLIFLua_importb(marpaESLIFValue_t *marpaESLIFValuep, void *us
     /* We take register this string in our MARPAESLIFSTRINGTOENCODINGTABLE internal table */
     MARPAESLIFLUA_GETORCREATEGLOBAL(L, MARPAESLIFSTRINGTOENCODINGTABLE, NULL /* gcp */, "k" /* mode */);                      /* Stack: ..., MARPAESLIFSTRINGTOENCODINGTABLE */
     if ((marpaESLIFValueResultp->u.s.p != NULL) && (marpaESLIFValueResultp->u.s.sizel > 0)) {
-      if (! marpaESLIFLua_lua_pushlstring(NULL, L, marpaESLIFValueResultp->u.s.p, marpaESLIFValueResultp->u.s.sizel)) goto err; /* Stack: ..., MARPAESLIFSTRINGTOENCODINGTABLE, string */
+      if (! marpaESLIFLua_lua_pushlstring(NULL, L, (const char *) marpaESLIFValueResultp->u.s.p, marpaESLIFValueResultp->u.s.sizel)) goto err; /* Stack: ..., MARPAESLIFSTRINGTOENCODINGTABLE, string */
     } else {
       if (! marpaESLIFLua_lua_pushlstring(NULL, L, "", 0)) goto err;                                                          /* Stack: ..., MARPAESLIFSTRINGTOENCODINGTABLE, "" */
     }
     if (! marpaESLIFLua_lua_pushstring(NULL, L, marpaESLIFValueResultp->u.s.encodingasciis)) goto err;                        /* Stack: ..., MARPAESLIFSTRINGTOENCODINGTABLE, string, encodingasciis */
     if (! marpaESLIFLua_lua_settable(L, -3)) goto err;                                                                        /* Stack: ..., MARPAESLIFSTRINGTOENCODINGTABLE */
     if (! marpaESLIFLua_lua_pop(L, 1)) goto err;                                                                              /* Stack: ... */
-    if (! marpaESLIFLua_lua_pushlstring(NULL, L, marpaESLIFValueResultp->u.s.p, marpaESLIFValueResultp->u.s.sizel)) goto err; /* Stack: ..., string */
+    if (! marpaESLIFLua_lua_pushlstring(NULL, L, (const char *) marpaESLIFValueResultp->u.s.p, marpaESLIFValueResultp->u.s.sizel)) goto err; /* Stack: ..., string */
     break;
   case MARPAESLIF_VALUE_TYPE_ROW:
     /* fprintf(stdout, "import row\n"); fflush(stdout); fflush(stderr); */
@@ -6823,7 +6823,7 @@ static short marpaESLIFLua_stack_setb(lua_State *L, marpaESLIF_t *marpaESLIFp, m
           marpaESLIFValueResultp->type               = MARPAESLIF_VALUE_TYPE_STRING;
           marpaESLIFValueResultp->contextp           = MARPAESLIFLUA_CONTEXT;
           marpaESLIFValueResultp->representationp    = NULL;
-          marpaESLIFValueResultp->u.s.p              = p;
+          marpaESLIFValueResultp->u.s.p              = (unsigned char *) p;
           marpaESLIFValueResultp->u.s.shallowb       = 0;
           marpaESLIFValueResultp->u.s.sizel          = tmpl;
           marpaESLIFValueResultp->u.s.encodingasciis = encodingasciis;
@@ -6837,7 +6837,7 @@ static short marpaESLIFLua_stack_setb(lua_State *L, marpaESLIF_t *marpaESLIFp, m
           marpaESLIFValueResultp->type               = MARPAESLIF_VALUE_TYPE_STRING;
           marpaESLIFValueResultp->contextp           = MARPAESLIFLUA_CONTEXT;
           marpaESLIFValueResultp->representationp    = NULL;
-          marpaESLIFValueResultp->u.s.p              = strdup("");
+          marpaESLIFValueResultp->u.s.p              = (unsigned char *) strdup("");
           if (marpaESLIFValueResultp->u.s.p == NULL) {
             marpaESLIFLua_luaL_errorf(L, "strdup failure, %s", strerror(errno));
             goto err;
@@ -7343,7 +7343,7 @@ static short marpaESLIFLua_metatypeb(int *luaip, lua_State *L, int index)
       if (! marpaESLIFLua_lua_type(&metatypei, L, -1)) goto err;
       if (metatypei == LUA_TFUNCTION) {
         if (! marpaESLIFLua_lua_pushnil(L)) goto err;                   /* Stack: ..., __type(), nil */
-        if (! marpaESLIFLua_lua_copy(L, index, -1));                    /* Stack: ..., __type(), value */
+        if (! marpaESLIFLua_lua_copy(L, index, -1)) goto err;           /* Stack: ..., __type(), value */
         if (! marpaESLIFLua_lua_call(L, 1, 1)) goto err;                /* Stack: ..., __type(value) */
         if (! marpaESLIFLua_lua_type(&metavaluetypei, L, -1)) goto err;
         if (metavaluetypei != LUA_TNIL) {
@@ -7437,7 +7437,7 @@ static short marpaESLIFLua_metanextb(int *rcip, lua_State *L, int idx)
     if (metatypei == LUA_TFUNCTION) {
       if (! marpaESLIFLua_lua_insert(L, -2)) goto err;                /* Stack: ..., __next(), <key> */
       if (! marpaESLIFLua_lua_pushnil(L)) goto err;                   /* Stack: ..., __next(), <key>, nil */
-      if (! marpaESLIFLua_lua_copy(L, idx, -1));                      /* Stack: ..., __next(), <key>, table */
+      if (! marpaESLIFLua_lua_copy(L, idx, -1)) goto err;             /* Stack: ..., __next(), <key>, table */
       if (! marpaESLIFLua_lua_insert(L, -2)) goto err;                /* Stack: ..., __next(), table, <key> */
       if (! marpaESLIFLua_lua_call(L, 2, 2)) goto err;                /* Stack: ..., nextkey, nextvalue */
       if (! marpaESLIFLua_metatypeb(&metakeytypei, L, -2)) goto err;

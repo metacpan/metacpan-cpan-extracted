@@ -1,6 +1,6 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:source_DatasetClass",
+      "dc:source" : "schemadotorgsources:source_DatasetClass",
       "owl:equivalentClass" : "dcat:Catalog",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A collection of datasets.",

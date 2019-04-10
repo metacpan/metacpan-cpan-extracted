@@ -35,15 +35,19 @@
          "schema:rangeIncludes" : "schema:URL"
       },
       "schema:duration" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
+         "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:MediaObject",
             "schema:Movie",
             "schema:Event",
             "schema:MusicRelease",
-            "schema:MusicRecording"
+            "schema:Audiobook",
+            "schema:QuantitativeValueDistribution",
+            "schema:MusicRecording",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : "schema:Duration"
       },
@@ -59,6 +63,7 @@
          "rdfs:comment" : "The CreativeWork encoded by this media object.",
          "rdfs:label" : "encodesCreativeWork",
          "schema:domainIncludes" : "schema:MediaObject",
+         "schema:inverseOf" : "schema:encoding",
          "schema:rangeIncludes" : "schema:CreativeWork"
       },
       "schema:encodingFormat" : {
@@ -74,15 +79,26 @@
             "schema:Text"
          ]
       },
+      "schema:endTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The endTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to end. For actions that span a period of time, when the action was performed. e.g. John wrote a book from January to <em>December</em>. For media, including audio and video, it's the time offset of the end of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "endTime",
+         "schema:domainIncludes" : [
+            "schema:Action",
+            "schema:FoodEstablishmentReservation",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
+      },
       "schema:height" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The height of the item.",
          "rdfs:label" : "height",
          "schema:domainIncludes" : [
-            "schema:Person",
-            "schema:MediaObject",
             "schema:VisualArtwork",
-            "schema:Product"
+            "schema:Person",
+            "schema:Product",
+            "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
@@ -101,14 +117,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:Movie",
-            "schema:MediaObject",
-            "schema:VideoGameSeries",
-            "schema:CreativeWorkSeason",
-            "schema:MovieSeries",
-            "schema:Episode",
             "schema:TVSeries",
-            "schema:RadioSeries"
+            "schema:RadioSeries",
+            "schema:VideoGameSeries",
+            "schema:Movie",
+            "schema:CreativeWorkSeason",
+            "schema:Episode",
+            "schema:MediaObject",
+            "schema:MovieSeries"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -120,11 +136,30 @@
          "schema:rangeIncludes" : "schema:Place"
       },
       "schema:requiresSubscription" : {
+         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates if use of the media require a subscription  (either paid or free). Allowed values are <code>true</code> or <code>false</code> (note that an earlier version had 'yes', 'no').",
          "rdfs:label" : "requiresSubscription",
-         "schema:domainIncludes" : "schema:MediaObject",
-         "schema:rangeIncludes" : "schema:Boolean"
+         "schema:category" : "issue-1741",
+         "schema:domainIncludes" : [
+            "schema:ActionAccessSpecification",
+            "schema:MediaObject"
+         ],
+         "schema:rangeIncludes" : [
+            "schema:MediaSubscription",
+            "schema:Boolean"
+         ]
+      },
+      "schema:startTime" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The startTime of something. For a reserved event or service (e.g. FoodEstablishmentReservation), the time that it is expected to start. For actions that span a period of time, when the action was performed. e.g. John wrote a book from <em>January</em> to December. For media, including audio and video, it's the time offset of the start of a clip within a larger file.<br/><br/>\n\nNote that Event uses startDate/endDate instead of startTime/endTime, even when describing dates with times. This situation may be clarified in future revisions.",
+         "rdfs:label" : "startTime",
+         "schema:domainIncludes" : [
+            "schema:FoodEstablishmentReservation",
+            "schema:MediaObject",
+            "schema:Action"
+         ],
+         "schema:rangeIncludes" : "schema:DateTime"
       },
       "schema:uploadDate" : {
          "rdf:type" : "rdf:Property",
@@ -138,9 +173,9 @@
          "rdfs:comment" : "The width of the item.",
          "rdfs:label" : "width",
          "schema:domainIncludes" : [
-            "schema:Product",
             "schema:MediaObject",
-            "schema:VisualArtwork"
+            "schema:VisualArtwork",
+            "schema:Product"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",

@@ -1,0 +1,51 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/116154003",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A patient is any person recipient of health care services.",
+      "rdfs:label" : "Patient",
+      "rdfs:subClassOf" : [
+         "schema:MedicalAudience",
+         "schema:Person"
+      ],
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:diagnosis" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "One or more alternative conditions considered in the differential diagnosis process as output of a diagnosis process.",
+         "rdfs:label" : "diagnosis",
+         "schema:domainIncludes" : [
+            "schema:DDxElement",
+            "schema:Patient"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      },
+      "schema:drug" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
+         "rdfs:label" : "drug",
+         "schema:domainIncludes" : [
+            "schema:TherapeuticProcedure",
+            "schema:MedicalCondition",
+            "schema:Patient",
+            "schema:DrugClass"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:Drug"
+      },
+      "schema:healthCondition" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Specifying the health condition(s) of a patient, medical study, or other target audience.",
+         "rdfs:label" : "healthCondition",
+         "schema:domainIncludes" : [
+            "schema:Patient",
+            "schema:PeopleAudience",
+            "schema:MedicalStudy"
+         ],
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:MedicalCondition"
+      }
+   }
+}

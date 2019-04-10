@@ -1,13 +1,12 @@
 Summary: Czech laguage tools
 Summary(cs): Nástroje pro práci s èeským jazykem (koverze kódování, tøídìní)
 Name: cstools
-Version: 3.42
+Version: 3.43
 Release: 1
 Group: Applications/Text
 Group(cs): Aplikace/Text
 Source: Cstools-%{version}.tar.gz
-URL: http://www.fi.muni.cz/~adelton/perl/
-Copyright: 1997--2002 Jan Pazdziora, adelton@fi.muni.cz.
+Copyright: 1997--2002 Jan Pazdziora
 Buildroot: /tmp/cstools-root
 Packager: Milan Kerslager <kerslage@linux.cz>
 

@@ -1,0 +1,36 @@
+{
+   "class" : {
+      "owl:equivalentClass" : "http://purl.bioontology.org/ontology/SNOMEDCT/51114001",
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A type of blood vessel that specifically carries blood away from the heart.",
+      "rdfs:label" : "Artery",
+      "rdfs:subClassOf" : "schema:Vessel",
+      "schema:isPartOf" : "http:health-lifesci.schema.org"
+   },
+   "properties" : {
+      "schema:arterialBranch" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The branches that comprise the arterial structure.",
+         "rdfs:label" : "arterialBranch",
+         "schema:domainIncludes" : "schema:Artery",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      },
+      "schema:source" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The anatomical or organ system that the artery originates from.",
+         "rdfs:label" : "source",
+         "schema:domainIncludes" : "schema:Artery",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      },
+      "schema:supplyTo" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The area to which the artery supplies blood.",
+         "rdfs:label" : "supplyTo",
+         "schema:domainIncludes" : "schema:Artery",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : "schema:AnatomicalStructure"
+      }
+   }
+}

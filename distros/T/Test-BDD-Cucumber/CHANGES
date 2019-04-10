@@ -1,4 +1,11 @@
 -----
+0.57: 09 May 2019
+    - Simple match mode `-m` based on a patch by @ehuelsmann
+    - Move the invocation of the pre- and post-execute triggers out of
+        'run()' @ehuelsmann
+    - Parallellism on TAP::Harness <= 3.39 and improved triggers @ehuelsmann
+    - General refactoring of the Executor @ehuelsmann
+    - Auto generate META.json using the plugin [MetaJSON] @manwar
 0.56: 21 Apr 2018
     - Minor upgrade to minimum required Moo version to help try and flush
       out some CPAN smokers failure.
