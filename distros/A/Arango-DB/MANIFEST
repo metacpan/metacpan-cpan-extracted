@@ -5,7 +5,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
+README.md
 dist.ini
 lib/Arango/DB.pm
 lib/Arango/DB/API.pm

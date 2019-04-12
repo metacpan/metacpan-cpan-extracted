@@ -29,6 +29,9 @@ translatePage = (lang) ->
 			$(this).text txt
 		$("[trmsg]").each ->
 			$(this).text translate "PE#{$(this).attr 'trmsg'}"
+			msg = translate "PE#{$(this).attr 'trmsg'}"
+			if msg.match /_hide_/
+				$(this).parent().hide()
 		$("[trplaceholder]").each ->
 			$(this).attr 'placeholder', translate($(this).attr('trplaceholder'))
 		$("[localtime]").each ->
@@ -53,6 +56,7 @@ getValues = () ->
 		catch e
 			console.log 'Parsing error', e
 			console.log 'JSON', $(this).text()
+	console.log values
 	values
 
 # Code from http://snipplr.com/view/29434/
@@ -224,8 +228,6 @@ $(document).ready ->
 	datas = getValues()
 	# Export datas for other scripts
 	window.datas = datas
-	if datas['antiframe'] and top != self
-		top.location.href = location.href
 
 	$("#appslist").sortable
 		axis: "y"

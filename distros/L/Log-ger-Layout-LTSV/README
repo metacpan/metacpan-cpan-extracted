@@ -1,15 +1,21 @@
-SYNOPSIS
+NAME
+    Log::ger::Layout::LTSV - Layout log message as LTSV
 
+VERSION
+    This document describes version 0.002 of Log::ger::Layout::LTSV (from
+    Perl distribution Log-ger-Layout-LTSV), released on 2019-04-12.
+
+SYNOPSIS
      use Log::ger::Layout LTSV => (
          add_fields         => {key3 => 'value', key4 => 'value', ...},         # optional
          add_special_fields => {_date => 'Date_GMT', _host => 'Hostname', ...}, # optional
          delete_fields      => ['key1', 'key2', qr/some-regex/, ...],           # optional
      );
      use Log::ger;
-    
+
      # if you use it together with Log::ger::Format::None:
      log_warn({key1 => 'val1', key2 => 'val2', foo => 'bar', ...);
-    
+
      # otherwise, using the standard formatter:
      log_warn("blah %s", ['some', 'data']);
 
@@ -22,19 +28,15 @@ SYNOPSIS
      _date:2017-06-28T14:08:22      _host:example.com       message:blah ["some","data"]
 
 DESCRIPTION
-
     This layouter allows you to log message as LTSV row. If you use
     Log::ger::Format::None, you can pass a hashref. Otherwise, the message
-    will be put in message label. You can then delete keys then add
+    will be put in "message" label. You can then delete keys then add
     additional fields/keys (including special fields, a la
     Log::ger::Layout::Pattern).
 
 CONFIGURATION
-
- add_fields => hash
-
- add_special_fields => hash
-
+  add_fields => hash
+  add_special_fields => hash
     Known special fields:
 
      Category: Category of the logging event
@@ -57,13 +59,43 @@ CONFIGURATION
 
     Unknown special fields will cause the layouter to die.
 
- delete_fields
+  delete_fields
+  packages_to_ignore
+    Regex or arrayref. When producing caller or stack trace information,
+    will pass this to Devel::Caller::Util's "caller()" or "callers()".
+
+  subroutines_to_ignore
+    Regex or arrayref. When producing caller or stack trace information,
+    will pass this to Devel::Caller::Util's "caller()" or "callers()".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-Layout-LTSV>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-Layout-LTSV>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-Layout-LTSV>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-    More about LTSV format: http://ltsv.org
+    More about LTSV format: <http://ltsv.org>
 
     Log::ger
 
     Log::ger::Layout::Pattern
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

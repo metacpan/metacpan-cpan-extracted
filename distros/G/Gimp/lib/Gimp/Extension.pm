@@ -12,7 +12,7 @@ use Gtk2;
 sub __ ($) { goto &Gimp::__ }
 sub main { goto &Gimp::main; }
 
-our $VERSION = "2.32";
+our $VERSION = "2.33";
 our @EXPORT = qw(podregister main add_listener register_temp podregister_temp);
 
 # this is to avoid warnings from importing main etc from Gimp::Fu AND here

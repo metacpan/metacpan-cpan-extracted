@@ -1,5 +1,15 @@
 Revision history for String-Tagged
 
+0.16    2019-04-12 16:03:33
+        [CHANGES]
+         * Print a more helpful message when ->sprintf encounters undef
+         * A few docs improvements
+         * Render linefeed as "." in ->debug_sprintf so line wrapping works
+
+        [BUGFIXES]
+         * Ensure ->substr preserves tags that are anchored both before and
+           after
+
 0.15    2017-10-02 16:09:35
         [CHANGES]
          * Added ->from_sprintf constructor and ->sprintf convenience wrapper

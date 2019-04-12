@@ -1,5 +1,9 @@
 Revision history for Perl extension Code::DRY.
 
+0.05
+	- Version 0.04 had some ugly bugs that were masked by my testing. Thanks to CPANTS testers.
+	- bugfixes in salcpis.c and DRY.xs
+
 0.04
 	- Build.PL added
 	- documentation fixes

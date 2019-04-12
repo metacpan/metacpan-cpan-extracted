@@ -199,10 +199,7 @@
       $scope.displaySession = function(scope) {
         var sessionId, transformSession;
         transformSession = function(session) {
-          var _insert, _stToStr, array, arrayDate, attr, attrs, category, cv, epoch, i, id, j, k, key, l, len, len1, len2, len3, len4, m, name, o, oidcConsent, pattern, ref, ref1, res, sfDevice, subres, time, title, tmp, value;
-          _stToStr = function(s) {
-            return s;
-          };
+          var _insert, array, attr, attrs, category, cv, epoch, i, id, j, k, key, l, len, len1, len2, len3, len4, m, name, o, oidcConsent, ref, ref1, res, sfDevice, subres, time, title, tmp, value;
           _insert = function(re, title) {
             var key, reg, tmp, value;
             tmp = [];
@@ -240,10 +237,7 @@
                 } else if (key.match(/^(_utime|_lastAuthnUTime|_lastSeen|notification)$/)) {
                   session[key] = $scope.localeDate(value);
                 } else if (key.match(/^(_startTime|_updateTime)$/)) {
-                  value = _stToStr(value);
-                  pattern = /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/;
-                  arrayDate = value.match(pattern);
-                  session[key] = arrayDate[3] + "/" + arrayDate[2] + "/" + arrayDate[1] + " à " + arrayDate[4] + ":" + arrayDate[5] + ":" + arrayDate[6];
+                  session[key] = $scope.strToLocaleDate(value);
                 }
               }
             }
@@ -422,6 +416,15 @@
       $scope.localeDate = function(s) {
         var d;
         d = new Date(s * 1000);
+        return d.toLocaleString();
+      };
+      $scope.strToLocaleDate = function(s) {
+        var arrayDate, d;
+        arrayDate = s.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/);
+        if (!arrayDate.length) {
+          return s;
+        }
+        d = new Date(arrayDate[1] + "-" + arrayDate[2] + "-" + arrayDate[3] + "T" + arrayDate[4] + ":" + arrayDate[5] + ":" + arrayDate[6]);
         return d.toLocaleString();
       };
       $scope.getLanguage = function(lang) {

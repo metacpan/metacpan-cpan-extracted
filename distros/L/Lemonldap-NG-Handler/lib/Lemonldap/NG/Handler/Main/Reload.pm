@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -362,7 +362,7 @@ sub headersInit {
         my $sub = '';
         foreach ( keys %headers ) {
             my $val = $class->substitute( $headers{$_} );
-            $sub .= "('$_' => $val),";
+            $sub .= "('$_' => $val || ''),";
         }
 
         unless ( $class->tsv->{forgeHeaders}->{$vhost} =

@@ -14,7 +14,7 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'Test::More' => '0.94', # subtest
-    'DBD::SQLite' => 0,
+    'DBD::SQLite' => '1.62',
   },
   PREREQ_PM => {
     'Mojo::Base' => '0',

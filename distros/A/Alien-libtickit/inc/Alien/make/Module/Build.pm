@@ -258,7 +258,7 @@ sub make_in_srcdir
 
    $self->in_srcdir( sub {
       system( MAKE(), MAKEARGS(), @args ) == 0 or
-         die "Unable to make - $!";
+         die "Unable to make - returned exit code $?";
    } );
 }
 

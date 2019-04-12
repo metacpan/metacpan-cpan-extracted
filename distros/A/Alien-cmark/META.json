@@ -66,7 +66,7 @@
    "provides" : {
       "Alien::cmark" : {
          "file" : "lib/Alien/cmark.pm",
-         "version" : "0.001"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -276,7 +276,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -572,17 +572,15 @@
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.26",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Alien::cmake3" : "0.02",
             "Archive::Tar" : "0",
             "Config" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "URI" : "0"
          },
          "system" : {}
       }

@@ -4,12 +4,15 @@ bin/fusioninventory-injector
 bin/fusioninventory-inventory
 bin/fusioninventory-netdiscovery
 bin/fusioninventory-netinventory
+bin/fusioninventory-remoteinventory
 bin/fusioninventory-wakeonlan
 bin/fusioninventory-win32-service
+bin/fusioninventory-win32-service.rc.sample
 bin/fusioninventory-wmi
 Changes
 CONTRIB.md
 contrib/debian-builder.sh
+contrib/netdisco/netdisco_2_glpi.sh
 contrib/unix/fusioninventory-agent.init.debian
 contrib/unix/fusioninventory-agent.init.redhat
 contrib/unix/fusioninventory-agent.service
@@ -25,6 +28,9 @@ doc/inventory.mdwn
 doc/network.mdwn
 doc/wakeonlan.mdwn
 etc/agent.cfg
+etc/inventory-server-plugin.cfg
+etc/server-test-plugin.cfg
+etc/ssl-server-plugin.cfg
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -45,6 +51,11 @@ lib/FusionInventory/Agent/HTTP/Client/Fusion.pm
 lib/FusionInventory/Agent/HTTP/Client/OCS.pm
 lib/FusionInventory/Agent/HTTP/Protocol/https.pm
 lib/FusionInventory/Agent/HTTP/Server.pm
+lib/FusionInventory/Agent/HTTP/Server/Inventory.pm
+lib/FusionInventory/Agent/HTTP/Server/Plugin.pm
+lib/FusionInventory/Agent/HTTP/Server/SSL.pm
+lib/FusionInventory/Agent/HTTP/Server/Test.pm
+lib/FusionInventory/Agent/HTTP/Session.pm
 lib/FusionInventory/Agent/Inventory.pm
 lib/FusionInventory/Agent/Logger.pm
 lib/FusionInventory/Agent/Logger/Backend.pm
@@ -63,7 +74,9 @@ lib/FusionInventory/Agent/SNMP/MibSupport/HPNetPeripheral.pm
 lib/FusionInventory/Agent/SNMP/MibSupport/iLO.pm
 lib/FusionInventory/Agent/SNMP/MibSupport/LinuxAppliance.pm
 lib/FusionInventory/Agent/SNMP/MibSupport/Mikrotik.pm
+lib/FusionInventory/Agent/SNMP/MibSupport/Oki.pm
 lib/FusionInventory/Agent/SNMP/MibSupport/Panasas.pm
+lib/FusionInventory/Agent/SNMP/MibSupport/Ubnt.pm
 lib/FusionInventory/Agent/SNMP/MibSupport/UPS.pm
 lib/FusionInventory/Agent/SNMP/MibSupport/Zebra.pm
 lib/FusionInventory/Agent/SNMP/MibSupportTemplate.pm
@@ -72,6 +85,7 @@ lib/FusionInventory/Agent/SOAP/VMware.pm
 lib/FusionInventory/Agent/SOAP/VMware/Host.pm
 lib/FusionInventory/Agent/Storage.pm
 lib/FusionInventory/Agent/Target.pm
+lib/FusionInventory/Agent/Target/Listener.pm
 lib/FusionInventory/Agent/Target/Local.pm
 lib/FusionInventory/Agent/Target/Scheduler.pm
 lib/FusionInventory/Agent/Target/Server.pm
@@ -365,9 +379,6 @@ lib/FusionInventory/Agent/XML/Query/Prolog.pm
 lib/FusionInventory/Agent/XML/Response.pm
 lib/setup.pm
 LICENSE
-list-m.txt
-list-t.txt
-list.txt
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -697,6 +708,7 @@ resources/generic/edid/lcd.acer-al19161.3
 resources/generic/edid/lcd.acer-al19161.4
 resources/generic/edid/lcd.acer-al1921
 resources/generic/edid/lcd.acer-asp1680
+resources/generic/edid/lcd.acer-b196hql
 resources/generic/edid/lcd.acer-b226hql
 resources/generic/edid/lcd.acer-b226hql.28.2016
 resources/generic/edid/lcd.acer-b243h

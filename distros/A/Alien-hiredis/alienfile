@@ -3,12 +3,24 @@ use alienfile;
 plugin PkgConfig => pkg_name => 'hiredis', minimum_version => '0.11.0';
 plugin 'Build::Make' => make_type => 'gmake';
 
+meta->around_hook(probe => sub {
+  my $orig = shift;
+  my $build = shift;
+  my $install_type = $orig->($build, @_);
+  if ($install_type eq 'system') {
+    my $version = $build->hook_prop->{version};
+    return 'share' if !defined $version or $version eq '0.13.0';
+  }
+  return $install_type;
+});
+
 share {
   start_url 'https://github.com/redis/hiredis/archive/v0.14.0.tar.gz';
-  plugin Download => version => qr/^v([0-9.]+)\.tar\.gz$/;
+  plugin 'Download';
   plugin Extract => format => 'tar.gz';
   build [
     [ '%{make} PREFIX=%{.install.prefix}' ],
     [ '%{make} PREFIX=%{.install.prefix} install' ],
   ];
+  plugin 'Gather::IsolateDynamic';
 };

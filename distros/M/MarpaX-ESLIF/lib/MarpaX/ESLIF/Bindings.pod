@@ -14,7 +14,7 @@ MarpaX::ESLIF::Bindings - MarpaX::ESLIF's Bindings
 
 =head1 VERSION
 
-version 3.0.4
+version 3.0.6
 
 =head1 DESCRIPTION
 
@@ -140,11 +140,11 @@ The method C<MarpaX::ESLIF::is_bool> is used to determine the boolean nature. De
 
 =item [2]
 
-The method C<MarpaX::ESLIF::is_int> is used to determine the integer nature. Default is to call C<Types::Standard::is_Int>. Storage is decided when comparing the size of a Perl's XS's C<IV>, and defaults to an opaque PTR that only perl will understand if not found.
+If input is a true scalar, the method C<MarpaX::ESLIF::is_int> is used to determine the integer nature. Default is to call C<Types::Standard::is_Int>. Storage is decided when comparing the size of a Perl's XS's C<IV>, and defaults to an opaque PTR that only perl will understand if not found.
 
 =item [3]
 
-The method C<MarpaX::ESLIF::is_StrictNum> is used to determine the number nature. Default is to call C<Types::Standard::is_StrictNum>. Storage depends on the size of an Perl's XS's C<NV>, and defaults to an opaque PTR that only perl will understand if not found.
+If input is a true scalar, the method C<MarpaX::ESLIF::is_StrictNum> is used to determine the number nature. Default is to call C<Types::Standard::is_StrictNum>. Storage depends on the size of an Perl's XS's C<NV>, and defaults to an opaque PTR that only perl will understand if not found.
 
 =item [4]
 

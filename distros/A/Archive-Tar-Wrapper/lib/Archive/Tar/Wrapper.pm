@@ -18,7 +18,7 @@ use IPC::Open3;
 use Symbol 'gensym';
 use Carp;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 my $logger = get_logger();
 
 =pod
@@ -207,7 +207,7 @@ sub new {
     my ( $class, %options ) = @_;
 
     my $self = {
-        tar                   => undef,
+        tar                   => delete $options{tar} || undef,
         tmpdir                => undef,
         tar_read_options      => '',
         tar_write_options     => '',
@@ -237,33 +237,31 @@ sub new {
 
     bless $self, $class;
 
-    if ( ( $self->_is_openbsd ) and ( $self->{tar_read_options} ) ) {
-        $self->{tar_read_options} = '-' . $self->{tar_read_options};
-    }
+    unless ( defined $self->{tar} ) {
 
-    if ( $self->{osname} eq 'MSWin32' ) {
-        $self->_setup_mswin();
-    }
-    else {
-        my $tar_location = which('tar');
-
-        unless ( defined($tar_location) ) {
-            $tar_location = which('gtar');
+        if ( ( $self->_is_openbsd ) and ( $self->{tar_read_options} ) ) {
+            $self->{tar_read_options} = '-' . $self->{tar_read_options};
         }
 
-        $self->{tar} = $tar_location;
-    }
+        if ( $self->{osname} eq 'MSWin32' ) {
+            $self->_setup_mswin();
+        }
+        else {
+            $self->{tar} = which('tar') || which('gtar');
+        }
 
-    unless ( defined $self->{tar} ) {
+        unless ( defined $self->{tar} ) {
 
 # this is specific for testing under MS Windows smokers without tar installed
 # "OS unsupported" will mark the testing as NA instead of failure as convention.
-        if ( $self->{osname} eq 'MSWin32' ) {
-            LOGDIE 'tar not found in PATH, OS unsupported';
+            if ( $self->{osname} eq 'MSWin32' ) {
+                LOGDIE 'tar not found in PATH, OS unsupported';
+            }
+            else {
+                LOGDIE 'tar not found in PATH, please specify location';
+            }
         }
-        else {
-            LOGDIE 'tar not found in PATH, please specify location';
-        }
+
     }
 
     $self->_acquire_tar_info();
@@ -388,7 +386,7 @@ sub read {    ## no critic (ProhibitBuiltinHomonyms)
 
     $arch->list_reset()
 
-Resets the list iterator. To be used before the first call to C<$arch->list_next()>.
+Resets the list iterator. To be used before the first call to C<list_next()>.
 
 =cut
 
@@ -443,9 +441,12 @@ sub _read_from_tar {
     close($err);
     close($wtr);
     waitpid( $pid, 0 );
+    chomp $error;
+    chomp $output;
     $self->{tar_error_msg} = $error;
     $self->{version_info}  = $output;
     $self->{tar_exit_code} = $? >> 8;
+    return 1;
 }
 
 sub _acquire_tar_info {
@@ -455,19 +456,24 @@ sub _acquire_tar_info {
     $self->{is_gnu} = 0;
     $self->{is_bsd} = 0;
 
-    # bsdtar exit code is 1 when asking for version
-    unless ( ( $self->{tar_exit_code} == 0 ) or ( $self->{tar} =~ $bsd_regex ) )
+    if ( $self->_is_openbsd() ) {
+
+# there is no way to acquire version information from default tar program on OpenBSD
+        $self->{version_info}  = "Information not available on $Config{osname}";
+        $self->{tar_exit_code} = 0;
+        $self->{is_bsd}        = 1;
+    }
+    elsif ( ( $self->{tar} =~ $bsd_regex ) and ( $self->{tar_exit_code} == 1 ) )
     {
-        $self->{version_info} = 'Information not available. Search for errors';
+# bsdtar exit code is 1 when asking for version, forcing to zero since is not an error
+        $self->{tar_exit_code} = 0;
+        $self->{is_bsd}        = 1;
     }
-    else {
-        if ( $self->{version_info} =~ /GNU/ ) {
-            $self->{is_gnu} = 1;
-        }
-        elsif ( $self->{tar} =~ $bsd_regex ) {
-            $self->{is_bsd} = 1;
-        }
-    }
+
+    $self->{version_info} = 'Information not available. Search for errors'
+      unless ( $self->{tar_exit_code} == 0 );
+    $self->{is_gnu} = 1 if ( $self->{version_info} =~ /GNU/ );
+    return 1;
 }
 
 sub _setup_mswin {
@@ -508,9 +514,21 @@ Expect as parameter a string with the path to the tarball.
 
 Returns:
 
-- a "z" character if the file is compressed with gzip.
-- a "j" character if the file is compressed with bzip2.
-- a "" character if the file is not compressed at all.
+=over
+
+=item *
+
+a "z" character if the file is compressed with gzip.
+
+=item *
+
+a "j" character if the file is compressed with bzip2.
+
+=item *
+
+a "" character if the file is not compressed at all.
+
+=back
 
 =cut
 
@@ -666,9 +684,13 @@ Expects as parameters:
 
 =over
 
-=item 1. string of the path to the file which permissions will be copied from.
+=item 1.
 
-=item 2. string of the path to the file which permissions will be copied to. 
+string of the path to the file which permissions will be copied from.
+
+=item 2.
+
+string of the path to the file which permissions will be copied to. 
 
 =back
 
@@ -1181,20 +1203,22 @@ newlines.
 
 Support on Microsoft Windows is limited.
 
-Version below Windows 10 will not be supported for desktops, and for servers from Windows 2012 and above.
+Versions below Windows 10 will not be supported for desktops, and for servers only Windows 2012 and above.
 
 The GNU C<tar.exe> program doesn't work properly with the current interface of B<Archive::Tar::Wrapper>.
+
 You must use the C<bsdtar.exe> and make sure it appears first in the C<PATH> environment variable than
 the GNU tar (if it is installed). See L<http://libarchive.org/> for details about how to download and
 install C<bsdtar.exe>, or go to L<http://gnuwin32.sourceforge.net/packages.html> for a direct download.
+Be sure to look for the C<bzip2> program package to install it as well.
 
-Windows 10 might come already with bsdtar program installed. Check
-L<https://blogs.technet.microsoft.com/virtualization/2017/12/19/tar-and-curl-come-to-windows/> for
-more details.
+Windows 10 might come already with C<bsdtar> program already installed. Please search for that on the appropriate
+page (Microsoft keeps changing the link to keep track of it here).
 
 Having spaces in the path string to the tar program might be an issue too. Although there is some effort
 in terms of workaround it, you best might avoid it completely by installing in a different path than
-C<C:\Program Files>.
+C<C:\Program Files>. Installing both C<bsdtar> and C<bzip2> in C<C:\GnuWin32> will probably be enough when
+running the installers.
 
 =head1 LEGALESE
 
@@ -1230,3 +1254,5 @@ Linux Gazette article from Ben Okopnik, issue 87
 =head1 MAINTAINER
 
 2018, Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+
+=cut

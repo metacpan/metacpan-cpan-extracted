@@ -3,7 +3,7 @@ package Alien::hiredis;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.006';
 
 use parent 'Alien::Base';
 
@@ -15,8 +15,9 @@ Alien::hiredis - Alien wrapper for hiredis
 
 =head1 DESCRIPTION
 
-This module provides the C<hiredis> minimalistic C client library for the
-L<Redis|https://redis.io> database. See L<Alien::Base> for usage.
+This module provides the L<hiredis|https://github.com/redis/hiredis>
+minimalistic C client library for the L<Redis|https://redis.io> database. See
+L<Alien::Build::Manual::AlienUser> for usage.
 
 =head1 BUGS
 
@@ -36,4 +37,4 @@ This is free software, licensed under:
 
 =head1 SEE ALSO
 
-L<Redis>, L<Redis::hiredis>
+L<Redis::hiredis>, L<Protocol::Redis::XS>

@@ -22,7 +22,6 @@
  "choicetab":"<TMPL_VAR NAME="CHOICE_VALUE">",
  "login":"<TMPL_VAR NAME="LOGIN">",
  "newwindow":<TMPL_VAR NAME="NEWWINDOW" DEFAULT="0">,
- "antiframe":<TMPL_VAR NAME="ANTIFRAME" DEFAULT="1">,
  "appslistorder":"<TMPL_VAR NAME="APPSLIST_ORDER">",
  "scriptname":"<TMPL_VAR NAME="SCRIPT_NAME">",
  "activeTimer":<TMPL_VAR NAME="ACTIVE_TIMER" DEFAULT="0">,

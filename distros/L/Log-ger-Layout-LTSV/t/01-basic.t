@@ -82,18 +82,18 @@ subtest "conf:add_special fields" => sub {
     my $res = { map { (split /:/, $_, 2) } split /\t/, $ary->[0] };
     #diag explain $res;
     is($res->{Category}, 'My::P1');
-    is($res->{Class}, 'main');
+    is($res->{Class}, 'My::P1');
     like($res->{Date_GMT}, qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\z/); # XXX test actual time
     like($res->{Date_Local}, qr/\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\z/); # XXX test actual time
     like($res->{Elapsed_Start}, qr/\d/); # XXX test actual elapsed time
     like($res->{Elapsed_Last}, qr/\d/); # XXX test actual elapsed time
-    like($res->{File}, qr/\w/); # XXX test actual file name
+    like($res->{File}, qr/01-basic\.t/);
     like($res->{Hostname}, qr/\w/); # XXX test actual hostname
     is($res->{Level}, 'warn');
     is($res->{Line}, 16);
     like($res->{Location}, qr/\AMy::P1::x \(.+?:16\)\z/);
     is($res->{Message}, 'warnmsg');
-    is($res->{Method}, 'x');
+    is($res->{Method}, 'My::P1::x');
     is($res->{PID}, $$);
     like($res->{Stack_Trace}, qr/\A\w+::/); # XXX test stack trace more
 

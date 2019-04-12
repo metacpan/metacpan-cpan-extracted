@@ -11,6 +11,8 @@ my $build = Module::Build->new(
    requires => {
       'ExtUtils::PkgConfig' => 0,
       'Module::Build' => 0,
+
+      'perl' => '5.010', # //
    },
    test_requires => {
       'Test::More'  => '0.88', # done_testing

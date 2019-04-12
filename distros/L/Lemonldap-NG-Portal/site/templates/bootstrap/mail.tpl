@@ -47,7 +47,7 @@
         <span class="fa fa-envelope-open"></span>
         <span trspan="sendPwd">Send me a link</span>
       </button>
-    
+
     </div>
     </form>
   </div>

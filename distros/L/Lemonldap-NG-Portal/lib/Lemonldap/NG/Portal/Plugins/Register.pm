@@ -22,10 +22,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::SMTP';
+  'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
 
 # PROPERTIES
 
@@ -77,7 +77,7 @@ sub init {
     }
 
     # Initialize form token if needed (captcha provides also a token)
-    elsif ( $self->conf->{requireToken} ) {
+    else {
         $_[0]->ott(
             $_[0]->p->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken') )
           or return 0;
@@ -165,9 +165,10 @@ sub _register {
             and
             !$self->getRegisterSession( $req->data->{registerInfo}->{mail} ) )
         {
+            
             # Check if token exists
             my $token;
-            if ( $self->ott or $self->captcha ) {
+            if ( $self->ottRule->( $req, {} ) or $self->captcha ) {
                 $token = $req->param('token');
                 unless ($token) {
                     $self->setSecurity($req);
@@ -199,7 +200,7 @@ sub _register {
                 }
                 $self->logger->debug("Captcha code verified");
             }
-            elsif ( $self->ott ) {
+            elsif ( $self->ottRule->( $req, {} ) ) {
                 unless ( $self->ott->getToken($token) ) {
                     $self->setSecurity($req);
                     $self->userLogger->notice(
@@ -530,7 +531,7 @@ sub setSecurity {
     if ( $self->captcha ) {
         $self->captcha->setCaptcha($req);
     }
-    elsif ( $self->ott ) {
+    elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
     }
 }

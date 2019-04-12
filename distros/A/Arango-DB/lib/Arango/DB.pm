@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::DB;
-$Arango::DB::VERSION = '0.004';
+$Arango::DB::VERSION = '0.005';
 use base 'Arango::DB::API';
 use Arango::DB::Database;
 use Arango::DB::Collection;
@@ -11,7 +11,7 @@ use HTTP::Tiny;
 use JSON;
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
-use JSON::Schema::Fit;
+use JSON::Schema::Fit 0.04;
 
 sub new {
     my ($package, %opts) = @_;
@@ -85,7 +85,7 @@ Arango::DB - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSYS
 
@@ -162,7 +162,7 @@ Password to be used to connect to ArangoDB. Default to the empty string.
 =head2 C<version>
 
     my $version_info = $db->version;
-    my $detailed_info = $db->version( 'details' => 'true' );
+    my $detailed_info = $db->version( 'details' => 1 );
 
 Returns a hash reference with basic server info. Detailed information can be requested with the C<details> option. 
 

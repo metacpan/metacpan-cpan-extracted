@@ -6,7 +6,7 @@ use JSON;
 use Lemonldap::NG::Common::PSGI::Constants;
 use Lemonldap::NG::Common::PSGI::Request;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 our $_json = JSON->new->allow_nonref;
 
@@ -17,7 +17,7 @@ has languages    => ( is => 'rw', isa     => 'Str', default => 'en' );
 has logLevel     => ( is => 'rw', isa     => 'Str', default => 'info' );
 has portal       => ( is => 'rw', isa     => 'Str' );
 has staticPrefix => ( is => 'rw', isa     => 'Str' );
-has templateDir  => ( is => 'rw', isa     => 'Str' );
+has templateDir  => ( is => 'rw', isa     => 'Str|ArrayRef' );
 has links        => ( is => 'rw', isa     => 'ArrayRef' );
 has menuLinks    => ( is => 'rw', isa     => 'ArrayRef' );
 has logger     => ( is => 'rw' );
@@ -174,7 +174,7 @@ body{background:#000;color:#fff;padding:10px 50px;font-family:sans-serif;}a{text
 <body>
 <h1>$title</h1>
 <p>$err</p>
-<center><a href=\"http://lemonldap-ng.org\">LemonLDAP::NG</a></center>'
+<center><a href=\"https://lemonldap-ng.org\">LemonLDAP::NG</a></center>
 </body>
 </html>";
         return [
@@ -250,6 +250,7 @@ sub sendHtml {
         $htpl = HTML::Template->new(
             filehandle             => IO::File->new($template),
             path                   => $self->templateDir,
+            search_path_on_include => 1,
             die_on_bad_params      => 0,
             die_on_missing_include => 1,
             cache                  => 0,
@@ -481,7 +482,7 @@ Syslog facility. If empty, STDERR will be used for logging
 
 L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>,
 L<Plack>, L<PSGI>, L<Lemonldap::NG::Common::PSGI::Router>,
-L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>, 
+L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =head1 AUTHORS
 

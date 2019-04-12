@@ -74,12 +74,20 @@ map should be able to implement this in most cases.
 
 =over 4
 
-=item * C<String::Tagged::IRC>
+=item *
 
-=item * C<Net::Async::Matrix::Utils>
+L<Net::Async::Matrix::Utils> - Contains a pair of functions to convert a
+formatted I<Matrix> message body to and from this format.
 
-Contains a pair of functions to convert a formatted I<Matrix> message body to
-and from this format.
+=item *
+
+L<String::Tagged::IRC> - parse or build IRC formatted messages and convert
+bidirectionally to this format.
+
+=item *
+
+L<String::Tagged::Terminal> - build terminal control sequences for message
+formatting and convert bidirectionally to this format.
 
 =back
 

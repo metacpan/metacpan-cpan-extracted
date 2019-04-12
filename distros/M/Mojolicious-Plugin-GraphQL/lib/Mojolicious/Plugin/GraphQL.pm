@@ -10,7 +10,7 @@ use Module::Runtime qw(require_module);
 use Mojo::Promise;
 use Exporter 'import';
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 our @EXPORT_OK = qw(promise_code);
 
 use constant promise_code => +{

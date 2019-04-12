@@ -48,3 +48,4 @@ Revision history for InterMine-Model
 0.9900  Added hooks to allow lazily fetching objects to exist, independent of implementation
 0.9901  Fri Feb  3 11:51:02 GMT 2012
         Fixed bug with closed over flag in ClassDescriptor. Changed to instance attribute.
+0.9904  Fixed bug with duplicate attribute in model. 

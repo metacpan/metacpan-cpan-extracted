@@ -74,6 +74,49 @@ my $ac = Config::AutoConf->new();
 $ac->check_cc;
 
 #
+# We want to align lua integer type with perl ivtype
+#
+my $ivtype = $Config{ivtype} || '';
+if ($ivtype eq 'int') {
+  $ac->msg_notice("Use int for lua_Integer");
+  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=1";
+  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=1";
+} elsif ($ivtype eq 'long') {
+  $ac->msg_notice("Use long for lua_Integer");
+  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=2";
+  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=2";
+} elsif ($ivtype eq 'long long') {
+  $ac->msg_notice("Use long long for lua_Integer");
+  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=3";
+  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=3";
+} else {
+  $ac->msg_notice("No exact map found in lua for perl integer type \"$ivtype\": use long long for lua_Integer");
+  $ENV{CFLAGS} .= " -DLUA_INT_TYPE=3";
+  $ENV{CXXFLAGS} .= " -DLUA_INT_TYPE=3";
+}
+
+#
+# We want to align lua float type with perl nvtype
+#
+my $nvtype = $Config{nvtype} || '';
+if ($nvtype eq 'float') {
+  $ac->msg_notice("Use float for lua_Number");
+  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=1";
+  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=1";
+} elsif ($nvtype eq 'double') {
+  $ac->msg_notice("Use double for lua_Number");
+  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=2";
+  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=2";
+} elsif ($nvtype eq 'long double') {
+  $ac->msg_notice("Use long double for lua_Number");
+  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=3";
+  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=3";
+} else {
+  $ac->msg_notice("No exact map found in lua for perl double type \"$nvtype\": use long double for lua_Number");
+  $ENV{CFLAGS} .= " -DLUA_FLOAT_TYPE=3";
+  $ENV{CXXFLAGS} .= " -DLUA_FLOAT_TYPE=3";
+}
+#
 # Guess CXX configuration
 #
 #
@@ -451,7 +494,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.4",
+  "VERSION" => "3.0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

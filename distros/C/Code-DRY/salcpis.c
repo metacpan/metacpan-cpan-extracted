@@ -60,7 +60,6 @@ void
 getCounts(const void *T, sais_index_type *C, sais_index_type n, sais_index_type k, int cs) {
   sais_index_type i;
   memset(C, 0, k*sizeof(sais_index_type));
-  //for(i = 0; i < k; ++i) { C[i] = 0; }
   for(i = 0; i < n; ++i) { ++C[chr(i)]; }
 }
 static
@@ -602,7 +601,7 @@ sais_main(const void *T, sais_index_type *SA,
      sort all the LMS-substrings */
   getCounts(T, C, n, k, cs); getBuckets(C, B, k, 1); /* find ends of buckets */
 
-  //for(i = 0; i < n; ++i) { SA[i] = 0; } 
+  //for(i = 0; i < n; ++i) { SA[i] = 0; }
   memset(SA, 0, n * sizeof(sais_index_type));
   b = &t; i = n - 1; j = n; m = 0; c0 = chr(n - 1);
   do { c1 = c0; } while((0 <= --i) && ((c0 = chr(i)) >= c1));
@@ -801,7 +800,7 @@ sais_main(const void *T, sais_index_type *SA,
         //assert(LCP[j]==0); // first S*-suffix in bucket must have LCP-value 0
 #ifndef NDEBUG
         if (LCP[j]!=0) { // first S*-suffix in bucket must have LCP-value 0
-fprintf(stderr, "\n\nassert in line 802 (was 794): LCP@%u == %u != 0\n\n\n", j, LCP[j]);
+fprintf(stderr, "\n\nassert in line %u: LCP@%u == %u != 0\n\n\n", __LINE__ - 3, j, LCP[j]);
         }
 #endif
         LCP[j] = -1;       // mark first S*-suffix in every bucket
@@ -827,16 +826,17 @@ fprintf(stderr, "\n\nassert in line 802 (was 794): LCP@%u == %u != 0\n\n\n", j, 
   if(isbwt == 0) {
     if (level0 && m > 1) induceSAandLCP(T, SA, LCP, C, B, n, k, cs);
     else if (level0) {
+	    // Buggy -> crashes
       induceSA(T, SA, C, B, n, k, cs);
-      LCP[0] = 0;
       //Compute the LCP naively. This is only done if the instance is very simple
       //and most likely constructed. Still this could be done by a more efficient
       //algorithm (phi-algorithm).
-      for(i = 0; i < n; ++i){
+      for(i = 1; i < n; ++i){
         p = 0;
         while (chr(SA[i - 1] + p) == chr(SA[i] + p)) { ++p; }
         LCP[i] = p;
       }
+      LCP[0] = 0;
     }
     else induceSA(T, SA, C, B, n, k, cs);
   }

@@ -9,6 +9,7 @@ minil.toml
 t/00_compile.t
 t/11_simple.t
 t/data/dummy.pdf
+t/data/expected-1_3.pdf
 t/data/expected.pdf
 META.yml
 MANIFEST

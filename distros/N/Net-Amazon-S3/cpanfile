@@ -65,3 +65,7 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
 };
+
+on 'configure' => sub {
+  suggests "JSON::PP" => "2.27300";
+};

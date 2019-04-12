@@ -10,7 +10,7 @@ build_requires:
   Test::Alien: '0'
   Test::More: '0.88'
 configure_requires:
-  Alien::Build: '1.19'
+  Alien::Build: '1.61'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Build::Make: '0.99'
   ExtUtils::MakeMaker: '6.52'
@@ -32,7 +32,7 @@ no_index:
 provides:
   Alien::hiredis:
     file: lib/Alien/hiredis.pm
-    version: '0.003'
+    version: '0.006'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Alien-hiredis/issues
   homepage: https://github.com/Grinnz/Alien-hiredis
   repository: https://github.com/Grinnz/Alien-hiredis.git
-version: '0.003'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -192,7 +192,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.006'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -362,7 +362,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AlienBuild
       name: AlienBuild
-      version: '0.24'
+      version: '0.26'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -413,18 +413,16 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.012'
 x_alienfile:
-  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.24'
+  generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.26'
   requires:
     share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
-      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
-      URI::Escape: '0'
     system: {}
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'

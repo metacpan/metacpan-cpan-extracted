@@ -7,7 +7,7 @@ use Carp;
 use Woothee::Util qw/update_map update_category update_version update_os update_os_version/;
 use Woothee::DataSet qw/dataset/;
 
-our $VERSION = "1.8.0";
+our $VERSION = "v1.10.0";
 
 sub challenge_windows {
     my ($ua, $result) = @_;
@@ -116,7 +116,7 @@ sub challenge_linux {
         # (Linux; U; Android-4.0.3; en-us; Galaxy Nexus Build/IML74K)
         # (Linux; Android 4.2.2; SO-01F Build/14.1.H.1.281)
         $data = dataset("Android");
-        if ($ua =~ /Android[- ](\d+\.\d+(?:\.\d+)?)/) {
+        if ($ua =~ /Android[- ](\d+(?:\.\d+(?:\.\d+)?)?)/) {
             $os_version = $1;
         }
     }else {

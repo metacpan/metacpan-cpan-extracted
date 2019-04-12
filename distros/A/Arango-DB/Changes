@@ -1,3 +1,7 @@
+0.005  2019-04-11
+   - Cursor creation now supports all options from Arango::DB API.
+   - Cursor next method to request further hits.
+
 0.004  2019-03-30
    - Rewrote REST API calls
    - Validate options with JSON::Schema::Fit

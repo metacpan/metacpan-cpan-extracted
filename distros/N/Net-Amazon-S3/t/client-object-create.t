@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1 + 4;
+use Test::More tests => 1 + 5;
 use Test::Deep;
 use Test::Warnings;
 
@@ -27,6 +27,23 @@ expect_client_object_create 'create object from scalar value' => (
         content_length => 10,
         content_md5 => 'WUYhDJ6TrjeJHf6Ww+OWFA==',
         expires => undef,
+    },
+);
+
+expect_client_object_create 'create object from scalar value' => (
+    with_bucket             => 'some-bucket',
+    with_key                => 'some-key',
+    with_value              => 'some value',
+    with_encryption         => 'AES256',
+    with_response_headers   => { etag => '5946210c9e93ae37891dfe96c3e39614' },
+    expect_data             => '',
+    expect_request          => { PUT => 'https://some-bucket.s3.amazonaws.com/some-key' },
+    expect_request_content  => 'some value',
+    expect_request_headers  => {
+        content_length => 10,
+        content_md5 => 'WUYhDJ6TrjeJHf6Ww+OWFA==',
+        expires => undef,
+        x_amz_server_side_encryption => 'AES256',
     },
 );
 

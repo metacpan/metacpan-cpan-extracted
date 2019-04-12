@@ -28,10 +28,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_USERNOTFOUND
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin',
-  'Lemonldap::NG::Portal::Lib::SMTP';
+  'Lemonldap::NG::Portal::Lib::SMTP', 'Lemonldap::NG::Portal::Lib::_tokenRule';
 
 # PROPERTIES
 
@@ -84,7 +84,7 @@ sub resetPwd {
 
 sub _reset {
     my ( $self, $req ) = @_;
-    my ( $mailToken, $newPwd, $confirmPwd, %tplPrms );
+    my ( $mailToken, %tplPrms );
 
     # PASSWORD CHANGE FORM => changePwd()
     if (
@@ -109,7 +109,7 @@ sub _reset {
 
     # OTHER FORMS
     if ($mailToken) {
-        $self->logger->debug( "Token given for password reset: " . $mailToken );
+        $self->logger->debug("Token given for password reset: $mailToken");
 
         # Check if token is valid
         my $mailSession = $self->p->getApacheSession($mailToken);
@@ -137,7 +137,7 @@ sub _reset {
 
         # Check if token exists
         my $token;
-        if ( $self->conf->{requireToken} or $self->captcha ) {
+        if ( $self->ottRule->( $req, {} ) or $self->captcha ) {
             $token = $req->param('token');
             unless ($token) {
                 $self->setSecurity($req);
@@ -166,9 +166,9 @@ sub _reset {
                 $self->setSecurity($req);
                 return PE_CAPTCHAERROR;
             }
-            $self->logger->debug("Captcha code verified");
+            $self->logger->debug('Captcha code verified');
         }
-        elsif ( $self->conf->{requireToken} ) {
+        elsif ( $self->ottRule->( $req, {} ) ) {
             unless ( $self->ott->getToken($token) ) {
                 $self->setSecurity($req);
                 $self->userLogger->warn('Reset try with expired/bad token');
@@ -190,9 +190,9 @@ sub _reset {
     );
     if ( my $error = $self->p->process( $req, useMail => $searchByMail ) ) {
         if ( $error == PE_USERNOTFOUND or $error == PE_BADCREDENTIALS ) {
-            $self->userLogger->warn( "Reset asked for an unvalid user ("
+            $self->userLogger->warn( 'Reset asked for an unvalid user ('
                   . $req->param('mail')
-                  . ")" );
+                  . ')' );
 
             # To avoid mail enumeration, return OK
             # unless portalErrorOnMailNotFound is set
@@ -206,9 +206,9 @@ sub _reset {
               $self->conf->{mailTimeout} || $self->conf->{timeout};
             my $expTimestamp = time() + $mailTimeout;
             $req->data->{expMailDate} =
-              strftime( "%d/%m/%Y", localtime $expTimestamp );
+              strftime( '%d/%m/%Y', localtime $expTimestamp );
             $req->data->{expMailTime} =
-              strftime( "%H:%M", localtime $expTimestamp );
+              strftime( '%H:%M', localtime $expTimestamp );
             return PE_MAILCONFIRMOK;
         }
         return $error;
@@ -245,7 +245,7 @@ sub _reset {
         $infos->{user} = $req->{user};
 
         # Store type
-        $infos->{_type} = "mail";
+        $infos->{_type} = 'mail';
 
         # Store pdata
         $infos->{_pdata} = $req->pdata;
@@ -270,22 +270,22 @@ sub _reset {
         $self->logger->debug("Mail expiration timestamp: $expTimestamp");
 
         $req->data->{expMailDate} =
-          strftime( "%d/%m/%Y", localtime $expTimestamp );
+          strftime( '%d/%m/%Y', localtime $expTimestamp );
         $req->data->{expMailTime} =
-          strftime( "%H:%M", localtime $expTimestamp );
+          strftime( '%H:%M', localtime $expTimestamp );
 
         # Mail session start date
         my $startTimestamp = $mailSession->data->{mailSessionStartTimestamp};
 
         $self->logger->debug("Mail start timestamp: $startTimestamp");
         $req->data->{startMailDate} =
-          strftime( "%d/%m/%Y", localtime $startTimestamp );
+          strftime( '%d/%m/%Y', localtime $startTimestamp );
         $req->data->{startMailTime} =
-          strftime( "%H:%M", localtime $startTimestamp );
+          strftime( '%H:%M', localtime $startTimestamp );
 
         # Ask if user wants an another confirmation email
         if ( $req->data->{mailAlreadySent}
-            and !$req->param('resendconfirmation') )
+            and not $req->param('resendconfirmation') )
         {
             $self->userLogger->notice(
                 'Reset mail already sent to ' . $req->{user} );
@@ -405,14 +405,12 @@ sub changePwd {
     # Check if user wants to generate the new password
     if ( $req->param('reset') ) {
         $self->logger->debug(
-            "Reset password request for " . $req->{sessionInfo}->{_user} );
+            "Reset password request for $req->{sessionInfo}->{_user}");
 
         # Generate a complex password
         my $password =
           $self->gen_password( $self->conf->{randomPasswordRegexp} );
-
-        $self->logger->debug( "Generated password: " . $password );
-
+        $self->logger->debug("Generated password: $password");
         $req->data->{newpassword}     = $password;
         $req->data->{confirmpassword} = $password;
         $req->data->{forceReset}      = 1;
@@ -490,7 +488,7 @@ sub changePwd {
       unless $self->send_mail( $req->data->{mailAddress}, $subject, $body,
         $html );
 
-    PE_MAILOK;
+    return PE_MAILOK;
 }
 
 sub setSecurity {
@@ -498,9 +496,10 @@ sub setSecurity {
     if ( $self->captcha ) {
         $self->captcha->setCaptcha($req);
     }
-    elsif ( $self->conf->{requireToken} ) {
+    elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
     }
+    return 1;
 }
 
 sub display {
@@ -522,7 +521,7 @@ sub display {
         MAILALREADYSENT => $req->data->{mailAlreadySent},
         MAIL            => (
             $self->p->checkXSSAttack( 'mail', $req->{user} )
-            ? ""
+            ? ''
             : $req->{user}
         ),
         DISPLAY_FORM            => 0,
@@ -532,7 +531,8 @@ sub display {
         DISPLAY_PASSWORD_FORM   => 0,
     );
     if ( $req->data->{mailToken}
-        and !$self->p->checkXSSAttack( 'mail_token', $req->data->{mailToken} ) )
+        and
+        not $self->p->checkXSSAttack( 'mail_token', $req->data->{mailToken} ) )
     {
         $tplPrm{MAIL_TOKEN} = $req->data->{mailToken};
     }
@@ -554,7 +554,7 @@ sub display {
             or $req->error == PE_CAPTCHAERROR
             or $req->error == PE_CAPTCHAEMPTY
         )
-        and !$req->data->{mailToken}
+        and not $req->data->{mailToken}
       )
     {
         $self->logger->debug('Display form');

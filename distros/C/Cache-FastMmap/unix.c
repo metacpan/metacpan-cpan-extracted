@@ -62,21 +62,22 @@ int mmc_open_cache_file(mmap_cache* cache, int * do_init) {
     }
 
     /* Fill file with 0's */
-    tmp = malloc(cache->c_page_size);
+    tmp = calloc(1, cache->c_page_size);
     if (!tmp) {
-      _mmc_set_error(cache, errno, "Malloc of tmp space failed");
+      _mmc_set_error(cache, errno, "Calloc of tmp space failed");
       return -1;
     }
 
-    memset(tmp, 0, cache->c_page_size);
     for (i = 0; i < cache->c_num_pages; i++) {
       int written = write(res, tmp, cache->c_page_size);
       if (written < 0) {
+        free(tmp);
         _mmc_set_error(cache, errno, "Write to share file %s failed", cache->share_file);
         return -1;
       }
       if (written < cache->c_page_size) {
-        _mmc_set_error(cache, errno, "Write to share file %s failed; short write (%d of %d bytes written)", cache->share_file, written, cache->c_page_size);
+        free(tmp);
+        _mmc_set_error(cache, 0, "Write to share file %s failed; short write (%d of %d bytes written)", cache->share_file, written, cache->c_page_size);
         return -1;
       }
     }
@@ -113,8 +114,8 @@ int mmc_map_memory(mmap_cache* cache) {
   /* Map file into memory */
   cache->mm_var = mmap(0, cache->c_size, PROT_READ | PROT_WRITE, MAP_SHARED, cache->fh, 0);
   if (cache->mm_var == (void *)MAP_FAILED) {
-    mmc_close_fh(cache);
     _mmc_set_error(cache, errno, "Mmap of shared file %s failed", cache->share_file);
+    mmc_close_fh(cache);
     return -1;
   }
 
@@ -140,7 +141,7 @@ int mmc_close_fh(mmap_cache* cache) {
   return res;
 }
 
-int mmc_lock_page(mmap_cache* cache, MU32 p_offset) {
+int mmc_lock_page(mmap_cache* cache, MU64 p_offset) {
   struct flock lock;
   int old_alarm, alarm_left = 10;
   int lock_res = -1;
@@ -200,7 +201,7 @@ int mmc_unlock_page(mmap_cache * cache) {
   fcntl(cache->fh, F_SETLKW, &lock);
 
   /* Set to bad value while page not locked */
-  cache->p_cur = -1;
+  cache->p_cur = NOPAGE;
 
   return 0;
 }

@@ -4,6 +4,7 @@ requires 'PDF::API2';
 requires 'Vector::QRCode::EPS';
 requires 'File::Temp';
 requires 'File::Spec';
+requires 'Class::Accessor::Lite';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

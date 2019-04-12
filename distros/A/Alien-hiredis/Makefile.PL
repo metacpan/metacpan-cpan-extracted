@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "1.19",
+    "Alien::Build" => "1.61",
     "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::Make" => "0.99",
     "ExtUtils::MakeMaker" => "6.52"
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

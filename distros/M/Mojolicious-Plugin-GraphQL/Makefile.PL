@@ -19,6 +19,7 @@ WriteMakefile(
     "Mojolicious" => '7.60', # Mojo::Promise->all
     "strict" => 0,
     "warnings" => 0,
+    "Module::Runtime" => 0,
     "GraphQL" => '0.26', # promises
   },
   "TEST_REQUIRES" => {
@@ -43,7 +44,6 @@ WriteMakefile(
     prereqs => {
       develop => {
         requires => {
-          'Test::CheckManifest' => '0.9',
           'Test::Pod' => '1.22',
           'Pod::Markdown' => 0,
         },
@@ -63,7 +63,7 @@ sub MY::postamble {
   <<EOF;
 pure_all :: README.md
 
-README.md : lib/Mojolicious/Plugin/GraphQL.pm
+README.md : \$(VERSION_FROM)
 \tpod2markdown \$< >\$\@
 
 containerprereq :

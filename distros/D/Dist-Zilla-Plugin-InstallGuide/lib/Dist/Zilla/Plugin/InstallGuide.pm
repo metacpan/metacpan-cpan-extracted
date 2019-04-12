@@ -2,15 +2,16 @@ use 5.008;
 use strict;
 use warnings;
 
-package Dist::Zilla::Plugin::InstallGuide; # git description: v1.200011-3-g7d54ffa
+package Dist::Zilla::Plugin::InstallGuide; # git description: v1.200012-7-g19b74b1
 # ABSTRACT: Build an INSTALL file
 
-our $VERSION = '1.200012';
+our $VERSION = '1.200013';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 with 'Dist::Zilla::Role::TextTemplate';
 with 'Dist::Zilla::Role::FileMunger';
+with 'Dist::Zilla::Role::ModuleMetadata';
 use List::Util 1.33 qw(first any);
 use namespace::autoclean;
 
@@ -201,7 +202,7 @@ sub munge_files {
         $self->log_fatal('neither Makefile.PL nor Build.PL is present, aborting');
     }
 
-    (my $main_package = $zilla->name) =~ s!-!::!g;
+    my $main_package = $self->module_metadata_for_file($zilla->main_module, collect_pod => 0)->name;
 
     my $file = first { $_->name eq 'INSTALL' } @{ $zilla->files };
 
@@ -236,7 +237,7 @@ Dist::Zilla::Plugin::InstallGuide - Build an INSTALL file
 
 =head1 VERSION
 
-version 1.200012
+version 1.200013
 
 =for test_synopsis BEGIN { die "SKIP: synopsis isn't perl code" }
 
@@ -293,17 +294,17 @@ Mike Doherty <doherty@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mike Doherty Karen Etheridge Marcel Gruenauer jonasbn Dan Book Dave Rolsky Apocalypse
+=for stopwords Karen Etheridge Mike Doherty Marcel Gruenauer jonasbn Dan Book Dave Rolsky Apocalypse
 
 =over 4
 
 =item *
 
-Mike Doherty <mike@mikedoherty.ca>
+Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Karen Etheridge <ether@cpan.org>
+Mike Doherty <mike@mikedoherty.ca>
 
 =item *
 

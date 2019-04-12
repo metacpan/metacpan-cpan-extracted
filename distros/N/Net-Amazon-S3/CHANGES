@@ -1,5 +1,13 @@
 Revision history for Perl module Net::Amazon::S3:
 
+0.86 Fri 12 Apr 2019 13:38:10 BST
+    - Retry bucket HEAD few times see #51 (thanks Branislav Zahradník)
+    - Support server side encryption also in Net::Amazon::S3::Bucket (thanks Branislav Zahradník)
+    - Use session token if specified in Signature V4 as well #43 (thanks Branislav Zahradník)
+    - Add website_redirect_location (thanks Gavin Carr)
+    - Make keep_alive cache size configurable (thanks Michael Schout)
+    - Pod::Weaver fixes (thanks Florian Schlichting)
+
 0.85 Tue 28 Aug 2018 20:14:38 BST
      - Support standard_ia and onezone_ia storage classes (thanks Michele Beltrame)
      - run 'use_ok' on all modules (thanks Yanick Champoux)

@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use App::BitBucketCli::Links;
 use App::BitBucketCli::Link;
 
-our $VERSION = 0.008;
+our $VERSION = 0.009;
 
 has [qw/
     id
@@ -59,7 +59,7 @@ App::BitBucketCli::Base - Parent class for other BitBucket objects
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Base version 0.008
+This documentation refers to App::BitBucketCli::Base version 0.009
 
 =head1 SYNOPSIS
 

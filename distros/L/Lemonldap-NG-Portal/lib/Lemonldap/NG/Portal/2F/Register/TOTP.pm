@@ -174,7 +174,8 @@ sub run {
             "Append 2F Device : { type => 'TOTP', name => $TOTPName }");
         $self->p->updatePersistentSession( $req,
             { _2fDevices => to_json( \@keep ) } );
-        $self->userLogger->notice('TOTP registration succeed');
+        $self->userLogger->notice(
+            "TOTP registration of $TOTPName succeeds for $user");
         return [
             200,
             [ 'Content-Type' => 'application/json', 'Content-Length' => 12, ],

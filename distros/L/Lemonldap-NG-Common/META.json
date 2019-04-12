@@ -51,6 +51,7 @@
             "Crypt::OpenSSL::RSA" : "0",
             "Crypt::OpenSSL::X509" : "0",
             "Crypt::Rijndael" : "0",
+            "Crypt::URandom" : "0",
             "Digest::SHA" : "0",
             "HTML::Template" : "0",
             "JSON" : "0",
@@ -70,6 +71,6 @@
       ],
       "x_MailingList" : "mailto:lemonldap-ng-dev@ow2.org"
    },
-   "version" : "v2.0.2",
+   "version" : "v2.0.3",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

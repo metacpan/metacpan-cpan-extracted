@@ -16,11 +16,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_PASSWORDFORMEMPTY
   PE_TOKENEXPIRED
+  PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
-extends 'Lemonldap::NG::Portal::Main::Auth';
+extends 'Lemonldap::NG::Portal::Main::Auth',
+  'Lemonldap::NG::Portal::Lib::_tokenRule';
 
 has authnLevel => (
     is      => 'rw',
@@ -37,12 +39,14 @@ has ott     => ( is => 'rw' );
 # INITIALIZATION
 
 sub init {
-    if ( $_[0]->{conf}->{captcha_login_enabled} ) {
-        $_[0]->captcha( $_[0]->p->loadModule('::Lib::Captcha') ) or return 0;
+    my $self = shift;
+
+    if ( $self->{conf}->{captcha_login_enabled} ) {
+        $self->captcha( $self->p->loadModule('::Lib::Captcha') ) or return 0;
     }
-    elsif ( $_[0]->{conf}->{requireToken} ) {
-        $_[0]->ott( $_[0]->p->loadModule('::Lib::OneTimeToken') ) or return 0;
-        $_[0]->ott->timeout( $_[0]->conf->{formTimeout} );
+    else {
+        $self->ott( $self->p->loadModule('::Lib::OneTimeToken') ) or return 0;
+        $self->ott->timeout( $self->conf->{formTimeout} );
     }
     return 1;
 }
@@ -52,6 +56,13 @@ sub init {
 # Read username and password from POST data
 sub extractFormInfo {
     my ( $self, $req ) = @_;
+
+    if ( $req->param('user') ) {
+        unless ( $req->param('user') =~ /$self->{conf}->{userControl}/o ) {
+            $self->setSecurity($req);
+            return PE_MALFORMEDUSER;
+        }
+    }
 
     # Detect first access and empty forms
     my $defUser        = defined $req->param('user');
@@ -88,13 +99,14 @@ sub extractFormInfo {
     }
 
     # Security: check for captcha or token
-    if ( $self->captcha or $self->ott ) {
+    if ( $self->captcha or $self->ottRule->( $req, {} ) ) {
         my $token;
         unless ( $token = $req->param('token') ) {
             $self->userLogger->error('Authentication tried without token');
             $self->ott->setToken($req);
             return PE_NOTOKEN;
         }
+
         if ( $self->captcha ) {
             my $code = $req->param('captcha');
             unless ($code) {
@@ -109,7 +121,7 @@ sub extractFormInfo {
             }
             $self->logger->debug("Captcha code verified");
         }
-        elsif ( $self->ott ) {
+        elsif ( $self->ottRule->( $req, {} ) ) {
             unless ( $req->data->{tokenVerified}
                 or $self->ott->getToken($token) )
             {
@@ -161,7 +173,7 @@ sub setSecurity {
     }
 
     # Else get token
-    elsif ( $self->ott ) {
+    elsif ( $self->ottRule->( $req, {} ) ) {
         $self->ott->setToken($req);
     }
 }

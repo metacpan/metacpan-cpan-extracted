@@ -1,3 +1,5 @@
+1.008 - 2019/04/11
+- fail early if bh does not match, don't wait for DNS result
 1.007 - 2019/02/29
 - less verbose fail reason if pubkey is corrupt
 1.006 - 2019/02/28

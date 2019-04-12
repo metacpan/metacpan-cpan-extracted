@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Bucket;
-$Net::Amazon::S3::Bucket::VERSION = '0.85';
+$Net::Amazon::S3::Bucket::VERSION = '0.86';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use Carp;
@@ -39,12 +39,15 @@ sub add_key {
         delete $conf->{acl_short};
     }
 
+    my $encryption = delete $conf->{encryption};
+
     my $http_request = Net::Amazon::S3::Request::PutObject->new(
         s3        => $self->account,
         bucket    => $self->bucket,
         key       => $key,
         value     => $value,
         acl_short => $acl_short,
+        (encryption => $encryption) x!! defined $encryption,
         headers   => $conf,
     )->http_request;
 
@@ -79,6 +82,8 @@ sub copy_key {
 
     $conf->{'x-amz-copy-source'} = $source;
 
+    my $encryption = delete $conf->{encryption};
+
     my $acct    = $self->account;
     my $http_request = Net::Amazon::S3::Request::PutObject->new(
         s3        => $self->account,
@@ -86,6 +91,7 @@ sub copy_key {
         key       => $key,
         value     => '',
         acl_short => $acl_short,
+        (encryption => $encryption) x!! defined $encryption,
         headers   => $conf,
     )->http_request;
 
@@ -381,23 +387,35 @@ sub _head_region {
     my $protocol = $self->account->secure ? 'https' : 'http';
     my $host = $self->account->host;
     my $path = $self->bucket;
+    my @retry = (1, 2, (4) x 8);
 
     if ($self->account->use_virtual_host) {
         $host = "$path.$host";
         $path = '';
     }
 
-    my $request = HTTP::Request->new( HEAD => "${protocol}://${host}/$path" );
+    my $request_uri = "${protocol}://${host}/$path";
+    while (@retry) {
+        my $request = HTTP::Request->new (HEAD => $request_uri);
 
-    # Disable redirects
-    my $requests_redirectable = $self->account->ua->requests_redirectable;
-    $self->account->ua->requests_redirectable( [] );
+        # Disable redirects
+        my $requests_redirectable = $self->account->ua->requests_redirectable;
+        $self->account->ua->requests_redirectable( [] );
 
-    my $response = $self->account->_do_http( $request );
+        my $response = $self->account->_do_http( $request );
 
-    $self->account->ua->requests_redirectable( $requests_redirectable );
+        $self->account->ua->requests_redirectable( $requests_redirectable );
 
-    return $response->header( 'x-amz-bucket-region' );
+        return $response->header ('x-amz-bucket-region')
+            if $response->header ('x-amz-bucket-region');
+
+        print STDERR "Invalid bucket head response; $request_uri\n";
+        print STDERR $response->as_string;
+
+        sleep shift @retry;
+    }
+
+    die "Cannot determine bucket region; bucket=${\ $self->bucket }";
 }
 
 1;
@@ -414,7 +432,7 @@ Net::Amazon::S3::Bucket - convenience object for working with Amazon S3 buckets
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -426,6 +444,11 @@ version 0.85
   ok($bucket->add_key("key", "data", {
      content_type => "text/html",
     'x-amz-meta-colour' => 'orange',
+  }));
+
+  # Enable server-side encryption
+  ok($bucket->add_key("key", "data", {
+     encryption => 'AES256',
   }));
 
   # the err and errstr methods just proxy up to the Net::Amazon::S3's
@@ -696,7 +719,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

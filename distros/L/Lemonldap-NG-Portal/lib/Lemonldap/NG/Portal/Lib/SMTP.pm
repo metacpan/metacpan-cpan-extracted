@@ -15,7 +15,7 @@ use Email::Sender::Transport::SMTP qw();
 use MIME::Base64;
 use Encode;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 our $transport;
 
@@ -184,8 +184,10 @@ sub send_mail {
             foreach ( keys %cid ) {
                 $message->attach(
                     Type => "image/" . ( $cid{$_} =~ m/\.(\w+)/ )[0],
-                    Id   => $_,
-                    Path => $self->p->{templateDir} . "/" . $cid{$_},
+                    Id => $_,
+                    Path => $self->conf->{templateDir} . "/"
+                      . $self->conf->{portalSkin} . "/"
+                      . $cid{$_},
                 );
             }
         }

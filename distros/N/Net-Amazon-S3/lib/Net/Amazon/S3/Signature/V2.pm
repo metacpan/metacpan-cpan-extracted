@@ -1,9 +1,6 @@
-
-use strict;
-use warnings;
-
 package Net::Amazon::S3::Signature::V2;
-$Net::Amazon::S3::Signature::V2::VERSION = '0.85';
+# ABSTRACT: V2 signatures
+$Net::Amazon::S3::Signature::V2::VERSION = '0.86';
 use Moose;
 use URI::Escape qw( uri_escape_utf8 );
 use HTTP::Date qw[ time2str ];
@@ -160,11 +157,11 @@ __END__
 
 =head1 NAME
 
-Net::Amazon::S3::Signature::V2
+Net::Amazon::S3::Signature::V2 - V2 signatures
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 AUTHOR
 
@@ -172,7 +169,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

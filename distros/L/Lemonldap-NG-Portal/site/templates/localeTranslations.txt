@@ -1,3 +1,0 @@
-error_en_5 = Big brother is watching you, authenticated user
-error_fr_0 = Souriez, vous êtes surveillés !
-msg_fr_selectIdP = Portail de Fédération des Identités

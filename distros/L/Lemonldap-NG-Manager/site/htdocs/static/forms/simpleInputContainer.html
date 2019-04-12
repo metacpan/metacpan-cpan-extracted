@@ -28,7 +28,7 @@
         <td ng-if="n.type=='bool'">
           <div class="input-group-solid" role="radiogroup">
             <label class="radio-inline">
-              <input id="bopeOn/{{n.title}}" type="radio" ng-value="1" ng-model="n.data" role="radio" aria-labelledby="lbopeOn{{n.title}}"/>
+              <input id="bopeOn/{{n.title}}" type="radio" ng-value="1" ng-model="n.data" ng-checked="n.data==1||n.data=='1'" role="radio" aria-labelledby="lbopeOn{{n.title}}"/>
               <span id="lbopeOn{{n.title}}" for="bopeOn/{{n.title}}" trspan="on"></span>
             </label>
             <label class="radio-inline">

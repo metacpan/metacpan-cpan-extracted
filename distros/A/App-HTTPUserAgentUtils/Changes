@@ -1,3 +1,12 @@
+0.002   2019-04-11 (PERLANCAR)
+
+	- Add utility: http-ua-by-nickname.
+
+	- [ux] Add shorter alias for gen-random-http-ua: rand-http-ua.
+
+	- [ux] Don't need to make CLI's read env & config files, for simplicity.
+
+
 0.001   2019-04-02 (PERLANCAR)
 
         - First release.

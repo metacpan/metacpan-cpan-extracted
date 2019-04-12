@@ -19,6 +19,7 @@ WriteMakefile(
     "Dancer2" => "0.200000",
     "Dancer2::Core::Types" => 0,
     "Dancer2::Plugin" => 0,
+    "Module::Runtime" => 0,
     "strict" => 0,
     "warnings" => 0,
     "GraphQL" => '0.20', # convert plugin
@@ -52,7 +53,6 @@ WriteMakefile(
     prereqs => {
       develop => {
         requires => {
-          'Test::CheckManifest' => '0.9',
           'Test::Pod::Coverage' => '1.08',
           'Test::Pod' => '1.22',
           'Pod::Markdown' => 0,
@@ -66,7 +66,7 @@ sub MY::postamble {
   <<EOF;
 pure_all :: README.md
 
-README.md : lib/Dancer2/Plugin/GraphQL.pm
+README.md : \$(VERSION_FROM)
 \tpod2markdown \$< >\$\@
 EOF
 }

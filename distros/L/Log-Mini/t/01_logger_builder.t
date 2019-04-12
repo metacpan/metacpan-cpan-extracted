@@ -13,6 +13,12 @@ subtest 'creates stderr logger' => sub {
     isa_ok $logger, 'Log::Mini::LoggerSTDERR';
 };
 
+subtest 'creates null logger' => sub {
+    my $logger = Log::Mini->new('null');
+
+    isa_ok $logger, 'Log::Mini::LoggerNULL';
+};
+
 subtest 'creates file logger' => sub {
     my $file = File::Temp->new;
     my $logger = Log::Mini->new('file' => $file->filename);

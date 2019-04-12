@@ -179,8 +179,6 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 
 		# Session preparation
 		transformSession = (session) ->
-			_stToStr = (s) ->
-				s
 			_insert = (re, title) ->
 				tmp = []
 				reg = new RegExp(re)
@@ -210,10 +208,7 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 						else if key.match /^(_utime|_lastAuthnUTime|_lastSeen|notification)$/
 							session[key] = $scope.localeDate value
 						else if key.match /^(_startTime|_updateTime)$/
-							value = _stToStr value
-							pattern = /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/
-							arrayDate = value.match(pattern)
-							session[key] = "#{arrayDate[3]}/#{arrayDate[2]}/#{arrayDate[1]} à #{arrayDate[4]}:#{arrayDate[5]}:#{arrayDate[6]}"
+							session[key] = $scope.strToLocaleDate value
 
 			res = []
 
@@ -343,6 +338,12 @@ llapp.controller 'SessionsExplorerCtrl', ['$scope', '$translator', '$location', 
 
 	$scope.localeDate = (s) ->
 		d = new Date(s * 1000)
+		return d.toLocaleString()
+
+	$scope.strToLocaleDate = (s) ->
+		arrayDate = s.match /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/
+		return s unless arrayDate.length
+		d = new Date "#{arrayDate[1]}-#{arrayDate[2]}-#{arrayDate[3]}T#{arrayDate[4]}:#{arrayDate[5]}:#{arrayDate[6]}"
 		return d.toLocaleString()
 
 	# Function to change interface language

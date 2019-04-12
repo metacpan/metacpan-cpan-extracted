@@ -113,6 +113,12 @@ ok(
 );
 count(1);
 my $idpId = expectCookie($res);
+
+# Expect pdata to be cleared
+$pdata = expectCookie( $res, 'lemonldappdata' );
+ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
+count(1);
+
 my ($query) =
   expectRedirection( $res, qr#^http://auth.sp.com/\?(ticket=[^&]+)$# );
 

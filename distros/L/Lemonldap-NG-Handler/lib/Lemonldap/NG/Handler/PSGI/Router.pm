@@ -7,7 +7,7 @@ require Lemonldap::NG::Handler::PSGI::Main;
 extends 'Lemonldap::NG::Handler::Lib::PSGI',
   'Lemonldap::NG::Common::PSGI::Router';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 sub init {
     $_[0]->api('Lemonldap::NG::Handler::PSGI::Main');
@@ -119,7 +119,7 @@ Returns a list of groups to which user belongs.
 
 L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>,
 L<Plack>, L<PSGI>, L<Lemonldap::NG::Common::PSGI::Router>,
-L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>, 
+L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =head1 AUTHORS
 

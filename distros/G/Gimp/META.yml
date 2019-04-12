@@ -22,7 +22,7 @@ configure_requires:
   IO::All: '0'
   PDL: 2.007_04
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,5 +44,7 @@ requires:
   Web::Scraper: '0'
   perl: '5.014001'
 resources:
-  repository: git://git.gnome.org/gimp-perl
-version: '2.32'
+  IRC: irc://irc.gnome.org/#gimp
+  repository: https://gitlab.gnome.org/GNOME/gimp-perl/
+version: '2.33'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

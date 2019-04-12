@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::DB::API;
-$Arango::DB::API::VERSION = '0.004';
+$Arango::DB::API::VERSION = '0.005';
 use Arango::DB::Database;
 use Arango::DB::Collection;
 
@@ -11,62 +11,89 @@ use JSON;
 use Clone 'clone';
 use MIME::Base64 3.11 'encode_base64url';
 use URI::Encode qw(uri_encode);
-use JSON::Schema::Fit;
+use JSON::Schema::Fit 0.02;
 
 my %API = (
     'list_databases'  => {
         method => 'get',
-        uri => '_api/database',
-        'params' => { details => { type => 'boolean' }}
+        uri    => '_api/database',
+        params => { details => { type => 'boolean' }},
     },
     'create_database' => {
-        method => 'post',
-        uri => '_api/database',
-        'builder' => sub { 
+        method  => 'post',
+        uri     => '_api/database',
+        params  => { name => { type => 'string' }},
+        builder => sub { 
             my ($self, %params) = @_;
             return Arango::DB::Database->_new(arango => $self, 'name' => $params{name});
         },
-        params => { name => { type => 'string' }}
     },
     'create_document' => {
         method => 'post',
         uri => '{database}_api/document/{collection}'
     },
     'create_collection' => {
-        method => 'post',
-        uri => '{database}_api/collection',
-        'builder' => sub {
+        method  => 'post',
+        uri     => '{database}_api/collection',
+        params  => { name => { type => 'string' }},
+        builder => sub {
             my ($self, %params) = @_;
             return Arango::DB::Collection->_new(arango => $self, database => $params{database}, 'name' => $params{name});
         },
-        params => { name => { type => 'string' }}
     },
     'delete_collection' => {
         method => 'delete',
-        uri => '{database}_api/collection/{name}'
+        uri    => '{database}_api/collection/{name}'
     },
     'delete_database' => {
         method => 'delete',
-        uri => '_api/database/{name}'
+        uri    => '_api/database/{name}'
     },
     'list_collections' => {
         method => 'get',
-        uri => '{database}_api/collection'
+        uri    => '{database}_api/collection'
     },
     'all_keys' => {
         method => 'put',
-        uri => '{database}_api/simple/all-keys',
+        uri    => '{database}_api/simple/all-keys',
         params => { type => { type => 'string' }, collection => { type => 'string' } },
     },
     'version' => {
         method => 'get',
-        uri => '_api/version',
+        uri    => '_api/version',
         params => {  details => { type => 'boolean' } } ,
+    },
+    'cursor_next' => {
+        method => 'put',
+        uri    => '{database}_api/cursor/{id}',
     },
     'create_cursor' => {
         method => 'post',
-        uri => '{database}_api/cursor',
-        params => { query => { type => 'string' }, count => { type => 'boolean' }},
+        uri    => '{database}_api/cursor',
+        params => { 
+            query       => { type => 'string'  }, 
+            count       => { type => 'boolean' },
+            batchSize   => { type => 'integer' },
+            cache       => { type => 'boolean' },
+            memoryLimit => { type => 'integer' },
+            ttl         => { type => 'integer' },
+            bindVars => { type => 'object', additionalProperties => 1 },
+            options  => { type => 'object', additionalProperties => 0, properties => {
+                    failOnWarning               => { type => 'boolean' },
+                    profile                     => { type => 'integer', maximum => 2, minimum => 0 }, # 0, 1, 2
+                    maxTransactionSize          => { type => 'integer' },
+                    stream                      => { type => 'boolean' },
+                    skipInaccessibleCollections => { type => 'boolean' },
+                    maxWarningCount             => { type => 'integer' }, 
+                    intermediateCommitCount     => { type => 'integer' },
+                    satelliteSyncWait           => { type => 'integer' },
+                    fullCount                   => { type => 'boolean' },
+                    intermediateCommitSize      => { type => 'integer' },
+                    'optimizer.rules'           => { type => 'string' },
+                    maxPlans                    => { type => 'integer' },
+                 }
+            },
+        },
     },
     
 );
@@ -149,7 +176,7 @@ Arango::DB::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

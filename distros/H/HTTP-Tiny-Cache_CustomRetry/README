@@ -1,0 +1,55 @@
+NAME
+    HTTP::Tiny::Cache_CustomRetry - Cache response + retry failed request
+
+VERSION
+    This document describes version 0.003 of HTTP::Tiny::Cache_CustomRetry
+    (from Perl distribution HTTP-Tiny-Cache_CustomRetry), released on
+    2019-04-12.
+
+SYNOPSIS
+     use HTTP::Tiny::Cache_CustomRetry;
+
+DESCRIPTION
+    EXPERIMENTAL / PROOF-OF-CONCEPT ONLY.
+
+    This class combines the functionalities of HTTP::Tiny::Cache (HT:Cache)
+    and HTTP::Tiny::CustomRetry (HT:CustomRetry). Since both HT:Cache and
+    HT:CustomRetry both extend HTTP::Tiny (HT), this module modifies
+    HT:CustomRetry's @ISA to point to HT:Retry instead. This is a hack and
+    probably only serves to show the limitation of subclassing mechanism for
+    adding functionalities, like we see in the WWW::Mechanize land. For an
+    alternative solution, see HTTP::Tiny::Plugin which is a plugin-enabled
+    variant of HTTP::Tiny.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Cache_CustomRetry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Cache_CustomRetry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Cache_Custo
+    mRetry>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny::Cache, HTTP::Tiny::CustomRetry
+
+    HTTP::Tiny::Plugin
+
+    HTTP::Tiny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

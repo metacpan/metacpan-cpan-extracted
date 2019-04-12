@@ -4,14 +4,14 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm';
 
 # INITIALIZATION
 
 sub init {
-    my ($self) = @_;
+    my $self = shift;
     return 0 unless $self->Lemonldap::NG::Portal::Auth::_WebForm::init();
     if ( $self->conf->{proxyUseSoap} ) {
         extends 'Lemonldap::NG::Portal::Lib::SOAPProxy',

@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::DB::Database;
-$Arango::DB::Database::VERSION = '0.004';
+$Arango::DB::Database::VERSION = '0.005';
 use Arango::DB::Cursor;
 
 use warnings;
@@ -59,7 +59,7 @@ Arango::DB::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 USAGE
 
@@ -94,9 +94,11 @@ Deletes a collection.
 
 =head2 C<cursor>
 
-   my $cursor = $database->cursor( $aql_query );
+   my $cursor = $database->cursor( $aql_query, %opt );
 
-Performs AQL queries, returning a cursor.
+Performs AQL queries, returning a cursor. An optional hash of
+options can be supplied. Supported hashes corresponde to the different attributes
+available in the Arango::DB REST API (L<https://docs.arangodb.com/3.4/HTTP/AqlQueryCursor/AccessingCursors.html>).
 
 =head1 AUTHOR
 

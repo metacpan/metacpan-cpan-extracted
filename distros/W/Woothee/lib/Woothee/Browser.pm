@@ -7,7 +7,7 @@ use Carp;
 use Woothee::Util qw/update_map update_category update_version update_os/;
 use Woothee::DataSet qw/dataset/;
 
-our $VERSION = "1.8.0";
+our $VERSION = "v1.10.0";
 
 sub challenge_msie {
     my ($ua,$result) = @_;
@@ -66,7 +66,7 @@ sub challenge_safari_chrome { # and Opera(blink)
 
     my $version = Woothee::DataSet->const('VALUE_UNKNOWN');
 
-    if ($ua =~ m{Edge/([.0-9]+)}o) {
+    if ($ua =~ m{(?:Edge|Edg|EdgiOS|EdgA)/([.0-9]+)}o) {
         # MS Edge
         $version = $1;
         update_map($result, dataset("Edge"));

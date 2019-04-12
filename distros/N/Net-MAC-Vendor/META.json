@@ -25,12 +25,12 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "Text::ParseWords" : "0",
-            "perl" : "v5.10.0"
+            "perl" : "5.010"
          }
       },
       "develop" : {
          "recommends" : {
-            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.147",
+            "Dist::Zilla::PluginBundle::Author::ETHER" : "0.148",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
@@ -66,9 +66,13 @@
             "File::Temp" : "0",
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
-            "perl" : "v5.10.0",
+            "Net::SSLeay" : "0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "NetAddr::MAC" : "0"
          }
       },
       "test" : {
@@ -81,7 +85,7 @@
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test::More" : "0.98",
-            "perl" : "v5.10.0"
+            "perl" : "5.010"
          }
       },
       "x_Dist_Zilla" : {
@@ -155,6 +159,7 @@
             "Dist::Zilla::Plugin::UseUnsafeInc" : "0",
             "Dist::Zilla::PluginBundle::Author::ETHER" : "0.119",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007",
+            "ExtUtils::HasCompiler" : "0.014",
             "Software::License::Artistic_2_0" : "0"
          }
       }
@@ -162,7 +167,7 @@
    "provides" : {
       "Net::MAC::Vendor" : {
          "file" : "lib/Net/MAC/Vendor.pm",
-         "version" : "1.263"
+         "version" : "1.264"
       }
    },
    "release_status" : "stable",
@@ -178,10 +183,10 @@
          "web" : "https://github.com/karenetheridge/Net-MAC-Vendor"
       }
    },
-   "version" : "1.263",
+   "version" : "1.264",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.029008"
+         "version" : "5.029009"
       },
       "plugins" : [
          {
@@ -222,6 +227,8 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     "CONTRIBUTING",
+                     "INSTALL",
                      "LICENSE",
                      "README.pod",
                      "t/rt79369.t"
@@ -774,7 +781,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20190220"
+                  "Module::CoreList" : "5.20190320"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -979,7 +986,9 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
+                     "CONTRIBUTING",
                      "Changes",
+                     "INSTALL",
                      "LICENSE",
                      "README.pod"
                   ],
@@ -1004,7 +1013,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.263",
+                  "tag" : "v1.264",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1173,7 +1182,18 @@
                }
             },
             "name" : "DynamicPrereqs",
-            "version" : "0.034"
+            "version" : "0.035"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "RuntimeSuggests",
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
@@ -1244,10 +1264,11 @@
       "brian d foy <brian.d.foy@gmail.com>",
       "Karen Etheridge <ether@cpan.org>",
       "Frank Maas <maas.frank@gmail.com>",
-      "openstrike <git@openstrike.co.uk>"
+      "openstrike <git@openstrike.co.uk>",
+      "Dean Hamstead <dean@fragfest.com.au>"
    ],
-   "x_generated_by_perl" : "v5.29.8",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
+   "x_generated_by_perl" : "v5.29.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
    "x_static_install" : 0,
    "x_use_unsafe_inc" : 0
 }

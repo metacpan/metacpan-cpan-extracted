@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v3.5.0';
+our $VERSION = 'v3.5.1';
 
 
 has contraindication => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::MedicalTherapy - Any medical intervention designed to preve
 
 =head1 VERSION
 
-version v3.5.0
+version v3.5.1
 
 =head1 DESCRIPTION
 
@@ -122,13 +122,27 @@ A serious_adverse_outcome should be one of the following types:
 
 L<SemanticWeb::Schema::TherapeuticProcedure>
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/SemanticWeb-Schema>
+and may be cloned from L<git://github.com/robrwo/SemanticWeb-Schema.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/SemanticWeb-Schema/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018-2019 by Robert Rothenberg.
 
 This is free software, licensed under:
 

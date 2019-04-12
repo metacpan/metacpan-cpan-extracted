@@ -275,7 +275,7 @@ static void pen_set_attrs(TickitPen *pen, HV *attrs)
   TickitPenAttr a;
   SV *val;
 
-  for(a = 0; a < TICKIT_N_PEN_ATTRS; a++) {
+  for(a = 1; a < TICKIT_N_PEN_ATTRS; a++) {
     const char *name = tickit_pen_attrname(a);
     val = hv_delete(attrs, name, strlen(name), 0);
     if(!val)
@@ -667,15 +667,15 @@ static void setup_constants(void)
   export = get_av("Tickit::Term::EXPORT_OK", TRUE);
 
   DO_CONSTANT(TICKIT_TERMCTL_ALTSCREEN)
-  DO_CONSTANT(TICKIT_TERMCTL_CURSORVIS)
+  DO_CONSTANT(TICKIT_TERMCTL_COLORS)
   DO_CONSTANT(TICKIT_TERMCTL_CURSORBLINK)
   DO_CONSTANT(TICKIT_TERMCTL_CURSORSHAPE)
+  DO_CONSTANT(TICKIT_TERMCTL_CURSORVIS)
   DO_CONSTANT(TICKIT_TERMCTL_ICON_TEXT)
   DO_CONSTANT(TICKIT_TERMCTL_ICONTITLE_TEXT)
   DO_CONSTANT(TICKIT_TERMCTL_KEYPAD_APP)
   DO_CONSTANT(TICKIT_TERMCTL_MOUSE)
   DO_CONSTANT(TICKIT_TERMCTL_TITLE_TEXT)
-  DO_CONSTANT(TICKIT_TERMCTL_COLORS)
 
   DO_CONSTANT(TICKIT_CURSORSHAPE_BLOCK)
   DO_CONSTANT(TICKIT_CURSORSHAPE_UNDER)
@@ -694,6 +694,12 @@ static void setup_constants(void)
   DO_CONSTANT(TICKIT_WINDOW_ROOT_PARENT);
   DO_CONSTANT(TICKIT_WINDOW_STEAL_INPUT);
   DO_CONSTANT(TICKIT_WINDOW_POPUP);
+
+  DO_CONSTANT(TICKIT_WINCTL_CURSORBLINK);
+  DO_CONSTANT(TICKIT_WINCTL_CURSORSHAPE);
+  DO_CONSTANT(TICKIT_WINCTL_CURSORVIS);
+  DO_CONSTANT(TICKIT_WINCTL_FOCUS_CHILD_NOTIFY);
+  DO_CONSTANT(TICKIT_WINCTL_STEAL_INPUT);
 }
 
 MODULE = Tickit             PACKAGE = Tickit::Debug
@@ -1033,7 +1039,7 @@ getattrs(self)
     TickitPenAttr a;
     int           count = 0;
   PPCODE:
-    for(a = 0; a < TICKIT_N_PEN_ATTRS; a++) {
+    for(a = 1; a < TICKIT_N_PEN_ATTRS; a++) {
       if(!tickit_pen_has_attr(self, a))
         continue;
 
@@ -1281,6 +1287,7 @@ subtract(self,hole)
   PPCODE:
     n_rects = tickit_rect_subtract(rects, self, hole);
 
+    EXTEND(SP, n_rects);
     for(i = 0; i < n_rects; i++)
       mPUSHrect(rects + i);
 
@@ -1526,11 +1533,13 @@ _xs_get_cell(self,line,col)
       XSRETURN(2);
     }
 
+    EXTEND(SP, 6);
+
     len = tickit_renderbuffer_get_cell_text(rb, line, col, NULL, 0);
     text = newSV(len + 1);
     tickit_renderbuffer_get_cell_text(rb, line, col, SvPVX(text), len + 1);
     SvPOK_on(text); SvUTF8_on(text); SvCUR_set(text, len);
-    XPUSHs(sv_2mortal(text));
+    mPUSHs(text);
 
     mPUSHs(newSVpen_noinc(tickit_pen_clone(tickit_renderbuffer_get_cell_pen(rb, line, col)), NULL));
 
@@ -2283,6 +2292,80 @@ setctl_str(self,ctl,value)
   OUTPUT:
     RETVAL
 
+SV *
+getctl(self,ctl)
+  Tickit::Term  self
+  SV           *ctl
+  INIT:
+    TickitTermCtl ctl_e;
+  CODE:
+    if(SvPOK(ctl)) {
+      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      if(ctl_e == -1)
+        croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
+    }
+    else if(SvIOK(ctl))
+      ctl_e = SvIV(ctl);
+    else
+      croak("Expected 'ctl' to be an integer or string");
+
+    switch(tickit_term_ctltype(ctl_e)) {
+      case TICKIT_TYPE_BOOL: {
+        int value;
+        if(!tickit_term_getctl_int(self, ctl_e, &value))
+          XSRETURN_UNDEF;
+        RETVAL = value ? &PL_sv_yes : &PL_sv_no;
+        break;
+      }
+      case TICKIT_TYPE_INT: {
+        int value;
+        if(!tickit_term_getctl_int(self, ctl_e, &value))
+          XSRETURN_UNDEF;
+        RETVAL = newSViv(value);
+        break;
+      }
+
+      case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_NONE:
+        RETVAL = &PL_sv_undef;
+        break;
+    }
+  OUTPUT:
+    RETVAL
+
+int
+setctl(self,ctl,value)
+  Tickit::Term  self
+  SV           *ctl
+  SV           *value
+  INIT:
+    TickitTermCtl ctl_e;
+  CODE:
+    if(SvPOK(ctl)) {
+      ctl_e = tickit_term_lookup_ctl(SvPV_nolen(ctl));
+      if(ctl_e == -1)
+        croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
+    }
+    else if(SvIOK(ctl))
+      ctl_e = SvIV(ctl);
+    else
+      croak("Expected 'ctl' to be an integer or string");
+
+    RETVAL = 0;
+    switch(tickit_term_ctltype(ctl_e)) {
+      case TICKIT_TYPE_BOOL:
+      case TICKIT_TYPE_INT:
+        RETVAL = tickit_term_setctl_int(self, ctl_e, SvIV(value));
+        break;
+      case TICKIT_TYPE_STR:
+        RETVAL = tickit_term_setctl_str(self, ctl_e, SvPV_nolen(value));
+        break;
+      case TICKIT_TYPE_NONE:
+        break;
+    }
+  OUTPUT:
+    RETVAL
+
 void
 _emit_key(self,info)
   Tickit::Term       self
@@ -2361,7 +2444,7 @@ get_methodlog(self)
           HV *penattrs = newHV();
           TickitPenAttr attr;
 
-          for(attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+          for(attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
             const char *attrname = tickit_pen_attrname(attr);
             int value;
             if(!tickit_pen_nondefault_attr(entry->pen, attr))
@@ -2427,7 +2510,7 @@ get_display_pen(self,line,col)
     pen = tickit_mockterm_get_display_pen((TickitMockTerm *)self, line, col);
 
     penattrs = newHV();
-    for(attr = 0; attr < TICKIT_N_PEN_ATTRS; attr++) {
+    for(attr = 1; attr < TICKIT_N_PEN_ATTRS; attr++) {
       const char *attrname;
       if(!tickit_pen_nondefault_attr(pen, attr))
         continue;
@@ -2967,13 +3050,6 @@ take_focus(self)
     tickit_window_take_focus(self->win);
 
 void
-set_focus_child_notify(self,notify)
-  Tickit::Window  self
-  bool            notify
-  CODE:
-    tickit_window_set_focus_child_notify(self->win, notify);
-
-void
 set_cursor_position(self,line,col)
   Tickit::Window  self
   int             line
@@ -2981,34 +3057,80 @@ set_cursor_position(self,line,col)
   CODE:
     tickit_window_set_cursor_position(self->win, line, col);
 
-void
-set_cursor_visible(self,visible)
+SV *
+getctl(self,ctl)
   Tickit::Window  self
-  bool            visible
+  SV             *ctl
+  INIT:
+    TickitWindowCtl ctl_e;
   CODE:
-    tickit_window_set_cursor_visible(self->win, visible);
+    if(SvPOK(ctl)) {
+      ctl_e = tickit_window_lookup_ctl(SvPV_nolen(ctl));
+      if(ctl_e == -1)
+        croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
+    }
+    else if(SvIOK(ctl))
+      ctl_e = SvIV(ctl);
+    else
+      croak("Expected 'ctl' to be an integer or string");
 
-void
-set_cursor_shape(self,shape)
-  Tickit::Window  self
-  int             shape
-  CODE:
-    tickit_window_set_cursor_shape(self->win, shape);
+    switch(tickit_window_ctltype(ctl_e)) {
+      case TICKIT_TYPE_BOOL: {
+        int value;
+        if(!tickit_window_getctl_int(self->win, ctl_e, &value))
+          XSRETURN_UNDEF;
+        RETVAL = value ? &PL_sv_yes : &PL_sv_no;
+        break;
+      }
+      case TICKIT_TYPE_INT: {
+        int value;
+        if(!tickit_window_getctl_int(self->win, ctl_e, &value))
+          XSRETURN_UNDEF;
+        RETVAL = newSViv(value);
+        break;
+      }
 
-bool
-is_steal_input(self)
-  Tickit::Window  self
-  CODE:
-    RETVAL = tickit_window_is_steal_input(self->win);
+      case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_NONE:
+        RETVAL = &PL_sv_undef;
+        break;
+    }
   OUTPUT:
     RETVAL
 
-void
-set_steal_input(self,steal)
+
+int
+setctl(self,ctl,value)
   Tickit::Window  self
-  bool            steal
+  SV             *ctl
+  SV             *value
+  INIT:
+    TickitWindowCtl ctl_e;
   CODE:
-    tickit_window_set_steal_input(self->win, steal);
+    if(SvPOK(ctl)) {
+      ctl_e = tickit_window_lookup_ctl(SvPV_nolen(ctl));
+      if(ctl_e == -1)
+        croak("Unrecognised 'ctl' name '%s'", SvPV_nolen(ctl));
+    }
+    else if(SvIOK(ctl))
+      ctl_e = SvIV(ctl);
+    else
+      croak("Expected 'ctl' to be an integer or string");
+
+    RETVAL = 0;
+    switch(tickit_window_ctltype(ctl_e)) {
+      case TICKIT_TYPE_BOOL:
+      case TICKIT_TYPE_INT:
+        RETVAL = tickit_window_setctl_int(self->win, ctl_e, SvIV(value));
+        break;
+      case TICKIT_TYPE_STR:
+        // TODO: currently there aren't any
+        break;
+      case TICKIT_TYPE_NONE:
+        break;
+    }
+  OUTPUT:
+    RETVAL
 
 MODULE = Tickit  PACKAGE = Tickit
 

@@ -9,15 +9,14 @@ use SQL::Translator;
 use_ok 'GraphQL::Plugin::Convert::DBIC';
 
 my $dbic_class = 'Schema';
-my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(
-  sub { $dbic_class->connect }
-);
+my $schema = $dbic_class->connect;
+my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql($schema);
 my $got = $converted->{schema}->to_doc;
 is_deeply_snapshot $got, 'schema';
 
 my $sqlt = SQL::Translator->new(
   parser => 'SQL::Translator::Parser::DBIx::Class',
-  parser_args => { dbic_schema => $dbic_class->connect },
+  parser_args => { dbic_schema => $schema},
   producer => 'GraphQL',
 );
 $got = $sqlt->translate or die $sqlt->error;

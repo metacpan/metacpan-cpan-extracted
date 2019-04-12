@@ -126,6 +126,12 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsIcon",
             "title" : "casSrvMetaDataOptionsIcon"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsSortNumber",
+            "id" : tpl+"s/"+key+"/"+"casSrvMetaDataOptionsSortNumber",
+            "title" : "casSrvMetaDataOptionsSortNumber",
+            "type" : "int"
          }
       ],
       "id" : "casSrvMetaDataOptionsDisplay",
@@ -336,6 +342,12 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsIcon",
             "title" : "oidcOPMetaDataOptionsIcon"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSortNumber",
+            "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsSortNumber",
+            "title" : "oidcOPMetaDataOptionsSortNumber",
+            "type" : "int"
          }
       ],
       "id" : "oidcOPMetaDataOptionsDisplayParams",
@@ -859,6 +871,12 @@ function templates(tpl,key) {
             "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsIcon",
             "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsIcon",
             "title" : "samlIDPMetaDataOptionsIcon"
+         },
+         {
+            "get" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSortNumber",
+            "id" : tpl+"s/"+key+"/"+"samlIDPMetaDataOptionsSortNumber",
+            "title" : "samlIDPMetaDataOptionsSortNumber",
+            "type" : "int"
          }
       ],
       "id" : "samlIDPMetaDataOptionsDisplay",

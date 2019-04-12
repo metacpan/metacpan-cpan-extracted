@@ -27,8 +27,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Math::BigInt" : "0",
-            "Math::BigRat" : "0",
+            "Math::BigInt" : "1.999816",
+            "Math::BigRat" : "0.2611",
             "perl" : "v5.10.1"
          }
       }
@@ -36,7 +36,7 @@
    "provides" : {
       "Math::ContinuedFraction" : {
          "file" : "lib/Math/ContinuedFraction.pm",
-         "version" : "0.13"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -48,7 +48,7 @@
          "url" : "git://github.com/jgamble/Math-ContinuedFraction.git"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_keyword" : [
       "math",
       "continued-fraction",

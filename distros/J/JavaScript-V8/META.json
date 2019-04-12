@@ -4,13 +4,13 @@
       "Pawel Murias <pawelmurias@gmail.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JavaScript-V8",
    "no_index" : {
@@ -22,25 +22,35 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::XSpp" : "0.11"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::CppGuess" : "0.19",
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
-      "runtime" : {
+      "develop" : {
          "requires" : {
-            "ExtUtils::XSpp" : "0.11"
+            "Pod::Markdown" : "0",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Number::Delta" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/dgl/javascript-v8"
-      }
+         "type" : "git",
+         "web" : "http://github.com/dgl/javascript-v8"
+      },
+      "x_IRC" : "irc://irc.perl.org/#v8"
    },
-   "version" : "0.07"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

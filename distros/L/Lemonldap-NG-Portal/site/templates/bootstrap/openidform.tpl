@@ -6,6 +6,7 @@
     <input name="openid_identifier" type="text" class="form-control" trplaceholder="enterOpenIDLogin" aria-required="true"/>
   </div>
 
+  <TMPL_INCLUDE NAME="impersonation.tpl">
   <TMPL_INCLUDE NAME="checklogins.tpl">
 
   <button type="submit" class="btn btn-success" >

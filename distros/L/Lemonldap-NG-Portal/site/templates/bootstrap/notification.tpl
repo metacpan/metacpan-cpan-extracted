@@ -1,7 +1,7 @@
 <TMPL_INCLUDE NAME="header.tpl">
 
 <div id="notifcontent" class="container">
-  
+
   <form action="/notifback" method="post" class="notif" role="form">
     <TMPL_VAR NAME="HIDDEN_INPUTS">
     <TMPL_IF NAME="CHOICE_VALUE">

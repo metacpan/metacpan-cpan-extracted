@@ -1,5 +1,4 @@
 package GraphQL::Plugin::Convert::DBIC;
-use 5.008001;
 use strict;
 use warnings;
 use GraphQL::Schema;
@@ -7,7 +6,7 @@ use GraphQL::Debug qw(_debug);
 use Lingua::EN::Inflect::Number qw(to_S to_PL);
 use Carp qw(confess);
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %GRAPHQL_TYPE2SQLS = (
@@ -236,8 +235,8 @@ sub _make_update_arg {
 }
 
 sub to_graphql {
-  my ($class, $dbic_schema_cb) = @_;
-  my $dbic_schema = $dbic_schema_cb->();
+  my ($class, $dbic_schema) = @_;
+  $dbic_schema = $dbic_schema->() if ((ref($dbic_schema)||'') eq 'CODE');
   my %root_value;
   my @ast;
   my (
@@ -324,7 +323,7 @@ sub to_graphql {
           my ($args, $content, $info) = @_;
           my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
           DEBUG and _debug('DBIC.root_value', @subfieldrels);
-          $dbic_schema_cb->()->resultset($name)->find(
+          $dbic_schema->resultset($name)->find(
             $args,
             { prefetch => \@subfieldrels }
           );
@@ -334,7 +333,7 @@ sub to_graphql {
           my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
           DEBUG and _debug('DBIC.root_value', @subfieldrels);
           [
-            $dbic_schema_cb->()->resultset($name)->search(
+            $dbic_schema->resultset($name)->search(
               +{ map { ("me.$_" => $args->{$_}) } keys %$args },
               {
                 prefetch => \@subfieldrels,
@@ -347,7 +346,7 @@ sub to_graphql {
           my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
           DEBUG and _debug('DBIC.root_value', @subfieldrels);
           [
-            $dbic_schema_cb->()->resultset($name)->search(
+            $dbic_schema->resultset($name)->search(
               +{
                 map { ("me.$_" => $args->{input}{$_}) } keys %{$args->{input}}
               },
@@ -411,7 +410,7 @@ sub to_graphql {
           my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
           DEBUG and _debug("DBIC.root_value($create_name)", $args, \@subfieldrels);
           [
-            map $dbic_schema_cb->()->resultset($name)->create(
+            map $dbic_schema->resultset($name)->create(
               $_,
               {
                 prefetch => \@subfieldrels,
@@ -427,7 +426,7 @@ sub to_graphql {
           [
             map {
               my $input = $_;
-              my $row = $dbic_schema_cb->()->resultset($name)->find(
+              my $row = $dbic_schema->resultset($name)->find(
                 +{
                   map {
                     my $key = $_;
@@ -453,7 +452,7 @@ sub to_graphql {
           [
             map {
               my $input = $_;
-              my $row = $dbic_schema_cb->()->resultset($name)->find(
+              my $row = $dbic_schema->resultset($name)->find(
                 +{
                   map {
                     my $key = $_;
@@ -531,9 +530,7 @@ GraphQL::Plugin::Convert::DBIC - convert DBIx::Class schema to GraphQL schema
 
   use GraphQL::Plugin::Convert::DBIC;
   use Schema;
-  my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(
-    sub { Schema->connect }
-  );
+  my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(Schema->connect);
   print $converted->{schema}->to_doc;
 
 =head1 DESCRIPTION
@@ -656,11 +653,7 @@ and Mutation) are created:
 
 =head1 ARGUMENTS
 
-To the C<to_graphql> method: a code-ref returning a L<DBIx::Class::Schema>
-object. This is so it can be called during the conversion process,
-but also during execution of a long-running process to e.g. execute
-database queries, when the database handle passed to this method as a
-simple value might have expired.
+To the C<to_graphql> method: a  L<DBIx::Class::Schema> object.
 
 =head1 PACKAGE FUNCTIONS
 

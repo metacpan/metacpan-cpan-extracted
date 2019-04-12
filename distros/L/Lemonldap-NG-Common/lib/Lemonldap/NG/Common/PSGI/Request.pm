@@ -7,7 +7,7 @@ use JSON;
 use Plack::Request;
 use URI::Escape;
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.3';
 
 our @ISA = ('Plack::Request');
 
@@ -31,8 +31,8 @@ sub new {
         $self->env->{PATH_INFO} =~ s|^$tmp|/|;
     }
     $self->env->{PATH_INFO} ||= '/';
-    $self->{uri} = uri_unescape( $self->env->{REQUEST_URI} );
-    $self->{uri} =~ s|^//+|/|g;
+    $self->env->{REQUEST_URI} =~ s|^//+|/|g;
+    $self->{uri}         = uri_unescape( $self->env->{REQUEST_URI} );
     $self->{data}        = {};
     $self->{error}       = 0;
     $self->{respHeaders} = [];
@@ -187,7 +187,7 @@ Example:
   # Set headers
   $req->respHeaders( "Location" => "http://x.y.z/", Etag => "XYZ", );
   # Add header
-  $req->respHeaders->{"X-Key"} = "Value"; 
+  $req->respHeaders->{"X-Key"} = "Value";
 
 =head2 set_param( $key, $value )
 
@@ -220,7 +220,7 @@ contains "application/json" or "text/json").
 
 L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Common::PSGI>,
 L<Lemonldap::NG::Hander::PSGI>, L<Plack::Request>,
-L<Lemonldap::NG::Portal::Main::Constants>, 
+L<Lemonldap::NG::Portal::Main::Constants>,
 
 =head1 AUTHORS
 

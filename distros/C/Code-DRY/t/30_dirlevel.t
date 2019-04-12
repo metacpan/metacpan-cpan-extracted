@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1+4+1;
+use Test::More tests => 3+4+1;
 use Code::DRY;
 #########################
 can_ok('Code::DRY', 'set_default_reporter');
@@ -10,6 +10,9 @@ can_ok('Code::DRY', 'scan_directories');
 
 is(ref Code::DRY::set_default_reporter(), 'CODE', "set_default_reporter sets default");
 is(ref [Code::DRY::set_reporter(Code::DRY::set_default_reporter())]->[0], 'CODE', "set_reporter sets given value (default)");
+
+is(Code::DRY::find_duplicates_in(2, undef, undef), '', "duplicates for undef succeeds");
+is(Code::DRY::find_duplicates_in(2, qr{}xms, ''), '', "duplicates for '' succeeds");
 
 eval { require Test::Output && Test::Output->import(); };
 my $noTestOutput = $@;

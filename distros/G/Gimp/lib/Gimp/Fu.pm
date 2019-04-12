@@ -11,7 +11,7 @@ use FindBin qw($RealBin $RealScript);
 use File::stat;
 
 our $run_mode;
-our $VERSION = "2.32";
+our $VERSION = "2.33";
 
 # manual import
 sub __ ($) { goto &Gimp::__ }

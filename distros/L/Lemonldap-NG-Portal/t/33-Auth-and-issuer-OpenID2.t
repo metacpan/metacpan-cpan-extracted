@@ -106,7 +106,7 @@ SKIP: {
         'Try to authenticate'
     );
     ok( $res->[2]->[0] =~ /trmsg="91"/, 'Reject reason is 91' )
-        or print STDERR Dumper( $res->[2]->[0] );
+      or print STDERR Dumper( $res->[2]->[0] );
     count(1);
 
     # Simple SP access

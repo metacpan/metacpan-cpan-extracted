@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Request::DeleteMultiObject;
-$Net::Amazon::S3::Request::DeleteMultiObject::VERSION = '0.85';
+$Net::Amazon::S3::Request::DeleteMultiObject::VERSION = '0.86';
 use Moose 0.85;
 use Digest::MD5 qw/md5 md5_hex/;
 use MIME::Base64;
@@ -54,7 +54,7 @@ Net::Amazon::S3::Request::DeleteMultiObject - An internal class to delete multip
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

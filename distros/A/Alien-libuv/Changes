@@ -1,5 +1,9 @@
 Revision history for Alien-libuv
 
+1.010     2019-04-10
+  - Revert the removal of NetBSD as a fix for it is in the works:
+    https://github.com/libuv/libuv/pull/2252
+
 1.009     2019-04-09
   - Update to the libuv v1.27.0 release
   - Don't try to test on GNUkFreeBSD or NetBSD as the library isn't

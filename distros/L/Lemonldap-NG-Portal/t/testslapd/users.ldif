@@ -86,6 +86,16 @@ mail: short@badwolf.org
 userPassword: passwordnottooshort
 pwdPolicySubentry: cn=passwordshort,ou=ppolicies,dc=example,dc=com
 
+dn: uid=grace,ou=users,dc=example,dc=com
+objectClass: inetOrgPerson
+uid: grace
+cn: grace
+sn: grace
+mail: grace@badwolf.org
+userPassword: grace
+pwdPolicySubentry: cn=passwordgrace,ou=ppolicies,dc=example,dc=com
+pwdChangedTime: 20190101000000Z
+
 dn: ou=ppolicies,dc=example,dc=com
 objectClass: top
 objectClass: organizationalUnit
@@ -127,4 +137,14 @@ pwdAttribute: userPassword
 pwdAllowUserChange: TRUE
 pwdCheckQuality: 2
 pwdMinLength: 6
+
+dn: cn=passwordgrace,ou=ppolicies,dc=example,dc=com
+objectClass: device
+objectClass: pwdPolicy
+cn: passwordgrace
+pwdAttribute: userPassword
+pwdAllowUserChange: TRUE
+pwdCheckQuality: 0
+pwdMaxAge: 5
+pwdGraceAuthnLimit: 2
 

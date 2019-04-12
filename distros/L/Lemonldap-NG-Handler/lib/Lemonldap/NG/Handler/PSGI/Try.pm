@@ -3,7 +3,7 @@ package Lemonldap::NG::Handler::PSGI::Try;
 use strict;
 use Mouse;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Handler::PSGI::Router';
 
@@ -51,7 +51,6 @@ sub defaultUnauthRoute {
 
 sub _run {
     my $self = shift;
-    $self->rule(1);
 
     return sub {
         my $req = Lemonldap::NG::Common::PSGI::Request->new( $_[0] );
@@ -60,13 +59,17 @@ sub _run {
             $self->routes( $self->authRoutes );
             $req->userData( $self->api->data );
         }
-        else {
+        elsif ( $res->[0] != 403 ) {
+
             # Unset headers (handler adds a Location header)
             $self->logger->debug(
                 "User not authenticated, Try in use, cancel redirection");
             $req->userData( {} );
             $req->respHeaders( [] );
             $self->routes( $self->unAuthRoutes );
+        }
+        else {
+            return $res;
         }
         $res = $self->handler($req);
 

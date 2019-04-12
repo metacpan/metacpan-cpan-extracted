@@ -73,6 +73,8 @@
                 <TMPL_IF NAME="logoFile">
                   <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/modules/<TMPL_VAR NAME="logoFile">" alt="<TMPL_VAR NAME="module">" class="img-thumbnail mb-3" />
                 </TMPL_IF>
+
+                <TMPL_INCLUDE NAME="impersonation.tpl">
                 <TMPL_INCLUDE NAME="checklogins.tpl">
 
                 <div class="buttons">
@@ -200,6 +202,7 @@
         <img src="<TMPL_VAR NAME="STATIC_PREFIX">common/modules/<TMPL_VAR NAME="module">.png" alt="<TMPL_VAR NAME="module">" class="img-thumbnail" />
       </TMPL_IF>
 
+      <TMPL_INCLUDE NAME="impersonation.tpl">
       <TMPL_INCLUDE NAME="checklogins.tpl">
 
       <div class="buttons">

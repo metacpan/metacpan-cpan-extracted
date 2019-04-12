@@ -6,10 +6,8 @@ Vector::QRCode::IntoPDF - A module to append QRCode as vector data into PDF
 
     use Vector::QRCode::IntoPDF;
     
-
     my $target = Vector::QRCode::IntoPDF->new(pdf_file => '/path/to/source.pdf');
     
-
     $target->imprint(
         page => 2,
         x    => 200,
@@ -19,10 +17,7 @@ Vector::QRCode::IntoPDF - A module to append QRCode as vector data into PDF
         unit => 'cm',
     );
     
-
     $target->save('/path/to/new.pdf');
-
-
 
 # DESCRIPTION
 
@@ -36,7 +31,7 @@ Vector::QRCode::IntoPDF makes to imprint QRCode as vector-data into PDF file.
 
 - workdir
 
-    Optional. A directory to use like temporary storage. Default is [File::Temp](http://search.cpan.org/perldoc?File::Temp)::tempdir(CLEANUP => 1);
+    Optional. A directory to use like temporary storage. Default is [File::Temp](https://metacpan.org/pod/File::Temp)::tempdir(CLEANUP => 1);
 
 # METHODS
 
@@ -46,7 +41,7 @@ Return PDF::API2 object for source pdf.
 
 ## imprint
 
-Imprint a qrcode. You may use options for [Vector::QRCode::EPS](http://search.cpan.org/perldoc?Vector::QRCode::EPS)::generate(), and following options.
+Imprint a qrcode. You may use options for [Vector::QRCode::EPS](https://metacpan.org/pod/Vector::QRCode::EPS)::generate(), and following options.
 
 - page
 

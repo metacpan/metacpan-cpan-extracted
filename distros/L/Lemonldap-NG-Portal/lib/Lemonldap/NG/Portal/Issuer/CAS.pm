@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -23,7 +23,7 @@ extends 'Lemonldap::NG::Portal::Main::Issuer',
 use constant beforeAuth  => 'storeEnvAndCheckGateway';
 use constant sessionKind => 'ICAS';
 
-has rule => ( is => 'rw', default => sub { {} } );
+has rule => ( is => 'rw' );
 
 sub init {
     my ($self) = @_;
@@ -363,7 +363,7 @@ sub logout {
     my $session_id = $req->{sessionInfo}->{_session_id} || $req->{id};
 
     # Delete linked CAS sessions
-    $self->deleteCasSecondarySessions($session_id);
+    $self->deleteCasSecondarySessions($session_id) if ($session_id);
 
     return PE_OK;
 }

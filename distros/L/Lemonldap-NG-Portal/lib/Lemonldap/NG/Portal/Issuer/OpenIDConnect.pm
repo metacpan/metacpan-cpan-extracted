@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OIDC_SERVICE_NOT_ALLOWED
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect',
@@ -29,7 +29,7 @@ sub beforeAuth { 'exportRequestParameters' }
 
 use constant sessionKind => 'OIDCI';
 
-has rule => ( is => 'rw', default => sub { {} } );
+has rule => ( is => 'rw' );
 has configStorage => (
     is      => 'ro',
     lazy    => 1,
@@ -198,8 +198,8 @@ sub run {
 "Override $_ OIDC param by value present in request parameter"
                     );
                     $oidc_request->{$_} = $request->{$_};
-                    $self->p->setHiddenFormValue( $req, $_, $request->{$_},
-                        '' );
+                    $self->p->setHiddenFormValue( $req, $_, $request->{$_}, '',
+                        0 );
                 }
             }
 
@@ -855,7 +855,8 @@ sub run {
                     $self->logger->debug( "OIDC request parameter $param: "
                           . $oidc_request->{$param} );
                     $self->p->setHiddenFormValue( $req, $param,
-                        $oidc_request->{$param}, '' );
+                        $oidc_request->{$param},
+                        '', 0 );
                 }
             }
 

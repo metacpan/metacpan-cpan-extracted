@@ -7,8 +7,8 @@ WriteMakefile
   'VERSION_FROM' => 'lib/Math/ContinuedFraction.pm',
   'PREREQ_PM' => {
                    'Carp' => 0,
-                   'Math::BigInt' => 0,
-                   'Math::BigRat' => 0,
+                   'Math::BigInt' => '1.999816',
+                   'Math::BigRat' => '0.2611',
                    'Test::More' => 0
                  },
   'INSTALLDIRS' => 'site',

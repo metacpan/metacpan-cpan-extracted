@@ -7,7 +7,7 @@ use Config;
 #########################
 
 if ($Config{'useperlio'}) {
-	plan tests => 9+10+10+12+3+7+5+5;
+	plan tests => 9+11+10+12+3+7+4+5;
 } else {
 	plan tests => 9+10;
 }
@@ -31,6 +31,7 @@ is(!defined Code::DRY::offset2filename(99999999), 1, "offset2filename(99999999):
 is(!defined Code::DRY::offsetAndFileindex2line(undef, undef, undef, undef), 1, "offsetAndFileindex2line(undef): undefined without files");
 is(!defined Code::DRY::offsetAndFileindex2line(0, undef, undef, undef), 1, "offsetAndFileindex2line(0): undefined for offset 0 without files");
 is(!defined Code::DRY::offsetAndFileindex2line(99999999,undef,undef,undef), 1, "offsetAndFileindex2line(99999999): undefined for big offset without files");
+is(!defined Code::DRY::get_concatenated_text(0, 999999999), 1,"check, if concatenated text is undef");
 
 # tests use in-memory files (dependent on Perl configuration useperlio)
 if ($Config{'useperlio'}) {
@@ -120,7 +121,6 @@ if ($Config{'useperlio'}) {
 	Code::DRY::enter_files(\@filerefs);
 
 	is_deeply(Code::DRY::get_concatenated_text(0, length $codetotal), $codetotal,"check, if concatenated text is correct");
-	is_deeply(!defined Code::DRY::get_substr_from_input(0, length $codetotal), 1,"check, if concatenated text is correct");
 	is_deeply(\@Code::DRY::fileoffsets, [29,59,89,119,149], "check, if file offsets are correct");
 	is_deeply(\@Code::DRY::file_lineoffsets, [
 		[2,5,8,11,14,17,20,23,26,29],

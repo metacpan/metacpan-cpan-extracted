@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-require 'common.pl';
+require './common.pl';
 
 my $version = ag_getversion();
 my $config_hash = ag_getconfig();

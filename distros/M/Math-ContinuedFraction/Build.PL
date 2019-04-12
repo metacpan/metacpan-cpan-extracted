@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
 
 	dist_author => q{John M. Gamble <jgamble@cpan.org>},
 	dist_abstract => 'Create and manipulate continued fractions',
-	dist_version => '0.13',
+	dist_version => '0.14',
 	release_status => 'stable',
 
 	provides => {
@@ -20,8 +20,8 @@ my $builder = Module::Build->new(
 	requires => {
 		perl => '5.10.1',
 		Carp => 0,
-		'Math::BigInt' => 0,
-		'Math::BigRat' => 0,
+		'Math::BigInt' => 1.999816,
+		'Math::BigRat' => 0.2611,
 	},
 
 	configure_requires => {

@@ -15,7 +15,6 @@ my $client = LLNG::Manager::Test->new( {
             passwordDB               => 'Demo',
             portalRequireOldPassword => 1,
             showLanguages            => 0,
-            translations             => 'site/templates/localeTranslations.txt',
             error_de_85              => 'From lemonlap-ng.ini',
         }
     }
@@ -25,30 +24,30 @@ ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu' );
 ok( $res->[2]->[0] !~ m%<span id="languages"></span>%,
     ' No language icon found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"trOver"%,
-    ' trOver found' )
+ok( $res->[2]->[0] =~ m%"trOver"%, ' trOver found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"all":\{\}%,
-    ' all found' )
+ok( $res->[2]->[0] =~ m%"all":\{\}%, ' all found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"en":\{"PE5":"Big brother is watching you, authenticated user"\}%,
-    ' en found' )
+ok( $res->[2]->[0] =~ m%"PE85":"From lemonlap-ng.ini"%, ' PE85 found' )
   or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"PE0":"Souriez, vous êtes surveillés !"%,
-    ' PE0 found' )
-  or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"selectIdP":"Portail de Fédération des Identités"%,
-    ' selectIdP found' )
-  or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"fr":\{%,
-    ' fr found' )
-  or print STDERR Dumper( $res->[2]->[0] );
-ok( $res->[2]->[0] =~ m%"PE85":"From lemonlap-ng.ini"%,
-    ' PE85 found' )
-  or print STDERR Dumper( $res->[2]->[0] );
-count(9);
+count(5);
 
-# Try yo authenticate
+# Try to authenticate
+# -------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho*&password=dwho'),
+        accept => 'text/html',
+        length => 24
+    ),
+    'Auth query'
+);
+ok( $res->[2]->[0] =~ m%<span trmsg="40"></span>%, ' PE40 found' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(2);
+
+# Try to authenticate
 # -------------------
 ok(
     $res = $client->_post(

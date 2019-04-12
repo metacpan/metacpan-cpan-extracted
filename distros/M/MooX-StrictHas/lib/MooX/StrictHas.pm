@@ -1,6 +1,6 @@
 package MooX::StrictHas;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # this bit would be MooX::Utils but without initial _ on func name
 use strict;
@@ -20,7 +20,8 @@ sub _override_function {
 
 my %ATTR2MESSAGE = (
   auto_deref => q{just dereference in your using code},
-  lazy_build => q{Use "is => 'lazy'" instead"},
+  lazy_build => q{Use "is => 'lazy'" instead},
+  does => q{Unsupported; use "isa" instead},
 );
 sub import {
   my $target = scalar caller;
@@ -66,6 +67,10 @@ MooX::StrictHas - Forbid "has" attributes lazy_build and auto_deref
     is => 'ro',
     lazy_build => 1, # blows up, not implemented in Moo
   );
+  has attr2 => (
+    is => 'ro',
+    does => "Thing", # blows up, not implemented in Moo
+  );
 
 =head1 DESCRIPTION
 
@@ -78,6 +83,10 @@ does not implement, but silently accepts:
 =item auto_deref
 
 This is not considered best practice - just dereference in your using code.
+
+=item does
+
+Unsupported; use C<isa> instead.
 
 =item lazy_build
 

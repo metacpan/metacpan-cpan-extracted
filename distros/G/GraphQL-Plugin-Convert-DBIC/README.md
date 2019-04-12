@@ -14,9 +14,7 @@ GraphQL::Plugin::Convert::DBIC - convert DBIx::Class schema to GraphQL schema
 
     use GraphQL::Plugin::Convert::DBIC;
     use Schema;
-    my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(
-      sub { Schema->connect }
-    );
+    my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(Schema->connect);
     print $converted->{schema}->to_doc;
 
 # DESCRIPTION
@@ -139,11 +137,7 @@ and Mutation) are created:
 
 # ARGUMENTS
 
-To the `to_graphql` method: a code-ref returning a [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema)
-object. This is so it can be called during the conversion process,
-but also during execution of a long-running process to e.g. execute
-database queries, when the database handle passed to this method as a
-simple value might have expired.
+To the `to_graphql` method: a  [DBIx::Class::Schema](https://metacpan.org/pod/DBIx::Class::Schema) object.
 
 # PACKAGE FUNCTIONS
 

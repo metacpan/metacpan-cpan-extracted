@@ -5,7 +5,7 @@ tests:
     spec:        12/16
     description: message body eol whitespace ignored
     message:     |
-      Authentication-Results: lists.example.org; arc=none;
+      Authentication-Results: (testing) lists.example.org (test); arc=none;
         spf=pass smtp.mfrom=jqd@d1.example;
         dkim=pass (1024-bit key) header.i=@d1.example;
         dmarc=pass

@@ -4,7 +4,7 @@ use Mouse;
 use Lemonldap::NG::Common::PSGI;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
@@ -88,7 +88,7 @@ sub genRoute {
                 $routes->{$word} = $dest;
             }
             else {
-                die "Type $t unauthorizated in routes";
+                die "Type $t unauthorized in routes";
             }
         }
         elsif ( $self->can($dest) ) {
@@ -322,7 +322,7 @@ bookId parameter will be stored in $req->params('bookId');
 
   $self->addRoute( books => { ':bookId' => { pages => { ':pageId' => 'page' } } }, ['GET'] );
 
-=item to manage simultaneously the 2 previous examples 
+=item to manage simultaneously the 2 previous examples
 
   $self->addRoute( books => { ':bookId' => { pages => { ':pageId' => 'page' } } }, ['GET'] )
        ->addRoute( books => { ':bookId' => { '*' => 'book' } }, ['GET'] );
@@ -349,7 +349,7 @@ logLevel, staticPrefix, templateDir, links, syslog).
 
 L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>,
 L<Plack>, L<PSGI>, L<Lemonldap::NG::Common::PSGI>,
-L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>, 
+L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =head1 AUTHORS
 

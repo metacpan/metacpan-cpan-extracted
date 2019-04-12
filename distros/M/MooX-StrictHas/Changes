@@ -1,3 +1,6 @@
+0.04 2019-04-12
+ - also reject "does"
+
 0.03 2019-03-22
  - make the overriding "has" call the overridden one
 

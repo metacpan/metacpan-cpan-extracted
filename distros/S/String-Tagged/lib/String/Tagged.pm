@@ -8,7 +8,7 @@ package String::Tagged;
 use strict;
 use warnings;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw( blessed );
 
@@ -210,6 +210,9 @@ As a further convenience, if the value for a given tag name is a plain string
 instead of a code reference, it gives the new name for the tag, and will be
 applied with its existing value.
 
+If C<only_tags> is being used too, then the source names of any tags to be
+converted must also be listed there, or they will not be copied.
+
 =back
 
 =head2 clone (instance)
@@ -338,6 +341,11 @@ sub from_sprintf
          $precision = shift @args if defined $precision and $precision eq "*";
          my $arg    = shift @args;
 
+         defined $arg or do {
+            warnings::warnif( uninitialized => "Use of ininitialized value in String::Tagged->from_sprintf" );
+            $arg = "";
+         };
+
          if( defined $precision ) {
             if( blessed $arg and $arg->isa( __PACKAGE__ ) ) {
                $arg = $arg->substr( 0, $precision );
@@ -463,7 +471,7 @@ sub substr
       $ts = -1 if $ts < 0    or $tf & FLAG_ANCHOR_BEFORE;
       $te = -1 if $te > $end or $tf & FLAG_ANCHOR_AFTER;
 
-      $ret->apply_tag( $ts, $te - $ts, $tn => $tv );
+      $ret->apply_tag( $ts, $te == -1 ? -1 : $te - $ts, $tn => $tv );
    }
 
    return $ret;
@@ -1652,7 +1660,7 @@ sub debug_sprintf
 
    my $maxnamelen = 0;
 
-   my $ret = "  $str\n";
+   my $ret = "  " . ( $str =~ s/\n/./gr ) . "\n";
 
    $self->iter_tags( sub {
       my ( undef, undef, $name, undef ) = @_;

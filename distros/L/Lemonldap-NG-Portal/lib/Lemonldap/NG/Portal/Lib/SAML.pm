@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SAML_SLO_ERROR
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 # PROPERTIES
 
@@ -145,11 +145,13 @@ sub init {
 
     return 0 unless ( $self->lassoServer( $self->loadService ) );
     $self->addUnauthRoute(
-        ( $self->{path} || 'saml' ) => { 'metadata' => 'metadata' },
+        ( $self->{path} || 'saml' ) =>
+          { 'metadata' => { ':type' => 'metadata' } },
         ['GET']
     );
     $self->addAuthRoute(
-        ( $self->{path} || 'saml' ) => { 'metadata' => 'metadata' },
+        ( $self->{path} || 'saml' ) =>
+          { 'metadata' => { ':type' => 'metadata' } },
         ['GET']
     );
     return 1;
@@ -184,7 +186,7 @@ sub loadService {
 
     # Create Lasso server with service metadata
     my $server = $self->createServer(
-        $service_metadata->serviceToXML( $self->conf ),
+        $service_metadata->serviceToXML( $self->conf, '' ),
         $self->conf->{samlServicePrivateKeySig},
         $self->conf->{samlServicePrivateKeySigPwd},
 
@@ -293,6 +295,9 @@ sub loadIDPs {
         $self->idpList->{$entityID}->{icon} =
           $self->conf->{samlIDPMetaDataOptions}->{$_}
           ->{samlIDPMetaDataOptionsIcon};
+        $self->idpList->{$entityID}->{order} =
+          $self->conf->{samlIDPMetaDataOptions}->{$_}
+          ->{samlIDPMetaDataOptionsSortNumber};
 
         # Set rule
         my $cond = $self->conf->{samlIDPMetaDataOptions}->{$_}
@@ -2385,7 +2390,10 @@ sub sendLogoutResponseToServiceProvider {
 
     # Logout response
     unless ( $self->buildLogoutResponseMsg($logout) ) {
-        return $self->p->sendError( $req, "Unable to build SLO response", 500 );
+        $self->logger->warn( "Could not build a logout response for provider "
+              . $logout->remote_providerID
+              . ", staying on portal" );
+        return $self->p->do( $req, [] );
     }
 
     # Send response depending on request method
@@ -3072,9 +3080,10 @@ sub importRealSession {
 
 sub metadata {
     my ( $self, $req ) = @_;
+    my $type = $req->param('type') || 'all';
     require Lemonldap::NG::Common::Conf::SAML::Metadata;
     if ( my $metadata = Lemonldap::NG::Common::Conf::SAML::Metadata->new() ) {
-        my $s = $metadata->serviceToXML( $self->conf );
+        my $s = $metadata->serviceToXML( $self->conf, $type );
         return [
             200,
             [
@@ -3417,8 +3426,8 @@ Send logout request to a provider
 
 Send logout response issue from a logout request to all other
 providers. If information have to be displayed to users, such as
-iframe to send HTTP-Redirect or HTTP-POST logout request, then          
-$self->{_info} will be updated.                                         
+iframe to send HTTP-Redirect or HTTP-POST logout request, then
+$self->{_info} will be updated.
 
 =head2 checkSignatureStatus
 

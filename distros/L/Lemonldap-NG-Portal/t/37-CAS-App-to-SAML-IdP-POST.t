@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 11;
+my $maintests = 12;
 my $debug     = 'error';
 my ( $idp, $proxy, $app, $res );
 my %handlerOR = ( idp => [], proxy => [], app => [] );
@@ -140,6 +140,10 @@ SKIP: {
     ( $host, $url, $query ) = expectAutoPost($res);
     $query =~ s/\+/%2B/g;
     my $idpId = expectCookie($res);
+
+    # Expect pdata to be cleared
+    $idpPdata = expectCookie( $res, 'lemonldappdata' );
+    ok( $idpPdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
 
     # Post SAML response
     switch ('proxy');

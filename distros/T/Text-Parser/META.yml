@@ -1,5 +1,5 @@
 ---
-abstract: 'Simplifies text parsing. Easily extensible to parse various text formats.'
+abstract: 'Simplifies text parsing. Easily extensible to parse any text format.'
 author:
   - 'Balaji Ramasubramanian <balajiram@cpan.org>'
 build_requires:
@@ -7,12 +7,13 @@ build_requires:
   Test::More: '0'
   Test::Output: '0'
   Text::CSV: '0'
+  Try::Tiny: '0'
   constant: '0'
   parent: '0'
-  perl: '5.013010'
+  perl: v5.14.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.012'
+  perl: v5.14.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,10 +24,13 @@ name: Text-Parser
 provides:
   Text::Parser:
     file: lib/Text/Parser.pm
-    version: '0.910'
+    version: '0.911'
+  Text::Parser::AutoSplit:
+    file: lib/Text/Parser/AutoSplit.pm
+    version: '0.911'
   Text::Parser::Multiline:
     file: lib/Text/Parser/Multiline.pm
-    version: '0.910'
+    version: '0.911'
 requires:
   Dist::Zilla::Plugin::Test::TidyAll: '0'
   Exception::Class: '0'
@@ -39,16 +43,17 @@ requires:
   MooseX::CoverableModifiers: '0'
   MooseX::StrictConstructor: '0'
   String::Util: '0'
-  Try::Tiny: '0'
+  Syntax::Keyword::Try: '0'
+  feature: '0'
   namespace::autoclean: '0'
-  perl: '5.013010'
+  perl: v5.14.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://github.com/balajirama/Text-Parser/issues
   homepage: https://github.com/balajirama/Text-Parser
   repository: https://github.com/balajirama/Text-Parser.git
-version: '0.910'
+version: '0.911'
 x_contributors:
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
 x_generated_by_perl: v5.28.1

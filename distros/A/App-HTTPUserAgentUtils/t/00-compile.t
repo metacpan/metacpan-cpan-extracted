@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/HTTPUserAgentUtils.pm'
@@ -14,7 +14,9 @@ my @module_files = (
 
 my @scripts = (
     'script/gen-random-http-ua',
-    'script/parse-http-ua'
+    'script/http-ua-by-nickname',
+    'script/parse-http-ua',
+    'script/rand-http-ua'
 );
 
 # no fake home requested

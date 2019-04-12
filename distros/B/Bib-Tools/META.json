@@ -4,7 +4,7 @@
       "Doug Leith <dougleith@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "perl_5"
    ],
@@ -22,29 +22,29 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Bib::CrossRef" : "0.08",
-            "BibTeX::Parser" : 0,
-            "HTML::Entities" : 0,
-            "HTML::TreeBuilder::XPath" : 0,
-            "IO::File" : 0,
-            "JSON" : 0,
-            "LWP::UserAgent" : 0,
-            "Test::More" : 0,
-            "URI::Escape" : 0,
-            "XML::Simple" : 0
+            "BibTeX::Parser" : "0",
+            "HTML::Entities" : "0",
+            "HTML::TreeBuilder::XPath" : "0",
+            "IO::File" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::More" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.15"
+   "version" : "0.16"
 }

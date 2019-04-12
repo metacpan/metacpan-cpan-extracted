@@ -5,7 +5,6 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml			Module meta-data (added by MakeMaker)
 t/001Basic.t
 t/002Mult.t
 t/003Dirs.t
@@ -16,6 +15,8 @@ t/007bzip.t
 t/008performance.t
 t/009compressed.t
 t/010openbsd.t
+t/011remdots.t
+t/012tarinfo.t
 t/data/bar.tar
 t/data/foo.tar.bz2
 t/data/foo.tgz
@@ -23,4 +24,5 @@ t/lib/ATWDumbbench.pm
 xt/performance-small.t
 README.md
 CONTRIBUTING.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

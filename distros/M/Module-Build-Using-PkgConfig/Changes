@@ -1,5 +1,10 @@
 Revision history for Module-Build-Using-PkgConfig
 
+0.03    2019-04-11 13:05:56
+        [CHANGES]
+         * Declare dependency on perl 5.010 because of // operator
+         * Spelling fixes from debian (thanks gregor herrmann) (RT128590)
+
 0.02    2019-02-21 20:47:31
         [BUGFIXES]
          * Declare Alien modules under 'requires', not 'build_requires'

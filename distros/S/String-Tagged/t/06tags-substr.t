@@ -107,4 +107,17 @@ is_deeply( \@tags,
    is( $e->length, 3, 'two tag length is 3' );
 }
 
+# ->substr can keep both-edge anchored tags
+{
+   my $str = String::Tagged->new( "one two three" )
+      ->apply_tag( -1, -1, wholestring => 1 );
+
+   my $sub = $str->substr( 4, 3 );
+   ok( my $e = $sub->get_tag_extent( 1, "wholestring" ), 'sub has wholestring tag' );
+   if( $e ) {
+      is( $e->start, 0, 'wholestring tag starts at 0' );
+      is( $e->length, 3, 'wholestring tag is 3 long' );
+   };
+}
+
 done_testing;

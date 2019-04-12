@@ -6,6 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME => 'Mail::POP3',
   VERSION_FROM => 'lib/Mail/POP3.pm',
+  LICENSE => 'perl',
   PREREQ_PM => {
     'HTTP::Cookies' => 0,
     'HTML::Form' => 0,

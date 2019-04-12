@@ -339,7 +339,7 @@ our %EXPORT_TAGS = (
           APPLYSECTION
           NO
           \$hashParameters
-          \@sessionTypes 
+          \@sessionTypes
           )
     ]
 );
@@ -735,7 +735,7 @@ some words for other developpers
 if test is not defined for this type or if test must
 be more restrictive, set here a regular expression or a subroutine. Arguments
 passed to subroutine are (keyValue, newConf, currentKey). It returns 2
-arguments: a boolean result and a message (if non empty message will be 
+arguments: a boolean result and a message (if non empty message will be
 displayed as warning or error depending of result);
 
 =item msgFail (optional):

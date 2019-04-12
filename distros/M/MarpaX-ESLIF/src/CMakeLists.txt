@@ -7,7 +7,7 @@ ENDIF ()
 # when we do make marpaESLIFPerlRelease
 #
 # SET (MYPACKAGE_DEBUG TRUE)
-MYPACKAGESTART (marpaESLIF 3 0 4)
+MYPACKAGESTART (marpaESLIF 3 0 6)
 
 ###########
 # Library #
@@ -80,12 +80,14 @@ MYPACKAGEDEPENDENCY (luaunpanic    "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/
 
 #
 # pcre2 is built as an external project: we have to explicitly give the include path.
-# In addition, using pcre2 requires setting PCRE2_CODE_UNIT_WIDTH.
+# In addition:
+# - Using pcre2 requires setting PCRE2_CODE_UNIT_WIDTH.
+# - Embedded lua uses long double for the lua_Number
 #
 FOREACH (_target marpaESLIF marpaESLIF_static)
   ADD_DEPENDENCIES           (${_target} pcre2)
   TARGET_INCLUDE_DIRECTORIES (${_target} PRIVATE ${PCRE2_INCLUDE_DIRS} "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/github/luaunpanic/output/include/luaunpanic/lua" "${CMAKE_CURRENT_SOURCE_DIR}/src/bindings/lua/include")
-  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC=1 -DMARPAESLIFLUA_EMBEDDED)
+  TARGET_COMPILE_DEFINITIONS (${_target} PRIVATE -DMARPAESLIF_BUFSIZ=${MARPAESLIF_BUFSIZ} -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC=1 -DMARPAESLIFLUA_EMBEDDED -DLUA_FLOAT_TYPE=3)
   TARGET_LINK_LIBRARIES      (${_target} PRIVATE ${PCRE2_LIBRARIES})
 ENDFOREACH ()
 

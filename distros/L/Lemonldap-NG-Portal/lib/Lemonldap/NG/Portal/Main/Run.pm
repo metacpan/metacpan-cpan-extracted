@@ -9,12 +9,15 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use URI::Escape;
+use JSON;
+
+has trOverCache => ( is => 'rw', default => sub { {} } );
 
 # List constants
 sub authProcess { qw(extractFormInfo getUser authenticate) }
@@ -183,8 +186,9 @@ sub logout {
     return $self->do(
         $req,
         [
-            'controlUrl', @{ $self->beforeLogout },
-            'authLogout', 'deleteSession'
+            'importHandlerData',      'controlUrl',
+            @{ $self->beforeLogout }, 'authLogout',
+            'deleteSession'
         ]
     );
 }
@@ -209,6 +213,12 @@ sub do {
     if ( $err == PE_SENDRESPONSE ) {
         return $req->response;
     }
+
+    # Remove userData if authentication fails
+    if ( $err == PE_BADCREDENTIALS ) {
+        $req->userData( {} );
+    }
+
     if ( !$self->conf->{noAjaxHook} and $req->wantJSON ) {
         $self->logger->debug('Processing to JSON response');
         if ( ( $err > 0 and !$req->id ) or $err eq PE_SESSIONNOTGRANTED ) {
@@ -237,14 +247,16 @@ sub do {
     }
     else {
         if (
-                $err
-            and $err != PE_LOGOUT_OK
-            and (
-                $err != PE_REDIRECT
-                or (    $err == PE_REDIRECT
-                    and $req->data->{redirectFormMethod}
-                    and $req->data->{redirectFormMethod} eq 'post' )
-                or $req->info
+            $req->info
+            or (
+                    $err
+                and $err != PE_LOGOUT_OK
+                and (
+                    $err != PE_REDIRECT
+                    or (    $err == PE_REDIRECT
+                        and $req->data->{redirectFormMethod}
+                        and $req->data->{redirectFormMethod} eq 'post' )
+                )
             )
           )
         {
@@ -478,8 +490,8 @@ sub updateSession {
         ## sessionInfo updated if $id defined : quite strange !!
         ## See https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues/430
         foreach ( keys %$infos ) {
-            $self->logger->debug(
-                "Update sessionInfo $_ with " . $infos->{$_} );
+            $self->logger->debug("Update sessionInfo $_");
+            $self->_dump( $infos->{$_} );
             $req->{sessionInfo}->{$_} = $self->HANDLER->data->{$_} =
               $infos->{$_};
         }
@@ -550,7 +562,10 @@ sub _deleteSession {
 
     # Log
     my $user = $req->{sessionInfo}->{ $self->conf->{whatToTrace} };
-    $self->userLogger->notice("User $user has been disconnected") if $user;
+    my $mod  = $req->{sessionInfo}->{_auth};
+    $self->userLogger->notice(
+"User $user has been disconnected from $mod ($req->{sessionInfo}->{ipAddr})"
+    ) if $user;
 
     return $session->error ? 0 : 1;
 }
@@ -621,7 +636,7 @@ sub setHiddenFormValue {
     if ( defined $val or !( $val & ~$val ) ) {
         $key = $prefix . $key;
 
-        #$val =~ s/\+/%2B/g;
+        $val = encode_base64($val) if $base64;
         $req->{portalHiddenFormValues}->{$key} = $val;
         $self->logger->debug("Store $val in hidden key $key");
     }
@@ -726,13 +741,51 @@ sub _dump {
 
 sub sendHtml {
     my ( $self, $req, $template, %args ) = @_;
-    $args{params}->{TROVER} = $self->trOver;
-    $args{templateDir} =
-      $self->conf->{templateDir} . '/' . $self->getSkin($req);
+
+    my $templateDir = $self->conf->{templateDir} . '/' . $self->getSkin($req);
+    $self->templateDir( [ $templateDir, @{ $self->templateDir } ] );
+
+    # Check template
+    $args{templateDir} = $templateDir;
+    my $tmpl = $args{templateDir} . "/$template.tpl";
+    unless ( -f $tmpl ) {
+        $self->logger->debug("Template $tmpl not found");
+        $args{templateDir} = $self->conf->{templateDir} . '/bootstrap';
+        $tmpl = $args{templateDir} . "/$template.tpl";
+        $self->logger->debug("-> Trying to load $tmpl");
+    }
+
+    # Override messages
+    my $trOverMessages = JSON::from_json( $self->trOver );
+
+    unless ( $self->trOverCache->{$templateDir} ) {
+        opendir( DIR, $templateDir );
+        my @langfiles = grep( /\.json$/, readdir(DIR) );
+        close(DIR);
+
+        foreach my $file (@langfiles) {
+            my ($lang) = ( $file =~ /^(\w+)\.json/ );
+            $self->logger->debug("Use $file to override messages");
+            if ( open my $json, "<", $templateDir . "/" . $file ) {
+                local $/ = undef;
+                $trOverMessages->{$lang} = JSON::from_json(<$json>);
+            }
+            else {
+                $self->logger->error("Unable to read $file");
+            }
+        }
+
+        $self->trOverCache->{$templateDir} = JSON::to_json($trOverMessages);
+    }
+    $args{params}->{TROVER} = $self->trOverCache->{$templateDir};
+
     my $res = $self->SUPER::sendHtml( $req, $template, %args );
     push @{ $res->[1] },
       'X-XSS-Protection'       => '1; mode=block',
-      'X-Content-Type-Options' => 'nosniff';
+      'X-Content-Type-Options' => 'nosniff',
+      'Cache-Control' => 'no-cache, no-store, must-revalidate',    # HTTP 1.1
+      'Pragma'        => 'no-cache',                               # HTTP 1.0
+      'Expires'       => '0';                                      # Proxies
 
     # Set authorized URL for POST
     my $csp = $self->csp . "form-action " . $self->conf->{cspFormAction};
@@ -781,7 +834,7 @@ sub sendHtml {
           ( $req->info =~ /<iframe.*?src="(.*?)"/sg );
     }
     if (@url) {
-        $csp .= join( ' ', 'child-src', @url ) . ';';
+        $csp .= join( ' ', 'child-src', @url, "'self'" ) . ';';
     }
 
     # Set CSP header
@@ -814,8 +867,8 @@ sub sendCss {
 }
 
 sub lmError {
-    my ( $self, $req ) = @_;
-    my $httpError = $req->param('code');
+    my ( $self, $req, $error ) = @_;
+    my $httpError = $req->param('code') || $error;
 
     # Check URL
     $self->controlUrl($req);
@@ -826,6 +879,7 @@ sub lmError {
         LOGOUT_URL => $self->conf->{portal} . "?logout=1",
         URL        => $req->{urldc},
     );
+    $req->pdata( {} );
 
     # Error code
     $templateParams{"ERROR$_"} = ( $httpError == $_ ? 1 : 0 )
@@ -837,8 +891,8 @@ sub rebuildCookies {
     my ( $self, $req ) = @_;
     my @tmp;
     for ( my $i = 0 ; $i < @{ $req->{respHeaders} } ; $i += 2 ) {
-        push @tmp, $req->respHeaders->[0], $req->respHeaders->[1]
-          unless ( $req->respHeaders->[0] eq 'Set-Cookie' );
+        push @tmp, $req->respHeaders->[$i], $req->respHeaders->[ $i + 1 ]
+          unless ( $req->respHeaders->[$i] eq 'Set-Cookie' );
     }
     $req->{respHeaders} = \@tmp;
     $self->buildCookie($req);
@@ -865,7 +919,6 @@ sub tplParams {
         SKIN       => $self->getSkin($req),
         PORTAL_URL => $self->conf->{portal},
         SKIN_PATH  => $portalPath . "skins",
-        ANTIFRAME  => $self->conf->{portalAntiFrame},
         SKIN_BG    => $self->conf->{portalSkinBackground},
         ( $self->customParameters ? ( %{ $self->customParameters } ) : () ),
         %templateParams
@@ -877,6 +930,36 @@ sub registerLogin {
     return
       unless ( $self->conf->{loginHistoryEnabled}
         and defined $req->authResult );
+
+    # Check old login history
+    if ( $req->sessionInfo->{loginHistory} ) {
+
+        if ( !$req->sessionInfo->{_loginHistory} ) {
+            $self->logger->debug("Restore old login history");
+
+            # Restore success login
+            $req->sessionInfo->{_loginHistory}->{successLogin} =
+              $req->sessionInfo->{loginHistory}->{successLogin};
+
+            # Restore failed login, with generic error
+            if ( $req->sessionInfo->{loginHistory}->{failedLogin} ) {
+                $self->logger->debug("Restore old failed logins");
+                $req->sessionInfo->{_loginHistory}->{failedLogin} = [];
+                foreach (
+                    @{ $req->sessionInfo->{loginHistory}->{failedLogin} } )
+                {
+                    $self->logger->debug(
+                        "Replace old failed login error " . $_->{error} );
+                    $_->{error} = 5;
+                    push @{ $req->sessionInfo->{_loginHistory}->{failedLogin} },
+                      $_;
+                }
+            }
+        }
+        $self->updatePersistentSession( $req, { 'loginHistory' => undef } );
+        delete $req->sessionInfo->{loginHistory};
+    }
+
     my $history = $req->sessionInfo->{_loginHistory} ||= {};
     my $type = ( $req->authResult > 0 ? 'failed' : 'success' ) . 'Login';
     $history->{$type} ||= [];
@@ -922,17 +1005,14 @@ sub _sumUpSession {
 sub loadTemplate {
     my ( $self, $name, %prm ) = @_;
     $name .= '.tpl';
-    my $file =
-        $self->conf->{templateDir} . '/'
-      . $self->conf->{portalSkin} . '/'
-      . $name;
-    $file = $self->conf->{templateDir} . '/common/' . $name
-      unless ( -e $file );
-    unless ( -e $file ) {
-        die "Unable to find $name in $self->conf->{templateDir}";
-    }
     my $tpl = HTML::Template->new(
-        filename               => $file,
+        filename => $name,
+        path     => [
+            $self->conf->{templateDir} . '/' . $self->conf->{portalSkin},
+            $self->conf->{templateDir} . '/bootstrap/',
+            $self->conf->{templateDir} . '/common/'
+        ],
+        search_path_on_include => 1,
         die_on_bad_params      => 0,
         die_on_missing_include => 1,
         cache                  => 1,

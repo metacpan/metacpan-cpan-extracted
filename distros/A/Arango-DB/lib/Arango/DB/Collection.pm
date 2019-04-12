@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::DB::Collection;
-$Arango::DB::Collection::VERSION = '0.004';
+$Arango::DB::Collection::VERSION = '0.005';
 use warnings;
 use strict;
 
@@ -11,7 +11,7 @@ sub _new {
 
 sub create_document {
     my ($self, $body) = @_;
-    die "Arango::DB | Refusing to store undefined body" unless defined($body) and ref($body) =~ /^(ARRAY|HASH)$/;
+    die "Arango::DB | Refusing to store undefined body" unless defined($body);
     return $self->{arango}->_api('create_document', { database => $self->{database}, collection => $self->{name}, body => $body})
 }
 
@@ -34,7 +34,7 @@ Arango::DB::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 USAGE
 
@@ -46,6 +46,7 @@ C<Arango::DB::Collection> answers to the following methods:
 =head2 C<create_document>
 
    $collection->create_document( { 'Hello' => 'World' } );
+   $collection->create_document( q!"{ "Hello": "World" }! );
 
 Stores a document in specified collection
 

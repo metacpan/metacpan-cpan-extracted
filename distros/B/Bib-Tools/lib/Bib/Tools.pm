@@ -26,7 +26,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 #use LWP::Protocol::https;
 #use Data::Dumper;
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(

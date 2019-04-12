@@ -36,6 +36,7 @@
             "Digest::SHA" : "0",
             "MIME::Base64" : "0",
             "Mail::Address" : "0",
+            "Mail::AuthenticationResults" : "1.20180215",
             "Net::DNS" : "0",
             "Net::DNS::Resolver::Mock" : "0",
             "Test::RequiresInternet" : "0",
@@ -45,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.54",
+   "version" : "0.55",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

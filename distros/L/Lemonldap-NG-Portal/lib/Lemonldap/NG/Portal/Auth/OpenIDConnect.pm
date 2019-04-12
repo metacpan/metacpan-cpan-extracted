@@ -9,14 +9,14 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth',
   'Lemonldap::NG::Portal::Lib::OpenIDConnect';
 
 # INTERFACE
 
-has opList   => ( is => 'rw', default => sub { [] } );
+has opList => ( is => 'rw', default => sub { [] } );
 has opNumber => ( is => 'rw', default => 0 );
 has path     => ( is => 'rw', default => 'oauth2' );
 
@@ -25,7 +25,7 @@ use constant sessionKind => 'OIDC';
 # INITIALIZATION
 
 sub init {
-    my ($self) = @_;
+    my $self = shift;
 
     return 0 unless ( $self->loadOPs and $self->refreshJWKSdata );
     my @tab = ( sort keys %{ $self->oidcOPList } );
@@ -41,10 +41,16 @@ sub init {
     #$portalPath =~ s#^https?://[^/]+/?#/#;
 
     foreach (@tab) {
-        my $name = $self->conf->{oidcOPMetaDataOptions}->{$_}
+        my $name = $_;
+        $name =
+          $self->conf->{oidcOPMetaDataOptions}->{$_}
+          ->{oidcOPMetaDataOptionsDisplayName}
+          if $self->conf->{oidcOPMetaDataOptions}->{$_}
           ->{oidcOPMetaDataOptionsDisplayName};
         my $icon = $self->conf->{oidcOPMetaDataOptions}->{$_}
           ->{oidcOPMetaDataOptionsIcon};
+        my $order = $self->conf->{oidcOPMetaDataOptions}->{$_}
+          ->{oidcOPMetaDataOptionsSortNumber} // 0;
         my $img_src;
 
         if ($icon) {
@@ -60,6 +66,7 @@ sub init {
             name  => $name,
             icon  => $img_src,
             class => "openidconnect",
+            order => $order
           };
     }
     $self->addRouteFromConf(
@@ -72,6 +79,12 @@ sub init {
         oidcServiceMetaDataFrontChannelURI => 'frontLogout',
         oidcServiceMetaDataBackChannelURI  => 'backLogout',
     );
+    @list =
+      sort {
+             $a->{order} <=> $b->{order}
+          or $a->{name} cmp $b->{name}
+          or $a->{val} cmp $b->{val}
+      } @list;
     $self->opList( [@list] );
     return 1;
 }

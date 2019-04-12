@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-require 'common.pl';
+require './common.pl';
 my $build_hash = ag_getbuild();
 
 my $pkg = ExtUtils::Depends->new('Alien::Gimp');

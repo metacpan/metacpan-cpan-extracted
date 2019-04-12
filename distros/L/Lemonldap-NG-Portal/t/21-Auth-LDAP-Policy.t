@@ -7,14 +7,13 @@ require 't/test-lib.pm';
 use lib 't/lib';
 
 my $res;
-my $maintests = 22;
+my $maintests = 24;
 
 SKIP: {
     skip( 'LLNGTESTLDAP is not set', $maintests ) unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -34,7 +33,9 @@ SKIP: {
     );
     use Lemonldap::NG::Portal::Main::Constants 'PE_PP_CHANGE_AFTER_RESET',
       'PE_PP_PASSWORD_EXPIRED', 'PE_PASSWORD_OK', 'PE_PP_ACCOUNT_LOCKED',
-      'PE_PP_PASSWORD_TOO_SHORT';
+      'PE_PP_PASSWORD_TOO_SHORT', 'PE_PP_GRACE';
+
+    my ( $user, $code, $postString, $match );
 
     # 1 - TEST PE_PP_CHANGE_AFTER_RESET AND PE_PP_PASSWORD_EXPIRED
     # ------------------------------------------------------------
@@ -43,11 +44,11 @@ SKIP: {
         [ 'expire', PE_PP_PASSWORD_EXPIRED ]
       )
     {
-        my $user       = $tpl->[0];
-        my $code       = $tpl->[1];
-        my $postString = "user=$user&password=$user";
+        $user       = $tpl->[0];
+        $code       = $tpl->[1];
+        $postString = "user=$user&password=$user";
 
-        # Try yo authenticate
+        # Try to authenticate
         # -------------------
         ok(
             $res = $client->_post(
@@ -57,7 +58,7 @@ SKIP: {
             ),
             'Auth query'
         );
-        my $match = 'trmsg="' . $code . '"';
+        $match = 'trmsg="' . $code . '"';
         ok( $res->[2]->[0] =~ /$match/, "Code is $code" );
 
         #open F, '>../e2e-tests/conf/portal/result.html' or die $!;
@@ -92,13 +93,13 @@ SKIP: {
         expectCookie($res) or print STDERR Dumper($res);
     }
 
-    # 2 - TEST PE_PP_ACCOUNT_LOCKED
+    # 2 - TEST PE_PP_GRACE
     # -------------------------
-    my $user       = 'lock';
-    my $code       = PE_PP_ACCOUNT_LOCKED;
-    my $postString = "user=$user&password=$user";
+    $user       = 'grace';
+    $code       = "ppGrace";
+    $postString = "user=$user&password=$user";
 
-    # Try yo authenticate
+    # Try to authenticate
     # -------------------
     ok(
         $res = $client->_post(
@@ -108,7 +109,26 @@ SKIP: {
         ),
         'Auth query'
     );
-    my $match = 'trmsg="' . $code . '"';
+    $match = 'trmsg="' . $code . '"';
+    ok( $res->[2]->[0] =~ /$match/, 'Grace remaining' );
+
+    # 3 - TEST PE_PP_ACCOUNT_LOCKED
+    # -------------------------
+    $user       = 'lock';
+    $code       = PE_PP_ACCOUNT_LOCKED;
+    $postString = "user=$user&password=$user";
+
+    # Try to authenticate
+    # -------------------
+    ok(
+        $res = $client->_post(
+            '/', IO::String->new($postString),
+            length => length($postString),
+            accept => 'text/html',
+        ),
+        'Auth query'
+    );
+    $match = 'trmsg="' . $code . '"';
     ok( $res->[2]->[0] =~ /$match/, 'Account is locked' );
 
     # Try to change anyway
@@ -125,13 +145,13 @@ SKIP: {
     $match = 'trmsg="' . PE_PASSWORD_OK . '"';
     ok( $res->[2]->[0] !~ /$match/s, 'Password is not changed' );
 
-    # 3 - TEST PE_PP_PASSWORD_TOO_SHORT
+    # 4 - TEST PE_PP_PASSWORD_TOO_SHORT
     # ---------------------------------
     $user       = 'short';
     $code       = PE_PP_PASSWORD_TOO_SHORT;
     $postString = "user=$user&password=passwordnottooshort";
 
-    # Try yo authenticate
+    # Try to authenticate
     # -------------------
     ok(
         $res = $client->_post(

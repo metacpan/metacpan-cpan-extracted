@@ -1,0 +1,65 @@
+NAME
+
+    IO::Async::Process::GracefulShutdown - controlled shutdown of a process
+
+SYNOPSIS
+
+       use IO::Async::Process::GracefulShutdown;
+    
+       use IO::Async::Loop;
+       my $loop = IO::Async::Loop;
+    
+       my $process = IO::Async::Process::GracefulShutdown->new(
+          command => [ "my-proc" ],
+       );
+    
+       $loop->add( $process );
+    
+       ...
+    
+       $process->shutdown( "TERM" )->get;
+
+DESCRIPTION
+
+    This subclass of IO::Async::Process adds a method to perform a shutdown
+    of the invoked process by sending a signal. If after some delay the
+    process has not yet exited, it is sent a SIGKILL instead.
+
+METHODS
+
+ finish_future
+
+       $f = $process->finish_future
+
+    Returns a Future that completes when the process finishes. It will
+    yield the exit code from the process.
+
+ shutdown
+
+       $process->shutdown( $signal, %args )->get
+
+    Requests the process shut down by sending it the given signal (either
+    specified by name or number). If the process does not shut down after a
+    timeout, SIGKILL is sent instead.
+
+    The returned future will complete when the process exits.
+
+    Takes the following named arguments:
+
+    timeout => NUM
+
+      Optional. Number of seconds to wait for exit before sending SIGKILL.
+      Defaults to 10 seconds.
+
+    on_kill => CODE
+
+      Optional. Callback to invoke if the timeout occurs and SIGKILL is
+      going to be sent. Intended for printing or logging purposes; this
+      doesn't have any material effect on the process otherwise.
+
+         $on_kill->( $process )
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

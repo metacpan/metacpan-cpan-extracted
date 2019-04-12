@@ -1,15 +1,15 @@
 # Math-ContinuedFraction
 
-## Version 0.13
+## Version 0.14
 
-## 9 April 2019
+## 10 April 2019
 
 Create and manipulate continued fractions in perl.
 
 This module is in an alpha state. Method names and parameters
-may change in the next release, aside from the methods "new()"
-and "from_ratio()". Fortunately, there aren't many other methods
-beyond that.
+may change in the next release, aside from the methods "new()",
+"from_ratio()", "from_root()". Fortunately, there aren't many
+other methods beyond that.
 
 Although the module uses Math::BigInt and Math::BigRat modules,
 the internal calculations to create the continued fraction are

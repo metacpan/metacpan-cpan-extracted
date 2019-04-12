@@ -24,10 +24,11 @@ void set_perl_error(const TryCatch& try_catch) {
     snprintf(
         message,
         1024,
-        "%s at %s:%d\n",
+        "%s at %s:%d:%d\n",
         *(String::Utf8Value(try_catch.Exception())),
         !msg.IsEmpty() ? *(String::AsciiValue(msg->GetScriptResourceName())) : "eval",
-        !msg.IsEmpty() ? msg->GetLineNumber() : 0
+        !msg.IsEmpty() ? msg->GetLineNumber() : 0,
+        !msg.IsEmpty() ? msg->GetStartColumn(): 0
     );
 
     sv_setpv(ERRSV, message);
@@ -222,6 +223,7 @@ public:
 class PerlFunctionData : public PerlObjectData {
 private:
     SV *rv;
+    Local<Value> *thisWrapped;
 
 protected:
     virtual Handle<Value> invoke(const Arguments& args);
@@ -235,13 +237,17 @@ public:
                   context_->make_function->Call(
                       context_->context->Global(),
                       1,
-                      &External::Wrap(this)
+                      thisWrapped = new Local<Value>(External::Wrap(this))
                   )
               ),
               cv
           )
        , rv(cv ? newRV_noinc(cv) : NULL)
     { }
+    
+    ~PerlFunctionData() {
+        delete thisWrapped;
+    }
 
     static Handle<Value> v8invoke(const Arguments& args) {
         PerlFunctionData* data = static_cast<PerlFunctionData*>(External::Unwrap(args[0]));
@@ -353,6 +359,8 @@ V8Context::~V8Context() {
       it->second.Dispose();
     }
     context.Dispose();
+    string_wrap.Dispose();
+    make_function.Dispose();
     while(!V8::IdleNotification()); // force garbage collection
 }
 
@@ -364,11 +372,21 @@ V8Context::bind(const char *name, SV *thing) {
     context->Global()->Set(String::New(name), sv2v8(thing));
 }
 
+void
+V8Context::bind_ro(const char *name, SV *thing) {
+    HandleScope scope;
+    Context::Scope context_scope(context);
+
+    context->Global()->ForceSet(String::New(name), sv2v8(thing),
+        v8::PropertyAttribute(v8::ReadOnly | v8::DontDelete));
+}
+
 void V8Context::name_global(const char *name) {
     HandleScope scope;
     Context::Scope context_scope(context);
 
-    context->Global()->Set(String::New(name), context->Global());
+    context->Global()->ForceSet(String::New(name), context->Global(),
+        v8::PropertyAttribute(v8::ReadOnly | v8::DontDelete));
 }
 
 // I fucking hate pthreads, this lacks error handling, but hopefully works.
@@ -411,6 +429,7 @@ private:
             V8::TerminateExecution();
         }
         pthread_mutex_unlock(&me->mutex_);
+        return NULL;
     }
 
     pthread_t id_;
@@ -444,6 +463,9 @@ V8Context::eval(SV* source, SV* origin) {
             return &PL_sv_undef;
         } else {
             sv_setsv(ERRSV,&PL_sv_undef);
+            if (GIMME_V == G_VOID) {
+                return &PL_sv_undef;
+            }
             return v82sv(val);
         }
     }
@@ -457,6 +479,10 @@ V8Context::sv2v8(SV *sv, HandleMap& seen) {
         // Upgrade string to UTF-8 if needed
         char *utf8 = SvPVutf8_nolen(sv);
         return String::New(utf8, SvCUR(sv));
+    }
+    if (SvUOK(sv)) {
+        UV v = SvUV(sv);
+        return (v < 0xffffffffUL) ? (Handle<Number>)Integer::NewFromUnsigned(v) : Number::New(SvNV(sv));
     }
     if (SvIOK(sv)) {
         IV v = SvIV(sv);
@@ -496,10 +522,10 @@ SV* V8Context::seen_v8(Handle<Object> object) {
 SV *
 V8Context::v82sv(Handle<Value> value, SvMap& seen) {
     if (value->IsUndefined())
-        return &PL_sv_undef;
+        return newSV(0);
 
     if (value->IsNull())
-        return &PL_sv_undef;
+        return newSV(0);
 
     if (value->IsInt32())
         return newSViv(value->Int32Value());
@@ -615,8 +641,14 @@ V8Context::rv2v8(SV *rv, HandleMap& seen) {
     }
 
 #if PERL_VERSION > 8
-    if (SvOBJECT(sv))
+    if (SvOBJECT(sv)) {
+        const char *Perl_class = sv_reftype(sv, 1);
+        if ((0 == strcmp(Perl_class, "JSON::PP::Boolean"))
+            || (0 == strcmp(Perl_class, "JSON::XS::Boolean"))
+        )
+            return Boolean::New(sv_2bool(sv));
         return blessed2object(sv);
+    }
 #endif
 
     unsigned t = SvTYPE(sv);
@@ -681,7 +713,6 @@ SV*
 V8Context::array2sv(Handle<Array> array, SvMap& seen) {
     AV *av = newAV();
     SV *rv = newRV_noinc((SV*)av);
-    SvREFCNT_inc(rv);
 
     seen.add(array, PTR2IV(av));
 
@@ -700,7 +731,6 @@ V8Context::object2sv(Handle<Object> obj, SvMap& seen) {
 
     HV *hv = newHV();
     SV *rv = newRV_noinc((SV*)hv);
-    SvREFCNT_inc(rv);
 
     seen.add(obj, PTR2IV(hv));
 
@@ -750,10 +780,10 @@ my_gv_setsv(pTHX_ GV* const gv, SV* const sv){
         V8Context      *self = data->context; \
         Handle<Context> ctx  = self->context; \
         Context::Scope  context_scope(ctx); \
-        Handle<Value>   argv[items - ARGS_OFFSET]; \
+        vector<Handle<Value> > argv; \
 \
         for (I32 i = ARGS_OFFSET; i < items; i++) { \
-            argv[i - ARGS_OFFSET] = self->sv2v8(ST(i)); \
+            argv.push_back(self->sv2v8(ST(i))); \
         }
 
 #define CONVERT_V8_RESULT(POP) \
@@ -794,14 +824,14 @@ XSRETURN(count);
 
 XS(v8closure) {
     SETUP_V8_CALL(0)
-    Handle<Value> result = Handle<Function>::Cast(data->object)->Call(ctx->Global(), items, argv);
+    Handle<Value> result = Handle<Function>::Cast(data->object)->Call(ctx->Global(), items, &argv[0]);
     CONVERT_V8_RESULT()
 }
 
 XS(v8method) {
     SETUP_V8_CALL(1)
     V8ObjectData* This = (V8ObjectData*)SvIV((SV*)SvRV(ST(0)));
-    Handle<Value> result = Handle<Function>::Cast(data->object)->Call(This->object, items - 1, argv);
+    Handle<Value> result = Handle<Function>::Cast(data->object)->Call(This->object, items - 1, &argv[0]);
     CONVERT_V8_RESULT(POPs);
 }
 

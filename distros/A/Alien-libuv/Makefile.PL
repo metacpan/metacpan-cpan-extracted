@@ -23,7 +23,7 @@ if ($^O eq 'MSWin32') {
         die("OS unsupported\nWindows needs to be Win7 or higher.\n");
     }
 }
-elsif ($^O eq 'gnukfreebsd' or $^O eq 'netbsd') {
+elsif ($^O eq 'gnukfreebsd') {
     die("OS unsupported\n");
 }
 
@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "1.009",
+  "VERSION" => "1.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -39,6 +39,7 @@
             "Data::Sah::Compiler::perl::TH::int" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "HTTP::BrowserDetect" : "0",
+            "HTTP::UserAgentStr::Util::ByNickname" : "0",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Base" : "1.816",
             "Perinci::CmdLine::Classic" : "1.770",
@@ -70,12 +71,17 @@
          "web" : "https://github.com/perlancar/perl-App-HTTPUserAgentUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript http-ua-by-nickname",
+            "version" : "0.421"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript gen-random-http-ua",
@@ -84,6 +90,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript parse-http-ua",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript rand-http-ua",
             "version" : "0.421"
          },
          {
@@ -385,7 +396,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

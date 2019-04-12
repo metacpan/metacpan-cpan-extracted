@@ -39,6 +39,7 @@ my %WriteMakefileArgs = (
     "lib/Alien/Build/Interpolate.pm"                     => "\$(INST_LIB)/Alien/Build/Interpolate.pm",
     "lib/Alien/Build/Interpolate/Default.pm"             => "\$(INST_LIB)/Alien/Build/Interpolate/Default.pm",
     "lib/Alien/Build/MM.pm"                              => "\$(INST_LIB)/Alien/Build/MM.pm",
+    "lib/Alien/Build/Manual/Alien.pod"                   => "\$(INST_LIB)/Alien/Build/Manual/Alien.pod",
     "lib/Alien/Build/Manual/AlienAuthor.pod"             => "\$(INST_LIB)/Alien/Build/Manual/AlienAuthor.pod",
     "lib/Alien/Build/Manual/AlienUser.pod"               => "\$(INST_LIB)/Alien/Build/Manual/AlienUser.pod",
     "lib/Alien/Build/Manual/Contributing.pod"            => "\$(INST_LIB)/Alien/Build/Manual/Contributing.pod",
@@ -124,7 +125,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0"              => "0.000060"
   },
-  "VERSION" => "1.63",
+  "VERSION" => "1.65",
   "test"    => {
     "TESTS" => "t/*.t"
   }

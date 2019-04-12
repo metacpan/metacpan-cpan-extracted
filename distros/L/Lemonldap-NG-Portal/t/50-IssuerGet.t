@@ -45,7 +45,7 @@ ok(
 );
 count(1);
 ok( $res->[2]->[0] =~ /trmsg="92"/, 'Reject reason is 92' )
-    or print STDERR Dumper( $res->[2]->[0] );
+  or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
 # Try to authenticate with an authorized user

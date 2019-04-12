@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 sub compactConf {
     my ( $self, $conf ) = @_;
@@ -24,6 +24,7 @@ sub compactConf {
             s/^(\w+).*$/lc($1)/e;
             s/OpenIDConnect/oidc/i;
             $keep{$_} = 1;
+            if ( $_ eq "ad" ) { $keep{'ldap'} = 1; }
         }
     }
     if ( $keep{choice} ) {
@@ -33,6 +34,7 @@ sub compactConf {
                 s/^(\w+).*$/lc($1)/e;
                 s/OpenIDConnect/oidc/i;
                 $keep{$_} = 1;
+                if ( $_ eq "ad" ) { $keep{'ldap'} = 1; }
             }
         }
     }

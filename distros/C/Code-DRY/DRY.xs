@@ -30,7 +30,6 @@ unsigned int *LCP= 0;
 //unsigned int *RANKS= 0;
 //unsigned int *LAST_RANK= 0;
 //unsigned int *RANKP= 0;
-unsigned char * T;
 size_t n= 0;
 
 /*AV *
@@ -100,6 +99,7 @@ INIT:
     unsigned int *sa;
     unsigned int *isa;
     unsigned int i;
+    unsigned char * T = NULL;
 CODE:
   if (!SA) {
     free(SA);
@@ -122,7 +122,6 @@ CODE:
  *   steal this input string from perl
  *   and set the original scalar to undef
  * */
-  //printf("len %u, >%s<\n",size, T);
 
   SA  = (unsigned int *)malloc((size_t)(size+1) * sizeof(int)); // +1 for computing LCP
   LCP = (unsigned int *)malloc((size_t) size    * sizeof(int));
@@ -336,29 +335,6 @@ fprintf(stderr, "  at %u: offset (%u) set lcp from %u to 0\n", ISA[offset], offs
       }
    }
 
-SV *
-get_substr_from_input(offset=0, length=n)
-  unsigned offset;
-  unsigned length;
-CODE:
-  if (-(int)offset > 0) {
-    offset = n +(int)offset;
-  }
-  if (offset > n) {
-    RETVAL = &PL_sv_undef;
-  } else {
-    if (-(int)length > 0) {
-      length = n +(int)length;
-    }
-    if (length > n - offset) {
-      length = n - offset;
-    }
-    RETVAL = newSVpvn(T+offset,length);
-  }
-OUTPUT:
-  RETVAL
-
-
 AV *
 get_sa()
 INIT:
@@ -440,9 +416,16 @@ OUTPUT:
 void
 __free_all()
 CODE:
-  free(SA);
-  free(LCP);
-  free(ISA);
+  if (!SA) {
+    free(SA);
+  }
+  if (!LCP) {
+    free(LCP);
+  }
+  if (!ISA) {
+    free(ISA);
+  }
+  SA = LCP = ISA = 0;
   n = 0;
 
   

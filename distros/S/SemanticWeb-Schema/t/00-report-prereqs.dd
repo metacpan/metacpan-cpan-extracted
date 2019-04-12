@@ -29,8 +29,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.1',
-                                      'utf8' => '0'
+                                      'perl' => 'v5.10.1'
                                     }
                     },
        'test' => {

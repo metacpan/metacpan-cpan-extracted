@@ -10,8 +10,10 @@ Makefile.PL
 README
 dist.ini
 lib/Text/Parser.pm
+lib/Text/Parser/AutoSplit.pm
 lib/Text/Parser/Multiline.pm
 t/Spice-Parser-3.t
+t/Spice-Parser-4.t
 t/Spice-Parser.t
 t/Text-Parser-csv-02.t
 t/Text-Parser-csv-03.t
@@ -19,6 +21,7 @@ t/Text-Parser-pod-01.t
 t/Text-Parser-pod-02.t
 t/Text-Parser-pod-03.t
 t/Text-Parser-pod-04.t
+t/Text-Parser-pod-05.t
 t/Text-Parser.t
 t/author-minimum-version.t
 t/author-pod-coverage.t
@@ -36,6 +39,7 @@ t/example-3.sp
 t/example-4.sp
 t/example-5.sp
 t/example.sp
+t/input.txt
 t/join-backslash.t
 t/lines-whitespace.txt
 t/mult-basic.t

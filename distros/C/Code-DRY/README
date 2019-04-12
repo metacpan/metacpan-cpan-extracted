@@ -22,9 +22,6 @@ Core module File::Find will be used for scanning directories.
 
 Core module Test::More and optionally non core module Test::Output is used in the tests.
 
-Test::Distribution, Test::Kwalitee, Test::CheckManifest, Test::Pod, Test::Pod::Coverage
-are needed for extra tests in the xt directory.
-
 Core module Getopt::Long is used in the application CP_reporter
 
 Optional module Term::ANSIColor is used by CP_reporter

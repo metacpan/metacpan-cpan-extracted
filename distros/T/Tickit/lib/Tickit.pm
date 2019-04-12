@@ -9,7 +9,7 @@ use strict;
 use warnings;
 
 BEGIN {
-   our $VERSION = '0.66';
+   our $VERSION = '0.67';
 }
 
 use Carp;
@@ -408,9 +408,9 @@ sub setup_term
 
    $term->await_started( 0.100 ); # 100 msec
 
-   $term->setctl_int( altscreen => 1 ) if $self->{use_altscreen};
-   $term->setctl_int( cursorvis => 0 );
-   $term->setctl_int( mouse     => Tickit::Term::TERM_MOUSEMODE_DRAG );
+   $term->setctl( altscreen => 1 ) if $self->{use_altscreen};
+   $term->setctl( cursorvis => 0 );
+   $term->setctl( mouse     => Tickit::Term::TERM_MOUSEMODE_DRAG );
    $term->clear;
 
    if( my $widget = $self->{root_widget} ) {
@@ -439,14 +439,14 @@ sub teardown_term
    my $term = $self->term;
 
    if( $self->{use_altscreen} ) {
-      $term->setctl_int( altscreen => 0 );
+      $term->setctl( altscreen => 0 );
    }
    else {
       $term->goto( $term->get_size );
    }
 
-   $term->setctl_int( cursorvis => 1 );
-   $term->setctl_int( mouse     => 0 );
+   $term->setctl( cursorvis => 1 );
+   $term->setctl( mouse     => 0 );
 
    $term->flush;
 }

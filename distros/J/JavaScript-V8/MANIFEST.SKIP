@@ -39,4 +39,5 @@
 .*\.gz$
 
 .*\.so$
-MYMETA.yml
+MYMETA\..*
+\.swp$

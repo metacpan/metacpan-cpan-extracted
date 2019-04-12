@@ -4,13 +4,13 @@
       "David Leadbeater <dgl@dgl.cx>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Protocol-Redis-XS",
    "no_index" : {
@@ -22,31 +22,51 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Protocol::Redis" : "0.9001",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::Depends" : 0,
+            "Alien::Base" : "1.65",
+            "Alien::hiredis" : "0.003",
+            "ExtUtils::Depends" : "0",
             "ExtUtils::MakeMaker" : "6.31",
-            "XS::Object::Magic" : 0
+            "XS::Object::Magic" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Protocol::Redis" : "0.9001",
-            "XS::Object::Magic" : 0,
-            "XSLoader" : 0,
-            "parent" : 0
+            "XS::Object::Magic" : "0",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Protocol::Redis::Test" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dgl/protocol-redis-xs/issues"
+      },
       "repository" : {
-         "url" : "https://github.com/dgl/protocol-redis-xs"
-      }
+         "type" : "git",
+         "url" : "https://github.com/dgl/protocol-redis-xs.git",
+         "web" : "https://github.com/dgl/protocol-redis-xs"
+      },
+      "x_IRC" : "irc://irc.perl.org/#redis"
    },
-   "version" : "0.05"
+   "version" : "0.06",
+   "x_contributors" : [
+      "Dan Book <grinnz@grinnz.com>",
+      "Mike Magowan <mike@magowan.co.uk>",
+      "Sergey Zasenko <d3fin3@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

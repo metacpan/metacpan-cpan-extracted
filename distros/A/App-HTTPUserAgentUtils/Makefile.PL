@@ -15,7 +15,9 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-HTTPUserAgentUtils",
   "EXE_FILES" => [
     "script/gen-random-http-ua",
-    "script/parse-http-ua"
+    "script/http-ua-by-nickname",
+    "script/parse-http-ua",
+    "script/rand-http-ua"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -24,6 +26,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "HTTP::BrowserDetect" => 0,
+    "HTTP::UserAgentStr::Util::ByNickname" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
@@ -38,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +53,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "File::Spec" => 0,
   "HTTP::BrowserDetect" => 0,
+  "HTTP::UserAgentStr::Util::ByNickname" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => 0,

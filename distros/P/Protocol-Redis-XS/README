@@ -10,7 +10,7 @@ SYNOPSIS
 
 DESCRIPTION
     This provides a fast parser for the Redis protocol using the code from
-    hiredis <http://github.com/antirez/hiredis> and with API compatibility
+    hiredis <https://github.com/redis/hiredis> and with API compatibility
     with Protocol::Redis.
 
     (If you've found yourself here just looking to use Redis in Perl: This
@@ -43,7 +43,7 @@ METHODS
 
 THREADS
     This module will work on a threaded perl and will work with threads,
-    however instances of Protcol::Redis should not be shared between
+    however instances of Protocol::Redis should not be shared between
     threads.
 
 SUPPORT
@@ -52,12 +52,6 @@ SUPPORT
 
 DEVELOPMENT
     See github: <https://github.com/dgl/protocol-redis-xs>.
-
-    Developer note, hiredis is pulled in via a git submodule, run:
-
-     git submodule update --init
-
-    to make the development version buildable.
 
 AUTHOR
     David Leadbeater <dgl@dgl.cx>
@@ -74,9 +68,6 @@ COPYRIGHT AND LICENSE
 
     See http://dev.perl.org/licenses/ for more information.
 
-    The hiredis library included in this distribution has a seperate license
-    (3 clause BSD). See hiredis/COPYING.
-
 SEE ALSO
-    Redis, Redis::hiredis, AnyEvent::Redis, Protocol::Redis.
+    Redis, Redis::hiredis, Mojo::Redis, AnyEvent::Redis, Protocol::Redis.
 

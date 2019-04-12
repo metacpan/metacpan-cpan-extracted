@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -27,7 +27,7 @@ has InitCmd => (
 # INITIALIZATION
 
 sub init {
-    my ($self) = @_;
+    my $self = shift;
     my $file;
     unless ( $file = $self->conf->{krbKeytab} ) {
         $self->error('Keytab not defined');
@@ -114,6 +114,7 @@ sub extractFormInfo {
             #$self->p->setHiddenFormValue( $req, kerberos => 0, '', 0 );
             eval( $self->InitCmd );
             die 'Unable to launch init commmand ' . $self->{InitCmd} if ($@);
+            $req->data->{waitingMessage} = 1;
             return PE_FIRSTACCESS;
         }
     }

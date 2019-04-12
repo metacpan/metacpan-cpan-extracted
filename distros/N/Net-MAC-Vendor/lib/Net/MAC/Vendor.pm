@@ -1,9 +1,11 @@
-package Net::MAC::Vendor; # git description: 9a6f169
+package Net::MAC::Vendor; # git description: v1.263-8-g8a60efe
 # ABSTRACT: Look up the vendor for a MAC
 
 use strict;
+use warnings;
+use 5.010;
 
-use v5.10;
+use Net::SSLeay;
 
 #pod =head1 SYNOPSIS
 #pod
@@ -73,7 +75,7 @@ use Carp ();
 use Mojo::URL;
 use Mojo::UserAgent;
 
-our $VERSION = '1.263';
+our $VERSION = '1.264';
 
 #pod =item run( @macs )
 #pod
@@ -161,12 +163,19 @@ sub lookup {
 #pod
 #pod 	:d:93               # missing all leading zeros
 #pod
+#pod The input string can also be a blessed L<NetAddr::MAC> object.
+#pod
 #pod =cut
 
 sub normalize_mac {
 	no warnings 'uninitialized';
 
-	my $input = uc shift;
+	my $input = shift;
+
+	return uc($input->as_microsoft)
+	    if ref $input eq 'NetAddr::MAC';
+
+	$input = uc $input;
 
 	do {
 		Carp::carp "Could not normalize MAC [$input]";
@@ -608,7 +617,7 @@ Net::MAC::Vendor - Look up the vendor for a MAC
 
 =head1 VERSION
 
-version 1.263
+version 1.264
 
 =head1 SYNOPSIS
 
@@ -718,6 +727,8 @@ only need the first three bytes
 	0:d:93              # missing leading zero
 
 	:d:93               # missing all leading zeros
+
+The input string can also be a blessed L<NetAddr::MAC> object.
 
 =item fetch_oui( MAC )
 
@@ -868,7 +879,7 @@ brian d foy <bdfoy@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords brian d foy Karen Etheridge Frank Maas openstrike
+=for stopwords brian d foy Karen Etheridge Frank Maas openstrike Dean Hamstead
 
 =over 4
 
@@ -887,6 +898,10 @@ Frank Maas <maas.frank@gmail.com>
 =item *
 
 openstrike <git@openstrike.co.uk>
+
+=item *
+
+Dean Hamstead <dean@fragfest.com.au>
 
 =back
 

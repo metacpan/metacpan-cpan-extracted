@@ -25,7 +25,7 @@ SKIP: {
                 portalDisplayRegister    => 1,
                 registerDB               => 'Demo',
                 captcha_register_enabled => 0,
-                requireToken             => 1,
+                requireToken             => '!$env->{ipAddr} || $env->{ipAddr} ne "127.1.1.1"',
             }
         }
     );

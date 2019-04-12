@@ -16,7 +16,7 @@ use namespace::autoclean;
 use Encode qw//;
 use Moo;
 
-our $VERSION = '3.0.4'; # VERSION
+our $VERSION = '3.0.6'; # VERSION
 
 
 has 'value' => ( is => 'ro' );
@@ -78,7 +78,7 @@ MarpaX::ESLIF::String - ESLIF String is any string value with encoding attribute
 
 =head1 VERSION
 
-version 3.0.4
+version 3.0.6
 
 =head1 DESCRIPTION
 

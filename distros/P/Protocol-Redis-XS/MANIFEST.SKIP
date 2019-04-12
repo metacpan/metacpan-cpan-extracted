@@ -34,9 +34,9 @@
 
 .*\.o$
 ^[^/]+\.c$
-^hiredis/(async|adapters|example|dict|test|Makefile)
 .*\.bs$
 .*\.gz$
 
 .*\.so$
 MYMETA.yml
+MYMETA.json

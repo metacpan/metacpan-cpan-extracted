@@ -1,7 +1,7 @@
 package Mail::DKIM::Iterator;
 use v5.10.0;
 
-our $VERSION = '1.007';
+our $VERSION = '1.008';
 
 use strict;
 use warnings;
@@ -229,35 +229,27 @@ sub _compute_result {
 	    next;
 	}
 
-	if (my $txt = $self->{records}{$dns}) {
-	    if (!ref($txt) || ref($txt) eq 'ARRAY') {
-		# Take the first syntactically valid DKIM key from the list of
-		# TXT records.
-		my $error = "no TXT records";
-		for(ref($txt) ? @$txt:$txt) {
-		    if (my $r = parse_dkimkey($_,\$error)) {
-			$self->{records}{$dns} = $txt = $r;
-			$error = undef;
-			last;
-		    }
-		}
-		if ($error) {
-		    $self->{records}{$dns} = $txt = { permfail => $error };
+	my $txt = $self->{records}{$dns};
+	if ($txt and !ref($txt) || ref($txt) eq 'ARRAY') {
+	    # Take the first syntactically valid DKIM key from the list of
+	    # TXT records.
+	    my $error = "no TXT records";
+	    for(ref($txt) ? @$txt:$txt) {
+		if (my $r = parse_dkimkey($_,\$error)) {
+		    $self->{records}{$dns} = $txt = $r;
+		    $error = undef;
+		    last;
 		}
 	    }
-
-	    my @v = _verify_sig($sig,$txt);
-	    push @rv, Mail::DKIM::Iterator::VerifyRecord->new($sig,$dns,@v);
-	    $sig->{':result'} = $rv[-1] if @v; # final result
-
-	} elsif (exists $self->{records}{$dns}) {
-	    # cannot get DKIM record
-	    push @rv, $sig->{':result'} = Mail::DKIM::Iterator::VerifyRecord
-		->new($sig,$dns, DKIM_TEMPERROR, "dns lookup failed");
-	} else {
-	    # no DKIM record yet known for $dns - preliminary result
-	    push @rv, Mail::DKIM::Iterator::VerifyRecord->new($sig,$dns);
+	    $self->{records}{$dns} = $txt = { permfail => $error }
+		if $error;
 	}
+
+	my @v = _verify_sig($sig,$txt);
+	@v = (DKIM_TEMPERROR, "dns lookup failed")
+	    if !@v and exists $self->{records}{$dns};
+	push @rv, Mail::DKIM::Iterator::VerifyRecord->new($sig,$dns,@v);
+	$sig->{':result'} = $rv[-1] if @v; # we got a final result
     }
     return ($self->{_last_result} = \@rv);
 }
@@ -498,6 +490,14 @@ sub sign {
 # (DKIM_PASS) in case of no error.
 sub _verify_sig {
     my ($sig,$param) = @_;
+
+    # check pre-computed hash over body if body done
+    if (defined $sig->{'bh:computed'}
+	and $sig->{'bh:computed'} ne $sig->{'bh:bin'}) {
+	return (DKIM_FAIL, 'body hash mismatch');
+    }
+    return if ! $param;
+
     return (DKIM_PERMERROR,"none or invalid dkim record") if ! %$param;
     return (DKIM_TEMPERROR,$param->{tempfail}) if $param->{tempfail};
     return (DKIM_PERMERROR,$param->{permfail}) if $param->{permfail};
@@ -514,11 +514,8 @@ sub _verify_sig {
     return ($FAIL,"identity does not match granularity")
 	if $param->{g} && $sig->{i} !~ $param->{g};
 
-    # pre-computed hash over body
-    return if ! defined $sig->{'bh:computed'}; # not yet computed
-    if ($sig->{'bh:computed'} ne $sig->{'bh:bin'}) {
-	return ($FAIL,'body hash mismatch');
-    }
+    # needs bh:computed to continue
+    return if ! defined $sig->{'bh:computed'};
 
     if (!eval {
 	my $rsa = Crypt::OpenSSL::RSA->new_public_key(do {
@@ -529,7 +526,7 @@ sub _verify_sig {
 	}) or die [DKIM_PERMERROR,"using public key failed"];
 	$rsa->use_no_padding;
 	my $bencrypt = eval { $rsa->encrypt($sig->{'b:bin'}) }
-	    or die die [DKIM_PERMERROR,"header sig corrupt"];
+	    or die [DKIM_PERMERROR,"header sig corrupt"];
 	my $expect = _emsa_pkcs1_v15(
 	    $sig->{'a:hash'},$sig->{'h:hash'},$rsa->size);
 	if ($expect ne $bencrypt) {

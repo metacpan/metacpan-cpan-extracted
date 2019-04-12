@@ -5,7 +5,7 @@ package Lemonldap::NG::Handler::PSGI::Main;
 
 use strict;
 use base 'Lemonldap::NG::Handler::Main';
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 # Specific modules and constants for Test or CGI
 use constant FORBIDDEN         => 403;
@@ -47,7 +47,7 @@ sub set_user {
 sub set_header_in {
     my ( $class, $req, %headers ) = @_;
     while ( my ( $h, $v ) = each %headers ) {
-        $req->{env}->{ cgiName($h) } = $v;
+        $req->{env}->{ cgiName($h) } = $v if ( defined $v );
     }
 }
 

@@ -1,0 +1,213 @@
+==================================================
+Changes from 2018-04-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2019-04-12 21:26:24 +0000
+------------------------------------------
+
+  Change: 15cb5cfbbb180d8371adb7f59f0eec9bb99ebc9c
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-12 23:25:35 +0000
+
+    Add CHANGES and github meta links 
+
+------------------------------------------
+version 0.004 at 2019-04-12 21:17:26 +0000
+------------------------------------------
+
+  Change: 3b987c5b75b1a1962903ff4f8e76304f89514507
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-12 23:17:26 +0000
+
+    Summarization size threshold varies by platform.
+
+    After several rounds of CPAN tester feedback that this module's tests
+    fail on every architecture aside from x86_64 (that is, my laptop), it
+    has become apparent that the module needs to be a little smarter
+    about how Perl's memory footprint varies according to arch. In order
+    to do so, I've introduced an 'exemplar' large data structure that
+    seems like a sane max size.
+
+    Additionally, this commit introduces the 'diagnostic' param to
+    Test2's 'like': future failed tests should be a little clearer. 
+
+  Change: f1648657f3bcf7a3c915f533a60c5cf3f1b99e49
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-12 23:17:02 +0000
+
+    Scalar truncation size: 512 -> 256
+
+    This creates a bit of symmetry with the scalar sample size (64 bytes)
+    and ref key sample count (4).
+
+    I think this is still reasonable, but I suspect that rather than
+    trying to tune this size to be exactly right it'd be better to
+    support a 'slice'-ish syntax for people to be able to pick chunks out
+    of strings or arrays. 
+
+  Change: fd63da821b3557a08a40273d692918c7145c4c02
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-12 23:16:11 +0000
+
+    CPANTS prefers a README in the dist
+
+    So include it by copying intead of moving it out. 
+
+  Change: 81698fdc777bb8c7a4236522d92c120a7a17e96c
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-12 23:16:07 +0000
+
+    Focus on 'length', not 'bytes' for non ref scalars
+
+    'Size in bytes' is misleading when we're really talking about
+    'substr'. 
+
+  Change: 80116adde79839ac7187cdcdb09fa05dbb39a37a
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-12 21:49:41 +0000
+
+    Silence Pod::Weaver warning about ABSTRACT 
+
+------------------------------------------
+version 0.003 at 2019-04-11 16:31:42 +0000
+------------------------------------------
+
+  Change: d223e70671f124d1982f2e9d377ed93a6a6e04ba
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 18:31:42 +0000
+
+    v0.003 
+
+  Change: fa57b025d9371e3257986fb1134173cc4e582ca1
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 18:30:24 +0000
+
+    s/lens/route/g
+
+    'lens' was a little too whimsical. I'm not convinced "route" is
+    wildly better, but it is a little less out there. 
+
+  Change: 863a26ef0c011a4ec13150e76f9ca17c77a96774
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 17:53:32 +0000
+
+    add generated README 
+
+  Change: 44281df2b439f5f197c08bb20aeef6991150bc48
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 17:52:15 +0000
+
+    fetch README from build 
+
+------------------------------------------
+version 0.002 at 2019-04-11 15:40:04 +0000
+------------------------------------------
+
+  Change: 2255094d56054048877b61b0be55c3fa2ba8ce8d
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 17:40:04 +0000
+
+    Add Git::NextVersion 
+
+  Change: 912b87fecc28e79d1e26c2f54475852c63647b5d
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 17:26:56 +0000
+
+    PodWeaver/README from pod 
+
+  Change: 879c1f646d36adb47b3cdd327840b3139193146d
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 17:26:34 +0000
+
+    Perl 5.10 minimum 
+
+  Change: 81f2bbccdc796a476806b62fe2ca5e33eca368b4
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 16:48:50 +0000
+
+    Change standard for "objectively large."
+
+    Tests were failing on 32-bit platforms because Devel::Size was
+    returning a small enough value to fall below the default threshold. 
+
+  Change: afc54876394570c690414c84639474c2feb5db16
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 01:37:16 +0000
+
+    duplicates with the bundles 
+
+------------------------------------------
+version 0.001 at 2019-04-10 23:17:02 +0000
+------------------------------------------
+
+  Change: 5c69c5cb6b531f996591addc235075f01c35c8a4
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 01:17:02 +0000
+
+    Add CPAN release to dist.ini 
+
+  Change: 628a8c836522e352bd44c73223a861d1ca1b0295
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 01:12:15 +0000
+
+    Tests for 'fit_to_view'
+
+    While writing the tests, realized that hash keys can also be
+    ginormous, and truncated them.
+
+    Making the default values constants allows for more robust tests. 
+
+  Change: 7b79717b271714b319c1d5eed7dcd449d479d4c6
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-11 00:13:02 +0000
+
+    Flip 'got' and 'expected' to match Test2 docs 
+
+  Change: d1d8935d40a1bc8c26f72152a42d1de5268906b7
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-10 23:21:12 +0000
+
+    Rename .t to match function name 
+
+  Change: b9f2806dcb8840ac865a19b477a393c3866a6353
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-10 18:09:04 +0000
+
+    More validation for lenses 
+
+  Change: 2dac75fe0972cd1ed1a93c1a533e553629b6571a
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-10 17:51:17 +0000
+
+    more tests for full_picture
+
+    * exception tests * negative index tests 
+
+  Change: b55cfb2e06183a8fd4d3d6a11c193fe7eebcd638
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-10 12:13:29 +0000
+
+    Document motivations around the lens syntax 
+
+  Change: 4937f70d445f88b4c80f9bbec3d60a0d864dc641
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-10 08:54:46 +0000
+
+    Test::More -> Test2 
+
+  Change: 16bd385c4906a3e74de991fb0c4a4472eca1cb8e
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-09 19:50:59 +0000
+
+    Remove 'serialize' hook; initial tests 
+
+  Change: 3683c6fae6a6ff09b8a1e6eb72d95ec745140980
+  Author: Ben Tyler <benjamin.tyler@booking.com>
+  Date : 2019-04-09 02:17:14 +0000
+
+    WIP 
+
+================
+End of releases.
+================

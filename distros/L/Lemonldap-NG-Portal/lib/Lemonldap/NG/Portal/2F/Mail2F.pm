@@ -4,18 +4,18 @@ use strict;
 use Mouse;
 use String::Random;
 use Lemonldap::NG::Portal::Main::Constants qw(
-    PE_BADCREDENTIALS
-    PE_ERROR
-    PE_FORMEMPTY
-    PE_OK
-    PE_SENDRESPONSE
-    PE_MUSTHAVEMAIL
+  PE_BADCREDENTIALS
+  PE_ERROR
+  PE_FORMEMPTY
+  PE_OK
+  PE_SENDRESPONSE
+  PE_MUSTHAVEMAIL
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor',
-    'Lemonldap::NG::Portal::Lib::SMTP';
+  'Lemonldap::NG::Portal::Lib::SMTP';
 
 # INITIALIZATION
 
@@ -31,28 +31,25 @@ has ott => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
-        my $ott = $_[0]->{p}
-            ->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
+        my $ott =
+          $_[0]->{p}->loadModule('Lemonldap::NG::Portal::Lib::OneTimeToken');
         $ott->timeout( $_[0]->{conf}->{mail2fTimeout}
-                || $_[0]->{conf}->{formTimeout} );
+              || $_[0]->{conf}->{formTimeout} );
         return $ott;
     }
 );
 
 sub init {
     my ($self) = @_;
-    foreach (qw(mail2fCodeRegex mailSessionKey)) {
-        unless ( $self->conf->{$_} ) {
-            $self->error("Missing $_ parameter, aborting");
-            return 0;
-        }
+    $self->{conf}->{mail2fCodeRegex} ||= '\d{6}';
+    unless ( $self->conf->{mailSessionKey} ) {
+        $self->error("Missing 'mailSessionKey' parameter, aborting");
+        return 0;
     }
     $self->logo( $self->conf->{mail2fLogo} )
-        if ( $self->conf->{mail2fLogo} );
+      if ( $self->conf->{mail2fLogo} );
     return $self->SUPER::init();
 }
-
-# RUNNING METHODS
 
 sub run {
     my ( $self, $req, $token ) = @_;
@@ -66,7 +63,7 @@ sub run {
     my $dest = $req->{sessionInfo}->{ $self->conf->{mailSessionKey} };
     unless ($dest) {
         $self->logger->error( "Could not find mail attribute for login "
-                . $req->{sessionInfo}->{_user} );
+              . $req->{sessionInfo}->{_user} );
         return PE_MUSTHAVEMAIL;
     }
 
@@ -80,7 +77,7 @@ sub run {
         $subject = 'mail2fSubject';
         $tr->( \$subject );
     }
-    my ($body, $html);
+    my ( $body, $html );
     if ( $self->conf->{mail2fBody} ) {
 
         # We use a specific text message, no html
@@ -144,7 +141,7 @@ sub verify {
     return PE_OK if ( $usercode eq $savedcode );
 
     $self->userLogger->warn( 'Second factor failed for '
-            . $session->{ $self->conf->{whatToTrace} } );
+          . $session->{ $self->conf->{whatToTrace} } );
     return PE_BADCREDENTIALS;
 }
 

@@ -47,8 +47,9 @@ sub try {
 
 sub iniCmb {
     my $expr = shift;
+    count(1);
     if (
-        my $res = LLNG::Manager::Test->new( {
+        my $client = LLNG::Manager::Test->new( {
                 ini => {
                     logLevel       => 'error',
                     useSafeJail    => 1,
@@ -68,7 +69,7 @@ sub iniCmb {
                                 dbiAuthLoginCol     => 'user',
                                 dbiAuthPasswordCol  => 'password',
                                 dbiAuthPasswordHash => '',
-                                dbiExportedVars     => {},
+                                dbiExportedVars     => '{"user":"user"}',
                             }
                         },
                         Dm => {
@@ -84,7 +85,15 @@ sub iniCmb {
       )
     {
         pass(qq'Expression loaded: "$expr"');
+        ok(
+            $client->{p}->{loadedModules}->{'Lemonldap::NG::Portal::Auth::DBI'}
+              ->{conf}->{dbiExportedVars}->{user} eq 'user',
+            'JSON is parsed'
+        );
         count(1);
-        return $res;
+        return $client;
+    }
+    else {
+        fail "Unable to build object";
     }
 }

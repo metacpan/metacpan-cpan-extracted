@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Conf::Zero;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir ) = @_;
@@ -147,6 +147,11 @@ sub zeroConf {
         'portal'              => "http://auth.$domain/",
         'notificationStorage' => 'File',
         'locationRules'       => {
+            "auth.$domain" => {
+                '(?#checkUser)^/checkuser' => '$uid eq "dwho"',
+                '(?#errors)^/lmerror/' => 'accept',
+                'default' => 'accept'
+            },
             "test1.$domain" => {
                 'default'  => 'accept',
                 '^/logout' => 'logout_sso'
@@ -157,7 +162,7 @@ sub zeroConf {
             },
             "manager.$domain" => {
                 'default' => '$uid eq "dwho" or $uid eq "rtyler"',
-                '(?#Configuration)^/(manager\.html|conf/)' => '$uid eq "dwho"',
+                '(?#Configuration)^/(manager\.html|confs|$)' => '$uid eq "dwho"',
                 '(?#Sessions)/sessions' => '$uid eq "dwho" or $uid eq "rtyler"',
                 '(?#Notifications)/notifications' =>
                   '$uid eq "dwho" or $uid eq "rtyler"',

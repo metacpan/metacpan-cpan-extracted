@@ -37,7 +37,12 @@ LemonLDAP::NG Portal jQuery scripts
         return $(this).text(txt);
       });
       $("[trmsg]").each(function() {
-        return $(this).text(translate("PE" + ($(this).attr('trmsg'))));
+        var msg;
+        $(this).text(translate("PE" + ($(this).attr('trmsg'))));
+        msg = translate("PE" + ($(this).attr('trmsg')));
+        if (msg.match(/_hide_/)) {
+          return $(this).parent().hide();
+        }
       });
       $("[trplaceholder]").each(function() {
         return $(this).attr('placeholder', translate($(this).attr('trplaceholder')));
@@ -78,6 +83,7 @@ LemonLDAP::NG Portal jQuery scripts
         return console.log('JSON', $(this).text());
       }
     });
+    console.log(values);
     return values;
   };
 
@@ -220,9 +226,6 @@ LemonLDAP::NG Portal jQuery scripts
     var action, al, authMenuTabs, back_url, i, l, lang, langdiv, langs, langs2, len, len1, len2, len3, link, m, menuIndex, menuTabs, method, n, nl, nlangs, re, ref, ref1, ref2;
     datas = getValues();
     window.datas = datas;
-    if (datas['antiframe'] && top !== self) {
-      top.location.href = location.href;
-    }
     $("#appslist").sortable({
       axis: "y",
       cursor: "move",

@@ -1,0 +1,49 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+
+      <span ng-if="!currentCfg.next" trspan="currentConfiguration"></span>
+      <span ng-if="currentCfg.next" trspan="loadedConfiguration"></span>
+      <i ng-if="currentCfg.prev && allowDiff">(<a trspan="diffWithPrevious" target="_blank" href="{{scriptname}}/viewDiff.html#!/{{currentCfg.cfgNum}}" role="link"></a>)</i>
+
+    </h3>
+  </div>
+  <table class="table table-striped">
+    <tr>
+      <th><span trspan="number"></span></th>
+      <td>
+        <span id="cfgnum" class="label label-success" comment="{{translateP('__newCfgAvailable__')}}" ng-class="{'label-warning':currentCfg.next}">{{currentCfg.cfgNum}}</span>
+      </td>
+    </tr>
+    <tr ng-if="currentCfg.cfgAuthor">
+      <th><span trspan="author"></span></th>
+      <td>{{currentCfg.cfgAuthor}}</td>
+    </tr>
+    <tr ng-if="currentCfg.cfgAuthorIP">
+      <th><span trspan="authorIPAddress"></span></th>
+      <td>{{currentCfg.cfgAuthorIP}}</td>
+    </tr>
+    <tr ng-if="currentCfg.cfgDate">
+      <th><span trspan="date"></span></th>
+      <td>{{currentCfg.date}}</td>
+    </tr>
+    <tr ng-if="currentCfg.cfgVersion">
+      <th><span trspan="cfgVersion"></span></th>
+      <td>{{currentCfg.cfgVersion}}</td>
+    </tr>
+    <tr ng-if="currentCfg.cfgLog">
+      <th><span trspan="cfgLog"></span></th>
+      <td id="cfglog">{{currentCfg.cfgLog}}</td>
+    </tr>
+  </table>
+</div>
+<script type="text/menu">
+[{
+  "title": "downloadIt",
+  "action": "downloadConf",
+  "icon": "export"
+},{
+  "title": "restore",
+  "icon": "import"
+}]
+</script>

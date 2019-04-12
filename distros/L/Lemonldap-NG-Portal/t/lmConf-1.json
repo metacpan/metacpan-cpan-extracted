@@ -31,9 +31,14 @@
     "LockDirectory": "t/sessions/lock",
     "generateModule": "Lemonldap::NG::Common::Apache::Session::Generate::SHA256"
   },
-  "groups": {},
+  "groups": { "su":"$uid eq \"rtyler\"" },
   "key": "qwertyui",
   "locationRules": {
+    "auth.example.com" : {
+       "(?#checkUser)^/checkuser" : "$uid eq \"dwho\" or $uid eq \"msmith\"",
+       "(?#errors)^/lmerror/": "accept",
+       "default" : "accept"
+    },
     "manager.example.com": {
       "(?#Configuration)^/(manager\\.html|conf/)": "$uid eq \"dwho\"",
       "(?#Notifications)^/notifications": "$uid eq \"dwho\" or $uid eq \"rtyler\"",
@@ -81,5 +86,10 @@
   "reloadUrls": {},
   "requireToken": 0,
   "userDB": "Same",
+  "vhostOptions": {
+    "test2.example.com": {
+      "vhostType": "AuthBasic"
+    }
+  },
   "whatToTrace": "_whatToTrace"
 }

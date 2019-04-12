@@ -40,7 +40,7 @@ no_index:
 provides:
   FusionInventory::Agent:
     file: lib/FusionInventory/Agent.pm
-    version: 2.4.3
+    version: '2.5'
 recommends:
   Archive::Extract: 0
   Compress::Zlib: 0
@@ -75,4 +75,4 @@ resources:
   homepage: http://www.fusioninventory.org
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/fusioninventory/fusioninventory-agent/
-version: 2.4.3
+version: '2.5'

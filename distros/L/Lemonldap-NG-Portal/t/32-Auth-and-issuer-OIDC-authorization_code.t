@@ -430,6 +430,7 @@ sub rp {
                         oidcOPMetaDataOptionsClientSecret => "rpsecret",
                         oidcOPMetaDataOptionsScope        => "openid profile",
                         oidcOPMetaDataOptionsStoreIDToken => 0,
+                        oidcOPMetaDataOptionsMaxAge       => 30,
                         oidcOPMetaDataOptionsDisplay      => "",
                         oidcOPMetaDataOptionsClientID     => "rpid",
                         oidcOPMetaDataOptionsConfigurationURI =>

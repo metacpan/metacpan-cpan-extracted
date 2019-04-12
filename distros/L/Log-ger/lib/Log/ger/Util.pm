@@ -1,7 +1,7 @@
 package Log::ger::Util;
 
-our $DATE = '2018-12-20'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2019-04-12'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 use strict;
 use warnings;
@@ -197,6 +197,7 @@ sub reinit_target {
 
 sub reinit_all_targets {
     for my $pkg (keys %Log::ger::Package_Targets) {
+        #print "D:reinit package $pkg\n";
         Log::ger::init_target(
             package => $pkg, $Log::ger::Package_Targets{$pkg});
     }
@@ -286,7 +287,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 DESCRIPTION
 
@@ -300,7 +301,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

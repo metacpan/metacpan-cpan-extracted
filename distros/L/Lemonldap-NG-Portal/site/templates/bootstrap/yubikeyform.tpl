@@ -6,6 +6,7 @@
     <input name="yubikeyOTP" type="text" class="form-control" trplaceholder="enterYubikey" aria-required="true" autocomplete="off" />
   </div>
 
+  <TMPL_INCLUDE NAME="impersonation.tpl">
   <TMPL_INCLUDE NAME="checklogins.tpl">
 
   <button type="submit" class="btn btn-success" >

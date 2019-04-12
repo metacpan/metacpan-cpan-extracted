@@ -61,11 +61,11 @@
         <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.min.js"></script>
       //else -->
         <script type="text/javascript" src="<TMPL_VAR NAME="STATIC_PREFIX">common/js/idpchoice.js"></script>
-      <!-- //endif --> 
+      <!-- //endif -->
 
       </div>
     </div>
-    
+
 	  <TMPL_IF NAME="PORTAL_URL">
 	    <div id="logout">
 	      <div class="buttons">
@@ -76,7 +76,7 @@
 	      </div>
 	    </div>
 	  </TMPL_IF>
-	  
+
   </form>
 
 </div>

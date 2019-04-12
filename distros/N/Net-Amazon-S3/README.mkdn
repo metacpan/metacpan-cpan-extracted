@@ -4,7 +4,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 # VERSION
 
-version 0.85
+version 0.86
 
 # SYNOPSIS
 
@@ -144,6 +144,10 @@ Create a new S3 client object. Takes some arguments:
     to S3. Defaults to `1`.
 
     To use SSL-encrypted connections, LWP::Protocol::https is required.
+
+- keep\_alive\_cache\_size
+
+    Set this to `0` to disable Keep-Alives.  Default is `10`.
 
 - timeout
 
@@ -424,7 +428,7 @@ Leo Lapworth <llap@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

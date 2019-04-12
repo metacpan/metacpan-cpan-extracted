@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm',
   'Lemonldap::NG::Portal::Lib::REST';
@@ -53,6 +53,7 @@ sub setAuthSessionInfo {
     $self->SUPER::setAuthSessionInfo($req);
     $req->sessionInfo->{$_} = $req->data->{restAuthInfo}->{$_}
       foreach ( keys %{ $req->data->{restAuthInfo} } );
+    $req->sessionInfo->{authenticationLevel} = $self->conf->{restAuthnLevel};
     return PE_OK;
 }
 

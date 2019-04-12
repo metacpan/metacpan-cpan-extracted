@@ -9,7 +9,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -51,6 +51,7 @@ sub extractFormInfo {
         $req->data->{customScript} .= $self->{AjaxInitScript};
         $self->logger->debug(
             "Send init/script -> " . $req->data->{customScript} );
+        $req->data->{waitingMessage} = 1;
         return PE_FIRSTACCESS;
     }
     else {
@@ -71,7 +72,7 @@ sub authenticate {
 
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
-    $req->{sessionInfo}->{authenticationLevel} = $self->conf->{SSLAuthnLevel};
+    $req->sessionInfo->{authenticationLevel} = $self->conf->{SSLAuthnLevel};
     PE_OK;
 }
 

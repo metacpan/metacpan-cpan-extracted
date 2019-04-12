@@ -12,7 +12,7 @@ use Unicode::String qw(utf8);
 use Scalar::Util 'weaken';
 use utf8;
 
-our $VERSION  = '2.0.2';
+our $VERSION  = '2.0.3';
 our $ppLoaded = 0;
 
 BEGIN {
@@ -207,10 +207,8 @@ sub userBind {
 
             # Get expiration warning and graces
             if ( $resp->grace_authentications_remaining ) {
-
-                # TODO
-                $self->info(
-                    $self->loadTemplate(
+                $req->info(
+                    $self->{portal}->loadTemplate(
                         'ldapPpGrace',
                         params => {
                             number => $resp->grace_authentications_remaining
@@ -221,7 +219,7 @@ sub userBind {
 
             if ( $resp->time_before_expiration ) {
                 $req->info(
-                    $self->loadTemplate(
+                    $self->{portal}->loadTemplate(
                         'simpleInfo',
                         params => {
                             trspan => 'authRemaining,'

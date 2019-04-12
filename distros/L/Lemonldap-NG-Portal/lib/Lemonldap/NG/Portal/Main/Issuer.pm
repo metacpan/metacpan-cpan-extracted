@@ -110,8 +110,10 @@ sub _redirect {
 
                     # Restore urldc if auth doesn't need to dial with browser
                     $self->restoreRequest( $req, $ir );
+                    delete $req->pdata->{ $self->ipath };
+                    delete $req->pdata->{ $self->ipath . 'Path' };
                     return $self->run( @_, @path );
-                }
+                  }
                 : ()
             )
         ]

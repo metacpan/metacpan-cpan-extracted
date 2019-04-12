@@ -7,8 +7,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -26,4 +26,5 @@ resources:
   bugtracker: https://github.com/mohawk2/Mail-POP3/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/mohawk2/Mail-POP3
-version: '3.09'
+version: '3.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

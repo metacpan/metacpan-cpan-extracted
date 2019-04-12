@@ -10,7 +10,7 @@ my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel     => 'error',
             useSafeJail  => 1,
-            requireToken => 1,
+            requireToken => '"Bad rule"',
         }
     }
 );

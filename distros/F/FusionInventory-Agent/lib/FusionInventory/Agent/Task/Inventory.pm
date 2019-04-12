@@ -50,12 +50,17 @@ sub run {
 
     $self->{modules} = {};
 
+    my $tag = $self->{config}->{'tag'};
+
     my $inventory = FusionInventory::Agent::Inventory->new(
         statedir => $self->{target}->getStorage()->getDirectory(),
         deviceid => $self->{deviceid},
         logger   => $self->{logger},
-        tag      => $self->{config}->{'tag'}
+        tag      => $tag
     );
+
+    $self->{logger}->info("New inventory from $self->{deviceid} for $self->{target}->{id}".
+        ( (defined($tag) && length($tag)) ? " (tag=$tag)" : "" ));
 
     # Set inventory as remote if running remote inventory like from wmi task
     $inventory->setRemote($self->getRemote()) if $self->getRemote();
@@ -73,6 +78,10 @@ sub run {
 
     $self->_initModulesList(\%disabled);
     $self->_feedInventory($inventory, \%disabled);
+
+    # Tell perl modules hash can now be cleaned from memory
+    delete $self->{modules};
+
     return unless $self->_validateInventory($inventory);
     $self->_submitInventory( %params, inventory => $inventory );
     return 1;
@@ -162,6 +171,18 @@ sub _submitInventory {
         return unless $response;
         $inventory->saveLastState();
 
+    } elsif ($self->{target}->isType('listener')) {
+
+        return $self->{logger}->error("Can't load Inventory XML Query API")
+            unless FusionInventory::Agent::XML::Query::Inventory->require();
+
+        my $query = FusionInventory::Agent::XML::Query::Inventory->new(
+            deviceid => $inventory->getDeviceId(),
+            content  => $inventory->getContent()
+        );
+
+        # Store inventory XML with the listener target
+        $self->{target}->inventory_xml($query->getContent());
     }
 
 }

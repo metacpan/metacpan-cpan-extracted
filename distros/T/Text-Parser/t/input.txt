@@ -1,0 +1,6 @@
+Some information in this file
+CSV_BELOW
+col1,col2,col3
+data1,1,1
+data2,2,4
+data3,3,9

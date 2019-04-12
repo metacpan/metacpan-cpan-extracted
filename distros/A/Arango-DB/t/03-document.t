@@ -20,6 +20,11 @@ my $list = $collection->document_paths();
 is ref($list) => "ARRAY" => "List of paths is an array";
 like $list->[0] => qr!/_db/tmp_/_api/document/collection/\d+! => "path looks right";
 
+$collection->create_document( q!{ "Hello" : "World" }! );
+$list = $collection->document_paths();
+
+is scalar(@$list), 2;
+
 $arango->delete_database("tmp_");
 
 done_testing;

@@ -1,5 +1,14 @@
 Revision history for Changes
 
+0.67    2019-04-10 19:42:06
+        [CHANGES]
+         * Use libtickit 0.3
+         * Build against installed library but do not bundle C source any more
+         * Provide generic ->setctl / ->getctl attribute methods
+
+        [BUGFIXES]
+         * Remember to EXTEND() the argument stack appropriately
+
 0.66    2019-02-20 22:20:39
         [CHANGES]
          * Switch build system to Module::Build::Using::PkgConfig

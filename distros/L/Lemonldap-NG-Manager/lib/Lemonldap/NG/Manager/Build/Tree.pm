@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 # TODO: Missing:
 #  * activeTimer
@@ -220,8 +220,8 @@ sub tree {
                             form  => 'simpleInputContainer',
                             help  => 'authkerberos.html',
                             nodes => [
-                                'krbKeytab',     'krbByJs',
-                                'krbAuthnLevel', 'krbRemoveDomain'
+                                'krbAuthnLevel', 'krbKeytab',
+                                'krbByJs',       'krbRemoveDomain'
                             ]
                         },
                         {
@@ -325,15 +325,15 @@ sub tree {
                             title => 'gpgParams',
                             help  => 'authgpg.html',
                             form  => 'simpleInputContainer',
-                            nodes => ['gpgDb'],
+                            nodes => [ 'gpgAuthnLevel', 'gpgDb' ],
                         },
                         {
                             title => 'proxyParams',
                             help  => 'authproxy.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'proxyAuthService', 'proxySessionService',
-                                'remoteCookieName', 'proxyAuthnLevel',
+                                'proxyAuthnLevel',     'proxyAuthService',
+                                'proxySessionService', 'remoteCookieName',
                                 'proxyUseSoap'
                             ]
                         },
@@ -341,7 +341,7 @@ sub tree {
                             title => 'pamParams',
                             help  => 'authpam.html',
                             form  => 'simpleInputContainer',
-                            nodes => [ 'pamService', 'pamAuthnLevel', ]
+                            nodes => [ 'pamAuthnLevel', 'pamService' ]
                         },
                         {
                             title => 'radiusParams',
@@ -357,8 +357,9 @@ sub tree {
                             help  => 'authrest.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'restAuthUrl',       'restUserDBUrl',
-                                'restPwdConfirmUrl', 'restPwdModifyUrl'
+                                'restAuthnLevel', 'restAuthUrl',
+                                'restUserDBUrl',  'restPwdConfirmUrl',
+                                'restPwdModifyUrl'
                             ]
                         },
                         {
@@ -498,8 +499,7 @@ sub tree {
                     title => 'logParams',
                     help  => 'logs.html',
                     form  => 'simpleInputContainer',
-                    nodes =>
-                      [ 'whatToTrace', 'hiddenAttributes' ]
+                    nodes => [ 'whatToTrace', 'hiddenAttributes' ]
                 },
                 {
                     title => 'cookieParams',
@@ -637,6 +637,31 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [ 'checkState', 'checkStateSecret', ],
                         },
+                        {
+                            title => 'checkUsers',
+                            help  => 'checkuser.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'checkUser',
+                                'checkUserIdRule',
+                                'checkUserHiddenAttributes',
+                                'checkUserDisplayPersistentInfo',
+                                'checkUserDisplayEmptyValues',
+                            ]
+                        },
+                        {
+                            title => 'impersonation',
+                            help  => 'impersonation.html',
+                            form  => 'simpleInputContainer',
+                            nodes => [
+                                'impersonationRule',
+                                'impersonationIdRule',
+                                'impersonationPrefix',
+                                'impersonationHiddenAttributes',
+                                'impersonationSkipEmptyValues',
+                                'impersonationMergeSSOgroups',
+                            ]
+                        },
                     ]
                 },
                 {
@@ -691,9 +716,9 @@ sub tree {
                             help  => 'external2f.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'ext2fActivation',      'ext2FSendCommand',
-                                'ext2FValidateCommand', 'ext2fAuthnLevel',
-                                'ext2fLogo',
+                                'ext2fActivation',  'ext2fCodeActivation',
+                                'ext2FSendCommand', 'ext2FValidateCommand',
+                                'ext2fAuthnLevel',  'ext2fLogo',
                             ]
                         },
                         {
@@ -986,7 +1011,8 @@ sub tree {
                                 'samlDiscoveryProtocolPolicy',
                                 'samlDiscoveryProtocolIsPassive'
                             ]
-                        }
+                        },
+                        'samlOverrideIDPEntityID',
                     ]
                 }
             ]

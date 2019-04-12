@@ -28,6 +28,7 @@
   </TMPL_IF>
   <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
 
+  <TMPL_INCLUDE NAME="impersonation.tpl">
   <TMPL_INCLUDE NAME="checklogins.tpl">
 
   <button type="submit" class="btn btn-success" >

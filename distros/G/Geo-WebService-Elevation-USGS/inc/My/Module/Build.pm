@@ -10,7 +10,7 @@ use Carp;
 use File::Spec;
 
 my @optionals_dir = qw{ xt author optionals };
-my @hide = qw{ SOAP::Lite Time::HiRes };
+my @hide = qw{ LWP::Protocol::https SOAP::Lite Time::HiRes };
 
 {
     my $done;
@@ -188,7 +188,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 Thomas R. Wyant, III
+Copyright (C) 2009-2019 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

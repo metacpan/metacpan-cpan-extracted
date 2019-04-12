@@ -29,8 +29,53 @@ ok( $res->[2]->[0] =~ m%<span id="languages"></span>%, ' Language icons found' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(2);
 
-# Try to authenticate
-# -------------------
+# Try to authenticate with unknown user
+# -------------------------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=jdoe&password=jdoe'),
+        accept => 'text/html',
+        length => 23
+    ),
+    'Auth query'
+);
+count(1);
+ok(
+    $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+    'jdoe rejected with PE_BADCREDENTIALS'
+) or print STDERR Dumper( $res->[2]->[0] );
+count(1);
+ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
+    'Found connect button' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(1);
+
+# Try to authenticate with bad password
+# -------------------------------------
+ok(
+    $res = $client->_post(
+        '/',
+        IO::String->new('user=dwho&password=jdoe'),
+        accept => 'text/html',
+        length => 23
+    ),
+    'Auth query'
+);
+count(1);
+ok(
+    $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
+    'dwho rejected with PE_BADCREDENTIALS'
+) or print STDERR Dumper( $res->[2]->[0] );
+count(1);
+ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
+    'Found connect button' )
+  or print STDERR Dumper( $res->[2]->[0] );
+count(1);
+
+
+# Try to authenticate with good password
+# --------------------------------------
 ok(
     $res = $client->_post(
         '/',

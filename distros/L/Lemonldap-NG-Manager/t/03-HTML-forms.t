@@ -30,7 +30,7 @@ $count += 4;
 
 my %types = %{ getTypes( $tree, values(%$ctrees), $attr ) };
 
-foreach (qw(home menuCat menuApp authParamsTextContainer)) {
+foreach (qw(home homeViewer menuCat menuApp authParamsTextContainer)) {
     ok( $forms{$_}, "Found $_ form" );
     $count++;
     delete $forms{$_};

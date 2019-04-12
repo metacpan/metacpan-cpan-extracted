@@ -100,14 +100,12 @@ m%<a class="btn btn-secondary" href="http://auth.example.com/register\?skin=boot
 s/^.*token=([^&]+).*$/token=$1&firstname=foo&lastname=bar&mail=foobar%40badwolf.org/,
         'Token found'
     );
-    my $token;
     ok( $token = $1, ' Token value is defined' );
     ok( $res->[2]->[0] =~ m#<img src="data:image/png;base64#,
         ' Captcha image inserted' )
       or print STDERR Dumper( $res->[2]->[0] );
 
     # Try to get captcha value
-    my ( $ts, $captcha );
     ok( $ts = getCache()->get($token), ' Found token session' );
     $ts = eval { JSON::from_json($ts) };
     ok( $captcha = $ts->{captcha}, ' Found captcha value' );

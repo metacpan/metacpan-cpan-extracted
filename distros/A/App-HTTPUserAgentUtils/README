@@ -3,8 +3,8 @@ NAME
     (string)
 
 VERSION
-    This document describes version 0.001 of App::HTTPUserAgentUtils (from
-    Perl distribution App-HTTPUserAgentUtils), released on 2019-04-02.
+    This document describes version 0.002 of App::HTTPUserAgentUtils (from
+    Perl distribution App-HTTPUserAgentUtils), released on 2019-04-11.
 
 SYNOPSIS
 DESCRIPTION
@@ -12,7 +12,11 @@ DESCRIPTION
 
     *   gen-random-http-ua
 
+    *   http-ua-by-nickname
+
     *   parse-http-ua
+
+    *   rand-http-ua
 
 FUNCTIONS
   gen_random_http_ua
@@ -31,6 +35,32 @@ FUNCTIONS
     *   category => *str*
 
     *   num => *nonnegint* (default: 1)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  http_ua_by_nickname
+    Usage:
+
+     http_ua_by_nickname(%args) -> [status, msg, payload, meta]
+
+    Get HTTP User-Agent string by nickname.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "get")
+
+    *   nickname => *str*
 
     Returns an enveloped result (an array).
 

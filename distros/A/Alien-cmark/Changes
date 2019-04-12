@@ -1,2 +1,8 @@
+0.003     2019-04-12 18:32:31 EDT
+  - Isolate dynamic libraries in a share install so XS code is built statically
+
+0.002     2019-04-11 17:51:08 EDT
+  - Trim unnecessary dynamic requirements for share install
+
 0.001     2019-04-01 13:32:26 EDT
   - First release

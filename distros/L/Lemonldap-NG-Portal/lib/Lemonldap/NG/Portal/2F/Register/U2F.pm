@@ -29,6 +29,11 @@ sub init {
 # Main method
 sub run {
     my ( $self, $req, $action ) = @_;
+    my $user = $req->userData->{ $self->conf->{whatToTrace} };
+    unless ($user) {
+        return $self->p->sendError( $req,
+            'No ' . $self->conf->{whatToTrace} . ' found in user data', 500 );
+    }
 
     if ( $action eq 'register' ) {
 
@@ -142,6 +147,8 @@ sub run {
                     "Append 2F Device : { type => 'U2F', name => $keyName }");
                 $self->p->updatePersistentSession( $req,
                     { _2fDevices => to_json($_2fDevices) } );
+                $self->userLogger->notice(
+                    "U2F key registration of $keyName succeeds for $user");
 
                 return [
                     200,

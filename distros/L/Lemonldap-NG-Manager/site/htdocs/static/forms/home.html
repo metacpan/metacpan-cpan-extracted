@@ -1,10 +1,14 @@
 <div class="panel panel-default">
   <div class="panel-heading">
+    <TMPL_IF NAME="ALLOWDIFF">
     <h3 class="panel-title">
+
       <span ng-if="!currentCfg.next" trspan="currentConfiguration"></span>
       <span ng-if="currentCfg.next" trspan="loadedConfiguration"></span>
       <i ng-if="currentCfg.prev">(<a trspan="diffWithPrevious" target="_blank" href="{{scriptname}}/diff.html#!/{{currentCfg.cfgNum}}" role="link"></a>)</i>
+
     </h3>
+    </TMPL_IF>
   </div>
   <table class="table table-striped">
     <tr>

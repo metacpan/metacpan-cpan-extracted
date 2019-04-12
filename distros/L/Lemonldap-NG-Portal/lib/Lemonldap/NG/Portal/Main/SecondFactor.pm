@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -158,7 +158,7 @@ L<Lemonldap::NG::Portal> second factor plugins.
       # If self registration is enabled and "activation" is set to "enabled",
       # replace the rule to detect if user has registered a device key.
       # The rule must be like this :
-      # By example : 
+      # By example :
       $self->conf->{u2fActivation} = '$_2fDevices =~ /"type":\s*"U2F"/s'
       # Optionally, the rule can be : '$_2fDevices and $_2fDevices =~ /"type":\s*"U2F"/s'
       # to avoid warning due to undef variable

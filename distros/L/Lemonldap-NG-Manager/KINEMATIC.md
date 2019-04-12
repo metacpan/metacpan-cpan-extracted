@@ -26,7 +26,7 @@
                +-> if protected:
                    Handler::PSGI::Base::_authAndTrace()
 
-           
+
 _Common::PSGI::run()_ returns a subroutine
 
 ## HTTP responses

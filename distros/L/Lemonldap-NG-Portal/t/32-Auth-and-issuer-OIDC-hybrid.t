@@ -114,7 +114,7 @@ ok(
 );
 count(1);
 ok( $res->[2]->[0] =~ /trmsg="90"/, 'Reject reason is 90' )
-    or print STDERR Dumper( $res->[2]->[0] );
+  or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
 # Initialization

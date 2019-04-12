@@ -10,7 +10,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 15;
+my $maintests = 14;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -132,8 +132,7 @@ m#img src="http://auth.idp.com(/saml/relaySingleLogoutSOAP)\?(relay=.*?)"#s,
         ),
         'Get image'
     );
-    ok( getHeader( $res, 'Content-Type' ) eq 'image/png', 'Get an image' )
-      or explain( [ $res->[0], $res->[1] ], 'Content-Type => image/png' );
+    expectRedirection( $res, "http://auth.idp.com/static/common/icons/ok.png");
 
     # Test if logout is done
     switch ('issuer');

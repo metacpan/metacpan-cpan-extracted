@@ -8,7 +8,7 @@ package Tickit::Term;
 use strict;
 use warnings;
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 use Carp;
 
@@ -468,6 +468,17 @@ for C<setctl_int>.
 Sets the terminal window icon text, title, or both.
 
 =back
+
+=head2 getctl
+
+=head2 setctl
+
+   $value = $term->getctl( $ctl )
+
+   $success = $term->setctl( $ctl, $value )
+
+A newer form of the various typed get and set methods above. This version
+will interpret the given value as appropriate, depending on the control type.
 
 =cut
 

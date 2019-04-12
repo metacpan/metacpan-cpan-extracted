@@ -3,12 +3,12 @@ do { my $x = {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
                                         'Text::ParseWords' => '0',
-                                        'perl' => 'v5.10.0'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.147',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.148',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -44,9 +44,13 @@ do { my $x = {
                                       'File::Temp' => '0',
                                       'Mojo::URL' => '0',
                                       'Mojo::UserAgent' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'Net::SSLeay' => '0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'NetAddr::MAC' => '0'
                                     }
                     },
        'test' => {
@@ -59,7 +63,7 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'Test::More' => '0.98',
-                                   'perl' => 'v5.10.0'
+                                   'perl' => '5.010'
                                  }
                  },
        'x_Dist_Zilla' => {
@@ -133,6 +137,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::UseUnsafeInc' => '0',
                                            'Dist::Zilla::PluginBundle::Author::ETHER' => '0.119',
                                            'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007',
+                                           'ExtUtils::HasCompiler' => '0.014',
                                            'Software::License::Artistic_2_0' => '0'
                                          }
                          }

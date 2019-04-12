@@ -11,6 +11,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-basic.t',
+    't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
     'xt/author/changes_has_content.t',
     'xt/author/clean-namespaces.t',

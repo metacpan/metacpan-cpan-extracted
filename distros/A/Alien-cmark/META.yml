@@ -32,7 +32,7 @@ no_index:
 provides:
   Alien::cmark:
     file: lib/Alien/cmark.pm
-    version: '0.001'
+    version: '0.003'
 requires:
   Alien::Base: '0.038'
   parent: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Alien-cmark/issues
   homepage: https://github.com/Grinnz/Alien-cmark
   repository: https://github.com/Grinnz/Alien-cmark.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.028001'
@@ -192,7 +192,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -416,17 +416,15 @@ x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.26'
   requires:
     share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Alien::cmake3: '0.02'
       Archive::Tar: '0'
       Config: '0'
-      HTML::LinkExtor: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
-      URI::Escape: '0'
     system: {}
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-MAC-Vendor",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Net::MAC::Vendor",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Mojo::URL" => 0,
     "Mojo::UserAgent" => 0,
+    "Net::SSLeay" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.263",
+  "VERSION" => "1.264",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,12 +55,13 @@ my %FallbackPrereqs = (
   "File::Temp" => 0,
   "Mojo::URL" => 0,
   "Mojo::UserAgent" => 0,
+  "Net::SSLeay" => 0,
   "Test::More" => "0.98",
   "strict" => 0,
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 if (can_xs() and not want_pp()) {
   requires('Compress::Bzip2');
   requires('Compress::Zlib');
@@ -77,7 +79,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.034
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.035
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;
@@ -102,15 +104,19 @@ use ExtUtils::HasCompiler 0.014 'can_compile_loadable_object';
   }
 }
 
-sub parse_args {
-  require ExtUtils::MakeMaker;
-  require Text::ParseWords;
-  ExtUtils::MakeMaker::parse_args(
-    my $tmp = {},
-    Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),
-    @ARGV,
-  );
-  return $tmp->{ARGS} || {};
+{
+  my $parsed_args;
+  sub parse_args {
+    return $parsed_args if defined $parsed_args;
+    require ExtUtils::MakeMaker;
+    require Text::ParseWords;
+    ExtUtils::MakeMaker::parse_args(
+      my $tmp = {},
+      Text::ParseWords::shellwords($ENV{PERL_MM_OPT} || ''),
+      @ARGV,
+    );
+    $parsed_args = $tmp->{ARGS} || {};
+  }
 }
 
 sub requires { goto &runtime_requires }

@@ -9,7 +9,7 @@ use Lemonldap::NG::Handler::PSGI::Main;
 
 extends 'Lemonldap::NG::Handler::Lib::PSGI', 'Lemonldap::NG::Common::PSGI';
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 sub init {
     my ( $self, $args ) = @_;
@@ -112,7 +112,7 @@ Returns a list of groups to which user belongs.
 
 L<http://lemonldap-ng.org/>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>,
 L<Plack>, L<PSGI>, L<Lemonldap::NG::Common::PSGI::Router>,
-L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>, 
+L<Lemonldap::NG::Common::PSGI::Request>, L<HTML::Template>,
 
 =head1 AUTHORS
 

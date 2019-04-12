@@ -28,9 +28,7 @@ my $dir = tempdir( CLEANUP => 1 );
 my ($tfh, $filename) = tempfile( DIR => $dir );
 print $tfh do { open my $fh, 't/test.db'; binmode $fh; join '', <$fh> };
 close $tfh;
-my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql(
-  sub { $dbic_class->connect("dbi:SQLite:$filename") }
-);
+my $converted = GraphQL::Plugin::Convert::DBIC->to_graphql($dbic_class->connect("dbi:SQLite:$filename"));
 
 subtest 'execute pk + deeper query' => sub {
   my $doc = <<'EOF';

@@ -138,6 +138,9 @@ CONSTRUCTOR
       plain string instead of a code reference, it gives the new name for
       the tag, and will be applied with its existing value.
 
+      If only_tags is being used too, then the source names of any tags to
+      be converted must also be listed there, or they will not be copied.
+
  clone (instance)
 
        $new = $orig->clone( %args )

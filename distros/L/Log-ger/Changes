@@ -1,3 +1,10 @@
+0.026   2019-04-12 (PERLANCAR)
+
+	- Name the generated routines with Sub::Name if available.
+
+	- Remove declaration of unneeded variable $Caller_Depth_Offset.
+
+
 0.025   2018-12-20 (PERLANCAR)
 
 	- No functional changes.

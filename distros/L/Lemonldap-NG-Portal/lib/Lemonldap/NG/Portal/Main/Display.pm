@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -113,7 +113,7 @@ sub display {
               && $req->data->{login},
             ASK_LOGINS => $req->param('checkLogins') || 0,
             CONFIRMKEY => $self->stamp(),
-            LIST       => $req->data->{list} || [],
+            LIST       => $req->data->{list}         || [],
             REMEMBER   => $req->data->{confirmRemember},
             (
                 $req->data->{customScript}
@@ -291,6 +291,7 @@ sub display {
             REGISTER_URL          => $self->conf->{registerUrl},
             HIDDEN_INPUTS         => $self->buildHiddenForm($req),
             STAYCONNECTED         => $self->conf->{stayConnected},
+            SPOOFID               => $self->conf->{impersonationRule},
             (
                 $req->data->{customScript}
                 ? ( CUSTOM_SCRIPT => $req->data->{customScript} )
@@ -351,8 +352,7 @@ sub display {
         # * Bad URL error
         elsif ($req->{error} == PE_LOGOUT_OK
             or $req->{error} == PE_WAIT
-            or $req->{error} == PE_BADURL
-            or $req->{error} == PE_BADCREDENTIALS )
+            or $req->{error} == PE_BADURL )
         {
             %templateParams = (
                 %templateParams,
@@ -417,6 +417,10 @@ sub display {
 
         }
 
+    }
+
+    if ( $req->data->{waitingMessage} ) {
+        $templateParams{WAITING_MESSAGE} = 1;
     }
 
     $self->logger->debug("Skin returned: $skinfile");

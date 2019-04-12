@@ -1,5 +1,9 @@
 Revision history for Text-Parser
 
+0.911     2019-04-11 21:17:53-07:00 America/Los_Angeles
+  - Added two new attributes auto_split and FS to split lines into fields
+  - Updated POD
+
 0.910     2019-02-10 17:52:24-08:00 America/Los_Angeles
   - Added a new attribute auto_trim and have four different values for it
   - Added a method line_auto_manip that can be overridden in subclasses

@@ -73,6 +73,10 @@ if ( $ExtUtils::MakeMaker::VERSION >= 6.46 ) {
     };
 }
 
+if ($ExtUtils::MakeMaker::VERSION >= 6.57_02) {
+    $WriteMakefileArgs{META_MERGE}->{NO_MYMETA} = 1;
+}
+
 if ( $ExtUtils::MakeMaker::VERSION >= 6.50 ) {
     $WriteMakefileArgs{META_MERGE}->{'meta-spec'} = { version => 2 };
     $WriteMakefileArgs{META_MERGE}->{'resources'} = {

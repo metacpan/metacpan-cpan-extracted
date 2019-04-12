@@ -36,6 +36,7 @@ requires:
   Crypt::OpenSSL::RSA: '0'
   Crypt::OpenSSL::X509: '0'
   Crypt::Rijndael: '0'
+  Crypt::URandom: '0'
   Digest::SHA: '0'
   HTML::Template: '0'
   JSON: '0'
@@ -48,5 +49,5 @@ resources:
   X_twitter: https://twitter.com/lemonldapng
   homepage: http://lemonldap-ng.org/
   license: http://opensource.org/licenses/GPL-2.0
-version: v2.0.2
+version: v2.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

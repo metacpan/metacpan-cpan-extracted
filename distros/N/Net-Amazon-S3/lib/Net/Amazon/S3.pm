@@ -1,5 +1,5 @@
 package Net::Amazon::S3;
-$Net::Amazon::S3::VERSION = '0.85';
+$Net::Amazon::S3::VERSION = '0.86';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 
@@ -74,9 +74,9 @@ has authorization_method => (
     },
 );
 
-__PACKAGE__->meta->make_immutable;
+has keep_alive_cache_size => ( is => 'ro', isa => 'Int', required => 0, default => 10 );
 
-my $KEEP_ALIVE_CACHESIZE = 10;
+__PACKAGE__->meta->make_immutable;
 
 
 sub BUILD {
@@ -92,13 +92,13 @@ sub BUILD {
     my $ua;
     if ( $self->retry ) {
         $ua = LWP::UserAgent::Determined->new(
-            keep_alive            => $KEEP_ALIVE_CACHESIZE,
+            keep_alive            => $self->keep_alive_cache_size,
             requests_redirectable => [qw(GET HEAD DELETE PUT POST)],
         );
         $ua->timing('1,2,4,8,16,32');
     } else {
         $ua = LWP::UserAgent->new(
-            keep_alive            => $KEEP_ALIVE_CACHESIZE,
+            keep_alive            => $self->keep_alive_cache_size,
             requests_redirectable => [qw(GET HEAD DELETE PUT POST)],
         );
     }
@@ -451,7 +451,7 @@ Net::Amazon::S3 - Use the Amazon S3 - Simple Storage Service
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -593,6 +593,10 @@ Set this to C<0> if you don't want to use SSL-encrypted connections when talking
 to S3. Defaults to C<1>.
 
 To use SSL-encrypted connections, LWP::Protocol::https is required.
+
+=item keep_alive_cache_size
+
+Set this to C<0> to disable Keep-Alives.  Default is C<10>.
 
 =item timeout
 
@@ -899,7 +903,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,10 @@
 Revision history for Perl extension Vector-QRCode-IntoPDF
 
+0.03 2019-04-12T07:41:10Z
+    - [resolved] Undeclared dependency Class::Accessor::Lite (reported by Slaven Rezić)
+    - [resolved] t/11_simple.t fails (reported by Slaven Rezić)
+      It was caused by difference of PDF version (expected PDF v1.3, but PDF v1.4 provoked data differences when testing).
+
 0.02 2014-04-09T06:38:02Z
     - modify test. Now Digest::SHA isn't a dependent module.
 

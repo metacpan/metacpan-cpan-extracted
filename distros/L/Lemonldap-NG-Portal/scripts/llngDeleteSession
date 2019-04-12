@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+#=============================================================================
+# Cleaner for LemonLDAP::NG: removes old sessions from Apache::Session
+#
+# This module is written to be used by cron to clean old sessions from
+# Apache::Session. It does not works with Apache::Session::Memcached
+#
+# This is part of LemonLDAP::NG product, released under GPL
+#=============================================================================
+
+use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::Conf::Constants;
+use Lemonldap::NG::Common::Apache::Session;
+use Lemonldap::NG::Common::Session;
+use strict;
+use Getopt::Std;
+
+# Options
+# -d: debug mode
+# -f: force delete of corrupted sessions
+our $opt_d;
+our $opt_f;
+getopts('df');
+
+my $debug     = $opt_d;
+my $force     = $opt_f;
+my $nb_purged = 0;
+my $nb_error  = 0;
+
+unless (@ARGV) {
+    print STDERR "Usage: $0 <uid>\n";
+    exit 1;
+}
+
+#=============================================================================
+# Load configuration
+#=============================================================================
+my $lmconf = Lemonldap::NG::Common::Conf->new()
+  or die $Lemonldap::NG::Common::Conf::msg;
+my $conf = $lmconf->getConf or die "Unable to get configuration ($!)";
+my $localconf = $lmconf->getLocalConf(PORTALSECTION)
+  or die "Unable to get local configuration ($!)";
+
+if ($localconf) {
+    $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
+}
+
+print "Configuration loaded\n" if $debug;
+
+#=============================================================================
+# Timeout
+#=============================================================================
+print "Timeout value: " . $conf->{timeout} . "\n" if $debug;
+
+#=============================================================================
+# Apache::Session backends
+#=============================================================================
+my @backends;
+my $module;
+
+# Sessions
+if ( defined $conf->{globalStorage} ) {
+
+    # Load module
+    $module = $conf->{globalStorage};
+    eval "use $module";
+    die $@ if ($@);
+    $conf->{globalStorageOptions}->{backend} = $module;
+
+    # Add module in managed backends
+    push @backends, $conf->{globalStorageOptions};
+
+    print "Session backend $module will be used\n" if $debug;
+}
+else {
+    print STDERR "Unable to find 'globalStorage' configuration key, aborting\n";
+    exit 1;
+}
+
+#=============================================================================
+# Load and purge sessions
+#=============================================================================
+for my $options (@backends) {
+
+    next if ( $options->{backend} eq "Apache::Session::Memcached" );
+
+    # Get all expired sessions
+    foreach my $reSession (@ARGV) {
+        my $sessions =
+          Lemonldap::NG::Common::Apache::Session->searchOnExpr( $options,
+            $conf->{whatToTrace}, $reSession );
+
+        foreach my $id ( keys %$sessions ) {
+            my $session = Lemonldap::NG::Common::Session->new(
+                storageModule        => $options->{backend},
+                storageModuleOptions => $options,
+                cacheModule          => $conf->{localSessionStorage},
+                cacheModuleOptions   => $conf->{localSessionStorageOptions},
+                id                   => $id,
+            );
+
+            unless ( $session->data ) {
+                print "Error while opening session $id\n" if $debug;
+                print STDERR "Error on session $id\n";
+                $nb_error++;
+                next;
+            }
+
+            unless ( $session->remove ) {
+                print "Error while deleting session $id\n" if $debug;
+                print STDERR "Error on session $id\n";
+                $nb_error++;
+                next;
+            }
+            print "Session $id has been purged\n" if $debug;
+            $nb_purged++;
+        }
+    }
+}
+
+#=============================================================================
+# Exit
+#=============================================================================
+print "$nb_purged sessions have been purged\n" if $debug;
+print STDERR
+  "$nb_error sessions remaining, try to purge them with force (option -f)\n"
+  if $nb_error;
+
+my $exit = $nb_error ? 1 : $nb_purged ? 0 : 1;
+exit $exit;

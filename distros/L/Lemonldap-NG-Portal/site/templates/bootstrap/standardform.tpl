@@ -1,3 +1,10 @@
+<TMPL_IF NAME="TOKEN">
+<input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
+</TMPL_IF>
+
+<TMPL_IF NAME="WAITING_MESSAGE">
+<div class="alert alert-info"><span trspan="waitingmessage" /></div>
+<TMPL_ELSE>
 <div class="form">
   <div class="input-group mb-3">
     <div class="input-group-prepend">
@@ -24,10 +31,8 @@
     <input type="text" name="captcha" size="<TMPL_VAR NAME=CAPTCHA_SIZE>" class="form-control" trplaceholder="captcha" required aria-required="true" autocomplete="off" />
   </div>
   </TMPL_IF>
-  <TMPL_IF NAME="TOKEN">
-    <input type="hidden" name="token" value="<TMPL_VAR NAME="TOKEN">" />
-  </TMPL_IF>
 
+  <TMPL_INCLUDE NAME="impersonation.tpl">
   <TMPL_INCLUDE NAME="checklogins.tpl">
 
   <button type="submit" class="btn btn-success" >
@@ -35,6 +40,7 @@
     <span trspan="connect">Connect</span>
   </button>
 </div>
+</TMPL_IF>
 
 <div class="actions">
   <TMPL_IF NAME="DISPLAY_RESETPASSWORD">

@@ -34,7 +34,7 @@
             "Data::Dumper" : "0",
             "HTTP::Tiny" : "0",
             "JSON" : "0",
-            "JSON::Schema::Fit" : "0",
+            "JSON::Schema::Fit" : "0.04",
             "MIME::Base64" : "3.11",
             "URI::Encode" : "0",
             "base" : "0",
@@ -64,7 +64,7 @@
          "web" : "https://gitlab.com/ambs/perl5-arango-db"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }

@@ -660,7 +660,7 @@ sub _get {
 Same as C<_get> except that a body is required. $body must be a file handle.
 Example with IO::String:
 
-  ok( 
+  ok(
       $res = $client->_post(
           '/',
           IO::String->new('user=dwho&password=dwho'),

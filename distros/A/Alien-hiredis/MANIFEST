@@ -14,5 +14,5 @@ dist.ini
 lib/Alien/hiredis.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
-t/ffi.t
+t/alien.t
 xt/author/pod-syntax.t

@@ -51,6 +51,12 @@ count(1);
 my ($query) =
   expectRedirection( $res, qr#^http://test.example.org/\?(lemonldapcda=.*)$# );
 
+# Bug #1650 made the portal store an _url in pdata at this step
+my $cookies = getCookies($res);
+
+ok( !defined( $cookies->{lemonldappdata} ), " Make sure no pdata is returned" );
+count(1);
+
 # Handler part
 use_ok('Lemonldap::NG::Handler::Server');
 use_ok('Lemonldap::NG::Common::PSGI::Cli::Lib');

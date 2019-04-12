@@ -63,6 +63,7 @@ WriteMakefile(
         'Crypt::OpenSSL::RSA'    => 0,
         'Crypt::OpenSSL::X509'   => 0,
         'Crypt::Rijndael'        => 0,
+        'Crypt::URandom'         => 0,
         'Digest::SHA'            => 0,
         'HTML::Template'         => 0,
         'JSON'                   => 0,

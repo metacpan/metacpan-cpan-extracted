@@ -24,7 +24,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth', 'Lemonldap::NG::Portal::Lib::SAML';
 
@@ -893,9 +893,11 @@ sub extractFormInfo {
         $self->logger->debug(
             "Will try to use SAML Discovery Protocol for IDP resolution");
 
+        if ( $req->urldc ) {
+            $req->pdata->{_url} = encode_base64( $req->urldc, '' );
+        }
         my $disco_url = $self->conf->{samlDiscoveryProtocolURL};
-
-        my $portal = $self->conf->{portal};
+        my $portal    = $self->conf->{portal};
         $disco_url .= ( $disco_url =~ /\?/ ? '&' : '?' )
           . build_urlencoded(
             entityID      => $self->getMetaDataURL( 'samlEntityID', 0, 1 ),
@@ -943,6 +945,7 @@ sub extractFormInfo {
             $idpName = $self->{idpList}->{$_}->{displayName}
               if $self->{idpList}->{$_}->{displayName};
             my $icon    = $self->{idpList}->{$_}->{icon};
+            my $order   = $self->{idpList}->{$_}->{order} // 0;
             my $img_src = '';
 
             if ($icon) {
@@ -953,14 +956,22 @@ sub extractFormInfo {
             }
             $self->logger->debug( "IDP "
                   . $self->{idpList}->{$_}->{name}
-                  . " -> DisplayName : $idpName with Icon : $img_src" );
+                  . " -> DisplayName : $idpName with Icon : $img_src at order : $order"
+            );
             push @list,
               {
-                val  => $_,
-                name => $idpName,
-                icon => $img_src,
+                val   => $_,
+                name  => $idpName,
+                icon  => $img_src,
+                order => $order,
               };
         }
+        @list =
+          sort {
+                 $a->{order} <=> $b->{order}
+              or $a->{name} cmp $b->{name}
+              or $a->{val} cmp $b->{val}
+          } @list;
         $req->data->{list}            = \@list;
         $req->data->{confirmRemember} = 1;
 

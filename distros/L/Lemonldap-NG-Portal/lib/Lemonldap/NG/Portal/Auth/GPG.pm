@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Auth::_WebForm';
 
@@ -25,11 +25,9 @@ has tmp => (
 );
 
 sub init {
-    my ($self) = @_;
+    my $self = shift;
+
     $self->db( $self->conf->{gpgDb} );
-    unless ( $_[0]->{conf}->{requireToken} ) {
-        $self->error("requireToken isn't set, unable to use GPG");
-    }
     unless ( $self->db ) {
         $self->error("gpgDb not set");
         return 0;
@@ -44,6 +42,10 @@ sub init {
 
 sub extractFormInfo {
     my ( $self, $req ) = @_;
+
+    unless ( $self->ottRule->( $req, {} ) ) {
+        $self->error("OTT isn't set, unable to use GPG");
+    }
 
     # Keep token data for later use
     my ( $token, $gpgToken );
@@ -141,7 +143,8 @@ sub authenticate {
 sub setAuthSessionInfo {
     my ( $self, $req ) = @_;
     $req->sessionInfo->{gpgMail} = $req->data->{gpgMail};
-    return PE_OK;
+    $req->sessionInfo->{authenticationLevel} = $self->conf->{gpgAuthnLevel};
+    PE_OK;
 }
 
 sub authLogout {

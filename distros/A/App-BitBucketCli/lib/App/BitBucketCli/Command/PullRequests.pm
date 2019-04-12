@@ -11,14 +11,16 @@ use warnings;
 use Carp;
 use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
+use Path::Tiny;
 
 extends 'App::BitBucketCli';
 
-our $VERSION = 0.008;
+our $VERSION = 0.009;
 
 sub options {
     return [qw/
         colors|c=s%
+        create|C
         force|f!
         author|a=s
         emails|e=s
@@ -39,6 +41,44 @@ sub options {
 sub pull_requests {
     my ($self) = @_;
 
+    my $author      = $self->opt->author();
+    my $to_branch   = $self->opt->to_branch();
+    my $from_branch = $self->opt->from_branch();
+    my $title       = $self->opt->title();
+    my $emails      = $self->opt->emails();
+    my $participant = $self->opt->participant();
+
+    if ( $self->opt->create() ) {
+        #https://stash.ext.springdigital-devisland.com.au/projects/SD/repos/onlinestyleguide/pull-requests
+        #    ?create
+        #    &targetBranch=refs%2Fheads%2Fproject_shop_performance
+        #    &sourceBranch=refs%2Fheads%2Fbugfix%2FALM-48995_hidden-scroll-bar3
+        #    &targetRepoId=12
+        if ( ! $self->opt->{from_branch} ) {
+            my $dir = `git rev-parse --show-toplevel`;
+            chomp $dir;
+            my $head = path($dir, '.git', 'HEAD');
+
+            if ( -s $head ) {
+                $head = $head->slurp;
+                chomp $head;
+                $head =~ s{^ref: refs/heads/}{};
+                $self->opt->{from_branch} = $head;
+            }
+        }
+
+        my $url = $self->core->url;
+        $url =~ s{^(https?://)([^/]+?@)}{$1};
+        $url =~ s{/rest/.*}{};
+        $url .= '/projects/' . $self->opt->{project} . '/repos/'
+            . $self->opt->{repository} . '/pull-requests?create';
+
+        $url .= '&sourceBranch=refs/heads/' . $self->opt->{from_branch} if $self->opt->{from_branch};
+        $url .= '&targetBranch=' . ( $self->opt->{to_branch} ? 'refs/heads/' . $self->opt->{to_branch} : '' );
+        print "$url\n";
+        return;
+    }
+
     my @pull_requests = sort {
             lc $a->id cmp lc $b->id;
         }
@@ -46,12 +86,7 @@ sub pull_requests {
 
     my @prs;
     my %max;
-    my $author      = $self->opt->author();
-    my $to_branch   = $self->opt->to_branch();
-    my $from_branch = $self->opt->from_branch();
-    my $title       = $self->opt->title();
-    my $emails      = $self->opt->emails();
-    my $participant = $self->opt->participant();
+
     for my $pull_request (@pull_requests) {
         next if $author && $pull_request->author->{user}{displayName} !~ /$author/;
         next if $to_branch && $pull_request->toRef->{displayId} !~ /$to_branch/;
@@ -97,7 +132,7 @@ App::BitBucketCli::Command::PullRequests - Show the pull requests of a repositor
 
 =head1 VERSION
 
-This documentation refers to App::BitBucketCli::Command::PullRequests version 0.008
+This documentation refers to App::BitBucketCli::Command::PullRequests version 0.009
 
 =head1 SYNOPSIS
 
@@ -107,6 +142,8 @@ This documentation refers to App::BitBucketCli::Command::PullRequests version 0.
   -c --colors[=]str Change colours used specified as key=value
                     eg --colors disabled=grey22
                     current colour names aborted, disabled and notbuilt
+  -C --create       Construct the url to create a pull request using --from-branch
+                    (or the current branch) and --to-branch.
   -f --force        Force action
   -l --long         Show long form data if possible
   -p --project[=]str
@@ -127,9 +164,9 @@ This documentation refers to App::BitBucketCli::Command::PullRequests version 0.
                     matching matching this regex.
   -P --participant[=]regex
                     Show only pull requests with participants matching this regex
-  -t --to-branch[=]regex
+  -t --to-branch[=](regex|branch)
                     Show only pull requests to this branch
-  -f --from-branch[=]rege
+  -f --from-branch[=](regex|branch)
                     Show only pull requests from this branchx
   -T --title[=]regex
                     Show only pull requests matching this title

@@ -7,7 +7,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants ':all';
 
-our $VERSION = '2.0.1';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Common::PSGI::Request';
 
@@ -104,6 +104,7 @@ sub error_type {
                 PE_CONFIRM,                       PE_MAILFORMEMPTY,
                 PE_MAILCONFIRMATION_ALREADY_SENT, PE_PASSWORDFORMEMPTY,
                 PE_CAPTCHAEMPTY,                  PE_REGISTERFORMEMPTY,
+                PE_PP_CHANGE_AFTER_RESET
             )
         )
       );

@@ -40,28 +40,20 @@ MU32    def_start_slots = 89;
  * 
 */
 mmap_cache * mmc_new() {
-  mmap_cache * cache = (mmap_cache *)malloc(sizeof(mmap_cache));
+  mmap_cache * cache = (mmap_cache *)calloc(1, sizeof(mmap_cache));
 
-  cache->mm_var = 0;
-  cache->p_cur = -1;
+  cache->p_cur = NOPAGE;
 
   cache->c_num_pages = def_c_num_pages;
   cache->c_page_size = def_c_page_size;
-  cache->c_size = 0;
 
   cache->start_slots = def_start_slots;
   cache->expire_time = def_expire_time;
 
-  cache->fh = 0;
   cache->share_file = _mmc_get_def_share_filename(cache);
   cache->permissions = 0640;
   cache->init_file = def_init_file;
   cache->test_file = def_test_file;
-
-  cache->catch_deadlocks = 0;
-  cache->enable_stats = 0;
-
-  cache->last_error = 0;
 
   return cache;
 }
@@ -117,7 +109,8 @@ int mmc_get_param(mmap_cache * cache, char * param) {
 */
 int mmc_init(mmap_cache * cache) {
   int i, do_init;
-  MU32 c_num_pages, c_page_size, c_size, start_slots;
+  MU32 c_num_pages, c_page_size;
+  MU64 c_size;
 
   /* Need a share file */
   if (!cache->share_file) {
@@ -130,12 +123,11 @@ int mmc_init(mmap_cache * cache) {
   ASSERT(c_num_pages >= 1 && c_num_pages <= 1000);
 
   c_page_size = cache->c_page_size;
-  ASSERT(c_page_size >= 1024 && c_page_size <= 16*1024*1024);
+  ASSERT(c_page_size >= 1024 && c_page_size <= 1024*1024*1024);
 
-  start_slots = cache->start_slots;
-  ASSERT(start_slots >= 10 && start_slots <= 500);
+  ASSERT(cache->start_slots >= 10 && cache->start_slots <= 500);
 
-  cache->c_size = c_size = c_num_pages * c_page_size;
+  cache->c_size = c_size = (MU64)c_num_pages * c_page_size;
 
   if ( mmc_open_cache_file(cache, &do_init) == -1) return -1;
 
@@ -202,10 +194,10 @@ int mmc_close(mmap_cache *cache) {
   ASSERT(cache->mm_var);
 
   /* Shouldn't call if page still locked */
-  ASSERT(cache->p_cur == -1);
+  ASSERT(cache->p_cur == NOPAGE);
 
   /* Unlock any locked page */
-  if (cache->p_cur != -1) {
+  if (cache->p_cur != NOPAGE) {
     mmc_unlock(cache);
   }
 
@@ -244,25 +236,25 @@ char * mmc_error(mmap_cache * cache) {
  *
 */
 int mmc_lock(mmap_cache * cache, MU32 p_cur) {
-  MU32 p_offset;
+  MU64 p_offset;
   void * p_ptr;
 
   /* Argument sanity check */
-  if (p_cur > cache->c_num_pages)
-    return -1 + _mmc_set_error(cache, 0, "page %u is larger than number of pages", p_cur);
+  if (p_cur == NOPAGE || p_cur > cache->c_num_pages)
+    return -1 + _mmc_set_error(cache, 0, "page %u is NOPAGE or larger than number of pages", p_cur);
 
   /* Check not already locked */
-  if (cache->p_cur != -1)
+  if (cache->p_cur != NOPAGE)
     return -1 + _mmc_set_error(cache, 0, "page %u is already locked, can't lock multiple pages", cache->p_cur);
 
   /* Setup page details */
-  p_offset = p_cur * cache->c_page_size;
+  p_offset = (MU64)p_cur * cache->c_page_size;
   p_ptr = PTR_ADD(cache->mm_var, p_offset);
 
   if (mmc_lock_page(cache, p_offset) == -1) return -1;
 
   if (!(P_Magic(p_ptr) == 0x92f7e3b1))
-    return -1 + _mmc_set_error(cache, 0, "magic page start marker not found. p_cur is %u, offset is %u", p_cur, p_offset);
+    return -1 + _mmc_set_error(cache, 0, "magic page start marker not found. p_cur is %u, offset is %llu", p_cur, p_offset);
 
   /* Copy to cache structure */
   cache->p_num_slots = P_NumSlots(p_ptr);
@@ -292,7 +284,7 @@ int mmc_lock(mmap_cache * cache, MU32 p_cur) {
 
   /* Setup page pointers */
   cache->p_cur = p_cur;
-  cache->p_offset = p_cur * cache->c_page_size;
+  cache->p_offset = p_offset;
   cache->p_base = p_ptr;
   cache->p_base_slots = PTR_ADD(p_ptr, P_HEADERSIZE);
 
@@ -311,7 +303,7 @@ int mmc_lock(mmap_cache * cache, MU32 p_cur) {
 */
 int mmc_unlock(mmap_cache * cache) {
 
-  ASSERT(cache->p_cur != -1);
+  ASSERT(cache->p_cur != NOPAGE);
 
   /* If changed, save page header changes back */
   if (cache->p_changed) {
@@ -345,7 +337,7 @@ int mmc_unlock(mmap_cache * cache) {
 */
 int mmc_is_locked(mmap_cache * cache) {
 
-  return cache->p_cur != -1 ? 1 : 0;
+  return cache->p_cur != NOPAGE ? 1 : 0;
 }
 
 /*
@@ -478,7 +470,7 @@ int mmc_write(
 
   ROUNDLEN(kvlen);
 
-  ASSERT(cache->p_cur != -1);
+  ASSERT(cache->p_cur != NOPAGE);
 
   /* If found, delete slot for new value */
   if (*slot_ptr > 1) {
@@ -601,7 +593,7 @@ int mmc_calc_expunge(
 ) {
   double slots_pct;
 
-  ASSERT(cache->p_cur != -1);
+  ASSERT(cache->p_cur != NOPAGE);
 
   /* If len >= 0, and space available for len bytes, nothing is expunged */
   if (len >= 0) {
@@ -624,7 +616,7 @@ int mmc_calc_expunge(
     MU32 * slot_end = slot_ptr + num_slots;
 
     /* Store pointers to used slots */
-    MU32 ** copy_base_det = (MU32 **)malloc(sizeof(MU32 *) * used_slots);
+    MU32 ** copy_base_det = (MU32 **)calloc(used_slots, sizeof(MU32 *));
     MU32 ** copy_base_det_end = copy_base_det + used_slots;
     MU32 ** copy_base_det_out = copy_base_det;
     MU32 ** copy_base_det_in = copy_base_det + used_slots;
@@ -637,7 +629,7 @@ int mmc_calc_expunge(
     for (; slot_ptr != slot_end; slot_ptr++) {
       MU32 data_offset = *slot_ptr;
       MU32 * base_det = S_Ptr(cache->p_base, data_offset);
-      MU32 expire_time, flags, kvlen;
+      MU32 expire_time, kvlen;
 
       /* Ignore if if free slot */
       if (data_offset <= 1) {
@@ -652,7 +644,6 @@ int mmc_calc_expunge(
 
       /* Definitely out if expired, and not dirty */
       expire_time = S_ExpireTime(base_det);
-      flags = S_Flags(base_det);
       if (expire_time && now >= expire_time) {
         *copy_base_det_out++ = base_det;
         continue;
@@ -736,11 +727,11 @@ int mmc_do_expunge(
 
   /* Build new slots data and KV data */
   MU32 slot_data_size = new_num_slots * 4;
-  MU32 * new_slot_data = (MU32 *)malloc(slot_data_size);
+  MU32 * new_slot_data = (MU32 *)calloc(1, slot_data_size);
 
   MU32 page_data_size = cache->c_page_size - new_num_slots * 4 - P_HEADERSIZE;
 
-  void * new_kv_data = malloc(page_data_size);
+  void * new_kv_data = calloc(1, page_data_size);
   MU32 new_offset = 0;
 
   /* Start all new slots empty */
@@ -846,11 +837,9 @@ void mmc_reset_page_details(mmap_cache * cache) {
  *
 */
 mmap_cache_it * mmc_iterate_new(mmap_cache * cache) {
-  mmap_cache_it * it = (mmap_cache_it *)malloc(sizeof(mmap_cache_it));
+  mmap_cache_it * it = (mmap_cache_it *)calloc(1, sizeof(mmap_cache_it));
   it->cache = cache;
-  it->p_cur = -1;
-  it->slot_ptr = 0;
-  it->slot_ptr_end = 0;
+  it->p_cur = NOPAGE;
 
   return it;
 }
@@ -875,16 +864,19 @@ MU32 * mmc_iterate_next(mmap_cache_it * it) {
     /* End of page ... */
     if (slot_ptr == it->slot_ptr_end) {
 
-      /* Unlock current page if any */
-      if (it->p_cur != -1) {
-        mmc_unlock(it->cache);
-      }
+      if (it->p_cur == NOPAGE) {
+        it->p_cur = 0;
 
-      /* Move to the next page, return 0 if no more pages */
-      if (++it->p_cur == cache->c_num_pages) {
-        it->p_cur = -1;
-        it->slot_ptr = 0;
-        return 0;
+      /* Unlock current page if any */
+      } else {
+        mmc_unlock(it->cache);
+
+        /* Move to the next page, return 0 if no more pages */
+        if (++it->p_cur == cache->c_num_pages) {
+          it->p_cur = NOPAGE;
+          it->slot_ptr = 0;
+          return 0;
+        }
       }
 
       /* Lock the new page number */
@@ -920,7 +912,7 @@ MU32 * mmc_iterate_next(mmap_cache_it * it) {
 */
 void mmc_iterate_close(mmap_cache_it * it) {
   /* Unlock page if locked */
-  if (it->p_cur != -1) {
+  if (it->p_cur != NOPAGE) {
     mmc_unlock(it->cache);
   }
 
@@ -976,7 +968,7 @@ void _mmc_delete_slot(
   mmap_cache * cache, MU32 * slot_ptr
 ) {
   ASSERT(*slot_ptr > 1);
-  ASSERT(cache->p_cur != -1);
+  ASSERT(cache->p_cur != NOPAGE);
 
   /* Set offset to 1 */
   *slot_ptr = 1;
@@ -1014,7 +1006,7 @@ MU32 * _mmc_find_slot(
   slots_left = cache->p_num_slots;
   slots_end = cache->p_base_slots + slots_left;
 
-  ASSERT(cache->p_cur != -1);
+  ASSERT(cache->p_cur != NOPAGE);
 
   /* Loop with integer probing till we find or don't */
   while (slots_left--) {
@@ -1077,14 +1069,14 @@ MU32 * _mmc_find_slot(
 */
 void _mmc_init_page(mmap_cache * cache, MU32 p_cur) {
   MU32 start_page = p_cur, end_page = p_cur+1;
-  if (p_cur == -1) {
+  if (p_cur == NOPAGE) {
     start_page = 0;
     end_page = cache->c_num_pages;
   }
 
   for (p_cur = start_page; p_cur < end_page; p_cur++) {
     /* Setup page details */
-    MU32 p_offset = p_cur * cache->c_page_size;
+    MU64 p_offset = (MU64)p_cur * cache->c_page_size;
     void * p_ptr = PTR_ADD(cache->mm_var, p_offset);
 
     /* Initialise to all 0's */
@@ -1113,8 +1105,8 @@ int  _mmc_test_page(mmap_cache * cache) {
   MU32 count_free = 0, count_old = 0, max_data_offset = 0;
   MU32 data_size = cache->c_page_size;
 
-  ASSERT(cache->p_cur != -1);
-  if (!(cache->p_cur != -1)) return 0;
+  ASSERT(cache->p_cur != NOPAGE);
+  if (cache->p_cur == NOPAGE) return 0;
 
   for (; slot_ptr < cache->p_base_slots + cache->p_num_slots; slot_ptr++) {
     MU32 data_offset = *slot_ptr;
@@ -1144,7 +1136,7 @@ int  _mmc_test_page(mmap_cache * cache) {
       MU32 kvlen = S_SlotLen(base_det);
       ROUNDLEN(kvlen);
 
-      ASSERT(last_access > 1000000000)
+      ASSERT(last_access > 1000000000);
       if (!(last_access > 1000000000)) return 0;
       ASSERT(expire_time == 0 || (expire_time > 1000000000));
       if (!(expire_time == 0 || (expire_time > 1000000000))) return 0;
@@ -1200,7 +1192,7 @@ int  _mmc_test_page(mmap_cache * cache) {
 int _mmc_dump_page(mmap_cache * cache) {
   MU32 slot;
 
-  ASSERT(cache->p_cur != -1);
+  ASSERT(cache->p_cur != NOPAGE);
 
   printf("PageNum: %d\n", cache->p_cur);
   printf("\n");

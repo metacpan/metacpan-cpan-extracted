@@ -6,13 +6,13 @@ Log::Mini - It's a very simple logger which can log your messages to a file or S
 
     use Log::Mini;
 
-    my $logger = Log::Mini->get_logger(); #STDERR logger used by default. Error is default log level
+    my $logger = Log::Mini->new(); #STDERR logger used by default. Error is default log level
     $logger->error('Error message');
 
-    my $debug_logger = Log::Mini->get_logger('stderr', level => 'debug'); #STDERR logger used by default
+    my $debug_logger = Log::Mini->new('stderr', level => 'debug'); #STDERR logger used by default
     $debug_logger->error('Error message');
 
-    my $file_logger = Log::Mini->get_logger(file => 'log_file.log');
+    my $file_logger = Log::Mini->new(file => 'log_file.log');
     $file_logger->info('message to log file');
 
     #prevent buffered output. May slow down your application!
@@ -23,6 +23,10 @@ Log::Mini - It's a very simple logger which can log your messages to a file or S
 
     #log method for better compatibility
     $logger->log('info', 'information message');
+
+    #Null logger - drops all messages to /dev/null
+    my $logger = Log::Mini->new('null);
+    $logger->error('Error message'); #Message will be dropped
 
 # DESCRIPTION
 

@@ -31,8 +31,8 @@ public:
     long ptr;
 
     SimpleObjectData(Handle<Object> object_, long ptr_)
-        : ptr(ptr_)
-        , object(object_)
+        : object(object_)
+        , ptr(ptr_)
     { }
 };
 
@@ -59,8 +59,8 @@ class V8Context;
 class ObjectData {
 public:
     V8Context* context;
-    SV* sv;
     Persistent<Object> object;
+    SV* sv;
     long ptr;
 
     ObjectData() {};
@@ -102,6 +102,7 @@ class V8Context {
         ~V8Context();
 
         void bind(const char*, SV*);
+        void bind_ro(const char*, SV*);
         SV* eval(SV* source, SV* origin = NULL);
         bool idle_notification();
         int adjust_amount_of_external_allocated_memory(int bytes);

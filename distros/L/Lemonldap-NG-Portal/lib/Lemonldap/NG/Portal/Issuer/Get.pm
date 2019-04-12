@@ -4,13 +4,14 @@ use strict;
 use Mouse;
 use URI::Escape;
 use Lemonldap::NG::Common::FormEncode;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED);
+use Lemonldap::NG::Portal::Main::Constants
+  qw(PE_OK PE_BADURL PE_GET_SERVICE_NOT_ALLOWED);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer';
 
-has rule => ( is => 'rw', default => sub { {} } );
+has rule => ( is => 'rw' );
 
 # INITIALIZATION
 
@@ -19,11 +20,9 @@ sub init {
 
     # Parse activation rule
     my $hd = $self->p->HANDLER;
-    $self->logger->debug(
-        "GET rule -> " . $self->conf->{issuerDBGetRule} );
+    $self->logger->debug( "GET rule -> " . $self->conf->{issuerDBGetRule} );
     my $rule =
-      $hd->buildSub(
-        $hd->substitute( $self->conf->{issuerDBGetRule} ) );
+      $hd->buildSub( $hd->substitute( $self->conf->{issuerDBGetRule} ) );
     unless ($rule) {
         $self->error( "Bad GET rule -> " . $hd->tsv->{jail}->error );
         return 0;

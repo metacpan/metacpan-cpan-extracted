@@ -1,5 +1,13 @@
 Revision history for Map::Tube::Madrid
 
+0.31  2019-04-12
+      - Updated map for Line L4 showing new connections.
+      - Added package Map::Tube::Madrid::Line::L4
+      - Added map image for Line L4.
+
+0.31  2019-04-11
+      - Updated MANIFEST file to remove map images.
+
 0.30  2019-03-02
       - Updated dependency on Map::Tube v3.60.
 

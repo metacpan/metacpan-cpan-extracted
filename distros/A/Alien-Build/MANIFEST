@@ -129,6 +129,7 @@ lib/Alien/Build/CommandSequence.pm
 lib/Alien/Build/Interpolate.pm
 lib/Alien/Build/Interpolate/Default.pm
 lib/Alien/Build/MM.pm
+lib/Alien/Build/Manual/Alien.pod
 lib/Alien/Build/Manual/AlienAuthor.pod
 lib/Alien/Build/Manual/AlienUser.pod
 lib/Alien/Build/Manual/Contributing.pod

@@ -1,5 +1,6 @@
 use 5.008;
 use ExtUtils::MakeMaker;
+use ExtUtils::CppGuess;
 
 use lib qw(inc);
 use Devel::CheckLib;
@@ -13,43 +14,56 @@ check_lib_or_exit(
         : (),
 );
 
-my $CC = 'g++';
-my %mm = (
+my $guess = ExtUtils::CppGuess->new;
+
+WriteMakefile(
     NAME              => 'JavaScript::V8',
-    VERSION_FROM      => 'lib/JavaScript/V8.pm', # finds $VERSION
-    PREREQ_PM         => {
+    VERSION_FROM      => 'lib/JavaScript/V8.pm',
+    BUILD_REQUIRES    => {
       'ExtUtils::XSpp' => '0.11',
-    }, # e.g., Module::Name => 1.1
-    ABSTRACT_FROM  => 'lib/JavaScript/V8.pm', # retrieve abstract from module
+    },
+    TEST_REQUIRES     => {
+      'Test::Number::Delta' => 0,
+    },
+    CONFIGURE_REQUIRES => {
+      'ExtUtils::MakeMaker' => '6.64', # TEST_REQUIRES
+      'ExtUtils::CppGuess' => '0.19',
+    },
+    ABSTRACT_FROM  => 'lib/JavaScript/V8.pm',
     AUTHOR         => 'Pawel Murias <pawelmurias@gmail.org>',
-    LIBS              => [($V8_DIR ? "-L$V8_DIR " : '') . '-lv8'], # e.g., '-lm'
-    DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
-    INC               => '-I.' . ($V8_DIR ? " -I$V8_DIR/include" : ''), # e.g., '-I. -I/usr/include/other'
+    LIBS              => [($V8_DIR ? "-L$V8_DIR " : '') . '-lv8'],
+    INC               => '-I.' . ($V8_DIR ? " -I$V8_DIR/include" : ''),
     OBJECT            => '$(O_FILES)', # link all the C files too
     XSOPT             => '-C++ -hiertype',
     TYPEMAPS          => ['perlobject.map'],
-    CC                => $CC,
-    LD                => '$(CC)',
     depend            => { 'WithV8Context.c' => 'JavaScript-V8-Context.xsp' },
+    META_MERGE => {
+      "meta-spec" => { version => 2 },
+      resources        => {
+        x_IRC => 'irc://irc.perl.org/#v8',
+        repository     => {
+          type => 'git',
+          url => 'git@github.com:dgl/javascript-v8.git',
+          web => 'http://github.com/dgl/javascript-v8',
+        },
+      },
+      prereqs => {
+        develop => {
+          requires => {
+            'Test::Pod' => '1.22',
+            'Pod::Markdown' => 0,
+          },
+        },
+      },
+    },
+    $guess->makemaker_options,
 );
 
-if(ExtUtils::MakeMaker->can("VERSION") && ExtUtils::MakeMaker->VERSION(6.46)) {
-  $mm{META_MERGE} = {
-    resources        => {
-      repository     => 'http://github.com/dgl/javascript-v8',
-    }
-  };
-}
+sub MY::postamble {
+  <<EOF;
+pure_all :: README.md
 
-if(gcc_version($CC) >= 4.5) {
-  $mm{CCFLAGS} = '-fpermissive';
-}
-
-WriteMakefile(%mm);
-
-sub gcc_version {
-  my($cc) = @_;
-  my $gcc_out = qx{$cc -v 2>&1};
-  # Just the first two digits
-  $gcc_out =~ /gcc version (\d+\.\d+)/ ? $1 : 0;
+README.md : \$(VERSION_FROM)
+\tpod2markdown \$< >\$\@
+EOF
 }

@@ -1,7 +1,7 @@
 package Log::ger;
 
-our $DATE = '2018-12-20'; # DATE
-our $VERSION = '0.025'; # VERSION
+our $DATE = '2019-04-12'; # DATE
+our $VERSION = '0.026'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -51,6 +51,12 @@ my $sub0 = sub {0};
 my $sub1 = sub {1};
 my $default_null_routines;
 
+if (eval { require Sub::Name; 1 }) {
+    *subname = \&Sub::Name::subname;
+} else {
+    *subname = sub {};
+}
+
 sub install_routines {
     my ($target, $target_arg, $routines) = @_;
 
@@ -64,6 +70,7 @@ sub install_routines {
             next unless $type =~ /_sub\z/;
             #print "D:installing $name to package $target_arg\n";
             *{"$target_arg\::$name"} = $code;
+            subname("$target_arg\::$name", $code);
         }
     } elsif ($target eq 'object') {
 #IFUNBUILT
@@ -75,6 +82,7 @@ sub install_routines {
             my ($code, $name, $lnum, $type) = @$r;
             next unless $type =~ /_method\z/;
             *{"$pkg\::$name"} = $code;
+            subname("$pkg\::$name", $code);
         }
     } elsif ($target eq 'hash') {
         for my $r (@$routines) {
@@ -166,7 +174,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.025
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -244,11 +252,11 @@ L<Log::Log4perl>, or some other popular logging frameworks, to ease migration or
 adjust with your personal style.
 
 B<Per-package settings.> Each importer package can use its own format/layout,
-output. For example, some modules that are migrated from Log::Any uses
-Log::Any-style logging, while another uses native Log::ger style, and yet some
-other uses block formatting like Log::Contextual. This eases code migration and
-teamwork. Each module author can preserve her own logging style, if wanted, and
-all the modules still use the same framework.
+output. For example, a module that is migrated from Log::Any uses Log::Any-style
+logging, while another uses native Log::ger style, and yet some other uses block
+formatting like Log::Contextual. This eases code migration and teamwork. Each
+module author can preserve her own logging style, if wanted, and all the modules
+still use the same framework.
 
 B<Dynamic.> Outputs and levels can be changed anytime during run-time and
 logging routines will be updated automatically. This is useful in situation like
@@ -283,7 +291,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

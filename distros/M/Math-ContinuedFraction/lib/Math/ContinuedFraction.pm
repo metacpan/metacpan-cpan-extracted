@@ -16,7 +16,7 @@ use overload
 	'/' => sub {return Continued::Fraction->div($_[0], $_[1]);},
 	;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =pod
 

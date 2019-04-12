@@ -155,3 +155,7 @@ div.oidc_consent_message > ul {
 .nodecor:hover, .nodecor:active.nodecor:focus {
   text-decoration: none;
 }
+
+.fa.icon-blue {
+    color: blue;
+}

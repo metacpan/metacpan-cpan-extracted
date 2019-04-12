@@ -23,6 +23,10 @@ MooX::StrictHas - Forbid "has" attributes lazy\_build and auto\_deref
       is => 'ro',
       lazy_build => 1, # blows up, not implemented in Moo
     );
+    has attr2 => (
+      is => 'ro',
+      does => "Thing", # blows up, not implemented in Moo
+    );
 
 # DESCRIPTION
 
@@ -33,6 +37,10 @@ does not implement, but silently accepts:
 - auto\_deref
 
     This is not considered best practice - just dereference in your using code.
+
+- does
+
+    Unsupported; use `isa` instead.
 
 - lazy\_build
 

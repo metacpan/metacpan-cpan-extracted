@@ -9,7 +9,9 @@ README
 dist.ini
 lib/App/HTTPUserAgentUtils.pm
 script/gen-random-http-ua
+script/http-ua-by-nickname
 script/parse-http-ua
+script/rand-http-ua
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

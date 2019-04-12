@@ -1,5 +1,8 @@
 Revision history for Mail::POP3
 
+3.10 2019-04-11
+ - update metadata - thanks @manwar
+
 3.09	Wed Oct 18 05:23:03 BST 2017
 - introduce sane MANIFEST.SKIP et al
 - zap sub Makefile.PL

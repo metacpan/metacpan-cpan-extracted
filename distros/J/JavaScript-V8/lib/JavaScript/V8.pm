@@ -2,7 +2,7 @@ package JavaScript::V8;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use JavaScript::V8::Context;
 require XSLoader;
@@ -23,42 +23,67 @@ JavaScript::V8 - Perl interface to the V8 JavaScript engine
 
   my $context = JavaScript::V8::Context->new();
 
-  $context->bind_function(write => sub { print @_ });
+  $context->bind( write => sub { print @_ } );
+  $context->bind( bottles => 3 );
+  $context->bind( wine_type => ['red', 'white', 'sparkling'] );
+
+  $context->bind( wine_type_description => {
+      white     => "White wine is a wine whose color is slightly yellow. This kind of wine is produced using non-coloured grapes or using red-skinned grapes' juice, not allowing it to extract pigment from the skin.",
+      red       => "Red wine is a type of wine made from dark-coloured (black) grape varieties. The actual colour of the wine can range from intense violet, typical of young wines, through to brick red for mature wines and brown for older red wines.",
+      sparkling => "Sparkling wine is a wine with significant levels of carbon dioxide in it making it fizzy. The carbon dioxide may result from natural fermentation, either in a bottle, as with the méthode champenoise, in a large tank designed to withstand the pressures involved (as in the Charmat process), or as a result of carbon dioxide injection.",
+  });
 
   $context->eval(q/
-    for (i = 99; i > 0; i--) {
-        write(i + " bottle(s) of beer on the wall, " + i + " bottle(s) of beer\n");
-        write("Take 1 down, pass it around, ");
-        if (i > 1) {
-            write((i - 1) + " bottle(s) of beer on the wall.");
-        }
-        else {
-            write("No more bottles of beer on the wall!");
-        }
-    }
+      for (i = bottles; i > 0; i--) {
+          var type = wine_type[i - 1];
+          var description = wine_type_description[type];
+
+          write(i + " bottle(s) of wine on the wall, " + i + " bottle(s) of wine\n");
+
+          write("This is bottle of " + type + " wine. " + description + "\n\n");
+
+          write("Take 1 down, pass it around, ");
+          if (i > 1) {
+              write((i - 1) + " bottle(s) of wine on the wall.\n");
+          }
+          else {
+              write("No more bottles of wine on the wall!\n");
+          }
+      }
   /);
+
+=head1 DIRECTION
+
+Since 2012, the v8 library has changed considerably, both in its build
+system and its API. Additionally, at the time of this writing (Apr 2019),
+the latest version available for Ubuntu is about 3.14, and for Homebrew
+is around 3.28. Meanwhile, the latest "release"(ish) from Google is
+around 7.5.99.
+
+The dramatic API changes mean that backward compatibility with the
+current API will be effectively impossible. Unfortunately, the likelihood
+of security holes in the 7-or-so year old software means it will be
+necessary to keep up with the current version, rather than with the one
+v0.08 of this module supports.
+
+Therefore, the next steps will be to use the excellent L<Alien::Build>
+to make an "alien" module that builds and makes available v8. The current
+L<Alien::V8> is not suitable, since its last release was from 2011.
+
+Contributions of effort will be welcome. Please open an RT, or just C<#v8>
+on C<irc.perl.org> to get involved.
 
 =head1 INSTALLING V8
 
+=head2 Memory notes
+
+Please note that v8 needs around 2MB of VSZ memory. See
+L<https://rt.cpan.org/Ticket/Display.html?id=78512> for more information.
+
 =head2 From Source
 
-See L<V8 issue 413|http://code.google.com/p/v8/issues/detail?id=413> if you are
-having trouble on gcc 4.4.1.
-
-    svn checkout http://v8.googlecode.com/svn/trunk/ v8
-    cd v8
-    scons library=shared
-    sudo mv include/v8.h /usr/local/include/
-    sudo mv libv8.so /usr/local/lib/
-
-If you're using a 64-bit architecture, you need to include C<arch=x64> when
-running scons:
-
-    scons library=shared arch=x64
-
-Otherwise, perl will complain when trying to link/load v8. For more
-information, see L<V8 issue
-330|http://code.google.com/p/v8/issues/detail?id=330>.
+See L<https://v8.dev/docs/build> for how. Be warned, the source repo
+alone is over 800MB.
 
 =head3 On OS X
 
@@ -71,9 +96,9 @@ install Homebrew then:
 
 =head3 Linux
 
-On Ubuntu 10.04 (and possibly Debian), the library and header files can be installed by running:
+On Ubuntu 18.04 (and possibly Debian), the library and header files can be installed by running:
 
-    sudo aptitude install libv8-2.0.3 libv8-dev
+    sudo aptitude install libv8-3.14.5 libv8-3.14-dev
 
 Similar packages may be available for other distributions (adjust the package names accordingly).
 

@@ -27,5 +27,6 @@ test_with_attr('', qr/^$/);
 test_with_attr('auto_deref => 1', qr/auto_deref/);
 test_with_attr('lazy_build => 1', qr/lazy_build/);
 test_with_attr('auto_deref => 1, lazy_build => 1', qr/auto_deref.*lazy_build/s);
+test_with_attr('does => "Thing"', qr/does/);
 
 done_testing;

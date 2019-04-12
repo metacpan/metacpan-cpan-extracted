@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -625,7 +625,7 @@ sub isUnprotected {
 }
 
 ## @rmethod void sendHeaders()
-# Launch function compiled by forgeHeadersInit() for the current virtual host
+# Launch function compiled by headersInit() for the current virtual host
 sub sendHeaders {
     my ( $class, $req, $session ) = @_;
     my $vhost = $class->resolveAlias($req);
@@ -644,6 +644,27 @@ sub sendHeaders {
         }
         $class->set_header_in( $req, %headers );
     }
+}
+
+## @rfunction array ref checkHeaders()
+# Return computed headers by headersInit() for the current virtual host
+# [ { key => 'header1', value => 'value1' }, { key => 'header2', value => 'value2' }, ...]
+sub checkHeaders {
+    my ( $class, $req, $session ) = @_;
+    my $vhost         = $class->resolveAlias($req);
+    my $array_headers = [];
+    if ( defined $class->tsv->{forgeHeaders}->{$vhost} ) {
+
+        # Create array of hashes with headers
+        my %headers =
+          $class->tsv->{forgeHeaders}->{$vhost}->( $req, $session );
+        foreach my $h ( sort keys %headers ) {
+            defined $headers{$h}
+              ? push @$array_headers, { key => $h, value => $headers{$h} }
+              : push @$array_headers, { key => $h, value => '' };
+        }
+    }
+    return $array_headers;
 }
 
 ## @rmethod void cleanHeaders()
@@ -759,7 +780,11 @@ sub postInputFilter {
         my %data =
           $class->tsv->{inputPostData}->{$vhost}->{$uri}->( $req, $session );
         foreach ( keys %data ) {
-            $data{$_} = uri_escape( $data{$_} );
+            my $post_key   = uri_escape($_);
+            my $post_value = uri_escape( $data{$_} );
+            delete $data{$_};
+            $data{$post_key} = $post_value;
+            $class->logger->debug("Send key $post_key with value $post_value");
         }
         $class->setPostParams( $req, \%data );
     }
@@ -788,7 +813,8 @@ sub postJavascript {
       : "form.submit();\n";
 
     my $jqueryUrl = $formParams->{jqueryUrl} || "";
-    $jqueryUrl = &{ $class->tsv->{portal} } . "skins/common/js/jquery-1.10.2.js"
+    $jqueryUrl =
+      &{ $class->tsv->{portal} } . "static/bwr/jquery/dist/jquery.min.js"
       if ( $jqueryUrl eq "default" );
     $jqueryUrl = "<script type='text/javascript' src='$jqueryUrl'></script>\n"
       if ($jqueryUrl);

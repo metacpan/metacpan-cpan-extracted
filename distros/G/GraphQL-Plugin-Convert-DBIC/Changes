@@ -1,5 +1,10 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.14 2019-04-11
+ - Changed the 'to_graphql' function to accept just a DBIC schema instance
+   and not a coderef.  We will continue to accept the coderef style for
+   back-compatibility but its considered deprecated.
+
 0.13	Fri  5 Apr 04:56:21 BST 2019
  - fix get-one - thanks @jjn1056
 

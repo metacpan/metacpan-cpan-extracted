@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Plugin to filter out known bad versions
-our $VERSION = '1.63'; # VERSION
+our $VERSION = '1.65'; # VERSION
 
 
 has '+filter' => sub { Carp::croak("The filter property is required for the Prefer::BadVersion plugin") };
@@ -16,9 +16,9 @@ sub init
   my($self, $meta) = @_;
 
   $meta->add_requires('configure', __PACKAGE__, '1.05');
-  
+
   my $filter;
-  
+
   if(ref($self->filter) eq '')
   {
     my $string = $self->filter;
@@ -44,13 +44,13 @@ sub init
   {
     Carp::croak("unknown filter type for Prefer::BadVersion");
   }
-  
+
   $meta->around_hook(
     prefer => sub {
       my($orig, $build, @therest) = @_;
       my $res1 = $orig->($build, @therest);
       return $res1 unless $res1->{type} eq 'list';
-      
+
       return {
         type => 'list',
         list => [
@@ -75,7 +75,7 @@ Alien::Build::Plugin::Prefer::BadVersion - Plugin to filter out known bad versio
 
 =head1 VERSION
 
-version 1.63
+version 1.65
 
 =head1 SYNOPSIS
 
@@ -84,8 +84,9 @@ version 1.63
 
 =head1 DESCRIPTION
 
-This plugin allows you to easily filter out known bad versions of libraries.  You need a Prefer plugin
-that filters and sorts files first.  You may specify the filter in one of three ways:
+This plugin allows you to easily filter out known bad versions of libraries in a share install.
+It doesn't affect a system install at all.  You need a Prefer plugin that filters and sorts files
+first.  You may specify the filter in one of three ways:
 
 =over
 
@@ -131,6 +132,9 @@ Filter out entries that match the filter.
 
 If you are using the string or array mode, then you need an existing Prefer plugin that sets the
 version number for each file candidate, such as L<Alien::Build::Plugin::Prefer::SortVersions>.
+
+Unless you want to exclude the latest version from a share install, this plugin isn't really
+that useful.  It has no effect on system installs, which may not be obvious at first.
 
 =head1 SEE ALSO
 

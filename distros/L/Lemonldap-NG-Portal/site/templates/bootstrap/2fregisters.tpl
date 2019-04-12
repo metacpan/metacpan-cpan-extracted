@@ -19,14 +19,15 @@
           <th><span trspan="date">Date</span></th>
           <th>
             <TMPL_IF NAME="ACTION">
-              <span trspan="action">Action</span></th>
+              <span trspan="action">Action</span>
             </TMPL_IF>
+          </th>
         </tr>
       </thead>
       <tbody>
         <TMPL_LOOP NAME="SFDEVICES">
           <tr id='delete-<TMPL_VAR NAME="epoch">'>
-            <td class="align-middle" ><TMPL_VAR NAME="type"></td>
+            <td class="align-middle"><TMPL_VAR NAME="type"></td>
             <td class="align-middle"><TMPL_VAR NAME="name"></td>
             <td class="data-epoch"><TMPL_VAR NAME="epoch"></td>
             <td>

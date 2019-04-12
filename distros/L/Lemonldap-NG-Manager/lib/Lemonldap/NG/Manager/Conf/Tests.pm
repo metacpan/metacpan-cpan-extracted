@@ -4,7 +4,7 @@ use utf8;
 use Lemonldap::NG::Common::Regexp;
 use Lemonldap::NG::Handler::Main;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -573,9 +573,12 @@ sub tests {
         # Error if external 2F Send or Validate command is missing
         ext2fCommands => sub {
             return 1 unless ( $conf->{ext2fActivation} );
-            return ( 0, "External 2F Send or Validate command must be set" )
-              unless ( defined $conf->{ext2FSendCommand}
-                && defined $conf->{ext2FValidateCommand} );
+            return ( 0, "External 2F Send command must be set" )
+              unless ( defined $conf->{ext2FSendCommand} );
+            unless ( defined $conf->{ext2fCodeActivation} ) {
+                return ( 0, "External 2F Validate command must be set" )
+                  unless ( defined $conf->{ext2FValidateCommand} );
+            }
 
             # Return
             return 1;
@@ -630,6 +633,16 @@ sub tests {
             return 1;
         },
 
+        ## Warn if IdSpoofing plugin is enabled
+        # checkIdSpoofing => sub {
+        #     return ( -1,
+        #         '"IdSpoofing" plugin is enabled!!!'
+        #         )
+        #         if ( $conf->{idSpoofingRule} );
+
+        #     # Return
+        #     return 1;
+        # },
     };
 }
 

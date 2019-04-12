@@ -5,7 +5,7 @@ use strict;
 use Exporter 'import';
 use base qw(Exporter);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 # CONSTANTS
 
@@ -48,7 +48,7 @@ our %EXPORT_TAGS = (
           APPLYSECTION
           NO
           $hashParameters
-          @sessionTypes 
+          @sessionTypes
           )
     ]
 );

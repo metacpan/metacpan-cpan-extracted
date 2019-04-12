@@ -1,5 +1,12 @@
 Revision history for App-bitbucket-cli
 
+0.009   2019-04-12
+        Updating for release of version 0.009
+        Updated date (Ivan Wills)
+        Adding file to be ignored (Ivan Wills)
+        Updating config (Ivan Wills)
+        Adding the ability to construct the pull request creation url (Ivan Wills)
+
 0.008   2018-12-27
         Updating for release of version 0.008
         Adding email and participand to filters for PRs (Ivan Wills)

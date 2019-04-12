@@ -7,11 +7,12 @@ package Module::Build::Using::PkgConfig;
 
 use strict;
 use warnings;
+use 5.010;  # //
 use base qw( Module::Build );
 
 use ExtUtils::PkgConfig;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
@@ -130,7 +131,7 @@ described above.
 
 =item alien_version => $version
 
-If the C<Alien::> module is not available, gives the module verison of it that
+If the C<Alien::> module is not available, gives the module version of it that
 will be required to provide the F<pkg-config> module of the required version.
 This gets added to C<requires>.
 
@@ -476,7 +477,7 @@ to neaten the common case of simple requirements.
 
 =item *
 
-Consider futher stealing the various helper methods from L<ExtUtils::CChecker>
+Consider further stealing the various helper methods from L<ExtUtils::CChecker>
 and possibly splitting this class into a lower "C-using XS modules" and
 higher-level F<pkg-config>+Alien layer.
 

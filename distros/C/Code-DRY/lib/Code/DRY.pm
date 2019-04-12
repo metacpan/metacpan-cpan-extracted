@@ -23,7 +23,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load( 'Code::DRY', $VERSION );
@@ -111,16 +111,16 @@ my $default_callback = sub {
                     "\n\ninternal error: $offsetLineBegin, $dup->[4], $dup->[5], $offsetLineEnd, line number $linenumber";
             }
 
-            print get_substr_from_input($offsetLineBegin,
+            print get_concatenated_text($offsetLineBegin,
                 $dup->[6] - $offsetLineBegin );
             print " ==>>" if ( $units eq 'bytes' );
         }
 
-        print get_substr_from_input( $dup->[4], $dup->[5] - $dup->[4] + 1 );
+        print get_concatenated_text( $dup->[4], $dup->[5] - $dup->[4] + 1 );
         print "<<== " if ( $units eq 'bytes' );
 
         if ( $units eq 'bytes' ) {
-            print get_substr_from_input(
+            print get_concatenated_text(
                 $dup->[7] + 1,
                 $offsetLineEnd - $dup->[7]
             ) if ( $dup->[7] + 1 < $offsetLineEnd );
@@ -335,6 +335,7 @@ sub get_line_offsets_of_fileindex {
 }
 
 sub get_concatenated_text {
+    return if (!defined $codetotal);
     my ( $start, $length ) = @_;
     return substr( $codetotal, $start, $length );
 }
@@ -349,6 +350,7 @@ sub enter_files {
 
     my $here = 0;
     for my $file (@{$rfiles}) {
+        next if (!defined $file || $file eq '');
         # check metadata
         my @statresult = stat($file);
         if (0 < $#statresult) {
@@ -390,7 +392,6 @@ sub find_duplicates_in {
     # enter codestring
     build_suffixarray_and_lcp($codetotal) == 0
         or die "Error building suffix array:$!\n";
-    $codetotal = undef; # release memory
     warn "analysing content of ", length $codetotal, " bytes out of ",
         scalar @files, " files...\n" if ($verbose);
     clip_lcp_to_fileboundaries( \@fileoffsets );
@@ -417,8 +418,8 @@ sub find_duplicates_in {
         # ignore filter
         my $off;
         if ( $res && defined $ignoreContentFilter ) {
-            $res = get_substr_from_input( $off = get_offset_at($_), $lcp )
-                !~ m{$ignoreContentFilter}xms;
+	    my $text = get_concatenated_text( $off = get_offset_at($_), $lcp );
+            $res = $text !~ m{$ignoreContentFilter}xms;
         }
 
         if ( $res && 0 <= $minlength )
@@ -447,6 +448,7 @@ sub find_duplicates_in {
 
     warn "ranking array created with ", scalar @ranks, " entries\n" if ($verbose);
 
+    my $res = '';
     # now report the remaining duplicates
     for my $matchentry (@ranks) {
 
@@ -459,6 +461,8 @@ sub find_duplicates_in {
 
         report_dupes( $minlength, $count_dups, $lcp, $matchentry - 1 );
     }
+    $codetotal = undef; # release memory
+    return $res;
 }
 
 use File::Find ();
@@ -873,10 +877,6 @@ This XS function returns the index number from the suffix array where the C<$off
 =head2 C<set_lcp_to_zero_for_shadowed_substrings($index)>
 
 This XS function sets all prefix lengths to zero for those entries where the suffix is contained in another longer (or more leftward) suffix.
-
-=head2 C<get_substr_from_input($offset, $length)>
-
-This XS function returns the given text portion of the internal concatenated string (after being fed to C<build_suffixarray_and_lcp>) at offset C<$offset> with a length of C<$length>.
 
 =head2 C<get_concatenated_text($offset, $length)>
 

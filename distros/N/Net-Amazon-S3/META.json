@@ -4,7 +4,7 @@
       "Leo Lapworth <llap@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,6 +17,9 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "runtime" : {
@@ -101,17 +104,21 @@
          "web" : "https://github.com/rustyconover/net-amazon-s3"
       }
    },
-   "version" : "0.85",
+   "version" : "0.86",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Ali Anari <ali@anari.me>",
       "Branislav Zahradnik <branislav.zahradnik@gooddata.com>",
       "Christian Lackas <lackas@invicro.com>",
       "Dylan William Hardison <dylan@hardison.net>",
+      "Florian Schlichting <fsfs@debian.org>",
       "Gabriel Andrade <gabriel@zumba.home>",
+      "Gabriel Andrade <gabriel@Zumba.local>",
+      "Gavin Carr <gavin@openfusion.com.au>",
       "Haruka Iwao <haruka@fout.jp>",
       "Leo Lapworth <leo@cuckoo.org>",
       "Leon Brocard <acme@astray.com>",
+      "Michael Schout <schoutm@gmail.com>",
       "Michele Beltrame <mb@cattlegrid.info>",
       "Michele Beltrame <mb@italpro.net>",
       "Miquel Ruiz <mruiz@cpan.org>",
@@ -121,19 +128,22 @@
       "Pedro Figueiredo <me@pedrofigueiredo.org>",
       "Pedro Figueiredo <pfig@89clouds.com>",
       "perlpong <calyx238@gmail.com>",
+      "Renato Santos <renato@aware.com.br>",
       "robert clarke <robert_clarke@trendmicro.co.uk>",
       "Robert Ward <robert@rtward.com>",
       "Rusty Conover <rusty_conover@me.com>",
       "Rusty Conover <rustyconover@users.noreply.github.com>",
       "Rusty Conover <rusty@luckydinosaur.com>",
       "Rusty Conover <rusty@parrotsnap.com>",
-      "Slobodan Mišković <slobodan@miskovic.ca>",
+      "Slobodan Mis\u030ckovic\u0301 <slobodan@miskovic.ca>",
       "Steven Berler <steven.berler@dreamhost.com>",
       "Struan Bartlett <struan.bartlett@NewsNow.co.uk>",
       "Stuart Skelton <stuarts@broadbean.com>",
       "Tom Hukins <tom@eborcom.com>",
       "toritori0318 <toritori0318@gmail.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>"
-   ]
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.07"
 }
 

@@ -9,7 +9,7 @@ use Capture::Tiny 0.17 qw/capture_stdout/;
 use Text::ParseWords qw/shellwords/;
 
 # ABSTRACT: Base classes for Alien:: modules
-our $VERSION = '1.63'; # VERSION
+our $VERSION = '1.65'; # VERSION
 
 
 sub import {
@@ -473,7 +473,10 @@ sub Inline {
   my ($class, $language) = @_;
   return if $language !~ /^(C|CPP)$/;
   my $config = {
-    CCFLAGSEX    => $class->cflags,
+    # INC should arguably be for -I flags only, but
+    # this improves compat with ExtUtils::Depends.
+    # see gh#107, gh#108
+    INC          => $class->cflags,
     LIBS         => $class->libs,
   };
   
@@ -587,7 +590,7 @@ Alien::Base - Base classes for Alien:: modules
 
 =head1 VERSION
 
-version 1.63
+version 1.65
 
 =head1 SYNOPSIS
 

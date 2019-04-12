@@ -4,8 +4,9 @@ NAME
 
 DESCRIPTION
 
-    This module provides the hiredis minimalistic C client library for the
-    Redis <https://redis.io> database. See Alien::Base for usage.
+    This module provides the hiredis <https://github.com/redis/hiredis>
+    minimalistic C client library for the Redis <https://redis.io>
+    database. See Alien::Build::Manual::AlienUser for usage.
 
 BUGS
 
@@ -25,5 +26,5 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Redis, Redis::hiredis
+    Redis::hiredis, Protocol::Redis::XS
 

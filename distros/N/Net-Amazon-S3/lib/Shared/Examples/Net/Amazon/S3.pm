@@ -1,5 +1,6 @@
 package Shared::Examples::Net::Amazon::S3;
-$Shared::Examples::Net::Amazon::S3::VERSION = '0.85';
+# ABSTRACT: used for testing and as example
+$Shared::Examples::Net::Amazon::S3::VERSION = '0.86';
 use strict;
 use warnings;
 
@@ -31,6 +32,7 @@ our @EXPORT_OK = (
 
 sub s3_api_with_signature_4 {
     Net::Amazon::S3->new (
+        @_,
         aws_access_key_id     => 'AKIDEXAMPLE',
         aws_secret_access_key => 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY',
         authorization_method  => 'Net::Amazon::S3::Signature::V4',
@@ -366,6 +368,7 @@ sub expect_operation_object_create {
         qw[ with_content_disposition  ],
         qw[ with_content_encoding  ],
         qw[ with_content_type  ],
+        qw[ with_encryption ],
         qw[ with_expires ],
         qw[ with_storage_class  ],
         qw[ with_user_metadata ],
@@ -429,11 +432,11 @@ __END__
 
 =head1 NAME
 
-Shared::Examples::Net::Amazon::S3
+Shared::Examples::Net::Amazon::S3 - used for testing and as example
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 AUTHOR
 
@@ -441,7 +444,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

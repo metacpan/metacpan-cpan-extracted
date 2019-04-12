@@ -13,6 +13,7 @@ sub new {
 
     $self->{file} = $params{file};
 
+    # TODO: Allow logrotate
     open my $fh, '>>', $params{file} or die $!;
     if (defined $params{'synced'}) {
         $fh->autoflush(1);

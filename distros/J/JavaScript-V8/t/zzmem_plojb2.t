@@ -4,7 +4,11 @@ use utf8;
 use strict;
 use warnings;
 
-use Test::More skip_all => $^V lt v5.10;
+use Test::More;
+
+if ($^V lt v5.10) {
+    plan skip_all => 'perl >= v5.10 needed';
+}
 
 use FindBin;
 my $context = require "$FindBin::Bin/mem.pl";
@@ -20,7 +24,6 @@ package main;
 
 $context->eval('var DATA = []');
 for (1..100000) {
-    print STDERR "$_\r";
     $context->eval('(function(data) { DATA.push(data); })')->(Test->new($_));
 }
 
@@ -28,7 +31,7 @@ for (1..100000) {
 
 SKIP: {
     skip "no ps", 1 unless check_ps();
-    ok get_rss() > 100_000, 'objects are not released';
+    ok get_rss() < 100_000, 'objects are not released';
 }
 
 done_testing;

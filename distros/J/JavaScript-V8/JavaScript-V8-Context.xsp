@@ -8,6 +8,7 @@
 
   SV* eval(SV* source, SV* origin = NULL);
   void bind(const char* name, SV* code);
+  void bind_ro(const char* name, SV* code);
   bool idle_notification();
   int adjust_amount_of_external_allocated_memory(int change_in_bytes);
   void set_flags_from_string(char *str);

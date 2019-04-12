@@ -111,7 +111,7 @@ ok(
 );
 count(1);
 ok( $res->[2]->[0] =~ /trmsg="68"/, 'Reject reason is 68' )
-    or print STDERR Dumper( $res->[2]->[0] );
+  or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
 # Simple SP access
@@ -143,8 +143,7 @@ $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 $body = $res->[2]->[0];
 $body =~ s/^.*?<form.*?>//s;
 $body =~ s#</form>.*$##s;
-%fields =
-  ( $body =~ /<input type="hidden".+?name="(.+?)".+?value="(.*?)"/sg );
+%fields = ( $body =~ /<input type="hidden".+?name="(.+?)".+?value="(.*?)"/sg );
 $fields{user} = $fields{password} = 'french';
 use URI::Escape;
 $s = join( '&', map { "$_=" . uri_escape( $fields{$_} ) } keys %fields );

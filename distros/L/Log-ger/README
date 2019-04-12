@@ -2,7 +2,7 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.025
+    version 0.026
 
 SYNOPSIS
     In your module (producer):
@@ -80,8 +80,8 @@ DESCRIPTION
         style.
 
         Per-package settings. Each importer package can use its own
-        format/layout, output. For example, some modules that are migrated
-        from Log::Any uses Log::Any-style logging, while another uses native
+        format/layout, output. For example, a module that is migrated from
+        Log::Any uses Log::Any-style logging, while another uses native
         Log::ger style, and yet some other uses block formatting like
         Log::Contextual. This eases code migration and teamwork. Each module
         author can preserve her own logging style, if wanted, and all the
@@ -115,7 +115,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Net::Amazon::S3::Client::Object;
-$Net::Amazon::S3::Client::Object::VERSION = '0.85';
+$Net::Amazon::S3::Client::Object::VERSION = '0.86';
 use Moose 0.85;
 use MooseX::StrictConstructor 0.16;
 use DateTime::Format::HTTP;
@@ -65,6 +65,11 @@ has 'user_metadata' => (
     isa      => 'HashRef',
     required => 0,
     default  => sub { {} },
+);
+has 'website_redirect_location' => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 0,
 );
 has 'encryption' => (
     is       => 'ro',
@@ -204,6 +209,9 @@ sub _put {
     }
     if ( $self->storage_class && $self->storage_class ne 'standard' ) {
         $conf->{'x-amz-storage-class'} = uc $self->storage_class;
+    }
+    if ( $self->website_redirect_location ) {
+        $conf->{'x-amz-website-redirect-location'} = $self->website_redirect_location;
     }
     $conf->{"x-amz-meta-\L$_"} = $self->user_metadata->{$_}
         for keys %{ $self->user_metadata };
@@ -416,7 +424,7 @@ Net::Amazon::S3::Client::Object - An easy-to-use Amazon S3 client object
 
 =head1 VERSION
 
-version 0.85
+version 0.86
 
 =head1 SYNOPSIS
 
@@ -568,6 +576,10 @@ You may specify the S3 storage class by setting C<storage_class> to either
 C<standard>, C<reduced_redundancy>, C<standard_ia>, or C<onezone_ia>;
 the default is C<standard>.
 
+You may set website-redirect-location object metadata by setting
+C<website_redirect_location> to either another object name in the same
+bucket, or to an external URL.
+
 =head2 put_filename
 
   # upload a file
@@ -592,6 +604,10 @@ Content-Disposition using C<content_disposition>.
 You may specify the S3 storage class by setting C<storage_class> to either
 C<standard>, C<reduced_redundancy>, C<standard_ia>, or C<onezone_ia>;
 the default is C<standard>.
+
+You may set website-redirect-location object metadata by setting
+C<website_redirect_location> to either another object name in the same
+bucket, or to an external URL.
 
 User metadata may be set by providing a non-empty hashref as
 C<user_metadata>.
@@ -670,7 +686,7 @@ Leo Lapworth <llap@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
+This software is copyright (c) 2019 by Amazon Digital Services, Leon Brocard, Brad Fitzpatrick, Pedro Figueiredo, Rusty Conover.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

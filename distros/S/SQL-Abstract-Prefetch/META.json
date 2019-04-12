@@ -49,7 +49,7 @@
       },
       "test" : {
          "requires" : {
-            "DBD::SQLite" : "0",
+            "DBD::SQLite" : "1.62",
             "Test::More" : "0.94"
          }
       }
@@ -68,6 +68,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dbix-class"
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

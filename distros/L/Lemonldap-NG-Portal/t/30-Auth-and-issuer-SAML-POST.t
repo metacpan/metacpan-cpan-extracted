@@ -11,7 +11,7 @@ BEGIN {
     require 't/saml-lib.pm';
 }
 
-my $maintests = 21;
+my $maintests = 22;
 my $debug     = 'error';
 my ( $issuer, $sp, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -86,7 +86,8 @@ SKIP: {
         'Post authentication'
     );
     ok( $res->[2]->[0] =~ /trmsg="89"/, 'Reject reason is 89' )
-        or print STDERR Dumper( $res->[2]->[0] );
+      or print STDERR Dumper( $res->[2]->[0] );
+
     # Simple SP access
     ok(
         $res = $sp->_get(
@@ -130,6 +131,11 @@ SKIP: {
         'Post authentication'
     );
     my $idpId = expectCookie($res);
+
+    # Expect pdata to be cleared
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+    ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
+
     ( $host, $url, $s ) =
       expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
         'SAMLResponse' );

@@ -1,0 +1,67 @@
+NAME
+    HTTP::Tiny::Plugin::Retry - Retry failed request
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Plugin::Retry (from
+    Perl distribution HTTP-Tiny-Plugin-Retry), released on 2019-04-12.
+
+SYNOPSIS
+     use HTTP::Tiny::Plugin 'Retry' => {
+         max_attempts => 3, # optional, default 3
+         delay        => 2, # optional, default 2
+         retry_if     => qr/^[45]/, # optional, default is only 5xx errors are retried
+     };
+
+     my $res  = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
+
+DESCRIPTION
+    This plugin retries failed response. By default only retries 5xx
+    failures, as 4xx are considered to be client's fault (but you can
+    configure it with "retry_if").
+
+CONFIGURATION
+  max_attempts
+    Int.
+
+  delay
+    Float.
+
+  retry_if
+    Regex or code. If regex, then will be matched against response status.
+    If code, will be called with arguments: "($self, $response)".
+
+ENVIRONMENT
+  HTTP_TINY_PLUGIN_RETRY_MAX_ATTEMPTS
+    Int.
+
+  HTTP_TINY_PLUGIN_RETRY_DELAY
+    Int.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Plugin-Retry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Plugin-Retry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Plugin-Retr
+    y>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

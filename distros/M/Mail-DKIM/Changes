@@ -1,6 +1,10 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.55
+
+ * Improve parsing of authserv-id in ARC signer
+
 Version 0.54
 
  * The T tag on arcseal is not required

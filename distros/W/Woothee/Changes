@@ -1,5 +1,9 @@
 Revision history for Perl module Woothee
 
+v1.10.0 2019-04-11T09:01:06Z
+   - add support for Android 9
+   - add support for Chromium based Microsoft Edge, Edge for iOS/Android
+
 1.8.0 2018-07-23T06:22:12Z
    - add support for YandexBrowser
 

@@ -15,7 +15,10 @@ Geo::WebService::Elevation::USGS - Elevation queries against USGS web services.
 
 Version 0.106_01 changes the default value of the C<'compatible'>
 attribute to C<0> (i.e. false). With version 0.108_01, the
-first attempt to modify this attribute will warn.
+first attempt to modify this attribute will warn. With version
+0.110_01, all attempts to modify this attribute will warn,
+and six months after the release of this version, any attempt to modify
+it will become fatal.
 
 The GIS data web service this module was originally based on has gone
 the way of the dodo. This release uses the NED service, which is similar
@@ -70,7 +73,7 @@ In the meantime you can suppress the warnings with
 
 The C<compatible> attribute is deprecated as of release 0.104_01. As of
 release 0.106_01 it will warn when set true. In the first
-release after September 1 2018 it will warn on any use. Six months after
+release after March 1 2019 it will warn on any use. Six months after
 that, it will become a fatal error to use it.
 
 =head1 DESCRIPTION
@@ -124,7 +127,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.110';
+our $VERSION = '0.111';
 
 use constant BEST_DATA_SET => -1;
 use constant USGS_URL => 'http://ned.usgs.gov/epqs/pqs.php';
@@ -498,7 +501,7 @@ sub _set_unsigned_integer {
 	attribute	=> {
 	    dflt	=> sub { return },
 	    item	=> {
-		compatible	=> 1,
+		compatible	=> 2,
 		default_ns	=> 2,
 		proxy		=> 2,
 		source		=> 2,
@@ -996,7 +999,7 @@ Thomas R. Wyant, III; F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2018 Thomas R. Wyant, III
+Copyright (C) 2008-2019 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

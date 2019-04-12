@@ -12,7 +12,8 @@ use Woothee::Crawler;
 use Woothee::Appliance;
 use Woothee::Misc;
 
-our $VERSION = "1.8.0";
+use version;
+our $VERSION = "v1.10.0";
 
 sub parse {
     my ($this,$useragent) = @_;

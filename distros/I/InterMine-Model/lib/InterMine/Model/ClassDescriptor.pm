@@ -409,7 +409,11 @@ sub _make_fields_into_attributes {
             $self->model->get_classdescriptor_by_name($field->referenced_type_name);
         }
 
-        $self->add_attribute($field->name, $options);
+        eval { 
+            # this fails if the model is incorrect, and the attribute is already present
+            # in this case, just ignore
+            $self->add_attribute($field->name, $options)
+        };
         $self->add_method($field->name, sub { my $obj = shift; 
             my $reader = $get . $suffix; 
             my $writer = "set" . $suffix;

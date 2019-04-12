@@ -1481,3 +1481,4 @@ t/data/classes/SemanticWeb/Schema/WriteAction.json
 t/data/classes/SemanticWeb/Schema/Zoo.json
 t/release-check-manifest.t
 t/release-fixme.t
+weaver.ini

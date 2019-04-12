@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -25,6 +25,8 @@ our @pList = (
     autoSigninRules            => '::Plugins::AutoSignin',
     checkState                 => '::Plugins::CheckState',
     portalForceAuthn           => '::Plugins::ForceAuthn',
+    checkUser                  => '::Plugins::CheckUser',
+    impersonationRule          => '::Plugins::Impersonation',
 );
 
 ##@method list enabledPlugins

@@ -1,5 +1,9 @@
 Revision history for Perl module Net::MAC::Vendor
 
+1.264     2019-04-12 19:41:33Z
+	* Net::SSLeay added to runtime prerequisites.
+	* Allow $mac parameter to be a NetAddr::MAC object
+
 1.263     2019-03-26 22:26:49Z
 	* Compress::Bzip2 and Compress::Zlib are now optional prerequisites if
 	PUREPERL_ONLY=1 is specified as a Makefile.PL argument (or e.g. via `cpanm --pureperl`,

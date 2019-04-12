@@ -91,7 +91,7 @@ METHODS
 
     alien_version => $version
 
-      If the Alien:: module is not available, gives the module verison of
+      If the Alien:: module is not available, gives the module version of
       it that will be required to provide the pkg-config module of the
       required version. This gets added to requires.
 
@@ -169,7 +169,7 @@ TODO
       build_requires_pkgconfig, to neaten the common case of simple
       requirements.
 
-      * Consider futher stealing the various helper methods from
+      * Consider further stealing the various helper methods from
       ExtUtils::CChecker and possibly splitting this class into a lower
       "C-using XS modules" and higher-level pkg-config+Alien layer.
 

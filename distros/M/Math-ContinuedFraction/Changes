@@ -1,5 +1,12 @@
 Revision history for Math-ContinuedFraction
 
+0.14
+     2019-04-10
+	- Failures from CPAN testers all point to Math::BigInt
+	  with versions 1.999806 and 1.999807. It looks like maybe
+	  there was an undefined value error fixed in 1.999810, but
+	  I can't really tell from its CHANGES file, so let's just
+	  specify the latest version (1.999816) in Build.PL.
 0.13
      2019-04-09
 	- End-of-array error in convergent() (which could result

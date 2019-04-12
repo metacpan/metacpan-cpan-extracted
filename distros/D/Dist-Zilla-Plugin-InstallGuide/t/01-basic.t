@@ -29,7 +29,7 @@ my $tzil = Builder->from_config(
                 [ InstallGuide => ],
                 [ '=inc::MyGatherer' ],
             ),
-            path(qw(source lib Foo.pm)) => "package Foo;\n1;\n",
+            path(qw(source lib Foo Bar.pm)) => "package Foo::Bar;\n1;\n",
         },
     },
 );
@@ -52,6 +52,9 @@ like($content, qr/Makefile.PL/m, 'INSTALL mentions Makefile.PL');
 unlike($content, qr/Build.PL/m, 'INSTALL does not mention Build.PL');
 
 like($content, qr{https://www.cpan.org/modules/INSTALL.html}m, 'INSTALL mentions CPAN reference');
+
+unlike($content, qr/DZT::Sample/, 'INSTALL does not mention nonexistent module DZT::Sample');
+like($content, qr/cpanm Foo::Bar/, 'INSTALL does mention the main module Foo::Bar');
 
 ok(
     scalar(grep { $_->name eq 'INSTALL' } @$gathered_files),

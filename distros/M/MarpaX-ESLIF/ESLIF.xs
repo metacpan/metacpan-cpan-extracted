@@ -346,6 +346,7 @@ static char                           *marpaESLIFPerl_sv2byte(pTHX_ marpaESLIF_t
 static short                           marpaESLIFPerl_importb(marpaESLIFValue_t *marpaESLIFValuep, void *userDatavp, marpaESLIFValueResult_t *marpaESLIFValueResultp);
 static void                            marpaESLIFPerl_generateStringWithLoggerCallback(void *userDatavp, genericLoggerLevel_t logLeveli, const char *msgs);
 static short                           marpaESLIFPerl_appendOpaqueDataToStringGenerator(marpaESLIFPerl_stringGenerator_t *marpaESLIFPerl_stringGeneratorp, char *p, size_t sizel);
+static short                           marpaESLIFPerl_is_scalar(pTHX_ SV *svp, int typei);
 static short                           marpaESLIFPerl_is_undef(pTHX_ SV *svp, int typei);
 static short                           marpaESLIFPerl_is_arrayref(pTHX_ SV *svp, int typei);
 static short                           marpaESLIFPerl_is_MarpaX__ESLIF__String(pTHX_ SV *svp, int typei);
@@ -2095,6 +2096,13 @@ static short marpaESLIFPerl_appendOpaqueDataToStringGenerator(marpaESLIFPerl_str
 }
 
 /*****************************************************************************/
+static short marpaESLIFPerl_is_scalar(pTHX_ SV *svp, int typei)
+/*****************************************************************************/
+{
+  return (typei == SCALAR);
+}
+
+/*****************************************************************************/
 static short marpaESLIFPerl_is_undef(pTHX_ SV *svp, int typei)
 /*****************************************************************************/
 {
@@ -2326,7 +2334,7 @@ static void marpaESLIFPerl_stack_setv(pTHX_ marpaESLIF_t *marpaESLIFp, marpaESLI
       SvGETMAGIC(svp);
       marpaESLIFValueResultp->u.y             = SvTRUE(svp) ? MARPAESLIFVALUERESULTBOOL_TRUE : MARPAESLIFVALUERESULTBOOL_FALSE;
       eslifb = 1;
-    } else if (marpaESLIFPerl_is_Types__Standard(aTHX_ svp, "MarpaX::ESLIF::is_Int", typei)) {
+    } else if (marpaESLIFPerl_is_scalar(aTHX_ svp, typei) && marpaESLIFPerl_is_Types__Standard(aTHX_ svp, "MarpaX::ESLIF::is_Int", typei)) {
       iv = SvIV(svp);
       if ((iv >= SHRT_MIN) && (iv <= SHRT_MAX)) {
         /* Ok if it fits into [SHRT_MIN,SHRT_MAX] */
@@ -2359,7 +2367,7 @@ static void marpaESLIFPerl_stack_setv(pTHX_ marpaESLIF_t *marpaESLIFp, marpaESLI
         eslifb = 1;
 #endif
       }
-    } else if (marpaESLIFPerl_is_Types__Standard(aTHX_ svp, "MarpaX::ESLIF::is_StrictNum", typei)) {
+    } else if (marpaESLIFPerl_is_scalar(aTHX_ svp, typei) && marpaESLIFPerl_is_Types__Standard(aTHX_ svp, "MarpaX::ESLIF::is_StrictNum", typei)) {
       /* Ok if it fits into [DBL_MIN,DBL_MAX] and we loosed nothing */
       nv = SvNV(svp);
       if (sv_cmp(svp, sv_2mortal(newSVnv(nv))) == 0) {

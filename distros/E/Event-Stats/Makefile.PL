@@ -28,6 +28,7 @@ my @opt=(
   PREREQ_PM => \%prereqs,
   VERSION_FROM	=> "lib/Event/Stats.pm",
   NAME      	=> "Event::Stats",
+  LICENSE     	=> "perl",
   XSMULTI => 1,
   @Safe,
   META_MERGE => {

@@ -7,7 +7,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -46,6 +46,10 @@ sub changeUrldc {
             }
 
             $self->p->updateSession( $req, $cdaInfos, $cdaSession->id );
+
+            # We are about to redirect the user to the CDA application,
+            # dismiss any previously stored redirections (#1650)
+            delete $req->{pdata}->{_url};
 
             $req->{urldc} .=
                 ( $urldc =~ /\?/ ? '&' : '?' )

@@ -29,7 +29,7 @@ subtest "placeholder" => sub {
         $str = "";
         Log::ger::Layout->set('Pattern', format=>'%C');
         My::P0::x();
-        is($str, 'main');
+        is($str, 'My::P0');
     };
     subtest '%d' => sub {
         $str = "";
@@ -114,7 +114,7 @@ subtest "placeholder" => sub {
         $str = "";
         Log::ger::Layout->set('Pattern', format=>'%T');
         My::P0::x();
-        like($str, qr/\A\w+::[^\n]+\n\w+::/);
+        like($str, qr/\A\S+ called at /);
         # XXX test actual stack trace
     };
     subtest '%%' => sub {

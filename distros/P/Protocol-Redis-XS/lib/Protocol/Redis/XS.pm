@@ -6,7 +6,7 @@ use parent "Protocol::Redis";
 use XS::Object::Magic;
 use XSLoader;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 XSLoader::load "Protocol::Redis::XS", $VERSION;
 
@@ -54,7 +54,7 @@ Protocol::Redis::XS - hiredis based parser compatible with Protocol::Redis
 =head1 DESCRIPTION
 
 This provides a fast parser for the Redis protocol using the code from
-L<hiredis|http://github.com/antirez/hiredis> and with API compatibility with
+L<hiredis|https://github.com/redis/hiredis> and with API compatibility with
 L<Protocol::Redis>.
 
 (If you've found yourself here just looking to use Redis in Perl: This is a low
@@ -92,7 +92,7 @@ Set callback for L</parse>.
 =head1 THREADS
 
 This module will work on a threaded perl and will work with threads, however
-instances of Protcol::Redis should not be shared between threads.
+instances of Protocol::Redis should not be shared between threads.
 
 =head1 SUPPORT
 
@@ -103,12 +103,6 @@ L<#redis on irc.perl.org|irc://irc.perl.org/redis>
 =head1 DEVELOPMENT
 
 See github: L<https://github.com/dgl/protocol-redis-xs>.
-
-Developer note, hiredis is pulled in via a git submodule, run:
-
- git submodule update --init
-
-to make the development version buildable.
 
 =head1 AUTHOR
 
@@ -127,12 +121,10 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
-The hiredis library included in this distribution has a seperate license (3
-clause BSD). See F<hiredis/COPYING>.
-
 =head1 SEE ALSO
 
-L<Redis>, L<Redis::hiredis>, L<AnyEvent::Redis>, L<Protocol::Redis>.
+L<Redis>, L<Redis::hiredis>, L<Mojo::Redis>, L<AnyEvent::Redis>,
+L<Protocol::Redis>.
 
 =cut
 

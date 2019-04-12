@@ -5,7 +5,10 @@ use JavaScript::V8;
 use Term::ANSIColor qw(colored);
 use Term::ReadLine; # Much better if Term::ReadLine::Gnu is installed
 
-my $js = JavaScript::V8::Context->new;
+my $js = JavaScript::V8::Context->new(
+  flags => join " ", grep /^--/, @ARGV
+);
+
 $js->name_global("global");
 $js->bind(print => sub { print "@_\n" });
 

@@ -1,6 +1,13 @@
 ######################################################################
 Revision history for Perl extension Archive::Tar::Wrapper
 
+0.36 (2019/04/11):
+    Bug fixes since tests on Windows were failing after latests changes.
+    Refactored code due unexpected way bsdtar on Windows and tar on OpenBSD behave.
+    Refactored the tests due the bugs found.
+    Small fixes on Pod, specially the section for MS Windows users.
+    Added the missing tests to the MANIFEST.
+
 0.35 (2019/04/05):
     Added _rem_dots method, a improved way to remove '.' and '..' from readdir(), supposed to be faster than previous implementation with sort() and shift().
     Added two more tests to increase testing coverage.

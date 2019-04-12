@@ -23,8 +23,7 @@ my %WriteMakefileArgs = (
     "MooX::Role::JSON_LD" => "0.0.16",
     "Ref::Util" => 0,
     "Types::Standard" => 0,
-    "namespace::autoclean" => 0,
-    "utf8" => 0
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -34,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::Most" => 0,
     "aliased" => 0
   },
-  "VERSION" => "v3.5.0",
+  "VERSION" => "v3.5.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,8 +53,7 @@ my %FallbackPrereqs = (
   "Test::Most" => 0,
   "Types::Standard" => 0,
   "aliased" => 0,
-  "namespace::autoclean" => 0,
-  "utf8" => 0
+  "namespace::autoclean" => 0
 );
 
 

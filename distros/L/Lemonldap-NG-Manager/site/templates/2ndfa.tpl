@@ -37,10 +37,10 @@
             </form>
           </div>
         </div>
-      </div>   
-        
+      </div>
+
           <!-- Tree -->
-          
+
       <div class="text-center"><p class="badge">{{total}} <span trspan="session_s"></span></p></div>
       <div class="region region-sidebar-first">
         <section id="block-superfish-1" class="block block-superfish clearfix">
@@ -58,7 +58,7 @@
     </aside>
 
     <!-- Right(main) div -->
-    <div id="right" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 scrollable" ng-class="{'hidden-xs':showT&&!showM}">    
+    <div id="right" class="col-lg-8 col-md-8 col-sm-7 col-xs-12 scrollable" ng-class="{'hidden-xs':showT&&!showM}">
       <div class="panel panel-default" ng-hide="currentSession===null">
         <div class="panel-heading">
           <h1 class="panel-title text-center">{{translate("sessionTitle")}} {{currentSession.id}}</h1>

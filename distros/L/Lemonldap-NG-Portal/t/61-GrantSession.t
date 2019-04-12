@@ -54,8 +54,8 @@ ok( $res->[2]->[0] =~ /<span trmsg="5"><\/span><\/div>/,
     'dwho rejected with PE_BADCREDENTIALS' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
-ok( $res->[2]->[0] =~ m%<span trspan="goToPortal">Go to portal</span>%,
-    'Found goToPortal button' )
+ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
+    'Found connect button' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 
@@ -125,8 +125,8 @@ ok(
     'rtyler rejected with PE_BADCREDENTIALS'
 ) or print STDERR Dumper( $res->[2]->[0] );
 count(1);
-ok( $res->[2]->[0] =~ m%<span trspan="goToPortal">Go to portal</span>%,
-    'Found goToPortal button' )
+ok( $res->[2]->[0] =~ m%<span trspan="connect">Connect</span>%,
+    'Found connect button' )
   or print STDERR Dumper( $res->[2]->[0] );
 count(1);
 

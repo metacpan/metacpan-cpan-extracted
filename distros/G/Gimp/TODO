@@ -1,4 +1,5 @@
-Items as of 2014-06-30 (by Ed J)
+Items as of 2018-05-31 (by Ed J)
+* make compatible with GIMP 2.10 - possibly reintroduce Gimp::Feature
 * gimp-plugins-refresh: load is
   app/plug-in/gimppluginmanager.c:gimp_plug_in_manager_query_new, closedown
   is ./app/plug-in/gimppluginmanager.c:gimp_plug_in_manager_exit
@@ -12,6 +13,7 @@ Items as of 2014-06-30 (by Ed J)
   way to pass GIMP data back and forth directly via typemap system. May
   involve a gimp-perl "wrapper" data structure that pairs an SV with its
   GimpParam counterpart - Gimp::Lib::Data?
+  - maybe use FFI, which would help on Win32
 * use Glib array for above
 * unify typemaps and C INCs, for more accurate EU::D support
 * Net.xs should implement own PDL serialise/deser. Use Lib.xs new_pdl?

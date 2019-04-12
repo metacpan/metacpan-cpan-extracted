@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "HTTP::Tiny" => 0,
     "JSON" => 0,
-    "JSON::Schema::Fit" => 0,
+    "JSON::Schema::Fit" => "0.04",
     "MIME::Base64" => "3.11",
     "URI::Encode" => 0,
     "base" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "HTTP::Tiny" => 0,
   "JSON" => 0,
-  "JSON::Schema::Fit" => 0,
+  "JSON::Schema::Fit" => "0.04",
   "MIME::Base64" => "3.11",
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,

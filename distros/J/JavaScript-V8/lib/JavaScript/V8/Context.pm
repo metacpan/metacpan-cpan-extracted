@@ -1,5 +1,8 @@
 package JavaScript::V8::Context;
 
+use strict;
+use warnings;
+
 sub new {
     my($class, %args) = @_;
 
@@ -21,6 +24,8 @@ sub bind_function {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 JavaScript::V8::Context - An object in which we can execute JavaScript
@@ -33,7 +38,16 @@ JavaScript::V8::Context - An object in which we can execute JavaScript
   my $context = JavaScript::V8::Context->new();
 
   # Add a function which we can call from JavaScript
-  $context->bind_function(print => sub { print @_ });
+  $context->bind(print => sub { print @_ });
+
+  # Bind variables
+  $context->bind( bottles => 3 );
+  $context->bind( wine_type => ['red', 'white', 'sparkling'] );
+  $context->bind( wine_type_description => {
+      white     => "White wine is a wine whose color is slightly yellow. This kind of wine is produced using non-coloured grapes or using red-skinned grapes' juice, not allowing it to extract pigment from the skin.",
+      red       => "Red wine is a type of wine made from dark-coloured (black) grape varieties. The actual colour of the wine can range from intense violet, typical of young wines, through to brick red for mature wines and brown for older red wines.",
+      sparkling => "Sparkling wine is a wine with significant levels of carbon dioxide in it making it fizzy. The carbon dioxide may result from natural fermentation, either in a bottle, as with the méthode champenoise, in a large tank designed to withstand the pressures involved (as in the Charmat process), or as a result of carbon dioxide injection.",
+  });
 
   my $result = $context->eval($source);
 
@@ -159,6 +173,11 @@ structure.
 The exact semantics of this interface are subject to change in a future
 version (the binding may become more complete).
 
+=item bind_ro ( $name => $scalar )
+
+Like C<bind()> but makes the item read-only on the global object (i.e. it is
+not recursive, if you need that use tie or other Perl mechanisms).
+
 =item bind_function ( $name => $subroutine_ref )
 
 DEPRECATED. This is just an alias for bind.
@@ -196,7 +215,7 @@ returns an array will return a list to Perl when called in list context.
 =item set_flags_from_string ( $flags )
 
 Set or unset various flags supported by V8 (see
-L<http://code.google.com/p/v8/source/browse/trunk/src/flag-definitions.h>
+L<https://github.com/v8/v8/blob/master/src/flag-definitions.h>
 or F<src/flag-definitions.h> in the V8 source for details of all available
 flags).
 

@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-require 'common.pl';
+require './common.pl';
 
 my $version = ag_getversion();
 
@@ -13,6 +13,7 @@ WriteMakefile(
   NAME	=> 'Alien::Gimp',
   VERSION => $version,
   MIN_PERL_VERSION => '5.014001',
+  LICENSE => 'perl',
   CONFIGURE_REQUIRES	=> {
     'IO::All'		=> 0,
     'ExtUtils::Depends'	=> '0.402',

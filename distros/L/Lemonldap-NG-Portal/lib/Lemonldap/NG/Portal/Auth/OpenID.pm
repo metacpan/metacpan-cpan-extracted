@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REDIRECT
 );
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -61,7 +61,7 @@ has ua => (
 # INITIALIZATION
 
 sub init {
-    my ($self) = @_;
+    my $self = shift;
 
     eval { require Net::OpenID::Consumer };
     if ($@) {

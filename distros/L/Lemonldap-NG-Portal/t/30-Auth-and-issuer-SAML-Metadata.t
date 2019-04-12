@@ -7,7 +7,7 @@ BEGIN {
     require 't/test-lib.pm';
 }
 
-my $maintests = 3;
+my $maintests = 10;
 my $debug     = 'error';
 my ( $issuer, $res );
 my %handlerOR = ( issuer => [], sp => [] );
@@ -25,6 +25,15 @@ SKIP: {
     ok( $res = $issuer->_get('/saml/metadata'), 'Get metadata' );
     ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
 
+    ok( $res = $issuer->_get('/saml/metadata/idp'), 'Get IDP metadata' );
+    ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
+    ok( $res->[2]->[0] !~ m#<SPSSODescriptor#s, 'Metadata does not contain SP information' );
+    ok( $res->[2]->[0] =~ m#entityID="urn:example\.com"#s, 'IDP EntityID is overriden' );
+
+    ok( $res = $issuer->_get('/saml/metadata/sp'), 'Get SP metadata' );
+    ok( $res->[2]->[0] =~ m#^<\?xml version="1.0"\?>#s, 'Metadata is XML' );
+    ok( $res->[2]->[0] !~ m#<IDPSSODescriptor#s, 'Metadata does not contain IDP information' );
+
     #print STDERR Dumper($res);
 }
 
@@ -41,6 +50,7 @@ sub issuer {
                 authentication         => 'Demo',
                 userDB                 => 'Same',
                 issuerDBSAMLActivation => 1,
+                samlOverrideIDPEntityID => 'urn:example.com',
                 samlSPMetaDataOptions  => {
                     'sp.com' => {
                         samlSPMetaDataOptionsEncryptionMode           => 'none',

@@ -8,11 +8,11 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Test::More: '0.98'
-  perl: v5.10.0
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Text::ParseWords: '0'
-  perl: v5.10.0
+  perl: '5.010'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -28,7 +28,7 @@ no_index:
 provides:
   Net::MAC::Vendor:
     file: lib/Net/MAC/Vendor.pm
-    version: '1.263'
+    version: '1.264'
 recommends:
   Compress::Bzip2: '0'
   Compress::Zlib: '0'
@@ -40,17 +40,18 @@ requires:
   File::Temp: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
-  perl: v5.10.0
+  Net::SSLeay: '0'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-MAC-Vendor
   homepage: https://github.com/karenetheridge/Net-MAC-Vendor
   repository: https://github.com/karenetheridge/Net-MAC-Vendor.git
-version: '1.263'
+version: '1.264'
 x_Dist_Zilla:
   perl:
-    version: '5.029008'
+    version: '5.029009'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -82,6 +83,8 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - CONTRIBUTING
+            - INSTALL
             - LICENSE
             - README.pod
             - t/rt79369.t
@@ -505,7 +508,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20190220'
+          Module::CoreList: '5.20190320'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -658,7 +661,9 @@ x_Dist_Zilla:
           commit_msg: '%N-%v%t%n%n%c'
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
+            - CONTRIBUTING
             - Changes
+            - INSTALL
             - LICENSE
             - README.pod
           allow_dirty_match: []
@@ -677,7 +682,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.263
+          tag: v1.264
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -800,7 +805,15 @@ x_Dist_Zilla:
           Module::Metadata: '1.000034'
           version: '0.006'
       name: DynamicPrereqs
-      version: '0.034'
+      version: '0.035'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: suggests
+      name: RuntimeSuggests
+      version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -856,7 +869,8 @@ x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Frank Maas <maas.frank@gmail.com>'
   - 'openstrike <git@openstrike.co.uk>'
-x_generated_by_perl: v5.29.8
+  - 'Dean Hamstead <dean@fragfest.com.au>'
+x_generated_by_perl: v5.29.9
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 0
 x_use_unsafe_inc: 0

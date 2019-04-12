@@ -1,14 +1,27 @@
 package Lemonldap::NG::Common::Conf::Wrapper;
 
 use strict;
+use JSON;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 sub TIEHASH {
     my ( $class, $conf, $overrides ) = @_;
+    my %h = %$overrides;
+    foreach ( keys %h ) {
+        if ( $h{$_} =~ /^[\[\{]/ ) {
+            my $tmp = eval { JSON::from_json( $h{$_} ) };
+            if ($@) {
+                print STDERR "Wrapper: unable to compile $_ key, skipping\n";
+            }
+            else {
+                $h{$_} = $tmp;
+            }
+        }
+    }
     return bless {
         _wrapC => $conf,
-        _wrapO => $overrides,
+        _wrapO => \%h,
     }, $class;
 }
 

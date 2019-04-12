@@ -123,7 +123,7 @@
                         <TMPL_ELSE>
                           <div class="col-12">
                         </TMPL_IF>
-                        
+
                         <!-- Name and link (mandatory) -->
                         <h5 class="appname <TMPL_VAR NAME="appid"> card-title">
                           <TMPL_VAR NAME="appname">

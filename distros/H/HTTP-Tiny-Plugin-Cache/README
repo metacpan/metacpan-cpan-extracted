@@ -1,0 +1,67 @@
+NAME
+    HTTP::Tiny::Plugin::Cache - Cache HTTP::Tiny responses
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Plugin::Cache (from
+    Perl distribution HTTP-Tiny-Plugin-Cache), released on 2019-04-12.
+
+SYNOPSIS
+     use HTTP::Tiny::Plugin 'Cache' => {
+         max_age  => '3600',     # defaults to HTTP_TINY_PLUGIN_CACHE_MAX_AGE or CACHE_MAX_AGE or 86400
+         cache_if => qr/^[23]/,  # optional, default is to cache all responses
+     };
+
+     my $res  = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
+     my $res2 = HTTP::Tiny::Plugin->request(GET => "http://www.example.com/"); # cached response
+
+DESCRIPTION
+    This plugin can cache responses to cache files.
+
+    Currently only GET requests are cached. Cache are keyed by
+    SHA256-hex(URL). Error responses are also cached (unless you configure
+    "/cache_if"). Currently no cache-related HTTP request or response
+    headers (e.g. "Cache-Control") are respected.
+
+CONFIGURATION
+  max_age
+    Int.
+
+  cache_if
+    Regex or code. If regex, then will be matched against response status.
+    If code, will be called with arguments: "($self, $response)".
+
+ENVIRONMENT
+  CACHE_MAX_AGE
+    Int. Will be consulted after "HTTP_TINY_PLUGIN_CACHE_MAX_AGE".
+
+  HTTP_TINY_PLUGIN_CACHE_MAX_AGE
+    Int. Will be consulted before "CACHE_MAX_AGE".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Plugin-Cache>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Plugin-Cache>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Plugin-Cach
+    e>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,5 +1,22 @@
 Revision history for Perl extension JavaScript::V8
 
+0.09 2019-04-11
+ - zap dep on JSON - thanks @eserte for report
+
+0.08 2019-04-11
+ - tests with floating-point tolerance - thanks @andk!
+ - Support for read only properties via bind_ro
+ - Fix compiler warnings - thanks @serejkus!
+ - Fix test counts - thanks @njohnston!
+ - update build system including using ExtUtils::CppGuess
+ - stop putting MYMETA.* in distro
+ - handle null/undef so can be in hashes/arrays - fix RT#86731
+ - fix unsigned ints on 32-bit perl - thanks @alankila
+ - fix memory leak in contexts - thanks @alankila - RT#86903
+ - fix needing -fpermissive - thanks @olegwtf
+ - handle JSON booleans properly - thanks @brad-mac
+ - fix memory leak returning array/hash - thanks @csirmaz
+
 0.07  Fri 28 Dec 11:52:52 GMT 2012
     - Add support for naming the top level object
     - Add a mini REPL as an example

@@ -24,7 +24,7 @@ no_index:
 provides:
   Archive::Tar::Wrapper:
     file: lib/Archive/Tar/Wrapper.pm
-    version: '0.35'
+    version: '0.36'
 requires:
   Cwd: '0'
   File::Temp: '0'
@@ -35,5 +35,6 @@ requires:
 resources:
   bugtracker: https://github.com/glasswalk3r/archive-tar-wrapper-perl/issues
   repository: https://github.com/glasswalk3r/archive-tar-wrapper-perl.git
-version: '0.35'
+version: '0.36'
+x_NO_MYMETA: 1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

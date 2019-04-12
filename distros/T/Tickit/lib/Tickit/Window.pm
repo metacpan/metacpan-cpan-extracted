@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2019 -- leonerd@leonerd.org.uk
 
 package Tickit::Window;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010; # //
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 use Carp;
 
@@ -426,6 +426,40 @@ window.
 
 =cut
 
+=head2 getctl
+
+=head2 setctl
+
+   $value = $win->getctl( $ctl )
+
+   $success = $win->setctl( $ctl, $value )
+
+Accessor and mutator for window control options. C<$ctl> should be one of the
+following options:
+
+=over 4
+
+=item cursor-blink (bool)
+
+=item cursor-shape (int)
+
+=item cursor-visible (bool)
+
+Cursor properties to set for the terminal cursor when this window has input
+focus.
+
+=item focus-child-notify (bool)
+
+Whether the window will also receive focus events about child windows.
+
+=item steal-input (bool)
+
+Whether the window is currently stealing input from its siblings.
+
+=back
+
+=cut
+
 =head2 set_focus_child_notify
 
    $win->set_focus_child_notify( $notify )
@@ -436,6 +470,14 @@ loses focus itself. Defaults to false; meaning the C<on_focus> handler only
 receives notifications about the window itself.
 
 =cut
+
+sub set_focus_child_notify
+{
+   my $self = shift;
+   my ( $notify ) = @_;
+
+   $self->setctl( 'focus-child-notify' => $notify );
+}
 
 =head2 top
 
@@ -745,6 +787,14 @@ when the window is focused.
 
 =cut
 
+sub set_cursor_visible
+{
+   my $self = shift;
+   my ( $visible ) = @_;
+
+   $self->setctl( 'cursor-visible' => $visible );
+}
+
 *cursor_visible = \&set_cursor_visible;
 
 =head2 cursor_shape
@@ -757,6 +807,14 @@ see C<take_focus>. Valid values for C<$shape> are the various
 C<CURSORSHAPE_*> constants from L<Tickit::Term>.
 
 =cut
+
+sub set_cursor_shape
+{
+   my $self = shift;
+   my ( $shape ) = @_;
+
+   $self->setctl( 'cursor-shape' => $shape );
+}
 
 *cursor_shape = \&set_cursor_shape;
 
@@ -801,6 +859,13 @@ Returns true if this window is currently stealing input from its siblings
 
 =cut
 
+sub is_steal_input
+{
+   my $self = shift;
+
+   return $self->getctl( 'steal-input' );
+}
+
 =head2 set_steal_input
 
    $win->set_steal_input( $steal )
@@ -808,6 +873,14 @@ Returns true if this window is currently stealing input from its siblings
 Controls whether this window is currently stealing input from its siblings
 
 =cut
+
+sub set_steal_input
+{
+   my $self = shift;
+   my ( $steal ) = @_;
+
+   $self->setctl( 'steal-input' => $steal );
+}
 
 sub sprintf
 {
@@ -932,14 +1005,14 @@ the containing window.
 
 Emitted when the window gains or loses input focus.
 
-If the C<focus_child_notify> behavior is enabled, this callback is also
+If the C<focus-child-notify> behavior is enabled, this callback is also
 invoked for changes of focus on descendent windows. In this case, it is
 passed an additional argument, being the immediate child window in which the
 focus chain has now changed (which may or may not be the focused window
 directly; it could itself be another ancestor).
 
 When a window gains focus, any of its ancestors that have
-C<focus_child_notify> enabled will be informed first, from the outermost
+C<focus-child-notify> enabled will be informed first, from the outermost
 inwards, before the window itself. When one loses focus, it is notified
 first, and then its parents from the innermost outwards.
 

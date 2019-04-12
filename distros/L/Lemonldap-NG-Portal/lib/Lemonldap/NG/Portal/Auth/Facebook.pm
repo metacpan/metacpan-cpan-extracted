@@ -7,14 +7,14 @@ use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR PE_BADCREDENTIALS);
 use utf8;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.0.3';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
 # INITIALIZATION
 
 sub init {
-    my ($self) = @_;
+    my $self = shift;
     eval { require Net::Facebook::Oauth2; };
     if ($@) {
         $self->error("Unable to load Net::Facebook::Oauth2: $@");

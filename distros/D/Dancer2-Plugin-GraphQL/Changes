@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::GraphQL
 
+0.07 2019-04-11
+ - update deps - thanks @manwar!
+
 0.06    Tue Nov 28 07:14:26 GMT 2017
  - use "latest" GraphiQL
 

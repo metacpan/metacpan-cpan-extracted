@@ -1,11 +1,13 @@
 package App::HTTPUserAgentUtils;
 
-our $DATE = '2019-04-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-11'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
+
+use HTTP::UserAgentStr::Util::ByNickname;
 
 our %SPEC;
 
@@ -105,7 +107,7 @@ _
 sub parse_http_ua {
     my %args = @_;
 
-    my $ua = $args{ua};
+    chomp(my $ua = $args{ua});
     my $backend = $args{backend} // 'HTML::ParseBrowser';
 
     my $res;
@@ -284,6 +286,42 @@ sub parse_http_ua {
     [200, "OK", $res];
 }
 
+$SPEC{http_ua_by_nickname} = {
+    v => 1.1,
+    summary => 'Get HTTP User-Agent string by nickname',
+    args => {
+        nickname => {
+            schema => ['str*', in=>\@HTTP::UserAgentStr::Util::ByNickname::nicknames],
+            pos => 0,
+        },
+        action => {
+            schema => ['str*', in=>['list', 'get']],
+            default => 'get',
+            cmdline_aliases => {
+                l => {
+                    summary => 'List available nicknames (shortcut for --action=list)',
+                    is_flag => 1,
+                    code => sub { $_[0]{action} = 'list' },
+                },
+            },
+        },
+    },
+};
+sub http_ua_by_nickname {
+    my %args = @_;
+
+    my $action = $args{action} // 'get';
+
+    if ($action eq 'list') {
+        return [200, "OK", \@HTTP::UserAgentStr::Util::ByNickname::nicknames];
+    } else {
+        # get
+        my $nickname = $args{nickname}
+            or return [400, "Please specify nickname"];
+        [200, "OK", HTTP::UserAgentStr::Util::ByNickname::_get($nickname)];
+    }
+}
+
 1;
 # ABSTRACT: CLI utilities related to HTTP User-Agent (string)
 
@@ -299,7 +337,7 @@ App::HTTPUserAgentUtils - CLI utilities related to HTTP User-Agent (string)
 
 =head1 VERSION
 
-This document describes version 0.001 of App::HTTPUserAgentUtils (from Perl distribution App-HTTPUserAgentUtils), released on 2019-04-02.
+This document describes version 0.002 of App::HTTPUserAgentUtils (from Perl distribution App-HTTPUserAgentUtils), released on 2019-04-11.
 
 =head1 SYNOPSIS
 
@@ -311,7 +349,11 @@ This distribution includes several utilities:
 
 =item * L<gen-random-http-ua>
 
+=item * L<http-ua-by-nickname>
+
 =item * L<parse-http-ua>
+
+=item * L<rand-http-ua>
 
 =back
 
@@ -350,6 +392,40 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
+
+
+=head2 http_ua_by_nickname
+
+Usage:
+
+ http_ua_by_nickname(%args) -> [status, msg, payload, meta]
+
+Get HTTP User-Agent string by nickname.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<action> => I<str> (default: "get")
+
+=item * B<nickname> => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
 
 
 =head2 parse_http_ua

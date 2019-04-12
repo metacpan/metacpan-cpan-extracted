@@ -1,5 +1,73 @@
 Revision history for FusionInventory agent
 
+2.5 Fri, 12 Apr 2019
+
+core:
+* linux: reload logger during daemonize to avoid issues like not listening http
+  daemon if logger has still not been used before starting the listener
+* Fix #646: HTTP daemon not starting on CentOS 7
+* revert dfcb64573e as now more generic fix has been implemented in a538abaed7
+  (tested on CentOS 6)
+* win32: don't show service memory usage on OS not supporting GetProcessMemoryInfo
+* Fix #601: Log URL for server target and log path for local target
+* win32: add early stderr logging support for service
+  Just rename "fusioninventory-win32-service.rc.sample" removing ".sample" part
+  to enable this feature. This can be handy to investigate start service failures.
+* Added support for HTTPD plugins
+* Added Inventory HTTPD plugins to permit remote inventory request (disabled by default)
+* Added Listener target to permit agent to only answer http requests
+* Updated configuration to support HTTPD plugins dedicated configuration file
+* Added fusioninventory-remoteinventory script to request agent with Inventory
+  HTTPD plugin enabled
+* Fix HTTPD local address reuse
+* Added SSL HTTPD plugins to support SSL in any server plugins
+* Limit the reload target check to 30 seconds
+* win32: report memory usage as Working Set Size (WSS) and Page File Usage (PFU)
+* win32: revert handling service with callbacks. Even if Win32::Daemon proposes
+  the callbacks usage obsoletes the typical skeleton code, the callbacks usage
+  is known to leak memory and tests with latest Win32::Daemon shows that's true.
+* win32: handle task run in a managed thread as this is more efficient than using
+  perl fork with thread emulation under win32 and preserve a little memory usage.
+* win32: wait service control manager is ready before really starting the service
+* logger: don't use File::stat module to just get logfile file size, better use -s
+  as File::stat module seems to fail in rare case.
+
+inventory:
+* Bump Inventory task version to 1.7
+* Fix lspci command subsystem parsing
+* Fix hponcfg.exe can output on stderr on win32 when not really usable
+* Skip not working under win32 Generic::Users inventory
+  Also avoid error in log on /etc/passwd and /etc/group not found files
+* Fix #601: Log deviceid as agentid and related target when running an inventory
+* Fix #644: Make WORKGROUP inventory consistent
+* Fix #541: Don't try to scan virtualbox VM in win32 users directories
+* Updated pci.ids to 2019.04.12 version
+* Updated usb.ids to 2019.03.20 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 2.9
+* Bump NetInventory task version to 3.3
+* Add Lancom in networking devices recognized by description parsing
+* Fix #650: discard empty consumable level elements
+* Fix #651: discard empty type element
+* Add Netdisco export contrib script from Stoatwblr, see contrib/netdisco
+* Fix #638: Fix Kyocera counters handling thanks to Stoatwblr
+* Printers: assume -2 counter value means a WARNING level and report it
+  Thanks Stoatwblr for the deep investigation
+* Add Oki printer support
+* Add APC serialnumber support
+* Fix #612: Enhanced Ubnt AccessPoint support
+* Updated sysobject.ids (tagged fia-2.5 tag on github repository)
+
+deploy:
+* Bump Deploy task version to 2.8
+* Fix #394: Check file parts source/mirror url to guaranty it ends with a slash
+  and trigger an error if it doesn't look like a valid URL.
+
+collect:
+* Bump Collect task version to 2.6
+* WMI properties can now be a list of properties with comma or space as separator
+
 2.4.3 Fri, 22 Feb 2019
 
 core:
@@ -32,6 +100,7 @@ inventory:
 * Fix #596: Openstack container seen as Physical on win32
 * Fix #593: Correct detection of machine type when /var/log/dmesg is too short
 * Fix #583: Add BitDefender antivirus support
+* Encrypted filesystems support added
 * Updated pci.ids to 2019.02.20 version
 * Updated usb.ids to 2019.01.17 version
 
@@ -45,6 +114,7 @@ netdiscovery/netinventory:
 * Add few HP/Compaq serialnumber cases support
 * Fix #605: try 'ip neighbor show' if 'arp' is not available for netdiscovery
 * Add UPS-MIB support for Riello, S2S & APC
+* Components support added
 * Updated sysobject.ids (tagged fia-2.4.3 tag on github repository)
 
 2.4.2 Wed, 03 Oct 2018
@@ -448,6 +518,7 @@ inventory:
 * Fixed memory reporting on Solaris
 * Enhanced installdate for softwares on many platforms
 * Enhanced drive a storage reporting on win32
+* Fix #584: Acer B196HQL S/N support
 
 deploy:
 * Bump Deploy task version to 2.1.0
