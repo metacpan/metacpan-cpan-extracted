@@ -58,6 +58,8 @@ my @files = (
     'lib/Protocol/Database/PostgreSQL/Client.pm',
     'lib/Protocol/Database/PostgreSQL/Client.pod',
     'lib/Protocol/Database/PostgreSQL/Constants.pm',
+    'lib/Protocol/Database/PostgreSQL/Error.pm',
+    'lib/Protocol/Database/PostgreSQL/Error.pod',
     'lib/Protocol/Database/PostgreSQL/Message.pm',
     't/00-check-deps.t',
     't/00-compile.t',

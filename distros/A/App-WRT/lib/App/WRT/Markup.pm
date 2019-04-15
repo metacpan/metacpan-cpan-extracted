@@ -7,11 +7,13 @@ use feature "state";
 use base qw(Exporter);
 our @EXPORT_OK = qw(line_parse image_markup eval_perl);
 
+use App::WRT::Image qw(image_size);
+use App::WRT::Util qw(file_get_contents);
+
+use Carp;
 use File::Basename;
 use Text::Textile;
 use Text::Markdown::Discount;
-
-use App::WRT::Image qw(image_size);
 
 # Some useful defaults:
 
@@ -39,6 +41,8 @@ my %newlines = (
 my %dashes = (
   freeverse => ' &mdash; '
 );
+
+=over
 
 =item line_parse
 
@@ -73,7 +77,7 @@ sub line_parse {
     include_process($self, $everything);
     textile_process($everything);
     markdown_process($everything);
-    $everything =~ s!<image>(.*?)</image>!$self->image_markup($file, $1)!seg; 
+    $everything =~ s!<image>(.*?)</image>!$self->image_markup($file, $1)!seg;
 
     foreach my $key (keys %tags) {
        # Set some replacements, unless they've been explicitly set already:
@@ -128,7 +132,7 @@ sub eval_perl {
 
     if ($@) {
       # Errors - log and return an empty string:
-      print STDERR $@;
+      carp($@);
       $output = '';
     }
 
@@ -172,7 +176,7 @@ sub newlines {
 
 # might need a rewrite.
 sub dashes {
-  my ($replacement, $block) =@_;
+  my ($replacement, $block) = @_;
 
   $block =~ s/(\s+)      # whitespace - no capture
               \-{2}      # two dashes
@@ -220,34 +224,34 @@ sub retrieve_include {
 
   if ($file =~ m{^ (/ | [.]/) }x) {
     # TODO: Leads with a slash or a ./
-    die('Tried to open an include path with a leading / or ./ - not yet supported.');
+    croak('Tried to open an include path with a leading / or ./ - not yet supported.');
   } else {
     # Use the archive root as path.
-    $file = $wrt->root_dir . '/' . $file;
+    $file = $wrt->{root_dir} . '/' . $file;
+  }
+
+  if ($wrt->{cache_includes}) {
+    if (defined $wrt->{include_cache}->{$file}) {
+      return $wrt->{include_cache}->{$file};
+    }
   }
 
   unless (-e $file) {
-    warn "No such file: $file";
+    carp "No such file: $file";
     return '';
   }
 
   if (-d $file) {
-    die("Tried to open a directory as an include path: $file");
+    carp("Tried to open a directory as an include path: $file");
+    return '';
   }
 
-  open my $fh, '<', $file
-    or warn "Couldn't open $file: $!\n";
-
-  my $file_contents;
-  {
-    # line separator:
-    local $/ = undef;
-    $file_contents = <$fh>;
+  if ($wrt->{cache_includes}) {
+    $wrt->{include_cache}->{$file} = file_get_contents($file);
+    return $wrt->{include_cache}->{$file};
+  } else {
+    return file_get_contents($file);
   }
-
-  close $fh or warn "Couldn't close $file: $!";
-
-  return $file_contents;
 }
 
 =item textile_process
@@ -257,15 +261,15 @@ Inline replace <textile> markup in a string.
 =cut
 
 # This is exactly the kind of code that, even though it isn't doing anything
-# especially insane, looks ghastly to people who don't read Perl, so I'll try
-# to explain a bit.
+# especially over the top, looks ghastly to people who don't read Perl, so I'll
+# try to explain a bit.
 
 sub textile_process {
 
   # First, there's a state variable here which can retain the Text::Textile
-  # object between invocations, saving us a bit of time on subsequent calls.
-  # This should be equivalent to creating a closure around the function and
-  # keeping a $textile variable there.
+  # object between invocations of the function, saving us a bit of time on
+  # subsequent calls.  This should be equivalent to creating a closure around
+  # the function and keeping a $textile variable there.
   state $textile;
 
   # Second, instead of unrolling the arguments to the function, we just act
@@ -275,7 +279,7 @@ sub textile_process {
 
   $_[0] =~ s{
 
-    # find tags...
+    # Find tags...
 
     <textile>  # start tag
       (.*?)    # anything (non-greedy)
@@ -335,7 +339,7 @@ sub image_markup {
     my $self = shift;
     my ($file, $block) = @_;
 
-    # Get a basename and directory for the file referencing the image:
+    # Get a basename and directory for the file (entry) referencing the image:
     my ($basename, $dir) = fileparse($file);
 
     # Truncated file date that just includes date + sub docs:
@@ -357,17 +361,20 @@ sub image_markup {
     # Resolve relative paths:
     my $image_file;
     if (-e "$dir/$image_url" ) {
+        # The path is to an image file in the same directory as current entry:
         $image_file = "$dir/$image_url";
         $image_url = "${file_date}${image_url}";
-    } elsif (-e $self->entry_dir . "/$image_url") {
-        $image_file = $self->entry_dir . "/$image_url";
+    } elsif (-e $self->{entry_dir} . "/$image_url") {
+        # The path is to an image file starting with the entry_dir, like
+        # 2005/9/20/candles.jpg -> ./archives/2005/9/20/candles.jpg
+        $image_file = $self->{entry_dir} . "/$image_url";
     }
 
     # Get width & height in pixels for known filetypes:
-    my ($width, $height) = image_size($image_file);
+    my ($width, $height) = image_size($self->{root_dir_abs} . '/' . $image_file);
 
     # This probably relies on mod_rewrite working:
-    $image_url = $self->image_url_root . $image_url;
+    $image_url = $self->{image_url_root} . $image_url;
     return <<"IMG";
 <img src="$image_url"
      width="$width"
@@ -377,21 +384,6 @@ sub image_markup {
 IMG
 }
 
-# Encapsulate some ugly file-location functionality.
-sub resolve_file {
-  my $self = shift;
-  my ($filename) = @_;
-
-  # Get a basename and directory for the file:
-  my ($basename, $dir) = fileparse($filename);
-
-  #if (-e "$dir/$image_url" ) {
-    #$image_file = "$dir/$image_url";
-    #$image_url = "${file_date}${image_url}";
-  #} elsif (-e $self->entry_dir . "/$image_url") {
-    #$image_file = $self->entry_dir . "/$image_url";
-  #}
-
-}
+=back
 
 1;

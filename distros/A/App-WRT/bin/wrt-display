@@ -46,7 +46,7 @@ Months in the form of B<yyyy/mm> will return all entries for that month.
 Years in the form of B<yyyy> will return a summary of entries for the year.
 
 Detailed documentation can be found in the L<App::WRT> man page or at
-L<https://github.com/brennen/wrt>.
+L<https://code.p1k3.com/gitea/brennen/wrt>.
 
 =head1 LICENSE
 
@@ -57,7 +57,7 @@ L<https://github.com/brennen/wrt>.
 
 =head1 AUTHOR
 
-Brennen Bearnes
+Brennen Bearnes <code@p1k3.com>
 
 =cut
 
@@ -69,6 +69,8 @@ no  warnings 'uninitialized';
 
 # use Data::Dumper;
 use App::WRT;
+
+use Carp;
 use Getopt::Long;
 use Pod::Usage;
 
@@ -85,7 +87,7 @@ GetOptions(
 ) or pod2usage(2);
 
 unless (-e $config_file) {
-  die "No wrt config file found.  Tried: $config_file";
+  croak "No wrt config file found.  Tried: $config_file";
 }
 
 my $w = App::WRT::new_from_file($config_file);

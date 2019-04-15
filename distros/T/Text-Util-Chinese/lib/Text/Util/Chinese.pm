@@ -3,18 +3,21 @@ use strict;
 use warnings;
 
 use Exporter 5.57 'import';
+use Unicode::UCD qw(charscript);
 
-our $VERSION = '0.04';
-our @EXPORT_OK = qw(phrase_iterator extract_presuf extract_words);
+our $VERSION = '0.05';
+our @EXPORT_OK = qw(phrase_iterator extract_presuf extract_words tokenize_by_script);
 
 use List::Util qw(uniq);
 
-sub grep_iterator(&$) {
-    my ($cb, $iter) = @_;
+sub grep_iterator {
+    my ($iter, $cb) = @_;
     return sub {
-        local $_ = $iter->();
-        return undef unless defined($_);
-        $cb->();
+        local $_;
+        do {
+            $_ = $iter->();
+            return undef unless defined($_);
+        } while (! $cb->());
         return $_;
     }
 }
@@ -38,11 +41,15 @@ sub extract_presuf {
     my %stats;
     my %extracted;
     my $threshold = $opts->{threshold} || 9; # an arbitrary choice.
+    my $lengths   = $opts->{lengths} || [2,3];
     my $text;
 
-    my $phrase_iter = grep_iterator sub { /\A\p{Han}+\z/ }, phrase_iterator( $input_iter );
+    my $phrase_iter = grep_iterator(
+        phrase_iterator( $input_iter ),
+        sub { /\A\p{Han}+\z/ }
+    );
     while (my $phrase = $phrase_iter->()) {
-        for my $len (2..5) {
+        for my $len ( @$lengths ) {
             my $re = '\p{Han}{' . $len . '}';
             next unless length($phrase) >= $len * 2 && $phrase =~ /\A($re) .* ($re)\z/x;
             my ($prefix, $suffix) = ($1, $2);
@@ -118,6 +125,29 @@ sub extract_words {
     }
 
     return \@words;
+}
+
+sub tokenize_by_script {
+    my ($str) = @_;
+    my @tokens;
+    my @chars = grep { defined($_) } split "", $str;
+    return () unless @chars;
+
+    my $t = shift(@chars);
+    my $s = charscript(ord($t));
+    while(my $char = shift @chars) {
+        my $_s = charscript(ord($char));
+        if ($_s eq $s) {
+            $t .= $char;
+        }
+        else {
+            push @tokens, $t;
+            $s = $_s;
+            $t = $char;
+        }
+    }
+    push @tokens, $t;
+    return grep { ! /\A\s*\z/u } @tokens;
 }
 
 1;
@@ -201,7 +231,10 @@ It is used like this:
 
             ...
         },
-        { threshold => 9 }
+        +{
+            threshold => 9,
+            lengths => [ 2,3 ],
+        }
     );
 
 The C<$output_cb> callback is passed two arguments. The first one is the new
@@ -210,13 +243,20 @@ suffix. The second arguments is a HashRef with keys being the set of all
 extracted tokens. The very same HashRef is also going to be the return value
 of this subroutine.
 
-The 3rd argument is a HashRef with parameters to the internal algorithm. So
-far C<threshold> is the only one with default value being 9.
+The 3rd argument is a HashRef with parameters to the internal algorithm.
+C<threshold> should be an Int, C<lengths> should be an ArrayRef[Int] and
+that constraints the lengths of prefixes and suffixes to be extracted.
+
+The default value for C<threshold> is 9, while the default value for C<lengths> is C<[2,3]>
 
 =item phrase_iterator( $input_iter ) #=> CodeRef
 
 This subroutine split input into smallelr phrases. It takes an text iterator,
 and returns another one.
+
+=item tokenize_by_script( $text ) #=> Array[ Str ]
+
+This subroutine split text into tokens, where each token is the same writing script.
 
 =back
 

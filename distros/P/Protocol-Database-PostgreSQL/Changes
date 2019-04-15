@@ -1,5 +1,17 @@
 Revision history for Protocol-Database-PostgreSQL
 
+1.001     2019-04-15 05:55:03+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - Protocol::Database::PostgreSQL::Error class for better abstraction and
+    error handling
+    - Proper COPY IN/OUT support (text protocol only for now)
+
+    Cosmetic:
+
+    - in debug mode, was generating a lot of unimportant output - have downgraded
+    that to trace level instead.
+
 1.000     2019-03-28 21:15:00+08:00 Asia/Kuala_Lumpur
 
     Forked from Protocol::PostgreSQL due to significant API changes.

@@ -1,0 +1,15 @@
+[
+   "200",
+   "OK",
+   [
+      "Content-Type",
+      "application/json",
+      "Status",
+      "200"
+   ],
+   "[\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {},\n   {}\n]\n",
+   {
+      "method" : "GET",
+      "uri" : "https://www.space-track.org/basicspacedata/query/class/launch_site/format/json/orderby/SITE_CODE%20asc/predicates/all"
+   }
+]

@@ -2,7 +2,7 @@ package PDL::StringfiableExtension;
 
 use strict;
 use warnings;
-use PDL::Lite;
+use PDL::Lite ();
 use List::AllUtils ();
 
 
@@ -44,7 +44,7 @@ PDL::StringfiableExtension
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 AUTHORS
 

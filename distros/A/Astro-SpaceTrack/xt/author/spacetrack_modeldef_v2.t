@@ -265,7 +265,7 @@ if ( $rslt->is_success() ) {
          "Field" : "ORIGINATOR",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "varchar(5)"
+         "Type" : "varchar(7)"
       },
       {
          "Default" : "0",
@@ -308,7 +308,7 @@ if ( $rslt->is_success() ) {
          "Type" : "varchar(8)"
       },
       {
-         "Default" : "0000-00-00 00:00:00",
+         "Default" : "1000-01-01 00:00:00",
          "Extra" : "",
          "Field" : "EPOCH",
          "Key" : "",
@@ -547,7 +547,7 @@ if ( $rslt->is_success() ) {
          "Field" : "ORIGINATOR",
          "Key" : "",
          "Null" : "NO",
-         "Type" : "varchar(5)"
+         "Type" : "varchar(7)"
       },
       {
          "Default" : "0",
@@ -590,7 +590,7 @@ if ( $rslt->is_success() ) {
          "Type" : "varchar(8)"
       },
       {
-         "Default" : "0000-00-00 00:00:00",
+         "Default" : "1000-01-01 00:00:00",
          "Extra" : "",
          "Field" : "EPOCH",
          "Key" : "",

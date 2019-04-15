@@ -3,7 +3,7 @@ use Config;
 
 use ExtUtils::MakeMaker;
 
-my $VERSION = '3.43';
+my $VERSION = '3.44';
 
 =comment
 

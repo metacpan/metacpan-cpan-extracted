@@ -10,7 +10,7 @@ use overload;
 
 use Table::Simple::Column;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 =head1 NAME
 
@@ -40,14 +40,14 @@ Table::Simple - Easily output perl object attributes to an ASCII table
 
 =head1 DESCRIPTION
 
-Oh good grief, another table formatter? Really? 
+Oh good grief, another table formatter? Really?
 
-Yes, and I had a good reason - I didn't find anything that did what I wanted, 
-which was to lazily extract attribute names and values from objects without 
+Yes, and I had a good reason - I didn't find anything that did what I wanted,
+which was to lazily extract attribute names and values from objects without
 me having to tell the formatter what they were.
 
-So, given one or more perl objects (either a plain old blessed hashref or 
-a Moose object) this module will pull the attribute names and values and 
+So, given one or more perl objects (either a plain old blessed hashref or
+a Moose object) this module will pull the attribute names and values and
 then output them into a formmatted ASCII table. This might be useful to you
 if you want to take a bunch of perl objects and say, dump them into Markdown
 for ultra lazy wiki pages which document the states of various things. (That's
@@ -56,8 +56,8 @@ what I will be using this module for myself.)
 I also wanted to use Moose in a project which wouldn't take a LOT of time to
 complete, but wasn't just a trivial contrived exercise either.
 
-This module is well behaved by skipping attributes which begin with an 
-underscore and prevent you from adding columns after you've processed
+This module is well behaved by skipping attributes which begin with an
+underscore and prevents you from adding columns after you've processed
 any rows.
 
 =head2 ATTRIBUTES
@@ -85,7 +85,7 @@ has 'type' => (
 
 =item row_count
 
-This attribute stores the number of rows that have been processed by the 
+This attribute stores the number of rows that have been processed by the
 table so far.  It's a read-only attribute.
 
 =back
@@ -106,7 +106,7 @@ has 'row_count' => (
 
 =item columns
 
-This attribute is a collection of L<Table::Simple::Column> objects which 
+This attribute is a collection of L<Table::Simple::Column> objects which
 represent the attribute names of the perl objects being processed.
 
 This attribute has a number of methods which permit you to manipulate
@@ -157,7 +157,8 @@ added to the collection.
 
 =item reorder_columns
 
-This method changes the order of columns. B<NOTE:> Any columns which are omitted will be deleted!
+This method changes the order of columns. B<NOTE:> Any columns which are
+omitted will be deleted!
 
 =item delete_column
 
@@ -165,7 +166,8 @@ Delete the given column from the collection.
 
 =item has_columns
 
-This method returns true if the collection has any columns. (See has_column to test whether a specific column exists.)
+This method returns true if the collection has any columns. (See has_column to
+test whether a specific column exists.)
 
 =item get_column_names
 
@@ -247,8 +249,8 @@ sub _columns_builder {
 =item extract_columns
 
 Given a perl object, this method extracts the non-private attribute names
-(that is, those which do not start with an underscore) and creates 
-L<Table::Simple::Column> objects for them.  It preserves the order in 
+(that is, those which do not start with an underscore) and creates
+L<Table::Simple::Column> objects for them.  It preserves the order in
 which columns were added to the collection.
 
 It will complain if you pass an argument that isn't blessed, or if you
@@ -384,7 +386,7 @@ sub extract_row {
 		return;
 	}
 
-	$self->_inc_row_count;	
+	$self->_inc_row_count;
 
 	foreach my $column ( $self->get_columns ) {
 		my $value;
@@ -393,8 +395,8 @@ sub extract_row {
 				( $object, $column->name() );
 		}
 		else {
-			$value = ref $object->{$column->name} 
-				? dump($object->{$column->name}) 
+			$value = ref $object->{$column->name}
+				? CORE::dump($object->{$column->name})
 				: $object->{$column->name}
 				;
 		}

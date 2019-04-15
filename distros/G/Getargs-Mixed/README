@@ -40,6 +40,8 @@ If you want to report bugs through the RT system, that's fine too:
     Web:   https://rt.cpan.org/Public/Dist/Display.html?Name=Getargs-Mixed
     Email: bug-Getargs-Mixed@rt.cpan.org
 
+The Appveyor build is at https://ci.appveyor.com/project/cxw42/getargs-mixed .
+
 COPYRIGHT AND LICENCE
 
 Copyright (C) 2003--2019 Andrew Sterling Hanenkamp, Christopher White

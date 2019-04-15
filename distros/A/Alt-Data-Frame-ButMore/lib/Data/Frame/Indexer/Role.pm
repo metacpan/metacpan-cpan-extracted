@@ -33,7 +33,7 @@ Data::Frame::Indexer::Role - Role for Data::Frame indexer
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 ATTRIBUTES
 

@@ -1,5 +1,11 @@
 Revision history for CPAN-Index-API
 
+0.008     2019-04-13
+    - Updated the build's dist.ini
+    - Cleaned up some documentation
+    - Removed all use of File::Slurp in favor of Path::Tiny
+    - No longer use File::Slurp for reading DATA sections
+
 0.007   1 October 2012
 
         * Normalize all missign values to undef
@@ -30,4 +36,3 @@ Revision history for CPAN-Index-API
 0.001   30 July 2012
 
         * Initial release
-

@@ -1,9 +1,6 @@
 NAME
     CPAN::Index::API - Read and write CPAN index files
 
-VERSION
-    version 0.007
-
 SYNOPSIS
         my $index = CPAN::Index::API->new_from_repo_uri(
             repo_uri => 'http://cpan.perl.org/',
@@ -12,9 +9,9 @@ SYNOPSIS
 
         my $packages = $index->file('PackagesDetails');
 
-DESRIPTION
+DESCRIPTION
     "CPAN::Index::API" is a library to read and write CPAN index files. See
-    the modules in the "CPAN::Index::API::File" namesace for documentation
+    the modules in the "CPAN::Index::API::File" namespace for documentation
     on the individual files supported.
 
     This class provides a convenient interface for working with multiple
@@ -83,7 +80,7 @@ AUTHOR
     Peter Shangov <pshangov@yahoo.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2012 by Venda, Inc..
+    This software is copyright (c) 2019 by Venda, Inc.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

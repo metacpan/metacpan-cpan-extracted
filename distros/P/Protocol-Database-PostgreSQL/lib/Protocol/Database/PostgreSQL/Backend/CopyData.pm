@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL::Backend::CopyData;
 use strict;
 use warnings;
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 use parent qw(Protocol::Database::PostgreSQL::Backend);
 
@@ -15,11 +15,40 @@ Protocol::Database::PostgreSQL::Backend::CopyData
 
 =cut
 
+use Log::Any qw($log);
+
 sub type { 'copy_data' }
 
+sub rows { shift->{rows}->@* }
+
+my %_charmap = reverse(
+    "\\"   => "\\\\",
+    "\x08" => "\\b",
+    "\x09" => "\\t",
+    "\x0A" => "\\r",
+    "\x0C" => "\\f",
+    "\x0D" => "\\n",
+);
+
 sub new_from_message {
-    my ($self, $msg) = @_;
-    ...
+    my ($class, $msg) = @_;
+    my $data = substr $msg, 5;
+    $log->tracef('COPY data is %s', $data);
+    my @rows = map {
+        [
+            map {
+                $_ eq '\N'
+                ? undef
+                : s/(\\[\\btrfn])/$_charmap{$1}/ger
+            } split /\t/
+        ]
+    } split /\n/, $data;
+    return $class->new(
+        rows => \@rows,
+#        data_format => $data_format,
+#        count       => $count,
+#        formats     => \@formats
+    );
 }
 
 1;

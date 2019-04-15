@@ -1,16 +1,13 @@
 package CPAN::Index::API::Role::Writable;
-{
-  $CPAN::Index::API::Role::Writable::VERSION = '0.007';
-}
 
-# ABSTRACT: Writes index files
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
 
-use File::Slurp    qw(write_file read_file);
 use File::Basename qw(fileparse);
 use Path::Class    qw(file dir);
+use Path::Tiny     qw(path);
 use Text::Template qw(fill_in_string);
 use Symbol         qw(qualify_to_ref);
 use Scalar::Util   qw(blessed);
@@ -48,8 +45,27 @@ has content => (
 
 sub _build_template {
     my $self = shift;
-    my $glob = qualify_to_ref("DATA", blessed $self);
-    return read_file($glob);
+    my $data;
+    my $error;
+    { # catch block
+        local $@;
+        $error = $@ || 'Error' unless eval { # try block
+            my $data_glob = qualify_to_ref("DATA", blessed $self);
+            # find the current location before reading
+            my $tell = tell($data_glob);
+            local $/;
+            $data = <$data_glob>;
+            # put the location back so we can read again
+            # SEEK_SET is 0
+            seek($data_glob, $tell, 0);
+            1;
+        };
+    }
+    if ($error) {
+        warn $error;
+        return;
+    }
+    return $data;
 }
 
 sub _build_content {
@@ -84,8 +100,7 @@ sub write_to_tarball {
 
 sub write_to_file {
     my ($self, $filename) = @_;
-    my $file = $self->_prepare_file($filename);
-    write_file($file, { err_mode => 'carp' }, $self->content);
+    path($self->_prepare_file($filename))->spew_utf8($self->content);
 }
 
 sub write_to_default_location {
@@ -120,17 +135,13 @@ sub _prepare_file {
 
 1;
 
-
-__END__
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::Role::Writable - Writes index files
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::Role::Writable - Writes index files
 
 =head1 DESCRIPTION
 
@@ -164,7 +175,7 @@ Optional attribute. Path to the repository root.
 =head2 template
 
 Optional attribute. The template to use for generating the index files. The
-defalt is fetched from the C<DATA> section of the consuming package.
+default is fetched from the C<DATA> section of the consuming package.
 
 =head2 content
 
@@ -194,16 +205,4 @@ location will be used.
 This method builds the file content if necessary and writes it to the default
 location.
 
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-

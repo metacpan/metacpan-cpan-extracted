@@ -3,6 +3,7 @@ package Mojolicious::Plugin::Web::Auth::OAuth2;
 use Mojo::Base 'Mojolicious::Plugin::Web::Auth::Base';
 use Mojo::URL;
 use Mojo::Parameters;
+use Mojolicious::Types qw();
 use Digest::SHA;
 
 has 'scope';
@@ -61,7 +62,7 @@ sub callback {
         ? $self->_ua->post( $self->access_token_url => form => $params )
         : $self->_ua->post_form( $self->access_token_url => $params ); # Mojo::UserAgent::post_form is deprecated from version 3.85
 
-    (my $res = $tx->success ) or do {
+    (my $res = $tx->result->is_success ) or do {
         return $callback->{on_error}->( $tx->res->body );
     };
 
@@ -81,7 +82,7 @@ sub callback {
             ? { 'Authorization' => $self->authorize_header.' '.$access_token }
             : { };
         my $tx = $self->_ua->get( $url->to_abs => $headers );
-        ( my $res = $tx->success )
+        ( my $res = $tx->result->is_success )
             or return $callback->{on_error}->( sprintf( '%d %s', $tx->res->code, $tx->res->default_message ) );
         push @args, $res->json;
     } else {
@@ -116,7 +117,10 @@ sub _ua {
 
 sub _response_to_hash {
     my ( $self, $res ) = @_;
-    return ( $res->headers->content_type =~ /^application\/json[;]?/ )
+    my $types = Mojolicious::Types->new;
+    $types->type(json => ['application/json', 'text/javascript']);
+    my $exts = $types->detect( $res->headers->content_type );
+    return ( scalar(@$exts) && $exts->[0] eq 'json' )
         ? $res->json
         : Mojo::Parameters->new( $res->body )->to_hash;
 }

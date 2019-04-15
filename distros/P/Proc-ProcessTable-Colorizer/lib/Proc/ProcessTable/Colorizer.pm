@@ -15,11 +15,11 @@ Proc::ProcessTable::Colorizer - Like ps, but with colored columns and enhnaced f
 
 =head1 VERSION
 
-Version 0.3.0
+Version 0.3.1
 
 =cut
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 
 =head1 SYNOPSIS
@@ -94,6 +94,22 @@ sub new {
 	};
 	bless $self;
 
+	# Proc::ProcessTable does not return a nice value for Linux
+	if ($^O =~ /linux/){
+		$self->{fields}=[
+				'pid',
+				'uid',
+				'pctcpu',
+				'pctmem',
+				'size',
+				'rss',
+				'info',
+				'start',
+				'time',
+				'proc',
+				];
+	}
+
 	if ($^O =~ /bsd/){
 		$self->{physmem}=`/sbin/sysctl -a hw.physmem`;
 		chomp($self->{physmem});
@@ -148,7 +164,7 @@ sub colorize{
 			}else{
 				$field=$field.ucfirst($fields->[$fieldInt]);
 			}
-			
+
 			push( @header, $field.color('reset') );
 
 			$fieldInt++;
@@ -162,16 +178,16 @@ sub colorize{
 
 	#an array of procs
 	my @procs;
-	
+
 	#goes through it all and gathers the information
 	foreach my $proc ( @{$pt->table} ){
-		
+
 		#process the requested fields
 		$fieldInt=0;
 		my %values;
 		while ( defined( $fields->[$fieldInt] ) ){
 			my $field=$fields->[$fieldInt];
-			
+
 			if (
 				($^O =~ /bsd/) &&
 				( $field =~ /pctmem/ )
@@ -260,12 +276,12 @@ sub colorize{
 					if ( hex($proc->flags) & 0x00800 ){$values{traced_by_debugger}=1; }
 					if ( hex($proc->flags) & 0x00001 ){$values{posix_advisory_lock}=1; }
 				}
-				
+
 			}else{
 				$values{$field}=$proc->$field;
 			}
 
-		
+
 			$fieldInt++;
 		}
 
@@ -279,7 +295,7 @@ sub colorize{
 		if ( ! defined( $values{size} ) ){
 			$values{size} = 0;
 		}
-		
+
 		$values{pctmem}=sprintf('%.2f', $values{pctmem});
 		$values{pctcpu}=sprintf('%.2f', $values{pctcpu});
 
@@ -356,12 +372,11 @@ sub colorize{
 						if ( $to_match eq $user ){
 							$hits++;
 							$matched=1;
-						}						
+						}
 					}
-					
+
 					$user_search_int++;
 				}
-				
 			}
 
 			#check to see if it needs to search for wait channels
@@ -392,12 +407,12 @@ sub colorize{
 						if ( $to_match eq $proc->{wchan} ){
 							$hits++;
 							$matched=1;
-						}						
+						}
 					}
-					
+
 					$wait_search_int++;
 				}
-				
+
 			}
 
 			#check to see if it needs to search for CPU time usage
@@ -465,10 +480,8 @@ sub colorize{
 							$matched++;
 						}
 					}
-					
 					$time_search_int++;
 				}
-				
 			}
 
 			#check to see if it needs to search for CPU percent
@@ -536,10 +549,10 @@ sub colorize{
 							$matched++;
 						}
 					}
-					
+
 					$pctcpu_search_int++;
 				}
-			}		
+			}
 
 			#check to see if it needs to search for memory percent
 			my $pctmem_search_array=$self->pctmemSearchGet;
@@ -648,7 +661,7 @@ sub colorize{
 				#increment this so it will always be off by one for this proc, meaning it is ignored
 				$required_hits++;
 			}
-			
+
 			if ( $required_hits == $hits ){
 				$show=1;
 			}
@@ -657,7 +670,7 @@ sub colorize{
 		if (
 			( $show )
 			){
-		
+
 			foreach my $field ( @{$fields} ){
 				my $item='';
 				if ( defined( $proc->{$field} ) ){
@@ -668,16 +681,19 @@ sub colorize{
 					if ( $field eq 'start' ){
 						$item=$self->startString($item);
 					}
-					
+
 					if (
 						( $field eq 'uid' ) &&
 						$self->{resolveUser}
 						){
 						$item=getpwuid($item);
 					}
-					
+
 					#colorizes it
 					if ( $field eq 'time' ){
+						if ( $^O =~ 'linux' ){
+							$item=$item/1000000;
+						}
 						$item=$self->timeString($item);
 					}elsif( $field eq 'proc' ){
 						$item=color($self->processColorGet).$item;
@@ -698,9 +714,9 @@ sub colorize{
 						}elsif(
 							$left eq 'run'
 						){
-							$left='R';						
+							$left='R';
 						}
-						
+
 						#checks if it is swapped out
 						if (
 							( $proc->{state} ne 'zombie' ) &&
@@ -708,15 +724,15 @@ sub colorize{
 							){
 							$left=$left.'O';
 						}
-						
+
 						#waiting to exit
 						if (
 						( defined( $proc->{working_on_exiting} ) ) &&
 							$proc->{working_on_exiting}
 							){
 							$left=$left.'E';
-						}					
-						
+						}
+
 						#session leader
 						if (
 							( defined( $proc->{is_session_leader} ) ) &&
@@ -724,7 +740,7 @@ sub colorize{
 							){
 							$left=$left.'s';
 						}
-						
+
 						#checks to see if any sort of locks are present
 						if (
 							( defined( $proc->{is_locked} ) || defined( $proc->{posix_advisory_lock} ) )&&
@@ -732,7 +748,7 @@ sub colorize{
 							){
 							$left=$left.'L';
 						}
-					
+
 						#checks to see if has a controlling terminal
 						if (
 							( defined( $proc->{has_controlling_terminal} ) ) &&
@@ -748,7 +764,7 @@ sub colorize{
 							){
 							$left=$left.'F';
 						}
-						
+
 						#checks if it knows it is being traced
 						if (
 							( defined( $proc->{traced_by_debugger} ) ) &&
@@ -756,9 +772,13 @@ sub colorize{
 							){
 							$left=$left.'X';
 						}
-						
-						$item=color($self->nextColor).$left.' '.color($self->nextColor).$proc->{wchan};
-						
+
+						if ( $^O =~ 'linux' ){
+							$item=color($self->nextColor).$left.' '.color($self->nextColor);
+						}else{
+							$item=color($self->nextColor).$left.' '.color($self->nextColor).$proc->{wchan};
+						}
+
 					}else{
 						$item=color($self->nextColor).$item;
 					}
@@ -766,9 +786,9 @@ sub colorize{
 					push( @line, $item.color('reset') );
 				}else{
 					push( @proc_column, $item );
-				}		
+				}
 			}
-			
+
 			push( @colored, \@line );
 		}
 	}
@@ -782,6 +802,10 @@ sub colorize{
 
 	#add 120 as Text::Table appears to be off by that much
 	$columns=$columns+128;
+
+	if ( $^O =~ 'linux' ){
+		$columns=$columns-12;
+	}
 
 	#this is 
 	my $procwidth=$columns-$width;
@@ -801,7 +825,7 @@ sub colorize{
 		$proc_column_int++;
 		$colored_int++;
 	}
-	
+
 	return $tb->load( @colored );
 }
 
@@ -824,7 +848,7 @@ sub fields{
 	my %toReturn;
 	while( defined($fields[$int]) ){
 		$toReturn{$fields[$int]}=1;
-		
+
 		$int++;
 	}
 
@@ -861,7 +885,7 @@ sub nextColor{
 	$self->errorblank;
 
 	my $color;
-	
+
 	if( defined( $self->{colors}[ $self->{nextColor} ] ) ){
 		$color=$self->{colors}[ $self->{nextColor} ];
 		$self->{nextColor}++;
@@ -978,9 +1002,9 @@ sub pctcpuSearchSetString{
 				$self->warn;
 				return undef;
 			}
-			
+
 		}
-		
+
 		$self->{pctcpu_search}=\@pctcpu_search_array;
 	}
 
@@ -1057,9 +1081,9 @@ sub pctmemSearchSetString{
 				$self->warn;
 				return undef;
 			}
-			
+
 		}
-		
+
 		$self->{pctmem_search}=\@pctmem_search_array;
 	}
 
@@ -1125,7 +1149,7 @@ sub procSearchSet{
 	$self->errorblank;
 
 	$self->{proc_search}=$proc_search;
-	
+
 	return 1;
 }
 
@@ -1172,9 +1196,9 @@ sub selfIgnoreSet{
 	if ( ! defined( $self_ignore ) ){
 		$self_ignore='2';
 	}
-	
+
 	$self->{self_ignore}=$self_ignore;
-	
+
 	return 1;
 }
 
@@ -1197,7 +1221,7 @@ sub startString{
 	$cyear += 1900;
 	$mon += 1;
 	$cmon += 1;
-	
+
 	#find the most common one and return it
 	if ( $year ne $cyear ){
 		return $year.sprintf('%02d', $mon).sprintf('%02d', $mday).'-'.sprintf('%02d', $hour).':'.sprintf('%02d', $min);
@@ -1336,9 +1360,9 @@ sub timeSearchSetString{
 				$self->warn;
 				return undef;
 			}
-			
+
 		}
-		
+
 		$self->{time_search}=\@time_search_array;
 	}
 
@@ -1377,7 +1401,7 @@ sub timeString{
 	$hours=~s/\..*//;
 	$minutes=~s/\..*//;
 	$seconds=sprintf('%.f',$seconds);
-	
+
 	#this will be returned
 	my $toReturn='';
 
@@ -1401,8 +1425,8 @@ sub timeString{
 	}
 
 	$toReturn=$toReturn.color( $colors->[0] ).$seconds;
-	
-	return $toReturn;	
+
+	return $toReturn;
 }
 
 =head1 userSearchGet

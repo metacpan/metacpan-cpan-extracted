@@ -3,7 +3,7 @@ package Database::Async::DB;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Future;
 
@@ -83,4 +83,12 @@ sub query {
 }
 
 1;
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

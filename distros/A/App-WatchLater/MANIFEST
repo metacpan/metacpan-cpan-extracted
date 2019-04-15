@@ -6,6 +6,7 @@ Build.PL
 Changes
 INSTALL
 lib/App/WatchLater.pm
+lib/App/WatchLater/Browser.pm
 lib/App/WatchLater/YouTube.pm
 LICENSE
 MANIFEST			This list of files

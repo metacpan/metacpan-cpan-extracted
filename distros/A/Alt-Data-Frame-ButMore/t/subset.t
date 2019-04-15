@@ -1,10 +1,11 @@
-use Test::Most;
+#!perl
 
-use strict;
-use warnings;
+use Data::Frame::Setup;
+
+use Test2::V0;
 
 use Data::Frame;
-use PDL;
+use PDL::Core qw(pdl);
 
 my $a = pdl( 1, 2, 3, 4 );
 my $b = $a >= 2;
@@ -36,13 +37,13 @@ subtest number_of_rows => sub {
 
 subtest subset => sub {
     my $df_subset = $df->subset( sub { $_->('z') > 2 } );
-    is_deeply( $df_subset->row_names->unpdl, [ 2 .. 3 ] );
+    is( $df_subset->row_names->unpdl, [ 2 .. 3 ] );
 
     my $df_subset_autoload = $df->subset( sub { $_->z > 2 } );
-    is_deeply( $df_subset_autoload->row_names->unpdl, [ 2 .. 3 ] );
+    is( $df_subset_autoload->row_names->unpdl, [ 2 .. 3 ] );
 
     my $df_subset_further = $df_subset->subset( sub { $_->('z') == 3 } );
-    is_deeply( $df_subset_further->row_names->unpdl, [2] );
+    is( $df_subset_further->row_names->unpdl, [2] );
 };
 
 done_testing;

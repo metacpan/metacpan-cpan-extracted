@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Log::ger::Layout::LTSV",
   "PREREQ_PM" => {
-    "Devel::Caller::Util" => "0.040",
-    "Log::ger" => "0.026",
+    "Devel::Caller::Util" => "0.042",
+    "Log::ger" => "0.027",
     "Sys::Hostname" => 0,
     "Time::HiRes" => 0,
     "strict" => 0,
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "vars" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,11 +44,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Devel::Caller::Util" => "0.040",
+  "Devel::Caller::Util" => "0.042",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.026",
+  "Log::ger" => "0.027",
   "Log::ger::Format" => "0.018",
   "Log::ger::Format::None" => 0,
   "Log::ger::Layout" => 0,

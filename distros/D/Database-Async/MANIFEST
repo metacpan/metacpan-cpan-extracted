@@ -21,6 +21,10 @@ lib/Database/Async/Engine.pod
 lib/Database/Async/Engine/Empty.pm
 lib/Database/Async/Engine/Empty.pod
 lib/Database/Async/ORM.pm
+lib/Database/Async/ORM/Field.pm
+lib/Database/Async/ORM/Schema.pm
+lib/Database/Async/ORM/Table.pm
+lib/Database/Async/ORM/Type.pm
 lib/Database/Async/Pool.pm
 lib/Database/Async/Query.pm
 lib/Database/Async/Row.pm

@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 2;
+plan tests => 3;
 
 BEGIN {
     use_ok( 'App::WatchLater' ) || print "Bail out!\n";
+    use_ok( 'App::WatchLater::Browser' ) || print "Bail out!\n";
     use_ok( 'App::WatchLater::YouTube' ) || print "Bail out!\n";
 }
 

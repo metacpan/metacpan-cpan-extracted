@@ -61,7 +61,6 @@ do { my $x = {
                                       'Math::BigFloat' => '0',
                                       'Math::BigInt' => '0',
                                       'Moo' => '0',
-                                      'Types::Standard' => '0',
                                       'XSLoader' => '0',
                                       'namespace::autoclean' => '0',
                                       'overload' => '0',

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Gen;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '0.487'; # VERSION
+our $DATE = '2019-04-14'; # DATE
+our $VERSION = '0.488'; # VERSION
 
 use 5.010001;
 use strict;
@@ -436,7 +436,7 @@ use experimental 'smartmatch'; no warnings ('void'); require List::Util; use exp
             $extra_modules->{$_} = $res->[3]{'func.raw_result'}{req_modules}{$_};
         }
     } else {
-        $extra_modules->{'Log::ger'} = '0.023' if $args{log};
+        $extra_modules->{'Log::ger'} = '0.027' if $args{log};
         # determine minimum required version
         if ($cmdline_mod =~ /\APerinci::CmdLine::(Lite|Any)\z/) {
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
@@ -580,7 +580,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.487 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2018-11-29.
+This document describes version 0.488 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2019-04-14.
 
 =head1 FUNCTIONS
 
@@ -1034,7 +1034,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

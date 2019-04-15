@@ -5,11 +5,12 @@ package PDL::SV;
 use 5.016;
 use warnings;
 
+use PDL::Lite ();   # PDL::Lite is the minimal to get PDL work
 use PDL::Core qw(pdl);
 use PDL::Primitive qw(which whichND);
+
 use Data::Rmap qw(rmap_array);
 use Safe::Isa;
-use Storable qw(dclone);
 use Type::Params;
 use Types::Standard qw(slurpy ArrayRef ConsumerOf Int);
 use List::AllUtils ();
@@ -128,6 +129,7 @@ sub _array_set {
     $subarray->[ $indices->[-1] ] = $val;
 }
 
+
 around qw(slice dice) => sub : lvalue {
     my $orig = shift;
     my $self = shift;
@@ -161,19 +163,38 @@ sub glue {
     return $new;
 }
 
+
 sub uniq {
     my $self  = shift;
     my $class = ref($self);
 
-    my $uniq = [ List::AllUtils::uniq( @{ $self->_internal } ) ];
-    return $class->new($uniq);
+    my @uniq = List::AllUtils::uniq( grep { defined $_ }
+          @{ $self->_effective_internal } );
+    my $new = $class->new( \@uniq );
+    return $new;
 }
 
-#around qw(sever) => sub {
-#	# TODO
-#	# clone the contents of _internal
-#	# renumber the elements
-#};
+
+sub sever {
+    my ($self) = @_;
+
+    $self->_internal( [ map { $_ // 'BAD' } @{ $self->_effective_internal } ] );
+    my $p = PDL->sequence( $self->dims );
+    $p = $p->setbadif( $self->isbad ) if $self->badflag;
+    $self->{PDL} = $p;
+    return $self;
+}
+
+
+sub set {
+    my ($self, @position) = @_;
+
+    my $value = pop @position;
+    my $idx = $self->{PDL}->at(@position);
+    $self->_internal->[$idx] = $value;
+    return $self;
+}
+
 
 sub at {
     my $self = shift;
@@ -182,6 +203,7 @@ sub at {
     return 'BAD' if $idx eq 'BAD';
     return $self->_internal->[$idx];
 }
+
 
 sub unpdl {
     my $self = shift;
@@ -204,6 +226,7 @@ sub unpdl {
     return $data;
 }
 
+
 sub list {
     my ($self) = @_;
 
@@ -216,18 +239,17 @@ sub list {
     }
 }
 
-#TODO: reimplement to reduce memory usage
+
 sub copy {
     my ($self) = @_;
 
     my $new = PDL::SV->new( [] );
     $new->{PDL} = PDL->sequence( $self->dims );
-    if ( $self->badflag ) {
-        $new->{PDL} = $new->{PDL}->setbadif( $self->isbad );
-    }
+    $new->{PDL} = $new->{PDL}->setbadif( $self->isbad ) if $self->badflag;
     $new->_internal( [ map { $_ // 'BAD' } @{ $self->_effective_internal } ] );
     return $new;
 }
+
 
 sub inplace {
     my $self = shift;
@@ -244,10 +266,18 @@ sub _call_on_pdl {
     };
 }
 
+
+sub where {
+    my ( $self, $mask ) = @_;
+    return $self->slice( which($mask) );
+}
+
+
 for my $method (qw(isbad isgood ngood nbad)) {
     no strict 'refs';
     *{$method} = _call_on_pdl($method);
 }
+
 
 sub setbadif {
     my $self = shift;
@@ -285,11 +315,6 @@ sub match_regexp {
         $p = $p->setbadif( $self->isbad );
     }
     return $p;
-}
-
-sub where {
-    my ( $self, $mask ) = @_;
-    return $self->slice( which($mask) );
 }
 
 sub _effective_internal {
@@ -379,7 +404,7 @@ PDL::SV - PDL subclass for keeping scalar data (like strings)
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 
@@ -387,7 +412,27 @@ version 0.0041
     
     my $p = PDL::SV->new( [ qw(foo bar) ] );
 
-=head1 METHODS
+=head1 DESCRIPTION
+
+This PDL::SV class stores array of scalar values. It can be used for vectors
+of strings.
+
+While this class is a subclass of L<PDL>, its internals are quite different
+from other normal PDL types. So basically what's not documented are not
+guarenteed to work.
+
+=head1 METHODS / BASIC
+
+These methods basically have similar behavior as PDL class's methods of
+same names.
+
+=head2 slice
+
+    slice(...)
+
+=head2 dice
+
+    dice(...)
 
 =head2 glue
 
@@ -396,9 +441,78 @@ version 0.0041
 Glue two or more PDLs together along an arbitrary dimension.
 For now it only supports 1D PDL::SV piddles, and C<$dim> has to be C<0>.
 
+=head2 uniq
+
+    uniq()
+
+BAD values are not considered unique and are ignored.
+
+=head2 sever
+
+    sever()
+
+=head2 set
+
+    set(@position, $value)
+
+=head2 at
+
+    at(@position)
+
+=head2 unpdl
+
+    unpdl()
+
+=head2 list
+
+    list()
+
+=head2 copy
+
+    copy()
+
+=head2 inplace
+
+    inplace()
+
+=head2 where
+
+    where($mask)
+
+=head1 METHODS / BAD VALUE
+
+These methods basically have similar behavior as PDL class's methods of
+same names.
+
+=head2 isbad
+
+    isbad()
+
+=head2 isgood
+
+    isgood()
+
+=head2 ngood
+
+    ngood()
+
+=head2 nbad
+
+    nbad()
+
+=head2 setbadif
+
+    setbadif($mask)
+
 =head2 setbadtoval
 
+    setbadtoval($val)
+
 Cannot be run inplace.
+
+=head1 METHODS / ADDITIONAL
+
+These methods exist not in PDL but only in this class.
 
 =head2 match_regexp
 

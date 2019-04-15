@@ -17,6 +17,9 @@ isa_ok($dut, $DUT);
 $dut = $DUT->new(42);   # With parameters
 isa_ok($dut, $DUT);
 
+$dut = $DUT->new(-at => 42);    # With named parameters
+isa_ok($dut, $DUT);
+
 # Initial members
 num_is($dut->size, 0, 'Zero size initially');
 num_is($dut->last, -1, '$# == -1 initially');

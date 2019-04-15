@@ -4,7 +4,6 @@ use strict;
 use warnings;
 no  warnings 'uninitialized';
 
-
 use Exporter;
 our @ISA = qw(Exporter);
 
@@ -65,36 +64,38 @@ my %tagmap = (
 # handle most HTML tags:
 sub tag {
   my ($tag) = shift;
-  my (@params) = @_;
 
   my ($attr_string, $text);
 
-  for my $param (@params) {
+  for my $param (@_) {
 
     if (ref($param)) {
-      # We sort these because, if using each, order is random(ish), and
-      # this can lead to different HTML for the same input:
-      foreach my $name (sort keys %{ $param }) {
-        my $value = encode_entities( ${ $param }{$name} );
-        $attr_string .= qq{ $name="$value"};
+      # A hashref containing one or more attribute => value pairs.  We sort
+      # these by key because, if using each, order is random(ish), and this can
+      # lead to different HTML for the same input.
+      foreach my $attr (sort keys %{ $param }) {
+        my $value = encode_entities( ${ $param }{$attr} );
+        $attr_string .= ' ' . $attr . '="' . $value . '"';
       }
     }
     else {
+      # Text that goes inside the content of the tag.
       $text .= "\n" if length($text) > 0;
       $text .= $param;
     }
 
   }
 
-  # voila, an X(HT)ML tag:
-  return "<${tag}${attr_string}>$text</$tag>";
+  # Voila, an X(HT)ML tag, pretty much:
+  return '<' . $tag . $attr_string . '>' . $text . '</' . $tag . '>';
 }
 
 # Special cases and higher-level markup
 
 sub entry_markup {
-    my ($text) = @_;
-    return "\n\n" . article(div($text, { class => 'entry' })) . "\n\n";
+    return qq{\n\n<article><div class="entry">}
+           . $_[0]
+           . "</div></article>\n\n";
 }
 
 sub heading {

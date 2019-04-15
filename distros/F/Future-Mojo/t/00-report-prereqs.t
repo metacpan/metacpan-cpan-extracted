@@ -60,7 +60,8 @@ sub _merge_prereqs {
 }
 
 my @include = qw(
-
+  IO::Async::Loop
+  IO::Async::Loop::Mojo
 );
 
 my @exclude = qw(

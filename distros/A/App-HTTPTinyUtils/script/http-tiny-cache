@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/HTTPTinyUtils/http_tiny_cache
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-04-10'; # DATE
+our $DATE = '2019-04-14'; # DATE
 our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ http-tiny-cache - Perform request with HTTP::Tiny::Cache
 
 =head1 VERSION
 
-This document describes version 0.004 of http-tiny-cache (from Perl distribution App-HTTPTinyUtils), released on 2019-04-10.
+This document describes version 0.005 of http-tiny-cache (from Perl distribution App-HTTPTinyUtils), released on 2019-04-14.
 
 =head1 SYNOPSIS
 

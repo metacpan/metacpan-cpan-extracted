@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL::Message;
 use strict;
 use warnings;
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 =head1 NAME
 

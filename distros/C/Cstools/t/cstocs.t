@@ -286,7 +286,10 @@ EOF
 	}
 	print "ok 30\n";
 	my $outmime = &$il2_mime($out);
-	if ($outmime ne "X-Hlavicka: UTF-8 =?ISO-8859-2?Q?=E8esk=FD?= text +=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9_=E8esk=FD?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=\n") {
+	print "X-Hlavicka: UTF-8 =?ISO-8859-2?Q?=E8esk=FD?= text +=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9_=E8esk=FD?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=\n";
+	print "$outmime\n";
+	if ($outmime ne "X-Hlavicka: UTF-8 =?ISO-8859-2?Q?=E8esk=FD?= text +=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9_=E8esk=FD?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=\n"
+		and $outmime ne "X-Hlavicka: UTF-8 =?ISO-8859-2?Q?=E8esk=FD=20?=text +=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9=20_=E8esk=FD?=+=?ISO-8859-2?Q?=EC=B9=E8=F8=BE=FD=E1=ED=E9=0A?=") {
 		print "not ";
 	}
 	print "ok 31\n";

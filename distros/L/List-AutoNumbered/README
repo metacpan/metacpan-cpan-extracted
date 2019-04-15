@@ -31,9 +31,40 @@ NAME
 
 METHODS
   new
-    Constructor.  Call as "$class->new($number)".  Each successive element
-    will have the next number, unless you say otherwise (e.g., using LSKIP()).
-    Specifically, the first item in the list will have "$number+1".
+    Constructor.  Basic usage options:
+
+        $list = List::AutoNumbered->new();      # first list item is number 1
+        $list = List::AutoNumbered->new($num);  # first list item is $num+1
+        $list = List::AutoNumbered->new(-at => $num);   # ditto
+
+    Each successive element will have the next number, unless you say
+    otherwise (e.g., using LSKIP()).  Specifically, the first item in the list
+    will be numbered one higher than the number passed to the
+    "List::AutoNumbered" constructor.
+
+    Constructor parameters are processed using Getargs::Mixed, so positional
+    and named parameters are both OK.
+
+   The "how" function
+    You can give the constructor a "how" function that will make the list
+    entry for a single load() or add() call:
+
+        $list = List::AutoNumbered->new(-how => sub { @_ });
+            # Jam everything together to make a flat array
+        $list = List::AutoNumbered->new(41, sub { @_ });
+            # Positional is OK, too.
+
+    The "how" function is called as "how($num, @data)".  $num is the line
+    number for load() calls, or "undef" for add() calls.  @data is whatever
+    data you passed to "load()" or "add()".  For example, the default "how"
+    function is:
+
+        sub how {
+            shift unless defined $_[0];     # add passes undef as the line number.
+            [@_]                            # Wrap everything in an arrayref.
+        }
+
+    See "t/05-custom-list-entry.t" for examples of custom "how" functions.
 
   size
     Returns the size of the array.  Like "scalar @arr".

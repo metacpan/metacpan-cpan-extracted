@@ -17,8 +17,9 @@ my $builder = Module::Build->new(
     'DBI'             => 0,
     'DBD::SQLite'     => 0,
     'HTTP::Tiny'      => '0.055',
-    'IO::Socket::SSL' => 0,
+    'IO::Socket::SSL' => '1.56',
     'JSON'            => 0,
+    'Net::SSLeay'     => '1.49',
     'Try::Tiny'       => 0,
     'URI::Find'       => 0,
     'perl'            => '5.016',
@@ -29,6 +30,11 @@ my $builder = Module::Build->new(
     'Test::MockObject::Extends' => 0,
   },
   add_to_cleanup     => [ 'App-WatchLater-*' ],
+  meta_merge         => {
+    resources        => {
+      repository     => q{https://github.com/bcc32/App-WatchLater}
+    },
+  },
 );
 
 $builder->create_build_script();

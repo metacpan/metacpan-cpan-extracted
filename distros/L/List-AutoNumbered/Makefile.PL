@@ -160,6 +160,7 @@ my %opts = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
+        'Getargs::Mixed' => '1.06', # Supports perl 5.6
         'Exporter' => '0',
         'parent' => '0',
         'Scalar::Util' => '1.50',

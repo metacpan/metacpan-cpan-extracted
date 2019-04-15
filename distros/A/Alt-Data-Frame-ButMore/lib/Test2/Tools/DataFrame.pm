@@ -6,14 +6,14 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0041'; # VERSION
+our $VERSION = '0.0043'; # VERSION
 
 use Safe::Isa;
 use Test2::API qw/context/;
 use Test2::Util::Table qw/table/;
 use Test2::Util::Ref qw/render_ref/;
 
-use parent qw/Exporter/;
+use parent qw(Exporter::Tiny);
 our @EXPORT = qw(dataframe_ok dataframe_is);
 
 
@@ -38,8 +38,7 @@ sub dataframe_is ($$;$@) {
     my ( $got, $exp, $name, @diag ) = @_;
     my $ctx = context();
 
-    # TODO: Make this a package variable.
-    local $Data::Frame::TOLERANCE_REL = 1e-9;
+    local $Data::Frame::TOLERANCE_REL = 1e-8 unless $Data::Frame::TOLERANCE_REL;
 
     unless ( $got->$_DOES('Data::Frame') ) {
         my $gotname = render_ref($got);
@@ -109,7 +108,7 @@ Test2::Tools::DataFrame - Tools for verifying Data::Frame data frames
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 

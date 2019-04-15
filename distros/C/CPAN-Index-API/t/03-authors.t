@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Most;
 use File::Temp qw(tempfile);
-use File::Slurp qw(read_file);
+use Path::Tiny qw(path);
 use CPAN::Index::API::File::MailRc;
 
 my $mailrc = <<'EndOfMailRc';
@@ -26,7 +26,7 @@ eq_or_diff( $writer->content, $mailrc, 'mailrc' );
 
 my ($fh, $filename) = tempfile;
 $writer->write_to_file($filename);
-my $content = read_file($filename);
+my $content = path($filename)->slurp_utf8;
 eq_or_diff( $content, $mailrc, 'write to file' );
 
 my $reader = CPAN::Index::API::File::MailRc->read_from_string($mailrc);

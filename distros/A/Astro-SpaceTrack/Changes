@@ -1,3 +1,15 @@
+0.128		2019-04-14	T. R. Wyant
+    Update canned status table for decay of
+
+    - Iridium 55
+    - Iridium 58
+    - Iridium 64
+    - Iridium 95
+
+    Do Space Track tests with dummy data by default. You can test live
+    by setting environment variable SPACETRACK_TEST_LIVE to a true
+    value.
+
 0.127		2019-03-21	T. R. Wyant
     Update canned status table for decay of
 

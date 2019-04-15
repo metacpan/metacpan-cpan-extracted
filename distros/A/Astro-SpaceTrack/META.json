@@ -28,6 +28,11 @@
             "Test::More" : "0.96"
          }
       },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -60,7 +65,7 @@
    "provides" : {
       "Astro::SpaceTrack" : {
          "file" : "lib/Astro/SpaceTrack.pm",
-         "version" : "0.127"
+         "version" : "0.128"
       }
    },
    "release_status" : "stable",
@@ -77,6 +82,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack"
       }
    },
-   "version" : "0.127",
+   "version" : "0.128",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -2,10 +2,12 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use lib 'lib';
 
-use Test::More tests => 6;
+use Encode;
+use Test::More tests => 4;
 use App::WRT;
 
 chdir 'example';
@@ -18,11 +20,6 @@ chdir 'example';
   );
 
 # 'individual subroutine tests';
-
-  ok(
-    $w->recent_month() =~ m/\d{4}\/\d{1,2}/,
-    'recent_month returns a month'
-  );
 
   my $datestamp = $w->datestamp('2014/1/1/test_entry');
   # diag($datestamp);
@@ -42,20 +39,14 @@ chdir 'example';
     'icon_test has an image in it'
   );
 
-# listing out of all source files
+# feed rendering
+  my $feed = decode('UTF-8', $w->display($w->{feed_alias}));
+  # diag($feed);
 
-  my (@all_source_files) = $w->get_all_source_files();
+  # look for ✨:
   ok(
-    scalar @all_source_files == 16,
-    'got 16 source files from example archive, as expected'
-  );
-
-# listing entries like 2014/1/1 for an individual day:
-
-  my (@all_day_entries) = $w->get_all_day_entries();
-  ok(
-    scalar @all_day_entries == 2,
-    'got 2 day entries from example archive, as expected'
+    $feed =~ m/✨/s,
+    'feed contains some stars'
   );
 
 # rendering static html files

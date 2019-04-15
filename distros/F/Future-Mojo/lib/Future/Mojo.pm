@@ -5,10 +5,13 @@ use warnings;
 use Carp 'croak';
 use Scalar::Util 'blessed', 'weaken';
 use Mojo::IOLoop;
+use Role::Tiny::With;
 
 use parent 'Future';
 
-our $VERSION = '0.004';
+our $VERSION = '1.000';
+
+with 'Future::Role::Promisify';
 
 sub new {
 	my $proto = shift;
@@ -165,6 +168,12 @@ immediately, but will wait for the next I/O round.
 A shortcut to calling the L<Future/"fail"> method on the
 L<Mojo::IOLoop/"next_tick">. Ensures that a returned Future object is not ready
 immediately, but will wait for the next I/O round.
+
+=head2 promisify
+
+ my $promise = $future->promisify;
+
+Composed from L<Future::Role::Promisify>.
 
 =head1 BUGS
 

@@ -7,7 +7,7 @@ use strict;
 use lib 'inc';
 require Module::Build::HiPi;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 my $requires = {
         'Try::Tiny'             => '0',
@@ -22,6 +22,10 @@ my $requires = {
 if( $^O =~ /^linux$/i ) {
     $requires->{'Device::SerialPort'} = '0';
     $requires->{'Image::Imlib2'}      = '0';
+    $requires->{'XML::LibXML'}        = '0';
+    $requires->{'LWP::UserAgent'}     = '0';
+    $requires->{'MIME::Base64'}       = '0';
+    $requires->{'Digest::SHA'}        = '0';
 }
 
 my $build = Module::Build::HiPi->new(

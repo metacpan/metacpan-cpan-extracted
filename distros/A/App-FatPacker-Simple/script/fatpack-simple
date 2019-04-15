@@ -16,28 +16,31 @@ fatpack-simple - only fatpack a script
 
 =head1 SYNOPSIS
 
-    > fatpack-simple [OPTIONS] SCRIPT
+  $ fatpack-simple [OPTIONS] SCRIPT
 
-    Options:
-    -d, --dir DIRECTORIES       where pm files to be fatpacked are.
-                                default: lib,fatlib,local,extlib
-    -o, --output OUTPUT         output filename
-    -e, --exclude MODULES       modules not to be fatpacked
-    -s, --strict                turn on strict mode
-    -q, --quiet                 be quiet
-        --color                 color output, default: on
-        --no-strip              do not perform perl-strip
-        --shebang SHEBANG       use custom shebang
-        --exclude-strip REGEXP  do not perform perl-strip on files which match REGEXP
-    -h, --help                  show this help
-    -v, --version               show version
+=head1 OPTIONS
 
-    Examples:
-    > fatpack-simple script.pl
-    > fatpack-simple --dir deps,my-ext --output artifact.pl script.pl
-    > fatpack-simple --exclude Module::Build,List::MoreUtils --strict script.pl
-    > fatpack-simple --shebang '#!/usr/bin/env perl' script.pl
-    > fatpack-simple --exclude-strip 'MyApp.*\.pm' script.pl
+  -d, --dir DIRECTORIES       where pm files to be fatpacked are.
+                              default: lib,fatlib,local,extlib
+  -o, --output OUTPUT         output filename
+  -e, --exclude MODULES       modules not to be fatpacked
+  -s, --strict                turn on strict mode
+  -q, --quiet                 be quiet
+      --color                 color output, default: on
+      --no-strip              do not perform perl-strip
+      --cache DIRECTORY       cache directory for perl-strip
+      --shebang SHEBANG       use custom shebang
+      --exclude-strip REGEXP  do not perform perl-strip on files which match REGEXP
+  -h, --help                  show this help
+  -v, --version               show version
+
+=head1 EXAMPLES
+
+  $ fatpack-simple script.pl
+  $ fatpack-simple --dir deps,my-ext --output artifact.pl script.pl
+  $ fatpack-simple --exclude Module::Build,List::MoreUtils --strict script.pl
+  $ fatpack-simple --shebang '#!/usr/bin/env perl' script.pl
+  $ fatpack-simple --exclude-strip 'MyApp.*\.pm' script.pl
 
 =head1 DESCRIPTION
 

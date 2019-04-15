@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+
+# TODO:
+#
+# Ideally, this would be able to handle the following gracefully:
+#
+#   wrt ls 2016     # all entries for 2016
+#   wrt ls 2016/4   # all entries for April 2016
+#   wrt ls 2016/4/1 # everything for April 1, 2016
+#
+# ...but I think doing that right requires a much cleaner separation of how
+# entries are _structured_ from how they're _displayed_, probably by moving
+# more operations into WRT::EntryStore.
+#
+# It makes some sense that wrt-ls would just expose the interface of
+# EntryStore in a relatively safe way, including the operations that find
+# things by depth, locate the next/previous entry, etc.  All of these could
+# be useful in scripting and publishing pipelines.
+
+=pod
+
+=head1 NAME
+
+wrt-ls - list 
+
+=head1 USAGE
+
+    wrt ls          # all entries
+    wrt ls --days   # entries for individual days
+    wrt ls --months # entries for individual months 
+    wrt ls --years  # entries for years
+
+    # Display help:
+    wrt ls --help
+
+    # Specify a different config file:
+    wrt ls --config ./wrt.json ...
+
+=head1 DESCRIPTION
+
+Lists entries in the current wrt archive.
+
+This interface is experimental and subject to revision in upcoming releases.
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://code.p1k3.com/gitea/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes <code@p1k3.com>
+
+=cut
+
+use 5.10.0;
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+
+use Getopt::Long;
+use Pod::Usage;
+use App::WRT;
+
+# Handle options, including help generated from the POD above.  See:
+# - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+# - https://metacpan.org/pod/Pod::Usage
+# - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+my $config_file = 'wrt.json';
+my $list_days = 0;
+my $list_months = 0;
+my $list_years = 0;
+my $list_all = 1;
+GetOptions(
+  'config=s' => \$config_file,
+  help       => sub { pod2usage(0) },
+  days       => \$list_days,
+  months     => \$list_months,
+  years      => \$list_years,
+) or pod2usage(2);
+
+# Allow only one of --days, --months, --years.  Default to listing all entries
+# if none of these are specified.
+my $option_count = 0;
+foreach ($list_days, $list_months, $list_years) {
+  $option_count += $_;
+}
+if ($option_count > 1) {
+  die "Please specify at most one of --days, --months, or --years.";
+} elsif ($option_count == 1) {
+  $list_all = 0;
+}
+
+unless (-e $config_file) {
+  die "No wrt config file found.  Tried: $config_file";
+}
+
+my $w = App::WRT::new_from_file($config_file);
+
+# Define the function that'll return the base list of entries to match
+# against:
+my $base_list;
+if ($list_days) {
+  $base_list = sub { $w->{entries}->all_days(); };
+} elsif ($list_months) {
+  $base_list = sub { $w->{entries}->all_months(); };
+} elsif ($list_years) {
+  $base_list = sub { $w->{entries}->all_years(); };
+} elsif ($list_all) {
+  $base_list = sub { $w->{entries}->all(); };
+}
+
+foreach my $entry ($base_list->()) {
+  say $entry;
+}
+
+exit(0);

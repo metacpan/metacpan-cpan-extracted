@@ -13,11 +13,11 @@ watch-later - Manage your YouTube Watch Later videos
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -41,7 +41,7 @@ our $VERSION = '0.02';
 
 =head2 Universal Options
 
-=head3 B<-d> <file>, B<--db-path>=<file>
+=head3 B<-d> I<file>, B<--db-path>=I<file>
 
 Use the provided file as the database, instead of the default database at
 F<$HOME/.watch-later.db>.

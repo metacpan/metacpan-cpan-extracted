@@ -1,3 +1,9 @@
+0.027   2019-04-13 (PERLANCAR)
+
+	- Fix startup overhead regression by avoiding to load Sub::Name &
+	  name routines if we don't have any outputs.
+
+
 0.026   2019-04-12 (PERLANCAR)
 
 	- Name the generated routines with Sub::Name if available.

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# use 5.010;
+use 5.006002;
 
 use strict;
 use warnings;
@@ -17,8 +17,9 @@ use Astro::SpaceTrack::Dumper;
 use File::Glob qw{ bsd_glob };
 use JSON;
 use Mock::LWP::UserAgent ();
+use My::Module::Test ();
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 my %opt = (
     directory		=> $Mock::LWP::UserAgent::CANNED_RESPONSE_DIR,
@@ -35,14 +36,25 @@ $Mock::LWP::UserAgent::CANNED_RESPONSE_DIR = $opt{directory};
 $opt{list}
     and list_captures();
 
+my $st = Astro::SpaceTrack::Dumper->new(
+    prompt => 'SpaceTrack capture> ',
+);
+
 {
     local $Astro::SpaceTrack::RETRIEVAL_SIZE = $opt{retrieval_size};
-    my $st = Astro::SpaceTrack::Dumper->new(
-	prompt => 'SpaceTrack capture> ',
-    );
     $opt{verbose}
 	and $st->set( dump_headers => Astro::SpaceTrack->DUMP_RESPONSE() );
     $st->shell( @ARGV );
+}
+
+{
+    my $ast;
+    sub Astro::SpaceTrack::site_check {
+	my ( undef, $site ) = @_;
+	my $uri = My::Module::Test::__site_to_check_uri( $site )
+	    or die "No check URI for site '$site'\n";
+	return $st->_get_from_net( url => $uri );
+    }
 }
 
 sub list_captures {
@@ -57,15 +69,12 @@ sub list_captures {
 	my ( undef, undef, undef, $content, $request ) =
 	    @{ $json->decode( <$fh> ) };
 	close $fh;
-	say $path;
-	( my $buffer = $content ) =~ s/ ( \A | [\r\n]+ ) /$1    /smxg;
-	$buffer =~ s/ \s+ \z //smx;
-	say $buffer;
+	print "$path\n";
+	print "    $request->{method} $request->{uri}\n";
 	if ( $opt{verbose} ) {
-	    print <<"EOD";
-    $request->{method}
-    $request->{uri}
-EOD
+	    ( my $buffer = $content ) =~ s/ ( \A | [\r\n]+ ) /$1    /smxg;
+	    $buffer =~ s/ \s+ \z //smx;
+	    print "$buffer\n";
 	}
     }
     exit;
@@ -97,6 +106,12 @@ written. The default is the default for C<Mock::LWP::UserAgent>.
 
 This option displays the documentation for this script. The script then
 exits.
+
+=head2 -list
+
+If this Boolean option is asserted, the captured objects are listed. The
+script then exits. The list includes captured data if
+L<-verbose|/-verbose> is also asserted.
 
 =head2 -retrieval-size
 

@@ -1,7 +1,7 @@
 package Log::ger::Layout::Pattern;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-04-13'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -142,7 +142,7 @@ Log::ger::Layout::Pattern - Pattern layout
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

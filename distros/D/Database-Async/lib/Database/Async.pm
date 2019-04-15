@@ -3,7 +3,7 @@ package Database::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent qw(Database::Async::DB IO::Async::Notifier);
 
@@ -171,6 +171,9 @@ In L<Database::Async>:
 use mro;
 no indirect;
 
+use Future::AsyncAwait;
+use Syntax::Keyword::Try;
+
 use URI;
 use URI::db;
 use Module::Load ();
@@ -195,7 +198,7 @@ instance once ready.
 
 =cut
 
-sub transaction {
+async sub transaction {
     my ($self, @args) = @_;
     Scalar::Util::weaken(
         $self->{transactions}[@{$self->{transactions}}] =  
@@ -204,10 +207,8 @@ sub transaction {
                 @args
             )
     );
-    $txn->begin
-        ->transform(
-            done => sub { $txn }
-        )
+    await $txn->begin;
+    return $txn;
 }
 
 =head2 txn
@@ -233,32 +234,24 @@ Returns a L<Future> which resolves once the transaction is committed.
 
 =cut
 
-sub txn {
+async sub txn {
     my ($self, $code, @args) = @_;
-    return $self->transaction
-        ->then(sub {
-            my ($txn) = @_;
-            Future->call(
-                $code => ($txn, @args)
-            )->then(sub {
-                my @data = @_;
-                $txn->commit
-                    ->transform(
-                    done => sub { @data }
-                )
-            }, sub {
-                my @data = @_;
-                eval {
-                    $txn->rollback
-                        ->followed_by(sub {
-                            Future->fail(@data)
-                        })
-                } or do {
-                    warn "exception $@ in rollback";
-                    Future->fail(@data)
-                }
-            })
-        })
+    my $txn = await $self->transaction;
+    try {
+        my @data = await Future->call(
+            $code => ($txn, @args)
+        );
+        await $txn->commit;
+        return @data;
+    } catch {
+        my $exception = $@;
+        try {
+            await $txn->rollback;
+        } catch {
+            $log->warnf("exception %s in rollback", $@);
+        }
+        die $exception;
+    }
 }
 
 =head1 METHODS - Internal
@@ -289,6 +282,12 @@ sub pool {
     )
 }
 
+=head2 pool_args
+
+Returns a list of standard pool constructor arguments.
+
+=cut
+
 sub pool_args {
     my ($self) = @_;
     return (
@@ -301,6 +300,18 @@ sub pool_args {
 
 Applies configuration, see L<IO::Async::Notifier> for details.
 
+Supports the following named parameters:
+
+=over 4
+
+=item * C<uri> - the endpoint to use when connecting a new engine instance
+
+=item * C<engine> - the parameters to pass when instantiating a new L<Database::Async::Engine>
+
+=item * C<pool> - parameters for setting up the pool, or a L<Database::Async::Pool> instance
+
+=back
+
 =cut
 
 sub configure {
@@ -312,6 +323,9 @@ sub configure {
         # engines provide such a standard (e.g. PostgreSQL).
         # Others may not...
         $self->{uri} = URI->new("$uri");
+    }
+    if(exists $args{engine}) {
+        $self->{engine_parameters} = delete $args{engine};
     }
     if(my $pool = delete $args{pool}) {
         if(blessed $pool) {
@@ -326,6 +340,12 @@ sub configure {
     $self->next::method(%args);
 }
 
+=head2 ryu
+
+A L<Ryu::Async> instance, used for requesting sources, sinks and timers.
+
+=cut
+
 sub ryu {
     my ($self) = @_;
     $self->{ryu} //= do {
@@ -336,7 +356,29 @@ sub ryu {
     }
 }
 
+=head2 new_source
+
+Instantiates a new L<Ryu::Source>.
+
+=cut
+
 sub new_source { shift->ryu->source }
+
+=head2 new_sink
+
+Instantiates a new L<Ryu::Sink>.
+
+=cut
+
+sub new_sink { shift->ryu->sink }
+
+=head2 new_future
+
+Instantiates a new L<Future>.
+
+=cut
+
+sub new_future { shift->loop->new_future }
 
 =head1 METHODS - Internal, engine-related
 
@@ -372,6 +414,7 @@ sub engine_instance {
     $log->tracef('Instantiating new %s', $engine_class);
     $self->add_child(
         my $engine = $engine_class->new(
+            %{$self->{engine_parameters} || {}},
             db => $self,
             uri => $uri
         )
@@ -393,16 +436,18 @@ sub engine_ready {
 
 sub db { shift }
 
-sub queue_query {
+=head2 queue_query
+
+Assign the given query to the next available engine instance.
+
+=cut
+
+async sub queue_query {
     my ($self, $query) = @_;
     $log->tracef('Queuing query %s', $query);
-    $self->pool
-        ->next_engine
-        ->then(sub {
-             my ($engine) = @_;
-             $log->tracef('Query %s about to run on %s', $query, $engine);
-             $engine->handle_query($query);
-        })
+    my $engine = await $self->pool->next_engine;
+    $log->tracef('Query %s about to run on %s', $query, $engine);
+    return await $engine->handle_query($query);
 }
 
 sub diagnostics {
@@ -522,9 +567,6 @@ backends, uses tied hashes and arrays
 
 =over 4
 
-=item * L<DBIx::Async> - I wrote this as a proof-of-concept for running DBI in a separate process,
-for basic non-blocking access from L<IO::Async>. Wouldn't recommend using it though.
-
 =item * L<DBI::Easy> - seems to be a wrapper around L<DBI>
 
 =item * L<AnyData> - interface between L<DBI> and arbitrary data sources such as XML or HTML
@@ -541,5 +583,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

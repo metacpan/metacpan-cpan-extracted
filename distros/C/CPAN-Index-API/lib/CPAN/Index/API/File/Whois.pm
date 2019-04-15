@@ -1,9 +1,6 @@
 package CPAN::Index::API::File::Whois;
-{
-  $CPAN::Index::API::File::Whois::VERSION = '0.007';
-}
 
-# ABSTRACT: Interface to 00whois.xml
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -122,17 +119,13 @@ sub default_location { 'authors/00whois.xml' }
 
 __PACKAGE__->meta->make_immutable;
 
-
-__END__
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::File::Whois - Interface to 00whois.xml
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::File::Whois - Interface to C<00whois.xml>.
 
 =head1 SYNOPSIS
 
@@ -146,13 +139,13 @@ version 0.007
 
 =head1 DESCRIPTION
 
-This is a class to read and write 01mailrc.txt
+This is a class to read and write C<01mailrc.txt>.
 
 =head1 METHODS
 
 =head2 authors
 
-List of hashres containing author data. The structure of the hashrefs is
+List of hashrefs containing author data. The structure of the hashrefs is
 as follows:
 
 =over
@@ -167,7 +160,7 @@ Author's full name. Can be an empty string.
 
 =item ascii_name
 
-Author's full name, but conatining only ASCII characters.
+Author's full name, but containing only ASCII characters.
 
 =item email
 
@@ -177,7 +170,7 @@ Author's email.
 
 Boolean - true if the author has a cpan directory.
 
-=item homepate
+=item homepage
 
 Author's homepage.
 
@@ -201,7 +194,7 @@ Method that fetches the entry for a given cpanid.
 
 =head2 parse
 
-Parses the file and reurns its representation as a data structure.
+Parses the file and returns its representation as a data structure.
 
 =head2 default_location
 
@@ -241,16 +234,4 @@ Default file location - C<authors/00whois.xml>.
 
 =back
 
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-

@@ -63,7 +63,7 @@
    "provides" : {
       "Slack::RTM::Bot" : {
          "file" : "lib/Slack/RTM/Bot.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "Slack::RTM::Bot::Client" : {
          "file" : "lib/Slack/RTM/Bot/Client.pm"
@@ -86,7 +86,7 @@
          "web" : "https://github.com/duck8823/Slack-RTM-Bot"
       }
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_contributors" : [
       "shmaeda <shmaeda@nig.ac.jp>",
       "makamaka <makamaka.donzoko@gmail.com>",
@@ -95,5 +95,6 @@
       "Matt Hallacy <mhallacy+github@haproxy.com>",
       "Shunsuke Maeda <duck8823@gmail.com>"
    ],
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
 }

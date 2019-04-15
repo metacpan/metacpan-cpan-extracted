@@ -1,10 +1,10 @@
-use Test::Most tests => 7;
+#!perl
 
-use strict;
-use warnings;
+use Data::Frame::Setup;
 
-use PDL::SV;
+use Test2::V0;
 
+use PDL::SV ();
 use Math::BigInt;
 
 my $data = [ Math::BigInt->new('4'), Math::BigInt->new('3'), Math::BigInt->new('20'), Math::BigInt->new('2'), ];

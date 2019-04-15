@@ -1,0 +1,64 @@
+=head1 PTP - An expressive Pipelining Text Processor
+
+=head2 INSTALLATION
+
+=head3 Requirements
+
+Building and installing this program only requires Perl modules from the
+standard library. So as long as you have Perl installed (which should be the
+case by default on almost all system), you should be able to install ptp using
+one of the method below. This program requires Perl version 5.22 or above. You
+can check which Perl you have installed with the following command:
+
+    perl -v
+
+=head3 Installing from the Git sources
+
+To install the program manually from Git, you can run the following commands (you do need to have the B<make> and B<git> program installed):
+
+    git clone https://github.com/mkende/ptp.git
+    cd ptp
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+=head3 Installing from CPAN
+
+This module is available on CPAN (the Perl package manager). The CPAN command
+should be installed on any system that has Perl (which, again, should mostly be
+any system at all). So, to install B<ptp> automatically using CPAN, you can just
+run the following command:
+
+    cpan App::PTP
+
+Note: if this is the first time that you run the B<cpan> command, you will be
+asked to configure it. The default answer to most questions is usually fine.
+
+=head2 DOCUMENTATION
+
+You can find the documentation for the program itself on L<meta::cpan|ptp>.
+After the progarm is installed, you can also get its documentation by running
+any of the following commands: B<man ptp>, B<ptp --help> or B<perldoc ptp>.
+
+The built-in B<--help> rendering will be better if the B<perldoc> program is
+installed. It usually comes in a B<perl-doc> package on most systems.
+
+=head2 DISTRIBUTION
+
+The main development of this software is done on
+L<GitHub|https://github.com/mkende/ptp>. However, it is also available on CPAN.
+
+The following can be used only by the module maintainer on CPAN. To update the
+CPAN module, remember to increment the version number and then run the following
+commands:
+
+    perl Makefile.PL
+    make distcheck
+    # Optionally, to add files not in the manifest:
+    # make manifest
+    make dist
+
+Finally, upload the F<App-PTP-I<version>.tar.gz> file that has been created
+through L<PAUSE|https://pause.perl.org>, ideally putting it under an F<App-PTP>
+directory.

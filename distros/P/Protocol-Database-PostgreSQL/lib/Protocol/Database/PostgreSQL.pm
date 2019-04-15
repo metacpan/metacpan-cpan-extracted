@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 =head1 NAME
 
@@ -596,8 +596,7 @@ Does the real preparation for the object.
 =cut
 
 sub configure {
-    my $self = shift;
-    my %args = @_;
+    my ($self, %args) = @_;
 
     $self->{$_} = 0 for grep !exists $self->{$_}, qw(authenticated message_count);
     $self->{wait_for_startup} = 1 unless exists $self->{wait_for_startup};
@@ -634,7 +633,7 @@ sub frontend_bind {
         0       # Number of result column format definitions (0=use default text format)
     );
     push @{$self->{pending_bind}}, $args{sth} || ();
-    $log->debugf(sub {
+    $log->tracef(sub {
         join('',
             "Bind",
             defined($args{portal}) ? " for portal [" . $args{portal} . "]" : '',
@@ -727,8 +726,13 @@ Execute either a named or anonymous portal (prepared statement with bind vars)
 sub frontend_execute {
     my ($self, %args) = @_;
 
-    my $msg = pack('Z*N1', defined($args{portal}) ? $args{portal} : '', $args{limit} || 0);
-    $log->debug("Executing " . (defined($args{portal}) ? "portal " . $args{portal} : "default portal") . ($args{limit} ? " with limit " . $args{limit} : " with no limit")) if $log->is_debug;
+    $args{portal} //= '';
+    my $msg = pack('Z*N1', $args{portal}, $args{limit} || 0);
+    $log->tracef(
+        "Executing portal '%s' %s",
+        $args{portal},
+        $args{limit} ? " with limit " . $args{limit} : " with no limit"
+    ) if $log->is_debug;
     return $self->build_message(
         type    => 'Execute',
         data    => $msg,
@@ -889,7 +893,7 @@ sub send_message {
     $log->tracef("Will send message with %s", \@args);
     die "Empty message?" unless defined(my $msg = $self->message(@args));
 
-    $log->debugf(
+    $log->tracef(
         "send data: [%v02x] %s (%s)",
         $msg,
         (($self->is_first_message ? "startup packet" : $FRONTEND_MESSAGE_CODE{substr($msg, 0, 1)}) || 'unknown message'),

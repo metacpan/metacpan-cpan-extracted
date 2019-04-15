@@ -1,3 +1,4 @@
+use 5.006;
 use strict;
 use warnings;
 
@@ -5,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Database/Async.pm',
@@ -15,6 +16,10 @@ my @module_files = (
     'Database/Async/Engine.pm',
     'Database/Async/Engine/Empty.pm',
     'Database/Async/ORM.pm',
+    'Database/Async/ORM/Field.pm',
+    'Database/Async/ORM/Schema.pm',
+    'Database/Async/ORM/Table.pm',
+    'Database/Async/ORM/Type.pm',
     'Database/Async/Pool.pm',
     'Database/Async/Query.pm',
     'Database/Async/Row.pm',

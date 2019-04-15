@@ -1,24 +1,32 @@
 Revision history for Getargs-Mixed
 
-1.05		2019-04-04
-		No changes since 1.04_2 (trial version)
+1.06	2019-04-12
+		No cpantesters reports on 5.6, and I don't have a 5.6
+		installation to test on.  However, perlver says it's 5.6-clean,
+		so I'm releasing it anyway! :)  Bug reports welcome.
 
-1.04_2		2019-03-28
+1.05_1	2019-04-09
+		Testing with 5.006 - no code changes other than the `use 5.006` line
+
+1.05	2019-04-04
+		Non-trial release of the code from 1.04_2
+
+1.04_2	2019-03-28
 		Better checking for invalid specifications; additional tests.
 
-1.04_1		2019-02-23
+1.04_1	2019-02-23
 		Better handling of specifications that include multiple semicolons
 		(which is unsupported).
 
-1.04        2019-02-11
-        Added OO interface (new()) and -undef_ok option.
+1.04	2019-02-11
+		Added OO interface (new()) and -undef_ok option.
 
-1.03        2003-09-04
-        Bugfixes and additional tests.
+1.03	2003-09-04
+		Bugfixes and additional tests.
 
-1.02        2003-09-03
-        Semicolon can come at the beginning of an argument name.
+1.02	2003-09-03
+		Semicolon can come at the beginning of an argument name.
 
-1.01        2003-09-03
-        Initial version, released on an unsuspecting world.
+1.01	2003-09-03
+		Initial version, released on an unsuspecting world.
 

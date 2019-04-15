@@ -62,6 +62,8 @@ lib/Protocol/Database/PostgreSQL/Backend/RowDescription.pod
 lib/Protocol/Database/PostgreSQL/Client.pm
 lib/Protocol/Database/PostgreSQL/Client.pod
 lib/Protocol/Database/PostgreSQL/Constants.pm
+lib/Protocol/Database/PostgreSQL/Error.pm
+lib/Protocol/Database/PostgreSQL/Error.pod
 lib/Protocol/Database/PostgreSQL/Message.pm
 script/extract-errors-from-errcodes-appendix.pl
 t/00-check-deps.t

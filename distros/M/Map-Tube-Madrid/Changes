@@ -1,6 +1,14 @@
 Revision history for Map::Tube::Madrid
 
-0.31  2019-04-12
+0.34  2019-04-14
+      - Added test for different routes.
+
+0.33  2019-04-13
+      - Updated Madrid map.
+      - Updated linked line maps.
+      - Linked Line L4 package to pod document.
+
+0.32  2019-04-12
       - Updated map for Line L4 showing new connections.
       - Added package Map::Tube::Madrid::Line::L4
       - Added map image for Line L4.

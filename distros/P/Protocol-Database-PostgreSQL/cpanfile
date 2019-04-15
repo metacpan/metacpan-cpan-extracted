@@ -3,7 +3,7 @@ requires 'indirect';
 requires 'Digest::MD5';
 requires 'Time::HiRes';
 requires 'POSIX';
-requires 'Ryu', '>= 0.023';
+requires 'Ryu', '>= 1.001';
 requires 'Log::Any', '>= 1.050';
 requires 'Check::UnitCheck', 0;
 requires 'Future', '>= 0.39';

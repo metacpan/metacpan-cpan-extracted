@@ -1,7 +1,7 @@
 package Versioning::Scheme::Perl;
 
-our $DATE = '2018-11-18'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2019-04-14'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,8 +46,20 @@ sub bump_version {
     $opts->{part} //= -1;
     $opts->{reset_smaller} //= 1;
 
-    my $vn = version->parse($v)->normal; $vn =~ s/\Av//;
     die "Invalid 'num', must be non-zero" unless $opts->{num} != 0;
+
+    if ($opts->{part} eq 'dev') {
+        version->parse($v);
+        my $dev1;
+        if ($v =~ /_([0-9]+)\z/) { $dev1 = $1 } else { $v .= "_000"; $dev1 = "000" }
+        my $dev2 = $dev1 + $opts->{num};
+        die "Cannot decrease version, would result in a negative dev part"
+            if $dev2 < 0;
+        $v =~ s/_([0-9]+)\z/sprintf("_%0".length($dev1)."d", $dev2)/e;
+        return $v;
+    }
+
+    my $vn = version->parse($v)->normal; $vn =~ s/\Av//;
     my @parts = split /\./, $vn;
     die "Invalid 'part', must not be smaller than -".@parts
         if $opts->{part} < -@parts;
@@ -99,7 +111,7 @@ Versioning::Scheme::Perl - Perl (version.pm) version numbering
 
 =head1 VERSION
 
-This document describes version 0.008 of Versioning::Scheme::Perl (from Perl distribution Versioning-Scheme), released on 2018-11-18.
+This document describes version 0.010 of Versioning::Scheme::Perl (from Perl distribution Versioning-Scheme), released on 2019-04-14.
 
 =head1 SYNOPSIS
 
@@ -132,6 +144,8 @@ This document describes version 0.008 of Versioning::Scheme::Perl (from Perl dis
  Versioning::Scheme::Perl->bump_version('1.2.3', {part=>-2});                   # => 'v1.3.0'
  Versioning::Scheme::Perl->bump_version('1.2.3', {part=>0});                    # => 'v2.0.0'
  Versioning::Scheme::Perl->bump_version('1.2.3', {part=>-2, reset_smaller=>0}); # => 'v1.3.3'
+ Versioning::Scheme::Perl->bump_version('1.2.3'    , {part=>'dev'}        ); # => '1.2.3_001
+ Versioning::Scheme::Perl->bump_version('1.2.3_001', {part=>'dev', num=>2}); # => '1.2.3_003
 
 You can also mix this role into your class.
 
@@ -164,13 +178,23 @@ Equivalent to:
 
 =head2 bump_version
 
-Will first normalize the version using:
+B<Bumping major/minor/patchlevel part>: Set C<part> to -3, -2, -1 respectively
+(or 0, 1, 2). To do this, C<bump_version> Will first normalize the version
+using:
 
- version->parse($v1)->normal
+ version->parse($v)->normal
 
 followed by bumping the part. Except for the first (most significant) part, if a
 number is bumped beyond 999 it will overflow to the next more significant part,
 for example: bumping v1.0.999 will result in v1.1.0.
+
+B<Bumping dev part>: Set C<part> to C<dev>. Currently no overflowing is done. To
+do this, first will check version number using:
+
+ version->parse($v)
+
+then will check for /_[0-9]+\z/ regex. Then will increment or decrement the dev
+part.
 
 =head1 HOMEPAGE
 
@@ -200,7 +224,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,7 +17,7 @@ use HiPi qw( :rpi );
 use HiPi::Device::GPIO::Pin;
 use Fcntl;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 my $sysroot = '/sys/class/gpio';
 

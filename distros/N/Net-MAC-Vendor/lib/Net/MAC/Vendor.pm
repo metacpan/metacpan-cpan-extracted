@@ -1,4 +1,4 @@
-package Net::MAC::Vendor; # git description: v1.263-8-g8a60efe
+package Net::MAC::Vendor; # git description: v1.264-2-gda20c47
 # ABSTRACT: Look up the vendor for a MAC
 
 use strict;
@@ -75,7 +75,7 @@ use Carp ();
 use Mojo::URL;
 use Mojo::UserAgent;
 
-our $VERSION = '1.264';
+our $VERSION = '1.265';
 
 #pod =item run( @macs )
 #pod
@@ -519,7 +519,7 @@ sub load_cache {
 
 sub _bunzip {
 	my $content = shift;
-	if (eval { require Compress::Bzip2; 1 }) {
+	if (eval { +require Compress::Bzip2; 1 }) {
 		return Compress::Bzip2::memBunzip($content);
 		}
 	else {
@@ -538,7 +538,7 @@ sub _bunzip {
 
 sub _gunzip {
 	my $content = shift;
-	if (eval { require Compress::Zlib; 1 }) {
+	if (eval { +require Compress::Zlib; 1 }) {
 		return Compress::Zlib::memGunzip($content);
 		}
 	else {
@@ -617,7 +617,7 @@ Net::MAC::Vendor - Look up the vendor for a MAC
 
 =head1 VERSION
 
-version 1.264
+version 1.265
 
 =head1 SYNOPSIS
 

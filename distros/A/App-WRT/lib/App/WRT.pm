@@ -1,3 +1,32 @@
+package App::WRT;
+
+use version; our $VERSION = version->declare("v5.0.0");
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+use 5.10.0;
+use utf8;
+
+use Carp;
+use Cwd qw(getcwd abs_path);
+use Data::Dumper;
+use Encode qw(decode encode);
+use File::Find;
+use File::Spec;
+use HTML::Entities;
+use JSON;
+use XML::Atom::SimpleFeed;
+
+use App::WRT::Date;
+use App::WRT::EntryStore;
+
+use App::WRT::HTML     qw(:all);
+use App::WRT::Image    qw(image_size);
+use App::WRT::Markup   qw(line_parse image_markup eval_perl);
+use App::WRT::Renderer qw(render);
+use App::WRT::Util     qw(dir_list get_date file_get_contents);
+
 =pod
 
 =head1 NAME
@@ -13,8 +42,10 @@ Using the commandline tools:
     $ mkdir project
     $ cd project
     $ wrt init         # set up some defaults
-    $ wrt display new  # print html for new posts to stdout
-    $ wrt render-all   # publish html to project/public/
+    $ wrt config       # dump configuration values
+    $ wrt ls           # list entries
+    $ wrt display new  # print HTML for new entries to stdout
+    $ wrt render-all   # publish HTML to project/public/
 
 Using App::WRT in library form:
 
@@ -31,13 +62,20 @@ Using App::WRT in library form:
 =head1 INSTALLING
 
 It's possible but not likely this would run on a Perl as old as 5.10.0.  In
-practice, I know that it works under 5.20.2.  It should be fine on any
-reasonably modern Linux distribution, and may also be fine on MacOS or a BSD of
-your choosing.
+practice, I know that it works under 5.26.2.  It should be fine on any
+reasonably modern Linux distribution, and may work on MacOS or a BSD of your
+choosing.  It's possible that it would run under the Windows Subsystem for
+Linux, but it would definitely fail under vanilla Windows; it currently makes
+too many assumptions about things like directory path separators and filesystem
+semantics.
+
+(Although I would like the code to be more robust across platforms, this is not
+a problem I feel much urgency about solving at the moment, since I'm pretty
+sure I am the only user of this software.  Patches would certainly be welcome.)
 
 To install the latest development version from the main repo:
 
-    $ git clone https://github.com/brennen/wrt.git
+    $ git clone https://code.p1k3.com/gitea/brennen/wrt.git
     $ cd wrt
     $ perl Build.PL
     $ ./Build installdeps
@@ -56,17 +94,14 @@ You will likely need to use C<sudo> or C<su> to get a systemwide install.
 
 =head1 DESCRIPTION
 
-This started life as C<display.pl>, a simple script to concatenate fragments of
-handwritten HTML by date.  It has since accumulated several of the usual weblog
-features (lightweight markup, feed generation, embedded Perl, poetry tools,
-image galleries, and ill-advised dependencies), but the basic idea hasn't
-changed that much.
+This started life somewhere around 2001 as C<display.pl>, a CGI script to
+concatenate fragments of handwritten HTML by date.  It has since accumulated
+several of the usual weblog features (lightweight markup, feed generation,
+embedded Perl, poetry tools, image galleries, and ill-advised dependencies),
+but the basic idea hasn't changed that much.
 
 The C<wrt> utility now generates static HTML files, instead of expecting to
 run as a CGI script.  This is a better idea, for the most part.
-
-The C<App::WRT> module will work with FastCGI, if called from the appropriate
-wrapper script, such as C<wrt-fcgi>.
 
 By default, entries are stored in a simple directory tree under C<entry_dir>.
 
@@ -93,10 +128,10 @@ top-level index file will consist of the most recent month's entries.
 It's possible (although not as flexible as it ought to be) to redefine the
 directory layout.  (See C<%default{entry_map}> below.)
 
-An entry may be either a plain text file, or a directory containing several
-files.  If it's a directory, a file named "index" will be treated as the text
-of the entry, and all other lower-case filenames without extensions will be
-treated as sub-entries or documents within that entry, and displayed
+An entry may be either a plain UTF-8 text file, or a directory containing
+several such files.  If it's a directory, a file named "index" will be treated
+as the text of the entry, and all other lower-case filenames without extensions
+will be treated as sub-entries or documents within that entry, and displayed
 accordingly.  Links to certain other filetypes will be displayed as well.
 
 Directories may be nested to an arbitrary depth, although it's probably not a
@@ -145,29 +180,28 @@ on it.
 Embedded code and variables are intended only for use in the F<template> file,
 where it's handy to drop in titles or conditionalize aspects of a layout. You
 want to be careful with this sort of thing - it's useful in small doses, but
-it's also a maintainability nightmare waiting to happen.  (WordPress, I am
-looking at you.)
+it's also a maintainability nightmare waiting to happen.
 
 B<Includes> - replaced by the contents of the enclosed file path, from the
 root of the current wrt project:
 
     <include>path/to/file</include>
 
-This is a bit constraining, since it doesn't allow for files outside of the
-current project, but is useful for including HTML generated by an external
-script in a page.
+This is a bit constraining, since it doesn't currently allow for files outside
+of the current project, but is useful for including HTML generated by an
+external script in a page.
 
 B<Several forms of lightweight markup>:
 
      <markdown>John Gruber's Markdown, by way of
-     Text::Markdown</markdown>
+     Text::Markdown::Discount</markdown>
 
      <textile>Dean Allen's Textile, via Brad Choate's
      Text::Textile.</textile>
 
      <freeverse>An easy way to
      get properly broken lines
-     plus -- en and em dashes ---
+     plus -- em dashes --
      for poetry and such.</freeverse>
 
 B<And a couple of shortcuts>:
@@ -211,30 +245,6 @@ current entry.
 
 =cut
 
-package App::WRT;
-
-use version; our $VERSION = version->declare("v4.3.0");
-
-use strict;
-use warnings;
-no  warnings 'uninitialized';
-use 5.10.0;
-
-use base 'App::WRT::MethodSpit';
-
-use Cwd;
-use File::Find;
-use File::Spec;
-use HTML::Entities;
-use JSON;
-use XML::Atom::SimpleFeed;
-
-use App::WRT::Date;
-use App::WRT::HTML     qw(:all);
-use App::WRT::Image    qw(image_size);
-use App::WRT::Markup   qw(line_parse image_markup eval_perl);
-use App::WRT::Renderer qw(render);
-use App::WRT::Util     qw(dir_list get_date);
 
 =head2 CONFIGURATION
 
@@ -260,7 +270,7 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
       root_dir       => '.',         # dir for wrt repository
       entry_dir      => 'archives',  # dir for entry files
       publish_dir    => 'public',    # dir to publish site to
-      url_root       => "/",       # root URL for building links
+      url_root       => "/",         # root URL for building links
       image_url_root => '',          # same for images
       template_dir   => 'templates', # dir for template files
       template       => 'default',   # template to use
@@ -275,9 +285,10 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
       content        => undef,       # place to stash content for templates
       embedded_perl  => 1,           # evaluate embedded <perl> tags?
       default_entry  => 'new',       # what to display if no entry specified
+      cache_includes => 0,           # should included files be cached in memory?
 
       # A license string for site content:
-      license        => 'public domain', 
+      license        => 'public domain',
 
       # A string value to replace all pages with (useful for occasional
       # situations where every page of a site should serve some other
@@ -299,6 +310,7 @@ Here's a verbatim copy of C<%default>, with some commentary about values.
 
 my %default = (
   root_dir       => '.',         # dir for wrt repository
+  root_dir_abs   => undef,       # for stashing absolute path to wrt repo
   entry_dir      => 'archives',  # dir for entry files
   publish_dir    => 'public',    # dir to publish site to
   url_root       => "/",         # root URL for building links
@@ -316,9 +328,10 @@ my %default = (
   content        => undef,       # place to stash content for templates
   embedded_perl  => 1,           # evaluate embedded <perl> tags?
   default_entry  => 'new',       # what to display if no entry specified
+  cache_includes => 0,           # should included files be cached in memory?
 
   # A license string for site content:
-  license        => 'public domain', 
+  license        => 'public domain',
 
   # A string value to replace all pages with (useful for occasional
   # situations where every page of a site should serve some other
@@ -338,8 +351,8 @@ my %default = (
 
 =item $default{entry_map}
 
-A hash which will dispatch entries matching various regexen to the appropriate
-output methods. The default looks something like this:
+A hashref which will dispatch entries matching various regexen to the
+appropriate output methods. The default looks something like this:
 
     nnnn/[nn/nn/]doc_name - a document within a day.
     nnnn/nn/nn            - a specific day.
@@ -388,12 +401,9 @@ A hashref which contains a map of entry titles to entry descriptions.
 
 # TODO: this has gotten more than a little silly.
 $default{entry_descriptions} = {
-  new      => 'newest entries',
-  all      => 'all entries',
+  new => 'newest entries',
+  all => 'all entries',
 };
-
-# Set up some accessor methods:
-__PACKAGE__->methodspit( keys %default );
 
 =back
 
@@ -415,23 +425,12 @@ instance with the parameters set in that file.
 sub new_from_file {
   my ($config_file) = @_;
 
-  # Grab configuration from wrt.json:
-  my $config_json;
-  {
-    open my $fh, '<', $config_file
-      or warn "Couldn't open configuration file: $config_file: $!\n";
-    # line separator:
-    local $/ = undef;
-    $config_json = <$fh>;
-    close $fh;
-  }
-
   my $JSON = JSON->new->utf8->pretty;
-  $JSON->convert_blessed(1);
 
-  my $config_hashref = $JSON->decode($config_json);
+  # Grab configuration from wrt.json or other file:
+  my $config_hashref = $JSON->decode(file_get_contents($config_file));
 
-  # decode() returns (I think) a hashref; this needs to be dereferenced:
+  # decode() returns a hashref; this needs to be dereferenced:
   return App::WRT->new(%{ $config_hashref });
 }
 
@@ -445,11 +444,32 @@ sub new {
   my $class = shift;
   my %params = @_;
 
+  # Stash absolute path to root directory.
+  # TODO: This is bad.  It's here because imgsize() winds up calling getcwd()
+  # a ton of times if you don't give it absolute paths, which is actually super
+  # inefficient.  See icon_markup() and image_markup() for usage.  image_markup()
+  # in particular is awful and should be rewritten anyway.
+  $params{root_dir_abs} = abs_path($params{root_dir});
+
   my %copy_of_default = %default;
   my $self = \%copy_of_default;
   bless $self, $class;
 
-  $self->configure(%params);
+  # Configure from passed-in values, overwriting defaults:
+  for my $p (keys %params) {
+    $self->{$p} = $params{$p};
+  }
+
+  $self->{entries} = App::WRT::EntryStore->new( $self->{entry_dir} );
+
+  # Check and set up template path for later use:
+  $self->{template_path} = File::Spec->catfile(
+    $self->{template_dir},
+    $self->{template}
+  );
+  unless (-f $self->{template_path}) {
+    croak($self->{template_path} . ' does not exist or is not a plain file');
+  }
 
   return $self;
 }
@@ -462,62 +482,42 @@ date/entry strings. If no parameters are given, default to default_entry().
 display() expands aliases ("new" and "all", for example) as necessary, collects
 output from handle($entry), and wraps the whole thing in a template file.
 
+If C<overlay> is set, will return the value of overlay regardless of options.
+(This is useful for hackily replacing every page in a site with a single blob
+of HTML, for example if you're participating in some sort of blackout or
+something.)
+
 =cut
 
 sub display {
   my $self = shift;
   my (@options) = @_;
 
-  $options[0] ||= $self->default_entry;
-  $self->title(join ' ', map { encode_entities($_) } @options); # title for head/foot
+  return $self->{overlay} if defined $self->{overlay};
+
+  $options[0] ||= $self->{default_entry};
+
+  # Title for template head/foot:
+  $self->{title} = join ' ', map { encode_entities($_) } @options;
 
   # Expand on any aliases:
   @options = map { $self->expand_option($_) } @options;
 
-  $self->content(undef);
-  my $output;
-  for my $option (@options) {
-    return $self->feed_print_latest() if $option eq $self->feed_alias;
-    $output .= $self->handle($option);
-  }
-  $self->content($output); # ${content} may now be used in the template below...
-
-  # Wrap entries in template:
-  my $rendered_page;
-  if (length($self->overlay)) {
-    $rendered_page .= $self->overlay;
-  } else {
-    my $template_path = File::Spec->catfile($self->template_dir, $self->template);
-    unless (-f $template_path) {
-      die("$template_path does not exist or is not a plain file");
-    }
-    $rendered_page .= $self->fragment_slurp($template_path);
+  # Hacky special case for printing the feed:
+  if ($options[0] eq $self->{feed_alias}) {
+    return $self->feed_print(
+      $self->{entries}->recent_days( $self->{feed_length} )
+    );
   }
 
-  return $rendered_page;
+  # To be accessed as ${content} in the template below:
+  $self->{content} = join '', map { $self->handle($_) } @options;
+  return $self->fragment_slurp($self->{template_path});
 }
 
 =item handle($entry)
 
 Return the text of an individual entry.
-
-=begin digression
-
-=item A digression about each()
-
-I once spent a lot of time chasing down a bug caused by a while loop in this
-method.  Specifically, I was using while to iterate over the entry_map hash.
-Since C<$self->entry_map> returns a reference to the same hash each time, every
-other request was finding C<each()> mid-way through iterating over this hash.
-
-I initially solved this by copying the hash into a local one called C<%map>
-every time C<handle()> was called.  I could also have called C<keys> or
-C<values> on the anonymous hash, as these reset C<each()>.
-
-Presently I'm not using each() or an explicit loop, so this probably doesn't
-make a whole lot of sense in the context of the existing code.
-
-=end digression
 
 =cut
 
@@ -526,7 +526,7 @@ sub handle {
   my ($entry) = @_;
 
   # Hashref:
-  my $map = $self->entry_map;
+  my $map = $self->{entry_map};
 
   # Find the first pattern in entry_map that matches this entry...
   my ($pattern) = grep { $entry =~ $_ } keys %{ $map };
@@ -550,128 +550,14 @@ sub expand_option {
   chop $option if $option =~ m{/$};
 
   if ($option eq 'all') {
-    return dir_list($self->entry_dir, 'high_to_low', qr/^[0-9]{1,4}$/);
+    return reverse $self->{entries}->all_years();
   } elsif ($option eq 'new') {
-    return $self->recent_month();
+    return $self->{entries}->recent_days(5);
   } elsif ($option eq 'fulltext') {
-    return $self->fulltext();
-  } else {
-    return $option;
-  }
-}
-
-=item recent_month()
-
-Tries to find the most recent month in the archive.
-
-If a year file is text, returns that instead.
-
-=cut
-
-sub recent_month {
-  my $self = shift;
-  my ($dir) = $self->entry_dir;
-
-  my ($mon, $year) = get_date('mon', 'year');
-
-  $mon++;
-  $year += 1900;
-
-  if (-e "$dir/$year/$mon") {
-    return "$year/$mon";
-  } else {
-    my @year_files = dir_list($dir, 'high_to_low', qr/^[0-9]{1,4}$/);
-
-    return $year_files[0] if -f "$dir/$year_files[0]";
-
-    my @month_files = dir_list(
-      "$dir/$year_files[0]", 'high_to_low', qr/^[0-9]{1,2}$/
-    );
-
-    return "$year_files[0]/$month_files[0]";
-  }
-}
-
-=item fulltext()
-
-Returns the full text of all entries, in order.
-
-=cut
-
-sub fulltext {
-  my $self = shift;
-
-  my @individual_entries;
-
-  my @years = dir_list($self->entry_dir, 'low_to_high', qr/^[0-9]{1,4}$/);
-  foreach my $year (@years) {
-    my @months = dir_list($self->entry_dir . '/' . $year, 'low_to_high', qr/^[0-9]+$/);
-    foreach my $month (@months) {
-      my @days = dir_list($self->entry_dir . '/' . $year . '/' . $month, 'low_to_high', qr/^[0-9]+$/);
-      foreach my $day (@days) {
-        push @individual_entries, "$year/$month/$day";
-      }
-    }
+    return $self->{entries}->all_days();
   }
 
-  return @individual_entries;
-}
-
-=item get_all_source_files()
-
-Returns a list of all source files for the current entry archive.
-
-This was originally in App::WRT::Renderer, so there may be some pitfalls here.
-
-=cut
-
-sub get_all_source_files {
-  my ($self) = shift;
-  my $entry_dir = $self->entry_dir;
-
-  state @source_files;
-
-  return @source_files if @source_files;
-
-  find(
-    sub {
-      # We skip index files, because they'll be rendered from the dir path:
-      return if /index$/;
-      if ($File::Find::name =~ m{^ \Q$entry_dir\E / (.*) $}x) {
-        my $target = $1;
-        push @source_files, $target;
-      }
-    },
-    $entry_dir
-  );
-  return @source_files;
-}
-
-=item get_all_day_entries()
-
-Returns a list of all entries which are a specific day.
-
-=cut
-
-sub get_all_day_entries {
-  my ($self) = @_;
-  # https://en.wikipedia.org/wiki/Schwartzian_transform
-  return map  { $_->[0] }
-         sort { $a->[1] cmp $b->[1] }
-         map  { [$_, sortable_date_from_entry($_)] }
-         grep m{^ \d+/\d+/\d+ $}x, $self->get_all_source_files();
-}
-
-=item get_all_day_entries()
-
-Returns an easily sortable date of the form nnnn-nn-nn for a given entry.
-
-=cut
-
-sub sortable_date_from_entry {
-  my ($entry) = @_;
-  my ($year, $month, $day) = split '/', $entry;
-  return sprintf("%d-%2d-%2d", $year, $month, $day);
+  return $option;
 }
 
 =item link_bar(@extra_links)
@@ -686,9 +572,7 @@ sub link_bar {
 
   my $output;
 
-  my $title = $self->title;
-
-  my (%description) = %{ $self->entry_descriptions() };
+  my (%description) = %{ $self->{entry_descriptions} };
 
   my @linklist = ( qw(new all), @extra_links );
 
@@ -700,68 +584,20 @@ sub link_bar {
       $link_title = 'entries for ' . $link;
     }
 
-    if ($title ne $link) {
-      my $href = $self->url_root . $link . '/';
-      if ($link eq 'new') {
-        $href = $self->url_root;
-      }
-      $output .= a({href => $href, title => $link_title}, $link) . "\n";
-    } else {
-      $output .= qq{<strong><span title="$link_title">$link</span></strong>\n};
+    my $href = $self->{url_root} . $link . '/';
+    if ($link eq 'new') {
+      $href = $self->{url_root};
     }
+    my $link_html = a({href => $href, title => $link_title}, $link) . "\n";
+
+    if ($self->{title} eq $link) {
+      $link_html = qq{<strong>$link_html</strong>};
+    }
+
+    $output .= $link_html;
   }
 
   return $output;
-}
-
-=item month_before($this_month)
-
-Return the month before the given month in the archive.
-
-Very naive; there has got to be a smarter way.
-
-=cut
-
-sub month_before {
-  my $self = shift;
-  my ($this_month) = @_;
-
-  state %cache;
-
-  if (exists $cache{$this_month}) {
-    return $cache{$this_month};
-  }
-
-  my ($year, $month) = $this_month =~
-    m/^            # start of string
-      ([0-9]{4})   # 4 digit year
-      \/           #
-      ([0-9]{1,2}) # 2 digit month
-     /x;
-
-  if ($month == 1) {
-    $month = 12;
-    $year--;
-  } else {
-    $month--;
-  }
-
-  until (-e $self->local_path("$year/$month")) {
-
-    if (! -d $self->local_path($year) ) {
-      # Give up easily, wrapping to newest month.
-      return $self->recent_month();
-    }
-
-    # handle January:
-    if ($month == 1) {
-      $month = 12; $year--;
-      next;
-    }
-    $month--;
-  }
-
-  return $cache{$this_month} = "$year/$month";
 }
 
 =item year($year)
@@ -777,7 +613,7 @@ sub year {
   my ($year_file, $year_url) = $self->root_locations($year);
 
   # Year is a text file:
-  return $self->entry_wrapped($year) if -f $year_file;
+  return entry_markup($self->entry($year)) if -f $year_file;
 
   # If it's not a directory, we can't do anything. Bail out:
   return p('No such year.') if (! -d $year_file);
@@ -798,30 +634,30 @@ sub year {
   my $year_text;
   my $count = 0; # explicitly defined for later printing.
 
-    foreach my $month (@months) {
-      my @entries = dir_list(
-        "$year_file/$month", 'low_to_high', qr/^[0-9]{1,2}$/
-      );
-      $count += @entries;
+  foreach my $month (@months) {
+    my @entries = dir_list(
+      "$year_file/$month", 'low_to_high', qr/^[0-9]{1,2}$/
+    );
+    $count += @entries;
 
-      my $month_text;
-      foreach my $entry (@entries) {
-        $month_text .= a({href => "$year_url/$month/$entry/"}, $entry) . "\n";
-      }
-
-      $month_text = small("( $month_text )");
-
-      my $link = a({href => "$year_url/$month/"}, month_name($month));
-
-      $year_text .= table_row(
-        table_cell({class => 'datelink'}, $link),
-        table_cell({class => 'datelink'}, $month_text)
-      ) . "\n\n";
+    my $month_text;
+    foreach my $entry (@entries) {
+      $month_text .= a({href => "$year_url/$month/$entry/"}, $entry) . "\n";
     }
+
+    $month_text = small("( $month_text )");
+
+    my $link = a({href => "$year_url/$month/"}, month_name($month));
+
+    $year_text .= table_row(
+      table_cell({class => 'datelink'}, $link),
+      table_cell({class => 'datelink'}, $month_text)
+    ) . "\n\n";
+  }
 
   if ($count > 1) {
     $year_text .= table_row(
-      table_cell(scalar(@months) . ' months'), 
+      table_cell(scalar(@months) . ' months'),
       table_cell("$count entries")
     );
   }
@@ -847,9 +683,9 @@ sub month {
 
   my $result;
 
-  # If a directory exists for $month, use dir_list to slurp
-  # the entry files it contains into @entry_files, sorted
-  # numerically.  Then send each entry to entry_markup().
+  # If a directory exists for $month, use dir_list to slurp the entry files it
+  # contains into @entry_files, sorted numerically.  Then send each entry to
+  # entry_markup().
   if (-d $month_file) {
 
     $result .= $self->entry($month)
@@ -865,36 +701,12 @@ sub month {
     $result .= $self->entry($month);
   }
 
-  my %link_params = (
-    href  => $self->url_root . $self->month_before($month) . '/',
-    title => 'previous month'
-  );
-  my $prev_link = a(\%link_params, '&#8656;');
-
-  $result .= div(
-    { class => 'entry' },
-    nav(p( {class => 'navigation'}, $prev_link )) . "\n\n"
-  );
-
   return $result;
-}
-
-=item entry_wrapped($entry, $level)
-
-Wraps entry() in entry_markup.
-
-=cut
-
-sub entry_wrapped {
-  my $self = shift;
-  my ($entry, $level) = @_;
-
-  return entry_markup($self->entry($entry, $level));
 }
 
 =item entry_stamped($entry, $level)
 
-Wraps entry() + a datestamp in entry_markup()
+Wraps entry() + a datestamp in entry_markup().
 
 =cut
 
@@ -910,8 +722,8 @@ sub entry_stamped {
 
 =item entry_topic_list($entry)
 
-Get a list of topics (by tag-* files) for the entry.  This hardcodes a
-p1k3-specific thing, and is dumb.
+Get a list of topics (by tag-* files) for the entry.  This hardcodes part of a
+p1k3-specific thing which should probably be moved into wrt entirely.
 
 =cut
 
@@ -919,28 +731,20 @@ sub entry_topic_list {
   my $self = shift;
   my ($entry) = @_;
 
-  # Location of entry on local filesystem, and its URL:
-  my ($entry_loc, $entry_url) = $self->root_locations($entry);
+  my @tags = sort grep { m/^tag-.*/ } $self->{entries}->props_for($entry);
 
-  my @tag_files;
-
-  # If it's a directory, look for some tag property files:
-  if (-d $entry_loc) {
-    @tag_files = dir_list($entry_loc, 'alpha', '^tag-.*[.]prop$');
-  }
-
-  return '' unless @tag_files;
+  return '' unless @tags;
 
   return join ', ', map {
-    s/^tag-(.*)[.]prop$/$1/;
-    a($_, { href => $self->url_root . 'topics/' . $_ })
-  } @tag_files;
+    s/^tag-(.*)$/$1/;
+    a($_, { href => $self->{url_root} . 'topics/' . $_ })
+  } @tags;
 }
 
 =item entry($entry)
 
-Returns the contents of a given entry. Calls dir_list
-and icon_markup. Recursively calls itself.
+Returns the contents of a given entry. Calls dir_list and icon_markup.
+Recursively calls itself.
 
 =cut
 
@@ -975,19 +779,27 @@ sub entry {
   my @sub_entries = $self->get_sub_entries($entry_loc);
 
   if (@sub_entries >= 1) {
-    # If the wrt-noexpand property is present, then don't expand
-    # sub-entries.  A hack.
+    # If the wrt-noexpand property is present, then don't expand sub-entries.
+    # A hack.
+
     if ($level eq 'index' || -f "$entry_loc/wrt-noexpand.prop") {
       # Icons or text links:
       $result .= $self->list_contents($entry, @sub_entries);
     }
     elsif ($level eq 'all') {
-      # Everything in the directory:
+      # Everything displayable in the directory:
       foreach my $se (@sub_entries) {
-        next if ($se =~ $self->binfile_expr);
+        next if ($se =~ $self->{binfile_expr});
         $result .= p({class => 'centerpiece'}, '+')
                  . $self->entry("$entry/$se");
+
       }
+
+      # Handle links to any remaining files that match binfile_expr:
+      $result .= $self->list_contents(
+        $entry,
+        grep { $self->{binfile_expr} } @sub_entries
+      );
     }
   }
 
@@ -1007,13 +819,12 @@ sub get_sub_entries {
   my %ignore = ('index' => 1);
 
   return grep { ! $ignore{$_} }
-              dir_list($entry_loc, 'alpha', $self->subentry_expr);
+              dir_list($entry_loc, 'alpha', $self->{subentry_expr});
 }
 
 =item list_contents($entry, @entries)
 
-Returns links (potentially with icons) for a set of sub-entries within an
-entry.
+Returns links (maybe with icons) for a set of sub-entries within an entry.
 
 =cut
 
@@ -1028,7 +839,7 @@ sub list_contents {
     $linktext ||= $se;
 
     $contents .= q{ }
-              . a({ href  => $self->url_root . "$entry/$se",
+              . a({ href  => $self->{url_root} . "$entry/$se",
                     title => $se },
                   $linktext);
   }
@@ -1054,7 +865,7 @@ sub icon_markup {
   my ($entry, $alt) = @_;
 
   if ($cache{$entry . $alt}) {
-    return $cache{$entry.$alt};
+    return $cache{$entry . $alt};
   }
 
   my ($entry_loc, $entry_url) = $self->root_locations($entry);
@@ -1084,7 +895,7 @@ sub icon_markup {
   return 0 unless $suffix;
 
   # call image_size to slurp width & height from the image file
-  my ($width, $height) = image_size("$icon_loc.$suffix");
+  my ($width, $height) = image_size($self->{root_dir_abs} . '/' . "$icon_loc.$suffix");
 
   return $cache{$entry . $alt} =
        qq{<img src="$icon_url.$suffix"\n width="$width" }
@@ -1102,42 +913,33 @@ sub datestamp {
   my $self = shift;
   my ($entry) = @_;
 
-  my ($stamp);
-
-  # Chop up by directory separator.
-  my @pieces = split '/', $entry;
-
-  my (@fragment_stack);
-  my (@fragment_stamps) = (
-    a({ href => $self->url_root }, $self->title_prefix),
+  my @fragment_stack;
+  my @fragment_stamps = (
+    a({ href => $self->{url_root} }, $self->{title_prefix}),
   );
+
+  # Chop up by directory separator:
+  my @pieces = split '/', $entry;
 
   foreach my $fragment (@pieces) {
     push @fragment_stack, $fragment;
     push @fragment_stamps,
-         a({ href => $self->url_root . (join '/', @fragment_stack) . '/',
+         a({ href => $self->{url_root} . (join '/', @fragment_stack) . '/',
              title => $fragment }, $fragment);
   }
 
-  $stamp = "\n"
-         . $self->entry_topic_list($entry)
-         . " :: "
-         . join(" /\n", @fragment_stamps)
-         . "\n";
+  my $stamp = $self->entry_topic_list($entry)
+            . " :: "
+            . join(" /\n", @fragment_stamps);
 
-  return p({class => 'datelink'}, $stamp);
+  return p({class => 'datelink'}, "\n$stamp\n");
 }
 
 =item fragment_slurp($file)
 
-Read a text fragment, call line_parse() and eval_perl() to take care of funky
-markup and interpreting embedded code, and then return it as a string. Takes
-one parameter, the name of the file, and returns '' if it's not an extant text
-file.
-
-This might be the place to implement an in-memory cache for FastCGI or mod_perl
-environments.  The trick is that the results for certain files shouldn't be
-cached because they contain embedded code.
+Read a text fragment, call line_parse() and eval_perl() to take care of
+lightweight markup sections and interpret embedded code, and then return it as
+a string. Takes one parameter, the name of the file.
 
 =cut
 
@@ -1145,23 +947,11 @@ sub fragment_slurp {
   my $self = shift;
 
   my ($file) = @_;
-
-  my $everything;
-
-  open my $fh, '<', $file
-    or warn "Couldn't open $file: $!\n";
-
-  {
-    # line separator:
-    local $/ = undef;
-    $everything = <$fh>;
-  }
-
-  close $fh or warn "Couldn't close: $!";
+  my $everything = file_get_contents($file);
 
   return $self->line_parse(
-    # handle embedded perl first
-    ($self->embedded_perl ? $self->eval_perl($everything) : $everything),
+    # Handle embedded perl first
+    ($self->{embedded_perl} ? $self->eval_perl($everything) : $everything),
     $file # some context to work with
   );
 }
@@ -1184,48 +974,16 @@ sub month_name {
 
 =item root_locations($file)
 
-Given a file/entry, return the appropriate concatenations with
-entry_dir and url_root.
+Given a file/entry, return the appropriate concatenations with entry_dir and
+url_root.
 
 =cut
 
 sub root_locations {
   return (
-    $_[0]->local_path($_[1]),
-    $_[0]->url_root . $_[1]
+    $_[0]->{entry_dir} . '/' . $_[1], # location on filesystem
+    $_[0]->{url_root} . $_[1]         # URL
   );
-}
-
-=item local_path($file)
-
-Return an absolute path for a given file. Called by root_locations.
-
-Arguably this is stupid and inefficient.
-
-=cut
-
-sub local_path {
-  return $_[0]->entry_dir . '/' . $_[1];
-}
-
-=item feed_print_latest()
-
-Return an Atom feed for the most recent entries.
-
-Called from display().
-
-=cut
-
-sub feed_print_latest {
-  my ($self) = @_;
-
-  # Get most recent feed_length entries:
-  my @feed_entries;
-  for my $feed_entry (reverse $self->get_all_day_entries()) {
-    last if scalar(@feed_entries) == $self->feed_length;
-    push @feed_entries, $feed_entry;
-  }
-  return $self->feed_print(@feed_entries);
 }
 
 =item feed_print(@entries)
@@ -1234,35 +992,64 @@ Return an Atom feed for the given list of entries.
 
 Requires XML::Atom::SimpleFeed.
 
+XML::Atom::SimpleFeed will give bogus results with input that's just a string
+of octets (I think) if it contains characters outside of US-ASCII.  In order to
+spit out clean UTF-8 output, we need to use Encode::decode() to flag entry
+content as UTF-8 / represent it internally as a string of characters.  There's
+a whole lot I don't really understand about how this is handled in Perl, and it
+may be a locus of bugs elsewhere in wrt, but for now I'm just dealing with it
+here.
+
+Some references on that:
+
+=over
+
+=item * L<https://github.com/ap/XML-Atom-SimpleFeed/issues/2>
+
+=item * L<https://rt.cpan.org/Public/Bug/Display.html?id=19722>
+
+=item * L<https://cpanratings.perl.org/dist/XML-Atom-SimpleFeed>
+
+=item * L<perlunitut>
+
+=back
+
 =cut
 
 sub feed_print {
   my $self = shift;
   my (@entries) = @_;
 
-  my $feed_url = $self->url_root . $self->feed_alias;
+  my $feed_url = $self->{url_root} . $self->{feed_alias};
 
   my ($first_entry_file, $first_entry_url) = $self->root_locations($entries[0]);
 
+  # TODO: Probably ought to consider utf-8 in titles, authors, etc., as well as
+  # entry content.
+
   my $feed = XML::Atom::SimpleFeed->new(
-    title     => $self->title_prefix . '::' . $self->title,
-    link      => $self->url_root,
+    -encoding => 'UTF-8',
+    title     => $self->{title_prefix} . '::' . $self->{title},
+    link      => $self->{url_root},
     link      => { rel => 'self', href => $feed_url, },
-    icon      => $self->favicon_url,
-    author    => $self->author,
-    id        => $self->url_root,
+    icon      => $self->{favicon_url},
+    author    => $self->{author},
+    id        => $self->{url_root},
     generator => 'App::WRT.pm / XML::Atom::SimpleFeed',
     updated   => App::WRT::Date::iso_date(App::WRT::Date::get_mtime($first_entry_file)),
   );
 
   foreach my $entry (@entries) {
-    my $title   = $entry;
     my $content = $self->entry($entry) . "\n" . $self->datestamp($entry);
+    my $utf8_content = decode('UTF-8', $content, Encode::FB_CROAK);
+
+    my $title = $entry;
     my ($entry_file, $entry_url) = $self->root_locations($entry);
 
-    # try to pull out a header:
-    my ($extracted_title) = $content =~ m{<h1>(.*?)</h1>}s;
-    my (@subtitles)       = $content =~ m{<h2>(.*?)</h2>}sg;
+    # Try to pull out a header:
+    my ($extracted_title) = $utf8_content =~ m{<h1.*?>(.*?)</h1>}s;
+    my (@subtitles)       = $utf8_content =~ m{<h2.*?>(.*?)</h2>}sg;
+
 
     if ($extracted_title) {
       $title = $extracted_title;
@@ -1272,11 +1059,11 @@ sub feed_print {
     }
 
     $feed->add_entry(
-      title     => $title,
-      link      => $entry_url,
-      id        => $entry_url,
-      content   => $content,
-      updated   => App::WRT::Date::iso_date(App::WRT::Date::get_mtime($entry_file)),
+      title   => $title,
+      link    => $entry_url,
+      id      => $entry_url,
+      content => $utf8_content,
+      updated => App::WRT::Date::iso_date(App::WRT::Date::get_mtime($entry_file)),
     );
   }
 

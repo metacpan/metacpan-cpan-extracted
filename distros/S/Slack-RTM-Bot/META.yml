@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Slack::RTM::Bot:
     file: lib/Slack/RTM/Bot.pm
-    version: '1.08'
+    version: '1.09'
   Slack::RTM::Bot::Client:
     file: lib/Slack/RTM/Bot/Client.pm
   Slack::RTM::Bot::Information:
@@ -48,7 +48,7 @@ resources:
   bugtracker: https://github.com/duck8823/Slack-RTM-Bot/issues
   homepage: https://github.com/duck8823/Slack-RTM-Bot
   repository: git://github.com/duck8823/Slack-RTM-Bot.git
-version: '1.08'
+version: '1.09'
 x_contributors:
   - 'shmaeda <shmaeda@nig.ac.jp>'
   - 'makamaka <makamaka.donzoko@gmail.com>'
@@ -56,4 +56,5 @@ x_contributors:
   - 'dada <dada@perl.it>'
   - 'Matt Hallacy <mhallacy+github@haproxy.com>'
   - 'Shunsuke Maeda <duck8823@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

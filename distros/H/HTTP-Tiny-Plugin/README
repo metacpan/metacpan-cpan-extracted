@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Plugin - HTTP::Tiny with plugins
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Plugin (from Perl
-    distribution HTTP-Tiny-Plugin), released on 2019-04-12.
+    This document describes version 0.002 of HTTP::Tiny::Plugin (from Perl
+    distribution HTTP-Tiny-Plugin), released on 2019-04-14.
 
 SYNOPSIS
      # set plugins to use, globally
@@ -139,6 +139,10 @@ METHODS
     hashref can be specified to configure the plugin.
 
 ENVIRONMENT
+  HTTP_TINY_PLUGINS
+    A JSON-encoded array. If set, will call "set_plugins" with the decoded
+    value.
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/HTTP-Tiny-Plugin>.

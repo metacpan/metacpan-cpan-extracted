@@ -5,6 +5,7 @@ use Data::Frame::Role;
 
 use List::AllUtils;
 
+
 method head($n=6) {
 	my ($start, $stop);
 	if( $n < 0 ) {
@@ -57,7 +58,7 @@ Data::Frame::Role::Rlike
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 
@@ -67,7 +68,7 @@ Data::Frame::Role::Rlike - role to provide R-like methods for Data::Frame
 
 =head2 head
 
-    head( Int $n )
+    head( Int $n=6 )
 
 If $n ≥ 0, returns a new C<Data::Frame> with the first $n rows of the
 C<Data::Frame>.
@@ -79,7 +80,7 @@ See also: R's L<head|https://stat.ethz.ch/R-manual/R-devel/library/utils/html/he
 
 =head2 tail
 
-    tail( Int $n )
+    tail( Int $n=6 )
 
 If $n ≥ 0, returns a new C<Data::Frame> with the last $n rows of the
 C<Data::Frame>.

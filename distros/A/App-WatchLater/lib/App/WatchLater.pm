@@ -11,6 +11,7 @@ use Pod::Usage;
 use Try::Tiny;
 
 use App::WatchLater::YouTube;
+use App::WatchLater::Browser;
 
 =head1 NAME
 
@@ -18,11 +19,11 @@ App::WatchLater - Manage your YouTube Watch Later videos
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -92,29 +93,6 @@ SQL
   $row->{video_id};
 }
 
-sub _get_browser {
-  return $ENV{BROWSER} if exists $ENV{BROWSER};
-  for ($^O) {
-    if (/MSWin32/ || /cygwin/) {
-      return 'start';
-    }
-    if (/darwin/) {
-      return 'open';
-    }
-    if (/linux/) {
-      return 'xdg-open';
-    }
-    croak 'unsupported operating system';
-  }
-}
-
-sub _open_video {
-  my ($vid) = @_;
-  my $browser = _get_browser();
-  my $url = "https://youtu.be/$vid";
-  system { $browser } $browser, $url;
-}
-
 sub _mark_watched {
   my ($dbh, $vid) = @_;
   my $sth = $dbh->prepare(<<'SQL');
@@ -133,7 +111,7 @@ sub _watch {
 
   for my $vid (@video_ids) {
     try {
-      _open_video($vid) if $opts->{open};
+      open_url("https://youtu.be/$vid") if $opts->{open};
       _mark_watched($dbh, $vid);
     } catch {
       # warn the user and continue
@@ -154,9 +132,9 @@ directly from C<@ARGV> using L<Getopt::Long>.
 # TODO a better module interface to main()
 sub main {
   my %opts = (
-    dbpath => "$ENV{HOME}/.watch-later.db",
-    force  => 0,
-    open   => 1,
+    'db-path' => "$ENV{HOME}/.watch-later.db",
+    force     => 0,
+    open      => 1,
   );
 
   GetOptions(
@@ -172,7 +150,8 @@ sub main {
 
   my @video_ids = map { find_video_id($_) } @ARGV;
 
-  my $dbh = DBI->connect("dbi:SQLite:dbname=$opts{dbpath}");
+  my $dbpath = $opts{'db-path'};
+  my $dbh = DBI->connect("dbi:SQLite:dbname=$dbpath");
   _ensure_schema($dbh);
 
   my $api = App::WatchLater::YouTube->new(

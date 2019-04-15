@@ -5,6 +5,8 @@ author:
 build_requires:
   File::Temp: '0'
   Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -21,7 +23,7 @@ no_index:
 provides:
   Astro::SpaceTrack:
     file: lib/Astro/SpaceTrack.pm
-    version: '0.127'
+    version: '0.128'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -51,5 +53,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-SpaceTrack.git
-version: '0.127'
+version: '0.128'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

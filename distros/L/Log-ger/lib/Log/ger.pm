@@ -1,10 +1,10 @@
 package Log::ger;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2019-04-13'; # DATE
+our $VERSION = '0.027'; # VERSION
 
 #IFUNBUILT
-# use strict;
+# use strict 'subs', 'vars';
 # use warnings;
 #END IFUNBUILT
 
@@ -51,14 +51,16 @@ my $sub0 = sub {0};
 my $sub1 = sub {1};
 my $default_null_routines;
 
-if (eval { require Sub::Name; 1 }) {
-    *subname = \&Sub::Name::subname;
-} else {
-    *subname = sub {};
-}
-
 sub install_routines {
-    my ($target, $target_arg, $routines) = @_;
+    my ($target, $target_arg, $routines, $name_routines) = @_;
+
+    if ($name_routines && !defined &subname) {
+        if (eval { require Sub::Name; 1 }) {
+            *subname = \&Sub::Name::subname;
+        } else {
+            *subname = sub {};
+        }
+    }
 
     if ($target eq 'package') {
 #IFUNBUILT
@@ -70,7 +72,7 @@ sub install_routines {
             next unless $type =~ /_sub\z/;
             #print "D:installing $name to package $target_arg\n";
             *{"$target_arg\::$name"} = $code;
-            subname("$target_arg\::$name", $code);
+            subname("$target_arg\::$name", $code) if $name_routines;
         }
     } elsif ($target eq 'object') {
 #IFUNBUILT
@@ -82,7 +84,7 @@ sub install_routines {
             my ($code, $name, $lnum, $type) = @$r;
             next unless $type =~ /_method\z/;
             *{"$pkg\::$name"} = $code;
-            subname("$pkg\::$name", $code);
+            subname("$pkg\::$name", $code) if $name_routines;
         }
     } elsif ($target eq 'hash') {
         for my $r (@$routines) {
@@ -137,7 +139,7 @@ sub get_logger {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
         _set_default_null_routines();
-        install_routines(object => $obj, $default_null_routines);
+        install_routines(object => $obj, $default_null_routines, 0);
     }
     $obj; # XXX add DESTROY to remove from list of targets
 }
@@ -155,7 +157,7 @@ sub import {
         # if we haven't added any hooks etc, skip init_target() process and use
         # this preconstructed routines as shortcut, to save startup overhead
         _set_default_null_routines();
-        install_routines(package => $caller, $default_null_routines);
+        install_routines(package => $caller, $default_null_routines, 0);
     }
 }
 
@@ -174,7 +176,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

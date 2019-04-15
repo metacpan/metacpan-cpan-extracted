@@ -1,7 +1,11 @@
 
 Revision history for Perl extension Cstools.
 
-3.43 Tue 09 Apr 2019 02:57:51 PM UTC
+3.44 Sat Apr 13 06:32:54 UTC 2019
+
+	Accept different MIME output with new MIME modules.
+
+3.43 Tue Apr 09 14:57:51 UTC 2019
 
 	Removed no-longer-working fi.muni.cz email address and URL.
 

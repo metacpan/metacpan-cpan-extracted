@@ -1,7 +1,7 @@
 package HTTP::Tiny::Plugin;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-14'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -10,9 +10,16 @@ use Log::ger;
 
 use parent 'HTTP::Tiny';
 
+if ($ENV{HTTP_TINY_PLUGINS}) {
+    require JSON::PP;
+    __PACKAGE__->set_plugins(@{
+        JSON::PP::decode_json($ENV{HTTP_TINY_PLUGINS})
+      });
+}
+
 sub import {
     my $class = shift;
-    $class->set_plugins(@_);
+    $class->set_plugins(@_) if @_;
 }
 
 my @plugins;
@@ -80,7 +87,7 @@ HTTP::Tiny::Plugin - HTTP::Tiny with plugins
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::Plugin (from Perl distribution HTTP-Tiny-Plugin), released on 2019-04-12.
+This document describes version 0.002 of HTTP::Tiny::Plugin (from Perl distribution HTTP-Tiny-Plugin), released on 2019-04-14.
 
 =head1 SYNOPSIS
 
@@ -237,6 +244,10 @@ prefix. After each plugin name, an optional hashref can be specified to
 configure the plugin.
 
 =head1 ENVIRONMENT
+
+=head2 HTTP_TINY_PLUGINS
+
+A JSON-encoded array. If set, will call L</set_plugins> with the decoded value.
 
 =head1 HOMEPAGE
 

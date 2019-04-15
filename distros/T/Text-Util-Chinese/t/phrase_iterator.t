@@ -10,7 +10,7 @@ open my $fh, '<:utf8', "$Bin/data/rand0m.txt";
 my $iter = phrase_iterator(sub { <$fh> });
 
 my $phrases = 0;
-while (my $phrase = $iter->()) {
+while (defined(my $phrase = $iter->())) {
     ok $phrase =~ /\p{Han}/, $phrase;
     $phrases++;
 }

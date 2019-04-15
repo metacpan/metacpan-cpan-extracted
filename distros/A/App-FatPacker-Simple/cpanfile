@@ -1,7 +1,8 @@
-requires 'perl', '5.008005';
+requires 'perl', '5.008001';
 requires 'App::FatPacker';
-requires 'Perl::Strip';
 requires 'Distribution::Metadata', '0.05';
+requires 'Perl::Strip';
+requires 'Pod::Usage', '1.33';
 
 on develop => sub {
     requires 'File::pushd';

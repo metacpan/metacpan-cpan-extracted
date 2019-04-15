@@ -1,0 +1,81 @@
+NAME
+    LWP::UserAgent::Patch::Plugin - Change use of LWP::UserAgent to that of
+    LWP::UserAgent::Plugin
+
+VERSION
+    This document describes version 0.001 of LWP::UserAgent::Patch::Plugin
+    (from Perl distribution LWP-UserAgent-Patch-Plugin), released on
+    2019-04-15.
+
+SYNOPSIS
+    First, invoke this patch. From Perl:
+
+     use LWP::UserAgent::Patch::Plugin
+         # -set_plugins => ['Cache', CustomRetry=>{strategy=>"Exponential", strategy_options=>{initial_delay=>0.5, max_delay=>300}}],
+     ;
+
+    or:
+
+     use LWP::UserAgent::Patch::Plugin;
+     LWP::UserAgent::Plugin->set_plugins('Cache', ...);
+
+    From command-line:
+
+     % LWP_USERAGENT_PLUGINS='["Cache","CustomRetry",{"strategy":"Exponential","strategy_options":{"initial_delay":0.5}}]' \
+         perl -MLWP::UserAgent::Patch::Plugin script-that-uses-lwp-useragent.pl ...
+
+    Now every usage of LWP::UserAgent, e.g.:
+
+     my $response = LWP::UserAgent->new->get("http://www.example.com/");
+
+    will become:
+
+     my $response = LWP::UserAgent::Plugin->new->get("http://www.example.com/");
+
+DESCRIPTION
+    This module replaces every instantiation of LWP::UserAgent to
+    instantiate LWP::UserAgent::Plugin instead, so you can use
+    LWP::UserAgent::Plugin's plugins. Note that instantiation of other
+    LWP::UserAgent subclasses, e.g. WWW::Mechanize is not replaced with
+    instantiation of LWP::UserAgent::Plugin.
+
+CONFIGURATION
+  -set_plugins
+    Array. Will be passed to LWP::UserAgent::Plugin's "set_plugins()". You
+    can also set plugins by calling "set_plugins()" yourself.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Patch-Plugin>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Patch-Plugin>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Patch-P
+    lugin>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    LWP::UserAgent::Plugin
+
+    LWP::UserAgent
+
+    Module::Patch
+
+    WWW::Mechanize::Patch::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

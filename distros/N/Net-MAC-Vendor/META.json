@@ -60,8 +60,6 @@
          },
          "requires" : {
             "Carp" : "0",
-            "Compress::Bzip2" : "0",
-            "Compress::Zlib" : "0",
             "Exporter" : "0",
             "File::Temp" : "0",
             "Mojo::URL" : "0",
@@ -167,7 +165,7 @@
    "provides" : {
       "Net::MAC::Vendor" : {
          "file" : "lib/Net/MAC/Vendor.pm",
-         "version" : "1.264"
+         "version" : "1.265"
       }
    },
    "release_status" : "stable",
@@ -183,7 +181,7 @@
          "web" : "https://github.com/karenetheridge/Net-MAC-Vendor"
       }
    },
-   "version" : "1.264",
+   "version" : "1.265",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.029009"
@@ -297,8 +295,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000034",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@Author::ETHER/InstallGuide",
-            "version" : "1.200012"
+            "version" : "1.200013"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -1013,7 +1017,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.264",
+                  "tag" : "v1.265",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

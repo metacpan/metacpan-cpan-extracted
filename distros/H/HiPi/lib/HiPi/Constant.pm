@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -1020,7 +1020,13 @@ my $const = {
         MAX7219_REG_SCAN_LIMIT  => 0x0B,
         MAX7219_REG_SHUTDOWN    => 0x0C,
         MAX7219_REG_TEST        => 0x0F,
-        
+    },
+    
+    hilink => {
+        HILINK_CONNSTATUS_CONNECTING     => 900,
+        HILINK_CONNSTATUS_CONNECTED      => 901,
+        HILINK_CONNSTATUS_DISCONNECTED   => 902,
+        HILINK_CONNSTATUS_DISCONNECTING  => 903,
     },
 };
 

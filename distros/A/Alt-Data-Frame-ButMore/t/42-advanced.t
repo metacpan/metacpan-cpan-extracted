@@ -12,7 +12,7 @@ use Test::File::ShareDir -share =>
   { -dist => { 'Alt-Data-Frame-ButMore' => 'data-raw' } };
 
 use Data::Frame;
-use Data::Frame::Examples qw(mtcars);
+use Data::Frame::Examples qw(mtcars iris);
 
 my $mtcars = mtcars();
 
@@ -292,6 +292,43 @@ subtest compare_df_with_bad => sub {
         '$df->which(bad_to_val => 1)'
     );
 
+};
+
+subtest summary => sub {
+    local $Data::Frame::TOLERANCE_REL = 1e-2;
+
+    dataframe_is(
+        iris()->summary(),
+        Data::Frame->new(
+            columns => [
+                Sepal_Length =>
+                  pdl( 150, 5.843, 0.828, 4.3, 5.1, 5.8, 6.4, 7.9 ),
+                Sepal_Width => pdl( 150, 3.057, 0.436, 2, 2.8, 3, 3.3, 4.4 ),
+                Petal_Length =>
+                  pdl( 150, 3.758, 1.765, 1, 1.6, 4.35, 5.1, 6.9 ),
+                Petal_Width =>
+                  pdl( 150, 1.199, 0.762, 0.1, 0.3, 1.3, 1.8, 2.5 ),
+                Species => pdl( 150, ('nan') x 7 )->setnantobad,
+            ],
+            row_names => [qw(count mean std min 25% 50% 75% max)]
+        ),
+        'summary'
+    );
+
+    dataframe_is(
+        iris()->summary( [0.1] ),
+        Data::Frame->new(
+            columns => [
+                Sepal_Length => pdl( 150, 5.843, 0.828, 4.3, 4.8, 5.8,  7.9 ),
+                Sepal_Width  => pdl( 150, 3.057, 0.436, 2,   2.5, 3,    4.4 ),
+                Petal_Length => pdl( 150, 3.758, 1.765, 1,   1.4, 4.35, 6.9 ),
+                Petal_Width  => pdl( 150, 1.199, 0.762, 0.1, 0.2, 1.3,  2.5 ),
+                Species => pdl( 150, ('nan') x 6 )->setnantobad,
+            ],
+            row_names => [qw(count mean std min 10% 50% max)]
+        ),
+        'summary($custom_percentiles)'
+    );
 };
 
 done_testing;

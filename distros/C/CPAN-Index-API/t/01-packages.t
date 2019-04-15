@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Most;
 use File::Temp qw(tempfile);
-use File::Slurp qw(read_file);
+use Path::Tiny qw(path);
 use Compress::Zlib qw(gzopen);
 use CPAN::Index::API::File::PackagesDetails;
 
@@ -60,12 +60,12 @@ eq_or_diff( $writer_without_packages->content, $without_packages, 'without packa
 
 my ($fh_with_packages, $filename_with_packages) = tempfile;
 $writer_with_packages->write_to_file($filename_with_packages);
-my $content_with_packages = read_file($filename_with_packages);
+my $content_with_packages = path($filename_with_packages)->slurp_utf8;
 eq_or_diff( $content_with_packages, $with_packages, 'write to file with packages' );
 
 my ($fh_without_packages, $filename_without_packages) = tempfile;
 $writer_without_packages->write_to_file($filename_without_packages);
-my $content_without_packages = read_file($filename_without_packages);
+my $content_without_packages = path($filename_without_packages)->slurp_utf8;
 eq_or_diff( $content_without_packages, $without_packages, 'write to file without packages' );
 
 my $reader_with_packages = CPAN::Index::API::File::PackagesDetails->read_from_string($with_packages);

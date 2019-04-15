@@ -1,7 +1,7 @@
 package Log::ger::Heavy;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2019-04-13'; # DATE
+our $VERSION = '0.027'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -375,7 +375,7 @@ sub init_target {
                   $target, $target_arg);
     }
 
-    install_routines($target, $target_arg, \@routines);
+    install_routines($target, $target_arg, \@routines, 1);
 
     {
         local $hook_args{routines} = \@routines;
@@ -399,7 +399,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

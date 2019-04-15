@@ -20,7 +20,7 @@ Data::Frame::Indexer::Integer - Data::Frame indexer by integer indices
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 AUTHORS
 

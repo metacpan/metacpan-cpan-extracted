@@ -83,7 +83,7 @@ $lines[1]='26.	D. Giustiniano, D. Malone, D.J. Leith and K. Papagiannaki, 2010. 
 $refs->add_details(@lines);
 
 SKIP: {
-  skip "Optional network tests", 7 unless ((defined ${$refs->{refs}}[0])&&(defined ${$refs->{refs}}[1]));
+  skip "Optional network tests", 6 unless ((defined ${$refs->{refs}}[0])&&(defined ${$refs->{refs}}[1]));
 
   my $expected1 ='article: 2011, I Dangerfield and D Malone and D J Leith, \'Incentivising Fairness and Policing Nodes in WiFi\'. IEEE Communications Letters, 15(5),pp500-502, DOI: 10.1109/lcomm.2011.040111.102111, http://dx.doi.org/10.1109/lcomm.2011.040111.102111';
   is(${$refs->{refs}}[0]->print,$expected1);

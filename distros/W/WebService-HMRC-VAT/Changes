@@ -1,5 +1,8 @@
 Revision history for WebService-HMRC-VAT
 
+0.04    2019-04-14
+        Correct pod synopsis illustrating use of `$vat->auth->access_token()`
+
 0.03    2019-01-13
         Fix failing test plan when skipping connection to HMRC server
 

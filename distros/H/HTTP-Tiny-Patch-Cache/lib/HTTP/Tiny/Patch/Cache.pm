@@ -1,7 +1,7 @@
 package HTTP::Tiny::Patch::Cache;
 
-our $DATE = '2018-10-06'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-04-14'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,7 +16,7 @@ our %config;
 my $p_request = sub {
     require Digest::SHA;
     require File::Util::Tempdir;
-    require JSON::MaybeXS;
+    require Storable;
 
     my $ctx = shift;
     my $orig = $ctx->{orig};
@@ -45,14 +45,14 @@ my $p_request = sub {
         return $res unless $res->{status} =~ /\A[23]/; # HTTP::Tiny only regards 2xx as success
         log_trace "Saving response to cache ...";
         open my $fh, ">", $cachepath or die "Can't create cache file '$cachepath' for '$url': $!";
-        print $fh JSON::MaybeXS::encode_json($res);
+        Storable::store_fd($res, $fh);
         close $fh;
         return $res;
     } else {
         log_trace "Retrieving response from cache ...";
         open my $fh, "<", $cachepath or die "Can't read cache file '$cachepath' for '$url': $!";
         local $/;
-        my $res = JSON::MaybeXS::decode_json(scalar <$fh>);
+        my $res = Storable::fd_retrieve($fh);
         close $fh;
         return $res;
     }
@@ -92,7 +92,7 @@ HTTP::Tiny::Patch::Cache - Cache HTTP::Tiny responses
 
 =head1 VERSION
 
-This document describes version 0.003 of HTTP::Tiny::Patch::Cache (from Perl distribution HTTP-Tiny-Patch-Cache), released on 2018-10-06.
+This document describes version 0.004 of HTTP::Tiny::Patch::Cache (from Perl distribution HTTP-Tiny-Patch-Cache), released on 2019-04-14.
 
 =head1 SYNOPSIS
 
@@ -123,11 +123,13 @@ retrieved from L<File::Util::Tempdir>'s C<get_user_tempdir()>.
 
 =head1 DESCRIPTION
 
-This module patches L<HTTP::Tiny> to cache responses. Currently only GET
-requests are cached. Cache are keyed by SHA256-hex(URL). Error responses are
-also cached. Currently no cache-related HTTP request or response headers (e.g.
-C<Cache-Control>) are respected. This patch is mostly useful when testing (e.g.
-saving bandwidth when repeatedly getting huge HTTP pages).
+This module patches L<HTTP::Tiny> to cache responses.
+
+Currently only GET requests are cached. Cache are keyed by SHA256-hex(URL).
+Error responses are also cached. Currently no cache-related HTTP request or
+response headers (e.g. C<Cache-Control>) are respected. This patch is mostly
+useful when testing (e.g. saving bandwidth when repeatedly getting huge HTTP
+pages).
 
 =for Pod::Coverage ^(patch_data)$
 
@@ -169,6 +171,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<HTTP::Tiny::Cache>, subclass version of this module.
+
 L<LWP::Simple::WithCache>
 
 L<LWP::UserAgent::WithCache>
@@ -181,7 +185,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

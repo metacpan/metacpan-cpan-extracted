@@ -1,7 +1,7 @@
 Summary: Czech laguage tools
 Summary(cs): Nástroje pro práci s èeským jazykem (koverze kódování, tøídìní)
 Name: cstools
-Version: 3.43
+Version: 3.44
 Release: 1
 Group: Applications/Text
 Group(cs): Aplikace/Text

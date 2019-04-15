@@ -57,11 +57,16 @@ subtest bump => sub {
     is(Versioning::Scheme::Perl->bump_version('1.200.003', {num=>120000}), 'v1.320.3');
     is(Versioning::Scheme::Perl->bump_version('1.200.003', {num=>1200000}), 'v2.400.3');
 
-    # opt: part
+    # opt: part (numeric)
     dies_ok { Versioning::Scheme::Perl->bump_version('1.200.003', {part=>-4}) };
     is(Versioning::Scheme::Perl->bump_version('1.200.003', {part=>-2}), 'v1.201.0');
     is(Versioning::Scheme::Perl->bump_version('1.200.003', {part=>-2, num=>-1}), 'v1.199.3');
     is(Versioning::Scheme::Perl->bump_version('1.200.003', {part=>0}), 'v2.0.0');
+
+    # opt: part=dev
+    is(Versioning::Scheme::Perl->bump_version('1.2.3', {part=>'dev'}), '1.2.3_001');
+    is(Versioning::Scheme::Perl->bump_version('1.2.3_004', {part=>'dev'}), '1.2.3_005');
+    is(Versioning::Scheme::Perl->bump_version('1.2.3_004', {part=>'dev', num=>2}), '1.2.3_006');
 
     # opt: reset_smaller
     is(Versioning::Scheme::Perl->bump_version('1.200.003', {part=>-2, reset_smaller=>0}), 'v1.201.3');

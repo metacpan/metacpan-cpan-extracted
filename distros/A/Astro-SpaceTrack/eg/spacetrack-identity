@@ -9,14 +9,19 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use Astro::SpaceTrack;
 use Pod::Usage;
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 my %opt;
 
 GetOptions( \%opt,
-    qw{ basic! },
+    qw{ basic! hide! },
     help => sub { pod2usage( { -verbose => 2 } ) },
 ) or pod2usage( { -verbose => 0 } );
+
+if ( defined $opt{hide} ) {
+    hide( $opt{hide} );
+    exit;
+}
 
 my $st;
 eval {
@@ -35,6 +40,18 @@ my $delim = $opt{basic} ? ':' : '/';
 
 print "SPACETRACK_USER=$info{username}$delim$info{password}\n";
 
+sub hide {
+    my ( $hide ) = @_;
+    my $id_file = Astro::SpaceTrack->__identity_file_name();
+    my $hidden_file = "$id_file-hidden";
+    my ( $from, $to, $name ) = $hide ? ( $id_file, $hidden_file, 'ID' ) : (
+	$hidden_file, $id_file, 'Hidden' );
+    -f $from
+	or die "$name file $from not found\n";
+    rename $from, $to
+	or die "Failed to rename $name file $from to $to: $!\n";
+    warn "$name file $from renamed to $to\n";
+}
 __END__
 
 =head1 TITLE
@@ -66,6 +83,16 @@ The default is C<-nobasic>.
 
 This option displays the documentation for this script. The script then
 exits.
+
+=head2 -hide
+
+If this Boolean option is asserted, the identity file, if any, is
+renamed so that it will not be found by
+L<Astro::SpaceTrack|Astro::SpaceTrack>.
+
+If it is negated (as C<-nohide>) it will be renamed back.
+
+Either way, the script then exits.
 
 =head2 -version
 

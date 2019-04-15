@@ -1,9 +1,6 @@
 package CPAN::Index::API::Role::HavingGeneratedBy;
-{
-  $CPAN::Index::API::Role::HavingGeneratedBy::VERSION = '0.007';
-}
 
-# ABSTRACT: Provides 'generated_by' and 'last_generated' attributes
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -35,17 +32,13 @@ sub _build_last_generated {
 
 1;
 
-
-__END__
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::Role::HavingGeneratedBy - Provides 'generated_by' and 'last_generated' attributes
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::Role::HavingGeneratedBy - Provides 'generated_by' and 'last_generated' attributes
 
 =head1 PROVIDES
 
@@ -57,16 +50,4 @@ Name of software that generated the file.
 
 Date and time when the file was last generated.
 
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-

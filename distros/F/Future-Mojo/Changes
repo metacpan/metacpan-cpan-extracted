@@ -1,3 +1,7 @@
+1.000     2019-04-14 19:56:55 EDT
+  - Added a new module Future::Role::Promisify, which is composed by default by
+    Future::Mojo to provide a promisify method that chains a Mojo::Promise.
+
 0.004     2017-11-03 12:20:54 EDT
   - Added new_timeout constructor for a future that fails after a delay
 

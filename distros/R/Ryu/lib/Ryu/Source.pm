@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 =head1 NAME
 
@@ -737,7 +737,7 @@ sub buffer {
     $src->{pause_propagation} = 0;
     my @pending;
     $self->completed->on_ready(sub {
-        shift->on_ready($src->completed) unless $src->completed->is_ready
+        shift->on_ready($src->completed) unless $src->completed->is_ready or @pending;
     });
     my $item_handler = do {
         Scalar::Util::weaken(my $weak_self = $self);
@@ -749,7 +749,15 @@ sub buffer {
                 $self->pause($src);
             }
             $src->emit(shift @pending) while @pending and not $src->is_paused;
-            $self->resume($src) if @pending < $args{low} and $self and $self->is_paused($src);
+            if($self) {
+                $self->resume($src) if @pending < $args{low} and $self->is_paused($src);
+
+                # It's common to have a situation where the parent chain completes while we're
+                # paused waiting for the queue to drain. In this situation, we want to propagate
+                # completion only once the queue is empty.
+                $self->completed->on_ready($src->completed)
+                    if $self->completed->is_ready and not @pending and not $src->completed->is_ready;
+            }
         }
     };
     $src->flow_control
@@ -1783,11 +1791,15 @@ Returns a L<Future> indicating completion (or failure) of this stream.
 
 sub completed {
     my ($self) = @_;
-    $self->{completed} //= $self->new_future(
-        'completion'
-    )->on_ready(
-        $self->curry::weak::cleanup
-    )
+    $self->{completed} //= do {
+        my $f = $self->new_future(
+            'completion'
+        )->on_ready(
+            $self->curry::weak::cleanup
+        );
+        $self->prepare_await;
+        $f
+    }
 }
 
 sub cleanup {

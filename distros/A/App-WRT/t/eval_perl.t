@@ -7,7 +7,8 @@ use lib 'lib';
 use Test::Simple tests => 1; # last test to print
 use App::WRT;
 
-my $w = App::WRT->new;
+chdir 'example';
+my $w = App::WRT::new_from_file('wrt.json');
 
 # 'configuration';
 my $perlcode = $w->eval_perl("IS <perl>return 'TRUE';</perl>");

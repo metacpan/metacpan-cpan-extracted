@@ -1,3 +1,17 @@
+Revision history of Alt-Data-Frame-ButMore
+
+0.0043      2019-04-14
+    - Breaking change: Dropped the number_of_rows() method for PDL and row
+      names. It becomes redundant as we have a role to add length() method to
+      PDL. The removal also helps reduce one dependency of the distributon.
+    - PDL::SV: Fixed "uniq" method, added new override methods "set" and
+      "sever". Also PDL::SV's doc is briefly written.
+    - Add a "summary" method to Data::Frame.
+    - Add "iris" example data set to Data::Frame::Examples.
+    - Restructured main module doc.
+    - Solved a circular use issue between Data::Frame and Data::Frame::Util.
+    - Switched from Test::More/Test::Most/Test::Fatal/etc to Test2::V0 for
+      testing.
 
 0.0041      2019-03-10
     - Release as Alt-Data-Frame-ButMore by SLOYD.

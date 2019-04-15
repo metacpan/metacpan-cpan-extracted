@@ -3,7 +3,7 @@ use warnings;
 
 use Test::Most;
 use File::Temp qw(tempfile);
-use File::Slurp qw(read_file);
+use Path::Tiny qw(path);
 use CPAN::Index::API::File::ModList;
 
 # defaults
@@ -11,7 +11,7 @@ my $with_modules = <<'EndOfModules';
 File:        03modlist.data.gz
 Description: Package names found in directory $CPAN/authors/id/
 Modcount:    3
-Written-By:  CPAN::Index::API::File::ModList 0.007
+Written-By:  CPAN::Index::API::File::ModList 0.008
 Date:        Fri Mar 23 18:23:15 2012 GMT
 
 package CPAN::Modulelist;
@@ -81,7 +81,7 @@ my $without_modules = <<'EndOfModules';
 File:        03modlist.data.gz
 Description: Package names found in directory $CPAN/authors/id/
 Modcount:    0
-Written-By:  CPAN::Index::API::File::ModList 0.007
+Written-By:  CPAN::Index::API::File::ModList 0.008
 Date:        Fri Mar 23 18:23:15 2012 GMT
 
 package CPAN::Modulelist;
@@ -167,12 +167,12 @@ eq_or_diff( $writer_without_modules->content, $without_modules, 'without modules
 
 my ($fh_with_modules, $filename_with_modules) = tempfile;
 $writer_with_modules->write_to_file($filename_with_modules);
-my $content_with_modules = read_file($filename_with_modules);
+my $content_with_modules = path($filename_with_modules)->slurp_utf8;
 eq_or_diff( $content_with_modules, $with_modules, 'write to file with modules' );
 
 my ($fh_without_modules, $filename_without_modules) = tempfile;
 $writer_without_modules->write_to_file($filename_without_modules);
-my $content_without_modules = read_file($filename_without_modules);
+my $content_without_modules = path($filename_without_modules)->slurp_utf8;
 eq_or_diff( $content_without_modules, $without_modules, 'write to file without modules' );
 
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 29 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Protocol/Database/PostgreSQL.pm',
@@ -36,6 +36,7 @@ my @module_files = (
     'Protocol/Database/PostgreSQL/Backend/RowDescription.pm',
     'Protocol/Database/PostgreSQL/Client.pm',
     'Protocol/Database/PostgreSQL/Constants.pm',
+    'Protocol/Database/PostgreSQL/Error.pm',
     'Protocol/Database/PostgreSQL/Message.pm'
 );
 

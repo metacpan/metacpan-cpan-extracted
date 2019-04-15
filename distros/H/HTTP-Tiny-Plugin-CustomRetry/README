@@ -1,0 +1,66 @@
+NAME
+    HTTP::Tiny::Plugin::CustomRetry - Retry failed request
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Plugin::CustomRetry
+    (from Perl distribution HTTP-Tiny-Plugin-CustomRetry), released on
+    2019-04-14.
+
+SYNOPSIS
+     use HTTP::Tiny::Plugin 'CustomRetry' => {
+         strategy         => 'Exponential',
+         strategy_options => {initial_delay=>2, max_delay=>100},
+         retry_if         => qr/^[45]/, # optional, default is only 5xx errors are retried
+     };
+
+     my $res  = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
+
+DESCRIPTION
+    This plugin retries failed response using one of available backoff
+    strategy in "Algorithm::Backoff::*" (e.g.
+    Algorithm::Backoff::Exponential).
+
+    By default only retries 5xx failures, as 4xx are considered to be
+    client's fault (but you can configure it with "retry_if").
+
+CONFIGURATION
+  strategy
+    Str. Name of backoff strategy, which corresponds to
+    Algorithm::Backoff::<strategy>.
+
+  strategy_options
+    Hashref. Will be passed to Algorithm::Backoff::* constructor.
+
+  retry_if
+    Regex or code. If regex, then will be matched against response status.
+    If code, will be called with arguments: "($self, $response)".
+
+ENVIRONMENT
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Plugin-CustomRetry>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Plugin-CustomRetry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Plugin-Cust
+    omRetry>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

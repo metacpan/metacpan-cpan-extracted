@@ -52,6 +52,11 @@ $expect{'2012-044'} = {
     note => 'Not actually provided as a fetchable data set.',
     ignore => 1,
 };
+$expect{'2019-006'} = {
+    name	=> 'Indian ASAT Test Debris',
+    note => 'Not actually provided as a fetchable data set.',
+    ignore => 1,
+};
 
 =begin comment
 

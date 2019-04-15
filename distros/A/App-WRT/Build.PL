@@ -20,19 +20,15 @@ my $build = Module::Build->new(
     'Text::Markdown::Discount' => '0.11',
     'Text::Textile'            => 0,
     'Time::HiRes'              => 0,
-    'XML::Atom::SimpleFeed'    => '0.8',
+    'XML::Atom::SimpleFeed'    => '0.900',
     'XML::Feed'                => 0,
     'perl'                     => '5.10.0',
   },
 
-  recommends => {
-    'CGI::Fast' => 0,
-  },
-
   resources => {
     repository  => {
-      url  => 'git://github.com/brennen/wrt.git',
-      web  => 'https://github.com/brennen/wrt',
+      url  => 'git://code.p1k3.com/gitea/brennen/wrt.git',
+      web  => 'https://code.p1k3.com/gitea/brennen/wrt',
       type => 'git',
     },
   }

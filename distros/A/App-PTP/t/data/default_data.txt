@@ -1,0 +1,9 @@
+test
+foobar=
+ab/cd
+Be
+foobaz
+.\+
+
+last=
+last

@@ -1,9 +1,6 @@
 package CPAN::Index::API;
-{
-  $CPAN::Index::API::VERSION = '0.007';
-}
 
-# ABSTRACT: Read and write CPAN index files
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -142,17 +139,13 @@ sub clone {
 
 __PACKAGE__->meta->make_immutable;
 
-
-__END__
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 CPAN::Index::API - Read and write CPAN index files
-
-=head1 VERSION
-
-version 0.007
 
 =head1 SYNOPSIS
 
@@ -163,10 +156,10 @@ version 0.007
 
     my $packages = $index->file('PackagesDetails');
 
-=head1 DESRIPTION
+=head1 DESCRIPTION
 
 C<CPAN::Index::API> is a library to read and write CPAN index files. See the
-modules in the C<CPAN::Index::API::File> namesace for documentation on the
+modules in the C<CPAN::Index::API::File> namespace for documentation on the
 individual files supported.
 
 This class provides a convenient interface for working with multiple files
@@ -260,14 +253,13 @@ attributes with any arguments passed.
 
 =head1 AUTHOR
 
-Peter Shangov <pshangov@yahoo.com>
+Peter Shangov <F<pshangov@yahoo.com>>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Venda, Inc..
+This software is copyright (c) 2019 by Venda, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

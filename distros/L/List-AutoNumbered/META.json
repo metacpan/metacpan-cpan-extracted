@@ -4,7 +4,7 @@
       "Christopher White <cxwembedded@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,6 +41,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
+            "Getargs::Mixed" : "1.06",
             "Scalar::Util" : "1.50",
             "parent" : "0",
             "perl" : "5.006",
@@ -61,7 +62,7 @@
    "provides" : {
       "List::AutoNumbered" : {
          "file" : "lib/List/AutoNumbered.pm",
-         "version" : "0.000005"
+         "version" : "0.000007"
       },
       "List::AutoNumbered::Skipper" : {
          "file" : "lib/List/AutoNumbered.pm"
@@ -78,6 +79,6 @@
          "web" : "https://github.com/cxw42/List-AutoNumbered"
       }
    },
-   "version" : "0.000005",
+   "version" : "0.000007",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

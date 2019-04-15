@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-wrt-render-all - utility for rendering static HTML files from entries
+wrt-render-all - utility for rendering static HTML files from wrt entries
 
 =head1 USAGE
 
@@ -19,7 +19,7 @@ in the configuration file (normally F<wrt.json>).  By default, this is
 F<./public>.
 
 Detailed documentation can be found in the L<App::WRT> man page or at
-L<https://github.com/brennen/wrt>.
+L<https://code.p1k3.com/gitea/brennen/wrt>.
 
 =head1 LICENSE
 
@@ -30,7 +30,7 @@ L<https://github.com/brennen/wrt>.
 
 =head1 AUTHOR
 
-Brennen Bearnes
+Brennen Bearnes <code@p1k3.com>
 
 =cut
 

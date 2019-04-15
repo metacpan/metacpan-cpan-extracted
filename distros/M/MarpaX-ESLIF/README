@@ -104,18 +104,17 @@ NOTES
 
       Defaults to JSON::MaybeXS::is_bool($value)
 
- NUMERIC TYPES
+ INTEGER TYPE
 
-    ESLIF has two functions MarpaX::ESLIF::is_Int() and
-    MarpaX::ESLIF::is_StrictNum(), that maps by default to the
-    Types::Standard implementations. You may localize them before using
-    ESLIF if needed.
+    ESLIF consider scalars that have only the internal IV flag.
+
+ FLOAT TYPE
+
+    ESLIF consider scalars that have only the internal NV flag.
 
  STRING TYPE
 
-    ESLIF has the function MarpaX::ESLIF::is_Str(), that maps by default to
-    the Types::Standard implementation. You may localize it before using
-    ESLIF if needed.
+    ESLIF consider scalars that have only the internal PV flag.
 
 SEE ALSO
 

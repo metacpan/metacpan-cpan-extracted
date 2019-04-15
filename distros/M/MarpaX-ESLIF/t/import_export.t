@@ -36,6 +36,7 @@ use Log::Any::Adapter;
 use Log::Any qw/$log/;
 use Math::BigInt;
 use Math::BigFloat;
+use Encode qw/ encode :fallbacks /;
 
 our @input;
 BEGIN {
@@ -65,7 +66,7 @@ BEGIN {
         );
 }
 use Safe::Isa;
-use Test::More tests => 1 + scalar(@input) + 4; # 4 pushes after the require_ok
+use Test::More tests => 1 + scalar(@input) + 10; # 8 pushes after the require_ok
 use Test::More::UTF8;
 use open qw( :utf8 :std );
 
@@ -73,7 +74,14 @@ BEGIN { require_ok('MarpaX::ESLIF') }
 push(@input, $MarpaX::ESLIF::true);
 push(@input, $MarpaX::ESLIF::false);
 push(@input, { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef });
+push(@input, { element1 => { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef },
+               element2 => { one => "one", two => "two", perltrue => 1, true => $MarpaX::ESLIF::true, false => $MarpaX::ESLIF::false, 'else' => 'again', 'undef' => undef }});
 push(@input, MarpaX::ESLIF::String->new("XXXḼơᶉëᶆYYY", 'UTF-8'));
+push(@input, MarpaX::ESLIF::String->new("", 'UTF-8'));
+push(@input, MarpaX::ESLIF::String->new(encode('UTF-16LE', my $s = "XXXḼơᶉëᶆYYY", FB_CROAK), 'UTF-16LE'));
+push(@input, MarpaX::ESLIF::String->new("", 'UTF-16'));
+push(@input, 'one');
+push(@input, 'two');
 #
 # Init log
 #
@@ -104,15 +112,18 @@ PERL_INPUT    ~ [^\s\S]
         io.write(string.rep (" ", indent)) -- indent it
         if type (value) == "table" and not done [value] then
           done [value] = true
-          io.write(string.format("[%s] => table\n", tostring (key)));
+          io.write(string.format("  [%s] => table\n", tostring(key)));
           io.write(string.rep (" ", indent+4)) -- indent it
           io.write("(\n");
           table_print (value, indent + 7, done)
           io.write(string.rep (" ", indent+4)) -- indent it
           io.write(")\n");
         else
-          io.write(string.format("[%s] => %s\n",
-              tostring (key), tostring(value)))
+          if type(value) == 'string' then
+            io.write(string.format("  [%s] => %s (type: %s, encoding: %s, length: %d bytes)\n", tostring (key), tostring(value), type(value), tostring(value:encoding()), string.len(value)))
+          else
+            io.write(string.format("  [%s] => %s (type: %s)\n", tostring (key), tostring(value), type(value)))
+          end
         end
       end
     else
@@ -122,15 +133,15 @@ PERL_INPUT    ~ [^\s\S]
   io.stdout:setvbuf('no')
 
   function lua_proxy(value)
-    -- print('lua_proxy received value of type: '..type(value))
-    -- if type(value) == 'string' then
-    --   print('lua_proxy value: '..tostring(value)..', encoding: '..tostring(value:encoding()))
-    -- else
-    --   print('lua_proxy value: '..tostring(value))
-    --   if type(value) == 'table' then
-    --     table_print(value)
-    --   end
-    -- end
+    print('  lua_proxy received value of type: '..type(value))
+    if type(value) == 'string' then
+      print('  lua_proxy value: '..tostring(value)..', encoding: '..tostring(value:encoding())..', length: '..string.len(value)..' bytes')
+    else
+      print('  lua_proxy value: '..tostring(value))
+      if type(value) == 'table' then
+        table_print(value)
+      end
+    end
     return value
   end
 </luascript>
@@ -149,7 +160,10 @@ foreach my $inputArray (@input) {
     my $eslifValue = MarpaX::ESLIF::Value->new($eslifRecognizer, $eslifValueInterface);
     $eslifValue->value();
     my $value = $eslifValueInterface->getResult;
-    if ($input->$_isa('MarpaX::ESLIF::String')) {
+    if ($input->$_isa('MarpaX::ESLIF::String') && $input->encoding eq 'UTF-8') {
+        #
+        # marpaESLIF will always reinject UTF-8 strings as true PV scalars for performance
+        #
         $input = "$input";
         $value = "$value" if defined($value);
     }

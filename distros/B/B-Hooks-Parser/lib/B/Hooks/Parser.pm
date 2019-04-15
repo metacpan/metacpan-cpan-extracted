@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-package B::Hooks::Parser; # git description: v0.18-3-gc96b1f1
+package B::Hooks::Parser; # git description: v0.20-4-g44a7b86
 # ABSTRACT: Interface to perl's parser variables
 # KEYWORDS: perl internals API parser hooks modify
 
 use B::Hooks::OP::Check;
 use parent qw/DynaLoader/;
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 sub dl_load_flags { 0x01 }
 
@@ -42,7 +42,7 @@ B::Hooks::Parser - Interface to perl's parser variables
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Zefram Alexandr Ciornii Vincent Pit Liu Kang-min
+=for stopwords Karen Etheridge Zefram Vincent Pit Alexandr Ciornii Karl Williamson Liu Kang-min
 
 =over 4
 
@@ -143,11 +143,15 @@ Zefram <zefram@fysh.org>
 
 =item *
 
+Vincent Pit <perl@profvince.com>
+
+=item *
+
 Alexandr Ciornii <alexchorny@gmail.com>
 
 =item *
 
-Vincent Pit <perl@profvince.com>
+Karl Williamson <khw@cpan.org>
 
 =item *
 

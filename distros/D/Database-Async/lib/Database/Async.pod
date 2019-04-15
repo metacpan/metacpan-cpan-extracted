@@ -208,9 +208,41 @@ Returns the configured L<URI> for populating database instances.
 
 Returns the L<Database::Async::Pool> instance.
 
+=head2 pool_args
+
+Returns a list of standard pool constructor arguments.
+
 =head2 configure
 
 Applies configuration, see L<IO::Async::Notifier> for details.
+
+Supports the following named parameters:
+
+=over 4
+
+=item * C<uri> - the endpoint to use when connecting a new engine instance
+
+=item * C<engine> - the parameters to pass when instantiating a new L<Database::Async::Engine>
+
+=item * C<pool> - parameters for setting up the pool, or a L<Database::Async::Pool> instance
+
+=back
+
+=head2 ryu
+
+A L<Ryu::Async> instance, used for requesting sources, sinks and timers.
+
+=head2 new_source
+
+Instantiates a new L<Ryu::Source>.
+
+=head2 new_sink
+
+Instantiates a new L<Ryu::Sink>.
+
+=head2 new_future
+
+Instantiates a new L<Future>.
 
 =head1 METHODS - Internal, engine-related
 
@@ -228,6 +260,10 @@ Loads the appropriate engine class and attaches to the loop.
 
 Called by L<Database::Async::Engine> instances when the engine is
 ready for queries.
+
+=head2 queue_query
+
+Assign the given query to the next available engine instance.
 
 =head1 SEE ALSO
 
@@ -338,9 +374,6 @@ backends, uses tied hashes and arrays
 
 =over 4
 
-=item * L<DBIx::Async> - I wrote this as a proof-of-concept for running DBI in a separate process,
-for basic non-blocking access from L<IO::Async>. Wouldn't recommend using it though.
-
 =item * L<DBI::Easy> - seems to be a wrapper around L<DBI>
 
 =item * L<AnyData> - interface between L<DBI> and arbitrary data sources such as XML or HTML
@@ -371,5 +404,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2018. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
 

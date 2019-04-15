@@ -5,7 +5,7 @@ package Alt::Data::Frame::ButMore;
 use strict;
 use warnings;
 
-our $VERSION = '0.0041'; # VERSION
+our $VERSION = '0.0043'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 STATUS
 
@@ -39,7 +39,6 @@ This library is current experimental.
                 y => ( sequence(4) >= 2 ) ,
                 x => [ qw/foo bar baz quux/ ],
             ] );
-
     say $df;
     # ---------------
     #     z  y  x
@@ -50,8 +49,9 @@ This library is current experimental.
     #  3  4  1  quux
     # ---------------
 
-    say $df->at(0);
-    # [1 2 3 4]
+    say $df->at(0);         # [1 2 3 4]
+    say $df->at(0)->length; # 4
+    say $df->at('x');       # [1 2 3 4]
 
     say $df->select_rows( 3,1 );
     # ---------------
@@ -79,6 +79,13 @@ So here I release my L<Alt> implenmentation.
 
 This implements a data frame container that uses L<PDL> for individual columns.
 As such, it supports marking missing values (C<BAD> values).
+
+=head2 Document Conventions
+
+Function signatures in docs of this library follow the
+L<Function::Parameters> conventions, for example,
+
+    function(Type1 $positional_parameter, Type2 :$named_parameter)
 
 =head1 CONSTRUCTION
 
@@ -118,7 +125,7 @@ C<HashRef> (sorted with a stringwise C<cmp>).
 
 =back
 
-=head1 METHODS
+=head1 METHODS / BASIC
 
 =head2 string
 
@@ -126,41 +133,33 @@ C<HashRef> (sorted with a stringwise C<cmp>).
 
 Returns a string representation of the C<Data::Frame>.
 
-=head2 number_of_columns
+=head2 ncol / length / number_of_columns
 
+These methods are same,
+
+    # returns Int
+    ncol()
+    length()
     number_of_columns() # returns Int
 
 Returns the count of the number of columns in the C<Data::Frame>.
 
-=head2 ncol
+=head2 nrow / number_of_rows
 
-    ncol()
+These methods are same,
 
-This is same as C<number_of_columns>.
-
-=head2 length
-
-    length()
-
-This is same as C<number_of_columns>.
-
-=head2 number_of_rows
-
+    # returns Int
+    nrow()
     number_of_rows() # returns Int
 
 Returns the count of the number of rows in the C<Data::Frame>.
-
-=head2 nrow
-
-    nrow()
-
-This is same as C<number_of_rows>.
 
 =head2 dims
 
     dims()
 
-Returns the dimensions of the data frame object, in an array of C<($nrow, $ncol)>.
+Returns the dimensions of the data frame object, in an array of
+C<($nrow, $ncol)>.
 
 =head2 shape
 
@@ -201,13 +200,24 @@ In-place delete column given by C<$col_name>.
 
 In-place rename columns.
 
-=head2 select_columns
+It can take either,
 
-    select_columns($indexer)
+=over 4
 
-Returns a new data frame object which has the columns selected by C<$indexer>.
+=item *
 
-If a given argument is non-indexer, it would coerce it by C<indexer_s()>.
+A hashref of key mappings.
+
+If a keys does not exist in the mappings, it would not be renamed.
+
+=item *
+
+A coderef which transforms each key.
+
+=back
+
+    $df->rename( { $from_key => $to_key, ... } );
+    $df->rename( sub { $_[0] . 'foo' } );
 
 =head2 set
 
@@ -221,18 +231,22 @@ Sets data to column. If C<$col_name> does not exist, it would add a new column.
 
 Returns true if the data frame has no rows.
 
-=head2 nth_columm
+=head2 names / col_names / column_names
 
-    number_of_rows(Int $n) # returns a column
+These methods are same
 
-Returns column number C<$n>. Supports negative indices (e.g., $n = -1 returns
-the last column).
+    # returns ArrayRef
+    names()
+    names( $new_column_names )
+    names( @new_column_names )
 
-=head2 column_names
+    col_names()
+    col_names( $new_column_names )
+    col_names( @new_column_names )
 
-    column_names() # returns an ArrayRef
-
-    column_names( @new_column_names ) # returns an ArrayRef
+    column_names()
+    column_names( $new_column_names )
+    column_names( @new_column_names )
 
 Returns an C<ArrayRef> of the names of the columns.
 
@@ -240,29 +254,15 @@ If passed a list of arguments C<@new_column_names>, then the columns will be
 renamed to the elements of C<@new_column_names>. The length of the argument
 must match the number of columns in the C<Data::Frame>.
 
-=head2 col_names
-
-    col_names($new_names)
-
-This is same as C<column_names>.
-
-=head2 names
-
-    names($new_names)
-
-This is same as C<column_names>.
-
 =head2 row_names
 
-    row_names() # returns a PDL
+    # returns a PDL::SV
+    row_names()
+    row_names( Array @new_row_names )
+    row_names( ArrayRef $new_row_names )
+    row_names( PDL $new_row_names )
 
-    row_names( Array @new_row_names ) # returns a PDL
-
-    row_names( ArrayRef $new_row_names ) # returns a PDL
-
-    row_names( PDL $new_row_names ) # returns a PDL
-
-Returns an C<ArrayRef> of the names of the columns.
+Returns an C<PDL::SV> of the names of the rows.
 
 If passed a argument, then the rows will be renamed. The length of the argument
 must match the number of rows in the C<Data::Frame>.
@@ -272,6 +272,13 @@ must match the number of rows in the C<Data::Frame>.
     column( Str $column_name )
 
 Returns the column with the name C<$column_name>.
+
+=head2 nth_column
+
+    number_of_rows(Int $n) # returns a column
+
+Returns column number C<$n>. Supports negative indices (e.g., $n = -1 returns
+the last column).
 
 =head2 add_columns
 
@@ -285,6 +292,50 @@ Adds all the columns in C<@column_pairlist> to the C<Data::Frame>.
 
 Adds a single column to the C<Data::Frame> with the name C<$name> and data
 C<$data>.
+
+=head2 copy / clone
+
+These methods are same,
+
+    copy()
+    clone()
+
+Make a deep copy of this data frame object.
+
+=head2 summary
+
+    summary($percentiles=[0.25, 0.75])
+
+Generate descriptive statistics that summarize the central tendency,
+dispersion and shape of a dataset’s distribution, excluding C<BAD> values.
+
+Analyzes numeric datetime columns only. For other column types like
+C<PDL::SV> and C<PDL::Factor> gets only good value count.
+Returns a data frame of the summarized statistics.
+
+Parameters:
+
+=over 4
+
+=item *
+
+$percentiles
+
+The percentiles to include in the output. All should fall between 0 and 1.
+The default is C<[.25, .75]>, which returns the 25th, 50th, and 75th
+percentiles (median is always automatically included).
+
+=back
+
+=head1 METHODS / SELECTING AND INDEXING
+
+=head2 select_columns
+
+    select_columns($indexer)
+
+Returns a new data frame object which has the columns selected by C<$indexer>.
+
+If a given argument is non-indexer, it would coerce it by C<indexer_s()>.
 
 =head2 select_rows
 
@@ -304,6 +355,49 @@ values in the child data frame columns will appear in the parent data frame.
 
 If no indices are given, a C<Data::Frame> with no rows is returned.
 
+=head2 head
+
+    head( Int $n=6 )
+
+If $n ≥ 0, returns a new C<Data::Frame> with the first $n rows of the
+C<Data::Frame>.
+
+If $n < 0, returns a new C<Data::Frame> with all but the last -$n rows of the
+C<Data::Frame>.
+
+See also: R's L<head|https://stat.ethz.ch/R-manual/R-devel/library/utils/html/head.html> function.
+
+=head2 tail
+
+    tail( Int $n=6 )
+
+If $n ≥ 0, returns a new C<Data::Frame> with the last $n rows of the
+C<Data::Frame>.
+
+If $n < 0, returns a new C<Data::Frame> with all but the first -$n rows of the
+C<Data::Frame>.
+
+See also: R's L<tail|https://stat.ethz.ch/R-manual/R-devel/library/utils/html/head.html> function.
+
+=head2 slice
+
+    my $subset1 = $df->slice($row_indexer, $column_indexer);
+
+    # Note that below two cases are different.
+    my $subset2 = $df->slice($column_indexer);
+    my $subset3 = $df->slice($row_indexer, undef);
+
+Returns a new dataframe object which is a slice of the raw data frame.
+
+This method returns an lvalue which allows PDL-like C<.=> assignment for
+changing a subset of the raw data frame. For example,
+
+    $df->slice($row_indexer, $column_indexer) .= $another_df;
+    $df->slice($row_indexer, $column_indexer) .= $piddle;
+
+If a given argument is non-indexer, it would try guessing if the argument
+is numeric or not, and coerce it by either C<indexer_s()> or C<indexer_i()>.
+
 =head2 sample
 
     sample($n)
@@ -312,25 +406,30 @@ Get a random sample of rows from the data frame object, as a new data frame.
 
     my $sample_df = $df->sample(100);
 
-=head2 merge
+=head2 which
+
+    which(:$bad_to_val=undef, :$ignore_both_bad=true)
+
+Returns a pdl of C<[[col_idx, row_idx], ...]>, like the output of
+L<PDL::Primitive/whichND>.
+
+=head1 METHODS / MERGE
+
+=head2 merge / cbind
+
+These methods are same,
 
     merge($df)
-
-=head2 cbind
-
     cbind($df)
 
-This is same as C<merge()>.
+=head2 append / rbind
 
-=head2 append
+These methods are same,
 
     append($df)
-
-=head2 rbind
-
     rbind($df)
 
-This is same as C<append()>.
+=head1 METHODS / TRANSFORMATION AND GROUPING
 
 =head2 transform
 
@@ -345,21 +444,25 @@ C<$func> can be one of the following,
 
 =item *
 
-A function coderef. It would be applied to all columns.
+A function coderef.
+
+It would be applied to all columns.
 
 =item *
 
-A hashref of C<< { $column_name =E<gt> $coderef, ... } >>. It allows to apply
+A hashref of C<< { $column_name =E<gt> $coderef, ... } >>
 
-the function to the specified columns. The raw data frame's columns not 
-existing in the hashref be retained unchanged. Hashref keys not yet
-existing in the raw data frame can be used for creating new columns.
+It allows to apply the function to the specified columns. The raw data
+frame's columns not existing in the hashref be retained unchanged. Hashref
+keys not yet existing in the raw data frame can be used for creating new
+columns.
 
 =item *
 
-An arrayref like C<< [ $column_name =E<gt> $coderef, ... ] >>. In this mode
+An arrayref like C<< [ $column_name =E<gt> $coderef, ... ] >>
 
-it's similar as the hasref above, but newly added columns would be in order.
+In this mode it's similar as the hasref above, but newly added columns
+would be in order.
 
 =back
 
@@ -416,49 +519,6 @@ values in C<$factor>.
 
 Note that C<$factor> does not necessarily to be PDL::Factor.
 
-=head2 slice
-
-    my $subset1 = $df->slice($row_indexer, $column_indexer);
-
-    # Note that below two cases are different.
-    my $subset2 = $df->slice($column_indexer);
-    my $subset3 = $df->slice($row_indexer, undef);
-
-Returns a new dataframe object which is a slice of the raw data frame.
-
-This method returns an lvalue which allows PDL-like C<.=> assignment for
-changing a subset of the raw data frame. For example,
-
-    $df->slice($row_indexer, $column_indexer) .= $another_df;
-    $df->slice($row_indexer, $column_indexer) .= $piddle;
-
-If a given argument is non-indexer, it would try guessing if the argument
-is numeric or not, and coerce it by either C<indexer_s()> or C<indexer_i()>.
-
-=head2 assign
-
-    assign( (DataFrame|Piddle) $x )
-
-Assign another data frame or a piddle to this data frame for in-place change.
-
-C<$x> can be,
-
-=over 4
-
-*A data frame object having the same dimensions and column names as C<$self>.
-*A piddle having the same number of elements as C<$self>.
-
-=back
-
-This method is internally used by the C<.=> operation, below are same,
-
-    $df->assign($x);
-    $df .= $x;
-
-=head2 is_numeric_column
-
-    is_numeric_column($column_name_or_idx)
-
 =head2 sort
 
     sort($by_columns, $ascending=true)
@@ -487,36 +547,48 @@ are from the first occurrance of each unique row in the raw data frame.
 
 Compute a unique numeric id for each unique row in a data frame.
 
-=head2 copy
+=head1 METHODS / OTHERS
 
-    copy()
+=head2 assign
 
-Make a deep copy of this data frame object.
+    assign( (DataFrame|Piddle) $x )
 
-=head2 clone
+Assign another data frame or a piddle to this data frame for in-place change.
 
-    clone()
+C<$x> can be,
 
-This is same as C<copy()>.
+=over 4
 
-=head2 which
+=item *
 
-    which(:$bad_to_val=undef, :$ignore_both_bad=true)
+A data frame object having the same dimensions and column names as C<$self>.
 
-Returns a pdl of C<[[col_idx, row_idx], ...]>, like the output of
-L<PDL::Primitive/whichND>.
+=item *
+
+A piddle having the same number of elements as C<$self>.
+
+=back
+
+This method is internally used by the C<.=> operation, below are same,
+
+    $df->assign($x);
+    $df .= $x;
+
+=head2 is_numeric_column
+
+    is_numeric_column($column_name_or_idx)
 
 =head1 MISCELLANEOUS FEATURES
 
-=head2 SERIALIZATION
+=head2 Serialization
 
 See L<Data::Frame::IO::CSV>
 
-=head2 SYNTAX SUGAR
+=head2 Syntax Sugar
 
 See L<Data::Frame::Partial::Sugar>
 
-=head2 TIDY EVALUATION
+=head2 Tidy Evaluation
 
 This feature is somewhat similar to R's tidy evaluation.
 
@@ -524,11 +596,11 @@ See L<Data::Frame::Partial::Eval>.
 
 =head1 VARIABLES
 
-=head1 doubleformat
+=head2 doubleformat
 
 This is used when stringifying the data frame. Default is C<'%.8g'>.
 
-=head1 TOLERANCE_REL
+=head2 TOLERANCE_REL
 
 This is the relative tolerance used when comparing numerical values of two
 data frames.
@@ -540,9 +612,9 @@ Default is C<undef>, which means no tolerance at all. You can set it like,
 
 =over 4
 
-=item * L<Alt>
-
 =item * L<Data::Frame::Examples>
+
+=item * L<Alt>
 
 =item * L<PDL>
 

@@ -1,3 +1,8 @@
+0.488   2019-04-14 (PERLANCAR)
+
+	- Bump prereq Log::ger to 0.027 (including in generated).
+
+
 0.487   2018-11-29 (PERLANCAR)
 
 	- Bump generated prereq version: Perinci::CmdLine::{Base,Lite}

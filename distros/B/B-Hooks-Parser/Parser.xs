@@ -1,15 +1,25 @@
 #define __PARSER_XS__
 
+/* This has a too cosy relationship with the core, of necessity.  Define this
+ * so that the functions it needs are available, while they can still be
+ * restricted from normal XS modules (as long as they don't cheat) */
+#define PERL_EXT
+
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
 
-#define NEED_PL_parser
+#define NEED_PL_parser_GLOBAL
 #include "ppport.h"
 
 #include "hook_parser.h"
-#include "stolen_chunk_of_toke.c"
+
+/* Before perl core changed to give us access to these functions, we used a
+ * stolen (and outdated for many releases) copy */
+#if ! defined(scan_word) || ! defined(scan_str) || ! defined(skipspace_flags)
+#  include "stolen_chunk_of_toke.c"
+#endif
 
 #define NOT_PARSING (!PL_parser || !PL_bufptr)
 
@@ -167,12 +177,12 @@ hook_toke_scan_word (pTHX_ int offset, int handle_package, char *dest, STRLEN de
 
 char *
 hook_toke_skipspace (pTHX_ char *s) {
-	return skipspace (s);
+	return skipspace_flags (s, 0);
 }
 
 char *
 hook_toke_scan_str (pTHX_ char *s) {
-	return scan_str (s, 0, 0);
+	return scan_str (s, 0, 0, 0, NULL);
 }
 
 MODULE = B::Hooks::Parser  PACKAGE = B::Hooks::Parser  PREFIX = hook_parser_

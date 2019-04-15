@@ -1,5 +1,17 @@
 Revision history for Ryu
 
+1.001     2019-04-15 05:44:47+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - sources populated from an immediate source (e.g. from an arrayref)
+    will stream data via the `->{on_get}` callback the first time
+    ->completed is called, since there's no guarantee we will be calling
+    ->await on the top-level source.
+
+    Bugs fixed:
+
+    - ->buffer sources now only complete once the queue is drained.
+
 1.000     2019-04-08 22:56:19+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -1,3 +1,8 @@
+0.003   2019-04-13 (PERLANCAR)
+
+	- Bump prereq Devel::Caller::Util 0.040 -> 0.042 [RT#129150].
+
+
 0.002   2019-04-12 (PERLANCAR)
 
 	- Instead of using offsets, use Devel::Caller::Util's

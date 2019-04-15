@@ -21,7 +21,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS @ISA);
 
 #use Data::Dumper;
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(
@@ -219,6 +219,7 @@ sub parse_text {
   my $cites_clean = $cites;
   # tidy up string, escape nasty characters etc.
   $cites_clean =~ s/\s+/+/g; #$cites_clean = uri_escape_utf8($cites_clean);
+  #print $cites_clean;
   # crossref like us to give a mailto email when making request so they can get in touch if the script is generating errors,
   # feel free to change the email address here to something more appropriate
   # change to using /works API instead of /dois API
@@ -228,7 +229,7 @@ sub parse_text {
   if ($res->is_success) {
     # extract json response
     my $json = decode_json($res->decoded_content);
-    use Data::Dumper;
+    #use Data::Dumper;
     #print Dumper($json->{'message'}{'items'});
     my $ref={};
     # keep a record of the query string we used
@@ -242,7 +243,8 @@ sub parse_text {
     $ref->{'score'} = $response->{'score'}; #$json->[0]{'normalizedScore'};
     $ref->{'issue'} = $response->{'journal-issue'}{'issue'};
     $ref->{'genre'} = $response->{'type'};
-    if ($ref->{'genre'} eq 'journal-article') { $ref->{'genre'}='article';} # for backward compatibility
+    if ($ref->{'genre'} =~ m/journal-article/) { $ref->{'genre'}='article';} # for backward compatibility
+    #print $ref->{'genre'};
     $ref->{'jtitle'} = $response->{'container-title'}[0];
     $ref->{'atitle'} = $response->{'title'}[0];
     $ref->{'volume'} = $response->{'volume'};

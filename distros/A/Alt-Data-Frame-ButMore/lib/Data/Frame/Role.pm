@@ -23,7 +23,7 @@ Data::Frame::Role - For creating roles in Data::Frame
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 

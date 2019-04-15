@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 TODO.otl
+appveyor.yml
 cpanfile
 data-raw/airquality.csv
 data-raw/diamonds.csv
@@ -18,7 +19,6 @@ data-raw/mpg.csv
 data-raw/mtcars.csv
 data-raw/txhousing.csv
 dist.ini
-example/iris-data.pl
 lib/Alt/Data/Frame/ButMore.pm
 lib/Data/Frame.pm
 lib/Data/Frame/Autobox/Array.pm
@@ -70,7 +70,6 @@ t/pdl-logical.t
 t/pdl-stringifiable-ext.t
 t/pdl-sv-new.t
 t/pdl-sv.t
-t/rlike-TODO.t
 t/rlike.t
 t/subset.t
 t/traits.t

@@ -17,7 +17,7 @@ use HiPi qw( :i2c :mpl3115a2 :rpi );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 __PACKAGE__->create_accessors( qw( osdelay backend ) );
 

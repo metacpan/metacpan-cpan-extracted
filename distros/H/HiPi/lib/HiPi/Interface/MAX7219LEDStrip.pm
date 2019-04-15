@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::MAX7219LEDStrip
 # Description  : Interface to strip of MAX7219 driven LEDs
-# Copyright    : (c) 2018 Mark Dootson
+# Copyright    : (c) 2018-2019 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -19,7 +19,7 @@ use HiPi::Graphics::Font5x7 qw( :font );
 use Try::Tiny;
 use Carp;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 __PACKAGE__->create_ro_accessors( qw( segments pixel_width pixel_height reverse_map ) );
 
@@ -97,8 +97,8 @@ sub clear {
     
     $self->buffer (
         HiPi::Utils::BitBuffer->new(
-            width       => $self->width,
-            height      => $self->height,
+            width       => $self->pixel_width,
+            height      => $self->pixel_height,
             autoresize  => 1,
         )
     );
@@ -276,9 +276,11 @@ sub show {
     $databuf->flip($self->pixel_width, $self->pixel_height) if $self->_rotate180;
     
     my @linebuffers = ([], [], [], [], [], [], [], []);
+    
+    my $maxsegment = $self->segments - 1;
         
     for (my $segment = 0; $segment < $self->segments; $segment ++) {
-        my $offset_x = ( 7 - $segment ) * 8;
+        my $offset_x = ( $maxsegment - $segment ) * 8;
         
         my @buffer = ( 0 ) x 8;
         

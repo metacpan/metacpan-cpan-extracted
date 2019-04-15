@@ -1,0 +1,68 @@
+NAME
+    LWP::UserAgent::Plugin::Cache - Cache LWP::UserAgent responses
+
+VERSION
+    This document describes version 0.001 of LWP::UserAgent::Plugin::Cache
+    (from Perl distribution LWP-UserAgent-Plugin-Cache), released on
+    2019-04-15.
+
+SYNOPSIS
+     use LWP::UserAgent::Plugin 'Cache' => {
+         max_age  => '3600',     # defaults to LWP_USERAGENT_PLUGIN_CACHE_MAX_AGE or CACHE_MAX_AGE or 86400
+         cache_if => qr/^[23]/,  # optional, default is to cache all responses
+     };
+
+     my $res  = LWP::UserAgent::Plugin->new->get("http://www.example.com/");
+     my $res2 = LWP::UserAgent::Plugin->request(GET => "http://www.example.com/"); # cached response
+
+DESCRIPTION
+    This plugin can cache responses to cache files.
+
+    Currently only GET requests are cached. Cache are keyed by
+    SHA256-hex(URL). Error responses are also cached (unless you configure
+    "/cache_if"). Currently no cache-related HTTP request or response
+    headers (e.g. "Cache-Control") are respected.
+
+CONFIGURATION
+  max_age
+    Int.
+
+  cache_if
+    Regex or code. If regex, then will be matched against response status.
+    If code, will be called with arguments: "($self, $response)".
+
+ENVIRONMENT
+  CACHE_MAX_AGE
+    Int. Will be consulted after "LWP_USERAGENT_PLUGIN_CACHE_MAX_AGE".
+
+  LWP_USERAGENT_PLUGIN_CACHE_MAX_AGE
+    Int. Will be consulted before "CACHE_MAX_AGE".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Plugin-Cache>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Plugin-Cache>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Plugin-
+    Cache>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    LWP::UserAgent::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

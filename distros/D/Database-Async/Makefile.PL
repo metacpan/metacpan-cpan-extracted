@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.024;
 
 use ExtUtils::MakeMaker 6.48;
 
@@ -14,16 +14,17 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Database-Async",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Database::Async",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
     "Future" => "0.38",
+    "Future::AsyncAwait" => "0.22",
     "IO::Async" => "0.68",
     "IO::Async::Notifier" => "0.68",
     "Log::Any" => "1.050",
     "Module::Load" => 0,
-    "Ryu" => "0.027",
+    "Ryu" => "1.001",
     "Ryu::Async" => "0.011",
     "URI" => 0,
     "URI::db" => "0.19",
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Refcount" => "0.07"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,13 +54,14 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Future" => "0.38",
+  "Future::AsyncAwait" => "0.22",
   "IO::Async" => "0.68",
   "IO::Async::Notifier" => "0.68",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::Any" => "1.050",
   "Module::Load" => 0,
-  "Ryu" => "0.027",
+  "Ryu" => "1.001",
   "Ryu::Async" => "0.011",
   "Test::CheckDeps" => "0.010",
   "Test::Fatal" => "0.010",

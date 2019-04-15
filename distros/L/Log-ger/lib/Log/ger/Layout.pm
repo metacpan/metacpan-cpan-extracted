@@ -1,7 +1,7 @@
 package Log::ger::Layout;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.026'; # VERSION
+our $DATE = '2019-04-13'; # DATE
+our $VERSION = '0.027'; # VERSION
 
 use parent qw(Log::ger::Plugin);
 
@@ -24,7 +24,7 @@ Log::ger::Layout - Use a layout plugin
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

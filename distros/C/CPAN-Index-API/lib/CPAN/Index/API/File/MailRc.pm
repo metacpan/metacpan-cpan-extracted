@@ -1,9 +1,6 @@
 package CPAN::Index::API::File::MailRc;
-{
-  $CPAN::Index::API::File::MailRc::VERSION = '0.007';
-}
 
-# ABSTRACT: Interface to 01mailrc.txt
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -66,18 +63,13 @@ sub default_location { 'authors/01mailrc.txt.gz' }
 
 __PACKAGE__->meta->make_immutable;
 
-
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::File::MailRc - Interface to 01mailrc.txt
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::File::MailRc - Interface to C<01mailrc.txt>.
 
 =head1 SYNOPSIS
 
@@ -91,20 +83,20 @@ version 0.007
 
 =head1 DESCRIPTION
 
-This is a class to read and write 01mailrc.txt
+This is a class to read and write C<01mailrc.txt>.
 
 =head1 METHODS
 
 =head2 authors
 
-List of hashres containing author data. The structure of the hashrefs is
+List of hashrefs containing author data. The structure of the hashrefs is
 as follows:
 
 =over
 
 =item authorid
 
-CPAN id of the author. This should be a string containing only capital latin
+CPAN id of the author. This should be a string containing only capital Latin
 letters and is at least 2 characters long.
 
 =item name
@@ -123,7 +115,7 @@ List of authors sorted by pause id.
 
 =head2 parse
 
-Parses the file and reurns its representation as a data structure.
+Parses the file and returns its representation as a data structure.
 
 =head2 default_location
 
@@ -159,19 +151,7 @@ Default file location - C<authors/01mailrc.txt.gz>.
 
 =back
 
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-
 
 __DATA__
 [%

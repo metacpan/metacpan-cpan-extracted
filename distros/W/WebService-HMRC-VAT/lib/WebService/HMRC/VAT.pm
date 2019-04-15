@@ -15,11 +15,11 @@ WebService::HMRC::VAT - Interact with the UK HMRC VAT API
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -27,7 +27,7 @@ our $VERSION = '0.03';
     my $vat = WebService::HMRC::VAT->new({
         vrn => '123456789'
     });
-    $vat->auth->access_token->('MY-ACCESS-TOKEN');
+    $vat->auth->access_token('MY-ACCESS-TOKEN');
 
     # Display outstanding VAT returns
     my $result = $vat->obligations({

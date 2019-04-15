@@ -2,7 +2,7 @@ NAME
     Log::ger::Layout::Pattern - Pattern layout
 
 VERSION
-    version 0.003
+    version 0.004
 
 SYNOPSIS
      use Log::ger::Layout 'Pattern', format => '%d (%F:%L)> %m';

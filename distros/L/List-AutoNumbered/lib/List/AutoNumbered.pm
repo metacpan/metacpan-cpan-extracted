@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000007';
 
 # Exports
 use parent 'Exporter';
@@ -17,6 +17,9 @@ BEGIN {
         all => [@EXPORT, @EXPORT_OK]
     );
 }
+
+# Imports
+use Getargs::Mixed;
 
 # Documentation ======================================================== {{{1
 
@@ -73,16 +76,57 @@ sub _dor { (defined $_[0]) ? $_[0] : $_[1] }
 
 =head2 new
 
-Constructor.  Call as C<< $class->new($number) >>.  Each successive element
+Constructor.  Basic usage options:
+
+    $list = List::AutoNumbered->new();      # first list item is number 1
+    $list = List::AutoNumbered->new($num);  # first list item is $num+1
+    $list = List::AutoNumbered->new(-at => $num);   # ditto
+
+Each successive element
 will have the next number, unless you say otherwise (e.g., using
-L<LSKIP()|/LSKIP>).  Specifically, the first item in the list will have
-C<$number+1>.
+L<LSKIP()|/LSKIP>).  Specifically, the first item in the list will be numbered
+one higher than the number passed to the C<List::AutoNumbered> constructor.
+
+Constructor parameters are processed using L<Getargs::Mixed>, so positional
+and named parameters are both OK.
+
+=head3 The C<how> function
+
+You can give the constructor a "how" function that will make the list entry
+for a single L<load()|/load> or L<add()|/add> call:
+
+    $list = List::AutoNumbered->new(-how => sub { @_ });
+        # Jam everything together to make a flat array
+    $list = List::AutoNumbered->new(41, sub { @_ });
+        # Positional is OK, too.
+
+The C<how> function is called as C<how($num, @data)>.  C<$num> is the
+line number for L<load()|/load> calls, or C<undef> for L<add()|/add> calls.
+C<@data> is whatever data you passed to C<load()> or C<add()>.  For example,
+the default C<how> function is:
+
+    sub how {
+        shift unless defined $_[0];     # add passes undef as the line number.
+        [@_]                            # Wrap everything in an arrayref.
+    }
+
+See C<t/05-custom-list-entry.t> for examples of custom C<how> functions.
 
 =cut
 
 sub new {
-    my $class = shift;
-    my $self = bless {num => _dor(shift, 0), arr => []}, $class;
+    my ($class, %args) = parameters('self',[qw(; at how)], @_);
+    my $self = bless {
+        num => _dor($args{at}, 0),  # The last number used
+        arr => [],                  # The data
+        how => _dor($args{how},     # Routine to make a list item
+                    sub {
+                        shift unless defined $_[0];     # add passes undef
+                                                        # as the line number.
+                        [@_]        # By default, just wrap it
+                    }
+                ),
+    }, $class;
 
     # Make a loader that adds an item and returns itself --- not $self.
     # Note that $self is captured --- the loader function does not take
@@ -163,7 +207,7 @@ sub _L {
 
     shift if $self->_update_lnum(@_);   # Check for skipped lines from LSKIP()
 
-    push @{ $self->{arr} }, [$self->{num}, @_];
+    push @{ $self->{arr} }, $self->{how}->($self->{num}, @_);
     return $self;
 } #_L()
 
@@ -179,7 +223,7 @@ Returns the instance.
 sub add {   # just add it
     my $self = shift;
     shift if $self->_update_lnum(@_);   # Check for skipped lines from LSKIP()
-    push @{ $self->{arr} }, [@_];
+    push @{ $self->{arr} }, $self->{how}->(undef, @_);
     return $self;
 } #add
 

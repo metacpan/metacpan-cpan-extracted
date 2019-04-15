@@ -1,5 +1,9 @@
 Revision history for App::FatPacker::Simple
 
+0.09  2019-04-14 17:24:21 JST
+
+    - Add --cache option for perl-strip
+
 0.08  2017-05-10 18:22:15 CEST
 
     - Allow *.pl files to be fatpacked (#8 ccakes)

@@ -1,5 +1,4 @@
 {
-   "feed_url": "https://example.com/feed",
    "entry_dir": "./archives",
    "publish_dir": "./public",
    "title_prefix": "p1k3",

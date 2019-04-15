@@ -11,11 +11,11 @@ yt-oauth - A simple script for retrieving access and refresh tokens
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Carp;
 use Getopt::Long qw(:config auto_help gnu_getopt);
@@ -23,6 +23,8 @@ use HTTP::Tiny;
 use JSON;
 use Pod::Usage;
 use Socket;
+
+use App::WatchLater::Browser;
 
 BEGIN {
   my ($ok, $why) = HTTP::Tiny->can_ssl;
@@ -45,36 +47,37 @@ URL
 # automatically reaped instead of turning into zombie processes.
 $SIG{CHLD} = 'IGNORE';
 
-sub listen_for_code {
-  my ($pipe, $sock) = @_;
-  listen $sock, SOMAXCONN;
-  accept my $client, $sock;
-  select $client; $| = 1;
-  print "204 No Content\r\n\r\n";
-  my $response = <$client>;
-  print $pipe $response;
-  exit;
-}
-
 sub start_http_listener {
-  # setup pipe to communicate response back to parent
-  pipe my $r, my $w;
-
-  # setup socket for listening
+  # setup socket to listen on arbitrary unused port
   socket my $sock, PF_INET, SOCK_STREAM, 0;
   my $sockaddr = pack_sockaddr_in 0, v127.0.0.1;
   bind $sock, $sockaddr;
   my ($port) = unpack_sockaddr_in getsockname $sock;
 
-  if (fork) {
+  # setup a pipe and fork
+  if (open my $fh, '-|') {
     # parent
-    close $w;
-    close $sock;
-    return ($port, $r);
+    return ($port, $fh);
   } else {
     # child
-    close $r;
-    listen_for_code $w, $sock;
+    listen $sock, SOMAXCONN;
+    accept(my $client, $sock);
+
+    # response displayed to user after credentials are obtained
+    $client->autoflush(1);
+    print $client qq(HTTP/1.1 200 OK\r\n);
+    print $client qq(Content-Language: en-US\r\n);
+    print $client qq(Content-Type: text/html\r\n);
+    print $client qq(\r\n);
+    print $client qq(<html lang="en"><body>\r\n);
+    print $client qq(Successfully obtained OAuth credentials.\r\n);
+    print $client qq(This page may be closed.\r\n);
+    print $client qq(</body></html>);
+
+    # print credentials to pipe
+    my $response = <$client>;
+    print $response;
+    exit;
   }
 }
 
@@ -84,7 +87,7 @@ sub authenticate {
   my $oauth_url = OAUTH_URL_TEMPLATE;
   $oauth_url =~ s/CLIENT_ID/$CLIENT_ID/;
   $oauth_url =~ s/PORT/$port/;
-  say "Please visit $oauth_url in your browser.";
+  open_url($oauth_url);
 
   my $response = <$fh>;
 

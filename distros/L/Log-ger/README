@@ -2,7 +2,7 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.026
+    version 0.027
 
 SYNOPSIS
     In your module (producer):

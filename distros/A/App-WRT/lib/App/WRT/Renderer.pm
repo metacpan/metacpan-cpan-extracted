@@ -8,6 +8,8 @@ use base qw(Exporter);
 our @EXPORT_OK = qw(render);
 
 use App::WRT::Util qw(file_put_contents);
+
+use Carp;
 use Data::Dumper;
 use File::Basename;
 use File::Copy;
@@ -21,18 +23,18 @@ sub render {
   # Expects a callback to be used to log (or print) rendering diagnostics:
   my ($logger) = @_;
   ref($logger) eq 'CODE' or
-    die "Error: render() expects an anonymous function $!";
+    croak("Error: render() expects an anonymous function");
 
-  my $entry_dir = $wrt->entry_dir;
-  my $publish_dir = $wrt->publish_dir;
+  my $entry_dir = $wrt->{entry_dir};
+  my $publish_dir = $wrt->{publish_dir};
 
   # Use this to log elapsed render time:
   my $start_time = [Time::HiRes::gettimeofday()];
 
-  # Insure that publication path exists and is a directory:
+  # Ensure that publication path exists and is a directory:
   if (-e $publish_dir) {
     unless (-d $publish_dir) {
-      die("$publish_dir exists but is not a directory");
+      croak("$publish_dir exists but is not a directory");
     }
   } else {
     my $path_err;
@@ -40,14 +42,14 @@ sub render {
     $logger->("Attempting to create $publish_dir");
     if (@{ $path_err }) {
       $logger->(Dumper($path_err));
-      die("Could not create $publish_dir: " . Dumper($path_err));
+      croak("Could not create $publish_dir: " . Dumper($path_err));
     }
   }
 
   # Handle the front page and Atom feed:
   file_put_contents("${publish_dir}/index.html", $wrt->display('new'));
 
-  my $feed_alias = $wrt->feed_alias;
+  my $feed_alias = $wrt->{feed_alias};
   my $feed_content = $wrt->display($feed_alias);
   file_put_contents("${publish_dir}/${feed_alias}", $feed_content);
   file_put_contents("${publish_dir}/${feed_alias}.xml", $feed_content);
@@ -57,12 +59,12 @@ sub render {
 
   my $rendered_count = 0;
   my $copied_count   = 0;
-  for my $target ($wrt->get_all_source_files(), @meta_paths)
+  for my $target ($wrt->{entries}->all(), @meta_paths)
   {
     my $path_err;
 
     # Lowercase and alpanumeric + underscores + dashes, no dots - an entry:
-    if ($target =~ $wrt->entrypath_expr) {
+    if ($target =~ $wrt->{entrypath_expr}) {
       make_path("${publish_dir}/$target", { error => \$path_err });
       $logger->(Dumper($path_err)) if @{ $path_err };
 
@@ -84,7 +86,7 @@ sub render {
     # Some other file - a static asset of some kind:
     my $dirname = dirname($target);
     $logger->("[copy] archives/$target -> ${publish_dir}/$target");
-    make_path("public/$dirname", { error => \$path_err });
+    make_path("$publish_dir/$dirname", { error => \$path_err });
     $logger->(Dumper($path_err)) if @{ $path_err };
     copy("$entry_dir/$target", "${publish_dir}/$target");
     $copied_count++;

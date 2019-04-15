@@ -1,3 +1,11 @@
+0.002   2019-04-14 (PERLANCAR)
+
+	- Observe HTTP_TINY_PLUGINS.
+
+	- [ux][bugfix] Don't set_plugins() if user does not specify any
+	  plugins during import.
+
+
 0.001    2019-04-12 (PERLANCAR)
 
          - First release.

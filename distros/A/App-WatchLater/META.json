@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-WatchLater",
    "prereqs" : {
@@ -29,8 +29,9 @@
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "HTTP::Tiny" : "0.055",
-            "IO::Socket::SSL" : "0",
+            "IO::Socket::SSL" : "1.56",
             "JSON" : "0",
+            "Net::SSLeay" : "1.49",
             "Try::Tiny" : "0",
             "URI::Find" : "0",
             "perl" : "5.016"
@@ -47,19 +48,26 @@
    "provides" : {
       "App::WatchLater" : {
          "file" : "lib/App/WatchLater.pm",
-         "version" : "0.02"
+         "version" : "0.03"
+      },
+      "App::WatchLater::Browser" : {
+         "file" : "lib/App/WatchLater/Browser.pm",
+         "version" : "0.03"
       },
       "App::WatchLater::YouTube" : {
          "file" : "lib/App/WatchLater/YouTube.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://opensource.org/licenses/mit-license.php"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/bcc32/App-WatchLater"
+      }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

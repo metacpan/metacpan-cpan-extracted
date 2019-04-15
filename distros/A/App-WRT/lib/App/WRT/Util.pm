@@ -3,8 +3,11 @@ package App::WRT::Util;
 use strict;
 use warnings;
 
+use Carp;
+use Encode;
+
 use base qw(Exporter);
-our @EXPORT_OK = qw(dir_list get_date file_put_contents);
+our @EXPORT_OK = qw(dir_list get_date file_put_contents file_get_contents);
 
 =over
 
@@ -60,6 +63,35 @@ sub file_put_contents {
     or die "Unable to open $file for writing: $!";
   print $fh $contents;
   close $fh;
+}
+
+=item file_get_contents($file)
+
+Get contents string of $file path.  Because:
+
+L<https://secure.php.net/manual/en/function.file-get-contents.php>
+
+=cut
+
+sub file_get_contents {
+  my ($file) = @_;
+
+  open my $fh, '<', $file
+    or croak "Couldn't open $file: $!\n";
+
+  my $contents;
+  {
+    # line separator:
+    local $/ = undef;
+    $contents = <$fh>;
+  }
+
+  close $fh or croak "Couldn't close $file: $!";
+
+  # TODO: _May_ want to assume here that any file is UTF-8 text.
+  # http://perldoc.perl.org/perlunitut.html
+  # return decode('UTF-8', $contents);
+  return $contents;
 }
 
 =item get_date('key', 'other_key', ...)

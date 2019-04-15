@@ -51,7 +51,7 @@ Data::Frame::Partial::Eval - Partial class for data frame's eval method
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,6 @@
 package CPAN::Index::API::File::PackagesDetails;
-{
-  $CPAN::Index::API::File::PackagesDetails::VERSION = '0.007';
-}
 
-# ABSTRACT: Interface to 02packages.details.txt
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -159,18 +156,13 @@ sub default_location { 'modules/02packages.details.txt.gz' }
 
 __PACKAGE__->meta->make_immutable;
 
-
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::File::PackagesDetails - Interface to 02packages.details.txt
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::File::PackagesDetails - Interface to C<02packages.details.txt>.
 
 =head1 SYNOPSIS
 
@@ -184,9 +176,13 @@ version 0.007
 
 =head1 DESCRIPTION
 
-This is a class to read and write 03modlist.data
+This is a class to read and write C<03modlist.data>.
 
 =head1 METHODS
+
+=head2 package
+
+First package in the list.
 
 =head2 packages
 
@@ -203,7 +199,7 @@ Package name, e.g. C<Foo::Bar>.
 
 Package version, e.g. C<0.001>.
 
-=item distribuiton
+=item distribution
 
 Distribution the package belongs to, e.g. C<Foo-Bar-0.001>.
 
@@ -231,11 +227,15 @@ Absolute URI pointing to the file location.
 
 =head2 parse
 
-Parses the file and reurns its representation as a data structure.
+Parses the file and returns its representation as a data structure.
 
 =head2 default_location
 
 Default file location - C<modules/02packages.details.txt.gz>.
+
+=head2 sorted_packages
+
+The list of packages sorted by name.
 
 =head1 METHODS FROM ROLES
 
@@ -273,19 +273,7 @@ Default file location - C<modules/02packages.details.txt.gz>.
 
 =back
 
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-
 
 __DATA__
 File:         [% $self->filename       %]

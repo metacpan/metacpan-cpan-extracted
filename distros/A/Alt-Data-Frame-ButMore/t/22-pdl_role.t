@@ -2,7 +2,6 @@
 
 use Data::Frame::Setup;
 
-use PDL::Lite;
 use PDL::Core qw(pdl);
 use PDL::SV ();
 

@@ -1,5 +1,13 @@
 Revision history for Proc-ProcessTable-Colorizer
 
+0.3.1	 2019-04-14/22:55
+		 -Proc::ProcessTable does support nice on Linux.
+		 -wchan on linux is garbage as it just returns a address,
+		 	making it pointless to include on Linux.
+		 -Term::Size offset added for Linux.	
+		 -Test on CentOS 7.
+		 -White space cleanup.
+
 0.3.0	 2019-01-07/20:00
 		 -No longer uses BSD::Processes.
 

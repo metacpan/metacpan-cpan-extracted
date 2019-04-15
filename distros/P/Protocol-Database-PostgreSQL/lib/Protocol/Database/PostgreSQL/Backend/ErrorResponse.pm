@@ -3,7 +3,7 @@ package Protocol::Database::PostgreSQL::Backend::ErrorResponse;
 use strict;
 use warnings;
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 
 use parent qw(Protocol::Database::PostgreSQL::Backend);
 
@@ -15,9 +15,12 @@ Protocol::Database::PostgreSQL::Backend::ErrorResponse
 
 =cut
 
+use Protocol::Database::PostgreSQL::Error;
 use Log::Any qw($log);
 
 sub type { 'error_response' }
+
+sub error { shift->{error} }
 
 sub new_from_message {
     my ($class, $msg) = @_;
@@ -33,9 +36,9 @@ sub new_from_message {
         $notice{$Protocol::Database::PostgreSQL::NOTICE_CODE{$code}} = $str;
         substr $msg, 0, 2+length($str), '';
     }
-    $log->errorf("Error was %s", \%notice);
+    $log->tracef("Error was %s", \%notice);
     return $class->new(
-        %notice
+        error => Protocol::Database::PostgreSQL::Error->new(%notice)
     );
 }
 

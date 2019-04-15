@@ -1,3 +1,10 @@
+0.004   2019-04-14 (PERLANCAR)
+
+	- Replace JSON::XS with Storable.
+
+	- [doc] Mention HTTP::Tiny::Cache.
+
+
 0.003   2018-10-06 (PERLANCAR)
 
 	- [Bugfix] Forgot to only cache successful (2xx and 3xx) responses.

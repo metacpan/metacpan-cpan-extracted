@@ -113,6 +113,10 @@ lib/HiPi/Graphics/BitmapFont/SerifExtended37.pm
 lib/HiPi/Graphics/BitmapFont/SerifExtended9.pm
 lib/HiPi/Graphics/DrawingContext.pm
 lib/HiPi/Graphics/Font5x7.pm
+lib/HiPi/Huawei/E3531.pm
+lib/HiPi/Huawei/Errors.pm
+lib/HiPi/Huawei/HiLink.pm
+lib/HiPi/Huawei/Modem.pm
 lib/HiPi/Interface.pm
 lib/HiPi/Interface/Common/HD44780.pm
 lib/HiPi/Interface/Common/MCP23X17.pm

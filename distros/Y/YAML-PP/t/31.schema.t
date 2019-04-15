@@ -7,7 +7,6 @@ use B ();
 use Data::Dumper;
 use Scalar::Util qw/ blessed /;
 use YAML::PP;
-use YAML::PP::Schema::YAML1_1;
 
 my $jsonpp = eval { require JSON::PP };
 
@@ -85,7 +84,7 @@ for my $schema_names (sort keys %$schema_data) {
             if ($type =~ s/-(\w+)//) {
                 $subtype = $1;
             }
-            my $label = sprintf "($name) type %s: load(%s)", $def{type}, $def{yaml};
+            my $label = sprintf "(%s) type %s: load(%s)", $name, $def{type}, $def{yaml};
             if ($def{data} =~ m/^([\w-]+)\(\)$/) {
                 my $func_name = $1;
                 $func = $check{ $func_name };
@@ -98,7 +97,7 @@ for my $schema_names (sort keys %$schema_data) {
                 ok(! $is_float, "$label is not float");
 
                 unless ($func) {
-                    cmp_ok($def{data}, 'eq', $data, sprintf("$label eq '%s'", $def{data}));
+                    cmp_ok($def{data}, 'eq', $data, "$label eq '$def{data}'");
                 }
             }
             elsif ($type eq 'int') {
@@ -106,7 +105,7 @@ for my $schema_names (sort keys %$schema_data) {
                 ok(!$is_str, "$label is not str");
 
                 unless ($func) {
-                    cmp_ok($data, 'eq', $def{data}, sprintf("$label eq '%s'", $def{data}));
+                    cmp_ok($data, 'eq', $def{data}, "$label eq '$def{data}'");
                 }
             }
             elsif ($type eq 'float') {
@@ -116,7 +115,7 @@ for my $schema_names (sort keys %$schema_data) {
                 }
 
                 unless ($func) {
-                    cmp_ok($data, 'eq', $def{data}, sprintf("$label eq '%s'", $def{data}));
+                    cmp_ok($data, 'eq', $def{data}, "$label eq '$def{data}'");
                 }
             }
             elsif ($type eq 'bool' or $type eq 'null') {

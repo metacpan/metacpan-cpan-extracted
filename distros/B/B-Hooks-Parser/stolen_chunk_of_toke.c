@@ -19,15 +19,16 @@
 
 #include "EXTERN.h"
 #include "perl.h"
-#define NEED_PL_parser
+#define NEED_sv_2pv_flags
 #include "ppport.h"
 
 /* the following #defines are stolen from assorted headers, not toke.c (mst) */
 
-#define skipspace(a)            S_skipspace(aTHX_ a)
+#define skipspace_flags(a,b)    S_skipspace(aTHX_ a)
+#define skipspace(a)            skipspace_flags(a, 0)
 #define incline(a)              S_incline(aTHX_ a)
 #define filter_gets(a,b,c)      S_filter_gets(aTHX_ a,b,c)
-#define scan_str(a,b,c)         S_scan_str(aTHX_ a,b,c)
+#define scan_str(a,b,c,d,e)     S_scan_str(aTHX_ a,b,c)
 #define scan_word(a,b,c,d,e)    S_scan_word(aTHX_ a,b,c,d,e)
 
 STATIC void     S_incline(pTHX_ char *s);

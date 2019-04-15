@@ -47,7 +47,7 @@ if ($noTestOutput) {
     stdout_like(sub {$testcases[1]->()},qr{duplicate\(s\)\sfound}xms,'output with ignore filter');
     is(         $retval,'','return value with ignore filter');
 
-    stdout_is  (sub {$testcases[2]->()},"no files found for start dir(s) t with accept filter (?^msx:\\.t\$) and ignore filter (?^msx:\\d.*?\\.t\$)!\n",'output with accept & ignore regex filter');
+    stdout_like(sub {$testcases[2]->()},qr{no files found for start dir\(s\) t with accept filter \(\?[^:]*:\\\.t\$\)\ and ignore filter \(\?[^:]*:\\d\.\*\?\\\.t\$\)!\n},'output with accept & ignore regex filter');
     is(!defined $retval,1,'return value with accept & ignore regex filter');
 
     stdout_like(sub {$testcases[3]->()},qr{duplicate\(s\)\sfound}xms,'output with accept & ignore string filter');

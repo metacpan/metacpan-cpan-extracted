@@ -1,0 +1,120 @@
+Revision history for App::WRT
+
+v5.0.0 2019-04-14
+
+  - Add bin/wrt-ls for listing entries in current archive
+  - Add bin/wrt-config for displaying configuration info
+  - Allow header tags with attributes
+  - Minor documentation cleanup
+  - Bump XML::Atom::SimpleFeed to 0.900; remove wrt-fcgi
+  - Concatenation instead of variable interpolation in HTML::tag()
+  - Remove hardcoded "public" from renderer directory path copying
+  - Remove unused feed_url param from wrt-init and example dir
+  - Remove an extraneous JSON->convert_blessed(1) call
+  - WRT::entry(): fix glitch with contents list for binfile_expr matches
+  - Correctly encode feed output - see https://p1k3.com/2018/5/28/
+  - Add App::WRT::Util::file_get_contents();
+  - Optionally cache included files in-memory
+  - Add EntryStore, a class for wrapping various methods for finding entry lists
+  - Refactor display()
+  - Use Carp for errors
+  - Remove old LaTeX markup stuff
+  - Add this Changes file
+
+v5.0.0-alpha 2018-04-19
+
+  - Use 5 most recent entries for home page instead of latest month
+  - Remove accessor methods for instance variables / configuration
+  - Give absolute paths to imgsize() so it chills out on Cwd::getcwd() calls
+  - Remove local_path(), recent_month(), month_before, and feed_print_latest()
+  - Stop using a() in entry_markup()
+  - Cache get_date_entries_by_depth() results
+  - Swap out state vars for stashing things on $self in get_all_source_files()
+  - Add get_date_entries_by_depth()
+  - Tweak link_bar() behavior to retain link for current page
+
+v4.3.0 2018-04-06
+
+  - Render feed for last feed_length day entries instead of for latest month
+  - Switch example config from p1k3.com to example.com urls
+  - feed_print() now takes a list of entries instead of a month
+
+v4.2.2 2018-02-10
+
+  - Fix --config option to wrt-display & wrt-render-all
+  - Remove year list from linkbar
+
+v4.2.1 2017-11-18
+
+  - Change url_root default to /
+  - Add url_root to topic link generator
+
+v4.2.0 2017-11-18
+
+  - Improved documentation in shell utilities
+  - Make a copy of %default before blessing
+  - Document MethodSpit
+  - Document the overlay option, add an accessor method for it
+  - Use a logging callback to WRT::Renderer::render()
+  - Miscellaneous test cleanup
+  - Add publish_dir to example wrt.json
+  - Improve documentation
+  - Add $wrt->feed_alias and a .xml copy of same
+
+v4.1.0  2017-11-15
+
+  - Add wrt-init for creating a skeleton project directory
+  - Die on missing template file
+
+v4.0.1 2017-11-14
+
+  - Fix App::WRT::Markup require of WRT::Image
+  - Remove an unused dependency on Imager
+
+v4.0.0 2017-11-14
+
+  - Rename WRT to App::WRT
+  - Add a license info
+  - Strip unused image size code from WRT::Image
+  - Add publish_dir config value, ensure that dir exists when rendering
+  - Add rendering tests
+
+v3.5.0 2017-11-13
+
+  - wrt-render-all now handles /, /all, and /feed
+  - Migrate wrt wrapper utilities to posix shell
+
+v3.4.2 2017-06-21
+
+  - Add [0-9] to acceptable sub-entry characters
+
+v3.3.1 2017-06-19
+
+  - Die on attempting to include a directory
+  - Include datestamps in feed
+
+v3.3.0 2017-04-03
+
+  - Add topic list to entries
+  - List topics in datestamp
+  - Clean up addprop output
+  - Allow `-` in entry names, use .prop for properties
+  - Simplify datestamps
+  - Add wrt-noexpand property
+  - Remove a sorta-extraneous trailing slash on contents
+
+v3.0.0 2016-10-12
+
+  - Split wrt utility into git-style subcommands
+  - Support for includes, change root_dir semantics, add entry_dir
+  - addprop and findprop subcommands for dealing with entry properties
+
+v2.0.0 2016-08-09
+
+  - Now called "wrt" instead of "display"
+  - Extract http_header stuff from WRT module
+  - Switch to wrt.json for configuration
+  - Add XML::Feed and CGI::Fast to dependencies
+  - Make wrt.fcgi work, more or less
+  - Escape braces in variable interpolation regexp
+  - Add --stdin flag

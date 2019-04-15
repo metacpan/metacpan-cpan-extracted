@@ -13,7 +13,7 @@ use Import::Into;
 use Carp;
 use Data::Dumper ();
 use Function::Parameters 2.001003;
-use PDL::Lite;    # PDL::Lite is the minimum required to have a working PDL
+use PDL::Lite ();   # PDL::Lite is the minimal to get PDL work
 use Ref::Util    ();
 use Safe::Isa 1.000009 ();
 use Syntax::Keyword::Try ();
@@ -104,7 +104,7 @@ Data::Frame::Setup - Import stuffs into Data::Frame classes
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 

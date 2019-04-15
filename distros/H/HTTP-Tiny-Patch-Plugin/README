@@ -1,0 +1,78 @@
+NAME
+    HTTP::Tiny::Patch::Plugin - Change use of HTTP::Tiny to that of
+    HTTP::Tiny::Plugin
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Patch::Plugin (from
+    Perl distribution HTTP-Tiny-Patch-Plugin), released on 2019-04-14.
+
+SYNOPSIS
+    First, invoke this patch. From Perl:
+
+     use HTTP::Tiny::Patch::Plugin
+         # -set_plugins => ['Cache', CustomRetry=>{strategy=>"Exponential", strategy_options=>{initial_delay=>0.5, max_delay=>300}}],
+     ;
+
+    or:
+
+     use HTTP::Tiny::Patch::Plugin;
+     HTTP::Tiny::Plugin->set_plugins('Cache', ...);
+
+    From command-line:
+
+     % HTTP_TINY_PLUGINS='["Cache","CustomRetry",{"strategy":"Exponential","strategy_options":{"initial_delay":0.5}}]' \
+         perl -MHTTP::Tiny::Patch::Plugin script-that-uses-http-tiny.pl ...
+
+    Now every usage of HTTP::Tiny, e.g.:
+
+     my $response = HTTP::Tiny->new->get("http://www.example.com/");
+
+    will become:
+
+     my $response = HTTP::Tiny::Plugin->new->get("http://www.example.com/");
+
+DESCRIPTION
+    This module replaces every instantiation of HTTP::Tiny to instantiate
+    HTTP::Tiny::Plugin instead, so you can use HTTP::Tiny::Plugin's plugins.
+    Note that instantiation of other HTTP::Tiny subclasses, e.g.
+    HTTP::Tiny::Cache is not replaced with instantiation of
+    HTTP::Tiny::Plugin.
+
+CONFIGURATION
+  -set_plugins
+    Array. Will be passed to HTTP::Tiny::Plugin's "set_plugins()". You can
+    also set plugins by calling "set_plugins()" yourself.
+
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Patch-Plugin>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Patch-Plugin>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Patch-Plugi
+    n>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny::Plugin
+
+    HTTP::Tiny
+
+    Module::Patch
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

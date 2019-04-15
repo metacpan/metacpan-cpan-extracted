@@ -1,16 +1,13 @@
 package CPAN::Index::API::Role::Readable;
-{
-  $CPAN::Index::API::Role::Readable::VERSION = '0.007';
-}
 
-# ABSTRACT: Reads index files
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
-use File::Slurp    qw(read_file);
 use File::Temp     qw(tempfile);
 use Scalar::Util   qw(blessed);
 use Path::Class    qw(file);
+use Path::Tiny     qw(path);
 use Carp           qw(croak);
 use LWP::Simple;
 use Compress::Zlib qw(gzopen Z_STREAM_END), '$gzerrno';
@@ -41,7 +38,7 @@ sub read_from_string
 
 sub read_from_file {
     my ($self, $file, %args) = @_;
-    my $content = read_file($file);
+    my $content = path($file)->slurp_utf8;
     return $self->read_from_string($content, %args);
 }
 
@@ -102,17 +99,13 @@ sub read_from_repo_uri
 
 1;
 
-
-__END__
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::Role::Readable - Reads index files
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::Role::Readable - Reads index files
 
 =head1 DESCRIPTION
 
@@ -155,17 +148,3 @@ repository.
 
 Construct a new index file object by locating and parsing a file in a remote
 repository.
-
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=cut
-

@@ -2,8 +2,8 @@ NAME
     App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 VERSION
-    This document describes version 0.004 of App::HTTPTinyUtils (from Perl
-    distribution App-HTTPTinyUtils), released on 2019-04-10.
+    This document describes version 0.005 of App::HTTPTinyUtils (from Perl
+    distribution App-HTTPTinyUtils), released on 2019-04-14.
 
 SYNOPSIS
 DESCRIPTION
@@ -14,6 +14,8 @@ DESCRIPTION
     *   http-tiny-cache
 
     *   http-tiny-customretry
+
+    *   http-tiny-plugin
 
     *   http-tiny-retry
 
@@ -103,6 +105,45 @@ FUNCTIONS
     Like "http_tiny", but uses HTTP::Tiny::CustomRetry instead of
     HTTP::Tiny. See the documentation of HTTP::Tiny::CustomRetry for more
     details.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   attributes => *hash*
+
+        Pass attributes to HTTP::Tiny constructor.
+
+    *   content => *str*
+
+    *   headers => *hash*
+
+    *   method => *str* (default: "GET")
+
+    *   raw => *bool*
+
+    *   url* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  http_tiny_plugin
+    Usage:
+
+     http_tiny_plugin(%args) -> [status, msg, payload, meta]
+
+    Perform request with HTTP::Tiny::Plugin.
+
+    Like "http_tiny", but uses HTTP::Tiny::Plugin instead of HTTP::Tiny. See
+    the documentation of HTTP::Tiny::Plugin for more details.
 
     This function is not exported.
 

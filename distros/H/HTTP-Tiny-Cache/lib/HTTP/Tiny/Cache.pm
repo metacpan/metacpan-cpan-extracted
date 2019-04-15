@@ -1,7 +1,7 @@
 package HTTP::Tiny::Cache;
 
-our $DATE = '2018-10-07'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2019-04-14'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +10,7 @@ use Log::ger;
 
 use Digest::SHA;
 use File::Util::Tempdir;
-use JSON::MaybeXS;
+use Storable qw(store_fd fd_retrieve);
 
 use parent 'HTTP::Tiny';
 
@@ -40,14 +40,14 @@ sub request {
         return $res unless $res->{status} =~ /\A[23]/; # HTTP::Tiny only regards 2xx as success
         log_trace "Saving response to cache ...";
         open my $fh, ">", $cachepath or die "Can't create cache file '$cachepath' for '$url': $!";
-        print $fh JSON::MaybeXS::encode_json($res);
+        store_fd $res, $fh;
         close $fh;
         return $res;
     } else {
         log_trace "Retrieving response from cache ...";
         open my $fh, "<", $cachepath or die "Can't read cache file '$cachepath' for '$url': $!";
         local $/;
-        my $res = JSON::MaybeXS::decode_json(scalar <$fh>);
+        my $res = fd_retrieve $fh;
         close $fh;
         return $res;
     }
@@ -68,7 +68,7 @@ HTTP::Tiny::Cache - Cache HTTP::Tiny responses
 
 =head1 VERSION
 
-This document describes version 0.001 of HTTP::Tiny::Cache (from Perl distribution HTTP-Tiny-Cache), released on 2018-10-07.
+This document describes version 0.002 of HTTP::Tiny::Cache (from Perl distribution HTTP-Tiny-Cache), released on 2019-04-14.
 
 =head1 SYNOPSIS
 
@@ -127,7 +127,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

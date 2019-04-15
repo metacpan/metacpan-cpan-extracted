@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-        > fatpack-simple script.pl
+      $ fatpack-simple script.pl
 
 DESCRIPTION
 

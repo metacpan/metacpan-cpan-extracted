@@ -1,5 +1,9 @@
 Revision history for App-WatchLater
 
+0.03    2018/01/15
+        Automatically open OAuth authentication link in yt-oauth.
+        Added App::WatchLater::Browser module.
+
 0.02    2017/11/12
         Actually implement the -m and -n flag behaviors.
         Friendlier command-line syntax.

@@ -11,7 +11,7 @@ use YAML::PP::Parser;
 
 $|++;
 
-my $yts = "$Bin/../yaml-test-suite";
+my $yts = "$Bin/../test-suite/yaml-test-suite-data";
 
 my @skip = qw/
     CXX2
@@ -40,6 +40,8 @@ my %skip_events = (
     'EW3V' => 1,
     'G9HC' => 1,
     '4H7K' => 1,
+    BS4K => 1,
+    EB22 => 1,
 );
 
 

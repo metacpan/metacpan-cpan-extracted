@@ -1,3 +1,15 @@
+0.010   2019-04-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Perl: Show bumping dev part in Synopsis.
+
+
+0.009   2019-04-14 (PERLANCAR)
+
+	- Perl: Support bumping dev part.
+
+
 0.008   2018-11-18 (PERLANCAR)
 
 	- Forgot to add $DATE and $VERSION to Role::Versioning::Scheme.

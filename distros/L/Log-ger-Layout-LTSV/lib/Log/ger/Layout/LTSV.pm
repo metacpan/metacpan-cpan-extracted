@@ -1,7 +1,7 @@
 package Log::ger::Layout::LTSV;
 
-our $DATE = '2019-04-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2019-04-13'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -184,7 +184,7 @@ Log::ger::Layout::LTSV - Layout log message as LTSV
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::ger::Layout::LTSV (from Perl distribution Log-ger-Layout-LTSV), released on 2019-04-12.
+This document describes version 0.003 of Log::ger::Layout::LTSV (from Perl distribution Log-ger-Layout-LTSV), released on 2019-04-13.
 
 =head1 SYNOPSIS
 

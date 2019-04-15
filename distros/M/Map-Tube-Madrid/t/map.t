@@ -22,3 +22,5 @@ SKIP: {
 
 __DATA__
 Route 1|Canal|Iglesia|Canal,Cuatro Caminos,Ríos Rosas,Iglesia
+Route 2|Canal|Bilbao|Canal,Quevedo,San Bernardo,Bilbao
+Route 3|Moncloa|Canal|Moncloa,Argüelles,San Bernardo,Quevedo,Canal

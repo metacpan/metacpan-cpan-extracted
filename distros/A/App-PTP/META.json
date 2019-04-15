@@ -1,0 +1,78 @@
+{
+   "abstract" : "An expressive Pipelining Text Processor",
+   "author" : [
+      "Mathias Kende <mathias@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-PTP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "namespace" : [
+         "App::PTP"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Benchmark" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "Getopt::Long" : "0",
+            "List::Util" : "0",
+            "Pod::Usage" : "0",
+            "Safe" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.022"
+         },
+         "suggests" : {
+            "re::engine::GNU" : "0",
+            "re::engine::PCRE" : "0",
+            "re::engine::PCRE2" : "0",
+            "re::engine::RE2" : "0",
+            "re::engine::TRE" : "0"
+         }
+      },
+      "test" : {
+         "suggests" : {
+            "Test::Pod" : "1.22",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mkende/ptp/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mkende/ptp"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

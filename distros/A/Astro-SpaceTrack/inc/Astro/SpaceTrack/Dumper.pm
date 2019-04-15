@@ -9,7 +9,7 @@ use Carp;
 use JSON;
 
 use Astro::SpaceTrack;
-my @ISA = qw{ Astro::SpaceTrack };
+our @ISA = qw{ Astro::SpaceTrack };
 
 eval {
     local @INC = @INC;
@@ -19,7 +19,7 @@ eval {
     1;
 } or croak 'Can not load Mock::LWP::UserAgent. Code must be run from the base directory of the Astro-SpaceTrack distribution';
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 {
     my $json;
@@ -62,12 +62,14 @@ our $VERSION = '0.127';
 		$keep->{$key}
 		    or delete $item->{$key};
 	    }
-	    $item->{TLE_LINE1} =~ s/
+	    defined $item->{TLE_LINE1}
+		and $item->{TLE_LINE1} =~ s/
 		    (?: \A | (?<= [\r\n] ) )
 		    ( 1 [\s0-9]{6}U \s )
 		    [^\r\n]*
 		/${1}First line of data/smxg;
-	    $item->{TLE_LINE2} =~ s/
+	    defined $item->{TLE_LINE2}
+		and $item->{TLE_LINE2} =~ s/
 		    (?: \A | (?<= [\r\n] ) )
 		    ( 2 [\s0-9]{6} \s )
 		    [^\r\n]*

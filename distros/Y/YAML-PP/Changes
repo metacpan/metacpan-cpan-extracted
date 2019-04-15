@@ -1,3 +1,15 @@
+0.012 2019-04-14 14:02:36+02:00
+
+    - Fix bug in emitter (strings starting with % must be quoted)
+    - Implement loading of schema classes not prefixed with YAML::PP::Schema
+      (PR#8 @pplu)
+    - Implement loading of perl objects
+    - Fix line number of multiline tokens
+    - Refactor parser/lexer. All tokens (except indentation) are now
+      parsed by the grammar.
+    - Change arguments of resolver callback
+    - Add a catchall resolver for scalars
+
 0.011 2019-03-23 12:03:12+01:00
 
     - Add YAML::PP::Common; use constants for YAML styles

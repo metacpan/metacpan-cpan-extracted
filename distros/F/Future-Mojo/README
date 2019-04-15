@@ -84,6 +84,12 @@ METHODS
     Mojo::IOLoop. Ensures that a returned Future object is not ready
     immediately, but will wait for the next I/O round.
 
+ promisify
+
+     my $promise = $future->promisify;
+
+    Composed from Future::Role::Promisify.
+
 BUGS
 
     Report any issues on the public bugtracker.

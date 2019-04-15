@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '3.2701'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,17 +21,17 @@ no_index:
 provides:
   Getargs::Mixed:
     file: lib/Getargs/Mixed.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   Carp: '0'
   Exporter: '0'
-  perl: '5.008'
+  perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/cxw42/Getargs-Mixed/issues
   repository: https://github.com/cxw42/Getargs-Mixed.git
-version: '1.05'
+version: '1.06'
 x_contributors:
   - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
   - 'Christopher White <cxw@cpan.org>'

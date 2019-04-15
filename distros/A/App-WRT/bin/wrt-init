@@ -23,7 +23,7 @@ publication directories in a given path for use with wrt.
 If no path is given, the current working directory will be assumed.
 
 Detailed documentation can be found in the L<App::WRT> man page or at
-L<https://github.com/brennen/wrt>.
+L<https://code.p1k3.com/gitea/brennen/wrt>.
 
 =head1 LICENSE
 
@@ -34,7 +34,7 @@ L<https://github.com/brennen/wrt>.
 
 =head1 AUTHOR
 
-Brennen Bearnes
+Brennen Bearnes <code@p1k3.com>
 
 =cut
 
@@ -86,7 +86,6 @@ mkdir -p "$init_target/public"
 printf "Configuration:\t%s/wrt.json\n" "$init_target"
 cat > "$init_target/wrt.json" << 'JSON'
 {
-   "feed_url": "https://example.com/feed",
    "entry_dir": "./archives",
    "publish_dir": "./public",
    "title_prefix": "your title here",

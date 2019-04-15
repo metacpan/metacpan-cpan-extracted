@@ -17,18 +17,19 @@ do { my $x = {
                       'requires' => {
                                       'Class::Method::Modifiers' => '0',
                                       'Future' => '0.38',
+                                      'Future::AsyncAwait' => '0.22',
                                       'IO::Async' => '0.68',
                                       'IO::Async::Notifier' => '0.68',
                                       'Log::Any' => '1.050',
                                       'Module::Load' => '0',
-                                      'Ryu' => '0.027',
+                                      'Ryu' => '1.001',
                                       'Ryu::Async' => '0.011',
                                       'URI' => '0',
                                       'URI::db' => '0.19',
                                       'curry' => '0',
                                       'mro' => '0',
                                       'parent' => '0',
-                                      'perl' => '5.014'
+                                      'perl' => '5.024'
                                     }
                     },
        'test' => {

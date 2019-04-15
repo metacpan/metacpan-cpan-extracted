@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.127';
+our $VERSION = '0.128';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -220,6 +220,12 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
 	    }
 	}
     }
+
+    sub __site_to_check_uri {
+	my ( $site ) = @_;
+	return $info{$site}{url};
+    }
+
     my $ua;
 
     sub set_skip ($;$) {	## no critic (ProhibitSubroutinePrototypes)
@@ -240,7 +246,7 @@ sub not_defined ($$) {	## no critic (ProhibitSubroutinePrototypes)
     sub _site_check {
 	my ( $site ) = @_;
 	exists $skip_site{$site} and return $skip_site{$site};
-	my $url = $info{$site}{url} or do {
+	my $url = __site_to_check_uri( $site ) or do {
 	    my $skip = "Programming error - No known url for '$site'";
 	    diag( $skip );
 	    return ( $skip_site{$site} = $skip );
@@ -380,6 +386,8 @@ EOD
 
 sub spacetrack_skip_no_prompt {
     my $skip;
+    $ENV{SPACETRACK_TEST_LIVE}
+	or plan skip_all => 'SPACETRACK_TEST_LIVE not set';
     defined( $skip = __spacetrack_skip(
 	    envir	=> 1,
 	    no_prompt	=> NO_SPACE_TRACK_ACCOUNT,

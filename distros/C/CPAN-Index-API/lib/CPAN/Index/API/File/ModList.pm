@@ -1,9 +1,6 @@
 package CPAN::Index::API::File::ModList;
-{
-  $CPAN::Index::API::File::ModList::VERSION = '0.007';
-}
 
-# ABSTRACT: Interface to 03modlist.data
+our $VERSION = '0.008';
 
 use strict;
 use warnings;
@@ -123,18 +120,13 @@ sub default_location { 'modules/03modlist.data.gz' }
 
 __PACKAGE__->meta->make_immutable;
 
-
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-CPAN::Index::API::File::ModList - Interface to 03modlist.data
-
-=head1 VERSION
-
-version 0.007
+CPAN::Index::File::ModList - Interface to C<03modlist.data>.
 
 =head1 SYNOPSIS
 
@@ -148,7 +140,7 @@ version 0.007
 
 =head1 DESCRIPTION
 
-This is a class to read and write 03modlist.data
+This is a class to read and write C<03modlist.data>.
 
 =head1 METHODS
 
@@ -229,7 +221,7 @@ Number of the chapter under which the module is classified. Valid options are:
 
 =item 28 - Perl6
 
-=item 99 - Not In Modulelist
+=item 99 - Not In Module list
 
 =back
 
@@ -314,7 +306,7 @@ Single character indicating the interface of the module. Valid options are:
 
 =item public_license
 
-Single character indicating the licence under which the module is distributed.
+Single character indicating the license under which the module is distributed.
 Valid options are:
 
 =over
@@ -341,7 +333,7 @@ Number of modules indexed in the file.
 
 =head2 filename
 
-Name of this file - defaults to C<'03modlist.data.gz>;
+Name of this file - defaults to C<03modlist.data.gz>;
 
 =head2 description
 
@@ -349,7 +341,7 @@ Short description of the file.
 
 =head2 parse
 
-Parses the file and reurns its representation as a data structure.
+Parses the file and returns its representation as a data structure.
 
 =head2 default_location
 
@@ -391,19 +383,7 @@ Default file location - C<modules/03modlist.data.gz>.
 
 =back
 
-=head1 AUTHOR
-
-Peter Shangov <pshangov@yahoo.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Venda, Inc..
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-
 
 __DATA__
 File:        [% $self->filename %]

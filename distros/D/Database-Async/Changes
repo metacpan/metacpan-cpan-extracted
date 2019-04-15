@@ -1,5 +1,13 @@
 Revision history for Database-Async
 
+0.002     2019-04-15 06:15:40+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - better definition for the Database::Async::Query interface
+    - some fixes required for proper PostgreSQL support
+    - additional classes for ORM support (undocumented for now since
+    the API is likely to change)
+
 0.001     2018-12-09 17:47:08+08:00 Asia/Kuala_Lumpur
     Initial CPAN release
 

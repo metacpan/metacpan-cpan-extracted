@@ -20,9 +20,9 @@ requires:
   Digest::SHA: '0'
   File::Util::Tempdir: '0.032'
   HTTP::Tiny: '0.057'
-  JSON::MaybeXS: '0'
-  Log::ger: '0.023'
+  Log::ger: '0.027'
   Module::Patch: '0.270'
+  Storable: '0'
   base: '0'
   perl: '5.010001'
   strict: '0'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Patch-Cache
   homepage: https://metacpan.org/release/HTTP-Tiny-Patch-Cache
   repository: git://github.com/perlancar/perl-HTTP-Tiny-Patch-Cache.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -107,7 +107,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -338,7 +338,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:

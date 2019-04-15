@@ -8,7 +8,9 @@ our @EXPORT_OK = qw(image_size);
 
 use Image::Size;
 
-=item image_size
+=over
+
+=item image_size($path)
 
 Returns (width, height) of a variety of image files.  Called by icon_markup and
 line_parse.
@@ -18,5 +20,7 @@ line_parse.
 sub image_size {
   return imgsize($_[0]);
 }
+
+=back
 
 1;

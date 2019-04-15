@@ -1,5 +1,8 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.310001 Apr 14 2019 12:30:00 PDT
+   - Documentation fixes.
+
 0.310000 Dec 26 2018 14:30:00 PDT
    - THIS RELEASE CONTAINS A POTENTIALLY BREAKING BEHAVIOR CHANGE.
    - Add a strict_mode (defaults to true)

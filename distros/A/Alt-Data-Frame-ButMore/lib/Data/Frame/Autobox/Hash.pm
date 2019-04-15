@@ -52,7 +52,7 @@ Data::Frame::Autobox::Hash - Additional Hash role for Moose::Autobox
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 
@@ -83,20 +83,34 @@ Returns a boolean value for if the hash ref is empty.
 
 This is same as the C<keys> method of Moose::Autobox::Hash.
 
-=head2 set($key, $value)
+=head2 set
 
-    $hash->set($key, $value);
+    $hash->set($key, $value)
 
 This is same as the C<put> method of Moose::Autobox::Hash.
 
-=head2 rename($hashref_or_coderef)
+=head2 rename
+
+    rename($hashref_or_coderef)
+
+It can take either,
+
+=over 4
+
+=item *
+
+A hashref of key mappings.
+
+If a keys does not exist in the mappings, it would not be renamed. 
+
+=item *
+
+A coderef which transforms each key.
+
+=back
 
     my $new_href1 = $href->rename( { $from_key => $to_key, ... } );
     my $new_href2 = $href->rename( sub { $_[0] . 'foo' } );
-
-It can take either a hashref of key mappings. If a keys does not exist in
-the mappings, it would not be renamed. 
-Also this method can take a coderef which transforms the keys.
 
 =head2 copy
 

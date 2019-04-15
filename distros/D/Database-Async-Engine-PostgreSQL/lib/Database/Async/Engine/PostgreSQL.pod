@@ -1,0 +1,189 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Database::Async::Engine::PostgreSQL
+at lib/Database/Async/Engine/PostgreSQL.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Database::Async::Engine::PostgreSQL - support for PostgreSQL databases in L<Database::Async>
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 connection
+
+Returns a L<Future> representing the database connection,
+and will attempt to connect if we are not already connected.
+
+=head2 ssl
+
+Whether to try SSL or not, expected to be one of the following
+values from L<Protocol::Database::PostgreSQL::Constants>:
+
+=over 4
+
+=item * C<SSL_REQUIRE>
+
+=item * C<SSL_PREFER>
+
+=item * C<SSL_DISABLE>
+
+=back
+
+=head2 read_len
+
+Buffer read length. Higher values mean we will attempt to read more
+data for each I/O loop iteration.
+
+Defaults to 2 megabytes.
+
+=head2 connect
+
+Establish a connection to the server.
+
+Returns a L<Future> which resolves to the L<IO::Async::Stream>
+once ready.
+
+=head2 negotiate_ssl
+
+Apply SSL negotiation.
+
+=head2 uri_for_dsn
+
+Returns a L<URI> corresponding to the given L<database source name|https://en.wikipedia.org/wiki/Data_source_name>.
+
+May throw an exception if we don't have a valid string.
+
+=head2 stream
+
+The L<IO::Async::Stream> representing the database connection.
+
+=head2 on_read
+
+Process incoming database packets.
+
+Expects the following parameters:
+
+=over 4
+
+=item * C<$stream> - the L<IO::Async::Stream> we are receiving data on
+
+=item * C<$buffref> - a scalar reference to the current input data buffer
+
+=item * C<$eof> - true if we have reached the end of input
+
+=back
+
+=head2 ryu
+
+Provides a L<Ryu::Async> instance.
+
+=head2 outgoing
+
+L<Ryu::Source> representing outgoing packets for the current database connection.
+
+=head2 incoming
+
+L<Ryu::Source> representing incoming packets for the current database connection.
+
+=head2 authenticated
+
+Resolves once database authentication is complete.
+
+=head2 protocol
+
+Returns the L<Protocol::Database::PostgreSQL> instance, creating it
+and setting up event handlers if necessary.
+
+=head2 set_parameter
+
+Marks a parameter update from the server.
+
+=head2 idle
+
+Resolves when we are idle and ready to process the next request.
+
+=head1 Implementation notes
+
+Query sequence is essentially:
+
+=over 4
+
+=item * receive C<ReadyForQuery>
+
+=item * send C<frontend_query>
+
+=item * Row Description
+
+=item * Data Row
+
+=item * Command Complete
+
+=item * ReadyForQuery
+
+=back
+
+The DB creates an engine.  The engine does whatever connection handling required, and eventually should reach a "ready" state.
+Once this happens, it'll notify DB to say "this engine is ready for queries".
+If there are any pending queries, the next in the queue is immediately assigned
+to this engine.
+Otherwise, the engine is pushed into the pool of available engines, awaiting
+query requests.
+
+On startup, the pool `min` count of engine instances will be instantiated.
+They start in the pending state.
+
+Any of the following:
+
+=over 4
+
+=item * tx
+
+=item * query
+
+=item * copy etc.
+
+=back
+
+is treated as "queue request". It indicates that we're going to send one or
+more commands over a connection.
+
+L</next_engine> resolves with an engine instance:
+
+=over 4
+
+=item * check for engines in `available` queue - these are connected and waiting, and can be assigned immediately
+
+=item * next look for engines in `unconnected` - these are instantiated but need
+a ->connection first
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Database::Async::Engine>
+
+L<configure|Database::Async::Engine/configure>, L<db|Database::Async::Engine/db>, L<register_class|Database::Async::Engine/register_class>, L<uri|Database::Async::Engine/uri>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth C<< <TEAM@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+

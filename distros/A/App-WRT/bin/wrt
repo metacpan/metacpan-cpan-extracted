@@ -14,6 +14,7 @@ wrt - WRiting Tool, a static site/blog generator and related utilites
     wrt render-all  # Render all defined entries to filesystem
     wrt addprop     # Add a property to an entry
     wrt findprop    # Find entries containing certain properties
+    wrt config      # Dump configuration data for a wrt repository
     wrt -h          # Print help message
 
 =head1 DESCRIPTION
@@ -25,7 +26,7 @@ C<wrt> is a simple wrapper script which invokes other subcommands.  It will
 pass its arguments along to any command of the form C<wrt-command>.
 
 Detailed documentation can be found in the L<App::WRT> man page or at
-L<https://github.com/brennen/wrt>.
+L<https://code.p1k3.com/gitea/brennen/wrt>.
 
 =head1 LICENSE
 
@@ -36,7 +37,7 @@ L<https://github.com/brennen/wrt>.
 
 =head1 AUTHOR
 
-Brennen Bearnes
+Brennen Bearnes <code@p1k3.com>
 
 =cut
 

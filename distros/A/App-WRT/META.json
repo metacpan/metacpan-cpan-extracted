@@ -20,9 +20,6 @@
          }
       },
       "runtime" : {
-         "recommends" : {
-            "CGI::Fast" : "0"
-         },
          "requires" : {
             "Data::Dumper" : "0",
             "Exporter" : "0",
@@ -37,7 +34,7 @@
             "Text::Markdown::Discount" : "0.11",
             "Text::Textile" : "0",
             "Time::HiRes" : "0",
-            "XML::Atom::SimpleFeed" : "0.8",
+            "XML::Atom::SimpleFeed" : "0.900",
             "XML::Feed" : "0",
             "perl" : "v5.10.0"
          }
@@ -46,10 +43,13 @@
    "provides" : {
       "App::WRT" : {
          "file" : "lib/App/WRT.pm",
-         "version" : "v4.3.0"
+         "version" : "v5.0.0"
       },
       "App::WRT::Date" : {
          "file" : "lib/App/WRT/Date.pm"
+      },
+      "App::WRT::EntryStore" : {
+         "file" : "lib/App/WRT/EntryStore.pm"
       },
       "App::WRT::HTML" : {
          "file" : "lib/App/WRT/HTML.pm"
@@ -57,14 +57,8 @@
       "App::WRT::Image" : {
          "file" : "lib/App/WRT/Image.pm"
       },
-      "App::WRT::LaTeX" : {
-         "file" : "lib/App/WRT/LaTeX.pm"
-      },
       "App::WRT::Markup" : {
          "file" : "lib/App/WRT/Markup.pm"
-      },
-      "App::WRT::MethodSpit" : {
-         "file" : "lib/App/WRT/MethodSpit.pm"
       },
       "App::WRT::Renderer" : {
          "file" : "lib/App/WRT/Renderer.pm"
@@ -79,6 +73,6 @@
          "http://opensource.org/licenses/gpl-license.php"
       ]
    },
-   "version" : "v4.3.0",
+   "version" : "v5.0.0",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

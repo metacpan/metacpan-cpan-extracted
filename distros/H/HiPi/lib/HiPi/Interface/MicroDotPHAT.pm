@@ -49,7 +49,7 @@ use HiPi::Interface::MicroDotPHAT::Font qw( :font );
 use Try::Tiny;
 use Carp;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 __PACKAGE__->create_ro_accessors( qw( _hat_width _hat_height ) );
 
@@ -130,8 +130,8 @@ sub clear {
     
     $self->buffer (
         HiPi::Utils::BitBuffer->new(
-            width       => $self->width,
-            height      => $self->height,
+            width       => $self->_hat_width,
+            height      => $self->_hat_height,
             autoresize  => 1,
         )
     );

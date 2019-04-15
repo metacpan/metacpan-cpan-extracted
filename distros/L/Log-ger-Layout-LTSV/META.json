@@ -29,8 +29,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Devel::Caller::Util" : "0.040",
-            "Log::ger" : "0.026",
+            "Devel::Caller::Util" : "0.042",
+            "Log::ger" : "0.027",
             "Sys::Hostname" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.010001",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-Layout-LTSV"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"

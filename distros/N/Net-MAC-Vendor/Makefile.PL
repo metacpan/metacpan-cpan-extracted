@@ -19,8 +19,6 @@ my %WriteMakefileArgs = (
   "NAME" => "Net::MAC::Vendor",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Compress::Bzip2" => 0,
-    "Compress::Zlib" => 0,
     "Exporter" => 0,
     "File::Temp" => 0,
     "Mojo::URL" => 0,
@@ -36,7 +34,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "1.264",
+  "VERSION" => "1.265",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,8 +43,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Compress::Bzip2" => 0,
-  "Compress::Zlib" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
   "Exporter" => 0,

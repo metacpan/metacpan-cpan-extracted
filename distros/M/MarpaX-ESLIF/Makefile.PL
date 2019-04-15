@@ -23,6 +23,7 @@ BEGIN {
 use Config;
 use Config::AutoConf;
 use ExtUtils::CBuilder;
+use Cwd qw/abs_path/;
 use ExtUtils::Constant qw /constant_types C_constant XS_constant autoload/;
 use File::Basename;
 use File::Find;
@@ -126,9 +127,56 @@ my $solariscase = 0;
 $ac->msg_checking(sprintf "if this is solaris compiler");
 if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"this is not solaris compiler\"\n#endif\nint main() { return 0; }")) {
   $ac->msg_result('yes');
-  if (which("CC")) {
-    $ac->msg_notice("Forcing CXX to CC");
-    $ENV{CXX} = 'CC';
+  my $cc = which($ENV{CC}) || '';
+  if (! $cc) {
+    #
+    # Should never happen since we checked that the compiler works
+    #
+    $ac->msg_notice("Warning! Solaris C compiler working but which() on its location returned false !?");
+  } else {
+    #
+    # $cc should be a full path
+    #
+    $cc = abs_path($cc);
+    my $ccdir = dirname($cc) || File::Spec->curdir();
+    my $cxx = File::Spec->catfile($ccdir, 'CC');
+    # We always give precedence to CC that should be at the same location of the C compiler
+    #
+    if (! which($cxx)) {
+      #
+      # No CC at the same location?
+      #
+      $ac->msg_notice("Warning! Solaris C compiler detected but no CC found at the same location - trying with default search path");
+      $cxx = 'CC';
+    } else {
+      #
+      # Could it be that this CC is also the one that is, eventually, in the path?
+      #
+      my $cxxfromPATH = which('CC') || '';
+      if ($cxxfromPATH) {
+        $cxxfromPATH = abs_path($cxxfromPATH);
+        my $cxxfromWhich = abs_path($cxx);
+        if ($cxxfromWhich eq $cxxfromPATH) {
+          $ac->msg_notice("Solaris C compiler detected and its CC counterpart is already in the search path");
+          $cxx = 'CC';
+        }
+      }
+    }
+    if (which($cxx)) {
+      $ac->msg_notice("Forcing CXX to $cxx");
+      $ENV{CXX} = $cxx;
+      #
+      # We got "CC" executable - no need of eventual -x c++ that perl may have add
+      #
+      if ($ENV{CXXFLAGS} =~ s/\-x\s+c\+\+\s*//) {
+        $ac->msg_notice("Removed -x c++ from CXXFLAGS");
+      }
+    } else {
+      $ac->msg_notice("Warning! Solaris C compiler detected but no CC found neither in path neither where is the C compiler");
+    }
+    #
+    # In any case, add -lCrun and do not execute guess_compiler - cross fingers if we did not managed to find CXX
+    #
     $ac->msg_notice("Adding -lCrun to OTHERLDFLAGS");
     push(@OTHERLDFLAGS, '-lCrun');
     $solariscase = 1;
@@ -463,7 +511,6 @@ my %WriteMakefileArgs = (
     "Math::BigFloat" => 0,
     "Math::BigInt" => 0,
     "Moo" => 0,
-    "Types::Standard" => 0,
     "XSLoader" => 0,
     "namespace::autoclean" => 0,
     "overload" => 0,
@@ -494,7 +541,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.6",
+  "VERSION" => "3.0.8",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -532,7 +579,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "Try::Tiny" => 0,
-  "Types::Standard" => 0,
   "XSLoader" => 0,
   "diagnostics" => 0,
   "namespace::autoclean" => 0,

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use HiPi::Energenie::Command;
 
-our $VERSION ='0.74';
+our $VERSION ='0.75';
 
 my $result = HiPi::Energenie::Command->new->handle_command;
 

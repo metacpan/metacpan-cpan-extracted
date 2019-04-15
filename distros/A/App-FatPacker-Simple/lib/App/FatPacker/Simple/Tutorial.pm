@@ -33,31 +33,31 @@ And assume
 
 so that you have:
 
-    $ find . -type f
-    ./cpanfile
-    ./hello.pl
-    ./lib/Hello/CLI.pm
-    ./lib/Hello.pm
+  $ find . -type f
+  ./cpanfile
+  ./hello.pl
+  ./lib/Hello/CLI.pm
+  ./lib/Hello.pm
 
-    $ cat cpanfile
-    requires 'Sub::Retry';
-    requires 'HTTP::Tiny';
+  $ cat cpanfile
+  requires 'Sub::Retry';
+  requires 'HTTP::Tiny';
 
 Well, C<fatpack-simple> just fatpacks a script with all modules in
 C<lib,fatlib,local,extlib>,
 so let's install dependencies to C<local> directory first:
 
-    # if you have carton, then:
-    $ carton install
+  # if you have carton, then:
+  $ carton install
 
-    # or just:
-    $ cpanm -Llocal -nq --installdeps .
+  # or just:
+  $ cpanm -Llocal -nq --installdeps .
 
-    # Oh, HTTP::Tiny is not core module for old perls, so we have to fatpack it too!
-    $ cpanm --reinstall -Llocal -nq HTTP::Tiny
+  # Oh, HTTP::Tiny is not core module for old perls, so we have to fatpack it too!
+  $ cpanm --reinstall -Llocal -nq HTTP::Tiny
 
-    # Oh, Sub::Retry depends on 'parent' module, so we have to fatpack it too!
-    $ cpanm --reinstall -Llocal -nq parent
+  # Oh, Sub::Retry depends on 'parent' module, so we have to fatpack it too!
+  $ cpanm --reinstall -Llocal -nq parent
 
 Now the whole dependencies are in C<lib> and C<local> directories,
 it's time to execute C<fatpack-simple>.
@@ -66,17 +66,17 @@ then cpanm installed configure deps Module::Build, CPAN::Meta, right?
 They are not necessary for runtime, so execute C<fatpack-simple> with
 C<--exclude> option:
 
-    $ fatpack-simple --exclude Module::Build,CPAN::Meta hello.pl
-    -> perl strip Hello.pm
-    -> perl strip Hello/CLI.pm
-    -> perl strip parent.pm
-    -> exclude CPAN/Meta.pm
-    ...
-    -> perl strip HTTP/Tiny.pm
-    -> exclude Module/Build.pm
-    ...
-    -> perl strip Sub/Retry.pm
-    -> Successfully created hello.fatpack.pl
+  $ fatpack-simple --exclude Module::Build,CPAN::Meta hello.pl
+  -> perl strip Hello.pm
+  -> perl strip Hello/CLI.pm
+  -> perl strip parent.pm
+  -> exclude CPAN/Meta.pm
+  ...
+  -> perl strip HTTP/Tiny.pm
+  -> exclude Module/Build.pm
+  ...
+  -> perl strip Sub/Retry.pm
+  -> Successfully created hello.fatpack.pl
 
 Finally you get C<hello.fatpack.pl>!
 

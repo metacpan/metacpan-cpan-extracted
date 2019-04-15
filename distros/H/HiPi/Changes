@@ -1,3 +1,9 @@
+Version 0.75  - 14 April 2019
+                Fix clear method in MicroDotPHAT - did not reset size to 30 x 7
+                Fix segment settings in MAX7219LEDStrip to handle segment
+                counts other than 8 correctly
+                Added interface to HiLink API for E3531 USB modem stick
+
 Version 0.74  - 20 November 2018
                 Added HiPi::Interface::MAX7219LEDStrip - LED strip controller. 
 

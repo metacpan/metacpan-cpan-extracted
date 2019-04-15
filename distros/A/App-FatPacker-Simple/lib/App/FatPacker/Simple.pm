@@ -12,9 +12,9 @@ use File::Spec::Functions 'catdir';
 use File::Spec::Unix;
 use Getopt::Long qw(:config no_auto_abbrev no_ignore_case);
 use Perl::Strip;
-use Pod::Usage 'pod2usage';
+use Pod::Usage 1.33 ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our $IGNORE_FILE = [
     qr/\.pod$/,
@@ -34,7 +34,7 @@ sub parse_options {
     GetOptions
         "d|dir=s"       => \(my $dir = 'lib,fatlib,local,extlib'),
         "e|exclude=s"   => \(my $exclude),
-        "h|help"        => sub { pod2usage(0) },
+        "h|help"        => sub { $self->show_help; exit 1 },
         "o|output=s"    => \(my $output),
         "q|quiet"       => \(my $quiet),
         "s|strict"      => \(my $strict),
@@ -43,17 +43,20 @@ sub parse_options {
         "shebang=s"     => \(my $custom_shebang),
         "exclude-strip=s@" => \(my $exclude_strip),
         "no-strip|no-perl-strip" => \(my $no_perl_strip),
-    or pod2usage(1);
+        "cache=s"       => \(my $cache),
+    or exit 1;
     $self->{script}     = shift @ARGV or do { warn "Missing scirpt.\n"; pod2usage(1) };
     $self->{dir}        = $self->build_dir($dir);
     $self->{output}     = $output;
     $self->{quiet}      = $quiet;
     $self->{strict}     = $strict;
     $self->{color}      = $color;
-    $self->{perl_strip} = $no_perl_strip ? undef : Perl::Strip->new;
     $self->{custom_shebang} = $custom_shebang;
     $self->{exclude_strip}  = [map { qr/$_/ } @{$exclude_strip || []}];
     $self->{exclude}    = [];
+    if (!$no_perl_strip) {
+        $self->{perl_strip} = Perl::Strip->new($cache ? (cache => $cache) : ());
+    }
     if ($exclude) {
         for my $e (split /,/, $exclude) {
             my $dist = Distribution::Metadata->new_from_module(
@@ -67,6 +70,20 @@ sub parse_options {
         }
     }
     $self;
+}
+
+sub show_help {
+    open my $fh, '>', \my $out;
+    Pod::Usage::pod2usage
+        exitval => 'noexit',
+        input => $0,
+        output => $fh,
+        sections => 'SYNOPSIS|COMMANDS|OPTIONS|EXAMPLES',
+        verbose => 99,
+    ;
+    $out =~ s/^[ ]{4,6}/  /mg;
+    $out =~ s/\n$//;
+    print $out;
 }
 
 sub warning {
@@ -222,7 +239,7 @@ App::FatPacker::Simple - only fatpack a script
 
 =head1 SYNOPSIS
 
-    > fatpack-simple script.pl
+  $ fatpack-simple script.pl
 
 =head1 DESCRIPTION
 

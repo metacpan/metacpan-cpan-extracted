@@ -3,23 +3,24 @@ abstract: 'Easily output perl object attributes to an ASCII table'
 author:
   - 'Mark Allen <mrallen1@yahoo.com>'
 build_requires:
-  Carp: 0
-  Moose: 0.94
-  Test::More: 0
-  Tie::IxHash: 0
-  namespace::autoclean: 0
+  Carp: '0'
+  Moose: '0.94'
+  Test::More: '0'
+  Tie::IxHash: '0'
+  namespace::autoclean: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Table-Simple
 provides:
   Table::Simple:
     file: lib/Table/Simple.pm
-    version: 0.02
+    version: '0.03'
   Table::Simple::Column:
     file: lib/Table/Simple/Column.pm
   Table::Simple::Output:
@@ -28,4 +29,5 @@ provides:
     file: lib/Table/Simple/Output/Theory.pm
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

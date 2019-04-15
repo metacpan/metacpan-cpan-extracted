@@ -44,7 +44,7 @@ sub import {
 	Cz::Cstocs->export_to_level(1, '_stupidity_workaround', @data);
 } 
 
-$VERSION = '3.4';
+$VERSION = '3.43';
 
 # Debugging option
 $DEBUG = 0 unless defined $DEBUG;
@@ -603,7 +603,7 @@ Jan "Yenya" Kasprzak has done the original Un*x implementation.
 
 =head1 VERSION
 
-3.4
+3.43
 
 =head1 SEE ALSO
 

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::MAC::Vendor
 
+1.265     2019-04-12 23:55:27Z
+        * properly remove Compress::* from list of mandatory prereqs
+
 1.264     2019-04-12 19:41:33Z
 	* Net::SSLeay added to runtime prerequisites.
 	* Allow $mac parameter to be a NetAddr::MAC object

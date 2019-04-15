@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/stphnlyd/p5-Data-Frame.svg?branch=master)](https://travis-ci.org/stphnlyd/p5-Data-Frame)
+[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/stphnlyd/p5-Data-Frame?branch=master&svg=true)](https://ci.appveyor.com/project/stphnlyd/p5-Data-Frame)
 
 # NAME
 
@@ -6,7 +7,7 @@ Alt::Data::Frame::ButMore - Alternative implementation of Data::Frame with more 
 
 # VERSION
 
-version 0.0041
+version 0.0043
 
 # STATUS
 
@@ -25,7 +26,6 @@ my $df = Data::Frame->new(
             y => ( sequence(4) >= 2 ) ,
             x => [ qw/foo bar baz quux/ ],
         ] );
-
 say $df;
 # ---------------
 #     z  y  x
@@ -36,8 +36,9 @@ say $df;
 #  3  4  1  quux
 # ---------------
 
-say $df->at(0);
-# [1 2 3 4]
+say $df->at(0);         # [1 2 3 4]
+say $df->at(0)->length; # 4
+say $df->at('x');       # [1 2 3 4]
 
 say $df->select_rows( 3,1 );
 # ---------------
@@ -66,6 +67,15 @@ So here I release my [Alt](https://metacpan.org/pod/Alt) implenmentation.
 
 This implements a data frame container that uses [PDL](https://metacpan.org/pod/PDL) for individual columns.
 As such, it supports marking missing values (`BAD` values).
+
+## Document Conventions
+
+Function signatures in docs of this library follow the
+[Function::Parameters](https://metacpan.org/pod/Function::Parameters) conventions, for example,
+
+```
+function(Type1 $positional_parameter, Type2 :$named_parameter)
+```
 
 # CONSTRUCTION
 
@@ -107,7 +117,7 @@ specification of the columns to add:
 
 - row\_names => ArrayRef $row\_names
 
-# METHODS
+# METHODS / BASIC
 
 ## string
 
@@ -117,45 +127,30 @@ string() # returns Str
 
 Returns a string representation of the `Data::Frame`.
 
-## number\_of\_columns
+## ncol / length / number\_of\_columns
+
+These methods are same,
 
 ```
+# returns Int
+ncol()
+length()
 number_of_columns() # returns Int
 ```
 
 Returns the count of the number of columns in the `Data::Frame`.
 
-## ncol
+## nrow / number\_of\_rows
+
+These methods are same,
 
 ```
-ncol()
-```
-
-This is same as `number_of_columns`.
-
-## length
-
-```
-length()
-```
-
-This is same as `number_of_columns`.
-
-## number\_of\_rows
-
-```
+# returns Int
+nrow()
 number_of_rows() # returns Int
 ```
 
 Returns the count of the number of rows in the `Data::Frame`.
-
-## nrow
-
-```
-nrow()
-```
-
-This is same as `number_of_rows`.
 
 ## dims
 
@@ -163,7 +158,8 @@ This is same as `number_of_rows`.
 dims()
 ```
 
-Returns the dimensions of the data frame object, in an array of `($nrow, $ncol)`.
+Returns the dimensions of the data frame object, in an array of
+`($nrow, $ncol)`.
 
 ## shape
 
@@ -214,15 +210,18 @@ rename($hashref_or_coderef)
 
 In-place rename columns.
 
-## select\_columns
+It can take either,
 
+- A hashref of key mappings.
+
+    If a keys does not exist in the mappings, it would not be renamed.
+
+- A coderef which transforms each key.
+
+```perl
+$df->rename( { $from_key => $to_key, ... } );
+$df->rename( sub { $_[0] . 'foo' } );
 ```
-select_columns($indexer)
-```
-
-Returns a new data frame object which has the columns selected by `$indexer`.
-
-If a given argument is non-indexer, it would coerce it by `indexer_s()`.
 
 ## set
 
@@ -240,21 +239,23 @@ isempty()
 
 Returns true if the data frame has no rows.
 
-## nth\_columm
+## names / col\_names / column\_names
+
+These methods are same
 
 ```
-number_of_rows(Int $n) # returns a column
-```
+# returns ArrayRef
+names()
+names( $new_column_names )
+names( @new_column_names )
 
-Returns column number `$n`. Supports negative indices (e.g., $n = -1 returns
-the last column).
+col_names()
+col_names( $new_column_names )
+col_names( @new_column_names )
 
-## column\_names
-
-```
-column_names() # returns an ArrayRef
-
-column_names( @new_column_names ) # returns an ArrayRef
+column_names()
+column_names( $new_column_names )
+column_names( @new_column_names )
 ```
 
 Returns an `ArrayRef` of the names of the columns.
@@ -263,35 +264,17 @@ If passed a list of arguments `@new_column_names`, then the columns will be
 renamed to the elements of `@new_column_names`. The length of the argument
 must match the number of columns in the `Data::Frame`.
 
-## col\_names
-
-```
-col_names($new_names)
-```
-
-This is same as `column_names`.
-
-## names
-
-```
-names($new_names)
-```
-
-This is same as `column_names`.
-
 ## row\_names
 
 ```
-row_names() # returns a PDL
-
-row_names( Array @new_row_names ) # returns a PDL
-
-row_names( ArrayRef $new_row_names ) # returns a PDL
-
-row_names( PDL $new_row_names ) # returns a PDL
+# returns a PDL::SV
+row_names()
+row_names( Array @new_row_names )
+row_names( ArrayRef $new_row_names )
+row_names( PDL $new_row_names )
 ```
 
-Returns an `ArrayRef` of the names of the columns.
+Returns an `PDL::SV` of the names of the rows.
 
 If passed a argument, then the rows will be renamed. The length of the argument
 must match the number of rows in the `Data::Frame`.
@@ -303,6 +286,15 @@ column( Str $column_name )
 ```
 
 Returns the column with the name `$column_name`.
+
+## nth\_column
+
+```
+number_of_rows(Int $n) # returns a column
+```
+
+Returns column number `$n`. Supports negative indices (e.g., $n = -1 returns
+the last column).
 
 ## add\_columns
 
@@ -320,6 +312,50 @@ add_column(Str $name, $data)
 
 Adds a single column to the `Data::Frame` with the name `$name` and data
 `$data`.
+
+## copy / clone
+
+These methods are same,
+
+```
+copy()
+clone()
+```
+
+Make a deep copy of this data frame object.
+
+## summary
+
+```
+summary($percentiles=[0.25, 0.75])
+```
+
+Generate descriptive statistics that summarize the central tendency,
+dispersion and shape of a dataset’s distribution, excluding `BAD` values.
+
+Analyzes numeric datetime columns only. For other column types like
+`PDL::SV` and `PDL::Factor` gets only good value count.
+Returns a data frame of the summarized statistics.
+
+Parameters:
+
+- $percentiles
+
+    The percentiles to include in the output. All should fall between 0 and 1.
+    The default is `[.25, .75]`, which returns the 25th, 50th, and 75th
+    percentiles (median is always automatically included).
+
+# METHODS / SELECTING AND INDEXING
+
+## select\_columns
+
+```
+select_columns($indexer)
+```
+
+Returns a new data frame object which has the columns selected by `$indexer`.
+
+If a given argument is non-indexer, it would coerce it by `indexer_s()`.
 
 ## select\_rows
 
@@ -341,6 +377,57 @@ values in the child data frame columns will appear in the parent data frame.
 
 If no indices are given, a `Data::Frame` with no rows is returned.
 
+## head
+
+```
+head( Int $n=6 )
+```
+
+If $n ≥ 0, returns a new `Data::Frame` with the first $n rows of the
+`Data::Frame`.
+
+If $n < 0, returns a new `Data::Frame` with all but the last -$n rows of the
+`Data::Frame`.
+
+See also: R's [head](https://stat.ethz.ch/R-manual/R-devel/library/utils/html/head.html) function.
+
+## tail
+
+```
+tail( Int $n=6 )
+```
+
+If $n ≥ 0, returns a new `Data::Frame` with the last $n rows of the
+`Data::Frame`.
+
+If $n < 0, returns a new `Data::Frame` with all but the first -$n rows of the
+`Data::Frame`.
+
+See also: R's [tail](https://stat.ethz.ch/R-manual/R-devel/library/utils/html/head.html) function.
+
+## slice
+
+```perl
+my $subset1 = $df->slice($row_indexer, $column_indexer);
+
+# Note that below two cases are different.
+my $subset2 = $df->slice($column_indexer);
+my $subset3 = $df->slice($row_indexer, undef);
+```
+
+Returns a new dataframe object which is a slice of the raw data frame.
+
+This method returns an lvalue which allows PDL-like `.=` assignment for
+changing a subset of the raw data frame. For example,
+
+```
+$df->slice($row_indexer, $column_indexer) .= $another_df;
+$df->slice($row_indexer, $column_indexer) .= $piddle;
+```
+
+If a given argument is non-indexer, it would try guessing if the argument
+is numeric or not, and coerce it by either `indexer_s()` or `indexer_i()`.
+
 ## sample
 
 ```
@@ -353,33 +440,36 @@ Get a random sample of rows from the data frame object, as a new data frame.
 my $sample_df = $df->sample(100);
 ```
 
-## merge
+## which
+
+```
+which(:$bad_to_val=undef, :$ignore_both_bad=true)
+```
+
+Returns a pdl of `[[col_idx, row_idx], ...]`, like the output of
+["whichND" in PDL::Primitive](https://metacpan.org/pod/PDL::Primitive#whichND).
+
+# METHODS / MERGE
+
+## merge / cbind
+
+These methods are same,
 
 ```
 merge($df)
-```
-
-## cbind
-
-```
 cbind($df)
 ```
 
-This is same as `merge()`.
+## append / rbind
 
-## append
+These methods are same,
 
 ```
 append($df)
-```
-
-## rbind
-
-```
 rbind($df)
 ```
 
-This is same as `append()`.
+# METHODS / TRANSFORMATION AND GROUPING
 
 ## transform
 
@@ -392,16 +482,21 @@ frame object.
 
 `$func` can be one of the following,
 
-- A function coderef. It would be applied to all columns.
-- A hashref of `{ $column_name => $coderef, ... }`. It allows to apply
+- A function coderef.
 
-    the function to the specified columns. The raw data frame's columns not 
-    existing in the hashref be retained unchanged. Hashref keys not yet
-    existing in the raw data frame can be used for creating new columns.
+    It would be applied to all columns.
 
-- An arrayref like `[ $column_name => $coderef, ... ]`. In this mode
+- A hashref of `{ $column_name => $coderef, ... }`
 
-    it's similar as the hasref above, but newly added columns would be in order.
+    It allows to apply the function to the specified columns. The raw data
+    frame's columns not existing in the hashref be retained unchanged. Hashref
+    keys not yet existing in the raw data frame can be used for creating new
+    columns.
+
+- An arrayref like `[ $column_name => $coderef, ... ]`
+
+    In this mode it's similar as the hasref above, but newly added columns
+    would be in order.
 
 In any of the forms of `$func` above, if a new column data is calculated
 to be `undef`, or in the mappings like hashref or arrayref `$coderef` is
@@ -460,55 +555,6 @@ values in `$factor`.
 
 Note that `$factor` does not necessarily to be PDL::Factor.
 
-## slice
-
-```perl
-my $subset1 = $df->slice($row_indexer, $column_indexer);
-
-# Note that below two cases are different.
-my $subset2 = $df->slice($column_indexer);
-my $subset3 = $df->slice($row_indexer, undef);
-```
-
-Returns a new dataframe object which is a slice of the raw data frame.
-
-This method returns an lvalue which allows PDL-like `.=` assignment for
-changing a subset of the raw data frame. For example,
-
-```
-$df->slice($row_indexer, $column_indexer) .= $another_df;
-$df->slice($row_indexer, $column_indexer) .= $piddle;
-```
-
-If a given argument is non-indexer, it would try guessing if the argument
-is numeric or not, and coerce it by either `indexer_s()` or `indexer_i()`.
-
-## assign
-
-```
-assign( (DataFrame|Piddle) $x )
-```
-
-Assign another data frame or a piddle to this data frame for in-place change.
-
-`$x` can be,
-
-> \*A data frame object having the same dimensions and column names as `$self`.
-> \*A piddle having the same number of elements as `$self`.
-
-This method is internally used by the `.=` operation, below are same,
-
-```
-$df->assign($x);
-$df .= $x;
-```
-
-## is\_numeric\_column
-
-```
-is_numeric_column($column_name_or_idx)
-```
-
 ## sort
 
 ```
@@ -545,42 +591,45 @@ id()
 
 Compute a unique numeric id for each unique row in a data frame.
 
-## copy
+# METHODS / OTHERS
+
+## assign
 
 ```
-copy()
+assign( (DataFrame|Piddle) $x )
 ```
 
-Make a deep copy of this data frame object.
+Assign another data frame or a piddle to this data frame for in-place change.
 
-## clone
+`$x` can be,
 
-```
-clone()
-```
+- A data frame object having the same dimensions and column names as `$self`.
+- A piddle having the same number of elements as `$self`.
 
-This is same as `copy()`.
-
-## which
+This method is internally used by the `.=` operation, below are same,
 
 ```
-which(:$bad_to_val=undef, :$ignore_both_bad=true)
+$df->assign($x);
+$df .= $x;
 ```
 
-Returns a pdl of `[[col_idx, row_idx], ...]`, like the output of
-["whichND" in PDL::Primitive](https://metacpan.org/pod/PDL::Primitive#whichND).
+## is\_numeric\_column
+
+```
+is_numeric_column($column_name_or_idx)
+```
 
 # MISCELLANEOUS FEATURES
 
-## SERIALIZATION
+## Serialization
 
 See [Data::Frame::IO::CSV](https://metacpan.org/pod/Data::Frame::IO::CSV)
 
-## SYNTAX SUGAR
+## Syntax Sugar
 
 See [Data::Frame::Partial::Sugar](https://metacpan.org/pod/Data::Frame::Partial::Sugar)
 
-## TIDY EVALUATION
+## Tidy Evaluation
 
 This feature is somewhat similar to R's tidy evaluation.
 
@@ -588,11 +637,11 @@ See [Data::Frame::Partial::Eval](https://metacpan.org/pod/Data::Frame::Partial::
 
 # VARIABLES
 
-# doubleformat
+## doubleformat
 
 This is used when stringifying the data frame. Default is `'%.8g'`.
 
-# TOLERANCE\_REL
+## TOLERANCE\_REL
 
 This is the relative tolerance used when comparing numerical values of two
 data frames.
@@ -604,8 +653,8 @@ $Data::Frame::TOLERANCE_REL = 1e-8;
 
 # SEE ALSO
 
-- [Alt](https://metacpan.org/pod/Alt)
 - [Data::Frame::Examples](https://metacpan.org/pod/Data::Frame::Examples)
+- [Alt](https://metacpan.org/pod/Alt)
 - [PDL](https://metacpan.org/pod/PDL)
 - [R manual: data.frame](https://stat.ethz.ch/R-manual/R-devel/library/base/html/data.frame.html).
 - [Statistics::NiceR](https://metacpan.org/pod/Statistics::NiceR)

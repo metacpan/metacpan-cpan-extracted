@@ -12,6 +12,7 @@ t/01-basic.t
 t/02-line-number.t
 t/03-errors.t
 t/04-trace.t
+t/05-custom-list-entry.t
 t/MY/Kit.pm
 xt/boilerplate.t
 xt/manifest.t

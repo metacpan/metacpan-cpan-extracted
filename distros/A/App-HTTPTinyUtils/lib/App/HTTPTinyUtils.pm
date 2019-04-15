@@ -1,7 +1,7 @@
 package App::HTTPTinyUtils;
 
-our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2019-04-14'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -99,6 +99,19 @@ _
 );
 
 gen_modified_sub(
+    output_name => 'http_tiny_plugin',
+    base_name   => 'http_tiny',
+    summary => 'Perform request with HTTP::Tiny::Plugin',
+    description => <<'_',
+
+Like `http_tiny`, but uses <pm:HTTP::Tiny::Plugin> instead of <pm:HTTP::Tiny>.
+See the documentation of HTTP::Tiny::Plugin for more details.
+
+_
+    output_code => sub { _http_tiny('HTTP::Tiny::Plugin', @_) },
+);
+
+gen_modified_sub(
     output_name => 'http_tiny_retry',
     base_name   => 'http_tiny',
     summary => 'Perform request with HTTP::Tiny::Retry',
@@ -175,7 +188,7 @@ App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.004 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2019-04-10.
+This document describes version 0.005 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2019-04-14.
 
 =head1 SYNOPSIS
 
@@ -190,6 +203,8 @@ This distribution includes several utilities related to L<HTTP::Tiny>:
 =item * L<http-tiny-cache>
 
 =item * L<http-tiny-customretry>
+
+=item * L<http-tiny-plugin>
 
 =item * L<http-tiny-retry>
 
@@ -240,7 +255,6 @@ that contains extra information.
 Return value:  (any)
 
 
-
 =head2 http_tiny_cache
 
 Usage:
@@ -284,7 +298,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
 
 
 =head2 http_tiny_customretry
@@ -332,6 +345,50 @@ that contains extra information.
 
 Return value:  (any)
 
+
+=head2 http_tiny_plugin
+
+Usage:
+
+ http_tiny_plugin(%args) -> [status, msg, payload, meta]
+
+Perform request with HTTP::Tiny::Plugin.
+
+Like C<http_tiny>, but uses L<HTTP::Tiny::Plugin> instead of L<HTTP::Tiny>.
+See the documentation of HTTP::Tiny::Plugin for more details.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<attributes> => I<hash>
+
+Pass attributes to HTTP::Tiny constructor.
+
+=item * B<content> => I<str>
+
+=item * B<headers> => I<hash>
+
+=item * B<method> => I<str> (default: "GET")
+
+=item * B<raw> => I<bool>
+
+=item * B<url>* => I<str>
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
 
 
 =head2 http_tiny_retry

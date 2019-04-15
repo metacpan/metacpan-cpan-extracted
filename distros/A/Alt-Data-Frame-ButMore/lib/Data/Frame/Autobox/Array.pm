@@ -63,7 +63,7 @@ Data::Frame::Autobox::Array - Additional Array role for Moose::Autobox
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,7 @@ Shallow copy.
 
     my $new_array = $array->union($other)
 
-=head2
+=head2 setdiff
 
     my $new_array = $array->setdiff($other)
 

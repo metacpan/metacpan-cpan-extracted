@@ -14,7 +14,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
     'Test::More' => 0,
-    'Bib::CrossRef' =>  0.08,
+    'Bib::CrossRef' =>  0.11,
     'LWP::UserAgent' =>  0,
     'JSON' =>  0,
     'URI::Escape' =>  0,

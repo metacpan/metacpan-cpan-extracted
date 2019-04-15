@@ -1,0 +1,150 @@
+NAME
+
+    Database::Async::Engine::PostgreSQL - support for PostgreSQL databases
+    in Database::Async
+
+DESCRIPTION
+
+METHODS
+
+ connection
+
+    Returns a Future representing the database connection, and will attempt
+    to connect if we are not already connected.
+
+ ssl
+
+    Whether to try SSL or not, expected to be one of the following values
+    from Protocol::Database::PostgreSQL::Constants:
+
+      * SSL_REQUIRE
+
+      * SSL_PREFER
+
+      * SSL_DISABLE
+
+ read_len
+
+    Buffer read length. Higher values mean we will attempt to read more
+    data for each I/O loop iteration.
+
+    Defaults to 2 megabytes.
+
+ connect
+
+    Establish a connection to the server.
+
+    Returns a Future which resolves to the IO::Async::Stream once ready.
+
+ negotiate_ssl
+
+    Apply SSL negotiation.
+
+ uri_for_dsn
+
+    Returns a URI corresponding to the given database source name
+    <https://en.wikipedia.org/wiki/Data_source_name>.
+
+    May throw an exception if we don't have a valid string.
+
+ stream
+
+    The IO::Async::Stream representing the database connection.
+
+ on_read
+
+    Process incoming database packets.
+
+    Expects the following parameters:
+
+      * $stream - the IO::Async::Stream we are receiving data on
+
+      * $buffref - a scalar reference to the current input data buffer
+
+      * $eof - true if we have reached the end of input
+
+ ryu
+
+    Provides a Ryu::Async instance.
+
+ outgoing
+
+    Ryu::Source representing outgoing packets for the current database
+    connection.
+
+ incoming
+
+    Ryu::Source representing incoming packets for the current database
+    connection.
+
+ authenticated
+
+    Resolves once database authentication is complete.
+
+ protocol
+
+    Returns the Protocol::Database::PostgreSQL instance, creating it and
+    setting up event handlers if necessary.
+
+ set_parameter
+
+    Marks a parameter update from the server.
+
+ idle
+
+    Resolves when we are idle and ready to process the next request.
+
+Implementation notes
+
+    Query sequence is essentially:
+
+      * receive ReadyForQuery
+
+      * send frontend_query
+
+      * Row Description
+
+      * Data Row
+
+      * Command Complete
+
+      * ReadyForQuery
+
+    The DB creates an engine. The engine does whatever connection handling
+    required, and eventually should reach a "ready" state. Once this
+    happens, it'll notify DB to say "this engine is ready for queries". If
+    there are any pending queries, the next in the queue is immediately
+    assigned to this engine. Otherwise, the engine is pushed into the pool
+    of available engines, awaiting query requests.
+
+    On startup, the pool `min` count of engine instances will be
+    instantiated. They start in the pending state.
+
+    Any of the following:
+
+      * tx
+
+      * query
+
+      * copy etc.
+
+    is treated as "queue request". It indicates that we're going to send
+    one or more commands over a connection.
+
+    "next_engine" resolves with an engine instance:
+
+      * check for engines in `available` queue - these are connected and
+      waiting, and can be assigned immediately
+
+      * next look for engines in `unconnected` - these are instantiated but
+      need a ->connection first
+
+AUTHOR
+
+    Tom Molesworth <TEAM@cpan.org>
+
+LICENSE
+
+    Copyright Tom Molesworth 2011-2019. Licensed under the same terms as
+    Perl itself.
+

@@ -14,9 +14,10 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use namespace::autoclean;
 use Encode qw//;
+use Carp qw/croak/;
 use Moo;
 
-our $VERSION = '3.0.6'; # VERSION
+our $VERSION = '3.0.8'; # VERSION
 
 
 has 'value' => ( is => 'ro' );
@@ -27,12 +28,11 @@ has 'encoding' => ( is => 'ro' );
 sub BUILDARGS {
     my ($class, $value, $encoding) = @_;
 
-    $value //= '';
-    $value = "$value"; # Make sure it is a PV
+    croak 'Undefined value' unless defined($value);
+    croak 'Undefined encoding' unless defined($encoding);
 
-    if (defined($encoding)) {
-	$encoding = "$encoding"; # Make sure it is a PV
-    }
+    $value = "$value"; # Make sure it is a PV
+    $encoding = "$encoding"; # Make sure it is a PV
 
     return {value => $value, encoding => $encoding}
 }
@@ -78,7 +78,7 @@ MarpaX::ESLIF::String - ESLIF String is any string value with encoding attribute
 
 =head1 VERSION
 
-version 3.0.6
+version 3.0.8
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,71 @@
+NAME
+    version::dev - Set $VERSION based on version from git tags
+
+VERSION
+    This document describes version 0.001 of version::dev (from Perl
+    distribution version-dev), released on 2019-04-14.
+
+SYNOPSIS
+    In lib/MyModule.pm you work on (you're using Dist::Zilla and a plugin
+    like Dist::Zilla::Plugin::PkgVersion or
+    Dist::Zilla::Plugin::OurPkgVersion):
+
+     package MyModule;
+     # VERSION
+     ...
+
+    Your git tags:
+
+     % git tag
+     v0.003
+     v0.002
+     v0.001
+
+    When running script that uses your module:
+
+     % perl -Ilib -Mversion::dev -MMyModule E'...'
+
+    $MyModule::VERSION will be set to "0.003_001" (if not already set).
+
+DESCRIPTION
+    Sometimes you do not explicitly set $VERSION in the module source code
+    that you're working on. For example, you're using Dist::Zilla with a
+    plugin that will set $VERSION during build, so only your built version
+    of modules will have their $VERSION set. Wen working with the unbuilt
+    version, this sometimes creates problem or annoyances when other modules
+    or other code expect your module to set $VERSION.
+
+    This pragma solves that annoyances. It installs a require hook that will
+    check if the module being loaded is: 1) inside the working directory;
+    and 2) the module's package does not have $VERSION set.
+
+    If the conditions are met, then first it will: 1) execute "git tag" to
+    list tags that look like a version number; 2) grab the most recent
+    version; 3) bump the version's dev part, e.g. v1.1 becomes v1.1_001 and
+    v1.1_001 becomes v1.1_002; 3) set the module's package $VERSION with
+    this version.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/version-dev>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-version-dev>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=version-dev>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

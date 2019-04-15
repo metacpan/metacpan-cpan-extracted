@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
 use Carp qw/croak/;
 
-our $VERSION = '3.0.6'; # VERSION
+our $VERSION = '3.0.8'; # VERSION
 
 # This section should be replaced on-the-fly at build time
 # AUTOLOAD
@@ -29,7 +29,7 @@ MarpaX::ESLIF::Symbol::Type - ESLIF Symbol Type
 
 =head1 VERSION
 
-version 3.0.6
+version 3.0.8
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Plerd;
 
-our $VERSION = '1.801';
+our $VERSION = '1.802';
 
 use Moose;
 use MooseX::Types::URI qw(Uri);
@@ -747,6 +747,8 @@ sub publish {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Plerd - Ultralight blogging with Markdown and Dropbox
@@ -804,10 +806,6 @@ And, optional keys:
 
 =item *
 
-facebook_id
-
-=item *
-
 image
 
 =item *
@@ -836,10 +834,6 @@ recent_posts_maxsize I<Default value: 10>
 
 L<URI> object representing the base URI for this blog, which the system will prepend
 to any absolute links it builds.
-
-=item facebook_id
-
-(Optional) This blog's Facebook app ID.
 
 =item image
 
@@ -987,3 +981,25 @@ returns false.
 =head1 AUTHOR
 
 Jason McIntosh <jmac@jmac.org>
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item *
+
+Joe Johnston
+
+=item *
+
+Christian Sánchez
+
+=item *
+
+David Turner
+
+=item *
+
+Rebecca Turner
+
+=back

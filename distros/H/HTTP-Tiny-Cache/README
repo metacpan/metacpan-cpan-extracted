@@ -2,8 +2,8 @@ NAME
     HTTP::Tiny::Cache - Cache HTTP::Tiny responses
 
 VERSION
-    This document describes version 0.001 of HTTP::Tiny::Cache (from Perl
-    distribution HTTP-Tiny-Cache), released on 2018-10-07.
+    This document describes version 0.002 of HTTP::Tiny::Cache (from Perl
+    distribution HTTP-Tiny-Cache), released on 2019-04-14.
 
 SYNOPSIS
      use HTTP::Tiny::Cache;
@@ -54,7 +54,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

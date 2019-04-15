@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Tie::IxHash;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use base 'YAML::PP::Schema';
 
@@ -43,7 +43,6 @@ YAML::PP::Schema::Tie::IxHash - Schema for serializing ordered hashes
 
     use YAML::PP;
     use Tie::IxHash;
-    use YAML::PP::Schema::Tie::IxHash;
     my $yp = YAML::PP->new( schema => [qw/ JSON Tie::IxHash /] );
 
     tie(my %ordered, 'Tie::IxHash');

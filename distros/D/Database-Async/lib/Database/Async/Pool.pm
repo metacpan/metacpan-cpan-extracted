@@ -3,7 +3,7 @@ package Database::Async::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 =head1 NAME
 

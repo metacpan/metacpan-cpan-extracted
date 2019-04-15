@@ -1,0 +1,947 @@
+#!/usr/bin/perl
+
+use 5.022;
+use strict;
+use warnings;
+
+use App::PTP;
+
+our $VERSION = $App::PTP::VERSION;
+
+App::PTP::Run(\*STDIN, \*STDOUT, \*STDERR, \@ARGV);
+exit 0;
+
+# PODNAME: ptp
+# ABSTRACT: An expressive Pipelining Text Processor
+ 
+__DATA__
+
+=pod
+
+=head1 NAME
+
+ptp - An expressive Pipelining Text Processor
+
+=head1 SYNOPSIS
+
+  ptp file1 file2 ... [--grep re] [--substitute re subst] ... [-o out]
+
+The program takes in argument a list of files (that can appear anywhere on the
+line) and a list of commands that describe a pipeline to apply on each input
+file.
+
+=head1 DESCRIPTION
+
+B<PTP> is a versatile and expressive text processor program. The core features
+that it tries to provide are the following:
+
+=over 8
+
+=item * Provide B<grep>, B<sed>-like and other operations with a coherent
+regular expression language (B<grep> has a B<-P> flag but B<sed> has nothing of
+the like).
+
+=item * Provide a powerful input/output files support, that is lacking when
+using vanilla-Perl one-liner (recursion in directories, output in-place with
+optional backups, etc.).
+
+=item * Pipelining of multiple operations on multiple files (using a pipeline
+made of several standard tool usually makes it difficult to process several
+input files at once).
+
+=back
+
+See examples of B<PTP> in action below, in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+All options are case sensitive and can be abbreviated down to uniqueness.
+However, it is recommended to use only the variants that are documented here, in
+case options are introduced in the future that render some abbreviations
+ambiguous. Unless specified otherwise, the arguments to all the options are
+mendatory (for brevity they are usually documented only on the short form of the
+options, but they are mendatory for the long form too).
+
+The program expects fourd different kinds of arguments (all described below).
+They can be mixed in any order that you want. However, for some of these
+arguments the order is actually meaningful (e.g. the commands are applied in the
+order in which they are specified):
+
+=over 4
+
+=item * L</INPUT FILES> can be specified anywhere on the command line, except
+between another flag and its argument.
+
+=item * L</PIPELINE COMMANDS>, which describe what operations should be executed
+on each input files. The commands are all executed, in the order in which they
+are specified on the command line, and applied to all input files.
+
+=item * L</PROGRAM BEHAVIOR> options, set global options for the program. These
+flags can appear multiple times on the command line, but only the last occurence
+will be used. To avoid mistakes, the program will stop with an error when some
+of these flags are specified more than once.
+
+=item * L</PIPELINE MODES> flags, which modify how the pipeline commands behave.
+These flags have effect starting at the point where they are specified for all
+the pipeline commands that are specified after them. Usually, each of these
+flags will have an opposite flag that allow to revert to the default behavior if
+needed.
+
+=back
+
+=head2 INPUT FILES
+
+Input files can be specified anywhere on the command line. They will be
+processed in the order in which they appear but their position relative to other
+arguments is ignored. Any command line argument that does not start with a B<->
+is considered to be a filename (unless it is an argument to a preceeding flag).
+
+A single B<-> alone indicates that the standard input will be processed, this
+can be mixed with reading other files. If no input files at all are specified
+then the standard input is processed.
+
+Finally, you can stop the processing of the command line arguments by
+specifying a B<--> option. In that case, all remaining arguments will be
+considered as input files, even if they start with a B<->.
+
+=head2 PIPELINE COMMANDS
+
+The options in this section specify what processing to apply on the input files.
+For each input file, all of these commands are applied in the order in which
+they are specified, before the next file is processed.
+
+If the B<--merge> flag was specified, then all the input files are merged and
+considered as a single input (this is described further in L</PROGRAM BEHAVIOR>
+below).
+
+Many of the commands from this list are affected by the flags described in
+L</PIPELINE MODES>. An overview of the most important one is given in the
+description of the affected commands.
+
+=over 8
+
+=item B<--g> I<pattern>, B<--grep>
+
+Filter each input to keep only the lines that match the given regular 
+expression. That expression cannot have delimiters (e.g. /foo/) so, if you
+want to pass options to the regex, you need to use the group syntex (e.g.
+(?i)foo).
+
+If you use parenthesis, you probably want to enclose the expression in single
+quotes, to prevent the shell from interpreting them.
+
+This command is much faster then manually giving a match operation to the
+B<--filter> command, because the code does not need to be escaped.
+
+This operation can be made case-insensitive with the B<-I> flag, inverted with
+B<-V> and the pattern can be interpreted as an exact string with B<-Q>.
+
+=item B<-s> I<pattern> I<subst>, B<--substitute>
+
+Replace all matches of the given regular expression by the given substitution
+pattern on each line of the input. The substitution string is evaluated like a 
+Perl string, so it can contain references to capture group in the regular
+expression using the B<$1>, B<$2>, etc. syntax.
+
+In addition to the B<-I> and B<-Q> flags that also apply to this operation (see
+the description of the B<--grep> command), this command can be made to match at
+most once per line with B<-L>.
+
+=item B<--p> I<code>, B<-perl>
+
+Execute the given perl code for each line of the input. The content of the line
+is in the B<$_> variable. That variable can be modified to change the content of
+the line. If the variable is undefined then the line is removed.
+
+Note that if you introduce new-line characters (or whatever characters specified
+by the B<--input-separator> flag), the resulting line will not be split again by
+the program and will be considered as a single line for the rest of the
+pipeline.
+
+See also the L</PERL ENVIRONMENT> section for details on variables and functions
+available to your Perl code.
+
+An error in the Perl code will result in a message printed to the standard
+output but the processing will continue. The current line may or may not be
+modified.
+
+=item B<-n> I<code>
+
+Execute the given perl code for each line of the input. Replace each line with
+the return value from the code. The input line is in the B<$_> variable. If the
+return value is B<undef> then the line is removed.
+
+See the note on new-line characters given in the description of the B<--perl>
+command.
+
+An error in the Perl code will result in a message printed to the standard
+output but the processing will continue. The current line will not be modified.
+
+=item B<-f> I<code>, B<--filter>
+
+Execute the given perl code for each line of the input and keep the lines where
+the return value from the code is true. The input line is in the the B<$_>
+variable. Note that you can modify that variable, but you probably should avoid
+doing it.
+
+An error in the Perl code will result in a message printed to the standard
+output but the processing will continue. The current line will not be removed.
+
+=item B<--ml> I<code>, B<--mark-line>
+
+Execute the given code for each line of input (the current line is in the B<$_>
+variable) and store the return value (usually a boolean) in the I<marker> of
+the current line.
+
+The marker can then be accessed by other commands through the B<$m> variable or
+used directly by the commands that operate on marked lines.
+
+=item B<-e> I<code>, B<--execute>
+
+Execute the given code. As other command, this will be executed once per input
+file being processed. This command can be used to initialize variables or
+functions used in B<--perl> or B<-n> commands.
+
+Any error in the Perl code will terminate the execution of the program.
+
+=item B<-l> I<path>, B<--load>
+
+Same as B<--execute> except that it takes the code to execute from the given
+file.
+
+Any error in the Perl code will terminate the execution of the program.
+
+=item B<--sort>
+
+Sort the content of the input using the default lexicographic order. Or the
+comparator specified with the B<--comparator> flag.
+
+Any error in the Perl code of the comparator will terminate the execution of the
+program.
+
+=item B<--ns>, B<--numeric-sort>
+
+Sort the content of the input using a numeric sort. The numeric value of each
+line is extracted by parsing a number at the beginning of the line (which should
+look like a number).
+
+The markers of the input lines are reset (no line is marked after this command).
+
+=item B<--ls>, B<--locale-sort>
+
+Sort the content of the input using a locale sensitive sorting. The exact
+meaning of this depends on the configuration of your system (see the
+L<perllocale> documentation for more details). In practice, it will do things
+like correctly comparing equivalent characters and/or ignoring the case.
+
+The markers of the input lines are reset (no line is marked after this command).
+
+=item B<--cs> I<code>, B<--custom-sort>
+
+Sort the content of the input using the given custom comparator. See the
+B<--comparator> flag for a specification of the argument of this command.
+
+=item B<-u>, B<--unique>
+
+Remove consecutive lines that are identical. You will often want to have a
+B<--sort> step before this one.
+
+=item B<--head> [I<n>]
+
+Keep only the first I<n> lines of the input. If the number of line is
+negative then remove that much lines from the end of the input. if I<n> is
+omitted, then uses some default value.
+
+=item B<--tail> [I<n>]
+
+Keep only the last I<n> lines of the input. If the number of line is
+negative then remove that much lines from the beginning of the input. if I<n> is
+omitted, then uses some default value.
+
+=item B<--reverse>, B<--tac>
+
+Reverse the order of the lines of the input. The markers of each lines are
+preserved (they are reversed with the input).
+
+=item B<--shuffle>
+
+Shuffle all the lines of the input in random order. The markers of the input
+lines are reset (no line is marked after this command).
+
+=item B<--delete-marked>
+
+Delete every line whose marker is currently set. See the B<--mark-line> command
+for details on how to set the marker of a line.
+
+After this operation, no line has a marker set (they were all deleted).
+
+=item B<--delete-before>
+
+Delete all the lines immediately preceeding a line whose marker is set. The
+markers of the lines that are not deleted are not changed.
+
+=item B<--delete-after>
+
+Delete all the lines immediately following a line whose marker is set. The
+markers of the lines that are not deleted are not changed.
+
+=item B<--delete-at-offset> I<offset>
+
+Delete all the lines situated at the given offset from a marked line. A positive offset means lines that are after the marked lines.
+
+=item B<--insert-before> I<text>
+
+Insert the given line of text immediately before each marked line. The given
+I<text> is treated as a quoted Perl string, so it can use any of the variable
+described in L</PERL ENVIRONMENT>. In particular, the B<$_> variable is set to
+the marked line before which the insertion is taking place. However this text is
+not a general Perl expression, so you may have to post-process with an other
+command for complex processing.
+
+Note that if the B<-Q> flag is in effect, then the given text is inserted as-is
+without any variable interpolation (except anything that may have been done by
+your shell before the argument is read by the program).
+
+The newly inserted lines have their markers unset. Other lines' markers are not
+changed.
+
+=item B<--insert-after> I<text>
+
+Same as B<--insert-before>, but the new line is inserted after the marked line.
+
+=item B<--insert-at-offset> I<offset> I<text>
+
+Generalized version of the B<--insert-before> and <--insert-after> commands.
+This commands insert the given text at the given offset relative to the marked
+line. Offset I<0> means inserting the line immediately after the marked line.
+
+=item B<--clear-markers>
+
+Clear the marker of all the input lines.
+
+=item B<--set-all-markers>
+
+Set the marker of all the input lines.
+
+=item B<--cut> I<field>,I<field>,...
+
+Select specific fields of each input line and replace the line content with
+these fields pasted together. The given B<field>s must be integer number. The
+first field has the number I<1>. It is also possible to give negative field
+numbers, to count from the end of the line. Each line does not need to have all
+the specified fields available. Missing fields are replaced by empty strings.
+The separator itself is not kept in the content of the fields.
+
+The notion of what constitute a field is defined by the B<-F> flag described
+below in L</PIPELINE MODES>. The default will try to split on both tabs and
+comma. When the fields are pasted together, tabs are added between each fields
+but this can be overriden with the B<-P> flag.
+
+The value of the B<-F> flag is also affected by the B<-Q> and B<-I> flags.
+
+=item B<--paste> I<file>
+
+Join each line of the input with the matching line of the given file (in
+sequential order). The joined file is reset for each new input that is
+processed. If the input and the given I<file> don't have the same length, then
+the missing lines are replaced by empty strings.
+
+The lines are joined using the separator given by the B<-P> flag (which defaults
+to a tab). If the side I<file> was longer than a given input, the new lines that
+are created in the processed file have their markers unset.
+
+=item B<--pivot>
+
+Join all lines of each input file into a single line. Use the separator given by
+the B<-P> flag to paste the lines together (this defaults to a tab).
+
+After this command each input file contains a single line, whose marker is
+unset.
+
+=item B<--transpose>
+
+Splits all the line according to the B<-F> flag (see B<--cut> for more details)
+and then transpose the rows and columns, so that the first fields of each lines
+are assembled on the first line of the output, the second fields on
+the second lines, etc. Missing fields are replaced with empty strings.
+
+The fields assembled on a given lines are joined using the separator given by
+the B<-P> flag (this defaults to a tab).
+
+After this command, the marker of every line is unset.
+
+=item B<--nl>, B<--number-lines>
+
+Number each line of the input (putting the line number in a prefix of the
+line). If you want more control on how the line numbering is done, you can have
+a look at the  L</EXAMPLES> section.
+
+=item B<--fn>, B<--file-name>
+
+Replace the entire content of the input with a single line containing the name of the file currently being processed.
+
+The resulting line has its marker unset.
+
+=item B<--pfn>, B<--prefix-file-name>
+
+Add the name of the current file as the first line of the file. That line has
+its marker unset.
+
+=item B<--lc>, B<--line-count>
+
+Replace the entire content of the input with a single line containing the
+number of lines in the file currently being processed.
+
+The resulting line has its marker unset.
+
+=item B<--tee> I<filename>
+
+Output the current content of the input to the given file. When inserted in the
+middle of the command pipeline, the content written to this file is not
+necessarily the same content as the final output of the pipeline.
+
+If I<filename> is a single B<->, then write to the standard output.
+
+Note that the I<filename> is actually evaluated as a quoted Perl string, so it
+can contain variables from the Perl environment. This behavior can be
+deactivated by the B<-Q> flag, to have the B<filename> be used as-is.
+
+=back
+
+=head2 PROGRAM BEHAVIOR
+
+The options in this section modify globally the behavior of the program. They
+can be specified anywhere on the command line with the same effect. Most of them
+can appear multiple time on the command line but only the last occurence is
+taken into account. To help find possible problem causes, for some of these
+options, specifying them multiple times will generate an error.
+
+=over 8
+
+=item B<-o> I<output_file>, B<--output>
+
+Send all output of the program to the specified file. The file is created if
+needed and its content is deleted at the beginning of the execution of the
+program. So the file cannot be used as an input to the program.
+
+You can only specify a single output file.
+
+=item B<-a> I<output_file>, B<--append>
+
+Same as B<--output> but append to the specified file instead of deleting its
+content.
+
+=item B<-m>, B<--merge>
+
+Merge the content of all the input files before the execution of the pipeline.
+
+=item B<-i>, B<--in-place>
+
+Write the output of the pipeline for each input file in-place into these files.
+This cannot be used when reading from the standard input.
+
+=item B<-R>, B<--recursive>
+
+Allow to specify directories instead of files on the command line. The entire
+content of the specified directories will be processed, as if all the files had
+been mentionned on the command line.
+
+=item B<--input-filter> I<code>
+
+When recursively expending a directory passed on the command line (when the
+B<-R> option is active), then execute the given Perl code (that will typically
+be just a regex match like I</foo.*bar/>). Only file names for which the code
+returns a true value are kept. The complete file name is passed to the code in
+the default B<$_> variable. You can view this option in action in the
+L</EXAMPLES> sections
+
+This option applies only of files recursively expended from a directory passed
+on the command line. It does not apply on files that are explicitely listed. In
+particular, this option does not apply on files that are expended by a shell
+glob. It derives that this option is useless unless B<-R> is specified too.
+
+All the functions from the Perl L<File::Spec::Functions> are available to the
+code being executed (e.g. the B<splitpath> function).
+
+=item B<--input-encoding> I<encoding> (alias B<--in-encoding>)
+
+Specify the encoding used to read the input files. The default is UTF-8.
+
+=item B<--output-encoding> I<encoding> (alias B<--out-encoding>)
+
+Specify the encoding used to write the output. The default is UTF-8.
+
+=item B<--input-separator> I<separator> (alias B<--in-separator>)
+
+Specify the separator that is used to split the lines in the input files. The
+default is "\n" (LF). Note that currently, on windows, "\r\n" (CRLF) characters
+in input files will be automatically transformed into "\n" characters.
+
+=item B<--output-separator> I<separator> (alias B<--out-separator>)
+
+Specify the separator that is added in-between lines in the output. The
+default is "\n" (LF). Note that currently, on Windows, this is automatically
+transformed into an "\r\n" (CRLF) sequence.
+
+=item B<--eol>, B<--preserve-input-separator>
+
+Keep the input separators in the content of each line. It is then your
+responsability to preserve (or to change) this separator when the files are
+processed.
+
+Setting this flag also sets the B<--output-separator> to the empty string. This can be overriden if needed by passing that flag after the B<--eol> one
+(this would result in each line having their initial end of line separator plus
+the one specified for the output (unless the initial one is removed during the
+processing).
+
+=item B<--fix-final-separator>
+
+If set, then the final line of each file is always terminated by a line
+separator in the output (as specified by B<--output-separator>), even if it
+did not have one in the input.
+
+=item B<-0>
+
+Set the B<--input-separator> to the null character (B<\000>) and the
+B<--output-separator> to the empty string. This result in having each file read
+entirely in a single logical line.
+
+=item B<-h>, B<--help>
+
+Print this help message and exits. Note: the help message will be much printed
+improved if you have the B<perldoc> program installed (sometimes from a
+B<perl-doc> package).
+
+=item B<--version>
+
+Print the version of the program and exit.
+
+=item B<-d>, B<--debug>
+
+Send debug output on the execution of the program to the standard error output.
+If you specify this option a second time, then the final output itself will be
+modified to contain some debugging information too (sent on the standard output
+or in any file that you specify as the output, not to the standard error).
+
+=item B<--abort>
+
+Abort the execution of the program after all argument have been parsed but
+before the actual execution of the program. This is most useful with B<--debug>
+to check that the arguments are interpreted as expected.
+
+=item B<--preserve-perl-env>
+
+By default, the Perl environment accessible to the commands executing user
+supplied code (B<--perl>, B<-n>, B<--filter>, etc.) is reset between each input
+file. When this option is passed, the environment is preserved between the
+files.
+
+=item B<--safe> [I<n>]
+
+Switch to a safer mode of evaluating user supplied Perl code (from the command
+line). The default mode (equivalent to passing B<--safe 0>) is the fastest. But
+some specifically crafted user supplied code could break the behavior of the
+program. That code is also run with all the privilege of the current user, so it
+can do anything on the system.
+
+When passed a value of I<1> or more, the user code is run in a container that
+protects the rest of the program from that code. The code still has access to
+the rest of the system. This mode is approximately 30 times slower than the
+default.
+
+When passed a value of I<2> or more, the container additionaly tries to prevent
+the user code from any interaction with the rest of the system (outside of the
+content of the files passed to the program). However, no claim is made that this
+is actually secure (and it most certainly is not).
+
+If the argument to B<--safe> is omitted, the value I<2> is used.
+
+=back
+
+=head2 PIPELINE MODES
+
+The options in this section modify the way the pipeline commands work. These
+options apply to all pipeline commands specified B<after> them, until they are
+cancelled by another option.
+
+=over 8
+
+=item B<-I>, B<--case-insensitive>
+
+Make the regular expressions used for the B<--grep> and B<--substitute> commands
+be case-insensitive by default (this can still be overidden in a given regular
+expression with the B<(?i)> flag).
+
+This does not apply to regular expressions evaluated through the B<--perl>
+command.
+
+=item B<-S>, B<--case-sensitive>
+
+Make the regular expressions used for the B<--grep> and B<--substitute> commands
+be case-insensitive by default (this can still be overidden in a given regular
+expression with the B<(?i)> flag).
+
+This is the default mode when B<--case-insensitive> is not specified.
+
+=item B<-Q>, B<--quote-regexp>
+
+Quote the regular expressions passed to the B<--grep> and B<--substitute> 
+commands so that all (possibly) special characters are treated like normal
+characters. In practice this means that the matching done by these commands
+will be a simple text matching. Also disable variable interpolation for the
+substitution string passed to B<--substitute> and for the arguments to the
+B<--insert-before>, B<--insert-after>, B<--insert-at-offset> and B<--tee>
+commands.
+
+This does not apply to regular expressions evaluated through the B<--perl>
+command.
+
+=item B<-E>, B<--end-quote-regexp>
+
+Stop the effect of the B<--quote-regexp> mode and resumes normal interpretation
+of regular expressions.
+
+This is the default mode when B<--quote-regexp> is not specified.
+
+=item B<-G>, B<--global-match>
+
+Apply the substitution given to the B<--substitute> command as many times as
+possible (this is the default).
+
+=item B<-L>, B<--local-match>
+
+Apply the substitution given to the B<--substitute> command at most once per
+line.
+
+=item B<-C> I<code>, B<--comparator>
+
+Specify a custom comparator to use with the B<--sort> command. This flag
+expect a perl expression that will receive the two lines to compare in the B<$a>
+and B<$b> variables and should return an integer less than, equal to, or greater
+than 0 depending on the order of the line (less than 0 if B<$a> should be before
+B<$b>).
+
+The default value is somehow equivalent to specifying
+B<--comparator '$a cmp $b'>. However, a user specified comparator will always be
+less efficient than the default one.
+
+Any error in the Perl code of the comparator will terminate the execution of the
+program.
+
+=item B<-F> I<regex>, B<--input-field-spec>
+
+Specify the regular expression used to cut fields with the B<--cut> command. The
+default is B<\s*,\*s|\t>. Note that this value is also affected by the B<-Q> and
+B<-I> flags (as well as their opposed B<-E> and B<-S>).
+
+=item B<-P> I<string>, B<--output-field-spec>
+
+Specify the separator used to paste fields together with the B<--cut> command.
+The default is a tabulation character.
+
+=item Default values for B<-F> and B<-P>
+
+The flags below are setting both the B<-F> and B<-P> value, used to split fields
+and to paste them:
+
+=over 4
+
+=item * B<--default> restore the default values for the two flags, as
+documented above.
+
+=item * B<--bytes> sets the flags so that each input character is a field and
+there is no separator when fields are pasted together. Not that the naming is
+sort of a misnomer, as it splits on characters and not on bytes (you can split
+on bytes by specifying an 'ascii' input encoding).
+
+=item * B<--csv> splits on comma (ignoring surrounding spaces) and use a comma
+to paste the fields.
+
+=item * B<--tsv> splits on each tab character, and use one to paste the fields.
+
+=item * B<--none> never splits on anything. This flag only sets B<-F> but not
+the B<-F> value. It is meant to be used with the B<--transpose> command so that
+all the lines of the input are joined into a single line. In that case, the
+B<--transpose> command becomes equivalent to the B<--pivot> one.
+
+=back
+
+=item B<--re> I<engine>, B<--regex-engine>
+
+Select the regular expression engine used for the B<--grep> and B<--substitute>
+commands. The default value I<perl> uses Perl built-in engine. Other values are expected to be the last part of the name of an B<re::engine::I<value>> module
+(e.g. I<RE2>, I<PCRE>, I<TRE>, I<GNU>, etc.). The matching Perl module needs to
+be installed. Note that the name of the engine is case-sensitive.
+
+For the B<--substitute> command, only the pattern is affected by this option.
+The substitution still uses the Perl syntax to refer to matched group (e.g.
+B<$1>, etc.).
+
+Finally, note that this option does not apply to regex that would be manually
+specified through any of the commands executing Perl code (e.g. B<--perl>,
+B<-e>, B<--filter>, etc.).
+
+=item B<-X>, B<--fatal-error>
+
+Make any Perl code error in the B<--perl>, B<-n> and B<--filter> commands be
+fatal error (the execution of the program is aborted).
+
+=item B<--ignore-error>
+
+Print an error to the standard output when an error occurs in the Perl code
+provided to the B<--perl>, B<-n> and B<--filter> commands and continue the
+processing (this is the default).
+
+=item B<-V>, B<--inverse-match>
+
+Inverse the behavior of the B<--grep> and B<--filter> commands (lines that
+would normally be dropped are kept and inversely).
+
+=item B<-N>, B<--normal-match>
+
+Give the default behavior to the B<--grep> and B<--filter> commands.
+
+=back
+
+=head2 PERL ENVIRONMENT
+
+Below is a description of variables and functions available to the Perl code
+executed as part of the B<--perl>, B<-n>, B<--execute>, B<--load>, B<--filter>,
+B<--mark-line>, and B<--custom-sort> (or B<--sort> with B<--comparator>)
+commands.
+
+While not directly executing Perl code, the B<--grep> and B<--substitute>
+commands also have access to the variables described below and those that are
+created by user supplied code.
+
+=head3 B<$_>
+
+This variable is set to the current line being processed. In most context (but
+not all), it can be modified to modify that line.
+
+=head3 B<$f>
+
+This variable contains the name of the input file currently being processed as
+given on the command line. This variable is available to all the commands. When
+processing the standard input, this will be B<'-'>.
+
+=head3 B<$F>
+
+This variable contains the absolute path of the input file currently being
+processed. This variable is available to all the commands. When processing the
+standard input, this will be B<'-'>.
+
+=head3 B<$n>
+
+This variables contains the number of the line currently being processed. It is
+available only to the B<--perl>, B<-n>, B<-s> (in the substitution argument
+only), B<--mark-line>, and B<--filter> commands.
+
+The same value is also available under the standard B<$.> variable, which allows
+to use the Perl C<..> operator. One difference is that any write to B<$n> are
+ignored, while write to B<$.> will modify that variable (but not the B<$n> one).
+
+=head3 B<$N>
+
+This variables contains the total number of lines in the current input.
+
+=head3 B<$m>
+
+This variables contains the marker of the current line. This is the value that
+is set be the B<--mark-line> command, but it can be manipulated by any other
+line-processing operation (mainly B<--perl>, B<-n>, and B<--filter>).
+
+=head3 B<@m>
+
+This array contains the markers of all the line, it is accessed using index
+relative to the current line (and using Perl convention, where array are read
+using the B<$> sigil), so B<$m[0]> is the marker of the current line
+(equivalent to B<$m>), B<$m[1]> is the marker of the following line, etc.
+The markers for lines that don't exist are all unset.
+
+This array can be used to modify the marker of any line. Modifying a marker
+outside of the existing lines is ignored.
+
+=head3 B<$I>
+
+This variable contains the index of the file currently being processed (starting
+at 1 for the first file).
+
+=head3 B<ss> I<start>[, I<len>[, I<$var>]]
+
+Returns the sub-string of the given I<$var>, starting at position I<start> and
+of length I<len>. If I<$var> is omitted, uses the default I<$_> variable. If
+I<len> is omitted or I<0>, reads the entire remaining of the string.
+
+If I<start> is negative, starts at the end of the string. If I<len> is negative,
+removes that much characters from the end of the string.
+
+This is quite similar to the built-in B<substr> function except that B<ss> will
+returns the empty-string instead of I<undef> if the specified sub-string is
+outside of the input.
+
+=head3 B<pf> I<format>[, I<args...>]
+
+Formats the given I<args> using the I<format> string (following the standard
+B<printf> format) and stores the result in the default B<$_> variable.
+
+=head3 B<spf> I<format>[, I<args...>]
+
+Formats the given I<args> using the I<format> string (following the standard
+B<printf> format) and returns the results.
+
+=head1 EXAMPLES
+
+A default invocation of the program without arguments other than file names will
+behave as the B<cat> program, printing the concatenated content of all its input
+files:
+
+  ptp file1 file2 file3
+
+This example is similar to the built-in B<--nl> commands. It replaces each line
+with the output of the B<sprintf> fonction which, here, will prefix the line
+number to each line.
+
+That example also demonstrates that a variable can be re-used across the lines
+of an input (the B<$i> variable), but that it is reset between each input. Using
+the variables and functions described in L</PERL ENVIRONMENT> the argument to
+the B<-n> command could be rewritten C<spf "% 5d  %s", $n, $_>:
+
+  ptp file1 file2 -n 'sprintf("%5d  %s", ++$i, $_)'
+
+Same as the example above, but does not number empty lines (this is the default
+behavior of the GNU B<nl> util). Also this uses the B<pf> function that modifies
+the B<$_> variable, so it can be used directly with the B<--perl> command
+instead of the B<-n> one:
+
+  ptp file -p 'pf("%5d  %s", ++$i, $_) if $_'
+
+Print a sorted list of the login name of all users:
+
+  ptp /etc/passwd -F : --cut 1 --sort
+
+Number all the lines of multiple inputs, as if they were a single file:
+
+  ptp file1 file2 -m --nl
+
+Join lines that end with an B<=> character with the next line. The B<chomp> Perl
+command removes the end-of-line character from the current line (which was there
+due to the usage of the B<--eol> flag). In this example, that command is applied
+only if the line matches the given regex (which search for the B<=> character
+at the end of the line):
+
+  ptp file --eol -p 'chomp if /=$/'
+
+Output the number of lines of comment in all the source files in a given
+directory, filtering only the files that match some extensions. The
+B<--input-filter> option ensures that only source file are used inside the given
+directory. The B<-g> (B<--grep>) command keeps only the lines that start with a
+C-style comment (or spaces followed by a comment), then the B<--lc> command
+(B<--line-count>), replaces the entire content of the file with just the number
+of lines that it contains (the number of comments at that point). Finally, the
+B<--pfn> command (B<--prefix-file-name>) adds the name of the current file as
+the first line of each file, and B<--pivot> joins the two lines of each file
+(the file name and the number of lines):
+
+  ptp dir -R --input-filter '/\.(c|h|cc)$/' -g '^\s*//' --lc --pfn --pivot
+
+=head1 ENVIRONMENT
+
+Some environment variables can affects default options of the program when they
+are set.
+
+=over 4
+
+=item PTP_DEFAULT_CASE_INSENSITIVE
+
+Setting this variable to B<1> means the the B<-I> flag is in effect at the
+beginning of the parsing of the command line arguments. Setting the variable to
+B<0> gives the default behavior (as if B<-S> was passed).
+
+=item PTP_DEFAULT_QUOTE_REGEX
+
+Setting this variable to B<1> means the the B<-Q> flag is in effect at the
+beginning of the parsing of the command line arguments. Setting the variable to
+B<0> gives the default behavior (as if B<-E> was passed).
+
+=item PTP_DEFAULT_LOCAL_MATCH
+
+Setting this variable to B<1> means the the B<-L> flag is in effect at the
+beginning of the parsing of the command line arguments. Setting the variable to
+B<0> gives the default behavior (as if B<-G> was passed).
+
+=item PTP_DEFAULT_REGEX_ENGINE
+
+Setting this variable allows to override the default regex engine used by the
+program. That variable can take the same values as the B<--re> flag.
+
+=item PTP_DEFAULT_FATAL_ERROR
+
+Setting this variable to B<1> means that the B<-X> flag is in effect at the
+beginning of the parsing of the command line arguments. Setting the variable to
+B<0> gives the default behavior (as if B<-ignore-error> was passed).
+
+=item PTP_DEFAULT_INVERSE_MATCH
+
+Setting this variable to B<1> means that the B<-V> flag is in effect at the
+beginning of the parsing of the command line arguments. Setting the variable to
+B<0> gives the default behavior (as if B<-N> was passed).
+
+=item PTP_DEFAULT_SAFE
+
+Setting this variable to an integer value will set the default mode of executing
+user supplied Perl code, as if the B<--safe> option was given.
+
+=back
+
+=head1 CAVEATS
+
+This program is optimized for expressivity rather than performance (also,
+modern computers are powerful). So it will read each file in memory entirely
+before processing it. In particular, if you use the B<--merge> option, then all
+the input files are entirely loaded in memory before they are processed.
+
+Handling of the user supplied code might differ depending on whether the
+B<--safe> option is in effect or not. In particular, currently any exception
+thrown by user code in safe mode is entirely ignored. While this is a bug, one
+could say that this contribute to prevent that anything unpredictable will
+happen to the calling code...
+
+=head1 AUTHOR
+
+This program has been written by L<Mathias Kende|mailto:mathias@cpan.org>.
+
+=head1 LICENCE
+
+Copyright 2019 Mathias Kende
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+=head1 SEE ALSO
+
+L<perl(1)>, L<grep(1)>, L<sed(1)>,
+L<perlre|https://perldoc.perl.org/perlre.html>
+
+=cut

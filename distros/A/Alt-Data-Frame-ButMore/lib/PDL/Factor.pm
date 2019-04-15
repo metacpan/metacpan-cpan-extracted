@@ -7,8 +7,10 @@ use warnings;
 
 use failures qw/levels::mismatch levels::number/;
 
+use PDL::Lite ();   # PDL::Lite is the minimal to get PDL work
 use PDL::Core qw(pdl);
 use PDL::Primitive qw(which);
+
 use Data::Rmap qw(rmap);
 use Module::Load;
 use Ref::Util qw(is_plain_arrayref);
@@ -36,8 +38,10 @@ BEGIN {
 }
 
 use overload
-  '==' => \&equal,
-  '!=' => \&not_equal,
+  '==' => \&_eq,
+  'eq' => \&_eq,
+  '!=' => \&_ne,
+  'ne' => \&_ne,
 #  '<'  => \&_lt,
 #  'lt' => \&_lt,
 #  '<=' => \&_le,
@@ -307,7 +311,7 @@ sub _compare_levels {
 # > levels(g$Species) <- levels(g$Species)[c(3, 2, 1)]
 # > iris$Species == g$Species
 # : # outputs a logical vector where only 'versicolor' indices are TRUE
-sub equal {
+sub _eq {
 	my ($self, $other, $d) = @_;
 	# TODO need to look at $d to determine direction
 	if( blessed($other) && $other->isa('PDL::Factor') ) {
@@ -333,9 +337,7 @@ sub equal {
 	}
 }
 
-sub not_equal {
-	return !equal(@_);
-}
+sub _ne { !_eq(@_); }
 
 
 1;
@@ -352,7 +354,7 @@ PDL::Factor - PDL subclass for keeping categorical data
 
 =head1 VERSION
 
-version 0.0041
+version 0.0043
 
 =head1 SYNOPSIS
 
