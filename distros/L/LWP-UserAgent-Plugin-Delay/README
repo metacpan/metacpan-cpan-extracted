@@ -1,0 +1,54 @@
+NAME
+    LWP::UserAgent::Plugin::Delay - Delay/sleep between requests
+
+VERSION
+    This document describes version 0.001 of LWP::UserAgent::Plugin::Delay
+    (from Perl distribution LWP-UserAgent-Plugin-Delay), released on
+    2019-04-15.
+
+SYNOPSIS
+     use LWP::UserAgent::Plugin 'Delay' => {
+         between_request => 3, # optional, default 1
+     };
+
+     my $ua = LWP::UserAgent::Plugin->new;
+     $ua->get("http://www.example.com/");
+     $ua->get("http://www.example.com/"); # will sleep 3 seconds first
+
+DESCRIPTION
+    This plugin inserts "sleep()" between requests.
+
+CONFIGURATION
+  between_requests
+    Ufloat. Default: 1.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Plugin-Delay>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Plugin-Delay>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Plugin-
+    Delay>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    HTTP::Tiny::Plugin::Delay
+
+    LWP::UserAgent::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

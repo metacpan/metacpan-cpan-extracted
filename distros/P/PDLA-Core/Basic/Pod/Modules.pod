@@ -17,20 +17,20 @@ If you want to search for a function name, you should use the PDLA
 shell along with the "help" or "apropos" command (to do a fuzzy search).
 For example:
 
- pdl> apropos xval
+ pdla> apropos xval
  xlinvals        X axis values between endpoints (see xvals).
  xlogvals        X axis values logarithmicly spaced...
  xvals           Fills a piddle with X index values...
  yvals           Fills a piddle with Y index values. See the CAVEAT for xvals.
  zvals           Fills a piddle with Z index values. See the CAVEAT for xvals.
 
-To learn more about the PDLA shell, see L<perldl|perldl> or L<pdl2|pdl2>.
+To learn more about the PDLA shell, see L<perldla|perldla> or L<pdla2|pdla2>.
 
 =head1 FOUNDATION
 
 =over 5
 
-=item L<perldl|perldl> or L<pdl2|pdl2>
+=item L<perldla|perldla> or L<pdla2|pdla2>
 
 Learn about the PDLA shell.
 

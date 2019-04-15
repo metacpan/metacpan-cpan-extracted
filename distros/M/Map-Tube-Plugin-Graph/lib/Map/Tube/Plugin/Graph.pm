@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph;
 
-$Map::Tube::Plugin::Graph::VERSION   = '0.37';
+$Map::Tube::Plugin::Graph::VERSION   = '0.38';
 $Map::Tube::Plugin::Graph::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph - Graph plugin for Map::Tube.
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
@@ -85,7 +85,7 @@ The C<$line_name> param is optional.If it's passed, the method returns the base6
 encoded string of the given line map. Otherwise  you  would get the entire map as
 base64 encoded string.
 
-See SYNOPSIS for more details on how it can be used.
+See L</SYNOPSIS> for more details on how it can be used.
 
 =cut
 

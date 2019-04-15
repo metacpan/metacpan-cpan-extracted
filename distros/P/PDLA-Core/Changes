@@ -1,3 +1,9 @@
+2.013007 2019-04-15
+ - rename pdl2 exe to pdla2, pdldoc to pdladoc, perldl exe to perldla,
+   pdl exe to pdla
+ - move Perldl2 into PDLA::Core
+ - . in @INC update
+
 v2.013006 Sun Aug 30 15:33:09 BST 2015
  - further tweak to how $VERSION recorded/used
 

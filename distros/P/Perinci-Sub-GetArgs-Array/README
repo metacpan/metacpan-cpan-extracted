@@ -1,15 +1,110 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::GetArgs::Array - Get subroutine arguments (%args) from
+    array
 
+VERSION
+    This document describes version 0.170 of Perinci::Sub::GetArgs::Array
+    (from Perl distribution Perinci-Sub-GetArgs-Array), released on
+    2019-04-15.
+
+SYNOPSIS
      use Perinci::Sub::GetArgs::Array;
-    
+
      my $res = get_args_from_array(array=>\@ary, meta=>$meta, ...);
 
 DESCRIPTION
-
     This module provides get_args_from_array(). This module is used by,
     among others, Perinci::Sub::GetArgs::Argv.
 
-SEE ALSO
+FUNCTIONS
+  get_args_from_array
+    Usage:
 
+     get_args_from_array(%args) -> [status, msg, payload, meta]
+
+    Get subroutine arguments (%args) from array.
+
+    Using information in metadata's "args" property (particularly the "pos"
+    and "slurpy" arg type clauses), extract arguments from an array into a
+    hash "\%args", suitable for passing into subs.
+
+    Example:
+
+     my $meta = {
+         v => 1.1,
+         summary => 'Multiply 2 numbers (a & b)',
+         args => {
+             a => {schema=>'num*', pos=>0},
+             b => {schema=>'num*', pos=>1},
+         }
+     }
+
+    then "get_args_from_array(array=>[2, 3], meta=>$meta)" will produce:
+
+     [200, "OK", {a=>2, b=>3}]
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_extra_elems => *bool* (default: 0)
+
+        Allow extra/unassigned elements in array.
+
+        If set to 1, then if there are array elements unassigned to one of
+        the arguments (due to missing "pos", for example), instead of
+        generating an error, the function will just ignore them.
+
+    *   array* => *array*
+
+        NOTE: array will be modified/emptied (elements will be taken from
+        the array as they are put into the resulting args). Copy your array
+        first if you want to preserve its content.
+
+    *   meta* => *hash*
+
+    *   meta_is_normalized => *bool* (default: 0)
+
+        Can be set to 1 if your metadata is normalized, to avoid duplicate
+        effort.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-GetArgs-Array>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-GetArgs-Array>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-GetArgs-A
+    rray>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

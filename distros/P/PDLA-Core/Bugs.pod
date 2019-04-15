@@ -89,17 +89,17 @@ Your operating System.  You can run the C<uname -a> command on many unix systems
 
 =item *
 
-The full output of C<perldl -V> 
+The full output of C<perldla -V> 
 
 If you are reporting a bug with an already installed PDLA.  If the PDLA
 has compiled and built but not been installed, you may run
-C<perl -Mblib perldl -V> from the top level of the PDLA build directory.
+C<perl -Mblib perldla -V> from the top level of the PDLA build directory.
 
 =item *
 
 The bug description and how to reproduce it.
 
-Short examples using the PDLA shells, C<pdl2> or C<perldl>, are excellent!
+Short examples using the PDLA shells, C<pdla2> or C<perldla>, are excellent!
 Don't forget to include needed input data (as small as possible) so that
 the code can be run with a cut and paste.
 
@@ -128,7 +128,7 @@ A patch against the latest released version of this distribution which fixes thi
 =back
 
 Alternatively, send an e-mail report with the above
-information (including the output of C<perldl -V>)
+information (including the output of C<perldla -V>)
 to C<pdl-devel@lists.sourceforge.net>. See
 
    http://pdl.perl.org/?page=mailing-lists

@@ -88,6 +88,11 @@ RCS
 ^Demos/TriD/test6.p$
 ^LOG$
 ^[.]Inline
+^Perldl2/logo3d.pdl
+^Perldl2/pdla2.pod$
+^Perldl2/tctrl-c.pl
+^Perldl2/trgnu-ctrl-c.txt$
+^Perldl2/work
 ^\.\#.*
 ^\.exists
 ^\.git
@@ -108,10 +113,10 @@ RCS
 ^inv-data.pl
 ^kitchen-sink
 ^patch
-^pdl$
+^pdla$
 ^pdl.*-log.txt$
-^pdldoc.db$
-^pdldoc.pod
+^pdladoc.db$
+^pdladoc.pod
 ^perl$
 ^perldl.conf-fast
 ^perldl.conf-orig

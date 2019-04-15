@@ -1,0 +1,52 @@
+NAME
+    HTTP::Tiny::Plugin::Delay - Delay/sleep between requests
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Plugin::Delay (from
+    Perl distribution HTTP-Tiny-Plugin-Delay), released on 2019-04-15.
+
+SYNOPSIS
+     use HTTP::Tiny::Plugin 'Delay' => {
+         between_request => 3, # optional, default 1
+     };
+
+     HTTP::Tiny::Plugin->new->get("http://www.example.com/");
+     HTTP::Tiny::Plugin->new->get("http://www.example.com/"); # will sleep 3 seconds first
+
+DESCRIPTION
+    This plugin inserts "sleep()" between requests.
+
+CONFIGURATION
+  between_requests
+    Ufloat. Default: 1.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Plugin-Delay>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Plugin-Delay>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Plugin-Dela
+    y>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    LWP::UserAgent::Plugin::Delay
+
+    HTTP::Tiny::Plugin
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

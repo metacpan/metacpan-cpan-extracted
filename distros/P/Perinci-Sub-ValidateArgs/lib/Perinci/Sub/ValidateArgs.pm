@@ -1,8 +1,8 @@
 package Perinci::Sub::ValidateArgs;
 
 # NOIFBUILT
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -144,7 +144,7 @@ sub gen_args_validator {
         my @arg_names = sort {
             ($meta_args->{$a}{pos}//9999) <=> ($meta_args->{$b}{pos}//9999)
         } keys %$meta_args;
-        if (@arg_names && $meta_args->{$arg_names[-1]}{greedy}) {
+        if (@arg_names && ($meta_args->{$arg_names[-1]}{slurpy} // $meta_args->{$arg_names[-1]}{greedy})) {
             my $pos = @arg_names - 1;
             push @code, "    # handle slurpy last arg\n";
             push @code, "    if (\@\$args >= $pos) { \$args->[$pos] = [splice \@\$args, $pos] }\n\n";
@@ -184,8 +184,8 @@ sub gen_args_validator {
             } elsif ($arg_spec->{pos} != $i) {
                 die "Error in metadata: argument '$arg_name' does not ".
                     "the correct pos value ($arg_spec->{pos}, should be $i)";
-            } elsif ($arg_spec->{greedy} && $i < $#arg_names) {
-                die "Error in metadata: argument '$arg_name' has greedy=1 ".
+            } elsif (($arg_spec->{slurpy} // $arg_spec->{greedy}) && $i < $#arg_names) {
+                die "Error in metadata: argument '$arg_name' has slurpy=1 ".
                     "but is not the last argument";
             }
             push @code, "    # check argument $arg_name\n";
@@ -242,7 +242,7 @@ Perinci::Sub::ValidateArgs - Validate function arguments using schemas in Rinci 
 
 =head1 VERSION
 
-This document describes version 0.010 of Perinci::Sub::ValidateArgs (from Perl distribution Perinci-Sub-ValidateArgs), released on 2016-06-02.
+This document describes version 0.011 of Perinci::Sub::ValidateArgs (from Perl distribution Perinci-Sub-ValidateArgs), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -293,7 +293,11 @@ schemas. See L<Data::Sah::Manual::ParamsValidating>.
 =head1 FUNCTIONS
 
 
-=head2 gen_args_validator(%args) -> any
+=head2 gen_args_validator
+
+Usage:
+
+ gen_args_validator(%args) -> any
 
 Generate argument validator from Rinci function metadata.
 
@@ -353,7 +357,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

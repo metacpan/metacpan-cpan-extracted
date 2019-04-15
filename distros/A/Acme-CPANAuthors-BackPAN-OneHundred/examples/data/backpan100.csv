@@ -1,45 +1,53 @@
-# DATE: 2017-05-23T07:53:27
+# DATE: 2019-04-15T04:53:47
 #Pause,Count,Name
-PERLANCAR,1268,perlancar
-PSIXDISTS,549,Perl 6 Modules
+PERLANCAR,1842,perlancar
+PSIXDISTS,550,Perl 6 Modules
 SHARYANTO,510,Steven Haryanto
-TOBYINK,314,Toby Inkster
-RJBS,312,Ricardo SIGNES
-ZOFFIX,293,Zoffix Znet
+TOBYINK,329,Toby Inkster
+RJBS,313,Ricardo SIGNES
+ZOFFIX,296,Zoffix Znet
 ADAMK,287,Adam Kennedy
-TOKUHIROM,251,???
-ETHER,243,Karen Etheridge
-MIYAGAWA,241,Tatsuhiko Miyagawa
-JGNI,236,John Imrie
-INGY,220,Ingy dot Net
-BINGOS,218,Chris Williams
+ETHER,271,Karen Etheridge
+TOKUHIROM,252,???
+JGNI,250,John Imrie
+MIYAGAWA,245,Tatsuhiko Miyagawa
+INGY,223,Ingy dot Net
+BINGOS,221,Chris Williams
 FLORA,210,Florian Ragwitz
-DAGOLDEN,202,David Golden
+DAGOLDEN,204,David Golden
+PLICEASE,202,Graham Ollis
 SMUELLER,192,Steffen Mueller
-KENTNL,188,Kent Fredric
+KENTNL,189,Kent Fredric
 MARCEL,182,???
+PEVANS,176,Paul Evans
 BOBTFISH,172,Tomas Doran
-DROLSKY,168,Dave Rolsky
-PEVANS,162,Paul Evans
+DROLSKY,172,Dave Rolsky
+ELIZABETH,166,Elizabeth Mattijsen
 NUFFIN,161,Yuval Kogman
-PLICEASE,151,Graham Ollis
-NEILB,144,Neil Bowers
+SHLOMIF,157,Shlomi Fish
+MANWAR,154,Mohammad S Anwar
+NEILB,148,Neil Bowers
+GUGOD,146,Liu Kang Min
+RSAVAGE,142,Ron Savage
 SKIM,142,Michal Josef Spacek
-GUGOD,141,Liu Kang Min
-RSAVAGE,141,Ron Savage
+BDFOY,138,brian d foy
 DMAKI,137,Daisuke Maki
 BARBIE,134,Barbie
-BDFOY,134,brian d foy
-FAYLAND,130,Fayland Lin
-SHLOMIF,129,Shlomi Fish
-MANWAR,128,Mohammad S Anwar
+FAYLAND,133,Fayland Lin
 AUTRIJUS,125,Audrey Tang
-SZABGAB,122,Gabor Szabo
+SZABGAB,124,Gabor Szabo
 SIMON,121,Simon Cozens
-MRAMBERG,113,Marcus Ramberg
-MLEHMANN,111,???
+MRAMBERG,120,Marcus Ramberg
+SALVA,116,Salvador Fandino Garcia
+MLEHMANN,114,???
+YANICK,113,Yanick Champoux
+DMUEY,112,Daniel Muey
+RRWO,112,Robert Rothenberg
+RENEEB,111,Renee Baecker
 LBROCARD,111,Leon Brocard
-SALVA,111,Salvador Fandino Garcia
-DMUEY,110,Daniel Muey
-GETTY,107,Torsten Raudssus
+GETTY,108,Torsten Raudssus
+JHTHORSEN,103,Jan Henning Thorsen
+LEONT,101,Leon Timmermans
 LEOCHARRE,101,Leo Charre
+EXODIST,100,Chad Granum
+TEAM,100,Tom Molesworth

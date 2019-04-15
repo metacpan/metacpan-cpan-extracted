@@ -1,13 +1,13 @@
 =head1 NAME
 
-PDLA::Doc::Perldl - commands for accessing PDLA doc database from 'perldl' shell
+PDLA::Doc::Perldl - commands for accessing PDLA doc database from 'perldla' shell
 
 =head1 DESCRIPTION
 
 This module provides a simple set of functions to
 access the PDLA documentation of database, for use
-from the I<perldl> or I<pdl2> shells as well as the
-I<pdldoc> command-line program.
+from the I<perldla> or I<pdla2> shells as well as the
+I<pdladoc> command-line program.
 
 Autoload files are also matched, via a search of the PDLALIB autoloader
 tree.  That behavior can be switched off with the variable 
@@ -54,14 +54,14 @@ my $bvalflag = $PDLA::Config{WITH_BADVAL} || 0;
 sub FindStdFile {
   my ($d,$f);
   for $d (@INC) {
-      $f = $d."/PDLA/pdldoc.db";
+      $f = $d."/PDLA/pdladoc.db";
       if (-f $f) {
          print "Found docs database $f\n" if $PDLA::verbose;
 	 print "Type 'help' for online help\n" if $PDLA::verbose;
          return $f;
       }
   }
-  warn "Unable to find PDLA/pdldoc.db in ".join(":",@INC)."\n";
+  warn "Unable to find PDLA/pdladoc.db in ".join(":",@INC)."\n";
 }
 
 # used to find out how wide the screen should be
@@ -137,7 +137,7 @@ Regex search PDLA documentation database
 
 =for example
 
- pdl> apropos 'pic'
+ pdla> apropos 'pic'
  rpic            Read images in many formats with automatic format detection.
  rpiccan         Test which image formats can be read/written
  wmpeg           Write an image sequence ((x,y,n) piddle) as an MPEG animation.
@@ -369,7 +369,7 @@ Prints usage information for a PDLA function
 
 =for example
 
-   pdl> usage 'inner'
+   pdla> usage 'inner'
 
    inner           inner prodcuct over one dimension
                    (Module PDLA::Primitive)
@@ -422,7 +422,7 @@ doesn't break -- it causes threading.  See L<PDLA::PP|PDLA::PP> for details.
 
 =for example
 
-  pdl> sig 'outer'
+  pdla> sig 'outer'
     Signature: outer(a(n); b(m); [o]c(n,m); )
 
 
@@ -578,9 +578,9 @@ and the remaining commands listed, along with the names of their modules.
 
 =for example
 
- pdl> help 'PDLA::Tutorials' # show the guide to PDLA tutorials
- pdl> help 'PDLA::Slices'    # show the docs in the PDLA::Slices module
- pdl> help 'slice'          # show docs on the 'slice' function
+ pdla> help 'PDLA::Tutorials' # show the guide to PDLA tutorials
+ pdla> help 'PDLA::Slices'    # show the docs in the PDLA::Slices module
+ pdla> help 'slice'          # show docs on the 'slice' function
 
 =cut
 
@@ -634,7 +634,7 @@ sub help {
   } else {
 	print <<'EOH';
 
-The following commands support online help in the perldl shell:
+The following commands support online help in the perldla shell:
 
  help 'thing'   -- print docs on 'thing' (func, module, manual, autoload-file)
  help vars      -- print information about all current piddles
@@ -658,7 +658,7 @@ Quick start:
   apropos 'manual:' -- Find all the manual documents
   apropos 'module:' -- Quick summary of all PDLA modules
   help 'help'       -- details about PDLA help system
-  help 'perldl'     -- help about this shell
+  help 'perldla'     -- help about this shell
 
 EOH
   }

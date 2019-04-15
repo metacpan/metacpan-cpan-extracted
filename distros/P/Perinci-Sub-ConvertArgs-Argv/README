@@ -1,14 +1,100 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::ConvertArgs::Argv - Convert hash arguments to command-line
+    options (and arguments)
 
+VERSION
+    This document describes version 0.110 of Perinci::Sub::ConvertArgs::Argv
+    (from Perl distribution Perinci-Sub-ConvertArgs-Argv), released on
+    2019-04-15.
+
+SYNOPSIS
      use Perinci::Sub::ConvertArgs::Argv qw(convert_args_to_argv);
-    
+
      my $res = convert_args_to_argv(args=>\%args, meta=>$meta, ...);
 
-SEE ALSO
+FUNCTIONS
+  convert_args_to_argv
+    Usage:
 
+     convert_args_to_argv(%args) -> [status, msg, payload, meta]
+
+    Convert hash arguments to command-line options (and arguments).
+
+    Convert hash arguments to command-line arguments. This is the reverse of
+    "Perinci::Sub::GetArgs::Argv::get_args_from_argv".
+
+    Note: currently the function expects schemas in metadata to be
+    normalized already.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args* => *hash*
+
+    *   meta => *hash*
+
+    *   use_pos => *bool*
+
+        Whether to use positional arguments.
+
+        For example, given this metadata:
+
+         {
+             v => 1.1,
+             args => {
+               arg1 => {pos=>0, req=>1},
+               arg2 => {pos=>1},
+               arg3 => {},
+             },
+         }
+
+        then under "use_pos=0" the hash "{arg1=>1, arg2=>2, arg3=>'a b'}"
+        will be converted to "['--arg1', 1, '--arg2', 2, '--arg3', 'a b']".
+        Meanwhile if "use_pos=1" the same hash will be converted to "[1, 2,
+        '--arg3', 'a b']".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-ConvertArgs-Argv>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-ConvertArgs-Argv>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-ConvertAr
+    gs-Argv>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::CmdLine, which uses this module for presenting command-line
     examples.
 
     Perinci::Sub::GetArgs::Argv which does the reverse: converting
     command-line arguments to hash.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

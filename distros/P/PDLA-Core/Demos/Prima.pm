@@ -20,7 +20,7 @@ demo from the command line by saying
 
 Second, you can invoke the demo from with the pdl shell by saying
 
- pdl> demo prima
+ pdla> demo prima
 
 Finally, all of the content is in the pod documentation, so you can simply
 read this, though it won't be quite so interactive. :-)

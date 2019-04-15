@@ -29,10 +29,10 @@ my $fname = do {
     closedir $dh;
     $fname;
 };
-like basename($fname), qr{^foo.\d{8,}\.log$};
+like basename($fname), qr{^foo.\d{8,}\.log$}, "Got expected file basename";
 open my $fh, '<', $fname or die;
 my $content = do { local $/; <$fh> };
-is $content, "OK\nOK2\nOK3\nOK4\n";
+is $content, "OK\nOK2\nOK3\nOK4\n", "Got expected file content";
 
 done_testing;
 

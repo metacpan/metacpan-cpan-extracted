@@ -50,7 +50,7 @@ use Inline Pdlapp => DATA => # inlined PP code is below in DATA section
 
 # quirk 2 follows
 Inline->init;               # you need this if you want to 'use' your module
-                            # from within perldl or pdl2 and your Pdlapp code
+                            # from within perldla or pdla2 and your Pdlapp code
                             # resides in the DATA section (as in this example)
 
 # following required to make exported functions work!

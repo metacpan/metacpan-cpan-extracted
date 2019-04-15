@@ -4,10 +4,10 @@ PDLA::Dataflow -- description of the dataflow philosophy
 
 =head1 SYNOPSIS
 
-	pdl> $a = zeroes(10);
-	pdl> $b = $a->slice("2:4:2");
-	pdl> $b ++;
-	pdl> print $a;
+	pdla> $a = zeroes(10);
+	pdla> $b = $a->slice("2:4:2");
+	pdla> $b ++;
+	pdla> print $a;
 	[0 0 1 0 1 0 0 0 0 0]
 
 

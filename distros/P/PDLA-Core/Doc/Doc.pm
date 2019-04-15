@@ -475,7 +475,7 @@ sub ensuredb {
       push(@a, "") unless(@a % 2);  # Add null string at end if necessary -- solves bug with missing REF section.
       my ($sym, %hash) = @a;
      
-      $hash{Dbfile} = $fi; # keep the origin pdldoc.db path
+      $hash{Dbfile} = $fi; # keep the origin pdladoc.db path
       $this->{SYMS}->{$sym} = {%hash};
     }
     close IN;
@@ -500,7 +500,7 @@ sub savedb {
     next if 0 == scalar(%$val);
     my $fi = $val->{File};
     if (File::Spec->file_name_is_absolute($fi) && -f $fi) {
-      #store paths to *.pm files relative to pdldoc.db
+      #store paths to *.pm files relative to pdladoc.db
       $val->{File} = File::Spec->abs2rel($fi, dirname($this->{Outfile})) ;
     }
     delete $val->{Dbfile}; # no need to store Dbfile
@@ -834,25 +834,25 @@ sub add_module {
 
     use File::Copy qw{copy};
 
-    my($dir, $file, $pdldoc);
+    my($dir, $file, $pdladoc);
     local($_);
 
   DIRECTORY:
     for(@INC){
 	$dir = $_;
-	$file = $dir."/PDLA/pdldoc.db";
+	$file = $dir."/PDLA/pdladoc.db";
 	if( -f $file) {
 	    if(! -w "$dir/PDLA") {
 		die "No write permission at $dir/PDLA - not updating docs database.\n";
 	    }
 
 	    print "Found docs database $file\n";
-	    $pdldoc = new ("PDLA::Doc",($file));
+	    $pdladoc = new ("PDLA::Doc",($file));
 	    last DIRECTORY;
 	}
     }
 
-    die "Unable to find docs database - therefore not updating it.\n" unless($pdldoc);
+    die "Unable to find docs database - therefore not updating it.\n" unless($pdladoc);
 
     my $mfile = $module;
     $mfile =~ s/\:\:/\//g;
@@ -862,9 +862,9 @@ sub add_module {
 	for $postfix(".pm",".pod") {
 	    my $f = "$_/$mfile$postfix";
 	    if( -e $f ){
-		$pdldoc->ensuredb();
-		$pdldoc->scan($f);
-		eval { $pdldoc->savedb(); };
+		$pdladoc->ensuredb();
+		$pdladoc->scan($f);
+		eval { $pdladoc->savedb(); };
 		warn $@ if $@;
 		print "PDLA docs database updated - added $f.\n";
 		$hit = 1;
@@ -885,26 +885,26 @@ own code.
 
  use PDLA::Doc;
  # Find the pdl documentation
- my ($dir,$file,$pdldoc);
+ my ($dir,$file,$pdladoc);
  DIRECTORY: for $dir (@INC) {
-     $file = $dir."/PDLA/pdldoc.db";
+     $file = $dir."/PDLA/pdladoc.db";
      if (-f $file) {
          print "Found docs database $file\n";
-         $pdldoc = new PDLA::Doc ($file);
+         $pdladoc = new PDLA::Doc ($file);
          last DIRECTORY;
      }
  }
  
- die ("Unable to find docs database!\n") unless $pdldoc;
+ die ("Unable to find docs database!\n") unless $pdladoc;
  
  # Print the reference line for zeroes:
- print $pdldoc->gethash->{zeroes}->{Ref};
+ print $pdladoc->gethash->{zeroes}->{Ref};
  
  # See which examples use zeroes
- $pdldoc->search('zeroes', 'Example', 1);
+ $pdladoc->search('zeroes', 'Example', 1);
  
  # All the functions that use zeroes in their example:
- my @entries = $pdldoc->search('zeroes', 'Example', 1);
+ my @entries = $pdladoc->search('zeroes', 'Example', 1);
  print "Functions that use 'zeroes' in their examples include:\n";
  foreach my $entry (@entries) {
      # Unpack the entry
@@ -915,7 +915,7 @@ own code.
  print "\n";
  
  # Let's look at the function 'mpdl'
- @entries = $pdldoc->search('mpdl', 'Name');
+ @entries = $pdladoc->search('mpdl', 'Name');
  # I know there's only one:
  my $entry = $entries[0];
  my ($func_name, $sym_hash) = @$entry;
@@ -932,8 +932,8 @@ The Ref entry will begin with 'Module:' if it's a module. In code:
 
  # Prints:
  #  Module: fundamental PDLA functionality
- my $sym_hash = $pdldoc->gethash;
- print $pdldoc->gethash->{'PDLA::Core'}->{Ref}, "\n"
+ my $sym_hash = $pdladoc->gethash;
+ print $pdladoc->gethash->{'PDLA::Core'}->{Ref}, "\n"
 
 =head1 BUGS
 

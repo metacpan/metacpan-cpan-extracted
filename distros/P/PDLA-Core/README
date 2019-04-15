@@ -36,7 +36,7 @@ DEVELOPMENT		How to participate in the development of PDLA
 
 
 *NOTE*  Most PDLA documentation is available online within the PDLA shell,
-        pdl2 (or perldl).  Try the help command within either shell.
+        pdla2 (or perldl).  Try the help command within either shell.
 
 
 
@@ -66,11 +66,11 @@ to read Known_problems if you have any INSTALL issues.
 Once you have built PDLA and either installed it or done
 'make doctest', try either
 
-	perl -Mblib Perldl2/pdl2
+	perl -Mblib Perldl2/pdla2
 
 from within the root of the PDLA tree or just
 
-	pdl2
+	pdla2
 	
 if you have installed PDLA already ('make install') to get the
 interactive PDLA shell.  In this shell, 'help' gives you

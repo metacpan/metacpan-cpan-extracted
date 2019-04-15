@@ -1,7 +1,7 @@
 package App::HTTPTinyUtils;
 
-our $DATE = '2019-04-14'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,36 +17,49 @@ sub _http_tiny {
     (my $class_pm = "$class.pm") =~ s!::!/!g;
     require $class_pm;
 
-    my $url = $args{url};
+    my $res;
     my $method = $args{method} // 'GET';
+    for my $i (0 .. $#{ $args{urls} }) {
+        my $url = $args{urls}[$i];
+        my $is_last_url = $i == $#{ $args{urls} };
 
-    my %opts;
+        my %opts;
+        if (defined $args{content}) {
+            $opts{content} = $args{content};
+        } elsif (!(-t STDIN)) {
+            local $/;
+            $opts{content} = <STDIN>;
+        }
 
-    if (defined $args{content}) {
-        $opts{content} = $args{content};
-    } elsif (!(-t STDIN)) {
-        local $/;
-        $opts{content} = <STDIN>;
+        my $res0 = $class->new(%{ $args{attributes} // {} })
+            ->request($method, $url, \%opts);
+        my $success = $res0->{success};
+
+        if ($args{raw}) {
+            $res = [200, "OK", $res0];
+        } else {
+            $res = [$res0->{status}, $res0->{reason}, $res0->{content}];
+            print $res0->{content} unless $is_last_url;
+        }
+
+        unless ($success) {
+            last unless $args{ignore_errors};
+        }
     }
-
-    my $res = $class->new(%{ $args{attributes} // {} })
-        ->request($method, $url, \%opts);
-
-    if ($args{raw}) {
-        [200, "OK", $res];
-    } else {
-        [$res->{status}, $res->{reason}, $res->{content}];
-    }
+    $res;
 }
 
 $SPEC{http_tiny} = {
     v => 1.1,
-    summary => 'Perform request with HTTP::Tiny',
+    summary => 'Perform request(s) with HTTP::Tiny',
     args => {
-        url => {
-            schema => 'str*',
+        urls => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'url',
+            schema => ['array*', of=>'str*'],
             req => 1,
             pos => 0,
+            slurpy => 1,
         },
         method => {
             schema => ['str*', match=>qr/\A[A-Z]+\z/],
@@ -75,6 +88,18 @@ $SPEC{http_tiny} = {
         },
         raw => {
             schema => 'bool*',
+        },
+        ignore_errors => {
+            summary => 'Ignore errors',
+            description => <<'_',
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With `ignore_errors` set to true, will just log the error
+and continue. Will return with the last error response.
+
+_
+            schema => 'bool*',
+            cmdline_aliases => {i=>{}},
         },
         # XXX option: agent
         # XXX option: timeout
@@ -188,7 +213,7 @@ App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.005 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2019-04-14.
+This document describes version 0.006 of App::HTTPTinyUtils (from Perl distribution App-HTTPTinyUtils), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -219,7 +244,7 @@ Usage:
 
  http_tiny(%args) -> [status, msg, payload, meta]
 
-Perform request with HTTP::Tiny.
+Perform request(s) with HTTP::Tiny.
 
 This function is not exported.
 
@@ -235,11 +260,19 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<headers> => I<hash>
 
+=item * B<ignore_errors> => I<bool>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With C<ignore_errors> set to true, will just log the error
+and continue. Will return with the last error response.
+
 =item * B<method> => I<str> (default: "GET")
 
 =item * B<raw> => I<bool>
 
-=item * B<url>* => I<str>
+=item * B<urls>* => I<array[str]>
 
 =back
 
@@ -253,6 +286,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 http_tiny_cache
@@ -280,11 +314,19 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<headers> => I<hash>
 
+=item * B<ignore_errors> => I<bool>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With C<ignore_errors> set to true, will just log the error
+and continue. Will return with the last error response.
+
 =item * B<method> => I<str> (default: "GET")
 
 =item * B<raw> => I<bool>
 
-=item * B<url>* => I<str>
+=item * B<urls>* => I<array[str]>
 
 =back
 
@@ -298,6 +340,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 http_tiny_customretry
@@ -326,11 +369,19 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<headers> => I<hash>
 
+=item * B<ignore_errors> => I<bool>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With C<ignore_errors> set to true, will just log the error
+and continue. Will return with the last error response.
+
 =item * B<method> => I<str> (default: "GET")
 
 =item * B<raw> => I<bool>
 
-=item * B<url>* => I<str>
+=item * B<urls>* => I<array[str]>
 
 =back
 
@@ -344,6 +395,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 http_tiny_plugin
@@ -371,11 +423,19 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<headers> => I<hash>
 
+=item * B<ignore_errors> => I<bool>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With C<ignore_errors> set to true, will just log the error
+and continue. Will return with the last error response.
+
 =item * B<method> => I<str> (default: "GET")
 
 =item * B<raw> => I<bool>
 
-=item * B<url>* => I<str>
+=item * B<urls>* => I<array[str]>
 
 =back
 
@@ -389,6 +449,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 http_tiny_retry
@@ -416,11 +477,19 @@ Pass attributes to HTTP::Tiny constructor.
 
 =item * B<headers> => I<hash>
 
+=item * B<ignore_errors> => I<bool>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With C<ignore_errors> set to true, will just log the error
+and continue. Will return with the last error response.
+
 =item * B<method> => I<str> (default: "GET")
 
 =item * B<raw> => I<bool>
 
-=item * B<url>* => I<str>
+=item * B<urls>* => I<array[str]>
 
 =back
 

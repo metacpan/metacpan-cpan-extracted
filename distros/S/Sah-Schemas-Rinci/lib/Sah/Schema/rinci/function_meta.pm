@@ -1,7 +1,7 @@
 package Sah::Schema::rinci::function_meta;
 
-our $DATE = '2018-11-29'; # DATE
-our $VERSION = '1.1.87.0'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '1.1.88.0'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,8 @@ our $schema = [hash => {
                 default => {},
                 req => {},
                 pos => {},
-                greedy => {},
+                slurpy => {},
+                greedy => {}, # old alias for slurpy, will be removed in Rinci 1.2
                 partial => {},
                 stream => {},
                 is_password => {},
@@ -154,7 +155,7 @@ Sah::Schema::rinci::function_meta - Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 1.1.87.0 of Sah::Schema::rinci::function_meta (from Perl distribution Sah-Schemas-Rinci), released on 2018-11-29.
+This document describes version 1.1.88.0 of Sah::Schema::rinci::function_meta (from Perl distribution Sah-Schemas-Rinci), released on 2019-04-15.
 
 =head1 HOMEPAGE
 
@@ -178,7 +179,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

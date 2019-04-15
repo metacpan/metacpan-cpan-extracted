@@ -22,7 +22,7 @@ Rinci::function - Metadata for your functions/methods
 
 =head1 VERSION
 
-This document describes version 1.1.87 of Rinci::function (from Perl distribution Rinci), released on 2018-11-29.
+This document describes version 1.1.89 of Rinci::function (from Perl distribution Rinci), released on 2019-04-15.
 
 =head1 INTRODUCTION
 
@@ -295,10 +295,16 @@ categorize arguments. Not unlike the C<tags> property.
 Non-negative integer. Argument position when specified in an ordered fashion,
 e.g. in an array. Starts from zero.
 
-=head3 greedy
+=head3 slurpy
 
 Bool. Only relevant if B<pos> is specified, specify whether argument should
 gobble up all remaining values in an ordered argument list into an array.
+
+Old alias: L</greedy>
+
+=head3 greedy
+
+Old alias for L</slurpy>. Will be removed in Rinci 1.2.
 
 =head3 partial (argument property)
 
@@ -443,7 +449,7 @@ logging.
 Str. Normally in a command-line program, command-line options and arguments will
 map to function arguments, e.g. C<--arg 2> will set the C<foo> argument to C<2>
 and positional arguments (argument which specifies the C<pos> property and
-optionally also a C<greedy> property with true value) will get or slurp
+optionally also a C<slurpy> property with true value) will get or slurp
 command-line arguments.
 
 In some cases, this is not convenient. When supplying larger amount of data, a
@@ -663,7 +669,7 @@ Another example (demonstrates C<cmdline_aliases>):
      },
  };
 
-Another example (demonstrates B<greedy>):
+Another example (demonstrates B<slurpy>):
 
  $SPEC{multiply_many} = {
      v => 1.1,
@@ -672,7 +678,7 @@ Another example (demonstrates B<greedy>):
          nums   => {
              schema => ['array*' => {of=>'num*', min_len=>1}],
              pos    => 0,
-             greedy => 1
+             slurpy => 1
          },
      },
  };
@@ -751,7 +757,7 @@ elements. Argument type must be C<array> or C<hash>. Example for array:
              schema     => ['array*' => of => 'str*'],
              req        => 1,
              pos        => 0,
-             greedy     => 1,
+             slurpy     => 1,
              element_completion => sub {
                  my %args = @_;
                  my $word = $args{word} // "";
@@ -1533,7 +1539,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -22,6 +22,15 @@ WriteMakefile1(
     },
   },
 
+# this makes version from logic fail - why?
+#  META_ADD => {
+#    provides => {
+#      'File::LsColor' => {
+#        file => 'lib/File/LsColor.pm',
+#      },
+#    },
+#  },
+
   NAME             => q{File::LsColor},
   AUTHOR           => q{Magnus Woldrich <m@japh.se>},
   ABSTRACT         => q{Colorize input filenames like ls(1)},

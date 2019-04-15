@@ -1,5 +1,13 @@
 Revision history for Text-Parser
 
+0.915     2019-04-14 23:50:51-07:00 America/Los_Angeles
+  - Remove exceptions based on Exception::Class and use Throwable::SugarFactory instead
+  - Add Text::Parser::Errors. Use exceptions from here in Text::Parser code.
+  - Make Dist::Zilla::Plugin::Test::TidyAll required only for the build phase of the distro - close issue #13 on Github
+  - Update and improve POD to reference errors in Text::Parser::Errors package
+  - Document the errors and make recommendations for error handling in POD
+  - Add README.PATCHING, and update CONTRIBUTING.md
+
 0.911     2019-04-11 21:17:53-07:00 America/Los_Angeles
   - Added two new attributes auto_split and FS to split lines into fields
   - Updated POD

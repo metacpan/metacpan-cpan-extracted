@@ -1,3 +1,16 @@
+=pod
+
+=head1 NAME
+
+URI::NamespaceMap - Class holding a collection of namespaces
+
+=head1 VERSION
+
+Version 1.08
+
+=cut
+
+
 package URI::NamespaceMap;
 use Moo 1.006000;
 use Module::Load::Conditional qw[can_load];
@@ -11,17 +24,8 @@ use Types::Namespace 0.004 qw(Namespace);
 use URI::NamespaceMap::ReservedLocalParts;
 use namespace::autoclean;
 
-=head1 NAME
 
-URI::NamespaceMap - Class holding a collection of namespaces
-
-=head1 VERSION
-
-Version 1.06
-
-=cut
-
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 
 =head1 SYNOPSIS
@@ -51,11 +55,18 @@ This module provides an object to manage multiple namespaces for creating L<URI:
 
 Returns a new namespace map object. You can pass a hash reference with
 mappings from local names to namespace URIs (given as string or
-L<RDF::Trine::Node::Resource>) or namespaces_map with a hashref. You
-may also pass an arrayref containing just prefixes and/or namespace
-URIs, and the module will try to guess the missing part. To use this
-feature, you need L<RDF::NS::Curated>, L<RDF::NS>, L<XML::CommonNS> or
-L<RDF::Prefixes>, or preferably all of them.
+L<RDF::Trine::Node::Resource>) or namespaces_map with a hashref. 
+
+You may also pass an arrayref containing just prefixes and/or
+namespace URIs, and the module will try to guess the missing part. To
+use this feature, you need L<RDF::NS::Curated>, L<RDF::NS>,
+L<XML::CommonNS> or L<RDF::Prefixes>, or preferably all of them. With
+that, you can do e.g.
+
+  my $map = URI::NamespaceMap->new( 'rdf', 'xsd', 'foaf' );
+
+and have the correct mappings added automatically.
+
 
 
 =item C<< add_mapping ( $name => $uri ) >>
@@ -209,6 +220,9 @@ sub _scrub_uri {
 				# and this
 				$uri = $uri->uri->uri_value;
 			}
+#			elsif ($uri =~ m/^\<(.*?)\>$/) {
+#			  $uri = $1;
+#			}
 			else {
 				# let's hope whatever was passed in has a string overload
 				$uri = "$uri";
@@ -325,7 +339,7 @@ sub _guess {
 				my $ns = RDF::NS->new;
 				$namespaces{$prefix} = $ns->SELECT($entry);
 			}
-			carp "Cannot resolve '$entry'" unless $namespaces{$prefix};
+			carp "Cannot resolve assumed prefix '$entry'" unless $namespaces{$prefix};
 		} else {
 			# Lets assume a URI string
 			carp "Cannot resolve '$entry' without RDF::NS::Curated, RDF::NS or RDF::Prefixes" unless ($rnscu || $rdfns || $rdfpr);
@@ -343,7 +357,7 @@ sub _guess {
 				$prefix = $context->get_prefix($entry);
 			}
 			unless ($prefix) {
-				carp "Cannot resolve '$entry'";
+				carp "Cannot resolve assumed URI string '$entry'";
 			} else {
 				my $i = 1;
 				while ($r->is_reserved($prefix)) {

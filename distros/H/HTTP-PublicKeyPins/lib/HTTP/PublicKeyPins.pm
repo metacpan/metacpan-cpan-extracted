@@ -22,7 +22,7 @@ our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 sub _CERTIFICATE_HEADER_SIZE { return 40; }
 sub _MAX_PUBLIC_KEY_SIZE     { return 65_536; }
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub pin_sha256 {
     my ($path) = @_;
@@ -117,7 +117,9 @@ sub _process_pem_pkcs10_certificate_request {
     defined read $handle, my $pkcs10_certificate_string, _MAX_PUBLIC_KEY_SIZE()
       or Carp::croak("Failed to read from $path:$EXTENDED_OS_ERROR");
     Crypt::PKCS10->setAPIversion(1);
-    my $req = Crypt::PKCS10->new($pkcs10_certificate_string);
+    my $req = Crypt::PKCS10->new($pkcs10_certificate_string)
+      or Carp::croak( 'Failed to initialise Crypt::PKCS10 library:'
+          . Crypt::PKCS10->error() );
     my $pem_encoded_public_key_string = $req->subjectPublicKey(1);
     return $pem_encoded_public_key_string;
 }
@@ -263,7 +265,7 @@ HTTP::PublicKeyPins - Generate RFC 7469 HTTP Public Key Pin (HPKP) header values
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =head1 SYNOPSIS
 

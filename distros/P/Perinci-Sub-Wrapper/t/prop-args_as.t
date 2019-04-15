@@ -96,7 +96,7 @@ subtest 'prop: args_as' => sub {
     # XXX convert arrayref->hashref
     # XXX convert arrayref->array
 
-    # XXX convert hash->array + greedy
+    # XXX convert hash->array + slurpy
 };
 
 DONE_TESTING:

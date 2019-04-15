@@ -1,7 +1,7 @@
 package Perinci::Sub::To::CLIDocData;
 
-our $DATE = '2016-10-27'; # DATE
-our $VERSION = '0.28'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.290'; # VERSION
 
 use 5.010001;
 use strict;
@@ -205,7 +205,7 @@ sub gen_cli_doc_data_from_meta {
             }
             $pos++;
             next unless defined($arg);
-            if ($arg_spec->{greedy}) {
+            if ($arg_spec->{slurpy} // $arg_spec->{greedy}) {
                 # try to find the singular form
                 $arg = $arg_spec->{'x.name.singular'}
                     if $arg_spec->{'x.name.is_plural'} &&
@@ -216,7 +216,7 @@ sub gen_cli_doc_data_from_meta {
             } else {
                 push @args, "[$arg]";
             }
-            $args[-1] .= " ..." if $arg_spec->{greedy};
+            $args[-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
             delete $args_prop{$arg};
         }
         unshift @args, "[options]" if keys(%args_prop) || keys(%$common_opts); # XXX translatable?
@@ -348,7 +348,7 @@ sub gen_cli_doc_data_from_meta {
                 }
 
                 # include keys from arg_spec
-                for (qw/req pos greedy is_password links tags/) {
+                for (qw/req pos slurpy greedy is_password links tags/) {
                     $opt->{$_} = $arg_spec->{$_} if defined $arg_spec->{$_};
                 }
 
@@ -494,7 +494,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.28 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2016-10-27.
+This document describes version 0.290 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -643,7 +643,11 @@ L<Perinci::Examples::CLI>.
 =head1 FUNCTIONS
 
 
-=head2 gen_cli_doc_data_from_meta(%args) -> [status, msg, result, meta]
+=head2 gen_cli_doc_data_from_meta
+
+Usage:
+
+ gen_cli_doc_data_from_meta(%args) -> [status, msg, payload, meta]
 
 From Rinci function metadata, generate structure convenient for producing CLI documentation (help/usage/POD).
 
@@ -697,7 +701,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -731,7 +735,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

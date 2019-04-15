@@ -2071,8 +2071,8 @@ code) explicitly specify C<Doc=E<gt>undef>.
 
 =item BadDoc (bad)
 
-Contains the text returned by the C<badinfo> command (in C<perldl>) or
-the C<-b> switch to the C<pdldoc> shell script. In many cases, you will
+Contains the text returned by the C<badinfo> command (in C<perldla>) or
+the C<-b> switch to the C<pdladoc> shell script. In many cases, you will
 not need to specify this, since the information can be automatically
 created by PDLA::PP. However, as befits computer-generated text, it's
 rather stilted; it may be much better to do it yourself!

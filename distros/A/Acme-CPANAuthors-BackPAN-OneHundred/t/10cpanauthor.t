@@ -11,7 +11,7 @@ my $authors  = eval { Acme::CPANAuthors->new("BackPAN::OneHundred") };
 is( $@, "", "creating a new Acme::CPANAuthors object with InMemoriam authors" );
 isa_ok( $authors, "Acme::CPANAuthors" );
 
-my $number = 43;
+my $number = 51;
 is( $authors->count, $number, " .. \$authors->count matches current count" );
 
 my @ids = $authors->id;

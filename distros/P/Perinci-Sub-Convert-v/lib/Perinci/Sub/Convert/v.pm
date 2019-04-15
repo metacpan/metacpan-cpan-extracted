@@ -1,7 +1,7 @@
 package Perinci::Sub::Convert::v;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ sub convert_property_v {
                     delete $oldarg->[1]{arg_pos};
                 }
                 if (defined $oldarg->[1]{arg_greedy}) {
-                    $newarg->{greedy} = $oldarg->[1]{arg_greedy};
+                    $newarg->{slurpy} = $oldarg->[1]{arg_greedy};
                     delete $oldarg->[1]{arg_greedy};
                 }
                 if (defined $oldarg->[1]{arg_complete}) {
@@ -114,23 +114,25 @@ Perinci::Sub::Convert::v - Convert v1.0 Rinci function metadata to v1.1
 
 =head1 VERSION
 
-This document describes version 0.02 of Perinci::Sub::Convert::v (from Perl distribution Perinci-Sub-Convert-v), released on 2015-09-03.
+This document describes version 0.030 of Perinci::Sub::Convert::v (from Perl distribution Perinci-Sub-Convert-v), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
  use Perinci::Sub::Convert::v qw(convert_property_v);
  convert_property_v(meta => $meta);
 
-=head1 SEE ALSO
-
-L<Rinci>
-
 =head1 FUNCTIONS
 
 
-=head2 convert_property_v(%args) -> any
+=head2 convert_property_v
+
+Usage:
+
+ convert_property_v(%args) -> any
 
 Convert v1.0 Rinci function metadata to v1.1.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -162,13 +164,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

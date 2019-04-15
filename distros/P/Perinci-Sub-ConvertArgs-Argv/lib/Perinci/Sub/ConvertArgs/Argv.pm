@@ -1,7 +1,7 @@
 package Perinci::Sub::ConvertArgs::Argv;
 
-our $DATE = '2016-12-12'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.110'; # VERSION
 
 use 5.010001;
 use strict;
@@ -82,7 +82,7 @@ sub convert_args_to_argv {
         for my $arg (sort {$args_prop->{$a}{pos} <=> $args_prop->{$b}{pos}}
                          grep {defined $args_prop->{$_}{pos}} keys %iargs) {
             my $pos = $args_prop->{$arg}{pos};
-            if ($args_prop->{$arg}{greedy}) {
+            if ($args_prop->{$arg}{slurpy} // $args_prop->{$arg}{greedy}) {
                 my $sch = $args_prop->{$arg}{schema};
                 my $is_array_of_simple = $sch && $sch->[0] eq 'array' &&
                     is_simple($sch->[1]{of} // $sch->[1]{each_elem});
@@ -151,7 +151,7 @@ Perinci::Sub::ConvertArgs::Argv - Convert hash arguments to command-line options
 
 =head1 VERSION
 
-This document describes version 0.10 of Perinci::Sub::ConvertArgs::Argv (from Perl distribution Perinci-Sub-ConvertArgs-Argv), released on 2016-12-12.
+This document describes version 0.110 of Perinci::Sub::ConvertArgs::Argv (from Perl distribution Perinci-Sub-ConvertArgs-Argv), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -162,7 +162,11 @@ This document describes version 0.10 of Perinci::Sub::ConvertArgs::Argv (from Pe
 =head1 FUNCTIONS
 
 
-=head2 convert_args_to_argv(%args) -> [status, msg, result, meta]
+=head2 convert_args_to_argv
+
+Usage:
+
+ convert_args_to_argv(%args) -> [status, msg, payload, meta]
 
 Convert hash arguments to command-line options (and arguments).
 
@@ -208,7 +212,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -220,7 +224,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-ConvertArgs-Argv>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-ConvertArgs-Argv>.
 
 =head1 BUGS
 
@@ -244,7 +248,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

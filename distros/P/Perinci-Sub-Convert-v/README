@@ -1,9 +1,59 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::Convert::v - Convert v1.0 Rinci function metadata to v1.1
 
+VERSION
+    This document describes version 0.030 of Perinci::Sub::Convert::v (from
+    Perl distribution Perinci-Sub-Convert-v), released on 2019-04-15.
+
+SYNOPSIS
      use Perinci::Sub::Convert::v qw(convert_property_v);
      convert_property_v(meta => $meta);
 
-SEE ALSO
+FUNCTIONS
+  convert_property_v
+    Usage:
 
+     convert_property_v(%args) -> any
+
+    Convert v1.0 Rinci function metadata to v1.1.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   meta* => *hash*
+
+    *   new => *float* (default: 1.1)
+
+        New version.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-Convert-v>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-Convert-v>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Convert-v
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

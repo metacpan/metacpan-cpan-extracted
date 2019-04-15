@@ -77,7 +77,7 @@ pdl (1:2.4.7+dfsg-1) unstable; urgency=low
   * build-depend on netpbm (improves testsuite runs)
   * build-depend on proj-bin (alternatively with proj) to have 'proj'
     command available
-  * build-depend and suggest libdevel-repl-perl (for new pdl2 shell)
+  * build-depend and suggest libdevel-repl-perl (for new pdla2 shell)
   * update debian standards-version to 3.9.1 (no further changes needed)
   * improve test suite run output in build log
 

@@ -294,10 +294,10 @@ the work planned for the future  PDLA-2.x releases.
 
 
    Complete Perldl2 shell:
-   * Implement remaining perldl features for pdl2
+   * Implement remaining perldl features for pdla2
    * Fix Ctrl-C handling for win32 systems
    * Update documentation
-   * See Perldl2/TODO for the pdl2-specific list.
+   * See Perldl2/TODO for the pdla2-specific list.
 
 
    Add support for 64bit data:
@@ -379,7 +379,7 @@ the work planned for the future  PDLA-2.x releases.
    * Implement key set of basic Matlab functions
    * MATLAB "expand" to PDLA syntax?
    * Document PDLA equivalents
-   * Add who/whos refs or links to pdl2 'help vars'
+   * Add who/whos refs or links to pdla2 'help vars'
 
    
    Fix external dependency processing

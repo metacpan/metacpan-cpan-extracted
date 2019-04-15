@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2018-05-20'; # DATE
-our $VERSION = '1.812'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '1.813'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -758,7 +758,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.812 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2018-05-20.
+This document describes version 1.813 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -1019,7 +1019,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_grep
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2018-05-25'; # DATE
+our $DATE = '2019-04-15'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +16,8 @@ use Perinci::CmdLine::Any;
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_grep",
     program_name => "csv-grep",
+    read_config => 0,
+    read_env => 0,
 );
 
 $cmdline->run;
@@ -35,7 +37,7 @@ csv-grep - Only output row(s) where Perl expression returns true
 
 =head1 VERSION
 
-This document describes version 0.014 of csv-grep (from Perl distribution App-CSVUtils), released on 2018-05-25.
+This document describes version 0.015 of csv-grep (from Perl distribution App-CSVUtils), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -49,7 +51,7 @@ Only show rows where the amount field is divisible by 7:
 
  % csv-grep -He '$_->{amount} % 7 ? 1:0' file.csv
 
-Only show rows where the date is a Wednesday:
+Only show rows where date is a Wednesday:
 
  % csv-grep -He 'BEGIN { use DateTime::Format::Natural; $parser = DateTime::Format::Natural->new } $dt = $parser->parse_datetime($_->{date}); $dt->day_of_week == 3' file.csv
 
@@ -57,10 +59,12 @@ Only show rows where the date is a Wednesday:
 
 This is like Perl's C<grep> performed over rows of CSV. In C<$_>, your Perl code
 will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
-C<$main::row> is also set to the row, while C<$main::rownum> contains the row
-number (2 means the first data row). Your code is then free to return true or
-false based on some criteria. Only rows where Perl expression returns true will
-be included in the result.
+C<$main::row> is also set to the row (always as arrayref), while C<$main::rownum>
+contains the row number (2 means the first data row). C<$main::field_idxs> is
+also available for additional information.
+
+Your code is then free to return true or false based on some criteria. Only rows
+where Perl expression returns true will be included in the result.
 
 =head1 OPTIONS
 
@@ -87,36 +91,6 @@ Provide row in $_ as hashref instead of arrayref.
 When you declare that CSV does not have header row (`--no-header`), the fields
 will be named `field1`, `field2`, and so on.
 
-
-=back
-
-=head2 Configuration options
-
-=over
-
-=item B<--config-path>=I<filename>
-
-Set path to configuration file.
-
-Can be specified multiple times.
-
-=item B<--config-profile>=I<s>
-
-Set configuration profile to use.
-
-=item B<--no-config>
-
-Do not use any configuration file.
-
-=back
-
-=head2 Environment options
-
-=over
-
-=item B<--no-env>
-
-Do not read environment for default options.
 
 =back
 
@@ -207,45 +181,6 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
-=head1 CONFIGURATION FILE
-
-This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
-
-By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/csv-grep.conf>, F<~/csv-grep.conf>, or F</etc/csv-grep.conf>.
-
-All found files will be read and merged.
-
-To disable searching for configuration files, pass C<--no-config>.
-
-You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
-
-You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
-
-Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
-
-List of available configuration parameters:
-
- eval (see --eval)
- filename (see --filename)
- format (see --format)
- hash (see --hash)
- header (see --no-header)
- naked_res (see --naked-res)
-
-=head1 ENVIRONMENT
-
-=head2 CSV_GREP_OPT => str
-
-Specify additional command-line options.
-
-=head1 FILES
-
-F<~/.config/csv-grep.conf>
-
-F<~/csv-grep.conf>
-
-F</etc/csv-grep.conf>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
@@ -272,7 +207,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ use strict;
 use Config;
 use File::Basename qw(&basename &dirname);
 
-require 'Dev.pm'; PDLA::Core::Dev->import;
+require './Dev.pm'; PDLA::Core::Dev->import;
 use vars qw( %PDLA_DATATYPES );
 
 # check for bad value support
@@ -14,7 +14,7 @@ require './Config.pm'; # to load the PDLA not the Perl one
 die "No PDLA::Config found" unless %PDLA::Config;
 my $bvalflag = $PDLA::Config{WITH_BADVAL};
 my $usenan = $PDLA::Config{BADVAL_USENAN};
-require 'Types.pm';
+require './Types.pm';
 PDLA::Types->import(':All');
 
 

@@ -32,7 +32,7 @@ is( $pars->multiline_type('join_next'),
 throws_ok {
     $pars->multiline_type(undef);
 }
-'Text::Parser::Exception',
+'Text::Parser::Errors::CantUndoMultiline',
     'Correct error when trying to reset multiline_type';
 lives_ok {
     is( $pars->multiline_type('join_last'),
@@ -51,16 +51,14 @@ throws_ok { $pars->filename( { a => 'b' } ); }
 'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'filename() will take only string as input';
 throws_ok { $pars->filename('') }
-'Moose::Exception::ValidationFailedForInlineTypeConstraint',
-    'Empty filename string';
+'Text::Parser::Errors::InvalidFilename', 'Empty filename string';
 throws_ok { $pars->filename($fname) }
-'Moose::Exception::ValidationFailedForInlineTypeConstraint',
-    'No file by this name';
+'Text::Parser::Errors::InvalidFilename', 'No file by this name';
 throws_ok { $pars->read( bless {}, 'Something' ); }
-'Text::Parser::Exception::BadReadInput',
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'filehandle() will take only a GLOB or FileHandle input';
 throws_ok { $pars->read($fname); }
-'Moose::Exception::ValidationFailedForInlineTypeConstraint',
+'Text::Parser::Errors::InvalidFilename',
     'Throws exception for non-existent file';
 
 lives_ok { $pars->read(); } 'Returns doing nothing';
@@ -81,8 +79,7 @@ SKIP: {
     close OFILE;
     chmod 0200, 't/unreadable.txt';
     throws_ok { $pars->filename('t/unreadable.txt'); }
-    'Moose::Exception::ValidationFailedForInlineTypeConstraint',
-        'This file cannot be read';
+    'Text::Parser::Errors::FileNotReadable', 'This file cannot be read';
     is( $pars->filename(), undef, 'Still no file has been read so far' );
     unlink 't/unreadable.txt';
 }
@@ -119,7 +116,8 @@ lives_ok { $pars->filehandle( \*STDOUT ); }
 'Some systems can read from STDOUT. Your system is one of them.';
 lives_ok { $pars->filehandle( \*STDIN ); } 'No issues in reading from STDIN';
 
-throws_ok { $pars->read( { a => 'b' } ); } 'Text::Parser::Exception',
+throws_ok { $pars->read( { a => 'b' } ); }
+'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'Invalid type of argument for read() method';
 
 lives_ok { $pars->read( 't/' . $fname ); }

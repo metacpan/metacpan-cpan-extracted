@@ -4,7 +4,7 @@
       "Andy Beverley <andy@andybev.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,6 +55,6 @@
          "url" : "https://github.com/ctrlo/CtrlO-PDF"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

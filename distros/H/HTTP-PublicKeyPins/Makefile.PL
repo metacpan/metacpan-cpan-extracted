@@ -23,6 +23,7 @@ WriteMakefile(
 	'Crypt::OpenSSL::X509' => 1.803,
 	'Crypt::PKCS10' => 1.5,
 	'Crypt::OpenSSL::RSA' => 0,
+	'CryptX' => 0, # undeclared dep for Crypt::PKCS10
 	'Carp' => 0,
 	'Digest' => 0,
 	'English' => 0,

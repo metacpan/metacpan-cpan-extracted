@@ -7,7 +7,7 @@ use warnings;
 use PDLA::Exporter;
 use DynaLoader;
 our @ISA    = qw( PDLA::Exporter DynaLoader );
-our $VERSION = "2.013006";
+our $VERSION = "2.013007";
 bootstrap PDLA::Core $VERSION;
 use PDLA::Types ':All';
 
@@ -446,7 +446,7 @@ storing a result in an existing piddle).
 
 =for example
 
- pdl> sumover sequence(10,10), $ans=null;p $ans
+ pdla> sumover sequence(10,10), $ans=null;p $ans
  [45 145 245 345 445 545 645 745 845 945]
 
 =cut
@@ -528,7 +528,7 @@ Return piddle dimensions as a perl list
 
 =for example
 
- pdl> p @tmp = dims zeroes 10,3,22
+ pdla> p @tmp = dims zeroes 10,3,22
  10 3 22
 
 See also L<shape|shape> which returns a piddle instead.
@@ -545,7 +545,7 @@ Return piddle dimensions as a piddle
 
 =for example
 
- pdl> p $shape = shape zeroes 10,3,22
+ pdla> p $shape = shape zeroes 10,3,22
  [10 3 22]
 
 See also L<dims|dims> which returns a perl list.
@@ -569,7 +569,7 @@ Returns the number of dimensions in a piddle
 
 =for example
 
- pdl> p zeroes(10,3,22)->getndims
+ pdla> p zeroes(10,3,22)->getndims
  3
 
 =head2 dim
@@ -591,7 +591,7 @@ Returns the size of the given dimension.
 
 =for example
 
- pdl> p zeroes(10,3,22)->getdim(1)
+ pdla> p zeroes(10,3,22)->getdim(1)
  3
 
 Negative indices count from the end of the dims array.
@@ -676,7 +676,7 @@ NOTE: NOT a method! This is because get_datatype returns
 
 =for example
 
- pdl> p howbig(ushort([1..10])->get_datatype)
+ pdla> p howbig(ushort([1..10])->get_datatype)
  2
 
 
@@ -1511,14 +1511,14 @@ positive indices.
 
 =for example
 
- pdl> p sequence(3)->dummy(0,3)
+ pdla> p sequence(3)->dummy(0,3)
  [
   [0 0 0]
   [1 1 1]
   [2 2 2]
  ]
 
- pdl> p sequence(3)->dummy(3,2)
+ pdla> p sequence(3)->dummy(3,2)
  [
   [
    [0 1 2]
@@ -1528,7 +1528,7 @@ positive indices.
   ]
  ]
 
- pdl> p sequence(3)->dummy(-3,2)
+ pdla> p sequence(3)->dummy(-3,2)
  Runtime error: PDLA: For safety, <pos> < -(dims+1) forbidden in dummy.  min=-2, pos=-3
 
 =cut
@@ -1762,9 +1762,9 @@ Returns the multidimensional diagonal over the specified dimensions.
 
 =for example
 
- pdl> $a = zeroes(3,3,3);
- pdl> ($b = $a->diagonal(0,1))++;
- pdl> p $a
+ pdla> $a = zeroes(3,3,3);
+ pdla> ($b = $a->diagonal(0,1))++;
+ pdla> p $a
  [
   [
    [1 0 0]
@@ -2228,9 +2228,9 @@ operate array element by array element like C<log10>).
 
 =for example
 
- pdl> $x = xvals zeroes 10;
- pdl> log10(inplace $x)
- pdl> p $x
+ pdla> $x = xvals zeroes 10;
+ pdla> log10(inplace $x)
+ pdla> p $x
  [-inf 0    0.30103 0.47712125 0.60205999    0.69897 0.77815125 0.84509804 0.90308999 0.95424251]
 
 =cut
@@ -2445,9 +2445,9 @@ useful in particular when using the indexing function which. In the
 case of no match to a specified criterion, the returned piddle has
 zero dimension.
 
- pdl> $a=sequence(10)
- pdl> $i=which($a < -1)
- pdl> print "I found no matches!\n" if ($i->isempty);
+ pdla> $a=sequence(10)
+ pdla> $i=which($a < -1)
+ pdla> print "I found no matches!\n" if ($i->isempty);
  I found no matches!
 
 Note that having zero elements is rather different from the concept
@@ -2486,14 +2486,14 @@ Various forms of usage,
 
 =for example
 
- pdl> $z = zeroes 4,3
- pdl> p $z
+ pdla> $z = zeroes 4,3
+ pdla> p $z
  [
   [0 0 0 0]
   [0 0 0 0]
   [0 0 0 0]
  ]
- pdl> $z = zeroes ushort, 3,2 # Create ushort array
+ pdla> $z = zeroes ushort, 3,2 # Create ushort array
  [ushort() etc. with no arg returns a PDLA::Types token]
 
 See also L<new_from_specification|/PDLA::new_from_specification>
@@ -2601,15 +2601,15 @@ Important: Physical piddles are changed inplace!
 
 =for example
 
- pdl> $x = sequence(10)
- pdl> reshape $x,3,4; p $x
+ pdla> $x = sequence(10)
+ pdla> reshape $x,3,4; p $x
  [
   [0 1 2]
   [3 4 5]
   [6 7 8]
   [9 0 0]
  ]
- pdl> reshape $x,5; p $x
+ pdla> reshape $x,5; p $x
  [0 1 2 3 4]
 
 =cut
@@ -2757,9 +2757,9 @@ see the function L<pdl()|/pdl> for more details.
 
 =for example
 
- pdl> p $x=sqrt float [1..10]
+ pdla> p $x=sqrt float [1..10]
  [1 1.41421 1.73205 2 2.23607 2.44949 2.64575 2.82843 3 3.16228]
- pdl> p byte $x
+ pdla> p byte $x
  [1 1 1 2 2 2 2 2 3 3]
 
 =head2 byte
@@ -3005,9 +3005,9 @@ by use of L<slice|PDLA::Slices/slice> and assigment operator C<.=>.
 
 =for example
 
- pdl> $x = sequence 3,4
- pdl> set $x, 2,1,99
- pdl> p $x
+ pdla> $x = sequence 3,4
+ pdla> set $x, 2,1,99
+ pdla> p $x
  [
   [ 0  1  2]
   [ 3  4 99]
@@ -3040,8 +3040,8 @@ in a general context, quite useful too inside PDLA internals.
 
 =for example
 
- pdl> $x = sequence 3,4
- pdl> p $x->at(1,2)
+ pdla> $x = sequence 3,4
+ pdla> p $x->at(1,2)
  7
 
 If you compile PDLA with bad value support (the default), your machine's
@@ -3131,7 +3131,7 @@ returns a single piddle of dimension N+1
 
 =for example
 
- pdl> $x = cat ones(3,3),zeroes(3,3),rvals(3,3); p $x
+ pdla> $x = cat ones(3,3),zeroes(3,3),rvals(3,3); p $x
  [
   [
    [1 1 1]
@@ -3290,9 +3290,9 @@ e.g.:
 
 =for example
 
- pdl> $p = ones 3,3,3
- pdl> ($a,$b,$c) = dog $p
- pdl> $b++; p $p
+ pdla> $p = ones 3,3,3
+ pdla> ($a,$b,$c) = dog $p
+ pdla> $b++; p $p
  [
   [
    [1 1 1]

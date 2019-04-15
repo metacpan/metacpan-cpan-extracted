@@ -25,14 +25,14 @@ requires:
   File::Temp: '0'
   File::Which: '0'
   Locale::TextDomain::UTF8: '0'
-  Log::ger: '0.023'
+  Log::ger: '0.027'
   Markdown::To::POD: '0.02'
   Moo: '0'
   Moo::Role: '0'
   Perinci::Access: '0.44'
   Perinci::Object: '0.310'
   Perinci::Sub::ConvertArgs::Array: '0'
-  Perinci::Sub::GetArgs::Argv: '0.83'
+  Perinci::Sub::GetArgs::Argv: '0.841'
   Perinci::Sub::Normalize: '0.19'
   Perinci::Sub::Util: '0.46'
   Perinci::Sub::Util::Sort: '0'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-To-Doc
   homepage: https://metacpan.org/release/Perinci-To-Doc
   repository: git://github.com/perlancar/perl-Perinci-To-Doc.git
-version: '0.865'
+version: '0.866'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -285,7 +285,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Rinci
   homepage: https://metacpan.org/release/Sah-Schemas-Rinci
   repository: git://github.com/perlancar/perl-Sah-Schemas-Rinci.git
-version: 1.1.87.0
+version: 1.1.88.0
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -108,7 +108,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.593'
+      version: '0.594'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -271,7 +271,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.77'
+              version: '0.780'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

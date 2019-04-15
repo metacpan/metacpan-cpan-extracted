@@ -2,7 +2,7 @@ NAME
     LWP::UserAgent::Plugin::Cache - Cache LWP::UserAgent responses
 
 VERSION
-    This document describes version 0.001 of LWP::UserAgent::Plugin::Cache
+    This document describes version 0.002 of LWP::UserAgent::Plugin::Cache
     (from Perl distribution LWP-UserAgent-Plugin-Cache), released on
     2019-04-15.
 
@@ -55,6 +55,10 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Existing (non-plugin-based) solutions: LWP::UserAgent::Cached,
+    LWP::UserAgent::WithCache, LWP::UserAgent::Cache::Memcached,
+    LWP::UserAgent::Snapshot, LWP::UserAgent::OfflineCache.
+
     LWP::UserAgent::Plugin
 
 AUTHOR

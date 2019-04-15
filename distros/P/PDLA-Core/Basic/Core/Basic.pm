@@ -70,7 +70,7 @@ etc. see L<zeroes|PDLA::Core/zeroes>.
 
 =for example
 
-  pdl> print xvals zeroes(5,10)
+  pdla> print xvals zeroes(5,10)
   [
    [0 1 2 3 4]
    [0 1 2 3 4]
@@ -99,7 +99,7 @@ etc. see L<zeroes|PDLA::Core/zeroes>.
 
 =for example
 
- pdl> print yvals zeroes(5,10)
+ pdla> print yvals zeroes(5,10)
  [
   [0 0 0 0 0]
   [1 1 1 1 1]
@@ -128,7 +128,7 @@ etc. see L<zeroes|PDLA::Core/zeroes>.
 
 =for example
 
- pdl> print zvals zeroes(3,4,2)
+ pdla> print zvals zeroes(3,4,2)
  [
   [
    [0 0 0]
@@ -338,7 +338,7 @@ $indices = ndcoords($type,@dimlist);
 
 =for example
 
-  pdl> print ndcoords(2,3)
+  pdla> print ndcoords(2,3)
 
   [
    [
@@ -355,12 +355,12 @@ $indices = ndcoords($type,@dimlist);
    ]
   ]
 
-  pdl> $a = zeroes(byte,2,3);        # $a is a 2x3 byte piddle
-  pdl> $b = ndcoords($a);            # $b inherits $a's type
-  pdl> $c = ndcoords(long,$a->dims); # $c is a long piddle, same dims as $b
-  pdl> help $b;
+  pdla> $a = zeroes(byte,2,3);        # $a is a 2x3 byte piddle
+  pdla> $b = ndcoords($a);            # $b inherits $a's type
+  pdla> $c = ndcoords(long,$a->dims); # $c is a long piddle, same dims as $b
+  pdla> help $b;
   This variable is   Byte D [2,2,3]              P            0.01Kb
-  pdl> help $c;
+  pdla> help $c;
   This variable is   Long D [2,2,3]              P            0.05Kb
 
 
@@ -417,10 +417,10 @@ L<PDLA::Graphics::PGPLOT|PDLA::Graphics::PGPLOT>) is
 
 =for example
 
- pdl> p $y
+ pdla> p $y
  [13 10 13 10 9 13 9 12 11 10 10 13 7 6 8 10 11 7 12 9 11 11 12 6 12 7]
- pdl> $h = hist $y,0,20,1; # hist with step 1, min 0 and 20 bins
- pdl> p $h
+ pdla> $h = hist $y,0,20,1; # hist with step 1, min 0 and 20 bins
+ pdla> p $h
  [0 0 0 0 0 0 2 3 1 3 5 4 4 4 0 0 0 0 0 0]
 
 =cut
@@ -467,11 +467,11 @@ L<PDLA::Graphics::PGPLOT|PDLA::Graphics::PGPLOT>) is
 
 =for example
 
- pdl> p $y
+ pdla> p $y
  [13 10 13 10 9 13 9 12 11 10 10 13 7 6 8 10 11 7 12 9 11 11 12 6 12 7]
- pdl> $wt = grandom($y->nelem)
- pdl> $h = whist $y, $wt, 0, 20, 1 # hist with step 1, min 0 and 20 bins
- pdl> p $h                        
+ pdla> $wt = grandom($y->nelem)
+ pdla> $h = whist $y, $wt, 0, 20, 1 # hist with step 1, min 0 and 20 bins
+ pdla> p $h                        
  [0 0 0 0 0 0 -0.49552342  1.7987439 0.39450696  4.0073722 -2.6255299 -2.5084501  2.6458365  4.1671676 0 0 0 0 0 0]
 
 
@@ -527,9 +527,9 @@ etc. see L<zeroes|PDLA::Core/zeroes>.
 
 =for example
 
- pdl> p sequence(10)
+ pdla> p sequence(10)
  [0 1 2 3 4 5 6 7 8 9]
- pdl> p sequence(3,4)
+ pdla> p sequence(3,4)
  [
   [ 0  1  2]
   [ 3  4  5]
@@ -570,7 +570,7 @@ Fills a piddle with radial distance values from some centre.
 
 =for example
 
- pdl> print rvals long,7,7,{Centre=>[2,2]}
+ pdla> print rvals long,7,7,{Centre=>[2,2]}
  [
   [2 2 2 2 2 3 4]
   [2 1 1 1 2 3 4]
@@ -745,13 +745,13 @@ transpose rows and columns.
 
 =for example
 
- pdl> $a = sequence(3,2)
- pdl> p $a
+ pdla> $a = sequence(3,2)
+ pdla> p $a
  [
   [0 1 2]
   [3 4 5]
  ]                                                                               
- pdl> p transpose( $a )
+ pdla> p transpose( $a )
  [
   [0 3]
   [1 4]

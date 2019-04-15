@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.911;
+package Text::Parser::Multiline 0.915;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
@@ -16,15 +16,12 @@ requires( qw(save_record setting lines_parsed has_aborted __read_file_handle),
 
 use Exception::Class (
     'Text::Parser::Multiline::Error',
-    'Text::Parser::Multiline::Error::UnexpectedEOF' => {
-        isa   => 'Text::Parser::Multiline::Error',
-        alias => 'throw_unexpected_eof',
-    },
     'Text::Parser::Multiline::Error::UnexpectedContinuation' => {
         isa   => 'Text::Parser::Multiline::Error',
         alias => 'throw_unexpected_continuation',
     }
 );
+use Text::Parser::Errors;
 
 around save_record       => \&__around_save_record;
 around is_line_continued => \&__around_is_line_continued;
@@ -56,10 +53,8 @@ sub __around_is_line_continued {
 sub __around_is_line_part_of_last {
     my ( $orig, $self ) = ( shift, shift );
     return 0 if not $orig->( $self, @_ );
-    throw_unexpected_continuation error =>
-        "$_[0] has a continuation character on the first line"
-        if $self->lines_parsed() == 1;
-    return 1;
+    return 1 if $self->lines_parsed() > 1;
+    die unexpected_cont( line => $_[0] );
 }
 
 sub __after__read_file_handle {
@@ -71,12 +66,11 @@ sub __after__read_file_handle {
 }
 
 sub __after_at_eof {
-    my $self      = shift;
-    my $remaining = $self->__pop_last_line();
-    throw_unexpected_eof error =>
-        "$remaining is still waiting to be continued. Unexpected EOF at line #"
-        . $self->lines_parsed()
-        if defined $remaining;
+    my $self = shift;
+    my $last = $self->__pop_last_line();
+    return if not defined $last;
+    my $lnum = $self->lines_parsed();
+    die unexpected_eof( discontd => $last, line_num => $lnum );
 }
 
 sub __join_next_proc {
@@ -143,7 +137,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.911
+version 0.915
 
 =head1 SYNOPSIS
 

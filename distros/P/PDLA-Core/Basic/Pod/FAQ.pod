@@ -300,28 +300,28 @@ Use the command C<perldoc PDLA> to start learning about PDLA.
 
 The easiest way by far, however, to get familiar with PDLA is to use
 the PDLA on-line help facility from within the PDLA
-shell, C<pdl2>  Just type C<pdl2> at your system prompt. Once you are inside the
-C<pdl2> shell type C<help> .  Using the C<help> and C<apropos> commands
+shell, C<pdla2>  Just type C<pdla2> at your system prompt. Once you are inside the
+C<pdla2> shell type C<help> .  Using the C<help> and C<apropos> commands
 inside the shell you should be able to find the way round the
 documentation.
 
 Even better, you can immediately try your newly acquired
 knowledge about PDLA by issuing PDLA/Perl commands directly at the command
 line. To illustrate this process, here is the record of a typical
-C<pdl2> session of a PDLA beginner (lengthy output is only symbolically
+C<pdla2> session of a PDLA beginner (lengthy output is only symbolically
 reproduced in braces ( <... ...> ) ):
 
-    unix> pdl2
-    pdl> help
+    unix> pdla2
+    pdla> help
     < ... help output ... >
-    pdl> help PDLA::QuickStart
+    pdla> help PDLA::QuickStart
     < ... perldoc page ... >
-    pdl> $a = pdl (1,5,7.3,1.0)
-    pdl> $b = sequence float, 4, 4
-    pdl> help inner
+    pdla> $a = pdl (1,5,7.3,1.0)
+    pdla> $b = sequence float, 4, 4
+    pdla> help inner
     < ... help on the 'inner' function ... >
-    pdl> $c = inner $a, $b
-    pdl> p $c
+    pdla> $c = inner $a, $b
+    pdla> p $c
     [22.6 79.8 137 194.2]
 
 For further sources of information that are accessible through the
@@ -535,7 +535,7 @@ To guarantee a completely clean installation of PDLA, you will need
 to first delete the current installation files and folders.  These
 will be all directories named C<PDLA> in the Perl C<@INC> path,
 files named C<*Pdlapp*> in any C<Inline> directories, and the 
-programs C<pdl, pdldoc, pdl2, perldl, and pptemplate>.  Then just build
+programs C<pdl, pdladoc, pdla2, perldla, and pptemplate>.  Then just build
 and install as usual.  This is much easier to keep track of if you
 always install C<PDLA> into a non-standard location.  See Q: 4.4 above.
 
@@ -709,23 +709,23 @@ variable contains.
 
 
 
-=head2 Q: 6.1    What is perldl?   What is pdl2?
+=head2 Q: 6.1    What is perldla?   What is pdla2?
 
 
-Sometimes C<perldl> (C<pdl2>) is used as a synonym for PDLA. Strictly
-speaking, however, the name C<perldl> (C<pdl2>) is reserved for the
+Sometimes C<perldla> (C<pdla2>) is used as a synonym for PDLA. Strictly
+speaking, however, the name C<perldla> (C<pdla2>) is reserved for the
 little shell that comes with the PDLA distribution and is
 supposed to be used for the interactive prototyping of PDLA
-scripts. For details check L<perldl> or L<pdl2>.
+scripts. For details check L<perldla> or L<pdla2>.
 
 
 =head2 Q: 6.2    How do I get on-line help for PDLA?  
 
 
-Just type C<help> (shortcut = "?") at the C<pdl2> shell 
+Just type C<help> (shortcut = "?") at the C<pdla2> shell 
 prompt and proceed from there. Another useful command 
 is the C<apropos> (shortcut = "??") command.
-Also try the C<demo> command in the C<perldl> or C<pdl2>
+Also try the C<demo> command in the C<perldla> or C<pdla2>
 shell if you are new to PDLA.
 
 
@@ -835,35 +835,35 @@ C<.=> for certain types of assignments.
 In Perl 5.6.7 and higher this assignment can be made
 using lvalue subroutines:
 
-    pdl> $a = sequence(5); p $a
+    pdla> $a = sequence(5); p $a
     [0 1 2 3 4]
-    pdl> $a->slice('1:2') .= pdl([5,6])
-    pdl> p $a
+    pdla> $a->slice('1:2') .= pdl([5,6])
+    pdla> p $a
     [0 5 6 3 4]
 
 see L<PDLA::Lvalue> for more info.  PDLA also supports a more
 matrix-like slice syntax via the L<PDLA::NiceSlice|PDLA::NiceSlice> module:
 
-    pdl> $a(1:2) .= pdl([5,6])
-    pdl> p $a
+    pdla> $a(1:2) .= pdl([5,6])
+    pdla> p $a
     [0 5 6 3 4]
 
 With versions of Perl prior to 5.6.7 B<or when running under
 the perl debugger> this has to be done using a temporary variable: 
 
-    pdl> $a = sequence(5); p $a
+    pdla> $a = sequence(5); p $a
     [0 1 2 3 4]
-    pdl> $tmp = $a->slice('1:2'); p $tmp;
+    pdla> $tmp = $a->slice('1:2'); p $tmp;
     [1 2]
-    pdl> $tmp .= pdl([5, 6]);    # Note .= !!
-    pdl> p $a
+    pdla> $tmp .= pdl([5, 6]);    # Note .= !!
+    pdla> p $a
     [0 5 6 3 4]
 
 This can also be made into one expression, which is often
 seen in PDLA code:
 
-    pdl> ($tmp = $a->slice('1:2')) .= pdl([5,6])
-    pdl> p $a
+    pdla> ($tmp = $a->slice('1:2')) .= pdl([5,6])
+    pdla> p $a
     [0 5 6 3 4]
 
 
@@ -877,11 +877,11 @@ has two very useful functions:
 C<any> and C<all> . Use these to test if any or
 all elements in a piddle fulfills some criterion:
 
-    pdl> $a=pdl ( 1, -2, 3);
-    pdl> print '$a has at least one element < 0' if (any $a < 0);
+    pdla> $a=pdl ( 1, -2, 3);
+    pdla> print '$a has at least one element < 0' if (any $a < 0);
     $a has at least one element < 0
     
-    pdl> print '$a is not positive definite' unless (all $a > 0);
+    pdla> print '$a is not positive definite' unless (all $a > 0);
     $a is not positive definite
 
 
@@ -963,7 +963,7 @@ L<PDLA::Indexing|PDLA::Indexing> and L<PDLA::PP|PDLA::PP> .
 
 
 The short answer is: read L<PDLA::Objects|PDLA::Objects> (e.g. type 
-C<help PDLA::Objects> in the I<perldl> or I<pdl2> shell).
+C<help PDLA::Objects> in the I<perldla> or I<pdla2> shell).
 
 The longer answer (extracted from L<PDLA::Objects|PDLA::Objects> ): 
 Since a PDLA object is an opaque reference to a C struct, it is not 
@@ -1168,9 +1168,9 @@ each but their simplicity makes it easy to debug if needed with the
 Perl debugger, see L<perldbug>.
 
 The programs in the Demo directory can be run most easily from the
-C<perldl> or C<pdl2> interactive shell:
+C<perldla> or C<pdla2> interactive shell:
 
-    perl -Mblib perldl  or  perl -Mblib Perldl2/pdl2
+    perl -Mblib perldla  or  perl -Mblib Perldl2/pdla2
 
 followed by C<demo 3d> or C<demo 3d2> at the prompt.
 C<demo> by itself will give you a list of the available PDLA demos.
@@ -1194,13 +1194,13 @@ to zoom in and out, and 'q' to advance to the next stage of the test.
 Questions like this should be a thing of the past with the PDLA
 on-line help system in place. Just try (after installation):
 
-    un*x> pdl2
-    pdl> apropos trid
+    un*x> pdla2
+    pdla> apropos trid
 
 Check the output for promising hits and then try to look up
 some of them, e.g.
 
-    pdl> help PDLA::Graphics::TriD
+    pdla> help PDLA::Graphics::TriD
 
 Note that case matters with C<help> but not with C<apropos> .
 
@@ -1248,12 +1248,12 @@ install;> sequence. Now you can write png files from PDLA!
 =head2 Q: 7.1    I am looking for a package to do XXX in PDLA. Where shall I look for it?  
 
 
-The first stop is again C<perldl> or C<pdl2> and the on-line help
+The first stop is again C<perldla> or C<pdla2> and the on-line help
 or the PDLA documentation. There is already a lot of functionality in
 PDLA which you might not be aware of.  The easiest way to look for
 functionality is to use the C<apropos> command:
 
-    pdl> apropos 'integral'
+    pdla> apropos 'integral'
     ceil            Round to integral values in floating-point format
     floor           Round to integral values in floating-point format
     intover         Project via integral to N-1 dimensions

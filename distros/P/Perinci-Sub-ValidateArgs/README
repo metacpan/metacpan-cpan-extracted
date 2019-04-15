@@ -1,7 +1,15 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::ValidateArgs - Validate function arguments using schemas
+    in Rinci function metadata
 
+VERSION
+    This document describes version 0.011 of Perinci::Sub::ValidateArgs
+    (from Perl distribution Perinci-Sub-ValidateArgs), released on
+    2019-04-15.
+
+SYNOPSIS
      use Perinci::Sub::ValidateArgs qw(gen_args_validator);
-    
+
      our %SPEC;
      $SPEC{foo} = {
          v => 1.1,
@@ -21,7 +29,7 @@ SYNOPSIS
          state $validator = gen_args_validator();
          my %args = @_;
          if (my $err = $validator->(\%args)) { return $err }
-    
+
          ...
      }
 
@@ -32,23 +40,78 @@ SYNOPSIS
          state $validator = gen_args_validator(die => 1);
          my %args = @_;
          $validator->(\%args);
-    
+
          ...
      }
 
 DESCRIPTION
-
     This module (PSV for short) can be used to validate function arguments
     using schema information in Rinci function metadata.
 
     There are other ways if you want to validate function arguments using
     Sah schemas. See Data::Sah::Manual::ParamsValidating.
 
-SEE ALSO
+FUNCTIONS
+  gen_args_validator
+    Usage:
 
+     gen_args_validator(%args) -> any
+
+    Generate argument validator from Rinci function metadata.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   die => *bool*
+
+        Whether validator should die or just return an error
+        message/response.
+
+    *   meta => *hash*
+
+        If not specified, will be searched from caller's %SPEC package
+        variable.
+
+    *   source => *bool*
+
+        Whether we want to get the source code instead.
+
+        The default is to generate Perl validator code, compile it with
+        "eval()", and return the resulting coderef. When this option is set
+        to true, the generated source string will be returned instead.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-ValidateArgs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-ValidateArgs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-ValidateA
+    rgs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci, Data::Sah
 
     Dist::Zilla::Plugin::IfBuilt
 
     Dist::Zilla::Plugin::Rinci::Validate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

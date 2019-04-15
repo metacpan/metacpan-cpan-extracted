@@ -11,7 +11,7 @@ my $meta = {
                           "Chris Prather (PERIGRIN) <chris\@prather.org>",
                         ],
   "dynamic_config"   => 0,
-  "generated_by"     => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+  "generated_by"     => "Dist::Inkt::Profile::KJETILK version 0.101, CPAN::Meta::Converter version 2.150010",
   "keywords"         => [],
   "license"          => ["perl_5"],
   "meta-spec"        => {
@@ -46,12 +46,12 @@ my $meta = {
                           test => { requires => { "Test::Exception" => 0, "Test::More" => 0.88 } },
                         },
   "provides"         => {
-                          "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.06 },
-                          "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.06 },
-                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.06 },
+                          "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.08 },
+                          "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.08 },
+                          "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.08 },
                           "URI::NamespaceMap::ReservedLocalParts" => {
                             file => "lib/URI/NamespaceMap/ReservedLocalParts.pm",
-                            version => 1.06,
+                            version => 1.08,
                           },
                         },
   "release_status"   => "stable",
@@ -65,7 +65,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project",
                         },
-  "version"          => 1.06,
+  "version"          => 1.08,
   "x_contributors"   => [
                           "Dorian Taylor <dorian\@cpan.org>",
                           "Toby Inkster (TOBYINK) <tobyink\@cpan.org>",

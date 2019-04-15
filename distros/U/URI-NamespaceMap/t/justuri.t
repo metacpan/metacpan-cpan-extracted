@@ -52,6 +52,25 @@ subtest 'Example without hash or slash' => sub {
 	is($ex->uri('Order')->as_string, 'http://www.example.orgOrder', 'expected resource object for EX namespace with Order when set with uri method' );
 };
 
+subtest 'Get local part based on ns' => sub {
+  my $exh = URI::Namespace->new( 'http://www.example.org/foo#');
+  my $exs = URI::Namespace->new( 'http://www.example.org/foo/');
+  isa_ok( $exh, 'URI::Namespace' );
+  isa_ok( $exs, 'URI::Namespace' );
+  is($exh->local_part('http://www.example.org/foo#bar'), 'bar', 'String input with hash is OK');
+  is($exs->local_part('http://www.example.org/foo/dahut'), 'dahut', 'String input with slash is OK');
+  is($exh->local_part(URI->new('http://www.example.org/foo#bar')), 'bar', 'URI input with hash is OK');
+  is($exs->local_part(URI->new('http://www.example.org/foo/dahut')), 'dahut', 'URI input with slash is OK');
+  is($exh->local_part(IRI->new('http://www.example.org/foo#bar')), 'bar', 'IRI input with hash is OK');
+  is($exs->local_part(IRI->new('http://www.example.org/foo/dahut')), 'dahut', 'IRI input with slash is OK');
+
+  is($exh->local_part('http://www.example.org/foo#'), undef, 'String input matches exactly hash is OK');
+  is($exs->local_part('http://www.example.com/foo/dahut'), undef, 'String input doesnt match with slash is OK');
+  is($exh->local_part(URI->new('http://www.example.com/foo#bar')), undef, 'URI input doesnt match with hash is OK');
+  is($exs->local_part(URI->new('http://www.example.org/foo/')), undef, 'URI input matches exactly with slash is OK');
+  is($exh->local_part(IRI->new('http://www.example.')), undef, 'IRI input substring with hash is OK');
+  is($exs->local_part(IRI->new('http://www.example')), undef, 'IRI input substring with slash is OK');
+};
 
 
 done_testing;

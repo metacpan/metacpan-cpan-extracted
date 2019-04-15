@@ -21,7 +21,7 @@ BEGIN {
 
 
 
-our $VERSION = "2.013006";
+our $VERSION = "2.013007";
    use PDLA::Slices;
    use PDLA::Types;
    use PDLA::Bad;
@@ -94,41 +94,41 @@ come across!
 
 The complex constant five is equal to C<pdl(1,0)>:
 
-   pdl> p $x = r2C 5
+   pdla> p $x = r2C 5
    5 +0i
 
 Now calculate the three cubic roots of of five:
 
-   pdl> p $r = Croots $x, 3
+   pdla> p $r = Croots $x, 3
    [1.70998 +0i  -0.854988 +1.48088i  -0.854988 -1.48088i]
 
 Check that these really are the roots:
 
-   pdl> p $r ** 3
+   pdla> p $r ** 3
    [5 +0i  5 -1.22465e-15i  5 -7.65714e-15i]
 
 Duh! Could be better. Now try by multiplying C<$r> three times with itself:
 
-   pdl> p $r*$r*$r
+   pdla> p $r*$r*$r
    [5 +0i  5 -4.72647e-15i  5 -7.53694e-15i]
 
 Well... maybe C<Cpow> (which is used by the C<**> operator) isn't as
 bad as I thought. Now multiply by C<i> and negate, which is just a very
 expensive way of swapping real and imaginary parts.
 
-   pdl> p -($r*i)
+   pdla> p -($r*i)
    [0 -1.70998i  1.48088 +0.854988i  -1.48088 +0.854988i]
 
 Now plot the magnitude of (part of) the complex sine. First generate the
 coefficients:
 
-   pdl> $sin = i * zeroes(50)->xlinvals(2,4) + zeroes(50)->xlinvals(0,7)
+   pdla> $sin = i * zeroes(50)->xlinvals(2,4) + zeroes(50)->xlinvals(0,7)
 
 Now plot the imaginary part, the real part and the magnitude of the sine
 into the same diagram:
 
-   pdl> use PDLA::Graphics::Gnuplot
-   pdl> gplot( with => 'lines',
+   pdla> use PDLA::Graphics::Gnuplot
+   pdla> gplot( with => 'lines',
               PDLA::cat(im ( sin $sin ),
                        re ( sin $sin ),
                        abs( sin $sin ) ))

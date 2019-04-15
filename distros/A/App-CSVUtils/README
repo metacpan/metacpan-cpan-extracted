@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.014 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2018-05-25.
+    This document describes version 0.015 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2019-04-15.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -17,6 +17,8 @@ DESCRIPTION
     *   csv-convert-to-hash
 
     *   csv-delete-field
+
+    *   csv-each-row
 
     *   csv-grep
 
@@ -40,14 +42,15 @@ FUNCTIONS
   csv_add_field
     Usage:
 
-     csv_add_field(%args) -> [status, msg, result, meta]
+     csv_add_field(%args) -> [status, msg, payload, meta]
 
     Add a field to CSV file.
 
     Your Perl code (-e) will be called for each row (excluding the header
     row) and should return the value for the new field. $main::row is
     available and contains the current row, while $main::rownum contains the
-    row number (2 means the first data row).
+    row number (2 means the first data row). $main::field_idxs is also
+    available for additional information.
 
     Field by default will be added as the last field, unless you specify one
     of "--after" (to put after a certain field), "--before" (to put before a
@@ -94,7 +97,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -103,7 +106,7 @@ FUNCTIONS
   csv_avg
     Usage:
 
-     csv_avg(%args) -> [status, msg, result, meta]
+     csv_avg(%args) -> [status, msg, payload, meta]
 
     Output a summary row which are arithmetic averages of data rows.
 
@@ -131,7 +134,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -140,7 +143,7 @@ FUNCTIONS
   csv_concat
     Usage:
 
-     csv_concat(%args) -> [status, msg, result, meta]
+     csv_concat(%args) -> [status, msg, payload, meta]
 
     Concatenate several CSV files together, collecting all the fields.
 
@@ -194,7 +197,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -203,7 +206,7 @@ FUNCTIONS
   csv_convert_to_hash
     Usage:
 
-     csv_convert_to_hash(%args) -> [status, msg, result, meta]
+     csv_convert_to_hash(%args) -> [status, msg, payload, meta]
 
     Return a hash of field names as keys and first row as values.
 
@@ -231,7 +234,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -240,7 +243,7 @@ FUNCTIONS
   csv_delete_field
     Usage:
 
-     csv_delete_field(%args) -> [status, msg, result, meta]
+     csv_delete_field(%args) -> [status, msg, payload, meta]
 
     Delete one or more fields from CSV file.
 
@@ -268,39 +271,30 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
     Return value: (any)
 
-  csv_grep
+  csv_each_row
     Usage:
 
-     csv_grep(%args) -> [status, msg, result, meta]
+     csv_each_row(%args) -> [status, msg, payload, meta]
 
-    Only output row(s) where Perl expression returns true.
+    Run Perl code for every row.
 
     Examples:
 
-    *   Only show rows where the amount field is divisible by 7:
+    *   Delete user data:
 
-         csv_grep( filename => "file.csv", eval => "\$_->{amount} % 7 ? 1:0", hash => 1);
-
-    *   Only show rows where the date is a Wednesday:
-
-         csv_grep(
-           filename => "file.csv",
-           eval => "BEGIN { use DateTime::Format::Natural; \$parser = DateTime::Format::Natural->new } \$dt = \$parser->parse_datetime(\$_->{date}); \$dt->day_of_week == 3",
+         csv_each_row(
+           filename => "users.csv",
+           eval => "\"unlink qq(/home/data/\$_->{username}.dat)\"",
            hash => 1
          );
 
-    This is like Perl's "grep" performed over rows of CSV. In $_, your Perl
-    code will find the CSV row as an arrayref (or, if you specify "-H", as a
-    hashref). $main::row is also set to the row, while $main::rownum
-    contains the row number (2 means the first data row). Your code is then
-    free to return true or false based on some criteria. Only rows where
-    Perl expression returns true will be included in the result.
+    This is like csv_map, except result of code is not printed.
 
     This function is not exported.
 
@@ -330,7 +324,72 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  csv_grep
+    Usage:
+
+     csv_grep(%args) -> [status, msg, payload, meta]
+
+    Only output row(s) where Perl expression returns true.
+
+    Examples:
+
+    *   Only show rows where the amount field is divisible by 7:
+
+         csv_grep( filename => "file.csv", eval => "\$_->{amount} % 7 ? 1:0", hash => 1);
+
+    *   Only show rows where date is a Wednesday:
+
+         csv_grep(
+           filename => "file.csv",
+           eval => "BEGIN { use DateTime::Format::Natural; \$parser = DateTime::Format::Natural->new } \$dt = \$parser->parse_datetime(\$_->{date}); \$dt->day_of_week == 3",
+           hash => 1
+         );
+
+    This is like Perl's "grep" performed over rows of CSV. In $_, your Perl
+    code will find the CSV row as an arrayref (or, if you specify "-H", as a
+    hashref). $main::row is also set to the row (always as arrayref), while
+    $main::rownum contains the row number (2 means the first data row).
+    $main::field_idxs is also available for additional information.
+
+    Your code is then free to return true or false based on some criteria.
+    Only rows where Perl expression returns true will be included in the
+    result.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   eval* => *str*
+
+        Perl code.
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   hash => *bool*
+
+        Provide row in $_ as hashref instead of arrayref.
+
+    *   header => *bool* (default: 1)
+
+        Whether CSV has a header row.
+
+        When you declare that CSV does not have header row ("--no-header"),
+        the fields will be named "field1", "field2", and so on.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -339,7 +398,7 @@ FUNCTIONS
   csv_list_field_names
     Usage:
 
-     csv_list_field_names(%args) -> [status, msg, result, meta]
+     csv_list_field_names(%args) -> [status, msg, payload, meta]
 
     List field names of CSV file.
 
@@ -363,7 +422,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -372,7 +431,7 @@ FUNCTIONS
   csv_map
     Usage:
 
-     csv_map(%args) -> [status, msg, result, meta]
+     csv_map(%args) -> [status, msg, payload, meta]
 
     Return result of Perl code for every row.
 
@@ -389,10 +448,13 @@ FUNCTIONS
 
     This is like Perl's "map" performed over rows of CSV. In $_, your Perl
     code will find the CSV row as an arrayref (or, if you specify "-H", as a
-    hashref). $main::row is also set to the row, while $main::rownum
-    contains the row number (2 means the first data row). Your code is then
-    free to return a string based on some operation against these data. This
-    utility will then print out the resulting string.
+    hashref). $main::row is also set to the row (always as arrayref), while
+    $main::rownum contains the row number (2 means the first data row).
+    $main::field_idxs is also available for additional information.
+
+    Your code is then free to return a string based on some operation
+    against these data. This utility will then print out the resulting
+    string.
 
     This function is not exported.
 
@@ -426,7 +488,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -435,7 +497,7 @@ FUNCTIONS
   csv_munge_field
     Usage:
 
-     csv_munge_field(%args) -> [status, msg, result, meta]
+     csv_munge_field(%args) -> [status, msg, payload, meta]
 
     Munge a field in every row of CSV file.
 
@@ -443,6 +505,7 @@ FUNCTIONS
     and $_ will contain the value of the field, and the Perl code is
     expected to modify it. $main::row will contain the current row array and
     $main::rownum contains the row number (2 means the first data row).
+    $main::field_idxs is also available for additional information.
 
     This function is not exported.
 
@@ -472,7 +535,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -481,7 +544,7 @@ FUNCTIONS
   csv_replace_newline
     Usage:
 
-     csv_replace_newline(%args) -> [status, msg, result, meta]
+     csv_replace_newline(%args) -> [status, msg, payload, meta]
 
     Replace newlines in CSV values.
 
@@ -514,7 +577,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -523,7 +586,7 @@ FUNCTIONS
   csv_select_fields
     Usage:
 
-     csv_select_fields(%args) -> [status, msg, result, meta]
+     csv_select_fields(%args) -> [status, msg, payload, meta]
 
     Only output selected field(s).
 
@@ -555,7 +618,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -564,7 +627,7 @@ FUNCTIONS
   csv_select_row
     Usage:
 
-     csv_select_row(%args) -> [status, msg, result, meta]
+     csv_select_row(%args) -> [status, msg, payload, meta]
 
     Only output specified row(s).
 
@@ -593,7 +656,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -602,7 +665,7 @@ FUNCTIONS
   csv_sort_fields
     Usage:
 
-     csv_sort_fields(%args) -> [status, msg, result, meta]
+     csv_sort_fields(%args) -> [status, msg, payload, meta]
 
     Sort CSV fields.
 
@@ -634,7 +697,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -643,7 +706,7 @@ FUNCTIONS
   csv_sum
     Usage:
 
-     csv_sum(%args) -> [status, msg, result, meta]
+     csv_sum(%args) -> [status, msg, payload, meta]
 
     Output a summary row which are arithmetic sums of data rows.
 
@@ -671,7 +734,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -699,7 +762,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2018, 2017, 2016 by
+    perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

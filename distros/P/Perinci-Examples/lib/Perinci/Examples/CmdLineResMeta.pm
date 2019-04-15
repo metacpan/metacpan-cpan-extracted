@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineResMeta;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.811'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.812'; # VERSION
 
 use 5.010;
 use strict;
@@ -88,7 +88,7 @@ Perinci::Examples::CmdLineResMeta - Functions in this package contains cmdline.*
 
 =head1 VERSION
 
-This document describes version 0.811 of Perinci::Examples::CmdLineResMeta (from Perl distribution Perinci-Examples), released on 2018-12-07.
+This document describes version 0.812 of Perinci::Examples::CmdLineResMeta (from Perl distribution Perinci-Examples), released on 2019-04-15.
 
 =head1 FUNCTIONS
 
@@ -117,6 +117,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 exit_code
 
 Usage:
@@ -139,6 +140,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 is_palindrome
@@ -171,6 +173,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 result
 
 Usage:
@@ -193,6 +196,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 skip_format
@@ -240,7 +244,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -251,18 +251,23 @@ export( 'scheme.json', $scheme );
 ## convert concepts
 info "Converting concepts";
 
+my @noteTypes =
+  qw(scopeNote definition example historyNote editorialNote changeNote note);
 my $concepts = {};
 
 # TODO: just all concepts instead of inScheme
 # TODO: broader, altLabel etc.
-$res = sparql(<<SPARQL);
+# TODO: created, modified
+my $query = <<SPARQL;
 ?c skos:inScheme <$opt{scheme}> .
 OPTIONAL { ?c skos:prefLabel ?pLabel } .
-OPTIONAL { ?c skos:scopeNote ?scopeNote } .
 OPTIONAL { ?c skos:notation ?notation } .
 OPTIONAL { ?c skos:narrower ?narrower } .
+OPTIONAL { ?c skos:broader ?broader } .
 SPARQL
-$res->each(
+
+$query = join "\n", $query, map { "OPTIONAL { ?c skos:$_ ?$_ } ." } @noteTypes;
+sparql($query)->each(
     sub {
         my $row = shift;
         my $uri = $row->{c}->uri_value;
@@ -280,8 +285,9 @@ $res->each(
 
         notation( $concept, $row->{notation} );
         prefLabel( $concept, $row->{pLabel} );
-        note( $concept, $row->{scopeNote}, 'scopeNote' );
+        note( $concept, $row->{$_}, $_ ) for @noteTypes;
         uriSet( $concept, 'narrower', $row->{narrower} );
+        uriSet( $concept, 'broader',  $row->{broader} );
     }
 );
 

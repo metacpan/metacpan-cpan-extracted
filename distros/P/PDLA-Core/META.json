@@ -4,13 +4,13 @@
       "PerlDL Developers (pdl-general@lists.sourceforge.net)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDLA-Core",
    "no_index" : {
@@ -57,6 +57,7 @@
             "Inline" : "0.68",
             "Inline::C" : "0.62",
             "Module::Compile" : "0.23",
+            "OpenGL" : "0.6702",
             "Pod::Parser" : "0",
             "Pod::Select" : "0",
             "Scalar::Util" : "0",
@@ -83,5 +84,6 @@
          "web" : "https://github.com/PDLPorters/pdla-core"
       }
    },
-   "version" : "2.013006"
+   "version" : "2.013007",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

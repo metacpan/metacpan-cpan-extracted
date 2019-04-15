@@ -2,4 +2,4 @@
  needs="text"\
  section="Applications/Science/Mathematics"\
  title="PerlDl"\
- command="/usr/bin/perldl"
+ command="/usr/bin/perldla"

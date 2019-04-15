@@ -2,8 +2,8 @@ NAME
     App::HTTPTinyUtils - Command-line utilities related to HTTP::Tiny
 
 VERSION
-    This document describes version 0.005 of App::HTTPTinyUtils (from Perl
-    distribution App-HTTPTinyUtils), released on 2019-04-14.
+    This document describes version 0.006 of App::HTTPTinyUtils (from Perl
+    distribution App-HTTPTinyUtils), released on 2019-04-15.
 
 SYNOPSIS
 DESCRIPTION
@@ -25,7 +25,7 @@ FUNCTIONS
 
      http_tiny(%args) -> [status, msg, payload, meta]
 
-    Perform request with HTTP::Tiny.
+    Perform request(s) with HTTP::Tiny.
 
     This function is not exported.
 
@@ -39,11 +39,20 @@ FUNCTIONS
 
     *   headers => *hash*
 
+    *   ignore_errors => *bool*
+
+        Ignore errors.
+
+        Normally, when given multiple URLs, the utility will exit after the
+        first non-success response. With "ignore_errors" set to true, will
+        just log the error and continue. Will return with the last error
+        response.
+
     *   method => *str* (default: "GET")
 
     *   raw => *bool*
 
-    *   url* => *str*
+    *   urls* => *array[str]*
 
     Returns an enveloped result (an array).
 
@@ -78,11 +87,20 @@ FUNCTIONS
 
     *   headers => *hash*
 
+    *   ignore_errors => *bool*
+
+        Ignore errors.
+
+        Normally, when given multiple URLs, the utility will exit after the
+        first non-success response. With "ignore_errors" set to true, will
+        just log the error and continue. Will return with the last error
+        response.
+
     *   method => *str* (default: "GET")
 
     *   raw => *bool*
 
-    *   url* => *str*
+    *   urls* => *array[str]*
 
     Returns an enveloped result (an array).
 
@@ -118,11 +136,20 @@ FUNCTIONS
 
     *   headers => *hash*
 
+    *   ignore_errors => *bool*
+
+        Ignore errors.
+
+        Normally, when given multiple URLs, the utility will exit after the
+        first non-success response. With "ignore_errors" set to true, will
+        just log the error and continue. Will return with the last error
+        response.
+
     *   method => *str* (default: "GET")
 
     *   raw => *bool*
 
-    *   url* => *str*
+    *   urls* => *array[str]*
 
     Returns an enveloped result (an array).
 
@@ -157,11 +184,20 @@ FUNCTIONS
 
     *   headers => *hash*
 
+    *   ignore_errors => *bool*
+
+        Ignore errors.
+
+        Normally, when given multiple URLs, the utility will exit after the
+        first non-success response. With "ignore_errors" set to true, will
+        just log the error and continue. Will return with the last error
+        response.
+
     *   method => *str* (default: "GET")
 
     *   raw => *bool*
 
-    *   url* => *str*
+    *   urls* => *array[str]*
 
     Returns an enveloped result (an array).
 
@@ -196,11 +232,20 @@ FUNCTIONS
 
     *   headers => *hash*
 
+    *   ignore_errors => *bool*
+
+        Ignore errors.
+
+        Normally, when given multiple URLs, the utility will exit after the
+        first non-success response. With "ignore_errors" set to true, will
+        just log the error and continue. Will return with the last error
+        response.
+
     *   method => *str* (default: "GET")
 
     *   raw => *bool*
 
-    *   url* => *str*
+    *   urls* => *array[str]*
 
     Returns an enveloped result (an array).
 

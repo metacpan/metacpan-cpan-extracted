@@ -344,7 +344,7 @@ sub reinstator_regexp{
     return qr/$reinstr/o; # allow trailing comments
 }
 
-# save eval of findslice that should be used within perldl or pdl2
+# save eval of findslice that should be used within perldla or pdla2
 # as a preprocessor
 sub perldlpp {
  my ($class, $txt) = @_;
@@ -484,14 +484,14 @@ cases.  C<PDLA::NiceSlice> rectifies that by incorporating new slicing
 syntax directly into the language via a perl I<source filter> (see
 L<the perlfilter man page|perlfilter>).  NiceSlice adds no new functionality, only convenient syntax.
 
-NiceSlice is loaded automatically in the perldl or pdl2 shell, but (to avoid
+NiceSlice is loaded automatically in the perldla or pdla2 shell, but (to avoid
 conflicts with other modules) must be loaded explicitly in standalone
 perl/PDLA scripts (see below).  If you prefer not to use a prefilter on
 your standalone scripts, you can use the L<slice|PDLA::Slices/slice>
 method in those scripts,
 rather than the more compact NiceSlice constructs.
 
-=head1 Use in scripts and C<perldl> or C<pdl2> shell
+=head1 Use in scripts and C<perldla> or C<pdla2> shell
 
 The new slicing syntax can be switched on and off in scripts
 and perl modules by using or unloading C<PDLA::NiceSlice>.
@@ -738,7 +738,7 @@ the following example:
   $sl = $a(0:myfunc 1, 2);
   print $sl;
  PDLA barfed: Error in slice:Too many dims in slice
- Caught at file /usr/local/bin/perldl, line 232, pkg main
+ Caught at file /usr/local/bin/perldla, line 232, pkg main
 
 
 The simple fix is
@@ -1036,7 +1036,7 @@ compiler. C<PDLA::NiceSlice> searches through your Perl source code and when
 it finds the new slicing syntax it rewrites the argument list
 appropriately and splices a call to the C<slice> method using the
 modified arg list into your perl code. You can see how this works in
-the L<perldl|perldl> or L<pdl2|PDLA::Perldl2> shells by switching on
+the L<perldla|perldla> or L<pdla2|PDLA::Perldl2> shells by switching on
 reporting (see above how to do that).
 
 =head1 BUGS

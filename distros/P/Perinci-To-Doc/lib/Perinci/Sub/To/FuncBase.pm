@@ -1,7 +1,7 @@
 package Perinci::Sub::To::FuncBase;
 
-our $DATE = '2019-04-08'; # DATE
-our $VERSION = '0.865'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.866'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -148,7 +148,7 @@ sub gen_doc_section_arguments {
             join(', ',
                  map {
                      my $var = $_; $var =~ s/[^A-Za-z0-9_]+/_/g;
-                     "\$$var" . ($args_p->{$_}{greedy} ? ', ...' : '');
+                     "\$$var" . (($args_p->{$_}{slurpy} // $args_p->{$_}{greedy}) ? ', ...' : '');
                  }
                      sort {
                          ($args_p->{$a}{pos} // 9999) <=>
@@ -228,7 +228,7 @@ Perinci::Sub::To::FuncBase - Base class for Perinci::Sub::To::* function documen
 
 =head1 VERSION
 
-This document describes version 0.865 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2019-04-08.
+This document describes version 0.866 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2019-04-15.
 
 =for Pod::Coverage .+
 

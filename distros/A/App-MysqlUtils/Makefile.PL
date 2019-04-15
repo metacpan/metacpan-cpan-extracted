@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "script/mysql-drop-all-tables",
     "script/mysql-drop-dbs",
     "script/mysql-drop-tables",
+    "script/mysql-fill-csv-columns-from-query",
     "script/mysql-find-identical-rows",
     "script/mysql-query",
     "script/mysql-run-pl-files",
@@ -28,6 +29,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::MysqlUtils",
   "PREREQ_PM" => {
+    "App::CSVUtils" => 0,
     "Complete::Util" => "0.57",
     "Config::IOD::Reader" => "0.341",
     "DBI" => 0,
@@ -42,7 +44,7 @@ my %WriteMakefileArgs = (
     "File::Path" => 0,
     "IPC::System::Options" => "0.331",
     "List::MoreUtils" => 0,
-    "Log::ger" => "0.023",
+    "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Base" => "1.816",
     "Perinci::CmdLine::Classic" => "1.770",
@@ -53,6 +55,7 @@ my %WriteMakefileArgs = (
     "Sah::Schema::posint" => 0,
     "Sah::Schema::true" => 0,
     "String::ShellQuote" => 0,
+    "Text::CSV::FromAOH" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -62,7 +65,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.015",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,6 +73,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "App::CSVUtils" => 0,
   "Complete::Util" => "0.57",
   "Config::IOD::Reader" => "0.341",
   "DBI" => 0,
@@ -87,7 +91,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.331",
   "List::MoreUtils" => 0,
-  "Log::ger" => "0.023",
+  "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Base" => "1.816",
   "Perinci::CmdLine::Classic" => "1.770",
@@ -99,6 +103,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::true" => 0,
   "String::ShellQuote" => 0,
   "Test::More" => 0,
+  "Text::CSV::FromAOH" => 0,
   "strict" => 0,
   "warnings" => 0
 );

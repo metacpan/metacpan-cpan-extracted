@@ -2,10 +2,11 @@ package URI::Namespace;
 use Moo 1.006000;
 use URI;
 use IRI 0.003;
+use Scalar::Util qw(blessed);
 use Types::Namespace 0.004 qw( Iri );
 use namespace::autoclean;
 
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 =head1 NAME
 
@@ -43,6 +44,13 @@ namespace URI with the local part appended.
 Returns a L<IRI> object with the namespace IRI. Optionally, the method
 can take a local part as argument, in which case, it will return the
 namespace IRI with the local part appended.
+
+=item C<< local_part ( $uri ) >>
+
+Returns the local part string if the given argument URI (which may be
+a string, L<URI> or L<IRI> object) matches the namespace URI, or
+C<undef> if not.
+
 
 =back
 
@@ -101,6 +109,22 @@ sub uri {
 		return URI->new($iri);
 	}
 }
+
+sub local_part {
+  my ($self, $fulluri) = @_;
+  my $local_part = undef;
+  if (blessed($fulluri) && $fulluri->isa('IRI')) {
+	 $fulluri = $fulluri->as_string;
+  }
+  my $iri = $self->_uri->as_string;
+  if ($fulluri =~ m/^$iri(.+)/) {
+	 $local_part = $1;
+  } else {
+	 # TODO: throw error?
+  }
+  return $local_part;
+}
+
 
 for my $method (qw/ abs rel eq canonical /) {
 	eval qq[ sub $method { shift->uri->${method}(\@_) } ];

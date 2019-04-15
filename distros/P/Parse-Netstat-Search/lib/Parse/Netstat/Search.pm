@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use base 'Error::Helper';
 use Net::CIDR;
+use Net::DNS;
 
 =head1 NAME
 
@@ -12,11 +13,11 @@ Parse::Netstat::Search - Searches the connection list in the results returned by
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -94,6 +95,15 @@ sub new{
 			  protocols=>{},
 			  ports=>{},
 			  states=>{},
+			  ptrs=>{},
+			  ptrs_r=>[],
+			  resolver=>Net::DNS::Resolver->new,
+			  ptr_invert=>0,
+			  ptr_r_invert=>0,
+			  cidr_invert=>0,
+			  protocol_invert=>0,
+			  state_invert=>0,
+			  port_invert=>0,
 			  };
 	bless $self;
 
@@ -121,6 +131,28 @@ sub get_cidrs{
 	return @{ $self->{cidrs} };
 }
 
+=head2 get_cidrs_invert
+
+Gets the invert status of the CIDRs search.
+
+    if ( $search->get_cidrs_invert ){
+        print "The search will be inverted\n";
+    }else{
+        print "The search will not be inverted";
+    }
+
+=cut
+
+sub get_cidrs_invert{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{cidr_invert};
+}
+
 =head2 get_ports
 
 Gets a list of desired ports.
@@ -140,6 +172,28 @@ sub get_ports{
 	}
 
 	return keys( %{ $self->{ports} } );
+}
+
+=head2 get_ports_invert
+
+Gets the invert status of the ports search.
+
+    if ( $search->get_ports_invert ){
+        print "The search will be inverted\n";
+    }else{
+        print "The search will not be inverted";
+    }
+
+=cut
+
+sub get_ports_invert{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{port_invert};
 }
 
 =head2 get_protocols
@@ -166,6 +220,28 @@ sub get_protocols{
 	return keys( %{ $self->{protocols} } );
 }
 
+=head2 get_protocols_invert
+
+Gets the invert status of the protocols search.
+
+    if ( $search->get_protocols_invert ){
+        print "The search will be inverted\n";
+    }else{
+        print "The search will not be inverted";
+    }
+
+=cut
+
+sub get_protocols_invert{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{protocol_invert};
+}
+
 =head2 get_states
 
 Get a list of desired sets.
@@ -187,6 +263,112 @@ sub get_states{
 	}
 
 	return keys( %{ $self->{states} } );
+}
+
+=head2 get_state_invert
+
+Gets the invert status of the states search.
+
+    if ( $search->get_state_invert ){
+        print "The search will be inverted\n";
+    }else{
+        print "The search will not be inverted";
+    }
+
+=cut
+
+sub get_states_invert{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{state_invert};
+}
+
+=head2 get_ptrs
+
+Gets the list of PTRs to search for.
+
+The returned value is a array. Each item is a PTR.
+
+    my @PTRs=$search->get_ptrs;
+
+=cut
+
+sub get_ptrs{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return keys( %{ $self->{ptrs} } );
+}
+
+=head2 get_ptrs_invert
+
+Gets the invert status of the PTRs search.
+
+    if ( $search->get_ptr_invert ){
+        print "The search will be inverted\n";
+    }else{
+        print "The search will not be inverted";
+    }
+
+=cut
+
+sub get_ptrs_invert{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{ptr_invert};
+}
+
+=head2 get_ptrs_r
+
+Gets the list of PTR regexps to search for.
+
+The returned value is a array. Each item is a PTR.
+
+    my @regexps=$search->get_ptrs_r;
+
+=cut
+
+sub get_ptrs_r{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return @{ $self->{ptrs_r} };
+}
+
+=head2 get_ptrs_invert
+
+Gets the invert status of the PTRs search.
+
+    if ( $search->get_ptr_invert ){
+        print "The search will be inverted\n";
+    }else{
+        print "The search will not be inverted";
+    }
+
+=cut
+
+sub get_ptrs_r_invert{
+	my $self=$_[0];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	return $self->{ptr_r_invert};
 }
 
 =head2 search
@@ -212,7 +394,7 @@ sub search{
 		( ! defined( $res->[2]->{active_conns} ) )
 		){
 		$self->{error}=3;
-		$self->{errorString}='$res->[2]->{active_conns} not defiend. Does not appear to be a Parse::Netstat return';
+		$self->{errorString}='$res->[2]->{active_conns} not defined. Does not appear to be a Parse::Netstat return';
 		$self->warn;
 		return undef;
 	}
@@ -225,6 +407,8 @@ sub search{
 	my $cidr_require=0;
 	my $protocol_require=0;
 	my $state_require=0;
+	my $ptr_require=0;
+	my $ptr_r_require=0;
 
 	# figure out what we need to check for
 	if (defined( $self->{cidrs}[0] )){
@@ -238,6 +422,12 @@ sub search{
 	}
 	if (defined( (keys(%{ $self->{states} }))[0] )){
 		$state_require=1;
+	}
+	if (defined( (keys(%{ $self->{ptrs} }))[0] )){
+		$ptr_require=1;
+	}
+	if (defined( $self->{ptrs_r}[0] )){
+		$ptr_r_require=1;
 	}
 
 	my $res_int=0;
@@ -291,23 +481,19 @@ sub search{
 			my $port_meet=1;
 			my $cidr_meet=1;
 			my $protocol_meet=1;
+			my $ptr_meet=1;
+			my $ptr_r_meet=1;
 			my $protocol_search=lc( $protocol );
 			my $state_meet=1;
 			my $state_search=lc( $state );
 
-			# reset the meet checks
-			if ( $port_require ) {
-				$port_meet=0;
-			}
-			if ( $cidr_require ) {
-				$cidr_meet=0;
-			}
-			if ( $protocol_require ) {
-				$protocol_meet=0;
-			}
-			if ( $state_require ) {
-				$state_meet=0;
-			}
+			# XOR the meet and require, setting the meet to false if required
+			$port_meet = $port_meet ^ $port_require;
+			$cidr_meet = $cidr_meet ^ $cidr_require;
+			$protocol_meet = $protocol_meet ^ $protocol_require;
+			$state_meet = $state_meet ^ $state_require;
+			$ptr_meet = $ptr_meet ^ $ptr_require;
+			$ptr_r_meet = $ptr_r_meet ^ $ptr_r_require;
 
 			# checks the forient port against each CIDR
 			my @cidrs=@{ $self->{cidrs} };
@@ -362,9 +548,90 @@ sub search{
 				$state_meet=1;
 			}
 
+			# check if the PTR of any matches
+			if ( $ptr_require ){
+				#look both up
+				my $answer_f=$self->{resolver}->search( $foreign_host );
+				my $answer_l=$self->{resolver}->search( $local_host );
+
+				# figure out if we have a ptr or not for foriegn host and if so grab it
+				my $ptr_f='NOTFOUND';
+				if ( defined( $answer_f->{answer}[0] ) &&
+					 ( ref( $answer_f->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
+					){
+					$ptr_f=lc($answer_f->{answer}[0]->ptrdname);
+				}
+
+				# figure out if we have a ptr or not for foriegn host and if so grab it
+				my $ptr_l='NOTFOUND';
+				if ( defined( $answer_l->{answer}[0] ) &&
+					 ( ref( $answer_l->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
+					){
+					$ptr_l=lc($answer_l->{answer}[0]->ptrdname);
+				}
+
+				# now that we have it, check if either are defined in the lookup table
+				if (
+					defined( $self->{ptrs}{$ptr_l} ) ||
+					defined( $self->{ptrs}{$ptr_f} )
+					){
+					$ptr_meet=1;
+				}
+			}
+
+			# check if the PTR of any matches
+			if ( $ptr_r_require ){
+				#look both up
+				my $answer_f=$self->{resolver}->search( $foreign_host );
+				my $answer_l=$self->{resolver}->search( $local_host );
+
+				# figure out if we have a ptr or not for foriegn host and if so grab it
+				my $ptr_f='NOTFOUND';
+				if ( defined( $answer_f->{answer}[0] ) &&
+					 ( ref( $answer_f->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
+					){
+					$ptr_f=lc($answer_f->{answer}[0]->ptrdname);
+				}
+
+				# figure out if we have a ptr or not for foriegn host and if so grab it
+				my $ptr_l='NOTFOUND';
+				if ( defined( $answer_l->{answer}[0] ) &&
+					 ( ref( $answer_l->{answer}[0] ) eq 'Net::DNS::RR::PTR' )
+					){
+					$ptr_l=lc($answer_l->{answer}[0]->ptrdname);
+				}
+
+				# check if any of them match
+				my @ptrs_r=@{ $self->{ptrs_r} };
+				my $ptr=pop( @ptrs_r );
+				while (
+					   defined( $ptr ) &&
+					   ( ! $ptr_r_meet )
+					   ){
+
+					if (
+						( $ptr_f =~ /$ptr/ ) ||
+						( $ptr_l =~ /$ptr/ )
+						){
+						$ptr_r_meet=1;
+					}
+
+					$ptr=pop( @ptrs_r );
+				}
+			}
+
+			# handle inversion
+			$port_meet = $port_meet ^ $self->{port_invert};
+			$protocol_meet = $protocol_meet ^ $self->{protocol_invert};
+			$cidr_meet = $cidr_meet ^ $self->{cidr_invert};
+			$state_meet = $state_meet ^ $self->{state_invert};
+			$ptr_require = $ptr_require ^ $self->{ptr_invert};
+			$ptr_r_require = $ptr_r_require ^ $self->{ptr_r_invert};
+
 			# if these are all good, add them
 			if (
-				$port_meet && $protocol_meet && $cidr_meet && $state_meet
+				$port_meet && $protocol_meet && $cidr_meet && $state_meet &&
+				$ptr_meet && $ptr_r_meet
 				){
 				push( @found, {
 							   'foreign_port'=>$foreign_port,
@@ -448,6 +715,38 @@ sub set_cidrs{
 	return 1;
 }
 
+=head2 set_cidrs_invert
+
+This sets if the CIDRs search should be inverted or not.
+
+One value is taken and that is a boolean.
+
+    # if it does not match, hit on it
+    $search->set_cidrs_invert(1);
+
+    # only hit on matches, the default
+    $search->set_cidrs_invert; # or...
+    $search->set_cidrs_invert(0);
+
+=cut
+
+sub set_cidrs_invert{
+	my $self=$_[0];
+	my $bool=$_[1];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( $bool ){
+		$self->{cidr_invert}=1;
+	}else{
+		$self->{cidr_invert}=0;
+	}
+
+	return 1;
+}
+
 =head2 set_ports
 
 This sets the ports to search for in either
@@ -513,6 +812,38 @@ sub set_ports{
 	return 1;
 }
 
+=head2 set_ports_invert
+
+This sets if the ports search should be inverted or not.
+
+One value is taken and that is a boolean.
+
+    # if it does not match, hit on it
+    $search->set_port_invert(1);
+
+    # only hit on matches, the default
+    $search->set_port_invert; # or...
+    $search->set_port_invert(0);
+
+=cut
+
+sub set_ports_invert{
+	my $self=$_[0];
+	my $bool=$_[1];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( $bool ){
+		$self->{port_invert}=1;
+	}else{
+		$self->{port_invert}=0;
+	}
+
+	return 1;
+}
+
 =head2 set_protocols
 
 Sets the list of desired protocols to match.
@@ -529,9 +860,6 @@ Starting and trailing white space is removed.
 
     # Set the desired ports to the contents of @protocols.
     $search->set_protocols( \@protocols );
-    if ( $search->error ){
-        warn("Bad value in ports array");
-    }
 
     # removes any previous selections
     $search->set_protocols;
@@ -567,6 +895,188 @@ sub set_protocols{
 
 	#save it for usage later
 	$self->{protocols}=\%lookup_hash;
+
+	return 1;
+}
+
+=head2 set_protocols_invert
+
+This sets if the protocols search should be inverted or not.
+
+One value is taken and that is a boolean.
+
+    # if it does not match, hit on it
+    $search->set_port_invert(1);
+
+    # only hit on matches, the default
+    $search->set_protocol_invert; # or...
+    $search->set_protocol_invert(0);
+
+=cut
+
+sub set_protocols_invert{
+	my $self=$_[0];
+	my $bool=$_[1];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( $bool ){
+		$self->{protocol_invert}=1;
+	}else{
+		$self->{protocol_invert}=0;
+	}
+
+	return 1;
+}
+
+=head2 set_ptrs
+
+This sets a list of PTRs to search for.
+
+One value is taken and that is a array.
+
+If this is undef, then  previous settings will be cleared.
+
+White space, [\ \t], at the start or end of each
+item is removed. It is then converted to lowercase
+and saved for later lookup.
+
+    # Set the desired PTRs to the contents of @ptrs.
+    $search->set_ptrs( \@ptrs );
+
+    # removes any previous selections
+    $search->set_ptrs;
+
+=cut
+
+sub set_ptrs{
+	my $self=$_[0];
+	my @ptrs;
+	if ( defined( $_[1] ) ){
+		@ptrs=@{ $_[1] };
+	}
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( !defined( $ptrs[0] ) ){
+		$self->{ptrs}={};
+	}
+
+	# convert each one to a array
+	my %lookup_hash;
+	my $ptr=pop( @ptrs );
+	while( defined( $ptr ) ){
+		$ptr=~s/^[\ \t]*//;
+		$ptr=~s/^[\ \t]*//;
+
+		#create a LCed version of the ptr name
+		$lookup_hash{ lc( $ptr) }=1;
+
+		$ptr=pop( @ptrs );
+	}
+
+	# save it for later use
+	$self->{ptrs}=\%lookup_hash;
+
+	return 1;
+}
+
+=head2 set_ptrs_invert
+
+This sets if the PTRs search should be inverted or not.
+
+One value is taken and that is a boolean.
+
+    # if it does not match, hit on it
+    $search->set_ptrs_invert(1);
+
+    # only hit on match, the default
+    $search->set_ptrs_invert; # or...
+    $search->set_ptrs_invert(0);
+
+=cut
+
+sub set_ptrs_invert{
+	my $self=$_[0];
+	my $bool=$_[1];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( $bool ){
+		$self->{ptr_invert}=1;
+	}else{
+		$self->{ptr_invert}=0;
+	}
+
+	return 1;
+}
+
+=head2 set_ptrs_r
+
+This sets a list of PTRs to search for via regexp
+
+One value is taken and that is a array.
+
+If this is undef, then  previous settings will be cleared.
+
+    # Set the desired PTRs regexps to the contents of @ptrs.
+    $search->set_ptrs_r( \@ptrs );
+
+    # removes any previous selections
+    $search->set_ptrs;
+
+=cut
+
+sub set_ptrs_r{
+	my $self=$_[0];
+	my @regexps;
+	if ( defined( $_[1] ) ){
+		@regexps=@{ $_[1] };
+	}
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	$self->{ptrs_r}=\@regexps;
+
+	return 1;
+}
+
+=head2 set_ptrs_invert
+
+This sets if the regexp PTRs search should be inverted or not.
+
+One value is taken and that is a boolean.
+
+    # if it does not match, hit on it
+    $search->set_ptrs_r_invert(1);
+
+    # only hit on match, the default
+    $search->set_ptrs_r_invert; # or...
+    $search->set_ptrs_r_invert(0);
+
+=cut
+
+sub set_ptrs_r_invert{
+	my $self=$_[0];
+	my $bool=$_[1];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( $bool ){
+		$self->{ptr_r_invert}=1;
+	}else{
+		$self->{ptr_r_invert}=0;
+	}
 
 	return 1;
 }
@@ -625,6 +1135,38 @@ sub set_states{
 
 	#save it for usage later
 	$self->{states}=\%lookup_hash;
+
+	return 1;
+}
+
+=head2 set_ptrs_invert
+
+This sets if the state search should be inverted or not.
+
+One value is taken and that is a boolean.
+
+    # if it does not match, hit on it
+    $search->set_state_invert(1);
+
+    # only hit on match, the default
+    $search->set_state_invert; # or...
+    $search->set_state_invert(0);
+
+=cut
+
+sub set_state_invert{
+	my $self=$_[0];
+	my $bool=$_[1];
+
+	if( ! $self->errorblank ){
+		return undef;
+	}
+
+	if ( $bool ){
+		$self->{state_invert}=1;
+	}else{
+		$self->{state_invert}=0;
+	}
 
 	return 1;
 }

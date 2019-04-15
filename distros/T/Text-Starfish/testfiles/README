@@ -23,3 +23,7 @@
 25 - Makefile example
 
 26 - testing include
+
+33 - testing sfish_add_tag in LaTeX
+
+34 - testing sfish_add_tag in LaTeX, and also sfish_ignore_outer

@@ -2,7 +2,7 @@ package File::Stamped;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use Carp ();
 use POSIX ();
 use SelectSaver ();
@@ -138,6 +138,8 @@ sub syswrite {
 
     my ($buf, @args) = @_;
 
+    local *$self->{iomode} = '>>:raw'; # perl-5.30 syswrite compatibility
+
     $self->_output(sub {
         my ($fh, $fname) = @_;
         unless ($fh) {
@@ -224,7 +226,8 @@ Default value is 1.
 
 This is IO mode for opening file.
 
-Default value is '>>:utf8'.
+Default value is '>>:utf8'.  However, for perl-5.30 compatibility, '>>:raw' is
+used for C<syswrite>.
 
 =item autoflush: Bool
 

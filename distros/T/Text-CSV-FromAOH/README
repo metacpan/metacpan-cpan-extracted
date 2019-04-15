@@ -1,0 +1,58 @@
+NAME
+    Text::CSV::FromAOH - Convert an AoH (array of hashes) to CSV
+
+VERSION
+    This document describes version 0.001 of Text::CSV::FromAOH (from Perl
+    distribution Text-CSV-FromAOH), released on 2019-04-15.
+
+SYNOPSIS
+     use Text::CSV::FromAOH qw(csv_from_aoh);
+
+     print csv_from_aoh(
+         [ {foo=>1}, {bar=>1}, {baz=>1}, {foo=>2,bar=>2}, {bar=>3,baz=>3} ],
+         # field_idxs => {foo=>0}, # optional: by default fields are ordered by occurrence
+     );
+
+    will print something like:
+
+     foo,bar,baz
+     1,"",""
+     "",1,""
+     "","",1
+     2,2,""
+     "",3,3
+
+DESCRIPTION
+FUNCTIONS
+  csv_from_aoh
+    Usage:
+
+     csv_from_aoh( \@aoh [, %opts ] ) => str
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-CSV-FromAOH>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-CSV-FromAOH>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-CSV-FromAOH>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::CSV_XS
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -29,27 +29,27 @@ N-dimensional matrices. They are highly optimized for numerical work.
 =head1 THINKING IN TERMS OF THREADING
 
 If you have used PDLA for a little while already, you may have been using
-threading without realising it. Start the PDLA shell (type C<perldl> or
-C<pdl2> on a terminal). Most examples in this tutorial use the PDLA shell.
+threading without realising it. Start the PDLA shell (type C<perldla> or
+C<pdla2> on a terminal). Most examples in this tutorial use the PDLA shell.
 Make sure that L<PDLA::NiceSlice|PDLA::NiceSlice> and L<PDLA::AutoLoader|PDLA::AutoLoader>
 are enabled. For example:
 
-  % pdl2
+  % pdla2
   perlDL shell v1.352
   ...
   ReadLines, NiceSlice, MultiLines  enabled
  ...
   Note: AutoLoader not enabled ('use PDLA::AutoLoader' recommended)
 
-  pdl> 
+  pdla> 
 
 In this example, NiceSlice was automatically enabled, but AutoLoader was not.
 To enable it, type C<use PDLA::AutoLoader>.
 
 Let's start with a two-dimensional I<piddle>:
 
-  pdl> $a = sequence(11,9)
-  pdl> p $a
+  pdla> $a = sequence(11,9)
+  pdla> p $a
   [
     [ 0  1  2  3  4  5  6  7  8  9 10]
     [11 12 13 14 15 16 17 18 19 20 21]
@@ -64,7 +64,7 @@ Let's start with a two-dimensional I<piddle>:
 
 The C<info> method gives you basic information about a I<piddle>:
 
-  pdl> p $a->info
+  pdla> p $a->info
   PDLA: Double D [11,9]
 
 This tells us that C<$a> is an 11 x 9 I<piddle> composed of double
@@ -83,8 +83,8 @@ MATLAB and IDL).
 
 But with PDLA, we can just write:
 
-  pdl> $b = $a + 3
-  pdl> p $b
+  pdla> $b = $a + 3
+  pdla> p $b
   [
     [  3   4   5   6   7   8   9  10  11  12  13]
     [ 14  15  16  17  18  19  20  21  22  23  24]
@@ -102,11 +102,11 @@ all numerical software tools do. The C<+ 3> operation was automatically
 applied along two dimensions. Now suppose you want to to subtract a
 line from every row in C<$a>:
 
-  pdl> $line = sequence(11)
-  pdl> p $line
+  pdla> $line = sequence(11)
+  pdla> p $line
   [0 1 2 3 4 5 6 7 8 9 10]
-  pdl> $c = $a - $line
-  pdl> p $c
+  pdla> $c = $a - $line
+  pdla> p $c
   [
    [ 0  0  0  0  0  0  0  0  0  0  0]
    [11 11 11 11 11 11 11 11 11 11 11]
@@ -124,9 +124,9 @@ C<p $a> to check. Second, PDLA automatically subtracted C<$line> from each
 row in C<$a>. Why did it do that? Let's look at the dimensions of C<$a>,
 C<$line> and C<$c>:
 
-  pdl> p $line->info  =>  PDLA: Double D [11]
-  pdl> p $a->info     =>  PDLA: Double D [11,9]
-  pdl> p $c->info     =>  PDLA: Double D [11,9]
+  pdla> p $line->info  =>  PDLA: Double D [11]
+  pdla> p $a->info     =>  PDLA: Double D [11,9]
+  pdla> p $c->info     =>  PDLA: Double D [11,9]
 
 So, both C<$a> and C<$line> have the same number of elements in the 0th
 dimension! What PDLA then did was thread over the higher dimensions in C<$a>
@@ -136,8 +136,8 @@ PDLA threading in action.
 What if you want to subtract C<$line> from the first line in C<$a> only?
 You can do that by specifying the line explicitly:
 
-  pdl> $a(:,0) -= $line
-  pdl> p $a
+  pdla> $a(:,0) -= $line
+  pdla> p $a
   [
    [ 0  0  0  0  0  0  0  0  0  0  0]
    [11 12 13 14 15 16 17 18 19 20 21]
@@ -156,13 +156,13 @@ learn more about specifying subsets from piddles.
 The true power of threading comes when you realise that the piddle can
 have any number of dimensions! Let's make a 4 dimensional piddle:
 
-  pdl> $piddle_4D = sequence(11,3,7,2)
-  pdl> $c = $piddle_4D - $line
+  pdla> $piddle_4D = sequence(11,3,7,2)
+  pdla> $c = $piddle_4D - $line
 
 Now C<$c> is a piddle of the same dimension as C<$piddle_4D>.
 
-  pdl> p $piddle_4D->info  =>  PDLA: Double D [11,3,7,2]
-  pdl> p $c->info          =>  PDLA: Double D [11,3,7,2]
+  pdla> p $piddle_4D->info  =>  PDLA: Double D [11,3,7,2]
+  pdla> p $c->info          =>  PDLA: Double D [11,3,7,2]
 
 This time PDLA has threaded over three higher dimensions automatically,
 subtracting C<$line> all the way.
@@ -171,13 +171,13 @@ But, maybe you don't want to subtract from the rows (dimension 0), but from
 the columns (dimension 1). How do I subtract a column of numbers from each
 column in C<$a>?
 
-  pdl> $cols = sequence(9)
-  pdl> p $a->info      =>  PDLA: Double D [11,9]
-  pdl> p $cols->info   =>  PDLA: Double D [9]
+  pdla> $cols = sequence(9)
+  pdla> p $a->info      =>  PDLA: Double D [11,9]
+  pdla> p $cols->info   =>  PDLA: Double D [9]
 
 Naturally, we can't just type C<$a - $cols>. The dimensions don't match:
 
-  pdl> p $a - $cols
+  pdla> p $a - $cols
   PDLA: PDLA::Ops::minus(a,b,c): Parameter 'b'
   PDLA: Mismatched implicit thread dimension 0: should be 11, is 9
 
@@ -198,11 +198,11 @@ most common ones are:
 
 The C<xchg> method "B<exchanges>" two dimensions in a piddle:
 
-  pdl> $a = sequence(6,7,8,9)
-  pdl> $a_xchg = $a->xchg(0,3)
+  pdla> $a = sequence(6,7,8,9)
+  pdla> $a_xchg = $a->xchg(0,3)
   
-  pdl> p $a->info       =>  PDLA: Double D [6,7,8,9]
-  pdl> p $a_xchg->info  =>  PDLA: Double D [9,7,8,6]
+  pdla> p $a->info       =>  PDLA: Double D [6,7,8,9]
+  pdla> p $a_xchg->info  =>  PDLA: Double D [9,7,8,6]
                                            |     |
                                            V     V
                                        (dim 0) (dim 3)
@@ -216,11 +216,11 @@ variable C<$a> remains untouched.
 The C<mv> method "B<moves>" one dimension, in a piddle, shifting other
 dimensions as necessary.
 
-  pdl> $a = sequence(6,7,8,9)         (dim 0)
-  pdl> $a_mv = $a->mv(0,3)               |
-  pdl>                                   V _____
-  pdl> p $a->info     =>  PDLA: Double D [6,7,8,9]
-  pdl> p $a_mv->info  =>  PDLA: Double D [7,8,9,6]
+  pdla> $a = sequence(6,7,8,9)         (dim 0)
+  pdla> $a_mv = $a->mv(0,3)               |
+  pdla>                                   V _____
+  pdla> p $a->info     =>  PDLA: Double D [6,7,8,9]
+  pdla> p $a_mv->info  =>  PDLA: Double D [7,8,9,6]
                                           ----- |
                                                 V
                                               (dim 3)
@@ -234,11 +234,11 @@ original variable C<$a> remains untouched.
 The C<reorder> method is a generalization of the C<xchg> and C<mv> methods.
 It "B<reorders>" the dimensions in any way you specify:
 
-  pdl> $a = sequence(6,7,8,9)
-  pdl> $a_reorder = $a->reorder(3,0,2,1)
-  pdl>
-  pdl> p $a->info          =>  PDLA: Double D [6,7,8,9]
-  pdl> p $a_reorder->info  =>  PDLA: Double D [9,6,8,7]
+  pdla> $a = sequence(6,7,8,9)
+  pdla> $a_reorder = $a->reorder(3,0,2,1)
+  pdla>
+  pdla> p $a->info          =>  PDLA: Double D [6,7,8,9]
+  pdla> p $a_reorder->info  =>  PDLA: Double D [9,6,8,7]
                                               | | | |
                                               V V v V
                                  dimensions:  0 1 2 3
@@ -261,13 +261,13 @@ C<reorder> does not alter C<$a>. The original variable C<$a> remains untouched.
 By default, piddles are B<linked together> so that changes on one will go
 back and affect the original B<as well>.
 
-  pdl> $a = sequence(4,5)
-  pdl> $a_xchg = $a->xchg(1,0)
+  pdla> $a = sequence(4,5)
+  pdla> $a_xchg = $a->xchg(1,0)
 
 Here, C<$a_xchg> B<is not a separate object>. It is merely a different way
 of looking at C<$a>. Any change in C<$a_xchg> will appear in C<$a> as well.
 
-  pdl> p $a
+  pdla> p $a
   [
    [ 0  1  2  3]
    [ 4  5  6  7]
@@ -275,8 +275,8 @@ of looking at C<$a>. Any change in C<$a_xchg> will appear in C<$a> as well.
    [12 13 14 15]
    [16 17 18 19]
   ]
-  pdl> $a_xchg += 3
-  pdl> p $a
+  pdla> $a_xchg += 3
+  pdla> p $a
   [
    [ 3  4  5  6]
    [ 7  8  9 10]
@@ -290,12 +290,12 @@ of looking at C<$a>. Any change in C<$a_xchg> will appear in C<$a> as well.
 Some times, linking is not the behaviour you want. If you want to make the
 piddles independent, use the C<copy> method:
 
-  pdl> $a = sequence(4,5)
-  pdl> $a_xchg = $a->copy->xchg(1,0)
+  pdla> $a = sequence(4,5)
+  pdla> $a_xchg = $a->copy->xchg(1,0)
 
 Now C<$a> and C<$a_xchg> are completely separate objects:
 
-  pdl> p $a
+  pdla> p $a
   [
    [ 0  1  2  3]
    [ 4  5  6  7]
@@ -303,8 +303,8 @@ Now C<$a> and C<$a_xchg> are completely separate objects:
    [12 13 14 15]
    [16 17 18 19]
   ]
-  pdl> $a_xchg += 3
-  pdl> p $a
+  pdla> $a_xchg += 3
+  pdla> p $a
   [
    [ 0  1  2  3]
    [ 4  5  6  7]
@@ -312,7 +312,7 @@ Now C<$a> and C<$a_xchg> are completely separate objects:
    [12 13 14 15]
    [16 17 18 19]
   ]
-  pdl> $a_xchg
+  pdla> $a_xchg
   [
    [ 3  7 11 15 19]
    [ 4  8 12 16 20]
@@ -325,16 +325,16 @@ Now C<$a> and C<$a_xchg> are completely separate objects:
 
 Now we are ready to solve the problem that motivated this whole discussion:
 
-  pdl> $a = sequence(11,9)
-  pdl> $cols = sequence(9)
-  pdl>
-  pdl> p $a->info     =>  PDLA: Double D [11,9]
-  pdl> p $cols->info  =>  PDLA: Double D [9]
+  pdla> $a = sequence(11,9)
+  pdla> $cols = sequence(9)
+  pdla>
+  pdla> p $a->info     =>  PDLA: Double D [11,9]
+  pdla> p $cols->info  =>  PDLA: Double D [9]
 
 How do we tell PDLA to subtract C<$cols> along dimension 1 instead of dimension 0?
 The simplest way is to use the C<xchg> method and rely on PDLA linking:
 
-  pdl> p $a
+  pdla> p $a
   [
    [ 0  1  2  3  4  5  6  7  8  9 10]
    [11 12 13 14 15 16 17 18 19 20 21]
@@ -346,8 +346,8 @@ The simplest way is to use the C<xchg> method and rely on PDLA linking:
    [77 78 79 80 81 82 83 84 85 86 87]
    [88 89 90 91 92 93 94 95 96 97 98]
   ]
-  pdl> $a->xchg(1,0) -= $cols
-  pdl> p $a
+  pdla> $a->xchg(1,0) -= $cols
+  pdla> p $a
   [
    [ 0  1  2  3  4  5  6  7  8  9 10]
    [10 11 12 13 14 15 16 17 18 19 20]
@@ -505,8 +505,8 @@ At the simplest level, the C<range> method is a different way to select a
 portion of a piddle. Instead of using the C<$a(2,3)> notation, we use
 another piddle.
 
-  pdl> $a = sequence(6,7)
-  pdl> p $a
+  pdla> $a = sequence(6,7)
+  pdla> p $a
   [
    [ 0  1  2  3  4  5]
    [ 6  7  8  9 10 11]
@@ -516,9 +516,9 @@ another piddle.
    [30 31 32 33 34 35]
    [36 37 38 39 40 41]
   ]
-  pdl> p $a->range( pdl [1,2] )
+  pdla> p $a->range( pdl [1,2] )
   13
-  pdl> p $a(1,2)
+  pdla> p $a(1,2)
   [
    [13]
   ]
@@ -527,15 +527,15 @@ At this point, the C<range> method looks very similar to a regular PDLA slice.
 But the C<range> method is more general. For example, you can select several
 components at once:
 
-  pdl> $index = pdl [ [1,2],[2,3],[3,4],[4,5] ]
-  pdl> p $a->range( $index )
+  pdla> $index = pdl [ [1,2],[2,3],[3,4],[4,5] ]
+  pdla> p $a->range( $index )
   [13 20 27 34]
 
 Additionally, C<range> takes a second parameter which determines the size
 of the chunk to return:
 
-  pdl> $size = 3
-  pdl> p $a->range( pdl([1,2]) , $size )
+  pdla> $size = 3
+  pdla> p $a->range( pdl([1,2]) , $size )
   [
    [13 14 15]
    [19 20 21]
@@ -549,7 +549,7 @@ It tells PDLA what to do if the size box you request goes beyond the edge of
 the piddle. We won't go over all the options. We'll just say that the option
 C<periodic> means that the piddle "wraps around". For example:
 
-  pdl> p $a
+  pdla> p $a
   [
    [ 0  1  2  3  4  5]
    [ 6  7  8  9 10 11]
@@ -559,14 +559,14 @@ C<periodic> means that the piddle "wraps around". For example:
    [30 31 32 33 34 35]
    [36 37 38 39 40 41]
   ]
-  pdl> $size = 3
-  pdl> p $a->range( pdl([4,2]) , $size , "periodic" )
+  pdla> $size = 3
+  pdla> p $a->range( pdl([4,2]) , $size , "periodic" )
   [
    [16 17 12]
    [22 23 18]
    [28 29 24]
   ]
-  pdl> p $a->range( pdl([5,2]) , $size , "periodic" )
+  pdla> p $a->range( pdl([5,2]) , $size , "periodic" )
   [
    [17 12 13]
    [23 18 19]
@@ -580,13 +580,13 @@ Notice how the box wraps around the boundary of the piddle.
 The C<ndcoords> method is a convenience method that returns an enumerated
 list of coordinates suitable for use with the C<range> method.
 
-  pdl> p $piddle = sequence(3,3)
+  pdla> p $piddle = sequence(3,3)
   [
    [0 1 2]
    [3 4 5]
    [6 7 8]
   ]
-  pdl> p ndcoords($piddle)
+  pdla> p ndcoords($piddle)
   [
    [
     [0 0]
@@ -617,13 +617,13 @@ for every element in C<$piddle> is given by:
 What really matters is that C<ndcoords> is designed to work together with
 C<range>, with no C<$size> parameter, you get the same piddle back.
 
-  pdl> p $piddle
+  pdla> p $piddle
   [
    [0 1 2]
    [3 4 5]
    [6 7 8]
   ]
-  pdl> p $piddle->range( ndcoords($piddle) )
+  pdla> p $piddle->range( ndcoords($piddle) )
   [
    [0 1 2]
    [3 4 5]
@@ -633,13 +633,13 @@ C<range>, with no C<$size> parameter, you get the same piddle back.
 Why would this be useful? Because now we can ask for a series of "boxes" for
 the entire piddle. For example, 2x2 boxes:
 
-  pdl> p $piddle->range( ndcoords($piddle) , 2 , "periodic" )
+  pdla> p $piddle->range( ndcoords($piddle) , 2 , "periodic" )
 
 The output of this function is difficult to read because the "boxes" along
 the last two dimension. We can make the result more readable by rearranging
 the dimensions:
 
-  pdl> p $piddle->range( ndcoords($piddle) , 2 , "periodic" )->reorder(2,3,0,1)
+  pdla> p $piddle->range( ndcoords($piddle) , 2 , "periodic" )->reorder(2,3,0,1)
   [
    [
     [
@@ -662,7 +662,7 @@ Is the 2x2 box starting with the (0,0) element of C<$piddle>.
 
 We are not done yet. For the game of life, we want 3x3 boxes from C<$a>:
 
-  pdl> p $a
+  pdla> p $a
   [
    [ 0  1  2  3  4  5]
    [ 6  7  8  9 10 11]
@@ -672,7 +672,7 @@ We are not done yet. For the game of life, we want 3x3 boxes from C<$a>:
    [30 31 32 33 34 35]
    [36 37 38 39 40 41]
   ]
-  pdl> p $a->range( ndcoords($a) , 3 , "periodic" )->reorder(2,3,0,1)
+  pdla> p $a->range( ndcoords($a) , 3 , "periodic" )->reorder(2,3,0,1)
   [
    [
     [
@@ -689,7 +689,7 @@ But there is one problem. We actually want the 3x3 box to be B<centered> on
 C<ndcoords($a)>. Remember that the "periodic" option takes care of making
 everything wrap around.
 
-  pdl> p $a->range( ndcoords($a) - 1 , 3 , "periodic" )->reorder(2,3,0,1)
+  pdla> p $a->range( ndcoords($a) - 1 , 3 , "periodic" )->reorder(2,3,0,1)
   [
    [
     [
@@ -711,8 +711,8 @@ Now we see a 3x3 box with the (0,0) element in the centre of the box.
 The C<sumover> method adds along only the first dimension. If we apply it
 twice, we will be adding all the elements of each 3x3 box.
 
-  pdl> $n = $a->range(ndcoords($a)-1,3,"periodic")->reorder(2,3,0,1)
-  pdl> p $n
+  pdla> $n = $a->range(ndcoords($a)-1,3,"periodic")->reorder(2,3,0,1)
+  pdla> p $n
   [
    [
     [
@@ -726,7 +726,7 @@ twice, we will be adding all the elements of each 3x3 box.
      [ 6  7  8]
     ]
     ...
-  pdl> p $n->sumover->sumover
+  pdla> p $n->sumover->sumover
   [
    [144 135 144 153 162 153]
    [ 72  63  72  81  90  81]
@@ -747,7 +747,7 @@ We are almost there!
 Adding up all the elements in a 3x3 box is not B<quite> what we want. We
 don't want to count the center box. Fortunately, this is an easy fix:
 
-  pdl> p $n->sumover->sumover - $a
+  pdla> p $n->sumover->sumover - $a
   [
    [144 134 142 150 158 148]
    [ 66  56  64  72  80  70]
@@ -761,11 +761,11 @@ don't want to count the center box. Fortunately, this is an easy fix:
 When applied to Conway's Game of Life, this will tell us how many living
 neighbours each cell has:
 
-  pdl> $a = zeroes(10,10)
-  pdl> $a(1:3,1:3) .= pdl ( [1,1,1],
+  pdla> $a = zeroes(10,10)
+  pdla> $a(1:3,1:3) .= pdl ( [1,1,1],
   ..(    >                  [0,0,1],
   ..(    >                  [0,1,0] )
-  pdl> p $a
+  pdla> p $a
   [
    [0 0 0 0 0 0 0 0 0 0]
    [0 1 1 1 0 0 0 0 0 0]
@@ -778,9 +778,9 @@ neighbours each cell has:
    [0 0 0 0 0 0 0 0 0 0]
    [0 0 0 0 0 0 0 0 0 0]
   ]
-  pdl> $n = $a->range(ndcoords($a)-1,3,"periodic")->reorder(2,3,0,1)
-  pdl> $n = $n->sumover->sumover - $a
-  pdl> p $n
+  pdla> $n = $a->range(ndcoords($a)-1,3,"periodic")->reorder(2,3,0,1)
+  pdla> $n = $n->sumover->sumover - $a
+  pdla> p $n
   [
    [1 2 3 2 1 0 0 0 0 0]
    [1 1 3 2 2 0 0 0 0 0]
@@ -809,7 +809,7 @@ generation.
 
 Get a list of cells that have exactly three neighbours:
 
-  pdl> p ($n == 3)
+  pdla> p ($n == 3)
   [
    [0 0 1 0 0 0 0 0 0 0]
    [0 0 1 0 0 0 0 0 0 0]
@@ -825,13 +825,13 @@ Get a list of cells that have exactly three neighbours:
 
 Get a list of B<empty> cells that have exactly three neighbours:
 
-  pdl> p ($n == 3) * !$a
+  pdla> p ($n == 3) * !$a
 
 =item If a living cell has less than 2 or more than 3 neighbours, it dies.
 
 Get a list of cells that have exactly 2 or 3 neighbours:
 
-  pdl> p (($n == 2) + ($n == 3))
+  pdla> p (($n == 2) + ($n == 3))
   [
    [0 1 1 1 0 0 0 0 0 0]
    [0 0 1 1 1 0 0 0 0 0]
@@ -847,14 +847,14 @@ Get a list of cells that have exactly 2 or 3 neighbours:
 
 Get a list of B<living> cells that have exactly 2 or 3 neighbours:
 
-  pdl> p (($n == 2) + ($n == 3)) * $a
+  pdla> p (($n == 2) + ($n == 3)) * $a
 
 =back
 
 Putting it all together, the next generation is:
 
-  pdl> $a = ((($n == 2) + ($n == 3)) * $a) + (($n == 3) * !$a)
-  pdl> p $a
+  pdla> $a = ((($n == 2) + ($n == 3)) * $a) + (($n == 3) * !$a)
+  pdla> p $a
   [
    [0 0 1 0 0 0 0 0 0 0]
    [0 0 1 1 0 0 0 0 0 0]

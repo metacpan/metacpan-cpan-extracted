@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.811'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.812'; # VERSION
 
 our %SPEC;
 
@@ -92,7 +92,7 @@ _
             schema  => ['array', {req=>1, of => ['float', {req=>1}, {}]}, {}],
             req     => 1,
             pos     => 0,
-            greedy  => 1,
+            slurpy  => 1,
         },
         round => {
             summary => 'Whether to round result to integer',
@@ -173,7 +173,7 @@ Perinci::Examples::Tiny - Small examples
 
 =head1 VERSION
 
-This document describes version 0.811 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2018-12-07.
+This document describes version 0.812 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2019-04-15.
 
 =head1 DESCRIPTION
 
@@ -207,6 +207,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 foo2
 
 Usage:
@@ -229,6 +230,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 foo3
@@ -255,6 +257,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 foo4
 
 Usage:
@@ -279,6 +282,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 hello_naked
 
 Usage:
@@ -292,6 +296,7 @@ This function is not exported.
 No arguments.
 
 Return value:  (any)
+
 
 
 =head2 noop
@@ -316,6 +321,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 noop2
@@ -375,6 +381,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 odd_even
 
 Usage:
@@ -405,6 +412,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
+
 
 
 =head2 sum
@@ -466,7 +474,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

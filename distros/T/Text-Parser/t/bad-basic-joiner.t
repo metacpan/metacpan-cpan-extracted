@@ -18,7 +18,7 @@ throws_ok {
     my $pars = BadJoiner->new();
     $pars->read('t/data.txt');
 }
-'Text::Parser::Multiline::Error',
+'Text::Parser::Errors::UnexpectedEof',
     'join_next multi-line parsers must have a continuation character';
 
 done_testing;

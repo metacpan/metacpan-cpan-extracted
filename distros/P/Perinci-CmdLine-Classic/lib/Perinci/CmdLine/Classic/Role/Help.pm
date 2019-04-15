@@ -2,8 +2,8 @@
 
 package Perinci::CmdLine::Classic::Role::Help;
 
-our $DATE = '2018-05-20'; # DATE
-our $VERSION = '1.812'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '1.813'; # VERSION
 
 # split here just so it's more organized
 
@@ -200,7 +200,7 @@ sub help_section_options {
                 # BEGIN DUPE1
                 if ($arg_spec && !$opt_spec->{main_opt} &&
                         defined($arg_spec->{pos})) {
-                    if ($arg_spec->{greedy}) {
+                    if ($arg_spec->{slurpy} // $arg_spec->{greedy}) {
                         $ct .= " (=arg[$arg_spec->{pos}-])";
                     } else {
                         $ct .= " (=arg[$arg_spec->{pos}])";
@@ -238,7 +238,7 @@ sub help_section_options {
                     # BEGIN DUPE1
                     if ($arg_spec && !$opt_spec->{main_opt} &&
                             defined($arg_spec->{pos})) {
-                        if ($arg_spec->{greedy}) {
+                        if ($arg_spec->{slurpy} // $arg_spec->{greedy}) {
                             $ct .= " (=arg[$arg_spec->{pos}-])";
                         } else {
                             $ct .= " (=arg[$arg_spec->{pos}])";
@@ -517,7 +517,7 @@ Perinci::CmdLine::Classic::Role::Help - Help-related routines
 
 =head1 VERSION
 
-This document describes version 1.812 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2018-05-20.
+This document describes version 1.813 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2019-04-15.
 
 =for Pod::Coverage ^(.+)$
 
@@ -554,7 +554,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

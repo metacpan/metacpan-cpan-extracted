@@ -79,6 +79,9 @@ SKIP: {
 	my $map		= URI::NamespaceMap->new( [ 'acl' ] );
 	isa_ok( $map, 'URI::NamespaceMap' );
 	ok($map->namespace_uri('acl'), 'acl returns something') || diag('RDF::NS is version ' . $RDF::NS::VERSION . ' and may need upgrading');
+	$map->guess_and_add('http://example.org/');
+	ok($map->namespace_uri('ex'), 'ex returns something');
+	is($map->namespace_uri('ex')->as_string, 'http://example.org/', 'ex URI string OK');
 }
 
 SKIP: {

@@ -89,7 +89,7 @@ C<approx>.
 
 =over
 
-=item * The L<perldl|perldl> or L<pdl2|PDLA::Perldl2> Shell
+=item * The L<perldla|perldla> or L<pdla2|PDLA::Perldl2> Shell
 
 The Perldl Shell is a REPL (Read-Evaluate-Print-Loop, in other words,
 a prompt or shell) that allows you to work with PDLA (or any Perl, for
@@ -113,7 +113,7 @@ program you write.
 =head1 Normal Usage
 
 The sorts of modules that you'll likely use on a normal basis in scripts
-or from within the perldl shell.  Some of these modules you may never
+or from within the perldla shell.  Some of these modules you may never
 use, but you should still be aware that they exist, just in case you
 need their functionality.
 
@@ -303,7 +303,7 @@ file.  Particularly useful when used with the Perldl Shell.
 =item * L<PDLA::Dbg|PDLA::Dbg>
 
 Declares the C<px> function, which can be handy for debugging your
-PDLA scripts and/or perldl shell commands.
+PDLA scripts and/or perldla shell commands.
 
 =item * L<PDLA::Options|PDLA::Options>
 
@@ -315,11 +315,11 @@ Perl would have tons of these sorts of modules lying around, but I
 couldn't find any.)  Note this module does not depend on PDLA for its
 usage or installation.
 
-=item * L<PDLA::pdldoc|PDLA::pdldoc>
+=item * L<PDLA::pdladoc|PDLA::pdladoc>
 
-Ever fired-up the perldl shell just to look up the help for a particular
-function?  You can use C<pdldoc> instead.  This shell script extracts
-information from the help index without needing to start the perldl
+Ever fired-up the perldla shell just to look up the help for a particular
+function?  You can use C<pdladoc> instead.  This shell script extracts
+information from the help index without needing to start the perldla
 shell.
 
 =back
@@ -381,7 +381,7 @@ Explanation of the PDLA documentation conventions, and an
 interface to the PDLA Documentation parser.  Following these
 guidelines when writing documentation for PDLA functions will
 ensure that your wonderful documentation is accessible from
-the perldl shell and from calls to C<barf>.  (Did you notice
+the perldla shell and from calls to C<barf>.  (Did you notice
 that C<barf> used your documentation?  Time to reread
 L<PDLA::Core|PDLA::Core>...)
 

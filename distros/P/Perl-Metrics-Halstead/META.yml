@@ -34,7 +34,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Metrics-Halstead
   repository: https://github.com/ology/Perl-Metrics-Halstead
-version: '0.0603'
+version: '0.0604'
 x_Dist_Zilla:
   perl:
     version: '5.027007'

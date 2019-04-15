@@ -1,3 +1,10 @@
+0.933   2019-04-15 (PERLANCAR)
+
+	- Update to Rinci 1.1.88 (slurpy).
+
+	- [logging] Log gen_completion() arguments.
+
+
 0.932   2018-12-07 (PERLANCAR)
 
 	- Complete from argument examples.

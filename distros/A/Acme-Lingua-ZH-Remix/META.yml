@@ -16,16 +16,16 @@ name: Acme-Lingua-ZH-Remix
 provides:
   Acme::Lingua::ZH::Remix:
     file: lib/Acme/Lingua/ZH/Remix.pm
-    version: '0.97'
+    version: '0.99'
 requires:
   Hash::Merge: '0'
   List::MoreUtils: '0'
-  Moose: '0'
+  Moo: '0'
   Types::Standard: '0'
 resources:
   bugtracker: https://github.com/gugod/Acme-Lingua-ZH-Remix/issues
   homepage: https://github.com/gugod/Acme-Lingua-ZH-Remix
   repository: git://github.com/gugod/Acme-Lingua-ZH-Remix.git
-version: '0.97'
+version: '0.99'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

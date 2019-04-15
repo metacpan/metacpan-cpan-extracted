@@ -46,6 +46,6 @@ is_deeply(
 throws_ok {
     $mpars->read('t/bad-continued.txt');
 }
-'Text::Parser::Multiline::Error', '';
+'Text::Parser::Errors::UnexpectedEof', 'Continuation bad';
 
 done_testing;

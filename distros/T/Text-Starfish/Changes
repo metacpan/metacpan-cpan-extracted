@@ -160,3 +160,6 @@ Revision history for Perl extension Text::Starfish.
 1.24  Sat Feb  4 23:03:30 AST 2017
         - fixed a bug in scan
 	- added sfish_ignore_outer feature
+
+1.25  Mon Apr 15 11:50:33 ADT 2019
+	- documentation improvements

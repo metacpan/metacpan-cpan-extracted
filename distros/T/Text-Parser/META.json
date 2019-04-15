@@ -14,6 +14,11 @@
    },
    "name" : "Text-Parser",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::Test::TidyAll" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
@@ -35,7 +40,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Dist::Zilla::Plugin::Test::TidyAll" : "0",
             "Exception::Class" : "0",
             "Exporter" : "0",
             "FileHandle" : "0",
@@ -45,8 +49,10 @@
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::CoverableModifiers" : "0",
             "MooseX::StrictConstructor" : "0",
+            "Scalar::Util" : "0",
             "String::Util" : "0",
             "Syntax::Keyword::Try" : "0",
+            "Throwable::SugarFactory" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.14.0",
@@ -70,15 +76,19 @@
    "provides" : {
       "Text::Parser" : {
          "file" : "lib/Text/Parser.pm",
-         "version" : "0.911"
+         "version" : "0.915"
       },
       "Text::Parser::AutoSplit" : {
          "file" : "lib/Text/Parser/AutoSplit.pm",
-         "version" : "0.911"
+         "version" : "0.915"
+      },
+      "Text::Parser::Errors" : {
+         "file" : "lib/Text/Parser/Errors.pm",
+         "version" : "0.915"
       },
       "Text::Parser::Multiline" : {
          "file" : "lib/Text/Parser/Multiline.pm",
-         "version" : "0.911"
+         "version" : "0.915"
       }
    },
    "release_status" : "stable",
@@ -93,7 +103,7 @@
          "web" : "https://github.com/balajirama/Text-Parser"
       }
    },
-   "version" : "0.911",
+   "version" : "0.915",
    "x_contributors" : [
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>"
    ],

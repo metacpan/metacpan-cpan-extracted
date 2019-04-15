@@ -1,13 +1,13 @@
 # some useful functions to experiment with
-# the new PDLA source filter within the perldl shell
+# the new PDLA source filter within the perldla shell
 
 # report switches translation reporting on/off
 # trans and notrans switch source filtering on/off
 
 # include the perl code below in your standard
-# perldl startup file ($ENV{HOME}/.perldlrc)
+# perldla startup file ($ENV{HOME}/.perldlrc)
 # to have it always available when working
-# in the perldl shell
+# in the perldla shell
 
 $PERLDL::report = 0;
 sub report {

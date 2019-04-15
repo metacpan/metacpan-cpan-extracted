@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineSrc;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.811'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.812'; # VERSION
 
 use 5.010;
 use strict;
@@ -225,7 +225,7 @@ Perinci::Examples::CmdLineSrc - Examples for using cmdline_src function property
 
 =head1 VERSION
 
-This document describes version 0.811 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2018-12-07.
+This document describes version 0.812 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2019-04-15.
 
 =head1 FUNCTIONS
 
@@ -262,6 +262,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cmdline_src_invalid_arg_type
 
 Usage:
@@ -290,6 +291,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 cmdline_src_multi_stdin
@@ -322,6 +324,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 cmdline_src_multi_stdin_line
@@ -360,6 +363,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cmdline_src_stdin_array
 
 Usage:
@@ -388,6 +392,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 cmdline_src_stdin_line
@@ -422,6 +427,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cmdline_src_stdin_or_args_array
 
 Usage:
@@ -450,6 +456,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 cmdline_src_stdin_or_file_array
@@ -482,6 +489,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cmdline_src_stdin_or_file_str
 
 Usage:
@@ -510,6 +518,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 cmdline_src_stdin_or_files_array
@@ -542,6 +551,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cmdline_src_stdin_or_files_str
 
 Usage:
@@ -570,6 +580,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 cmdline_src_stdin_str
@@ -602,6 +613,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 cmdline_src_unknown
 
 Usage:
@@ -630,6 +642,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 test_binary
@@ -686,7 +699,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.015 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2019-02-28.
+    This document describes version 0.016 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2019-04-15.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -15,6 +15,8 @@ SYNOPSIS
     *   mysql-drop-dbs
 
     *   mysql-drop-tables
+
+    *   mysql-fill-csv-columns-from-query
 
     *   mysql-find-identical-rows
 
@@ -293,6 +295,68 @@ FUNCTIONS
     *   table_pattern => *re*
 
     *   tables => *array[str]*
+
+    *   username => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mysql_fill_csv_columns_from_query
+    Usage:
+
+     mysql_fill_csv_columns_from_query(%args) -> [status, msg, payload, meta]
+
+    Fill CSV columns with data from a query.
+
+    This utility is handy if you have a partially filled table (in CSV
+    format, which you can convert from spreadsheet or Google Sheet or
+    whatever), where you have some unique key already specified in the table
+    (e.g. customer_id) and you want to fill up other columns (e.g.
+    customer_name, customer_email, last_order_date) from a query:
+
+     % mysql-fill-csv-columns-from-query DBNAME TABLE.csv 'SELECT c.NAME customer_name, c.email customer_email, (SELECT date FROM tblorders WHERE client_id=$customer_id ORDER BY date DESC LIMIT 1) last_order_time FROM tblclients WHERE id=$customer_id'
+
+    The $NAME in the query will be replaced by actual CSV column value.
+    SELECT fields must correspond to the CSV column names. For each row, a
+    new query will be executed and the first result row is used.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   database* => *str*
+
+    *   filename* => *filename*
+
+        Input CSV file.
+
+    *   host => *str* (default: "localhost")
+
+    *   password => *str*
+
+        Will try to get default from "~/.my.cnf".
+
+    *   port => *int* (default: 3306)
+
+    *   query* => *str*
 
     *   username => *str*
 

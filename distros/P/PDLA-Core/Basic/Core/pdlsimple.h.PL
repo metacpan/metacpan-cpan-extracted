@@ -3,7 +3,7 @@
 use Config;
 use File::Basename qw(&basename &dirname);
 
-require 'Types.pm';
+require './Types.pm';
 my $PDLA_DATATYPES = PDLA::Types::datatypes_header();
 
 # List explicitly here the variables you want Configure to

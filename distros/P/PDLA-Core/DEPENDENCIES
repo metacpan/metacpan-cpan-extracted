@@ -78,21 +78,21 @@ PDLA::IO::Storable Storable >=1.03
 		                          versions prior to 5.10.0
 
 
-pdl2   (shell)    Devel::REPL >= 1.003011
+pdla2   (shell)    Devel::REPL >= 1.003011
                   and Term::ReadLine::Perl    
                   or Term::ReadLine::Gnu 
 		                          
 					  Devel::REPL requires Data::Dump::Streamer
-					  to support pdl2.  This may need to be
+					  to support pdla2.  This may need to be
 					  hand-installed if you are doing a manual
 					  PDLA build.
 
 perldl (shell)    Term::ReadLine::Perl    
                   or Term::ReadLine::Gnu 
 
-                                          pdl2 (and perldl) will be installed
+                                          pdla2 (and perldl) will be installed
                                           by default.  If Devel::REPL is not
-                                          installed, pdl2 uses perldl.  The
+                                          installed, pdla2 uses perldl.  The
                                           same thing if a Term::ReadLine::Perl
                                           or Term::ReadLine::Gnu is not installed.
 

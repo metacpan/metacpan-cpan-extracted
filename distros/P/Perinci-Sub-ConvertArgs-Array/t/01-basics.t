@@ -64,16 +64,16 @@ test_convertargs(
 $meta = {
     v => 1.1,
     args => {
-        arg1 => {schema=>['array*' => {of=>'str*'}], pos=>0, greedy=>1},
+        arg1 => {schema=>['array*' => {of=>'str*'}], pos=>0, slurpy=>1},
     },
 };
 test_convertargs(
-    name=>'arg_greedy (1a)',
+    name=>'arg_slurpy (array, 1a)',
     meta=>$meta, args=>{arg1=>[1, 2, 3]},
     status=>200, array=>[1, 2, 3],
 );
 test_convertargs(
-    name=>'arg_greedy (1b)',
+    name=>'arg_slurpy (array, 1b)',
     meta=>$meta, args=>{arg1=>2},
     status=>200, array=>[2],
 );
@@ -82,11 +82,11 @@ $meta = {
     v => 1.1,
     args => {
         arg1 => {schema=>'str*', pos=>0},
-        arg2 => {schema=>['array*' => {of=>'str*'}], pos=>1, greedy=>1},
+        arg2 => {schema=>['array*' => {of=>'str*'}], pos=>1, slurpy=>1},
     },
 };
 test_convertargs(
-    name=>'arg_greedy (2)',
+    name=>'arg_slurpy (array, 2)',
     meta=>$meta, args=>{arg1=>1, arg2=>[2, 3, 4]},
     status=>200, array=>[1, 2, 3, 4],
 );

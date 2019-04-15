@@ -1,5 +1,8 @@
 Revision history for Perl-Metrics-Halstead
 
+0.0604 2019-04-14 23:06:36
+    - Improve die calls in the BUILD() routine.
+
 0.0603 2019-04-06 08:40:29
     - Fix comment skipping logic.
     - Turn eg/analyze into bin/halstead with Getopt::Long goodness.

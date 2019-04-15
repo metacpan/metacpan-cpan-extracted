@@ -120,7 +120,8 @@ lives_ok { $sp->read('t/example-4.sp'); } 'Works fine again';
 is( scalar( $sp->get_records() ), 2, '2 records saved' );
 is( $sp->lines_parsed(),          4, '4 lines parsed' );
 
-throws_ok { $sp->read('t/bad-spice.sp'); } 'Text::Parser::Multiline::Error',
+throws_ok { $sp->read('t/bad-spice.sp'); }
+'Text::Parser::Errors::UnexpectedCont',
     'Dies as expected';
 
 lives_ok { $sp->read('t/example-5.sp'); }

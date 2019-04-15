@@ -98,13 +98,13 @@ subtest "nonscalar argv" => sub {
     $meta = {
         v => 1.1,
         args => {
-            arg1 => {schema=>'array', req=>1, pos=>0, greedy=>1},
+            arg1 => {schema=>'array', req=>1, pos=>0, slurpy=>1},
         },
     };
     test_getargs(meta=>$meta, argv=>['[foo]'],
                  per_arg_json=>1, per_arg_yaml=>1,
                  args=>{arg1=>[['foo']]},
-                 name=>"nonscalar argv, yaml/json parsing, greedy");
+                 name=>"nonscalar argv, yaml/json parsing, slurpy");
 };
 
 {
@@ -431,7 +431,7 @@ test_getargs(meta=>$meta, argv=>[qw/-X=foo/],
             pos => {
                 schema => ['array*' => of => 'str*'],
                 pos    => 0,
-                greedy => 1,
+                slurpy => 1,
                 cmdline_on_getopt => sub {
                     push @pos, {@_};
                 },
@@ -475,12 +475,12 @@ test_getargs(meta=>$meta, argv=>[qw/-X=foo/],
         },
     );
 
-    # from now on, pos becomes greedy
-    $meta->{args}{pos}{greedy} = 1;
+    # from now on, pos becomes slurpy
+    $meta->{args}{pos}{slurpy} = 1;
 
     @pos = ();
     test_getargs(
-        name => 'cmdline_on_getopt for arg with pos + greedy, feed opts',
+        name => 'cmdline_on_getopt for arg with pos + slurpy, feed opts',
         meta => $meta,
         argv => [qw/--pos 1 --pos 2/],
         posttest => sub {
@@ -493,7 +493,7 @@ test_getargs(meta=>$meta, argv=>[qw/-X=foo/],
     );
     @pos = ();
     test_getargs(
-        name => 'cmdline_on_getopt for arg with pos + greedy, feed args',
+        name => 'cmdline_on_getopt for arg with pos + slurpy, feed args',
         meta => $meta,
         argv => [qw/1 2/],
         posttest => sub {

@@ -4,7 +4,7 @@ use warnings;
 
 {
     no strict "vars";
-    $VERSION = "1.10";
+    $VERSION = "1.11";
 }
 
 use Acme::CPANAuthors::Register (
@@ -19,16 +19,20 @@ use Acme::CPANAuthors::Register (
     'DMAKI'         => 'Daisuke Maki',
     'DMUEY'         => 'Daniel Muey',
     'DROLSKY'       => 'Dave Rolsky',
+    'ELIZABETH'     => 'Elizabeth Mattijsen',
     'ETHER'         => 'Karen Etheridge',
+    'EXODIST'       => 'Chad Granum',
     'FAYLAND'       => 'Fayland Lin',
     'FLORA'         => 'Florian Ragwitz',
     'GETTY'         => 'Torsten Raudssus',
     'GUGOD'         => 'Liu Kang Min',
     'INGY'          => 'Ingy dot Net',
     'JGNI'          => 'John Imrie',
+    'JHTHORSEN'     => 'Jan Henning Thorsen',
     'KENTNL'        => 'Kent Fredric',
     'LBROCARD'      => 'Leon Brocard',
     'LEOCHARRE'     => 'Leo Charre',
+    'LEONT'         => 'Leon Timmermans',
     'MANWAR'        => 'Mohammad S Anwar',
     'MARCEL'        => '???',
     'MIYAGAWA'      => 'Tatsuhiko Miyagawa',
@@ -40,7 +44,9 @@ use Acme::CPANAuthors::Register (
     'PEVANS'        => 'Paul Evans',
     'PLICEASE'      => 'Graham Ollis',
     'PSIXDISTS'     => 'Perl 6 Modules',
+    'RENEEB'        => 'Renee Baecker',
     'RJBS'          => 'Ricardo SIGNES',
+    'RRWO'          => 'Robert Rothenberg',
     'RSAVAGE'       => 'Ron Savage',
     'SALVA'         => 'Salvador Fandino Garcia',
     'SHARYANTO'     => 'Steven Haryanto',
@@ -49,8 +55,10 @@ use Acme::CPANAuthors::Register (
     'SKIM'          => 'Michal Josef Spacek',
     'SMUELLER'      => 'Steffen Mueller',
     'SZABGAB'       => 'Gabor Szabo',
+    'TEAM'          => 'Tom Molesworth',
     'TOBYINK'       => 'Toby Inkster',
     'TOKUHIROM'     => '???',
+    'YANICK'        => 'Yanick Champoux',
     'ZOFFIX'        => 'Zoffix Znet',
 
 );
@@ -92,51 +100,59 @@ See L<http://backpan.cpantesters.org>.
 
 =head1 THE AUTHORS
 
-   1.  1268  PERLANCAR     perlancar
-   2.  549  PSIXDISTS     Perl 6 Modules
+   1.  1842  PERLANCAR     perlancar
+   2.  550  PSIXDISTS     Perl 6 Modules
    3.  510  SHARYANTO     Steven Haryanto
-   4.  314  TOBYINK       Toby Inkster
-   5.  312  RJBS          Ricardo SIGNES
-   6.  293  ZOFFIX        Zoffix Znet
+   4.  329  TOBYINK       Toby Inkster
+   5.  313  RJBS          Ricardo SIGNES
+   6.  296  ZOFFIX        Zoffix Znet
    7.  287  ADAMK         Adam Kennedy
-   8.  251  TOKUHIROM     ???
-   9.  243  ETHER         Karen Etheridge
-  10.  241  MIYAGAWA      Tatsuhiko Miyagawa
-  11.  236  JGNI          John Imrie
-  12.  220  INGY          Ingy dot Net
-  13.  218  BINGOS        Chris Williams
+   8.  271  ETHER         Karen Etheridge
+   9.  252  TOKUHIROM     ???
+  10.  250  JGNI          John Imrie
+  11.  245  MIYAGAWA      Tatsuhiko Miyagawa
+  12.  223  INGY          Ingy dot Net
+  13.  221  BINGOS        Chris Williams
   14.  210  FLORA         Florian Ragwitz
-  15.  202  DAGOLDEN      David Golden
-  16.  192  SMUELLER      Steffen Mueller
-  17.  188  KENTNL        Kent Fredric
-  18.  182  MARCEL        ???
-  19.  172  BOBTFISH      Tomas Doran
-  20.  168  DROLSKY       Dave Rolsky
-  21.  162  PEVANS        Paul Evans
-  22.  161  NUFFIN        Yuval Kogman
-  23.  151  PLICEASE      Graham Ollis
-  24.  144  NEILB         Neil Bowers
-  25.  142  SKIM          Michal Josef Spacek
-  26.  141  GUGOD         Liu Kang Min
-  27.  141  RSAVAGE       Ron Savage
-  28.  137  DMAKI         Daisuke Maki
-  29.  134  BARBIE        Barbie
-  30.  134  BDFOY         brian d foy
-  31.  130  FAYLAND       Fayland Lin
-  32.  129  SHLOMIF       Shlomi Fish
-  33.  128  MANWAR        Mohammad S Anwar
-  34.  125  AUTRIJUS      Audrey Tang
-  35.  122  SZABGAB       Gabor Szabo
-  36.  121  SIMON         Simon Cozens
-  37.  113  MRAMBERG      Marcus Ramberg
-  38.  111  LBROCARD      Leon Brocard
-  39.  111  MLEHMANN      ???
-  40.  111  SALVA         Salvador Fandino Garcia
-  41.  110  DMUEY         Daniel Muey
-  42.  107  GETTY         Torsten Raudssus
-  43.  101  LEOCHARRE     Leo Charre
+  15.  204  DAGOLDEN      David Golden
+  16.  202  PLICEASE      Graham Ollis
+  17.  192  SMUELLER      Steffen Mueller
+  18.  189  KENTNL        Kent Fredric
+  19.  182  MARCEL        ???
+  20.  176  PEVANS        Paul Evans
+  21.  172  BOBTFISH      Tomas Doran
+  22.  172  DROLSKY       Dave Rolsky
+  23.  166  ELIZABETH     Elizabeth Mattijsen
+  24.  161  NUFFIN        Yuval Kogman
+  25.  157  SHLOMIF       Shlomi Fish
+  26.  154  MANWAR        Mohammad S Anwar
+  27.  148  NEILB         Neil Bowers
+  28.  146  GUGOD         Liu Kang Min
+  29.  142  RSAVAGE       Ron Savage
+  30.  142  SKIM          Michal Josef Spacek
+  31.  138  BDFOY         brian d foy
+  32.  137  DMAKI         Daisuke Maki
+  33.  134  BARBIE        Barbie
+  34.  133  FAYLAND       Fayland Lin
+  35.  125  AUTRIJUS      Audrey Tang
+  36.  124  SZABGAB       Gabor Szabo
+  37.  121  SIMON         Simon Cozens
+  38.  120  MRAMBERG      Marcus Ramberg
+  39.  116  SALVA         Salvador Fandino Garcia
+  40.  114  MLEHMANN      ???
+  41.  113  YANICK        Yanick Champoux
+  42.  112  DMUEY         Daniel Muey
+  43.  112  RRWO          Robert Rothenberg
+  44.  111  LBROCARD      Leon Brocard
+  45.  111  RENEEB        Renee Baecker
+  46.  108  GETTY         Torsten Raudssus
+  47.  103  JHTHORSEN     Jan Henning Thorsen
+  48.  101  LEOCHARRE     Leo Charre
+  49.  101  LEONT         Leon Timmermans
+  50.  100  EXODIST       Chad Granum
+  51.  100  TEAM          Tom Molesworth
 
-List last updated: 2017-05-23T07:53:27
+List last updated: 2019-04-15T04:53:47
 
 =head1 MAINTENANCE
 
@@ -187,7 +203,7 @@ Thanks to Kenichi Ishigaki for writing C<Acme::CPANAuthors>.
 
 =head1 COPYRIGHT & LICENSE
 
-  Copyright 2014-2017 Barbie for Miss Barbell Productions.
+  Copyright 2014-2019 Barbie for Miss Barbell Productions.
 
   This distribution is free software; you can redistribute it and/or
   modify it under the Artistic License 2.0.

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Help;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.170'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.171'; # VERSION
 
 use 5.010001;
 use strict;
@@ -209,7 +209,7 @@ sub gen_help {
 
                 my $argv = '';
                 if (!$ospec->{main_opt} && defined($ospec->{pos})) {
-                    if ($ospec->{greedy}) {
+                    if ($ospec->{slurpy} // $ospec->{greedy}) {
                         $argv = " (=arg[$ospec->{pos}-])";
                     } else {
                         $argv = " (=arg[$ospec->{pos}])";
@@ -256,7 +256,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.170 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2017-08-12.
+This document describes version 0.171 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2019-04-15.
 
 =head1 DESCRIPTION
 
@@ -271,7 +271,7 @@ formatting options first though).
 
 Usage:
 
- gen_help(%args) -> [status, msg, result, meta]
+ gen_help(%args) -> [status, msg, payload, meta]
 
 Generate help message for Perinci::CmdLine-based app.
 
@@ -312,7 +312,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -344,7 +344,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2018-10-03'; # DATE
-our $VERSION = '0.544'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.545'; # VERSION
 
 # line 820, don't know how to turn off this warning?
 ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
@@ -79,6 +79,7 @@ sub _gen_read_env {
     return "" unless $cd->{gen_args}{read_env};
 
     _pack_module($cd, "Complete::Bash");
+    _pack_module($cd, "Log::ger"); # required by Complete::Bash
     push @l2, "{\n";
     push @l2, '  last unless $_pci_r->{read_env};', "\n";
     push @l2, '  my $env = $ENV{', dmp($cd->{gen_args}{env_name}), '};', "\n";
@@ -183,7 +184,7 @@ sub _gen_pci_check_args {
             push @l2, ' if (exists $args->{"'.$arg.'"}) {';
             push @l2, ' return [400, "You specified '.$arg_opts->[0].' but also argument #'.$arg_spec->{pos}.'"];';
             push @l2, " } else {";
-            if ($arg_spec->{greedy}) {
+            if ($arg_spec->{slurpy} // $arg_spec->{greedy}) {
                 push @l2, ' $args->{"'.$arg.'"} = [splice(@ARGV, '.$arg_spec->{pos}.')];';
             } else {
                 push @l2, ' $args->{"'.$arg.'"} = delete($ARGV['.$arg_spec->{pos}.']);';
@@ -1573,7 +1574,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.544 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2018-10-03.
+This document describes version 0.545 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -1631,7 +1632,7 @@ values are subroutines' source codes.
 
 Usage:
 
- gen_inline_pericmd_script(%args) -> [status, msg, result, meta]
+ gen_inline_pericmd_script(%args) -> [status, msg, payload, meta]
 
 Generate inline Perinci::CmdLine CLI script.
 
@@ -1865,7 +1866,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1908,7 +1909,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

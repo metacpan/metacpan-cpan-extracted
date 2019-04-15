@@ -19,7 +19,7 @@ set -e
 
 case "$1" in
     configure|triggered)
-      perl /usr/lib/perl5/PDLA/Doc/scantree.pl /usr/lib/perl5/ /var/lib/pdl/pdldoc.db /var/lib/pdl/Index.pod >/dev/null 2>&1
+      perl /usr/lib/perl5/PDLA/Doc/scantree.pl /usr/lib/perl5/ /var/lib/pdl/pdladoc.db /var/lib/pdl/Index.pod >/dev/null 2>&1
       perl /usr/lib/perl5/PDLA/Doc/mkhtmldoc.pl -s "PDLA/" /usr/lib/perl5/PDLA /var/lib/pdl/html >/dev/null 2>&1
     ;;
 

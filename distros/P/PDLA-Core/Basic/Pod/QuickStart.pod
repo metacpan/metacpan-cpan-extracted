@@ -35,23 +35,23 @@ double precision floats. And because of the Object-Oriented nature
 of PDLA new customised datatypes can be derived from them.
 
 As well as the PDLA modules, that can be used by normal Perl programs, PerlDL
-comes with a command line Perl shell, called 'perldl', which supports command
+comes with a command line Perl shell, called 'perldla', which supports command
 line editing. In combination with the various PDLA graphics modules this allows
 data to be easily played with and visualised.
 
 =head2 Help
 
 PDLA contains extensive documentation, available both within the
-I<perldl> or I<pdl2> shells and from the command line, using the C<pdldoc> program.
+I<perldla> or I<pdla2> shells and from the command line, using the C<pdladoc> program.
 For further information try either of:
 
- pdl> help help
- $ pdldoc
+ pdla> help help
+ $ pdladoc
 
 HTML copies of the documentation should also be available. 
 To find their location, try the following:
 
- pdl> foreach ( map{"$_/PDLA/HtmlDocs"}@INC ) { p "$_\n" if -d $_ }  
+ pdla> foreach ( map{"$_/PDLA/HtmlDocs"}@INC ) { p "$_\n" if -d $_ }  
 
 =head2 Perl Datatypes and how PDLA extends them
 
@@ -117,8 +117,8 @@ And the empty C<qw()>  quotes are recognised as meaning 'nothing'.
 You can also specify a list of functions to import in the normal
 Perl way.
 
-There is also an interactive shell, C<perldl> or C<pdl2>, see I<perldl>
-or L<pdl2|PDLA::Perldl2> for details.
+There is also an interactive shell, C<perldla> or C<pdla2>, see I<perldla>
+or L<pdla2|PDLA::Perldl2> for details.
 
 =head2 To create a new PDLA variable
 
@@ -411,14 +411,14 @@ One can also write PDLA extensions as normal Perl modules.
 
 =head2 PDLA shells
 
-The Perl script C<pdl2> (or C<perldl>) provides a simple command line interface
-to PDLA.  If the latest Readlines/ReadKey modules have been installed C<pdl2>
+The Perl script C<pdla2> (or C<perldla>) provides a simple command line interface
+to PDLA.  If the latest Readlines/ReadKey modules have been installed C<pdla2>
 detects this and enables command line recall and editing.
 See the man page for details.
 
 e.g.:
 
- % perldl
+ % perldla
  perlDL shell v1.354
   PDLA comes with ABSOLUTELY NO WARRANTY. For details, see the file
   'COPYING' in the PDLA distribution. This is free software and you
@@ -426,18 +426,18 @@ e.g.:
   the same file for details.
  ReadLines, NiceSlice, MultiLines  enabled
  Reading PDLA/default.perldlrc...
- Found docs database /home/pdl/dev/lib/perl5/site_perl/PDLA/pdldoc.db
+ Found docs database /home/pdl/dev/lib/perl5/site_perl/PDLA/pdladoc.db
  Type 'help' for online help
  Type 'demo' for online demos
  Loaded PDLA v2.4.9_003 (supports bad values)
- pdl> $x = rfits 'm51.fits'
+ pdla> $x = rfits 'm51.fits'
  Reading IMAGE data...
  BITPIX =  32  size = 147456 pixels 
  Reading  589824  bytes
  BSCALE =  &&  BZERO = 
 
- pdl> use PDLA::Graphics::PGPLOT;
- pdl> imag $x
+ pdla> use PDLA::Graphics::PGPLOT;
+ pdla> imag $x
  Displaying 384 x 384 image from 40 to 761, using 84 colors (16-99)...
 
 You can also run it from the Perl debugger (C<perl -MPDLA -d -e 1>)
@@ -451,7 +451,7 @@ Miscellaneous shell features:
 
 The shell aliases C<p> to be a convenient short form of C<print>, e.g.
 
-   pdl> p ones 5,3
+   pdla> p ones 5,3
    [
     [1 1 1 1 1]
     [1 1 1 1 1]

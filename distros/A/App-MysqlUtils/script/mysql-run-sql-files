@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/MysqlUtils/mysql_run_sql_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.487
+# and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-02-28'; # DATE
+our $DATE = '2019-04-15'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ mysql-run-sql-files - Feed each .sql file to `mysql` command and write result to
 
 =head1 VERSION
 
-This document describes version 0.015 of mysql-run-sql-files (from Perl distribution App-MysqlUtils), released on 2019-02-28.
+This document describes version 0.016 of mysql-run-sql-files (from Perl distribution App-MysqlUtils), released on 2019-04-15.
 
 =head1 SYNOPSIS
 

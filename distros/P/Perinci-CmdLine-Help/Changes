@@ -1,3 +1,9 @@
+0.171   2019-04-15 (PERLANCAR)
+
+	- Observe argument spec property 'slurpy' in addition to 'greedy'
+	  (Rinci 1.1.88).
+
+
 0.170   2017-08-12 (PERLANCAR)
 
 	- Search description.alt.env.cmdline before description in meta.

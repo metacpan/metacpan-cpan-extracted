@@ -1,4 +1,4 @@
 /var/lib/pdl/Index.pod /usr/lib/perl5/PDLA/Index.pod
-/var/lib/pdl/pdldoc.db /usr/lib/perl5/PDLA/pdldoc.db
+/var/lib/pdl/pdladoc.db /usr/lib/perl5/PDLA/pdladoc.db
 /var/lib/pdl/html /usr/share/doc/pdl/html
 /usr/share/man/man3/PDLA.3pm.gz /usr/share/man/man1/pdl.1.gz

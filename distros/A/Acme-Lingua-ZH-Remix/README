@@ -1,88 +1,77 @@
 NAME
-
     Acme::Lingua::ZH::Remix - The Chinese sentence generator.
 
 SYNOPSIS
-
         use Acme::Lingua::ZH::Remix;
-    
+
         my $x = Acme::Lingua::ZH::Remix->new;
-    
+
         # Generate a random sentance
         say $x->random_sentence;
 
 DESCRIPTION
-
     Because lipsum is not funny enough, that is the reason to write this
     module.
 
-    This module is a Moose based OO module. You create an instance of it
-    with new method, and then invoke methods on the returned object.
+    This module is a Moo-based, with "new" method being the constructor.
 
-    The random_sentence method returns a string of one sentence of Chinese
+    The "random_sentence" method returns a string of one sentence of Chinese
     like:
 
-        Ã§ÂÂÃ¦ÂÂ¯Ã¥Â®ÂÃ¥ÂÂ¨Ã¥Â¤Â±Ã¦ÂÂÃ¯Â¼ÂÃ¥Â©Ã¥ÂÃ¯Â¼ÂÃ¦ÂÂÃ©ÂºÂ¼Ã¤Â¸ÂÃ¥ÂÂÃ¤ÂºÂÃ¥ÂÂ¢Ã¯Â¼Â
+        真是完全失敗，孩子！怎麼不動了呢？
 
-    It uses the corpus data from Project Gutenberg by default. All generate
-    sentences are remixes of the corpus.
+    By default, it uses small corpus data from Project Gutenberg. The
+    generated sentences are remixes of the corpus.
 
     You can feed you own corpus data to the `feed` method:
 
         my $x = Acme::Lingua::ZH::Remix->new;
         $x->feed($my_corpus);
-    
+
         # Say something based on $my_corpus
         say $x->random_santence;
 
     The corpus should use full-width punctuation characters.
 
 METHODS
-
- split_corpus($corpus_text)
-
+  split_corpus($corpus_text)
     Takes a scalar, returns an list.
 
-    This is an utility method that does not change the internal state of
-    the topic object.
+    This is an utility method that does not change the internal state of the
+    topic object.
 
- feed($corpus_text)
-
+  feed($corpus_text)
     Instance method. Takes a scalar, return the topic object.
 
     Merge $corpus_text into the internal phrases corpus of the object.
 
- random_sentence( min => $min, max => $max )
-
+  random_sentence( min => $min, max => $max )
     Instance method. Optionally takes "min" or "max" parameter as the
     constraint of sentence length (number of characters).
 
     Both min and max values are required to be integers greater or equal to
     zero. The value of max should be greater then the value of min. If any
-    of these values are invalidate, it is treated as if they are not
-    passed.
+    of these values are invalidate, it is treated as if they are not passed.
 
     The default values of min, max are 0 and 140, respectively.
 
     The implementation random algorthm based, thus it needs indefinite time
-    to generate the result. If it takes more then 1000 iterations, it
-    aborts and return the results anyway, regardless the length constraint.
-    This can happen when the lengths of phrases from corpus do no adds up
-    to a value within the given range.
+    to generate the result. If it takes more then 1000 iterations, it aborts
+    and return the results anyway, regardless the length constraint. This
+    can happen when the lengths of phrases from corpus do no adds up to a
+    value within the given range.
 
     The returned scalar is the generate sentence string of wide characters.
     (Which makes Encode::is_utf8 return true.)
 
 AUTHOR
-
     Kang-min Liu <gugod@gugod.org>
 
 COPYRIGHT
-
     Copyright 2010- by Kang-min Liu, <gugod@gugod.org>
 
-    This program is free software; you can redistribute it a nd/or modify
-    it under the same terms as Perl itself.
+    This program is free software; you can redistribute it a nd/or modify it
+    under the same terms as Perl itself.
 
-    See http://www.perl.com/perl/misc/Artistic.html
+    See <http://www.perl.com/perl/misc/Artistic.html>
 

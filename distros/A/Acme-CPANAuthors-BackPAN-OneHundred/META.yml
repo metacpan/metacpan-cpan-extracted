@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:     Acme-CPANAuthors-BackPAN-OneHundred
-version:  1.10
+version:  1.11
 abstract: The CPAN Authors who have 100+ distributions on BackPAN
 author:
   - Barbie <barbie@cpan.org>
@@ -24,7 +24,7 @@ build_requires:
 provides:
   Acme::CPANAuthors::BackPAN::OneHundred:
     file:     lib/Acme/CPANAuthors/BackPAN/OneHundred.pm
-    version:  1.10
+    version:  1.11
 
 no_index:
   directory:

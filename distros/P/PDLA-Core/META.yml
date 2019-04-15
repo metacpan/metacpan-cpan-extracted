@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.56'
   File::Path: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,6 +47,7 @@ requires:
   Inline: '0.68'
   Inline::C: '0.62'
   Module::Compile: '0.23'
+  OpenGL: '0.6702'
   Pod::Parser: '0'
   Pod::Select: '0'
   Scalar::Util: '0'
@@ -56,4 +57,5 @@ requires:
 resources:
   homepage: http://pdlporters.github.io
   repository: git://github.com/PDLPorters/pdla-core
-version: '2.013006'
+version: '2.013007'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,11 @@
 Revision history for CtrlO::PDF
 
+0.02 Mon Apr 15 2019
+
+    * Fix failing test due to missing default font (thanks Tom Hukins). A
+      better longer term solution would probably allow the module to not depend
+      on any fonts - PRs welcome.
+
 0.01 Sun Aug 12 2018
 
     * Initial release

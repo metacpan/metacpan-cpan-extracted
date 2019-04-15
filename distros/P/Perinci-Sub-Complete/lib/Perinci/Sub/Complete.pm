@@ -1,7 +1,7 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.932'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.933'; # VERSION
 
 use 5.010001;
 use strict;
@@ -144,7 +144,7 @@ sub complete_from_schema {
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     my $fref = \&{"$mod\::gen_completion"};
-                    log_trace("[comp][periscomp] invoking gen_completion() from %s ...", $mod);
+                    log_trace("[comp][periscomp] invoking %s's gen_completion(%s) ...", $mod, $xcargs);
                     $comp = $fref->(%$xcargs);
                 } else {
                     log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
@@ -1180,12 +1180,12 @@ sub complete_cli_arg {
             my $pos = $cargs{argpos};
             my $fasa = $args{func_arg_starts_at} // 0;
 
-            # find if there is a non-greedy argument with the exact position
+            # find if there is a non-slurpy argument with the exact position
             for my $an (keys %$args_prop) {
                 my $arg_spec = $args_prop->{$an};
-                next unless !$arg_spec->{greedy} &&
+                next unless !($arg_spec->{slurpy} // $arg_spec->{greedy}) &&
                     defined($arg_spec->{pos}) && $arg_spec->{pos} == $pos - $fasa;
-                log_trace("[comp][periscomp] this argument position is for non-greedy function argument <%s>", $an);
+                log_trace("[comp][periscomp] this argument position is for non-slurpy function argument <%s>", $an);
                 $cargs{arg} = $an;
                 if ($comp) {
                     log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
@@ -1203,18 +1203,18 @@ sub complete_cli_arg {
                 goto RETURN_RES;
             }
 
-            # find if there is a greedy argument which takes elements at that
+            # find if there is a slurpy argument which takes elements at that
             # position
             for my $an (sort {
                 ($args_prop->{$b}{pos} // 9999) <=> ($args_prop->{$a}{pos} // 9999)
             } keys %$args_prop) {
                 my $arg_spec = $args_prop->{$an};
-                next unless $arg_spec->{greedy} &&
+                next unless ($arg_spec->{slurpy} // $arg_spec->{greedy}) &&
                     defined($arg_spec->{pos}) && $arg_spec->{pos} <= $pos - $fasa;
                 my $index = $pos - $fasa - $arg_spec->{pos};
                 $cargs{arg} = $an;
                 $cargs{index} = $index;
-                log_trace("[comp][periscomp] this position is for greedy function argument <%s>'s element[%d]", $an, $index);
+                log_trace("[comp][periscomp] this position is for slurpy function argument <%s>'s element[%d]", $an, $index);
                 if ($comp) {
                     log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
                     my $res;
@@ -1282,7 +1282,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.932 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2018-12-07.
+This document describes version 0.933 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -1395,6 +1395,7 @@ Word to be completed.
 Return value:  (array)
 
 
+
 =head2 complete_arg_index
 
 Usage:
@@ -1486,6 +1487,7 @@ Word to be completed.
 =back
 
 Return value:  (array)
+
 
 
 =head2 complete_arg_val
@@ -1583,6 +1585,7 @@ Word to be completed.
 =back
 
 Return value:  (array)
+
 
 
 =head2 complete_cli_arg
@@ -1713,6 +1716,7 @@ You can use C<format_completion> function in L<Complete::Bash> module to format
 the result of this function for bash.
 
 
+
 =head2 complete_from_schema
 
 Usage:
@@ -1781,7 +1785,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

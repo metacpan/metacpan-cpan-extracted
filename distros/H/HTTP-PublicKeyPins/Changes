@@ -1,5 +1,8 @@
 Revision history for HTTP-PublicKeyPins
 
+0.15   Mon Apr 15 19:00:00 2010
+        Including CryptX as a dependency
+
 0.14   Thu Mar 17 20:07:00 2016
         Updated minimum version of Crypt::PKCS10
 

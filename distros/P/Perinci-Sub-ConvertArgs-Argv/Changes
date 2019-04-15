@@ -1,4 +1,8 @@
-Revision history for Perinci-Sub-ConvertArgs-Argv
+0.110   2019-04-15 (PERLANCAR)
+
+	- Observe argument spec property 'slurpy' in addition to 'greedy'
+	  (Rinci 1.1.88).
+
 
 0.10    2016-12-12 (PERLANCAR)
 

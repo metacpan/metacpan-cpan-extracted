@@ -1,3 +1,8 @@
+0.016   2019-04-15 (PERLANCAR)
+
+	- Add utility: mysql-fill-csv-columns-from-query.
+
+
 0.015   2019-02-28 (PERLANCAR)
 
 	- No functional changes.

@@ -33,8 +33,8 @@ comment q|
                 perl script.pl
 
         or you can just try some of the commands illustrated
-        in the demos by just retyping them at the perldl or pdl
-        'pdl>' command prompt.
+        in the demos by just retyping them at the perldla or pdla
+        'pdla>' command prompt.
 |;
 
 act q|
@@ -154,7 +154,7 @@ comment q|
 	of the basic capabilities of PDLA.
 
 	We encourage you to play with these commands in
-        the perldl or pdl2 shell and use its online help support
+        the perldla or pdla2 shell and use its online help support
 	to find out more about these and other commands and
 	features of PDLA.
 

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0603';
+our $VERSION = '0.0604';
 
 use Moo;
 use strictures 2;
@@ -97,7 +97,7 @@ sub _build_effort {
 
 sub _build_time_to_program {
     my ($self) = @_;
-    return $self->effort / 18; # seconds
+    return $self->effort / 18;
 }
 
 sub _build_delivered_bugs {
@@ -112,6 +112,9 @@ sub BUILD {
     my $doc = PPI::Document->new( $self->file );
 
     my $dump = PPI::Dumper->new( $doc, whitespace => 0, comments => 0 );
+
+    die 'No document parsed for ', $self->file, ". Computation can't continue.\n"
+        unless $dump;
 
     my %halstead;
 
@@ -154,7 +157,7 @@ sub BUILD {
     $self->{n_distinct_operators} = keys %{ $distinct{operators} };
     $self->{n_distinct_operands}  = keys %{ $distinct{operands} };
 
-    die 'No distinct operands. Computation cannot continue.'
+    die 'No distinct operands for ', $self->file, ". Computation cannot continue.\n"
         unless $self->{n_distinct_operands};
 }
 
@@ -226,7 +229,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0603
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -377,7 +380,7 @@ Return a hashref of the metrics and their computed values.
 
 =head1 SEE ALSO
 
-The F<eg/analyze> and F<t/01-methods.t> file in this distribution.
+The F<bin/halstead> and F<t/01-methods.t> files in this distribution.
 
 L<Moo>
 

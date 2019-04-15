@@ -145,7 +145,7 @@ The manual configure/build/install process is:
  PDLA shell before actually installing PDLA by running from the
  PDLA/ top level directory:
 
-  perl -Mblib Perldl2/pdl2   # type quit to exit the PDLA shell
+  perl -Mblib Perldl2/pdla2   # type quit to exit the PDLA shell
 
 
  To finally install the PDLA into your system run:

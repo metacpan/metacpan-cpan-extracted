@@ -23,7 +23,7 @@ $SPEC{foo} = {
             schema => [array => of=>'int*'],
             default => [1],
             pos => 1,
-            greedy => 1,
+            slurpy => 1,
         },
     },
 };

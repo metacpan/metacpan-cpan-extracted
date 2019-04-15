@@ -8,9 +8,11 @@ META.json
 META.yml
 Makefile.PL
 README
+README.PATCHING
 dist.ini
 lib/Text/Parser.pm
 lib/Text/Parser/AutoSplit.pm
+lib/Text/Parser/Errors.pm
 lib/Text/Parser/Multiline.pm
 t/Spice-Parser-3.t
 t/Spice-Parser-4.t

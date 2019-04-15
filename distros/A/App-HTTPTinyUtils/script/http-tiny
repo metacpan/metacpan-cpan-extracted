@@ -3,9 +3,9 @@
 # Note: This script is a CLI for Riap function /App/HTTPTinyUtils/http_tiny
 # and generated automatically using Perinci::CmdLine::Gen version 0.488
 
-our $DATE = '2019-04-14'; # DATE
+our $DATE = '2019-04-15'; # DATE
 our $DIST = 'App-HTTPTinyUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Perform request with HTTP::Tiny
+# ABSTRACT: Perform request(s) with HTTP::Tiny
 # PODNAME: http-tiny
 
 __END__
@@ -35,17 +35,17 @@ __END__
 
 =head1 NAME
 
-http-tiny - Perform request with HTTP::Tiny
+http-tiny - Perform request(s) with HTTP::Tiny
 
 =head1 VERSION
 
-This document describes version 0.005 of http-tiny (from Perl distribution App-HTTPTinyUtils), released on 2019-04-14.
+This document describes version 0.006 of http-tiny (from Perl distribution App-HTTPTinyUtils), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % http-tiny [options] <url>
+ % http-tiny [options] <url> ...
 
 =head1 OPTIONS
 
@@ -93,6 +93,15 @@ Each value is a name-value pair, use I<key=value> syntax. Can be specified multi
 
 See C<--header>.
 
+=item B<--ignore-errors>, B<-i>
+
+Ignore errors.
+
+Normally, when given multiple URLs, the utility will exit after the first
+non-success response. With `ignore_errors` set to true, will just log the error
+and continue. Will return with the last error response.
+
+
 =item B<--method>=I<s>
 
 Default value:
@@ -113,7 +122,13 @@ See C<--method>.
 
 =item B<--raw>
 
-=item B<--url>=I<s>*
+=item B<--url>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--urls-json>=I<s>
+
+See C<--url>.
 
 =back
 

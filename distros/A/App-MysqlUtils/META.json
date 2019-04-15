@@ -28,11 +28,12 @@
             "Test::Rinci" : "0.151"
          },
          "x_spec" : {
-            "Rinci" : "v1.1.87"
+            "Rinci" : "v1.1.88"
          }
       },
       "runtime" : {
          "requires" : {
+            "App::CSVUtils" : "0",
             "Complete::Util" : "0.57",
             "Config::IOD::Reader" : "0.341",
             "DBI" : "0",
@@ -47,7 +48,7 @@
             "File::Path" : "0",
             "IPC::System::Options" : "0.331",
             "List::MoreUtils" : "0",
-            "Log::ger" : "0.023",
+            "Log::ger" : "0.027",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Base" : "1.816",
             "Perinci::CmdLine::Classic" : "1.770",
@@ -58,6 +59,7 @@
             "Sah::Schema::posint" : "0",
             "Sah::Schema::true" : "0",
             "String::ShellQuote" : "0",
+            "Text::CSV::FromAOH" : "0",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -84,7 +86,7 @@
          "web" : "https://github.com/perlancar/perl-App-MysqlUtils"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -108,6 +110,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript mysql_drop_tables",
+            "version" : "0.421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript mysql_fill_csv_columns_from_query",
             "version" : "0.421"
          },
          {
@@ -434,7 +441,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.77"
+                        "version" : "0.780"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

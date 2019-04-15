@@ -28,7 +28,7 @@
          "requires" : {
             "Hash::Merge" : "0",
             "List::MoreUtils" : "0",
-            "Moose" : "0",
+            "Moo" : "0",
             "Types::Standard" : "0"
          }
       },
@@ -41,7 +41,7 @@
    "provides" : {
       "Acme::Lingua::ZH::Remix" : {
          "file" : "lib/Acme/Lingua/ZH/Remix.pm",
-         "version" : "0.97"
+         "version" : "0.99"
       }
    },
    "release_status" : "stable",
@@ -56,7 +56,7 @@
          "web" : "https://github.com/gugod/Acme-Lingua-ZH-Remix"
       }
    },
-   "version" : "0.97",
+   "version" : "0.99",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_static_install" : 1
 }

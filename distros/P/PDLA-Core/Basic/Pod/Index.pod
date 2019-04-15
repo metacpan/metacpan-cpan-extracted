@@ -101,15 +101,15 @@ L<PDLA::Tutorials|PDLA::Tutorials> - A guide to PDLA's tutorial documentation.
 
 =item *
 
-L<pdl2|PDLA::pdl2> - Simple shell (version 2) for PDLA
+L<pdla2|PDLA::pdla2> - Simple shell (version 2) for PDLA
 
 =item *
 
-L<pdldoc|PDLA::pdldoc> - shell interface to PDLA documentation
+L<pdladoc|PDLA::pdladoc> - shell interface to PDLA documentation
 
 =item *
 
-L<perldl|PDLA::perldl> - Simple shell for PDLA (see also L<pdl2>)
+L<perldla|PDLA::perldla> - Simple shell for PDLA (see also L<pdla2>)
 
 =item *
 
@@ -180,7 +180,7 @@ L<PDLA::Doc|PDLA::Doc> - support for PDLA online documentation
 
 =item *
 
-L<PDLA::Doc::Perldl|PDLA::Doc::Perldl> - commands for accessing PDLA doc database from 'perldl' shell
+L<PDLA::Doc::Perldl|PDLA::Doc::Perldl> - commands for accessing PDLA doc database from 'perldla' shell
 
 =item *
 
@@ -556,7 +556,7 @@ L<PDLA::Perldl2::Plugin::NiceSlice|PDLA::Perldl2::Plugin::NiceSlice> - enable PD
 
 =item *
 
-L<PDLA::Perldl2::Plugin::PDLACommands|PDLA::Perldl2::Plugin::PDLACommands> - implement perldl aliases/escapes
+L<PDLA::Perldl2::Plugin::PDLACommands|PDLA::Perldl2::Plugin::PDLACommands> - implement perldla aliases/escapes
 
 =item *
 

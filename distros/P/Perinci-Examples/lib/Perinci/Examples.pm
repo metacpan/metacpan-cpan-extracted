@@ -2,8 +2,8 @@
 
 package Perinci::Examples;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.811'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.812'; # VERSION
 
 use 5.010001;
 use strict;
@@ -483,7 +483,7 @@ _
                  ],
             }]],
             pos => 1,
-            greedy => 1,
+            slurpy => 1,
             description => <<'_',
 
 Completion library can perhaps complete from the `in` value and remember
@@ -564,7 +564,7 @@ _
             schema  => ['array*', of => 'float*'],
             req     => 1,
             pos     => 0,
-            greedy  => 1,
+            slurpy  => 1,
             examples => [[1,2,3], []],
         },
         round => {
@@ -1133,7 +1133,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.811 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2018-12-07.
+This document describes version 0.812 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2019-04-15.
 
 =head1 DESCRIPTION
 
@@ -1218,6 +1218,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 call_gen_array
 
 Usage:
@@ -1250,6 +1251,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (array[int])
+
 
 
 =head2 call_randlog
@@ -1294,6 +1296,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 comment_fruit
 
 Usage:
@@ -1326,6 +1329,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 delay
@@ -1366,6 +1370,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 dies
 
 Usage:
@@ -1390,6 +1395,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 err
@@ -1422,6 +1428,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 gen_array
@@ -1458,6 +1465,7 @@ that contains extra information.
 Return value:  (array[int])
 
 
+
 =head2 gen_hash
 
 Usage:
@@ -1492,6 +1500,7 @@ that contains extra information.
 Return value:  (array[int])
 
 
+
 =head2 gen_random_bytes
 
 Usage:
@@ -1524,6 +1533,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (buf)
+
 
 
 =head2 gen_sample_data
@@ -1575,6 +1585,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 merge_hash
 
 Usage:
@@ -1620,6 +1631,7 @@ that contains extra information.
 Return value:  (hash)
 
 
+
 =head2 multi_status
 
 Usage:
@@ -1652,6 +1664,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 noop
@@ -1693,6 +1706,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 noop2
@@ -1752,6 +1766,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 randlog
 
 Usage:
@@ -1792,6 +1807,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 return_args
 
 Usage:
@@ -1826,6 +1842,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 sum
@@ -1884,6 +1901,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 test_args_as_array
 
 Usage:
@@ -1918,6 +1936,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 test_args_as_arrayref
@@ -1955,6 +1974,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 test_args_as_hashref
 
 Usage:
@@ -1986,6 +2006,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 test_binary
@@ -2048,6 +2069,7 @@ that contains extra information.
 Return value:  (buf)
 
 
+
 =head2 test_common_opts
 
 Usage:
@@ -2104,6 +2126,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 test_completion
@@ -2228,6 +2251,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 test_dry_run
 
 Usage:
@@ -2268,6 +2292,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 test_result_naked
 
 Usage:
@@ -2293,6 +2318,7 @@ Arguments ('*' denotes required arguments):
 =back
 
 Return value:  (any)
+
 
 
 =head2 test_validate_args
@@ -2327,6 +2353,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (str)
+
 
 
 =head2 undescribed_args
@@ -2395,7 +2422,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

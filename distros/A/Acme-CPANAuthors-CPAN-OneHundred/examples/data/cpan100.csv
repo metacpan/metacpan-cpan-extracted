@@ -1,37 +1,43 @@
-# DATE: 2017-05-23T07:53:26
+# DATE: 2019-04-15T04:53:46
 #Pause,Count,Name
-PERLANCAR,1153,perlancar
-PSIXDISTS,549,Perl 6 Modules
-RJBS,295,Ricardo SIGNES
-TOBYINK,267,Toby Inkster
+PERLANCAR,1706,perlancar
+PSIXDISTS,550,Perl 6 Modules
+RJBS,296,Ricardo SIGNES
+TOBYINK,282,Toby Inkster
+ETHER,261,Karen Etheridge
 ADAMK,247,Adam Kennedy
-MIYAGAWA,235,Tatsuhiko Miyagawa
-ETHER,233,Karen Etheridge
-JGNI,230,John Imrie
-INGY,216,Ingy dot Net
-BINGOS,212,Chris Williams
+JGNI,245,John Imrie
+MIYAGAWA,239,Tatsuhiko Miyagawa
+INGY,219,Ingy dot Net
+BINGOS,215,Chris Williams
 FLORA,209,Florian Ragwitz
 SMUELLER,185,Steffen Mueller
-KENTNL,184,Kent Fredric
-TOKUHIROM,181,???
-DAGOLDEN,178,David Golden
+KENTNL,185,Kent Fredric
+TOKUHIROM,182,???
+DAGOLDEN,180,David Golden
+PLICEASE,167,Graham Ollis
+PEVANS,166,Paul Evans
 NUFFIN,158,Yuval Kogman
-PEVANS,154,Paul Evans
-DROLSKY,152,Dave Rolsky
+DROLSKY,156,Dave Rolsky
 BOBTFISH,152,Tomas Doran
+SHLOMIF,149,Shlomi Fish
 MARCEL,147,???
+ELIZABETH,143,Elizabeth Mattijsen
 SKIM,140,Michal Josef Spacek
-PLICEASE,133,Graham Ollis
-NEILB,129,Neil Bowers
-GUGOD,125,Liu Kang Min
+NEILB,133,Neil Bowers
+GUGOD,130,Liu Kang Min
 DMAKI,122,Daisuke Maki
-SHLOMIF,121,Shlomi Fish
 SIMON,118,Simon Cozens
+RSAVAGE,117,Ron Savage
 BARBIE,117,Barbie
-RSAVAGE,116,Ron Savage
+MANWAR,117,Mohammad S Anwar
 AUTRIJUS,112,Audrey Tang
-SALVA,107,Salvador Fandino Garcia
-FAYLAND,105,Fayland Lin
-MRAMBERG,104,Marcus Ramberg
-MLEHMANN,104,???
+SALVA,112,Salvador Fandino Garcia
+MRAMBERG,111,Marcus Ramberg
+YANICK,109,Yanick Champoux
+FAYLAND,108,Fayland Lin
+MLEHMANN,107,???
+RENEEB,103,Renee Baecker
+BDFOY,103,brian d foy
 LBROCARD,101,Leon Brocard
+TEAM,100,Tom Molesworth

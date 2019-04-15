@@ -1,0 +1,6 @@
+0.002     2019-04-15 12:42:55+02:00 Europe/Stockholm
+ - Remove debug warning message
+ - Small code cleanups
+
+0.001     2019-04-15 12:09:24+02:00 Europe/Stockholm
+ - Tests seem to pass, no guarantees beyond that!

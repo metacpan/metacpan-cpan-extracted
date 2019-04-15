@@ -1,0 +1,141 @@
+Created on: Thu 10 Dec 2009 10:32:58 PM
+Last saved: Tue 09 Jul 2013 08:51:39 AM 
+
+
++-----------------------------------------------------------+
+|                OS/Platforms supported: ALL                |
++-----------------------------------------------------------+
+
+This directory contains development efforts for a new and
+improved perldla shell (Perldl2).
+
+You need to install the version 1.003011 of Devel::REPL
+and have installed either Term::ReadLine::Perl or
+Term::ReadLine::Gnu in order to use the new Perldl2 shell
+capabilities.
+
+
++-----------------------------------------------------------+
+|                         CONTENTS                          |
++-----------------------------------------------------------+
+
+ README
+   This file
+
+ TODO
+   Development list for Perldl2 shell
+
+ Makefile.PL
+   Perl configuration/build script for Perldl2
+
+ Plugin/
+ Profile/
+ Script.pm
+   Perl modules and directories with modules for Perldl2
+
+ pdla2
+   A perl script for starting the Perldl2 shell.
+   (Falls back to the original perldla if either Devel::REPL
+   or neither Term::ReadLine::Gnu nor Term::ReadLine::Perl
+   are installed.)
+
+
++-----------------------------------------------------------+
+|                      INSTALLATION                         |
++-----------------------------------------------------------+
+
+  By default, the Perldl2 shell is always built and the
+  pdla2 script installed.  To disable this, edit the
+  WITH_DEVEL_REPL option in the perldl.conf file.
+
+  You will need to install Devel::REPL version 1.003011
+  or greater and either of Term::ReadLine::Gnu or
+  Term::ReadLine::Perl to access the new pdla2 capabilities.
+
+
++-----------------------------------------------------------+
+|                           USE                             |
++-----------------------------------------------------------+
+
+  To use the Perldl2 shell, from the PDLA build directory
+  run the following:
+
+    perl -Mblib Perldl2/pdla2
+
+  If you have installed the just built PDLA, you should
+  be able to run:
+
+    pdla2
+
+  To exit the Perldl2 shell from the 'pdla> ' prompt, type
+  Ctrl-D or quit, (q, x, and exit shortcuts are also
+  available).  If Devel::REPL is not installed (or you
+  don't have either TR::Gnu or TR::Perl), pdla2 will use
+  perldla instead but the new Perldl2 features will not
+  be available.
+
+  The idea is that one just uses pdla2 where you used to
+  use perldla.  At some point, the development will be
+  complete and there will be only one PDLA shell.
+
+
++-----------------------------------------------------------+
+|                          NOTES                            |
++-----------------------------------------------------------+
+
+ Supported functionality from Devel::REPL and PDLA:
+  * DDS (pretty prints output using Data::Dump::Streamer)
+  * History (redo commands with !-1 and !<num> syntax)
+  * Interrupt (interrupt with Ctrl-C; not on MSWin32)
+  * LexEnv (e.g., my $a = zeros(10) works)
+  * MultiLine::PPI (handles multiline input like perldla)
+  * NiceSlice (PDLA::NiceSlice works too!)
+  * Packages (keeps track of current user package)
+  * PDLACommands (perldla shell v1 convenience routines)
+  * ReadLineHistory
+    * Save and restore command history to file
+  * CompletionDrivers
+    * Globals  (completion for globals) 
+    * INC      (completion for use module::name)
+    * Keywords (completion for perl keywords)
+    * LexEnv   (completion for lexical vars)
+    * Methods  (completion of method names)
+
+ Default PDLA modules loaded:
+  * PDLA
+  * PDLA::Dbg
+  * PDLA::Doc::Perldl
+  * PDLA::IO::Dumper
+  * PDLA::IO::FlexRaw
+  * PDLA::IO::Pic
+  * PDLA::Image2D
+  * PDLA::AutoLoader
+
+ ? and ?? are aliases for help and apropos
+ 
+ Arguments to help|usage|apropos|sig|badinfo|demo are autoquoted
+
+ Shell escapes start with $PERLDL::ESCAPE as the first character
+ of a line ('#' by default).
+
+ l <num> prints the last <num> lines of history, default 20.
+
+ p prints the following args separated by space (i.e., $,=' ')
+
+ demo as a command by itself lists the possible demos available.
+ Otherwise it runs the specified demo.
+
+ By default, leading patterns matching the pdla2 shell
+ prompt ('pdla> ' with possible surrounding white space)
+ are stripped from the input.  That allows for easy
+ cut-and-paste of pdla2 sessions from examples, demos,
+ or docs.
+
+ The Perldl2 shell, pdla2, loads/saves from the same history
+ file as perldla.
+
+ The Perldl2 shell, pdla2, loads your .perldlrc file
+ from the same location as the perldla shell does.  It also
+ accepts .pdlrc as the name---looking forward to the new
+ naming scheme for the interactive shell.  A local.pdlrc
+ or local.perldlrc are run if present as well.

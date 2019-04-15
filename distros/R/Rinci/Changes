@@ -1,3 +1,16 @@
+1.1.89  2019-04-15 (PERLANCAR)
+
+	- No spec changes.
+
+	- Replace greedy with slurpy in examples.
+
+
+1.1.88  2019-04-15 (PERLANCAR)
+
+	- Introduce argument property 'slurpy' as replacement for 'greedy',
+	  note that 'greedy' will be removed in Rinci 1.2.
+
+
 1.1.87  2018-11-29 (PERLANCAR)
 
 	- Specify function argument 'examples'.

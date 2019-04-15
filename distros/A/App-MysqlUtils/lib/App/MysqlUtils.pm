@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2019-02-28'; # DATE
-our $VERSION = '0.015'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,6 +100,16 @@ my %args_output = (
         cmdline_aliases => {
             p => {},
         },
+    },
+);
+
+my %argscsv_filename1 = (
+    filename => {
+        summary => 'Input CSV file',
+        schema => 'filename*',
+        req => 1,
+        pos => 1,
+        cmdline_aliases => {f=>{}},
     },
 );
 
@@ -998,6 +1008,85 @@ sub mysql_find_identical_rows {
     [200, "OK"];
 }
 
+$SPEC{mysql_fill_csv_columns_from_query} = {
+    v => 1.1,
+    summary => 'Fill CSV columns with data from a query',
+    description => <<'_',
+
+This utility is handy if you have a partially filled table (in CSV format, which
+you can convert from spreadsheet or Google Sheet or whatever), where you have
+some unique key already specified in the table (e.g. customer_id) and you want
+to fill up other columns (e.g. customer_name, customer_email, last_order_date) from a
+query:
+
+    % mysql-fill-csv-columns-from-query DBNAME TABLE.csv 'SELECT c.NAME customer_name, c.email customer_email, (SELECT date FROM tblorders WHERE client_id=$customer_id ORDER BY date DESC LIMIT 1) last_order_time FROM tblclients WHERE id=$customer_id'
+
+The `$NAME` in the query will be replaced by actual CSV column value. SELECT
+fields must correspond to the CSV column names. For each row, a new query will
+be executed and the first result row is used.
+
+_
+    args => {
+        %args_common,
+        %args_database0,
+        %argscsv_filename1,
+        query => {
+            schema => 'str*',
+            req => 1,
+            pos => 2,
+        },
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub mysql_fill_csv_columns_from_query {
+    require App::CSVUtils;
+    require Text::CSV::FromAOH;
+
+    my %args = @_;
+
+    my $dbh = _connect(%args);
+
+    my $aoh = [];
+    my $field_idxs;
+    my $columns_set;
+    my $res = App::CSVUtils::csvutil(
+        action => 'each-row',
+        filename => $args{filename},
+        hash => 1,
+        eval => sub {
+            $field_idxs //= { %{ $main::field_idxs } };
+
+            my $query = $args{query};
+            $query =~ s/\$(\w+)/exists($_->{$1}) ? $dbh->quote($_->{$1}) : "\$$1"/eg;
+            log_trace "Row query: %s", $query;
+            return if $args{-dry_run};
+            my $sth = $dbh->prepare($query);
+            $sth->execute;
+            my $row = $sth->fetchrow_arrayref;
+            if ($row) {
+                # register additional csv columns
+                unless ($columns_set++) {
+                    for my $c (@{ $sth->{NAME} }) {
+                        $field_idxs->{ $c } //= (keys %$field_idxs)-1;
+                    }
+                }
+                for my $i (0 .. $#{ $sth->{NAME} }) {
+                    my $c = $sth->{NAME}[$i];
+                    $_->{$c} = $row->[$i];
+                }
+            }
+            log_trace "Resulting row: %s", $_;
+            push @$aoh, $_;
+        },
+    );
+    return $res unless $res->[0] == 200;
+
+    [200, "OK",
+     Text::CSV::FromAOH::csv_from_aoh($aoh, field_idxs=>$field_idxs)];
+}
+
 1;
 # ABSTRACT: CLI utilities related to MySQL
 
@@ -1013,7 +1102,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.015 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-02-28.
+This document describes version 0.016 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -1028,6 +1117,8 @@ This distribution includes the following CLI utilities:
 =item * L<mysql-drop-dbs>
 
 =item * L<mysql-drop-tables>
+
+=item * L<mysql-fill-csv-columns-from-query>
 
 =item * L<mysql-find-identical-rows>
 
@@ -1169,6 +1260,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 mysql_drop_all_tables
 
 Usage:
@@ -1225,6 +1317,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 mysql_drop_dbs
@@ -1300,6 +1393,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 mysql_drop_tables
@@ -1379,6 +1473,81 @@ that contains extra information.
 Return value:  (any)
 
 
+
+=head2 mysql_fill_csv_columns_from_query
+
+Usage:
+
+ mysql_fill_csv_columns_from_query(%args) -> [status, msg, payload, meta]
+
+Fill CSV columns with data from a query.
+
+This utility is handy if you have a partially filled table (in CSV format, which
+you can convert from spreadsheet or Google Sheet or whatever), where you have
+some unique key already specified in the table (e.g. customer_id) and you want
+to fill up other columns (e.g. customer_name, customer_email, last_order_date) from a
+query:
+
+ % mysql-fill-csv-columns-from-query DBNAME TABLE.csv 'SELECT c.NAME customer_name, c.email customer_email, (SELECT date FROM tblorders WHERE client_id=$customer_id ORDER BY date DESC LIMIT 1) last_order_time FROM tblclients WHERE id=$customer_id'
+
+The C<$NAME> in the query will be replaced by actual CSV column value. SELECT
+fields must correspond to the CSV column names. For each row, a new query will
+be executed and the first result row is used.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<database>* => I<str>
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<host> => I<str> (default: "localhost")
+
+=item * B<password> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
+
+=item * B<port> => I<int> (default: 3306)
+
+=item * B<query>* => I<str>
+
+=item * B<username> => I<str>
+
+Will try to get default from C<~/.my.cnf>.
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 mysql_find_identical_rows
 
 Usage:
@@ -1435,6 +1604,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 mysql_query
@@ -1502,6 +1672,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 mysql_run_pl_files
 
 Usage:
@@ -1553,6 +1724,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 mysql_run_sql_files
 
 Usage:
@@ -1599,6 +1771,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 mysql_sql_dump_extract_tables

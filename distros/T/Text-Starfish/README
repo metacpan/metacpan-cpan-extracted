@@ -1,6 +1,6 @@
 <? read_starfish_conf(); echo &readme_line(); !>
 #+
-Text::Starfish version 1.24
+Text::Starfish version 1.25
 ===========================
 #-
 
@@ -31,7 +31,7 @@ something important to add.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2001-2017 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+Copyright 2001-2019 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under

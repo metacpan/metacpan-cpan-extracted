@@ -1,7 +1,7 @@
 package Perinci::Sub::GetArgs::Argv;
 
-our $DATE = '2017-08-27'; # DATE
-our $VERSION = '0.840'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.841'; # VERSION
 
 use 5.010001;
 use strict;
@@ -997,7 +997,7 @@ sub get_args_from_argv {
                 my ($is_simple, $is_array_of_simple, $is_hash_of_simple, $type, $cset, $eltype) =
                     _is_simple_or_array_of_simple_or_hash_of_simple($arg_spec->{schema});
 
-                if ($arg_spec->{greedy} && ref($val) eq 'ARRAY' &&
+                if (($arg_spec->{slurpy} // $arg_spec->{greedy}) && ref($val) eq 'ARRAY' &&
                         !$is_array_of_simple && !$is_hash_of_simple) {
                     my $i = 0;
                     for (@$val) {
@@ -1026,7 +1026,7 @@ sub get_args_from_argv {
                         $i++;
                     }
                 }
-                if (!$arg_spec->{greedy} && !$is_simple) {
+                if (!($arg_spec->{slurpy} // $arg_spec->{greedy}) && !$is_simple) {
                   TRY_PARSING_AS_JSON_YAML:
                     {
                         my ($success, $e, $decoded);
@@ -1053,7 +1053,7 @@ sub get_args_from_argv {
                 $rargs->{$name} = $val;
                 # we still call cmdline_on_getopt for this
                 if ($arg_spec->{cmdline_on_getopt}) {
-                    if ($arg_spec->{greedy}) {
+                    if ($arg_spec->{slurpy} // $arg_spec->{greedy}) {
                         $arg_spec->{cmdline_on_getopt}->(
                             arg=>$name, fqarg=>$name, value=>$_, args=>$rargs,
                             opt=>undef, # this marks that value is retrieved from cmdline arg
@@ -1124,7 +1124,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.840 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2017-08-27.
+This document describes version 0.841 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -1146,7 +1146,7 @@ processed, see Perinci::CmdLine's documentation.
 
 Usage:
 
- gen_getopt_long_spec_from_meta(%args) -> [status, msg, result, meta]
+ gen_getopt_long_spec_from_meta(%args) -> [status, msg, payload, meta]
 
 Generate Getopt::Long spec from Rinci function metadata.
 
@@ -1264,18 +1264,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 get_args_from_argv
 
 Usage:
 
- get_args_from_argv(%args) -> [status, msg, result, meta]
+ get_args_from_argv(%args) -> [status, msg, payload, meta]
 
 Get subroutine arguments (%args) from command-line arguments (@ARGV).
 
@@ -1418,7 +1419,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1467,7 +1468,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,9 @@
+0.545   2019-04-15 (PERLANCAR)
+
+	- Observe argument spec property 'slurpy' in addition to 'greedy'
+	  (Rinci 1.1.88).
+
+
 0.544   2018-10-03 (PERLANCAR)
 
 	- [test] Specify test dependency to JSON::PP because this core module is

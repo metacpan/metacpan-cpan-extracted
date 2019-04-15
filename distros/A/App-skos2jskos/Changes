@@ -1,5 +1,8 @@
 Revision history for App-skos2jskos
 
+0.1.7  2019-04-15 13:26:45 CEST
+    - Support skos:broader and all note types
+
 0.1.6  2019-03-08 09:10:04 CET
     - Fix field inScheme
     - Add missing dependency JSON

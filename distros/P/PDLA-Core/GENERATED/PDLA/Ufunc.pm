@@ -4,7 +4,7 @@
 #
 package PDLA::Ufunc;
 
-@EXPORT_OK  = qw( PDLA::PP prodover PDLA::PP dprodover PDLA::PP cumuprodover PDLA::PP dcumuprodover PDLA::PP sumover PDLA::PP dsumover PDLA::PP cumusumover PDLA::PP dcumusumover PDLA::PP andover PDLA::PP borover PDLA::PP orover PDLA::PP bandover PDLA::PP zcover PDLA::PP intover PDLA::PP average PDLA::PP daverage PDLA::PP medover PDLA::PP oddmedover PDLA::PP modeover PDLA::PP pctover PDLA::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDLA::PP qsort PDLA::PP qsorti PDLA::PP qsortvec PDLA::PP qsortveci PDLA::PP minimum PDLA::PP minimum_ind PDLA::PP minimum_n_ind PDLA::PP maximum PDLA::PP maximum_ind PDLA::PP maximum_n_ind PDLA::PP minmaximum );
+@EXPORT_OK  = qw( PDLA::PP prodover PDLA::PP dprodover PDLA::PP cumuprodover PDLA::PP dcumuprodover PDLA::PP sumover PDLA::PP dsumover PDLA::PP cumusumover PDLA::PP dcumusumover PDLA::PP bandover PDLA::PP zcover PDLA::PP borover PDLA::PP orover PDLA::PP andover PDLA::PP intover PDLA::PP average PDLA::PP daverage PDLA::PP medover PDLA::PP oddmedover PDLA::PP modeover PDLA::PP pctover PDLA::PP oddpctover  pct  oddpct  avg  sum  prod  davg  dsum  dprod  zcheck  and  band  or  bor  min  max  median  mode  oddmedian  any all  minmax PDLA::PP qsort PDLA::PP qsorti PDLA::PP qsortvec PDLA::PP qsortveci PDLA::PP minimum PDLA::PP minimum_ind PDLA::PP minimum_n_ind PDLA::PP maximum PDLA::PP maximum_ind PDLA::PP maximum_n_ind PDLA::PP minmaximum );
 %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 use PDLA::Core;
@@ -464,7 +464,7 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 
 
-=head2 andover
+=head2 bandover
 
 =for sig
 
@@ -473,21 +473,21 @@ It will set the bad-value flag of all output piddles if the flag is set for any 
 
 =for ref
 
-Project via and to N-1 dimensions
+Project via bitwise and to N-1 dimensions
 
 This function reduces the dimensionality of a piddle
-by one by taking the and along the 1st dimension.
+by one by taking the bitwise and along the 1st dimension.
 
 By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
 =for usage
 
- $b = andover($a);
+ $b = bandover($a);
 
 =for example
 
- $spectrum = andover $image->xchg(0,1)
+ $spectrum = bandover $image->xchg(0,1)
 
 
 
@@ -506,7 +506,55 @@ as it will not contain any bad values.
 
 
 
-*andover = \&PDLA::andover;
+*bandover = \&PDLA::bandover;
+
+
+
+
+
+=head2 zcover
+
+=for sig
+
+  Signature: (a(n); int+ [o]b())
+
+
+=for ref
+
+Project via == 0 to N-1 dimensions
+
+This function reduces the dimensionality of a piddle
+by one by taking the == 0 along the 1st dimension.
+
+By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
+I<any> dimension.
+
+=for usage
+
+ $b = zcover($a);
+
+=for example
+
+ $spectrum = zcover $image->xchg(0,1)
+
+
+
+
+
+=for bad
+
+If C<a()> contains only bad data (and its bad flag is set), 
+C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
+as it will not contain any bad values.
+
+=cut
+
+
+
+
+
+
+*zcover = \&PDLA::zcover;
 
 
 
@@ -608,7 +656,7 @@ as it will not contain any bad values.
 
 
 
-=head2 bandover
+=head2 andover
 
 =for sig
 
@@ -617,21 +665,21 @@ as it will not contain any bad values.
 
 =for ref
 
-Project via bitwise and to N-1 dimensions
+Project via and to N-1 dimensions
 
 This function reduces the dimensionality of a piddle
-by one by taking the bitwise and along the 1st dimension.
+by one by taking the and along the 1st dimension.
 
 By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
 I<any> dimension.
 
 =for usage
 
- $b = bandover($a);
+ $b = andover($a);
 
 =for example
 
- $spectrum = bandover $image->xchg(0,1)
+ $spectrum = andover $image->xchg(0,1)
 
 
 
@@ -650,55 +698,7 @@ as it will not contain any bad values.
 
 
 
-*bandover = \&PDLA::bandover;
-
-
-
-
-
-=head2 zcover
-
-=for sig
-
-  Signature: (a(n); int+ [o]b())
-
-
-=for ref
-
-Project via == 0 to N-1 dimensions
-
-This function reduces the dimensionality of a piddle
-by one by taking the == 0 along the 1st dimension.
-
-By using L<xchg|PDLA::Slices/xchg> etc. it is possible to use
-I<any> dimension.
-
-=for usage
-
- $b = zcover($a);
-
-=for example
-
- $spectrum = zcover $image->xchg(0,1)
-
-
-
-
-
-=for bad
-
-If C<a()> contains only bad data (and its bad flag is set), 
-C<b()> is set bad. Otherwise C<b()> will have its bad flag cleared,
-as it will not contain any bad values.
-
-=cut
-
-
-
-
-
-
-*zcover = \&PDLA::zcover;
+*andover = \&PDLA::andover;
 
 
 
@@ -1795,9 +1795,9 @@ The two values are returned as Perl scalars similar to min/max.
 
 =for example
 
- pdl> $x = pdl [1,-2,3,5,0]
- pdl> ($min, $max) = minmax($x);
- pdl> p "$min $max\n";
+ pdla> $x = pdl [1,-2,3,5,0]
+ pdla> ($min, $max) = minmax($x);
+ pdla> p "$min $max\n";
  -2 5
 
 =cut
@@ -1834,9 +1834,9 @@ Quicksort a vector into ascending order.
 
 Bad values are moved to the end of the array:
 
- pdl> p $b
+ pdla> p $b
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdl> p qsort($b)
+ pdla> p qsort($b)
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
@@ -1875,9 +1875,9 @@ Quicksort a vector and return index of elements in ascending order.
 
 Bad elements are moved to the end of the array:
 
- pdl> p $b
+ pdla> p $b
  [42 47 98 BAD 22 96 74 41 79 76 96 BAD 32 76 25 59 BAD 96 32 BAD]
- pdl> p $b->index( qsorti($b) )
+ pdla> p $b->index( qsorti($b) )
  [22 25 32 32 41 42 47 59 74 76 76 79 96 96 96 98 BAD BAD BAD BAD]
 
 
@@ -2210,9 +2210,9 @@ Find minimum and maximum and their indices for a given piddle;
 
 =for usage
 
- pdl> $a=pdl [[-2,3,4],[1,0,3]]
- pdl> ($min, $max, $min_ind, $max_ind)=minmaximum($a)
- pdl> p $min, $max, $min_ind, $max_ind
+ pdla> $a=pdl [[-2,3,4],[1,0,3]]
+ pdla> ($min, $max, $min_ind, $max_ind)=minmaximum($a)
+ pdla> p $min, $max, $min_ind, $max_ind
  [-2 0] [4 3] [0 1] [2 2]
 
 See also L<minmax|/minmax>, which clumps the piddle together.

@@ -1,7 +1,7 @@
 # Starfish - Perl-based System for Text-Embedded
 #     Programming and Preprocessing
 #
-# (c) 2001-2017 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+# (c) 2001-2019 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
 #               and contributing authors
 #
 # See the documentation following the code.  You can also use the
@@ -30,10 +30,10 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS); # Exporter vars
 use vars qw($NAME $ABSTRACT $VERSION);
 $NAME     = 'Starfish';
 $ABSTRACT = 'Perl-based System for Text-Embedded Programming and Preprocessing';
-$VERSION  = '1.24';
+$VERSION  = '1.25';
 
 use vars qw($Revision);
-($Revision = substr(q$Revision: 392 $, 10)) =~ s/\s+$//;
+($Revision = substr(q$Revision: $, 10)) =~ s/\s+$//;
 
 # non-exported package globals
 use vars qw($GlobalREPLACE);
@@ -1178,6 +1178,8 @@ sub _croak {
     Carp::croak($m);
 }
 
+1;
+
 __END__
 # Documentation
 =pod
@@ -1342,7 +1344,19 @@ Output:
 Beside $O, $Star is another predefined variable: It refers to the
 Starfish object currently processing the text.
 
-=head2 Example from a TeX file
+=head2 TeX and LaTeX Examples
+
+=head3 Simle TeX or LaTeX Example
+
+Generating text with a variable replacement:
+
+  <?echo "
+  When we split the probability reserved for unseen characters equally
+  among the remaining $UnseenNum characters, we obtain the final estimated
+  probabilities:
+  "!>
+
+=head3 Example from a TeX file
 
  % <? $Star->Style('TeX') !>
 
@@ -1989,7 +2003,7 @@ other comments.
 
 =head1 AUTHORS
 
- 2001-2015 Vlado Keselj http://web.cs.dal.ca/~vlado
+ 2001-2019 Vlado Keselj http://web.cs.dal.ca/~vlado
            and contributing authors:
       2007 Charles Ikeson (overhaul of test.pl)
 
@@ -2056,4 +2070,4 @@ interface.
 =back
 
 =cut
-# $Id: Starfish.pm 252 2016-05-17 02:04:10Z vlado $
+# $Id: $

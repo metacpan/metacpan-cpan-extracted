@@ -18,7 +18,7 @@ unless (defined $dir) {
 	print "DIR = $dir\n";
 }
 unless (defined $outdb) {
-	$outdb = "$dir/PDLA/pdldoc.db";
+	$outdb = "$dir/PDLA/pdladoc.db";
 	print "DB  = $outdb\n";
 }
 

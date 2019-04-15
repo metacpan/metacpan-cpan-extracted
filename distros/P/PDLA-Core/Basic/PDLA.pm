@@ -27,7 +27,7 @@ L<PDLA::Core|PDLA::Core>.
 =head1 INTERACTIVE SHELL
 
 The PDLA package includes an interactive shell. You can learn about it,
-run C<perldoc perldl>, or run the shell C<perldl> or C<pdl2> and type
+run C<perldoc perldla>, or run the shell C<perldla> or C<pdla2> and type
 C<help>.
 
 =head1 LOOKING FOR A FUNCTION?
@@ -36,14 +36,14 @@ If you want to search for a function name, you should use the PDLA
 shell along with the "help" or "apropos" command (to do a fuzzy search).
 For example:
 
- pdl> apropos xval
+ pdla> apropos xval
  xlinvals        X axis values between endpoints (see xvals).
  xlogvals        X axis values logarithmicly spaced...
  xvals           Fills a piddle with X index values...
  yvals           Fills a piddle with Y index values. See the CAVEAT for xvals.
  zvals           Fills a piddle with Z index values. See the CAVEAT for xvals.
 
-To learn more about the PDLA shell, see L<perldl|perldl> or L<pdl2|pdl2>.
+To learn more about the PDLA shell, see L<perldla|perldla> or L<pdla2|pdla2>.
 
 =head1 LANGUAGE DOCUMENTATION
 
@@ -143,7 +143,7 @@ start-up modules.
 
 =cut
 
-our $VERSION = "2.013006";
+our $VERSION = "2.013007";
 
 # Main loader of standard PDLA package
 

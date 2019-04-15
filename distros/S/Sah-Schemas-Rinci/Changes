@@ -1,3 +1,9 @@
+1.1.88.0  2019-04-15 (PERLANCAR)
+
+          - Update to Rinci 1.1.88 (function argument spec's 'slurpy' property
+            which replaces 'greedy').
+
+
 1.1.87.0  2018-11-29 (PERLANCAR)
 
 	  - Update to Rinci 1.1.87 (function argument 'examples' property).

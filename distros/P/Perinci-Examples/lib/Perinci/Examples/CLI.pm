@@ -1,7 +1,7 @@
 package Perinci::Examples::CLI;
 
-our $DATE = '2018-12-07'; # DATE
-our $VERSION = '0.811'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.812'; # VERSION
 
 use 5.010001;
 use strict;
@@ -162,12 +162,12 @@ _
             tags => ['category:negation'],
         },
         array1 => {
-            summary => 'Positional, greedy, and plural',
-            'summary.alt.plurality.singular' => 'Positional, greedy, and singular',
+            summary => 'Positional, slurpy, and plural',
+            'summary.alt.plurality.singular' => 'Positional, slurpy, and singular',
             schema => ['array*', of => 'str*'],
             req => 1,
             pos => 1,
-            greedy => 1,
+            slurpy => 1,
             description => <<'_',
 
 Argument with non-scalar types (like array or hash) can be specified in the CLI
@@ -323,7 +323,7 @@ Perinci::Examples::CLI - Example for CLI help/usage generation
 
 =head1 VERSION
 
-This document describes version 0.811 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2018-12-07.
+This document describes version 0.812 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2019-04-15.
 
 =head1 DESCRIPTION
 
@@ -389,7 +389,7 @@ This demonstrate negation of --are-foo to --arent-foo.
 
 =item * B<array1>* => I<array[str]>
 
-Positional, greedy, and plural.
+Positional, slurpy, and plural.
 
 Argument with non-scalar types (like array or hash) can be specified in the CLI
 using C<--ARG-json> or C<--ARG-yaml>. Arguments with type of array of string can
@@ -508,6 +508,7 @@ that contains extra information.
 Return value:  (any)
 
 
+
 =head2 demo_cli_opts_shorter
 
 Usage:
@@ -583,7 +584,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

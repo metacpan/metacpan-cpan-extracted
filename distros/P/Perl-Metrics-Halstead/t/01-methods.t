@@ -14,7 +14,7 @@ throws_ok {
 
 throws_ok {
     Perl::Metrics::Halstead->new( file => 'bogus' )
-} qr/undefined value/, 'bogus file';
+} qr/Computation can't continue/, 'bogus file';
 
 my $pmh = Perl::Metrics::Halstead->new( file => 'eg/tester1.pl' );
 isa_ok $pmh, 'Perl::Metrics::Halstead';

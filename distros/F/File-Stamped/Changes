@@ -1,5 +1,9 @@
 Revision history for Perl extension File::Stamped
 
+0.09 2019-04-15T07:12:12Z
+
+    Fixed issues around Perl 5.30+(James E Keenan <jkeenan@cpan.org>)
+
 0.08 2014-07-29T06:00:50Z
     [MISC]
     - fix symlink file check at generate file (thx spiritloose)

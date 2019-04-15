@@ -1,3 +1,15 @@
+0.015   2019-04-15 (PERLANCAR)
+
+	- Add utility: csv-each-row.
+
+	- Make $main::field_idxs also available for Perl code.
+
+	- [ux] CLIs do not need to read env or config.
+
+	- Allow 'eval' argument to be coderef, for when csvutil() is called
+	  from Perl.
+
+
 0.014   2018-05-25 (PERLANCAR)
 
 	- Add utility: csv-map.

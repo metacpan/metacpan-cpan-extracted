@@ -1,7 +1,7 @@
 package Perinci::Sub::GetArgs::Array;
 
-our $DATE = '2016-12-10'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2019-04-15'; # DATE
+our $VERSION = '0.170'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,7 @@ $SPEC{get_args_from_array} = {
     description => <<'_',
 
 Using information in metadata's `args` property (particularly the `pos` and
-`greedy` arg type clauses), extract arguments from an array into a hash
+`slurpy` arg type clauses), extract arguments from an array into a hash
 `\%args`, suitable for passing into subs.
 
 Example:
@@ -97,7 +97,7 @@ sub get_args_from_array {
         while (my ($a, $as) = each %$args_p) {
             my $o = $as->{pos};
             if (defined($o) && $o == $i) {
-                if ($as->{greedy}) {
+                if ($as->{slurpy} // $as->{greedy}) {
                     my $type = $as->{schema}[0];
                     my @elems = splice(@$ary, $i);
                     if ($type eq 'array') {
@@ -144,7 +144,7 @@ Perinci::Sub::GetArgs::Array - Get subroutine arguments (%args) from array
 
 =head1 VERSION
 
-This document describes version 0.16 of Perinci::Sub::GetArgs::Array (from Perl distribution Perinci-Sub-GetArgs-Array), released on 2016-12-10.
+This document describes version 0.170 of Perinci::Sub::GetArgs::Array (from Perl distribution Perinci-Sub-GetArgs-Array), released on 2019-04-15.
 
 =head1 SYNOPSIS
 
@@ -160,12 +160,16 @@ others, L<Perinci::Sub::GetArgs::Argv>.
 =head1 FUNCTIONS
 
 
-=head2 get_args_from_array(%args) -> [status, msg, result, meta]
+=head2 get_args_from_array
+
+Usage:
+
+ get_args_from_array(%args) -> [status, msg, payload, meta]
 
 Get subroutine arguments (%args) from array.
 
 Using information in metadata's C<args> property (particularly the C<pos> and
-C<greedy> arg type clauses), extract arguments from an array into a hash
+C<slurpy> arg type clauses), extract arguments from an array into a hash
 C<\%args>, suitable for passing into subs.
 
 Example:
@@ -216,7 +220,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -228,7 +232,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-GetArgs-Array>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-GetArgs-Array>.
 
 =head1 BUGS
 
@@ -248,7 +252,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -25,7 +25,7 @@ set -e
 case "$1" in
     remove|upgrade|deconfigure)
 	rm -rf /var/lib/pdl/html
-	rm -f  /var/lib/pdl/pdldoc.db /var/lib/pdl/Index.pod
+	rm -f  /var/lib/pdl/pdladoc.db /var/lib/pdl/Index.pod
         ;;
     failed-upgrade)
         ;;

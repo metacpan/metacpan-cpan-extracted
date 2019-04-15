@@ -22,7 +22,7 @@ my $v11meta = {
         a => {
             schema => [str => {default=>'x'}],
             pos => 0,
-            greedy => 1,
+            slurpy => 1,
             cmdline_aliases => {
                 a1=>{},
             },

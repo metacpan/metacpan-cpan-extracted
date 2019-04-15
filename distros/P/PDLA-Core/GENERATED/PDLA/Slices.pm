@@ -634,33 +634,33 @@ ranges out of a small matrix.  The first few examples show extraction
 and selection of individual chunks.  The last example shows
 how to mark loci in the original matrix (using dataflow).
 
- pdl> $src = 10*xvals(10,5)+yvals(10,5)
- pdl> print $src->range([2,3])    # Cut out a single element
+ pdla> $src = 10*xvals(10,5)+yvals(10,5)
+ pdla> print $src->range([2,3])    # Cut out a single element
  23
- pdl> print $src->range([2,3],1)  # Cut out a single 1x1 block
+ pdla> print $src->range([2,3],1)  # Cut out a single 1x1 block
  [
   [23]
  ]
- pdl> print $src->range([2,3], [2,1]) # Cut a 2x1 chunk
+ pdla> print $src->range([2,3], [2,1]) # Cut a 2x1 chunk
  [
   [23 33]
  ]
- pdl> print $src->range([[2,3]],[2,1]) # Trivial list of 1 chunk
+ pdla> print $src->range([[2,3]],[2,1]) # Trivial list of 1 chunk
  [
   [
    [23]
    [33]
   ]
  ]
- pdl> print $src->range([[2,3],[0,1]], [2,1])   # two 2x1 chunks
+ pdla> print $src->range([[2,3],[0,1]], [2,1])   # two 2x1 chunks
  [
   [
    [23  1]
    [33 11]
   ]
  ]
- pdl> # A 2x2 collection of 2x1 chunks
- pdl> print $src->range([[[1,1],[2,2]],[[2,3],[0,1]]],[2,1])
+ pdla> # A 2x2 collection of 2x1 chunks
+ pdla> print $src->range([[[1,1],[2,2]],[[2,3],[0,1]]],[2,1])
  [
   [
    [
@@ -673,17 +673,17 @@ how to mark loci in the original matrix (using dataflow).
    ]
   ]
  ]
- pdl> $src = xvals(5,3)*10+yvals(5,3)
- pdl> print $src->range(3,1)  # Thread over y dimension in $src
+ pdla> $src = xvals(5,3)*10+yvals(5,3)
+ pdla> print $src->range(3,1)  # Thread over y dimension in $src
  [
   [30]
   [31]
   [32]
  ]
 
- pdl> $src = zeroes(5,4);
- pdl> $src->range(pdl([2,3],[0,1]),pdl(2,1)) .= xvals(2,2,1) + 1
- pdl> print $src
+ pdla> $src = zeroes(5,4);
+ pdla> $src->range(pdl([2,3],[0,1]),pdl(2,1)) .= xvals(2,2,1) + 1
+ pdla> print $src
  [
   [0 0 0 0 0]
   [2 2 0 0 0]
@@ -697,9 +697,9 @@ guaranteed result in the original PDLA -- the result is an arbitrary
 choice among the valid values.  For some things that's OK; but for
 others it's not. In particular, this doesn't work:
 
-    pdl> $photon_list = new PDLA::RandVar->sample(500)->reshape(2,250)*10
-    pdl> histogram = zeroes(10,10)
-    pdl> histogram->range($photon_list,1)++;  #not what you wanted
+    pdla> $photon_list = new PDLA::RandVar->sample(500)->reshape(2,250)*10
+    pdla> histogram = zeroes(10,10)
+    pdla> histogram->range($photon_list,1)++;  #not what you wanted
 
 The reason is that if two photons land in the same bin, then that bin
 doesn't get incremented twice.  (That may get fixed in a later version...)
@@ -969,8 +969,8 @@ across color plane.
 
 Example:
 
- pdl> $a = sequence(5,3,2);       # Create a 3-d Array
- pdl> p $a
+ pdla> $a = sequence(5,3,2);       # Create a 3-d Array
+ pdla> p $a
  [
   [
    [ 0  1  2  3  4]
@@ -983,7 +983,7 @@ Example:
    [25 26 27 28 29]
   ]
  ]
- pdl> p $a->reorder(2,1,0); # Reverse the order of the 3-D PDLA
+ pdla> p $a->reorder(2,1,0); # Reverse the order of the 3-D PDLA
  [
   [
    [ 0 15]
@@ -1226,8 +1226,8 @@ Plot, as a line, column 1 of C<$pdl> vs. column 2
 
 =for example
 
- pdl> $pdl = rcols("file");
- pdl> line $pdl->using(1,2);
+ pdla> $pdl = rcols("file");
+ pdla> line $pdl->using(1,2);
 
 =cut
 
@@ -1560,25 +1560,25 @@ dimensions can be omitted implying C<X>'es for those.
 
 =for example
 
- pdl> $a = sequence(10,4)
- pdl> p $a
+ pdla> $a = sequence(10,4)
+ pdla> p $a
  [
   [ 0  1  2  3  4  5  6  7  8  9]
   [10 11 12 13 14 15 16 17 18 19]
   [20 21 22 23 24 25 26 27 28 29]
   [30 31 32 33 34 35 36 37 38 39]
  ]
- pdl> p $a->dice([1,2],[0,3]) # Select columns 1,2 and rows 0,3
+ pdla> p $a->dice([1,2],[0,3]) # Select columns 1,2 and rows 0,3
  [
   [ 1  2]
   [31 32]
  ]
- pdl> p $a->dice(X,[0,3])
+ pdla> p $a->dice(X,[0,3])
  [
   [ 0  1  2  3  4  5  6  7  8  9]
   [30 31 32 33 34 35 36 37 38 39]
  ]
- pdl> p $a->dice([0,2,5])
+ pdla> p $a->dice([0,2,5])
  [
   [ 0  2  5]
   [10 12 15]
@@ -1639,18 +1639,18 @@ figure it out each time!
 
 =for example
 
- pdl> $a = sequence(10,4)
- pdl> $idx = pdl(1,2)
- pdl> p $a->dice_axis(0,$idx) # Select columns
+ pdla> $a = sequence(10,4)
+ pdla> $idx = pdl(1,2)
+ pdla> p $a->dice_axis(0,$idx) # Select columns
  [
   [ 1  2]
   [11 12]
   [21 22]
   [31 32]
  ]
- pdl> $t = $a->dice_axis(1,$idx) # Select rows
- pdl> $t.=0
- pdl> p $a
+ pdla> $t = $a->dice_axis(1,$idx) # Select rows
+ pdla> $t.=0
+ pdla> p $a
  [
   [ 0  1  2  3  4  5  6  7  8  9]
   [ 0  0  0  0  0  0  0  0  0  0]

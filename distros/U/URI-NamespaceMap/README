@@ -2,7 +2,7 @@ NAME
     URI::NamespaceMap - Class holding a collection of namespaces
 
 VERSION
-    Version 1.06
+    Version 1.08
 
 SYNOPSIS
       use URI::NamespaceMap;
@@ -25,11 +25,16 @@ METHODS
     `new ( [ \%namespaces | @prefixes | @uris ] )`
         Returns a new namespace map object. You can pass a hash reference with
         mappings from local names to namespace URIs (given as string or
-        RDF::Trine::Node::Resource) or namespaces_map with a hashref. You may
-        also pass an arrayref containing just prefixes and/or namespace URIs,
-        and the module will try to guess the missing part. To use this
-        feature, you need RDF::NS::Curated, RDF::NS, XML::CommonNS or
-        RDF::Prefixes, or preferably all of them.
+        RDF::Trine::Node::Resource) or namespaces_map with a hashref.
+
+        You may also pass an arrayref containing just prefixes and/or
+        namespace URIs, and the module will try to guess the missing part. To
+        use this feature, you need RDF::NS::Curated, RDF::NS, XML::CommonNS or
+        RDF::Prefixes, or preferably all of them. With that, you can do e.g.
+
+          my $map = URI::NamespaceMap->new( 'rdf', 'xsd', 'foaf' );
+
+        and have the correct mappings added automatically.
 
     `add_mapping ( $name => $uri )`
         Adds a new namespace to the map. The namespace URI can be passed as

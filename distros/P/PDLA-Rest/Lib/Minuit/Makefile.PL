@@ -1,0 +1,173 @@
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+use Config;
+
+# This mess sorts out the Fortran availability
+# Modified from Makefile.PL from Slatec
+# Depends on ExtUtils::F77
+
+our ($f2cbased, $g2cbased);
+
+my $donot = 0;
+my $msg = ""; 
+my $forcebuild = 0;
+my $f77;
+my @minuitfiles;
+
+if (defined $PDLA::Config{WITH_MINUIT} && $PDLA::Config{WITH_MINUIT}==0) {
+  $msg = "\n   Will skip build of PDLA::Minuit on this system   \n";
+  goto skip;
+}
+
+if (defined $PDLA::Config{WITH_MINUIT} && $PDLA::Config{WITH_MINUIT}==1) {
+  print "\n   Will forcibly try and build PDLA::Minuit on this system   \n\n";
+  $forcebuild = 1;
+}
+
+if (exists $PDLA::Config{F77CONF} && -f $PDLA::Config{F77CONF}) {
+  print "loading F77 configuration from $PDLA::Config{F77CONF}...\n";
+  eval { require $PDLA::Config{F77CONF} };
+  if ($@ ne "") {
+    $msg = "F77CONF file not loaded: $@\nOught not build PDLA::Minuit\n" ;
+    goto skip unless $forcebuild;
+  }
+  $f77 = 'F77Conf';
+} else {
+  eval { require ExtUtils::F77; ExtUtils::F77->import; };  # Might want "ExtUtils::F77->import(qw(generic f2c))"
+  if ($@ ne "") {
+    $msg = "ExtUtils::F77 module not found. Ought not build PDLA::Minuit";
+    goto skip unless $forcebuild;
+  } else {
+    $f77 = 'ExtUtils::F77';
+    print "(ExtUtils Version $ExtUtils::F77::VERSION)\n";
+    if ($ExtUtils::F77::VERSION < 1.03 ) {
+      $msg = "Need a version of ExtUtils::F77 >= 1.03. Ought not build PDLA::Minuit\n" ;
+      goto skip unless $forcebuild;
+    }
+  }  # end if ($@ ne "")
+} # if (exists $PDLA::Config{F77CONF}...
+
+if (!$f77->testcompiler) {
+  $msg = "No f77 compiler found. Ought to skip PDLA::Minuit on this system";
+  $PDLA::Config{WITH_MINUIT} = 0;
+} else {
+  $PDLA::Config{WITH_MINUIT} = 1;
+}
+
+skip:
+
+if ($msg ne "" && !$forcebuild) {
+  write_dummy_make( $msg );
+  $PDLA::Config{WITH_MINUIT} = 0;
+  $donot = 1;
+} else {
+  print "Building PDLA::Minuit. Turn off WITH_MINUIT if there are any problems\n";
+  $PDLA::Config{WITH_MINUIT} = 1;
+}
+
+return if $donot;
+
+my @pack = (["minuit.pd", qw(Minuit PDLA::Minuit)]);
+
+if (defined($PDLA::Config{MINUIT_LIB})){
+    # If libraries are specified, just need to build futils
+    print "Using compiled CERN library: ".$PDLA::Config{MINUIT_LIB}."...\n";
+    @minuitfiles = ("futils");
+}
+else{
+    # Otherwise, we need to build the Minuit library as well
+    print "Stand alone Minuit library will be built...\n";
+    @minuitfiles = ("futils", "minuit", "intracfalse");
+}
+   
+
+my %hash = pdlpp_stdargs(@pack);
+
+$hash{OBJECT} .= join '', map {" minuitlib/${_}$Config{obj_ext} "} @minuitfiles;
+
+if($Config{cc} eq 'cl') {
+# Link to MinGW's libg2c.a and libgcc.a, if appropriate
+# First check that ExtUtils::F77 is available
+  eval{require ExtUtils::F77};
+  unless($@) {
+    my @f = ();
+
+    my $drive = (split /:/, `gcc -v 2>&1`)[0];
+    $drive = substr($drive, -1, 1);
+
+    for(split ' ', ExtUtils::F77->runtime) {
+       if($_ =~ /^\-L/) {
+         $_ =~ s#^\-L##;
+         unless($_ =~ /:/) {$_ = $drive . ':' . $_}
+         if(-e $_ . '/libg2c.a') {push @f, $_ . '/libg2c.a'}
+         if(-e $_ . '/libgcc.a') {push @f, $_ . '/libgcc.a'}
+       }
+    }
+    $hash{LDFROM} = $hash{OBJECT};
+    for(@f) {$hash{LDFROM} .= ' ' . $_}
+  }
+}
+
+$hash{LIBS}[0] .= $f77->runtime ;
+$hash{clean}{FILES} .= join '', map {" minuitlib/$_.o "} @minuitfiles;
+
+# Handle multiple compilers
+
+$f2cbased = ($f77->runtime =~ /-lf2c/);
+$g2cbased = ($f77->runtime =~ /-lg2c/) unless $f2cbased;
+
+$hash{DEFINE} .= $f77->trail_ ? "" : "-DNO_TRAILING_USCORE";
+
+### unless($^O =~ /mswin32/i) {
+###   if (defined($PDLA::Config{MINUIT_LIB})){
+###       $hash{MYEXTLIB} .= (" ".$PDLA::Config{MINUIT_LIB}." ");
+###   }
+###   else{
+###       $hash{MYEXTLIB} .= " ./minuitlib/libminuit$Config::Config{lib_ext} ";
+###       $hash{clean}{FILES} .= " ./minuitlib/libminuit$Config::Config{lib_ext} ";
+###   }
+### }
+
+
+undef &MY::postamble; # suppress warning
+*MY::postamble = sub {
+        my $mycompiler     = $f77->compiler();
+        my $mycflags       = $f77->cflags();
+	my $orig = pdlpp_postamble(@pack);
+	my $hack_64bit = ($Config{archname}=~m/x86_64/ ?" -fPIC " : "");
+	$orig =~ s/:\s*minuit\.pd/: minuit.pd/;
+	$orig .= join "\n",map {
+	    ("
+
+minuitlib/$_\$(OBJ_EXT): minuitlib/$_.f 
+	$mycompiler -c $hack_64bit -o minuitlib/$_\$(OBJ_EXT) $mycflags minuitlib/$_.f
+" )} @minuitfiles;
+
+	if (!defined($PDLA::Config{MINUIT_LIB})){
+          my $libbuild;
+          if($Config::Config{cc} eq 'cl') {
+            $libbuild = "
+
+minuitlib/libminuit\$(LIB_EXT): minuitlib/minuit\$(OBJ_EXT) minuitlib/intracfalse\$(OBJ_EXT)
+	\$(AR) -out:minuitlib/libminuit\$(LIB_EXT) minuitlib/minuit\$(OBJ_EXT) minuitlib/intracfalse\$(OBJ_EXT)
+	\$(RANLIB) minuitlib/libminuit\$(LIB_EXT)
+";
+          }
+          else {
+	      $libbuild = "
+
+minuitlib/libminuit\$(LIB_EXT): minuitlib/minuit\$(OBJ_EXT) minuitlib/intracfalse\$(OBJ_EXT)
+	\$(AR) rv minuitlib/libminuit\$(LIB_EXT) minuitlib/minuit\$(OBJ_EXT) minuitlib/intracfalse\$(OBJ_EXT)
+	\$(RANLIB) minuitlib/libminuit\$(LIB_EXT)
+";
+          }
+	    $orig .= $libbuild;
+	}
+	return $orig;
+};
+
+WriteMakefile(
+ %hash,
+ VERSION => "0.1",   # This is overridden by VERSION_FROM in %hash 
+);

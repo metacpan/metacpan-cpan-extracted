@@ -1,7 +1,7 @@
 
 # default.perldlrc
 
-# Default startup for perldl shell.
+# Default startup for perldla shell.
 # Note: any $HOME/.perldlrc file overrides this
 
 use PDLA;

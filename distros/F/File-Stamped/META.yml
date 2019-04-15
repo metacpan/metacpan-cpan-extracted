@@ -5,11 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  CPAN::Meta: '0'
-  CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,15 +26,18 @@ no_index:
 provides:
   File::Stamped:
     file: lib/File/Stamped.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   perl: '5.008001'
 resources:
-  bugtracker: ssh://git@github.com/tokuhirom/File-Stamped/issues
-  homepage: ssh://git@github.com/tokuhirom/File-Stamped
-  repository: ssh://git@github.com/tokuhirom/File-Stamped.git
-version: '0.08'
+  bugtracker: https://github.com/tokuhirom/File-Stamped/issues
+  homepage: https://github.com/tokuhirom/File-Stamped
+  repository: git://github.com/tokuhirom/File-Stamped.git
+version: '0.09'
 x_contributors:
+  - 'James E Keenan <jkeenan@cpan.org>'
+  - 'Kan Fushihara <kan.fushihara@gmail.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
-  - 'kan fushihara <kan.fushihara@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,3 +1,8 @@
+0.812   2019-04-15 (PERLANCAR)
+
+	- Use slurpy instead of greedy for example (Rinci 1.1.88).
+
+
 0.811   2018-12-07 (PERLANCAR)
 
 	- Add example: comment_fruit to demonstrate argument examples.
