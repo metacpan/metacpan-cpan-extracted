@@ -19,6 +19,7 @@ WriteMakefile(
 								 'Net::CIDR' => '0',
 								 'Parse::Netstat'=>'0.14',
 								 'Error::Helper' => '1.0.0',
+								 'Net::DNS' => '1.20',
 								 },
 			  dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 			  clean => { FILES => 'Parse-Netstat-Search-*' },

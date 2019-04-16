@@ -24,6 +24,7 @@ Caleb
 Christian
 Christopher
 Ciornii
+Conrad
 Cushing
 David
 Dist
@@ -52,6 +53,7 @@ executables
 git
 ini
 lib
+mike
 mjemmeson
 perl
 perltidy

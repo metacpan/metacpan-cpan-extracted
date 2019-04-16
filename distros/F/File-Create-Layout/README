@@ -3,8 +3,8 @@ NAME
     layout
 
 VERSION
-    This document describes version 0.05 of File::Create::Layout (from Perl
-    distribution File-Create-Layout), released on 2017-07-10.
+    This document describes version 0.060 of File::Create::Layout (from Perl
+    distribution File-Create-Layout), released on 2019-04-16.
 
 SYNOPSIS
      use File::Create::Layout qw(
@@ -108,7 +108,7 @@ FUNCTIONS
   check_layout
     Usage:
 
-     check_layout(%args) -> [status, msg, result, meta]
+     check_layout(%args) -> [status, msg, payload, meta]
 
     Check whether layout has syntax errors.
 
@@ -127,7 +127,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -136,7 +136,7 @@ FUNCTIONS
   create_files_using_layout
     Usage:
 
-     create_files_using_layout(%args) -> [status, msg, result, meta]
+     create_files_using_layout(%args) -> [status, msg, payload, meta]
 
     Create files/directories according to a layout.
 
@@ -169,7 +169,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -178,7 +178,7 @@ FUNCTIONS
   parse_layout
     Usage:
 
-     parse_layout(%args) -> [status, msg, result, meta]
+     parse_layout(%args) -> [status, msg, payload, meta]
 
     Parse layout string into a data structure suitable for processing.
 
@@ -197,7 +197,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -225,7 +225,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+    This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

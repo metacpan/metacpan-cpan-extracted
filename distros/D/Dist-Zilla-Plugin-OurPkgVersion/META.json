@@ -49,8 +49,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
-            "Dist::Zilla" : "5.038",
+            "Dist::Zilla" : "6.00",
             "Dist::Zilla::Role::FileFinderUser" : "0",
             "Dist::Zilla::Role::FileMunger" : "0",
             "Dist::Zilla::Role::PPI" : "0",
@@ -58,9 +57,7 @@
             "MooseX::Types::Perl" : "0",
             "PPI" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "5.008",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.014"
          }
       },
       "test" : {
@@ -69,12 +66,8 @@
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::Spec" : "0",
-            "IO::Handle" : "0",
-            "IPC::Open3" : "0",
             "Path::Tiny" : "0",
             "Test::DZil" : "0",
-            "Test::More" : "0",
             "Test::Version" : "0.04"
          }
       }
@@ -91,7 +84,7 @@
          "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexei Znamensky <russoz@cpan.org>",
@@ -102,10 +95,11 @@
       "Graham Ollis <plicease@cpan.org>",
       "Graham\u2708\ufe0f\u2708\ufe0f <plicease@cpan.org>",
       "Ian Sealy <git@iansealy.com>",
+      "Michael Conrad <mike@nrdvana.net>",
       "Michael Jemmeson <mjemmeson@cpan.org>",
       "Stephan Loyd <stephanloyd9@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "x_generated_by_perl" : "v5.29.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
 }
 

@@ -1,0 +1,105 @@
+NAME
+    File::Common - List files that are found in {all,more than one}
+    directories
+
+VERSION
+    This document describes version 0.003 of File::Common (from Perl
+    distribution File-Common), released on 2019-04-16.
+
+SYNOPSIS
+     use File::Common qw(list_common_files);
+
+     my $res = list_common_files(
+         dirs => ["dir1", "dir2"],
+         # min_occurrence => 2, # optional, the default if unset is to return files that exist in all dirs
+     );
+
+    Given this tree:
+
+     dir1/
+       file1
+       sub1/
+         file2
+         file3
+
+     dir2/
+       file2
+       sub1/
+         file3
+       file3
+       file4
+
+    Will return:
+
+     ["file1", "sub1/file3"]
+
+DESCRIPTION
+FUNCTIONS
+  list_common_files
+    Usage:
+
+     list_common_files(%args) -> any
+
+    List files that are found in {all,more than one} directories.
+
+    This routine lists files that are found in all specified directories
+    (or, when "min_occurrences" option is specified, files that are found in
+    at least a certain number of occurrences. Note that only filenames are
+    compared, not content/checksum. Directories are excluded.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Whether to return detailed result per file.
+
+        If set to true, instead of an array of filenames:
+
+         ["file1", "file2"]
+
+        it will instead return a hash with filename as key and another hash
+        containing detailed information:
+
+         {
+             "file1" => {
+                 dirs => ["dir1", "dir2"], # in which dirs the file is found
+             },
+             "file2" => {
+                 ...
+             },
+         }
+
+    *   dirs* => *array[dirname]*
+
+    *   min_occurrence => *posint*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Common>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-File-Common>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Common>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::Find::Duplicate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

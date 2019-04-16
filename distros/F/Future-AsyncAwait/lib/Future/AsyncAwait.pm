@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use Carp;
 
@@ -226,15 +226,13 @@ suspend mechanism:
       await func();
    }
 
-Since C<foreach> loops on non-lexical iterator variables (usually package
-variables) effectively imply a C<local>-like behaviour, these are also
+Since C<foreach> loops on non-lexical iterator variables (usually the C<$_>
+global variable) effectively imply a C<local>-like behaviour, these are also
 disallowed.
-
-   our $VAR;
 
    async sub splurt
    {
-      foreach $VAR ( LIST ) {
+      foreach ( LIST ) {
          await ...
       }
    }

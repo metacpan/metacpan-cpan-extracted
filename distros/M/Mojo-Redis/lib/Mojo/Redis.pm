@@ -9,7 +9,7 @@ use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
 use Scalar::Util 'blessed';
 
-our $VERSION = '3.20';
+our $VERSION = '3.21';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 
@@ -17,7 +17,9 @@ has encoding        => 'UTF-8';
 has max_connections => 5;
 
 has protocol_class => do {
-  my $class = $ENV{MOJO_REDIS_PROTOCOL} || 'Protocol::Redis::Faster';
+  my $class = $ENV{MOJO_REDIS_PROTOCOL};
+  $class ||= eval { require Protocol::Redis::XS; Protocol::Redis::XS->VERSION('0.06'); 'Protocol::Redis::XS' };
+  $class ||= 'Protocol::Redis::Faster';
   eval "require $class; 1" or die $@;
   $class;
 };
@@ -150,33 +152,6 @@ L<https://github.com/jhthorsen/mojo-redis/issues> if you find this module
 useful, annoying or if you simply find bugs. Feedback can also be sent to
 C<jhthorsen@cpan.org>.
 
-=head1 CAVEATS
-
-L<Protocol::Redis::XS> is not the default L</protocol> because it has some
-limitations:
-
-=over 2
-
-=item * Cannot handle binary data
-
-L<Mojo::Redis::Cache> uses L<Protocol::Redis::Faster> for now, since
-L<Protocol::Redis::XS> fail to handle binary data.
-
-See L<https://github.com/dgl/protocol-redis-xs/issues/4> for more information.
-
-=item * Cannot handle multi bulk replies with depth higher than 2
-
-L<Mojo::Redis::Database/xread> and other Redis commands returns complex nested
-data structures with depth higher than two. L<Protocol::Redis::XS> is unable to
-handle these messages.
-
-See L<https://github.com/dgl/protocol-redis-xs/issues/5> for more information.
-
-=back
-
-If you experience any issues with L<Protocol::Redis::XS> then please report
-them to L<https://github.com/dgl/protocol-redis-xs/issues>.
-
 =head1 EVENTS
 
 =head2 connection
@@ -212,9 +187,8 @@ Maximum number of idle database handles to cache for future use, defaults to
   $str   = $redis->protocol_class;
   $redis = $redis->protocol_class("Protocol::Redis::XS");
 
-Default to L<Protocol::Redis::Faster>. You can change this to
-L<Protocol::Redis::XS> if you need a faster protocl parser, but do look at
-L</CAVEATS> for first.
+Default to L<Protocol::Redis::XS> if the optional module is available and at
+least version 0.06, or falls back to L<Protocol::Redis::Faster>.
 
 =head2 pubsub
 

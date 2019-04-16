@@ -7,7 +7,7 @@ package Net::LDAP::Control::VLV;
 use Net::LDAP::Control;
 
 our @ISA = qw(Net::LDAP::Control);
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Net::LDAP::ASN qw(VirtualListViewRequest);
 use strict;
@@ -280,7 +280,7 @@ control. See L<Net::LDAP::Control::Sort>
 
 ##
 ## Need some blurb here to describe the VLV control. Maybe extract some simple
-## describtion from the draft RFC
+## description from the draft RFC
 ##
 
 =head1 CONSTRUCTOR ARGUMENTS

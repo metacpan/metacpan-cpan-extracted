@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::AutoSplit 0.915;
+package Text::Parser::AutoSplit 0.917;
 
 # ABSTRACT: A role that adds the ability to auto-split a line into fields
 
@@ -52,7 +52,7 @@ Text::Parser::AutoSplit - A role that adds the ability to auto-split a line into
 
 =head1 VERSION
 
-version 0.915
+version 0.917
 
 =head1 SYNOPSIS
 
@@ -71,8 +71,8 @@ version 0.915
 
     sub save_record {
         my $self = shift;
-        return $self->abort_reading if $self->NS > 0 and $self->field(0) eq 'STOP_READING';
-        $self->SUPER::save_record(@_) if $self->NS > 0 and $self->field(0) !~ /^[#]/;
+        return $self->abort_reading if $self->NF > 0 and $self->field(0) eq 'STOP_READING';
+        $self->SUPER::save_record(@_) if $self->NF > 0 and $self->field(0) !~ /^[#]/;
     }
 
     package main;
@@ -87,7 +87,7 @@ C<Text::Parser::AutoSplit> is a role that gets automatically composed into an ob
 
 =head1 METHODS AVAILABLE ON AUTO-SPLIT
 
-These methods become available when C<auto_split> attribute is true. You'll get a runtime error if you try to use them otherwise. They would be most likely used inside your own implementation of C<L<save_record|/save_record>> since the splits are done for each line.
+These methods become available when C<auto_split> attribute is true. You'll get a runtime error if you try to use them otherwise. They would be most likely used inside your own implementation of C<L<save_record|Text::Parser/save_record>> since the splits are done for each line.
 
 =head2 NF
 

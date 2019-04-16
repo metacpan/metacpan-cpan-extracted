@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-SporeDefinitionControl
 
+0.17    2019-04-16, Frédéric Lechauve, Nicolas Oudard
+        Add Access control header to all requests
+
 0.17    2019-04-05, Frédéric Lechauve, Nicolas Oudard
         update the way origin is manage + access-control-allow-credentials on all requests (Frederic Lechauve)
 

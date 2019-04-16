@@ -1,0 +1,97 @@
+NAME
+    Tie::Array::File::LazyRead - Read a file record by record using tied
+    array and for()
+
+VERSION
+    This document describes version 0.001 of Tie::Array::File::LazyRead
+    (from Perl distribution Tie-Array-File-LazyRead), released on
+    2019-04-16.
+
+SYNOPSIS
+    Given FILENAME.txt containing:
+
+     line1
+     line2
+     line3
+
+    Then this Perl script:
+
+     use Tie::Array::File::LazyRead;
+
+     tie my @ary, 'Tie::Array::File::LazyRead', 'FILENAME.txt', {accumulate=>1}; # default for accumulate is 0
+
+     for my $line (@ary) {
+         print $line;
+     }
+
+    will print:
+
+     line1
+     line2
+     line3
+
+    and @ary containing:
+
+     ["line1", "line2", "line3"]
+
+    If "accumulate" is set to 0 (the default), @ary will contain:
+
+     [undef, undef, "line3"]
+
+    (i.e. only the last element/line will be remembered.
+
+DESCRIPTION
+    EXPERIMENTAL, PROOF-OF-CONCEPT.
+
+    When "for()" is given a tied array:
+
+     for (@tied_array) {
+         ...
+     }
+
+    it will invoke "FETCHSIZE" on the tied array to find out the size, then
+    FETCH(0), *then FETCHSIZE() again, then FETCH(1), and so on.* In other
+    words, "FETCHSIZE" is called on each iteration. This makes it possible
+    to only fetch new data in "FETCHSIZE" instead of "FETCH".
+
+    Without using "for()":
+
+     tie my @ary, 'Tie::Array::File::LazyRead', 'FILENAME.txt';
+
+     print $ary[0];
+
+    will not print anything, and the first line of the file is not fetched.
+    To fetch one more line, you need to do:
+
+     my $size = @ary;
+     # then
+     print $ary[0];
+
+    and so on.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Tie-Array-File-LazyRead>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Tie-Array-File-LazyRead>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Array-File-LazyRe
+    ad>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

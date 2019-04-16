@@ -21,6 +21,7 @@ my $lib_4 = $tzil->slurp_file('build/lib/DZT4.pm');
 my $lib_5 = $tzil->slurp_file('build/lib/DZT5.pm');
 my $lib_6 = $tzil->slurp_file('build/lib/DZT6.pm');
 my $lib_7 = $tzil->slurp_file('build/lib/DZT7.pm');
+my $lib_8 = $tzil->slurp_file('build/lib/DZT8.pm');
 my $tst_0 = $tzil->slurp_file('build/t/basic.t'  );
 
 # e short for expected files
@@ -95,6 +96,28 @@ our $VERSION = '0.1.0'; ## VERSION
 1;
 END LIB7
 
+my $elib_8 = <<'END LIB8';
+use strict;
+use warnings;
+package DZT8;
+<<END
+# VERSION
+END
+
+=pod
+
+# VERSION
+
+=cut
+
+our $VERSION = ''; our $VERSION = '0.1.0'; # VERSION
+
+1;
+__END__
+
+# VERSION
+END LIB8
+
 my $etst_0 = <<'END TST0';
 #!/usr/bin/perl
 # VERSION
@@ -109,6 +132,7 @@ is ( $lib_4, $elib_4, 'check DZT4.pm' );
 is ( $lib_5, $elib_5, 'check DZT5.pm' );
 is ( $lib_6, $elib_6, 'check DZT6.pm' );
 is ( $lib_7, $elib_7, 'check DZT7.pm' );
+is ( $lib_8, $elib_8, 'check DZT8.pm' );
 is ( $tst_0, $etst_0, 'check basic.t' );
 
 for my $file ( qw/DZT2 DZT3/ ) {

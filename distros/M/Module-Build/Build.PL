@@ -30,13 +30,10 @@ my $build = Module::Build->new(
     'Perl::OSType'          => 1,
     'Module::Metadata'      => '1.000002',
     'version'               => '0.87',
-  },
-  build_requires        => {
-    'File::Temp'            => 0.15,    # tmpdir() + fixes
-    'Test::More'            => 0.49,
-    'TAP::Harness'          => 3.29,    # TAP::Harness::Env
-    'Parse::CPAN::Meta'     => '1.4401',
-    'CPAN::Meta::YAML'      => 0.003,
+    'File::Spec'            => '0.82',
+    'File::Copy'            => 0,
+    'File::Basename'        => 0,
+    'File::Path'            => 0,
   },
   # KEEP 'requires' as low as possible and target Build/test/install
   # Requirements for authors should be implemented as optional features
@@ -64,6 +61,13 @@ my $build = Module::Build->new(
     'version'               => 0.87,  # No longer requires M::B
     'Module::Metadata'      => 1.000002, # uses version.pm
     'Pod::Man'              => 2.17, # utf8 support
+  },
+  test_requires         => {
+    'File::Temp'            => 0.15,    # tmpdir() + fixes
+    'Test::More'            => 0.49,
+    'TAP::Harness'          => 3.29,    # TAP::Harness::Env
+    'Parse::CPAN::Meta'     => '1.4401',
+    'CPAN::Meta::YAML'      => 0.003,
   },
   recommends => {
     'ExtUtils::Install'  => 0.30,

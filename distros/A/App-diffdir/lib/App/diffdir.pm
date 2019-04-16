@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use Path::Tiny;
 use Text::Diff;
 
-our $VERSION = 0.7;
+our $VERSION = 0.8;
 
 has files => (
     is      => 'rw',
@@ -84,10 +84,14 @@ sub get_files {
     my %found;
 
     for my $dir (@dirs) {
+        $dir =~ s{/$}{};
         my @found = $self->find_files($dir);
         for my $file (@found) {
             my $base = $file;
-            $base =~ s/^$dir\/?//;
+            if ( $dir ne '.' ) {
+                # remove the base directory from the file name
+                $base =~ s/^\Q$dir\E\/?//;
+            }
             $found{$base}{$dir} = {
                 name => $file,
             };
@@ -104,7 +108,7 @@ sub find_files {
 
     FILE:
     while ( my $file = shift @files ) {
-        next FILE if $file->basename =~ /^[.].*[.]sw[n-z]$|^[.](?:svn|bzr|git)$|CVS|RCS$/;
+        next FILE if $file->basename =~ /^[.].*[.]sw[n-z]$|^[.](?:svn|bzr|git)$|CVS|RCS$|cover_db|_build|Build$|blib/;
         next FILE if $self->{exclude} && grep {$file =~ /$_/} @{ $self->{exclude} };
 
         push @found, $file;
@@ -194,7 +198,7 @@ App::diffdir - Compares two or more directories for files that differ
 
 =head1 VERSION
 
-This documentation refers to App::diffdir version 0.7
+This documentation refers to App::diffdir version 0.8
 
 =head1 SYNOPSIS
 

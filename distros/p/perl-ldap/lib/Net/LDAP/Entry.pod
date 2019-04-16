@@ -33,7 +33,7 @@ Net::LDAP::Entry - An LDAP entry object
  $entry->delete ( 'unwanted' );
 
  $entry->replace (
-   attr1 => 'newvalue'
+   attr1 => 'newvalue',
    attr2 => [ qw(new values) ]
  );
 
@@ -43,14 +43,12 @@ Net::LDAP::Entry - An LDAP entry object
 
  # new alternate syntax
 
- $entry = Net::LDAP::Entry->new ( $dn
-   , attr1 => 'value1'
-   , attr2 => [ qw(value1 value2) ]
+ $entry = Net::LDAP::Entry->new ( $dn,
+   attr1 => 'value1',
+   attr2 => [ qw(value1 value2) ]
  )->add(
    attr3   => 'value'
  )->update( $ldap );
-
-
 
 
 =head1 DESCRIPTION
@@ -219,7 +217,8 @@ the directory server until the C<update> method is called.
 
 =item ldif ( OPTION =E<gt> VALUE, ... )
 
-Returns the entry as an LDIF string. Possible options are
+Returns the entry as an LDIF string. Possible options are all options
+L<Net::LDAP::LDIF/new> allows, with two being treated special:
 
 =over
 
@@ -230,6 +229,11 @@ If false, then the LDIF generated will represent the entry content. If
 unspecified then it will default to true if the entry has changes and
 false if no changes have been applied to the entry.
 
+=item version =E<gt> VALUE
+
+No matter what value is passed, it will be ignored, and treated as if 0
+were given.
+
 =back
 
 =item dump ( [ FILEHANDLE ] )
@@ -238,6 +242,8 @@ Dump the entry to the given filehandle.
 
 This method is intended for debugging purposes and does not
 treat binary attributes specially.
+It also does not deal properly with entries resulting from
+LDIF change records.
 
 See L<Net::LDAP::LDIF> on how to generate LDIF output.
 

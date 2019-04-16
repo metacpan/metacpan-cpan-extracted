@@ -1,5 +1,8 @@
 Revision history for perl distribution Mojo-Redis
 
+3.21 2019-04-16T09:58:44+0700
+ - Changed default protocol parser to Protocol::Redis::XS #43
+
 3.20 2019-04-04T10:31:03+0700
  - Use Protocol::Redis::Faster instead of Protocol::Redis #38
  - Only decode data from bulk string responses #40

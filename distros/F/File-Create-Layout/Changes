@@ -1,3 +1,8 @@
+0.060   2019-04-16 (PERLANCAR)
+
+	- [Bugfix] Fix bug when moving up more than one level.
+
+
 0.05    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

@@ -22,7 +22,8 @@ GetOptions(
 pod2usage(1) if $help || !@ARGV;
 pod2usage( -exitval => 0, -verbose => 2 ) if $man;
 
-die "Invalid Halstead metric: $metric\n" unless Perl::Metrics::Halstead->can($metric);
+die "Invalid Halstead metric: $metric\n"
+    unless Perl::Metrics::Halstead->can($metric);
 
 my @packages = @ARGV;
 
@@ -30,13 +31,17 @@ my @scores;
 
 my $i = 0;
 
-# Compute the Halstead metric for each given file.
+# Compute Halstead for each given file.
 for my $file (@packages) {
-    next unless -e $file;
+    unless ( -e $file ) {
+        warn "File $file does not exist.\n";
+        next;
+    }
 
-    $i++;
-
-    print "$i. Processing $file:\n" if $report;
+    if ( $report ) {
+        $i++;
+        print "$i. Processing $file:\n";
+    }
 
     my $m;
     eval {
@@ -44,6 +49,7 @@ for my $file (@packages) {
     };
     if ( $@ ) {
         warn "$@\n";
+        next;
     }
 
     if ( $report ) {
@@ -57,7 +63,7 @@ for my $file (@packages) {
 if ( @scores ) {
     # Output the sorted file list.
     my $n = 0;
-    for my $i ( sort{ $a->[1] <=> $b->[1] } @scores ){
+    for my $i ( sort { $a->[1] <=> $b->[1] } @scores ){
         printf "%d. %.4f %s\n", ++$n, $i->[1], $i->[0];
     }
 }
@@ -74,7 +80,7 @@ halstead
 
 =head1 VERSION
 
-version 0.0604
+version 0.0605
 
 =head1 SYNOPSIS
 

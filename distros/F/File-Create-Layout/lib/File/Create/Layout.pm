@@ -1,7 +1,7 @@
 package File::Create::Layout;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2019-04-16'; # DATE
+our $VERSION = '0.060'; # VERSION
 
 use 5.010001;
 use strict;
@@ -75,11 +75,11 @@ sub _parse_layout {
             push @indents, $cur_indent;
         } elsif ($cur_indent < $indents[-1]) {
             # indent is shallower than previous spec-line, find previous level
-            my $found;
+            my $found = 0;
             for my $i (reverse 0..$#indents) {
                 if ($cur_indent == $indents[$i]) {
                     $found++;
-                    splice @indents, $i;
+                    splice @indents, $i+1;
                     last;
                 }
             }
@@ -225,12 +225,14 @@ sub create_files_using_layout {
             if ($e->{level} > $prev_level) {
                 log_trace("chdir %s ...", $dirs[-1]);
                 eval { $CWD = $dirs[-1] };
-                return [500, "Can't chdir to $p/$e->{name}: $!"] if $@;
+                return [500, "Can't chdir to $p/$e->{name}: $! (cwd=$CWD)"] if $@;
             } elsif ($e->{level} < $prev_level) {
                 my $dir = join("/", (("..") x ($prev_level - $e->{level})));
-                log_trace("chdir %s ...", $dir);
+                splice @dirs, $e->{level};
+                $p = $prefix . join("", map {"/$_"} @dirs);
+                log_trace("chdir back %s ...", $dir);
                 eval { $CWD = $dir };
-                return [500, "Can't chdir back to $dir: $!"]
+                return [500, "Can't chdir back to $dir: $! (cwd=$CWD)"]
                     if $@;
             }
         }
@@ -324,7 +326,7 @@ File::Create::Layout - Quickly create files/directories according to a layout
 
 =head1 VERSION
 
-This document describes version 0.05 of File::Create::Layout (from Perl distribution File-Create-Layout), released on 2017-07-10.
+This document describes version 0.060 of File::Create::Layout (from Perl distribution File-Create-Layout), released on 2019-04-16.
 
 =head1 SYNOPSIS
 
@@ -430,7 +432,7 @@ are not allowed) is used for this:
 
 Usage:
 
- check_layout(%args) -> [status, msg, result, meta]
+ check_layout(%args) -> [status, msg, payload, meta]
 
 Check whether layout has syntax errors.
 
@@ -453,18 +455,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 create_files_using_layout
 
 Usage:
 
- create_files_using_layout(%args) -> [status, msg, result, meta]
+ create_files_using_layout(%args) -> [status, msg, payload, meta]
 
 Create files/directories according to a layout.
 
@@ -501,18 +504,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 parse_layout
 
 Usage:
 
- parse_layout(%args) -> [status, msg, result, meta]
+ parse_layout(%args) -> [status, msg, payload, meta]
 
 Parse layout string into a data structure suitable for processing.
 
@@ -535,7 +539,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -567,7 +571,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2019, 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

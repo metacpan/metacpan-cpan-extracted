@@ -1,5 +1,8 @@
 Revision history for Parse-Netstat-Search
 
+0.2.1	 2019-04-15/21:20
+		 - Add missing depend Net::DNS. (SREZIC, #129196)
+
 0.2.0	 2019-04-15/02:30
 		 - Minor typo correction(japh).
 		 - Add PTR search support.

@@ -2,7 +2,7 @@ package Net::LDAP::Extension::Refresh;
 require Net::LDAP::Extension;
 
 our @ISA = qw(Net::LDAP::Extension);
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Convert::ASN1;
 
@@ -14,7 +14,7 @@ $refreshReq->prepare(q<SEQUENCE {
 
 my $refreshResp = Convert::ASN1->new;
 $refreshResp->prepare(q<SEQUENCE {
-                      responseTtl [0] INTEGER
+                      responseTtl [1] INTEGER
                       }>);
 
 sub Net::LDAP::refresh {

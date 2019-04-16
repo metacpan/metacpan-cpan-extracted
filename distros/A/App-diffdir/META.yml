@@ -17,7 +17,7 @@ name: App-diffdir
 provides:
   App::diffdir:
     file: lib/App/diffdir.pm
-    version: '0.7'
+    version: '0.8'
 requires:
   Moo: '2.000000'
   Path::Tiny: '0'
@@ -27,5 +27,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=App::diffdir
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/App-diffdir.git
-version: '0.7'
+version: '0.8'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

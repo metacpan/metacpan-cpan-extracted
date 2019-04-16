@@ -8,7 +8,6 @@ build_requires:
   Test::More: '0'
   Test::Output: '0'
   Text::CSV: '0'
-  Try::Tiny: '0'
   constant: '0'
   parent: '0'
   perl: v5.14.0
@@ -25,16 +24,16 @@ name: Text-Parser
 provides:
   Text::Parser:
     file: lib/Text/Parser.pm
-    version: '0.915'
+    version: '0.917'
   Text::Parser::AutoSplit:
     file: lib/Text/Parser/AutoSplit.pm
-    version: '0.915'
+    version: '0.917'
   Text::Parser::Errors:
     file: lib/Text/Parser/Errors.pm
-    version: '0.915'
+    version: '0.917'
   Text::Parser::Multiline:
     file: lib/Text/Parser/Multiline.pm
-    version: '0.915'
+    version: '0.917'
 requires:
   Exception::Class: '0'
   Exporter: '0'
@@ -47,8 +46,8 @@ requires:
   MooseX::StrictConstructor: '0'
   Scalar::Util: '0'
   String::Util: '0'
-  Syntax::Keyword::Try: '0'
   Throwable::SugarFactory: '0'
+  Try::Tiny: '0'
   feature: '0'
   namespace::autoclean: '0'
   perl: v5.14.0
@@ -58,8 +57,9 @@ resources:
   bugtracker: http://github.com/balajirama/Text-Parser/issues
   homepage: https://github.com/balajirama/Text-Parser
   repository: https://github.com/balajirama/Text-Parser.git
-version: '0.915'
+version: '0.917'
 x_contributors:
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

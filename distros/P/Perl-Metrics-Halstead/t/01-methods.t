@@ -41,8 +41,8 @@ isa_ok $y, 'HASH';
 is keys %$y, 15, 'dump';
 
 my ($stdout, $stderr) = capture { $pmh->report };
-ok !$stderr, 'stderr';
-like $stdout, qr/difficulty: $x/, 'stdout';
+ok !$stderr, 'no report errors';
+like $stdout, qr/difficulty: $x/, 'report difficulty';
 
 $pmh = Perl::Metrics::Halstead->new( file => 'eg/tester2.pl' );
 ok $pmh->difficulty > $x, 'increasing difficulty';

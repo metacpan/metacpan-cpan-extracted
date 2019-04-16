@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.011 Tue, 16 Apr 2019 12:31:38 +0200 moocow
+	* decode UTF-8 on dcdb-create.perl arguments
+	* fixed deep recursion typo in Utils::file_timestamp()
+
 v0.12.010 Fri, 10 Nov 2017 10:31:29 +0100 moocow
 	* fixed native query syntax regex parsing with ddcmode=-1 (fallback)
 

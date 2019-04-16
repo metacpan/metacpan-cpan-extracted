@@ -1,0 +1,36 @@
+
+Telugu::TGC
+
+Perl extension for tailored grapheme clusters for Telugu script.
+
+
+USAGE EXAMPLE
+
+use Telugu::TGC;
+use utf8;
+binmode STDOUT, ":encoding(UTF-8)";
+
+my $o = Telugu::TGC->new();
+my @res = $o->TGC("రాజ్కుమార్రెడ్డి");
+
+print $res[1], "\n";
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2019 by Rajkumar Reddy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.

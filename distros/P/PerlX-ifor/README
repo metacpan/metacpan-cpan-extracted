@@ -1,0 +1,46 @@
+NAME
+    PerlX::ifor - A version of for() that accepts iterator instead of list
+
+VERSION
+    This document describes version 0.001 of PerlX::ifor (from Perl
+    distribution PerlX-ifor), released on 2019-04-16.
+
+SYNOPSIS
+    With Array::Iter or Range::Iter which generates a coderef iterator:
+
+     use PerlX::ifor;
+     use Array::Iter qw(array_iter list_iter);
+     use Range::Iter qw(range_iter);
+
+     ifor { say } iter_range("a", "z");
+
+DESCRIPTION
+    CAVEAT: Yes, it's ugly and doesn't look like a regular for(). Sue Perl
+    :-)
+
+    TODO: Support other iterator, e.g. Array::Iterator.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PerlX-ifor>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-PerlX-ifor>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PerlX-ifor>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

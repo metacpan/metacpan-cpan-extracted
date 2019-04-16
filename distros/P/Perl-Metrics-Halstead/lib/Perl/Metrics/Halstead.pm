@@ -3,14 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute Halstead complexity metrics
 
-our $VERSION = '0.0604';
+our $VERSION = '0.0605';
+
+use PPI::Document;
+use PPI::Dumper;
 
 use Moo;
 use strictures 2;
 use namespace::clean;
-
-use PPI::Document;
-use PPI::Dumper;
 
 
 has file => (
@@ -229,7 +229,7 @@ Perl::Metrics::Halstead - Compute Halstead complexity metrics
 
 =head1 VERSION
 
-version 0.0604
+version 0.0605
 
 =head1 SYNOPSIS
 

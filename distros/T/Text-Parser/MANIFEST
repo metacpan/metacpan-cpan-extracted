@@ -24,7 +24,9 @@ t/Text-Parser-pod-02.t
 t/Text-Parser-pod-03.t
 t/Text-Parser-pod-04.t
 t/Text-Parser-pod-05.t
+t/Text-Parser-pod-06.t
 t/Text-Parser.t
+t/account.txt
 t/author-minimum-version.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
@@ -49,5 +51,7 @@ t/release-cpan-changes.t
 t/release-distmeta.t
 t/release-kwalitee.t
 t/text-simple.txt
+t/trim-vs-split.t
+t/trim-vs-split.txt
 tidyall.ini
 weaver.ini

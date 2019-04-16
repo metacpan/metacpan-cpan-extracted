@@ -25,8 +25,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Carp' => '0',
-                                      'Dist::Zilla' => '5.038',
+                                      'Dist::Zilla' => '6.00',
                                       'Dist::Zilla::Role::FileFinderUser' => '0',
                                       'Dist::Zilla::Role::FileMunger' => '0',
                                       'Dist::Zilla::Role::PPI' => '0',
@@ -34,9 +33,7 @@ do { my $x = {
                                       'MooseX::Types::Perl' => '0',
                                       'PPI' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => '5.008',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => '5.014'
                                     }
                     },
        'test' => {
@@ -45,12 +42,8 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
-                                   'File::Spec' => '0',
-                                   'IO::Handle' => '0',
-                                   'IPC::Open3' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::DZil' => '0',
-                                   'Test::More' => '0',
                                    'Test::Version' => '0.04'
                                  }
                  }

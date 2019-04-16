@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use Path::Tiny;
 use base qw/Exporter/;
 
-our $VERSION     = 0.7;
+our $VERSION     = 0.8;
 our @EXPORT_OK   = qw/build_tree/;
 our %EXPORT_TAGS = ();
 our @EXPORT      = qw/build_tree/;

@@ -1135,7 +1135,7 @@ sub vprofile {
 	     $f12p, $f2p={});
     $vs->vlog($logDebug, "got ", scalar(keys %$f2p), " independent item2 tuple-frequencies via tym");
   }
-  elsif ($groupby->{how} eq 'c') {
+  elsif (0 && $groupby->{how} eq 'c') {
     ##-- evaluate query: groupby doc-attrs
     $vs->vlog($logLocal, "vprofile(): evaluating query (groupby metadata-attributes only)");
     my $cofsub = PDL->can('diacollo_cof_c_'.$vs->itype) || \&PDL::diacollo_cof_c_long;

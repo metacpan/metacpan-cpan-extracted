@@ -15,6 +15,11 @@ eval "use PDL;";
 my $HAVE_PDL = defined($PDL::VERSION);
 warn("$0 WARNING: PDL module is missing or broken, TDF relation will be disabled!") if (!$HAVE_PDL);
 
+##-- workaround for irritating "/some/symlinked/file is encountered a second time at File/Find.pm line 79." errors
+##   under ExtUtils::MakeMaker 7.1002 (see also RT bug #99018)
+*ExtUtils::MakeMaker::_check_files = sub {};
+*ExtUtils::MakeMaker::check_manifest = sub {};
+
 ##----------------------------------------------------------------------
 ## MAIN
 ##----------------------------------------------------------------------

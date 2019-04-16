@@ -59,6 +59,7 @@ sub pack64 {
   $coldb{tdfopts}{itype} = $_[1] ? 'ccs_indx' : 'long';
   $coldb{tdfopts}{vtype} = $_[1] ? 'double' : 'float';
 }
+foreach (@ARGV) { utf8::decode($_) if (!utf8::is_utf8($_)); }
 GetOptions(##-- general
 	   'help|h' => \$help,
 	   'version|V' => \$version,
@@ -360,7 +361,7 @@ If enabled, INPUT(s) are treated as DB URLs to be merged "lazily",
 and only a simple L<DiaColloDB::Client::list|DiaColloDB::Client::list>
 configuration file F<OUT> is created, suitable for passing to
 L<dcdb-query.perl|dcdb-query.perl> as F<rcfile://OUT>.  User
-options specified with L<-option OPT=VAL|/-option-OPT-VAL> will
+options specified with L<C<-option OPT=VAL>|/"-option OPT=VAL"> will
 clobber the L<DiaColloDB::Client::list|DiaColloDB::Client::list> defaults
 (e.g. C<fudge>, C<fork>, etc.). Unlike L<-union|/-union> mode,
 no physical DB is created in L<-lazy|/-lazy> mode; queries to the lazy
@@ -389,7 +390,7 @@ L<C<-dopt foreign=1>|/"-dopt OPT=VAL">.
 Set corpus document option, e.g.
 L<C<-dopt eosre=EOSRE>|DDCTabs/new> sets the end-of-sentence regex
 for the default L<DDCTabs|DiaColloDB::Document::DDCTabs> document class,
-and L<C<-dopt foreign=1|DDCTabs/new> disables D*-specific hacks.
+and L<C<-dopt foreign=1>|DDCTabs/new> disables D*-specific hacks.
 
 Aliases: -document-option, -docoption, -dO
 

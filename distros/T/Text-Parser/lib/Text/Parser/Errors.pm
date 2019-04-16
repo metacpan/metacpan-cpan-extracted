@@ -1,4 +1,4 @@
-package Text::Parser::Errors 0.915;
+package Text::Parser::Errors 0.917;
 use strict;
 use warnings;
 
@@ -43,7 +43,7 @@ exception
 
 
 exception
-    UnexpectedEof => 'continuation character in last line, unexpected EoF',
+    UnexpectedEof => 'join_next cont. character in last line, unexpected EoF',
     has           => [
     discontd => (
         is  => 'ro',
@@ -92,7 +92,7 @@ Text::Parser::Errors - Exceptions for Text::Parser
 
 =head1 VERSION
 
-version 0.915
+version 0.917
 
 =head1 DESCRIPTION
 
@@ -100,7 +100,7 @@ This document contains a manifest of all the exception classes thrown by L<Text:
 
 =head1 EXCEPTION CLASSES
 
-All exceptions are derived from C<Text::Parser::Errors::GenericError>. They are all based on L<Throwable::SugarFactory> and so all the exception methods of those, such as C<L<error|Throwable::SugarFactory/error>>, C<L<namespace|/Throwable::SugarFactory/namespace>>, etc., will be accessible. Read L<Exceptions> if you don't know about exceptions in Perl 5.
+All exceptions are derived from C<Text::Parser::Errors::GenericError>. They are all based on L<Throwable::SugarFactory> and so all the exception methods of those, such as C<L<error|Throwable::SugarFactory/error>>, C<L<namespace|Throwable::SugarFactory/namespace>>, etc., will be accessible. Read L<Exceptions> if you don't know about exceptions in Perl 5.
 
 =head2 C<Text::Parser::Errors::InvalidFilename>
 

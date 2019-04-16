@@ -1,5 +1,6 @@
 .perltidyrc
 .travis.yml
+.vstags
 Changes
 cpanfile
 examples/cache.pl

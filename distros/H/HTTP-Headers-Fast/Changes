@@ -1,5 +1,9 @@
 Revision history for Perl extension HTTP::Headers::Fast
 
+0.22 2019-04-16T01:51:15Z
+
+    Fixed test case(Slaven Rezić)
+
 0.21 2017-02-10T03:10:11Z
 
     - rename flatten to psgi_flatten for fixing compatibility issue plack/plack#541

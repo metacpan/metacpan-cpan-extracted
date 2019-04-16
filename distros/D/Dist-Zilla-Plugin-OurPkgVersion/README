@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.14
+    version 0.15
 
 SYNOPSIS
 
@@ -156,6 +156,16 @@ PROPERTIES
       Dist::Zilla::Plugin::VersionFromMainModule to obtain the version
       number instead of the dist.ini file.
 
+    overwrite
+
+      When enabled, this option causes any match of the # VERSION comment
+      to first check for an existing our $VERSION = ...; on the same line,
+      and if found, overwrite the value in the existing statement. (the
+      comment still gets modified for trial releases)
+
+      Currently, the value must be a single Perl token such as a string or
+      number.
+
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
@@ -167,6 +177,8 @@ BUGS
 CONTRIBUTORS
 
       * Alexandr Ciornii <alexchorny@gmail.com>
+
+      * Michael Jemmeson <mjemmeson@cpan.org>
 
       * Stephan Loyd <stephanloyd9@gmail.com>
 
@@ -186,7 +198,7 @@ CONTRIBUTORS
 
       * Ian Sealy <git@iansealy.com>
 
-      * Michael Jemmeson <mjemmeson@cpan.org>
+      * Michael Conrad <mike@nrdvana.net>
 
 AUTHORS
 

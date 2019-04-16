@@ -3,7 +3,7 @@
 use FindBin;
 BEGIN { $ENV{DANCER_APPDIR} = $FindBin::Bin }
 
-use Test::More tests => 56, import => ["!pass"];
+use Test::More tests => 58, import => ["!pass"];
 
 use Dancer;
 use Dancer::Test;
@@ -27,7 +27,7 @@ use t::lib::WebService;
 
 my $response;
 my $params1  = { params => {name_object => 'test_result'} };
-my $params2  = { params => {name_object => 'test_result', created_at => '2010-10-10'} };
+my $params2  = { params => {name_object => 'test_result', created_at => '2010-10-10'}, headers => [ 'Content-Type' => 'application/x-www-form-urlencoded', 'Origin'=>'https://testurl1.com' ] };
 my $params3  = { params => {name_object => 'test_result', created_at => '2010-10-10', test => 'test_result'} };
 my $params4  = { params => {name_object => 'test_result', params_sup => 1 } };
 my $params5  = { params => {name_object => 'test_result', my_file =>  {filename => "test.png", name => "my_file" } } };
@@ -37,10 +37,13 @@ response_content_is ['GET' => '/object/12'], '{"error":"required params `name_ob
 response_status_is ['GET' => '/object/12', $params1], 200, "GET only required params";
 response_status_is ['GET' => '/object/12', $params2], 200, "GET required and optional params";
 response_headers_include ['GET' => '/object/12', $params2], [ 'Access-Control-Allow-Credentials' => 'true' ];
+response_headers_include ['GET' => '/object/12', $params2], [ 'Access-Control-Allow-Origin' => 'https://testurl1.com' ];
 response_status_is ['GET' => '/object/12', $params3], 400, "GET unknown params";
 response_content_is ['GET' => '/object/12', $params3], '{"error":"parameter `test\' is unknown"}', "GET param is unknown";
 response_status_is ['GET' => '/nimportequoi/12', $params1], 404, "GET route pattern is not defined";
 response_content_is ['GET' => '/nimportequoi/12', $params1], '{"error":"route pattern `/nimportequoi/:id\' is not defined"}', "GET required param is missing";
+$response = dancer_response 'GET' => '/object/12', { headers => [ 'Content-Type' => 'application/x-www-form-urlencoded', 'Origin'=>'https://testurl_nope.com' ]};
+ok !$response->{headers}->{'access-control-allow-origin'}, "access-control-allow-origin is not set";
 
 response_status_is ['POST' => '/object'], 400, "POST required param is missing";
 response_content_is ['POST' => '/object'], '{"error":"required params `name_object\' is not defined"}', "GET required param is missing";

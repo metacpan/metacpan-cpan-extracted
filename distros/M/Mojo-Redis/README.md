@@ -52,29 +52,6 @@ without warning. Please report at
 useful, annoying or if you simply find bugs. Feedback can also be sent to
 `jhthorsen@cpan.org`.
 
-# CAVEATS
-
-[Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) is not the default ["protocol"](#protocol) because it has some
-limitations:
-
-- Cannot handle binary data
-
-    [Mojo::Redis::Cache](https://metacpan.org/pod/Mojo::Redis::Cache) uses [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol::Redis::Faster) for now, since
-    [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) fail to handle binary data.
-
-    See [https://github.com/dgl/protocol-redis-xs/issues/4](https://github.com/dgl/protocol-redis-xs/issues/4) for more information.
-
-- Cannot handle multi bulk replies with depth higher than 2
-
-    ["xread" in Mojo::Redis::Database](https://metacpan.org/pod/Mojo::Redis::Database#xread) and other Redis commands returns complex nested
-    data structures with depth higher than two. [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) is unable to
-    handle these messages.
-
-    See [https://github.com/dgl/protocol-redis-xs/issues/5](https://github.com/dgl/protocol-redis-xs/issues/5) for more information.
-
-If you experience any issues with [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) then please report
-them to [https://github.com/dgl/protocol-redis-xs/issues](https://github.com/dgl/protocol-redis-xs/issues).
-
 # EVENTS
 
 ## connection
@@ -110,9 +87,8 @@ Maximum number of idle database handles to cache for future use, defaults to
     $str   = $redis->protocol_class;
     $redis = $redis->protocol_class("Protocol::Redis::XS");
 
-Default to [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol::Redis::Faster). You can change this to
-[Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) if you need a faster protocl parser, but do look at
-["CAVEATS"](#caveats) for first.
+Default to [Protocol::Redis::XS](https://metacpan.org/pod/Protocol::Redis::XS) if the optional module is available and at
+least version 0.06, or falls back to [Protocol::Redis::Faster](https://metacpan.org/pod/Protocol::Redis::Faster).
 
 ## pubsub
 

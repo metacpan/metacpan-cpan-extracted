@@ -23,13 +23,12 @@ DESCRIPTION
 
     Module::Build is a system for building, testing, and installing Perl
     modules. It is meant to be an alternative to ExtUtils::MakeMaker.
-    Developers may alter the behavior of the module through subclassing in
-    a much more straightforward way than with MakeMaker. It also does not
-    require a make on your system - most of the Module::Build code is
-    pure-perl and written in a very cross-platform way.
+    Developers may alter the behavior of the module through subclassing. It
+    also does not require a make on your system - most of the Module::Build
+    code is pure-perl and written in a very cross-platform way.
 
-    See "MOTIVATIONS" for more comparisons between ExtUtils::MakeMaker and
-    Module::Build.
+    See "COMPARISON" for more comparisons between Module::Build and other
+    installer tools.
 
     To install Module::Build, and any other module that uses Module::Build
     for its installation process, do the following:
@@ -176,7 +175,7 @@ ACTIONS
       [version 0.05]
 
       Reports which files are in the build directory but not in the
-      MANIFEST file, and vice versa. (See manifest for details.)
+      MANIFEST file, and vice versa. (See "manifest" for details.)
 
     distclean
 
@@ -346,8 +345,8 @@ ACTIONS
         ^MANIFEST\.SKIP$
         CVS
 
-      See the distcheck and skipcheck actions if you want to find out what
-      the manifest action would do, without actually doing anything.
+      See the "distcheck" and "skipcheck" actions if you want to find out
+      what the manifest action would do, without actually doing anything.
 
     manifest_skip
 
@@ -455,7 +454,7 @@ ACTIONS
       [version 0.05]
 
       Reports which files are skipped due to the entries in the
-      MANIFEST.SKIP file (See manifest for details)
+      MANIFEST.SKIP file (See "manifest" for details)
 
     test
 
@@ -508,8 +507,8 @@ ACTIONS
 
       [Note: the 'testall' action and the code snippets below are currently
       in alpha stage, see
-      "/www.nntp.perl.org/group/perl.module.build/2007/03/msg584.html"" in
-      "http: ]
+      http://www.nntp.perl.org/group/perl.module.build/2007/03/msg584.html
+      ]
 
       Runs the test action plus each of the test$type actions defined by
       the keys of the test_types parameter.
@@ -881,57 +880,47 @@ INSTALL PATHS
       location as ExtUtils::MakeMaker" in Module::Build::Cookbook for
       further information.
 
-MOTIVATIONS
+COMPARISON
 
-    There are several reasons I wanted to start over, and not just fix what
-    I didn't like about MakeMaker:
+    A comparison between Module::Build and other CPAN distribution
+    installers.
 
-      * I don't like the core idea of MakeMaker, namely that make should be
-      involved in the build process. Here are my reasons:
+      * ExtUtils::MakeMaker requires make and use of a Makefile.
+      Module::Build does not, nor do other pure-perl installers following
+      the Build.PL spec such as Module::Build::Tiny. In practice, this is
+      usually not an issue for the end user, as make is already required to
+      install most CPAN modules, even on Windows.
 
-      +
+      * ExtUtils::MakeMaker has been a core module in every version of Perl
+      5, and must maintain compatibility to install the majority of CPAN
+      modules. Module::Build was added to core in Perl 5.10 and removed
+      from core in Perl 5.20, and (like ExtUtils::MakeMaker) is only
+      updated to fix critical issues and maintain compatibility.
+      Module::Build and other non-core installers like Module::Build::Tiny
+      are installed from CPAN by declaring themselves as a configure phase
+      prerequisite, and in this way any installer can be used in place of
+      ExtUtils::MakeMaker.
 
-	When a person is installing a Perl module, what can you assume
-	about their environment? Can you assume they have make? No, but you
-	can assume they have some version of Perl.
+      * Customizing the build process with ExtUtils::MakeMaker involves
+      overriding certain methods that form the Makefile by defining the
+      subs in the MY:: namespace, requiring in-depth knowledge of Makefile,
+      but allowing targeted customization of the entire build. Customizing
+      Module::Build involves subclassing Module::Build itself, adding or
+      overriding pure-perl methods that represent build actions, which are
+      invoked as arguments passed to the generated ./Build script. This is
+      a simpler concept but requires redefining the standard build actions
+      to invoke your customizations. Module::Build::Tiny does not allow for
+      customization.
 
-      +
-
-	When a person is writing a Perl module for intended distribution,
-	can you assume that they know how to build a Makefile, so they can
-	customize their build process? No, but you can assume they know
-	Perl, and could customize that way.
-
-      For years, these things have been a barrier to people getting the
-      build/install process to do what they want.
-
-      * There are several architectural decisions in MakeMaker that make it
-      very difficult to customize its behavior. For instance, when using
-      MakeMaker you do use ExtUtils::MakeMaker, but the object created in
-      WriteMakefile() is actually blessed into a package name that's
-      created on the fly, so you can't simply subclass ExtUtils::MakeMaker.
-      There is a workaround MY package that lets you override certain
-      MakeMaker methods, but only certain explicitly preselected (by
-      MakeMaker) methods can be overridden. Also, the method of
-      customization is very crude: you have to modify a string containing
-      the Makefile text for the particular target. Since these strings
-      aren't documented, and can't be documented (they take on different
-      values depending on the platform, version of perl, version of
-      MakeMaker, etc.), you have no guarantee that your modifications will
-      work on someone else's machine or after an upgrade of MakeMaker or
-      perl.
-
-      * It is risky to make major changes to MakeMaker, since it does so
-      many things, is so important, and generally works. Module::Build is
-      an entirely separate package so that I can work on it all I want,
-      without worrying about backward compatibility with MakeMaker.
-
-      * Finally, Perl is said to be a language for system administration.
-      Could it really be the case that Perl isn't up to the task of
-      building and installing software? Even if that software is a bunch of
-      .pm files that just need to be copied from one place to another? My
-      sense was that we could design a system to accomplish this in a
-      flexible, extensible, and friendly manner. Or die trying.
+      * Module::Build provides more features and a better experience for
+      distribution authors than ExtUtils::MakeMaker. However, tools
+      designed specifically for authoring, such as Dist::Zilla and its
+      spinoffs Dist::Milla and Minilla, provide these features and more,
+      and generate a configure script (Makefile.PL/Build.PL) that will use
+      any of the various installers separately on the end user side.
+      App::ModuleBuildTiny is an alternative standalone authoring tool for
+      distributions using Module::Build::Tiny, which requires only a simple
+      two-line Build.PL.
 
 TO DO
 

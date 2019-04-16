@@ -591,7 +591,7 @@ sub file_mtime {
 ## $timestamp = PACKAGE->file_timestamp($file_or_fh)
 sub file_timestamp {
   shift if (UNIVERSAL::isa($_[0],__PACKAGE__));
-  return file_timestamp(file_mtime(@_));
+  return timestamp(file_mtime(@_));
 }
 
 ## $nbytes = du_file(@filenames_or_dirnames_or_fhs)
@@ -724,7 +724,7 @@ sub si_str {
   return sprintf("%.2fG", $x/10**9)  if ($x >= 10**9);   ##-- giga
   return sprintf("%.2fM", $x/10**6)  if ($x >= 10**6);   ##-- mega
   return sprintf("%.2fk", $x/10**3)  if ($x >= 10**3);   ##-- kilo
-  return sprintf("%.2f",  $x)        if ($x >= 0);       ##-- (natural units)
+  return sprintf("%.2f",  $x)        if ($x >= 1);       ##-- (natural units)
   return sprintf("%.2fm", $x*10**3)  if ($x >= 10**-3);  ##-- milli
   return sprintf("%.2fu", $x*10**6)  if ($x >= 10**-6);  ##-- micro
   return sprintf("%.2fn", $x*10**9)  if ($x >= 10**-9);  ##-- nano
@@ -990,6 +990,7 @@ sub valcounts {
   return ($vals->where($mask), $counts->where($mask));
 }
 BEGIN {
+  no warnings 'redefine'; ##-- avoid irritating "PDL::valcounts redefined" messages when running together with (legacy) MUDL & DocClassify code
   *PDL::valcounts = \&valcounts;
 }
 

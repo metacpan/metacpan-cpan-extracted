@@ -11,7 +11,7 @@ use XML::SAX::Base;
 use Net::LDAP::Entry;
 
 our @ISA = qw(XML::SAX::Base);
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 # OO purists will hate this :)
 my %schema_typemap = qw(
@@ -542,7 +542,7 @@ sub write_schema {
 	Name  => 'superior'
       };
     }
-    if (my $type = (grep { $oc->{$_} } qw(structural abstract auxilary))[0]) {
+    if (my $type = (grep { $oc->{$_} } qw(structural abstract auxiliary))[0]) {
       $attr{'{}type'} = {
 	Value => $type,
 	Name  => 'type',

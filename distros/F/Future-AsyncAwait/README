@@ -212,15 +212,13 @@ BETA-VERSION WARNING
           await func();
        }
 
-    Since foreach loops on non-lexical iterator variables (usually package
-    variables) effectively imply a local-like behaviour, these are also
-    disallowed.
+    Since foreach loops on non-lexical iterator variables (usually the $_
+    global variable) effectively imply a local-like behaviour, these are
+    also disallowed.
 
-       our $VAR;
-    
        async sub splurt
        {
-          foreach $VAR ( LIST ) {
+          foreach ( LIST ) {
              await ...
           }
        }

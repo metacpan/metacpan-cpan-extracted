@@ -6,42 +6,46 @@ Net::LDAP - Lightweight Directory Access Protocol
 
  use Net::LDAP;
 
- $ldap = Net::LDAP->new( 'ldap.bigfoot.com' ) or die "$@";
+ $ldap = Net::LDAP->new( 'ldap.example.com' )  or  die "$@";
 
- $mesg = $ldap->bind ;    # an anonymous bind
+ $mesg = $ldap->bind;                         # anonymous bind
 
- $mesg = $ldap->search( # perform a search
-                        base   => "c=US",
+ $mesg->code  and  die $mesg->error;          # check for errors
+
+ $srch = $ldap->search( base   => "c=US",     # perform a search
                         filter => "(&(sn=Barr)(o=Texas Instruments))"
                       );
 
- $mesg->code && die $mesg->error;
+ $srch->code  and  die $srch->error;          # check for errors
 
- foreach $entry ($mesg->entries) { $entry->dump; }
+ foreach $entry ($srch->entries) { $entry->dump; }
 
- $mesg = $ldap->unbind;   # take down session
+ $mesg = $ldap->unbind;                       # take down session
 
 
- $ldap = Net::LDAP->new( 'ldap.umich.edu' );
+ $ldap = Net::LDAP->new( 'ldaps://ldap.example.com' )  or  die "$@";
 
- # bind to a directory with dn and password
+ # simple bind with DN and password
  $mesg = $ldap->bind( 'cn=root, o=University of Michigan, c=us',
                       password => 'secret'
                     );
 
+ $mesg->code  and  die $mesg->error;          # check for errors
+
  $result = $ldap->add( 'cn=Barbara Jensen, o=University of Michigan, c=US',
                        attrs => [
-                         'cn'   => ['Barbara Jensen', 'Barbs Jensen'],
-                	 'sn'   => 'Jensen',
-                	 'mail' => 'b.jensen@umich.edu',
-                	 'objectclass' => ['top', 'person',
-                                           'organizationalPerson',
-                                           'inetOrgPerson' ],
+                         cn          => ['Barbara Jensen', 'Barbs Jensen'],
+                	 sn          => 'Jensen',
+                	 mail        => 'b.jensen@umich.edu',
+                	 objectclass => ['top', 'person',
+                                         'organizationalPerson',
+                                         'inetOrgPerson' ],
                        ]
                      );
 
- $result->code && warn "failed to add entry: ", $result->error ;
- $mesg = $ldap->unbind;  # take down session
+ $result->code  and  warn "failed to add entry: ", $result->error;
+
+ $mesg = $ldap->unbind;                       # take down session
 
 =head1 DESCRIPTION
 
@@ -120,7 +124,7 @@ Set the debug level. See the L<debug|/debug> method for details.
 
 Perform all operations asynchronously.
 
-=item onerror =E<gt> 'die' | 'warn' | undef | sub { ... }
+=item onerror =E<gt> 'die' | 'warn' | 'undef' | sub { ... }
 
 In synchronous mode, change what happens when an error is detected.
 
@@ -134,10 +138,12 @@ Net::LDAP will croak whenever an error is detected.
 
 Net::LDAP will warn whenever an error is detected.
 
-=item undef
+=item 'undef'
 
 Net::LDAP will warn whenever an error is detected and C<-w> is in
 effect. The method that was called will return C<undef>.
+
+Note this value is the string C<'undef'>, not the C<undef> value.
 
 =item sub { ... }
 
@@ -789,6 +795,14 @@ This defines the version of the SSL/TLS protocol to use.
 Default is to use the value that L<IO::Socket::SSL> uses as default.
 
 See L<IO::Socket::SSL/SSL_version> for more details.
+
+=item sslserver =E<gt> SSLHOST
+
+Allow changing the server name to use in certificate hostname verification
+in case the target hostname does not match the LDAP server's certificate.
+If not given it defaults to the name of the HOST connected to.
+
+See L<IO::Socket::SSL/SSL_verifycn_name> for more details.
 
 =item ciphers =E<gt> CIPHERS
 

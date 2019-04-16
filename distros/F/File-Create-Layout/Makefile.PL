@@ -17,22 +17,23 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "File::Create::Layout",
   "PREREQ_PM" => {
-    "Exporter" => 0,
+    "Exporter" => "5.57",
     "File::chdir" => 0,
     "File::chown" => 0,
     "JSON::MaybeXS" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.027",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "File::Temp" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.060",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,14 +41,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Exporter" => 0,
+  "Exporter" => "5.57",
   "File::Spec" => 0,
+  "File::Temp" => 0,
   "File::chdir" => 0,
   "File::chown" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.027",
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "strict" => 0,

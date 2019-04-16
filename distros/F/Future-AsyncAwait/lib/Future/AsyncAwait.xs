@@ -129,9 +129,10 @@ struct SuspendedFrame {
 #ifdef HAVE_ITERVAR
   SV *itervar;
 #endif
-#ifdef DEBUGGING
-  const char *scopename;
-#endif
+  U32 scopes;
+
+  U32 mortallen;
+  SV **mortals;
 };
 
 typedef struct {
@@ -141,9 +142,6 @@ typedef struct {
 
   U32 padlen;
   SV **padslots;
-
-  U32 mortallen;
-  SV **mortals;
 
 #ifdef DEBUG
   COP *curcop;
@@ -187,6 +185,9 @@ static void debug_sv_summary(const SV *sv)
     type = "RV";
 
   fprintf(stderr, "SV{type=%s,refcnt=%d", type, SvREFCNT(sv));
+
+  if(SvTEMP(sv))
+    fprintf(stderr, ",TEMP");
 
   if(SvROK(sv))
     fprintf(stderr, ",ROK");
@@ -276,6 +277,12 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
       for(i = 0; i < frame->stacklen; i++)
         ret += DMD_ANNOTATE_SV(sv, frame->stack[i], "a suspended stack temporary");
     }
+
+    if(frame->mortallen) {
+      int i;
+      for(i = 0; i < frame->mortallen; i++)
+        ret += DMD_ANNOTATE_SV(sv, frame->mortals[i], "a suspended mortal");
+    }
   }
 
   if(state->padlen) {
@@ -283,12 +290,6 @@ static int dumpmagic(pTHX_ const SV *sv, MAGIC *mg)
     for(i = 0; i < state->padlen - 1; i++)
       if(state->padslots[i])
         ret += DMD_ANNOTATE_SV(sv, state->padslots[i], "a suspended pad slot");
-  }
-
-  if(state->mortallen) {
-    int i;
-    for(i = 0; i < state->mortallen; i++)
-      ret += DMD_ANNOTATE_SV(sv, state->mortals[i], "a suspended mortal");
   }
 
   return ret;
@@ -316,7 +317,6 @@ static SuspendedState *MY_suspendedstate_new(pTHX_ CV *cv)
   ret->awaiting_future = NULL;
   ret->returning_future = NULL;
   ret->frames = NULL;
-  ret->mortals = NULL;
   ret->padslots = NULL;
 
   sv_magicext((SV *)cv, NULL, PERL_MAGIC_ext, &vtbl, (char *)ret, 0);
@@ -388,6 +388,14 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
         fprintf(stderr, "TODO: free frame->itervar\n");
 #endif
 
+      if(frame->mortals) {
+        int i;
+        for(i = 0; i < frame->mortallen; i++)
+          sv_2mortal(frame->mortals[i]);
+
+        Safefree(frame->mortals);
+      }
+
       Safefree(frame);
     }
   }
@@ -403,21 +411,13 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
     state->padslots = NULL;
   }
 
-  if(state->mortals) {
-    int i;
-    for(i = 0; i < state->mortallen; i++)
-      sv_2mortal(state->mortals[i]);
-
-    Safefree(state->mortals);
-  }
-
   Safefree(state);
 
   return 1;
 }
 
-#define suspend_block(frame, cx)  MY_suspend_block(aTHX_ frame, cx)
-static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
+#define suspend_frame(frame, cx)  MY_suspend_frame(aTHX_ frame, cx)
+static void MY_suspend_frame(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 {
   /* The base of the stack within this context */
   SV **bp = PL_stack_base + cx->blk_oldsp + 1;
@@ -459,6 +459,15 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
   else
     frame->saved = NULL;
   frame->savedlen = 0; /* we increment it as we fill it */
+
+  I32 oldtmpsfloor = -2;
+#if HAVE_PERL_VERSION(5, 24, 0)
+  /* Perl 5.24 onwards has a PERL_CONTEXT slot for the old value of
+   * PL_tmpsfloor. Older perls do not, and keep it in the save stack instead.
+   * We'll keep an eye out for its saved value
+   */
+  oldtmpsfloor = cx->blk_old_tmpsfloor;
+#endif
 
   while(PL_savestack_ix > old_saveix) {
     /* Useful references
@@ -529,11 +538,13 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         /* In general we don't want to support this; but specifically on perls
          * older than 5.20, this might be PL_tmps_floor
          */
-        if(var == (int *)&PL_tmps_floor)
+        if(var == (int *)&PL_tmps_floor) {
           /* Don't bother to save the old tmpsfloor. We'll actually just
            * squash all the mortals into one big block anyway
            */
+          oldtmpsfloor = val;
           goto nosave;
+        }
 
         panic("TODO: Unsure how to handle a savestack entry of SAVEt_INT_SMALL with var != &PL_tmps_floor\n");
         break;
@@ -564,11 +575,13 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
         /* In general we don't want to support this; but specifically on perls
          * older than 5.24, this might be PL_tmps_floor
          */
-        if(var == (STRLEN *)&PL_tmps_floor)
+        if(var == (STRLEN *)&PL_tmps_floor) {
           /* Don't bother to save the old tmpsfloor. We'll actually just
            * squash all the mortals into one big block anyway
            */
+          oldtmpsfloor = val;
           goto nosave;
+        }
 
         panic("TODO: Unsure how to handle a savestack entry of SAVEt_STRLEN with var != &PL_tmps_floor\n");
         break;
@@ -648,6 +661,140 @@ nosave:
 
   if(OLDSAVEIX(cx) != PL_savestack_ix)
     panic("TODO: handle OLDSAVEIX\n");
+
+  frame->scopes = (PL_scopestack_ix - cx->blk_oldscopesp) + 1;
+  if(frame->scopes) {
+    /* We'll mutate PL_scopestack_ix but it doesn't matter as dounwind() will
+     * put it right at the end. Do this unconditionally to avoid divergent
+     * behaviour between -DDEBUGGING builds and non.
+     */
+    PL_scopestack_ix -= frame->scopes;
+  }
+
+  /* ref:
+   *   https://perl5.git.perl.org/perl.git/blob/HEAD:/cop.h
+   */
+  U8 type = CxTYPE(cx);
+  switch(type) {
+    case CXt_BLOCK:
+      frame->type = CXt_BLOCK;
+      frame->gimme = cx->blk_gimme;
+      /* nothing else special */
+      break;
+
+    case CXt_LOOP_PLAIN:
+      frame->type = type;
+      frame->el.loop = cx->blk_loop;
+      frame->gimme = cx->blk_gimme;
+      break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+    case CXt_LOOP_ARY:
+    case CXt_LOOP_LIST:
+#else
+    case CXt_LOOP_FOR:
+#endif
+    case CXt_LOOP_LAZYSV:
+    case CXt_LOOP_LAZYIV:
+      if(!CxPADLOOP(cx))
+        /* non-lexical foreach will effectively work like 'local' and we
+         * can't really support local
+         */
+        croak("Cannot suspend a foreach loop on non-lexical iterator");
+
+      frame->type = type;
+      frame->el.loop = cx->blk_loop;
+      frame->gimme = cx->blk_gimme;
+
+#ifdef HAVE_ITERVAR
+#  ifdef USE_ITHREADS
+      if(cx->blk_loop.itervar_u.svp != (SV **)PL_comppad)
+        panic("TODO: Unsure how to handle a foreach loop with itervar != PL_comppad\n");
+#  else
+      if(cx->blk_loop.itervar_u.svp != &PAD_SVl(cx->blk_loop.my_op->op_targ))
+        panic("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))\n");
+#  endif
+
+      frame->itervar = SvREFCNT_inc(*CxITERVAR(cx));
+#else
+      if(CxITERVAR(cx) != &PAD_SVl(cx->blk_loop.my_op->op_targ))
+        panic("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))\n");
+      SvREFCNT_inc(cx->blk_loop.itersave);
+#endif
+
+      switch(type) {
+        case CXt_LOOP_LAZYSV:
+          /* these two fields are refcounted, so we need to save them from
+           * dounwind() throwing them away
+           */
+          SvREFCNT_inc(frame->el.loop.state_u.lazysv.cur);
+          SvREFCNT_inc(frame->el.loop.state_u.lazysv.end);
+          break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+        case CXt_LOOP_ARY:
+#else
+        case CXt_LOOP_FOR:
+#endif
+          /* this field is also refcounted, so we need to save it too */
+          if(frame->el.loop.state_u.ary.ary)
+            SvREFCNT_inc(frame->el.loop.state_u.ary.ary);
+          break;
+      }
+
+      break;
+
+    case CXt_EVAL: {
+      if(!(cx->cx_type & CXp_TRYBLOCK))
+        panic("TODO: handle CXt_EVAL without CXp_TRYBLOCK\n");
+      if(cx->blk_eval.old_namesv)
+        panic("TODO: handle cx->blk_eval.old_namesv\n");
+      if(cx->blk_eval.cv)
+        panic("TODO: handle cx->blk_eval.cv\n");
+      if(cx->blk_eval.cur_top_env != PL_top_env)
+        panic("TODO: handle cx->blk_eval.cur_top_env\n");
+
+      /*
+       * It seems we don't need to care about blk_eval.old_eval_root or
+       * blk_eval.cur_text, and if we ignore these then it works fine via
+       * string eval().
+       *   https://rt.cpan.org/Ticket/Display.html?id=126036
+       */
+
+      frame->type = CXt_EVAL;
+      frame->gimme = cx->blk_gimme;
+
+      frame->el.eval.retop = cx->blk_eval.retop;
+
+      break;
+    }
+
+    default:
+      panic("TODO: unsure how to handle a context frame of type %d\n", CxTYPE(cx));
+  }
+
+  frame->mortallen = 0;
+  frame->mortals = NULL;
+  if(oldtmpsfloor == -2) {
+    /* Don't worry about it; the next level down will save us */
+  }
+  else {
+    /* Save the mortals! */
+    SV **tmpsbase = PL_tmps_stack + PL_tmps_floor + 1;
+    I32 i;
+
+    frame->mortallen = (I32)(PL_tmps_ix - PL_tmps_floor);
+    if(frame->mortallen) {
+      Newx(frame->mortals, frame->mortallen, SV *);
+      for(i = 0; i < frame->mortallen; i++) {
+        frame->mortals[i] = tmpsbase[i];
+        tmpsbase[i] = NULL;
+      }
+    }
+
+    PL_tmps_ix = PL_tmps_floor;
+    PL_tmps_floor = oldtmpsfloor;
+  }
 }
 
 static bool padname_is_normal_lexical(PADNAME *pname)
@@ -806,7 +953,6 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
   PADLIST *plist;
   PADNAME **padnames;
   PAD *pad;
-  SV **tmpsbase = PL_tmps_stack + PL_tmps_floor + 1;
 
   state->frames = NULL;
 
@@ -824,125 +970,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
     frame->itervar = NULL;
 #endif
 
-    suspend_block(frame, cx);
-
-    if(cx->blk_oldscopesp <= PL_scopestack_ix) {
-#ifdef DEBUGGING
-      frame->scopename = PL_scopestack_name[PL_scopestack_ix-1];
-#endif
-      /* We'll mutate PL_scopestack_ix but it doesn't matter as dounwind() will
-       * put it right at the end. Do this unconditionally to avoid divergent
-       * behaviour between -DDEBUGGING builds and non.
-       */
-      --PL_scopestack_ix;
-    }
-    else {
-#ifdef DEBUGGING
-      frame->scopename = NULL;
-#endif
-    }
-
-    /* ref:
-     *   https://perl5.git.perl.org/perl.git/blob/HEAD:/cop.h
-     */
-    U8 type = CxTYPE(cx);
-    switch(type) {
-      case CXt_BLOCK:
-        frame->type = CXt_BLOCK;
-        frame->gimme = cx->blk_gimme;
-        /* nothing else special */
-        continue;
-
-      case CXt_LOOP_PLAIN:
-        frame->type = type;
-        frame->el.loop = cx->blk_loop;
-        frame->gimme = cx->blk_gimme;
-        break;
-
-#if HAVE_PERL_VERSION(5, 24, 0)
-      case CXt_LOOP_ARY:
-      case CXt_LOOP_LIST:
-#else
-      case CXt_LOOP_FOR:
-#endif
-      case CXt_LOOP_LAZYSV:
-      case CXt_LOOP_LAZYIV:
-        if(!CxPADLOOP(cx))
-          /* non-lexical foreach will effectively work like 'local' and we
-           * can't really support local
-           */
-          croak("Cannot suspend a foreach loop on non-lexical iterator");
-
-        frame->type = type;
-        frame->el.loop = cx->blk_loop;
-        frame->gimme = cx->blk_gimme;
-
-#ifdef HAVE_ITERVAR
-#  ifdef USE_ITHREADS
-        if(cx->blk_loop.itervar_u.svp != (SV **)PL_comppad)
-          panic("TODO: Unsure how to handle a foreach loop with itervar != PL_comppad\n");
-#  else
-        if(cx->blk_loop.itervar_u.svp != &PAD_SVl(cx->blk_loop.my_op->op_targ))
-          panic("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))\n");
-#  endif
-
-        frame->itervar = SvREFCNT_inc(*CxITERVAR(cx));
-#else
-        if(CxITERVAR(cx) != &PAD_SVl(cx->blk_loop.my_op->op_targ))
-          panic("TODO: Unsure how to handle a foreach loop with itervar != PAD_SVl(op_targ))\n");
-        SvREFCNT_inc(cx->blk_loop.itersave);
-#endif
-
-        switch(type) {
-          case CXt_LOOP_LAZYSV:
-            /* these two fields are refcounted, so we need to save them from
-             * dounwind() throwing them away
-             */
-            SvREFCNT_inc(frame->el.loop.state_u.lazysv.cur);
-            SvREFCNT_inc(frame->el.loop.state_u.lazysv.end);
-            break;
-
-#if HAVE_PERL_VERSION(5, 24, 0)
-          case CXt_LOOP_ARY:
-#else
-          case CXt_LOOP_FOR:
-#endif
-            /* this field is also refcounted, so we need to save it too */
-            if(frame->el.loop.state_u.ary.ary)
-              SvREFCNT_inc(frame->el.loop.state_u.ary.ary);
-            break;
-        }
-
-        continue;
-
-      case CXt_EVAL: {
-        if(!(cx->cx_type & CXp_TRYBLOCK))
-          panic("TODO: handle CXt_EVAL without CXp_TRYBLOCK\n");
-        if(cx->blk_eval.old_namesv)
-          panic("TODO: handle cx->blk_eval.old_namesv\n");
-        if(cx->blk_eval.cv)
-          panic("TODO: handle cx->blk_eval.cv\n");
-        if(cx->blk_eval.cur_top_env != PL_top_env)
-          panic("TODO: handle cx->blk_eval.cur_top_env\n");
-
-        /*
-         * It seems we don't need to care about blk_eval.old_eval_root or
-         * blk_eval.cur_text, and if we ignore these then it works fine via
-         * string eval().
-         *   https://rt.cpan.org/Ticket/Display.html?id=126036
-         */
-
-        frame->type = CXt_EVAL;
-        frame->gimme = cx->blk_gimme;
-
-        frame->el.eval.retop = cx->blk_eval.retop;
-
-        continue;
-      }
-
-      default:
-        panic("TODO: unsure how to handle a context frame of type %d\n", CxTYPE(cx));
-    }
+    suspend_frame(frame, cx);
   }
 
   /* Now steal the lexical SVs from the PAD */
@@ -984,25 +1012,90 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
       }
   }
 
-  state->mortallen = (I32)(PL_tmps_ix - PL_tmps_floor);
-  if(state->mortallen) {
-    /* Save the mortals! */
-    I32 i;
-    Newx(state->mortals, state->mortallen, SV *);
-    for(i = 0; i < state->mortallen; i++) {
-      state->mortals[i] = tmpsbase[i];
-      tmpsbase[i] = NULL;
-    }
-    PL_tmps_ix = PL_tmps_floor;
-  }
-
   dounwind(cxix);
 }
 
-#define resume_block(frame, cx)  MY_resume_block(aTHX_ frame, cx)
-static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
+#define resume_frame(frame, cx)  MY_resume_frame(aTHX_ frame)
+static void MY_resume_frame(pTHX_ SuspendedFrame *frame)
 {
   I32 i;
+
+  PERL_CONTEXT *cx;
+  I32 was_scopestack_ix = PL_scopestack_ix;
+
+  switch(frame->type) {
+    case CXt_BLOCK:
+#if !HAVE_PERL_VERSION(5, 24, 0)
+      ENTER_with_name("block");
+      SAVETMPS;
+#endif
+      cx = cx_pushblock(CXt_BLOCK, frame->gimme, PL_stack_sp, PL_savestack_ix);
+      /* nothing else special */
+      break;
+
+    case CXt_LOOP_PLAIN:
+#if !HAVE_PERL_VERSION(5, 24, 0)
+      ENTER_with_name("loop1");
+      SAVETMPS;
+      ENTER_with_name("loop2");
+#endif
+      cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
+      /* don't call cx_pushloop_plain() because it will get this wrong */
+      cx->blk_loop = frame->el.loop;
+      break;
+
+#if HAVE_PERL_VERSION(5, 24, 0)
+    case CXt_LOOP_ARY:
+    case CXt_LOOP_LIST:
+#else
+    case CXt_LOOP_FOR:
+#endif
+    case CXt_LOOP_LAZYSV:
+    case CXt_LOOP_LAZYIV:
+#if !HAVE_PERL_VERSION(5, 24, 0)
+      ENTER_with_name("loop1");
+      SAVETMPS;
+      ENTER_with_name("loop2");
+#endif
+      cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
+      /* don't call cx_pushloop_plain() because it will get this wrong */
+      cx->blk_loop = frame->el.loop;
+#if HAVE_PERL_VERSION(5, 24, 0)
+      cx->cx_type |= CXp_FOR_PAD;
+#endif
+
+#ifdef HAVE_ITERVAR
+#  ifdef USE_ITHREADS
+      cx->blk_loop.itervar_u.svp = (SV **)PL_comppad;
+#  else 
+      cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
+#  endif
+      SvREFCNT_dec(*CxITERVAR(cx));
+      *CxITERVAR(cx) = frame->itervar;
+      frame->itervar = NULL;
+#else
+      cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
+#endif
+      break;
+
+    case CXt_EVAL:
+      if(CATCH_GET)
+        panic("Too late to docatch()\n");
+
+#if !HAVE_PERL_VERSION(5, 24, 0)
+      ENTER_with_name("eval_scope");
+      SAVETMPS;
+#endif
+      cx = cx_pushblock(CXt_EVAL|CXp_TRYBLOCK, frame->gimme,
+        PL_stack_sp, PL_savestack_ix);
+      cx_pusheval(cx, frame->el.eval.retop, NULL);
+      PL_in_eval = EVAL_INEVAL;
+      CLEAR_ERRSV();
+      break;
+
+    default:
+      panic("TODO: Unsure how to restore a %d frame\n", frame->type);
+  }
 
   if(frame->stacklen) {
     dSP;
@@ -1104,6 +1197,23 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 
   if(frame->saved)
     Safefree(frame->saved);
+
+  if(frame->scopes) {
+#ifdef DEBUG
+    if(PL_scopestack_ix - was_scopestack_ix < frame->scopes) {
+      fprintf(stderr, "TODO ARG still more scopes to ENTER\n");
+    }
+#endif
+  }
+
+  if(frame->mortallen) {
+    for(i = 0; i < frame->mortallen; i++) {
+      sv_2mortal(frame->mortals[i]);
+    }
+
+    Safefree(frame->mortals);
+    frame->mortals = NULL;
+  }
 }
 
 #define suspendedstate_resume(state, cv)  MY_suspendedstate_resume(aTHX_ state, cv)
@@ -1128,95 +1238,11 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     state->padslots = NULL;
   }
 
-  if(state->mortallen) {
-    for(i = 0; i < state->mortallen; i++) {
-      sv_2mortal(state->mortals[i]);
-    }
-
-    Safefree(state->mortals);
-    state->mortals = NULL;
-  }
-
   SuspendedFrame *frame, *next;
   for(frame = state->frames; frame; frame = next) {
     next = frame->next;
 
-    PERL_CONTEXT *cx;
-
-#if defined(DEBUGGING) && HAVE_PERL_VERSION(5, 24, 0)
-    /* Apparently, we have to ENTER here on versions of perl before the Grand
-     * Context Stack Refactoring at 5.24, or else the scopename logic will get
-     * upset. See
-     *  https://rt.cpan.org/Ticket/Display.html?id=128164
-     */
-    if(frame->scopename) {
-      ENTER;
-    }
-#endif
-
-    switch(frame->type) {
-      case CXt_BLOCK:
-        cx = cx_pushblock(CXt_BLOCK, frame->gimme, PL_stack_sp, PL_savestack_ix);
-        /* nothing else special */
-        break;
-
-      case CXt_LOOP_PLAIN:
-        cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
-        /* don't call cx_pushloop_plain() because it will get this wrong */
-        cx->blk_loop = frame->el.loop;
-        break;
-
-#if HAVE_PERL_VERSION(5, 24, 0)
-      case CXt_LOOP_ARY:
-      case CXt_LOOP_LIST:
-#else
-      case CXt_LOOP_FOR:
-#endif
-      case CXt_LOOP_LAZYSV:
-      case CXt_LOOP_LAZYIV:
-        cx = cx_pushblock(frame->type, frame->gimme, PL_stack_sp, PL_savestack_ix);
-        /* don't call cx_pushloop_plain() because it will get this wrong */
-        cx->blk_loop = frame->el.loop;
-#if HAVE_PERL_VERSION(5, 24, 0)
-        cx->cx_type |= CXp_FOR_PAD;
-#endif
-
-#ifdef HAVE_ITERVAR
-#  ifdef USE_ITHREADS
-        cx->blk_loop.itervar_u.svp = (SV **)PL_comppad;
-#  else 
-        cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
-#  endif
-        SvREFCNT_dec(*CxITERVAR(cx));
-        *CxITERVAR(cx) = frame->itervar;
-        frame->itervar = NULL;
-#else
-        cx->blk_loop.itervar_u.svp = &PAD_SVl(cx->blk_loop.my_op->op_targ);
-#endif
-        break;
-
-      case CXt_EVAL:
-        if(CATCH_GET)
-          panic("Too late to docatch()\n");
-
-        cx = cx_pushblock(CXt_EVAL|CXp_TRYBLOCK, frame->gimme,
-          PL_stack_sp, PL_savestack_ix);
-        cx_pusheval(cx, frame->el.eval.retop, NULL);
-        PL_in_eval = EVAL_INEVAL;
-        CLEAR_ERRSV();
-        break;
-
-      default:
-        panic("TODO: Unsure how to restore a %d frame\n", frame->type);
-    }
-
-    resume_block(frame, cx);
-
-#ifdef DEBUGGING
-    if(frame->scopename) {
-      PL_scopestack_name[PL_scopestack_ix-1] = frame->scopename;
-    }
-#endif
+    resume_frame(frame, cx);
 
     Safefree(frame);
   }

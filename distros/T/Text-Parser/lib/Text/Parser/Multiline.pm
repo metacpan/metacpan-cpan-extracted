@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.915;
+package Text::Parser::Multiline 0.917;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
@@ -137,7 +137,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.915
+version 0.917
 
 =head1 SYNOPSIS
 
@@ -153,103 +153,55 @@ version 0.915
 
 Some text formats allow users to split a single line into multiple lines, with a continuation character in the beginning or in the end, usually to improve human readability.
 
+This extension allows users to use the familiar C<save_record> interface to save records, as if all the multi-line text inputs were joined.
+
+=head1 OVERVIEW
+
 To handle these types of text formats with the native L<Text::Parser> class, the derived class would need to have a C<save_record> method that would:
 
 =over 4
 
 =item *
 
-Detect if the line is continued, and if it is, save it in a temporary location
+Detect if the line is continued, and if it is, save it in a temporary location. To detect this, the developer has to implement a function named C<L<is_line_continued|Text::Parser/is_line_continued>>.
 
 =item *
 
-Keep appending (or joining) any continued lines to this temporary location
+Keep appending (or joining) any continued lines to this temporary location. For this, the developer has to implement a function named C<L<join_last_line|Text::Parser/join_last_line>>.
 
 =item *
 
-Once the line continuation stops, then create a record and save the record with C<save_record> method
+Once the line continuation has stopped, create and save a data record. The developer needs to write this the same way as earlier, assuming that the text is already joined properly.
 
 =back
 
-It should also look for error conditions:
+It should also look for the following error conditions (see L<Text::Parser::Errors>):
 
 =over 4
 
 =item *
 
-If the end of file is reached, and a joined line is still waiting incomplete, throw an exception "unexpected EOF"
+If the end of file is reached, and the line is expected to be still continued.
 
 =item *
 
-If the first line in a text input happens to be a continuation of a previous line, that is impossible, since it is the first line ; so throw an exception
+If the first line in a text input happens to be a continuation of a previous line, that is impossible, since it is the first line
 
 =back
 
-This gets further complicated by the fact that whereas some multi-line text formats have a way to indicate that the line continues I<after> the current line (like a back-slash character at the end of the line or something), and some other text formats indicate that the current line is a continuation of the I<previous> line. For example, in bash, Tcl, etc., the continuation character is C<\> (back-slash) which, if added to the end of a line of code would imply "there is more on the next line". In contrast, L<SPICE|https://bwrcs.eecs.berkeley.edu/Classes/IcBook/SPICE/> has a continuation character (C<+>) on the next line, indicating that the text on that line should be joined with the I<previous> line.
+To create a multi-line text parser you need to L<determine|Text::Parser/multiline_type> if your parser is a C<'join_next'> type or a C<'join_last'> type.
 
-This extension allows users to use the familiar C<save_record> interface to save records, as if all the multi-line text inputs were joined.
+=head1 METHODS TO BE IMPLEMENTED
 
-=head1 OVERVIEW
-
-To create a multi-line text parser you need to know:
-
-=over 4
-
-=item *
-
-L<Determine|Text::Parser/new> if your parser is a C<'join_next'> type or a C<'join_last'> type.
-
-=item *
-
-Recognize if a line has a continuation pattern
-
-=item *
-
-How to strip the continuation character and join with last line
-
-=back
-
-=head1 REQUIRED METHODS
-
-So here are the things you need to do if you have to write a multi-line text parser:
-
-=over 4
-
-=item *
-
-As usual inherit from L<Text::Parser>, never this class (C<use parent 'Text::Parser'>)
-
-=item *
-
-Override the C<new> constructor to add C<multiline_type> option by default. Read about the option L<here|Text::Parser/new>.
-
-=item *
-
-Override the C<is_line_continued> method to detect if there is a continuation character on the line.
-
-=item *
-
-Override the C<join_last_line> to join the previous line and the current line after stripping any continuation characters.
-
-=item *
-
-Implement your C<save_record> as if you always get joined lines!
-
-=back
-
-That's it! What's more? There are some default implementations for these methods in L<Text::Parser> class already. But if you want to do any stripping of continuation characters etc., you'd want to override these in your own parser class.
-
-=head2 C<< Text::Parser->new(%options) >>
-
-L<Decide|Text::Parser/new> if you want to set any options like C<auto_chomp> by default. In order to get a multi-line parser, you I<must> select one of C<multiline_type> values: C<'join_next'> or C<'join_last'>.
+These methods must be implemented by the developer. There are default implementations provided in L<Text::Parser> but they do nothing.
 
 =head2 C<< $parser->is_line_continued($line) >>
 
-Takes a string argument as input. Returns a boolean that indicates if the current line is continued from the previous line, or is continued on the next line (depending on the type of multi-line text format). You don't need to bother about how the boolean result of this routine is interpreted. That is handled depending on the type of multi-line parser. The way the result of this function is interpreted depends on the type of multi-line parser you make. If it is a C<'join_next'> parser, then a true value from this routine means that some data is expected to be in the I<next> line which is expected to be joined with this line. If instead the parser is C<'join_last'>, then a true value from this method would mean that the current line is a continuation from the I<previous> line, and the current line should be appended to the content of the previous line.
+Takes a string argument as input. Should returns a boolean that indicates if the current line is continued from the previous line, or is continued on the next line (depending on the type of multi-line text format). If parser is a C<'join_next'> parser, then a true value from this routine means that some data is expected to be in the I<next> line which is expected to be joined with this line. If instead the parser is C<'join_last'>, then a true value from this method would mean that the current line is a continuation from the I<previous> line, and the current line should be appended to the content of the previous line.
 
 =head2 C<< $parser->join_last_line($last_line, $current_line) >>
 
-Takes two string arguments. The first is the line previously read which is expected to be continued on this line. You can be certain that the two strings will not be C<undef>. Your method should return a string that has stripped any continuation characters, and joined the current line with the previous line. You don't need to bother about where and how this is being saved. You also don't need to bother about where the last line is stored/coming from. The management of the last line is handled internally.
+Takes two string arguments. The first is the line previously read which is expected to be continued on this line. You can be certain that the two strings will not be C<undef>. Your method should return a string that has stripped any continuation characters, and joined the current line with the previous line.
 
 =head1 BUGS
 

@@ -10,7 +10,9 @@ dist.ini
 lib/File/Create/Layout.pm
 t/00-compile.t
 t/01-layout.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-rinci.t
+t/sample.t
 weaver.ini

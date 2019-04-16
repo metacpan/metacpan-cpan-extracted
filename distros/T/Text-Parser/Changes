@@ -1,5 +1,16 @@
 Revision history for Text-Parser
 
+0.917     2019-04-15 22:56:49-07:00 America/Los_Angeles
+  - Fixed broken link in pod as reported by CPANTS. #15 (by M Anwar)
+  - Fixed a similar broken link in pod as reported in CPANTS for save_record from Autoplit.pm
+  - Added a new test to check that when both auto_split and auto_trim are on, auto_trim works first
+
+0.916     2019-04-15 20:12:03-07:00 America/Los_Angeles
+  - Minor patches to ensure class doesn't fail due to Syntax::Keyword::Try
+  - Added test for one POD example
+  - Made exceptions prominent on main POD page
+  - Cleaned up CONTRIBUTING.md
+
 0.915     2019-04-14 23:50:51-07:00 America/Los_Angeles
   - Remove exceptions based on Exception::Class and use Throwable::SugarFactory instead
   - Add Text::Parser::Errors. Use exceptions from here in Text::Parser code.
