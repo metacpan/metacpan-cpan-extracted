@@ -6,12 +6,13 @@ use Mojo::JSON;
 use Mojo::UserAgent;
 use Mojo::Util qw(dumper url_escape);
 
-use constant DEBUG => $ENV{MOJO_TRANSMISSION_DEBUG} || 0;
+use constant DEBUG          => $ENV{TRANSMISSION_DEBUG} || 0;
+use constant RETURN_PROMISE => sub { };
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @EXPORT_OK = qw(tr_status);
 
-has default_trackers => sub { [] };
+has default_trackers => sub { [split /,/, ($ENV{TRANSMISSION_DEFAULT_TRACKERS} || '')] };
 has ua               => sub { Mojo::UserAgent->new; };
 has url =>
   sub { Mojo::URL->new($ENV{TRANSMISSION_RPC_URL} || 'http://localhost:9091/transmission/rpc'); };
@@ -35,8 +36,10 @@ sub add {
   $self->_post('torrent-add', {filename => "$url"}, $cb);
 }
 
+sub add_p { shift->add(shift, RETURN_PROMISE) }
+
 sub session {
-  my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
+  my $cb   = ref $_[-1] eq 'CODE' ? pop : undef;
   my $self = shift;
 
   return $self->_post('session-get', $_[0], $cb) if ref $_[0] eq 'ARRAY';
@@ -45,10 +48,14 @@ sub session {
   die 'Invalid input.';
 }
 
+sub session_p { shift->session(shift, RETURN_PROMISE) }
+
 sub stats {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
   return shift->_post('session-stats', {}, $cb);
 }
+
+sub stats_p { shift->_post('session-stats', {}, RETURN_PROMISE) }
 
 sub torrent {
   my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
@@ -71,41 +78,43 @@ sub torrent {
     return $self->_post('torrent-remove', {ids => $id, 'delete-local-data' => Mojo::JSON->true},
       $cb);
   }
+  else {
+    return $self->_post("torrent-$args", {ids => $id}, $cb);
+  }
+}
 
-  return $self->_post("torrent-$args", {ids => $id}, $cb);
+sub torrent_p { shift->torrent(@_, RETURN_PROMISE) }
+
+sub _done {
+  my ($self, $cb, $res) = @_;
+  $self->$cb($res) unless $cb eq RETURN_PROMISE;
+  return $res;
 }
 
 sub _post {
   my ($self, $method, $req, $cb) = @_;
-
   $req = {arguments => $req, method => $method};
 
-  # non-blocking
+  # Non-Blocking
   if ($cb) {
-    Mojo::IOLoop->delay(
-      sub {
-        my ($delay) = @_;
-        warn '[TRANSMISSION] <<< ', dumper($req), "\n" if DEBUG;
-        $self->ua->post($self->url, $self->_headers, json => $req, $delay->begin);
-      },
-      sub {
-        my ($delay, $tx) = @_;
-        warn '[TRANSMISSION] >>> ', dumper($tx->res->json || $tx->res->error), "\n" if DEBUG;
-        return $self->$cb(_res($tx)) unless ($tx->res->code // 0) == 409;
-        $self->{session_id} = $tx->res->headers->header('X-Transmission-Session-Id');
-        $self->ua->post($self->url, $self->_headers, json => $req, $delay->begin);
-      },
-      sub {
-        my ($delay, $tx) = @_;
-        warn '[TRANSMISSION] >>> ', dumper($tx->res->json || $tx->res->error), "\n" if DEBUG;
-        $self->$cb(_res($tx));
-      },
-    );
+    warn '[TRANSMISSION] <<< ', dumper($req), "\n" if DEBUG;
+    my $p = $self->ua->post_p($self->url, $self->_headers, json => $req)->then(sub {
+      my $tx = shift;
+      warn '[TRANSMISSION] >>> ', dumper($tx->res->json || $tx->res->error), "\n" if DEBUG;
+      return $self->_done($cb, _res($tx)) unless ($tx->res->code // 0) == 409;
+      $self->{session_id} = $tx->res->headers->header('X-Transmission-Session-Id');
+      return $self->ua->post_p($self->url, $self->_headers, json => $req);
+    })->then(sub {
+      return $_[0] if ref $_[0] eq 'HASH';    # _done() is already called
+      my $tx = shift;
+      warn '[TRANSMISSION] >>> ', dumper($tx->res->json || $tx->res->error), "\n" if DEBUG;
+      return $self->_done($cb, _res($tx));
+    });
 
-    return $self;
+    return $cb eq RETURN_PROMISE ? $p : $self;
   }
 
-  # blocking
+  # Blocking
   else {
     warn '[TRANSMISSION] <<< ', dumper($req), "\n" if DEBUG;
     my $tx = $self->ua->post($self->url, $self->_headers, json => $req);
@@ -152,32 +161,32 @@ L<Transmission API|https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec
 
 =head1 SYNOPSIS
 
-  my $t = Mojo::Transmission->new;
-  $t->add(url => "http://releases.ubuntu.com/17.10/ubuntu-17.10.1-desktop-amd64.iso.torrent");
+  my $transmission = Mojo::Transmission->new;
+  $transmission->add(url => "http://releases.ubuntu.com/17.10/ubuntu-17.10.1-desktop-amd64.iso.torrent");
 
-  my $torrents = $t->torrent([]);
-  $t->torrent(remove => $torrents[0]->{id}) if @$torrents;
+  my $torrents = $transmission->torrent([]);
+  $transmission->torrent(remove => $torrents[0]->{id}) if @$torrents;
 
 =head1 ATTRIBUTES
 
 =head2 default_trackers
 
-  $array_ref = $self->default_trackers;
-  $self = $self->default_trackers([$url, ...]);
+  $array_ref    = $transmission->default_trackers;
+  $transmission = $transmission->default_trackers([$url, ...]);
 
 Holds a list of default trackers that can be used by L</add>.
 
 =head2 ua
 
-  $ua = $self->ua;
-  $self = $self->ua(Mojo::UserAgent->new);
+  $ua           = $transmission->ua;
+  $transmission = $transmission->ua(Mojo::UserAgent->new);
 
 Holds a L<Mojo::UserAgent> used to issue requests to backend.
 
 =head2 url
 
-  $url = $self->url;
-  $self = $self->url(Mojo::URL->new);
+  $url          = $transmission->url;
+  $transmission = $transmission->url(Mojo::URL->new);
 
 L<Mojo::URL> object holding the URL to the transmission daemon.
 Default to the C<TRANSMISSION_RPC_URL> environment variable or
@@ -188,64 +197,83 @@ Default to the C<TRANSMISSION_RPC_URL> environment variable or
 =head2 add
 
   # Generic call
-  $res = $self->add(\%args);
-  $self = $self->add(\%args, sub { my ($self, $res) = @_ });
+  $res          = $transmission->add(\%args);
+  $transmission = $transmission->add(\%args, sub { my ($transmission, $res) = @_ });
 
   # magnet:?xt=${xt}&dn=${dn}&tr=${tr}
-  $self->add({xt => "...", dn => "...", tr => [...]});
+  $transmission->add({xt => "...", dn => "...", tr => [...]});
 
   # magnet:?xt=urn:btih:${hash}&dn=${dn}&tr=${tr}
-  $self->add({hash => "...", dn => "...", tr => [...]});
+  $transmission->add({hash => "...", dn => "...", tr => [...]});
 
   # Custom URL or file
-  $self->add({url => "...", tr => [...]});
+  $transmission->add({url => "...", tr => [...]});
 
 This method can be used to add a torrent. C<tr> defaults to L</default_trackers>.
 
 See also L<https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L356>.
 
+=head2 add_p
+
+  $promise = $transmission->add_p(\%args);
+
+Same as L</add>, but returns a promise.
+
 =head2 session
 
   # session-get
-  $self = $self->session([], sub { my ($self, $res) = @_; });
-  $res = $self->session([]);
+  $transmission = $transmission->session([], sub { my ($transmission, $res) = @_; });
+  $res          = $transmission->session([]);
 
   # session-set
-  $self = $self->session(\%attrs, sub { my ($self, $res) = @_; });
-  $res = $self->session(\%attrs);
+  $transmission = $transmission->session(\%attrs, sub { my ($transmission, $res) = @_; });
+  $res          = $transmission->session(\%attrs);
 
 Used to get or set Transmission session arguments.
 
 See also L<https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L444>.
 
+=head2 session_p
+
+  $promise = $transmission->session_p([]);
+  $promise = $transmission->session_p(\%args);
+
+Same as L</session>, but returns a promise.
+
 =head2 stats
 
   # session-stats
-  $self = $self->stats(sub { my ($self, $res) = @_; });
-  $res = $self->stats;
+  $transmission = $transmission->stats(sub { my ($transmission, $res) = @_; });
+  $res          = $transmission->stats;
 
 Used to retrieve Transmission statistics.
+
+=head2 stats_p
+
+  $promise = $transmission->stats_p;
+
+Same as L</stats>, but returns a promise.
 
 See also L<https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L531>.
 
 =head2 torrent
 
   # torrent-get
-  $self = $self->torrent(\@attrs, $id, sub { my ($self, $res) = @_; });
-  $res = $self->torrent(\@attrs, $id);
+  $transmission = $transmission->torrent(\@attrs, $id, sub { my ($transmission, $res) = @_; });
+  $res          = $transmission->torrent(\@attrs, $id);
 
   # torrent-set
-  $self = $self->torrent(\%attrs, $id, sub { my ($self, $res) = @_; });
-  $res = $self->torrent(\%attrs, $id);
+  $transmission = $transmission->torrent(\%attrs, $id, sub { my ($transmission, $res) = @_; });
+  $res          = $transmission->torrent(\%attrs, $id);
 
   # torrent-$action
-  $self = $self->torrent(remove  => $id, sub { my ($self, $res) = @_; });
-  $self = $self->torrent(start   => $id, sub { my ($self, $res) = @_; });
-  $self = $self->torrent(stop    => $id, sub { my ($self, $res) = @_; });
-  $res  = $self->torrent($action => $id);
+  $transmission = $transmission->torrent(remove  => $id, sub { my ($transmission, $res) = @_; });
+  $transmission = $transmission->torrent(start   => $id, sub { my ($transmission, $res) = @_; });
+  $transmission = $transmission->torrent(stop    => $id, sub { my ($transmission, $res) = @_; });
+  $res          = $transmission->torrent($action => $id);
 
   # torrent-remove + delete-local-data
-  $self = $self->torrent(purge => $id, sub { my ($self, $res) = @_; });
+  $transmission = $transmission->torrent(purge => $id, sub { my ($transmission, $res) = @_; });
 
 Used to get or set torrent related attributes or execute an action on a torrent.
 
@@ -269,6 +297,14 @@ L<https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L90>
 L<https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L71>.
 
 =back
+
+=head2 torrent_p
+
+  $promise = $transmission->torrent_p(\@attrs, ...);
+  $promise = $transmission->torrent_p(\%attrs, ...);
+  $promise = $transmission->torrent_p($action => ...);
+
+Same as L</torrent>, but returns a promise.
 
 =head1 FUNCTIONS
 

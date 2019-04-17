@@ -30,11 +30,11 @@ Log::AutoDump - Log with automatic dumping of references and objects.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 $VERSION = eval $VERSION;
 

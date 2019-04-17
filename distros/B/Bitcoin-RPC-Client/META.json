@@ -42,9 +42,13 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/whindsx/Bitcoin-RPC-Client",
-         "web" : ""
-      }
+         "url" : "https://github.com/whindsx/Bitcoin-RPC-Client.git",
+         "web" : "https://github.com/whindsx/Bitcoin-RPC-Client"
+      },
+      "bugtracker" : {
+          "web" : "https://github.com/whindsx/Bitcoin-RPC-Client/issues"
+      },
+      "homepage" : "https://github.com/whindsx/Bitcoin-RPC-Client"
    },
-   "version" : "0.08"
+   "version" : "0.09"
 }

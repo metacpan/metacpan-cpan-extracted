@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..11\n"; }
+BEGIN { $| = 1; print "1..14\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Net::CIDR;
 $loaded = 1;
@@ -131,4 +131,56 @@ if (Net::CIDR::cidrvalidate("fe80:0:120::/44"))
 else
 {
     print "not ok 11\n";
+}
+
+my @only4 = qw(
+    10.0.0.0/24
+    10.0.1.0/24
+);
+
+my @only6 = qw(
+    2001:db8::/64
+    2001:db8:1::/64
+);
+
+my @dualstack = qw(
+    10.0.2.0/24
+    2001:db8:2::/64
+);
+
+if (join("",
+    Net::CIDR::cidrlookup("10.0.0.1", @only4),
+    Net::CIDR::cidrlookup("10.0.10.1", @only4),
+    Net::CIDR::cidrlookup("2001:db8::1", @only4)) eq "100")
+{
+    print "ok 12\n";
+}
+else
+{
+    print "not ok 12\n";
+}
+
+if (join("",
+    Net::CIDR::cidrlookup("2001:db8::1", @only6),
+    Net::CIDR::cidrlookup("2001:db8:a::1", @only6),
+    Net::CIDR::cidrlookup("10.0.0.1", @only6)) eq "100")
+{
+    print "ok 13\n";
+}
+else
+{
+    print "not ok 13\n";
+}
+
+if (join("",
+    Net::CIDR::cidrlookup("10.0.2.1", @dualstack),
+    Net::CIDR::cidrlookup("10.0.20.1", @dualstack),
+    Net::CIDR::cidrlookup("2001:db8:2::1", @dualstack),
+    Net::CIDR::cidrlookup("2001:db8:20::1", @dualstack)))
+{
+    print "ok 14\n";
+}
+else
+{
+    print "not ok 14\n";
 }

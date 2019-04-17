@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <inttypes.h>
 #include <float.h>
 #include <time.h>
@@ -10,6 +11,41 @@
 #include <memory.h>
 #include <fcntl.h>
 #include <assert.h>
+
+int32_t SPNATIVE__SPVM__CORE__strerror(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_number = stack[0].ival;
+  const char* string_error = strerror(error_number);
+  
+  void* obj_string_error = env->new_str(env, string_error);
+  
+  stack[0].oval = obj_string_error;
+  
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__CORE__getenv(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+  void* obj_name = stack[0].oval;
+  if (obj_name == NULL) {
+    SPVM_DIE("Name must be defined", "SPVM/CORE.c", __LINE__);
+  }
+  const char* name = (const char*)env->belems(env, obj_name);
+  
+  const char* value = getenv(name);
+  
+  void* obj_value;
+  if (value == NULL) {
+    obj_value = NULL;
+  }
+  else {
+    obj_value = env->new_str(env, value);
+  }
+  
+  stack[0].oval = obj_value;
+  
+  return SPVM_SUCCESS;
+}
 
 int32_t SPNATIVE__SPVM__CORE__abs(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;

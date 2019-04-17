@@ -1,0 +1,46 @@
+Telugu-Keyword
+===========================
+
+Perl extension to provide Telugu keywords. It allows you to write Perl in Telugu script
+
+SYNOPSIS
+
+    use Telugu::Keyword;
+    use utf8;
+    binmode STDOUT, ":encoding(UTF-8)";
+
+    ధర్మం డోర్స్($ఎన్ని) {
+         నా @డోర్స్;
+         కొఱకు $పాస్ (1 .. $ఎన్ని) {
+               కొఱకు $ఎ (1 .. $ఎన్ని) {
+                     ఐతే (0 == $ఎ % $పాస్) {
+		            $డోర్స్[$ఎ] = !$డోర్స్[$ఎ];
+            	     }
+  	       }
+         }
+         కొఱకు $ఎ (1 .. $ఎన్ని) {
+                ముద్రణ "డోర్ $ఎ ", $డోర్స్[$ఎ] ? "తెర్చుంది" : "మూసుంది";
+         }
+    }
+
+    డోర్స్(100);
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DOCUMENTATION
+
+   perldoc Telugu::Keyword
+
+Copyright (C) 2019 by Rajkumar Reddy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
+at your option, any later version of Perl 5 you may have available.

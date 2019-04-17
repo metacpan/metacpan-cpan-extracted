@@ -43,11 +43,11 @@ if ( $opt{n} ) {
 }
 
 if ($^O eq 'MSWin32') {
-    @exe_files = map {"bin/$_"} @exe_files;
+    @exe_files = map {"script/$_"} @exe_files;
     foreach (@exe_files) {`pl2bat $_`}
     @clean_files = @exe_files = grep {-e $_} map {"$_.bat"} @exe_files;
 } elsif ($^O eq 'VMS') {
-    foreach my $fni (map {"[.bin]$_"} @exe_files) {
+    foreach my $fni (map {"[.script]$_"} @exe_files) {
 	my $fno = "$fni.com";
 	open (my $fhi, '<', $fni) or die "Unable to open $fni: $!\n";
 	open (my $fho, '>', $fno) or die "Unable to open $fno: $!\n";
@@ -56,9 +56,9 @@ if ($^O eq 'MSWin32') {
 	close $fho;
 	close $fhi;
     }
-    @clean_files = @exe_files = map {"[.bin]$_.com"} @exe_files;
+    @clean_files = @exe_files = map {"[.script]$_.com"} @exe_files;
 } else {
-    @exe_files = map {"bin/$_"} @exe_files;
+    @exe_files = map {"script/$_"} @exe_files;
 }
 
 (my $mmv = ExtUtils::MakeMaker->VERSION) =~ s/_//g;

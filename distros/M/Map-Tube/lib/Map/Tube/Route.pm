@@ -1,6 +1,6 @@
 package Map::Tube::Route;
 
-$Map::Tube::Route::VERSION   = '3.60';
+$Map::Tube::Route::VERSION   = '3.61';
 $Map::Tube::Route::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Route - Class to represent the route in the map.
 
 =head1 VERSION
 
-Version 3.60
+Version 3.61
 
 =cut
 
@@ -28,7 +28,7 @@ has nodes => (is => 'ro', isa => Nodes, required => 1);
 
 =head1 DESCRIPTION
 
-It provides simple interface to the 'route' of the map.
+It provides simple interface to the C<route> of the map.
 
 =head1 METHODS
 
@@ -43,7 +43,7 @@ Returns an object of type L<Map::Tube::Node> representing the end station.
 =head2 nodes()
 
 Returns ref to a list of objects of type L<Map::Tube::Node> representing the path
-from "start" to "end" station.
+from C<start> to C<end> station.
 
 =head2 preferred()
 

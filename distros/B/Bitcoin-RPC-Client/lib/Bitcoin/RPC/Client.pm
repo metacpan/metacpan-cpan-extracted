@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use JSON::RPC::Legacy::Client;
 
-our $VERSION  = '0.08';
+our $VERSION  = '0.09';
 
 has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Legacy::Client"->new });
 has user     => (is => 'ro');
@@ -187,7 +187,7 @@ Bitcoin::RPC::Client - Bitcoin Core JSON RPC Client
 
    # Send to an address
    #     https://bitcoin.org/en/developer-reference#sendtoaddress
-   $transid = $btc->sendtoaddress("1Ky49cu7FLcfVmuQEHLa1WjhRiqJU2jHxe","0.01");
+   $transid = $btc->sendtoaddress("18uqrhFDnbkemSG1bCfRCh5G5D9jaaQUVb","0.01");
 
    # See ex/example.pl for more in depth JSON handling:
    #     https://github.com/whindsx/Bitcoin-RPC-Client/tree/master/ex
@@ -254,7 +254,7 @@ https://github.com/whindsx/Bitcoin-RPC-Client.git
 
 =head1 DONATE
 
-1Ky49cu7FLcfVmuQEHLa1WjhRiqJU2jHxe
+18uqrhFDnbkemSG1bCfRCh5G5D9jaaQUVb
 
 =head1 LICENSE AND COPYRIGHT
 

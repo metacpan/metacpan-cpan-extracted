@@ -3,12 +3,13 @@ abstract: 'Interface to open3 under AnyEvent'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
+  Test::More: '0.98'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +22,13 @@ requires:
   perl: '5.006'
 resources:
   bugtracker: https://github.com/plicease/AnyEvent-Open3-Simple/issues
-  homepage: http://perl.wdlabs.com/AnyEvent-Open3-Simple
+  homepage: https://metacpan.org/pod/AnyEvent::Open3::Simple
   repository: git://github.com/plicease/AnyEvent-Open3-Simple.git
-version: '0.86'
+version: '0.87'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Stephen R. Scaffidi'
+  - 'Scott Wiersdorf'
+x_generated_by_perl: v5.29.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_use_unsafe_inc: 0

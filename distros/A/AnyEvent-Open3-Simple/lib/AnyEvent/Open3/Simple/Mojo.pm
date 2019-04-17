@@ -5,7 +5,7 @@ use warnings;
 use POSIX ':sys_wait_h';
 
 # ABSTRACT: Code for the AnyEvent::Open3::Simple mojo implementation
-our $VERSION = '0.86'; # VERSION
+our $VERSION = '0.87'; # VERSION
 
 if($^O eq 'MSWin32')
 {
@@ -47,7 +47,7 @@ AnyEvent::Open3::Simple::Mojo - Code for the AnyEvent::Open3::Simple mojo implem
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 AUTHOR
 
@@ -61,7 +61,7 @@ Scott Wiersdorf
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

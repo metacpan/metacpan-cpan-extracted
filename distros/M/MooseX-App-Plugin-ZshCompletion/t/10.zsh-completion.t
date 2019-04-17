@@ -3,8 +3,9 @@ use warnings;
 use Test::More tests => 3;
 
 use FindBin '$Bin';
-use lib "$Bin/../examples/lib";
-use MyApp;
+use lib "$Bin/lib";
+use
+    MyApp;
 
 MooseX::App::ParsedArgv->new(argv => [qw(zsh_completion)]);
 my $test01 = MyApp->new_with_command;

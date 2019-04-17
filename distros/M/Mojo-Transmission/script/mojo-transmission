@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+use Applify;
+use Mojo::Util;
+
+documentation __FILE__;
+
+option string => url      => 'URL to Transmission server', $ENV{TRANSMISSION_RPC_URL};
+option string => trackers => 'URL to trackers',            n_of => '@';
+
+sub t {
+  my $self = shift;
+  return $self->{t} ||= do {
+    require Mojo::Transmission;
+    Mojo::Transmission->new(
+      default_trackers => $self->trackers || [split /,/, $ENV{TRANSMISSION_DEFAULT_TRACKERS}],
+      url              => $self->url,
+    );
+  };
+}
+
+for my $method (qw(purge remove start stop)) {
+  Mojo::Util::monkey_patch(__PACKAGE__,
+    "action_$method" => sub {
+      my $self = shift;
+      return print "Need to specify at least one ID.\n" unless @_;
+      return $self->_call(torrent => $method => [_ids(@_)]);
+    }
+  );
+}
+
+sub action_add {
+  my ($self, @args) = @_;
+  unshift @args, $args[0] =~ m!^[0-9A-Fa-f]+$! ? 'hash' : 'url' if @args % 2;
+  return $self->_call(add => {_kv(@args)});
+}
+
+sub action_session {
+  my ($self, @args) = @_;
+  return $self->_call(session => [@args]) unless my %kv = _kv(@args);
+  return $self->_call(session => \%kv);
+}
+
+sub action_t {
+  my ($self, $id, @args) = @_;
+  my @ids = _ids(defined $id ? $id : '');
+
+  return $self->_call(torrent => [@args], [@ids]) unless my %kv = _kv(@args);
+  return $self->_call(torrent => \%kv,    [@ids]);
+}
+
+sub _call {
+  my ($self, $method, @args) = @_;
+  my $res = $self->t->$method(@args);
+
+  return print Mojo::JSON::encode_json($res) ? 0 : 1 unless my $err = $res->{error};
+  printf "Error: %s\n", $err->{message} || Mojo::JSON::encode_json($res);
+  return int($err->{code} / 100) || 1;
+}
+
+sub _ids {
+  return map { split /\D+/ } @_;
+}
+
+sub _kv {
+  return unless @_ and $_[0] =~ /=/;
+  return map {
+    my @kv = split /=/, $_, 2;
+    $kv[1] = split /,/, ($kv[1] // '');
+    @kv;
+  } @_;
+}
+
+app {
+  my ($self, $action, @args) = @_;
+  $action ||= 'print_help';
+
+  if (my $method = $self->can("action_$action")) {
+    return $self->$method(@args);
+  }
+  elsif ($self->t->can($action)) {
+    return $self->_call($action);
+  }
+
+  $self->_script->print_help;
+  return 0;
+};
+
+__END__
+
+=head1 NAME
+
+mojo-transmission - Command line utility for talking to a Transmission server
+
+=head1 SYNOPSIS
+
+  # Tell mojo-transmission where the Transmission server is
+  # and optionally set default trackers
+  $ export TRANSMISSION_RPC_URL=http://10.0.0.2:9091
+  $ export TRANSMISSION_DEFAULT_TRACKERS=x,y,z
+
+  # Add a torrent either by URL or magnet hash
+  $ mojo-transmission add http://releases.ubuntu.com/18.04/ubuntu-18.04-desktop-amd64.iso.torrent
+  $ mojo-transmission add url=http://releases.ubuntu.com/18.04/ubuntu-18.04-desktop-amd64.iso.torrent
+  $ mojo-transmission add c12fe1c06bba254a9dc9f519b335aa7c1367a88a
+  $ mojo-transmission add xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a
+
+  # Get or set session parameters
+  # https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L444
+  $ mojo-transmission session
+  $ mojo-transmission session download-dir=/tmp encryption=tolerated
+
+  # Get statistics
+  $ mojo-transmission stats
+
+  # Execute actions on a list of torrents
+  $ mojo-transmission purge 1,2,3
+  $ mojo-transmission remove 1,2,3
+  $ mojo-transmission start 1,2,3
+  $ mojo-transmission stop 1,2,3
+
+  # List all torrents or get/set information about torrents
+  # https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L90
+  # https://trac.transmissionbt.com/browser/trunk/extras/rpc-spec.txt#L127
+  $ mojo-transmission t
+  $ mojo-transmission t 1,2,3
+  $ mojo-transmission t 1,2,3 name downloadDir rateDownload rateUpload totalSize
+  $ mojo-transmission t 1,2,3 files-wanted=x,y,z uploadLimit=1000
+
+=head1 AUTHOR
+
+Jan Henning Thorsen - C<jhthorsen@cpan.org>
+
+=cut

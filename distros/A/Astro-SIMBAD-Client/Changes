@@ -1,3 +1,8 @@
+0.039		2019-04-16	T. R. Wyant
+    Tweak canned test data.  SIMBAD changed the radial velocity of
+    Arctusus; because the test checks the actual data returned, I have
+    to follow it.
+
 0.038		2018-10-02	T. R. Wyant
     Properly test without https: support. This means checking and
     skipping, but it also means including LWP::Protocol::https in the

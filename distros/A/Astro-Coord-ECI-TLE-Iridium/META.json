@@ -29,6 +29,11 @@
             "Test::More" : "0.88"
          }
       },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Astro::Coord::ECI::TLE" : "0.091",
@@ -47,7 +52,7 @@
    "provides" : {
       "Astro::Coord::ECI::TLE::Iridium" : {
          "file" : "lib/Astro/Coord/ECI/TLE/Iridium.pm",
-         "version" : "0.118"
+         "version" : "0.119"
       }
    },
    "release_status" : "stable",
@@ -65,6 +70,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium"
       }
    },
-   "version" : "0.118",
+   "version" : "0.119",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,3 +1,7 @@
+2.013005 2019-04-17
+ - zap IO/HDF as that's in separate distro
+ - hide PDLA package declaration from IO/Storage as PAUSE tries to index
+
 2.013004 2019-04-15
  - strip out duplicate PDLA::Core stuff, dep on that distro
  - updates of tests and modules that broke with PDLA's smaller default imports

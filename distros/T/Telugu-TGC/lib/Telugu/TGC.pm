@@ -6,9 +6,9 @@ use Kavorka -all;
 use utf8;
 
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
-# V[m] | CH | {CH}C[v][m] | D | F | Hpv | W | Sid | N | Other
+# V[m] | CH | {CH}C[v][m] | D | F | Hpv | W | Sid | N | Other | NT
 
 # []  - 0 or 1 times
 # {}  - zero or more times
@@ -20,7 +20,6 @@ our $VERSION = '0.03';
 # H   - Virama
 # D   - Digit
 # F   - fraction
-# Hpv - Historic phonetic variants
 # W   - Weights
 # Sid - Siddham
 # N   - Never occurs, if script is written properly it never matches
@@ -40,7 +39,7 @@ method TE::String::X() {
 }
 
 method TE::Tgc::X() {
-  ($self->{S} || $self->{Vm} || $self->{CH} || $self->{CHCvm} || $self->{D} || $self->{F} || $self->{Hpv} || $self->{W} ||  $self->{Sid} || $self->{N} || $self->{Other})->X();
+  ($self->{S} || $self->{Vm} || $self->{CH} || $self->{CHCvm} || $self->{D} || $self->{F} || $self->{W} ||  $self->{Sid} || $self->{N} || $self->{Other} || $self->{NT})->X() ;
 }
 
 method TE::S::X() {
@@ -67,10 +66,6 @@ method TE::F::X() {
   push @result, $self->{''};
 }
 
-method TE::Hpv::X() {
-  push @result, $self->{''};
-}
-
 method TE::W::X() {
   push @result, $self->{''};
 }
@@ -88,27 +83,31 @@ method TE::Other::X() {
 }
 
 
+method TE::NT::X() {
+  push @result, $self->{''};
+}
+
 my $parser = qr {
     <nocontext:>
     <String>
     <objrule:  TE::String>        <[Tgc]>+
-    <objrule:  TE::Tgc>           <ws: (\s++)*> <S> | <Vm> | <CH> | <CHCvm> | <D> | <F> | <Hpv> | <W> | <Sid> | <N> | <Other>
+    <objrule:  TE::Tgc>           <ws: (\s++)*> <S> | <Vm> | <CH> | <CHCvm> | <D> | <F> | <W> | <Sid> | <N> | <Other> | <NT>
     <objrule:  TE::Vm>            <V><m_>
     <objrule:  TE::CHCvm>         <CH__><C><v_><m_>
-    <objtoken: TE::CH>            ([క-హ])( ్\b )
-    <objtoken: TE::V>             [అ-ఔ ౠ-ౡ]
-    <objtoken: TE::m_>            [ఀ-ఄ ఽ ౕ ౖ]?
-    <objtoken: TE::CH__>          (([క-హ])(్))*
-    <objtoken: TE::C>             [క-హ]
-    <objtoken: TE::v_>            [ా-ౌ ౢ ౣ]?
+    <objtoken: TE::CH>            ([క-హౘ-ౚ])(్\b)
+    <objtoken: TE::V>             [అ-ఔౠ-ౡ]
+    <objtoken: TE::m_>            [ఀ-ఄఽౕౖ]?
+    <objtoken: TE::CH__>          (([క-హౘ-ౚ])(్))*
+    <objtoken: TE::C>             [క-హౘ-ౚ]
+    <objtoken: TE::v_>            [ా-ౌౢౣ]?
     <objtoken: TE::D>             [౦-౯]
     <objtoken: TE::F>             [౸-౾]
-    <objtoken: TE::Hpv>           [ౘ-ౚ]
     <objtoken: TE::W>             [౿]
     <objtoken: TE::Sid>           [౷]
-    <objtoken: TE::N>             [ా-ౌ ౢ ౣ ఀ-ఄ ఽ ౕ ౖ]
+    <objtoken: TE::N>             [ా-ౌౢౣఀ-ఄఽౕౖ]
     <objtoken: TE::S>             [ ]
-    <objtoken: TE::Other>         [^ఀ-౿]
+    <objtoken: TE::Other>         [ఀ-౿]
+    <objtoken: TE::NT>            [^ఀ-౿]
 }xms;
 
 
@@ -126,7 +125,7 @@ __END__
 
 =head1 NAME
 
-Telugu::TGC - Perl extension for tailored grapheme clusters for Telugu script.
+Telugu::TGC - Tailored grapheme clusters for Telugu languauge.
 
 =head1 SYNOPSIS
 
@@ -145,16 +144,8 @@ This module provides one function, TGC.
 This function takes a string and returns an array.
 
 
-=head1 SEE ALSO
-
-https://www.unicode.org/charts/PDF/U0C00.pdf
-http://www.unicode.org/L2/L2016/16161-indic-text-seg.pdf
-http://unicode.org/reports/tr29/
-
-
 =head1 BUGS
 
-None reported
 Please send me email, if you find any bugs
 
 

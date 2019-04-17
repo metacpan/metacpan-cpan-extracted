@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.60';
+$Map::Tube::VERSION   = '3.61';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.60
+Version 3.61
 
 =cut
 
@@ -54,8 +54,8 @@ use namespace::autoclean;
 =head1 DESCRIPTION
 
 The core module defined as Role (Moo) to process  the map data.  It provides the
-the interface to find the shortest route in terms of stoppage between two nodes.
-Also you can get all possible routes between two given nodes.
+interface to find the shortest route in terms of stoppage between two nodes.Also
+you can get all possible routes between two given nodes.
 
 If you are keen to know the internals of L<Map::Tube> then please follow the note
 documented in L<Map::Tube::Cookbook>.
@@ -472,8 +472,9 @@ sub get_next_stations {
 =head2 bgcolor($color)
 
 Set the background color for the map. It is optional. Please set it before making
-call to method C<as_image()>. If not set, it will try to  guess and may not be as
-good as you would expect. The C<$color> can be a simply color name or hash code.
+call to method L<Map::Tube::Plugin::Graph/"as_image($line_name)">. If not set, it
+will try to guess and may not be as good as you would expect.The C<$color> can be
+a simply color name or hash code.
 
 =cut
 

@@ -1,0 +1,6 @@
+Revision history for Perl extension Telugu::Keyword.
+
+0.01  Thu Mar 21 19:44:49 2019
+	- original version; created by h2xs 1.23 with options
+		-Xn Telugu::Keyword
+

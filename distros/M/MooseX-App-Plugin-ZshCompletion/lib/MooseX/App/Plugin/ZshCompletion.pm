@@ -5,7 +5,7 @@ package MooseX::App::Plugin::ZshCompletion;
 
 use 5.010;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use namespace::autoclean;
 use Moose::Role;
@@ -50,12 +50,12 @@ In your base class:
 
 In your .zshrc:
 
-    fpath=('completion-dir/zsh' $fpath)
+    fpath=('/path/to/completion-dir' $fpath)
 
 In your shell
 
- zsh% myapp zsh_completion > completion-dir/_myapp
- zsh% chmod u+x completion-dir/_myapp
+ zsh% myapp zsh_completion > /path/to/completion-dir/_myapp
+ zsh% chmod u+x /path/to/completion-dir/_myapp
  zsh% exec zsh
 
 =head1 DESCRIPTION
@@ -70,12 +70,12 @@ Option completions will show its descriptions also.
 
 The default completion type for parameters is C<_files>
 
-In the examples directory you find C<myapp>.
+In the examples directory you find C<moosex-app-zsh>.
 
-    % myapp <TAB>
+    % moosex-app-zsh <TAB>
     bash_completion  fetch_mail    help          lala          zsh_completion
 
-    % myapp fetch_mail server.example -<TAB>
+    % moosex-app-zsh fetch_mail server.example -<TAB>
     --dir                     -- Output 'dir'
     --max                     -- Maximum number of emails to fetch
     --servertype              -- Mailserver type: IMAP or POP3
@@ -83,7 +83,7 @@ In the examples directory you find C<myapp>.
     --user                    -- User
     --verbose                 -- be verbose
 
-    % myapp fetch_mail server.example --servertype <TAB>
+    % moosex-app-zsh fetch_mail server.example --servertype <TAB>
     IMAP  POP3
 
 =head1 METHODS

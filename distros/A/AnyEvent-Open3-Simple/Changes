@@ -1,5 +1,8 @@
 Revision history for AnyEvent-Open3-Simple
 
+0.87      2019-04-16 17:32:23 -0400
+  - Require Test::More 0.98 for test fixes (gh#12)
+
 0.86      2016-01-14 09:41:20 -0500
   - Experimental support for Mojolicious without EV (use 'mojo' as implementation)
   - Use IO::Select for actual non-blocking on windows (fixes bug introduced in 0.85)

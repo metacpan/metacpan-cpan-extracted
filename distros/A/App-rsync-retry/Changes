@@ -1,3 +1,8 @@
+0.004   2019-04-17 (PERLANCAR)
+
+	- Observe RSYNC_RETRY_ON, RSYNC_RETRY_ON_ALL.
+
+
 0.003   2019-04-10 (PERLANCAR)
 
 	- Add options: --retry-on, --retry-on-all.

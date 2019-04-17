@@ -1,3 +1,15 @@
+2.042006 - 2019-04-16
+
+  [ENHANCEMENTS]
+
+  * #558 netdisco-rancid-export is now a no-op (inphobia)
+  * hide the ignored duplicate jobs in the web job queue display
+
+  [BUG FIXES]
+
+  * #549 redux - fix for changing pseudo device ports
+  * fix inconsistency in titlebar global search when port is selected
+
 2.042005 - 2019-04-03
 
   [ENHANCEMENTS]

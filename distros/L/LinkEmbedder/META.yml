@@ -24,5 +24,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/linkembedder/issues
   homepage: https://github.com/jhthorsen/linkembedder
   repository: https://github.com/jhthorsen/linkembedder.git
-version: '1.04'
+version: '1.05'
+x_contributors:
+  - 'Jan Henning Thorsen'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

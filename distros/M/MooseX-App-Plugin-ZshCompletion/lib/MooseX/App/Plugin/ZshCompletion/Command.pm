@@ -3,7 +3,7 @@ package MooseX::App::Plugin::ZshCompletion::Command;
 
 use Moose;
 use 5.010;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use namespace::autoclean;
 use MooseX::App::Command;

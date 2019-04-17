@@ -4,9 +4,9 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'AUTHOR'		=> 'Sam Varshavchik <sam@email-scan.com>',
-    'ABSTRACT_FROM'	=> 'CIDR.pm',
+    'ABSTRACT_FROM'	=> 'lib/Net/CIDR.pm',
     'NAME'		=> 'Net::CIDR',
-    'VERSION_FROM'	=> 'CIDR.pm', # finds $VERSION
+    'VERSION_FROM'	=> 'lib/Net/CIDR.pm', # finds $VERSION
     'PREREQ_PM'	=> { 'Carp' => 0 }, # e.g., Module::Name => 1.1
     'LICENSE' => 'perl',
     'PL_FILES' => { 'Net-CIDR.spec.PL' => 'Net-CIDR.spec' }

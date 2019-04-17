@@ -7,6 +7,8 @@ build_requires:
   Data::Dumper: '0'
   Exporter: '5.64'
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -22,7 +24,7 @@ no_index:
 provides:
   Astro::Coord::ECI::TLE::Iridium:
     file: lib/Astro/Coord/ECI/TLE/Iridium.pm
-    version: '0.118'
+    version: '0.119'
 requires:
   Astro::Coord::ECI::TLE: '0.091'
   Astro::Coord::ECI::Utils: '0.091'
@@ -38,5 +40,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-satpass
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-Coord-ECI-TLE-Iridium.git
-version: '0.118'
+version: '0.119'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,3 @@
-bin/simbadc
 Build.PL
 Changes
 eg/csv
@@ -23,6 +22,7 @@ MANIFEST
 META.json
 META.yml
 README
+script/simbadc
 t/arcturus.simple
 t/arcturus.vo
 t/arcturus.yaml

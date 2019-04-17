@@ -1,5 +1,8 @@
 Revision history for Perl script csvgrep
 
+0.07 2019-04-17 NEILB
+    - Set STDOUT to utf8
+
 0.06 2017-07-20 NEILB
     - Added a --match-column / -mc option, which says that the pattern
       should only be applied to a specific column, rather than the whole line.

@@ -65,5 +65,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdla-rest/issues
   homepage: http://pdlporters.github.io
   repository: git://github.com/PDLPorters/pdla-rest
-version: '2.013004'
+version: '2.013005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

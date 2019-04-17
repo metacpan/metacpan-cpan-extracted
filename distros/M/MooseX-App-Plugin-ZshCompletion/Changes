@@ -1,5 +1,11 @@
 Revision history for Perl module MooseX::App::Plugin::ZshCompletion
 
+0.003 2019-04-16 23:12:21+02:00
+
+    - Rename example app
+    - Auto generate META.json using plugin [MetaJSON] (PR#1 @manwar)
+    - Removed +x attribute from test script 00_load.t (PR#2 @manwar)
+    - Fix for wrong dependency
 
 0.002 2015-10-22
 

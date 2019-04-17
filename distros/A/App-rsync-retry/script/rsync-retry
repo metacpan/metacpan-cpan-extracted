@@ -1,8 +1,9 @@
 #!perl
 
-our $DATE = '2019-04-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2019-04-17'; # DATE
+our $VERSION = '0.004'; # VERSION
 
+use 5.010001;
 use strict;
 use warnings;
 
@@ -12,8 +13,8 @@ use Getopt::Long;
 my %Opts = (
     retry_times  => -1,
     retry_delay  => 30,
-    retry_on     => [split /,/, "10,11,12,22,23,24,30,35"],
-    retry_on_all => 0,
+    retry_on     => [split /,/, ($ENV{RSYNC_RETRY_ON} // "10,11,12,22,23,24,30,35")],
+    retry_on_all => $ENV{RSYNC_RETRY_ON_ALL} // 0,
 );
 
 Getopt::Long::Configure(
@@ -95,7 +96,7 @@ rsync-retry - Rsync wrapper to retry on transfer errors
 
 =head1 VERSION
 
-This document describes version 0.003 of rsync-retry (from Perl distribution App-rsync-retry), released on 2019-04-10.
+This document describes version 0.004 of rsync-retry (from Perl distribution App-rsync-retry), released on 2019-04-17.
 
 =head1 SYNOPSIS
 
@@ -142,6 +143,14 @@ Specify that rsync-retry should retry on all non-zero exit codes.
 
 String. Rsync command to use. Defaults to C<rsynccolor> (if available) or
 C<rsync> otherwise. Can be used to chain several wrappers together.
+
+=head2 RSYNC_RETRY_ON
+
+String. Used to set default for --retry-on.
+
+=head2 RSYNC_RETRY_ON_ALL
+
+Bool. Used to set default for --retry-on-all.
 
 =head1 HOMEPAGE
 

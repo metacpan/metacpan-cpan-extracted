@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2019-01-06'; # DATE
-our $VERSION = '0.594'; # VERSION
+our $DATE = '2019-04-17'; # DATE
+our $VERSION = '0.596'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -35,7 +35,7 @@ sub configure {
         ['Authority' => {locate_comment=>1}],
         'OurDate',
         'OurDist',
-        'PERLANCAR::OurPkgVersion',
+        ['OurPkgVersion' => {overwrite=>1}],
         'PodWeaver',
         ['PruneFiles' => {match => ['~$', '^nytprof.*']}],
         'Pod2Readme',
@@ -72,7 +72,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.594 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-01-06.
+This document describes version 0.596 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2019-04-17.
 
 =head1 SYNOPSIS
 

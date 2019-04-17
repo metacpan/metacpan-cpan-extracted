@@ -5,7 +5,7 @@ use warnings;
 use 5.006;
 
 # ABSTRACT: Process run using AnyEvent::Open3::Simple
-our $VERSION = '0.86'; # VERSION
+our $VERSION = '0.87'; # VERSION
 
 
 sub new
@@ -64,7 +64,7 @@ AnyEvent::Open3::Simple::Process - Process run using AnyEvent::Open3::Simple
 
 =head1 VERSION
 
-version 0.86
+version 0.87
 
 =head1 DESCRIPTION
 
@@ -147,7 +147,7 @@ Scott Wiersdorf
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Graham Ollis.
+This software is copyright (c) 2012-2019 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

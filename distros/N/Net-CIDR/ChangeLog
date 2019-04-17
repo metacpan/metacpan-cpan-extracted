@@ -1,3 +1,11 @@
+0.20
+
+2019-04-16  Sam Varshavchik  <mrsam@courier-mta.com>
+
+	* _ipcmp: handle comparison of mixed IPv4 and IPv6-specified
+	addresses, allowing cidrlookup() to look up IPv6-mapped IPv4 addresses
+	in IPv4 address ranges, and vice versa.
+
 0.19
 
 2018-06-11  Sam Varshavchik  <mrsam@courier-mta.com>

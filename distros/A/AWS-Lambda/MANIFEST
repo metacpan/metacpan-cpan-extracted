@@ -71,5 +71,10 @@ t/testdata/alb-post-request.json
 t/testdata/apigateway-base64-request.json
 t/testdata/apigateway-get-request.json
 t/testdata/apigateway-post-request.json
+xt/21_mojo.t
+xt/21_mojo_custom_domain.t
+xt/21_mojoapp.pl
+xt/22_dancer.t
+xt/22_dancerapp.pl
 META.yml
 MANIFEST

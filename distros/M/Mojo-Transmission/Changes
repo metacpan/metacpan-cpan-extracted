@@ -1,5 +1,9 @@
 Revision history for perl distribution Mojo-Transmission
 
+0.03 2019-04-16T21:41:48+0700
+ - Add mojo-transmission executable
+ - Add support for promises
+
 0.02 2018-03-11T15:04:36+0100
  - tr_status() can now be imported
 

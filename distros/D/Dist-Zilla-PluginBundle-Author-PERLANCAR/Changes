@@ -1,3 +1,14 @@
+0.596   2019-04-17 (PERLANCAR)
+
+	- Derp, fix syntax.
+
+
+0.595   2019-04-17 (PERLANCAR)
+
+	- Replace PERLANCAR::OurPkgVersion with OurPkgVersion 0.15 which
+	  has now overwrite=1 config.
+
+
 0.594   2019-01-06 (PERLANCAR)
 
 	- Also blacklist my retired modules.

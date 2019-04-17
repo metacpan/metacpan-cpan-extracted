@@ -16,6 +16,7 @@ $modules{$_} = $_ for qw(
   Event
   ExtUtils::MakeMaker
   Mojolicious
+  Test::More
 );
 
 $post_diag = sub

@@ -1,6 +1,6 @@
 package Map::Tube::Node;
 
-$Map::Tube::Node::VERSION   = '3.60';
+$Map::Tube::Node::VERSION   = '3.61';
 $Map::Tube::Node::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Node - Class to represent the station in the map.
 
 =head1 VERSION
 
-Version 3.60
+Version 3.61
 
 =cut
 
@@ -36,7 +36,7 @@ sub as_string {
 
 =head1 DESCRIPTION
 
-It provides simple interface to the 'node' of the map.
+It provides simple interface to the C<node> of the map.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ The following possible attributes for an object of type L<Map::Tube::Node>.
     +------+--------------------------------------------------------------------+
     | id   | Unique Node ID (required).                                         |
     | name | Node name (required).                                              |
-    | link | Comman seperated Node ID (required).                               |
+    | link | Comma separated Node ID (required).                                |
     | line | Ref to a list of objects of type Map::Tube::Line (required).       |
     +------+--------------------------------------------------------------------+
 
@@ -73,7 +73,7 @@ Returns the station name.
 
 =head2 link()
 
-Returns comma seperated linked station id.
+Returns comma separated linked station id.
 
 =head2 line()
 

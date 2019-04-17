@@ -1,5 +1,5 @@
 package csvgrep;
-$csvgrep::VERSION = '0.06';
+$csvgrep::VERSION = '0.07';
 use 5.010;
 use strict;
 use warnings;

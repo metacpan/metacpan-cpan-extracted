@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -146,8 +146,9 @@ LinkEmbedder - Embed / expand oEmbed resources and other URL / links
 L<LinkEmbedder> is a module that can expand an URL into a rich HTML snippet or
 simply to extract information about the URL.
 
-Note that this module is currently EXPERIMENTAL. It will replace
-L<Mojolicious::Plugin::LinkEmbedder> when it gets stable.
+This module replaces L<Mojolicious::Plugin::LinkEmbedder>.
+
+Go to L<https://thorsen.pm/linkembedder> to see a demo of how it works.
 
 These web pages are currently supported:
 
@@ -155,11 +156,7 @@ These web pages are currently supported:
 
 =item * L<http://imgur.com/>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=http://imgur.com/gallery/ohL3e>
-
 =item * L<https://instagram.com/>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=https://www.instagram.com/p/BSRYg_Sgbqe/>
 
 Instagram need some additional JavaScript. Please look at
 L<https://github.com/jhthorsen/linkembedder/blob/master/examples/embedder.pl> and
@@ -168,59 +165,31 @@ for more information.
 
 =item * L<https://appear.in/>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=https://appear.in/link-embedder-demo>
-
 =item * L<https://gist.github.com>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=https://gist.github.com/jhthorsen/3738de6f44f180a29bbb>
 
 =item * L<https://github.com>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=https://github.com/jhthorsen/linkembedder/blob/master/t/basic.t>
-
 =item * L<https://ix.io>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=http://ix.io/fpW>
 
 =item * L<https://maps.google.com>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=https%3A%2F%2Fwww.google.no%2Fmaps%2Fplace%2FOslo%2C%2BNorway%2F%4059.8937806%2C10.645035…m4!1s0x46416e61f267f039%3A0x7e92605fd3231e9a!8m2!3d59.9138688!4d10.7522454>
-
 =item * L<https://metacpan.org>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=https://metacpan.org/pod/Mojolicious>
 
 =item * L<https://paste.fedoraproject.org/>
 
-Example: L<https://app.thorsen.pm/linkembedder?https://paste.fedoraproject.org/paste/9qkGGjN-D3fL2M-bimrwNQ>
-
 =item * L<http://paste.opensuse.org>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=http://paste.opensuse.org/2931429>
 
 =item * L<http://paste.scsys.co.uk>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=http://paste.scsys.co.uk/557716>
-
 =item * L<http://pastebin.com>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=https://pastebin.com/V5gZTzhy>
 
 =item * L<https://www.spotify.com/>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=spotify:track:0aBi2bHHOf3ZmVjt3x00wv>
-
 =item * L<https://ted.com>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=https://www.ted.com/talks/jill_bolte_taylor_s_powerful_stroke_of_insight>
 
 =item * L<https://travis-ci.org>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=https://travis-ci.org/Nordaaker/convos/builds/47421379>
-
 =item * L<https://twitter.com>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=https://twitter.com/jhthorsen/status/786688349536972802>
 
 Twitter need some additional JavaScript. Please look at
 L<https://github.com/jhthorsen/linkembedder/blob/master/examples/embedder.pl> and
@@ -229,22 +198,14 @@ for more information.
 
 =item * L<https://vimeo.com>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=https://vimeo.com/154038415>
-
 =item * L<https://youtube.com>
 
-Example: L<https://app.thorsen.pm/linkembedder?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DOspRE1xnLjE>
-
 =item * L<https://www.xkcd.com/>
-
-Example: L<https://app.thorsen.pm/linkembedder?url=http://xkcd.com/927>
 
 =item * HTML
 
 Any web page will be parsed, and "og:", "twitter:", meta tags and other
 significant elements will be used to generate a oEmbed response.
-
-Example: L<https://app.thorsen.pm/linkembedder?url=http://www.aftenposten.no/kultur/Kunstig-intelligens-ma-ikke-lenger-trenes-av-mennesker-617794b.html>
 
 =item * Images
 

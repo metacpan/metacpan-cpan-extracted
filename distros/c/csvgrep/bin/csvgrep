@@ -15,6 +15,7 @@ my $column_spec;
 
 
 my ($pattern, $filename) = process_command_line();
+binmode(STDOUT, ':utf8');
 show_matching_rows($pattern, $filename);
 exit 0;
 

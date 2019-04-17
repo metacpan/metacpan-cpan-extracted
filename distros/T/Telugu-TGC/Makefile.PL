@@ -7,8 +7,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Telugu/TGC.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {'Alt::Devel::CallParser::ButWorking' => '0.002', 'Kavorka' => '0.039', 'Mouse' => '2.5.6', 'Regexp::Grammars' => '1.049'}, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Telugu/TGC.pm', # retrieve abstract from module
-    AUTHOR            => 'Rajkumar Reddy',
-    LICENSE           => 'perl',
+    AUTHOR            => '',
     #Value must be from legacy list of licenses here
     #http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
 );

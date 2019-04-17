@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use HTTP::Tiny;
 
-our $VERSION = "0.0.1";
+our $VERSION = "0.0.2";
 
 1;
 __END__
@@ -92,35 +92,35 @@ The Layer ARN list is here.
 
 =over
 
-=item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:us-east-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:us-east-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:us-east-2:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:us-east-2:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:us-west-1:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:us-west-1:445285296882:layer:perl-5-28-runtime:6>
 
-=item C<arn:aws:lambda:us-west-2:445285296882:layer:perl-5-28-runtime:5>
+=item C<arn:aws:lambda:us-west-2:445285296882:layer:perl-5-28-runtime:6>
 
 =back
 
@@ -128,35 +128,35 @@ The Layer ARN list is here.
 
 =over
 
-=item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:ap-northeast-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:ap-northeast-2:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:ap-south-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:ap-southeast-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:ap-southeast-2:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:ca-central-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:eu-central-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:eu-west-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:eu-west-2:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:eu-west-3:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:sa-east-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:us-east-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:us-east-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:us-east-2:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:us-east-2:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:us-west-1:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:us-west-1:445285296882:layer:perl-5-26-runtime:6>
 
-=item C<arn:aws:lambda:us-west-2:445285296882:layer:perl-5-26-runtime:5>
+=item C<arn:aws:lambda:us-west-2:445285296882:layer:perl-5-26-runtime:6>
 
 =back
 
@@ -218,7 +218,7 @@ Here is prebuild docker image based on L<https://hub.docker.com/r/lambci/lambda/
 
 =over
 
-=item L<AWS::Lambda::Bootstap>
+=item L<AWS::Lambda::Bootstrap>
 
 =item L<AWS::Lambda::Context>
 

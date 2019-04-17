@@ -1,5 +1,9 @@
 Revision history for Bitcoin::RPC::Client 
 
+0.09    2019-4-16/14
+        - Updated documentation
+        - Updated META
+
 0.08    2018-1-30/14
         - Changed dependency for JSON::RPC::Client to JSON::RPC::Legacy::Client
         - Fatal on bitcoind errors

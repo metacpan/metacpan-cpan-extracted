@@ -4,7 +4,7 @@ use namespace::autoclean;
 use Moose::Role;
 
 use 5.010;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 
 

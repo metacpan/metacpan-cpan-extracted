@@ -1,5 +1,9 @@
 Revision history for perl distribution LinkEmbedder
 
+1.05 2019-04-17T18:33:02+0700
+ - No longer EXPERIMENTAL
+ - Replaced a bunch of outdated example links
+
 1.04 2019-04-03T16:21:20+0700
  - Fix https://app.thorsen.pm/linkembedder demo links #10
 

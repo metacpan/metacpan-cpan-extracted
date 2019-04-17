@@ -1,0 +1,8 @@
+Changes
+lib/Telugu/Keyword.pm
+Makefile.PL
+MANIFEST
+README
+t/Telugu-Keyword.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
