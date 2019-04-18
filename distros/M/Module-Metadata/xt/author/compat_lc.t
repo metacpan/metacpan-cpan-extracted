@@ -1,8 +1,7 @@
-
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 
 # ABSTRACT: Make sure not to fail if Log::Contextual is accidentally uninitialised
 
@@ -28,4 +27,3 @@ ok( $ok, "Log::Contextual being loaded didn't cause an explosion" )
   or note $error;
 
 done_testing;
-

@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Clipboard",
   "PREREQ_PM" => {
     "CGI" => 0,
+    "File::Spec" => 0,
     "File::Temp" => 0,
     "IPC::Open2" => 0,
     "URI::Escape" => 0,
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "lib" => 0
   },
-  "VERSION" => "0.19",
+  "VERSION" => "0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CGI" => 0,
+  "File::Spec" => 0,
   "File::Temp" => 0,
   "IPC::Open2" => 0,
   "Module::Build" => "0.28",

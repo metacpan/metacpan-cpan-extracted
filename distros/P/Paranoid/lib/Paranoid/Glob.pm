@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Glob.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Glob.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -30,7 +30,7 @@ use File::Glob qw(bsd_glob);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/s );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/s );
 
 #####################################################################
 #
@@ -51,6 +51,7 @@ sub _sanitize (\@) {
     foreach (@$aref) {
         if (/^([[:print:]]+)$/s) {
             $_ = $1;
+            $_ =~ s#/{2,}#/#sg;
         } else {
             $Paranoid::ERROR =
                 pdebug( 'invalid glob entry: %s', PDLEVEL1, $_ );
@@ -506,7 +507,7 @@ Paranoid::Glob - Paranoid Glob objects
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Glob.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Glob.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.510';
+our $VERSION = '0.511';
 
 use Carp       qw( croak carp );
 use List::Util qw( any );
@@ -1062,6 +1062,7 @@ sub fill_form {
             $self->{i}{beep} = 1;
         }
         else {
+
             $char = chr $char;
             utf8::upgrade $char;
             if ( $char eq "\n" || $char eq "\r" ) {                                                                     # ENTER
@@ -1080,8 +1081,8 @@ sub fill_form {
                     return;
                 }
                 elsif ( $list->[$self->{i}{curr_row}][0] eq $opt->{confirm} ) {                                         # if ENTER on {confirm/1}: leave and return result
-                    $self->__reset_term( $up );
                     splice @$list, 0, @{$self->{i}{pre}};
+                    $self->__reset_term( $up );
                     return [ map { [ $orig_list->[$_][0], $list->[$_][1] ] } 0 .. $#{$list} ];
                 }
                 if ( $auto_up == 2 ) {                                                                                  # if ENTER && "auto_up" == 2 && any row: jumps {back/0}
@@ -1173,7 +1174,7 @@ Term::Form - Read lines from STDIN.
 
 =head1 VERSION
 
-Version 0.510
+Version 0.511
 
 =cut
 

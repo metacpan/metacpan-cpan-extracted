@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Log/File.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Log/File.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -28,7 +28,7 @@ use Paranoid::Input;
 use Paranoid::IO;
 use Fcntl qw(:DEFAULT :flock :mode :seek);
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 #####################################################################
 #
@@ -184,7 +184,7 @@ Paranoid::Log::File - File Logging Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log/File.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Log/File.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ leverages L<Paranoid::IO>'s I<popen>.
 
 I<mode> defaults to O_CREAT | O_APPEND | O_WRONLY.'
 
-I<perm> defaults to 0666 (umask still applies).
+I<perm> defaults to 0666 ^ UMASK
 
 I<syslog> defaults to false.  Enabling it causes every line to be formatted
 akin to syslog, along with the 2048 byte limit on messages.

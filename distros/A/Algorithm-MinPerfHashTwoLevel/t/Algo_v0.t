@@ -12,7 +12,7 @@ use Algorithm::MinPerfHashTwoLevel qw(hash_with_state);
 
 my $class= "Algorithm::MinPerfHashTwoLevel";
 
-my $o= $class->new("seed"=>"1234567812345678",debug=>$ENV{TEST_VERBOSE});
+my $o= $class->new("seed"=>"1234567812345678",debug=>$ENV{TEST_VERBOSE},variant=>0);
 my $state= $o->state;
 my $state_as_hex= unpack "h*",$o->state;
 is($state_as_hex,"cd355d25eec7d5d07bd270f4c86408b5b1f3e9df0fa48f95b964ec012fcddc25","state for seed is as expected");

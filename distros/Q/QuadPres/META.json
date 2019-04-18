@@ -45,6 +45,7 @@
             "IO::All" : "0",
             "List::MoreUtils" : "0",
             "MooX" : "0",
+            "MooX::late" : "0.010",
             "Path::Tiny" : "0",
             "Template" : "0",
             "Text::VimColor" : "0",
@@ -69,45 +70,45 @@
    "provides" : {
       "QuadPres" : {
          "file" : "lib/QuadPres.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::Base" : {
          "file" : "lib/QuadPres/Base.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::Config" : {
          "file" : "lib/QuadPres/Config.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::Exception" : {
          "file" : "lib/QuadPres/Exception.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::Exception::RenderFile" : {
          "file" : "lib/QuadPres/Exception.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::FS" : {
          "file" : "lib/QuadPres/FS.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::Url" : {
          "file" : "lib/QuadPres/Url.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::VimIface" : {
          "file" : "lib/QuadPres/VimIface.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       },
       "QuadPres::WriteContents" : {
          "file" : "lib/QuadPres/WriteContents.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.28.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shlomif/quadpres/issues"
+         "web" : "https://github.com/shlomif/quad-pres/issues"
       },
       "homepage" : "http://metacpan.org/release/QuadPres",
       "repository" : {
@@ -116,7 +117,7 @@
          "web" : "https://github.com/shlomif/quad-pres"
       }
    },
-   "version" : "0.28.0",
+   "version" : "0.28.1",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028001"
@@ -498,6 +499,17 @@
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Filter/UploadToCPAN",
+            "version" : "6.012"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Runtime",
             "version" : "6.012"
          },
          {

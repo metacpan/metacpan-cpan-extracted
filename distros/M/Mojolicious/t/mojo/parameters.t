@@ -37,6 +37,17 @@ is $params->merge(y => 3, z => [4, 5])->to_string,
 is $params->merge(Mojo::Parameters->new(z => 6))->to_string,
   'foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=3&z=6', 'right format';
 
+# Merge (instances)
+$params
+  = Mojo::Parameters->new->merge(Mojo::Parameters->new(foo => [123, 456]));
+is_deeply $params->to_hash, {foo => [123, 456]}, 'right structure';
+$params = Mojo::Parameters->new(foo => 321)
+  ->merge(Mojo::Parameters->new(foo => [123, 456]));
+is_deeply $params->to_hash, {foo => [123, 456]}, 'right structure';
+$params = Mojo::Parameters->new(bar => 321)
+  ->merge(Mojo::Parameters->new(foo => [123, 456]));
+is_deeply $params->to_hash, {foo => [123, 456], bar => 321}, 'right structure';
+
 # Param
 $params
   = Mojo::Parameters->new('foo=b%3Bar&a=4&a=5&b=6&b=7&c=f%3Boo&x=1&y=3&z=6');

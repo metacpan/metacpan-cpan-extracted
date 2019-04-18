@@ -61,7 +61,7 @@ function tables() {
     $('#tablesbuts button').removeClass('ui-state-highlight');
     $this.addClass('ui-state-highlight');
     $('.data-hdr h3').text($this.text());
-    $('#tablesbody button.add').button('enable').click(function(){ document.location = '/tables/' + dtTableTabName + '/add' });
+    $('#tablesbody button.add').button('enable').click(function(){ document.location = shipped.urlbase + '/tables/' + dtTableTabName + '/add' });
     dtTabInfo = shipped.bytable[dtTableTabName];
     var columns = $.map(dtTabInfo.columns, colmaker);
     //console.log("genned columns struct ", columns);
@@ -89,7 +89,7 @@ function dtTableEvents() {
         function(){$(this).css({cursor:'pointer','font-weight':'normal'}).addClass('ui-state-active')},
         function(){$(this).css({cursor:''}).removeClass('ui-state-active')}
     ).on('click',
-        function(){document.location = '/tables/' + dtTableTabName + '/' + $(this).attr('id') + '/view'}
+        function(){document.location = shipped.urlbase + '/tables/' + dtTableTabName + '/' + $(this).attr('id') + '/view'}
     );
 }
 
@@ -116,6 +116,8 @@ function init() {
     shipped = JSON.parse($('#shipped').html());
     console.log("session %o, shipped %o", session, shipped);
 
+    $('#header a#logo').css('background', 'url('+shipped.logourl+')');
+
     $('.button').each(function(i){
         var $this = $(this);
         var icon1 = $this.data('icon1');
@@ -140,11 +142,11 @@ function init() {
         if ($this.hasClass('save' )) return true; // allows post to proceed
         var newloc = '/tables/' + shipped.table;
         if ($this.hasClass('list' )) {
-            document.location = newloc;
+            document.location = shipped.urlbase + newloc;
             return;
         }
         if ($this.hasClass('add' )) {
-            document.location = newloc + '/add';
+            document.location = shipped.urlbase + newloc + '/add';
             return;
         }
         newloc += '/' + shipped.id;
@@ -153,14 +155,14 @@ function init() {
             if ($this.hasClass(act)) more = act
         });
         if (more) {
-            document.location = newloc + '/' + more;
+            document.location = shipped.urlbase + newloc + '/' + more;
             return false;
         }
 
         $.each(['prev','start','next','end'], function(i,nav) {
             if ($this.hasClass(nav)) more = nav
         });
-        if (more) document.location = newloc + '/navigate?to=' + more;
+        if (more) document.location = shipped.urlbase + newloc + '/navigate?to=' + more;
         return false;
     });
 
@@ -173,7 +175,7 @@ function init() {
             var $this = $(this);
             if ($this.hasClass('add'  )) {
                 var href = '/tables/' + shipped.table + '/' + shipped.id + '/add_child/' + cdata.collection;
-                document.location = href;
+                document.location = shipped.urlbase + href;
                 return false;
             }
             if ($this.hasClass('prev' )) cdata.offset = cdata.offset<10? 0: cdata.offset-10;

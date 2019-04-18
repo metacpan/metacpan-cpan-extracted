@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Oct 21 09:18:23 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Thu Oct 25 19:04:56 2018
-# Update Count    : 388
+# Last Modified On: Fri Nov 16 10:49:04 2018
+# Update Count    : 389
 # Status          : Unknown, Use with caution!
 
 use 5.012;
@@ -54,6 +54,7 @@ my $force;			# process disabled modules as well
 my $rebuild;			# rebuild index, no fetching
 my $list;			# produce listing
 my $verbose = 1;		# verbose processing
+my $reuse = 0;			# reuse existing fetch results
 
 # Development options (not shown with -help).
 my $debug = 0;			# debugging
@@ -312,7 +313,7 @@ sub run_plugins {
 
 	# Run it, trapping errors.
 	$stats->{tally}++;
-	unless ( eval { $comic->fetch; 1 } ) {
+	unless ( eval { $comic->fetch($reuse); 1 } ) {
 	    $comic->{state}->{fail} = $@;
 	    debug($comic->{state}->{fail});
 	    push( @{ $stats->{fail} },
@@ -518,6 +519,7 @@ sub app_options {
 		   'disable'	=> sub { $activate = -1 },
 		   'list'	=> \$list,
 		   'force'	=> \$force,
+		   'reuser'	=> \$reuse,
 		   'ident'	=> \$ident,
 		   'verbose+'	=> \$verbose,
 		   'quiet'	=> sub { $verbose = 0 },

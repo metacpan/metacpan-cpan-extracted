@@ -4,13 +4,13 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-List/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-List)
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-List.svg)](http://search.cpan.org/~nhorne/Geo-Coder-List/)
 
-# Geo::Coder::List
+# NAME
 
-Call many geocoders
+Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.23
+Version 0.24
 
 # SYNOPSIS
 
@@ -26,6 +26,18 @@ This module's primary use is to allow many backends to be used by
 ## new
 
 Creates a Geo::Coder::List object.
+
+Takes an optional argument 'cache' which takes an cache object that supports
+get() and set() methods.
+The licences of some geo coders,
+such as Google,
+specifically prohibit caching API calls,
+so be careful to only use with those services that allow it.
+
+    use Geo::Coder::List;
+    use CHI;
+
+    my $geocoder->new(cache => CHI->new(driver => 'Memory', global => 1));
 
 ## push
 
@@ -81,9 +93,16 @@ environment variables:
 
 Note that unlike Geo::Coders, there is no read method, since that would be pointless.
 
+## reverse\_geocode
+
+Similar to geocode except it expects a latitude/longitude parameter.
+
+    print $geocoder_list->reverse_geocode(latlng => '37.778907,-122.39732');
+
 ## log
 
-Returns the log of events to help you debug failures, optimize lookup order and fix quota breakage
+Returns the log of events to help you debug failures,
+optimize lookup order and fix quota breakage.
 
     my @log = @{$geocoderlist->log()};
 
@@ -103,7 +122,8 @@ or through the web interface at
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-There is no reverse\_geocode() yet.
+reverse\_geocode() doesn't update the logger.
+reverse\_geocode() should support [Geo::Location::Point](https://metacpan.org/pod/Geo::Location::Point) objects.
 
 # SEE ALSO
 
@@ -137,6 +157,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Nigel Horne.
+Copyright 2016-2019 Nigel Horne.
 
 This program is released under the following licence: GPL

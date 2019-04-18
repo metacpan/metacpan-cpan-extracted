@@ -33,8 +33,8 @@ sub new {
         o => $options,
         d => $data,
     };
-    $sf->{i}{f_tmp_copy_paste} = catfile $sf->{i}{app_dir}, 'tmp_copy_and_paste.csv';
-    $sf->{i}{f_dir_history}    = catfile $sf->{i}{app_dir}, 'dir_history.json';
+    $sf->{i}{f_tmp_copy_paste} = catfile $sf->{i}{app_dir}, 'tmp_copy_and_paste.csv'; #
+    $sf->{i}{f_dir_history}    = catfile $sf->{i}{app_dir}, 'dir_history.json'; #
     bless $sf, $class;
 }
 
@@ -177,7 +177,6 @@ sub from_copy_and_paste {
     my $parse_mode_idx = $sf->{o}{insert}{copy_parse_mode};
     $ax->print_sql( $sql );
     print "Multi row:\n";
-    my $parse_mode = $sf->{o}{insert}{copy_parse_mode};
     my $file_ec = $sf->{i}{f_tmp_copy_paste};
     local $SIG{INT} = sub { unlink $file_ec; exit };
     if ( ! eval {

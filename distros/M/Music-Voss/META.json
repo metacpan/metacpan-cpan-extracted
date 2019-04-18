@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Music-Voss",
    "no_index" : {
@@ -48,13 +48,11 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
-   "x_homepageresources" : {
+   "resources" : {
       "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/thrig/Music-Voss.git",
-         "web" : "https://github.com/thrig/Music-Voss"
+         "url" : "https://github.com/thrig/Music-Voss"
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

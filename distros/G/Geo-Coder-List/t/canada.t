@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use LWP;
-use Test::Most tests => 14;
+use Test::Most tests => 15;
 use Test::NoWarnings
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -14,7 +14,7 @@ BEGIN {
 
 CANADA: {
 	SKIP: {
-		skip 'Test requires Internet access', 12 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 13 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::CA;
@@ -33,7 +33,7 @@ CANADA: {
 		# curl 'geocoder.ca/some_location?locate=9235+Main+St,+Richibucto,+New Brunswick,+Canada&json=1'
 		if($@) {
 			diag('Geo::Coder::CA not installed - skipping tests');
-			skip 'Geo::Coder::CA not installed', 12;
+			skip('Geo::Coder::CA not installed', 13);
 		} else {
 			diag("Using Geo::Coder::CA $Geo::Coder::CA::VERSION");
 		}
@@ -52,6 +52,8 @@ CANADA: {
 		delta_within($location->{geometry}{location}{lat}, 46.68, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -64.86, 1e-1);
 
+		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
+
 		$location = $geocoderlist->geocode(location => 'Allen, Maryland, USA');
 		ok(!defined($location));
 
@@ -63,6 +65,5 @@ CANADA: {
 
 		ok(!defined($geocoderlist->geocode()));
 		ok(!defined($geocoderlist->geocode('')));
-
 	}
 }

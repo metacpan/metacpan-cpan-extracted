@@ -1,5 +1,8 @@
 Revision history for Perl extension AnySan-Provider-Slack
 
+0.06 2019-04-18T03:14:29Z
+    - Added missing prereqs as reported by CPANTS. #5 (thx @manwar)
+
 0.05 2017-09-22T11:10:16Z
     - Add link_names option #4 (thx @nukokusa)
 

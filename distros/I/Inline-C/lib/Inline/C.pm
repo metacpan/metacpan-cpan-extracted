@@ -1,6 +1,6 @@
 use strict; use warnings;
 package Inline::C;
-our $VERSION = '0.78';
+our $VERSION = '0.80';
 
 use Inline 0.56;
 use Config;
@@ -47,8 +47,27 @@ sub validate {
     $o->{ILSM}{MAKEFILE} ||= {};
     if (not $o->UNTAINT) {
         require FindBin;
-        $o->{ILSM}{MAKEFILE}{INC} = "-I\"$FindBin::Bin\""
-            if not defined $o->{ILSM}{MAKEFILE}{INC};
+        if (not defined $o->{ILSM}{MAKEFILE}{INC}) {
+            # detect Microsoft Windows OS, and either Microsoft Visual Studio compiler "cl.exe", "clarm.exe", or Intel C compiler "icl.exe"
+            if (($Config{osname} eq 'MSWin32') and ($Config{cc} =~ /\b(cl\b|clarm|icl)/)) {
+                warn "\n   Any header files specified relative to\n",
+                     "   $FindBin::Bin\n",
+                     "   will be included only if no file of the same relative path and\n",
+                     "   name is found elsewhere in the search locations (including those\n",
+                     "   specified in \$ENV{INCLUDE}).\n",
+                     "   Otherwise, that header file \"found elsewhere\" will be included.\n";
+                warn "  ";    # provide filename and line number.
+                $ENV{INCLUDE} .= qq{;"$FindBin::Bin"};
+            }
+            # detect Oracle Solaris/SunOS OS, and Oracle Developer Studio compiler "cc" (and double check it is not GCC)
+            elsif ((($Config{osname} eq 'solaris') or ($Config{osname} eq 'sunos')) and ($Config{cc} eq 'cc') and (not $Config{gccversion})) {
+                $o->{ILSM}{MAKEFILE}{INC} = "-I\"$FindBin::Bin\" -I-";   # angle-bracket includes will NOT incorrectly search -I dirs given before -I-
+                warn q{NOTE: Oracle compiler detected, unable to utilize '-iquote' compiler option, falling back to '-I-' which should produce correct results for files included in angle brackets}, "\n";
+            }
+            else {
+                $o->{ILSM}{MAKEFILE}{INC} = qq{-iquote"$FindBin::Bin"};  # angle-bracket includes will NOT incorrectly search -iquote dirs
+            }
+        }
     }
     $o->{ILSM}{AUTOWRAP} = 0 if not defined $o->{ILSM}{AUTOWRAP};
     $o->{ILSM}{XSMODE} = 0 if not defined $o->{ILSM}{XSMODE};

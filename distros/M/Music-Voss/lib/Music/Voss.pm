@@ -15,7 +15,7 @@ use List::Util ();
 use Math::Trig qw(pi);
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '0.08';
+our $VERSION = '0.16';
 
 our @EXPORT_OK = qw(bitchange powers powers_stateless weierstrass);
 
@@ -145,7 +145,7 @@ sub weierstrass {
         croak "input must be number" if !defined $t or !looks_like_number $t;
         $x //= 0;
         my @nums;
-        for my $k ( 0 .. $params{N} ) {
+        for my $k ( 0 .. $params{N} - 1 ) {
             push @nums,
               $params{r}**( $k * $params{H} ) *
               sin(

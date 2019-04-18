@@ -31,6 +31,6 @@ $fun = Music::Voss::weierstrass(
     }
 );
 $fun->( 42, 640 );
-$deeply->( \@cb_args, [ 42, 640, 32, 0.5, 1.0, 32 ] );
+$deeply->( \@cb_args, [ 42, 640, 31, 0.5, 1.0, 32 ] );
 
 plan tests => 3;

@@ -7,16 +7,15 @@ package Comics::Plugin::PoorlyDrawnLines;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 our $name    = "Poorly Drawn Lines";
 our $url     = "http://www.poorlydrawnlines.com/";
 
 our $pattern =
-  qr{ <div \s+ class="post"> \s*
-      <p> \s*
-      <img \s+ class=".*?" \s+
-       src="(?<url>http://www.poorlydrawnlines.com/wp-content/uploads/
+  qr{ <figure \s+ class="wp-block-image"> \s*
+      <img \s+
+       src="(?<url>https?://www.poorlydrawnlines.com/wp-content/uploads/
 	      \d+/\d+/
 	      (?<image>.+?\.\w+))"
     }x;

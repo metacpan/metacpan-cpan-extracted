@@ -533,7 +533,7 @@ my %WriteMakefileArgs = (
     "Safe::Isa" => 0,
     "Test::Deep" => "1.128",
     "Test::Deep::NoTest" => 0,
-    "Test::More" => 0,
+    "Test::More" => "1.3",
     "Test::More::UTF8" => 0,
     "Try::Tiny" => 0,
     "diagnostics" => 0,
@@ -541,7 +541,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.0.8",
+  "VERSION" => "3.0.9",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -576,7 +576,7 @@ my %FallbackPrereqs = (
   "Safe::Isa" => 0,
   "Test::Deep" => "1.128",
   "Test::Deep::NoTest" => 0,
-  "Test::More" => 0,
+  "Test::More" => "1.3",
   "Test::More::UTF8" => 0,
   "Try::Tiny" => 0,
   "XSLoader" => 0,

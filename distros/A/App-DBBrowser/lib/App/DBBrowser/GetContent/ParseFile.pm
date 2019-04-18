@@ -109,7 +109,7 @@ sub __parse_file_Spreadsheet_Read { # 2
         if ( ! defined $book ) {
             choose(
                 [ 'Press ENTER' ],
-                { %{$sf->{i}{lyt_m}}, prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) .'!' }
+                { %{$sf->{i}{lyt_m}}, prompt => 'No Book in ' . decode( 'locale_fs', $file_ec ) . '!' }
             );
             return;
         }
@@ -160,7 +160,7 @@ sub __parse_file_Spreadsheet_Read { # 2
         return $book, $sheet_count;
     }
     $sql->{insert_into_args} = [ Spreadsheet::Read::rows( $book->[$sheet_idx] ) ];
-    if ( ! -T $file_ec && length $book->[$sheet_idx]{label} ){
+    if ( ! -T $file_ec && length $book->[$sheet_idx]{label} ) {
         $sf->{d}{sheet_name} = $book->[$sheet_idx]{label};
     }
     return $book, $sheet_count;

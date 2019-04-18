@@ -9,14 +9,13 @@ package Comics::Plugin::DoodleForFood;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 our $name    = "Doodle For Food";
-our $url     = "http://www.doodleforfood.com/";
+our $url     = "https://www.doodleforfood.com/";
 
 our $pattern =
-  qr{ <figure \s+ class="photo-hires-item".*? > \s*
-      <a \s+ href="https?://www\.doodleforfood\.com/image/\d+"> \s*
+  qr{ class="tmblr-full"> \s*
       <img \s+
        src="?(?<url>https?://\d+\.media\.tumblr\.com/
                     [0-9a-f]+/

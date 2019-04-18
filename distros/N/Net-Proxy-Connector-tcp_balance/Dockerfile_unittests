@@ -1,0 +1,17 @@
+FROM perl
+
+# install additional tools we'll need
+#RUN apt-get update \
+#    && apt-get -y install bzip2 git pwgen wget libssl-dev \
+#    && apt-get clean \
+#    && rm -r /var/lib/apt/lists/*
+
+RUN curl -L http://cpanmin.us | perl - App::cpanminus \
+    && cpanm --notest Net::Proxy::Connector::tcp Test::Fork Test::Warn
+
+ADD lib /app/lib
+ADD t /app/t
+
+WORKDIR /app
+
+CMD ["prove", "-Ilib"]

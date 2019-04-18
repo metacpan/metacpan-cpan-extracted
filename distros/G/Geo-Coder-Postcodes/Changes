@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Postcodes
 
+0.06	Wed 17 Apr 19:40:21 EDT 2019
+	Improved handling of failures
+
 0.05	Sat 26 May 08:56:29 EDT 2018
 	Find Bolton-upon-Dearne, which is not listed in a county
 	Find Southend-on-Sea

@@ -27,10 +27,7 @@ requires:
   Scalar::Util: '0'
   perl: '5.010000'
   strict: '0'
-version: '0.08'
-x_homepageresources:
-  repository:
-    type: git
-    url: git://github.com/thrig/Music-Voss.git
-    web: https://github.com/thrig/Music-Voss
+resources:
+  repository: https://github.com/thrig/Music-Voss
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

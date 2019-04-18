@@ -221,7 +221,7 @@ sub database_setting {
                 }
                 my $choices = choose_a_subset(
                     [ sort @databases ],
-                    { p_new => 'Reset DB: ', mouse => $sf->{o}{table}{mouse} }
+                    { name => 'Reset DB: ', mouse => $sf->{o}{table}{mouse} }
                 );
                 if ( ! $choices->[0] ) {
                     next GROUP;

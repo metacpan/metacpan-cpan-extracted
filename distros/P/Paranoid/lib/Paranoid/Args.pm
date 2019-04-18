@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Args.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Args.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -26,11 +26,31 @@ use base qw(Exporter);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(parseArgs);
-@EXPORT_OK   = @EXPORT;
+@EXPORT_OK   = ( @EXPORT, qw(PA_DEBUG PA_VERBOSE PA_HELP PA_VERSION) );
 %EXPORT_TAGS = ( all => [@EXPORT_OK], );
+
+# I know, this really doesn't protect the contents...
+use constant PA_DEBUG => {
+    Short      => 'D',
+    Long       => 'debug',
+    CountShort => 1,
+    };
+use constant PA_VERBOSE => {
+    Short      => 'v',
+    Long       => 'verbose',
+    CountShort => 1,
+    };
+use constant PA_HELP => {
+    Short => 'h',
+    Long  => 'help',
+    };
+use constant PA_VERSION => {
+    Short => 'V',
+    Long  => 'version',
+    };
 
 #####################################################################
 #
@@ -82,6 +102,19 @@ use Paranoid::Debug qw(:all);
         # Purpose:  Gets the contents of @errors
         # Returns:  Contents of @errors
         # Usage:    @errors = listErrors();
+
+        my ( %messages, $n, @indices );
+
+        # Filter out redundant messages
+        $n = 0;
+        foreach (@errors) {
+            $messages{$_}++;
+            push @indices, $n if $messages{$_} > 1;
+            $n++;
+        }
+        foreach ( sort { $b <=> $a } @indices ) {
+            splice @errors, $_, 1;
+        }
 
         return @errors;
     }
@@ -182,7 +215,7 @@ sub _tLint {
     $oname = $$tref{Name};
 
     # Make sure a short or long option is declared
-    if ( $oname eq 'undef/undef' ) {
+    if ( !defined $oname ) {
         _pushErrors('No short or long option name declared');
         $rv = 0;
     }
@@ -272,6 +305,7 @@ sub _tLint {
     # Make sure CountShort is enabled only for those with a template of ''
     # or '$'
     if ($rv) {
+
         if ( $$tref{CountShort} ) {
             unless ( $$tref{Template} =~ /^\$?$/sm ) {
                 _pushErrors( "Option $oname has CountShort set but with an "
@@ -561,14 +595,28 @@ sub parseArgs (\@\%;\@) {
             %$_,
             };
 
-        # Create the short/long option for error-reporting purposes
-        $oname =
-              ( defined $$tref{Short} ? $$tref{Short} : 'undef' ) . '/'
-            . ( defined $$tref{Long}  ? $$tref{Long}  : 'undef' );
-        $$tref{Name} = $oname;
+        # Set AllOptions for error message reporting
+        $$tref{Name} =
+               defined $$tref{Short}
+            && defined $$tref{Long} ? "-$$tref{Short}/--$$tref{Long}"
+            : defined $$tref{Short} ? "-$$tref{Short}"
+            : defined $$tref{Long}  ? "--$$tref{Long}"
+            :                         undef;
 
         # Initialize our usage counter
         $$tref{Count} = 0;
+
+        # Anything that has CountShort enabled implies Multiple/CanBundle
+        # and a template of '$'
+        if ( $$tref{CountShort} ) {
+            $$tref{CanBundle} = $$tref{Multiple} = 1;
+            $$tref{Template} = '$' if defined $$tref{Long};
+        }
+
+        # Anything that has a Short option and a template of '$' or ''
+        # implies CanBundle
+        $$tref{CanBundle} = 1
+            if defined $$tref{Short} and $$tref{Template} eq '';
 
         # We'll associate both the long and short options to the same hash
         # to make sure that we count/collect everything appropriately.
@@ -699,7 +747,8 @@ sub parseArgs (\@\%;\@) {
                             # Check if we've call this more than once
                             if ( not $$tref{Multiple}
                                 and $$tref{Count} > 0 ) {
-                                _pushErrors( "Option -$_ is only allowed "
+                                _pushErrors(
+                                    "Option $$tref{Name} is only allowed "
                                         . 'to be used once' );
                                 $rv = 0;
                                 next;
@@ -771,7 +820,7 @@ sub parseArgs (\@\%;\@) {
                         # Check if we've call this more than once
                         if ( not $$tref{Multiple} and $$tref{Count} > 0 ) {
                             _pushErrors(
-                                "Option --$_ is only allowed to be used once"
+                                "Option $$tref{Name} is only allowed to be used once"
                                 );
                             $rv = 0;
                             next;
@@ -819,7 +868,7 @@ sub parseArgs (\@\%;\@) {
             $regex = '(?:' . join( '|', @{ $$tref{ExclusiveOf} } ) . ')';
             if ( grep /^$regex$/sm, @tmp ) {
                 _pushErrors(
-                    "$_ cannot be called with the following options: "
+                    "$$tref{Name} cannot be called with the following options: "
                         . join ', ',
                     @{ $$tref{ExclusiveOf} } );
                 $rv = 0;
@@ -830,7 +879,7 @@ sub parseArgs (\@\%;\@) {
         foreach $regex ( @{ $$tref{AccompaniedBy} } ) {
             unless ( grep /^\Q$regex\E$/sm, @tmp ) {
                 _pushErrors(
-                    "$_ must be called with the following options: "
+                    "$$tref{Name} must be called with the following options: "
                         . join ', ',
                     @{ $$tref{AccompaniedBy} } );
                 $rv = 0;
@@ -857,7 +906,7 @@ Paranoid::Args - Command-line argument parsing functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Args.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Args.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1088,6 +1137,29 @@ the long name you will be able to retrieve the cumulative value.
 
 The particulars of all key/value pairs in a template are documented below.
 
+B<NOTES:>  The default template is as follows:
+
+        {
+            Short         => undef,
+            Long          => undef,
+            Template      => '',
+            Multiple      => 0, 
+            ExclusiveOf   => [],
+            AccompaniedBy => [],
+            CanBundle     => 0,
+            CountShort    => 0,
+            Value         => undef,
+         };
+
+When creating your option templates you only need to specify those that differ
+from the defaults.  In addition, there's a few options that are also modified
+automatically for you.  If your template consists of a I<Short> option and has
+a template of I<''> then I<CanBundle> is automatically set to true.
+
+If I<CountShort> is enabled then I<Multiple> and I<CanBundle> is set to be
+true as well.  Additionally, if there is a I<Long> option, the I<Template> is
+set to I<'$'>.
+
 =head2 Short
 
 B<Short> refers to the form of the short option style (minus the normal
@@ -1230,6 +1302,42 @@ v would be associated with foo, and S with bar.  Bundling of short options
 that use '@' as part of their template is not allowed due to the obvious 
 guaranteed problems which will result.
 
+=head1 TEMPLATES
+
+There are a few convenience templates available to code down on code
+generation.  These are not exported by default, however, so you'll need
+explicitly import the ones you want or import them with the B<:all> tag.
+
+=head2 PA_DEBUG
+
+    {
+        Short      => 'D',
+        Long       => 'debug',
+        CountShort => 1,
+    };
+
+=head2 PA_VERBOSE
+
+    {
+        Short      => 'v',
+        Long       => 'verbose',
+        CountShort => 1,
+     };
+
+=head2 PA_HELP
+
+    {
+        Short => 'h',
+        Long  => 'help',
+    };
+
+=head2 PA_VERSION
+
+    {
+        Short => 'V',
+        Long  => 'version',
+    };
+
 =head1 DEPENDENCIES
 
 =over
@@ -1250,16 +1358,11 @@ L<Paranoid::Debug>
       {
         Short       => 'v',
         Long        => 'verbose',
-        Multiple    => 1,
         CountShort  => 1,
-        CanBundle   => 1,
-        Template    => '$',
       },
       {
         Short       => 'f',
         Long        => 'force',
-        CanBundle   => 1,
-        Template    => '',
       },
       {
         Short       => 'h',

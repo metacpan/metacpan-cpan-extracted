@@ -35,7 +35,8 @@
             "Test::MinimumVersion" : "0",
             "Test::More" : "0.88",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0"
          }
       },
       "runtime" : {
@@ -75,19 +76,19 @@
    "provides" : {
       "Text::Parser" : {
          "file" : "lib/Text/Parser.pm",
-         "version" : "0.917"
+         "version" : "0.918"
       },
       "Text::Parser::AutoSplit" : {
          "file" : "lib/Text/Parser/AutoSplit.pm",
-         "version" : "0.917"
+         "version" : "0.918"
       },
       "Text::Parser::Errors" : {
          "file" : "lib/Text/Parser/Errors.pm",
-         "version" : "0.917"
+         "version" : "0.918"
       },
       "Text::Parser::Multiline" : {
          "file" : "lib/Text/Parser/Multiline.pm",
-         "version" : "0.917"
+         "version" : "0.918"
       }
    },
    "release_status" : "stable",
@@ -102,7 +103,7 @@
          "web" : "https://github.com/balajirama/Text-Parser"
       }
    },
-   "version" : "0.917",
+   "version" : "0.918",
    "x_contributors" : [
       "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

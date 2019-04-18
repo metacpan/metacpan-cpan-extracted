@@ -1,4 +1,13 @@
 Revision history for QuadPres
 
+0.28.1       2019-04-17
+
+    - Add missing req on MooX::late
+        - https://rt.cpan.org/Public/Bug/Display.html?id=129214
+    - Fix issues link
+        - https://rt.cpan.org/Public/Bug/Display.html?id=129213
+    - Thanks to SREZIC .
+
 0.28.0       2019-04-17
+
     - First CPAN version, released on an unsuspecting world

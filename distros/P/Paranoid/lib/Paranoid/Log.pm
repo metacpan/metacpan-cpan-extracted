@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Log.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Log.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -27,13 +27,13 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Module;
 use Paranoid::Input;
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     PL_DEBUG     PL_INFO      PL_NOTICE    PL_WARN
     PL_ERR       PL_CRIT      PL_ALERT     PL_EMERG
     PL_EQ        PL_NE        PL_GE        PL_LE
-    startLogger stopLogger plog
+    startLogger stopLogger plog plverbosity
     );
 @EXPORT_OK = (@EXPORT);
 %EXPORT_TAGS = ( all => [@EXPORT_OK], );
@@ -110,7 +110,9 @@ our @_levels = (
 
                 # Yep, so try to load relative to Paranoid::Log
                 $rv =
-                    $mname eq 'Stderr' ? 1
+                      $mname eq 'Stderr' ? 1
+                    : $mname eq 'Stdout' ? 1
+                    : $mname eq 'PDebug' ? 1
                     : loadModule( "Paranoid::Log::$mname", '' )
                     && eval "Paranoid::Log::${mname}::init();"
                     && eval "\$sref = \\&Paranoid::Log::${mname}::logMsg;"
@@ -219,6 +221,11 @@ our @_levels = (
         $level = PL_NOTICE unless defined $level;
         $scope = PL_GE     unless defined $scope;
 
+        # This is totally unnecessary, but we'll set PDebug to reflect
+        # how it actually operations in case anyone is looking at the
+        # distribution map
+        $level = PL_DEBUG if $mech eq 'PDebug';
+
         # Make sure this is a valid named logger
         unless ( defined $name and length $name ) {
             Paranoid::ERROR =
@@ -259,9 +266,10 @@ our @_levels = (
                     scope     => $scope,
                     options   => {%$mopts} };
                 $rv =
-                    $mech eq 'Stderr'
-                    ? 1
-                    : &{ $msubs{$mech}[PL_AREF] }( %{ $loggers{$name} } );
+                      $mech eq 'Stderr' ? 1
+                    : $mech eq 'Stdout' ? 1
+                    : $mech eq 'PDebug' ? 1
+                    :   &{ $msubs{$mech}[PL_AREF] }( %{ $loggers{$name} } );
                 if ($rv) {
                     _updateDist();
                 } else {
@@ -287,7 +295,9 @@ our @_levels = (
 
         pdebug( 'deleting %s logger', PDLEVEL3, $name );
         if ( exists $loggers{$name} ) {
-            unless ( $loggers{$name}{mechanism} eq 'Stderr' ) {
+            unless ( $loggers{$name}{mechanism} eq 'Stderr'
+                or $loggers{$name}{mechanism} eq 'Stdout'
+                or $loggers{$name}{mechanism} eq 'PDebug' ) {
                 $rv =
                     &{ $msubs{ $loggers{$name}{mechanism} }[PL_DREF] }(
                     %{ $loggers{$name} } );
@@ -307,15 +317,17 @@ our @_levels = (
        # Returns:  True (1) if the message was succesfully logged,
        #           False (0) if there are any errors
        # Usage:    $rv = plog($severity, $message);
+       # Usage:    $rv = plog($severity, $message, @pdebugvals);
 
         my $level   = shift;
         my $message = shift;
+        my @margs   = @_;
         my $rv      = 1;
         my %record  = (
             severity => $level,
             message  => $message,
             );
-        my ( $logger, $sref );
+        my ( $logger, $sref, $plevel );
 
         pdebug( 'entering w/(%s)(%s)', PDLEVEL1, $level, $message );
         pIn();
@@ -327,15 +339,53 @@ our @_levels = (
 
         if ($rv) {
 
+            # Trim leading/trailing whitespace and line terminators
+            $message =~ s/^[\s\r\n]+//s;
+            $message =~ s/[\s\r\n]+$//s;
+
+            # First, if PDebug was enabled, we'll preprocess messages through
+            # pdebug. *Every* message gets passed since pdebug has its own
+            # mechanism to decide what to display
+            if ( grep { $loggers{$_}{mechanism} eq 'PDebug' } keys %loggers )
+            {
+
+                # Paranoid::Debug uses an escalating scale of verbosity while
+                # this module uses an escalating scale of severity.  We can
+                # equate them in an inverse relationship, but we'll also need
+                # to increment the output value since pdebug equates 0 as
+                # disabled.
+                #
+                # In addition to that, we'll also make it a negative number to
+                # signal pdebug to dive deeper into the call stack to find the
+                # true originator of the message.  Otherwise, it would report
+                # plog as the originator, which is less than helpful.
+                $plevel = ( ( $level ^ 7 ) + 1 ) * -1;
+
+                # Send it to pdebug, but save the output
+                $message = pdebug( $message, $plevel, @margs );
+
+                # Substitute the processed output if we had any substitution
+                # values passed at all
+                $record{message} = $message if scalar @margs;
+
+            }
+
             # Iterate over the @dist level
             if ( defined $dist[$level] ) {
 
                 # Iterate over each logger
                 foreach $logger ( @{ $dist[$level] } ) {
+                    next if $loggers{$logger}{mechanism} eq 'PDebug';
+
                     if ( $loggers{$logger}{mechanism} eq 'Stderr' ) {
 
                         # Special handling for STDERR
-                        $rv = pderror($message) ? 1 : 0;
+                        $rv = pderror($message);
+
+                    } elsif ( $loggers{$logger}{mechanism} eq 'Stdout' ) {
+
+                        # Special handling for STDOUT
+                        $rv = print STDOUT "$message\n";
 
                     } else {
 
@@ -365,6 +415,58 @@ our @_levels = (
     }
 }
 
+sub plverbosity {
+
+    # Purpose:  Sets Stdout/Stderr verbosity according to passed leve.
+    #           Supports levels 1 - 3, with 4 being the most verbose
+    # Returns:  Boolean
+    # Usage:    $rv = plverbosity($level);
+
+    my $level  = shift;
+    my $max    = 3;
+    my $outidx = 2;
+    my $erridx = 5;
+    my $rv     = 1;
+
+    pdebug( 'entering w/(%s)', PDLEVEL3, $level );
+    pIn();
+
+    # Make sure a positive integer was passed
+    $rv = 0 unless $level > -1;
+
+    # Cap $level
+    $level = $max if $level > $max;
+
+    # First, stop an current logging
+    foreach ( 0 .. 7 ) {
+        stopLogger( $_ < 3 ? "Stdout$_" : "Stderr$_" );
+    }
+
+    # Always enable PL_EMERG/PL_ALERT
+    if ($level) {
+        startLogger( "Stderr6", 'Stderr', PL_ALERT, PL_EQ );
+        startLogger( "Stderr7", 'Stderr', PL_EMERG, PL_EQ );
+    }
+
+    # Enable what's been asked
+    while ( $rv and $level ) {
+
+        # Start the levels
+        startLogger( "Stdout$outidx", 'Stdout', $outidx, PL_EQ );
+        startLogger( "Stderr$erridx", 'Stderr', $erridx, PL_EQ );
+
+        # Decrement the counters
+        $outidx--;
+        $erridx--;
+        $level--;
+    }
+
+    pOut();
+    pdebug( 'leaving w/rv: %s', PDLEVEL3, $rv );
+
+    return $rv;
+}
+
 1;
 
 __END__
@@ -375,7 +477,7 @@ Paranoid::Log - Log Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Log.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -478,7 +580,7 @@ Scope is defined with the following characters:
                     or higher
   PL_LE           log only messages at this severity
                     or lower
-  PL_NE          log at all levels but this severity
+  PL_NE           log at all levels but this severity
 
 If omitted scope defaults to I<PL_GE>.
 
@@ -488,10 +590,12 @@ facilities provided directly by B<Paranoid> are as follows:
 
   mechanism        arguments
   =====================================================
-  Stderr          none
-  Buffer          bufferSize (optional)
-  File            file, mode (optional), perm (optional),
-                  syslog (optional)
+  Stdout           none
+  Stderr           none
+  Buffer           bufferSize (optional)
+  File             file, mode (optional), perm (optional),
+                   syslog (optional)
+  PDebug           none
 
 =head2 stopLogger
 
@@ -504,8 +608,37 @@ re-initializes the distribution processor.
 
   $rv = plog($severity, $message);
 
+  # If the PDebug mechanism is enabled
+  $rv = plog($severity, $message, @substitutions);
+
 This call logs the passed message to all facilities enabled at the specified
-log level.
+log level.  If you have B<PDebug> enabled as a mechanism this function can
+also provide an equivalent L<sprintf> functionality using the additional
+arguments, and that processed output will be shared with all other mechanisms
+that are enabled.
+
+B<NOTE:> I<PDebug> support is meant to be a convenience to unify both normal
+logging and the L<Paranoid::Debug::pdebug> B<STDERR> tracing mechanism.  That
+said, note than enabling it means that B<all> log messages are passed to
+L<pdebug>, since it has its own mechanism for deciding what gets sent to
+B<STDERR> or not.
+
+I<PDebug> support may not make sense for if your logging and debug output
+can't be neatly lined up with the syslog-styled severities.
+
+=head2 plverbosity
+
+    $rv = plverbosity($level);
+ 
+This function provides a simpler way to enable B<Stdout>/B<Stderr> logging to
+the appropriate level, if you consider B<PL_DEBUG> to B<PL_NOTICE> to be
+normal operation messages appropriate for B<STDOUT> messages, and B<PL_WARN>
+through B<PL_EMERG> to be error messages appropriate for B<STDERR>.
+
+This is primarily a convenience function for those simple, non-interactive
+programs/functions that need support varying levels of verbosity for the
+console.  From that perspective, it will be assumed that all user
+notifications would be simple one-line messages.
 
 =head1 DEPENDENCIES
 

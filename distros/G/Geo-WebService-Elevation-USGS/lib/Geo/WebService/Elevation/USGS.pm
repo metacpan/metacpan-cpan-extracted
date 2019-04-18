@@ -127,7 +127,7 @@ use JSON;
 use LWP::UserAgent;
 use Scalar::Util 1.10 qw{ blessed looks_like_number };
 
-our $VERSION = '0.111';
+our $VERSION = '0.112';
 
 use constant BEST_DATA_SET => -1;
 use constant USGS_URL => 'http://ned.usgs.gov/epqs/pqs.php';
@@ -892,7 +892,7 @@ The default is the null subroutine, i.e. C<sub {}>.
 
 =head3 source
 
-This attribute is deprecated. See the L<NOTICE|/NOtICE> above for the
+This attribute is deprecated. See the L</NOTICE> above for the
 deprecation schedule.
 
 This attribute specifies the ID of the source layer to be queried by

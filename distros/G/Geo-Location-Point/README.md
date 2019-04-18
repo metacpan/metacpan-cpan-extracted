@@ -5,7 +5,7 @@ Location information
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 

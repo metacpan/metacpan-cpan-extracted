@@ -1,6 +1,6 @@
 Revision history for Perl extension Lingua::IN::TGC.
 
-0.01  Wed May 17 18:38:35 2017
+0.01  Tue Apr 16 21:28:01 2019
 	- original version; created by h2xs 1.23 with options
-		-AX -n Lingua::IN::TGC
+		-Xn Lingua::IN::TGC
 

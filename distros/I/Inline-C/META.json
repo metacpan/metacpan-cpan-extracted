@@ -4,13 +4,13 @@
       "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Inline-C",
    "no_index" : {
@@ -41,10 +41,10 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "7.00",
             "File::Spec" : "0.8",
-            "Inline" : "0.79",
+            "Inline" : "0.81",
             "Parse::RecDescent" : "1.967009",
-            "Pegex" : "0.58",
-            "perl" : "v5.10.0"
+            "Pegex" : "0.66",
+            "perl" : "v5.8.1"
          }
       },
       "test" : {
@@ -71,7 +71,8 @@
          "web" : "https://github.com/ingydotnet/inline-c-pm"
       }
    },
-   "version" : "0.78",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.80",
+   "x_generated_by_perl" : "v5.24.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
 }
 

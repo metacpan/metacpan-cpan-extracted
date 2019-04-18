@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/IO.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/IO.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -30,7 +30,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Input;
 use IO::Handle;
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(pclose pcloseAll popen preopen ptell pseek pflock pread
     pnlread pwrite pappend ptruncate);
@@ -740,7 +740,7 @@ Paranoid::IO - Paranoid IO support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/IO.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -891,17 +891,20 @@ would be cautioned to avoid using relative paths with I<popen>.
 This lvalue function is not exported by default.  It is used to determine the
 default block size to read when a size is not explicitly passed.  Depending on
 hardware and file system parameters there might be performance gains to be
-had when doing default-sized reads.  The default is 4096, which is generally a
-safe size for most applications.
+had when doing default-sized reads.
+
+The default is 4096, which is generally a safe size for most applications.
 
 =head2 PIOMAXFSIZE
 
-    PIOMAXFSIZE = 65536;
+    PIOMAXFSIZE = 131072;
 
 This lvalue function is not exported by default.  It is used to determine the
 maximum file size that will be read.  This is not used in this module, but
 provided for use in dependent modules that may want to impose file size
 limits, such as L<Paranoid::IO::Line> and others.
+
+The default is 65536.
 
 =head2 popen
 

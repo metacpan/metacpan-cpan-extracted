@@ -1,9 +1,9 @@
 package Clipboard::Xclip;
-$Clipboard::Xclip::VERSION = '0.19';
+$Clipboard::Xclip::VERSION = '0.20';
 use strict;
 use warnings;
 
-use Clipboard;
+use File::Spec ();
 
 sub copy {
     my $self = shift;
@@ -50,8 +50,25 @@ sub paste_from_selection {
 # This ordering isn't officially verified, but so far seems to work the best:
 sub all_selections { qw(primary buffer clipboard secondary) }
 sub favorite_selection { my $self = shift; ($self->all_selections)[0] }
+
+sub xclip_available {
+    # close STDERR
+    open my $olderr, '>&', \*STDERR;
+    close STDERR;
+    open STDERR, '>', File::Spec->devnull;
+
+    my $open_retval = open my $just_checking, 'xclip -o|';
+
+    # restore STDERR
+    close STDERR;
+    open STDERR, '>&', $olderr;
+    close $olderr;
+
+    return $open_retval;
+}
+
 {
-  open my $just_checking, 'xclip -o|' or warn <<'EPIGRAPH';
+  xclip_available() or warn <<'EPIGRAPH';
 
 Can't find the 'xclip' script.  Clipboard.pm's X support depends on it.
 
@@ -74,7 +91,7 @@ Clipboard::Xclip
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

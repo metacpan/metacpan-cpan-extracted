@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Input.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Input.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -27,7 +27,7 @@ use Paranoid;
 use Paranoid::Debug qw(:all);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(detaint stringMatch pchomp);
 @EXPORT_OK   = ( @EXPORT, qw(NEWLINE_REGEX) );
@@ -282,7 +282,7 @@ Paranoid::Input - Paranoid input functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Input.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Input.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -312,6 +312,17 @@ $Id: lib/Paranoid/Input.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
 This provides some generic functions for working with text-based input.  The
 main benefirst of this module is a relatively simple way of validating and
 detainting formatted text and performing platform-agnostic chomps.
+
+=head1 VARIABLES
+
+=head2 NEWLINE_REGEX
+
+This returns regular expression that matches against DOS, UNIX, and legacy Mac
+line terminators.  This is the regular expression used internally by L<pchomp>
+to perform platform-agnostic chomps.
+
+This is only exported if explicity requested, or under an import target of 
+B<:all>.
 
 =head1 SUBROUTINES/METHODS
 

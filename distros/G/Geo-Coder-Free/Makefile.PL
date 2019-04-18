@@ -106,7 +106,7 @@ WriteMakefile(
 		'File::Copy' => 0,
 		'File::Spec' => 0,
 		'autodie' => 0,
-		'Geo::Location::Point' => 0,
+		'Geo::Location::Point' => 0.02,
 		'IO::AIO' => 0,
 		'IPC::System::Simple' => 0,
 		'JSON' => 0,

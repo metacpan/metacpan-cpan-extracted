@@ -1,3 +1,10 @@
+0.20    2019-04-18
+
+    - use xclip on cygwin/win32 if SSH_CONNECTION is set (rkitover)
+    - use xclip if DISPLAY is set and OS is unknown (rkitover)
+    - Apply doc patch from https://rt.cpan.org/Ticket/Display.html?id=64243
+        - Thanks to Andreas
+
 0.19    2019-01-31
 
     - Add copy_to_all_selections().

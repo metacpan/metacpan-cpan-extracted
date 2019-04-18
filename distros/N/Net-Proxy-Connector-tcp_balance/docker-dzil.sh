@@ -5,7 +5,7 @@
 # so that prereque perl modules (or even perl itself)
 # do not need to be installed on the host
 
-# first construct a Dockerfile 
+# first construct a Dockerfile
 # that specifies all of the prereques needed to build this module
 cat - > Dockerfile <<Dockerfile
 FROM jmmills/dist-zilla

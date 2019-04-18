@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Net-Proxy-Connector-tcp_balance,
-version 0.005:
+version 0.006:
 
   A Net::Proxy connector for outbound tcp balancing and failover
 
-This software is copyright (c) 2017 by Jesse Thompson.
+This software is copyright (c) 2019 by Jesse Thompson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

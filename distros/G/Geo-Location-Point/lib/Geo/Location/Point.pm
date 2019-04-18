@@ -14,11 +14,11 @@ Location information
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -124,8 +124,9 @@ sub as_string {
 		$rc = ucfirst(lc($rc));
 	}
 
-	foreach my $field('house_number', 'number', 'road', 'street', 'AccentCity', 'city', 'county', 'Region', 'state_district', 'state', 'country', 'Country') {
-		if(my $value = $self->{$field}) {
+	# foreach my $field('house_number', 'number', 'road', 'street', 'AccentCity', 'city', 'county', 'region', 'state_district', 'state', 'country') {
+	foreach my $field('house_number', 'number', 'road', 'street', 'city', 'county', 'region', 'state_district', 'state', 'country') {
+		if(my $value = ($self->{$field} || $self->{ucfirst($field)})) {
 			if($rc) {
 				if(($field eq 'street') || ($field eq 'road')) {
 					if($self->{'number'} || $self->{'house_number'}) {
@@ -151,6 +152,11 @@ sub as_string {
 				} elsif(($country eq 'Canada') || ($country eq 'Australia')) {
 					if($field eq 'state') {
 						$leave_case = 1;
+					}
+				} elsif(uc($country) eq 'GB') {
+					if(lc($field) eq 'country') {
+						$leave_case = 1;
+						$value = 'GB';
 					}
 				}
 			}

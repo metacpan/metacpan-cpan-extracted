@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 
 use Mojolicious::Plugin::Tables::Model;
 
-our $VERSION = '0.08';
+our $VERSION = '1.01';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -45,6 +45,20 @@ sub register {
     my $model = $schema->model;
     $app->config(model=>$model);
 
+    $app->hook(before_dispatch => sub {
+        my $c = shift;
+        # Move first part and slash from path to base path when deployed under a path
+        if ($c->req->headers->header('X-Request-Base')) {
+            my $part0 = shift @{$c->req->url->path->leading_slash(0)};
+                         push @{$c->req->url->base->path->trailing_slash(0)}, $part0;
+        }
+        # capture https into base
+        if ($c->req->headers->header('X-Forwarded-HTTPS')
+        || ($c->req->headers->header('X-Forwarded-Proto')||'') eq 'https') {
+            $c->req->url->base->scheme('https')
+        }
+    });
+ 
     my $plugin_resources = catdir dirname(__FILE__), 'Tables', 'resources';
     push @{$app->routes->namespaces}, 'Mojolicious::Plugin::Tables::Controller';
     push @{$app->renderer->paths}, catdir($plugin_resources, 'templates');

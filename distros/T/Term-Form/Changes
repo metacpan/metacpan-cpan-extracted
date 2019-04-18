@@ -1,6 +1,9 @@
 Revision history for Term::Form
 
 
+0.511   2019-04-18
+        - Bufix: reset_term to early.
+
 0.510   2019-04-05
         - "readline": use 'Ctrl-X' instead of 'Ctrl-D' to return undef.
 

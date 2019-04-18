@@ -15,11 +15,11 @@ App::Spoor::ParsedFileManager
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
@@ -74,17 +74,21 @@ sub process_parsed_files {
   my ($source_file_path, $file_contents);
   opendir my $parsed_entries_dir, $config->{parsed_entries_path};
 
-  my @sanitised_file_names = grep { /\A((error|access|login)\.\d+\.\d+\.json)\z/ } readdir $parsed_entries_dir;
+  my @file_names = grep { /\A((error|access|login)\.\d+\.\d+\.json)\z/ } readdir $parsed_entries_dir;
 
-  foreach my $sanitised_file_name (@sanitised_file_names) {
-    $source_file_path = File::Spec->catfile($config->{parsed_entries_path}, $sanitised_file_name);
-    if ($file_security_check->($source_file_path)) {
-      $file_contents = from_json(path($source_file_path)->slurp_utf8());
+  foreach my $file_name (@file_names) {
+    # Untaint 
+    if ($file_name =~ /\A((error|access|login)\.\d+\.\d+\.json)\z/) {
+      my $sanitised_file_name = $1;
+      $source_file_path = File::Spec->catfile($config->{parsed_entries_path}, $sanitised_file_name);
+      if ($file_security_check->($source_file_path)) {
+        $file_contents = from_json(path($source_file_path)->slurp_utf8());
 
-      if ($transmitter->($file_contents)) {
-        move($source_file_path, $config->{transmitted_entries_path});
-      } else {
-        move($source_file_path, $config->{transmission_failed_entries_path});
+        if ($transmitter->($file_contents)) {
+          move($source_file_path, $config->{transmitted_entries_path});
+        } else {
+          move($source_file_path, $config->{transmission_failed_entries_path});
+        }
       }
     }
   }

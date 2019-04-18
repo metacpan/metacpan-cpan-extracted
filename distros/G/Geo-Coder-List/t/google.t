@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 22;
+use Test::Most tests => 20;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 GOOGLE: {
 	SKIP: {
-		skip 'Test requires Internet access', 20 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 18 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::Google::V3;
@@ -27,7 +27,7 @@ GOOGLE: {
 
 		if($@) {
 			diag('Geo::Coder::Google::V3 not installed - skipping tests');
-			skip 'Geo::Coder::Google::V3 not installed', 20;
+			skip 'Geo::Coder::Google::V3 not installed', 18;
 		} else {
 			diag("Using Geo::Coder::Google::V3 $Geo::Coder::Google::V3::VERSION");
 		}
@@ -54,8 +54,8 @@ GOOGLE: {
 			delta_within($location->{geometry}{location}{lng}, -77.02, 1e-1);
 			is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
 
-			$location = $geocoderlist->geocode('Plugh Hospice, Rochester, Earth');
-			ok(!defined($location));
+			# $location = $geocoderlist->geocode('Plugh Hospice, Rochester, Earth');
+			# ok(!defined($location));
 
 			$location = $geocoderlist->geocode({ location => 'Rochester, Kent, England' });
 			ok(defined($location));
@@ -63,14 +63,14 @@ GOOGLE: {
 			delta_within($location->{geometry}{location}{lat}, 51.38, 1e-1);
 			delta_within($location->{geometry}{location}{lng}, 0.5067, 1e-1);
 
-			$location = $geocoderlist->geocode('Xyzzy Lane, Minster, Thanet, Kent, England');
-			ok(!defined($location));
+			# $location = $geocoderlist->geocode('Xyzzy Lane, Minster, Thanet, Kent, England');
+			# ok(!defined($location));
 
 			ok(!defined($geocoderlist->geocode()));
 			ok(!defined($geocoderlist->geocode('')));
 		} else {
 			diag('Set GMAP_KEY to enable more tests');
-			skip 'GMAP_KEY not set', 20;
+			skip('GMAP_KEY not set', 18);
 		}
 	}
 }

@@ -97,7 +97,7 @@ The alternative text.
 use parent qw(Comics::Fetcher::Base);
 
 sub fetch {
-    my ( $self ) = @_;
+    my ( $self, $reuse ) = @_;
     my $state = $self->{state};
     my $pats  = $self->{patterns} || [ $self->{pattern} ];
     my $name  = $self->{name};
@@ -116,21 +116,30 @@ sub fetch {
 	my $data;
 	foreach my $pat ( @$pats ) {
 	    $pix++;
-
+	    $data = "";
 	    $state->{trying} = $url;
-	    ::debug("Fetching page $pix $url");
-	    $::ua->default_header( Referer => $referer );
-	    my $res = $::ua->get($url);
-	    unless ( $res->is_success ) {
-		$self->{fail} = "Not found", return if $self->{optional};
-		die($res->status_line);
+
+	    if ( $reuse ) {
+		::debug("Reusing page $pix $url");
+		$data = $self->load_html(".$tag.$pix.html");
+		$reuse = 0 unless $data;
+	    }
+	    unless ( $data ) {
+		::debug("Fetching page $pix $url");
+		$::ua->default_header( Referer => $referer );
+		my $res = $::ua->get($url);
+		unless ( $res->is_success ) {
+		    $self->{fail} = "Not found", return if $self->{optional};
+		    die($res->status_line);
+		}
+		$data = $res->content;
 	    }
 
-	    $data = $res->content;
 	    unless ( $data =~ $pat ) {
 		$self->{fail} = "No match", return if $self->{optional};
 		# Save a copy of the failed data.
-		$self->save_html( ".$tag.html", $data ) if ::debugging();
+		$self->save_html( ".$tag.$pix.html", $data )
+		  if ::debugging() && !$reuse;
 		die("FAIL: pattern $pix not found");
 	    }
 

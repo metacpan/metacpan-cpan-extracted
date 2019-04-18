@@ -41,16 +41,8 @@ my %params = (
         'strict'       => 0,
     },
 
-    META_MERGE => {
-        'meta-spec'         => { version => 2 },
-        'homepageresources' => {
-            repository => {
-                url  => 'git://github.com/thrig/Music-Voss.git',
-                web  => 'https://github.com/thrig/Music-Voss',
-                type => 'git',
-            },
-        },
-    },
+    META_MERGE =>
+      { 'resources' => { repository => 'https://github.com/thrig/Music-Voss', }, },
 );
 
 (   my $mm_version = ExtUtils::MakeMaker->VERSION(
@@ -59,7 +51,6 @@ my %params = (
 ) =~ tr/_//d;
 
 if ( $mm_version < 6.67_04 ) {
-    # Why? For the glory of spectral filtering, of course!
     *ExtUtils::MM_Any::_add_requirements_to_meta_v1_4 =
       \&ExtUtils::MM_Any::_add_requirements_to_meta_v2;
 }

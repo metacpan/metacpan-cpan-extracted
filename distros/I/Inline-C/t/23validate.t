@@ -3,6 +3,7 @@
 
 use warnings;
 use strict;
+use Config;
 
 print "1..5\n";
 
@@ -25,8 +26,22 @@ bless($o3, 'Inline::C');
 
 Inline::C::validate($o1);
 
-if($o1->{ILSM}{MAKEFILE}{INC}) {print "ok 1\n"}
-else {print "not ok 1\n"}
+if(($Config{osname} eq 'MSWin32') and ($Config{cc} =~ /\b(cl\b|clarm|icl)/)) {
+
+  ## $o1->{ILSM}{MAKEFILE}{INC} should be unset
+  ## as it's $ENV{INCLUDE} that is instead amended
+
+  if($o1->{ILSM}{MAKEFILE}{INC}) {print "not ok 1\n"}
+  else {print "ok 1\n"}
+}
+else {
+
+  ## $o1->{ILSM}{MAKEFILE}{INC} should be set
+  ## to "-I\"$FindBin::Bin\""
+
+  if($o1->{ILSM}{MAKEFILE}{INC}) {print "ok 1\n"}
+  else {print "not ok 1\n"}
+}
 
 Inline::C::validate($o2);
 
@@ -52,9 +67,27 @@ else {
 
 Inline::C::validate($o3, 'INC', '-I/baz');
 
-if($o3->{ILSM}{MAKEFILE}{INC} =~ / \-I\/baz/ &&
-   $o3->{ILSM}{MAKEFILE}{INC} ne ' -I/baz' ) {print "ok 5\n"}
+if(($Config{osname} eq 'MSWin32') and ($Config{cc} =~ /\b(cl\b|clarm|icl)/)) {
+
+  ## $o3->{ILSM}{MAKEFILE}{INC} should be set to " -I/baz"
+
+  if($o3->{ILSM}{MAKEFILE}{INC} eq ' -I/baz' ) {print "ok 5\n"}
+  else {
+    warn "INC: ", $o3->{ILSM}{MAKEFILE}{INC}, "\n";
+    print "not ok 5\n";
+  }
+
+}
 else {
-  warn "INC: ", $o3->{ILSM}{MAKEFILE}{INC}, "\n";
-  print "not ok 5\n";
+
+  ## $o3->{ILSM}{MAKEFILE}{INC} should be set
+  ## to "-I\"$FindBin::Bin\"" followed by " -I/baz"
+
+  if($o3->{ILSM}{MAKEFILE}{INC} =~ / \-I\/baz/ &&
+     $o3->{ILSM}{MAKEFILE}{INC} ne ' -I/baz' ) {print "ok 5\n"}
+  else {
+    warn "INC: ", $o3->{ILSM}{MAKEFILE}{INC}, "\n";
+    print "not ok 5\n";
+  }
+
 }

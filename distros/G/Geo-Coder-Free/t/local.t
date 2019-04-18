@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 10;
+use Test::Most tests => 11;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -18,6 +18,8 @@ LOCAL: {
 
 	cmp_deeply($geo_coder->geocode('NCBI, MEDLARS DR, BETHESDA, MONTGOMERY, MD, USA'),
 		methods('lat' => num(39.00, 1e-2), 'long' => num(-77.10, 1e-2)));
+
+	like($geo_coder->reverse_geocode('39,-77.10'), qr/Bethesda/i, 'test reverse_geocode');
 
 	cmp_deeply($geo_coder->geocode(location => 'NCBI, MEDLARS DR, BETHESDA, MONTGOMERY, MD, USA'),
 		methods('lat' => num(39.00, 1e-2), 'long' => num(-77.10, 1e-2)));

@@ -4,38 +4,38 @@
 [![CPAN](https://img.shields.io/cpan/v/Geo-Coder-Postcodes.svg)](http://search.cpan.org/~nhorne/Geo-Coder-Postcodes/)
 [![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/6314705722033970/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/6314705722033970/heads/master/)
 
-# Geo::Coder::Postcodes
+# NAME
 
-Provides a geocoding functionality using https://postcodes.io.
+Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcodes.io.
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
       use Geo::Coder::Postcodes;
 
-      my $geocoder = Geo::Coder::Postcodes->new();
-      my $location = $geocoder->geocode(location => 'Margate');
+      my $geo_coder = Geo::Coder::Postcodes->new();
+      my $location = $geo_coder->geocode(location => 'Margate');
 
 # DESCRIPTION
 
 Geo::Coder::Postcodes provides an interface to postcodes.io,
-a free geocode database covering the towns in the UK.
+a free Geo-Coder database covering the towns in the UK.
 
 # METHODS
 
 ## new
 
-    $geocoder = Geo::Coder::Postcodes->new();
+    $geo_coder = Geo::Coder::Postcodes->new();
     my $ua = LWP::UserAgent->new();
     $ua->env_proxy(1);
-    $geocoder = Geo::Coder::Postcodes->new(ua => $ua);
+    $geo_coder = Geo::Coder::Postcodes->new(ua => $ua);
 
 ## geocode
 
-    $location = $geocoder->geocode(location => $location);
+    $location = $geo_coder->geocode(location => $location);
 
     print 'Latitude: ', $location->{'latitude'}, "\n";
     print 'Longitude: ', $location->{'logitude'}, "\n";
@@ -46,16 +46,16 @@ Accessor method to get and set UserAgent object used internally. You
 can call _env\_proxy_ for example, to get the proxy information from
 environment variables:
 
-    $geocoder->ua()->env_proxy(1);
+    $geo_coder->ua()->env_proxy(1);
 
 You can also set your own User-Agent object:
 
     use LWP::UserAgent::Throttled;
-    $geocoder->ua(LWP::UserAgent::Throttled->new());
+    $geo_coder->ua(LWP::UserAgent::Throttled->new());
 
 ## reverse\_geocode
 
-    $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
+    $location = $geo_coder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 Similar to geocode except it expects a latitude/longitude parameter.
 
@@ -81,6 +81,6 @@ Lots of thanks to the folks at postcodes.io.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017-2018 Nigel Horne.
+Copyright 2017-2019 Nigel Horne.
 
 This program is released under the following licence: GPL2

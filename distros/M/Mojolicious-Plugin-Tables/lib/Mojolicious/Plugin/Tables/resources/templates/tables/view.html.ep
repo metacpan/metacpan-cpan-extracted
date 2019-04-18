@@ -51,7 +51,7 @@
 <div id="tablesbuts" class="ui-widget-content ui-corner-all">
     % for my $table1 (@$tablist) {
         % my $tinfo1 = $bytable->{$table1};
-        % my $url    = url_for('tables')->query(start_with=>$table1);
+        % my $url    = url_for('/tables')->query(start_with=>$table1);
         %= link_to $tinfo1->{label} => $url => (class=>"button")
     % }
 </div>

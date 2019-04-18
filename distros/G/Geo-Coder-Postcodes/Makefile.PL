@@ -8,13 +8,17 @@ my $online_tests;
 
 if($ENV{RELEASE_TESTING}) {
 	$online_tests = are_online();
-} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING}) {
+} elsif($ENV{AUTOMATED_TESTING} || $ENV{NO_NETWORK_TESTING} || (!-t STDIN)) {
 	$online_tests = 0;
 } else {
 	Getopt::Long::GetOptions('online-tests!' => \$online_tests);
 
 	if(!defined($online_tests)) {
-		$online_tests = are_online();
+		if($ENV{RELEASE_TESTING}) {
+			$online_tests = are_online();
+		} else {
+			$online_tests = 0;
+		}
 	}
 }
 
@@ -55,13 +59,13 @@ WriteMakefile(
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo-Coder-Postcodes-*' },
     META_MERGE		=> {
-    	'meta-spec' => { version => 2 },
-    	resources => {
-    		repository => {
+	'meta-spec' => { version => 2 },
+	resources => {
+		repository => {
 			type => 'git',
 			url => 'git://github.com/nigelhorne/Geo-Coder-Postcodes.git',
 			web => 'https://github.com/nigelhorne/Geo-Coder-Postcodes',
-    		},
+		},
 		bugtracker => {
 			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Postcodes',
 			mailto => 'bug-Geo-Coder-Postcodes@rt.cpan.org'

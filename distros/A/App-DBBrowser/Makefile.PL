@@ -60,7 +60,7 @@ WriteMakefile(
         'SQL::Type::Guess'        => 0,
         'Term::Choose'            => '1.646',
         'Term::Choose::Util'      => '0.071',
-        'Term::Form'              => '0.510',
+        'Term::Form'              => '0.511',
         'Term::TablePrint'        => '0.108',
         'Text::CSV'               => 0,
         %prereqs_os_specific,

@@ -12,7 +12,7 @@ use File::LibMagic;
 use Carp qw(confess);
 use Data::Dumper;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our $CLIENT = "Net-JMAPTalk";
 our $AGENT = "$CLIENT/$VERSION";
@@ -22,6 +22,8 @@ sub new {
   my $Class = ref($Proto) || $Proto;
 
   my $Self = bless { %Args }, $Class;
+
+  $Self->{Using} ||= ['urn:ietf:params:jmap:core', 'urn:ietf:params:jmap:mail'];
 
   return $Self;
 }
@@ -184,10 +186,16 @@ sub Request {
   return $Self->JSONPOST($Self->uri(), $Request, %Headers);
 }
 
+sub DefaultUsing {
+  my ($Self, $Using) = @_;
+  return $Self->{Using} unless $Using;
+  $Self->{Using} = $Using;
+}
+
 sub CallMethods {
   my ($Self, $MethodCalls, $Using, %Headers) = @_;
 
-  $Using ||= ['urn:ietf:params:jmap:core', 'urn:ietf:params:jmap:mail'];
+  $Using ||= $Self->{Using};
 
   my $Request = { using => $Using, methodCalls => $MethodCalls };
 

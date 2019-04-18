@@ -3,9 +3,9 @@ NAME
     openssl
 
 VERSION
-    This document describes version 0.150 of App::CreateSelfSignedSSLCert
+    This document describes version 0.151 of App::CreateSelfSignedSSLCert
     (from Perl distribution App-CreateSelfSignedSSLCert), released on
-    2017-10-11.
+    2019-04-18.
 
 SYNOPSIS
     This distribution provides command-line utility called
@@ -31,7 +31,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

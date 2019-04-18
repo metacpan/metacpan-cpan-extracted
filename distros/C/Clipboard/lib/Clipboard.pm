@@ -1,5 +1,5 @@
 package Clipboard;
-$Clipboard::VERSION = '0.19';
+$Clipboard::VERSION = '0.20';
 use strict;
 use warnings;
 
@@ -27,9 +27,26 @@ sub find_driver {
             dynixptx gnu hpux irix dragonfly machten next os2 sco_sv solaris
             sunos svr4 svr5 unicos unicosmk)),
         bind_os(MacPasteboard => qw(darwin)),
-        bind_os(Win32 => qw(mswin ^win cygwin)),
     );
+
+    if ($os =~ /^(?:mswin|win|cygwin)/i) {
+        # If we are connected to windows through ssh, and xclip is
+        # available, use it.
+        if (exists $ENV{SSH_CONNECTION}) {
+            local $SIG{__WARN__} = sub {};
+            require Clipboard::Xclip;
+
+            return 'Xclip' if Clipboard::Xclip::xclip_available();
+        }
+
+        return 'Win32';
+    }
+
     $os =~ /$_/i && return $drivers{$_} for keys %drivers;
+
+    # use xclip on unknown OSes that seem to have a DISPLAY
+    return 'Xclip' if exists $ENV{DISPLAY};
+
     die "The $os system is not yet supported by Clipboard.pm.  Please email rking\@panoptic.com and tell him about this.\n";
 }
 
@@ -55,7 +72,7 @@ Clipboard
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -67,13 +84,6 @@ version 0.19
 
 Clipboard->cut() is an alias for copy(). copy() is the preferred
 method, because we're not really "cutting" anything.
-
-Also see the scripts:
-    clipaccumulate
-    clipbrowse
-    clipedit
-    clipfilter
-    clipjoin
 
 =head1 DESCRIPTION
 
@@ -90,7 +100,7 @@ Clipboard - Copy and paste with any OS
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 STATUS
 
@@ -111,6 +121,11 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 See http://www.perl.com/perl/misc/Artistic.html
+
+=head1 SEE ALSO
+
+L<clipaccumulate(1)>, L<clipbrowse(1)>, L<clipedit(1)>,
+L<clipfilter(1)>, L<clipjoin(1)>
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -16,6 +16,7 @@ BEGIN {
 
         UINT64_MAX => 0xFFFFFFFFFFFFFFFF,
         UINT32_MAX => 0xFFFFFFFF,
+        INT32_MAX  => 0x7FFFFFFF,
         UINT16_MAX => 0xFFFF,
         UINT8_MAX  => 0xFF,
     );
@@ -35,7 +36,8 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
+our $DEFAULT_VARIANT = 1;
 
 require XSLoader;
 XSLoader::load('Algorithm::MinPerfHashTwoLevel', $VERSION);
@@ -49,6 +51,10 @@ sub new {
     my $o= bless \%opts, $class;
     $o->{state} = seed_state($o->{seed})
         if $o->{seed};
+    $o->{variant} //= $DEFAULT_VARIANT;
+    $o->{variant}= int(0+$o->{variant});
+    die "Unknown variant '$o->{variant}' in constructor new()"
+        if ($o->{variant} > 1);
     return $o;
 }
 
@@ -112,7 +118,7 @@ sub _compute_first_level {
 }
 
 sub __compute_max_xor_val {
-    my ($n)= @_;
+    my ($n,$variant)= @_;
     # if $n is a power of two then flipping higher bits
     # wont change the distribution of the keys, so we set
     # max_xor_val to $n, on the other hand if it is not,
@@ -123,15 +129,16 @@ sub __compute_max_xor_val {
     if ($n_bits_sum == 1) {
         return $n;
     } else {
-        return UINT32_MAX;
+        return $variant ? INT32_MAX : UINT32_MAX;
     }
 }
 
 sub _compute_first_level_inner {
     my ($self)= @_;
     my $debug= $self->{debug};
-    
     my $state= $self->{state};
+
+    my $variant= $self->{variant};
 
     printf "checking seed %s => state: %s\n", 
         unpack("H*",$self->{seed}), 
@@ -140,7 +147,7 @@ sub _compute_first_level_inner {
 
     my $source_hash= $self->{source_hash};
     my $n= $self->{n};
-    my $max_xor_val= __compute_max_xor_val($n);
+    my $max_xor_val= __compute_max_xor_val($n,$variant);
     printf "max_xor_val=%d (n=%d)\n",$max_xor_val,$n
         if $debug;
 
@@ -178,6 +185,7 @@ sub _compute_first_level_inner {
         } (0 .. ($n-1));
     my $last_size= -1;
     my $size_count= 0;
+    my $used_pos= $variant == 1 ? 0 : undef;
 
     while (@idx1) {
         my $idx1= shift @idx1;
@@ -195,7 +203,7 @@ sub _compute_first_level_inner {
             $size_count++;
         }
         my $idx_sv;
-        my $xor_val= calc_xor_val($max_xor_val,$h2_buckets[$idx1],$idx_sv,$used_sv);
+        my $xor_val= calc_xor_val($max_xor_val,$h2_buckets[$idx1],$idx_sv,$used_sv,$used_pos);
 
         if ($xor_val) {
             my @idx2= unpack "L*", $idx_sv;
@@ -266,7 +274,8 @@ which has no collisions for any keys, a minimal perfect hash has exactly the
 same number of buckets as it has keys. The "two level" algorithm involves
 computing two hash values for each key. The first is used as an initial lookup
 into the bucket array to find a mask value which is used to modify the second
-hash value to determine the actual bucket to read from.
+hash value to determine the actual bucket to read from. This module computes
+the appropriate mask values.
 
 In this implementation only one 64 bit hash value is computed, but the high
 and low 32 bits are used as if there were two hash values. The hash function
@@ -282,7 +291,11 @@ as follows:
     1. compute idx = h1 % n;
     2. find the xor_val for bucket[idx]
     3. if the xor_val is zero we are done, the key is not in the hash
-    4. compute idx = (h2 ^ xor_val) % n;
+    4. compute idx 
+        if variant == 0 and (int)xor_val < 0
+         idx = -xor_val-1
+        else 
+         idx = (h2 ^ xor_val) % n;
     5. compare the key data associated with bucket[idx] with the key provided
     6. if they match return the desired value.
 

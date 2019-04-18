@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 85;
 use File::Temp;
 use Data::Dumper; $Data::Dumper::Sortkeys=1; $Data::Dumper::Useqq=1;
 my $class;
@@ -33,61 +33,67 @@ my @source_hashes= (
     },
 );
 
-foreach my $idx (0..$#source_hashes) {
-    foreach my $seed ("1234567812345678",undef) {
-        my $seed_str= defined $seed ? $seed : "undef";
-        my $source_hash= $source_hashes[$idx];
-        my $test_file= "$tmpdir/test.$idx.hash";
-        my $got_file= $class->make_file(
-            file        => $test_file,
-            source_hash => $source_hash,
-            comment     => "this is a comment",
-            debug       => $ENV{TEST_VERBOSE},
-            seed        => $seed,
-        );
+foreach my $variant (0..1) {
+    foreach my $idx (0..$#source_hashes) {
+        foreach my $seed ("1234567812345678",undef) {
+            my $seed_str= defined $seed ? $seed : "undef";
+            my $source_hash= $source_hashes[$idx];
+            my $title= "$seed_str.$idx.$variant";
+            my $test_file= "$tmpdir/test.$title.hash";
+            my $got_file= $class->make_file(
+                file        => $test_file,
+                source_hash => $source_hash,
+                comment     => "this is a comment",
+                debug       => $ENV{TEST_VERBOSE},
+                seed        => $seed,
+                variant     => $variant,
+            );
 
-        is( $got_file,$test_file, "make_file returned as expected ($idx - $seed_str)" );
-        my ($version,$message)= $class->validate_file(file=>$test_file);
-        ok( defined $version, "file validates ok ($idx - $seed_str)")
-            or diag $message;
-        my %tied_hash;
-        tie %tied_hash, $class, $test_file;
-        my (@got_keys,@want_keys);
-        {
-            my @bad;
-            foreach my $key (sort keys %$source_hash) {
-                push @want_keys, $key;
-                my $got= $tied_hash{$key};
-                my $want= $source_hash->{$key};
-                if (defined($got) != defined($want) or (defined($got) and $got ne $want)) {
-                    push @bad, [$key,$got,$want];
+            is( $got_file,$test_file, "make_file returned as expected ($title)" );
+            my ($got_variant,$got_message)= $class->validate_file(file=>$test_file);
+            ok( defined $got_variant, "file validates ok ($title)")
+                or diag $got_message;
+            is( $got_variant, $variant, "file variant ok ($title)");
+            my %tied_hash;
+            tie %tied_hash, $class, $test_file;
+            my (@got_keys,@want_keys);
+            {
+                my @bad;
+                foreach my $key (sort keys %$source_hash) {
+                    push @want_keys, $key;
+                    my $got= $tied_hash{$key};
+                    my $want= $source_hash->{$key};
+                    if (defined($got) != defined($want) or (defined($got) and $got ne $want)) {
+                        push @bad, [$key,$got,$want];
+                    }
                 }
+                is(0+@bad,0,"no bad values via source_hash ($title)")
+                    or diag Dumper(\@bad);
             }
-            is(0+@bad,0,"no bad values via source_hash (test hash $idx - $seed_str)")
-                or diag Dumper(\@bad);
-        }
-        {
-            my @bad;
-            foreach my $key (sort keys %tied_hash) {
-                push @got_keys, $key;
-                my $got= $tied_hash{$key};
-                my $want= $source_hash->{$key};
-                if (defined($got) != defined($want) or (defined($got) and $got ne $want)) {
-                    push @bad, [$key,$got,$want];
+            {
+                my @bad;
+                foreach my $key (sort keys %tied_hash) {
+                    push @got_keys, $key;
+                    my $got= $tied_hash{$key};
+                    my $want= $source_hash->{$key};
+                    if (defined($got) != defined($want) or (defined($got) and $got ne $want)) {
+                        push @bad, [$key,$got,$want];
+                    }
                 }
+                is(0+@bad,0,"no bad values via tied_hash ($title)")
+                    or diag Dumper(\@bad);
             }
-            is(0+@bad,0,"no bad values via tied_hash (test_hash $idx - $seed_str)")
-                or diag Dumper(\@bad);
-        }
-        is_deeply(\@got_keys,\@want_keys,"keys in both are the same (test_hash $idx - $seed_str)");
-        {
-            my @bad;
-            foreach my $idx (0..$#got_keys) {
-                if (utf8::is_utf8($got_keys[$idx]) != utf8::is_utf8($want_keys[$idx])) {
-                    push @bad, [ $got_keys[$idx], $want_keys[$idx] ];
+            is_deeply(\@got_keys,\@want_keys,"keys in both are the same ($title)");
+            {
+                my @bad;
+                foreach my $idx (0..$#got_keys) {
+                    if (utf8::is_utf8($got_keys[$idx]) != utf8::is_utf8($want_keys[$idx])) {
+                        push @bad, [ $got_keys[$idx], $want_keys[$idx] ];
+                    }
                 }
+                is(0+@bad,0,"no keys with differing utf8 flags ($title)")
+                    or diag Dumper(\@bad);
             }
-            is(0+@bad,0,"no keys with differing utf8 flags (test_hash $idx - $seed_str)");
         }
     }
 }

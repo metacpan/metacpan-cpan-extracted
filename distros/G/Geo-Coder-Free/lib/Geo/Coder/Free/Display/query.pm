@@ -17,7 +17,7 @@ sub html {
 	my $info = $self->{_info};
 	my $allowed = {
 		'page' => 'query',
-		'q' => undef,	# TODO: regex of allowable name formats
+		'q' => /[a-z][A-Z]$/i,	# TODO: regex of allowable name formats
 		'scantext' => undef,	# TODO: regex of allowable name formats
 		'lang' => qr/^[A-Z][A-Z]/i,
 	};

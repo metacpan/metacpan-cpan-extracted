@@ -1,7 +1,7 @@
 package Geo::Coder::Free::DB;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2015-2018, Nigel Horne
+# Copyright (C) 2015-2019, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -10,19 +10,29 @@ package Geo::Coder::Free::DB;
 #	must apply in writing for a licence for use from Nigel Horne at the
 #	above e-mail.
 
-# TODO: support a directory hierachy of databases
+# Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL.
+# Look for databases in $directory in this order;
+#	SQLite (file ends with .sql)
+#	CSV (file ends with .csv or .db, can be gzipped)
+#	XML (file ends with .xml)
 
-# Abstract class giving read-only access to CSV, XML and SQLite databases
-
-# You can then access the files in $directory/foo.csv via this class:
+# For example, you can access the files in /var/db/foo.csv via this class:
 
 # package MyPackageName::DB::foo;
 
-# use Geo::Coder::Free::DB
+# use NJH::Snippets::DB;
 
-# our @ISA = ('Geo::Coder::Free::DB');
+# our @ISA = ('NJH::Snippets::DB');
 
 # 1;
+
+# You can then access the data using:
+# my $foo = MyPackageName::DB::foo->new(directory => '/var/db');
+# my $row = $foo->fetchrow_hashref(customer_id => '12345);
+# print Data::Dumper->new([$row])->Dump();
+
+# TODO: support a directory hierachy of databases
+# TODO: consider returning an object or array of objects, rather than hashes
 
 use warnings;
 use strict;
@@ -48,7 +58,7 @@ sub new {
 
 	my $class = ref($proto) || $proto;
 
-	if($class eq 'Geo::Coder::Free::DB') {
+	if($class eq __PACKAGE__) {
 		die "$class: abstract class";
 	}
 
@@ -129,6 +139,7 @@ sub _open {
 		my $fin;
 		($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv.gz:db.gz');
 		if(defined($slurp_file) && (-r $slurp_file)) {
+			close($fin);
 			$fin = File::Temp->new(SUFFIX => '.csv', UNLINK => 0);
 			print $fin gunzip_file($slurp_file);
 			$slurp_file = $fin->filename();
@@ -263,26 +274,26 @@ sub selectall_hash {
 	}
 
 	my $query = "SELECT * FROM $table";
-	my @args;
+	my @query_args;
 	foreach my $c1(sort keys(%params)) {	# sort so that the key is always the same
-		if(scalar(@args) == 0) {
+		if(scalar(@query_args) == 0) {
 			$query .= ' WHERE';
 		} else {
 			$query .= ' AND';
 		}
 		$query .= " $c1 = ?";
-		push @args, $params{$c1};
+		push @query_args, $params{$c1};
 	}
 	if($self->{'logger'}) {
-		if(defined($args[0])) {
-			$self->{'logger'}->debug("selectall_hash $query: " . join(', ', @args));
+		if(defined($query_args[0])) {
+			$self->{'logger'}->debug("selectall_hash $query: ", join(', ', @query_args));
 		} else {
 			$self->{'logger'}->debug("selectall_hash $query");
 		}
 	}
 	my $key = $query;
-	if(defined($args[0])) {
-		$key .= ' ' . join(', ', @args);
+	if(defined($query_args[0])) {
+		$key .= ' ' . join(', ', @query_args);
 	}
 	my $c;
 	if($c = $self->{cache}) {
@@ -290,19 +301,23 @@ sub selectall_hash {
 			return @{$rc};
 		}
 	}
-	my $sth = $self->{$table}->prepare($query);
-	$sth->execute(@args) || throw Error::Simple("$query: @args");
 
-	my @rc;
-	while(my $href = $sth->fetchrow_hashref()) {
-		push @rc, $href;
-		last if(!wantarray);
-	}
-	if($c && wantarray) {
-		$c->set($key, \@rc, '1 hour');
-	}
+	if(my $sth = $self->{$table}->prepare($query)) {
+		$sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
 
-	return @rc;
+		my @rc;
+		while(my $href = $sth->fetchrow_hashref()) {
+			push @rc, $href;
+			last if(!wantarray);
+		}
+		if($c && wantarray) {
+			$c->set($key, \@rc, '1 hour');
+		}
+
+		return @rc;
+	}
+	$self->{'logger'}->warn("selectall_hash failure on $query: @query_args");
+	throw Error::Simple("$query: @query_args");
 }
 
 # Returns a hash reference for one row in a table
@@ -337,7 +352,7 @@ sub fetchrow_hashref {
 	$query .= ' LIMIT 1';
 	if($self->{'logger'}) {
 		if(defined($args[0])) {
-			$self->{'logger'}->debug("fetchrow_hashref $query: " . join(', ', @args));
+			$self->{'logger'}->debug("fetchrow_hashref $query: ", join(', ', @args));
 		} else {
 			$self->{'logger'}->debug("fetchrow_hashref $query");
 		}
@@ -360,7 +375,8 @@ sub fetchrow_hashref {
 }
 
 # Execute the given SQL on the data
-# In an array context, returns an array of hash refs, in a scalar context returns a hash of the first row
+# In an array context, returns an array of hash refs,
+#	in a scalar context returns a hash of the first row
 sub execute {
 	my $self = shift;
 	my %args;
@@ -392,7 +408,7 @@ sub execute {
 		push @rc, $href;
 	}
 
-	return \@rc;
+	return @rc;
 }
 
 # Time that the database was last updated
@@ -451,7 +467,7 @@ sub AUTOLOAD {
 	}
 	if($self->{'logger'}) {
 		if(scalar(@args) && $args[0]) {
-			$self->{'logger'}->debug("AUTOLOAD $query: " . join(', ', @args));
+			$self->{'logger'}->debug("AUTOLOAD $query: ", join(', ', @args));
 		} else {
 			$self->{'logger'}->debug("AUTOLOAD $query");
 		}

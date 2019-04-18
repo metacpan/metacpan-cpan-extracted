@@ -88,12 +88,8 @@ sub then {
   return $new;
 }
 
-sub timeout {
-  my ($self, $after, $err)
-    = (ref $_[0] ? shift : shift->new, @_, 'Promise timeout');
-  $self->ioloop->timer($after => sub { $self->reject($err) });
-  return $self;
-}
+sub timer   { shift->_timer('resolve', @_) }
+sub timeout { shift->_timer('reject',  @_) }
 
 sub wait {
   my $self = shift;
@@ -114,10 +110,8 @@ sub _defer {
 
 sub _finally {
   my ($new, $finally, $method, @result) = @_;
-  my ($res) = eval { $finally->(@result) };
-  return $new->$method(@result)
-    unless $res && blessed $res && $res->can('then');
-  $res->then(sub { $new->$method(@result) }, sub { $new->$method(@result) });
+  return $new->reject($@) unless eval { $finally->(); 1 };
+  return $new->$method(@result);
 }
 
 sub _settle {
@@ -144,6 +138,14 @@ sub _then {
   my @res;
   return $new->reject($@) unless eval { @res = $cb->(@result); 1 };
   return $new->resolve(@res);
+}
+
+sub _timer {
+  my ($self, $method, $after, @result) = @_;
+  $self = $self->new unless ref $self;
+  $result[0] = 'Promise timeout' if $method eq 'reject' && !@result;
+  $self->ioloop->timer($after => sub { $self->$method(@result) });
+  return $self;
 }
 
 1;
@@ -312,7 +314,6 @@ reason.
 
   # Do something on fulfillment and rejection
   $promise->finally(sub {
-    my @value_or_reason = @_;
     say "We are done!";
   });
 
@@ -407,6 +408,17 @@ L<Mojo::Promise> object resolving to the return value of the called handler.
       return "This is bad: $reason[0]";
     }
   );
+
+=head2 timer
+
+  my $new  = Mojo::Promise->timer(5 => 'Success!');
+  $promise = $promise->timer(5 => 'Success!');
+  $promise = $promise->timer(5);
+
+Create a new L<Mojo::Promise> object with a timer or attach a timer to an
+existing promise. The promise will be resolved after the given amount of time in
+seconds with or without a value. Note that this method is EXPERIMENTAL and might
+change without warning!
 
 =head2 timeout
 

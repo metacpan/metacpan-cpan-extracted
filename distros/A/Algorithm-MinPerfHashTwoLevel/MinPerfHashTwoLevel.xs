@@ -14,7 +14,7 @@
 
 struct mph_header {
     U32 magic_num;
-    U32 version;
+    U32 variant;
     U32 num_buckets;
     U32 state_ofs;
 
@@ -28,7 +28,10 @@ struct mph_header {
 };
 
 struct mph_bucket {
-    U32 xor_val;
+    union {
+        U32 xor_val;
+        I32 index;
+    };
     U32 key_ofs;
     U32 val_ofs;
     U16 key_len;
@@ -115,7 +118,11 @@ lookup_key(struct mph_header *mph, SV *key_sv, SV *val_sv)
         U32 h2= h0 & 0xFFFFFFFF;
         U8 *got_key_pv;
         STRLEN got_key_len;
-        index = (h2 ^ bucket->xor_val) % mph->num_buckets;
+        if ( mph->variant == 0 || bucket->index > 0 ) {
+            index = (h2 ^ bucket->xor_val) % mph->num_buckets;
+        } else { /* mph->variant == 1 */
+            index = -bucket->index-1;
+        }
         bucket= buckets + index;
         got_key_pv= strs + bucket->key_ofs;
         if (bucket->key_len == key_len && memEQ(key_pv,got_key_pv,key_len)) {
@@ -227,12 +234,13 @@ seed_state(base_seed_sv)
         RETVAL
 
 U32
-calc_xor_val(max_xor_val,h2_sv,idx_sv,used_sv)
+calc_xor_val(max_xor_val,h2_sv,idx_sv,used_sv,used_pos)
     U32 max_xor_val
     SV *h2_sv
     SV *idx_sv
     SV *used_sv
-    PROTOTYPE: $$$$
+    SV *used_pos
+    PROTOTYPE: $$$$$
     CODE:
 {
     U32 xor_val= 0;
@@ -249,31 +257,46 @@ calc_xor_val(max_xor_val,h2_sv,idx_sv,used_sv)
     SvPOK_on(idx_sv);
     idx_start= (U32 *)SvPVX(idx_sv);
 
-    next_xor_val:
-    while (1) {
-        U32 *h2_ptr= h2_start;
-        U32 *idx_ptr= idx_start;
-        if (xor_val == max_xor_val) {
+    if (h2_count == 1 && SvOK(used_pos)) {
+        I32 pos= SvIV(used_pos);
+        while (pos < bucket_count && used[pos]) {
+            pos++;
+        }
+        SvIV_set(used_pos,pos);
+        if (pos == bucket_count) {
             RETVAL= 0;
-            break;
         } else {
-            xor_val++;
+            *idx_start= pos;
+            pos = -pos-1;
+            RETVAL= (U32)pos;
         }
-        while (h2_ptr < h2_end) {
-            U32 i= (*h2_ptr ^ xor_val) % bucket_count;
-            U32 *check_idx;
-            if (used[i])
-                goto next_xor_val;
-            for (check_idx= idx_start; check_idx < idx_ptr; check_idx++) {
-                if (*check_idx == i)
-                    goto next_xor_val;
+    } else {
+        next_xor_val:
+        while (1) {
+            U32 *h2_ptr= h2_start;
+            U32 *idx_ptr= idx_start;
+            if (xor_val == max_xor_val) {
+                RETVAL= 0;
+                break;
+            } else {
+                xor_val++;
             }
-            *idx_ptr= i;
-            h2_ptr++;
-            idx_ptr++;
+            while (h2_ptr < h2_end) {
+                U32 i= (*h2_ptr ^ xor_val) % bucket_count;
+                U32 *check_idx;
+                if (used[i])
+                    goto next_xor_val;
+                for (check_idx= idx_start; check_idx < idx_ptr; check_idx++) {
+                    if (*check_idx == i)
+                        goto next_xor_val;
+                }
+                *idx_ptr= i;
+                h2_ptr++;
+                idx_ptr++;
+            }
+            RETVAL= xor_val;
+            break;
         }
-        RETVAL= xor_val;
-        break;
     }
 }
     OUTPUT:

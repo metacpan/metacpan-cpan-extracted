@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.070';
+our $VERSION = '2.071';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -303,22 +303,22 @@ sub regexp {
     }
     elsif ( $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/ ) {
         if ( $do_not_match ) {
-            return ' '. $col . ' NOT REGEXP ?'        if ! $case_sensitive;
-            return ' '. $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
+            return ' ' . $col . ' NOT REGEXP ?'        if ! $case_sensitive;
+            return ' ' . $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
         }
         else {
-            return ' '. $col . ' REGEXP ?'            if ! $case_sensitive;
-            return ' '. $col . ' REGEXP BINARY ?'     if   $case_sensitive;
+            return ' ' . $col . ' REGEXP ?'            if ! $case_sensitive;
+            return ' ' . $col . ' REGEXP BINARY ?'     if   $case_sensitive;
         }
     }
     elsif ( $sf->get_db_driver eq 'Pg' ) {
         if ( $do_not_match ) {
-            return ' '. $col . '::text' . ' !~* ?' if ! $case_sensitive;
-            return ' '. $col . '::text' . ' !~ ?'  if   $case_sensitive;
+            return ' ' . $col . '::text' . ' !~* ?' if ! $case_sensitive;
+            return ' ' . $col . '::text' . ' !~ ?'  if   $case_sensitive;
         }
         else {
-            return ' '. $col . '::text' . ' ~* ?'  if ! $case_sensitive;
-            return ' '. $col . '::text' . ' ~ ?'   if   $case_sensitive;
+            return ' ' . $col . '::text' . ' ~* ?'  if ! $case_sensitive;
+            return ' ' . $col . '::text' . ' ~ ?'   if   $case_sensitive;
         }
     }
 }
@@ -422,7 +422,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.070
+Version 2.071
 
 =head1 DESCRIPTION
 
@@ -637,12 +637,12 @@ Example (C<mysql>):
     sub regexp {
         my ( $self, $col, $do_not_match, $case_sensitive ) = @_;
         if ( $do_not_match ) {
-            return ' '. $col . ' NOT REGEXP ?'        if ! $case_sensitive;
-            return ' '. $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
+            return ' ' . $col . ' NOT REGEXP ?'        if ! $case_sensitive;
+            return ' ' . $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
         }
         else {
-            return ' '. $col . ' REGEXP ?'            if ! $case_sensitive;
-            return ' '. $col . ' REGEXP BINARY ?'     if   $case_sensitive;
+            return ' ' . $col . ' REGEXP ?'            if ! $case_sensitive;
+            return ' ' . $col . ' REGEXP BINARY ?'     if   $case_sensitive;
         }
     }
 

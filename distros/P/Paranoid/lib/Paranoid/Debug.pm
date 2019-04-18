@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Debug.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Debug.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -23,12 +23,13 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 use Paranoid;
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
-@EXPORT    = qw(PDEBUG pdebug pIn pOut);
+@EXPORT = qw(PDEBUG pdebug pIn pOut
+    PDEBUG1 PDEBUG2 PDEBUG3 PDEBUG4 PDEBUG5 PDEBUG6 PDEBUG7 PDEBUG8);
 @EXPORT_OK = (
     @EXPORT,
-    qw(pderror PDPREFIX PDLEVEL1 PDLEVEL2 PDLEVEL3 PDLEVEL4 PDMAXINDENT)
+    qw(pderror PDPREFIX PDLEVEL1 PDLEVEL2 PDLEVEL3 PDLEVEL4 PDMAXINDENT),
     );
 %EXPORT_TAGS = ( all => [@EXPORT_OK], );
 
@@ -38,6 +39,15 @@ use constant PDLEVEL3 => 11;
 use constant PDLEVEL4 => 12;
 
 use constant PDMAXIND => 60;
+
+use constant PDEBUG1 => 1;
+use constant PDEBUG2 => 2;
+use constant PDEBUG3 => 3;
+use constant PDEBUG4 => 4;
+use constant PDEBUG5 => 5;
+use constant PDEBUG6 => 6;
+use constant PDEBUG7 => 7;
+use constant PDEBUG8 => 8;
 
 #####################################################################
 #
@@ -58,11 +68,8 @@ use constant PDMAXIND => 60;
         #
         #   [PID - $dlevel] Subroutine:
         #
-        my $caller = ( caller 2 )[3];
-        my $prefix;
-
-        $caller = defined $caller ? $caller : 'undef';
-        $prefix = ' ' x $ilevel . "[$$-$dlevel] $caller: ";
+        my $caller = shift;
+        my $prefix = ' ' x $ilevel . "[$$-$dlevel] $caller: ";
 
         return $prefix;
     };
@@ -106,9 +113,23 @@ use constant PDMAXIND => 60;
         my $level  = shift || 1;
         my @pfargs = @_;
         my $prefix = PDPREFIX;
-        my ( $n, $np );
+        my ( $ci, @crec, $caller, $n, $np );
 
         $msg = '' unless defined $msg;
+
+        # If called with a negative level it merely means we
+        # need to go a little bit deeper in the call stack to find the
+        # true initiator of the message.  This provides the mechanism for
+        # Paranoid::Log::plog to pass indirect debug messages
+        $ci = $level < 0 ? 2 : 1;
+        $level *= -1 if $level < 0;
+
+        # Get the call stack info
+        @crec = caller $ci;
+        $caller =
+              defined $crec[3] ? $crec[3]
+            : defined $crec[1] ? "$crec[1]/$crec[2]"
+            :                    'undef';
 
         # Filter message through sprintf if args were passed
         $n = [ $msg =~ m#(%[\w.]+)#sg ];
@@ -142,7 +163,7 @@ use constant PDMAXIND => 60;
         return $msg if $level > PDEBUG;
 
         # Execute the code block, if that's what it is
-        $prefix = &$prefix() if ref($prefix) eq 'CODE';
+        $prefix = &$prefix($caller) if ref($prefix) eq 'CODE';
 
         {
             no warnings;
@@ -196,7 +217,7 @@ Paranoid::Debug - Trace message support for paranoid programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Debug.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Debug.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -241,6 +262,14 @@ or code.
 Only I<PDEBUG>, I<pdebug>, I<pIn>, and I<pOut> are exported by default.  All
 other functions and constants can be exported with the I<:all> tag set.
 
+=head1 CONSTANTS
+
+=head2 PDEBUG1 - PDEBUG8
+
+There are eight constants exported by default for use by developers that allow
+for up to eight levels of diagnostic output.  None of these levels are used by
+internal B<Paranoid> code, they are reserved for use by third parties.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 PDEBUG
@@ -260,13 +289,14 @@ deep.
 =head2 PDPREFIX
 
 B<PDPREFIX> is also an lvalue subroutine and is set by default to a 
-subroutine that returns as a string the standard prefix for debug 
+code reference that returns as a string the standard prefix for debug 
 messages:
 
   [PID - DLEVEL] Subroutine:
 
 Assigning another reference to a subroutine or string can override this 
-behavior.
+behavior.  The only argument that will be passed to any such routine will be
+the name of the calling subroutine.
 
 =head2 pderror
 

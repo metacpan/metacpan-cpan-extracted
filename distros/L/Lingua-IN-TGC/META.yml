@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl extension for tailored grapheme clusters for indian languages'
+abstract: 'Tailored grapheme clusters for Indic scripts.'
 author:
   - unknown
 build_requires:
@@ -18,7 +18,9 @@ no_index:
     - t
     - inc
 requires:
-  Function::Parameters: '2.00'
-  Moose: '2.00'
-version: '1.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  Alt::Devel::CallParser::ButWorking: '0.002'
+  Kavorka: '0.039'
+  Mouse: v2.5.6
+  Regexp::Grammars: '1.049'
+version: '2.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

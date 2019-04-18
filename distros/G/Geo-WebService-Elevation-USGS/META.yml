@@ -23,7 +23,7 @@ no_index:
 provides:
   Geo::WebService::Elevation::USGS:
     file: lib/Geo/WebService/Elevation/USGS.pm
-    version: '0.111'
+    version: '0.112'
 requires:
   Carp: '0'
   HTTP::Request::Common: '0'
@@ -37,5 +37,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-WebService-Elevation-USGS
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Geo-WebService-Elevation-USGS.git
-version: '0.111'
+version: '0.112'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

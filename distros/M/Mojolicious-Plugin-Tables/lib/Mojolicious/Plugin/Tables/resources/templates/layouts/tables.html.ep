@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.1.0/css/buttons.jqueryui.min.css">
     % }
     %#
-    <link rel="stylesheet" href="/css/tables.css">
+    <link rel="stylesheet" href="<%=url_for('/css/tables.css')%>">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     %#
@@ -28,7 +28,7 @@
     % }
     %#
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-    <script src="/js/tables.js"></script>
+    <script src="<%=url_for('/js/tables.js')%>"></script>
 </head>
 
 <script id="session" type="application/json"><%== Mojo::JSON::encode_json(session)%></script>

@@ -10,7 +10,10 @@ BEGIN {
 
 UK: {
 	SKIP: {
-		skip 'Test requires Internet access', 32 unless(-e 't/online.enabled');
+		if(!-e 't/online.enabled') {
+			diag('Online tests disabled');
+			skip('Online tests disabled', 32);
+		}
 
 		require Test::LWP::UserAgent;
 		Test::LWP::UserAgent->import();
@@ -26,7 +29,7 @@ UK: {
 
 		if($@) {
 			diag('Test::Number::Delta not installed - skipping tests');
-			skip 'Test::Number::Delta not installed', 28;
+			skip('Test::Number::Delta not installed', 28);
 		}
 
 		my $geocoder = new_ok('Geo::Coder::Postcodes');

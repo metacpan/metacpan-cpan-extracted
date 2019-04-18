@@ -31,11 +31,11 @@ is_deeply \@errors, [], 'promise not rejected';
 # Resolved with finally
 $promise = Mojo::Promise->new;
 @results = ();
-$promise->finally(sub { @results = @_; 'fail' })
+$promise->finally(sub { @results = ('finally'); 'fail' })
   ->then(sub { push @results, @_ });
 $promise->resolve('hello', 'world');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['hello', 'world', 'hello', 'world'], 'promise settled';
+is_deeply \@results, ['finally', 'hello', 'world'], 'promise settled';
 
 # Rejected
 $promise = Mojo::Promise->new;
@@ -62,11 +62,11 @@ is_deeply \@errors, ['early'], 'promise rejected';
 # Rejected with finally
 $promise = Mojo::Promise->new;
 @errors  = ();
-$promise->finally(sub { @errors = @_; 'fail' })
+$promise->finally(sub { @errors = ('finally'); 'fail' })
   ->then(undef, sub { push @errors, @_ });
 $promise->reject('bye', 'world');
 Mojo::IOLoop->one_tick;
-is_deeply \@errors, ['bye', 'world', 'bye', 'world'], 'promise settled';
+is_deeply \@errors, ['finally', 'bye', 'world'], 'promise settled';
 
 # No state change
 $promise = Mojo::Promise->new;
@@ -120,17 +120,31 @@ $promise2->reject('hello world');
 Mojo::IOLoop->one_tick;
 is_deeply \@errors, ['hello world'], 'promise rejected';
 
+# Double finally
+$promise = Mojo::Promise->new;
+@results = ();
+$promise->finally(sub { push @results, 'finally1' })
+  ->finally(sub { push @results, 'finally2' });
+$promise->resolve('pass');
+Mojo::IOLoop->one_tick;
+is_deeply \@results, ['finally1', 'finally2'], 'promise not resolved';
+
 # Resolved nested with finally
 $promise  = Mojo::Promise->new;
 $promise2 = Mojo::Promise->new;
 @results  = ();
-$promise->finally(sub {$promise2})->finally(sub { @results = @_ });
+$promise->finally(sub {$promise2})->finally(sub { @results = ('finally') });
 $promise->resolve('pass');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, [], 'promise not resolved';
-$promise2->resolve('fail');
+is_deeply \@results, ['finally'], 'promise already resolved';
+
+# Exception in finally
+$promise = Mojo::Promise->new;
+@results = ();
+$promise->finally(sub { die "Test!\n" })->catch(sub { push @results, @_ });
+$promise->resolve('pass');
 Mojo::IOLoop->one_tick;
-is_deeply \@results, ['pass'], 'promise resolved';
+is_deeply \@results, ["Test!\n"], 'promise rejected';
 
 # Clone
 my $loop = Mojo::IOLoop->new;
@@ -195,6 +209,17 @@ is_deeply \@errors, ['Timeout2'], 'promise rejected';
 @errors = ();
 Mojo::Promise->timeout(0.025)->catch(sub { @errors = @_ })->wait;
 is_deeply \@errors, ['Promise timeout'], 'default timeout message';
+
+# Timer without value
+@results = ();
+Mojo::Promise->timer(0.025)->then(sub { @results = (@_, 'works!') })->wait;
+is_deeply \@results, ['works!'], 'default timer result';
+
+# Timer with values
+@results = ();
+Mojo::Promise->new->timer(0, 'first', 'second')
+  ->then(sub { @results = (@_, 'works too!') })->wait;
+is_deeply \@results, ['first', 'second', 'works too!'], 'timer result';
 
 # All
 $promise  = Mojo::Promise->new->then(sub {@_});

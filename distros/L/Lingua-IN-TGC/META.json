@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl extension for tailored grapheme clusters for indian languages",
+   "abstract" : "Tailored grapheme clusters for Indic scripts.",
    "author" : [
       "unknown"
    ],
@@ -32,12 +32,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Function::Parameters" : "2.00",
-            "Moose" : "2.00"
+            "Alt::Devel::CallParser::ButWorking" : "0.002",
+            "Kavorka" : "0.039",
+            "Mouse" : "v2.5.6",
+            "Regexp::Grammars" : "1.049"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Mail::JMAPTalk.
 
+0.13  Wed Apr 17 14:00:42 CEST 2019
+    - Added DefaultUsing subroutine to get/set 'using' argument
+
 0.12  Mon Jul 16 03:02:21 AEST 2018
     - Changed 'using' default to standard params
 

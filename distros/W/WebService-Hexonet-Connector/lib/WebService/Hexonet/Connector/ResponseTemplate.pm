@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use WebService::Hexonet::Connector::ResponseParser;
 
-use version 0.9917; our $VERSION = version->declare('v2.1.0');
+use version 0.9917; our $VERSION = version->declare('v2.2.0');
 
 
 sub new {
@@ -80,6 +80,15 @@ sub isTmpError {
     my $self = shift;
     my $first = substr $self->{hash}->{CODE}, 0, 1;
     return ( $first eq '4' );
+}
+
+
+sub isPending {
+    my $self = shift;
+    if ( defined $self->{hash}->{PENDING} ) {
+        return int( $self->{hash}->{PENDING} );
+    }
+    return 0;
 }
 
 1;
@@ -170,6 +179,11 @@ Returns boolean 0 or 1.
 
 Checks if the API response code represents a temporary error case.
 400 <= Code <= 499
+Returns boolean 0 or 1.
+
+=item C<isPending>
+
+Checks if current operation is returned as pending.
 Returns boolean 0 or 1.
 
 =back

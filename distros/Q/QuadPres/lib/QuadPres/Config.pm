@@ -1,5 +1,5 @@
 package QuadPres::Config;
-$QuadPres::Config::VERSION = '0.28.0';
+$QuadPres::Config::VERSION = '0.28.1';
 use strict;
 use warnings;
 
@@ -155,7 +155,7 @@ QuadPres::Config
 
 =head1 VERSION
 
-version 0.28.0
+version 0.28.1
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
@@ -265,7 +265,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/quadpres/issues>
+L<https://github.com/shlomif/quad-pres/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -30,6 +30,7 @@ use Test::Exception;
 use Try::Tiny;
 
 my $parser = My::Text::Parser->new();
+isa_ok $parser, 'Text::Parser';
 throws_ok {
     $parser->read('t/account.txt');
 }

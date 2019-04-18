@@ -26,7 +26,7 @@ Mitchell N Charity <mcharity@vendian.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2000-2017. Ingy döt Net.
+Copyright 2000-2019. Ingy döt Net.
 
 Copyright 2008, 2010-2014. Sisyphus.
 

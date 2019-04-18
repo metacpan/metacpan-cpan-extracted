@@ -19,12 +19,13 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Clipboard",
-  "dist_version" => "0.19",
+  "dist_version" => "0.20",
   "license" => "perl",
   "module_name" => "Clipboard",
   "recursive_test_files" => 1,
   "requires" => {
     "CGI" => 0,
+    "File::Spec" => 0,
     "File::Temp" => 0,
     "IPC::Open2" => 0,
     "URI::Escape" => 0,

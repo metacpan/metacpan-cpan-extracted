@@ -1,5 +1,13 @@
 Revision history for Text-Parser
 
+0.918     2019-04-18 00:28:58-07:00 America/Los_Angeles
+  - Add a test to ensure that auto_split works correctly even without auto_trim (Issue: #18)
+  - Add a new method named this_line which works in all subclasses (Issue: #20)
+  - Don't use setting method in Text::Parser::Multiline
+  - Remove line_auto_manip and setting methods
+  - Refactor code in Text::Parser::Multiline
+  - Re-organize and simplify POD, test all links (Issue: #22)
+
 0.917     2019-04-15 22:56:49-07:00 America/Los_Angeles
   - Fixed broken link in pod as reported by CPANTS. #15 (by M Anwar)
   - Fixed a similar broken link in pod as reported in CPANTS for save_record from Autoplit.pm

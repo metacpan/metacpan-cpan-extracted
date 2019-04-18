@@ -1,3 +1,10 @@
+0.151   2019-04-18 (PERLANCAR)
+
+	- No changes.
+
+        - [build] Rebuild to update generated CLI's.
+
+
 0.150   2017-10-11 (PERLANCAR)
 
 	- Split app backend to its own dist AppLib-CreateSelfSignedSSLCert so it

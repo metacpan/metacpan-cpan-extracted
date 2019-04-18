@@ -1,10 +1,12 @@
 Changes
-lib/Lingua/IN/Ic.pm
-lib/Lingua/IN/R/TGC.pm
 lib/Lingua/IN/TGC.pm
 Makefile.PL
 MANIFEST
 README
+t/devanagari.t
+t/kannada.t
 t/Lingua-IN-TGC.t
+t/oriya.t
+t/tamil.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

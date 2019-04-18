@@ -73,7 +73,7 @@ sub extended_col {
     elsif ( $type eq $set_to_null ) {
         return "NULL";
     }
-    if ( $clause !~ /^(?:set|where|having|group_by|oder_by)\z/i ) {
+    if ( $clause !~ /^(?:set|where|having|group_by|order_by)\z/i ) {
         my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
         my $alias = $ax->alias( $alias_type, $ext_col );
         if ( defined $alias && length $alias ) {

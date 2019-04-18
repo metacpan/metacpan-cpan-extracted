@@ -1,5 +1,9 @@
 Revision history for Geo::Location::Point
 
+0.03	Wed 17 Apr 16:35:20 EDT 2019
+	Don't turn GB into Gb
+	Improved handling of fields with different cases
+
 0.02	Fri Mar 29 18:28:10 EDT 2019
 	as_string() now returns the location attribute if that has been set
 	minimum version set to 5.10.0 because of //=

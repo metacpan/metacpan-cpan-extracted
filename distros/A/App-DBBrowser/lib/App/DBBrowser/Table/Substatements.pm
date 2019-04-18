@@ -46,7 +46,6 @@ sub select {
     my $sign_idx = $sf->{o}{enable}{'expand_' . $clause};
     my $expand_sign = $sf->{i}{expand_signs}[$sign_idx];
     my @pre = ( undef, $sf->{i}{ok}, $expand_sign ? $expand_sign : () );
-    my $type;
     if ( @{$sql->{group_by_cols}} || @{$sql->{aggr_cols}} ) {
         $choices = [ @pre, @{$sql->{group_by_cols}}, @{$sql->{aggr_cols}} ];
     }

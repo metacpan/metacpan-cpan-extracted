@@ -38,7 +38,7 @@ AnySan::Provider::Slack - AnySan provider for Slack
 
 # AUTHOR
 
-Ichinose Shogo <shogo82148@gmail.com >
+Ichinose Shogo &lt;shogo82148@gmail.com >
 
 # SEE ALSO
 

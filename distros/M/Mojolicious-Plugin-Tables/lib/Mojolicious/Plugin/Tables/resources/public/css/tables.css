@@ -54,9 +54,6 @@ div.tables-notice p        { margin: .3em 0 }
 .home table#buts td { padding: 10px 4px }
 .home table#buts a.button { width: 116px }
 
-.about           { background: url(/img/lse.jpg) }
-.footnotes       { margin-top: 28px; border-top: black solid 1px; padding-top: 4px; font-size: 0.9em }
-.feedback textarea { width: 520px; height: 4em; display: block; margin-bottom: 8px }
 .ui-selectmenu-button { vertical-align: middle }
 
 table.dataTable td a       { text-decoration: none }

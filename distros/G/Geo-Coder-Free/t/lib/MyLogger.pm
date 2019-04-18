@@ -12,12 +12,10 @@ sub new {
 }
 
 sub trace {
-	# my $self = shift;
-	# my $message = shift;
+	debug(@_);
+}
 
-	# if($ENV{'TEST_VERBOSE'}) {
-		# ::diag($message);
-	# }
+sub warn {
 	debug(@_);
 }
 

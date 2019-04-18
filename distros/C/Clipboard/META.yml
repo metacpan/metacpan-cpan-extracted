@@ -23,18 +23,19 @@ name: Clipboard
 provides:
   Clipboard:
     file: lib/Clipboard.pm
-    version: '0.19'
+    version: '0.20'
   Clipboard::MacPasteboard:
     file: lib/Clipboard/MacPasteboard.pm
-    version: '0.19'
+    version: '0.20'
   Clipboard::Win32:
     file: lib/Clipboard/Win32.pm
-    version: '0.19'
+    version: '0.20'
   Clipboard::Xclip:
     file: lib/Clipboard/Xclip.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   CGI: '0'
+  File::Spec: '0'
   File::Temp: '0'
   IPC::Open2: '0'
   URI::Escape: '0'
@@ -44,7 +45,7 @@ resources:
   bugtracker: https://github.com/shlomif/clipboard/issues
   homepage: http://metacpan.org/release/Clipboard
   repository: https://github.com/shlomif/Clipboard
-version: '0.19'
+version: '0.20'
 x_Dist_Zilla:
   perl:
     version: '5.028001'

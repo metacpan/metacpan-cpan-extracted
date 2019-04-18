@@ -22,9 +22,7 @@ lives_ok { $pars = Text::Parser->new( multiline_type => undef ); }
 'Improve coverage';
 $pars = Text::Parser->new();
 isa_ok( $pars, 'Text::Parser' );
-is( $pars->setting(),         undef, 'When no setting is called' );
-is( $pars->setting('balaji'), undef, 'balaji is not a setting at all' );
-is( $pars->filename(),        undef, 'No filename specified so far' );
+is( $pars->filename(), undef, 'No filename specified so far' );
 
 is( $pars->multiline_type, undef, 'Not a multi-line parser' );
 is( $pars->multiline_type('join_next'),
@@ -145,7 +143,5 @@ is( $pars->pop_record,   undef,    'Now undef is removed' );
 is( $pars->last_record,  $content, 'Now the last record is the one earlier' );
 is_deeply( [ $pars->get_records ],
     [$content], 'Got correct content after pop' );
-
-is( $pars->line_auto_manip, undef, 'Returns nothing for empty call' );
 
 done_testing;

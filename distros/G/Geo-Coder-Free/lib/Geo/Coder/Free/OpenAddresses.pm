@@ -378,14 +378,13 @@ sub geocode {
 					if(my $prefix = $href->{prefix}) {
 						$street = "$prefix $street";
 					}
-					my $rc;
 					if($href->{'number'}) {
-						if($rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
+						if(my $rc = $self->_get($href->{'number'}, "$street$city$state", 'US')) {
 							$rc->{'country'} = 'US';
 							return $rc;
 						}
 					}
-					if($rc = $self->_get("$street$city$state", 'US')) {
+					if(my $rc = $self->_get("$street$city$state", 'US')) {
 						$rc->{'country'} = 'US';
 						return $rc;
 					}
@@ -970,7 +969,7 @@ sub _normalize {
 	}
 }
 
-=head2 reverse_geocode
+=head2	reverse_geocode
 
     $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
@@ -978,8 +977,9 @@ To be done.
 
 =cut
 
+# At the moment this can't be supported as the DB only has an MD5 in it
 sub reverse_geocode {
-	Carp::croak('Reverse lookup is not yet supported');
+	Carp::croak(__PACKAGE__, ': Reverse lookup is not yet supported');
 }
 
 =head2	ua

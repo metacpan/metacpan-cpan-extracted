@@ -6,6 +6,7 @@ use Algorithm::MinPerfHashTwoLevel ( 'hash_with_state', ':utf8_flags', ':uint_ma
 use Exporter qw(import);
 use constant MAGIC_STR => "PH2L";
 use Carp;
+our $DEFAULT_VARIANT = 1;
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
     unmount_file
@@ -23,7 +24,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub TIEHASH {
     my ($class,$file)= @_;
@@ -117,6 +118,8 @@ sub make_file {
         or die "source_hash is a mandatory option to make_file";
     my $comment= $opts{comment} // "";
     my $debug= $opts{debug} || 0;
+    my $variant= int($opts{variant} // $DEFAULT_VARIANT);
+    die "Unknown file variant $variant" if $variant > 1 or $variant < 0;
 
     die "comment cannot contain null"
         if index($comment,"\0") >= 0;
@@ -127,7 +130,8 @@ sub make_file {
 
     my $hasher= Algorithm::MinPerfHashTwoLevel->new(
         debug => $debug,
-        seed => $opts{seed}
+        seed => $opts{seed},
+        variant => $variant,
     );
     my $buckets= $hasher->compute($source_hash);
 
@@ -163,7 +167,6 @@ sub make_file {
     my $buf= pack( "V8Q2", (0) x 10);
 
     my $magic_num=     unpack "V", MAGIC_STR;
-    my $version=       0;
     my $count=         0+@$buckets;
     my $state_ofs=     _append_ofs($buf, $state);
     my $table_ofs=     _append_ofs($buf, $table_buf); # the order of these items matters
@@ -175,7 +178,7 @@ sub make_file {
     my $str_buf_checksum= hash_with_state($str_buf,                             $state);
 
     my $header= pack( "V8Q2",
-                      $magic_num,   $version,           0+@$buckets,      $state_ofs,
+                      $magic_num,   $variant,           0+@$buckets,      $state_ofs,
                       $table_ofs,   $key_flags_ofs,     $val_flags_ofs,   $str_buf_ofs,
                       $table_checksum, $str_buf_checksum );
 
@@ -195,15 +198,15 @@ sub validate_file {
     my $file= $opts{file}
         or die "file is a mandatory option to validate_file";
     my $verbose= $opts{verbose};
-    my ($version,$msg)= $class->_validate_file(%opts);
+    my ($variant,$msg)= $class->_validate_file(%opts);
     if ($verbose) {
-        if (defined $version) {
+        if (defined $variant) {
             print $msg;
         } else {
             die $msg."\n";
         }
     }
-    return ($version,$msg);
+    return ($variant,$msg);
 }
 
 sub _validate_file {
@@ -225,12 +228,12 @@ sub _validate_file {
         return(undef, "file '$file' is not a valid '" . MAGIC_STR . "' file - missing magic header.");
     }
 
-    my ( $magic_num, $version,       $num_buckets,      $state_ofs,
+    my ( $magic_num, $variant,       $num_buckets,      $state_ofs,
          $table_ofs, $key_flags_ofs, $val_flags_ofs,    $str_buf_ofs,
          $table_checksum, $str_buf_checksum )= unpack "V8Q2", $head;
 
-    if ($version != 0) {
-        return(undef,"file '$file' is an unknown '" . MAGIC_STR . "' version $version");
+    if ( $variant > 1 ) {
+        return(undef,"file '$file' is an unknown '" . MAGIC_STR . "' variant $variant");
     }
     
     $/= \($table_ofs - $state_ofs);
@@ -254,7 +257,7 @@ sub _validate_file {
 
     my $comment= substr($str_buf,1,index($str_buf,"\0",1));
     my $ok_msg= sprintf "file '%s' is a valid '%s' file\n"
-         . "  version: %d\n"
+         . "  variant: %d\n"
          . "  keys: %d\n"
          . "  hash-state: %s\n"
          . "  table  checksum: %016x\n"
@@ -262,14 +265,14 @@ sub _validate_file {
          . "  comment: %s"
          , $file,
             MAGIC_STR,
-            $version,
+            $variant,
             $num_buckets,
             unpack("h*",$state),
             $got_table_checksum,
             $got_str_buf_checksum,
             $comment
     ;
-    return ($version,$ok_msg);
+    return ($variant,$ok_msg);
 }
 
 
@@ -321,14 +324,74 @@ outputs some basic status infromation about the construction process.
 =item validate_file
 
 Validate the file specified by the 'file' argument. Returns a list of
-two values, 'version' and 'message'. If the file fails validation the 'version'
+two values, 'variant' and 'message'. If the file fails validation the 'variant'
 will be undef and the 'message' will contain an error message. If the file
-passes validation the 'version' will specify the version of the file
+passes validation the 'variant' will specify the variant of the file
 (currently only 0 is valid), and 'message' will contain some basic information
 about the file, such as how many keys it contains, the comment it was
 created with, etc.
 
 =back
+
+=head2 FILE FORMAT
+
+Currently there is only one file format, variant 0.
+
+The file structure consists of a header, followed by a byte vector of seed/state
+data for the hash function, followed by a bucket table with records of a fixed size,
+followed by a bitvector of the flags for the keys with two bits per key,
+followed by a bitvector of flags for values with one bit per value, followed by a
+string table containing the comment for the file and the strings it contains.
+The key flags may be 0 for "latin-1/not-utf8", 1 for "is-utf8", and 2 for "was-utf8"
+which is used for keys which can be represented as latin-1, but should be restored
+as unicode/utf8. The val flags are similar but do not (need to) support "was-utf8".
+
+Structure:
+
+    Header
+    Hash-state
+    Bucket-table
+    Key flags
+    Val flags
+    Strings
+
+Header:
+
+    U32 magic_num       -> 1278363728 -> "PH2L"
+    U32 variant         -> 0
+    U32 num_buckets     -> number of buckets/keys in hash
+    U32 state_ofs       -> offset in file where hash preseeded state is found
+    U32 table_ofs       -> offset in file where bucket table starts
+    U32 key_flags_ofs   -> offset in file where key flags are located
+    U32 val_flags ofs   -> offset in file where val flags are located
+    U32 str_buf_ofs     -> offset in file where strings are located
+    U64 table_checksum  -> hash value checksum of table and key/val flags
+    U64 str_buf_checksum-> hash value checksum of string data
+
+All "_ofs" members in the header are aligned on 16 byte boundaries and
+may be right padded with nulls if necessary to make them a multiple of 16 bytes
+long, including the string buffer.
+
+The string buffer contains the comment at str_buf_ofs+1, its length can be found
+with strlen(), the comment may NOT contain nulls, and will be null terminated. All
+other strings in the table are NOT null padded, the length data stored in the
+bucket records should be used to determine the length of the keys and values.
+
+The table_checksum is the hash (using the seed/state data stored at state_ofs)
+of the data in the file from table_ofs to str_buf_ofs, eg it includes the
+key_flags bit vector and val_flags bit vector. The str_buf_checksum is
+similar but of the data from the str_buf_ofs to the end of the file.
+
+Buckets:
+
+   U32 xor_val      -> the xor_val for this bucket's h1 lookups (0 means none)
+   U32 key_ofs      -> offset from str_buf_ofs to find this key (nonzero always)
+   U32 val_ofs      -> offset from str_buf_ofs to find this value (0 means undef)
+   U16 key_len      -> length of key
+   U16 val_len      -> length of value
+
+The hash function used is stadtx hash, which uses a 16 byte seed to produce
+a 32 byte state vector.
 
 =head2 EXPORT
 

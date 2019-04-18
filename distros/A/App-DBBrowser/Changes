@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.071    2019-04-18
+        - extensions: fixed spelling error.
+        - choose_a_subset: replaced removed option.
+        - insert: removed invalid menu entry 'settings'.
+
 2.070    2019-04-05
         - readline: to return undef press Ctrl-X instead of Ctrl-D.
 

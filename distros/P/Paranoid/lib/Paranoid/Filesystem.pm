@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Filesystem.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Filesystem.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -33,7 +33,7 @@ use Paranoid::Input;
 use Paranoid::IO;
 use Paranoid::Glob;
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     preadDir     psubdirs    pfiles
@@ -88,7 +88,7 @@ sub pmkdir ($;$\%) {
 
     # Set and detaint mode
     if ($rv) {
-        $mode = umask ^ PERMMASK unless defined $mode;
+        $mode = ptranslatePerms( defined $mode ? $mode : umask ^ PERMMASK );
         unless ( detaint( $mode, 'int' ) ) {
             Paranoid::ERROR =
                 pdebug( 'invalid mode argument passed', PDLEVEL1 );
@@ -113,13 +113,20 @@ sub pmkdir ($;$\%) {
             $i++ while $i < $#parts and -d join '/', @parts[ 0 .. $i ];
             while ( $i <= $#parts ) {
                 $subdir = join '/', @parts[ 0 .. $i ];
-                unless ( -d $subdir or mkdir $subdir, $mode ) {
+                unless ( -d $subdir ) {
+                    if ( mkdir $subdir, $mode ) {
 
-                    # Error out and halt all work
-                    Paranoid::ERROR = pdebug( 'failed to create %s: %s',
-                        PDLEVEL1, $subdir, $! );
-                    $rv = 0;
-                    last;
+                        # Make sure perms are applied
+                        chmod $mode, $subdir;
+
+                    } else {
+
+                        # Error out and halt all work
+                        Paranoid::ERROR = pdebug( 'failed to create %s: %s',
+                            PDLEVEL1, $subdir, $! );
+                        $rv = 0;
+                        last;
+                    }
                 }
                 $i++;
             }
@@ -658,7 +665,26 @@ sub ptranslatePerms {
     pIn();
 
     # Validate permissions string
-    if ( defined $perm and $perm =~ /^([ugo]+)([+\-])([rwxst]+)$/s ) {
+    if ( defined $perm and $perm =~ /^\d+$/s ) {
+
+        if ( $perm =~ /^0/s ) {
+            if ( $perm =~ /^0[0-8]{3,4}$/s ) {
+
+                # String representation of octal number
+                eval "\$perm = $perm;";
+                detaint( $perm, 'int', $p );
+
+            } else {
+                pdebug( 'invalid octal presentation: %s', PDLEVEL1, $perm );
+            }
+
+        } else {
+
+            # Probably a converted integer already, treat it as verbatim
+            detaint( $perm, 'int', $p );
+        }
+
+    } elsif ( defined $perm and $perm =~ /^([ugo]+)([+\-])([rwxst]+)$/s ) {
 
         # Translate symbolic representation
         $o = $p = 00;
@@ -679,6 +705,7 @@ sub ptranslatePerms {
         # Report invalid characters in permission string
         Paranoid::ERROR =
             pdebug( 'invalid permissions (%s)', PDLEVEL1, $perm );
+
     }
     $rv = $p;
 
@@ -726,9 +753,15 @@ sub pchmod ($$;\%) {
     $rv = 0 unless defined $glob;
 
     # Convert perms if they're symbolic
-    $ptrans = ptranslatePerms($perms);
-    if ( defined $ptrans ) {
-        $addPerms = $perms =~ /-/s ? 0 : 1;
+    if ( defined $perms and defined( $ptrans = ptranslatePerms($perms) ) ) {
+        if ( $perms =~ /[ugo]+[+-]/si ) {
+            $addPerms = $perms =~ /-/s ? 0 : 1;
+        } else {
+            $ptrans = undef;
+        }
+    } else {
+        pdebug( 'invalid permissions passed: %s', PDLEVEL1, $perms );
+        $rv = 0;
     }
 
     if ($rv) {
@@ -1036,7 +1069,7 @@ Paranoid::Filesystem - Filesystem Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Filesystem.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Filesystem.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -1244,6 +1277,11 @@ B<EXAMPLES>
   # Remove all world privileges
   $perms = (stat "./bar")[2];
   chmod $perms ^ ptranslatePerms("o-rwx"), "./bar";
+
+B<NOTE:> If this function is called with a numeric representation of
+permissions, it will return them as-is.  This allows for this function to be
+called indiscriminately where you might be given permissions in either format,
+but ultimately want them only in numeric presentation.
 
 =head2 pchmod
 

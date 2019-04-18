@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package Text::Parser::Multiline 0.917;
+package Text::Parser::Multiline 0.918;
 
 # ABSTRACT: Adds multi-line support to the Text::Parser object.
 
@@ -11,8 +11,10 @@ our (@EXPORT)    = ();
 use Moose::Role;
 
 
-requires( qw(save_record setting lines_parsed has_aborted __read_file_handle),
-    qw(join_last_line is_line_continued) );
+requires(
+    qw(save_record multiline_type lines_parsed __read_file_handle),
+    qw(join_last_line is_line_continued _set_this_line this_line)
+);
 
 use Exception::Class (
     'Text::Parser::Multiline::Error',
@@ -39,33 +41,27 @@ my %save_record_proc = (
 sub __around_save_record {
     my ( $orig, $self ) = ( shift, shift );
     $orig_save_record = $orig;
-    my $type = $self->setting('multiline_type');
+    my $type = $self->multiline_type;
     $save_record_proc{$type}->( $orig, $self, @_ );
 }
 
 sub __around_is_line_continued {
-    my ( $orig, $self ) = ( shift, shift );
-    my $type = $self->setting('multiline_type');
-    return $orig->( $self, @_ ) if $type eq 'join_next';
-    __around_is_line_part_of_last( $orig, $self, @_ );
-}
-
-sub __around_is_line_part_of_last {
-    my ( $orig, $self ) = ( shift, shift );
-    return 0 if not $orig->( $self, @_ );
+    my ( $orig, $self, $line ) = ( shift, shift, shift );
+    return $orig->( $self, $line ) if $self->multiline_type eq 'join_next';
+    return 0 if not $orig->( $self, $line );
     return 1 if $self->lines_parsed() > 1;
-    die unexpected_cont( line => $_[0] );
+    die unexpected_cont( line => $line );
 }
 
 sub __after__read_file_handle {
     my $self = shift;
-    return $self->__after_at_eof()
-        if $self->setting('multiline_type') eq 'join_next';
-    my $last_line = $self->__pop_last_line();
-    $orig_save_record->( $self, $last_line ) if defined $last_line;
+    return $self->__test_safe_eof()
+        if $self->multiline_type eq 'join_next';
+    $self->_set_this_line( $self->__pop_last_line );
+    $orig_save_record->( $self, $self->this_line );
 }
 
-sub __after_at_eof {
+sub __test_safe_eof {
     my $self = shift;
     my $last = $self->__pop_last_line();
     return if not defined $last;
@@ -77,51 +73,51 @@ sub __join_next_proc {
     my ( $orig, $self ) = ( shift, shift );
     $self->__append_last_stash(@_);
     return if $self->is_line_continued(@_);
-    $orig->( $self, $self->__pop_last_line() );
+    $self->__call_orig_save_rec($orig);
+}
+
+sub __call_orig_save_rec {
+    my $self = shift;
+    my $orig = shift;
+    $self->_set_this_line( $self->__pop_last_line );
+    $orig->( $self, $self->this_line );
 }
 
 sub __join_last_proc {
     my ( $orig, $self ) = ( shift, shift );
-    return $self->__append_last_stash(@_)
-        if $self->is_line_continued(@_);
-    my $last_line = $self->__pop_last_line();
-    $orig->( $self, $last_line ) if defined $last_line;
-    $self->__save_this_line( $orig, @_ );
+    return $self->__append_last_stash(@_) if $self->__more_may_join_last(@_);
+    $self->__call_orig_save_rec($orig);
+    $self->__append_last_stash(@_);
 }
 
-sub __save_this_line {
-    my ( $self, $orig ) = ( shift, shift );
-    return $self->__append_last_stash(@_)
-        if not $self->has_aborted;
+sub __more_may_join_last {
+    my $self = shift;
+    $self->is_line_continued(@_) or not defined $self->_joined_line;
 }
+
+has _joined_line => (
+    is      => 'rw',
+    isa     => 'Str|Undef',
+    default => undef,
+    clearer => '_delete_joined_line',
+);
 
 sub __append_last_stash {
     my ( $self, $line ) = @_;
-    my $last_line = $self->__pop_last_line();
-    $last_line = $self->__strip_append_line( $line, $last_line );
-    $self->__stash_line($last_line);
-}
-
-sub __strip_append_line {
-    my ( $self, $line, $last ) = ( shift, shift, shift );
-    return $line if not defined $last;
-    return $self->join_last_line( $last, $line );
-}
-
-sub __stash_line {
-    my $self = shift;
-    $self->{__temp_joined_line} = shift;
+    return $self->_joined_line($line) if not defined $self->_joined_line;
+    my $joined_line = $self->join_last_line( $self->__pop_last_line, $line );
+    $self->_joined_line($joined_line);
 }
 
 sub __pop_last_line {
-    my $self = shift;
-    return if not exists $self->{__temp_joined_line};
-    my $last_line = $self->{__temp_joined_line};
-    delete $self->{__temp_joined_line};
+    my $self      = shift;
+    my $last_line = $self->_joined_line();
+    $self->_delete_joined_line;
     return $last_line;
 }
 
 no Moose::Role;
+
 
 1;
 
@@ -137,7 +133,7 @@ Text::Parser::Multiline - Adds multi-line support to the Text::Parser object.
 
 =head1 VERSION
 
-version 0.917
+version 0.918
 
 =head1 SYNOPSIS
 
@@ -151,29 +147,27 @@ version 0.917
 
 =head1 RATIONALE
 
-Some text formats allow users to split a single line into multiple lines, with a continuation character in the beginning or in the end, usually to improve human readability.
-
-This extension allows users to use the familiar C<save_record> interface to save records, as if all the multi-line text inputs were joined.
-
-=head1 OVERVIEW
-
-To handle these types of text formats with the native L<Text::Parser> class, the derived class would need to have a C<save_record> method that would:
+Some text formats allow line-wrapping with a continuation character, usually to improve human readability. To handle these types of text formats with the native L<Text::Parser> class, the derived class would need to have a C<save_record> method that would:
 
 =over 4
 
 =item *
 
-Detect if the line is continued, and if it is, save it in a temporary location. To detect this, the developer has to implement a function named C<L<is_line_continued|Text::Parser/is_line_continued>>.
+Detect if the line is wrapped or is part of a wrapped line. To do this the developer has to implement a function named C<L<is_line_continued|Text::Parser/is_line_continued>>.
 
 =item *
 
-Keep appending (or joining) any continued lines to this temporary location. For this, the developer has to implement a function named C<L<join_last_line|Text::Parser/join_last_line>>.
-
-=item *
-
-Once the line continuation has stopped, create and save a data record. The developer needs to write this the same way as earlier, assuming that the text is already joined properly.
+Join any wrapped lines to form a single line. For this, the developer has to implement a function named C<L<join_last_line|Text::Parser/join_last_line>>.
 
 =back
+
+With these two things, the developer can implement their C<L<save_record|Text::Parser/save_record>> assuming that the line is already unwrapped.
+
+=head1 OVERVIEW
+
+This role may be composed into an object of the L<Text::Parser> class. To use this role, just set the C<L<multiline_type|Text::Parser/multiline_type>> attribute. A derived class may set this in their constructor (or C<BUILDARGS> if you use L<Moose>). If this option is set, the developer should re-define the C<is_line_continued> and C<join_last_line> methods.
+
+=head1 ERRORS AND EXCEPTIONS
 
 It should also look for the following error conditions (see L<Text::Parser::Errors>):
 
@@ -181,27 +175,56 @@ It should also look for the following error conditions (see L<Text::Parser::Erro
 
 =item *
 
-If the end of file is reached, and the line is expected to be still continued.
+If the end of file is reached, and the line is expected to be still continued, an exception of C<L<Text::Parser::Errors::UnexpectedEof|Text::Parser::Errors/"Text::Parser::Errors::UnexpectedEof">> is thrown.
 
 =item *
 
-If the first line in a text input happens to be a continuation of a previous line, that is impossible, since it is the first line
+It is impossible for the first line in a text input to be wrapped from a previous line. So if this condition occurs, an exception of C<L<Text::Parser::Errors::UnexpectedCont|Text::Parser::Errors/"Text::Parser::Errors::UnexpectedCont">> is thrown.
 
 =back
 
-To create a multi-line text parser you need to L<determine|Text::Parser/multiline_type> if your parser is a C<'join_next'> type or a C<'join_last'> type.
-
 =head1 METHODS TO BE IMPLEMENTED
 
-These methods must be implemented by the developer. There are default implementations provided in L<Text::Parser> but they do nothing.
+These methods must be implemented by the developer in the derived class. There are default implementations provided in L<Text::Parser> but they may not handle your target text format.
 
 =head2 C<< $parser->is_line_continued($line) >>
 
-Takes a string argument as input. Should returns a boolean that indicates if the current line is continued from the previous line, or is continued on the next line (depending on the type of multi-line text format). If parser is a C<'join_next'> parser, then a true value from this routine means that some data is expected to be in the I<next> line which is expected to be joined with this line. If instead the parser is C<'join_last'>, then a true value from this method would mean that the current line is a continuation from the I<previous> line, and the current line should be appended to the content of the previous line.
+Takes a string argument containing the current line (also available through the C<this_line> method) as input. Your implementation should return a boolean that indicates if the current line is wrapped.
+
+    sub is_line_continued {
+        my ($self, $line) = @_;
+        chomp $line;
+        $line =~ /\\\s*$/;
+    }
+
+The above example method checks if a line is being continued by using a back-slash character (C<\>).
 
 =head2 C<< $parser->join_last_line($last_line, $current_line) >>
 
-Takes two string arguments. The first is the line previously read which is expected to be continued on this line. You can be certain that the two strings will not be C<undef>. Your method should return a string that has stripped any continuation characters, and joined the current line with the previous line.
+Takes two string arguments. The first is the previously read line which is wrapped in the next line (the second argument). The second argument should be identical to the return value of C<L<this_line|Text::Parser/"this_line">>. Neither argument will be C<undef>. Your implementation should join the two strings stripping any continuation character(s), and return the resultant string.
+
+Here is an example implementation that joins the previous line terminated by a back-slash (C<\>) with the present line:
+
+    sub join_last_line {
+        my $self = shift;
+        my ($last, $line) = (shift, shift);
+        $last =~ s/\\\s*$//g;
+        return "$last $line";
+    }
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Text::Parser>
+
+=item *
+
+L<Text::Parser::Errors>
+
+=back
 
 =head1 BUGS
 

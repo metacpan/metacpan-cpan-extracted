@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Free
 
+0.19	Wed 17 Apr 17:25:55 EDT 2019
+	Added reverse_geocode support to MaxMind and Local
+
 0.18	Wed 20 Mar 17:00:52 EDT 2019
 	Added Geo::Coder::Free::Local
 	Now return Geo::Location::Point object

@@ -7,23 +7,19 @@ package Comics::Plugin::Dilbert;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.02";
+our $VERSION = "1.00";
 
-sub register {
-    shift->SUPER::register
-      ( { name    => "Dilbert",
-	  url     => "http://dilbert.com/",
-	  pat	  =>
+our $name    = "Dilbert";
+our $url     = "http://dilbert.com/";
+our $pattern =
 	    qr{ <img \s+
 		class="img-responsive \s img-comic" \s+
 		width="\d+" \s+
 		height="\d+" \s+
 		alt="(?<alt>[^"]+)" \s+
-		src="(?<url>http://assets.amuniversal.com/
+		src="(?<url>(?:https?:)?//assets.amuniversal.com/
 		       (?<image>.*?))"  \s+ />
-	      }x,
-	} );
-}
+	      }x;
 
 # Important: Return the package name!
 __PACKAGE__;

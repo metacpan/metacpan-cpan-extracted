@@ -16,12 +16,12 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 
-our $VERSION = '0.23';
-our %locations;
+our $VERSION = '0.24';
+our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,19 @@ L<HTML::GoogleMaps::V3>
 =head2 new
 
 Creates a Geo::Coder::List object.
+
+Takes an optional argument 'cache' which takes an cache object that supports
+get() and set() methods.
+The licences of some geo coders,
+such as Google,
+specifically prohibit caching API calls,
+so be careful to only use with those services that allow it.
+
+    use Geo::Coder::List;
+    use CHI;
+
+    my $geocoder->new(cache => CHI->new(driver => 'Memory', global => 1));
+
 =cut
 
 sub new {
@@ -45,10 +58,9 @@ sub new {
 
 	return unless(defined($class));
 
-	# my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	# return bless { %args, geo_coders => [] }, $class;
-	return bless { }, $class;
+	return bless { %args, geo_coders => [] }, $class;
 }
 
 =head2 push
@@ -127,7 +139,7 @@ sub geocode {
 
 	my @call_details = caller(0);
 	print "location: $location\n" if(DEBUG);
-	if((!wantarray) && (my $rc = $locations{$location})) {
+	if((!wantarray) && (my $rc = $self->_cache($location))) {
 		if(ref($rc) eq 'ARRAY') {
 			$rc = @{$rc}[0];
 		}
@@ -145,11 +157,11 @@ sub geocode {
 			return $rc;
 		}
 	}
-	if(defined($locations{$location}) && (ref($locations{$location}) eq 'ARRAY') && (my @rc = @{$locations{$location}})) {
+	if(defined($self->_cache($location)) && (ref($self->_cache($location)) eq 'ARRAY') && (my @rc = @{$self->_cache($location)})) {
 		if(scalar(@rc)) {
 			my $allempty = 1;
 			foreach (@rc) {
-				if(ref($_) eq 'HASH') {
+				if((ref($_) eq 'HASH') || (ref($_) eq 'Geo::Location::Point')) {
 					$allempty = 0;
 					delete $_->{'geocoder'};
 				}
@@ -174,23 +186,16 @@ sub geocode {
 
 	ENCODER: foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
-		if((ref($geocoder) eq 'HASH') && exists($geocoder->{'limit'}) && defined(my $limit = $geocoder->{'limit'})) {
-			print "limit: $limit\n" if(DEBUG);
-			if($limit <= 0) {
-				next ENCODER;
-			}
-			$geocoder->{'limit'}--;
-		}
 		if(ref($geocoder) eq 'HASH') {
 			if(exists($geocoder->{'limit'}) && defined(my $limit = $geocoder->{'limit'})) {
 				print "limit: $limit\n" if(DEBUG);
 				if($limit <= 0) {
-					next ENCODER;
+					next;
 				}
 				$geocoder->{'limit'}--;
 			}
 			if(my $regex = $geocoder->{'regex'}) {
-				print 'Consider ', ref($geocoder->{geocoder}), ": $regex\n" if(DEBUG);
+				print 'consider ', ref($geocoder->{geocoder}), ": $regex\n" if(DEBUG);
 				if($location !~ $regex) {
 					next;
 				}
@@ -208,9 +213,6 @@ sub geocode {
 				die 'lost username' if(!defined($geocoder->username()));
 				@rc = $geocoder->geocode($location);
 			} else {
-				if(ref($geocoder) eq 'Geo::Coder::GooglePlaces::V3') {
-					print 'key: ', $geocoder->key(), "\n" if(DEBUG);
-				}
 				@rc = $geocoder->geocode(%params);
 			}
 		};
@@ -225,9 +227,9 @@ sub geocode {
 				error => $@
 			};
 			CORE::push @{$self->{'log'}}, $log;
-			Carp::carp(ref($geocoder) . " '$location': $@");
+			Carp::carp(ref($geocoder), " '$location': $@");
 			$error = $@;
-			next;
+			next ENCODER;
 		}
 		if(scalar(@rc) == 0) {
 			my $log = {
@@ -239,13 +241,12 @@ sub geocode {
 				result => 'not found',
 			};
 			CORE::push @{$self->{'log'}}, $log;
-			@rc = ();
 			next ENCODER;
 		}
 		POSSIBLE_LOCATION: foreach my $l(@rc) {
 			if(ref($l) eq 'ARRAY') {
 				# Geo::GeoNames
-				# TODO: should consider all locations in the array
+				# FIXME: should consider all locations in the array
 				$l = $l->[0];
 			}
 			if(!defined($l)) {
@@ -258,10 +259,10 @@ sub geocode {
 					result => 'not found',
 				};
 				CORE::push @{$self->{'log'}}, $log;
-				@rc = ();
 				next ENCODER;
 			}
 			print Data::Dumper->new([\$l])->Dump() if(DEBUG >= 2);
+			last if(ref($l) eq 'Geo::Location::Point');
 			next if(ref($l) ne 'HASH');
 			if($l->{'error'}) {
 				my $log = {
@@ -273,7 +274,6 @@ sub geocode {
 					error => $l->{'error'}
 				};
 				CORE::push @{$self->{'log'}}, $log;
-				@rc = ();
 				next ENCODER;
 			} else {
 				# Try to create a common interface, helps with HTML::GoogleMaps::V3
@@ -346,11 +346,11 @@ sub geocode {
 		if(scalar(@rc)) {
 			print 'Number of matches from ', ref($geocoder), ': ', scalar(@rc), "\n" if(DEBUG);
 			if(wantarray) {
-				$locations{$location} = \@rc;
+				$self->_cache($location, \@rc);
 				return @rc;
 			}
 			if(scalar($rc[0])) {	# check it's not an empty hash
-				$locations{$location} = $rc[0];
+				$self->_cache($location, $rc[0]);
 				return $rc[0];
 			}
 		}
@@ -360,10 +360,10 @@ sub geocode {
 		# return { error => $error };
 	# }
 	if(wantarray) {
-		$locations{$location} = ();
+		$self->_cache($location, ());
 		return ();
 	}
-	$locations{$location} = undef;
+	$self->_cache($location, undef);
 }
 
 =head2 ua
@@ -389,15 +389,172 @@ sub ua {
 			my $geocoder = $g;
 			if(ref($g) eq 'HASH') {
 				$geocoder = $g->{'geocoder'};
+				if(!defined($geocoder)) {
+					Carp::croak('No geocoder found');
+				}
 			}
 			$geocoder->ua($ua);
 		}
 	}
 }
 
+=head2 reverse_geocode
+
+Similar to geocode except it expects a latitude/longitude parameter.
+
+    print $geocoder_list->reverse_geocode(latlng => '37.778907,-122.39732');
+
+=cut
+
+sub reverse_geocode {
+	my $self = shift;
+	my %params = @_;
+
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location)');
+	} elsif(@_ % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'latlng'} = shift;
+	}
+
+	my $latlng = $params{'latlng'}
+		or Carp::croak('Usage: reverse_geocode(latlng => $location)');
+
+	my $latitude;
+	my $longitude;
+
+	if($latlng) {
+		($latitude, $longitude) = split(/,/, $latlng);
+	} else {
+		$latitude //= $params{'lat'};
+		$longitude //= $params{'lon'};
+		$longitude //= $params{'long'};
+	}
+
+	if(my $rc = $self->_cache($latlng)) {
+		return $rc;
+	}
+
+	foreach my $g(@{$self->{geocoders}}) {
+		my $geocoder = $g;
+		if(ref($geocoder) eq 'HASH') {
+			if(exists($geocoder->{'limit'}) && defined(my $limit = $geocoder->{'limit'})) {
+				print "limit: $limit\n" if(DEBUG);
+				if($limit <= 0) {
+					next;
+				}
+				$geocoder->{'limit'}--;
+			}
+			$geocoder = $g->{'geocoder'};
+		}
+		print 'trying ', ref($geocoder), "\n" if(DEBUG);
+		if(wantarray) {
+			my @rc;
+			if(my @locs = $geocoder->reverse_geocode(%params)) {
+				print Data::Dumper->new([\@locs])->Dump() if(DEBUG >= 2);
+				foreach my $loc(@locs) {
+					if(my $name = $loc->{'display_name'}) {
+						# OSM
+						CORE::push @rc, $name;
+					} elsif($loc->{'city'}) {
+						# Geo::Coder::CA
+						my $name;
+						if(my $usa = $loc->{'usa'}) {
+							$name = $usa->{'usstnumber'};
+							if(my $staddress = $usa->{'usstaddress'}) {
+								$name .= ' ' if($name);
+								$name .= $staddress;
+							}
+							if(my $city = $usa->{'uscity'}) {
+								$name .= ', ' if($name);
+								$name .= $city;
+							}
+							if(my $state = $usa->{'state'}) {
+								$name .= ', ' if($name);
+								$name .= $state;
+							}
+							$name .= ', ' if($name);
+							$name .= 'USA';
+						} else {
+							$name = $loc->{'stnumber'};
+							if(my $staddress = $loc->{'staddress'}) {
+								$name .= ' ' if($name);
+								$name .= $staddress;
+							}
+							if(my $city = $loc->{'city'}) {
+								$name .= ', ' if($name);
+								$name .= $city;
+							}
+							if(my $state = $loc->{'prov'}) {
+								$state .= ', ' if($name);
+								$name .= $state;
+							}
+						}
+						CORE::push @rc, $name;
+					}
+				}
+			}
+			if(wantarray) {
+				$self->_cache($latlng, \@rc);
+				return @rc;
+			}
+			if(scalar($rc[0])) {	# check it's not an empty hash
+				$self->_cache($latlng, $rc[0]);
+				return $rc[0];
+			}
+		} elsif(my $rc = $geocoder->reverse_geocode(%params)) {
+			return $rc if(!ref($rc));
+			print Data::Dumper->new([$rc])->Dump() if(DEBUG >= 2);
+			if(my $name = $rc->{'display_name'}) {
+				# OSM
+				return $self->_cache($latlng, $name);
+			} elsif($rc->{'city'}) {
+				# Geo::Coder::CA
+				my $name;
+				if(my $usa = $rc->{'usa'}) {
+					$name = $usa->{'usstnumber'};
+					if(my $staddress = $usa->{'usstaddress'}) {
+						$name .= ' ' if($name);
+						$name .= $staddress;
+					}
+					if(my $city = $usa->{'uscity'}) {
+						$name .= ', ' if($name);
+						$name .= $city;
+					}
+					if(my $state = $usa->{'state'}) {
+						$name .= ', ' if($name);
+						$name .= $state;
+					}
+					return $self->_cache($latlng, "$name, USA");
+				} else {
+					$name = $rc->{'stnumber'};
+					if(my $staddress = $rc->{'staddress'}) {
+						$name .= ' ' if($name);
+						$name .= $staddress;
+					}
+					if(my $city = $rc->{'city'}) {
+						$name .= ', ' if($name);
+						$name .= $city;
+					}
+					if(my $state = $rc->{'prov'}) {
+						$state .= ', ' if($name);
+						return $self->_cache($latlng, "$name $state");
+					}
+				}
+				return $self->_cache($latlng, $name);
+			}
+		}
+	}
+	return;
+}
+
 =head2 log
 
-Returns the log of events to help you debug failures, optimize lookup order and fix quota breakage
+Returns the log of events to help you debug failures,
+optimize lookup order and fix quota breakage.
 
     my @log = @{$geocoderlist->log()};
 
@@ -421,6 +578,39 @@ sub flush {
 	delete $self->{'log'};
 }
 
+sub _cache {
+	my $self = shift;
+	my $key = shift;
+
+	if(my $value = shift) {
+		$locations{$key} = $value;
+		if($self->{'cache'}) {
+			if(ref($value) eq 'ARRAY') {
+				foreach my $item(@{$value}) {
+					if(ref($item) eq 'HASH') {
+						foreach my $key(keys(%{$item})) {
+							delete $item->{$key} unless ($key eq 'geometry');
+						}
+					}
+				}
+			} elsif(ref($value) eq 'HASH') {
+				foreach my $key(keys(%{$value})) {
+					delete $value->{$key} unless ($key eq 'geometry');
+				}
+			}
+			$self->{'cache'}->set($key, $value, '1 month');
+		}
+		return $value;
+	}
+
+	if(my $rc = $locations{$key}) {
+		return $rc;
+	}
+	if($self->{'cache'}) {
+		return $self->{'cache'}->get($key);
+	}
+}
+
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
@@ -433,7 +623,8 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-There is no reverse_geocode() yet.
+reverse_geocode() doesn't update the logger.
+reverse_geocode() should support L<Geo::Location::Point> objects.
 
 =head1 SEE ALSO
 
@@ -471,7 +662,7 @@ L<http://search.cpan.org/dist/Geo-Coder-List/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2018 Nigel Horne.
+Copyright 2016-2019 Nigel Horne.
 
 This program is released under the following licence: GPL
 

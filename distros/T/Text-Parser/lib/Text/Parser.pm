@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use feature ':5.14';
 
-package Text::Parser 0.917;
+package Text::Parser 0.918;
 
 # ABSTRACT: Simplifies text parsing. Easily extensible to parse any text format.
 
@@ -90,16 +90,6 @@ sub __newval_multi_line {
 }
 
 
-sub setting {
-    my $self = shift;
-    return if not @_;
-    my $setting = shift;
-    my %allowed = ( multiline_type => 1, auto_chomp => 1 );
-    return if not exists $allowed{$setting};
-    return $self->$setting();
-}
-
-
 sub read {
     my $self = shift;
     return if not defined $self->_handle_read_inp(@_);
@@ -116,11 +106,17 @@ sub _handle_read_inp {
 
 sub __read_and_close_filehandle {
     my $self = shift;
+    $self->_prep_to_read_file;
+    $self->__read_file_handle;
+    $self->_clear_this_line;
+    $self->_close_filehandles if $self->_has_filename;
+}
+
+sub _prep_to_read_file {
+    my $self = shift;
     $self->_reset_line_count;
     $self->_empty_records;
     $self->_clear_abort;
-    $self->__read_file_handle;
-    $self->_close_filehandles if $self->_has_filename;
 }
 
 sub __read_file_handle {
@@ -134,13 +130,28 @@ sub __read_file_handle {
 sub __parse_line {
     my ( $self, $line ) = ( shift, shift );
     $self->_next_line_parsed();
-    $line = $self->line_auto_manip($line);
+    $line = $self->_def_line_manip($line);
     $self->__try_to_parse($line);
     return not $self->has_aborted;
 }
 
+sub _def_line_manip {
+    my ( $self, $line ) = ( shift, shift );
+    chomp $line if $self->auto_chomp;
+    return $self->_trim_line($line);
+}
+
+sub _trim_line {
+    my ( $self, $line ) = ( shift, shift );
+    return $line        if $self->auto_trim eq 'n';
+    return trim($line)  if $self->auto_trim eq 'b';
+    return ltrim($line) if $self->auto_trim eq 'l';
+    return rtrim($line);
+}
+
 sub __try_to_parse {
     my ( $self, $line ) = @_;
+    $self->_set_this_line($line);
     try { $self->save_record($line); }
     catch { die $_; };
 }
@@ -215,21 +226,15 @@ sub save_record {
 }
 
 
-sub line_auto_manip {
-    my ( $self, $line ) = ( shift, shift );
-    return if not defined $line;
-    chomp $line if $self->auto_chomp;
-    return $self->_trim_line($line);
-}
-
-sub _trim_line {
-    my ( $self, $line ) = ( shift, shift );
-    return $line        if $self->auto_trim eq 'n';
-    return trim($line)  if $self->auto_trim eq 'b';
-    return ltrim($line) if $self->auto_trim eq 'l';
-    return rtrim($line);
-}
-
+has _current_line => (
+    is       => 'ro',
+    isa      => 'Str|Undef',
+    init_arg => undef,
+    writer   => '_set_this_line',
+    reader   => 'this_line',
+    clearer  => '_clear_this_line',
+    default  => undef,
+);
 
 
 
@@ -291,6 +296,7 @@ sub join_last_line {
 }
 
 
+
 __PACKAGE__->meta->make_immutable;
 
 no Moose;
@@ -309,7 +315,7 @@ Text::Parser - Simplifies text parsing. Easily extensible to parse any text form
 
 =head1 VERSION
 
-version 0.917
+version 0.918
 
 =head1 SYNOPSIS
 
@@ -358,33 +364,29 @@ Unfortunately however, most file parsing code looks like this:
     }
     close FH;
 
-Note that a developer may have to repeat all of the above if she has to read another file with different content or format. And if the text has line-continuation characters, it isn't easy to implement it well with the C<while> loop above.
+Note that a developer may have to repeat all of the above if she has to read another file with different content or format. And if the target text format allows line-wrapping with a continuation character, it isn't easy to implement it well with this C<while> loop.
 
-With C<Text::Parser>, developers can focus on specifying the grammar and simply use the C<read> method. Just inherit the class and override one method (C<L<save_record|/save_record>>). Voila! you have a parser. L<These examples|/EXAMPLES> illustrate how easy this can be.
+With C<Text::Parser>, developers can focus on specifying the grammar and simply use the C<read> method. Just extend (inherit) this class and override one method (C<L<save_record|/save_record>>). Voila! you have a parser. L<These examples|/EXAMPLES> illustrate how easy this can be.
 
 =head1 DESCRIPTION
 
-C<Text::Parser> is a format-agnostic text parsing utility class. Derived classes can specify the format-specific syntax they intend to parse. Usually just methods needs to be overridden to do this. But of course derived classes can create any additional attributes or methods needed to interpret the fomart and extract records.
+C<Text::Parser> is a format-agnostic text parsing base class. Derived classes can specify the format-specific syntax they intend to parse.
 
-Future versions are expected to include progress-bar support, parsing text from sockets, UTF support, or parsing from a chunk of memory. All these software features are text-format independent and should be re-used. Derived classes of C<Text::Parser> will be able to take advantage of these features seamlessly, while the base class handles the "mundane" details.
+Future versions are expected to include progress-bar support, parsing text from sockets, UTF support, or parsing from a chunk of memory.
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
-Takes optional attributes in the form of a hash. See section L<ATTRIBUTES|/ATTRIBUTES> for a list of the attributes and their description. Throws an exception if you use wrong inputs to create an object.
+Takes optional attributes as in example below. See section L<ATTRIBUTES|/ATTRIBUTES> for a list of the attributes and their description.
 
     my $parser = Text::Parser->new(
-        auto_chomp      => 0,           # 0 (Default) or 1
-                                        #   - automatically chomp lines
-        multiline_type  => 'join_last', # 'join_last'|'join_next'|undef ; Default: undef
-        auto_trim       => 'b',         # 'l' (left), 'r' (right), 'b' (both), 'n' (neither) (Default)
-                                        #   - automatically trim leading and trailing whitespaces
-        auto_split      => 1,           # Auto-splits lines into fields
-        FS => qr/\s+/,     # Used by auto_split feature above. Default: qr/\s+/
+        auto_chomp      => 0,
+        multiline_type  => 'join_last',
+        auto_trim       => 'b',
+        auto_split      => 1,
+        FS              => qr/\s+/,
     );
-
-This C<$parser> variable will be used in all examples below.
 
 =head1 ATTRIBUTES
 
@@ -392,13 +394,15 @@ The attributes below can be used as options to the C<new> constructor. Each attr
 
 =head2 auto_chomp
 
-Read-write attribute. Takes a boolean value as parameter. Defaults to 0.
+Read-write attribute. Takes a boolean value as parameter. Defaults to C<0>.
 
     print "Parser will chomp lines automatically\n" if $parser->auto_chomp;
 
 =head2 auto_split
 
-Read-only attribute that can be set only during object construction. Defaults to 0. This attribute indicates if the parser will automatically split every line into fields. If it is set to a true value, each line will be split into fields which can be accessed through special methods that become available. These methods are documented in L<Text::Parser::AutoSplit>. The field separator can be set using another attribute named C<'FS'>.
+A set-once-only attribute that can be set only during object construction. Defaults to C<0>. This attribute indicates if the parser will automatically split every line into fields.
+
+If it is set to a true value, each line will be split into fields, and six methods (like C<L<field|Text::Parser::AutoSplit/field>>, C<L<find_field|Text::Parser::AutoSplit/find_field>>, etc.) become accessible within the C<L<save_record|/save_record>> method. These methods are documented in L<Text::Parser::AutoSplit>.
 
 =head2 auto_trim
 
@@ -410,99 +414,47 @@ Read-write attribute. The values this can take are shown under the C<L<new|/new>
 
 Read-write attribute that can be used to specify the field separator along with C<auto_split> attribute. It must be a regular expression reference enclosed in the C<qr> function, like C<qr/\s+|[,]/> which will split across either spaces or commas. The default value for this argument is C<qr/\s+/>.
 
-The name for this attribute comes from the built-in C<FS> variable in the popular GNU Awk program.
+The name for this attribute comes from the built-in C<FS> variable in the popular L<GNU Awk program|https://www.gnu.org/software/gawk/gawk.html>.
 
     $parser->FS( qr/\s+\(*|\s*\)/ );
 
-You I<can> change the field separator in the course of parsing a file. But the changes would take effect only on the next line. For example:
-
-    package MyParser;
-
-    use Moose;
-    extends 'Text::Parser';
-
-    sub BUILDARGS {
-        return {
-            auto_split => 1,
-            auto_chomp => 1,
-            auto_trim => 'b'
-        };
-    }
-
-    sub save_record {
-        my $self = shift;
-        $self->FS(qr/[,]/) if $self->field(0) eq 'CSV_BELOW';
-        $self->SUPER::save_record([$self->fields]);
-    }
-
-    package main;
-
-    use Data::Dumper 'Dumper';
-
-    my $parser = MyParser->new();
-    $parser->read('input.txt');
-    print Dumper([$parser->get_records]), "\n";
-
-Now, let us say you have a file F<input.txt> with the following content:
-
-    Some information in this file
-    CSV_BELOW
-    col1,col2,col3
-    data1,1,1
-    data2,2,4
-    data3,3,9
-
-Then the output will be:
-
-    $VAR1 = [
-        [ 'Some', 'information', 'in', 'this', 'file' ],
-        [ 'CSV_BELOW' ], 
-        [ 'col1', 'col2', 'col3' ], 
-        [ 'data1', '1', '1' ], 
-        [ 'data2', '2', '4' ], 
-        [ 'data3', '3', '9' ]
-    ]; 
+C<FS> I<can> be changed in your implementation of C<save_record>. But the changes would take effect only on the next line.
 
 =head2 multiline_type
 
-Read-write attribute. Takes a value that is either C<undef> or one of strings C<'join_next'> or C<'join_last'>.
+If the target text format allows line-wrapping with a continuation character, the C<multiline_type> option tells the parser to join them into a single line. When setting this attribute, one must re-define L<two more methods|/"FOR MULTI-LINE TEXT PARSING">. See L<these examples|/"Example 4 : Multi-line parsing">.
+
+By default, the C<multiline_type> attribute has a value of C<undef>, i.e., the target text format will not have wrapped lines. It can be set to either C<'join_next'> or C<'join_last'>. Once set, it cannot be set back to C<undef> again.
+
+    $parser->multiline_type(undef);
+    $parser->multiline_type('join_next');
 
     my $mult = $parser->multiline_type;
     print "Parser is a multi-line parser of type: $mult" if defined $mult;
-
-    $parser->multiline_type(undef);
-                        # setting this to undef will throw an exception if it was previously set to a real value like
-                        # 'join_next' or 'join_last'. In this case, since $parser was of 'join_last' type, there will
-                        # be an exception
-    $parser->multiline_type('join_next');
-                        # Changes the parser to a multiline parser of type 'join_next'
-                        # This is okay.
-
-=head3 What value should I choose?
-
-If your text format allows users to break up what should be on a single line into another line using a continuation character, you need to use the C<multiline_type> option. The option tells the parser to join lines back into a single line, so that your C<save_record> method doesn't have to bother about joining the continued lines, stripping any continuation characters, line-feeds etc. There are two variations in this:
 
 =over 4
 
 =item *
 
-If your format allows something like a trailing back-slash or some other character to indicate that text on I<B<next>> line is to be joined with this one, then choose C<join_next>. See L<this example|/"Continue with character">.
+If the target format allows line-wrapping I<to the B<next>> line, set C<multiline_type> to C<join_next>. L<This example|/"Continue with character"> illustrates this case.
 
 =item *
 
-If your format allows some character to indicate that text on the current line is part of the I<B<last>> line, then choose C<join_last>. See L<this simple SPICE line-joiner|/"Simple SPICE line joiner"> as an example. B<Note:> If you have no continuation character, but you want to just join all the lines into one single line and then call C<save_record> only once for the whole text block, then use C<join_last>. See L<this trivial line-joiner|/"Trivial line-joiner">.
+If the target format allows line-wrapping I<from the B<last>> line, set C<multiline_type> to C<join_last>. L<This simple SPICE line-joiner|/"Simple SPICE line joiner"> illustrates this case.
+
+=item *
+
+To "slurp" a file into a single string, set C<multiline_type> to C<join_last>. In this special case, you don't need to re-define the C<L<is_line_continued|/is_line_continued>> and C<L<join_last_line|/join_last_line>> methods. See L<this trivial line-joiner|/"Trivial line-joiner"> example.
 
 =back
 
-Remember that C<join_next> multi-line parsers will blindly look for input to be continued on the next line, even if C<EOF> has been reached. This means, if you want to "slurp" a file into a single large string, without any continuation characters, you must use the C<join_last> multi-line type.
-
 =head1 METHODS
+
+These are meant to be called from the C<::main> program or within subclasses. In general, don't override them - just use them.
 
 =head2 read
 
-Takes zero or one argument which could be a string containing the name of the file, or a filehandle reference (a C<GLOB>) like C<\*STDIN> or an object of the C<L<FileHandle>> class. Throws an exception if filename/C<GLOB> provided is either non-existent or cannot be read for any reason.
-
-B<Note:> Normally if you provide the C<GLOB> of a file opened for write, some Operating Systems allow reading from it too, and some don't. Read the documentation for C<L<filehandle|/filehandle>> for more on this.
+Takes an optional argument, either a string containing the name of the file, or a filehandle reference (a C<GLOB>) like C<\*STDIN> or an object of the C<L<FileHandle>> class.
 
     $parser->read($filename);
 
@@ -514,7 +466,7 @@ B<Note:> Normally if you provide the C<GLOB> of a file opened for write, some Op
     $parser->filehandle(\*STDIN);
     $parser->read();
 
-Returns once all records have been read or if an exception is thrown for any parsing errors, or if reading has been aborted with the C<L<abort_reading|/abort_reading>> method.
+Returns once all records have been read or if an exception is thrown, or if reading has been aborted with the C<L<abort_reading|/abort_reading>> method.
 
 If you provide a filename as input, the function will handle all C<open> and C<close> operations on files even if any exception is thrown, or if the reading has been aborted. But if you pass a file handle C<GLOB> or C<FileHandle> object instead, then the file handle won't be closed and it will be the responsibility of the calling program to close the filehandle.
 
@@ -526,27 +478,15 @@ If you provide a filename as input, the function will handle all C<open> and C<c
     # Will not close MYFH and it is the respo
     close MYFH;
 
-When you do read a new file name or file handle with this method, you will lose all the records stored from the previous read operation. So this means that if you want to read a different file with the same parser object, (unless you don't care about the records from the last file you read) you should use the C<L<get_records|/get_records>> method to retrieve all the read records before parsing a new file. So all those calls to C<read> in the example above were parsing three different files, and each successive call overwrote the records from the previous call.
-
-    $parser->read($file1);
-    my (@records) = $parser->get_records();
-
-    $parser->read(\*STDIN);
-    my (@stdin) = $parser->get_records();
-
-B<Note:> To extend the class to other file formats, override C<L<save_record|/save_record>> instead of this one.
-
-=head3 Future Enhancement
-
-I<At present the C<read> method takes only two possible inputs argument types, either a file name, or a file handle. In future this may be enhanced to read from sockets, subroutines, or even just a block of memory (a string reference). Suggestions for other forms of input are welcome.>
+B<Note:> To extend the class to other file formats, override C<L<save_record|/save_record>>.
 
 =head2 filename
 
-Takes zero or one string argument containing the name of a file. Returns the name of the file that was last opened if any. Returns C<undef> if no file has been opened.
+Takes an optional string argument containing the name of a file. Returns the name of the file that was last opened if any. Returns C<undef> if no file has been opened.
 
     print "Last read ", $parser->filename, "\n";
 
-The file name is "persistent" in the object. Meaning, even after you have called C<L<read|/read>> once, it still remembers the file name. So you can do this:
+The file name is "persistent" in the object. Meaning, that the C<filename> method remembers the last file that was C<L<read|/read>>.
 
     $parser->read(shift @ARGV);
     print $parser->filename(), ":\n",
@@ -555,18 +495,18 @@ The file name is "persistent" in the object. Meaning, even after you have called
           $parser->get_records(),
           "\n";
 
-But if you do a C<read> with a filehandle as argument, you'll see that the last filename is lost - which makes sense.
+A C<read> call with a filehandle, will reset last file name.
 
     $parser->read(\*MYFH);
     print "Last file name is lost\n" if not defined $parser->filename();
 
 =head2 filehandle
 
-Takes zero or one argument that must be either a filehandle C<GLOB> (such as C<\*STDIN>) or an object of the C<FileHandle> class. The method saves it for future a C<L<read|/read>> call. Returns the filehandle last saved, or C<undef> if none was saved. Remember that after a successful C<read> call, filehandles are lost.
+Takes an optional argument, that is a filehandle C<GLOB> (such as C<\*STDIN>) or an object of the C<FileHandle> class. Returns the filehandle last saved, or C<undef> if none was saved.
 
     my $fh = $parser->filehandle();
 
-Like in the case of C<L<filename|/filename>> method, if after you C<read> with a filehandle, you call C<read> again, this time with a file name, the last filehandle is lost.
+Like in the case of C<L<filename|/filename>> method, C<filehandle> is also "persistent" and remembers previous state even after C<read>.
 
     my $lastfh = $parser->filehandle();
     ## Will return STDOUT
@@ -577,13 +517,17 @@ Like in the case of C<L<filename|/filename>> method, if after you C<read> with a
 
 =head2 lines_parsed
 
-Takes no arguments. Returns the number of lines last parsed. A line is reckoned when the C<\n> character is encountered.
+Takes no arguments. Returns the number of lines last parsed.
 
     print $parser->lines_parsed, " lines were parsed\n";
 
-The value is auto-updated during the execution of C<L<read|/read>>. See L<this example|/"Example 2 : Error checking"> of how this can be used in derived classes.
+Every call of C<read>, causes the value to be auto-reset before parsing a new file.
 
-Again the information in this is "persistent". But you can also be assured that every time you call C<read>, the value be auto-reset before parsing.
+=head2 has_aborted
+
+Takes no arguments, returns a boolean to indicate if text reading was aborted in the middle.
+
+    print "Aborted\n" if $parser->has_aborted();
 
 =head2 get_records
 
@@ -593,12 +537,6 @@ Takes no arguments. Returns an array containing all the records saved by the par
         $i++;
         print "Record: $i: ", $record, "\n";
     }
-
-=head2 has_aborted
-
-Takes no arguments, returns a boolean to indicate if text reading was aborted in the middle.
-
-    print "Aborted\n" if $parser->has_aborted();
 
 =head2 pop_record
 
@@ -614,94 +552,79 @@ Takes no arguments and returns the last saved record. Leaves the saved records u
 
     my $last_rec = $parser->last_record;
 
-=head1 OVERRIDE IN SUBCLASS
+=head1 FOR USE IN SUBCLASS ONLY
 
-=head2 save_record
+Do NOT override these methods. They are valid only within a subclass, inside the user-implementation of methods described under L<OVERRIDE IN SUBCLASS|/"OVERRIDE IN SUBCLASS">. 
 
-Takes exactly one argument and that is saved as a record. Additional arguments are ignored. If no arguments are passed, then C<undef> is stored as a record.
+=head2 this_line
 
-In an application that uses a text parser, you will most-likely never call this method directly. It is automatically called within C<L<read|/read>> for each line. In this base class C<Text::Parser>, C<save_record> is simply called with a string containing the raw line of text ; i.e. the line of text will not be C<chomp>ed or modified in any way (unless of course the C<auto_chomp> attribute is turned on). L<Here|/"Example 1 : A simple CSV Parser"> is a basic example.
+Takes no arguments, and returns the current line being parsed. For example:
 
-Derived classes can decide to store records in a different form. A derived class could, for example, store the records in the form of hash references (so that when you use C<L<get_records|/get_records>>, you'd get an array of hashes), or maybe even another array reference (so when you use C<get_records> you'd get an array of arrays). The L<CSV parser example|/"Example 1 : A simple CSV Parser"> does the latter.
-
-=head2 line_auto_manip
-
-A method that could be overridden to manipulate each line before it gets to C<save_record> method. Because this is called before the C<save_record> method, it is called even before the C<Text::Parser::Multiline> role can be called. You will almost never call this method in a program directly but might use it in subclasses.
-
-The default implementation C<chomp>s lines (if C<auto_chomp> is true) and trims leading/trailing whitespace (if C<auto_trim> is not C<'n'>).
-
-If you override this method, remember that it takes a string as input and returns a string.
-
-=head2 is_line_continued
-
-This method is to be defined by the derived class and is used only for multi-line parsers. Look under L<FOR MULTI-LINE TEXT PARSING|/"FOR MULTI-LINE TEXT PARSING"> for details.
-
-=head1 DON'T OVERRIDE IN SUBCLASS
-
-=head2 push_records
-
-Don't override this method unless you know what you're doing. This method is useful if you have to copy the records from another parser. It is a general-purpose method for storing records that have been prepared before-hand. It is not supposed to be used to modify the arguments and make records (like C<L<save_record|/save_record>> does).
-
-    $parser->push_records(
-        $another_parser->get_records
-    );
-
-=head1 FOR USE IN SUBCLASS
+    sub save_record {
+        # ...
+        do_something($self->this_line);
+        # ...
+    }
 
 =head2 abort_reading
 
-Takes no arguments. Returns C<1>. You will probably never call this method in your main program.
+Takes no arguments. Returns C<1>. To be used only in the derived class to abort C<read> in the middle. See L<this example|/"Example 3 : Aborting without errors">.
 
-This method is usually used only in the derived class. See L<this example|/"Example 3 : Aborting without errors">.
-
-=head1 FOR MULTI-LINE TEXT PARSING
-
-=head2 is_line_continued
-
-Takes a string argument and returns a boolean indicating of the line is continued or not. If the user defines a new text format with multi-line support, they should implement this method. An example implementation would look like this:
-
-    sub is_line_continued {
-        my ($self, $line) = @_;
-        chomp $line;
-        $line =~ /\\\s*$/;
+    sub save_record {
+        # ...
+        $self->abort_reading if some_condition($self->this_line);
+        # ...
     }
 
-The above example method checks if a line is being continued by using a back-slash character (C<\>).
+=head2 push_records
 
-The default method provided in this class will return C<0> if the parser is not a multi-line parser. If it is a multi-line parser, return value depends on the type of multiline parser. If it is of type C<'join_last'>, then it returns C<1> for all lines except the first line. This means all lines continue from the previous line (except the first line, because there is no line before that). But if it is of type C<'join_next'>, then it returns C<1> for all lines unconditionally. B<Note:> This means the parser will expect further lines, even when the last line in the text input has been read. Thus you need to have a way to indicate that there is no further continuation. This is why if you are building a trivial line-joiner, you should use the C<'join_last'> type. See L<this example|/"Trivial line-joiner">
+This is useful if one needs to implement the parsing of an C<include>-like command in the parsed text format. The example below illustrates this.
 
-Most users would never need to use this method in their own programs, but if one is writing a parser for a specific format that supports multi-line extension, mostly they'd have to implement it.
+    package OneParser;
+    use parent 'Text::Parser';
 
-=head2 join_last_line
-
-This method can be overridden in multi-line text parsing. The method takes two string arguments and joins them in a way that removes the continuation character. The default implementation just concatenates two strings and returns the result without removing anything. You should redefine this method to strip any continuation characters and join the strings with any required spaces. Below is an example of a method which strips the ending back-slash continuation characters, that were detected in the C<L<is_line_continued|/is_line_continued>> method above.
-
-    sub join_last_line {
-        my $self = shift;
-        my ($last, $line) = (shift, shift);
-        $last =~ s/\\\s*$//g;
-        return "$last $line";
+    my save_record {
+        # ...
+        # Under some condition:
+        my $parser = AnotherParser->new();
+        $parser->read($some_file)
+        $parser->push_records($parser->get_records);
+        # ...
     }
 
-=head1 DEPRECATED
+=head1 OVERRIDE IN SUBCLASS
 
-=head2 setting
+The following methods should never be called in the C<::main> program. They are meant to be overridden (or re-defined) in a subclass.
 
-This method has been deprecated. Use C<multiline_type> and C<auto_chomp> instead.
+=head2 save_record
 
-I<(Note: This deprecated method cannot be used with the >C<auto_trim>I< attribute)>
+This method should be re-defined in a subclass to parse the target text format. To save a record, the re-defined implementation in the derived class must call C<SUPER::save_record> (or C<super> if you're using L<Moose>) with exactly one argument as a record. If no arguments are passed, C<undef> is stored as a record.
 
-I<This method will disappear from version 1.0 onwards.>
+For a developer re-defining C<save_record>, in addition to C<L<this_line|/"this_line">>, six additional methods become available if the C<auto_split> attribute is set. These methods are described in greater detail in L<Text::Parser::AutoSplit>, and they are accessible only within C<save_record>.
+
+B<Note:> Developers may store records in any form - string, array reference, hash reference, complex data structure, or an object of some class. The program that reads these records using C<L<get_records|/get_records>> has to interpret them. So developers should document the records created by their own implementation of C<save_record>.
+
+=head2 FOR MULTI-LINE TEXT PARSING
+
+These methods need to be re-defined by only multiline derived classes, i.e., if the target text format allows wrapping the content of one line into multiple lines. In most cases, you should re-define both methods. As usual, the C<L<this_line|/"this_line">> method may be used while re-defining them.
+
+=head3 is_line_continued
+
+This takes a string argument and returns a boolean indicating if the line is continued or not. See L<Text::Parser::Multiline> for more on this.
+
+The return values of the default method provided with this class are:
+
+    multiline_type    |    Return value
+    ------------------+---------------------------------
+    undef             |         0
+    join_last         |    0 for first line, 1 otherwise
+    join_next         |         1
+
+=head3 join_last_line
+
+This method takes two strings, joins them while removing any continuation characters, and returns the result. The default implementation just concatenates two strings and returns the result without removing anything (not even chomp). See L<Text::Parser::Multiline> for more on this.
 
 =head1 EXAMPLES
-
-=head2 Basic principle
-
-Derived classes simply need to override one method : C<L<save_record|/save_record>>. With the help of that any arbitrary file format can be read. C<save_record> should interpret the format of the text and store it in some form by calling C<SUPER::save_record>. The C<main::> program will then use the records and create an appropriate data structure with it.
-
-Notice that the creation of a data structure is not the objective of a parser. It is simply concerned with collecting data and arranging it in a form that can be used. That's all. Data structures can be created by a different part of your program using the data collected by your parser.
-
-B<Note:> There is support for L<Moose>. So you could use C<extends 'Text::Parser'> instead of the C<use parent> pragma in these examples. The examples in this documentation will show non-L<Moose> classic Perl OO derived classes for ease of understanding. Those who know how to C<use> class automators like L<Moo>/L<Moose> should be able to follow.
 
 =head2 Example 1 : A simple CSV Parser
 
@@ -734,9 +657,9 @@ The above program reads the content of a given CSV file and prints the content o
 
 =head2 Example 2 : Error checking
 
-This class encourages the use of exceptions for error checking. Read the documentation for C<L<Exceptions>> to learn about creating, throwing, and catching exceptions in Perl 5. All of the methods of creating, throwing, and catching exceptions described in L<Exceptions> are supported.
+I<Note:> Read the documentation for C<L<Exceptions>> to learn about creating, throwing, and catching exceptions in Perl 5. All of the methods of creating, throwing, and catching exceptions described in L<Exceptions> are supported.
 
-You I<can> throw exceptions from C<save_record>, for example, when you detect a syntax error. The C<read> method will C<close> all filehandles automatically as soon as an exception is thrown. The exception will pass through to C<::main> unless you catch and handle it in your derived class.
+You I<can> throw exceptions from C<save_record> in your subclass, for example, when you detect a syntax error. The C<read> method will C<close> all filehandles automatically as soon as an exception is thrown. The exception will pass through to C<::main> unless you catch and handle it in your derived class.
 
 Here is an example showing the use of an exception to detect a syntax error in a file:
 
@@ -911,21 +834,9 @@ Some text formats allow a line to indicate that it is continuing from a previous
 
 Try this parser with a SPICE deck with continuation characters and see what you get. Try having errors in the file. You may now write a more elaborate method for C<save_record> above and that could be used to parse a full SPICE file.
 
-=head1 ERRORS AND EXCEPTIONS
-
-This class adopts the principle that errors should be indicated with exceptions, and not a special return code or an error code. Several exceptions described in L<Text::Parser::Errors> could be thrown when using C<Text::Parser>. All these are derived from C<Text::Parser::Errors::GenericError>. Since this is a L<Moose> class, exceptions derived from C<L<Moose::Exception>> will be thrown when methods of this class are used improperly.
-
-In addition to these two types of exceptions, the developer can make her own exceptions. L<This example|/"Example 2 : Error checking"> shows how she could create her own exceptions. We recommend L<Syntax::Keyword::Try> (or L<Try::Tiny> if you can't use that) to catch exceptions.
-
-Since the handling of exceptions depends on their type, one could optionally build a handler routine using L<Dispatch::Class>.
-
 =head1 SEE ALSO
 
 =over 4
-
-=item *
-
-L<Text::Parser::Multiline>
 
 =item *
 
@@ -933,19 +844,15 @@ L<FileHandle>
 
 =item *
 
+L<Text::Parser::Errors>
+
+=item *
+
+L<Moose::Manual::Exceptions::Manifest>
+
+=item *
+
 L<Exceptions>
-
-=item *
-
-L<Throwable::SugarFactory>
-
-=item *
-
-L<Syntax::Keyword::Try>
-
-=item *
-
-L<Try::Tiny>
 
 =item *
 
@@ -953,7 +860,7 @@ L<Dispatch::Class>
 
 =item *
 
-L<Moose>
+L<Text::Parser::Multiline>
 
 =item *
 

@@ -12,7 +12,6 @@ use Term::TablePrint   qw( print_table );
 use App::DBBrowser::Auxil;
 use App::DBBrowser::DB;
 #use App::DBBrowser::GetContent; # required
-use App::DBBrowser::Opt;
 use App::DBBrowser::Table::Substatements;
 
 
@@ -255,12 +254,11 @@ sub __build_insert_stmt {
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     $ax->reset_sql( $sql );
-    my @cu_keys = ( qw/insert_col insert_copy insert_file settings/ );
+    my @cu_keys = ( qw/insert_col insert_copy insert_file/ );
     my %cu = (
         insert_col  => '- Plain',
         insert_file => '- From File',
         insert_copy => '- Copy & Paste',
-        settings    => '  Settings'
     );
     my $old_idx = 0;
 
@@ -286,11 +284,6 @@ sub __build_insert_stmt {
             }
         }
         delete $ENV{TC_RESET_AUTO_UP};
-        if ( $custom eq $cu{settings} ) {
-            my $opt = App::DBBrowser::Opt->new( $sf->{i}, $sf->{o} );
-            $opt->config_insert;
-            next MENU;
-        }
         my $cols_ok = $sf->__insert_into_stmt_columns( $sql );
         if ( ! $cols_ok ) {
             next MENU;

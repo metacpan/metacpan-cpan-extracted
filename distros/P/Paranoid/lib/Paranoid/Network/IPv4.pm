@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/Network/IPv4.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/Network/IPv4.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -32,7 +32,7 @@ my @constants = qw(MAXIPV4CIDR IPV4REGEX IPV4CIDRRGX IPV4BASE IPV4BRDCST
     IPV4MASK);
 my @ipv4sort = qw(ipv4NumSort ipv4StrSort ipv4PackedSort);
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 @EXPORT      = @base;
 @EXPORT_OK   = ( @base, @constants, @ipv4sort );
 %EXPORT_TAGS = (
@@ -244,7 +244,7 @@ Paranoid::Network::IPv4 - IPv4-related functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/IPv4.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/Network/IPv4.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 

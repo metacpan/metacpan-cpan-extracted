@@ -42,7 +42,7 @@
    "provides" : {
       "App::Spoor" : {
          "file" : "lib/App/Spoor.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "App::Spoor::AccessEntryParser" : {
          "file" : "lib/App/Spoor/AccessEntryParser.pm",
@@ -90,7 +90,7 @@
       },
       "App::Spoor::ParsedFileManager" : {
          "file" : "lib/App/Spoor/ParsedFileManager.pm",
-         "version" : "0.01"
+         "version" : "0.06"
       },
       "App::Spoor::Security" : {
          "file" : "lib/App/Spoor/Security.pm",
@@ -114,6 +114,6 @@
          "http://www.perlfoundation.org/artistic_license_2_0"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

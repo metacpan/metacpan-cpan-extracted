@@ -416,6 +416,16 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 43017
 		}
+	], 'us/pa/statewide.csv' => [
+		{
+			'LAT' => 40.206267,
+			'LON' => -79.565682,
+			'NAME' => 'NEW STANTON SERVICE PLAZA',
+			'CITY' => 'HEMPFIELD',
+			'STATE' => 'PA',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 15639
+		}
 	], 'us/va/statewide.csv' => [
 		{
 			'LAT' => 44.40662476,
@@ -1122,6 +1132,7 @@ if(my $oa = $ENV{'OPENADDR_HOME'}) {
 					$inserts = 0;
 				}
 			}
+			close $file;
 		}
 
 		# print "Debug exit\n" if(DEBUG&DEBUG_ALL);

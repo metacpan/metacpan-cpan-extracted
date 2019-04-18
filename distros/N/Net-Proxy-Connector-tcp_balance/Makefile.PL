@@ -29,10 +29,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Test::Fork" => 0,
     "Test::More" => 0,
-    "blib" => "1.01"
+    "Test::Warn" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,9 +45,10 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Net::Proxy::Connector::tcp" => 0,
+  "Test::Fork" => 0,
   "Test::More" => 0,
+  "Test::Warn" => 0,
   "base" => 0,
-  "blib" => "1.01",
   "strict" => 0,
   "warnings" => 0
 );

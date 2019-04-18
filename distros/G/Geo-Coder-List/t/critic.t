@@ -6,8 +6,8 @@ use File::Spec;
 use Test::Most;
 use English qw(-no_match_vars);
 
-unless($ENV{RELEASE_TESTING}) {
-    plan( skip_all => "Author tests not required for installation" );
+unless($ENV{AUTHOR_TESTING}) {
+	plan(skip_all => 'Author tests not required for installation');
 }
 
 eval "use Test::Perl::Critic";

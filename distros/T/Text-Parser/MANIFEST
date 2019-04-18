@@ -9,11 +9,13 @@ META.yml
 Makefile.PL
 README
 README.PATCHING
+appveyor.yml
 dist.ini
 lib/Text/Parser.pm
 lib/Text/Parser/AutoSplit.pm
 lib/Text/Parser/Errors.pm
 lib/Text/Parser/Multiline.pm
+t/Spice-Parser-2.t
 t/Spice-Parser-3.t
 t/Spice-Parser-4.t
 t/Spice-Parser.t
@@ -29,6 +31,7 @@ t/Text-Parser.t
 t/account.txt
 t/author-minimum-version.t
 t/author-pod-coverage.t
+t/author-pod-linkcheck.t
 t/author-pod-syntax.t
 t/auto_trim.t
 t/bad-basic-joiner.t
@@ -50,6 +53,7 @@ t/mult-basic.t
 t/release-cpan-changes.t
 t/release-distmeta.t
 t/release-kwalitee.t
+t/split-no-trim.t
 t/text-simple.txt
 t/trim-vs-split.t
 t/trim-vs-split.txt

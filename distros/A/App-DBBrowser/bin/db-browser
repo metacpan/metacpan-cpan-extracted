@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '2.070';
+our $VERSION = '2.071';
 
 use Term::Choose::Constants qw( :screen );
 
@@ -50,7 +50,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.070
+Version 2.071
 
 =cut
 
@@ -332,11 +332,15 @@ Create a table.
 =item Copy and Paste
 
 Reads from STDIN until the end of input. Then it creates a table and inserts the records of fields parsed from the input
-data. In the I<Settings> one can configure how the data is parsed.
+data.
+
+The input filter L</Reparse> allows one to change the parse-settings.
 
 =item From File
 
 Like I<Copy and Paste> with the difference that the data is read from a chosen file.
+
+Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
 
 Selecting the prompt line of the I<Files> menu allows one to set the options described in L</Insert Data>.
 
@@ -367,9 +371,15 @@ Insert data column by column.
 
 Multi line input: reads until the end of input. It is OS-depend how to indicate the end of input.
 
+The input filter L</Reparse> allows one to change the parse-settings.
+
 =item From File
 
-Read the input from am file. Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+Read the input from am file.
+
+Supported file formats: text files and file formats supported by L<Spreadsheet::Read>.
+
+Selecting the prompt line of the I<Files> menu allows one to set the options described in L</Insert Data>.
 
 =back
 

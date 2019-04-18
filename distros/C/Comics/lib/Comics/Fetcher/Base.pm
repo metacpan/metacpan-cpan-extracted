@@ -117,4 +117,25 @@ sub save_html {
     ::debug("Wrote: $f");
 }
 
+=head2 load_html($html)
+
+Loads the HTML fragment for this comic from the spooldir,
+
+See also: B<spoolfile>.
+
+=cut
+
+sub load_html {
+    my ( $self, $html ) = @_;
+    my $f = $self->spoolfile($html);
+    open( my $fd, "<:utf8", $f );
+    unless ( $fd ) {
+	::debug("Cannot reuse $html: $!\n");
+	return;
+    }
+    my $data = do { local $/; <$fd> };
+    ::debug("Read: $f");
+    return $data;
+}
+
 1;

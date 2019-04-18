@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 33;
+use Test::Most tests => 34;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 OSM: {
 	SKIP: {
-		skip 'Test requires Internet access', 31 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 32 unless(-e 't/online.enabled');
 
 		eval {
 			require Geo::Coder::OSM;
@@ -31,7 +31,7 @@ OSM: {
 
 		if($@) {
 			diag('Geo::Coder::OSM not installed - skipping tests');
-			skip 'Geo::Coder::OSM not installed', 31;
+			skip('Geo::Coder::OSM not installed', 32);
 		} else {
 			diag("Using Geo::Coder::OSM $Geo::Coder::OSM::VERSION");
 		}
@@ -73,8 +73,11 @@ OSM: {
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 39.00, 1e-1);
 		delta_within($location->{geometry}{location}{lng}, -77.10, 1e-1);
+
+		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
+
 		ok($location->{address}{country_code} eq 'us');
-		like($location->{address}{country}, qr/United States/, 'check USA');
+		like($location->{address}{country}, qr/USA$/, 'check USA');
 
 		my @locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
 		my $count = scalar(@locations);

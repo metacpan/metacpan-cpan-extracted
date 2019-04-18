@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'coreapi.1api.net' => 80 );
 
-use version 0.9917; our $VERSION = version->declare('v2.1.0');
+use version 0.9917; our $VERSION = version->declare('v2.2.0');
 
 # T1-4: test import modules
 use_ok('Config');
@@ -125,6 +125,12 @@ $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 is( $tpl->getRuntime(), 0, 'ResponseTemplate: Check response runtime of template `empty`' );
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response\r\nruntime=0.12\r\nEOF\r\n");
 is( $tpl->getRuntime(), $RES_RUNTIME, 'ResponseTemplate: Check response runtime' );
+
+# ~> isPending method test
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
+is( $tpl->isPending(), 0, 'ResponseTemplate: Check response pending value of template `empty`' );
+$tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=423\r\ndescription=Empty API response\r\npending=1\r\nEOF\r\n");
+is( $tpl->isPending(), 1, 'ResponseTemplate: Check response pending value' );
 
 # ---- Module "ResponseTemplateManager" ---- #
 # - T25 ~> getTemplate method test

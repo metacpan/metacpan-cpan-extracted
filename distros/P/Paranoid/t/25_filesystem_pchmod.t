@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 
-use Test::More tests => 19;
+use Test::More tests => 20;
 use Paranoid;
 use Paranoid::Debug;
 use Paranoid::Filesystem qw(:all);
@@ -31,6 +31,9 @@ foreach ( '', qw(0990 xr+uG) ) {
     $rv = ptranslatePerms($_);
     is( $rv, undef, "perms undef ($_)" );
 }
+
+$rv = ptranslatePerms('04755');
+is( $rv, 04755, 'perms octal string' );
 
 mkdir './t/test_chmod';
 system('touch ./t/test_chmod/foo ./t/test_chmod/bar');
@@ -64,9 +67,10 @@ ok( !pchmod(
 ok( pchmod( './t/test_chmod/*', 0700 ), 'pchmod 4' );
 ok( !pchmod( './t/test_chmod/roooo', 0755, %errors ), 'pchmod 5' );
 
-mkdir './t/test_chmod2',     0777;
-mkdir './t/test_chmod2/foo', 0777;
-mkdir './t/test_chmod2/roo', 0777;
+mkdir './t/test_chmod2';
+mkdir './t/test_chmod2/foo';
+mkdir './t/test_chmod2/roo';
+chmod 0777, qw(./t/test_chmod2 ./t/test_chmod2/foo ./t/test_chmod2/roo);
 symlink '../../test_chmod', './t/test_chmod2/foo/bar';
 
 ok( pchmodR( './t/test_chmod2/*', 0750, 0, %errors ), 'pchmodR 1' );

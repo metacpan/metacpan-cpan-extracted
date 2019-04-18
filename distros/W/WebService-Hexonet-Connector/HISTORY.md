@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/hexonet/perl-sdk/compare/v2.1.0...v2.2.0) (2019-04-18)
+
+
+### Features
+
+* **responsetemplate:** add isPending method ([abe830c](https://github.com/hexonet/perl-sdk/commit/abe830c))
+
 # [2.1.0](https://github.com/hexonet/perl-sdk/compare/v2.0.1...v2.1.0) (2019-04-03)
 
 

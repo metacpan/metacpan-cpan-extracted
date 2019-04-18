@@ -23,8 +23,10 @@ my %WriteMakefileArgs = (
     "AppLib::CreateSelfSignedSSLCert" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
+    "Log::ger" => "0.027",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.79",
+    "Perinci::CmdLine::Base" => "1.816",
+    "Perinci::CmdLine::Classic" => "1.770",
     "Perinci::Sub::DepChecker" => 0,
     "Perinci::Sub::XCompletion::filename" => 0
   },
@@ -34,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.150",
+  "VERSION" => "0.151",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,8 +50,10 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Log::ger" => "0.027",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.79",
+  "Perinci::CmdLine::Base" => "1.816",
+  "Perinci::CmdLine::Classic" => "1.770",
   "Perinci::Sub::DepChecker" => 0,
   "Perinci::Sub::XCompletion::filename" => 0,
   "Test::More" => 0

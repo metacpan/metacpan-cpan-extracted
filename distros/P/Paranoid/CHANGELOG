@@ -1,5 +1,47 @@
 CHANGELOG
 
+v2.07 (2019/02/01)
+==================
+Paranoid::Args:
+--Consolidate error messages, removing reports for both short/long argument
+  versions, etc
+--Correlate AccompaniedBy/ExclusiveOf errors to both long/short versions
+--Automatically set Multiple/CanBundle and Template for any templates
+  w/CountShort
+--Automatically set CanBundle for any options w/a short option and a
+  template of '' or '$'.  The latter is done if there is also a long
+  name for the option
+--Add templates for debug, verbose, help, and version for convenience
+Paranoid::Debug:
+--Modified pdebug to provide support for plog-passing of messages
+--PDPREFIX subroutines are now passed the appropriate caller name during
+  invocation
+--Added PDEBUG1 - PDEBUG8 for developer convenience
+Paranoid::Filesystem:
+--Fix pmkdir to treat permissions as explicit, not relative to umask
+--Modified ptranslatePerms to allow it to be passed octal numbers (or string
+  representations of octal numbers) and have it return those values
+  unmodified.  This makes it agnostic to translated or untranslated input.
+Paranoid::Glob:
+--Prune redundant / in paths
+Paranoid::Input:
+--Documented NEWLINE_REGEX
+Paranoid::IO:
+--File locking had some corner cases in which flocks weren't applied.
+  Removed that logic entirely, locks are now applied, regardless.
+Paranoid::Log:
+--Added Stdout mechanism that passes log messages to STDOUT
+--Added Stderr mechanism that passes log messages to STDERR
+--Added PDebug mechanism that passes log messages to pdebug, and allows
+  for pdebug to be used as a message preprocessor for sprintf functionality
+--Added plverbosity as a convenience function to support Stdout/Stderr
+  messages for non-interactive applications
+Paranoid::Process:
+--fixed pfork to make sure the children counters were reset for the child,
+  so max children limits apply on a per-process basis.  Doing it globally
+  was unreliable, especially since children only knew what the parent's
+  count was prior to forking.
+
 v2.06 (2018/08/06)
 ==================
 --Typos in documentation (Debian Perl Group)

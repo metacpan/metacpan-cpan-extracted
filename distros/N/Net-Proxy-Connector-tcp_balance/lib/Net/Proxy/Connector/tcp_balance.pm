@@ -1,6 +1,6 @@
 ## no critic (RequireUseStrict)
 package Net::Proxy::Connector::tcp_balance;
-$Net::Proxy::Connector::tcp_balance::VERSION = '0.005';
+$Net::Proxy::Connector::tcp_balance::VERSION = '0.006';
 ## use critic (RequireUseStrict)
 use strict;
 use warnings;
@@ -18,16 +18,18 @@ sub connect {
     elsif ( $self->{sort} and $self->{sort} eq 'none' ){
         @hosts_sorted = @{$self->{hosts}};
     }
+    warn "[ ".localtime." ] tcp_balance hosts_sorted are: ".join(',', @hosts_sorted)."\n" if $self->{verbose};
     for ( @hosts_sorted ) {
         $self->{host} = $_;
         my $sock = eval { $self->SUPER::connect(@params); };
         if ($@) { # connect() dies if the connection fails
-            warn "tcp_balance failed to connect to ".$self->{host} ." '$@'\n";
+            warn "[ ".localtime." ] tcp_balance failed to connect to ".$self->{host} ." '$@'\n";
             next;
         }
+        warn "[ ".localtime." ] tcp_balance connected to ".$self->{host} ." '$@'\n" if $self->{verbose};
         return $sock if $sock;
     }
-    die "tcp_balance failed all hosts";
+    die "[ ".localtime." ] tcp_balance failed all hosts";
 }
 
 1;
@@ -42,7 +44,7 @@ Net::Proxy::Connector::tcp_balance - A Net::Proxy connector for outbound tcp bal
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -54,24 +56,24 @@ version 0.005
     # using standard TCP connections
     my $proxy = Net::Proxy->new(
         {   in  => { type => 'tcp', port => '6789' },
-            out => { type => 'tcp_balance', hosts => [ 'remotehost1', 'remotehost2' ], port => '9876' },
+            out => { type => 'tcp_balance', hosts => [ 'remotehost1', 'remotehost2' ], port => '9876', verbose => 1 },
         }
     );
     $proxy->register();
 
     Net::Proxy->mainloop();
 
-=head1 NAME
-
-Net::Proxy::Connector::tcp_balance - connector for outbound tcp balancing and failover
-
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 C<Net::Proxy::Connector::tcp_balance> is an outbound tcp connector for C<Net::Proxy> that provides randomized load balancing and also provides failover when outbound tcp hosts are unavailable.
 
 It will randomly connect to one of the specified hosts. If that host is unavailable, it will continue to try the other hosts until it makes a connection.
 
 The capabilities of the C<Net::Proxy::Connector::tcp_balance> are otherwise identical to those C<Net::Proxy::Connector::tcp>
+
+=head1 NAME
+
+Net::Proxy::Connector::tcp_balance - connector for outbound tcp balancing and failover
 
 =head1 CONNECTOR OPTIONS
 
@@ -97,7 +99,7 @@ The listening port.
 
 =item * hosts
 
-The remote hosts.  An array ref. 
+The remote hosts.  An array ref.
 
 =item * port
 
@@ -111,6 +113,10 @@ The remote port.
 
 The socket timeout for connection (C<out> only).
 
+=item * verbose
+
+(Optional) Will print to STDERR the list of sorted hosts for every request.
+
 =back
 
 =head1 AUTHOR
@@ -119,7 +125,7 @@ Jesse Thompson <zjt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Jesse Thompson.
+This software is copyright (c) 2019 by Jesse Thompson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

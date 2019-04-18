@@ -10,9 +10,12 @@ sub ok {
     my $log     = $c->app->log;
     my $user_id = $c->stash('user_id') || die 'no user_id in stash';
     if ($c->allowed($user_id, 'tables')) {
-        my $model = $c->app->config('model');
+        my $logourl = $c->app->config('logourl') || $c->url_for('/img/tables.png');
+        my $model   = $c->app->config('model');
         $c->shipped( tablist => $model->{tablist},
-                     bytable => $model->{bytable} );
+                     bytable => $model->{bytable},
+                     urlbase => $c->req->url->base,
+                     logourl => $logourl );
         $c->stash( schema=>$model->{schema} );
         return 1;
     }
@@ -165,7 +168,7 @@ sub nuke {
     my $row0 = "$row";
     my $hits = $row->nuke;
     $c->add_flash(messages=>"REMOVED $row0 at key $id and all subordinate info.. $hits records in total") if $hits;
-    my $url  = $c->url_for('tables')->query(start_with=>$table);
+    my $url  = $c->url_for('/tables')->query(start_with=>$table);
     $c->redirect_to($url);
 
 }

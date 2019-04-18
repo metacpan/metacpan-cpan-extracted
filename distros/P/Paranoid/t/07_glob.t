@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 use Paranoid;
 use Paranoid::Glob;
 use Paranoid::Debug;
@@ -20,7 +20,9 @@ symlink 't/{asdfa-sdfas}', 't/test-bar';
 
 ok( $obj = new Paranoid::Glob, 'glob object new 1' );
 
-$obj = Paranoid::Glob->new( globs => ['./t/*'], );
+$obj = Paranoid::Glob->new( globs => ['./t///*'], );
+
+is( grep( m#//#, @$obj ), 0, 'redundant /' );
 
 ok( defined $obj, 'glob object new 2' );
 ok( grep( qr/99_pod.t/, @$obj ),        'file found 1' );

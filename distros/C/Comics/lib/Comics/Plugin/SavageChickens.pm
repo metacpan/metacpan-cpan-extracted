@@ -7,26 +7,21 @@ package Comics::Plugin::SavageChickens;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.01";
+our $VERSION = "1.00";
 
-sub register {
-
-    shift->SUPER::register
-      ( { name    => "Savage Chickens",
-	  url     => "http://www.savagechickens.com/",
-	  pat     =>
-	    qr{ <div \s+ class="entry_content"> \s+
+our $name    = "Savage Chickens";
+our $url     = "https://www.savagechickens.com/";
+our $pattern =
+	    qr{ <div \s+ class="entry_content"> \s*
 		<p> \s*
 		<img \s+
-		 src="(?<url>http://www.savagechickens.com/
+		 src="(?<url>https?://www.savagechickens.com/
 		        wp-content/uploads/
 		       (?<image>.*?\.\w+))" \s+
 		 alt="(?<alt>.*?)" \s+
 		 width="\d+" \s+ height="\d+" \s*
 		 /> \s* </p>
-	      }sx,
-	} );
-}
+	      }sx;
 
 # Important: Return the package name!
 __PACKAGE__;

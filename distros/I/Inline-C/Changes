@@ -1,5 +1,14 @@
+0.80 Thu 18 Apr 2019 10:42:30 AM CEST
+ - Apply PR#71 (ETJ++) Support perl 5.8.1 again
+ - Apply PR#74 and PR#76 (WBRASWELL++) Fix Include Dir Behavior, replace -I
+   with -iquote or -I- respectively
+ - Apply PR#77 (WBRASWELL++) Fix Include Dir Behavior, Non-GCC Compilers
+ - More fixes for include dir behaviour (@sisyphus++)
+
 0.78 Tue 30 May 22:56:30 CEST 2017
  - Apply PR#66 (TINITA++) Remove system calls `rm` and `diff`
+ - Apply PR#65 (TINITA++) Use FindBin in tests (Dot gets removed from @INC
+   in perl 5.26)
 
 0.77 Fri 12 May 17:57:36 CEST 2017
  - Apply PR#63 (@mohawk2++)

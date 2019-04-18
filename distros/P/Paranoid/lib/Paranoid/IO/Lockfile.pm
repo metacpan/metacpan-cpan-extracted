@@ -2,7 +2,7 @@
 #
 # (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
 #
-# $Id: lib/Paranoid/IO/Lockfile.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+# $Id: lib/Paranoid/IO/Lockfile.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 #
 #    This software is licensed under the same terms as Perl, itself.
 #    Please see http://dev.perl.org/licenses/ for more information.
@@ -28,7 +28,7 @@ use Paranoid;
 use Paranoid::Debug qw(:all);
 use Paranoid::IO;
 
-($VERSION) = ( q$Revision: 2.06 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(plock pexclock pshlock punlock);
 @EXPORT_OK   = @EXPORT;
@@ -52,19 +52,19 @@ sub plock {
 
     my $filename = shift;
     my $type     = shift;
-    my $mode     = shift;
+    my $perms    = shift;
     my ( $rv, $fh );
 
-    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $filename, $type, $mode );
+    pdebug( 'entering w/(%s)(%s)(%s)', PDLEVEL1, $filename, $type, $perms );
     pIn();
 
     # Set the defaults
-    $mode = PRIV_UMASK unless defined $mode;
-    $type = LOCK_EX    unless defined $type;
+    $perms = PRIV_UMASK unless defined $perms;
+    $type  = LOCK_EX    unless defined $type;
 
     # Open the file and apply the lock
-    $fh = popen( $filename, O_RDWR | O_CREAT | O_EXCL, $mode )
-        || popen( $filename, O_RDWR, $mode );
+    $fh = popen( $filename, O_RDWR | O_CREAT | O_EXCL, $perms )
+        || popen( $filename, O_RDWR, $perms );
     $rv = pflock( $filename, $type ) if defined $fh;
 
     pOut();
@@ -149,7 +149,7 @@ Paranoid::IO::Lockfile - Paranoid Lockfile support
 
 =head1 VERSION
 
-$Id: lib/Paranoid/IO/Lockfile.pm, 2.06 2018/08/05 01:21:48 acorliss Exp $
+$Id: lib/Paranoid/IO/Lockfile.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 
 =head1 SYNOPSIS
 

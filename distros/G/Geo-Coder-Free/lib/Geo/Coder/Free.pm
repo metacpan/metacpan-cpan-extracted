@@ -17,11 +17,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 our $alternatives;
 
@@ -212,6 +212,37 @@ To be done.
 =cut
 
 sub reverse_geocode {
+	my $self = shift;
+	my %param;
+
+	if(ref($_[0]) eq 'HASH') {
+		%param = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
+	} elsif(@_ % 2 == 0) {
+		%param = @_;
+	} else {
+		$param{location} = shift;
+	}
+
+	# The drivers don't yet support it
+	if($self->{'openaddr'}) {
+		if(wantarray) {
+			my @rc = $self->{'openaddr'}->geocode(\%param);
+		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
+			return $rc;
+		}
+	}
+
+	if($param{'location'}) {
+		if(wantarray) {
+			my @rc = $self->{'maxmind'}->geocode(\%param);
+			return @rc;
+		} else {
+			return $self->{'maxmind'}->geocode(\%param);
+		}
+	}
+
 	Carp::croak('Reverse lookup is not yet supported');
 }
 
